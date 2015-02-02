@@ -1,0 +1,1 @@
+Executable( 'Tests', project, sources = [ 'threads' ], libs = [ 'Core' ], include = [ '../' ] )

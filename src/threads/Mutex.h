@@ -1,0 +1,100 @@
+/**************************************************************************
+
+ The MIT License (MIT)
+
+ Copyright (c) 2015 Dmitry Sovetov
+
+ https://github.com/dmsovetov
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+ **************************************************************************/
+
+#ifndef		__DC_Mutex_H__
+#define		__DC_Mutex_H__
+
+#include	"Threads.h"
+
+namespace dreemchest {
+
+namespace thread {
+        
+	// ** class Mutex
+    //! Mutex object.
+	class dcInterface Mutex {
+	public:
+
+		virtual				~Mutex( void );
+
+        //! Releases this Mutex object.
+		void				release( void );
+
+        //! Creates a new Mutex object.
+        /*!
+         \param recursive Flag indicating that a recursive mutex should be created.
+         \return Mutex object.
+         */
+        static Mutex*       create( bool recursive = false );
+
+        //! Tries to lock this mutex, returns true if the lock is successfull (mutex was not locked before this call), otherwise returns false.
+		virtual bool		tryLock( void )	= 0;
+
+        //! Locks this mutex.
+		virtual void		lock( void )	= 0;
+
+        //! Unlocks this mutex.
+		virtual void		unlock( void )	= 0;
+	};
+
+    // ** class Condition
+    //! Condition object.
+    class dcInterface Condition {
+    public:
+
+        virtual             ~Condition( void );
+
+        //! Releases this Condition object.
+        void				release( void );
+
+        //! Creates a new Condition object.
+        static Condition*   create( void );
+
+        //! Waits for this condition to trigger.
+        virtual void        wait( void )    = 0;
+
+        //! Triggers this condition.
+        virtual void        trigger( void ) = 0;
+    };
+
+    // ** class ScopedLock
+    //! A helper struct to lock a mutex by a C++ scope.
+    class ScopedLock {
+    public:
+
+                    ScopedLock( dcMutex mutex ) : m_mutex( mutex ) { m_mutex->lock(); }
+                    ~ScopedLock( void ) { m_mutex->unlock(); }
+
+    private:
+
+        dcMutex     m_mutex;
+    };
+
+} // namespace thread
+
+} // namespace dreemchest
+
+#endif	/*	!__DC_Mutex_H__	*/
