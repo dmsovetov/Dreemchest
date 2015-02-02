@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_TaskQueue_H__
-#define		__DC_TaskQueue_H__
+#ifndef        __DC_TaskQueue_H__
+#define        __DC_TaskQueue_H__
 
-#include	"../../Common.h"
+#include    "../../Common.h"
 #include    "TaskProgress.h"
 
 namespace dreemchest {
@@ -76,4 +76,4 @@ namespace thread {
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_TaskQueue_H__	*/
+#endif    /*    !__DC_TaskQueue_H__    */

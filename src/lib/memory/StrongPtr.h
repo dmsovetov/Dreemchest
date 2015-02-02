@@ -24,129 +24,129 @@
 
  **************************************************************************/
 
-#ifndef		__DC_StrongPtr_H__
-#define		__DC_StrongPtr_H__
+#ifndef        __DC_StrongPtr_H__
+#define        __DC_StrongPtr_H__
 
-#include	"RefCounted.h"
+#include    "RefCounted.h"
 
 namespace dreemchest {
 
-	// ** class StrongPtr
-	template<typename T>
-	class StrongPtr {
-	public:
+    // ** class StrongPtr
+    template<typename T>
+    class StrongPtr {
+    public:
 
                         StrongPtr( T *pointer = NULL );
                         StrongPtr( const StrongPtr<T>& other );
                         ~StrongPtr( void );
 
-		T*				get( void ) const;
-		T*				operator -> ( void );
-		const T*		operator -> ( void ) const;
-		T&				operator *	( void );
-		const T&		operator *	( void ) const;
-		StrongPtr&		operator =	( T *pointer );
-		StrongPtr&		operator =	( StrongPtr<T>& other );
-		bool			operator ==	( const StrongPtr<T>& other ) const;
-		bool			operator != ( const StrongPtr<T>& other ) const;
+        T*                get( void ) const;
+        T*                operator -> ( void );
+        const T*        operator -> ( void ) const;
+        T&                operator *    ( void );
+        const T&        operator *    ( void ) const;
+        StrongPtr&        operator =    ( T *pointer );
+        StrongPtr&        operator =    ( StrongPtr<T>& other );
+        bool            operator ==    ( const StrongPtr<T>& other ) const;
+        bool            operator != ( const StrongPtr<T>& other ) const;
 
-	private:
+    private:
 
-		void			setPointer( RefCounted *pointer );
+        void            setPointer( RefCounted *pointer );
 
-	private:
+    private:
 
-		RefCounted*     m_ptr;
-	};
+        RefCounted*     m_ptr;
+    };
 
-	// ** StrongPtr::StrongPtr
-	template<typename T>
-	StrongPtr<T>::StrongPtr( T *pointer ) : m_ptr( pointer ) {
-		if( m_ptr ) {
-			static_cast<RefCounted*>( m_ptr )->retain();
-		}
-	}
+    // ** StrongPtr::StrongPtr
+    template<typename T>
+    StrongPtr<T>::StrongPtr( T *pointer ) : m_ptr( pointer ) {
+        if( m_ptr ) {
+            static_cast<RefCounted*>( m_ptr )->retain();
+        }
+    }
 
-	// ** StrongPtr::StrongPtr
-	template<typename T>
-	StrongPtr<T>::StrongPtr( const StrongPtr<T>& other ) : m_ptr( other.m_ptr ) {
-		if( m_ptr ) {
-			static_cast<RefCounted*>( m_ptr )->retain();
-		}
-	}
+    // ** StrongPtr::StrongPtr
+    template<typename T>
+    StrongPtr<T>::StrongPtr( const StrongPtr<T>& other ) : m_ptr( other.m_ptr ) {
+        if( m_ptr ) {
+            static_cast<RefCounted*>( m_ptr )->retain();
+        }
+    }
 
-	// ** StrongPtr::~StrongPtr
-	template<typename T>
-	StrongPtr<T>::~StrongPtr( void ) {
-		if( m_ptr ) {
-			m_ptr->release();
-			m_ptr = NULL;
-		}
-	}
+    // ** StrongPtr::~StrongPtr
+    template<typename T>
+    StrongPtr<T>::~StrongPtr( void ) {
+        if( m_ptr ) {
+            m_ptr->release();
+            m_ptr = NULL;
+        }
+    }
 
-	// ** StrongPtr::get
-	template<typename T>
-	T* StrongPtr<T>::get( void ) const  {
-		return ( T* )m_ptr;
-	}
+    // ** StrongPtr::get
+    template<typename T>
+    T* StrongPtr<T>::get( void ) const  {
+        return ( T* )m_ptr;
+    }
 
-	// ** StrongPtr::operator ->
-	template<typename T>
-	T* StrongPtr<T>::operator -> ( void ) {
-		DC_BREAK_IF( m_ptr == NULL );
-		return ( T* )m_ptr;
-	}
+    // ** StrongPtr::operator ->
+    template<typename T>
+    T* StrongPtr<T>::operator -> ( void ) {
+        DC_BREAK_IF( m_ptr == NULL );
+        return ( T* )m_ptr;
+    }
 
-	template<typename T>
-	const T* StrongPtr<T>::operator -> ( void ) const {
-		DC_BREAK_IF( m_ptr == NULL );
-		return ( T* )m_ptr;
-	}
+    template<typename T>
+    const T* StrongPtr<T>::operator -> ( void ) const {
+        DC_BREAK_IF( m_ptr == NULL );
+        return ( T* )m_ptr;
+    }
 
-	// ** StrongPtr::operator *
-	template<typename T>
-	T& StrongPtr<T>::operator * ( void ) {
-		DC_BREAK_IF( m_ptr == NULL );
-		return *m_ptr;
-	}
+    // ** StrongPtr::operator *
+    template<typename T>
+    T& StrongPtr<T>::operator * ( void ) {
+        DC_BREAK_IF( m_ptr == NULL );
+        return *m_ptr;
+    }
 
-	// ** StrongPtr::operator =
-	template<typename T>
-	StrongPtr<T>& StrongPtr<T>::operator = ( StrongPtr<T>& other ) {
-		setPointer( other.m_ptr );
-		return *this;
-	}
+    // ** StrongPtr::operator =
+    template<typename T>
+    StrongPtr<T>& StrongPtr<T>::operator = ( StrongPtr<T>& other ) {
+        setPointer( other.m_ptr );
+        return *this;
+    }
 
-	template<typename T>
-	StrongPtr<T>& StrongPtr<T>::operator = ( T *pointer ) {
-		setPointer( pointer );
-		return *this;
-	}
+    template<typename T>
+    StrongPtr<T>& StrongPtr<T>::operator = ( T *pointer ) {
+        setPointer( pointer );
+        return *this;
+    }
 
-	// ** StrongPtr::operator ==
-	template<typename T>
-	bool StrongPtr<T>::operator == ( const StrongPtr<T>& other ) const {
-		return ( m_ptr == other.m_ptr );
-	}
+    // ** StrongPtr::operator ==
+    template<typename T>
+    bool StrongPtr<T>::operator == ( const StrongPtr<T>& other ) const {
+        return ( m_ptr == other.m_ptr );
+    }
 
-	// ** StrongPtr::operator !=
-	template<typename T>
-	bool StrongPtr<T>::operator != ( const StrongPtr<T>& other ) const {
-		return ( m_ptr != other.m_ptr );
-	}
+    // ** StrongPtr::operator !=
+    template<typename T>
+    bool StrongPtr<T>::operator != ( const StrongPtr<T>& other ) const {
+        return ( m_ptr != other.m_ptr );
+    }
 
-	// ** StrongPtr::setPointer
-	template<typename T>
-	void StrongPtr<T>::setPointer( RefCounted *pointer ) {
-		if( m_ptr ) {
-			m_ptr->release();
-		}
+    // ** StrongPtr::setPointer
+    template<typename T>
+    void StrongPtr<T>::setPointer( RefCounted *pointer ) {
+        if( m_ptr ) {
+            m_ptr->release();
+        }
 
-		if( (m_ptr = pointer) ) {
-			m_ptr->retain();
-		}
-	}
+        if( (m_ptr = pointer) ) {
+            m_ptr->retain();
+        }
+    }
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_StrongPtr_H__	*/
+#endif    /*    !__DC_StrongPtr_H__    */

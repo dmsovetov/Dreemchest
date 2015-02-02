@@ -24,24 +24,24 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Mutex_H__
-#define		__DC_Mutex_H__
+#ifndef        __DC_Mutex_H__
+#define        __DC_Mutex_H__
 
-#include	"Threads.h"
+#include    "Threads.h"
 
 namespace dreemchest {
 
 namespace thread {
         
-	// ** class Mutex
+    // ** class Mutex
     //! Mutex object.
-	class dcInterface Mutex {
-	public:
+    class dcInterface Mutex {
+    public:
 
-		virtual				~Mutex( void );
+        virtual                ~Mutex( void );
 
         //! Releases this Mutex object.
-		void				release( void );
+        void                release( void );
 
         //! Creates a new Mutex object.
         /*!
@@ -51,14 +51,14 @@ namespace thread {
         static Mutex*       create( bool recursive = false );
 
         //! Tries to lock this mutex, returns true if the lock is successfull (mutex was not locked before this call), otherwise returns false.
-		virtual bool		tryLock( void )	= 0;
+        virtual bool        tryLock( void )    = 0;
 
         //! Locks this mutex.
-		virtual void		lock( void )	= 0;
+        virtual void        lock( void )    = 0;
 
         //! Unlocks this mutex.
-		virtual void		unlock( void )	= 0;
-	};
+        virtual void        unlock( void )    = 0;
+    };
 
     // ** class Condition
     //! Condition object.
@@ -68,7 +68,7 @@ namespace thread {
         virtual             ~Condition( void );
 
         //! Releases this Condition object.
-        void				release( void );
+        void                release( void );
 
         //! Creates a new Condition object.
         static Condition*   create( void );
@@ -97,4 +97,4 @@ namespace thread {
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_Mutex_H__	*/
+#endif    /*    !__DC_Mutex_H__    */

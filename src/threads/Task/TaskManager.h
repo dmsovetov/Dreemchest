@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_TaskManager_H__
-#define		__DC_TaskManager_H__
+#ifndef        __DC_TaskManager_H__
+#define        __DC_TaskManager_H__
 
 #include    "TaskProgress.h"
 
@@ -126,4 +126,4 @@ namespace thread {
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_TaskManager_H__	*/
+#endif    /*    !__DC_TaskManager_H__    */

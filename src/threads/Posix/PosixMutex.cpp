@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include	"PosixMutex.h"
+#include    "PosixMutex.h"
 
 #include    "../Thread.h"
 
@@ -44,12 +44,12 @@ PosixMutex::PosixMutex( bool recursive )
     DC_BREAK_IF( result );
 
     result = pthread_mutex_init( &m_mutex, &m_attr );
-	DC_BREAK_IF( result );
+    DC_BREAK_IF( result );
 }
 
 PosixMutex::~PosixMutex( void )
 {
-	int result = pthread_mutex_destroy( &m_mutex );
+    int result = pthread_mutex_destroy( &m_mutex );
     DC_BREAK_IF( result );
 
     result = pthread_mutexattr_destroy( &m_attr );
@@ -59,21 +59,21 @@ PosixMutex::~PosixMutex( void )
 // ** PosixMutex::lock
 void PosixMutex::lock( void )
 {
-	int result = pthread_mutex_lock( &m_mutex );
+    int result = pthread_mutex_lock( &m_mutex );
     DC_BREAK_IF( result );
 }
 
 // ** PosixMutex::unlock
 void PosixMutex::unlock( void )
 {
-	int result = pthread_mutex_unlock( &m_mutex );
+    int result = pthread_mutex_unlock( &m_mutex );
     DC_BREAK_IF( result );
 }
 
 // ** PosixMutex::tryLock
 bool PosixMutex::tryLock( void )
 {
-	return pthread_mutex_trylock( &m_mutex ) == 0;
+    return pthread_mutex_trylock( &m_mutex ) == 0;
 }
 
 // -------------------------------------------------- PosixCondition -------------------------------------------------- //
@@ -96,19 +96,19 @@ PosixCondition::~PosixCondition( void )
 {
     int result = 0;
 
-	result = pthread_cond_destroy( &m_condition );
-	DC_BREAK_IF( result );
+    result = pthread_cond_destroy( &m_condition );
+    DC_BREAK_IF( result );
 
-	while( pthread_mutex_trylock( &m_mutex ) == 0 ) {
-	#ifdef DC_PLATFORM_ANDROID
-		sched_yield();
-	#else
-		pthread_yield_np();
-	#endif
-	}
-	pthread_mutex_unlock( &m_mutex );
-	result = pthread_mutex_destroy( &m_mutex );
-	DC_BREAK_IF( result );
+    while( pthread_mutex_trylock( &m_mutex ) == 0 ) {
+    #ifdef DC_PLATFORM_ANDROID
+        sched_yield();
+    #else
+        pthread_yield_np();
+    #endif
+    }
+    pthread_mutex_unlock( &m_mutex );
+    result = pthread_mutex_destroy( &m_mutex );
+    DC_BREAK_IF( result );
 }
 
 // ** PosixCondition::wait

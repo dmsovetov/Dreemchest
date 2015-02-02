@@ -24,149 +24,149 @@
 
  **************************************************************************/
 
-#ifndef		__DC_WeakPtr_H__
-#define		__DC_WeakPtr_H__
+#ifndef        __DC_WeakPtr_H__
+#define        __DC_WeakPtr_H__
 
-#include	"RefCounted.h"
+#include    "RefCounted.h"
 
 namespace dreemchest {
 
-	// ** class WeakPtr
-	template<typename T>
-	class WeakPtr {
-	private:
+    // ** class WeakPtr
+    template<typename T>
+    class WeakPtr {
+    private:
 
-		mutable T*          m_ptr;
-		mutable WeakProxy*  m_weakProxy;
+        mutable T*          m_ptr;
+        mutable WeakProxy*  m_weakProxy;
 
-	private:
+    private:
 
-		void				setPointer( T *pointer );
-		void				manageProxy( void ) const;
+        void                setPointer( T *pointer );
+        void                manageProxy( void ) const;
 
-	public:
+    public:
 
-							WeakPtr( T *pointer = NULL );
+                            WeakPtr( T *pointer = NULL );
                             WeakPtr( const WeakPtr<T>& other );
-							~WeakPtr( void );
+                            ~WeakPtr( void );
 
-		T*					get( void ) const;
-		T*					operator -> ( void );
-		const T*			operator -> ( void ) const;
-		T&					operator *	( void );
-		const T&			operator *	( void ) const;
-		WeakPtr&			operator =	( T *pointer );
-		WeakPtr&			operator =	( const WeakPtr<T>& other );
-		bool				operator ==	( T *pointer ) const;
-		bool				operator != ( T *pointer ) const;
-	};
+        T*                    get( void ) const;
+        T*                    operator -> ( void );
+        const T*            operator -> ( void ) const;
+        T&                    operator *    ( void );
+        const T&            operator *    ( void ) const;
+        WeakPtr&            operator =    ( T *pointer );
+        WeakPtr&            operator =    ( const WeakPtr<T>& other );
+        bool                operator ==    ( T *pointer ) const;
+        bool                operator != ( T *pointer ) const;
+    };
 
-	// ** WeakPtr::WeakPtr
-	template<typename T>
-	WeakPtr<T>::WeakPtr( T *pointer ) : m_ptr( NULL ), m_weakProxy( NULL ) {
-		setPointer( pointer );
-	}
+    // ** WeakPtr::WeakPtr
+    template<typename T>
+    WeakPtr<T>::WeakPtr( T *pointer ) : m_ptr( NULL ), m_weakProxy( NULL ) {
+        setPointer( pointer );
+    }
 
-	// ** WeakPtr::WeakPtr
-	template<typename T>
-	WeakPtr<T>::WeakPtr( const WeakPtr<T>& other ) : m_ptr( NULL ), m_weakProxy( NULL ) {
-		setPointer( other.get() );
-	}
+    // ** WeakPtr::WeakPtr
+    template<typename T>
+    WeakPtr<T>::WeakPtr( const WeakPtr<T>& other ) : m_ptr( NULL ), m_weakProxy( NULL ) {
+        setPointer( other.get() );
+    }
 
-	// ** WeakPtr::~WeakPtr
-	template<typename T>
-	WeakPtr<T>::~WeakPtr( void ) {
-		setPointer( NULL );
-	}
+    // ** WeakPtr::~WeakPtr
+    template<typename T>
+    WeakPtr<T>::~WeakPtr( void ) {
+        setPointer( NULL );
+    }
 
-	// ** WeakPtr::operator ->
-	template<typename T>
-	T* WeakPtr<T>::operator -> ( void ) {
-		manageProxy();
-		return m_ptr;
-	}
+    // ** WeakPtr::operator ->
+    template<typename T>
+    T* WeakPtr<T>::operator -> ( void ) {
+        manageProxy();
+        return m_ptr;
+    }
 
-	template<typename T>
-	const T* WeakPtr<T>::operator -> ( void ) const {
-		manageProxy();
-		return m_ptr;
-	}
+    template<typename T>
+    const T* WeakPtr<T>::operator -> ( void ) const {
+        manageProxy();
+        return m_ptr;
+    }
 
-	// ** WeakPtr::operator *
-	template<typename T>
-	T& WeakPtr<T>::operator * ( void ) {
-		manageProxy();
-		DC_BREAK_IF( m_ptr == NULL );
-		return *m_ptr;
-	}
+    // ** WeakPtr::operator *
+    template<typename T>
+    T& WeakPtr<T>::operator * ( void ) {
+        manageProxy();
+        DC_BREAK_IF( m_ptr == NULL );
+        return *m_ptr;
+    }
 
-	// ** WeakPtr::operator =
-	template<typename T>
-	WeakPtr<T>& WeakPtr<T>::operator = ( T *pointer ) {
-		setPointer( pointer );
-		return *this;
-	}
+    // ** WeakPtr::operator =
+    template<typename T>
+    WeakPtr<T>& WeakPtr<T>::operator = ( T *pointer ) {
+        setPointer( pointer );
+        return *this;
+    }
 
-	// ** WeakPtr::operator =
-	template<typename T>
-	WeakPtr<T>& WeakPtr<T>::operator = ( const WeakPtr<T>& other ) {
-		setPointer( other.get() );
-		return *this;
-	}
+    // ** WeakPtr::operator =
+    template<typename T>
+    WeakPtr<T>& WeakPtr<T>::operator = ( const WeakPtr<T>& other ) {
+        setPointer( other.get() );
+        return *this;
+    }
 
-	// ** WeakPtr::operator ==
-	template<typename T>
-	bool WeakPtr<T>::operator == ( T *pointer ) const {
-		manageProxy();
-		return ( m_ptr == pointer );
-	}
+    // ** WeakPtr::operator ==
+    template<typename T>
+    bool WeakPtr<T>::operator == ( T *pointer ) const {
+        manageProxy();
+        return ( m_ptr == pointer );
+    }
 
-	// ** WeakPtr::operator !=
-	template<typename T>
-	bool WeakPtr<T>::operator != ( T *pointer ) const {
-		manageProxy();
-		return ( m_ptr != pointer );
-	}
+    // ** WeakPtr::operator !=
+    template<typename T>
+    bool WeakPtr<T>::operator != ( T *pointer ) const {
+        manageProxy();
+        return ( m_ptr != pointer );
+    }
 
-	// ** WeakPtr::setPointer
-	template<typename T>
-	void WeakPtr<T>::setPointer( T *pointer ) {
-		if( m_ptr == pointer ) {
-			return;
-		}
+    // ** WeakPtr::setPointer
+    template<typename T>
+    void WeakPtr<T>::setPointer( T *pointer ) {
+        if( m_ptr == pointer ) {
+            return;
+        }
 
-		if( m_weakProxy ) {
-			m_weakProxy->release();
-			m_weakProxy = NULL;
-		}
+        if( m_weakProxy ) {
+            m_weakProxy->release();
+            m_weakProxy = NULL;
+        }
 
-		if( (m_ptr = pointer) ) {
-			m_weakProxy = m_ptr->weakProxy();
-		}
-	}
+        if( (m_ptr = pointer) ) {
+            m_weakProxy = m_ptr->weakProxy();
+        }
+    }
 
-	// ** cWeakPtr::get
-	template<typename T>
-	T* WeakPtr<T>::get( void ) const  {
-		manageProxy();
-		return m_ptr; 
-	}
+    // ** cWeakPtr::get
+    template<typename T>
+    T* WeakPtr<T>::get( void ) const  {
+        manageProxy();
+        return m_ptr; 
+    }
 
-	// ** WeakPtr::manageProxy
-	template<typename T>
-	void WeakPtr<T>::manageProxy( void ) const {
-		if( !m_ptr ) {
-			return;
-		}
+    // ** WeakPtr::manageProxy
+    template<typename T>
+    void WeakPtr<T>::manageProxy( void ) const {
+        if( !m_ptr ) {
+            return;
+        }
 
-		DC_BREAK_IF( m_weakProxy == NULL );
-		if( !m_weakProxy->isAlive() ) {
-			m_weakProxy->release();
-			m_weakProxy = NULL;
-			m_ptr		= NULL;
-		}
-	}
+        DC_BREAK_IF( m_weakProxy == NULL );
+        if( !m_weakProxy->isAlive() ) {
+            m_weakProxy->release();
+            m_weakProxy = NULL;
+            m_ptr        = NULL;
+        }
+    }
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_WeakPtr_H__	*/
+#endif    /*    !__DC_WeakPtr_H__    */

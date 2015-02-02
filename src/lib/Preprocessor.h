@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#ifndef		__DC_LIB_PREPROCESSOR_H__
-#define		__DC_LIB_PREPROCESSOR_H__
+#ifndef        __DC_LIB_PREPROCESSOR_H__
+#define        __DC_LIB_PREPROCESSOR_H__
 
 // ** Bit shifting
-#define		BIT( bit )				( 1 << bit )
+#define        BIT( bit )                ( 1 << bit )
 
 // ** Memory management
 #define DC_SCOPED_LOCK( mutex )     thread::ScopedLock __scopedLock( mutex )
@@ -45,112 +45,112 @@
 #define dcStaticFunction( function )        SCLOSURE( &function )
 
 // ** Smart ptrs
-#define		DC_DECLARE_PTRS( type, name )						\
-                typedef WeakPtr<type>		dc##name##Weak;		\
+#define        DC_DECLARE_PTRS( type, name )                        \
+                typedef WeakPtr<type>        dc##name##Weak;        \
                 typedef StrongPtr<type>     dc##name##Strong;
 
 // ** new
 #if defined( DC_DEVELOPER_BUILD ) && defined( DC_EXPORTS )
     #if DC_TRACK_MEMORY
-        #define DC_NEW			new( __FILE__, __LINE__ )
+        #define DC_NEW            new( __FILE__, __LINE__ )
     #else
-        #define	DC_NEW			new
+        #define    DC_NEW            new
     #endif
 #else
-    #define	DC_NEW			new
+    #define    DC_NEW            new
 #endif
 
 // ** Debugging
 #if defined( _DEBUG ) || defined( DC_PLATFORM_ANDROID ) || ((defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )) && !defined( NDEBUG ))
-	#define DC_DEBUG
+    #define DC_DEBUG
 #endif
 
 #ifdef NDEBUG
     #undef DC_DEBUG
 #endif
 
-#define DC_NOT_IMPLEMENTED			\
-			DC_BREAK_IF( true );	\
-			cException::Error( "%s : not implemented\n", __FUNCTION__ );
+#define DC_NOT_IMPLEMENTED            \
+            DC_BREAK_IF( true );    \
+            cException::Error( "%s : not implemented\n", __FUNCTION__ );
 
-#define DC_CHECK_IMPL( log, ... )	\
-			if( !m_impl ) {			\
-				if( log ) log->Warning( "%s : not implemented\n", __FUNCTION__ );	\
-				return __VA_ARGS__;	\
-			}
+#define DC_CHECK_IMPL( log, ... )    \
+            if( !m_impl ) {            \
+                if( log ) log->Warning( "%s : not implemented\n", __FUNCTION__ );    \
+                return __VA_ARGS__;    \
+            }
 
-#define DC_LOG_THIS			Message( "%s : object of type '%s' (%x)\n", __FUNCTION__, GetClassName(), this );
+#define DC_LOG_THIS            Message( "%s : object of type '%s' (%x)\n", __FUNCTION__, GetClassName(), this );
 
 #if defined( DC_DEBUG )
-	#if defined( DC_PLATFORM_WINDOWS )
-		#if defined( _WIN64 )
-			#include <crtdbg.h>
-			#define DC_BREAK_IF( condition ) if( condition ) { _CrtDbgBreak(); }
-		#else
-			#define DC_BREAK_IF( condition ) if( condition ) { __asm { int 3 } }
-		#endif
+    #if defined( DC_PLATFORM_WINDOWS )
+        #if defined( _WIN64 )
+            #include <crtdbg.h>
+            #define DC_BREAK_IF( condition ) if( condition ) { _CrtDbgBreak(); }
+        #else
+            #define DC_BREAK_IF( condition ) if( condition ) { __asm { int 3 } }
+        #endif
 
-		#define DC_CHECK_MEMORY DC_BREAK_IF( _CrtCheckMemory() == 0 )
-	#elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )
-		#if defined __arm__ || defined __thumb__
-			#define DC_BREAK_IF( condition ) if( condition ) { asm( "trap" ); }
-		#elif defined(__i386__) || defined(__x86_64__)
-			#define DC_BREAK_IF( condition ) if( condition ) { asm( "int $0x3" ); }
-		#else
-			#define DC_BREAK_IF( condition ) assert( !(condition) );
-		#endif
+        #define DC_CHECK_MEMORY DC_BREAK_IF( _CrtCheckMemory() == 0 )
+    #elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )
+        #if defined __arm__ || defined __thumb__
+            #define DC_BREAK_IF( condition ) if( condition ) { asm( "trap" ); }
+        #elif defined(__i386__) || defined(__x86_64__)
+            #define DC_BREAK_IF( condition ) if( condition ) { asm( "int $0x3" ); }
+        #else
+            #define DC_BREAK_IF( condition ) assert( !(condition) );
+        #endif
 
-		#define DC_CHECK_MEMORY
-	#elif defined( DC_PLATFORM_ANDROID )
-		#define DC_BREAK_IF( condition )		\
-			if( condition )  {					\
-				char buffer[1024];				\
-				sprintf( buffer, "Debug break at %s, line %d\nExpression: %s\n", __FILE__, __LINE__, #condition );	\
-				__android_log_print( ANDROID_LOG_WARN, "DreemchestNative", buffer );	\
-			}
+        #define DC_CHECK_MEMORY
+    #elif defined( DC_PLATFORM_ANDROID )
+        #define DC_BREAK_IF( condition )        \
+            if( condition )  {                    \
+                char buffer[1024];                \
+                sprintf( buffer, "Debug break at %s, line %d\nExpression: %s\n", __FILE__, __LINE__, #condition );    \
+                __android_log_print( ANDROID_LOG_WARN, "DreemchestNative", buffer );    \
+            }
 
-		#define DC_CHECK_MEMORY
-	#elif defined( DC_PLATFORM_LINUX )
-		#if defined(__i386__) || defined(__x86_64__)
-			#define DC_BREAK_IF( condition ) if( condition ) { asm("int $3"); }
-		#else
-			#include <cassert>
-			#define DC_BREAK_IF( condition ) assert( !(condition) );
-		#endif
+        #define DC_CHECK_MEMORY
+    #elif defined( DC_PLATFORM_LINUX )
+        #if defined(__i386__) || defined(__x86_64__)
+            #define DC_BREAK_IF( condition ) if( condition ) { asm("int $3"); }
+        #else
+            #include <cassert>
+            #define DC_BREAK_IF( condition ) assert( !(condition) );
+        #endif
 
-		#define DC_CHECK_MEMORY
-	#elif defined( DC_PLATFORM_FLASH )
-		#define DC_BREAK_IF( condition )		\
-			if( condition )  {					\
-				static char buffer[1024];		\
-				sprintf( buffer, "Debug break at %s, line %d\nExpression: %s\n", __FILE__, __LINE__, #condition );	\
-				printf( buffer );			\
-			}
+        #define DC_CHECK_MEMORY
+    #elif defined( DC_PLATFORM_FLASH )
+        #define DC_BREAK_IF( condition )        \
+            if( condition )  {                    \
+                static char buffer[1024];        \
+                sprintf( buffer, "Debug break at %s, line %d\nExpression: %s\n", __FILE__, __LINE__, #condition );    \
+                printf( buffer );            \
+            }
 
-		#define DC_CHECK_MEMORY
-	#endif
+        #define DC_CHECK_MEMORY
+    #endif
 
-	#define DC_DEBUG_ONLY( code )			code
-	#define DC_ASSERT( condition )			DC_BREAK_IF( !condition )
+    #define DC_DEBUG_ONLY( code )            code
+    #define DC_ASSERT( condition )            DC_BREAK_IF( !condition )
 
     #if !defined( DC_PLATFORM_ANDROID )
-        #define DC_ENSURE_TYPE( object, type )	DC_BREAK_IF( dynamic_cast<const type*>( object ) == NULL )
+        #define DC_ENSURE_TYPE( object, type )    DC_BREAK_IF( dynamic_cast<const type*>( object ) == NULL )
     #else
         #define DC_ENSURE_TYPE( object, type )
     #endif
 
-	#define DC_BEGIN_MEASURE( id, ctx )	\
-		float __time##id = ctx->iTime->GetMilliseconds( true );
+    #define DC_BEGIN_MEASURE( id, ctx )    \
+        float __time##id = ctx->iTime->GetMilliseconds( true );
 
-	#define DC_END_MEASURE( id, message, ctx ) \
-		ctx->iLog->Message( "%s in %2.2fms\n", message, ctx->iTime->GetMilliseconds( true ) - __time##id );
+    #define DC_END_MEASURE( id, message, ctx ) \
+        ctx->iLog->Message( "%s in %2.2fms\n", message, ctx->iTime->GetMilliseconds( true ) - __time##id );
 #else
-	#define DC_BREAK_IF( condition )
-	#define DC_CHECK_MEMORY
-	#define DC_DEBUG_ONLY( code )
-	#define DC_ENSURE_TYPE( object, type )
+    #define DC_BREAK_IF( condition )
+    #define DC_CHECK_MEMORY
+    #define DC_DEBUG_ONLY( code )
+    #define DC_ENSURE_TYPE( object, type )
 #endif
 
 #define DC_BREAK DC_BREAK_IF( true )
 
-#endif		/*	!__DC_COMMON_H__	*/
+#endif        /*    !__DC_COMMON_H__    */

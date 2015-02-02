@@ -24,171 +24,171 @@
 
  **************************************************************************/
 
-#ifndef		__DC_RefCounter_H__
-#define		__DC_RefCounter_H__
+#ifndef        __DC_RefCounter_H__
+#define        __DC_RefCounter_H__
 
-#include	"../../Common.h"
+#include    "../../Common.h"
 
 namespace dreemchest {
 
-	// --------------------------------- WeakProxy --------------------------------- //
+    // --------------------------------- WeakProxy --------------------------------- //
 
-	// ** class WeakProxy
+    // ** class WeakProxy
     //! A reference counted object proxy for WeakPtr object.
-	class WeakProxy {
-	public:
+    class WeakProxy {
+    public:
 
                         WeakProxy( void );
 
         //! Retains this weak proxy.
-		int				retain( void );
+        int                retain( void );
 
         //! Releases this weak proxy.
-		int				release( void );
+        int                release( void );
 
         //! Marks this proxy as dead or alive.
-		void			setAlive( bool alive );
+        void            setAlive( bool alive );
 
         //! Returns true if a target object is still alive.
-		bool			isAlive( void ) const;
+        bool            isAlive( void ) const;
 
-	private:
+    private:
 
                         WeakProxy( const WeakProxy& other ) {}
         void operator = ( const WeakProxy& other ) {}
 
-	private:
+    private:
 
         //! Weak proxy reference counter.
-		int				m_references;
+        int                m_references;
         
         //! Dead or alive flag.
-		bool			m_isAlive;
-	};
+        bool            m_isAlive;
+    };
 
-	// ** WeakProxy::cWeakProxy
-	inline WeakProxy::WeakProxy( void )
-	{
-		m_references = 0;
-		m_isAlive	 = true;
-	}
+    // ** WeakProxy::cWeakProxy
+    inline WeakProxy::WeakProxy( void )
+    {
+        m_references = 0;
+        m_isAlive     = true;
+    }
 
-	// ** WeakProxy::retain
-	inline int WeakProxy::retain( void ) {
-		DC_BREAK_IF( !m_isAlive );
-		m_references++;
-		return m_references;
-	}
+    // ** WeakProxy::retain
+    inline int WeakProxy::retain( void ) {
+        DC_BREAK_IF( !m_isAlive );
+        m_references++;
+        return m_references;
+    }
 
-	// ** WeakProxy::release
-	inline int WeakProxy::release( void ) {
-		DC_BREAK_IF( m_references == 0 );
-		if( --m_references == 0 ) {
-			delete this;
-		}
+    // ** WeakProxy::release
+    inline int WeakProxy::release( void ) {
+        DC_BREAK_IF( m_references == 0 );
+        if( --m_references == 0 ) {
+            delete this;
+        }
 
-		return m_references;
-	}
+        return m_references;
+    }
 
-	// ** WeakProxy::setAlive
-	inline void WeakProxy::setAlive( bool alive ) {
-		m_isAlive = alive;
-	}
+    // ** WeakProxy::setAlive
+    inline void WeakProxy::setAlive( bool alive ) {
+        m_isAlive = alive;
+    }
 
-	// ** WeakProxy::isAlive
-	inline bool WeakProxy::isAlive( void ) const {
-		return m_isAlive;
-	}
+    // ** WeakProxy::isAlive
+    inline bool WeakProxy::isAlive( void ) const {
+        return m_isAlive;
+    }
 
-	// --------------------------------- RefCounted --------------------------------- //
+    // --------------------------------- RefCounted --------------------------------- //
 
-	// ** class RefCounted
+    // ** class RefCounted
     //! An intrusive reference counting object.
-	class dcInterface RefCounted {
-	public:
+    class dcInterface RefCounted {
+    public:
 
                             RefCounted( void );
-		virtual				~RefCounted( void );
+        virtual                ~RefCounted( void );
 
         //! Returns a WeakProxy object.
-		WeakProxy*			weakProxy( void ) const;
+        WeakProxy*            weakProxy( void ) const;
 
         //! Disposes this object.
-		virtual void		dispose( void ) const;
+        virtual void        dispose( void ) const;
 
         //! Retains this object (adds a reference).
-		virtual int			retain( void ) const;
+        virtual int            retain( void ) const;
 
         //! Releases this object (drops a reference), disposes an object if there are no more references left.
-		virtual int			release( void ) const;
+        virtual int            release( void ) const;
 
         //! Returns an amount of references pointing to this object.
-		virtual int			totalReferences( void ) const;
+        virtual int            totalReferences( void ) const;
 
-	private:
+    private:
 
         //! Reference counter.
-		mutable int			m_references;
+        mutable int            m_references;
 
         //! Weak proxy object.
-		mutable WeakProxy*  m_weakProxy;
-	};
+        mutable WeakProxy*  m_weakProxy;
+    };
 
-	// ** RefCounted::RefCounted
-	inline RefCounted::RefCounted( void ) {
-		m_references = 0;
-		m_weakProxy	 = NULL;
-	}
+    // ** RefCounted::RefCounted
+    inline RefCounted::RefCounted( void ) {
+        m_references = 0;
+        m_weakProxy     = NULL;
+    }
 
-	// ** RefCounted::~RefCounted
-	inline RefCounted::~RefCounted( void )
-	{
-		DC_BREAK_IF( m_references != 0 );
-		if( m_weakProxy ) {
-			m_weakProxy->setAlive( false );
-			m_weakProxy->release();
-			m_weakProxy = NULL;
-		}
-	}
+    // ** RefCounted::~RefCounted
+    inline RefCounted::~RefCounted( void )
+    {
+        DC_BREAK_IF( m_references != 0 );
+        if( m_weakProxy ) {
+            m_weakProxy->setAlive( false );
+            m_weakProxy->release();
+            m_weakProxy = NULL;
+        }
+    }
 
-	// ** RefCounted::dispose
-	inline void RefCounted::dispose( void ) const {
-		delete this;
-	}
+    // ** RefCounted::dispose
+    inline void RefCounted::dispose( void ) const {
+        delete this;
+    }
 
-	// ** RefCounted::retain
-	inline int RefCounted::retain( void ) const {
-		m_references++;
-		return m_references;
-	}
+    // ** RefCounted::retain
+    inline int RefCounted::retain( void ) const {
+        m_references++;
+        return m_references;
+    }
 
-	// ** RefCounted::release
-	inline int RefCounted::release( void ) const {
-		DC_BREAK_IF( m_references == 0 );
+    // ** RefCounted::release
+    inline int RefCounted::release( void ) const {
+        DC_BREAK_IF( m_references == 0 );
 
-		int left = --m_references;
-		if( left == 0 ) {
-			dispose();
-		}
-		return left;
-	}
+        int left = --m_references;
+        if( left == 0 ) {
+            dispose();
+        }
+        return left;
+    }
 
-	// ** RefCounted::totalReferences
-	inline int RefCounted::totalReferences( void ) const {
-		return m_references;
-	}
+    // ** RefCounted::totalReferences
+    inline int RefCounted::totalReferences( void ) const {
+        return m_references;
+    }
 
-	// ** RefCounted::weakProxy
-	inline WeakProxy* RefCounted::weakProxy( void ) const {
-		if( !m_weakProxy ) {
-			m_weakProxy = new WeakProxy;
-			m_weakProxy->retain();
-		}
+    // ** RefCounted::weakProxy
+    inline WeakProxy* RefCounted::weakProxy( void ) const {
+        if( !m_weakProxy ) {
+            m_weakProxy = new WeakProxy;
+            m_weakProxy->retain();
+        }
 
-		m_weakProxy->retain();
-		return m_weakProxy;
-	}
+        m_weakProxy->retain();
+        return m_weakProxy;
+    }
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_RefCounter_H__	*/
+#endif    /*    !__DC_RefCounter_H__    */

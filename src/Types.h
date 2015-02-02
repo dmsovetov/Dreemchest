@@ -24,19 +24,19 @@
 
  **************************************************************************/
 
-#ifndef		__DC_TYPES_H__
-#define		__DC_TYPES_H__
+#ifndef        __DC_TYPES_H__
+#define        __DC_TYPES_H__
 
-#include	<string>
-#include	<vector>
-#include	<list>
-#include	<stdarg.h>
+#include    <string>
+#include    <vector>
+#include    <list>
+#include    <stdarg.h>
 #include    <map>
 #include    <queue>
 
 #include    "lib/StringHash.h"
-#include	"lib/memory/WeakPtr.h"
-#include	"lib/memory/StrongPtr.h"
+#include    "lib/memory/WeakPtr.h"
+#include    "lib/memory/StrongPtr.h"
 
 namespace dreemchest {
 
@@ -46,12 +46,12 @@ namespace dreemchest {
     typedef signed long long        s64;
     typedef signed int              s32;
     typedef unsigned long long      u64;
-	typedef unsigned int			u32;
-	typedef unsigned short			u16;
-	typedef unsigned char			u8;
+    typedef unsigned int            u32;
+    typedef unsigned short            u16;
+    typedef unsigned char            u8;
     typedef StringHash::strhash     strhash;
     typedef std::string             String;
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_TYPES_H__	*/
+#endif        /*    !__DC_TYPES_H__    */

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Threads_H__
-#define		__DC_Threads_H__
+#ifndef        __DC_Threads_H__
+#define        __DC_Threads_H__
 
 #include    "../Common.h"
 
@@ -58,4 +58,4 @@ namespace dreemchest {
     #include "Thread.h"
 #endif
 
-#endif	/*	!__DC_Thread_H__	*/
+#endif    /*    !__DC_Thread_H__    */

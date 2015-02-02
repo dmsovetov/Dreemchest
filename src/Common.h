@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_COMMON_H__
-#define		__DC_COMMON_H__
+#ifndef        __DC_COMMON_H__
+#define        __DC_COMMON_H__
 
 #define dcInterface
 
@@ -35,4 +35,4 @@
 #include "lib/delegate/Closure.h"
 #include "Types.h"
 
-#endif		/*	!__DC_COMMON_H__	*/
+#endif        /*    !__DC_COMMON_H__    */

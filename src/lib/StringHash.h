@@ -38,7 +38,7 @@ namespace dreemchest {
         // ** StringHash
         StringHash( const char *input ) {
             m_hash = 5381;
-            unsigned char	*str = ( unsigned char* )input;
+            unsigned char    *str = ( unsigned char* )input;
             int c;
 
             while( (c = *str++) ) {

@@ -30,7 +30,7 @@
 #include "../Threads.h"
 
 #if defined( DC_PLATFORM_WINDOWS )
-    #include	<pthreads/pthread.h>
+    #include    <pthreads/pthread.h>
 #elif defined( DC_PLATFORM_HTML5 )
     #include    <libc/pthread.h>
 #elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )

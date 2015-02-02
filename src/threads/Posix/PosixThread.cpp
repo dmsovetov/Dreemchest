@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#include	"PosixThread.h"
+#include    "PosixThread.h"
 
 #ifdef DC_PLATFORM_WINDOWS
-	#pragma comment( lib, "../../../../lib/pthreadVC1.lib" )
+    #pragma comment( lib, "../../../../lib/pthreadVC1.lib" )
 #endif
 
 
@@ -43,9 +43,9 @@ PosixThread::PosixThread( void )
 PosixThread::~PosixThread( void )
 {
 #ifdef DC_PLATFORM_ANDROID
-	printf( "PosixThread::~PosixThread : not implemented\n" );
+    printf( "PosixThread::~PosixThread : not implemented\n" );
 #else
-	pthread_cancel( m_thread );
+    pthread_cancel( m_thread );
 #endif
 }
 
@@ -54,20 +54,20 @@ void PosixThread::start( const ThreadCallback& callback, void *userData )
 {
     Thread::start( callback, userData );
     
-	int error = pthread_create( &m_thread, NULL, threadProc, this );
+    int error = pthread_create( &m_thread, NULL, threadProc, this );
     DC_BREAK_IF( error );
 }
 
 // ** PosixThread::threadProc
 void* PosixThread::threadProc( void *data )
 {
-	PosixThread *thread = reinterpret_cast<PosixThread*>( data );
+    PosixThread *thread = reinterpret_cast<PosixThread*>( data );
     thread->m_id        = currentThread();
-	thread->m_callback( thread->m_userData );
+    thread->m_callback( thread->m_userData );
 
-	sched_yield();
+    sched_yield();
 
-	return NULL;
+    return NULL;
 }
 
 // ** PosixThread::yield

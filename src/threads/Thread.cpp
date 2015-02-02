@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include	"Thread.h"
+#include    "Thread.h"
 
 #ifdef DC_THREADING_POSIX
     #include    "Posix/PosixThread.h"
@@ -82,8 +82,8 @@ u32 Thread::id( void ) const
 // ** Thread::start
 void Thread::start( const ThreadCallback& callback, void *userData )
 {
-	m_callback = callback;
-	m_userData = userData;
+    m_callback = callback;
+    m_userData = userData;
     m_isAlive  = true;
 }
 
@@ -103,7 +103,7 @@ void Thread::yield( void )
 void Thread::sleep( u32 ms )
 {
 #ifdef DC_PLATFORM_WINDOWS
-	::Sleep( ms );
+    ::Sleep( ms );
 #else
     usleep( ms * 1000 );
 #endif
@@ -113,7 +113,7 @@ void Thread::sleep( u32 ms )
 u32 Thread::currentThread( void )
 {
 #ifdef DC_PLATFORM_WINDOWS
-	return GetCurrentThreadId();
+    return GetCurrentThreadId();
 #else
     return ( u32 )pthread_self();
 #endif

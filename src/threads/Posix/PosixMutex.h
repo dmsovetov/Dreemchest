@@ -24,33 +24,33 @@
 
  **************************************************************************/
 
-#ifndef		__DC_PosixMutex_H__
-#define		__DC_PosixMutex_H__
+#ifndef        __DC_PosixMutex_H__
+#define        __DC_PosixMutex_H__
 
-#include	"Posix.h"
+#include    "Posix.h"
 #include    "../Mutex.h"
 
 namespace dreemchest {
 
 namespace thread {
         
-	// ** class PosixMutex
-	class PosixMutex : public Mutex {
-	public:
+    // ** class PosixMutex
+    class PosixMutex : public Mutex {
+    public:
 
-							PosixMutex( bool recursive );
-		virtual				~PosixMutex( void );
+                            PosixMutex( bool recursive );
+        virtual                ~PosixMutex( void );
 
-		// ** Mutex
-		virtual bool		tryLock( void );
-		virtual void		lock( void );
-		virtual void		unlock( void );
+        // ** Mutex
+        virtual bool        tryLock( void );
+        virtual void        lock( void );
+        virtual void        unlock( void );
 
-	private:
+    private:
 
-		pthread_mutex_t		m_mutex;
+        pthread_mutex_t        m_mutex;
         pthread_mutexattr_t m_attr;
-	};
+    };
 
     // ** class PosixCondition
     class PosixCondition : public Condition {
@@ -73,4 +73,4 @@ namespace thread {
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_PosixMutex_H__	*/
+#endif    /*    !__DC_PosixMutex_H__    */

@@ -24,13 +24,13 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Thread_H__
-#define		__DC_Thread_H__
+#ifndef        __DC_Thread_H__
+#define        __DC_Thread_H__
 
-#include	"../Common.h"
+#include    "../Common.h"
 
 #ifdef DC_PLATFORM_WINDOWS
-	#undef Yield
+    #undef Yield
 #endif
 
 namespace dreemchest {
@@ -40,19 +40,19 @@ namespace thread {
     //! Thread function callback.
     typedef cClosure<void(void*)> ThreadCallback;
 
-	// ** class Thread
+    // ** class Thread
     //! Thread object.
-	class dcInterface Thread {
-	public:
+    class dcInterface Thread {
+    public:
 
                             Thread( void );
-		virtual				~Thread( void );
+        virtual                ~Thread( void );
 
         //! Returns true is this thread is alive.
-		bool				isAlive( void ) const;
+        bool                isAlive( void ) const;
 
         //! Releases this Thread object.
-		void				release( void );
+        void                release( void );
 
         //! Returns a thread id.
         u32                 id( void ) const;
@@ -74,10 +74,10 @@ namespace thread {
          \param callback Thread callback function.
          \param userData Associated thread user data.
          */
-		virtual void		start( const ThreadCallback& callback, void *userData );
+        virtual void        start( const ThreadCallback& callback, void *userData );
 
         //! Stops this thread.
-		virtual void		end( void );
+        virtual void        end( void );
 
         //! Yields a processor time to other threads.
         virtual void        yield( void );
@@ -85,20 +85,20 @@ namespace thread {
     protected:
 
         //! A boolean flag indicating that thread is alive.
-		bool				m_isAlive;
+        bool                m_isAlive;
 
         //! A callback function.
-		ThreadCallback		m_callback;
+        ThreadCallback      m_callback;
 
         //! An associated user data.
-		void*               m_userData;
+        void*               m_userData;
 
         //! Thread id.
         u32                 m_id;
-	};
+    };
 
 } // namespace thread
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_Thread_H__	*/
+#endif    /*    !__DC_Thread_H__    */

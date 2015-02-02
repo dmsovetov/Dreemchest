@@ -24,39 +24,39 @@
 
  **************************************************************************/
 
-#ifndef		__DC_PosixThread_H__
-#define		__DC_PosixThread_H__
+#ifndef        __DC_PosixThread_H__
+#define        __DC_PosixThread_H__
 
-#include	"Posix.h"
+#include    "Posix.h"
 #include    "../Thread.h"
 
 namespace dreemchest {
 
 namespace thread {
         
-	// ** class PosixThread
+    // ** class PosixThread
     //! POSIX thread implementation.
-	class PosixThread : public Thread {
-	public:
+    class PosixThread : public Thread {
+    public:
 
-							PosixThread( void );
-		virtual				~PosixThread( void );
+                            PosixThread( void );
+        virtual                ~PosixThread( void );
 
-		// ** Thread
-		virtual void		start( const ThreadCallback& callback, void *userData );
+        // ** Thread
+        virtual void        start( const ThreadCallback& callback, void *userData );
         virtual void        yield( void );
-
-	private:
-
-		static void*		threadProc( void *data );
 
     private:
 
-		pthread_t			m_thread;
-	};
+        static void*        threadProc( void *data );
+
+    private:
+
+        pthread_t            m_thread;
+    };
 
 } // namespace thread
 
 } // namespace dreemchest
 
-#endif	/*	!__DC_PosixThread_H__	*/
+#endif    /*    !__DC_PosixThread_H__    */
