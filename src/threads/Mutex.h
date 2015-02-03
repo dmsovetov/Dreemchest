@@ -50,7 +50,8 @@ namespace thread {
          */
         static Mutex*       create( bool recursive = false );
 
-        //! Tries to lock this mutex, returns true if the lock is successfull (mutex was not locked before this call), otherwise returns false.
+        //! Tries to lock this mutex, returns true if the lock is successfull
+        //! (mutex was not locked before this call), otherwise returns false.
         virtual bool        tryLock( void )    = 0;
 
         //! Locks this mutex.
