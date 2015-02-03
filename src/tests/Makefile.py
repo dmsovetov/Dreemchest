@@ -1,1 +1,1 @@
-Executable( 'Tests', project, sources = [ 'threads' ], libs = [ 'Core' ], include = [ '../' ] )
+Executable( 'Tests', project, sources = [ './*' ], libs = [ 'Core', 'Dependency' ], include = [ '../' ] )

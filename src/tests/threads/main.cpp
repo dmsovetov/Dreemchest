@@ -65,7 +65,7 @@ void taskPushToMain( thread::TaskProgress* progress, void* userData )
     printf( "Background: task completed\n" );
 }
 
-int main( int argc, char **argv )
+int testThreads( int argc, char **argv )
 {
     dcTaskManager taskManager = new thread::TaskManager;
 
