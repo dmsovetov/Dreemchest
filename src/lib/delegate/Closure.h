@@ -6,11 +6,11 @@
  */
 //---------------------------------------------------------------------------
 #ifdef _MSC_VER
-#	pragma once
+#    pragma once
 #endif
 //---------------------------------------------------------------------------
 #ifndef _CLOSURE_H
-#	define _CLOSURE_H
+#    define _CLOSURE_H
 //---------------------------------------------------------------------------
 #define TEMPLATE_PARAMS 
 #define TEMPLATE_ARGS void

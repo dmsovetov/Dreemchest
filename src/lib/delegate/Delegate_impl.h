@@ -10,60 +10,60 @@ template<class T>class CDelegate;
 template<class TReturn TEMPLATE_PARAMS>
 class CDelegate<TReturn(TEMPLATE_ARGS)>
 {
-	typedef CClosure<TReturn(TEMPLATE_ARGS)> TClosure;
-	typedef CDelegate<TReturn(TEMPLATE_ARGS)> TDelegate;
+    typedef CClosure<TReturn(TEMPLATE_ARGS)> TClosure;
+    typedef CDelegate<TReturn(TEMPLATE_ARGS)> TDelegate;
 
-	typedef std::vector<TClosure> TClosuresStorage;
+    typedef std::vector<TClosure> TClosuresStorage;
     typedef typename TClosuresStorage::const_iterator const_iterator;
     
 
     void add(const TClosure& closure)
     {
         if(closure)
-			closures_.push_back(closure);
+            closures_.push_back(closure);
     }
 
-	void remove(const TClosure& closure)
-	{
-		TClosuresStorage::iterator i = 
-			std::find(closures_.begin(), closures_.end(), closure);
+    void remove(const TClosure& closure)
+    {
+        TClosuresStorage::iterator i = 
+            std::find(closures_.begin(), closures_.end(), closure);
 
-		closures_.erase(i);
-	}
+        closures_.erase(i);
+    }
 
 public:
 
-	TDelegate& override(const TClosure& oldClosure, const TClosure& newClosure)
-	{
-		TClosuresStorage::iterator i = 
-			std::find(closures_.begin(), closures_.end(), oldClosure);
-
-		if(i != closures_.end())
-			(*i) = newClosure;
-		else 
-			add(newClosure);
-
-		return *this;
-	}
-		 
-	TDelegate& operator+=(const TClosure& closure)
+    TDelegate& override(const TClosure& oldClosure, const TClosure& newClosure)
     {
-		add(closure);
-		return *this;
-	}
+        TClosuresStorage::iterator i = 
+            std::find(closures_.begin(), closures_.end(), oldClosure);
 
-	TDelegate& operator-=(const TClosure& closure)
+        if(i != closures_.end())
+            (*i) = newClosure;
+        else 
+            add(newClosure);
+
+        return *this;
+    }
+         
+    TDelegate& operator+=(const TClosure& closure)
     {
-		remove(closure);
-		return *this;
-	}
-	
-	TDelegate& operator=(const TClosure& closure)          
-	{               
-		clear();               
-		add(closure);
-		return *this;          
-	}
+        add(closure);
+        return *this;
+    }
+
+    TDelegate& operator-=(const TClosure& closure)
+    {
+        remove(closure);
+        return *this;
+    }
+    
+    TDelegate& operator=(const TClosure& closure)          
+    {               
+        clear();               
+        add(closure);
+        return *this;          
+    }
 
     void operator()(PARAMS) const
     {
@@ -78,7 +78,7 @@ public:
 
 private:
     
-	TClosuresStorage closures_;
+    TClosuresStorage closures_;
 };
 
 //---------------------------------------------------------------------------
