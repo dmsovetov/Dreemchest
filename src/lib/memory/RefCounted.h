@@ -41,10 +41,10 @@ namespace dreemchest {
                         WeakProxy( void );
 
         //! Retains this weak proxy.
-        int                retain( void );
+        int             retain( void );
 
         //! Releases this weak proxy.
-        int                release( void );
+        int             release( void );
 
         //! Marks this proxy as dead or alive.
         void            setAlive( bool alive );
@@ -60,7 +60,7 @@ namespace dreemchest {
     private:
 
         //! Weak proxy reference counter.
-        int                m_references;
+        int             m_references;
         
         //! Dead or alive flag.
         bool            m_isAlive;

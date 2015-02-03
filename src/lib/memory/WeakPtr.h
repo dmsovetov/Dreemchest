@@ -50,14 +50,14 @@ namespace dreemchest {
                             WeakPtr( const WeakPtr<T>& other );
                             ~WeakPtr( void );
 
-        T*                    get( void ) const;
-        T*                    operator -> ( void );
+        T*                  get( void ) const;
+        T*                  operator -> ( void );
         const T*            operator -> ( void ) const;
-        T&                    operator *    ( void );
-        const T&            operator *    ( void ) const;
-        WeakPtr&            operator =    ( T *pointer );
-        WeakPtr&            operator =    ( const WeakPtr<T>& other );
-        bool                operator ==    ( T *pointer ) const;
+        T&                  operator *  ( void );
+        const T&            operator *  ( void ) const;
+        WeakPtr&            operator =  ( T *pointer );
+        WeakPtr&            operator =  ( const WeakPtr<T>& other );
+        bool                operator == ( T *pointer ) const;
         bool                operator != ( T *pointer ) const;
     };
 

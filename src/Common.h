@@ -30,9 +30,17 @@
 #define dcInterface
 
 #include <assert.h>
+#include <string.h>
 
 #include "lib/Preprocessor.h"
+#include "lib/Exception.h"
+#include "lib/Logger.h"
 #include "lib/delegate/Closure.h"
+#include "lib/StringHash.h"
+#include "lib/memory/WeakPtr.h"
+#include "lib/memory/StrongPtr.h"
+#include "lib/memory/AutoPtr.h"
+#include "lib/math/Vector2.h"
 #include "Types.h"
 
 #endif        /*    !__DC_COMMON_H__    */

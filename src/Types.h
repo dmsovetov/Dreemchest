@@ -34,10 +34,6 @@
 #include    <map>
 #include    <queue>
 
-#include    "lib/StringHash.h"
-#include    "lib/memory/WeakPtr.h"
-#include    "lib/memory/StrongPtr.h"
-
 namespace dreemchest {
 
     typedef double                  f64;
@@ -47,10 +43,11 @@ namespace dreemchest {
     typedef signed int              s32;
     typedef unsigned long long      u64;
     typedef unsigned int            u32;
-    typedef unsigned short            u16;
-    typedef unsigned char            u8;
+    typedef unsigned short          u16;
+    typedef unsigned char           u8;
     typedef StringHash::strhash     strhash;
     typedef std::string             String;
+    typedef std::vector<String>     StringArray;
 
 } // namespace dreemchest
 

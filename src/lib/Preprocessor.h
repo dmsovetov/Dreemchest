@@ -49,6 +49,9 @@
                 typedef WeakPtr<type>        dc##name##Weak;        \
                 typedef StrongPtr<type>     dc##name##Strong;
 
+// ** Random
+#define		RANDOM_SCALAR( min, max ) ((rand() / float( RAND_MAX ) * ( (max) - (min) )) + (min))
+
 // ** new
 #if defined( DC_DEVELOPER_BUILD ) && defined( DC_EXPORTS )
     #if DC_TRACK_MEMORY
@@ -69,14 +72,53 @@
     #undef DC_DEBUG
 #endif
 
-#define DC_NOT_IMPLEMENTED            \
-            DC_BREAK_IF( true );    \
-            cException::Error( "%s : not implemented\n", __FUNCTION__ );
+// ** Serialization
+#ifdef DC_SERIALIZATION_ENABLED
+    #define dcBeginSerializableSuper( type, super )             \
+        struct type : public super {                            \
+            virtual void read( io::Stream *stream );            \
+            virtual void write( io::Stream *stream ) const;     \
+            virtual void read( const JSON& json );              \
+            virtual void write( JSON& json ) const;
+#else
+    #define dcBeginSerializableSuper( type, super )             \
+        struct type {
+#endif
 
-#define DC_CHECK_IMPL( log, ... )    \
-            if( !m_impl ) {            \
+#define dcBeginSerializable( type )                         \
+    dcBeginSerializableSuper( type, ISerializable )
+
+#define dcBeginNetworkPacket( type, id )                    \
+    dcBeginSerializableSuper( type, net::INetworkPacket )   \
+    enum { PacketId = id };                                 \
+    virtual INetworkPacket* clone( void ) const { return DC_NEW type; }
+
+#define dcEndNetworkPacket dcEndSerializable
+
+#define dcEndSerializable };
+#define dcField( ... ) __VA_ARGS__;
+#define dcVector( ... ) __VA_ARGS__;
+#define dcMap( ... ) __VA_ARGS__;
+
+// ** Classes
+#define DC_NO_COPY( T )						\
+    private:                                \
+        T( const T& );                      \
+        T& operator = ( const T& )
+
+#define DC_NO_HEAPALLOC()                       \
+    private:								\
+        void *operator new(size_t size);	\
+        void *operator new[](size_t size)
+
+#define DC_NOT_IMPLEMENTED              \
+            DC_BREAK_IF( true );        \
+            Exception::Error( "%s : not implemented\n", __FUNCTION__ );
+
+#define DC_CHECK_IMPL( log, ... )       \
+            if( !m_impl ) {             \
                 if( log ) log->Warning( "%s : not implemented\n", __FUNCTION__ );    \
-                return __VA_ARGS__;    \
+                return __VA_ARGS__;     \
             }
 
 #define DC_LOG_THIS            Message( "%s : object of type '%s' (%x)\n", __FUNCTION__, GetClassName(), this );

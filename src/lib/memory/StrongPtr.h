@@ -40,14 +40,14 @@ namespace dreemchest {
                         StrongPtr( const StrongPtr<T>& other );
                         ~StrongPtr( void );
 
-        T*                get( void ) const;
-        T*                operator -> ( void );
+        T*              get( void ) const;
+        T*              operator -> ( void );
         const T*        operator -> ( void ) const;
-        T&                operator *    ( void );
-        const T&        operator *    ( void ) const;
-        StrongPtr&        operator =    ( T *pointer );
-        StrongPtr&        operator =    ( StrongPtr<T>& other );
-        bool            operator ==    ( const StrongPtr<T>& other ) const;
+        T&              operator *  ( void );
+        const T&        operator *  ( void ) const;
+        StrongPtr&      operator =  ( T *pointer );
+        StrongPtr&      operator =  ( StrongPtr<T>& other );
+        bool            operator == ( const StrongPtr<T>& other ) const;
         bool            operator != ( const StrongPtr<T>& other ) const;
 
     private:
