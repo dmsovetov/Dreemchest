@@ -27,6 +27,8 @@
 #ifndef        __DC_COMMON_H__
 #define        __DC_COMMON_H__
 
+#include "Namespace.h"
+
 #define dcInterface
 
 #include <assert.h>
@@ -42,5 +44,6 @@
 #include "lib/memory/AutoPtr.h"
 #include "lib/math/Vector2.h"
 #include "Types.h"
+#include "lib/Color.h"
 
 #endif        /*    !__DC_COMMON_H__    */

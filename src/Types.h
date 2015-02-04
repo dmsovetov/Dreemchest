@@ -34,7 +34,7 @@
 #include    <map>
 #include    <queue>
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     typedef double                  f64;
     typedef float                   f32;
@@ -45,10 +45,13 @@ namespace dreemchest {
     typedef unsigned int            u32;
     typedef unsigned short          u16;
     typedef unsigned char           u8;
-    typedef StringHash::strhash     strhash;
+    typedef StringHash::type        strhash;
     typedef std::string             String;
     typedef std::vector<String>     StringArray;
 
-} // namespace dreemchest
+    template<typename T>
+    class Hash : public std::map<strhash, T> {};
+
+DC_END_DREEMCHEST
 
 #endif        /*    !__DC_TYPES_H__    */

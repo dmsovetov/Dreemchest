@@ -27,13 +27,13 @@
 #ifndef __DC_StringHash_H__
 #define __DC_StringHash_H__
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // ** class StringHash
     class StringHash {
     public:
 
-        typedef unsigned long strhash;
+        typedef unsigned long type;
 
         // ** StringHash
         StringHash( const char *input ) {
@@ -46,13 +46,13 @@ namespace dreemchest {
             }
         }
 
-        operator strhash() const { return m_hash; }
+        operator type() const { return m_hash; }
 
     private:
 
-        strhash     m_hash;
+        type     m_hash;
     };
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif  /*      !defined( __DC_StringHash_H__ )   */
