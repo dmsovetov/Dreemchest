@@ -29,32 +29,57 @@
 
 #include    "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
+    //! Fader callback type.
     typedef cClosure<void(class Fader*)> FaderCallback;
 
     // ** class Fader
+    //! Fader object is used to fade sound source parameters.
     class Fader {
     public:
 
-                            Fader( float start, float end, float duration, FaderCallback callback );
+                            //! Constructs a new Fader object.
+                            /*!
+                             \param start Interpolation start value.
+                             \param end Interpolation end value.
+                             \param duration Interpolation duration in milliseconds.
+                             \param callback Fader completion callback.
+                             */
+                            Fader( f32 start, f32 end, f32 duration, FaderCallback callback );
 
-        float               update( float dt );
-        float               value( void ) const;
+        //! Updates fader by a given amount of time.
+        /*!
+         \param dt Time in seconds passed since last fader update.
+         \return New Fader value.
+         */
+        f32                 update( f32 dt );
+
+        //! Returns a current Fader value.
+        f32                 value( void ) const;
 
     private:
 
-        float               m_start;
-        float               m_end;
-        float               m_duration;
-        float               m_time;
+        //! Interpolation start value.
+        f32                 m_start;
+
+        //! Interpolation end value.
+        f32                 m_end;
+
+        //! Total interpolation duration.
+        f32                 m_duration;
+
+        //! Current interpolation time.
+        f32                 m_time;
+
+        //! Fader completion callback.
         FaderCallback       m_callback;
     };
     
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_SoundFader_H__    */

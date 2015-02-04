@@ -29,7 +29,7 @@
 
 #include    "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -42,6 +42,8 @@ namespace sound {
     dcEndSerializable
 
     // ** class SoundEvent
+    //! SoundEvent class represents a set of sounds, that are played
+    //! when we raise an event from a SoundFx instance.
     class SoundEvent {
     friend class SoundFx;
     public:
@@ -99,6 +101,6 @@ namespace sound {
     
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_SoundEvent_H__    */

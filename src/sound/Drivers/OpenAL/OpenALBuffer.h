@@ -30,7 +30,7 @@
 #include    "OpenAL.h"
 #include    "../SoundBuffer.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -48,7 +48,7 @@ namespace sound {
 
     private:
 
-        bool                    readSoundDecoder( ALuint target, long size );
+        bool                    readSoundDecoder( ALuint target, u32 size );
 
     private:
 
@@ -60,6 +60,6 @@ namespace sound {
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_OpenALBuffer_H__    */

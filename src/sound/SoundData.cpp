@@ -29,7 +29,7 @@
 #include    "SoundGroup.h"
 #include    "Drivers/SoundBuffer.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -239,4 +239,4 @@ f32 SoundData::pitchForSound( void ) const
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

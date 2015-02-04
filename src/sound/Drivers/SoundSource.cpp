@@ -27,7 +27,7 @@
 #include    "SoundSource.h"
 #include    "SoundBuffer.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -60,13 +60,13 @@ void SoundSource::setBuffer( SoundBuffer* value )
 }
 
 // ** SoundSource::state
-SoundSource::eSourceState SoundSource::state( void ) const
+SoundSource::SourceState SoundSource::state( void ) const
 {
     return m_state;
 }
 
 // ** SoundSource::setState
-void SoundSource::setState( eSourceState value )
+void SoundSource::setState( SourceState value )
 {
     m_state = value;
 }
@@ -84,29 +84,29 @@ void SoundSource::setLooped( bool value )
 }
 
 // ** SoundSource::volume
-float SoundSource::volume( void ) const
+f32 SoundSource::volume( void ) const
 {
     return m_volume;
 }
 
 // ** SoundSource::setVolume
-void SoundSource::setVolume( float value )
+void SoundSource::setVolume( f32 value )
 {
     m_volume = value;
 }
 
 // ** SoundSource::pitch
-float SoundSource::pitch( void ) const
+f32 SoundSource::pitch( void ) const
 {
     return m_pitch;
 }
 
 // ** SoundSource::setPitch
-void SoundSource::setPitch( float value )
+void SoundSource::setPitch( f32 value )
 {
     m_pitch = value;
 }
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

@@ -33,16 +33,16 @@
 
 #define     MAX_PCM_SIZE    10024
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
 // ** OpenAL::OpenAL
 OpenAL::OpenAL( void )
 {
-    float lp[] = { 0.0f, 0.0f,  0.0f };
-    float lv[] = { 0.0f, 0.0f,  0.0f };
-    float lo[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
+    f32 lp[] = { 0.0f, 0.0f,  0.0f };
+    f32 lv[] = { 0.0f, 0.0f,  0.0f };
+    f32 lo[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 
     log::verbose( "Creating OpenAL device... " );
     m_device = alcOpenDevice( NULL );
@@ -135,4 +135,4 @@ SoundBuffer* OpenAL::createBuffer( SoundDecoder* decoder, u32 chunks )
 
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST

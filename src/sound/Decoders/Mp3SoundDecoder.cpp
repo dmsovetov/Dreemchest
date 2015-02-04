@@ -31,7 +31,7 @@
 #include    "../../IFileSystem.h"
 #include    "../../File.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -58,7 +58,7 @@ bool cMp3SoundDecoder::Open( const char *fileName )
     resumeSize        = 0;
 //    bitsPerSample    = 16;
 
-    int size = stream->Length() * 8 / bitRate * numChannels * rate * 2;
+    u32 size = stream->Length() * 8 / bitRate * numChannels * rate * 2;
 
     return true;
 }
@@ -73,7 +73,7 @@ void cMp3SoundDecoder::Close( void )
     stream->Release();
 }
 
-inline int    resample ( mad_fixed_t sample )
+inline u32    resample ( mad_fixed_t sample )
 {
     sample += 1 << (MAD_F_FRACBITS - 16);
 
@@ -83,13 +83,13 @@ inline int    resample ( mad_fixed_t sample )
     if ( sample < -MAD_F_ONE )
         sample = -MAD_F_ONE;
 
-    return (int)(sample >> (MAD_F_FRACBITS  - 15));
+    return (u32)(sample >> (MAD_F_FRACBITS  - 15));
 }
 
 // ** cMp3SoundDecoder::Read
-long cMp3SoundDecoder::Read( u8 *buffer, int size )
+u32 cMp3SoundDecoder::Read( u8 *buffer, u32 size )
 {
-    int bytesRead = 0;
+    u32 bytesRead = 0;
 
     while( bytesRead < size ) {
         if( resumeData ) {
@@ -109,7 +109,7 @@ long cMp3SoundDecoder::Read( u8 *buffer, int size )
         size_t nBytes = len * numChannels * 2;
 
         if( bytesRead + nBytes >= size ) {
-            int d = size - bytesRead;
+            u32 d = size - bytesRead;
             len = d / (numChannels * 2);
 
             resumeData = ( u16* )(buffer + bytesRead + d);
@@ -157,17 +157,17 @@ void cMp3SoundDecoder::ResumeFrame( u8 *buffer )
 }
 
 // ** cMp3SoundDecoder::Seek
-void cMp3SoundDecoder::Seek( int pos )
+void cMp3SoundDecoder::Seek( u32 pos )
 {
     stream->Seek( pos, SO_SET );
     ReadFrame();
 }
 
 // ** cMp3SoundDecoder::ReadFrame
-int    cMp3SoundDecoder::ReadFrame( void )
+u32    cMp3SoundDecoder::ReadFrame( void )
 {
     while( true ) {
-        int ret = stream->Read( buffer + bufferPos, MP3_BUFFER_SIZE - bufferPos, 1 );
+        u32 ret = stream->Read( buffer + bufferPos, MP3_BUFFER_SIZE - bufferPos, 1 );
 
         if( ret <= 0 ) {
             break;
@@ -185,7 +185,7 @@ int    cMp3SoundDecoder::ReadFrame( void )
         }
 
         if( mp3Stream.next_frame != NULL ) {
-            int    length = buffer + bufferPos - ( u8* )mp3Stream.next_frame;
+            u32    length = buffer + bufferPos - ( u8* )mp3Stream.next_frame;
 
             // copy next frame data to start of buffer
             memmove( buffer, mp3Stream.next_frame, length );
@@ -205,6 +205,6 @@ int    cMp3SoundDecoder::ReadFrame( void )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    DC_MP3    */

@@ -28,7 +28,7 @@
 #include    "SoundChannel.h"
 #include    "SoundData.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -153,7 +153,7 @@ bool SoundGroup::hasFreeSlots( void ) const
 // ** SoundGroup::update
 void SoundGroup::update( void )
 {
-    for( int i = 0; i < activeSlotCount(); i++ ) {
+    for( u32 i = 0; i < activeSlotCount(); i++ ) {
         if( m_slots[i] == NULL ) {
             m_slots.erase( m_slots.begin() + i );
             i--;
@@ -201,7 +201,7 @@ s32 SoundGroup::findLowestSlot( u32 priority ) const
 {
     s32 index = -1;
 
-    for( int i = 0, n = activeSlotCount(); i < n; i++ ) {
+    for( u32 i = 0, n = activeSlotCount(); i < n; i++ ) {
         u32 slotPriority = m_slots[i]->sound()->priority();
 
         if( slotPriority < priority ) {
@@ -232,4 +232,4 @@ s32 SoundGroup::findLowestOldest( u32 priority ) const
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

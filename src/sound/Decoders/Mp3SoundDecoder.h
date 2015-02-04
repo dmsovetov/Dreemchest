@@ -32,7 +32,7 @@
 
 #define MP3_BUFFER_SIZE    4096
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -42,34 +42,34 @@ namespace sound {
 
         u8                      buffer[MP3_BUFFER_SIZE];
         u8                      outBuf[MP3_BUFFER_SIZE];
-        int                     bufferPos;
+        u32                     bufferPos;
         mad_synth               mp3Synth;
         mad_stream              mp3Stream;
         mad_frame               mp3Frame;
-        int                     bitRate;
-        int                     numChannels;
+        u32                     bitRate;
+        u32                     numChannels;
         u16                     *resumeData;
         mad_fixed_t             *resumeLeft, *resumeRight;
         u32                     resumeSize;
 
     private:
 
-        int                     ReadFrame( void );
+        u32                     ReadFrame( void );
         void                    ResumeFrame( u8 *buffer );
 
     public:
 
-                                cMp3SoundDecoder( int blockSize ) : cSoundDecoder( blockSize ) {}
+                                cMp3SoundDecoder( u32 blockSize ) : cSoundDecoder( blockSize ) {}
         virtual                 ~cMp3SoundDecoder( void );
 
         // ** SoundDecoder
         virtual void            close( void );
-        virtual long            read( u8 *buffer, int size );
-        virtual void            seek( int pos );
+        virtual u32            read( u8 *buffer, u32 size );
+        virtual void            seek( u32 pos );
     };
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_Mp3SoundDecoder_H__    */

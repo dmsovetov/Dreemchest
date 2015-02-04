@@ -29,7 +29,7 @@
 
 #include "SoundDecoder.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -43,9 +43,9 @@ namespace sound {
 
         // ** SoundDecoder
         virtual bool            open( ISoundStream* stream );
-        virtual long            read( u8 *buffer, int size );
-        virtual void            seek( int pos );
-        virtual int             size( void ) const;
+        virtual u32            read( u8 *buffer, u32 size );
+        virtual void            seek( u32 pos );
+        virtual u32             size( void ) const;
 
     private:
 
@@ -69,11 +69,11 @@ namespace sound {
         };
 
         u32                     m_pcmSize;
-        long                    m_pcmDataOffset;
+        u32                    m_pcmDataOffset;
     };
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_WavSoundDecoder_H__    */

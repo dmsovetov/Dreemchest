@@ -30,7 +30,7 @@
 
 #include    "../../Decoders/SoundDecoder.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -80,7 +80,7 @@ void OpenALSource::setBuffer( SoundBuffer *value )
 }
 
 // ** OpenALSource::state
-SoundSource::eSourceState OpenALSource::state( void ) const
+SoundSource::SourceState OpenALSource::state( void ) const
 {
     ALint state;
     alGetSourcei( m_id, AL_SOURCE_STATE, &state );
@@ -95,7 +95,7 @@ SoundSource::eSourceState OpenALSource::state( void ) const
 }
 
 // ** OpenALSource::setState
-void OpenALSource::setState( eSourceState value )
+void OpenALSource::setState( SourceState value )
 {
     SoundSource::setState( value );
 
@@ -113,7 +113,7 @@ void OpenALSource::setState( eSourceState value )
 }
 
 // ** OpenALSource::setVolume
-void OpenALSource::setVolume( float value )
+void OpenALSource::setVolume( f32 value )
 {
     SoundSource::setVolume( value );
     alSourcef( m_id, AL_GAIN, m_volume );
@@ -122,7 +122,7 @@ void OpenALSource::setVolume( float value )
 }
 
 // ** OpenALSource::setPitch
-void OpenALSource::setPitch( float value )
+void OpenALSource::setPitch( f32 value )
 {
     SoundSource::setPitch( value );
     alSourcef( m_id, AL_PITCH, m_pitch );
@@ -153,4 +153,4 @@ void OpenALSource::update( void )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

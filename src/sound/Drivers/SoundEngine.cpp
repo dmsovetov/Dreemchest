@@ -27,7 +27,7 @@
 #include    "SoundEngine.h"
 #include    "../Decoders/OggSoundDecoder.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -58,7 +58,7 @@ SoundBuffer* SoundEngine::createBuffer( SoundDecoder* decoder, u32 chunks )
 SoundDecoder* SoundEngine::createSoundDecoderFromUnknown( ISoundStream* stream )
 {
     char    header[33];
-    int     format;
+    u32     format;
 
     // ** Read header string
     stream->readString( header, 32 );
@@ -105,4 +105,4 @@ SoundDecoder* SoundEngine::createSoundDecoder( ISoundStream* stream, SoundFormat
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

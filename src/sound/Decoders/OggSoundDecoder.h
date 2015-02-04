@@ -32,7 +32,7 @@
 #include	<vorbis/codec.h>
 #include	<vorbis/vorbisfile.h>
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -47,16 +47,16 @@ namespace sound {
         // ** SoundDecoder
         virtual bool            open( ISoundStream* stream );
         virtual void            close( void );
-        virtual long            read( u8 *buffer, int size );
-        virtual void            seek( int pos );
-        virtual int             size( void ) const;
+        virtual u32             read( u8 *buffer, u32 size );
+        virtual void            seek( u32 pos );
+        virtual u32             size( void ) const;
 
     private:
 
         static size_t           readOgg( void *ptr, size_t size, size_t nmemb, void *source );
-        static int              seekOgg( void *source, ogg_int64_t offset, int origin );
+        static s32              seekOgg( void *source, ogg_int64_t offset, s32 origin );
         static long             tellOgg( void *source );
-        static int              closeOgg( void *source );
+        static s32              closeOgg( void *source );
 
     private:
 
@@ -67,6 +67,6 @@ namespace sound {
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_OggSoundDecoder_H__    */

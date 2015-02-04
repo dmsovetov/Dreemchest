@@ -29,32 +29,55 @@
 
 #include "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
     // ** class ISoundStream
+    //! Input stream interface used to read sound files.
     class ISoundStream {
     public:
 
         // ** SeekOrigin
+        //! Seek file origin.
         enum SeekOrigin {
-            SeekSet,
-            SeekCur,
-            SeekEnd
+            SeekSet,    //!< Seek from the begining of a stream.
+            SeekCur,    //!< Seek from the current position.
+            SeekEnd     //!< Seek from the end of a stream.
         };
 
         virtual                     ~ISoundStream( void ) {}
 
+        //! Returns a length of input stream in bytes.
         virtual u32                 length( void ) const                                        = 0;
+
+        //! Releases this input stream.
         virtual void                release( void )                                             = 0;
+
+        //! Reads data from input stream to a buffer.
+        /*!
+         \param buffer Destination buffer.
+         \param size Number of bytes to read from input stream.
+         \return Amount of bytes read.
+         */
         virtual u32                 read( void* buffer, u32 size )                              = 0;
+
+        //! Sets a stream read position.
+        /*!
+         \param offset Offset in bytes.
+         \param origin Offset origin.
+         */
         virtual void                setPosition( u32 offset, SeekOrigin origin = SeekSet )      = 0;
+
+        //! Returns a current stream position.
         virtual u32                 position( void ) const                                      = 0;
+
+        //! Reads all stream content to memory and returns a memory input stream.
         virtual ISoundStream*       loadToRam( void ) const                                     = 0;
     };
 
     // ** class IStreamOpener
+    //! Interface used to open input streams.
     class IStreamOpener {
     public:
 
@@ -69,6 +92,7 @@ namespace sound {
     };
 
     // ** class StandardStreamOpener
+    //! Standard file opener.
     class StandardStreamOpener : public IStreamOpener {
     public:
         
@@ -78,6 +102,7 @@ namespace sound {
     };
 
     // ** class StandardSoundStream
+    //! Standard input stream.
     class StandardSoundStream : public ISoundStream {
     public:
 
@@ -106,6 +131,6 @@ namespace sound {
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*   !defined( __DC__SoundStream_H__ ) */

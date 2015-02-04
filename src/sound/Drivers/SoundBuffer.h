@@ -29,34 +29,55 @@
 
 #include    "../Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
     // ** class SoundBuffer
+    //! Hardware sound buffer that holds decoded PCM samples.
     class SoundBuffer : public RefCounted {
     public:
 
+                        //! Constructs a new SoundBuffer instance.
+                        /*!
+                         \param decoder Sound decoder instance used for streaming sound data from input stream and decoding them to raw PCM.
+                         \param chunks Number of raw PCM buffers (used for streamed sound playback).
+                         */
                         SoundBuffer( SoundDecoder* decoder, u32 chunks );
         virtual         ~SoundBuffer( void );
 
+        //! Attaches this sound buffer to hardware sound source.
         virtual void    attachToSource( SoundSource* target );
+
+        //! Detaches this sound buffer from hardware sound source.
         virtual void    detachFromSource( SoundSource* target );
+
+        //! Updates a streamed buffer. Reads a new PCM data samles and uploads them to hardware sound source.
         virtual bool    updateStream( SoundSource* target, bool isLooped );
 
+        //! Returns a pointer to used sound decoder.
         SoundDecoder*   decoder( void ) const;
+
+        //! Returns an amount of PCM chunks. (This property is greater than 1 for streamed sound buffers).
         u32             chunks( void ) const;
+
+        //! Returns the total PCM data size.
         u64             size( void ) const;
 
     protected:
 
+        //! Attached sound decoder.
         SoundDecoder*   m_decoder;
+
+        //! Total PCM data size.
         u64             m_size;
+
+        //! Number of PCM chunks.
         u32             m_chunks;
     };
 
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif  /*    __DC_SoundBuffer_H__    */

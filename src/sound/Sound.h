@@ -29,7 +29,7 @@
 
 #include    "../Common.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     namespace sound {
 
@@ -50,18 +50,18 @@ namespace dreemchest {
 
         // ** enum SoundSampleFormat
         enum SoundSampleFormat {
-            SoundSampleMono8,
-            SoundSampleMono16,
-            SoundSampleStereo8,
-            SoundSampleStereo16,
+            SoundSampleMono8,       //!< 8-bit mono.
+            SoundSampleMono16,      //!< 16-bit mono.
+            SoundSampleStereo8,     //!< 8-bit stereo.
+            SoundSampleStereo16,    //!< 16-bit stereo.
         };
 
         // ** enum SoundFormat
         enum SoundFormat {
-            SoundFormatUnknown = 0,
-            SoundFormatWav,
-            SoundFormatOgg,
-            SoundFormatMp3,
+            SoundFormatUnknown = 0, //!< Unknown file format.
+            SoundFormatWav,         //!< Wave sound format.
+            SoundFormatOgg,         //!< Ogg vorbis.
+            SoundFormatMp3,         //!< MP3
         };
 
         typedef std::vector<SoundSource*>   SoundSourceArray;
@@ -83,7 +83,7 @@ namespace dreemchest {
     typedef std::vector<dcSoundChannelStrong>  SoundChannelArray;
     typedef std::vector<dcSoundChannelWeak>    SoundChannelWeakArray;
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
     #include "SoundFx.h"

@@ -30,7 +30,7 @@
 
 #include    "../../Decoders/SoundDecoder.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -47,13 +47,13 @@ OpenALBuffer::OpenALBuffer( SoundDecoder* data, u32 chunks, u32 pcmSize ) : Soun
 
     // ** Generate buffers
     alGenBuffers( m_chunks, &m_buffers[0] );
-    for( int i = 0; i < m_chunks; i++ ) {
+    for( u32 i = 0; i < m_chunks; i++ ) {
         DC_BREAK_IF( !alIsBuffer( m_buffers[i] ) );
     }
 
     // ** Fill buffers with data
     m_decoder->seek( 0 );
-    for( int i = 0; i < m_chunks; i++ ) {
+    for( u32 i = 0; i < m_chunks; i++ ) {
         readSoundDecoder( m_buffers[i], m_pcmSize );
     }
 
@@ -107,7 +107,7 @@ void OpenALBuffer::detachFromSource( SoundSource* target )
 }
 
 // ** OpenALBuffer::readSoundDecoder
-bool OpenALBuffer::readSoundDecoder( ALuint target, long size )
+bool OpenALBuffer::readSoundDecoder( ALuint target, u32 size )
 {
     DC_BREAK_IF( size <= 0 );
 
@@ -184,4 +184,4 @@ bool OpenALBuffer::updateStream( SoundSource* target, bool isLooped )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

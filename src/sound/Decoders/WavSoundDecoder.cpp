@@ -27,7 +27,7 @@
 #include    "WavSoundDecoder.h"
 #include    "../SoundStream.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -98,23 +98,23 @@ bool WavSoundDecoder::open( ISoundStream* stream )
 }
 
 // ** WavSoundDecoder::size
-int WavSoundDecoder::size( void ) const
+u32 WavSoundDecoder::size( void ) const
 {
     return m_pcmSize;
 }
 
 // ** WavSoundDecoder::read
-long WavSoundDecoder::read( u8 *buffer, int size )
+u32 WavSoundDecoder::read( u8 *buffer, u32 size )
 {
     return m_stream->read( buffer, size );
 }
 
 // ** WavSoundDecoder::seek
-void WavSoundDecoder::seek( int pos )
+void WavSoundDecoder::seek( u32 pos )
 {
     m_stream->setPosition( pos );
 }
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

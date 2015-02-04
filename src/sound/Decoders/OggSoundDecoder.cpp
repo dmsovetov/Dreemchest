@@ -27,7 +27,7 @@
 #include    "OggSoundDecoder.h"
 #include    "../SoundStream.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -76,16 +76,16 @@ void OggSoundDecoder::close( void )
 }
 
 // ** OggSoundDecoder::size
-int OggSoundDecoder::size( void ) const
+u32 OggSoundDecoder::size( void ) const
 {
     return ov_pcm_total( m_vorbisFile, -1 ) * 4;
 }
 
 // ** OggSoundDecoder::read
-long OggSoundDecoder::read( u8 *buffer, int size )
+u32 OggSoundDecoder::read( u8 *buffer, u32 size )
 {
-    int        currentSection        = 0;
-    long    totalRet = 0, ret    = 0;
+    s32     currentSection      = 0;
+    u32    totalRet = 0, ret   = 0;
 
     while( totalRet < size ) {
         ret = ov_read( m_vorbisFile, ( char* )buffer + totalRet, size - totalRet, 0, 2, 1, &currentSection );
@@ -102,7 +102,7 @@ long OggSoundDecoder::read( u8 *buffer, int size )
 }
 
 // ** OggSoundDecoder::seek
-void OggSoundDecoder::seek( int pos )
+void OggSoundDecoder::seek( u32 pos )
 {
     ov_pcm_seek( m_vorbisFile, pos );
 }
@@ -110,11 +110,11 @@ void OggSoundDecoder::seek( int pos )
 // ** OggSoundDecoder::readOgg
 size_t OggSoundDecoder::readOgg( void *ptr, size_t size, size_t nmemb, void *source )
 {
-    return reinterpret_cast<ISoundStream*>( source )->read( ptr, ( long )(size * nmemb) );
+    return reinterpret_cast<ISoundStream*>( source )->read( ptr, ( u32 )(size * nmemb) );
 }
 
 // ** OggSoundDecoder::seekOgg
-int OggSoundDecoder::seekOgg( void *source, ogg_int64_t offset, int origin )
+s32 OggSoundDecoder::seekOgg( void *source, ogg_int64_t offset, s32 origin )
 {
     ISoundStream*            file = reinterpret_cast<ISoundStream*>( source );
     ISoundStream::SeekOrigin so;
@@ -126,7 +126,7 @@ int OggSoundDecoder::seekOgg( void *source, ogg_int64_t offset, int origin )
     default:        return -1;
     }
 
-    file->setPosition( ( long )offset, so );
+    file->setPosition( ( u32 )offset, so );
 
     return 0;
 }
@@ -137,10 +137,10 @@ long OggSoundDecoder::tellOgg( void *source ) {
 }
 
 // ** OggSoundDecoder::closeOgg
-int OggSoundDecoder::closeOgg( void *source ) {
+s32 OggSoundDecoder::closeOgg( void *source ) {
     return 0;
 }
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

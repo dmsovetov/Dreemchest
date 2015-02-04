@@ -27,7 +27,7 @@
 #include    "SoundDecoder.h"
 #include    "../SoundStream.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -60,13 +60,13 @@ void SoundDecoder::close( void )
 }
 
 // ** SoundDecoder::read
-long SoundDecoder::read( u8 *buffer, int size )
+u32 SoundDecoder::read( u8 *buffer, u32 size )
 {
     return 0;
 }
 
 // ** SoundDecoder::seek
-void SoundDecoder::seek( int pos )
+void SoundDecoder::seek( u32 pos )
 {
 
 }
@@ -84,11 +84,11 @@ SoundSampleFormat SoundDecoder::format( void ) const
 }
 
 // ** SoundDecoder::size
-int SoundDecoder::size( void ) const
+u32 SoundDecoder::size( void ) const
 {
     return 0;
 }
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

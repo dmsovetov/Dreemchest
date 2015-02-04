@@ -39,7 +39,7 @@
     }
 #endif
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -68,6 +68,6 @@ namespace sound {
     
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_OpenALSound_H__    */

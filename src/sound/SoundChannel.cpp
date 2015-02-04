@@ -29,7 +29,7 @@
 #include    "Decoders/SoundDecoder.h"
 #include    "Drivers/SoundSource.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -46,13 +46,13 @@ SoundChannel::~SoundChannel( void )
 }
 
 // ** SoundChannel::volume
-float SoundChannel::volume( void ) const
+f32 SoundChannel::volume( void ) const
 {
     return m_volume;
 }
 
 // ** SoundChannel::setVolume
-void SoundChannel::setVolume( float value )
+void SoundChannel::setVolume( f32 value )
 {
     m_volume = value;
 }
@@ -76,7 +76,7 @@ const SoundData* SoundChannel::sound( void ) const
 }
 
 // ** SoundChannel::pause
-void SoundChannel::pause( float fade )
+void SoundChannel::pause( f32 fade )
 {
     if( m_volumeFader ) {
         DC_BREAK;
@@ -87,7 +87,7 @@ void SoundChannel::pause( float fade )
 }
 
 // ** SoundChannel::resume
-void SoundChannel::resume( float fade )
+void SoundChannel::resume( f32 fade )
 {
     if( m_volumeFader ) {
         DC_BREAK;
@@ -101,7 +101,7 @@ void SoundChannel::resume( float fade )
 }
 
 // ** SoundChannel::stop
-void SoundChannel::stop( float fade )
+void SoundChannel::stop( f32 fade )
 {
     if( fade == 0.0f ) {
         onStopped( m_volumeFader );
@@ -116,7 +116,7 @@ void SoundChannel::stop( float fade )
 }
 
 // ** SoundChannel::update
-bool SoundChannel::update( float dt )
+bool SoundChannel::update( f32 dt )
 {
     m_source->update();
 
@@ -156,4 +156,4 @@ void SoundChannel::onStopped( Fader *fader )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

@@ -29,7 +29,7 @@
 
 #include    "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -43,6 +43,12 @@ namespace sound {
     dcEndSerializable
 
     // ** class SoundGroup
+    //! SoundGroup instance is a home for SoundChannel instances that are playing sounds.
+    /*!
+     Each sound playback resides inside the group. For example, short sound effects are put
+     to a 'sfx' group and background music is put to 'bgm' group. Each group has a limit amount
+     of sound playback slots and a behaviour, that is used to answer a question 'What should we do, when a sound group is full?'.
+     */
     class SoundGroup : public RefCounted {
     friend class SoundFx;
     public:
@@ -67,30 +73,43 @@ namespace sound {
 
         //! Returns true if the group has free playback slots.
         bool                    hasFreeSlots( void ) const;
+
         //! Returns a group identifier.
         const char*             identifier( void ) const;
+
         //! Sets a group identifier.
         void                    setIdentifier( const char* value );
+
         //! Sets the count of playback slots (maximum sounds that can be playing simultaneously).
         void                    setSlotCount( u32 value );
+
         //! Returns the count of a playback slots (maximum sounds that can be playing simultaneously).
         u32                     slotCount( void ) const;
+
         //! Returns the count of a used playback slots.
         u32                     activeSlotCount( void ) const;
+
         //! Sets the behaviour to follow when the group is full and play is requested.
         void                    setBehaviour( Behaviour value );
+
         //! Returns the behaviour to follow when the group is full and play is requested.
         Behaviour               behaviour( void ) const;
+
         //! Sets the minimum sound priority to get the playback slot inside the group.
         void                    setThreshold( u32 value );
+
         //! Returns the minimum sound priority.
         u32                     threshold( void ) const;
+
         //! Returns a sound fade out time (in milliseconds) for the freed playback slots.
         f32                     fadeTime( void ) const;
+
         //! Sets a sound fade out time (in milliseconds) for the freed playback slots.
         void                    setFadeTime( f32 value );
+
         //! Returns a serialized sound group data.
         SoundGroupInfo          data( void ) const;
+
         //! Loads a serialized sound group data.
         void                    setData( const SoundGroupInfo& value );
 
@@ -109,8 +128,10 @@ namespace sound {
 
         //! Pushes a sound channel to a group.
         void                    addSound( const dcSoundChannelWeak& channel );
+
         //! Returns an index of a lowest playback slot.
         s32                     findLowestSlot( u32 priority ) const;
+
         //! Returns an index of a lowest playback slot or an oldest with the given priority.
         s32                     findLowestOldest( u32 priority ) const;
 
@@ -118,20 +139,25 @@ namespace sound {
 
         //! Sound group identifier.
         String                  m_identifier;
+
         //! Maximum sounds that can be playing simultaneously.
         u32                     m_slotCount;
+
         //! Behaviour to apply when the playback limit is reached.
         Behaviour               m_behaviour;
+
         //! Minimum sound priority to get the playback slot inside the group.
         u32                     m_threshold;
+
         //! Sound channel slots.
         SoundChannelWeakArray   m_slots;
+        
         //! Fade out time.
         f32                     m_fadeTime;
     };
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_SoundGroup_H__    */

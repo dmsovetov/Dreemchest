@@ -29,13 +29,13 @@
 
 #include    "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
-    typedef std::map<strhash, dcSoundDataStrong>    Sounds;
-    typedef std::map<strhash, dcSoundGroupStrong>   SoundGroups;
-    typedef std::map<strhash, class SoundEvent*>    SoundEvents;
+    typedef Hash<dcSoundDataStrong>    Sounds;
+    typedef Hash<dcSoundGroupStrong>   SoundGroups;
+    typedef Hash<class SoundEvent*>    SoundEvents;
 
     // ** struct SoundFxInfo
     dcBeginSerializable( SoundFxInfo )
@@ -161,7 +161,7 @@ namespace sound {
         //! Resets all sound fx data and stops all sound playbacks.
         void                    reset( void );
         //! Updates all sound groups and channels, should be called each frame.
-        void                    update( float dt );
+        void                    update( f32 dt );
 
         //! Returns a master sound volume.
         f32                     volume( void ) const;
@@ -231,6 +231,6 @@ namespace sound {
     
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_SoundFx_H__    */

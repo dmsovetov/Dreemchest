@@ -29,29 +29,41 @@
 
 #include    "../Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
     // ** class SoundEngine
+    //! Hardware sound engine, used for creating hardware sound sources and buffers.
     class SoundEngine {
     public:
 
                                 SoundEngine( void );
         virtual                 ~SoundEngine( void );
 
+        //! Creates a new hardware sound source.
         virtual SoundSource*    createSource( void );
+
+        //! Creates a new hardware sound buffer.
+        /*!
+         \param decoder Sound decoder used to read PCM sound samples from input stream.
+         \param chunks
+         */
         virtual SoundBuffer*    createBuffer( SoundDecoder* decoder, u32 chunks );
+
+        //! Creates a sound decoder with a given input stream and file format.
         SoundDecoder*           createSoundDecoder( ISoundStream* stream, SoundFormat format = SoundFormatUnknown );
 
     private:
 
     //    SoundDecoder*           createSoundDecoderFromUnknown( ISoundStream* stream );
+
+        //! Creates a sound decoder with a given input stream and file format.
         SoundDecoder*           createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format );
     };
     
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_SoundEngine_H__    */

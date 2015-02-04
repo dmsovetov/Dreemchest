@@ -37,7 +37,7 @@
 #include    "Drivers/SoundBuffer.h"
 #include    "Drivers/OpenAL/OpenAL.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -450,7 +450,7 @@ bool SoundFx::load( const char *identifier )
 
     setData( data );
 
-    int size = 0;
+    u32 size = 0;
     log::verbose( "Loading sounds...\n" );
     for( Sounds::iterator i = m_sounds.begin(), end = m_sounds.end(); i != end; ++i ) {
         if( i->second->loading() == SoundData::Decode ) {
@@ -459,7 +459,7 @@ bool SoundFx::load( const char *identifier )
             size += buffer->size();
         }
     }
-    log::verbose( "%2.2fmb of PCM data loaded\n", float( size ) / 1024 / 1024 );
+    log::verbose( "%2.2fmb of PCM data loaded\n", f32( size ) / 1024 / 1024 );
 */
     return true;
 }
@@ -512,10 +512,10 @@ const Sounds& SoundFx::sounds( void ) const
 }
 
 // ** SoundFx::update
-void SoundFx::update( float dt )
+void SoundFx::update( f32 dt )
 {
     // ** Update channels
-    for( int i = 0; i < ( int )m_channels.size(); i++ ) {
+    for( u32 i = 0; i < ( u32 )m_channels.size(); i++ ) {
         m_channels[i]->update( dt );
     }
 
@@ -531,7 +531,7 @@ void SoundFx::update( float dt )
 // ** SoundFx::cleanupChannels
 void SoundFx::cleanupChannels( void )
 {
-    for( int i = 0; i < ( int )m_channels.size(); i++ ) {
+    for( u32 i = 0; i < ( u32 )m_channels.size(); i++ ) {
         if( !m_channels[i]->isStopped() ) {
             continue;
         }
@@ -544,4 +544,4 @@ void SoundFx::cleanupChannels( void )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

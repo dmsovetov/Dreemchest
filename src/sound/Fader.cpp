@@ -26,28 +26,28 @@
 
 #include    "Fader.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
 // ** Fader::Fader
-Fader::Fader( float start, float end, float duration, FaderCallback callback ) : m_start( start ), m_end( end ), m_duration( duration ), m_time( 0.0f ), m_callback( callback )
+Fader::Fader( f32 start, f32 end, f32 duration, FaderCallback callback ) : m_start( start ), m_end( end ), m_duration( duration ), m_time( 0.0f ), m_callback( callback )
 {
     DC_BREAK_IF( duration < 0 || duration > 60000 )
 }
 
 // ** Fader::value
-float Fader::value( void ) const
+f32 Fader::value( void ) const
 {
-    float scalar = std::min( 1.0f, m_time / m_duration );
+    f32 scalar = std::min( 1.0f, m_time / m_duration );
     return m_start * (1.0f - scalar) + m_end * scalar;
 }
 
 // ** Fader::update
-float Fader::update( float dt )
+f32 Fader::update( f32 dt )
 {
     m_time += dt * 1000.0f;
-    float result = value();
+    f32 result = value();
 
     if( m_time >= m_duration ) {
         m_callback( this );
@@ -58,4 +58,4 @@ float Fader::update( float dt )
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

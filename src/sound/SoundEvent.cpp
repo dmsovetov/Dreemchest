@@ -26,7 +26,7 @@
 
 #include    "SoundEvent.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -120,4 +120,4 @@ void SoundEvent::setData( const SoundEventInfo& value )
 
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST

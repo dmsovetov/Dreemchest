@@ -29,7 +29,7 @@
 
 #include    "Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -50,6 +50,8 @@ namespace sound {
     dcEndSerializable
 
     // ** SoundData
+    //! SoundData class represents a single sound that is shared
+    //! across all hardware sources that are playing a sound.
     class SoundData : public RefCounted {
     friend class SoundFx;
     public:
@@ -94,7 +96,7 @@ namespace sound {
         //! Sets a sound loading flag.
         void                setLoading( LoadingFlags value );
         //! Returns a sound fade in/fade out time.
-        float               fadeTime( void ) const;
+        f32                 fadeTime( void ) const;
         //! Sets a sound fade in/fade out time.
         void                setFadeTime( f32 value );
         //! Returns base sound playback volume.
@@ -160,6 +162,6 @@ namespace sound {
     
 } // namespace sound
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_SoundData_H__    */

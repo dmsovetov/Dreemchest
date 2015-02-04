@@ -29,34 +29,58 @@
 
 #include    "../Sound.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
     // ** class SoundDecoder
+    //! SoundDecoder class is used for reading PCM samples from input stream.
     class SoundDecoder {
     public:
 
                                     SoundDecoder( void );
         virtual                     ~SoundDecoder( void );
 
+        //! Initializes sound decoder with a given input stream.
         virtual bool                open( ISoundStream* stream );
+
+        //! Closes sound decoder and releases an input stream.
         virtual void                close( void );
-        virtual long                read( u8 *buffer, int size );
-        virtual void                seek( int pos );
+
+        //! Reads PCM samles from an input stream.
+        /*!
+         \param buffer Destination buffer.
+         \param size The amount of bytes to read.
+         \return Amount of bytes read.
+         */
+        virtual u32                 read( u8* buffer, u32 size );
+
+        //! Seeks for the PCM data position.
+        virtual void                seek( u32 pos );
+
+        //! Returns a sample rate.
         virtual u32                 rate( void ) const;
+
+        //! Returns a sound sample format.
         virtual SoundSampleFormat   format( void ) const;
-        virtual int                 size( void ) const;
+
+        //! Returns a total size of PCM data.
+        virtual u32                 size( void ) const;
 
     protected:
 
+        //! Attached sound stream.
         ISoundStream*               m_stream;
+
+        //! Sample rate.
         u32                         m_rate;
+
+        //! Sound sample format.
         SoundSampleFormat           m_format;
     };
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_SoundDecoder_H__    */

@@ -30,7 +30,7 @@
 #include    "OpenAL.h"
 #include    "../SoundSource.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
@@ -45,10 +45,10 @@ namespace sound {
         // ** SoundSource
         virtual void            update( void );
         virtual void            setBuffer( SoundBuffer* value );
-        virtual eSourceState    state( void ) const;
-        virtual void            setState( eSourceState value );
-        virtual void            setVolume( float value );
-        virtual void            setPitch( float value );
+        virtual SourceState     state( void ) const;
+        virtual void            setState( SourceState value );
+        virtual void            setVolume( f32 value );
+        virtual void            setPitch( f32 value );
 
     private:
 
@@ -58,6 +58,6 @@ namespace sound {
 
 } // namespace sound
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif        /*    __DC_OpenALSound_H__    */
