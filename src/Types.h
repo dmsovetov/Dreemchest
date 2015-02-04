@@ -45,6 +45,7 @@ DC_BEGIN_DREEMCHEST
     typedef unsigned int            u32;
     typedef unsigned short          u16;
     typedef unsigned char           u8;
+    typedef const char*             CString;
     typedef StringHash::type        strhash;
     typedef std::string             String;
     typedef std::vector<String>     StringArray;
