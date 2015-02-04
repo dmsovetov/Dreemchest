@@ -121,6 +121,11 @@
                 return __VA_ARGS__;     \
             }
 
+#define DC_DECLARE_IS( type, name, value )                                  \
+        public:                                                             \
+            virtual type* is##name( void ) { return value; }                \
+            virtual const type* is##name( void ) const { return value; }
+
 #define DC_LOG_THIS            Message( "%s : object of type '%s' (%x)\n", __FUNCTION__, GetClassName(), this );
 
 #if defined( DC_DEBUG )
