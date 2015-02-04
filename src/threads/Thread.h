@@ -33,7 +33,7 @@
     #undef Yield
 #endif
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -46,7 +46,7 @@ namespace thread {
     public:
 
                             Thread( void );
-        virtual                ~Thread( void );
+        virtual             ~Thread( void );
 
         //! Returns true is this thread is alive.
         bool                isAlive( void ) const;
@@ -99,6 +99,6 @@ namespace thread {
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_Thread_H__    */

@@ -30,7 +30,7 @@
 #include    "Posix.h"
 #include    "../Mutex.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
         
@@ -39,7 +39,7 @@ namespace thread {
     public:
 
                             PosixMutex( bool recursive );
-        virtual                ~PosixMutex( void );
+        virtual             ~PosixMutex( void );
 
         // ** Mutex
         virtual bool        tryLock( void );
@@ -48,7 +48,7 @@ namespace thread {
 
     private:
 
-        pthread_mutex_t        m_mutex;
+        pthread_mutex_t     m_mutex;
         pthread_mutexattr_t m_attr;
     };
 
@@ -71,6 +71,6 @@ namespace thread {
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_PosixMutex_H__    */

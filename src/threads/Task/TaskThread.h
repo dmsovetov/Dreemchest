@@ -29,33 +29,49 @@
 
 #include    "../Threads.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
     // ** class TaskThread
+    //! TaskThread object with associated task queue, used for background task processing.
     class TaskThread {
     public:
 
-                                TaskThread( const char *name, class TaskQueue *queue );
+
+                                //! Constructs a new TaskThread object.
+                                /*!
+                                 \param name Task thread name.
+                                 \param queue Task thread queue.
+                                 */
+                                TaskThread( const char* name, class TaskQueue* queue );
                                 ~TaskThread( void );
 
+        //! Returns a pointer to thread task queue.
         class TaskQueue*        taskQueue( void ) const;
+        
+        //! Returns a thread identifier.
         u32                     threadId( void ) const;
 
     private:
 
-        void                    run( void *userData );
+        //! Thread callback function. Task queue is processed here.
+        void                    run( void* userData );
 
     private:
 
+        //! Task thread name.
         String                  m_name;
+
+        //! Task queue.
         class TaskQueue*        m_tasks;
-        dcThread                m_thread;
+
+        //! Thread object.
+        Thread*                 m_thread;
     };
     
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_TaskQueue_H__    */

@@ -29,7 +29,7 @@
 
 #include    "../Threads.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -41,10 +41,10 @@ namespace thread {
                                 ~TaskProgress( void );
 
         //! Returns a task progress.
-        float                   progress( void ) const;
+        f32                   progress( void ) const;
 
         //! Sets a task progress.
-        void                    setProgress( float value );
+        void                    setProgress( f32 value );
 
         //! Returns a latest task status message.
         String                  status( void ) const;
@@ -67,7 +67,7 @@ namespace thread {
         dcCondition             m_condition;
 
         //! Task progress.
-        float                   m_progress;
+        f32                   m_progress;
 
         //! A boolean flag indicating that this task is completed
         bool                    m_isCompleted;
@@ -78,6 +78,6 @@ namespace thread {
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_TaskProgress_H__    */

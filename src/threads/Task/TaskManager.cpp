@@ -31,7 +31,7 @@
 
 #include    "../Thread.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -39,7 +39,7 @@ namespace thread {
 TaskManager::TaskManager( void )
 {
     // ** Create built-in task queues
-    for( int i = 0; i < TotalBuiltInQueues; i++ ) {
+    for( u32 i = 0; i < TotalBuiltInQueues; i++ ) {
         m_taskQueues[i] = DC_NEW TaskQueue;
     }
 
@@ -55,7 +55,7 @@ TaskManager::TaskManager( void )
 
 TaskManager::~TaskManager( void )
 {
-    for( int i = 0; i < TotalBuiltInQueues; i++ ) {
+    for( u32 i = 0; i < TotalBuiltInQueues; i++ ) {
         delete m_taskQueues[i];
     }
 
@@ -65,7 +65,7 @@ TaskManager::~TaskManager( void )
 }
 
 // ** TaskManager::totalBackgroundTasks
-int TaskManager::totalBackgroundTasks( void ) const
+u32 TaskManager::totalBackgroundTasks( void ) const
 {
     return m_taskQueues[BackgroundQueue]->size();
 }
@@ -102,7 +102,7 @@ dcTaskProgressWeak TaskManager::runMainThreadTask( const TaskFunction& task, voi
 }
 
 // ** TaskManager::runBackgroundTask
-dcTaskProgressWeak TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, int priority, const char* thread )
+dcTaskProgressWeak TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const char* thread )
 {
     DC_BREAK_IF( !task );
 
@@ -171,4 +171,4 @@ void TaskManager::startTaskThread( const char *name, TaskQueue *queue )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

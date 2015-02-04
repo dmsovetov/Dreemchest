@@ -28,7 +28,7 @@
 #include    "TaskQueue.h"
 #include    "../Thread.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -73,4 +73,4 @@ void TaskThread::run( void *userData )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

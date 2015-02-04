@@ -29,7 +29,7 @@
 
 #include    "Threads.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
         
@@ -52,13 +52,13 @@ namespace thread {
 
         //! Tries to lock this mutex, returns true if the lock is successfull
         //! (mutex was not locked before this call), otherwise returns false.
-        virtual bool        tryLock( void )    = 0;
+        virtual bool        tryLock( void ) = 0;
 
         //! Locks this mutex.
         virtual void        lock( void )    = 0;
 
         //! Unlocks this mutex.
-        virtual void        unlock( void )    = 0;
+        virtual void        unlock( void )  = 0;
     };
 
     // ** class Condition
@@ -96,6 +96,6 @@ namespace thread {
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_Mutex_H__    */

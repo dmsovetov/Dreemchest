@@ -34,7 +34,7 @@
     #error Unknown threading option defined.
 #endif
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -121,4 +121,4 @@ u32 Thread::currentThread( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

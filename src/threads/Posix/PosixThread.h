@@ -30,7 +30,7 @@
 #include    "Posix.h"
 #include    "../Thread.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
         
@@ -40,7 +40,7 @@ namespace thread {
     public:
 
                             PosixThread( void );
-        virtual                ~PosixThread( void );
+        virtual             ~PosixThread( void );
 
         // ** Thread
         virtual void        start( const ThreadCallback& callback, void *userData );
@@ -52,11 +52,11 @@ namespace thread {
 
     private:
 
-        pthread_t            m_thread;
+        pthread_t           m_thread;
     };
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_PosixThread_H__    */

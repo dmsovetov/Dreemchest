@@ -34,7 +34,7 @@
     #error Unknown threading option defined.
 #endif
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -86,4 +86,4 @@ void Condition::release( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

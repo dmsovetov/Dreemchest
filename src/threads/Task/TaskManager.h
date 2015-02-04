@@ -29,14 +29,14 @@
 
 #include    "TaskProgress.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
     // ** class TaskManager
     class dcInterface TaskManager {
 
-        typedef std::map<strhash, class TaskThread*>  TaskThreads;
+        typedef Hash<class TaskThread*>  TaskThreads;
 
         // ** enum eBuiltInQueue
         enum eBuiltInQueue {
@@ -60,7 +60,7 @@ namespace thread {
          \param thread Worker name.
          \return TaskProgress object.
          */
-        dcTaskProgressWeak      runBackgroundTask( const TaskFunction& task, void* userData = NULL, int priority = 0, const char* thread = NULL );
+        dcTaskProgressWeak      runBackgroundTask( const TaskFunction& task, void* userData = NULL, u32 priority = 0, const char* thread = NULL );
 
         //! Adds a new task to process on main thread.
         /*!
@@ -85,7 +85,7 @@ namespace thread {
         void                    doMainThreadTasks( void );
 
         //! Rerturns an amount of queued background tasks.
-        int                     totalBackgroundTasks( void ) const;
+        u32                     totalBackgroundTasks( void ) const;
 
     private:
 
@@ -124,6 +124,6 @@ namespace thread {
     
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_TaskManager_H__    */

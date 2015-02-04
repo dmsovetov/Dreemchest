@@ -27,7 +27,7 @@
 #include    "TaskQueue.h"
 #include    "../Mutex.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -52,26 +52,26 @@ bool TaskQueue::hasTasks( void ) const
 }
 
 // ** TaskQueue::size
-int TaskQueue::size( void ) const
+u32 TaskQueue::size( void ) const
 {
     DC_SCOPED_LOCK( m_mutex );
     return m_tasks.size();
 }
 
 // ** TaskQueue::pushTask
-void TaskQueue::pushTask( const TaskFunction& task, void *userData, TaskProgress *progress, int priority )
+void TaskQueue::pushTask( const TaskFunction& task, void *userData, TaskProgress *progress, u32 priority )
 {
     DC_SCOPED_LOCK( m_mutex );
-    m_tasks.push( sTask( task, userData, progress, priority ) );
+    m_tasks.push( Task( task, userData, progress, priority ) );
     m_condition->trigger();
 }
 
 // ** TaskQueue::doTask
 void TaskQueue::doTask( void )
 {
-    TaskFunction         function;
-    dcTaskProgressStrong progress;
-    void                 *userData;
+    TaskFunction            function;
+    dcTaskProgressStrong    progress;
+    void*                   userData;
 
     {
         DC_SCOPED_LOCK( m_mutex );
@@ -79,7 +79,7 @@ void TaskQueue::doTask( void )
             return;
         }
 
-        sTask task = m_tasks.top();
+        Task task = m_tasks.top();
 
         function = task.m_function;
         progress = task.m_progress;
@@ -98,8 +98,8 @@ void TaskQueue::waitForTasks( void )
     m_condition->wait();
 }
 
-// ** TaskQueue::sTask::sTask
-TaskQueue::sTask::sTask( TaskFunction function, void *userData, TaskProgress *progress, int priority )
+// ** TaskQueue::Task::Task
+TaskQueue::Task::Task( TaskFunction function, void *userData, TaskProgress *progress, u32 priority )
 {
     m_function = function;
     m_userData = userData;
@@ -107,18 +107,18 @@ TaskQueue::sTask::sTask( TaskFunction function, void *userData, TaskProgress *pr
     m_priority = priority;
 }
 
-// ** TaskQueue::sTask::operator <
-bool TaskQueue::sTask::operator < ( const sTask& other ) const
+// ** TaskQueue::Task::operator <
+bool TaskQueue::Task::operator < ( const Task& other ) const
 {
     return m_priority < other.m_priority;
 }
 
-// ** TaskQueue::sTask::operator TaskFunction
-TaskQueue::sTask::operator TaskFunction ( void ) const
+// ** TaskQueue::Task::operator TaskFunction
+TaskQueue::Task::operator TaskFunction ( void ) const
 {
     return m_function;
 }
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

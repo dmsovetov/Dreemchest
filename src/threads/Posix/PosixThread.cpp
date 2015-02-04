@@ -31,7 +31,7 @@
 #endif
 
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -54,7 +54,7 @@ void PosixThread::start( const ThreadCallback& callback, void *userData )
 {
     Thread::start( callback, userData );
     
-    int error = pthread_create( &m_thread, NULL, threadProc, this );
+    u32 error = pthread_create( &m_thread, NULL, threadProc, this );
     DC_BREAK_IF( error );
 }
 
@@ -82,4 +82,4 @@ void PosixThread::yield( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

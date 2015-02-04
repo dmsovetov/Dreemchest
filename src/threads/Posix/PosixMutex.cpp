@@ -28,14 +28,14 @@
 
 #include    "../Thread.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
 // ** PosixMutex::PosixMutex
 PosixMutex::PosixMutex( bool recursive )
 {
-    int result = 0;
+    u32 result = 0;
     
     result = pthread_mutexattr_init( &m_attr );
     DC_BREAK_IF( result );
@@ -49,7 +49,7 @@ PosixMutex::PosixMutex( bool recursive )
 
 PosixMutex::~PosixMutex( void )
 {
-    int result = pthread_mutex_destroy( &m_mutex );
+    u32 result = pthread_mutex_destroy( &m_mutex );
     DC_BREAK_IF( result );
 
     result = pthread_mutexattr_destroy( &m_attr );
@@ -59,14 +59,14 @@ PosixMutex::~PosixMutex( void )
 // ** PosixMutex::lock
 void PosixMutex::lock( void )
 {
-    int result = pthread_mutex_lock( &m_mutex );
+    u32 result = pthread_mutex_lock( &m_mutex );
     DC_BREAK_IF( result );
 }
 
 // ** PosixMutex::unlock
 void PosixMutex::unlock( void )
 {
-    int result = pthread_mutex_unlock( &m_mutex );
+    u32 result = pthread_mutex_unlock( &m_mutex );
     DC_BREAK_IF( result );
 }
 
@@ -81,7 +81,7 @@ bool PosixMutex::tryLock( void )
 // ** PosixCondition::PosixCondition
 PosixCondition::PosixCondition( void )
 {
-    int result = 0;
+    u32 result = 0;
     
     // ** Create condition var
     result = pthread_cond_init( &m_condition, NULL );
@@ -94,7 +94,7 @@ PosixCondition::PosixCondition( void )
 
 PosixCondition::~PosixCondition( void )
 {
-    int result = 0;
+    u32 result = 0;
 
     result = pthread_cond_destroy( &m_condition );
     DC_BREAK_IF( result );
@@ -114,7 +114,7 @@ PosixCondition::~PosixCondition( void )
 // ** PosixCondition::wait
 void PosixCondition::wait( void )
 {
-    int result = 0;
+    u32 result = 0;
 
     result = pthread_mutex_lock( &m_mutex );
     DC_BREAK_IF( result );
@@ -129,7 +129,7 @@ void PosixCondition::wait( void )
 // ** PosixCondition::trigger
 void PosixCondition::trigger( void )
 {
-    int result = 0;
+    u32 result = 0;
 
     result = pthread_mutex_lock( &m_mutex );
     DC_BREAK_IF( result );
@@ -143,4 +143,4 @@ void PosixCondition::trigger( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

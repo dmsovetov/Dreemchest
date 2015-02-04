@@ -27,7 +27,7 @@
 #include    "TaskProgress.h"
 #include    "../Mutex.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
@@ -51,14 +51,14 @@ TaskProgress::~TaskProgress( void )
 }
 
 // ** TaskProgress::progress
-float TaskProgress::progress( void ) const
+f32 TaskProgress::progress( void ) const
 {
     DC_SCOPED_LOCK( m_mutex );
     return m_progress;
 }
 
 // ** TaskProgress::setProgress
-void TaskProgress::setProgress( float value )
+void TaskProgress::setProgress( f32 value )
 {
     DC_SCOPED_LOCK( m_mutex );
     m_progress = value;
@@ -99,4 +99,4 @@ void TaskProgress::complete( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

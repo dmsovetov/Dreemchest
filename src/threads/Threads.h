@@ -29,7 +29,7 @@
 
 #include    "../Common.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     namespace thread {
         class Thread;
@@ -51,7 +51,7 @@ namespace dreemchest {
 
     DC_DECLARE_PTRS( thread::TaskProgress, TaskProgress )
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
     #include "Task/TaskManager.h"
