@@ -24,12 +24,17 @@
 
  **************************************************************************/
 
-extern int testSound( int argc, char** argv );
-extern int testThreads( int argc, char** argv );
-extern int testRenderer( int argc, char** argv );
+#include <renderer/Renderer.h>
 
-int main( int argc, char** argv )
+DC_USE_DREEMCHEST
+
+using namespace renderer;
+
+int testRenderer( int argc, char **argv )
 {
-//    testThreads( argc, argv );
-    testSound( argc, argv );
+    log::setStandardHandler();
+
+    dcHal hal = Hal::create( OpenGL );
+
+    return 0;
 }
