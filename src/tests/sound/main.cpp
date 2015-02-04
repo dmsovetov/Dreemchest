@@ -27,7 +27,7 @@
 #include <sound/Sound.h>
 #include <threads/Threads.h>
 
-using namespace dreemchest;
+DC_USE_DREEMCHEST
 using namespace sound;
 
 SoundDataInfo createSound( const char* identifier, const char* uri, const char* group, bool looped = false, SoundData::LoadingFlags loading = SoundData::Decode )

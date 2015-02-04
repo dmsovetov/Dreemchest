@@ -27,7 +27,7 @@
 #include <threads/Threads.h>
 #include <math.h>
 
-using namespace dreemchest;
+DC_USE_DREEMCHEST
 
 void taskForMainThread( thread::TaskProgress* progress, void* userData )
 {
