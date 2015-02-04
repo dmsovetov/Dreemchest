@@ -33,7 +33,7 @@
 #endif
 
 #ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace dreemchest;
+    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
     #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
     #define DC_END_DREEMCHEST    }
 #else
