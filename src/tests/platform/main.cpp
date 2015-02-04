@@ -24,14 +24,26 @@
 
  **************************************************************************/
 
-extern int testSound( int argc, char** argv );
-extern int testThreads( int argc, char** argv );
-extern int testRenderer( int argc, char** argv );
-extern int testPlatform( int argc, char** argv );
+#include <platform/Platform.h>
+#include <threads/Threads.h>
 
-int main( int argc, char** argv )
+DC_USE_DREEMCHEST
+
+using namespace platform;
+
+void handleApplicationLaunched( Application* app )
 {
-//    testThreads( argc, argv );
-//    testSound( argc, argv );
-    testPlatform( argc, argv );
+    printf( "handleApplicationLaunched\n" );
+    Window* window = Window::create( 800, 600 );
+    window->setCaption( "Hello" );
+}
+
+int testPlatform( int argc, char **argv )
+{
+    log::setStandardHandler();
+
+    Application* app = Application::create();
+    app->launch( dcStaticFunction( handleApplicationLaunched ) );
+
+    return 0;
 }
