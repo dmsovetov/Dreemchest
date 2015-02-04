@@ -29,7 +29,7 @@
 
 #include    "RefCounted.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // ** class StrongPtr
     template<typename T>
@@ -147,6 +147,6 @@ namespace dreemchest {
         }
     }
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_StrongPtr_H__    */

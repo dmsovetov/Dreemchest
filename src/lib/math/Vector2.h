@@ -27,7 +27,7 @@
 #ifndef __DC_Vector2_H__
 #define __DC_Vector2_H__
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // ** class Vec2
     class Vec2 {
@@ -42,6 +42,6 @@ namespace dreemchest {
         float       y;
     };
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif  /*  !defined( __DC_Vector2_H__ )    */

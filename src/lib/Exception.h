@@ -27,7 +27,7 @@
 #ifndef __DC_Exception_H__
 #define __DC_Exception_H__
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // ** class Exception
     class Exception {
@@ -57,6 +57,6 @@ namespace dreemchest {
     #endif
     }
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif  /*  !defined( __DC_Exception_H__ )  */

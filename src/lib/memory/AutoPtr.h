@@ -27,7 +27,9 @@
 #ifndef		__DC_AutoPtr_H__
 #define		__DC_AutoPtr_H__
 
-namespace dreemchest {
+#include "../../Namespace.h"
+
+DC_BEGIN_DREEMCHEST
 
 	template<typename T>
 	class AutoPtr {
@@ -140,6 +142,6 @@ namespace dreemchest {
 		return tmp;
 	}
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif		/*	!__DC_AutoPtr_H__	*/

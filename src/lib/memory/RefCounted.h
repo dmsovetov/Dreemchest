@@ -29,7 +29,7 @@
 
 #include    "../../Common.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // --------------------------------- WeakProxy --------------------------------- //
 
@@ -189,6 +189,6 @@ namespace dreemchest {
         return m_weakProxy;
     }
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_RefCounter_H__    */

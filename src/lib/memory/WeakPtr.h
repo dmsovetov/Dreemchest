@@ -29,7 +29,7 @@
 
 #include    "RefCounted.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
     // ** class WeakPtr
     template<typename T>
@@ -167,6 +167,6 @@ namespace dreemchest {
         }
     }
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif    /*    !__DC_WeakPtr_H__    */
