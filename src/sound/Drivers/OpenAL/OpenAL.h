@@ -29,7 +29,7 @@
 
 #include    "../SoundEngine.h"
 
-#if defined( DC_PLATFORM_OSX ) || defined( DC_PLATFORM_IOS )
+#if defined( DC_PLATFORM_MACOS ) || defined( DC_PLATFORM_IOS )
     #include <OpenAL/al.h>
     #include <OpenAL/alc.h>
 #elif defined( DC_PLATFORM_ANDROID ) || defined( DC_PLATFORM_WINDOWS )

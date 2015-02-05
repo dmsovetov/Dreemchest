@@ -81,7 +81,7 @@
     #include <OpenGLES/ES2/glext.h>
 #endif
 
-#if defined( DC_PLATFORM_OSX )
+#if defined( DC_PLATFORM_MACOS )
     #include <OpenGL/gl.h>
     #include <OpenGL/OpenGL.h>
     #include <OpenGL/glext.h>

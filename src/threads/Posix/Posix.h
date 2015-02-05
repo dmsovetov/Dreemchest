@@ -33,7 +33,7 @@
     #include    <pthreads/pthread.h>
 #elif defined( DC_PLATFORM_HTML5 )
     #include    <libc/pthread.h>
-#elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )
+#elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_MACOS )
     #include    <unistd.h>
     #include    <pthread.h>
 #endif

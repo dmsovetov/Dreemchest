@@ -26,9 +26,9 @@
 
 #include    "Thread.h"
 
-#ifdef DC_THREADING_POSIX
+#ifdef DC_THREADS_POSIX
     #include    "Posix/PosixThread.h"
-#elif DC_THREADING_WINDOWS
+#elif DC_THREADS_WINDOWS
     #include    "Windows/WindowsThread.h"
 #else
     #error Unknown threading option defined.
@@ -51,9 +51,9 @@ Thread::~Thread( void )
 // ** Thread::create
 Thread* Thread::create( void )
 {
-#ifdef DC_THREADING_POSIX
+#ifdef DC_THREADS_POSIX
     return DC_NEW PosixThread;
-#elif DC_THREADING_WINDOWS
+#elif DC_THREADS_WINDOWS
     return DC_NEW WindowsThread;
 #else
     #error Unknown threading option defined.

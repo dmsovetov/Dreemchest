@@ -26,9 +26,9 @@
 
 #include    "Mutex.h"
 
-#ifdef DC_THREADING_POSIX
+#ifdef DC_THREADS_POSIX
     #include    "Posix/PosixMutex.h"
-#elif DC_THREADING_WINDOWS
+#elif DC_THREADS_WINDOWS
     #include    "Windows/WindowsThread.h"
 #else
     #error Unknown threading option defined.
@@ -46,9 +46,9 @@ Mutex::~Mutex( void )
 // ** Mutex::create
 Mutex* Mutex::create( bool recursive )
 {
-#ifdef DC_THREADING_POSIX
+#ifdef DC_THREADS_POSIX
     return DC_NEW PosixMutex( recursive );
-#elif DC_THREADING_WINDOWS
+#elif DC_THREADS_WINDOWS
     return DC_NEW WindowsMutex;
 #else
     #error Unknown threading option defined.
@@ -69,9 +69,9 @@ Condition::~Condition( void )
 // ** Condition::create
 Condition* Condition::create( void )
 {
-#ifdef DC_THREADING_POSIX
+#ifdef DC_THREADS_POSIX
     return DC_NEW PosixCondition;
-#elif DC_THREADING_WINDOWS
+#elif DC_THREADS_WINDOWS
     return DC_NEW WindowsCondition;
 #else
     #error Unknown threading option defined.

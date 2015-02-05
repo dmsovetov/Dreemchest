@@ -64,7 +64,7 @@
 #endif
 
 // ** Debugging
-#if defined( _DEBUG ) || defined( DC_PLATFORM_ANDROID ) || ((defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )) && !defined( NDEBUG ))
+#if defined( _DEBUG ) || defined( DC_PLATFORM_ANDROID ) || ((defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_MACOS )) && !defined( NDEBUG ))
     #define DC_DEBUG
 #endif
 
@@ -138,7 +138,7 @@
         #endif
 
         #define DC_CHECK_MEMORY DC_BREAK_IF( _CrtCheckMemory() == 0 )
-    #elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_OSX )
+    #elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_MACOS )
         #if defined __arm__ || defined __thumb__
             #define DC_BREAK_IF( condition ) if( condition ) { asm( "trap" ); }
         #elif defined(__i386__) || defined(__x86_64__)

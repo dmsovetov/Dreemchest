@@ -78,6 +78,15 @@ SoundEventInfo createEvent( const char* identifier, SoundEvent::EventType type, 
     return ev;
 }
 
+void sleep( u32 amount )
+{
+#ifdef DC_THREADS
+    thread::Thread::sleep( 50 );
+#else
+    log::warn( "Error: no Thread::sleep method, built with no threading support\n" );
+#endif
+}
+
 int testSound( int argc, char **argv )
 {
     sound::log::setStandardHandler();
@@ -108,7 +117,7 @@ int testSound( int argc, char **argv )
 
     while( musicChannel->isPlaying() ) {
         sfx->update( 0.01f );
-        thread::Thread::sleep( 50 );
+        sleep( 50 );
     }
 
     printf( "Music playback ended\n" );
@@ -121,7 +130,7 @@ int testSound( int argc, char **argv )
 
         while( sfxChannel->isPlaying() ) {
             sfx->update( 0.01f );
-            thread::Thread::sleep( 1 );
+            sleep( 1 );
         }
     }
 
@@ -133,7 +142,7 @@ int testSound( int argc, char **argv )
 
         while( eventChannel->isPlaying() ) {
             sfx->update( 0.01f );
-            thread::Thread::sleep( 1 );
+           sleep( 1 );
         }
     }
 

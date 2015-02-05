@@ -47,7 +47,7 @@ Application::~Application( void )
 // ** Application::create
 Application* Application::create( void )
 {
-#ifdef DC_PLATFORM_OSX
+#ifdef DC_PLATFORM_MACOS
     if( IApplication* impl = createApplication() ) {
         return DC_NEW Application( impl );
     }

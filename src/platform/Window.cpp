@@ -51,7 +51,7 @@ Window::~Window( void )
 // ** Window::create
 Window* Window::create( u32 width, u32 height )
 {
-#ifdef DC_PLATFORM_OSX
+#ifdef DC_PLATFORM_MACOS
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
     }

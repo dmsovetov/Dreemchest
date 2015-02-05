@@ -76,7 +76,7 @@ namespace renderer {
 
 	// ** GL_ARB_texture_compression
 	extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2D;
-#elif defined( DC_PLATFORM_OSX )
+#elif defined( DC_PLATFORM_MACOS )
     #define GL_RGBA16F              GL_RGBA16F_ARB
     #define GL_POINT_SIZE_ARRAY     GL_POINT_SIZE_ARRAY_APPLE
     #define glPointSizePointer      glPointSizePointerAPPLE

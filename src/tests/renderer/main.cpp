@@ -29,12 +29,53 @@
 DC_USE_DREEMCHEST
 
 using namespace renderer;
+using namespace platform;
+
+using namespace platform;
+using namespace renderer;
+
+class AppWindow : public WindowDelegate {
+public:
+
+    AppWindow( Hal* hal ) : m_clearColor( Black ), m_hal( hal ) {}
+
+    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {
+        platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
+        m_clearColor.r = sx / ( float )window->width();
+        m_clearColor.g = sy / ( float )window->height();
+    }
+
+    virtual void handleUpdate( Window* window ) {
+        m_hal->clear( m_clearColor );
+
+        m_hal->present();
+    }
+
+private:
+
+    Rgba    m_clearColor;
+    Hal*    m_hal;
+};
+
+void handleApplicationLaunched( Application* app )
+{
+    platform::log::msg( "handleApplicationLaunched\n" );
+
+    Window*     window = Window::create( 800, 600 );
+    RenderView* view   = Hal::createOpenGLView( window->handle() );
+    Hal*        hal    = Hal::create( OpenGL, view );
+
+    window->setCaption( "Hello" );
+    window->setDelegate( new AppWindow( hal ) );
+}
 
 int testRenderer( int argc, char **argv )
 {
-    log::setStandardHandler();
+    ::platform::log::setStandardHandler();
+    ::renderer::log::setStandardHandler();
 
-    dcHal hal = Hal::create( OpenGL );
+    Application* app = Application::create();
+    app->launch( dcStaticFunction( handleApplicationLaunched ) );
 
     return 0;
 }

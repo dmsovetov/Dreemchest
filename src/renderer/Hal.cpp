@@ -28,9 +28,9 @@
 #include	"RenderState.h"
 #include    "BatchRenderer.h"
 
-#ifdef DC_THREADS_ENABLED
-    #include    <thread/Task/TaskManager.h>
-    #include    <thread/Thread.h>
+#ifdef DC_THREADS
+    #include    <threads/Task/TaskManager.h>
+    #include    <threads/Thread.h>
 #endif
 
 #include "OpenGL/OpenGLHal.h"
@@ -99,7 +99,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 // ** Hal::createOpenGLView
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
-#ifdef DC_PLATFORM_OSX
+#ifdef DC_PLATFORM_MACOS
     return renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
