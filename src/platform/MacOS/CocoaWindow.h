@@ -24,52 +24,29 @@
 
  **************************************************************************/
 
-#ifndef __DC_Platform_MacOSWindow_H__
-#define __DC_Platform_MacOSWindow_H__
+#ifndef __DC_Platform_CocoaWindow__
+#define __DC_Platform_CocoaWindow__
 
-#include "../Window.h"
-#include "CocoaWindow.h"
+#include "../Platform.h"
+#include <Cocoa/Cocoa.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace platform {
-
-    // ** class MacOSWindow
-    class MacOSWindow : public IWindow {
-    public:
-
-                            MacOSWindow( void );
-        virtual             ~MacOSWindow( void );
-
-        // ** IWindow
-        virtual u32         width( void ) const;
-        virtual u32         height( void ) const;
-        virtual String      caption( void ) const;
-        virtual void        setCaption( const String& value );
-        virtual void*       handle( void ) const;
-        void                setOwner( Window* value );
-        Window*             owner( void ) const;
-
-        // ** MacOSWindow
-        bool                create( u32 width, u32 height );
-
-    private:
-
-        //! Implementation owner
-        Window*             m_owner;
-
-        //! Window width.
-        u32                 m_width;
-
-        //! Window height.
-        u32                 m_height;
-
-        //! Window handle.
-        CocoaWindow*        m_window;
-    };
-
-} // namespace platform
+    class MacOSWindow;
+}
 
 DC_END_DREEMCHEST
 
-#endif /*   !defined( __DC_Platform_MacOSWindow_H__ )   */
+DC_USE_DREEMCHEST
+
+@interface CocoaWindow : NSWindow<NSAnimationDelegate> {
+    NSPoint                 m_prevMousePos;
+    platform::MacOSWindow*  m_window;
+}
+
+- ( void )setWindow: ( platform::MacOSWindow* )window;
+
+@end
+
+#endif /*   !defined( __DC_Platform_CocoaWindow__ )   */

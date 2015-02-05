@@ -25,8 +25,7 @@
  **************************************************************************/
 
 #include "MacOSWindow.h"
-
-#include "../../renderer/OpenGL/MacOS/MacOSOpenGLView.h"
+#include "CocoaWindow.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -47,7 +46,7 @@ IWindow* createWindow( u32 width, u32 height )
 }
 
 // ** MacOSWindow::MacOSWindow
-MacOSWindow::MacOSWindow( void ) : m_width( 0 ), m_height( 0 )
+MacOSWindow::MacOSWindow( void ) : m_owner( NULL ), m_width( 0 ), m_height( 0 )
 {
 
 }
@@ -59,6 +58,18 @@ MacOSWindow::~MacOSWindow( void )
         [m_window close];
         [m_window dealloc];
     }
+}
+
+// ** MacOSWindow::setOwner
+void MacOSWindow::setOwner( Window* value )
+{
+    m_owner = value;
+}
+
+// ** MacOSWindow::owner
+Window* MacOSWindow::owner( void ) const
+{
+    return m_owner;
 }
 
 // ** MacOSWindow::width
@@ -85,6 +96,12 @@ String MacOSWindow::caption( void ) const
     return m_window.title.UTF8String;
 }
 
+// ** MacOSWindow::handle
+void* MacOSWindow::handle( void ) const
+{
+    return reinterpret_cast<void*>( m_window );
+}
+
 // ** MacOSWindow::create
 bool MacOSWindow::create( u32 width, u32 height )
 {
@@ -96,11 +113,11 @@ bool MacOSWindow::create( u32 width, u32 height )
     NSRect		screen		= [[NSScreen mainScreen] frame];
     NSRect		frame		= NSMakeRect( screen.size.width * 0.5 - m_width * 0.5, screen.size.height * 0.5 - m_width * 0.5, m_width, m_height );
     NSUInteger	styleMask	= NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
-    NSRect		rect		= [NSWindow contentRectForFrameRect:frame styleMask:styleMask];
 
-    m_window = [[NSWindow alloc] initWithContentRect:rect styleMask:styleMask backing: NSBackingStoreBuffered    defer:false];
+    m_window = [[CocoaWindow alloc] initWithContentRect:frame styleMask:styleMask backing:NSBackingStoreBuffered defer:false];
     [m_window makeKeyAndOrderFront: m_window];
     [m_window setAcceptsMouseMovedEvents: YES];
+    [m_window setWindow: this];
 
     log::verbose( "MacOS window created %dx%d...\n", m_width, m_height );
 

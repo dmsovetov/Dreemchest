@@ -38,19 +38,53 @@ namespace platform {
     class IWindow {
     public:
 
-        virtual             ~IWindow( void ) {}
+        virtual                 ~IWindow( void ) {}
 
         //! Returns window width.
-        virtual u32         width( void ) const         = 0;
+        virtual u32             width( void ) const         = 0;
 
         //! Returns window height.
-        virtual u32         height( void ) const        = 0;
+        virtual u32             height( void ) const        = 0;
 
         //! Returns a window caption.
-        virtual String      caption( void ) const       = 0;
+        virtual String          caption( void ) const       = 0;
 
         //! Sets a window caption.
-        virtual void        setCaption( const String& value )   = 0;
+        virtual void            setCaption( const String& value )   = 0;
+
+        //! Returns a platform-specific window handle.
+        virtual void*           handle( void ) const        = 0;
+
+        //! Sets window implemetation owner.
+        virtual void            setOwner( Window* value )   = 0;
+
+        //! Returns a window implementation owner.
+        virtual Window*         owner( void ) const         = 0;
+    };
+
+    // ** class WindowDelegate
+    class WindowDelegate : public RefCounted {
+    public:
+
+        virtual                 ~WindowDelegate( void ) {}
+
+        //! Handles window frame update.
+        virtual void            handleUpdate( Window* window ) {}
+
+        //! Handles mouse pressed event.
+        virtual void            handleMouseDown( Window* window, u32 x, u32 y ) {}
+
+        //! Handles mouse released event.
+        virtual void            handleMouseUp( Window* window, u32 x, u32 y ) {}
+
+        //! Handles mouse moved event.
+        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {}
+
+        //! Handles key pressed event.
+        virtual void            handleKeyDown( Window* window, Key key ) {}
+
+        //! Handles key released event.
+        virtual void            handleKeyUp( Window* window, Key key ) {}
     };
 
     // ** class Window
@@ -58,25 +92,63 @@ namespace platform {
     class Window {
     public:
 
-        virtual             ~Window( void );
+        virtual                 ~Window( void );
 
         //! Creates and shows a new Window instance.
-        static Window*      create( u32 width, u32 height );
+        static Window*          create( u32 width, u32 height );
 
         //! Returns a window caption.
-        String              caption( void ) const;
+        String                  caption( void ) const;
         
         //! Sets a window caption.
-        void                setCaption( const String& value );
+        void                    setCaption( const String& value );
+
+        //! Sets a window event delegate.
+        void                    setDelegate( WindowDelegate* delegate );
+
+        //! Returns window width.
+        u32                     width( void ) const;
+
+        //! Returns window height.
+        u32                     height( void ) const;
+
+        //! Returns a platform-specific window handle.
+        /*!
+         On Windows it returns a HWND handle.
+         On MacOS it returns a NSWindow pointer.
+         */
+        void*                   handle( void ) const;
+
+        //! Notifies window about a frame update.
+        void                    notifyUpdate( void );
+
+        //! Notifies window that mouse was pressed.
+        void                    notifyMouseDown( u32 x, u32 y );
+
+        //! Notifies window that mouse was released.
+        void                    notifyMouseUp( u32 x, u32 y );
+
+        //! Notifies window that mouse was moved.
+        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey );
+
+        //! Notifies window that key was pressed.
+        void                    notifyKeyDown( Key key );
+
+        //! Notifies window that key was released.
+        void                    notifyKeyUp( Key key );
 
     private:
 
-                            //! Constructs a new Window instance.
-                            Window( IWindow* impl );
+                                //! Constructs a new Window instance.
+                                Window( IWindow* impl );
 
     private:
 
-        IWindow*            m_impl;
+        //! Platform-spefific implementation.
+        IWindow*                m_impl;
+
+        //! Event delegate.
+        dcWindowDelegateStrong  m_delegate;
     };
 
 } // namespace platform

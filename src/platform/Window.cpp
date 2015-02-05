@@ -38,7 +38,8 @@ extern IWindow* createWindow( u32 width, u32 height );
 // ** Window::Window
 Window::Window( IWindow* impl ) : m_impl( impl )
 {
-    if( !impl ) log::warn( "Window::Window : windows are not available on current platform\n" );
+    if( m_impl ) m_impl->setOwner( this );
+    else         log::warn( "Window::Window : windows are not available on current platform\n" );
 }
 
 // ** Window::~Window
@@ -61,6 +62,34 @@ Window* Window::create( u32 width, u32 height )
     return DC_NEW Window( NULL );
 }
 
+// ** Window::width
+u32 Window::width( void ) const
+{
+    if( m_impl ) {
+        return m_impl->width();
+    }
+
+    log::warn( "Window::width : window is not implemented\n" );
+    return 0;
+}
+
+// ** Window::height
+u32 Window::height( void ) const
+{
+    if( m_impl ) {
+        return m_impl->height();
+    }
+
+    log::warn( "Window::height : window is not implemented\n" );
+    return 0;
+}
+
+// ** Window::setDelegate
+void Window::setDelegate( WindowDelegate* delegate )
+{
+    m_delegate = delegate;
+}
+
 // ** Window::caption
 String Window::caption( void ) const
 {
@@ -81,6 +110,65 @@ void Window::setCaption( const String& value )
     }
 
     m_impl->setCaption( value );
+}
+
+// ** Window::handle
+void* Window::handle( void ) const
+{
+    if( m_impl == NULL ) {
+        log::warn( "Window::handle : window is not implemented\n" );
+        return NULL;
+    }
+
+    return m_impl->handle();
+}
+
+// ** Window::notifyUpdate
+void Window::notifyUpdate( void )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleUpdate( this );
+    }
+}
+
+// ** Window::notifyMouseUp
+void Window::notifyMouseUp( u32 x, u32 y )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleMouseUp( this, x, y );
+    }
+}
+
+// ** Window::notifyMouseDown
+void Window::notifyMouseDown( u32 x, u32 y )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleMouseDown( this, x, y );
+    }
+}
+
+// ** Window::notifyMouseMove
+void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleMouseMove( this, sx, sy, ex, ey );
+    }
+}
+
+// ** Window::notifyKeyDown
+void Window::notifyKeyDown( Key key )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleKeyDown( this, key );
+    }
+}
+
+// ** Window::notifyKeyUp
+void Window::notifyKeyUp( Key key )
+{
+    if( m_delegate != NULL ) {
+        m_delegate->handleKeyUp( this, key );
+    }
 }
 
 } // namespace platform
