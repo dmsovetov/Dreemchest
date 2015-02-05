@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include <platform/Platform.h>
-#include <threads/Threads.h>
 #include <renderer/Renderer.h>
 
 DC_USE_DREEMCHEST

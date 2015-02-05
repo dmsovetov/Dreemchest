@@ -81,9 +81,10 @@
 // ** mouseMoved
 - ( void )mouseMoved : ( NSEvent* )event
 {
+    NSRect  rect  = self.frame;
     NSPoint point = [self transformPoint: event];
 
-    if( point.y >= 0 ) {
+    if( point.y >= 0 && NSPointInRect( [NSEvent mouseLocation], rect ) ) {
         m_window->owner()->notifyMouseMove( m_prevMousePos.x, m_prevMousePos.y, point.x, point.y );
         m_prevMousePos = point;
     }
