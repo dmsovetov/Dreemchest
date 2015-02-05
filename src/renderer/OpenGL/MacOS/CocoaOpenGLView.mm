@@ -70,10 +70,24 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
         NSLog(@"No OpenGL pixel format");
     }
 
+    m_prevMousePos.x = m_prevMousePos.y = -1;
+
     self = [super initWithFrame:frameRect pixelFormat:[pf autorelease]];
     [[self openGLContext] makeCurrentContext];
 
     return self;
+}
+
+// ** setDelegate
+- ( void ) setDelegate: ( id )delegate
+{
+    m_delegate = delegate;
+}
+
+// ** delegate
+- ( id ) delegate
+{
+    return m_delegate;
 }
 
 // ** beginFrame
@@ -117,15 +131,12 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 }
 
-// ** drawView
-- ( void ) drawView
-{
-    // ?? Notify update here
-}
-
 // ** drawRect
-- ( void ) drawRect : ( NSRect )rect {
-    [self drawView];
+- ( void ) drawRect : ( NSRect )rect
+{
+    if( [m_delegate respondsToSelector:@selector(update)] ) {
+        [m_delegate update];
+    }
 }
 
 // ** dealoc
@@ -136,41 +147,65 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     [super dealloc];
 }
 
+// ** transformPoint
+- ( NSPoint )transformPoint : ( NSEvent* )event
+{
+    NSPoint point = [event locationInWindow];
+    point.y       = self.bounds.size.height - point.y;
+
+    return point;
+}
+
 // ** mouseDown
 - ( void )mouseDown : ( NSEvent* )event
 {
-    printf( "CocoaOpenGLView::mouseDown\n" );
+    if( [m_delegate respondsToSelector:@selector(notifyMouseDown:)] ) {
+        [m_delegate notifyMouseDown: [self transformPoint:event]];
+    }
+
+    [super mouseDown:event];
 }
 
 // ** mouseUp
 - ( void )mouseUp : ( NSEvent* )event
 {
-    printf( "CocoaOpenGLView::mouseUp\n" );
-}
+    if( [m_delegate respondsToSelector:@selector(notifyMouseUp:)] ) {
+        [m_delegate notifyMouseUp: [self transformPoint:event]];
+    }
 
-// ** mouseMoved
-- ( void )mouseMoved : ( NSEvent* )event
-{
-    printf( "CocoaOpenGLView::mouseMoved\n" );
+    [super mouseUp:event];
 }
 
 // ** mouseDragged
 - ( void )mouseDragged : ( NSEvent* )event
 {
-    printf( "CocoaOpenGLView::mouseDragged\n" );
-    [self mouseMoved: event];
+    if( [m_delegate respondsToSelector:@selector(notifyMouseMoved:prev:)] ) {
+        NSPoint current = [self transformPoint:event];
+        [m_delegate notifyMouseMoved: current prev:m_prevMousePos];
+        m_prevMousePos = current;
+    }
+
+    [super mouseMoved:event];
 }
 
 // ** keyDown
 - ( void )keyDown : ( NSEvent* )event
 {
-    printf( "CocoaOpenGLView::keyDown\n" );
+    if( [m_delegate respondsToSelector:@selector(keyDown:)] ) {
+        [m_delegate keyDown: event];
+    }
+
+    [super keyDown:event];
 }
 
 // ** keyUp
 - ( void )keyUp : ( NSEvent* )event
 {
-    printf( "CocoaOpenGLView::keyUp\n" );
+    if( [m_delegate respondsToSelector:@selector(keyUp:)] ) {
+        [m_delegate keyUp: event];
+    }
+
+    [super keyUp:event];
 }
 
 // ** acceptsFirstResponder

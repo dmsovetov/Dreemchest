@@ -37,9 +37,10 @@ MacOSOpenGLView::~MacOSOpenGLView( void )
 }
 
 // ** MacOSOpenGLView::initialize
-bool MacOSOpenGLView::initialize( NSWindow* window )
+bool MacOSOpenGLView::initialize( NSWindow* window, id delegate )
 {
     m_view = [[CocoaOpenGLView alloc] initWithFrame:[window frame]];
+    [m_view setDelegate:    delegate];
     [window setContentView: m_view];
     return true;
 }

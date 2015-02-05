@@ -45,7 +45,7 @@ namespace renderer {
         virtual void        endFrame( void );
 
         // ** MacOSOpenGLView
-        bool                initialize( NSWindow* window );
+        bool                initialize( NSWindow* window, id delegate = nil );
 
     private:
 
