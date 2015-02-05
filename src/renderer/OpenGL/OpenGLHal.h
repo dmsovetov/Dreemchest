@@ -132,21 +132,16 @@ namespace renderer {
     };
 
     // ** class OpenGLView
-    class OpenGLView : public IView {
+    class OpenGLView : public RenderView {
     public:
 
-        virtual                     ~OpenGLView( void ) {}
-
-        // ** IView
-        virtual void                beginFrame( void ) {}
-        virtual void                endFrame( void ) {}
     };
 
     // ** class OpenGLHal
     class OpenGLHal : public Hal {
     public:
 
-                                    OpenGLHal( IView* view );
+                                    OpenGLHal( RenderView* view );
 
         // ** Renderer
         virtual void				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );

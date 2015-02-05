@@ -30,26 +30,15 @@
 #include <Cocoa/Cocoa.h>
 #include <QuartzCore/CVDisplayLink.h>
 
-// ** CocoaOpenGLViewDelegate
-@interface CocoaOpenGLViewDelegate : NSObject
-    - ( void )update;
-    - ( void )notifyMouseMoved: ( NSPoint )point prev:( NSPoint )prev;
-    - ( void )notifyMouseDown:  ( NSPoint )point;
-    - ( void )notifyMouseUp:    ( NSPoint )point;
-    - ( void )keyDown:      ( NSEvent* )event;
-    - ( void )keyUp:        ( NSEvent* )event;
-@end
-
 // ** CocoaOpenGLView
 @interface CocoaOpenGLView : NSOpenGLView {
-        CVDisplayLinkRef            m_displayLink;
-        CocoaOpenGLViewDelegate*    m_delegate;
-        NSPoint                     m_prevMousePos;
+        CVDisplayLinkRef        m_displayLink;
+        NSWindow*               m_window;
     }
-    - ( void ) setDelegate: ( id )delegate;
-    - ( id )   delegate;
-    - ( void ) beginFrame;
-    - ( void ) endFrame;
+    - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
+    - ( void )  beginFrame;
+    - ( void )  endFrame;
+    - ( void )  makeCurrent;
 @end
 
 #endif /*   !defined( __DC_Renderer_CocoaOpenGLView_H__ ) */

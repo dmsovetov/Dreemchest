@@ -41,11 +41,12 @@ namespace renderer {
         virtual             ~MacOSOpenGLView( void );
 
         // ** IView
+        virtual void        makeCurrent( void );
         virtual void        beginFrame( void );
         virtual void        endFrame( void );
 
         // ** MacOSOpenGLView
-        bool                initialize( NSWindow* window, id delegate = nil );
+        bool                initialize( NSWindow* window, PixelFormat depthStencil, id delegate );
 
     private:
 

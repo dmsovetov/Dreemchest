@@ -35,6 +35,7 @@ namespace renderer {
 
     DECLARE_LOG( log )
 
+    class RenderView;
     class Hal;
     class BatchRenderer;
     class BlendState;
@@ -53,6 +54,7 @@ namespace renderer {
             class TextureCube;
 
     // ** enum Renderer
+    //! Hardware rendering API.
     enum Renderer {
         OpenGL,
         Direct3D

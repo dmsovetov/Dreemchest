@@ -33,18 +33,21 @@ DC_BEGIN_DREEMCHEST
 
 namespace renderer {
 
-    // ** class IView
-    //! View interface is a container for rendering surface.
-    class IView {
+    // ** class RenderView
+    //! RenderView class is a container for rendering surface.
+    class dcInterface RenderView {
     public:
         
-        virtual                     ~IView( void ) {}
+        virtual                     ~RenderView( void ) {}
+
+        //! Activates the view for rendering.
+        virtual void                makeCurrent( void ) {}
 
         //! Begins a frame rendering.
-        virtual void                beginFrame( void )  = 0;
+        virtual void                beginFrame( void ) {}
 
         //! Ends a frame rendering.
-        virtual void                endFrame( void )    = 0;
+        virtual void                endFrame( void ) {}
     };
 
     // ** class Hal
@@ -56,7 +59,7 @@ namespace renderer {
                                     /*!
                                      \param view Viewport container.
                                      */
-                                    Hal( IView* view );
+                                    Hal( RenderView* view );
         virtual                     ~Hal( void );
 
         //! Returns a pointer to a batched 2D renderer.
@@ -247,12 +250,24 @@ namespace renderer {
     //    virtual void                setTransform( Transform transform, const mat4& T );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
 
-        static Hal*                 create( Renderer renderer );
+        //! Creates a new HAL instance.
+        /*!
+         \param renderer Rendering API to be used.
+         \param view Rendering viewport to be used.
+         */
+        static Hal*                 create( Renderer renderer, RenderView* view = NULL );
+
+        //! Creates and initializes a new OpenGL view.
+        /*!
+         \param window Platform-specific window handle (like HWND or NSWindow).
+         \return OpenGLView instance.
+         */
+        static RenderView*          createOpenGLView( void* window, PixelFormat depthStencil = PixelD24S8 );
 
     protected:
 
         //! Rendering viewport.
-        IView*                      m_view;
+        RenderView*                 m_view;
 
         //! Batched 2D renderer.
         dcBatchRenderer             m_batchRenderer;

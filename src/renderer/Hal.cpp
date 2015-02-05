@@ -41,10 +41,13 @@ namespace renderer {
 
 IMPLEMENT_LOGGER( log )
 
+//! Platform-specific OpenGL view constructor.
+extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
+
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
 // ** Hal::Hal
-Hal::Hal( IView* view ) : m_view( view )
+Hal::Hal( RenderView* view ) : m_view( view )
 {
     m_batchRenderer = NULL;
 
@@ -83,14 +86,25 @@ dcBatchRenderer Hal::requestBatchRenderer( void )
 }
 
 // ** Hal::create
-Hal* Hal::create( Renderer renderer )
+Hal* Hal::create( Renderer renderer, RenderView* view )
 {
     switch( renderer ) {
-    case OpenGL:    return DC_NEW OpenGLHal( NULL );
+    case OpenGL:    return DC_NEW OpenGLHal( view );
     case Direct3D:  log::error( "Hal::create : Direct3D renderer is not implemented\n" );
     }
 
     return NULL;
+}
+
+// ** Hal::createOpenGLView
+RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
+{
+#ifdef DC_PLATFORM_OSX
+    return renderer::createOpenGLView( window, depthStencil );
+#else
+    log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
+    return NULL;
+#endif
 }
 
 // ** Hal::clear

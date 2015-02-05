@@ -36,9 +36,16 @@ namespace renderer {
 // ----------------------------------------------- OpenGLHal ----------------------------------------------- //
 
 // ** OpenGLHal::OpenGLHal
-OpenGLHal::OpenGLHal( IView* view ) : Hal( view )
+OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 {
+    if( m_view ) m_view->makeCurrent();
+
 	DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL );
+
+    log::msg( "GL_VERSION:    %s\n", glGetString( GL_VERSION ) );
+    log::msg( "GL_RENDERER:   %s\n", glGetString( GL_RENDERER ) );
+    log::msg( "GL_VENDOR:     %s\n", glGetString( GL_VENDOR ) );
+    log::msg( "GL_EXTENSIONS: %s\n", glGetString( GL_EXTENSIONS ) );
 
     m_stencilFunc   = Always;
     m_stencilMask   = ~0;

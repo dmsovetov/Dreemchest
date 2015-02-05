@@ -25,6 +25,9 @@
  **************************************************************************/
 
 #include "CocoaOpenGLView.h"
+#include "../../Renderer.h"
+
+DC_USE_DREEMCHEST
 
 // ** CocoaOpenGLView
 @implementation CocoaOpenGLView
@@ -48,19 +51,28 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     return result;
 }
 
-// ** initWithFrame
-- ( id ) initWithFrame : ( NSRect )frameRect
+// ** initWithWindow
+-( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
 {
+    m_window = window;
+
+    int depth   = 24;
+    int stencil = 8;
+
+    switch( depthStencil ) {
+    case renderer::PixelD24S8:  depth   = 24;
+                                stencil = 8;
+                                break;
+    case renderer::PixelD24X8:  depth   = 24;
+                                stencil = 0;
+                                break;
+    }
+
     NSOpenGLPixelFormatAttribute attrs[] =
     {
         NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFADepthSize, 24,
-        NSOpenGLPFAStencilSize, 8,
-        // Must specify the 3.2 Core Profile to use OpenGL 3.2
-#if ESSENTIAL_GL_PRACTICES_SUPPORT_GL3
-        NSOpenGLPFAOpenGLProfile,
-        NSOpenGLProfileVersion3_2Core,
-#endif
+        NSOpenGLPFADepthSize,   depth,
+        NSOpenGLPFAStencilSize, stencil,
         0
     };
 
@@ -70,30 +82,16 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
         NSLog(@"No OpenGL pixel format");
     }
 
-    m_prevMousePos.x = m_prevMousePos.y = -1;
-
-    self = [super initWithFrame:frameRect pixelFormat:[pf autorelease]];
+    self = [super initWithFrame:m_window.frame pixelFormat:[pf autorelease]];
     [[self openGLContext] makeCurrentContext];
 
     return self;
 }
 
-// ** setDelegate
-- ( void ) setDelegate: ( id )delegate
-{
-    m_delegate = delegate;
-}
-
-// ** delegate
-- ( id ) delegate
-{
-    return m_delegate;
-}
-
 // ** beginFrame
 - ( void ) beginFrame
 {
-    [[self openGLContext] makeCurrentContext];
+    [self makeCurrent];
     CGLLockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
 }
 
@@ -102,6 +100,12 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 {
     CGLFlushDrawable( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
     CGLUnlockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+}
+
+// ** makeCurrent
+- ( void ) makeCurrent
+{
+    [[self openGLContext] makeCurrentContext];
 }
 
 // ** prepareOpenGL
@@ -125,7 +129,7 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 // ** initGL
 - ( void ) initGL
 {
-    [[self openGLContext] makeCurrentContext];
+    [self makeCurrent];
 
     GLint swapInt = 1;
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
@@ -134,9 +138,7 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 // ** drawRect
 - ( void ) drawRect : ( NSRect )rect
 {
-    if( [m_delegate respondsToSelector:@selector(update)] ) {
-        [m_delegate update];
-    }
+    [m_window update];
 }
 
 // ** dealoc
@@ -145,72 +147,6 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     // Release the display link
     CVDisplayLinkRelease( m_displayLink );
     [super dealloc];
-}
-
-// ** transformPoint
-- ( NSPoint )transformPoint : ( NSEvent* )event
-{
-    NSPoint point = [event locationInWindow];
-    point.y       = self.bounds.size.height - point.y;
-
-    return point;
-}
-
-// ** mouseDown
-- ( void )mouseDown : ( NSEvent* )event
-{
-    if( [m_delegate respondsToSelector:@selector(notifyMouseDown:)] ) {
-        [m_delegate notifyMouseDown: [self transformPoint:event]];
-    }
-
-    [super mouseDown:event];
-}
-
-// ** mouseUp
-- ( void )mouseUp : ( NSEvent* )event
-{
-    if( [m_delegate respondsToSelector:@selector(notifyMouseUp:)] ) {
-        [m_delegate notifyMouseUp: [self transformPoint:event]];
-    }
-
-    [super mouseUp:event];
-}
-
-// ** mouseDragged
-- ( void )mouseDragged : ( NSEvent* )event
-{
-    if( [m_delegate respondsToSelector:@selector(notifyMouseMoved:prev:)] ) {
-        NSPoint current = [self transformPoint:event];
-        [m_delegate notifyMouseMoved: current prev:m_prevMousePos];
-        m_prevMousePos = current;
-    }
-
-    [super mouseMoved:event];
-}
-
-// ** keyDown
-- ( void )keyDown : ( NSEvent* )event
-{
-    if( [m_delegate respondsToSelector:@selector(keyDown:)] ) {
-        [m_delegate keyDown: event];
-    }
-
-    [super keyDown:event];
-}
-
-// ** keyUp
-- ( void )keyUp : ( NSEvent* )event
-{
-    if( [m_delegate respondsToSelector:@selector(keyUp:)] ) {
-        [m_delegate keyUp: event];
-    }
-
-    [super keyUp:event];
-}
-
-// ** acceptsFirstResponder
-- ( BOOL )acceptsFirstResponder {
-    return YES;
 }
 
 @end
