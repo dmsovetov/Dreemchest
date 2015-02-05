@@ -26,21 +26,57 @@
 
 #include <platform/Platform.h>
 #include <threads/Threads.h>
+#include <renderer/Renderer.h>
 
 DC_USE_DREEMCHEST
 
 using namespace platform;
+using namespace renderer;
+
+class AppWindow : public WindowDelegate {
+public:
+
+                            AppWindow( Hal* hal ) : m_clearColor( Black ), m_hal( hal ) {}
+
+    void                    handleMouseDown( Window* window, u32 x, u32 y ) { platform::log::msg( "handleMouseDown : %d %d\n", x, y ); }
+    void                    handleMouseUp( Window* window, u32 x, u32 y ) { platform::log::msg( "handleMouseUp : %d %d\n", x, y ); }
+    void                    handleKeyDown( Window* window, Key key ) { platform::log::msg( "handleKeyDown : %d\n", key ); }
+    void                    handleKeyUp( Window* window, Key key ) { platform::log::msg( "handleKeyUp : %d\n", key ); }
+
+    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {
+        platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
+        m_clearColor.r = sx / ( float )window->width();
+        m_clearColor.g = sy / ( float )window->height();
+    }
+
+    virtual void handleUpdate( Window* window ) {
+        m_hal->clear( m_clearColor );
+
+        m_hal->present();
+    }
+
+private:
+
+    Rgba    m_clearColor;
+    Hal*    m_hal;
+};
 
 void handleApplicationLaunched( Application* app )
 {
-    printf( "handleApplicationLaunched\n" );
-    Window* window = Window::create( 800, 600 );
+    platform::log::msg( "handleApplicationLaunched\n" );
+    
+    Window*     window = Window::create( 800, 600 );
+    RenderView* view   = Hal::createOpenGLView( window->handle() );
+    Hal*        hal    = Hal::create( OpenGL, view );
+
     window->setCaption( "Hello" );
+    window->setDelegate( new AppWindow( hal ) );
 }
 
 int testPlatform( int argc, char **argv )
 {
-    log::setStandardHandler();
+    ::platform::log::setStandardHandler();
+    ::renderer::log::setStandardHandler();
 
     Application* app = Application::create();
     app->launch( dcStaticFunction( handleApplicationLaunched ) );
