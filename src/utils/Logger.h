@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Logger_H__
-#define __DC_Logger_H__
+#ifndef __DC_Utils_Logger_H__
+#define __DC_Utils_Logger_H__
 
 #define LOGGER_FORMAT( fmt )                                                \
     char	buffer[MaxMessageLength];                                       \
@@ -56,4 +56,4 @@
 
 #define IMPLEMENT_LOGGER( name ) name::LoggerCallback name::s_callback = NULL;
 
-#endif  /*  !defined( __DC_Logger_H__ ) */
+#endif  /*  !defined( __DC_Utils_Logger_H__ ) */

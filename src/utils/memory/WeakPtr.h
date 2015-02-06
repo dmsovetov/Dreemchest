@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef        __DC_WeakPtr_H__
-#define        __DC_WeakPtr_H__
+#ifndef        __DC_Utils_WeakPtr_H__
+#define        __DC_Utils_WeakPtr_H__
 
 #include    "RefCounted.h"
 
@@ -169,4 +169,4 @@ DC_BEGIN_DREEMCHEST
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_WeakPtr_H__    */
+#endif    /*    !__DC_Utils_WeakPtr_H__    */

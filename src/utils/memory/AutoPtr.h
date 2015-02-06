@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_AutoPtr_H__
-#define		__DC_AutoPtr_H__
+#ifndef		__DC_Utils_AutoPtr_H__
+#define		__DC_Utils_AutoPtr_H__
 
 #include "../../Namespace.h"
 
@@ -144,4 +144,4 @@ DC_BEGIN_DREEMCHEST
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_AutoPtr_H__	*/
+#endif		/*	!__DC_Utils_AutoPtr_H__	*/

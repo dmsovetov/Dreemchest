@@ -27,7 +27,9 @@
 #ifndef __DC_Renderer_H__
 #define __DC_Renderer_H__
 
-#include "../Common.h"
+#ifndef DC_UTILS_INCLUDED
+    #include <utils/Utils.h>
+#endif
 
 DC_BEGIN_DREEMCHEST
 

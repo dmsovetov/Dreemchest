@@ -27,7 +27,18 @@
 #ifndef        __DC_Threads_H__
 #define        __DC_Threads_H__
 
-#include    "../Common.h"
+#ifndef DC_UTILS_INCLUDED
+    #include <utils/Utils.h>
+#endif
+
+#include <queue>
+
+// --------------------------------------- Module macroses --------------------------------------- //
+
+#define DC_SCOPED_LOCK( mutex ) \
+            thread::ScopedLock mutex##ScopedLock( mutex )
+
+// ---------------------------------- Module types and namespaces -------------------------------- //
 
 DC_BEGIN_DREEMCHEST
 
@@ -52,6 +63,8 @@ DC_BEGIN_DREEMCHEST
     DC_DECLARE_PTRS( thread::TaskProgress, TaskProgress )
 
 DC_END_DREEMCHEST
+
+// ------------------------------------- Export module headers ------------------------------------ //
 
 #ifndef DC_BUILD_LIBRARY
     #include "Task/TaskManager.h"

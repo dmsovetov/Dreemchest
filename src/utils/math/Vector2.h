@@ -24,35 +24,24 @@
 
  **************************************************************************/
 
-#ifndef __DC_StringHash_H__
-#define __DC_StringHash_H__
+#ifndef __DC_Utils_Vector2_H__
+#define __DC_Utils_Vector2_H__
 
 DC_BEGIN_DREEMCHEST
 
-    // ** class StringHash
-    class StringHash {
+    // ** class Vec2
+    class Vec2 {
     public:
 
-        typedef unsigned long type;
+                    Vec2( void ) : x( 0.0f ), y( 0.0f ) {}
+                    Vec2( float _x, float _y ) : x( _x ), y( _y ) {}
 
-        // ** StringHash
-        StringHash( const char *input ) {
-            m_hash = 5381;
-            unsigned char    *str = ( unsigned char* )input;
-            int c;
+    public:
 
-            while( (c = *str++) ) {
-                m_hash = ((m_hash << 5) + m_hash) + c;
-            }
-        }
-
-        operator type() const { return m_hash; }
-
-    private:
-
-        type     m_hash;
+        float       x;
+        float       y;
     };
 
 DC_END_DREEMCHEST
 
-#endif  /*      !defined( __DC_StringHash_H__ )   */
+#endif  /*  !defined( __DC_Utils_Vector2_H__ )    */

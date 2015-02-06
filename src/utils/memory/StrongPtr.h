@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef        __DC_StrongPtr_H__
-#define        __DC_StrongPtr_H__
+#ifndef __DC_Utils_StrongPtr_H__
+#define __DC_Utils_StrongPtr_H__
 
 #include    "RefCounted.h"
 
@@ -149,4 +149,4 @@ DC_BEGIN_DREEMCHEST
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_StrongPtr_H__    */
+#endif    /*    !__DC_Utils_StrongPtr_H__    */

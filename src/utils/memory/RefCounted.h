@@ -24,10 +24,8 @@
 
  **************************************************************************/
 
-#ifndef        __DC_RefCounter_H__
-#define        __DC_RefCounter_H__
-
-#include    "../../Common.h"
+#ifndef        __DC_Utils_RefCounter_H__
+#define        __DC_Utils_RefCounter_H__
 
 DC_BEGIN_DREEMCHEST
 
@@ -104,7 +102,7 @@ DC_BEGIN_DREEMCHEST
 
     // ** class RefCounted
     //! An intrusive reference counting object.
-    class dcInterface RefCounted {
+    class RefCounted {
     public:
 
                             RefCounted( void );
@@ -191,4 +189,4 @@ DC_BEGIN_DREEMCHEST
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_RefCounter_H__    */
+#endif    /*    !__DC_Utils_RefCounter_H__    */

@@ -24,24 +24,21 @@
 
  **************************************************************************/
 
-#ifndef __DC_Vector2_H__
-#define __DC_Vector2_H__
+#ifndef DREEMCHEST_H
+#define DREEMCHEST_H
 
-DC_BEGIN_DREEMCHEST
+#include "utils/Utils.h"
 
-    // ** class Vec2
-    class Vec2 {
-    public:
+#ifdef DC_THREADS
+    #include "threads/Threads.h"
+#endif
 
-                    Vec2( void ) : x( 0.0f ), y( 0.0f ) {}
-                    Vec2( float _x, float _y ) : x( _x ), y( _y ) {}
+#ifdef DC_RENDERER
+    #include "renderer/Renderer.h"
+#endif
 
-    public:
+#ifdef DC_SOUND
+    #include "sound/Sound.h"
+#endif
 
-        float       x;
-        float       y;
-    };
-
-DC_END_DREEMCHEST
-
-#endif  /*  !defined( __DC_Vector2_H__ )    */
+#endif  /*  !defined( DREEMCHEST_H )    */

@@ -24,14 +24,35 @@
 
  **************************************************************************/
 
-extern int testSound( int argc, char** argv );
-extern int testThreads( int argc, char** argv );
-extern int testRenderer( int argc, char** argv );
-extern int testPlatform( int argc, char** argv );
+#ifndef __DC_Utils_StringHash_H__
+#define __DC_Utils_StringHash_H__
 
-int main( int argc, char** argv )
-{
-    testThreads( argc, argv );
-//    testSound( argc, argv );
-//    testPlatform( argc, argv );
-}
+DC_BEGIN_DREEMCHEST
+
+    // ** class StringHash
+    class StringHash {
+    public:
+
+        typedef unsigned long type;
+
+        // ** StringHash
+        StringHash( const char *input ) {
+            m_hash = 5381;
+            unsigned char    *str = ( unsigned char* )input;
+            int c;
+
+            while( (c = *str++) ) {
+                m_hash = ((m_hash << 5) + m_hash) + c;
+            }
+        }
+
+        operator type() const { return m_hash; }
+
+    private:
+
+        type     m_hash;
+    };
+
+DC_END_DREEMCHEST
+
+#endif  /*      !defined( __DC_Utils_StringHash_H__ )   */

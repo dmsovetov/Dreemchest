@@ -24,39 +24,30 @@
 
  **************************************************************************/
 
-#ifndef __DC_Exception_H__
-#define __DC_Exception_H__
+#ifndef __DC_Utils_H__
+#define __DC_Utils_H__
 
-DC_BEGIN_DREEMCHEST
+#define DC_UTILS_INCLUDED
 
-    // ** class Exception
-    class Exception {
-    public:
+#define dcInterface
 
-        enum { MaxMessageLength = 4096 };
+#include "Namespace.h"
 
-        char			message[MaxMessageLength];
-                        Exception( const char *string = "" ) { strncpy( message, string, MaxMessageLength ); }
+#include "Preprocessor.h"
+#include "Exception.h"
+#include "Logger.h"
+#include "StringHash.h"
 
-    public:
+#include "delegate/Closure.h"
 
-        static void		Error( const char *message, ... );
-    };
+#include "memory/WeakPtr.h"
+#include "memory/StrongPtr.h"
+#include "memory/AutoPtr.h"
 
-    // ** Exception::Error
-    inline void Exception::Error( const char *message, ... ) {
-    #ifdef DC_EXCEPTIONS_ENABLED
-        va_list		ap;
-        char		formated[MaxMessageLength];
+#include "math/Vector2.h"
 
-        va_start( ap, message );
-        vsnprintf( formated, MaxMessageLength, message, ap );
-        va_end( ap );
-        
-        throw Exception( formated );
-    #endif
-    }
+#include "Types.h"
 
-DC_END_DREEMCHEST
+#include "Color.h"
 
-#endif  /*  !defined( __DC_Exception_H__ )  */
+#endif  /*  !defined( __DC_Utils_H__ ) */

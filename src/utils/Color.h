@@ -24,8 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Color_H__
-#define		__DC_Color_H__
+#ifndef		__DC_Utils_Color_H__
+#define		__DC_Utils_Color_H__
+
+#include <stdlib.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -295,4 +297,4 @@ DC_BEGIN_DREEMCHEST
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Color_H__	*/
+#endif		/*	!__DC_Utils_Color_H__	*/

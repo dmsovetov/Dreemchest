@@ -24,11 +24,10 @@
 
  **************************************************************************/
 
-#ifndef        __DC_TaskQueue_H__
-#define        __DC_TaskQueue_H__
+#ifndef __DC_Threads_TaskQueue_H__
+#define __DC_Threads_TaskQueue_H__
 
-#include    "../../Common.h"
-#include    "TaskProgress.h"
+#include "TaskProgress.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -112,4 +111,4 @@ namespace thread {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_TaskQueue_H__    */
+#endif    /*    !__DC_Threads_TaskQueue_H__    */

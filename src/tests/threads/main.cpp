@@ -24,6 +24,7 @@
 
  **************************************************************************/
 
+#include <Dreemchest.h>
 #include <threads/Threads.h>
 #include <math.h>
 

@@ -27,7 +27,7 @@
 #ifndef        __DC_Thread_H__
 #define        __DC_Thread_H__
 
-#include    "../Common.h"
+#include    "Threads.h"
 
 #ifdef DC_PLATFORM_WINDOWS
     #undef Yield

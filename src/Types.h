@@ -24,15 +24,17 @@
 
  **************************************************************************/
 
-#ifndef        __DC_TYPES_H__
-#define        __DC_TYPES_H__
+#ifndef __DC_TYPES_H__
+#define __DC_TYPES_H__
+
+#define DC_TYPES_INCLUDED
 
 #include    <string>
 #include    <vector>
-#include    <list>
-#include    <stdarg.h>
 #include    <map>
-#include    <queue>
+//#include    <list>
+//#include    <stdarg.h>
+//#include    <queue>
 
 DC_BEGIN_DREEMCHEST
 

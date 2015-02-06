@@ -28,6 +28,8 @@
 #ifndef __DC_Namespace_H__
 #define __DC_Namespace_H__
 
+#define DC_NAMESPACE_INCLUDED
+
 #ifndef DC_NAMESPACE
     #define DC_NAMESPACE    dreemchest
 #endif

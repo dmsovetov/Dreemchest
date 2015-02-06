@@ -24,14 +24,13 @@
 
  **************************************************************************/
 
-#ifndef        __DC_LIB_PREPROCESSOR_H__
-#define        __DC_LIB_PREPROCESSOR_H__
+#ifndef __DC_Utils_Preprocessor_H__
+#define __DC_Utils_Preprocessor_H__
 
 // ** Bit shifting
 #define        BIT( bit )                ( 1 << bit )
 
 // ** Memory management
-#define DC_SCOPED_LOCK( mutex )     thread::ScopedLock __scopedLock( mutex )
 #define DC_RELEASE( object )        if( object != NULL ) { object->release(); object = NULL; }
 #define DC_DELETE( pointer )        delete pointer;  pointer = NULL;
 #define DC_DELETE_ARRAY( pointer )  delete[]pointer; pointer = NULL;
@@ -200,4 +199,4 @@
 
 #define DC_BREAK DC_BREAK_IF( true )
 
-#endif        /*    !__DC_COMMON_H__    */
+#endif        /*    !__DC_Utils_Preprocessor_H__    */

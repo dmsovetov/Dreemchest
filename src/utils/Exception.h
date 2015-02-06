@@ -24,14 +24,41 @@
 
  **************************************************************************/
 
-extern int testSound( int argc, char** argv );
-extern int testThreads( int argc, char** argv );
-extern int testRenderer( int argc, char** argv );
-extern int testPlatform( int argc, char** argv );
+#ifndef __DC_Utils_Exception_H__
+#define __DC_Utils_Exception_H__
 
-int main( int argc, char** argv )
-{
-    testThreads( argc, argv );
-//    testSound( argc, argv );
-//    testPlatform( argc, argv );
-}
+#include <string.h>
+
+DC_BEGIN_DREEMCHEST
+
+    // ** class Exception
+    class Exception {
+    public:
+
+        enum { MaxMessageLength = 4096 };
+
+        char			message[MaxMessageLength];
+                        Exception( const char *string = "" ) { strncpy( message, string, MaxMessageLength ); }
+
+    public:
+
+        static void		Error( const char *message, ... );
+    };
+
+    // ** Exception::Error
+    inline void Exception::Error( const char *message, ... ) {
+    #ifdef DC_EXCEPTIONS_ENABLED
+        va_list		ap;
+        char		formated[MaxMessageLength];
+
+        va_start( ap, message );
+        vsnprintf( formated, MaxMessageLength, message, ap );
+        va_end( ap );
+        
+        throw Exception( formated );
+    #endif
+    }
+
+DC_END_DREEMCHEST
+
+#endif  /*  !defined( __DC_Utils_Exception_H__ )  */
