@@ -28,6 +28,7 @@
 #define		__DC_OpenGLExtensions_H__
 
 #include	"../Renderer.h"
+#include	"OpenGLHal.h"
 
 DC_BEGIN_DREEMCHEST
 

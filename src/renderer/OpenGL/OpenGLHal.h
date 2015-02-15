@@ -47,6 +47,8 @@
 
 // ** OpenGL headers and libraries
 #if defined( DC_PLATFORM_WINDOWS )
+	#include	<windows.h>
+
     #include	<gl/gl.h>
     #include	<gl/glu.h>
     #include	<gl/glext.h>
