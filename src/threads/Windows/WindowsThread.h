@@ -24,22 +24,24 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Win32Thread_H__
-#define		__DC_Win32Thread_H__
+#ifndef		__DC_WindowsThread_H__
+#define		__DC_WindowsThread_H__
 
 #include	"../Thread.h"
 #include	"../Mutex.h"
 
-namespace dreemchest {
+#include	<windows.h>
+
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
-	// ** class Win32Thread
-	class Win32Thread : public Thread {
+	// ** class WindowsThread
+	class WindowsThread : public Thread {
 	public:
 
-						Win32Thread( void );
-		virtual			~Win32Thread( void );
+						WindowsThread( void );
+		virtual			~WindowsThread( void );
 
 		// ** Thread
 		virtual void	start( const ThreadCallback& callback, void *userData );
@@ -53,12 +55,12 @@ namespace thread {
 		HANDLE			m_handle;
 	};
 
-	// ** class Win32Mutex
-	class Win32Mutex : public Mutex {
+	// ** class WindowsMutex
+	class WindowsMutex : public Mutex {
 	public:
 
-							Win32Mutex( void );
-		virtual				~Win32Mutex( void );
+							WindowsMutex( void );
+		virtual				~WindowsMutex( void );
 
 		// ** Mutex
 		virtual bool		tryLock( void );
@@ -70,12 +72,12 @@ namespace thread {
 		CRITICAL_SECTION	m_criticalSection;
 	};
 
-	// ** class Win32Condition
-	class Win32Condition : public Condition {
+	// ** class WindowsCondition
+	class WindowsCondition : public Condition {
 	public:
 
-							Win32Condition( void );
-		virtual             ~Win32Condition( void );
+							WindowsCondition( void );
+		virtual             ~WindowsCondition( void );
 
 		// ** Condition
         virtual void        wait( void );
@@ -89,6 +91,6 @@ namespace thread {
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif		/*	!__DC_Win32Thread_H__	*/

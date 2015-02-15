@@ -26,16 +26,16 @@
 
 #include	"WindowsThread.h"
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
 namespace thread {
 
-// ** Win32Thread::Win32Thread
-Win32Thread::Win32Thread( void ) : m_handle( NULL )
+// ** WindowsThread::WindowsThread
+WindowsThread::WindowsThread( void ) : m_handle( NULL )
 {
 }
 
-Win32Thread::~Win32Thread( void )
+WindowsThread::~WindowsThread( void )
 {
 	TerminateThread( m_handle, 0 );
 
@@ -44,78 +44,78 @@ Win32Thread::~Win32Thread( void )
 	}
 }
 
-// ** Win32Thread::start
-void Win32Thread::start( const ThreadCallback& callback, void *userData )
+// ** WindowsThread::start
+void WindowsThread::start( const ThreadCallback& callback, void *userData )
 {
 	Thread::start( callback, userData );
 	m_handle = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )threadProc, this, 0, NULL );
 	SetThreadPriority( m_handle, THREAD_PRIORITY_NORMAL );
 }
 
-// ** Win32Thread::threadProc
-void Win32Thread::threadProc( void *data )
+// ** WindowsThread::threadProc
+void WindowsThread::threadProc( void *data )
 {
-	Win32Thread *thread = reinterpret_cast<Win32Thread*>( data );
+	WindowsThread* thread = reinterpret_cast<WindowsThread*>( data );
 	thread->m_callback( thread->m_userData );
 
 	Sleep( 0 );
 }
 
-// ----------------------------- Win32Mutex ----------------------------- //
+// ----------------------------- WindowsMutex ----------------------------- //
 
-// ** Win32Mutex::Win32Mutex
-Win32Mutex::Win32Mutex( void )
+// ** WindowsMutex::WindowsMutex
+WindowsMutex::WindowsMutex( void )
 {
 	InitializeCriticalSection( &m_criticalSection );
 }
 
-Win32Mutex::~Win32Mutex( void )
+WindowsMutex::~WindowsMutex( void )
 {
 	DeleteCriticalSection( &m_criticalSection );
 }
 
-// ** Win32Mutex::lock
-void Win32Mutex::lock( void )
+// ** WindowsMutex::lock
+void WindowsMutex::lock( void )
 {
 	EnterCriticalSection( &m_criticalSection );
 }
 
-// ** Win32Mutex::unlock
-void Win32Mutex::unlock( void )
+// ** WindowsMutex::unlock
+void WindowsMutex::unlock( void )
 {
 	LeaveCriticalSection( &m_criticalSection );
 }
 
-// ** Win32Mutex::tryLock
-bool Win32Mutex::tryLock( void )
+// ** WindowsMutex::tryLock
+bool WindowsMutex::tryLock( void )
 {
 	return TryEnterCriticalSection( &m_criticalSection ) == TRUE;
 }
 
-// ----------------------------- Win32Condition ----------------------------- //
+// ----------------------------- WindowsCondition ----------------------------- //
 
-// ** Win32Condition::Win32Condition
-Win32Condition::Win32Condition( void )
+// ** WindowsCondition::WindowsCondition
+WindowsCondition::WindowsCondition( void )
 {
 	InitializeCriticalSection( &m_criticalSection );
 	InitializeConditionVariable( &m_condition );
 }
 
-Win32Condition::~Win32Condition( void )
+WindowsCondition::~WindowsCondition( void )
 {
 	DeleteCriticalSection( &m_criticalSection );
 }
 
-// ** Win32Condition::wait
-void Win32Condition::wait( void )
+// ** WindowsCondition::wait
+void WindowsCondition::wait( void )
 {
 	EnterCriticalSection( &m_criticalSection );
 	SleepConditionVariableCS( &m_condition, &m_criticalSection, INFINITE );
 	LeaveCriticalSection( &m_criticalSection );
 }
 
-// ** Win32Condition::trigger
-void Win32Condition::trigger( void )
+// ** WindowsCondition::trigger
+void WindowsCondition::trigger( void )
 {
 	EnterCriticalSection( &m_criticalSection );
 	WakeConditionVariable( &m_condition );
@@ -124,4 +124,4 @@ void Win32Condition::trigger( void )
 
 } // namespace thread
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
