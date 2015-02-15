@@ -48,7 +48,7 @@ void taskBackground( thread::TaskProgress* progress, void* userData )
         printf( "Background: doing a task, step %d\n", i );
 
         progress->setProgress( float( i ) / 10 * 100 );
-        progress->setStatus( ("Background: doing a task " + std::to_string( floor( float( i ) / 10 * 100 ) ) + "%").c_str() );
+        progress->setStatus( ("Background: doing a task " + std::to_string( ( long double )( floor( float( i ) / 10 * 100 ) ) ) + "%").c_str() );
         thread::Thread::sleep( 500 );
     }
 
