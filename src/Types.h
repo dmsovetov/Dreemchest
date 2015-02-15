@@ -32,9 +32,10 @@
 #include    <string>
 #include    <vector>
 #include    <map>
-//#include    <list>
-//#include    <stdarg.h>
-//#include    <queue>
+
+#ifdef DC_PLATFORM_WINDOWS
+	#include <stdarg.h>
+#endif
 
 DC_BEGIN_DREEMCHEST
 

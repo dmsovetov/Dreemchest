@@ -29,6 +29,8 @@
 
 #include <string.h>
 
+#pragma warning( disable : 4996 )
+
 DC_BEGIN_DREEMCHEST
 
     // ** class Exception

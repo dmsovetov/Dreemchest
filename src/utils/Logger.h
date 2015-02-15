@@ -27,6 +27,8 @@
 #ifndef __DC_Utils_Logger_H__
 #define __DC_Utils_Logger_H__
 
+#pragma warning( disable : 4996 )
+
 #define LOGGER_FORMAT( fmt )                                                \
     char	buffer[MaxMessageLength];                                       \
     va_list ap;                                                             \
