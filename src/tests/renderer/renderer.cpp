@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <renderer/Renderer.h>
+#include <platform/Platform.h>
 
 DC_USE_DREEMCHEST
 
@@ -34,10 +35,10 @@ using namespace platform;
 using namespace platform;
 using namespace renderer;
 
-class AppWindow : public WindowDelegate {
+class AppWindowRenderer : public WindowDelegate {
 public:
 
-    AppWindow( Hal* hal ) : m_clearColor( Black ), m_hal( hal ) {}
+    AppWindowRenderer( Hal* hal ) : m_clearColor( Black ), m_hal( hal ) {}
 
     virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {
         platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
@@ -57,7 +58,7 @@ private:
     Hal*    m_hal;
 };
 
-void handleApplicationLaunched( Application* app )
+void handleRendererApplicationLaunched( Application* app )
 {
     platform::log::msg( "handleApplicationLaunched\n" );
 
@@ -66,7 +67,7 @@ void handleApplicationLaunched( Application* app )
     Hal*        hal    = Hal::create( OpenGL, view );
 
     window->setCaption( "Hello" );
-    window->setDelegate( new AppWindow( hal ) );
+    window->setDelegate( new AppWindowRenderer( hal ) );
 }
 
 int testRenderer( int argc, char **argv )
@@ -75,7 +76,7 @@ int testRenderer( int argc, char **argv )
     ::renderer::log::setStandardHandler();
 
     Application* app = Application::create();
-    app->launch( dcStaticFunction( handleApplicationLaunched ) );
+    app->launch( dcStaticFunction( handleRendererApplicationLaunched ) );
 
     return 0;
 }

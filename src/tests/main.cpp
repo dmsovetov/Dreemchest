@@ -32,6 +32,7 @@ extern int testPlatform( int argc, char** argv );
 int main( int argc, char** argv )
 {
 //    testThreads( argc, argv );
-    testSound( argc, argv );
+//    testSound( argc, argv );
 //    testPlatform( argc, argv );
+    testRenderer( argc, argv );
 }

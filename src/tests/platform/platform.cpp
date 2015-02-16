@@ -40,7 +40,7 @@ public:
     virtual void    handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) { platform::log::msg( "handleMouseMove : %d %d\n", ex, ey ); }
 };
 
-void handleApplicationLaunched( Application* app )
+void handlePlatformApplicationLaunched( Application* app )
 {
     platform::log::msg( "handleApplicationLaunched\n" );
     
@@ -55,7 +55,7 @@ int testPlatform( int argc, char **argv )
     ::platform::log::setStandardHandler();
 
     Application* app = Application::create();
-    app->launch( dcStaticFunction( handleApplicationLaunched ) );
+    app->launch( dcStaticFunction( handlePlatformApplicationLaunched ) );
 
     return 0;
 }
