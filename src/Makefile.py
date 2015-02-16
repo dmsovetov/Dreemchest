@@ -1,0 +1,2 @@
+Include( 'dreemchest' )
+Include( 'tests' )
