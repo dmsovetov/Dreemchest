@@ -35,7 +35,3 @@ if Has( 'sound' ):
 
 	if core.linkExternal( Library( 'mad' ) ):
 		core.files( 'sound/Decoders/Mp3SoundDecoder.cpp', 'sound/Decoders/Mp3SoundDecoder.h' )
-
-################################################################################
-
-Include( 'tests' )

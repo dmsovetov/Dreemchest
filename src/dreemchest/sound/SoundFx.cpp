@@ -344,7 +344,7 @@ dcSoundChannelStrong SoundFx::play( const char *identifier )
 
     // ** Ensure we have a free playback slot
     if( group && !group->requestSlot( data ) ) {
-        return false;
+        return NULL;
     }
 
     // ** Cleanup dead channels

@@ -78,7 +78,7 @@ SoundEventInfo createEvent( const char* identifier, SoundEvent::EventType type, 
     return ev;
 }
 
-void sleep( u32 amount )
+void wait( u32 amount )
 {
 #ifdef DC_THREADS
     thread::Thread::sleep( 50 );
@@ -117,7 +117,7 @@ int testSound( int argc, char **argv )
 
     while( musicChannel->isPlaying() ) {
         sfx->update( 0.01f );
-        sleep( 50 );
+        wait( 50 );
     }
 
     printf( "Music playback ended\n" );
@@ -130,7 +130,7 @@ int testSound( int argc, char **argv )
 
         while( sfxChannel->isPlaying() ) {
             sfx->update( 0.01f );
-            sleep( 1 );
+            wait( 1 );
         }
     }
 
@@ -142,7 +142,7 @@ int testSound( int argc, char **argv )
 
         while( eventChannel->isPlaying() ) {
             sfx->update( 0.01f );
-           sleep( 1 );
+            wait( 1 );
         }
     }
 
