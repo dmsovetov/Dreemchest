@@ -56,7 +56,8 @@ namespace sound {
 
     private:
 
-    //    SoundDecoder*           createSoundDecoderFromUnknown( ISoundStream* stream );
+        //! Creates a sound decoder instance for a given format.
+        SoundDecoder*           createSoundDecoder( SoundFormat format ) const;
 
         //! Creates a sound decoder with a given input stream and file format.
         SoundDecoder*           createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format );

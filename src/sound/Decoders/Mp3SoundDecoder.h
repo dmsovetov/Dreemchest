@@ -27,7 +27,7 @@
 #ifndef __DC_Mp3SoundDecoder_H__
 #define __DC_Mp3SoundDecoder_H__
 
-#include "CommonSoundDecoder.h"
+#include "SoundDecoder.h"
 #include <mad/mad.h>
 
 #define MP3_BUFFER_SIZE    4096
@@ -59,12 +59,12 @@ namespace sound {
 
     public:
 
-                                cMp3SoundDecoder( u32 blockSize ) : cSoundDecoder( blockSize ) {}
-        virtual                 ~cMp3SoundDecoder( void );
+                                Mp3SoundDecoder( u32 blockSize ) : SoundDecoder( blockSize ) {}
+        virtual                 ~Mp3SoundDecoder( void );
 
         // ** SoundDecoder
         virtual void            close( void );
-        virtual u32            read( u8 *buffer, u32 size );
+        virtual u32             read( u8 *buffer, u32 size );
         virtual void            seek( u32 pos );
     };
 

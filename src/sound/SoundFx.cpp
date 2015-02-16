@@ -289,17 +289,17 @@ SoundDecoder* SoundFx::createDecoder( const SoundData *data ) const
 
     switch( data->loading() ) {
     case SoundData::Decode:     if( !data->pcm() ) {
-                                    decoder = m_hal->createSoundDecoder( stream );
+                                    decoder = m_hal->createSoundDecoder( stream, SoundFormatOgg );
                                 } else {
                                     stream->release();
                                 }
                                 break;
 
-    case SoundData::LoadToRam:  decoder = m_hal->createSoundDecoder( stream->loadToRam() );
+    case SoundData::LoadToRam:  decoder = m_hal->createSoundDecoder( stream->loadToRam(), SoundFormatOgg );
                                 stream->release();
                                 break;
 
-    case SoundData::Stream:     decoder = m_hal->createSoundDecoder( stream );
+    case SoundData::Stream:     decoder = m_hal->createSoundDecoder( stream, SoundFormatOgg );
                                 break;
     }
 

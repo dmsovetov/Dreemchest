@@ -25,7 +25,12 @@
  **************************************************************************/
 
 #include    "SoundEngine.h"
-#include    "../Decoders/OggSoundDecoder.h"
+
+#include    "../Decoders/WavSoundDecoder.h"
+
+#ifdef HAVE_VORBIS
+    #include "../Decoders/OggSoundDecoder.h"
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -53,35 +58,43 @@ SoundBuffer* SoundEngine::createBuffer( SoundDecoder* decoder, u32 chunks )
 {
     return NULL;
 }
-/*
-// ** SoundEngine::createSoundDecoderFromUnknown
-SoundDecoder* SoundEngine::createSoundDecoderFromUnknown( ISoundStream* stream )
-{
-    char    header[33];
-    u32     format;
 
-    // ** Read header string
-    stream->readString( header, 32 );
-    if( strcmp( header, "DCSOUND" ) != 0 ) {
-        log::error( "SoundEngine::createSoundDecoderFromUnknown : invalid file format" );
-        return false;
+// ** SoundEngine::createSoundDecoder
+SoundDecoder* SoundEngine::createSoundDecoder( SoundFormat format ) const
+{
+    switch( format ) {
+    case SoundFormatUnknown:    log::warn( "SoundEngine::createSoundDecoder : unknown sound format\n" );
+                                return NULL;
+
+    case SoundFormatWav:        return DC_NEW WavSoundDecoder;
+    case SoundFormatMp3:
+                            #ifdef HAVE_MP3
+                                return DC_NEW Mp3SoundDecoder;
+                            #else
+                                log::warn( "SoundEngine::createSoundDecoder : MP3 sound decoder is not supported\n" );
+                            #endif
+                            break;
+    case SoundFormatOgg:
+                            #ifdef HAVE_VORBIS
+                                return DC_NEW OggSoundDecoder;
+                            #else
+                                log::warn( "SoundEngine::createSoundDecoder : Vorbis sound decoder is not supported\n" );
+                            #endif
+                            break;
     }
 
-    // ** Read format ID
-    stream->read( &format, sizeof( format ) );
-
-    return createSoundDecoderWithFormat( stream, scast( SoundFormat, format ) );
-}*/
+    return NULL;
+}
 
 // ** SoundEngine::createSoundDecoderWithFormat
 SoundDecoder* SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format )
 {
     DC_BREAK_IF( stream == NULL );
 
-    SoundDecoder* soundDecoder = DC_NEW OggSoundDecoder;
+    SoundDecoder* soundDecoder = createSoundDecoder( format );
 
     if( !soundDecoder ) {
-        log::error( "OpenAL::createSoundDecoder : failed to open file" );
+        log::error( "OpenAL::createSoundDecoder : failed to open file\n" );
         return NULL;
     }
 
@@ -89,17 +102,13 @@ SoundDecoder* SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, S
         return soundDecoder;
     }
 
-    log::error( "OpenAL::createSoundDecoder : unknown file format" );
+    log::error( "OpenAL::createSoundDecoder : unknown file format\n" );
     return NULL;
 }
 
 // ** SoundEngine::createSoundDecoder
 SoundDecoder* SoundEngine::createSoundDecoder( ISoundStream* stream, SoundFormat format )
 {
-//    if( format == SoundFormatUnknown ) {
-//        return createSoundDecoderFromUnknown( stream );
-//    }
-
     return createSoundDecoderWithFormat( stream, format );
 }
 

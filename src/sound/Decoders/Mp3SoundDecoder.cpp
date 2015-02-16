@@ -24,8 +24,6 @@
 
  **************************************************************************/
 
-#ifdef DC_MP3
-
 #include    "Mp3SoundDecoder.h"
 #include    "../OpenAL/OpenALSoundEngine.h"
 #include    "../../IFileSystem.h"
@@ -35,10 +33,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace sound {
 
-// ** cMp3SoundDecoder::Open
-bool cMp3SoundDecoder::Open( const char *fileName )
+// ** Mp3SoundDecoder::open
+bool Mp3SoundDecoder::open( const char *fileName )
 {
-    cSoundDecoder::Open( fileName );
+    SoundDecoder::Open( fileName );
 
     mad_synth_init( &mp3Synth  );
     mad_stream_init( &mp3Stream );
@@ -63,8 +61,8 @@ bool cMp3SoundDecoder::Open( const char *fileName )
     return true;
 }
 
-// ** cMp3SoundDecoder::Close
-void cMp3SoundDecoder::Close( void )
+// ** Mp3SoundDecoder::close
+void Mp3SoundDecoder::close( void )
 {
     mad_synth_finish( &mp3Synth  );
     mad_stream_finish( &mp3Stream );
@@ -73,7 +71,7 @@ void cMp3SoundDecoder::Close( void )
     stream->Release();
 }
 
-inline u32    resample ( mad_fixed_t sample )
+inline u32 resample ( mad_fixed_t sample )
 {
     sample += 1 << (MAD_F_FRACBITS - 16);
 
@@ -86,8 +84,8 @@ inline u32    resample ( mad_fixed_t sample )
     return (u32)(sample >> (MAD_F_FRACBITS  - 15));
 }
 
-// ** cMp3SoundDecoder::Read
-u32 cMp3SoundDecoder::Read( u8 *buffer, u32 size )
+// ** Mp3SoundDecoder::Read
+u32 Mp3SoundDecoder::Read( u8 *buffer, u32 size )
 {
     u32 bytesRead = 0;
 
@@ -140,8 +138,8 @@ u32 cMp3SoundDecoder::Read( u8 *buffer, u32 size )
     return bytesRead;
 }
 
-// ** cMp3SoundDecoder::ResumeFrame
-void cMp3SoundDecoder::ResumeFrame( u8 *buffer )
+// ** Mp3SoundDecoder::ResumeFrame
+void Mp3SoundDecoder::ResumeFrame( u8 *buffer )
 {
     u16 *data = ( u16* )buffer;
 
@@ -156,15 +154,15 @@ void cMp3SoundDecoder::ResumeFrame( u8 *buffer )
     resumeData = NULL;
 }
 
-// ** cMp3SoundDecoder::Seek
-void cMp3SoundDecoder::Seek( u32 pos )
+// ** Mp3SoundDecoder::Seek
+void Mp3SoundDecoder::Seek( u32 pos )
 {
     stream->Seek( pos, SO_SET );
     ReadFrame();
 }
 
-// ** cMp3SoundDecoder::ReadFrame
-u32    cMp3SoundDecoder::ReadFrame( void )
+// ** Mp3SoundDecoder::ReadFrame
+u32 Mp3SoundDecoder::ReadFrame( void )
 {
     while( true ) {
         u32 ret = stream->Read( buffer + bufferPos, MP3_BUFFER_SIZE - bufferPos, 1 );
@@ -206,5 +204,3 @@ u32    cMp3SoundDecoder::ReadFrame( void )
 } // namespace sound
 
 DC_END_DREEMCHEST
-
-#endif    /*    DC_MP3    */
