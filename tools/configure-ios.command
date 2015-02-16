@@ -1,3 +1,3 @@
 cd "$(dirname $0)"
 cd ../scripts
-python configure.py --source ../../src --output ../../projects/iOS --name cmaketest --platform iOS
+yap iOS --source ../dreemchest/src --output ../projects/dreemchest.ios --name dreemchest --renderer=OpenGL --sound=OpenAL --threads=Posix
