@@ -1,7 +1,41 @@
-core = StaticLibrary( 'Core', paths = ['../dependency', '.'], sources = [ '.', 'utils/*' ], defines = [ 'DC_BUILD_LIBRARY' ] )
-if Has( 'threads' ):  core.dirs( 'threads', 'threads/Task', 'threads/$(THREADS)' )
-if Has( 'sound' ):    core.dirs( 'sound', 'sound/Drivers', 'sound/Decoders', 'sound/Drivers/$(SOUND)' )
-if Has( 'renderer' ): core.dirs( 'renderer', 'renderer/$(RENDERER)', 'renderer/$(RENDERER)/$(PLATFORM)' )
-if Has( 'platform' ): core.dirs( 'platform', 'platform/$(PLATFORM)' )
+core = StaticLibrary( 'Dreemchest', paths = [ '.' ], sources = [ '.', 'utils/*' ], defines = [ 'DC_BUILD_LIBRARY' ] )
 
-Include( '../dependency', 'tests' )
+#############################   Threads     #############################
+
+if Has( 'threads' ):
+	core.dirs( 'threads', 'threads/Task', 'threads/$(THREADS)' )
+
+#############################   Platform    #############################
+
+if Has( 'platform' ):
+	core.dirs( 'platform', 'platform/$(PLATFORM)' )
+
+	if platform == 'MacOS':
+		core.frameworks( 'Cocoa' )
+
+#############################   Renderer    #############################
+
+if Has( 'renderer' ):
+	core.dirs( 'renderer' )
+
+	if core.linkExternal( Library( Get( 'renderer' ), True ) ):
+		core.dirs( 'renderer/$(RENDERER)', 'renderer/$(RENDERER)/$(PLATFORM)' )
+
+#############################   Sound engine    #############################
+
+if Has( 'sound' ):
+	core.dirs( 'sound', 'sound/Drivers' )
+	core.files( 'sound/Decoders/SoundDecoder.cpp', 'sound/Decoders/SoundDecoder.h', 'sound/Decoders/WavSoundDecoder.cpp', 'sound/Decoders/WavSoundDecoder.h' )
+
+	if core.linkExternal( Library( Get( 'sound' ), True ) ):
+		core.dirs( 'sound/Drivers/$(SOUND)' )
+
+	if core.linkExternal( Library( 'vorbis' ) ):
+		core.files( 'sound/Decoders/OggSoundDecoder.cpp', 'sound/Decoders/OggSoundDecoder.h' )
+
+	if core.linkExternal( Library( 'mad' ) ):
+		core.files( 'sound/Decoders/Mp3SoundDecoder.cpp', 'sound/Decoders/Mp3SoundDecoder.h' )
+
+################################################################################
+
+Include( 'tests' )
