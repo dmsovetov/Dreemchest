@@ -53,7 +53,7 @@ public:
     // Called each frame and renders a single frame
     virtual void handleUpdate( Window* window ) {
         // First clear a viewport with a color
-        m_hal->clear( Rgba( 0.2f, 0.2f, 0.2f ) );
+        m_hal->clear( Rgba( 0.3f, 0.3f, 0.3f ) );
 
         // And now just present all rendered data to the screen
         m_hal->present();
@@ -67,7 +67,7 @@ public:
 class RendererInitialization : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void notifyLaunched( Application* application ) {
+    virtual void handleLaunched( Application* application ) {
         platform::log::setStandardHandler();
         renderer::log::setStandardHandler();
 

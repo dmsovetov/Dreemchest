@@ -169,10 +169,6 @@ DC_USE_DREEMCHEST
 // ** drawView
 - (void) drawView: ( id )sender
 {
-    [self beginFrame];
-    glClearColor(1, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-    [self endFrame];
     if( [m_window respondsToSelector:@selector(update)] ) {
         [m_window update];
     }
