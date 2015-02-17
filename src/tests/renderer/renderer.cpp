@@ -40,7 +40,7 @@ public:
 
     AppWindowRenderer( Hal* hal ) : m_clearColor( Black ), m_hal( hal ) {}
 
-    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {
+    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId ) {
         platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
         m_clearColor.r = sx / ( float )window->width();
         m_clearColor.g = sy / ( float )window->height();

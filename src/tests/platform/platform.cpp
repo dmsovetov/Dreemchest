@@ -33,11 +33,11 @@ using namespace platform;
 class AppWindow : public WindowDelegate {
 public:
 
-    virtual void    handleMouseDown( Window* window, u32 x, u32 y ) { platform::log::msg( "handleMouseDown : %d %d\n", x, y ); }
-    virtual void    handleMouseUp( Window* window, u32 x, u32 y ) { platform::log::msg( "handleMouseUp : %d %d\n", x, y ); }
-    virtual void    handleKeyDown( Window* window, Key key ) { platform::log::msg( "handleKeyDown : %d\n", key ); }
+    virtual void    handleMouseDown( Window* window, u32 x, u32 y, int touchId ) { platform::log::msg( "handleMouseDown : %d %d\n", x, y ); }
+    virtual void    handleMouseUp( Window* window, u32 x, u32 y, int touchId ) { platform::log::msg( "handleMouseUp : %d %d\n", x, y ); }
+    virtual void    handleKeyDown( Window* window, Key key, int touchId ) { platform::log::msg( "handleKeyDown : %d\n", key ); }
     virtual void    handleKeyUp( Window* window, Key key ) { platform::log::msg( "handleKeyUp : %d\n", key ); }
-    virtual void    handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) { platform::log::msg( "handleMouseMove : %d %d\n", ex, ey ); }
+    virtual void    handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId ) { platform::log::msg( "handleMouseMove : %d %d\n", ex, ey ); }
 };
 
 void handlePlatformApplicationLaunched( Application* app )

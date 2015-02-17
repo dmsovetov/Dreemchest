@@ -24,6 +24,8 @@
 
  **************************************************************************/
 
+#include <platform/Platform.h>
+
 extern int testSound( int argc, char** argv );
 extern int testThreads( int argc, char** argv );
 extern int testRenderer( int argc, char** argv );
