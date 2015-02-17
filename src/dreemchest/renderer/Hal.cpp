@@ -99,7 +99,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 // ** Hal::createOpenGLView
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
-#if defined( DC_PLATFORM_OSX ) || defined( DC_PLATFORM_IOS )
+#if defined( DC_RENDERER_OPENGL )
     return renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
