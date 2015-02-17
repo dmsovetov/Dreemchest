@@ -27,12 +27,10 @@
 // Include a Platform module header.
 #include <platform/Platform.h>
 
-#include <renderer/Renderer.h>
-
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace to shorted the types.
+// Open a platform namespace to use shorter types.
 using namespace platform;
 
 // This class is a key for handling events raised by Window.
@@ -64,13 +62,19 @@ class WindowHandler : public WindowDelegate {
     virtual void handleKeyUp( Window* window, Key key ) {
         platform::log::msg( "handleKeyUp : %d\n", key );
     }
+
+    // This method is called each frame
+    virtual void handleUpdate( Window* window ) {
+        
+    }
 };
 
 // Application delegate is used to handle an events raised by application instance.
 class WindowEvents : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void notifyLaunched( Application* application ) {
+    virtual void handleLaunched( Application* application ) {
+        
         platform::log::setStandardHandler();
         
         // Create a 800x600 window like we did in previous example.

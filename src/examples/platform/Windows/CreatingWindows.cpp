@@ -34,7 +34,8 @@ DC_USE_DREEMCHEST
 class CreatingWindows : public platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void notifyLaunched( platform::Application* application ) {
+    virtual void handleLaunched( platform::Application* application ) {
+
         // This line of code creates a window with 800x600 dimensions.
         //
         // Note: on mobile devices you won't see anything.

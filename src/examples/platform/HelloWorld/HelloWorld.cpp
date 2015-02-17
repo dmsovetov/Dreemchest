@@ -47,7 +47,8 @@ DC_USE_DREEMCHEST
 class HelloWorld : public platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void notifyLaunched( platform::Application* application ) {
+    virtual void handleLaunched( platform::Application* application ) {
+        
         // The log callback can be overridden by custom function (for example to write logs to file),
         // but now we just set a standard log handler, to print all messages to console.
         platform::log::setStandardHandler();
