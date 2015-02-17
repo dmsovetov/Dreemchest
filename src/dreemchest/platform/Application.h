@@ -53,7 +53,7 @@ namespace platform {
         virtual                 ~ApplicationDelegate( void ) {}
 
         //! Notifies about an application start.
-        virtual void            notifyLaunched( Application* application ) {}
+        virtual void            handleLaunched( Application* application ) {}
     };
 
     //! Application class is an entry point for applications.

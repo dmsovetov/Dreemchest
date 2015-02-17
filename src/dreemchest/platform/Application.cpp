@@ -101,7 +101,7 @@ void Application::notifyLaunched( void )
         return;
     }
 
-    m_delegate->notifyLaunched( this );
+    m_delegate->handleLaunched( this );
 }
 
 } // namespace platform
