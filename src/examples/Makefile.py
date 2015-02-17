@@ -1,4 +1,4 @@
 examples = Executable( 'Examples', paths = [ '../dreemchest' ], link = [ 'Dreemchest' ] )
 
-if Has( 'platform' ): examples.dirs( 'platform/*' )
-if Has( 'renderer' ): examples.dirs( 'renderer/*' )
+if Has( 'platform' ): examples.dirs( '01_Platform/*' )
+if Has( 'renderer' ): examples.dirs( '02_Renderer/*' )

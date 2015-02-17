@@ -27,64 +27,63 @@
 // Include a Platform module header.
 #include <platform/Platform.h>
 
-// Include a Renderer module header.
-//
-// This module contains all hardware rendering stuff like
-// textures, vertex buffers, shaders, etc.
-#include <renderer/Renderer.h>
-
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
 // Open a platform namespace to use shorter types.
 using namespace platform;
 
-// Open a renderer namespace.
-using namespace renderer;
-
-// This class will handle notifyUpdate and just clear the viewport
+// This class is a key for handling events raised by Window.
+// Yes, this is a window delegate class, and it works in the
+// same way as an application delegate.
 class WindowHandler : public WindowDelegate {
-public:
-    
-    // Constructs a WindowHandler instance, we pass a HAL pointer
-    // to be able to clear the viewport.
-    WindowHandler( Hal* hal ) : m_hal( hal ) {}
 
-    // Called each frame and renders a single frame
-    virtual void handleUpdate( Window* window ) {
-        // First clear a viewport with a color
-        m_hal->clear( Rgba( 0.3f, 0.3f, 0.3f ) );
-
-        // And now just present all rendered data to the screen
-        m_hal->present();
+    // This method is called when mouse/touch is pressed.
+    virtual void handleMouseDown( Window* window, u32 x, u32 y, int touchId ) {
+        platform::log::msg( "handleMouseDown : %d %d\n", x, y );
     }
 
-    // The previously created HAL instance.
-    Hal* m_hal;
+    // This method is called when mouse/touch is released.
+    virtual void handleMouseUp( Window* window, u32 x, u32 y, int touchId ) {
+        platform::log::msg( "handleMouseUp : %d %d\n", x, y );
+    }
+
+    // This method is called when mouse/touch is moved.
+    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId ) {
+        platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
+    }
+
+    // This method is called when key is pressed.
+    virtual void handleKeyDown( Window* window, Key key, int touchId ) {
+        platform::log::msg( "handleKeyDown : %d\n", key );
+    }
+
+    // This method is called when key is released.
+    virtual void handleKeyUp( Window* window, Key key ) {
+        platform::log::msg( "handleKeyUp : %d\n", key );
+    }
+
+    // This method is called each frame
+    virtual void handleUpdate( Window* window ) {
+        
+    }
 };
 
 // Application delegate is used to handle an events raised by application instance.
-class RendererInitialization : public ApplicationDelegate {
+class WindowEvents : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
+        
         platform::log::setStandardHandler();
-        renderer::log::setStandardHandler();
-
+        
         // Create a 800x600 window like we did in previous example.
-        // This window will contain a rendering viewport.
         Window* window = Window::create( 800, 600 );
 
-        // Create a rendering view.
-        RenderView* view   = Hal::createOpenGLView( window->handle() );
-
-        // Now create the main renderer interface called HAL (hardware abstraction layer).
-        Hal* hal = Hal::create( OpenGL, view );
-
-        // Finally set the window delegate to handle updates.
-        window->setDelegate( new WindowHandler( hal ) );
+        // Now set a window delegate.
+        window->setDelegate( new WindowHandler );
     }
 };
 
-// Now declare an application entry point with Windows application delegate.
-dcDeclareApplication( new RendererInitialization )
+// Now declare an application entry point with WindowEvents application delegate.
+dcDeclareApplication( new WindowEvents )

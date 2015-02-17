@@ -50,5 +50,5 @@ class CreatingWindows : public platform::ApplicationDelegate {
     }
 };
 
-// Now declare an application entry point with Windows application delegate.
+// Now declare an application entry point with CreatingWindows application delegate.
 dcDeclareApplication( new CreatingWindows )
