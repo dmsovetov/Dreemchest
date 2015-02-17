@@ -1,2 +1,2 @@
 Include( 'dreemchest' )
-Include( 'tests' )
+Include( 'examples' )
