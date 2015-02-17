@@ -33,49 +33,80 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-    typedef cClosure<void(Application*)>    ApplicationLaunchedCallback;
-
-    // ** class IApplication
     //! A platform-specific application implementation interface.
     class IApplication {
     public:
 
-        virtual             ~IApplication( void ) {}
+        virtual                 ~IApplication( void ) {}
 
         //! Quits application with an exit code.
-        virtual void        quit( u32 exitCode ) = 0;
+        virtual void            quit( u32 exitCode ) = 0;
 
         //! Launches application with a callback.
-        virtual void        launch( Application* application, ApplicationLaunchedCallback callback )  = 0;
+        virtual int             launch( Application* application )  = 0;
     };
 
-    // ** class Application
+    //! ApplicationDelegate is used to handle events raised by application.
+    class ApplicationDelegate {
+    public:
+
+        virtual                 ~ApplicationDelegate( void ) {}
+
+        //! Notifies about an application start.
+        virtual void            notifyLaunched( Application* application ) {}
+    };
+
+    //! Application class is an entry point for applications.
     class Application {
     public:
 
-        virtual             ~Application( void );
+        virtual                 ~Application( void );
 
         //! Quits application with an exit code.
-        void                quit( u32 exitCode = 0 );
+        /*!
+         \param exitCode Application exit code.
+         */
+        void                    quit( u32 exitCode = 0 );
 
         //! Launches application with a callback.
-        void                launch( ApplicationLaunchedCallback callback );
+        /*!
+         \param delegate Application event delegate.
+         */
+        int                     launch( ApplicationDelegate* delegate );
+
+        //! Notifies an application about a lunch.
+        void                    notifyLaunched( void );
 
         //! Creates a new Application instance.
-        static Application* create( void );
+        static Application*     create( void );
+
+        //! Returns a shared application instance.
+        static Application*     sharedInstance( void );
 
     private:
 
-                            //! Constructs a new Application instance.
-                            Application( IApplication* impl );
+                                //! Constructs a new Application instance.
+                                Application( IApplication* impl );
 
     private:
 
-        IApplication*       m_impl;
+        //! Shared application instance.
+        static Application*     s_application;
+
+        //! Platform specific application implementation.
+        IApplication*           m_impl;
+
+        //! Application delegate instance.
+        ApplicationDelegate*    m_delegate;
     };
 
 } // namespace platform
 
 DC_END_DREEMCHEST
+
+#define dcDeclareApplication( delegate )                                        \
+    int main( int argc, char** argv ) {                                         \
+        return platform::Application::create()->launch( delegate );             \
+    }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

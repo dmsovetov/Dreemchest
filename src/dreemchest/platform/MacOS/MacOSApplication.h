@@ -39,7 +39,7 @@ namespace platform {
 
         // ** IApplication
         virtual void        quit( u32 exitCode );
-        virtual void        launch( Application* application, ApplicationLaunchedCallback callback );
+        virtual int         launch( Application* application );
     };
 
 } // namespace platform

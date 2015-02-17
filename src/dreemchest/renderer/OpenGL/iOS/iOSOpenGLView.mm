@@ -24,38 +24,53 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
-
-#include <Cocoa/Cocoa.h>
+#include "iOSOpenGLView.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace renderer {
 
-// ** createApplication
-IApplication* createApplication( void )
+// ** createOpenGLView
+OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
-    return DC_NEW MacOSApplication;
+    iOSOpenGLView* view = DC_NEW iOSOpenGLView;
+    view->initialize( reinterpret_cast<UIWindow*>( window ), depthStencil, nil );
+    log::verbose( "iOS OpenGL viewport created\n" );
+    return view;
 }
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
+// ** iOSOpenGLView::~iOSOpenGLView
+iOSOpenGLView::~iOSOpenGLView( void )
 {
-    exit( exitCode );
+    [m_view dealloc];
 }
 
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
+// ** iOSOpenGLView::initialize
+bool iOSOpenGLView::initialize( UIWindow* window, PixelFormat depthStencil, id delegate )
 {
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
-    return 0;
+    m_view = [[UIKitOpenGLView alloc] initWithWindow: window depthStencil:depthStencil];
+    [window setContentView: m_view];
+    return true;
 }
 
-} // namespace platform
+// ** iOSOpenGLView::beginFrame
+void iOSOpenGLView::beginFrame( void )
+{
+    [m_view beginFrame];
+}
+
+// ** iOSOpenGLView::endFrame
+void iOSOpenGLView::endFrame( void )
+{
+    [m_view endFrame];
+}
+
+// ** iOSOpenGLView::makeCurrent
+void iOSOpenGLView::makeCurrent( void )
+{
+    [m_view makeCurrent];
+}
+
+} // namespace renderer
 
 DC_END_DREEMCHEST

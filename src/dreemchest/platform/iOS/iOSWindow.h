@@ -24,38 +24,46 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Platform_iOSWindow_H__
+#define __DC_Platform_iOSWindow_H__
 
-#include <Cocoa/Cocoa.h>
+#include "../Window.h"
+#include "UIKitWindow.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
+    // ** class iOSWindow
+    class iOSWindow : public IWindow {
+    public:
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
+                            iOSWindow( void );
+        virtual             ~iOSWindow( void );
 
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
+        // ** IWindow
+        virtual u32         width( void ) const;
+        virtual u32         height( void ) const;
+        virtual String      caption( void ) const;
+        virtual void        setCaption( const String& value );
+        virtual void*       handle( void ) const;
+        void                setOwner( Window* value );
+        Window*             owner( void ) const;
 
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
+        // ** iOSWindow
+        bool                create( void );
 
-    return 0;
-}
+    private:
+
+        //! Implementation owner
+        Window*             m_owner;
+
+        //! Native window.
+        UIKitWindow*        m_window;
+    };
 
 } // namespace platform
 
 DC_END_DREEMCHEST
+
+#endif /*   !defined( __DC_Platform_iOSWindow_H__ )   */

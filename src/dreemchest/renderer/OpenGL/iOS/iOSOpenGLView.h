@@ -24,38 +24,37 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Renderer_iOSOpenGLView_H__
+#define __DC_Renderer_iOSOpenGLView_H__
 
-#include <Cocoa/Cocoa.h>
+#include "../OpenGLHal.h"
+#include "UIKitOpenGLView.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace renderer {
 
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
+    // ** class iOSOpenGLView
+    class iOSOpenGLView : public OpenGLView {
+    public:
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
+        virtual             ~iOSOpenGLView( void );
 
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
+        // ** IView
+        virtual void        makeCurrent( void );
+        virtual void        beginFrame( void );
+        virtual void        endFrame( void );
 
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
+        // ** iOSOpenGLView
+        bool                initialize( UIWindow* window, PixelFormat depthStencil, id delegate );
 
-    return 0;
-}
+    private:
 
-} // namespace platform
+        UIKitOpenGLView*    m_view;
+    };
+
+} // namespace renderer
 
 DC_END_DREEMCHEST
+
+#endif /*   !defined(__DC_Renderer_iOSOpenGLView_H__) */

@@ -24,38 +24,26 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Platform_iOSApplication_H__
+#define __DC_Platform_iOSApplication_H__
 
-#include <Cocoa/Cocoa.h>
+#include "../Application.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
+    // ** class iOSApplication
+    class iOSApplication : public IApplication {
+    public:
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
-
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
-    return 0;
-}
+        // ** IApplication
+        virtual void                quit( u32 exitCode );
+        virtual int                 launch( Application* application );
+    };
 
 } // namespace platform
 
 DC_END_DREEMCHEST
+
+#endif /*   !defined( __DC_Platform_iOSApplication_H__ )  */

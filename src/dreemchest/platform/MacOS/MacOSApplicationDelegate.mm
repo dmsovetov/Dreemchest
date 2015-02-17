@@ -24,38 +24,27 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
 #include "MacOSApplicationDelegate.h"
+#include "MacOSApplication.h"
 
-#include <Cocoa/Cocoa.h>
+@implementation MacOSApplicationDelegate
 
-DC_BEGIN_DREEMCHEST
-
-namespace platform {
-
-// ** createApplication
-IApplication* createApplication( void )
+// ** applicationDidFinishLaunching
+- ( void )applicationDidFinishLaunching: ( NSNotification* )notification
 {
-    return DC_NEW MacOSApplication;
+    platform::Application::sharedInstance()->notifyLaunched();
 }
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
+// ** applicationShouldTerminateAfterLastWindowClosed
+- ( BOOL )applicationShouldTerminateAfterLastWindowClosed: ( NSApplication* )theApplication
 {
-    exit( exitCode );
+    return YES;
 }
 
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
+// ** applicationWillTerminate
+- ( void )applicationWillTerminate: ( NSNotification* )aNotification
 {
-    NSApplication* app = [NSApplication sharedApplication];
 
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
-    return 0;
 }
 
-} // namespace platform
-
-DC_END_DREEMCHEST
+@end

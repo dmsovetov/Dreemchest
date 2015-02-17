@@ -51,7 +51,7 @@ Window::~Window( void )
 // ** Window::create
 Window* Window::create( u32 width, u32 height )
 {
-#ifdef DC_PLATFORM_MACOS
+#if defined( DC_PLATFORM )
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
     }
@@ -132,26 +132,26 @@ void Window::notifyUpdate( void )
 }
 
 // ** Window::notifyMouseUp
-void Window::notifyMouseUp( u32 x, u32 y )
+void Window::notifyMouseUp( u32 x, u32 y, int touchId )
 {
     if( m_delegate != NULL ) {
-        m_delegate->handleMouseUp( this, x, y );
+        m_delegate->handleMouseUp( this, x, y, touchId );
     }
 }
 
 // ** Window::notifyMouseDown
-void Window::notifyMouseDown( u32 x, u32 y )
+void Window::notifyMouseDown( u32 x, u32 y, int touchId )
 {
     if( m_delegate != NULL ) {
-        m_delegate->handleMouseDown( this, x, y );
+        m_delegate->handleMouseDown( this, x, y, touchId );
     }
 }
 
 // ** Window::notifyMouseMove
-void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey )
+void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 {
     if( m_delegate != NULL ) {
-        m_delegate->handleMouseMove( this, sx, sy, ex, ey );
+        m_delegate->handleMouseMove( this, sx, sy, ex, ey, touchId );
     }
 }
 

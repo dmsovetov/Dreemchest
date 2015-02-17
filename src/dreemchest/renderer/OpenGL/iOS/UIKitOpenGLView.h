@@ -24,38 +24,33 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Renderer_UIKitOpenGLView_H__
+#define __DC_Renderer_UIKitOpenGLView_H__
 
-#include <Cocoa/Cocoa.h>
+#include <UIKit/UIKit.h>
 
-DC_BEGIN_DREEMCHEST
+#include "../OpenGLHal.h"
 
-namespace platform {
+// ** UIKitOpenGLView
+@interface UIKitOpenGLView : UIView {
+    @private
 
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
+        UIWindow*       m_window;
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
+        BOOL            m_animating;
+        NSInteger       m_animationFrameInterval;
+        id              m_displayLink;
 
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
+        EAGLContext*    m_context;
+        GLint           m_backingWidth;
+        GLint           m_backingHeight;
+        GLuint          m_defaultFramebuffer, m_colorRenderbuffer, m_depthBuffer;
+    }
 
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
+    - ( id )    initWithWindow: ( UIWindow* )window depthStencil:( int )depthStencil;
+    - ( void )  beginFrame;
+    - ( void )  endFrame;
+    - ( BOOL )  makeCurrent;
+@end
 
-    return 0;
-}
-
-} // namespace platform
-
-DC_END_DREEMCHEST
+#endif /*   !defined( __DC_Renderer_UIKitOpenGLView_H__ ) */

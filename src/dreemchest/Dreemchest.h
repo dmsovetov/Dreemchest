@@ -29,6 +29,10 @@
 
 #include "utils/Utils.h"
 
+#ifdef DC_PLATFORM
+    #include "platform/Platform.h"
+#endif
+
 #ifdef DC_THREADS
     #include "threads/Threads.h"
 #endif

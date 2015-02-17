@@ -33,10 +33,15 @@ namespace platform {
 //! Platform-specific application constructor.
 extern IApplication* createApplication( void );
 
+// ** Application::s_application
+Application* Application::s_application = NULL;
+
 // ** Application::Application
-Application::Application( IApplication* impl ) : m_impl( impl )
+Application::Application( IApplication* impl ) : m_impl( impl ), m_delegate( NULL )
 {
+    DC_BREAK_IF( s_application != NULL );
     if( !m_impl ) log::warn( "Application::Application : application interface is not implemented on current platform\n" );
+    s_application = this;
 }
 
 Application::~Application( void )
@@ -44,10 +49,16 @@ Application::~Application( void )
     DC_DELETE( m_impl )
 }
 
+// ** Application::sharedInstance
+Application* Application::sharedInstance( void )
+{
+    return s_application;
+}
+
 // ** Application::create
 Application* Application::create( void )
 {
-#ifdef DC_PLATFORM_MACOS
+#if defined( DC_PLATFORM )
     if( IApplication* impl = createApplication() ) {
         return DC_NEW Application( impl );
     }
@@ -70,14 +81,27 @@ void Application::quit( u32 exitCode )
 }
 
 // ** Application::launch
-void Application::launch( ApplicationLaunchedCallback callback )
+int Application::launch( ApplicationDelegate* delegate )
 {
     if( !m_impl ) {
         log::warn( "Application::launch : application is not implemented\n" );
+        return -1;
+    }
+
+    m_delegate = delegate;
+
+    return m_impl->launch( this );
+}
+
+// ** Application::notifyLaunched
+void Application::notifyLaunched( void )
+{
+    if( !m_delegate ) {
+        log::verbose( "Application::notifyLaunched : no application delegate set, event ignored\n" );
         return;
     }
 
-    m_impl->launch( this, callback );
+    m_delegate->notifyLaunched( this );
 }
 
 } // namespace platform

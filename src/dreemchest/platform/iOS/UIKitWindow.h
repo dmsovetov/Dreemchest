@@ -24,38 +24,33 @@
 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Platform_UIKitWindow__
+#define __DC_Platform_UIKitWindow__
 
-#include <Cocoa/Cocoa.h>
+#include "../Platform.h"
+#include <UIKit/UIKit.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace platform {
-
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
+    class iOSWindow;
 }
-
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
-
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
-    return 0;
-}
-
-} // namespace platform
 
 DC_END_DREEMCHEST
+
+DC_USE_DREEMCHEST
+
+@interface UIKitWindow : UIWindow {
+    enum { MaxTouches = 16 };
+    CGPoint                 m_prevMousePos;
+    platform::iOSWindow*    m_window;
+    UITouch*                m_touches[MaxTouches];
+}
+
+- ( id )    initWithWindow: ( platform::iOSWindow* )window;
+- ( float ) width;
+- ( float ) height;
+
+@end
+
+#endif /*   !defined( __DC_Platform_CocoaWindow__ )   */

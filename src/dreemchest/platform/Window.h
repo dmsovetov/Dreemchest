@@ -33,7 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-    // ** class IWindow
     //! A platform-specific window implementation interface.
     class IWindow {
     public:
@@ -62,7 +61,7 @@ namespace platform {
         virtual Window*         owner( void ) const         = 0;
     };
 
-    // ** class WindowDelegate
+    //! WindiwDelegate is used to handle events raised by windows.
     class WindowDelegate : public RefCounted {
     public:
 
@@ -72,13 +71,13 @@ namespace platform {
         virtual void            handleUpdate( Window* window ) {}
 
         //! Handles mouse pressed event.
-        virtual void            handleMouseDown( Window* window, u32 x, u32 y ) {}
+        virtual void            handleMouseDown( Window* window, u32 x, u32 y, int touchId = -1 ) {}
 
         //! Handles mouse released event.
-        virtual void            handleMouseUp( Window* window, u32 x, u32 y ) {}
+        virtual void            handleMouseUp( Window* window, u32 x, u32 y, int touchId = -1 ) {}
 
         //! Handles mouse moved event.
-        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey ) {}
+        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId = -1 ) {}
 
         //! Handles key pressed event.
         virtual void            handleKeyDown( Window* window, Key key ) {}
@@ -87,7 +86,6 @@ namespace platform {
         virtual void            handleKeyUp( Window* window, Key key ) {}
     };
 
-    // ** class Window
     //! A platform-specific work with windows.
     class Window {
     public:
@@ -123,13 +121,13 @@ namespace platform {
         void                    notifyUpdate( void );
 
         //! Notifies window that mouse was pressed.
-        void                    notifyMouseDown( u32 x, u32 y );
+        void                    notifyMouseDown( u32 x, u32 y, int touchId = -1 );
 
         //! Notifies window that mouse was released.
-        void                    notifyMouseUp( u32 x, u32 y );
+        void                    notifyMouseUp( u32 x, u32 y, int touchId = -1 );
 
         //! Notifies window that mouse was moved.
-        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey );
+        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId = -1 );
 
         //! Notifies window that key was pressed.
         void                    notifyKeyDown( Key key );
