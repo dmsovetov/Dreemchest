@@ -101,6 +101,43 @@ void* WindowsWindow::handle( void ) const
     return reinterpret_cast<void*>( m_window );
 }
 
+// ** WndProc
+LRESULT WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+	/*
+	cWin32Input		*input		= ( cWin32Input* )wndProcEnv->iInput;
+	const cVector2&	cursorPos	= wndProcEnv->iInput->GetCursorPos();
+	Key				key			= Key::Total;
+
+	switch( message ) {
+	case WM_CLOSE:			PostQuitMessage( 0 );
+		break;
+
+	case WM_KEYDOWN:		key = cWin32Engine::TranslateVirtualKey( ( u32 )wParam );
+		wndProcEnv->iEngine->DispatchKeyDown( key );
+		break;
+
+	case WM_KEYUP:			key = cWin32Engine::TranslateVirtualKey( ( u32 )wParam );
+		wndProcEnv->iEngine->DispatchKeyUp( key );
+		break;
+
+	case WM_LBUTTONDOWN:	wndProcEnv->iEngine->DispatchTouchBegan( cursorPos.x, wndProcEnv->iEngine->GetScreenHeight() - cursorPos.y, 0 );
+		break;
+
+	case WM_LBUTTONUP:		wndProcEnv->iEngine->DispatchTouchEnded( cursorPos.x, wndProcEnv->iEngine->GetScreenHeight() - cursorPos.y, 0 );
+		break;
+
+	case WM_RBUTTONDOWN:	break;
+
+	case WM_RBUTTONUP:		break;
+
+	case WM_CHAR:			break;
+
+	}
+	*/
+	return DefWindowProc( hWnd, message, wParam, lParam );
+}
+
 // ** WindowsWindow::create
 bool WindowsWindow::create( u32 width, u32 height )
 {
@@ -110,8 +147,8 @@ bool WindowsWindow::create( u32 width, u32 height )
 
 	m_windowClass.hCursor		= LoadCursor( NULL, IDC_ARROW );
 	m_windowClass.hInstance		= m_applicationInstance;
-	m_windowClass.lpfnWndProc	= NULL;
-	m_windowClass.lpszClassName	= L"dreemchest";
+	m_windowClass.lpfnWndProc	= ( WNDPROC )WndProc;
+	m_windowClass.lpszClassName	= "dreemchest";
 	m_windowClass.style			= CS_HREDRAW | CS_VREDRAW;
 	m_windowClass.hbrBackground	= ( HBRUSH )COLOR_GRAYTEXT;
 
@@ -125,7 +162,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 	u32 y		= ( GetSystemMetrics( SM_CYSCREEN ) / 2 ) - ( height / 2 );
 
 	m_window = CreateWindowEx( 0, 
-		m_windowClass.lpszClassName, L"",
+		m_windowClass.lpszClassName, "",
 		style,
 		x, y,
 		width, height,
