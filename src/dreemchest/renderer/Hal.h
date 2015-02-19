@@ -41,7 +41,7 @@ namespace renderer {
         virtual                     ~RenderView( void ) {}
 
         //! Activates the view for rendering.
-        virtual void                makeCurrent( void ) {}
+        virtual bool                makeCurrent( void ) { return false; }
 
         //! Begins a frame rendering.
         virtual void                beginFrame( void ) {}
