@@ -24,31 +24,33 @@
 
  **************************************************************************/
 
-#ifndef __DC_Utils_H__
-#define __DC_Utils_H__
-
-#define DC_UTILS_INCLUDED
-
-#define dcInterface
-
-#include "Namespace.h"
-
-#include "Preprocessor.h"
-#include "Exception.h"
-#include "Logger.h"
-#include "StringHash.h"
-#include "Format.h"
-
-#include "delegate/Closure.h"
-
-#include "memory/WeakPtr.h"
-#include "memory/StrongPtr.h"
-#include "memory/AutoPtr.h"
-
-#include "math/Vector2.h"
+#ifndef __DC_Utils_Format_H__
+#define __DC_Utils_Format_H__
 
 #include "Types.h"
 
-#include "Color.h"
+DC_BEGIN_DREEMCHEST
 
-#endif  /*  !defined( __DC_Utils_H__ ) */
+	namespace format {
+
+		//! Converts a integer value to a string.
+		inline String number( u32 value )
+		{
+			char buffer[10];
+			sprintf( buffer, "%d", buffer );
+			return buffer;
+		}
+
+		//! Converts a pointer value to a string.
+		inline String ptr( void* value )
+		{
+			char buffer[20];
+			sprintf( buffer, "%p", value );
+			return buffer;
+		}
+
+	} // namespace format
+
+DC_END_DREEMCHEST
+
+#endif	/*	!__DC_Utils_Format_H__	*/
