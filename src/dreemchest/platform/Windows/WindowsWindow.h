@@ -37,12 +37,14 @@ namespace platform {
 
     // ** class WindowsWindow
     class WindowsWindow : public IWindow {
+	friend class WindowsApplication;
     public:
 
                             WindowsWindow( void );
         virtual             ~WindowsWindow( void );
 
         // ** IWindow
+		virtual void		close( void );
         virtual u32         width( void ) const;
         virtual u32         height( void ) const;
         virtual String      caption( void ) const;
@@ -54,7 +56,18 @@ namespace platform {
         // ** WindowsWindow
         bool                create( u32 width, u32 height );
 
+	private:
+
+		//! Window procedure.
+		static LRESULT		windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+
+		//! Translates a Windows virtual key to Dreemchest key enum.
+		static Key			translateKey( u32 key );
+
     private:
+
+		//! Window registry type
+		typedef std::map<HWND, WindowsWindow*>	Windows;
 
         //! Implementation owner
         Window*             m_owner;
@@ -67,6 +80,15 @@ namespace platform {
 
 		//! Window class.
 		WNDCLASS			m_windowClass;
+
+		//! Window class name.
+		String				m_className;
+
+		//! A windows counter to generate a unique class name.
+		static u32			s_windowCount;
+
+		//! Window registry.
+		static Windows		s_windows;
     };
 
 } // namespace platform

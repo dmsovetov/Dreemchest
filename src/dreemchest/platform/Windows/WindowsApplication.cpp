@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "WindowsApplication.h"
+#include "WindowsWindow.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -45,8 +46,35 @@ void WindowsApplication::quit( u32 exitCode )
 // ** WindowsApplication::launch
 int WindowsApplication::launch( Application* application )
 {
+	// ** Notify application about a launch.
     application->notifyLaunched();
+
+	// ** Start an event loop
+	loop();
+
 	return 0;
+}
+
+// ** WindowsApplication::loop
+void WindowsApplication::loop( void )
+{
+	MSG msg;
+
+	while( 1 ) {
+		if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+			if( msg.message == WM_QUIT ) {
+				break;
+			}
+
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+		else {
+			for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
+				i->second->owner()->notifyUpdate();
+			}
+		}
+	}
 }
 
 } // namespace platform

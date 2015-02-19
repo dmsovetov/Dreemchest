@@ -40,6 +40,11 @@ namespace platform {
         // ** IApplication
         virtual void                quit( u32 exitCode );
         virtual int                 launch( Application* application );
+
+	private:
+
+		//! Windows application event loop.
+		void						loop( void );
     };
 
 } // namespace platform
