@@ -62,6 +62,20 @@ Window* Window::create( u32 width, u32 height )
     return DC_NEW Window( NULL );
 }
 
+// ** Window::release
+void Window::release( void )
+{
+	if( m_delegate != NULL ) {
+		m_delegate->handleClosed( this );
+	}
+
+	if( m_impl ) {
+		m_impl->close();
+	}
+
+	delete this;
+}
+
 // ** Window::width
 u32 Window::width( void ) const
 {

@@ -39,6 +39,9 @@ namespace platform {
 
         virtual                 ~IWindow( void ) {}
 
+		//! Closes a window.
+		virtual void			close( void )				= 0;
+
         //! Returns window width.
         virtual u32             width( void ) const         = 0;
 
@@ -70,6 +73,9 @@ namespace platform {
         //! Handles window frame update.
         virtual void            handleUpdate( Window* window ) {}
 
+		//! Handles a window close.
+		virtual void			handleClosed( Window* window ) {}
+
         //! Handles mouse pressed event.
         virtual void            handleMouseDown( Window* window, u32 x, u32 y, int touchId = -1 ) {}
 
@@ -94,6 +100,9 @@ namespace platform {
 
         //! Creates and shows a new Window instance.
         static Window*          create( u32 width, u32 height );
+
+		//! Closes a window and releases a memory.
+		void					release( void );
 
         //! Returns a window caption.
         String                  caption( void ) const;
