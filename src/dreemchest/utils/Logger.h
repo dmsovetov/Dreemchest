@@ -40,7 +40,7 @@
     class name {                                                            \
     public:                                                                 \
         enum LogType { Verbose, Normal, Warning, Error };                   \
-        enum { MaxMessageLength = 500 };                                    \
+        enum { MaxMessageLength = 4096 };                                   \
                                                                             \
         typedef void ( *LoggerCallback )( int type, const char* message );  \
                                                                             \
