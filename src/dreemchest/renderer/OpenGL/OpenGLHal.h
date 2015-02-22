@@ -53,9 +53,6 @@
     #include	<gl/glu.h>
     #include	<gl/glext.h>
     #include	<gl/wglext.h>
-
-    #pragma comment( lib, "opengl32.lib" )
-    #pragma comment( lib, "glu32.lib" )
 #endif
 
 #if defined( DC_PLATFORM_ANDROID )

@@ -33,7 +33,9 @@
     #include    <threads/Thread.h>
 #endif
 
-#include "OpenGL/OpenGLHal.h"
+#ifdef HAVE_OPENGL
+	#include "OpenGL/OpenGLHal.h"
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,8 +43,10 @@ namespace renderer {
 
 IMPLEMENT_LOGGER( log )
 
-//! Platform-specific OpenGL view constructor.
-extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
+#ifdef HAVE_OPENGL
+	//! Platform-specific OpenGL view constructor.
+	extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
+#endif
 
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
@@ -89,8 +93,16 @@ dcBatchRenderer Hal::requestBatchRenderer( void )
 Hal* Hal::create( Renderer renderer, RenderView* view )
 {
     switch( renderer ) {
-    case OpenGL:    return DC_NEW OpenGLHal( view );
+	case OpenGL:	
+					#ifdef HAVE_OPENGL
+						return DC_NEW OpenGLHal( view );
+					#else
+						log::error( "Hal::create : OpenGL renderer is not implemented\n" );
+					#endif
+					break;
+
     case Direct3D:  log::error( "Hal::create : Direct3D renderer is not implemented\n" );
+					break;
     }
 
     return NULL;
@@ -99,7 +111,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 // ** Hal::createOpenGLView
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
-#if defined( DC_RENDERER_OPENGL )
+#if defined( HAVE_OPENGL )
     return renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
