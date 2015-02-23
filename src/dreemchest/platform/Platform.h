@@ -56,6 +56,8 @@ namespace platform {
 			Total
 		} m_mapping;
 
+        operator int() const { return m_mapping; }
+
 		Key( Mapping mapping ) : m_mapping( mapping ) {}
     };
 
