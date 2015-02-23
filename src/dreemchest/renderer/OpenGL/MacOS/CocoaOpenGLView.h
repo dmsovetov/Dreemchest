@@ -38,7 +38,7 @@
     - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
     - ( void )  beginFrame;
     - ( void )  endFrame;
-    - ( void )  makeCurrent;
+    - ( BOOL )  makeCurrent;
 @end
 
 #endif /*   !defined( __DC_Renderer_CocoaOpenGLView_H__ ) */

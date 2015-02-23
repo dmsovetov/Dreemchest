@@ -66,9 +66,9 @@ void MacOSOpenGLView::endFrame( void )
 }
 
 // ** MacOSOpenGLView::makeCurrent
-void MacOSOpenGLView::makeCurrent( void )
+bool MacOSOpenGLView::makeCurrent( void )
 {
-    [m_view makeCurrent];
+    return [m_view makeCurrent];
 }
 
 } // namespace renderer

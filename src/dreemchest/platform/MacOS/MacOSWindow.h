@@ -42,6 +42,7 @@ namespace platform {
         virtual             ~MacOSWindow( void );
 
         // ** IWindow
+        virtual void        close( void );
         virtual u32         width( void ) const;
         virtual u32         height( void ) const;
         virtual String      caption( void ) const;

@@ -41,7 +41,7 @@ namespace renderer {
         virtual             ~MacOSOpenGLView( void );
 
         // ** IView
-        virtual void        makeCurrent( void );
+        virtual bool        makeCurrent( void );
         virtual void        beginFrame( void );
         virtual void        endFrame( void );
 

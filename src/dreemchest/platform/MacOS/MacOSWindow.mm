@@ -60,6 +60,12 @@ MacOSWindow::~MacOSWindow( void )
     }
 }
 
+// ** MacOSWindow::close
+void MacOSWindow::close( void )
+{
+    [m_window close];
+}
+
 // ** MacOSWindow::setOwner
 void MacOSWindow::setOwner( Window* value )
 {

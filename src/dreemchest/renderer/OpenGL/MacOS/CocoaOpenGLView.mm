@@ -103,9 +103,10 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 }
 
 // ** makeCurrent
-- ( void ) makeCurrent
+- ( BOOL ) makeCurrent
 {
     [[self openGLContext] makeCurrentContext];
+    return YES;
 }
 
 // ** prepareOpenGL
