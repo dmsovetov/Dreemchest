@@ -41,7 +41,7 @@ namespace renderer {
         virtual             ~iOSOpenGLView( void );
 
         // ** IView
-        virtual void        makeCurrent( void );
+        virtual bool        makeCurrent( void );
         virtual void        beginFrame( void );
         virtual void        endFrame( void );
 

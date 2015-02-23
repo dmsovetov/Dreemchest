@@ -66,9 +66,9 @@ void iOSOpenGLView::endFrame( void )
 }
 
 // ** iOSOpenGLView::makeCurrent
-void iOSOpenGLView::makeCurrent( void )
+bool iOSOpenGLView::makeCurrent( void )
 {
-    [m_view makeCurrent];
+    return [m_view makeCurrent];
 }
 
 } // namespace renderer

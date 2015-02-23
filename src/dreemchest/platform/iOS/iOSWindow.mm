@@ -55,6 +55,12 @@ iOSWindow::~iOSWindow( void )
 
 }
 
+// ** iOSWindow::close
+void iOSWindow::close( void )
+{
+
+}
+
 // ** iOSWindow::setOwner
 void iOSWindow::setOwner( Window* value )
 {
