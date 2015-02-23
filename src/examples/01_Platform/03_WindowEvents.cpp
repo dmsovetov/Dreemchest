@@ -55,12 +55,12 @@ class WindowHandler : public WindowDelegate {
 
     // This method is called when key is pressed.
     virtual void handleKeyDown( Window* window, Key key ) {
-        platform::log::msg( "handleKeyDown : %d\n", key );
+        platform::log::msg( "handleKeyDown : %d\n", (int)key );
     }
 
     // This method is called when key is released.
     virtual void handleKeyUp( Window* window, Key key ) {
-        platform::log::msg( "handleKeyUp : %d\n", key );
+        platform::log::msg( "handleKeyUp : %d\n", (int)key );
     }
 
     // This method is called each frame
