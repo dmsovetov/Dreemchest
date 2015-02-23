@@ -33,7 +33,7 @@
     #include    <threads/Thread.h>
 #endif
 
-#ifdef HAVE_OPENGL
+#ifdef DC_RENDERER_OPENGL
 	#include "OpenGL/OpenGLHal.h"
 #endif
 
@@ -43,7 +43,7 @@ namespace renderer {
 
 IMPLEMENT_LOGGER( log )
 
-#ifdef HAVE_OPENGL
+#ifdef DC_RENDERER_OPENGL
 	//! Platform-specific OpenGL view constructor.
 	extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
 #endif
@@ -94,7 +94,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 {
     switch( renderer ) {
 	case OpenGL:	
-					#ifdef HAVE_OPENGL
+					#ifdef DC_RENDERER_OPENGL
 						return DC_NEW OpenGLHal( view );
 					#else
 						log::error( "Hal::create : OpenGL renderer is not implemented\n" );
@@ -111,7 +111,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 // ** Hal::createOpenGLView
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
-#if defined( HAVE_OPENGL )
+#if defined( DC_RENDERER_OPENGL )
     return renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );

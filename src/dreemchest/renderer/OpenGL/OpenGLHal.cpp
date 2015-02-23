@@ -445,7 +445,7 @@ void OpenGLHal::setRasterizerState( dcRasterizerState state )
         return;
     }
 
-#ifndef OPENGL_ES
+#ifndef HAVE_OPENGLES
     // ** Polygon mode
     if( state->m_fillMode != RSValueNotSet ) {
         static GLenum glFill[] = { GL_LINE, GL_FILL };
