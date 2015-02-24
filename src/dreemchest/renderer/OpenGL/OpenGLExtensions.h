@@ -79,6 +79,8 @@ namespace renderer {
 	extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2D;
 #elif defined( DC_PLATFORM_MACOS )
     #define GL_RGBA16F              GL_RGBA16F_ARB
+    #define GL_RGBA32F              GL_RGBA32F_ARB
+    #define GL_RGB32F               GL_RGB32F_ARB
     #define GL_POINT_SIZE_ARRAY     GL_POINT_SIZE_ARRAY_APPLE
     #define glPointSizePointer      glPointSizePointerAPPLE
 #elif defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_ANDROID ) || defined( DC_PLATFORM_HTML5 ) // ** OpenGL ES

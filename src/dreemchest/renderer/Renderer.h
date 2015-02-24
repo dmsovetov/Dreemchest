@@ -190,8 +190,9 @@ namespace renderer {
         PixelRg16F,     //!< 16-bit floating point format with two color channels.
         PixelRgba16F,   //!< 16-bit floating point RGBA color.
         PixelR32F,      //!< 32-bit floating point format with a single color channel.
-        PixelRg32F,     //!< 32-bit floating point RGBA color.
-        PixelRgba32F,
+        PixelRg32F,     //!< 32-bit floating point RG color.
+        PixelRgb32F,    //!< 32-bit floating point RGB color.
+        PixelRgba32F,   //!< 32-bit floating point RGBA color.
 
         // ** Depth-stencil formats
         PixelD24X8,     //!< 32-bit depth stencil surface with 24-bit depth value and no stencil.

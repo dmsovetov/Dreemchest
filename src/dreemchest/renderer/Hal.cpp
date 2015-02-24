@@ -612,9 +612,10 @@ bool VertexDeclaration::parse( const char *format )
                     m_vertexSize += sizeof( f32 ) * 3;
                     break;
         case 'c':
-        case 'C':   m_vertexElements[VertexColor].m_offset = m_vertexSize;
-                    m_vertexElements[VertexColor].m_count  = 4;
-                    m_vertexSize += sizeof( unsigned char ) * 4;
+        case 'C':   size = token[1] - 48;
+                    m_vertexElements[VertexColor].m_offset = m_vertexSize;
+                    m_vertexElements[VertexColor].m_count  = size;
+                    m_vertexSize += sizeof( u8 ) * size;
                     break;
 
         case 's':
@@ -627,8 +628,12 @@ bool VertexDeclaration::parse( const char *format )
         case 't':
         case 'T':   size = token[1] - 48;
 					m_vertexElements[VertexTex0 + size].m_offset = m_vertexSize;
-                    m_vertexElements[VertexTex0 + size].m_count  = token[2] - 48;
-                    m_vertexSize += sizeof( f32 ) * (token[2] - 48);
+                    m_vertexElements[VertexTex0 + size].m_count  = 2;
+                    m_vertexSize += sizeof( f32 ) * 2;
+                    break;
+
+        case '*':   size = token[1] - 48;
+                    m_vertexSize += sizeof( f32 ) * size;
                     break;
         }
 
@@ -738,6 +743,12 @@ IndexBuffer::IndexBuffer( u32 count, bool gpu )
 IndexBuffer::~IndexBuffer( void )
 {
 	delete[]m_data;
+}
+
+// ** IndexBuffer::size
+u32 IndexBuffer::size( void ) const
+{
+    return m_size;
 }
 
 // ** IndexBuffer::pointer

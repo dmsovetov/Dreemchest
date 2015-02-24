@@ -62,7 +62,11 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
         glEnable( GL_TEXTURE_2D );
 	}
 
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+
     glActiveTexture( GL_TEXTURE0 );
+    glCullFace( GL_BACK );
 
     while( glGetError() != GL_NO_ERROR ) {}
 }
@@ -258,14 +262,14 @@ void OpenGLHal::setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *
         DC_BREAK_IF( vertexBuffer->isGpu() );
         enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
     }
-    
-    m_vertexDeclaration = vertexDeclaration ? vertexDeclaration : vertexBuffer->vertexDeclaration();
 }
 
 // ** OpenGLHal::enableVertexDeclaration
 void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclaration* vertexDeclaration )
 {
     DC_CHECK_GL;
+
+    m_vertexDeclaration = vertexDeclaration;
 
     u32 stride = vertexDeclaration->vertexSize();
 
@@ -334,6 +338,8 @@ void OpenGLHal::disableVertexDeclaration( const VertexDeclaration* vertexDeclara
     }
 
     glDisableClientState( GL_VERTEX_ARRAY );
+
+    m_vertexDeclaration = NULL;
 }
 
 // ** OpenGLHal::setColorMask
@@ -714,6 +720,8 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
 #endif
 #if !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
     case PixelRgba16F:  return GL_RGBA16F;
+    case PixelRgba32F:  return GL_RGBA32F;
+    case PixelRgb32F:   return GL_RGB32F;
 #endif
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
@@ -733,7 +741,9 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
     case PixelDxtc5:    return GL_RGBA;
     case PixelPvrtc2:   return GL_RGBA;
     case PixelPvrtc4:   return GL_RGBA;
+    case PixelRgb32F:   return GL_RGB;
     case PixelRgba16F:  return GL_RGBA;
+    case PixelRgba32F:  return GL_RGBA;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
     
@@ -753,6 +763,8 @@ GLenum OpenGLHal::imageDataType( u32 pixelFormat )
     case PixelPvrtc2:   return 0;
     case PixelPvrtc4:   return 0;
     case PixelRgba16F:  return GL_HALF_FLOAT;
+    case PixelRgb32F:
+    case PixelRgba32F:  return GL_FLOAT;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
     
@@ -806,6 +818,7 @@ void OpenGLTexture2D::setData( u32 level, void *data )
     if( isCompressed() ) {
         glCompressedTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, bytesPerMip( width, height ), data );
     } else {
+        glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
         glTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, format, type, data );
     }
     glBindTexture( GL_TEXTURE_2D, 0 );
@@ -899,6 +912,7 @@ bool OpenGLRenderTarget::setColor( OpenGLTexture2D *color )
 OpenGLVertexBuffer::OpenGLVertexBuffer( VertexDeclaration *vertexDeclaration, u32 count )
 	: VertexBuffer( vertexDeclaration, count, true )
 {
+    DC_BREAK_IF( vertexDeclaration == NULL );
     DC_CHECK_GL;
     
 	glGenBuffers( 1, &m_id );
