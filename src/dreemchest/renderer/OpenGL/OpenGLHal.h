@@ -169,7 +169,7 @@ namespace renderer {
         virtual void                setBlendState( dcBlendState state );
         virtual void                setDepthStencilState( dcDepthStencilState state );
         virtual void                setRasterizerState( dcRasterizerState state );
-    //    virtual void                setTransform( Transform transform, const mat4& T );
+        virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
 
         // ** OpenGLRenderer

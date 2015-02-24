@@ -537,18 +537,18 @@ void OpenGLHal::setStencilValue( u32 value, u32 mask )
     
     glStencilFunc( compareFunc( m_stencilFunc ), value, mask );
 }
-/*
+
 // ** OpenGLHal::setTransform
-void OpenGLHal::setTransform( Transform transform, const cMatrix4& T )
+void OpenGLHal::setTransform( Transform transform, const float* matrix )
 {
     DC_CHECK_GL;
 
     switch( transform ) {
-    case TransformModel:        m_modelTransform = T;
+    case TransformModel:        //m_modelTransform = T;
                                 glMatrixMode( GL_MODELVIEW );
                                 break;
             
-    case TransformView:         m_viewTransform = T;
+    case TransformView:         //m_viewTransform = T;
                                 glMatrixMode( GL_MODELVIEW );
                                 break;
 
@@ -558,9 +558,11 @@ void OpenGLHal::setTransform( Transform transform, const cMatrix4& T )
     default:                    DC_NOT_IMPLEMENTED;
     }
 
-    glLoadMatrixf( transform == TransformProjection ? T.m : (m_modelTransform * m_viewTransform).m );
+    glLoadMatrixf( matrix );
+
+//    glLoadMatrixf( transform == TransformProjection ? T.m : (m_modelTransform * m_viewTransform).m );
 }
-*/
+
 // ** OpenGLHal::setColorModulation
 void OpenGLHal::setColorModulation( f32 r, f32 g, f32 b, f32 a )
 {

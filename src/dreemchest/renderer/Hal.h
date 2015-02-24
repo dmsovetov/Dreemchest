@@ -247,7 +247,7 @@ namespace renderer {
         virtual void                setRasterizerState( dcRasterizerState state );
 
         // ?? Fixed pipeline
-    //    virtual void                setTransform( Transform transform, const mat4& T );
+        virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
 
         //! Creates a new HAL instance.

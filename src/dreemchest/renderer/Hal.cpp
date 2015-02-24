@@ -393,10 +393,10 @@ void Hal::unlockTexture( dcTexture2D texture )
 }
 
 // ** Hal::setTransform
-//void Hal::setTransform( Transform transform, const mat4& T )
-//{
-//
-//}
+void Hal::setTransform( Transform transform, const float* matrix )
+{
+
+}
 
 // ** Hal::setColorModulation
 void Hal::setColorModulation( f32 r, f32 g, f32 b, f32 a )
