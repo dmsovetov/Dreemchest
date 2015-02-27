@@ -32,12 +32,19 @@
 #include    <string>
 #include    <vector>
 #include    <map>
+#include    <list>
 
 #ifdef DC_PLATFORM_WINDOWS
 	#include <stdarg.h>
 #endif
 
 DC_BEGIN_DREEMCHEST
+
+	template<typename T>
+	class Array : public std::vector<T> {};
+
+	template<typename T>
+	class List : public std::list<T> {};
 
     typedef double                  f64;
     typedef float                   f32;
@@ -51,10 +58,11 @@ DC_BEGIN_DREEMCHEST
     typedef const char*             CString;
     typedef StringHash::type        strhash;
     typedef std::string             String;
-    typedef std::vector<String>     StringArray;
+    typedef Array<String>			StringArray;
+	typedef List<String>			StringList;
 
-    template<typename T>
-    class Hash : public std::map<strhash, T> {};
+	template<typename T>
+	class Hash : public std::map<strhash, T> {};
 
 DC_END_DREEMCHEST
 
