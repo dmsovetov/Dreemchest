@@ -36,7 +36,7 @@
         NSWindow*               m_window;
     }
     - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
-    - ( void )  beginFrame;
+    - ( BOOL )  beginFrame;
     - ( void )  endFrame;
     - ( BOOL )  makeCurrent;
 @end

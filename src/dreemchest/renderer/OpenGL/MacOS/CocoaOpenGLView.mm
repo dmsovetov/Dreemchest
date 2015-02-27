@@ -54,7 +54,8 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 // ** initWithWindow
 -( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
 {
-    m_window = window;
+    m_window        = window;
+    m_displayLink   = nil;
 
     int depth   = 24;
     int stencil = 8;
@@ -89,17 +90,35 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
 }
 
 // ** beginFrame
-- ( void ) beginFrame
+- ( BOOL ) beginFrame
 {
+    if( m_displayLink == nil ) {
+        return NO;
+    }
+
     [self makeCurrent];
-    CGLLockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+    CGLError error = CGLLockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+    if( error != kCGLNoError ) {
+        NSLog( @"CocoaOpenGLView::beginFrame : CGLLockContext error %x\n", error );
+    }
+
+    return YES;
 }
 
 // ** endFrame
 - ( void ) endFrame
 {
-    CGLFlushDrawable( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
-    CGLUnlockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+    CGLError error;
+
+    error = CGLFlushDrawable( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+    if( error != kCGLNoError ) {
+        NSLog( @"CocoaOpenGLView::beginFrame : CGLFlushDrawable error %x\n", error );
+    }
+
+    error = CGLUnlockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
+    if( error != kCGLNoError ) {
+        NSLog( @"CocoaOpenGLView::beginFrame : CGLUnlockContext error %x\n", error );
+    }
 }
 
 // ** makeCurrent
@@ -115,16 +134,32 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     [super prepareOpenGL];
     [self initGL];
 
-    CVDisplayLinkCreateWithActiveCGDisplays( &m_displayLink );
-    CVDisplayLinkSetOutputCallback( m_displayLink, &OnDisplay, self );
+    CVReturn result;
+
+    result = CVDisplayLinkCreateWithActiveCGDisplays( &m_displayLink );
+    if( result != kCVReturnSuccess ) {
+        NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkCreateWithActiveCGDisplays result %d\n", result );
+    }
+
+    result = CVDisplayLinkSetOutputCallback( m_displayLink, &OnDisplay, self );
+    if( result != kCVReturnSuccess ) {
+        NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkSetOutputCallback result %d\n", result );
+    }
 
     // ** Set the display link for the current renderer
     CGLContextObj		cglContext		= ( CGLContextObj )[[self openGLContext] CGLContextObj];
     CGLPixelFormatObj	cglPixelFormat	= ( CGLPixelFormatObj )[[self pixelFormat] CGLPixelFormatObj];
-    CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext( m_displayLink, cglContext, cglPixelFormat );
+
+    result = CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext( m_displayLink, cglContext, cglPixelFormat );
+    if( result != kCVReturnSuccess ) {
+        NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext result %d\n", result );
+    }
 
     // ** Activate the display link
-    CVDisplayLinkStart( m_displayLink );
+    result = CVDisplayLinkStart( m_displayLink );
+    if( result != kCVReturnSuccess ) {
+        NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkStart result %d\n", result );
+    }
 }
 
 // ** initGL

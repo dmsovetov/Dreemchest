@@ -44,7 +44,7 @@ namespace renderer {
         virtual bool                makeCurrent( void ) { return false; }
 
         //! Begins a frame rendering.
-        virtual void                beginFrame( void ) {}
+        virtual bool                beginFrame( void ) { return false; }
 
         //! Ends a frame rendering.
         virtual void                endFrame( void ) {}
@@ -71,8 +71,9 @@ namespace renderer {
          \param depth       Value used to clear the depth buffer (ClearDepth should be passed, see mask parameter).
          \param stencil     Value used to clear the stencil buffer (ClearStencil should be passed, see mask parameter).
          \param mask        A bit mask that defines a set of buffers to be cleared.
+         \return            Returns true if the device is ready to render the frame.
          */
-        virtual void        clear( const Rgba& clearColor = Black, f32 depth = 1.0f, u32 stencil = 0, u32 mask = ClearAll );
+        virtual bool        clear( const Rgba& clearColor = Black, f32 depth = 1.0f, u32 stencil = 0, u32 mask = ClearAll );
 
         //! Present a rendered frame on a viewport.
         virtual void        present( void );
@@ -369,7 +370,7 @@ namespace renderer {
         u32                         height( void ) const;
 
         //! Uploads a texture data to a given mip level.
-        virtual void                setData( u32 level, void *data );
+        virtual void                setData( u32 level, const void *data );
 
         //! Locks a given mip level.
         /*!

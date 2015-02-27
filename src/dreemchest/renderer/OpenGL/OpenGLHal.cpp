@@ -72,11 +72,13 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 }
 
 // ** OpenGLHal::clear
-void OpenGLHal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
+bool OpenGLHal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
 {
     DC_CHECK_GL;
     
-    Hal::clear( clearColor, depth, stencil, mask );
+    if( !Hal::clear( clearColor, depth, stencil, mask ) ) {
+        return false;
+    }
     
     GLbitfield flags = 0;
 
@@ -94,6 +96,8 @@ void OpenGLHal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask 
     glClearDepth( depth );
     glClearStencil( stencil );
     glClear( flags );
+
+    return true;
 }
 
 // ** OpenGLHal::present
@@ -515,7 +519,7 @@ void OpenGLHal::setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 heigh
 void OpenGLHal::setDepthTest( bool mask, Compare compare )
 {
     DC_CHECK_GL;
-    
+
     glDepthMask( mask ? GL_TRUE : GL_FALSE );
     glDepthFunc( compareFunc( compare ) );
 }
@@ -804,7 +808,7 @@ GLuint OpenGLTexture2D::id( void ) const
 }
 
 // ** OpenGLTexture2D::setData
-void OpenGLTexture2D::setData( u32 level, void *data )
+void OpenGLTexture2D::setData( u32 level, const void *data )
 {
     DC_CHECK_GL;
 

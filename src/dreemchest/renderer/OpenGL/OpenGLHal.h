@@ -143,7 +143,7 @@ namespace renderer {
                                     OpenGLHal( RenderView* view );
 
         // ** Renderer
-        virtual void				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
+        virtual bool				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
         virtual void				present( void );
         virtual void                renderPrimitives( PrimitiveType primType, u32 offset, u32 count );
         virtual void				renderIndexed( PrimitiveType primType, IndexBuffer *indexBuffer, u32 firstIndex, u32 count );
@@ -217,7 +217,7 @@ namespace renderer {
         virtual                     ~OpenGLTexture2D( void );
 
         // ** Texture2D
-        virtual void                setData( u32 level, void *data );
+        virtual void                setData( u32 level, const void* data );
         virtual void*               lock( u32 level, u32& size );
         virtual void                unlock( void );
 

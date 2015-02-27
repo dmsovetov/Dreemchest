@@ -54,9 +54,9 @@ bool MacOSOpenGLView::initialize( NSWindow* window, PixelFormat depthStencil, id
 }
 
 // ** MacOSOpenGLView::beginFrame
-void MacOSOpenGLView::beginFrame( void )
+bool MacOSOpenGLView::beginFrame( void )
 {
-    [m_view beginFrame];
+    return [m_view beginFrame];
 }
 
 // ** MacOSOpenGLView::endFrame

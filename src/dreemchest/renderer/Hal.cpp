@@ -120,9 +120,13 @@ RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 }
 
 // ** Hal::clear
-void Hal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
+bool Hal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
 {
-    if( m_view ) m_view->beginFrame();
+    if( m_view ) {
+        return m_view->beginFrame();
+    }
+
+    return true;
 }
 
 // ** Hal::present
@@ -533,7 +537,7 @@ u32 Texture2D::height( void ) const
 }
 
 // ** Texture2D::setData
-void Texture2D::setData( u32 level, void *data )
+void Texture2D::setData( u32 level, const void *data )
 {
 
 }
