@@ -252,6 +252,18 @@ void Hal::setBlendFactors( BlendFactor source, BlendFactor destination )
 
 }
 
+// ** Hal::setFog
+void Hal::setFog( FogMode mode, f32 density, const Rgba& color, f32 linearStart, f32 linearEnd )
+{
+
+}
+
+// ** Hal::setAlphaTest
+void Hal::setAlphaTest( Compare compare, float ref )
+{
+
+}
+
 // ** Hal::setCulling
 void Hal::setCulling( TriangleFace value )
 {

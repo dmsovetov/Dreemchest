@@ -235,6 +235,8 @@ void OpenGLHal::setTexture( u32 sampler, Texture *texture )
     glBindTexture( glType, textureID( texture ) );
 
     if( texture ) {
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_samplers[sampler].m_wrap );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_samplers[sampler].m_wrap );
 
@@ -382,6 +384,53 @@ void OpenGLHal::setBlendFactors( BlendFactor source, BlendFactor destination )
     } else {
         glEnable( GL_BLEND );
         glBlendFunc( blendFactor( source ), blendFactor( destination ) );
+    }
+}
+
+// ** OpenGLHal::setFog
+void OpenGLHal::setFog( FogMode mode, f32 density, const Rgba& color, f32 linearStart, f32 linearEnd )
+{
+    DC_CHECK_GL;
+
+    if( mode == FogDisabled ) {
+        glDisable( GL_FOG );
+        return;
+    }
+
+    glEnable( GL_FOG );
+    glHint( GL_FOG_HINT, GL_NICEST );
+    glFogfv( GL_FOG_COLOR, &color.r );
+
+    switch( mode ) {
+    case FogLinear: glFogi( GL_FOG_MODE, GL_LINEAR );
+                    glFogf( GL_FOG_START, linearStart );
+                    glFogf( GL_FOG_END, linearEnd );
+                    break;
+
+    case FogExp:    glFogi( GL_FOG_MODE, GL_EXP );
+                    glFogf( GL_FOG_DENSITY, density );
+                    break;
+
+    case FogExp2:   glFogi( GL_FOG_MODE, GL_EXP2 );
+                    glFogf( GL_FOG_DENSITY, density );
+                    break;
+
+    default:        break;
+    }
+
+    glFogi( GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH );
+}
+
+// ** OpenGLHal::setAlphaTest
+void OpenGLHal::setAlphaTest( Compare compare, f32 value )
+{
+    DC_CHECK_GL;
+
+    if( compare == CompareDisabled ) {
+        glDisable( GL_ALPHA_TEST );
+    } else {
+        glEnable( GL_ALPHA_TEST );
+        glAlphaFunc( compareFunc( compare ), value );
     }
 }
 

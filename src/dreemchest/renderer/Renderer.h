@@ -98,7 +98,6 @@ namespace renderer {
         BlendInvDstAlpha,
     };
 
-    // ** enum ColorMask
     //! Color mask bits used as an argument for Hal::setColorMask method.
     enum ColorMask {
         ColorMaskRed	= BIT( 0 ),                                                         //!< Render only RED channel.
@@ -109,14 +108,12 @@ namespace renderer {
         ColorMaskRgb	= ColorMaskRed | ColorMaskGreen | ColorMaskBlue,                    //!< Render RED, GREEN and BLUE color channels.
     };
 
-    // ** enum TextureWrap
     //! Texture wrapping control.
     enum TextureWrap {
         Clamp,              //!< Clamp texture.
         Repeat              //!< Repeat texture.
     };
 
-    // ** enum TextureFilter
     //! Texture filtering.
     enum TextureFilter {
         FilterNearest,      //!< The texture filtering is disabled.
@@ -137,7 +134,6 @@ namespace renderer {
         PolygonFill
     };
 
-    // ** enum TriangleFace
     //! Triangle face enum (used in Hal::setCulling, Hal::setStencilAction, etc.)
     enum TriangleFace {
         TriangleFaceFront,          //!< Front face.
@@ -146,7 +142,14 @@ namespace renderer {
         TriangleFaceNone            //!< Nothing.
     };
 
-    // ** enum Compare
+    //! Available fog modes
+    enum FogMode {
+        FogDisabled,
+        FogLinear,
+        FogExp,
+        FogExp2
+    };
+
     //! Comparison function used for alpha, depth and stencil tests.
     enum Compare {
         Always,                     //!< Always passes.
@@ -170,7 +173,6 @@ namespace renderer {
         TransformTotal
     };
 
-    // ** enum PixelFormat
     //! Supported pixel format for textures and render targets.
     enum PixelFormat {
         PixelAlpha8,    //!< 8-bit alpha.
@@ -199,7 +201,6 @@ namespace renderer {
         PixelD24S8,     //!< 32-bit depth stencil surface with 24-bit depth value and 8-bit stencil.
     };
 
-    // ** enum PrimitiveType
     //! A list of available primitive types.
     enum PrimitiveType {
         PrimLines,          //!< Render lines.

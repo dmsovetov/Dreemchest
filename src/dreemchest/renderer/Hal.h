@@ -176,7 +176,7 @@ namespace renderer {
          \param vertexBuffer        Vertex buffer to be bound.
          \param vertexDeclaration   Override the vertex declaration.
          */
-        virtual void                setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration = NULL );
+        virtual void    setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration = NULL );
 
         //! Sets a rendering viewport.
         /*!
@@ -198,7 +198,14 @@ namespace renderer {
          \param source      Source pixel blend factor.
          \param destination Destination pixel blend factor.
          */
-        virtual void        setBlendFactors( BlendFactor source, BlendFactor destination );
+        virtual void    setBlendFactors( BlendFactor source, BlendFactor destination );
+
+        //! Sets an alpha test.
+        /*!
+         \param compare Alpha test compare function.
+         \param value Alpha reference value.
+         */
+        virtual void    setAlphaTest( Compare compare, f32 value = 1.0f );
 
         //! Sets face culling.
         virtual void    setCulling( TriangleFace value );
@@ -228,7 +235,7 @@ namespace renderer {
          \param depthFail   Specifies the stencil action when the stencil test passes.
          \param stencilFail Specifies the action to take when the stencil test fails.
          */
-        virtual void        setStencilAction( TriangleFace face, Compare compare, StencilAction pass = StencilKeep, StencilAction depthFail = StencilKeep, StencilAction stencilFail = StencilKeep );
+        virtual void    setStencilAction( TriangleFace face, Compare compare, StencilAction pass = StencilKeep, StencilAction depthFail = StencilKeep, StencilAction stencilFail = StencilKeep );
 
         //! Sets a reference value for stencil testing.
         /*!
@@ -250,6 +257,7 @@ namespace renderer {
         // ?? Fixed pipeline
         virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
+        virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
 
         //! Creates a new HAL instance.
         /*!

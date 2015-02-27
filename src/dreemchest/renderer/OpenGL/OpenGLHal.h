@@ -157,10 +157,12 @@ namespace renderer {
         virtual void				setRenderTarget( RenderTarget *renderTarget );
         virtual void				setTexture( u32 sampler, Texture *texture );
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
+        virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
         virtual void                setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
         virtual void				setColorMask( u32 value );
         virtual void				setBlendFactors( BlendFactor source, BlendFactor destination );
+        virtual void                setAlphaTest( Compare compare, f32 value );
         virtual void				setCulling( TriangleFace value );
         virtual void				setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 height );
         virtual void				setDepthTest( bool mask, Compare compare );
