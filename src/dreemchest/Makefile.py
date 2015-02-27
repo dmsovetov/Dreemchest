@@ -4,6 +4,11 @@ core = StaticLibrary( 'Dreemchest', paths = [ '.' ], sources = [ '.', 'utils/*' 
 
 if Has( 'threads' ):
 	core.dirs( 'threads', 'threads/Task', 'threads/$(THREADS)' )
+	
+#############################     IO        #############################
+
+if Has( 'io' ):
+	core.dirs( 'io' )
 
 #############################   Platform    #############################
 
