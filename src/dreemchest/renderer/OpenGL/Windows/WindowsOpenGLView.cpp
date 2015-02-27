@@ -101,9 +101,9 @@ bool WindowsOpenGLView::initialize( HWND window, PixelFormat depthStencil )
 }
 
 // ** WindowsOpenGLView::beginFrame
-void WindowsOpenGLView::beginFrame( void )
+bool WindowsOpenGLView::beginFrame( void )
 {
-	makeCurrent();
+	return makeCurrent();
 }
 
 // ** WindowsOpenGLView::endFrame
