@@ -33,6 +33,7 @@
 #include    <vector>
 #include    <map>
 #include    <list>
+#include    <set>
 
 #ifdef DC_PLATFORM_WINDOWS
 	#include <stdarg.h>
@@ -46,6 +47,12 @@ DC_BEGIN_DREEMCHEST
 	template<typename T>
 	class List : public std::list<T> {};
 
+    template<typename T>
+    class Set : public std::set<T> {};
+
+    template<typename K, typename V>
+    class Map : public std::map<K, V> {};
+
     typedef double                  f64;
     typedef float                   f32;
     typedef char                    s8;
@@ -53,6 +60,7 @@ DC_BEGIN_DREEMCHEST
     typedef signed int              s32;
     typedef unsigned long long      u64;
     typedef unsigned int            u32;
+    typedef short                   s16;
     typedef unsigned short          u16;
     typedef unsigned char           u8;
     typedef const char*             CString;
