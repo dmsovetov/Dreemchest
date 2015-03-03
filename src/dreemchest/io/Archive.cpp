@@ -71,14 +71,14 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 }
 
 // ** Archive::packFile
-bool Archive::packFile( const char *fileName, const char *compressedFileName )
+bool Archive::packFile( const Path& fileName, const Path& compressedFileName )
 {
     u8 chunk[CHUNK_SIZE + 1], compressed[CHUNK_SIZE * 2];
 
     sFileInfo         *file        = createFileInfo( compressedFileName, m_file->position(), 0, 0 );
     IBufferCompressor *compressor  = createCompressor( m_info.m_compressor );
 
-    FILE *input = fopen( fileName, "rb" );
+    FILE *input = fopen( fileName.c_str(), "rb" );
     if( !input ) {
         file->m_decompressedSize = 0;
         return false;
@@ -104,9 +104,11 @@ bool Archive::packFile( const char *fileName, const char *compressedFileName )
 }
 
 // ** Archive::open
-bool Archive::open( Stream* file )
+bool Archive::open( const StreamPtr& file )
 {
     clearFiles();
+
+    m_file = StreamPtr();
     
     m_isCreating = false;
     m_file       = file;
@@ -121,7 +123,7 @@ bool Archive::open( Stream* file )
     readFiles();
 
     // !! WORKAROUND for in-memory files
-    if( file->isMemoryStream() ) {
+    if( file->isByteBuffer() ) {
         return true;
     }
 
@@ -130,7 +132,7 @@ bool Archive::open( Stream* file )
 }
 
 // ** Archive::create
-void Archive::create( Stream* file, eCompressor compressor )
+void Archive::create( const StreamPtr& file, eCompressor compressor )
 {
     clearFiles();
 
@@ -154,29 +156,29 @@ void Archive::close( void )
 }
 
 // ** Archive::fileName
-CString Archive::fileName( void ) const
+const Path& Archive::fileName( void ) const
 {
-    return m_fileName.c_str();
+    return m_fileName;
 }
 
 // ** Archive::openFile
-Stream* Archive::openFile( const char *fileName ) const
+StreamPtr Archive::openFile( const Path& fileName ) const
 {
     const sFileInfo *fileInfo = findFileInfo( fileName );
     if( !fileInfo ) {
         return NULL;
     }
 
-    Stream* file = m_file;
+    StreamPtr file = m_file;
 
     // !! WORKAROUND for in-memory files
     if( m_fileName != "" ) {
-        file = m_diskFileSystem->openFile( m_fileName.c_str() );
+        file = m_diskFileSystem->openFile( m_fileName );
     }
 
     DC_BREAK_IF( file == NULL );
-    if( !file ) {
-        return NULL;
+    if( file == NULL ) {
+        return StreamPtr();
     }
 
     file->setPosition( fileInfo->m_offset );
@@ -185,43 +187,42 @@ Stream* Archive::openFile( const char *fileName ) const
 }
 
 // ** Archive::openFile
-Stream* Archive::openFile( const char *fileName, const char *mode ) const
+StreamPtr Archive::openFile( const Path& fileName, StreamMode mode ) const
 {
-	if( mode[0] == 'r' ) {
+	if( mode == BinaryReadStream ) {
 		return openFile( fileName );
 	}
 
     DC_BREAK_IF( true );
-	return NULL;
+	return StreamPtr();
 }
 
 // ** Archive::fileExists
-bool Archive::fileExists( const char *fileName ) const
+bool Archive::fileExists( const Path& fileName ) const
 {
     return findFileInfo( fileName ) != NULL;
 }
 
 // ** Archive::extractFile
-bool Archive::extractFile( const char *fileName, const char *outputFileName )
+bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
 {
-    AutoPtr<Stream> input = openFile( fileName );
+    StreamPtr input = openFile( fileName );
     if( input == NULL ) {
-        printf( "No such file %s in package\n", fileName );
+        log::error( "Archive::extractFile : no such file %s in package\n", fileName.c_str() );
         return false;
     }
 
-    AutoPtr<Stream> output = m_diskFileSystem->openFile( outputFileName, "wb" );
+    StreamPtr output = m_diskFileSystem->openFile( outputFileName, BinaryWriteStream );
     if( output == NULL ) {
-        printf( "Failed to open file %s for writing\n", outputFileName );
-        system( "ls" );
+        log::error( "Archive::extractFile : failed to open file %s for writing\n", outputFileName.c_str()  );
         return false;
     }
 
-    const int kChunkSize = 16536;
-    u8      chunk[kChunkSize];
+    const u64 kChunkSize = 16536;
+    u8        chunk[kChunkSize];
     
     while( input->hasDataLeft() ) {
-        int read = input->read( chunk, kChunkSize );
+        u64 read = input->read( chunk, kChunkSize );
         output->write( chunk, read );
     }
 
@@ -262,10 +263,10 @@ void Archive::readFiles( void )
 }
 
 // ** Archive::findOffsetEntry
-const Archive::sFileInfo* Archive::findFileInfo( const char *fileName ) const
+const Archive::sFileInfo* Archive::findFileInfo( const Path& fileName ) const
 {
     for( tFileInfoList::const_iterator i = m_files.begin(), end = m_files.end(); i != end; i++ ) {
-        if( strcmp( fileName, (*i)->m_name ) == 0 ) {
+        if( fileName == (*i)->m_name ) {
             return *i;
         }
     }
@@ -274,9 +275,9 @@ const Archive::sFileInfo* Archive::findFileInfo( const char *fileName ) const
 }
 
 // ** Archive::createFileInfo
-Archive::sFileInfo* Archive::createFileInfo( const char *fileName, int offset, int compressedSize, int decompressedSize )
+Archive::sFileInfo* Archive::createFileInfo( const Path& fileName, int offset, int compressedSize, int decompressedSize )
 {
-    sFileInfo *entry = DC_NEW sFileInfo( fileName, offset, decompressedSize );
+    sFileInfo *entry = DC_NEW sFileInfo( fileName.c_str(), offset, decompressedSize );
     m_files.push_back( entry );
     return entry;
 }
@@ -284,11 +285,11 @@ Archive::sFileInfo* Archive::createFileInfo( const char *fileName, int offset, i
 // ** Archive::readFileInfo
 Archive::sFileInfo* Archive::readFileInfo( void ) const
 {
-    char buffer[256];
+    String name;
 
-    m_file->readString( buffer, 256 );
+    m_file->readString( name );
 
-    sFileInfo *file = DC_NEW sFileInfo( buffer, 0, 0 );
+    sFileInfo *file = DC_NEW sFileInfo( name.c_str(), 0, 0 );
 
     m_file->read( &file->m_decompressedSize, sizeof( file->m_decompressedSize ) );
     m_file->read( &file->m_offset, sizeof( file->m_offset ) );
@@ -297,7 +298,7 @@ Archive::sFileInfo* Archive::readFileInfo( void ) const
 }
 
 // ** Archive::writeFileInfo
-void Archive::writeFileInfo( const sFileInfo *file ) const
+void Archive::writeFileInfo( const sFileInfo *file )
 {
     m_file->writeString( file->m_name );
     m_file->write( &file->m_decompressedSize, sizeof( file->m_decompressedSize ) );

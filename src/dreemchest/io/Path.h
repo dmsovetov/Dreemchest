@@ -33,36 +33,71 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    // ** class Path
+    //! A helper class to work with file paths.
     class Path {
     public:
 
                             Path( void );
                             Path( const String& str );
-                            Path( const char *str );
+                            Path( CString str );
                             Path( const Path& other );
 
-        const Path&         operator =  ( const char *str );
+        //! Sets a path from string.
+        const Path&         operator =  ( CString str );
+
+        //! Sets a path from string.
         const Path&         operator =  ( const String& str );
-        const Path&         operator += ( const char *str );
+
+        //! Compares two paths and returns true if they are equal.
+        bool                operator == ( const Path& other ) const;
+
+        //! Compares two paths.
+        bool                operator < ( const Path& other ) const;
+
+        //! Compares a path object with string.
+        bool                operator != ( CString str ) const;
+
+        //! Appends a path component to this path.
+        const Path&         operator += ( CString str );
+
+        //! Append a path to this path.
         const Path&         operator += ( const Path& other );
+
+        //! Concatenates a path with string.
         Path                operator +  ( const String& str ) const;
-        Path                operator +  ( const char *str ) const;
 
-        static StringList   split( const char *str );
+        //! Concatenates a path with string.
+        Path                operator +  ( CString str ) const;
 
+        //! Returns true if this path is empty.
         bool                isEmpty( void ) const;
+
+        //! Returns a path's parent folder.
         Path                folder( void ) const;
-        CString         last( void ) const;
-        CString         c_str( void ) const;
+
+        //! Returns a last path component.
+        CString             last( void ) const;
+
+        //! Returns a C string representation of this path.
+        CString             c_str( void ) const;
+
+        //! Returns a string representation of this path.
+        const String&       str( void ) const;
+
+        //! Splits a path string to list.
+        static StringList   split( CString str );
 
     private:
 
+        //! Rebuilds an internal path data.
         void                build( void );
 
     private:
 
-        String         m_str;
+        //! Full path string.
+        String              m_str;
+
+        //! Path components.
         StringList          m_items;
     };
 

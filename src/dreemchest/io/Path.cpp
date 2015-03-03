@@ -37,7 +37,7 @@ Path::Path( void )
 }
 
 // ** Path::Path
-Path::Path( const char *str )
+Path::Path( CString str )
 {
     m_items = split( str );
     build();
@@ -58,12 +58,30 @@ Path::Path( const Path& other )
 }
 
 // ** Path::operator =
-const Path& Path::operator = ( const char *str )
+const Path& Path::operator = ( CString str )
 {
     m_items = split( str );
     build();
 
     return *this;
+}
+
+// ** Path::operator ==
+bool Path::operator == ( const Path& other ) const
+{
+    return m_str == other.m_str;
+}
+
+// ** Path::operator !=
+bool Path::operator != ( CString str ) const
+{
+    return m_str != str;
+}
+
+// ** Path::operator <
+bool Path::operator < ( const Path& other ) const
+{
+    return m_str < other.m_str;
 }
 
 // ** Path::operator =
@@ -84,7 +102,7 @@ Path Path::operator + ( const String& str ) const
 }
 
 // ** Path::operator +
-Path Path::operator + ( const char *str ) const
+Path Path::operator + ( CString str ) const
 {
     Path result = *this;
     result += str;
@@ -92,7 +110,7 @@ Path Path::operator + ( const char *str ) const
 }
 
 // ** Path::operator +=
-const Path& Path::operator += ( const char *str )
+const Path& Path::operator += ( CString str )
 {
     StringList items = split( str );
 
@@ -155,11 +173,11 @@ void Path::build( void )
 }
 
 // ** Path::split
-StringList Path::split( const char *str )
+StringList Path::split( CString str )
 {
     StringList result;
     
-    char *path = strdup( str );
+    char* path = strdup( str );
 
     // ** Replace \\ in path
     for( int i = 0; i < strlen( path ); i++ ) {
@@ -169,7 +187,7 @@ StringList Path::split( const char *str )
     }
 
     // ** Tokenize path
-    const char *item = strtok( path, "/" );
+    CString item = strtok( path, "/" );
 
     while( item ) {
         result.push_back( item );

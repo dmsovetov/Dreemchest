@@ -33,10 +33,9 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** ZLibBufferCompressor::compressToBuffer
-int ZLibBufferCompressor::compressToBuffer( const u8 *in, int size, u8 *out, int maxSize )
+s64 ZLibBufferCompressor::compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )
 {
-#ifdef HAVE_ZLIB
-    int result = 0;
+    s64 result = 0;
 
     if( !beginStreamCompression() ) {
         return -1;
@@ -55,15 +54,12 @@ int ZLibBufferCompressor::compressToBuffer( const u8 *in, int size, u8 *out, int
     endStreamCompression();
 
     return result;
-#endif
-	return 0;
 }
 
 // ** ZLibBufferCompressor::decompressToBuffer
-int ZLibBufferCompressor::decompressToBuffer( const u8 *in, int size, u8 *out, int maxSize )
+s64 ZLibBufferCompressor::decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )
 {
-#ifdef HAVE_ZLIB
-    int result = -1;
+    s64 result = -1;
 
     if( !beginStreamDecompression() ) {
         return -1;
@@ -82,14 +78,11 @@ int ZLibBufferCompressor::decompressToBuffer( const u8 *in, int size, u8 *out, i
     endStreamDecompression();
 
     return result;
-#endif
-	return 0;
 }
 
 // ** ZLibBufferCompressor::beginStreamCompression
 bool ZLibBufferCompressor::beginStreamCompression( void )
 {
-#ifdef HAVE_ZLIB
     m_stream.zalloc = Z_NULL;
     m_stream.zfree  = Z_NULL;
     m_stream.opaque = Z_NULL;
@@ -97,7 +90,6 @@ bool ZLibBufferCompressor::beginStreamCompression( void )
     if( deflateInit( &m_stream, Z_DEFAULT_COMPRESSION ) != Z_OK ) {
         return false;
     }
-#endif
 
     return true;
 }
@@ -105,15 +97,12 @@ bool ZLibBufferCompressor::beginStreamCompression( void )
 // ** ZLibBufferCompressor::endStreamCompression
 void ZLibBufferCompressor::endStreamCompression( void )
 {
-#ifdef HAVE_ZLIB
     deflateEnd( &m_stream );
-#endif
 }
 
 // ** ZLibBufferCompressor::beginStreamDecompression
 bool ZLibBufferCompressor::beginStreamDecompression( void )
 {
-#ifdef HAVE_ZLIB
     m_stream.zalloc		= Z_NULL;
     m_stream.zfree		= Z_NULL;
     m_stream.opaque		= Z_NULL;
@@ -123,7 +112,6 @@ bool ZLibBufferCompressor::beginStreamDecompression( void )
     if( inflateInit( &m_stream ) != Z_OK ) {
         return false;
     }
-#endif
 
     return true;
 }
@@ -131,9 +119,7 @@ bool ZLibBufferCompressor::beginStreamDecompression( void )
 // ** ZLibBufferCompressor::endStreamDecompression
 void ZLibBufferCompressor::endStreamDecompression( void )
 {
-#ifdef HAVE_ZLIB
     inflateEnd( &m_stream );
-#endif
 }
     
 } // namespace io

@@ -27,7 +27,7 @@
 #ifndef		__DC_Io_JSONSerialization_H__
 #define		__DC_Io_JSONSerialization_H__
 
-#include	"Io.h"
+#include	"../Io.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -28,40 +28,66 @@
 #define		__DC_Io_HDDFile_H__
 
 #include	"Stream.h"
+#include    "../Path.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
         
-	// ** class FileStream
+	//! A FileStream class is used for work with physical files.
 	class FileStream : public Stream {
+    friend class DiskFileSystem;
 
         DC_DECLARE_IS( FileStream, FileStream, this );
 
 	public:
 
-								FileStream( const char *fileName, const char *mode );
 		virtual					~FileStream( void );
 
-        // ** Stream
-        virtual long            length( void ) const;
-        virtual long            position( void ) const;
-        virtual void            setPosition( long offset, eSeekOrigin origin = SeekSet );
-        virtual bool            hasDataLeft( void ) const;
-        virtual long            read( void *buffer, long size );
-        virtual long            write( const void *buffer, long size );
-		virtual long            writeWithFormat( const char *format, ... );
+        //! Disposes this file stream.
+        virtual void            dispose( void );
 
-        // ** FileStream
-        CString             fileName( void ) const;
-        bool                    isValid( void ) const;
+        //! Returns a total lenght of this file.
+        virtual u64             length( void ) const;
+
+        //! Returns current file position.
+        virtual u64             position( void ) const;
+
+        //! Sets the position inside the file.
+        virtual void            setPosition( u64 offset, SeekOrigin origin = SeekSet );
+
+        //! Returns true if there are any data left.
+        virtual bool            hasDataLeft( void ) const;
+
+        //! Reads data from file.
+        virtual u64             read( void* buffer, u64 size ) const;
+
+        //! Writes data to file.
+        virtual u64             write( const void* buffer, u64 size );
+
+        //! Returns a file name of this file.
+        const Path&             fileName( void ) const;
 
     private:
 
-		FILE*                   m_file;
-		u64                     m_length;
-        String             m_fileName;
+                                //! Constructs a file stream.
+                                FileStream( void );
 
+        //! Opens a file.
+        bool                    open( const Path& fileName, StreamMode mode );
+
+    private:
+
+        //! File handle.
+		FILE*                   m_file;
+
+        //! Total file length in bytes.
+		u64                     m_length;
+
+        //! File name.
+        Path                    m_fileName;
+
+        //! Total opened files counter, used for debugging.
         static u32              s_openFileCount;
 	};
 

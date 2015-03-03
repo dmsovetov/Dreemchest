@@ -24,56 +24,37 @@
 
  **************************************************************************/
 
-#include	"ByteBuffer.h"
+#ifndef		__DC_Io_ZLibBufferCompressor_H__
+#define		__DC_Io_ZLibBufferCompressor_H__
+
+#include	"IBufferCompressor.h"
+#include    <zlib.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** ByteBuffer::ByteBuffer
-ByteBuffer::ByteBuffer( u8 *buffer, int size ) : m_buffer( buffer ), m_size( size )
-{
-}
+    // ** class ZLibBufferCompressor
+    class ZLibBufferCompressor : public IBufferCompressor {
+    public:
 
-// ** ByteBuffer::ByteBuffer
-ByteBuffer::ByteBuffer( int size ) : m_size( size )
-{
-	m_buffer = DC_NEW u8[size];
-}
+        // ** IBufferCompressor
+        virtual s64     compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
+        virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
 
-// ** ByteBuffer::~ByteBuffer
-ByteBuffer::~ByteBuffer( void )
-{
-	if( m_buffer ) {
-		delete[]m_buffer;
-		m_buffer = NULL;
-	}
-}
+        // ** ZLibBufferCompressor
+        bool            beginStreamCompression( void );
+        void            endStreamCompression( void );
+        bool            beginStreamDecompression( void );
+        void            endStreamDecompression( void );
 
-// ** ByteBuffer::release
-void ByteBuffer::release( void )
-{
-	delete this;
-}
+    private:
 
-// ** ByteBuffer::data
-const u8* ByteBuffer::data( void ) const
-{
-	return m_buffer;
-}
-
-// ** ByteBuffer::data
-u8* ByteBuffer::data( void )
-{
-	return m_buffer;
-}
-
-// ** ByteBuffer::size
-int ByteBuffer::size( void ) const
-{
-	return m_size;
-}
+        z_stream        m_stream;
+    };
 
 } // namespace io
 
 DC_END_DREEMCHEST
+
+#endif		/*	!__DC_Io_ZLibBufferCompressor_H__	*/

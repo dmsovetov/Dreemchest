@@ -35,70 +35,29 @@ namespace io {
 // ** DiskFileSystem::DiskFileSystem
 DiskFileSystem::DiskFileSystem( void )
 {
-	addPath( "", true );
-	m_packages.clear();
 }
 
 DiskFileSystem::~DiskFileSystem( void )
 {
-	for( ArchiveList::iterator i = m_packages.begin(), end = m_packages.end(); i != end; i++ ) {
-		(*i)->release();
-	}
+
 }
 
 // ** DiskFileSystem::openFile
-Stream* DiskFileSystem::openFile( const char *fileName, const char *mode ) const
+StreamPtr DiskFileSystem::openFile( const Path& fileName, StreamMode mode ) const
 {
-	char		path[MaxPathLength + 1];
+    FileStreamPtr file = DC_NEW FileStream;
 
-	if( strncmp( fileName, m_baseDir.c_str(), m_baseDir.length() ) != 0 ) {
-    #ifdef DC_PLATFORM_IOS
-        if( fileName[0] != '/' ) {
-            _snprintf( path, MaxPathLength, "%s%s", m_baseDir.c_str(), fileName );
-        } else {
-            _snprintf( path, MaxPathLength, "%s", fileName );
-        }
-    #else
-        _snprintf( path, MaxPathLength, "%s%s", m_baseDir.c_str(), fileName );
-    #endif
-	} else {
-		_snprintf( path, MaxPathLength, "%s", fileName );
-	}
-    
-#ifdef DC_PLATFORM_IOS
-    if( mode[0] == 'w' ) {
-    //    if( path[0] != '/' ) {
-        if( fileName[0] != '/' ) {
-            _snprintf( path, MaxPathLength, "%s/%s", m_ctx->iNative->GetDocumentsPath(), fileName );
-        }
-    }
-#endif
-
-    FileStream* file = DC_NEW FileStream( path, mode );
-    if( !file->isValid() ) {
-        delete file;
-        return NULL;
+    if( !file->open( fileName, mode ) ) {
+        return StreamPtr();
     }
 
 	return file;
 }
 
 // ** DiskFileSystem::openFile
-Stream* DiskFileSystem::openFile( const char *fileName ) const
+StreamPtr DiskFileSystem::openFile( const Path& fileName ) const
 {
 /*
-#ifndef embeddedAssetsNotFound
-	if( strcmp( fileName, "AssetsEmbedded" ) == 0 ) {
-		return DC_NEW embeddedAssets;
-	}
-#endif
-
-#ifndef embeddedDefaultNotFound
-	if( strcmp( fileName, "em/embedded.font" ) == 0 ) {
-		return DC_NEW embeddedDefault;
-	}
-#endif
-  */
 #ifdef DC_PLATFORM_FLASH
     inline_as3(
                "import com.adobe.flascc.CModule                                 \n"
@@ -135,13 +94,14 @@ Stream* DiskFileSystem::openFile( const char *fileName ) const
 			return (*i)->openFile( fileName );
 		}
 	}
-
+*/
 	return NULL;
 }
 
 // ** DiskFileSystem::fileExists
-bool DiskFileSystem::fileExists( const char *fileName ) const
+bool DiskFileSystem::fileExists( const Path& fileName ) const
 {
+/*
 	char path[MaxPathLength + 1];
 
 	for( int i = 0; i < ( int )m_paths.size(); i++ ) {
@@ -158,14 +118,14 @@ bool DiskFileSystem::fileExists( const char *fileName ) const
 		}
 	}
 #endif
-
+*/
 	return false;
 }
 
 // ** DiskFileSystem::fileExistsAtPath
-bool DiskFileSystem::fileExistsAtPath( const char *fileName )
+bool DiskFileSystem::fileExistsAtPath( const Path& fileName )
 {
-    FILE *file = fopen( fileName, "rb" );
+    FILE *file = fopen( fileName.c_str(), "rb" );
 
     if( !file ) {
         return false;
@@ -177,109 +137,87 @@ bool DiskFileSystem::fileExistsAtPath( const char *fileName )
 }
 
 // ** DiskFileSystem::openPackage
-Archive* DiskFileSystem::openPackage( const char *fileName, const char *path ) const
+ArchivePtr DiskFileSystem::openPackage( const Path& fileName ) const
 {
-	Stream* file = openFile( fileName );
-	if( !file ) {
-		return NULL;
+	StreamPtr file = openFile( fileName );
+	if( file == NULL ) {
+		return ArchivePtr();
 	}
 
 	// ** Open package
-	Archive* package = DC_NEW Archive( this );
+	ArchivePtr package = DC_NEW Archive( this );
     if( !package->open( file ) ) {
-        delete package;
-        return NULL;
+        return ArchivePtr();
     }
     
 	return package;
 }
 
 // ** DiskFileSystem::loadPackage
-Archive* DiskFileSystem::loadPackage( const char *fileName )
+ArchivePtr DiskFileSystem::loadPackage( const Path& fileName )
 {
-	if( Archive* a = findPackage( fileName ) ) {
-		return a;
-	}
+    // ** First search for previously loaded package
+    ArchivePtr alreadyLoaded = findPackage( fileName );
+    if( alreadyLoaded != NULL ) {
+        return alreadyLoaded;
+    }
 
-	if( Archive* a = openPackage( fileName ) ) {
-		m_packages.push_back( a );
-		return a;
-	}
+    // ** Open a package
+    ArchivePtr archive = openPackage( fileName );
+    if( archive != NULL ) {
+        m_archives[fileName] = archive;
+        return archive;
+    }
 
 	return NULL;
 }
 
 // ** DiskFileSystem::unloadPackage
-bool DiskFileSystem::unloadPackage( const char *fileName )
+bool DiskFileSystem::unloadPackage( const Path& fileName )
 {
-	for( ArchiveList::iterator i = m_packages.begin(), end = m_packages.end(); i != end; i++ ) {
-		Archive* a = *i;
+    Archives::iterator i = m_archives.find( fileName );
 
-		if( strcmp( a->fileName(), fileName ) == 0 ) {
-			a->release();
-			m_packages.erase( i );
-			return true;
-		}
-	}
+    if( i == m_archives.end() ) {
+        return false;
+    }
 
-	return false;
+    m_archives.erase( i );
+    return true;
 }
 
 // ** DiskFileSystem::findPackage
-Archive* DiskFileSystem::findPackage( const char *fileName )
+ArchivePtr DiskFileSystem::findPackage( const Path& fileName )
 {
-	for( ArchiveList::iterator i = m_packages.begin(), end = m_packages.end(); i != end; i++ ) {
-		Archive* a = *i;
-
-		if( strcmp( a->fileName(), fileName ) == 0 ) {
-			return a;
-		}
-	}
-
-	return NULL;
+    Archives::iterator i = m_archives.find( fileName );
+    return i != m_archives.end() ? i->second : NULL;
 }
 
 // ** DiskFileSystem::addPath
-void DiskFileSystem::addPath( const char *path, bool first )
+void DiskFileSystem::addPath( const Path& path )
 {
-	if( first ) {
-		m_paths.insert( m_paths.begin(), path );
-	} else {
-		m_paths.push_back( path );
-	}
+    m_paths.insert( path );
 }
 
 // ** DiskFileSystem::removePath
-void DiskFileSystem::removePath( const char *path )
+void DiskFileSystem::removePath( const Path& path )
 {
-	for( StringArray::iterator i = m_paths.begin(), end = m_paths.end(); i != end; i++ ) {
-        if( path != *i ) {
-            continue;
-        }
-        
+    PathSet::iterator i = m_paths.find( path );
+
+    if( i != m_paths.end() ) {
         m_paths.erase( i );
-        break;
-	}
-}
-
-// ** DiskFileSystem::setBaseDir
-void DiskFileSystem::setBaseDir( const char *value )
-{
-	DC_BREAK_IF( value == NULL );
-    
-    m_baseDir = value;
-	if( m_baseDir.empty() ) {
-		return;
-	}
-
-    if( m_baseDir[m_baseDir.length() - 1] != '/' ) {
-        m_baseDir += '/';
     }
 }
 
+// ** DiskFileSystem::setBaseDir
+void DiskFileSystem::setBaseDir( const Path& value )
+{
+    m_baseDir = value;
+}
+
 // ** DiskFileSystem::baseDir
-CString DiskFileSystem::baseDir(void ) const {
-	return m_baseDir.c_str();
+const Path& DiskFileSystem::baseDir(void ) const
+{
+	return m_baseDir;
 }
 
 } // namespace io

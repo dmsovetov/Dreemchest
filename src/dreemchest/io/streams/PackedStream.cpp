@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** PackedStream::PackedStream
-PackedStream::PackedStream( Stream* file, IBufferCompressor* compressor, int fileSize, int fileOffset )
+PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor, u64 fileSize, u64 fileOffset )
     : m_compressor( compressor ), m_file( file ), m_fileSize( fileSize ), m_fileOffset( fileOffset )
 {
     m_position       = 0;
@@ -43,7 +43,6 @@ PackedStream::PackedStream( Stream* file, IBufferCompressor* compressor, int fil
 
 PackedStream::~PackedStream( void )
 {
-    DC_RELEASE( m_file );
     DC_DELETE( m_buffer );
     DC_DELETE( m_compressor );
 }
@@ -58,7 +57,7 @@ void PackedStream::reopen( void )
 }
 
 // ** PackedStream::read
-long PackedStream::read( void *buffer, long size )
+u64 PackedStream::read( void* buffer, u64 size )
 {
     DC_BREAK_IF( m_file == NULL );
     DC_BREAK_IF( buffer == NULL );
@@ -68,7 +67,7 @@ long PackedStream::read( void *buffer, long size )
 }
 
 // ** PackedStream::setPosition
-void PackedStream::setPosition( long offset, eSeekOrigin origin )
+void PackedStream::setPosition( u64 offset, SeekOrigin origin )
 {
 	DC_BREAK_IF( m_file == NULL );
 
@@ -101,26 +100,20 @@ void PackedStream::setPosition( long offset, eSeekOrigin origin )
 }
 
 // ** PackedStream::position
-long PackedStream::position( void ) const
+u64 PackedStream::position( void ) const
 {
     DC_BREAK_IF( m_file == NULL );
     return m_position;
 }
 
-// ** PackedStream::hasDataLeft
-bool PackedStream::hasDataLeft( void ) const
-{
-    return position() < length();
-}
-
 // ** PackedStream::length
-long PackedStream::length( void ) const
+u64 PackedStream::length( void ) const
 {
     return m_fileSize;
 }
 
 // ** PackedStream::readFile
-int PackedStream::readFile( u8 *buffer, int size )
+u64 PackedStream::readFile( u8 *buffer, u64 size )
 {
     int bytesRead = readFromBuffer( buffer, size );
     DC_BREAK_IF( bytesRead > size );
@@ -142,7 +135,7 @@ int PackedStream::readFile( u8 *buffer, int size )
 }
 
 // ** PackedStream::readFromBuffer
-int PackedStream::readFromBuffer( u8 *buffer, int size )
+u64 PackedStream::readFromBuffer( u8* buffer, u64 size )
 {
     int bytesRead = 0;
 

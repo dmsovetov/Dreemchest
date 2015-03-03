@@ -24,42 +24,30 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_ZLibBufferCompressor_H__
-#define		__DC_Io_ZLibBufferCompressor_H__
+#ifndef		__DC_Io_IProcessor_H__
+#define		__DC_Io_IProcessor_H__
 
-#include	"IBufferCompressor.h"
-
-#ifdef HAVE_ZLIB
-	#include <zlib/zlib.h>
-#endif
+#include	"../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    // ** class ZLibBufferCompressor
-    class ZLibBufferCompressor : public IBufferCompressor {
+    //! A stream processor class is used for processing in/out streamed bytes.
+    class IProcessor {
     public:
 
-        // ** IBufferCompressor
-        virtual int     compressToBuffer( const u8 *in, int size, u8 *out, int maxSize );
-        virtual int     decompressToBuffer( const u8 *in, int size, u8 *out, int maxSize );
+        virtual         ~IProcessor( void ) {}
 
-        // ** ZLibBufferCompressor
-        bool            beginStreamCompression( void );
-        void            endStreamCompression( void );
-        bool            beginStreamDecompression( void );
-        void            endStreamDecompression( void );
+        //! Processes a bytes to be written to stream.
+        virtual u64     write( const void* src, u64 size )  = 0;
 
-    private:
-
-	#ifdef HAVE_ZLIB
-        z_stream        m_stream;
-	#endif
+        //! Processes a bytes that were read from stream.
+        virtual u64     read( void* src, u64 size )         = 0;
     };
 
 } // namespace io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_ZLibBufferCompressor_H__	*/
+#endif		/*	!__DC_Io_IProcessor_H__	*/

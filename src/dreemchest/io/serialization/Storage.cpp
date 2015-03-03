@@ -24,30 +24,13 @@
 
  **************************************************************************/
 
-#include "FastLZBufferCompressor.h"
-
-#ifdef HAVE_FASTLZ
-
-#include <fastlz/fastlz.h>
+#include	"Storage.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** FastLZBufferCompressor::compressToBuffer
-int FastLZBufferCompressor::compressToBuffer( const u8 *in, int inSize, u8 *out, int maxSize )
-{
-    return fastlz_compress( in, inSize, out );
-}
 
-// ** FastLZBufferCompressor::decompressToBuffer
-int FastLZBufferCompressor::decompressToBuffer( const u8 *in, int inSize, u8 *out, int maxSize )
-{
-    return fastlz_decompress( in, inSize, out, maxSize );
-}
-    
 } // namespace io
 
 DC_END_DREEMCHEST
-
-#endif

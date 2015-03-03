@@ -24,51 +24,26 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_MemoryStream_H__
-#define		__DC_Io_MemoryStream_H__
+#ifndef		__DC_Io_Storage_H__
+#define		__DC_Io_Storage_H__
 
-#include	"Stream.h"
+#include	"../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-	// ** class MemoryStream
-	class dcInterface MemoryStream : public Stream {
+    //! A storage interface to use in serialization
+    class IStorage {
+    public:
 
-        DC_DECLARE_IS( MemoryStream, MemoryStream, this )
+        virtual                 ~IStorage( void ) {}
 
-	public:
-
-                                MemoryStream( u8 *pointer, int size, bool own );
-		virtual					~MemoryStream( void );
-
-        // ** Stream
-        virtual long            length( void ) const;
-        virtual long            position( void ) const;
-        virtual void            setPosition( long offset, eSeekOrigin origin = SeekSet );
-        virtual bool            hasDataLeft( void ) const;
-        virtual long            read( void *buffer, long size );
-        virtual long            write( const void *buffer, long size );
-
-        // ** MemoryStream
-        void                    clear( void );
-        int                     bytesAvailable( void ) const;
-        int                     maxSize( void ) const;
-        const u8*             buffer( void ) const;
-        void                    trimFromLeft( int size );
-        void                    trimFromRight( int size );
-
-	private:
-
-		u8*                   m_buffer;
-		long					m_maxSize;
-        bool                    m_isOwner;
-		long                    m_size, m_offset;
-	};
-
+        virtual void            write( CString name, const void* data, u64 size );
+    };
+    
 } // namespace io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_MemoryStream_H__	*/
+#endif		/*	!__DC_Io_Storage_H__	*/

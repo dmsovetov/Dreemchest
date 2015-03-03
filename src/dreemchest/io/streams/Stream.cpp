@@ -26,7 +26,6 @@
 
 #include	"Stream.h"
 #include	"ByteBuffer.h"
-#include    "MemoryStream.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -43,88 +42,28 @@ Stream::~Stream( void )
 
 }
 
-// ** Stream::release
-void Stream::release( void )
+// ** Stream::dispose
+void Stream::dispose( void )
 {
-    delete this;
-}
 
-// ** Stream::writeWithFormat
-long Stream::writeWithFormat( const char *format, ... )
-{
-/*    DC_BREAK_IF( format == NULL );
-    
-    va_list		ap;
-    char		formated[MAX_FORMAT_BUFFER_SIZE];
-
-    va_start( ap, format );
-    vsnprintf( formated, MAX_FORMAT_BUFFER_SIZE, format, ap );
-    va_end( ap );
-
-    return write( formated, ( long )strlen( formated ) + 1 );*/
-	return 0;
-}
-
-// ** Stream::writeIdentation
-long Stream::writeIdentation( int size )
-{
-	long result = 0;
-
-	for( int i = 0; i < size; i++ ) {
-		result += writeWithFormat( "\t" );
-	}
-
-	return result;
-}
-
-// ** Stream::toByteBuffer
-ByteBuffer* Stream::toByteBuffer( bool asText )
-{
-    int         len    = length();
-    ByteBuffer *buffer = DC_NEW ByteBuffer( len + (asText ? 1 : 0) );
-
-    if( len ) {
-        read( buffer->data(), len );
-    }
-
-	if( asText ) {
-		buffer->data()[len] = 0;
-	}
-
-	return buffer;
-}
-
-// ** Stream::toMemoryStream
-MemoryStream* Stream::toMemoryStream( void )
-{
-    ByteBuffer*   buffer = toByteBuffer();
-    MemoryStream* result = DC_NEW MemoryStream( buffer->data(), buffer->size(), true );
-    buffer->release();
-
-    return result;
 }
 
 // ** Stream::readString
-long Stream::readString( char *dst, int bufferSize )
+u64 Stream::readString( String& str ) const
 {
-    long result		= 0;
-    long strResult	= 0;
+    u64 result		= 0;
+    u64 strResult	= 0;
     u32 length		= 0;
 
-    dst[0] = 0;
     result += read( &length, sizeof( length ) );
+    str.resize( length );
+    result += read( &str[0], length );
 
-    while( strResult < ( int )length && strResult < bufferSize ) {
-        int bytesRead = read( dst, std::min( ( int )length, bufferSize ) ); dst[bytesRead] = '\0';
-        length		-= bytesRead;
-        strResult	+= bytesRead;
-    }
-    
     return result + strResult;
 }
 
 // ** Stream::writeString
-long Stream::writeString( const char *str )
+u64 Stream::writeString( const char* str )
 {
     long result = 0;
     u32 length = ( u32 )strlen( str );
@@ -138,21 +77,21 @@ long Stream::writeString( const char *str )
 }
 
 // ** Stream::length
-long Stream::length( void ) const
+u64 Stream::length( void ) const
 {
     DC_BREAK;
     return 0;
 }
     
-// ** Stream::length
-long Stream::position( void ) const
+// ** Stream::position
+u64 Stream::position( void ) const
 {
     DC_BREAK;
     return 0;
 }
     
 // ** Stream::setPosition
-void Stream::setPosition( long offset, eSeekOrigin origin )
+void Stream::setPosition( u64 offset, SeekOrigin origin )
 {
     DC_BREAK;
 }
@@ -160,19 +99,18 @@ void Stream::setPosition( long offset, eSeekOrigin origin )
 // ** Stream::hasDataLeft
 bool Stream::hasDataLeft( void ) const
 {
-    DC_BREAK;
-    return false;
+    return position() < length();
 }
     
 // ** Stream::read
-long Stream::read( void *buffer, long size )
+u64 Stream::read( void* buffer, u64 size ) const
 {
     DC_BREAK;
     return 0;
 }
     
 // ** Stream::write
-long Stream::write( const void *buffer, long size )
+u64 Stream::write( const void* buffer, u64 size )
 {
     DC_BREAK;
     return 0;

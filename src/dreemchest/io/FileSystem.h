@@ -33,18 +33,46 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-	// ** class FileSystem
-	class dcInterface FileSystem {
+	//! FileSystem class is a base for all other file systems, like disk file system or archive.
+    class dcInterface FileSystem : public RefCounted {
 	public:
 
-								FileSystem( void );
 		virtual					~FileSystem( void );
 
-		// ** FileSystem
-		MemoryStream*			openMemory( u8 *pointer, u32 size ) const;
-		virtual Stream*		openFile( const char *fileName ) const;
-		virtual Stream*		openFile( const char *fileName, const char *mode ) const;
-		virtual bool			fileExists( const char *fileName ) const;
+        //! Creates a byte buffer stream from an in-memory data.
+        /*!
+         \param pointer A source memory buffer that will be copied to a created byte buffer.
+         \param size Byte buffer size.
+         \return ByteBuffer instance.
+         */
+		ByteBufferPtr           createByteBuffer( u8* pointer, u32 size ) const;
+
+        //! Opens a file with a given file name for reading.
+        /*!
+         \param path File path.
+         \return Instance of stream if file exists, otherwise false.
+         */
+		virtual StreamPtr       openFile( const Path& path ) const;
+
+        //! Opens a file with a given file name an mode.
+        /*!
+         \param path File path.
+         \param mode File open mode.
+         \return Instance of stream if file exists, otherwise false.
+         */
+		virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const;
+
+        //! Returns true if file at a given path exists.
+        /*!
+         \param path File path to check.
+         \return True if file exists at path.
+         */
+		virtual bool			fileExists( const Path& path ) const;
+
+    protected:
+
+                                //! Constructs file system instance.
+                                FileSystem( void );
 	};
 
 } // namespace io

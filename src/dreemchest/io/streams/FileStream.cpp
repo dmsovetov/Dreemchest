@@ -24,7 +24,8 @@
 
  **************************************************************************/
 
-#include	"FileStream.h"
+#include "FileStream.h"
+#include <errno.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -34,108 +35,117 @@ namespace io {
 u32 FileStream::s_openFileCount = 0;
 
 // ** FileStream::FileStream
-FileStream::FileStream( const char *fileName, const char *mode )
+FileStream::FileStream( void ) : m_file( NULL ), m_length( 0 )
 {
-	m_length    = 0;
-	m_fileName  = fileName;
-    m_file      = fopen( fileName, mode );
 
-    if( !m_file ) {
-        return;
-    }
-
-    s_openFileCount++;
-
- 	fseek( m_file, 0, SEEK_END );
-	m_length = ftell( m_file );
-	fseek( m_file, 0, SEEK_SET );
 }
 
 FileStream::~FileStream( void )
 {
-	if( m_file ) {
-        fclose( m_file );
-        s_openFileCount--;
-    }
+    dispose();
 }
 
-// ** FileStream::fileName
-CString FileStream::fileName( void ) const
+// ** FileStream::dispose
+void FileStream::dispose( void )
 {
-	return m_fileName.c_str();
-}
-
-// ** FileStream::read
-long FileStream::read( void *buffer, long size )
-{
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
-    
-	if( m_file ) {
-		int bytesRead = fread( buffer, 1, size, m_file );
-        return bytesRead;
-	}
-
-	return 0;
-}
-
-// ** FileStream::write
-long FileStream::write( const void *buffer, long size )
-{
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
-    
-	if( m_file ) {
-		int bytesWritten = fwrite( buffer, 1, size, m_file );
-        DC_BREAK_IF( bytesWritten != size );
-        return bytesWritten;
-	}
-
-	return 0;
-}
-
-// ** FileStream::writeWithFormat
-long FileStream::writeWithFormat( const char *format, ... )
-{
-/*    DC_BREAK_IF( format == NULL );
-    
-    va_list		ap;
-    char		formated[MAX_FORMAT_BUFFER_SIZE];
-
-    va_start( ap, format );
-    vsnprintf( formated, MAX_FORMAT_BUFFER_SIZE, format, ap );
-    va_end( ap );
-
-	return fprintf( m_file, formated );*/
-	return 0;
-}
-
-// ** FileStream::setPosition
-void FileStream::setPosition( long offset, eSeekOrigin origin )
-{
-    if( !m_file ) {
+    if( m_file == NULL ) {
         return;
     }
 
-    int result = 0;
+    fclose( m_file );
+    s_openFileCount--;
+
+    m_file = NULL;
+}
+
+// ** FileStream::open
+bool FileStream::open( const Path& fileName, StreamMode mode )
+{
+    CString fmode = "rb";
+
+    switch( mode ) {
+    case BinaryReadStream:  fmode = "rb"; break;
+    case BinaryWriteStream: fmode = "wb"; break;
+    }
+
+    // ** Open file
+    m_fileName = fileName;
+    m_file     = fopen( fileName.c_str(), fmode );
+
+    if( !m_file ) {
+        return false;
+    }
+
+    // ** Increase file counter
+    s_openFileCount++;
+
+    // ** Cache the file length
+    setPosition( 0, SeekEnd );
+    m_length = position();
+    setPosition( 0, SeekSet );
+
+    return true;
+}
+
+// ** FileStream::fileName
+const Path& FileStream::fileName( void ) const
+{
+	return m_fileName;
+}
+
+// ** FileStream::read
+u64 FileStream::read( void* buffer, u64 size ) const
+{
+    DC_BREAK_IF( m_file == NULL );
+    DC_BREAK_IF( buffer == NULL );
+    DC_BREAK_IF( size <= 0 );
+
+    u64 bytesRead = fread( buffer, 1, size, m_file );
+
+    if( bytesRead != size && ferror( m_file ) ) {
+        log::error( "FileStream::read : failed to read %d bytes from file, %d\n", size, errno );
+    }
+    
+    return bytesRead;
+}
+
+// ** FileStream::write
+u64 FileStream::write( const void* buffer, u64 size )
+{
+    DC_BREAK_IF( m_file == NULL );
+    DC_BREAK_IF( buffer == NULL );
+    DC_BREAK_IF( size <= 0 );
+
+    u64 bytesWritten = fwrite( buffer, 1, size, m_file );
+    
+    if( bytesWritten != size && ferror( m_file ) ) {
+        log::error( "FileStream::write : failed to write %d bytes to file, %d\n", size, errno );
+    }
+    
+    return bytesWritten;
+}
+
+// ** FileStream::setPosition
+void FileStream::setPosition( u64 offset, SeekOrigin origin )
+{
+    DC_BREAK_IF( m_file == NULL );
+
+    s32 result = 0;
 
     switch( origin ) {
     case SeekSet: result = fseek( m_file, offset, SEEK_SET ); break;
     case SeekCur: result = fseek( m_file, offset, SEEK_CUR ); break;
     case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
     }
-    
+
     DC_BREAK_IF( result != 0 );
 }
 
 // ** FileStream::position
-long FileStream::position( void ) const
+u64 FileStream::position( void ) const
 {
-	if( m_file ) {
-		return ftell( m_file );
-	}
-
-	return 0;
+    DC_BREAK_IF( m_file == NULL );
+    return ftell( m_file );
 }
 
 // ** FileStream::hasDataLeft
@@ -144,14 +154,8 @@ bool FileStream::hasDataLeft( void ) const
 	return feof( m_file ) == 0;
 }
 
-// ** FileStream::isValid
-bool FileStream::isValid( void ) const
-{
-	return (m_file != NULL);
-}
-
 // ** FileStream::length
-long FileStream::length( void ) const
+u64 FileStream::length( void ) const
 {
 	return m_length;
 }

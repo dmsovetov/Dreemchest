@@ -42,33 +42,38 @@ namespace io {
 
 	public:
 
-                                PackedStream( Stream* file, IBufferCompressor *compressor, int fileSize, int fileOffset );
+                                PackedStream( const StreamPtr& file, IBufferCompressor* compressor, u64 fileSize, u64 fileOffset );
 		virtual					~PackedStream( void );
 
-		// ** Stream
-        virtual long            length( void ) const;
-        virtual long            position( void ) const;
-        virtual void            setPosition( long offset, eSeekOrigin origin = SeekSet );
-        virtual bool            hasDataLeft( void ) const;
-        virtual long            read( void *buffer, long size );
+		//! Returns a decompressed file length.
+        virtual u64             length( void ) const;
+
+        //! Returns a current file position.
+        virtual u64             position( void ) const;
+
+        //! Sets a position inside the file.
+        virtual void            setPosition( u64 offset, SeekOrigin origin = SeekSet );
+
+        //! Reads data from file.
+        virtual u64             read( void *buffer, u64 size );
 
         // ** PackedStream
         void                    reopen( void );
         void                    decompressChunk( void );
-        int                     readFile( u8 *buffer, int length );
-        int                     readFromBuffer( u8 *buffer, int size );
+        u64                     readFile( u8* buffer, u64 length );
+        u64                     readFromBuffer( u8* buffer, u64 size );
 
     private:
 
         IBufferCompressor*      m_compressor;
-        Stream*					m_file;
+        StreamPtr               m_file;
 
-        int                     m_position;
-        int                     m_fileSize;
-        int                     m_fileOffset;
+        u64                     m_position;
+        u64                     m_fileSize;
+        u64                     m_fileOffset;
 
-        int                     m_bytesAvailable;
-        int                     m_bufferOffset;
+        u64                     m_bytesAvailable;
+        u64                     m_bufferOffset;
         u8*						m_buffer;
 	};
 

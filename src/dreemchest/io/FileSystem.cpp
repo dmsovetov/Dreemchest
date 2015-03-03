@@ -25,11 +25,13 @@
  **************************************************************************/
 
 #include	"FileSystem.h"
-#include	"MemoryStream.h"
+#include	"ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
+
+IMPLEMENT_LOGGER( log )
 
 // ** FileSystem::FileSystem
 FileSystem::FileSystem( void )
@@ -40,26 +42,26 @@ FileSystem::~FileSystem( void )
 {
 }
 
-// ** FileSystem::openMemory
-MemoryStream* FileSystem::openMemory( u8 *pointer, u32 size ) const
+// ** FileSystem::createByteBuffer
+ByteBufferPtr FileSystem::createByteBuffer( u8 *pointer, u32 size ) const
 {
-	return DC_NEW MemoryStream( pointer, size, false );
+	return DC_NEW ByteBuffer( pointer, size );
 }
 
 // ** FileSystem::openFile
-Stream* FileSystem::openFile( const char *fileName ) const
+StreamPtr FileSystem::openFile( const Path& path ) const
 {
     return NULL;
 }
 
 // ** FileSystem::openFile
-Stream* FileSystem::openFile( const char *fileName, const char *mode ) const
+StreamPtr FileSystem::openFile( const Path& path, StreamMode mode ) const
 {
     return NULL;
 }
 
 // ** FileSystem::fileExists
-bool FileSystem::fileExists( const char *fileName ) const
+bool FileSystem::fileExists( const Path& path ) const
 {
     return false;
 }

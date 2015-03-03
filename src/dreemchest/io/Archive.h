@@ -28,7 +28,8 @@
 #define		__DC_Io_Archive_H__
 
 #include    "FileSystem.h"
-#include    "IBufferCompressor.h"
+#include    "processors/IBufferCompressor.h"
+#include    "Path.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -74,24 +75,28 @@ namespace io {
 
     public:
 
-                                Archive( const DiskFileSystem *diskFileSystem );
+                                Archive( const DiskFileSystem* diskFileSystem );
         virtual                 ~Archive( void );
 
-        // ** FileSystem
-		virtual Stream*        openFile( const char *fileName ) const;
-		virtual Stream*        openFile( const char *fileName, const char *mode ) const;
-		virtual bool            fileExists( const char *fileName ) const;
+        //! Opens a file for reading from this archive.
+		virtual StreamPtr       openFile( const Path& fileName ) const;
+
+        //! Opens a file from this archive, only reading is supported.
+		virtual StreamPtr       openFile( const Path& fileName, StreamMode mode ) const;
+
+        //! Returns true if the file with a given name exists inside an archive.
+		virtual bool            fileExists( const Path& fileName ) const;
 
         // ** Archive
         void                    release( void );
-        bool                    open( Stream* file );
-        void                    create( Stream* file, eCompressor compressor = CompressorZ );
+        bool                    open( const StreamPtr& file );
+        void                    create( const StreamPtr& file, eCompressor compressor = CompressorZ );
         void                    close( void );
 
-        CString             fileName( void ) const;
+        const Path&             fileName( void ) const;
 
-        bool                    packFile( const char *fileName, const char *compressedFileName );
-        bool                    extractFile( const char *fileName, const char *outputFileName );
+        bool                    packFile( const Path& fileName, const Path& compressedFileName );
+        bool                    extractFile( const Path& fileName, const Path& outputFileName );
 
     private:
 
@@ -101,10 +106,10 @@ namespace io {
 
         IBufferCompressor*      createCompressor( eCompressor compressor ) const;
 
-        sFileInfo*              createFileInfo( const char *fileName, int offset, int compressedSize = 0, int decompressedSize = 0 );
-        const sFileInfo*        findFileInfo( const char *fileName ) const;
+        sFileInfo*              createFileInfo( const Path& fileName, int offset, int compressedSize = 0, int decompressedSize = 0 );
+        const sFileInfo*        findFileInfo( const Path& fileName ) const;
         sFileInfo*              readFileInfo( void ) const;
-        void                    writeFileInfo( const sFileInfo *file ) const;
+        void                    writeFileInfo( const sFileInfo *file );
 
     private:
 
@@ -114,9 +119,9 @@ namespace io {
         tFileInfoList           m_files;
         sArchiveInfo            m_info;
 
-        Stream*                m_file;
+        StreamPtr               m_file;
         bool                    m_isCreating;
-        String             m_fileName;
+        Path                    m_fileName;
     };
 
 } // namespace io

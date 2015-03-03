@@ -27,7 +27,7 @@
 #ifndef		__DC_Io_BinarySerialization_H__
 #define		__DC_Io_BinarySerialization_H__
 
-#include	"Io.h"
+#include	"../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -147,17 +147,17 @@ namespace io {
 
     // ** writeField
     template<>
-    inline void writeField( Stream* stream, const vec2 *data, int count )
+    inline void writeField( Stream* stream, const Vec2 *data, int count )
     {
 		for( int i = 0; i < count; i++ ) {
 			stream->write( &data[i].x, sizeof( float ) );
 			stream->write( &data[i].y, sizeof( float ) );
 		}
     }
-
+/*
     // ** writeField
     template<>
-    inline void writeField( Stream* stream, const cVector3 *data, int count )
+    inline void writeField( Stream* stream, const Vec3 *data, int count )
     {
 		for( int i = 0; i < count; i++ ) {
 			stream->write( &data[i].x, sizeof( float ) );
@@ -168,7 +168,7 @@ namespace io {
 
     // ** writeField
     template<>
-    inline void writeField( Stream* stream, const vec4 *data, int count )
+    inline void writeField( Stream* stream, const Vec4 *data, int count )
     {
 		for( int i = 0; i < count; i++ ) {
 			stream->write( &data[i].x, sizeof( float ) );
@@ -186,7 +186,7 @@ namespace io {
             data[i].writeToStream( stream );
         }
     }
-
+*/
     // ** readField
     template<typename T>
     inline void readField( Stream* stream, T *data, int count = 1 )
@@ -297,7 +297,7 @@ namespace io {
     {
         stream->read( data, count * sizeof( unsigned long ) );
     }
-
+/*
     // ** readField
     template<>
     inline void readField( Stream* stream, vec2 *data, int count )
@@ -330,14 +330,14 @@ namespace io {
 			stream->read( &data[i].w, sizeof( float ) );
 		}
     }
-
+*/
     // ** readField
     template<>
     inline void readField( Stream* stream, char *data, int count )
     {
         stream->read( data, count * sizeof( char ) );
     }
-
+/*
     // ** readField
     template<>
     inline void readField( Stream* stream, cValue *data, int count )
@@ -346,7 +346,7 @@ namespace io {
             data[i].readFromStream( stream );
         }
     }
-
+*/
 } // namespace io
     
 DC_END_DREEMCHEST

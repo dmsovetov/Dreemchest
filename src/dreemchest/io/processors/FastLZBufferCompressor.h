@@ -37,8 +37,8 @@ namespace io {
     class FastLZBufferCompressor : public IBufferCompressor {
     public:
 
-        virtual int     compressToBuffer( const u8 *in, int size, u8 *out, int maxSize );
-        virtual int     decompressToBuffer( const u8 *in, int size, u8 *out, int maxSize );
+        virtual s64     compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
+        virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
     };
     
 } // namespace io

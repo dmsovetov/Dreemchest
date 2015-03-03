@@ -24,52 +24,27 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_Stream_H__
-#define		__DC_Io_Stream_H__
+#ifndef		__DC_Io_IBufferCompressor_H__
+#define		__DC_Io_IBufferCompressor_H__
 
-#include	"Io.h"
+#include	"../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    // ** enum eSeekOrigin
-	enum eSeekOrigin {
-		SeekSet = 0,
-		SeekCur,
-		SeekEnd
-	};
-
-	// ** class Stream
-	class dcInterface Stream {
-
-        DC_DECLARE_IS( FileStream, FileStream, NULL );
-        DC_DECLARE_IS( MemoryStream, MemoryStream, NULL );
-
+	// ** class IBufferCompressor
+	class IBufferCompressor {
 	public:
 
-                                Stream( void );
-		virtual					~Stream( void );
+        virtual         ~IBufferCompressor( void ) {}
 
-        void                    release( void );
-        ByteBuffer*				toByteBuffer( bool asText = false );
-        MemoryStream*			toMemoryStream( void );
-
-        long					writeString( const char *str );
-        long					readString( char *dst, int bufferSize );
-
-        virtual long            length( void ) const;
-        virtual long            position( void ) const;
-        virtual void            setPosition( long offset, eSeekOrigin origin = SeekSet );
-        virtual bool            hasDataLeft( void ) const;
-        virtual long            read( void *buffer, long size );
-        virtual long            write( const void *buffer, long size );
-		virtual long            writeWithFormat( const char *format, ... );
-		virtual long			writeIdentation( int size );
+        virtual s64     compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )    = 0;
+        virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )  = 0;
 	};
 
 } // namespace io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_Stream_H__	*/
+#endif		/*	!__DC_Io_IBufferCompressor_H__	*/

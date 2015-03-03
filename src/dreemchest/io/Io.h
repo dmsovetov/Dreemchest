@@ -35,7 +35,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-	class ByteBuffer;
+    DECLARE_LOG( log )
+
+    class Path;
 
 	class FileSystem;
 		class DiskFileSystem;
@@ -43,20 +45,42 @@ namespace io {
 
 	class Stream;
 		class FileStream;
-		class MemoryStream;
+		class ByteBuffer;
 		class PackedStream;
 
-	typedef List<Archive*>	ArchiveList;
+    //! Available stream open modes.
+    enum StreamMode {
+        BinaryReadStream,     //!< Open binary stream for reading.
+        BinaryWriteStream,    //!< Open binary stream for writing.
+    };
+
+    //! Stream ptr type.
+    typedef StrongPtr<Stream>       StreamPtr;
+
+    //! File stream ptr type.
+    typedef StrongPtr<FileStream>   FileStreamPtr;
+
+    //! Byte buffer ptr type.
+    typedef StrongPtr<ByteBuffer>   ByteBufferPtr;
+
+    //! Archive ptr type.
+    typedef StrongPtr<Archive>      ArchivePtr;
+
+    typedef Map<Path, ArchivePtr>	Archives;
+    typedef Set<Path>               PathSet;
 
 } // namespace io
 
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "MemoryStream.h"
-	#include "DiskFileStream.h"
+	#include "streams/FileStream.h"
+    #include "streams/ByteBuffer.h"
+    #include "serialization/Serializable.h"
+    #include "serialization/BinarySerialization.h"
 	#include "FileSystem.h"
 	#include "Archive.h"
+    #include "DiskFileSystem.h"
 #endif
 
 #endif /*   !defined( __DC_Io_Io_H__ )   */

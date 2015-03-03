@@ -24,27 +24,36 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_IBufferCompressor_H__
-#define		__DC_Io_IBufferCompressor_H__
+#include "FastLZBufferCompressor.h"
 
-#include	"Io.h"
+#ifdef HAVE_FASTLZ
+    #include <fastlz.h>
+#endif
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-	// ** class IBufferCompressor
-	class IBufferCompressor {
-	public:
+// ** FastLZBufferCompressor::compressToBuffer
+s64 FastLZBufferCompressor::compressToBuffer( const u8 *in, u64 inSize, u8 *out, u64 maxSize )
+{
+#ifdef HAVE_FASTLZ
+    return fastlz_compress( in, inSize, out );
+#else
+    return 0;
+#endif
+}
 
-        virtual         ~IBufferCompressor( void ) {}
-
-        virtual int     compressToBuffer( const u8 *in, int size, u8 *out, int maxSize )    = 0;
-        virtual int     decompressToBuffer( const u8 *in, int size, u8 *out, int maxSize )  = 0;
-	};
-
+// ** FastLZBufferCompressor::decompressToBuffer
+s64 FastLZBufferCompressor::decompressToBuffer( const u8 *in, u64 inSize, u8 *out, u64 maxSize )
+{
+#ifdef HAVE_FASTLZ
+    return fastlz_decompress( in, inSize, out, maxSize );
+#else
+    return 0;
+#endif
+}
+    
 } // namespace io
 
 DC_END_DREEMCHEST
-
-#endif		/*	!__DC_Io_IBufferCompressor_H__	*/

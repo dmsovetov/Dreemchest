@@ -24,50 +24,53 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_DiskFileSystem_H__
-#define		__DC_Io_DiskFileSystem_H__
-
-#include	"FileSystem.h"
+#include	"Serializable.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-	// ** class DiskFileSystem
-	class dcInterface DiskFileSystem : public FileSystem {
-	public:
+// ** Serializable::read
+void Serializable::read( const StreamPtr& stream )
+{
+    Array<Field> items = fields();
 
-								DiskFileSystem( void );
-		virtual					~DiskFileSystem( void );
+    for( int i = 0; i < items.size(); i++ ) {
+        const Field& field = items[i];
 
-		// ** FileSystem
-		virtual Stream*		openFile( const char *fileName ) const;
-		virtual Stream*		openFile( const char *fileName, const char *mode ) const;
-		virtual bool			fileExists( const char *fileName ) const;
+        if( !field.m_reader ) {
+            log::warn( "Serializable::read : field '%s' has no reader set, do not know how to read this field\n", field.m_name );
+            continue;
+        }
 
-		// ** DiskFileSystem
-		void					setBaseDir( const char *value );
-		CString				baseDir( void ) const;
-		void					addPath( const char *path, bool first = false );
-		void					removePath( const char *path );
-		Archive*				openPackage( const char *fileName, const char *path = NULL ) const;
-		Archive*				loadPackage( const char *fileName );
-		bool					unloadPackage( const char *fileName );
-		Archive*				findPackage( const char *fileName );
+        field.m_reader( stream, field.m_pointer );
+    }
+}
 
-        static bool				fileExistsAtPath( const char *fileName );
+// ** Serializable::write
+void Serializable::write( StreamPtr& stream ) const
+{
+    Array<Field> items = fields();
 
-	protected:
+    for( int i = 0; i < items.size(); i++ ) {
+        const Field& field = items[i];
 
-        enum { MaxPathLength = 256 };
+        if( !field.m_writer ) {
+            log::warn( "Serializable::write : field '%s' has no writer set, do not know how to write this field\n", field.m_name );
+            continue;
+        }
 
-		ArchiveList             m_packages;
-		StringArray             m_paths;
-        String             m_baseDir;
-	};
+        field.m_writer( stream, field.m_pointer );
+    }
+}
+
+// ** Serializable::fields
+Array<Serializable::Field> Serializable::fields( void ) const
+{
+    log::warn( "Serializable::fields : not implemented in a subclass\n" );
+    return Array<Field>();
+}
 
 } // namespace io
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Io_DiskFileSystem_H__	*/
