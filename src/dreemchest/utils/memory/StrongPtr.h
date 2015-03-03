@@ -36,19 +36,28 @@ DC_BEGIN_DREEMCHEST
     class StrongPtr {
     public:
 
+        typedef StrongPtr<T> ThisType;
+
+                        StrongPtr( const ThisType& other );
                         StrongPtr( T *pointer = NULL );
-                        StrongPtr( const StrongPtr<T>& other );
                         ~StrongPtr( void );
+
+                        template <class R>
+                        StrongPtr( const StrongPtr<R>& other ) : m_ptr( other.get() ) {
+                            if( m_ptr ) {
+                                static_cast<RefCounted*>( m_ptr )->retain();
+                            }
+                        }
 
         T*              get( void ) const;
         T*              operator -> ( void );
         const T*        operator -> ( void ) const;
         T&              operator *  ( void );
         const T&        operator *  ( void ) const;
-        StrongPtr&      operator =  ( T *pointer );
-        StrongPtr&      operator =  ( StrongPtr<T>& other );
-        bool            operator == ( const StrongPtr<T>& other ) const;
-        bool            operator != ( const StrongPtr<T>& other ) const;
+        ThisType&       operator =  ( T* pointer );
+        ThisType&       operator =  ( const ThisType& other );
+        bool            operator == ( const ThisType& other ) const;
+        bool            operator != ( const ThisType& other ) const;
 
     private:
 
@@ -61,7 +70,7 @@ DC_BEGIN_DREEMCHEST
 
     // ** StrongPtr::StrongPtr
     template<typename T>
-    StrongPtr<T>::StrongPtr( T *pointer ) : m_ptr( pointer ) {
+    StrongPtr<T>::StrongPtr( T* pointer ) : m_ptr( pointer ) {
         if( m_ptr ) {
             static_cast<RefCounted*>( m_ptr )->retain();
         }
@@ -69,7 +78,7 @@ DC_BEGIN_DREEMCHEST
 
     // ** StrongPtr::StrongPtr
     template<typename T>
-    StrongPtr<T>::StrongPtr( const StrongPtr<T>& other ) : m_ptr( other.m_ptr ) {
+    StrongPtr<T>::StrongPtr( const ThisType& other ) : m_ptr( other.m_ptr ) {
         if( m_ptr ) {
             static_cast<RefCounted*>( m_ptr )->retain();
         }
@@ -112,13 +121,13 @@ DC_BEGIN_DREEMCHEST
 
     // ** StrongPtr::operator =
     template<typename T>
-    StrongPtr<T>& StrongPtr<T>::operator = ( StrongPtr<T>& other ) {
+    typename StrongPtr<T>::ThisType& StrongPtr<T>::operator = ( const ThisType& other ) {
         setPointer( other.m_ptr );
         return *this;
     }
 
     template<typename T>
-    StrongPtr<T>& StrongPtr<T>::operator = ( T *pointer ) {
+    typename StrongPtr<T>::ThisType& StrongPtr<T>::operator = ( T *pointer ) {
         setPointer( pointer );
         return *this;
     }
