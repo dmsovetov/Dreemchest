@@ -2,6 +2,7 @@ examples = Executable( 'Examples', paths = [ '../dreemchest' ], link = [ 'Dreemc
 
 if Has( 'platform' ):
 	examples.dirs( '01_Platform/*' )
+	examples.dirs( '03_IO/*' )
 
 	if platform == 'iOS':
 		examples.linkExternal( Library( 'Foundation', True ), Library( 'UIKit', True ) )
