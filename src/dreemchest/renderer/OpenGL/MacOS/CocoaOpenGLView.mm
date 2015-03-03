@@ -72,8 +72,8 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     NSOpenGLPixelFormatAttribute attrs[] =
     {
         NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFADepthSize,   depth,
-        NSOpenGLPFAStencilSize, stencil,
+        NSOpenGLPFADepthSize,   static_cast<NSOpenGLPixelFormatAttribute>( depth ),
+        NSOpenGLPFAStencilSize, static_cast<NSOpenGLPixelFormatAttribute>( stencil ),
         0
     };
 
