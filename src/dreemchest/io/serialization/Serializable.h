@@ -48,30 +48,20 @@
 #define IoTypeSize( T, size )   template<> inline u64 sizeOfType<T>( void ) { return size; }
 
 //! Macro definition for overriding field writer
-#define IoFieldWriter( T, code )                                        \
-    template<>                                                          \
-    inline io::FieldWriter io::fieldWriter( const T& data ) {           \
-        struct Writer {                                                 \
-            static void thunk( StreamPtr& stream, const void* data ) {  \
-                const T& value = *reinterpret_cast<const T*>( data );   \
-                code                                                    \
-            }                                                           \
-        };                                                              \
-        return Writer::thunk;                                           \
+#define IoFieldWriter( T, ... )                                             \
+    template<>                                                              \
+    inline void io::writeField<T>( StreamPtr& stream, const void* data ) {  \
+        const T& value = *reinterpret_cast<const T*>( data );               \
+        __VA_ARGS__                                                         \
     }
 
 //! Macro definition for overriding field reader
-#define IoFieldReader( T, code )                                        \
-    template<>                                                          \
-    inline io::FieldReader io::fieldReader( const T& data ) {           \
-        struct Reader {                                                 \
-            static void thunk( const StreamPtr& stream, void* data ) {  \
-                T& value = *reinterpret_cast<T*>( data );               \
-                code                                                    \
-            }                                                           \
-        };                                                              \
-        return Reader::thunk;                                           \
-        }
+#define IoFieldReader( T, ... )                                             \
+    template<>                                                              \
+    inline void io::readField<T>( const StreamPtr& stream, void* data ) {   \
+        T& value = *reinterpret_cast<T*>( data );                           \
+        __VA_ARGS__                                                         \
+    }
 
 DC_BEGIN_DREEMCHEST
 
@@ -126,61 +116,78 @@ namespace io {
         virtual Array<Field>    fields( void ) const;
     };
 
-    //! Default field writer function
+    // ------------------------ Field serialization
+
     template<typename T>
-    inline FieldWriter fieldWriter( const T& data )
-    {
-        if( !sizeOfType<T>() ) {
-            return NULL;
-        }
-
-        struct Writer {
-            static void thunk( StreamPtr& stream, const void* data ) {
-                stream->write( data, sizeOfType<T>() );
-            }
-        };
-
-        return Writer::thunk;
-    }
-
-    //! Default field reader function
-    template<typename T>
-    inline FieldReader fieldReader( const T& data )
-    {
-        if( !sizeOfType<T>() ) {
-            return NULL;
-        }
-        
-        struct Reader {
-            static void thunk( const StreamPtr& stream, void* data ) {
-                stream->read( data, sizeOfType<T>() );
-            }
-        };
-
-        return Reader::thunk;
+    inline void writeField( StreamPtr& stream, const void* data ) {
+        stream->write( data, sizeOfType<T>() );
     }
 
     template<typename T>
-    inline FieldWriter fieldWriter( const std::vector<T>& data )
-    {
-        struct Writer {
-            static void thunk( StreamPtr& stream, const void* data ) {
-                const std::vector<T>* value = reinterpret_cast<const std::vector<T>*>( data );
-                for( int i = 0, n = ( int )value->size(); i < n; i++ ) {
-                    if( FieldWriter writer = fieldWriter( value->at( i ) ) ) {
-                        writer( stream, &value->at( i ) );
-                    } else {
-                        value->at( i ).write( stream );
-                    }
-                }
-            }
-        };
+    inline FieldWriter fieldWriter( const T& value ) {
+        return &writeField<T>;
+    }
 
-        return Writer::thunk;
+    template<typename T>
+    inline void readField( const StreamPtr& stream, void* data ) {
+        stream->read( data, sizeOfType<T>() );
+    }
+
+    template<typename T>
+    inline FieldReader fieldReader( const T& value ) {
+        return &readField<T>;
+    }
+
+    // ------------------------ Array serialization
+
+    template<typename T>
+    inline void writeArray( StreamPtr& stream, const void* data ) {
+        const Array<T>& array = *reinterpret_cast< const Array<T>* >( data );
+
+        u32 size = array.size();
+        stream->write( &size, 4 );
+
+        for( int i = 0; i < size; i++ ) {
+            if( sizeOfType<T>() ) {
+                writeField<T>( stream, &array[i] );
+            } else {
+                array[i].write( stream );
+            }
+        }
+    }
+
+    template<typename T>
+    inline FieldWriter fieldWriter( const Array<T>& data )
+    {
+        return &writeArray<T>;
+    }
+
+    template<typename T>
+    inline void readArray( const StreamPtr& stream, void* data ) {
+        Array<T>& array = *reinterpret_cast< Array<T>* >( data );
+
+        u32 size;
+        stream->read( &size, 4 );
+
+        array.resize( size );
+        for( int i = 0; i < size; i++ ) {
+            if( sizeOfType<T>() ) {
+                readField<T>( stream, &array[i] );
+            } else {
+                array[i].read( stream );
+            }
+        }
+    }
+
+    template<typename T>
+    inline FieldReader fieldReader( const Array<T>& data )
+    {
+        return &readArray<T>;
     }
 
 } // namespace io
 
+//! Declare reader/writer for String
 IoFieldWriter( String, stream->writeString( value.c_str() ); )
 IoFieldReader( String, stream->readString( value ); )
 
