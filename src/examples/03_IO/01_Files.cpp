@@ -68,8 +68,8 @@ struct Item : public io::Serializable {
 };
 
 struct ArrayOfPoints : public io::Serializable {
-    std::string         label;
-    std::vector<Item>   items;
+    std::string     label;
+    Array<Item>   items;
 
     IoBeginSerializer
         IoField( label )
@@ -95,39 +95,65 @@ class Files : public ApplicationDelegate {
 
         // Create a disk file system instance
         DiskFileSystem fs;
-        StreamPtr dstFile = fs.openFile( "lol", BinaryWriteStream );
-        if( dstFile == NULL ) {
-            return;
+
+        {
+            StreamPtr file = fs.openFile( "lol", BinaryWriteStream );
+            if( file == NULL ) {
+                return;
+            }
+
+            Item p1; p1.x = 1; p1.z = 0.01f; p1.w = 123.31112; p1.msg = "hello"; p1.v = Vec2( 11,-12);
+            p1.write( file );
+
+            printf( "Data written from p1\n" );
+            p1.dump();
         }
 
-        Item p1; p1.x = 1; p1.z = 0.01f; p1.w = 123.31112; p1.msg = "hello"; p1.v = Vec2( 11,-12);
-        p1.write( dstFile );
-        dstFile->dispose();
+        {
+            StreamPtr file = fs.openFile( "lol", BinaryReadStream );
+            if( file == NULL ) {
+                return;
+            }
+            Item p2;
+            p2.read( file );
 
-        ArrayOfPoints arr;
-        arr.label = "12";
-        for( int i = 0; i < 5; i++ ) {
-            p1.x = i;
-            arr.items.push_back( p1 );
+            printf( "Data read to p2\n" );
+            p2.dump();
         }
 
-        dstFile = fs.openFile( "points", BinaryWriteStream );
-        if( dstFile == NULL ) {
-            return;
-        }
-        arr.write( dstFile );
-        dstFile->dispose();
+        {
+            ArrayOfPoints arr;
+            arr.label = "12";
+            for( int i = 0; i < 5; i++ ) {
+                Item p1;
+                p1.x = i;
+                p1.msg = "zxc";
+                p1.v.x = 22;
+                p1.v.y = 2222;
+                arr.items.push_back( p1 );
+            }
 
-        StreamPtr srcFile = fs.openFile( "lol", BinaryReadStream );
-        if( srcFile == NULL ) {
-            return;
-        }
-        Item p2;
-        p2.read( srcFile );
+            StreamPtr file = fs.openFile( "points", BinaryWriteStream );
+            if( file == NULL ) {
+                return;
+            }
 
-        p1.dump();
-        p2.dump();
-        arr.dump();
+            arr.write( file );
+            printf( "Data written from arr\n" );
+            arr.dump();
+        }
+
+        {
+            StreamPtr file = fs.openFile( "points", BinaryReadStream );
+            if( file == NULL ) {
+                return;
+            }
+
+            ArrayOfPoints arr;
+            arr.read( file );
+            printf( "Data read to arr\n" );
+            arr.dump();
+        }
     }
 };
 
