@@ -55,7 +55,13 @@ u64 Stream::readString( String& str ) const
     u64 strResult	= 0;
     u32 length		= 0;
 
+    str     = "";
     result += read( &length, sizeof( length ) );
+
+    if( length == 0 ) {
+        return result;
+    }
+
     str.resize( length );
     result += read( &str[0], length );
 
