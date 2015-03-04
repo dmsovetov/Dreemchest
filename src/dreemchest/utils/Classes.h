@@ -99,6 +99,12 @@ inline T* castTo( S* ptr ) {
     return ptr->is( T::typeId() ) ? static_cast<T*>( ptr ) : 0;
 }
 
+//! Does a type cast.
+template<typename T, typename S>
+inline const T* castTo( const S* ptr ) {
+    return ptr->is( T::typeId() ) ? static_cast<const T*>( ptr ) : 0;
+}
+
 DC_END_DREEMCHEST
 
 #endif  /*      !defined( __DC_Utils_Classes_H__ )   */

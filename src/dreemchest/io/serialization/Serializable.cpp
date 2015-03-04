@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** Serializable::read
-void Serializable::read( const StreamPtr& stream )
+void Serializable::read( const Storage& storage )
 {
     Array<Field> items = fields();
 
@@ -43,12 +43,12 @@ void Serializable::read( const StreamPtr& stream )
             continue;
         }
 
-        field.m_reader( stream, field.m_pointer );
+        field.m_reader( storage, field.m_pointer );
     }
 }
 
 // ** Serializable::write
-void Serializable::write( StreamPtr& stream ) const
+void Serializable::write( Storage& storage ) const
 {
     Array<Field> items = fields();
 
@@ -60,7 +60,7 @@ void Serializable::write( StreamPtr& stream ) const
             continue;
         }
 
-        field.m_writer( stream, field.m_pointer );
+        field.m_writer( storage, field.m_pointer );
     }
 }
 

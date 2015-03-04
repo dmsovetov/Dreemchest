@@ -42,8 +42,10 @@ using namespace platform;
 using namespace io;
 
 //! Override a field writer/reader for Vec2 data type.
-IoFieldReader( Vec2, stream->read ( &value.x, sizeof( f32 ) ); stream->read ( &value.y, sizeof( f32 ) ); )
-IoFieldWriter( Vec2, stream->write( &value.x, sizeof( f32 ) ); stream->write( &value.y, sizeof( f32 ) ); )
+IoFieldReader( Vec2, storage.read ( &value.x, sizeof( f32 ) ); storage.read ( &value.y, sizeof( f32 ) ); )
+IoFieldWriter( Vec2, storage.write( &value.x, sizeof( f32 ) ); storage.write( &value.y, sizeof( f32 ) ); )
+
+StreamPtr stream;
 
 // Test structure to serialize data.
 struct Item : public io::Serializable {
@@ -69,11 +71,13 @@ struct Item : public io::Serializable {
 
 struct ArrayOfPoints : public io::Serializable {
     std::string     label;
-    Array<Item>   items;
+    Array<Item>     items;
+    Array<u32>      idx;
 
     IoBeginSerializer
         IoField( label )
-        IoField( items )
+        IoArray( items )
+        IoArray( idx )
     IoEndSerializer
 
     void dump( void ) const {
@@ -81,8 +85,23 @@ struct ArrayOfPoints : public io::Serializable {
         for( int i = 0; i < items.size(); i++ ) {
             items[i].dump();
         }
+        printf( "idx:" );
+        for( int i = 0; i < idx.size(); i++ ) {
+            printf( " %d", idx[i] );
+        }
+        printf( "\n" );
     }
 };
+
+void bar( int z )
+{
+
+}
+
+void bar( io::Serializable& s )
+{
+
+}
 
 // Application delegate is used to handle an events raised by application instance.
 class Files : public ApplicationDelegate {
@@ -97,25 +116,25 @@ class Files : public ApplicationDelegate {
         DiskFileSystem fs;
 
         {
-            StreamPtr file = fs.openFile( "lol", BinaryWriteStream );
-            if( file == NULL ) {
+            Storage storage = fs.openFile( "lol", BinaryWriteStream );
+            if( !storage ) {
                 return;
             }
 
             Item p1; p1.x = 1; p1.z = 0.01f; p1.w = 123.31112; p1.msg = "hello"; p1.v = Vec2( 11,-12);
-            p1.write( file );
+            p1.write( storage );
 
             printf( "Data written from p1\n" );
             p1.dump();
         }
 
         {
-            StreamPtr file = fs.openFile( "lol", BinaryReadStream );
-            if( file == NULL ) {
+            Storage storage = fs.openFile( "lol", BinaryReadStream );
+            if( !storage ) {
                 return;
             }
             Item p2;
-            p2.read( file );
+            p2.read( storage );
 
             printf( "Data read to p2\n" );
             p2.dump();
@@ -124,6 +143,8 @@ class Files : public ApplicationDelegate {
         {
             ArrayOfPoints arr;
             arr.label = "12";
+            arr.idx.push_back( 1 );
+            arr.idx.push_back( 2 );
             for( int i = 0; i < 5; i++ ) {
                 Item p1;
                 p1.x = i;
@@ -133,24 +154,24 @@ class Files : public ApplicationDelegate {
                 arr.items.push_back( p1 );
             }
 
-            StreamPtr file = fs.openFile( "points", BinaryWriteStream );
-            if( file == NULL ) {
+            Storage storage = fs.openFile( "points", BinaryWriteStream );
+            if( !storage ) {
                 return;
             }
 
-            arr.write( file );
+            arr.write( storage );
             printf( "Data written from arr\n" );
             arr.dump();
         }
 
         {
-            StreamPtr file = fs.openFile( "points", BinaryReadStream );
-            if( file == NULL ) {
+            Storage storage = fs.openFile( "points", BinaryReadStream );
+            if( !storage ) {
                 return;
             }
 
             ArrayOfPoints arr;
-            arr.read( file );
+            arr.read( storage );
             printf( "Data read to arr\n" );
             arr.dump();
         }

@@ -37,7 +37,11 @@
 
 //! Macro definition for adding a serializable field.
 #define IoField( field )                            \
-    result.push_back( Field( #field, const_cast<void*>( reinterpret_cast<const void*>( &field ) ), fieldWriter( field ), fieldReader( field ) ) );
+    result.push_back( Field( #field, const_cast<void*>( reinterpret_cast<const void*>( &field ) ), generateFieldWriter( field ), generateFieldReader( field ) ) );
+
+//! Macro definition for adding a serializable array.
+#define IoArray( field )                            \
+    result.push_back( Field( #field, const_cast<void*>( reinterpret_cast<const void*>( &field ) ), generateArrayWriter( field ), generateArrayReader( field ) ) );
 
 //! Macro definition for serializer fields declaration
 #define IoEndSerializer                             \
@@ -45,31 +49,67 @@
     }
 
 //! Macro definition for overriding type size
-#define IoTypeSize( T, size )   template<> inline u64 sizeOfType<T>( void ) { return size; }
+#define IoTypeSize( T, size )   template<> struct TypeSize<T> { enum { value = size }; };
 
 //! Macro definition for overriding field writer
-#define IoFieldWriter( T, ... )                                             \
-    template<>                                                              \
-    inline void io::writeField<T>( StreamPtr& stream, const void* data ) {  \
-        const T& value = *reinterpret_cast<const T*>( data );               \
-        __VA_ARGS__                                                         \
+#define IoFieldWriter( T, ... )                                                 \
+    template<>                                                                  \
+    inline io::FieldWriter io::generateFieldWriter( const T& value ) {          \
+        struct _##T {                                                           \
+            static void thunk( io::Storage& storage, const void* data ) {       \
+                const T& value = *reinterpret_cast<const T*>( data );           \
+                __VA_ARGS__;                                                    \
+            }                                                                   \
+        };                                                                      \
+        return _##T::thunk;                                                     \
+    }
+
+//! Macro definition for overriding POD field writer
+#define IoPODWriter( T )                                                        \
+    template<>                                                                  \
+    inline io::FieldWriter io::generateFieldWriter( const T& value ) {          \
+        struct POD {                                                            \
+            static void thunk( io::Storage& storage, const void* data ) {       \
+                storage.write( data, io::TypeSize<T>::value );                  \
+            }                                                                   \
+        };                                                                      \
+        return POD::thunk;                                                      \
     }
 
 //! Macro definition for overriding field reader
-#define IoFieldReader( T, ... )                                             \
-    template<>                                                              \
-    inline void io::readField<T>( const StreamPtr& stream, void* data ) {   \
-        T& value = *reinterpret_cast<T*>( data );                           \
-        __VA_ARGS__                                                         \
+#define IoFieldReader( T, ... )                                                 \
+    template<>                                                                  \
+    inline io::FieldReader io::generateFieldReader( const T& value ) {          \
+        struct _##T {                                                           \
+            static void thunk( const io::Storage& storage, void* data ) {       \
+                T& value = *reinterpret_cast<T*>( data );                       \
+                __VA_ARGS__;                                                    \
+            }                                                                   \
+        };                                                                      \
+        return _##T::thunk;                                                     \
+}
+
+//! Macro definition for overriding POD field reader
+#define IoPODReader( T )                                                        \
+    template<>                                                                  \
+    inline io::FieldReader io::generateFieldReader( const T& value ) {          \
+        struct POD {                                                            \
+            static void thunk( const io::Storage& storage, void* data ) {       \
+                storage.read( data, io::TypeSize<T>::value );                   \
+            }                                                                   \
+        };                                                                      \
+        return POD::thunk;                                                      \
     }
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! A helper function to define a type size for serialization.
+    //! A helper struct to define a type size for serialization.
     template<typename T>
-    u64 sizeOfType( void ) { return 0; }
+    struct TypeSize {
+        enum { value = 0 };
+    };
 
     //! Override type size for long & integers.
     IoTypeSize( s8,  1 );
@@ -83,20 +123,107 @@ namespace io {
     IoTypeSize( f64, 8 );
 
     //! Function type for writing a field value.
-    typedef void ( *FieldWriter )( StreamPtr& stream, const void* data );
+    typedef void ( *FieldWriter )( class Storage& storage, const void* data );
 
     //! Function type for reading a field value.
-    typedef void ( *FieldReader )( const StreamPtr& stream, void* data );
+    typedef void ( *FieldReader )( const class Storage& storage, void* data );
+
+    //! Forward declaration for field readers/writers
+    template<typename T> FieldReader generateFieldReader( const T& value );
+    template<typename T> FieldWriter generateFieldWriter( const T& value );
+
+    //! Storage interface
+    class Storage {
+    public:
+
+                            Storage( const StreamPtr& stream )
+                                : m_stream( stream ) {}
+
+        operator bool() const { return m_stream != NULL; }
+
+        void beginWritingArray( u32 size )
+        {
+            write( &size, 4 );
+        }
+
+        void endWritingArray( void )
+        {
+
+        }
+
+        u32 beginReadingArray( void ) const
+        {
+            u32 size;
+            read( &size, 4 );
+            return size;
+        }
+
+        void endReadingArray( void ) const
+        {
+            
+        }
+
+        template<typename T>
+        void writeArray( const Array<T>& array )
+        {
+            beginWritingArray( array.size() );
+
+            for( int i = 0; i < array.size(); i++ ) {
+                generateFieldWriter( array[i] )( *this, &array[i] );
+            }
+
+            endWritingArray();
+        }
+
+        template<typename T>
+        void readArray( Array<T>& array ) const
+        {
+            array.resize( beginReadingArray() );
+
+            for( int i = 0; i < array.size(); i++ ) {
+                generateFieldReader( array[i] )( *this, &array[i] );
+            }
+
+            endReadingArray();
+        }
+
+        void write( const void* data, u64 size )
+        {
+            m_stream->write( data, size );
+        }
+
+        void read( void* data, u64 size ) const
+        {
+            m_stream->read( data, size );
+        }
+
+        void writeString( const String& str )
+        {
+            m_stream->writeString( str.c_str() );
+        }
+
+        void readString( String& str ) const
+        {
+            m_stream->readString( str );
+        }
+
+    private:
+
+        StreamPtr           m_stream;
+    };
 
     //! Base class for all serializable data structs.
     class Serializable {
+
+        ClassEnableTypeInfo( Serializable )
+
     public:
 
         //! Reads data from stream.
-        void                read( const StreamPtr& stream );
+        void                read( const Storage& storage );
 
         //! Writes data to stream.
-        void                write( StreamPtr& stream ) const;
+        void                write( Storage& storage ) const;
 
     protected:
 
@@ -116,80 +243,70 @@ namespace io {
         virtual Array<Field>    fields( void ) const;
     };
 
-    // ------------------------ Field serialization
+    // ---------------------------- Field writers
 
     template<typename T>
-    inline void writeField( StreamPtr& stream, const void* data ) {
-        stream->write( data, sizeOfType<T>() );
-    }
-
-    template<typename T>
-    inline FieldWriter fieldWriter( const T& value ) {
-        return &writeField<T>;
-    }
-
-    template<typename T>
-    inline void readField( const StreamPtr& stream, void* data ) {
-        stream->read( data, sizeOfType<T>() );
-    }
-
-    template<typename T>
-    inline FieldReader fieldReader( const T& value ) {
-        return &readField<T>;
-    }
-
-    // ------------------------ Array serialization
-
-    template<typename T>
-    inline void writeArray( StreamPtr& stream, const void* data ) {
-        const Array<T>& array = *reinterpret_cast< const Array<T>* >( data );
-
-        u32 size = array.size();
-        stream->write( &size, 4 );
-
-        for( int i = 0; i < size; i++ ) {
-            if( sizeOfType<T>() ) {
-                writeField<T>( stream, &array[i] );
-            } else {
-                array[i].write( stream );
+    inline FieldWriter generateFieldWriter( const T& value ) {
+        struct Struct {
+            static void thunk( Storage& storage, const void* data ) {
+                castTo<Serializable>( reinterpret_cast<const T*>( data ) )->write( storage );
             }
-        }
+        };
+
+        return Struct::thunk;
     }
 
     template<typename T>
-    inline FieldWriter fieldWriter( const Array<T>& data )
-    {
-        return &writeArray<T>;
-    }
-
-    template<typename T>
-    inline void readArray( const StreamPtr& stream, void* data ) {
-        Array<T>& array = *reinterpret_cast< Array<T>* >( data );
-
-        u32 size;
-        stream->read( &size, 4 );
-
-        array.resize( size );
-        for( int i = 0; i < size; i++ ) {
-            if( sizeOfType<T>() ) {
-                readField<T>( stream, &array[i] );
-            } else {
-                array[i].read( stream );
+    inline FieldWriter generateArrayWriter( const T& value ) {
+        struct Arr {
+            static void thunk( Storage& storage, const void* data ) {
+                storage.writeArray( *reinterpret_cast<const T*>( data ) );
             }
-        }
+        };
+
+        return Arr::thunk;
+    }
+
+    // ---------------------------- Field readers
+
+    template<typename T>
+    inline FieldReader generateFieldReader( T& value ) {
+        struct Struct {
+            static void thunk( const Storage& storage, void* data ) {
+                castTo<Serializable>( reinterpret_cast<T*>( data ) )->read( storage );
+            }
+        };
+
+        return Struct::thunk;
     }
 
     template<typename T>
-    inline FieldReader fieldReader( const Array<T>& data )
-    {
-        return &readArray<T>;
+    inline FieldReader generateArrayReader( const T& value ) {
+        struct Arr {
+            static void thunk( const Storage& storage, void* data ) {
+                storage.readArray( *reinterpret_cast<T*>( data ) );
+            }
+        };
+
+        return Arr::thunk;
     }
 
 } // namespace io
 
-//! Declare reader/writer for String
-IoFieldWriter( String, stream->writeString( value.c_str() ); )
-IoFieldReader( String, stream->readString( value ); )
+IoFieldWriter( String, storage.writeString( value ) )
+IoFieldReader( String, storage.readString( value ) )
+
+IoPODWriter( int )
+IoPODReader( int )
+
+IoPODWriter( unsigned int )
+IoPODReader( unsigned int )
+
+IoPODWriter( float )
+IoPODReader( float )
+
+IoPODWriter( double )
+IoPODReader( double )
 
 DC_END_DREEMCHEST
 
