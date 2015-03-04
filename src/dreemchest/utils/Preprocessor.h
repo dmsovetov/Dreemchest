@@ -71,45 +71,6 @@
     #undef DC_DEBUG
 #endif
 
-// ** Serialization
-#ifdef DC_SERIALIZATION_ENABLED
-    #define dcBeginSerializableSuper( type, super )             \
-        struct type : public super {                            \
-            virtual void read( io::Stream *stream );            \
-            virtual void write( io::Stream *stream ) const;     \
-            virtual void read( const JSON& json );              \
-            virtual void write( JSON& json ) const;
-#else
-    #define dcBeginSerializableSuper( type, super )             \
-        struct type {
-#endif
-
-#define dcBeginSerializable( type )                         \
-    dcBeginSerializableSuper( type, ISerializable )
-
-#define dcBeginNetworkPacket( type, id )                    \
-    dcBeginSerializableSuper( type, net::INetworkPacket )   \
-    enum { PacketId = id };                                 \
-    virtual INetworkPacket* clone( void ) const { return DC_NEW type; }
-
-#define dcEndNetworkPacket dcEndSerializable
-
-#define dcEndSerializable };
-#define dcField( ... ) __VA_ARGS__;
-#define dcVector( ... ) __VA_ARGS__;
-#define dcMap( ... ) __VA_ARGS__;
-
-// ** Classes
-#define DC_NO_COPY( T )						\
-    private:                                \
-        T( const T& );                      \
-        T& operator = ( const T& )
-
-#define DC_NO_HEAPALLOC()                       \
-    private:								\
-        void *operator new(size_t size);	\
-        void *operator new[](size_t size)
-
 #define DC_NOT_IMPLEMENTED              \
             DC_BREAK_IF( true );        \
             Exception::Error( "%s : not implemented\n", __FUNCTION__ );

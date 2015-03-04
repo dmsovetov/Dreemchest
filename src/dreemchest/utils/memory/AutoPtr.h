@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 	template<typename T>
 	class AutoPtr {
 
-		DC_NO_HEAPALLOC();
+		ClassDisableHeapAlloc()
 
 	protected:
 

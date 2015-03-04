@@ -34,6 +34,7 @@
 #include "Namespace.h"
 
 #include "Preprocessor.h"
+#include "Classes.h"
 #include "Exception.h"
 #include "Logger.h"
 #include "StringHash.h"
