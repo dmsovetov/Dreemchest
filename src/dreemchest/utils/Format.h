@@ -37,7 +37,7 @@ DC_BEGIN_DREEMCHEST
 		inline String number( u32 value )
 		{
 			char buffer[10];
-			sprintf( buffer, "%d", buffer );
+			sprintf( buffer, "%d", value );
 			return buffer;
 		}
 
