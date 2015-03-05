@@ -113,13 +113,15 @@ u32 WindowsWindow::height( void ) const
 // ** WindowsWindow::setCaption
 void WindowsWindow::setCaption( const String& value )
 {
-    log::warn( "WindowsWindow::setCaption : window caption is not supported on Windows\n" );
+	SetWindowText( m_window, value.c_str() );
 }
 
 // ** WindowsWindow::caption
 String WindowsWindow::caption( void ) const
 {
-    return "";
+	s8 text[128];
+    GetWindowText( m_window, text, 128 );
+	return text; 
 }
 
 // ** WindowsWindow::handle
