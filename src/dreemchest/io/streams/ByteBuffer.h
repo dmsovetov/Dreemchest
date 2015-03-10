@@ -76,6 +76,9 @@ namespace io {
         //! Trims a specified amount of bytes from the end of a stream.
         void                    trimFromRight( u64 size );
 
+        //! Creates an empty byte buffer.
+        static ByteBufferPtr    create( void );
+
     private:
 
                                 //! Constructs a memory stream from data.

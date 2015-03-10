@@ -33,6 +33,10 @@ namespace io {
 // ** ByteBuffer::ByteBuffer
 ByteBuffer::ByteBuffer( const u8* pointer, u64 size ) : m_position( 0 )
 {
+    if( size == 0 ) {
+        return;
+    }
+    
     m_buffer.resize( size );
     memcpy( &m_buffer[0], pointer, size );
     fill( 0 );
@@ -41,6 +45,12 @@ ByteBuffer::ByteBuffer( const u8* pointer, u64 size ) : m_position( 0 )
 ByteBuffer::~ByteBuffer( void )
 {
 
+}
+
+// ** ByteBuffer::create
+ByteBufferPtr ByteBuffer::create( void )
+{
+    return ByteBufferPtr( new ByteBuffer( NULL, 0 ) );
 }
 
 // ** ByteBuffer::fill
