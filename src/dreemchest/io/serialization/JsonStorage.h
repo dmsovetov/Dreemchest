@@ -65,36 +65,14 @@ namespace io {
         //! Reads a string value.
         virtual void                readString( CString key, String& value ) const;
 
+        //! Pushes a write state.
+        virtual void                pushWrite( const StorageState& state );
 
-        //! Begins writing of an array.
-        virtual void                pushArrayWrite( CString key, u32 size );
+        //! Pushes a read state.
+        virtual void                pushRead( StorageState& state ) const;
 
-        //! End writing of an array.
-        virtual void                popArrayWrite( void );
-
-        //! Begins writing of an object.
-        virtual void                pushObjectWrite( CString key );
-
-        //! Ends writing of an object.
-        virtual void                popObjectWrite( void );
-
-        //! Begins writing of an array item.
-        virtual void                pushItemWrite( u32 index );
-
-        //! Ends writing of an array item.
-        virtual void                popItemWrite( void );
-
-        //! Begins reading of an array.
-        virtual u32                 pushArrayRead( CString key ) const;
-
-        //! Ends reading of an array.
-        virtual void                popArrayRead( void ) const;
-
-        //! Begins reading of an object.
-        virtual void                pushObjectRead( CString key ) const;
-
-        //! Ends reading of an object.
-        virtual void                popObjectRead( void ) const;
+        //! Pops a state.
+        virtual StorageState        pop( void ) const;
 
         //! Returns a current JSON node (top of the node stack).
         Json::Value*                current( void );
@@ -107,10 +85,13 @@ namespace io {
         //! Returns a writable JSON node
         Json::Value&                writeTo( CString key );
 
+        //! Returns a writable JSON node
+        Json::Value*                readFrom( CString key ) const;
+
     private:
 
         //! Stream
-        StreamPtr                   m_stream;
+        mutable StreamPtr                   m_stream;
 
         //! Stack of JSON nodes to handle nesting.
         mutable std::stack<Json::Value*>    m_stack;

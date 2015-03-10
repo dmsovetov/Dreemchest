@@ -43,8 +43,8 @@ using namespace io;
 
 //! Override a field serializer for Vec2 data type.
 IoBeginFieldSerializer( Vec2 )
-    IoWriteField( storage.pushObjectWrite( m_name ); storage.write( "x", m_pointer->x ); storage.write( "y", m_pointer->y ); storage.popObjectWrite(); )
-    IoReadField ( storage.pushObjectRead( m_name );  storage.read ( "x", m_pointer->x ); storage.read ( "y", m_pointer->y ); storage.popObjectRead();  )
+    IoWriteField( storage.write( "x", m_pointer->x ); storage.write( "y", m_pointer->y ); )
+    IoReadField ( storage.read ( "x", m_pointer->x ); storage.read ( "y", m_pointer->y ); )
 IoEndFieldSerializer( Vec2 )
 
 StreamPtr stream;
@@ -107,6 +107,9 @@ class Files : public ApplicationDelegate {
         // Create a disk file system instance
         DiskFileSystem fs;
 
+        io::ByteBufferPtr buffer1 = io::ByteBuffer::create();
+        io::ByteBufferPtr buffer2 = io::ByteBuffer::create();
+
         {
             Storage storage( io::StorageBinary, fs.openFile( "lol", BinaryWriteStream ) );
             if( !storage ) {
@@ -119,7 +122,7 @@ class Files : public ApplicationDelegate {
             printf( "Data written from p1\n" );
             p1.dump();
 
-            Storage json( io::StorageJson, ByteBuffer::create() );
+            Storage json( io::StorageJson, buffer1 );
             p1.write( json );
         }
 
@@ -133,6 +136,12 @@ class Files : public ApplicationDelegate {
 
             printf( "Data read to p2\n" );
             p2.dump();
+
+            printf( "Data read to p3\n" );
+            Storage json( io::StorageJson, buffer1 );
+            Item p3;
+            p3.read( json );
+            p3.dump();
         }
 
         {
@@ -160,7 +169,7 @@ class Files : public ApplicationDelegate {
             printf( "Data written from arr\n" );
             arr.dump();
 
-            Storage json( io::StorageJson, io::ByteBuffer::create() );
+            Storage json( io::StorageJson, buffer2 );
             arr.write( json );
         }
 
@@ -174,6 +183,12 @@ class Files : public ApplicationDelegate {
             arr.read( storage );
             printf( "Data read to arr\n" );
             arr.dump();
+
+            printf( "Data read to arr2\n" );
+            Storage json( io::StorageJson, buffer2 );
+            ArrayOfPoints arr2;
+            arr2.read( json );
+            arr2.dump();
         }
     }
 };

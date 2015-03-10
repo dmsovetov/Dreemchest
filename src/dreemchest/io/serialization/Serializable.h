@@ -58,12 +58,17 @@
 
 #define IoWriteField( ... )                                             \
     virtual void write( Storage& storage ) const {                      \
+        storage.pushWrite( m_name );                                    \
         __VA_ARGS__                                                     \
+        storage.pop();                                                  \
     }
 
 #define IoReadField( ... )                                              \
     virtual void read( const Storage& storage ) {                       \
+        StorageState state( m_name );                                   \
+        storage.pushRead( state );                                      \
         __VA_ARGS__                                                     \
+        storage.pop();                                                  \
     }
 
 #define IoEndFieldSerializer( T )                                                                           \

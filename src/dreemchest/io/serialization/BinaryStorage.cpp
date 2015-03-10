@@ -43,67 +43,26 @@ void BinaryStorage::read( CString key, String& value ) const
     m_stream->readString( value );
 }
 
-// ** BinaryStorage::pushItemWrite
-void BinaryStorage::pushItemWrite( u32 index )
+// ** BinaryStorage::pushWrite
+void BinaryStorage::pushWrite( const StorageState& state )
 {
-
+    if( state == StorageState::Array ) {
+        m_stream->write( &state.m_size, 4 );
+    }
 }
 
-// ** BinaryStorage::pushObjectRead
-void BinaryStorage::pushObjectRead( CString key ) const
+// ** BinaryStorage::pushRead
+void BinaryStorage::pushRead( StorageState& state ) const
 {
-
+    if( state == StorageState::Array ) {
+        m_stream->read( &state.m_size, 4 );
+    }
 }
 
-// ** BinaryStorage::popObjectRead
-void BinaryStorage::popObjectRead( void ) const
+// ** BinaryStorage::pop
+StorageState BinaryStorage::pop( void ) const
 {
-
-}
-
-// ** BinaryStorage::pushObjectWrite
-void BinaryStorage::pushObjectWrite( CString key )
-{
-
-}
-
-// ** BinaryStorage::popObjectWrite
-void BinaryStorage::popObjectWrite( void )
-{
-
-}
-
-
-// ** BinaryStorage::popItemWrite
-void BinaryStorage::popItemWrite( void )
-{
-
-}
-
-// ** BinaryStorage::pushArrayWrite
-void BinaryStorage::pushArrayWrite( CString key, u32 size )
-{
-    m_stream->write( &size, 4 );
-}
-
-// ** BinaryStorage::popArrayWrite
-void BinaryStorage::popArrayWrite( void )
-{
-
-}
-
-// ** BinaryStorage::pushArrayRead
-u32 BinaryStorage::pushArrayRead( CString key ) const
-{
-    u32 size;
-    m_stream->read( &size, 4 );
-    return size;
-}
-
-// ** BinaryStorage::popArrayRead
-void BinaryStorage::popArrayRead( void ) const
-{
-
+    return StorageState();
 }
     
 } // namespace io

@@ -54,6 +54,34 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
+    //! Storage state info.
+    struct StorageState {
+        enum State { Unknown, Property, Object, Array, ArrayItem };
+
+                //! Constructs a storage state instance
+                StorageState( void )
+                    : m_key( NULL ), m_size( 0 ), m_state( Unknown ) {}
+
+                //! Constructs an Object storage state.
+                StorageState( CString key )
+                    : m_key( key ), m_size( 0 ), m_state( Object ) {}
+
+                //! Constructs an Array storage state instance.
+                StorageState( CString key, u32 size )
+                    : m_key( key ), m_size( size ), m_state( Array ) {}
+
+                //! Constructs an ArrayItem storage state instance.
+                StorageState( u32 index )
+                    : m_key( NULL ), m_index( index ), m_size( 0 ), m_state( ArrayItem ) {}
+
+        bool    operator == ( State state ) const { return m_state == state; }
+
+        CString m_key;
+        u32     m_index;
+        u32     m_size;
+        State   m_state;
+    };
+
     //! A data storage interface.
     class IStorage {
     public:
@@ -73,35 +101,14 @@ namespace io {
         IoStoreAbstract( f64 )
         IoStoreAbstract( String )
 
-        //! Begins writing of an array.
-        virtual void    pushArrayWrite( CString key, u32 size ) = 0;
+        //! Pushes a write state.
+        virtual void            pushWrite( const StorageState& state ) = 0;
 
-        //! End writing of an array.
-        virtual void    popArrayWrite( void ) = 0;
+        //! Pushes a read state.
+        virtual void            pushRead( StorageState& state ) const = 0;
 
-        //! Begins writing of an object.
-        virtual void    pushObjectWrite( CString key ) = 0;
-
-        //! Ends writing of an object.
-        virtual void    popObjectWrite( void ) = 0;
-
-        //! Begins writing of an array item.
-        virtual void    pushItemWrite( u32 index ) = 0;
-
-        //! Ends writing of an array item.
-        virtual void    popItemWrite( void ) = 0;
-
-        //! Begins reading of an array.
-        virtual u32     pushArrayRead( CString key ) const = 0;
-
-        //! Ends reading of an array.
-        virtual void    popArrayRead( void ) const = 0;
-
-        //! Begins reading of an object.
-        virtual void    pushObjectRead( CString key ) const = 0;
-
-        //! Ends reading of an object.
-        virtual void    popObjectRead( void ) const = 0;
+        //! Pops a state.
+        virtual StorageState    pop( void ) const = 0;
     };
 
     //! A data storage into which the data is serialized.
@@ -137,35 +144,14 @@ namespace io {
         template<typename T>
         void            read( CString key, Array<T>& array ) const;
 
-        //! Begins writing of an array.
-        void            pushArrayWrite( CString key, u32 size );
+        //! Pushes a write state.
+        virtual void            pushWrite( const StorageState& state );
 
-        //! End writing of an array.
-        void            popArrayWrite( void );
+        //! Pushes a read state.
+        virtual void            pushRead( StorageState& state ) const;
 
-        //! Begins writing of an object.
-        void            pushObjectWrite( CString key );
-
-        //! Ends writing of an object.
-        void            popObjectWrite( void );
-
-        //! Begins writing of an array item.
-        void            pushItemWrite( u32 index );
-
-        //! Ends writing of an array item.
-        void            popItemWrite( void );
-
-        //! Begins reading of an array.
-        u32             pushArrayRead( CString key ) const;
-
-        //! Ends reading of an array.
-        void            popArrayRead( void ) const;
-
-        //! Begins reading of an object.
-        void            pushObjectRead( CString key ) const;
-
-        //! Ends reading of an object.
-        void            popObjectRead( void ) const;
+        //! Pops a state.
+        virtual StorageState    pop( void ) const;
 
     private:
 
@@ -186,28 +172,32 @@ namespace io {
     template<typename T>
     void Storage::write( CString key, const Array<T>& array )
     {
-        pushArrayWrite( key, ( u32 )array.size() );
+        pushWrite( StorageState( key, ( u32 )array.size() ) );
 
         for( int i = 0; i < array.size(); i++ ) {
-            pushItemWrite( i );
+            pushWrite( StorageState( i ) );
             detail::createFieldSerializer( NULL, array[i] )->write( *this );
-            popItemWrite();
         }
 
-        popArrayWrite();
+        pop();
     }
 
     // ** Storage::read
     template<typename T>
     void Storage::read( CString key, Array<T>& array ) const
     {
-        array.resize( pushArrayRead( key ) );
+        StorageState state( key, 0 );
 
+        pushRead( state );
+
+        array.resize( state.m_size );
         for( int i = 0; i < array.size(); i++ ) {
+            StorageState state( i );
+            pushRead( state );
             detail::createFieldSerializer( NULL, array[i] )->read( *this );
         }
 
-        popArrayRead();
+        pop();
     }
 
 } // namespace io

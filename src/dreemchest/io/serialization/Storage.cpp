@@ -78,6 +78,19 @@ Storage::operator bool( void ) const
     return m_impl != NULL;
 }
 
+// ** Storage::write
+void Storage::write( CString key, const Serializable& value )
+{
+    value.write( *this, key );
+}
+
+// ** Storage::read
+void Storage::read( CString key, Serializable& value ) const
+{
+    value.read( *this, key );
+}
+
+/*
 // ** Storage::pushObjectRead
 void Storage::pushObjectRead( CString key ) const
 {
@@ -100,18 +113,6 @@ void Storage::pushObjectWrite( CString key )
 void Storage::popObjectWrite( void )
 {
     m_impl->popObjectWrite();
-}
-
-// ** Storage::write
-void Storage::write( CString key, const Serializable& value )
-{
-    value.write( *this, key );
-}
-
-// ** Storage::read
-void Storage::read( CString key, Serializable& value ) const
-{
-    value.read( *this, key );
 }
 
 // ** Storage::pushArrayWrite
@@ -148,6 +149,25 @@ u32 Storage::pushArrayRead( CString key ) const
 void Storage::popArrayRead( void ) const
 {
     m_impl->popArrayRead();
+}
+*/
+
+// ** Storage::pushWrite
+void Storage::pushWrite( const StorageState& state )
+{
+    m_impl->pushWrite( state );
+}
+
+// ** Storage::pushRead
+void Storage::pushRead( StorageState& state ) const
+{
+    m_impl->pushRead( state );
+}
+
+// ** Storage::pop
+StorageState Storage::pop( void ) const
+{
+    return m_impl->pop();
 }
 
 } // namespace io

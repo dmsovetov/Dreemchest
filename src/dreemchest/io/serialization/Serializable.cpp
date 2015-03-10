@@ -35,10 +35,15 @@ namespace io {
 void Serializable::read( const Storage& storage, CString key )
 {
     detail::FieldSerializers serializers = fieldSerializers();
+    StorageState state;
+
+    storage.pushRead( state );
 
     for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
         i->get()->read( storage );
     }
+
+    storage.pop();
 }
 
 // ** Serializable::write
@@ -46,13 +51,13 @@ void Serializable::write( Storage& storage, CString key ) const
 {
     detail::FieldSerializers serializers = fieldSerializers();
 
-    storage.pushObjectWrite( key );
+    storage.pushWrite( StorageState( key ) );
 
     for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
         i->get()->write( storage );
     }
 
-    storage.popObjectWrite();
+    storage.pop();
 }
 
 // ** Serializable::fieldSerializers

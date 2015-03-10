@@ -56,38 +56,14 @@ namespace io {
 
     private:
 
-        //! Does nothing
-        virtual void    commit( void ) {}
+        //! Pushes a write state.
+        virtual void            pushWrite( const StorageState& state );
 
-        //! Begins writing of an array.
-        virtual void    pushArrayWrite( CString key, u32 size );
+        //! Pushes a read state.
+        virtual void            pushRead( StorageState& state ) const;
 
-        //! End writing of an array.
-        virtual void    popArrayWrite( void );
-
-        //! Begins writing of an object.
-        virtual void    pushObjectWrite( CString key );
-
-        //! Ends writing of an object.
-        virtual void    popObjectWrite( void );
-
-        //! Begins writing of an array item.
-        virtual void    pushItemWrite( u32 index );
-
-        //! Ends writing of an array item.
-        virtual void    popItemWrite( void );
-
-        //! Begins reading of an array.
-        virtual u32     pushArrayRead( CString key ) const;
-
-        //! Ends reading of an array.
-        virtual void    popArrayRead( void ) const;
-
-        //! Begins reading of an object.
-        virtual void    pushObjectRead( CString key ) const;
-
-        //! Ends reading of an object.
-        virtual void    popObjectRead( void ) const;
+        //! Pops a state.
+        virtual StorageState    pop( void ) const;
 
     private:
         

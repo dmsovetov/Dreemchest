@@ -41,35 +41,63 @@ JsonStorage::JsonStorage( const StreamPtr& stream ) : m_stream( stream ), m_inde
 
 }
 
-// ** JsonStorage::pushObjectRead
-void JsonStorage::pushObjectRead( CString key ) const
+// ** JsonStorage::pushWrite
+void JsonStorage::pushWrite( const StorageState& state )
 {
+    switch( state.m_state ) {
+    case StorageState::Object:      if( Json::Value* parent = current() ) {
+                                        writeTo( state.m_key ) = Json::objectValue;
+                                        m_stack.push( &writeTo( state.m_key ) );
+                                    } else {
+                                        m_stack.push( new Json::Value( Json::objectValue ) );
+                                    }
+                                    break;
 
-}
+    case StorageState::Array:       writeTo( state.m_key ) = Json::arrayValue;
+                                    m_stack.push( &writeTo( state.m_key ) );
+                                    break;
 
-// ** JsonStorage::popObjectRead
-void JsonStorage::popObjectRead( void ) const
-{
+    case StorageState::ArrayItem:   m_index = state.m_index;
+                                    break;
 
-}
-
-// ** JsonStorage::pushObjectWrite
-void JsonStorage::pushObjectWrite( CString key )
-{
-    if( Json::Value* parent = current() ) {
-        writeTo( key ) = Json::objectValue;
-        m_stack.push( &writeTo( key ) );
-    } else {
-        m_stack.push( new Json::Value );
+    default: DC_BREAK;
     }
 }
 
-// ** JsonStorage::popObjectWrite
-void JsonStorage::popObjectWrite( void )
+// ** JsonStorage::pushRead
+void JsonStorage::pushRead( StorageState& state ) const
+{
+    if( m_stack.empty() ) {
+        Json::Reader reader;
+        String       input;
+
+        input.resize( m_stream->length() );
+        m_stream->read( &input[0], m_stream->length() );
+
+        Json::Value* root  = new Json::Value;
+        bool result = Json::Reader().parse( input.c_str(), *root );
+        DC_BREAK_IF( result == false );
+        m_stack.push( root );
+    } else {
+        if( state == StorageState::ArrayItem ) {
+            m_index = state.m_index;
+        }
+        
+        m_stack.push( readFrom( state.m_key ) );
+    //    m_stack.push( &(*const_cast<JsonStorage*>( this )->current())[state.m_key] );
+
+        if( m_stack.top()->type() == Json::arrayValue ) {
+            state.m_size = m_stack.top()->size();
+        }
+    }
+}
+
+// ** JsonStorage::pop
+StorageState JsonStorage::pop( void ) const
 {
     if( m_stack.size() == 1 ) {
         String formatted = Json::StyledWriter().write( *m_stack.top() );
-        log::verbose( "JSON: %s\n", formatted.c_str() );
+   //     log::verbose( "JSON: %s\n", formatted.c_str() );
         m_stream->write( formatted.c_str(), formatted.length() );
 
         delete m_stack.top();
@@ -114,51 +142,6 @@ void JsonStorage::readString( CString key, String& value ) const
     value = current()->get( key, "" ).asCString();
 }
 
-// ** JsonStorage::pushArrayWrite
-void JsonStorage::pushArrayWrite( CString key, u32 size )
-{
-    m_index = 0;
-    
-    writeTo( key ) = Json::arrayValue;
-    m_stack.push( &writeTo( key ) );
-}
-
-// ** JsonStorage::popArrayWrite
-void JsonStorage::popArrayWrite( void )
-{
-    m_stack.pop();
-}
-
-
-// ** JsonStorage::pushItemWrite
-void JsonStorage::pushItemWrite( u32 index )
-{
-    m_index = index;
-}
-
-
-// ** JsonStorage::popItemWrite
-void JsonStorage::popItemWrite( void )
-{
-
-}
-
-
-// ** JsonStorage::pushArrayRead
-u32 JsonStorage::pushArrayRead( CString key ) const
-{
-    return 0;
-//    m_stack.push( &const_cast<JsonStorage*>( this )->current()[key] );
-//    return current()[key].size();
-}
-
-
-// ** JsonStorage::popArrayRead
-void JsonStorage::popArrayRead( void ) const
-{
-
-}
-
 // ** JsonStorage::current
 Json::Value* JsonStorage::current( void )
 {
@@ -175,8 +158,30 @@ const Json::Value* JsonStorage::current( void ) const
 Json::Value& JsonStorage::writeTo( CString key )
 {
     Json::Value& root = *current();
-    return key ? root[key] : root[m_index];
+
+    if( key ) {
+        DC_BREAK_IF( root.type() != Json::objectValue )
+        return root[key];
+    }
+
+    DC_BREAK_IF( root.type()!= Json::arrayValue );
+    return root[m_index];
 }
+
+// ** JsonStorage::writeTo
+Json::Value* JsonStorage::readFrom( CString key ) const
+{
+    Json::Value& root = *m_stack.top();
+
+    if( key ) {
+        DC_BREAK_IF( root.type() != Json::objectValue )
+        return &root[key];
+    }
+
+    DC_BREAK_IF( root.type()!= Json::arrayValue );
+    return &root[m_index];
+}
+
 
 } // namespace io
 
