@@ -56,11 +56,13 @@ namespace io {
         BinaryWriteStream,    //!< Open binary stream for writing.
     };
 
-    //! Function type for writing a field value.
-    typedef void ( *FieldWriter )( Storage* storage, CString key, const void* value );
-
-    //! Function type for reading a field value.
-    typedef void ( *FieldReader )( const Storage* storage, CString key, void* value );
+    //! Available text data storages.
+    enum StorageType {
+        StorageBinary,
+        StorageJson,
+        StorageYaml,
+        StorageXml,
+    };
 
     //! Stream ptr type.
     typedef StrongPtr<Stream>       StreamPtr;

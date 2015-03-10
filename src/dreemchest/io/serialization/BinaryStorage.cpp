@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "BinaryStorage.h"
-#include "Serializable.h"
+#include "../streams/Stream.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,128 +37,75 @@ void BinaryStorage::write( CString key, const String& value )
     m_stream->writeString( value.c_str() );
 }
 
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const u8& value )
-{
-    m_stream->write( &value, 1 );
-}
-
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const u16& value )
-{
-    m_stream->write( &value, 2 );
-}
-
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const u32& value )
-{
-    m_stream->write( &value, 4 );
-}
-
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const s32& value )
-{
-    m_stream->write( &value, 4 );
-}
-
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const f32& value )
-{
-    m_stream->write( &value, 4 );
-}
-
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const f64& value )
-{
-    m_stream->write( &value, 8 );
-}
-
 // ** BinaryStorage::read
 void BinaryStorage::read( CString key, String& value ) const
 {
     m_stream->readString( value );
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, u8& value ) const
+// ** BinaryStorage::pushItemWrite
+void BinaryStorage::pushItemWrite( u32 index )
 {
-    m_stream->read( &value, 1 );
+
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, u16& value ) const
+// ** BinaryStorage::pushObjectRead
+void BinaryStorage::pushObjectRead( CString key ) const
 {
-    m_stream->read( &value, 2 );
+
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, u32& value ) const
+// ** BinaryStorage::popObjectRead
+void BinaryStorage::popObjectRead( void ) const
 {
-    m_stream->read( &value, 4 );
+
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, s32& value ) const
+// ** BinaryStorage::pushObjectWrite
+void BinaryStorage::pushObjectWrite( CString key )
 {
-    m_stream->read( &value, 4 );
+
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, f32& value ) const
+// ** BinaryStorage::popObjectWrite
+void BinaryStorage::popObjectWrite( void )
 {
-    m_stream->read( &value, 4 );
+
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, f64& value ) const
+
+// ** BinaryStorage::popItemWrite
+void BinaryStorage::popItemWrite( void )
 {
-    m_stream->read( &value, 8 );
+
 }
 
-// ** BinaryStorage::write
-void BinaryStorage::write( CString key, const Serializable& value )
+// ** BinaryStorage::pushArrayWrite
+void BinaryStorage::pushArrayWrite( CString key, u32 size )
 {
-    value.write( this );
+    m_stream->write( &size, 4 );
 }
 
-// ** BinaryStorage::read
-void BinaryStorage::read( CString key, Serializable& value ) const
+// ** BinaryStorage::popArrayWrite
+void BinaryStorage::popArrayWrite( void )
 {
-    value.read( this );
+
 }
 
-// ** BinaryStorage::startWritingArray
-void BinaryStorage::startWritingArray( CString key, u32 size )
-{
-    write( "array.size", size );
-}
-
-// ** BinaryStorage::endWritingArray
-void BinaryStorage::endWritingArray( CString key )
-{
-    
-}
-
-// ** BinaryStorage::startReadingArray
-u32 BinaryStorage::startReadingArray( CString key ) const
+// ** BinaryStorage::pushArrayRead
+u32 BinaryStorage::pushArrayRead( CString key ) const
 {
     u32 size;
-    read( "array.size", size );
+    m_stream->read( &size, 4 );
     return size;
 }
 
-// ** BinaryStorage::endReadingArray
-void BinaryStorage::endReadingArray( CString key ) const
+// ** BinaryStorage::popArrayRead
+void BinaryStorage::popArrayRead( void ) const
 {
+
+}
     
-}
-
-// ** BinaryStorage::startWritingItem
-void BinaryStorage::startWritingItem( int index )
-{
-
-}
-
 } // namespace io
 
 DC_END_DREEMCHEST

@@ -27,7 +27,7 @@
 #ifndef __DC_Io_JsonStorage_H__
 #define __DC_Io_JsonStorage_H__
 
-#include "Storage.h"
+#include "TextStorage.h"
 
 #ifndef HAVE_JSONCPP
     #error HAVE_JSONCPP should be defined when building with JsonStorage
@@ -40,69 +40,83 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
     //! A JSON storage interface to use in serialization
-    class JsonStorage : public Storage {
+    class JsonStorage : public TextStorage {
     public:
 
-        //! Writes JSON to a string.
-        String                  save( void ) const;
-
-        void                    write( CString key, const String& value );
-
-        void                    write( CString key, const u8& value );
-
-        void                    write( CString key, const u16& value );
-
-        void                    write( CString key, const u32& value );
-
-        void                    write( CString key, const s32& value );
-
-        void                    write( CString key, const f32& value );
-
-        void                    write( CString key, const f64& value );
-
-        void                    write( CString key, const Serializable& value );
-
-        void                    read( CString key, String& value ) const;
-
-        void                    read( CString key, u8& value ) const;
-
-        void                    read( CString key, u16& value ) const;
-
-        void                    read( CString key, u32& value ) const;
-
-        void                    read( CString key, s32& value ) const;
-
-        void                    read( CString key, f32& value ) const;
-
-        void                    read( CString key, f64& value ) const;
-
-        void                    read( CString key, Serializable& value ) const;
-
-        virtual void            startWritingItem( int index );
-
-        virtual void            startWritingArray( CString key, u32 size );
-
-        virtual void            endWritingArray( CString key );
-
-        virtual u32             startReadingArray( CString key ) const;
-
-        virtual void            endReadingArray( CString key ) const;
+                                    JsonStorage( const StreamPtr& stream );
 
     private:
 
-        //! Returns a current JSON node (top of the node stack or the root node if stack is empty).
-        Json::Value&            current( void );
+        //! Writes a number value.
+        virtual void                writeNumber( CString key, double value );
 
-        //! Returns a current JSON node (top of the node stack or the root node if stack is empty).
-        const Json::Value&      current( void ) const;
+        //! Reads a number value.
+        virtual void                readNumber( CString key, double& value ) const;
+
+        //! Writes a boolean value.
+        virtual void                writeBoolean( CString key, const bool& value );
+
+        //! Reads a boolean value.
+        virtual void                readBoolean( CString key, bool& value ) const;
+
+        //! Writes a string value.
+        virtual void                writeString( CString key, const String& value );
+
+        //! Reads a string value.
+        virtual void                readString( CString key, String& value ) const;
+
+
+        //! Begins writing of an array.
+        virtual void                pushArrayWrite( CString key, u32 size );
+
+        //! End writing of an array.
+        virtual void                popArrayWrite( void );
+
+        //! Begins writing of an object.
+        virtual void                pushObjectWrite( CString key );
+
+        //! Ends writing of an object.
+        virtual void                popObjectWrite( void );
+
+        //! Begins writing of an array item.
+        virtual void                pushItemWrite( u32 index );
+
+        //! Ends writing of an array item.
+        virtual void                popItemWrite( void );
+
+        //! Begins reading of an array.
+        virtual u32                 pushArrayRead( CString key ) const;
+
+        //! Ends reading of an array.
+        virtual void                popArrayRead( void ) const;
+
+        //! Begins reading of an object.
+        virtual void                pushObjectRead( CString key ) const;
+
+        //! Ends reading of an object.
+        virtual void                popObjectRead( void ) const;
+
+        //! Returns a current JSON node (top of the node stack).
+        Json::Value*                current( void );
+
+        //! Returns a current JSON node (top of the node stack).
+        const Json::Value*          current( void ) const;
+
+    protected:
+
+        //! Returns a writable JSON node
+        Json::Value&                writeTo( CString key );
 
     private:
 
-        //! Root JSON node.
-        Json::Value                 m_json;
+        //! Stream
+        StreamPtr                   m_stream;
 
         //! Stack of JSON nodes to handle nesting.
-        std::stack<Json::Value*>    m_stack;
+        mutable std::stack<Json::Value*>    m_stack;
+
+        //! Array index.
+        mutable u32                 m_index;
     };
 
 } // namespace io

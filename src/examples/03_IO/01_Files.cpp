@@ -43,8 +43,8 @@ using namespace io;
 
 //! Override a field serializer for Vec2 data type.
 IoBeginFieldSerializer( Vec2 )
-    IoWriteField( storage->write( "x", m_pointer->x ); storage->write( "y", m_pointer->y ); )
-    IoReadField ( storage->read ( "x", m_pointer->x ); storage->read ( "y", m_pointer->y ); )
+    IoWriteField( storage.pushObjectWrite( m_name ); storage.write( "x", m_pointer->x ); storage.write( "y", m_pointer->y ); storage.popObjectWrite(); )
+    IoReadField ( storage.pushObjectRead( m_name );  storage.read ( "x", m_pointer->x ); storage.read ( "y", m_pointer->y ); storage.popObjectRead();  )
 IoEndFieldSerializer( Vec2 )
 
 StreamPtr stream;
@@ -108,29 +108,28 @@ class Files : public ApplicationDelegate {
         DiskFileSystem fs;
 
         {
-            BinaryStorage storage = fs.openFile( "lol", BinaryWriteStream );
+            Storage storage( io::StorageBinary, fs.openFile( "lol", BinaryWriteStream ) );
             if( !storage ) {
                 return;
             }
 
             Item p1; p1.x = 1; p1.z = 0.01f; p1.w = 123.31112; p1.msg = "hello"; p1.v = Vec2( 11,-12);
-            p1.write( &storage );
+            p1.write( storage );
 
             printf( "Data written from p1\n" );
             p1.dump();
 
-        //    JsonStorage json;
-        //    p1.write( &json );
-        //    printf( "result: %s\n", json.save().c_str() );
+            Storage json( io::StorageJson, ByteBuffer::create() );
+            p1.write( json );
         }
 
         {
-            BinaryStorage storage = fs.openFile( "lol", BinaryReadStream );
+            Storage storage( io::StorageBinary, fs.openFile( "lol", BinaryReadStream ) );
             if( !storage ) {
                 return;
             }
             Item p2;
-            p2.read( &storage );
+            p2.read( storage );
 
             printf( "Data read to p2\n" );
             p2.dump();
@@ -144,34 +143,35 @@ class Files : public ApplicationDelegate {
             for( int i = 0; i < 5; i++ ) {
                 Item p1;
                 p1.x = i;
+                p1.z = -1;
+                p1.w = -2;
                 p1.msg = "zxc";
                 p1.v.x = 22;
                 p1.v.y = 2222;
                 arr.items.push_back( p1 );
             }
 
-            BinaryStorage storage = fs.openFile( "points", BinaryWriteStream );
+            Storage storage( io::StorageBinary, fs.openFile( "points", BinaryWriteStream ) );
             if( !storage ) {
                 return;
             }
 
-            arr.write( &storage );
+            arr.write( storage );
             printf( "Data written from arr\n" );
             arr.dump();
 
-        //    JsonStorage json;
-        //    arr.write( &json );
-        //    printf( "result: %s\n", json.save().c_str() );
+            Storage json( io::StorageJson, io::ByteBuffer::create() );
+            arr.write( json );
         }
 
         {
-            BinaryStorage storage = fs.openFile( "points", BinaryReadStream );
+            Storage storage( io::StorageBinary, fs.openFile( "points", BinaryReadStream ) );
             if( !storage ) {
                 return;
             }
 
             ArrayOfPoints arr;
-            arr.read( &storage );
+            arr.read( storage );
             printf( "Data read to arr\n" );
             arr.dump();
         }

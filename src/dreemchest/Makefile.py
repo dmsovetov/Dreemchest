@@ -8,7 +8,10 @@ if Has( 'threads' ):
 #############################     IO        #############################
 
 if Has( 'io' ):
-	core.dirs( 'io' )
+	core.dirs( 'io/*' )
+
+	jsoncpp = Library( 'jsoncpp', False )
+	if jsoncpp: core.linkExternal( jsoncpp )
 
 #############################   Platform    #############################
 

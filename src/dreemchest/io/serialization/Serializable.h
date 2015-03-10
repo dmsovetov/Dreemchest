@@ -40,15 +40,12 @@
 
 //! Macro definition for adding a serializable array.
 #define IoArray( field )                            \
-    result.push_back( io::detail::createFieldSerializer( #field, field ) );
+    result.push_back( io::detail::createArraySerializer( #field, field ) );
 
 //! Macro definition for serializer fields declaration
 #define IoEndSerializer                             \
         return result;                              \
     }
-
-//! Macro definition to declare a type info
-#define IoTypeInfo( T, _Type, _Size ) template<> struct TypeInfo<T> { enum { Type = _Type }; enum { Size = _Size }; };
 
 //! Macro definition for overriding field serializers
 #define IoBeginFieldSerializer( T )                                                 \
@@ -60,12 +57,12 @@
         T*          m_pointer;
 
 #define IoWriteField( ... )                                             \
-    virtual void write( Storage* storage ) const {                      \
+    virtual void write( Storage& storage ) const {                      \
         __VA_ARGS__                                                     \
     }
 
 #define IoReadField( ... )                                              \
-    virtual void read( const Storage* storage ) {                       \
+    virtual void read( const Storage& storage ) {                       \
         __VA_ARGS__                                                     \
     }
 
@@ -80,36 +77,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! Primitive field data types.
-    enum PrimitiveType {
-        TypeUnknown,
-        TypeBool,
-        TypeNumber,
-        TypeString,
-        TypeArray,
-        TypeObject
-    };
-
-    //! Primitive type info.
-    template<typename T>
-    struct TypeInfo {
-        enum { Type = TypeUnknown };
-        enum { Size = 0 };
-    };
-
-    IoTypeInfo( bool,   TypeBool,   1 )
-    IoTypeInfo( u8,     TypeNumber, 1 )
-    IoTypeInfo( s8,     TypeNumber, 1 )
-    IoTypeInfo( u16,    TypeNumber, 2 )
-    IoTypeInfo( s16,    TypeNumber, 2 )
-    IoTypeInfo( u32,    TypeNumber, 4 )
-    IoTypeInfo( s32,    TypeNumber, 4 )
-    IoTypeInfo( u64,    TypeNumber, 8 )
-    IoTypeInfo( s64,    TypeNumber, 8 )
-    IoTypeInfo( f32,    TypeNumber, 4 )
-    IoTypeInfo( f64,    TypeNumber, 8 )
-    IoTypeInfo( String, TypeString, 8 )
-
     namespace detail {
 
         //! Field serializer
@@ -119,10 +86,10 @@ namespace io {
             virtual         ~FieldSerializer( void ) {}
 
             //! Writes field data to a storage.
-            virtual void    write( Storage* storage ) const = 0;
+            virtual void    write( Storage& storage ) const = 0;
 
             //! Reads field data from a storage.
-            virtual void    read( const Storage* storage )  = 0;
+            virtual void    read( const Storage& storage )  = 0;
         };
 
         //! Serializable field info
@@ -135,10 +102,10 @@ namespace io {
                                 : m_name( name ), m_pointer( const_cast<T*>( &field ) ) {}
 
             //! Writes field data to a storage.
-            virtual void    write( Storage* storage ) const;
+            virtual void    write( Storage& storage ) const;
 
             //! Reads field data from a storage.
-            virtual void    read( const Storage* storage );
+            virtual void    read( const Storage& storage );
 
         protected:
 
@@ -148,16 +115,16 @@ namespace io {
 
         // ** TypedFieldSerializer::write
         template<typename T>
-        void TypedFieldSerializer<T>::write( Storage* storage ) const
+        void TypedFieldSerializer<T>::write( Storage& storage ) const
         {
-            storage->write( m_name, *m_pointer );
+            storage.write( m_name, *m_pointer );
         }
 
         // ** TypedFieldSerializer::read
         template<typename T>
-        void TypedFieldSerializer<T>::read( const Storage* storage )
+        void TypedFieldSerializer<T>::read( const Storage& storage )
         {
-            storage->read( m_name, *m_pointer );
+            storage.read( m_name, *m_pointer );
         }
 
         //! Serializable array info
@@ -170,10 +137,10 @@ namespace io {
                                 : m_name( name ), m_pointer( const_cast<Array<T>*>( &field ) ) {}
 
             //! Writes field data to a storage.
-            virtual void    write( Storage* storage ) const;
+            virtual void    write( Storage& storage ) const;
 
             //! Reads field data from a storage.
-            virtual void    read( const Storage* storage );
+            virtual void    read( const Storage& storage );
 
         private:
 
@@ -183,16 +150,16 @@ namespace io {
 
         // ** TypedArraySerializer::write
         template<typename T>
-        void TypedArraySerializer<T>::write( Storage* storage ) const
+        void TypedArraySerializer<T>::write( Storage& storage ) const
         {
-            storage->write( m_name, *m_pointer );
+            storage.write( m_name, *m_pointer );
         }
 
         // ** TypedArraySerializer::read
         template<typename T>
-        void TypedArraySerializer<T>::read( const Storage* storage )
+        void TypedArraySerializer<T>::read( const Storage& storage )
         {
-            storage->read( m_name, *m_pointer );
+            storage.read( m_name, *m_pointer );
         }
 
         //! Allocates a TypedFieldSerializer instance.
@@ -203,7 +170,7 @@ namespace io {
         }
 
         template<typename T>
-        FieldSerializerPtr createFieldSerializer( CString name, const Array<T>& field )
+        FieldSerializerPtr createArraySerializer( CString name, const Array<T>& field )
         {
             return FieldSerializerPtr( new TypedArraySerializer<T>( name, field ) );
         }
@@ -218,10 +185,10 @@ namespace io {
     public:
 
         //! Reads data from a storage.
-        void                                read( const Storage* storage );
+        void                                read( const Storage& storage, CString key = NULL );
 
         //! Writes data to a storage.
-        void                                write( Storage* storage ) const;
+        void                                write( Storage& storage, CString key = NULL ) const;
 
     protected:
 

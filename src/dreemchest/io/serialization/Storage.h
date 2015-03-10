@@ -30,69 +30,146 @@
 #include	"../Io.h"
 #include    "../streams/Stream.h"
 
+#define IoStoreAbstract( T )                                \
+    virtual void write( CString key, const T& value ) = 0;  \
+    virtual void read ( CString key, T& value ) const = 0;
+
+#define IoStoreImplement( T )                               \
+    virtual void write( CString key, const T& value );      \
+    virtual void read ( CString key, T& value ) const;
+
+#define IoStoreBinary( T, size )                                                            \
+    virtual void write( CString key, const T& value ) { m_stream->write( &value, size ); }  \
+    virtual void read ( CString key, T& value ) const { m_stream->read ( &value, size ); }
+
+#define IoStoreInterface( T )                               \
+    virtual void write( CString key, const T& value ) {     \
+        m_impl->write( key, value );                        \
+    }                                                       \
+    virtual void read( CString key, T& value ) const {      \
+        m_impl->read( key, value );                         \
+    }
+
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! A storage interface.
-    class Storage {
+    //! A data storage interface.
+    class IStorage {
     public:
 
-        virtual         ~Storage( void ) {}
+        virtual         ~IStorage( void ) {}
 
-        virtual void    write( CString key, const String& value ) = 0;
+        IoStoreAbstract( bool )
+        IoStoreAbstract( u8 )
+        IoStoreAbstract( s8 )
+        IoStoreAbstract( u16 )
+        IoStoreAbstract( s16 )
+        IoStoreAbstract( u32 )
+        IoStoreAbstract( s32 )
+        IoStoreAbstract( u64 )
+        IoStoreAbstract( s64 )
+        IoStoreAbstract( f32 )
+        IoStoreAbstract( f64 )
+        IoStoreAbstract( String )
 
-        virtual void    write( CString key, const u8& value ) = 0;
+        //! Begins writing of an array.
+        virtual void    pushArrayWrite( CString key, u32 size ) = 0;
 
-        virtual void    write( CString key, const u16& value ) = 0;
+        //! End writing of an array.
+        virtual void    popArrayWrite( void ) = 0;
 
-        virtual void    write( CString key, const u32& value ) = 0;
+        //! Begins writing of an object.
+        virtual void    pushObjectWrite( CString key ) = 0;
 
-        virtual void    write( CString key, const s32& value ) = 0;
+        //! Ends writing of an object.
+        virtual void    popObjectWrite( void ) = 0;
 
-        virtual void    write( CString key, const f32& value ) = 0;
+        //! Begins writing of an array item.
+        virtual void    pushItemWrite( u32 index ) = 0;
 
-        virtual void    write( CString key, const f64& value ) = 0;
+        //! Ends writing of an array item.
+        virtual void    popItemWrite( void ) = 0;
 
-        virtual void    write( CString key, const Serializable& value ) = 0;
+        //! Begins reading of an array.
+        virtual u32     pushArrayRead( CString key ) const = 0;
 
-        virtual void    read( CString key, String& value ) const = 0;
+        //! Ends reading of an array.
+        virtual void    popArrayRead( void ) const = 0;
 
-        virtual void    read( CString key, u8& value ) const = 0;
+        //! Begins reading of an object.
+        virtual void    pushObjectRead( CString key ) const = 0;
 
-        virtual void    read( CString key, u16& value ) const = 0;
+        //! Ends reading of an object.
+        virtual void    popObjectRead( void ) const = 0;
+    };
 
-        virtual void    read( CString key, u32& value ) const = 0;
+    //! A data storage into which the data is serialized.
+    class Storage {
+    friend class Serializable;
+    public:
 
-        virtual void    read( CString key, s32& value ) const = 0;
+                        //! Constructs a Storage instance.
+                        Storage( StorageType type, const StreamPtr& stream );
+        virtual         ~Storage( void );
 
-        virtual void    read( CString key, f32& value ) const = 0;
+                        //! Returns true if this storage is valid.
+                        operator bool( void ) const;
 
-        virtual void    read( CString key, f64& value ) const = 0;
+        IoStoreInterface( bool )
+        IoStoreInterface( u8 )
+        IoStoreInterface( s8 )
+        IoStoreInterface( u16 )
+        IoStoreInterface( s16 )
+        IoStoreInterface( u32 )
+        IoStoreInterface( s32 )
+        IoStoreInterface( u64 )
+        IoStoreInterface( s64 )
+        IoStoreInterface( f32 )
+        IoStoreInterface( f64 )
+        IoStoreInterface( String )
 
-        virtual void    read( CString key, Serializable& value ) const = 0;
+        IoStoreImplement( Serializable )
 
-        virtual void    startWritingItem( int index ) = 0;
-
-        virtual void    startWritingArray( CString key, u32 size ) = 0;
-
-        virtual void    endWritingArray( CString key ) = 0;
-
-        virtual u32     startReadingArray( CString key ) const = 0;
-
-        virtual void    endReadingArray( CString key ) const = 0;
-/*
-        template<typename T>
-        void            write( CString key, const T& value );
-
-        template<typename T>
-        void            read( CString key, T& value ) const;
-*/
         template<typename T>
         void            write( CString key, const Array<T>& array );
-        
+
         template<typename T>
         void            read( CString key, Array<T>& array ) const;
+
+        //! Begins writing of an array.
+        void            pushArrayWrite( CString key, u32 size );
+
+        //! End writing of an array.
+        void            popArrayWrite( void );
+
+        //! Begins writing of an object.
+        void            pushObjectWrite( CString key );
+
+        //! Ends writing of an object.
+        void            popObjectWrite( void );
+
+        //! Begins writing of an array item.
+        void            pushItemWrite( u32 index );
+
+        //! Ends writing of an array item.
+        void            popItemWrite( void );
+
+        //! Begins reading of an array.
+        u32             pushArrayRead( CString key ) const;
+
+        //! Ends reading of an array.
+        void            popArrayRead( void ) const;
+
+        //! Begins reading of an object.
+        void            pushObjectRead( CString key ) const;
+
+        //! Ends reading of an object.
+        void            popObjectRead( void ) const;
+
+    private:
+
+        IStorage*       m_impl;
     };
 
     namespace detail {
@@ -109,27 +186,28 @@ namespace io {
     template<typename T>
     void Storage::write( CString key, const Array<T>& array )
     {
-        startWritingArray( key, array.size() );
+        pushArrayWrite( key, ( u32 )array.size() );
 
         for( int i = 0; i < array.size(); i++ ) {
-            startWritingItem( i );
-            detail::createFieldSerializer( NULL, array[i] )->write( this );
+            pushItemWrite( i );
+            detail::createFieldSerializer( NULL, array[i] )->write( *this );
+            popItemWrite();
         }
 
-        endWritingArray( key );
+        popArrayWrite();
     }
 
     // ** Storage::read
     template<typename T>
     void Storage::read( CString key, Array<T>& array ) const
     {
-        array.resize( startReadingArray( key ) );
+        array.resize( pushArrayRead( key ) );
 
         for( int i = 0; i < array.size(); i++ ) {
-            detail::createFieldSerializer( NULL, array[i] )->read( this );
+            detail::createFieldSerializer( NULL, array[i] )->read( *this );
         }
 
-        endReadingArray( key );
+        popArrayRead();
     }
 
 } // namespace io

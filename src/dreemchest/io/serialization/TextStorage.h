@@ -24,44 +24,55 @@
 
  **************************************************************************/
 
-#include    "Storage.h"
-#include	"Serializable.h"
+#ifndef __DC_Io_TextStorage_H__
+#define __DC_Io_TextStorage_H__
+
+#include "Storage.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** Serializable::read
-void Serializable::read( const Storage& storage, CString key )
-{
-    detail::FieldSerializers serializers = fieldSerializers();
+    //! Textual data storage like json, xml or yaml.
+    class TextStorage : public IStorage {
+    public:
 
-    for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
-        i->get()->read( storage );
-    }
-}
+        IoStoreImplement( bool )
+        IoStoreImplement( u8 )
+        IoStoreImplement( s8 )
+        IoStoreImplement( u16 )
+        IoStoreImplement( s16 )
+        IoStoreImplement( u32 )
+        IoStoreImplement( s32 )
+        IoStoreImplement( u64 )
+        IoStoreImplement( s64 )
+        IoStoreImplement( f32 )
+        IoStoreImplement( f64 )
+        IoStoreImplement( String )
 
-// ** Serializable::write
-void Serializable::write( Storage& storage, CString key ) const
-{
-    detail::FieldSerializers serializers = fieldSerializers();
+    protected:
 
-    storage.pushObjectWrite( key );
+        //! Writes a number value.
+        virtual void writeNumber( CString key, double value ) = 0;
 
-    for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
-        i->get()->write( storage );
-    }
+        //! Reads a number value.
+        virtual void readNumber( CString key, double& value ) const = 0;
 
-    storage.popObjectWrite();
-}
+        //! Writes a boolean value.
+        virtual void writeBoolean( CString key, const bool& value ) = 0;
 
-// ** Serializable::fieldSerializers
-detail::FieldSerializers Serializable::fieldSerializers( void ) const
-{
-    log::warn( "Serializable::fieldSerializers : not implemented in a subclass\n" );
-    return detail::FieldSerializers();
-}
+        //! Reads a boolean value.
+        virtual void readBoolean( CString key, bool& value ) const = 0;
+
+        //! Writes a string value.
+        virtual void writeString( CString key, const String& value ) = 0;
+
+        //! Reads a string value.
+        virtual void readString( CString key, String& value ) const = 0;
+    };
 
 } // namespace io
 
 DC_END_DREEMCHEST
+
+#endif  /*  !defined(__DC_Io_TextStorage_H__)   */

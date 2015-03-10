@@ -35,151 +35,147 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const String& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const u8& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const u16& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const u32& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const s32& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const f32& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::write
-void JsonStorage::write( CString key, const f64& value )
-{
-    current()[key] = value;
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, String& value ) const
-{
-    value = current()[key].asCString();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, u8& value ) const
-{
-    value = current()[key].asInt();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, u16& value ) const
-{
-    value = current()[key].asInt();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, u32& value ) const
-{
-    value = current()[key].asInt();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, s32& value ) const
-{
-    value = current()[key].asInt();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, f32& value ) const
-{
-    value = current()[key].asFloat();
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, f64& value ) const
-{
-    value = current()[key].asDouble();
-}
-
-// ** JsonStorage::read
-void JsonStorage::write( CString key, const Serializable& value )
-{
-    value.write( this );
-}
-
-// ** JsonStorage::read
-void JsonStorage::read( CString key, Serializable& value ) const
-{
-    value.read( this );
-}
-
-// ** JsonStorage::startWritingItem
-void JsonStorage::startWritingItem( int index )
+// ** JsonStorage::JsonStorage
+JsonStorage::JsonStorage( const StreamPtr& stream ) : m_stream( stream ), m_index( 0 )
 {
 
 }
 
-// ** JsonStorage::save
-String JsonStorage::save( void ) const
+// ** JsonStorage::pushObjectRead
+void JsonStorage::pushObjectRead( CString key ) const
 {
-    return Json::StyledWriter().write( m_json );
+
 }
 
-// ** JsonStorage::current
-Json::Value& JsonStorage::current( void )
+// ** JsonStorage::popObjectRead
+void JsonStorage::popObjectRead( void ) const
 {
-    return m_stack.empty() ? m_json : *m_stack.top();
+
 }
 
-// ** JsonStorage::current
-const Json::Value& JsonStorage::current( void ) const
+// ** JsonStorage::pushObjectWrite
+void JsonStorage::pushObjectWrite( CString key )
 {
-    return m_stack.empty() ? m_json : *m_stack.top();
+    if( Json::Value* parent = current() ) {
+        writeTo( key ) = Json::objectValue;
+        m_stack.push( &writeTo( key ) );
+    } else {
+        m_stack.push( new Json::Value );
+    }
 }
 
-// ** JsonStorage::startWritingArray
-void JsonStorage::startWritingArray( CString key, u32 size )
+// ** JsonStorage::popObjectWrite
+void JsonStorage::popObjectWrite( void )
 {
-    m_json[key] = Json::arrayValue;
-    m_stack.push( &m_json[key] );
+    if( m_stack.size() == 1 ) {
+        String formatted = Json::StyledWriter().write( *m_stack.top() );
+        log::verbose( "JSON: %s\n", formatted.c_str() );
+        m_stream->write( formatted.c_str(), formatted.length() );
+
+        delete m_stack.top();
+    }
+
+    m_stack.pop();
 }
 
-// ** JsonStorage::endWritingArray
-void JsonStorage::endWritingArray( CString key )
+// ** JsonStorage::writeNumber
+void JsonStorage::writeNumber( CString key, double value )
+{
+    writeTo( key ) = value;
+}
+
+// ** JsonStorage::readNumber
+void JsonStorage::readNumber( CString key, double& value ) const
+{
+    value = current()->get( key, 0.0 ).asDouble();
+}
+
+// ** JsonStorage::writeBoolean
+void JsonStorage::writeBoolean( CString key, const bool& value )
+{
+    writeTo( key ) = value;
+}
+
+// ** JsonStorage::readBoolean
+void JsonStorage::readBoolean( CString key, bool& value ) const
+{
+    value = current()->get( key, false ).asBool();
+}
+
+// ** JsonStorage::writeString
+void JsonStorage::writeString( CString key, const String& value )
+{
+    writeTo( key ) = value;
+}
+
+// ** JsonStorage::readString
+void JsonStorage::readString( CString key, String& value ) const
+{
+    value = current()->get( key, "" ).asCString();
+}
+
+// ** JsonStorage::pushArrayWrite
+void JsonStorage::pushArrayWrite( CString key, u32 size )
+{
+    m_index = 0;
+    
+    writeTo( key ) = Json::arrayValue;
+    m_stack.push( &writeTo( key ) );
+}
+
+// ** JsonStorage::popArrayWrite
+void JsonStorage::popArrayWrite( void )
 {
     m_stack.pop();
 }
 
-// ** JsonStorage::startReadingArray
-u32 JsonStorage::startReadingArray( CString key ) const
+
+// ** JsonStorage::pushItemWrite
+void JsonStorage::pushItemWrite( u32 index )
 {
-    u32 size;
-    read( "array.size", size );
-    return size;
+    m_index = index;
 }
 
-// ** JsonStorage::endReadingArray
-void JsonStorage::endReadingArray( CString key ) const
+
+// ** JsonStorage::popItemWrite
+void JsonStorage::popItemWrite( void )
 {
 
+}
+
+
+// ** JsonStorage::pushArrayRead
+u32 JsonStorage::pushArrayRead( CString key ) const
+{
+    return 0;
+//    m_stack.push( &const_cast<JsonStorage*>( this )->current()[key] );
+//    return current()[key].size();
+}
+
+
+// ** JsonStorage::popArrayRead
+void JsonStorage::popArrayRead( void ) const
+{
+
+}
+
+// ** JsonStorage::current
+Json::Value* JsonStorage::current( void )
+{
+    return m_stack.empty() ? NULL : m_stack.top();
+}
+
+// ** JsonStorage::current
+const Json::Value* JsonStorage::current( void ) const
+{
+    return m_stack.empty() ? NULL : m_stack.top();
+}
+
+// ** JsonStorage::writeTo
+Json::Value& JsonStorage::writeTo( CString key )
+{
+    Json::Value& root = *current();
+    return key ? root[key] : root[m_index];
 }
 
 } // namespace io

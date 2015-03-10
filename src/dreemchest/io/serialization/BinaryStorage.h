@@ -28,65 +28,67 @@
 #define __DC_Io_BinaryStorage_H__
 
 #include "Storage.h"
-#include "../streams/Stream.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
     //! A binary storage interface to use in serialization
-    class BinaryStorage : public Storage {
+    class BinaryStorage : public IStorage {
     public:
 
                         // Constructs BinaryStorage instance.
                         BinaryStorage( const StreamPtr& stream )
                             : m_stream( stream ) {}
 
-                        //! Returns true if this storage is valid.
-                        operator bool() const { return m_stream != NULL; }
+        IoStoreBinary( bool, 1 )
+        IoStoreBinary( u8,   1 )
+        IoStoreBinary( s8,   1 )
+        IoStoreBinary( u16,  2 )
+        IoStoreBinary( s16,  2 )
+        IoStoreBinary( u32,  4 )
+        IoStoreBinary( s32,  4 )
+        IoStoreBinary( f32,  4 )
+        IoStoreBinary( u64,  8 )
+        IoStoreBinary( s64,  8 )
+        IoStoreBinary( f64,  8 )
+        IoStoreImplement( String )
 
-        void            write( CString key, const String& value );
+    private:
 
-        void            write( CString key, const u8& value );
+        //! Does nothing
+        virtual void    commit( void ) {}
 
-        void            write( CString key, const u16& value );
+        //! Begins writing of an array.
+        virtual void    pushArrayWrite( CString key, u32 size );
 
-        void            write( CString key, const u32& value );
+        //! End writing of an array.
+        virtual void    popArrayWrite( void );
 
-        void            write( CString key, const s32& value );
+        //! Begins writing of an object.
+        virtual void    pushObjectWrite( CString key );
 
-        void            write( CString key, const f32& value );
+        //! Ends writing of an object.
+        virtual void    popObjectWrite( void );
 
-        void            write( CString key, const f64& value );
+        //! Begins writing of an array item.
+        virtual void    pushItemWrite( u32 index );
 
-        void            write( CString key, const Serializable& value );
+        //! Ends writing of an array item.
+        virtual void    popItemWrite( void );
 
-        void            read( CString key, String& value ) const;
+        //! Begins reading of an array.
+        virtual u32     pushArrayRead( CString key ) const;
 
-        void            read( CString key, u8& value ) const;
+        //! Ends reading of an array.
+        virtual void    popArrayRead( void ) const;
 
-        void            read( CString key, u16& value ) const;
+        //! Begins reading of an object.
+        virtual void    pushObjectRead( CString key ) const;
 
-        void            read( CString key, u32& value ) const;
+        //! Ends reading of an object.
+        virtual void    popObjectRead( void ) const;
 
-        void            read( CString key, s32& value ) const;
-
-        void            read( CString key, f32& value ) const;
-
-        void            read( CString key, f64& value ) const;
-
-        void            read( CString key, Serializable& value ) const;
-
-        virtual void    startWritingItem( int index );
-
-        virtual void    startWritingArray( CString key, u32 size );
-
-        virtual void    endWritingArray( CString key );
-
-        virtual u32     startReadingArray( CString key ) const;
-
-        virtual void    endReadingArray( CString key ) const;
-        
     private:
         
         //! Binary stream.
