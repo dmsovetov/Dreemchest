@@ -24,6 +24,7 @@
 
  **************************************************************************/
 
+#include    "Storage.h"
 #include	"Serializable.h"
 
 DC_BEGIN_DREEMCHEST
@@ -31,44 +32,30 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** Serializable::read
-void Serializable::read( const Storage& storage )
+void Serializable::read( const Storage* storage )
 {
-    Array<Field> items = fields();
+    detail::FieldSerializers serializers = fieldSerializers();
 
-    for( int i = 0; i < items.size(); i++ ) {
-        const Field& field = items[i];
-
-        if( !field.m_reader ) {
-            log::warn( "Serializable::read : field '%s' has no reader set, do not know how to read this field\n", field.m_name );
-            continue;
-        }
-
-        field.m_reader( storage, field.m_pointer );
+    for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
+        i->get()->read( storage );
     }
 }
 
 // ** Serializable::write
-void Serializable::write( Storage& storage ) const
+void Serializable::write( Storage* storage ) const
 {
-    Array<Field> items = fields();
+    detail::FieldSerializers serializers = fieldSerializers();
 
-    for( int i = 0; i < items.size(); i++ ) {
-        const Field& field = items[i];
-
-        if( !field.m_writer ) {
-            log::warn( "Serializable::write : field '%s' has no writer set, do not know how to write this field\n", field.m_name );
-            continue;
-        }
-
-        field.m_writer( storage, field.m_pointer );
+    for( detail::FieldSerializers::iterator i = serializers.begin(), end = serializers.end(); i != end; ++i ) {
+        i->get()->write( storage );
     }
 }
 
-// ** Serializable::fields
-Array<Serializable::Field> Serializable::fields( void ) const
+// ** Serializable::fieldSerializers
+detail::FieldSerializers Serializable::fieldSerializers( void ) const
 {
-    log::warn( "Serializable::fields : not implemented in a subclass\n" );
-    return Array<Field>();
+    log::warn( "Serializable::fieldSerializers : not implemented in a subclass\n" );
+    return detail::FieldSerializers();
 }
 
 } // namespace io

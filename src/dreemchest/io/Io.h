@@ -38,6 +38,8 @@ namespace io {
     DECLARE_LOG( log )
 
     class Path;
+    class Serializable;
+    class Storage;
 
 	class FileSystem;
 		class DiskFileSystem;
@@ -54,6 +56,12 @@ namespace io {
         BinaryWriteStream,    //!< Open binary stream for writing.
     };
 
+    //! Function type for writing a field value.
+    typedef void ( *FieldWriter )( Storage* storage, CString key, const void* value );
+
+    //! Function type for reading a field value.
+    typedef void ( *FieldReader )( const Storage* storage, CString key, void* value );
+
     //! Stream ptr type.
     typedef StrongPtr<Stream>       StreamPtr;
 
@@ -69,6 +77,11 @@ namespace io {
     typedef Map<Path, ArchivePtr>	Archives;
     typedef Set<Path>               PathSet;
 
+    namespace detail {
+        typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
+        typedef List<FieldSerializerPtr>            FieldSerializers;
+    }
+
 } // namespace io
 
 DC_END_DREEMCHEST
@@ -76,8 +89,13 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
 	#include "streams/FileStream.h"
     #include "streams/ByteBuffer.h"
+    #include "serialization/BinaryStorage.h"
+
+    #ifdef HAVE_JSONCPP
+   //     #include "serialization/JsonStorage.h"
+    #endif
+
     #include "serialization/Serializable.h"
-    #include "serialization/BinarySerialization.h"
 	#include "FileSystem.h"
 	#include "Archive.h"
     #include "DiskFileSystem.h"

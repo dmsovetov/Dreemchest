@@ -41,9 +41,11 @@ using namespace platform;
 // Open a io namespace.
 using namespace io;
 
-//! Override a field writer/reader for Vec2 data type.
-IoFieldReader( Vec2, storage.read ( &value.x, sizeof( f32 ) ); storage.read ( &value.y, sizeof( f32 ) ); )
-IoFieldWriter( Vec2, storage.write( &value.x, sizeof( f32 ) ); storage.write( &value.y, sizeof( f32 ) ); )
+//! Override a field serializer for Vec2 data type.
+IoBeginFieldSerializer( Vec2 )
+    IoWriteField( storage->write( "x", m_pointer->x ); storage->write( "y", m_pointer->y ); )
+    IoReadField ( storage->read ( "x", m_pointer->x ); storage->read ( "y", m_pointer->y ); )
+IoEndFieldSerializer( Vec2 )
 
 StreamPtr stream;
 
@@ -93,16 +95,6 @@ struct ArrayOfPoints : public io::Serializable {
     }
 };
 
-void bar( int z )
-{
-
-}
-
-void bar( io::Serializable& s )
-{
-
-}
-
 // Application delegate is used to handle an events raised by application instance.
 class Files : public ApplicationDelegate {
 
@@ -116,25 +108,29 @@ class Files : public ApplicationDelegate {
         DiskFileSystem fs;
 
         {
-            Storage storage = fs.openFile( "lol", BinaryWriteStream );
+            BinaryStorage storage = fs.openFile( "lol", BinaryWriteStream );
             if( !storage ) {
                 return;
             }
 
             Item p1; p1.x = 1; p1.z = 0.01f; p1.w = 123.31112; p1.msg = "hello"; p1.v = Vec2( 11,-12);
-            p1.write( storage );
+            p1.write( &storage );
 
             printf( "Data written from p1\n" );
             p1.dump();
+
+        //    JsonStorage json;
+        //    p1.write( &json );
+        //    printf( "result: %s\n", json.save().c_str() );
         }
 
         {
-            Storage storage = fs.openFile( "lol", BinaryReadStream );
+            BinaryStorage storage = fs.openFile( "lol", BinaryReadStream );
             if( !storage ) {
                 return;
             }
             Item p2;
-            p2.read( storage );
+            p2.read( &storage );
 
             printf( "Data read to p2\n" );
             p2.dump();
@@ -154,24 +150,28 @@ class Files : public ApplicationDelegate {
                 arr.items.push_back( p1 );
             }
 
-            Storage storage = fs.openFile( "points", BinaryWriteStream );
+            BinaryStorage storage = fs.openFile( "points", BinaryWriteStream );
             if( !storage ) {
                 return;
             }
 
-            arr.write( storage );
+            arr.write( &storage );
             printf( "Data written from arr\n" );
             arr.dump();
+
+        //    JsonStorage json;
+        //    arr.write( &json );
+        //    printf( "result: %s\n", json.save().c_str() );
         }
 
         {
-            Storage storage = fs.openFile( "points", BinaryReadStream );
+            BinaryStorage storage = fs.openFile( "points", BinaryReadStream );
             if( !storage ) {
                 return;
             }
 
             ArrayOfPoints arr;
-            arr.read( storage );
+            arr.read( &storage );
             printf( "Data read to arr\n" );
             arr.dump();
         }
