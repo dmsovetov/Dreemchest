@@ -34,13 +34,13 @@ DC_BEGIN_DREEMCHEST
 namespace sound {
 
     // ** struct SoundGroupInfo
-    dcBeginSerializable( SoundGroupInfo )
-        dcField( String     identifier )
-        dcField( u8         behaviour )
-        dcField( u8         slotCount )
-        dcField( u32        threshold )
-        dcField( f32        fadeTime )
-    dcEndSerializable
+    struct SoundGroupInfo {
+        String     identifier;
+        u8         behaviour;
+        u8         slotCount;
+        u32        threshold;
+        f32        fadeTime;
+    };
 
     // ** class SoundGroup
     //! SoundGroup instance is a home for SoundChannel instances that are playing sounds.

@@ -38,11 +38,11 @@ namespace sound {
     typedef Hash<class SoundEvent*>    SoundEvents;
 
     // ** struct SoundFxInfo
-    dcBeginSerializable( SoundFxInfo )
-        dcVector( std::vector<struct SoundDataInfo>  sounds )   //! Array of sounds.
-        dcVector( std::vector<struct SoundGroupInfo> groups )   //! Array of sound groups.
-        dcVector( std::vector<struct SoundEventInfo> events )   //! Array of sound events.
-    dcEndSerializable
+    struct SoundFxInfo {
+        Array<struct SoundDataInfo>  sounds;   //! Array of sounds.
+        Array<struct SoundGroupInfo> groups;   //! Array of sound groups.
+        Array<struct SoundEventInfo> events;   //! Array of sound events.
+    };
 
     // ** class SoundFx
     class SoundFx {

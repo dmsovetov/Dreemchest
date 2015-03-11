@@ -34,20 +34,20 @@ DC_BEGIN_DREEMCHEST
 namespace sound {
 
     // ** struct SoundDataInfo
-    dcBeginSerializable( SoundDataInfo )
-        dcField( String         identifier )
-        dcField( String         uri )
-        dcField( String         group )
-        dcField( u32            type )
-        dcField( u8             loading )
-        dcField( f32            fadeTime )
-        dcField( f32            volume )
-        dcField( Vec2           volumeModifier )
-        dcField( f32            pitch )
-        dcField( Vec2           pitchModifier )
-        dcField( bool           isLooped )
-        dcField( u32            priority )
-    dcEndSerializable
+    struct SoundDataInfo {
+        String         identifier;
+        String         uri;
+        String         group;
+        u32            type;
+        u8             loading;
+        f32            fadeTime;
+        f32            volume;
+        Vec2           volumeModifier;
+        f32            pitch;
+        Vec2           pitchModifier;
+        bool           isLooped;
+        u32            priority;
+    };
 
     // ** SoundData
     //! SoundData class represents a single sound that is shared

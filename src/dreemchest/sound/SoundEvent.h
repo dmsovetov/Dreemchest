@@ -34,12 +34,12 @@ DC_BEGIN_DREEMCHEST
 namespace sound {
 
     // ** struct SoundEventInfo
-    dcBeginSerializable( SoundEventInfo )
-        dcField( String                 identifier )
-        dcField( u8                     probability )
-        dcField( u8                     type )
-        dcVector( std::vector<String>   sounds )
-    dcEndSerializable
+    struct SoundEventInfo {
+        String          identifier;
+        u8              probability;
+        u8              type;
+        Array<String>   sounds;
+    };
 
     // ** class SoundEvent
     //! SoundEvent class represents a set of sounds, that are played
