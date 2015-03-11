@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include	"DiskFileSystem.h"
-#include	"FileStream.h"
+#include	"streams/FileStream.h"
 #include    "Archive.h"
 
 DC_BEGIN_DREEMCHEST

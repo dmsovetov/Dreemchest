@@ -27,7 +27,7 @@
 #ifndef DREEMCHEST_H
 #define DREEMCHEST_H
 
-#include "utils/Utils.h"
+#include <utils/Utils.h>
 
 #ifdef DC_PLATFORM
     #include "platform/Platform.h"

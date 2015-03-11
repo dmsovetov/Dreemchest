@@ -1,4 +1,7 @@
-core = StaticLibrary( 'Dreemchest', paths = [ '.' ], sources = [ '.', 'utils/*' ], defines = [ 'DC_BUILD_LIBRARY' ] )
+core = StaticLibrary( 'Dreemchest', paths = [ '.', '../modules' ], sources = [ '.', 'utils/*' ], defines = [ 'DC_BUILD_LIBRARY' ] )
+
+Module( url = 'https://github.com/dmsovetov/utils.git', folder = '../modules' )
+Module( url = 'https://github.com/dmsovetov/math.git',  folder = '../modules' )
 
 #############################   Threads     #############################
 

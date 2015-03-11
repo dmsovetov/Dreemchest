@@ -31,6 +31,9 @@
     #include <utils/Utils.h>
 #endif
 
+#include <math/Color.h>
+#include <math/Vec2.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace renderer {

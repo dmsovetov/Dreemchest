@@ -73,7 +73,7 @@ namespace renderer {
          \param mask        A bit mask that defines a set of buffers to be cleared.
          \return            Returns true if the device is ready to render the frame.
          */
-        virtual bool        clear( const Rgba& clearColor = Black, f32 depth = 1.0f, u32 stencil = 0, u32 mask = ClearAll );
+        virtual bool        clear( const Rgba& clearColor = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 depth = 1.0f, u32 stencil = 0, u32 mask = ClearAll );
 
         //! Present a rendered frame on a viewport.
         virtual void        present( void );

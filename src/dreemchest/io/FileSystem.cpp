@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include	"FileSystem.h"
-#include	"ByteBuffer.h"
+#include	"streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include	"PackedStream.h"
-#include    "Archive.h"
+#include    "../Archive.h"
 
 DC_BEGIN_DREEMCHEST
 

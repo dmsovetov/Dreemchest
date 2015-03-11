@@ -26,12 +26,12 @@
 
 #include	"Archive.h"
 
-#include    "FileStream.h"
-#include    "PackedStream.h"
+#include    "streams/FileStream.h"
+#include    "streams/PackedStream.h"
 #include    "DiskFileSystem.h"
 
-#include    "ZLibBufferCompressor.h"
-#include    "FastLZBufferCompressor.h"
+#include    "processors/ZLibBufferCompressor.h"
+#include    "processors/FastLZBufferCompressor.h"
 
 DC_BEGIN_DREEMCHEST
 
