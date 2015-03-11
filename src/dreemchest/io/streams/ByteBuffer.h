@@ -79,15 +79,18 @@ namespace io {
         //! Creates an empty byte buffer.
         static ByteBufferPtr    create( void );
 
+        //! Creates a byte buffer from data.
+        static ByteBufferPtr    createWithData( const u8* pointer, u64 size );
+
     private:
 
                                 //! Constructs a memory stream from data.
-                                ByteBuffer( const u8 *pointer, u64 size );
+                                ByteBuffer( const u8* pointer, u64 size );
 
 	private:
 
         //! Current stream position.
-        u64                     m_position;
+        mutable u64             m_position;
 
         //! Stream buffer.
         Array<u8>               m_buffer;
