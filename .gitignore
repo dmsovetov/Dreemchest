@@ -31,3 +31,4 @@
 *.ogg
 dependency
 projects
+src/modules
