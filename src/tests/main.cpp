@@ -24,17 +24,10 @@
 
  **************************************************************************/
 
-#include <platform/Platform.h>
+#include <gtest/gtest.h>
 
-extern int testSound( int argc, char** argv );
-extern int testThreads( int argc, char** argv );
-extern int testRenderer( int argc, char** argv );
-extern int testPlatform( int argc, char** argv );
-
-int main( int argc, char** argv )
+int main( int argc, char *argv[] )
 {
-//    testThreads( argc, argv );
-//    testSound( argc, argv );
-//    testPlatform( argc, argv );
-    testRenderer( argc, argv );
+    ::testing::InitGoogleTest( &argc, argv );
+    return RUN_ALL_TESTS();
 }
