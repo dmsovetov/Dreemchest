@@ -1,7 +1,7 @@
 items = ['sound', 'threads', 'platform', 'renderer', 'io']
-Tests = Executable( 'Tests', sources = [ '.' ], link = [ 'Dreemchest' ], paths = [ '../dreemchest' ] )
+Tests = Executable( 'Tests', sources = [ '.' ], link = [ 'Dreemchest' ], paths = [ '../dreemchest', '../modules' ] )
 
-Tests.linkExternal( Library( 'gtest', True ) )
+Tests.linkExternal( Library( 'gtest', True ), Library( 'jsoncpp', True ) )
 
 for item in items:
     if Has( item ): Tests.dirs( item )
