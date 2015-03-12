@@ -114,7 +114,7 @@ namespace event {
 
 		//! Typed event.
 		template<typename T>
-		class QueuedEvent : public IEvent {
+		class QueuedEvent : public IQueuedEvent {
 		public:
 
 							//! Constructs a QueuedEvent instance.
