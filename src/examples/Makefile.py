@@ -1,4 +1,4 @@
-examples = Executable( 'Examples', paths = [ '../dreemchest' ], link = [ 'Dreemchest' ] )
+examples = Executable( 'Examples', paths = [ '../dreemchest', '../modules' ], link = [ 'Dreemchest' ] )
 
 if Has( 'platform' ):
 	examples.dirs( '01_Platform/*' )

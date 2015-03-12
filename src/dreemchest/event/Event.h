@@ -35,97 +35,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace event {
 
-	//! Event identifier type.
-	typedef u32 EventId;
-
-	//! Generates unique integer event identifiers.
-	class dcInterface EventIdGenerator {
-	protected:
-
-		//! Generates a next event identifier.
-		static EventId	generateEventId( void );
-	};
-
-	// ----
-
-
-	typedef void (*EventCallback)( void* callback, const void* event );
-
-	struct BaseEvent
-	{
-		virtual ~BaseEvent() {}
-	protected:
-		static size_t getNextType();
-	};
-
-	inline size_t BaseEvent::getNextType()
-	{
-		static size_t type_count = 0;
-		return type_count++;
-	}
-
-	template <typename EventType>
-	struct Event : BaseEvent
-	{
-		static size_t type()
-		{
-			static size_t t_type = BaseEvent::getNextType();
-			return t_type;
-		} //; You don't need this semi-colon. Remove it.
-	};
-
-	template<typename Event>
-	EventCallback createCallback( cClosure<void(const Event&)> callback ) {
-		typedef cClosure<void(const Event&)> Closure;
-
-		struct X {
-			static void thunk( void* callback, const void* event ) {
-				const Event& e = *reinterpret_cast<const Event*>( event );
-				Closure c = *reinterpret_cast<Closure*>( callback );
-				c( e );
-			}
-		};
-
-		return X::thunk;
-	}
-
-	struct EventHandler {
-		EventCallback	callback;
-		int				id;
-		void*			closure;
-	};
-
-	class EventManager {
-	public:
-
-		template<typename E>
-		void subscribe( cClosure<void(const E&)>& callback ) {
-			EventHandler handler;
-			handler.callback = createCallback<E>( callback );
-			handler.id		 = Event<E>::type();
-			handler.closure	 = &callback;
-			m_callbacks.push_back( handler );
-		}
-
-		template<typename E>
-		void emit( const E& e ) {
-			int id = Event<E>::type();
-
-			for( int i = 0; i < m_callbacks.size(); i++ ) {
-				if( m_callbacks[i].id == id ) {
-					m_callbacks[i].callback( m_callbacks[i].closure, &e );
-				}
-			}
-		}
-
-	private:
-
-		std::vector<EventHandler> m_callbacks;
-	};
-
-
 } // namespace event
 
 DC_END_DREEMCHEST
+
+#ifndef DC_BUILD_LIBRARY
+	#include "EventEmitter.h"
+#endif
 
 #endif	/*	!__DC_Event_H__	*/

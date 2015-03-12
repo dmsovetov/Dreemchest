@@ -1,4 +1,4 @@
-core = StaticLibrary( 'Dreemchest', paths = [ '.', '../modules' ], sources = [ '.', 'utils/*' ], defines = [ 'DC_BUILD_LIBRARY' ] )
+core = StaticLibrary( 'Dreemchest', paths = [ '.', '../modules' ], sources = [ '.' ], defines = [ 'DC_BUILD_LIBRARY' ] )
 
 Module( url = 'https://github.com/dmsovetov/utils.git', folder = '../modules' )
 Module( url = 'https://github.com/dmsovetov/math.git',  folder = '../modules' )
@@ -15,6 +15,11 @@ if Has( 'io' ):
 
 	jsoncpp = Library( 'jsoncpp', False )
 	if jsoncpp: core.linkExternal( jsoncpp )
+	
+############################     Event        ###########################
+
+if Has( 'event' ):
+	core.dirs( 'event/*' )
 
 #############################   Platform    #############################
 

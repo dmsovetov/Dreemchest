@@ -1,0 +1,95 @@
+/**************************************************************************
+
+ The MIT License (MIT)
+
+ Copyright (c) 2015 Dmitry Sovetov
+
+ https://github.com/dmsovetov
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+ **************************************************************************/
+
+#ifndef __DC_Event_EventEmitter_H__
+#define __DC_Event_EventEmitter_H__
+
+#include "Event.h"
+
+DC_BEGIN_DREEMCHEST
+
+namespace event {
+
+	//! Event emitter class is used for dispatching strong typed global events.
+	class EventEmitter {
+	public:
+
+		//! Subscribes for an event.
+		template<typename T>
+		void subscribe( const cClosure<void(const T&)>& callback );
+
+		//! Emits a global event.
+		template<typename T>
+		void emit( const T& e );
+
+	private:
+
+		//! Array of listeners.
+		typedef Array<const void*> Listeners;
+
+		//! Listener container type.
+		typedef Map<TypeIdx, Listeners> Subscribers;
+
+		//! Array of array of listeners.
+		Subscribers	m_subscribers;
+	};
+
+	// ** EventEmitter::subscribe
+	template<typename T>
+	inline void EventEmitter::subscribe( const cClosure<void(const T&)>& callback )
+	{
+		TypeIdx idx = TypeIndex<T>::idx();
+
+		if( m_subscribers.count( idx ) == 0 ) {
+			m_subscribers[idx] = Listeners();
+		}
+
+		m_subscribers[idx].push_back( reinterpret_cast<const void*>( &callback ) );
+	}
+
+	// ** EventEmitter::emit
+	template<typename T>
+	inline void EventEmitter::emit( const T& e )
+	{
+		typedef cClosure<void(const T&)> CallbackType;
+
+		TypeIdx idx = TypeIndex<T>::idx();
+		Subscribers::const_iterator i = m_subscribers.find( idx );
+
+		if( i == m_subscribers.end() ) {
+			return;
+		}
+
+		for( u32 j = 0, n = ( u32 )i->second.size(); j < n; j++ ) {
+			(*reinterpret_cast<const CallbackType*>( i->second[j] ))( e );
+		}
+	}
+
+} // namespace event
+
+DC_END_DREEMCHEST
+
+#endif	/*	!__DC_Event_EventEmitter_H__	*/
