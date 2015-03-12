@@ -27,6 +27,8 @@
 #ifndef		__DC_Event_H__
 #define		__DC_Event_H__
 
+#include "../Namespace.h"
+
 #ifndef DC_UTILS_INCLUDED
 	#include <utils/Utils.h>
 #endif
