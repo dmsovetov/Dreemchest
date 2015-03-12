@@ -81,7 +81,6 @@ namespace event {
 			m_subscribers[idx] = Listeners();
 		}
 
-
 		m_subscribers[idx].push_back( new CallbackType( callback ) );
 	}
 
@@ -102,6 +101,71 @@ namespace event {
 			(*reinterpret_cast<const CallbackType*>( i->second[j] ))( e );
 		}
 	}
+
+	namespace detail {
+
+		//! Event interface
+		class IQueuedEvent {
+		public:
+
+			virtual			~IQueuedEvent( void ) {}
+			virtual void	emit( EventEmitter& emitter ) = 0;
+		};
+
+		//! Typed event.
+		template<typename T>
+		class QueuedEvent : public IEvent {
+		public:
+
+							//! Constructs a QueuedEvent instance.
+							QueuedEvent( const T& e )
+								: m_event( e ) {}
+
+			//! Emits an event.
+			virtual void	emit( EventEmitter& emitter ) { emitter.emit( m_event ); }
+
+		private:
+
+			//! Stored event data.
+			T				m_event;
+		};
+
+		//! Event queue is used for cross-thread event emitting.
+		class EventQueue {
+		public:
+
+			//! Queues a new event.
+			template<typename T>
+			void			queue( const T& e );
+
+			//! Emits all queued events.
+			void			emit( EventEmitter& emitter );
+
+		private:
+
+			//! Queued events.
+			Array<IQueuedEvent*>	m_events;
+		};
+
+		// ** EventQueue::queue
+		template<typename T>
+		inline void EventQueue::queue( const T& e )
+		{
+			m_events.push_back( new QueuedEvent( e ) );
+		}
+
+		// ** EventQueue::emit
+		inline void EventQueue::emit( EventEmitter& emitter )
+		{
+			for( u32 i = 0, n = m_events.size(); i < n; i++ ) {
+				m_events[i]->emit( emitter );
+				delete m_events[i];
+			}
+
+			m_events.clear();
+		}
+
+	} // namespace detail
 
 } // namespace event
 
