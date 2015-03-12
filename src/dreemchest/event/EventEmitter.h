@@ -37,6 +37,8 @@ namespace event {
 	class EventEmitter {
 	public:
 
+		virtual	~EventEmitter( void );
+
 		//! Subscribes for an event.
 		template<typename T>
 		void subscribe( const cClosure<void(const T&)>& callback );
@@ -57,17 +59,30 @@ namespace event {
 		Subscribers	m_subscribers;
 	};
 
+	// ** EventEmitter::~EventEmitter
+	inline EventEmitter::~EventEmitter( void )
+	{
+		for( Subscribers::iterator i = m_subscribers.begin(), end = m_subscribers.end(); i != end; ++i ) {
+			for( u32 j = 0, n = i->second.size(); j < n; j++ ) {
+				delete i->second[j];
+			}
+		}
+	}
+
 	// ** EventEmitter::subscribe
 	template<typename T>
 	inline void EventEmitter::subscribe( const cClosure<void(const T&)>& callback )
 	{
+		typedef cClosure<void(const T&)> CallbackType;
+
 		TypeIdx idx = TypeIndex<T>::idx();
 
 		if( m_subscribers.count( idx ) == 0 ) {
 			m_subscribers[idx] = Listeners();
 		}
 
-		m_subscribers[idx].push_back( reinterpret_cast<const void*>( &callback ) );
+
+		m_subscribers[idx].push_back( new CallbackType( callback ) );
 	}
 
 	// ** EventEmitter::emit
