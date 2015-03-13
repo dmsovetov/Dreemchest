@@ -216,62 +216,62 @@ struct Scene : public Serializable {
 };
 
 typedef testing::Types<
-// POD types
-  Value<u8>
-, Value<s8>
-, Value<u16>
-, Value<s16>
-, Value<u32>
-, Value<s32>
-, Value<u64>
-, Value<s64>
-, Value<f32>
-, Value<f64>
-, Value<String>
+    // POD types
+      Value<u8>
+    , Value<s8>
+    , Value<u16>
+    , Value<s16>
+    , Value<u32>
+    , Value<s32>
+    , Value<u64>
+    , Value<s64>
+    , Value<f32>
+    , Value<f64>
+    , Value<String>
 
-// Arrays of POD types
-, ArrayOf<u8>
-, ArrayOf<s8>
-, ArrayOf<u16>
-, ArrayOf<s16>
-, ArrayOf<u32>
-, ArrayOf<s32>
-, ArrayOf<u64>
-, ArrayOf<s64>
-, ArrayOf<f32>
-, ArrayOf<f64>
-, ArrayOf<String>
+    // Arrays of POD types
+    , ArrayOf<u8>
+    , ArrayOf<s8>
+    , ArrayOf<u16>
+    , ArrayOf<s16>
+    , ArrayOf<u32>
+    , ArrayOf<s32>
+    , ArrayOf<u64>
+    , ArrayOf<s64>
+    , ArrayOf<f32>
+    , ArrayOf<f64>
+    , ArrayOf<String>
 
-// Compound values
-, CompoundValue<u8>
-, CompoundValue<s8>
-, CompoundValue<u16>
-, CompoundValue<s16>
-, CompoundValue<u32>
-, CompoundValue<s32>
-, CompoundValue<u64>
-, CompoundValue<s64>
-, CompoundValue<f32>
-, CompoundValue<f64>
-, CompoundValue<String>
+    // Compound values
+    , CompoundValue<u8>
+    , CompoundValue<s8>
+    , CompoundValue<u16>
+    , CompoundValue<s16>
+    , CompoundValue<u32>
+    , CompoundValue<s32>
+    , CompoundValue<u64>
+    , CompoundValue<s64>
+    , CompoundValue<f32>
+    , CompoundValue<f64>
+    , CompoundValue<String>
 
-// Complex objects
-, Vector
-, Mesh
-, SceneSettings
-, Scene
+    // Complex objects
+    , Vector
+    , Mesh
+    , SceneSettings
+    , Scene
 
-// Array of complex objects
-, ArrayOf<Vector>
-, ArrayOf<Mesh>
-, ArrayOf<SceneSettings>
-, ArrayOf<Scene>
+    // Array of complex objects
+    , ArrayOf<Vector>
+    , ArrayOf<Mesh>
+    , ArrayOf<SceneSettings>
+    , ArrayOf<Scene>
 
-// Compound values of objects
-, CompoundValue<Vector>
-, CompoundValue<Mesh>
-, CompoundValue<SceneSettings>
-, CompoundValue<Scene>
+    // Compound values of objects
+    , CompoundValue<Vector>
+    , CompoundValue<Mesh>
+    , CompoundValue<SceneSettings>
+    , CompoundValue<Scene>
 > SerializableTypes;
 
 TYPED_TEST_CASE(Serialization, SerializableTypes);
