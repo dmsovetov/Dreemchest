@@ -151,7 +151,7 @@ namespace event {
 		template<typename T>
 		inline void EventQueue::queue( const T& e )
 		{
-			m_events.push_back( new QueuedEvent( e ) );
+		//	m_events.push_back( new QueuedEvent( e ) );
 		}
 
 		// ** EventQueue::emit
