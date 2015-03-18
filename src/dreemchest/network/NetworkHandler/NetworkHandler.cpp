@@ -24,12 +24,13 @@
 
  **************************************************************************/
 
-#include	"NetworkHandler.h"
-#include    "PacketFormatter.h"
-#include    "RemoteProcedure.h"
+#include "NetworkHandler.h"
+//#include    "PacketFormatter.h"
+//#include    "RemoteProcedure.h"
 
-#include    "../TCPSocket.h"
-#include    "../UDPSocket.h"
+#include "../../io/streams/ByteBuffer.h"
+#include "../TCPSocket.h"
+#include "../UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,48 +39,46 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( dcContext ctx ) : EventDispatcher( ctx )
 {
-    m_netTCP            = DC_NEW TCPSocket( m_ctx );
-    m_netBroadcast      = DC_NEW UDPSocket( m_ctx, true );
-    m_netDatagram       = DC_NEW UDPSocket( m_ctx, false );
+    m_netTCP            = TCPSocket::create();
+    m_netBroadcast      = UDPSocket::create( NULL, true );
+    m_netDatagram       = UDPSocket::create( NULL, false );
     m_packetParser      = DC_NEW PacketFormatter( PacketMagic );
-    m_outputStream      = DC_NEW io::MemoryStream( DC_NEW u8[MaxPacketBufferSize], MaxPacketBufferSize, true );
+    m_outputStream      = DC_NEW io::ByteBuffer::create( MaxPacketBufferSize );
     m_remoteProcedure   = DC_NEW RemoteProcedure( m_ctx, this );
 
     // ** Register built-in packets
-    RegisterPacket( sTimeSyncPacket::PacketId,       DC_NEW sTimeSyncPacket );
-    RegisterPacket( sRemoteCallPacket::PacketId,     DC_NEW sRemoteCallPacket );
-    RegisterPacket( sRemoteResponsePacket::PacketId, DC_NEW sRemoteResponsePacket );
-    RegisterPacket( sSendFile::PacketId,             DC_NEW sSendFile );
-    RegisterPacket( sFileChunk::PacketId,            DC_NEW sFileChunk );
+//    RegisterPacket( sTimeSyncPacket::PacketId,       DC_NEW sTimeSyncPacket );
+//    RegisterPacket( sRemoteCallPacket::PacketId,     DC_NEW sRemoteCallPacket );
+//    RegisterPacket( sRemoteResponsePacket::PacketId, DC_NEW sRemoteResponsePacket );
+//    RegisterPacket( sSendFile::PacketId,             DC_NEW sSendFile );
+//    RegisterPacket( sFileChunk::PacketId,            DC_NEW sFileChunk );
 
     // ** TCP socket listeners
-    m_netTCP->AttachListener( TCPSocketEvent::Data,         dcThisMethod( NetworkHandler::OnDataReceived ) );
-    m_netTCP->AttachListener( TCPSocketEvent::Disconnected, dcThisMethod( NetworkHandler::OnDisconnected ) );
+//    m_netTCP->AttachListener( TCPSocketEvent::Data,         dcThisMethod( NetworkHandler::OnDataReceived ) );
+//    m_netTCP->AttachListener( TCPSocketEvent::Disconnected, dcThisMethod( NetworkHandler::OnDisconnected ) );
 
     // ** UDP socket listeners
-    m_netDatagram->AttachListener( UDPSocketEvent::Data, dcThisMethod( NetworkHandler::OnPacketUDP ) );
-    m_netBroadcast->AttachListener( UDPSocketEvent::Data, dcThisMethod( NetworkHandler::OnPacketUDP ) );
+//    m_netDatagram->AttachListener( UDPSocketEvent::Data, dcThisMethod( NetworkHandler::OnPacketUDP ) );
+//    m_netBroadcast->AttachListener( UDPSocketEvent::Data, dcThisMethod( NetworkHandler::OnPacketUDP ) );
 }
     
 NetworkHandler::~NetworkHandler( void )
 {
-    for( InputStreams::iterator i = m_inputStreams.begin(), end = m_inputStreams.end(); i != end; ++i ) {
-        delete i->second;
-    }
+//    for( InputStreams::iterator i = m_inputStreams.begin(), end = m_inputStreams.end(); i != end; ++i ) {
+//        delete i->second;
+//    }
 
     DC_DELETE( m_remoteProcedure )
     DC_DELETE( m_outputStream )
     DC_DELETE( m_packetParser )
-    DC_DELETE( m_netTCP )
-    DC_DELETE( m_netBroadcast )
-    DC_DELETE( m_netBroadcast )
 }
 
 // ** NetworkHandler::ProcessConnection
 void NetworkHandler::ProcessConnection( const NetworkAddress& address )
 {
     m_flags.On( Connected );
-    DispatchEvent( NetworkHandlerEvent::Connected, NetworkHandlerEvent::OnConnected( address ) );
+	DC_BREAK;
+//    DispatchEvent( NetworkHandlerEvent::Connected, NetworkHandlerEvent::OnConnected( address ) );
 }
 
 // ** NetworkHandler::ProcessDisconnection
@@ -92,18 +91,22 @@ void NetworkHandler::ProcessDisconnection( void )
     Warning( "NetworkHandler::ProcessDisconnection sockets are not cleaned up [dev]\n" );
     
     m_flags.Off( Connected );
-    DispatchEvent( NetworkHandlerEvent::Disconnected, NetworkHandlerEvent::OnDisconnected() );
+	DC_BREAK;
+//    DispatchEvent( NetworkHandlerEvent::Disconnected, NetworkHandlerEvent::OnDisconnected() );
 }
 
 // ** NetworkHandler::ProcessFailure
 void NetworkHandler::ProcessFailure( void )
 {
-    DispatchEvent( NetworkHandlerEvent::Failure, NetworkHandlerEvent::OnFailure() );
+	DC_BREAK
+//    DispatchEvent( NetworkHandlerEvent::Failure, NetworkHandlerEvent::OnFailure() );
 }
 
 // ** NetworkHandler::ProcessReceivedPacket
-void NetworkHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection )
+void NetworkHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, Socket connection )
 {
+	DC_BREAK
+/*
     switch( packetId ) {
     case sSendFile::PacketId:   {
                                     DC_ENSURE_TYPE( packet, sSendFile )
@@ -122,7 +125,7 @@ void NetworkHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *
     default:                    DispatchEvent( NetworkHandlerEvent::PacketReceived, NetworkHandlerEvent::OnPacketReceived( packetId, packet, connection, address ) );
                                 break;
     }
-    
+   */
 }
 
 // ** NetworkHandler::ListenDatagrams
@@ -172,7 +175,7 @@ bool NetworkHandler::Update( int dt )
 }
 
 // ** NetworkHandler::SendPacket
-bool NetworkHandler::SendPacket( int packetId, const INetworkPacket *packet, int connection )
+bool NetworkHandler::SendPacket( int packetId, const INetworkPacket *packet, Socket connection )
 {
     DC_BREAK_IF( !IsConnected() );
 
@@ -189,7 +192,7 @@ bool NetworkHandler::SendPacket( int packetId, const INetworkPacket *packet, int
 }
 
 // ** NetworkHandler::SendFile
-bool NetworkHandler::SendFile( dcStream file, const char *fileName, int connection )
+bool NetworkHandler::SendFile( const io::StreamPtr& file, const char *fileName, Socket connection )
 {
     DC_BREAK_IF( file == NULL );
     DC_BREAK_IF( fileName == NULL );
@@ -226,7 +229,7 @@ bool NetworkHandler::SendFile( dcStream file, const char *fileName, int connecti
 }
 
 // ** NetworkHandler::SendUDP
-bool NetworkHandler::SendUDP( dcUDPSocket socket, int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port )
+bool NetworkHandler::SendUDP( UDPSocket* socket, int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port )
 {
     m_outputStream->setPosition( 0 );
     int bytesWritten = m_packetParser->WritePacketToStream( packetId, packet, m_outputStream );
@@ -251,14 +254,14 @@ bool NetworkHandler::SendBroadcast( int packetId, const INetworkPacket *packet, 
 }
 
 // ** NetworkHandler::GetOrCreateInputStream
-dcMemoryStream NetworkHandler::GetOrCreateInputStream( int connection )
+io::ByteBufferPtr NetworkHandler::GetOrCreateInputStream( Socket connection )
 {
     InputStreams::iterator i = m_inputStreams.find( connection );
     if( i != m_inputStreams.end() ) {
         return i->second;
     }
 
-    dcMemoryStream stream = DC_NEW io::MemoryStream( new u8[MaxPacketBufferSize], MaxPacketBufferSize, true );
+    io::ByteBufferPtr stream = io::ByteBuffer::create( MaxPacketBufferSize );
     m_inputStreams[connection] = stream;
 
     return stream;
@@ -271,22 +274,22 @@ bool NetworkHandler::RegisterPacket( int packetId, const INetworkPacket *packet 
 }
 
 // ** NetworkHandler::RegisterRemoteProcedure
-bool NetworkHandler::RegisterRemoteProcedure( const char *name, const RemoteProcedureCallback& callback )
-{
-    return m_remoteProcedure->RegisterRemoteProcedure( name, callback );
-}
+//bool NetworkHandler::RegisterRemoteProcedure( const char *name, const RemoteProcedureCallback& callback )
+//{
+//    return m_remoteProcedure->RegisterRemoteProcedure( name, callback );
+//}
 
 // ** NetworkHandler::InvokeRemoteProcedure
-bool NetworkHandler::InvokeRemoteProcedure( const char *name, const dreemchest::cValue *args, int count )
-{
-    return m_remoteProcedure->InvokeRemoteProcedure( name, args, count );
-}
+//bool NetworkHandler::InvokeRemoteProcedure( const char *name, const dreemchest::cValue *args, int count )
+//{
+//    return m_remoteProcedure->InvokeRemoteProcedure( name, args, count );
+//}
 
 // ** NetworkHandler::InvokeRemoteProcedure
-bool NetworkHandler::InvokeRemoteProcedure( const char *name, const cValue *args, int count, const RemoteProcedureResponseCallback& callback )
-{
-    return m_remoteProcedure->InvokeRemoteProcedure( name, args, count, callback );
-}
+//bool NetworkHandler::InvokeRemoteProcedure( const char *name, const cValue *args, int count, const RemoteProcedureResponseCallback& callback )
+//{
+//    return m_remoteProcedure->InvokeRemoteProcedure( name, args, count, callback );
+//}
 
 // ** NetworkHandler::IsConnected
 bool NetworkHandler::IsConnected( void ) const
@@ -311,16 +314,16 @@ int NetworkHandler::GetMaxPacketPayload( void ) const
 {
     return MaxPacketBufferSize - 12;
 }
-
+/*
 // ** NetworkHandler::OnDataReceived
 void NetworkHandler::OnDataReceived( const dcEvent e )
 {
     dcTCPSocketEvent se = ( dcTCPSocketEvent )e;
 
     // ** Get stream for connection
-    dcMemoryStream stream = GetOrCreateInputStream( se->m_connection );
+    io::ByteBufferPtr stream = GetOrCreateInputStream( se->m_connection );
     DC_BREAK_IF( stream == NULL );
-    if( !stream ) {
+    if( stream == NULL ) {
         return;
     }
 
@@ -339,9 +342,9 @@ void NetworkHandler::OnDataReceived( const dcEvent e )
         bytesParsed += bytesToCopy;
     }
 }
-
+*/
 // ** NetworkHandler::ParseReceivedPackets
-void NetworkHandler::ParseReceivedPackets( dcMemoryStream stream, const NetworkAddress& address, int connection )
+void NetworkHandler::ParseReceivedPackets( io::ByteBufferPtr& stream, const NetworkAddress& address, int connection )
 {
     int              packetId    = 0;
     INetworkPacket  *packet      = NULL;
@@ -361,7 +364,7 @@ void NetworkHandler::ParseReceivedPackets( dcMemoryStream stream, const NetworkA
     stream->trimFromLeft( stream->position() );
     stream->setPosition( 0 );
 }
-
+/*
 // ** NetworkHandler::OnDisconnected
 void NetworkHandler::OnDisconnected( const dcEvent e )
 {
@@ -388,7 +391,7 @@ void NetworkHandler::OnPacketUDP( const dcEvent e )
 
     ProcessReceivedPacket( packetId, packet, ue->m_address, -1 );
 }
-    
+   */
 } // namespace net
 
 DC_END_DREEMCHEST

@@ -33,58 +33,62 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    // ** class INetworkPacket
-    class INetworkPacket : public ISerializable {
-    public:
-
-        virtual                 ~INetworkPacket( void ) {}
-
-        virtual void            read( dcStream stream )         = 0;
-        virtual void            write( dcStream stream ) const  = 0;
-        virtual INetworkPacket* clone( void ) const             = 0;
-    };
-
-    // ** enum eBuiltInPackets
-    enum eBuiltInPackets {
-        PacketTimeSync          = -1,
-        PacketRemoteCall        = -2,
-        PacketRemoteResponse    = -3,
-        PacketSendFile          = -4,
-        PacketFileChunk         = -5,
-    };
-
-    // ** packet sTimeSyncPacket
-    struct sTimeSyncPacket {
-        int timestamp;
-       int localTime;
+	class INetworkPacket : public io::Serializable {
+	public:
 	};
 
+    // ** class INetworkPacket
+//    class INetworkPacket : public ISerializable {
+//    public:
+//
+//        virtual                 ~INetworkPacket( void ) {}
+//
+//        virtual void            read( dcStream stream )         = 0;
+//        virtual void            write( dcStream stream ) const  = 0;
+//        virtual INetworkPacket* clone( void ) const             = 0;
+//    };
+
+    // ** enum eBuiltInPackets
+//    enum eBuiltInPackets {
+//        PacketTimeSync          = -1,
+//        PacketRemoteCall        = -2,
+//        PacketRemoteResponse    = -3,
+//        PacketSendFile          = -4,
+//        PacketFileChunk         = -5,
+//    };
+
+    // ** packet sTimeSyncPacket
+//    struct sTimeSyncPacket {
+//        int timestamp;
+//       int localTime;
+//	};
+
     // ** packet sRemoteCallPacket
-    struct sRemoteCallPacket {
-        std::string         name;
-        int                 identifier;
-        std::vector<cValue> args;
-    };
+//    struct sRemoteCallPacket {
+//        std::string         name;
+//        int                 identifier;
+//        std::vector<cValue> args;
+//    };
 
     // ** packet sRemoteResponsePacket
-    struct sRemoteResponsePacket {
-        int    identifier;
-	//	cValue value;
-    };
+//    struct sRemoteResponsePacket {
+//        int    identifier;
+//	//	cValue value;
+//    };
 
     // ** packet sSendFile
-    struct sSendFile {
-        std::string fileName;
-        int         length;
-    };
+//    struct sSendFile {
+//        std::string fileName;
+//        int         length;
+//    };
 
     // ** packet sFileChunk
-    struct sFileChunk {
-		std::vector<u8> data;
-    };
+//    struct sFileChunk {
+//		std::vector<u8> data;
+//    };
 
-    // ** class NetworkHandler
-    class NetworkHandler : public event::EventDispatcher {
+    //! Basic network handler class.
+    class NetworkHandler {
 
         // ** enum eFlags
         enum eFlags {
@@ -95,22 +99,21 @@ namespace net {
 
         enum { PacketMagic = 0xef, MaxPacketBufferSize = 4096, MaxFileChunkSize = 4000 };
 
-        DC_DECLARE_IS( NetworkServerHandler, ServerHandler, NULL )
-        DC_DECLARE_IS( NetworkClientHandler, ClientHandler, NULL )
+//        DC_DECLARE_IS( NetworkServerHandler, ServerHandler, NULL )
+//        DC_DECLARE_IS( NetworkClientHandler, ClientHandler, NULL )
 
-        typedef std::map<int, dcMemoryStream> InputStreams;
-        
+        typedef Map<s32, io::ByteBufferPtr> InputStreams;   
 
     public:
 
-                                NetworkHandler( dcContext ctx );
+                                NetworkHandler( void );
         virtual                 ~NetworkHandler( void );
 
         void                    Disconnect( void );
         virtual bool            Update( int dt );
         bool                    ListenDatagrams( u16 port );
         bool                    ListenBroadcast( u16 port );
-        bool                    SendFile( dcStream file, const char *fileName, int connection = -1 );
+        bool                    SendFile( const io::StreamPtr& file, CString fileName, Socket connection = -1 );
         bool                    SendPacket( int packetId, const INetworkPacket *packet, int connection = -1 );
         bool                    SendDatagram( int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
         bool                    SendBroadcast( int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
@@ -120,17 +123,17 @@ namespace net {
         bool                    IsListeningDatagrams( void ) const;
         bool                    IsListeningBroadcast( void ) const;
 
-        bool                    RegisterRemoteProcedure( const char *name, const RemoteProcedureCallback& callback );
-        bool                    InvokeRemoteProcedure( const char *name, const cValue *args, int count );
-        bool                    InvokeRemoteProcedure( const char *name, const cValue *args, int count, const RemoteProcedureResponseCallback& callback );
+    //    bool                    RegisterRemoteProcedure( CString name, const RemoteProcedureCallback& callback );
+    //    bool                    InvokeRemoteProcedure( CString name, const Value *args, int count );
+    //    bool                    InvokeRemoteProcedure( CString name, const Value *args, int count, const RemoteProcedureResponseCallback& callback );
 
     protected:
 
-        dcMemoryStream          GetOrCreateInputStream( int connection );
-        void                    ParseReceivedPackets( dcMemoryStream stream, const NetworkAddress& address, int connection );
-        bool                    SendUDP( dcUDPSocket socket, int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
+        io::ByteBufferPtr       GetOrCreateInputStream( Socket connection );
+        void                    ParseReceivedPackets( io::ByteBufferPtr& stream, const NetworkAddress& address, Socket connection );
+        bool                    SendUDP( UDPSocket* socket, int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
 
-        virtual void            ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
+        virtual void            ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, Socket connection );
         virtual void            ProcessConnection( const NetworkAddress& address );
         virtual void            ProcessDisconnection( void );
         virtual void            ProcessFailure( void );
@@ -138,22 +141,23 @@ namespace net {
     private:
 
         // ** Socket event handlers
-        void                    OnDataReceived( const dcEvent e );
-        void                    OnDisconnected( const dcEvent e );
-        void                    OnPacketUDP( const dcEvent e );
+   //     void                    OnDataReceived( const dcEvent e );
+   //     void                    OnDisconnected( const dcEvent e );
+   //     void                    OnPacketUDP( const dcEvent e );
 
     protected:
 
-        dcTCPSocket             m_netTCP;
-        dcUDPSocket             m_netDatagram;
-        dcUDPSocket             m_netBroadcast;
+        TCPSocketPtr			m_netTCP;
+        UDPSocketPtr            m_netDatagram;
+        UDPSocketPtr            m_netBroadcast;
         cFlagSet8               m_flags;
         class PacketFormatter*  m_packetParser;
-        dcMemoryStream          m_outputStream;
+        io::ByteBufferPtr		m_outputStream;
         InputStreams            m_inputStreams;
         class RemoteProcedure*  m_remoteProcedure;
     };
 
+	/*
     // ** class NetworkHandlerEvent
     class NetworkHandlerEvent : public event::Event {
 
@@ -185,7 +189,7 @@ namespace net {
         const u8*             m_data;
         int                     m_length;
     };
-    
+    */
 } // namespace net
     
 DC_END_DREEMCHEST

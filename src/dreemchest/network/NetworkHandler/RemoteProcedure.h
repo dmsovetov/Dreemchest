@@ -59,7 +59,7 @@ namespace net {
 
     private:
 
-        dcContext                   m_ctx;
+    //    dcContext                   m_ctx;
         NetworkHandler*             m_networkHandler;
         RemoteProcedures            m_procedures;
         RemoteProcedureCallbacks    m_callbacks;

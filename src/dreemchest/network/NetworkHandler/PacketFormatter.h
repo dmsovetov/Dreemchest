@@ -44,9 +44,9 @@ namespace net {
                             ~PacketFormatter( void );
 
         bool                RegisterPacket( int packetId, const INetworkPacket *packet );
-        int                 WritePacketToStream( int packetId, const INetworkPacket *packet, dcMemoryStream stream ) const;
-        bool                ParsePacketFromStream( INetworkPacket **packet, int& packetId, dcMemoryStream stream ) const;
-        bool                ParsePacketFromMemory( INetworkPacket **packet, int& packetId, const u8 *buffer, int size ) const;
+        int                 WritePacketToStream( int packetId, const INetworkPacket *packet, io::ByteBufferPtr& stream ) const;
+        bool                ParsePacketFromStream( INetworkPacket **packet, int& packetId, io::ByteBufferPtr& stream ) const;
+        bool                ParsePacketFromMemory( INetworkPacket **packet, int& packetId, const u8* buffer, u32 size ) const;
 
     private:
 
