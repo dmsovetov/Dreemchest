@@ -27,22 +27,40 @@
 #ifndef DREEMCHEST_H
 #define DREEMCHEST_H
 
-#include <utils/Utils.h>
+#define dcInterface
 
-#ifdef DC_PLATFORM
-    #include "platform/Platform.h"
+#ifndef DC_NAMESPACE
+    #define DC_NAMESPACE    dreemchest
 #endif
 
-#ifdef DC_THREADS
-    #include "threads/Threads.h"
+#ifdef DC_NAMESPACE
+    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
+    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
+    #define DC_END_DREEMCHEST    }
+#else
+    #define DC_USE_DREEMCHEST
+    #define DC_BEGIN_DREEMCHEST
+    #define DC_END_DREEMCHEST
 #endif
 
-#ifdef DC_RENDERER
-    #include "renderer/Renderer.h"
-#endif
+#ifndef DC_BUILD_LIBRARY
+	#include <utils/Utils.h>
 
-#ifdef DC_SOUND
-    #include "sound/Sound.h"
+	#ifdef DC_PLATFORM
+		#include "platform/Platform.h"
+	#endif
+
+	#ifdef DC_THREADS
+		#include "threads/Threads.h"
+	#endif
+
+	#ifdef DC_RENDERER
+		#include "renderer/Renderer.h"
+	#endif
+
+	#ifdef DC_SOUND
+		#include "sound/Sound.h"
+	#endif
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */

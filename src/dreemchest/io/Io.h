@@ -27,6 +27,8 @@
 #ifndef __DC_Io_Io_H__
 #define __DC_Io_Io_H__
 
+#include "../Dreemchest.h"
+
 #ifndef DC_UTILS_INCLUDED
 	#include <utils/Utils.h>
 #endif

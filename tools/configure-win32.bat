@@ -1,2 +1,2 @@
-python -m Pygling configure --output ../projects/ --source ../src --name dreemchest --io=yes --event=yes --platform Windows
+python -m Pygling configure --output ../projects/ --source ../src --name dreemchest --platform Windows --io=yes --threads=Windows
 pause

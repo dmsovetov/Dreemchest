@@ -56,9 +56,9 @@ namespace event {
         bool                        IsBlockEvents( void ) const;
         void                        SetBlockEvents( bool value );
 
-		dcInvokable void            AttachListener( const char *eventId, EventListener listener, const char *method = NULL );
-		dcInvokable void            DetachListener( const char *eventId, EventListener listener, const char *method = NULL );
-        dcInvokable void            DispatchEvent( const char *eventId, dcScriptObject event );
+		void						AttachListener( const char *eventId, EventListener listener, const char *method = NULL );
+		void						DetachListener( const char *eventId, EventListener listener, const char *method = NULL );
+        void						DispatchEvent( const char *eventId, dcScriptObject event );
         void                        DispatchEvent( const char *eventId, Event *e );
 		void                        DetachAllListeners( const void *listener );
 

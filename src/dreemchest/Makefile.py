@@ -11,10 +11,34 @@ if Has( 'threads' ):
 #############################     IO        #############################
 
 if Has( 'io' ):
-	core.dirs( 'io/*' )
+	core.dirs( 'io', 'streams' )
+	core.files(
+	  'io/serialization/BinaryStorage.cpp'
+	, 'io/serialization/BinaryStorage.h'
+	, 'io/serialization/Serializable.cpp'
+	, 'io/serialization/Serializable.h'
+	, 'io/serialization/Storage.cpp'
+	, 'io/serialization/Storage.h'
+	, 'io/serialization/TextStorage.cpp'
+	, 'io/serialization/TextStorage.h'
+	)
 
 	jsoncpp = Library( 'jsoncpp', False )
-	if jsoncpp: core.linkExternal( jsoncpp )
+	if jsoncpp:
+		core.files(
+		  'io/serialization/JsonStorage.cpp'
+		, 'io/serialization/JsonStorage.h'
+		)
+		
+		core.linkExternal( jsoncpp )
+		
+	zlib = Library( 'zlib', False )
+	if zlib:
+		core.files(
+		  'io/processors/ZlibBufferCompressor.cpp'
+		, 'io/processors/ZlibBufferCompressor.h'
+		)
+		core.linkExternal( zlib )
 	
 ############################     Event        ###########################
 

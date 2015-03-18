@@ -30,8 +30,13 @@
 #include    "streams/PackedStream.h"
 #include    "DiskFileSystem.h"
 
-#include    "processors/ZLibBufferCompressor.h"
-#include    "processors/FastLZBufferCompressor.h"
+#ifdef HAVE_ZLIB
+	#include "processors/ZLibBufferCompressor.h"
+#endif
+
+#ifdef HAVE_FASTLZ
+	#include    "processors/FastLZBufferCompressor.h"
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -58,10 +63,20 @@ void Archive::release( void )
 IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 {
     switch( compressor ) {
-    case CompressorFastLZ:  return DC_NEW FastLZBufferCompressor;
+	case CompressorFastLZ:  
+							#ifdef HAVE_FASTLZ
+								return DC_NEW FastLZBufferCompressor;
+							#else
+								log::warn( "Archive::createCompressor : built without FastLZ support\n" );
+							#endif
                             break;
 
-    case CompressorZ:       return DC_NEW ZLibBufferCompressor;
+    case CompressorZ:      
+							#ifdef HAVE_FASTLZ
+								return DC_NEW ZLibBufferCompressor;
+							#else
+								log::warn( "Archive::createCompressor : built without Zlib support\n" );
+							#endif
                             break;
 
     default:                return NULL;
@@ -85,12 +100,12 @@ bool Archive::packFile( const Path& fileName, const Path& compressedFileName )
     }
 
     while( !feof( input ) ) {
-        int read = fread( chunk, 1, CHUNK_SIZE, input );
+        u64 read = fread( chunk, 1, CHUNK_SIZE, input );
         if( read == 0 ) {
             break;
         }
 
-        int compressedSize = compressor->compressToBuffer( chunk, read, compressed, CHUNK_SIZE * 2 );
+        u64 compressedSize = compressor->compressToBuffer( chunk, read, compressed, CHUNK_SIZE * 2 );
 
         m_file->write( &compressedSize, sizeof( compressedSize ) );
         m_file->write( compressed, compressedSize );
@@ -275,7 +290,7 @@ const Archive::sFileInfo* Archive::findFileInfo( const Path& fileName ) const
 }
 
 // ** Archive::createFileInfo
-Archive::sFileInfo* Archive::createFileInfo( const Path& fileName, int offset, int compressedSize, int decompressedSize )
+Archive::sFileInfo* Archive::createFileInfo( const Path& fileName, u64 offset, u64 compressedSize, u64 decompressedSize )
 {
     sFileInfo *entry = DC_NEW sFileInfo( fileName.c_str(), offset, decompressedSize );
     m_files.push_back( entry );
