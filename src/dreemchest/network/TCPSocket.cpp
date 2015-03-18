@@ -44,9 +44,9 @@ TCPSocket::TCPSocket( impl::TCPSocketPrivate* impl ) : m_impl( impl )
 }
 
 // ** TCPSocket::create
-TCPSocket TCPSocket::create( TCPSocketDelegate* delegate )
+TCPSocketPtr TCPSocket::create( TCPSocketDelegate* delegate )
 {
-	return TCPSocket( DC_NEW PosixTCPSocket( delegate ) );
+	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( delegate ) ) );
 }
 
 // ** TCPSocket::operator bool

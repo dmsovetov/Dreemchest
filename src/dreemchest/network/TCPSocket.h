@@ -43,7 +43,7 @@ namespace net {
 
 								//! Constructs a TCPSocket instance.
 								TCPSocket( impl::TCPSocketPrivate* impl = NULL );
-		virtual                 ~TCPSocket( void ) {}
+		virtual					~TCPSocket( void ) {}
 
 								//! Returns true if this socket is valid.
 								operator bool() const;
@@ -55,13 +55,13 @@ namespace net {
 		bool					isServer( void ) const;
 
 		//! Connects to a TCP socket at a given remote address, if address is 0 then starts listening for incomming connections.
-        bool                    connectTo( const NetworkAddress& address, u16 port );
+        bool					connectTo( const NetworkAddress& address, u16 port );
 
 		//! Closes a socket. If performed for server socket - closes a client connection.
-        void                    disconnect( Socket connection = -1 );
+        void					disconnect( Socket connection = -1 );
 
 		//! Reads all incoming data.
-        void                    update( void );
+        void					update( void );
 
 		//! Returns a remote address.
 		const NetworkAddress&	address( void ) const;
@@ -72,10 +72,10 @@ namespace net {
 		\param size Data size to be sent.
 		\param sendTo Connection to send data to (valid only for server sockets).
 		*/
-        u32                     sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const;
+        u32						sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const;
 
 		//! Creates a new TCP socket.
-		static TCPSocket		create( TCPSocketDelegate* delegate = NULL );
+		static TCPSocketPtr		create( TCPSocketDelegate* delegate = NULL );
         
     private:
 

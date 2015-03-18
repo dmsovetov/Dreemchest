@@ -216,7 +216,7 @@ PosixTCPSocket::ClientConnection PosixTCPSocket::acceptConnection( void )
 
 	ClientConnection connection;
 	connection.m_buffer = io::ByteBuffer::create( 4096 );
-	connection.m_socket = dcTCPSocketStrong( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( NULL, socket, addr.sin_addr.s_addr ) ) );
+	connection.m_socket = TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( NULL, socket, addr.sin_addr.s_addr ) ) );
 	connection.m_closed = false;
 
 	return connection;

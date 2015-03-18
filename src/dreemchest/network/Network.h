@@ -47,6 +47,12 @@ namespace net {
     class INetwork;
 	typedef s32 Socket;
 
+	//! TCP socket strong ptr.
+	typedef StrongPtr<TCPSocket> TCPSocketPtr;
+
+	//! TCP socket weak ptr.
+	typedef WeakPtr<TCPSocket> TCPSocketWPtr;
+
     //! A helper class to represent a network address.
     class NetworkAddress {
     public:

@@ -55,7 +55,7 @@ namespace net {
 
 		//! Client connection helper struct.
 		struct ClientConnection {
-			dcTCPSocketStrong	m_socket;	//!< Client socket.
+			TCPSocketPtr		m_socket;	//!< Client socket.
 			io::ByteBufferPtr	m_buffer;	//!< Incoming buffer data.
 			bool				m_closed;	//!< Flag that indicates this connection is closed.
 

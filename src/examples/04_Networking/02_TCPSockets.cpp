@@ -85,13 +85,13 @@ public:
 	//! Called when a server socket has accepted an incomming connection.
 	virtual void handleConnectionAccepted( TCPSocket* sender, TCPSocket* socket )
 	{
-		net::log::msg( "Client connected, remote address %s, socket %d\n", socket->address().toString(), socket );
+		net::log::msg( "Client connected, remote address %s\n", socket->address().toString() );
 	}
 
 	//! Called when client socket is closed.
 	virtual void handleConnectionClosed( TCPSocket* sender, TCPSocket* socket )
 	{
-		net::log::msg( "Client disconnected, socket %d\n", socket->address().toString() );
+		net::log::msg( "Client disconnected, remote address %s\n", socket->address().toString() );
 	}
 
 	Application* m_application;
@@ -111,16 +111,16 @@ class Server : public ApplicationDelegate {
 		Network network;
 
 		// Connect to a remote server
-		TCPSocket socket = connectToServer( application );
+		TCPSocketPtr socket = connectToServer( application, 20000 );
 		
 		// If failed to connect - start server
-		if( !socket ) {
+		if( socket == NULL ) {
 			net::log::msg( "Failed to connect to server - launching a new one...\n" );
-			socket = startServer( application );
+			socket = startServer( application, 20000 );
 		}
 
 		while( true ) {
-			socket.update();
+			socket->update();
 		}
 
 		// Now quit
@@ -128,23 +128,19 @@ class Server : public ApplicationDelegate {
     }
 
 	// This method connects to a remote socket.
-	TCPSocket connectToServer( Application* application )
+	TCPSocketPtr connectToServer( Application* application, u16 port )
 	{
 		// Create a TCP socket.
-		TCPSocket socket = TCPSocket::create( new TCPEventHandler( application ) );
-
-		if( !socket ) {
-			return socket;
-		}
+		TCPSocketPtr socket = TCPSocket::create( new TCPEventHandler( application ) );
 
 		// Connect to localhost server
-		if( !socket.connectTo( NetworkAddress::Localhost, 10000 ) ) {
-			return TCPSocket();
+		if( !socket->connectTo( NetworkAddress::Localhost, port ) ) {
+			return TCPSocketPtr();
 		}
 
 		// Send message to server
 		const char* msg = "Hello!";
-		socket.sendTo( msg, strlen( msg ) );
+		socket->sendTo( msg, strlen( msg ) );
 
 		// Check for incomming data.
 		net::log::msg( "Waiting for server response...\n" );
@@ -153,19 +149,13 @@ class Server : public ApplicationDelegate {
 	}
 
 	// This method starts a TCP server
-	TCPSocket startServer( Application* application )
+	TCPSocketPtr startServer( Application* application, u16 port )
 	{
 		// Create a TCP socket.
-		TCPSocket socket = TCPSocket::create( new TCPEventHandler( application ) );
-
-		if( !socket ) {
-			net::log::error( "Failed to start server\n" );
-			application->quit();
-			return TCPSocket();
-		}
+		TCPSocketPtr socket = TCPSocket::create( new TCPEventHandler( application ) );
 
 		// Do not pass a remote address to create a server socket and listen for connections.
-		socket.connectTo( NetworkAddress::Null, 10000 );
+		socket->connectTo( NetworkAddress::Null, port );
 
 		// Check for incomming data.
 		net::log::msg( "Waiting for connections...\n" );
