@@ -69,9 +69,9 @@ u64 Stream::readString( String& str ) const
 }
 
 // ** Stream::writeString
-u64 Stream::writeString( const char* str )
+u64 Stream::writeString( CString str )
 {
-    long result = 0;
+    u64 result = 0;
     u32 length = ( u32 )strlen( str );
 
     result += write( &length, sizeof( length ) );

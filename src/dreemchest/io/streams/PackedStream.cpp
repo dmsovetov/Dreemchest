@@ -71,8 +71,8 @@ void PackedStream::setPosition( u64 offset, SeekOrigin origin )
 {
 	DC_BREAK_IF( m_file == NULL );
 
-	long currentPos = position();
-	long targetPos	= 0;
+	u64 currentPos = position();
+	u64 targetPos	= 0;
 
 	switch( origin ) {
     case SeekCur: targetPos = currentPos  + offset;     break;
@@ -115,7 +115,7 @@ u64 PackedStream::length( void ) const
 // ** PackedStream::readFile
 u64 PackedStream::readFile( u8 *buffer, u64 size )
 {
-    int bytesRead = readFromBuffer( buffer, size );
+    u64 bytesRead = readFromBuffer( buffer, size );
     DC_BREAK_IF( bytesRead > size );
 
     // ** Output buffer is full

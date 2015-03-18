@@ -44,7 +44,7 @@ void RasterizerState::setAs( RenderStateValue value )
     m_fillMode   = value;
     m_cullMode   = value;
     m_alphaFunc  = value;
-    m_alphaRef   = (int)value;
+    m_alphaRef   = (float)value;
     m_scissor    = value;
     m_red        = value;
     m_green      = value;

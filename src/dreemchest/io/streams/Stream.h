@@ -69,7 +69,7 @@ namespace io {
         virtual u64             readString( String& str ) const;
 
         //! Writes a string to a stream.
-        virtual u64             writeString( const char* str );
+        virtual u64             writeString( CString str );
 
         //! Reads data from stream.
         /*!
