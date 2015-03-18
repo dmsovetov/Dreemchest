@@ -11,3 +11,6 @@ if Has( 'platform' ):
 
 if Has( 'renderer' ):
 	examples.dirs( '02_Renderer/*' )
+	
+if Has( 'network' ):
+	examples.dirs( '04_Networking/*' )
