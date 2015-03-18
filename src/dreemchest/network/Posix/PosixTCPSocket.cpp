@@ -154,7 +154,7 @@ sockaddr_in PosixTCPSocket::toSockaddr( const NetworkAddress& address, u16 port 
     sockaddr_in addr;
 
     addr.sin_addr.s_addr = address ? ( u32 )address : INADDR_ANY;
-	addr.sin_port        = htons( (short)port );
+	addr.sin_port        = htons( ( u16 )port );
 	addr.sin_family      = AF_INET;
 
     return addr;

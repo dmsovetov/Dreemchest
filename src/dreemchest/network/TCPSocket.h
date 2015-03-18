@@ -33,38 +33,45 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	namespace impl {
-		class TCPSocketPrivate;
-	} // namespace impl
+	BeginPrivateInterface( TCPSocket )
+		InterfaceMethod( const NetworkAddress&	address( void ) const )
+		InterfaceMethod( Socket	socket( void ) const )
+		InterfaceMethod( bool	isServer( void ) const )
+		InterfaceMethod( bool	isValid( void ) const )
+		InterfaceMethod( bool	connectTo( const NetworkAddress& address, u16 port ) )
+		InterfaceMethod( void   disconnect( Socket connection = -1 ) )
+		InterfaceMethod( void	update( void ) )
+		InterfaceMethod( u32	sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const )
+	EndPrivateInterface
 
     //! TCP socket class.
     class TCPSocket : public RefCounted {
     public:
 
-								//! Constructs a TCPSocket instance.
-								TCPSocket( impl::TCPSocketPrivate* impl = NULL );
-		virtual					~TCPSocket( void ) {}
+									//! Constructs a TCPSocket instance.
+									TCPSocket( impl::TCPSocketPrivate* impl = NULL );
+		virtual						~TCPSocket( void ) {}
 
-								//! Returns true if this socket is valid.
-								operator bool() const;
+									//! Returns true if this socket is valid.
+									operator bool() const;
 
 		//! Returns a socket handle.
-		Socket					socket( void ) const;
+		Socket						socket( void ) const;
 
 		//! Returns true if this is a server socket.
-		bool					isServer( void ) const;
+		bool						isServer( void ) const;
 
 		//! Connects to a TCP socket at a given remote address, if address is 0 then starts listening for incomming connections.
-        bool					connectTo( const NetworkAddress& address, u16 port );
+        bool						connectTo( const NetworkAddress& address, u16 port );
 
 		//! Closes a socket. If performed for server socket - closes a client connection.
-        void					disconnect( Socket connection = -1 );
+        void						disconnect( Socket connection = -1 );
 
 		//! Reads all incoming data.
-        void					update( void );
+        void						update( void );
 
 		//! Returns a remote address.
-		const NetworkAddress&	address( void ) const;
+		const NetworkAddress&		address( void ) const;
 
 		//! Sends data to socket.
 		/*
@@ -72,15 +79,15 @@ namespace net {
 		\param size Data size to be sent.
 		\param sendTo Connection to send data to (valid only for server sockets).
 		*/
-        u32						sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const;
+        u32							sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const;
 
 		//! Creates a new TCP socket.
-		static TCPSocketPtr		create( TCPSocketDelegate* delegate = NULL );
+		static TCPSocketPtr			create( TCPSocketDelegate* delegate = NULL );
         
     private:
 
 		//! Socket implementation.
-		StrongPtr<impl::TCPSocketPrivate>	m_impl;
+		impl::TCPSocketPrivatePtr	m_impl;
     };
 
 	//! TCP socket event delegate.
@@ -107,30 +114,6 @@ namespace net {
 		//! Handles a remote connection closed.
 		virtual void			handleConnectionClosed( TCPSocket* sender, TCPSocket* socket ) {}
 	};
-
-	namespace impl {
-
-		// ** class TCPSocketPrivate
-		class TCPSocketPrivate : public RefCounted {
-		friend class TCPSocket;
-		public:
-
-			virtual							~TCPSocketPrivate( void ) {}
-
-			virtual const NetworkAddress&	address( void ) const = 0;
-			virtual Socket					socket( void ) const = 0;
-			virtual bool					isServer( void ) const = 0;
-			virtual bool					isValid( void ) const = 0;
-			virtual bool					connectTo( const NetworkAddress& address, u16 port ) = 0;
-			virtual void					disconnect( Socket connection = -1 ) = 0;
-			virtual void					update( void ) = 0;
-			virtual u32						sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const = 0;
-
-		protected:
-
-			class TCPSocket*			m_parent;
-		};
-	}
 
 } // namespace net
     

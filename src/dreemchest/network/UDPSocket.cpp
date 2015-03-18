@@ -32,41 +32,43 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** UDPSocket::UDPSocket
-UDPSocket::UDPSocket( bool broadcast ) : m_impl( NULL )
+UDPSocket::UDPSocket( impl::UDPSocketPrivate* impl ) : m_impl( impl )
 {
-    if( m_impl == NULL ) {
-        m_impl = DC_NEW PosixUDPSocket( broadcast );
-    }
-
-    if( m_impl ) {
+    if( m_impl != NULL ) {
         m_impl->m_parent = this;
     }
 }
 
 UDPSocket::~UDPSocket( void )
 {
-    delete m_impl;
+
 }
 
-// ** UDPSocket::Send
-int UDPSocket::Send( const NetworkAddress& address, u16 port, const void *buffer, int size )
+// ** UDPSocket::create
+UDPSocketPtr UDPSocket::create( UDPSocketDelegate* delegate, bool broadcast )
+{
+	return UDPSocketPtr( DC_NEW UDPSocket( DC_NEW PosixUDPSocket( delegate, broadcast ) ) );
+}
+
+// ** UDPSocket::send
+u32 UDPSocket::send( const NetworkAddress& address, u16 port, const void *buffer, u32 size )
 {
     DC_CHECK_IMPL( -1 )
-    return m_impl->Send( address, port, buffer, size );
+    return m_impl->send( address, port, buffer, size );
 }
 
-// ** UDPSocket::Listen
-bool UDPSocket::Listen( u16 port )
+// ** UDPSocket::listen
+bool UDPSocket::listen( u16 port )
 {
     DC_CHECK_IMPL( false )
-    return m_impl->Listen( port );
+    return m_impl->listen( port );
 }
 
-// ** UDPSocket::Update
-void UDPSocket::Update( void )
+// ** UDPSocket::update
+void UDPSocket::update( void )
 {
     DC_CHECK_IMPL()
-    m_impl->Update();
+    m_impl->update();
 }
 
 } // namespace net

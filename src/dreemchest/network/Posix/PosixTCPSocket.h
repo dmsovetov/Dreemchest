@@ -76,13 +76,23 @@ namespace net {
 		//! List of incoming connections.
 		typedef List<ClientConnection>	ClientSocketsList;
 
-		dcTCPSocketDelegateStrong	m_delegate;
+		//! TCP socket event delegate.
+		TCPSocketDelegatePtr	m_delegate;
+
+		//! Socket handle.
         Socket						m_socket;
-        String						m_host;
+
+      //  String						m_host;
+		//! Flag indicating that socket is listening for incomming connections.
         bool						m_isServer;
+
+		//! Socket receive buffer.
 		io::ByteBufferPtr			m_buffer;
+
+		//! Socket address.
         NetworkAddress				m_address;
 
+		//! List of client connections.
         ClientSocketsList			m_clientSockets;
     };
     

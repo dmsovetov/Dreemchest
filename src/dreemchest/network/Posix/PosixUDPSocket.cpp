@@ -24,17 +24,22 @@
 
  **************************************************************************/
 
-#include    "PosixUDPSocket.h"
+#include "PosixUDPSocket.h"
+#include "../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
 // ** PosixUDPSocket::PosixUDPSocket
-PosixUDPSocket::PosixUDPSocket( bool broadcast )
+PosixUDPSocket::PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast ) : m_delegate( delegate )
 {
     m_socket = socket( AF_INET, SOCK_DGRAM, 0 );
-    m_buffer = DC_NEW u8[MaxUDPPacketSize];
+    m_buffer = io::ByteBuffer::create( 4096 );
+
+	if( m_delegate == NULL ) {
+		m_delegate = UDPSocketDelegatePtr( DC_NEW UDPSocketDelegate );
+	}
 
 	PosixNetwork::setSocketNonBlocking( m_socket );
 
@@ -47,12 +52,11 @@ PosixUDPSocket::PosixUDPSocket( bool broadcast )
 
 PosixUDPSocket::~PosixUDPSocket( void )
 {
-    delete m_buffer;
     PosixNetwork::closeSocket( m_socket );
 }
 
-// ** PosixUDPSocket::Send
-int PosixUDPSocket::Send( const NetworkAddress& address, u16 port, const void *buffer, int size )
+// ** PosixUDPSocket::send
+u32 PosixUDPSocket::send( const NetworkAddress& address, u16 port, const void *buffer, u32 size )
 {
     // ** Format address
     sockaddr_in dest;
@@ -62,17 +66,18 @@ int PosixUDPSocket::Send( const NetworkAddress& address, u16 port, const void *b
 	dest.sin_family      = AF_INET;
 
     // ** Send datagram
-    int result = sendto( m_socket, ( const char* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
+    s32 result = sendto( m_socket, ( const char* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
     if( result == -1 ) {
         log::warn( "PosixUDPSocket::Send : failed to send data to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
         DC_BREAK;
+		return 0;
     }
 
     return result;
 }
 
-// ** PosixUDPSocket::Listen
-bool PosixUDPSocket::Listen( u16 port )
+// ** PosixUDPSocket::listen
+bool PosixUDPSocket::listen( u16 port )
 {
     // ** Format address
     sockaddr_in addr;
@@ -82,38 +87,34 @@ bool PosixUDPSocket::Listen( u16 port )
     addr.sin_port        = htons( port );
 
     //** Bind address
-    int result = bind( m_socket, ( sockaddr* )&addr, sizeof( addr ) );
+    s32 result = bind( m_socket, ( sockaddr* )&addr, sizeof( addr ) );
     if( result == -1 ) {
-		DC_BREAK;
-    //    m_parent->DispatchEvent( UDPSocketEvent::Failed, UDPSocketEvent::OnFailed() );
+		m_delegate->handleListenFailure( m_parent );
         return false;
     }
 
-	DC_BREAK;
- //   m_parent->DispatchEvent( UDPSocketEvent::Listening, UDPSocketEvent::OnListening() );
-    
+	m_delegate->handleListenSuccess( m_parent );
     return true;
 }
 
-// ** PosixUDPSocket::Update
-void PosixUDPSocket::Update( void )
+// ** PosixUDPSocket::update
+void PosixUDPSocket::update( void )
 {
     sockaddr_in addr;
     socklen_t   addrlen = sizeof( addr );
     
-    int size = recvfrom( m_socket, ( char* )m_buffer, MaxUDPPacketSize, 0, ( sockaddr* )&addr, &addrlen );
+    s32 size = recvfrom( m_socket, ( s8* )m_buffer->buffer(), m_buffer->length(), 0, ( sockaddr* )&addr, &addrlen );
     if( size <= 0 ) {
 	#if defined( DC_PLATFORM_WINDOWS )
 		if( WSAGetLastError() != WSAEWOULDBLOCK ) { DC_BREAK; }
 	#else
 		if( errno != EAGAIN ) { DC_BREAK; }
 	#endif
-
         return;
     }
 
-	DC_BREAK;
-//    m_parent->DispatchEvent( UDPSocketEvent::Data, UDPSocketEvent::OnData( addr.sin_addr.s_addr, m_buffer, size ) );
+	NetworkAddress remoteAddress( addr.sin_addr.s_addr );
+	m_delegate->handleReceivedData( m_parent, remoteAddress, m_buffer->buffer(), m_buffer->length() );
 }
 
 } // namespace net

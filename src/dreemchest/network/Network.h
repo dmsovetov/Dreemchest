@@ -43,6 +43,8 @@ namespace net {
 
 	class TCPSocketDelegate;
 	class TCPSocket;
+	class UDPSocketDelegate;
+	class UDPSocket;
 
     class INetwork;
 	typedef s32 Socket;
@@ -50,8 +52,14 @@ namespace net {
 	//! TCP socket strong ptr.
 	typedef StrongPtr<TCPSocket> TCPSocketPtr;
 
-	//! TCP socket weak ptr.
-	typedef WeakPtr<TCPSocket> TCPSocketWPtr;
+	//! TCP socket event delegate ptr.
+	typedef StrongPtr<TCPSocketDelegate> TCPSocketDelegatePtr;
+
+	//! UDP socket strong ptr.
+	typedef StrongPtr<UDPSocket> UDPSocketPtr;
+
+	//! UDP socket event delegate ptr.
+	typedef StrongPtr<UDPSocketDelegate> UDPSocketDelegatePtr;
 
     //! A helper class to represent a network address.
     class NetworkAddress {
@@ -124,9 +132,6 @@ namespace net {
     };
     
 } // namespace net
-
-	DC_DECLARE_PTRS( net::TCPSocketDelegate, TCPSocketDelegate )
-	DC_DECLARE_PTRS( net::TCPSocket, TCPSocket )
     
 DC_END_DREEMCHEST
 

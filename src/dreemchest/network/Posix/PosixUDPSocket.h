@@ -35,24 +35,27 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
     // ** class PosixUDPSocket
-    class PosixUDPSocket : public IUDPSocket {
-
-        enum { MaxUDPPacketSize = 256 };
-
+    class PosixUDPSocket : public impl::UDPSocketPrivate {
     public:
 
-                            PosixUDPSocket( bool broadcast );
-        virtual             ~PosixUDPSocket( void );
+								PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast );
+        virtual					~PosixUDPSocket( void );
 
         // ** IUDPSocket
-        virtual int         Send( const NetworkAddress& address, u16 port, const void *buffer, int size );
-        virtual bool        Listen( u16 port );
-        virtual void        Update( void );
+        virtual u32				send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
+        virtual bool			listen( u16 port );
+        virtual void			update( void );
 
     private:
 
-        int                 m_socket;
-        u8*               m_buffer;
+		//! Socket handle.
+        Socket					m_socket;
+
+		//! Socket event delegate.
+		UDPSocketDelegatePtr	m_delegate;
+
+		//! Socket receive buffer.
+		io::ByteBufferPtr		m_buffer;
     };
     
 } // namespace net
