@@ -77,7 +77,7 @@ namespace io {
         void                    trimFromRight( u64 size );
 
         //! Creates an empty byte buffer.
-        static ByteBufferPtr    create( void );
+        static ByteBufferPtr    create( u64 size = 0 );
 
         //! Creates a byte buffer from data.
         static ByteBufferPtr    createWithData( const u8* pointer, u64 size );

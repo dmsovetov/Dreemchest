@@ -38,7 +38,10 @@ ByteBuffer::ByteBuffer( const u8* pointer, u64 size ) : m_position( 0 )
     }
     
     m_buffer.resize( size );
-    memcpy( &m_buffer[0], pointer, size );
+
+	if( pointer ) {
+		memcpy( &m_buffer[0], pointer, size );
+	}
 }
 
 ByteBuffer::~ByteBuffer( void )
@@ -47,9 +50,9 @@ ByteBuffer::~ByteBuffer( void )
 }
 
 // ** ByteBuffer::create
-ByteBufferPtr ByteBuffer::create( void )
+ByteBufferPtr ByteBuffer::create( u64 size )
 {
-    return ByteBufferPtr( new ByteBuffer( NULL, 0 ) );
+    return ByteBufferPtr( new ByteBuffer( NULL, size ) );
 }
 
 // ** ByteBuffer::createWithData
