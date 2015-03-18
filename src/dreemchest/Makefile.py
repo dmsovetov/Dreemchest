@@ -11,7 +11,7 @@ if Has( 'threads' ):
 #############################     IO        #############################
 
 if Has( 'io' ):
-	core.dirs( 'io', 'streams' )
+	core.dirs( 'io', 'io/streams' )
 	core.files(
 	  'io/serialization/BinaryStorage.cpp'
 	, 'io/serialization/BinaryStorage.h'
@@ -39,6 +39,14 @@ if Has( 'io' ):
 		, 'io/processors/ZlibBufferCompressor.h'
 		)
 		core.linkExternal( zlib )
+		
+############################    Network       ###########################
+
+if Has( 'network' ):
+	core.dirs( 'network', 'network/Posix' )
+	
+	if Windows:
+		core.linkExternal( Library( 'Winsock2', True ) )
 	
 ############################     Event        ###########################
 
