@@ -113,7 +113,7 @@ void TextStorage::read( CString key, u8& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( u8 )v;
 }
 
 // ** TextStorage::read
@@ -121,7 +121,7 @@ void TextStorage::read( CString key, s8& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( s8 )v;
 }
 
 // ** TextStorage::read
@@ -129,7 +129,7 @@ void TextStorage::read( CString key, u16& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( u16 )v;
 }
 
 // ** TextStorage::read
@@ -137,7 +137,7 @@ void TextStorage::read( CString key, s16& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( s16 )v;
 }
 
 // ** TextStorage::read
@@ -145,7 +145,7 @@ void TextStorage::read( CString key, u32& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( u32 )v;
 }
 
 // ** TextStorage::read
@@ -153,7 +153,7 @@ void TextStorage::read( CString key, s32& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( s32 )v;
 }
 
 // ** TextStorage::read
@@ -161,7 +161,7 @@ void TextStorage::read( CString key, u64& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( u64 )v;
 }
 
 // ** TextStorage::read
@@ -169,7 +169,7 @@ void TextStorage::read( CString key, s64& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( s64 )v;
 }
 
 // ** TextStorage::read
@@ -177,7 +177,7 @@ void TextStorage::read( CString key, f32& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( f32 )v;
 }
 
 // ** TextStorage::read
@@ -185,7 +185,7 @@ void TextStorage::read( CString key, f64& value ) const
 {
     double v;
     readNumber( key, v );
-    value = v;
+    value = ( f64 )v;
 }
 
 // ** TextStorage::read
