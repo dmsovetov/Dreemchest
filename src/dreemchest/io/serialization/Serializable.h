@@ -185,6 +185,7 @@ namespace io {
     //! Base class for all serializable data structs.
     class Serializable {
 
+		ClassEnableCloning( Serializable )
         ClassEnableTypeInfo( Serializable )
 
     public:
