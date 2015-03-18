@@ -1,2 +1,2 @@
-python C:\Python27\Scripts\yap Windows --source ../src --output ../projects/dreemchest.win --name dreemchest --io=yes --event=yes
+python -m Pygling configure --output ../projects/ --source ../src --name dreemchest --io=yes --event=yes --platform Windows
 pause

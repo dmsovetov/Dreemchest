@@ -26,7 +26,7 @@ if Has( 'event' ):
 if Has( 'platform' ):
 	core.dirs( 'platform', 'platform/$(PLATFORM)' )
 
-	if platform == 'MacOS':
+	if MacOS:
 		core.linkExternal( Library( 'Cocoa', True ) )
 
 #############################   Renderer    #############################
@@ -37,7 +37,7 @@ if Has( 'renderer' ):
 	if core.linkExternal( Library( Get( 'renderer' ), True ) ):
 		core.dirs( 'renderer/$(RENDERER)', 'renderer/$(RENDERER)/$(PLATFORM)' )
 
-		if platform == 'iOS':
+		if iOS:
 			core.linkExternal( Library( 'QuartzCore', True ) )
 
 #############################   Sound engine    #############################

@@ -4,9 +4,9 @@ if Has( 'platform' ):
 	examples.dirs( '01_Platform/*' )
 	examples.dirs( '03_IO/*' )
 
-	if platform == 'iOS':
+	if iOS:
 		examples.linkExternal( Library( 'Foundation', True ), Library( 'UIKit', True ) )
-	elif platform == 'MacOS':
+	elif MacOS:
 		examples.linkExternal( Library( 'Cocoa', True ), Library( 'QuartzCore', True ) )
 
 if Has( 'renderer' ):
