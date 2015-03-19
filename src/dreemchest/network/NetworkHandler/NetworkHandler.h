@@ -27,12 +27,55 @@
 #ifndef		__DC_Network_NetworkHandler_H__
 #define		__DC_Network_NetworkHandler_H__
 
-#include    "../Network.h"
+#include "PacketParser.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
+	//! Basic network handler.
+	class NetworkHandler : public RefCounted {
+	public:
+
+							//! Constructs NetworkHandler instance.
+							NetworkHandler( void );
+
+		//! Updates network handler.
+		virtual void		update( void );
+
+	protected:
+
+		//! Sends a packet.
+		void				sendPacket( TCPSocket* socket, NetworkPacket* packet );
+
+		//! Processes a received data from client.
+		virtual void		processReceivedData( TCPSocket* socket, TCPStream* stream );
+
+	private:
+
+		//! Test packet.
+		struct TestPacket : public NetworkPacket {
+			ClassEnableTypeId( TestPacket );
+			ClassEnableCloning( TestPacket );
+
+			bool	m_flag;
+			s32		m_counter;
+			f32		m_number;
+			String	m_message;
+
+			IoBeginSerializer
+				IoField( m_flag )
+				IoField( m_counter )
+				IoField( m_number )
+				IoField( m_message )
+			IoEndSerializer
+		};
+
+		//! Packet parser.
+		PacketParser		m_packetParser;
+	};
+
+/*
 	class INetworkPacket : public io::Serializable {
 	public:
 	};

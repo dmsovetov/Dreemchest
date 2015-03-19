@@ -27,8 +27,9 @@
 #ifndef		__DC_Network_NetworkClientHandler_H__
 #define		__DC_Network_NetworkClientHandler_H__
 
-#include	"NetworkHandler.h"
-#include    "TimeSync.h"
+#include "NetworkHandler.h"
+#include "../Sockets/TCPSocket.h"
+//#include    "TimeSync.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -36,32 +37,58 @@ namespace net {
 
     // ** class NetworkClientHandler
     class NetworkClientHandler : public NetworkHandler {
-
-        DC_DECLARE_IS( NetworkClientHandler, ClientHandler, this )
-
+	friend class ClientSocketDelegate;
     public:
 
-                            NetworkClientHandler( dcContext ctx );
-        virtual             ~NetworkClientHandler( void );
+                            
 
-        int                 GetServerTime( void ) const;
+  //      int                 GetServerTime( void ) const;
 
-        bool                Connect( const NetworkAddress& address, u16 port );
+   //     bool                Connect( const NetworkAddress& address, u16 port );
 
-        // ** NetworkClientHandler
-        virtual bool        Update( int dt );
-
-    protected:
+		//! Creates a new NetworkClientHandler instance and connects to server.
+		static NetworkClientHandlerPtr	create( const NetworkAddress& address, u16 port );
 
         // ** NetworkHandler
-        virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
-        virtual void        ProcessConnection( const NetworkAddress& address );
+        virtual void					update( void );
 
-    private:
+	protected:
 
-        TimeSync            m_timeSync;
-        int                 m_serverTime;
+										//! Constructs NetworkClientHandler instance.
+										NetworkClientHandler( TCPSocketPtr socket );
+
+	private:
+
+		//! Client socket.
+		TCPSocketPtr					m_socket;
+
+//    protected:
+
+        // ** NetworkHandler
+    //    virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
+   //     virtual void        ProcessConnection( const NetworkAddress& address );
+
+ //   private:
+
+ //       TimeSync            m_timeSync;
+ //       int                 m_serverTime;
     };
+
+	//! Client socket handler.
+	class ClientSocketDelegate : public TCPSocketDelegate {
+	friend class NetworkClientHandler;
+	public:
+
+		//! Handles a socket disconnection.
+		virtual void			handleClosed( TCPSocket* sender );
+
+		//! Handles a received data.
+		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
+
+	private:
+
+		NetworkClientHandler*	m_clientHandler;
+	};
     
 } // namespace net
     

@@ -27,44 +27,77 @@
 #ifndef		__DC_Network_NetworkServerHandler_H__
 #define		__DC_Network_NetworkServerHandler_H__
 
-#include	"NetworkHandler.h"
+#include "NetworkHandler.h"
+#include "../Sockets/TCPSocketListener.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    // ** class NetworkServerHandler
+	//! Server-side network handler.
     class NetworkServerHandler : public NetworkHandler {
-
-        DC_DECLARE_IS( NetworkServerHandler, ServerHandler, this )
-
+	friend class ServerSocketDelegate;
     public:
 
-                            NetworkServerHandler( dcContext ctx );
-        virtual             ~NetworkServerHandler( void );
+        // ** NetworkHandler
+        virtual void					update( void );
 
-        bool                Start( u16 port );
+		//! Creates a new server network handler and binds it to specified port.
+		static NetworkServerHandlerPtr	create( u16 port );
+
+	protected:
+
+										//! Constructs NetworkServerHandler instance.
+										NetworkServerHandler( const TCPSocketListenerPtr& socketListener );
+
+		//! Processes a client connection.
+		virtual void					processClientConnection( TCPSocket* socket );
+
+		//! Processes a client disconnection.
+		virtual void					processClientDisconnection( TCPSocket* socket );
+
+	private:
+
+		//! TCP socket listener.
+		TCPSocketListenerPtr			m_socketListener;
+
+//    protected:
+
+//        virtual void        ProcessAcceptedConnection( const NetworkAddress& address, int connection );
+//        virtual void        ProcessClosedConnection( int connection );
 
         // ** NetworkHandler
-        virtual bool        Update( int dt );
+ //       virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
 
-    protected:
+//    private:
 
-        virtual void        ProcessAcceptedConnection( const NetworkAddress& address, int connection );
-        virtual void        ProcessClosedConnection( int connection );
+//        void                OnConnectionAccepted( const dcEvent e );
+//        void                OnConnectionClosed( const dcEvent e );
 
-        // ** NetworkHandler
-        virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
+//    private:
 
-    private:
-
-        void                OnConnectionAccepted( const dcEvent e );
-        void                OnConnectionClosed( const dcEvent e );
-
-    private:
-
-        int                 m_time;
+   //     int                 m_time;
     };
+
+	//! Server socket listener handler.
+	class ServerSocketDelegate : public TCPSocketListenerDelegate {
+	friend class NetworkServerHandler;
+	public:
+
+		//! Handles incoming data from client.
+		virtual void			handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream );
+
+		//! Handles accepted incomming connection.
+		virtual void			handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket );
+
+		//! Handles a remote connection closed.
+		virtual void			handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket );
+
+	private:
+
+		//! Parent network server handler.
+		NetworkServerHandler*	m_serverHandler;
+	};
     
 } // namespace net
 

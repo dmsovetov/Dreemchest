@@ -25,12 +25,56 @@
  **************************************************************************/
 
 #include "NetworkHandler.h"
+#include "../Sockets/TCPSocket.h"
+#include "../Sockets/TCPStream.h"
+#include "../../io/streams/ByteBuffer.h"
+
+DC_BEGIN_DREEMCHEST
+
+namespace net {
+
+// ** NetworkHandler::NetworkHandler
+NetworkHandler::NetworkHandler( void )
+{
+	m_packetParser.registerPacketType<TestPacket>();
+}
+
+// ** NetworkHandler::sendPacket
+void NetworkHandler::sendPacket( TCPSocket* socket, NetworkPacket* packet )
+{
+	io::ByteBufferPtr buffer = io::ByteBuffer::create();
+
+	// ** Write packet to binary stream
+	u32 bytesWritten = m_packetParser.writeToStream( packet, buffer );
+
+	// ** Send binary data to socket
+	s32 bytesSent = socket->sendTo( buffer->buffer(), buffer->length() );
+	DC_BREAK_IF( bytesWritten != bytesSent );
+}
+
+// ** NetworkHandler::update
+void NetworkHandler::update( void )
+{
+}
+
+// ** NetworkHandler::processReceivedData
+void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
+{
+	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
+}
+
+} // namespace net
+
+DC_END_DREEMCHEST
+
+/*
+#include "NetworkHandler.h"
 //#include    "PacketFormatter.h"
 //#include    "RemoteProcedure.h"
 
-#include "../../io/streams/ByteBuffer.h"
-#include "../TCPSocket.h"
-#include "../UDPSocket.h"
+//#include "../../io/streams/ByteBuffer.h"
+//#include "../TCPSocket.h"
+//#include "../UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -105,8 +149,6 @@ void NetworkHandler::ProcessFailure( void )
 // ** NetworkHandler::ProcessReceivedPacket
 void NetworkHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, Socket connection )
 {
-	DC_BREAK
-/*
     switch( packetId ) {
     case sSendFile::PacketId:   {
                                     DC_ENSURE_TYPE( packet, sSendFile )
@@ -125,7 +167,6 @@ void NetworkHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *
     default:                    DispatchEvent( NetworkHandlerEvent::PacketReceived, NetworkHandlerEvent::OnPacketReceived( packetId, packet, connection, address ) );
                                 break;
     }
-   */
 }
 
 // ** NetworkHandler::ListenDatagrams
@@ -314,7 +355,7 @@ int NetworkHandler::GetMaxPacketPayload( void ) const
 {
     return MaxPacketBufferSize - 12;
 }
-/*
+
 // ** NetworkHandler::OnDataReceived
 void NetworkHandler::OnDataReceived( const dcEvent e )
 {
@@ -342,7 +383,7 @@ void NetworkHandler::OnDataReceived( const dcEvent e )
         bytesParsed += bytesToCopy;
     }
 }
-*/
+
 // ** NetworkHandler::ParseReceivedPackets
 void NetworkHandler::ParseReceivedPackets( io::ByteBufferPtr& stream, const NetworkAddress& address, int connection )
 {
@@ -364,7 +405,7 @@ void NetworkHandler::ParseReceivedPackets( io::ByteBufferPtr& stream, const Netw
     stream->trimFromLeft( stream->position() );
     stream->setPosition( 0 );
 }
-/*
+
 // ** NetworkHandler::OnDisconnected
 void NetworkHandler::OnDisconnected( const dcEvent e )
 {
@@ -391,7 +432,8 @@ void NetworkHandler::OnPacketUDP( const dcEvent e )
 
     ProcessReceivedPacket( packetId, packet, ue->m_address, -1 );
 }
-   */
+ 
 } // namespace net
 
 DC_END_DREEMCHEST
+*/

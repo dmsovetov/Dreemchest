@@ -49,6 +49,9 @@ namespace net {
 	class TCPSocketListener;
 	class SocketDescriptor;
 	class TCPStream;
+	class NetworkHandler;
+		class NetworkServerHandler;
+		class NetworkClientHandler;
 
     class INetwork;
 
@@ -72,6 +75,12 @@ namespace net {
 
 	//! TCP socket listener delegate ptr.
 	typedef StrongPtr<TCPSocketListenerDelegate> TCPSocketListenerDelegatePtr;
+
+	//! Server network handler strong ptr.
+	typedef StrongPtr<NetworkServerHandler> NetworkServerHandlerPtr;
+
+	//! Client network handler strong ptr.
+	typedef StrongPtr<NetworkClientHandler> NetworkClientHandlerPtr;
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
@@ -151,6 +160,8 @@ namespace net {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
+	#include "NetworkHandler/NetworkServerHandler.h"
+	#include "NetworkHandler/NetworkClientHandler.h"
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"

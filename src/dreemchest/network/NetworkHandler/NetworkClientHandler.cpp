@@ -24,26 +24,59 @@
 
  **************************************************************************/
 
-#include	"NetworkClientHandler.h"
+#include "NetworkClientHandler.h"
 
-#include    "../TCPSocket.h"
-#include    "../UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
+// -----------------------------------------NetworkClientHandler --------------------------------------- //
+
 // ** NetworkClientHandler::NetworkClientHandler
-NetworkClientHandler::NetworkClientHandler( dcContext ctx ) : NetworkHandler( ctx ), m_serverTime( -1 )
+NetworkClientHandler::NetworkClientHandler( TCPSocketPtr socket ) : m_socket( socket )
 {
 
 }
 
-NetworkClientHandler::~NetworkClientHandler( void )
+// ** NetworkClientHandler::create
+NetworkClientHandlerPtr NetworkClientHandler::create( const NetworkAddress& address, u16 port )
 {
+	ClientSocketDelegate* clientDelegate = DC_NEW ClientSocketDelegate;
+	TCPSocketPtr	      clientSocket   = TCPSocket::connectTo( address, port, clientDelegate );
 
+	if( clientSocket == NULL ) {
+		return NetworkClientHandlerPtr();
+	}
+
+	NetworkClientHandler* clientHandler = DC_NEW NetworkClientHandler( clientSocket );
+	clientDelegate->m_clientHandler     = clientHandler;
+
+	return NetworkClientHandlerPtr( clientHandler );
 }
 
+// ** NetworkClientHandler::update
+void NetworkClientHandler::update( void )
+{
+	NetworkHandler::update();
+	m_socket->update();
+}
+
+
+// -----------------------------------------ClientSocketDelegate --------------------------------------- //
+
+// ** ClientSocketDelegate::handleClosed
+void ClientSocketDelegate::handleClosed( TCPSocket* sender )
+{
+}
+
+// ** ClientSocketDelegate::handleReceivedData
+void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
+{
+	m_clientHandler->processReceivedData( socket, stream );
+}
+
+/*
 // ** NetworkClientHandler::GetServerTime
 int NetworkClientHandler::GetServerTime( void ) const
 {
@@ -103,6 +136,7 @@ bool NetworkClientHandler::Update( int dt )
     m_serverTime += dt;
     return true;
 }
+*/
 
 } // namespace net
 

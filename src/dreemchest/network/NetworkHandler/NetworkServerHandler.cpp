@@ -24,15 +24,75 @@
 
  **************************************************************************/
 
-#include	"NetworkServerHandler.h"
-
-#include    "../TCPSocket.h"
-#include    "../UDPSocket.h"
+#include "NetworkServerHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
+// --------------------------------------- NetworkServerHandler -------------------------------------- //
+
+// ** NetworkServerHandler::NetworkServerHandler
+NetworkServerHandler::NetworkServerHandler( const TCPSocketListenerPtr& socketListener ) : m_socketListener( socketListener )
+{
+}
+
+// ** NetworkServerHandler::create
+NetworkServerHandlerPtr NetworkServerHandler::create( u16 port )
+{
+	ServerSocketDelegate* serverDelegate = DC_NEW ServerSocketDelegate;
+	TCPSocketListenerPtr  socketListener = TCPSocketListener::bindTo( port, serverDelegate );
+
+	if( socketListener == NULL ) {
+		return NetworkServerHandlerPtr();
+	}
+
+	NetworkServerHandler* serverHandler = DC_NEW NetworkServerHandler( socketListener );
+	serverDelegate->m_serverHandler     = serverHandler;
+
+	return NetworkServerHandlerPtr( serverHandler );
+}
+
+// ** NetworkServerHandler::update
+void NetworkServerHandler::update( void )
+{
+	NetworkHandler::update();
+	m_socketListener->update();
+}
+
+// ** NetworkServerHandler::processClientConnection
+void NetworkServerHandler::processClientConnection( TCPSocket* socket )
+{
+	log::verbose( "Client %s connected to server\n", socket->address().toString() );
+}
+
+// ** NetworkServerHandler::processClientDisconnection
+void NetworkServerHandler::processClientDisconnection( TCPSocket* socket )
+{
+	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
+}
+
+// ---------------------------------------- ServerSocketDelegate ------------------------------------//
+
+// ** ServerSocketDelegate::handleReceivedData
+void ServerSocketDelegate::handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
+{
+	m_serverHandler->processReceivedData( socket, stream );
+}
+
+// ** ServerSocketDelegate::handleConnectionAccepted
+void ServerSocketDelegate::handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )
+{
+	m_serverHandler->processClientConnection( socket );
+}
+
+// ** ServerSocketDelegate::handleConnectionClosed
+void ServerSocketDelegate::handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket )
+{
+	m_serverHandler->processClientDisconnection( socket );
+}
+
+/*
 // ** NetworkServerHandler::NetworkServerHandler
 NetworkServerHandler::NetworkServerHandler( void ) : m_time( 0 )
 {
@@ -99,8 +159,6 @@ void NetworkServerHandler::ProcessClosedConnection( int connection )
 // ** NetworkServerHandler::ProcessReceivedPacket
 void NetworkServerHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection )
 {
-	DC_BREAK
-/*
     switch( packetId ) {
     case sTimeSyncPacket::PacketId: {
                                         DC_ENSURE_TYPE( packet, sTimeSyncPacket );
@@ -115,7 +173,6 @@ void NetworkServerHandler::ProcessReceivedPacket( int packetId, const INetworkPa
     default:    NetworkHandler::ProcessReceivedPacket( packetId, packet, address, connection );
                 break;
     }
-*/
 }
 
 // ** NetworkServerHandler::OnConnectionAccepted
@@ -130,7 +187,7 @@ void NetworkServerHandler::OnConnectionAccepted( const dcEvent e )
 void NetworkServerHandler::OnConnectionClosed( const dcEvent e )
 {
     ProcessClosedConnection( static_cast<dcTCPSocketEvent>( e )->m_connection );
-}
+}*/
 
 } // namespace net
 
