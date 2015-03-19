@@ -48,8 +48,8 @@ namespace net {
 
     private:
 
-		//! Socket handle.
-        Socket					m_socket;
+		//! Socket descriptor.
+        SocketDescriptor		m_socket;
 
 		//! Socket event delegate.
 		UDPSocketDelegatePtr	m_delegate;

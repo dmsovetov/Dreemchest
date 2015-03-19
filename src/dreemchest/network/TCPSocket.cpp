@@ -69,11 +69,11 @@ const NetworkAddress& TCPSocket::address( void ) const
 	return m_impl->address();
 }
 
-// ** TCPSocket::socket
-Socket TCPSocket::socket( void ) const
+// ** TCPSocket::descriptor
+SocketDescriptor TCPSocket::descriptor( void ) const
 {
 	DC_CHECK_IMPL( INVALID_SOCKET );
-	return m_impl->socket();
+	return m_impl->descriptor();
 }
 
 // ** TCPSocket::connectTo
@@ -84,7 +84,7 @@ bool TCPSocket::connectTo( const NetworkAddress& address, u16 port )
 }
 
 // ** TCPSocket::disconnect
-void TCPSocket::disconnect( Socket connection )
+void TCPSocket::disconnect( SocketDescriptor connection )
 {
     DC_CHECK_IMPL();
     m_impl->disconnect( connection );
@@ -98,7 +98,7 @@ void TCPSocket::update( void )
 }
 
 // ** TCPSocket::sendTo
-u32 TCPSocket::sendTo( const void* buffer, u32 size, Socket connection ) const
+u32 TCPSocket::sendTo( const void* buffer, u32 size, SocketDescriptor connection ) const
 {
     DC_CHECK_IMPL( -1 );
     return m_impl->sendTo( buffer, size, connection );

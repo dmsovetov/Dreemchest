@@ -38,18 +38,18 @@ namespace net {
 	class PosixTCPSocket : public impl::TCPSocketPrivate {
     public:
 
-										PosixTCPSocket( TCPSocketDelegate* delegate, Socket socket = INVALID_SOCKET, const NetworkAddress& address = NetworkAddress::Null );
+										PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor socket = INVALID_SOCKET, const NetworkAddress& address = NetworkAddress::Null );
         virtual							~PosixTCPSocket( void );
 
         // ** ITCPSocket
 		virtual const NetworkAddress&	address( void ) const;
-		virtual Socket					socket( void ) const;
+		virtual SocketDescriptor		descriptor( void ) const;
 		virtual bool					isServer( void ) const;
 		virtual bool					isValid( void ) const;
         virtual bool					connectTo( const NetworkAddress& address, u16 port );
-        virtual void					disconnect( Socket connection = -1 );
+        virtual void					disconnect( SocketDescriptor connection = -1 );
         virtual void					update( void );
-        virtual u32						sendTo( const void* buffer, u32 size, Socket sendTo ) const;
+        virtual u32						sendTo( const void* buffer, u32 size, SocketDescriptor sendTo ) const;
 
     private:
 
@@ -77,12 +77,11 @@ namespace net {
 		typedef List<ClientConnection>	ClientSocketsList;
 
 		//! TCP socket event delegate.
-		TCPSocketDelegatePtr	m_delegate;
+		TCPSocketDelegatePtr		m_delegate;
 
-		//! Socket handle.
-        Socket						m_socket;
+		//! Socket descriptor.
+        SocketDescriptor			m_socket;
 
-      //  String						m_host;
 		//! Flag indicating that socket is listening for incomming connections.
         bool						m_isServer;
 

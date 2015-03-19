@@ -47,7 +47,7 @@ namespace net {
 	class UDPSocket;
 
     class INetwork;
-	typedef s32 Socket;
+	typedef s32 SocketDescriptor;
 
 	//! TCP socket strong ptr.
 	typedef StrongPtr<TCPSocket> TCPSocketPtr;

@@ -52,10 +52,10 @@ namespace net {
         virtual CString					hostName( void ) const;
 
 		// ** PosixNetwork
-		static void						setSocketAddressReuse( Socket socket );
-		static void						setSocketNonBlocking( Socket socket );
-		static void						setSocketBroadcast( Socket socket );
-		static void						closeSocket( Socket socket );
+		static void						setSocketAddressReuse( SocketDescriptor socket );
+		static void						setSocketNonBlocking( SocketDescriptor socket );
+		static void						setSocketBroadcast( SocketDescriptor socket );
+		static void						closeSocket( SocketDescriptor socket );
 		static s32						lastError( void );
 
     private:

@@ -261,7 +261,7 @@ const char* PosixNetwork::hostName( void ) const
 }
 
 // ** PosixNetwork::setSocketNonBlocking
-void PosixNetwork::setSocketNonBlocking( Socket socket )
+void PosixNetwork::setSocketNonBlocking( SocketDescriptor socket )
 {
 	s32 result = 0;
 
@@ -276,7 +276,7 @@ void PosixNetwork::setSocketNonBlocking( Socket socket )
 }
 
 // ** PosixNetwork::setSocketBroadcast
-void PosixNetwork::setSocketBroadcast( Socket socket )
+void PosixNetwork::setSocketBroadcast( SocketDescriptor socket )
 {
 	s32 result = 0;
 
@@ -291,7 +291,7 @@ void PosixNetwork::setSocketBroadcast( Socket socket )
 }
 
 // ** PosixNetwork::closeSocket
-void PosixNetwork::closeSocket( Socket socket )
+void PosixNetwork::closeSocket( SocketDescriptor socket )
 {
 #if defined( DC_PLATFORM_WINDOWS )
 	closesocket( socket );
@@ -301,7 +301,7 @@ void PosixNetwork::closeSocket( Socket socket )
 }
 
 // ** PosixNetwork::setSocketAddressReuse
-void PosixNetwork::setSocketAddressReuse( Socket socket )
+void PosixNetwork::setSocketAddressReuse( SocketDescriptor socket )
 {
 #if defined( DC_PLATFORM_WINDOWS )
 	s8 one = 1;

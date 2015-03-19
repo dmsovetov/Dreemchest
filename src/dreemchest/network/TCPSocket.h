@@ -35,13 +35,13 @@ namespace net {
 
 	BeginPrivateInterface( TCPSocket )
 		InterfaceMethod( const NetworkAddress&	address( void ) const )
-		InterfaceMethod( Socket	socket( void ) const )
-		InterfaceMethod( bool	isServer( void ) const )
-		InterfaceMethod( bool	isValid( void ) const )
-		InterfaceMethod( bool	connectTo( const NetworkAddress& address, u16 port ) )
-		InterfaceMethod( void   disconnect( Socket connection = -1 ) )
-		InterfaceMethod( void	update( void ) )
-		InterfaceMethod( u32	sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const )
+		InterfaceMethod( SocketDescriptor		descriptor( void ) const )
+		InterfaceMethod( bool					isServer( void ) const )
+		InterfaceMethod( bool					isValid( void ) const )
+		InterfaceMethod( bool					connectTo( const NetworkAddress& address, u16 port ) )
+		InterfaceMethod( void					disconnect( SocketDescriptor connection = -1 ) )
+		InterfaceMethod( void					update( void ) )
+		InterfaceMethod( u32					sendTo( const void* buffer, u32 size, SocketDescriptor sendTo = -1 ) const )
 	EndPrivateInterface
 
     //! TCP socket class.
@@ -55,8 +55,8 @@ namespace net {
 									//! Returns true if this socket is valid.
 									operator bool() const;
 
-		//! Returns a socket handle.
-		Socket						socket( void ) const;
+		//! Returns a socket descriptor.
+		SocketDescriptor			descriptor( void ) const;
 
 		//! Returns true if this is a server socket.
 		bool						isServer( void ) const;
@@ -65,7 +65,7 @@ namespace net {
         bool						connectTo( const NetworkAddress& address, u16 port );
 
 		//! Closes a socket. If performed for server socket - closes a client connection.
-        void						disconnect( Socket connection = -1 );
+        void						disconnect( SocketDescriptor connection = -1 );
 
 		//! Reads all incoming data.
         void						update( void );
@@ -79,7 +79,7 @@ namespace net {
 		\param size Data size to be sent.
 		\param sendTo Connection to send data to (valid only for server sockets).
 		*/
-        u32							sendTo( const void* buffer, u32 size, Socket sendTo = -1 ) const;
+        u32							sendTo( const void* buffer, u32 size, SocketDescriptor sendTo = -1 ) const;
 
 		//! Creates a new TCP socket.
 		static TCPSocketPtr			create( TCPSocketDelegate* delegate = NULL );
@@ -97,13 +97,13 @@ namespace net {
 		virtual					~TCPSocketDelegate( void ) {}
 
 		//! Handles a successfull socket connection.
-		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address, Socket socket ) {}
+		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address, SocketDescriptor socket ) {}
 
 		//! Handles a socket connection failure.
-		virtual void			handleConnectionFailed( TCPSocket* sender, Socket socket ) {}
+		virtual void			handleConnectionFailed( TCPSocket* sender, SocketDescriptor socket ) {}
 
 		//! Handles a socket disconnection.
-		virtual void			handleDisconnected( TCPSocket* sender, Socket socket ) {}
+		virtual void			handleDisconnected( TCPSocket* sender, SocketDescriptor socket ) {}
 
 		//! Handles a received data.
 		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, const u8 *data, u32 size ) {}
