@@ -168,31 +168,6 @@ sockaddr_in PosixTCPSocket::toSockaddr( const NetworkAddress& address, u16 port 
 u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 {
 	return m_stream->write( buffer, size );
-/*
-    DC_BREAK_IF( !m_socket.isValid() );
-
-    u32       bytesSent = 0;
-    const u8* data      = ( u8* )buffer;
-
-    while( bytesSent < size ) {
-        s32 result = send( m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
-
-        if( result == -1 ) {
-		#ifdef DC_PLATFORM_WINDOWS
-			if( WSAGetLastError() == WSAEWOULDBLOCK ) continue;
-		#else
-			if( errno == EAGAIN ) continue;
-			log::error( "PosixTCPSocket::sendTo : %s\n", strerror( errno ) );
-		#endif
-
-			DC_BREAK
-            return -1;
-        }
-
-        bytesSent += result;
-    }
-
-    return bytesSent;*/
 }
 
 // ** PosixTCPSocket::listenConnections
@@ -221,7 +196,6 @@ PosixTCPSocket::ClientConnection PosixTCPSocket::acceptConnection( void )
     }
 
 	ClientConnection connection;
-	connection.m_buffer = io::ByteBuffer::create(400);
 	connection.m_socket = TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( NULL, socket, addr.sin_addr.s_addr ) ) );
 	connection.m_closed = false;
 

@@ -60,7 +60,6 @@ namespace net {
 		//! Client connection helper struct.
 		struct ClientConnection {
 			TCPSocketPtr		m_socket;	//!< Client socket.
-			io::ByteBufferPtr	m_buffer;	//!< Incoming buffer data.
 			bool				m_closed;	//!< Flag that indicates this connection is closed.
 
 			bool				operator == ( const ClientConnection& other ) const { return m_socket == other.m_socket; }

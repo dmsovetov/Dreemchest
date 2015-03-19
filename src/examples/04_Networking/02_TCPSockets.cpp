@@ -79,9 +79,16 @@ public:
 			const char* response = "pong";
 			socket->sendTo( response, strlen( response ) );
 		} else {
+			static int counter = 0;
+
 			const char* response = "ping";
 			socket->sendTo( response, strlen( response ) );
 			thread::Thread::sleep( 1000 );
+
+			counter++;
+			if( counter >= 5 ) {
+				socket->close();
+			}
 		}
 	}
 
@@ -121,8 +128,10 @@ class Server : public ApplicationDelegate {
 
 		TCPSocketPtr client = connectToServer( application, 20000 );
 
-		while( client->isValid() ) {
-			client->update();
+		while( true ) {
+			if( client->isValid() ) {
+				client->update();
+			}
 		}
 /*
 		// Connect to a remote server
