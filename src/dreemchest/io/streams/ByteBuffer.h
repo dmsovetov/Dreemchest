@@ -82,7 +82,7 @@ namespace io {
         //! Creates a byte buffer from data.
         static ByteBufferPtr    createWithData( const u8* pointer, u64 size );
 
-    private:
+    protected:
 
                                 //! Constructs a memory stream from data.
                                 ByteBuffer( const u8* pointer, u64 size );
