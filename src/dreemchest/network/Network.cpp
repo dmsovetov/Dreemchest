@@ -97,7 +97,8 @@ NetworkAddress::operator u32( void ) const
 // ** NetworkAddress::toString
 CString NetworkAddress::toString( void ) const
 {
-    return inet_ntoa( *( in_addr* )&m_address );
+	CString result = inet_ntoa( *( in_addr* )&m_address );
+    return result;
 }
 
 } // namespace net

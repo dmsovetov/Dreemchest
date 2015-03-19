@@ -62,6 +62,27 @@ bool TCPSocket::isServer( void ) const
 	return m_impl->isServer();
 }
 
+// ** TCPSocket::isValid
+bool TCPSocket::isValid( void ) const
+{
+	DC_CHECK_IMPL( false );
+	return m_impl->isValid();
+}
+
+// ** TCPSocket::stream
+const TCPStream* TCPSocket::stream( void ) const
+{
+	DC_CHECK_IMPL( NULL );
+	return m_impl->stream();
+}
+
+// ** TCPSocket::stream
+TCPStream* TCPSocket::stream( void )
+{
+	DC_CHECK_IMPL( NULL );
+	return m_impl->stream();
+}
+
 // ** TCPSocket::address
 const NetworkAddress& TCPSocket::address( void ) const
 {
@@ -105,10 +126,10 @@ void TCPSocket::update( void )
 }
 
 // ** TCPSocket::sendTo
-u32 TCPSocket::sendTo( const void* buffer, u32 size, const SocketDescriptor& connection ) const
+u32 TCPSocket::sendTo( const void* buffer, u32 size )
 {
     DC_CHECK_IMPL( -1 );
-    return m_impl->sendTo( buffer, size, connection );
+    return m_impl->sendTo( buffer, size );
 }
 
 } // namespace net

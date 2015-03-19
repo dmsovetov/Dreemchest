@@ -24,21 +24,18 @@
 
  **************************************************************************/
 
-#include	"PosixTCPSocket.h"
-
-#include    "../TCPSocket.h"
-#include	"../../../io/streams/ByteBuffer.h"
+#include "PosixTCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
 // ** PosixTCPSocket::PosixTCPSocket
-PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor socket, const NetworkAddress& address )
-	: m_delegate( delegate ), m_socket( socket ), m_isServer( false ), m_buffer( NULL ), m_address( address )
+PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& socket, const NetworkAddress& address )
+	: m_delegate( delegate ), m_socket( socket ), m_isServer( false ), m_stream( NULL ), m_address( address )
 {
 	m_parent = NULL;
-	m_buffer = io::ByteBuffer::create(400);
+	m_stream = DC_NEW TCPStream( &m_socket );
 
 	if( m_delegate == NULL ) {
 		m_delegate = new TCPSocketDelegate;
@@ -72,6 +69,18 @@ bool PosixTCPSocket::isValid( void ) const
 bool PosixTCPSocket::isServer( void ) const
 {
 	return m_isServer;
+}
+
+// ** PosixTCPSocket::stream
+const TCPStream* PosixTCPSocket::stream( void ) const
+{
+	return m_stream.get();
+}
+
+// ** PosixTCPSocket::stream
+TCPStream* PosixTCPSocket::stream( void )
+{
+	return m_stream.get();
 }
 
 // ** PosixTCPSocket::descriptor
@@ -114,9 +123,9 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 	}
 
     if( result != -1 ) {
-		m_delegate->handleConnected( m_parent, m_address, m_socket );
+		m_delegate->handleConnected( m_parent, m_address );
     } else {
-		m_delegate->handleConnectionFailed( m_parent, m_socket );
+		m_delegate->handleConnectionFailed( m_parent );
         return false;
     }
 
@@ -133,11 +142,11 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 // ** PosixTCPSocket::close
 void PosixTCPSocket::close( void )
 {
-	m_delegate->handleClosed( m_parent, m_socket );
+	m_delegate->handleClosed( m_parent );
 
 	m_socket.close();
 
-	for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {\
+	for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
 		i->m_closed = true;
 		i->m_socket = TCPSocketPtr();
 	}
@@ -156,15 +165,17 @@ sockaddr_in PosixTCPSocket::toSockaddr( const NetworkAddress& address, u16 port 
 }
 
 // ** PosixTCPSocket::sendTo
-u32 PosixTCPSocket::sendTo( const void* buffer, u32 size, const SocketDescriptor& connection ) const
+u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 {
+	return m_stream->write( buffer, size );
+/*
     DC_BREAK_IF( !m_socket.isValid() );
 
     u32       bytesSent = 0;
     const u8* data      = ( u8* )buffer;
 
     while( bytesSent < size ) {
-        s32 result = send( connection.isValid() ? connection : m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
+        s32 result = send( m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
 
         if( result == -1 ) {
 		#ifdef DC_PLATFORM_WINDOWS
@@ -181,7 +192,7 @@ u32 PosixTCPSocket::sendTo( const void* buffer, u32 size, const SocketDescriptor
         bytesSent += result;
     }
 
-    return bytesSent;
+    return bytesSent;*/
 }
 
 // ** PosixTCPSocket::listenConnections
@@ -231,24 +242,29 @@ void PosixTCPSocket::update( void )
     if( m_isServer ) {
         updateServerSocket();
     } else {
-        updateClientSocket();
+		pullDataFromStream( m_parent );
     }
 }
 
-// ** PosixTCPSocket::updateClientSocket
-void PosixTCPSocket::updateClientSocket( void )
+// ** PosixTCPSocket::pullDataFromStream
+void PosixTCPSocket::pullDataFromStream( TCPSocket* socket )
 {
-	DC_BREAK_IF( !m_socket.isValid() );
-    
-	s32 length = 0;
+	s32				 result = 0;
+	TCPStream*		 stream = socket->stream();
+	TCPStream::State state  = TCPStream::Idle;
 
-	while( (length = recv( m_socket, ( s8* )m_buffer->buffer(), m_buffer->length() - 1, 0 )) != -1 ) {
-		if( length == 0 ) {
+	while( (state = stream->pull()) ) {
+		if( state == TCPStream::Closed ) {
 			close();
 			break;
 		}
 
-		m_delegate->handleReceivedData( m_parent, m_parent, m_buffer->buffer(), length );
+		m_delegate->handleReceivedData( m_parent, socket, stream );
+		stream->flush();
+
+		if( !isValid() ) {
+			break;
+		}
 	}
 }
 
@@ -290,21 +306,9 @@ void PosixTCPSocket::updateServerSocket( void )
     // ** Process connections
     for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
         ClientConnection&		clientConnection = *i;
-		TCPSocket*				clientSocket = clientConnection.m_socket.get();
-		const SocketDescriptor&	clientHandle = clientSocket->descriptor();
 
-        if( FD_ISSET( clientHandle, &readSet ) ) {
-            u32 length = 0;
-
-			while( (length = recv( clientHandle, ( s8* )clientConnection.m_buffer->buffer(), clientConnection.m_buffer->length() - 1, 0 )) != -1 ) {
-                if( length == 0 ) {
-					m_delegate->handleConnectionClosed( m_parent, clientSocket );
-					closeConnection( clientConnection );
-                    break;
-                }
-
-				m_delegate->handleReceivedData( m_parent, clientSocket, clientConnection.m_buffer->buffer(), length );
-            }
+		if( FD_ISSET( clientConnection.m_socket->descriptor(), &readSet ) ) {
+			pullDataFromStream( clientConnection.m_socket.get() );
         }
     }
 

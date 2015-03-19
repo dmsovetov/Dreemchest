@@ -37,12 +37,14 @@ namespace net {
 		InterfaceMethod( const NetworkAddress&		address( void ) const )
 		InterfaceMethod( const SocketDescriptor&	descriptor( void ) const )
 		InterfaceMethod( SocketDescriptor&			descriptor( void ) )
+		InterfaceMethod( const TCPStream*			stream( void ) const )
+		InterfaceMethod( TCPStream*					stream( void ) )
 		InterfaceMethod( bool						isServer( void ) const )
 		InterfaceMethod( bool						isValid( void ) const )
 		InterfaceMethod( bool						connectTo( const NetworkAddress& address, u16 port ) )
 		InterfaceMethod( void						close( void ) )
 		InterfaceMethod( void						update( void ) )
-		InterfaceMethod( u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo = -1 ) const )
+		InterfaceMethod( u32						sendTo( const void* buffer, u32 size ) )
 	EndPrivateInterface
 
     //! TCP socket class.
@@ -63,6 +65,9 @@ namespace net {
 		//! Returns true if this is a server socket.
 		bool						isServer( void ) const;
 
+		//! Returns true if this socket is valid.
+		bool						isValid( void ) const;
+
 		//! Connects to a TCP socket at a given remote address, if address is 0 then starts listening for incomming connections.
         bool						connectTo( const NetworkAddress& address, u16 port );
 
@@ -75,13 +80,16 @@ namespace net {
 		//! Returns a remote address.
 		const NetworkAddress&		address( void ) const;
 
+		//! Returns a TCP stream owned by this socket.
+		const TCPStream*			stream( void ) const;
+		TCPStream*					stream( void );
+
 		//! Sends data to socket.
 		/*
 		\param buffer Data to be sent.
 		\param size Data size to be sent.
-		\param sendTo Connection to send data to (valid only for server sockets).
 		*/
-        u32							sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo = -1 ) const;
+        u32							sendTo( const void* buffer, u32 size );
 
 		//! Creates a new TCP socket.
 		static TCPSocketPtr			create( TCPSocketDelegate* delegate = NULL );
@@ -99,16 +107,16 @@ namespace net {
 		virtual					~TCPSocketDelegate( void ) {}
 
 		//! Handles a successfull socket connection.
-		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address, const SocketDescriptor& socket ) {}
+		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address ) {}
 
 		//! Handles a socket connection failure.
-		virtual void			handleConnectionFailed( TCPSocket* sender, const SocketDescriptor& socket ) {}
+		virtual void			handleConnectionFailed( TCPSocket* sender ) {}
 
 		//! Handles a socket disconnection.
-		virtual void			handleClosed( TCPSocket* sender, const SocketDescriptor& socket ) {}
+		virtual void			handleClosed( TCPSocket* sender ) {}
 
 		//! Handles a received data.
-		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, const u8 *data, u32 size ) {}
+		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream ) {}
 
 		//! Handles accepted incomming connection.
 		virtual void			handleConnectionAccepted( TCPSocket* sender, TCPSocket* socket ) {}

@@ -24,6 +24,9 @@
 
  **************************************************************************/
 
+#ifndef __DC_Network_SocketDescriptor_H__
+#define __DC_Network_SocketDescriptor_H__
+
 #include "../Network.h"
 
 DC_BEGIN_DREEMCHEST
@@ -81,3 +84,5 @@ namespace net {
 } // namespace net
 
 DC_END_DREEMCHEST
+
+#endif	/*	!__DC_Network_SocketDescriptor_H__	*/

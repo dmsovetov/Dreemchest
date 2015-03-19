@@ -24,6 +24,9 @@
 
  **************************************************************************/
 
+#ifndef __DC_Network_TCPStream_H__
+#define __DC_Network_TCPStream_H__
+
 #include "SocketDescriptor.h"
 #include "../../io/streams/ByteBuffer.h"
 
@@ -35,14 +38,20 @@ namespace net {
 	class TCPStream : public io::ByteBuffer {
 	public:
 
+		//! Socket pull result
+		enum State { Idle, Received, Closed };
+
 								//! Constructs a TCPStream instance.
-								TCPStream( const SocketDescriptor& descriptor );
+								TCPStream( SocketDescriptor* descriptor );
 
 		//! Returns a TCP socket descriptor.
-		const SocketDescriptor&	descriptor( void ) const;
+		const SocketDescriptor*	descriptor( void ) const;
 
-        //! Reads data from stream.
-        virtual u64				read( void* buffer, u64 size ) const;
+		//! Pulls incoming data from TCP stream.
+		State					pull( void );
+
+		//! Flushes all received data.
+		void					flush( void );
 
         //! Writes data from stream.
         virtual u64				write( const void* buffer, u64 size );
@@ -50,9 +59,11 @@ namespace net {
 	private:
 
 		//! TCP stream socket.
-		SocketDescriptor	m_socket;
+		SocketDescriptor*	m_socket;
 	};
 
 } // namespace net
 
 DC_END_DREEMCHEST
+
+#endif	/*	!__DC_Network_TCPStream_H__	*/

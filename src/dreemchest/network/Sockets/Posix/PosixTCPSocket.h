@@ -28,7 +28,8 @@
 #define		__DC_Network_PosixTCPSocket_H__
 
 #include    "../TCPSocket.h"
-#include    "PosixNetwork.h"
+#include	"../TCPStream.h"
+#include	"PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,19 +39,21 @@ namespace net {
 	class PosixTCPSocket : public impl::TCPSocketPrivate {
     public:
 
-										PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor socket = INVALID_SOCKET, const NetworkAddress& address = NetworkAddress::Null );
+										PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& socket = SocketDescriptor::Invalid, const NetworkAddress& address = NetworkAddress::Null );
         virtual							~PosixTCPSocket( void );
 
         // ** ITCPSocket
 		virtual const NetworkAddress&	address( void ) const;
 		virtual const SocketDescriptor&	descriptor( void ) const;
 		virtual SocketDescriptor&		descriptor( void );
+		virtual TCPStream*				stream( void );
+		virtual const TCPStream*		stream( void ) const;
 		virtual bool					isServer( void ) const;
 		virtual bool					isValid( void ) const;
         virtual bool					connectTo( const NetworkAddress& address, u16 port );
         virtual void					close( void );
         virtual void					update( void );
-        virtual u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo ) const;
+        virtual u32						sendTo( const void* buffer, u32 size );
 
     private:
 
@@ -65,7 +68,7 @@ namespace net {
 
         sockaddr_in             toSockaddr( const NetworkAddress& address, u16 port ) const;
         void                    updateServerSocket( void );
-        void                    updateClientSocket( void );
+        void                    pullDataFromStream( TCPSocket* socket );
 
         // ** Server socket
         bool					listenConnections( void );
@@ -87,7 +90,7 @@ namespace net {
         bool						m_isServer;
 
 		//! Socket receive buffer.
-		io::ByteBufferPtr			m_buffer;
+		TCPStreamPtr				m_stream;
 
 		//! Socket address.
         NetworkAddress				m_address;

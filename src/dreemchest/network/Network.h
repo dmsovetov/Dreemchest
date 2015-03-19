@@ -46,6 +46,7 @@ namespace net {
 	class UDPSocketDelegate;
 	class UDPSocket;
 	class SocketDescriptor;
+	class TCPStream;
 
     class INetwork;
 
@@ -60,6 +61,9 @@ namespace net {
 
 	//! UDP socket event delegate ptr.
 	typedef StrongPtr<UDPSocketDelegate> UDPSocketDelegatePtr;
+
+	//! TCP stream strong ptr.
+	typedef StrongPtr<TCPStream> TCPStreamPtr;
 
     //! A helper class to represent a network address.
     class NetworkAddress {
@@ -138,6 +142,7 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"
+	#include "Sockets/TCPStream.h"
 #endif
 
 #endif	/*	!__DC_Network_H__	*/

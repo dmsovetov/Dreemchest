@@ -25,32 +25,77 @@
  **************************************************************************/
 
 #include "TCPStream.h"
+#include "Posix/PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
 // ** TCPStream::TCPStream
-TCPStream::TCPStream( const SocketDescriptor& socket ) : ByteBuffer( NULL, 0 ), m_socket( socket )
+TCPStream::TCPStream( SocketDescriptor* socket ) : ByteBuffer( NULL, 0 ), m_socket( socket )
 {
 }
 
 // ** TCPStream::descriptor
-const SocketDescriptor& TCPStream::descriptor( void ) const
+const SocketDescriptor* TCPStream::descriptor( void ) const
 {
 	return m_socket;
 }
 
-// ** TCPStream::read
-u64 TCPStream::read( void* buffer, u64 size ) const
+// ** TCPStream::pull
+TCPStream::State TCPStream::pull( void )
 {
-	return 0;
+	DC_BREAK_IF( !m_socket->isValid() );
+	DC_BREAK_IF( bytesAvailable() );
+
+	s8  chunk[1];
+	s32 received = 0;
+
+	while( (received = recv( *m_socket, chunk, sizeof( chunk ), 0 )) != -1 ) {
+		if( received == 0 ) {
+			return Closed;
+		}
+
+		ByteBuffer::write( chunk, received );
+	}
+
+	setPosition( 0 );
+	return bytesAvailable() ? Received : Idle;
+}
+
+// ** TCPStream::flush
+void TCPStream::flush( void )
+{
+	trimFromLeft( length() );
 }
 
 // ** TCPStream::write
 u64 TCPStream::write( const void* buffer, u64 size )
 {
-	return 0;
+    DC_BREAK_IF( !m_socket->isValid() );
+
+    u32       bytesSent = 0;
+    const u8* data      = ( u8* )buffer;
+
+    while( bytesSent < size ) {
+        s32 result = send( *m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
+
+        if( result == -1 ) {
+		#ifdef DC_PLATFORM_WINDOWS
+			if( WSAGetLastError() == WSAEWOULDBLOCK ) continue;
+		#else
+			if( errno == EAGAIN ) continue;
+			log::error( "PosixTCPSocket::sendTo : %s\n", strerror( errno ) );
+		#endif
+
+			DC_BREAK
+            return -1;
+        }
+
+        bytesSent += result;
+    }
+
+    return bytesSent;
 }
 
 } // namespace net

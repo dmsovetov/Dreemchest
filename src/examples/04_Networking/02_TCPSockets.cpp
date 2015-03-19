@@ -30,6 +30,8 @@
 // Include a Network module header.
 #include <network/Network.h>
 
+#include <threads/Threads.h>
+
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
@@ -46,39 +48,40 @@ public:
 	TCPEventHandler( Application* app ) : m_application( app ) {}
 
 	//! Called each time the socket is successfully connected to an address.
-	virtual void handleConnected( TCPSocket* sender, const NetworkAddress& address, const SocketDescriptor& socket )
+	virtual void handleConnected( TCPSocket* sender, const NetworkAddress& address )
 	{
-		net::log::msg( "Connected to %s, socket %d\n", address.toString(), socket );
+		net::log::msg( "Connected to %s\n", address.toString() );
 	}
 
 	//! Called when socket failed to connect.
-	virtual void handleConnectionFailed( TCPSocket* sender, const SocketDescriptor& socket )
+	virtual void handleConnectionFailed( TCPSocket* sender )
 	{
 		net::log::msg( "Failed to connect\n" );
 	}
 
 	//! Called when socket is closed.
-	virtual void handleClosed( TCPSocket* sender, const SocketDescriptor& socket )
+	virtual void handleClosed( TCPSocket* sender  )
 	{
-		net::log::msg( "Socket disconnected, socket %d\n", socket );
+		net::log::msg( "Socket disconnected\n" );
 	}
 
 	//! Called when socket has received data.
-	virtual void handleReceivedData( TCPSocket* sender, TCPSocket* socket, const u8 *data, u32 size )
+	virtual void handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 	{
-		net::log::msg( "%d bytes of data recived from %s:", size, socket->address().toString() );
-		for( int i = 0; i < size; i++ ) {
-			net::log::msg( " %c", ( s8 )data[i] );
+		net::log::msg( "%d bytes of data recived from %s:", ( int )stream->bytesAvailable(), socket->address().toString() );
+		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
+			net::log::msg( " %c", ( s8 )stream->buffer()[i] );
 		}
 		printf( "\n" );
 
 		// Send a response
 		if( sender->isServer() ) {
-			const char* response = "hi there!";
-			sender->sendTo( response, strlen( response ), socket->descriptor() );
+			const char* response = "pong";
+			socket->sendTo( response, strlen( response ) );
 		} else {
-			sender->close();
-			m_application->quit();
+			const char* response = "ping";
+			socket->sendTo( response, strlen( response ) );
+			thread::Thread::sleep( 1000 );
 		}
 	}
 
@@ -97,6 +100,8 @@ public:
 	Application* m_application;
 };
 
+thread::Thread* serverThread = NULL;
+
 // Application delegate is used to handle an events raised by application instance.
 class Server : public ApplicationDelegate {
 
@@ -110,6 +115,16 @@ class Server : public ApplicationDelegate {
 		//! Create a network interface
 		Network network;
 
+		TCPSocketPtr server = startServer( application, 20000 );
+		serverThread = thread::Thread::create();
+		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
+
+		TCPSocketPtr client = connectToServer( application, 20000 );
+
+		while( client->isValid() ) {
+			client->update();
+		}
+/*
 		// Connect to a remote server
 		TCPSocketPtr socket = connectToServer( application, 20000 );
 		
@@ -122,10 +137,18 @@ class Server : public ApplicationDelegate {
 		while( true ) {
 			socket->update();
 		}
-
+*/
 		// Now quit
 		application->quit();
     }
+
+	void updateServer( void* userData )
+	{
+		while( true ) {
+			reinterpret_cast<TCPSocket*>( userData )->update();
+			thread::Thread::sleep( 1 );
+		}
+	}
 
 	// This method connects to a remote socket.
 	TCPSocketPtr connectToServer( Application* application, u16 port )
@@ -139,7 +162,7 @@ class Server : public ApplicationDelegate {
 		}
 
 		// Send message to server
-		const char* msg = "Hello!";
+		const char* msg = "ping";
 		socket->sendTo( msg, strlen( msg ) );
 
 		// Check for incomming data.
