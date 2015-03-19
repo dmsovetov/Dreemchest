@@ -57,6 +57,7 @@ namespace net {
 
 		// ** PosixNetwork
 		static s32						lastError( void );
+		static sockaddr_in				toSockaddr( const NetworkAddress& address, u16 port );
 
     private:
 

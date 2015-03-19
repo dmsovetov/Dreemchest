@@ -260,6 +260,18 @@ const char* PosixNetwork::hostName( void ) const
     return m_hostName.c_str();
 }
 
+// ** PosixNetwork::toSockaddr
+sockaddr_in PosixNetwork::toSockaddr( const NetworkAddress& address, u16 port )
+{
+    sockaddr_in addr;
+
+    addr.sin_addr.s_addr = address ? ( u32 )address : INADDR_ANY;
+	addr.sin_port        = htons( ( u16 )port );
+	addr.sin_family      = AF_INET;
+
+    return addr;
+}
+
 } // namespace net
 
 DC_END_DREEMCHEST

@@ -24,50 +24,54 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_PosixTCPSocket_H__
-#define		__DC_Network_PosixTCPSocket_H__
-
-#include    "../TCPSocket.h"
-#include	"../TCPStream.h"
-#include	"PosixNetwork.h"
+#include "TCPSocketListener.h"
+#include "Posix/PosixTCPSocketListener.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    //! Berkley socket implementation.
-	class PosixTCPSocket : public impl::TCPSocketPrivate {
-    public:
+// ** TCPSocketListener::TCPSocketListener
+TCPSocketListener::TCPSocketListener( impl::TCPSocketListenerPrivate* impl ) : m_impl( impl )
+{
+	if( m_impl != NULL ) {
+		m_impl->m_parent = this;
+	}
+}
 
-										PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& socket = SocketDescriptor::Invalid, const NetworkAddress& address = NetworkAddress::Null );
-        virtual							~PosixTCPSocket( void );
+// ** TCPSocketListener::update
+void TCPSocketListener::update( void )
+{
+	DC_CHECK_IMPL();
+	m_impl->update();
+}
 
-        // ** ITCPSocket
-		virtual const NetworkAddress&	address( void ) const;
-		virtual const SocketDescriptor&	descriptor( void ) const;
-		virtual bool					isValid( void ) const;
-        virtual bool					connectTo( const NetworkAddress& address, u16 port );
-        virtual void					close( void );
-        virtual void					update( void );
-        virtual u32						sendTo( const void* buffer, u32 size );
+// ** TCPSocketListener::close
+void TCPSocketListener::close( void )
+{
+	DC_CHECK_IMPL();
+	m_impl->close();
+}
 
-    private:
+// ** TCPSocketListener::connectionsCount
+u32 TCPSocketListener::connectionsCount( void ) const
+{
+	DC_CHECK_IMPL( 0 );
+	return m_impl->connectionsCount();
+}
 
-		//! TCP socket event delegate.
-		TCPSocketDelegatePtr		m_delegate;
+// ** TCPSocketListener::bindTo
+TCPSocketListenerPtr TCPSocketListener::bindTo( u16 port, TCPSocketListenerDelegate* delegate )
+{
+	PosixTCPSocketListener* impl = DC_NEW PosixTCPSocketListener( delegate );
+	if( !impl->bindTo( port ) ) {
+		delete impl;
+		return TCPSocketListenerPtr();
+	}
 
-		//! Socket descriptor.
-        SocketDescriptor			m_socket;
+	return TCPSocketListenerPtr( DC_NEW TCPSocketListener( impl ) );
+}
 
-		//! Socket receive buffer.
-		TCPStreamPtr				m_stream;
-
-		//! Socket address.
-        NetworkAddress				m_address;
-    };
-    
 } // namespace net
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Network_PosixTCPSocket_H__	*/

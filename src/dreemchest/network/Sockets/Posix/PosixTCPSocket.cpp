@@ -32,14 +32,11 @@ namespace net {
 
 // ** PosixTCPSocket::PosixTCPSocket
 PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& socket, const NetworkAddress& address )
-	: m_delegate( delegate ), m_socket( socket ), m_isServer( false ), m_stream( NULL ), m_address( address )
+	: m_socket( socket ), m_address( address )
 {
-	m_parent = NULL;
-	m_stream = DC_NEW TCPStream( &m_socket );
-
-	if( m_delegate == NULL ) {
-		m_delegate = new TCPSocketDelegate;
-	}
+	m_parent   = NULL;
+	m_stream   = DC_NEW TCPStream( &m_socket );
+	m_delegate = TCPSocketDelegatePtr( delegate ? delegate : DC_NEW TCPSocketDelegate );
 
     if( m_socket.isValid() ) {
         return;
@@ -65,32 +62,8 @@ bool PosixTCPSocket::isValid( void ) const
 	return m_socket.isValid();
 }
 
-// ** PosixTCPSocket::isServer
-bool PosixTCPSocket::isServer( void ) const
-{
-	return m_isServer;
-}
-
-// ** PosixTCPSocket::stream
-const TCPStream* PosixTCPSocket::stream( void ) const
-{
-	return m_stream.get();
-}
-
-// ** PosixTCPSocket::stream
-TCPStream* PosixTCPSocket::stream( void )
-{
-	return m_stream.get();
-}
-
 // ** PosixTCPSocket::descriptor
 const SocketDescriptor& PosixTCPSocket::descriptor( void ) const
-{
-	return m_socket;
-}
-
-// ** PosixTCPSocket::descriptor
-SocketDescriptor& PosixTCPSocket::descriptor( void )
 {
 	return m_socket;
 }
@@ -109,32 +82,19 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
         return false;
     }
     
-    m_isServer = (address == 0);
     m_address  = address;
 
-	sockaddr_in addr   = toSockaddr( address, port );
-    int         result = -1;
+	sockaddr_in addr = PosixNetwork::toSockaddr( address, port );
 
 	// ** Connect
-	if( !m_isServer ) {
-		result = connect( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
-	} else {
-		result = bind( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
-	}
+	s32 result = connect( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
 
-    if( result != -1 ) {
-		m_delegate->handleConnected( m_parent, m_address );
-    } else {
-		m_delegate->handleConnectionFailed( m_parent );
-        return false;
-    }
+	if( result == SOCKET_ERROR ) {
+		return false;
+	}
 
 	// ** Set non blocking mode
 	m_socket.setNonBlocking();
-
-    if( m_isServer ) {
-        listenConnections();
-    }
 
 	return true;
 }
@@ -143,88 +103,20 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 void PosixTCPSocket::close( void )
 {
 	m_delegate->handleClosed( m_parent );
-
 	m_socket.close();
-
-	for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-		i->m_closed = true;
-		i->m_socket = TCPSocketPtr();
-	}
-}
-
-// ** PosixTCPSocket::toSockaddr
-sockaddr_in PosixTCPSocket::toSockaddr( const NetworkAddress& address, u16 port ) const
-{
-    sockaddr_in addr;
-
-    addr.sin_addr.s_addr = address ? ( u32 )address : INADDR_ANY;
-	addr.sin_port        = htons( ( u16 )port );
-	addr.sin_family      = AF_INET;
-
-    return addr;
 }
 
 // ** PosixTCPSocket::sendTo
 u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 {
-	return m_stream->write( buffer, size );
-}
-
-// ** PosixTCPSocket::listenConnections
-bool PosixTCPSocket::listenConnections( void )
-{
-    s32 result = listen( m_socket, 16 );
-    DC_BREAK_IF( result < 0 );
-
-    return result ? true : false;
-}
-
-// ** PosixTCPSocket::acceptConnection
-PosixTCPSocket::ClientConnection PosixTCPSocket::acceptConnection( void )
-{
-    sockaddr_in addr;
-#if defined( DC_PLATFORM_WINDOWS )
-    s32         size    = sizeof( addr );
-#else
-    socklen_t   size    = sizeof( addr );
-#endif
-    SocketDescriptor socket  = accept( m_socket, ( sockaddr* )&addr, &size );
-
-	if( !socket.isValid() ) {
-        DC_BREAK;
-        return ClientConnection();
-    }
-
-	ClientConnection connection;
-	connection.m_socket = TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( NULL, socket, addr.sin_addr.s_addr ) ) );
-	connection.m_closed = false;
-
-	return connection;
-}
-
-// ** PosixTCPSocket::closeConnection
-void PosixTCPSocket::closeConnection( ClientConnection& connection )
-{
-    ClientSocketsList::iterator i = std::find( m_clientSockets.begin(), m_clientSockets.end(), connection );
-    DC_BREAK_IF( i == m_clientSockets.end() );
-	connection.m_closed = true;
+	return ( u32 )m_stream->write( buffer, size );
 }
 
 // ** PosixTCPSocket::update
 void PosixTCPSocket::update( void )
 {
-    if( m_isServer ) {
-        updateServerSocket();
-    } else {
-		pullDataFromStream( m_parent );
-    }
-}
-
-// ** PosixTCPSocket::pullDataFromStream
-void PosixTCPSocket::pullDataFromStream( TCPSocket* socket )
-{
 	s32				 result = 0;
-	TCPStream*		 stream = socket->stream();
+	TCPStream*		 stream = m_stream.get();
 	TCPStream::State state  = TCPStream::Idle;
 
 	while( (state = stream->pull()) ) {
@@ -233,69 +125,13 @@ void PosixTCPSocket::pullDataFromStream( TCPSocket* socket )
 			break;
 		}
 
-		m_delegate->handleReceivedData( m_parent, socket, stream );
+		m_delegate->handleReceivedData( m_parent, m_parent, stream );
 		stream->flush();
 
 		if( !isValid() ) {
 			break;
 		}
 	}
-}
-
-// ** PosixTCPSocket::updateServerSocket
-void PosixTCPSocket::updateServerSocket( void )
-{
-    int result = 0;
-
-    timeval timeout;
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 0;
-
-    fd_set readSet;
-
-    do {
-        FD_ZERO( &readSet );
-        FD_SET( m_socket, &readSet );
-
-        for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-            FD_SET( i->m_socket->descriptor(), &readSet );
-        }
-
-//      result = select( 0, &readSet, NULL, NULL, &timeout ); // ** Win32
-        result = select( 16, &readSet, NULL, NULL, &timeout );
-    } while( result == -1 );
-
-	if( result < 0 ) {
-		return;
-	}
-
-    // ** Accept connections
-    if( FD_ISSET( m_socket, &readSet ) ) {
-		ClientConnection accepted = acceptConnection();
-        m_clientSockets.push_back( accepted );
-
-		m_delegate->handleConnectionAccepted( m_parent, accepted.m_socket.get() );
-    }
-
-    // ** Process connections
-    for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-        ClientConnection&		clientConnection = *i;
-
-		if( FD_ISSET( clientConnection.m_socket->descriptor(), &readSet ) ) {
-			pullDataFromStream( clientConnection.m_socket.get() );
-        }
-    }
-
-    // ** Remove closed connections
-    for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ) {
-		if( i->m_closed ) {
-            i = m_clientSockets.erase( i );
-        } else {
-            ++i;
-        }
-    }
-
-    DC_BREAK_IF( result < 0 );
 }
 
 } // namespace net

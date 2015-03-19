@@ -39,7 +39,7 @@ namespace net {
 
 								//! Constructs a new socket descritptor
 								SocketDescriptor( s32 socket = -1 );
-								SocketDescriptor( SocketDescriptor& other );
+								SocketDescriptor( const SocketDescriptor& other );
 								~SocketDescriptor( void );
 
 								//! Converts to raw socket handle.
@@ -55,7 +55,7 @@ namespace net {
 		bool					operator == ( const SocketDescriptor& other ) const;
 
 		//! Copies a socket descriptor.
-		const SocketDescriptor&	operator = ( SocketDescriptor& other );
+		const SocketDescriptor&	operator = ( const SocketDescriptor& other );
 
 		//! Sets a socket descriptor from 32-bit integer
 		const SocketDescriptor&	operator = ( s32 socket );
@@ -65,6 +65,9 @@ namespace net {
 
 		//! Closes a socket.
 		void					close( void );
+
+		//! Accepts incoming connection to this socket.
+		SocketDescriptor		accept( NetworkAddress& remoteAddress ) const;			
 
 		//! Enables socket address reuse.
 		bool					enableAddressReuse( void );
@@ -78,7 +81,7 @@ namespace net {
 	private:
 
 		//! Actual socket descriptor.
-		s32						m_socket;
+		mutable s32				m_socket;
 	};
 
 } // namespace net

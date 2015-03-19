@@ -45,7 +45,7 @@ SocketDescriptor::SocketDescriptor( s32 socket ) : m_socket( socket )
 }
 
 // ** SocketDescriptor::SocketDescriptor
-SocketDescriptor::SocketDescriptor( SocketDescriptor& other )
+SocketDescriptor::SocketDescriptor( const SocketDescriptor& other )
 {
 	ActiveCount++;
 
@@ -67,7 +67,7 @@ SocketDescriptor::operator s32( void ) const
 }
 
 // ** SocketDescriptor::operator =
-const SocketDescriptor& SocketDescriptor::operator = ( SocketDescriptor& other )
+const SocketDescriptor& SocketDescriptor::operator = ( const SocketDescriptor& other )
 {
 	m_socket = other.m_socket;
 	other.m_socket = INVALID_SOCKET;
@@ -92,6 +92,24 @@ bool SocketDescriptor::operator == ( const SocketDescriptor& other ) const
 bool SocketDescriptor::isValid( void ) const
 {
 	return m_socket != INVALID_SOCKET;
+}
+
+// ** SocketDescriptor::accept
+SocketDescriptor SocketDescriptor::accept( NetworkAddress& remoteAddress ) const
+{
+    sockaddr_in addr;
+#if defined( DC_PLATFORM_WINDOWS )
+    s32       size = sizeof( addr );
+#else
+    socklen_t size = sizeof( addr );
+#endif
+    SocketDescriptor socket = ::accept( m_socket, ( sockaddr* )&addr, &size );
+
+	if( socket.isValid() ) {
+		remoteAddress = addr.sin_addr.s_addr;
+	}
+
+	return socket;
 }
 
 // ** SocketDescriptor::close

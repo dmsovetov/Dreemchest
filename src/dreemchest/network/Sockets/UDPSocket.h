@@ -59,10 +59,7 @@ namespace net {
 		//! Creates a new UDP socket instance.
 		static UDPSocketPtr	create( UDPSocketDelegate* delegate, bool broadcast );
 
-    private:
-
-		//! UDP socket implementation.
-		impl::UDPSocketPrivatePtr	m_impl;
+		UsePrivateInterface( UDPSocket )
     };
 
 	//! UDP socket event delegate.

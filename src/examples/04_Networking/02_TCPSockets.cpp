@@ -41,26 +41,45 @@ using namespace platform;
 // Open a net namespace.
 using namespace net;
 
+// A delagate class to listen the server socket events.
+class TCPListenerEventHandler : public TCPSocketListenerDelegate {
+public:
+
+	//! Handles accepted incomming connection.
+	virtual void handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )
+	{
+		net::log::msg( "Client connected, remote address %s\n", socket->address().toString() );
+	}
+
+	//! Handles a remote connection closed.
+	virtual void handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket )
+	{
+		net::log::msg( "Client disconnected, remote address %s\n", socket->address().toString() );
+	}
+
+	//! Called when socket has received data.
+	virtual void handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
+	{
+		net::log::msg( "%d bytes of data recived from %s:", ( int )stream->bytesAvailable(), socket->address().toString() );
+		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
+			net::log::msg( " %c", ( s8 )stream->buffer()[i] );
+		}
+		printf( "\n" );
+
+		// Send a response
+		const char* response = "pong";
+		socket->sendTo( response, strlen( response ) );
+	}
+};
+
 // A delegate class to listen the socket events.
 class TCPEventHandler : public TCPSocketDelegate {
 public:
 
 	TCPEventHandler( Application* app ) : m_application( app ) {}
 
-	//! Called each time the socket is successfully connected to an address.
-	virtual void handleConnected( TCPSocket* sender, const NetworkAddress& address )
-	{
-		net::log::msg( "Connected to %s\n", address.toString() );
-	}
-
-	//! Called when socket failed to connect.
-	virtual void handleConnectionFailed( TCPSocket* sender )
-	{
-		net::log::msg( "Failed to connect\n" );
-	}
-
 	//! Called when socket is closed.
-	virtual void handleClosed( TCPSocket* sender  )
+	virtual void handleClosed( TCPSocket* sender )
 	{
 		net::log::msg( "Socket disconnected\n" );
 	}
@@ -74,34 +93,16 @@ public:
 		}
 		printf( "\n" );
 
-		// Send a response
-		if( sender->isServer() ) {
-			const char* response = "pong";
-			socket->sendTo( response, strlen( response ) );
-		} else {
-			static int counter = 0;
+		static int counter = 0;
 
-			const char* response = "ping";
-			socket->sendTo( response, strlen( response ) );
-			thread::Thread::sleep( 1000 );
+		const char* response = "ping";
+		socket->sendTo( response, strlen( response ) );
+		thread::Thread::sleep( 1000 );
 
-			counter++;
-			if( counter >= 5 ) {
-				socket->close();
-			}
+		counter++;
+		if( counter >= 5 ) {
+			socket->close();
 		}
-	}
-
-	//! Called when a server socket has accepted an incomming connection.
-	virtual void handleConnectionAccepted( TCPSocket* sender, TCPSocket* socket )
-	{
-		net::log::msg( "Client connected, remote address %s\n", socket->address().toString() );
-	}
-
-	//! Called when client socket is closed.
-	virtual void handleConnectionClosed( TCPSocket* sender, TCPSocket* socket )
-	{
-		net::log::msg( "Client disconnected, remote address %s\n", socket->address().toString() );
 	}
 
 	Application* m_application;
@@ -122,14 +123,14 @@ class Server : public ApplicationDelegate {
 		//! Create a network interface
 		Network network;
 
-		TCPSocketPtr server = startServer( application, 20000 );
+		TCPSocketListenerPtr server = startServer( application, 20000 );
 		serverThread = thread::Thread::create();
 		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
 
 		TCPSocketPtr client = connectToServer( application, 20000 );
 
 		while( true ) {
-			if( client->isValid() ) {
+			if( client != NULL && client->isValid() ) {
 				client->update();
 			}
 		}
@@ -154,7 +155,7 @@ class Server : public ApplicationDelegate {
 	void updateServer( void* userData )
 	{
 		while( true ) {
-			reinterpret_cast<TCPSocket*>( userData )->update();
+			reinterpret_cast<TCPSocketListener*>( userData )->update();
 			thread::Thread::sleep( 1 );
 		}
 	}
@@ -162,11 +163,10 @@ class Server : public ApplicationDelegate {
 	// This method connects to a remote socket.
 	TCPSocketPtr connectToServer( Application* application, u16 port )
 	{
-		// Create a TCP socket.
-		TCPSocketPtr socket = TCPSocket::create( new TCPEventHandler( application ) );
+		// Connect to remote server
+		TCPSocketPtr socket = TCPSocket::connectTo( NetworkAddress::Localhost, port, new TCPEventHandler( application ) );
 
-		// Connect to localhost server
-		if( !socket->connectTo( NetworkAddress::Localhost, port ) ) {
+		if( socket == NULL ) {
 			return TCPSocketPtr();
 		}
 
@@ -181,13 +181,14 @@ class Server : public ApplicationDelegate {
 	}
 
 	// This method starts a TCP server
-	TCPSocketPtr startServer( Application* application, u16 port )
+	TCPSocketListenerPtr startServer( Application* application, u16 port )
 	{
 		// Create a TCP socket.
-		TCPSocketPtr socket = TCPSocket::create( new TCPEventHandler( application ) );
+		TCPSocketListenerPtr socket = TCPSocketListener::bindTo( port, new TCPListenerEventHandler );
 
-		// Do not pass a remote address to create a server socket and listen for connections.
-		socket->connectTo( NetworkAddress::Null, port );
+		if( socket == NULL ) {
+			return TCPSocketListenerPtr();
+		}
 
 		// Check for incomming data.
 		net::log::msg( "Waiting for connections...\n" );

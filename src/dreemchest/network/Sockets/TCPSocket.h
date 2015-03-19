@@ -36,10 +36,6 @@ namespace net {
 	BeginPrivateInterface( TCPSocket )
 		InterfaceMethod( const NetworkAddress&		address( void ) const )
 		InterfaceMethod( const SocketDescriptor&	descriptor( void ) const )
-		InterfaceMethod( SocketDescriptor&			descriptor( void ) )
-		InterfaceMethod( const TCPStream*			stream( void ) const )
-		InterfaceMethod( TCPStream*					stream( void ) )
-		InterfaceMethod( bool						isServer( void ) const )
 		InterfaceMethod( bool						isValid( void ) const )
 		InterfaceMethod( bool						connectTo( const NetworkAddress& address, u16 port ) )
 		InterfaceMethod( void						close( void ) )
@@ -60,16 +56,9 @@ namespace net {
 
 		//! Returns a socket descriptor.
 		const SocketDescriptor&		descriptor( void ) const;
-		SocketDescriptor&			descriptor( void );
-
-		//! Returns true if this is a server socket.
-		bool						isServer( void ) const;
 
 		//! Returns true if this socket is valid.
 		bool						isValid( void ) const;
-
-		//! Connects to a TCP socket at a given remote address, if address is 0 then starts listening for incomming connections.
-        bool						connectTo( const NetworkAddress& address, u16 port );
 
 		//! Closes a socket.
 		void						close( void );
@@ -80,10 +69,6 @@ namespace net {
 		//! Returns a remote address.
 		const NetworkAddress&		address( void ) const;
 
-		//! Returns a TCP stream owned by this socket.
-		const TCPStream*			stream( void ) const;
-		TCPStream*					stream( void );
-
 		//! Sends data to socket.
 		/*
 		\param buffer Data to be sent.
@@ -91,13 +76,10 @@ namespace net {
 		*/
         u32							sendTo( const void* buffer, u32 size );
 
-		//! Creates a new TCP socket.
-		static TCPSocketPtr			create( TCPSocketDelegate* delegate = NULL );
+		//! Connects to a TCP socket at a given remote address and port.
+		static TCPSocketPtr			connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate = NULL );
         
-    private:
-
-		//! Socket implementation.
-		impl::TCPSocketPrivatePtr	m_impl;
+		UsePrivateInterface( TCPSocket )
     };
 
 	//! TCP socket event delegate.
@@ -106,23 +88,11 @@ namespace net {
 
 		virtual					~TCPSocketDelegate( void ) {}
 
-		//! Handles a successfull socket connection.
-		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address ) {}
-
-		//! Handles a socket connection failure.
-		virtual void			handleConnectionFailed( TCPSocket* sender ) {}
-
 		//! Handles a socket disconnection.
 		virtual void			handleClosed( TCPSocket* sender ) {}
 
 		//! Handles a received data.
 		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream ) {}
-
-		//! Handles accepted incomming connection.
-		virtual void			handleConnectionAccepted( TCPSocket* sender, TCPSocket* socket ) {}
-
-		//! Handles a remote connection closed.
-		virtual void			handleConnectionClosed( TCPSocket* sender, TCPSocket* socket ) {}
 	};
 
 } // namespace net

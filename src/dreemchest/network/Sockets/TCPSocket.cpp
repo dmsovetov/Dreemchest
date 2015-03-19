@@ -43,10 +43,17 @@ TCPSocket::TCPSocket( impl::TCPSocketPrivate* impl ) : m_impl( impl )
     }
 }
 
-// ** TCPSocket::create
-TCPSocketPtr TCPSocket::create( TCPSocketDelegate* delegate )
+// ** TCPSocket::connectTo
+TCPSocketPtr TCPSocket::connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate )
 {
-	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( delegate ) ) );
+	PosixTCPSocket* impl = DC_NEW PosixTCPSocket( delegate );
+
+	if( !impl->connectTo( address, port ) ) {
+		delete impl;
+		return TCPSocketPtr();
+	}
+
+	return TCPSocketPtr( DC_NEW TCPSocket( impl ) );
 }
 
 // ** TCPSocket::operator bool
@@ -55,32 +62,11 @@ TCPSocket::operator bool( void ) const
 	return m_impl != NULL;
 }
 
-// ** TCPSocket::isServer
-bool TCPSocket::isServer( void ) const
-{
-	DC_CHECK_IMPL( false );
-	return m_impl->isServer();
-}
-
 // ** TCPSocket::isValid
 bool TCPSocket::isValid( void ) const
 {
 	DC_CHECK_IMPL( false );
 	return m_impl->isValid();
-}
-
-// ** TCPSocket::stream
-const TCPStream* TCPSocket::stream( void ) const
-{
-	DC_CHECK_IMPL( NULL );
-	return m_impl->stream();
-}
-
-// ** TCPSocket::stream
-TCPStream* TCPSocket::stream( void )
-{
-	DC_CHECK_IMPL( NULL );
-	return m_impl->stream();
 }
 
 // ** TCPSocket::address
@@ -95,20 +81,6 @@ const SocketDescriptor& TCPSocket::descriptor( void ) const
 {
 	DC_CHECK_IMPL( SocketDescriptor::Invalid );
 	return m_impl->descriptor();
-}
-
-// ** TCPSocket::descriptor
-SocketDescriptor& TCPSocket::descriptor( void )
-{
-	DC_CHECK_IMPL( SocketDescriptor::Invalid );
-	return m_impl->descriptor();
-}
-
-// ** TCPSocket::connectTo
-bool TCPSocket::connectTo( const NetworkAddress& address, u16 port )
-{
-    DC_CHECK_IMPL( false );
-    return m_impl->connectTo( address, port );
 }
 
 // ** TCPSocket::close
