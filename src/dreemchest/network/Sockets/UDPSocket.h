@@ -27,7 +27,7 @@
 #ifndef		__DC_Network_UDPSocket_H__
 #define		__DC_Network_UDPSocket_H__
 
-#include    "Network.h"
+#include    "../Network.h"
 
 DC_BEGIN_DREEMCHEST
 

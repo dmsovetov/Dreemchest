@@ -28,11 +28,15 @@
 #define		__DC_Network_PosixNetwork_H__
 
 
-#include    "../Network.h"
+#include    "../../Network.h"
 #include	"PosixNetworkAPI.h"
 
 #ifndef INVALID_SOCKET
 	#define INVALID_SOCKET (~0)
+#endif
+
+#ifndef SOCKET_ERROR
+	#define SOCKET_ERROR (-1)
 #endif
 
 DC_BEGIN_DREEMCHEST
@@ -52,10 +56,6 @@ namespace net {
         virtual CString					hostName( void ) const;
 
 		// ** PosixNetwork
-		static void						setSocketAddressReuse( SocketDescriptor socket );
-		static void						setSocketNonBlocking( SocketDescriptor socket );
-		static void						setSocketBroadcast( SocketDescriptor socket );
-		static void						closeSocket( SocketDescriptor socket );
 		static s32						lastError( void );
 
     private:

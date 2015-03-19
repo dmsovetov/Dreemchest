@@ -27,7 +27,7 @@
 #include	"PosixTCPSocket.h"
 
 #include    "../TCPSocket.h"
-#include	"../../io/streams/ByteBuffer.h"
+#include	"../../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -44,28 +44,28 @@ PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor so
 		m_delegate = new TCPSocketDelegate;
 	}
 
-    if( m_socket != INVALID_SOCKET ) {
+    if( m_socket.isValid() ) {
         return;
     }
 
     m_socket = ::socket( PF_INET, SOCK_STREAM, 0 );
-	if( m_socket == INVALID_SOCKET ) {
+	if( !m_socket.isValid() ) {
 		log::error( "PosixTCPSocket::PosixTCPSocket : failed to create socket, %d\n", PosixNetwork::lastError() );
 		return;
 	}
 
-	PosixNetwork::setSocketAddressReuse( m_socket );
+	m_socket.enableAddressReuse();
 }
 
 PosixTCPSocket::~PosixTCPSocket( void )
 {
-    disconnect( -1 );
+	disconnect( SocketDescriptor() );
 }
 
 // ** PosixTCPSocket::isValid
 bool PosixTCPSocket::isValid( void ) const
 {
-	return m_socket != INVALID_SOCKET;
+	return m_socket.isValid();
 }
 
 // ** PosixTCPSocket::isServer
@@ -75,7 +75,13 @@ bool PosixTCPSocket::isServer( void ) const
 }
 
 // ** PosixTCPSocket::descriptor
-SocketDescriptor PosixTCPSocket::descriptor( void ) const
+const SocketDescriptor& PosixTCPSocket::descriptor( void ) const
+{
+	return m_socket;
+}
+
+// ** PosixTCPSocket::descriptor
+SocketDescriptor& PosixTCPSocket::descriptor( void )
 {
 	return m_socket;
 }
@@ -89,7 +95,7 @@ const NetworkAddress& PosixTCPSocket::address( void ) const
 // ** PosixTCPSocket::connectTo
 bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 {
-    if( !m_socket ) {
+	if( !m_socket.isValid() ) {
         DC_BREAK
         return false;
     }
@@ -115,7 +121,7 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
     }
 
 	// ** Set non blocking mode
-	PosixNetwork::setSocketNonBlocking( m_socket );
+	m_socket.setNonBlocking();
 
     if( m_isServer ) {
         listenConnections();
@@ -125,11 +131,11 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 }
 
 // ** PosixTCPSocket::disconnect
-void PosixTCPSocket::disconnect( SocketDescriptor connection )
+void PosixTCPSocket::disconnect( SocketDescriptor& connection )
 {
-    int socket = connection == -1 ? m_socket : connection;
+	SocketDescriptor& socket = connection.isValid() ? connection : m_socket;
     
-    if( socket == INVALID_SOCKET ) {
+    if( !socket.isValid() ) {
         return;
     }
 
@@ -145,7 +151,7 @@ void PosixTCPSocket::disconnect( SocketDescriptor connection )
 		m_delegate->handleDisconnected( m_parent, m_socket );
     }
 
-	PosixNetwork::closeSocket( socket );
+	socket.close();
 }
 
 // ** PosixTCPSocket::toSockaddr
@@ -161,15 +167,15 @@ sockaddr_in PosixTCPSocket::toSockaddr( const NetworkAddress& address, u16 port 
 }
 
 // ** PosixTCPSocket::sendTo
-u32 PosixTCPSocket::sendTo( const void* buffer, u32 size, SocketDescriptor connection = -1 ) const
+u32 PosixTCPSocket::sendTo( const void* buffer, u32 size, const SocketDescriptor& connection ) const
 {
-    DC_BREAK_IF( m_socket == INVALID_SOCKET );
+    DC_BREAK_IF( !m_socket.isValid() );
 
     u32       bytesSent = 0;
     const u8* data      = ( u8* )buffer;
 
     while( bytesSent < size ) {
-        s32 result = send( connection == -1 ? m_socket : connection, ( CString )(data + bytesSent), size - bytesSent, 0 );
+        s32 result = send( connection.isValid() ? connection : m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
 
         if( result == -1 ) {
 		#ifdef DC_PLATFORM_WINDOWS
@@ -209,7 +215,7 @@ PosixTCPSocket::ClientConnection PosixTCPSocket::acceptConnection( void )
 #endif
     SocketDescriptor socket  = accept( m_socket, ( sockaddr* )&addr, &size );
 
-    if( socket == INVALID_SOCKET ) {
+	if( !socket.isValid() ) {
         DC_BREAK;
         return ClientConnection();
     }
@@ -243,7 +249,7 @@ void PosixTCPSocket::update( void )
 // ** PosixTCPSocket::updateClientSocket
 void PosixTCPSocket::updateClientSocket( void )
 {
-    DC_BREAK_IF( m_socket == INVALID_SOCKET );
+	DC_BREAK_IF( !m_socket.isValid() );
     
 	s32 length = 0;
 
@@ -295,9 +301,9 @@ void PosixTCPSocket::updateServerSocket( void )
 
     // ** Process connections
     for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-        ClientConnection&	clientConnection = *i;
-		TCPSocket*			clientSocket = clientConnection.m_socket.get();
-		SocketDescriptor	clientHandle = clientSocket->descriptor();
+        ClientConnection&		clientConnection = *i;
+		TCPSocket*				clientSocket = clientConnection.m_socket.get();
+		const SocketDescriptor&	clientHandle = clientSocket->descriptor();
 
         if( FD_ISSET( clientHandle, &readSet ) ) {
             u32 length = 0;

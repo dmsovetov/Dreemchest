@@ -24,42 +24,35 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_PosixUDPSocket_H__
-#define		__DC_Network_PosixUDPSocket_H__
-
-#include    "../UDPSocket.h"
-#include    "PosixNetwork.h"
+#include "SocketDescriptor.h"
+#include "../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    // ** class PosixUDPSocket
-    class PosixUDPSocket : public impl::UDPSocketPrivate {
-    public:
+	//! A TCP stream class.
+	class TCPStream : public io::ByteBuffer {
+	public:
 
-								PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast );
-        virtual					~PosixUDPSocket( void );
+								//! Constructs a TCPStream instance.
+								TCPStream( const SocketDescriptor& descriptor );
 
-        // ** IUDPSocket
-        virtual u32				send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
-        virtual bool			listen( u16 port );
-        virtual void			update( void );
+		//! Returns a TCP socket descriptor.
+		const SocketDescriptor&	descriptor( void ) const;
 
-    private:
+        //! Reads data from stream.
+        virtual u64				read( void* buffer, u64 size ) const;
 
-		//! Socket descriptor.
-        SocketDescriptor		m_socket;
+        //! Writes data from stream.
+        virtual u64				write( const void* buffer, u64 size );
 
-		//! Socket event delegate.
-		UDPSocketDelegatePtr	m_delegate;
+	private:
 
-		//! Socket receive buffer.
-		io::ByteBufferPtr		m_buffer;
-    };
-    
+		//! TCP stream socket.
+		SocketDescriptor	m_socket;
+	};
+
 } // namespace net
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Network_PosixUDPSocket_H__	*/

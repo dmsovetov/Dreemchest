@@ -45,9 +45,9 @@ namespace net {
 	class TCPSocket;
 	class UDPSocketDelegate;
 	class UDPSocket;
+	class SocketDescriptor;
 
     class INetwork;
-	typedef s32 SocketDescriptor;
 
 	//! TCP socket strong ptr.
 	typedef StrongPtr<TCPSocket> TCPSocketPtr;
@@ -136,8 +136,8 @@ namespace net {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "TCPSocket.h"
-	#include "UDPSocket.h"
+	#include "Sockets/TCPSocket.h"
+	#include "Sockets/UDPSocket.h"
 #endif
 
 #endif	/*	!__DC_Network_H__	*/

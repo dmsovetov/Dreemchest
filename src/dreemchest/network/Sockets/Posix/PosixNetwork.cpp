@@ -260,59 +260,6 @@ const char* PosixNetwork::hostName( void ) const
     return m_hostName.c_str();
 }
 
-// ** PosixNetwork::setSocketNonBlocking
-void PosixNetwork::setSocketNonBlocking( SocketDescriptor socket )
-{
-	s32 result = 0;
-
-#if defined( DC_PLATFORM_WINDOWS )
-	u_long noBlock = 1;
-	result = ioctlsocket( socket, FIONBIO, &noBlock );
-	DC_BREAK_IF( result == SOCKET_ERROR );
-#else
-    result = fcntl( socket, F_SETFL, O_NONBLOCK );
-    DC_BREAK_IF( result == -1 );
-#endif
-}
-
-// ** PosixNetwork::setSocketBroadcast
-void PosixNetwork::setSocketBroadcast( SocketDescriptor socket )
-{
-	s32 result = 0;
-
-#if defined( DC_PLATFORM_WINDOWS )
-	s8 one = 1;
-#else
-	s32 one = 1;
-#endif
-
-	result  = setsockopt( socket, SOL_SOCKET, SO_BROADCAST, &one, sizeof( one ) );
-	DC_BREAK_IF( result == -1 );
-}
-
-// ** PosixNetwork::closeSocket
-void PosixNetwork::closeSocket( SocketDescriptor socket )
-{
-#if defined( DC_PLATFORM_WINDOWS )
-	closesocket( socket );
-#else
-	close( socket );
-#endif
-}
-
-// ** PosixNetwork::setSocketAddressReuse
-void PosixNetwork::setSocketAddressReuse( SocketDescriptor socket )
-{
-#if defined( DC_PLATFORM_WINDOWS )
-	s8 one = 1;
-#else
-	s32 one = 1;
-#endif
-
-    s32 result = setsockopt( socket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof( one ) );
-    DC_BREAK_IF( result == -1 );
-}
-
 } // namespace net
 
 DC_END_DREEMCHEST

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Network.h"
-#include "Posix/PosixNetwork.h"
+#include "Sockets/Posix/PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -43,13 +43,14 @@ namespace net {
 
         // ** ITCPSocket
 		virtual const NetworkAddress&	address( void ) const;
-		virtual SocketDescriptor		descriptor( void ) const;
+		virtual const SocketDescriptor&	descriptor( void ) const;
+		virtual SocketDescriptor&		descriptor( void );
 		virtual bool					isServer( void ) const;
 		virtual bool					isValid( void ) const;
         virtual bool					connectTo( const NetworkAddress& address, u16 port );
-        virtual void					disconnect( SocketDescriptor connection = -1 );
+        virtual void					disconnect( SocketDescriptor& connection );
         virtual void					update( void );
-        virtual u32						sendTo( const void* buffer, u32 size, SocketDescriptor sendTo ) const;
+        virtual u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo ) const;
 
     private:
 

@@ -25,7 +25,8 @@
  **************************************************************************/
 
 #include "PosixUDPSocket.h"
-#include "../../io/streams/ByteBuffer.h"
+#include "PosixNetwork.h"
+#include "../../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,22 +42,28 @@ PosixUDPSocket::PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast ) : 
 		m_delegate = UDPSocketDelegatePtr( DC_NEW UDPSocketDelegate );
 	}
 
-	PosixNetwork::setSocketNonBlocking( m_socket );
+	m_socket.setNonBlocking();
 
-    if( !broadcast ) {
-        return;
-    }
+	if( broadcast ) {
+		m_socket.enableBroadcast();
+	}
 
-	PosixNetwork::setSocketBroadcast( m_socket );
+//	PosixNetwork::setSocketNonBlocking( m_socket );
+
+//    if( !broadcast ) {
+//        return;
+//    }
+
+//	PosixNetwork::setSocketBroadcast( m_socket );
 }
 
 PosixUDPSocket::~PosixUDPSocket( void )
 {
-    PosixNetwork::closeSocket( m_socket );
+//    PosixNetwork::closeSocket( m_socket );
 }
 
 // ** PosixUDPSocket::send
-u32 PosixUDPSocket::send( const NetworkAddress& address, u16 port, const void *buffer, u32 size )
+u32 PosixUDPSocket::send( const NetworkAddress& address, u16 port, const void* buffer, u32 size )
 {
     // ** Format address
     sockaddr_in dest;
@@ -66,7 +73,7 @@ u32 PosixUDPSocket::send( const NetworkAddress& address, u16 port, const void *b
 	dest.sin_family      = AF_INET;
 
     // ** Send datagram
-    s32 result = sendto( m_socket, ( const char* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
+    s32 result = sendto( m_socket, ( s8* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
     if( result == -1 ) {
         log::warn( "PosixUDPSocket::Send : failed to send data to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
         DC_BREAK;

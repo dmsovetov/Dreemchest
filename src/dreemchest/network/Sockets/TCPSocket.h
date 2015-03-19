@@ -27,21 +27,22 @@
 #ifndef		__DC_Network_TCPSocket_H__
 #define		__DC_Network_TCPSocket_H__
 
-#include    "Network.h"
+#include	"SocketDescriptor.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
 	BeginPrivateInterface( TCPSocket )
-		InterfaceMethod( const NetworkAddress&	address( void ) const )
-		InterfaceMethod( SocketDescriptor		descriptor( void ) const )
-		InterfaceMethod( bool					isServer( void ) const )
-		InterfaceMethod( bool					isValid( void ) const )
-		InterfaceMethod( bool					connectTo( const NetworkAddress& address, u16 port ) )
-		InterfaceMethod( void					disconnect( SocketDescriptor connection = -1 ) )
-		InterfaceMethod( void					update( void ) )
-		InterfaceMethod( u32					sendTo( const void* buffer, u32 size, SocketDescriptor sendTo = -1 ) const )
+		InterfaceMethod( const NetworkAddress&		address( void ) const )
+		InterfaceMethod( const SocketDescriptor&	descriptor( void ) const )
+		InterfaceMethod( SocketDescriptor&			descriptor( void ) )
+		InterfaceMethod( bool						isServer( void ) const )
+		InterfaceMethod( bool						isValid( void ) const )
+		InterfaceMethod( bool						connectTo( const NetworkAddress& address, u16 port ) )
+		InterfaceMethod( void						disconnect( SocketDescriptor& connection ) )
+		InterfaceMethod( void						update( void ) )
+		InterfaceMethod( u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo = -1 ) const )
 	EndPrivateInterface
 
     //! TCP socket class.
@@ -56,7 +57,8 @@ namespace net {
 									operator bool() const;
 
 		//! Returns a socket descriptor.
-		SocketDescriptor			descriptor( void ) const;
+		const SocketDescriptor&		descriptor( void ) const;
+		SocketDescriptor&			descriptor( void );
 
 		//! Returns true if this is a server socket.
 		bool						isServer( void ) const;
@@ -65,7 +67,7 @@ namespace net {
         bool						connectTo( const NetworkAddress& address, u16 port );
 
 		//! Closes a socket. If performed for server socket - closes a client connection.
-        void						disconnect( SocketDescriptor connection = -1 );
+		void						disconnect( SocketDescriptor& connection = SocketDescriptor() );
 
 		//! Reads all incoming data.
         void						update( void );
@@ -79,7 +81,7 @@ namespace net {
 		\param size Data size to be sent.
 		\param sendTo Connection to send data to (valid only for server sockets).
 		*/
-        u32							sendTo( const void* buffer, u32 size, SocketDescriptor sendTo = -1 ) const;
+        u32							sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo = -1 ) const;
 
 		//! Creates a new TCP socket.
 		static TCPSocketPtr			create( TCPSocketDelegate* delegate = NULL );
@@ -97,13 +99,13 @@ namespace net {
 		virtual					~TCPSocketDelegate( void ) {}
 
 		//! Handles a successfull socket connection.
-		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address, SocketDescriptor socket ) {}
+		virtual void			handleConnected( TCPSocket* sender, const NetworkAddress& address, const SocketDescriptor& socket ) {}
 
 		//! Handles a socket connection failure.
-		virtual void			handleConnectionFailed( TCPSocket* sender, SocketDescriptor socket ) {}
+		virtual void			handleConnectionFailed( TCPSocket* sender, const SocketDescriptor& socket ) {}
 
 		//! Handles a socket disconnection.
-		virtual void			handleDisconnected( TCPSocket* sender, SocketDescriptor socket ) {}
+		virtual void			handleDisconnected( TCPSocket* sender, const SocketDescriptor& socket ) {}
 
 		//! Handles a received data.
 		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, const u8 *data, u32 size ) {}
