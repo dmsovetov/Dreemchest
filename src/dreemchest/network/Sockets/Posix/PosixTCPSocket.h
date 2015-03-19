@@ -48,7 +48,7 @@ namespace net {
 		virtual bool					isServer( void ) const;
 		virtual bool					isValid( void ) const;
         virtual bool					connectTo( const NetworkAddress& address, u16 port );
-        virtual void					disconnect( SocketDescriptor& connection );
+        virtual void					close( void );
         virtual void					update( void );
         virtual u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo ) const;
 

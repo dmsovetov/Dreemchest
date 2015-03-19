@@ -59,7 +59,7 @@ PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor so
 
 PosixTCPSocket::~PosixTCPSocket( void )
 {
-	disconnect( SocketDescriptor() );
+	close();
 }
 
 // ** PosixTCPSocket::isValid
@@ -130,28 +130,17 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 	return true;
 }
 
-// ** PosixTCPSocket::disconnect
-void PosixTCPSocket::disconnect( SocketDescriptor& connection )
+// ** PosixTCPSocket::close
+void PosixTCPSocket::close( void )
 {
-	SocketDescriptor& socket = connection.isValid() ? connection : m_socket;
-    
-    if( !socket.isValid() ) {
-        return;
-    }
+	m_delegate->handleClosed( m_parent, m_socket );
 
-    if( socket == m_socket && m_isServer ) {
-        for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-			disconnect( i->m_socket->descriptor() );
-        }
+	m_socket.close();
 
-        m_clientSockets.clear();
-    }
-
-    if( socket == m_socket && m_parent ) {
-		m_delegate->handleDisconnected( m_parent, m_socket );
-    }
-
-	socket.close();
+	for( ClientSocketsList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {\
+		i->m_closed = true;
+		i->m_socket = TCPSocketPtr();
+	}
 }
 
 // ** PosixTCPSocket::toSockaddr
@@ -255,8 +244,7 @@ void PosixTCPSocket::updateClientSocket( void )
 
 	while( (length = recv( m_socket, ( s8* )m_buffer->buffer(), m_buffer->length() - 1, 0 )) != -1 ) {
 		if( length == 0 ) {
-            disconnect( m_socket );
-			m_delegate->handleDisconnected( m_parent, m_socket );
+			close();
 			break;
 		}
 

@@ -40,7 +40,7 @@ namespace net {
 		InterfaceMethod( bool						isServer( void ) const )
 		InterfaceMethod( bool						isValid( void ) const )
 		InterfaceMethod( bool						connectTo( const NetworkAddress& address, u16 port ) )
-		InterfaceMethod( void						disconnect( SocketDescriptor& connection ) )
+		InterfaceMethod( void						close( void ) )
 		InterfaceMethod( void						update( void ) )
 		InterfaceMethod( u32						sendTo( const void* buffer, u32 size, const SocketDescriptor& sendTo = -1 ) const )
 	EndPrivateInterface
@@ -66,8 +66,8 @@ namespace net {
 		//! Connects to a TCP socket at a given remote address, if address is 0 then starts listening for incomming connections.
         bool						connectTo( const NetworkAddress& address, u16 port );
 
-		//! Closes a socket. If performed for server socket - closes a client connection.
-		void						disconnect( SocketDescriptor& connection = SocketDescriptor() );
+		//! Closes a socket.
+		void						close( void );
 
 		//! Reads all incoming data.
         void						update( void );
@@ -105,7 +105,7 @@ namespace net {
 		virtual void			handleConnectionFailed( TCPSocket* sender, const SocketDescriptor& socket ) {}
 
 		//! Handles a socket disconnection.
-		virtual void			handleDisconnected( TCPSocket* sender, const SocketDescriptor& socket ) {}
+		virtual void			handleClosed( TCPSocket* sender, const SocketDescriptor& socket ) {}
 
 		//! Handles a received data.
 		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, const u8 *data, u32 size ) {}

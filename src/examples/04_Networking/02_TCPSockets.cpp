@@ -46,19 +46,19 @@ public:
 	TCPEventHandler( Application* app ) : m_application( app ) {}
 
 	//! Called each time the socket is successfully connected to an address.
-	virtual void handleConnected( TCPSocket* sender, const NetworkAddress& address, SocketDescriptor socket )
+	virtual void handleConnected( TCPSocket* sender, const NetworkAddress& address, const SocketDescriptor& socket )
 	{
 		net::log::msg( "Connected to %s, socket %d\n", address.toString(), socket );
 	}
 
 	//! Called when socket failed to connect.
-	virtual void handleConnectionFailed( TCPSocket* sender, SocketDescriptor socket )
+	virtual void handleConnectionFailed( TCPSocket* sender, const SocketDescriptor& socket )
 	{
 		net::log::msg( "Failed to connect\n" );
 	}
 
 	//! Called when socket is closed.
-	virtual void handleDisconnected( TCPSocket* sender, SocketDescriptor socket )
+	virtual void handleClosed( TCPSocket* sender, const SocketDescriptor& socket )
 	{
 		net::log::msg( "Socket disconnected, socket %d\n", socket );
 	}
@@ -77,7 +77,7 @@ public:
 			const char* response = "hi there!";
 			sender->sendTo( response, strlen( response ), socket->descriptor() );
 		} else {
-			sender->disconnect();
+			sender->close();
 			m_application->quit();
 		}
 	}

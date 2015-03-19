@@ -47,19 +47,11 @@ PosixUDPSocket::PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast ) : 
 	if( broadcast ) {
 		m_socket.enableBroadcast();
 	}
-
-//	PosixNetwork::setSocketNonBlocking( m_socket );
-
-//    if( !broadcast ) {
-//        return;
-//    }
-
-//	PosixNetwork::setSocketBroadcast( m_socket );
 }
 
 PosixUDPSocket::~PosixUDPSocket( void )
 {
-//    PosixNetwork::closeSocket( m_socket );
+
 }
 
 // ** PosixUDPSocket::send

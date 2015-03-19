@@ -90,11 +90,11 @@ bool TCPSocket::connectTo( const NetworkAddress& address, u16 port )
     return m_impl->connectTo( address, port );
 }
 
-// ** TCPSocket::disconnect
-void TCPSocket::disconnect( SocketDescriptor& connection )
+// ** TCPSocket::close
+void TCPSocket::close( void )
 {
     DC_CHECK_IMPL();
-    m_impl->disconnect( connection );
+    m_impl->close();
 }
 
 // ** TCPSocket::update
