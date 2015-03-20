@@ -55,8 +55,8 @@ ByteBufferPtr ByteBuffer::create( s32 size )
     return ByteBufferPtr( new ByteBuffer( NULL, size ) );
 }
 
-// ** ByteBuffer::createWithData
-ByteBufferPtr ByteBuffer::createWithData( const u8* pointer, s32 size )
+// ** ByteBuffer::createFromData
+ByteBufferPtr ByteBuffer::createFromData( const u8* pointer, s32 size )
 {
     return ByteBufferPtr( new ByteBuffer( pointer, size ) );
 }
@@ -71,6 +71,12 @@ void ByteBuffer::fill( u8 value )
 s32 ByteBuffer::bytesAvailable( void ) const
 {
     return length() - m_position;
+}
+
+// ** ByteBuffer::array
+const Array<u8>& ByteBuffer::array( void ) const
+{
+	return m_buffer;
 }
 
 // ** ByteBuffer::buffer

@@ -64,6 +64,9 @@ namespace io {
         //! Returns a total number of bytes available starting from current stream position.
         s32                     bytesAvailable( void ) const;
 
+		//! Returns an array of bytes.
+		const Array<u8>&		array( void ) const;
+
         //! Returns a data pointer.
         const u8*               buffer( void ) const;
 
@@ -80,7 +83,7 @@ namespace io {
         static ByteBufferPtr    create( s32 size = 0 );
 
         //! Creates a byte buffer from data.
-        static ByteBufferPtr    createWithData( const u8* pointer, s32 size );
+        static ByteBufferPtr    createFromData( const u8* pointer, s32 size );
 
     protected:
 
