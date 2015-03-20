@@ -35,6 +35,8 @@
 
 #include "../io/Io.h"
 #include "../io/streams/ByteBuffer.h"
+#include "../io/serialization/Storage.h"
+#include "../io/serialization/Serializable.h"
 #include "../event/EventEmitter.h"
 #include <time.h>
 

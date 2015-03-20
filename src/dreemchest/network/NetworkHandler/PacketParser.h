@@ -28,8 +28,6 @@
 #define __DC_Network_PacketParser_H__
 
 #include "../Network.h"
-#include "../../io/serialization/Storage.h"
-#include "../../io/serialization/Serializable.h"
 
 DC_BEGIN_DREEMCHEST
 

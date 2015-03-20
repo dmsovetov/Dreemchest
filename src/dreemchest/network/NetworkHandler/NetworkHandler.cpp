@@ -27,7 +27,6 @@
 #include "NetworkHandler.h"
 #include "../Sockets/TCPSocket.h"
 #include "../Sockets/TCPStream.h"
-#include "../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
