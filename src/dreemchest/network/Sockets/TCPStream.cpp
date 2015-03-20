@@ -70,11 +70,11 @@ void TCPStream::flush( void )
 }
 
 // ** TCPStream::write
-u64 TCPStream::write( const void* buffer, u64 size )
+s32 TCPStream::write( const void* buffer, s32 size )
 {
     DC_BREAK_IF( !m_socket->isValid() );
 
-    u32       bytesSent = 0;
+    s32       bytesSent = 0;
     const u8* data      = ( u8* )buffer;
 
     while( bytesSent < size ) {

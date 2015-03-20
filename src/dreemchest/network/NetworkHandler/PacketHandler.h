@@ -24,46 +24,53 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_TCPStream_H__
-#define __DC_Network_TCPStream_H__
+#ifndef __DC_Network_PacketHandler_H__
+#define __DC_Network_PacketHandler_H__
 
-#include "SocketDescriptor.h"
-#include "../../io/streams/ByteBuffer.h"
+#include "../Network.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! A TCP stream class.
-	class TCPStream : public io::ByteBuffer {
+	//! Packet handler interface class.
+	class PacketHandler {
 	public:
 
-		//! Socket pull result
-		enum State { Idle, Received, Closed };
+		virtual			~PacketHandler( void ) {}
 
-								//! Constructs a TCPStream instance.
-								TCPStream( SocketDescriptor* descriptor );
+		//! Packet handler callback.
+		virtual bool	handle( TCPSocket* sender, NetworkPacket* packet ) = 0;
+	};
 
-		//! Returns a TCP socket descriptor.
-		const SocketDescriptor*	descriptor( void ) const;
+	//! Template class that handles a strict-typed packets.
+	template<typename T>
+	class GenericPacketHandler : public PacketHandler {
+	public:
 
-		//! Pulls incoming data from TCP stream.
-		State					pull( void );
+		//! Function type to handle packets.
+		typedef cClosure<bool(TCPSocket*,const T*)> Callback;
 
-		//! Flushes all received data.
-		void					flush( void );
+						//! Constructs GenericPacketHandler instance.
+						GenericPacketHandler( const Callback& callback )
+							: m_callback( callback ) {}
 
-        //! Writes data from stream.
-        virtual s32				write( const void* buffer, s32 size );
+		//! Casts an input network packet to a specified type and runs a callback.
+		virtual bool	handle( TCPSocket* sender, NetworkPacket* packet )
+		{
+			T* packetWithType = castTo<T>( packet );
+			DC_BREAK_IF( packetWithType == NULL );
+			return m_callback( sender, packetWithType );
+		}
 
 	private:
 
-		//! TCP stream socket.
-		SocketDescriptor*	m_socket;
+		//! Packet handler callback.
+		Callback		m_callback;
 	};
 
 } // namespace net
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_TCPStream_H__	*/
+#endif	/*	!__DC_Network_PacketHandler_H__	*/

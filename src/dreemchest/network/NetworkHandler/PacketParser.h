@@ -39,6 +39,12 @@ namespace net {
 	struct NetworkPacket : public io::Serializable {
 		ClassEnableTypeId( NetworkPacket )
 		ClassEnableCloning( NetworkPacket )
+
+		u32 timestamp;
+
+		IoBeginSerializer
+			IoField( timestamp )
+		IoEndSerializer
 	};
 
 	//! Network packet parser.
@@ -58,7 +64,10 @@ namespace net {
 	private:
 
 		//! Creates a packed by type id.
-		NetworkPacket*		createPacket( TypeId packetId ) const;	
+		NetworkPacket*		createPacket( TypeId packetId ) const;
+
+		//! Returns true if the specified packet type is registered.
+		bool				hasPacketType( TypeId packetId ) const;
 
 	private:
 
@@ -72,7 +81,7 @@ namespace net {
 						: m_id( id ), m_size( 0 ) {}
 
 			//! Returns a packet header size.
-			static u32 size( void ) { return sizeof( TypeId ) + sizeof( u16 ); }
+			static s32 size( void ) { return sizeof( TypeId ) + sizeof( u16 ); }
 		};
 
 		//! Container type to store registered network packet types.

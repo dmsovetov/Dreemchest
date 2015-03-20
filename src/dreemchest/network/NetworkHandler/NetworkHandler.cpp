@@ -36,13 +36,17 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void )
 {
-	m_packetParser.registerPacketType<TestPacket>();
+	registerPacketHandler<packets::Ping>( dcThisMethod( NetworkHandler::handlePingPacket ) );
+	registerPacketHandler<packets::Pong>( dcThisMethod( NetworkHandler::handlePongPacket ) );
 }
 
 // ** NetworkHandler::sendPacket
 void NetworkHandler::sendPacket( TCPSocket* socket, NetworkPacket* packet )
 {
 	io::ByteBufferPtr buffer = io::ByteBuffer::create();
+
+	// ** Set packet timestamp
+	packet->timestamp = UnixTime();
 
 	// ** Write packet to binary stream
 	u32 bytesWritten = m_packetParser.writeToStream( packet, buffer );
@@ -52,15 +56,57 @@ void NetworkHandler::sendPacket( TCPSocket* socket, NetworkPacket* packet )
 	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 
-// ** NetworkHandler::update
-void NetworkHandler::update( void )
-{
-}
-
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
 	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
+
+	NetworkPacket* packet = m_packetParser.parseFromStream( io::ByteBufferPtr( stream ) );
+
+	if( !packet ) {
+		log::warn( "Failed to parse packed from data sent by %s\n", socket->address().toString() );
+		return;
+	}
+
+	PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
+	DC_BREAK_IF( i == m_packetHandlers.end() );
+
+	log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
+	if( !i->second->handle( socket, packet ) ) {
+		log::warn( "NetworkHandler::processReceivedData : invalid packet of type %d received from %s\n", packet->typeId(), socket->address().toString() );
+	}
+
+	delete packet;
+}
+
+// ** NetworkHandler::doLatencyTest
+void NetworkHandler::doLatencyTest( TCPSocket* socket, u8 iterations )
+{
+	sendPacket<packets::Ping>( socket, iterations );
+}
+
+// ** NetworkHandler::handlePingPacket
+bool NetworkHandler::handlePingPacket( TCPSocket* sender, const packets::Ping* packet )
+{
+	sendPacket<packets::Pong>( sender, packet->iteration );
+	return true;
+}
+
+// ** NetworkHandler::handlePongPacket
+bool NetworkHandler::handlePongPacket( TCPSocket* sender, const packets::Pong* packet )
+{
+	if( packet->iteration == 0 ) {
+		log::verbose( "To much ping packets sent\n" );
+		return true;
+	}
+
+	sendPacket<packets::Ping>( sender, packet->iteration - 1 );
+	return true;
+}
+
+// ** NetworkHandler::update
+void NetworkHandler::update( void )
+{
 }
 
 } // namespace net

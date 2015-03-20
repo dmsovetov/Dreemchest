@@ -24,46 +24,56 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_TCPStream_H__
-#define __DC_Network_TCPStream_H__
+#ifndef	__DC_Network_Packets_H__
+#define	__DC_Network_Packets_H__
 
-#include "SocketDescriptor.h"
-#include "../../io/streams/ByteBuffer.h"
+#include "PacketParser.h"
 
 DC_BEGIN_DREEMCHEST
 
+
+#define BeginNetworkPacket( name )			\
+	struct name : public NetworkPacket {	\
+		ClassEnableTypeId( name );			\
+		ClassEnableCloning( name );
+
+#define EndNetworkPacket	};
+
+
 namespace net {
 
-	//! A TCP stream class.
-	class TCPStream : public io::ByteBuffer {
-	public:
+namespace packets {
 
-		//! Socket pull result
-		enum State { Idle, Received, Closed };
+	//! Ping packet
+	BeginNetworkPacket( Ping )
+		u8 iteration;
 
-								//! Constructs a TCPStream instance.
-								TCPStream( SocketDescriptor* descriptor );
+		//! Constructs a Ping instance.
+		Ping( u8 iteration = 0 ) : iteration( iteration ) {}
 
-		//! Returns a TCP socket descriptor.
-		const SocketDescriptor*	descriptor( void ) const;
+		//! Packet serializer
+		IoBeginSerializerSuper( NetworkPacket )
+			IoField( iteration )
+		IoEndSerializer
+	EndNetworkPacket
 
-		//! Pulls incoming data from TCP stream.
-		State					pull( void );
+	//! Pong packet
+	BeginNetworkPacket( Pong )
+		u8 iteration;
 
-		//! Flushes all received data.
-		void					flush( void );
+		//! Constructs a Pong instance.
+		Pong( u8 iteration = 0 ) : iteration( iteration ) {}
 
-        //! Writes data from stream.
-        virtual s32				write( const void* buffer, s32 size );
+		//! Packet serializer
+		IoBeginSerializerSuper( NetworkPacket )
+			IoField( iteration )
+		IoEndSerializer
+	EndNetworkPacket
 
-	private:
-
-		//! TCP stream socket.
-		SocketDescriptor*	m_socket;
-	};
+} // namespace packets
 
 } // namespace net
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_TCPStream_H__	*/
+#endif	/*	!__DC_Network_Packets_H__	*/

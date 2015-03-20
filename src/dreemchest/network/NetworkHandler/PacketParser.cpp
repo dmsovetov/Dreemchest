@@ -34,7 +34,9 @@ namespace net {
 // ** PacketParser::writeToStream
 u32 PacketParser::writeToStream( NetworkPacket* packet, io::ByteBufferPtr& stream )
 {
-	u64 initialPosition = stream->position();
+	DC_BREAK_IF( !hasPacketType( packet->typeId() ) );
+
+	s32 initialPosition = stream->position();
 
 	// ** Write header
 	PacketHeader header( packet->typeId() );
@@ -45,22 +47,25 @@ u32 PacketParser::writeToStream( NetworkPacket* packet, io::ByteBufferPtr& strea
 	io::Storage storage( io::StorageBinary, stream );
 	packet->write( storage );
 
+	// ** Save the total packet size
+	s32 packetSize = stream->position() - initialPosition;
+
 	// ** Calculate and write packet size
-	header.m_size = stream->position() - initialPosition - PacketHeader::size();
+	header.m_size = packetSize - PacketHeader::size();
 	stream->setPosition( initialPosition + sizeof( header.m_id ) );
 	stream->write( &header.m_size, sizeof( header.m_size ) );
 
 	// ** Move back
-	stream->setPosition( initialPosition + header.m_size + PacketHeader::size() );
+	stream->setPosition( packetSize );
 
-	return stream->position() - initialPosition;
+	return packetSize;
 }
 
 // ** PacketParser::parseFromStream
 NetworkPacket* PacketParser::parseFromStream( io::ByteBufferPtr& stream ) const
 {
 	// ** Save current position.
-	u64 position = stream->position();
+	s32 position = stream->position();
 
 	// ** Check amount of available bytes.
 	if( stream->bytesAvailable() < PacketHeader::size() ) {
@@ -97,6 +102,12 @@ NetworkPacket* PacketParser::createPacket( TypeId packetId ) const
 {
 	NetworkPacketTypes::const_iterator i = m_packetTypes.find( packetId );
 	return i != m_packetTypes.end() ? i->second->clone() : NULL;
+}
+
+// ** PacketParser::hasPacketType
+bool PacketParser::hasPacketType( TypeId packetId ) const
+{
+	return m_packetTypes.count( packetId ) != 0;
 }
 
 } // namespace net

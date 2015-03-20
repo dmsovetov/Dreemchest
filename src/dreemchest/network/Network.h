@@ -34,6 +34,7 @@
 #endif
 
 #include "../io/Io.h"
+#include <time.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -53,6 +54,7 @@ namespace net {
 		class NetworkServerHandler;
 		class NetworkClientHandler;
 
+	struct NetworkPacket;
     class INetwork;
 
 	//! TCP socket strong ptr.
@@ -114,6 +116,38 @@ namespace net {
 
 	//! Array of network addresses.
     typedef Array<NetworkAddress> NetworkAddressArray;
+
+	//! Unix time structure.
+	struct UnixTime {
+						//! Constructs a current Unix time.
+						UnixTime( void )
+							: m_value( time( NULL ) ) {}
+
+						//! Constructs a Unix time that is ahead of current time by a given amount of seconds.
+						explicit UnixTime( unsigned int seconds )
+							: m_value( time( NULL ) + seconds ) {}
+
+						//! Constructs a Unix time from a timestamp.
+						UnixTime( time_t value )
+							: m_value( value ) {}
+
+						//! Convers Unix time to unsigned int.
+						operator u32( void ) const { return static_cast<u32>( m_value ); }
+
+		//! Subtracts two Unix time values and returns amount of seconds between them.
+		s32				operator - ( const UnixTime& other ) const { return static_cast<s32>( m_value - other.m_value ); }
+
+		//! Adds a given amount of seconds to Unix time value.
+		UnixTime		operator + ( unsigned int seconds ) const { return UnixTime( static_cast<u32>( m_value + seconds ) ); }
+
+		//! Compares two Unix time values.
+		bool			operator >= ( const UnixTime& other ) const { return m_value >= other.m_value; }
+
+		//! Compares two Unix time values.
+		bool			operator <= ( const UnixTime& other ) const { return m_value <= other.m_value; }
+
+		time_t			m_value;	//! Actual value.
+	};
 
     //! Network interface class.
     class Network {

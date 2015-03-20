@@ -45,6 +45,7 @@ namespace net {
 
     //! TCP socket class.
     class TCPSocket : public RefCounted {
+	EmbedUserData
     public:
 
 									//! Constructs a TCPSocket instance.

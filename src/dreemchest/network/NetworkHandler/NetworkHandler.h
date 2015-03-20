@@ -27,7 +27,8 @@
 #ifndef		__DC_Network_NetworkHandler_H__
 #define		__DC_Network_NetworkHandler_H__
 
-#include "PacketParser.h"
+#include "Packets.h"
+#include "PacketHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -43,196 +44,81 @@ namespace net {
 		//! Updates network handler.
 		virtual void		update( void );
 
+		//! Registeres a new packet type.
+		template<typename T>
+		void				registerPacketHandler( typename GenericPacketHandler<T>::Callback& callback );
+
 	protected:
 
 		//! Sends a packet.
 		void				sendPacket( TCPSocket* socket, NetworkPacket* packet );
 
+		//! Sends a packet of a specified type.
+		template<typename T>
+		void sendPacket( TCPSocket* socket );
+
+		template<typename T, typename Arg0>
+		void sendPacket( TCPSocket* socket, const Arg0& arg0 );
+
+		template<typename T, typename Arg0, typename Arg1>
+		void sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1 );
+
 		//! Processes a received data from client.
 		virtual void		processReceivedData( TCPSocket* socket, TCPStream* stream );
 
+		//! Performs a latency test with a specified amount of iterations.
+		void				doLatencyTest( TCPSocket* socket, u8 iterations );
+
+		//! Handles a ping packet and sends back a pong response.
+		bool				handlePingPacket( TCPSocket* sender, const packets::Ping* packet );
+
+		//! Handles a pong packet.
+		bool				handlePongPacket( TCPSocket* sender, const packets::Pong* packet );
+
 	private:
 
-		//! Test packet.
-		struct TestPacket : public NetworkPacket {
-			ClassEnableTypeId( TestPacket );
-			ClassEnableCloning( TestPacket );
-
-			bool	m_flag;
-			s32		m_counter;
-			f32		m_number;
-			String	m_message;
-
-			IoBeginSerializer
-				IoField( m_flag )
-				IoField( m_counter )
-				IoField( m_number )
-				IoField( m_message )
-			IoEndSerializer
-		};
+		//! A container type to store all registered packet handlers.
+		typedef Map< TypeId, AutoPtr<PacketHandler> > PacketHandlers;
 
 		//! Packet parser.
 		PacketParser		m_packetParser;
+
+		//! Packet handlers.
+		PacketHandlers		m_packetHandlers;
 	};
 
-/*
-	class INetworkPacket : public io::Serializable {
-	public:
-	};
+	// ** NetworkHandler::registerPacketHandler
+	template<typename T>
+	inline void NetworkHandler::registerPacketHandler( typename GenericPacketHandler<T>::Callback& callback )
+	{
+		m_packetParser.registerPacketType<T>();
+		m_packetHandlers[T::classTypeId()] = DC_NEW GenericPacketHandler<T>( callback );
+	}
 
-    // ** class INetworkPacket
-//    class INetworkPacket : public ISerializable {
-//    public:
-//
-//        virtual                 ~INetworkPacket( void ) {}
-//
-//        virtual void            read( dcStream stream )         = 0;
-//        virtual void            write( dcStream stream ) const  = 0;
-//        virtual INetworkPacket* clone( void ) const             = 0;
-//    };
+	// ** NetworkHandler::sendPacket
+	template<typename T>
+	inline void NetworkHandler::sendPacket( TCPSocket* socket )
+	{
+		T packet;
+		sendPacket( socket, &packet );
+	}
 
-    // ** enum eBuiltInPackets
-//    enum eBuiltInPackets {
-//        PacketTimeSync          = -1,
-//        PacketRemoteCall        = -2,
-//        PacketRemoteResponse    = -3,
-//        PacketSendFile          = -4,
-//        PacketFileChunk         = -5,
-//    };
+	// ** NetworkHandler::sendPacket
+	template<typename T, typename Arg0>
+	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0 )
+	{
+		T packet( arg0 );
+		sendPacket( socket, &packet );
+	}
 
-    // ** packet sTimeSyncPacket
-//    struct sTimeSyncPacket {
-//        int timestamp;
-//       int localTime;
-//	};
+	// ** NetworkHandler::sendPacket
+	template<typename T, typename Arg0, typename Arg1>
+	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1 )
+	{
+		T packet( arg0, arg1 );
+		sendPacket( socket, &packet );
+	}
 
-    // ** packet sRemoteCallPacket
-//    struct sRemoteCallPacket {
-//        std::string         name;
-//        int                 identifier;
-//        std::vector<cValue> args;
-//    };
-
-    // ** packet sRemoteResponsePacket
-//    struct sRemoteResponsePacket {
-//        int    identifier;
-//	//	cValue value;
-//    };
-
-    // ** packet sSendFile
-//    struct sSendFile {
-//        std::string fileName;
-//        int         length;
-//    };
-
-    // ** packet sFileChunk
-//    struct sFileChunk {
-//		std::vector<u8> data;
-//    };
-
-    //! Basic network handler class.
-    class NetworkHandler {
-
-        // ** enum eFlags
-        enum eFlags {
-            Connected           = BIT( 0 ),
-            ListeningDatagrams  = BIT( 1 ),
-            ListeningBroadcast  = BIT( 2 ),
-        };
-
-        enum { PacketMagic = 0xef, MaxPacketBufferSize = 4096, MaxFileChunkSize = 4000 };
-
-//        DC_DECLARE_IS( NetworkServerHandler, ServerHandler, NULL )
-//        DC_DECLARE_IS( NetworkClientHandler, ClientHandler, NULL )
-
-        typedef Map<s32, io::ByteBufferPtr> InputStreams;   
-
-    public:
-
-                                NetworkHandler( void );
-        virtual                 ~NetworkHandler( void );
-
-        void                    Disconnect( void );
-        virtual bool            Update( int dt );
-        bool                    ListenDatagrams( u16 port );
-        bool                    ListenBroadcast( u16 port );
-        bool                    SendFile( const io::StreamPtr& file, CString fileName, Socket connection = -1 );
-        bool                    SendPacket( int packetId, const INetworkPacket *packet, int connection = -1 );
-        bool                    SendDatagram( int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
-        bool                    SendBroadcast( int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
-        bool                    RegisterPacket( int packetId, const INetworkPacket *packet );
-        int                     GetMaxPacketPayload( void ) const;
-        bool                    IsConnected( void ) const;
-        bool                    IsListeningDatagrams( void ) const;
-        bool                    IsListeningBroadcast( void ) const;
-
-    //    bool                    RegisterRemoteProcedure( CString name, const RemoteProcedureCallback& callback );
-    //    bool                    InvokeRemoteProcedure( CString name, const Value *args, int count );
-    //    bool                    InvokeRemoteProcedure( CString name, const Value *args, int count, const RemoteProcedureResponseCallback& callback );
-
-    protected:
-
-        io::ByteBufferPtr       GetOrCreateInputStream( Socket connection );
-        void                    ParseReceivedPackets( io::ByteBufferPtr& stream, const NetworkAddress& address, Socket connection );
-        bool                    SendUDP( UDPSocket* socket, int packetId, const INetworkPacket *packet, const NetworkAddress& address, u16 port );
-
-        virtual void            ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, Socket connection );
-        virtual void            ProcessConnection( const NetworkAddress& address );
-        virtual void            ProcessDisconnection( void );
-        virtual void            ProcessFailure( void );
-
-    private:
-
-        // ** Socket event handlers
-   //     void                    OnDataReceived( const dcEvent e );
-   //     void                    OnDisconnected( const dcEvent e );
-   //     void                    OnPacketUDP( const dcEvent e );
-
-    protected:
-
-        TCPSocketPtr			m_netTCP;
-        UDPSocketPtr            m_netDatagram;
-        UDPSocketPtr            m_netBroadcast;
-        cFlagSet8               m_flags;
-        class PacketFormatter*  m_packetParser;
-        io::ByteBufferPtr		m_outputStream;
-        InputStreams            m_inputStreams;
-        class RemoteProcedure*  m_remoteProcedure;
-    };
-
-	/*
-    // ** class NetworkHandlerEvent
-    class NetworkHandlerEvent : public event::Event {
-
-        dcDeclareEventID( Connected, const NetworkAddress& address )
-        dcDeclareEventID( FileAccepted, const char *fileName, int length )
-        dcDeclareEventID( FileChunk, const u8 *data, int length )
-        dcDeclareEventID( FileDownloaded )
-        dcDeclareEventID( Disconnected )
-        dcDeclareEventID( Failure )
-        dcDeclareEventID( ConnectionAccepted, int connection, const NetworkAddress& address )
-        dcDeclareEventID( ConnectionClosed, int connection )
-        dcDeclareEventID( PacketReceived, int packetId, const INetworkPacket *packet, int connection, const NetworkAddress& address )
-
-        dcBeginClass( NetworkHandlerEvent )
-        dcEndClass
-
-    public:
-
-                                NetworkHandlerEvent( dcContext ctx = NULL ) : Event( ctx ) { m_type = "NetworkHandlerEvent"; }
-
-    public:
-
-        int                     m_packetId;
-        const INetworkPacket*   m_packet;
-        int                     m_size;
-        int                     m_connection;
-        NetworkAddress          m_address;
-        const char*             m_fileName;
-        const u8*             m_data;
-        int                     m_length;
-    };
-    */
 } // namespace net
     
 DC_END_DREEMCHEST

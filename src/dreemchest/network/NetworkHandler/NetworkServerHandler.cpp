@@ -64,6 +64,7 @@ void NetworkServerHandler::update( void )
 void NetworkServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
+	doLatencyTest( socket, 5 );
 }
 
 // ** NetworkServerHandler::processClientDisconnection

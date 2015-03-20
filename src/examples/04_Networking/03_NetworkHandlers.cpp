@@ -44,7 +44,7 @@ using namespace net;
 thread::Thread* serverThread = NULL;
 
 // Application delegate is used to handle an events raised by application instance.
-class Server : public ApplicationDelegate {
+class NetworkHandlers : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application )
@@ -58,7 +58,7 @@ class Server : public ApplicationDelegate {
 
 		NetworkServerHandlerPtr server = startServer( application, 20000 );
 		serverThread = thread::Thread::create();
-		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
+		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
 
 		NetworkClientHandlerPtr client = connectToServer( application, 20000 );
 
@@ -108,5 +108,5 @@ class Server : public ApplicationDelegate {
 	}
 };
 
-// Now declare an application entry point with Files application delegate.
-dcDeclareApplication( new Server )
+// Now declare an application entry point with NetworkHandlers application delegate.
+dcDeclareApplication( new NetworkHandlers )
