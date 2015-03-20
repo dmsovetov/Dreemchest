@@ -56,11 +56,11 @@ class NetworkHandlers : public ApplicationDelegate {
 		//! Create a network interface
 		Network network;
 
-		NetworkServerHandlerPtr server = startServer( application, 20000 );
+		ServerHandlerPtr server = startServer( application, 20000 );
 		serverThread = thread::Thread::create();
 		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
 
-		NetworkClientHandlerPtr client = connectToServer( application, 20000 );
+		ClientHandlerPtr client = connectToServer( application, 20000 );
 
 		while( true ) {
 			client->update();
@@ -73,32 +73,32 @@ class NetworkHandlers : public ApplicationDelegate {
 	void updateServer( void* userData )
 	{
 		while( true ) {
-			reinterpret_cast<NetworkServerHandler*>( userData )->update();
+			reinterpret_cast<ServerHandler*>( userData )->update();
 			thread::Thread::sleep( 1 );
 		}
 	}
 
 	// This method connects to a remote socket.
-	NetworkClientHandlerPtr connectToServer( Application* application, u16 port )
+	ClientHandlerPtr connectToServer( Application* application, u16 port )
 	{
 		// Connect to remote server
-		NetworkClientHandlerPtr client = NetworkClientHandler::create( NetworkAddress::Localhost, port );
+		ClientHandlerPtr client = ClientHandler::create( NetworkAddress::Localhost, port );
 
 		if( client == NULL ) {
-			return NetworkClientHandlerPtr();
+			return ClientHandlerPtr();
 		}
 
 		return client;
 	}
 
 	// This method starts a TCP server
-	NetworkServerHandlerPtr startServer( Application* application, u16 port )
+	ServerHandlerPtr startServer( Application* application, u16 port )
 	{
 		// Create a server-side network handler
-		NetworkServerHandlerPtr server = NetworkServerHandler::create( port );
+		ServerHandlerPtr server = ServerHandler::create( port );
 
 		if( server == NULL ) {
-			return NetworkServerHandlerPtr();
+			return ServerHandlerPtr();
 		}
 
 		// Check for incomming data.

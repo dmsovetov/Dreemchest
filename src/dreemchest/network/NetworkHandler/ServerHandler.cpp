@@ -24,51 +24,51 @@
 
  **************************************************************************/
 
-#include "NetworkServerHandler.h"
+#include "ServerHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// --------------------------------------- NetworkServerHandler -------------------------------------- //
+// --------------------------------------- ServerHandler -------------------------------------- //
 
-// ** NetworkServerHandler::NetworkServerHandler
-NetworkServerHandler::NetworkServerHandler( const TCPSocketListenerPtr& socketListener ) : m_socketListener( socketListener )
+// ** ServerHandler::ServerHandler
+ServerHandler::ServerHandler( const TCPSocketListenerPtr& socketListener ) : m_socketListener( socketListener )
 {
 }
 
-// ** NetworkServerHandler::create
-NetworkServerHandlerPtr NetworkServerHandler::create( u16 port )
+// ** ServerHandler::create
+ServerHandlerPtr ServerHandler::create( u16 port )
 {
 	ServerSocketDelegate* serverDelegate = DC_NEW ServerSocketDelegate;
 	TCPSocketListenerPtr  socketListener = TCPSocketListener::bindTo( port, serverDelegate );
 
 	if( socketListener == NULL ) {
-		return NetworkServerHandlerPtr();
+		return ServerHandlerPtr();
 	}
 
-	NetworkServerHandler* serverHandler = DC_NEW NetworkServerHandler( socketListener );
-	serverDelegate->m_serverHandler     = serverHandler;
+	ServerHandler* serverHandler    = DC_NEW ServerHandler( socketListener );
+	serverDelegate->m_serverHandler = serverHandler;
 
-	return NetworkServerHandlerPtr( serverHandler );
+	return ServerHandlerPtr( serverHandler );
 }
 
-// ** NetworkServerHandler::update
-void NetworkServerHandler::update( void )
+// ** ServerHandler::update
+void ServerHandler::update( void )
 {
 	NetworkHandler::update();
 	m_socketListener->update();
 }
 
-// ** NetworkServerHandler::processClientConnection
-void NetworkServerHandler::processClientConnection( TCPSocket* socket )
+// ** ServerHandler::processClientConnection
+void ServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
 	doLatencyTest( socket, 5 );
 }
 
-// ** NetworkServerHandler::processClientDisconnection
-void NetworkServerHandler::processClientDisconnection( TCPSocket* socket )
+// ** ServerHandler::processClientDisconnection
+void ServerHandler::processClientDisconnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
 }

@@ -24,39 +24,39 @@
 
  **************************************************************************/
 
-#include "NetworkClientHandler.h"
+#include "ClientHandler.h"
 
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// -----------------------------------------NetworkClientHandler --------------------------------------- //
+// -----------------------------------------ClientHandler --------------------------------------- //
 
-// ** NetworkClientHandler::NetworkClientHandler
-NetworkClientHandler::NetworkClientHandler( TCPSocketPtr socket ) : m_socket( socket )
+// ** ClientHandler::ClientHandler
+ClientHandler::ClientHandler( TCPSocketPtr socket ) : m_socket( socket )
 {
 
 }
 
-// ** NetworkClientHandler::create
-NetworkClientHandlerPtr NetworkClientHandler::create( const NetworkAddress& address, u16 port )
+// ** ClientHandler::create
+ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port )
 {
 	ClientSocketDelegate* clientDelegate = DC_NEW ClientSocketDelegate;
 	TCPSocketPtr	      clientSocket   = TCPSocket::connectTo( address, port, clientDelegate );
 
 	if( clientSocket == NULL ) {
-		return NetworkClientHandlerPtr();
+		return ClientHandlerPtr();
 	}
 
-	NetworkClientHandler* clientHandler = DC_NEW NetworkClientHandler( clientSocket );
-	clientDelegate->m_clientHandler     = clientHandler;
+	ClientHandler* clientHandler    = DC_NEW ClientHandler( clientSocket );
+	clientDelegate->m_clientHandler = clientHandler;
 
-	return NetworkClientHandlerPtr( clientHandler );
+	return ClientHandlerPtr( clientHandler );
 }
 
-// ** NetworkClientHandler::update
-void NetworkClientHandler::update( void )
+// ** ClientHandler::update
+void ClientHandler::update( void )
 {
 	NetworkHandler::update();
 	m_socket->update();

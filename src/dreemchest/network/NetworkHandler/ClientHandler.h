@@ -24,19 +24,18 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_NetworkClientHandler_H__
-#define		__DC_Network_NetworkClientHandler_H__
+#ifndef		__DC_Network_ClientHandler_H__
+#define		__DC_Network_ClientHandler_H__
 
 #include "NetworkHandler.h"
 #include "../Sockets/TCPSocket.h"
-//#include    "TimeSync.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    // ** class NetworkClientHandler
-    class NetworkClientHandler : public NetworkHandler {
+    // ** class ClientHandler
+    class ClientHandler : public NetworkHandler {
 	friend class ClientSocketDelegate;
     public:
 
@@ -47,15 +46,15 @@ namespace net {
    //     bool                Connect( const NetworkAddress& address, u16 port );
 
 		//! Creates a new NetworkClientHandler instance and connects to server.
-		static NetworkClientHandlerPtr	create( const NetworkAddress& address, u16 port );
+		static ClientHandlerPtr	create( const NetworkAddress& address, u16 port );
 
         // ** NetworkHandler
-        virtual void					update( void );
+        virtual void			update( void );
 
 	protected:
 
-										//! Constructs NetworkClientHandler instance.
-										NetworkClientHandler( TCPSocketPtr socket );
+								//! Constructs ClientHandler instance.
+								ClientHandler( TCPSocketPtr socket );
 
 	private:
 
@@ -76,18 +75,18 @@ namespace net {
 
 	//! Client socket handler.
 	class ClientSocketDelegate : public TCPSocketDelegate {
-	friend class NetworkClientHandler;
+	friend class ClientHandler;
 	public:
 
 		//! Handles a socket disconnection.
-		virtual void			handleClosed( TCPSocket* sender );
+		virtual void		handleClosed( TCPSocket* sender );
 
 		//! Handles a received data.
-		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
+		virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
 
 	private:
 
-		NetworkClientHandler*	m_clientHandler;
+		ClientHandler*		m_clientHandler;
 	};
     
 } // namespace net

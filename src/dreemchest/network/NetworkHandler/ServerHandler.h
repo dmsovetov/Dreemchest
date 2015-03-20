@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_NetworkServerHandler_H__
-#define		__DC_Network_NetworkServerHandler_H__
+#ifndef		__DC_Network_ServerHandler_H__
+#define		__DC_Network_ServerHandler_H__
 
 #include "NetworkHandler.h"
 #include "../Sockets/TCPSocketListener.h"
@@ -35,31 +35,31 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 	//! Server-side network handler.
-    class NetworkServerHandler : public NetworkHandler {
+    class ServerHandler : public NetworkHandler {
 	friend class ServerSocketDelegate;
     public:
 
         // ** NetworkHandler
-        virtual void					update( void );
+        virtual void				update( void );
 
 		//! Creates a new server network handler and binds it to specified port.
-		static NetworkServerHandlerPtr	create( u16 port );
+		static ServerHandlerPtr		create( u16 port );
 
 	protected:
 
-										//! Constructs NetworkServerHandler instance.
-										NetworkServerHandler( const TCPSocketListenerPtr& socketListener );
+									//! Constructs ServerHandler instance.
+									ServerHandler( const TCPSocketListenerPtr& socketListener );
 
 		//! Processes a client connection.
-		virtual void					processClientConnection( TCPSocket* socket );
+		virtual void				processClientConnection( TCPSocket* socket );
 
 		//! Processes a client disconnection.
-		virtual void					processClientDisconnection( TCPSocket* socket );
+		virtual void				processClientDisconnection( TCPSocket* socket );
 
 	private:
 
 		//! TCP socket listener.
-		TCPSocketListenerPtr			m_socketListener;
+		TCPSocketListenerPtr		m_socketListener;
 
 //    protected:
 
@@ -81,7 +81,7 @@ namespace net {
 
 	//! Server socket listener handler.
 	class ServerSocketDelegate : public TCPSocketListenerDelegate {
-	friend class NetworkServerHandler;
+	friend class ServerHandler;
 	public:
 
 		//! Handles incoming data from client.
@@ -96,11 +96,11 @@ namespace net {
 	private:
 
 		//! Parent network server handler.
-		NetworkServerHandler*	m_serverHandler;
+		ServerHandler*			m_serverHandler;
 	};
     
 } // namespace net
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkServerHandler_H__	*/
+#endif	/*	!__DC_Network_ServerHandler_H__	*/
