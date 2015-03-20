@@ -115,7 +115,14 @@ bool NetworkHandler::handlePongPacket( TCPSocket* sender, const packets::Pong* p
 // ** NetworkHandler::handleEventPacket
 bool NetworkHandler::handleEventPacket( TCPSocket* sender, const packets::Event* packet )
 {
-	return false;
+	PacketHandlers::iterator i = m_eventHandlers.find( packet->eventId );
+
+	if( i == m_eventHandlers.end() ) {
+		log::warn( "NetworkHandler::handleEventPacket : unknown event %d received\n", packet->eventId );
+		return false;
+	}
+
+	return i->second->handle( sender, packet );
 }
 
 // ** NetworkHandler::update

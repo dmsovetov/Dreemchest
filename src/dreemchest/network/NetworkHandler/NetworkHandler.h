@@ -99,11 +99,17 @@ namespace net {
 		//! A container type to store all registered packet handlers.
 		typedef Map< TypeId, AutoPtr<PacketHandler> > PacketHandlers;
 
+		//! A container type to store all network event emitters.
+		typedef Map< TypeId, AutoPtr<PacketHandler> > EventHandlers;
+
 		//! Packet parser.
 		PacketParser			m_packetParser;
 
 		//! Packet handlers.
 		PacketHandlers			m_packetHandlers;
+
+		//! Event handlers.
+		EventHandlers			m_eventHandlers;
 
 		//! Network event emitter.
 		event::EventEmitter		m_eventEmitter;
@@ -120,7 +126,7 @@ namespace net {
 	template<typename T>
 	inline void NetworkHandler::registerEvent( void )
 	{
-		m_packetHandlers[packets::Event::classTypeId()] = DC_NEW EventPacketHandler<T>( &m_eventEmitter );
+		m_eventHandlers[T::classTypeId()] = DC_NEW EventPacketHandler<T>( &m_eventEmitter );
 	}
 
 	// ** NetworkHandler::subscribe

@@ -32,7 +32,7 @@
 
 #include <threads/Threads.h>
 
-#define LOCAL_MODE	(0)
+#define LOCAL_MODE	(1)
 
 // Open a root engine namespace
 DC_USE_DREEMCHEST
@@ -63,6 +63,11 @@ class NetworkHandlers : public ApplicationDelegate {
 		LolEvent( int x = 0, std::string bar = "" ) : x( x ), bar( bar ) {}
 	};
 
+	struct ExtraEvent : public io::Serializable {
+		ClassEnableTypeId( ExtraEvent )
+		ClassEnableCloning( ExtraEvent )
+	};
+
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application )
 	{
@@ -80,7 +85,9 @@ class NetworkHandlers : public ApplicationDelegate {
 
 		ClientHandlerPtr client = connectToServer( application, 20000 );
 		client->registerEvent<LolEvent>();
+		client->registerEvent<ExtraEvent>();
 		client->subscribe<LolEvent>( dcThisMethod( NetworkHandlers::handleLolEvent ) );
+		client->subscribe<ExtraEvent>( dcThisMethod( NetworkHandlers::handleExtraEvent ) );
 
 		while( true ) {
 			client->update();
@@ -107,6 +114,11 @@ class NetworkHandlers : public ApplicationDelegate {
 		net::log::verbose( "handleLolEvent : x=%d, bar=%s\n", e.x, e.bar.c_str() );
 	}
 
+	void handleExtraEvent( const ExtraEvent& e )
+	{
+		net::log::verbose( "handleExtraEvent\n" );
+	}
+
 	void updateServer( void* userData )
 	{
 		ServerHandler* server = reinterpret_cast<ServerHandler*>( userData );
@@ -120,6 +132,7 @@ class NetworkHandlers : public ApplicationDelegate {
 			if( (++counter % 500) == 0 ) {
 				printf( "emit : %d\n", counter );
 				server->emit( LolEvent( counter, "counter!" ) );
+				server->emit( ExtraEvent() );
 			}
 		}
 	}
