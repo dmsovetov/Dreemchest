@@ -1,2 +1,2 @@
 cd "$(dirname $0)"
-yap MacOS --source ../src --output ../projects/dreemchest.mac --name dreemchest --renderer=OpenGL --sound=OpenAL --threads=Posix --io=yes
+python -m Pygling configure --output ../projects --source ../src --name dreemchest —platform MacOS --renderer=OpenGL --sound=OpenAL --threads=Posix --io=yes --network=yes

@@ -1,2 +1,2 @@
 cd "$(dirname $0)"
-yap iOS --source ../src --output ../projects/dreemchest.ios --name dreemchest --renderer=OpenGL --sound=OpenAL --threads=Posix
+python -m Pygling configure --output ../projects --source ../src --name dreemchest —platform iOS --renderer=OpenGL --sound=OpenAL --threads=Posix --io=yes --network=yes
