@@ -34,6 +34,8 @@
 #endif
 
 #include "../io/Io.h"
+#include "../io/streams/ByteBuffer.h"
+#include "../event/EventEmitter.h"
 #include <time.h>
 
 DC_BEGIN_DREEMCHEST

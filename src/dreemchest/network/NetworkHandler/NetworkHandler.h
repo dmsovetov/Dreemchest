@@ -29,7 +29,7 @@
 
 #include "Packets.h"
 #include "PacketHandler.h"
-#include "../../event/EventEmitter.h"
+#include "EventHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -47,7 +47,7 @@ namespace net {
 
 		//! Registers a new packet type.
 		template<typename T>
-		void					registerPacketHandler( const typename GenericPacketHandler<T>::Callback& callback );
+		void					registerPacketHandler( const typename PacketHandler<T>::Callback& callback );
 
 		//! Registers a new event type.
 		template<typename T>
@@ -97,10 +97,10 @@ namespace net {
 	protected:
 
 		//! A container type to store all registered packet handlers.
-		typedef Map< TypeId, AutoPtr<PacketHandler> > PacketHandlers;
+		typedef Map< TypeId, AutoPtr<IPacketHandler> > PacketHandlers;
 
 		//! A container type to store all network event emitters.
-		typedef Map< TypeId, AutoPtr<PacketHandler> > EventHandlers;
+		typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
 
 		//! Packet parser.
 		PacketParser			m_packetParser;
@@ -117,16 +117,16 @@ namespace net {
 
 	// ** NetworkHandler::registerPacketHandler
 	template<typename T>
-	inline void NetworkHandler::registerPacketHandler( const typename GenericPacketHandler<T>::Callback& callback )
+	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
 		m_packetParser.registerPacketType<T>();
-		m_packetHandlers[T::classTypeId()] = DC_NEW GenericPacketHandler<T>( callback );
+		m_packetHandlers[T::classTypeId()] = DC_NEW PacketHandler<T>( callback );
 	}
 
 	template<typename T>
 	inline void NetworkHandler::registerEvent( void )
 	{
-		m_eventHandlers[T::classTypeId()] = DC_NEW EventPacketHandler<T>( &m_eventEmitter );
+		m_eventHandlers[T::classTypeId()] = DC_NEW EventHandler<T>( &m_eventEmitter );
 	}
 
 	// ** NetworkHandler::subscribe

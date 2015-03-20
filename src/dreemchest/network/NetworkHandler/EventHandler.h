@@ -24,57 +24,61 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_PacketHandler_H__
-#define __DC_Network_PacketHandler_H__
+#ifndef __DC_Network_EventHandler_H__
+#define __DC_Network_EventHandler_H__
 
-#include "../Network.h"
+#include "Packets.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! Packet handler interface class.
-	class IPacketHandler {
+	//! Event handler interface class.
+	class IEventHandler {
 	public:
 
-		virtual			~IPacketHandler( void ) {}
+		virtual			~IEventHandler( void ) {}
 
 		//! Packet handler callback.
-		virtual bool	handle( TCPSocket* sender, const NetworkPacket* packet ) = 0;
+		virtual bool	handle( TCPSocket* sender, const packets::Event* packet ) = 0;
 	};
 
-	//! Template class that handles a strict-typed packets.
+	//! Template class that handles an Event packet and emits the local event.
 	template<typename T>
-	class PacketHandler : public IPacketHandler {
+	class EventHandler : public IEventHandler {
 	public:
 
-		//! Function type to handle packets.
-		typedef cClosure<bool(TCPSocket*,const T*)> Callback;
+								//! Constructs EventHandler instance.
+								EventHandler( event::EventEmitter* eventEmitter )
+									: m_eventEmitter( eventEmitter ) {}
 
-						//! Constructs GenericPacketHandler instance.
-						PacketHandler( const Callback& callback )
-							: m_callback( callback ) {}
-
-		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( TCPSocket* sender, const NetworkPacket* packet );
+		//! Reads a payload from an Event packet and emits it as local event.
+		virtual bool handle( TCPSocket* sender, const packets::Event* packet );
 
 	private:
 
-		//! Packet handler callback.
-		Callback	 m_callback;
+		//! Parent event emitter.
+		event::EventEmitter*	m_eventEmitter;
 	};
 
-	// ** PacketHandler::handle
+	// ** EventHandler::handle
 	template<typename T>
-	bool PacketHandler<T>::handle( TCPSocket* sender, const NetworkPacket* packet )
+	inline bool EventHandler<T>::handle( TCPSocket* sender, const packets::Event* packet )
 	{
-		const T* packetWithType = castTo<T>( packet );
-		DC_BREAK_IF( packetWithType == NULL );
-		return m_callback( sender, packetWithType );
+		T e;
+
+		if( packet->payload.size() ) {
+			io::ByteBufferPtr buffer = io::ByteBuffer::createFromData( &packet->payload[0], packet->payload.size() );
+			io::Storage       storage( io::StorageBinary, buffer );
+			e.read( storage );
+		}
+
+		m_eventEmitter->emit( e );
+		return true;
 	}
 
 } // namespace net
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_PacketHandler_H__	*/
+#endif	/*	!__DC_Network_EventHandler_H__	*/
