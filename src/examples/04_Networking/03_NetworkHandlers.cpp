@@ -32,6 +32,8 @@
 
 #include <threads/Threads.h>
 
+#define LOCAL_MODE	(0)
+
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
@@ -71,6 +73,7 @@ class NetworkHandlers : public ApplicationDelegate {
 		//! Create a network interface
 		Network network;
 
+	#if LOCAL_MODE
 		ServerHandlerPtr server = startServer( application, 20000 );
 		serverThread = thread::Thread::create();
 		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
@@ -82,6 +85,18 @@ class NetworkHandlers : public ApplicationDelegate {
 		while( true ) {
 			client->update();
 		}
+	#else
+		ClientHandlerPtr client = connectToServer( application, 20000 );
+		if( client != NULL ) {
+			while( true ) {
+				client->update();
+			}
+		}
+
+		ServerHandlerPtr server = startServer( application, 20000 );
+
+		updateServer( server.get() );
+	#endif
 
 		// Now quit
 		application->quit();
@@ -102,8 +117,8 @@ class NetworkHandlers : public ApplicationDelegate {
 			server->update();
 			thread::Thread::sleep( 1 );
 
-			if( (++counter % 1000) == 0 ) {
-				printf( "emit\n" );
+			if( (++counter % 500) == 0 ) {
+				printf( "emit : %d\n", counter );
 				server->emit( LolEvent( counter, "counter!" ) );
 			}
 		}
