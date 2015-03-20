@@ -174,7 +174,7 @@ namespace io {
     {
         pushWrite( StorageState( key, ( u32 )array.size() ) );
 
-        for( int i = 0; i < array.size(); i++ ) {
+        for( u32 i = 0; i < ( u32 )array.size(); i++ ) {
             pushWrite( StorageState( i ) );
             detail::createFieldSerializer( NULL, array[i] )->write( *this );
         }
@@ -191,7 +191,7 @@ namespace io {
         pushRead( state );
 
         array.resize( state.m_size );
-        for( int i = 0; i < array.size(); i++ ) {
+        for( u32 i = 0; i < ( u32 )array.size(); i++ ) {
             StorageState state( i );
             pushRead( state );
             detail::createFieldSerializer( NULL, array[i] )->read( *this );
