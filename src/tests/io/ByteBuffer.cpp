@@ -47,19 +47,19 @@ TEST(ByteBuffer, PositionAfterCreation)
 
 TEST(ByteBuffer, SizeAfterInitilization)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     EXPECT_EQ( strlen( data ), buffer->length() );
 }
 
 TEST(ByteBuffer, PiositionAfterInitilization)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     EXPECT_EQ( 0, buffer->position() );
 }
 
 TEST(ByteBuffer, DataAfterInitialization)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     for( int i = 0; i < buffer->length(); i++ ) {
@@ -69,7 +69,7 @@ TEST(ByteBuffer, DataAfterInitialization)
 
 TEST(ByteBuffer, SeekSet)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     for( int i = 0; i < buffer->length(); i++ ) {
@@ -80,7 +80,7 @@ TEST(ByteBuffer, SeekSet)
 
 TEST(ByteBuffer, SeekCur)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     for( int i = 0; i < buffer->length(); i++ ) {
@@ -91,7 +91,7 @@ TEST(ByteBuffer, SeekCur)
 
 TEST(ByteBuffer, SeekEnd)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     for( int i = 0; i < buffer->length(); i++ ) {
@@ -102,7 +102,7 @@ TEST(ByteBuffer, SeekEnd)
 
 TEST(ByteBuffer, DataAfterSeek)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     for( int i = 0; i < buffer->length(); i++ ) {
@@ -114,7 +114,7 @@ TEST(ByteBuffer, DataAfterSeek)
 
 TEST(ByteBuffer, Fill)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     buffer->fill( 1 );
@@ -126,7 +126,7 @@ TEST(ByteBuffer, Fill)
 
 TEST(ByteBuffer, TrimLeft)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     buffer->trimFromLeft( 2 );
@@ -139,7 +139,7 @@ TEST(ByteBuffer, TrimLeft)
 
 TEST(ByteBuffer, TrimRight)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     buffer->trimFromRight( 2 );
@@ -152,7 +152,7 @@ TEST(ByteBuffer, TrimRight)
 
 TEST(ByteBuffer, Read)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char in[20] = { 0 };
@@ -163,7 +163,7 @@ TEST(ByteBuffer, Read)
 
 TEST(ByteBuffer, PositionAfterRead)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char in[20] = { 0 };
@@ -174,7 +174,7 @@ TEST(ByteBuffer, PositionAfterRead)
 
 TEST(ByteBuffer, SequentialRead)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char c;
@@ -188,7 +188,7 @@ TEST(ByteBuffer, SequentialRead)
 
 TEST(ByteBuffer, Write)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char* text = "written";
@@ -201,7 +201,7 @@ TEST(ByteBuffer, Write)
 
 TEST(ByteBuffer, PositionAfterWrite)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char* text = "written";
@@ -212,7 +212,7 @@ TEST(ByteBuffer, PositionAfterWrite)
 
 TEST(ByteBuffer, SequentialWrite)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char c = 'x';
@@ -229,7 +229,7 @@ TEST(ByteBuffer, SequentialWrite)
 
 TEST(ByteBuffer, BytesAbvailableAfterInit)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
     EXPECT_EQ( strlen( data ), buffer->bytesAvailable() );
     EXPECT_EQ( buffer->length(), buffer->bytesAvailable() );
@@ -237,7 +237,7 @@ TEST(ByteBuffer, BytesAbvailableAfterInit)
 
 TEST(ByteBuffer, BytesAbvailableAfterRead)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     char c;
@@ -251,7 +251,7 @@ TEST(ByteBuffer, BytesAbvailableAfterRead)
 
 TEST(ByteBuffer, WriteExpandsTheBuffer)
 {
-    ByteBufferPtr buffer = ByteBuffer::createWithData( ( u8* )data, strlen( data ) );
+    ByteBufferPtr buffer = ByteBuffer::createFromData( ( u8* )data, strlen( data ) );
     ASSERT_EQ( strlen( data ), buffer->length() );
 
     buffer->setPosition( 0, SeekEnd );
