@@ -115,6 +115,11 @@ u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 // ** PosixTCPSocket::update
 void PosixTCPSocket::update( void )
 {
+    if( !m_socket.isValid() ) {
+        log::verbose( "PosixTCPSocket::update : updating socket with an invalid descriptor.\n" );
+        return;
+    }
+    
 	s32				 result = 0;
 	TCPStream*		 stream = m_stream.get();
 	TCPStream::State state  = TCPStream::Idle;
