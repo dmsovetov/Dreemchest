@@ -42,7 +42,7 @@ namespace net {
 		// ** TCPSocketListenerPrivate
 		virtual void					update( void );
 		virtual void					close( void );
-		virtual u32						connectionsCount( void ) const;
+		virtual const TCPSocketList&	connections( void ) const;
 
 		//! Binds a socket to a specified port.
 		bool							bindTo( u16 port );

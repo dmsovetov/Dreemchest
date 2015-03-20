@@ -53,11 +53,11 @@ void TCPSocketListener::close( void )
 	m_impl->close();
 }
 
-// ** TCPSocketListener::connectionsCount
-u32 TCPSocketListener::connectionsCount( void ) const
+// ** TCPSocketListener::connections
+const TCPSocketList& TCPSocketListener::connections( void ) const
 {
-	DC_CHECK_IMPL( 0 );
-	return m_impl->connectionsCount();
+	DC_CHECK_IMPL( TCPSocketList() );
+	return m_impl->connections();
 }
 
 // ** TCPSocketListener::bindTo

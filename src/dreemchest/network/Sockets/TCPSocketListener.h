@@ -34,9 +34,9 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 	BeginPrivateInterface( TCPSocketListener )
-		InterfaceMethod( void update( void ) )
-		InterfaceMethod( void close( void ) )
-		InterfaceMethod( u32  connectionsCount( void ) const )
+		InterfaceMethod( void					update( void ) )
+		InterfaceMethod( void					close( void ) )
+		InterfaceMethod( const TCPSocketList&	connections( void ) const )
 	EndPrivateInterface
 
 	//! Binds a TCP socket to port and listens for incoming connections.
@@ -53,8 +53,8 @@ namespace net {
 		//! Closes a socket listener.
 		void						close( void );
 
-		//! Returns a total number of active connections.
-		u32							connectionsCount( void ) const;
+		//! Returns a list of active connections.
+		const TCPSocketList&		connections( void ) const;
 
 		//! Creates and binds a new socket listener to a specified port.
 		static TCPSocketListenerPtr	bindTo( u16 port, TCPSocketListenerDelegate* delegate = NULL );

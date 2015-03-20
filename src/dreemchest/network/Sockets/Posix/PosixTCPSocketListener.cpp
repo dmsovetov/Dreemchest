@@ -116,10 +116,10 @@ void PosixTCPSocketListener::close( void )
 	m_clientSockets.clear();
 }
 
-// ** PosixTCPSocketListener::connectionsCount
-u32 PosixTCPSocketListener::connectionsCount( void ) const
+// ** PosixTCPSocketListener::connections
+const TCPSocketList& PosixTCPSocketListener::connections( void ) const
 {
-	return ( u32 )m_clientSockets.size();
+	return m_clientSockets;
 }
 
 // ** PosixTCPSocketListener::acceptConnection
