@@ -35,7 +35,7 @@ namespace net {
 TCPSocketListener::TCPSocketListener( impl::TCPSocketListenerPrivate* impl ) : m_impl( impl )
 {
 	if( m_impl != NULL ) {
-		m_impl->m_parent = this;
+        m_impl->setParent( this );
 	}
 }
 

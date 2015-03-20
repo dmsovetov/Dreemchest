@@ -28,6 +28,7 @@
 #define __DC_Network_PacketHandler_H__
 
 #include "../Network.h"
+#include "../../io/streams/ByteBuffer.h"
 #include "../../event/EventEmitter.h"
 
 DC_BEGIN_DREEMCHEST

@@ -122,7 +122,7 @@ void SocketDescriptor::close( void )
 #if defined( DC_PLATFORM_WINDOWS )
 	closesocket( m_socket );
 #else
-	close( m_socket );
+    ::close( m_socket );
 #endif
 
 	m_socket = INVALID_SOCKET;
@@ -137,7 +137,7 @@ bool SocketDescriptor::setNonBlocking( void )
 	u_long noBlock = 1;
 	result = ioctlsocket( m_socket, FIONBIO, &noBlock );
 #else
-    result = fcntl( socket, F_SETFL, O_NONBLOCK );
+    result = fcntl( m_socket, F_SETFL, O_NONBLOCK );
 #endif
 
 	DC_BREAK_IF( result == SOCKET_ERROR );

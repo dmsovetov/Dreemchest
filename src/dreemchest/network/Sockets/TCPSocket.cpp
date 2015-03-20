@@ -35,7 +35,7 @@ namespace net {
 TCPSocket::TCPSocket( impl::TCPSocketPrivate* impl ) : m_impl( impl )
 {
     if( m_impl != NULL ) {
-        m_impl->m_parent = this;
+        m_impl->setParent( this );
 
 		if( !m_impl->isValid() ) {
 			m_impl = NULL;

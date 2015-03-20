@@ -32,7 +32,7 @@
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
+/*
     // ** class PacketFormatter
     class PacketFormatter {
 
@@ -58,7 +58,7 @@ namespace net {
 
         PacketTypes         m_packets;
         const int           m_magic;
-    };
+    };*/
 
 } // namespace net
 

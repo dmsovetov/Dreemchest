@@ -30,7 +30,7 @@
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
+/*
 // ** PacketFormatter::PacketFormatter
 PacketFormatter::PacketFormatter( int magic ) : m_magic( magic )
 {
@@ -168,7 +168,7 @@ bool PacketFormatter::RegisterPacket( int packetId, const INetworkPacket *packet
     
     m_packets[packetId] = packet;
     return true;
-}
+}*/
 
 } // namespace net
 

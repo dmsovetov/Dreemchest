@@ -47,7 +47,7 @@ namespace net {
 
 		//! Registers a new packet type.
 		template<typename T>
-		void					registerPacketHandler( typename GenericPacketHandler<T>::Callback& callback );
+		void					registerPacketHandler( const typename GenericPacketHandler<T>::Callback& callback );
 
 		//! Registers a new event type.
 		template<typename T>
@@ -111,7 +111,7 @@ namespace net {
 
 	// ** NetworkHandler::registerPacketHandler
 	template<typename T>
-	inline void NetworkHandler::registerPacketHandler( typename GenericPacketHandler<T>::Callback& callback )
+	inline void NetworkHandler::registerPacketHandler( const typename GenericPacketHandler<T>::Callback& callback )
 	{
 		m_packetParser.registerPacketType<T>();
 		m_packetHandlers[T::classTypeId()] = DC_NEW GenericPacketHandler<T>( callback );

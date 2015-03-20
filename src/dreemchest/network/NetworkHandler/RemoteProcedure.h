@@ -32,7 +32,7 @@
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
+/*
     // ** class RemoteProcedure
     class RemoteProcedure {
 
@@ -65,7 +65,7 @@ namespace net {
         RemoteProcedureCallbacks    m_callbacks;
         int                         m_callbackId;
     };
-    
+    */
 } // namespace net
     
 DC_END_DREEMCHEST

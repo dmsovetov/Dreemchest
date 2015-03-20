@@ -30,7 +30,7 @@
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
+/*
 // ** RemoteProcedure::RemoteProcedure
 RemoteProcedure::RemoteProcedure( dcContext ctx, NetworkHandler *networkHandler ) : m_ctx( ctx ), m_networkHandler( networkHandler ), m_callbackId( 0 )
 {
@@ -158,7 +158,7 @@ void RemoteProcedure::OnPacketReceived( const dcEvent e )
                                             break;
     }
 }
-
+*/
 } // namespace net
 
 DC_END_DREEMCHEST

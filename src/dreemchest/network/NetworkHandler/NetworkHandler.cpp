@@ -62,7 +62,8 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
 	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 
-	NetworkPacket* packet = m_packetParser.parseFromStream( io::ByteBufferPtr( stream ) );
+    io::ByteBufferPtr source( stream );
+	NetworkPacket*    packet = m_packetParser.parseFromStream( source );
 
 	if( !packet ) {
 		log::warn( "Failed to parse packed from data sent by %s\n", socket->address().toString() );
