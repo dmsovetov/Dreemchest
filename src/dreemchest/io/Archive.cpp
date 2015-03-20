@@ -100,12 +100,12 @@ bool Archive::packFile( const Path& fileName, const Path& compressedFileName )
     }
 
     while( !feof( input ) ) {
-        u64 read = fread( chunk, 1, CHUNK_SIZE, input );
+        s32 read = fread( chunk, 1, CHUNK_SIZE, input );
         if( read == 0 ) {
             break;
         }
 
-        u64 compressedSize = compressor->compressToBuffer( chunk, read, compressed, CHUNK_SIZE * 2 );
+        s32 compressedSize = compressor->compressToBuffer( chunk, read, compressed, CHUNK_SIZE * 2 );
 
         m_file->write( &compressedSize, sizeof( compressedSize ) );
         m_file->write( compressed, compressedSize );
@@ -233,11 +233,11 @@ bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
         return false;
     }
 
-    const u64 kChunkSize = 16536;
+    const s32 kChunkSize = 16536;
     u8        chunk[kChunkSize];
     
     while( input->hasDataLeft() ) {
-        u64 read = input->read( chunk, kChunkSize );
+        s32 read = input->read( chunk, kChunkSize );
         output->write( chunk, read );
     }
 
@@ -290,7 +290,7 @@ const Archive::sFileInfo* Archive::findFileInfo( const Path& fileName ) const
 }
 
 // ** Archive::createFileInfo
-Archive::sFileInfo* Archive::createFileInfo( const Path& fileName, u64 offset, u64 compressedSize, u64 decompressedSize )
+Archive::sFileInfo* Archive::createFileInfo( const Path& fileName, s32 offset, s32 compressedSize, s32 decompressedSize )
 {
     sFileInfo *entry = DC_NEW sFileInfo( fileName.c_str(), offset, decompressedSize );
     m_files.push_back( entry );

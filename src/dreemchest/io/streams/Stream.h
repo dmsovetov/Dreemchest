@@ -54,22 +54,22 @@ namespace io {
         virtual void            dispose( void );
 
         //! Returns a length in bytes of this stream.
-        virtual u64             length( void ) const;
+        virtual s32             length( void ) const;
 
         //! Returns a current position inside the stream.
-        virtual u64             position( void ) const;
+        virtual s32             position( void ) const;
 
         //! Sets the position inside the stream.
-        virtual void            setPosition( u64 offset, SeekOrigin origin = SeekSet );
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet );
 
         //! Returns true if there are any data left in stream.
         virtual bool            hasDataLeft( void ) const;
 
         //! Reads a string from stream.
-        virtual u64             readString( String& str ) const;
+        virtual s32             readString( String& str ) const;
 
         //! Writes a string to a stream.
-        virtual u64             writeString( CString str );
+        virtual s32             writeString( CString str );
 
         //! Reads data from stream.
         /*!
@@ -77,7 +77,7 @@ namespace io {
          \param size Number of bytes to read from stream.
          \return Number of bytes read from stream.
          */
-        virtual u64             read( void* buffer, u64 size ) const;
+        virtual s32             read( void* buffer, s32 size ) const;
 
         //! Writes data to a stream.
         /*!
@@ -85,7 +85,7 @@ namespace io {
          \param size Number of bytes to write to stream.
          \return Number of bytes written to stream.
          */
-        virtual u64             write( const void* buffer, u64 size );
+        virtual s32             write( const void* buffer, s32 size );
 
     protected:
 

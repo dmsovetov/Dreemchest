@@ -39,8 +39,8 @@ namespace io {
 
         virtual         ~IBufferCompressor( void ) {}
 
-        virtual s64     compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )    = 0;
-        virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )  = 0;
+        virtual s32     compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )    = 0;
+        virtual s32     decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )  = 0;
 	};
 
 } // namespace io

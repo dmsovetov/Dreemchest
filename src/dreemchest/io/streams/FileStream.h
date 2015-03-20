@@ -48,22 +48,22 @@ namespace io {
         virtual void            dispose( void );
 
         //! Returns a total lenght of this file.
-        virtual u64             length( void ) const;
+        virtual s32             length( void ) const;
 
         //! Returns current file position.
-        virtual u64             position( void ) const;
+        virtual s32             position( void ) const;
 
         //! Sets the position inside the file.
-        virtual void            setPosition( u64 offset, SeekOrigin origin = SeekSet );
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet );
 
         //! Returns true if there are any data left.
         virtual bool            hasDataLeft( void ) const;
 
         //! Reads data from file.
-        virtual u64             read( void* buffer, u64 size ) const;
+        virtual s32             read( void* buffer, s32 size ) const;
 
         //! Writes data to file.
-        virtual u64             write( const void* buffer, u64 size );
+        virtual s32             write( const void* buffer, s32 size );
 
         //! Returns a file name of this file.
         const Path&             fileName( void ) const;
@@ -82,7 +82,7 @@ namespace io {
 		FILE*                   m_file;
 
         //! Total file length in bytes.
-		u64                     m_length;
+		s32                     m_length;
 
         //! File name.
         Path                    m_fileName;

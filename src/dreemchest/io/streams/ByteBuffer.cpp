@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** ByteBuffer::ByteBuffer
-ByteBuffer::ByteBuffer( const u8* pointer, u64 size ) : m_position( 0 )
+ByteBuffer::ByteBuffer( const u8* pointer, s32 size ) : m_position( 0 )
 {
     if( size == 0 ) {
         return;
@@ -50,13 +50,13 @@ ByteBuffer::~ByteBuffer( void )
 }
 
 // ** ByteBuffer::create
-ByteBufferPtr ByteBuffer::create( u64 size )
+ByteBufferPtr ByteBuffer::create( s32 size )
 {
     return ByteBufferPtr( new ByteBuffer( NULL, size ) );
 }
 
 // ** ByteBuffer::createWithData
-ByteBufferPtr ByteBuffer::createWithData( const u8* pointer, u64 size )
+ByteBufferPtr ByteBuffer::createWithData( const u8* pointer, s32 size )
 {
     return ByteBufferPtr( new ByteBuffer( pointer, size ) );
 }
@@ -68,7 +68,7 @@ void ByteBuffer::fill( u8 value )
 }
 
 // ** ByteBuffer::bytesAvailable
-u64 ByteBuffer::bytesAvailable( void ) const
+s32 ByteBuffer::bytesAvailable( void ) const
 {
     return length() - m_position;
 }
@@ -86,13 +86,13 @@ const u8* ByteBuffer::current( void ) const
 }
 
 // ** ByteBuffer::length
-u64 ByteBuffer::length( void ) const
+s32 ByteBuffer::length( void ) const
 {
     return ( u64 )m_buffer.size();
 }
 
 // ** ByteBuffer::trimFromLeft
-void ByteBuffer::trimFromLeft( u64 size )
+void ByteBuffer::trimFromLeft( s32 size )
 {
     DC_BREAK_IF( size > length() );
     m_buffer.erase( m_buffer.begin(), m_buffer.begin() + size );
@@ -100,7 +100,7 @@ void ByteBuffer::trimFromLeft( u64 size )
 }
 
 // ** ByteBuffer::trimFromRight
-void ByteBuffer::trimFromRight( u64 size )
+void ByteBuffer::trimFromRight( s32 size )
 {
     DC_BREAK_IF( size > length() );
     m_buffer.erase( m_buffer.begin() + (length() - size), m_buffer.end() );
@@ -108,7 +108,7 @@ void ByteBuffer::trimFromRight( u64 size )
 }
 
 // ** ByteBuffer::read
-u64 ByteBuffer::read( void* buffer, u64 size ) const
+s32 ByteBuffer::read( void* buffer, s32 size ) const
 {
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
@@ -121,12 +121,12 @@ u64 ByteBuffer::read( void* buffer, u64 size ) const
 }
 
 // ** ByteBuffer::write
-u64 ByteBuffer::write( const void* buffer, u64 size )
+s32 ByteBuffer::write( const void* buffer, s32 size )
 {
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
 
-    u64 extra = std::max( ( u64 )0, size - bytesAvailable() );
+    s32 extra = std::max( 0, size - bytesAvailable() );
 
     if( extra ) {
         m_buffer.resize( length() + extra );
@@ -139,22 +139,22 @@ u64 ByteBuffer::write( const void* buffer, u64 size )
 }
 
 // ** ByteBuffer::position
-u64 ByteBuffer::position( void ) const
+s32 ByteBuffer::position( void ) const
 {
     return m_position;
 }
 
 // ** ByteBuffer::setPosition
-void ByteBuffer::setPosition( u64 offset, SeekOrigin origin )
+void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-    case SeekSet:   m_position = std::min( length() - 1, offset );
+    case SeekSet:   m_position = std::min( length(), offset );
                     break;
             
     case SeekCur:   m_position = std::min( m_position + offset, length() );
                     break;
             
-	case SeekEnd:   m_position = std::max( static_cast<u64>(0), length() - offset );
+	case SeekEnd:   m_position = std::max( 0, length() - offset );
                     break;
 	}
 }

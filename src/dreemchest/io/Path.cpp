@@ -180,7 +180,7 @@ StringList Path::split( CString str )
     char* path = strdup( str );
 
     // ** Replace \\ in path
-    for( int i = 0; i < strlen( path ); i++ ) {
+    for( s32 i = 0; i < ( s32 )strlen( path ); i++ ) {
         if( path[i] == '\\' ) {
             path[i] = '/';
         }

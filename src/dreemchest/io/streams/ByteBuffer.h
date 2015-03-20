@@ -44,25 +44,25 @@ namespace io {
 		virtual					~ByteBuffer( void );
 
         //! Returns a length of this stream.
-        virtual u64             length( void ) const;
+        virtual s32             length( void ) const;
 
         //! Returns current memory offset in bytes.
-        virtual u64             position( void ) const;
+        virtual s32             position( void ) const;
 
         //! Sets an offset inside this byte buffer.
-        virtual void            setPosition( u64 offset, SeekOrigin origin = SeekSet );
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet );
 
         //! Reads data from stream.
-        virtual u64             read( void* buffer, u64 size ) const;
+        virtual s32             read( void* buffer, s32 size ) const;
 
         //! Writes data from stream.
-        virtual u64             write( const void* buffer, u64 size );
+        virtual s32             write( const void* buffer, s32 size );
 
         //! Fills this memory with a given value
         void                    fill( u8 value );
 
         //! Returns a total number of bytes available starting from current stream position.
-        u64                     bytesAvailable( void ) const;
+        s32                     bytesAvailable( void ) const;
 
         //! Returns a data pointer.
         const u8*               buffer( void ) const;
@@ -71,26 +71,26 @@ namespace io {
         const u8*               current( void ) const;
 
         //! Trims a specified amount of bytes from the beginning of a stream.
-        void                    trimFromLeft( u64 size );
+        void                    trimFromLeft( s32 size );
 
         //! Trims a specified amount of bytes from the end of a stream.
-        void                    trimFromRight( u64 size );
+        void                    trimFromRight( s32 size );
 
         //! Creates an empty byte buffer.
-        static ByteBufferPtr    create( u64 size = 0 );
+        static ByteBufferPtr    create( s32 size = 0 );
 
         //! Creates a byte buffer from data.
-        static ByteBufferPtr    createWithData( const u8* pointer, u64 size );
+        static ByteBufferPtr    createWithData( const u8* pointer, s32 size );
 
     protected:
 
                                 //! Constructs a memory stream from data.
-                                ByteBuffer( const u8* pointer, u64 size );
+                                ByteBuffer( const u8* pointer, s32 size );
 
 	private:
 
         //! Current stream position.
-        mutable u64             m_position;
+        mutable s32             m_position;
 
         //! Stream buffer.
         Array<u8>               m_buffer;

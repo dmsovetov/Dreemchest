@@ -49,10 +49,10 @@ void Stream::dispose( void )
 }
 
 // ** Stream::readString
-u64 Stream::readString( String& str ) const
+s32 Stream::readString( String& str ) const
 {
-    u64 result		= 0;
-    u64 strResult	= 0;
+    s32 result		= 0;
+    s32 strResult	= 0;
     u32 length		= 0;
 
     str     = "";
@@ -69,9 +69,9 @@ u64 Stream::readString( String& str ) const
 }
 
 // ** Stream::writeString
-u64 Stream::writeString( CString str )
+s32 Stream::writeString( CString str )
 {
-    u64 result = 0;
+    s32 result = 0;
     u32 length = ( u32 )strlen( str );
 
     result += write( &length, sizeof( length ) );
@@ -83,21 +83,21 @@ u64 Stream::writeString( CString str )
 }
 
 // ** Stream::length
-u64 Stream::length( void ) const
+s32 Stream::length( void ) const
 {
     DC_BREAK;
     return 0;
 }
     
 // ** Stream::position
-u64 Stream::position( void ) const
+s32 Stream::position( void ) const
 {
     DC_BREAK;
     return 0;
 }
     
 // ** Stream::setPosition
-void Stream::setPosition( u64 offset, SeekOrigin origin )
+void Stream::setPosition( s32 offset, SeekOrigin origin )
 {
     DC_BREAK;
 }
@@ -109,14 +109,14 @@ bool Stream::hasDataLeft( void ) const
 }
     
 // ** Stream::read
-u64 Stream::read( void* buffer, u64 size ) const
+s32 Stream::read( void* buffer, s32 size ) const
 {
     DC_BREAK;
     return 0;
 }
     
 // ** Stream::write
-u64 Stream::write( const void* buffer, u64 size )
+s32 Stream::write( const void* buffer, s32 size )
 {
     DC_BREAK;
     return 0;

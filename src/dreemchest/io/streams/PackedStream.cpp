@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** PackedStream::PackedStream
-PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor, u64 fileSize, u64 fileOffset )
+PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor, s32 fileSize, s32 fileOffset )
     : m_compressor( compressor ), m_file( file ), m_fileSize( fileSize ), m_fileOffset( fileOffset )
 {
     m_position       = 0;
@@ -57,7 +57,7 @@ void PackedStream::reopen( void )
 }
 
 // ** PackedStream::read
-u64 PackedStream::read( void* buffer, u64 size )
+s32 PackedStream::read( void* buffer, s32 size )
 {
     DC_BREAK_IF( m_file == NULL );
     DC_BREAK_IF( buffer == NULL );
@@ -67,7 +67,7 @@ u64 PackedStream::read( void* buffer, u64 size )
 }
 
 // ** PackedStream::setPosition
-void PackedStream::setPosition( u64 offset, SeekOrigin origin )
+void PackedStream::setPosition( s32 offset, SeekOrigin origin )
 {
 	DC_BREAK_IF( m_file == NULL );
 
@@ -100,22 +100,22 @@ void PackedStream::setPosition( u64 offset, SeekOrigin origin )
 }
 
 // ** PackedStream::position
-u64 PackedStream::position( void ) const
+s32 PackedStream::position( void ) const
 {
     DC_BREAK_IF( m_file == NULL );
     return m_position;
 }
 
 // ** PackedStream::length
-u64 PackedStream::length( void ) const
+s32 PackedStream::length( void ) const
 {
     return m_fileSize;
 }
 
 // ** PackedStream::readFile
-u64 PackedStream::readFile( u8 *buffer, u64 size )
+s32 PackedStream::readFile( u8 *buffer, s32 size )
 {
-    u64 bytesRead = readFromBuffer( buffer, size );
+    s32 bytesRead = readFromBuffer( buffer, size );
     DC_BREAK_IF( bytesRead > size );
 
     // ** Output buffer is full
@@ -135,7 +135,7 @@ u64 PackedStream::readFile( u8 *buffer, u64 size )
 }
 
 // ** PackedStream::readFromBuffer
-u64 PackedStream::readFromBuffer( u8* buffer, u64 size )
+s32 PackedStream::readFromBuffer( u8* buffer, s32 size )
 {
     int bytesRead = 0;
 
@@ -155,8 +155,8 @@ u64 PackedStream::readFromBuffer( u8* buffer, u64 size )
 // ** PackedStream::decompressChunk
 void PackedStream::decompressChunk( void )
 {
-    int  compressedSize = 0;
-    const int CHUNK_SIZE = 16536;
+    s32  compressedSize = 0;
+    const s32 CHUNK_SIZE = 16536;
     u8 compressed[CHUNK_SIZE * 2];
     
     m_file->read( &compressedSize, sizeof( compressedSize ) );

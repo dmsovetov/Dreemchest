@@ -34,6 +34,11 @@
     virtual io::detail::FieldSerializers fieldSerializers( void ) const {   \
         io::detail::FieldSerializers result;
 
+//! Macro definition for serializer fields declaration with a superclass.
+#define IoBeginSerializerSuper( T )											\
+    virtual io::detail::FieldSerializers fieldSerializers( void ) const {   \
+        io::detail::FieldSerializers result = T::fieldSerializers();
+
 //! Macro definition for adding a serializable field.
 #define IoField( field )                            \
     result.push_back( io::detail::createFieldSerializer( #field, field ) );

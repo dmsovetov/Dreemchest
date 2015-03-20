@@ -48,10 +48,10 @@ namespace io {
         // ** struct sFileInfo
         struct sFileInfo {
             const char		*m_name;
-            u64				m_offset;
-            u64             m_decompressedSize;
+            s32				m_offset;
+            s32             m_decompressedSize;
 
-                            sFileInfo( CString name, u64 offset, u64 decompressedSize )
+                            sFileInfo( CString name, s32 offset, s32 decompressedSize )
                                 : m_offset( offset ), m_decompressedSize( decompressedSize ) {
                                 m_name = strdup( name );
                             }
@@ -63,8 +63,8 @@ namespace io {
         // ** struct sArchiveInfo
         struct sArchiveInfo {
             s8				m_token[8];
-            u64             m_fileInfoOffset;
-            u64             m_totalFiles;
+            s32             m_fileInfoOffset;
+            s32             m_totalFiles;
             eCompressor     m_compressor;
 
                             sArchiveInfo( void )
@@ -106,7 +106,7 @@ namespace io {
 
         IBufferCompressor*      createCompressor( eCompressor compressor ) const;
 
-        sFileInfo*              createFileInfo( const Path& fileName, u64 offset, u64 compressedSize = 0, u64 decompressedSize = 0 );
+        sFileInfo*              createFileInfo( const Path& fileName, s32 offset, s32 compressedSize = 0, s32 decompressedSize = 0 );
         const sFileInfo*        findFileInfo( const Path& fileName ) const;
         sFileInfo*              readFileInfo( void ) const;
         void                    writeFileInfo( const sFileInfo *file );

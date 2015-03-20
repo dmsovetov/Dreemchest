@@ -94,13 +94,13 @@ const Path& FileStream::fileName( void ) const
 }
 
 // ** FileStream::read
-u64 FileStream::read( void* buffer, u64 size ) const
+s32 FileStream::read( void* buffer, s32 size ) const
 {
     DC_BREAK_IF( m_file == NULL );
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
 
-    u64 bytesRead = fread( buffer, 1, size, m_file );
+    s32 bytesRead = fread( buffer, 1, size, m_file );
 
     if( bytesRead != size && ferror( m_file ) ) {
         log::error( "FileStream::read : failed to read %d bytes from file, %d\n", size, errno );
@@ -110,13 +110,13 @@ u64 FileStream::read( void* buffer, u64 size ) const
 }
 
 // ** FileStream::write
-u64 FileStream::write( const void* buffer, u64 size )
+s32 FileStream::write( const void* buffer, s32 size )
 {
     DC_BREAK_IF( m_file == NULL );
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
 
-    u64 bytesWritten = fwrite( buffer, 1, size, m_file );
+    s32 bytesWritten = fwrite( buffer, 1, size, m_file );
     
     if( bytesWritten != size && ferror( m_file ) ) {
         log::error( "FileStream::write : failed to write %d bytes to file, %d\n", size, errno );
@@ -126,7 +126,7 @@ u64 FileStream::write( const void* buffer, u64 size )
 }
 
 // ** FileStream::setPosition
-void FileStream::setPosition( u64 offset, SeekOrigin origin )
+void FileStream::setPosition( s32 offset, SeekOrigin origin )
 {
     DC_BREAK_IF( m_file == NULL );
 
@@ -142,7 +142,7 @@ void FileStream::setPosition( u64 offset, SeekOrigin origin )
 }
 
 // ** FileStream::position
-u64 FileStream::position( void ) const
+s32 FileStream::position( void ) const
 {
     DC_BREAK_IF( m_file == NULL );
     return ftell( m_file );
@@ -155,7 +155,7 @@ bool FileStream::hasDataLeft( void ) const
 }
 
 // ** FileStream::length
-u64 FileStream::length( void ) const
+s32 FileStream::length( void ) const
 {
 	return m_length;
 }
