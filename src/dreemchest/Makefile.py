@@ -43,7 +43,7 @@ if Has( 'io' ):
 ############################    Network       ###########################
 
 if Has( 'network' ):
-	core.dirs( 'network', 'network/Sockets/*' )
+	core.dirs( 'network', 'network/NetworkHandler/*', 'network/Sockets/*' )
 	
 	if Windows:
 		core.linkExternal( Library( 'Winsock2', True ) )
