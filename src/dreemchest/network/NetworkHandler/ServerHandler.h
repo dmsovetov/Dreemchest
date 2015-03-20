@@ -41,6 +41,7 @@ namespace net {
 
         // ** NetworkHandler
         virtual void				update( void );
+		virtual TCPSocketList		eventListeners( void ) const;
 
 		//! Creates a new server network handler and binds it to specified port.
 		static ServerHandlerPtr		create( u16 port );

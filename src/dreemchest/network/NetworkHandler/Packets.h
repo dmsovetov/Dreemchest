@@ -70,6 +70,21 @@ namespace packets {
 		IoEndSerializer
 	EndNetworkPacket
 
+	//! Network event packet
+	BeginNetworkPacket( Event )
+		TypeId		eventId;
+		Array<u8>	payload;
+
+		//! Constructs Event instance.
+		Event( TypeId eventId = 0, const Array<u8>& payload = Array<u8>() ) : eventId( eventId ), payload( payload ) {}
+
+		//! Packet serializer
+		IoBeginSerializerSuper( NetworkPacket )
+			IoField( eventId )
+			IoArray( payload )
+		IoEndSerializer
+	EndNetworkPacket
+
 } // namespace packets
 
 } // namespace net

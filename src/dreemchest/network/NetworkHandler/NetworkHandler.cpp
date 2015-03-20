@@ -36,8 +36,9 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void )
 {
-	registerPacketHandler<packets::Ping>( dcThisMethod( NetworkHandler::handlePingPacket ) );
-	registerPacketHandler<packets::Pong>( dcThisMethod( NetworkHandler::handlePongPacket ) );
+	registerPacketHandler<packets::Ping> ( dcThisMethod( NetworkHandler::handlePingPacket ) );
+	registerPacketHandler<packets::Pong> ( dcThisMethod( NetworkHandler::handlePongPacket ) );
+	registerPacketHandler<packets::Event>( dcThisMethod( NetworkHandler::handleEventPacket ) );
 }
 
 // ** NetworkHandler::sendPacket
@@ -73,10 +74,16 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 
 	log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
 	if( !i->second->handle( socket, packet ) ) {
-		log::warn( "NetworkHandler::processReceivedData : invalid packet of type %d received from %s\n", packet->typeId(), socket->address().toString() );
+		log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 	}
 
 	delete packet;
+}
+
+// ** NetworkHandler::eventListeners
+TCPSocketList NetworkHandler::eventListeners( void ) const
+{
+	return TCPSocketList();
 }
 
 // ** NetworkHandler::doLatencyTest
@@ -102,6 +109,12 @@ bool NetworkHandler::handlePongPacket( TCPSocket* sender, const packets::Pong* p
 
 	sendPacket<packets::Ping>( sender, packet->iteration - 1 );
 	return true;
+}
+
+// ** NetworkHandler::handleEventPacket
+bool NetworkHandler::handleEventPacket( TCPSocket* sender, const packets::Event* packet )
+{
+	return false;
 }
 
 // ** NetworkHandler::update

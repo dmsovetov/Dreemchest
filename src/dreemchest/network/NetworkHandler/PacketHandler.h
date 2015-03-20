@@ -28,6 +28,7 @@
 #define __DC_Network_PacketHandler_H__
 
 #include "../Network.h"
+#include "../../event/EventEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -67,6 +68,37 @@ namespace net {
 
 		//! Packet handler callback.
 		Callback		m_callback;
+	};
+
+	//! Template class that handles an Event packet and emits the local event.
+	template<typename T>
+	class EventPacketHandler : public PacketHandler {
+	public:
+
+								//! Constructs EventPacketHandler instance.
+								EventPacketHandler( event::EventEmitter* eventEmitter )
+									: m_eventEmitter( eventEmitter ) {}
+
+		//! Casts an input network packet to an Event packet and emits it's payload as local event.
+		virtual bool handle( TCPSocket* sender, NetworkPacket* packet )
+		{
+			packets::Event* eventPacket = castTo<packets::Event>( packet );
+			DC_BREAK_IF( eventPacket == NULL );
+
+			io::ByteBufferPtr buffer = io::ByteBuffer::createFromData( &eventPacket->payload[0], eventPacket->payload.size() );
+			io::Storage       storage( io::StorageBinary, buffer );
+
+			T e;
+			e.read( storage );
+
+			m_eventEmitter->emit( e );
+			return true;
+		}
+
+	private:
+
+		//! Parent event emitter.
+		event::EventEmitter*	m_eventEmitter;
 	};
 
 } // namespace net

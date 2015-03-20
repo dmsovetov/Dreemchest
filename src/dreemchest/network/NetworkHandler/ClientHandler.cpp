@@ -62,6 +62,11 @@ void ClientHandler::update( void )
 	m_socket->update();
 }
 
+// ** ClientHandler::eventListeners
+TCPSocketList ClientHandler::eventListeners( void ) const
+{
+	return TCPSocketList();
+}
 
 // -----------------------------------------ClientSocketDelegate --------------------------------------- //
 

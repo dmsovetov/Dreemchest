@@ -46,6 +46,21 @@ thread::Thread* serverThread = NULL;
 // Application delegate is used to handle an events raised by application instance.
 class NetworkHandlers : public ApplicationDelegate {
 
+	struct LolEvent : public io::Serializable {
+		ClassEnableTypeId( LolEvent )
+		ClassEnableCloning( LolEvent )
+
+		int x;
+		std::string bar;
+
+		IoBeginSerializer
+			IoField( x )
+			IoField( bar )
+		IoEndSerializer
+
+		LolEvent( int x = 0, std::string bar = "" ) : x( x ), bar( bar ) {}
+	};
+
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application )
 	{
@@ -61,6 +76,8 @@ class NetworkHandlers : public ApplicationDelegate {
 		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
 
 		ClientHandlerPtr client = connectToServer( application, 20000 );
+		client->registerEvent<LolEvent>();
+		client->subscribe<LolEvent>( dcThisMethod( NetworkHandlers::handleLolEvent ) );
 
 		while( true ) {
 			client->update();
@@ -70,11 +87,25 @@ class NetworkHandlers : public ApplicationDelegate {
 		application->quit();
     }
 
+	void handleLolEvent( const LolEvent& e )
+	{
+		net::log::verbose( "handleLolEvent : x=%d, bar=%s\n", e.x, e.bar.c_str() );
+	}
+
 	void updateServer( void* userData )
 	{
+		ServerHandler* server = reinterpret_cast<ServerHandler*>( userData );
+
+		int counter = 1;
+
 		while( true ) {
-			reinterpret_cast<ServerHandler*>( userData )->update();
+			server->update();
 			thread::Thread::sleep( 1 );
+
+			if( (++counter % 1000) == 0 ) {
+				printf( "emit\n" );
+				server->emit( LolEvent( counter, "counter!" ) );
+			}
 		}
 	}
 

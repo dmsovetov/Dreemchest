@@ -54,6 +54,7 @@ namespace net {
 		class ServerHandler;
 		class ClientHandler;
 
+	class NetworkEvents;
 	struct NetworkPacket;
     class INetwork;
 

@@ -73,6 +73,12 @@ void ServerHandler::processClientDisconnection( TCPSocket* socket )
 	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
 }
 
+// ** ServerHandler::eventListeners
+TCPSocketList ServerHandler::eventListeners( void ) const
+{
+	return m_socketListener->connections();
+}
+
 // ---------------------------------------- ServerSocketDelegate ------------------------------------//
 
 // ** ServerSocketDelegate::handleReceivedData
