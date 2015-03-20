@@ -44,6 +44,9 @@ namespace net {
 
 namespace packets {
 
+	//! Packet payload type.
+	typedef Array<u8> Payload;
+
 	//! Ping packet
 	BeginNetworkPacket( Ping )
 		u8 iteration;
@@ -73,14 +76,46 @@ namespace packets {
 	//! Network event packet
 	BeginNetworkPacket( Event )
 		TypeId		eventId;
-		Array<u8>	payload;
+		Payload		payload;
 
 		//! Constructs Event instance.
-		Event( TypeId eventId = 0, const Array<u8>& payload = Array<u8>() ) : eventId( eventId ), payload( payload ) {}
+		Event( TypeId eventId = 0, const Payload& payload = Payload() ) : eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
 		IoBeginSerializerSuper( NetworkPacket )
 			IoField( eventId )
+			IoArray( payload )
+		IoEndSerializer
+	EndNetworkPacket
+
+	//! RPC call packet.
+	BeginNetworkPacket( RemoteCall )
+		u16			id;
+		u32			method;
+		Payload		payload;
+
+		//! Constructs RemoteCall instance.
+		RemoteCall( u16 id = 0, u32 method = 0, const Payload& payload = Payload() ) : id( id ), method( method ), payload( payload ) {}
+
+		//! Packet serializer
+		IoBeginSerializerSuper( NetworkPacket )
+			IoField( id )
+			IoField( method )
+			IoArray( payload )
+		IoEndSerializer
+	EndNetworkPacket
+
+	//! RPC call response
+	BeginNetworkPacket( RemoteCallResponse )
+		u16			id;
+		Payload		payload;
+
+		//! Constructs RemoteCallResponse instance.
+		RemoteCallResponse( u16 id = 0, const Payload& payload = Payload() ) : id( id ), payload( payload ) {}
+
+		//! Packet serializer
+		IoBeginSerializerSuper( NetworkPacket )
+			IoField( id )
 			IoArray( payload )
 		IoEndSerializer
 	EndNetworkPacket
