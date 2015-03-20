@@ -44,11 +44,17 @@ void PosixTCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* s
 {
 	m_listener->m_delegate->handleReceivedData( m_listener->m_parent, socket, stream );
 }
+    
+// ** PosixTCPSocketListener::TCPClientDelegate::handleClosed
+void PosixTCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
+{
+    m_listener->m_delegate->handleConnectionClosed( m_listener->m_parent, sender );
+}
 
 // ------------------------------------------PosixTCPSocketListener ---------------------------------------- //
 
 // ** PosixTCPSocketListener::PosixTCPSocketListener
-PosixTCPSocketListener::PosixTCPSocketListener( TCPSocketListenerDelegate* delegate )
+PosixTCPSocketListener::PosixTCPSocketListener( TCPSocketListenerDelegate* delegate ) : m_port( 0 )
 {
 	m_delegate = TCPSocketListenerDelegatePtr( delegate ? delegate : DC_NEW TCPSocketListenerDelegate );
 }
@@ -114,6 +120,13 @@ void PosixTCPSocketListener::close( void )
 {
 	m_socket.close();
 	m_clientSockets.clear();
+    m_port = 0;
+}
+    
+// ** PosixTCPSocketListener::port
+u16 PosixTCPSocketListener::port( void ) const
+{
+    return m_port;
 }
 
 // ** PosixTCPSocketListener::connections
@@ -163,6 +176,8 @@ bool PosixTCPSocketListener::bindTo( u16 port )
 		log::error( "PosixTCPSocketListener::bindTo : listen failed, %d\n", PosixNetwork::lastError() );
 		return false;
 	}
+    
+    m_port = port;
 
     return true;
 }

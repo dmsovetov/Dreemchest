@@ -36,6 +36,7 @@ namespace net {
 	BeginPrivateInterface( TCPSocketListener )
 		InterfaceMethod( void					update( void ) )
 		InterfaceMethod( void					close( void ) )
+        InterfaceMethod( u16					port( void ) const )
 		InterfaceMethod( const TCPSocketList&	connections( void ) const )
 	EndPrivateInterface
 
@@ -52,6 +53,9 @@ namespace net {
 
 		//! Closes a socket listener.
 		void						close( void );
+        
+        //! Returns a port that listener is bound to.
+        u16                         port( void ) const;
 
 		//! Returns a list of active connections.
 		const TCPSocketList&		connections( void ) const;

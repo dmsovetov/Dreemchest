@@ -42,6 +42,7 @@ namespace net {
 		// ** TCPSocketListenerPrivate
 		virtual void					update( void );
 		virtual void					close( void );
+        virtual u16                     port( void ) const;
 		virtual const TCPSocketList&	connections( void ) const;
 
 		//! Binds a socket to a specified port.
@@ -59,6 +60,9 @@ namespace net {
 
 		//! Socket descriptor.
 		SocketDescriptor				m_socket;
+        
+        //! Port used.
+        u16                             m_port;
 
 		//! List of client connections.
         TCPSocketList					m_clientSockets;
@@ -66,11 +70,12 @@ namespace net {
 		//! A client connection delegate to dispatch client events to parent delegate.
 		class TCPClientDelegate : public TCPSocketDelegate {
 		public:
-									//! Constructs TCPClientDelegate instance.
-									TCPClientDelegate( PosixTCPSocketListener* listener );
+                                //! Constructs TCPClientDelegate instance.
+                                TCPClientDelegate( PosixTCPSocketListener* listener );
 
-				//! Throws a received data to TCP listener delegate.
-				virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
+            //! Throws a received data to TCP listener delegate.
+            virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
+            virtual void        handleClosed( TCPSocket* sender );
 
 		private:
 

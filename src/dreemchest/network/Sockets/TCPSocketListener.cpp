@@ -52,6 +52,13 @@ void TCPSocketListener::close( void )
 	DC_CHECK_IMPL();
 	m_impl->close();
 }
+    
+// ** TCPSocketListener::port
+u16 TCPSocketListener::port( void ) const
+{
+    DC_CHECK_IMPL( 0 );
+    return m_impl->port();
+}
 
 // ** TCPSocketListener::connections
 const TCPSocketList& TCPSocketListener::connections( void ) const
