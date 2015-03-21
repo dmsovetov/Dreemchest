@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include	"RemoteProcedure.h"
+//#include	"RemoteProcedure.h"
 #include    "NetworkHandler.h"
 
 DC_BEGIN_DREEMCHEST

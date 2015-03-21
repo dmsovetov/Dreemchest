@@ -92,15 +92,18 @@ namespace packets {
 	BeginNetworkPacket( RemoteCall )
 		u16			id;
 		u32			method;
+		TypeId		returnType;
 		Payload		payload;
 
 		//! Constructs RemoteCall instance.
-		RemoteCall( u16 id = 0, u32 method = 0, const Payload& payload = Payload() ) : id( id ), method( method ), payload( payload ) {}
+		RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const Payload& payload = Payload() )
+			: id( id ), method( method ), returnType( 0 ), payload( payload ) {}
 
 		//! Packet serializer
 		IoBeginSerializerSuper( NetworkPacket )
 			IoField( id )
 			IoField( method )
+			IoField( returnType )
 			IoArray( payload )
 		IoEndSerializer
 	EndNetworkPacket
@@ -108,14 +111,17 @@ namespace packets {
 	//! RPC call response
 	BeginNetworkPacket( RemoteCallResponse )
 		u16			id;
+		TypeId		returnType;
 		Payload		payload;
 
 		//! Constructs RemoteCallResponse instance.
-		RemoteCallResponse( u16 id = 0, const Payload& payload = Payload() ) : id( id ), payload( payload ) {}
+		RemoteCallResponse( u16 id = 0, TypeId returnType = 0, const Payload& payload = Payload() )
+			: id( id ), returnType( returnType ), payload( payload ) {}
 
 		//! Packet serializer
 		IoBeginSerializerSuper( NetworkPacket )
 			IoField( id )
+			IoField( returnType )
 			IoArray( payload )
 		IoEndSerializer
 	EndNetworkPacket

@@ -33,11 +33,13 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** NetworkHandler::NetworkHandler
-NetworkHandler::NetworkHandler( void )
+NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
 {
-	registerPacketHandler<packets::Ping> ( dcThisMethod( NetworkHandler::handlePingPacket ) );
-	registerPacketHandler<packets::Pong> ( dcThisMethod( NetworkHandler::handlePongPacket ) );
-	registerPacketHandler<packets::Event>( dcThisMethod( NetworkHandler::handleEventPacket ) );
+	registerPacketHandler<packets::Ping>              ( dcThisMethod( NetworkHandler::handlePingPacket ) );
+	registerPacketHandler<packets::Pong>              ( dcThisMethod( NetworkHandler::handlePongPacket ) );
+	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
+	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
+	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 }
 
 // ** NetworkHandler::sendPacket
@@ -124,9 +126,52 @@ bool NetworkHandler::handleEventPacket( TCPSocket* sender, const packets::Event*
 	return i->second->handle( sender, packet );
 }
 
+// ** NetworkHandler::handleRemoteCallPacket
+bool NetworkHandler::handleRemoteCallPacket( TCPSocket* sender, const packets::RemoteCall* packet )
+{
+	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet->method );
+
+	if( i == m_remoteCallHandlers.end() ) {
+		log::warn( "NetworkHandler::handleRemoteCallPacket : trying to invoke unknown remote procedure %d\n", packet->method );
+		return false;
+	}
+
+	return i->second->handle( sender, packet );
+}
+
+// ** NetworkHandler::handleRemoteCallResponsePacket
+bool NetworkHandler::handleRemoteCallResponsePacket( TCPSocket* sender, const packets::RemoteCallResponse* packet )
+{
+	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
+
+	if( i == m_pendingRemoteCalls.end() ) {
+		log::warn( "NetworkHandler::handleRemoteCallResponsePacket : invalid request id %d\n", packet->id );
+		return false;
+	}
+
+	bool result = i->second.m_handler->handle( sender, packet );
+	m_pendingRemoteCalls.erase( i );
+
+	return result;
+}
+
 // ** NetworkHandler::update
 void NetworkHandler::update( void )
 {
+	if( m_pendingRemoteCalls.empty() ) {
+		return;
+	}
+
+	UnixTime currentTime;
+
+	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
+		if( (currentTime - i->second.m_timestamp) > 10 ) {
+			log::warn( "NetworkHandler::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
+			i = m_pendingRemoteCalls.erase( i );
+		} else {
+			++i;
+		}
+	}
 }
 
 } // namespace net
