@@ -45,72 +45,20 @@ namespace net {
 		//! Returns a remote address of a connection.
 		const NetworkAddress&	address( void ) const;
 
-		//! Sends a packet over this connection.
-		void					sendPacket( NetworkPacket* packet );
-
-		//! Sends a packet of a specified type over this connection.
-		template<typename T>						 void sendPacket( void );
-		template<typename T, TemplateFunctionTypes1> void sendPacket( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2> void sendPacket( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3> void sendPacket( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4> void sendPacket( TemplateFunctionArgs4 );
-
 		//! Creates a new Connection instance.
-		static ConnectionPtr	create( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
+		static ConnectionPtr	create( const TCPSocketPtr& socket );
 
 	private:
 
 								//! Constructs Connection instance.
-								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
+								Connection( const TCPSocketPtr& socket );
 
 	private:
-
-		//! Parent network handler.
-		NetworkHandler*			m_networkHandler;
 
 		//! Connection TCP socket.
 		TCPSocketPtr			m_socket;
 	};
 
-	// ** Connection::sendPacket
-	template<typename T>
-	inline void Connection::sendPacket( void )
-	{
-		T packet;
-		sendPacket( &packet );
-	}
-
-	// ** Connection::sendPacket
-	template<typename T, TemplateFunctionTypes1>
-	inline void Connection::sendPacket( TemplateFunctionArgs1 )
-	{
-		T packet( arg0 );
-		sendPacket( &packet );
-	}
-
-	// ** Connection::sendPacket
-	template<typename T, TemplateFunctionTypes2>
-	inline void Connection::sendPacket( TemplateFunctionArgs2 )
-	{
-		T packet( arg0, arg1 );
-		sendPacket( &packet );
-	}
-
-	// ** Connection::sendPacket
-	template<typename T, TemplateFunctionTypes3>
-	inline void Connection::sendPacket( TemplateFunctionArgs3 )
-	{
-		T packet( arg0, arg1, arg2 );
-		sendPacket( &packet );
-	}
-
-	// ** Connection::sendPacket
-	template<typename T, TemplateFunctionTypes4>
-	inline void Connection::sendPacket( TemplateFunctionArgs4 )
-	{
-		T packet( arg0, arg1, arg2, arg3 );
-		sendPacket( &packet );
-	}
 }
 
 DC_END_DREEMCHEST

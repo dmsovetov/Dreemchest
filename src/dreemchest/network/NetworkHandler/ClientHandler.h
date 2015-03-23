@@ -93,6 +93,9 @@ namespace net {
 
 		//! Parent client handler.
 		ClientHandler*		m_clientHandler;
+
+		//! Remote connection.
+		ConnectionPtr		m_connection;
 	};
     
 } // namespace net
