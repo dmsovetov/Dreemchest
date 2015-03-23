@@ -201,6 +201,24 @@ namespace io {
         //! Writes data to a storage.
         void                                write( Storage& storage, CString key = NULL ) const;
 
+		//! Writes data to byte buffer.
+		ByteBufferPtr						writeToByteBuffer( void ) const;
+
+		//! Reads data from a byte buffer.
+		void								readFromByteBuffer( const ByteBufferPtr& buffer );
+
+		//! Reads data from array of bytes.
+		void								readFromBytes( const Array<u8>& bytes );
+
+		//! Reads a serializable with a specified type from an array of bytes.
+		template<typename T>
+		static T readFromBytes( const Array<u8>& bytes )
+		{
+			T result;
+			result.readFromBytes( bytes );
+			return result;
+		}
+
     protected:
 
         //! Returns an array of field serializers.

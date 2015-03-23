@@ -26,6 +26,7 @@
 
 #include    "Storage.h"
 #include	"Serializable.h"
+#include	"../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -58,6 +59,32 @@ void Serializable::write( Storage& storage, CString key ) const
     }
 
     storage.pop();
+}
+
+// ** Serializable::writeToByteBuffer
+ByteBufferPtr Serializable::writeToByteBuffer( void ) const
+{
+	ByteBufferPtr buffer = ByteBuffer::create();
+	Storage		  storage( StorageBinary, buffer );
+	write( storage );
+
+	return buffer;
+}
+
+// ** Serializable::readFromByteBuffer
+void Serializable::readFromByteBuffer( const ByteBufferPtr& buffer )
+{
+	read( Storage( StorageBinary, buffer ) );
+}
+
+// ** Serializable::readFromBytes
+void Serializable::readFromBytes( const Array<u8>& bytes )
+{
+	if( bytes.empty() ) {
+		return;
+	}
+
+	readFromByteBuffer( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
 }
 
 // ** Serializable::fieldSerializers
