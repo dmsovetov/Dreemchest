@@ -38,6 +38,9 @@ namespace net {
 	EmbedUserData
 	public:
 
+		//! Returns parent network handler.
+		NetworkHandler*			networkHandler( void ) const;
+
 		//! Returns a connection TCP socket.
 		const  TCPSocketPtr&	socket( void ) const;
 		TCPSocketPtr&			socket( void );
@@ -46,14 +49,17 @@ namespace net {
 		const NetworkAddress&	address( void ) const;
 
 		//! Creates a new Connection instance.
-		static ConnectionPtr	create( const TCPSocketPtr& socket );
+		static ConnectionPtr	create( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
 
 	private:
 
 								//! Constructs Connection instance.
-								Connection( const TCPSocketPtr& socket );
+								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
 
 	private:
+
+		//! Parent network connection.
+		NetworkHandler*			m_networkHandler;
 
 		//! Connection TCP socket.
 		TCPSocketPtr			m_socket;

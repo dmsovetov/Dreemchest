@@ -32,16 +32,22 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** Connection::Connection
-Connection::Connection( const TCPSocketPtr& socket ) : m_socket( socket )
+Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket ) : m_networkHandler( networkHandler ), m_socket( socket )
 {
 
 }
 
 // ** Connection::create
-ConnectionPtr Connection::create( const TCPSocketPtr& socket )
+ConnectionPtr Connection::create( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
 {
 	DC_BREAK_IF( socket == NULL );
-	return ConnectionPtr( DC_NEW Connection( socket ) );
+	return ConnectionPtr( DC_NEW Connection( networkHandler, socket ) );
+}
+
+// ** Connection::networkHandler
+NetworkHandler* Connection::networkHandler( void ) const
+{
+	return m_networkHandler;
 }
 
 // ** Connection::address
