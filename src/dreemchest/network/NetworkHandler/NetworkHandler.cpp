@@ -70,7 +70,7 @@ void NetworkHandler::processReceivedData( ConnectionPtr& connection, TCPStream* 
 		NetworkPacket* packet = m_packetParser.parseFromStream( source );
 
 		if( !packet ) {
-			log::warn( "Failed to parse packed from data sent by %s\n", connection->address().toString() );
+			log::warn( "NetworkHandler::processReceivedData : failed to parse packed from data sent by %s\n", connection->address().toString() );
 			continue;
 		}
 
