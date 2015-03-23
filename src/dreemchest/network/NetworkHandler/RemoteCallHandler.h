@@ -28,6 +28,7 @@
 #define	__DC_Network_RemoteCallHandler_H__
 
 #include "../Network.h"
+#include "Connection.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -43,13 +44,52 @@ namespace net {
 		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCall* packet ) = 0;
 	};
 
-	//! Template class that handles a RemoteCall packet and invokes a local procedure.
+	//! Remote call response object.
 	template<typename T>
+	class Response {
+	public:
+
+		//! Constructs a Response instance.
+		Response( const ConnectionWPtr& connection, u16 id ) 
+			: m_connection( connection ), m_id( id ), m_wasSent( false ) {}
+
+		bool wasSent( void ) const { return m_wasSent; }
+
+		//! Send a response to caller.
+		void operator()( const T& value )
+		{
+			// ** Serialize argument to a byte buffer.
+			io::ByteBufferPtr buffer = value.writeToByteBuffer();
+
+			// ** Send an RPC response packet.
+			m_connection->networkHandler()->sendPacket<packets::RemoteCallResponse>( m_connection.lock(), m_id, T::classTypeId(), buffer->array() );
+
+			// ** Mark this response as sent.
+			m_wasSent = true;
+		}
+
+	private:
+
+		//! Parent connection.
+		ConnectionWPtr	m_connection;
+
+		//! Remote call identifier.
+		u16				m_id;
+
+		//! Flag indicating that a response was sent.
+		bool			m_wasSent;
+	};
+
+	//! Template class that handles a RemoteCall packet and invokes a local procedure.
+	template<typename T, typename R>
 	class RemoteCallHandler : public IRemoteCallHandler {
 	public:
 
+		//! Response type.
+		typedef Response<R> Response;
+
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,u16,const T*)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,Response&,const T&)> Callback;
 
 						//! Constructs RemoteCallHandler instance.
 						RemoteCallHandler( const Callback& callback )
@@ -65,18 +105,13 @@ namespace net {
 	};
 
 	// ** RemoteCallHandler::handle
-	template<typename T>
-	inline bool RemoteCallHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCall* packet )
+	template<typename T, typename R>
+	inline bool RemoteCallHandler<T, R>::handle( ConnectionPtr& connection, const packets::RemoteCall* packet )
 	{
-		T argument;
-
-		if( packet->payload.size() ) {
-			io::ByteBufferPtr buffer = io::ByteBuffer::createFromData( &packet->payload[0], packet->payload.size() );
-			io::Storage       storage( io::StorageBinary, buffer );
-			argument.read( storage );
-		}
-
-		return m_callback( connection, packet->id, &argument );
+		Response response( connection, packet->id );
+		bool result = m_callback( connection, response, io::Serializable::readFromBytes<T>( packet->payload ) );
+		DC_BREAK_IF( !response.wasSent() );
+		return result;
 	}
 
 	//! Remote response handler interface.
@@ -94,7 +129,7 @@ namespace net {
 	public:
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,const T*)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,const T&)> Callback;
 
 						//! Constructs RemoteResponseHandler instance.
 						RemoteResponseHandler( const Callback& callback )
@@ -113,15 +148,7 @@ namespace net {
 	template<typename T>
 	inline bool RemoteResponseHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
 	{
-		T value;
-
-		if( packet->payload.size() ) {
-			io::ByteBufferPtr buffer = io::ByteBuffer::createFromData( &packet->payload[0], packet->payload.size() );
-			io::Storage       storage( io::StorageBinary, buffer );
-			value.read( storage );
-		}
-
-		return m_callback( connection, &value );
+		return m_callback( connection, io::Serializable::readFromBytes<T>( packet->payload ) );
 	}
 
 } // namespace net

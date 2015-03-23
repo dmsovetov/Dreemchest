@@ -56,7 +56,11 @@ namespace net {
 
 		//! Registers a remote procedure.
 		template<typename T>
-		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T>::Callback& callback );
+		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, void>::Callback& callback );
+
+		//! Registers a remote procedure.
+		template<typename T, typename R>
+		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback );
 
 		//! Invokes a remote procedure.
 		template<typename T>
@@ -66,10 +70,6 @@ namespace net {
 		template<typename T, typename R>
 		void					invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
 
-		//! Responds to a remote procedure call.
-		template<typename T>
-		void					respond( ConnectionPtr& connection, u16 id, const T& value );
-
 		//! Emits a network event.
 		template<typename T>
 		void					emit( const T& e );
@@ -77,8 +77,6 @@ namespace net {
 		//! Subscribes for a network event of a specified type.
 		template<typename T>
 		void					subscribe( const cClosure<void(const T&)>& callback );
-
-	protected:
 
 		//! Sends a packet.
 		void					sendPacket( ConnectionPtr& connection, NetworkPacket* packet );
@@ -98,6 +96,8 @@ namespace net {
 
 		template<typename T, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
 		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 );
+
+	protected:
 
 		//! Returns a list of TCP sockets to send event to.
 		virtual TCPSocketList	eventListeners( void ) const;
@@ -186,10 +186,10 @@ namespace net {
 	}
 
 	// ** NetworkHandler::registerRemoteProcedure
-	template<typename T>
-	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T>::Callback& callback )
+	template<typename T, typename R>
+	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback )
 	{
-		m_remoteCallHandlers[StringHash( name )] = DC_NEW RemoteCallHandler<T>( callback );
+		m_remoteCallHandlers[StringHash( name )] = DC_NEW RemoteCallHandler<T, R>( callback );
 	}
 
 	// ** NetworkHandler::subscribe
@@ -212,26 +212,11 @@ namespace net {
 		}
 
 		// ** Serialize event to a byte buffer.
-		io::ByteBufferPtr buffer = io::ByteBuffer::create();
-		io::Storage		  storage( io::StorageBinary, buffer );
-		e.write( storage );
+		io::ByteBufferPtr buffer = e.writeToByteBuffer();
 
 		for( TCPSocketList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
 			sendPacket<packets::Event>( i->get(), T::classTypeId(), buffer->array() );
 		}
-	}
-
-	// ** NetworkHandler::respond
-	template<typename T>
-	inline void NetworkHandler::respond( ConnectionPtr& connection, u16 id, const T& value )
-	{
-		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::ByteBuffer::create();
-		io::Storage		  storage( io::StorageBinary, buffer );
-		value.write( storage );
-
-		// ** Send an RPC response packet.
-		sendPacket<packets::RemoteCallResponse>( connection, id, T::classTypeId(), buffer->array() );
 	}
 
 	// ** NetworkHandler::invoke
@@ -239,9 +224,7 @@ namespace net {
 	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::ByteBuffer::create();
-		io::Storage		  storage( io::StorageBinary, buffer );
-		argument.write( storage );
+		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
 
 		// ** Send an RPC request
 		sendPacket<packets::RemoteCall>( socket, 0, StringHash( method ), 0, buffer->array() );
@@ -252,9 +235,7 @@ namespace net {
 	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::ByteBuffer::create();
-		io::Storage		  storage( io::StorageBinary, buffer );
-		argument.write( storage );
+		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
 
 		// ** Send an RPC request
 		u16 remoteCallId = m_nextRemoteCallId++;
