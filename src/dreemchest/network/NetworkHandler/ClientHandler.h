@@ -45,6 +45,10 @@ namespace net {
 
    //     bool                Connect( const NetworkAddress& address, u16 port );
 
+		//! Return current connection.
+		const TCPSocketPtr&		connection( void ) const;
+		TCPSocketPtr&			connection( void );
+
 		//! Creates a new NetworkClientHandler instance and connects to server.
 		static ClientHandlerPtr	create( const NetworkAddress& address, u16 port );
 

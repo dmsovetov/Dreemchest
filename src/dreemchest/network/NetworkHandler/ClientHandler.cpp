@@ -39,6 +39,18 @@ ClientHandler::ClientHandler( TCPSocketPtr socket ) : m_socket( socket )
 
 }
 
+// ** ClientHandler::connection
+const TCPSocketPtr& ClientHandler::connection( void ) const
+{
+	return m_socket;
+}
+
+// ** ClientHandler::connection
+TCPSocketPtr& ClientHandler::connection( void )
+{
+	return m_socket;
+}
+
 // ** ClientHandler::create
 ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port )
 {
