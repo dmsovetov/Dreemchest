@@ -29,8 +29,10 @@
 
 #define dcInterface
 
-#ifndef DC_NAMESPACE
-    #define DC_NAMESPACE    dreemchest
+#ifdef DC_BUILD_ENGINE
+	#ifndef DC_NAMESPACE
+		#define DC_NAMESPACE    dreemchest
+	#endif
 #endif
 
 #ifdef DC_NAMESPACE
