@@ -24,57 +24,44 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_PacketHandler_H__
-#define __DC_Network_PacketHandler_H__
-
-#include "../Network.h"
+#include "Connection.h"
+#include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! Packet handler interface class.
-	class IPacketHandler {
-	public:
+// ** Connection::Connection
+Connection::Connection( const TCPSocketPtr& socket ) : m_socket( socket )
+{
 
-		virtual			~IPacketHandler( void ) {}
+}
 
-		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, const NetworkPacket* packet ) = 0;
-	};
+// ** Connection::create
+ConnectionPtr Connection::create( const TCPSocketPtr& socket )
+{
+	DC_BREAK_IF( socket == NULL );
+	return ConnectionPtr( DC_NEW Connection( socket ) );
+}
 
-	//! Template class that handles a strict-typed packets.
-	template<typename T>
-	class PacketHandler : public IPacketHandler {
-	public:
+// ** Connection::address
+const NetworkAddress& Connection::address( void ) const
+{
+	return m_socket->address();
+}
 
-		//! Function type to handle packets.
-		typedef cClosure<bool(ConnectionPtr&,const T*)> Callback;
+// ** Connection::socket
+const TCPSocketPtr& Connection::socket( void ) const
+{
+	return m_socket;
+}
 
-						//! Constructs GenericPacketHandler instance.
-						PacketHandler( const Callback& callback )
-							: m_callback( callback ) {}
-
-		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( ConnectionPtr& connection, const NetworkPacket* packet );
-
-	private:
-
-		//! Packet handler callback.
-		Callback	 m_callback;
-	};
-
-	// ** PacketHandler::handle
-	template<typename T>
-	bool PacketHandler<T>::handle( ConnectionPtr& connection, const NetworkPacket* packet )
-	{
-		const T* packetWithType = castTo<T>( packet );
-		DC_BREAK_IF( packetWithType == NULL );
-		return m_callback( connection, packetWithType );
-	}
+// ** Connection::socket
+TCPSocketPtr& Connection::socket( void )
+{
+	return m_socket;
+}
 
 } // namespace net
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Network_PacketHandler_H__	*/

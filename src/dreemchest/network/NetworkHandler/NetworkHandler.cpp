@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "NetworkHandler.h"
+#include "Connection.h"
 #include "../Sockets/TCPSocket.h"
 #include "../Sockets/TCPStream.h"
 
@@ -43,7 +44,7 @@ NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
 }
 
 // ** NetworkHandler::sendPacket
-void NetworkHandler::sendPacket( TCPSocket* socket, NetworkPacket* packet )
+void NetworkHandler::sendPacket( ConnectionPtr& connection, NetworkPacket* packet )
 {
 	io::ByteBufferPtr buffer = io::ByteBuffer::create();
 
@@ -54,31 +55,31 @@ void NetworkHandler::sendPacket( TCPSocket* socket, NetworkPacket* packet )
 	u32 bytesWritten = m_packetParser.writeToStream( packet, buffer );
 
 	// ** Send binary data to socket
-	s32 bytesSent = socket->sendTo( buffer->buffer(), buffer->length() );
+	s32 bytesSent = connection->socket()->sendTo( buffer->buffer(), buffer->length() );
 	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 
 // ** NetworkHandler::processReceivedData
-void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
+void NetworkHandler::processReceivedData( ConnectionPtr& connection, TCPStream* stream )
 {
-	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
+	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), connection->address().toString() );
 
-    io::ByteBufferPtr source( stream );
-
+    io::ByteBufferPtr   source( stream );
+	
 	while( stream->hasDataLeft() ) {
 		NetworkPacket* packet = m_packetParser.parseFromStream( source );
 
 		if( !packet ) {
-			log::warn( "Failed to parse packed from data sent by %s\n", socket->address().toString() );
+			log::warn( "Failed to parse packed from data sent by %s\n", connection->address().toString() );
 			continue;
 		}
 
 		PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
 		DC_BREAK_IF( i == m_packetHandlers.end() );
 
-		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
-		if( !i->second->handle( socket, packet ) ) {
-			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
+		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), connection->address().toString() );
+		if( !i->second->handle( connection, packet ) ) {
+			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
 		}
 
 		delete packet;
@@ -94,32 +95,32 @@ TCPSocketList NetworkHandler::eventListeners( void ) const
 }
 
 // ** NetworkHandler::doLatencyTest
-void NetworkHandler::doLatencyTest( TCPSocket* socket, u8 iterations )
+void NetworkHandler::doLatencyTest( ConnectionPtr& connection, u8 iterations )
 {
-	sendPacket<packets::Ping>( socket, iterations );
+	sendPacket<packets::Ping>( connection, iterations );
 }
 
 // ** NetworkHandler::handlePingPacket
-bool NetworkHandler::handlePingPacket( TCPSocket* sender, const packets::Ping* packet )
+bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, const packets::Ping* packet )
 {
-	sendPacket<packets::Pong>( sender, packet->iteration );
+	sendPacket<packets::Pong>( connection, packet->iteration );
 	return true;
 }
 
 // ** NetworkHandler::handlePongPacket
-bool NetworkHandler::handlePongPacket( TCPSocket* sender, const packets::Pong* packet )
+bool NetworkHandler::handlePongPacket( ConnectionPtr& connection, const packets::Pong* packet )
 {
 	if( packet->iteration == 0 ) {
 		log::verbose( "To much ping packets sent\n" );
 		return true;
 	}
 
-	sendPacket<packets::Ping>( sender, packet->iteration - 1 );
+	sendPacket<packets::Ping>( connection, packet->iteration - 1 );
 	return true;
 }
 
 // ** NetworkHandler::handleEventPacket
-bool NetworkHandler::handleEventPacket( TCPSocket* sender, const packets::Event* packet )
+bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, const packets::Event* packet )
 {
 	EventHandlers::iterator i = m_eventHandlers.find( packet->eventId );
 
@@ -128,11 +129,11 @@ bool NetworkHandler::handleEventPacket( TCPSocket* sender, const packets::Event*
 		return false;
 	}
 
-	return i->second->handle( sender, packet );
+	return i->second->handle( connection, packet );
 }
 
 // ** NetworkHandler::handleRemoteCallPacket
-bool NetworkHandler::handleRemoteCallPacket( TCPSocket* sender, const packets::RemoteCall* packet )
+bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const packets::RemoteCall* packet )
 {
 	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet->method );
 
@@ -141,11 +142,11 @@ bool NetworkHandler::handleRemoteCallPacket( TCPSocket* sender, const packets::R
 		return false;
 	}
 
-	return i->second->handle( sender, packet );
+	return i->second->handle( connection, packet );
 }
 
 // ** NetworkHandler::handleRemoteCallResponsePacket
-bool NetworkHandler::handleRemoteCallResponsePacket( TCPSocket* sender, const packets::RemoteCallResponse* packet )
+bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
 {
 	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
 
@@ -154,7 +155,7 @@ bool NetworkHandler::handleRemoteCallResponsePacket( TCPSocket* sender, const pa
 		return false;
 	}
 
-	bool result = i->second.m_handler->handle( sender, packet );
+	bool result = i->second.m_handler->handle( connection, packet );
 	m_pendingRemoteCalls.erase( i );
 
 	return result;

@@ -96,8 +96,14 @@ namespace net {
 
 	private:
 
+		//! Container type to store socket to connection mapping
+		typedef Map<TCPSocket*, ConnectionPtr>	ConnectionBySocket;
+
 		//! Parent network server handler.
 		ServerHandler*			m_serverHandler;
+
+		//! Active connections.
+		ConnectionBySocket		m_connectionBySocket;
 	};
     
 } // namespace net

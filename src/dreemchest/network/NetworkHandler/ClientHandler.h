@@ -46,8 +46,8 @@ namespace net {
    //     bool                Connect( const NetworkAddress& address, u16 port );
 
 		//! Return current connection.
-		const TCPSocketPtr&		connection( void ) const;
-		TCPSocketPtr&			connection( void );
+		const ConnectionPtr&	connection( void ) const;
+		ConnectionPtr&			connection( void );
 
 		//! Creates a new NetworkClientHandler instance and connects to server.
 		static ClientHandlerPtr	create( const NetworkAddress& address, u16 port );
@@ -59,12 +59,12 @@ namespace net {
 	protected:
 
 								//! Constructs ClientHandler instance.
-								ClientHandler( TCPSocketPtr socket );
+								ClientHandler( const TCPSocketPtr& socket );
 
 	private:
 
-		//! Client socket.
-		TCPSocketPtr					m_socket;
+		//! Client connection.
+		ConnectionPtr			m_connection;
 
 //    protected:
 
@@ -91,7 +91,11 @@ namespace net {
 
 	private:
 
+		//! Parent client handler.
 		ClientHandler*		m_clientHandler;
+
+		//! Remote connection.
+		ConnectionPtr		m_connection;
 	};
     
 } // namespace net

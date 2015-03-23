@@ -60,15 +60,15 @@ namespace net {
 
 		//! Invokes a remote procedure.
 		template<typename T>
-		void					invoke( TCPSocket* socket, CString method, const T& argument );
+		void					invoke( ConnectionPtr& connection, CString method, const T& argument );
 
 		//! Invokes a remote procedure.
 		template<typename T, typename R>
-		void					invoke( TCPSocket* socket, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
+		void					invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
 
 		//! Responds to a remote procedure call.
 		template<typename T>
-		void					respond( TCPSocket* socket, u16 id, const T& value );
+		void					respond( ConnectionPtr& connection, u16 id, const T& value );
 
 		//! Emits a network event.
 		template<typename T>
@@ -81,47 +81,47 @@ namespace net {
 	protected:
 
 		//! Sends a packet.
-		void					sendPacket( TCPSocket* socket, NetworkPacket* packet );
+		void					sendPacket( ConnectionPtr& connection, NetworkPacket* packet );
 
 		//! Sends a packet of a specified type.
 		template<typename T>
-		void sendPacket( TCPSocket* socket );
+		void sendPacket( ConnectionPtr& connection );
 
 		template<typename T, typename Arg0>
-		void sendPacket( TCPSocket* socket, const Arg0& arg0 );
+		void sendPacket( ConnectionPtr& connection, const Arg0& arg0 );
 
 		template<typename T, typename Arg0, typename Arg1>
-		void sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1 );
+		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1 );
 
 		template<typename T, typename Arg0, typename Arg1, typename Arg2>
-		void sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 );
+		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 );
 
 		template<typename T, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-		void sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 );
+		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 );
 
 		//! Returns a list of TCP sockets to send event to.
 		virtual TCPSocketList	eventListeners( void ) const;
 
 		//! Processes a received data from client.
-		virtual void			processReceivedData( TCPSocket* socket, TCPStream* stream );
+		virtual void			processReceivedData( ConnectionPtr& connection, TCPStream* stream );
 
 		//! Performs a latency test with a specified amount of iterations.
-		void					doLatencyTest( TCPSocket* socket, u8 iterations );
+		void					doLatencyTest( ConnectionPtr& connection, u8 iterations );
 
 		//! Handles a ping packet and sends back a pong response.
-		bool					handlePingPacket( TCPSocket* sender, const packets::Ping* packet );
+		bool					handlePingPacket( ConnectionPtr& connection, const packets::Ping* packet );
 
 		//! Handles a pong packet.
-		bool					handlePongPacket( TCPSocket* sender, const packets::Pong* packet );
+		bool					handlePongPacket( ConnectionPtr& connection, const packets::Pong* packet );
 
 		//! Handles an event packet.
-		bool					handleEventPacket( TCPSocket* sender, const packets::Event* packet );
+		bool					handleEventPacket( ConnectionPtr& connection, const packets::Event* packet );
 
 		//! Handles a remote call packet.
-		bool					handleRemoteCallPacket( TCPSocket* sender, const packets::RemoteCall* packet );
+		bool					handleRemoteCallPacket( ConnectionPtr& connection, const packets::RemoteCall* packet );
 
 		//! Handles a response to remote call.
-		bool					handleRemoteCallResponsePacket( TCPSocket* sender, const packets::RemoteCallResponse* packet );
+		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet );
 
 	protected:
 
@@ -223,7 +223,7 @@ namespace net {
 
 	// ** NetworkHandler::respond
 	template<typename T>
-	inline void NetworkHandler::respond( TCPSocket* socket, u16 id, const T& value )
+	inline void NetworkHandler::respond( ConnectionPtr& connection, u16 id, const T& value )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::ByteBuffer::create();
@@ -231,12 +231,12 @@ namespace net {
 		value.write( storage );
 
 		// ** Send an RPC response packet.
-		sendPacket<packets::RemoteCallResponse>( socket, id, T::classTypeId(), buffer->array() );
+		sendPacket<packets::RemoteCallResponse>( connection, id, T::classTypeId(), buffer->array() );
 	}
 
 	// ** NetworkHandler::invoke
 	template<typename T>
-	inline void NetworkHandler::invoke( TCPSocket* socket, CString method, const T& argument )
+	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::ByteBuffer::create();
@@ -249,7 +249,7 @@ namespace net {
 
 	// ** NetworkHandler::invoke
 	template<typename T, typename R>
-	inline void NetworkHandler::invoke( TCPSocket* socket, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
+	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::ByteBuffer::create();
@@ -258,7 +258,7 @@ namespace net {
 
 		// ** Send an RPC request
 		u16 remoteCallId = m_nextRemoteCallId++;
-		sendPacket<packets::RemoteCall>( socket, remoteCallId, StringHash( method ), R::classTypeId(), buffer->array() );
+		sendPacket<packets::RemoteCall>( connection, remoteCallId, StringHash( method ), R::classTypeId(), buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
@@ -266,7 +266,7 @@ namespace net {
 
 	// ** NetworkHandler::sendPacket
 	template<typename T>
-	inline void NetworkHandler::sendPacket( TCPSocket* socket )
+	inline void NetworkHandler::sendPacket( ConnectionPtr& connection )
 	{
 		T packet;
 		sendPacket( socket, &packet );
@@ -274,34 +274,34 @@ namespace net {
 
 	// ** NetworkHandler::sendPacket
 	template<typename T, typename Arg0>
-	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0 )
+	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0 )
 	{
 		T packet( arg0 );
-		sendPacket( socket, &packet );
+		sendPacket( connection, &packet );
 	}
 
 	// ** NetworkHandler::sendPacket
 	template<typename T, typename Arg0, typename Arg1>
-	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1 )
+	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1 )
 	{
 		T packet( arg0, arg1 );
-		sendPacket( socket, &packet );
+		sendPacket( connection, &packet );
 	}
 
 	// ** NetworkHandler::sendPacket
 	template<typename T, typename Arg0, typename Arg1, typename Arg2>
-	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 )
+	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 )
 	{
 		T packet( arg0, arg1, arg2 );
-		sendPacket( socket, &packet );
+		sendPacket( connection, &packet );
 	}
 
 	// ** NetworkHandler::sendPacket
 	template<typename T, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-	inline void NetworkHandler::sendPacket( TCPSocket* socket, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 )
+	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 )
 	{
 		T packet( arg0, arg1, arg2, arg3 );
-		sendPacket( socket, &packet );
+		sendPacket( connection, &packet );
 	}
 
 } // namespace net

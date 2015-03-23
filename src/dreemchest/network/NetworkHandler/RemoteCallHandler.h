@@ -40,7 +40,7 @@ namespace net {
 		virtual			~IRemoteCallHandler( void ) {}
 
 		//! Packet handler callback.
-		virtual bool	handle( TCPSocket* sender, const packets::RemoteCall* packet ) = 0;
+		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCall* packet ) = 0;
 	};
 
 	//! Template class that handles a RemoteCall packet and invokes a local procedure.
@@ -49,14 +49,14 @@ namespace net {
 	public:
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(TCPSocket*,u16,const T*)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,u16,const T*)> Callback;
 
 						//! Constructs RemoteCallHandler instance.
 						RemoteCallHandler( const Callback& callback )
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool	handle( TCPSocket* sender, const packets::RemoteCall* packet );
+		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCall* packet );
 
 	private:
 
@@ -66,7 +66,7 @@ namespace net {
 
 	// ** RemoteCallHandler::handle
 	template<typename T>
-	inline bool RemoteCallHandler<T>::handle( TCPSocket* sender, const packets::RemoteCall* packet )
+	inline bool RemoteCallHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCall* packet )
 	{
 		T argument;
 
@@ -76,7 +76,7 @@ namespace net {
 			argument.read( storage );
 		}
 
-		return m_callback( sender, packet->id, &argument );
+		return m_callback( connection, packet->id, &argument );
 	}
 
 	//! Remote response handler interface.
@@ -85,7 +85,7 @@ namespace net {
 
 		virtual			~IRemoteResponseHandler( void ) {}
 
-		virtual bool	handle( TCPSocket* socket, const packets::RemoteCallResponse* packet ) = 0;
+		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCallResponse* packet ) = 0;
 	};
 
 	//! Template class that handles a RemoteCallResponse packet and invokes a local procedure.
@@ -94,14 +94,14 @@ namespace net {
 	public:
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(TCPSocket*,const T*)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,const T*)> Callback;
 
 						//! Constructs RemoteResponseHandler instance.
 						RemoteResponseHandler( const Callback& callback )
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool	handle( TCPSocket* sender, const packets::RemoteCallResponse* packet );
+		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCallResponse* packet );
 
 	private:
 
@@ -111,7 +111,7 @@ namespace net {
 
 	// ** RemoteResponseHandler::handle
 	template<typename T>
-	inline bool RemoteResponseHandler<T>::handle( TCPSocket* sender, const packets::RemoteCallResponse* packet )
+	inline bool RemoteResponseHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
 	{
 		T value;
 
@@ -121,7 +121,7 @@ namespace net {
 			value.read( storage );
 		}
 
-		return m_callback( sender, &value );
+		return m_callback( connection, &value );
 	}
 
 } // namespace net

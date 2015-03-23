@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_PacketHandler_H__
-#define __DC_Network_PacketHandler_H__
+#ifndef __Network_Connection_H__
+#define __Network_Connection_H__
 
 #include "../Network.h"
 
@@ -33,48 +33,34 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! Packet handler interface class.
-	class IPacketHandler {
+	//! Remote connection interface.
+	class Connection : public RefCounted {
+	EmbedUserData
 	public:
 
-		virtual			~IPacketHandler( void ) {}
+		//! Returns a connection TCP socket.
+		const  TCPSocketPtr&	socket( void ) const;
+		TCPSocketPtr&			socket( void );
 
-		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, const NetworkPacket* packet ) = 0;
-	};
+		//! Returns a remote address of a connection.
+		const NetworkAddress&	address( void ) const;
 
-	//! Template class that handles a strict-typed packets.
-	template<typename T>
-	class PacketHandler : public IPacketHandler {
-	public:
-
-		//! Function type to handle packets.
-		typedef cClosure<bool(ConnectionPtr&,const T*)> Callback;
-
-						//! Constructs GenericPacketHandler instance.
-						PacketHandler( const Callback& callback )
-							: m_callback( callback ) {}
-
-		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( ConnectionPtr& connection, const NetworkPacket* packet );
+		//! Creates a new Connection instance.
+		static ConnectionPtr	create( const TCPSocketPtr& socket );
 
 	private:
 
-		//! Packet handler callback.
-		Callback	 m_callback;
+								//! Constructs Connection instance.
+								Connection( const TCPSocketPtr& socket );
+
+	private:
+
+		//! Connection TCP socket.
+		TCPSocketPtr			m_socket;
 	};
 
-	// ** PacketHandler::handle
-	template<typename T>
-	bool PacketHandler<T>::handle( ConnectionPtr& connection, const NetworkPacket* packet )
-	{
-		const T* packetWithType = castTo<T>( packet );
-		DC_BREAK_IF( packetWithType == NULL );
-		return m_callback( connection, packetWithType );
-	}
-
-} // namespace net
+}
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_PacketHandler_H__	*/
+#endif	/*	!__Network_Connection_H__	*/

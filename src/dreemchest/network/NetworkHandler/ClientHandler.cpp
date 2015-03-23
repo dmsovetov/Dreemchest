@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "ClientHandler.h"
-
+#include "Connection.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -34,21 +34,21 @@ namespace net {
 // -----------------------------------------ClientHandler --------------------------------------- //
 
 // ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( TCPSocketPtr socket ) : m_socket( socket )
+ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_connection( Connection::create( socket ) )
 {
 
 }
 
 // ** ClientHandler::connection
-const TCPSocketPtr& ClientHandler::connection( void ) const
+const ConnectionPtr& ClientHandler::connection( void ) const
 {
-	return m_socket;
+	return m_connection;
 }
 
 // ** ClientHandler::connection
-TCPSocketPtr& ClientHandler::connection( void )
+ConnectionPtr& ClientHandler::connection( void )
 {
-	return m_socket;
+	return m_connection;
 }
 
 // ** ClientHandler::create
@@ -71,7 +71,7 @@ ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port 
 void ClientHandler::update( void )
 {
 	NetworkHandler::update();
-	m_socket->update();
+	m_connection->socket()->update();
 }
 
 // ** ClientHandler::eventListeners
@@ -85,12 +85,18 @@ TCPSocketList ClientHandler::eventListeners( void ) const
 // ** ClientSocketDelegate::handleClosed
 void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 {
+	m_connection = ConnectionPtr();
 }
 
 // ** ClientSocketDelegate::handleReceivedData
 void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
-	m_clientHandler->processReceivedData( socket, stream );
+	if( m_connection == NULL ) {
+		m_connection = Connection::create( sender );
+	}
+
+	DC_BREAK_IF( m_connection->socket()->descriptor() == sender->descriptor() );
+	m_clientHandler->processReceivedData( m_connection, stream );
 }
 
 /*

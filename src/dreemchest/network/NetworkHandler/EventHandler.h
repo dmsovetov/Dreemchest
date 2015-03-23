@@ -40,7 +40,7 @@ namespace net {
 		virtual			~IEventHandler( void ) {}
 
 		//! Packet handler callback.
-		virtual bool	handle( TCPSocket* sender, const packets::Event* packet ) = 0;
+		virtual bool	handle( ConnectionPtr& connection, const packets::Event* packet ) = 0;
 	};
 
 	//! Template class that handles an Event packet and emits the local event.
@@ -53,7 +53,7 @@ namespace net {
 									: m_eventEmitter( eventEmitter ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool handle( TCPSocket* sender, const packets::Event* packet );
+		virtual bool handle( ConnectionPtr& connection, const packets::Event* packet );
 
 	private:
 
@@ -63,7 +63,7 @@ namespace net {
 
 	// ** EventHandler::handle
 	template<typename T>
-	inline bool EventHandler<T>::handle( TCPSocket* sender, const packets::Event* packet )
+	inline bool EventHandler<T>::handle( ConnectionPtr& connection, const packets::Event* packet )
 	{
 		T e;
 

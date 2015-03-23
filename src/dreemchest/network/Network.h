@@ -54,6 +54,8 @@ namespace net {
 	class TCPSocketListener;
 	class SocketDescriptor;
 	class TCPStream;
+
+	class Connection;
 	class NetworkHandler;
 		class ServerHandler;
 		class ClientHandler;
@@ -89,8 +91,14 @@ namespace net {
 	//! Client network handler strong ptr.
 	typedef StrongPtr<ClientHandler> ClientHandlerPtr;
 
+	//! Connection strong ptr.
+	typedef StrongPtr<Connection> ConnectionPtr;
+
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
+
+	//! Connection list type.
+	typedef List<ConnectionPtr> ConnectionList;
 
     //! A helper class to represent a network address.
     class NetworkAddress {
