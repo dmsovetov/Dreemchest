@@ -193,6 +193,14 @@ namespace net {
 
         Network*                        m_parent;
     };
+
+	//! Base class for all remote call argument types.
+	struct RemoteCallArgument : public io::Serializable {
+	};
+
+	//! Base call for all remote call response types.
+	struct RemoteCallResponse : public io::Serializable {
+	};
     
 } // namespace net
     
