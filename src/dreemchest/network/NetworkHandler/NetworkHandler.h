@@ -103,16 +103,16 @@ namespace net {
 		virtual TCPSocketList	eventListeners( void ) const;
 
 		//! Processes a received data from client.
-		virtual void			processReceivedData( ConnectionPtr& connection, TCPStream* stream );
+		virtual void			processReceivedData( TCPSocket* socket, TCPStream* stream );
 
-		//! Performs a latency test with a specified amount of iterations.
-		void					doLatencyTest( ConnectionPtr& connection, u8 iterations );
+		//! Creates a connection from socket.
+		ConnectionPtr			createConnection( TCPSocket* socket );
 
-		//! Handles a ping packet and sends back a pong response.
-		bool					handlePingPacket( ConnectionPtr& connection, const packets::Ping* packet );
+		//! Returns a connection by socket.
+		ConnectionPtr			findConnectionBySocket( TCPSocket* socket );
 
-		//! Handles a pong packet.
-		bool					handlePongPacket( ConnectionPtr& connection, const packets::Pong* packet );
+		//! Removes connection by socket.
+		void					removeConnection( TCPSocket* socket );
 
 		//! Handles an event packet.
 		bool					handleEventPacket( ConnectionPtr& connection, const packets::Event* packet );
@@ -145,6 +145,9 @@ namespace net {
 		//! A container type to store all remote call handlers.
 		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
+		//! Container type to store socket to connection mapping
+		typedef Map<TCPSocket*, ConnectionPtr>	ConnectionBySocket;
+
 		//! A container type to store all pending remote calls.
 		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
 
@@ -165,6 +168,9 @@ namespace net {
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
+
+		//! Active connections.
+		ConnectionBySocket		m_connections;
 
 		//! Network event emitter.
 		event::EventEmitter		m_eventEmitter;

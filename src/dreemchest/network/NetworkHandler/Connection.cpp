@@ -37,13 +37,6 @@ Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& sock
 
 }
 
-// ** Connection::create
-ConnectionPtr Connection::create( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-{
-	DC_BREAK_IF( socket == NULL );
-	return ConnectionPtr( DC_NEW Connection( networkHandler, socket ) );
-}
-
 // ** Connection::networkHandler
 NetworkHandler* Connection::networkHandler( void ) const
 {

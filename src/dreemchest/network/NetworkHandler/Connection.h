@@ -36,6 +36,7 @@ namespace net {
 	//! Remote connection interface.
 	class Connection : public RefCounted {
 	EmbedUserData
+	friend class NetworkHandler;
 	public:
 
 		//! Returns parent network handler.
@@ -47,9 +48,6 @@ namespace net {
 
 		//! Returns a remote address of a connection.
 		const NetworkAddress&	address( void ) const;
-
-		//! Creates a new Connection instance.
-		static ConnectionPtr	create( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
 
 	private:
 

@@ -36,11 +36,30 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
 {
-	registerPacketHandler<packets::Ping>              ( dcThisMethod( NetworkHandler::handlePingPacket ) );
-	registerPacketHandler<packets::Pong>              ( dcThisMethod( NetworkHandler::handlePongPacket ) );
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
+}
+
+// ** NetworkHandler::findConnectionBySocket
+ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket )
+{
+	ConnectionBySocket::iterator i = m_connections.find( socket );
+	return i != m_connections.end() ? i->second : ConnectionPtr();
+}
+
+// ** NetworkHandler::createConnection
+ConnectionPtr NetworkHandler::createConnection( TCPSocket* socket )
+{
+	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
+	m_connections[socket] = connection;
+	return connection;
+}
+
+// ** NetworkHandler::removeConnection
+void NetworkHandler::removeConnection( TCPSocket* socket )
+{
+	m_connections.erase( socket );
 }
 
 // ** NetworkHandler::sendPacket
@@ -60,26 +79,30 @@ void NetworkHandler::sendPacket( ConnectionPtr& connection, NetworkPacket* packe
 }
 
 // ** NetworkHandler::processReceivedData
-void NetworkHandler::processReceivedData( ConnectionPtr& connection, TCPStream* stream )
+void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
-	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), connection->address().toString() );
+	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 
-    io::ByteBufferPtr   source( stream );
+	// ** Find a connection by socket
+	ConnectionPtr connection = findConnectionBySocket( socket );
+	DC_BREAK_IF( connection == NULL );
+
+    io::ByteBufferPtr source( stream );
 	
 	while( stream->hasDataLeft() ) {
 		NetworkPacket* packet = m_packetParser.parseFromStream( source );
 
 		if( !packet ) {
-			log::warn( "NetworkHandler::processReceivedData : failed to parse packed from data sent by %s\n", connection->address().toString() );
+			log::warn( "NetworkHandler::processReceivedData : failed to parse packed from data sent by %s\n", socket->address().toString() );
 			continue;
 		}
 
 		PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
 		DC_BREAK_IF( i == m_packetHandlers.end() );
 
-		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), connection->address().toString() );
+		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
 		if( !i->second->handle( connection, packet ) ) {
-			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
+			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 		}
 
 		delete packet;
@@ -94,34 +117,10 @@ TCPSocketList NetworkHandler::eventListeners( void ) const
 	return TCPSocketList();
 }
 
-// ** NetworkHandler::doLatencyTest
-void NetworkHandler::doLatencyTest( ConnectionPtr& connection, u8 iterations )
-{
-	sendPacket<packets::Ping>( connection, iterations );
-}
-
-// ** NetworkHandler::handlePingPacket
-bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, const packets::Ping* packet )
-{
-	sendPacket<packets::Pong>( connection, packet->iteration );
-	return true;
-}
-
-// ** NetworkHandler::handlePongPacket
-bool NetworkHandler::handlePongPacket( ConnectionPtr& connection, const packets::Pong* packet )
-{
-	if( packet->iteration == 0 ) {
-		log::verbose( "To much ping packets sent\n" );
-		return true;
-	}
-
-	sendPacket<packets::Ping>( connection, packet->iteration - 1 );
-	return true;
-}
-
 // ** NetworkHandler::handleEventPacket
 bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, const packets::Event* packet )
 {
+	// ** Find an event handler from this event id.
 	EventHandlers::iterator i = m_eventHandlers.find( packet->eventId );
 
 	if( i == m_eventHandlers.end() ) {
@@ -129,12 +128,14 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, const packets
 		return false;
 	}
 
+	// ** Handle this event
 	return i->second->handle( connection, packet );
 }
 
 // ** NetworkHandler::handleRemoteCallPacket
 bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const packets::RemoteCall* packet )
 {
+	// ** Find a remote call handler
 	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet->method );
 
 	if( i == m_remoteCallHandlers.end() ) {
@@ -142,12 +143,14 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const pa
 		return false;
 	}
 
+	// ** Invoke a method
 	return i->second->handle( connection, packet );
 }
 
 // ** NetworkHandler::handleRemoteCallResponsePacket
 bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
 {
+	// ** Find pending remote call
 	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
 
 	if( i == m_pendingRemoteCalls.end() ) {
@@ -155,6 +158,7 @@ bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, 
 		return false;
 	}
 
+	// ** Run a callback
 	bool result = i->second.m_handler->handle( connection, packet );
 	m_pendingRemoteCalls.erase( i );
 

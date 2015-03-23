@@ -47,32 +47,6 @@ namespace packets {
 	//! Packet payload type.
 	typedef Array<u8> Payload;
 
-	//! Ping packet
-	BeginNetworkPacket( Ping )
-		u8 iteration;
-
-		//! Constructs a Ping instance.
-		Ping( u8 iteration = 0 ) : iteration( iteration ) {}
-
-		//! Packet serializer
-		IoBeginSerializerSuper( NetworkPacket )
-			IoField( iteration )
-		IoEndSerializer
-	EndNetworkPacket
-
-	//! Pong packet
-	BeginNetworkPacket( Pong )
-		u8 iteration;
-
-		//! Constructs a Pong instance.
-		Pong( u8 iteration = 0 ) : iteration( iteration ) {}
-
-		//! Packet serializer
-		IoBeginSerializerSuper( NetworkPacket )
-			IoField( iteration )
-		IoEndSerializer
-	EndNetworkPacket
-
 	//! Network event packet
 	BeginNetworkPacket( Event )
 		TypeId		eventId;

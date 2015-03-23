@@ -65,13 +65,14 @@ void ServerHandler::update( void )
 void ServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
-	
+	createConnection( socket );
 }
 
 // ** ServerHandler::processClientDisconnection
 void ServerHandler::processClientDisconnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
+	removeConnection( socket );
 }
 
 // ** ServerHandler::eventListeners
@@ -85,28 +86,19 @@ TCPSocketList ServerHandler::eventListeners( void ) const
 // ** ServerSocketDelegate::handleReceivedData
 void ServerSocketDelegate::handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
 {
-	DC_BREAK_IF( m_connectionBySocket.count( socket ) == 0 );
-	m_serverHandler->processReceivedData( m_connectionBySocket[socket], stream );
+	m_serverHandler->processReceivedData( socket, stream );
 }
 
 // ** ServerSocketDelegate::handleConnectionAccepted
 void ServerSocketDelegate::handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )
 {
-	// ** Create a new connection.
-	m_connectionBySocket[socket] = Connection::create( m_serverHandler, socket );
-
-	// ** Dispatch event.
 	m_serverHandler->processClientConnection( socket );
 }
 
 // ** ServerSocketDelegate::handleConnectionClosed
 void ServerSocketDelegate::handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket )
 {
-	// ** Dispatch event.
 	m_serverHandler->processClientDisconnection( socket );
-
-	// ** Remove connection.
-	m_connectionBySocket.erase( m_connectionBySocket.find( socket ) );
 }
 
 /*
