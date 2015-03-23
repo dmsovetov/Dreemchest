@@ -93,7 +93,7 @@ void ServerSocketDelegate::handleReceivedData( TCPSocketListener* sender, TCPSoc
 void ServerSocketDelegate::handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )
 {
 	// ** Create a new connection.
-	m_connectionBySocket[socket] = Connection::create( socket );
+	m_connectionBySocket[socket] = Connection::create( m_serverHandler, socket );
 
 	// ** Dispatch event.
 	m_serverHandler->processClientConnection( socket );

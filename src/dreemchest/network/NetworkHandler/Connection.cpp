@@ -25,6 +25,8 @@
  **************************************************************************/
 
 #include "Connection.h"
+#include "Packets.h"
+#include "NetworkHandler.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
@@ -32,16 +34,16 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** Connection::Connection
-Connection::Connection( const TCPSocketPtr& socket ) : m_socket( socket )
+Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket ) : m_networkHandler( networkHandler ), m_socket( socket )
 {
 
 }
 
 // ** Connection::create
-ConnectionPtr Connection::create( const TCPSocketPtr& socket )
+ConnectionPtr Connection::create( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
 {
 	DC_BREAK_IF( socket == NULL );
-	return ConnectionPtr( DC_NEW Connection( socket ) );
+	return ConnectionPtr( DC_NEW Connection( networkHandler, socket ) );
 }
 
 // ** Connection::address
@@ -60,6 +62,22 @@ const TCPSocketPtr& Connection::socket( void ) const
 TCPSocketPtr& Connection::socket( void )
 {
 	return m_socket;
+}
+
+// ** Connection::sendPacket
+void Connection::sendPacket( NetworkPacket* packet )
+{
+	io::ByteBufferPtr buffer = io::ByteBuffer::create();
+
+	// ** Set packet timestamp
+	packet->timestamp = UnixTime();
+
+	// ** Write packet to binary stream
+	u32 bytesWritten = m_networkHandler->m_packetParser.writeToStream( packet, buffer );
+
+	// ** Send binary data to socket
+	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );
+	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 
 } // namespace net
