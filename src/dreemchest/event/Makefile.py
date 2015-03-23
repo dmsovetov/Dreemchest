@@ -1,0 +1,1 @@
+StaticLibrary( 'dEvent', sources = [ '.' ], defines = [ 'DC_BUILD_LIBRARY' ] )

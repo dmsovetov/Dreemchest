@@ -1,0 +1,1 @@
+StaticLibrary( 'dThreads', sources = [ '.', 'Task', '$(THREADS)' ], defines = [ 'DC_BUILD_LIBRARY' ] )
