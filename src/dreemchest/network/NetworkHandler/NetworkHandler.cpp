@@ -64,22 +64,27 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 
     io::ByteBufferPtr source( stream );
-	NetworkPacket*    packet = m_packetParser.parseFromStream( source );
 
-	if( !packet ) {
-		log::warn( "Failed to parse packed from data sent by %s\n", socket->address().toString() );
-		return;
+	while( stream->hasDataLeft() ) {
+		NetworkPacket* packet = m_packetParser.parseFromStream( source );
+
+		if( !packet ) {
+			log::warn( "Failed to parse packed from data sent by %s\n", socket->address().toString() );
+			continue;
+		}
+
+		PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
+		DC_BREAK_IF( i == m_packetHandlers.end() );
+
+		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
+		if( !i->second->handle( socket, packet ) ) {
+			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
+		}
+
+		delete packet;
 	}
 
-	PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
-	DC_BREAK_IF( i == m_packetHandlers.end() );
-
-	log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
-	if( !i->second->handle( socket, packet ) ) {
-		log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
-	}
-
-	delete packet;
+	stream->trimFromLeft( stream->position() );
 }
 
 // ** NetworkHandler::eventListeners

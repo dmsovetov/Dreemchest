@@ -131,7 +131,6 @@ void PosixTCPSocket::update( void )
 		}
 
 		m_delegate->handleReceivedData( m_parent, m_parent, stream );
-		stream->flush();
 
 		if( !isValid() ) {
 			break;
