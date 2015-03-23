@@ -43,22 +43,6 @@ NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 }
 
-// ** NetworkHandler::sendPacket
-void NetworkHandler::sendPacket( ConnectionPtr& connection, NetworkPacket* packet )
-{
-	io::ByteBufferPtr buffer = io::ByteBuffer::create();
-
-	// ** Set packet timestamp
-	packet->timestamp = UnixTime();
-
-	// ** Write packet to binary stream
-	u32 bytesWritten = m_packetParser.writeToStream( packet, buffer );
-
-	// ** Send binary data to socket
-	s32 bytesSent = connection->socket()->sendTo( buffer->buffer(), buffer->length() );
-	DC_BREAK_IF( bytesWritten != bytesSent );
-}
-
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( ConnectionPtr& connection, TCPStream* stream )
 {
@@ -97,13 +81,13 @@ TCPSocketList NetworkHandler::eventListeners( void ) const
 // ** NetworkHandler::doLatencyTest
 void NetworkHandler::doLatencyTest( ConnectionPtr& connection, u8 iterations )
 {
-	sendPacket<packets::Ping>( connection, iterations );
+	connection->sendPacket<packets::Ping>( iterations );
 }
 
 // ** NetworkHandler::handlePingPacket
 bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, const packets::Ping* packet )
 {
-	sendPacket<packets::Pong>( connection, packet->iteration );
+	connection->sendPacket<packets::Pong>( packet->iteration );
 	return true;
 }
 
@@ -115,7 +99,7 @@ bool NetworkHandler::handlePongPacket( ConnectionPtr& connection, const packets:
 		return true;
 	}
 
-	sendPacket<packets::Ping>( connection, packet->iteration - 1 );
+	connection->sendPacket<packets::Ping>( packet->iteration - 1 );
 	return true;
 }
 

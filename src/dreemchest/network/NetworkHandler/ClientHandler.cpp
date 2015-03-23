@@ -34,7 +34,7 @@ namespace net {
 // -----------------------------------------ClientHandler --------------------------------------- //
 
 // ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_connection( Connection::create( socket ) )
+ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_connection( Connection::create( this, socket ) )
 {
 
 }
@@ -85,18 +85,14 @@ TCPSocketList ClientHandler::eventListeners( void ) const
 // ** ClientSocketDelegate::handleClosed
 void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 {
-	m_connection = ConnectionPtr();
+
 }
 
 // ** ClientSocketDelegate::handleReceivedData
 void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
-	if( m_connection == NULL ) {
-		m_connection = Connection::create( sender );
-	}
-
-	DC_BREAK_IF( m_connection->socket()->descriptor() == sender->descriptor() );
-	m_clientHandler->processReceivedData( m_connection, stream );
+	DC_BREAK_IF( m_clientHandler->connection()->socket()->descriptor() != socket->descriptor() );
+	m_clientHandler->processReceivedData( m_clientHandler->connection(), stream );
 }
 
 /*
