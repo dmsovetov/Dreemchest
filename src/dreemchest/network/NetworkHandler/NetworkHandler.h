@@ -38,6 +38,7 @@ namespace net {
 
 	//! Basic network handler.
 	class NetworkHandler : public RefCounted {
+	friend class Connection;
 	public:
 
 								//! Constructs NetworkHandler instance.
@@ -77,25 +78,6 @@ namespace net {
 		//! Subscribes for a network event of a specified type.
 		template<typename T>
 		void					subscribe( const cClosure<void(const T&)>& callback );
-
-		//! Sends a packet.
-		void					sendPacket( ConnectionPtr& connection, NetworkPacket* packet );
-
-		//! Sends a packet of a specified type.
-		template<typename T>
-		void sendPacket( ConnectionPtr& connection );
-
-		template<typename T, typename Arg0>
-		void sendPacket( ConnectionPtr& connection, const Arg0& arg0 );
-
-		template<typename T, typename Arg0, typename Arg1>
-		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1 );
-
-		template<typename T, typename Arg0, typename Arg1, typename Arg2>
-		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 );
-
-		template<typename T, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-		void sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 );
 
 	protected:
 
@@ -221,7 +203,7 @@ namespace net {
 		io::ByteBufferPtr buffer = e.writeToByteBuffer();
 
 		for( TCPSocketList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
-			sendPacket<packets::Event>( i->get(), T::classTypeId(), buffer->array() );
+			connection->send<packets::Event>( T::classTypeId(), buffer->array() );
 		}
 	}
 
@@ -233,7 +215,7 @@ namespace net {
 		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
 
 		// ** Send an RPC request
-		sendPacket<packets::RemoteCall>( socket, 0, StringHash( method ), 0, buffer->array() );
+		connection->send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
 	}
 
 	// ** NetworkHandler::invoke
@@ -245,50 +227,10 @@ namespace net {
 
 		// ** Send an RPC request
 		u16 remoteCallId = m_nextRemoteCallId++;
-		sendPacket<packets::RemoteCall>( connection, remoteCallId, StringHash( method ), R::classTypeId(), buffer->array() );
+		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), R::classTypeId(), buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
-	}
-
-	// ** NetworkHandler::sendPacket
-	template<typename T>
-	inline void NetworkHandler::sendPacket( ConnectionPtr& connection )
-	{
-		T packet;
-		sendPacket( socket, &packet );
-	}
-
-	// ** NetworkHandler::sendPacket
-	template<typename T, typename Arg0>
-	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0 )
-	{
-		T packet( arg0 );
-		sendPacket( connection, &packet );
-	}
-
-	// ** NetworkHandler::sendPacket
-	template<typename T, typename Arg0, typename Arg1>
-	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1 )
-	{
-		T packet( arg0, arg1 );
-		sendPacket( connection, &packet );
-	}
-
-	// ** NetworkHandler::sendPacket
-	template<typename T, typename Arg0, typename Arg1, typename Arg2>
-	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2 )
-	{
-		T packet( arg0, arg1, arg2 );
-		sendPacket( connection, &packet );
-	}
-
-	// ** NetworkHandler::sendPacket
-	template<typename T, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-	inline void NetworkHandler::sendPacket( ConnectionPtr& connection, const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3 )
-	{
-		T packet( arg0, arg1, arg2, arg3 );
-		sendPacket( connection, &packet );
 	}
 
 } // namespace net

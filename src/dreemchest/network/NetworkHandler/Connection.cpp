@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Connection.h"
+#include "NetworkHandler.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
@@ -60,6 +61,23 @@ TCPSocketPtr& Connection::socket( void )
 {
 	return m_socket;
 }
+
+// ** Connection::send
+void Connection::send( NetworkPacket* packet )
+{
+	io::ByteBufferPtr buffer = io::ByteBuffer::create();
+
+	// ** Set packet timestamp
+	packet->timestamp = UnixTime();
+
+	// ** Write packet to binary stream
+	u32 bytesWritten = m_networkHandler->m_packetParser.writeToStream( packet, buffer );
+
+	// ** Send binary data to socket
+	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );
+	DC_BREAK_IF( bytesWritten != bytesSent );
+}
+
 
 } // namespace net
 

@@ -62,22 +62,6 @@ void NetworkHandler::removeConnection( TCPSocket* socket )
 	m_connections.erase( socket );
 }
 
-// ** NetworkHandler::sendPacket
-void NetworkHandler::sendPacket( ConnectionPtr& connection, NetworkPacket* packet )
-{
-	io::ByteBufferPtr buffer = io::ByteBuffer::create();
-
-	// ** Set packet timestamp
-	packet->timestamp = UnixTime();
-
-	// ** Write packet to binary stream
-	u32 bytesWritten = m_packetParser.writeToStream( packet, buffer );
-
-	// ** Send binary data to socket
-	s32 bytesSent = connection->socket()->sendTo( buffer->buffer(), buffer->length() );
-	DC_BREAK_IF( bytesWritten != bytesSent );
-}
-
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {

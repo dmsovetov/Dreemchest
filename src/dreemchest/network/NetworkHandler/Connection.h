@@ -49,6 +49,16 @@ namespace net {
 		//! Returns a remote address of a connection.
 		const NetworkAddress&	address( void ) const;
 
+		//! Sends a packet over this connection.
+		void					send( NetworkPacket* packet );
+
+		//! Sends a packet of a specified type over this connection.
+		template<typename T>						 void send( void );
+		template<typename T, TemplateFunctionTypes1> void send( TemplateFunctionArgs1 );
+		template<typename T, TemplateFunctionTypes2> void send( TemplateFunctionArgs2 );
+		template<typename T, TemplateFunctionTypes3> void send( TemplateFunctionArgs3 );
+		template<typename T, TemplateFunctionTypes4> void send( TemplateFunctionArgs4 );
+
 	private:
 
 								//! Constructs Connection instance.
@@ -62,6 +72,46 @@ namespace net {
 		//! Connection TCP socket.
 		TCPSocketPtr			m_socket;
 	};
+
+	// ** Connection::send
+	template<typename T>
+	inline void Connection::send( void )
+	{
+		T packet;
+		send( &packet );
+	}
+
+	// ** Connection::send
+	template<typename T, TemplateFunctionTypes1>
+	inline void Connection::send( TemplateFunctionArgs1 )
+	{
+		T packet( arg0 );
+		send( &packet );
+	}
+
+	// ** Connection::send
+	template<typename T, TemplateFunctionTypes2>
+	inline void Connection::send( TemplateFunctionArgs2 )
+	{
+		T packet( arg0, arg1 );
+		send( &packet );
+	}
+
+	// ** Connection::send
+	template<typename T, TemplateFunctionTypes3>
+	inline void Connection::send( TemplateFunctionArgs3 )
+	{
+		T packet( arg0, arg1, arg2 );
+		send( &packet );
+	}
+
+	// ** Connection::send
+	template<typename T, TemplateFunctionTypes4>
+	inline void Connection::send( TemplateFunctionArgs4 )
+	{
+		T packet( arg0, arg1, arg2, arg3 );
+		send( &packet );
+	}
 
 }
 
