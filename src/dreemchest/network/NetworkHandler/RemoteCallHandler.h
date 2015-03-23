@@ -62,7 +62,7 @@ namespace net {
 			io::ByteBufferPtr buffer = value.writeToByteBuffer();
 
 			// ** Send an RPC response packet.
-			m_connection->networkHandler()->sendPacket<packets::RemoteCallResponse>( m_connection.lock(), m_id, T::classTypeId(), buffer->array() );
+			m_connection->send<packets::RemoteCallResponse>( m_id, T::classTypeId(), buffer->array() );
 
 			// ** Mark this response as sent.
 			m_wasSent = true;
