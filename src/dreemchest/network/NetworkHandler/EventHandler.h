@@ -65,15 +65,7 @@ namespace net {
 	template<typename T>
 	inline bool EventHandler<T>::handle( ConnectionPtr& connection, const packets::Event* packet )
 	{
-		T e;
-
-		if( packet->payload.size() ) {
-			io::ByteBufferPtr buffer = io::ByteBuffer::createFromData( &packet->payload[0], packet->payload.size() );
-			io::Storage       storage( io::StorageBinary, buffer );
-			e.read( storage );
-		}
-
-		m_eventEmitter->emit( e );
+		m_eventEmitter->emit( Serializable::readFromBytes<T>( packet->payload ) );
 		return true;
 	}
 
