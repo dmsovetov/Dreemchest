@@ -91,6 +91,9 @@ namespace net {
 	//! Client network handler strong ptr.
 	typedef StrongPtr<ClientHandler> ClientHandlerPtr;
 
+	//! Connection weak ptr.
+	typedef WeakPtr<Connection> ConnectionWPtr;
+
 	//! Connection strong ptr.
 	typedef StrongPtr<Connection> ConnectionPtr;
 
