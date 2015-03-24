@@ -55,7 +55,7 @@ namespace net {
 		bool wasSent( void ) const { return m_wasSent; }
 
 		//! Send a response to caller.
-		void operator()( const T& value )
+		bool operator()( const T& value )
 		{
 			// ** Serialize argument to a byte buffer.
 			io::ByteBufferPtr buffer = value.writeToByteBuffer();
@@ -65,6 +65,8 @@ namespace net {
 
 			// ** Mark this response as sent.
 			m_wasSent = true;
+
+			return true;
 		}
 
 	private:
@@ -81,9 +83,10 @@ namespace net {
 
 	// ** Response::operator()
 	template<>
-	inline void Response<Void>::operator()( const Void& value )
+	inline bool Response<Void>::operator()( const Void& value )
 	{
 		log::warn( "Response<Void> : void responses are ignored\n" ); 
+		return true;
 	}
 
 	template<>
