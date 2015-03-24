@@ -225,6 +225,19 @@ namespace io {
         virtual detail::FieldSerializers    fieldSerializers( void ) const;
     };
 
+	//! A template class for declaring serializable types.
+	template<typename T>
+	class SerializableType : public Serializable {
+	public:
+
+		//! Returns true if the specified type matches this type.
+		virtual bool is( const TypeId& id ) const { return id == TypeInfo<T>::id(); }
+
+		//! Clones this instance.
+		virtual Serializable* clone( void ) const { return new T; }
+	};
+
+
 } // namespace io
 
 DC_END_DREEMCHEST
