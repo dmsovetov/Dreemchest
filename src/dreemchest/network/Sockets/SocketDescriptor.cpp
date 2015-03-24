@@ -94,6 +94,15 @@ bool SocketDescriptor::isValid( void ) const
 	return m_socket != INVALID_SOCKET;
 }
 
+// ** SocketDescriptor::error
+s32 SocketDescriptor::error( void ) const
+{
+	s32 err;
+	s32 errlen = sizeof( err );
+	getsockopt( m_socket, SOL_SOCKET, SO_ERROR, ( s8* )&err, &errlen );
+	return err;
+}
+
 // ** SocketDescriptor::accept
 SocketDescriptor SocketDescriptor::accept( NetworkAddress& remoteAddress ) const
 {

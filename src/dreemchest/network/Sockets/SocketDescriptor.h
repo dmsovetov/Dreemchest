@@ -66,6 +66,9 @@ namespace net {
 		//! Closes a socket.
 		void					close( void );
 
+		//! Returns an error code on this socket.
+		s32						error( void ) const;
+
 		//! Accepts incoming connection to this socket.
 		SocketDescriptor		accept( NetworkAddress& remoteAddress ) const;			
 
