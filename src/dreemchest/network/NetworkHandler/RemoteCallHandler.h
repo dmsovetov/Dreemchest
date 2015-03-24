@@ -27,8 +27,7 @@
 #ifndef	__DC_Network_RemoteCallHandler_H__
 #define	__DC_Network_RemoteCallHandler_H__
 
-#include "../Network.h"
-#include "Connection.h"
+#include "Packets.h"
 
 DC_BEGIN_DREEMCHEST
 

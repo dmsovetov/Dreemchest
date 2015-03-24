@@ -218,6 +218,7 @@ namespace net {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
+	#include "NetworkHandler/Connection.h"
 	#include "NetworkHandler/ServerHandler.h"
 	#include "NetworkHandler/ClientHandler.h"
 	#include "Sockets/TCPSocketListener.h"

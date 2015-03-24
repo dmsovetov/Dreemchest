@@ -27,7 +27,8 @@
 #ifndef __Network_Connection_H__
 #define __Network_Connection_H__
 
-#include "../Network.h"
+#include "RemoteCallHandler.h"
+#include "Packets.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -49,6 +50,14 @@ namespace net {
 		//! Returns a remote address of a connection.
 		const NetworkAddress&	address( void ) const;
 
+		//! Invokes a remote procedure.
+		template<typename T>
+		void					invoke( CString method, const T& argument );
+
+		//! Invokes a remote procedure.
+		template<typename T, typename R>
+		void					invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
+
 		//! Sends a packet over this connection.
 		void					send( NetworkPacket* packet );
 
@@ -64,14 +73,68 @@ namespace net {
 								//! Constructs Connection instance.
 								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
 
+		//! Updates this connection
+		void					update( void );
+
+		//! Handles a recieved remote call response.
+		bool					handleResponse( const packets::RemoteCallResponse* packet );
+
 	private:
+
+		//! A helper struct to store a timestamp of an RPC call.
+		struct PendingRemoteCall {
+			String							m_name;			//!< Remote procedure name.
+			UnixTime						m_timestamp;	//!< A Unix time when a call was performed.
+			AutoPtr<IRemoteResponseHandler>	m_handler;		//!< Response handler.
+
+											//! Constructs a PendingRemoteCall instance.
+											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL )
+												: m_name( name ), m_handler( handler ) {}
+		};
+
+		//! A container type to store all pending remote calls.
+		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
 
 		//! Parent network connection.
 		NetworkHandler*			m_networkHandler;
 
 		//! Connection TCP socket.
 		TCPSocketPtr			m_socket;
+
+		//! A list of pending remote calls.
+		PendingRemoteCalls		m_pendingRemoteCalls;
+
+		//! Next remote call response id.
+		u16						m_nextRemoteCallId;
 	};
+
+	// ** Connection::invoke
+	template<typename T>
+	inline void Connection::invoke( CString method, const T& argument )
+	{
+		// ** Serialize argument to a byte buffer.
+		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
+
+		// ** Send an RPC request
+		connection->send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
+	}
+
+	// ** Connection::invoke
+	template<typename T, typename R>
+	inline void Connection::invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
+	{
+		// ** Serialize argument to a byte buffer.
+		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
+
+		// ** Send an RPC request
+		u16     remoteCallId = m_nextRemoteCallId++;
+        TypeId  returnTypeId = TypeInfo<R>::id();
+        
+		send<packets::RemoteCall>( remoteCallId, StringHash( method ), returnTypeId, buffer->array() );
+		
+		// ** Create a response handler.
+		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
+	}
 
 	// ** Connection::send
 	template<typename T>

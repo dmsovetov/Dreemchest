@@ -63,14 +63,6 @@ namespace net {
 		template<typename T, typename R>
 		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback );
 
-		//! Invokes a remote procedure.
-		template<typename T>
-		void					invoke( ConnectionPtr& connection, CString method, const T& argument );
-
-		//! Invokes a remote procedure.
-		template<typename T, typename R>
-		void					invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
-
 		//! Emits a network event.
 		template<typename T>
 		void					emit( const T& e );
@@ -107,17 +99,6 @@ namespace net {
 
 	protected:
 
-		//! A helper struct to store a timestamp of an RPC call.
-		struct PendingRemoteCall {
-			String							m_name;			//!< Remote procedure name.
-			UnixTime						m_timestamp;	//!< A Unix time when a call was performed.
-			AutoPtr<IRemoteResponseHandler>	m_handler;		//!< Response handler.
-
-											//! Constructs a PendingRemoteCall instance.
-											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL )
-												: m_name( name ), m_handler( handler ) {}
-		};
-
 		//! A container type to store all registered packet handlers.
 		typedef Map< TypeId, AutoPtr<IPacketHandler> > PacketHandlers;
 
@@ -130,9 +111,6 @@ namespace net {
 		//! Container type to store socket to connection mapping
 		typedef Map<TCPSocket*, ConnectionPtr>	ConnectionBySocket;
 
-		//! A container type to store all pending remote calls.
-		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
-
 		//! Packet parser.
 		PacketParser			m_packetParser;
 
@@ -144,12 +122,6 @@ namespace net {
 
 		//! Remote call handlers.
 		RemoteCallHandlers		m_remoteCallHandlers;
-
-		//! A list of pending remote calls.
-		PendingRemoteCalls		m_pendingRemoteCalls;
-
-		//! Next remote call response id.
-		u16						m_nextRemoteCallId;
 
 		//! Active connections.
 		ConnectionBySocket		m_connections;
@@ -205,34 +177,6 @@ namespace net {
 		for( ConnectionList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
             (*i)->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
 		}
-	}
-
-	// ** NetworkHandler::invoke
-	template<typename T>
-	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument )
-	{
-		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
-
-		// ** Send an RPC request
-		connection->send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
-	}
-
-	// ** NetworkHandler::invoke
-	template<typename T, typename R>
-	inline void NetworkHandler::invoke( ConnectionPtr& connection, CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
-	{
-		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
-
-		// ** Send an RPC request
-		u16     remoteCallId = m_nextRemoteCallId++;
-        TypeId  returnTypeId = TypeInfo<R>::id();
-        
-		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), returnTypeId, buffer->array() );
-		
-		// ** Create a response handler.
-		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
 	}
 
 } // namespace net

@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** NetworkHandler::NetworkHandler
-NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
+NetworkHandler::NetworkHandler( void )
 {
     DC_BREAK_IF( TypeInfo<RemoteCallArgument>::name() != String( "RemoteCallArgument" ) );
     
@@ -136,38 +136,13 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const pa
 // ** NetworkHandler::handleRemoteCallResponsePacket
 bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
 {
-	// ** Find pending remote call
-	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
-
-	if( i == m_pendingRemoteCalls.end() ) {
-		log::warn( "NetworkHandler::handleRemoteCallResponsePacket : invalid request id %d\n", packet->id );
-		return false;
-	}
-
-	// ** Run a callback
-	bool result = i->second.m_handler->handle( connection, packet );
-	m_pendingRemoteCalls.erase( i );
-
-	return result;
+	return connection->handleResponse( packet );
 }
 
 // ** NetworkHandler::update
 void NetworkHandler::update( void )
 {
-	if( m_pendingRemoteCalls.empty() ) {
-		return;
-	}
 
-	UnixTime currentTime;
-
-	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
-		if( (currentTime - i->second.m_timestamp) > 60 ) {
-			log::warn( "NetworkHandler::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
-			i = m_pendingRemoteCalls.erase( i );
-		} else {
-			++i;
-		}
-	}
 }
 
 } // namespace net

@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** Connection::Connection
-Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket ) : m_networkHandler( networkHandler ), m_socket( socket )
+Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket ) : m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 )
 {
 
 }
@@ -78,6 +78,42 @@ void Connection::send( NetworkPacket* packet )
 	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 
+// ** Connection::handleResponse
+bool Connection::handleResponse( const packets::RemoteCallResponse* packet )
+{
+	// ** Find pending remote call
+	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
+
+	if( i == m_pendingRemoteCalls.end() ) {
+		log::warn( "Connection::handleResponse : invalid request id %d\n", packet->id );
+		return false;
+	}
+
+	// ** Run a callback
+	bool result = i->second.m_handler->handle( ConnectionPtr( this ), packet );	//!! Potential bug :(
+	m_pendingRemoteCalls.erase( i );
+
+	return result;
+}
+
+// ** Connection::update
+void Connection::update( void )
+{
+	if( m_pendingRemoteCalls.empty() ) {
+		return;
+	}
+
+	UnixTime currentTime;
+
+	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
+		if( (currentTime - i->second.m_timestamp) > 60 ) {
+			log::warn( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
+			i = m_pendingRemoteCalls.erase( i );
+		} else {
+			++i;
+		}
+	}
+}
 
 } // namespace net
 
