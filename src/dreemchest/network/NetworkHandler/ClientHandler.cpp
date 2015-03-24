@@ -85,7 +85,7 @@ ConnectionList ClientHandler::eventListeners( void ) const
 // ** ClientSocketDelegate::handleClosed
 void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 {
-
+	log::verbose( "ClientSocketDelegate::handleClosed : connection closed\n" );
 }
 
 // ** ClientSocketDelegate::handleReceivedData
