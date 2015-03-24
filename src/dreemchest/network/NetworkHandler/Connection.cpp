@@ -75,6 +75,10 @@ void Connection::send( NetworkPacket* packet )
 
 	// ** Send binary data to socket
 	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );
+	if( bytesSent == 0 ) {
+		return;	// ** The socket was closed.
+	}
+
 	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 

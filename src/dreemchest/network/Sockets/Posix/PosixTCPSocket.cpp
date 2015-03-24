@@ -109,7 +109,13 @@ void PosixTCPSocket::close( void )
 // ** PosixTCPSocket::sendTo
 u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 {
-	return ( u32 )m_stream->write( buffer, size );
+	s32 result = m_stream->write( buffer, size );
+	if( result == -1 ) {
+		close();
+		return 0;
+	}
+
+	return ( u32 )result;
 }
 
 // ** PosixTCPSocket::update
