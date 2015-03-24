@@ -54,7 +54,7 @@ namespace net {
 
         // ** NetworkHandler
         virtual void			update( void );
-		virtual TCPSocketList	eventListeners( void ) const;
+		virtual ConnectionList	eventListeners( void ) const;
 
 	protected:
 

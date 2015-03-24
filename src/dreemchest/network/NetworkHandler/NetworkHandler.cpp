@@ -36,15 +36,17 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void ) : m_nextRemoteCallId( 1 )
 {
+    DC_BREAK_IF( TypeInfo<RemoteCallArgument>::name() != String( "RemoteCallArgument" ) );
+    
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 }
 
 // ** NetworkHandler::findConnectionBySocket
-ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket )
+ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket ) const
 {
-	ConnectionBySocket::iterator i = m_connections.find( socket );
+	ConnectionBySocket::const_iterator i = m_connections.find( socket );
 	return i != m_connections.end() ? i->second : ConnectionPtr();
 }
 
@@ -96,9 +98,9 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 }
 
 // ** NetworkHandler::eventListeners
-TCPSocketList NetworkHandler::eventListeners( void ) const
+ConnectionList NetworkHandler::eventListeners( void ) const
 {
-	return TCPSocketList();
+	return ConnectionList();
 }
 
 // ** NetworkHandler::handleEventPacket
@@ -159,7 +161,7 @@ void NetworkHandler::update( void )
 	UnixTime currentTime;
 
 	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
-		if( (currentTime - i->second.m_timestamp) > 10 ) {
+		if( (currentTime - i->second.m_timestamp) > 60 ) {
 			log::warn( "NetworkHandler::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
 			i = m_pendingRemoteCalls.erase( i );
 		} else {

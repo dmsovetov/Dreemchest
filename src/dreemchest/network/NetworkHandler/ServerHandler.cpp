@@ -76,9 +76,16 @@ void ServerHandler::processClientDisconnection( TCPSocket* socket )
 }
 
 // ** ServerHandler::eventListeners
-TCPSocketList ServerHandler::eventListeners( void ) const
+ConnectionList ServerHandler::eventListeners( void ) const
 {
-	return m_socketListener->connections();
+    const TCPSocketList& sockets = m_socketListener->connections();
+    
+    ConnectionList connections;
+    for( TCPSocketList::const_iterator i = sockets.begin(), end = sockets.end(); i != end; ++i ) {
+        connections.push_back( findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) ) );
+    }
+    
+	return connections;
 }
 
 // ---------------------------------------- ServerSocketDelegate ------------------------------------//

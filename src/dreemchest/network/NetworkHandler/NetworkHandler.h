@@ -82,7 +82,7 @@ namespace net {
 	protected:
 
 		//! Returns a list of TCP sockets to send event to.
-		virtual TCPSocketList	eventListeners( void ) const;
+		virtual ConnectionList	eventListeners( void ) const;
 
 		//! Processes a received data from client.
 		virtual void			processReceivedData( TCPSocket* socket, TCPStream* stream );
@@ -91,7 +91,7 @@ namespace net {
 		ConnectionPtr			createConnection( TCPSocket* socket );
 
 		//! Returns a connection by socket.
-		ConnectionPtr			findConnectionBySocket( TCPSocket* socket );
+        ConnectionPtr			findConnectionBySocket( TCPSocket* socket ) const;
 
 		//! Removes connection by socket.
 		void					removeConnection( TCPSocket* socket );
@@ -192,7 +192,7 @@ namespace net {
 	inline void NetworkHandler::emit( const T& e )
 	{
 		// ** Get the list of potential listeners
-		TCPSocketList listeners = eventListeners();
+		ConnectionList listeners = eventListeners();
 
 		if( listeners.empty() ) {
 			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", T::classTypeName() );
@@ -202,8 +202,8 @@ namespace net {
 		// ** Serialize event to a byte buffer.
 		io::ByteBufferPtr buffer = e.writeToByteBuffer();
 
-		for( TCPSocketList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
-			connection->send<packets::Event>( T::classTypeId(), buffer->array() );
+		for( ConnectionList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
+            (*i)->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
 		}
 	}
 
@@ -226,8 +226,10 @@ namespace net {
 		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
 
 		// ** Send an RPC request
-		u16 remoteCallId = m_nextRemoteCallId++;
-		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), TypeInfo<R>::id(), buffer->array() );
+		u16     remoteCallId = m_nextRemoteCallId++;
+        TypeId  returnTypeId = TypeInfo<R>::id();
+        
+		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), returnTypeId, buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );

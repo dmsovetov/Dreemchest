@@ -75,9 +75,9 @@ void ClientHandler::update( void )
 }
 
 // ** ClientHandler::eventListeners
-TCPSocketList ClientHandler::eventListeners( void ) const
+ConnectionList ClientHandler::eventListeners( void ) const
 {
-	return TCPSocketList();
+	return ConnectionList();
 }
 
 // -----------------------------------------ClientSocketDelegate --------------------------------------- //
