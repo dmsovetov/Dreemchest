@@ -163,14 +163,14 @@ namespace net {
 	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
 		m_packetParser.registerPacketType<T>();
-		m_packetHandlers[T::classTypeId()] = DC_NEW PacketHandler<T>( callback );
+		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
 
 	// ** NetworkHandler::registerEvent
 	template<typename T>
 	inline void NetworkHandler::registerEvent( void )
 	{
-		m_eventHandlers[T::classTypeId()] = DC_NEW EventHandler<T>( &m_eventEmitter );
+		m_eventHandlers[TypeInfo<T>::id()] = DC_NEW EventHandler<T>( &m_eventEmitter );
 	}
 
 	// ** NetworkHandler::registerRemoteProcedure
@@ -227,7 +227,7 @@ namespace net {
 
 		// ** Send an RPC request
 		u16 remoteCallId = m_nextRemoteCallId++;
-		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), R::classTypeId(), buffer->array() );
+		connection->send<packets::RemoteCall>( remoteCallId, StringHash( method ), TypeInfo<R>::id(), buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
