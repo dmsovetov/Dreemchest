@@ -28,6 +28,7 @@
 #define __DC_Network_PosixTCPSocketListener_H__
 
 #include "../TCPSocketListener.h"
+#include "PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -52,6 +53,9 @@ namespace net {
 
 		//! Accepst incoming connection.
 		TCPSocketPtr					acceptConnection( void );
+
+		//! Setups FD sets used in select call.
+		void							setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener );
 
 	private:
 

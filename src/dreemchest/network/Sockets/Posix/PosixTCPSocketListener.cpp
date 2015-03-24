@@ -26,7 +26,6 @@
 
 #include "PosixTCPSocketListener.h"
 #include "PosixTCPSocket.h"
-#include "PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -59,49 +58,82 @@ PosixTCPSocketListener::PosixTCPSocketListener( TCPSocketListenerDelegate* deleg
 	m_delegate = TCPSocketListenerDelegatePtr( delegate ? delegate : DC_NEW TCPSocketListenerDelegate );
 }
 
+// ** PosixTCPSocketListener::setupFDSet
+void PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener ) 
+{
+    FD_ZERO( &read );
+    FD_ZERO( &write );
+    FD_ZERO( &except );
+
+    // ** Add the listener socket
+	FD_SET( listener, &read );
+	FD_SET( listener, &except );
+
+    // ** Add client connections
+	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
+		const SocketDescriptor& socket = (*i)->descriptor();
+
+		FD_SET( socket, &read );
+		FD_SET( socket, &write );
+		FD_SET( socket, &except );
+	}
+}
+
 // ** PosixTCPSocketListener::update
 void PosixTCPSocketListener::update( void )
 {
-    int result = 0;
+	// ** Setup FD sets
+	fd_set read, write, except;
+	setupFDSets( read, write, except, m_socket );
 
-    timeval timeout;
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 0;
-
-    fd_set readSet;
-
-    do {
-        FD_ZERO( &readSet );
-        FD_SET( m_socket, &readSet );
-
-        for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-            FD_SET( (*i)->descriptor(), &readSet );
-        }
-
-//      result = select( 0, &readSet, NULL, NULL, &timeout ); // ** Win32
-        result = select( 16, &readSet, NULL, NULL, &timeout );
-    } while( result == -1 );
-
-	if( result < 0 ) {
+	// ** Do a select
+	if( select( 0, &read, &write, &except, NULL ) <= 0 ) {
+		log::error( "PosixTCPSocketListener::update : select failed, %d\n", PosixNetwork::lastError() );
 		return;
 	}
 
-    // ** Accept connections
-    if( FD_ISSET( m_socket, &readSet ) ) {
+	// ** Process listener socket
+	if( FD_ISSET( m_socket, &read ) ) {
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
 
 		m_delegate->handleConnectionAccepted( m_parent, accepted.get() );
-    }
+	}
+	else if( FD_ISSET( m_socket, &except ) ) {
+		log::error( "PosixTCPSocketListener::update : error on listening socket: %d\n", m_socket.error() );
+		return;
+	}
 
-    // ** Process connections
-    for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
-        TCPSocketPtr& socket = *i;
+	// ** Process client sockets
+	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
+		TCPSocketPtr&			socket	   = *i;
+		const SocketDescriptor& descriptor = socket->descriptor();
+		bool					hasError   = false;
 
-		if( FD_ISSET( socket->descriptor(), &readSet ) ) {
-			socket->update();
-        }
-    }
+		// ** Check the erro on this socket.
+		if( FD_ISSET( descriptor, &except ) ) {
+			FD_CLR( descriptor, &except );
+			hasError = true;
+		}
+		else {
+			if( FD_ISSET( descriptor, &read ) ) {
+				FD_CLR( descriptor, &read );
+				socket->update();
+			}
+			if( FD_ISSET( descriptor, &write ) ) {
+				FD_CLR( descriptor, &write );
+			//	log::verbose( "PosixTCPSocketListener::update : writable socket handle %d\n", ( s32 )descriptor );
+			}
+		}
+
+		if( hasError ) {
+			s32 error = descriptor.error();
+			if( error != NO_ERROR ) {
+				log::error( "PosixTCPSocketListener::update : socket error %\n", error );
+			}
+			socket->close();
+		}
+	}
 
     // ** Remove closed connections
     for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ) {
@@ -111,8 +143,6 @@ void PosixTCPSocketListener::update( void )
             ++i;
         }
     }
-
-    DC_BREAK_IF( result < 0 );
 }
 
 // ** PosixTCPSocketListener::close
