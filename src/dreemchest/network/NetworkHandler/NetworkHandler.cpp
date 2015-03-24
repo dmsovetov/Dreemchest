@@ -36,7 +36,7 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void )
 {
-    DC_BREAK_IF( TypeInfo<RemoteCallArgument>::name() != String( "RemoteCallArgument" ) );
+    DC_BREAK_IF( TypeInfo<NetworkPacket>::name() != String( "NetworkPacket" ) );
     
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );

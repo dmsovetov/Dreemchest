@@ -79,6 +79,18 @@ namespace net {
 		bool			m_wasSent;
 	};
 
+	// ** Response::operator()
+	template<>
+	inline void Response<Void>::operator()( const Void& value )
+	{
+		log::warn( "Response<Void> : void responses are ignored\n" ); 
+	}
+
+	template<>
+	inline Response<Void>::Response( const ConnectionWPtr& connection, u16 id ) : m_connection( connection ), m_id( id ), m_wasSent( true )
+	{
+	}
+
 	//! Template class that handles a RemoteCall packet and invokes a local procedure.
 	template<typename T, typename R>
 	class RemoteCallHandler : public IRemoteCallHandler {

@@ -206,11 +206,18 @@ namespace net {
     };
 
 	//! Base class for all remote call argument types.
-	struct RemoteCallArgument : public io::Serializable {
+	template<typename T>
+	struct RemoteCallArgument : public io::SerializableType<T> {
 	};
 
 	//! Base call for all remote call response types.
-	struct RemoteCallResponse : public io::Serializable {
+	template<typename T>
+	struct RemoteCallResponse : public io::SerializableType<T> {
+	};
+
+	//! Base class for all replicated event types.
+	template<typename T>
+	struct ReplicatedEvent : public io::SerializableType<T> {
 	};
     
 } // namespace net

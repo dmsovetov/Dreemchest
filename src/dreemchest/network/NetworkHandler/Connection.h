@@ -116,7 +116,7 @@ namespace net {
 		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
 
 		// ** Send an RPC request
-		connection->send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
+		send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
 	}
 
 	// ** Connection::invoke

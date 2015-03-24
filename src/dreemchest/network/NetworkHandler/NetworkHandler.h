@@ -57,7 +57,7 @@ namespace net {
 
 		//! Registers a remote procedure.
 		template<typename T>
-		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, void>::Callback& callback );
+		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, Void>::Callback& callback );
 
 		//! Registers a remote procedure.
 		template<typename T, typename R>
@@ -66,6 +66,13 @@ namespace net {
 		//! Emits a network event.
 		template<typename T>
 		void					emit( const T& e );
+
+		//! Template functions to emit a new event.
+		template<typename T>						 void emit( void );
+		template<typename T, TemplateFunctionTypes1> void emit( TemplateFunctionArgs1 );
+		template<typename T, TemplateFunctionTypes2> void emit( TemplateFunctionArgs2 );
+		template<typename T, TemplateFunctionTypes3> void emit( TemplateFunctionArgs3 );
+		template<typename T, TemplateFunctionTypes4> void emit( TemplateFunctionArgs4 );
 
 		//! Subscribes for a network event of a specified type.
 		template<typename T>
@@ -146,6 +153,13 @@ namespace net {
 	}
 
 	// ** NetworkHandler::registerRemoteProcedure
+	template<typename T>
+	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, Void>::Callback& callback )
+	{
+		m_remoteCallHandlers[StringHash( name )] = DC_NEW RemoteCallHandler<T, Void>( callback );
+	}
+
+	// ** NetworkHandler::registerRemoteProcedure
 	template<typename T, typename R>
 	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback )
 	{
@@ -167,7 +181,7 @@ namespace net {
 		ConnectionList listeners = eventListeners();
 
 		if( listeners.empty() ) {
-			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", T::classTypeName() );
+			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", TypeInfo<T>::name() );
 			return;
 		}
 
@@ -177,6 +191,46 @@ namespace net {
 		for( ConnectionList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
             (*i)->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
 		}
+	}
+
+	// ** NetworkHandler::emit
+	template<typename T>
+	inline void NetworkHandler::emit( void )
+	{
+		T e;
+		emit( e );
+	}
+
+	// ** NetworkHandler::emit
+	template<typename T, TemplateFunctionTypes1>
+	inline void NetworkHandler::emit( TemplateFunctionArgs1 )
+	{
+		T e( arg0 );
+		emit( e );
+	}
+
+	// ** NetworkHandler::send
+	template<typename T, TemplateFunctionTypes2>
+	inline void NetworkHandler::emit( TemplateFunctionArgs2 )
+	{
+		T e( arg0, arg1 );
+		emit( e );
+	}
+
+	// ** NetworkHandler::send
+	template<typename T, TemplateFunctionTypes3>
+	inline void NetworkHandler::emit( TemplateFunctionArgs3 )
+	{
+		T e( arg0, arg1, arg2 );
+		emit( e );
+	}
+
+	// ** NetworkHandler::send
+	template<typename T, TemplateFunctionTypes4>
+	inline void NetworkHandler::emit( TemplateFunctionArgs4 )
+	{
+		T e( arg0, arg1, arg2, arg3 );
+		emit( e );
 	}
 
 } // namespace net
