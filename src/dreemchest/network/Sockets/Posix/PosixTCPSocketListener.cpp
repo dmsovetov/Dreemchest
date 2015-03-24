@@ -41,13 +41,13 @@ PosixTCPSocketListener::TCPClientDelegate::TCPClientDelegate( PosixTCPSocketList
 // ** PosixTCPSocketListener::TCPClientDelegate::handleReceivedData
 void PosixTCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
-	m_listener->m_delegate->handleReceivedData( m_listener->m_parent, socket, stream );
+	if( m_listener != NULL ) m_listener->m_delegate->handleReceivedData( m_listener->m_parent, socket, stream );
 }
     
 // ** PosixTCPSocketListener::TCPClientDelegate::handleClosed
 void PosixTCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
 {
-    m_listener->m_delegate->handleConnectionClosed( m_listener->m_parent, sender );
+    if( m_listener != NULL ) m_listener->m_delegate->handleConnectionClosed( m_listener->m_parent, sender );
 }
 
 // ------------------------------------------PosixTCPSocketListener ---------------------------------------- //

@@ -84,7 +84,7 @@ namespace net {
 		private:
 
 			//! Parent socket listener.
-			PosixTCPSocketListener*	m_listener;
+			WeakPtr<PosixTCPSocketListener>	m_listener;
 		};
 	};
 
