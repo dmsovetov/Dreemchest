@@ -89,7 +89,6 @@ s32 TCPStream::write( const void* buffer, s32 size )
 			log::error( "PosixTCPSocket::sendTo : %s\n", strerror( errno ) );
 		#endif
 
-			DC_BREAK
             return -1;
         }
 
