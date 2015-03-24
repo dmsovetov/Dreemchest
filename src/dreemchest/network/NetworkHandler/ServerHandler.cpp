@@ -82,7 +82,13 @@ ConnectionList ServerHandler::eventListeners( void ) const
     
     ConnectionList connections;
     for( TCPSocketList::const_iterator i = sockets.begin(), end = sockets.end(); i != end; ++i ) {
-        connections.push_back( findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) ) );
+		ConnectionPtr connection = findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) );
+		if( connection == ConnectionPtr() ) {
+			log::msg( "ServerHandler::eventListeners : null\n" );
+			continue;
+		}
+
+        connections.push_back( connection );
     }
     
 	return connections;
