@@ -65,7 +65,7 @@ namespace net {
 
 		//! Emits a network event.
 		template<typename T>
-		void					emit( const T& e );
+		void					emitTo( const T& e, ConnectionList& listeners );
 
 		//! Template functions to emit a new event.
 		template<typename T>						 void emit( void );
@@ -173,13 +173,10 @@ namespace net {
 		m_eventEmitter.subscribe<T>( callback );
 	}
 
-	// ** NetworkHandler::emit
+	// ** NetworkHandler::emitTo
 	template<typename T>
-	inline void NetworkHandler::emit( const T& e )
+	inline void NetworkHandler::emitTo( const T& e, ConnectionList& listeners )
 	{
-		// ** Get the list of potential listeners
-		ConnectionList listeners = eventListeners();
-
 		if( listeners.empty() ) {
 			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", TypeInfo<T>::name() );
 			return;
@@ -197,40 +194,35 @@ namespace net {
 	template<typename T>
 	inline void NetworkHandler::emit( void )
 	{
-		T e;
-		emit( e );
+		emitTo( T(), eventListeners() );
 	}
 
 	// ** NetworkHandler::emit
 	template<typename T, TemplateFunctionTypes1>
 	inline void NetworkHandler::emit( TemplateFunctionArgs1 )
 	{
-		T e( arg0 );
-		emit( e );
+		emitTo( T( arg0 ), eventListeners() );
 	}
 
 	// ** NetworkHandler::send
 	template<typename T, TemplateFunctionTypes2>
 	inline void NetworkHandler::emit( TemplateFunctionArgs2 )
 	{
-		T e( arg0, arg1 );
-		emit( e );
+		emitTo( T( arg0, arg1 ), eventListeners() );
 	}
 
 	// ** NetworkHandler::send
 	template<typename T, TemplateFunctionTypes3>
 	inline void NetworkHandler::emit( TemplateFunctionArgs3 )
 	{
-		T e( arg0, arg1, arg2 );
-		emit( e );
+		emitTo( T( arg0, arg1, arg2 ), eventListeners() );
 	}
 
 	// ** NetworkHandler::send
 	template<typename T, TemplateFunctionTypes4>
 	inline void NetworkHandler::emit( TemplateFunctionArgs4 )
 	{
-		T e( arg0, arg1, arg2, arg3 );
-		emit( e );
+		emitTo( T( arg0, arg1, arg2, arg3 ), eventListeners() );
 	}
 
 } // namespace net
