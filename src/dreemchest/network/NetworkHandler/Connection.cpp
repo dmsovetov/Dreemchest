@@ -67,9 +67,6 @@ void Connection::send( NetworkPacket* packet )
 {
 	io::ByteBufferPtr buffer = io::ByteBuffer::create();
 
-	// ** Set packet timestamp
-	packet->timestamp = UnixTime();
-
 	// ** Write packet to binary stream
 	u32 bytesWritten = m_networkHandler->m_packetParser.writeToStream( packet, buffer );
 
