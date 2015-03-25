@@ -31,15 +31,6 @@
 
 DC_BEGIN_DREEMCHEST
 
-
-#define BeginNetworkPacket( name )			\
-	struct name : public NetworkPacket {	\
-		ClassEnableTypeId( name );			\
-		ClassEnableCloning( name );
-
-#define EndNetworkPacket	};
-
-
 namespace net {
 
 namespace packets {
@@ -48,22 +39,22 @@ namespace packets {
 	typedef Array<u8> Payload;
 
 	//! Network event packet
-	BeginNetworkPacket( Event )
-		TypeId		eventId;
-		Payload		payload;
+	struct Event : public io::SerializableType<Event> {
+		TypeId			eventId;
+		Payload			payload;
 
 		//! Constructs Event instance.
-		Event( TypeId eventId = 0, const Payload& payload = Payload() ) : eventId( eventId ), payload( payload ) {}
+		Event( server::TypeId eventId = 0, const Payload& payload = Payload() ) : eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
 		IoBeginSerializerSuper( NetworkPacket )
 			IoField( eventId )
 			IoArray( payload )
 		IoEndSerializer
-	EndNetworkPacket
+	};
 
 	//! RPC call packet.
-	BeginNetworkPacket( RemoteCall )
+	struct RemoteCall : public io::SerializableType<RemoteCall> {
 		u16			id;
 		u32			method;
 		TypeId		returnType;
@@ -80,10 +71,10 @@ namespace packets {
 			IoField( returnType )
 			IoArray( payload )
 		IoEndSerializer
-	EndNetworkPacket
+	};
 
 	//! RPC call response
-	BeginNetworkPacket( RemoteCallResponse )
+	struct RemoteCallResponse : public io::SerializableType<RemoteCallResponse> {
 		u16			id;
 		TypeId		returnType;
 		Payload		payload;
@@ -98,7 +89,7 @@ namespace packets {
 			IoField( returnType )
 			IoArray( payload )
 		IoEndSerializer
-	EndNetworkPacket
+	};
 
 } // namespace packets
 
