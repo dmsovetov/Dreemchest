@@ -93,6 +93,7 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
 	#include "streams/FileStream.h"
     #include "streams/ByteBuffer.h"
+	#include "serialization/BinarySerializer.h"
     #include "serialization/BinaryStorage.h"
 
     #ifdef HAVE_JSONCPP
