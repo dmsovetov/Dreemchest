@@ -80,9 +80,7 @@ namespace io {
 	template<typename T>
 	inline void BinarySerializer::registerType( void )
 	{
-		printf( "%s registered as %d\n", TypeInfo<T>::name(), TypeInfo<T>::id() );
-		TypeId id = TypeInfo<T>::id();
-		s_types[id] = new T;
+		s_types[TypeInfo<T>::id()] = new T;
 	}
 
 } // namespace io
