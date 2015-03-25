@@ -62,15 +62,15 @@
         T*          m_pointer;
 
 #define IoWriteField( ... )                                             \
-    virtual void write( Storage& storage ) const {                      \
+    virtual void write( io::Storage& storage ) const {					\
         storage.pushWrite( m_name );                                    \
         __VA_ARGS__                                                     \
         storage.pop();                                                  \
     }
 
 #define IoReadField( ... )                                              \
-    virtual void read( const Storage& storage ) {                       \
-        StorageState state( m_name );                                   \
+    virtual void read( const io::Storage& storage ) {					\
+        io::StorageState state( m_name );								\
         storage.pushRead( state );                                      \
         __VA_ARGS__                                                     \
         storage.pop();                                                  \
