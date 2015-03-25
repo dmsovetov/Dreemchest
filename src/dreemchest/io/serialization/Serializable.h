@@ -189,11 +189,10 @@ namespace io {
 
     //! Base class for all serializable data structs.
     class Serializable {
+    public:
 
 		ClassEnableCloning( Serializable )
         ClassEnableTypeInfo( Serializable )
-
-    public:
 
         //! Reads data from a storage.
         void                                read( const Storage& storage, CString key = NULL );
@@ -235,6 +234,15 @@ namespace io {
 
 		//! Clones this instance.
 		virtual Serializable* clone( void ) const { return new T; }
+
+		//! Returns a type id.
+		virtual TypeId  typeId( void ) const  { return TypeInfo<T>::id(); }
+
+		//! Returns a type name.
+		virtual CString typeName( void ) const { return TypeInfo<T>::name(); }
+
+		//! Returns a type index.
+		static  TypeIdx typeIdx( void ) { return TypeIndex<T>::idx(); }
 	};
 
 
