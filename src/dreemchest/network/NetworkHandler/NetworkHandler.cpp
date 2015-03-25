@@ -67,38 +67,33 @@ void NetworkHandler::removeConnection( TCPSocket* socket )
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
+	using namespace io;
+
 	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 
 	// ** Find a connection by socket
 	ConnectionPtr connection = findConnectionBySocket( socket );
 	DC_BREAK_IF( connection == NULL );
 
-    io::ByteBufferPtr source( stream );
-	
-	while( stream->hasDataLeft() ) {
-		NetworkPacket* packet = NULL;
+    ByteBufferPtr source( stream );
 
-		io::BinarySerializer::Result result = io::BinarySerializer::read( source, &packet );
-		if( result == io::BinarySerializer::NotEnoughData ) {
-			break;
-		}
+	Serializables packets = BinarySerializer::read( source );
 
-		if( !packet ) {
-			log::warn( "NetworkHandler::processReceivedData : failed to parse packed from data sent by %s\n", socket->address().toString() );
+	for( Serializables::iterator i = packets.begin(), end = packets.end(); i != end; ++i ) {
+		NetworkPacket* packet = i->get();
+
+		PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
+		if( j == m_packetHandlers.end() ) {
+			log::warn( "NetworkHandler::processReceivedData : unhandled packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 			continue;
 		}
 
-		PacketHandlers::iterator i = m_packetHandlers.find( packet->typeId() );
-		DC_BREAK_IF( i == m_packetHandlers.end() );
-
 		log::verbose( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
-		if( !i->second->handle( connection, packet ) ) {
+		if( !j->second->handle( connection, packet ) ) {
 			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 		}
-
-		delete packet;
 	}
-
+	
 	stream->trimFromLeft( stream->position() );
 }
 
