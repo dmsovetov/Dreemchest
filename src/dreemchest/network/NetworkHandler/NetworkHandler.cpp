@@ -76,7 +76,12 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
     io::ByteBufferPtr source( stream );
 	
 	while( stream->hasDataLeft() ) {
-		NetworkPacket* packet = m_packetParser.parseFromStream( source );
+		NetworkPacket* packet = NULL;
+
+		io::BinarySerializer::Result result = io::BinarySerializer::read( source, &packet );
+		if( result == io::BinarySerializer::NotEnoughData ) {
+			break;
+		}
 
 		if( !packet ) {
 			log::warn( "NetworkHandler::processReceivedData : failed to parse packed from data sent by %s\n", socket->address().toString() );

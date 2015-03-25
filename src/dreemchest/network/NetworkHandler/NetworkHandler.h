@@ -118,9 +118,6 @@ namespace net {
 		//! Container type to store socket to connection mapping
 		typedef Map<TCPSocket*, ConnectionPtr>	ConnectionBySocket;
 
-		//! Packet parser.
-		PacketParser			m_packetParser;
-
 		//! Packet handlers.
 		PacketHandlers			m_packetHandlers;
 
@@ -141,7 +138,7 @@ namespace net {
 	template<typename T>
 	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
-		m_packetParser.registerPacketType<T>();
+		io::BinarySerializer::registerType<T>();
 		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
 

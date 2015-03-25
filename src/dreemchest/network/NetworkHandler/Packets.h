@@ -27,7 +27,7 @@
 #ifndef	__DC_Network_Packets_H__
 #define	__DC_Network_Packets_H__
 
-#include "PacketParser.h"
+#include "../Network.h"
 
 DC_BEGIN_DREEMCHEST
 

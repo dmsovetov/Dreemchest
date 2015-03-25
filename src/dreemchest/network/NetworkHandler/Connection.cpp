@@ -68,7 +68,7 @@ void Connection::send( NetworkPacket* packet )
 	io::ByteBufferPtr buffer = io::ByteBuffer::create();
 
 	// ** Write packet to binary stream
-	u32 bytesWritten = m_networkHandler->m_packetParser.writeToStream( packet, buffer );
+	u32 bytesWritten = io::BinarySerializer::write( buffer, packet );
 
 	// ** Send binary data to socket
 	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );
