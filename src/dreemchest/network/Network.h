@@ -88,6 +88,9 @@ namespace net {
 	//! TCP socket listener delegate ptr.
 	typedef StrongPtr<TCPSocketListenerDelegate> TCPSocketListenerDelegatePtr;
 
+	//! Network handler strong ptr.
+	typedef StrongPtr<NetworkHandler> NetworkHandlerPtr;
+
 	//! Server network handler strong ptr.
 	typedef StrongPtr<ServerHandler> ServerHandlerPtr;
 
