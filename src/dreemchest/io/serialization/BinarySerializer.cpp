@@ -73,6 +73,32 @@ BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializa
 	return Success;
 }
 
+// ** BinarySerializer::read
+Serializables BinarySerializer::read( ByteBufferPtr& bytes )
+{
+	Serializables serializables;
+
+	while( bytes->hasDataLeft() ) {
+		Serializable* item   = NULL;
+		Result		  result = read( bytes, &item );
+
+		if( result == NotEnoughData ) {
+			break;
+		}
+
+		if( result == Malformed ) {
+			bytes->setPosition( 0, SeekEnd );
+			break;
+		}
+
+		if( item ) {
+			serializables.push_back( item );
+		}
+	}
+
+	return serializables;
+}
+
 // ** BinarySerializer::write
 s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 {

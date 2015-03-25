@@ -48,6 +48,9 @@ namespace io {
 		//! Read a serializable from storage.
 		static Result				read( ByteBufferPtr& bytes, Serializable** data );
 
+		//! Reads a list of serializables from storage.
+		static Serializables		read( ByteBufferPtr& bytes );
+
 		//! Writes a serializable to storage.
 		static s32					write( ByteBufferPtr& bytes, Serializable* data );
 

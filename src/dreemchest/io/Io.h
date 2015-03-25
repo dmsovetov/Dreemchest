@@ -78,8 +78,9 @@ namespace io {
     //! Archive ptr type.
     typedef StrongPtr<Archive>      ArchivePtr;
 
-    typedef Map<Path, ArchivePtr>	Archives;
-    typedef Set<Path>               PathSet;
+    typedef Map<Path, ArchivePtr>			Archives;
+    typedef Set<Path>						PathSet;
+	typedef List< AutoPtr<Serializable> >	Serializables;
 
     namespace detail {
         typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
