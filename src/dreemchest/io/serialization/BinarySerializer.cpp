@@ -39,7 +39,7 @@ BinarySerializer::SerializableTypes BinarySerializer::s_types;
 // ** BinarySerializer::read
 BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializable** data )
 {
-	if( bytes->bytesAvailable() <= Header::size() ) {
+	if( bytes->bytesAvailable() < Header::size() ) {
 		return NotEnoughData;
 	}
 
