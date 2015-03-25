@@ -47,6 +47,13 @@ namespace event {
 		template<typename T>
 		void emit( const T& e );
 
+		//! Constructs and emits a new event instance.
+		template<typename T>							void emit( void );
+		template<typename T, TemplateFunctionTypes1>	void emit( TemplateFunctionArgs1 );
+		template<typename T, TemplateFunctionTypes2>	void emit( TemplateFunctionArgs2 );
+		template<typename T, TemplateFunctionTypes3>	void emit( TemplateFunctionArgs3 );
+		template<typename T, TemplateFunctionTypes4>	void emit( TemplateFunctionArgs4 );
+
 	private:
 
 		//! Array of listeners.
@@ -100,6 +107,46 @@ namespace event {
 		for( u32 j = 0, n = ( u32 )i->second.size(); j < n; j++ ) {
 			(*reinterpret_cast<const CallbackType*>( i->second[j] ))( e );
 		}
+	}
+
+	// ** EventEmitter::emit
+	template<typename T>
+	inline void EventEmitter::emit( void )
+	{
+		T e;
+		emit( e );
+	}
+
+	// ** EventEmitter::emit
+	template<typename T, TemplateFunctionTypes1>
+	inline void EventEmitter::emit( TemplateFunctionArgs1 )
+	{
+		T e( arg0 );
+		emit( e );
+	}
+
+	// ** EventEmitter::send
+	template<typename T, TemplateFunctionTypes2>
+	inline void EventEmitter::emit( TemplateFunctionArgs2 )
+	{
+		T e( arg0, arg1 );
+		emit( e );
+	}
+
+	// ** EventEmitter::send
+	template<typename T, TemplateFunctionTypes3>
+	inline void EventEmitter::emit( TemplateFunctionArgs3 )
+	{
+		T e( arg0, arg1, arg2 );
+		emit( e );
+	}
+
+	// ** EventEmitter::send
+	template<typename T, TemplateFunctionTypes4>
+	inline void EventEmitter::emit( TemplateFunctionArgs4 )
+	{
+		T e( arg0, arg1, arg2, arg3 );
+		emit( e );
 	}
 
 	namespace detail {
