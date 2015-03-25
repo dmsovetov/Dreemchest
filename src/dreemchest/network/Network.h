@@ -36,6 +36,7 @@
 #include "../io/Io.h"
 #include "../io/streams/ByteBuffer.h"
 #include "../io/serialization/Storage.h"
+#include "../io/serialization/BinarySerializer.h"
 #include "../io/serialization/Serializable.h"
 #include "../event/EventEmitter.h"
 #include <time.h>
@@ -61,8 +62,10 @@ namespace net {
 		class ClientHandler;
 
 	class NetworkEvents;
-	struct NetworkPacket;
     class INetwork;
+
+	//! Alias io::Serializable as NetworkPacket
+	typedef io::Serializable NetworkPacket;
 
 	//! TCP socket strong ptr.
 	typedef StrongPtr<TCPSocket> TCPSocketPtr;
