@@ -94,7 +94,6 @@ void PosixTCPSocketListener::update( void )
 
 	// ** Process listener socket
 	if( FD_ISSET( m_socket, &read ) ) {
-		log::verbose( "\taccept\n" );
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
 
@@ -175,6 +174,8 @@ TCPSocketPtr PosixTCPSocketListener::acceptConnection( void )
 	if( !socket.isValid() ) {
 		return TCPSocketPtr();
 	}
+
+	socket.setNonBlocking();
 
 	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( DC_NEW TCPClientDelegate( this ), socket, address ) ) );
 }
