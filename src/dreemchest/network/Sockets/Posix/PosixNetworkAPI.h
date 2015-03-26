@@ -43,8 +43,6 @@
 
     #if !defined( DC_PLATFORM_ANDROID )
         #include    <ifaddrs.h>
-    #else
-        #include    <ifaddrs/ifaddrs.h>
     #endif
 #endif
 

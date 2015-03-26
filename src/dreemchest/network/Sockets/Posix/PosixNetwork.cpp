@@ -116,7 +116,10 @@ bool PosixNetwork::requestHostName( String& name ) const
 // ** PosixNetwork::requestInterfaces
 bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const
 {
-#ifndef DC_PLATFORM_WINDOWS
+#if defined( DC_PLATFORM_ANDROID )
+	log::error( "PosixNetwork::requestInterfaces : not available on Android devices\n" );
+	return false;
+#elif !defined( DC_PLATFORM_WINDOWS )
     ifaddrs *interfaces     = NULL;
     s32     totalInterfaces = 0;
 
