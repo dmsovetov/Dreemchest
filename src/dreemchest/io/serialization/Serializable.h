@@ -188,7 +188,7 @@ namespace io {
     } // namespace detail
 
     //! Base class for all serializable data structs.
-    class Serializable {
+    class Serializable : public RefCounted {
     public:
 
 		ClassEnableCloning( Serializable )
@@ -237,6 +237,9 @@ namespace io {
 
 		//! Returns a type id.
 		virtual TypeId  typeId( void ) const  { return TypeInfo<T>::id(); }
+
+		//! Returns a type index for this component.
+		virtual TypeIdx	typeIndex( void ) const { return TypeIndex<T>::idx(); }
 
 		//! Returns a type name.
 		virtual CString typeName( void ) const { return TypeInfo<T>::name(); }

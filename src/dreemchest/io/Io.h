@@ -42,6 +42,7 @@ namespace io {
     class Path;
     class Serializable;
     class Storage;
+	class Serializable;
 
 	class FileSystem;
 		class DiskFileSystem;
@@ -78,9 +79,12 @@ namespace io {
     //! Archive ptr type.
     typedef StrongPtr<Archive>      ArchivePtr;
 
-    typedef Map<Path, ArchivePtr>			Archives;
-    typedef Set<Path>						PathSet;
-	typedef List< AutoPtr<Serializable> >	Serializables;
+	//! Serializable strong ptr.
+	typedef StrongPtr<Serializable>	SerializablePtr;
+
+    typedef Map<Path, ArchivePtr>	Archives;
+    typedef Set<Path>				PathSet;
+	typedef List<SerializablePtr>	Serializables;
 
     namespace detail {
         typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
