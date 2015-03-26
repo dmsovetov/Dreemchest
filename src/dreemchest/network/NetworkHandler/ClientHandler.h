@@ -39,11 +39,8 @@ namespace net {
 	friend class ClientSocketDelegate;
     public:
 
-                            
-
-  //      int                 GetServerTime( void ) const;
-
-   //     bool                Connect( const NetworkAddress& address, u16 port );
+		//! Returns an aproximate server time.
+		UnixTime				serverTime( void ) const;
 
 		//! Return current connection.
 		const ConnectionPtr&	connection( void ) const;
@@ -51,6 +48,9 @@ namespace net {
 
 		//! Creates a new NetworkClientHandler instance and connects to server.
 		static ClientHandlerPtr	create( const NetworkAddress& address, u16 port );
+
+		//! Does a broadcast request to detect a running servers.
+		static bool				detectServers( u16 port );
 
         // ** NetworkHandler
         virtual void			update( void );
@@ -61,10 +61,16 @@ namespace net {
 								//! Constructs ClientHandler instance.
 								ClientHandler( const TCPSocketPtr& socket );
 
+		//! Handles a time sync packet.
+		virtual bool			handleTimePacket( ConnectionPtr& connection, packets::Time& packet );
+
 	private:
 
 		//! Client connection.
 		ConnectionPtr			m_connection;
+
+		//! Server time delta.
+		s32						m_serverTimeDelta;
 
 //    protected:
 

@@ -43,6 +43,12 @@ namespace net {
 		//! Returns parent network handler.
 		NetworkHandler*			networkHandler( void ) const;
 
+		//! Returns the total amount of bytes received.
+		u32						totalBytesReceived( void ) const;
+
+		//! Returns the total amount of bytes sent.
+		u32						totalBytesSent( void ) const;
+
 		//! Returns a connection TCP socket.
 		const  TCPSocketPtr&	socket( void ) const;
 		TCPSocketPtr&			socket( void );
@@ -77,7 +83,7 @@ namespace net {
 		void					update( void );
 
 		//! Handles a recieved remote call response.
-		bool					handleResponse( const packets::RemoteCallResponse* packet );
+		bool					handleResponse( const packets::RemoteCallResponse& packet );
 
 	private:
 
@@ -106,6 +112,12 @@ namespace net {
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
+
+		//! The total amount of bytes received.
+		u32						m_totalBytesReceived;
+
+		//! The total amount of bytes sent.
+		u32						m_totalBytesSent;
 	};
 
 	// ** Connection::invoke

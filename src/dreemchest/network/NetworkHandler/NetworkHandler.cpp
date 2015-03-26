@@ -26,6 +26,7 @@
 
 #include "NetworkHandler.h"
 #include "Connection.h"
+#include "../Sockets/UDPSocket.h"
 #include "../Sockets/TCPSocket.h"
 #include "../Sockets/TCPStream.h"
 
@@ -38,9 +39,13 @@ NetworkHandler::NetworkHandler( void )
 {
     DC_BREAK_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ) );
     
+	registerPacketHandler<packets::Time>			  ( dcThisMethod( NetworkHandler::handleTimePacket ) );
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
+	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( NetworkHandler::handleDetectServersPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
+
+	m_broadcastListener = UDPSocket::createBroadcast( DC_NEW UDPSocketNetworkDelegate( this ) );
 }
 
 // ** NetworkHandler::findConnectionBySocket
@@ -62,6 +67,12 @@ ConnectionPtr NetworkHandler::createConnection( TCPSocket* socket )
 void NetworkHandler::removeConnection( TCPSocket* socket )
 {
 	m_connections.erase( socket );
+}
+
+// ** NetworkHandler::listenForBroadcasts
+void NetworkHandler::listenForBroadcasts( u16 port )
+{
+	m_broadcastListener->listen( port );
 }
 
 // ** NetworkHandler::processReceivedData
@@ -103,14 +114,27 @@ ConnectionList NetworkHandler::eventListeners( void ) const
 	return ConnectionList();
 }
 
+// ** NetworkHandler::handleTimePacket
+bool NetworkHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
+{
+	connection->send<packets::Time>( packet.timestamp, packet.roundTripTime );
+	return true;
+}
+
+// ** NetworkHandler::handleDetectServersPacket
+bool NetworkHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
+{
+	return true;
+}
+
 // ** NetworkHandler::handleEventPacket
-bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, const packets::Event* packet )
+bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Event& packet )
 {
 	// ** Find an event handler from this event id.
-	EventHandlers::iterator i = m_eventHandlers.find( packet->eventId );
+	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
 
 	if( i == m_eventHandlers.end() ) {
-		log::warn( "NetworkHandler::handleEventPacket : unknown event %d received\n", packet->eventId );
+		log::warn( "NetworkHandler::handleEventPacket : unknown event %d received\n", packet.eventId );
 		return false;
 	}
 
@@ -119,13 +143,13 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, const packets
 }
 
 // ** NetworkHandler::handleRemoteCallPacket
-bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const packets::RemoteCall* packet )
+bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet )
 {
 	// ** Find a remote call handler
-	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet->method );
+	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
 
 	if( i == m_remoteCallHandlers.end() ) {
-		log::warn( "NetworkHandler::handleRemoteCallPacket : trying to invoke unknown remote procedure %d\n", packet->method );
+		log::warn( "NetworkHandler::handleRemoteCallPacket : trying to invoke unknown remote procedure %d\n", packet.method );
 		return false;
 	}
 
@@ -134,7 +158,7 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, const pa
 }
 
 // ** NetworkHandler::handleRemoteCallResponsePacket
-bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet )
+bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet )
 {
 	return connection->handleResponse( packet );
 }
@@ -142,7 +166,9 @@ bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, 
 // ** NetworkHandler::update
 void NetworkHandler::update( void )
 {
-
+	if( m_broadcastListener != NULL ) {
+		m_broadcastListener->update();
+	}
 }
 
 } // namespace net

@@ -33,9 +33,22 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** Connection::Connection
-Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket ) : m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 )
+Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
+	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 )
 {
 
+}
+
+// ** Connection::totalBytesReceived
+u32 Connection::totalBytesReceived( void ) const
+{
+	return m_totalBytesReceived;
+}
+
+// ** Connection::totalBytesSent
+u32 Connection::totalBytesSent( void ) const
+{
+	return m_totalBytesSent;
 }
 
 // ** Connection::networkHandler
@@ -76,17 +89,20 @@ void Connection::send( NetworkPacket* packet )
 		return;	// ** The socket was closed.
 	}
 
+	// ** Increase the sent bytes counter.
+	m_totalBytesSent += bytesSent;
+
 	DC_BREAK_IF( bytesWritten != bytesSent );
 }
 
 // ** Connection::handleResponse
-bool Connection::handleResponse( const packets::RemoteCallResponse* packet )
+bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 {
 	// ** Find pending remote call
-	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet->id );
+	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet.id );
 
 	if( i == m_pendingRemoteCalls.end() ) {
-		log::warn( "Connection::handleResponse : invalid request id %d\n", packet->id );
+		log::warn( "Connection::handleResponse : invalid request id %d\n", packet.id );
 		return false;
 	}
 

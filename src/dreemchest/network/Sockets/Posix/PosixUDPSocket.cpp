@@ -88,11 +88,9 @@ bool PosixUDPSocket::listen( u16 port )
     //** Bind address
     s32 result = bind( m_socket, ( sockaddr* )&addr, sizeof( addr ) );
     if( result == -1 ) {
-		m_delegate->handleListenFailure( m_parent );
         return false;
     }
 
-	m_delegate->handleListenSuccess( m_parent );
     return true;
 }
 
@@ -105,7 +103,8 @@ void PosixUDPSocket::update( void )
     s32 size = recvfrom( m_socket, ( s8* )m_buffer->buffer(), m_buffer->length(), 0, ( sockaddr* )&addr, &addrlen );
     if( size <= 0 ) {
 	#if defined( DC_PLATFORM_WINDOWS )
-		if( WSAGetLastError() != WSAEWOULDBLOCK ) { DC_BREAK; }
+		if( WSAGetLastError() == WSAEWOULDBLOCK ) { return; }
+		log::error( "PosixUDPSocket::update : recvfrom failed, %d\n", PosixNetwork::lastError() );
 	#else
 		if( errno != EAGAIN ) { DC_BREAK; }
 	#endif

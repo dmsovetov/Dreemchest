@@ -40,7 +40,7 @@ namespace net {
 		virtual			~IPacketHandler( void ) {}
 
 		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, const NetworkPacket* packet ) = 0;
+		virtual bool	handle( ConnectionPtr& connection, NetworkPacket* packet ) = 0;
 	};
 
 	//! Template class that handles a strict-typed packets.
@@ -49,14 +49,14 @@ namespace net {
 	public:
 
 		//! Function type to handle packets.
-		typedef cClosure<bool(ConnectionPtr&,const T*)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,T&)> Callback;
 
 						//! Constructs GenericPacketHandler instance.
 						PacketHandler( const Callback& callback )
 							: m_callback( callback ) {}
 
 		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( ConnectionPtr& connection, const NetworkPacket* packet );
+		virtual bool handle( ConnectionPtr& connection, NetworkPacket* packet );
 
 	private:
 
@@ -66,11 +66,11 @@ namespace net {
 
 	// ** PacketHandler::handle
 	template<typename T>
-	bool PacketHandler<T>::handle( ConnectionPtr& connection, const NetworkPacket* packet )
+	bool PacketHandler<T>::handle( ConnectionPtr& connection, NetworkPacket* packet )
 	{
-		const T* packetWithType = castTo<T>( packet );
+		T* packetWithType = castTo<T>( packet );
 		DC_BREAK_IF( packetWithType == NULL );
-		return m_callback( connection, packetWithType );
+		return m_callback( connection, *packetWithType );
 	}
 
 } // namespace net

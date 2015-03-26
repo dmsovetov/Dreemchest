@@ -66,6 +66,7 @@ TCPStream::State TCPStream::pull( void )
 // ** TCPStream::flush
 void TCPStream::flush( void )
 {
+	DC_BREAK
 	trimFromLeft( length() );
 }
 

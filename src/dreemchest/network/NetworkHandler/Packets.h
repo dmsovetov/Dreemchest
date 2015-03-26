@@ -38,16 +38,47 @@ namespace packets {
 	//! Packet payload type.
 	typedef Array<u8> Payload;
 
+	//! Latency test & time sync packet
+	struct Time : public io::SerializableType<Time> {
+		u32				timestamp;		//!< A timestamp value when the packet was sent.
+		s32				roundTripTime;	//!< A time took the packet to travel to target and back.
+
+						//! Constructs a Time instance.
+						Time( u32 timestamp = UnixTime(), s32 roundTripTime = 0 )
+							: timestamp( timestamp ), roundTripTime( roundTripTime ) {}
+
+		//! Packet serializer
+		IoBeginSerializer
+			IoField( timestamp )
+			IoField( roundTripTime )
+		IoEndSerializer
+	};
+
+	//! Server detection packet.
+	struct DetectServers : public io::SerializableType<DetectServers> {
+		String			query;	//!< A server query.
+
+						//! Constructs DetectServers instance.
+						DetectServers( const String& query = "" )
+							: query( query ) {}
+
+		//! Packet serializer
+		IoBeginSerializer
+			IoField( query )
+		IoEndSerializer
+	};
+
 	//! Network event packet
 	struct Event : public io::SerializableType<Event> {
 		TypeId			eventId;
 		Payload			payload;
 
-		//! Constructs Event instance.
-		Event( server::TypeId eventId = 0, const Payload& payload = Payload() ) : eventId( eventId ), payload( payload ) {}
+						//! Constructs Event instance.
+						Event( server::TypeId eventId = 0, const Payload& payload = Payload() )
+							: eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializerSuper( NetworkPacket )
+		IoBeginSerializer
 			IoField( eventId )
 			IoArray( payload )
 		IoEndSerializer
@@ -60,12 +91,12 @@ namespace packets {
 		TypeId		returnType;
 		Payload		payload;
 
-		//! Constructs RemoteCall instance.
-		RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const Payload& payload = Payload() )
-			: id( id ), method( method ), returnType( 0 ), payload( payload ) {}
+					//! Constructs RemoteCall instance.
+					RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const Payload& payload = Payload() )
+						: id( id ), method( method ), returnType( 0 ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializerSuper( NetworkPacket )
+		IoBeginSerializer
 			IoField( id )
 			IoField( method )
 			IoField( returnType )
@@ -79,12 +110,12 @@ namespace packets {
 		TypeId		returnType;
 		Payload		payload;
 
-		//! Constructs RemoteCallResponse instance.
-		RemoteCallResponse( u16 id = 0, TypeId returnType = 0, const Payload& payload = Payload() )
-			: id( id ), returnType( returnType ), payload( payload ) {}
+					//! Constructs RemoteCallResponse instance.
+					RemoteCallResponse( u16 id = 0, TypeId returnType = 0, const Payload& payload = Payload() )
+						: id( id ), returnType( returnType ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializerSuper( NetworkPacket )
+		IoBeginSerializer
 			IoField( id )
 			IoField( returnType )
 			IoArray( payload )

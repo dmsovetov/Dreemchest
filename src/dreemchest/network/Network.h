@@ -159,8 +159,14 @@ namespace net {
 		//! Subtracts two Unix time values and returns amount of seconds between them.
 		s32				operator - ( const UnixTime& other ) const { return static_cast<s32>( m_value - other.m_value ); }
 
+		//! Subtracts a given amount of seconds from this UnixTime and returns a seconds between them.
+		s32				operator - ( s32 seconds ) const { return static_cast<s32>( m_value ) - seconds; }
+
+		//! Subtracts a given amount of seconds from this UnixTime and returns a seconds between them.
+		s32				operator - ( u32 seconds ) const { return static_cast<s32>( m_value ) - seconds; }
+
 		//! Adds a given amount of seconds to Unix time value.
-		UnixTime		operator + ( unsigned int seconds ) const { return UnixTime( static_cast<u32>( m_value + seconds ) ); }
+		UnixTime		operator + ( s32 seconds ) const { return UnixTime( static_cast<u32>( m_value + seconds ) ); }
 
 		//! Compares two Unix time values.
 		bool			operator >= ( const UnixTime& other ) const { return m_value >= other.m_value; }

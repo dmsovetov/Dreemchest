@@ -34,9 +34,15 @@ namespace net {
 // -----------------------------------------ClientHandler --------------------------------------- //
 
 // ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( const TCPSocketPtr& socket )
+ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_serverTimeDelta( 0 )
 {
 	m_connection = createConnection( socket.get() );
+}
+
+// ** ClientHandler::serverTime
+UnixTime ClientHandler::serverTime( void ) const
+{
+	return UnixTime() + m_serverTimeDelta;
 }
 
 // ** ClientHandler::connection
@@ -78,6 +84,21 @@ void ClientHandler::update( void )
 ConnectionList ClientHandler::eventListeners( void ) const
 {
 	return ConnectionList();
+}
+
+// ** ClientHandler::handleTimePacket
+bool ClientHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
+{
+	log::verbose( "Client syncronized to server time %d (rtt %d)\n", packet.timestamp + packet.roundTripTime / 2, packet.roundTripTime );
+
+	m_serverTimeDelta = packet.timestamp + packet.roundTripTime / 2;
+	return NetworkHandler::handleTimePacket( connection, packet );
+}
+
+// ** ClientHandler::detectServers
+bool ClientHandler::detectServers( u16 port )
+{
+	return true;
 }
 
 // -----------------------------------------ClientSocketDelegate --------------------------------------- //

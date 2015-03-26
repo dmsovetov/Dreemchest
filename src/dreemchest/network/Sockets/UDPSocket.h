@@ -57,7 +57,10 @@ namespace net {
         void                update( void );
 
 		//! Creates a new UDP socket instance.
-		static UDPSocketPtr	create( UDPSocketDelegate* delegate, bool broadcast );
+		static UDPSocketPtr	create( UDPSocketDelegate* delegate );
+
+		//! Creates a new broadcast UDP socket instance.
+		static UDPSocketPtr	createBroadcast( UDPSocketDelegate* delegate );
 
 		UsePrivateInterface( UDPSocket )
     };
@@ -67,12 +70,6 @@ namespace net {
 	public:
 
 		virtual				~UDPSocketDelegate( void ) {}
-
-		//! Handles socket listen failure.
-		virtual void		handleListenFailure( UDPSocket* sender ) {}
-
-		//! Handles socked listen success.
-		virtual void		handleListenSuccess( UDPSocket* sender ) {}
 
 		//! Handles received data.
 		virtual void		handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size ) {}

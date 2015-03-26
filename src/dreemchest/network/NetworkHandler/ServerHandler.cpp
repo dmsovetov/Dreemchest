@@ -61,11 +61,19 @@ void ServerHandler::update( void )
 	m_socketListener->update();
 }
 
+// ** ServerHandler::handleDetectServersPacket
+bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
+{
+	return true;
+}
+
 // ** ServerHandler::processClientConnection
 void ServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
-	createConnection( socket );
+
+	ConnectionPtr connection = createConnection( socket );
+	connection->send<packets::Time>();
 }
 
 // ** ServerHandler::processClientDisconnection
@@ -92,6 +100,19 @@ ConnectionList ServerHandler::eventListeners( void ) const
     }
     
 	return connections;
+}
+
+// ** ServerHandler::handleTimePacket
+bool ServerHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
+{
+	s32 roundTripTime = UnixTime() - packet.timestamp;
+	
+	if( abs( packet.roundTripTime - roundTripTime ) > 1 ) {
+		packet.roundTripTime = roundTripTime;
+		return NetworkHandler::handleTimePacket( connection, packet );
+	}
+
+	return true;
 }
 
 // ---------------------------------------- ServerSocketDelegate ------------------------------------//

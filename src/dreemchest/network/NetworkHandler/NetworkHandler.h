@@ -31,6 +31,7 @@
 #include "PacketHandler.h"
 #include "EventHandler.h"
 #include "RemoteCallHandler.h"
+#include "../Sockets/UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -46,6 +47,9 @@ namespace net {
 
 		//! Updates network handler.
 		virtual void			update( void );
+
+		//! Begins listening for broadcast messages.
+		void					listenForBroadcasts( u16 port );
 
 		//! Registers a new packet type.
 		template<typename T>
@@ -95,14 +99,20 @@ namespace net {
 		//! Removes connection by socket.
 		void					removeConnection( TCPSocket* socket );
 
+		//! Handles a time sync packet.
+		virtual bool			handleTimePacket( ConnectionPtr& connection, packets::Time& packet );
+
+		//! Handles a server detection packet.
+		virtual bool			handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
+
 		//! Handles an event packet.
-		bool					handleEventPacket( ConnectionPtr& connection, const packets::Event* packet );
+		bool					handleEventPacket( ConnectionPtr& connection, packets::Event& packet );
 
 		//! Handles a remote call packet.
-		bool					handleRemoteCallPacket( ConnectionPtr& connection, const packets::RemoteCall* packet );
+		bool					handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet );
 
 		//! Handles a response to remote call.
-		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, const packets::RemoteCallResponse* packet );
+		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet );
 
 	protected:
 
@@ -132,6 +142,9 @@ namespace net {
 
 		//! Network event emitter.
 		event::EventEmitter		m_eventEmitter;
+
+		//! Broadcast listener socket.
+		UDPSocketPtr			m_broadcastListener;
 	};
 
 	// ** NetworkHandler::registerPacketHandler
@@ -221,6 +234,25 @@ namespace net {
 	{
 		emitTo( T( arg0, arg1, arg2, arg3 ), eventListeners() );
 	}
+
+	//! UDP socket delegate
+	class UDPSocketNetworkDelegate : public UDPSocketDelegate {
+	public:
+
+						//! Constructs UDPSocketNetworkDelegate instance.
+						UDPSocketNetworkDelegate( NetworkHandler* network )
+							: m_network( network ) {}
+
+		//! Sends a received data to parent network handler.
+		virtual void	handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size )
+		{
+			log::error( "udp\n" );
+		}
+
+	private:
+
+		NetworkHandler*	m_network;	//!< Parent network handler.
+	};
 
 } // namespace net
     

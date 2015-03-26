@@ -45,9 +45,15 @@ UDPSocket::~UDPSocket( void )
 }
 
 // ** UDPSocket::create
-UDPSocketPtr UDPSocket::create( UDPSocketDelegate* delegate, bool broadcast )
+UDPSocketPtr UDPSocket::create( UDPSocketDelegate* delegate )
 {
-	return UDPSocketPtr( DC_NEW UDPSocket( DC_NEW PosixUDPSocket( delegate, broadcast ) ) );
+	return UDPSocketPtr( DC_NEW UDPSocket( DC_NEW PosixUDPSocket( delegate, false ) ) );
+}
+
+// ** UDPSocket::createBroadcast
+UDPSocketPtr UDPSocket::createBroadcast( UDPSocketDelegate* delegate )
+{
+	return UDPSocketPtr( DC_NEW UDPSocket( DC_NEW PosixUDPSocket( delegate, true ) ) );
 }
 
 // ** UDPSocket::send
