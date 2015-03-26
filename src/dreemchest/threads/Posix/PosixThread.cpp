@@ -73,8 +73,16 @@ void* PosixThread::threadProc( void *data )
 // ** PosixThread::yield
 void PosixThread::yield( void )
 {
-#ifdef DC_PLATFORM_ANDROID
+	threadYield();
+}
+
+// ** PosixThread::threadYield
+void PosixThread::threadYield( void )
+{
+#if defined( DC_PLATFORM_ANDROID )
     sched_yield();
+#elif defined( DC_PLATFORM_LINUX )
+	pthread_yield();
 #else
     pthread_yield_np();
 #endif

@@ -126,7 +126,7 @@ void Connection::update( void )
 	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
 		if( (currentTime - i->second.m_timestamp) > 60 ) {
 			log::warn( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
-			i = m_pendingRemoteCalls.erase( i );
+			/*i = */m_pendingRemoteCalls.erase( i );
 		} else {
 			++i;
 		}

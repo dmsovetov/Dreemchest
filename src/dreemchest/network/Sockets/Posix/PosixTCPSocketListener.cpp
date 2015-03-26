@@ -87,13 +87,14 @@ void PosixTCPSocketListener::update( void )
 	setupFDSets( read, write, except, m_socket );
 
 	// ** Do a select
-	if( select( 0, &read, &write, &except, NULL ) <= 0 ) {
+	if( select( 16, &read, &write, &except, NULL ) <= 0 ) {
 		log::error( "PosixTCPSocketListener::update : select failed, %d\n", PosixNetwork::lastError() );
 		return;
 	}
 
 	// ** Process listener socket
 	if( FD_ISSET( m_socket, &read ) ) {
+		log::verbose( "\taccept\n" );
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
 

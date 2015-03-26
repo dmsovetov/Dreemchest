@@ -45,6 +45,9 @@ namespace thread {
         // ** Thread
         virtual void        start( const ThreadCallback& callback, void *userData );
         virtual void        yield( void );
+		
+		// ** PosixThread
+		static void			threadYield( void );
 
     private:
 

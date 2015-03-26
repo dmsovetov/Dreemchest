@@ -188,6 +188,22 @@ namespace net {
 		send( &packet );
 	}
 
+	//! Send a response to caller.
+	template<typename T>
+	inline bool Response<T>::operator()( const T& value )
+	{
+		// ** Serialize argument to a byte buffer.
+		io::ByteBufferPtr buffer = value.writeToByteBuffer();
+
+		// ** Send an RPC response packet.
+		m_connection->send<packets::RemoteCallResponse>( m_id, TypeInfo<T>::id(), buffer->array() );
+
+		// ** Mark this response as sent.
+		m_wasSent = true;
+
+		return true;
+	}
+
 }
 
 DC_END_DREEMCHEST

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include    "PosixMutex.h"
+#include	"PosixThread.h"
 
 #include    "../Thread.h"
 
@@ -100,11 +101,7 @@ PosixCondition::~PosixCondition( void )
     DC_BREAK_IF( result );
 
     while( pthread_mutex_trylock( &m_mutex ) == 0 ) {
-    #ifdef DC_PLATFORM_ANDROID
-        sched_yield();
-    #else
-        pthread_yield_np();
-    #endif
+		PosixThread::threadYield();
     }
     pthread_mutex_unlock( &m_mutex );
     result = pthread_mutex_destroy( &m_mutex );

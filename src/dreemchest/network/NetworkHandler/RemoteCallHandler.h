@@ -101,10 +101,10 @@ namespace net {
 	public:
 
 		//! Response type.
-		typedef Response<R> Response;
+		typedef Response<R> ResponseType;
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,Response&,const T&)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,ResponseType&,const T&)> Callback;
 
 						//! Constructs RemoteCallHandler instance.
 						RemoteCallHandler( const Callback& callback )
@@ -123,7 +123,7 @@ namespace net {
 	template<typename T, typename R>
 	inline bool RemoteCallHandler<T, R>::handle( ConnectionPtr& connection, const packets::RemoteCall& packet )
 	{
-		Response response( connection, packet.id );
+		ResponseType response( connection, packet.id );
 		bool result = m_callback( connection, response, io::Serializable::readFromBytes<T>( packet.payload ) );
 		DC_BREAK_IF( !response.wasSent() );
 		return result;
