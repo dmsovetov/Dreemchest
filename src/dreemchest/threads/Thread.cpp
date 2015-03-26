@@ -34,6 +34,10 @@
     #error Unknown threading option defined.
 #endif
 
+#ifdef DC_PLATFORM_ANDROID
+	#include <unistd.h>
+#endif
+
 DC_BEGIN_DREEMCHEST
 
 namespace thread {
