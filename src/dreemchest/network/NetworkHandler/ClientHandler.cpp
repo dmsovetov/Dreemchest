@@ -42,7 +42,7 @@ ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_serverTimeDelta( 
 // ** ClientHandler::serverTime
 UnixTime ClientHandler::serverTime( void ) const
 {
-	return UnixTime() + m_serverTimeDelta;
+	return UnixTime::current() + m_serverTimeDelta;
 }
 
 // ** ClientHandler::connection
@@ -91,7 +91,8 @@ bool ClientHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& 
 {
 	log::verbose( "Client syncronized to server time %d (rtt %d)\n", packet.timestamp + packet.roundTripTime / 2, packet.roundTripTime );
 
-	m_serverTimeDelta = packet.timestamp + packet.roundTripTime / 2;
+	u32 serverTime    = packet.timestamp + packet.roundTripTime / 2;
+	m_serverTimeDelta = UnixTime::current() - serverTime;
 	return NetworkHandler::handleTimePacket( connection, packet );
 }
 

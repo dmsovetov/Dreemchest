@@ -73,7 +73,7 @@ void ServerHandler::processClientConnection( TCPSocket* socket )
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
 
 	ConnectionPtr connection = createConnection( socket );
-	connection->send<packets::Time>();
+	connection->send<packets::Time>( UnixTime::current().value() );
 }
 
 // ** ServerHandler::processClientDisconnection
@@ -105,7 +105,7 @@ ConnectionList ServerHandler::eventListeners( void ) const
 // ** ServerHandler::handleTimePacket
 bool ServerHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
 {
-	s32 roundTripTime = UnixTime() - packet.timestamp;
+	s32 roundTripTime = UnixTime::current() - packet.timestamp;
 	
 	if( abs( packet.roundTripTime - roundTripTime ) > 1 ) {
 		packet.roundTripTime = roundTripTime;

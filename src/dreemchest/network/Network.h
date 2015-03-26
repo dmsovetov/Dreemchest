@@ -143,18 +143,11 @@ namespace net {
 	struct UnixTime {
 						//! Constructs a current Unix time.
 						UnixTime( void )
-							: m_value( time( NULL ) ) {}
-
-						//! Constructs a Unix time that is ahead of current time by a given amount of seconds.
-						explicit UnixTime( unsigned int seconds )
-							: m_value( time( NULL ) + seconds ) {}
+							: m_value( 0 ) {}
 
 						//! Constructs a Unix time from a timestamp.
 						UnixTime( time_t value )
 							: m_value( value ) {}
-
-						//! Convers Unix time to unsigned int.
-						operator u32( void ) const { return static_cast<u32>( m_value ); }
 
 		//! Subtracts two Unix time values and returns amount of seconds between them.
 		s32				operator - ( const UnixTime& other ) const { return static_cast<s32>( m_value - other.m_value ); }
@@ -173,6 +166,12 @@ namespace net {
 
 		//! Compares two Unix time values.
 		bool			operator <= ( const UnixTime& other ) const { return m_value <= other.m_value; }
+
+		//! Convers Unix time to unsigned int.
+		u32				value( void ) const { return static_cast<u32>( m_value ); }
+
+		//! Returns a current Unix time.
+		static UnixTime	current( void ) { return UnixTime( time( NULL ) ); }
 
 		time_t			m_value;	//! Actual value.
 	};

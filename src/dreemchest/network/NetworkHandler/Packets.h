@@ -44,7 +44,7 @@ namespace packets {
 		s32				roundTripTime;	//!< A time took the packet to travel to target and back.
 
 						//! Constructs a Time instance.
-						Time( u32 timestamp = UnixTime(), s32 roundTripTime = 0 )
+						Time( u32 timestamp = 0, s32 roundTripTime = 0 )
 							: timestamp( timestamp ), roundTripTime( roundTripTime ) {}
 
 		//! Packet serializer
