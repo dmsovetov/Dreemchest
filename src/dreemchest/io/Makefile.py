@@ -1,6 +1,8 @@
 SOURCE_FILES = [
   'serialization/BinaryStorage.cpp'
 , 'serialization/BinaryStorage.h'
+, 'serialization/BinarySerializer.cpp'
+, 'serialization/BinarySerializer.h'
 , 'serialization/Serializable.cpp'
 , 'serialization/Serializable.h'
 , 'serialization/Storage.cpp'
