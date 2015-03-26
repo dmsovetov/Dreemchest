@@ -24,9 +24,9 @@
 
  **************************************************************************/
 
+#include "Storage.h"
 #include "BinarySerializer.h"
 #include "Serializable.h"
-#include "Storage.h"
 #include "../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
@@ -111,7 +111,8 @@ s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 	bytes->write( &header.m_size, sizeof( header.m_size ) );
 
 	s32 start = bytes->position();
-	data->write( Storage( StorageBinary, bytes ) );
+    Storage storage( StorageBinary, bytes );
+	data->write( storage );
 	header.m_size = bytes->position() - start;
 
 	// ** Write size

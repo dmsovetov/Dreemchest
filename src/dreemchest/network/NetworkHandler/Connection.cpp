@@ -107,7 +107,8 @@ bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 	}
 
 	// ** Run a callback
-	bool result = i->second.m_handler->handle( ConnectionPtr( this ), packet );	//!! Potential bug :(
+    ConnectionPtr connection( this );	//!! Potential bug :(
+	bool result = i->second.m_handler->handle( connection, packet );
 	m_pendingRemoteCalls.erase( i );
 
 	return result;

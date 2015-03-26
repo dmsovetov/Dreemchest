@@ -31,6 +31,7 @@
 #include "PacketHandler.h"
 #include "EventHandler.h"
 #include "RemoteCallHandler.h"
+#include "Connection.h"
 #include "../Sockets/UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
@@ -69,7 +70,7 @@ namespace net {
 
 		//! Emits a network event.
 		template<typename T>
-		void					emitTo( const T& e, ConnectionList& listeners );
+		void					emitTo( const T& e, const ConnectionList& listeners );
 
 		//! Template functions to emit a new event.
 		template<typename T>						 void emit( void );
@@ -185,7 +186,7 @@ namespace net {
 
 	// ** NetworkHandler::emitTo
 	template<typename T>
-	inline void NetworkHandler::emitTo( const T& e, ConnectionList& listeners )
+	inline void NetworkHandler::emitTo( const T& e, const ConnectionList& listeners )
 	{
 		if( listeners.empty() ) {
 			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", TypeInfo<T>::name() );
@@ -195,8 +196,8 @@ namespace net {
 		// ** Serialize event to a byte buffer.
 		io::ByteBufferPtr buffer = e.writeToByteBuffer();
 
-		for( ConnectionList::iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
-            (*i)->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
+		for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
+            const_cast<ConnectionPtr&>( *i )->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
 		}
 	}
 

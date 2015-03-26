@@ -128,7 +128,7 @@ void PosixTCPSocketListener::update( void )
 
 		if( hasError ) {
 			s32 error = descriptor.error();
-			if( error != NO_ERROR ) {
+			if( error != 0 ) {
 				log::error( "PosixTCPSocketListener::update : socket error %\n", error );
 			}
 			socket->close();

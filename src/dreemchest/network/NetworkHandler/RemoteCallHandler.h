@@ -55,7 +55,8 @@ namespace net {
 		bool wasSent( void ) const { return m_wasSent; }
 
 		//! Send a response to caller.
-		bool operator()( const T& value )
+        bool operator()( const T& value );
+        /*
 		{
 			// ** Serialize argument to a byte buffer.
 			io::ByteBufferPtr buffer = value.writeToByteBuffer();
@@ -67,7 +68,7 @@ namespace net {
 			m_wasSent = true;
 
 			return true;
-		}
+		}*/
 
 	private:
 

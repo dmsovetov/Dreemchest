@@ -67,7 +67,7 @@ namespace thread {
         static void         sleep( u32 ms );
 
         //! Returns a current thread id.
-        static u32          currentThread( void );
+        static u64          currentThread( void );
 
         //! Starts a thread with a given callback & user data.
         /*!

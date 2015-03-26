@@ -110,12 +110,12 @@ void Thread::sleep( u32 ms )
 }
 
 // ** Thread::currentThread
-u32 Thread::currentThread( void )
+u64 Thread::currentThread( void )
 {
 #ifdef DC_PLATFORM_WINDOWS
     return GetCurrentThreadId();
 #else
-    return ( u32 )pthread_self();
+    return ( u64 )pthread_self();
 #endif
 }
 
