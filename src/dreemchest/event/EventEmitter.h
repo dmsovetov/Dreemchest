@@ -32,16 +32,50 @@
 DC_BEGIN_DREEMCHEST
 
 namespace event {
+    
+    namespace detail {
+        
+        //! Event listener subscribtion
+        class Listener {
+        public:
+            
+            virtual         ~Listener( void ) {}
+            
+            //! Emits event to listener.
+            virtual void    emit( const void* e ) = 0;
+        };
+        
+        //! Event listener with a type.
+        template<typename T>
+        class EventListener : public Listener {
+        public:
+            
+            //! Callback function type.
+            typedef cClosure<void(const T&)> Callback;
+            
+                            //! Constructs EventListener instance.
+                            EventListener( const Callback& callback )
+                                : m_callback( callback ) {}
+            
+            //! Calls a callback function with a casted event.
+            virtual void    emit( const void* e ) { m_callback( *reinterpret_cast<const T*>( e ) ); }
+            
+        private:
+            
+            //! Callback function.
+            Callback        m_callback;
+        };
+    } // namespace detail
 
 	//! Event emitter class is used for dispatching strong typed global events.
 	class EventEmitter {
 	public:
 
-		virtual	~EventEmitter( void );
+        virtual	~EventEmitter( void ) {}
 
 		//! Subscribes for an event.
 		template<typename T>
-		void subscribe( const cClosure<void(const T&)>& callback );
+        void subscribe( const typename detail::EventListener<T>::Callback& callback );
 
 		//! Emits a global event.
 		template<typename T>
@@ -57,7 +91,7 @@ namespace event {
 	private:
 
 		//! Array of listeners.
-		typedef Array<const void*> Listeners;
+		typedef Array< AutoPtr<detail::Listener> > Listeners;
 
 		//! Listener container type.
 		typedef Map<TypeIdx, Listeners> Subscribers;
@@ -66,29 +100,17 @@ namespace event {
 		Subscribers	m_subscribers;
 	};
 
-	// ** EventEmitter::~EventEmitter
-	inline EventEmitter::~EventEmitter( void )
-	{
-		for( Subscribers::iterator i = m_subscribers.begin(), end = m_subscribers.end(); i != end; ++i ) {
-			for( u32 j = 0, n = i->second.size(); j < n; j++ ) {
-				delete i->second[j];
-			}
-		}
-	}
-
 	// ** EventEmitter::subscribe
 	template<typename T>
-	inline void EventEmitter::subscribe( const cClosure<void(const T&)>& callback )
+	inline void EventEmitter::subscribe( const typename detail::EventListener<T>::Callback& callback )
 	{
-		typedef cClosure<void(const T&)> CallbackType;
-
 		TypeIdx idx = TypeIndex<T>::idx();
 
 		if( m_subscribers.count( idx ) == 0 ) {
 			m_subscribers[idx] = Listeners();
 		}
 
-		m_subscribers[idx].push_back( new CallbackType( callback ) );
+        m_subscribers[idx].push_back( DC_NEW detail::EventListener<T>( callback ) );
 	}
 
 	// ** EventEmitter::emit
@@ -98,14 +120,14 @@ namespace event {
 		typedef cClosure<void(const T&)> CallbackType;
 
 		TypeIdx idx = TypeIndex<T>::idx();
-		Subscribers::const_iterator i = m_subscribers.find( idx );
+		Subscribers::iterator i = m_subscribers.find( idx );
 
 		if( i == m_subscribers.end() ) {
 			return;
 		}
 
 		for( u32 j = 0, n = ( u32 )i->second.size(); j < n; j++ ) {
-			(*reinterpret_cast<const CallbackType*>( i->second[j] ))( e );
+            i->second[j]->emit( &e );
 		}
 	}
 
