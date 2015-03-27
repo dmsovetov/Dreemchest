@@ -106,8 +106,9 @@ ConnectionList ServerHandler::eventListeners( void ) const
 bool ServerHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
 {
 	s32 roundTripTime = UnixTime::current() - packet.timestamp;
-	
+
 	if( abs( packet.roundTripTime - roundTripTime ) > 1 ) {
+		packet.timestamp	 = UnixTime::current().value();
 		packet.roundTripTime = roundTripTime;
 		return NetworkHandler::handleTimePacket( connection, packet );
 	}
