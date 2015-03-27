@@ -39,8 +39,8 @@ ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_serverTimeDelta( 
 	m_connection = createConnection( socket.get() );
 }
 
-// ** ClientHandler::serverTime
-UnixTime ClientHandler::serverTime( void ) const
+// ** ClientHandler::currentTime
+UnixTime ClientHandler::currentTime( void ) const
 {
 	return UnixTime::current() + m_serverTimeDelta;
 }

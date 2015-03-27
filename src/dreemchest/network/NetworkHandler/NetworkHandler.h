@@ -49,6 +49,9 @@ namespace net {
 		//! Updates network handler.
 		virtual void			update( void );
 
+		//! Returns a current network time.
+		virtual UnixTime		currentTime( void ) const;
+
 		//! Begins listening for broadcast messages.
 		void					listenForBroadcasts( u16 port );
 

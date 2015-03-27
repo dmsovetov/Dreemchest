@@ -39,9 +39,6 @@ namespace net {
 	friend class ClientSocketDelegate;
     public:
 
-		//! Returns an aproximate server time.
-		UnixTime				serverTime( void ) const;
-
 		//! Return current connection.
 		const ConnectionPtr&	connection( void ) const;
 		ConnectionPtr&			connection( void );
@@ -53,6 +50,7 @@ namespace net {
 		static bool				detectServers( u16 port );
 
         // ** NetworkHandler
+		virtual UnixTime		currentTime( void ) const;
         virtual void			update( void );
 		virtual ConnectionList	eventListeners( void ) const;
 

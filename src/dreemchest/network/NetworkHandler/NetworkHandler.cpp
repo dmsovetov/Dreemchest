@@ -75,6 +75,12 @@ void NetworkHandler::listenForBroadcasts( u16 port )
 	m_broadcastListener->listen( port );
 }
 
+// ** NetworkHandler::currentTime
+UnixTime NetworkHandler::currentTime( void ) const
+{
+	return UnixTime::current();
+}
+
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
@@ -166,9 +172,9 @@ bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, 
 // ** NetworkHandler::update
 void NetworkHandler::update( void )
 {
-	if( m_broadcastListener != NULL ) {
-		m_broadcastListener->update();
-	}
+//	if( m_broadcastListener != NULL ) {
+//		m_broadcastListener->update();
+//	}
 }
 
 } // namespace net
