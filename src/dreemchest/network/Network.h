@@ -170,11 +170,23 @@ namespace net {
 		//! Convers Unix time to unsigned int.
 		u32				value( void ) const { return static_cast<u32>( m_value ); }
 
+		//! Converts Unix time to UTC string.
+		String			utc( void ) const;
+
 		//! Returns a current Unix time.
 		static UnixTime	current( void ) { return UnixTime( time( NULL ) ); }
 
 		time_t			m_value;	//! Actual value.
 	};
+
+	// ** UnixTime::utc
+	inline String UnixTime::utc( void ) const
+	{
+		tm* ptm = gmtime( &m_value );
+		s8  buffer[256];
+		strftime( buffer, 256, "%a, %d %b %Y %H:%M:%S +0000", ptm );
+		return buffer;
+	}
 
     //! Network interface class.
     class Network {
