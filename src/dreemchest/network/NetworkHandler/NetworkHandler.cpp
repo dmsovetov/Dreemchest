@@ -99,6 +99,8 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 	for( Serializables::iterator i = packets.begin(), end = packets.end(); i != end; ++i ) {
 		NetworkPacket* packet = i->get();
 
+		log::verbose( "Packet %s(%d) received from %s\n", packet->typeName(), packet->typeId(), socket->address().toString() );
+
 		PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
 		if( j == m_packetHandlers.end() ) {
 			log::warn( "NetworkHandler::processReceivedData : unhandled packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
@@ -110,6 +112,8 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 			log::warn( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 		}
 	}
+
+	log::verbose( "%d bytes from %s processed, %d bytes left in buffer\n", stream->position(), socket->address().toString(), stream->length() - stream->position() );
 	
 	stream->trimFromLeft( stream->position() );
 }

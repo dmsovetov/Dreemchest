@@ -89,6 +89,8 @@ void Connection::send( NetworkPacket* packet )
 		return;	// ** The socket was closed.
 	}
 
+	log::verbose( "Packet %s(%d) sent to %s (%d bytes)\n", packet->typeName(), packet->typeId(), m_socket->address().toString(), bytesSent );
+
 	// ** Increase the sent bytes counter.
 	m_totalBytesSent += bytesSent;
 
