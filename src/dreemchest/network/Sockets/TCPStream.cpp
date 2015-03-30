@@ -46,10 +46,11 @@ const SocketDescriptor* TCPStream::descriptor( void ) const
 TCPStream::State TCPStream::pull( void )
 {
 	DC_BREAK_IF( !m_socket->isValid() );
-	DC_BREAK_IF( bytesAvailable() );
 
 	s8  chunk[1];
 	s32 received = 0;
+
+	setPosition( length() );
 
 	while( (received = recv( *m_socket, chunk, sizeof( chunk ), 0 )) != -1 ) {
 		if( received == 0 ) {
