@@ -131,8 +131,8 @@ class NetworkHandlers : public ApplicationDelegate {
 
 			if( (++counter % 500) == 0 ) {
 				printf( "emit : %d\n", counter );
-				server->emit( LolEvent( counter, "counter!" ) );
-				server->emit( ExtraEvent() );
+				server->emit<LolEvent>( counter, "counter!" );
+				server->emit<ExtraEvent>();
 			}
 		}
 	}
