@@ -74,7 +74,7 @@ namespace packets {
 		Payload			payload;
 
 						//! Constructs Event instance.
-						Event( server::TypeId eventId = 0, const Payload& payload = Payload() )
+						Event( TypeId eventId = 0, const Payload& payload = Payload() )
 							: eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
