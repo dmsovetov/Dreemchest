@@ -119,7 +119,7 @@ namespace thread {
         TaskThreads             m_taskThreads;
 
         //! Main thread id.
-        u32                     m_mainThread;
+        u64                     m_mainThread;
     };
     
 } // namespace thread
