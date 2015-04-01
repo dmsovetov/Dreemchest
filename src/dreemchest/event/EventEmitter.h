@@ -56,6 +56,9 @@ namespace event {
                             //! Constructs EventListener instance.
                             EventListener( const Callback& callback )
                                 : m_callback( callback ) {}
+
+			//! Compares this listener with a callback.
+			bool			operator == ( const Callback& callback ) const { return m_callback == callback; }
             
             //! Calls a callback function with a casted event.
             virtual void    emit( const void* e ) { m_callback( *reinterpret_cast<const T*>( e ) ); }
@@ -76,6 +79,10 @@ namespace event {
 		//! Subscribes for an event.
 		template<typename T>
         void subscribe( const typename detail::EventListener<T>::Callback& callback );
+
+		//! Removes an event listener.
+		template<typename T>
+		void unsubscribe( const typename detail::EventListener<T>::Callback& callback );
 
 		//! Emits a global event.
 		template<typename T>
@@ -111,6 +118,30 @@ namespace event {
 		}
 
         m_subscribers[idx].push_back( DC_NEW detail::EventListener<T>( callback ) );
+	}
+
+	// ** EventEmitter::unsubscribe
+	template<typename T>
+	inline void EventEmitter::unsubscribe( const typename detail::EventListener<T>::Callback& callback )
+	{
+		TypeIdx idx = TypeIndex<T>::idx();
+
+		if( m_subscribers.count( idx ) == 0 ) {
+			return;
+		}
+
+		typedef detail::EventListener<T> EventListenerType;
+		Listeners& listeners = m_subscribers[idx];
+
+		for( Listeners::iterator i = listeners.begin(); i != listeners.end(); )
+		{
+			EventListenerType& listener = *static_cast<EventListenerType*>( i->get() );
+			if( listener == callback ) {
+				i = listeners.erase( i );
+			} else {
+				++i;
+			}
+		}
 	}
 
 	// ** EventEmitter::emit
