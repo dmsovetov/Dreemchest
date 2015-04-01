@@ -41,30 +41,166 @@ using namespace platform;
 // Open a io namespace.
 using namespace io;
 
-#include <stdint.h>
+class BinaryArchive {
+public:
 
-struct PodSerializer {
-	static void	show( void ) { printf( "POD serialzier\n" ); }
+	virtual void write( const void* data, u32 size )
+	{
+		printf( "Writing %d bytes\n", size );
+	}
+
+	virtual void read( void* data, u32 size )
+	{
+		printf( "Reading %d bytes\n", size );
+	}
 };
 
-struct ObjectSerializer {
-	static void	show( void ) { printf( "Object serializer\n" ); }
+class KeyValueArchive {
+public:
+
+	virtual void write( CString key )
+	{
+		printf( "Writing %s\n", key );
+	}
+
+	virtual void read( CString key )
+	{
+		printf( "Reading %s\n", key );
+	}
 };
 
-struct CollectionSerializer {
-	static void	show( void ) { printf( "Collection serializer\n" ); }
-};
+struct Serializer {
+	virtual void write( BinaryArchive* ar, const u8* data ) = 0;
+	virtual void read( const BinaryArchive* ar, u8* data ) = 0;
 
-template<typename T, typename R = void>
-struct TypeSerializer {
-	typedef PodSerializer Type;
+	virtual void write( KeyValueArchive* ar, CString name, const u8* data ) = 0;
+	virtual void read( const KeyValueArchive* ar, CString name, u8* data ) = 0;
+
+	template<typename T>
+	static Serializer& get( const T& value );
+
+	template<typename T>
+	const T& as( const void* data )
+	{
+		return *reinterpret_cast<const T*>( reinterpret_cast<u8*>( data ) + m_offset );
+	}
+
+	template<typename T>
+	T& as( void* data )
+	{
+		return *reinterpret_cast<T*>( reinterpret_cast<u8*>( data ) + m_offset );
+	}
 };
 
 template<typename T>
-class TypeSerializer<T, typename EnableIf< IsBaseOf<SerializableType<T>, T>::Value, T >::Type> {
+struct PodSerializer : public Serializer
+{
+	virtual void write( BinaryArchive* ar, const u8* data )
+	{
+		ar->write( data, sizeof( T ) );
+	}
+
+	virtual void read( const BinaryArchive* ar, u8* data )
+	{
+		ar->read( data, sizeof( T ) );
+	}
+
+	virtual void write( KeyValueArchive* ar, CString name, const u8* data )
+	{
+		ar->write( name );
+	}
+
+	virtual void read( const KeyValueArchive* ar, CString name, u8* data )
+	{
+		ar->read( name );
+	}
+};
+
+template<typename T>
+struct ObjectSerializer : public Serializer
+{
+	virtual void write( BinaryArchive* ar, const u8* data )
+	{
+		T::write( ar, as<T>() );
+	}
+
+	virtual void read( const BinaryArchive* ar, u8* data )
+	{
+		T::read( ar, as<T>() );
+	}
+
+	virtual void write( KeyValueArchive* ar, const u8* data )
+	{
+		T::write( ar, as<T>() );
+	}
+
+	virtual void read( const KeyValueArchive* ar, u8* data )
+	{
+		T::read( ar, as<T>() );
+	}
+};
+
+template<typename T>
+struct CollectionSerializer : public Serializer
+{
+	virtual void write( BinaryArchive* ar, const u8* data )
+	{
+		printf( "Collection with %d elements\n", as<T>( data ).size() );
+	}
+
+	virtual void read( const BinaryArchive* ar, u8* data )
+	{
+
+	}
+
+	virtual void write( KeyValueArchive* ar, const u8* data )
+	{
+
+	}
+
+	virtual void read( const KeyValueArchive* ar, u8* data )
+	{
+
+	}
+};
+
+//! Value serialization type.
+template <class T, class Enable = void>
+struct SerializerType
+{
+	typedef PodSerializer Type;
+};
+
+//! Object serializer type.
+template <class T>
+struct SerializerType< T, typename std::enable_if<std::is_base_of<SerializableType<T>, T>::value>::type >
+{
 	typedef ObjectSerializer Type;
 };
 
+//! Collection serializer type.
+template <class T>
+struct SerializerType< Array<T> >
+{
+	typedef CollectionSerializer Type;
+};
+
+template<typename T>
+Serializer& Serializer::get( const T& value )
+{
+	static SerializerType<T>::Type serializer;
+	return serializer;
+}
+
+/*
+typedef void (*ShowProc)();
+
+template<typename T>
+ShowProc getShow( const T& value )
+{
+	return baz<T>::show;
+}
+*/
 /*
 struct ITypeSerializer {
 	virtual void	write( const void* ptr, StreamPtr& stream ) = 0;
@@ -179,7 +315,6 @@ struct A {
 	float b;
 };
 
-
 struct Nested : public SerializableType<Nested> {
 	String			m_a;
 	int				m_b;
@@ -189,20 +324,24 @@ struct Data : public SerializableType<Data> {
 	bool			m_boolean;
 	int				m_integer;
 	float			m_float;
-	A				m_a;
 	String			m_string;
-	Nested			m_xx;
 	Nested			m_nested;
 	Array<double>	m_doubles;
 	Array<Nested>	m_nestedItems;
+
+	static void write( BinaryArchive* ar, const Data& value )
+	{
+		Serializer::get( value.m_integer ).write( ar, "m_integer", &m_integer );
+	}
 };
 
-
+/*
 template<typename T>
 void getTypeSerializer( T& value )
 {
 	TypeSerializer<T>::Type::show();
-}
+}*/
+
 
 // Application delegate is used to handle an events raised by application instance.
 class Files : public ApplicationDelegate {
@@ -213,10 +352,9 @@ class Files : public ApplicationDelegate {
         platform::log::setStandardHandler();
         io::log::setStandardHandler();
 
-		int x;
-		Nested n;
-		getTypeSerializer( x );
-		getTypeSerializer( n );
+		Data d;
+
+		Data::write( new BinaryArchive, d );
 
 /*
 		Data z;
