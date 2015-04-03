@@ -229,6 +229,9 @@ namespace io {
 	class SerializableType : public Serializable {
 	public:
 
+		//! A typedef of a template parameter.
+		typedef T Type;
+
 		//! Returns true if the specified type matches this type.
 		virtual bool is( const TypeId& id ) const { return id == TypeInfo<T>::id(); }
 
