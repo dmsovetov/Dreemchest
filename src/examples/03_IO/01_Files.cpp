@@ -41,276 +41,263 @@ using namespace platform;
 // Open a io namespace.
 using namespace io;
 
-class BinaryArchive {
+class Ar : public RefCounted {
 public:
 
-	virtual void write( const void* data, u32 size )
+	virtual			~Ar( void ) {}
+};
+
+class BinaryArchive : public Ar {
+public:
+
+	template<typename T>
+	void write( const T& value )
+	{
+		write( &value, sizeof( T ) );
+	}
+
+	template<typename T>
+	void read( T& value ) const
+	{
+		read( &value, sizeof( T ) );
+	}
+
+	virtual void write( const void* ptr, u32 size )
 	{
 		printf( "Writing %d bytes\n", size );
 	}
 
-	virtual void read( void* data, u32 size )
+	virtual void read( void* ptr, u32 size ) const
 	{
 		printf( "Reading %d bytes\n", size );
 	}
 };
 
-class KeyValueArchive {
+typedef StrongPtr<class KeyValueArchive> KeyValueArchivePtr;
+
+class KeyValueArchive : public Ar {
 public:
 
-	virtual void write( CString key )
+	virtual void write( CString key, const Variant& value )
 	{
-		printf( "Writing %s\n", key );
+		printf( "Writing %s as %s\n", key, value.typeName() );
 	}
 
-	virtual void read( CString key )
+	virtual Variant read( CString key ) const
 	{
 		printf( "Reading %s\n", key );
+		return Variant();
+	}
+
+	virtual KeyValueArchivePtr object( CString key )
+	{
+		return KeyValueArchivePtr( new KeyValueArchive );
+	}
+
+	virtual KeyValueArchivePtr object( CString key ) const
+	{
+		return KeyValueArchivePtr( new KeyValueArchive );
+	}
+
+	virtual KeyValueArchivePtr array( CString key )
+	{
+		return KeyValueArchivePtr( new KeyValueArchive );
+	}
+
+	virtual KeyValueArchivePtr array( CString key ) const
+	{
+		return KeyValueArchivePtr( new KeyValueArchive );
 	}
 };
 
-struct Serializer {
-	virtual void write( BinaryArchive* ar, const u8* data ) = 0;
-	virtual void read( const BinaryArchive* ar, u8* data ) = 0;
+typedef StrongPtr<class Serializer> SerializerPtr;
+typedef List<SerializerPtr> SerializerList;
 
-	virtual void write( KeyValueArchive* ar, CString name, const u8* data ) = 0;
-	virtual void read( const KeyValueArchive* ar, CString name, u8* data ) = 0;
+struct Serializer : RefCounted {
+	virtual void write( BinaryArchive* ar ) = 0;
+	virtual void read( const BinaryArchive* ar ) = 0;
 
-	template<typename T>
-	static Serializer& get( const T& value );
-
-	template<typename T>
-	const T& as( const void* data )
-	{
-		return *reinterpret_cast<const T*>( reinterpret_cast<u8*>( data ) + m_offset );
-	}
+	virtual void write( KeyValueArchive* ar ) = 0;
+	virtual void read( const KeyValueArchive* ar ) = 0;
 
 	template<typename T>
-	T& as( void* data )
-	{
-		return *reinterpret_cast<T*>( reinterpret_cast<u8*>( data ) + m_offset );
-	}
+	static SerializerPtr create( CString name, const T& value );
+
+	Serializer( CString name )
+		: m_name( name ) {}
+
+	CString m_name;
 };
 
 template<typename T>
 struct PodSerializer : public Serializer
 {
-	virtual void write( BinaryArchive* ar, const u8* data )
+	PodSerializer( CString name, T& value )
+		: Serializer( name ), m_value( value ) {}
+
+	virtual void write( BinaryArchive* ar )
 	{
-		ar->write( data, sizeof( T ) );
+		ar->write( m_value );
 	}
 
-	virtual void read( const BinaryArchive* ar, u8* data )
+	virtual void read( const BinaryArchive* ar )
 	{
-		ar->read( data, sizeof( T ) );
+		ar->read( m_value );
 	}
 
-	virtual void write( KeyValueArchive* ar, CString name, const u8* data )
+	virtual void write( KeyValueArchive* ar )
 	{
-		ar->write( name );
+		ar->write( m_name, Variant( m_value ) );
 	}
 
-	virtual void read( const KeyValueArchive* ar, CString name, u8* data )
+	virtual void read( const KeyValueArchive* ar )
 	{
-		ar->read( name );
+		ar->read( m_name );
 	}
+
+	T&	m_value;
 };
 
 template<typename T>
 struct ObjectSerializer : public Serializer
 {
-	virtual void write( BinaryArchive* ar, const u8* data )
+	ObjectSerializer( CString name, T& value )
+		: Serializer( name ), m_value( value ) {}
+
+	virtual void write( BinaryArchive* ar )
 	{
-		T::write( ar, as<T>() );
+		printf( "Writing object %s\n", m_name );
+		m_value.write( ar );
 	}
 
-	virtual void read( const BinaryArchive* ar, u8* data )
+	virtual void read( const BinaryArchive* ar )
 	{
-		T::read( ar, as<T>() );
+		m_value.read( ar );
 	}
 
-	virtual void write( KeyValueArchive* ar, const u8* data )
+	virtual void write( KeyValueArchive* ar )
 	{
-		T::write( ar, as<T>() );
+		DC_BREAK_IF( m_name == NULL );
+
+		printf( "Writing object %s\n", m_name );
+		KeyValueArchivePtr object = ar->object( m_name );
+		m_value.write( object.get() );
 	}
 
-	virtual void read( const KeyValueArchive* ar, u8* data )
+	virtual void read( const KeyValueArchive* ar )
 	{
-		T::read( ar, as<T>() );
+		DC_BREAK_IF( m_name == NULL );
+
+		KeyValueArchivePtr object = ar->object( m_name );
+		m_value.read( object.get() );
 	}
+
+	T&	m_value;
 };
 
-template<typename T>
+struct StringSerializer : public Serializer {
+	StringSerializer( CString name, const String& value )
+		: Serializer( name ), m_value( value ) {}
+
+	virtual void write( BinaryArchive* ar )
+	{
+		ar->write( m_value );
+	}
+
+	virtual void read( const BinaryArchive* ar )
+	{
+		ar->read( m_value );
+	}
+
+	virtual void write( KeyValueArchive* ar )
+	{
+		ar->write( m_name, Variant( m_value ) );
+	}
+
+	virtual void read( const KeyValueArchive* ar )
+	{
+		ar->read( m_name );
+	}
+
+	String	m_value;
+};
+
+template<typename T, typename E>
 struct CollectionSerializer : public Serializer
 {
-	virtual void write( BinaryArchive* ar, const u8* data )
-	{
-		printf( "Collection with %d elements\n", as<T>( data ).size() );
-	}
+	CollectionSerializer( CString name, T& value )
+		: Serializer( name ), m_value( value ) {}
 
-	virtual void read( const BinaryArchive* ar, u8* data )
+	virtual void write( BinaryArchive* ar )
 	{
 
 	}
 
-	virtual void write( KeyValueArchive* ar, const u8* data )
+	virtual void read( const BinaryArchive* ar )
 	{
 
 	}
 
-	virtual void read( const KeyValueArchive* ar, u8* data )
+	virtual void write( KeyValueArchive* ar )
 	{
-
+		DC_BREAK_IF( m_name == NULL );
+		KeyValueArchivePtr array = ar->array( m_name );
 	}
+
+	virtual void read( const KeyValueArchive* ar )
+	{
+		DC_BREAK_IF( m_name == NULL );
+		KeyValueArchivePtr array = ar->array( m_name );
+	}
+
+	T& m_value;
 };
 
 //! Value serialization type.
 template <class T, class Enable = void>
 struct SerializerType
 {
-	typedef PodSerializer Type;
+	typedef PodSerializer<T> Type;
 };
 
 //! Object serializer type.
 template <class T>
 struct SerializerType< T, typename std::enable_if<std::is_base_of<SerializableType<T>, T>::value>::type >
 {
-	typedef ObjectSerializer Type;
+	typedef ObjectSerializer<T> Type;
 };
 
 //! Collection serializer type.
 template <class T>
 struct SerializerType< Array<T> >
 {
-	typedef CollectionSerializer Type;
+	typedef CollectionSerializer< Array<T>, T > Type;
+};
+
+//! String serializer type.
+template <>
+struct SerializerType< String >
+{
+	typedef StringSerializer Type;
 };
 
 template<typename T>
-Serializer& Serializer::get( const T& value )
+StrongPtr<Serializer> Serializer::create( CString name, const T& value )
 {
-	static SerializerType<T>::Type serializer;
-	return serializer;
+	return StrongPtr<Serializer>( new SerializerType<T>::Type( name, const_cast<T&>( value ) ) );
 }
 
-/*
-typedef void (*ShowProc)();
+#define _IoBeginSerializer								\
+	static SerializerList serializers( Type* value ) {	\
+		SerializerList result;
 
-template<typename T>
-ShowProc getShow( const T& value )
-{
-	return baz<T>::show;
-}
-*/
-/*
-struct ITypeSerializer {
-	virtual void	write( const void* ptr, StreamPtr& stream ) = 0;
-	virtual void	read( void* ptr, const StreamPtr& stream ) = 0;
-};
+#define _IoField( name )	\
+	result.push_back( Serializer::create( #name, value->name ) );
 
-template<typename T>
-struct TypeSerializer : public ITypeSerializer {
-	static T& get( void )
-	{
-		static T serializer;
-		return serializer;
+#define _IoEndSerializer	\
+		return result;		\
 	}
 
-	String	name;
-};
-
-template<typename T>
-struct PodSerializer : public TypeSerializer {
-	virtual void write( const void* ptr, StreamPtr& stream )
-	{
-		stream->write( ptr, sizeof( T ) );
-	}
-
-	virtual void read( void* ptr, const StreamPtr& stream )
-	{
-		stream->read( ptr, sizeof( T ) );
-	}
-};
-
-template<typename T>
-struct ComplexSerializer : public TypeSerializer {
-				ComplexSerializer( u32 offset, String name )
-					: Field( offset, name ) {}
-
-	virtual void write( const void* ptr, StreamPtr& stream )
-	{
-		reinterpret_cast<const T*>( ptr )->write( stream );
-	}
-
-	virtual void read( void* ptr, const StreamPtr& stream )
-	{
-		reinterpret_cast<T*>( ptr )->read( stream );
-	}
-};
-
-template<typename Collection, typename Type>
-struct CollectionSerializer : public TypeSerializer {
-				CollectionSerializer( u32 offset, String name )
-					: TypeSerializer( offset, name ) {}
-
-	virtual void write( const void* ptr, StreamPtr& stream )
-	{
-		const Collection<T>& collection = *reinterpret_cast< const Collection<T> >( ptr + offset );
-
-		for( T::const_iterator i = collection->begin(), end = collection->end(); i != end; ++i ) {
-	
-		}
-	}
-
-	virtual void read( void* ptr, const StreamPtr& stream )
-	{
-		reinterpret_cast<T*>( ptr + offset )->read( stream );
-	}
-};
-
-typedef Array<ITypeSerializer> Fields;
-
-struct ISerializable {
-	virtual void	write( StreamPtr& stream ) = 0;
-	virtual void	read( const StreamPtr& stream ) = 0;
-};
-
-template<typename T>
-struct SerializableTypeEx {
-	typedef T Type;
-
-	virtual void	write( StreamPtr& stream )
-	{
-
-	}
-
-	virtual void	read( const StreamPtr& stream )
-	{
-
-	}
-};
-
-// ¬ключение перегруженных вариантов foo2 при помощи дополнительного неиспользуемого параметра
-template<class T>
-TypeSerializer* foo2(const char* name, T& t, typename EnableIf< !IsBaseOf<SerializableTypeEx<T>, T>::Value, T >::Type* = 0)
-{
-	printf( "%s is a POD type\n", name );
-    return NULL;
-}
-
-template<class T>
-TypeSerializer* foo2(const char* name, T& t, typename EnableIf< IsBaseOf<SerializableTypeEx<T>, T>::Value, T >::Type* = 0)
-{
-	printf( "%s is a serializable type\n", name );
-    return NULL;
-}
-
-template<class T>
-TypeSerializer* foo2(const char* name, Array<T>& t)
-{
-	printf( "%s is an array\n", name );
-	return NULL;
-}
-*/
 struct A {
 	float b;
 };
@@ -318,6 +305,31 @@ struct A {
 struct Nested : public SerializableType<Nested> {
 	String			m_a;
 	int				m_b;
+
+	_IoBeginSerializer
+		_IoField( m_a )
+		_IoField( m_b )
+	_IoEndSerializer
+
+	template<typename T>
+	void write( T* ar )
+	{
+		SerializerList fields = serializers( this );
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+			i->get()->write( ar );
+		}
+	}
+
+	template<typename T>
+	void read( const T* ar )
+	{
+		SerializerList fields = serializers( this );
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+			i->get()->read( ar );
+		}
+	}
 };
 
 struct Data : public SerializableType<Data> {
@@ -329,19 +341,36 @@ struct Data : public SerializableType<Data> {
 	Array<double>	m_doubles;
 	Array<Nested>	m_nestedItems;
 
-	static void write( BinaryArchive* ar, const Data& value )
+	template<typename T>
+	void write( T* ar )
 	{
-		Serializer::get( value.m_integer ).write( ar, "m_integer", &m_integer );
+		SerializerList fields = serializers( this );
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+			i->get()->write( ar );
+		}
 	}
+
+	template<typename T>
+	void read( const T* ar )
+	{
+		SerializerList fields = serializers( this );
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+			i->get()->read( ar );
+		}
+	}
+
+	_IoBeginSerializer
+		_IoField( m_string )
+		_IoField( m_boolean )
+		_IoField( m_integer )
+		_IoField( m_float )
+		_IoField( m_nested )
+		_IoField( m_doubles )
+		_IoField( m_nestedItems )
+	_IoEndSerializer
 };
-
-/*
-template<typename T>
-void getTypeSerializer( T& value )
-{
-	TypeSerializer<T>::Type::show();
-}*/
-
 
 // Application delegate is used to handle an events raised by application instance.
 class Files : public ApplicationDelegate {
@@ -352,9 +381,28 @@ class Files : public ApplicationDelegate {
         platform::log::setStandardHandler();
         io::log::setStandardHandler();
 
+		Variant integer( 1 );
+		Variant boolean( true );
+		Variant number( 213.23f );
+		Variant str( "hello" );
+
+		printf( "%s\n", integer.toCString() );
+
+		f64 a = number.as<f64>();
+		String s = str.as<String>();
+		s32 i = str.as<s32>();
+
 		Data d;
 
-		Data::write( new BinaryArchive, d );
+		d.m_string = "hello";
+		d.m_nestedItems.push_back( Nested() );
+		d.m_nestedItems.push_back( Nested() );
+		d.m_doubles.push_back( 1.0 );
+		d.m_doubles.push_back( 2323.9 );
+		d.m_doubles.push_back( 23.0321 );
+
+	//	d.write( new BinaryArchive );
+		d.write( new KeyValueArchive );
 
 /*
 		Data z;
