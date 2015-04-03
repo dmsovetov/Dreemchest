@@ -67,7 +67,8 @@ BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializa
 
 	// ** Instantiate and read the data
 	Serializable* result = i->second->clone();
-	result->read( Storage( StorageBinary, bytes ) );
+	DC_BREAK;
+//	result->read( Storage( StorageBinary, bytes ) );
 	*data = result;
 
 	return Success;
@@ -111,8 +112,9 @@ s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 	bytes->write( &header.m_size, sizeof( header.m_size ) );
 
 	s32 start = bytes->position();
-    Storage storage( StorageBinary, bytes );
-	data->write( storage );
+	DC_BREAK;
+//    Storage storage( StorageBinary, bytes );
+//	data->write( storage );
 	header.m_size = bytes->position() - start;
 
 	// ** Write size

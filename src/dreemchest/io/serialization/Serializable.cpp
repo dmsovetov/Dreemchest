@@ -32,6 +32,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
+/*
 // ** Serializable::read
 void Serializable::read( const Storage& storage, CString key )
 {
@@ -92,7 +93,7 @@ detail::FieldSerializers Serializable::fieldSerializers( void ) const
 {
     log::warn( "Serializable::fieldSerializers : not implemented in a subclass\n" );
     return detail::FieldSerializers();
-}
+}*/
 
 } // namespace io
 

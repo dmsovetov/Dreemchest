@@ -30,176 +30,145 @@
 #include	"../Io.h"
 #include    "../streams/Stream.h"
 
-#define IoStoreAbstract( T )                                \
-    virtual void write( CString key, const T& value ) = 0;  \
-    virtual void read ( CString key, T& value ) const = 0;
-
-#define IoStoreImplement( T )                               \
-    virtual void write( CString key, const T& value );      \
-    virtual void read ( CString key, T& value ) const;
-
-#define IoStoreBinary( T, size )                                                            \
-    virtual void write( CString key, const T& value ) { m_stream->write( &value, size ); }  \
-    virtual void read ( CString key, T& value ) const { m_stream->read ( &value, size ); }
-
-#define IoStoreInterface( T )                               \
-    virtual void write( CString key, const T& value ) {     \
-        m_impl->write( key, value );                        \
-    }                                                       \
-    virtual void read( CString key, T& value ) const {      \
-        m_impl->read( key, value );                         \
-    }
+#include	<json/json.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! Storage state info.
-    struct StorageState {
-        enum State { Unknown, Property, Object, Array, ArrayItem };
+	//! Basic data storage interface
+	class Storage : public RefCounted {
+	public:
 
-                //! Constructs a storage state instance
-                StorageState( void )
-                    : m_key( NULL ), m_size( 0 ), m_state( Unknown ) {}
+		virtual			~Storage( void ) {}
 
-                //! Constructs an Object storage state.
-                StorageState( CString key )
-                    : m_key( key ), m_size( 0 ), m_state( Object ) {}
+		//! Storage key.
+		struct Key {
+						//! Constructs Key instance with an object field name.
+						Key( CString name )
+							: name( name ), index( -1 ) {}
 
-                //! Constructs an Array storage state instance.
-                StorageState( CString key, u32 size )
-                    : m_key( key ), m_size( size ), m_state( Array ) {}
+						//! Constructs Key instance with an array index.
+						Key( s32 index )
+							: name( NULL ), index( index ) {}
 
-                //! Constructs an ArrayItem storage state instance.
-                StorageState( u32 index )
-                    : m_key( NULL ), m_index( index ), m_size( 0 ), m_state( ArrayItem ) {}
+			CString		name;	//!< Object field.
+			s32			index;	//!< Array index.
+		};
+	};
 
-        bool    operator == ( State state ) const { return m_state == state; }
+	//! Binary storage interface.
+	class BinaryStorage : public Storage {
+	public:
 
-        CString m_key;
-        u32     m_index;
-        u32     m_size;
-        State   m_state;
-    };
+						//! Constructs BinaryStorage instance.
+						BinaryStorage( const StreamPtr& stream );
 
-    //! A data storage interface.
-    class IStorage {
-    public:
+		//! Writes the specified amount of bytes to a binary storage.
+		virtual void	write( const void* ptr, u32 size );
 
-        virtual         ~IStorage( void ) {}
+		//! Reads the specified amount of bytes from a binary storage.
+		virtual void	read( void* ptr, u32 size ) const;
 
-        IoStoreAbstract( bool )
-        IoStoreAbstract( u8 )
-        IoStoreAbstract( s8 )
-        IoStoreAbstract( u16 )
-        IoStoreAbstract( s16 )
-        IoStoreAbstract( u32 )
-        IoStoreAbstract( s32 )
-        IoStoreAbstract( u64 )
-        IoStoreAbstract( s64 )
-        IoStoreAbstract( f32 )
-        IoStoreAbstract( f64 )
-        IoStoreAbstract( String )
+		//! Writes value to a binary storage.
+		template<typename T>
+		void			write( const T& value );
 
-        //! Pushes a write state.
-        virtual void            pushWrite( const StorageState& state ) = 0;
+		//! Reads value from a binary storage.
+		template<typename T>
+		void			read( T& value ) const;
 
-        //! Pushes a read state.
-        virtual void            pushRead( StorageState& state ) const = 0;
+	protected:
 
-        //! Pops a state.
-        virtual StorageState    pop( void ) const = 0;
-    };
+		//! Storage stream.
+		StreamPtr		m_stream;
+	};
 
-    //! A data storage into which the data is serialized.
-    class Storage {
-    friend class Serializable;
-    public:
+	// ** BinaryStorage::write
+	template<typename T>
+	inline void BinaryStorage::write( const T& value )
+	{
+		write( &value, sizeof( T ) );
+	}
 
-                        //! Constructs a Storage instance.
-                        Storage( StorageType type, const StreamPtr& stream );
-        virtual         ~Storage( void );
+	// ** BinaryStorage::read
+	template<typename T>
+	inline void BinaryStorage::read( T& value ) const
+	{
+		read( &value, sizeof( T ) );
+	}
 
-                        //! Returns true if this storage is valid.
-                        operator bool( void ) const;
+	//! Key value storage interface.
+	class KeyValueStorage : public Storage {
+	public:
 
-        IoStoreInterface( bool )
-        IoStoreInterface( u8 )
-        IoStoreInterface( s8 )
-        IoStoreInterface( u16 )
-        IoStoreInterface( s16 )
-        IoStoreInterface( u32 )
-        IoStoreInterface( s32 )
-        IoStoreInterface( u64 )
-        IoStoreInterface( s64 )
-        IoStoreInterface( f32 )
-        IoStoreInterface( f64 )
-        IoStoreInterface( String )
+		//! Writes a value to a specified key of a storage.
+		virtual void				write( const Key& key, const Variant& value ) = 0;
 
-        IoStoreImplement( Serializable )
+		//! Reads a value at a specified key from a storage.
+		virtual Variant				read( const Key& key ) const	= 0;
 
-        template<typename T>
-        void            write( CString key, const Array<T>& array );
+		//! Writes a new object to a specified key of a storage.
+		virtual KeyValueStoragePtr	object( const Key& key )		= 0;
 
-        template<typename T>
-        void            read( CString key, Array<T>& array ) const;
+		//! Reads an object from a specified key of a storage.
+		virtual KeyValueStoragePtr	object( const Key& key ) const	= 0;
 
-        //! Pushes a write state.
-        virtual void            pushWrite( const StorageState& state );
+		//! Writes a new array to a specified key of a storage.
+		virtual KeyValueStoragePtr	array( const Key& key )			= 0;
 
-        //! Pushes a read state.
-        virtual void            pushRead( StorageState& state ) const;
+		//! Reads an array from a specified key of a storage.
+		virtual KeyValueStoragePtr	array( const Key& key ) const	= 0;
 
-        //! Pops a state.
-        virtual StorageState    pop( void ) const;
+		//! Returns a total number of entries that exist inside this key-value storage.
+		virtual u32					size( void ) const				= 0;
+	};
 
-    private:
+	//! Json key value storage.
+	class JsonStorage : public KeyValueStorage {
+	public:
 
-        IStorage*       m_impl;
-    };
+									//! Constructs JsonStorage instance
+									JsonStorage( Json::Value* root = NULL );
+		virtual						~JsonStorage( void );
 
-    namespace detail {
+		//! Writes a value to a specified key of a storage.
+		virtual void				write( const Key& key, const Variant& value );
 
-        template<typename T>
-        FieldSerializerPtr createFieldSerializer( CString name, const T& field );
+		//! Reads a value at a specified key from a storage.
+		virtual Variant				read( const Key& key ) const;
 
-        template<typename T>
-        FieldSerializerPtr createFieldSerializer( CString name, const Array<T>& field );
+		//! Writes a new object to a specified key of a storage.
+		virtual KeyValueStoragePtr	object( const Key& key );
 
-    } // namespace detail
+		//! Reads an object from a specified key of a storage.
+		virtual KeyValueStoragePtr	object( const Key& key ) const;
 
-    // ** Storage::write
-    template<typename T>
-    void Storage::write( CString key, const Array<T>& array )
-    {
-        pushWrite( StorageState( key, ( u32 )array.size() ) );
+		//! Writes a new array to a specified key of a storage.
+		virtual KeyValueStoragePtr	array( const Key& key );
 
-        for( u32 i = 0; i < ( u32 )array.size(); i++ ) {
-            pushWrite( StorageState( i ) );
-            detail::createFieldSerializer( NULL, array[i] )->write( *this );
-        }
+		//! Reads an array from a specified key of a storage.
+		virtual KeyValueStoragePtr	array( const Key& key ) const;
 
-        pop();
-    }
+		//! Returns a total number of entries that exist inside this key-value storage.
+		virtual u32					size( void ) const;
 
-    // ** Storage::read
-    template<typename T>
-    void Storage::read( CString key, Array<T>& array ) const
-    {
-        StorageState state( key, 0 );
+		//! Converts a storage to JSON string.
+		String						toString( void ) const;
 
-        pushRead( state );
+	private:
 
-        array.resize( state.m_size );
-        for( u32 i = 0; i < ( u32 )array.size(); i++ ) {
-            StorageState state( i );
-            pushRead( state );
-            detail::createFieldSerializer( NULL, array[i] )->read( *this );
-        }
+		//! Returns a value reference with a specified key.
+		Json::Value&				get( const Key& key ) const;
 
-        pop();
-    }
+	public:
 
+		//! Flag indicating that we own a JSON value.
+		bool						m_isOwned;
+
+		//! Root JSON object.
+		Json::Value*				m_root;
+	};
 
 } // namespace io
 

@@ -29,6 +29,7 @@
 
 #include	"../Io.h"
 
+/*
 //! Macro definition for serializer fields declaration
 #define IoBeginSerializer                                                   \
     virtual io::detail::FieldSerializers fieldSerializers( void ) const {   \
@@ -82,6 +83,18 @@
     io::detail::FieldSerializerPtr io::detail::createFieldSerializer<T>( CString name, const T& field ) {   \
         return io::detail::FieldSerializerPtr( new T##FieldSerializer( name, field ) );                     \
     }
+*/
+
+#define IoBeginSerializer								\
+	static SerializerList serializers( Type* value ) {	\
+		SerializerList result;
+
+#define IoField( name )	\
+	result.push_back( Serializer::create( #name, value->name ) );
+
+#define IoEndSerializer	\
+		return result;		\
+	}
 
 DC_BEGIN_DREEMCHEST
 
@@ -221,7 +234,7 @@ namespace io {
     protected:
 
         //! Returns an array of field serializers.
-        virtual detail::FieldSerializers    fieldSerializers( void ) const;
+   //     virtual detail::FieldSerializers    fieldSerializers( void ) const;
     };
 
 	//! A template class for declaring serializable types.
@@ -249,6 +262,28 @@ namespace io {
 
 		//! Returns a type index.
 		static  TypeIdx typeIdx( void ) { return TypeIndex<T>::idx(); }
+
+		//! Writes serializable type to a storage.
+		template<typename Storage>
+		void write( Storage* storage )
+		{
+			SerializerList fields = T::serializers( static_cast<T*>( this ) );
+
+			for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+				i->get()->write( storage );
+			}
+		}
+
+		//! Reads serializable type from a storage.
+		template<typename Storage>
+		void read( const Storage* storage )
+		{
+			SerializerList fields = T::serializers( static_cast<T*>( this ) );
+
+			for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+				i->get()->read( storage );
+			}
+		}
 	};
 
 

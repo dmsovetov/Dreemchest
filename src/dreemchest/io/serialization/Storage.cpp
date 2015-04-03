@@ -25,149 +25,126 @@
  **************************************************************************/
 
 #include "Storage.h"
-#include "BinaryStorage.h"
-#include "Serializable.h"
-
-#ifdef HAVE_JSONCPP
-    #include "JsonStorage.h"
-#endif
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** Storage::Storage
-Storage::Storage( StorageType type, const StreamPtr& stream ) : m_impl( NULL )
+// ----------------------------------------BinaryStorage ------------------------------------------//
+
+// ** BinaryStorage::BinaryStorage
+BinaryStorage::BinaryStorage( const StreamPtr& stream ) : m_stream( stream )
 {
-    if( stream == NULL ) {
-        log::warn( "Storage::Storage : invalid stream\n" );
-        return;
-    }
-
-    switch( type ) {
-    case StorageBinary:
-            m_impl = new BinaryStorage( stream );
-            break;
-    case StorageJson:
-        #ifdef HAVE_JSONCPP
-            m_impl = new JsonStorage( stream );
-        #else
-            log::warn( "Storage::Storage : JSON storage is not available\n" );
-        #endif
-            break;
-
-    case StorageXml:
-            log::warn( "Storage::Storage : XML storage is not available\n" );
-            break;
-
-    case StorageYaml:
-            log::warn( "Storage::Storage : Yaml storage is not available\n" );
-            break;
-    }
 }
 
-// ** Storage::Storage
-Storage::~Storage( void )
+// ** BinaryStorage::read
+void BinaryStorage::read( void* ptr, u32 size ) const
 {
-    delete m_impl;
+	m_stream->read( ptr, size );
 }
 
-// ** Storage::operator bool
-Storage::operator bool( void ) const
+// ** BinaryStorage::write
+void BinaryStorage::write( const void* ptr, u32 size )
 {
-    return m_impl != NULL;
+	m_stream->write( ptr, size );
 }
 
-// ** Storage::write
-void Storage::write( CString key, const Serializable& value )
+// ----------------------------------------JsonStorage ------------------------------------------//
+
+// ** JsonStorage::JsonStorage
+JsonStorage::JsonStorage( Json::Value* root ) : m_root( NULL ), m_isOwned( root == NULL )
 {
-    value.write( *this, key );
+	m_root = root ? root : DC_NEW Json::Value( Json::objectValue );
 }
 
-// ** Storage::read
-void Storage::read( CString key, Serializable& value ) const
+JsonStorage::~JsonStorage( void )
 {
-    value.read( *this, key );
+	if( m_isOwned ) delete m_root;
 }
 
-/*
-// ** Storage::pushObjectRead
-void Storage::pushObjectRead( CString key ) const
+// ** JsonStorage::size
+u32 JsonStorage::size( void ) const
 {
-    m_impl->pushObjectRead( key );
+	return m_root->size();
 }
 
-// ** Storage::popObjectRead
-void Storage::popObjectRead( void ) const
+// ** JsonStorage::write
+void JsonStorage::write( const Key& key, const Variant& value )
 {
-    m_impl->popObjectRead();
+	switch( value.type() ) {
+	case Variant::BooleanValue: get( key ) = Json::Value( value.toBool() );
+								break;
+
+	case Variant::NumberValue:	get( key ) = Json::Value( value.toDouble() );
+								break;
+
+	case Variant::StringValue:	get( key ) = Json::Value( value.toString() );
+								break;
+
+	default:					DC_BREAK;
+	}
 }
 
-// ** Storage::pushObjectWrite
-void Storage::pushObjectWrite( CString key )
+// ** JsonStorage::read
+Variant JsonStorage::read( const Key& key ) const
 {
-    m_impl->pushObjectWrite( key );
+	Json::Value& node = get( key );
+
+	switch( node.type() ) {
+	case Json::booleanValue:	return Variant( node.asBool() );
+	case Json::realValue:		return Variant( node.asDouble() );
+	case Json::stringValue:		return Variant( node.asString() );
+	default:					DC_BREAK;
+	}
+
+	return Variant();
 }
 
-// ** Storage::popObjectWrite
-void Storage::popObjectWrite( void )
+// ** JsonStorage::object
+KeyValueStoragePtr JsonStorage::object( const Key& key )
 {
-    m_impl->popObjectWrite();
+	get( key ) = Json::objectValue;
+	return KeyValueStoragePtr( DC_NEW JsonStorage( &get( key ) ) );
 }
 
-// ** Storage::pushArrayWrite
-void Storage::pushArrayWrite( CString key, u32 size )
+// ** JsonStorage::object
+KeyValueStoragePtr JsonStorage::object( const Key& key ) const
 {
-    m_impl->pushArrayWrite( key, size );
+	Json::Value& node = get( key );
+	return node.isObject() ? KeyValueStoragePtr( DC_NEW JsonStorage( &node ) ) : KeyValueStoragePtr();
 }
 
-// ** Storage::popArrayWrite
-void Storage::popArrayWrite( void )
+// ** JsonStorage::array
+KeyValueStoragePtr JsonStorage::array( const Key& key )
 {
-    m_impl->popArrayWrite();
+	get( key ) = Json::arrayValue;
+	return KeyValueStoragePtr( DC_NEW JsonStorage( &get( key ) ) );
 }
 
-// ** Storage::pushItemWrite
-void Storage::pushItemWrite( u32 index )
+// ** JsonStorage::array
+KeyValueStoragePtr JsonStorage::array( const Key& key ) const
 {
-    m_impl->pushItemWrite( index );
+	Json::Value& node = get( key );
+	return node.isArray() ? KeyValueStoragePtr( DC_NEW JsonStorage( &node ) ) : KeyValueStoragePtr();
 }
 
-// ** Storage::popItemWrite
-void Storage::popItemWrite( void )
+// ** JsonStorage::value
+Json::Value& JsonStorage::get( const Key& key ) const
 {
-    m_impl->popItemWrite();
+	if( key.name ) {
+		DC_BREAK_IF( !m_root->isObject() );
+		return (*m_root)[key.name];
+	}
+
+	DC_BREAK_IF( !m_root->isArray() );
+	return (*m_root)[key.index];
 }
 
-// ** Storage::pushArrayRead
-u32 Storage::pushArrayRead( CString key ) const
+// ** JsonStorage::toString
+String JsonStorage::toString( void ) const
 {
-    return m_impl->pushArrayRead( key );
-}
-
-// ** Storage::popArrayRead
-void Storage::popArrayRead( void ) const
-{
-    m_impl->popArrayRead();
-}
-*/
-
-// ** Storage::pushWrite
-void Storage::pushWrite( const StorageState& state )
-{
-    m_impl->pushWrite( state );
-}
-
-// ** Storage::pushRead
-void Storage::pushRead( StorageState& state ) const
-{
-    m_impl->pushRead( state );
-}
-
-// ** Storage::pop
-StorageState Storage::pop( void ) const
-{
-    return m_impl->pop();
+	Json::StyledWriter writer;
+	return writer.write( *m_root );
 }
 
 } // namespace io

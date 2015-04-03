@@ -53,21 +53,14 @@ namespace io {
 		class ByteBuffer;
 		class PackedStream;
 
-	class BinaryArchive;
-	class KeyValueArchive;
+	class Storage;
+		class BinaryStorage;
+		class KeyValueStorage;
 
     //! Available stream open modes.
     enum StreamMode {
         BinaryReadStream,     //!< Open binary stream for reading.
         BinaryWriteStream,    //!< Open binary stream for writing.
-    };
-
-    //! Available text data storages.
-    enum StorageType {
-        StorageBinary,
-        StorageJson,
-        StorageYaml,
-        StorageXml,
     };
 
     //! Stream ptr type.
@@ -95,6 +88,9 @@ namespace io {
 	//! List of field serializer ptrs.
 	typedef List<SerializerPtr> SerializerList;
 
+	//! Key-value storage strong ptr.
+	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;
+
     namespace detail {
         typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
         typedef List<FieldSerializerPtr>            FieldSerializers;
@@ -108,7 +104,8 @@ DC_END_DREEMCHEST
 	#include "streams/FileStream.h"
     #include "streams/ByteBuffer.h"
 	#include "serialization/BinarySerializer.h"
-    #include "serialization/BinaryStorage.h"
+    #include "serialization/Storage.h"
+	#include "serialization/Serializer.h"
 
     #ifdef HAVE_JSONCPP
    //     #include "serialization/JsonStorage.h"
