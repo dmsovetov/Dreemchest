@@ -53,6 +53,9 @@ namespace io {
 		class ByteBuffer;
 		class PackedStream;
 
+	class BinaryArchive;
+	class KeyValueArchive;
+
     //! Available stream open modes.
     enum StreamMode {
         BinaryReadStream,     //!< Open binary stream for reading.
@@ -85,6 +88,12 @@ namespace io {
     typedef Map<Path, ArchivePtr>	Archives;
     typedef Set<Path>				PathSet;
 	typedef List<SerializablePtr>	Serializables;
+
+	//! Field serializer strong ptr.
+	typedef StrongPtr<class Serializer> SerializerPtr;
+
+	//! List of field serializer ptrs.
+	typedef List<SerializerPtr> SerializerList;
 
     namespace detail {
         typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
