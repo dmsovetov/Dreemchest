@@ -51,8 +51,15 @@ namespace io {
 		//! Reads a list of serializables from storage.
 		static Serializables		read( ByteBufferPtr& bytes );
 
+		//! Reads a serializable of a specified type from a byte buffer.
+		template<typename T>
+		static T					read( const Array<u8>& bytes );
+
 		//! Writes a serializable to storage.
 		static s32					write( ByteBufferPtr& bytes, Serializable* data );
+
+		//! Writes a serializable to a byte buffer.
+		static ByteBufferPtr		write( const Serializable& data );
 
 		//! Registers a new serializable type.
 		template<typename T>
@@ -84,6 +91,21 @@ namespace io {
 	inline void BinarySerializer::registerType( void )
 	{
 		s_types[TypeInfo<T>::id()] = new T;
+	}
+
+	// ** BinarySerializer::read
+	template<typename T>
+	inline T BinarySerializer::read( const Array<u8>& bytes )
+	{
+		T data;
+
+		if( bytes.empty() ) {
+			return data;
+		}
+
+		BinaryStorage storage( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
+		data.read( &storage );
+		return data;
 	}
 
 } // namespace io

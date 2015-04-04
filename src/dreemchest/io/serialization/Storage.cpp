@@ -51,6 +51,8 @@ void BinaryStorage::write( const void* ptr, u32 size )
 
 // ----------------------------------------JsonStorage ------------------------------------------//
 
+#ifdef HAVE_JSONCPP
+
 // ** JsonStorage::JsonStorage
 JsonStorage::JsonStorage( Json::Value* root ) : m_root( NULL ), m_isOwned( root == NULL )
 {
@@ -146,6 +148,8 @@ String JsonStorage::toString( void ) const
 	Json::StyledWriter writer;
 	return writer.write( *m_root );
 }
+
+#endif
 
 } // namespace io
 

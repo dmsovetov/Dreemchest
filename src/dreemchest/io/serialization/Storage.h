@@ -30,7 +30,9 @@
 #include	"../Io.h"
 #include    "../streams/Stream.h"
 
-#include	<json/json.h>
+#ifdef HAVE_JSONCPP
+	#include <json/json.h>
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,6 +41,9 @@ namespace io {
 	//! Basic data storage interface
 	class Storage : public RefCounted {
 	public:
+
+						DC_DECLARE_IS(BinaryStorage, BinaryStorage, NULL)
+						DC_DECLARE_IS(KeyValueStorage, KeyValueStorage, NULL)
 
 		virtual			~Storage( void ) {}
 
@@ -60,6 +65,8 @@ namespace io {
 	//! Binary storage interface.
 	class BinaryStorage : public Storage {
 	public:
+
+						DC_DECLARE_IS(BinaryStorage, BinaryStorage, this)
 
 						//! Constructs BinaryStorage instance.
 						BinaryStorage( const StreamPtr& stream );
@@ -102,6 +109,8 @@ namespace io {
 	class KeyValueStorage : public Storage {
 	public:
 
+									DC_DECLARE_IS(KeyValueStorage, KeyValueStorage, this)
+
 		//! Writes a value to a specified key of a storage.
 		virtual void				write( const Key& key, const Variant& value ) = 0;
 
@@ -123,6 +132,8 @@ namespace io {
 		//! Returns a total number of entries that exist inside this key-value storage.
 		virtual u32					size( void ) const				= 0;
 	};
+
+#ifdef HAVE_JSONCPP
 
 	//! Json key value storage.
 	class JsonStorage : public KeyValueStorage {
@@ -169,6 +180,8 @@ namespace io {
 		//! Root JSON object.
 		Json::Value*				m_root;
 	};
+
+#endif	// HAVE_JSONCPP
 
 } // namespace io
 

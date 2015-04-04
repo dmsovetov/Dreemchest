@@ -197,7 +197,7 @@ namespace net {
 		}
 
 		// ** Serialize event to a byte buffer.
-		io::ByteBufferPtr buffer = e.writeToByteBuffer();
+		io::ByteBufferPtr buffer = io::BinarySerializer::write( e );
 
 		for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
             const_cast<ConnectionPtr&>( *i )->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );

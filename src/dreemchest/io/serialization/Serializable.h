@@ -29,212 +29,37 @@
 
 #include	"../Io.h"
 
-/*
-//! Macro definition for serializer fields declaration
-#define IoBeginSerializer                                                   \
-    virtual io::detail::FieldSerializers fieldSerializers( void ) const {   \
-        io::detail::FieldSerializers result;
+#define IoBeginSerializer( Type )							\
+	static io::SerializerList serializers( Type* value ) {	\
+		io::SerializerList result;
 
-//! Macro definition for serializer fields declaration with a superclass.
-#define IoBeginSerializerSuper( T )											\
-    virtual io::detail::FieldSerializers fieldSerializers( void ) const {   \
-        io::detail::FieldSerializers result = T::fieldSerializers();
-
-//! Macro definition for adding a serializable field.
-#define IoField( field )                            \
-    result.push_back( io::detail::createFieldSerializer( #field, field ) );
-
-//! Macro definition for adding a serializable array.
-#define IoArray( field )                            \
-    result.push_back( io::detail::createArraySerializer( #field, field ) );
-
-//! Macro definition for serializer fields declaration
-#define IoEndSerializer                             \
-        return result;                              \
-    }
-
-//! Macro definition for overriding field serializers
-#define IoBeginFieldSerializer( T )                                                 \
-    class T##FieldSerializer : public io::detail::FieldSerializer {                 \
-    public:                                                                         \
-                    T##FieldSerializer( CString name, const T& field )              \
-                        : m_name( name ), m_pointer( const_cast<T*>( &field ) ) {}  \
-        CString     m_name;                                                         \
-        T*          m_pointer;
-
-#define IoWriteField( ... )                                             \
-    virtual void write( io::Storage& storage ) const {					\
-        storage.pushWrite( m_name );                                    \
-        __VA_ARGS__                                                     \
-        storage.pop();                                                  \
-    }
-
-#define IoReadField( ... )                                              \
-    virtual void read( const io::Storage& storage ) {					\
-        io::StorageState state( m_name );								\
-        storage.pushRead( state );                                      \
-        __VA_ARGS__                                                     \
-        storage.pop();                                                  \
-    }
-
-#define IoEndFieldSerializer( T )                                                                           \
-    };                                                                                                      \
-    template<>                                                                                              \
-    io::detail::FieldSerializerPtr io::detail::createFieldSerializer<T>( CString name, const T& field ) {   \
-        return io::detail::FieldSerializerPtr( new T##FieldSerializer( name, field ) );                     \
-    }
-*/
-
-#define IoBeginSerializer								\
-	static SerializerList serializers( Type* value ) {	\
-		SerializerList result;
+#define IoBeginSerializerSuper( Type, Base )				\
+	static io::SerializerList serializers( Type* value ) {	\
+	io::SerializerList result = Base::serializers( value );
 
 #define IoField( name )	\
-	result.push_back( Serializer::create( #name, value->name ) );
+	result.push_back( io::Serializer::create( #name, value->name ) );
 
 #define IoEndSerializer	\
-		return result;		\
+		return result;	\
 	}
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    namespace detail {
-
-        //! Field serializer
-        class FieldSerializer : public RefCounted {
-        public:
-
-            virtual         ~FieldSerializer( void ) {}
-
-            //! Writes field data to a storage.
-            virtual void    write( Storage& storage ) const = 0;
-
-            //! Reads field data from a storage.
-            virtual void    read( const Storage& storage )  = 0;
-        };
-
-        //! Serializable field info
-        template<typename T>
-        class TypedFieldSerializer : public FieldSerializer {
-        public:
-
-                            //! Constructs a TypedFieldSerializer instance.
-                            TypedFieldSerializer( CString name, const T& field )
-                                : m_name( name ), m_pointer( const_cast<T*>( &field ) ) {}
-
-            //! Writes field data to a storage.
-            virtual void    write( Storage& storage ) const;
-
-            //! Reads field data from a storage.
-            virtual void    read( const Storage& storage );
-
-        protected:
-
-            CString         m_name;     //!< Field name.
-            T*              m_pointer;  //!< Field data pointer.
-        };
-
-        // ** TypedFieldSerializer::write
-        template<typename T>
-        void TypedFieldSerializer<T>::write( Storage& storage ) const
-        {
-            storage.write( m_name, *m_pointer );
-        }
-
-        // ** TypedFieldSerializer::read
-        template<typename T>
-        void TypedFieldSerializer<T>::read( const Storage& storage )
-        {
-            storage.read( m_name, *m_pointer );
-        }
-
-        //! Serializable array info
-        template<typename T>
-        class TypedArraySerializer : public FieldSerializer {
-        public:
-
-                            //! Constructs a TypedArraySerializer instance.
-                            TypedArraySerializer( CString name, const Array<T>& field )
-                                : m_name( name ), m_pointer( const_cast<Array<T>*>( &field ) ) {}
-
-            //! Writes field data to a storage.
-            virtual void    write( Storage& storage ) const;
-
-            //! Reads field data from a storage.
-            virtual void    read( const Storage& storage );
-
-        private:
-
-            CString         m_name;     //!< Field name.
-            Array<T>*       m_pointer;  //!< Field data pointer.
-        };
-
-        // ** TypedArraySerializer::write
-        template<typename T>
-        void TypedArraySerializer<T>::write( Storage& storage ) const
-        {
-            storage.write( m_name, *m_pointer );
-        }
-
-        // ** TypedArraySerializer::read
-        template<typename T>
-        void TypedArraySerializer<T>::read( const Storage& storage )
-        {
-            storage.read( m_name, *m_pointer );
-        }
-
-        //! Allocates a TypedFieldSerializer instance.
-        template<typename T>
-        FieldSerializerPtr createFieldSerializer( CString name, const T& field )
-        {
-            return FieldSerializerPtr( new TypedFieldSerializer<T>( name, field ) );
-        }
-
-        template<typename T>
-        FieldSerializerPtr createArraySerializer( CString name, const Array<T>& field )
-        {
-            return FieldSerializerPtr( new TypedArraySerializer<T>( name, field ) );
-        }
-
-    } // namespace detail
-
     //! Base class for all serializable data structs.
     class Serializable : public RefCounted {
     public:
 
-		ClassEnableCloning( Serializable )
-        ClassEnableTypeInfo( Serializable )
+						ClassEnableCloning( Serializable )
+						ClassEnableTypeInfo( Serializable )
 
         //! Reads data from a storage.
-        void                                read( const Storage& storage, CString key = NULL );
+        virtual void	read( const Storage& storage ) { DC_BREAK; }
 
         //! Writes data to a storage.
-        void                                write( Storage& storage, CString key = NULL ) const;
-
-		//! Writes data to byte buffer.
-		ByteBufferPtr						writeToByteBuffer( void ) const;
-
-		//! Reads data from a byte buffer.
-		void								readFromByteBuffer( const ByteBufferPtr& buffer );
-
-		//! Reads data from array of bytes.
-		void								readFromBytes( const Array<u8>& bytes );
-
-		//! Reads a serializable with a specified type from an array of bytes.
-		template<typename T>
-		static T readFromBytes( const Array<u8>& bytes )
-		{
-			T result;
-			result.readFromBytes( bytes );
-			return result;
-		}
-
-    protected:
-
-        //! Returns an array of field serializers.
-   //     virtual detail::FieldSerializers    fieldSerializers( void ) const;
+        virtual void	write( Storage& storage ) const	{ DC_BREAK; }
     };
 
 	//! A template class for declaring serializable types.
@@ -243,7 +68,7 @@ namespace io {
 	public:
 
 		//! A typedef of a template parameter.
-		typedef T Type;
+	//	typedef T Type;
 
 		//! Returns true if the specified type matches this type.
 		virtual bool is( const TypeId& id ) const { return id == TypeInfo<T>::id(); }
@@ -263,11 +88,20 @@ namespace io {
 		//! Returns a type index.
 		static  TypeIdx typeIdx( void ) { return TypeIndex<T>::idx(); }
 
+		//! Returns a list of serializable fields.
+		static SerializerList serializers( T* value ) { return SerializerList(); }
+
+		//! Reads data from a storage.
+		virtual void	read( const Storage& storage );
+
+		//! Writes data to a storage.
+		virtual void	write( Storage& storage ) const;
+
 		//! Writes serializable type to a storage.
 		template<typename Storage>
-		void write( Storage* storage )
+		void write( Storage* storage ) const
 		{
-			SerializerList fields = T::serializers( static_cast<T*>( this ) );
+			SerializerList fields = T::serializers( const_cast<T*>( static_cast<const T*>( this ) ) );
 
 			for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
 				i->get()->write( storage );
@@ -286,6 +120,35 @@ namespace io {
 		}
 	};
 
+	// ** SerializableType::read
+	template<typename T>
+	inline void SerializableType<T>::read( const Storage& storage )
+	{
+		if( const BinaryStorage* binary = storage.isBinaryStorage() ) {
+			read( binary );
+		}
+		else if( const KeyValueStorage* keyValue = storage.isKeyValueStorage() ) {
+			read( keyValue );
+		}
+		else {
+			DC_BREAK;
+		}
+	}
+
+	// ** SerializableType::write
+	template<typename T>
+	inline void SerializableType<T>::write( Storage& storage ) const
+	{
+		if( BinaryStorage* binary = storage.isBinaryStorage() ) {
+			write( binary );
+		}
+		else if( KeyValueStorage* keyValue = storage.isKeyValueStorage() ) {
+			write( keyValue );
+		}
+		else {
+			DC_BREAK;
+		}
+	}
 
 } // namespace io
 

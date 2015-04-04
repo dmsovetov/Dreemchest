@@ -91,11 +91,6 @@ namespace io {
 	//! Key-value storage strong ptr.
 	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;
 
-    namespace detail {
-        typedef StrongPtr<class FieldSerializer>    FieldSerializerPtr;
-        typedef List<FieldSerializerPtr>            FieldSerializers;
-    }
-
 } // namespace io
 
 DC_END_DREEMCHEST
@@ -106,11 +101,6 @@ DC_END_DREEMCHEST
 	#include "serialization/BinarySerializer.h"
     #include "serialization/Storage.h"
 	#include "serialization/Serializer.h"
-
-    #ifdef HAVE_JSONCPP
-   //     #include "serialization/JsonStorage.h"
-    #endif
-
     #include "serialization/Serializable.h"
 	#include "FileSystem.h"
 	#include "Archive.h"

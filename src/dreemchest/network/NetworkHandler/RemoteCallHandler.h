@@ -124,7 +124,7 @@ namespace net {
 	inline bool RemoteCallHandler<T, R>::handle( ConnectionPtr& connection, const packets::RemoteCall& packet )
 	{
 		ResponseType response( connection, packet.id );
-		bool result = m_callback( connection, response, io::Serializable::readFromBytes<T>( packet.payload ) );
+		bool result = m_callback( connection, response, io::BinarySerializer::read<T>( packet.payload ) );
 		DC_BREAK_IF( !response.wasSent() );
 		return result;
 	}
@@ -163,7 +163,7 @@ namespace net {
 	template<typename T>
 	inline bool RemoteResponseHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCallResponse& packet )
 	{
-		return m_callback( connection, io::Serializable::readFromBytes<T>( packet.payload ) );
+		return m_callback( connection, io::BinarySerializer::read<T>( packet.payload ) );
 	}
 
 } // namespace net

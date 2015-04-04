@@ -125,7 +125,7 @@ namespace net {
 	inline void Connection::invoke( CString method, const T& argument )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
+		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
 		send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
@@ -136,7 +136,7 @@ namespace net {
 	inline void Connection::invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = argument.writeToByteBuffer();
+		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;
@@ -193,7 +193,7 @@ namespace net {
 	inline bool Response<T>::operator()( const T& value )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = value.writeToByteBuffer();
+		io::ByteBufferPtr buffer = io::BinarySerializer::write( value );
 
 		// ** Send an RPC response packet.
 		m_connection->send<packets::RemoteCallResponse>( m_id, TypeInfo<T>::id(), buffer->array() );

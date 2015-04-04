@@ -38,6 +38,7 @@
 #include "../io/serialization/Storage.h"
 #include "../io/serialization/BinarySerializer.h"
 #include "../io/serialization/Serializable.h"
+#include "../io/serialization/Serializer.h"
 #include "../event/EventEmitter.h"
 #include <time.h>
 

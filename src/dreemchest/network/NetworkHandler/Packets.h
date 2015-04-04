@@ -48,7 +48,7 @@ namespace packets {
 							: timestamp( timestamp ), roundTripTime( roundTripTime ) {}
 
 		//! Packet serializer
-		IoBeginSerializer
+		IoBeginSerializer( Time )
 			IoField( timestamp )
 			IoField( roundTripTime )
 		IoEndSerializer
@@ -63,7 +63,7 @@ namespace packets {
 							: query( query ) {}
 
 		//! Packet serializer
-		IoBeginSerializer
+		IoBeginSerializer( DetectServers )
 			IoField( query )
 		IoEndSerializer
 	};
@@ -78,9 +78,9 @@ namespace packets {
 							: eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer
+		IoBeginSerializer( Event )
 			IoField( eventId )
-			IoArray( payload )
+			IoField( payload )
 		IoEndSerializer
 	};
 
@@ -96,11 +96,11 @@ namespace packets {
 						: id( id ), method( method ), returnType( 0 ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer
+		IoBeginSerializer( RemoteCall )
 			IoField( id )
 			IoField( method )
 			IoField( returnType )
-			IoArray( payload )
+			IoField( payload )
 		IoEndSerializer
 	};
 
@@ -115,10 +115,10 @@ namespace packets {
 						: id( id ), returnType( returnType ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer
+		IoBeginSerializer( RemoteCallResponse )
 			IoField( id )
 			IoField( returnType )
-			IoArray( payload )
+			IoField( payload )
 		IoEndSerializer
 	};
 
