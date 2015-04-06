@@ -111,26 +111,39 @@ namespace io {
 
 									DC_DECLARE_IS(KeyValueStorage, KeyValueStorage, this)
 
+									//! Constructs a KeyValueStorage.
+									KeyValueStorage( Variant* value = NULL );
+
 		//! Writes a value to a specified key of a storage.
-		virtual void				write( const Key& key, const Variant& value ) = 0;
+		virtual void				write( const Key& key, const Variant& value );
 
 		//! Reads a value at a specified key from a storage.
-		virtual Variant				read( const Key& key ) const	= 0;
+		virtual Variant				read( const Key& key ) const;
 
 		//! Writes a new object to a specified key of a storage.
-		virtual KeyValueStoragePtr	object( const Key& key )		= 0;
+		virtual KeyValueStoragePtr	object( const Key& key );
 
 		//! Reads an object from a specified key of a storage.
-		virtual KeyValueStoragePtr	object( const Key& key ) const	= 0;
+		virtual KeyValueStoragePtr	object( const Key& key ) const;
 
 		//! Writes a new array to a specified key of a storage.
-		virtual KeyValueStoragePtr	array( const Key& key )			= 0;
+		virtual KeyValueStoragePtr	array( const Key& key );
 
 		//! Reads an array from a specified key of a storage.
-		virtual KeyValueStoragePtr	array( const Key& key ) const	= 0;
+		virtual KeyValueStoragePtr	array( const Key& key ) const;
 
 		//! Returns a total number of entries that exist inside this key-value storage.
-		virtual u32					size( void ) const				= 0;
+		virtual u32					size( void ) const;
+
+	private:
+
+		//! Returns a property reference with a specified key.
+		Variant&					get( const Key& key ) const;
+
+	private:
+
+		//! Root value.
+		Variant*					m_root;
 	};
 
 #ifdef HAVE_JSONCPP

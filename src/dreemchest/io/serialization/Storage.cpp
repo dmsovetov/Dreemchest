@@ -49,7 +49,79 @@ void BinaryStorage::write( const void* ptr, u32 size )
 	m_stream->write( ptr, size );
 }
 
-// ----------------------------------------JsonStorage ------------------------------------------//
+// --------------------------------------- KeyValueStorage --------------------------------------- //
+
+// ** KeyValueStorage::KeyValueStorage
+KeyValueStorage::KeyValueStorage( Variant* value ) : m_root( value )
+{
+
+}
+
+// ** KeyValueStorage::size
+u32 KeyValueStorage::size( void ) const
+{
+	return m_root->type() == Variant::ArrayValue ? m_root->toArray().size() : 0;
+}
+
+// ** KeyValueStorage::write
+void KeyValueStorage::write( const Key& key, const Variant& value )
+{
+	get( key ) = value;
+}
+
+// ** KeyValueStorage::read
+Variant KeyValueStorage::read( const Key& key ) const
+{
+	return get( key );
+}
+
+// ** KeyValueStorage::object
+KeyValueStoragePtr KeyValueStorage::object( const Key& key )
+{
+	get( key ) = Variant::RegistryValue;
+	return KeyValueStoragePtr( DC_NEW KeyValueStorage( &get( key ) ) );
+}
+
+// ** KeyValueStorage::object
+KeyValueStoragePtr KeyValueStorage::object( const Key& key ) const
+{
+	Variant& node = get( key );
+	return node.type() == Variant::RegistryValue ? KeyValueStoragePtr( DC_NEW KeyValueStorage( &node ) ) : KeyValueStoragePtr();
+}
+
+// ** KeyValueStorage::array
+KeyValueStoragePtr KeyValueStorage::array( const Key& key )
+{
+	get( key ) = Variant::ArrayValue;
+	return KeyValueStoragePtr( DC_NEW KeyValueStorage( &get( key ) ) );
+}
+
+// ** KeyValueStorage::array
+KeyValueStoragePtr KeyValueStorage::array( const Key& key ) const
+{
+	Variant& node = get( key );
+	return node.type() == Variant::ArrayValue ? KeyValueStoragePtr( DC_NEW KeyValueStorage( &node ) ) : KeyValueStoragePtr();
+}
+
+// ** KeyValueStorage::value
+Variant& KeyValueStorage::get( const Key& key ) const
+{
+	if( key.name ) {
+		DC_BREAK_IF( m_root->type() != Variant::RegistryValue );
+		return (*(m_root->toRegistry().get()))[key.name];
+	}
+
+	DC_BREAK_IF( m_root->type() != Variant::ArrayValue );
+	VariantArray& array = const_cast<VariantArray&>( m_root->toArray() );
+
+	if( key.index >= array.size() ) {
+		array.resize( key.index + 1 );
+	}
+
+	return array[key.index];
+}
+
+// ---------------------------------------- JsonStorage ------------------------------------------ //
 
 #ifdef HAVE_JSONCPP
 
