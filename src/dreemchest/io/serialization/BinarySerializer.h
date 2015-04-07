@@ -61,10 +61,6 @@ namespace io {
 		//! Writes a serializable to a byte buffer.
 		static ByteBufferPtr		write( const Serializable& data );
 
-		//! Registers a new serializable type.
-		template<typename T>
-		static void					registerType( void );
-
 	private:
 
 		//! Serializable data header.
@@ -78,20 +74,7 @@ namespace io {
 
 			static s32	size( void ) { return sizeof( TypeId ) + sizeof( u16 ); }
 		};
-
-		//! A container type to store all registered data types.
-		typedef Map< TypeId, AutoPtr<Serializable> >	SerializableTypes;
-
-		//! Registered serializable types.
-		static SerializableTypes	s_types;
 	};
-
-	// ** BinarySerializer::registerType
-	template<typename T>
-	inline void BinarySerializer::registerType( void )
-	{
-		s_types[TypeInfo<T>::id()] = new T;
-	}
 
 	// ** BinarySerializer::read
 	template<typename T>

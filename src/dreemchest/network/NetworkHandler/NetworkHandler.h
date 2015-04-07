@@ -155,7 +155,7 @@ namespace net {
 	template<typename T>
 	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
-		io::BinarySerializer::registerType<T>();
+		io::SerializableTypes::registerType<T>();
 		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
 

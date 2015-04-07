@@ -33,8 +33,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-// ** BinarySerializer::s_types
-BinarySerializer::SerializableTypes BinarySerializer::s_types;
+// ** SerializableTypes::s_typeById
+SerializableTypes::TypeById SerializableTypes::s_typeById;
+
+// ** SerializableTypes::s_typeByName
+SerializableTypes::TypeByName SerializableTypes::s_typeByName;
 
 // ** BinarySerializer::read
 BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializable** data )
@@ -58,15 +61,14 @@ BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializa
 	}
 
 	// ** Create instance of serializable type.
-	SerializableTypes::iterator i = s_types.find( header.m_type );
+	Serializable* result = SerializableTypes::create( header.m_type );
 
-	if( i == s_types.end() ) {
+	if( result == NULL ) {
 		bytes->setPosition( header.m_size, SeekCur );
 		return Unknown;
 	}
 
 	// ** Instantiate and read the data
-	Serializable* result = i->second->clone();
 	result->read( BinaryStorage( bytes ) );
 	*data = result;
 
@@ -102,7 +104,7 @@ Serializables BinarySerializer::read( ByteBufferPtr& bytes )
 // ** BinarySerializer::write
 s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 {
-	DC_BREAK_IF( s_types.find( data->typeId() ) == s_types.end() );
+	DC_BREAK_IF( !SerializableTypes::isRegistered( data->typeId() ) );
 
 	s32	   position = bytes->position();
 	Header header( data->typeId(), 0 );

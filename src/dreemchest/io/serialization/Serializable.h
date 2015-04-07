@@ -62,13 +62,80 @@ namespace io {
         virtual void	write( Storage& storage ) const	{ DC_BREAK; }
     };
 
+	//! Serializable types registry.
+	class SerializableTypes {
+	public:
+
+		//! Returns true if a type with specified id is registered.
+		static bool					isRegistered( const TypeId& id );
+
+		//! Creates a serializable type instance by id.
+		static Serializable*		create( const TypeId& id );
+
+		//! Creates a serializable type instance by name.
+		static Serializable*		create( CString name );
+
+		//! Registers a new serializable type.
+		template<typename T>
+		static void					registerType( void );
+
+	private:
+
+		//! A container type to store all registered data types by type id.
+		typedef Map< TypeId, AutoPtr<Serializable> >	TypeById;
+
+		//! A container type to store all registered data types by type name.
+		typedef Map< String, AutoPtr<Serializable> >	TypeByName;
+
+		//! Registered serializable types.
+		static TypeById		s_typeById;
+
+		//! Registered serializable types.
+		static TypeByName	s_typeByName;
+	};
+
+	// ** SerializableTypes::isRegistered
+	inline bool SerializableTypes::isRegistered( const TypeId& id )
+	{
+		return s_typeById.find( id ) != s_typeById.end();
+	}
+
+	// ** SerializableTypes::create
+	inline Serializable* SerializableTypes::create( const TypeId& id )
+	{
+		TypeById::iterator i = s_typeById.find( id );
+
+		if( i == s_typeById.end() ) {
+			return NULL;
+		}
+
+		return i->second->clone();
+	}
+
+	// ** SerializableTypes::create
+	inline Serializable* SerializableTypes::create( CString name )
+	{
+		TypeByName::iterator i = s_typeByName.find( name );
+
+		if( i == s_typeByName.end() ) {
+			return NULL;
+		}
+
+		return i->second->clone();
+	}
+
+	// ** SerializableTypes::registerType
+	template<typename T>
+	inline void SerializableTypes::registerType( void )
+	{
+		s_typeById  [TypeInfo<T>::id()]   = new T;
+		s_typeByName[TypeInfo<T>::name()] = new T;
+	}
+
 	//! A template class for declaring serializable types.
 	template<typename T>
 	class SerializableType : public Serializable {
 	public:
-
-		//! A typedef of a template parameter.
-	//	typedef T Type;
 
 		//! Returns true if the specified type matches this type.
 		virtual bool is( const TypeId& id ) const { return id == TypeInfo<T>::id(); }
