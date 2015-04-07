@@ -104,6 +104,19 @@ namespace io {
 		virtual void			read( const KeyValueStorage* storage );
 	};
 
+	//! Numeric field serializer.
+	template<typename T>
+	class NumericSerializer : public PodSerializer<T> {
+	public:
+
+								//! Constructs NumericSerializer instance.
+								NumericSerializer( const Storage::Key& key, T& value )
+									: PodSerializer( key, value ) {}
+
+		//! Reads numeric value from a key-value storage.
+		virtual void			read( const KeyValueStorage* storage );
+	};
+
 	//! Object serializer type
 	template<typename T>
 	class ObjectSerializer : public TypeSerializer<T> {
@@ -175,6 +188,13 @@ namespace io {
 		typedef PodSerializer<T> Type;
 	};
 
+	//! Number serializer.
+	template <class T>
+	struct SerializerType< T, typename std::enable_if<std::is_arithmetic<T>::value>::type >
+	{
+		typedef NumericSerializer<T> Type;
+	};
+
 	//! Object serializer type.
 	template <class T>
 	struct SerializerType< T, typename std::enable_if<std::is_base_of<SerializableType<T>, T>::value>::type >
@@ -231,6 +251,19 @@ namespace io {
 	inline void PodSerializer<T>::read( const KeyValueStorage* storage )
 	{
 		m_value = storage->read( m_key ).as<T>();
+	}
+
+	// --------------------------------- NumericSerializer ----------------------------------//
+
+	// ** NumericSerializer::read
+	template<typename T>
+	inline void NumericSerializer<T>::read( const KeyValueStorage* storage )
+	{
+		Variant value = storage->read( m_key );
+
+		if( value.type() == Variant::NumberValue ) {
+			m_value = static_cast<T>( value.toDouble() );
+		}
 	}
 
 	// -----------------------------------StringSerializer ----------------------------------//
