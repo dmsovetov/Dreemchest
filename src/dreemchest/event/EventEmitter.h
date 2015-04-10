@@ -76,13 +76,20 @@ namespace event {
 
         virtual	~EventEmitter( void ) {}
 
+		//! Callback type wrapper.
+		template<typename T>
+		struct Callback {
+			//! Callback type alias.
+			typedef typename detail::EventListener<T>::Callback Type;
+		};
+
 		//! Subscribes for an event.
 		template<typename T>
-        void subscribe( const typename detail::EventListener<T>::Callback& callback );
+        void subscribe( const typename Callback<T>::Type& callback );
 
 		//! Removes an event listener.
 		template<typename T>
-		void unsubscribe( const typename detail::EventListener<T>::Callback& callback );
+		void unsubscribe( const typename Callback<T>::Type& callback );
 
 		//! Emits a global event.
 		template<typename T>
@@ -109,7 +116,7 @@ namespace event {
 
 	// ** EventEmitter::subscribe
 	template<typename T>
-	inline void EventEmitter::subscribe( const typename detail::EventListener<T>::Callback& callback )
+	inline void EventEmitter::subscribe( const typename Callback<T>::Type& callback )
 	{
 		TypeIdx idx = TypeIndex<T>::idx();
 
@@ -122,7 +129,7 @@ namespace event {
 
 	// ** EventEmitter::unsubscribe
 	template<typename T>
-	inline void EventEmitter::unsubscribe( const typename detail::EventListener<T>::Callback& callback )
+	inline void EventEmitter::unsubscribe( const typename Callback<T>::Type& callback )
 	{
 		TypeIdx idx = TypeIndex<T>::idx();
 
@@ -148,8 +155,6 @@ namespace event {
 	template<typename T>
 	inline void EventEmitter::emit( const T& e )
 	{
-		typedef cClosure<void(const T&)> CallbackType;
-
 		TypeIdx idx = TypeIndex<T>::idx();
 		Subscribers::iterator i = m_subscribers.find( idx );
 

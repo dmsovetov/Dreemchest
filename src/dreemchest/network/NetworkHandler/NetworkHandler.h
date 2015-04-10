@@ -84,7 +84,7 @@ namespace net {
 
 		//! Subscribes for a network event of a specified type.
 		template<typename T>
-		void					subscribe( const cClosure<void(const T&)>& callback );
+		void					subscribe( const typename event::EventEmitter::Callback<T>::Type& callback );
 
 	protected:
 
@@ -182,7 +182,7 @@ namespace net {
 
 	// ** NetworkHandler::subscribe
 	template<typename T>
-	inline void NetworkHandler::subscribe( const cClosure<void(const T&)>& callback )
+	inline void NetworkHandler::subscribe( const typename event::EventEmitter::Callback<T>::Type& callback )
 	{
 		m_eventEmitter.subscribe<T>( callback );
 	}
