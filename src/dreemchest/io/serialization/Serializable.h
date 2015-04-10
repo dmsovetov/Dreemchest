@@ -27,7 +27,7 @@
 #ifndef		__DC_Io_Serializable_H__
 #define		__DC_Io_Serializable_H__
 
-#include	"../Io.h"
+#include	"Serializer.h"
 
 #define IoBeginSerializer( Type )							\
 	static io::SerializerList serializers( Type* value ) {	\

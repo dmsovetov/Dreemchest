@@ -27,7 +27,8 @@
 #ifndef __Io_BinarySerializer_H__
 #define __Io_BinarySerializer_H__
 
-#include "../Io.h"
+#include "Storage.h"
+#include "../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 

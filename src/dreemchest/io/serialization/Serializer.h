@@ -27,12 +27,14 @@
 #ifndef __Io_Serializer_H__
 #define __Io_Serializer_H__
 
-#include "Serializable.h"
 #include "Storage.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
+    
+    template<typename T>
+    class SerializableType;
 
 	//! Base class for a field serializers.
 	class Serializer : public RefCounted {
@@ -89,7 +91,7 @@ namespace io {
 
 								//! Constructs POD serializer instance.
 								PodSerializer( const Storage::Key& key, T& value )
-									: TypeSerializer( key, value ) {}
+									: TypeSerializer<T>( key, value ) {}
 
 		//! Writes value to a binary storage.
 		virtual void			write( BinaryStorage* storage );
@@ -111,7 +113,7 @@ namespace io {
 
 								//! Constructs NumericSerializer instance.
 								NumericSerializer( const Storage::Key& key, T& value )
-									: PodSerializer( key, value ) {}
+									: PodSerializer<T>( key, value ) {}
 
 		//! Reads numeric value from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage );
@@ -124,7 +126,7 @@ namespace io {
 
 								//! Constructs object serializer instance.
 								ObjectSerializer( const Storage::Key& key, T& value )
-									: TypeSerializer( key, value ) {}
+									: TypeSerializer<T>( key, value ) {}
 
 		//! Writes object to a binary storage.
 		virtual void			write( BinaryStorage* ar );
@@ -166,7 +168,7 @@ namespace io {
 	{
 								//! Constructs CollectionSerializer type.
 								CollectionSerializer( const Storage::Key& key, TCollection& value )
-									: TypeSerializer( key, value ) {}
+									: TypeSerializer<TCollection>( key, value ) {}
 
 		//! Writes collection to a binary storage.
 		virtual void			write( BinaryStorage* ar );
@@ -220,7 +222,7 @@ namespace io {
 	template<typename T>
 	StrongPtr<Serializer> Serializer::create( const Storage::Key& key, const T& value )
 	{
-		return StrongPtr<Serializer>( new SerializerType<T>::Type( key, const_cast<T&>( value ) ) );
+		return StrongPtr<Serializer>( new typename SerializerType<T>::Type( key, const_cast<T&>( value ) ) );
 	}
 
 	// ----------------------------------- PodSerializer ------------------------------------//
@@ -229,28 +231,28 @@ namespace io {
 	template<typename T>
 	inline void PodSerializer<T>::write( BinaryStorage* storage )
 	{
-		storage->write( m_value );
+        storage->write( this->m_value );
 	}
 
 	// ** PodSerializer::read
 	template<typename T>
 	inline void PodSerializer<T>::read( const BinaryStorage* storage )
 	{
-		storage->read( m_value );
+		storage->read( this->m_value );
 	}
 
 	// ** PodSerializer::write
 	template<typename T>
 	inline void PodSerializer<T>::write( KeyValueStorage* storage )
 	{
-		storage->write( m_key, m_value );
+		storage->write( this->m_key, this->m_value );
 	}
 
 	// ** PodSerializer::read
 	template<typename T>
 	inline void PodSerializer<T>::read( const KeyValueStorage* storage )
 	{
-		m_value = storage->read( m_key ).as<T>();
+		this->m_value = storage->read( this->m_key ).template as<T>();
 	}
 
 	// --------------------------------- NumericSerializer ----------------------------------//
@@ -259,10 +261,10 @@ namespace io {
 	template<typename T>
 	inline void NumericSerializer<T>::read( const KeyValueStorage* storage )
 	{
-		Variant value = storage->read( m_key );
+		Variant value = storage->read( this->m_key );
 
 		if( value.type() == Variant::NumberValue ) {
-			m_value = static_cast<T>( value.toDouble() );
+			this->m_value = static_cast<T>( value.toDouble() );
 		}
 	}
 
@@ -308,32 +310,32 @@ namespace io {
 	template<typename T>
 	inline void ObjectSerializer<T>::write( BinaryStorage* storage )
 	{
-		m_value.write( storage );
+		this->m_value.write( storage );
 	}
 
 	// ** ObjectSerializer::read
 	template<typename T>
 	inline void ObjectSerializer<T>::read( const BinaryStorage* storage )
 	{
-		m_value.read( storage );
+		this->m_value.read( storage );
 	}
 
 	// ** ObjectSerializer::write
 	template<typename T>
 	inline void ObjectSerializer<T>::write( KeyValueStorage* storage )
 	{
-		KeyValueStoragePtr object = storage->object( m_key );
+		KeyValueStoragePtr object = storage->object( this->m_key );
 		DC_BREAK_IF( object == KeyValueStoragePtr() );
-		m_value.write( object.get() );
+		this->m_value.write( object.get() );
 	}
 
 	// ** ObjectSerializer::read
 	template<typename T>
 	inline void ObjectSerializer<T>::read( const KeyValueStorage* storage )
 	{
-		KeyValueStoragePtr object = storage->object( m_key );
+		KeyValueStoragePtr object = storage->object( this->m_key );
 		DC_BREAK_IF( object == KeyValueStoragePtr() );
-		m_value.read( object.get() );
+		this->m_value.read( object.get() );
 	}
 
 	// -----------------------------------CollectionSerializer ------------------------------------//
@@ -342,9 +344,9 @@ namespace io {
 	template<typename TCollection, typename TElement>
 	inline void CollectionSerializer<TCollection, TElement>::write( BinaryStorage* storage )
 	{
-		storage->write( ( u32 )m_value.size() );
+		storage->write( ( u32 )this->m_value.size() );
 
-		for( TCollection::iterator i = m_value.begin(), end = m_value.end(); i != end; ++i ) {
+		for( typename TCollection::iterator i = this->m_value.begin(), end = this->m_value.end(); i != end; ++i ) {
 			Serializer::create( NULL, *i )->write( storage );
 		}
 	}
@@ -362,7 +364,7 @@ namespace io {
 
 		for( u32 i = 0; i < length; i++ ) {
 			serializer->read( storage );
-			m_value.push_back( element );
+			this->m_value.push_back( element );
 		}
 	}
 
@@ -370,12 +372,12 @@ namespace io {
 	template<typename TCollection, typename TElement>
 	inline void CollectionSerializer<TCollection, TElement>::write( KeyValueStorage* storage )
 	{
-		KeyValueStoragePtr array = storage->array( m_key );
+		KeyValueStoragePtr array = storage->array( this->m_key );
 		DC_BREAK_IF( array == KeyValueStoragePtr() );
 		
 		s32 index = 0;
 
-		for( TCollection::iterator i = m_value.begin(), end = m_value.end(); i != end; ++i ) {
+		for( typename TCollection::iterator i = this->m_value.begin(), end = this->m_value.end(); i != end; ++i ) {
 			Serializer::create( index++, *i )->write( array.get() );
 		}
 	}
@@ -384,14 +386,14 @@ namespace io {
 	template<typename TCollection, typename TElement>
 	inline void CollectionSerializer<TCollection, TElement>::read( const KeyValueStorage* storage )
 	{
-		KeyValueStoragePtr array = storage->array( m_key );
+		KeyValueStoragePtr array = storage->array( this->m_key );
 		DC_BREAK_IF( array == KeyValueStoragePtr() );
 
 		for( u32 i = 0; i < array->size(); i++ ) {
 			TElement element;
 			SerializerPtr serializer = Serializer::create( i, element );
 			serializer->read( array.get() );
-			m_value.push_back( element );
+			this->m_value.push_back( element );
 		}
 	}
 
