@@ -67,23 +67,6 @@ namespace net {
 
 		//! TCP socket listener.
 		TCPSocketListenerPtr		m_socketListener;
-
-//    protected:
-
-//        virtual void        ProcessAcceptedConnection( const NetworkAddress& address, int connection );
-//        virtual void        ProcessClosedConnection( int connection );
-
-        // ** NetworkHandler
- //       virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
-
-//    private:
-
-//        void                OnConnectionAccepted( const dcEvent e );
-//        void                OnConnectionClosed( const dcEvent e );
-
-//    private:
-
-   //     int                 m_time;
     };
 
 	//! Server socket listener handler.

@@ -69,17 +69,6 @@ namespace net {
 
 		//! Server time delta.
 		s32						m_serverTimeDelta;
-
-//    protected:
-
-        // ** NetworkHandler
-    //    virtual void        ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection );
-   //     virtual void        ProcessConnection( const NetworkAddress& address );
-
- //   private:
-
- //       TimeSync            m_timeSync;
- //       int                 m_serverTime;
     };
 
 	//! Client socket handler.

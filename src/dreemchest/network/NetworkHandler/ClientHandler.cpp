@@ -116,68 +116,6 @@ void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* soc
 	m_clientHandler->processReceivedData( sender, stream );
 }
 
-/*
-// ** NetworkClientHandler::GetServerTime
-int NetworkClientHandler::GetServerTime( void ) const
-{
-    return m_serverTime;
-}
-
-// ** NetworkClientHandler::Connect
-bool NetworkClientHandler::Connect( const NetworkAddress& address, u16 port )
-{
-    if( IsConnected() ) {
-        DC_BREAK;
-        return false;
-    }
-
-    // ** Connect sockets
-    bool tcpConnected = m_netTCP->Connect( address, port );
-
-    if( tcpConnected ) {
-        ProcessConnection( address );
-        return true;
-    }
-    
-    ProcessFailure();
-    
-    return false;
-}
-
-// ** NetworkClientHandler::ProcessConnection
-void NetworkClientHandler::ProcessConnection( const NetworkAddress& address )
-{
-    NetworkHandler::ProcessConnection( address );
-
-    m_serverTime = -1;
-    m_timeSync.SyncTo( &m_serverTime, m_ctx->iTime, this, 10, -1 );
-}
-
-// ** NetworkClientHandler::ProcessReceivedPacket
-void NetworkClientHandler::ProcessReceivedPacket( int packetId, const INetworkPacket *packet, const NetworkAddress& address, int connection )
-{
-    switch( packetId ) {
-    default:    NetworkHandler::ProcessReceivedPacket( packetId, packet, address, connection );
-                break;
-    }
-}
-
-// ** NetworkClientHandler::Update
-bool NetworkClientHandler::Update( int dt )
-{
-    if( !NetworkHandler::Update( dt ) ) {
-        return false;
-    }
-
-    if( !m_timeSync.IsReady() ) {
-        return true;
-    }
-
-    m_serverTime += dt;
-    return true;
-}
-*/
-
 } // namespace net
 
 DC_END_DREEMCHEST
