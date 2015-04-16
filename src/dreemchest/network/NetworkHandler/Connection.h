@@ -190,13 +190,13 @@ namespace net {
 
 	//! Send a response to caller.
 	template<typename T>
-	inline bool Response<T>::operator()( const T& value )
+	inline bool Response<T>::operator()( const T& value, const Error& error )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( value );
 
 		// ** Send an RPC response packet.
-		m_connection->send<packets::RemoteCallResponse>( m_id, TypeInfo<T>::id(), buffer->array() );
+		m_connection->send<packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
 
 		// ** Mark this response as sent.
 		m_wasSent = true;

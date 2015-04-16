@@ -55,7 +55,7 @@ namespace net {
 		bool wasSent( void ) const { return m_wasSent; }
 
 		//! Send a response to caller.
-        bool operator()( const T& value );
+        bool operator()( const T& value, const Error& error = Error() );
         /*
 		{
 			// ** Serialize argument to a byte buffer.
@@ -84,7 +84,7 @@ namespace net {
 
 	// ** Response::operator()
 	template<>
-	inline bool Response<Void>::operator()( const Void& value )
+	inline bool Response<Void>::operator()( const Void& value, const Error& error )
 	{
 		log::warn( "Response<Void> : void responses are ignored\n" ); 
 		return true;
@@ -144,7 +144,7 @@ namespace net {
 	public:
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,const T&)> Callback;
+		typedef cClosure<bool(ConnectionPtr&,const Error&,const T&)> Callback;
 
 						//! Constructs RemoteResponseHandler instance.
 						RemoteResponseHandler( const Callback& callback )
@@ -163,7 +163,7 @@ namespace net {
 	template<typename T>
 	inline bool RemoteResponseHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCallResponse& packet )
 	{
-		return m_callback( connection, io::BinarySerializer::read<T>( packet.payload ) );
+		return m_callback( connection, packet.error, io::BinarySerializer::read<T>( packet.payload ) );
 	}
 
 } // namespace net

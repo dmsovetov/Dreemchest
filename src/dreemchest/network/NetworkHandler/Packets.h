@@ -107,16 +107,18 @@ namespace packets {
 	//! RPC call response
 	struct RemoteCallResponse : public io::SerializableType<RemoteCallResponse> {
 		u16			id;
+		Error		error;
 		TypeId		returnType;
 		Payload		payload;
 
 					//! Constructs RemoteCallResponse instance.
-					RemoteCallResponse( u16 id = 0, TypeId returnType = 0, const Payload& payload = Payload() )
-						: id( id ), returnType( returnType ), payload( payload ) {}
+					RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const Payload& payload = Payload() )
+						: id( id ), error( error ), returnType( returnType ), payload( payload ) {}
 
 		//! Packet serializer
 		IoBeginSerializer( RemoteCallResponse )
 			IoField( id )
+			IoField( error )
 			IoField( returnType )
 			IoField( payload )
 		IoEndSerializer

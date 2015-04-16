@@ -243,6 +243,31 @@ namespace net {
 	template<typename T>
 	struct ReplicatedEvent : public io::SerializableType<T> {
 	};
+
+	//! Remote call error response.
+	struct Error : public io::SerializableType<Error> {
+		//! Error codes
+		enum {
+			NoError			 = 0		//!< No error recorded.
+		,	NotImplemented   = 10001
+		,	InvalidProcedure = 20001
+		,	InvalidCall		 = 30001
+		,	InvalidEnum		 = 40001
+		,	InvalidValue	 = 50001
+		};
+
+					//! Constructs an Error instance.
+					Error( u16 code = NoError, const String& message = String() )
+						: code( code ), message( message ) {}
+
+		u16			code;		//!< Recorded error code.
+		String		message;	//!< Error message.
+
+		IoBeginSerializer( Error )
+			IoField( code )
+			IoField( message )
+		IoEndSerializer
+	};
     
 } // namespace net
     
