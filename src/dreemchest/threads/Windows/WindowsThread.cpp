@@ -52,6 +52,12 @@ void WindowsThread::start( const ThreadCallback& callback, void *userData )
 	SetThreadPriority( m_handle, THREAD_PRIORITY_NORMAL );
 }
 
+// ** WindowsThread::wait
+void WindowsThread::wait( void )
+{
+	WaitForSingleObject( m_handle );
+}
+
 // ** WindowsThread::threadProc
 void WindowsThread::threadProc( void *data )
 {

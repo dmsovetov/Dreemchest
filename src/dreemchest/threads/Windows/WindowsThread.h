@@ -45,6 +45,7 @@ namespace thread {
 
 		// ** Thread
 		virtual void	start( const ThreadCallback& callback, void *userData );
+		virtual void	wait( void );
 
 	private:
 

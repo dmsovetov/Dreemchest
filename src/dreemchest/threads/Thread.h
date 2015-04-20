@@ -82,6 +82,9 @@ namespace thread {
         //! Yields a processor time to other threads.
         virtual void        yield( void );
 
+		//! Suspends execution of the calling thread until this one terminates.
+		virtual void		wait( void ) const;
+
     protected:
 
         //! A boolean flag indicating that thread is alive.

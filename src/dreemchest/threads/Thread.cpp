@@ -103,6 +103,11 @@ void Thread::yield( void )
     sleep( 1 );
 }
 
+// ** Thread::wait
+void Thread::wait( void )
+{
+}
+
 // ** Thread::sleep
 void Thread::sleep( u32 ms )
 {

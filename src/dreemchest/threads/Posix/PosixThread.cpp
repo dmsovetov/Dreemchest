@@ -76,6 +76,12 @@ void PosixThread::yield( void )
 	threadYield();
 }
 
+// ** PosixThread::wait
+void PosixThread::wait( void )
+{
+	pthread_join( m_thread, NULL );
+}
+
 // ** PosixThread::threadYield
 void PosixThread::threadYield( void )
 {
