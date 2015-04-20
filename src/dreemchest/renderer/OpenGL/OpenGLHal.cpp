@@ -210,7 +210,7 @@ VertexBuffer* OpenGLHal::createVertexBuffer( VertexDeclaration *declaration, u32
 // ** OpenGLHal::setShader
 void OpenGLHal::setShader( Shader *shader )
 {
-    DC_NOT_IMPLEMENTED;
+	glUseProgram(static_cast<OpenGLShader*>(shader)->m_program);
 }
 
 // ** OpenGLHal::setRenderTarget

@@ -53,6 +53,7 @@ PFNGLDELETESHADERPROC				glDeleteShader = NULL;
 PFNGLATTACHSHADERPROC				glAttachShader = NULL;
 PFNGLCOMPILESHADERPROC				glCompileShader = NULL;
 PFNGLSHADERSOURCEPROC				glShaderSource = NULL;
+PFNGLUSEPROGRAMPROC					glUseProgram = NULL;
 PFNGLGETSHADERINFOLOGPROC			glGetShaderInfoLog = NULL;
 PFNGLGETPROGRAMIVPROC				glGetProgramiv = NULL;
 PFNGLGETUNIFORMLOCATIONARBPROC		glGetUniformLocation = NULL;
@@ -88,6 +89,17 @@ bool loadOpenGLExtensions( void )
 	glMapBuffer				= ( PFNGLMAPBUFFERARBPROC )             wglGetProcAddress( "glMapBufferARB" );
 	glUnmapBuffer			= ( PFNGLUNMAPBUFFERARBPROC )           wglGetProcAddress( "glUnmapBufferARB" );
 
+	glCreateProgram			=  (PFNGLCREATEPROGRAMPROC )			wglGetProcAddress( "glCreateProgram" );
+	glCreateShader			= ( PFNGLCREATESHADERPROC )				wglGetProcAddress( "glCreateShader" );
+	glLinkProgram			= ( PFNGLLINKPROGRAMPROC )				wglGetProcAddress( "glLinkProgram" );
+	glDeleteProgram			= ( PFNGLDELETEPROGRAMPROC )			wglGetProcAddress( "glDeleteProgram" );
+	glDeleteShader			= ( PFNGLDELETESHADERPROC )				wglGetProcAddress( "glDeleteShader" );
+	glAttachShader			= ( PFNGLATTACHSHADERPROC)				wglGetProcAddress( "glAttachShader" );
+	glCompileShader			= ( PFNGLCOMPILESHADERPROC )			wglGetProcAddress( "glCompileShader" );
+	glShaderSource			= ( PFNGLSHADERSOURCEPROC )				wglGetProcAddress( "glShaderSource" );
+	glUseProgram			= ( PFNGLUSEPROGRAMPROC )				wglGetProcAddress( "glUseProgram" );
+	glGetShaderInfoLog		= ( PFNGLGETSHADERINFOLOGPROC )			wglGetProcAddress( "glGetShaderInfoLog" );
+	glGetProgramiv			= ( PFNGLGETPROGRAMIVPROC )				wglGetProcAddress( "glGetProgramiv" );
 	glGetUniformLocation	= ( PFNGLGETUNIFORMLOCATIONARBPROC )    wglGetProcAddress( "glGetUniformLocationARB" );
 	glUniform4f				= ( PFNGLUNIFORM4FARBPROC )             wglGetProcAddress( "glUniform4fARB" );
 	glUniform3f				= ( PFNGLUNIFORM3FARBPROC )             wglGetProcAddress( "glUniform3fARB" );

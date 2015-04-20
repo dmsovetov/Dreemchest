@@ -56,6 +56,7 @@ namespace renderer {
 	extern PFNGLATTACHSHADERPROC				glAttachShader;
 	extern PFNGLCOMPILESHADERPROC				glCompileShader;
 	extern PFNGLSHADERSOURCEPROC				glShaderSource;
+	extern PFNGLUSEPROGRAMPROC					glUseProgram;
 	extern PFNGLGETSHADERINFOLOGPROC			glGetShaderInfoLog;
 	extern PFNGLGETPROGRAMIVPROC				glGetProgramiv;
 	extern PFNGLGETUNIFORMLOCATIONARBPROC		glGetUniformLocation;
