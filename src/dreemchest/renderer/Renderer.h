@@ -60,14 +60,16 @@ namespace renderer {
             class Texture3D;
             class TextureCube;
 
-    // ** enum Renderer
+	//! Aliases for the math types.
+	typedef math::Rgba Rgba;
+	typedef math::Vec2 Vec2;
+
     //! Hardware rendering API.
     enum Renderer {
         OpenGL,
         Direct3D
     };
 
-    // ** enum ClearMask
     //! Clear mask bits that are passed to Hal::clear method.
     enum ClearMask {
         ClearColor		= BIT( 0 ),                                 //!< Clear color buffer.
