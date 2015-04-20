@@ -104,7 +104,7 @@ void Thread::yield( void )
 }
 
 // ** Thread::wait
-void Thread::wait( void )
+void Thread::wait( void ) const
 {
 }
 

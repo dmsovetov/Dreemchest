@@ -77,7 +77,7 @@ void PosixThread::yield( void )
 }
 
 // ** PosixThread::wait
-void PosixThread::wait( void )
+void PosixThread::wait( void ) const
 {
 	pthread_join( m_thread, NULL );
 }

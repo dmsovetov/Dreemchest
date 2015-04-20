@@ -53,9 +53,9 @@ void WindowsThread::start( const ThreadCallback& callback, void *userData )
 }
 
 // ** WindowsThread::wait
-void WindowsThread::wait( void )
+void WindowsThread::wait( void ) const
 {
-	WaitForSingleObject( m_handle );
+	WaitForSingleObject( m_handle, INFINITE );
 }
 
 // ** WindowsThread::threadProc
