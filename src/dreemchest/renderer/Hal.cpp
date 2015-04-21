@@ -800,10 +800,10 @@ u32 Shader::findUniformLocation( const char * name )
 }
 
 // ** Shader::setMatrix
-//void Shader::setMatrix( u32 location, const mat4& value )
-//{
-//
-//}
+void Shader::setMatrix( u32 location, const Matrix4& value )
+{
+
+}
 
 // ** Shader::setInt
 void Shader::setInt( u32 location, u32 value )
@@ -824,10 +824,10 @@ void Shader::setVec2( u32 location, const Vec2& value )
 }
 
 // ** Shader::setVec3
-//void Shader::setVec3( u32 location, const vec3& value )
-//{
-//
-//}
+void Shader::setVec3( u32 location, const Vec3& value )
+{
+
+}
 
 // ** Shader::setVec4
 //void Shader::setVec4( u32 location, const vec4& value )

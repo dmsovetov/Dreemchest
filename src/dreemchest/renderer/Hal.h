@@ -613,7 +613,9 @@ namespace renderer {
          */
         virtual u32                 findUniformLocation( CString name );
         
-    //    virtual void                setMatrix( u32 location, const mat4& value );
+		//! Sets a 4x4 matrix value to a uniform location.
+        virtual void                setMatrix( u32 location, const Matrix4& value );
+
         //! Sets an integer value to a uniform location.
         virtual void                setInt( u32 location, u32 value );
 
@@ -622,8 +624,12 @@ namespace renderer {
 
         //! Sets a Vec2 value to a uniform location.
         virtual void                setVec2( u32 location, const Vec2& value );
-    //    virtual void                setVec3( u32 location, const vec3& value );
-    //    virtual void                setVec4( u32 location, const vec4& value );
+
+		//! Sets a Vec3 value to a uniform location.
+        virtual void                setVec3( u32 location, const Vec3& value );
+
+		//! Sets a Vec4 value to a uniform location.
+    //    virtual void                setVec4( u32 location, const Vec4& value );
     };
 
 } // namespace renderer

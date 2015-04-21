@@ -210,6 +210,9 @@ VertexBuffer* OpenGLHal::createVertexBuffer( VertexDeclaration *declaration, u32
 // ** OpenGLHal::setShader
 void OpenGLHal::setShader( Shader *shader )
 {
+	DC_CHECK_GL_CONTEXT;
+	DC_CHECK_GL;
+
 	glUseProgram(static_cast<OpenGLShader*>(shader)->m_program);
 }
 
@@ -1076,7 +1079,7 @@ bool OpenGLShader::compile( GLenum shaderType, const char *data, char *error, u3
     GLuint id = glCreateShader( shaderType );
     glShaderSource( id, 1, &data, NULL );
     glCompileShader( id );
-    glGetProgramiv( id, GL_COMPILE_STATUS, &result );
+    glGetShaderiv( id, GL_COMPILE_STATUS, &result );
 
     switch( shaderType ) {
     case GL_VERTEX_SHADER:      m_vertex   = id; break;
@@ -1102,11 +1105,11 @@ u32 OpenGLShader::findUniformLocation( const char *name )
 }
 
 // ** OpenGLShader::setMatrix
-//void OpenGLShader::setMatrix( u32 location, const mat4& value )
-//{
-//    DC_CHECK_GL;
-//    glUniformMatrix4fv( location, 1, false, value.m );
-//}
+void OpenGLShader::setMatrix( u32 location, const Matrix4& value )
+{
+    DC_CHECK_GL;
+    glUniformMatrix4fv( location, 1, false, value.m );
+}
 
 // ** OpenGLShader::setInt
 void OpenGLShader::setInt( u32 location, u32 value )
@@ -1130,11 +1133,11 @@ void OpenGLShader::setVec2( u32 location, const Vec2& value )
 }
 
 // ** OpenGLShader::setVec3
-//void OpenGLShader::setVec3( u32 location, const vec3& value )
-//{
-//    DC_CHECK_GL;
-//    glUniform3fv( location, 1, &value.x );
-//}
+void OpenGLShader::setVec3( u32 location, const Vec3& value )
+{
+    DC_CHECK_GL;
+    glUniform3fv( location, 1, &value.x );
+}
 
 // ** OpenGLShader::setVec4
 //void OpenGLShader::setVec4( u32 location, const vec4& value )

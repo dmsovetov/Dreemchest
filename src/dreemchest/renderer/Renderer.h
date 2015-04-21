@@ -35,6 +35,9 @@
 
 #include <math/Color.h>
 #include <math/Vec2.h>
+#include <math/Vec3.h>
+#include <math/Quat.h>
+#include <math/Matrix4.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -61,8 +64,10 @@ namespace renderer {
             class TextureCube;
 
 	//! Aliases for the math types.
-	typedef math::Rgba Rgba;
-	typedef math::Vec2 Vec2;
+	typedef math::Rgba		Rgba;
+	typedef math::Vec2		Vec2;
+	typedef math::Vec3		Vec3;
+	typedef math::Matrix4	Matrix4;
 
     //! Hardware rendering API.
     enum Renderer {

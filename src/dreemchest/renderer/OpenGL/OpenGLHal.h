@@ -307,16 +307,16 @@ namespace renderer {
         virtual                     ~OpenGLShader( void );
 
         // ** Shader
-        virtual u32                 findUniformLocation( const char * name );
-     //   virtual void                setMatrix( u32 location, const mat4& value );
+        virtual u32                 findUniformLocation( CString name );
+        virtual void                setMatrix( u32 location, const Matrix4& value );
         virtual void                setInt( u32 location, u32 value );
         virtual void                setFloat( u32 location, f32 value );
         virtual void                setVec2( u32 location, const Vec2& value );
-     //   virtual void                setVec3( u32 location, const vec3& value );
+        virtual void                setVec3( u32 location, const Vec3& value );
      //   virtual void                setVec4( u32 location, const vec4& value );
 
         // ** OpenGLShader
-        bool                        compile( GLenum shaderType, const char *data, char *error, u32 errSize );
+        bool                        compile( GLenum shaderType, CString data, char *error, u32 errSize );
         bool                        link( void ) const;
 
     private:
