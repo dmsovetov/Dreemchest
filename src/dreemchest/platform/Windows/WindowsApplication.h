@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #ifndef __DC_Platform_WindowsApplication_H__
-#define __DC_Platform_iOSApplication_H__
+#define __DC_Platform_WindowsApplication_H__
 
 #include "../Application.h"
 
