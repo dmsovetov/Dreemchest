@@ -24,59 +24,30 @@
 
  **************************************************************************/
 
-#ifndef __DC_Platform_Platform_H__
-#define __DC_Platform_Platform_H__
+#ifndef __DC_Platform_WindowsInput_H__
+#define __DC_Platform_WindowsInput_H__
 
-#include "../Dreemchest.h"
-
-#ifndef DC_UTILS_INCLUDED
-    #include <utils/Utils.h>
-#endif
+#include "../Input.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-    DECLARE_LOG( log )
+    // ** class WindowsKeyboard
+    class WindowsKeyboard : public IKeyboard {
+    public:
 
-    // ** enum Key
-    //! Available key mappings.
-    struct Key {
-		enum Mapping {
-			_0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
-			Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
-			A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-			F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-			Escape, Tab, Capital, Shift, Control, Win, Alt, Space,
-			Return, Back,
-			Pause, Snapshot, Scroll,
-			PgDown, PgUp, Home, End, Insert, Delete,
-			Up, Down, Left, Right,
-			Numlock, Divide, Multiply, Subtract, Add, Decimal,
-			RButton, LButton, MButton,
+        // ** IKeyboard
+        virtual bool		keyDown( const Key& key );
 
-			Total
-		} m_mapping;
+	private:
 
-        operator int() const { return m_mapping; }
-
-		Key( Mapping mapping ) : m_mapping( mapping ) {}
+		//! Windows virtual keys mapping.
+		static s32			s_virtualKeysWinAPI[];
     };
-
-    class Application;
-    class Window;
-    class WindowDelegate;
 
 } // namespace platform
 
-    DC_DECLARE_PTRS( platform::WindowDelegate, WindowDelegate )
-
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-    #include "Window.h"
-    #include "Application.h"
-	#include "Input.h"
-#endif
-
-#endif  /*  !defined( __DC_Platform_Platform_H__ )  */
+#endif /*   !defined( __DC_Platform_WindowsInput_H__ )  */
