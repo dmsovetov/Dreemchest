@@ -213,7 +213,7 @@ void OpenGLHal::setShader( Shader *shader )
 	DC_CHECK_GL_CONTEXT;
 	DC_CHECK_GL;
 
-	glUseProgram(static_cast<OpenGLShader*>(shader)->m_program);
+	glUseProgram( shader ? static_cast<OpenGLShader*>( shader )->m_program : 0 );
 }
 
 // ** OpenGLHal::setRenderTarget
