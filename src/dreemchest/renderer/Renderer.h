@@ -64,6 +64,11 @@ namespace renderer {
             class Texture3D;
             class TextureCube;
 
+	//! Pointer types for renderer resources.
+	typedef StrongPtr<VertexBuffer> VertexBufferPtr;
+	typedef StrongPtr<IndexBuffer>	IndexBufferPtr;
+	typedef StrongPtr<Texture>		TexturePtr;
+
 	//! Aliases for the math types.
 	typedef math::Rgba		Rgba;
 	typedef math::Vec2		Vec2;

@@ -298,7 +298,7 @@ namespace renderer {
 
     // ** class RenderResource
     //! RenderResource is a base class for all render resources.
-    class dcInterface RenderResource {
+    class dcInterface RenderResource : public RefCounted {
     public:
 
         virtual                     ~RenderResource( void ) {}
