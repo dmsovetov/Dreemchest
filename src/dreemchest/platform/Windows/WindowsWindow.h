@@ -58,6 +58,9 @@ namespace platform {
 
 	private:
 
+		//! Calculates the window size based on client area size.
+		static void			adjustWindowSize( u32 style, u32& width, u32& height );
+
 		//! Window procedure.
 		static LRESULT		windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 

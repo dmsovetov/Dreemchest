@@ -151,9 +151,15 @@ bool WindowsWindow::create( u32 width, u32 height )
 		return false;
 	}
 
-	u32 style	= WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX;
-	u32 x		= ( GetSystemMetrics( SM_CXSCREEN ) / 2 ) - ( width  / 2 );
-	u32 y		= ( GetSystemMetrics( SM_CYSCREEN ) / 2 ) - ( height / 2 );
+	// ** Initialize the window style
+	u32 style = WS_OVERLAPPEDWINDOW | WS_SYSMENU | WS_MINIMIZEBOX;
+
+	// ** Adjust the window rect to make sure the client are size is right.
+	adjustWindowSize( style, width, height );
+
+	// ** Caclulate the window position
+	u32 x = ( GetSystemMetrics( SM_CXSCREEN ) / 2 ) - ( width  / 2 );
+	u32 y = ( GetSystemMetrics( SM_CYSCREEN ) / 2 ) - ( height / 2 );
 
 	m_window = CreateWindowEx( 0, 
 		m_windowClass.lpszClassName, "",
@@ -173,6 +179,16 @@ bool WindowsWindow::create( u32 width, u32 height )
 	SetFocus( m_window );
 
     return true;
+}
+
+// ** WindowsWindow::adjustWindowSize
+void WindowsWindow::adjustWindowSize( u32 style, u32& width, u32& height )
+{
+	RECT rect = { 0, 0, width, height };
+	AdjustWindowRect( &rect, style, FALSE );
+
+	width  = rect.right  - rect.left;
+	height = rect.bottom - rect.top;
 }
 
 // ** WindowsWindow::windowProc
