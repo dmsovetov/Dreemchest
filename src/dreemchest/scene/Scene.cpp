@@ -24,49 +24,35 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#include "Scene.h"
 
-#define dcInterface
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+namespace scene {
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+// ** Scene::Scene
+Scene::Scene( void )
+{
+}
 
-#ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+// ** Scene::add
+void Scene::add( const SceneObjectPtr& sceneObject )
+{
+	m_sceneObjects.push_back( sceneObject );
+}
 
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
+// ** Scene::sceneObjects
+const SceneObjects& Scene::sceneObjects( void ) const
+{
+	return m_sceneObjects;
+}
 
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
+// ** Scene::create
+ScenePtr Scene::create( void )
+{
+	return ScenePtr( DC_NEW Scene );
+}
 
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
+} // namespace scene
 
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE
-		#include "scene/Scene.h"
-	#endif
-#endif
-
-#endif  /*  !defined( DREEMCHEST_H )    */
+DC_END_DREEMCHEST

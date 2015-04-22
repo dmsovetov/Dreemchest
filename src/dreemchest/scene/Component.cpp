@@ -24,49 +24,38 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#include "Component.h"
 
-#define dcInterface
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+namespace scene {
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+// ----------------------------------------- Transform ----------------------------------------- //
 
-#ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+// ** Transform::affine
+Matrix4 Transform::affine( void ) const
+{
+	if( const Transform* parent = m_parent.get() ) {
+		return parent->affine() * Matrix4::translation( m_position ) * Matrix4::scale( m_scale ) * m_rotation;
+	}
 
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
+	return Matrix4::translation( m_position ) * Matrix4::scale( m_scale ) * m_rotation;
+}
 
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
+// ---------------------------------------- MeshRenderer ---------------------------------------- //
 
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
+// ** MeshRenderer::mesh
+const MeshPtr& MeshRenderer::mesh( void ) const
+{
+	return m_mesh;
+}
 
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE
-		#include "scene/Scene.h"
-	#endif
-#endif
+// ** MeshRenderer::setMesh
+void MeshRenderer::setMesh( const MeshPtr& value )
+{
+	m_mesh = value;
+}
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+} // namespace scene
+
+DC_END_DREEMCHEST

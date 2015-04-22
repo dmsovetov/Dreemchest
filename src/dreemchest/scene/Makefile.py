@@ -1,0 +1,1 @@
+StaticLibrary( 'dScene', sources = [ '.' ], defines = [ 'DC_BUILD_LIBRARY' ] )

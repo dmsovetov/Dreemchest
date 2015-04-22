@@ -24,49 +24,48 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#include <renderer/Hal.h>
+#include "Mesh.h"
 
-#define dcInterface
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+namespace scene {
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+// ** Mesh::Mesh
+Mesh::Mesh( void )
+{
+}
 
-#ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+// ** Mesh::addChunk
+void Mesh::addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer)
+{
+	Chunk chunk;
+	chunk.m_vertexBuffer = vertexBuffer;
+	chunk.m_indexBuffer  = indexBuffer;
+	DC_BREAK_IF( chunk == false );
 
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
+	m_chunks.push_back( chunk );
+}
 
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
+// ** Mesh::chunkCount
+u32 Mesh::chunkCount( void ) const
+{
+	return ( u32 )m_chunks.size();
+}
 
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
+// ** Mesh::chunk
+const Mesh::Chunk& Mesh::chunk( u32 index ) const
+{
+	static Chunk Invalid;
+	return index < chunkCount() ? m_chunks[index] : Invalid;
+}
 
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE
-		#include "scene/Scene.h"
-	#endif
-#endif
+// ** Mesh::create
+MeshPtr Mesh::create( void )
+{
+	return MeshPtr( DC_NEW Mesh );
+}
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+} // namespace scene
+
+DC_END_DREEMCHEST

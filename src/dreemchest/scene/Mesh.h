@@ -24,49 +24,55 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#ifndef __DC_Scene_Mesh_H__
+#define __DC_Scene_Mesh_H__
 
-#define dcInterface
+#include "Scene.h"
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+namespace scene {
 
-#ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+	//! Mesh data container.
+	class Mesh : public RefCounted {
+	public:
 
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
+		//! Mesh submesh type.
+		struct Chunk {
+			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
+			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
 
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
+			//! Returns true if this chunk is valid.
+			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
+		};
 
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
+		//! Adds a new mesh chunk.
+		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
 
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE
-		#include "scene/Scene.h"
-	#endif
-#endif
+		//! Returns the total number of chunks.
+		u32						chunkCount( void ) const;
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+		//! Returns a chunk by index.
+		const Chunk&			chunk( u32 index ) const;
+
+		//! Creates a new Mesh instance.
+		static MeshPtr			create( void );
+
+	private:
+
+								//! Constructs Mesh instance.
+								Mesh( void );
+
+	private:
+
+		//! Container type to store mesh chunks.
+		typedef Array<Chunk>	Chunks;
+
+		Chunks					m_chunks; //!< Mesh chunks.
+	};
+
+} // namespace scene
+
+DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_Mesh_H__    */

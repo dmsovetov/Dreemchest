@@ -24,49 +24,34 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#ifndef __DC_Scene_Renderer_H__
+#define __DC_Scene_Renderer_H__
 
-#define dcInterface
+#include "Scene.h"
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+namespace scene {
 
-#ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+	//! A basic scene renderer
+	class Renderer : public RefCounted {
+	public:
 
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
+								//! Constructs a Renderer instance.
+								Renderer( renderer::Hal* hal );
+		virtual					~Renderer( void ) {}
 
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
+		//! Renders a scene.
+		virtual void			render( const Matrix4& view, const Matrix4& proj, const ScenePtr& scene );
 
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
+	private:
 
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE
-		#include "scene/Scene.h"
-	#endif
-#endif
+		renderer::Hal*			m_hal;				//!< Renderer HAL.
+		renderer::Shader*		m_shaderDefault;	//!< Default shader.
+	};
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+} // namespace scene
+
+DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_Mesh_H__    */
