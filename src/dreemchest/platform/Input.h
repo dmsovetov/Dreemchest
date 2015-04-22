@@ -33,21 +33,30 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-	//! A platform-specific keyboard implementation interface.
-	class IKeyboard {
+	//! A platform-specific input implementation interface.
+	class IInput {
 	public:
 
-		virtual                 ~IKeyboard( void ) {}
+		virtual                 ~IInput( void ) {}
 
 		//! Returns true if a specified key is down.
 		virtual bool            keyDown( const Key& key ) = 0;
+
+		//! Sets the mouse position.
+		virtual void			setMouse( s32 x, s32 y ) = 0;
+
+		//! Returns the mouse X position.
+		virtual s32				mouseX( void ) const = 0;
+
+		//! Returns the mouse Y position.
+		virtual s32				mouseY( void ) const = 0;
 	};
 
-	//! Keyboard class performs access to a keyboard state.
-	class Keyboard {
+	//! Input class performs access to a keyboard and mouse state.
+	class Input {
 	public:
 
-		virtual                 ~Keyboard( void );
+		virtual                 ~Input( void );
 
 		//! Returns true if a specified key is down.
 		/*!
@@ -55,27 +64,33 @@ namespace platform {
 		*/
 		bool                    keyDown( const Key& key );
 
-		//! Notifies an application about a lunch.
-		void                    notifyLaunched(void);
+		//! Sets the mouse position.
+		void					setMouse( s32 x, s32 y );
 
-		//! Creates a new Keyboard instance.
-		static Keyboard*		create(void);
+		//! Returns the mouse X position.
+		s32						mouseX( void ) const;
 
-		//! Returns a shared keyboard instance.
-		static Keyboard*		sharedInstance(void);
+		//! Returns the mouse Y position.
+		s32						mouseY( void ) const;
+
+		//! Creates a new Input instance.
+		static Input*			create( void );
+
+		//! Returns a shared Input instance.
+		static Input*			sharedInstance( void );
 
 	private:
 
-								//! Constructs a new Keyboard instance.
-								Keyboard( IKeyboard* impl );
+								//! Constructs a new Input instance.
+								Input( IInput* impl );
 
 	private:
 
 		//! Shared keyboard instance.
-		static Keyboard*		s_keyboard;
+		static Input*			s_input;
 
-		//! Platform specific keyboard implementation.
-		IKeyboard*				m_impl;
+		//! Platform specific input implementation.
+		IInput*					m_impl;
 	};
 
 } // namespace platform

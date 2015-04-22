@@ -30,54 +30,75 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-//! Platform-specific keyboard constructor.
-extern IKeyboard* createKeyboard( void );
+//! Platform-specific inpit constructor.
+extern IInput* createInput( void );
 
-// ** Keyboard::s_keyboard
-Keyboard* Keyboard::s_keyboard = NULL;
+// ** Input::s_input
+Input* Input::s_input = NULL;
 
-// ** Keyboard::Keyboard
-Keyboard::Keyboard( IKeyboard* impl ) : m_impl( impl )
+// ** Input::Input
+Input::Input( IInput* impl ) : m_impl( impl )
 {
-    DC_BREAK_IF( s_keyboard != NULL );
-    if( !m_impl ) log::warn( "Keyboard::Keyboard : keyboard interface is not implemented on current platform\n" );
-    s_keyboard = this;
+    DC_BREAK_IF( s_input != NULL );
+    if( !m_impl ) log::warn( "Input::Input : input interface is not implemented on current platform\n" );
+    s_input = this;
 }
 
-Keyboard::~Keyboard( void )
+Input::~Input( void )
 {
     DC_DELETE( m_impl )
 }
 
-// ** Keyboard::sharedInstance
-Keyboard* Keyboard::sharedInstance( void )
+// ** Input::sharedInstance
+Input* Input::sharedInstance( void )
 {
-	if( s_keyboard == NULL ) {
-		s_keyboard = Keyboard::create();
+	if( s_input == NULL ) {
+		s_input = Input::create();
 	}
 
-    return s_keyboard;
+    return s_input;
 }
 
-// ** Keyboard::create
-Keyboard* Keyboard::create( void )
+// ** Input::create
+Input* Input::create( void )
 {
 #if defined( DC_PLATFORM )
-    if( IKeyboard* impl = createKeyboard() ) {
-        return DC_NEW Keyboard( impl );
+    if( IInput* impl = createInput() ) {
+        return DC_NEW Input( impl );
     }
 
     return NULL;
 #endif
 
-    return DC_NEW Keyboard( NULL );
+    return DC_NEW Input( NULL );
 }
 
-// ** Keyboard::keyDown
-bool Keyboard::keyDown( const Key& key )
+// ** Input::keyDown
+bool Input::keyDown( const Key& key )
 {
     DC_CHECK_IMPL( false );
     return m_impl->keyDown( key );
+}
+
+// ** Input::mouseX
+s32 Input::mouseX( void ) const
+{
+    DC_CHECK_IMPL( 0 );
+    return m_impl->mouseX();
+}
+
+// ** Input::mouseY
+s32 Input::mouseY( void ) const
+{
+    DC_CHECK_IMPL( 0 );
+    return m_impl->mouseY();
+}
+
+// ** Input::mouseY
+void Input::setMouse( s32 x, s32 y )
+{
+    DC_CHECK_IMPL();
+    return m_impl->setMouse( x, y );
 }
 
 } // namespace platform

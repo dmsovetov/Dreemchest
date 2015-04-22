@@ -31,20 +31,42 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-// ** createKeyboard
-IKeyboard* createKeyboard( void )
+// ** createInput
+IInput* createInput( void )
 {
-    return DC_NEW WindowsKeyboard;
+    return DC_NEW WindowsInput;
 }
 
-// ** WindowsKeyboard::keyDown
-bool WindowsKeyboard::keyDown( const Key& key )
+// ** WindowsInput::keyDown
+bool WindowsInput::keyDown( const Key& key )
 {
 	return GetKeyState( s_virtualKeysWinAPI[key] ) & 0x80;
 }
 
-// ** WindowsKeyboard::s_virtualKeysWinAPI
-s32 WindowsKeyboard::s_virtualKeysWinAPI[] = {
+// ** WindowsInput::mouseY
+void WindowsInput::setMouse( s32 x, s32 y )
+{
+	SetCursorPos( x, y );
+}
+
+// ** WindowsInput::mouseX
+s32 WindowsInput::mouseX( void ) const
+{
+	POINT point;
+	GetCursorPos( &point );
+	return point.x;
+}
+
+// ** WindowsInput::mouseY
+s32 WindowsInput::mouseY( void ) const
+{
+	POINT point;
+	GetCursorPos( &point );
+	return point.y;
+}
+
+// ** WindowsInput::s_virtualKeysWinAPI
+s32 WindowsInput::s_virtualKeysWinAPI[] = {
 	// ** Numbers
 	0x30,	// 0
 	0x31,	// 1

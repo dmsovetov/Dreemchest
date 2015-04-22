@@ -33,12 +33,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace platform {
 
-    // ** class WindowsKeyboard
-    class WindowsKeyboard : public IKeyboard {
+    // ** class WindowsInput
+    class WindowsInput : public IInput {
     public:
 
-        // ** IKeyboard
+        // ** IInput
         virtual bool		keyDown( const Key& key );
+		virtual void		setMouse( s32 x, s32 y );
+		virtual s32			mouseX( void ) const;
+		virtual s32			mouseY( void ) const;
 
 	private:
 
