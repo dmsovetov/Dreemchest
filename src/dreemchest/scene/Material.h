@@ -41,6 +41,7 @@ namespace scene {
         enum Layer {
             Diffuse,
             Specular,
+			Tint,
             TotalMaterialLayers
         };
 

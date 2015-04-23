@@ -103,12 +103,13 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 		GLSL(
 			uniform sampler2D u_diffuse;
 			uniform vec4	  u_diffuseColor;
+			uniform vec4	  u_tintColor;
 
 			varying vec2	  v_tex0;
 
 			void main()
 			{
-				gl_FragColor = texture2D( u_diffuse, v_tex0 ) * u_diffuseColor;
+				gl_FragColor = texture2D( u_diffuse, v_tex0 ) * u_diffuseColor * u_tintColor * u_tintColor.a;
 			} ) );
 }
 
@@ -129,10 +130,12 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, renderer::Shade
 
 		if( material != MaterialPtr() ) {
 			Rgba diffuseColor = material->color( Material::Diffuse );
+			Rgba tintColor	  = material->color( Material::Tint );
 
 			shader->setInt( shader->findUniformLocation( "u_diffuse" ), 0 );
 			shader->setInt( shader->findUniformLocation( "u_lightmap" ), 1 );
 			shader->setVec4( shader->findUniformLocation( "u_diffuseColor" ), Vec4( diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a ) );
+			shader->setVec4( shader->findUniformLocation( "u_tintColor" ), Vec4( tintColor.r, tintColor.g, tintColor.b, tintColor.a ) );
 			m_hal->setTexture( 0, material->texture( Material::Diffuse ).get() );
 			m_hal->setTexture( 1, meshRenderer->lightmap().get() );
 		} else {
