@@ -830,10 +830,10 @@ void Shader::setVec3( u32 location, const Vec3& value )
 }
 
 // ** Shader::setVec4
-//void Shader::setVec4( u32 location, const vec4& value )
-//{
-//
-//}
+void Shader::setVec4( u32 location, const Vec4& value )
+{
+
+}
 
 } // namespace renderer
 

@@ -629,7 +629,7 @@ namespace renderer {
         virtual void                setVec3( u32 location, const Vec3& value );
 
 		//! Sets a Vec4 value to a uniform location.
-    //    virtual void                setVec4( u32 location, const Vec4& value );
+        virtual void                setVec4( u32 location, const Vec4& value );
     };
 
 } // namespace renderer

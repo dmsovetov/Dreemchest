@@ -313,7 +313,7 @@ namespace renderer {
         virtual void                setFloat( u32 location, f32 value );
         virtual void                setVec2( u32 location, const Vec2& value );
         virtual void                setVec3( u32 location, const Vec3& value );
-     //   virtual void                setVec4( u32 location, const vec4& value );
+        virtual void                setVec4( u32 location, const Vec4& value );
 
         // ** OpenGLShader
         bool                        compile( GLenum shaderType, CString data, char *error, u32 errSize );

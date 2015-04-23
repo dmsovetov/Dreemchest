@@ -73,6 +73,7 @@ namespace renderer {
 	typedef math::Rgba		Rgba;
 	typedef math::Vec2		Vec2;
 	typedef math::Vec3		Vec3;
+	typedef math::Vec4		Vec4;
 	typedef math::Matrix4	Matrix4;
 
     //! Hardware rendering API.

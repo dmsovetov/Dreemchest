@@ -1066,11 +1066,18 @@ bool OpenGLShader::link( void ) const
     glLinkProgram( m_program );
     glGetProgramiv( m_program, GL_LINK_STATUS, &result );
 
+    if( result == GL_FALSE ) {
+		s8 error[256];
+        glGetShaderInfoLog( m_program, sizeof( error ), NULL, error );
+		log::error( "OpenGLShader::link : %s\n", error );
+        return false;
+    }
+
     return result != GL_FALSE;
 }
 
 // ** OpenGLShader::compile
-bool OpenGLShader::compile( GLenum shaderType, const char *data, char *error, u32 errSize )
+bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 errSize )
 {
     DC_CHECK_GL;
     
@@ -1088,6 +1095,7 @@ bool OpenGLShader::compile( GLenum shaderType, const char *data, char *error, u3
 
     if( result == GL_FALSE ) {
         glGetShaderInfoLog( id, errSize, NULL, error );
+		log::error( "OpenGLShader::compile : %s\n", error );
         return false;
     }
 
@@ -1140,13 +1148,12 @@ void OpenGLShader::setVec3( u32 location, const Vec3& value )
 }
 
 // ** OpenGLShader::setVec4
-//void OpenGLShader::setVec4( u32 location, const vec4& value )
-//{
-//    DC_CHECK_GL;
-//    glUniform4fv( location, 1, &value.x );
-//}
+void OpenGLShader::setVec4( u32 location, const Vec4& value )
+{
+    DC_CHECK_GL;
+    glUniform4fv( location, 1, &value.x );
+}
 
-    
 } // namespace renderer
 
 DC_END_DREEMCHEST
