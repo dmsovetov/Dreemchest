@@ -92,6 +92,14 @@ namespace scene {
 		return component;
 	}
 
+	// ** SceneObject::get
+	template<typename T>
+	StrongPtr<T> SceneObject::get( void ) const
+	{
+		Components::const_iterator i = m_components.find( TypeIndex<T>::idx() );
+		return i != m_components.end() ? i->second : StrongPtr<T>();
+	}
+
 	// ** SceneObject::has
 	template<typename T>
 	bool SceneObject::has( void ) const

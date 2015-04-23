@@ -64,7 +64,7 @@
 		#include "sound/Sound.h"
 	#endif
 	
-	#ifdef DC_SCENE
+	#ifdef DC_SCENE_ENABLED
 		#include "scene/Scene.h"
 	#endif
 #endif
