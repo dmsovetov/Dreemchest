@@ -59,14 +59,14 @@ namespace scene {
 	public:
 
 								//! Constructs Transform instance.
-								Transform( SceneObject* sceneObject, const Vec3& position, const Quat& rotation, const Vec3& scale )
-									: Component( sceneObject ), m_position( position ), m_rotation( rotation ), m_scale( scale ) {}
+								Transform( SceneObject* sceneObject, const Vec3& position = Vec3(), const Quat& rotation = Quat(), const Vec3& scale = Vec3( 1.0f, 1.0f, 1.0f ), Transform* parent = NULL )
+									: Component( sceneObject ), m_parent( parent ), m_position( position ), m_rotation( rotation ), m_scale( scale ) {}
 
 		//! Returns parent transform.
 		const TransformWPtr&	parent( void ) const;
 
 		//! Sets parent transform.
-		void					setParent( Transform* value );
+		void					setParent( const TransformWPtr& value );
 
 		//! Returns transform position.
 		const Vec3&				position( void ) const;
@@ -102,19 +102,36 @@ namespace scene {
 	class MeshRenderer : public Component {
 	public:
 
-								//! Constructs MeshRenderer instance.
-								MeshRenderer( SceneObject* sceneObject, const MeshPtr& mesh = MeshPtr() )
-									: Component( sceneObject ), m_mesh( mesh ) {}
+									//! Constructs MeshRenderer instance.
+									MeshRenderer( SceneObject* sceneObject, const MeshPtr& mesh = MeshPtr() )
+										: Component( sceneObject ), m_mesh( mesh ) {}
 
 		//! Returns mesh to be rendered.
-		const MeshPtr&			mesh( void ) const;
+		const MeshPtr&				mesh( void ) const;
 
 		//! Sets a mesh to be rendered.
-		void					setMesh( const MeshPtr& value );
+		void						setMesh( const MeshPtr& value );
+
+		//! Returns the total number of materials.
+		u32							materialCount( void ) const;
+
+		//! Returns the material by index.
+		MaterialPtr					material( u32 index ) const;
+
+		//! Sets the material by index.
+		void						setMaterial( u32 index, const MaterialPtr& value );
+
+		//! Returns a lightmap texture.
+		const renderer::TexturePtr&	lightmap( void ) const;
+
+		//! Sets a lightmap texture.
+		void						setLightmap( const renderer::TexturePtr& value );
 
 	private:
 
-		MeshPtr					m_mesh;	//!< Mesh to be rendered.
+		MeshPtr						m_mesh;			//!< Mesh to be rendered.
+		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
+		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
 	};
 
 } // namespace scene

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Component.h"
+#include "Material.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -32,14 +33,26 @@ namespace scene {
 
 // ----------------------------------------- Transform ----------------------------------------- //
 
+// ** Transform::parent
+const TransformWPtr& Transform::parent( void ) const
+{
+	return m_parent;
+}
+
+// ** Transform::setParent
+void Transform::setParent( const TransformWPtr& value )
+{
+	m_parent = value;
+}
+
 // ** Transform::affine
 Matrix4 Transform::affine( void ) const
 {
 	if( const Transform* parent = m_parent.get() ) {
-		return parent->affine() * Matrix4::translation( m_position ) * Matrix4::scale( m_scale ) * m_rotation;
+		return parent->affine() * Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
 	}
 
-	return Matrix4::translation( m_position ) * Matrix4::scale( m_scale ) * m_rotation;
+	return Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
 }
 
 // ---------------------------------------- MeshRenderer ---------------------------------------- //
@@ -54,6 +67,42 @@ const MeshPtr& MeshRenderer::mesh( void ) const
 void MeshRenderer::setMesh( const MeshPtr& value )
 {
 	m_mesh = value;
+}
+
+// ** MeshRenderer::materialCount
+u32 MeshRenderer::materialCount( void ) const
+{
+	return ( u32 )m_materials.size();
+}
+
+// ** MeshRenderer::material
+MaterialPtr MeshRenderer::material( u32 index ) const
+{
+	return index < materialCount() ? m_materials[index] : MaterialPtr();
+}
+
+// ** MeshRenderer::setMaterial
+void MeshRenderer::setMaterial( u32 index, const MaterialPtr& value )
+{
+	DC_BREAK_IF( index > 8 );
+
+	if( index >= materialCount() ) {
+		m_materials.resize( index + 1 );
+	}
+
+	m_materials[index] = value;
+}
+
+// ** MeshRenderer::lightmap
+const renderer::TexturePtr& MeshRenderer::lightmap( void ) const
+{
+	return m_lightmap;
+}
+
+// ** MeshRenderer::setLightmap
+void MeshRenderer::setLightmap( const renderer::TexturePtr& value )
+{
+	m_lightmap = value;
 }
 
 } // namespace scene

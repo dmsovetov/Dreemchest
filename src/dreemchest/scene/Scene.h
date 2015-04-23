@@ -46,6 +46,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	class Mesh;
+	class Material;
 	class SceneObject;
 	class Component;
 		class Transform;
@@ -56,6 +57,7 @@ namespace scene {
 	typedef StrongPtr<Component>		ComponentPtr;
 	typedef WeakPtr<Transform>			TransformWPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
+	typedef StrongPtr<Material>			MaterialPtr;
 
 	//! Container type to store a list of objects.
 	typedef List<SceneObjectPtr>	SceneObjects;
@@ -64,6 +66,7 @@ namespace scene {
 	typedef math::Vec4		Vec4;
 	typedef math::Quat		Quat;
 	typedef math::Matrix4	Matrix4;
+	typedef math::Rgba		Rgba;
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {
@@ -98,6 +101,7 @@ DC_END_DREEMCHEST
 	#include "Component.h"
 	#include "Mesh.h"
 	#include "Renderer.h"
+	#include "Material.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */

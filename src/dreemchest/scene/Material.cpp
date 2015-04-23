@@ -24,40 +24,59 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderer_H__
-#define __DC_Scene_Renderer_H__
-
-#include "Scene.h"
 #include "Material.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! A basic scene renderer
-	class Renderer : public RefCounted {
-	public:
+// ** Material::Material
+Material::Material( void ) : m_shader( Solid )
+{
+}
 
-								//! Constructs a Renderer instance.
-								Renderer( renderer::Hal* hal );
-		virtual					~Renderer( void ) {}
+// ** Material::create
+MaterialPtr Material::create( void )
+{
+	return MaterialPtr( DC_NEW Material );
+}
 
-		//! Renders a scene.
-		virtual void			render( const Matrix4& view, const Matrix4& proj, const ScenePtr& scene );
+// ** Material::shader
+Material::Shader Material::shader( void ) const
+{
+	return m_shader;
+}
 
-	private:
+// ** Material::setShader
+void Material::setShader( Shader value )
+{
+	m_shader = value;
+}
 
-		//! Renders a scene object with a specified shader.
-		void					render( const Matrix4& view, const Matrix4& proj, renderer::Shader* shader, const SceneObjectPtr& sceneObject );
+// ** Material::color
+const Rgba& Material::color( Layer layer ) const
+{
+	return m_color[layer];
+}
 
-	private:
+// ** Material::setColor
+void Material::setColor( Layer layer, const Rgba& value )
+{
+	m_color[layer] = value;
+}
 
-		renderer::Hal*			m_hal;										//!< Renderer HAL.
-		renderer::Shader*		m_shaders[Material::TotalMaterialShaders];	//!< Material shaders.
-	};
+// ** Material::texture
+const renderer::TexturePtr& Material::texture( Layer layer ) const
+{
+	return m_texture[layer];
+}
+
+// ** Material::setTexture
+void Material::setTexture( Layer layer, const renderer::TexturePtr& value )
+{
+	m_texture[layer] = value;
+}
 
 } // namespace scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_Mesh_H__    */

@@ -35,13 +35,17 @@ namespace scene {
 
 	//! Scene object class is a component holder.
 	class SceneObject : public RefCounted {
+	EmbedUserData
 	public:
+
+		virtual								~SceneObject( void );
 
 		//! Attaches a new component to a scene object.
 		template<typename T>							StrongPtr<T> attach( void );
 		template<typename T, TemplateFunctionTypes1>	StrongPtr<T> attach( TemplateFunctionArgs1 );
 		template<typename T, TemplateFunctionTypes2>	StrongPtr<T> attach( TemplateFunctionArgs2 );
 		template<typename T, TemplateFunctionTypes3>	StrongPtr<T> attach( TemplateFunctionArgs3 );
+		template<typename T, TemplateFunctionTypes4>	StrongPtr<T> attach( TemplateFunctionArgs4 );
 
 		//! Returns a component of specified type that is attached to this scene object.
 		template<typename T> StrongPtr<T>	get( void ) const;
@@ -74,6 +78,10 @@ namespace scene {
 
 	// ** SceneObject::SceneObject
 	inline SceneObject::SceneObject( void )
+	{
+	}
+
+	inline SceneObject::~SceneObject( void )
 	{
 	}
 
@@ -143,6 +151,13 @@ namespace scene {
 	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs3 )
 	{
 		return set( DC_NEW T( this, arg0, arg1, arg2 ) );
+	}
+
+	// ** SceneObject::attach
+	template<typename T, TemplateFunctionTypes4>
+	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs4 )
+	{
+		return set( DC_NEW T( this, arg0, arg1, arg2, arg3 ) );
 	}
 
 } // namespace scene

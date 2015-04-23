@@ -24,40 +24,69 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderer_H__
-#define __DC_Scene_Renderer_H__
+#ifndef __DC_Scene_Material_H__
+#define __DC_Scene_Material_H__
 
 #include "Scene.h"
-#include "Material.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! A basic scene renderer
-	class Renderer : public RefCounted {
+	//! Mesh material class.
+	class Material : public RefCounted {
 	public:
 
-								//! Constructs a Renderer instance.
-								Renderer( renderer::Hal* hal );
-		virtual					~Renderer( void ) {}
+		//! Material layers.
+        enum Layer {
+            Diffuse,
+            Specular,
+            TotalMaterialLayers
+        };
 
-		//! Renders a scene.
-		virtual void			render( const Matrix4& view, const Matrix4& proj, const ScenePtr& scene );
+		//! Material shader.
+		enum Shader {
+			Solid,
+			Transparent,
+			Additive,
+			TotalMaterialShaders
+		};
+
+		//! Returns material shader.
+		Shader						shader( void ) const;
+
+		//! Sets material shader.
+		void						setShader( Shader value );
+
+        //! Returns a material color.
+        const Rgba&					color( Layer layer ) const;
+
+		//! Sets material color.
+		void						setColor( Layer layer, const Rgba& value );
+
+        //! Returns a material texture.
+        const renderer::TexturePtr&	texture( Layer layer ) const;
+
+		//! Sets material texture.
+		void						setTexture( Layer layer, const renderer::TexturePtr& value );
+
+		//! Creates a new Material instance.
+		static MaterialPtr			create( void );
 
 	private:
 
-		//! Renders a scene object with a specified shader.
-		void					render( const Matrix4& view, const Matrix4& proj, renderer::Shader* shader, const SceneObjectPtr& sceneObject );
+									//! Constructs Material instance.
+									Material( void );
 
 	private:
 
-		renderer::Hal*			m_hal;										//!< Renderer HAL.
-		renderer::Shader*		m_shaders[Material::TotalMaterialShaders];	//!< Material shaders.
+		Shader						m_shader;						//!< Material shader.
+        Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
+		renderer::TexturePtr		m_texture[TotalMaterialLayers];	//!< Material textures.
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene_Material_H__    */
