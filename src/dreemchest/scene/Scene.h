@@ -50,12 +50,15 @@ namespace scene {
 	class SceneObject;
 	class Component;
 		class Transform;
+		class MeshRenderer;
 
 	typedef StrongPtr<class Scene>		ScenePtr;
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
 	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
 	typedef StrongPtr<Component>		ComponentPtr;
+	typedef StrongPtr<Transform>		TransformPtr;
 	typedef WeakPtr<Transform>			TransformWPtr;
+	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
 	typedef StrongPtr<Material>			MaterialPtr;
 

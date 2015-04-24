@@ -36,6 +36,7 @@ namespace scene {
 
 	//! A basic scene renderer
 	class Renderer : public RefCounted {
+	friend class Scene;
 	public:
 
 								//! Constructs a Renderer instance.
