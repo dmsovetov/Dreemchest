@@ -71,21 +71,25 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 			uniform mat4 u_mvp;
 
 			varying vec2 v_tex0;
+			varying vec2 v_tex1;
 
 			void main()
 			{
 				v_tex0		= gl_MultiTexCoord0.xy;
+				v_tex1		= gl_MultiTexCoord1.xy;
 				gl_Position = u_mvp * gl_Vertex;
 			} ),
 		GLSL(
 			uniform sampler2D u_diffuse;
+			uniform sampler2D u_lightmap;
 			uniform vec4	  u_diffuseColor;
 
 			varying vec2	  v_tex0;
+			varying vec2	  v_tex1;
 
 			void main()
 			{
-				gl_FragColor = texture2D( u_diffuse, v_tex0 ) * u_diffuseColor;
+				gl_FragColor = texture2D( u_diffuse, v_tex0 ) * texture2D( u_lightmap, v_tex1 ) * u_diffuseColor;
 			} ) );
 
 	// ** Create the colored & textured shader
