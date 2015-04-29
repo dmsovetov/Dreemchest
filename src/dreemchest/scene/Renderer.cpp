@@ -63,7 +63,8 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 			void main()
 			{
                 vec4 light   = texture2D( u_lightmap, v_tex1 );
-				gl_FragColor = texture2D( u_diffuse, v_tex0 ) * (light * 2.0) * u_diffuseColor + vec4( 0.5254902, 0.80392157, 0.91764706, 1.0 );
+				vec4 diffuse = texture2D( u_diffuse, v_tex0 ) * u_diffuseColor;
+				gl_FragColor = diffuse * (light * 1.0) + diffuse * vec4( 0.5254902, 0.80392157, 0.91764706, 1.0 );
 			} ) );
 
 	// ** Create the colored & textured shader
