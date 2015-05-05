@@ -47,6 +47,7 @@ namespace scene {
 
 		//! Material shader.
 		enum Shader {
+			Unknown,
 			Solid,
 			Transparent,
 			Additive,

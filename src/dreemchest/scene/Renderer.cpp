@@ -38,6 +38,26 @@ namespace scene {
 // ** Renderer::Renderer
 Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 {
+	// ** Create default shader
+	m_shaders[Material::Unknown] = m_hal->createShader(
+		GLSL(
+			uniform mat4 u_mvp;
+			varying vec3 v_color;
+
+			void main()
+			{
+				v_color		= gl_Normal * 0.5 + 0.5;
+			//	gl_Position = vec4( gl_MultiTexCoord0.xy, 0.0, 1.0 );
+				gl_Position = u_mvp * gl_Vertex;
+			} ),
+		GLSL(
+			varying vec3 v_color;
+
+			void main()
+			{
+				gl_FragColor = vec4( v_color, 1.0 );
+			} ) );
+
 	// ** Create the solid lightmap shader
 	m_shaders[Material::Solid] = m_hal->createShader(
 		GLSL(
@@ -149,13 +169,19 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, renderer::Shade
 			m_hal->setTexture( 1, NULL );
 		}
 
-		m_hal->setVertexBuffer( chunk.m_vertexBuffer.get() );
-		m_hal->renderIndexed( renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
+		render( chunk );
 	}
 }
 
 // ** Renderer::render
-void Renderer::render( const Matrix4& view, const Matrix4& proj, const ScenePtr& scene )
+void Renderer::render( const Mesh::Chunk& chunk )
+{
+	m_hal->setVertexBuffer( chunk.m_vertexBuffer.get() );
+	m_hal->renderIndexed( renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
+}
+
+// ** Renderer::render
+void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* scene )
 {
 	const SceneObjects& sceneObjects = scene->sceneObjects();
 
@@ -172,11 +198,27 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const ScenePtr&
 		MaterialPtr material = meshRenderer->material( 0 );
 
 		if( material == MaterialPtr() ) {
+			objects[Material::Unknown].push_back( sceneObject );
 			continue;
 		}
 
 		objects[material->shader()].push_back( sceneObject );
 	}
+
+    {
+		renderer::Shader* shader = m_shaders[Material::Unknown];
+
+		m_hal->setShader( shader );
+		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), proj * view );
+
+		for( SceneObjects::const_iterator i = objects[Material::Unknown].begin(), end = objects[Material::Unknown].end(); i != end; ++i ) {
+			const MeshPtr& mesh = (*i)->get<MeshRenderer>()->mesh();
+
+			for( int j = 0; j < mesh->chunkCount(); j++ ) {
+				render( mesh->chunk( j ) );
+			}
+		}
+    }
 
     {
 		for( SceneObjects::const_iterator i = objects[Material::Solid].begin(), end = objects[Material::Solid].end(); i != end; ++i ) {

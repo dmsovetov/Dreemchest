@@ -45,12 +45,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+	DECLARE_LOG( log )
+
+	class Renderer;
 	class Mesh;
 	class Material;
 	class SceneObject;
 	class Component;
 		class Transform;
 		class MeshRenderer;
+		class Camera;
 
 	typedef StrongPtr<class Scene>		ScenePtr;
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
@@ -58,13 +62,17 @@ namespace scene {
 	typedef StrongPtr<Component>		ComponentPtr;
 	typedef StrongPtr<Transform>		TransformPtr;
 	typedef WeakPtr<Transform>			TransformWPtr;
+	typedef StrongPtr<Camera>			CameraPtr;
+	typedef WeakPtr<Camera>				CameraWPtr;
 	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
 	typedef StrongPtr<Material>			MaterialPtr;
+	typedef StrongPtr<Renderer>			RendererPtr;
 
 	//! Container type to store a list of objects.
 	typedef List<SceneObjectPtr>	SceneObjects;
 
+	typedef math::Vec2		Vec2;
 	typedef math::Vec3		Vec3;
 	typedef math::Vec4		Vec4;
 	typedef math::Quat		Quat;
@@ -77,6 +85,15 @@ namespace scene {
 
 		//! Adds a new scene object to scene.
 		void							add( const SceneObjectPtr& sceneObject );
+
+		//! Performs a scene update.
+		void							update( f32 dt );
+
+		//! Renders a scene.
+		void							render( f32 aspect );
+
+		//! Sets a scene renderer.
+		void							setRenderer( const RendererPtr& value );
 
 		//! Returns a scene object list.
 		const SceneObjects&				sceneObjects( void ) const;
@@ -93,6 +110,12 @@ namespace scene {
 
 		//! Scene object list.
 		SceneObjects					m_sceneObjects;
+
+		//! Main scene camera.
+		CameraPtr						m_camera;
+
+		//! Default scene renderer.
+		RendererPtr						m_renderer;
 	};
 
 } // namespace scene

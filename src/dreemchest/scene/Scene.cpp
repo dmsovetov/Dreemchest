@@ -25,14 +25,78 @@
  **************************************************************************/
 
 #include "Scene.h"
+#include "Renderer.h"
+#include "Component.h"
+
+#include <platform/Input.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+IMPLEMENT_LOGGER( log )
+
 // ** Scene::Scene
 Scene::Scene( void )
 {
+	m_camera = CameraPtr( DC_NEW Camera( NULL ) );
+}
+
+// ** Scene::setRenderer
+void Scene::setRenderer( const RendererPtr& value )
+{
+	m_renderer = value;
+}
+
+// ** Scene::update
+void Scene::update( f32 dt )
+{
+	platform::Input* input = platform::Input::sharedInstance();
+
+	if( !input->keyDown( platform::Key::RButton ) ) {
+		return;
+	}
+
+	float speed = 0.001f;
+
+	if( input->keyDown( platform::Key::Shift ) ) speed *= 5.0f;
+	if( input->keyDown( platform::Key::Space ) ) speed *= 50.0f;
+
+	if( input->keyDown( platform::Key::W ) ) m_camera->move(  speed * dt );
+	if( input->keyDown( platform::Key::S ) ) m_camera->move( -speed * dt );
+
+	if( input->keyDown( platform::Key::A ) ) m_camera->strafe( -speed * dt );
+	if( input->keyDown( platform::Key::D ) ) m_camera->strafe(  speed * dt );
+		
+	static s32 prevMouseX = -1;
+	static s32 prevMouseY = -1;
+
+	s32 x = input->mouseX();
+	s32 y = input->mouseY();
+
+	if( prevMouseX >= 0 && prevMouseY >= 0 ) {
+		f32 dx = (x - prevMouseX) * 0.1f;
+		f32 dy = (y - prevMouseY) * 0.1f;
+
+		m_camera->pitch( -dy );
+		m_camera->yaw( -dx );
+
+		input->setMouse( prevMouseX, prevMouseY );
+	} else {
+		prevMouseX = x;
+		prevMouseY = y;
+	}
+}
+
+// ** Scene::render
+void Scene::render( f32 aspect )
+{
+	if( m_renderer == RendererPtr() ) {
+		log::warn( "Scene::render : no scene renderer set.\n" );
+		return;
+	}
+
+	m_renderer->render( m_camera->view(), m_camera->proj( aspect ), this );
 }
 
 // ** Scene::add

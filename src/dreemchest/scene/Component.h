@@ -134,6 +134,46 @@ namespace scene {
 		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
 	};
 
+	//! Camera component.
+	class Camera : public Component {
+	public:
+
+									//! Constructs Camera instance.
+									Camera( SceneObject* sceneObject )
+										: Component( sceneObject ), m_direction( 0, 0, 1 ), m_up( 0, 1, 0 ), m_right( 1, 0, 0 ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 100.0f ) {}
+
+		//! Moves camera in a direction of view by a specified distance.
+		void						move( f32 amount );
+
+		//! Moves camera to a side of a right vector.
+		void						strafe( f32 amount );
+
+		//! Rotates camera view around the side vector.
+		void						pitch( f32 amount );
+
+		//! Rotates camera view around the up vector.
+		void						yaw( f32 amount );
+
+		//! Returns a composed view projection matrix with a specified aspect.
+		Matrix4						viewProj( f32 apsect ) const;
+
+		//! Returns a view matrix composed from a camera vectors.
+		Matrix4						view( void ) const;
+
+		//! Returns a projection matrix with a specified aspect.
+		Matrix4						proj( f32 apsect ) const;
+
+	private:
+
+		Vec3						m_position;		//!< Camera position.
+		Vec3						m_direction;	//!< Camera view direction.
+		Vec3						m_up;			//!< Camera up vector.
+		Vec3						m_right;		//!< Camera right side vector.
+		f32							m_fov;			//!< Camera field of view angle.
+		f32							m_near;			//!< Camera Z near.
+		f32							m_far;			//!< Camera Z far.
+	};
+
 } // namespace scene
 
 DC_END_DREEMCHEST

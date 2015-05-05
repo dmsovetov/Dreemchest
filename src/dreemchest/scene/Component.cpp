@@ -105,6 +105,55 @@ void MeshRenderer::setLightmap( const renderer::TexturePtr& value )
 	m_lightmap = value;
 }
 
+// ---------------------------------------- Camera ---------------------------------------- //
+
+// ** Camera::move
+void Camera::move( f32 amount )
+{
+	m_position = m_position + m_direction * amount;
+}
+
+// ** Camera::strafe
+void Camera::strafe( f32 amount )
+{
+	m_position = m_position + m_right * amount;
+}
+
+// ** Camera::pitch
+void Camera::pitch( f32 amount )
+{
+	m_direction = Quat::rotateAroundAxis( amount, m_right ).rotate( m_direction );
+}
+
+// ** Camera::yaw
+void Camera::yaw( f32 amount )
+{
+	// ** Rotate the view direction
+	m_direction = Quat::rotateAroundAxis( amount, m_up ).rotate( m_direction );
+
+	// ** Calculate a new side vector.
+	m_right = m_direction % m_up;
+	m_right.normalize();
+}
+
+// ** Camera::viewProj
+Matrix4 Camera::viewProj( f32 aspect ) const
+{
+	return view() * proj( aspect );
+}
+
+// ** Camera::view
+Matrix4 Camera::view( void ) const
+{
+	return Matrix4::lookAt( m_position, m_position + m_direction, m_up );
+}
+
+// ** Camera::proj
+Matrix4 Camera::proj( f32 aspect ) const
+{
+	return Matrix4::perspective( m_fov, aspect, m_near, m_far );
+}
+
 } // namespace scene
 
 DC_END_DREEMCHEST

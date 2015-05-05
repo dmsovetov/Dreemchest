@@ -29,6 +29,7 @@
 
 #include "Scene.h"
 #include "Material.h"
+#include "Mesh.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -44,12 +45,15 @@ namespace scene {
 		virtual					~Renderer( void ) {}
 
 		//! Renders a scene.
-		virtual void			render( const Matrix4& view, const Matrix4& proj, const ScenePtr& scene );
+		virtual void			render( const Matrix4& view, const Matrix4& proj, const Scene* scene );
 
 	private:
 
 		//! Renders a scene object with a specified shader.
 		void					render( const Matrix4& view, const Matrix4& proj, renderer::Shader* shader, const SceneObjectPtr& sceneObject );
+
+		//! Renders a mesh chunk to a screen.
+		void					render( const Mesh::Chunk& chunk );
 
 	private:
 
