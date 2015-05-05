@@ -71,6 +71,7 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
     #include "Task/TaskManager.h"
     #include "Thread.h"
+    #include "Mutex.h"
 #endif
 
 #endif    /*    !__DC_Thread_H__    */
