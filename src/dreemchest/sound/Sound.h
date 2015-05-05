@@ -33,8 +33,6 @@
     #include <utils/Utils.h>
 #endif
 
-#include <math/Vec2.h>
-
 DC_BEGIN_DREEMCHEST
 
     namespace sound {

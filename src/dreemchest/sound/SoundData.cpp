@@ -41,9 +41,9 @@ SoundData::SoundData( SoundFx* sfx, const char* identifier, const char* uri, con
     m_loading           = LoadToRam;
     m_fadeTime          = 0;
     m_volume            = 1.0f;
-    m_volumeModifier    = Vec2( 1.0f, 1.0f );
+    m_volumeModifier    = Range( 1.0f, 1.0f );
     m_pitch             = 1.0f;
-    m_pitchModifier     = Vec2( 1.0f, 1.0f );
+    m_pitchModifier     = Range( 1.0f, 1.0f );
     m_isLooped          = false;
     m_priority          = 0;
 }
@@ -228,13 +228,13 @@ void SoundData::setPcm( SoundBuffer *value )
 // ** SoundData::volumeForSound
 f32 SoundData::volumeForSound( void ) const
 {
-    return m_volume * RANDOM_SCALAR( m_volumeModifier.x, m_volumeModifier.y );
+    return m_volume * RANDOM_SCALAR( m_volumeModifier.min, m_volumeModifier.max );
 }
 
 // ** SoundData::pitchForSound
 f32 SoundData::pitchForSound( void ) const
 {
-    return m_pitch * RANDOM_SCALAR( m_pitchModifier.x, m_pitchModifier.y );
+    return m_pitch * RANDOM_SCALAR( m_pitchModifier.min, m_pitchModifier.max );
 }
 
 } // namespace sound

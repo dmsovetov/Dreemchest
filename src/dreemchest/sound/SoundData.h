@@ -42,9 +42,9 @@ namespace sound {
         u8             loading;
         f32            fadeTime;
         f32            volume;
-        Vec2           volumeModifier;
+        Range          volumeModifier;
         f32            pitch;
-        Vec2           pitchModifier;
+        Range          pitchModifier;
         bool           isLooped;
         u32            priority;
     };
@@ -147,11 +147,11 @@ namespace sound {
         //! Sound volume.
         f32                 m_volume;
         //! Sound volume random multiplicative modifier.
-        Vec2                m_volumeModifier;
+        Range               m_volumeModifier;
         //! Sound pitch.
         f32                 m_pitch;
         //! Sound pitch random multiplicative modifier.
-        Vec2                m_pitchModifier;
+        Range               m_pitchModifier;
         //! The flag indicating whether this sound is looped.
         bool                m_isLooped;
         //! Sound playback priority.

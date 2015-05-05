@@ -29,15 +29,8 @@
 
 #include    "../SoundEngine.h"
 
-#if defined( DC_PLATFORM_MACOS ) || defined( DC_PLATFORM_IOS )
-    #include <OpenAL/al.h>
-    #include <OpenAL/alc.h>
-#elif defined( DC_PLATFORM_ANDROID ) || defined( DC_PLATFORM_WINDOWS )
-    extern "C" {
-        #include <openal/include/AL/al.h>
-        #include <openal/include/AL/alc.h>
-    }
-#endif
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 
 DC_BEGIN_DREEMCHEST
 
