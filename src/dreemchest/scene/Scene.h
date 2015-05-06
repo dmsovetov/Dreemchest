@@ -95,6 +95,9 @@ namespace scene {
 		//! Sets a scene renderer.
 		void							setRenderer( const RendererPtr& value );
 
+        //! Returns active camera.
+        const CameraPtr&                camera( void ) const;
+
 		//! Returns a scene object list.
 		const SceneObjects&				sceneObjects( void ) const;
 

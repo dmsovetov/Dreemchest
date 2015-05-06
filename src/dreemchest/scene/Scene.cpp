@@ -48,6 +48,12 @@ void Scene::setRenderer( const RendererPtr& value )
 	m_renderer = value;
 }
 
+// ** Scene::camera
+const CameraPtr& Scene::camera( void ) const
+{
+    return m_camera;
+}
+
 // ** Scene::update
 void Scene::update( f32 dt )
 {
