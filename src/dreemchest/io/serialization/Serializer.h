@@ -183,6 +183,27 @@ namespace io {
 		virtual void			read( const KeyValueStorage* storage );
 	};
 
+	//! Collection of serializable objects.
+	template<typename TCollection, typename TElement>
+	struct ObjectCollectionSerializer : public TypeSerializer<TCollection>
+	{
+								//! Constructs ObjectCollectionSerializer type.
+								ObjectCollectionSerializer( const Storage::Key& key, TCollection& value )
+									: TypeSerializer<TCollection>( key, value ) {}
+
+		//! Writes collection to a binary storage.
+		virtual void			write( BinaryStorage* ar );
+
+		//! Reads collection from a binary storage.
+		virtual void			read( const BinaryStorage* ar );
+
+		//! Writes collection to a key-value storage.
+		virtual void			write( KeyValueStorage* storage );
+
+		//! Reads collection from a key-value storage.
+		virtual void			read( const KeyValueStorage* storage );
+	};
+
 	//! Value serialization type.
 	template <class T, class Enable = void>
 	struct SerializerType
@@ -210,6 +231,13 @@ namespace io {
 	{
 		typedef CollectionSerializer< Array<T>, T > Type;
 	};
+
+    //! Object collection serializer type.
+    template <class T>
+    struct SerializerType< List< StrongPtr<T> >, typename std::enable_if<std::is_base_of<Serializable, T>::value>::type >
+    {
+        typedef ObjectCollectionSerializer< List< StrongPtr<T> >, T > Type;
+    };
 
 	//! String serializer type.
 	template <>
