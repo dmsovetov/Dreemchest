@@ -33,13 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! Available seeking origins.
-	enum SeekOrigin {
-		SeekSet = 0,    //!< Seek from the begining of a stream.
-		SeekCur,        //!< Seek from a current position inside a stream.
-		SeekEnd         //!< Seek from the end of a stream.
-	};
-
 	//! Basic stream class.
     class dcInterface Stream : public RefCounted {
 

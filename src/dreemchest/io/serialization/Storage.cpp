@@ -32,6 +32,24 @@ namespace io {
 
 // ----------------------------------------BinaryStorage ------------------------------------------//
 
+// ** BinaryStorage::position
+s32 BinaryStorage::position( void ) const
+{
+	return m_stream->position();
+}
+
+// ** BinaryStorage::setPosition
+void BinaryStorage::setPosition( s32 value, SeekOrigin origin ) const
+{
+	const_cast<BinaryStorage*>( this )->m_stream->setPosition( value, origin );
+}
+
+// ** BinaryStorage::bytesAvailable
+s32 BinaryStorage::bytesAvailable( void ) const
+{
+	return m_stream->length() - m_stream->position();
+}
+
 // ** BinaryStorage::BinaryStorage
 BinaryStorage::BinaryStorage( const StreamPtr& stream ) : m_stream( stream )
 {
@@ -114,7 +132,7 @@ Variant& KeyValueStorage::get( const Key& key ) const
 	DC_BREAK_IF( m_root->type() != Variant::ArrayValue );
 	VariantArray& array = const_cast<VariantArray&>( m_root->toArray() );
 
-	if( key.index >= array.size() ) {
+	if( key.index >= ( s32 )array.size() ) {
 		array.resize( key.index + 1 );
 	}
 

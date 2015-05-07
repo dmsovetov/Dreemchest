@@ -63,6 +63,13 @@ namespace io {
         BinaryWriteStream,    //!< Open binary stream for writing.
     };
 
+	//! Available seeking origins.
+	enum SeekOrigin {
+		SeekSet = 0,    //!< Seek from the begining of a stream.
+		SeekCur,        //!< Seek from a current position inside a stream.
+		SeekEnd         //!< Seek from the end of a stream.
+	};
+
     //! Stream ptr type.
     typedef StrongPtr<Stream>       StreamPtr;
 

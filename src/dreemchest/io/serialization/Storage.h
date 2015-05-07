@@ -77,6 +77,15 @@ namespace io {
 		//! Reads the specified amount of bytes from a binary storage.
 		virtual void	read( void* ptr, u32 size ) const;
 
+		//! Returns the total number of bytes available in this storage.
+		s32				bytesAvailable( void ) const;
+
+		//! Returns current position.
+		s32				position( void ) const;
+
+		//! Rewinds to a specified position.
+		void			setPosition( s32 value, SeekOrigin origin = SeekSet ) const;
+
 		//! Writes value to a binary storage.
 		template<typename T>
 		void			write( const T& value );
