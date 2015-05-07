@@ -28,6 +28,7 @@
 #define __Io_Serializer_H__
 
 #include "Storage.h"
+#include "BinarySerializer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -423,6 +424,69 @@ namespace io {
 			serializer->read( array.get() );
 			this->m_value.push_back( element );
 		}
+	}
+
+	// ----------------------------------- ObjectCollectionSerializer ------------------------------------//
+
+	// ** ObjectCollectionSerializer::write
+	template<typename TCollection, typename TElement>
+	inline void ObjectCollectionSerializer<TCollection, TElement>::write( BinaryStorage* storage )
+	{
+		storage->write( ( u32 )this->m_value.size() );
+
+		for( typename TCollection::iterator i = this->m_value.begin(), end = this->m_value.end(); i != end; ++i ) {
+			BinarySerializer::write( storage, i->get() );
+		}
+	}
+
+	// ** ObjectCollectionSerializer::read
+	template<typename TCollection, typename TElement>
+	inline void ObjectCollectionSerializer<TCollection, TElement>::read( const BinaryStorage* storage )
+	{
+		u32 length = 0;
+
+		storage->read( length );
+
+		for( u32 i = 0; i < length; i++ ) {
+			Serializable* data = NULL;
+			BinarySerializer::read( storage, &data );
+
+			this->m_value.push_back( castTo<TElement>( data ) );
+		}
+	}
+
+	// ** ObjectCollectionSerializer::write
+	template<typename TCollection, typename TElement>
+	inline void ObjectCollectionSerializer<TCollection, TElement>::write( KeyValueStorage* storage )
+	{
+		DC_BREAK;
+		KeyValueStoragePtr array = storage->array( this->m_key );
+		DC_BREAK_IF( array == KeyValueStoragePtr() );
+
+		s32 index = 0;
+
+		for( typename TCollection::iterator i = this->m_value.begin(), end = this->m_value.end(); i != end; ++i ) {
+			TElement*		   data   = i->get();
+			KeyValueStoragePtr item   = array->object( index++ );
+			KeyValueStoragePtr object = item->object( data->typeName() );
+			data->write( object.get() );
+		}
+	}
+
+	// ** ObjectCollectionSerializer::read
+	template<typename TCollection, typename TElement>
+	inline void ObjectCollectionSerializer<TCollection, TElement>::read( const KeyValueStorage* storage )
+	{
+		DC_BREAK;
+		//KeyValueStoragePtr array = storage->array( this->m_key );
+		//DC_BREAK_IF( array == KeyValueStoragePtr() );
+
+		//for( u32 i = 0; i < array->size(); i++ ) {
+		//	TElement element;
+		//	SerializerPtr serializer = Serializer::create( i, element );
+		//	serializer->read( array.get() );
+		//	this->m_value.push_back( element );
+		//}
 	}
 
 } // namespace io
