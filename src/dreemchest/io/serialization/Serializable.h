@@ -33,6 +33,10 @@
     virtual Serializable* clone( void ) const { return new Type; }  \
     ClassEnableTypeInfo( Type )
 
+#define IoOverrideSerializableSuper( Type, Super )                  \
+    virtual Serializable* clone( void ) const { return new Type; }  \
+    ClassEnableTypeInfoSuper( Type, Super )
+
 #define IoBeginSerializer							        \
 	virtual io::SerializerList serializers( void ) const {  \
 		io::SerializerList result;
