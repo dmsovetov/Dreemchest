@@ -42,21 +42,28 @@ SerializableTypes::TypeByName SerializableTypes::s_typeByName;
 // ** BinarySerializer::read
 BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializable** data )
 {
-	if( bytes->bytesAvailable() < Header::size() ) {
+	BinaryStorage storage( bytes );
+	return read( &storage, data );
+}
+
+// ** BinarySerializer::read
+BinarySerializer::Result BinarySerializer::read( const BinaryStorage* storage, Serializable** data )
+{
+	if( storage->bytesAvailable() < Header::size() ) {
 		return NotEnoughData;
 	}
 
 	// ** Save current stream position
-	s32 initial = bytes->position();
+	s32 initial = storage->position();
 
 	// ** Read header
 	Header header;
-	bytes->read( &header.m_type, sizeof( header.m_type ) );
-	bytes->read( &header.m_size, sizeof( header.m_size ) );
+	storage->read( &header.m_type, sizeof( header.m_type ) );
+	storage->read( &header.m_size, sizeof( header.m_size ) );
 
 	// ** Check the data size
-	if( bytes->bytesAvailable() < header.m_size ) {
-		bytes->setPosition( initial );
+	if( storage->bytesAvailable() < header.m_size ) {
+		storage->setPosition( initial );
 		return NotEnoughData;
 	}
 
@@ -64,13 +71,12 @@ BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializa
 	Serializable* result = SerializableTypes::create( header.m_type );
 
 	if( result == NULL ) {
-		bytes->setPosition( header.m_size, SeekCur );
+		storage->setPosition( header.m_size, SeekCur );
 		return Unknown;
 	}
 
 	// ** Instantiate and read the data
-    BinaryStorage storage( bytes );
-	result->read( &storage );
+	result->read( storage );
 	*data = result;
 
 	return Success;
@@ -105,26 +111,32 @@ Serializables BinarySerializer::read( ByteBufferPtr& bytes )
 // ** BinarySerializer::write
 s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 {
+	BinaryStorage storage( bytes );
+	return write( &storage, data );
+}
+
+// ** BinarySerializer::write
+s32 BinarySerializer::write( BinaryStorage* storage, Serializable* data )
+{
 	DC_BREAK_IF( !SerializableTypes::isRegistered( data->typeId() ) );
 
-	s32	   position = bytes->position();
+	s32	   position = storage->position();
 	Header header( data->typeId(), 0 );
 
-	bytes->write( &header.m_type, sizeof( header.m_type ) );
-	bytes->write( &header.m_size, sizeof( header.m_size ) );
+	storage->write( &header.m_type, sizeof( header.m_type ) );
+	storage->write( &header.m_size, sizeof( header.m_size ) );
 
-	s32 start = bytes->position();
-    BinaryStorage storage( bytes );
-	data->write( &storage );
-	header.m_size = bytes->position() - start;
+	s32 start = storage->position();
+	data->write( storage );
+	header.m_size = storage->position() - start;
 
 	// ** Write size
-	bytes->setPosition( position + sizeof( TypeId ) );
-	bytes->write( &header.m_size, sizeof( header.m_size ) );
+	storage->setPosition( position + sizeof( TypeId ) );
+	storage->write( &header.m_size, sizeof( header.m_size ) );
 
-	bytes->setPosition( start + header.m_size );
+	storage->setPosition( start + header.m_size );
 
-	return bytes->position() - position;
+	return storage->position() - position;
 }
 
 // ** BinarySerializer::writeToByteBuffer

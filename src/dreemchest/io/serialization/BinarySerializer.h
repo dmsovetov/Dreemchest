@@ -49,6 +49,9 @@ namespace io {
 		//! Read a serializable from storage.
 		static Result				read( ByteBufferPtr& bytes, Serializable** data );
 
+		//! Read a serializable from storage.
+		static Result				read( const BinaryStorage* storage, Serializable** data );
+
 		//! Reads a list of serializables from storage.
 		static Serializables		read( ByteBufferPtr& bytes );
 
@@ -58,6 +61,9 @@ namespace io {
 
 		//! Writes a serializable to storage.
 		static s32					write( ByteBufferPtr& bytes, Serializable* data );
+
+		//! Writes a serializable to storage.
+		static s32					write( BinaryStorage* storage, Serializable* data );
 
 		//! Writes a serializable to a byte buffer.
 		static ByteBufferPtr		write( const Serializable& data );
