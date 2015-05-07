@@ -29,6 +29,8 @@
 
 #include	"Serializer.h"
 
+#define IoRegisterType( Type ) io::SerializableTypes::registerType<Type>();
+
 #define IoOverrideSerializable( Type )                              \
     virtual Serializable* clone( void ) const { return new Type; }  \
     ClassEnableTypeInfo( Type )
