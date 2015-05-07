@@ -29,16 +29,20 @@
 
 #include	"Serializer.h"
 
-#define IoBeginSerializer( Type )							\
-	static io::SerializerList serializers( Type* value ) {	\
+#define IoOverrideSerializable( Type )                              \
+    virtual Serializable* clone( void ) const { return new Type; }  \
+    ClassEnableTypeInfo( Type )
+
+#define IoBeginSerializer							        \
+	virtual io::SerializerList serializers( void ) const {  \
 		io::SerializerList result;
 
-#define IoBeginSerializerSuper( Type, Base )				\
-	static io::SerializerList serializers( Type* value ) {	\
-	io::SerializerList result = Base::serializers( value );
+#define IoBeginSerializerSuper( Base )				        \
+	virtual io::SerializerList serializers( void ) const {  \
+	io::SerializerList result = Base::serializers();
 
 #define IoField( name )	\
-	result.push_back( io::Serializer::create( #name, value->name ) );
+    result.push_back( io::Serializer::create( #name, this->name ) );
 
 #define IoEndSerializer	\
 		return result;	\
@@ -48,12 +52,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-    //! Base class for all serializable data structs.
-    class Serializable : public RefCounted {
+    //! Base interface class for all serializable data structs.
+    class ISerializable : public RefCounted {
     public:
-
-						ClassEnableCloning( Serializable )
-						ClassEnableTypeInfo( Serializable )
 
         //! Reads data from a storage.
         virtual void	read( const Storage& storage ) { DC_BREAK; }
@@ -61,6 +62,30 @@ namespace io {
         //! Writes data to a storage.
         virtual void	write( Storage& storage ) const	{ DC_BREAK; }
     };
+
+    //! Base class for all types that has a serializers defined by macroses.
+    class Serializable : public ISerializable {
+    public:
+
+                        IoOverrideSerializable( Serializable )
+
+                        IoBeginSerializer
+                        IoEndSerializer
+
+		//! Reads data from a storage.
+		virtual void	read( const Storage* storage );
+
+		//! Writes data to a storage.
+		virtual void	write( Storage* storage ) const;
+    };
+
+	//! A template class for declaring serializable types and overriding the type info in a base class.
+	template<typename T>
+	class SerializableT : public Serializable {
+	public:
+
+                        IoOverrideSerializable( T )
+	};
 
 	//! Serializable types registry.
 	class SerializableTypes {
@@ -132,88 +157,29 @@ namespace io {
 		s_typeByName[TypeInfo<T>::name()] = new T;
 	}
 
-	//! A template class for declaring serializable types.
-	template<typename T>
-	class SerializableType : public Serializable {
-	public:
-
-		//! Returns true if the specified type matches this type.
-		virtual bool is( const TypeId& id ) const { return id == TypeInfo<T>::id(); }
-
-		//! Clones this instance.
-		virtual Serializable* clone( void ) const { return new T; }
-
-		//! Returns a type id.
-		virtual TypeId  typeId( void ) const  { return TypeInfo<T>::id(); }
-
-		//! Returns a type index for this component.
-		virtual TypeIdx	typeIndex( void ) const { return TypeIndex<T>::idx(); }
-
-		//! Returns a type name.
-		virtual CString typeName( void ) const { return TypeInfo<T>::name(); }
-
-		//! Returns a type index.
-		static  TypeIdx typeIdx( void ) { return TypeIndex<T>::idx(); }
-
-		//! Returns a list of serializable fields.
-		static SerializerList serializers( T* value ) { return SerializerList(); }
-
-		//! Reads data from a storage.
-		virtual void	read( const Storage& storage );
-
-		//! Writes data to a storage.
-		virtual void	write( Storage& storage ) const;
-
-		//! Writes serializable type to a storage.
-		template<typename Storage>
-		void write( Storage* storage ) const
-		{
-			SerializerList fields = T::serializers( const_cast<T*>( static_cast<const T*>( this ) ) );
-
-			for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
-				i->get()->write( storage );
-			}
-		}
-
-		//! Reads serializable type from a storage.
-		template<typename Storage>
-		void read( const Storage* storage )
-		{
-			SerializerList fields = T::serializers( static_cast<T*>( this ) );
-
-			for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
-				i->get()->read( storage );
-			}
-		}
-	};
-
-	// ** SerializableType::read
-	template<typename T>
-	inline void SerializableType<T>::read( const Storage& storage )
+	// ** Serializable::read
+	inline void Serializable::read( const Storage* storage )
 	{
-		if( const BinaryStorage* binary = storage.isBinaryStorage() ) {
-			read( binary );
-		}
-		else if( const KeyValueStorage* keyValue = storage.isKeyValueStorage() ) {
-			read( keyValue );
-		}
-		else {
-			DC_BREAK;
+		SerializerList fields = serializers();
+
+        const BinaryStorage*   binary   = storage->isBinaryStorage();
+		const KeyValueStorage* keyValue = storage->isKeyValueStorage();
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+            binary ? (*i)->read( binary ) : (*i)->read( keyValue );
 		}
 	}
 
-	// ** SerializableType::write
-	template<typename T>
-	inline void SerializableType<T>::write( Storage& storage ) const
+	// ** Serializable::write
+	inline void Serializable::write( Storage* storage ) const
 	{
-		if( BinaryStorage* binary = storage.isBinaryStorage() ) {
-			write( binary );
-		}
-		else if( KeyValueStorage* keyValue = storage.isKeyValueStorage() ) {
-			write( keyValue );
-		}
-		else {
-			DC_BREAK;
+		SerializerList fields = serializers();
+
+        BinaryStorage*   binary   = storage->isBinaryStorage();
+		KeyValueStorage* keyValue = storage->isKeyValueStorage();
+
+		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+            binary ? (*i)->write( binary ) : (*i)->write( keyValue );
 		}
 	}
 

@@ -39,7 +39,7 @@ namespace packets {
 	typedef Array<u8> Payload;
 
 	//! Latency test & time sync packet
-	struct Time : public io::SerializableType<Time> {
+	struct Time : public io::SerializableT<Time> {
 		u32				timestamp;		//!< A timestamp value when the packet was sent.
 		s32				roundTripTime;	//!< A time took the packet to travel to target and back.
 
@@ -48,14 +48,14 @@ namespace packets {
 							: timestamp( timestamp ), roundTripTime( roundTripTime ) {}
 
 		//! Packet serializer
-		IoBeginSerializer( Time )
+		IoBeginSerializer
 			IoField( timestamp )
 			IoField( roundTripTime )
 		IoEndSerializer
 	};
 
 	//! Server detection packet.
-	struct DetectServers : public io::SerializableType<DetectServers> {
+	struct DetectServers : public io::SerializableT<DetectServers> {
 		String			query;	//!< A server query.
 
 						//! Constructs DetectServers instance.
@@ -63,13 +63,13 @@ namespace packets {
 							: query( query ) {}
 
 		//! Packet serializer
-		IoBeginSerializer( DetectServers )
+		IoBeginSerializer
 			IoField( query )
 		IoEndSerializer
 	};
 
 	//! Network event packet
-	struct Event : public io::SerializableType<Event> {
+	struct Event : public io::SerializableT<Event> {
 		TypeId			eventId;
 		Payload			payload;
 
@@ -78,14 +78,14 @@ namespace packets {
 							: eventId( eventId ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer( Event )
+		IoBeginSerializer
 			IoField( eventId )
 			IoField( payload )
 		IoEndSerializer
 	};
 
 	//! RPC call packet.
-	struct RemoteCall : public io::SerializableType<RemoteCall> {
+	struct RemoteCall : public io::SerializableT<RemoteCall> {
 		u16			id;
 		u32			method;
 		TypeId		returnType;
@@ -96,7 +96,7 @@ namespace packets {
 						: id( id ), method( method ), returnType( 0 ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer( RemoteCall )
+		IoBeginSerializer
 			IoField( id )
 			IoField( method )
 			IoField( returnType )
@@ -105,7 +105,7 @@ namespace packets {
 	};
 
 	//! RPC call response
-	struct RemoteCallResponse : public io::SerializableType<RemoteCallResponse> {
+	struct RemoteCallResponse : public io::SerializableT<RemoteCallResponse> {
 		u16			id;
 		Error		error;
 		TypeId		returnType;
@@ -116,7 +116,7 @@ namespace packets {
 						: id( id ), error( error ), returnType( returnType ), payload( payload ) {}
 
 		//! Packet serializer
-		IoBeginSerializer( RemoteCallResponse )
+		IoBeginSerializer
 			IoField( id )
 			IoField( error )
 			IoField( returnType )

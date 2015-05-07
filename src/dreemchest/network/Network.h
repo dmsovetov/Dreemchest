@@ -231,21 +231,21 @@ namespace net {
 
 	//! Base class for all remote call argument types.
 	template<typename T>
-	struct RemoteCallArgument : public io::SerializableType<T> {
+	struct RemoteCallArgument : public io::SerializableT<T> {
 	};
 
 	//! Base call for all remote call response types.
 	template<typename T>
-	struct RemoteCallResponse : public io::SerializableType<T> {
+	struct RemoteCallResponse : public io::SerializableT<T> {
 	};
 
 	//! Base class for all replicated event types.
 	template<typename T>
-	struct ReplicatedEvent : public io::SerializableType<T> {
+	struct ReplicatedEvent : public io::SerializableT<T> {
 	};
 
 	//! Remote call error response.
-	struct Error : public io::SerializableType<Error> {
+	struct Error : public io::SerializableT<Error> {
 		//! Error codes
 		enum {
 			NoError			 = 0		//!< No error recorded.
@@ -263,7 +263,7 @@ namespace net {
 		u16			code;		//!< Recorded error code.
 		String		message;	//!< Error message.
 
-		IoBeginSerializer( Error )
+		IoBeginSerializer
 			IoField( code )
 			IoField( message )
 		IoEndSerializer

@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
     
     template<typename T>
-    class SerializableType;
+    class SerializableT;
 
 	//! Base class for a field serializers.
 	class Serializer : public RefCounted {
@@ -199,7 +199,7 @@ namespace io {
 
 	//! Object serializer type.
 	template <class T>
-	struct SerializerType< T, typename std::enable_if<std::is_base_of<SerializableType<T>, T>::value>::type >
+	struct SerializerType< T, typename std::enable_if<std::is_base_of<SerializableT<T>, T>::value>::type >
 	{
 		typedef ObjectSerializer<T> Type;
 	};

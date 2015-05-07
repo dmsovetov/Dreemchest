@@ -69,7 +69,8 @@ BinarySerializer::Result BinarySerializer::read( ByteBufferPtr& bytes, Serializa
 	}
 
 	// ** Instantiate and read the data
-	result->read( BinaryStorage( bytes ) );
+    BinaryStorage storage( bytes );
+	result->read( &storage );
 	*data = result;
 
 	return Success;
@@ -114,7 +115,7 @@ s32 BinarySerializer::write( ByteBufferPtr& bytes, Serializable* data )
 
 	s32 start = bytes->position();
     BinaryStorage storage( bytes );
-	data->write( storage );
+	data->write( &storage );
 	header.m_size = bytes->position() - start;
 
 	// ** Write size
@@ -131,7 +132,7 @@ ByteBufferPtr BinarySerializer::write( const Serializable& data )
 {
 	ByteBufferPtr stream = ByteBuffer::create();
 	BinaryStorage storage( stream );
-	data.write( storage );
+	data.write( &storage );
 
 	return stream;
 }
