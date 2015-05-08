@@ -62,6 +62,8 @@ namespace io {
     class ISerializable : public RefCounted {
     public:
 
+        virtual         ~ISerializable( void ) {}
+
         //! Reads data from a storage.
         virtual void	read( const Storage& storage ) { DC_BREAK; }
 
