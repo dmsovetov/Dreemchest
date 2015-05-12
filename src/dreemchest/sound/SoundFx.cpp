@@ -50,7 +50,13 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpener* streamOpener ) : m_hal( NULL ), m
 {
     switch( hal ) {
     case None:      m_hal = NULL;           break;
-    case Default:   m_hal = DC_NEW OpenAL;  break;
+    case Default:   
+                    #ifdef HAVE_OPENAL
+                        m_hal = DC_NEW OpenAL;
+                    #else
+                        log::error( "SoundFx::SoundFx : the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
+                    #endif
+                    break;
     }
 }
 
