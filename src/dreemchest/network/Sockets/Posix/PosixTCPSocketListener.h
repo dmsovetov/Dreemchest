@@ -55,7 +55,7 @@ namespace net {
 		TCPSocketPtr					acceptConnection( void );
 
 		//! Setups FD sets used in select call.
-		void							setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener );
+		s32                             setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener );
 
 	private:
 

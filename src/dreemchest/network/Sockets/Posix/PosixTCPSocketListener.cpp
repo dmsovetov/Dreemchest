@@ -59,8 +59,11 @@ PosixTCPSocketListener::PosixTCPSocketListener( TCPSocketListenerDelegate* deleg
 }
 
 // ** PosixTCPSocketListener::setupFDSet
-void PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener ) 
+s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener )
 {
+    // ** Maximum socket descriptor.
+    s32 result = 0;
+    
     FD_ZERO( &read );
     FD_ZERO( &write );
     FD_ZERO( &except );
@@ -68,6 +71,8 @@ void PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& 
     // ** Add the listener socket
 	FD_SET( listener, &read );
 	FD_SET( listener, &except );
+    
+    result = std::max( result, ( s32 )listener );
 
     // ** Add client connections
 	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
@@ -76,7 +81,11 @@ void PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& 
 		FD_SET( socket, &read );
 		FD_SET( socket, &write );
 		FD_SET( socket, &except );
+        
+        result = std::max( result, ( s32 )socket );
 	}
+    
+    return result + 1;
 }
 
 // ** PosixTCPSocketListener::update
@@ -84,11 +93,16 @@ void PosixTCPSocketListener::update( void )
 {
 	// ** Setup FD sets
 	fd_set read, write, except;
-	setupFDSets( read, write, except, m_socket );
+	s32 nfds = setupFDSets( read, write, except, m_socket );
+    
+    // ** Setup the timeout structure.
+    timeval waitTime;
+    waitTime.tv_sec  = 0;
+    waitTime.tv_usec = 0;
 
 	// ** Do a select
-	if( select( 16, &read, &write, &except, NULL ) <= 0 ) {
-		log::error( "PosixTCPSocketListener::update : select failed, %d\n", PosixNetwork::lastError() );
+	if( select( nfds, &read, &write, &except, &waitTime ) <= 0 ) {
+		log::error( "PosixTCPSocketListener::update : select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
 		return;
 	}
 
