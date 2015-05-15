@@ -58,6 +58,16 @@ s32 PosixNetwork::lastError( void )
 	return errno;
 #endif
 }
+    
+// ** PosixNetwork::lastErrorMessage
+String PosixNetwork::lastErrorMessage( void )
+{
+#ifdef DC_PLATFORM_WINDOWS
+    return WSAGetLastError();
+#else
+    return strerror( errno );
+#endif
+}
 
 // ** PosixNetwork::initialize
 void PosixNetwork::initialize( void )
@@ -271,7 +281,7 @@ sockaddr_in PosixNetwork::toSockaddr( const NetworkAddress& address, u16 port )
     addr.sin_addr.s_addr = address ? ( u32 )address : INADDR_ANY;
 	addr.sin_port        = htons( ( u16 )port );
 	addr.sin_family      = AF_INET;
-
+    
     return addr;
 }
 
