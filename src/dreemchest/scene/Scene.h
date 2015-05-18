@@ -29,17 +29,12 @@
 
 #include "../Dreemchest.h"
 
-#ifndef DC_UTILS_INCLUDED
-    #include <utils/Utils.h>
+#ifndef FOO_INCLUDED
+    #include <Foo/Foo.h>
 #endif
 
 #include <renderer/Renderer.h>
 #include <renderer/Hal.h>
-
-#include <math/Vec3.h>
-#include <math/Vec4.h>
-#include <math/Quat.h>
-#include <math/Matrix4.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -71,13 +66,6 @@ namespace scene {
 
 	//! Container type to store a list of objects.
 	typedef List<SceneObjectPtr>	SceneObjects;
-
-	typedef math::Vec2		Vec2;
-	typedef math::Vec3		Vec3;
-	typedef math::Vec4		Vec4;
-	typedef math::Quat		Quat;
-	typedef math::Matrix4	Matrix4;
-	typedef math::Rgba		Rgba;
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {
