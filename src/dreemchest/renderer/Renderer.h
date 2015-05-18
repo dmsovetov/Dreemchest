@@ -29,16 +29,9 @@
 
 #include "../Dreemchest.h"
 
-#ifndef DC_UTILS_INCLUDED
-    #include <utils/Utils.h>
+#ifndef FOO_INCLUDED
+    #include <Foo/Foo.h>
 #endif
-
-#include <math/Color.h>
-#include <math/Vec2.h>
-#include <math/Vec3.h>
-#include <math/Vec4.h>
-#include <math/Quat.h>
-#include <math/Matrix4.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -68,13 +61,6 @@ namespace renderer {
 	typedef StrongPtr<VertexBuffer> VertexBufferPtr;
 	typedef StrongPtr<IndexBuffer>	IndexBufferPtr;
 	typedef StrongPtr<Texture>		TexturePtr;
-
-	//! Aliases for the math types.
-	typedef math::Rgba		Rgba;
-	typedef math::Vec2		Vec2;
-	typedef math::Vec3		Vec3;
-	typedef math::Vec4		Vec4;
-	typedef math::Matrix4	Matrix4;
 
     //! Hardware rendering API.
     enum Renderer {

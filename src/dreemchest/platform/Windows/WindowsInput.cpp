@@ -40,7 +40,7 @@ IInput* createInput( void )
 // ** WindowsInput::keyDown
 bool WindowsInput::keyDown( const Key& key )
 {
-	return GetKeyState( s_virtualKeysWinAPI[key] ) & 0x80;
+	return GetKeyState( s_virtualKeysWinAPI[key] ) & 0x80 ? true : false;
 }
 
 // ** WindowsInput::mouseY

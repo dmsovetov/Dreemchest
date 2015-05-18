@@ -30,7 +30,7 @@
 #include "../Dreemchest.h"
 
 #ifndef DC_UTILS_INCLUDED
-	#include <utils/Utils.h>
+	#include <Foo/Foo.h>
 #endif
 
 DC_BEGIN_DREEMCHEST

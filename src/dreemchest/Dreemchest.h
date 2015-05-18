@@ -46,7 +46,7 @@
 #endif
 
 #ifndef DC_BUILD_LIBRARY
-	#include <utils/Utils.h>
+	#include <Foo/Foo.h>
 
 	#ifdef DC_PLATFORM
 		#include "platform/Platform.h"

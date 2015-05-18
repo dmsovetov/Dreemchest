@@ -63,7 +63,11 @@ s32 PosixNetwork::lastError( void )
 String PosixNetwork::lastErrorMessage( void )
 {
 #ifdef DC_PLATFORM_WINDOWS
-    return WSAGetLastError();
+	LPSTR err = NULL;
+	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0, WSAGetLastError(), 0, (LPSTR)&err, 0, 0 );
+	String msg = err;
+	LocalFree( err );
+	return msg;
 #else
     return strerror( errno );
 #endif

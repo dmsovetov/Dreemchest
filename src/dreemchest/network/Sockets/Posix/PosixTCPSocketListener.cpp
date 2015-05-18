@@ -72,7 +72,7 @@ s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& e
 	FD_SET( listener, &read );
 	FD_SET( listener, &except );
     
-    result = std::max( result, ( s32 )listener );
+    result = max2( result, ( s32 )listener );
 
     // ** Add client connections
 	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
@@ -82,7 +82,7 @@ s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& e
 		FD_SET( socket, &write );
 		FD_SET( socket, &except );
         
-        result = std::max( result, ( s32 )socket );
+        result = max2( result, ( s32 )socket );
 	}
     
     return result + 1;
