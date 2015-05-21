@@ -42,6 +42,8 @@ Input::Input( IInput* impl ) : m_impl( impl )
     DC_BREAK_IF( s_input != NULL );
     if( !m_impl ) log::warn( "Input::Input : input interface is not implemented on current platform\n" );
     s_input = this;
+
+	memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );
 }
 
 Input::~Input( void )
@@ -78,6 +80,25 @@ bool Input::keyDown( const Key& key )
 {
     DC_CHECK_IMPL( false );
     return m_impl->keyDown( key );
+}
+
+// ** Input::keyPressed
+bool Input::keyPressed( const Key& key )
+{
+    DC_CHECK_IMPL( false );
+    
+	if( keyDown( key ) ) {
+		if( !m_isKeyDown[key] ) {
+			m_isKeyDown[key] = true;
+			return true;
+		}
+
+		return false;
+	} else {
+		m_isKeyDown[key] = false;
+	}
+
+	return false;
 }
 
 // ** Input::mouseX

@@ -64,6 +64,9 @@ namespace platform {
 		*/
 		bool                    keyDown( const Key& key );
 
+		//! Returns true once after the key was pressed.
+		bool					keyPressed( const Key& key );
+
 		//! Sets the mouse position.
 		void					setMouse( s32 x, s32 y );
 
@@ -91,6 +94,9 @@ namespace platform {
 
 		//! Platform specific input implementation.
 		IInput*					m_impl;
+
+		//! Key down flags.
+		bool					m_isKeyDown[Key::Total];
 	};
 
 } // namespace platform
