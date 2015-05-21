@@ -98,6 +98,13 @@ u32 Window::height( void ) const
     return 0;
 }
 
+// ** Window::mapCursorToWindow
+void Window::mapCursorToWindow( s32& x, s32& y ) const
+{
+	DC_CHECK_IMPL();
+	m_impl->mapCursorToWindow( x, y );
+}
+
 // ** Window::setDelegate
 void Window::setDelegate( WindowDelegate* delegate )
 {

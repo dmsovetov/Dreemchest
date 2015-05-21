@@ -110,6 +110,15 @@ u32 WindowsWindow::height( void ) const
 	return rect.bottom - rect.top;
 }
 
+// ** WindowsWindow::mapCursorToWindow
+void WindowsWindow::mapCursorToWindow( s32& x, s32& y ) const
+{
+	POINT point = { x, y };
+	ScreenToClient( m_window, &point );
+	x = point.x;
+	y = point.y;
+}
+
 // ** WindowsWindow::setCaption
 void WindowsWindow::setCaption( const String& value )
 {

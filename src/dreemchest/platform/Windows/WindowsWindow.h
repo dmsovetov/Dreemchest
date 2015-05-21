@@ -47,6 +47,7 @@ namespace platform {
 		virtual void		close( void );
         virtual u32         width( void ) const;
         virtual u32         height( void ) const;
+		virtual void		mapCursorToWindow( s32& x, s32& y ) const;
         virtual String      caption( void ) const;
         virtual void        setCaption( const String& value );
         virtual void*       handle( void ) const;

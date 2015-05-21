@@ -48,6 +48,9 @@ namespace platform {
         //! Returns window height.
         virtual u32             height( void ) const        = 0;
 
+		//! Converts the global mouse coordinates to a local ones.
+		virtual void			mapCursorToWindow( s32& x, s32& y ) const = 0;
+
         //! Returns a window caption.
         virtual String          caption( void ) const       = 0;
 
@@ -118,6 +121,10 @@ namespace platform {
 
         //! Returns window height.
         u32                     height( void ) const;
+
+		//! Converts the global mouse coordinates to a local ones.
+		void					mapCursorToWindow( s32& x, s32& y ) const;
+
 
         //! Returns a platform-specific window handle.
         /*!
