@@ -29,8 +29,8 @@
 
 #include "../Dreemchest.h"
 
-#ifndef DC_UTILS_INCLUDED
-    #include <utils/Utils.h>
+#ifndef FOO_INCLUDED
+    #include <Foo/Foo.h>
 #endif
 
 DC_BEGIN_DREEMCHEST
