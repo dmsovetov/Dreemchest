@@ -33,3 +33,5 @@ dependency
 projects
 src/modules
 externals/src
+*.suo
+*.pyc
