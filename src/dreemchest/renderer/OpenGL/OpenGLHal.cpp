@@ -341,7 +341,7 @@ void OpenGLHal::disableVertexDeclaration( const VertexDeclaration* vertexDeclara
 
     for( u32 i = 0; i < VertexDeclaration::VertexTex4 - VertexDeclaration::VertexTex0; i++ ) {
         if( vertexDeclaration->uv( i ) ) {
-            glClientActiveTexture( GL_TEXTURE0 );
+            glClientActiveTexture( GL_TEXTURE0 + i );
             glDisableClientState( GL_TEXTURE_COORD_ARRAY );
         }
     }

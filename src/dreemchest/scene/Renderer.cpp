@@ -47,7 +47,6 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 			void main()
 			{
 				v_color		= gl_Normal * 0.5 + 0.5;
-			//	gl_Position = vec4( gl_MultiTexCoord0.xy, 0.0, 1.0 );
 				gl_Position = u_mvp * gl_Vertex;
 			} ),
 		GLSL(
@@ -76,6 +75,7 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 			uniform sampler2D u_diffuse;
 			uniform sampler2D u_lightmap;
 			uniform vec4	  u_diffuseColor;
+			uniform vec4	  u_ambientColor;
 
 			varying vec2	  v_tex0;
 			varying vec2	  v_tex1;
@@ -84,7 +84,7 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 			{
                 vec4 light   = texture2D( u_lightmap, v_tex1 );
 				vec4 diffuse = texture2D( u_diffuse, v_tex0 ) * u_diffuseColor;
-				gl_FragColor = diffuse * (light * 1.0) + diffuse * vec4( 0.5254902, 0.80392157, 0.91764706, 1.0 );
+				gl_FragColor = diffuse * (light * 1.0) + diffuse * u_ambientColor;
 			} ) );
 
 	// ** Create the colored & textured shader
@@ -219,7 +219,7 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
 			}
 		}
     }
-
+	
     {
 		for( SceneObjects::const_iterator i = objects[Material::Solid].begin(), end = objects[Material::Solid].end(); i != end; ++i ) {
 			render( view, proj, m_shaders[Material::Solid], *i );
@@ -247,6 +247,11 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
     }
 
 	m_hal->setShader( NULL );
+	m_hal->setVertexBuffer( NULL );
+
+	for( s32 i = 0; i < 8; i++ ) {
+		m_hal->setTexture( i, NULL );
+	}
 }
 
 } // namespace scene
