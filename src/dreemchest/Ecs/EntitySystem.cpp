@@ -38,15 +38,32 @@ EntitySystem::EntitySystem( Entities& entities, const String& name, const Aspect
 	m_family = Family::create( entities, name, aspect );
 }
 
+// ** EntitySystem::begin
+bool EntitySystem::begin( u32 currentTime )
+{
+	return true;
+}
+
+// ** EntitySystem::end
+void EntitySystem::end( void )
+{
+}
+
 // ** EntitySystem::update
 void EntitySystem::update( u32 currentTime, f32 dt )
 {
+	if( !begin( currentTime ) ) {
+		return;
+	}
+
 	const EntitySet& entities = m_family->entities();
 
 	for( EntitySet::const_iterator i = entities.begin(); i != entities.end(); ) {
 		EntityPtr entity = *(i++);
 		process( currentTime, dt, entity );
 	}
+
+	end();
 }
 
 } // namespace ecs

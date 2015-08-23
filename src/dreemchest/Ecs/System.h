@@ -99,35 +99,35 @@ namespace ecs {
 	template<typename T>
 	inline void Systems::add( void )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_world, m_entities ) );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities ) );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes1>
 	inline void Systems::add( TemplateFunctionArgs1 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_world, m_entities, arg0 ) );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0 ) );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes2>
 	inline void Systems::add( TemplateFunctionArgs2 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_world, m_entities, arg0, arg1 ) );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1 ) );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes3>
 	inline void Systems::add( TemplateFunctionArgs3 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_world, m_entities, arg0, arg1, arg2 ) );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1, arg2 ) );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes4>
 	inline void Systems::add( TemplateFunctionArgs4 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_world, m_entities, arg0, arg1, arg2, arg3 ) );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1, arg2, arg3 ) );
 	}
 
 	// ** Systems::remove

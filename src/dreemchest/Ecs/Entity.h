@@ -33,6 +33,9 @@
 
 DC_BEGIN_DREEMCHEST
 
+#define OverrideEntity( Type, Super )		\
+    ClassEnableTypeInfoSuper( Type, Super )	\
+
 namespace ecs {
 
 	//! Entity handle contains an entity id & parent world.
@@ -44,6 +47,8 @@ namespace ecs {
 	*/
 	class Entity : public RefCounted {
 	public:
+
+								ClassEnableTypeInfo( Entity )
 
 		virtual					~Entity( void );
 
@@ -100,7 +105,7 @@ namespace ecs {
 		//! Returns a total number of active handles.
 		static u32				activeCount( void );
 
-	private:
+	protected:
 
 								//! Constructs Entity instance.
 								Entity( Entities& entities, const EntityId& id = EntityId() );

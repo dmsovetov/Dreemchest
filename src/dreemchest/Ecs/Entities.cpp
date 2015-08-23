@@ -79,9 +79,24 @@ ComponentSet Entities::entityComponents( const EntityId& id ) const
 EntityPtr Entities::registerEntity( const EntityId& id )
 {
 	EntityPtr entity = Entity::create( *this, id );
+
+	if( addEntity( entity ) ) {
+		return entity;
+	}
+
+	return EntityPtr();
+}
+
+// ** Entities::addEntity
+bool Entities::addEntity( const EntityPtr& entity )
+{
+	if( findEntity( entity->id() ) != EntityPtr() ) {
+		return false;
+	}
+
 	m_entities[entity] = ComponentsByType();
 
-	return entity;
+	return true;
 }
 
 // ** Entities::addComponent

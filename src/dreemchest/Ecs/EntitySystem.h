@@ -45,6 +45,12 @@ namespace ecs {
 		//! System logic is done here.
 		virtual void	update( u32 currentTime, f32 dt );
 
+		//! Called every update tick before processing entities.
+		virtual bool	begin( u32 currentTime );
+
+		//! Called every update tick after all entities are processed.
+		virtual void	end( void );
+
 	protected:
 
 		//! Processes a single entity.
@@ -79,6 +85,32 @@ namespace ecs {
 
 		//! Strong typed process method.
 		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent& component )
+		{
+			DC_BREAK
+		}
+	};
+
+	//! A template class to process entities that contain all components from a specified set.
+	template<typename TComponent1, typename TComponent2>
+	class EntityWithComponentsSystem2 : public EntitySystem {
+	public:
+
+						//! Constructs EntityWithComponentsSystem2 instance.
+						EntityWithComponentsSystem2( Entities& entities, const String& name )
+							: EntitySystem( entities, name, Aspect::all<TComponent1, TComponent2>() ) {}
+
+	protected:
+
+		//! Extracts a specified components from entity and runs a processing callback.
+		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity )
+		{
+			TComponent1* c1 = entity->get<TComponent1>();
+			TComponent2* c2 = entity->get<TComponent2>();
+			process( currentTime, dt, entity, *c1, *c2 );
+		}
+
+		//! Strong typed process method.
+		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent1& component1, TComponent2& component2 )
 		{
 			DC_BREAK
 		}

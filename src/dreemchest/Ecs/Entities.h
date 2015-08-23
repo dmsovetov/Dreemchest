@@ -45,6 +45,9 @@ namespace ecs {
 		//! Registeres an Entity instance with a given id.
 		EntityPtr		registerEntity( const EntityId& id );
 
+		//! Adds a new Entity instance.
+		bool			addEntity( const EntityPtr& entity );
+
 		//! Returns a handle for specified entity, if entity does not exist - creates it.
 		EntityPtr		requestEntity( const EntityId& id );
 
