@@ -24,58 +24,31 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Mesh_H__
-#define __DC_Scene_Mesh_H__
+#ifndef __DC_Scene_Systems_Transofrm_H__
+#define __DC_Scene_Systems_Transofrm_H__
 
-#include "Scene.h"
+#include "SceneSystem.h"
+
+#include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Mesh data container.
-	class Mesh : public RefCounted {
+	//! The Rotator2D system
+	class Rotator2DSystem : public SceneSystem2<Rotator2D, Transform2D> {
 	public:
 
-		//! Mesh submesh type.
-		struct Chunk {
-			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
+							//! Constructs a Renderer instance.
+							Rotator2DSystem( ecs::Entities& entities )
+								: SceneSystem2( entities, "Rotator2D" ) {}
 
-			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
-		};
-
-		//! Adds a new mesh chunk.
-		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
-
-		//! Returns the total number of chunks.
-		u32						chunkCount( void ) const;
-
-		//! Returns a chunk by index.
-		const Chunk&			chunk( u32 index ) const;
-
-		//! Creates a new Mesh instance.
-		static MeshPtr			create( void );
-
-		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( renderer::Hal* hal, f32 width, f32 height );
-
-	private:
-
-								//! Constructs Mesh instance.
-								Mesh( void );
-
-	private:
-
-		//! Container type to store mesh chunks.
-		typedef Array<Chunk>	Chunks;
-
-		Chunks					m_chunks; //!< Mesh chunks.
+		//! Renders a single entity with a rotator
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform );
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene_Systems_Transofrm_H__    */

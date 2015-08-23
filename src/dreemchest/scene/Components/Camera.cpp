@@ -24,88 +24,72 @@
 
  **************************************************************************/
 
-#include "Component.h"
-#include "Material.h"
+#include "Camera.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ----------------------------------------- Transform ----------------------------------------- //
+// ------------------------------------------ BasicCamera ----------------------------------------- //
 
-// ** Transform::parent
-const TransformWPtr& Transform::parent( void ) const
+// ** BasicCamera::viewProj
+Matrix4 BasicCamera::viewProj( void ) const
 {
-	return m_parent;
+	return view() * proj();
 }
 
-// ** Transform::setParent
-void Transform::setParent( const TransformWPtr& value )
+// ** BasicCamera::view
+Matrix4 BasicCamera::view( void ) const
 {
-	m_parent = value;
+	return Matrix4();
 }
 
-// ** Transform::affine
-Matrix4 Transform::affine( void ) const
+// ** BasicCamera::proj
+Matrix4 BasicCamera::proj( void ) const
 {
-	if( const Transform* parent = m_parent.get() ) {
-		return parent->affine() * Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
-	}
-
-	return Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
+	return Matrix4();
 }
 
-// ---------------------------------------- MeshRenderer ---------------------------------------- //
+// ------------------------------------------- Camera2D ------------------------------------------- //
 
-// ** MeshRenderer::mesh
-const MeshPtr& MeshRenderer::mesh( void ) const
+// ** Camera2D::width
+u32 Camera2D::width( void ) const
 {
-	return m_mesh;
+	return m_width;
 }
 
-// ** MeshRenderer::setMesh
-void MeshRenderer::setMesh( const MeshPtr& value )
+// ** Camera2D::setWidth
+void Camera2D::setWidth( u32 value )
 {
-	m_mesh = value;
+	m_width = value;
 }
 
-// ** MeshRenderer::materialCount
-u32 MeshRenderer::materialCount( void ) const
+// ** Camera2D::height
+u32 Camera2D::height( void ) const
 {
-	return ( u32 )m_materials.size();
+	return m_height;
 }
 
-// ** MeshRenderer::material
-MaterialPtr MeshRenderer::material( u32 index ) const
+// ** Camera2D::setHeight
+void Camera2D::setHeight( u32 value )
 {
-	return index < materialCount() ? m_materials[index] : MaterialPtr();
+	m_height = value;
 }
 
-// ** MeshRenderer::setMaterial
-void MeshRenderer::setMaterial( u32 index, const MaterialPtr& value )
+// ** Camera2D::view
+Matrix4 Camera2D::view( void ) const
 {
-	DC_BREAK_IF( index > 8 );
-
-	if( index >= materialCount() ) {
-		m_materials.resize( index + 1 );
-	}
-
-	m_materials[index] = value;
+	return Matrix4::translation( m_pan.x, m_pan.y, 0 ) * Matrix4::scale( m_zoom, m_zoom, 1.0f );
 }
 
-// ** MeshRenderer::lightmap
-const renderer::TexturePtr& MeshRenderer::lightmap( void ) const
+// ** Camera2D::proj
+Matrix4 Camera2D::proj( void ) const
 {
-	return m_lightmap;
+	DC_BREAK_IF( m_width == 0 || m_height == 0 )
+	return Matrix4::ortho( 0, ( f32 )m_width, 0, ( f32 )m_height, -1, 100000 );
 }
 
-// ** MeshRenderer::setLightmap
-void MeshRenderer::setLightmap( const renderer::TexturePtr& value )
-{
-	m_lightmap = value;
-}
-
-// ---------------------------------------- Camera ---------------------------------------- //
+// -------------------------------------------- Camera -------------------------------------------- //
 
 // ** Camera::move
 void Camera::move( f32 amount )
@@ -136,12 +120,6 @@ void Camera::yaw( f32 amount )
 	m_right.normalize();
 }
 
-// ** Camera::viewProj
-Matrix4 Camera::viewProj( f32 aspect ) const
-{
-	return view() * proj( aspect );
-}
-
 // ** Camera::view
 Matrix4 Camera::view( void ) const
 {
@@ -149,9 +127,9 @@ Matrix4 Camera::view( void ) const
 }
 
 // ** Camera::proj
-Matrix4 Camera::proj( f32 aspect ) const
+Matrix4 Camera::proj( void ) const
 {
-	return Matrix4::perspective( m_fov, aspect, m_near, m_far );
+	return Matrix4::perspective( m_fov, m_aspect, m_near, m_far );
 }
 
 } // namespace scene

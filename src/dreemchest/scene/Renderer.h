@@ -27,6 +27,8 @@
 #ifndef __DC_Scene_Renderer_H__
 #define __DC_Scene_Renderer_H__
 
+#if 0
+
 #include "Scene.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -64,5 +66,7 @@ namespace scene {
 } // namespace scene
 
 DC_END_DREEMCHEST
+
+#endif
 
 #endif    /*    !__DC_Scene_Mesh_H__    */

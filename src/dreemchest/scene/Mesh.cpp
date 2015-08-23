@@ -66,6 +66,43 @@ MeshPtr Mesh::create( void )
 	return MeshPtr( DC_NEW Mesh );
 }
 
+// ** Mesh::createRectangular
+MeshPtr Mesh::createRectangular( renderer::Hal* hal, f32 width, f32 height )
+{
+	MeshPtr mesh = create();
+
+	//! Rectangular mesh vertex
+	struct Vertex {
+		f32 position[3];
+		f32 texCoord[2];
+	} vertices[4] = {
+		{ -width * 0.5f, -height * 0.5f, 0.0f,		0.0f, 0.0f },
+		{  width * 0.5f, -height * 0.5f, 0.0f,		1.0f, 0.0f },
+		{  width * 0.5f,  height * 0.5f, 0.0f,		1.0f, 1.0f },
+		{ -width * 0.5f,  height * 0.5f, 0.0f,		0.0f, 1.0f },
+	};
+
+	//! Mesh indices
+	u16 indices[6] = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	renderer::VertexDeclaration* vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
+	
+	renderer::VertexBufferPtr vb = hal->createVertexBuffer( vertexDeclaration, 4, false );
+	memcpy( vb->lock(), vertices, sizeof( Vertex ) * 4 );
+	vb->unlock();
+
+	renderer::IndexBufferPtr ib = hal->createIndexBuffer( 6, false );
+	memcpy( ib->lock(), indices, sizeof( u16 ) * 6 );
+	ib->unlock();
+
+	mesh->addChunk( vb, ib );
+
+	return mesh;
+}
+
 } // namespace scene
 
 DC_END_DREEMCHEST

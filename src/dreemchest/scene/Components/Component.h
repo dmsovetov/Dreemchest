@@ -24,58 +24,32 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Mesh_H__
-#define __DC_Scene_Mesh_H__
+#ifndef __DC_Scene_Component_H__
+#define __DC_Scene_Component_H__
 
-#include "Scene.h"
+#include "../SceneObject.h"
+#include "../Mesh.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Mesh data container.
-	class Mesh : public RefCounted {
+	//! A base class for all components.
+	class SceneComponent : public ecs::Component {
 	public:
 
-		//! Mesh submesh type.
-		struct Chunk {
-			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
+								OverrideComponent( SceneComponent, Component )
 
-			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
-		};
+		virtual					~SceneComponent( void ) {}
 
-		//! Adds a new mesh chunk.
-		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
+	protected:
 
-		//! Returns the total number of chunks.
-		u32						chunkCount( void ) const;
-
-		//! Returns a chunk by index.
-		const Chunk&			chunk( u32 index ) const;
-
-		//! Creates a new Mesh instance.
-		static MeshPtr			create( void );
-
-		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( renderer::Hal* hal, f32 width, f32 height );
-
-	private:
-
-								//! Constructs Mesh instance.
-								Mesh( void );
-
-	private:
-
-		//! Container type to store mesh chunks.
-		typedef Array<Chunk>	Chunks;
-
-		Chunks					m_chunks; //!< Mesh chunks.
+								//! Constructs SceneComponent instance.
+								SceneComponent( void ) {}
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene_Component_H__    */

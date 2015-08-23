@@ -24,58 +24,57 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Mesh_H__
-#define __DC_Scene_Mesh_H__
+#ifndef __DC_Scene_Renderer_H__
+#define __DC_Scene_Renderer_H__
 
-#include "Scene.h"
+#include "SceneSystem.h"
+
+#include "../Components/Rendering.h"
+#include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Mesh data container.
-	class Mesh : public RefCounted {
+	//! The scene rendering system
+	class Renderer : public SceneSystem2<MeshRenderer, Transform2D> {
 	public:
 
-		//! Mesh submesh type.
-		struct Chunk {
-			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
+							//! Constructs a Renderer instance.
+							Renderer( ecs::Entities& entities, renderer::Hal* hal );
 
-			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
+		//! Renders a single entity with a mesh
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform );
+
+		//! Called every frame before any entites are rendered.
+		virtual bool		begin( u32 currentTime );
+
+		//! Called every frame after all entities has been rendered.
+		virtual void		end( void );
+
+		//! Sets the view/projection matrices used for rendering
+		void				setViewProjection( const Matrix4& viewProjection );
+
+	protected:
+
+		//! Available shader types.
+		enum ShaderType {
+			  ShaderSolid = 0
+			, TotalShaderTypes
 		};
 
-		//! Adds a new mesh chunk.
-		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
+		//! Renderer HAL.
+		renderer::Hal*		m_hal;
 
-		//! Returns the total number of chunks.
-		u32						chunkCount( void ) const;
+		//! Loaded shaders.
+		renderer::Shader*	m_shaders[TotalShaderTypes];
 
-		//! Returns a chunk by index.
-		const Chunk&			chunk( u32 index ) const;
-
-		//! Creates a new Mesh instance.
-		static MeshPtr			create( void );
-
-		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( renderer::Hal* hal, f32 width, f32 height );
-
-	private:
-
-								//! Constructs Mesh instance.
-								Mesh( void );
-
-	private:
-
-		//! Container type to store mesh chunks.
-		typedef Array<Chunk>	Chunks;
-
-		Chunks					m_chunks; //!< Mesh chunks.
+		//! The view-projection matrix.
+		Matrix4				m_viewProjection;
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene_Renderer_H__    */

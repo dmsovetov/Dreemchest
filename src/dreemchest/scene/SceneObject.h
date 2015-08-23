@@ -34,131 +34,147 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! Scene object class is a component holder.
-	class SceneObject : public RefCounted {
+	class SceneObject : public ecs::Entity {
 	EmbedUserData
+	friend class Scene;
 	public:
 
-		virtual								~SceneObject( void );
+								OverrideEntity( SceneObject, Entity )
+
+		//virtual								~SceneObject( void );
 
 		//! Attaches a new component to a scene object.
-		template<typename T>							StrongPtr<T> attach( void );
-		template<typename T, TemplateFunctionTypes1>	StrongPtr<T> attach( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2>	StrongPtr<T> attach( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3>	StrongPtr<T> attach( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4>	StrongPtr<T> attach( TemplateFunctionArgs4 );
+		//template<typename T>							StrongPtr<T> attach( void );
+		//template<typename T, TemplateFunctionTypes1>	StrongPtr<T> attach( TemplateFunctionArgs1 );
+		//template<typename T, TemplateFunctionTypes2>	StrongPtr<T> attach( TemplateFunctionArgs2 );
+		//template<typename T, TemplateFunctionTypes3>	StrongPtr<T> attach( TemplateFunctionArgs3 );
+		//template<typename T, TemplateFunctionTypes4>	StrongPtr<T> attach( TemplateFunctionArgs4 );
 
 		//! Returns a component of specified type that is attached to this scene object.
-		template<typename T> StrongPtr<T>	get( void ) const;
+		//template<typename T> StrongPtr<T>	get( void ) const;
 
 		//! Removes a component of specified type from a scene object.
-		template<typename T> void			detach( void );
+		//template<typename T> void			detach( void );
 
 		//! Returns true if a scene object has a component of specified type.
-		template<typename T> bool			has( void ) const;
+		//template<typename T> bool			has( void ) const;
 
 		//! Creates a new scene object instance.
-		static SceneObjectPtr				create( void );
+		//static SceneObjectPtr				create( void );
+
+		//! Returns the parent scene
+		const SceneWPtr&					scene( void ) const;
 
 	private:
 
 											//! Constructs a SceneObject instance.
-											SceneObject( void );
+											SceneObject( Scene* scene, ecs::Entities& entities, const ecs::EntityId& id = ecs::EntityId() );
 
 		//! Sets a scene object component.
-		template<typename T> StrongPtr<T>	set( T* value );
+		//template<typename T> StrongPtr<T>	set( T* value );
 
 	private:
 
+		//! Parent scene
+		SceneWPtr				m_scene;
+
 		//! Container type to store scene object components.
-		typedef Map<TypeIdx, ComponentPtr> Components;
+		//typedef Map<TypeIdx, ComponentPtr> Components;
 
 		//! Scene object components.
-		Components			m_components;
+		//Components			m_components;
 	};
 
 	// ** SceneObject::SceneObject
-	inline SceneObject::SceneObject( void )
+	inline SceneObject::SceneObject( Scene* scene, ecs::Entities& entities, const ecs::EntityId& id ) : Entity( entities, id ), m_scene( scene )
 	{
 	}
 
-	inline SceneObject::~SceneObject( void )
+	// ** SceneObject::scene
+	inline const SceneWPtr& SceneObject::scene( void ) const
 	{
+		return m_scene;
 	}
+
+	//inline SceneObject::~SceneObject( void )
+	//{
+	//}
 
 	// ** SceneObject::create
-	inline SceneObjectPtr SceneObject::create( void )
-	{
-		return SceneObjectPtr( DC_NEW SceneObject );
-	}
+	//inline SceneObjectPtr SceneObject::create( void )
+	//{
+	//	return SceneObjectPtr();
+	////	return SceneObjectPtr( DC_NEW SceneObject );
+	//}
 
 	// ** SceneObject::set
-	template<typename T>
-	StrongPtr<T> SceneObject::set( T* value )
-	{
-		StrongPtr<T> component = StrongPtr<T>( value );
-		m_components[TypeIndex<T>::idx()] = component;
-		return component;
-	}
+	//template<typename T>
+	//StrongPtr<T> SceneObject::set( T* value )
+	//{
+	//	StrongPtr<T> component = StrongPtr<T>( value );
+	//	m_components[TypeIndex<T>::idx()] = component;
+	//	return component;
+	//}
 
-	// ** SceneObject::get
-	template<typename T>
-	StrongPtr<T> SceneObject::get( void ) const
-	{
-		Components::const_iterator i = m_components.find( TypeIndex<T>::idx() );
-		return i != m_components.end() ? i->second : StrongPtr<T>();
-	}
+	//// ** SceneObject::get
+	//template<typename T>
+	//StrongPtr<T> SceneObject::get( void ) const
+	//{
+	//	Components::const_iterator i = m_components.find( TypeIndex<T>::idx() );
+	//	return i != m_components.end() ? i->second : StrongPtr<T>();
+	//}
 
-	// ** SceneObject::has
-	template<typename T>
-	bool SceneObject::has( void ) const
-	{
-		return m_components.find( TypeIndex<T>::idx() ) != m_components.end();
-	}
+	//// ** SceneObject::has
+	//template<typename T>
+	//bool SceneObject::has( void ) const
+	//{
+	//	return m_components.find( TypeIndex<T>::idx() ) != m_components.end();
+	//}
 
-	// ** SceneObject::detach
-	template<typename T>
-	void SceneObject::detach( void )
-	{
-		Components::iterator i = m_components.find( TypeIndex<T>::idx() );
-		if( i != m_components.end() ) {
-			m_components.erase( i );
-		}
-	}
+	//// ** SceneObject::detach
+	//template<typename T>
+	//void SceneObject::detach( void )
+	//{
+	//	Components::iterator i = m_components.find( TypeIndex<T>::idx() );
+	//	if( i != m_components.end() ) {
+	//		m_components.erase( i );
+	//	}
+	//}
 
-	// ** SceneObject::attach
-	template<typename T>
-	StrongPtr<T> SceneObject::attach( void )
-	{
-		return set( DC_NEW T( this ) );
-	}
+	//// ** SceneObject::attach
+	//template<typename T>
+	//StrongPtr<T> SceneObject::attach( void )
+	//{
+	//	return set( DC_NEW T( this ) );
+	//}
 
-	// ** SceneObject::attach
-	template<typename T, TemplateFunctionTypes1>
-	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs1 )
-	{
-		return set( DC_NEW T( this, arg0 ) );
-	}
+	//// ** SceneObject::attach
+	//template<typename T, TemplateFunctionTypes1>
+	//StrongPtr<T> SceneObject::attach( TemplateFunctionArgs1 )
+	//{
+	//	return set( DC_NEW T( this, arg0 ) );
+	//}
 
-	// ** SceneObject::attach
-	template<typename T, TemplateFunctionTypes2>
-	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs2 )
-	{
-		return set( DC_NEW T( this, arg0, arg1 ) );
-	}
+	//// ** SceneObject::attach
+	//template<typename T, TemplateFunctionTypes2>
+	//StrongPtr<T> SceneObject::attach( TemplateFunctionArgs2 )
+	//{
+	//	return set( DC_NEW T( this, arg0, arg1 ) );
+	//}
 
-	// ** SceneObject::attach
-	template<typename T, TemplateFunctionTypes3>
-	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs3 )
-	{
-		return set( DC_NEW T( this, arg0, arg1, arg2 ) );
-	}
+	//// ** SceneObject::attach
+	//template<typename T, TemplateFunctionTypes3>
+	//StrongPtr<T> SceneObject::attach( TemplateFunctionArgs3 )
+	//{
+	//	return set( DC_NEW T( this, arg0, arg1, arg2 ) );
+	//}
 
-	// ** SceneObject::attach
-	template<typename T, TemplateFunctionTypes4>
-	StrongPtr<T> SceneObject::attach( TemplateFunctionArgs4 )
-	{
-		return set( DC_NEW T( this, arg0, arg1, arg2, arg3 ) );
-	}
+	//// ** SceneObject::attach
+	//template<typename T, TemplateFunctionTypes4>
+	//StrongPtr<T> SceneObject::attach( TemplateFunctionArgs4 )
+	//{
+	//	return set( DC_NEW T( this, arg0, arg1, arg2, arg3 ) );
+	//}
 
 } // namespace scene
 

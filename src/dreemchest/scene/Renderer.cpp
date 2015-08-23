@@ -24,6 +24,8 @@
 
  **************************************************************************/
 
+#if 0
+
 #include "Renderer.h"
 #include "SceneObject.h"
 #include "Component.h"
@@ -257,3 +259,5 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
 } // namespace scene
 
 DC_END_DREEMCHEST
+
+#endif

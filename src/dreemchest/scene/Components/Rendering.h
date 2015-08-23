@@ -24,58 +24,55 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Mesh_H__
-#define __DC_Scene_Mesh_H__
+#ifndef __DC_Scene_Component_Rendering_H__
+#define __DC_Scene_Component_Rendering_H__
 
-#include "Scene.h"
+#include "Component.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Mesh data container.
-	class Mesh : public RefCounted {
+	//! Mesh renderer component.
+	class MeshRenderer : public SceneComponent {
 	public:
 
-		//! Mesh submesh type.
-		struct Chunk {
-			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
+									OverrideComponent( MeshRenderer, SceneComponent )
 
-			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
-		};
+									//! Constructs MeshRenderer instance.
+									MeshRenderer( /*SceneObject* sceneObject = NULL,*/ const MeshPtr& mesh = MeshPtr() )
+										: /*SceneComponent( sceneObject ),*/ m_mesh( mesh ) {}
 
-		//! Adds a new mesh chunk.
-		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
+		//! Returns mesh to be rendered.
+		const MeshPtr&				mesh( void ) const;
 
-		//! Returns the total number of chunks.
-		u32						chunkCount( void ) const;
+		//! Sets a mesh to be rendered.
+		void						setMesh( const MeshPtr& value );
 
-		//! Returns a chunk by index.
-		const Chunk&			chunk( u32 index ) const;
+		//! Returns the total number of materials.
+		u32							materialCount( void ) const;
 
-		//! Creates a new Mesh instance.
-		static MeshPtr			create( void );
+		//! Returns the material by index.
+		MaterialPtr					material( u32 index ) const;
 
-		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( renderer::Hal* hal, f32 width, f32 height );
+		//! Sets the material by index.
+		void						setMaterial( u32 index, const MaterialPtr& value );
 
-	private:
+		//! Returns a lightmap texture.
+		const renderer::TexturePtr&	lightmap( void ) const;
 
-								//! Constructs Mesh instance.
-								Mesh( void );
+		//! Sets a lightmap texture.
+		void						setLightmap( const renderer::TexturePtr& value );
 
 	private:
 
-		//! Container type to store mesh chunks.
-		typedef Array<Chunk>	Chunks;
-
-		Chunks					m_chunks; //!< Mesh chunks.
+		MeshPtr						m_mesh;			//!< Mesh to be rendered.
+		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
+		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene_Component_Rendering_H__    */

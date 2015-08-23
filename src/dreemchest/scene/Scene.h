@@ -36,6 +36,10 @@
 #include <renderer/Renderer.h>
 #include <renderer/Hal.h>
 
+#include <Ecs/Entity.h>
+#include <Ecs/Component.h>
+#include <Ecs/EntitySystem.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
@@ -47,18 +51,29 @@ namespace scene {
 	class Material;
 	class SceneObject;
 	class Component;
-		class Transform;
+		class BasicTransform;
+			class Transform;
 		class MeshRenderer;
-		class Camera;
+		class BasicCamera;
+			class Camera2D;
+			class Camera;
+		class Rotator2D;
+
+	class Renderer;
 
 	typedef StrongPtr<class Scene>		ScenePtr;
+	typedef WeakPtr<class Scene>		SceneWPtr;
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
 	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
 	typedef StrongPtr<Component>		ComponentPtr;
 	typedef StrongPtr<Transform>		TransformPtr;
 	typedef WeakPtr<Transform>			TransformWPtr;
+	typedef StrongPtr<BasicTransform>	BasicTransformPtr;
+	typedef WeakPtr<BasicTransform>		BasicTransformWPtr;
 	typedef StrongPtr<Camera>			CameraPtr;
 	typedef WeakPtr<Camera>				CameraWPtr;
+	typedef StrongPtr<Camera2D>			Camera2DPtr;
+	typedef WeakPtr<Camera2D>			Camera2DWPtr;
 	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
 	typedef StrongPtr<Material>			MaterialPtr;
@@ -67,27 +82,26 @@ namespace scene {
 	//! Container type to store a list of objects.
 	typedef List<SceneObjectPtr>	SceneObjects;
 
+	//! Available scene renderers.
+	enum RendererType {
+		RendererDefault = 0,	//!< Default scene renderer.
+	};
+
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {
 	public:
-
-		//! Adds a new scene object to scene.
-		void							add( const SceneObjectPtr& sceneObject );
 
 		//! Performs a scene update.
 		void							update( f32 dt );
 
 		//! Renders a scene.
-		void							render( f32 aspect );
+		void							render( const BasicCamera* camera );
 
 		//! Sets a scene renderer.
-		void							setRenderer( const RendererPtr& value );
+		void							setRenderer( renderer::Hal* hal, RendererType renderer );
 
-        //! Returns active camera.
-        const CameraPtr&                camera( void ) const;
-
-		//! Returns a scene object list.
-		const SceneObjects&				sceneObjects( void ) const;
+		//! Creates a new scene object instance.
+		SceneObjectPtr					createSceneObject( void );
 
 		//! Creates a new scene.
 		static ScenePtr					create( void );
@@ -99,14 +113,17 @@ namespace scene {
 
 	private:
 
-		//! Scene object list.
-		SceneObjects					m_sceneObjects;
+		//! Scene entities container.
+		ecs::Entities					m_entities;
 
-		//! Main scene camera.
-		CameraPtr						m_camera;
+		//! Built-in scene entity systems.
+		ecs::Systems					m_systems;
 
-		//! Default scene renderer.
-		RendererPtr						m_renderer;
+		//! Next scene object id.
+		ecs::EntityId					m_nextEntityId;
+
+		//! Scene renderer.
+		RendererPtr						m_renderer;						
 	};
 
 } // namespace scene
@@ -115,9 +132,10 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
 	#include "SceneObject.h"
-	#include "Component.h"
+	#include "Components/Rendering.h"
+	#include "Components/Camera.h"
+	#include "Components/Transform.h"
 	#include "Mesh.h"
-	#include "Renderer.h"
 	#include "Material.h"
 #endif
 
