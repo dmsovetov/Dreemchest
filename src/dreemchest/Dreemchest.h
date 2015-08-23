@@ -37,10 +37,12 @@
 
 #ifdef DC_NAMESPACE
     #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
+	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
     #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
     #define DC_END_DREEMCHEST    }
 #else
     #define DC_USE_DREEMCHEST
+	#define DC_DREEMCHEST_NS
     #define DC_BEGIN_DREEMCHEST
     #define DC_END_DREEMCHEST
 #endif

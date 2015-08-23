@@ -214,7 +214,7 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
 		for( SceneObjects::const_iterator i = objects[Material::Unknown].begin(), end = objects[Material::Unknown].end(); i != end; ++i ) {
 			const MeshPtr& mesh = (*i)->get<MeshRenderer>()->mesh();
 
-			for( int j = 0; j < mesh->chunkCount(); j++ ) {
+			for( u32 j = 0; j < mesh->chunkCount(); j++ ) {
 				render( mesh->chunk( j ) );
 			}
 		}

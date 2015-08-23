@@ -104,9 +104,9 @@ namespace platform {
 
 DC_END_DREEMCHEST
 
-#define dcDeclareApplication( delegate )                                        \
-    int main( int argc, char** argv ) {                                         \
-        return platform::Application::create()->launch( delegate );             \
+#define dcDeclareApplication( delegate )												\
+    int main( int argc, char** argv ) {													\
+        return DC_DREEMCHEST_NS platform::Application::create()->launch( delegate );	\
     }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */
