@@ -122,6 +122,9 @@ namespace platform {
         //! Returns window height.
         u32                     height( void ) const;
 
+		//! Returns an aspect ratio of a window.
+		f32						aspectRatio( void ) const;
+
 		//! Converts the global mouse coordinates to a local ones.
 		void					mapCursorToWindow( s32& x, s32& y ) const;
 

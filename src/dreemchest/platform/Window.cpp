@@ -98,6 +98,12 @@ u32 Window::height( void ) const
     return 0;
 }
 
+// ** Window::aspectRatio
+f32 Window::aspectRatio( void ) const
+{
+	return f32( width() ) / height();
+}
+
 // ** Window::mapCursorToWindow
 void Window::mapCursorToWindow( s32& x, s32& y ) const
 {
