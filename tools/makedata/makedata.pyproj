@@ -26,6 +26,12 @@
     <Compile Include="actions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cache.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="signature.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tasks.py">
       <SubType>Code</SubType>
     </Compile>
