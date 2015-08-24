@@ -56,19 +56,19 @@ namespace io {
         /*!
          Path to a base directory is prepended to each file path that is tried to be opened by file system.
          */
-		void					setBaseDir( const Path& path );
+		//void					setBaseDir( const Path& path );
 
         //! Returns a base directory path.
-		const Path&             baseDir( void ) const;
+		//const Path&             baseDir( void ) const;
 
         //! Registers a file search path.
         /*!
          \param path Directory path.
          */
-		void					addPath( const Path& path );
+		//void					addPath( const Path& path );
 
         //! Removes a file search path.
-		void					removePath( const Path& path );
+		//void					removePath( const Path& path );
 
         //! Opens an archive file.
         /*!
