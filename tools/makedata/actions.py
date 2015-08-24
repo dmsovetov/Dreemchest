@@ -24,30 +24,49 @@
 #
 #################################################################################
 
-import shutil, os
+import shutil, os, struct
+from PIL import Image
 
 # action
 class action:
     # ctor
-    def __init__(self, source, dest):
-        self.source, self.dest = source, dest
+    def __init__(self, item, source, dest):
+        self.item, self.source, self.dest = item, source, dest
 
 # copy
 class copy(action):
     # ctor
-    def __init__(self, source, dest):
-        action.__init__(self, source, dest)
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
 
     # call
     def __call__(self):
         print 'Copying', self.source, 'from', self.dest
         shutil.copyfile(self.source, self.dest)
 
+# image
+class image(action):
+    # ctor
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
+
+    # call
+    def __call__(self):
+        # Load image from file
+        img = Image.open(self.source)
+
+        # Update asset info
+        self.item['width'] = img.size[0]
+        self.item['height'] = img.size[1]
+        self.item['type'] = 'image'
+
+        return img
+
 # compress
 class compress(action):
     # ctor
-    def __init__(self, source, dest):
-        action.__init__(self, source, dest)
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
 
     # call
     def __call__(self):
@@ -56,8 +75,30 @@ class compress(action):
 # png_quant
 class png_quant(action):
     # ctor
-    def __init__(self, source, dest):
-        action.__init__(self, source, dest)
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
         
         if not 'PNG_QUANT' in os.environ:
             raise Exception('Pngquant not found, make sure that PNG_QUANT enviroment variable is set')
+
+# convert_to_raw
+class convert_to_raw(image):
+    # ctor
+    def __init__(self, item, source, dest):
+        image.__init__(self, item, source, dest)
+
+    # call
+    def __call__(self):
+        img = image.__call__(self)
+
+        width = img.size[0]
+        height = img.size[1]
+        channels = 3 if img.mode == 'RGB' else 4
+
+        self.item['format'] = 'raw'
+
+        with open(self.dest, 'wb') as fh:
+            pixels = img.tostring()
+            data = struct.pack('HHB%us' % len(pixels), width, height, channels, pixels)
+            fh.write(data)
+            fh.close()

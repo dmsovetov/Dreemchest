@@ -58,19 +58,31 @@ class TextureCompression:
     Dxt = 'dxt'
     Etc = 'etc'
 
+# class TextureFormat
+class TextureFormat:
+    Raw = 'raw'
+    Png = 'png'
+    Tga = 'tga'
+
+    @staticmethod
+    def convert_to(format):
+        if format == TextureFormat.Raw: return actions.convert_to_raw
+        if format == TextureFormat.Png: return actions.png_quant
+        if format == TextureFormat.Tga: return actions.compress
+
 # class ExportError
 class ExportError(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
 # Builds the data to a specified folder
-def build(source, output):
+def build(args, source, output):
     if not os.path.exists(output):
         os.makedirs(output)
 
     rules = {
-            '*.tga': actions.compress
-        ,   '*.png': actions.png_quant
+            '*.tga': TextureFormat.convert_to(args.texFormat)
+        ,   '*.png': TextureFormat.convert_to(args.texFormat)
         }
 
     queue    = tasks.create(8)
@@ -80,20 +92,26 @@ def build(source, output):
 
     queue.start()
 
+    # Write the manifest file
+    with open(os.path.join(output, 'assets.json'), 'wt') as fh:
+        fh.write(files.generate_manifest(outdated))
+        fh.close()
+
 # Entry point
 if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser( description = 'Dreemchest make data tool', formatter_class = argparse.ArgumentDefaultsHelpFormatter )
 
-    parser.add_argument( "-a",  "--action",      type = str, default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install"] )
-    parser.add_argument( "-s",  "--source",      type = str, required = True,                               help = "Input resource path." )
-    parser.add_argument( "-o",  "--output",      type = str, required = True,                               help = "Output path." )
-    parser.add_argument( "-tc", "--compression", type = str, default  = TextureCompression.Disabled,        help = "Hardware texture compression." )
-    parser.add_argument( "-p",  "--platform",    type = str, default  = TargetPlatform.Win,                 help = "Target platform.", choices = TargetPlatform.Available )
-    parser.add_argument( "-v",  "--version",     type = str, default  = '1.0',                              help = "Resource version" )
-    parser.add_argument( "-w",  "--workers",     type = int, default  = 8,                                  help = "The number of concurrent workers." )
-    parser.add_argument( "-q",  "--quality",     type = str, default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
-    parser.add_argument( "-c",  "--cache",       type = str, default  = '[source]/[platform]/cache',        help = "Cache file name." )
+    parser.add_argument( "-a",  "--action",      type = str,  default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install"] )
+    parser.add_argument( "-s",  "--source",      type = str,  required = True,                               help = "Input resource path." )
+    parser.add_argument( "-o",  "--output",      type = str,  required = True,                               help = "Output path." )
+    parser.add_argument( "-tc", "--compression", type = str,  default  = TextureCompression.Disabled,        help = "Hardware texture compression." )
+    parser.add_argument( "-tf", "--texFormat",   type = str,  default  = TextureFormat.Raw,                  help = "Exported image format." )
+    parser.add_argument( "-p",  "--platform",    type = str,  default  = TargetPlatform.Win,                 help = "Target platform.", choices = TargetPlatform.Available )
+    parser.add_argument( "-v",  "--version",     type = str,  default  = '1.0',                              help = "Resource version" )
+    parser.add_argument( "-w",  "--workers",     type = int,  default  = 8,                                  help = "The number of concurrent workers." )
+    parser.add_argument( "-q",  "--quality",     type = str,  default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
+    parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
 
     args = parser.parse_args()
 
@@ -108,7 +126,7 @@ if __name__ == "__main__":
 
     try:
         if args.action == 'build':
-            build(args.source, args.output)
+            build(args, args.source, args.output)
     except ExportError as e:
         print e.message
 

@@ -24,7 +24,10 @@
 #
 #################################################################################
 
-import os, fnmatch
+import os, fnmatch, collections, json
+
+# File item data type
+Item = collections.namedtuple('Item', ['path', 'info'])
 
 # Scans the directory recursively and returns the list of outdated files
 def find_outdated(path):
@@ -37,17 +40,24 @@ def find_outdated(path):
             name = os.path.splitext(file_name)[0]
             path = os.path.join(root, file_name)
 
-        #    if name in result:
-        #        raise Exception('Duplicate file name "{0}"\n\t{1}\n\t{2}'.format(name, path, result[name]))
+            if name in result:
+                raise Exception('Duplicate file name "{0}"\n\t{1}\n\t{2}'.format(name, path, result[name]))
 
-            result[name] = path
+            result[name] = Item(path=path, info=dict(identifier=name))
 
     return result
 
+# Generates the manifest from files
+def generate_manifest(files):
+    assets = [item.info for k, item in files.items()]
+    return json.dumps(assets)
+
 # Builds each file to an output folder
 def build(tasks, files, path, rules):
-    for file_name, file_path in files.items():
+    for file_name, item in files.items():
         rule = None
+        file_path = item.path
+        info = item.info
 
         for k, v in rules.items():
             if fnmatch.fnmatch(file_path, k):
@@ -55,4 +65,4 @@ def build(tasks, files, path, rules):
                 break
 
         if rule:
-            tasks.push(rule(file_path, os.path.join(path, file_name)))
+            tasks.push(rule(info, file_path, os.path.join(path, file_name)))

@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
-    <CommandLineArguments>-s D:\Projects\bfg\src\client\build\data -o D:\Projects\bfg\src\client\build\.data</CommandLineArguments>
+    <CommandLineArguments>-s D:\Projects\warfall\src\assets -o D:\Projects\warfall\build\assets</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
