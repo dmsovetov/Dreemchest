@@ -28,7 +28,6 @@
 #define __DC_Scene_Component_H__
 
 #include "../SceneObject.h"
-#include "../Mesh.h"
 
 DC_BEGIN_DREEMCHEST
 

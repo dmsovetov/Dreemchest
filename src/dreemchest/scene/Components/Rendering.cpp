@@ -26,8 +26,8 @@
 
 #include "Rendering.h"
 
-#include "../Mesh.h"
-#include "../Material.h"
+#include "../Assets/Mesh.h"
+#include "../Assets/Material.h"
 
 DC_BEGIN_DREEMCHEST
 

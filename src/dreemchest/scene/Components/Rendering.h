@@ -29,6 +29,8 @@
 
 #include "Component.h"
 
+#include "../Assets/Mesh.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
@@ -40,8 +42,8 @@ namespace scene {
 									OverrideComponent( MeshRenderer, SceneComponent )
 
 									//! Constructs MeshRenderer instance.
-									MeshRenderer( /*SceneObject* sceneObject = NULL,*/ const MeshPtr& mesh = MeshPtr() )
-										: /*SceneComponent( sceneObject ),*/ m_mesh( mesh ) {}
+									MeshRenderer( const MeshPtr& mesh = MeshPtr() )
+										: m_mesh( mesh ) {}
 
 		//! Returns mesh to be rendered.
 		const MeshPtr&				mesh( void ) const;
