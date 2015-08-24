@@ -95,7 +95,11 @@ StreamPtr DiskFileSystem::openFile( const Path& fileName ) const
 		}
 	}
 */
-	return NULL;
+	if( fileExistsAtPath( fileName ) ) {
+		return openFile( fileName, BinaryReadStream );
+	}
+
+	return StreamPtr();
 }
 
 // ** DiskFileSystem::fileExists
@@ -119,7 +123,7 @@ bool DiskFileSystem::fileExists( const Path& fileName ) const
 	}
 #endif
 */
-	return false;
+	return fileExistsAtPath( fileName );
 }
 
 // ** DiskFileSystem::fileExistsAtPath
@@ -193,32 +197,32 @@ ArchivePtr DiskFileSystem::findPackage( const Path& fileName )
 }
 
 // ** DiskFileSystem::addPath
-void DiskFileSystem::addPath( const Path& path )
-{
-    m_paths.insert( path );
-}
+//void DiskFileSystem::addPath( const Path& path )
+//{
+//    m_paths.insert( path );
+//}
 
 // ** DiskFileSystem::removePath
-void DiskFileSystem::removePath( const Path& path )
-{
-    PathSet::iterator i = m_paths.find( path );
-
-    if( i != m_paths.end() ) {
-        m_paths.erase( i );
-    }
-}
+//void DiskFileSystem::removePath( const Path& path )
+//{
+//    PathSet::iterator i = m_paths.find( path );
+//
+//    if( i != m_paths.end() ) {
+//        m_paths.erase( i );
+//    }
+//}
 
 // ** DiskFileSystem::setBaseDir
-void DiskFileSystem::setBaseDir( const Path& value )
-{
-    m_baseDir = value;
-}
+//void DiskFileSystem::setBaseDir( const Path& value )
+//{
+//    m_baseDir = value;
+//}
 
 // ** DiskFileSystem::baseDir
-const Path& DiskFileSystem::baseDir(void ) const
-{
-	return m_baseDir;
-}
+//const Path& DiskFileSystem::baseDir(void ) const
+//{
+//	return m_baseDir;
+//}
 
 } // namespace io
 
