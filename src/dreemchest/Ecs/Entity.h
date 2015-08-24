@@ -71,22 +71,22 @@ namespace ecs {
 
 		//! Adds a new component to this entity.
 		template<typename TComponent>
-		void					attach( TComponent* component );
+		TComponent*				attach( TComponent* component );
 
 		//! Adds a new component to this entity.
-		template<typename TComponent>						  void attach( void );
+		template<typename TComponent>						  TComponent* attach( void );
 
 		//! Adds a new component to this entity.
-		template<typename TComponent, TemplateFunctionTypes1> void attach( TemplateFunctionArgs1 );
+		template<typename TComponent, TemplateFunctionTypes1> TComponent* attach( TemplateFunctionArgs1 );
 
 		//! Adds a new component to this entity.
-		template<typename TComponent, TemplateFunctionTypes2> void attach( TemplateFunctionArgs2 );
+		template<typename TComponent, TemplateFunctionTypes2> TComponent* attach( TemplateFunctionArgs2 );
 
 		//! Adds a new component to this entity.
-		template<typename TComponent, TemplateFunctionTypes3> void attach( TemplateFunctionArgs3 );
+		template<typename TComponent, TemplateFunctionTypes3> TComponent* attach( TemplateFunctionArgs3 );
 
 		//! Adds a new component to this entity.
-		template<typename TComponent, TemplateFunctionTypes4> void attach( TemplateFunctionArgs4 );
+		template<typename TComponent, TemplateFunctionTypes4> TComponent* attach( TemplateFunctionArgs4 );
 
 		//! Removes a component from this entity.
 		/*!
@@ -157,45 +157,46 @@ namespace ecs {
 
 	// ** Entity::attach
 	template<typename TComponent>
-	inline void Entity::attach( TComponent* component )
+	inline TComponent* Entity::attach( TComponent* component )
 	{
 		m_mask.set( component->typeIndex() );
 		m_entities.addComponent( m_id, ComponentPtr( component ), component->typeIndex() );
+		return component;
 	}
 
 	// ** Entity::attach
 	template<typename TComponent>
-	inline void Entity::attach( void )
+	inline TComponent* Entity::attach( void )
 	{
-		attach<TComponent>( new TComponent );
+		return attach<TComponent>( new TComponent );
 	}
 
 	// ** Entity::attach
 	template<typename TComponent, TemplateFunctionTypes1>
-	inline void Entity::attach( TemplateFunctionArgs1 )
+	inline TComponent* Entity::attach( TemplateFunctionArgs1 )
 	{
-		attach<TComponent>( new TComponent( arg0 ) );
+		return attach<TComponent>( new TComponent( arg0 ) );
 	}
 
 	// ** Entity::attach
 	template<typename TComponent, TemplateFunctionTypes2>
-	inline void Entity::attach( TemplateFunctionArgs2 )
+	inline TComponent* Entity::attach( TemplateFunctionArgs2 )
 	{
-		attach<TComponent>( new TComponent( arg0, arg1 ) );
+		return attach<TComponent>( new TComponent( arg0, arg1 ) );
 	}
 
 	// ** Entity::attach
 	template<typename TComponent, TemplateFunctionTypes3>
-	inline void Entity::attach( TemplateFunctionArgs3 )
+	inline TComponent* Entity::attach( TemplateFunctionArgs3 )
 	{
-		attach<TComponent>( new TComponent( arg0, arg1, arg2 ) );
+		return attach<TComponent>( new TComponent( arg0, arg1, arg2 ) );
 	}
 
 	// ** Entity::attach
 	template<typename TComponent, TemplateFunctionTypes4>
-	inline void Entity::attach( TemplateFunctionArgs4 )
+	inline TComponent* Entity::attach( TemplateFunctionArgs4 )
 	{
-		attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3 ) );
+		return attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3 ) );
 	}
 
 } // namespace ecs
