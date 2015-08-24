@@ -27,15 +27,18 @@
 #ifndef __DC_Scene_Material_H__
 #define __DC_Scene_Material_H__
 
-#include "Scene.h"
+#include "Assets.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
 	//! Mesh material class.
-	class Material : public RefCounted {
+	class Material : public Asset {
+	friend class AssetBundle;
 	public:
+
+									ClassEnableTypeInfoSuper( Material, Asset )
 
 		//! Material layers.
         enum Layer {
@@ -67,24 +70,24 @@ namespace scene {
 		void						setColor( Layer layer, const Rgba& value );
 
         //! Returns a material texture.
-        const renderer::TexturePtr&	texture( Layer layer ) const;
+        const ImageWPtr&			texture( Layer layer ) const;
 
 		//! Sets material texture.
-		void						setTexture( Layer layer, const renderer::TexturePtr& value );
+		void						setTexture( Layer layer, const ImageWPtr& value );
 
 		//! Creates a new Material instance.
-		static MaterialPtr			create( void );
+		static MaterialPtr			create( const String& name );
 
 	private:
 
 									//! Constructs Material instance.
-									Material( void );
+									Material( AssetBundle* bundle, const String& name );
 
 	private:
 
 		Shader						m_shader;						//!< Material shader.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
-		renderer::TexturePtr		m_texture[TotalMaterialLayers];	//!< Material textures.
+		ImageWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
 	};
 
 } // namespace scene

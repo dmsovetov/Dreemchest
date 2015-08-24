@@ -131,34 +131,6 @@ AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType )
 	return i->second;
 }
 
-// ** AssetBundle::findImage
-ImagePtr AssetBundle::findImage( const String& name )
-{
-	AssetPtr asset = findAsset( name, Asset::Image );
-
-	if( asset == AssetPtr() ) {
-		return ImagePtr();
-	}
-
-	Image* image = static_cast<Image*>( asset.get() );
-
-	return ImagePtr( image );
-}
-
-// ** AssetBundle::findMaterial
-MaterialPtr AssetBundle::findMaterial( const String& name )
-{
-	AssetPtr asset = findAsset( name, Asset::Material );
-
-	if( asset == AssetPtr() ) {
-		return MaterialPtr();
-	}
-
-	Material* material = static_cast<Material*>( asset.get() );
-
-	return MaterialPtr( material );
-}
-
 // ** AssetBundle::loadFromJson
 bool AssetBundle::loadFromJson( const String& json )
 {

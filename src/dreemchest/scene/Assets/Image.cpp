@@ -24,57 +24,69 @@
 
  **************************************************************************/
 
-#include "Material.h"
+#include "Image.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ** Material::Material
-Material::Material( void ) : m_shader( Solid )
+// ** Image::Image
+Image::Image( AssetBundle* bundle, const String& name, ImageFormat format, u16 width, u16 height )
+	: Asset( bundle, Asset::Image, name ), m_width( width ), m_height( height ), m_format( format )
 {
 }
 
-// ** Material::create
-MaterialPtr Material::create( void )
+// ** Image::width
+u16 Image::width( void ) const
 {
-	return MaterialPtr( DC_NEW Material );
+	return m_width;
 }
 
-// ** Material::shader
-Material::Shader Material::shader( void ) const
+// ** Image::height
+u16 Image::height( void ) const
 {
-	return m_shader;
+	return m_height;
 }
 
-// ** Material::setShader
-void Material::setShader( Shader value )
+// ** Image::loadFromStream
+bool Image::loadFromStream( const io::StreamPtr& stream )
 {
-	m_shader = value;
+	stream->read( &m_width, 2 );
+	stream->read( &m_height, 2 );
+	stream->read( &m_channels, 1 );
+
+	m_pixels = DC_NEW u8[m_width * m_height * m_channels];
+	stream->read( m_pixels.get(), m_width * m_height * m_channels );
+
+	m_texture = renderer::TexturePtr();
+
+	return true;
 }
 
-// ** Material::color
-const Rgba& Material::color( Layer layer ) const
+// ** Image::unload
+void Image::unload( void )
 {
-	return m_color[layer];
+	m_texture = renderer::TexturePtr();
+	m_pixels = NULL;
 }
 
-// ** Material::setColor
-void Material::setColor( Layer layer, const Rgba& value )
+// ** Image::requestTexture
+renderer::TexturePtr Image::requestTexture( renderer::Hal* hal )
 {
-	m_color[layer] = value;
-}
+	if( m_texture != renderer::TexturePtr() ) {
+		return m_texture;
+	}
 
-// ** Material::texture
-const renderer::TexturePtr& Material::texture( Layer layer ) const
-{
-	return m_texture[layer];
-}
+	if( !m_pixels.get() ) {
+		return renderer::TexturePtr();
+	}
 
-// ** Material::setTexture
-void Material::setTexture( Layer layer, const renderer::TexturePtr& value )
-{
-	m_texture[layer] = value;
+	renderer::Texture2D* texture = hal->createTexture2D( m_width, m_height, m_channels == 4 ? renderer::PixelRgba8 : renderer::PixelRgb8 );
+	texture->setData( 0, m_pixels.get() );
+	m_texture = texture;
+	m_pixels = NULL;
+
+	return m_texture;
 }
 
 } // namespace scene

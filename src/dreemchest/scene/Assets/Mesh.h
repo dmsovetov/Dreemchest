@@ -27,15 +27,17 @@
 #ifndef __DC_Scene_Mesh_H__
 #define __DC_Scene_Mesh_H__
 
-#include "Scene.h"
+#include "Assets.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
 	//! Mesh data container.
-	class Mesh : public RefCounted {
+	class Mesh : public Asset {
 	public:
+
+								ClassEnableTypeInfoSuper( Mesh, Asset )
 
 		//! Mesh submesh type.
 		struct Chunk {
@@ -56,15 +58,15 @@ namespace scene {
 		const Chunk&			chunk( u32 index ) const;
 
 		//! Creates a new Mesh instance.
-		static MeshPtr			create( void );
+		static MeshPtr			create( const String& name );
 
 		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( renderer::Hal* hal, f32 width, f32 height );
+		static MeshPtr			createRectangular( const String& name, renderer::Hal* hal, f32 width, f32 height );
 
 	private:
 
 								//! Constructs Mesh instance.
-								Mesh( void );
+								Mesh( AssetBundle* bundle, const String& name );
 
 	private:
 

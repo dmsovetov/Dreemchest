@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** Mesh::Mesh
-Mesh::Mesh( void )
+Mesh::Mesh( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Mesh, name )
 {
 }
 
@@ -61,15 +61,15 @@ const Mesh::Chunk& Mesh::chunk( u32 index ) const
 }
 
 // ** Mesh::create
-MeshPtr Mesh::create( void )
+MeshPtr Mesh::create( const String& name )
 {
-	return MeshPtr( DC_NEW Mesh );
+	return MeshPtr( DC_NEW Mesh( NULL, name ) );
 }
 
 // ** Mesh::createRectangular
-MeshPtr Mesh::createRectangular( renderer::Hal* hal, f32 width, f32 height )
+MeshPtr Mesh::createRectangular( const String& name, renderer::Hal* hal, f32 width, f32 height )
 {
-	MeshPtr mesh = create();
+	MeshPtr mesh = create( name );
 
 	//! Rectangular mesh vertex
 	struct Vertex {
