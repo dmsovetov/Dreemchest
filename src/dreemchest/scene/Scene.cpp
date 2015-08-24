@@ -25,9 +25,11 @@
  **************************************************************************/
 
 #include "Scene.h"
-#include "Systems/Renderer.h"
+#include "Systems/SpriteRenderer.h"
 #include "Systems/TransformSystems.h"
 #include "Components/Camera.h"
+
+#include <json/json.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -63,7 +65,7 @@ SceneObjectPtr Scene::createSceneObject( void )
 void Scene::setRenderer( renderer::Hal* hal, RendererType renderer )
 {
 	switch( renderer ) {
-	case RendererDefault:	m_renderer = new Renderer( m_entities, hal );
+	case RendererDefault:	m_renderer = new SpriteRenderer( m_entities, hal );
 							break;
 	}
 }
@@ -71,7 +73,7 @@ void Scene::setRenderer( renderer::Hal* hal, RendererType renderer )
 // ** Scene::render
 void Scene::render( const BasicCamera* camera )
 {
-	if( m_renderer == RendererPtr() ) {
+	if( m_renderer == SpriteRendererPtr() ) {
 		log::warn( "Scene::render : no scene renderer set.\n" );
 		return;
 	}

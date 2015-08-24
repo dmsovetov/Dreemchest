@@ -40,6 +40,8 @@
 #include <Ecs/Component.h>
 #include <Ecs/EntitySystem.h>
 
+#include <Io/DiskFileSystem.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
@@ -47,9 +49,12 @@ namespace scene {
 	DECLARE_LOG( log )
 
 	class Renderer;
-	class Mesh;
-	class Material;
 	class SceneObject;
+	class AssetBundle;
+	class Asset;
+		class Image;
+		class Mesh;
+		class Material;
 	class Component;
 		class BasicTransform;
 			class Transform;
@@ -59,10 +64,13 @@ namespace scene {
 			class Camera;
 		class Rotator2D;
 
-	class Renderer;
+	class SpriteRenderer;
 
 	typedef StrongPtr<class Scene>		ScenePtr;
 	typedef WeakPtr<class Scene>		SceneWPtr;
+	typedef StrongPtr<Asset>			AssetPtr;
+	typedef StrongPtr<AssetBundle>		AssetBundlePtr;
+	typedef WeakPtr<AssetBundle>		AssetBundleWPtr;
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
 	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
 	typedef StrongPtr<Component>		ComponentPtr;
@@ -77,7 +85,9 @@ namespace scene {
 	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
 	typedef StrongPtr<Material>			MaterialPtr;
-	typedef StrongPtr<Renderer>			RendererPtr;
+	typedef StrongPtr<Image>			ImagePtr;
+	typedef WeakPtr<Image>				ImageWPtr;
+	typedef StrongPtr<SpriteRenderer>	SpriteRendererPtr;
 
 	//! Container type to store a list of objects.
 	typedef List<SceneObjectPtr>	SceneObjects;
@@ -85,6 +95,12 @@ namespace scene {
 	//! Available scene renderers.
 	enum RendererType {
 		RendererDefault = 0,	//!< Default scene renderer.
+	};
+
+	//! Supported image formats.
+	enum ImageFormat {
+		  ImageRaw = 0
+		, TotalImageFormats
 	};
 
 	//! The root class for a scene subsystem.
@@ -123,7 +139,7 @@ namespace scene {
 		ecs::EntityId					m_nextEntityId;
 
 		//! Scene renderer.
-		RendererPtr						m_renderer;						
+		SpriteRendererPtr				m_renderer;						
 	};
 
 } // namespace scene
@@ -135,8 +151,9 @@ DC_END_DREEMCHEST
 	#include "Components/Rendering.h"
 	#include "Components/Camera.h"
 	#include "Components/Transform.h"
-	#include "Mesh.h"
-	#include "Material.h"
+	#include "Assets/Mesh.h"
+	#include "Assets/Material.h"
+	#include "Assets/Image.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */

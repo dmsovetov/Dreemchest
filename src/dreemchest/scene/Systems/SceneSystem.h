@@ -55,11 +55,6 @@ namespace scene {
 		{
 			DC_BREAK
 		}
-
-	protected:
-
-		//! Parent scene
-		//Scene*					m_scene;
 	};
 
 	//! The basic scene system for two component types
@@ -84,11 +79,6 @@ namespace scene {
 		{
 			DC_BREAK
 		}
-
-	protected:
-
-		//! Parent scene
-		//Scene*					m_scene;
 	};
 
 } // namespace scene

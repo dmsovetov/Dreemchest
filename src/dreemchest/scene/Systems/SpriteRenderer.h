@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderer_H__
-#define __DC_Scene_Renderer_H__
+#ifndef __DC_Scene_SpriteRenderer_System_H__
+#define __DC_Scene_SpriteRenderer_System_H__
 
 #include "SceneSystem.h"
 
@@ -36,12 +36,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! The scene rendering system
-	class Renderer : public SceneSystem2<MeshRenderer, Transform2D> {
+	//! The sprite rendering system
+	class SpriteRenderer : public SceneSystem2<MeshRenderer, Transform2D> {
 	public:
 
-							//! Constructs a Renderer instance.
-							Renderer( ecs::Entities& entities, renderer::Hal* hal );
+							//! Constructs the SpriteRenderer instance.
+							SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal );
 
 		//! Renders a single entity with a mesh
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform );
@@ -77,4 +77,4 @@ namespace scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Renderer_H__    */
+#endif    /*    !__DC_Scene_SpriteRenderer_System_H__    */

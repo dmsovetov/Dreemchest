@@ -24,7 +24,11 @@
 
  **************************************************************************/
 
-#include "Renderer.h"
+#include "SpriteRenderer.h"
+
+#include "../Assets/Mesh.h"
+#include "../Assets/Material.h"
+#include "../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -32,8 +36,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ** Renderer::Renderer
-Renderer::Renderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform2D>( entities, "Renderer" ), m_hal( hal )
+// ** SpriteRenderer::SpriteRenderer
+SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform2D>( entities, "SpriteRenderer" ), m_hal( hal )
 {
 	m_shaders[ShaderSolid] = m_hal->createShader(
 		CODE(
@@ -59,26 +63,26 @@ Renderer::Renderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2
 			} ) );
 }
 
-// ** Renderer::setViewProjection
-void Renderer::setViewProjection( const Matrix4& viewProjection )
+// ** SpriteRenderer::setViewProjection
+void SpriteRenderer::setViewProjection( const Matrix4& viewProjection )
 {
 	m_viewProjection = viewProjection;
 }
 
-// ** Renderer::begin
-bool Renderer::begin( u32 currentTime )
+// ** SpriteRenderer::begin
+bool SpriteRenderer::begin( u32 currentTime )
 {
 	return true;
 }
 
-// ** Renderer::end
-void Renderer::end( void )
+// ** SpriteRenderer::end
+void SpriteRenderer::end( void )
 {
 	m_hal->setShader( NULL );
 }
 
-// ** Renderer::process
-void Renderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform )
+// ** SpriteRenderer::process
+void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform )
 {
 	const MeshPtr&    mesh   = meshRenderer.mesh();
 	renderer::Shader* shader = m_shaders[ShaderSolid];
@@ -89,6 +93,24 @@ void Renderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshR
 
 	for( s32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
 		const Mesh::Chunk& chunk = mesh->chunk( i );
+		const MaterialPtr& material = meshRenderer.material( i );
+
+		if( material != MaterialPtr() ) {
+			const Rgba& diffuse = material->color( Material::Diffuse );
+			shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
+			shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( diffuse.r, diffuse.g, diffuse.b, diffuse.a ) );
+
+			const ImageWPtr& image = material->texture( Material::Diffuse );
+			m_hal->setTexture( 0, const_cast<ImageWPtr&>( image )->requestTexture( m_hal ).get() );
+
+			if( material->shader() == Material::Transparent ) {
+				m_hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
+				m_hal->setDepthTest( false, renderer::Less );
+			} else {
+				m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
+				m_hal->setDepthTest( true, renderer::Less );
+			}
+		}
 
 		m_hal->setVertexBuffer( chunk.m_vertexBuffer.get() );
 		m_hal->renderIndexed( renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
