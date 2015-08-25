@@ -126,7 +126,7 @@ namespace scene {
 
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )
-								: m_mass( mass ), m_type( type ), m_internal( NULL ) {}
+								: m_mass( mass ), m_type( type ) {}
 
 		//! Returns the rigid body mass.
 		f32					mass( void ) const;
@@ -134,17 +134,10 @@ namespace scene {
 		//! Returns the rigid body type.
 		Type				type( void ) const;
 
-		//! Returns an internal engine-specific rigid body implementation.
-		void*				internal( void ) const;
-
-		//! Sets an internal engine-specific rigid body implementation.
-		void				setInternal( void* value );
-
 	private:
 
 		f32					m_mass;			//!< The rigid body mass.
 		Type				m_type;			//!< The rigid body type.
-		void*				m_internal;		//!< Internal rigid body implementation.
 	};
 
 } // namespace scene

@@ -35,6 +35,7 @@ namespace scene {
 
 	//! A base class for all components.
 	class SceneComponent : public ecs::Component {
+	EmbedUserData
 	public:
 
 								OverrideComponent( SceneComponent, Component )

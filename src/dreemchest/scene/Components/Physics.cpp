@@ -90,18 +90,6 @@ RigidBody2D::Type RigidBody2D::type( void ) const
 	return m_type;
 }
 
-// ** RigidBody2D::internal
-void* RigidBody2D::internal( void ) const
-{
-	return m_internal;
-}
-
-// ** RigidBody2D::setInternal
-void RigidBody2D::setInternal( void* value )
-{
-	m_internal = value;
-}
-
 } // namespace scene
 
 DC_END_DREEMCHEST
