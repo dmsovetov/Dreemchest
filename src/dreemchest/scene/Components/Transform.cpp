@@ -79,6 +79,43 @@ f32 Transform2D::rotation( void ) const
 	return m_rotation;
 }
 
+// ** Transform2D::position
+Vec2 Transform2D::position( void ) const
+{
+	return Vec2( m_x, m_y );
+}
+
+// ** Transform2D::setPosition
+void Transform2D::setPosition( const Vec2& value )
+{
+	m_x = value.x;
+	m_y = value.y;
+}
+
+// ** Transform2D::x
+f32 Transform2D::x( void ) const
+{
+	return m_x;
+}
+
+// ** Transform2D::setX
+void Transform2D::setX( f32 value )
+{
+	m_x = value;
+}
+
+// ** Transform2D::y
+f32 Transform2D::y( void ) const
+{
+	return m_y;
+}
+
+// ** Transform2D::setY
+void Transform2D::setY( f32 value )
+{
+	m_y = value;
+}
+
 // ** Transform2D::setRotation
 void Transform2D::setRotation( f32 value )
 {

@@ -72,6 +72,12 @@ namespace scene {
 		//! Returns an affine transformation matrix.
 		virtual Matrix4			matrix( void ) const;
 
+		//! Returns transformation position as a 2D vector.
+		Vec2					position( void ) const;
+
+		//! Sets position from a 2D vector.
+		void					setPosition( const Vec2& value );
+
 		//! Returns transformation X coordinate
 		f32						x( void ) const;
 
