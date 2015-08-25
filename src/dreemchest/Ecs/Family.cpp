@@ -61,6 +61,12 @@ const EntitySet& Family::entities( void ) const
 	return m_family;
 }
 
+// ** Family::events
+EventEmitter& Family::events( void )
+{
+	return m_eventEmitter;
+}
+
 // ** Family::handleEntityChanged
 void Family::handleEntityChanged( const Entities::Changed& e )
 {
@@ -82,12 +88,14 @@ void Family::processEntityAdded( const EntityPtr& handle )
 {
 	log::verbose( "%s: entity %d added\n", m_name.c_str(), handle->id() );
 	m_family.insert( handle );
+	m_eventEmitter.emit<Added>( handle );
 }
 
 // ** Family::processEntityRemoved
 void Family::processEntityRemoved( const EntityPtr& handle )
 {
 	log::verbose( "%s: entity %d removed\n", m_name.c_str(), handle->id() );
+	m_eventEmitter.emit<Removed>( handle );
 	m_family.erase( handle );
 }
 

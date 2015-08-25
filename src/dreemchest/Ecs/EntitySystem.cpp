@@ -36,6 +36,8 @@ IMPLEMENT_LOGGER(log)
 EntitySystem::EntitySystem( Entities& entities, const String& name, const Aspect& aspect ) : m_entities( entities )
 {
 	m_family = Family::create( entities, name, aspect );
+	m_family->events().subscribe<Family::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
+	m_family->events().subscribe<Family::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
 }
 
 // ** EntitySystem::begin
@@ -64,6 +66,28 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 	}
 
 	end();
+}
+
+// ** EntitySystem::handleEntityAdded
+void EntitySystem::handleEntityAdded( const Family::Added& e )
+{
+	entityAdded( e.entity );
+}
+
+// ** EntitySystem::handleEntityRemoved
+void EntitySystem::handleEntityRemoved( const Family::Removed& e )
+{
+	entityRemoved( e.entity );
+}
+
+// ** EntitySystem::entityAdded
+void EntitySystem::entityAdded( const EntityPtr& entity )
+{
+}
+
+// ** EntitySystem::entityRemoved
+void EntitySystem::entityRemoved( const EntityPtr& entity )
+{
 }
 
 } // namespace ecs

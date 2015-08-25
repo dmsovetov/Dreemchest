@@ -49,8 +49,27 @@ namespace ecs {
 		//! Returns a set of entities 
 		const EntitySet&		entities( void ) const;
 
+		//! Returns event emitter
+		EventEmitter&			events( void );
+
 		//! Creates a new Family instance.
 		static FamilyPtr		create( Entities& entities, const String& name, const Aspect& aspect );
+
+		//! New entity has been added to family.
+		struct Added {
+								//! Constructs Added instance.
+								Added( const EntityPtr& entity )
+									: entity( entity ) {}
+			EntityPtr			entity;	//! Added entity.
+		};
+
+		//! New entity has been removed from family.
+		struct Removed {
+								//! Constructs Removed instance.
+								Removed( const EntityPtr& entity )
+									: entity( entity ) {}
+			EntityPtr			entity;	//! Removed entity.
+		};
 
 	protected:
 
@@ -81,6 +100,9 @@ namespace ecs {
 
 		//! Entity set.
 		EntitySet				m_family;
+
+		//! Family event emitter.
+		EventEmitter			m_eventEmitter;
 	};
 
 	//! Archetype entity family.

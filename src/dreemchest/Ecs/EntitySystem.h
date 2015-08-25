@@ -45,16 +45,28 @@ namespace ecs {
 		//! System logic is done here.
 		virtual void	update( u32 currentTime, f32 dt );
 
+	protected:
+
 		//! Called every update tick before processing entities.
 		virtual bool	begin( u32 currentTime );
 
 		//! Called every update tick after all entities are processed.
 		virtual void	end( void );
 
-	protected:
-
 		//! Processes a single entity.
 		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity ) = 0;
+
+		//! Called when entity was added.
+		virtual void	entityAdded( const EntityPtr& entity );
+
+		//! Called when entity was removed.
+		virtual void	entityRemoved( const EntityPtr& entity );
+
+		//! Handles an entity added event.
+		void			handleEntityAdded( const Family::Added& e );
+
+		//! Handles an entity removed event.
+		void			handleEntityRemoved( const Family::Removed& e );
 
 	protected:
 
