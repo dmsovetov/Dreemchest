@@ -37,7 +37,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** SpriteRenderer::SpriteRenderer
-SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform2D>( entities, "SpriteRenderer" ), m_hal( hal )
+SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform2D>( entities, "SpriteRenderer" ), m_hal( hal ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_hal->createShader(
 		CODE(
@@ -72,49 +72,132 @@ void SpriteRenderer::setViewProjection( const Matrix4& viewProjection )
 // ** SpriteRenderer::begin
 bool SpriteRenderer::begin( u32 currentTime )
 {
+	// Clean the allocated render operations
+	m_renderOperations.reset();
 	return true;
 }
 
 // ** SpriteRenderer::end
 void SpriteRenderer::end( void )
 {
+	// Sort the emitted render operations
+	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
+
+	// Perform all rendering operations
+	for( EmittedRenderOps::const_iterator i = m_frame.m_renderOperations.begin(), end = m_frame.m_renderOperations.end(); i != end; ++i ) {
+		const RenderOp* rop = *i;
+
+		// Set the shader
+		setShader( rop );
+
+		// Set the texture
+		if( rop->texture != m_frame.m_texture ) {
+			m_hal->setTexture( 0, rop->texture );
+			m_frame.m_texture = rop->texture;
+		}
+
+		// Set the vertex buffer
+		if( rop->vertexBuffer != m_frame.m_vertexBuffer ) {
+			m_hal->setVertexBuffer( rop->vertexBuffer );
+			m_frame.m_vertexBuffer = rop->vertexBuffer;
+		}
+
+		// Render the mesh
+		m_hal->renderIndexed( renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
+	}
+
+	// Set the default shader
 	m_hal->setShader( NULL );
+
+	// Set the default vertex buffer
+	m_hal->setVertexBuffer( NULL );
+
+	// Set default textures
+	for( s32 i = 0; i < 8; i++ ) {
+		m_hal->setTexture( i, NULL );
+	}
+
+	// Clean the list of emitted render operations
+	m_frame.clear();
+}
+
+// ** SpriteRenderer::setShader
+void SpriteRenderer::setShader( const RenderOp* rop )
+{
+	if( m_frame.m_materialShader != rop->shader ) {
+		switch( rop->shader ) {
+		case Material::Solid:		m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
+									m_hal->setDepthTest( true, renderer::Less );
+									break;
+
+		case Material::Transparent:	m_hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
+									m_hal->setDepthTest( false, renderer::Less );
+									break;
+
+		case Material::Additive:	m_hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
+									m_hal->setDepthTest( false, renderer::Less );
+									break;
+		}
+
+		m_hal->setShader( m_shaders[ShaderSolid] );
+		m_frame.m_materialShader = rop->shader;
+	}
+
+	renderer::Shader* shader = m_shaders[ShaderSolid];
+	shader->setMatrix( shader->findUniformLocation( "u_mvp" ),  rop->mvp );
+	shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
+	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
 }
 
 // ** SpriteRenderer::process
 void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform )
 {
-	const MeshPtr&    mesh   = meshRenderer.mesh();
-	renderer::Shader* shader = m_shaders[ShaderSolid];
-	
-	m_hal->setShader( shader );
+	// Calculate the MVP matrix
+	Matrix4 mvp = m_viewProjection * transform.affine();
 
-	shader->setMatrix( shader->findUniformLocation( "u_mvp" ),  m_viewProjection * transform.affine() );
+	// Get the rendered mesh
+	const MeshPtr& mesh = meshRenderer.mesh();
 
-	for( s32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
+	// Emit render operation for each mesh chunk
+	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
+		// Get the mesh chunk by index
 		const Mesh::Chunk& chunk = mesh->chunk( i );
+
+		// Get the material for chunk
 		const MaterialPtr& material = meshRenderer.material( i );
 
-		if( material != MaterialPtr() ) {
-			const Rgba& diffuse = material->color( Material::Diffuse );
-			shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
-			shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( diffuse.r, diffuse.g, diffuse.b, diffuse.a ) );
+		// Emit a new render operation
+		RenderOp* rop = emitRenderOp();
 
-			const ImageWPtr& image = material->texture( Material::Diffuse );
-			m_hal->setTexture( 0, const_cast<ImageWPtr&>( image )->requestTexture( m_hal ).get() );
-
-			if( material->shader() == Material::Transparent ) {
-				m_hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
-				m_hal->setDepthTest( false, renderer::Less );
-			} else {
-				m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
-				m_hal->setDepthTest( true, renderer::Less );
-			}
-		}
-
-		m_hal->setVertexBuffer( chunk.m_vertexBuffer.get() );
-		m_hal->renderIndexed( renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
+		// Initialize the rendering operation
+		rop->mvp			= mvp;
+		rop->indexBuffer	= chunk.m_indexBuffer.get();
+		rop->vertexBuffer	= chunk.m_vertexBuffer.get();
+		rop->shader			= material->shader();
+		rop->texture		= const_cast<ImageWPtr&>( material->texture( Material::Diffuse ) )->requestTexture( m_hal ).get();
+		rop->diffuse		= &material->color( Material::Diffuse );
 	}
+}
+
+// ** SpriteRenderer::emitRenderOp
+SpriteRenderer::RenderOp* SpriteRenderer::emitRenderOp( void )
+{
+	RenderOp* rop = m_renderOperations.allocate();
+	DC_BREAK_IF( rop == NULL )
+
+	m_frame.m_renderOperations.push_back( rop );
+
+	return rop;
+}
+
+// ** SpriteRenderer::sortByShaderTextureMesh
+bool SpriteRenderer::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
+{
+	if( a->shader != b->shader ) return a->shader > b->shader;
+	if( a->texture != b->texture ) return a->texture > b->texture;
+	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
+
+	return false;
 }
 
 } // namespace scene
