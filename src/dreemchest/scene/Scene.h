@@ -48,6 +48,7 @@ namespace scene {
 
 	DECLARE_LOG( log )
 
+	class Scene;
 	class Renderer;
 	class SceneObject;
 	class AssetBundle;
@@ -66,8 +67,8 @@ namespace scene {
 
 	class SpriteRenderer;
 
-	typedef StrongPtr<class Scene>		ScenePtr;
-	typedef WeakPtr<class Scene>		SceneWPtr;
+	typedef StrongPtr<Scene>			ScenePtr;
+	typedef WeakPtr<Scene>				SceneWPtr;
 	typedef StrongPtr<Asset>			AssetPtr;
 	typedef StrongPtr<AssetBundle>		AssetBundlePtr;
 	typedef WeakPtr<AssetBundle>		AssetBundleWPtr;
@@ -151,6 +152,7 @@ DC_END_DREEMCHEST
 	#include "Components/Rendering.h"
 	#include "Components/Camera.h"
 	#include "Components/Transform.h"
+	#include "Components/Physics.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"

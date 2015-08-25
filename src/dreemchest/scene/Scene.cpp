@@ -27,6 +27,7 @@
 #include "Scene.h"
 #include "Systems/SpriteRenderer.h"
 #include "Systems/TransformSystems.h"
+#include "Systems/Physics2D.h"
 #include "Components/Camera.h"
 
 #include <json/json.h>
@@ -41,6 +42,7 @@ IMPLEMENT_LOGGER( log )
 Scene::Scene( void ) : m_systems( m_entities ), m_nextEntityId( 1 )
 {
 	m_systems.add<Rotator2DSystem>();
+	m_systems.add<Box2DPhysics>();
 }
 
 // ** Scene::update

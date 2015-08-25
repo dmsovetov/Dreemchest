@@ -46,14 +46,52 @@ namespace scene {
 		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity, T& component )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
-			DC_BREAK_IF( sceneObject == NULL );
+			DC_BREAK_IF( sceneObject == NULL )
 			process( currentTime, dt, *sceneObject, component );
+		}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectAdded( *sceneObject );
+		}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectRemoved( *sceneObject );
 		}
 
 		//! Processes the scene object
 		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, T& component )
 		{
 			DC_BREAK
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject )
+		{
+			sceneObjectAdded( sceneObject, *sceneObject.get<T>() );
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject, T& component )
+		{
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject )
+		{
+			sceneObjectRemoved( sceneObject, *sceneObject.get<T>() );
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject, T& component )
+		{
 		}
 	};
 
@@ -74,10 +112,48 @@ namespace scene {
 			process( currentTime, dt, *sceneObject, component1, component2 );
 		}
 
+		//! Casts the entity to a SceneObject type
+		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectAdded( *sceneObject );
+		}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectRemoved( *sceneObject );
+		}
+
 		//! Processes the scene object
 		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent1& component1, TComponent2& component2 )
 		{
 			DC_BREAK
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject )
+		{
+			sceneObjectAdded( sceneObject, *sceneObject.get<TComponent1>(), *sceneObject.get<TComponent2>() );
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject, TComponent1& component1, TComponent2& component2 )
+		{
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject )
+		{
+			sceneObjectRemoved( sceneObject, *sceneObject.get<TComponent1>(), *sceneObject.get<TComponent2>() );
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject, TComponent1& component1, TComponent2& component2 )
+		{
 		}
 	};
 
