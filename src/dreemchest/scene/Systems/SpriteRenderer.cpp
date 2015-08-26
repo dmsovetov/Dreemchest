@@ -74,6 +74,10 @@ bool SpriteRenderer::begin( u32 currentTime )
 {
 	// Clean the allocated render operations
 	m_renderOperations.reset();
+
+	// Disable the depth test for 2d rendering
+	m_hal->setDepthTest( true, renderer::Always );
+
 	return true;
 }
 
@@ -117,6 +121,9 @@ void SpriteRenderer::end( void )
 		m_hal->setTexture( i, NULL );
 	}
 
+	// Enable the depth test back
+	m_hal->setDepthTest( true, renderer::Less );
+
 	// Clean the list of emitted render operations
 	m_frame.clear();
 }
@@ -127,15 +134,12 @@ void SpriteRenderer::setShader( const RenderOp* rop )
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
 		case Material::Solid:		m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
-									m_hal->setDepthTest( true, renderer::Less );
 									break;
 
 		case Material::Transparent:	m_hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
-									m_hal->setDepthTest( false, renderer::Less );
 									break;
 
 		case Material::Additive:	m_hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
-									m_hal->setDepthTest( false, renderer::Less );
 									break;
 		}
 
@@ -193,7 +197,7 @@ SpriteRenderer::RenderOp* SpriteRenderer::emitRenderOp( void )
 // ** SpriteRenderer::sortByShaderTextureMesh
 bool SpriteRenderer::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
 {
-	if( a->shader != b->shader ) return a->shader > b->shader;
+	if( a->shader != b->shader ) return a->shader < b->shader;
 	if( a->texture != b->texture ) return a->texture > b->texture;
 	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
 
