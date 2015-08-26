@@ -35,15 +35,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! The Rotator2D system
+	//! The Rotator2DSystem system
 	class Rotator2DSystem : public SceneSystem2<Rotator2D, Transform2D> {
 	public:
 
-							//! Constructs a Renderer instance.
+							//! Constructs a Rotator2DSystem instance.
 							Rotator2DSystem( ecs::Entities& entities )
 								: SceneSystem2( entities, "Rotator2D" ) {}
 
-		//! Renders a single entity with a rotator
+		//! Rotates a single entity by a rotator
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform );
 	};
 
