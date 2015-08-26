@@ -76,10 +76,10 @@ MeshPtr Mesh::createRectangular( const String& name, renderer::Hal* hal, f32 wid
 		f32 position[3];
 		f32 texCoord[2];
 	} vertices[4] = {
-		{ -width * 0.5f, -height * 0.5f, 0.0f,		0.0f, 0.0f },
-		{  width * 0.5f, -height * 0.5f, 0.0f,		1.0f, 0.0f },
-		{  width * 0.5f,  height * 0.5f, 0.0f,		1.0f, 1.0f },
-		{ -width * 0.5f,  height * 0.5f, 0.0f,		0.0f, 1.0f },
+		{ -width * 0.5f,  height * 0.5f, 0.0f,		0.0f, 0.0f },
+		{  width * 0.5f,  height * 0.5f, 0.0f,		1.0f, 0.0f },
+		{  width * 0.5f, -height * 0.5f, 0.0f,		1.0f, 1.0f },
+		{ -width * 0.5f, -height * 0.5f, 0.0f,		0.0f, 1.0f },
 	};
 
 	//! Mesh indices
