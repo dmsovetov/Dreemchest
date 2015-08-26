@@ -39,7 +39,6 @@ namespace platform {
 
     DECLARE_LOG( log )
 
-    // ** enum Key
     //! Available key mappings.
     struct Key {
 		enum Mapping {
@@ -60,7 +59,7 @@ namespace platform {
 
         operator int() const { return m_mapping; }
 
-		Key( Mapping mapping ) : m_mapping( mapping ) {}
+		Key( Mapping mapping = Total ) : m_mapping( mapping ) {}
     };
 
     class Application;
