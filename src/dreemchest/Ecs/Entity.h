@@ -75,18 +75,11 @@ namespace ecs {
 
 		//! Adds a new component to this entity.
 		template<typename TComponent>						  TComponent* attach( void );
-
-		//! Adds a new component to this entity.
 		template<typename TComponent, TemplateFunctionTypes1> TComponent* attach( TemplateFunctionArgs1 );
-
-		//! Adds a new component to this entity.
 		template<typename TComponent, TemplateFunctionTypes2> TComponent* attach( TemplateFunctionArgs2 );
-
-		//! Adds a new component to this entity.
 		template<typename TComponent, TemplateFunctionTypes3> TComponent* attach( TemplateFunctionArgs3 );
-
-		//! Adds a new component to this entity.
 		template<typename TComponent, TemplateFunctionTypes4> TComponent* attach( TemplateFunctionArgs4 );
+		template<typename TComponent, TemplateFunctionTypes5> TComponent* attach( TemplateFunctionArgs5 );
 
 		//! Removes a component from this entity.
 		/*!
@@ -198,6 +191,14 @@ namespace ecs {
 	{
 		return attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3 ) );
 	}
+
+	// ** Entity::attach
+	template<typename TComponent, TemplateFunctionTypes5>
+	inline TComponent* Entity::attach( TemplateFunctionArgs5 )
+	{
+		return attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3, arg4 ) );
+	}
+
 
 } // namespace ecs
 
