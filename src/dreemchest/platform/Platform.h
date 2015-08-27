@@ -68,7 +68,8 @@ namespace platform {
 
 } // namespace platform
 
-    DC_DECLARE_PTRS( platform::WindowDelegate, WindowDelegate )
+    dcDeclareNamedPtrs( platform::WindowDelegate, WindowDelegate )
+	dcDeclareNamedPtrs( platform::Window, Window )
 
 DC_END_DREEMCHEST
 

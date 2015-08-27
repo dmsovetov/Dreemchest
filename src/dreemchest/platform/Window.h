@@ -96,7 +96,7 @@ namespace platform {
     };
 
     //! A platform-specific work with windows.
-    class Window {
+    class Window : public RefCounted {
     public:
 
         virtual                 ~Window( void );
@@ -165,7 +165,7 @@ namespace platform {
         IWindow*                m_impl;
 
         //! Event delegate.
-        dcWindowDelegateStrong  m_delegate;
+        WindowDelegatePtr		m_delegate;
     };
 
 } // namespace platform
