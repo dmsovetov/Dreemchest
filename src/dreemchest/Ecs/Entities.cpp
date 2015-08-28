@@ -110,7 +110,7 @@ void Entities::addComponent( const EntityId& id, const ComponentPtr& component, 
 	i->second[type] = component;
 
 	// ** Notify systems about a change
-	m_eventEmitter.emit<Changed>( i->first.m_entity );
+	m_changed.insert( i->first.m_entity );
 }
 
 // ** Entities::removeComponent
@@ -124,7 +124,7 @@ void Entities::removeComponent( const EntityId& id, TypeIdx type )
 	i->second.erase( type );
 
 	// ** Notify systems about a change
-	m_eventEmitter.emit<Changed>( i->first.m_entity );
+	m_changed.insert( i->first.m_entity );
 }
 
 // ** Entities::findComponent
@@ -149,8 +149,8 @@ void Entities::remove( const EntityId& id )
 	DC_BREAK_IF( i == m_entities.end() );
 
 	// ** Remove entity from processing
-	m_eventEmitter.emit<Changed>( i->first.m_entity );
-	m_eventEmitter.emit<Removed>( i->first.m_entity );
+	m_changed.insert( i->first.m_entity );
+	m_removed.insert( i->first.m_entity );
 
 	// ** Remove entity from a list
 	m_entities.erase( i );
@@ -160,6 +160,21 @@ void Entities::remove( const EntityId& id )
 #else
 	log::verbose( "World: entity %d removed\n", id );
 #endif
+}
+
+// ** Entities::notify
+void Entities::notify( void )
+{
+	for( EntitySet::const_iterator i = m_changed.begin(), end = m_changed.end(); i != end; ++i ) {
+		m_eventEmitter.emit<Changed>( *i );
+	}
+
+	for( EntitySet::const_iterator i = m_removed.begin(), end = m_removed.end(); i != end; ++i ) {
+		m_eventEmitter.emit<Removed>( *i );
+	}
+
+	m_changed.clear();
+	m_removed.clear();
 }
 
 // ** Entities::EntityKey::EntityKey

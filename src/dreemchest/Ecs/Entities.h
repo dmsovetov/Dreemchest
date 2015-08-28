@@ -42,6 +42,9 @@ namespace ecs {
 		//! Returns an entity handle by id.
 		EntityPtr		operator[]( const EntityId& id ) const;
 
+		//! Notifies all systems about entity changes.
+		void			notify( void );
+
 		//! Registeres an Entity instance with a given id.
 		EntityPtr		registerEntity( const EntityId& id );
 
@@ -78,14 +81,6 @@ namespace ecs {
 							Changed( const EntityPtr& entity )
 								: m_entity( entity ) {}
 			EntityPtr		m_entity;	//! Changed entity.
-		};
-
-		//! New entity has been added to world.
-		struct Added {
-							//! Constructs Added instance.
-							Added( const EntityPtr& entity )
-								: m_entity( entity ) {}
-			EntityPtr		m_entity;	//! Added entity.
 		};
 
 		//! New entity has been added to world.
@@ -137,6 +132,9 @@ namespace ecs {
 
 		//! Entity event emitter.
 		EventEmitter	m_eventEmitter;
+
+		//! Entity sets to dispatch events.
+		EntitySet		m_changed, m_added, m_removed;
 	};
 
 	// ** Entities::archetype
