@@ -26,110 +26,102 @@
 
 #include "Camera.h"
 
+#include <platform/Window.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ------------------------------------------ BasicCamera ----------------------------------------- //
+// ------------------------------------------ WindowView ------------------------------------------ //
 
-// ** BasicCamera::viewProj
-Matrix4 BasicCamera::viewProj( void ) const
+// ** WindowView::WindowView
+WindowView::WindowView( const WindowWPtr& window ) : m_window( window )
 {
-	return view() * proj();
 }
 
-// ** BasicCamera::view
-Matrix4 BasicCamera::view( void ) const
+// ** WindowView::width
+u32 WindowView::width( void ) const
 {
-	return Matrix4();
+	return m_window->width();
 }
 
-// ** BasicCamera::proj
-Matrix4 BasicCamera::proj( void ) const
+// ** WindowView::height
+u32 WindowView::height( void ) const
 {
-	return Matrix4();
+	return m_window->height();
 }
 
-// ------------------------------------------- Camera2D ------------------------------------------- //
-
-// ** Camera2D::width
-u32 Camera2D::width( void ) const
+// ** WindowView::create
+ViewPtr WindowView::create( const WindowWPtr& window )
 {
-	return m_width;
-}
-
-// ** Camera2D::setWidth
-void Camera2D::setWidth( u32 value )
-{
-	m_width = value;
-}
-
-// ** Camera2D::height
-u32 Camera2D::height( void ) const
-{
-	return m_height;
-}
-
-// ** Camera2D::setHeight
-void Camera2D::setHeight( u32 value )
-{
-	m_height = value;
-}
-
-// ** Camera2D::view
-Matrix4 Camera2D::view( void ) const
-{
-	return Matrix4::translation( m_pan.x, m_pan.y, 0 ) * Matrix4::scale( m_zoom, m_zoom, 1.0f );
-}
-
-// ** Camera2D::proj
-Matrix4 Camera2D::proj( void ) const
-{
-	DC_BREAK_IF( m_width == 0 || m_height == 0 )
-	return Matrix4::ortho( 0, ( f32 )m_width, 0, ( f32 )m_height, -1, 100000 );
+	return ViewPtr( DC_NEW WindowView( window ) );
 }
 
 // -------------------------------------------- Camera -------------------------------------------- //
 
-// ** Camera::move
-void Camera::move( f32 amount )
+// ** Camera::clearColor
+const Rgba& Camera::clearColor( void ) const
 {
-	m_position = m_position + m_direction * amount;
+	return m_clearColor;
 }
 
-// ** Camera::strafe
-void Camera::strafe( f32 amount )
+// ** Camera::setClearColor
+void Camera::setClearColor( const Rgba& value )
 {
-	m_position = m_position + m_right * amount;
+	m_clearColor = value;
 }
 
-// ** Camera::pitch
-void Camera::pitch( f32 amount )
+// ** Camera::ndc
+const Rect& Camera::ndc( void ) const
 {
-	m_direction = Quat::rotateAroundAxis( amount, m_right ).rotate( m_direction );
+	return m_ndc;
 }
 
-// ** Camera::yaw
-void Camera::yaw( f32 amount )
+// ** Camera::setNdc
+void Camera::setNdc( const Rect& value )
 {
-	// ** Rotate the view direction
-	m_direction = Quat::rotateAroundAxis( amount, m_up ).rotate( m_direction );
+	m_ndc = value;
+}
 
-	// ** Calculate a new side vector.
-	m_right = m_direction % m_up;
-	m_right.normalize();
+// ** Camera::viewport
+Rect Camera::viewport( void ) const
+{
+	DC_BREAK_IF( m_view == NULL )
+
+	u32 w = m_view->width();
+	u32 h = m_view->height();
+
+	return Rect( w * m_ndc.min().x, h * m_ndc.min().y, w * m_ndc.max().x, h * m_ndc.max().y );
+}
+
+// ** Camera::setView
+void Camera::setView( const ViewPtr& value )
+{
+	m_view = value;
 }
 
 // ** Camera::view
-Matrix4 Camera::view( void ) const
+const ViewPtr& Camera::view( void ) const
 {
-	return Matrix4::lookAt( m_position, m_position + m_direction, m_up );
+	return m_view;
 }
 
-// ** Camera::proj
-Matrix4 Camera::proj( void ) const
+// ** Camera::calculateProjectionMatrix
+Matrix4 Camera::calculateProjectionMatrix( void ) const
 {
-	return Matrix4::perspective( m_fov, m_aspect, m_near, m_far );
+	DC_BREAK_IF( m_view == NULL )
+
+	f32 width  = static_cast<f32>( m_view->width() );
+	f32 height = static_cast<f32>( m_view->height() );
+
+	switch( m_projection ) {
+	case Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
+	case Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
+	case OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, -height * 0.5f, height * 0.5f, -10000, 10000 );
+	default:			DC_BREAK
+	}
+
+	return Matrix4();
 }
 
 } // namespace scene

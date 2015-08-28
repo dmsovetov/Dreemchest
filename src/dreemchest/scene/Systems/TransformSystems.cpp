@@ -33,9 +33,9 @@ namespace scene {
 // ------------------------------------------------ FollowSystem ------------------------------------------------- //
 
 // ** FollowSystem::process
-void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform2D& transform )
+void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform& transform )
 {
-	const Transform2DWPtr& target = follow.target();
+	const TransformWPtr& target = follow.target();
 	DC_BREAK_IF( target == NULL )
 
 	switch( follow.type() ) {
@@ -43,20 +43,20 @@ void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, F
 							break;
 
 	case Follow::Smooth:	{
-								Vec2 dir = target->position() - transform.position();
+								Vec3 dir = target->position() - transform.position();
 								transform.setPosition( transform.position() + dir * follow.damping() * dt );
 							}
 							break;
 
-	case Follow::Spring:	{
+	case Follow::Elastic:	{
 								Internal::Ptr internal = follow.internal<Internal>();
 
-								Vec2 direction = target->position() - transform.position();
+								Vec3 direction = target->position() - transform.position();
 
-								internal->m_force    += direction * follow.springForce();
-								internal->m_velocity  = internal->m_force;
+								internal->m_force += direction * follow.springForce();
+								Vec3 velocity = internal->m_force;
 
-								transform.setPosition( transform.position() + internal->m_velocity * dt );
+								transform.setPosition( transform.position() + velocity * dt );
 
 								internal->m_force *= 1.0f - (follow.damping() * dt);
 							}
@@ -66,7 +66,7 @@ void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, F
 }
 
 // ** FollowSystem::sceneObjectAdded
-void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform2D& transform )
+void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform& transform )
 {
 	follow.setInternal<Internal>( DC_NEW Internal );
 }
@@ -74,7 +74,7 @@ void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, T
 // ----------------------------------------------- Rotator2DSystem ----------------------------------------------- //
 
 // ** Rotator2DSystem::process
-void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform )
+void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform& transform )
 {
 	transform.setRotation( transform.rotation() + rotator.speed() * dt );
 }

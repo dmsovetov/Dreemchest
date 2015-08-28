@@ -25,12 +25,7 @@
  **************************************************************************/
 
 #include "Scene.h"
-#include "Systems/SpriteRenderer.h"
-#include "Systems/TransformSystems.h"
-#include "Systems/Physics2D.h"
-#include "Components/Camera.h"
-
-#include <json/json.h>
+#include "SceneObject.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,15 +34,15 @@ namespace scene {
 IMPLEMENT_LOGGER( log )
 
 // ** Scene::Scene
-Scene::Scene( void ) : m_systems( m_entities ), m_nextEntityId( 1 )
+Scene::Scene( void ) : m_systems( m_entities ), m_renderingSystems( m_entities ), m_nextEntityId( 1 )
 {
-	m_systems.add<Rotator2DSystem>();
-	m_systems.add<Box2DPhysics>();
+
 }
 
 // ** Scene::update
 void Scene::update( f32 dt )
 {
+	m_entities.notify();
 	m_systems.update( 0, dt );
 }
 
@@ -63,25 +58,22 @@ SceneObjectPtr Scene::createSceneObject( void )
 	return sceneObject;
 }
 
-// ** Scene::setRenderer
-void Scene::setRenderer( renderer::Hal* hal, RendererType renderer )
+// ** Scene::render
+void Scene::render( void )
 {
-	switch( renderer ) {
-	case RendererDefault:	m_renderer = new SpriteRenderer( m_entities, hal );
-							break;
-	}
+	m_renderingSystems.update( 0, 0.0f );
 }
 
-// ** Scene::render
-void Scene::render( const BasicCamera* camera )
+// ** Scene::systems
+ecs::Systems& Scene::systems( void )
 {
-	if( m_renderer == SpriteRendererPtr() ) {
-		log::warn( "Scene::render : no scene renderer set.\n" );
-		return;
-	}
+	return m_systems;
+}
 
-	m_renderer->setViewProjection( camera->viewProj() );
-	m_renderer->update( 0, 0 );
+// ** Scene::renderingSystems
+ecs::Systems& Scene::renderingSystems( void )
+{
+	return m_renderingSystems;
 }
 
 // ** Scene::create

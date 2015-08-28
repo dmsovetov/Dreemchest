@@ -37,10 +37,10 @@ WasdInput2DSystem::WasdInput2DSystem( ecs::Entities& entities ) : SceneSystem2( 
 }
 
 // ** WasdInput2DSystem::process
-void WasdInput2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform2D& transform )
+void WasdInput2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform& transform )
 {
 	// Movement direction
-	Vec2 direction( 0.0f, 0.0f );
+	Vec3 direction( 0.0f, 0.0f, 0.0f );
 
 	// Get the movement direction
 		 if( m_input->keyDown( input.left() ) )  direction.x = -1.0f;

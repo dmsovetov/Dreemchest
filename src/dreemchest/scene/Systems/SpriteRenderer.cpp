@@ -36,8 +36,51 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+// ------------------------------------------------- Renderer ------------------------------------------------- //
+
+// ** Renderer::Renderer
+Renderer::Renderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2( entities, "Renderer" ), m_hal( hal ), m_systems( entities )
+{
+	m_systems.add<SpriteRenderer>( m_hal );
+}
+
+// ** Renderer::process
+void Renderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Camera& camera, Transform& transform )
+{
+	// Get the output viewport for this camera
+	Rect viewport = camera.viewport();
+
+	// Get the view
+	const ViewPtr& view = camera.view();
+
+	// Get the viewport bounds
+	const Vec2& min		= viewport.min();
+	const Vec2& max		= viewport.max();
+	u32			width	= static_cast<u32>( max.x - min.x );
+	u32			height	= static_cast<u32>( max.y - min.y );
+	f32			vwidth  = static_cast<f32>( view->width() );
+	f32			vheight = static_cast<f32>( view->height() );
+
+	view->begin();
+	{
+		m_hal->setViewport( ( u32 )min.x, ( u32 )min.y,  width, height );
+		m_hal->setScissorTest( true, ( u32 )min.x, ( u32 )min.y,  width, height );
+
+		m_hal->clear( camera.clearColor() );
+
+		m_systems.get<SpriteRenderer>()->setViewProjection( camera.calculateProjectionMatrix() * transform.matrix().inversed() );
+		m_systems.update( currentTime, dt );
+
+		m_hal->setScissorTest( false );
+		m_hal->setViewport( 0, 0, vwidth, vheight );
+	}
+	view->end();
+}
+
+// ---------------------------------------------- SpriteRenderer ---------------------------------------------- //
+
 // ** SpriteRenderer::SpriteRenderer
-SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform2D>( entities, "SpriteRenderer" ), m_hal( hal ), m_renderOperations( 2000 )
+SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform>( entities, "SpriteRenderer" ), m_hal( hal ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_hal->createShader(
 		CODE(
@@ -154,10 +197,10 @@ void SpriteRenderer::setShader( const RenderOp* rop )
 }
 
 // ** SpriteRenderer::process
-void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform )
+void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
 {
 	// Calculate the MVP matrix
-	Matrix4 mvp = m_viewProjection * transform.affine();
+	Matrix4 mvp = m_viewProjection * transform.matrix();
 
 	// Get the rendered mesh
 	const MeshPtr& mesh = meshRenderer.mesh();

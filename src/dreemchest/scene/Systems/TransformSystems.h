@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! The Rotator2DSystem system
-	class Rotator2DSystem : public SceneSystem2<Rotator2D, Transform2D> {
+	class Rotator2DSystem : public SceneSystem2<Rotator2D, Transform> {
 	public:
 
 							//! Constructs a Rotator2DSystem instance.
@@ -44,11 +44,11 @@ namespace scene {
 								: SceneSystem2( entities, "Rotator2D" ) {}
 
 		//! Rotates a single entity by a rotator
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform );
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform& transform );
 	};
 
 	//! The following system
-	class FollowSystem : public SceneSystem2<Follow, Transform2D> {
+	class FollowSystem : public SceneSystem2<Follow, Transform> {
 	public:
 
 							//! Constructs a FollowSystem instance.
@@ -56,17 +56,16 @@ namespace scene {
 								: SceneSystem2( entities, "Follow" ) {}
 
 		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform2D& transform );
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform& transform );
 
 		//! Attaches the internal following data to an added scene object.
-		virtual void		sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform2D& transform );
+		virtual void		sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform& transform );
 
 	private:
 
 		//! Holds the accumulated acceleration.
 		struct Internal : ecs::Internal<Internal> {
-			Vec2			m_velocity;		//!< Current velocity.
-			Vec2			m_force;		//!< The accumulated acceleration.
+			Vec3			m_force;		//!< The accumulated force.
 		};
 	};
 

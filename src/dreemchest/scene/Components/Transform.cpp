@@ -33,7 +33,7 @@ namespace scene {
 // ------------------------------------------- Follow ------------------------------------------- //
 
 // ** Follow::target
-const Transform2DWPtr& Follow::target( void ) const
+const TransformWPtr& Follow::target( void ) const
 {
 	return m_target;
 }
@@ -56,104 +56,78 @@ f32 Follow::springForce( void ) const
 	return m_springForce;
 }
 
-// --------------------------------------- BasicTransform --------------------------------------- //
-
-// ** BasicTransform::BasicTransform
-BasicTransform::BasicTransform( BasicTransform* parent ) : m_parent( parent )
-{
-}
-
-// ** BasicTransform::parent
-const BasicTransformWPtr& BasicTransform::parent( void ) const
-{
-	return m_parent;
-}
-
-// ** BasicTransform::setParent
-void BasicTransform::setParent( const BasicTransformWPtr& value )
-{
-	m_parent = value;
-}
-
-// ** BasicTransform::affine
-Matrix4 BasicTransform::affine( void ) const
-{
-	if( const BasicTransform* parent = m_parent.get() ) {
-		return parent->affine() * matrix();
-	}
-
-	return matrix();
-}
-
-// ** BasicTransform::matrix
-Matrix4 BasicTransform::matrix( void ) const
-{
-	return Matrix4();
-}
-
-// ----------------------------------------- Transform2D ----------------------------------------- //
-
-// ** Transform2D::matrix
-Matrix4 Transform2D::matrix( void ) const
-{
-	return Matrix4::translation( Vec3( m_x, m_y, 0.0f ) ) * Quat::rotateAroundAxis( m_rotation, Vec3( 0, 0, -1 ) ) * Matrix4::scale( Vec3( m_scaleX, m_scaleY, 1.0f ) );
-}
-
-// ** Transform2D::rotation
-f32 Transform2D::rotation( void ) const
-{
-	return m_rotation;
-}
-
-// ** Transform2D::position
-Vec2 Transform2D::position( void ) const
-{
-	return Vec2( m_x, m_y );
-}
-
-// ** Transform2D::setPosition
-void Transform2D::setPosition( const Vec2& value )
-{
-	m_x = value.x;
-	m_y = value.y;
-}
-
-// ** Transform2D::x
-f32 Transform2D::x( void ) const
-{
-	return m_x;
-}
-
-// ** Transform2D::setX
-void Transform2D::setX( f32 value )
-{
-	m_x = value;
-}
-
-// ** Transform2D::y
-f32 Transform2D::y( void ) const
-{
-	return m_y;
-}
-
-// ** Transform2D::setY
-void Transform2D::setY( f32 value )
-{
-	m_y = value;
-}
-
-// ** Transform2D::setRotation
-void Transform2D::setRotation( f32 value )
-{
-	m_rotation = value;
-}
-
 // ------------------------------------------ Transform ------------------------------------------ //
 
 // ** Transform::matrix
 Matrix4 Transform::matrix( void ) const
 {
-	return Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
+	Matrix4 T = Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
+
+	if( m_parent != NULL ) {
+		T = m_parent->matrix() * T;
+	}
+
+	return T;
+}
+
+// ** Transform::parent
+const TransformWPtr& Transform::parent( void ) const
+{
+	return m_parent;
+}
+
+// ** Transform::setParent
+void Transform::setParent( const TransformWPtr& value )
+{
+	m_parent = value;
+}
+
+// ** Transform::position
+const Vec3& Transform::position( void ) const
+{
+	return m_position;
+}
+
+// ** Transform::setPosition
+void Transform::setPosition( const Vec3& value )
+{
+	m_position = value;
+}
+
+// ** Transform::x
+f32 Transform::x( void ) const
+{
+	return m_position.x;
+}
+
+// ** Transform::setX
+void Transform::setX( f32 value )
+{
+	m_position.x = value;
+}
+
+// ** Transform::y
+f32 Transform::y( void ) const
+{
+	return m_position.y;
+}
+
+// ** Transform::setY
+void Transform::setY( f32 value )
+{
+	m_position.y = value;
+}
+
+// ** Transform::rotation
+f32 Transform::rotation( void ) const
+{
+	return -m_rotation.euler().z;
+}
+
+// ** Transform::setRotation
+void Transform::setRotation( f32 value )
+{
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 0, -1.0f ) );
 }
 
 // ------------------------------------------ Rotator2D ------------------------------------------ //

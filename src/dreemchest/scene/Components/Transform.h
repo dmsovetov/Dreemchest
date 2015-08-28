@@ -33,50 +33,30 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Basic scene transformation
-	class BasicTransform : public SceneComponent {
+	//! Scene object transformation component.
+	class Transform : public SceneComponent {
 	public:
 
-									OverrideComponent( BasicTransform, SceneComponent )
-
-									//! Constructs BasicTransform instance
-									BasicTransform( BasicTransform* parent = NULL );
-
-		//! Calculates the affine transform matrix.
-		Matrix4						affine( void ) const;
-
-		//! Returns parent transform.
-		const BasicTransformWPtr&	parent( void ) const;
-
-		//! Sets parent transform.
-		void						setParent( const BasicTransformWPtr& value );
-
-		//! Calculates the transformation matrix.
-		virtual Matrix4				matrix( void ) const;
-
-	private:
-
-		BasicTransformWPtr			m_parent;	//!< Parent transform
-	};
-
-	//! Scene object 2D transformation component.
-	class Transform2D : public BasicTransform {
-	public:
-
-								OverrideComponent( Transform2D, BasicTransform )
+								OverrideComponent( Transform, SceneComponent )
 									
 								//! Constructs Transform2D instance.
-								Transform2D( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, BasicTransform* parent = NULL )
-									: BasicTransform( parent ), m_x( x ), m_y( y ), m_rotation( rotation ), m_scaleX( sx ), m_scaleY( sy ) {}
+								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
+									: m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0.0f, 0.0f, -1.0f ) ) ), m_scale( sx, sy, 1.0f ) {}
 
 		//! Returns an affine transformation matrix.
 		virtual Matrix4			matrix( void ) const;
 
-		//! Returns transformation position as a 2D vector.
-		Vec2					position( void ) const;
+		//! Returns parent transform.
+		const TransformWPtr&	parent( void ) const;
 
-		//! Sets position from a 2D vector.
-		void					setPosition( const Vec2& value );
+		//! Sets parent transform.
+		void					setParent( const TransformWPtr& value );
+
+		//! Returns transformation position.
+		const Vec3&				position( void ) const;
+
+		//! Sets the position.
+		void					setPosition( const Vec3& value );
 
 		//! Returns transformation X coordinate
 		f32						x( void ) const;
@@ -90,6 +70,12 @@ namespace scene {
 		//! Sets transform Y coordinate.
 		void					setY( f32 value );
 
+		//! Returns transformation Z coordinate
+		f32						z( void ) const;
+
+		//! Sets transform Z coordinate.
+		void					setZ( f32 value );
+
 		//! Returns transform rotation.
 		f32						rotation( void ) const;
 
@@ -98,48 +84,10 @@ namespace scene {
 
 	private:
 
-		f32						m_x;		//!< Object X coordinate.
-		f32						m_y;		//!< Object Y coordinate.
-		f32						m_rotation;	//!< Object rotation.
-		f32						m_scaleX;	//!< Object X scale.
-		f32						m_scaleY;	//!< Object Y scale.
-	};
-
-	//! Scene object 3D transformation component.
-	class Transform : public BasicTransform {
-	public:
-
-								OverrideComponent( Transform, BasicTransform )
-
-								//! Constructs Transform instance.
-								Transform( const Vec3& position = Vec3(), const Quat& rotation = Quat(), const Vec3& scale = Vec3( 1.0f, 1.0f, 1.0f ), BasicTransform* parent = NULL )
-									: BasicTransform( parent ), m_position( position ), m_rotation( rotation ), m_scale( scale ) {}
-
-		//! Returns an affine transformation matrix.
-		virtual Matrix4			matrix( void ) const;
-
-		//! Returns transform position.
-		const Vec3&				position( void ) const;
-
-		//! Sets transform position.
-		void					setPosition( const Vec3& value );
-
-		//! Returns transform rotation.
-		const Quat&				rotation( void ) const;
-
-		//! Sets transform rotation.
-		void					setRotation( const Quat& value );
-
-	private:
-
-		//! Object position.
-		Vec3					m_position;
-
-		//! Object rotation.
-		Quat					m_rotation;
-
-		//! Object scale.
-		Vec3					m_scale;
+		TransformWPtr			m_parent;	//!< Parent transform.
+		Vec3					m_position;	//!< Object position.
+		Quat					m_rotation;	//!< Object rotation.
+		Vec3					m_scale;	//!< Object scale.
 	};
 
 	//! Rotates the 2D transform
@@ -168,17 +116,17 @@ namespace scene {
 		enum Type {
 			Immediate,	//!< Sets the transform to a target transform.
 			Smooth,		//!< Smoothly changes the transform to a target one.
-			Spring,		//!< Calculates the spring force.
+			Elastic,	//!< Calculates the spring force.
 		};
 
 								OverrideComponent( Follow, SceneComponent )
 
 								//! Constructs the Follow instance.
-								Follow( const Transform2DWPtr& target = Transform2DWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )
+								Follow( const TransformWPtr& target = TransformWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )
 									: m_target( target ), m_type( type ), m_damping( damping ), m_springForce( springForce ) {}
 
 		//! Returns the target transform.
-		const Transform2DWPtr&	target( void ) const;
+		const TransformWPtr&	target( void ) const;
 
 		//! Returns the follow type
 		Type					type( void ) const;
@@ -191,7 +139,7 @@ namespace scene {
 
 	private:
 
-		Transform2DWPtr			m_target;		//!< The transform to follow.
+		TransformWPtr			m_target;		//!< The transform to follow.
 		Type					m_type;			//!< The following type.
 		f32						m_damping;		//!< Damping factor.
 		f32						m_springForce;	//!< The spring force.

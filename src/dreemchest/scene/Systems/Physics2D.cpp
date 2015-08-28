@@ -48,7 +48,7 @@ bool Box2DPhysics::begin( u32 currentTime )
 }
 
 // ** Box2DPhysics::process
-void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform )
+void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	if( rigidBody.type() != RigidBody2D::Dynamic ) {
 		return;
@@ -69,7 +69,7 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 }
 
 // ** Box2DPhysics::sceneObjectAdded
-void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform )
+void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
 
@@ -114,7 +114,7 @@ void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigi
 }
 
 // ** Box2DPhysics::sceneObjectRemoved
-void Box2DPhysics::sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform )
+void Box2DPhysics::sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	Internal::Ptr physical = rigidBody.internal<Internal>();
 	DC_BREAK_IF( physical == NULL )
@@ -136,7 +136,7 @@ void Box2DPhysics::addCircleFixture( b2Body* body, const Shape2D::Part& shape ) 
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
 
-	circle.m_p = positionToBox2D( Vec2( shape.circle.x, shape.circle.y ) );
+	circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
 	circle.m_radius = sizeToBox2D( shape.circle.radius );
 	fixture.shape = &circle;
 
@@ -153,7 +153,7 @@ void Box2DPhysics::addRectFixture( b2Body* body, const Shape2D::Part& shape ) co
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
 
-	polygon.m_centroid = positionToBox2D( Vec2( shape.rect.x, shape.rect.y ) );
+	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
 	polygon.SetAsBox( sizeToBox2D( shape.rect.width ), sizeToBox2D( shape.rect.height ) );
 	fixture.shape = &polygon;
 
@@ -173,7 +173,7 @@ void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape )
 	polygon.m_count = shape.polygon.count;
 
 	for( u32 i = 0; i < shape.polygon.count; i++ ) {
-		polygon.m_vertices[i] = positionToBox2D( Vec2( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1] ) );
+		polygon.m_vertices[i] = positionToBox2D( Vec3( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1], 0.0f ) );
 	}
 
 	fixture.shape = &polygon;
@@ -182,9 +182,9 @@ void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape )
 }
 
 // ** Box2DPhysics::positionFromBox2D
-Vec2 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
+Vec3 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
 {
-	return Vec2( position.x, position.y ) * m_scale;
+	return Vec3( position.x, position.y, 0.0f ) * m_scale;
 }
 
 // ** Box2DPhysics::rotationFromBox2D
@@ -194,7 +194,7 @@ f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 }
 
 // ** Box2DPhysics::positionToBox2D
-b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
+b2Vec2 Box2DPhysics::positionToBox2D( const Vec3& position ) const
 {
 	return b2Vec2( position.x / m_scale, position.y / m_scale );
 }

@@ -43,7 +43,7 @@ namespace scene {
 #ifdef DC_PHYSICS2D_BOX2D
 
 	//! The 2D physics system
-	class Box2DPhysics : public SceneSystem2<RigidBody2D, Transform2D> {
+	class Box2DPhysics : public SceneSystem2<RigidBody2D, Transform> {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
@@ -53,13 +53,13 @@ namespace scene {
 		virtual bool			begin( u32 currentTime );
 
 		//! Synchronizes the scene object transform with a rigid body.
-		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform );
+		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform );
+		virtual void			sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform );
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 	private:
 
@@ -73,10 +73,10 @@ namespace scene {
 		void					addPolygonFixture( b2Body* body, const Shape2D::Part& shape ) const;
 
 		//! Converts position from Box2D space to a scene space.
-		Vec2					positionFromBox2D( const b2Vec2& position ) const;
+		Vec3					positionFromBox2D( const b2Vec2& position ) const;
 
 		//! Converts position from scene space to a Box2D space.
-		b2Vec2					positionToBox2D( const Vec2& position ) const;
+		b2Vec2					positionToBox2D( const Vec3& position ) const;
 
 		//! Converts size from scene space to a Box2D space.
 		f32						sizeToBox2D( f32 value ) const;

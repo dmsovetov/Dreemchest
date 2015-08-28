@@ -30,14 +30,33 @@
 #include "SceneSystem.h"
 
 #include "../Components/Rendering.h"
+#include "../Components/Camera.h"
 #include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+	//! Rendering system.
+	class Renderer : public SceneSystem2<Camera, Transform> {
+	public:
+
+									//! Constructs Renderer instance.
+									Renderer( ecs::Entities& entities, renderer::Hal* hal );
+
+	protected:
+
+		//! Renders the frame from a camera.
+		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Camera& camera, Transform& transform );
+
+	private:
+
+		renderer::Hal*				m_hal;		//!< Renderer HAL.
+		ecs::Systems				m_systems;	//!< Actual render systems.
+	};
+
 	//! The sprite rendering system
-	class SpriteRenderer : public SceneSystem2<MeshRenderer, Transform2D> {
+	class SpriteRenderer : public SceneSystem2<MeshRenderer, Transform> {
 	public:
 
 									//! Constructs the SpriteRenderer instance.
@@ -65,7 +84,7 @@ namespace scene {
 		};
 
 		//! Renders a single entity with a mesh
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform2D& transform );
+		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform );
 
 		//! Called every frame before any entites are rendered.
 		virtual bool				begin( u32 currentTime );

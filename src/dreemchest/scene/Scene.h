@@ -33,6 +33,9 @@
     #include <Foo/Foo.h>
 #endif
 
+#include <platform/Platform.h>
+#include <platform/Input.h>
+
 #include <renderer/Renderer.h>
 #include <renderer/Hal.h>
 
@@ -51,18 +54,16 @@ namespace scene {
 	class Scene;
 	class Renderer;
 	class SceneObject;
+	class View;
 	class AssetBundle;
 	class Asset;
 		class Image;
 		class Mesh;
 		class Material;
 	class Component;
-		class BasicTransform;
-			class Transform;
+		class Transform;
 		class MeshRenderer;
-		class BasicCamera;
-			class Camera2D;
-			class Camera;
+		class Camera;
 		class Rotator2D;
 
 	class SpriteRenderer;
@@ -75,14 +76,6 @@ namespace scene {
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
 	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
 	typedef StrongPtr<Component>		ComponentPtr;
-	typedef StrongPtr<Transform>		TransformPtr;
-	typedef WeakPtr<Transform>			TransformWPtr;
-	typedef StrongPtr<BasicTransform>	BasicTransformPtr;
-	typedef WeakPtr<BasicTransform>		BasicTransformWPtr;
-	typedef StrongPtr<Camera>			CameraPtr;
-	typedef WeakPtr<Camera>				CameraWPtr;
-	typedef StrongPtr<Camera2D>			Camera2DPtr;
-	typedef WeakPtr<Camera2D>			Camera2DWPtr;
 	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
 	typedef StrongPtr<Mesh>				MeshPtr;
 	typedef StrongPtr<Material>			MaterialPtr;
@@ -90,13 +83,9 @@ namespace scene {
 	typedef WeakPtr<Image>				ImageWPtr;
 	typedef StrongPtr<SpriteRenderer>	SpriteRendererPtr;
 
-	//! Container type to store a list of objects.
-	typedef List<SceneObjectPtr>	SceneObjects;
-
-	//! Available scene renderers.
-	enum RendererType {
-		RendererDefault = 0,	//!< Default scene renderer.
-	};
+	dcDeclarePtrs( View )
+	dcDeclarePtrs( Transform )
+	dcDeclarePtrs( Camera )
 
 	//! Supported image formats.
 	enum ImageFormat {
@@ -112,13 +101,16 @@ namespace scene {
 		void							update( f32 dt );
 
 		//! Renders a scene.
-		void							render( const BasicCamera* camera );
-
-		//! Sets a scene renderer.
-		void							setRenderer( renderer::Hal* hal, RendererType renderer );
+		void							render( void );
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
+
+		//! Returns the scene systems.
+		ecs::Systems&					systems( void );
+
+		//! Returns the scene rendering systems.
+		ecs::Systems&					renderingSystems( void );
 
 		//! Creates a new scene.
 		static ScenePtr					create( void );
@@ -133,14 +125,14 @@ namespace scene {
 		//! Scene entities container.
 		ecs::Entities					m_entities;
 
-		//! Built-in scene entity systems.
+		//! Entity update systems.
 		ecs::Systems					m_systems;
+
+		//! Entity rendering systems.
+		ecs::Systems					m_renderingSystems;
 
 		//! Next scene object id.
 		ecs::EntityId					m_nextEntityId;
-
-		//! Scene renderer.
-		SpriteRendererPtr				m_renderer;						
 	};
 
 } // namespace scene
@@ -153,6 +145,10 @@ DC_END_DREEMCHEST
 	#include "Components/Camera.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"
+	#include "Systems/TransformSystems.h"
+	#include "Systems/Physics2D.h"
+	#include "Systems/SpriteRenderer.h"
+	#include "Systems/Input2DSystems.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"

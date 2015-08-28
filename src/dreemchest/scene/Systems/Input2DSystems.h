@@ -37,14 +37,14 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! Moves scene object transform 2d according to a WASD input scheme
-	class WasdInput2DSystem : public SceneSystem2<WasdInput2D, Transform2D> {
+	class WasdInput2DSystem : public SceneSystem2<WasdInput2D, Transform> {
 	public:
 
 							//! Constructs a WasdInput2DSystem instance.
 							WasdInput2DSystem( ecs::Entities& entities );
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform2D& transform );
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform& transform );
 
 	private:
 

@@ -33,100 +33,117 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Basic camera
-	class BasicCamera : public SceneComponent {
+	//! Scene rendering view.
+	class View : public RefCounted {
 	public:
 
-									OverrideComponent( BasicCamera, SceneComponent )
+		virtual						~View( void ) {}
 
-		//! Returns a composed view projection matrix.
-		Matrix4						viewProj( void ) const;
+		//! Returns the view width.
+		virtual u32					width( void ) const { return 0; }
 
+		//! Returns the view height.
+		virtual u32					height( void ) const { return 0; }
 
-		//! Returns a view matrix composed from a camera vectors.
-		virtual Matrix4				view( void ) const;
+		//! Begins rendering to this view.
+		virtual void				begin( void ) const {}
 
-		//! Returns a projection matrix.
-		virtual Matrix4				proj( void ) const;
+		//! Ends rendering to this view.
+		virtual void				end( void ) const {}
 	};
 
-	//! 2D space camera component.
-	class Camera2D : public BasicCamera {
+	//! WindowView is used for rendering the scene to window.
+	class WindowView : public View {
 	public:
 
-									OverrideComponent( Camera2D, BasicCamera )
+		//! Returns the window width.
+		virtual u32					width( void ) const;
 
-									//! Constructs Camera instance.
-									Camera2D( void )
-										: m_width( 0 ), m_height( 0 ), m_zoom( 1.0f ), m_pan( 0.0f, 0.0f ) {}
+		//! Returns the window height.
+		virtual u32					height( void ) const;
 
-		//! Returns the viewport width.
-		u32							width( void ) const;
-
-		//! Sets the viewport width.
-		void						setWidth( u32 value );
-
-		//! Returns the viewport height.
-		u32							height( void ) const;
-
-		//! Sets the viewport height.
-		void						setHeight( u32 value );
-
-		//! Returns a view matrix composed from a camera vectors.
-		virtual Matrix4				view( void ) const;
-
-		//! Returns a projection matrix.
-		virtual Matrix4				proj( void ) const;
+		//! Creates the WindowView instance.
+		static ViewPtr				create( const WindowWPtr& window );
 
 	private:
 
-		u32							m_width;		//!< The viewport width.
-		u32							m_height;		//!< The viewport height.
-		f32							m_zoom;			//!< The zoom.
-		Vec2						m_pan;			//!< Camera pan.
-	};
-
-	//! 3D space camera component.
-	class Camera : public BasicCamera {
-	public:
-
-									OverrideComponent( Camera, BasicCamera )
-
-									//! Constructs Camera instance.
-									Camera( void )
-										: m_direction( 0, 0, 1 ), m_up( 0, 1, 0 ), m_right( 1, 0, 0 ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 100.0f ), m_aspect( 1.0f ) {}
-
-		//! Moves camera in a direction of view by a specified distance.
-		void						move( f32 amount );
-
-		//! Moves camera to a side of a right vector.
-		void						strafe( f32 amount );
-
-		//! Rotates camera view around the side vector.
-		void						pitch( f32 amount );
-
-		//! Rotates camera view around the up vector.
-		void						yaw( f32 amount );
-
-		//! Sets camera aspect ratio.
-		void						setAspect( f32 value );
-
-		//! Returns a view matrix composed from a camera vectors.
-		virtual Matrix4				view( void ) const;
-
-		//! Returns a projection matrix with a specified aspect.
-		virtual Matrix4				proj( void ) const;
+									//! Constructs the WindowView instance.
+									WindowView( const WindowWPtr& window );
 
 	private:
 
-		Vec3						m_position;		//!< Camera position.
-		Vec3						m_direction;	//!< Camera view direction.
-		Vec3						m_up;			//!< Camera up vector.
-		Vec3						m_right;		//!< Camera right side vector.
-		f32							m_fov;			//!< Camera field of view angle.
-		f32							m_near;			//!< Camera Z near.
-		f32							m_far;			//!< Camera Z far.
-		f32							m_aspect;		//!< Camera aspect ratio.
+		WindowWPtr					m_window;	//!< The output window.
+	};
+
+	//! Camera component.
+	class Camera : public SceneComponent {
+	public:
+
+		//! Available camera projections.
+		enum Projection {
+			Perspective = 0,
+			Ortho,
+			OrthoCenter
+		};
+
+									OverrideComponent( Camera, SceneComponent )
+
+									//! Constructs Camera instance.
+									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
+										: m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
+
+
+		//! Sets the clear color.
+		void						setClearColor( const Rgba& value );
+
+		//! Returns the clear color.
+		const Rgba&					clearColor( void ) const;
+
+		//! Returns camera field of view.
+		f32							fov( void ) const;
+
+		//! Sets camera field of view.
+		void						setFov( f32 value );
+
+		//! Returns the Z-near value.
+		f32							near( void ) const;
+
+		//! Sets the Z-near value.
+		void						setNear( f32 value ) const;
+
+		//! Returns the Z-far value.
+		f32							far( void ) const;
+
+		//! Sets the Z-far value.
+		void						setFar( f32 value ) const;
+
+		//! Sets the normalized device coordinates to render frame to.
+		void						setNdc( const Rect& value );
+
+		//! Returns the normalized device coordinates to render frame to.
+		const Rect&					ndc( void ) const;
+
+		//! Calculates the output viewport coordinates.
+		Rect						viewport( void ) const;
+
+		//! Sets the camera render view.
+		void						setView( const ViewPtr& value );
+
+		//! Returns the camera render view.
+		const ViewPtr&				view( void ) const;
+
+		//! Calculates the projection matrix.
+		Matrix4						calculateProjectionMatrix( void ) const;
+
+	private:
+
+		Projection					m_projection;	//!< Camera projection.
+		Rect						m_ndc;			//!< Output normalized device coordinates.
+		ViewPtr						m_view;			//!< Render view.
+		Rgba						m_clearColor;	//!< The clear color.
+		f32							m_fov;			//!< Camera field of view.
+		f32							m_near;			//!< Z-near value.
+		f32							m_far;			//!< Z-far value.
 	};
 
 } // namespace scene
