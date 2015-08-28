@@ -30,6 +30,32 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+// ------------------------------------------- Follow ------------------------------------------- //
+
+// ** Follow::target
+const Transform2DWPtr& Follow::target( void ) const
+{
+	return m_target;
+}
+
+// ** Follow::type
+Follow::Type Follow::type( void ) const
+{
+	return m_type;
+}
+
+// ** Follow::damping
+f32 Follow::damping( void ) const
+{
+	return m_damping;
+}
+
+// ** Follow::springForce
+f32 Follow::springForce( void ) const
+{
+	return m_springForce;
+}
+
 // --------------------------------------- BasicTransform --------------------------------------- //
 
 // ** BasicTransform::BasicTransform

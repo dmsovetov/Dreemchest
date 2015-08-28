@@ -160,6 +160,43 @@ namespace scene {
 		f32						m_speed;	//!< The rotation speed.
 	};
 
+	//! Follows the transform
+	class Follow : public SceneComponent {
+	public:
+
+		//! Available follow types.
+		enum Type {
+			Immediate,	//!< Sets the transform to a target transform.
+			Smooth,		//!< Smoothly changes the transform to a target one.
+			Spring,		//!< Calculates the spring force.
+		};
+
+								OverrideComponent( Follow, SceneComponent )
+
+								//! Constructs the Follow instance.
+								Follow( const Transform2DWPtr& target = Transform2DWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )
+									: m_target( target ), m_type( type ), m_damping( damping ), m_springForce( springForce ) {}
+
+		//! Returns the target transform.
+		const Transform2DWPtr&	target( void ) const;
+
+		//! Returns the follow type
+		Type					type( void ) const;
+
+		//! Returns the damping factor.
+		f32						damping( void ) const;
+
+		//! Returns the spring force.
+		f32						springForce( void ) const;
+
+	private:
+
+		Transform2DWPtr			m_target;		//!< The transform to follow.
+		Type					m_type;			//!< The following type.
+		f32						m_damping;		//!< Damping factor.
+		f32						m_springForce;	//!< The spring force.
+	};
+
 } // namespace scene
 
 DC_END_DREEMCHEST

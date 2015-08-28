@@ -30,6 +30,49 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+// ------------------------------------------------ FollowSystem ------------------------------------------------- //
+
+// ** FollowSystem::process
+void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform2D& transform )
+{
+	const Transform2DWPtr& target = follow.target();
+	DC_BREAK_IF( target == NULL )
+
+	switch( follow.type() ) {
+	case Follow::Immediate:	transform.setPosition( target->position() );
+							break;
+
+	case Follow::Smooth:	{
+								Vec2 dir = target->position() - transform.position();
+								transform.setPosition( transform.position() + dir * follow.damping() * dt );
+							}
+							break;
+
+	case Follow::Spring:	{
+								Internal::Ptr internal = follow.internal<Internal>();
+
+								Vec2 direction = target->position() - transform.position();
+
+								internal->m_force    += direction * follow.springForce();
+								internal->m_velocity  = internal->m_force;
+
+								transform.setPosition( transform.position() + internal->m_velocity * dt );
+
+								internal->m_force *= 1.0f - (follow.damping() * dt);
+							}
+							break;
+	}
+	
+}
+
+// ** FollowSystem::sceneObjectAdded
+void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform2D& transform )
+{
+	follow.setInternal<Internal>( DC_NEW Internal );
+}
+
+// ----------------------------------------------- Rotator2DSystem ----------------------------------------------- //
+
 // ** Rotator2DSystem::process
 void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform )
 {

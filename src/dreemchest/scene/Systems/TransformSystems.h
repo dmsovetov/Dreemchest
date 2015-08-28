@@ -47,6 +47,29 @@ namespace scene {
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform2D& transform );
 	};
 
+	//! The following system
+	class FollowSystem : public SceneSystem2<Follow, Transform2D> {
+	public:
+
+							//! Constructs a FollowSystem instance.
+							FollowSystem( ecs::Entities& entities )
+								: SceneSystem2( entities, "Follow" ) {}
+
+		//! Follows the target transform
+		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform2D& transform );
+
+		//! Attaches the internal following data to an added scene object.
+		virtual void		sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform2D& transform );
+
+	private:
+
+		//! Holds the accumulated acceleration.
+		struct Internal : ecs::Internal<Internal> {
+			Vec2			m_velocity;		//!< Current velocity.
+			Vec2			m_force;		//!< The accumulated acceleration.
+		};
+	};
+
 } // namespace scene
 
 DC_END_DREEMCHEST
