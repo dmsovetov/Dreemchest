@@ -89,6 +89,15 @@ namespace scene {
 
 	private:
 
+		//! Holds the per-instance internal physics data inside the component.
+		struct Internal : public ecs::Internal<Internal> {
+								//! Constructs the Internal instance.
+								Internal( b2Body* body )
+									: m_body( body ) {}
+
+			b2Body*				m_body;				//!< The attached Box2D body.
+		};
+
 		AutoPtr<b2World>		m_world;			//!< The Box2D physics world.
 		f32						m_scale;			//!< Physics world scale.
 		f32						m_deltaTime;		//!< Physics delta time.

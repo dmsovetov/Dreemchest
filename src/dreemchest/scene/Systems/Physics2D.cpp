@@ -55,8 +55,10 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 	}
 
 	// Get the Box2D body
-	b2Body* body = rigidBody.userData<b2Body>();
-	DC_BREAK_IF( body == NULL );
+	Internal::Ptr physical = rigidBody.internal<Internal>();
+	DC_BREAK_IF( physical == NULL );
+
+	b2Body* body = physical->m_body;
 
 	// Get the body transform
 	const b2Transform& rigidBodyTransform = body->GetTransform();
@@ -69,7 +71,7 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 // ** Box2DPhysics::sceneObjectAdded
 void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform )
 {
-	DC_BREAK_IF( rigidBody.userData<b2Body>() )
+	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
 
 	Shape2D* shape = sceneObject.get<Shape2D>();
 	DC_BREAK_IF( shape == NULL )
@@ -108,14 +110,17 @@ void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigi
 	}
 
 	// Attach created body to a component
-	rigidBody.setUserData<b2Body>( body );
+	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );
 }
 
 // ** Box2DPhysics::sceneObjectRemoved
 void Box2DPhysics::sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform2D& transform )
 {
-	b2Body* body = rigidBody.userData<b2Body>();
-	DC_BREAK_IF( body == NULL )
+	Internal::Ptr physical = rigidBody.internal<Internal>();
+	DC_BREAK_IF( physical == NULL )
+
+	b2Body* body = physical->m_body;
+	DC_BREAK_IF( body == NULL );
 
     body->SetUserData( NULL );
     m_world->DestroyBody( body );
