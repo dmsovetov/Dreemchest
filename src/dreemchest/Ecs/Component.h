@@ -37,6 +37,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace ecs {
 
+	//! A base class for internal system data attached to a components.
+	struct InternalBase : public RefCounted {
+	};
+
+	//! A template class used for declaring system-specific internal data.
+	template<typename T>
+	struct Internal : public InternalBase {
+		typedef StrongPtr<T> Ptr;	//!< The internal data pointer.
+	};
+
 	//! A base class for all components.
 	/*!
 	A component is all the data for one aspect of the entity. Component is just a plain
@@ -45,8 +55,38 @@ namespace ecs {
 	class Component : public io::Serializable {
 	public:
 
-        OverrideComponent( Component, io::Serializable )
+									OverrideComponent( Component, io::Serializable )
+
+		//! Sets the internal data.
+		template<typename T>
+		void						setInternal( InternalBase* value );
+
+		//! Returns the internal data.
+		template<typename T>
+		typename Internal<T>::Ptr	internal( void ) const;
+
+	private:
+
+		//! Container type to store internal system state inside a component.
+		typedef Map< TypeIdx, StrongPtr<InternalBase> > InternalDataHolder;
+
+		InternalDataHolder			m_internal;	//!< The internal data.
 	};
+
+	// ** Component::setInternal
+	template<typename T>
+	inline void Component::setInternal( InternalBase* value )
+	{
+		m_internal[TypeIndex<T>::idx()] = value;
+	}
+
+	// ** Component::internal
+	template<typename T>
+	inline typename Internal<T>::Ptr Component::internal( void ) const
+	{
+		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
+		return i != m_internal.end() ? i->second : Internal<T>::Ptr();
+	}
 
 } // namespace ecs
 
