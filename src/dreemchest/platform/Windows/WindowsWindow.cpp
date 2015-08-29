@@ -98,7 +98,7 @@ Window* WindowsWindow::owner( void ) const
 u32 WindowsWindow::width( void ) const
 {
     RECT rect;
-	GetWindowRect( m_window, &rect );
+	GetClientRect( m_window, &rect );
 	return rect.right - rect.left;
 }
 
@@ -106,7 +106,7 @@ u32 WindowsWindow::width( void ) const
 u32 WindowsWindow::height( void ) const
 {
 	RECT rect;
-	GetWindowRect( m_window, &rect );
+	GetClientRect( m_window, &rect );
 	return rect.bottom - rect.top;
 }
 
