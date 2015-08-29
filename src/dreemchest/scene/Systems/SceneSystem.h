@@ -157,6 +157,68 @@ namespace scene {
 		}
 	};
 
+	//! The basic scene system for two component types
+	template<typename TComponent1, typename TComponent2, typename TComponent3>
+	class SceneSystem3 : public ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3> {
+	public:
+
+								//! Constructs the SceneSystem3 instance
+								SceneSystem3( ecs::Entities& entities, const String& name )
+									: ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3>( entities, name ) {}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL );
+			process( currentTime, dt, *sceneObject, component1, component2, component3 );
+		}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectAdded( *sceneObject );
+		}
+
+		//! Casts the entity to a SceneObject type
+		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		{
+			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
+			DC_BREAK_IF( sceneObject == NULL )
+			sceneObjectRemoved( *sceneObject );
+		}
+
+		//! Processes the scene object
+		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		{
+			DC_BREAK
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject )
+		{
+			sceneObjectAdded( sceneObject, *sceneObject.get<TComponent1>(), *sceneObject.get<TComponent2>(), *sceneObject.get<TComponent3>() );
+		}
+
+		//! Processes the added scene object
+		virtual void			sceneObjectAdded( SceneObject& sceneObject, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		{
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject )
+		{
+			sceneObjectRemoved( sceneObject, *sceneObject.get<TComponent1>(), *sceneObject.get<TComponent2>(), *sceneObject.get<TComponent3>() );
+		}
+
+		//! Processes the removed scene object
+		virtual void			sceneObjectRemoved( SceneObject& sceneObject, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		{
+		}
+	};
+
 } // namespace scene
 
 DC_END_DREEMCHEST
