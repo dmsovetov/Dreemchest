@@ -57,6 +57,10 @@ namespace ecs {
 		template<typename TComponent0, typename TComponent1>
 		static Aspect	all( void );
 
+		//! Returns an aspect with all mask.
+		template<typename TComponent0, typename TComponent1, typename TComponent2>
+		static Aspect	all( void );
+
 	private:
 
 		Bitset			m_any;	//!< Entity should have at least one component from this set.
@@ -74,6 +78,12 @@ namespace ecs {
 	template<typename TComponent0, typename TComponent1>
 	inline Aspect Aspect::all( void ) {
 		return Aspect( All, TComponent0::bit() | TComponent1::bit() );
+	}
+
+	// ** Aspect::all
+	template<typename TComponent0, typename TComponent1, typename TComponent2>
+	inline Aspect Aspect::all( void ) {
+		return Aspect( All, TComponent0::bit() | TComponent1::bit() | TComponent2::bit() );
 	}
 
 } // namespace ecs

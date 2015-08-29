@@ -128,6 +128,33 @@ namespace ecs {
 		}
 	};
 
+	//! A template class to process entities that contain all components from a specified set.
+	template<typename TComponent1, typename TComponent2, typename TComponent3>
+	class EntityWithComponentsSystem3 : public EntitySystem {
+	public:
+
+						//! Constructs EntityWithComponentsSystem3 instance.
+						EntityWithComponentsSystem3( Entities& entities, const String& name )
+							: EntitySystem( entities, name, Aspect::all<TComponent1, TComponent2, TComponent3>() ) {}
+
+	protected:
+
+		//! Extracts a specified components from entity and runs a processing callback.
+		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity )
+		{
+			TComponent1* c1 = entity->get<TComponent1>();
+			TComponent2* c2 = entity->get<TComponent2>();
+			TComponent3* c3 = entity->get<TComponent3>();
+			process( currentTime, dt, entity, *c1, *c2, *c3 );
+		}
+
+		//! Strong typed process method.
+		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		{
+			DC_BREAK
+		}
+	};
+
 } // namespace ecs
 
 DC_END_DREEMCHEST
