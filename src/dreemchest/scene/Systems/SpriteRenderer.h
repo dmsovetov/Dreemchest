@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_SpriteRenderer_System_H__
 #define __DC_Scene_SpriteRenderer_System_H__
 
-#include "SceneSystem.h"
+#include "RenderSystem.h"
 
 #include "../Components/Rendering.h"
 #include "../Components/Camera.h"
@@ -37,33 +37,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! Rendering system.
-	class Renderer : public SceneSystem2<Camera, Transform> {
+	//! The sprite rendering pass
+	class SpriteRendererPass : public RenderPass<MeshRenderer> {
 	public:
 
-									//! Constructs Renderer instance.
-									Renderer( ecs::Entities& entities, renderer::Hal* hal );
-
-	protected:
-
-		//! Renders the frame from a camera.
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Camera& camera, Transform& transform );
-
-	private:
-
-		renderer::Hal*				m_hal;		//!< Renderer HAL.
-		ecs::Systems				m_systems;	//!< Actual render systems.
-	};
-
-	//! The sprite rendering system
-	class SpriteRenderer : public SceneSystem2<MeshRenderer, Transform> {
-	public:
-
-									//! Constructs the SpriteRenderer instance.
-									SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal );
-
-		//! Sets the view/projection matrices used for rendering
-		void						setViewProjection( const Matrix4& viewProjection );
+									//! Constructs the SpriteRendererPass instance.
+									SpriteRendererPass( ecs::Entities& entities, renderer::Hal* hal );
 
 	protected:
 
@@ -123,11 +102,17 @@ namespace scene {
 			}
 		};
 		
-		renderer::Hal*				m_hal;							//!< Renderer HAL.
 		renderer::Shader*			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
 		ArrayAllocator<RenderOp>	m_renderOperations;				//!< Array allocator used to allocated render operations.
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
-		Matrix4						m_viewProjection;				//!< The view-projection matrix.
+	};
+
+	//! Sprite render system
+	class SpriteRenderer : public RenderSystem<RenderSprites> {
+	public:
+
+									SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal )
+										: RenderSystem( entities, "SpriteRenderer", hal ) { addPass<SpriteRendererPass>(); }
 	};
 
 } // namespace scene

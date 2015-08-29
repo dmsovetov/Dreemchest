@@ -36,51 +36,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ------------------------------------------------- Renderer ------------------------------------------------- //
-
-// ** Renderer::Renderer
-Renderer::Renderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2( entities, "Renderer" ), m_hal( hal ), m_systems( entities )
-{
-	m_systems.add<SpriteRenderer>( m_hal );
-}
-
-// ** Renderer::process
-void Renderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Camera& camera, Transform& transform )
-{
-	// Get the output viewport for this camera
-	Rect viewport = camera.viewport();
-
-	// Get the view
-	const ViewPtr& view = camera.view();
-
-	// Get the viewport bounds
-	const Vec2& min		= viewport.min();
-	const Vec2& max		= viewport.max();
-	u32			width	= static_cast<u32>( max.x - min.x );
-	u32			height	= static_cast<u32>( max.y - min.y );
-	f32			vwidth  = static_cast<f32>( view->width() );
-	f32			vheight = static_cast<f32>( view->height() );
-
-	view->begin();
-	{
-		m_hal->setViewport( ( u32 )min.x, ( u32 )min.y,  width, height );
-		m_hal->setScissorTest( true, ( u32 )min.x, ( u32 )min.y,  width, height );
-
-		m_hal->clear( camera.clearColor() );
-
-		m_systems.get<SpriteRenderer>()->setViewProjection( camera.calculateProjectionMatrix() * transform.matrix().inversed() );
-		m_systems.update( currentTime, dt );
-
-		m_hal->setScissorTest( false );
-		m_hal->setViewport( 0, 0, vwidth, vheight );
-	}
-	view->end();
-}
-
-// ---------------------------------------------- SpriteRenderer ---------------------------------------------- //
-
-// ** SpriteRenderer::SpriteRenderer
-SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : SceneSystem2<MeshRenderer, Transform>( entities, "SpriteRenderer" ), m_hal( hal ), m_renderOperations( 2000 )
+// ** SpriteRendererPass::SpriteRendererPass
+SpriteRendererPass::SpriteRendererPass( ecs::Entities& entities, renderer::Hal* hal ) : RenderPass( entities, "SpriteRendererPass", hal ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_hal->createShader(
 		CODE(
@@ -106,14 +63,8 @@ SpriteRenderer::SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal ) : 
 			} ) );
 }
 
-// ** SpriteRenderer::setViewProjection
-void SpriteRenderer::setViewProjection( const Matrix4& viewProjection )
-{
-	m_viewProjection = viewProjection;
-}
-
-// ** SpriteRenderer::begin
-bool SpriteRenderer::begin( u32 currentTime )
+// ** SpriteRendererPass::begin
+bool SpriteRendererPass::begin( u32 currentTime )
 {
 	// Clean the allocated render operations
 	m_renderOperations.reset();
@@ -124,8 +75,8 @@ bool SpriteRenderer::begin( u32 currentTime )
 	return true;
 }
 
-// ** SpriteRenderer::end
-void SpriteRenderer::end( void )
+// ** SpriteRendererPass::end
+void SpriteRendererPass::end( void )
 {
 	// Sort the emitted render operations
 	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
@@ -171,8 +122,8 @@ void SpriteRenderer::end( void )
 	m_frame.clear();
 }
 
-// ** SpriteRenderer::setShader
-void SpriteRenderer::setShader( const RenderOp* rop )
+// ** SpriteRendererPass::setShader
+void SpriteRendererPass::setShader( const RenderOp* rop )
 {
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
@@ -196,11 +147,11 @@ void SpriteRenderer::setShader( const RenderOp* rop )
 	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
 }
 
-// ** SpriteRenderer::process
-void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
+// ** SpriteRendererPass::process
+void SpriteRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
 {
 	// Calculate the MVP matrix
-	Matrix4 mvp = m_viewProjection * transform.matrix();
+	Matrix4 mvp = m_viewProj * transform.matrix();
 
 	// Get the rendered mesh
 	const MeshPtr& mesh = meshRenderer.mesh();
@@ -226,8 +177,8 @@ void SpriteRenderer::process( u32 currentTime, f32 dt, SceneObject& sceneObject,
 	}
 }
 
-// ** SpriteRenderer::emitRenderOp
-SpriteRenderer::RenderOp* SpriteRenderer::emitRenderOp( void )
+// ** SpriteRendererPass::emitRenderOp
+SpriteRendererPass::RenderOp* SpriteRendererPass::emitRenderOp( void )
 {
 	RenderOp* rop = m_renderOperations.allocate();
 	DC_BREAK_IF( rop == NULL )
@@ -237,8 +188,8 @@ SpriteRenderer::RenderOp* SpriteRenderer::emitRenderOp( void )
 	return rop;
 }
 
-// ** SpriteRenderer::sortByShaderTextureMesh
-bool SpriteRenderer::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
+// ** SpriteRendererPass::sortByShaderTextureMesh
+bool SpriteRendererPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
 {
 	if( a->shader != b->shader ) return a->shader < b->shader;
 	if( a->texture != b->texture ) return a->texture > b->texture;

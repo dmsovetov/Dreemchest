@@ -35,6 +35,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+	class RenderSprites : public SceneComponent {
+	public:
+
+									OverrideComponent( RenderSprites, SceneComponent )
+	};
+
 	//! Mesh renderer component.
 	class MeshRenderer : public SceneComponent {
 	public:

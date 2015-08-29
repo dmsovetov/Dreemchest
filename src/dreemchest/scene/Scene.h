@@ -52,7 +52,6 @@ namespace scene {
 	DECLARE_LOG( log )
 
 	class Scene;
-	class Renderer;
 	class SceneObject;
 	class View;
 	class AssetBundle;
@@ -81,11 +80,11 @@ namespace scene {
 	typedef StrongPtr<Material>			MaterialPtr;
 	typedef StrongPtr<Image>			ImagePtr;
 	typedef WeakPtr<Image>				ImageWPtr;
-	typedef StrongPtr<SpriteRenderer>	SpriteRendererPtr;
 
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
+	dcDeclarePtrs( RenderPassBase )
 
 	//! Supported image formats.
 	enum ImageFormat {
@@ -149,6 +148,7 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/SpriteRenderer.h"
 	#include "Systems/Input2DSystems.h"
+	#include "Systems/RenderSystem.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
