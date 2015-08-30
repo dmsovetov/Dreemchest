@@ -32,6 +32,21 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+// --------------------------------------------- View --------------------------------------------- //
+
+// ** View::calculateSplitRect
+Rect View::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
+{
+	// Calculate the viewport dimensions in NDC
+	f32 width  = 1.0f / nx;
+	f32 height = 1.0f / ny;
+
+	// Calculate the NDC of a viewport
+	Rect ndc = Rect( x * width, y * height, (x + 1) * width, (y + 1) * height );
+
+	return ndc;
+}
+
 // ------------------------------------------ WindowView ------------------------------------------ //
 
 // ** WindowView::WindowView
@@ -111,8 +126,9 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 {
 	DC_BREAK_IF( m_view == NULL )
 
-	f32 width  = static_cast<f32>( m_view->width() );
-	f32 height = static_cast<f32>( m_view->height() );
+	Rect rect   = viewport();
+	f32  width  = rect.width();
+	f32  height = rect.height();
 
 	switch( m_projection ) {
 	case Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
