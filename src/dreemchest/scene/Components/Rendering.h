@@ -35,10 +35,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	class RenderSprites : public SceneComponent {
+	//! This component is attached to a camera to render unlit meshes.
+	class RenderUnlitMeshes : public SceneComponent {
 	public:
 
-									OverrideComponent( RenderSprites, SceneComponent )
+									OverrideComponent( RenderUnlitMeshes, SceneComponent )
 	};
 
 	//! Mesh renderer component.

@@ -24,11 +24,14 @@
 
  **************************************************************************/
 
-#include "SpriteRenderer.h"
+#include "UnlitMeshRenderer.h"
 
 #include "../Assets/Mesh.h"
 #include "../Assets/Material.h"
 #include "../Assets/Image.h"
+
+#include "../Components/Transform.h"
+#include "../Components/Camera.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -36,8 +39,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ** SpriteRendererPass::SpriteRendererPass
-SpriteRendererPass::SpriteRendererPass( ecs::Entities& entities, renderer::Hal* hal ) : RenderPass( entities, "SpriteRendererPass", hal ), m_renderOperations( 2000 )
+// ** MeshRendererPass::MeshRendererPass
+MeshRendererPass::MeshRendererPass( ecs::Entities& entities, renderer::Hal* hal ) : RenderPass( entities, "MeshRendererPass", hal ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_hal->createShader(
 		CODE(
@@ -63,8 +66,8 @@ SpriteRendererPass::SpriteRendererPass( ecs::Entities& entities, renderer::Hal* 
 			} ) );
 }
 
-// ** SpriteRendererPass::begin
-bool SpriteRendererPass::begin( u32 currentTime )
+// ** MeshRendererPass::begin
+bool MeshRendererPass::begin( u32 currentTime )
 {
 	// Clean the allocated render operations
 	m_renderOperations.reset();
@@ -75,8 +78,8 @@ bool SpriteRendererPass::begin( u32 currentTime )
 	return true;
 }
 
-// ** SpriteRendererPass::end
-void SpriteRendererPass::end( void )
+// ** MeshRendererPass::end
+void MeshRendererPass::end( void )
 {
 	// Sort the emitted render operations
 	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
@@ -122,8 +125,8 @@ void SpriteRendererPass::end( void )
 	m_frame.clear();
 }
 
-// ** SpriteRendererPass::setShader
-void SpriteRendererPass::setShader( const RenderOp* rop )
+// ** MeshRendererPass::setShader
+void MeshRendererPass::setShader( const RenderOp* rop )
 {
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
@@ -147,8 +150,8 @@ void SpriteRendererPass::setShader( const RenderOp* rop )
 	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
 }
 
-// ** SpriteRendererPass::process
-void SpriteRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
+// ** MeshRendererPass::process
+void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
 {
 	// Calculate the MVP matrix
 	Matrix4 mvp = m_viewProj * transform.matrix();
@@ -177,8 +180,8 @@ void SpriteRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObj
 	}
 }
 
-// ** SpriteRendererPass::emitRenderOp
-SpriteRendererPass::RenderOp* SpriteRendererPass::emitRenderOp( void )
+// ** MeshRendererPass::emitRenderOp
+MeshRendererPass::RenderOp* MeshRendererPass::emitRenderOp( void )
 {
 	RenderOp* rop = m_renderOperations.allocate();
 	DC_BREAK_IF( rop == NULL )
@@ -188,12 +191,12 @@ SpriteRendererPass::RenderOp* SpriteRendererPass::emitRenderOp( void )
 	return rop;
 }
 
-// ** SpriteRendererPass::sortByShaderTextureMesh
-bool SpriteRendererPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
+// ** MeshRendererPass::sortByShaderTextureMesh
+bool MeshRendererPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
 {
 	if( a->shader != b->shader ) return a->shader < b->shader;
-	if( a->texture != b->texture ) return a->texture > b->texture;
 	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
+	if( a->texture != b->texture ) return a->texture > b->texture;
 
 	return false;
 }

@@ -24,25 +24,23 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_SpriteRenderer_System_H__
-#define __DC_Scene_SpriteRenderer_System_H__
+#ifndef __DC_Scene_UnlitMeshRenderer_H__
+#define __DC_Scene_UnlitMeshRenderer_H__
 
 #include "RenderSystem.h"
 
 #include "../Components/Rendering.h"
-#include "../Components/Camera.h"
-#include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! The sprite rendering pass
-	class SpriteRendererPass : public RenderPass<MeshRenderer> {
+	//! The mesh rendering pass
+	class MeshRendererPass : public RenderPass<MeshRenderer> {
 	public:
 
-									//! Constructs the SpriteRendererPass instance.
-									SpriteRendererPass( ecs::Entities& entities, renderer::Hal* hal );
+									//! Constructs the MeshRendererPass instance.
+									MeshRendererPass( ecs::Entities& entities, renderer::Hal* hal );
 
 	protected:
 
@@ -107,16 +105,16 @@ namespace scene {
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
 
-	//! Sprite render system
-	class SpriteRenderer : public RenderSystem<RenderSprites> {
+	//! Unlit mesh render system
+	class UnlitMeshRenderer : public RenderSystem<RenderUnlitMeshes> {
 	public:
 
-									SpriteRenderer( ecs::Entities& entities, renderer::Hal* hal )
-										: RenderSystem( entities, "SpriteRenderer", hal ) { addPass<SpriteRendererPass>(); }
+									UnlitMeshRenderer( ecs::Entities& entities, renderer::Hal* hal )
+										: RenderSystem( entities, "UnlitMeshRenderer", hal ) { addPass<MeshRendererPass>(); }
 	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_SpriteRenderer_System_H__    */
+#endif    /*    !__DC_Scene_UnlitMeshRenderer_H__    */

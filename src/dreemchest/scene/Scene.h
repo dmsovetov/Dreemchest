@@ -65,8 +65,6 @@ namespace scene {
 		class Camera;
 		class Rotator2D;
 
-	class SpriteRenderer;
-
 	typedef StrongPtr<Scene>			ScenePtr;
 	typedef WeakPtr<Scene>				SceneWPtr;
 	typedef StrongPtr<Asset>			AssetPtr;
@@ -146,7 +144,7 @@ DC_END_DREEMCHEST
 	#include "Components/Physics.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
-	#include "Systems/SpriteRenderer.h"
+	#include "Systems/UnlitMeshRenderer.h"
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/RenderSystem.h"
 	#include "Assets/Mesh.h"
