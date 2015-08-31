@@ -99,8 +99,8 @@ namespace scene {
 		//! Creates the new Material asset inside this bundle.
 		MaterialPtr				addMaterial( const String& name );
 
-		//! Creates an AssetBundle instance.
-		static AssetBundlePtr	create( const String& name, const io::Path& path, const String& json );
+		//! Creates an AssetBundle instance and loads it from a JSON file.
+		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& fileName );
 
 	private:
 

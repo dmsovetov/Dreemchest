@@ -91,11 +91,21 @@ AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( p
 {
 }
 
-// ** AssetBundle::create
-AssetBundlePtr AssetBundle::create( const String& name, const io::Path& path, const String& json )
+// ** AssetBundle::createFromJson
+AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& fileName )
 {
+	// Read the JSON file
+	String json = io::DiskFileSystem::readTextFile( fileName );
+
+	if( json == "" ) {
+		log::warn( "AssetBundle::createFromJson : %s, file not found or empty JSON\n", fileName.c_str() );
+		return AssetBundlePtr();
+	}
+
+	// Create asset bundle instance
 	AssetBundlePtr assetBundle( DC_NEW AssetBundle( name, path ) );
 
+	// Load assets from JSON
 	if( !assetBundle->loadFromJson( json ) ) {
 		return AssetBundlePtr();
 	}
