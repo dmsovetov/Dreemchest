@@ -97,6 +97,9 @@ namespace io {
         //! Returns true if file exists at path.
         static bool				fileExistsAtPath( const Path& fileName );
 
+		//! Reads the text file content.
+		static String			readTextFile( const Path& fileName );
+
 	protected:
 
         //! List of loaded file archives.

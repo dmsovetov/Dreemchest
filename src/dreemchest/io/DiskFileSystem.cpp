@@ -140,6 +140,23 @@ bool DiskFileSystem::fileExistsAtPath( const Path& fileName )
     return true;
 }
 
+// ** DiskFileSystem::readTextFile
+String DiskFileSystem::readTextFile( const Path& fileName )
+{
+	DiskFileSystem fileSystem;
+	StreamPtr file = fileSystem.openFile( fileName );
+
+	if( file == StreamPtr() ) {
+		return "";
+	}
+
+	String result;
+	result.resize( file->length() );
+	file->read( &result[0], file->length() );
+
+	return result;
+}
+
 // ** DiskFileSystem::openPackage
 ArchivePtr DiskFileSystem::openPackage( const Path& fileName ) const
 {
