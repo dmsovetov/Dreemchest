@@ -54,7 +54,7 @@ namespace ecs {
 		virtual void	end( void );
 
 		//! Processes a single entity.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity ) = 0;
+		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity );
 
 		//! Called when entity was added.
 		virtual void	entityAdded( const EntityPtr& entity );

@@ -51,6 +51,11 @@ void EntitySystem::end( void )
 {
 }
 
+// ** EntitySystem::process
+void EntitySystem::process( u32 currentTime, f32 dt, EntityPtr& entity )
+{
+}
+
 // ** EntitySystem::update
 void EntitySystem::update( u32 currentTime, f32 dt )
 {
