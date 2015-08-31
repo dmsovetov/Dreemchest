@@ -37,7 +37,7 @@ def find_outdated(path):
 
     for root, dirs, files in os.walk(path):
         for file_name in files:
-            name = os.path.splitext(file_name)[0]
+            name = os.path.splitext(file_name)[0].lower()
             path = os.path.join(root, file_name)
 
             if name in result:
