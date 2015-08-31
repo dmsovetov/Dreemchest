@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+// ---------------------------------------------- MeshRenderer ---------------------------------------------- //
+
 // ** MeshRenderer::mesh
 const MeshPtr& MeshRenderer::mesh( void ) const
 {
@@ -79,6 +81,20 @@ const renderer::TexturePtr& MeshRenderer::lightmap( void ) const
 void MeshRenderer::setLightmap( const renderer::TexturePtr& value )
 {
 	m_lightmap = value;
+}
+
+// ---------------------------------------------- SpriteRenderer ---------------------------------------------- //
+
+// ** SpriteRenderer::image
+const ImagePtr& SpriteRenderer::image( void ) const
+{
+	return m_image;
+}
+
+// ** SpriteRenderer::color
+const Rgba& SpriteRenderer::color( void ) const
+{
+	return m_color;
 }
 
 } // namespace scene

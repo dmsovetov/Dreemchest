@@ -30,6 +30,7 @@
 #include "Component.h"
 
 #include "../Assets/Mesh.h"
+#include "../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -78,6 +79,28 @@ namespace scene {
 		MeshPtr						m_mesh;			//!< Mesh to be rendered.
 		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
 		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
+	};
+
+	//! Sprite rendering component.
+	class SpriteRenderer : public SceneComponent {
+	public:
+			
+									OverrideComponent( SpriteRenderer, SceneComponent )
+
+									//! Constructs the SpriteRenderer instance.
+									SpriteRenderer( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+										: m_image( image ), m_color( color ) {}
+
+		//! Returns the sprite image.
+		const ImagePtr&				image( void ) const;
+
+		//! Returns the sprite color.
+		const Rgba&					color( void ) const;
+
+	private:
+
+		ImagePtr					m_image;	//!< Sprite image.
+		Rgba						m_color;	//!< Sprite color.
 	};
 
 } // namespace scene
