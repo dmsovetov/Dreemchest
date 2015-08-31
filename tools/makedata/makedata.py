@@ -85,7 +85,7 @@ def build(args, source, output):
         ,   '*.png': TextureFormat.convert_to(args.texFormat)
         }
 
-    queue    = tasks.create(8)
+    queue    = tasks.create(args.workers)
     outdated = files.find_outdated(source)
 
     files.build(queue, outdated, output, rules)
