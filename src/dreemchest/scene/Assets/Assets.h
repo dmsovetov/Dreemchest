@@ -48,6 +48,15 @@ namespace scene {
 			, All				= ~0
 		};
 
+		//! Asset loading state.
+		enum State {
+			Unknown,		//!< The asset state is unknown.
+			Unloaded,		//!< The asset is unloaded.
+			Loading,		//!< The asset is now loading.
+			Loaded,			//!< The asset is loaded.
+			LoadingError	//! An error was encountered while loading an asset.
+		};
+
 								//! Constructs Asset instance.
 								Asset( AssetBundle* bundle, Type type, const String& name );
 
@@ -56,6 +65,12 @@ namespace scene {
 
 		//! Returns asset name.
 		const String&			name( void ) const;
+
+		//! Returns asset state.
+		State					state( void ) const;
+
+		//! Returns true if an asset needs to be loaded.
+		bool					needsLoading( void ) const;
 
 		//! Returns the root asset bundle.
 		const AssetBundleWPtr&	bundle( void ) const;
@@ -74,6 +89,7 @@ namespace scene {
 		AssetBundleWPtr			m_bundle;	//!< Parent asset bundle.
 		Type					m_type;		//!< Asset type.
 		String					m_name;		//!< Asset name.
+		State					m_state;	//!< Asset state.
 	};
 
 	//! Contains asset meta information & caches loaded assets.

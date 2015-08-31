@@ -39,9 +39,9 @@ namespace scene {
 
 // ** Asset::Asset
 Asset::Asset( AssetBundle* bundle, Type type, const String& name )
-	: m_bundle( bundle ), m_type( type ), m_name( name )
+	: m_bundle( bundle ), m_type( type ), m_name( name ), m_state( Unknown )
 {
-//	DC_BREAK_IF( bundle == NULL )
+	DC_BREAK_IF( bundle == NULL )
 }
 
 // ** Asset::type
@@ -56,32 +56,57 @@ const String& Asset::name( void ) const
 	return m_name;
 }
 
+// ** Asset::state
+Asset::State Asset::state( void ) const
+{
+	return m_state;
+}
+
+// ** Asset::needsLoading
+bool Asset::needsLoading( void ) const
+{
+	return m_state != Loading && m_state != Loaded;
+}
+
 // ** Asset::load
 bool Asset::load( void )
 {
+	DC_BREAK_IF( !needsLoading() );
+
+	m_state = Loading;
+
 	io::DiskFileSystem fileSystem;
 	io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByName( name() ) );
 
 	if( stream == io::StreamPtr() ) {
 		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
+		m_state = LoadingError;
 		return false;
 	}
 
 	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
 
-	return loadFromStream( stream );
+	if( !loadFromStream( stream ) ) {
+		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
+		m_state = LoadingError;
+		return false;
+	}
+
+	m_state = Loaded;
+
+	return true;
 }
 
 // ** Asset::loadFromStream
 bool Asset::loadFromStream( const io::StreamPtr& stream )
 {
-	log::warn( "Asset::loadFromStream : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
 	return false;
 }
 
 // ** Asset::unload
 void Asset::unload( void )
 {
+	m_state = Unloaded;
 }
 
 // ---------------------------------------- AssetBundle ------------------------------------------- //
@@ -175,8 +200,6 @@ ImagePtr AssetBundle::addImage( const String& name, ImageFormat format, u32 widt
 
 	ImagePtr image( DC_NEW Image( this, name, format, width, height ) );
 	m_assets[StringHash( name.c_str() )] = image;
-
-	image->load();
 
 	return image;
 }
