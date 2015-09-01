@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! The mesh rendering pass
-	class MeshRendererPass : public RenderPass<MeshRenderer> {
+	class MeshRendererPass : public RenderPass<StaticMesh> {
 	public:
 
 									//! Constructs the MeshRendererPass instance.
@@ -61,7 +61,7 @@ namespace scene {
 		};
 
 		//! Renders a single entity with a mesh
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform );
+		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform );
 
 		//! Called every frame before any entites are rendered.
 		virtual bool				begin( u32 currentTime );

@@ -43,14 +43,14 @@ namespace scene {
 									OverrideComponent( RenderUnlitMeshes, SceneComponent )
 	};
 
-	//! Mesh renderer component.
-	class MeshRenderer : public SceneComponent {
+	//! Holds the static mesh data with per-instance materials.
+	class StaticMesh : public SceneComponent {
 	public:
 
-									OverrideComponent( MeshRenderer, SceneComponent )
+									OverrideComponent( StaticMesh, SceneComponent )
 
-									//! Constructs MeshRenderer instance.
-									MeshRenderer( const MeshPtr& mesh = MeshPtr() )
+									//! Constructs StaticMesh instance.
+									StaticMesh( const MeshPtr& mesh = MeshPtr() )
 										: m_mesh( mesh ) {}
 
 		//! Returns mesh to be rendered.
@@ -81,14 +81,14 @@ namespace scene {
 		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
 	};
 
-	//! Sprite rendering component.
-	class SpriteRenderer : public SceneComponent {
+	//! Holds the sprite rendering info.
+	class Sprite : public SceneComponent {
 	public:
 			
-									OverrideComponent( SpriteRenderer, SceneComponent )
+									OverrideComponent( Sprite, SceneComponent )
 
-									//! Constructs the SpriteRenderer instance.
-									SpriteRenderer( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+									//! Constructs the Sprite instance.
+									Sprite( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
 										: m_image( image ), m_color( color ) {}
 
 		//! Returns the sprite image.

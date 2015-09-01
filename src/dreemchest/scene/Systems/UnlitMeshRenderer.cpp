@@ -151,13 +151,13 @@ void MeshRendererPass::setShader( const RenderOp* rop )
 }
 
 // ** MeshRendererPass::process
-void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MeshRenderer& meshRenderer, Transform& transform )
+void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
 	// Calculate the MVP matrix
 	Matrix4 mvp = m_viewProj * transform.matrix();
 
 	// Get the rendered mesh
-	const MeshPtr& mesh = meshRenderer.mesh();
+	const MeshPtr& mesh = staticMesh.mesh();
 
 	// Emit render operation for each mesh chunk
 	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
@@ -165,7 +165,7 @@ void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 		const Mesh::Chunk& chunk = mesh->chunk( i );
 
 		// Get the material for chunk
-		const MaterialPtr& material = meshRenderer.material( i );
+		const MaterialPtr& material = staticMesh.material( i );
 
 		// Emit a new render operation
 		RenderOp* rop = emitRenderOp();

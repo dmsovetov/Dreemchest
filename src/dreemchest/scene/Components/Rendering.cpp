@@ -33,34 +33,34 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ---------------------------------------------- MeshRenderer ---------------------------------------------- //
+// ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
-// ** MeshRenderer::mesh
-const MeshPtr& MeshRenderer::mesh( void ) const
+// ** StaticMesh::mesh
+const MeshPtr& StaticMesh::mesh( void ) const
 {
 	return m_mesh;
 }
 
-// ** MeshRenderer::setMesh
-void MeshRenderer::setMesh( const MeshPtr& value )
+// ** StaticMesh::setMesh
+void StaticMesh::setMesh( const MeshPtr& value )
 {
 	m_mesh = value;
 }
 
-// ** MeshRenderer::materialCount
-u32 MeshRenderer::materialCount( void ) const
+// ** StaticMesh::materialCount
+u32 StaticMesh::materialCount( void ) const
 {
 	return ( u32 )m_materials.size();
 }
 
-// ** MeshRenderer::material
-MaterialPtr MeshRenderer::material( u32 index ) const
+// ** StaticMesh::material
+MaterialPtr StaticMesh::material( u32 index ) const
 {
 	return index < materialCount() ? m_materials[index] : MaterialPtr();
 }
 
-// ** MeshRenderer::setMaterial
-void MeshRenderer::setMaterial( u32 index, const MaterialPtr& value )
+// ** StaticMesh::setMaterial
+void StaticMesh::setMaterial( u32 index, const MaterialPtr& value )
 {
 	DC_BREAK_IF( index > 8 );
 
@@ -71,28 +71,28 @@ void MeshRenderer::setMaterial( u32 index, const MaterialPtr& value )
 	m_materials[index] = value;
 }
 
-// ** MeshRenderer::lightmap
-const renderer::TexturePtr& MeshRenderer::lightmap( void ) const
+// ** StaticMesh::lightmap
+const renderer::TexturePtr& StaticMesh::lightmap( void ) const
 {
 	return m_lightmap;
 }
 
-// ** MeshRenderer::setLightmap
-void MeshRenderer::setLightmap( const renderer::TexturePtr& value )
+// ** StaticMesh::setLightmap
+void StaticMesh::setLightmap( const renderer::TexturePtr& value )
 {
 	m_lightmap = value;
 }
 
-// ---------------------------------------------- SpriteRenderer ---------------------------------------------- //
+// ---------------------------------------------- Sprite ---------------------------------------------- //
 
-// ** SpriteRenderer::image
-const ImagePtr& SpriteRenderer::image( void ) const
+// ** Sprite::image
+const ImagePtr& Sprite::image( void ) const
 {
 	return m_image;
 }
 
-// ** SpriteRenderer::color
-const Rgba& SpriteRenderer::color( void ) const
+// ** Sprite::color
+const Rgba& Sprite::color( void ) const
 {
 	return m_color;
 }
