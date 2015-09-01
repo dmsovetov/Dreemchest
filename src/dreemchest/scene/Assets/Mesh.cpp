@@ -88,7 +88,7 @@ MeshPtr Mesh::createRectangular( const String& name, renderer::Hal* hal, f32 wid
 		0, 2, 3
 	};
 
-	renderer::VertexDeclaration* vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
+	renderer::VertexDeclarationPtr vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
 	
 	renderer::VertexBufferPtr vb = hal->createVertexBuffer( vertexDeclaration, 4, false );
 	memcpy( vb->lock(), vertices, sizeof( Vertex ) * 4 );
