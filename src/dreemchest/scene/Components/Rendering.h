@@ -38,9 +38,12 @@ namespace scene {
 
 	//! This component is attached to a camera to render unlit meshes.
 	class RenderUnlitMeshes : public SceneComponent {
-	public:
+		OverrideComponent( RenderUnlitMeshes, SceneComponent )
+	};
 
-									OverrideComponent( RenderUnlitMeshes, SceneComponent )
+	//! This component is attached to a camera to render sprites.
+	class RenderSprites : public SceneComponent {
+		OverrideComponent( RenderSprites, SceneComponent )
 	};
 
 	//! Holds the static mesh data with per-instance materials.
