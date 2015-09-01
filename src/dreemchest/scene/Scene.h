@@ -38,6 +38,7 @@
 
 #include <renderer/Renderer.h>
 #include <renderer/Hal.h>
+#include <renderer/Renderer2D.h>
 
 #include <Ecs/Entity.h>
 #include <Ecs/Component.h>
@@ -61,28 +62,26 @@ namespace scene {
 		class Material;
 	class Component;
 		class Transform;
-		class MeshRenderer;
+		class StaticMesh;
+		class Sprite;
 		class Camera;
 		class Rotator2D;
 
 	typedef StrongPtr<Scene>			ScenePtr;
 	typedef WeakPtr<Scene>				SceneWPtr;
-	typedef StrongPtr<Asset>			AssetPtr;
 	typedef StrongPtr<AssetBundle>		AssetBundlePtr;
 	typedef WeakPtr<AssetBundle>		AssetBundleWPtr;
 	typedef StrongPtr<SceneObject>		SceneObjectPtr;
 	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
-	typedef StrongPtr<Component>		ComponentPtr;
-	typedef StrongPtr<MeshRenderer>		MeshRendererPtr;
-	typedef StrongPtr<Mesh>				MeshPtr;
-	typedef StrongPtr<Material>			MaterialPtr;
-	typedef StrongPtr<Image>			ImagePtr;
-	typedef WeakPtr<Image>				ImageWPtr;
 
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( RenderPassBase )
+	dcDeclarePtrs( Asset )
+	dcDeclarePtrs( Image )
+	dcDeclarePtrs( Mesh )
+	dcDeclarePtrs( Material )
 
 	//! Supported image formats.
 	enum ImageFormat {

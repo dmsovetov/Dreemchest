@@ -40,7 +40,7 @@ namespace scene {
 	public:
 
 									//! Constructs the MeshRendererPass instance.
-									MeshRendererPass( ecs::Entities& entities, renderer::Hal* hal );
+									MeshRendererPass( ecs::Entities& entities, const Renderer& renderer );
 
 	protected:
 
@@ -100,7 +100,7 @@ namespace scene {
 			}
 		};
 		
-		renderer::Shader*			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
+		renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
 		ArrayAllocator<RenderOp>	m_renderOperations;				//!< Array allocator used to allocated render operations.
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
@@ -109,8 +109,8 @@ namespace scene {
 	class UnlitMeshRenderer : public RenderSystem<RenderUnlitMeshes> {
 	public:
 
-									UnlitMeshRenderer( ecs::Entities& entities, renderer::Hal* hal )
-										: RenderSystem( entities, "UnlitMeshRenderer", hal ) { addPass<MeshRendererPass>(); }
+									UnlitMeshRenderer( ecs::Entities& entities, const Renderer& renderer )
+										: RenderSystem( entities, "UnlitMeshRenderer", renderer ) { addPass<MeshRendererPass>(); }
 	};
 
 } // namespace scene

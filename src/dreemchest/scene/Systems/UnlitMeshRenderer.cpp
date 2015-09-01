@@ -35,14 +35,12 @@
 
 DC_BEGIN_DREEMCHEST
 
-#define CODE( ... ) #__VA_ARGS__
-
 namespace scene {
 
 // ** MeshRendererPass::MeshRendererPass
-MeshRendererPass::MeshRendererPass( ecs::Entities& entities, renderer::Hal* hal ) : RenderPass( entities, "MeshRendererPass", hal ), m_renderOperations( 2000 )
+MeshRendererPass::MeshRendererPass( ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "MeshRendererPass", renderer ), m_renderOperations( 2000 )
 {
-	m_shaders[ShaderSolid] = m_hal->createShader(
+	m_shaders[ShaderSolid] = m_renderer.m_hal->createShader(
 		CODE(
 			uniform mat4 u_mvp;
 
@@ -73,7 +71,7 @@ bool MeshRendererPass::begin( u32 currentTime )
 	m_renderOperations.reset();
 
 	// Disable the depth test for 2d rendering
-	m_hal->setDepthTest( true, renderer::Always );
+	m_renderer.m_hal->setDepthTest( true, renderer::Always );
 
 	return true;
 }
@@ -81,6 +79,9 @@ bool MeshRendererPass::begin( u32 currentTime )
 // ** MeshRendererPass::end
 void MeshRendererPass::end( void )
 {
+	// Get the HAL reference
+	renderer::HalPtr& hal = m_renderer.m_hal;
+
 	// Sort the emitted render operations
 	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
 
@@ -93,33 +94,33 @@ void MeshRendererPass::end( void )
 
 		// Set the texture
 		if( rop->texture != m_frame.m_texture ) {
-			m_hal->setTexture( 0, rop->texture );
+			hal->setTexture( 0, rop->texture );
 			m_frame.m_texture = rop->texture;
 		}
 
 		// Set the vertex buffer
 		if( rop->vertexBuffer != m_frame.m_vertexBuffer ) {
-			m_hal->setVertexBuffer( rop->vertexBuffer );
+			hal->setVertexBuffer( rop->vertexBuffer );
 			m_frame.m_vertexBuffer = rop->vertexBuffer;
 		}
 
 		// Render the mesh
-		m_hal->renderIndexed( renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
+		hal->renderIndexed( renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
 	}
 
 	// Set the default shader
-	m_hal->setShader( NULL );
+	hal->setShader( NULL );
 
 	// Set the default vertex buffer
-	m_hal->setVertexBuffer( NULL );
+	hal->setVertexBuffer( NULL );
 
 	// Set default textures
 	for( s32 i = 0; i < 8; i++ ) {
-		m_hal->setTexture( i, NULL );
+		hal->setTexture( i, NULL );
 	}
 
 	// Enable the depth test back
-	m_hal->setDepthTest( true, renderer::Less );
+	hal->setDepthTest( true, renderer::Less );
 
 	// Clean the list of emitted render operations
 	m_frame.clear();
@@ -128,23 +129,25 @@ void MeshRendererPass::end( void )
 // ** MeshRendererPass::setShader
 void MeshRendererPass::setShader( const RenderOp* rop )
 {
+	renderer::HalPtr& hal = m_renderer.m_hal;
+
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
-		case Material::Solid:		m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
+		case Material::Solid:		hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
 									break;
 
-		case Material::Transparent:	m_hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
+		case Material::Transparent:	hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
 									break;
 
-		case Material::Additive:	m_hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
+		case Material::Additive:	hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
 									break;
 		}
 
-		m_hal->setShader( m_shaders[ShaderSolid] );
+		hal->setShader( m_shaders[ShaderSolid] );
 		m_frame.m_materialShader = rop->shader;
 	}
 
-	renderer::Shader* shader = m_shaders[ShaderSolid];
+	renderer::ShaderPtr shader = m_shaders[ShaderSolid];
 	shader->setMatrix( shader->findUniformLocation( "u_mvp" ),  rop->mvp );
 	shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
 	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
@@ -175,7 +178,7 @@ void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 		rop->indexBuffer	= chunk.m_indexBuffer.get();
 		rop->vertexBuffer	= chunk.m_vertexBuffer.get();
 		rop->shader			= material->shader();
-		rop->texture		= const_cast<ImageWPtr&>( material->texture( Material::Diffuse ) )->requestTexture( m_hal ).get();
+		rop->texture		= const_cast<ImageWPtr&>( material->texture( Material::Diffuse ) )->requestTexture( m_renderer.m_hal.get() ).get();
 		rop->diffuse		= &material->color( Material::Diffuse );
 	}
 }
