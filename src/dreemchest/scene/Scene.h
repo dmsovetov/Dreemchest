@@ -147,6 +147,7 @@ DC_END_DREEMCHEST
 	#include "Systems/SpriteRenderer.h"
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/RenderSystem.h"
+	#include "Systems/AssetSystem.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
