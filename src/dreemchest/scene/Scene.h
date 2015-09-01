@@ -144,6 +144,7 @@ DC_END_DREEMCHEST
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/UnlitMeshRenderer.h"
+	#include "Systems/SpriteRenderer.h"
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/RenderSystem.h"
 	#include "Assets/Mesh.h"
