@@ -248,6 +248,7 @@ DC_END_DREEMCHEST
     #include "Hal.h"
     #include "RenderState.h"
     #include "BatchRenderer.h"
+	#include "Renderer2D.h"
 #endif
 
 #endif
