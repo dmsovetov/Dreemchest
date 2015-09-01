@@ -58,9 +58,14 @@ namespace renderer {
             class TextureCube;
 
 	//! Pointer types for renderer resources.
-	typedef StrongPtr<VertexBuffer> VertexBufferPtr;
-	typedef StrongPtr<IndexBuffer>	IndexBufferPtr;
-	typedef StrongPtr<Texture>		TexturePtr;
+	dcDeclarePtrs( Hal )
+	dcDeclarePtrs( Renderer2D )
+	dcDeclarePtrs( VertexDeclaration )
+	dcDeclarePtrs( VertexBuffer )
+	dcDeclarePtrs( IndexBuffer )
+	dcDeclarePtrs( Texture )
+	dcDeclarePtrs( Texture2D )
+	dcDeclarePtrs( Shader )
 
     //! Hardware rendering API.
     enum Renderer {
@@ -215,7 +220,7 @@ namespace renderer {
         PrimTriangleFan,    //!< Render triangle fan.
         PrimPoints,         //!< Render points.
 
-        PrimTotal           //!< Total primitive types available.
+        TotalPrimitiveTypes	//!< Total primitive types available.
     };
 
 } // namespace renderer

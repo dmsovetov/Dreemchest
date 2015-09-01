@@ -52,14 +52,9 @@ namespace renderer {
 
     // ** class Hal
     //! Hal class is a hardware abstraction layer around a low level graphics API.
-    class dcInterface Hal {
+    class dcInterface Hal : public RefCounted {
     public:
 
-                                    //! Constructs a new Hal instance.
-                                    /*!
-                                     \param view Viewport container.
-                                     */
-                                    Hal( RenderView* view );
         virtual                     ~Hal( void );
 
         //! Returns a pointer to a batched 2D renderer.
@@ -93,7 +88,7 @@ namespace renderer {
          \param firstIndex  First index to use in rendering.
          \param count       Number of indices to use in this draw call.
          */
-        virtual void        renderIndexed( PrimitiveType primType, IndexBuffer* indexBuffer, u32 firstIndex, u32 count );
+        virtual void        renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
 
         //! Creates a new 2D texture.
         /*!
@@ -127,7 +122,7 @@ namespace renderer {
          \param fragment    Fragment shader source.
          \return            Shader instance.
          */
-        virtual Shader*     createShader( CString vertex, CString fragment );
+        virtual ShaderPtr     createShader( CString vertex, CString fragment );
 
         //! Creates a new vertex declaration object.
         /*!
@@ -135,7 +130,7 @@ namespace renderer {
          \param vertexSize  A single vertex size in bytes.
          \return            VertexDeclaration instance.
          */
-        virtual VertexDeclaration*  createVertexDeclaration( CString format, u32 vertexSize = 0 );
+        virtual VertexDeclarationPtr  createVertexDeclaration( CString format, u32 vertexSize = 0 );
 
         //! Creates a new index buffer.
         /*!
@@ -143,7 +138,7 @@ namespace renderer {
          \param GPU     Determines a location where to store the index buffer data (RAM or GPU).
          \return        IndexBuffer instance.
          */
-        virtual IndexBuffer*    createIndexBuffer( u32 count, bool GPU = true );
+        virtual IndexBufferPtr    createIndexBuffer( u32 count, bool GPU = true );
 
         //! Creates a new vertex buffer.
         /*!
@@ -152,10 +147,10 @@ namespace renderer {
          \param GPU         Determines a location where to store the vertex buffer data (RAM or GPU).
          \return            VertexBuffer instance.
          */
-        virtual VertexBuffer*   createVertexBuffer( VertexDeclaration* declaration, u32 count, bool GPU = true );
+        virtual VertexBufferPtr   createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
 
         //! Binds a shader.
-        virtual void    setShader( Shader* shader );
+        virtual void    setShader( const ShaderPtr& shader );
 
         //! Binds a render target.
         virtual void    setRenderTarget( RenderTarget* renderTarget );
@@ -176,7 +171,7 @@ namespace renderer {
          \param vertexBuffer        Vertex buffer to be bound.
          \param vertexDeclaration   Override the vertex declaration.
          */
-        virtual void    setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration = NULL );
+        virtual void    setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration = VertexDeclarationWPtr() );
 
         //! Sets a rendering viewport.
         /*!
@@ -273,6 +268,14 @@ namespace renderer {
          */
         static RenderView*          createOpenGLView( void* window, PixelFormat depthStencil = PixelD24S8 );
 
+	protected:
+
+									//! Constructs a new Hal instance.
+                                    /*!
+                                     \param view Viewport container.
+                                     */
+                                    Hal( RenderView* view );
+
     protected:
 
         //! Rendering viewport.
@@ -293,7 +296,7 @@ namespace renderer {
         dcBlendState                m_blendState2D;
 
         //! Current vertex declaration.
-        const VertexDeclaration*    m_vertexDeclaration;
+        VertexDeclarationWPtr		m_vertexDeclaration;
     };
 
     // ** class RenderResource
@@ -527,11 +530,11 @@ namespace renderer {
                                      \param count Total number of vertices that are reside inside this buffer.
                                      \param gpu Specifies whether this buffer resides in GPU memory or not.
                                      */
-                                    VertexBuffer( VertexDeclaration* vertexDeclaration, u32 count, bool gpu );
+                                    VertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count, bool gpu );
 		virtual						~VertexBuffer( void );
 
         //! Returns a vertex declaration of this vertex buffer.
-        const VertexDeclaration*    vertexDeclaration( void ) const;
+        const VertexDeclarationPtr&	vertexDeclaration( void ) const;
 
         //! Returns a pointer to buffer vertex data.
         const void*                 pointer( void ) const;
@@ -551,7 +554,7 @@ namespace renderer {
     protected:
 
         //! Vertex declaration.
-        const VertexDeclaration*    m_vertexDeclaration;
+        const VertexDeclarationPtr	m_vertexDeclaration;
 
         //! Vertex buffer size.
         u32                         m_size;

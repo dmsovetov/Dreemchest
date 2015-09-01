@@ -59,9 +59,6 @@ Hal::Hal( RenderView* view ) : m_view( view )
     m_renderThread  = thread::Thread::currentThread();
 #endif
 
-    // ** Render objects
-    m_vertexDeclaration = NULL;
-
 	// ** 2D render state
 	m_rasterState2D = DC_NEW RasterizerState;
 	m_rasterState2D->setCullMode( TriangleFaceNone );
@@ -136,7 +133,7 @@ void Hal::present( void )
 }
 
 // ** Hal::renderIndexed
-void Hal::renderIndexed( PrimitiveType primType, IndexBuffer *indexBuffer, u32 firstIndex, u32 count )
+void Hal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
 {
     
 }
@@ -166,46 +163,46 @@ RenderTarget* Hal::createRenderTarget( u32 width, u32 height, PixelFormat format
 }
 
 // ** Hal::createShader
-Shader* Hal::createShader( const char *vertex, const char *fragment )
+ShaderPtr Hal::createShader( const char *vertex, const char *fragment )
 {
-    return DC_NEW Shader;
+    return ShaderPtr( DC_NEW Shader );
 }
 
 // ** Hal::createVertexDeclaration
-VertexDeclaration* Hal::createVertexDeclaration( const char *format, u32 vertexSize )
+VertexDeclarationPtr Hal::createVertexDeclaration( const char *format, u32 vertexSize )
 {
-    VertexDeclaration *decl = DC_NEW VertexDeclaration;
+    VertexDeclarationPtr decl( DC_NEW VertexDeclaration );
+
     if( decl->parse( format ) ) {
         if( vertexSize ) decl->m_vertexSize = vertexSize;
         return decl;
     }
 
-    delete decl;
-    return NULL;
+    return VertexDeclarationPtr();
 }
 
 // ** Hal::createIndexBuffer
-IndexBuffer* Hal::createIndexBuffer( u32 count, bool GPU )
+IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 {
 	if( GPU ) {
         log::warn( "Renderer::createIndexBuffer : GPU index buffers are not supported\n" );
 	}
 
-    return DC_NEW IndexBuffer( count, false );
+    return IndexBufferPtr( DC_NEW IndexBuffer( count, false ) );
 }
 
 // ** Hal::createVertexBuffer
-VertexBuffer* Hal::createVertexBuffer( VertexDeclaration *declaration, u32 count, bool GPU )
+VertexBufferPtr Hal::createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU )
 {
 	if( GPU ) {
 		log::warn( "Renderer::createVertexBuffer : GPU vertex buffers are not supported\n" );
 	}
 
-    return DC_NEW VertexBuffer( declaration, count, false );
+    return VertexBufferPtr( DC_NEW VertexBuffer( declaration, count, false ) );
 }
 
 // ** Hal::setShader
-void Hal::setShader( Shader *shader )
+void Hal::setShader( const ShaderPtr& shader )
 {
     
 }
@@ -229,7 +226,7 @@ void Hal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 }
 
 // ** Hal::setVertexBuffer
-void Hal::setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration )
+void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration )
 {
 
 }
@@ -702,7 +699,7 @@ const VertexDeclaration::VertexElement& VertexDeclaration::pointSize( void ) con
 // ----------------------------------------------- VertexBuffer ------------------------------------------------- //
 
 // ** VertexBuffer::VertexBuffer
-VertexBuffer::VertexBuffer( VertexDeclaration *vertexDeclaration, u32 count, bool gpu )
+VertexBuffer::VertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count, bool gpu )
 	: m_vertexDeclaration( vertexDeclaration ), m_size( count ), m_data( NULL ), m_isGpu( gpu )
 {
     if( !m_isGpu ) {
@@ -716,7 +713,7 @@ VertexBuffer::~VertexBuffer( void )
 }
 
 // ** VertexBuffer::vertexDeclaration
-const VertexDeclaration* VertexBuffer::vertexDeclaration( void ) const
+const VertexDeclarationPtr& VertexBuffer::vertexDeclaration( void ) const
 {
     return m_vertexDeclaration;
 }

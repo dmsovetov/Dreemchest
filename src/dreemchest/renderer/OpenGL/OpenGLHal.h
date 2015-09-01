@@ -146,19 +146,19 @@ namespace renderer {
         virtual bool				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
         virtual void				present( void );
         virtual void                renderPrimitives( PrimitiveType primType, u32 offset, u32 count );
-        virtual void				renderIndexed( PrimitiveType primType, IndexBuffer *indexBuffer, u32 firstIndex, u32 count );
+        virtual void				renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
         virtual Texture2D*			createTexture2D( u32 width, u32 height, PixelFormat format );
         virtual TextureCube*        createTextureCube( u32 size, PixelFormat format );
         virtual RenderTarget*       createRenderTarget( u32 width, u32 height, PixelFormat format );
-        virtual Shader*             createShader( const char *vertex, const char *fragment );
-        virtual IndexBuffer*        createIndexBuffer( u32 count, bool GPU = true );
-        virtual VertexBuffer*		createVertexBuffer( VertexDeclaration *declaration, u32 count, bool GPU = true );
-        virtual void				setShader( Shader *shader );
+        virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
+        virtual IndexBufferPtr      createIndexBuffer( u32 count, bool GPU = true );
+        virtual VertexBufferPtr		createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
+        virtual void				setShader( const ShaderPtr& shader );
         virtual void				setRenderTarget( RenderTarget *renderTarget );
         virtual void				setTexture( u32 sampler, Texture *texture );
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
-        virtual void                setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration );
+        virtual void                setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
         virtual void				setColorMask( u32 value );
         virtual void				setBlendFactors( BlendFactor source, BlendFactor destination );
@@ -190,8 +190,8 @@ namespace renderer {
 
     private:
 
-        void                        enableVertexDeclaration( const u8 *pointer, const VertexDeclaration* vertexDeclaration );
-        void                        disableVertexDeclaration( const VertexDeclaration* vertexDeclaration );
+        void                        enableVertexDeclaration( const u8 *pointer, const VertexDeclarationWPtr& vertexDeclaration );
+        void                        disableVertexDeclaration( const VertexDeclarationWPtr& vertexDeclaration );
 
     private:
 
@@ -269,7 +269,7 @@ namespace renderer {
     friend class OpenGLHal;
     public:
 
-                                    OpenGLVertexBuffer( VertexDeclaration *vertexDeclaration, u32 count );
+                                    OpenGLVertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count );
         virtual                     ~OpenGLVertexBuffer( void );
 
         // ** VertexBuffer

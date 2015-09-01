@@ -111,17 +111,18 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 {
     DC_CHECK_GL;
 
-    static GLenum glPrimType[PrimTotal] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
+    static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
     glDrawArrays( glPrimType[primType], offset, count );
 }
 
 // ** OpenGLHal::renderIndexed
-void OpenGLHal::renderIndexed( PrimitiveType primType, IndexBuffer *indexBuffer, u32 firstIndex, u32 count )
+void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
+	DC_BREAK_IF( !indexBuffer.valid() )
     
-    static GLenum glPrimType[PrimTotal] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
+    static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
     glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, indexBuffer->pointer() + firstIndex );
 }
@@ -157,45 +158,44 @@ RenderTarget* OpenGLHal::createRenderTarget( u32 width, u32 height, PixelFormat 
 }
 
 // ** OpenGLHal::createShader
-Shader* OpenGLHal::createShader( const char *vertex, const char *fragment )
+ShaderPtr OpenGLHal::createShader( const char *vertex, const char *fragment )
 {
     DC_CHECK_GL;
     
-    OpenGLShader *shader = DC_NEW OpenGLShader;
-    char         error[256];
+    OpenGLShader* shader = DC_NEW OpenGLShader;
+	ShaderPtr	  result( shader );
+    char          error[256];
 
     if( !shader->compile( GL_VERTEX_SHADER, vertex, error, sizeof( error ) ) ) {
-        delete shader;
-        return NULL;
+        return ShaderPtr();
     }
 
     if( !shader->compile( GL_FRAGMENT_SHADER, fragment, error, sizeof( error ) ) ) {
-        delete shader;
-        return NULL;
+        return ShaderPtr();
     }
 
     if( !shader->link() ) {
-        delete shader;
-        return NULL;
+        return ShaderPtr();
     }
 
-    return shader;
+    return result;
 }
 
 // ** OpenGLHal::createIndexBuffer
-IndexBuffer* OpenGLHal::createIndexBuffer( u32 count, bool GPU )
+IndexBufferPtr OpenGLHal::createIndexBuffer( u32 count, bool GPU )
 {
+	DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
 	if( !GPU ) {
 		return Hal::createIndexBuffer( count, GPU );
 	}
 
-    return DC_NEW OpenGLIndexBuffer( count );
+    return IndexBufferPtr( DC_NEW OpenGLIndexBuffer( count ) );
 }
 
 // ** OpenGLHal::createVertexBuffer
-VertexBuffer* OpenGLHal::createVertexBuffer( VertexDeclaration *declaration, u32 count, bool GPU )
+VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU )
 {
 	DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
@@ -204,16 +204,16 @@ VertexBuffer* OpenGLHal::createVertexBuffer( VertexDeclaration *declaration, u32
 		return Hal::createVertexBuffer( declaration, count, GPU );
 	}
     
-    return DC_NEW OpenGLVertexBuffer( declaration, count );
+    return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( declaration, count ) );
 }
 
 // ** OpenGLHal::setShader
-void OpenGLHal::setShader( Shader *shader )
+void OpenGLHal::setShader( const ShaderPtr& shader )
 {
 	DC_CHECK_GL_CONTEXT;
 	DC_CHECK_GL;
 
-	glUseProgram( shader ? static_cast<OpenGLShader*>( shader )->m_program : 0 );
+	glUseProgram( shader.valid() ? static_cast<OpenGLShader*>( shader.get() )->m_program : 0 );
 }
 
 // ** OpenGLHal::setRenderTarget
@@ -261,20 +261,20 @@ void OpenGLHal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter fi
 }
 
 // ** OpenGLHal::setVertexBuffer
-void OpenGLHal::setVertexBuffer( VertexBuffer *vertexBuffer, VertexDeclaration *vertexDeclaration )
+void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration )
 {
-    if( m_vertexDeclaration ) {
+    if( m_vertexDeclaration.valid() ) {
         disableVertexDeclaration( m_vertexDeclaration );
     }
 
-    if( vertexBuffer ) {
+    if( vertexBuffer.valid() ) {
         DC_BREAK_IF( vertexBuffer->isGpu() );
-        enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
+        enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration.valid() ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
     }
 }
 
 // ** OpenGLHal::enableVertexDeclaration
-void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclaration* vertexDeclaration )
+void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclarationWPtr& vertexDeclaration )
 {
     DC_CHECK_GL;
 
@@ -321,7 +321,7 @@ void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclarat
 }
 
 // ** OpenGLHal::disableVertexDeclaration
-void OpenGLHal::disableVertexDeclaration( const VertexDeclaration* vertexDeclaration )
+void OpenGLHal::disableVertexDeclaration( const VertexDeclarationWPtr& vertexDeclaration )
 {
     DC_CHECK_GL;
 
@@ -965,7 +965,7 @@ bool OpenGLRenderTarget::setColor( OpenGLTexture2D *color )
 // ----------------------------------------------- OpenGLVertexBuffer ------------------------------------------------- //
 
 // ** OpenGLVertexBuffer::OpenGLVertexBuffer
-OpenGLVertexBuffer::OpenGLVertexBuffer( VertexDeclaration *vertexDeclaration, u32 count )
+OpenGLVertexBuffer::OpenGLVertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count )
 	: VertexBuffer( vertexDeclaration, count, true )
 {
     DC_BREAK_IF( vertexDeclaration == NULL );
