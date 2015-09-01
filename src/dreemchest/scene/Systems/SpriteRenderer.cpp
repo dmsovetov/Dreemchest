@@ -44,10 +44,21 @@ SpriteRenderPass::SpriteRenderPass( ecs::Entities& entities, const Renderer& ren
 // ** SpriteRenderPass::process
 void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
 {
+	// Get the sprite texture
 	ImagePtr image = sprite.image();
 	renderer::Texture2DPtr texture = image->requestTexture( m_renderer.m_hal.get() );
 
-	m_renderer.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, Vec2( 0.0f, 1.0f ), Vec2( 1.0f, 0.0f ), sprite.color() );
+	// Get the rotation
+	f32  angle = radians( transform.rotation() );
+	f32  s	   = sinf( angle );
+	f32  c	   = cosf( angle );
+
+	// Calculate the basis vectors from rotation
+	Vec2 up   = Vec2( s, c );
+	Vec2 side = Vec2( up.y, -up.x );
+
+	// Render oriented quad
+	m_renderer.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, up, side, sprite.color() );
 }
 
 // ** SpriteRenderPass::begin
