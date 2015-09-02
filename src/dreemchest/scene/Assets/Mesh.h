@@ -35,6 +35,7 @@ namespace scene {
 
 	//! Mesh data container.
 	class Mesh : public Asset {
+	friend class AssetBundle;
 	public:
 
 								ClassEnableTypeInfoSuper( Mesh, Asset )

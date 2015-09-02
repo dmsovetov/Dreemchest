@@ -59,7 +59,7 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 		return;
 	}
 
-	m_queue.front()->load();
+	m_queue.front()->load( m_hal );
 	m_queue.pop_front();
 }
 

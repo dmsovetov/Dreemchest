@@ -170,12 +170,15 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		// Emit a new render operation
 		RenderOp* rop = emitRenderOp();
 
+		// Get the texture data from an asset
+		AssetTexturePtr data    = material->texture( Material::Diffuse )->data();
+
 		// Initialize the rendering operation
 		rop->mvp			= mvp;
 		rop->indexBuffer	= chunk.m_indexBuffer.get();
 		rop->vertexBuffer	= chunk.m_vertexBuffer.get();
 		rop->shader			= material->shader();
-		rop->texture		= const_cast<ImageWPtr&>( material->texture( Material::Diffuse ) )->requestTexture( m_renderer.m_hal.get() ).get();
+		rop->texture		= data.valid() ? data->texture.get() : NULL;
 		rop->diffuse		= &material->color( Material::Diffuse );
 	}
 }

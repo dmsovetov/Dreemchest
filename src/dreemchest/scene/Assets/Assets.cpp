@@ -28,6 +28,8 @@
 
 #include "Image.h"
 #include "Material.h"
+#include "Mesh.h"
+#include "Loaders.h"
 
 #include <json/json.h>
 
@@ -68,9 +70,26 @@ bool Asset::needsLoading( void ) const
 	return m_state != Loading && m_state != Loaded;
 }
 
-// ** Asset::load
-bool Asset::load( void )
+// ** Asset::loader
+const AssetLoaderPtr& Asset::loader( void ) const
 {
+	return m_loader;
+}
+
+// ** Asset::setLoader
+void Asset::setLoader( const AssetLoaderPtr& value )
+{
+	m_loader = value;
+}
+
+// ** Asset::load
+bool Asset::load( const renderer::HalPtr& hal )
+{
+	if( m_loader == AssetLoaderPtr() ) {
+		log::verbose( "Asset::load : %s, has no asset loader\n", name().c_str() );
+		return true;
+	}
+
 	DC_BREAK_IF( !needsLoading() );
 
 	m_state = Loading;
@@ -86,7 +105,7 @@ bool Asset::load( void )
 
 	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
 
-	if( !loadFromStream( stream ) ) {
+	if( !m_loader->loadFromStream( hal, stream ) ) {
 		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
 		m_state = LoadingError;
 		return false;
@@ -95,12 +114,6 @@ bool Asset::load( void )
 	m_state = Loaded;
 
 	return true;
-}
-
-// ** Asset::loadFromStream
-bool Asset::loadFromStream( const io::StreamPtr& stream )
-{
-	return false;
 }
 
 // ** Asset::unload
@@ -183,7 +196,8 @@ bool AssetBundle::loadFromJson( const String& json )
 		String type		  = item["type"].asString();
 
 		if( type == "image" ) {
-			addImage( identifier, ImageFormat::ImageRaw, item["width"].asInt(), item["height"].asInt() ).get();
+			ImagePtr image = addImage( identifier, item["width"].asInt(), item["height"].asInt() ).get();
+			RawImageLoader::attachTo( image );
 		}
 		else {
 			log::warn( "AssetBundle::loadFromJson : unknown asset type '%s'\n", type.c_str() );
@@ -194,11 +208,11 @@ bool AssetBundle::loadFromJson( const String& json )
 }
 
 // ** AssetBundle::addImage
-ImagePtr AssetBundle::addImage( const String& name, ImageFormat format, u32 width, u32 height )
+ImagePtr AssetBundle::addImage( const String& name, u32 width, u32 height )
 {
 	log::msg( "Adding image '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
 
-	ImagePtr image( DC_NEW Image( this, name, format, width, height ) );
+	ImagePtr image( DC_NEW Image( this, name, width, height ) );
 	m_assets[StringHash( name.c_str() )] = image;
 
 	return image;

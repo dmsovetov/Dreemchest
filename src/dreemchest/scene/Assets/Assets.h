@@ -33,6 +33,17 @@ DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
+	//! Asset data stores the loaded asset data (HAL texture, vertex buffers, etc.).
+	class AssetData : public RefCounted {
+	public:
+	};
+
+	//! The loaded HAL texture.
+	class AssetTexture : public AssetData {
+	public:
+		renderer::TexturePtr	texture;	//!< Reference to a loaded texture.
+	};
+
 	//! Basic scene asset
 	class Asset : public RefCounted {
 	public:
@@ -63,6 +74,12 @@ namespace scene {
 		//! Returns asset type.
 		Type					type( void ) const;
 
+		//! Returns the loader attached to an asset.
+		const AssetLoaderPtr&	loader( void ) const;
+
+		//! Sets the asset loader.
+		void					setLoader( const AssetLoaderPtr& value );
+
 		//! Returns asset name.
 		const String&			name( void ) const;
 
@@ -76,20 +93,43 @@ namespace scene {
 		const AssetBundleWPtr&	bundle( void ) const;
 
 		//! Loads an asset.
-		bool					load( void );
-
-		//! Loads an asset from stream.
-		virtual bool			loadFromStream( const io::StreamPtr& stream );
+		bool					load( const renderer::HalPtr& hal );
 
 		//! Unloads asset.
 		virtual void			unload( void );
 
 	private:
 
+		AssetLoaderPtr			m_loader;	//!< Asset loader instance.
 		AssetBundleWPtr			m_bundle;	//!< Parent asset bundle.
 		Type					m_type;		//!< Asset type.
 		String					m_name;		//!< Asset name.
 		State					m_state;	//!< Asset state.
+	};
+
+	//! Generic asset class to derive other asset types from it.
+	template<typename TData>
+	class AssetWithData : public Asset {
+	public:
+
+		//! Returns the asset data.
+		const StrongPtr<TData>&	data( void ) const { return m_data; }
+
+		//! Sets the asset data.
+		void					setData( const StrongPtr<TData>& value ) { m_data = value; }
+
+	protected:
+
+								//! Constructs AssetWithData instance.
+								AssetWithData( AssetBundle* bundle, Type type, const String& name )
+									: Asset( bundle, type, name ) {}
+
+		//! Unloads the asset data.
+		virtual void			unload( void ) { m_data = StrongPtr<TData>(); Asset::unload(); }
+
+	private:
+
+		StrongPtr<TData>		m_data;		//!< Loaded asset data.
 	};
 
 	//! Contains asset meta information & caches loaded assets.
@@ -110,7 +150,7 @@ namespace scene {
 		io::Path				assetPathByName( const String& name ) const;
 
 		//! Creates the new Image asset inside this bundle.
-		ImagePtr				addImage( const String& name, ImageFormat format, u32 width, u32 height );
+		ImagePtr				addImage( const String& name, u32 width, u32 height );
 
 		//! Creates the new Material asset inside this bundle.
 		MaterialPtr				addMaterial( const String& name );

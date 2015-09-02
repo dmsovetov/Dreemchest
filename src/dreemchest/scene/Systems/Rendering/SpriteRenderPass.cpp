@@ -39,8 +39,9 @@ SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderer& ren
 void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
 {
 	// Get the sprite texture
-	ImagePtr image = sprite.image();
-	renderer::Texture2DPtr texture = image->requestTexture( m_renderer.m_hal.get() );
+	ImagePtr			 image   = sprite.image();
+	AssetTexturePtr		 data    = image->data();
+	renderer::TexturePtr texture = data.valid() ? data->texture : renderer::TexturePtr();
 
 	// Get the rotation
 	f32  angle = radians( transform.rotationZ() );

@@ -68,27 +68,21 @@ namespace scene {
 		class Camera;
 		class Rotator2D;
 
-	typedef StrongPtr<Scene>			ScenePtr;
-	typedef WeakPtr<Scene>				SceneWPtr;
-	typedef StrongPtr<AssetBundle>		AssetBundlePtr;
-	typedef WeakPtr<AssetBundle>		AssetBundleWPtr;
-	typedef StrongPtr<SceneObject>		SceneObjectPtr;
-	typedef WeakPtr<SceneObject>		SceneObjectWPtr;
-
+	dcDeclarePtrs( SceneObject )
+	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( RenderPassBase )
+	dcDeclarePtrs( AssetBundle )
+	dcDeclarePtrs( AssetLoader )
 	dcDeclarePtrs( Asset )
+	dcDeclarePtrs( AssetData )
 	dcDeclarePtrs( Image )
 	dcDeclarePtrs( Mesh )
 	dcDeclarePtrs( Material )
 
-	//! Supported image formats.
-	enum ImageFormat {
-		  ImageRaw = 0
-		, TotalImageFormats
-	};
+	dcDeclarePtrs( AssetTexture )
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {

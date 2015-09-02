@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! 2D image asset
-	class Image : public Asset {
+	class Image : public AssetWithData<AssetTexture> {
 	friend class AssetBundle;
 	public:
 
@@ -46,29 +46,16 @@ namespace scene {
 		//! Returns image height.
 		u16						height( void ) const;
 
-		//! Loads image from file.
-		virtual bool			loadFromStream( const io::StreamPtr& stream );
-
-		//! Unloads image from memory.
-		virtual void			unload( void );
-
-		//! Constructs HAL texture from loaded data.
-		renderer::TexturePtr	requestTexture( renderer::Hal* hal );
-
 	private:
 
 								//! Constructs Image instance.
-								Image( AssetBundle* bundle, const String& name, ImageFormat format, u16 width, u16 height );
+								Image( AssetBundle* bundle, const String& name, u16 width, u16 height );
 
 	private:
 
 		u16						m_width;	//!< Image width.
 		u16						m_height;	//!< Image height.
 		u8						m_channels;	//!< Image channels.
-		ImageFormat				m_format;	//!< Image format.
-
-		renderer::TexturePtr	m_texture;	//!< Loaded texture.
-		AutoPtr<u8>				m_pixels;	//!< Pixel buffer.
 	};
 
 } // namespace scene

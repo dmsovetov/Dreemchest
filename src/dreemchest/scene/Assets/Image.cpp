@@ -31,8 +31,8 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** Image::Image
-Image::Image( AssetBundle* bundle, const String& name, ImageFormat format, u16 width, u16 height )
-	: Asset( bundle, Asset::Image, name ), m_width( width ), m_height( height ), m_format( format )
+Image::Image( AssetBundle* bundle, const String& name, u16 width, u16 height )
+	: AssetWithData( bundle, Asset::Image, name ), m_width( width ), m_height( height )
 {
 }
 
@@ -46,47 +46,6 @@ u16 Image::width( void ) const
 u16 Image::height( void ) const
 {
 	return m_height;
-}
-
-// ** Image::loadFromStream
-bool Image::loadFromStream( const io::StreamPtr& stream )
-{
-	stream->read( &m_width, 2 );
-	stream->read( &m_height, 2 );
-	stream->read( &m_channels, 1 );
-
-	m_pixels = DC_NEW u8[m_width * m_height * m_channels];
-	stream->read( m_pixels.get(), m_width * m_height * m_channels );
-
-	m_texture = renderer::TexturePtr();
-
-	return true;
-}
-
-// ** Image::unload
-void Image::unload( void )
-{
-	m_texture = renderer::TexturePtr();
-	m_pixels = NULL;
-}
-
-// ** Image::requestTexture
-renderer::TexturePtr Image::requestTexture( renderer::Hal* hal )
-{
-	if( m_texture != renderer::TexturePtr() ) {
-		return m_texture;
-	}
-
-	if( !m_pixels.get() ) {
-		return renderer::TexturePtr();
-	}
-
-	renderer::Texture2D* texture = hal->createTexture2D( m_width, m_height, m_channels == 4 ? renderer::PixelRgba8 : renderer::PixelRgb8 );
-	texture->setData( 0, m_pixels.get() );
-	m_texture = texture;
-	m_pixels = NULL;
-
-	return m_texture;
 }
 
 } // namespace scene
