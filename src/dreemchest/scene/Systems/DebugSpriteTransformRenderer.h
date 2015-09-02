@@ -29,8 +29,6 @@
 
 #include "RenderSystem.h"
 
-#include "../Components/Rendering.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace scene {

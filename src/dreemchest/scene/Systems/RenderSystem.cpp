@@ -26,9 +26,6 @@
 
 #include "RenderSystem.h"
 
-#include "../Components/Camera.h"
-#include "../Components/Transform.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace scene {

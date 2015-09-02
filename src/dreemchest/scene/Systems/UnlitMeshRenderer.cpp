@@ -30,8 +30,6 @@
 #include "../Assets/Material.h"
 #include "../Assets/Image.h"
 
-#include "../Components/Transform.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace scene {

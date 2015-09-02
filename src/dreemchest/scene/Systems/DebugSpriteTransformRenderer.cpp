@@ -26,8 +26,6 @@
 
 #include "DebugSpriteTransformRenderer.h"
 
-#include "../Components/Transform.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace scene {

@@ -35,6 +35,7 @@
 
 #include <platform/Platform.h>
 #include <platform/Input.h>
+#include <platform/Window.h>
 
 #include <renderer/Renderer.h>
 #include <renderer/Hal.h>
@@ -138,7 +139,6 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
 	#include "SceneObject.h"
 	#include "Components/Rendering.h"
-	#include "Components/Camera.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"
 	#include "Systems/TransformSystems.h"
