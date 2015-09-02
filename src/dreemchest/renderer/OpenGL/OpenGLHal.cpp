@@ -128,11 +128,11 @@ void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& ind
 }
 
 // ** OpenGLHal::createTexture2D
-Texture2D* OpenGLHal::createTexture2D( u32 width, u32 height, PixelFormat format )
+Texture2DPtr OpenGLHal::createTexture2D( u32 width, u32 height, PixelFormat format )
 {
     DC_CHECK_GL;
     
-    return DC_NEW OpenGLTexture2D( width, height, format );
+    return Texture2DPtr( DC_NEW OpenGLTexture2D( width, height, format ) );
 }
 
 // ** OpenGLHal::createTextureCube
@@ -148,13 +148,16 @@ RenderTarget* OpenGLHal::createRenderTarget( u32 width, u32 height, PixelFormat 
 {
     DC_CHECK_GL;
 
-    OpenGLRenderTarget  *rt    = DC_NEW OpenGLRenderTarget( width, height, format );
-    OpenGLTexture2D     *color = ( OpenGLTexture2D* )createTexture2D( width, height, format );
+	DC_NOT_IMPLEMENTED;
+	return NULL;
 
-    color->setData( 0, NULL );
-    rt->setColor( color );
+    //OpenGLRenderTarget* rt    = DC_NEW OpenGLRenderTarget( width, height, format );
+    //OpenGLTexture2D*    color = ( OpenGLTexture2D* )createTexture2D( width, height, format );
+
+    //color->setData( 0, NULL );
+    //rt->setColor( color );
     
-    return rt;
+    //return rt;
 }
 
 // ** OpenGLHal::createShader

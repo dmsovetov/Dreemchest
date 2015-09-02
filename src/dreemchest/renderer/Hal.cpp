@@ -145,9 +145,9 @@ void Hal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count )
 }
 
 // ** Hal::createTexture2D
-Texture2D* Hal::createTexture2D( u32 width, u32 height, PixelFormat format )
+Texture2DPtr Hal::createTexture2D( u32 width, u32 height, PixelFormat format )
 {
-    return DC_NEW Texture2D( width, height, format );
+    return Texture2DPtr( DC_NEW Texture2D( width, height, format ) );
 }
 
 // ** Hal::createTextureCube
@@ -311,10 +311,10 @@ void Hal::setStencilValue( u32 value, u32 mask )
 
 struct sCreateTextureTask {
     dcHal           hal;
-    dcTexture2D*    texture;
+    Texture2DPtr*   texture;
     u32             width, height;
-    PixelFormat    format;
-                    sCreateTextureTask( dcHal hal, dcTexture2D *texture, u32 width, u32 height, PixelFormat format )
+    PixelFormat     format;
+                    sCreateTextureTask( dcHal hal, Texture2DPtr *texture, u32 width, u32 height, PixelFormat format )
                         : hal( hal ), texture( texture ), width( width ), height( height ), format( format ) {}
 
 #ifdef DC_THREADS_ENABLED
@@ -361,7 +361,7 @@ struct sUnlockTextureTask {
 };
 
 // ** Hal::createTexture2D
-void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, dcTexture2D *texture )
+void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture )
 {
 	DC_BREAK_IF( texture == NULL );
 

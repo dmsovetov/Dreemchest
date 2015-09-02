@@ -97,7 +97,7 @@ namespace renderer {
          \param format  Texture pixel format.
          \return        Texture2D instance.
          */
-        virtual Texture2D*  createTexture2D( u32 width, u32 height, PixelFormat format );
+        virtual Texture2DPtr	createTexture2D( u32 width, u32 height, PixelFormat format );
 
         //! Creates a new CUBE texture.
         /*!
@@ -240,7 +240,7 @@ namespace renderer {
         virtual void    setStencilValue( u32 value, u32 mask = ~0 );
 
         // ?? Thread-safe operations
-		virtual void				createTexture2D( u32 width, u32 height, PixelFormat format, dcTexture2D *texture );
+		virtual void				createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture );
         virtual void*               lockTexture( dcTexture2D texture, u32& size );
         virtual void                unlockTexture( dcTexture2D texture );
 

@@ -147,7 +147,7 @@ namespace renderer {
         virtual void				present( void );
         virtual void                renderPrimitives( PrimitiveType primType, u32 offset, u32 count );
         virtual void				renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
-        virtual Texture2D*			createTexture2D( u32 width, u32 height, PixelFormat format );
+        virtual Texture2DPtr		createTexture2D( u32 width, u32 height, PixelFormat format );
         virtual TextureCube*        createTextureCube( u32 size, PixelFormat format );
         virtual RenderTarget*       createRenderTarget( u32 width, u32 height, PixelFormat format );
         virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
