@@ -144,16 +144,16 @@ namespace Scene {
 		virtual u32					height( void ) const;
 
 		//! Creates the WindowView instance.
-		static ViewPtr				create( const WindowWPtr& window );
+		static ViewPtr				create( const Platform::WindowWPtr& window );
 
 	private:
 
 									//! Constructs the WindowView instance.
-									WindowView( const WindowWPtr& window );
+									WindowView( const Platform::WindowWPtr& window );
 
 	private:
 
-		WindowWPtr					m_window;	//!< The output window.
+		Platform::WindowWPtr		m_window;	//!< The output window.
 	};
 
 	//! Camera component.

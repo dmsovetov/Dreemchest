@@ -48,7 +48,7 @@ namespace Scene {
 
 	private:
 
-		platform::Input*	m_input;	//!< The input instance.
+		Platform::Input*	m_input;	//!< The input instance.
 	};
 
 } // namespace Scene

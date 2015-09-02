@@ -37,25 +37,25 @@ f32 WasdInput2D::speed( void ) const
 }
 
 // ** WasdInput2D::left
-platform::Key::Mapping WasdInput2D::left( void ) const
+Platform::Key::Mapping WasdInput2D::left( void ) const
 {
 	return m_left;
 }
 
 // ** WasdInput2D::right
-platform::Key::Mapping WasdInput2D::right( void ) const
+Platform::Key::Mapping WasdInput2D::right( void ) const
 {
 	return m_right;
 }
 
 // ** WasdInput2D::up
-platform::Key::Mapping WasdInput2D::up( void ) const
+Platform::Key::Mapping WasdInput2D::up( void ) const
 {
 	return m_up;
 }
 
 // ** WasdInput2D::down
-platform::Key::Mapping WasdInput2D::down( void ) const
+Platform::Key::Mapping WasdInput2D::down( void ) const
 {
 	return m_down;
 }

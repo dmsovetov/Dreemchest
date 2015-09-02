@@ -115,7 +115,7 @@ Rect View::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
 // ------------------------------------------ WindowView ------------------------------------------ //
 
 // ** WindowView::WindowView
-WindowView::WindowView( const WindowWPtr& window ) : m_window( window )
+WindowView::WindowView( const Platform::WindowWPtr& window ) : m_window( window )
 {
 }
 
@@ -132,7 +132,7 @@ u32 WindowView::height( void ) const
 }
 
 // ** WindowView::create
-ViewPtr WindowView::create( const WindowWPtr& window )
+ViewPtr WindowView::create( const Platform::WindowWPtr& window )
 {
 	return ViewPtr( DC_NEW WindowView( window ) );
 }

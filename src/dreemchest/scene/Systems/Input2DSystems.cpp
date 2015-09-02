@@ -33,7 +33,7 @@ namespace Scene {
 // ** WasdInput2DSystem::WasdInput2DSystem
 WasdInput2DSystem::WasdInput2DSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "WasdInput2D" )
 {
-	m_input = platform::Input::sharedInstance();
+	m_input = Platform::Input::sharedInstance();
 }
 
 // ** WasdInput2DSystem::process

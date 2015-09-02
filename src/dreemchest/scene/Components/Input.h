@@ -40,31 +40,31 @@ namespace Scene {
 								OverrideComponent( WasdInput2D, SceneComponent )
 
 								//! Constructs WasdInput2D instance.
-								WasdInput2D( f32 speed = 1.0f, platform::Key::Mapping left = platform::Key::Total, platform::Key::Mapping right = platform::Key::Total, platform::Key::Mapping up = platform::Key::Total, platform::Key::Mapping down = platform::Key::Total )
+								WasdInput2D( f32 speed = 1.0f, Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total )
 									: m_speed( speed ), m_left( left ), m_right( right ), m_up( up ), m_down( down ) {}
 
 		//! Returns the movement speed.
 		f32						speed( void ) const;
 
 		//! Returns left key mapping.
-		platform::Key::Mapping	left( void ) const;
+		Platform::Key::Mapping	left( void ) const;
 
 		//! Return right key mapping.
-		platform::Key::Mapping	right( void ) const;
+		Platform::Key::Mapping	right( void ) const;
 
 		//! Returns up key mapping.
-		platform::Key::Mapping	up( void ) const;
+		Platform::Key::Mapping	up( void ) const;
 
 		//! Returns down key mapping.
-		platform::Key::Mapping	down( void ) const;
+		Platform::Key::Mapping	down( void ) const;
 
 	private:
 
 		f32						m_speed;	//!< Movement speed.
-		platform::Key::Mapping	m_left;		//!< Move object left key mapping
-		platform::Key::Mapping	m_right;	//!< Move object right key mapping
-		platform::Key::Mapping	m_up;		//!< Move object up key mapping
-		platform::Key::Mapping	m_down;		//!< Move object down key mapping
+		Platform::Key::Mapping	m_left;		//!< Move object left key mapping
+		Platform::Key::Mapping	m_right;	//!< Move object right key mapping
+		Platform::Key::Mapping	m_up;		//!< Move object up key mapping
+		Platform::Key::Mapping	m_down;		//!< Move object down key mapping
 	};
 
 } // namespace Scene
