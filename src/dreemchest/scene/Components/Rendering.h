@@ -46,6 +46,11 @@ namespace scene {
 		OverrideComponent( RenderSprites, SceneComponent )
 	};
 
+	//! This component is attached to a camera to debug render sprite transforms.
+	class DebugRenderSpriteTransform : public SceneComponent {
+		OverrideComponent( DebugRenderSpriteTransform, SceneComponent )
+	};
+
 	//! Holds the static mesh data with per-instance materials.
 	class StaticMesh : public SceneComponent {
 	public:
