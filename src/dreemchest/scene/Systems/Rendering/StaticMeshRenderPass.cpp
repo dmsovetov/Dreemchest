@@ -24,18 +24,18 @@
 
  **************************************************************************/
 
-#include "UnlitMeshRenderer.h"
+#include "StaticMeshRenderPass.h"
 
-#include "../Assets/Mesh.h"
-#include "../Assets/Material.h"
-#include "../Assets/Image.h"
+#include "../../Assets/Mesh.h"
+#include "../../Assets/Material.h"
+#include "../../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ** MeshRendererPass::MeshRendererPass
-MeshRendererPass::MeshRendererPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "MeshRendererPass", renderer ), m_renderOperations( 2000 )
+// ** StaticMeshRenderPass::StaticMeshRenderPass
+StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "StaticMeshRenderPass", renderer ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_renderer.m_hal->createShader(
 		CODE(
@@ -61,8 +61,8 @@ MeshRendererPass::MeshRendererPass( Ecs::Entities& entities, const Renderer& ren
 			} ) );
 }
 
-// ** MeshRendererPass::begin
-bool MeshRendererPass::begin( u32 currentTime )
+// ** StaticMeshRenderPass::begin
+bool StaticMeshRenderPass::begin( u32 currentTime )
 {
 	// Clean the allocated render operations
 	m_renderOperations.reset();
@@ -73,8 +73,8 @@ bool MeshRendererPass::begin( u32 currentTime )
 	return true;
 }
 
-// ** MeshRendererPass::end
-void MeshRendererPass::end( void )
+// ** StaticMeshRenderPass::end
+void StaticMeshRenderPass::end( void )
 {
 	// Get the HAL reference
 	renderer::HalPtr& hal = m_renderer.m_hal;
@@ -123,8 +123,8 @@ void MeshRendererPass::end( void )
 	m_frame.clear();
 }
 
-// ** MeshRendererPass::setShader
-void MeshRendererPass::setShader( const RenderOp* rop )
+// ** StaticMeshRenderPass::setShader
+void StaticMeshRenderPass::setShader( const RenderOp* rop )
 {
 	renderer::HalPtr& hal = m_renderer.m_hal;
 
@@ -150,8 +150,8 @@ void MeshRendererPass::setShader( const RenderOp* rop )
 	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
 }
 
-// ** MeshRendererPass::process
-void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform )
+// ** StaticMeshRenderPass::process
+void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
 	// Calculate the MVP matrix
 	Matrix4 mvp = m_viewProj * transform.matrix();
@@ -180,8 +180,8 @@ void MeshRendererPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	}
 }
 
-// ** MeshRendererPass::emitRenderOp
-MeshRendererPass::RenderOp* MeshRendererPass::emitRenderOp( void )
+// ** StaticMeshRenderPass::emitRenderOp
+StaticMeshRenderPass::RenderOp* StaticMeshRenderPass::emitRenderOp( void )
 {
 	RenderOp* rop = m_renderOperations.allocate();
 	DC_BREAK_IF( rop == NULL )
@@ -191,8 +191,8 @@ MeshRendererPass::RenderOp* MeshRendererPass::emitRenderOp( void )
 	return rop;
 }
 
-// ** MeshRendererPass::sortByShaderTextureMesh
-bool MeshRendererPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
+// ** StaticMeshRenderPass::sortByShaderTextureMesh
+bool StaticMeshRenderPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
 {
 	if( a->shader != b->shader ) return a->shader < b->shader;
 	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;

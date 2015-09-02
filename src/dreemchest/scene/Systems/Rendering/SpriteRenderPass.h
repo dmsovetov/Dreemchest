@@ -24,44 +24,36 @@
 
  **************************************************************************/
 
-#include "DebugSpriteTransformRenderer.h"
+#ifndef __DC_Scene_SpriteRenderPass_H__
+#define __DC_Scene_SpriteRenderPass_H__
+
+#include "RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-// ** DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass
-DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "DebugSpriteTransformRenderPass", renderer )
-{
-}
+	//! The sprite rendering pass
+	class SpriteRenderPass : public RenderPass<Sprite> {
+	public:
 
-// ** DebugSpriteTransformRenderPass::process
-void DebugSpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
-{
-	const Quat& rotation = transform.rotation();
+									//! Constructs the SpriteRenderPass instance.
+									SpriteRenderPass( Ecs::Entities& entities, const Renderer& renderer );
 
-	f32  x	  = transform.x();
-	f32  y	  = transform.y();
-	Vec3 left = rotation.rotate( Vec3( 10, 0, 0 ) );
-	Vec3 up   = rotation.rotate( Vec3( 0, 10, 0 ) );
+	private:
 
-	m_renderer.m_renderer2d->line( x, y, x + left.x, y + left.y, Rgba( 1.0f, 0.0f, 0.0f ) );
-	m_renderer.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
-}
+		//! Renders a single entity with a sprite
+		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
 
-// ** DebugSpriteTransformRenderPass::begin
-bool DebugSpriteTransformRenderPass::begin( u32 currentTime )
-{
-	m_renderer.m_renderer2d->begin( m_viewProj );
-	return true;
-}
+		//! Sets the view-projection matrix for 2D rendering.
+		virtual bool				begin( u32 currentTime );
 
-// ** DebugSpriteTransformRenderPass::end
-void DebugSpriteTransformRenderPass::end( void )
-{
-	m_renderer.m_renderer2d->end();
-}
+		//! Flushes the generated 2D mesh.
+		virtual void				end( void );
+	};
 
 } // namespace scene
 
 DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_SpriteRenderer_H__    */

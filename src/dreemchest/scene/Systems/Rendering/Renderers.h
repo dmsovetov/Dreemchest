@@ -24,39 +24,28 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Systems_DebugSpriteTransformRenderer_H__
-#define __DC_Scene_Systems_DebugSpriteTransformRenderer_H__
+#ifndef __DC_Scene_Renderers_H__
+#define __DC_Scene_Renderers_H__
 
-#include "RenderSystem.h"
+#include "StaticMeshRenderPass.h"
+#include "SpriteRenderPass.h"
+#include "Debug/SpriteTransformRenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! The sprite position rendering pass
-	class DebugSpriteTransformRenderPass : public RenderPass<Sprite> {
-	public:
+	//! Define the unlit mesh render system
+	typedef SinglePassRenderer<RenderUnlitMeshes, StaticMeshRenderPass> UnlitMeshRenderer;
 
-									//! Constructs the DebugSpriteTransformRenderPass instance.
-									DebugSpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer );
-
-	private:
-
-		//! Renders a position point of a sprite.
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
-
-		//! Sets the view-projection matrix for 2D rendering.
-		virtual bool				begin( u32 currentTime );
-
-		//! Flushes the generated 2D mesh.
-		virtual void				end( void );
-	};
+	//! Define the sprite rendering system
+	typedef SinglePassRenderer<RenderSprites, SpriteRenderPass> SpriteRenderer;
 
 	//! Define the sprite position renderer
-	typedef SinglePassRenderer<DebugRenderSpriteTransform, DebugSpriteTransformRenderPass> DebugSpriteTransformRenderer;
+	typedef SinglePassRenderer<RenderSpriteTransform, SpriteTransformRenderPass> SpriteTransformRenderer;
 
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Systems_DebugSpriteTransformRenderer_H__    */
+#endif    /*    !__DC_Scene_Renderers_H__    */

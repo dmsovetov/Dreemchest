@@ -27,10 +27,10 @@
 #ifndef __DC_Scene_RenderSystem_H__
 #define __DC_Scene_RenderSystem_H__
 
-#include "SceneSystem.h"
+#include "../SceneSystem.h"
 
-#include "../Components/Rendering.h"	//!< Include the rendering components here
-#include "../Components/Transform.h"	//!< Everything that is rendered should have a transform component, so include this file here
+#include "../../Components/Rendering.h"	//!< Include the rendering components here
+#include "../../Components/Transform.h"	//!< Everything that is rendered should have a transform component, so include this file here
 
 DC_BEGIN_DREEMCHEST
 

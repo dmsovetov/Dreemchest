@@ -24,25 +24,25 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_SpriteRenderer_H__
-#define __DC_Scene_SpriteRenderer_H__
+#ifndef __DC_Scene_Systems_SpriteTransformRenderPass_H__
+#define __DC_Scene_Systems_SpriteTransformRenderPass_H__
 
-#include "RenderSystem.h"
+#include "../RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
 
-	//! The sprite rendering pass
-	class SpriteRenderPass : public RenderPass<Sprite> {
+	//! The sprite position rendering pass
+	class SpriteTransformRenderPass : public RenderPass<Sprite> {
 	public:
 
-									//! Constructs the SpriteRenderPass instance.
-									SpriteRenderPass( Ecs::Entities& entities, const Renderer& renderer );
+									//! Constructs the SpriteTransformRenderPass instance.
+									SpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer );
 
 	private:
 
-		//! Renders a single entity with a sprite
+		//! Renders a position point of a sprite.
 		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
 
 		//! Sets the view-projection matrix for 2D rendering.
@@ -52,11 +52,8 @@ namespace scene {
 		virtual void				end( void );
 	};
 
-	//! Define the sprite rendering system
-	typedef SinglePassRenderer<RenderSprites, SpriteRenderPass> SpriteRenderer;
-
 } // namespace scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_SpriteRenderer_H__    */
+#endif    /*    !__DC_Scene_Systems_SpriteTransformRenderPass_H__    */

@@ -144,17 +144,15 @@ DC_END_DREEMCHEST
 	#include "Components/Rendering.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"
-	#include "Systems/TransformSystems.h"
-	#include "Systems/Physics2D.h"
-	#include "Systems/UnlitMeshRenderer.h"
-	#include "Systems/SpriteRenderer.h"
-	#include "Systems/DebugSpriteTransformRenderer.h"
-	#include "Systems/Input2DSystems.h"
-	#include "Systems/RenderSystem.h"
-	#include "Systems/AssetSystem.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
+	#include "Systems/TransformSystems.h"
+	#include "Systems/Physics2D.h"
+	#include "Systems/Input2DSystems.h"
+	#include "Systems/AssetSystem.h"
+
+	#include "Systems/Rendering/Renderers.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */

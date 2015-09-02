@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_UnlitMeshRenderer_H__
-#define __DC_Scene_UnlitMeshRenderer_H__
+#ifndef __DC_Scene_StaticMeshRenderPass_H__
+#define __DC_Scene_StaticMeshRenderPass_H__
 
 #include "RenderSystem.h"
 
@@ -34,11 +34,11 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! The mesh rendering pass
-	class MeshRendererPass : public RenderPass<StaticMesh> {
+	class StaticMeshRenderPass : public RenderPass<StaticMesh> {
 	public:
 
-									//! Constructs the MeshRendererPass instance.
-									MeshRendererPass( Ecs::Entities& entities, const Renderer& renderer );
+									//! Constructs the StaticMeshRenderPass instance.
+									StaticMeshRenderPass( Ecs::Entities& entities, const Renderer& renderer );
 
 	protected:
 
@@ -102,9 +102,6 @@ namespace scene {
 		ArrayAllocator<RenderOp>	m_renderOperations;				//!< Array allocator used to allocated render operations.
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
-
-	//! Define the unlit mesh render system
-	typedef SinglePassRenderer<RenderUnlitMeshes, MeshRendererPass> UnlitMeshRenderer;
 
 } // namespace scene
 

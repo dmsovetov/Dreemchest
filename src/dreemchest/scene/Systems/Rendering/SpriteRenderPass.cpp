@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "SpriteRenderer.h"
+#include "SpriteRenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 

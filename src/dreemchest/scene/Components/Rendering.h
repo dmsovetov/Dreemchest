@@ -47,8 +47,8 @@ namespace scene {
 	};
 
 	//! This component is attached to a camera to debug render sprite transforms.
-	class DebugRenderSpriteTransform : public SceneComponent {
-		OverrideComponent( DebugRenderSpriteTransform, SceneComponent )
+	class RenderSpriteTransform : public SceneComponent {
+		OverrideComponent( RenderSpriteTransform, SceneComponent )
 	};
 
 	//! Holds the static mesh data with per-instance materials.
