@@ -94,6 +94,15 @@ namespace scene {
 									: RenderSystemBase( entities, name, ecs::Aspect::all<Camera, Transform, TRender>(), renderer ) {}
 	};
 
+	//! Generic single pass renderer
+	template<typename TRenderer, typename TPass>
+	class SinglePassRenderer : public RenderSystem<TRenderer> {
+	public:
+
+								SinglePassRenderer( ecs::Entities& entities, const Renderer& renderer )
+									: RenderSystem( entities, "SinglePassRenderer", renderer ) { addPass<TPass>(); }
+	};
+
 	//! Base class for all render passes.
 	class RenderPassBase : public ecs::EntitySystem {
 	public:

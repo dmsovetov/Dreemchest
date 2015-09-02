@@ -26,11 +26,7 @@
 
 #include "SpriteRenderer.h"
 
-#include "../Components/Camera.h"
 #include "../Components/Transform.h"
-
-#include <Windows.h>
-#include <gl/GL.h>
 
 DC_BEGIN_DREEMCHEST
 

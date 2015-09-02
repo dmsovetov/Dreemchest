@@ -105,13 +105,8 @@ namespace scene {
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
 
-	//! Unlit mesh render system
-	class UnlitMeshRenderer : public RenderSystem<RenderUnlitMeshes> {
-	public:
-
-									UnlitMeshRenderer( ecs::Entities& entities, const Renderer& renderer )
-										: RenderSystem( entities, "UnlitMeshRenderer", renderer ) { addPass<MeshRendererPass>(); }
-	};
+	//! Define the unlit mesh render system
+	typedef SinglePassRenderer<RenderUnlitMeshes, MeshRendererPass> UnlitMeshRenderer;
 
 } // namespace scene
 

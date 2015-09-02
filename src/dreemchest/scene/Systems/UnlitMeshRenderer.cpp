@@ -31,7 +31,6 @@
 #include "../Assets/Image.h"
 
 #include "../Components/Transform.h"
-#include "../Components/Camera.h"
 
 DC_BEGIN_DREEMCHEST
 

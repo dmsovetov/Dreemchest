@@ -54,13 +54,8 @@ namespace scene {
 		virtual void				end( void );
 	};
 
-	//! Sprite render system
-	class SpriteRenderer : public RenderSystem<RenderSprites> {
-	public:
-
-									SpriteRenderer( ecs::Entities& entities, const Renderer& renderer )
-										: RenderSystem( entities, "SpriteRenderer", renderer ) { addPass<SpriteRenderPass>(); }
-	};
+	//! Define the sprite rendering system
+	typedef SinglePassRenderer<RenderSprites, SpriteRenderPass> SpriteRenderer;
 
 } // namespace scene
 
