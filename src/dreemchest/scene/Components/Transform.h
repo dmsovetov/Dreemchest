@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Scene object transformation component.
 	class Transform : public SceneComponent {
@@ -160,7 +160,7 @@ namespace scene {
 		f32						m_springForce;	//!< The spring force.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

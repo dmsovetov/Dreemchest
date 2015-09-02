@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! The sprite position rendering pass
 	class SpriteTransformRenderPass : public RenderPass<Sprite> {
@@ -52,7 +52,7 @@ namespace scene {
 		virtual void				end( void );
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

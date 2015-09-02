@@ -38,7 +38,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 #ifdef DC_PHYSICS2D_BOX2D
 
@@ -105,7 +105,7 @@ namespace scene {
 
 #endif	/*	DC_PHYSICS2D_BOX2D	*/
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

@@ -34,7 +34,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Base class for all asset loaders.
 	class AssetLoader : public RefCounted {
@@ -96,7 +96,7 @@ namespace scene {
 		mutable MeshPtr		m_mesh;	//!< Target mesh to load data into
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

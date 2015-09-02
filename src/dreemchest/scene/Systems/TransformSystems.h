@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! The Rotator2DSystem system
 	class Rotator2DSystem : public SceneSystem2<Rotator2D, Transform> {
@@ -69,7 +69,7 @@ namespace scene {
 		};
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Asset system ensures that all needed assets are loaded into the memory.
 	class AssetSystem : public Ecs::EntitySystem {
@@ -69,7 +69,7 @@ namespace scene {
 		List<AssetWPtr>		m_queue;	//!< Asset loading queue.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

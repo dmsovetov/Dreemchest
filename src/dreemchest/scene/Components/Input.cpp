@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** WasdInput2D::speed
 f32 WasdInput2D::speed( void ) const
@@ -60,6 +60,6 @@ platform::Key::Mapping WasdInput2D::down( void ) const
 	return m_down;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

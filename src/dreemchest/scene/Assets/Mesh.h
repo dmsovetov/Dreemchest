@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Mesh data container.
 	class Mesh : public Asset {
@@ -77,7 +77,7 @@ namespace scene {
 		Chunks					m_chunks; //!< Mesh chunks.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

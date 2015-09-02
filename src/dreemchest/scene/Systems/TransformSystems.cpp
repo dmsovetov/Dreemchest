@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------------ FollowSystem ------------------------------------------------- //
 
@@ -79,6 +79,6 @@ void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject
 	transform.setRotationZ( transform.rotationZ() + rotator.speed() * dt );
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ---------------------------------------- RenderSystemBase ---------------------------------------- //
 
@@ -98,6 +98,6 @@ void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
 	DC_BREAK
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

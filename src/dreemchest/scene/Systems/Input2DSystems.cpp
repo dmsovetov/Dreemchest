@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** WasdInput2DSystem::WasdInput2DSystem
 WasdInput2DSystem::WasdInput2DSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "WasdInput2D" )
@@ -59,6 +59,6 @@ void WasdInput2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObje
 	transform.setPosition( transform.position() + direction * dt );
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

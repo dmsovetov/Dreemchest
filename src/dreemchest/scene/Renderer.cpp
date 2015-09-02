@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** Renderer::Renderer
 Renderer::Renderer( Renderer::Hal* hal ) : m_hal( hal )
@@ -256,7 +256,7 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
 	}
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! The basic scene system
 	template<typename T>
@@ -219,7 +219,7 @@ namespace scene {
 		}
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

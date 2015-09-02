@@ -49,7 +49,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	DECLARE_LOG( log )
 
@@ -129,7 +129,7 @@ namespace scene {
 		Ecs::EntityId					m_nextEntityId;
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

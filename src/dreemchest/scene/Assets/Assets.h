@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Asset data stores the loaded asset data (HAL texture, vertex buffers, etc.).
 	class AssetData : public RefCounted {
@@ -191,7 +191,7 @@ namespace scene {
 		return StrongPtr<T>( casted );
 	}
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

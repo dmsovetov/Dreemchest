@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** Mesh::Mesh
 Mesh::Mesh( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Mesh, name )
@@ -103,6 +103,6 @@ MeshPtr Mesh::createRectangular( const String& name, Renderer::Hal* hal, f32 wid
 	return mesh;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

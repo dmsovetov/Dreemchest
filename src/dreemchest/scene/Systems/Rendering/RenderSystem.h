@@ -34,7 +34,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! A helper struct to wrap HAL & 2D renderer instances.
 	struct Renderers {
@@ -163,7 +163,7 @@ namespace scene {
 		DC_BREAK
 	}
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

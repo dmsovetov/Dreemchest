@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** Image::Image
 Image::Image( AssetBundle* bundle, const String& name, u16 width, u16 height )
@@ -48,6 +48,6 @@ u16 Image::height( void ) const
 	return m_height;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

@@ -34,7 +34,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! This component is attached to a camera to render unlit meshes.
 	class RenderUnlitMeshes : public SceneComponent {
@@ -241,7 +241,7 @@ namespace scene {
 		f32							m_far;			//!< Z-far value.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

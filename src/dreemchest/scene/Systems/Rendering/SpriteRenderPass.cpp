@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** SpriteRenderPass::SpriteRenderPass
 SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "SpriteRenderPass", renderers )
@@ -69,6 +69,6 @@ void SpriteRenderPass::end( void )
 	m_renderers.m_renderer2d->end();
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

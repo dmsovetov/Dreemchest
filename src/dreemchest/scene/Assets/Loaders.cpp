@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------ RawImageLoader ------------------------------------------ //
 
@@ -83,6 +83,6 @@ bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& s
 	return true;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

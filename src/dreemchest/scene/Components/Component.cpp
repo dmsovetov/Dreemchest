@@ -28,10 +28,10 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! A base class for all components.
 	class SceneComponent : public Ecs::Component {
@@ -47,7 +47,7 @@ namespace scene {
 								SceneComponent( void ) {}
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

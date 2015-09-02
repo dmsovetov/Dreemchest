@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! A basic scene renderer
 	class Renderer : public RefCounted {
@@ -63,7 +63,7 @@ namespace scene {
 		Renderer::Shader*		m_shaders[Material::TotalMaterialShaders];	//!< Material shaders.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

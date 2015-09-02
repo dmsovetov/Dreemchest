@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 IMPLEMENT_LOGGER( log )
 
@@ -93,6 +93,6 @@ ScenePtr Scene::create( void )
 	return ScenePtr( DC_NEW Scene );
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

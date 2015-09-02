@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Scene object class is a component holder.
 	class SceneObject : public Ecs::Entity {
@@ -66,7 +66,7 @@ namespace scene {
 		return m_scene;
 	}
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

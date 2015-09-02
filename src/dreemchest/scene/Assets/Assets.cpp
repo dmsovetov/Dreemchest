@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------- Asset ------------------------------------------- //
 
@@ -229,6 +229,6 @@ MaterialPtr AssetBundle::addMaterial( const String& name )
 	return material;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

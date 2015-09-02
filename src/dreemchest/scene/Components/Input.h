@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Moves the scene object with WASD control scheme
 	class WasdInput2D : public SceneComponent {
@@ -67,7 +67,7 @@ namespace scene {
 		platform::Key::Mapping	m_down;		//!< Move object down key mapping
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

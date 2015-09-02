@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** AssetSystem::AssetSystem
 AssetSystem::AssetSystem( Ecs::Entities& entities, Renderer::HalPtr hal ) : EntitySystem( entities, "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
@@ -105,6 +105,6 @@ void AssetSystem::queueAsset( AssetWPtr asset )
 	}	
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Define the unlit mesh render system
 	typedef SinglePassRenderer<RenderUnlitMeshes, StaticMeshRenderPass> UnlitMeshRenderer;
@@ -44,7 +44,7 @@ namespace scene {
 	//! Define the sprite position renderer
 	typedef SinglePassRenderer<RenderSpriteTransform, SpriteTransformRenderPass> SpriteTransformRenderer;
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

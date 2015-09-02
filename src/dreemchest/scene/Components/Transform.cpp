@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------- Follow ------------------------------------------- //
 
@@ -168,6 +168,6 @@ f32 Rotator2D::speed( void ) const
 	return m_speed;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

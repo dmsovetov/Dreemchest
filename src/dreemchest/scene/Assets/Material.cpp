@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** Material::Material
 Material::Material( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Material, name ), m_shader( Solid )
@@ -78,6 +78,6 @@ void Material::setTexture( Layer layer, const ImageWPtr& value )
 	m_texture[layer] = value;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

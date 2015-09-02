@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Shape of an object used for hit tests and/or 2D physics.
 	class Shape2D : public SceneComponent {
@@ -140,7 +140,7 @@ namespace scene {
 		Type				m_type;			//!< The rigid body type.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

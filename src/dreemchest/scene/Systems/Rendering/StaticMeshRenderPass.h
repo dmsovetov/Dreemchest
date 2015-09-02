@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! The mesh rendering pass
 	class StaticMeshRenderPass : public RenderPass<StaticMesh> {
@@ -103,7 +103,7 @@ namespace scene {
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

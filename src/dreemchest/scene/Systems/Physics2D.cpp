@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
@@ -213,6 +213,6 @@ f32 Box2DPhysics::sizeToBox2D( f32 value ) const
 
 #endif	/*	DC_PHYSICS2D_BOX2D	*/
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

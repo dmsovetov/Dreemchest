@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ------------------------------------------- Shape2D ------------------------------------------- //
 
@@ -90,6 +90,6 @@ RigidBody2D::Type RigidBody2D::type( void ) const
 	return m_type;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

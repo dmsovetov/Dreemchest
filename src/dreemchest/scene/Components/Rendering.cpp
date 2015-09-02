@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
@@ -217,6 +217,6 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 	return Matrix4();
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

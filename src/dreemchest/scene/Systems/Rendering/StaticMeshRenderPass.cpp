@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 // ** StaticMeshRenderPass::StaticMeshRenderPass
 StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_renderOperations( 2000 )
@@ -204,6 +204,6 @@ bool StaticMeshRenderPass::sortByShaderTextureMesh( const RenderOp* a, const Ren
 	return false;
 }
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST

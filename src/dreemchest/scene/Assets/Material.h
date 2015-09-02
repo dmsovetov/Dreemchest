@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Mesh material class.
 	class Material : public Asset {
@@ -90,7 +90,7 @@ namespace scene {
 		ImageWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

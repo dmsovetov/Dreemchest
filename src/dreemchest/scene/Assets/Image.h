@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! 2D image asset
 	class Image : public AssetWithData<AssetTexture> {
@@ -58,7 +58,7 @@ namespace scene {
 		u8						m_channels;	//!< Image channels.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 

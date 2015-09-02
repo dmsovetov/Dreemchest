@@ -34,7 +34,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace scene {
+namespace Scene {
 
 	//! Moves scene object transform 2d according to a WASD input scheme
 	class WasdInput2DSystem : public SceneSystem2<WasdInput2D, Transform> {
@@ -51,7 +51,7 @@ namespace scene {
 		platform::Input*	m_input;	//!< The input instance.
 	};
 
-} // namespace scene
+} // namespace Scene
 
 DC_END_DREEMCHEST
 
