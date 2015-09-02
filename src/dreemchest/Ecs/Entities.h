@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! Contains all active entities.
 	class Entities {
@@ -159,7 +159,7 @@ namespace ecs {
 		m_eventEmitter.unsubscribe<T>( callback );
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

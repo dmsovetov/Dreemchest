@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	/*!
 	Archetype class is a predefined set of components that compose an entity type, this
@@ -81,7 +81,7 @@ namespace ecs {
 		return component;
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

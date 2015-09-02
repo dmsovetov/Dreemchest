@@ -38,7 +38,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	DECLARE_LOG(log)
 
@@ -75,7 +75,7 @@ namespace ecs {
 	//! Event emitter type alias.
 	typedef event::EventEmitter EventEmitter;
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

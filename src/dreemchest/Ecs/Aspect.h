@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! Entity aspect to filter entities for systems & families. 
 	/*!
@@ -116,7 +116,7 @@ namespace ecs {
 		return Aspect( Any, TComponent0::bit() | TComponent1::bit() | TComponent2::bit() );
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

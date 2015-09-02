@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! System is a base class for all systems that process components.
 	/*!
@@ -150,7 +150,7 @@ namespace ecs {
 		return static_cast<T*>( i->second.get() );
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

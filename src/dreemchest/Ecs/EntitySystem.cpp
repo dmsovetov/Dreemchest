@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 IMPLEMENT_LOGGER(log)
 
@@ -95,6 +95,6 @@ void EntitySystem::entityRemoved( const EntityPtr& entity )
 {
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST

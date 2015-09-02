@@ -30,7 +30,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 // ** Entities::operator[]
 EntityPtr Entities::operator[]( const EntityId& id ) const
@@ -194,6 +194,6 @@ bool Entities::EntityKey::operator < ( const EntityKey& other ) const
 	return m_entityId < other.m_entityId;
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST

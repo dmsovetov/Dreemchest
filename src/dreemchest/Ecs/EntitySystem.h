@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! Entity system is used for processing entities.
 	class EntitySystem : public System {
@@ -155,7 +155,7 @@ namespace ecs {
 		}
 	};
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! A base class for internal system data attached to a components.
 	struct InternalBase : public RefCounted {
@@ -88,7 +88,7 @@ namespace ecs {
 		return i != m_internal.end() ? i->second : Internal<T>::Ptr();
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

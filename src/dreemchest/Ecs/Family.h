@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 	//! Entity family represents a set of entities grouped by a certain criteria.
 	class Family : public RefCounted {
@@ -196,7 +196,7 @@ namespace ecs {
 		Family::processEntityRemoved( entity );
 	}
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

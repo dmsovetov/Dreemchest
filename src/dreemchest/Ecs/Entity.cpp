@@ -30,7 +30,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 // ** Entity::s_aliveCount
 u32 Entity::s_aliveCount = 0;
@@ -83,6 +83,6 @@ EntityPtr Entity::create( Entities& entities, const EntityId& id )
 	return EntityPtr( new Entity( entities, id ) );
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST

@@ -30,7 +30,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 // ** Archetype::Archetype
 Archetype::Archetype( const EntityWPtr& entity ) : m_entity( entity )
@@ -50,6 +50,6 @@ const EntityWPtr& Archetype::entity( void ) const
 	return m_entity;
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST

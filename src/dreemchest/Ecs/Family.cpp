@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 // ** Family::Family
 Family::Family( Entities& entities, const String& name, const Aspect& aspect ) : m_entities( entities ), m_name( name ), m_aspect( aspect )
@@ -99,6 +99,6 @@ void Family::processEntityRemoved( const EntityPtr& handle )
 	m_family.erase( handle );
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST

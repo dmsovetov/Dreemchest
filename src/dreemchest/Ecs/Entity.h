@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 #define OverrideEntity( Type, Super )		\
     ClassEnableTypeInfoSuper( Type, Super )	\
 
-namespace ecs {
+namespace Ecs {
 
 	//! Entity handle contains an entity id & parent world.
 	/*!
@@ -200,7 +200,7 @@ namespace ecs {
 	}
 
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
 

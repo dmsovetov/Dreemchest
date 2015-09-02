@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace ecs {
+namespace Ecs {
 
 // ** Aspect::Aspect
 Aspect::Aspect( AspectType type, const Bitset& mask )
@@ -69,6 +69,6 @@ bool Aspect::hasIntersection( const EntityPtr& entity ) const
 	return true;
 }
 
-} // namespace ecs
+} // namespace Ecs
 
 DC_END_DREEMCHEST
