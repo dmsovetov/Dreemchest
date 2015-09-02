@@ -38,7 +38,15 @@ DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass( Ecs::Entities& e
 // ** DebugSpriteTransformRenderPass::process
 void DebugSpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
 {
-	m_renderer.m_renderer2d->point( transform.x(), transform.y(), Rgba( 0.0f, 1.0f, 0.0f, 1.0f ) );
+	const Quat& rotation = transform.rotation();
+
+	f32  x	  = transform.x();
+	f32  y	  = transform.y();
+	Vec3 left = rotation.rotate( Vec3( 10, 0, 0 ) );
+	Vec3 up   = rotation.rotate( Vec3( 0, 10, 0 ) );
+
+	m_renderer.m_renderer2d->line( x, y, x + left.x, y + left.y, Rgba( 1.0f, 0.0f, 0.0f ) );
+	m_renderer.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
 }
 
 // ** DebugSpriteTransformRenderPass::begin
