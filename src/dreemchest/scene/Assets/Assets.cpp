@@ -196,8 +196,12 @@ bool AssetBundle::loadFromJson( const String& json )
 		String type		  = item["type"].asString();
 
 		if( type == "image" ) {
-			ImagePtr image = addImage( identifier, item["width"].asInt(), item["height"].asInt() ).get();
+			ImagePtr image = addImage( identifier, item["width"].asInt(), item["height"].asInt() );
 			RawImageLoader::attachTo( image );
+		}
+		else if( type == "mesh" ) {
+			MeshPtr mesh = addMesh( identifier );
+			RawMeshLoader::attachTo( mesh );
 		}
 		else {
 			log::warn( "AssetBundle::loadFromJson : unknown asset type '%s'\n", type.c_str() );
@@ -216,6 +220,17 @@ ImagePtr AssetBundle::addImage( const String& name, u32 width, u32 height )
 	m_assets[StringHash( name.c_str() )] = image;
 
 	return image;
+}
+
+// ** AssetBundle::addMesh
+MeshPtr AssetBundle::addMesh( const String& name )
+{
+	log::msg( "Adding mesh '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
+
+	MeshPtr mesh( DC_NEW Mesh( this, name ) );
+	m_assets[StringHash( name.c_str() )] = mesh;
+
+	return mesh;
 }
 
 // ** AssetBundle::addMaterial

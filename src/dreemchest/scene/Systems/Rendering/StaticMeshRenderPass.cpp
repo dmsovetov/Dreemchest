@@ -37,6 +37,22 @@ namespace Scene {
 // ** StaticMeshRenderPass::StaticMeshRenderPass
 StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_renderOperations( 2000 )
 {
+	m_shaders[ShaderInvalid] = m_renderers.m_hal->createShader(
+		CODE(
+			uniform mat4 u_mvp;
+
+			void main()
+			{
+				gl_Position = u_mvp * gl_Vertex;
+			} ),
+		CODE(
+			uniform sampler2D u_texture;
+
+			void main()
+			{
+				gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
+			} ) );
+
 	m_shaders[ShaderSolid] = m_renderers.m_hal->createShader(
 		CODE(
 			uniform mat4 u_mvp;
@@ -126,28 +142,38 @@ void StaticMeshRenderPass::end( void )
 // ** StaticMeshRenderPass::setShader
 void StaticMeshRenderPass::setShader( const RenderOp* rop )
 {
-	Renderer::HalPtr& hal = m_renderers.m_hal;
+	Renderer::HalPtr&   hal    = m_renderers.m_hal;
+	Renderer::ShaderPtr shader;
 
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
-		case Material::Solid:		hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
-									break;
-
 		case Material::Transparent:	hal->setBlendFactors( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 									break;
 
 		case Material::Additive:	hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 									break;
+
+		default:					hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
 		}
 
-		hal->setShader( m_shaders[ShaderSolid] );
+		shader = rop->shader != Material::Unknown ? m_shaders[ShaderSolid] : m_shaders[ShaderInvalid];
+		hal->setShader( shader );
 		m_frame.m_materialShader = rop->shader;
 	}
 
-	Renderer::ShaderPtr shader = m_shaders[ShaderSolid];
-	shader->setMatrix( shader->findUniformLocation( "u_mvp" ),  rop->mvp );
-	shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
-	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
+	u32 location = 0;
+
+	if( location = shader->findUniformLocation( "u_mvp" ) ) {
+		shader->setMatrix( location,  rop->mvp );
+	}
+
+	if( location = shader->findUniformLocation( "u_texture" ) ) {
+		shader->setInt( location, 0 );
+	}
+	
+	if( location = shader->findUniformLocation( "u_color" ) ) {
+		shader->setVec4( location, Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
+	}
 }
 
 // ** StaticMeshRenderPass::process
@@ -159,11 +185,15 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
 
-	// Emit render operation for each mesh chunk
-	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
-		// Get the mesh chunk by index
-		const Mesh::Chunk& chunk = mesh->chunk( i );
+	// Get the mesh data
+	AssetMeshPtr meshData = mesh->data();
 
+	if( !meshData.valid() ) {
+		return;
+	}
+
+	// Emit render operation for each mesh chunk
+	for( u32 i = 0, n = ( u32 )meshData->vertexBuffers.size(); i < n; i++ ) {
 		// Get the material for chunk
 		const MaterialPtr& material = staticMesh.material( i );
 
@@ -171,15 +201,15 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		RenderOp* rop = emitRenderOp();
 
 		// Get the texture data from an asset
-		AssetTexturePtr data    = material->texture( Material::Diffuse )->data();
+		AssetTexturePtr textueData = material.valid() ? material->texture( Material::Diffuse )->data() : AssetTexturePtr();
 
 		// Initialize the rendering operation
 		rop->mvp			= mvp;
-		rop->indexBuffer	= chunk.m_indexBuffer.get();
-		rop->vertexBuffer	= chunk.m_vertexBuffer.get();
-		rop->shader			= material->shader();
-		rop->texture		= data.valid() ? data->texture.get() : NULL;
-		rop->diffuse		= &material->color( Material::Diffuse );
+		rop->indexBuffer	= meshData->indexBuffers[i].get();
+		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
+		rop->shader			= material.valid() ? material->shader() : Material::Unknown;
+		rop->texture		= textueData.valid() ? textueData->texture.get() : NULL;
+		rop->diffuse		= material.valid() ? &material->color( Material::Diffuse ) : NULL;
 	}
 }
 

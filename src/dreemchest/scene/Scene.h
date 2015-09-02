@@ -83,6 +83,7 @@ namespace Scene {
 	dcDeclarePtrs( Material )
 
 	dcDeclarePtrs( AssetTexture )
+	dcDeclarePtrs( AssetMesh )
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {

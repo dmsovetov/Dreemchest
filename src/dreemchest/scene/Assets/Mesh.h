@@ -34,47 +34,16 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Mesh data container.
-	class Mesh : public Asset {
+	class Mesh : public AssetWithData<AssetMesh> {
 	friend class AssetBundle;
 	public:
 
 								ClassEnableTypeInfoSuper( Mesh, Asset )
 
-		//! Mesh submesh type.
-		struct Chunk {
-			Renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			Renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
-
-			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != Renderer::VertexBufferPtr() && m_indexBuffer != Renderer::IndexBufferPtr(); }
-		};
-
-		//! Adds a new mesh chunk.
-		void					addChunk( const Renderer::VertexBufferPtr& vertexBuffer, const Renderer::IndexBufferPtr& indexBuffer );
-
-		//! Returns the total number of chunks.
-		u32						chunkCount( void ) const;
-
-		//! Returns a chunk by index.
-		const Chunk&			chunk( u32 index ) const;
-
-		//! Creates a new Mesh instance.
-		static MeshPtr			create( const String& name );
-
-		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( const String& name, Renderer::Hal* hal, f32 width, f32 height );
-
 	private:
 
 								//! Constructs Mesh instance.
 								Mesh( AssetBundle* bundle, const String& name );
-
-	private:
-
-		//! Container type to store mesh chunks.
-		typedef Array<Chunk>	Chunks;
-
-		Chunks					m_chunks; //!< Mesh chunks.
 	};
 
 } // namespace Scene

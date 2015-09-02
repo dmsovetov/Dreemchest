@@ -44,7 +44,8 @@ namespace Scene {
 
 		//! Available shader types.
 		enum ShaderType {
-			  ShaderSolid = 0
+			  ShaderInvalid
+			, ShaderSolid
 			, TotalShaderTypes
 		};
 

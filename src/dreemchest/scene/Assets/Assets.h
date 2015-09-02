@@ -44,6 +44,13 @@ namespace Scene {
 		Renderer::TexturePtr	texture;	//!< Reference to a loaded texture.
 	};
 
+	//! The loaded mesh data.
+	class AssetMesh : public AssetData {
+	public:
+		Array<Renderer::VertexBufferPtr>	vertexBuffers;	//!< Mesh vertex buffers.
+		Array<Renderer::IndexBufferPtr>		indexBuffers;	//!< Mesh index buffers.
+	};
+
 	//! Basic scene asset
 	class Asset : public RefCounted {
 	public:
@@ -154,6 +161,9 @@ namespace Scene {
 
 		//! Creates the new Material asset inside this bundle.
 		MaterialPtr				addMaterial( const String& name );
+
+		//! Creates the new Mesh asset inside this bundle.
+		MeshPtr					addMesh( const String& name );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& fileName );

@@ -32,75 +32,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Mesh::Mesh
-Mesh::Mesh( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Mesh, name )
+Mesh::Mesh( AssetBundle* bundle, const String& name ) : AssetWithData( bundle, Asset::Mesh, name )
 {
-}
-
-// ** Mesh::addChunk
-void Mesh::addChunk( const Renderer::VertexBufferPtr& vertexBuffer, const Renderer::IndexBufferPtr& indexBuffer)
-{
-	Chunk chunk;
-	chunk.m_vertexBuffer = vertexBuffer;
-	chunk.m_indexBuffer  = indexBuffer;
-	DC_BREAK_IF( chunk == false );
-
-	m_chunks.push_back( chunk );
-}
-
-// ** Mesh::chunkCount
-u32 Mesh::chunkCount( void ) const
-{
-	return ( u32 )m_chunks.size();
-}
-
-// ** Mesh::chunk
-const Mesh::Chunk& Mesh::chunk( u32 index ) const
-{
-	static Chunk Invalid;
-	return index < chunkCount() ? m_chunks[index] : Invalid;
-}
-
-// ** Mesh::create
-MeshPtr Mesh::create( const String& name )
-{
-	return MeshPtr( DC_NEW Mesh( NULL, name ) );
-}
-
-// ** Mesh::createRectangular
-MeshPtr Mesh::createRectangular( const String& name, Renderer::Hal* hal, f32 width, f32 height )
-{
-	MeshPtr mesh = create( name );
-
-	//! Rectangular mesh vertex
-	struct Vertex {
-		f32 position[3];
-		f32 texCoord[2];
-	} vertices[4] = {
-		{ -width * 0.5f,  height * 0.5f, 0.0f,		0.0f, 0.0f },
-		{  width * 0.5f,  height * 0.5f, 0.0f,		1.0f, 0.0f },
-		{  width * 0.5f, -height * 0.5f, 0.0f,		1.0f, 1.0f },
-		{ -width * 0.5f, -height * 0.5f, 0.0f,		0.0f, 1.0f },
-	};
-
-	//! Mesh indices
-	u16 indices[6] = {
-		0, 1, 2,
-		0, 2, 3
-	};
-
-	Renderer::VertexDeclarationPtr vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
-	
-	Renderer::VertexBufferPtr vb = hal->createVertexBuffer( vertexDeclaration, 4, false );
-	memcpy( vb->lock(), vertices, sizeof( Vertex ) * 4 );
-	vb->unlock();
-
-	Renderer::IndexBufferPtr ib = hal->createIndexBuffer( 6, false );
-	memcpy( ib->lock(), indices, sizeof( u16 ) * 6 );
-	ib->unlock();
-
-	mesh->addChunk( vb, ib );
-
-	return mesh;
 }
 
 } // namespace Scene

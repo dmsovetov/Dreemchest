@@ -66,8 +66,11 @@ bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& s
 	stream->read( &vertexCount, 4 );
 	stream->read( &indexCount, 4 );
 
-	Vertex* vertices = DC_NEW Vertex[vertexCount];
-	u16*	indices  = DC_NEW u16[indexCount];
+	Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
+	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount, false );
+	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount, false );
+
+	Vertex* vertices = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
 
 	for( u32 i = 0; i < vertexCount; i++ ) {
 		Vertex* v = vertices + i;
@@ -76,9 +79,22 @@ bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& s
 		stream->read( v->normal, sizeof( v->normal ) );
 		stream->read( v->tex0, sizeof( v->tex0 ) );
 		stream->read( v->tex1, sizeof( v->tex1 ) );
+
+		for( u32 j = 0; j < 3; j++ ) {
+			v->position[j] *= 0.01f;
+		}
 	}
 
+	vertexBuffer->unlock();
+
+	u16* indices = indexBuffer->lock();
 	stream->read( indices, sizeof( u16 ) * indexCount );
+	indexBuffer->unlock();
+
+	AssetMesh* data = DC_NEW AssetMesh;
+	data->vertexBuffers.push_back( vertexBuffer );
+	data->indexBuffers.push_back( indexBuffer );
+	m_mesh->setData( data );
 
 	return true;
 }
