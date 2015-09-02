@@ -27,6 +27,8 @@
 #include "Scene.h"
 #include "SceneObject.h"
 
+#include "Components/Rendering.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace scene {
@@ -36,7 +38,7 @@ IMPLEMENT_LOGGER( log )
 // ** Scene::Scene
 Scene::Scene( void ) : m_systems( m_entities ), m_renderingSystems( m_entities ), m_nextEntityId( 1 )
 {
-
+	m_cameras = ecs::Family::create( m_entities, "Cameras", ecs::Aspect::all<Camera>() );
 }
 
 // ** Scene::update
@@ -61,7 +63,16 @@ SceneObjectPtr Scene::createSceneObject( void )
 // ** Scene::render
 void Scene::render( void )
 {
+	// Update all rendering systems
 	m_renderingSystems.update( 0, 0.0f );
+
+	// Now reset internal Camera::ClearDisabled flag for all cameras in scene
+	const ecs::EntitySet& cameras = m_cameras->entities();
+
+	for( ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
+		Camera* camera = (*i)->get<Camera>();
+		camera->setClearMask( camera->clearMask() & ~Camera::ClearDisabled );
+	}
 }
 
 // ** Scene::systems

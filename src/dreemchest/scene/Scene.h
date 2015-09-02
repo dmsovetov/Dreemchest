@@ -128,6 +128,9 @@ namespace scene {
 		//! Entity rendering systems.
 		ecs::Systems					m_renderingSystems;
 
+		//! All cameras that reside in scene.
+		ecs::FamilyPtr					m_cameras;
+
 		//! Next scene object id.
 		ecs::EntityId					m_nextEntityId;
 	};

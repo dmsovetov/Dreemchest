@@ -36,7 +36,8 @@ namespace scene {
 void RenderSystemBase::process( u32 currentTime, f32 dt, ecs::EntityPtr& entity )
 {
 	// Get the camera component from entity
-	Camera& camera = *entity->get<Camera>();
+	Camera& camera    = *entity->get<Camera>();
+	u8		clearMask = camera.clearMask();
 
 	// Get the transform component from entity
 	Transform& transform = *entity->get<Transform>();
@@ -66,7 +67,11 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, ecs::EntityPtr& entity 
 		hal->setViewport( ( u32 )min.x, ( u32 )min.y,  width, height );
 		hal->setScissorTest( true, ( u32 )min.x, ( u32 )min.y,  width, height );
 
-		hal->clear( camera.clearColor() );
+		if( (clearMask & Camera::ClearDisabled) == 0 ) {
+			u32 mask = ( clearMask & Camera::ClearColor ? renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? renderer::ClearDepth : 0 );
+			hal->clear( camera.clearColor(), 1.0f, 0, mask );
+			camera.setClearMask( mask | Camera::ClearDisabled ); // Clear the viewport only once per frame.
+		}
 
 		for( RenderPasses::iterator i = m_passes.begin(), end = m_passes.end(); i != end; ++i ) {
 			(*i)->render( currentTime, dt, viewProjection );
