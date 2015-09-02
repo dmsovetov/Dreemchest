@@ -77,16 +77,16 @@ namespace scene {
 		void						setMaterial( u32 index, const MaterialPtr& value );
 
 		//! Returns a lightmap texture.
-		const renderer::TexturePtr&	lightmap( void ) const;
+		const Renderer::TexturePtr&	lightmap( void ) const;
 
 		//! Sets a lightmap texture.
-		void						setLightmap( const renderer::TexturePtr& value );
+		void						setLightmap( const Renderer::TexturePtr& value );
 
 	private:
 
 		MeshPtr						m_mesh;			//!< Mesh to be rendered.
 		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
-		renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
+		Renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
 	};
 
 	//! Holds the sprite rendering info.

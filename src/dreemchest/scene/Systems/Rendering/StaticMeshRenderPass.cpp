@@ -35,9 +35,9 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** StaticMeshRenderPass::StaticMeshRenderPass
-StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "StaticMeshRenderPass", renderer ), m_renderOperations( 2000 )
+StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_renderOperations( 2000 )
 {
-	m_shaders[ShaderSolid] = m_renderer.m_hal->createShader(
+	m_shaders[ShaderSolid] = m_renderers.m_hal->createShader(
 		CODE(
 			uniform mat4 u_mvp;
 
@@ -68,7 +68,7 @@ bool StaticMeshRenderPass::begin( u32 currentTime )
 	m_renderOperations.reset();
 
 	// Disable the depth test for 2d rendering
-	m_renderer.m_hal->setDepthTest( true, renderer::Always );
+	m_renderers.m_hal->setDepthTest( true, Renderer::Always );
 
 	return true;
 }
@@ -77,7 +77,7 @@ bool StaticMeshRenderPass::begin( u32 currentTime )
 void StaticMeshRenderPass::end( void )
 {
 	// Get the HAL reference
-	renderer::HalPtr& hal = m_renderer.m_hal;
+	Renderer::HalPtr& hal = m_renderers.m_hal;
 
 	// Sort the emitted render operations
 	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
@@ -102,7 +102,7 @@ void StaticMeshRenderPass::end( void )
 		}
 
 		// Render the mesh
-		hal->renderIndexed( renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
+		hal->renderIndexed( Renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
 	}
 
 	// Set the default shader
@@ -117,7 +117,7 @@ void StaticMeshRenderPass::end( void )
 	}
 
 	// Enable the depth test back
-	hal->setDepthTest( true, renderer::Less );
+	hal->setDepthTest( true, Renderer::Less );
 
 	// Clean the list of emitted render operations
 	m_frame.clear();
@@ -126,17 +126,17 @@ void StaticMeshRenderPass::end( void )
 // ** StaticMeshRenderPass::setShader
 void StaticMeshRenderPass::setShader( const RenderOp* rop )
 {
-	renderer::HalPtr& hal = m_renderer.m_hal;
+	Renderer::HalPtr& hal = m_renderers.m_hal;
 
 	if( m_frame.m_materialShader != rop->shader ) {
 		switch( rop->shader ) {
-		case Material::Solid:		hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
+		case Material::Solid:		hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
 									break;
 
-		case Material::Transparent:	hal->setBlendFactors( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
+		case Material::Transparent:	hal->setBlendFactors( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 									break;
 
-		case Material::Additive:	hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
+		case Material::Additive:	hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 									break;
 		}
 
@@ -144,7 +144,7 @@ void StaticMeshRenderPass::setShader( const RenderOp* rop )
 		m_frame.m_materialShader = rop->shader;
 	}
 
-	renderer::ShaderPtr shader = m_shaders[ShaderSolid];
+	Renderer::ShaderPtr shader = m_shaders[ShaderSolid];
 	shader->setMatrix( shader->findUniformLocation( "u_mvp" ),  rop->mvp );
 	shader->setInt( shader->findUniformLocation( "u_texture" ), 0 );
 	shader->setVec4( shader->findUniformLocation( "u_color" ), Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );

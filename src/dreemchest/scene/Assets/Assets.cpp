@@ -83,7 +83,7 @@ void Asset::setLoader( const AssetLoaderPtr& value )
 }
 
 // ** Asset::load
-bool Asset::load( const renderer::HalPtr& hal )
+bool Asset::load( const Renderer::HalPtr& hal )
 {
 	if( m_loader == AssetLoaderPtr() ) {
 		log::verbose( "Asset::load : %s, has no asset loader\n", name().c_str() );

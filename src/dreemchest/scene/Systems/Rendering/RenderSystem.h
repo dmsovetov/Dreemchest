@@ -37,20 +37,20 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! A helper struct to wrap HAL & 2D renderer instances.
-	struct Renderer {
-		renderer::HalPtr		m_hal;			//!< Rendering HAL.
-		renderer::Renderer2DPtr	m_renderer2d;	//!< 2D renderer.
+	struct Renderers {
+		Renderer::HalPtr		m_hal;			//!< Rendering HAL.
+		Renderer::Renderer2DPtr	m_renderer2d;	//!< 2D renderer.
 
-								//! Constructs empty Renderer instance.
-								Renderer( void )
+								//! Constructs empty Renderers instance.
+								Renderers( void )
 									{}
 
 								//! Constructs Renderer instance.
-								Renderer( const renderer::HalPtr& hal )
+								Renderers( const Renderer::HalPtr& hal )
 									: m_hal( hal ) {}
 
 								//! Constructs Renderer2D instance.
-								Renderer( const renderer::Renderer2DPtr& renderer2d )
+								Renderers( const Renderer::Renderer2DPtr& renderer2d )
 									: m_renderer2d( renderer2d ) {}
 	};
 	 
@@ -59,8 +59,8 @@ namespace scene {
 	public:
 
 								//! Constructs RenderSystemBase instance
-								RenderSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderer& renderer )
-									: EntitySystem( entities, name, aspect ), m_renderer( renderer ) {}
+								RenderSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
+									: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
 
 		//! Adds a new render pass to this system.
 		template<typename T>
@@ -76,15 +76,15 @@ namespace scene {
 		//! Container type to store nested render passes.
 		typedef List<RenderPassBasePtr> RenderPasses;
 
-		Renderer				m_renderer;	//!< Renderers wraper.
-		RenderPasses			m_passes;	//!< Render passes.
+		Renderers				m_renderers;	//!< Renderers wraper.
+		RenderPasses			m_passes;		//!< Render passes.
 	};
 
 	// ** RenderSystemBase::addPass
 	template<typename T>
 	void RenderSystemBase::addPass( void )
 	{
-		m_passes.push_back( DC_NEW T( m_entities, m_renderer ) );
+		m_passes.push_back( DC_NEW T( m_entities, m_renderers ) );
 	}
 
 	//! Generic render system to subclass user-defined rendering systems from
@@ -93,8 +93,8 @@ namespace scene {
 	public:
 
 								//! Constructs RenderSystem instance
-								RenderSystem( Ecs::Entities& entities, const String& name, const Renderer& renderer )
-									: RenderSystemBase( entities, name, Ecs::Aspect::all<Camera, Transform, TRender>(), renderer ) {}
+								RenderSystem( Ecs::Entities& entities, const String& name, const Renderers& renderers )
+									: RenderSystemBase( entities, name, Ecs::Aspect::all<Camera, Transform, TRender>(), renderers ) {}
 	};
 
 	//! Generic single pass renderer
@@ -102,8 +102,8 @@ namespace scene {
 	class SinglePassRenderer : public RenderSystem<TRenderer> {
 	public:
 
-								SinglePassRenderer( Ecs::Entities& entities, const Renderer& renderer )
-									: RenderSystem( entities, "SinglePassRenderer", renderer ) { addPass<TPass>(); }
+								SinglePassRenderer( Ecs::Entities& entities, const Renderers& renderers )
+									: RenderSystem( entities, "SinglePassRenderer", renderers ) { addPass<TPass>(); }
 	};
 
 	//! Base class for all render passes.
@@ -111,8 +111,8 @@ namespace scene {
 	public:
 
 								//! Constructs RenderPassBase instance
-								RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderer& renderer )
-									: EntitySystem( entities, name, aspect ), m_renderer( renderer ) {}
+								RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
+									: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
 
 		//! Renders the pass.
 		void					render( u32 currentTime, f32 dt, const Matrix4& viewProjection );
@@ -124,8 +124,8 @@ namespace scene {
 
 	protected:
 
-		Renderer				m_renderer;	//!< Rendering HAL.
-		Matrix4					m_viewProj;	//!< The view-projection matrix.
+		Renderers				m_renderers;	//!< Rendering HAL.
+		Matrix4					m_viewProj;		//!< The view-projection matrix.
 	};
 
 	//! Generic render pass to subclass user-defined render passes from
@@ -134,8 +134,8 @@ namespace scene {
 	public:
 
 								//! Constructs RenderPass instance
-								RenderPass( Ecs::Entities& entities, const String& name, const Renderer& renderer )
-									: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderer ) {}
+								RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers )
+									: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers ) {}
 
 	private:
 

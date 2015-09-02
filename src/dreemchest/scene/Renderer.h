@@ -43,7 +43,7 @@ namespace scene {
 	public:
 
 								//! Constructs a Renderer instance.
-								Renderer( renderer::Hal* hal );
+								Renderer( Renderer::Hal* hal );
 		virtual					~Renderer( void ) {}
 
 		//! Renders a scene.
@@ -52,15 +52,15 @@ namespace scene {
 	private:
 
 		//! Renders a scene object with a specified shader.
-		void					render( const Matrix4& view, const Matrix4& proj, renderer::Shader* shader, const SceneObjectPtr& sceneObject );
+		void					render( const Matrix4& view, const Matrix4& proj, Renderer::Shader* shader, const SceneObjectPtr& sceneObject );
 
 		//! Renders a mesh chunk to a screen.
 		void					render( const Mesh::Chunk& chunk );
 
 	private:
 
-		renderer::Hal*			m_hal;										//!< Renderer HAL.
-		renderer::Shader*		m_shaders[Material::TotalMaterialShaders];	//!< Material shaders.
+		Renderer::Hal*			m_hal;										//!< Renderer HAL.
+		Renderer::Shader*		m_shaders[Material::TotalMaterialShaders];	//!< Material shaders.
 	};
 
 } // namespace scene

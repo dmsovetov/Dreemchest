@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** SpriteRenderPass::SpriteRenderPass
-SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "SpriteRenderPass", renderer )
+SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "SpriteRenderPass", renderers )
 {
 }
 
@@ -41,7 +41,7 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	// Get the sprite texture
 	ImagePtr			 image   = sprite.image();
 	AssetTexturePtr		 data    = image->data();
-	renderer::TexturePtr texture = data.valid() ? data->texture : renderer::TexturePtr();
+	Renderer::TexturePtr texture = data.valid() ? data->texture : Renderer::TexturePtr();
 
 	// Get the rotation
 	f32  angle = radians( transform.rotationZ() );
@@ -53,20 +53,20 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	Vec2 side = Vec2( up.y, -up.x );
 
 	// Render oriented quad
-	m_renderer.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, up, side, sprite.color() );
+	m_renderers.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, up, side, sprite.color() );
 }
 
 // ** SpriteRenderPass::begin
 bool SpriteRenderPass::begin( u32 currentTime )
 {
-	m_renderer.m_renderer2d->begin( m_viewProj );
+	m_renderers.m_renderer2d->begin( m_viewProj );
 	return true;
 }
 
 // ** SpriteRenderPass::end
 void SpriteRenderPass::end( void )
 {
-	m_renderer.m_renderer2d->end();
+	m_renderers.m_renderer2d->end();
 }
 
 } // namespace scene

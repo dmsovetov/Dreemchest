@@ -42,15 +42,15 @@ namespace scene {
 
 		//! Mesh submesh type.
 		struct Chunk {
-			renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
-			renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
+			Renderer::VertexBufferPtr	m_vertexBuffer;	//!< Hardware vertex buffer for this chunk.
+			Renderer::IndexBufferPtr	m_indexBuffer;	//!< Hardware index buffer for this chunk.
 
 			//! Returns true if this chunk is valid.
-			operator bool( void ) const { return m_vertexBuffer != renderer::VertexBufferPtr() && m_indexBuffer != renderer::IndexBufferPtr(); }
+			operator bool( void ) const { return m_vertexBuffer != Renderer::VertexBufferPtr() && m_indexBuffer != Renderer::IndexBufferPtr(); }
 		};
 
 		//! Adds a new mesh chunk.
-		void					addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer );
+		void					addChunk( const Renderer::VertexBufferPtr& vertexBuffer, const Renderer::IndexBufferPtr& indexBuffer );
 
 		//! Returns the total number of chunks.
 		u32						chunkCount( void ) const;
@@ -62,7 +62,7 @@ namespace scene {
 		static MeshPtr			create( const String& name );
 
 		//! Creates a new rectangular Mesh instance.
-		static MeshPtr			createRectangular( const String& name, renderer::Hal* hal, f32 width, f32 height );
+		static MeshPtr			createRectangular( const String& name, Renderer::Hal* hal, f32 width, f32 height );
 
 	private:
 

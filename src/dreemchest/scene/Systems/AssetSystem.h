@@ -38,7 +38,7 @@ namespace scene {
 	public:
 
 							//! Constructs the AssetSystem instance.
-							AssetSystem( Ecs::Entities& entities, renderer::HalPtr hal );
+							AssetSystem( Ecs::Entities& entities, Renderer::HalPtr hal );
 
 	private:
 
@@ -65,7 +65,7 @@ namespace scene {
 
 	private:
 
-		renderer::HalPtr	m_hal;		//! Rendering HAL.
+		Renderer::HalPtr	m_hal;		//! Rendering HAL.
 		List<AssetWPtr>		m_queue;	//!< Asset loading queue.
 	};
 

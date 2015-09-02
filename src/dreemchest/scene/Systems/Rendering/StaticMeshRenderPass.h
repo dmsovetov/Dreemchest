@@ -38,7 +38,7 @@ namespace scene {
 	public:
 
 									//! Constructs the StaticMeshRenderPass instance.
-									StaticMeshRenderPass( Ecs::Entities& entities, const Renderer& renderer );
+									StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers );
 
 	protected:
 
@@ -51,9 +51,9 @@ namespace scene {
 		//! Rendering operation emitted by scene object processing.
 		struct RenderOp {
 			u32						shader;			//!< Material shader.
-			renderer::VertexBuffer*	vertexBuffer;	//!< Vertex buffer to be used for rendering.
-			renderer::IndexBuffer*	indexBuffer;	//!< Index buffer to be used for rendering.
-			renderer::Texture*		texture;		//!< Texture to be used for rendering.
+			Renderer::VertexBuffer*	vertexBuffer;	//!< Vertex buffer to be used for rendering.
+			Renderer::IndexBuffer*	indexBuffer;	//!< Index buffer to be used for rendering.
+			Renderer::Texture*		texture;		//!< Texture to be used for rendering.
 			const Rgba*				diffuse;		//!< Diffuse color.
 			Matrix4					mvp;			//!< Model/view/projection matrix.
 		};
@@ -83,8 +83,8 @@ namespace scene {
 
 		//! Internal structure to hold current rendering state.
 		struct RenderedFrame {
-			renderer::VertexBuffer*	m_vertexBuffer;			//!< Active vertex buffer.
-			renderer::Texture*		m_texture;				//!< Active texture
+			Renderer::VertexBuffer*	m_vertexBuffer;			//!< Active vertex buffer.
+			Renderer::Texture*		m_texture;				//!< Active texture
 			u32						m_materialShader;		//!< Active material shader
 			EmittedRenderOps		m_renderOperations;		//!< List of emitted render operations.
 
@@ -98,7 +98,7 @@ namespace scene {
 			}
 		};
 		
-		renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
+		Renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
 		ArrayAllocator<RenderOp>	m_renderOperations;				//!< Array allocator used to allocated render operations.
 		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};

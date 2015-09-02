@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** AssetSystem::AssetSystem
-AssetSystem::AssetSystem( Ecs::Entities& entities, renderer::HalPtr hal ) : EntitySystem( entities, "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
+AssetSystem::AssetSystem( Ecs::Entities& entities, Renderer::HalPtr hal ) : EntitySystem( entities, "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
 {
 
 }

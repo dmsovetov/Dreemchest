@@ -41,7 +41,7 @@ namespace scene {
 	public:
 
 		//! Loads an asset data from an input stream.
-		virtual bool		loadFromStream( renderer::HalPtr hal, const io::StreamPtr& stream ) const { return false; }
+		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const { return false; }
 	};
 
 	//! Loads an image from a raw pixel buffer format.
@@ -53,7 +53,7 @@ namespace scene {
 								: m_image( image ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( ImagePtr image ) {
@@ -83,7 +83,7 @@ namespace scene {
 								: m_mesh( mesh ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( MeshPtr mesh ) {

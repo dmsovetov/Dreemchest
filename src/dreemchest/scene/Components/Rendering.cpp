@@ -72,13 +72,13 @@ void StaticMesh::setMaterial( u32 index, const MaterialPtr& value )
 }
 
 // ** StaticMesh::lightmap
-const renderer::TexturePtr& StaticMesh::lightmap( void ) const
+const Renderer::TexturePtr& StaticMesh::lightmap( void ) const
 {
 	return m_lightmap;
 }
 
 // ** StaticMesh::setLightmap
-void StaticMesh::setLightmap( const renderer::TexturePtr& value )
+void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 {
 	m_lightmap = value;
 }

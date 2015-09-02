@@ -38,7 +38,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** Renderer::Renderer
-Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
+Renderer::Renderer( Renderer::Hal* hal ) : m_hal( hal )
 {
 	// ** Create default shader
 	m_shaders[Material::Unknown] = m_hal->createShader(
@@ -142,7 +142,7 @@ Renderer::Renderer( renderer::Hal* hal ) : m_hal( hal )
 }
 
 // ** Renderer::render
-void Renderer::render( const Matrix4& view, const Matrix4& proj, renderer::Shader* shader, const SceneObjectPtr& sceneObject )
+void Renderer::render( const Matrix4& view, const Matrix4& proj, Renderer::Shader* shader, const SceneObjectPtr& sceneObject )
 {
 	StrongPtr<MeshRenderer> meshRenderer = sceneObject->get<MeshRenderer>();
 	StrongPtr<Transform>	transform	 = sceneObject->get<Transform>();
@@ -179,7 +179,7 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, renderer::Shade
 void Renderer::render( const Mesh::Chunk& chunk )
 {
 	m_hal->setVertexBuffer( chunk.m_vertexBuffer.get() );
-	m_hal->renderIndexed( renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
+	m_hal->renderIndexed( Renderer::PrimTriangles, chunk.m_indexBuffer.get(), 0, chunk.m_indexBuffer->size() );
 }
 
 // ** Renderer::render
@@ -208,7 +208,7 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
 	}
 
     {
-		renderer::Shader* shader = m_shaders[Material::Unknown];
+		Renderer::Shader* shader = m_shaders[Material::Unknown];
 
 		m_hal->setShader( shader );
 		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), proj * view );
@@ -229,23 +229,23 @@ void Renderer::render( const Matrix4& view, const Matrix4& proj, const Scene* sc
     }
 
     {
-        m_hal->setAlphaTest( renderer::Greater, 0.5f );
+        m_hal->setAlphaTest( Renderer::Greater, 0.5f );
 		for( SceneObjects::const_iterator i = objects[Material::Transparent].begin(), end = objects[Material::Transparent].end(); i != end; ++i ) {
 			render( view, proj, m_shaders[Material::Transparent], *i );
 		}
-        m_hal->setAlphaTest( renderer::CompareDisabled );
+        m_hal->setAlphaTest( Renderer::CompareDisabled );
     }
 
     {
-        m_hal->setDepthTest( false, renderer::Less );
-        m_hal->setBlendFactors( renderer::BlendOne, renderer::BlendOne );
+        m_hal->setDepthTest( false, Renderer::Less );
+        m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 
 		for( SceneObjects::const_iterator i = objects[Material::Additive].begin(), end = objects[Material::Additive].end(); i != end; ++i ) {
 			render( view, proj, m_shaders[Material::Additive], *i );
 		}
 
-        m_hal->setDepthTest( true, renderer::Less );
-        m_hal->setBlendFactors( renderer::BlendDisabled, renderer::BlendDisabled );
+        m_hal->setDepthTest( true, Renderer::Less );
+        m_hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
     }
 
 	m_hal->setShader( NULL );

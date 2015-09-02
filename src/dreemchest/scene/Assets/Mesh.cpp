@@ -37,7 +37,7 @@ Mesh::Mesh( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Me
 }
 
 // ** Mesh::addChunk
-void Mesh::addChunk( const renderer::VertexBufferPtr& vertexBuffer, const renderer::IndexBufferPtr& indexBuffer)
+void Mesh::addChunk( const Renderer::VertexBufferPtr& vertexBuffer, const Renderer::IndexBufferPtr& indexBuffer)
 {
 	Chunk chunk;
 	chunk.m_vertexBuffer = vertexBuffer;
@@ -67,7 +67,7 @@ MeshPtr Mesh::create( const String& name )
 }
 
 // ** Mesh::createRectangular
-MeshPtr Mesh::createRectangular( const String& name, renderer::Hal* hal, f32 width, f32 height )
+MeshPtr Mesh::createRectangular( const String& name, Renderer::Hal* hal, f32 width, f32 height )
 {
 	MeshPtr mesh = create( name );
 
@@ -88,13 +88,13 @@ MeshPtr Mesh::createRectangular( const String& name, renderer::Hal* hal, f32 wid
 		0, 2, 3
 	};
 
-	renderer::VertexDeclarationPtr vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
+	Renderer::VertexDeclarationPtr vertexDeclaration = hal->createVertexDeclaration( "P3:T0" );
 	
-	renderer::VertexBufferPtr vb = hal->createVertexBuffer( vertexDeclaration, 4, false );
+	Renderer::VertexBufferPtr vb = hal->createVertexBuffer( vertexDeclaration, 4, false );
 	memcpy( vb->lock(), vertices, sizeof( Vertex ) * 4 );
 	vb->unlock();
 
-	renderer::IndexBufferPtr ib = hal->createIndexBuffer( 6, false );
+	Renderer::IndexBufferPtr ib = hal->createIndexBuffer( 6, false );
 	memcpy( ib->lock(), indices, sizeof( u16 ) * 6 );
 	ib->unlock();
 

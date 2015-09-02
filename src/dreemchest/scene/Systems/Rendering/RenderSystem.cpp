@@ -46,7 +46,7 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity 
 	Rect viewport = camera.viewport();
 
 	// Get HAL from a renderer
-	renderer::HalPtr& hal = m_renderer.m_hal;
+	Renderer::HalPtr& hal = m_renderers.m_hal;
 
 	// Get the view
 	const ViewPtr& view = camera.view();
@@ -68,7 +68,7 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity 
 		hal->setScissorTest( true, ( u32 )min.x, ( u32 )min.y,  width, height );
 
 		if( (clearMask & Camera::ClearDisabled) == 0 ) {
-			u32 mask = ( clearMask & Camera::ClearColor ? renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? renderer::ClearDepth : 0 );
+			u32 mask = ( clearMask & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
 			hal->clear( camera.clearColor(), 1.0f, 0, mask );
 			camera.setClearMask( mask | Camera::ClearDisabled ); // Clear the viewport only once per frame.
 		}

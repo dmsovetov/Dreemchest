@@ -33,7 +33,7 @@ namespace scene {
 // ------------------------------------------ RawImageLoader ------------------------------------------ //
 
 // ** RawImageLoader::loadFromStream
-bool RawImageLoader::loadFromStream( renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawImageLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const
 {
 	u16 width, height;
 	u8  channels;
@@ -45,7 +45,7 @@ bool RawImageLoader::loadFromStream( renderer::HalPtr hal, const io::StreamPtr& 
 	u8* pixels = DC_NEW u8[width * height * channels];
 	stream->read( pixels, width * height * channels );
 
-	renderer::Texture2DPtr texture = hal->createTexture2D( width, height, channels == 3 ? renderer::PixelRgb8 : renderer::PixelRgba8 );
+	Renderer::Texture2DPtr texture = hal->createTexture2D( width, height, channels == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
 	texture->setData( 0, pixels );
 	delete[]pixels;
 
@@ -59,7 +59,7 @@ bool RawImageLoader::loadFromStream( renderer::HalPtr hal, const io::StreamPtr& 
 // ------------------------------------------ RawMeshLoader ------------------------------------------ //
 
 // ** RawMeshLoader::loadFromStream
-bool RawMeshLoader::loadFromStream( renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const
 {
 	u32 vertexCount, indexCount;
 

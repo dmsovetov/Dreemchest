@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** SpriteTransformRenderPass::SpriteTransformRenderPass
-SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "SpriteTransformRenderPass", renderer )
+SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "SpriteTransformRenderPass", renderers )
 {
 }
 
@@ -45,21 +45,21 @@ void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& s
 	Vec3 left = rotation.rotate( Vec3( 10, 0, 0 ) );
 	Vec3 up   = rotation.rotate( Vec3( 0, 10, 0 ) );
 
-	m_renderer.m_renderer2d->line( x, y, x + left.x, y + left.y, Rgba( 1.0f, 0.0f, 0.0f ) );
-	m_renderer.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
+	m_renderers.m_renderer2d->line( x, y, x + left.x, y + left.y, Rgba( 1.0f, 0.0f, 0.0f ) );
+	m_renderers.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
 }
 
 // ** SpriteTransformRenderPass::begin
 bool SpriteTransformRenderPass::begin( u32 currentTime )
 {
-	m_renderer.m_renderer2d->begin( m_viewProj );
+	m_renderers.m_renderer2d->begin( m_viewProj );
 	return true;
 }
 
 // ** SpriteTransformRenderPass::end
 void SpriteTransformRenderPass::end( void )
 {
-	m_renderer.m_renderer2d->end();
+	m_renderers.m_renderer2d->end();
 }
 
 } // namespace scene

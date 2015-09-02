@@ -41,7 +41,7 @@ namespace scene {
 	//! The loaded HAL texture.
 	class AssetTexture : public AssetData {
 	public:
-		renderer::TexturePtr	texture;	//!< Reference to a loaded texture.
+		Renderer::TexturePtr	texture;	//!< Reference to a loaded texture.
 	};
 
 	//! Basic scene asset
@@ -93,7 +93,7 @@ namespace scene {
 		const AssetBundleWPtr&	bundle( void ) const;
 
 		//! Loads an asset.
-		bool					load( const renderer::HalPtr& hal );
+		bool					load( const Renderer::HalPtr& hal );
 
 		//! Unloads asset.
 		virtual void			unload( void );
