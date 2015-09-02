@@ -90,16 +90,17 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 			} ) );
 
 	// Create vertex declarations
-	VertexDeclarationPtr vertexColored = m_hal->createVertexDeclaration( "P2:C4:T0" );
-	VertexDeclarationPtr vertexPoint   = m_hal->createVertexDeclaration( "P2", sizeof( Vertex ) );
+	VertexDeclarationPtr vertexTextured = m_hal->createVertexDeclaration( "P2:C4:T0" );
+	VertexDeclarationPtr vertexColored  = m_hal->createVertexDeclaration( "P2:C4", sizeof( Vertex ) );
 	DC_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ) );
 
 	// Set vertex formats for primitive types
-	m_vertexFormat[PrimPoints] = vertexPoint;
-	m_vertexFormat[PrimTriangles] = vertexColored;
+	m_vertexFormat[PrimPoints]    = vertexColored;
+	m_vertexFormat[PrimLines]	  = vertexColored;
+	m_vertexFormat[PrimTriangles] = vertexTextured;
 
 	// Create a vertex buffer
-	m_vertexBuffer = m_hal->createVertexBuffer( vertexColored, m_maxVertexBufferSize, false );
+	m_vertexBuffer = m_hal->createVertexBuffer( vertexTextured, m_maxVertexBufferSize, false );
 
 	// Create index buffers
 	IndexBufferPtr idxQuads		  = m_hal->createIndexBuffer( m_maxIndexBufferSize, false );
@@ -130,7 +131,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 	idxConsecutive->unlock();
 
 	// Set index buffer for each primitive type
-	m_indexBuffers[PrimPoints] = idxConsecutive;
+//	m_indexBuffers[PrimPoints]    = idxConsecutive;
 	m_indexBuffers[PrimTriangles] = idxQuads;
 
 	// Lock the vertex buffer
@@ -178,6 +179,17 @@ void Renderer2D::point( f32 x, f32 y, const Rgba& color )
 	emitVertices( PrimPoints, renderer::Texture2DPtr(), &vertex, 1 );
 }
 
+// ** Renderer2D::line
+void Renderer2D::line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color )
+{
+	Vertex vertices[2];
+
+	SET_VERTEX( vertices[0], x1, y1, color );
+	SET_VERTEX( vertices[1], x2, y2, color );
+
+	emitVertices( PrimLines, renderer::Texture2DPtr(), vertices, 2 );
+}
+
 // ** Renderer2D::orientedQuad
 void Renderer2D::orientedQuad( const Texture2DPtr& texture, f32 x, f32 y, f32 w, f32 h, const Vec2& up, const Vec2& side, const Rgba& color )
 {
@@ -207,7 +219,7 @@ void Renderer2D::flush( void )
 	PrimitiveType primitiveType = m_state.primitiveType;
 
 	DC_BREAK_IF( !m_vertexFormat[primitiveType].valid() )
-	DC_BREAK_IF( !m_indexBuffers[primitiveType].valid() )
+	DC_BREAK_IF( m_state.nIndices && !m_indexBuffers[primitiveType].valid() )
 
 	// Set the shader
 	if( m_state.texture.valid() ) {

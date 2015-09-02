@@ -55,6 +55,9 @@ namespace renderer {
 		//! Renders a single point.
 		void					point( f32 x, f32 y, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders the line segment.
+		void					line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Creates a new instance of Renderer2D.
 		static Renderer2DPtr	create( const HalPtr& hal, u32 maxVertexBufferSize = 1024 );
 
