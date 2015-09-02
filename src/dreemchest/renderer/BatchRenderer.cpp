@@ -45,7 +45,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ** BatchRenderer::BatchRenderer
 BatchRenderer::BatchRenderer( dcEngine engine, dcHal hal, int maxRenderBufferSize ) : m_engine( engine ), m_hal( hal ), m_immediateTexture( NULL )
@@ -692,7 +692,7 @@ void BatchRenderer::renderCircle( float x, float y, float r, const rgba& fill, c
     renderVertices( renderer::PrimLineStrip, NULL, vertices, kVertexCount );
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

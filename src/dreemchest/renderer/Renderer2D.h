@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 	//! Renderer2D is used for displaying 2D vector graphics.
 	class Renderer2D : public RefCounted {
@@ -116,7 +116,7 @@ namespace renderer {
 		u32						m_maxIndexBufferSize;					//!< The maximum size of an index buffer.
 	};
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

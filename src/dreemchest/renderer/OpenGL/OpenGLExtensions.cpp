@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 #ifdef DC_PLATFORM_WINDOWS
     
@@ -127,6 +127,6 @@ bool loadOpenGLExtensions( void )
 }
 #endif
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

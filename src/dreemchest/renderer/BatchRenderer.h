@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 #if 0
 
@@ -114,7 +114,7 @@ namespace renderer {
 
 #endif
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** class WindowsOpenGLView
     class WindowsOpenGLView : public OpenGLView {
@@ -61,7 +61,7 @@ namespace renderer {
 		HGLRC				m_renderingContext;
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

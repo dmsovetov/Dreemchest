@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     DECLARE_LOG( log )
 
@@ -68,7 +68,7 @@ namespace renderer {
 	dcDeclarePtrs( Shader )
 
     //! Hardware rendering API.
-    enum Renderer {
+    enum RenderingHal {
         OpenGL,
         Direct3D
     };
@@ -223,23 +223,7 @@ namespace renderer {
         TotalPrimitiveTypes	//!< Total primitive types available.
     };
 
-} // namespace renderer
-
-    typedef renderer::Hal*                  dcHal;
-    typedef renderer::BatchRenderer*        dcBatchRenderer;
-    typedef renderer::Shader*               dcShader;
-    typedef renderer::Texture*              dcTexture;
-    typedef renderer::Texture1D*            dcTexture1D;
-    typedef renderer::Texture2D*            dcTexture2D;
-    typedef renderer::Texture3D*            dcTexture3D;
-    typedef renderer::TextureCube*          dcTextureCube;
-    typedef renderer::VertexBuffer*         dcVertexBuffer;
-    typedef renderer::IndexBuffer*          dcIndexBuffer;
-    typedef renderer::RenderTarget*         dcRenderTarget;
-    typedef renderer::VertexDeclaration*    dcVertexDeclaration;
-    typedef renderer::BlendState*           dcBlendState;
-    typedef renderer::DepthStencilState*    dcDepthStencilState;
-    typedef renderer::RasterizerState*      dcRasterizerState;
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

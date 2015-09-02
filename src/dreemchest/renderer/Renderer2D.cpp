@@ -39,7 +39,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ** Renderer2D::Renderer2D
 Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( hal ), m_maxVertexBufferSize( maxVertexBufferSize ), m_maxIndexBufferSize( maxVertexBufferSize * 6 )
@@ -176,7 +176,7 @@ void Renderer2D::point( f32 x, f32 y, const Rgba& color )
 	Vertex vertex;
 	SET_VERTEX( vertex, x, y, color );
 
-	emitVertices( PrimPoints, renderer::Texture2DPtr(), &vertex, 1 );
+	emitVertices( PrimPoints, Texture2DPtr(), &vertex, 1 );
 }
 
 // ** Renderer2D::line
@@ -187,7 +187,7 @@ void Renderer2D::line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color )
 	SET_VERTEX( vertices[0], x1, y1, color );
 	SET_VERTEX( vertices[1], x2, y2, color );
 
-	emitVertices( PrimLines, renderer::Texture2DPtr(), vertices, 2 );
+	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
 }
 
 // ** Renderer2D::orientedQuad
@@ -278,14 +278,14 @@ void Renderer2D::emitVertices( PrimitiveType primitiveType, const Texture2DPtr& 
 u32 Renderer2D::indexCountForPrimitives( PrimitiveType primType, u32 vertexCount )
 {
     switch( primType ) {
-    case renderer::PrimTriangles:		return vertexCount + vertexCount / 4 * 2;
-    case renderer::PrimTriangleStrip:	return vertexCount;
-    default:                            return 0;
+    case PrimTriangles:		return vertexCount + vertexCount / 4 * 2;
+    case PrimTriangleStrip:	return vertexCount;
+    default:                return 0;
     }
     
     return 0;
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

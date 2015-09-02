@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ** createOpenGLView
 OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
@@ -120,6 +120,6 @@ bool WindowsOpenGLView::makeCurrent( void )
 	return result;
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

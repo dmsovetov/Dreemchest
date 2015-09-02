@@ -39,7 +39,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 IMPLEMENT_LOGGER( log )
 
@@ -53,41 +53,30 @@ IMPLEMENT_LOGGER( log )
 // ** Hal::Hal
 Hal::Hal( RenderView* view ) : m_view( view )
 {
-    m_batchRenderer = NULL;
+    //m_batchRenderer = NULL;
 
 #ifdef DC_THREADS_ENABLED
     m_renderThread  = thread::Thread::currentThread();
 #endif
 
 	// ** 2D render state
-	m_rasterState2D = DC_NEW RasterizerState;
-	m_rasterState2D->setCullMode( TriangleFaceNone );
-	m_rasterState2D->setZWrite( false );
+	//m_rasterState2D = DC_NEW RasterizerState;
+	//m_rasterState2D->setCullMode( TriangleFaceNone );
+	//m_rasterState2D->setZWrite( false );
 
-	m_blendState2D = DC_NEW BlendState;
-	m_blendState2D->setBlendEnabled( true );
-	m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
+	//m_blendState2D = DC_NEW BlendState;
+	//m_blendState2D->setBlendEnabled( true );
+	//m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
 }
 
 Hal::~Hal( void )
 {
-	delete m_rasterState2D;
-	delete m_blendState2D;
-//    delete m_batchRenderer;
-}
-
-// ** Hal::requestBatchRenderer
-dcBatchRenderer Hal::requestBatchRenderer( void )
-{
-//    if( !m_batchRenderer ) {
-//        m_batchRenderer = DC_NEW BatchRenderer( m_ctx->iEngine, this, 16536 );
-//    }
-
-    return m_batchRenderer;
+	//delete m_rasterState2D;
+	//delete m_blendState2D;
 }
 
 // ** Hal::create
-Hal* Hal::create( Renderer renderer, RenderView* view )
+Hal* Hal::create( RenderingHal renderer, RenderView* view )
 {
     switch( renderer ) {
 	case OpenGL:	
@@ -109,7 +98,7 @@ Hal* Hal::create( Renderer renderer, RenderView* view )
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
 #if defined( DC_RENDERER_OPENGL )
-    return renderer::createOpenGLView( window, depthStencil );
+    return Renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
     return NULL;
@@ -274,19 +263,19 @@ void Hal::setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 height )
 }
 
 // ** Hal::setBlendState
-void Hal::setBlendState( dcBlendState state )
+void Hal::setBlendState( BlendState* state )
 {
     
 }
 
 // ** Hal::setDepthStencilState
-void Hal::setDepthStencilState( dcDepthStencilState state )
+void Hal::setDepthStencilState( DepthStencilState* state )
 {
 
 }
 
 // ** Hal::setRasterizerState
-void Hal::setRasterizerState( dcRasterizerState state )
+void Hal::setRasterizerState( RasterizerState* state )
 {
 
 }
@@ -310,11 +299,11 @@ void Hal::setStencilValue( u32 value, u32 mask )
 }
 
 struct sCreateTextureTask {
-    dcHal           hal;
+    Hal*            hal;
     Texture2DPtr*   texture;
     u32             width, height;
     PixelFormat     format;
-                    sCreateTextureTask( dcHal hal, Texture2DPtr *texture, u32 width, u32 height, PixelFormat format )
+                    sCreateTextureTask( Hal* hal, Texture2DPtr *texture, u32 width, u32 height, PixelFormat format )
                         : hal( hal ), texture( texture ), width( width ), height( height ), format( format ) {}
 
 #ifdef DC_THREADS_ENABLED
@@ -328,11 +317,11 @@ struct sCreateTextureTask {
 };
 
 struct sLockTextureTask {
-    dcTexture2D texture;
+    Texture2D*  texture;
     u32*        size;
     void*       locked;
 
-                sLockTextureTask( dcTexture2D texture, u32 *size )
+                sLockTextureTask( Texture2D* texture, u32 *size )
                     : texture( texture ), size( size ), locked( NULL ) {}
 
 #ifdef DC_THREADS_ENABLED
@@ -346,8 +335,8 @@ struct sLockTextureTask {
 };
 
 struct sUnlockTextureTask {
-    dcTexture2D texture;
-                sUnlockTextureTask( dcTexture2D texture )
+    Texture2D*  texture;
+                sUnlockTextureTask( Texture2D* texture )
                     : texture( texture ) {}
 
 #ifdef DC_THREADS_ENABLED
@@ -376,7 +365,7 @@ void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DP
 }
 
 // ** Hal::lockTexture
-void* Hal::lockTexture( dcTexture2D texture, u32& size )
+void* Hal::lockTexture( Texture2D* texture, u32& size )
 {
     DC_BREAK_IF( texture == NULL );
 
@@ -392,7 +381,7 @@ void* Hal::lockTexture( dcTexture2D texture, u32& size )
 }
 
 // ** Hal::unlockTexture
-void Hal::unlockTexture( dcTexture2D texture )
+void Hal::unlockTexture( Texture2D* texture )
 {
     DC_BREAK_IF( texture == NULL );
 
@@ -832,6 +821,6 @@ void Shader::setVec4( u32 location, const Vec4& value )
 
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

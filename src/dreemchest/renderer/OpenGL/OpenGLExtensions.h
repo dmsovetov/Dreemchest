@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 #if defined( DC_PLATFORM_WINDOWS )
 	// ** GL_ARB_multitexture
@@ -104,7 +104,7 @@ namespace renderer {
 
 	bool loadOpenGLExtensions( void );
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

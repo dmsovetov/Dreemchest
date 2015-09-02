@@ -96,7 +96,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** struct sOpenGLErrorCheck
     struct sOpenGLErrorCheck {
@@ -168,9 +168,9 @@ namespace renderer {
         virtual void				setDepthTest( bool mask, Compare compare );
         virtual void				setStencilAction( TriangleFace face, Compare compare, StencilAction pass, StencilAction depthFail, StencilAction stencilFail );
         virtual void				setStencilValue( u32 value, u32 mask );
-        virtual void                setBlendState( dcBlendState state );
-        virtual void                setDepthStencilState( dcDepthStencilState state );
-        virtual void                setRasterizerState( dcRasterizerState state );
+        virtual void                setBlendState( BlendState* state );
+        virtual void                setDepthStencilState( DepthStencilState* state );
+        virtual void                setRasterizerState( RasterizerState* state );
         virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
 
@@ -325,7 +325,7 @@ namespace renderer {
         GLuint                      m_vertex, m_fragment;
     };
     
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

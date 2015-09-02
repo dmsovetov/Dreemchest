@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** class RasterizerState
     class RasterizerState {
@@ -96,7 +96,7 @@ namespace renderer {
         void            setStencilEnabled( bool enabled );
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

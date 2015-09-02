@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** class RenderView
     //! RenderView class is a container for rendering surface.
@@ -56,9 +56,6 @@ namespace renderer {
     public:
 
         virtual                     ~Hal( void );
-
-        //! Returns a pointer to a batched 2D renderer.
-        dcBatchRenderer     requestBatchRenderer( void );
 
         //! Clears the rendering surface.
         /*!
@@ -241,13 +238,13 @@ namespace renderer {
 
         // ?? Thread-safe operations
 		virtual void				createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture );
-        virtual void*               lockTexture( dcTexture2D texture, u32& size );
-        virtual void                unlockTexture( dcTexture2D texture );
+        virtual void*               lockTexture( Texture2D* texture, u32& size );
+        virtual void                unlockTexture( Texture2D* texture );
 
         // ??
-        virtual void                setBlendState( dcBlendState state );
-        virtual void                setDepthStencilState( dcDepthStencilState state );
-        virtual void                setRasterizerState( dcRasterizerState state );
+        virtual void                setBlendState( BlendState* state );
+        virtual void                setDepthStencilState( DepthStencilState* state );
+        virtual void                setRasterizerState( RasterizerState* state );
 
         // ?? Fixed pipeline
         virtual void                setTransform( Transform transform, const float* matrix );
@@ -259,7 +256,7 @@ namespace renderer {
          \param renderer Rendering API to be used.
          \param view Rendering viewport to be used.
          */
-        static Hal*                 create( Renderer renderer, RenderView* view = NULL );
+        static Hal*                 create( RenderingHal renderer, RenderView* view = NULL );
 
         //! Creates and initializes a new OpenGL view.
         /*!
@@ -281,19 +278,16 @@ namespace renderer {
         //! Rendering viewport.
         RenderView*                 m_view;
 
-        //! Batched 2D renderer.
-        dcBatchRenderer             m_batchRenderer;
-
     #ifdef DC_THREADS_ENABLED
         //! Current render thread ID.
         u32                         m_renderThread;
     #endif
 
         //! Current rasterizer state.
-        dcRasterizerState           m_rasterState2D;
+        //RasterizerState				m_rasterState2D;
 
         //! Current blend state.
-        dcBlendState                m_blendState2D;
+        //BlendState					m_blendState2D;
 
         //! Current vertex declaration.
         VertexDeclarationWPtr		m_vertexDeclaration;
@@ -635,7 +629,7 @@ namespace renderer {
         virtual void                setVec4( u32 location, const Vec4& value );
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

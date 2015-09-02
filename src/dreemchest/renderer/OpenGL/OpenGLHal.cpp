@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ----------------------------------------------- OpenGLHal ----------------------------------------------- //
 
@@ -455,7 +455,7 @@ void OpenGLHal::setCulling( TriangleFace value )
 }
 
 // ** OpenGLHal::setBlendState
-void OpenGLHal::setBlendState( dcBlendState state )
+void OpenGLHal::setBlendState( BlendState* state )
 {
     DC_CHECK_GL;
     DC_BREAK_IF( state == NULL );
@@ -470,7 +470,7 @@ void OpenGLHal::setBlendState( dcBlendState state )
 }
 
 // ** OpenGLHal::setDepthStencilState
-void OpenGLHal::setDepthStencilState( dcDepthStencilState state )
+void OpenGLHal::setDepthStencilState( DepthStencilState* state )
 {
     DC_CHECK_GL;
     
@@ -500,7 +500,7 @@ void OpenGLHal::setDepthStencilState( dcDepthStencilState state )
 }
 
 // ** OpenGLHal::setRasterizerState
-void OpenGLHal::setRasterizerState( dcRasterizerState state )
+void OpenGLHal::setRasterizerState( RasterizerState* state )
 {
     DC_CHECK_GL;
     
@@ -1157,6 +1157,6 @@ void OpenGLShader::setVec4( u32 location, const Vec4& value )
     glUniform4fv( location, 1, &value.x );
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
