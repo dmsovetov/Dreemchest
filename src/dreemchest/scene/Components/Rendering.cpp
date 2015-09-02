@@ -139,6 +139,18 @@ ViewPtr WindowView::create( const WindowWPtr& window )
 
 // -------------------------------------------- Camera -------------------------------------------- //
 
+// ** Camera::clearMask
+u8 Camera::clearMask( void ) const
+{
+	return m_clearMask;
+}
+
+// ** Camera::setClearMask
+void Camera::setClearMask( u8 value )
+{
+	m_clearMask = value;
+}
+
 // ** Camera::clearColor
 const Rgba& Camera::clearColor( void ) const
 {

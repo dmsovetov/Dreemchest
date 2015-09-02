@@ -162,17 +162,30 @@ namespace scene {
 
 		//! Available camera projections.
 		enum Projection {
-			Perspective = 0,
-			Ortho,
-			OrthoCenter
+			  Perspective = 0
+			, Ortho
+			, OrthoCenter
+		};
+
+		//! Camera clear flags.
+		enum ClearFlags {
+			  ClearColor	= BIT( 0 )					//!< Camera will clear the color buffer.
+			, ClearDepth	= BIT( 1 )					//!< Camera will clear the depth buffer.
+			, ClearDisabled	= BIT( 2 )					//!< Disables clearing buffers (internal use only).
+			, ClearAll		= ClearColor | ClearDepth	//!< Camera will clear all buffers.
 		};
 
 									OverrideComponent( Camera, SceneComponent )
 
 									//! Constructs Camera instance.
 									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
-										: m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
+										: m_clearMask( ClearAll ), m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
 
+		//! Returns camera clear mask.
+		u8							clearMask( void ) const;
+
+		//! Sets camera clear mask.
+		void						setClearMask( u8 value );
 
 		//! Sets the clear color.
 		void						setClearColor( const Rgba& value );
@@ -218,6 +231,7 @@ namespace scene {
 
 	private:
 
+		u8							m_clearMask;	//!< Camera clear flags.
 		Projection					m_projection;	//!< Camera projection.
 		Rect						m_ndc;			//!< Output normalized device coordinates.
 		ViewPtr						m_view;			//!< Render view.
