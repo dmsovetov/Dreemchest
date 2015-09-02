@@ -65,7 +65,7 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 
 	// Update the Transform2D instance
 	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
-	transform.setRotation( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
 }
 
 // ** Box2DPhysics::sceneObjectAdded
@@ -89,7 +89,7 @@ void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigi
 
 	// Set the initial body transform
 	def.position = positionToBox2D( transform.position() );
-	def.angle = rotationToBox2D( transform.rotation() );
+	def.angle = rotationToBox2D( transform.rotationZ() );
 
 	// Construct the Box2D body and attach scene object to it
     b2Body* body = m_world->CreateBody( &def );

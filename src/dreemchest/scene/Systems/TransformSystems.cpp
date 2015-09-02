@@ -76,7 +76,7 @@ void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, T
 // ** Rotator2DSystem::process
 void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform& transform )
 {
-	transform.setRotation( transform.rotation() + rotator.speed() * dt );
+	transform.setRotationZ( transform.rotationZ() + rotator.speed() * dt );
 }
 
 } // namespace scene

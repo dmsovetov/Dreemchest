@@ -119,15 +119,45 @@ void Transform::setY( f32 value )
 }
 
 // ** Transform::rotation
-f32 Transform::rotation( void ) const
+const Quat& Transform::rotation( void ) const
+{
+	return m_rotation;
+}
+
+// ** Transform::rotationX
+f32 Transform::rotationX( void ) const
+{
+	return -m_rotation.euler().x;
+}
+
+// ** Transform::setRotationX
+void Transform::setRotationX( f32 value )
+{
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 1, 0, 0 ) );
+}
+
+// ** Transform::rotationY
+f32 Transform::rotationY( void ) const
+{
+	return -m_rotation.euler().y;
+}
+
+// ** Transform::setRotationY
+void Transform::setRotationY( f32 value )
+{
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 1, 0 ) );
+}
+
+// ** Transform::rotationZ
+f32 Transform::rotationZ( void ) const
 {
 	return -m_rotation.euler().z;
 }
 
-// ** Transform::setRotation
-void Transform::setRotation( f32 value )
+// ** Transform::setRotationZ
+void Transform::setRotationZ( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 0, -1.0f ) );
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 0, -1 ) );
 }
 
 // ------------------------------------------ Rotator2D ------------------------------------------ //

@@ -76,11 +76,26 @@ namespace scene {
 		//! Sets transform Z coordinate.
 		void					setZ( f32 value );
 
-		//! Returns transform rotation.
-		f32						rotation( void ) const;
+		//! Returns the transform rotation quaternion.
+		const Quat&				rotation( void ) const;
 
-		//! Sets transform rotation.
-		void					setRotation( f32 value );
+		//! Returns transform rotation around the X axis.
+		f32						rotationX( void ) const;
+
+		//! Sets transform rotation around the X axis.
+		void					setRotationX( f32 value );
+
+		//! Returns transform rotation around the Y axis.
+		f32						rotationY( void ) const;
+
+		//! Sets transform rotation around the Y axis.
+		void					setRotationY( f32 value );
+
+		//! Returns transform rotation around the Z axis.
+		f32						rotationZ( void ) const;
+
+		//! Sets transform rotation around the Z axis.
+		void					setRotationZ( f32 value );
 
 	private:
 

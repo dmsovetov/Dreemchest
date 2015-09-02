@@ -43,7 +43,7 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	renderer::Texture2DPtr texture = image->requestTexture( m_renderer.m_hal.get() );
 
 	// Get the rotation
-	f32  angle = radians( transform.rotation() );
+	f32  angle = radians( transform.rotationZ() );
 	f32  s	   = sinf( angle );
 	f32  c	   = cosf( angle );
 
