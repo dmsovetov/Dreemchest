@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class WindowsInput
     class WindowsInput : public IInput {
@@ -49,7 +49,7 @@ namespace platform {
 		static s32			s_virtualKeysWinAPI[];
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

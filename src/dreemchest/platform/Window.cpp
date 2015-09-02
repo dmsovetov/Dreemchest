@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 IMPLEMENT_LOGGER( log )
 
@@ -198,6 +198,6 @@ void Window::notifyKeyUp( Key key )
     }
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

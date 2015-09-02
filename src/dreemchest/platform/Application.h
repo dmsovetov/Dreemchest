@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     //! A platform-specific application implementation interface.
     class IApplication {
@@ -100,13 +100,13 @@ namespace platform {
         ApplicationDelegate*    m_delegate;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 
 #define dcDeclareApplication( delegate )												\
     int main( int argc, char** argv ) {													\
-        return DC_DREEMCHEST_NS platform::Application::create()->launch( delegate );	\
+        return DC_DREEMCHEST_NS Platform::Application::create()->launch( delegate );	\
     }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

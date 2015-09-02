@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 //! Platform-specific inpit constructor.
 extern IInput* createInput( void );
@@ -122,6 +122,6 @@ void Input::setMouse( s32 x, s32 y )
     return m_impl->setMouse( x, y );
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

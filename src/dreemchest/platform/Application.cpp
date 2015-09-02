@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 //! Platform-specific application constructor.
 extern IApplication* createApplication( void );
@@ -104,6 +104,6 @@ void Application::notifyLaunched( void )
     m_delegate->handleLaunched( this );
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

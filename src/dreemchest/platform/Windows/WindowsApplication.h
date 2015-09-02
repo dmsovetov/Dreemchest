@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class WindowsApplication
     class WindowsApplication : public IApplication {
@@ -47,7 +47,7 @@ namespace platform {
 		void						loop( void );
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

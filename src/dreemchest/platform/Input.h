@@ -31,7 +31,7 @@ SOFTWARE.
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 	//! A platform-specific input implementation interface.
 	class IInput {
@@ -99,7 +99,7 @@ namespace platform {
 		bool					m_isKeyDown[Key::Total];
 	};
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

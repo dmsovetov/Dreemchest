@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class WindowsWindow
     class WindowsWindow : public IWindow {
@@ -95,7 +95,7 @@ namespace platform {
 		static Windows		s_windows;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

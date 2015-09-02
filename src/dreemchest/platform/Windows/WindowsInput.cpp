@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createInput
 IInput* createInput( void )
@@ -174,6 +174,6 @@ s32 WindowsInput::s_virtualKeysWinAPI[] = {
 	VK_MBUTTON
 };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

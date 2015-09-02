@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createApplication
 IApplication* createApplication( void )
@@ -77,6 +77,6 @@ void WindowsApplication::loop( void )
 	}
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

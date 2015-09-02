@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     //! A platform-specific window implementation interface.
     class IWindow {
@@ -168,7 +168,7 @@ namespace platform {
         WindowDelegatePtr		m_delegate;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

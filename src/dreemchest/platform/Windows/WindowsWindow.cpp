@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createWindow
 IWindow* createWindow( u32 width, u32 height )
@@ -349,6 +349,6 @@ Key WindowsWindow::translateKey( u32 vkey )
 	return Key::Total;
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

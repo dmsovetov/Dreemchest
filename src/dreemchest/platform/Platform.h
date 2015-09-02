@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     DECLARE_LOG( log )
 
@@ -66,10 +66,10 @@ namespace platform {
     class Window;
     class WindowDelegate;
 
-} // namespace platform
+	dcDeclarePtrs( WindowDelegate )
+	dcDeclarePtrs( Window )
 
-    dcDeclareNamedPtrs( platform::WindowDelegate, WindowDelegate )
-	dcDeclareNamedPtrs( platform::Window, Window )
+} // namespace Platform
 
 DC_END_DREEMCHEST
 
