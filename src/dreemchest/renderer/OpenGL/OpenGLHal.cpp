@@ -1112,49 +1112,54 @@ u32 OpenGLShader::findUniformLocation( const char *name )
     DC_CHECK_GL;
     
 	u32 location = glGetUniformLocation( m_program, name );
-	return location;
+
+	if( location == -1 ) {
+		return 0;
+	}
+
+	return location + 1;
 }
 
 // ** OpenGLShader::setMatrix
 void OpenGLShader::setMatrix( u32 location, const Matrix4& value )
 {
     DC_CHECK_GL;
-    glUniformMatrix4fv( location, 1, false, value.m );
+    glUniformMatrix4fv( location - 1, 1, false, value.m );
 }
 
 // ** OpenGLShader::setInt
 void OpenGLShader::setInt( u32 location, u32 value )
 {
     DC_CHECK_GL;
-    glUniform1i( location, value );
+    glUniform1i( location - 1, value );
 }
 
 // ** OpenGLShader::setFloat
 void OpenGLShader::setFloat( u32 location, f32 value )
 {
     DC_CHECK_GL;
-    glUniform1f( location, value );
+    glUniform1f( location - 1, value );
 }
 
 // ** OpenGLShader::setVec2
 void OpenGLShader::setVec2( u32 location, const Vec2& value )
 {
     DC_CHECK_GL;
-    glUniform2fv( location, 1, &value.x );
+    glUniform2fv( location - 1, 1, &value.x );
 }
 
 // ** OpenGLShader::setVec3
 void OpenGLShader::setVec3( u32 location, const Vec3& value )
 {
     DC_CHECK_GL;
-    glUniform3fv( location, 1, &value.x );
+    glUniform3fv( location - 1, 1, &value.x );
 }
 
 // ** OpenGLShader::setVec4
 void OpenGLShader::setVec4( u32 location, const Vec4& value )
 {
     DC_CHECK_GL;
-    glUniform4fv( location, 1, &value.x );
+    glUniform4fv( location - 1, 1, &value.x );
 }
 
 } // namespace Renderer
