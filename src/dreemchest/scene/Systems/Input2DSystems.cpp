@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** WasdInput2DSystem::WasdInput2DSystem
-WasdInput2DSystem::WasdInput2DSystem( ecs::Entities& entities ) : SceneSystem2( entities, "WasdInput2D" )
+WasdInput2DSystem::WasdInput2DSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "WasdInput2D" )
 {
 	m_input = platform::Input::sharedInstance();
 }

@@ -36,13 +36,13 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** AssetSystem::AssetSystem
-AssetSystem::AssetSystem( ecs::Entities& entities, renderer::HalPtr hal ) : EntitySystem( entities, "AssetSystem", ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
+AssetSystem::AssetSystem( Ecs::Entities& entities, renderer::HalPtr hal ) : EntitySystem( entities, "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
 {
 
 }
 
 // ** AssetSystem::entityAdded
-void AssetSystem::entityAdded( const ecs::EntityPtr& entity )
+void AssetSystem::entityAdded( const Ecs::EntityPtr& entity )
 {
 	if( StaticMesh* mesh = entity->get<StaticMesh>() ) {
 		queueStaticMesh( mesh );

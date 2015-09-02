@@ -35,15 +35,15 @@ namespace scene {
 
 	//! The basic scene system
 	template<typename T>
-	class SceneSystem : public ecs::EntityWithComponentsSystem<T> {
+	class SceneSystem : public Ecs::EntityWithComponentsSystem<T> {
 	public:
 
 								//! Constructs the SceneSystem instance
-								SceneSystem( ecs::Entities& entities, const String& name )
-									: ecs::EntityWithComponentsSystem<T>( entities, name ) {}
+								SceneSystem( Ecs::Entities& entities, const String& name )
+									: Ecs::EntityWithComponentsSystem<T>( entities, name ) {}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity, T& component )
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity, T& component )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -51,7 +51,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		virtual void			entityAdded( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -59,7 +59,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		virtual void			entityRemoved( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -97,15 +97,15 @@ namespace scene {
 
 	//! The basic scene system for two component types
 	template<typename TComponent1, typename TComponent2>
-	class SceneSystem2 : public ecs::EntityWithComponentsSystem2<TComponent1, TComponent2> {
+	class SceneSystem2 : public Ecs::EntityWithComponentsSystem2<TComponent1, TComponent2> {
 	public:
 
 								//! Constructs the SceneSystem2 instance
-								SceneSystem2( ecs::Entities& entities, const String& name )
-									: ecs::EntityWithComponentsSystem2<TComponent1, TComponent2>( entities, name ) {}
+								SceneSystem2( Ecs::Entities& entities, const String& name )
+									: Ecs::EntityWithComponentsSystem2<TComponent1, TComponent2>( entities, name ) {}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity, TComponent1& component1, TComponent2& component2 )
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity, TComponent1& component1, TComponent2& component2 )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL );
@@ -113,7 +113,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		virtual void			entityAdded( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -121,7 +121,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		virtual void			entityRemoved( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -159,15 +159,15 @@ namespace scene {
 
 	//! The basic scene system for two component types
 	template<typename TComponent1, typename TComponent2, typename TComponent3>
-	class SceneSystem3 : public ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3> {
+	class SceneSystem3 : public Ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3> {
 	public:
 
 								//! Constructs the SceneSystem3 instance
-								SceneSystem3( ecs::Entities& entities, const String& name )
-									: ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3>( entities, name ) {}
+								SceneSystem3( Ecs::Entities& entities, const String& name )
+									: Ecs::EntityWithComponentsSystem3<TComponent1, TComponent2, TComponent3>( entities, name ) {}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL );
@@ -175,7 +175,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityAdded( const ecs::EntityPtr& entity )
+		virtual void			entityAdded( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )
@@ -183,7 +183,7 @@ namespace scene {
 		}
 
 		//! Casts the entity to a SceneObject type
-		virtual void			entityRemoved( const ecs::EntityPtr& entity )
+		virtual void			entityRemoved( const Ecs::EntityPtr& entity )
 		{
 			SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 			DC_BREAK_IF( sceneObject == NULL )

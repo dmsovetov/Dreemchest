@@ -34,16 +34,16 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! Asset system ensures that all needed assets are loaded into the memory.
-	class AssetSystem : public ecs::EntitySystem {
+	class AssetSystem : public Ecs::EntitySystem {
 	public:
 
 							//! Constructs the AssetSystem instance.
-							AssetSystem( ecs::Entities& entities, renderer::HalPtr hal );
+							AssetSystem( Ecs::Entities& entities, renderer::HalPtr hal );
 
 	private:
 
 		//! Checks if an entity contains any components that contain assets and queues them for loading.
-		virtual void		entityAdded( const ecs::EntityPtr& entity );
+		virtual void		entityAdded( const Ecs::EntityPtr& entity );
 
 		//! Tracks the asset loading.
 		virtual void		update( u32 currentTime, f32 dt );

@@ -38,7 +38,7 @@ namespace scene {
 	public:
 
 									//! Constructs the DebugSpriteTransformRenderPass instance.
-									DebugSpriteTransformRenderPass( ecs::Entities& entities, const Renderer& renderer );
+									DebugSpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer );
 
 	private:
 

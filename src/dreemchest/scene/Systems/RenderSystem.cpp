@@ -33,7 +33,7 @@ namespace scene {
 // ---------------------------------------- RenderSystemBase ---------------------------------------- //
 
 // ** RenderSystemBase::process
-void RenderSystemBase::process( u32 currentTime, f32 dt, ecs::EntityPtr& entity )
+void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
 {
 	// Get the camera component from entity
 	Camera& camera    = *entity->get<Camera>();
@@ -93,7 +93,7 @@ void RenderPassBase::render( u32 currentTime, f32 dt, const Matrix4& viewProject
 }
 
 // ** RenderPassBase::process
-void RenderPassBase::process( u32 currentTime, f32 dt, ecs::EntityPtr& entity )
+void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
 {
 	DC_BREAK
 }

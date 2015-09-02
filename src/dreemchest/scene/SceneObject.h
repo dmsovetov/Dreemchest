@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! Scene object class is a component holder.
-	class SceneObject : public ecs::Entity {
+	class SceneObject : public Ecs::Entity {
 	EmbedUserData
 	friend class Scene;
 	public:
@@ -47,7 +47,7 @@ namespace scene {
 	private:
 
 								//! Constructs a SceneObject instance.
-								SceneObject( Scene* scene, ecs::Entities& entities, const ecs::EntityId& id = ecs::EntityId() );
+								SceneObject( Scene* scene, Ecs::Entities& entities, const Ecs::EntityId& id = Ecs::EntityId() );
 
 	private:
 
@@ -56,7 +56,7 @@ namespace scene {
 	};
 
 	// ** SceneObject::SceneObject
-	inline SceneObject::SceneObject( Scene* scene, ecs::Entities& entities, const ecs::EntityId& id ) : Entity( entities, id ), m_scene( scene )
+	inline SceneObject::SceneObject( Scene* scene, Ecs::Entities& entities, const Ecs::EntityId& id ) : Entity( entities, id ), m_scene( scene )
 	{
 	}
 

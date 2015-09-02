@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 	//! A base class for all components.
-	class SceneComponent : public ecs::Component {
+	class SceneComponent : public Ecs::Component {
 	public:
 
 								OverrideComponent( SceneComponent, Component )

@@ -35,7 +35,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** MeshRendererPass::MeshRendererPass
-MeshRendererPass::MeshRendererPass( ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "MeshRendererPass", renderer ), m_renderOperations( 2000 )
+MeshRendererPass::MeshRendererPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "MeshRendererPass", renderer ), m_renderOperations( 2000 )
 {
 	m_shaders[ShaderSolid] = m_renderer.m_hal->createShader(
 		CODE(

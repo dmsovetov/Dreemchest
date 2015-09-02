@@ -40,7 +40,7 @@ namespace scene {
 	public:
 
 							//! Constructs a Rotator2DSystem instance.
-							Rotator2DSystem( ecs::Entities& entities )
+							Rotator2DSystem( Ecs::Entities& entities )
 								: SceneSystem2( entities, "Rotator2D" ) {}
 
 		//! Rotates a single entity by a rotator
@@ -52,7 +52,7 @@ namespace scene {
 	public:
 
 							//! Constructs a FollowSystem instance.
-							FollowSystem( ecs::Entities& entities )
+							FollowSystem( Ecs::Entities& entities )
 								: SceneSystem2( entities, "Follow" ) {}
 
 		//! Follows the target transform
@@ -64,7 +64,7 @@ namespace scene {
 	private:
 
 		//! Holds the accumulated acceleration.
-		struct Internal : ecs::Internal<Internal> {
+		struct Internal : Ecs::Internal<Internal> {
 			Vec3			m_force;		//!< The accumulated force.
 		};
 	};

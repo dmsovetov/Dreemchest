@@ -47,7 +47,7 @@ namespace scene {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
-								Box2DPhysics( ecs::Entities& entities, f32 deltaTime = 0.01f, f32 scale = 1.0f );
+								Box2DPhysics( Ecs::Entities& entities, f32 deltaTime = 0.01f, f32 scale = 1.0f );
 
 		//! Updates the physics engine state.
 		virtual bool			begin( u32 currentTime );
@@ -90,7 +90,7 @@ namespace scene {
 	private:
 
 		//! Holds the per-instance internal physics data inside the component.
-		struct Internal : public ecs::Internal<Internal> {
+		struct Internal : public Ecs::Internal<Internal> {
 								//! Constructs the Internal instance.
 								Internal( b2Body* body )
 									: m_body( body ) {}

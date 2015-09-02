@@ -104,10 +104,10 @@ namespace scene {
 		SceneObjectPtr					createSceneObject( void );
 
 		//! Returns the scene systems.
-		ecs::Systems&					systems( void );
+		Ecs::Systems&					systems( void );
 
 		//! Returns the scene rendering systems.
-		ecs::Systems&					renderingSystems( void );
+		Ecs::Systems&					renderingSystems( void );
 
 		//! Creates a new scene.
 		static ScenePtr					create( void );
@@ -120,19 +120,19 @@ namespace scene {
 	private:
 
 		//! Scene entities container.
-		ecs::Entities					m_entities;
+		Ecs::Entities					m_entities;
 
 		//! Entity update systems.
-		ecs::Systems					m_systems;
+		Ecs::Systems					m_systems;
 
 		//! Entity rendering systems.
-		ecs::Systems					m_renderingSystems;
+		Ecs::Systems					m_renderingSystems;
 
 		//! All cameras that reside in scene.
-		ecs::FamilyPtr					m_cameras;
+		Ecs::FamilyPtr					m_cameras;
 
 		//! Next scene object id.
-		ecs::EntityId					m_nextEntityId;
+		Ecs::EntityId					m_nextEntityId;
 	};
 
 } // namespace scene

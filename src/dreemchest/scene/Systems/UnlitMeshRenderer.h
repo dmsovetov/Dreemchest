@@ -38,7 +38,7 @@ namespace scene {
 	public:
 
 									//! Constructs the MeshRendererPass instance.
-									MeshRendererPass( ecs::Entities& entities, const Renderer& renderer );
+									MeshRendererPass( Ecs::Entities& entities, const Renderer& renderer );
 
 	protected:
 

@@ -55,11 +55,11 @@ namespace scene {
 	};
 	 
 	//! Base class for all render systems.
-	class RenderSystemBase : public ecs::EntitySystem {
+	class RenderSystemBase : public Ecs::EntitySystem {
 	public:
 
 								//! Constructs RenderSystemBase instance
-								RenderSystemBase( ecs::Entities& entities, const String& name, const ecs::Aspect& aspect, const Renderer& renderer )
+								RenderSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderer& renderer )
 									: EntitySystem( entities, name, aspect ), m_renderer( renderer ) {}
 
 		//! Adds a new render pass to this system.
@@ -69,7 +69,7 @@ namespace scene {
 	protected:
 
 		//! Renders all nested render passes using the camera.
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
 	protected:
 
@@ -93,8 +93,8 @@ namespace scene {
 	public:
 
 								//! Constructs RenderSystem instance
-								RenderSystem( ecs::Entities& entities, const String& name, const Renderer& renderer )
-									: RenderSystemBase( entities, name, ecs::Aspect::all<Camera, Transform, TRender>(), renderer ) {}
+								RenderSystem( Ecs::Entities& entities, const String& name, const Renderer& renderer )
+									: RenderSystemBase( entities, name, Ecs::Aspect::all<Camera, Transform, TRender>(), renderer ) {}
 	};
 
 	//! Generic single pass renderer
@@ -102,16 +102,16 @@ namespace scene {
 	class SinglePassRenderer : public RenderSystem<TRenderer> {
 	public:
 
-								SinglePassRenderer( ecs::Entities& entities, const Renderer& renderer )
+								SinglePassRenderer( Ecs::Entities& entities, const Renderer& renderer )
 									: RenderSystem( entities, "SinglePassRenderer", renderer ) { addPass<TPass>(); }
 	};
 
 	//! Base class for all render passes.
-	class RenderPassBase : public ecs::EntitySystem {
+	class RenderPassBase : public Ecs::EntitySystem {
 	public:
 
 								//! Constructs RenderPassBase instance
-								RenderPassBase( ecs::Entities& entities, const String& name, const ecs::Aspect& aspect, const Renderer& renderer )
+								RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderer& renderer )
 									: EntitySystem( entities, name, aspect ), m_renderer( renderer ) {}
 
 		//! Renders the pass.
@@ -120,7 +120,7 @@ namespace scene {
 	protected:
 
 		//! Processes the entity.
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
 	protected:
 
@@ -134,13 +134,13 @@ namespace scene {
 	public:
 
 								//! Constructs RenderPass instance
-								RenderPass( ecs::Entities& entities, const String& name, const Renderer& renderer )
-									: RenderPassBase( entities, name, ecs::Aspect::all<TComponent, Transform>(), renderer ) {}
+								RenderPass( Ecs::Entities& entities, const String& name, const Renderer& renderer )
+									: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderer ) {}
 
 	private:
 
 		//! Extracts the components from entity.
-		virtual void			process( u32 currentTime, f32 dt, ecs::EntityPtr& entity );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
 		//! This method should be overridden in subclass
 		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform );
@@ -148,7 +148,7 @@ namespace scene {
 
 	// ** RenderPass::process
 	template<typename TComponent>
-	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, ecs::EntityPtr& entity )
+	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
 	{
 		SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
 		DC_BREAK_IF( sceneObject == NULL )

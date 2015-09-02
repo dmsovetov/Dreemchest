@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace scene {
 
 // ** DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass
-DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass( ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "DebugSpriteTransformRenderPass", renderer )
+DebugSpriteTransformRenderPass::DebugSpriteTransformRenderPass( Ecs::Entities& entities, const Renderer& renderer ) : RenderPass( entities, "DebugSpriteTransformRenderPass", renderer )
 {
 }
 

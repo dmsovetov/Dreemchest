@@ -35,7 +35,7 @@ namespace scene {
 #ifdef DC_PHYSICS2D_BOX2D
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( ecs::Entities& entities, f32 deltaTime, f32 scale ) : SceneSystem2( entities, "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
+Box2DPhysics::Box2DPhysics( Ecs::Entities& entities, f32 deltaTime, f32 scale ) : SceneSystem2( entities, "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
 {
 	m_world = DC_NEW b2World( b2Vec2( 0, -9.8f ) );
 }

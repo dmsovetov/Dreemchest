@@ -41,7 +41,7 @@ namespace scene {
 	public:
 
 							//! Constructs a WasdInput2DSystem instance.
-							WasdInput2DSystem( ecs::Entities& entities );
+							WasdInput2DSystem( Ecs::Entities& entities );
 
 		//! Moves the scene object
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform& transform );
