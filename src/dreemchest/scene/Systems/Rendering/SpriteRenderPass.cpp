@@ -52,8 +52,12 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	Vec2 up   = Vec2( s, c );
 	Vec2 side = Vec2( up.y, -up.x );
 
+	// Calculate the sprite dimensions
+	f32 width  = image->width()  * transform.scaleX() * 0.5f;
+	f32 height = image->height() * transform.scaleY() * 0.5f;
+
 	// Render oriented quad
-	m_renderers.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, up, side, sprite.color() );
+	m_renderers.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), width,height, up, side, sprite.color() );
 }
 
 } // namespace Scene
