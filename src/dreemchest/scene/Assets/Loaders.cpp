@@ -67,8 +67,8 @@ bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& s
 	stream->read( &indexCount, 4 );
 
 	Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
-	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount, false );
-	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount, false );
+	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount );
+	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount );
 
 	Vertex* vertices = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
 
