@@ -160,6 +160,42 @@ void Transform::setRotationZ( f32 value )
 	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 0, -1 ) );
 }
 
+// ** Transform::scaleX
+f32 Transform::scaleX( void ) const
+{
+	return m_scale.x;
+}
+
+// ** Transform::setScaleX
+void Transform::setScaleX( f32 value )
+{
+	m_scale.x = value;
+}
+
+// ** Transform::scaleY
+f32 Transform::scaleY( void ) const
+{
+	return m_scale.y;
+}
+
+// ** Transform::setScaleY
+void Transform::setScaleY( f32 value )
+{
+	m_scale.y = value;
+}
+
+// ** Transform::scaleZ
+f32 Transform::scaleZ( void ) const
+{
+	return m_scale.z;
+}
+
+// ** Transform::setScaleZ
+void Transform::setScaleZ( f32 value )
+{
+	m_scale.z = value;
+}
+
 // ------------------------------------------ Rotator2D ------------------------------------------ //
 
 // ** Rotator2D::speed

@@ -101,6 +101,24 @@ namespace Scene {
 		//! Sets transform rotation around the Z axis.
 		void					setRotationZ( f32 value );
 
+		//! Returns the X scale.
+		f32						scaleX( void ) const;
+
+		//! Sets the X scale.
+		void					setScaleX( f32 value );
+
+		//! Returns the Y scale.
+		f32						scaleY( void ) const;
+
+		//! Sets the X scale.
+		void					setScaleY( f32 value );
+
+		//! Returns the Z scale.
+		f32						scaleZ( void ) const;
+
+		//! Sets the Z scale.
+		void					setScaleZ( f32 value );
+
 	private:
 
 		TransformWPtr			m_parent;	//!< Parent transform.
