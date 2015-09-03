@@ -81,6 +81,7 @@ namespace Ecs {
 		template<typename TComponent, TemplateFunctionTypes4> TComponent* attach( TemplateFunctionArgs4 );
 		template<typename TComponent, TemplateFunctionTypes5> TComponent* attach( TemplateFunctionArgs5 );
 		template<typename TComponent, TemplateFunctionTypes6> TComponent* attach( TemplateFunctionArgs6 );
+		template<typename TComponent, TemplateFunctionTypes7> TComponent* attach( TemplateFunctionArgs7 );
 
 		//! Removes a component from this entity.
 		/*!
@@ -205,6 +206,13 @@ namespace Ecs {
 	inline TComponent* Entity::attach( TemplateFunctionArgs6 )
 	{
 		return attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3, arg4, arg5 ) );
+	}
+
+	// ** Entity::attach
+	template<typename TComponent, TemplateFunctionTypes7>
+	inline TComponent* Entity::attach( TemplateFunctionArgs7 )
+	{
+		return attach<TComponent>( new TComponent( arg0, arg1, arg2, arg3, arg4, arg5, arg6 ) );
 	}
 
 } // namespace Ecs
