@@ -233,12 +233,12 @@ bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
         return false;
     }
 
-    const s32 kChunkSize = 16536;
-    u8        chunk[kChunkSize];
+    const s32   kChunkSize = 16536;
+    AutoPtr<u8> chunk = DC_NEW u8[kChunkSize];
     
     while( input->hasDataLeft() ) {
-        s32 read = input->read( chunk, kChunkSize );
-        output->write( chunk, read );
+        s32 read = input->read( chunk.get(), kChunkSize );
+        output->write( chunk.get(), read );
     }
 
     return true;
