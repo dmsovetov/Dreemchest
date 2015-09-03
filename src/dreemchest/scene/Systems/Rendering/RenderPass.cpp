@@ -24,30 +24,27 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_SpriteRenderPass_H__
-#define __DC_Scene_SpriteRenderPass_H__
-
 #include "RenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! The sprite rendering pass
-	class SpriteRenderPass : public RenderPass2D<Sprite> {
-	public:
+// ---------------------------------------- RenderPassBase ---------------------------------------- //
 
-									//! Constructs the SpriteRenderPass instance.
-									SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers );
+// ** RenderPassBase::render
+void RenderPassBase::render( u32 currentTime, f32 dt, const Matrix4& viewProjection )
+{
+	m_viewProj = viewProjection;
+	update( currentTime, dt );
+}
 
-	private:
-
-		//! Renders a single entity with a sprite
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
-	};
+// ** RenderPassBase::process
+void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
+{
+	DC_BREAK
+}
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_SpriteRenderer_H__    */

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderSystem.h"
+#include "RenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -81,21 +82,6 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity 
 		hal->setViewport( 0, 0, ( u32 )vwidth, ( u32 )vheight );
 	}
 	view->end();
-}
-
-// ---------------------------------------- RenderPassBase ---------------------------------------- //
-
-// ** RenderPassBase::render
-void RenderPassBase::render( u32 currentTime, f32 dt, const Matrix4& viewProjection )
-{
-	m_viewProj = viewProjection;
-	update( currentTime, dt );
-}
-
-// ** RenderPassBase::process
-void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
-{
-	DC_BREAK
 }
 
 } // namespace Scene

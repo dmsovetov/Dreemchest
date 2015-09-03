@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_StaticMeshRenderPass_H__
 #define __DC_Scene_StaticMeshRenderPass_H__
 
-#include "RenderSystem.h"
+#include "RenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
