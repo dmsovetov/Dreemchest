@@ -59,6 +59,12 @@ namespace Scene {
 		//! Emits a new render operation.
 		Command*						emit( void );
 
+		//! Sets the default blending.
+		void							setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst );
+
+		//! Sets the default deth testing function.
+		void							setDefaultDepthFunction( Renderer::Compare value );
+
 		//! Sorts render operations by shader used, then by texture, then by mesh data.
 		static bool						sortByShaderTextureMesh( const Command* a, const Command* b );
 
@@ -72,8 +78,12 @@ namespace Scene {
 		//! Render operations list container
 		typedef List<const Command*>	EmittedCommands;
 
-		ArrayAllocator<Command>			m_allocator;	//!< Array allocator used to allocated render operations.
-		EmittedCommands					m_commands;		//!< Emitted rendering commands.
+		ArrayAllocator<Command>			m_allocator;			//!< Array allocator used to allocated render operations.
+		EmittedCommands					m_commands;				//!< Emitted rendering commands.
+
+		Renderer::BlendFactor			m_defaultSrcBlending;	//!< The default source blend factor.
+		Renderer::BlendFactor			m_defaultDstBlending;	//!< The default dest blend factor.
+		Renderer::Compare				m_defaultDepthFunction;	//!< The default blend function.
 	};
 
 } // namespace Scene

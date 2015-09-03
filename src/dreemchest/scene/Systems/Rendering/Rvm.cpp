@@ -33,6 +33,22 @@ namespace Scene {
 // ** Rvm::Rvm
 Rvm::Rvm( u32 maxCommands ) : m_allocator( maxCommands )
 {
+	m_defaultSrcBlending	= Renderer::BlendDisabled;
+	m_defaultDstBlending	= Renderer::BlendDisabled;
+	m_defaultDepthFunction	= Renderer::Less;
+}
+
+// ** Rvm::setDefaultBlending
+void Rvm::setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst )
+{
+	m_defaultSrcBlending = src;
+	m_defaultDstBlending = dst;
+}
+
+// ** Rvm::setDefaultDepthFunction
+void Rvm::setDefaultDepthFunction( Renderer::Compare value )
+{
+	m_defaultDepthFunction = value;
 }
 
 // ** Rvm::flush
@@ -49,6 +65,12 @@ void Rvm::flush( Renderer::HalPtr hal )
 
 	//! Active shader
 	Renderer::Shader* activeShader = NULL;
+
+	// Set the default blending function
+	hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
+
+	// Set the default depth testing function
+	hal->setDepthTest( true, m_defaultDepthFunction );
 
 	// Perform all rendering operations
 	for( EmittedCommands::const_iterator i = m_commands.begin(), end = m_commands.end(); i != end; ++i ) {
