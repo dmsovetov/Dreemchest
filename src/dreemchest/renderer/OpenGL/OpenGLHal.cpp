@@ -210,6 +210,16 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& decla
     return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( declaration, count ) );
 }
 
+// ** OpenGLHal::setPolygonMode
+void OpenGLHal::setPolygonMode( PolygonMode mode )
+{
+#ifndef HAVE_OPENGLES
+	glLineWidth( 2.0f );
+    static GLenum fill[] = { GL_LINE, GL_FILL };
+    glPolygonMode( GL_FRONT_AND_BACK, fill[mode] );
+#endif
+}
+
 // ** OpenGLHal::setShader
 void OpenGLHal::setShader( const ShaderPtr& shader )
 {

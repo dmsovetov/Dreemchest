@@ -153,6 +153,7 @@ namespace Renderer {
         virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
         virtual IndexBufferPtr      createIndexBuffer( u32 count, bool GPU = true );
         virtual VertexBufferPtr		createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
+		virtual void				setPolygonMode( PolygonMode mode );
         virtual void				setShader( const ShaderPtr& shader );
         virtual void				setRenderTarget( RenderTarget *renderTarget );
         virtual void				setTexture( u32 sampler, Texture *texture );

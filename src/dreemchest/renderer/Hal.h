@@ -155,6 +155,9 @@ namespace Renderer {
         //! Binds a texture to a specified texture sampler.
         virtual void    setTexture( u32 sampler, Texture *texture );
 
+		//! Sets the polygon rendering mode.
+		virtual void	setPolygonMode( PolygonMode mode );
+
         //! Sets a texture sampler state.
         /*!
          \param sampler Sampler index.

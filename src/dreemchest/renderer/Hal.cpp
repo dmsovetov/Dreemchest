@@ -190,6 +190,11 @@ VertexBufferPtr Hal::createVertexBuffer( const VertexDeclarationPtr& declaration
     return VertexBufferPtr( DC_NEW VertexBuffer( declaration, count, false ) );
 }
 
+// ** Hal::setPolygonMode
+void Hal::setPolygonMode( PolygonMode mode )
+{
+}
+
 // ** Hal::setShader
 void Hal::setShader( const ShaderPtr& shader )
 {
