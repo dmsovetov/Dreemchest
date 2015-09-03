@@ -126,7 +126,7 @@ namespace Scene {
 
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )
-								: m_mass( mass ), m_type( type ) {}
+								: m_mass( mass ), m_type( type ), m_torque( 0.0f ) {}
 
 		//! Returns the rigid body mass.
 		f32					mass( void ) const;
@@ -134,10 +134,27 @@ namespace Scene {
 		//! Returns the rigid body type.
 		Type				type( void ) const;
 
+		//! Returns the torque applied to this rigid body.
+		f32					torque( void ) const;
+
+		//! Applies the torque to the rigid body.
+		void				applyTorque( f32 value );
+
+		//! Returns the force applied to this rigid body.
+		const Vec2&			force( void ) const;
+
+		//! Applies force to the center of mass.
+		void				applyForce( const Vec2& value );
+
+		//! Clears all applied forces.
+		void				clear( void );
+
 	private:
 
 		f32					m_mass;			//!< The rigid body mass.
 		Type				m_type;			//!< The rigid body type.
+		f32					m_torque;		//!< The total torque applied.
+		Vec2				m_force;		//!< The total force applied.
 	};
 
 } // namespace Scene

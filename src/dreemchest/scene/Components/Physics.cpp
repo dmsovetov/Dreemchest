@@ -90,6 +90,37 @@ RigidBody2D::Type RigidBody2D::type( void ) const
 	return m_type;
 }
 
+// ** RigidBody2D::torque
+f32 RigidBody2D::torque( void ) const
+{
+	return m_torque;
+}
+
+// ** RigidBody2D::applyTorque
+void RigidBody2D::applyTorque( f32 value )
+{
+	m_torque += value;
+}
+
+// ** RigidBody2D::force
+const Vec2& RigidBody2D::force( void ) const
+{
+	return m_force;
+}
+
+// ** RigidBody2D::applyForc
+void RigidBody2D::applyForce( const Vec2& value )
+{
+	m_force += value;
+}
+
+// ** RigidBody2D::clear
+void RigidBody2D::clear( void )
+{
+	m_torque = 0.0f;
+	m_force  = Vec2( 0.0f, 0.0f );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
