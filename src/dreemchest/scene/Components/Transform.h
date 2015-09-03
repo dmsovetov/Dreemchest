@@ -39,9 +39,13 @@ namespace Scene {
 
 								OverrideComponent( Transform, SceneComponent )
 									
-								//! Constructs Transform2D instance.
+								//! Constructs Transform instance.
 								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
-									: m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0.0f, 0.0f, -1.0f ) ) ), m_scale( sx, sy, 1.0f ) {}
+									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0.0f, 0.0f, -1.0f ) ) ), m_scale( sx, sy, 1.0f ) {}
+
+								//! Constructs Transform instance.
+								Transform( f32 x, f32 y, f32 z, const TransformWPtr& parent = TransformWPtr() )
+									: m_parent( parent ), m_position( x, y, z ), m_scale( 1.0f, 1.0f, 1.0f ) {}
 
 		//! Returns an affine transformation matrix.
 		virtual Matrix4			matrix( void ) const;
