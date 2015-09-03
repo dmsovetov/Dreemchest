@@ -41,7 +41,10 @@ bool WireframeRenderPass::begin( u32 currentTime )
 	m_renderers.m_hal->setPolygonMode( Renderer::PolygonWire );
 
 	// Set the additive blending
-	m_renderers.m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
+	m_rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
+
+	// Set the depth testing function
+	m_rvm.setDefaultDepthFunction( Renderer::LessEqual );
 
 	return true;
 }
@@ -49,9 +52,6 @@ bool WireframeRenderPass::begin( u32 currentTime )
 // ** WireframeRenderPass::end
 void WireframeRenderPass::end( void )
 {
-	// Set the depth testing function
-	m_renderers.m_hal->setDepthTest( true, Renderer::LessEqual );
-
 	// Flush emitted render operations
 	StaticMeshRenderPass::end();
 

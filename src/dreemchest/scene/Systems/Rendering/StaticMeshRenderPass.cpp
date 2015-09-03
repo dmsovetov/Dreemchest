@@ -35,19 +35,17 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshRenderPass::StaticMeshRenderPass
-StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_rvm( 2000 )
+StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers, 1000 )
 {
 	m_shaders[ShaderInvalid] = m_renderers.m_hal->createShader(
 		CODE(
-			uniform mat4 u_mvp;
+			uniform mat4 u_vp, u_transform;
 
 			void main()
 			{
-				gl_Position = u_mvp * gl_Vertex;
+				gl_Position = u_vp * u_transform * gl_Vertex;
 			} ),
 		CODE(
-			uniform sampler2D u_texture;
-
 			void main()
 			{
 				gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
@@ -55,25 +53,24 @@ StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Rende
 
 	m_shaders[ShaderSolid] = m_renderers.m_hal->createShader(
 		CODE(
-			uniform mat4 u_mvp;
+			uniform mat4 u_vp, u_transform;
 
-			varying vec2 v_tex0;
+			varying vec2 v_uv0;
 
 			void main()
 			{
-				v_tex0		= gl_MultiTexCoord0.xy;
-				gl_Position = u_mvp * gl_Vertex;
+				v_uv0		= gl_MultiTexCoord0.xy;
+				gl_Position = u_vp * u_transform * gl_Vertex;
 			} ),
 		CODE(
-			uniform sampler2D u_texture;
-			uniform vec4	  u_color;
+			uniform sampler2D u_tex0;
+			uniform vec4	  u_clr0;
 
-			varying vec2	  v_tex0;
+			varying vec2	  v_uv0;
 
 			void main()
 			{
-                vec4 color   = texture2D( u_texture, v_tex0 );
-				gl_FragColor = color * u_color;
+				gl_FragColor = texture2D( u_tex0, v_uv0 ) * u_clr0;
 			} ) );
 }
 
@@ -95,9 +92,6 @@ void StaticMeshRenderPass::end( void )
 // ** StaticMeshRenderPass::process
 void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
-	// Calculate the MVP matrix
-	Matrix4 mvp = m_viewProj * transform.matrix();
-
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
 
@@ -116,16 +110,31 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		// Emit a new render operation
 		Rvm::Command* rop = m_rvm.emit();
 
-		// Get the texture data from an asset
-		AssetTexturePtr textueData = material.valid() ? material->texture( Material::Diffuse )->data() : AssetTexturePtr();
-
 		// Initialize the rendering operation
-		rop->mvp			= mvp;
+		rop->transform		= transform.matrix();
 		rop->indexBuffer	= meshData->indexBuffers[i].get();
 		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
 		rop->shader			= m_shaders[material.valid() ? material->shader() : Material::Unknown].get();
-		rop->texture		= textueData.valid() ? textueData->texture.get() : NULL;
-		rop->diffuse		= material.valid() ? &material->color( Material::Diffuse ) : NULL;
+
+		if( !material.valid() ) {
+			continue;
+		}
+
+		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
+			Material::Layer  layer = static_cast<Material::Layer>( j );
+
+			rop->colors[j]   = &material->color( layer );
+
+			const ImageWPtr& image = material->texture( layer );
+
+			if( !image.valid() ) {
+				continue;
+			}
+
+			AssetTexturePtr  data = image->data();
+			rop->textures[j] = data.valid() ? data->texture.get() : NULL;
+		}
+		
 	}
 }
 

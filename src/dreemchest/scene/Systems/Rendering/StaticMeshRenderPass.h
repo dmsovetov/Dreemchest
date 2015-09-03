@@ -60,7 +60,6 @@ namespace Scene {
 
 	protected:
 		
-		Rvm							m_rvm;							//!< The rendering virtual machine that performs rendering.
 		Renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
 	};
 

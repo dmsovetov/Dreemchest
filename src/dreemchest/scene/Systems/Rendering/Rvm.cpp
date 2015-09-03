@@ -30,6 +30,18 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** Rvm::s_samplersUniformNames
+CString Rvm::s_samplersUniformNames[] = { "u_tex0" , "u_tex1", "u_tex2", "u_tex3", "u_tex4", "u_tex5", "u_tex6", "u_tex7" };
+
+// ** Rvm::s_colorsUniformNames
+CString Rvm::s_colorsUniformNames[]   = { "u_clr0" , "u_clr1", "u_clr2", "u_clr3", "u_clr4", "u_clr5", "u_clr6", "u_clr7" };
+
+// ** Rvm::s_transformUniformName
+CString Rvm::s_transformUniformName = "u_transform";
+
+// ** Rvm::s_vpUniformName
+CString Rvm::s_vpUniformName = "u_vp";
+
 // ** Rvm::Rvm
 Rvm::Rvm( u32 maxCommands ) : m_allocator( maxCommands )
 {
@@ -51,6 +63,18 @@ void Rvm::setDefaultDepthFunction( Renderer::Compare value )
 	m_defaultDepthFunction = value;
 }
 
+// ** Rvm::setViewProjection
+void Rvm::setViewProjection( const Matrix4& value )
+{
+	m_viewProjection = value;
+}
+
+// ** Rvm::viewProjection
+const Matrix4& Rvm::viewProjection( void ) const
+{
+	return m_viewProjection;
+}
+
 // ** Rvm::flush
 void Rvm::flush( Renderer::HalPtr hal )
 {
@@ -58,7 +82,7 @@ void Rvm::flush( Renderer::HalPtr hal )
 	m_commands.sort( sortByShaderTextureMesh );
 
 	// Active texture
-	Renderer::Texture* activeTexture = NULL;
+	Renderer::Texture* activeTextures[Material::TotalMaterialLayers] = { 0 };
 
 	// Active vertex buffer
 	Renderer::VertexBuffer* activeVertexBuffer = NULL;
@@ -72,6 +96,9 @@ void Rvm::flush( Renderer::HalPtr hal )
 	// Set the default depth testing function
 	hal->setDepthTest( true, m_defaultDepthFunction );
 
+	// Set culling
+	hal->setCulling( Renderer::TriangleFaceBack );
+
 	// Perform all rendering operations
 	for( EmittedCommands::const_iterator i = m_commands.begin(), end = m_commands.end(); i != end; ++i ) {
 		const Command* cmd = *i;
@@ -82,10 +109,19 @@ void Rvm::flush( Renderer::HalPtr hal )
 			activeShader = cmd->shader;
 		}
 
+		// Set the instance uniforms
+		if( activeShader ) {
+			setShaderUniforms( activeShader, cmd );
+		}
+
 		// Set the texture
-		if( cmd->texture != activeTexture ) {
-			hal->setTexture( 0, cmd->texture );
-			activeTexture = cmd->texture;
+		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
+			Renderer::Texture* texture = cmd->textures[j];
+
+			if( texture != activeTextures[j] ) {
+				hal->setTexture( j, texture );
+				activeTextures[j] = texture;
+			}
 		}
 
 		// Set the vertex buffer
@@ -126,6 +162,7 @@ Rvm::Command* Rvm::emit( void )
 	Command* rop = m_allocator.allocate();
 	DC_BREAK_IF( rop == NULL )
 
+	memset( rop, 0, sizeof( Command ) );
 	m_commands.push_back( rop );
 
 	return rop;
@@ -140,16 +177,33 @@ void Rvm::setShader( Renderer::HalPtr hal, const Command* rop )
 
 	u32 location = 0;
 
-	if( location = shader->findUniformLocation( "u_mvp" ) ) {
-		shader->setMatrix( location,  rop->mvp );
+	if( location = shader->findUniformLocation( s_vpUniformName ) ) {
+		shader->setMatrix( location, m_viewProjection );
 	}
 
-	if( location = shader->findUniformLocation( "u_texture" ) ) {
-		shader->setInt( location, 0 );
+	// Bind texture samplers
+	for( u32 i = 0; i < 8; i++ ) {
+		if( location = shader->findUniformLocation( s_samplersUniformNames[i] ) ) {
+			shader->setInt( location, i );
+		}
 	}
-	
-	if( location = shader->findUniformLocation( "u_color" ) ) {
-		shader->setVec4( location, Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
+}
+
+// ** Rvm::setShaderUniforms
+void Rvm::setShaderUniforms( Renderer::Shader* shader, const Command* cmd )
+{
+	u32 location = 0;
+
+	// Set colors
+	for( u32 i = 0; i < 8; i++ ) {
+		if( location = shader->findUniformLocation( s_colorsUniformNames[i] ) ) {
+			shader->setVec4( location, Vec4( cmd->colors[i]->r, cmd->colors[i]->g, cmd->colors[i]->b, cmd->colors[i]->a ) );
+		}
+	}
+
+	// Set the transformation matrix
+	if( location = shader->findUniformLocation( s_transformUniformName ) ) {
+		shader->setMatrix( location,  cmd->transform );
 	}
 }
 
@@ -158,7 +212,10 @@ bool Rvm::sortByShaderTextureMesh( const Command* a, const Command* b )
 {
 	if( a->shader != b->shader ) return a->shader < b->shader;
 	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
-	if( a->texture != b->texture ) return a->texture > b->texture;
+
+	for( u32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
+		if( a->textures[i] != b->textures[i] ) return a->textures[i] > b->textures[i];
+	}
 
 	return false;
 }

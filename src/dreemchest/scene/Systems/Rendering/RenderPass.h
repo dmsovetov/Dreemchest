@@ -39,8 +39,8 @@ namespace Scene {
 	public:
 
 									//! Constructs RenderPassBase instance
-									RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
-										: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
+									RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers, u32 maxCommands )
+										: EntitySystem( entities, name, aspect ), m_renderers( renderers ), m_rvm( maxCommands ) {}
 
 		//! Renders the pass.
 		void						render( u32 currentTime, f32 dt, const Matrix4& viewProjection );
@@ -52,8 +52,8 @@ namespace Scene {
 
 	protected:
 
+		Rvm							m_rvm;				//!< The rendering virtual machine that performs rendering.
 		Renderers					m_renderers;		//!< Rendering HAL.
-		Matrix4						m_viewProj;			//!< The view-projection matrix.
 	};
 
 	//! Generic render pass to subclass user-defined render passes from
@@ -62,8 +62,8 @@ namespace Scene {
 	public:
 
 									//! Constructs RenderPass instance
-									RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-										: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers ) {}
+									RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers, u32 maxCommands )
+										: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers, maxCommands ) {}
 
 	private:
 
@@ -98,7 +98,7 @@ namespace Scene {
 
 									//! Constructs RenderPass2D instance
 									RenderPass2D( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-										: RenderPass( entities, name, renderers ) {}
+										: RenderPass( entities, name, renderers, 0 ) {}
 
 	protected:
 
@@ -113,7 +113,7 @@ namespace Scene {
 	template<typename TComponent>
 	bool RenderPass2D<TComponent>::begin( u32 currentTime )
 	{
-		m_renderers.m_renderer2d->begin( m_viewProj );
+		m_renderers.m_renderer2d->begin( m_rvm.viewProjection() );
 		return true;
 	}
 
