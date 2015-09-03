@@ -61,11 +61,11 @@ namespace Ecs {
 		void			update( u32 currentTime, f32 dt );
 
 		//! Adds a new system
-		template<typename T>							void add( void );
-		template<typename T, TemplateFunctionTypes1>	void add( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2>	void add( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3>	void add( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4>	void add( TemplateFunctionArgs4 );
+		template<typename T>							StrongPtr<T> add( void );
+		template<typename T, TemplateFunctionTypes1>	StrongPtr<T> add( TemplateFunctionArgs1 );
+		template<typename T, TemplateFunctionTypes2>	StrongPtr<T> add( TemplateFunctionArgs2 );
+		template<typename T, TemplateFunctionTypes3>	StrongPtr<T> add( TemplateFunctionArgs3 );
+		template<typename T, TemplateFunctionTypes4>	StrongPtr<T> add( TemplateFunctionArgs4 );
 
 		//! Removes a system
 		template<typename T>
@@ -97,37 +97,47 @@ namespace Ecs {
 
 	// ** Systems::add
 	template<typename T>
-	inline void Systems::add( void )
+	inline StrongPtr<T> Systems::add( void )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities ) );
+		T* system = new T( m_entities );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( system );
+		return StrongPtr<T>( system );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes1>
-	inline void Systems::add( TemplateFunctionArgs1 )
+	inline StrongPtr<T> Systems::add( TemplateFunctionArgs1 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0 ) );
+		T* system = new T( m_entities, arg0 );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( system );
+		return StrongPtr<T>( system );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes2>
-	inline void Systems::add( TemplateFunctionArgs2 )
+	inline StrongPtr<T> Systems::add( TemplateFunctionArgs2 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1 ) );
+		T* system = new T( m_entities, arg0, arg1 );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( system );
+		return StrongPtr<T>( system );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes3>
-	inline void Systems::add( TemplateFunctionArgs3 )
+	inline StrongPtr<T> Systems::add( TemplateFunctionArgs3 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1, arg2 ) );
+		T* system = new T( m_entities, arg0, arg1, arg2 );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( system );
+		return StrongPtr<T>( system );
 	}
 
 	// ** Systems::add
 	template<typename T, TemplateFunctionTypes4>
-	inline void Systems::add( TemplateFunctionArgs4 )
+	inline StrongPtr<T> Systems::add( TemplateFunctionArgs4 )
 	{
-		m_systems[TypeIndex<T>::idx()] = SystemPtr( new T( m_entities, arg0, arg1, arg2, arg3 ) );
+		T* system = new T( m_entities, arg0, arg1, arg2, arg3 );
+		m_systems[TypeIndex<T>::idx()] = SystemPtr( system );
+		return StrongPtr<T>( system );
 	}
 
 	// ** Systems::remove
