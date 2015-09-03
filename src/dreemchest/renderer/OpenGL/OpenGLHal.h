@@ -277,6 +277,9 @@ namespace Renderer {
         virtual void*               lock( void );
         virtual void                unlock( void );
 
+		// ** OpenGLVertexBuffer
+		void						bind( void );
+
     private:
 
         GLuint                      m_id;
@@ -293,6 +296,9 @@ namespace Renderer {
         // ** IndexBuffer
         virtual u16*                lock( void );
         virtual void                unlock( void );
+
+		// ** OpenGLIndexBuffer
+		void						bind( void );
 
     private:
 

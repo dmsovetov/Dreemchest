@@ -124,6 +124,10 @@ void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& ind
     
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
+	if( indexBuffer->isGpu() ) {
+		static_cast<OpenGLIndexBuffer*>( indexBuffer.get() )->bind();
+	}
+
     glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, indexBuffer->pointer() + firstIndex );
 }
 
@@ -280,10 +284,16 @@ void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const Vert
         disableVertexDeclaration( m_vertexDeclaration );
     }
 
-    if( vertexBuffer.valid() ) {
-        DC_BREAK_IF( vertexBuffer->isGpu() );
-        enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration.valid() ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
-    }
+	if( !vertexBuffer.valid() ) {
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		return;
+	}
+
+	if( vertexBuffer->isGpu() ) {
+		static_cast<OpenGLVertexBuffer*>( vertexBuffer.get() )->bind();
+	}
+
+	enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration.valid() ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
 }
 
 // ** OpenGLHal::enableVertexDeclaration
@@ -997,6 +1007,13 @@ OpenGLVertexBuffer::~OpenGLVertexBuffer( void )
     glDeleteBuffers( 1, &m_id );
 }
 
+// ** OpenGLVertexBuffer::bind
+void OpenGLVertexBuffer::bind( void )
+{
+	DC_CHECK_GL;
+	glBindBuffer( GL_ARRAY_BUFFER, m_id );
+}
+
 // ** OpenGLVertexBuffer::lock
 void* OpenGLVertexBuffer::lock( void )
 {
@@ -1032,6 +1049,13 @@ OpenGLIndexBuffer::OpenGLIndexBuffer( u32 count )
 OpenGLIndexBuffer::~OpenGLIndexBuffer( void )
 {
     glDeleteBuffers( 1, &m_id );
+}
+
+// ** OpenGLIndexBuffer::bind
+void OpenGLIndexBuffer::bind( void )
+{
+	DC_CHECK_GL;
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
 }
 
 // ** OpenGLIndexBuffer::lock
