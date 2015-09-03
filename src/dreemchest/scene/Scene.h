@@ -88,6 +88,10 @@ namespace Scene {
 	dcDeclarePtrs( AssetMesh )
 
 	dcDeclarePtrs( Box2DPhysics )
+	dcDeclarePtrs( RigidBody2D )
+
+	//! Container type to store scene objects.
+	typedef List<SceneObjectPtr> SceneObjectsList;
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {

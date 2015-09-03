@@ -40,6 +40,64 @@ Box2DPhysics::Box2DPhysics( Ecs::Entities& entities, f32 deltaTime, f32 scale ) 
 	m_world = DC_NEW b2World( b2Vec2( 0, -9.8f ) );
 }
 
+// ** Box2DPhysics::queryRect
+SceneObjectsList Box2DPhysics::queryRect( const Rect& rect ) const
+{
+	// Query callback
+	struct Callback : public b2QueryCallback {
+		virtual bool ReportFixture( b2Fixture* fixture ) {
+			SceneObject* sceneObject = reinterpret_cast<SceneObject*>( fixture->GetBody()->GetUserData() );
+			m_result.push_back( sceneObject );
+			return true;
+		}
+
+		SceneObjectsList m_result;
+	};
+
+	// Construct the AABB of a query
+	b2AABB aabb;
+	aabb.lowerBound = positionToBox2D( rect.min() );
+	aabb.upperBound = positionToBox2D( rect.max() );
+
+	// Run the query
+	Callback callback;
+	m_world->QueryAABB( &callback, aabb );
+
+	return callback.m_result;
+}
+
+// ** Box2DPhysics::rayCast
+bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const
+{
+	// Ray casting callback
+	struct Callback : public b2RayCastCallback {
+		Callback( void ) : m_hasIntersection( false ) {}
+
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) {
+			m_result = point;
+			m_hasIntersection = true;
+			return 0.0f;
+		}
+
+		bool	m_hasIntersection;
+		b2Vec2	m_result;
+	};
+
+	// Convert start & end points to Box2D coordinates
+	b2Vec2 p1 = positionToBox2D( start );
+	b2Vec2 p2 = positionToBox2D( end );
+
+	// Ray cast the physics world.
+	Callback callback;
+	m_world->RayCast( &callback, p1, p2 );
+
+	// Convert the result to Vec2 and return
+	Vec3 result = positionFromBox2D( callback.m_result );
+	intersectionPoint = Vec2( result.x, result.y );
+
+	return callback.m_hasIntersection;
+}
+
 // ** Box2DPhysics::update
 bool Box2DPhysics::begin( u32 currentTime )
 {
@@ -66,6 +124,17 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 	// Update the Transform2D instance
 	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+
+	// Now apply forces
+	f32			mass   = body->GetMass();
+	f32			torque = rigidBody.torque();
+	const Vec2& force  = rigidBody.force();
+
+	body->ApplyTorque( -torque * mass, true );
+	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
+
+	// Clear all forces now
+	rigidBody.clear();
 }
 
 // ** Box2DPhysics::sceneObjectAdded
@@ -154,7 +223,7 @@ void Box2DPhysics::addRectFixture( b2Body* body, const Shape2D::Part& shape ) co
 	fixture.restitution = shape.material.restitution;
 
 	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
-	polygon.SetAsBox( sizeToBox2D( shape.rect.width ), sizeToBox2D( shape.rect.height ) );
+	polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
 	fixture.shape = &polygon;
 
 	body->CreateFixture( &fixture );
@@ -195,6 +264,12 @@ f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec3& position ) const
+{
+	return b2Vec2( position.x / m_scale, position.y / m_scale );
+}
+
+// ** Box2DPhysics::positionToBox2D
+b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
 {
 	return b2Vec2( position.x / m_scale, position.y / m_scale );
 }

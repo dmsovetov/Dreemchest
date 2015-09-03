@@ -49,6 +49,12 @@ namespace Scene {
 								//! Constructs the Box2DPhysics instance.
 								Box2DPhysics( Ecs::Entities& entities, f32 deltaTime = 0.01f, f32 scale = 1.0f );
 
+		//! Performs the ray casting and returns the closes point to the starting one.
+		bool					rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const;
+
+		//! Returns all scene objects inside the rect.
+		SceneObjectsList		queryRect( const Rect& rect ) const;
+
 		//! Updates the physics engine state.
 		virtual bool			begin( u32 currentTime );
 
@@ -77,6 +83,9 @@ namespace Scene {
 
 		//! Converts position from scene space to a Box2D space.
 		b2Vec2					positionToBox2D( const Vec3& position ) const;
+
+		//! Converts position from scene space to a Box2D space.
+		b2Vec2					positionToBox2D( const Vec2& position ) const;
 
 		//! Converts size from scene space to a Box2D space.
 		f32						sizeToBox2D( f32 value ) const;
