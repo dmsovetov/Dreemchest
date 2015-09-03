@@ -68,6 +68,8 @@ namespace Scene {
 		class Camera;
 		class Rotator2D;
 
+	dcDeclarePtrs( Direction )
+
 	dcDeclarePtrs( SceneObject )
 	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( View )

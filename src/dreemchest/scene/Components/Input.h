@@ -33,38 +33,71 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Moves the scene object with WASD control scheme
-	class WasdInput2D : public SceneComponent {
+	//! Constant direction, can be subclassed to implement a different direction behaviour.
+	class Direction : public RefCounted {
 	public:
 
-								OverrideComponent( WasdInput2D, SceneComponent )
+								//! Constructs the Direction instance
+								Direction( const Vec3& direction = Vec3( 0.0f, 0.0f, 0.0f ) );
+		virtual					~Direction( void ) {}
 
-								//! Constructs WasdInput2D instance.
-								WasdInput2D( f32 speed = 1.0f, Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total )
-									: m_speed( speed ), m_left( left ), m_right( right ), m_up( up ), m_down( down ) {}
+		//! Returns the direction.
+		virtual Vec3			get( void ) const;
+
+	protected:
+
+		Vec3					m_direction;	//!< The direction value.
+	};
+
+	//! Calculates the direction vector from the keyboard input.
+	class DirectionFromKeyboard : public Direction {
+	public:
+
+								//! Constructs the DirectionFromKeyboard instance.
+								DirectionFromKeyboard( Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total );
+
+		//! Calculates the direction.
+		virtual Vec3			get( void ) const;
+
+	private:
+
+		Platform::Input*		m_input;		//!< The input used.
+		Platform::Key::Mapping	m_left;			//!< Left key mapping
+		Platform::Key::Mapping	m_right;		//!< Right key mapping
+		Platform::Key::Mapping	m_up;			//!< Up key mapping
+		Platform::Key::Mapping	m_down;			//!< Down key mapping
+	};
+
+	//! Moves the scene object along the input direction.
+	class MoveInDirection : public SceneComponent {
+	public:
+
+		//! Movement axes.
+		enum Axes {
+			  XY				//!< Move along the XY axes.
+			, XZ				//!< Move along the XZ axes.
+		};
+
+								OverrideComponent( MoveInDirection, SceneComponent )
+
+								//! Constructs MoveInDirection instance.
+								MoveInDirection( Axes axes = XY, f32 speed = 1.0f, const DirectionPtr& direction = DirectionPtr() )
+									: m_axes( axes ), m_speed( speed ), m_direction( direction ) {}
 
 		//! Returns the movement speed.
 		f32						speed( void ) const;
 
-		//! Returns left key mapping.
-		Platform::Key::Mapping	left( void ) const;
+		//! Movement axes.
+		Axes					axes( void ) const;
 
-		//! Return right key mapping.
-		Platform::Key::Mapping	right( void ) const;
-
-		//! Returns up key mapping.
-		Platform::Key::Mapping	up( void ) const;
-
-		//! Returns down key mapping.
-		Platform::Key::Mapping	down( void ) const;
+		//! Returns the movement direction.
+		Vec3					direction( void ) const;
 
 	private:
 
-		f32						m_speed;	//!< Movement speed.
-		Platform::Key::Mapping	m_left;		//!< Move object left key mapping
-		Platform::Key::Mapping	m_right;	//!< Move object right key mapping
-		Platform::Key::Mapping	m_up;		//!< Move object up key mapping
-		Platform::Key::Mapping	m_down;		//!< Move object down key mapping
+		Axes					m_axes;			//!< Movement is performed along this axes.
+		f32						m_speed;		//!< Movement speed.
+		DirectionPtr			m_direction;	//!< Movement direction.
 	};
 
 } // namespace Scene

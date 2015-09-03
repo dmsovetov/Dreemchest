@@ -30,33 +30,30 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** WasdInput2DSystem::WasdInput2DSystem
-WasdInput2DSystem::WasdInput2DSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "WasdInput2D" )
+// ** MoveInDirectionSystem::MoveInDirectionSystem
+MoveInDirectionSystem::MoveInDirectionSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "MoveInDirection" )
 {
-	m_input = Platform::Input::sharedInstance();
+
 }
 
-// ** WasdInput2DSystem::process
-void WasdInput2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, WasdInput2D& input, Transform& transform )
+// ** MoveInDirectionSystem::process
+void MoveInDirectionSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MoveInDirection& move, Transform& transform )
 {
-	// Movement direction
-	Vec3 direction( 0.0f, 0.0f, 0.0f );
+	Vec3 direction = move.direction();
 
-	// Get the movement direction
-		 if( m_input->keyDown( input.left() ) )  direction.x = -1.0f;
-	else if( m_input->keyDown( input.right() ) ) direction.x =  1.0f;
-
-		 if( m_input->keyDown( input.up() ) )    direction.y =  1.0f;
-	else if( m_input->keyDown( input.down() ) )  direction.y = -1.0f;
-
-	// Normalize the direction
-	direction.normalize();
+	DC_BREAK_IF( direction.length() > 1.0f )
 
 	// Scale direction by speed
-	direction = direction * input.speed();
+	direction = direction * move.speed();
 
 	// Update the transform
-	transform.setPosition( transform.position() + direction * dt );
+	switch( move.axes() ) {
+	case MoveInDirection::XY:	transform.setPosition( transform.position() + Vec3( direction.x, direction.y, 0.0f )  * dt );
+								break;
+
+	case MoveInDirection::XZ:	transform.setPosition( transform.position() + Vec3( direction.x, 0.0f, -direction.y ) * dt );
+								break;
+	}
 }
 
 } // namespace Scene

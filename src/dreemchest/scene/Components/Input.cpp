@@ -30,34 +30,66 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** WasdInput2D::speed
-f32 WasdInput2D::speed( void ) const
+// ------------------------------------------------ Direction ------------------------------------------------ //
+
+// ** Direction::Direction
+Direction::Direction( const Vec3& direction ) : m_direction( direction )
+{
+
+}
+
+// ** Direction::get
+Vec3 Direction::get( void ) const
+{
+	return m_direction;
+}
+
+// ------------------------------------------ DirectionFromKeyboard ------------------------------------------ //
+
+// ** DirectionFromKeyboard::DirectionFromKeyboard
+DirectionFromKeyboard::DirectionFromKeyboard( Platform::Key::Mapping left, Platform::Key::Mapping right, Platform::Key::Mapping up, Platform::Key::Mapping down )
+	: m_left( left ), m_right( right ), m_up( up ), m_down( down )
+{
+	m_input = Platform::Input::sharedInstance();
+}
+
+// ** DirectionFromKeyboard::get
+Vec3 DirectionFromKeyboard::get( void ) const
+{
+	// Resulting direction
+	Vec3 direction( 0.0f, 0.0f, 0.0f );
+
+	// Get the movement direction
+		 if( m_input->keyDown( m_left ) )  direction.x = -1.0f;
+	else if( m_input->keyDown( m_right ) ) direction.x =  1.0f;
+
+		 if( m_input->keyDown( m_up ) )    direction.y =  1.0f;
+	else if( m_input->keyDown( m_down ) )  direction.y = -1.0f;
+
+	// Normalize the direction
+	direction.normalize();
+
+	return direction;
+}
+
+// --------------------------------------------- MoveInDirection --------------------------------------------- //
+
+// ** MoveInDirection::speed
+f32 MoveInDirection::speed( void ) const
 {
 	return m_speed;
 }
 
-// ** WasdInput2D::left
-Platform::Key::Mapping WasdInput2D::left( void ) const
+// ** MoveByInput::axes
+MoveInDirection::Axes MoveInDirection::axes( void ) const
 {
-	return m_left;
+	return m_axes;
 }
 
-// ** WasdInput2D::right
-Platform::Key::Mapping WasdInput2D::right( void ) const
+// ** MoveInDirection::direction
+Vec3 MoveInDirection::direction( void ) const
 {
-	return m_right;
-}
-
-// ** WasdInput2D::up
-Platform::Key::Mapping WasdInput2D::up( void ) const
-{
-	return m_up;
-}
-
-// ** WasdInput2D::down
-Platform::Key::Mapping WasdInput2D::down( void ) const
-{
-	return m_down;
+	return m_direction->get();
 }
 
 } // namespace Scene
