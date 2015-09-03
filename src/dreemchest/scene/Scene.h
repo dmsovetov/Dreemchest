@@ -87,6 +87,8 @@ namespace Scene {
 	dcDeclarePtrs( AssetTexture )
 	dcDeclarePtrs( AssetMesh )
 
+	dcDeclarePtrs( Box2DPhysics )
+
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {
 	public:
