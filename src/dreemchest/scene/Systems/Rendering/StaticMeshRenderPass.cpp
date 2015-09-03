@@ -35,7 +35,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshRenderPass::StaticMeshRenderPass
-StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_renderOperations( 2000 )
+StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers ), m_rvm( 2000 )
 {
 	m_shaders[ShaderInvalid] = m_renderers.m_hal->createShader(
 		CODE(
@@ -80,8 +80,8 @@ StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Rende
 // ** StaticMeshRenderPass::begin
 bool StaticMeshRenderPass::begin( u32 currentTime )
 {
-	// Clean the allocated render operations
-	m_renderOperations.reset();
+	// Clean the RVM
+	m_rvm.clear();
 	return true;
 }
 
@@ -91,31 +91,8 @@ void StaticMeshRenderPass::end( void )
 	// Get the HAL reference
 	Renderer::HalPtr& hal = m_renderers.m_hal;
 
-	// Sort the emitted render operations
-	m_frame.m_renderOperations.sort( sortByShaderTextureMesh );
-
-	// Perform all rendering operations
-	for( EmittedRenderOps::const_iterator i = m_frame.m_renderOperations.begin(), end = m_frame.m_renderOperations.end(); i != end; ++i ) {
-		const RenderOp* rop = *i;
-
-		// Set the shader
-		setShader( rop );
-
-		// Set the texture
-		if( rop->texture != m_frame.m_texture ) {
-			hal->setTexture( 0, rop->texture );
-			m_frame.m_texture = rop->texture;
-		}
-
-		// Set the vertex buffer
-		if( rop->vertexBuffer != m_frame.m_vertexBuffer ) {
-			hal->setVertexBuffer( rop->vertexBuffer );
-			m_frame.m_vertexBuffer = rop->vertexBuffer;
-		}
-
-		// Render the mesh
-		hal->renderIndexed( Renderer::PrimTriangles, rop->indexBuffer, 0, rop->indexBuffer->size() );
-	}
+	// Run accumulated commands
+	m_rvm.flush( hal );
 
 	// Set the default shader
 	hal->setShader( NULL );
@@ -130,46 +107,6 @@ void StaticMeshRenderPass::end( void )
 
 	// Enable the depth test back
 	hal->setDepthTest( true, Renderer::Less );
-
-	// Clean the list of emitted render operations
-	m_frame.clear();
-}
-
-// ** StaticMeshRenderPass::setShader
-void StaticMeshRenderPass::setShader( const RenderOp* rop )
-{
-	Renderer::HalPtr&   hal    = m_renderers.m_hal;
-	Renderer::ShaderPtr shader;
-
-	if( m_frame.m_materialShader != rop->shader ) {
-		switch( rop->shader ) {
-		case Material::Transparent:	hal->setBlendFactors( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
-									break;
-
-		case Material::Additive:	hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
-									break;
-
-		default:					hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
-		}
-
-		shader = rop->shader != Material::Unknown ? m_shaders[ShaderSolid] : m_shaders[ShaderInvalid];
-		hal->setShader( shader );
-		m_frame.m_materialShader = rop->shader;
-	}
-
-	u32 location = 0;
-
-	if( location = shader->findUniformLocation( "u_mvp" ) ) {
-		shader->setMatrix( location,  rop->mvp );
-	}
-
-	if( location = shader->findUniformLocation( "u_texture" ) ) {
-		shader->setInt( location, 0 );
-	}
-	
-	if( location = shader->findUniformLocation( "u_color" ) ) {
-		shader->setVec4( location, Vec4( rop->diffuse->r, rop->diffuse->g, rop->diffuse->b, rop->diffuse->a ) );
-	}
 }
 
 // ** StaticMeshRenderPass::process
@@ -194,7 +131,7 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		const MaterialPtr& material = staticMesh.material( i );
 
 		// Emit a new render operation
-		RenderOp* rop = emitRenderOp();
+		Rvm::Command* rop = m_rvm.emit();
 
 		// Get the texture data from an asset
 		AssetTexturePtr textueData = material.valid() ? material->texture( Material::Diffuse )->data() : AssetTexturePtr();
@@ -203,31 +140,10 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		rop->mvp			= mvp;
 		rop->indexBuffer	= meshData->indexBuffers[i].get();
 		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
-		rop->shader			= material.valid() ? material->shader() : Material::Unknown;
+		rop->shader			= m_shaders[material.valid() ? material->shader() : Material::Unknown].get();
 		rop->texture		= textueData.valid() ? textueData->texture.get() : NULL;
 		rop->diffuse		= material.valid() ? &material->color( Material::Diffuse ) : NULL;
 	}
-}
-
-// ** StaticMeshRenderPass::emitRenderOp
-StaticMeshRenderPass::RenderOp* StaticMeshRenderPass::emitRenderOp( void )
-{
-	RenderOp* rop = m_renderOperations.allocate();
-	DC_BREAK_IF( rop == NULL )
-
-	m_frame.m_renderOperations.push_back( rop );
-
-	return rop;
-}
-
-// ** StaticMeshRenderPass::sortByShaderTextureMesh
-bool StaticMeshRenderPass::sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b )
-{
-	if( a->shader != b->shader ) return a->shader < b->shader;
-	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
-	if( a->texture != b->texture ) return a->texture > b->texture;
-
-	return false;
 }
 
 } // namespace Scene

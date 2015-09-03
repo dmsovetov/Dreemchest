@@ -28,6 +28,7 @@
 #define __DC_Scene_RenderPass_H__
 
 #include "RenderSystem.h"
+#include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,22 +38,22 @@ namespace Scene {
 	class RenderPassBase : public Ecs::EntitySystem {
 	public:
 
-								//! Constructs RenderPassBase instance
-								RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
-									: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
+									//! Constructs RenderPassBase instance
+									RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
+										: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
 
 		//! Renders the pass.
-		void					render( u32 currentTime, f32 dt, const Matrix4& viewProjection );
+		void						render( u32 currentTime, f32 dt, const Matrix4& viewProjection );
 
 	protected:
 
 		//! Processes the entity.
-		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
 	protected:
 
-		Renderers				m_renderers;	//!< Rendering HAL.
-		Matrix4					m_viewProj;		//!< The view-projection matrix.
+		Renderers					m_renderers;		//!< Rendering HAL.
+		Matrix4						m_viewProj;			//!< The view-projection matrix.
 	};
 
 	//! Generic render pass to subclass user-defined render passes from
@@ -60,17 +61,17 @@ namespace Scene {
 	class RenderPass : public RenderPassBase {
 	public:
 
-								//! Constructs RenderPass instance
-								RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-									: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers ) {}
+									//! Constructs RenderPass instance
+									RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers )
+										: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers ) {}
 
 	private:
 
 		//! Extracts the components from entity.
-		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
 		//! This method should be overridden in subclass
-		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform );
+		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform );
 	};
 
 	// ** RenderPass::process
@@ -95,17 +96,17 @@ namespace Scene {
 	class RenderPass2D : public RenderPass<TComponent> {
 	public:
 
-								//! Constructs RenderPass2D instance
-								RenderPass2D( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-									: RenderPass( entities, name, renderers ) {}
+									//! Constructs RenderPass2D instance
+									RenderPass2D( Ecs::Entities& entities, const String& name, const Renderers& renderers )
+										: RenderPass( entities, name, renderers ) {}
 
 	protected:
 
 		//! Sets the view-projection matrix for 2D rendering.
-		virtual bool			begin( u32 currentTime );
+		virtual bool				begin( u32 currentTime );
 
 		//! Flushes the generated 2D mesh.
-		virtual void			end( void );
+		virtual void				end( void );
 	};
 
 	// ** RenderPass2D::begin

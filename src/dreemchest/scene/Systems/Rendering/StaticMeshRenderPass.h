@@ -49,16 +49,6 @@ namespace Scene {
 			, TotalShaderTypes
 		};
 
-		//! Rendering operation emitted by scene object processing.
-		struct RenderOp {
-			u32						shader;			//!< Material shader.
-			Renderer::VertexBuffer*	vertexBuffer;	//!< Vertex buffer to be used for rendering.
-			Renderer::IndexBuffer*	indexBuffer;	//!< Index buffer to be used for rendering.
-			Renderer::Texture*		texture;		//!< Texture to be used for rendering.
-			const Rgba*				diffuse;		//!< Diffuse color.
-			Matrix4					mvp;			//!< Model/view/projection matrix.
-		};
-
 		//! Renders a single entity with a mesh
 		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform );
 
@@ -68,40 +58,10 @@ namespace Scene {
 		//! Called every frame after all entities has been rendered.
 		virtual void				end( void );
 
-		//! Emits a new render operation.
-		RenderOp*					emitRenderOp( void );
-
-		//! Sets the shader for current render operation.
-		void						setShader( const RenderOp* rop );
-
-		//! Sorts render operations by shader used, then by texture, then by mesh data.
-		static bool					sortByShaderTextureMesh( const RenderOp* a, const RenderOp* b );
-
 	protected:
-
-		//! Render operations list container
-		typedef List<const RenderOp*> EmittedRenderOps;
-
-		//! Internal structure to hold current rendering state.
-		struct RenderedFrame {
-			Renderer::VertexBuffer*	m_vertexBuffer;			//!< Active vertex buffer.
-			Renderer::Texture*		m_texture;				//!< Active texture
-			u32						m_materialShader;		//!< Active material shader
-			EmittedRenderOps		m_renderOperations;		//!< List of emitted render operations.
-
-			//! Clears the frame
-			void clear( void )
-			{
-				m_vertexBuffer = NULL;
-				m_texture = NULL;
-				m_materialShader = -1;
-				m_renderOperations.clear();
-			}
-		};
 		
+		Rvm							m_rvm;							//!< The rendering virtual machine that performs rendering.
 		Renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
-		ArrayAllocator<RenderOp>	m_renderOperations;				//!< Array allocator used to allocated render operations.
-		RenderedFrame				m_frame;						//!< The frame to be rendered.
 	};
 
 } // namespace Scene
