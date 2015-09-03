@@ -41,6 +41,11 @@ namespace Scene {
 		OverrideComponent( RenderUnlitMeshes, SceneComponent )
 	};
 
+	//! This component is attached to a camera to render wireframe meshes.
+	class RenderWireframeMeshes : public SceneComponent {
+		OverrideComponent( RenderWireframeMeshes, SceneComponent )
+	};
+
 	//! This component is attached to a camera to render sprites.
 	class RenderSprites : public SceneComponent {
 		OverrideComponent( RenderSprites, SceneComponent )

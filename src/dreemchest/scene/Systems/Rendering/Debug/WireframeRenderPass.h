@@ -24,32 +24,34 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderers_H__
-#define __DC_Scene_Renderers_H__
+#ifndef __DC_Scene_Systems_WireframeRenderPass_H__
+#define __DC_Scene_Systems_WireframeRenderPass_H__
 
-#include "StaticMeshRenderPass.h"
-#include "SpriteRenderPass.h"
-#include "Debug/SpriteTransformRenderPass.h"
-#include "Debug/WireframeRenderPass.h"
+#include "../StaticMeshRenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Define the unlit mesh render system
-	typedef SinglePassRenderer<RenderUnlitMeshes, StaticMeshRenderPass> UnlitMeshRenderer;
+	//! Renders the wireframes of static meshes
+	class WireframeRenderPass : public StaticMeshRenderPass {
+	public:
 
-	//! Define the wireframe mesh render system
-	typedef SinglePassRenderer<RenderWireframeMeshes, WireframeRenderPass> WireframeMeshRenderer;
+									//! Constructs the WireframeRenderPass instance.
+									WireframeRenderPass( Ecs::Entities& entities, const Renderers& renderers )
+										: StaticMeshRenderPass( entities, renderers ) {}
 
-	//! Define the sprite rendering system
-	typedef SinglePassRenderer<RenderSprites, SpriteRenderPass> SpriteRenderer;
+	private:
 
-	//! Define the sprite position renderer
-	typedef SinglePassRenderer<RenderSpriteTransform, SpriteTransformRenderPass> SpriteTransformRenderer;
+		//! Called every frame before any entites are rendered.
+		virtual bool				begin( u32 currentTime );
+
+		//! Called every frame after all entities has been rendered.
+		virtual void				end( void );
+	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Renderers_H__    */
+#endif    /*    !__DC_Scene_Systems_WireframeRenderPass_H__    */

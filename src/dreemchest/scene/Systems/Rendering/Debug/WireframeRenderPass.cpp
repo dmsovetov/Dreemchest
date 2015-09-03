@@ -24,32 +24,41 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderers_H__
-#define __DC_Scene_Renderers_H__
-
-#include "StaticMeshRenderPass.h"
-#include "SpriteRenderPass.h"
-#include "Debug/SpriteTransformRenderPass.h"
-#include "Debug/WireframeRenderPass.h"
+#include "WireframeRenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Define the unlit mesh render system
-	typedef SinglePassRenderer<RenderUnlitMeshes, StaticMeshRenderPass> UnlitMeshRenderer;
+// ** WireframeRenderPass::begin
+bool WireframeRenderPass::begin( u32 currentTime )
+{
+	if( !StaticMeshRenderPass::begin( currentTime ) ) {
+		return false;
+	}
 
-	//! Define the wireframe mesh render system
-	typedef SinglePassRenderer<RenderWireframeMeshes, WireframeRenderPass> WireframeMeshRenderer;
+	// Set wireframe polygon mode
+	m_renderers.m_hal->setPolygonMode( Renderer::PolygonWire );
 
-	//! Define the sprite rendering system
-	typedef SinglePassRenderer<RenderSprites, SpriteRenderPass> SpriteRenderer;
+	// Set the additive blending
+	m_renderers.m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 
-	//! Define the sprite position renderer
-	typedef SinglePassRenderer<RenderSpriteTransform, SpriteTransformRenderPass> SpriteTransformRenderer;
+	return true;
+}
+
+// ** WireframeRenderPass::end
+void WireframeRenderPass::end( void )
+{
+	// Set the depth testing function
+	m_renderers.m_hal->setDepthTest( true, Renderer::LessEqual );
+
+	// Flush emitted render operations
+	StaticMeshRenderPass::end();
+
+	// Set fill polygon mode
+	m_renderers.m_hal->setPolygonMode( Renderer::PolygonFill );
+}
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_Renderers_H__    */
