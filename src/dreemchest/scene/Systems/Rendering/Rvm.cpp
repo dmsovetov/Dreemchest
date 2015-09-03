@@ -75,6 +75,20 @@ void Rvm::flush( Renderer::HalPtr hal )
 		// Render the mesh
 		hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
 	}
+
+	// Set the default shader
+	hal->setShader( NULL );
+
+	// Set the default vertex buffer
+	hal->setVertexBuffer( NULL );
+
+	// Set default textures
+	for( s32 i = 0; i < 8; i++ ) {
+		hal->setTexture( i, NULL );
+	}
+
+	// Enable the depth test back
+	hal->setDepthTest( true, Renderer::Less );
 }
 
 // ** Rvm::clear

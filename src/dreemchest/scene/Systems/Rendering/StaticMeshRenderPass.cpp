@@ -88,25 +88,8 @@ bool StaticMeshRenderPass::begin( u32 currentTime )
 // ** StaticMeshRenderPass::end
 void StaticMeshRenderPass::end( void )
 {
-	// Get the HAL reference
-	Renderer::HalPtr& hal = m_renderers.m_hal;
-
 	// Run accumulated commands
-	m_rvm.flush( hal );
-
-	// Set the default shader
-	hal->setShader( NULL );
-
-	// Set the default vertex buffer
-	hal->setVertexBuffer( NULL );
-
-	// Set default textures
-	for( s32 i = 0; i < 8; i++ ) {
-		hal->setTexture( i, NULL );
-	}
-
-	// Enable the depth test back
-	hal->setDepthTest( true, Renderer::Less );
+	m_rvm.flush( m_renderers.m_hal );
 }
 
 // ** StaticMeshRenderPass::process

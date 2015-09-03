@@ -59,11 +59,8 @@ namespace Scene {
 		//! Emits a new render operation.
 		Command*						emit( void );
 
-				//! Sets the shader for current render operation.
-	//	void						setShader( const RenderOp* rop );
-
 		//! Sorts render operations by shader used, then by texture, then by mesh data.
-		static bool					sortByShaderTextureMesh( const Command* a, const Command* b );
+		static bool						sortByShaderTextureMesh( const Command* a, const Command* b );
 
 	private:
 
