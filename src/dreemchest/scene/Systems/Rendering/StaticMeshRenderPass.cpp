@@ -82,10 +82,6 @@ bool StaticMeshRenderPass::begin( u32 currentTime )
 {
 	// Clean the allocated render operations
 	m_renderOperations.reset();
-
-	// Disable the depth test for 2d rendering
-	m_renderers.m_hal->setDepthTest( true, Renderer::Always );
-
 	return true;
 }
 
