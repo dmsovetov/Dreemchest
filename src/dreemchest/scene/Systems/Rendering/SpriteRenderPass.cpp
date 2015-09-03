@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** SpriteRenderPass::SpriteRenderPass
-SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "SpriteRenderPass", renderers )
+SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass2D( entities, "SpriteRenderPass", renderers )
 {
 }
 
@@ -54,19 +54,6 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 
 	// Render oriented quad
 	m_renderers.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), image->width() * 0.5f, image->height() * 0.5f, up, side, sprite.color() );
-}
-
-// ** SpriteRenderPass::begin
-bool SpriteRenderPass::begin( u32 currentTime )
-{
-	m_renderers.m_renderer2d->begin( m_viewProj );
-	return true;
-}
-
-// ** SpriteRenderPass::end
-void SpriteRenderPass::end( void )
-{
-	m_renderers.m_renderer2d->end();
 }
 
 } // namespace Scene

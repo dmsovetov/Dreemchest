@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! The sprite rendering pass
-	class SpriteRenderPass : public RenderPass<Sprite> {
+	class SpriteRenderPass : public RenderPass2D<Sprite> {
 	public:
 
 									//! Constructs the SpriteRenderPass instance.
@@ -44,12 +44,6 @@ namespace Scene {
 
 		//! Renders a single entity with a sprite
 		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
-
-		//! Sets the view-projection matrix for 2D rendering.
-		virtual bool				begin( u32 currentTime );
-
-		//! Flushes the generated 2D mesh.
-		virtual void				end( void );
 	};
 
 } // namespace Scene

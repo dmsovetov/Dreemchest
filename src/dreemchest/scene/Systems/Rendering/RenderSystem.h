@@ -156,11 +156,44 @@ namespace Scene {
 		process( currentTime, dt, *sceneObject, *entity->get<TComponent>(), *entity->get<Transform>() );
 	}
 
-	// ** RenderPass::pricess
+	// ** RenderPass::process
 	template<typename TComponent>
 	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform )
 	{
 		DC_BREAK
+	}
+
+	//! Generic render pass to draw the 2D graphics
+	template<typename TComponent>
+	class RenderPass2D : public RenderPass<TComponent> {
+	public:
+
+								//! Constructs RenderPass2D instance
+								RenderPass2D( Ecs::Entities& entities, const String& name, const Renderers& renderers )
+									: RenderPass( entities, name, renderers ) {}
+
+	protected:
+
+		//! Sets the view-projection matrix for 2D rendering.
+		virtual bool			begin( u32 currentTime );
+
+		//! Flushes the generated 2D mesh.
+		virtual void			end( void );
+	};
+
+	// ** RenderPass2D::begin
+	template<typename TComponent>
+	bool RenderPass2D<TComponent>::begin( u32 currentTime )
+	{
+		m_renderers.m_renderer2d->begin( m_viewProj );
+		return true;
+	}
+
+	// ** RenderPass2D::end
+	template<typename TComponent>
+	void RenderPass2D<TComponent>::end( void )
+	{
+		m_renderers.m_renderer2d->end();
 	}
 
 } // namespace Scene
