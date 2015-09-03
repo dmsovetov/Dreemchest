@@ -61,7 +61,10 @@ f32 Follow::springForce( void ) const
 // ** Transform::matrix
 Matrix4 Transform::matrix( void ) const
 {
-	Matrix4 T = Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
+	Quat    rx = Quat::rotateAroundAxis( m_rotation.x, Vec3( 1.0f, 0.0f, 0.0f ) );
+	Quat    ry = Quat::rotateAroundAxis( m_rotation.y, Vec3( 0.0f, 1.0f, 0.0f ) );
+	Quat    rz = Quat::rotateAroundAxis( m_rotation.z, Vec3( 0.0f, 0.0f, 1.0f ) );
+	Matrix4 T  = Matrix4::translation( m_position ) * (rx * ry * rz) * Matrix4::scale( m_scale );
 
 	if( m_parent != NULL ) {
 		T = m_parent->matrix() * T;
@@ -119,7 +122,7 @@ void Transform::setY( f32 value )
 }
 
 // ** Transform::rotation
-const Quat& Transform::rotation( void ) const
+const Vec3& Transform::rotation( void ) const
 {
 	return m_rotation;
 }
@@ -127,37 +130,37 @@ const Quat& Transform::rotation( void ) const
 // ** Transform::rotationX
 f32 Transform::rotationX( void ) const
 {
-	return -m_rotation.euler().x;
+	return m_rotation.x;
 }
 
 // ** Transform::setRotationX
 void Transform::setRotationX( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 1, 0, 0 ) );
+	m_rotation.x = value;
 }
 
 // ** Transform::rotationY
 f32 Transform::rotationY( void ) const
 {
-	return -m_rotation.euler().y;
+	return m_rotation.y;
 }
 
 // ** Transform::setRotationY
 void Transform::setRotationY( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 1, 0 ) );
+	m_rotation.y = value;
 }
 
 // ** Transform::rotationZ
 f32 Transform::rotationZ( void ) const
 {
-	return -m_rotation.euler().z;
+	return m_rotation.z;
 }
 
 // ** Transform::setRotationZ
 void Transform::setRotationZ( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0, 0, -1 ) );
+	m_rotation.z = value;
 }
 
 // ** Transform::scaleX
@@ -196,12 +199,24 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
-// ------------------------------------------ Rotator2D ------------------------------------------ //
+// ------------------------------------------ Rotor ------------------------------------------ //
 
-// ** Rotator2D::speed
-f32 Rotator2D::speed( void ) const
+// ** Rotor::x
+f32 Rotor::x( void ) const
 {
-	return m_speed;
+	return m_x;
+}
+
+// ** Rotor::y
+f32 Rotor::y( void ) const
+{
+	return m_y;
+}
+
+// ** Rotor::z
+f32 Rotor::z( void ) const
+{
+	return m_z;
 }
 
 } // namespace Scene

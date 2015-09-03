@@ -41,7 +41,7 @@ namespace Scene {
 									
 								//! Constructs Transform instance.
 								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
-									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0.0f, 0.0f, -1.0f ) ) ), m_scale( sx, sy, 1.0f ) {}
+									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( 0.0f, 0.0f, rotation ), m_scale( sx, sy, 1.0f ) {}
 
 								//! Constructs Transform instance.
 								Transform( f32 x, f32 y, f32 z, const TransformWPtr& parent = TransformWPtr() )
@@ -81,7 +81,7 @@ namespace Scene {
 		void					setZ( f32 value );
 
 		//! Returns the transform rotation quaternion.
-		const Quat&				rotation( void ) const;
+		const Vec3&				rotation( void ) const;
 
 		//! Returns transform rotation around the X axis.
 		f32						rotationX( void ) const;
@@ -123,26 +123,34 @@ namespace Scene {
 
 		TransformWPtr			m_parent;	//!< Parent transform.
 		Vec3					m_position;	//!< Object position.
-		Quat					m_rotation;	//!< Object rotation.
+		Vec3					m_rotation;	//!< Object rotation.
 		Vec3					m_scale;	//!< Object scale.
 	};
 
-	//! Rotates the 2D transform
-	class Rotator2D : public SceneComponent {
+	//! Rotates the transform
+	class Rotor : public SceneComponent {
 	public:
 
-								OverrideComponent( Rotator2D, SceneComponent )
+								OverrideComponent( Rotor, SceneComponent )
 
-								//! Constructs the Rotator2D instance.
-								Rotator2D( f32 speed = 1.0f )
-									: m_speed( speed ) {}
+								//! Constructs the Rotor instance.
+								Rotor( f32 x = 0.0f, f32 y = 0.0f, f32 z = 0.0f )
+									: m_x( x ), m_y( y ), m_z( z ) {}
 
-		//! Returns the rotation speed.
-		f32						speed( void ) const;
+		//! Returns the X rotation speed.
+		f32						x( void ) const;
+
+		//! Returns the Y rotation speed.
+		f32						y( void ) const;
+
+		//! Returns the Z rotation speed.
+		f32						z( void ) const;
 
 	private:
 
-		f32						m_speed;	//!< The rotation speed.
+		f32						m_x;	//!< The X rotation speed.
+		f32						m_y;	//!< The Y rotation speed.
+		f32						m_z;	//!< The Z rotation speed.
 	};
 
 	//! Follows the transform
