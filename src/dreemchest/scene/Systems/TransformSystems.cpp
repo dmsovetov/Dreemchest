@@ -71,12 +71,14 @@ void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, T
 	follow.setInternal<Internal>( DC_NEW Internal );
 }
 
-// ----------------------------------------------- Rotator2DSystem ----------------------------------------------- //
+// ----------------------------------------------- RotorSystem ----------------------------------------------- //
 
-// ** Rotator2DSystem::process
-void Rotator2DSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotator2D& rotator, Transform& transform )
+// ** RotorSystem::process
+void RotorSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotor& rotor, Transform& transform )
 {
-	transform.setRotationZ( transform.rotationZ() + rotator.speed() * dt );
+	transform.setRotationX( transform.rotationX() + rotor.x() * dt );
+	transform.setRotationY( transform.rotationY() + rotor.y() * dt );
+	transform.setRotationZ( transform.rotationZ() + rotor.z() * dt );
 }
 
 } // namespace Scene

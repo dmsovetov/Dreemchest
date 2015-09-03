@@ -66,7 +66,7 @@ namespace Scene {
 		class StaticMesh;
 		class Sprite;
 		class Camera;
-		class Rotator2D;
+		class Rotor;
 
 	dcDeclarePtrs( Direction )
 

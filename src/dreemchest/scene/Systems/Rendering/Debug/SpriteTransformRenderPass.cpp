@@ -38,14 +38,19 @@ SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, c
 // ** SpriteTransformRenderPass::process
 void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
 {
-	const Quat& rotation = transform.rotation();
+	// Get the rotation
+	f32  angle = radians( transform.rotationZ() );
+	f32  s	   = sinf( angle );
+	f32  c	   = cosf( angle );
 
-	f32  x	  = transform.x();
-	f32  y	  = transform.y();
-	Vec3 left = rotation.rotate( Vec3( 10, 0, 0 ) );
-	Vec3 up   = rotation.rotate( Vec3( 0, 10, 0 ) );
+	// Calculate the basis vectors from rotation
+	Vec2 up   = Vec2( s, c );
+	Vec2 side = Vec2( up.y, -up.x );
 
-	m_renderers.m_renderer2d->line( x, y, x + left.x, y + left.y, Rgba( 1.0f, 0.0f, 0.0f ) );
+	f32  x = transform.x();
+	f32  y = transform.y();
+
+	m_renderers.m_renderer2d->line( x, y, x + side.x, y + side.y, Rgba( 1.0f, 0.0f, 0.0f ) );
 	m_renderers.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
 }
 
