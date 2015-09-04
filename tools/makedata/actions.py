@@ -24,14 +24,19 @@
 #
 #################################################################################
 
-import shutil, os, struct
-from PIL import Image
+import shutil, os, struct, fbx
+from PIL import Image, ImageOps
 
 # action
 class action:
     # ctor
     def __init__(self, item, source, dest):
         self.item, self.source, self.dest = item, source, dest
+
+    # call
+    def __call__(self, type):
+        print type, '<=', self.source
+        self.item['type'] = type
 
 # copy
 class copy(action):
@@ -52,13 +57,14 @@ class image(action):
 
     # call
     def __call__(self):
+        action.__call__(self, 'image')
+
         # Load image from file
         img = Image.open(self.source)
 
         # Update asset info
         self.item['width'] = img.size[0]
         self.item['height'] = img.size[1]
-        self.item['type'] = 'image'
 
         return img
 
@@ -94,6 +100,7 @@ class convert_to_raw(image):
         width = img.size[0]
         height = img.size[1]
         channels = 3 if img.mode == 'RGB' else 4
+        img = ImageOps.flip(img)
 
         self.item['format'] = 'raw'
 
@@ -102,3 +109,115 @@ class convert_to_raw(image):
             data = struct.pack('HHB%us' % len(pixels), width, height, channels, pixels)
             fh.write(data)
             fh.close()
+
+# convert_fbx
+class convert_fbx(action):
+    # ctor
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
+
+    # call
+    def __call__(self):
+        action.__call__(self, 'mesh')
+
+        manager  = fbx.FbxManager.Create()
+        importer = fbx.FbxImporter.Create(manager, 'Importer')
+        status   = importer.Initialize(self.source)
+
+        if status == False:
+           print 'ERROR:', self.source
+           return
+
+        scene = fbx.FbxScene.Create(manager, 'Scene')
+        importer.Import(scene)
+        importer.Destroy()
+
+        converter = fbx.FbxGeometryConverter(manager)
+        converter.Triangulate(scene, True)
+        converter.SplitMeshesPerMaterial(scene, True)
+
+        # processEachMesh
+        def processEachMesh(node, callback):
+            # Check if node has a mesh and than extract it
+            attribute = node.GetNodeAttribute()
+
+            if attribute and attribute.ClassId == fbx.FbxMesh.ClassId:
+                mesh        = node.GetMesh()
+                geometry    = node.GetGeometry()
+
+                for i in range(0, node.GetNodeAttributeCount()):
+                    attribute = node.GetNodeAttributeByIndex(i)
+
+                    if attribute.ClassId == fbx.FbxMesh.ClassId:
+                        callback(attribute)
+
+            # Process each node child
+            for i in range(0, node.GetChildCount()):
+                processEachMesh(node.GetChild(i), callback)
+
+        # get_uv_set
+        def get_uv_set(mesh):
+            result = []
+
+            for i in range(0, mesh.GetLayerCount()):
+                result.append(mesh.GetLayer(i).GetUVSets()[0].GetName())
+
+            return result
+
+        # class Vertex
+        class Vertex:
+            def __init__(self, pos, normal, uv0, uv1):
+                self.pos = pos
+                self.normal = normal
+                self.uv0 = uv0
+                self.uv1 = uv1
+
+        # load_mesh
+        def load_mesh(mesh):
+            controlPointsCount = mesh.GetControlPointsCount()
+            controlPoints      = mesh.GetControlPoints()
+
+            uv = get_uv_set(mesh)
+
+            for i in range(0, mesh.GetPolygonCount()):
+                polygonSize = mesh.GetPolygonSize(i)
+                assert polygonSize == 3
+
+                for j in range(0, polygonSize):
+                    controlPointIndex = mesh.GetPolygonVertex(i, j)
+                    if controlPointIndex > controlPointsCount:
+                        continue
+
+                    uv0     = fbx.FbxVector2()
+                    uv1     = fbx.FbxVector2()
+                    normal  = fbx.FbxVector4()
+                    pos     = controlPoints[controlPointIndex]
+
+                    mesh.GetPolygonVertexNormal(i, j, normal)
+                    mesh.GetPolygonVertexUV(i, j, uv[0], uv0)
+
+                    if len(uv) > 1:
+                        mesh.GetPolygonVertexUV(i, j, uv[1], uv1)
+
+                    load_mesh.vertices.append(Vertex(pos, normal, uv0, uv1))
+                    load_mesh.indices.append(len(load_mesh.vertices) - 1)
+
+        load_mesh.indices  = []
+        load_mesh.vertices = []
+
+        processEachMesh(scene.GetRootNode(), load_mesh)
+
+        vertices = load_mesh.vertices
+        indices  = load_mesh.indices
+
+        with open(self.dest, 'wb') as fh:
+            Header = struct.Struct('I I')
+            Vertex = struct.Struct('f f f f f f f f f f')
+            Index  = struct.Struct('H')
+            fh.write(Header.pack(len(vertices), len(indices)))
+
+            for v in vertices:
+                fh.write(Vertex.pack(v.pos[0], v.pos[1], v.pos[2], v.normal[0], v.normal[1], v.normal[2], v.uv0[0], v.uv0[1], v.uv1[0], v.uv1[1]))
+
+            for i in indices:
+                fh.write(Index.pack(i))
