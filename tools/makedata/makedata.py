@@ -26,7 +26,7 @@
 #
 #################################################################################
 
-import argparse, time, files, os, actions, tasks
+import argparse, time, files, os, actions, tasks, project
 
 # substitute_variables
 def substitute_variables( args, *variables ):
@@ -75,14 +75,23 @@ class ExportError(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
+# Imports the project
+def import_project(args, source, output):
+    # Parse project assets
+    assets = project.parse_assets(source)
+    
+    # Import scenes
+    project.import_scenes(assets, source, output)
+
+    # Import assets
+    project.import_assets(assets, source, output)
+
 # Builds the data to a specified folder
 def build(args, source, output):
-    if not os.path.exists(output):
-        os.makedirs(output)
-
     rules = {
             '*.tga': TextureFormat.convert_to(args.texFormat)
         ,   '*.png': TextureFormat.convert_to(args.texFormat)
+        ,   '*.fbx': actions.convert_fbx
         }
 
     queue    = tasks.create(args.workers)
@@ -102,7 +111,7 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser( description = 'Dreemchest make data tool', formatter_class = argparse.ArgumentDefaultsHelpFormatter )
 
-    parser.add_argument( "-a",  "--action",      type = str,  default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install"] )
+    parser.add_argument( "-a",  "--action",      type = str,  default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install", "import"] )
     parser.add_argument( "-s",  "--source",      type = str,  required = True,                               help = "Input resource path." )
     parser.add_argument( "-o",  "--output",      type = str,  required = True,                               help = "Output path." )
     parser.add_argument( "-tc", "--compression", type = str,  default  = TextureCompression.Disabled,        help = "Hardware texture compression." )
@@ -121,12 +130,18 @@ if __name__ == "__main__":
     if not os.path.exists(args.source):
         raise AssertionError('the input folder does not exist')
 
+    # Create the output folder
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+
     print '---', 'Building [', args.platform, '] data package to [', args.output, '] with [', args.compression, '] texture compression', '---'
     start = time.time()
 
     try:
         if args.action == 'build':
             build(args, args.source, args.output)
+        elif args.action == 'import':
+            import_project(args, args.source, args.output)
     except ExportError as e:
         print e.message
 
