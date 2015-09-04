@@ -50,11 +50,11 @@ namespace Scene {
 
 		//! Material shader.
 		enum Shader {
-			Unknown,
-			Solid,
-			Transparent,
-			Additive,
-			TotalMaterialShaders
+			  Null
+			, Solid
+			, Transparent
+			, Additive
+			, TotalMaterialShaders
 		};
 
 		//! Returns material shader.
