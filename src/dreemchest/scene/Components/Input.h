@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_Component_Input_H__
 #define __DC_Scene_Component_Input_H__
 
-#include "Component.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -69,7 +69,7 @@ namespace Scene {
 	};
 
 	//! Moves the scene object along the input direction.
-	class MoveInDirection : public SceneComponent {
+	class MoveInDirection : public Component {
 	public:
 
 		//! Movement axes.
@@ -78,7 +78,7 @@ namespace Scene {
 			, XZ				//!< Move along the XZ axes.
 		};
 
-								OverrideComponent( MoveInDirection, SceneComponent )
+								OverrideComponent( MoveInDirection, Component )
 
 								//! Constructs MoveInDirection instance.
 								MoveInDirection( Axes axes = XY, f32 speed = 1.0f, const DirectionPtr& direction = DirectionPtr() )

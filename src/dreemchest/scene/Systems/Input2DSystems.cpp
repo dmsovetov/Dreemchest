@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** MoveInDirectionSystem::MoveInDirectionSystem
-MoveInDirectionSystem::MoveInDirectionSystem( Ecs::Entities& entities ) : SceneSystem2( entities, "MoveInDirection" )
+MoveInDirectionSystem::MoveInDirectionSystem( Ecs::Entities& entities ) : EntityWithComponentsSystem2( entities, "MoveInDirection" )
 {
 
 }

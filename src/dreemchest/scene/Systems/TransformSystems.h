@@ -27,8 +27,7 @@
 #ifndef __DC_Scene_Systems_Transofrm_H__
 #define __DC_Scene_Systems_Transofrm_H__
 
-#include "SceneSystem.h"
-
+#include "../Scene.h"
 #include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
@@ -36,24 +35,24 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! The RotorSystem system
-	class RotorSystem : public SceneSystem2<Rotor, Transform> {
+	class RotorSystem : public Ecs::EntityWithComponentsSystem2<Rotor, Transform> {
 	public:
 
 							//! Constructs a RotorSystem instance.
 							RotorSystem( Ecs::Entities& entities )
-								: SceneSystem2( entities, "RotorSystem" ) {}
+								: EntityWithComponentsSystem2( entities, "RotorSystem" ) {}
 
 		//! Rotates a single entity by a rotor
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotor& rotator, Transform& transform );
 	};
 
 	//! The following system
-	class FollowSystem : public SceneSystem2<Follow, Transform> {
+	class FollowSystem : public Ecs::EntityWithComponentsSystem2<Follow, Transform> {
 	public:
 
 							//! Constructs a FollowSystem instance.
 							FollowSystem( Ecs::Entities& entities )
-								: SceneSystem2( entities, "Follow" ) {}
+								: EntityWithComponentsSystem2( entities, "Follow" ) {}
 
 		//! Follows the target transform
 		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform& transform );

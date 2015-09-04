@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "Scene.h"
-#include "SceneObject.h"
 
 #include "Components/Rendering.h"
 
@@ -51,13 +50,7 @@ void Scene::update( f32 dt )
 // ** Scene::createSceneObject
 SceneObjectPtr Scene::createSceneObject( void )
 {
-	SceneObjectPtr sceneObject( DC_NEW SceneObject( this, m_entities, m_nextEntityId++ ) );
-
-	if( !m_entities.addEntity( sceneObject ) ) {
-		return SceneObjectPtr();
-	}
-
-	return sceneObject;
+	return m_entities.registerEntity( m_nextEntityId++ );
 }
 
 // ** Scene::render

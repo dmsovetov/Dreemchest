@@ -27,8 +27,7 @@
 #ifndef __DC_Scene_Component_Rendering_H__
 #define __DC_Scene_Component_Rendering_H__
 
-#include "Component.h"
-
+#include "../Scene.h"
 #include "../Assets/Mesh.h"
 #include "../Assets/Image.h"
 
@@ -37,15 +36,15 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! This component is attached to a camera to render unlit meshes.
-	class RenderUnlitMeshes : public SceneComponent {
-		OverrideComponent( RenderUnlitMeshes, SceneComponent )
+	class RenderUnlitMeshes : public Component {
+		OverrideComponent( RenderUnlitMeshes, Component )
 	};
 
 	//! This component is attached to a camera to render wireframe meshes.
-	class RenderWireframeMeshes : public SceneComponent {
+	class RenderWireframeMeshes : public Component {
 	public:
 
-								OverrideComponent( RenderWireframeMeshes, SceneComponent )
+								OverrideComponent( RenderWireframeMeshes, Component )
 
 		//! Returns mesh wireframe rendering color.
 		const Rgba&				color( void ) const;
@@ -56,20 +55,20 @@ namespace Scene {
 	};
 
 	//! This component is attached to a camera to render sprites.
-	class RenderSprites : public SceneComponent {
-		OverrideComponent( RenderSprites, SceneComponent )
+	class RenderSprites : public Component {
+		OverrideComponent( RenderSprites, Component )
 	};
 
 	//! This component is attached to a camera to debug render sprite transforms.
-	class RenderSpriteTransform : public SceneComponent {
-		OverrideComponent( RenderSpriteTransform, SceneComponent )
+	class RenderSpriteTransform : public Component {
+		OverrideComponent( RenderSpriteTransform, Component )
 	};
 
 	//! Holds the static mesh data with per-instance materials.
-	class StaticMesh : public SceneComponent {
+	class StaticMesh : public Component {
 	public:
 
-									OverrideComponent( StaticMesh, SceneComponent )
+									OverrideComponent( StaticMesh, Component )
 
 									//! Constructs StaticMesh instance.
 									StaticMesh( const MeshPtr& mesh = MeshPtr() )
@@ -104,10 +103,10 @@ namespace Scene {
 	};
 
 	//! Holds the sprite rendering info.
-	class Sprite : public SceneComponent {
+	class Sprite : public Component {
 	public:
 			
-									OverrideComponent( Sprite, SceneComponent )
+									OverrideComponent( Sprite, Component )
 
 									//! Constructs the Sprite instance.
 									Sprite( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
@@ -171,7 +170,7 @@ namespace Scene {
 	};
 
 	//! Camera component.
-	class Camera : public SceneComponent {
+	class Camera : public Component {
 	public:
 
 		//! Available camera projections.
@@ -189,7 +188,7 @@ namespace Scene {
 			, ClearAll		= ClearColor | ClearDepth	//!< Camera will clear all buffers.
 		};
 
-									OverrideComponent( Camera, SceneComponent )
+									OverrideComponent( Camera, Component )
 
 									//! Constructs Camera instance.
 									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )

@@ -27,8 +27,7 @@
 #ifndef __DC_Scene_Systems_Physics2D_H__
 #define __DC_Scene_Systems_Physics2D_H__
 
-#include "SceneSystem.h"
-
+#include "../Scene.h"
 #include "../Components/Transform.h"
 #include "../Components/Physics.h"
 
@@ -43,7 +42,7 @@ namespace Scene {
 #ifdef DC_PHYSICS2D_BOX2D
 
 	//! The 2D physics system
-	class Box2DPhysics : public SceneSystem2<RigidBody2D, Transform> {
+	class Box2DPhysics : public Ecs::EntityWithComponentsSystem2<RigidBody2D, Transform> {
 	public:
 
 								//! Constructs the Box2DPhysics instance.

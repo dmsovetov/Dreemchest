@@ -27,8 +27,7 @@
 #ifndef __DC_Scene_Systems_Input2DSystems_H__
 #define __DC_Scene_Systems_Input2DSystems_H__
 
-#include "SceneSystem.h"
-
+#include "../Scene.h"
 #include "../Components/Transform.h"
 #include "../Components/Input.h"
 
@@ -37,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Moves scene object transform in direction.
-	class MoveInDirectionSystem : public SceneSystem2<MoveInDirection, Transform> {
+	class MoveInDirectionSystem : public Ecs::EntityWithComponentsSystem2<MoveInDirection, Transform> {
 	public:
 
 							//! Constructs a MoveInDirectionSystem instance.

@@ -27,17 +27,17 @@
 #ifndef __DC_Scene_Component_Transform_H__
 #define __DC_Scene_Component_Transform_H__
 
-#include "Component.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
 	//! Scene object transformation component.
-	class Transform : public SceneComponent {
+	class Transform : public Component {
 	public:
 
-								OverrideComponent( Transform, SceneComponent )
+								OverrideComponent( Transform, Component )
 									
 								//! Constructs Transform instance.
 								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
@@ -128,10 +128,10 @@ namespace Scene {
 	};
 
 	//! Rotates the transform
-	class Rotor : public SceneComponent {
+	class Rotor : public Component {
 	public:
 
-								OverrideComponent( Rotor, SceneComponent )
+								OverrideComponent( Rotor, Component )
 
 								//! Constructs the Rotor instance.
 								Rotor( f32 x = 0.0f, f32 y = 0.0f, f32 z = 0.0f )
@@ -154,7 +154,7 @@ namespace Scene {
 	};
 
 	//! Follows the transform
-	class Follow : public SceneComponent {
+	class Follow : public Component {
 	public:
 
 		//! Available follow types.
@@ -164,7 +164,7 @@ namespace Scene {
 			Elastic,	//!< Calculates the spring force.
 		};
 
-								OverrideComponent( Follow, SceneComponent )
+								OverrideComponent( Follow, Component )
 
 								//! Constructs the Follow instance.
 								Follow( const TransformWPtr& target = TransformWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )

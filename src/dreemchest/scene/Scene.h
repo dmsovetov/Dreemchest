@@ -54,23 +54,31 @@ namespace Scene {
 	DECLARE_LOG( log )
 
 	class Scene;
-	class SceneObject;
+	//class SceneObject;
 	class View;
 	class AssetBundle;
 	class Asset;
 		class Image;
 		class Mesh;
 		class Material;
-	class Component;
+//	class Component;
 		class Transform;
 		class StaticMesh;
 		class Sprite;
 		class Camera;
 		class Rotor;
 
+	// Alias the Ecs::Entity type
+	typedef Ecs::Entity				SceneObject;
+	typedef StrongPtr<SceneObject>	SceneObjectPtr;
+	typedef WeakPtr<SceneObject>	SceneObjectWPtr;
+
+	// Alias the Ecs::Component type
+	typedef Ecs::Component			Component;
+
 	dcDeclarePtrs( Direction )
 
-	dcDeclarePtrs( SceneObject )
+	//dcDeclarePtrs( SceneObject )
 	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )
@@ -144,7 +152,6 @@ namespace Scene {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "SceneObject.h"
 	#include "Components/Rendering.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"

@@ -27,14 +27,14 @@
 #ifndef __DC_Scene_Component_Physics_H__
 #define __DC_Scene_Component_Physics_H__
 
-#include "Component.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
 	//! Shape of an object used for hit tests and/or 2D physics.
-	class Shape2D : public SceneComponent {
+	class Shape2D : public Component {
 	public:
 
 		//! The shape part types.
@@ -82,7 +82,7 @@ namespace Scene {
 			};
 		};
 
-							OverrideComponent( Shape2D, SceneComponent )
+							OverrideComponent( Shape2D, Component )
 
 							//! Constructs Shape2D instance.
 							Shape2D( void ) {}
@@ -111,7 +111,7 @@ namespace Scene {
 	};
 
 	//! 2D rigid body.
-	class RigidBody2D : public SceneComponent {
+	class RigidBody2D : public Component {
 	public:
 
 		//! Supported rigid body types.
@@ -122,7 +122,7 @@ namespace Scene {
 			, TotalTypes	//!< The total number of rigid body types.
 		};
 
-							OverrideComponent( RigidBody2D, SceneComponent )
+							OverrideComponent( RigidBody2D, Component )
 
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )
