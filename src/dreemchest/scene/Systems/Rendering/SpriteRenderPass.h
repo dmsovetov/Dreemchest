@@ -38,7 +38,7 @@ namespace Scene {
 	public:
 
 									//! Constructs the SpriteRenderPass instance.
-									SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers );
+									SpriteRenderPass( Ecs::Entities& entities, const Rendering& rendering );
 
 	private:
 

@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** SpriteTransformRenderPass::SpriteTransformRenderPass
-SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass2D( entities, "SpriteTransformRenderPass", renderers )
+SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, const Rendering& rendering ) : RenderPass2D( entities, "SpriteTransformRenderPass", rendering )
 {
 }
 
@@ -50,8 +50,8 @@ void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& s
 	f32  x = transform.x();
 	f32  y = transform.y();
 
-	m_renderers.m_renderer2d->line( x, y, x + side.x, y + side.y, Rgba( 1.0f, 0.0f, 0.0f ) );
-	m_renderers.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
+	m_rendering.m_renderer2d->line( x, y, x + side.x, y + side.y, Rgba( 1.0f, 0.0f, 0.0f ) );
+	m_rendering.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
 }
 
 } // namespace Scene

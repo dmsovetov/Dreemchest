@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** SpriteRenderPass::SpriteRenderPass
-SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass2D( entities, "SpriteRenderPass", renderers )
+SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Rendering& rendering ) : RenderPass2D( entities, "SpriteRenderPass", rendering )
 {
 }
 
@@ -57,7 +57,7 @@ void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObjec
 	f32 height = image->height() * transform.scaleY() * 0.5f;
 
 	// Render oriented quad
-	m_renderers.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), width,height, up, side, sprite.color() );
+	m_rendering.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), width,height, up, side, sprite.color() );
 }
 
 } // namespace Scene

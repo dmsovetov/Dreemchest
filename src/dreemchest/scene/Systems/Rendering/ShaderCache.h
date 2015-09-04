@@ -24,40 +24,50 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Systems_WireframeRenderPass_H__
-#define __DC_Scene_Systems_WireframeRenderPass_H__
+#ifndef __DC_Scene_ShaderCache_H__
+#define __DC_Scene_ShaderCache_H__
 
-#include "../StaticMeshRenderPass.h"
+#include "../../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Renders the wireframes of static meshes
-	class WireframeRenderPass : public StaticMeshRenderPass {
+	//! All shaders used for scene rendering reside here.
+	class ShaderCache : public RefCounted {
 	public:
 
-										//! Constructs the WireframeRenderPass instance.
-										WireframeRenderPass( Ecs::Entities& entities, const Rendering& rendering );
+		//! Available shaders.
+		enum ShaderId {
+			  Pink
+			, ConstantColor
+			, Diffuse
+			, TotalShaders
+		};
+
+									//! Constructs the ShaderCache
+									ShaderCache( const Renderer::HalPtr& hal );
+
+		//! Returns the shader by name.
+		const Renderer::ShaderPtr&	shaderById( ShaderId id );
 
 	private:
 
-		//! Extracts the renderer component from camera before rendering the pass.
-		virtual void					render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
+		//! Shader code container.
+		struct Code {
+			CString		m_vertex;	//!< Vertex shader code.
+			CString		m_fragment;	//!< Fragment shader code.
+		};
 
-		//! Called every frame before any entites are rendered.
-		virtual bool					begin( u32 currentTime );
+		static Code					s_shaderCode[TotalShaders];	//!< Shader code.
+		static CString				s_shaderName[TotalShaders];	//!< Shader names.
 
-		//! Called every frame after all entities has been rendered.
-		virtual void					end( void );
-
-	private:
-
-		const RenderWireframeMeshes*	m_settings;		//!< Wireframe rendering settings.
+		Renderer::HalPtr			m_hal;						//!< The rendering HAL.
+		Renderer::ShaderPtr			m_shaders[TotalShaders];	//!< Cached shaders.
 	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Systems_WireframeRenderPass_H__    */
+#endif    /*    !__DC_Scene_ShaderCache_H__    */

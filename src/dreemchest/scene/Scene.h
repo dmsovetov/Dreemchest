@@ -76,6 +76,7 @@ namespace Scene {
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( RenderPassBase )
+	dcDeclarePtrs( ShaderCache )
 	dcDeclarePtrs( AssetBundle )
 	dcDeclarePtrs( AssetLoader )
 	dcDeclarePtrs( Asset )
@@ -155,6 +156,7 @@ DC_END_DREEMCHEST
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/AssetSystem.h"
 
+	#include "Systems/Rendering/ShaderCache.h"
 	#include "Systems/Rendering/Renderers.h"
 #endif
 

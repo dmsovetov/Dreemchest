@@ -37,20 +37,21 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! A helper struct to wrap HAL & 2D renderer instances.
-	struct Renderers {
+	struct Rendering {
+		ShaderCachePtr			m_shaders;		//!< Shader cache.
 		Renderer::HalPtr		m_hal;			//!< Rendering HAL.
 		Renderer::Renderer2DPtr	m_renderer2d;	//!< 2D renderer.
 
-								//! Constructs empty Renderers instance.
-								Renderers( void )
+								//! Constructs empty Rendering instance.
+								Rendering( void )
 									{}
 
-								//! Constructs Renderer instance.
-								Renderers( const Renderer::HalPtr& hal )
+								//! Constructs Rendering instance.
+								Rendering( const Renderer::HalPtr& hal )
 									: m_hal( hal ) {}
 
-								//! Constructs Renderer2D instance.
-								Renderers( const Renderer::Renderer2DPtr& renderer2d )
+								//! Constructs Rendering instance.
+								Rendering( const Renderer::Renderer2DPtr& renderer2d )
 									: m_renderer2d( renderer2d ) {}
 	};
 	 
@@ -59,8 +60,8 @@ namespace Scene {
 	public:
 
 								//! Constructs RenderSystemBase instance
-								RenderSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers )
-									: EntitySystem( entities, name, aspect ), m_renderers( renderers ) {}
+								RenderSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Rendering& rendering )
+									: EntitySystem( entities, name, aspect ), m_rendering( rendering ) {}
 
 		//! Adds a new render pass to this system.
 		template<typename T>
@@ -76,7 +77,7 @@ namespace Scene {
 		//! Container type to store nested render passes.
 		typedef List<RenderPassBasePtr> RenderPasses;
 
-		Renderers				m_renderers;	//!< Renderers wraper.
+		Rendering				m_rendering;	//!< Renderers wraper.
 		RenderPasses			m_passes;		//!< Render passes.
 	};
 
@@ -84,7 +85,7 @@ namespace Scene {
 	template<typename T>
 	void RenderSystemBase::addPass( void )
 	{
-		m_passes.push_back( DC_NEW T( m_entities, m_renderers ) );
+		m_passes.push_back( DC_NEW T( m_entities, m_rendering ) );
 	}
 
 	//! Generic render system to subclass user-defined rendering systems from
@@ -93,8 +94,12 @@ namespace Scene {
 	public:
 
 								//! Constructs RenderSystem instance
-								RenderSystem( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-									: RenderSystemBase( entities, name, Ecs::Aspect::all<Camera, Transform, TRender>(), renderers ) {}
+								RenderSystem( Ecs::Entities& entities, const String& name, const Rendering& rendering )
+									: RenderSystemBase( entities, name, Ecs::Aspect::all<Camera, Transform, TRender>(), rendering ), m_render( NULL ) {}
+
+	protected:
+
+		const TRender*			m_render;	//!< Handle to render component.
 	};
 
 	//! Generic single pass renderer
@@ -102,8 +107,8 @@ namespace Scene {
 	class SinglePassRenderer : public RenderSystem<TRenderer> {
 	public:
 
-								SinglePassRenderer( Ecs::Entities& entities, const Renderers& renderers )
-									: RenderSystem( entities, "SinglePassRenderer", renderers ) { addPass<TPass>(); }
+								SinglePassRenderer( Ecs::Entities& entities, const Rendering& rendering )
+									: RenderSystem( entities, "SinglePassRenderer", rendering ) { addPass<TPass>(); }
 	};
 
 } // namespace Scene

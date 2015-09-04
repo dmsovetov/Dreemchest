@@ -37,7 +37,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Define the unlit mesh render system
-	typedef SinglePassRenderer<RenderUnlitMeshes, StaticMeshRenderPass> UnlitMeshRenderer;
+	typedef SinglePassRenderer<RenderUnlitMeshes, UnlitStaticMeshRenderPass> UnlitMeshRenderer;
 
 	//! Define the wireframe mesh render system
 	typedef SinglePassRenderer<RenderWireframeMeshes, WireframeRenderPass> WireframeMeshRenderer;

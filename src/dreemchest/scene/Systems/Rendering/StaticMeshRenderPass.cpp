@@ -34,44 +34,25 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** StaticMeshRenderPass::StaticMeshRenderPass
-StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers ) : RenderPass( entities, "StaticMeshRenderPass", renderers, 1000 )
+// ** UnlitStaticMeshRenderPass::UnlitStaticMeshRenderPass
+UnlitStaticMeshRenderPass::UnlitStaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering )
+	: StaticMeshRenderPass( entities, rendering, 1 )
 {
-	m_shaders[ShaderInvalid] = m_renderers.m_hal->createShader(
-		CODE(
-			uniform mat4 u_vp, u_transform;
 
-			void main()
-			{
-				gl_Position = u_vp * u_transform * gl_Vertex;
-			} ),
-		CODE(
-			void main()
-			{
-				gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
-			} ) );
+}
 
-	m_shaders[ShaderSolid] = m_renderers.m_hal->createShader(
-		CODE(
-			uniform mat4 u_vp, u_transform;
+// ** UnlitStaticMeshRenderPass::begin
+bool UnlitStaticMeshRenderPass::begin( u32 currentTime )
+{
+	m_rvm.setDefaultShader( m_rendering.m_shaders->shaderById( ShaderCache::Diffuse ) );
+	return StaticMeshRenderPass::begin( currentTime );
+}
 
-			varying vec2 v_uv0;
+// ** StaticMeshRenderPass::StaticMeshRenderPass
+StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering, u32 materialMask )
+	: RenderPass( entities, "StaticMeshRenderPass", rendering, 16000 ), m_materialMask( materialMask )
+{
 
-			void main()
-			{
-				v_uv0		= gl_MultiTexCoord0.xy;
-				gl_Position = u_vp * u_transform * gl_Vertex;
-			} ),
-		CODE(
-			uniform sampler2D u_tex0;
-			uniform vec4	  u_clr0;
-
-			varying vec2	  v_uv0;
-
-			void main()
-			{
-				gl_FragColor = texture2D( u_tex0, v_uv0 ) * u_clr0;
-			} ) );
 }
 
 // ** StaticMeshRenderPass::begin
@@ -86,7 +67,7 @@ bool StaticMeshRenderPass::begin( u32 currentTime )
 void StaticMeshRenderPass::end( void )
 {
 	// Run accumulated commands
-	m_rvm.flush( m_renderers.m_hal );
+	m_rvm.flush( m_rendering.m_hal );
 }
 
 // ** StaticMeshRenderPass::process
@@ -114,16 +95,20 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneO
 		rop->transform		= transform.matrix();
 		rop->indexBuffer	= meshData->indexBuffers[i].get();
 		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
-		rop->shader			= m_shaders[material.valid() ? material->shader() : Material::Unknown].get();
+		rop->shader			= material.valid() ? material->shader() : Material::Null;
 
 		if( !material.valid() ) {
 			continue;
 		}
 
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
-			Material::Layer  layer = static_cast<Material::Layer>( j );
+			if( (m_materialMask & (1 << j)) == 0 ) {
+				continue;
+			}
 
-			rop->colors[j]   = &material->color( layer );
+			Material::Layer layer = static_cast<Material::Layer>( j );
+
+			rop->colors[j] = &material->color( layer );
 
 			const ImageWPtr& image = material->texture( layer );
 

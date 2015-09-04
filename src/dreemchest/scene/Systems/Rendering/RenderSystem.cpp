@@ -47,7 +47,7 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity 
 	Rect viewport = camera.viewport();
 
 	// Get HAL from a renderer
-	Renderer::HalPtr& hal = m_renderers.m_hal;
+	Renderer::HalPtr& hal = m_rendering.m_hal;
 
 	// Get the view
 	const ViewPtr& view = camera.view();
@@ -75,7 +75,7 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity 
 		}
 
 		for( RenderPasses::iterator i = m_passes.begin(), end = m_passes.end(); i != end; ++i ) {
-			(*i)->render( currentTime, dt, viewProjection );
+			(*i)->render( entity, currentTime, dt, viewProjection );
 		}
 
 		hal->setScissorTest( false );

@@ -30,6 +30,19 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** WireframeRenderPass::WireframeRenderPass
+WireframeRenderPass::WireframeRenderPass( Ecs::Entities& entities, const Rendering& rendering )
+	: StaticMeshRenderPass( entities, rendering )
+{
+}
+
+// ** WireframeRenderPass::render
+void WireframeRenderPass::render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
+{
+	m_settings = camera->get<RenderWireframeMeshes>();
+	StaticMeshRenderPass::render( camera, currentTime, dt, viewProjection );
+}
+
 // ** WireframeRenderPass::begin
 bool WireframeRenderPass::begin( u32 currentTime )
 {
@@ -38,7 +51,10 @@ bool WireframeRenderPass::begin( u32 currentTime )
 	}
 
 	// Set wireframe polygon mode
-	m_renderers.m_hal->setPolygonMode( Renderer::PolygonWire );
+	m_rendering.m_hal->setPolygonMode( Renderer::PolygonWire );
+
+	// Set the default shader
+	m_rvm.setDefaultShader( m_rendering.m_shaders->shaderById( ShaderCache::ConstantColor ) );
 
 	// Set the additive blending
 	m_rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
@@ -56,7 +72,7 @@ void WireframeRenderPass::end( void )
 	StaticMeshRenderPass::end();
 
 	// Set fill polygon mode
-	m_renderers.m_hal->setPolygonMode( Renderer::PolygonFill );
+	m_rendering.m_hal->setPolygonMode( Renderer::PolygonFill );
 }
 
 } // namespace Scene

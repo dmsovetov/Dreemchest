@@ -40,7 +40,7 @@ namespace Scene {
 
 		//! Rendering operation emitted by scene object processing.
 		struct Command {
-			Renderer::Shader*			shader;										//!< Material shader.
+			u32							shader;										//!< Shader to be used for rendering.
 			Renderer::VertexBuffer*		vertexBuffer;								//!< Vertex buffer to be used for rendering.
 			Renderer::IndexBuffer*		indexBuffer;								//!< Index buffer to be used for rendering.
 			Renderer::Texture*			textures[Material::TotalMaterialLayers];	//!< Texture to be used for rendering.
@@ -69,6 +69,12 @@ namespace Scene {
 		//! Sets the view-projection matrix.
 		void							setViewProjection( const Matrix4& value );
 
+		//! Sets the id to shader mapping.
+		void							setShader( u32 id, const Renderer::ShaderPtr& shader );
+
+		//! Sets the default shader.
+		void							setDefaultShader( const Renderer::ShaderPtr& value );
+
 		//! Sets the default blending.
 		void							setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst );
 
@@ -81,39 +87,18 @@ namespace Scene {
 	private:
 
 		//! Sets the shader used by a command.
-		void							setShader( Renderer::HalPtr hal, const Command* cmd );
+		void							setShader( Renderer::HalPtr hal, Renderer::Shader* shader );
 
 		//! Sets the per-instance shader uniforms.
 		void							setShaderUniforms( Renderer::Shader* shader, const Command* cmd );
 
+		//! Returns the shader by id.
+		Renderer::Shader*				findShaderById( u32 id ) const;
+
 	private:
-
-		//! Global register value
-		struct RegisterValue {
-			//! Stored value type.
-			enum Type {
-				  Float
-				, Float2
-				, Float3
-				, Float4
-				, Matrix
-			};
-
-			Type	m_type;			//!< The value type.
-			union {
-				f32	m_float;		//!< The float value.
-				f32 m_vec2[2];		//!< The Vec2 value.
-				f32 m_vec3[2];		//!< The Vec2 value.
-				f32 m_vec4[2];		//!< The Vec2 value.
-				f32 m_matrix[16];	//!< The Vec2 value.
-			};
-		};
 
 		//! Render operations list container
 		typedef List<const Command*>	EmittedCommands;
-
-		//! Container type to store register values
-		typedef Map<String, RegisterValue>	Registers;
 
 		static CString					s_samplersUniformNames[];	//!< Samplers uniform names.
 		static CString					s_colorsUniformNames[];		//!< Colors uniform names.
@@ -122,9 +107,10 @@ namespace Scene {
 
 		ArrayAllocator<Command>			m_allocator;				//!< Array allocator used to allocated render operations.
 		EmittedCommands					m_commands;					//!< Emitted rendering commands.
-		Registers						m_registers;				//!< The rendering registers.
 		Matrix4							m_viewProjection;			//!< The view projection matrix.
+		Array<Renderer::ShaderPtr>		m_shaders;					//!< Array of available shaders.
 
+		Renderer::ShaderPtr				m_defaultShader;			//!< The default shader to use.
 		Renderer::BlendFactor			m_defaultSrcBlending;		//!< The default source blend factor.
 		Renderer::BlendFactor			m_defaultDstBlending;		//!< The default dest blend factor.
 		Renderer::Compare				m_defaultDepthFunction;		//!< The default blend function.

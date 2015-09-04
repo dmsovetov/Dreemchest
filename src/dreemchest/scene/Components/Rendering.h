@@ -43,7 +43,16 @@ namespace Scene {
 
 	//! This component is attached to a camera to render wireframe meshes.
 	class RenderWireframeMeshes : public SceneComponent {
-		OverrideComponent( RenderWireframeMeshes, SceneComponent )
+	public:
+
+								OverrideComponent( RenderWireframeMeshes, SceneComponent )
+
+		//! Returns mesh wireframe rendering color.
+		const Rgba&				color( void ) const;
+
+	private:
+
+		Rgba					m_color;	//!< Mesh wireframe color.
 	};
 
 	//! This component is attached to a camera to render sprites.

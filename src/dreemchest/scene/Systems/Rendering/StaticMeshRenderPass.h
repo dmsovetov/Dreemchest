@@ -38,16 +38,9 @@ namespace Scene {
 	public:
 
 									//! Constructs the StaticMeshRenderPass instance.
-									StaticMeshRenderPass( Ecs::Entities& entities, const Renderers& renderers );
+									StaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering, u32 materialMask = 0 );
 
 	protected:
-
-		//! Available shader types.
-		enum ShaderType {
-			  ShaderInvalid
-			, ShaderSolid
-			, TotalShaderTypes
-		};
 
 		//! Renders a single entity with a mesh
 		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform );
@@ -59,8 +52,19 @@ namespace Scene {
 		virtual void				end( void );
 
 	protected:
-		
-		Renderer::ShaderPtr			m_shaders[TotalShaderTypes];	//!< Loaded shaders.
+
+		u32							m_materialMask;					//!< What material layers will be used in rendering.
+	};
+
+	//! Renders unlit textured static meshes.
+	class UnlitStaticMeshRenderPass : public StaticMeshRenderPass {
+	public:
+
+									//! Constructs the WireframeRenderPass instance.
+									UnlitStaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering );
+
+		//! Sets the default shader
+		virtual bool				begin( u32 currentTime );
 	};
 
 } // namespace Scene

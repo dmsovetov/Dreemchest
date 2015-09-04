@@ -24,6 +24,7 @@
 
  **************************************************************************/
 
+#include "ShaderCache.h"
 #include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
@@ -50,6 +51,12 @@ Rvm::Rvm( u32 maxCommands ) : m_allocator( maxCommands )
 	m_defaultDepthFunction	= Renderer::Less;
 }
 
+// ** Rvm::setDefaultShader
+void Rvm::setDefaultShader( const Renderer::ShaderPtr& value )
+{
+	m_defaultShader = value;
+}
+
 // ** Rvm::setDefaultBlending
 void Rvm::setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst )
 {
@@ -69,10 +76,26 @@ void Rvm::setViewProjection( const Matrix4& value )
 	m_viewProjection = value;
 }
 
+// ** Rvm::setShader
+void Rvm::setShader( u32 id, const Renderer::ShaderPtr& shader )
+{
+	if( id >= ( u32 )m_shaders.size() ) {
+		m_shaders.resize( id + 1 );
+	}
+
+	m_shaders[id] = shader;
+}
+
 // ** Rvm::viewProjection
 const Matrix4& Rvm::viewProjection( void ) const
 {
 	return m_viewProjection;
+}
+
+// ** Rvm::findShaderById
+Renderer::Shader* Rvm::findShaderById( u32 idx ) const
+{
+	return idx < ( u32 )m_shaders.size() ? m_shaders[idx].get() : m_defaultShader.get();
 }
 
 // ** Rvm::flush
@@ -88,7 +111,8 @@ void Rvm::flush( Renderer::HalPtr hal )
 	Renderer::VertexBuffer* activeVertexBuffer = NULL;
 
 	//! Active shader
-	Renderer::Shader* activeShader = NULL;
+	Renderer::Shader* activeShader   = NULL;
+	u32				  activeShaderId = -1;
 
 	// Set the default blending function
 	hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
@@ -104,9 +128,16 @@ void Rvm::flush( Renderer::HalPtr hal )
 		const Command* cmd = *i;
 
 		// Set the shader
-		if( cmd->shader != activeShader ) {
-			setShader( hal, cmd );
-			activeShader = cmd->shader;
+		if( activeShaderId != cmd->shader ) {
+			Renderer::Shader* shader = findShaderById( cmd->shader );
+			DC_BREAK_IF( shader == NULL )
+
+			if( shader != activeShader ) {
+				activeShader = shader;
+				setShader( hal, activeShader );
+			}
+
+			activeShaderId = cmd->shader;
 		}
 
 		// Set the instance uniforms
@@ -169,10 +200,8 @@ Rvm::Command* Rvm::emit( void )
 }
 
 // ** Rvm::setShader
-void Rvm::setShader( Renderer::HalPtr hal, const Command* rop )
+void Rvm::setShader( Renderer::HalPtr hal, Renderer::Shader* shader )
 {
-	Renderer::ShaderPtr shader = rop->shader;
-
 	hal->setShader( shader );
 
 	u32 location = 0;
@@ -187,6 +216,11 @@ void Rvm::setShader( Renderer::HalPtr hal, const Command* rop )
 			shader->setInt( location, i );
 		}
 	}
+
+	// Set the constant color value
+	if( location = shader->findUniformLocation( "u_color" ) ) {
+		shader->setVec4( location, Vec4( 0.1f, 0.1f, 0.0f, 1.0f ) );
+	}
 }
 
 // ** Rvm::setShaderUniforms
@@ -196,6 +230,10 @@ void Rvm::setShaderUniforms( Renderer::Shader* shader, const Command* cmd )
 
 	// Set colors
 	for( u32 i = 0; i < 8; i++ ) {
+		if( !cmd->colors[i] ) {
+			continue;
+		}
+
 		if( location = shader->findUniformLocation( s_colorsUniformNames[i] ) ) {
 			shader->setVec4( location, Vec4( cmd->colors[i]->r, cmd->colors[i]->g, cmd->colors[i]->b, cmd->colors[i]->a ) );
 		}

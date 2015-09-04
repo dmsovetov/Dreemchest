@@ -33,7 +33,7 @@ namespace Scene {
 // ---------------------------------------- RenderPassBase ---------------------------------------- //
 
 // ** RenderPassBase::render
-void RenderPassBase::render( u32 currentTime, f32 dt, const Matrix4& viewProjection )
+void RenderPassBase::render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
 {
 	m_rvm.setViewProjection( viewProjection );
 	update( currentTime, dt );

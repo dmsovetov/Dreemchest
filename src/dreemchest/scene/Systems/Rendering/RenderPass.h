@@ -29,6 +29,7 @@
 
 #include "RenderSystem.h"
 #include "Rvm.h"
+#include "ShaderCache.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,11 +40,11 @@ namespace Scene {
 	public:
 
 									//! Constructs RenderPassBase instance
-									RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Renderers& renderers, u32 maxCommands )
-										: EntitySystem( entities, name, aspect ), m_renderers( renderers ), m_rvm( maxCommands ) {}
+									RenderPassBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect, const Rendering& rendering, u32 maxCommands )
+										: EntitySystem( entities, name, aspect ), m_rendering( rendering ), m_rvm( maxCommands ) {}
 
 		//! Renders the pass.
-		void						render( u32 currentTime, f32 dt, const Matrix4& viewProjection );
+		virtual void				render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
 
 	protected:
 
@@ -53,7 +54,7 @@ namespace Scene {
 	protected:
 
 		Rvm							m_rvm;				//!< The rendering virtual machine that performs rendering.
-		Renderers					m_renderers;		//!< Rendering HAL.
+		Rendering					m_rendering;		//!< Rendering HAL.
 	};
 
 	//! Generic render pass to subclass user-defined render passes from
@@ -62,15 +63,15 @@ namespace Scene {
 	public:
 
 									//! Constructs RenderPass instance
-									RenderPass( Ecs::Entities& entities, const String& name, const Renderers& renderers, u32 maxCommands )
-										: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), renderers, maxCommands ) {}
+									RenderPass( Ecs::Entities& entities, const String& name, const Rendering& rendering, u32 maxCommands )
+										: RenderPassBase( entities, name, Ecs::Aspect::all<TComponent, Transform>(), rendering, maxCommands ) {}
 
 	private:
 
 		//! Extracts the components from entity.
 		virtual void				process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
 
-		//! This method should be overridden in subclass
+		//! This method should be overridden in subclass.
 		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform );
 	};
 
@@ -97,8 +98,8 @@ namespace Scene {
 	public:
 
 									//! Constructs RenderPass2D instance
-									RenderPass2D( Ecs::Entities& entities, const String& name, const Renderers& renderers )
-										: RenderPass( entities, name, renderers, 0 ) {}
+									RenderPass2D( Ecs::Entities& entities, const String& name, const Rendering& rendering )
+										: RenderPass( entities, name, rendering, 0 ) {}
 
 	protected:
 
@@ -113,7 +114,7 @@ namespace Scene {
 	template<typename TComponent>
 	bool RenderPass2D<TComponent>::begin( u32 currentTime )
 	{
-		m_renderers.m_renderer2d->begin( m_rvm.viewProjection() );
+		m_rendering.m_renderer2d->begin( m_rvm.viewProjection() );
 		return true;
 	}
 
@@ -121,7 +122,7 @@ namespace Scene {
 	template<typename TComponent>
 	void RenderPass2D<TComponent>::end( void )
 	{
-		m_renderers.m_renderer2d->end();
+		m_rendering.m_renderer2d->end();
 	}
 
 } // namespace Scene
