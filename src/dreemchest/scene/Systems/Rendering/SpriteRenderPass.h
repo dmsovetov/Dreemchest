@@ -43,7 +43,7 @@ namespace Scene {
 	private:
 
 		//! Renders a single entity with a sprite
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Sprite& sprite, Transform& transform );
 	};
 
 } // namespace Scene

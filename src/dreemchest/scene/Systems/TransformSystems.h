@@ -43,7 +43,7 @@ namespace Scene {
 								: EntityWithComponentsSystem2( entities, "RotorSystem" ) {}
 
 		//! Rotates a single entity by a rotor
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotor& rotator, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotator, Transform& transform );
 	};
 
 	//! The following system
@@ -55,10 +55,10 @@ namespace Scene {
 								: EntityWithComponentsSystem2( entities, "Follow" ) {}
 
 		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
 
 		//! Attaches the internal following data to an added scene object.
-		virtual void		sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform& transform );
+		virtual void		sceneObjectAdded( Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
 
 	private:
 

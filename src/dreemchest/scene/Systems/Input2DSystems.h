@@ -43,7 +43,7 @@ namespace Scene {
 							MoveInDirectionSystem( Ecs::Entities& entities );
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, SceneObject& sceneObject, MoveInDirection& move, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveInDirection& move, Transform& transform );
 	};
 
 } // namespace Scene

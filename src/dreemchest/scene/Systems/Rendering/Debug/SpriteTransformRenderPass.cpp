@@ -36,7 +36,7 @@ SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, c
 }
 
 // ** SpriteTransformRenderPass::process
-void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
+void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Sprite& sprite, Transform& transform )
 {
 	// Get the rotation
 	f32  angle = radians( transform.rotationZ() );

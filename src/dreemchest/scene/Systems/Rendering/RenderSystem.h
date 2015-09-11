@@ -70,7 +70,7 @@ namespace Scene {
 	protected:
 
 		//! Renders all nested render passes using the camera.
-		virtual void			process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& entity );
 
 	protected:
 

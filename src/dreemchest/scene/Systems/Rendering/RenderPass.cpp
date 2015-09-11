@@ -33,14 +33,14 @@ namespace Scene {
 // ---------------------------------------- RenderPassBase ---------------------------------------- //
 
 // ** RenderPassBase::render
-void RenderPassBase::render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
+void RenderPassBase::render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
 {
 	m_rvm.setViewProjection( viewProjection );
 	update( currentTime, dt );
 }
 
 // ** RenderPassBase::process
-void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
+void RenderPassBase::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
 {
 	DC_BREAK
 }

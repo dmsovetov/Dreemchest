@@ -43,7 +43,7 @@ namespace Scene {
 	protected:
 
 		//! Renders a single entity with a mesh
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
 
 		//! Called every frame before any entites are rendered.
 		virtual bool				begin( u32 currentTime );

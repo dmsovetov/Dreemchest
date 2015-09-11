@@ -37,7 +37,7 @@ MoveInDirectionSystem::MoveInDirectionSystem( Ecs::Entities& entities ) : Entity
 }
 
 // ** MoveInDirectionSystem::process
-void MoveInDirectionSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, MoveInDirection& move, Transform& transform )
+void MoveInDirectionSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveInDirection& move, Transform& transform )
 {
 	Vec3 direction = move.direction();
 

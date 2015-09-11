@@ -44,12 +44,12 @@ namespace Scene {
 										: EntitySystem( entities, name, aspect ), m_rendering( rendering ), m_rvm( maxCommands ) {}
 
 		//! Renders the pass.
-		virtual void				render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
+		virtual void				render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
 
 	protected:
 
 		//! Processes the entity.
-		virtual void				process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity );
 
 	protected:
 
@@ -69,25 +69,22 @@ namespace Scene {
 	private:
 
 		//! Extracts the components from entity.
-		virtual void				process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity );
 
 		//! This method should be overridden in subclass.
-		virtual void				process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform );
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, TComponent& component, Transform& transform );
 	};
 
 	// ** RenderPass::process
 	template<typename TComponent>
-	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
+	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
 	{
-		SceneObject* sceneObject = castTo<SceneObject>( entity.get() );
-		DC_BREAK_IF( sceneObject == NULL )
-
-		process( currentTime, dt, *sceneObject, *entity->get<TComponent>(), *entity->get<Transform>() );
+		process( currentTime, dt, entity, *entity.get<TComponent>(), *entity.get<Transform>() );
 	}
 
 	// ** RenderPass::process
 	template<typename TComponent>
-	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, SceneObject& sceneObject, TComponent& component, Transform& transform )
+	void RenderPass<TComponent>::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, TComponent& component, Transform& transform )
 	{
 		DC_BREAK
 	}

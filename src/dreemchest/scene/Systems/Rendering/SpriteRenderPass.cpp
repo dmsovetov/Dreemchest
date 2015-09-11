@@ -36,7 +36,7 @@ SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Rendering& re
 }
 
 // ** SpriteRenderPass::process
-void SpriteRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Sprite& sprite, Transform& transform )
+void SpriteRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Sprite& sprite, Transform& transform )
 {
 	// Get the sprite texture
 	ImagePtr			 image   = sprite.image();

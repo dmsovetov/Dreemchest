@@ -58,13 +58,13 @@ namespace Scene {
 		virtual bool			begin( u32 currentTime );
 
 		//! Synchronizes the scene object transform with a rigid body.
-		virtual void			process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			sceneObjectRemoved( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 	private:
 

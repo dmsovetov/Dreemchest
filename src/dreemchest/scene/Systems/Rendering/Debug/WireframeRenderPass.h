@@ -43,7 +43,7 @@ namespace Scene {
 	private:
 
 		//! Extracts the renderer component from camera before rendering the pass.
-		virtual void					render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
+		virtual void					render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
 
 		//! Called every frame before any entites are rendered.
 		virtual bool					begin( u32 currentTime );

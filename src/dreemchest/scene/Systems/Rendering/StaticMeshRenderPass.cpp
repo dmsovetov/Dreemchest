@@ -71,7 +71,7 @@ void StaticMeshRenderPass::end( void )
 }
 
 // ** StaticMeshRenderPass::process
-void StaticMeshRenderPass::process( u32 currentTime, f32 dt, SceneObject& sceneObject, StaticMesh& staticMesh, Transform& transform )
+void StaticMeshRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();

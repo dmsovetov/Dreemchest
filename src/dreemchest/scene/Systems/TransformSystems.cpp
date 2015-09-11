@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------------ FollowSystem ------------------------------------------------- //
 
 // ** FollowSystem::process
-void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Follow& follow, Transform& transform )
+void FollowSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform )
 {
 	const TransformWPtr& target = follow.target();
 	DC_BREAK_IF( target == NULL )
@@ -66,7 +66,7 @@ void FollowSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, F
 }
 
 // ** FollowSystem::sceneObjectAdded
-void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, Transform& transform )
+void FollowSystem::sceneObjectAdded( Ecs::Entity& sceneObject, Follow& follow, Transform& transform )
 {
 	follow.setInternal<Internal>( DC_NEW Internal );
 }
@@ -74,7 +74,7 @@ void FollowSystem::sceneObjectAdded( SceneObject& sceneObject, Follow& follow, T
 // ----------------------------------------------- RotorSystem ----------------------------------------------- //
 
 // ** RotorSystem::process
-void RotorSystem::process( u32 currentTime, f32 dt, SceneObject& sceneObject, Rotor& rotor, Transform& transform )
+void RotorSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotor, Transform& transform )
 {
 	transform.setRotationX( transform.rotationX() + rotor.x() * dt );
 	transform.setRotationY( transform.rotationY() + rotor.y() * dt );

@@ -46,8 +46,8 @@ SceneObjectsList Box2DPhysics::queryRect( const Rect& rect ) const
 	// Query callback
 	struct Callback : public b2QueryCallback {
 		virtual bool ReportFixture( b2Fixture* fixture ) {
-			SceneObject* sceneObject = reinterpret_cast<SceneObject*>( fixture->GetBody()->GetUserData() );
-			m_result.push_back( sceneObject );
+			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
+			m_result.push_back( entity );
 			return true;
 		}
 
@@ -106,7 +106,7 @@ bool Box2DPhysics::begin( u32 currentTime )
 }
 
 // ** Box2DPhysics::process
-void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
+void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	if( rigidBody.type() != RigidBody2D::Dynamic ) {
 		return;
@@ -138,7 +138,7 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, SceneObject& sceneObject, R
 }
 
 // ** Box2DPhysics::sceneObjectAdded
-void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
+void Box2DPhysics::sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
 
@@ -183,7 +183,7 @@ void Box2DPhysics::sceneObjectAdded( SceneObject& sceneObject, RigidBody2D& rigi
 }
 
 // ** Box2DPhysics::sceneObjectRemoved
-void Box2DPhysics::sceneObjectRemoved( SceneObject& sceneObject, RigidBody2D& rigidBody, Transform& transform )
+void Box2DPhysics::sceneObjectRemoved( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
 	Internal::Ptr physical = rigidBody.internal<Internal>();
 	DC_BREAK_IF( physical == NULL )

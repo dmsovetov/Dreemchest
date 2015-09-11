@@ -37,9 +37,9 @@ WireframeRenderPass::WireframeRenderPass( Ecs::Entities& entities, const Renderi
 }
 
 // ** WireframeRenderPass::render
-void WireframeRenderPass::render( const Ecs::EntityPtr& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
+void WireframeRenderPass::render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
 {
-	m_settings = camera->get<RenderWireframeMeshes>();
+	m_settings = camera.get<RenderWireframeMeshes>();
 	StaticMeshRenderPass::render( camera, currentTime, dt, viewProjection );
 }
 

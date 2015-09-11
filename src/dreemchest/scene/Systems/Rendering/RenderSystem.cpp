@@ -34,14 +34,14 @@ namespace Scene {
 // ---------------------------------------- RenderSystemBase ---------------------------------------- //
 
 // ** RenderSystemBase::process
-void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::EntityPtr& entity )
+void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
 {
 	// Get the camera component from entity
-	Camera& camera    = *entity->get<Camera>();
+	Camera& camera    = *entity.get<Camera>();
 	u8		clearMask = camera.clearMask();
 
 	// Get the transform component from entity
-	Transform& transform = *entity->get<Transform>();
+	Transform& transform = *entity.get<Transform>();
 
 	// Get the output viewport for this camera
 	Rect viewport = camera.viewport();

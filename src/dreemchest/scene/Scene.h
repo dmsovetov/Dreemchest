@@ -54,31 +54,27 @@ namespace Scene {
 	DECLARE_LOG( log )
 
 	class Scene;
-	//class SceneObject;
 	class View;
 	class AssetBundle;
 	class Asset;
 		class Image;
 		class Mesh;
 		class Material;
-//	class Component;
-		class Transform;
-		class StaticMesh;
-		class Sprite;
-		class Camera;
-		class Rotor;
+
+	class Transform;
+	class StaticMesh;
+	class Sprite;
+	class Camera;
+	class Rotor;
 
 	// Alias the Ecs::Entity type
-	typedef Ecs::Entity				SceneObject;
-	typedef StrongPtr<SceneObject>	SceneObjectPtr;
-	typedef WeakPtr<SceneObject>	SceneObjectWPtr;
+	typedef StrongPtr<Ecs::Entity>	SceneObjectPtr;
+	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
 
 	// Alias the Ecs::Component type
 	typedef Ecs::Component			Component;
 
 	dcDeclarePtrs( Direction )
-
-	//dcDeclarePtrs( SceneObject )
 	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )

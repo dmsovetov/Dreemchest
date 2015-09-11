@@ -42,12 +42,12 @@ AssetSystem::AssetSystem( Ecs::Entities& entities, Renderer::HalPtr hal ) : Enti
 }
 
 // ** AssetSystem::entityAdded
-void AssetSystem::entityAdded( const Ecs::EntityPtr& entity )
+void AssetSystem::entityAdded( const Ecs::Entity& entity )
 {
-	if( StaticMesh* mesh = entity->get<StaticMesh>() ) {
+	if( StaticMesh* mesh = entity.get<StaticMesh>() ) {
 		queueStaticMesh( mesh );
 	}
-	if( Sprite* sprite = entity->get<Sprite>() ) {
+	if( Sprite* sprite = entity.get<Sprite>() ) {
 		queueSprite( sprite );
 	}
 }
