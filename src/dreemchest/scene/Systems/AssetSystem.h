@@ -43,7 +43,7 @@ namespace Scene {
 	private:
 
 		//! Checks if an entity contains any components that contain assets and queues them for loading.
-		virtual void		entityAdded( const Ecs::EntityPtr& entity );
+		virtual void		entityAdded( const Ecs::Entity& entity );
 
 		//! Tracks the asset loading.
 		virtual void		update( u32 currentTime, f32 dt );
