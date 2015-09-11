@@ -83,8 +83,14 @@ def import_project(args, source, output):
     # Import scenes
     project.import_scenes(assets, source, output)
 
+    # Import materials
+    project.import_materials(assets, source, output)
+
     # Import assets
     project.import_assets(assets, source, output)
+
+    # Save the assets
+    assets.save(output)
 
 # Builds the data to a specified folder
 def build(args, source, output):

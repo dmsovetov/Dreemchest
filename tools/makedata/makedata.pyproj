@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
-    <CommandLineArguments>-s D:\Projects\warfall\src\assets -o D:\Projects\warfall\build\assets</CommandLineArguments>
+    <CommandLineArguments>-s D:\Projects\warfall\src\project -o D:\Projects\warfall\build\project -w 1 -a import</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
@@ -39,6 +39,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="makedata.py" />
+    <Compile Include="project.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

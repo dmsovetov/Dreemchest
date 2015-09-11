@@ -24,7 +24,7 @@
 #
 #################################################################################
 
-import os, json, yaml, collections, shutil
+import os, json, yaml, collections, shutil, actions
 
 # Saves object to a JSON file
 def save_to_json(file_name, data):
@@ -55,7 +55,11 @@ def yaml_objects_from_string(str):
         nl   = stream.find( '\n' )
         tag  = stream[:nl]
         id   = tag.split(' ')[2][1:]
-        data = yaml_from_string(stream[nl:])
+        str  = stream[nl:]
+
+        str = str.replace('data:', '- data:') # Fixes the material properties
+
+        data = yaml_from_string(str)
 
         data['id'] = int(id)
         result[id] = data
@@ -91,7 +95,12 @@ class asset:
     # uuid
     @property
     def uuid(self):
-	    return self._meta['guid']
+        return self._meta['guid']
+
+    # file_name
+    @property
+    def file_name(self):
+        return self._file_name
 
     # full_path
     @property
@@ -108,7 +117,7 @@ class assets:
     Unknown     = 'unknown'
     Mesh        = 'mesh'
     Scene       = 'scene'
-    Texture     = 'texture'
+    Texture     = 'image'
     Prefab      = 'prefab'
     Lightmap    = 'lightmap'
     Material    = 'material'
@@ -138,16 +147,22 @@ class assets:
         return self._used_assets
 
     # save
-    def save(self, fileName):
+    def save(self, folder):
         print 'Saving assets..'
 
-        assets = []
-        for guid, asset in self._usedAssets.items():
-            asset._meta['fileName'] = asset.fullPath
-            assets.append( Prettify.prettify( asset._meta, Prettify.Asset ) )
+        file_name = os.path.join(folder, 'assets.json')
+
+        # Append used assets
+        result = []
+        for guid, item in self.used_assets.items():
+            result.append(dict(identifier=item.uuid, type=item.type))
+
+        # Append scenes
+        for scene in self.filter_by_type(assets.Scene):
+            result.append(dict(identifier=os.path.splitext(scene.file_name)[0], type=assets.Scene))
 
         with open(file_name, 'wt') as fh:
-            fh.write(json.dumps(assets))
+            fh.write(json.dumps(result))
             fh.close()
 
     # parse
@@ -199,7 +214,7 @@ class assets:
         return result
 
 # Patches the object properties
-def patch(assets, object):
+class patcher:
     # Renames the property
     class rename:
         # __init__
@@ -207,8 +222,22 @@ def patch(assets, object):
             self.name = name
 
         # __call__
-        def __call__(self, object, property):
+        def __call__(self, assets, object, property):
             object[self.name] = object[property]
+            del object[property]
+
+    # Patches an object
+    class object:
+        # __init__
+        def __init__(self, name, patchers):
+            self.name = name
+            self.patchers = patchers
+
+        # __call__
+        def __call__(self, assets, object, property):
+            value = object[property]
+
+            object[self.name] = patcher.patch(assets, value, self.patchers)
             del object[property]
 
     # Formats an asset
@@ -218,7 +247,7 @@ def patch(assets, object):
             self.name = name
 
         # __call__
-        def __call__(self, object, property):
+        def __call__(self, assets, object, property):
             value = object[property]
 
             if isinstance(value, dict):
@@ -228,23 +257,6 @@ def patch(assets, object):
 
             del object[property]
 
-    # Formats an array of object ids
-    class objectIds:
-        # __init__
-        def __init__(self, name):
-            self.name = name
-
-        # __call__
-        def __call__(self, object, property):
-            ids = []
-
-            for nested in object[property]:
-                for k, v in nested.items():
-                    ids.append(v['fileID'])
-
-            object[self.name] = ids
-            del object[property]
-
     # Formats the reference
     class reference:
         # __init__
@@ -252,7 +264,7 @@ def patch(assets, object):
             self.name = name
 
         # __call__
-        def __call__(self, object, property):
+        def __call__(self, assets, object, property):
             object[self.name] = str(object[property]['fileID'])
             del object[property]
 
@@ -264,7 +276,7 @@ def patch(assets, object):
             self.coords = coords
 
         # __call__
-        def __call__(self, object, property):
+        def __call__(self, assets, object, property):
             value  = object[property]
             result = []
 
@@ -274,56 +286,62 @@ def patch(assets, object):
             object[self.name] = result
             del object[property]
 
-    # Property patchers
-    patchers = {}
+    # Formats the shader name
+    class shader:
+        # __init__
+        def __init__(self, name):
+            self.name = name
 
-    # Renderer
-    patchers['m_CastShadows'] = rename('castShadows')
-    patchers['m_ReceiveShadows'] = rename('receiveShadows')
-    patchers['m_Materials'] = asset('materials')
-    patchers['m_Mesh'] = asset('mesh')
-    patchers['m_PrefabParentObject'] = asset('asset')
+        # __call__
+        def __call__(self, assets, object, property):
+            shaderById = {
+        	    7:      'diffuse'
+    	    ,   3:      'specular'
+    	    ,   30:     'transparent.diffuse'
+    	    ,   32:     'transparent.specular'
+    	    ,   51:     'transparent.cutout.diffuse'
+    	    ,   53:     'transparent.cutout.specular'
+    	    ,   200:    'additive'
+    	    ,   202:    'additive.soft'
+    	    ,   10:     'emissive'
+   		    ,   10511:  'nature.treeSoftOcclusionLeaves'
+		    }
 
-    # Components
-    patchers['m_Enabled'] = rename('enabled')
-    patchers['m_GameObject'] = reference('sceneObject')
+            object[self.name] = shaderById[object[property]['fileID']]
+            del object[property]
 
-    # Transform
-    patchers['m_LocalRotation'] = vector('rotation', ['x', 'y', 'z', 'w'])
-    patchers['m_LocalScale'] = vector('scale', ['x', 'y', 'z'])
-    patchers['m_LocalPosition'] = vector('position', ['x', 'y', 'z'])
+    # Formats the key-value properties
+    class keyValue:
+        # __init__
+        def __init__(self, name, patchers):
+            self.name = name
+            self.patchers = patchers
 
-    # GameObject
-    patchers['m_Name'] = rename('name')
-    patchers['m_IsActive'] = rename('active')
-    patchers['m_Layer'] = rename('layer')
-    patchers['m_StaticEditorFlags'] = rename('flags')
-    #patchers['m_Component'] = objectIds('components')
+        # __call__
+        def __call__(self, assets, object, property):
+            result = {}
 
-    # Light
-    patchers['m_Intensity'] = rename('intensity')
-    patchers['m_SpotAngle'] = rename('spotAngle')
-    patchers['m_Type'] = rename('type')
-    patchers['m_Range'] = rename('range')
-    patchers['m_Color'] = vector('color', ['r', 'g', 'b', 'a'])
-    patchers['m_Lightmapping'] = rename('backed')
+            for prop in object[property]:
+                key = prop['first']['name']
+                value = {}
 
-    # Camera
-    patchers['near clip plane']             = rename('near')
-    patchers['far clip plane']              = rename('far')
-    patchers['field of view']               = rename('fov')
-    patchers['m_OcclusionCulling']          = rename('occlusionCulling')
-    patchers['m_BackGroundColor']           = vector('backgroundColor', ['r', 'g', 'b', 'a'])
-    patchers['m_NormalizedViewPortRect']    = vector('ndc', ['x', 'y', 'width', 'height'])
+                if key in self.patchers.keys():
+                    value[key] = prop['second']
+                    value = patcher.patch(assets, value, self.patchers)
+                    result[value.keys()[0]] = value[value.keys()[0]]
 
-    # Patch the properties
-    for name, value in object.items():
-        if name in patchers.keys():
-            patchers[name](object, name)
-        else:
-            del object[name]
+            object[self.name] = result
+            del object[property]
 
-    return object
+    @staticmethod
+    def patch(assets, object, patchers):
+        for name, value in object.items():
+            if name in patchers.keys():
+                patchers[name](assets, object, name)
+            else:
+                del object[name]
+
+        return object
 
 # Holds the info about a single scene
 class scene:
@@ -346,7 +364,9 @@ class scene:
         objects = yaml_objects(file_name)
 
         # Only this object types will be exported
-        types = ['GameObject', 'Transform', 'Renderer', 'Camera', 'Light']
+        types = {
+	        'GameObject', 'Transform', 'Renderer', 'Camera', 'Light'
+        }
 
         # Resulting object
         result = {}
@@ -360,7 +380,7 @@ class scene:
                 continue
 
             # Get the actual properties
-            data = patch(self._assets, object[type])
+            data = patcher.patch(self._assets, object[type], ScenePatchers[type])
 
             # Remove properties with None values
             for k, v in data.items():
@@ -369,10 +389,31 @@ class scene:
 
             # Save parsed object
             data['id']    = str(object['id'])
-            data['class'] = type
+            data['class'] = type if type != 'GameObject' else 'SceneObject'
             result[id]    = data
 
         return result
+
+# Holds the material info
+class material:
+    # Converts material to JSON
+    @staticmethod
+    def convert(assets, source, output):
+        objects = yaml_objects(source)
+        assert len(objects) == 1
+        result = None
+
+        for k, v in objects.items():
+            result   = v['Material']
+            properties = patcher.patch(assets, result['m_SavedProperties'], MaterialPropertiesPatcher)
+            result = patcher.patch(assets, result, MaterialPatcher)
+
+            for k, v in properties.items():
+                result[k] = v
+
+        # Save parsed scene to a JSON file
+        save_to_json(output, result)
+
 
 # Parses assets from a path
 def parse_assets(path):
@@ -384,14 +425,127 @@ def parse_assets(path):
 def import_scenes(assets, source, output):
     for item in assets.filter_by_type(assets.Scene):
         paths = item.format_paths(source, output)
+        dest = os.path.join(output, item.uuid)
 
         print 'Importing scene', item.full_path
-        scene.convert(assets, paths.source, os.path.join(output, item.uuid))
+        scene.convert(assets, paths.source, dest)
+
+# Import used materials
+def import_materials(assets, source, output):
+    for item in assets.filter_by_type(assets.Material):
+        paths = item.format_paths(source, output)
+        dest = os.path.join(output, item.uuid)
+
+        if not item.uuid in assets.used_assets.keys():
+            continue
+
+        print 'Importing material', item.full_path
+        material.convert(assets, paths.source, dest)
 
 # Imports all used assets
 def import_assets(assets, source, output):
-	for uuid, asset in assets.used_assets.items():
-		paths = asset.format_paths(source, output)
+    for uuid, asset in assets.used_assets.items():
+        paths = asset.format_paths(source, output)
+        dest = os.path.join(output, uuid)
 
-		print 'Importing asset', asset.full_path
-		shutil.copyfile(paths.source, os.path.join(output, uuid))
+        if asset.type == 'mesh':
+            actions.convert_fbx({}, paths.source, dest)()
+        elif asset.type == 'texture':
+            actions.convert_to_raw({}, paths.source, dest)()
+
+# Renderer patcher
+RendererPatcher = {
+	  'm_CastShadows': patcher.rename('castShadows')
+	, 'm_ReceiveShadows': patcher.rename('receiveShadows')
+	, 'm_Materials': patcher.asset('materials')
+	, 'm_Mesh': patcher.asset('mesh')
+	, 'm_PrefabParentObject': patcher.asset('asset')
+	, 'm_Enabled': patcher.rename('enabled')
+	, 'm_GameObject': patcher.reference('sceneObject')
+}
+
+# Transform
+TransformPatcher = {
+	  'm_LocalRotation': patcher.vector('rotation', ['x', 'y', 'z', 'w'])
+	, 'm_LocalScale': patcher.vector('scale', ['x', 'y', 'z'])
+	, 'm_LocalPosition': patcher.vector('position', ['x', 'y', 'z'])
+	, 'm_Enabled': patcher.rename('enabled')
+	, 'm_GameObject': patcher.reference('sceneObject')
+}
+
+# GameObject
+GameObjectPatcher = {
+	  'm_Name': patcher.rename('name')
+	, 'm_IsActive': patcher.rename('active')
+	, 'm_Layer': patcher.rename('layer')
+	, 'm_StaticEditorFlags': patcher.rename('flags')
+}
+
+# Light
+LightPatcher = {
+	  'm_Intensity': patcher.rename('intensity')
+	, 'm_SpotAngle': patcher.rename('spotAngle')
+	, 'm_Type': patcher.rename('type')
+	, 'm_Range': patcher.rename('range')
+	, 'm_Color': patcher.vector('color', ['r', 'g', 'b', 'a'])
+	, 'm_Lightmapping': patcher.rename('backed')
+	, 'm_Enabled': patcher.rename('enabled')
+	, 'm_GameObject': patcher.reference('sceneObject')
+}
+
+# Camera
+CameraPatcher = {
+	  'near clip plane': patcher.rename('near')
+	, 'far clip plane': patcher.rename('far')
+	, 'field of view': patcher.rename('fov')
+	, 'm_OcclusionCulling': patcher.rename('occlusionCulling')
+	, 'm_BackGroundColor': patcher.vector('backgroundColor', ['r', 'g', 'b', 'a'])
+	, 'm_NormalizedViewPortRect': patcher.vector('ndc', ['x', 'y', 'width', 'height'])
+	, 'm_Enabled': patcher.rename('enabled')
+	, 'm_GameObject': patcher.reference('sceneObject')
+}
+
+# Material
+MaterialPatcher = {
+	  'm_Name': patcher.rename('name')
+    , 'm_Shader': patcher.shader('shader')
+}
+
+# Material texture patcher
+MaterialTexturePatcher = {
+      'm_Texture': patcher.asset('asset')
+    , 'm_Scale': patcher.vector('scale', ['x', 'y'])
+    , 'm_Offset': patcher.vector('offset', ['x', 'y'])
+}
+
+# Material textures
+MaterialTexturesPatcher = {
+    '_MainTex': patcher.object('diffuse', MaterialTexturePatcher)
+}
+
+# Material parameters
+MaterialParametersPatcher = {
+    '_Shininess': patcher.rename('shininess')
+}
+
+# Material colors
+MaterialColorsPatcher = {
+      '_Color': patcher.vector('diffuse', ['r', 'g', 'b', 'a'])
+    , '_SpecColor': patcher.vector('specular', ['r', 'g', 'b', 'a'])
+}
+
+# Material properties
+MaterialPropertiesPatcher = {
+	  'm_TexEnvs': patcher.keyValue('textures', MaterialTexturesPatcher)
+    , 'm_Floats': patcher.keyValue('parameters', MaterialParametersPatcher)
+    , 'm_Colors': patcher.keyValue('colors', MaterialColorsPatcher)
+}
+
+# Scene patchers
+ScenePatchers = {
+	  'Renderer': RendererPatcher
+    , 'Transform': TransformPatcher
+    , 'GameObject': GameObjectPatcher
+    , 'Light': LightPatcher
+    , 'Camera': CameraPatcher
+}
