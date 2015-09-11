@@ -52,7 +52,7 @@ void EntitySystem::end( void )
 }
 
 // ** EntitySystem::process
-void EntitySystem::process( u32 currentTime, f32 dt, EntityPtr& entity )
+void EntitySystem::process( u32 currentTime, f32 dt, Entity& entity )
 {
 }
 
@@ -66,8 +66,8 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 	const EntitySet& entities = m_family->entities();
 
 	for( EntitySet::const_iterator i = entities.begin(); i != entities.end(); ) {
-		EntityPtr entity = *(i++);
-		process( currentTime, dt, entity );
+		const Entity& entity = *(i++)->get();
+		process( currentTime, dt, const_cast<Entity&>( entity ) );
 	}
 
 	end();
@@ -76,22 +76,22 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 // ** EntitySystem::handleEntityAdded
 void EntitySystem::handleEntityAdded( const Family::Added& e )
 {
-	entityAdded( e.entity );
+	entityAdded( *e.entity.get() );
 }
 
 // ** EntitySystem::handleEntityRemoved
 void EntitySystem::handleEntityRemoved( const Family::Removed& e )
 {
-	entityRemoved( e.entity );
+	entityRemoved( *e.entity.get() );
 }
 
 // ** EntitySystem::entityAdded
-void EntitySystem::entityAdded( const EntityPtr& entity )
+void EntitySystem::entityAdded( const Entity& entity )
 {
 }
 
 // ** EntitySystem::entityRemoved
-void EntitySystem::entityRemoved( const EntityPtr& entity )
+void EntitySystem::entityRemoved( const Entity& entity )
 {
 }
 

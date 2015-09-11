@@ -54,13 +54,13 @@ namespace Ecs {
 		virtual void	end( void );
 
 		//! Processes a single entity.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity );
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity );
 
 		//! Called when entity was added.
-		virtual void	entityAdded( const EntityPtr& entity );
+		virtual void	entityAdded( const Entity& entity );
 
 		//! Called when entity was removed.
-		virtual void	entityRemoved( const EntityPtr& entity );
+		virtual void	entityRemoved( const Entity& entity );
 
 		//! Handles an entity added event.
 		void			handleEntityAdded( const Family::Added& e );
@@ -89,14 +89,14 @@ namespace Ecs {
 	protected:
 
 		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
 		{
-			TComponent* c = entity->get<TComponent>();
+			TComponent* c = entity.get<TComponent>();
 			process( currentTime, dt, entity, *c );
 		}
 
 		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent& component )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent& component )
 		{
 			DC_BREAK
 		}
@@ -114,15 +114,15 @@ namespace Ecs {
 	protected:
 
 		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
 		{
-			TComponent1* c1 = entity->get<TComponent1>();
-			TComponent2* c2 = entity->get<TComponent2>();
+			TComponent1* c1 = entity.get<TComponent1>();
+			TComponent2* c2 = entity.get<TComponent2>();
 			process( currentTime, dt, entity, *c1, *c2 );
 		}
 
 		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent1& component1, TComponent2& component2 )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent1& component1, TComponent2& component2 )
 		{
 			DC_BREAK
 		}
@@ -140,16 +140,16 @@ namespace Ecs {
 	protected:
 
 		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
 		{
-			TComponent1* c1 = entity->get<TComponent1>();
-			TComponent2* c2 = entity->get<TComponent2>();
-			TComponent3* c3 = entity->get<TComponent3>();
+			TComponent1* c1 = entity.get<TComponent1>();
+			TComponent2* c2 = entity.get<TComponent2>();
+			TComponent3* c3 = entity.get<TComponent3>();
 			process( currentTime, dt, entity, *c1, *c2, *c3 );
 		}
 
 		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, EntityPtr& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
 		{
 			DC_BREAK
 		}
