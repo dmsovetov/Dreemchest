@@ -36,3 +36,4 @@ src/dreemchest/externals/src
 externals/src
 *.suo
 *.pyc
+.idea
