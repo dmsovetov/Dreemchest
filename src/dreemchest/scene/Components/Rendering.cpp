@@ -151,6 +151,24 @@ void Camera::setClearMask( u8 value )
 	m_clearMask = value;
 }
 
+// ** Camera:setFar
+void Camera::setFar( f32 value )
+{
+	m_far = value;
+}
+
+// ** Camera:setNear
+void Camera::setNear( f32 value )
+{
+	m_near = value;
+}
+
+// ** Camera:setFov
+void Camera::setFov( f32 value )
+{
+	m_fov = value;
+}
+
 // ** Camera::clearColor
 const Rgba& Camera::clearColor( void ) const
 {

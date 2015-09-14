@@ -216,13 +216,13 @@ namespace Scene {
 		f32							near( void ) const;
 
 		//! Sets the Z-near value.
-		void						setNear( f32 value ) const;
+		void						setNear( f32 value );
 
 		//! Returns the Z-far value.
 		f32							far( void ) const;
 
 		//! Sets the Z-far value.
-		void						setFar( f32 value ) const;
+		void						setFar( f32 value );
 
 		//! Sets the normalized device coordinates to render frame to.
 		void						setNdc( const Rect& value );

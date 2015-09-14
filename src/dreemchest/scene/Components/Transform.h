@@ -101,6 +101,9 @@ namespace Scene {
 		//! Sets transform rotation around the Z axis.
 		void					setRotationZ( f32 value );
 
+		//! Sets the scale.
+		void					setScale( const Vec3& value );
+
 		//! Returns the X scale.
 		f32						scaleX( void ) const;
 

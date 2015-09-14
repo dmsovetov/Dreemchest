@@ -163,6 +163,12 @@ void Transform::setRotationZ( f32 value )
 	m_rotation.z = value;
 }
 
+// ** Transform::setScale
+void Transform::setScale( const Vec3& value )
+{
+	m_scale = value;
+}
+
 // ** Transform::scaleX
 f32 Transform::scaleX( void ) const
 {
