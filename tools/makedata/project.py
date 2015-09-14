@@ -265,7 +265,8 @@ class patcher:
 
         # __call__
         def __call__(self, assets, object, property):
-            object[self.name] = str(object[property]['fileID'])
+            objectId = str(object[property]['fileID'])
+            object[self.name] = None if objectId == '0' else objectId
             del object[property]
 
     # Formats the vector
@@ -304,6 +305,7 @@ class patcher:
     	    ,   200:    'additive'
     	    ,   202:    'additive.soft'
     	    ,   10:     'emissive'
+            ,   12:     'emissive.specular'
    		    ,   10511:  'nature.treeSoftOcclusionLeaves'
 		    }
 
@@ -370,7 +372,23 @@ class scene:
 
         # Resulting object
         result = {}
+        meshes = {}
 
+        # Collect all mesh filters
+        for id, object in objects.items():
+            # Get the object type
+            type = [key for key in object.keys() if key != 'id'][0]
+            
+            if type != 'MeshFilter':
+                continue
+
+            # Get the parent scene object
+            sceneObject = object['MeshFilter']['m_GameObject']['fileID']
+
+            # Save the mesh filter asset
+            meshes[sceneObject] = object['MeshFilter']['m_Mesh']['guid']
+
+        # Patch objects
         for id, object in objects.items():
             # Get the object type
             type = [key for key in object.keys() if key != 'id'][0]
@@ -379,8 +397,15 @@ class scene:
             if not type in types:
                 continue
 
+            # Get the scene object id
+            sceneObject = object[type]['m_GameObject']['fileID'] if type != 'GameObject' else id
+
             # Get the actual properties
             data = patcher.patch(self._assets, object[type], ScenePatchers[type])
+
+            # Link the mesh asset with renderer
+            if type == 'Renderer':
+                data['asset'] = self._assets.use(meshes[sceneObject])
 
             # Remove properties with None values
             for k, v in data.items():
@@ -427,6 +452,9 @@ def import_scenes(assets, source, output):
         paths = item.format_paths(source, output)
         dest = os.path.join(output, item.uuid)
 
+    #    if item.file_name.find('Debug') == -1:
+    #        continue
+
         print 'Importing scene', item.full_path
         scene.convert(assets, paths.source, dest)
 
@@ -444,13 +472,13 @@ def import_materials(assets, source, output):
 
 # Imports all used assets
 def import_assets(assets, source, output):
-    for uuid, asset in assets.used_assets.items():
-        paths = asset.format_paths(source, output)
+    for uuid, item in assets.used_assets.items():
+        paths = item.format_paths(source, output)
         dest = os.path.join(output, uuid)
 
-        if asset.type == 'mesh':
+        if item.type == assets.Mesh:
             actions.convert_fbx({}, paths.source, dest)()
-        elif asset.type == 'texture':
+        elif item.type == assets.Texture:
             actions.convert_to_raw({}, paths.source, dest)()
 
 # Renderer patcher
@@ -458,8 +486,6 @@ RendererPatcher = {
 	  'm_CastShadows': patcher.rename('castShadows')
 	, 'm_ReceiveShadows': patcher.rename('receiveShadows')
 	, 'm_Materials': patcher.asset('materials')
-	, 'm_Mesh': patcher.asset('mesh')
-	, 'm_PrefabParentObject': patcher.asset('asset')
 	, 'm_Enabled': patcher.rename('enabled')
 	, 'm_GameObject': patcher.reference('sceneObject')
 }
@@ -471,6 +497,7 @@ TransformPatcher = {
 	, 'm_LocalPosition': patcher.vector('position', ['x', 'y', 'z'])
 	, 'm_Enabled': patcher.rename('enabled')
 	, 'm_GameObject': patcher.reference('sceneObject')
+    , 'm_Father': patcher.reference('parent')
 }
 
 # GameObject
