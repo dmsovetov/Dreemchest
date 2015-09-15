@@ -72,6 +72,20 @@ Vec3 DirectionFromKeyboard::get( void ) const
 	return direction;
 }
 
+// ----------------------------------------------- Identifier ------------------------------------------------ //
+
+// ** Identifier::name
+const String& Identifier::name( void ) const
+{
+	return m_name;
+}
+
+// ** Identifier::setName
+void Identifier::setName( const String& value )
+{
+	m_name = value;
+}
+
 // --------------------------------------------- MoveInDirection --------------------------------------------- //
 
 // ** MoveInDirection::speed

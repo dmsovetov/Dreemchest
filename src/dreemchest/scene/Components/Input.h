@@ -68,6 +68,27 @@ namespace Scene {
 		Platform::Key::Mapping	m_down;			//!< Down key mapping
 	};
 
+	//! Identifier component.
+	class Identifier : public Component {
+	public:
+
+								OverrideComponent( Identifier, Component )
+
+								//! Constructs the Identifier instance.
+								Identifier( const String& name = "" )
+									: m_name( name ) {}
+
+		//! Returns the identifier.
+		const String&			name( void ) const;
+
+		//! Sets the identifier.
+		void					setName( const String& value );
+
+	private:
+
+		String					m_name;	//!< Scene object name.
+	};
+
 	//! Moves the scene object along the input direction.
 	class MoveInDirection : public Component {
 	public:
