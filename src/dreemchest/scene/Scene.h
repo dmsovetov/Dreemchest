@@ -29,6 +29,8 @@
 
 #include "../Dreemchest.h"
 
+#define HAVE_JSON
+
 #ifndef FOO_INCLUDED
     #include <Foo/Foo.h>
 #endif
@@ -46,6 +48,10 @@
 #include <Ecs/EntitySystem.h>
 
 #include <Io/DiskFileSystem.h>
+
+#ifdef HAVE_JSON
+	#include <json/json.h>
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -111,6 +117,9 @@ namespace Scene {
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
 
+		//! Returns the list of scene object with specified name.
+		SceneObjectsList				findAllWithName( const String& name ) const;
+
 		//! Returns the scene systems.
 		Ecs::Systems&					systems( void );
 
@@ -139,9 +148,83 @@ namespace Scene {
 		//! All cameras that reside in scene.
 		Ecs::FamilyPtr					m_cameras;
 
+		//! All named entities that reside in scene stored inside this family.
+		Ecs::FamilyPtr					m_named;
+
 		//! Next scene object id.
 		Ecs::EntityId					m_nextEntityId;
 	};
+
+#ifdef HAVE_JSON
+
+	//! Loads the scene from JSON file.
+	class JsonSceneLoader {
+	public:
+
+									//! Constructs the JsonSceneLoader instance.
+									JsonSceneLoader( void );
+
+		//! Loads the scene from string.
+		bool						load( ScenePtr scene, const AssetBundlePtr& assets, const String& json );
+
+	private:
+
+		//! Returns the scene object by it's id.
+		Ecs::EntityPtr				requestSceneObject( const String& id );
+
+		//! Returns the component by it's id.
+		Ecs::ComponentPtr			requestComponent( const String& id );
+
+		//! Reads the Transform component from JSON object.
+		Ecs::ComponentPtr			readTransform( const Json::Value& value );
+
+		//! Reads the Renderer component from JSON object.
+		Ecs::ComponentPtr			readRenderer( const Json::Value& value );
+
+		//! Reads the Camera component from JSON object.
+		Ecs::ComponentPtr			readCamera( const Json::Value& value );
+
+		//! Reads the Light component from JSON object.
+		Ecs::ComponentPtr			readLight( const Json::Value& value );
+
+		//! Reads the Vec3 from a JSON object.
+		static Vec3					readVec3( const Json::Value& value );
+
+		//! Reads the Rect from a JSON object.
+		static Rect					readRect( const Json::Value& value );
+
+		//! Reads the Rgba from JSON object.
+		static Rgba					readRgba( const Json::Value& value );
+
+		//! Reads the Rgba from JSON object.
+		static Rgb					readRgb( const Json::Value& value );
+
+		//! Reads the Quat from JSON object.
+		static Quat					readQuat( const Json::Value& value );
+
+	private:
+
+		//! Component loader type.
+		typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
+
+		//! Container to store all available component loaders.
+		typedef Map<String, ComponentLoader> ComponentLoaders;
+
+		//! Container type to store parsed scene objects.
+		typedef Map<String, Ecs::EntityPtr> SceneObjects;
+
+		//! Container type to store parsed components.
+		typedef Map<String, Ecs::ComponentPtr> Components;
+
+		AssetBundlePtr				m_assets;		//!< Available assets.
+		Json::Value					m_json;			//!< Parsed JSON.
+		ScenePtr					m_scene;		//!< The scene to be loaded.
+		SceneObjects				m_sceneObjects;	//!< Parsed scene objects.
+		Components					m_components;	//!< Parsed components.
+		ComponentLoaders			m_loaders;		//!< Available component loaders.
+	};
+
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 
