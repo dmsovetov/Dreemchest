@@ -64,6 +64,55 @@ namespace Scene {
 		OverrideComponent( RenderSpriteTransform, Component )
 	};
 
+	//! Holds the light information.
+	class Light : public Component {
+	public:
+
+									OverrideComponent( Light, Component )
+
+		//! Available light types.
+		enum Type {
+			  Point
+			, Spot
+			, Directional
+		};
+
+									//! Constructs Light instance.
+									Light( Type type = Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
+										: m_type( type ), m_color( color ), m_intensity( intensity ), m_range( range ) {}
+
+		//! Returns the light type.
+		Type						type( void ) const;
+
+		//! Sets the light type.
+		void						setType( Type value );
+
+		//! Returns the light color.
+		const Rgb&					color( void ) const;
+
+		//! Sets the light color.
+		void						setColor( const Rgb& value );
+
+		//! Returns the light intensity.
+		f32							intensity( void ) const;
+
+		//! Sets the light intensity.
+		void						setIntensity( f32 value );
+
+		//! Returns the light influence range.
+		f32							range( void ) const;
+
+		//! Sets the light influence range.
+		void						setRange( f32 value );
+
+	private:
+
+		Type						m_type;			//!< Light type.
+		Rgb							m_color;		//!< Light color.
+		f32							m_intensity;	//!< Light intensity.
+		f32							m_range;		//!< Light influence range.
+	};
+
 	//! Holds the static mesh data with per-instance materials.
 	class StaticMesh : public Component {
 	public:

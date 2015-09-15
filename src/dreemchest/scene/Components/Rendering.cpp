@@ -33,6 +33,56 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ------------------------------------------------ Light ------------------------------------------------- //
+
+// ** Light::type
+Light::Type Light::type( void ) const
+{
+	return m_type;
+}
+
+// ** Light::setType
+void Light::setType( Type value )
+{
+	m_type = value;
+}
+
+// ** Light::color
+const Rgb& Light::color( void ) const
+{
+	return m_color;
+}
+
+// ** Light::setColor
+void Light::setColor( const Rgb& value )
+{
+	m_color = value;
+}
+
+// ** Light::intensity
+f32 Light::intensity( void ) const
+{
+	return m_intensity;
+}
+
+// ** Light::setIntensity
+void Light::setIntensity( f32 value )
+{
+	m_intensity = value;
+}
+
+// ** Light::range
+f32 Light::range( void ) const
+{
+	return m_range;
+}
+
+// ** Light::setRange
+void Light::setRange( f32 value )
+{
+	m_range = value;
+}
+
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
@@ -44,6 +94,7 @@ const MeshPtr& StaticMesh::mesh( void ) const
 // ** StaticMesh::setMesh
 void StaticMesh::setMesh( const MeshPtr& value )
 {
+	DC_BREAK_IF( !value.valid() );
 	m_mesh = value;
 }
 
