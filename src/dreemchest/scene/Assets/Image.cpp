@@ -31,8 +31,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Image::Image
-Image::Image( AssetBundle* bundle, const String& name, u16 width, u16 height )
-	: AssetWithData( bundle, Asset::Image, name ), m_width( width ), m_height( height )
+Image::Image( AssetBundle* bundle, const String& uuid, const String& name, u16 width, u16 height )
+	: AssetWithData( bundle, Asset::Image, uuid, name ), m_width( width ), m_height( height )
 {
 }
 

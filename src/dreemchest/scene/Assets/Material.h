@@ -81,7 +81,7 @@ namespace Scene {
 	private:
 
 									//! Constructs Material instance.
-									Material( AssetBundle* bundle, const String& name );
+									Material( AssetBundle* bundle, const String& uuid, const String& name );
 
 	private:
 

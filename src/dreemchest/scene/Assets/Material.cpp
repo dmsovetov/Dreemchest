@@ -32,14 +32,14 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Material::Material
-Material::Material( AssetBundle* bundle, const String& name ) : Asset( bundle, Asset::Material, name ), m_shader( Solid )
+Material::Material( AssetBundle* bundle, const String& uuid, const String& name ) : Asset( bundle, Asset::Material, uuid, name ), m_shader( Solid )
 {
 }
 
 // ** Material::create
 MaterialPtr Material::create( const String& name )
 {
-	return MaterialPtr( DC_NEW Material( NULL, name ) );
+	return MaterialPtr( DC_NEW Material( NULL, name, name ) );
 }
 
 // ** Material::shader

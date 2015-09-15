@@ -43,7 +43,7 @@ namespace Scene {
 	private:
 
 								//! Constructs Mesh instance.
-								Mesh( AssetBundle* bundle, const String& name );
+								Mesh( AssetBundle* bundle, const String& uuid, const String& name );
 	};
 
 } // namespace Scene

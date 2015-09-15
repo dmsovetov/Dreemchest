@@ -62,6 +62,7 @@ namespace Scene {
 			  Image				= BIT( 0 )
 			, Mesh				= BIT( 1 )
 			, Material			= BIT( 2 )
+			, Scene				= BIT( 3 )
 			, TotalAssetTypes	= 3
 			, All				= ~0
 		};
@@ -76,7 +77,7 @@ namespace Scene {
 		};
 
 								//! Constructs Asset instance.
-								Asset( AssetBundle* bundle, Type type, const String& name );
+								Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name );
 
 		//! Returns asset type.
 		Type					type( void ) const;
@@ -89,6 +90,9 @@ namespace Scene {
 
 		//! Returns asset name.
 		const String&			name( void ) const;
+
+		//! Returns asset uuid.
+		const String&			uuid( void ) const;
 
 		//! Returns asset state.
 		State					state( void ) const;
@@ -111,6 +115,7 @@ namespace Scene {
 		AssetBundleWPtr			m_bundle;	//!< Parent asset bundle.
 		Type					m_type;		//!< Asset type.
 		String					m_name;		//!< Asset name.
+		String					m_uuid;		//!< Asset UUID.
 		State					m_state;	//!< Asset state.
 	};
 
@@ -128,8 +133,8 @@ namespace Scene {
 	protected:
 
 								//! Constructs AssetWithData instance.
-								AssetWithData( AssetBundle* bundle, Type type, const String& name )
-									: Asset( bundle, type, name ) {}
+								AssetWithData( AssetBundle* bundle, Type type, const String& uuid, const String& name )
+									: Asset( bundle, type, uuid, name ) {}
 
 		//! Unloads the asset data.
 		virtual void			unload( void ) { m_data = StrongPtr<TData>(); Asset::unload(); }
@@ -151,19 +156,22 @@ namespace Scene {
 		StrongPtr<T>			find( const String& name );
 
 		//! Returns asset by name.
-		AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All );
+		AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All ) const;
 
 		//! Returns the full asset path by an identifier.
-		io::Path				assetPathByName( const String& name ) const;
+		io::Path				assetPathByIdentifier( const String& name ) const;
 
 		//! Creates the new Image asset inside this bundle.
-		ImagePtr				addImage( const String& name, u32 width, u32 height );
+		ImagePtr				addImage( const String& uuid, const String& name, u32 width, u32 height );
 
 		//! Creates the new Material asset inside this bundle.
-		MaterialPtr				addMaterial( const String& name );
+		MaterialPtr				addMaterial( const String& uuid, const String& name );
+
+		//! Creates the new Asset inside this bundle.
+		AssetPtr				addAsset( Asset::Type type, const String& uuid, const String& name );
 
 		//! Creates the new Mesh asset inside this bundle.
-		MeshPtr					addMesh( const String& name );
+		MeshPtr					addMesh( const String& uuid, const String& name );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& fileName );
@@ -181,9 +189,9 @@ namespace Scene {
 		//! Container type to store available assets.
 		typedef Hash<AssetPtr>	Assets;
 
-		io::Path				m_path;		//!< Asset bundle physical path.
-		String					m_name;		//!< Asset bundle name.
-		Assets					m_assets;	//!< Available assets.
+		io::Path				m_path;				//!< Asset bundle physical path.
+		String					m_name;				//!< Asset bundle name.
+		Assets					m_assets;			//!< Identifier to asset mapping.
 	};
 
 	// ** AssetBundle::find

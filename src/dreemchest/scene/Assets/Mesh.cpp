@@ -24,7 +24,6 @@
 
  **************************************************************************/
 
-#include <renderer/Hal.h>
 #include "Mesh.h"
 
 DC_BEGIN_DREEMCHEST
@@ -32,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Mesh::Mesh
-Mesh::Mesh( AssetBundle* bundle, const String& name ) : AssetWithData( bundle, Asset::Mesh, name )
+Mesh::Mesh( AssetBundle* bundle, const String& uuid, const String& name ) : AssetWithData( bundle, Asset::Mesh, uuid, name )
 {
 }
 

@@ -49,7 +49,7 @@ namespace Scene {
 	private:
 
 								//! Constructs Image instance.
-								Image( AssetBundle* bundle, const String& name, u16 width, u16 height );
+								Image( AssetBundle* bundle, const String& uuid, const String& name, u16 width, u16 height );
 
 	private:
 

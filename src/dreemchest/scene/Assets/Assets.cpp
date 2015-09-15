@@ -40,8 +40,8 @@ namespace Scene {
 // ------------------------------------------- Asset ------------------------------------------- //
 
 // ** Asset::Asset
-Asset::Asset( AssetBundle* bundle, Type type, const String& name )
-	: m_bundle( bundle ), m_type( type ), m_name( name ), m_state( Unknown )
+Asset::Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name )
+	: m_bundle( bundle ), m_type( type ), m_uuid( uuid ), m_name( name ), m_state( Unknown )
 {
 	DC_BREAK_IF( bundle == NULL )
 }
@@ -56,6 +56,12 @@ Asset::Type Asset::type( void ) const
 const String& Asset::name( void ) const
 {
 	return m_name;
+}
+
+// ** Asset::uuid
+const String& Asset::uuid( void ) const
+{
+	return m_uuid;
 }
 
 // ** Asset::state
@@ -95,7 +101,7 @@ bool Asset::load( const Renderer::HalPtr& hal )
 	m_state = Loading;
 
 	io::DiskFileSystem fileSystem;
-	io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByName( name() ) );
+	io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() ) );
 
 	if( stream == io::StreamPtr() ) {
 		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
@@ -157,16 +163,22 @@ const String& AssetBundle::name( void ) const
 	return m_name;
 }
 
-// ** AssetBundle::assetPathByName
-io::Path AssetBundle::assetPathByName( const String& name ) const
+// ** AssetBundle::assetPathByIdentifier
+io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
 {
-	return m_path + name;
+	AssetPtr asset = findAsset( name );
+
+	if( asset == AssetPtr() ) {
+		return "";
+	}
+
+	return m_path + asset->uuid();
 }
 
 // ** AssetBundle::findAsset
-AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType )
+AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
 {
-	Assets::iterator i = m_assets.find( StringHash( name.c_str() ) );
+	Assets::const_iterator i = m_assets.find( StringHash( name.c_str() ) );
 
 	if( i == m_assets.end() ) {
 		return AssetPtr();
@@ -192,16 +204,24 @@ bool AssetBundle::loadFromJson( const String& json )
 	for( u32 i = 0, n = root.size(); i < n; i++ ) {
 		const Json::Value& item = root[i];
 
-		String identifier = item["identifier"].asString(); 
+		String identifier = item["identifier"].asString();
+		String uuid		  = item["uuid"].asString();
 		String type		  = item["type"].asString();
 
 		if( type == "image" ) {
-			ImagePtr image = addImage( identifier, item["width"].asInt(), item["height"].asInt() );
+			ImagePtr image = addImage( uuid, identifier, item["width"].asInt(), item["height"].asInt() );
 			RawImageLoader::attachTo( image );
 		}
 		else if( type == "mesh" ) {
-			MeshPtr mesh = addMesh( identifier );
+			MeshPtr mesh = addMesh( uuid, identifier );
 			RawMeshLoader::attachTo( mesh );
+		}
+		else if( type == "material" ) {
+			MaterialPtr material = addMaterial( uuid, identifier );
+			JsonMaterialLoader::attachTo( material );
+		}
+		else if( type == "scene" ) {
+			AssetPtr scene = addAsset( Asset::Scene, uuid, identifier );
 		}
 		else {
 			log::warn( "AssetBundle::loadFromJson : unknown asset type '%s'\n", type.c_str() );
@@ -212,36 +232,51 @@ bool AssetBundle::loadFromJson( const String& json )
 }
 
 // ** AssetBundle::addImage
-ImagePtr AssetBundle::addImage( const String& name, u32 width, u32 height )
+ImagePtr AssetBundle::addImage( const String& uuid, const String& name, u32 width, u32 height )
 {
 	log::msg( "Adding image '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
 
-	ImagePtr image( DC_NEW Image( this, name, width, height ) );
+	ImagePtr image( DC_NEW Image( this, uuid, name, width, height ) );
+	m_assets[StringHash( uuid.c_str() )] = image;
 	m_assets[StringHash( name.c_str() )] = image;
 
 	return image;
 }
 
 // ** AssetBundle::addMesh
-MeshPtr AssetBundle::addMesh( const String& name )
+MeshPtr AssetBundle::addMesh( const String& uuid, const String& name )
 {
 	log::msg( "Adding mesh '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
 
-	MeshPtr mesh( DC_NEW Mesh( this, name ) );
+	MeshPtr mesh( DC_NEW Mesh( this, uuid, name ) );
+	m_assets[StringHash( uuid.c_str() )] = mesh;
 	m_assets[StringHash( name.c_str() )] = mesh;
 
 	return mesh;
 }
 
 // ** AssetBundle::addMaterial
-MaterialPtr AssetBundle::addMaterial( const String& name )
+MaterialPtr AssetBundle::addMaterial( const String& uuid, const String& name )
 {
 	log::msg( "Adding material '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
 
-	MaterialPtr material( DC_NEW Material( this, name ) );
+	MaterialPtr material( DC_NEW Material( this, uuid, name ) );
+	m_assets[StringHash( uuid.c_str() )] = material;
 	m_assets[StringHash( name.c_str() )] = material;
 
 	return material;
+}
+
+// ** AssetBundle::addAsset
+AssetPtr AssetBundle::addAsset( Asset::Type type, const String& uuid, const String& name )
+{
+	log::msg( "Adding asset '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
+
+	AssetPtr asset( DC_NEW Asset( this, type, uuid, name ) );
+	m_assets[StringHash( uuid.c_str() )] = asset;
+	m_assets[StringHash( name.c_str() )] = asset;
+
+	return asset;
 }
 
 } // namespace Scene
