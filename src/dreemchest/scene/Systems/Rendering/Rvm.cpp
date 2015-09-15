@@ -49,6 +49,7 @@ Rvm::Rvm( u32 maxCommands ) : m_allocator( maxCommands )
 	m_defaultSrcBlending	= Renderer::BlendDisabled;
 	m_defaultDstBlending	= Renderer::BlendDisabled;
 	m_defaultDepthFunction	= Renderer::Less;
+	m_defaultCullFace		= Renderer::TriangleFaceBack;
 }
 
 // ** Rvm::setDefaultShader
@@ -68,6 +69,12 @@ void Rvm::setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor d
 void Rvm::setDefaultDepthFunction( Renderer::Compare value )
 {
 	m_defaultDepthFunction = value;
+}
+
+// ** Rvm::setDefaultCullFace
+void Rvm::setDefaultCullFace( Renderer::TriangleFace value )
+{
+	m_defaultCullFace = value;
 }
 
 // ** Rvm::setViewProjection
@@ -121,7 +128,7 @@ void Rvm::flush( Renderer::HalPtr hal )
 	hal->setDepthTest( true, m_defaultDepthFunction );
 
 	// Set culling
-	hal->setCulling( Renderer::TriangleFaceBack );
+	hal->setCulling( m_defaultCullFace );
 
 	// Perform all rendering operations
 	for( EmittedCommands::const_iterator i = m_commands.begin(), end = m_commands.end(); i != end; ++i ) {

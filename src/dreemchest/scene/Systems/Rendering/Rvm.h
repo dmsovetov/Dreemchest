@@ -81,6 +81,9 @@ namespace Scene {
 		//! Sets the default deth testing function.
 		void							setDefaultDepthFunction( Renderer::Compare value );
 
+		//! Sets the default cull face side.
+		void							setDefaultCullFace( Renderer::TriangleFace value );
+
 		//! Sorts render operations by shader used, then by texture, then by mesh data.
 		static bool						sortByShaderTextureMesh( const Command* a, const Command* b );
 
@@ -114,6 +117,7 @@ namespace Scene {
 		Renderer::BlendFactor			m_defaultSrcBlending;		//!< The default source blend factor.
 		Renderer::BlendFactor			m_defaultDstBlending;		//!< The default dest blend factor.
 		Renderer::Compare				m_defaultDepthFunction;		//!< The default blend function.
+		Renderer::TriangleFace			m_defaultCullFace;			//!< The default cull face side.
 	};
 
 } // namespace Scene
