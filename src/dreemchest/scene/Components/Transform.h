@@ -41,7 +41,7 @@ namespace Scene {
 									
 								//! Constructs Transform instance.
 								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
-									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( 0.0f, 0.0f, rotation ), m_scale( sx, sy, 1.0f ) {}
+									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0, 0, 1 ) ) ), m_scale( sx, sy, 1.0f ) {}
 
 								//! Constructs Transform instance.
 								Transform( f32 x, f32 y, f32 z, const TransformWPtr& parent = TransformWPtr() )
@@ -81,7 +81,10 @@ namespace Scene {
 		void					setZ( f32 value );
 
 		//! Returns the transform rotation quaternion.
-		const Vec3&				rotation( void ) const;
+		const Quat&				rotation( void ) const;
+
+		//! Sets the transform rotation quaternion.
+		void					setRotation( const Quat& value );
 
 		//! Returns transform rotation around the X axis.
 		f32						rotationX( void ) const;
@@ -126,7 +129,7 @@ namespace Scene {
 
 		TransformWPtr			m_parent;	//!< Parent transform.
 		Vec3					m_position;	//!< Object position.
-		Vec3					m_rotation;	//!< Object rotation.
+		Quat					m_rotation;	//!< Object rotation.
 		Vec3					m_scale;	//!< Object scale.
 	};
 

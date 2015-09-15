@@ -61,10 +61,7 @@ f32 Follow::springForce( void ) const
 // ** Transform::matrix
 Matrix4 Transform::matrix( void ) const
 {
-	Quat    rx = Quat::rotateAroundAxis( m_rotation.x, Vec3( 1.0f, 0.0f, 0.0f ) );
-	Quat    ry = Quat::rotateAroundAxis( m_rotation.y, Vec3( 0.0f, 1.0f, 0.0f ) );
-	Quat    rz = Quat::rotateAroundAxis( m_rotation.z, Vec3( 0.0f, 0.0f, 1.0f ) );
-	Matrix4 T  = Matrix4::translation( m_position ) * (rx * ry * rz) * Matrix4::scale( m_scale );
+	Matrix4 T = Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
 
 	if( m_parent != NULL ) {
 		T = m_parent->matrix() * T;
@@ -122,9 +119,15 @@ void Transform::setY( f32 value )
 }
 
 // ** Transform::rotation
-const Vec3& Transform::rotation( void ) const
+const Quat& Transform::rotation( void ) const
 {
 	return m_rotation;
+}
+
+// ** Transform::setRotation
+void Transform::setRotation( const Quat& value )
+{
+	m_rotation = value;
 }
 
 // ** Transform::rotationX
