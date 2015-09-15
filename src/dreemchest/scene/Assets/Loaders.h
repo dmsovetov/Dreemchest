@@ -31,6 +31,7 @@
 
 #include "Mesh.h"
 #include "Image.h"
+#include "Material.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,7 +42,7 @@ namespace Scene {
 	public:
 
 		//! Loads an asset data from an input stream.
-		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const { return false; }
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const { return false; }
 	};
 
 	//! Loads an image from a raw pixel buffer format.
@@ -53,7 +54,7 @@ namespace Scene {
 								: m_image( image ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( ImagePtr image ) {
@@ -83,7 +84,7 @@ namespace Scene {
 								: m_mesh( mesh ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( MeshPtr mesh ) {
@@ -95,6 +96,32 @@ namespace Scene {
 
 		mutable MeshPtr		m_mesh;	//!< Target mesh to load data into
 	};
+
+#ifdef HAVE_JSON
+
+	//! Loads a material from a JSON format.
+	class JsonMaterialLoader : public AssetLoader {
+	public:
+
+							//! Constructs the JsonMaterialLoader instance.
+							JsonMaterialLoader( MaterialPtr material )
+								: m_material( material ) {}
+
+		//! Loads image data from an input stream.
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+
+		//! Attaches this loader to an asset.
+		static void			attachTo( MaterialPtr material ) {
+			AssetLoaderPtr loader( DC_NEW JsonMaterialLoader( material ) );
+			material->setLoader( loader );
+		}
+
+	private:
+
+		mutable MaterialPtr	m_material;	//!< Target material to load data into
+	};
+
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------ RawImageLoader ------------------------------------------ //
 
 // ** RawImageLoader::loadFromStream
-bool RawImageLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
 {
 	u16 width, height;
 	u8  channels;
@@ -59,7 +59,7 @@ bool RawImageLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& 
 // ------------------------------------------ RawMeshLoader ------------------------------------------ //
 
 // ** RawMeshLoader::loadFromStream
-bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
 {
 	u32 vertexCount, indexCount;
 
@@ -98,6 +98,37 @@ bool RawMeshLoader::loadFromStream( Renderer::HalPtr hal, const io::StreamPtr& s
 
 	return true;
 }
+
+// --------------------------------------- JsonMaterialLoader --------------------------------------- //
+
+#ifdef HAVE_JSON
+
+// ** JsonMaterialLoader::loadFromStream
+bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+{
+	String json;
+	json.resize( stream->length() );
+	stream->read( &json[0], stream->length() );
+
+	Json::Reader reader;
+	Json::Value root;
+
+	if( !reader.parse( json, root ) ) {
+		return false;
+	}
+
+	Json::Value diffuseColor   = root["colors"]["diffuse"];
+	Json::Value diffuseTexture = root["textures"]["diffuse"];
+	Json::Value parameters = root["parameters"];
+
+	m_material->setShader( Material::Solid );
+	m_material->setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
+	m_material->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
+
+	return true;
+}
+
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

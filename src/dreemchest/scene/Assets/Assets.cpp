@@ -111,7 +111,7 @@ bool Asset::load( const Renderer::HalPtr& hal )
 
 	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
 
-	if( !m_loader->loadFromStream( hal, stream ) ) {
+	if( !m_loader->loadFromStream( m_bundle, hal, stream ) ) {
 		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
 		m_state = LoadingError;
 		return false;
