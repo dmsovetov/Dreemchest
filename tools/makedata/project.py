@@ -79,10 +79,11 @@ class asset:
 
     # ctor
     def __init__(self, file_name, full_path, meta):
-        self._file_name = file_name
-        self._full_path = full_path
-        self._meta      = meta
-        self._type      = assets.asset_type(file_name)
+        self._file_name     = file_name
+        self._full_path     = full_path
+        self._meta          = meta
+        self._identifier    = os.path.splitext(full_path.replace('\\', '/').replace('Assets/', ''))[0].lower()
+        self._type          = assets.asset_type(file_name)
 
     # format_paths
     def format_paths(self, source, output):
@@ -96,6 +97,11 @@ class asset:
     @property
     def uuid(self):
         return self._meta['guid']
+
+    # identifier
+    @property
+    def identifier(self):
+        return self._identifier
 
     # file_name
     @property
@@ -155,11 +161,11 @@ class assets:
         # Append used assets
         result = []
         for guid, item in self.used_assets.items():
-            result.append(dict(identifier=item.uuid, type=item.type))
+            result.append(dict(identifier=item.identifier, uuid=item.uuid, type=item.type))
 
         # Append scenes
-        for scene in self.filter_by_type(assets.Scene):
-            result.append(dict(identifier=os.path.splitext(scene.file_name)[0], type=assets.Scene))
+        for item in self.filter_by_type(assets.Scene):
+            result.append(dict(identifier=item.identifier, uuid=item.uuid, type=item.type))
 
         with open(file_name, 'wt') as fh:
             fh.write(json.dumps(result))
@@ -183,7 +189,7 @@ class assets:
     # use
     def use(self, uuid):
         if not uuid in self._used_assets.keys():
-            print 'Using asset', self._files[uuid].full_path
+        #    print 'Using asset', self._files[uuid].full_path
             self._used_assets[uuid] = self._files[uuid]
 
         return uuid
