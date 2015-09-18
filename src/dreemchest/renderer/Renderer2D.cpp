@@ -32,6 +32,13 @@
 				vtx.y = ceilf( _y );			\
                 vtx.r = u8( color.r * 255 ), vtx.g = u8( color.g * 255 ), vtx.b = u8( color.b * 255 ), vtx.a = u8( color.a * 255 );
 
+#define		SET_VERTEX3( vtx, pos, _color )		\
+                vtx.x = pos.x;					\
+				vtx.y = pos.y;					\
+				vtx.z = pos.z;					\
+                vtx.r = u8( color.r * 255 ), vtx.g = u8( color.g * 255 ), vtx.b = u8( color.b * 255 ), vtx.a = u8( color.a * 255 );
+
+
 #define		SET_VERTEX_UV( vtx, _x, _y, _color, _u, _v )	\
 				SET_VERTEX( vtx, _x, _y, _color )			\
 				vtx.u = _u;									\
@@ -90,8 +97,8 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 			} ) );
 
 	// Create vertex declarations
-	VertexDeclarationPtr vertexTextured = m_hal->createVertexDeclaration( "P2:C4:T0" );
-	VertexDeclarationPtr vertexColored  = m_hal->createVertexDeclaration( "P2:C4", sizeof( Vertex ) );
+	VertexDeclarationPtr vertexTextured = m_hal->createVertexDeclaration( "P3:C4:T0" );
+	VertexDeclarationPtr vertexColored  = m_hal->createVertexDeclaration( "P3:C4", sizeof( Vertex ) );
 	DC_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ) );
 
 	// Set vertex formats for primitive types
@@ -145,13 +152,13 @@ Renderer2DPtr Renderer2D::create( const HalPtr& hal, u32 maxVertexBufferSize )
 }
 
 // ** Renderer2D::begin
-void Renderer2D::begin( const Matrix4& value )
+void Renderer2D::begin( const Matrix4& value, Compare depthTest )
 {
 	// Set the view-projection matrix
 	m_viewProjection = value;
 
 	// Disable the depth test for 2d rendering
-	m_hal->setDepthTest( true, Always );
+	m_hal->setDepthTest( true, depthTest );
 
 	// Enable alpha blending
 	m_hal->setBlendFactors( BlendSrcAlpha, BlendInvSrcAlpha );
@@ -186,6 +193,17 @@ void Renderer2D::line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color )
 
 	SET_VERTEX( vertices[0], x1, y1, color );
 	SET_VERTEX( vertices[1], x2, y2, color );
+
+	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
+}
+
+// ** Renderer2D::line
+void Renderer2D::line( const Vec3& start, const Vec3& end, const Rgba& color )
+{
+	Vertex vertices[2];
+
+	SET_VERTEX3( vertices[0], start, color );
+	SET_VERTEX3( vertices[1], end, color );
 
 	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
 }

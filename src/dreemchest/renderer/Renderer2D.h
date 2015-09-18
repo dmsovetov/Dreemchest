@@ -37,15 +37,19 @@ namespace Renderer {
 	class Renderer2D : public RefCounted {
 	public:
 
-		//! 2D render vertex.
+		//! Render vertex.
 		struct Vertex {
-			f32					x, y;			//!< Vertex coordinate.
+			f32					x, y, z;		//!< Vertex coordinate.
 			u8					r, g, b, a;		//!< Vertex color.
 			f32					u, v;			//!< Vertex texture coordinates.
+
+								//! Construct Vertex instance.
+								Vertex( void )
+									: x( 0.0f ), y( 0.0f ), z( 0.0f ) {}
 		};
 
 		//! Begins the 2D rendering.
-		void					begin( const Matrix4& value );
+		void					begin( const Matrix4& value, Compare depthTest = Always );
 
 		void					end( void );
 
@@ -57,6 +61,9 @@ namespace Renderer {
 
 		//! Renders the line segment.
 		void					line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+		//! Renders the line segment in 3D space.
+		void					line( const Vec3& start, const Vec3& end, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 		//! Creates a new instance of Renderer2D.
 		static Renderer2DPtr	create( const HalPtr& hal, u32 maxVertexBufferSize = 1024 );
