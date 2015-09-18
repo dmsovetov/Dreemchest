@@ -28,6 +28,7 @@
 #define __DC_Scene_DebugPasses_H__
 
 #include "../RenderPass.h"
+#include "../RenderingSystem.h"
 #include "../Emitters/StaticMeshRopEmitter.h"
 
 DC_BEGIN_DREEMCHEST
@@ -62,18 +63,44 @@ namespace Scene {
 		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
 	};
 
-	//! Renders bounding box of a meshes.
-	class BoundingBoxPass : public RenderPass<StaticMesh> {
+	//! Renders bounding boxes of meshes.
+	class MeshBoundsPass : public RenderPass<StaticMesh> {
 	public:
 
-								//! Constructs BoundingBoxPass instance.
-								BoundingBoxPass( Ecs::Entities& entities )
-									: RenderPass( entities, "BoundingBoxPass" ) {}
+								//! Constructs MeshBoundsPass instance.
+								MeshBoundsPass( Ecs::Entities& entities )
+									: RenderPass( entities, "MeshBoundsPass" ) {}
 
 	protected:
 
-		//! Emits render operations for a single static mesh.
+		//! Renders bounding box of a single static mesh.
 		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform );
+	};
+
+	//! Renders bounding boxes of lights.
+	class LightBoundsPass : public RenderPass<Light> {
+	public:
+
+								//! Constructs LightBoundsPass instance.
+								LightBoundsPass( Ecs::Entities& entities )
+									: RenderPass( entities, "LightBoundsPass" ) {}
+
+	protected:
+
+		//! Renders bounding box of a single light.
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
+	};
+
+	//! Renders bounding boxes of scene objects.
+	class BoundingBoxRenderer : public RenderingSystemBase {
+	public:
+
+								BoundingBoxRenderer( Ecs::Entities& entities )
+									: RenderingSystemBase( entities, "BoundingBoxRenderer", Ecs::Aspect::all<Camera, Transform>() )
+								{
+									addPass<MeshBoundsPass>();
+									addPass<LightBoundsPass>();
+								}
 	};
 
 } // namespace Scene
