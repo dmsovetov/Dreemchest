@@ -218,7 +218,6 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& decla
 void OpenGLHal::setPolygonMode( PolygonMode mode )
 {
 #ifndef HAVE_OPENGLES
-	glLineWidth( 2.0f );
     static GLenum fill[] = { GL_LINE, GL_FILL };
     glPolygonMode( GL_FRONT_AND_BACK, fill[mode] );
 #endif
