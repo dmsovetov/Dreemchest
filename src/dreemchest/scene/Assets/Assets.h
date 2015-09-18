@@ -60,8 +60,8 @@ namespace Scene {
 		//! Available asset types.
 		enum Type {
 			  Image				= BIT( 0 )
-			, Mesh				= BIT( 1 )
-			, Material			= BIT( 2 )
+			, Material			= BIT( 1 )
+			, Mesh				= BIT( 2 )
 			, Scene				= BIT( 3 )
 			, TotalAssetTypes	= 3
 			, All				= ~0

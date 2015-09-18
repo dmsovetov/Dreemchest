@@ -65,7 +65,7 @@ namespace Scene {
 
 	private:
 
-		Renderer::HalPtr	m_hal;		//! Rendering HAL.
+		Renderer::HalPtr	m_hal;		//!< Rendering HAL.
 		List<AssetWPtr>		m_queue;	//!< Asset loading queue.
 	};
 

@@ -59,8 +59,24 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 		return;
 	}
 
-	m_queue.front()->load( m_hal );
+	// Get the next asset in queue
+	AssetWPtr asset = m_queue.front();
+
+	// Pop it from queue
 	m_queue.pop_front();
+
+	// Load an asset
+	asset->load( m_hal );
+
+	if( Material* material = castTo<Material>( asset.get() ) ) {
+		for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
+			ImageWPtr image = material->texture( static_cast<Material::Layer>( i ) );
+
+			if( image.valid() ) {
+				queueAsset( image );
+			}
+		}
+	}
 }
 
 // ** AssetSystem::queueSprite
@@ -82,6 +98,8 @@ void AssetSystem::queueStaticMesh( StaticMesh* mesh )
 // ** AssetSystem::queueMaterialAsset
 void AssetSystem::queueMaterialAsset( MaterialPtr material )
 {
+	queueAsset( material );
+
 	for( u32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
 		const ImageWPtr& image = material->texture( static_cast<Material::Layer>( i ) );
 
@@ -100,8 +118,16 @@ void AssetSystem::queueAsset( AssetWPtr asset )
 		return;
 	}
 
+	struct Compare {
+		static bool byType( const AssetWPtr& a, const AssetWPtr& b )
+		{
+			return a->type() < b->type();
+		}
+	};
+
 	if( std::find( m_queue.begin(), m_queue.end(), asset ) == m_queue.end() ) {
 		m_queue.push_back( asset );
+		m_queue.sort( Compare::byType );
 	}	
 }
 
