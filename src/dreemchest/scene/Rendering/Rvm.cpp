@@ -52,7 +52,7 @@ const Rvm::RasterizationOptions Rvm::OpaqueRasterization = { true, Renderer::Ble
 const Rvm::RasterizationOptions Rvm::CutoutRasterization = { true, Renderer::BlendDisabled, Renderer::BlendDisabled, Renderer::Greater, 0.5f, true, Renderer::LessEqual };
 
 // ** Rvm::TranslucentRasterization
-const Rvm::RasterizationOptions Rvm::TranslucentRasterization = { true, Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha, Renderer::CompareDisabled, 0.0f, true, Renderer::LessEqual };
+const Rvm::RasterizationOptions Rvm::TranslucentRasterization = { true, Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha, Renderer::CompareDisabled, 0.0f, false, Renderer::LessEqual };
 
 // ** Rvm::AdditiveRasterization
 const Rvm::RasterizationOptions Rvm::AdditiveRasterization = { true, Renderer::BlendOne, Renderer::BlendOne, Renderer::CompareDisabled, 0.0f, false, Renderer::LessEqual };
