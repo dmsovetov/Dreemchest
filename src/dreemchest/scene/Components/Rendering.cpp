@@ -98,6 +98,13 @@ void StaticMesh::setMesh( const MeshPtr& value )
 	m_mesh = value;
 }
 
+// ** StaticMesh::bounds
+const Bounds& StaticMesh::bounds( void ) const
+{
+	static Bounds empty;
+	return m_mesh.valid() ? m_mesh->bounds() : empty;
+}
+
 // ** StaticMesh::materialCount
 u32 StaticMesh::materialCount( void ) const
 {

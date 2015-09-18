@@ -38,8 +38,8 @@ namespace Scene {
 	public:
 
 								//! Constructs the RenderingContext instance.
-								RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal )
-									: m_rvm( rvm ), m_shaders( shaders ), m_hal( hal ) {}
+								RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal, Renderer::Renderer2DPtr renderer )
+									: m_rvm( rvm ), m_shaders( shaders ), m_hal( hal ), m_renderer( renderer ) {}
 
 		//! Returns RVM.
 		RvmPtr					rvm( void ) const { return m_rvm; }
@@ -50,11 +50,15 @@ namespace Scene {
 		//! Returns hal.
 		Renderer::HalPtr		hal( void ) const { return m_hal; }
 
+		//! Returns renderer.
+		Renderer::Renderer2DPtr	renderer( void ) const { return m_renderer; }
+
 	private:
 
 		RvmPtr					m_rvm;		//!< Rendering virtual machine.
 		ShaderCachePtr			m_shaders;	//!< Shaders cache.
 		Renderer::HalPtr		m_hal;		//!< Rendering HAL.
+		Renderer::Renderer2DPtr	m_renderer;	//!< Rendering interface.
 	};
 
 } // namespace Scene

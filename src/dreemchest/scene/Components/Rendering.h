@@ -134,6 +134,9 @@ namespace Scene {
 		//! Sets a mesh to be rendered.
 		void						setMesh( const MeshPtr& value );
 
+		//! Returns mesh bounds.
+		const Bounds&				bounds( void ) const;
+
 		//! Returns the total number of materials.
 		u32							materialCount( void ) const;
 

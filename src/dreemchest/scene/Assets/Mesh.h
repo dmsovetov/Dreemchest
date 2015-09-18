@@ -40,10 +40,20 @@ namespace Scene {
 
 								ClassEnableTypeInfoSuper( Mesh, Asset )
 
+		//! Returns mesh bounds.
+		const Bounds&			bounds( void ) const;
+
+		//! Sets mesh bounds.
+		void					setBounds( const Bounds& value );
+
 	private:
 
 								//! Constructs Mesh instance.
 								Mesh( AssetBundle* bundle, const String& uuid, const String& name );
+
+	private:
+
+		Bounds					m_bounds;		//!< Bounding box of a mesh.
 	};
 
 } // namespace Scene

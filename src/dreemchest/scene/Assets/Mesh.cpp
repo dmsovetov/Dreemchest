@@ -35,6 +35,18 @@ Mesh::Mesh( AssetBundle* bundle, const String& uuid, const String& name ) : Asse
 {
 }
 
+// ** Mesh::bounds
+const Bounds& Mesh::bounds( void ) const
+{
+	return m_bounds;
+}
+
+// ** Mesh::setBounds
+void Mesh::setBounds( const Bounds& value )
+{
+	m_bounds = value;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

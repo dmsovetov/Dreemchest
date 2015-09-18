@@ -64,6 +64,7 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 	u32 chunkCount, vertexCount, indexCount;
 	
 	AssetMesh* data = DC_NEW AssetMesh;
+	Bounds bounds;
 
 	stream->read( &chunkCount, 4 );
 
@@ -88,6 +89,8 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 			for( u32 j = 0; j < 3; j++ ) {
 				v->position[j] *= 0.01f;
 			}
+
+			bounds += v->position;
 		}
 
 		vertexBuffer->unlock();
@@ -101,6 +104,7 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 	}
 
 	m_mesh->setData( data );
+	m_mesh->setBounds( bounds );
 
 	return true;
 }
