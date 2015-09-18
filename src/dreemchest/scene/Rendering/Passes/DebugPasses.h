@@ -62,6 +62,20 @@ namespace Scene {
 		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
 	};
 
+	//! Renders bounding box of a meshes.
+	class BoundingBoxPass : public RenderPass<StaticMesh> {
+	public:
+
+								//! Constructs BoundingBoxPass instance.
+								BoundingBoxPass( Ecs::Entities& entities )
+									: RenderPass( entities, "BoundingBoxPass" ) {}
+
+	protected:
+
+		//! Emits render operations for a single static mesh.
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform );
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

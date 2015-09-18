@@ -61,6 +61,31 @@ void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewPr
 	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.1f, 0.0f ) );
 }
 
+// ** BoundingBoxPass::render
+void BoundingBoxPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
+{
+	Renderer::Renderer2DPtr renderer = context->renderer();
+
+	Bounds bounds = staticMesh.bounds() * transform.matrix();
+
+	Vec3 x = Vec3( bounds.width(), 0.0f, 0.0f );
+	Vec3 y = Vec3( 0.0f, bounds.height(), 0.0f );
+	Vec3 z = Vec3( 0.0f, 0.0f, bounds.depth() );
+
+	const Vec3& min = bounds.min();
+	const Vec3& max = bounds.max();
+
+	const Rgba color( 1.0f, 1.0f, 0.0f, 0.25f );
+
+	renderer->line( min, min + x, color );
+	renderer->line( min, min + y, color );
+	renderer->line( min, min + z, color );
+
+	renderer->line( max, max - x, color );
+	renderer->line( max, max - y, color );
+	renderer->line( max, max - z, color );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
