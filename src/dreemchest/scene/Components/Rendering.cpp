@@ -293,6 +293,31 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 	return Matrix4();
 }
 
+// ** Camera::calculateClipSpace
+Matrix4 Camera::calculateClipSpace( const Matrix4& transform ) const
+{
+	return calculateProjectionMatrix() * transform.inversed() /*Matrix4::lookAt( Vec3( 5, 5, 5 ), Vec3( 0, 0, 0 ), Vec3( 0, 1, 0 ) )*/;
+}
+
+// ** Camera::calculateFrustum
+void Camera::calculateFrustum( const Matrix4& clip, Plane* planes )
+{
+	const f32 *m = clip.m;
+
+	planes[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
+	planes[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
+
+	planes[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
+	planes[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
+
+	planes[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
+	planes[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
+
+	for( s32 i = 0; i < 6; i++ ) {
+		planes[i].normalize();
+	}
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

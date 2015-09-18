@@ -299,6 +299,12 @@ namespace Scene {
 		//! Calculates the projection matrix.
 		Matrix4						calculateProjectionMatrix( void ) const;
 
+		//! Calculates the clip space matrix.
+		Matrix4						calculateClipSpace( const Matrix4& transform ) const;
+
+		//! Extracts frustum planes from clip space matrix.
+		static void					calculateFrustum( const Matrix4& clip, Plane* planes );
+
 	private:
 
 		u8							m_clearMask;	//!< Camera clear flags.
