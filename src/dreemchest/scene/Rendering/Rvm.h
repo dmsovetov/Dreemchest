@@ -61,6 +61,23 @@ namespace Scene {
 
 			//! Returns true if the rendering mode will not be skipped.
 			operator bool( void ) const { return m_enabled; }
+
+			//! Returns rasterization options with modified depth mask.
+			RasterizationOptions		overrideDepthMask( bool value ) const
+			{
+				RasterizationOptions result = *this;
+				result.m_depthMask = value;
+				return result;
+			}
+
+			//! Returns rasterization options with modified blending.
+			RasterizationOptions		overrideBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst ) const
+			{
+				RasterizationOptions result = *this;
+				result.m_blend[0] = src;
+				result.m_blend[1] = dst;
+				return result;
+			}
 		};
 
 		static const RasterizationOptions SkipRasterization;					//!< Skip rendering.
@@ -115,6 +132,9 @@ namespace Scene {
 
 		//! Sets rasterization state for specified rendering mode.
 		void							setRasterization( RenderingMode mode, const RasterizationOptions& value );
+
+		//! Sets rasterization state for specified rendering mode mask.
+		void							setRasterization( u32 mask, const RasterizationOptions& value );
 
 		//! Sets the global shader constant.
 		void							setUniformMatrix( CString name, const Matrix4& value );

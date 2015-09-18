@@ -33,13 +33,8 @@ namespace Scene {
 // ** OverdrawPass::setup
 void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
-	Rvm::RasterizationOptions additive = Rvm::OpaqueRasterization;
-	additive.m_blend[0] = additive.m_blend[1] = Renderer::BlendOne;
-
 	// Set additive blending for all render passes
-	rvm.setRasterization( RenderOpaque, Rvm::AdditiveRasterization );
-	rvm.setRasterization( RenderCutout, additive );
-	rvm.setRasterization( RenderTranslucent, additive );
+	rvm.setRasterization( AllRenderModesBit, Rvm::AdditiveRasterization );
 
 	// Set the default shader
 	rvm.setDefaultShader( shaders.shaderById( ShaderCache::ConstantColor ) );
@@ -51,13 +46,10 @@ void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewPro
 // ** WireframePass::setup
 void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
-	Rvm::RasterizationOptions additive = Rvm::OpaqueRasterization;
-	additive.m_blend[0] = additive.m_blend[1] = Renderer::BlendOne;
+	Rvm::RasterizationOptions additiveWithDepthWrite = Rvm::AdditiveRasterization.overrideDepthMask( true );
 
 	// Set additive blending for all render passes
-	rvm.setRasterization( RenderOpaque, Rvm::AdditiveRasterization );
-	rvm.setRasterization( RenderCutout, additive );
-	rvm.setRasterization( RenderTranslucent, additive );
+	rvm.setRasterization( AllRenderModesBit, additiveWithDepthWrite );
 
 	// Set wireframe polygon mode
 	rvm.setDefaultPolygonMode( Renderer::PolygonWire );

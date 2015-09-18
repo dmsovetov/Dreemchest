@@ -109,6 +109,16 @@ void Rvm::setRasterization( RenderingMode mode, const RasterizationOptions& valu
 	m_rasterization[mode] = value;
 }
 
+// ** Rvm::setRasterization
+void Rvm::setRasterization( u32 mask, const RasterizationOptions& value )
+{
+	for( u32 mode = 0; mode < TotalRenderModes; mode++ ) {
+		if( mask & BIT( mode ) ) {
+			m_rasterization[mode] = value;
+		}
+	}
+}
+
 // ** Rvm::setDefaultPolygonMode
 void Rvm::setDefaultPolygonMode( Renderer::PolygonMode value )
 {

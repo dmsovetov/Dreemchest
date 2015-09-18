@@ -85,11 +85,12 @@ namespace Scene {
 	};
 
 	//! Rendering mode mask.
-	enum RenderingModeMask {
-		  EnableOpaque		= BIT( RenderOpaque )		//!< Enables opaque rendering.
-		, EnableCutout		= BIT( RenderCutout )		//!< Enables cutout rendering.
-		, EnableTranslucent = BIT( RenderTranslucent )	//!< Enables translucent rendering.
-		, EnableAdditive	= BIT( RenderAdditive )		//!< Enables additive rendering.
+	enum RenderingModeBits {
+		  RenderOpaqueBit		= BIT( RenderOpaque )		//!< Opaque rendering bit.
+		, RenderCutoutBit		= BIT( RenderCutout )		//!< Cutout rendering bit.
+		, RenderTranslucentBit	= BIT( RenderTranslucent )	//!< Translucent rendering bit.
+		, RenderAdditiveBit		= BIT( RenderAdditive )		//!< Additive rendering bit.
+		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
 	};
 
 	// Alias the Ecs::Entity type
