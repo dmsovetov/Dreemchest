@@ -61,6 +61,12 @@ const EntitySet& Family::entities( void ) const
 	return m_family;
 }
 
+// ** Family::size
+s32 Family::size( void ) const
+{
+	return static_cast<s32>( m_family.size() );
+}
+
 // ** Family::events
 EventEmitter& Family::events( void )
 {
