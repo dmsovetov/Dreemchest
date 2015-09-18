@@ -57,12 +57,25 @@ namespace Scene {
 	class AdditiveLightPass : public RenderPassBase {
 	public:
 
-								//! Constructs AmbientPass instance.
+								//! Constructs AdditiveLightPass instance.
 								AdditiveLightPass( Ecs::Entities& entities );
 
 	protected:
 
 		//! Setups the RVM for rendering additive layer.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+	};
+
+	//! Emits render operations for translucent objects.
+	class TranslucentLightPass : public ForwardLightPass {
+	public:
+
+								//! Constructs TranslucentLightPass instance.
+								TranslucentLightPass( Ecs::Entities& entities );
+
+	protected:
+
+		//! Setups the RVM for rendering translucent layer.
 		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
 	};
 
@@ -75,6 +88,7 @@ namespace Scene {
 								{
 									addPass<AmbientPass>();
 									addPass<ForwardLightPass>();
+									addPass<TranslucentLightPass>();
 									addPass<AdditiveLightPass>();
 								}
 	};

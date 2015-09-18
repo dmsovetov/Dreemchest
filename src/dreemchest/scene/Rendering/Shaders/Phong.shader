@@ -45,17 +45,17 @@ uniform vec4 u_lightPosition;
 uniform vec4 u_lightIntensity;
 
 void main() {
-	vec4 result  = u_clr0;
+	vec4 diffuse  = u_clr0;
 
 #ifdef USE_DIFFUSE_MAP
-	result *= texture2D( u_tex0, v_uv0 );
+	diffuse *= texture2D( u_tex0, v_uv0 );
 #endif
 
 	vec3 normal = normalize( v_normal );
 	vec3 light  = normalize( v_lightDir.xyz );
 	float r     = length(v_lightDir.xyz) / u_lightPosition.w;
 	float att   = 1.0 / (1.0 + 25.0 * r * r);
-	result *= att * v_lightColor.a * v_lightColor * max( dot( normal, light ), 0.0 );
+	vec4 result = diffuse * att * v_lightColor.a * v_lightColor * max( dot( normal, light ), 0.0 );
 
-	gl_FragColor = vec4( result.rgb, 1.0 );	
+	gl_FragColor = vec4( result.rgb, diffuse.a );	
 }

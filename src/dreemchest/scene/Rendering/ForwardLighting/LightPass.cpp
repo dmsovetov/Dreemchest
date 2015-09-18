@@ -49,11 +49,8 @@ void ForwardLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& vie
 	// Additive render mode can't be lit
 	rvm.setRasterization( RenderAdditive, Rvm::SkipRasterization );
 
-	// Override blend mode for lit translucent objects
-	Rvm::RasterizationOptions options = Rvm::TranslucentRasterization;
-	options.m_blend[0] = Renderer::BlendSrcAlpha;
-	options.m_blend[1] = Renderer::BlendOne;
-	rvm.setRasterization( RenderTranslucent, options );
+	// Skip translucent objects in this pass
+	rvm.setRasterization( RenderTranslucent, Rvm::SkipRasterization );
 }
 
 // ** ForwardLightPass::render
@@ -85,6 +82,28 @@ void AdditiveLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& vi
 	rvm.setRasterization( RenderCutout, Rvm::SkipRasterization );
 	rvm.setRasterization( RenderTranslucent, Rvm::SkipRasterization );
 }
+
+// ** TranslucentLightPass::TranslucentLightPass
+TranslucentLightPass::TranslucentLightPass( Ecs::Entities& entities ) : ForwardLightPass( entities )
+{
+	addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::Unlit ) );
+}
+
+// ** TranslucentLightPass::setup
+void TranslucentLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
+{
+	// Disable all render modes except the translucent
+	rvm.setRasterization( RenderOpaque, Rvm::SkipRasterization );
+	rvm.setRasterization( RenderCutout, Rvm::SkipRasterization );
+	rvm.setRasterization( RenderAdditive, Rvm::SkipRasterization );
+
+	// Override blend mode for lit translucent objects
+	Rvm::RasterizationOptions options = Rvm::TranslucentRasterization;
+	options.m_blend[0] = Renderer::BlendSrcAlpha;
+	options.m_blend[1] = Renderer::BlendOne;
+	rvm.setRasterization( RenderTranslucent, options );
+}
+
 
 } // namespace Scene
 
