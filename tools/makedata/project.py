@@ -565,6 +565,7 @@ MaterialParametersPatcher = {
 MaterialColorsPatcher = {
       '_Color': patcher.vector('diffuse', ['r', 'g', 'b', 'a'])
     , '_SpecColor': patcher.vector('specular', ['r', 'g', 'b', 'a'])
+    , '_TintColor': patcher.vector('tint', ['r', 'g', 'b', 'a'])
 }
 
 # Material properties
