@@ -65,6 +65,12 @@ namespace Renderer {
 		//! Renders the line segment in 3D space.
 		void					line( const Vec3& start, const Vec3& end, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders bounding box in 3D space.
+		void					wireBox( const Bounds& bounds, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+		//! Renders a wire sphere in 3D space.
+		void					wireSphere( const Vec3& center, f32 radius, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Creates a new instance of Renderer2D.
 		static Renderer2DPtr	create( const HalPtr& hal, u32 maxVertexBufferSize = 1024 );
 

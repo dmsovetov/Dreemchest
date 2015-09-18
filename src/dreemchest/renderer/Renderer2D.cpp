@@ -208,6 +208,78 @@ void Renderer2D::line( const Vec3& start, const Vec3& end, const Rgba& color )
 	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
 }
 
+// ** Renderer2D::wireBox
+void Renderer2D::wireBox( const Bounds& bounds, const Rgba& color )
+{
+	Vec3 x = Vec3( bounds.width(), 0.0f, 0.0f );
+	Vec3 y = Vec3( 0.0f, bounds.height(), 0.0f );
+	Vec3 z = Vec3( 0.0f, 0.0f, bounds.depth() );
+
+	const Vec3& min = bounds.min();
+	const Vec3& max = bounds.max();
+
+	// Render the bottom side
+	line( min,			min + x,	 color );
+	line( min + x,	    min + x + z, color );
+	line( min + x + z,  min + z,	 color );
+	line( min + z,      min,		 color );
+
+	// Render the top side
+	line( max,			max - x,	 color );
+	line( max - x,	    max - x - z, color );
+	line( max - x - z,  max - z,	 color );
+	line( max - z,      max,		 color );
+
+	// Render vertical lines
+	line( min,			min + y,		 color );
+	line( min + x,		min + x + y,	 color );
+	line( min + x + z,	min + x + z + y, color );
+	line( min + z,		min + z + y,	 color );
+}
+
+// ** Renderer2D::wireSphere
+void Renderer2D::wireSphere( const Vec3& center, f32 radius, const Rgba& color )
+{
+    const s32 kSegments = 32;
+    Vertex vertices[kSegments];
+
+    f32	step   = 360.0f / (kSegments - 1);
+    f32	angle  = 0.0f;
+
+	// XZ circle
+	for( s32 i = 0; i < kSegments - 1; i++ ) {
+		Vec2 dir1   = Vec2::fromAngle( (i + 0) * step );
+		Vec3 point1 = center + Vec3( dir1.x, 0.0f, dir1.y ) * radius;
+
+		Vec2 dir2   = Vec2::fromAngle( (i + 1) * step );
+		Vec3 point2 = center + Vec3( dir2.x, 0.0f, dir2.y ) * radius;
+
+		line( point1, point2, color );
+	}
+
+	// XY circle
+	for( s32 i = 0; i < kSegments - 1; i++ ) {
+		Vec2 dir1   = Vec2::fromAngle( (i + 0) * step );
+		Vec3 point1 = center + Vec3( dir1.x, dir1.y, 0.0f ) * radius;
+
+		Vec2 dir2   = Vec2::fromAngle( (i + 1) * step );
+		Vec3 point2 = center + Vec3( dir2.x, dir2.y, 0.0f ) * radius;
+
+		line( point1, point2, color );
+	}
+
+	// YZ circle
+	for( s32 i = 0; i < kSegments - 1; i++ ) {
+		Vec2 dir1   = Vec2::fromAngle( (i + 0) * step );
+		Vec3 point1 = center + Vec3( 0.0f, dir1.x, dir1.y ) * radius;
+
+		Vec2 dir2   = Vec2::fromAngle( (i + 1) * step );
+		Vec3 point2 = center + Vec3( 0.0f, dir2.x, dir2.y ) * radius;
+
+		line( point1, point2, color );
+	}
+}
+
 // ** Renderer2D::orientedQuad
 void Renderer2D::orientedQuad( const Texture2DPtr& texture, f32 x, f32 y, f32 w, f32 h, const Vec2& up, const Vec2& side, const Rgba& color )
 {
