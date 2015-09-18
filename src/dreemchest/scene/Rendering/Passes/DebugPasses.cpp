@@ -33,19 +33,32 @@ namespace Scene {
 // ** OverdrawPass::setup
 void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
+	Rvm::RasterizationOptions additive = Rvm::OpaqueRasterization;
+	additive.m_blend[0] = additive.m_blend[1] = Renderer::BlendOne;
+
+	// Set additive blending for all render passes
+	rvm.setRasterization( RenderOpaque, Rvm::AdditiveRasterization );
+	rvm.setRasterization( RenderCutout, additive );
+	rvm.setRasterization( RenderTranslucent, additive );
+
 	// Set the default shader
 	rvm.setDefaultShader( shaders.shaderById( ShaderCache::ConstantColor ) );
 
 	// Set constant color register
 	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.0f, 0.0f ) );
-
-	// Set the additive blending
-	rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
 }
 
 // ** WireframePass::setup
 void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
+	Rvm::RasterizationOptions additive = Rvm::OpaqueRasterization;
+	additive.m_blend[0] = additive.m_blend[1] = Renderer::BlendOne;
+
+	// Set additive blending for all render passes
+	rvm.setRasterization( RenderOpaque, Rvm::AdditiveRasterization );
+	rvm.setRasterization( RenderCutout, additive );
+	rvm.setRasterization( RenderTranslucent, additive );
+
 	// Set wireframe polygon mode
 	rvm.setDefaultPolygonMode( Renderer::PolygonWire );
 
@@ -54,12 +67,6 @@ void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewPr
 
 	// Set constant color register
 	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.1f, 0.0f ) );
-
-	// Set the additive blending
-	rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
-
-	// Set the depth testing function
-	rvm.setDefaultDepthFunction( Renderer::LessEqual );
 }
 
 } // namespace Scene

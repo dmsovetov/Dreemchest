@@ -137,12 +137,6 @@ namespace Scene {
 		//! Sets the default shader.
 		void							setDefaultShader( const Renderer::ShaderPtr& value );
 
-		//! Sets the default blending.
-		void							setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst );
-
-		//! Sets the default deth testing function.
-		void							setDefaultDepthFunction( Renderer::Compare value );
-
 		//! Sets the default cull face side.
 		void							setDefaultCullFace( Renderer::TriangleFace value );
 
@@ -189,9 +183,6 @@ namespace Scene {
 		RasterizationOptions			m_rasterization[TotalRenderModes];	//!< Render mode rasterization options.
 
 		Renderer::ShaderPtr				m_defaultShader;					//!< The default shader to use.
-		Renderer::BlendFactor			m_defaultSrcBlending;				//!< The default source blend factor.
-		Renderer::BlendFactor			m_defaultDstBlending;				//!< The default dest blend factor.
-		Renderer::Compare				m_defaultDepthFunction;				//!< The default blend function.
 		Renderer::TriangleFace			m_defaultCullFace;					//!< The default cull face side.
 		Renderer::PolygonMode			m_defaultPolygonMode;				//!< The default polygon mode.
 	};

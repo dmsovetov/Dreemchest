@@ -60,9 +60,6 @@ const Rvm::RasterizationOptions Rvm::AdditiveRasterization = { true, Renderer::B
 // ** Rvm::Rvm
 Rvm::Rvm( Renderer::HalPtr hal, u32 maxCommands ) : m_hal( hal ), m_allocator( maxCommands )
 {
-	m_defaultSrcBlending	= Renderer::BlendDisabled;
-	m_defaultDstBlending	= Renderer::BlendDisabled;
-	m_defaultDepthFunction	= Renderer::Less;
 	m_defaultCullFace		= Renderer::TriangleFaceBack;
 	m_defaultPolygonMode	= Renderer::PolygonFill;
 
@@ -118,19 +115,6 @@ void Rvm::setDefaultPolygonMode( Renderer::PolygonMode value )
 	m_defaultPolygonMode = value;
 }
 
-// ** Rvm::setDefaultBlending
-void Rvm::setDefaultBlending( Renderer::BlendFactor src, Renderer::BlendFactor dst )
-{
-	m_defaultSrcBlending = src;
-	m_defaultDstBlending = dst;
-}
-
-// ** Rvm::setDefaultDepthFunction
-void Rvm::setDefaultDepthFunction( Renderer::Compare value )
-{
-	m_defaultDepthFunction = value;
-}
-
 // ** Rvm::setDefaultCullFace
 void Rvm::setDefaultCullFace( Renderer::TriangleFace value )
 {
@@ -180,12 +164,6 @@ void Rvm::flush( void )
 	//! Active shader
 	Renderer::Shader* activeShader			= ( Renderer::Shader* )-1;
 	u8				  activeRenderingMode	= -1;
-
-	// Set the default blending function
-	m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
-
-	// Set the default depth testing function
-	m_hal->setDepthTest( true, m_defaultDepthFunction );
 
 	// Set culling
 	m_hal->setCulling( m_defaultCullFace );
@@ -264,8 +242,6 @@ void Rvm::reset( void )
 	setRasterization( RenderCutout, CutoutRasterization );
 
 	// Reset render states
-	setDefaultBlending( Renderer::BlendDisabled, Renderer::BlendDisabled );
-	setDefaultDepthFunction( Renderer::LessEqual );
 	setDefaultCullFace( Renderer::TriangleFaceBack );
 	setDefaultPolygonMode( Renderer::PolygonFill );
 
@@ -310,31 +286,6 @@ void Rvm::setRenderingMode( u8 value )
 	m_hal->setBlendFactors( options.m_blend[0], options.m_blend[1] );
 	m_hal->setAlphaTest( options.m_alphaTest, options.m_alphaRef );
 	m_hal->setDepthTest( options.m_depthMask, options.m_depthTest );
-	
-
-	//switch( value ) {
-	//case RenderOpaque:		m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
-	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
-	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
-	//						break;
-
-	//case RenderTranslucent:	m_hal->setBlendFactors( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
-	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
-	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
-	//						break;
-
-	//case RenderCutout:		m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
-	//						m_hal->setAlphaTest( Renderer::Greater, 0.5f );
-	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
-	//						break;
-
-	//case RenderAdditive:	m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
-	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
-	//						m_hal->setDepthTest( false, Renderer::Always );
-	//						break;
-
-	//default: DC_BREAK;
-	//}
 }
 
 // ** Rvm::setShader
