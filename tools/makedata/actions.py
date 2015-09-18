@@ -24,7 +24,7 @@
 #
 #################################################################################
 
-import shutil, os, struct, fbx
+import shutil, os, struct, fbx, collections
 from PIL import Image, ImageOps
 
 # action
@@ -112,6 +112,8 @@ class convert_to_raw(image):
 
 # convert_fbx
 class convert_fbx(action):
+    chunk = collections.namedtuple('chunk', ['vertices', 'indices'])
+
     # ctor
     def __init__(self, item, source, dest):
         action.__init__(self, item, source, dest)
@@ -178,6 +180,8 @@ class convert_fbx(action):
             controlPoints      = mesh.GetControlPoints()
 
             uv = get_uv_set(mesh)
+            vertices = []
+            indices = []
 
             for i in range(0, mesh.GetPolygonCount()):
                 polygonSize = mesh.GetPolygonSize(i)
@@ -199,25 +203,33 @@ class convert_fbx(action):
                     if len(uv) > 1:
                         mesh.GetPolygonVertexUV(i, j, uv[1], uv1)
 
-                    load_mesh.vertices.append(Vertex(pos, normal, uv0, uv1))
-                    load_mesh.indices.append(len(load_mesh.vertices) - 1)
+                    vertices.append(Vertex(pos, normal, uv0, uv1))
+                    indices.append(len(vertices) - 1)
 
-        load_mesh.indices  = []
-        load_mesh.vertices = []
+            load_mesh.chunks.append(convert_fbx.chunk(vertices=vertices, indices=indices))
+
+        load_mesh.chunks   = []
 
         processEachMesh(scene.GetRootNode(), load_mesh)
 
-        vertices = load_mesh.vertices
-        indices  = load_mesh.indices
+        chunks = load_mesh.chunks
 
         with open(self.dest, 'wb') as fh:
-            Header = struct.Struct('I I')
+            Header = struct.Struct('I')
+            ChunkHeader = struct.Struct('I I')
             Vertex = struct.Struct('f f f f f f f f f f')
             Index  = struct.Struct('H')
-            fh.write(Header.pack(len(vertices), len(indices)))
 
-            for v in vertices:
-                fh.write(Vertex.pack(v.pos[0], v.pos[1], v.pos[2], v.normal[0], v.normal[1], v.normal[2], v.uv0[0], v.uv0[1], v.uv1[0], v.uv1[1]))
+            fh.write(Header.pack(len(chunks)))
 
-            for i in indices:
-                fh.write(Index.pack(i))
+            for i in range(0, len(chunks)):
+                vertices = chunks[i].vertices
+                indices = chunks[i].indices
+
+                fh.write(ChunkHeader.pack(len(vertices), len(indices)))
+
+                for v in vertices:
+                    fh.write(Vertex.pack(v.pos[0], v.pos[1], v.pos[2], v.normal[0], v.normal[1], v.normal[2], v.uv0[0], v.uv0[1], v.uv1[0], v.uv1[1]))
+
+                for i in indices:
+                    fh.write(Index.pack(i))
