@@ -165,16 +165,33 @@ void Entities::remove( const EntityId& id )
 // ** Entities::notify
 void Entities::notify( void )
 {
-	for( EntitySet::const_iterator i = m_changed.begin(), end = m_changed.end(); i != end; ++i ) {
-		m_eventEmitter.emit<Changed>( *i );
+	// Do while we have changes
+	while( m_changed.size() ) {
+		// Copy the changed set to a local variable
+		EntitySet changed = m_changed;
+
+		// Clear changes
+		m_changed.clear();
+
+		// Process changes
+		for( EntitySet::const_iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
+			m_eventEmitter.emit<Changed>( *i );
+		}
 	}
 
-	for( EntitySet::const_iterator i = m_removed.begin(), end = m_removed.end(); i != end; ++i ) {
-		m_eventEmitter.emit<Removed>( *i );
-	}
+	// Do while we have removed entities
+	while( m_changed.size() ) {
+		// Copy the removed set to a local variable
+		EntitySet removed = m_removed;
 
-	m_changed.clear();
-	m_removed.clear();
+		// Clear changes
+		m_removed.clear();
+
+		// Process changes
+		for( EntitySet::const_iterator i = removed.begin(), end = removed.end(); i != end; ++i ) {
+			m_eventEmitter.emit<Removed>( *i );
+		}
+	}
 }
 
 // ** Entities::EntityKey::EntityKey
