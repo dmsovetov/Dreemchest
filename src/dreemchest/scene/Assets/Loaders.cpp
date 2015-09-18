@@ -61,39 +61,45 @@ bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr ha
 // ** RawMeshLoader::loadFromStream
 bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
 {
-	u32 vertexCount, indexCount;
+	u32 chunkCount, vertexCount, indexCount;
+	
+	AssetMesh* data = DC_NEW AssetMesh;
 
-	stream->read( &vertexCount, 4 );
-	stream->read( &indexCount, 4 );
+	stream->read( &chunkCount, 4 );
 
-	Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
-	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount );
-	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount );
+	for( u32 i = 0; i < chunkCount; i++ ) {
+		stream->read( &vertexCount, 4 );
+		stream->read( &indexCount, 4 );
 
-	Vertex* vertices = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
+		Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
+		Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount );
+		Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount );
 
-	for( u32 i = 0; i < vertexCount; i++ ) {
-		Vertex* v = vertices + i;
+		Vertex* vertices = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
 
-		stream->read( v->position, sizeof( v->position ) );
-		stream->read( v->normal, sizeof( v->normal ) );
-		stream->read( v->tex0, sizeof( v->tex0 ) );
-		stream->read( v->tex1, sizeof( v->tex1 ) );
+		for( u32 i = 0; i < vertexCount; i++ ) {
+			Vertex* v = vertices + i;
 
-		for( u32 j = 0; j < 3; j++ ) {
-			v->position[j] *= 0.01f;
+			stream->read( v->position, sizeof( v->position ) );
+			stream->read( v->normal, sizeof( v->normal ) );
+			stream->read( v->tex0, sizeof( v->tex0 ) );
+			stream->read( v->tex1, sizeof( v->tex1 ) );
+
+			for( u32 j = 0; j < 3; j++ ) {
+				v->position[j] *= 0.01f;
+			}
 		}
+
+		vertexBuffer->unlock();
+
+		u16* indices = indexBuffer->lock();
+		stream->read( indices, sizeof( u16 ) * indexCount );
+		indexBuffer->unlock();
+
+		data->vertexBuffers.push_back( vertexBuffer );
+		data->indexBuffers.push_back( indexBuffer );
 	}
 
-	vertexBuffer->unlock();
-
-	u16* indices = indexBuffer->lock();
-	stream->read( indices, sizeof( u16 ) * indexCount );
-	indexBuffer->unlock();
-
-	AssetMesh* data = DC_NEW AssetMesh;
-	data->vertexBuffers.push_back( vertexBuffer );
-	data->indexBuffers.push_back( indexBuffer );
 	m_mesh->setData( data );
 
 	return true;
@@ -117,11 +123,25 @@ bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPt
 		return false;
 	}
 
-	Json::Value diffuseColor   = root["colors"]["diffuse"];
+	String      shader		   = root["shader"].asString();
+	Json::Value diffuseColor   = root["colors"]["tint"] != Json::nullValue ? root["colors"]["tint"] : root["colors"]["diffuse"];
 	Json::Value diffuseTexture = root["textures"]["diffuse"];
 	Json::Value parameters = root["parameters"];
 
-	m_material->setShader( Material::Solid );
+	if( shader.find( "cutout" ) != String::npos ) {
+		m_material->setRenderingMode( RenderCutout );
+	}
+	else if( shader.find( "transparent" ) != String::npos ) {
+		m_material->setRenderingMode( RenderTranslucent );
+	}
+	else if( shader.find( "additive" ) != String::npos ) {
+		m_material->setRenderingMode( RenderAdditive );
+	}
+	else {
+		m_material->setRenderingMode( RenderOpaque );
+	}
+	
+	m_material->setModel( Material::Phong );
 	m_material->setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
 	m_material->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
 
