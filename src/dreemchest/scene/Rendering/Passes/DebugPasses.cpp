@@ -74,7 +74,7 @@ void LightBoundsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache
 {
 	Renderer::Renderer2DPtr renderer = context->renderer();
 
-	renderer->wireSphere( transform.matrix() * Vec3( 0.0f, 0.0f, 0.0f ), light.range(), light.color() );
+	renderer->wireSphere( transform.worldSpacePosition(), light.range(), light.color() );
 }
 
 } // namespace Scene

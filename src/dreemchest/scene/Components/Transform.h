@@ -56,6 +56,9 @@ namespace Scene {
 		//! Sets parent transform.
 		void					setParent( const TransformWPtr& value );
 
+		//! Calculates the world space position.
+		Vec3					worldSpacePosition( void ) const;
+
 		//! Returns transformation position.
 		const Vec3&				position( void ) const;
 

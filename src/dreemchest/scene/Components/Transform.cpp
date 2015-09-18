@@ -82,6 +82,12 @@ void Transform::setParent( const TransformWPtr& value )
 	m_parent = value;
 }
 
+// ** Transform::worldSpacePosition
+Vec3 Transform::worldSpacePosition( void ) const
+{
+	return matrix() * Vec3( 0.0f, 0.0f, 0.0f );
+}
+
 // ** Transform::position
 const Vec3& Transform::position( void ) const
 {
