@@ -24,40 +24,22 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Systems_WireframeRenderPass_H__
-#define __DC_Scene_Systems_WireframeRenderPass_H__
-
-#include "../StaticMeshRenderPass.h"
+#include "BasicPasses.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Renders the wireframes of static meshes
-	class WireframeRenderPass : public StaticMeshRenderPass {
-	public:
+// ** AmbientPass::setup
+void AmbientPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
+{
+	// Disable additive rendering in ambient pass
+	rvm.setRasterization( RenderAdditive, Rvm::SkipRasterization );
 
-										//! Constructs the WireframeRenderPass instance.
-										WireframeRenderPass( Ecs::Entities& entities, const Rendering& rendering );
-
-	private:
-
-		//! Extracts the renderer component from camera before rendering the pass.
-		virtual void					render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection );
-
-		//! Called every frame before any entites are rendered.
-		virtual bool					begin( u32 currentTime );
-
-		//! Called every frame after all entities has been rendered.
-		virtual void					end( void );
-
-	private:
-
-		const RenderWireframeMeshes*	m_settings;		//!< Wireframe rendering settings.
-	};
+	// Set the additive blending
+	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.2f, 0.2f, 0.2f ) );
+}
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_Systems_WireframeRenderPass_H__    */

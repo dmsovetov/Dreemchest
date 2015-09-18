@@ -24,50 +24,42 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_ShaderCache_H__
-#define __DC_Scene_ShaderCache_H__
+#ifndef __DC_Scene_BasicPasses_H__
+#define __DC_Scene_BasicPasses_H__
 
-#include "../../Scene.h"
+#include "../RenderPass.h"
+#include "../Emitters/StaticMeshRopEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! All shaders used for scene rendering reside here.
-	class ShaderCache : public RefCounted {
+	//! Renders unlit textured scene.
+	class UnlitPass : public RenderPassBase {
 	public:
 
-		//! Available shaders.
-		enum ShaderId {
-			  Pink
-			, ConstantColor
-			, Diffuse
-			, TotalShaders
-		};
+								//! Constructs UnlitPass instance.
+								UnlitPass( Ecs::Entities& entities )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::Unlit ) ); }
+	};
 
-									//! Constructs the ShaderCache
-									ShaderCache( const Renderer::HalPtr& hal );
 
-		//! Returns the shader by name.
-		const Renderer::ShaderPtr&	shaderById( ShaderId id );
+	//! Renders a constant color ambient
+	class AmbientPass : public RenderPassBase {
+	public:
 
-	private:
+								//! Constructs AmbientPass instance.
+								AmbientPass( Ecs::Entities& entities )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::DiffuseTexture | StaticMeshRopEmitter::Shader | StaticMeshRopEmitter::RenderingMode, Material::Ambient ) ); }
 
-		//! Shader code container.
-		struct Code {
-			CString		m_vertex;	//!< Vertex shader code.
-			CString		m_fragment;	//!< Fragment shader code.
-		};
+	protected:
 
-		static Code					s_shaderCode[TotalShaders];	//!< Shader code.
-		static CString				s_shaderName[TotalShaders];	//!< Shader names.
-
-		Renderer::HalPtr			m_hal;						//!< The rendering HAL.
-		Renderer::ShaderPtr			m_shaders[TotalShaders];	//!< Cached shaders.
+		//! Setups the RVM for rendering ambient.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
 	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_ShaderCache_H__    */
+#endif    /*    !__DC_Scene_BasicPasses_H__    */

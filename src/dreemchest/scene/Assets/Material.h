@@ -40,6 +40,19 @@ namespace Scene {
 
 									ClassEnableTypeInfoSuper( Material, Asset )
 
+		//! Material features.
+		enum Feature {
+			  FeatureDiffuse	= BIT( 1 )
+		};
+
+		//! Material lighting model.
+		enum Model {
+			  Unlit
+			, Ambient
+			, Phong
+			, TotalModels
+		};
+
 		//! Material layers.
         enum Layer {
             Diffuse,
@@ -48,20 +61,20 @@ namespace Scene {
             TotalMaterialLayers
         };
 
-		//! Material shader.
-		enum Shader {
-			  Null
-			, Solid
-			, Transparent
-			, Additive
-			, TotalMaterialShaders
-		};
+		//! Returns material rendering mode.
+		RenderingMode				renderingMode( void ) const;
 
-		//! Returns material shader.
-		Shader						shader( void ) const;
+		//! Sets material rendering mode.
+		void						setRenderingMode( RenderingMode value );
 
-		//! Sets material shader.
-		void						setShader( Shader value );
+		//! Returns material light model.
+		Model						model( void ) const;
+
+		//! Sets material light model.
+		void						setModel( Model value );
+
+		//! Returns material feature set.
+		u32							features( void ) const;
 
         //! Returns a material color.
         const Rgba&					color( Layer layer ) const;
@@ -83,9 +96,14 @@ namespace Scene {
 									//! Constructs Material instance.
 									Material( AssetBundle* bundle, const String& uuid, const String& name );
 
+		//! Updates material features.
+		void						updateMaterialFeatures( void );
+
 	private:
 
-		Shader						m_shader;						//!< Material shader.
+		Model						m_model;						//!< Material light model.
+		RenderingMode				m_renderingMode;				//!< Material blending.
+		u32							m_features;						//!< Used material features.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
 		ImageWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
 	};

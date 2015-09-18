@@ -24,40 +24,23 @@
 
  **************************************************************************/
 
-#include "SpriteRenderPass.h"
+#include "RopEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** SpriteRenderPass::SpriteRenderPass
-SpriteRenderPass::SpriteRenderPass( Ecs::Entities& entities, const Rendering& rendering ) : RenderPass2D( entities, "SpriteRenderPass", rendering )
+// ** RopEmitterBase::RopEmitterBase
+RopEmitterBase::RopEmitterBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect ) : m_camera( NULL ), m_transform( NULL )
 {
+	m_entities = Ecs::Family::create( entities, name, aspect );
 }
 
-// ** SpriteRenderPass::process
-void SpriteRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Sprite& sprite, Transform& transform )
+// ** RopEmitterBase::emit
+void RopEmitterBase::emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform )
 {
-	// Get the sprite texture
-	ImagePtr			 image   = sprite.image();
-	AssetTexturePtr		 data    = image->data();
-	Renderer::TexturePtr texture = data.valid() ? data->texture : Renderer::TexturePtr();
-
-	// Get the rotation
-	f32  angle = radians( transform.rotationZ() );
-	f32  s	   = sinf( angle );
-	f32  c	   = cosf( angle );
-
-	// Calculate the basis vectors from rotation
-	Vec2 up   = Vec2( s, c );
-	Vec2 side = Vec2( up.y, -up.x );
-
-	// Calculate the sprite dimensions
-	f32 width  = image->width()  * transform.scaleX() * 0.5f;
-	f32 height = image->height() * transform.scaleY() * 0.5f;
-
-	// Render oriented quad
-	m_rendering.m_renderer2d->orientedQuad( texture, transform.x(), transform.y(), width,height, up, side, sprite.color() );
+	m_camera    = &camera;
+	m_transform = &transform;
 }
 
 } // namespace Scene

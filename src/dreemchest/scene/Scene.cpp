@@ -26,6 +26,8 @@
 
 #include "Scene.h"
 
+#include "Rendering/RenderingSystem.h"
+#include "Rendering/Rvm.h"
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
@@ -41,7 +43,7 @@ namespace Scene {
 IMPLEMENT_LOGGER( log )
 
 // ** Scene::Scene
-Scene::Scene( void ) : m_systems( m_entities ), m_renderingSystems( m_entities ), m_nextEntityId( 1 )
+Scene::Scene( void ) : m_systems( m_entities ), m_nextEntityId( 1 )
 {
 	m_cameras	= Ecs::Family::create( m_entities, "Cameras", Ecs::Aspect::all<Camera>() );
 	m_named		= Ecs::Family::create( m_entities, "Named Entities", Ecs::Aspect::all<Identifier>() );
@@ -61,10 +63,12 @@ SceneObjectPtr Scene::createSceneObject( void )
 }
 
 // ** Scene::render
-void Scene::render( void )
+void Scene::render( const RenderingContextPtr& context )
 {
 	// Update all rendering systems
-	m_renderingSystems.update( 0, 0.0f );
+	for( u32 i = 0; i < ( u32 )m_renderingSystems.size(); i++ ) {
+		m_renderingSystems[i]->render( context );
+	}
 
 	// Now reset internal Camera::ClearDisabled flag for all cameras in scene
 	const Ecs::EntitySet& cameras = m_cameras->entities();
@@ -73,18 +77,14 @@ void Scene::render( void )
 		Camera* camera = (*i)->get<Camera>();
 		camera->setClearMask( camera->clearMask() & ~Camera::ClearDisabled );
 	}
+
+	context->rvm()->reset();
 }
 
 // ** Scene::systems
 Ecs::Systems& Scene::systems( void )
 {
 	return m_systems;
-}
-
-// ** Scene::renderingSystems
-Ecs::Systems& Scene::renderingSystems( void )
-{
-	return m_renderingSystems;
 }
 
 // ** Scene::findAllWithName

@@ -24,30 +24,43 @@
 
  **************************************************************************/
 
-#include "RenderSystem.h"
-#include "RenderPass.h"
+#include "RenderingSystem.h"
+#include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ---------------------------------------- RenderSystemBase ---------------------------------------- //
+// ** RenderingSystemBase::RenderingSystemBase
+RenderingSystemBase::RenderingSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect ) : m_entities( entities ), m_name( name )
+{
+	m_cameras = Ecs::Family::create( entities, "Cameras", aspect );
+}
 
-// ** RenderSystemBase::process
-void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
+// ** RenderingSystemBase::render
+void RenderingSystemBase::render( RenderingContextPtr context )
+{
+	const Ecs::EntitySet& entities = m_cameras->entities();
+
+	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+		renderFromCamera( context, *(*i)->get<Camera>(), *(*i)->get<Transform>() );
+	}
+}
+
+// ** RenderingSystemBase::renderFromCamera
+void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera& camera, Transform& transform )
 {
 	// Get the camera component from entity
-	Camera& camera    = *entity.get<Camera>();
-	u8		clearMask = camera.clearMask();
-
-	// Get the transform component from entity
-	Transform& transform = *entity.get<Transform>();
+	u8 clearMask = camera.clearMask();
 
 	// Get the output viewport for this camera
 	Rect viewport = camera.viewport();
 
+	// Get RVM from context
+	RvmPtr rvm = context->rvm();
+
 	// Get HAL from a renderer
-	Renderer::HalPtr& hal = m_rendering.m_hal;
+	Renderer::HalPtr hal = context->hal();
 
 	// Get the view
 	const ViewPtr& view = camera.view();
@@ -61,7 +74,7 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
 	f32			vheight = static_cast<f32>( view->height() );
 
 	// Calculate the view-projection matrix
-	Matrix4 viewProjection = camera.calculateProjectionMatrix() * transform.matrix().inversed();
+	Matrix4 viewProjection = camera.calculateProjectionMatrix() * transform.matrix().inversed() /*Matrix4::lookAt( Vec3( 5, 5, 5 ), Vec3( 0, 0, 0 ), Vec3( 0, 1, 0 ) )*/;
 
 	view->begin();
 	{
@@ -75,7 +88,11 @@ void RenderSystemBase::process( u32 currentTime, f32 dt, Ecs::Entity& entity )
 		}
 
 		for( RenderPasses::iterator i = m_passes.begin(), end = m_passes.end(); i != end; ++i ) {
-			(*i)->render( entity, currentTime, dt, viewProjection );
+			RenderPassBasePtr& pass = *i;
+
+			pass->begin( context, camera, transform, viewProjection );
+			pass->render( context );
+			pass->end( context );
 		}
 
 		hal->setScissorTest( false );

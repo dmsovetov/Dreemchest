@@ -24,7 +24,6 @@
 
  **************************************************************************/
 
-#include "ShaderCache.h"
 #include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
@@ -43,19 +42,80 @@ CString Rvm::s_transformUniformName = "u_transform";
 // ** Rvm::s_vpUniformName
 CString Rvm::s_vpUniformName = "u_vp";
 
+// ** Rvm::SkipRasterization
+const Rvm::RasterizationOptions Rvm::SkipRasterization = { false };
+
+// ** Rvm::OpaqueRasterization
+const Rvm::RasterizationOptions Rvm::OpaqueRasterization = { true, Renderer::BlendDisabled, Renderer::BlendDisabled, Renderer::CompareDisabled, 0.0f, true, Renderer::LessEqual };
+
+// ** Rvm::CutoutRasterization
+const Rvm::RasterizationOptions Rvm::CutoutRasterization = { true, Renderer::BlendDisabled, Renderer::BlendDisabled, Renderer::Greater, 0.5f, true, Renderer::LessEqual };
+
+// ** Rvm::TranslucentRasterization
+const Rvm::RasterizationOptions Rvm::TranslucentRasterization = { true, Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha, Renderer::CompareDisabled, 0.0f, true, Renderer::LessEqual };
+
+// ** Rvm::AdditiveRasterization
+const Rvm::RasterizationOptions Rvm::AdditiveRasterization = { true, Renderer::BlendOne, Renderer::BlendOne, Renderer::CompareDisabled, 0.0f, false, Renderer::LessEqual };
+
 // ** Rvm::Rvm
-Rvm::Rvm( u32 maxCommands ) : m_allocator( maxCommands )
+Rvm::Rvm( Renderer::HalPtr hal, u32 maxCommands ) : m_hal( hal ), m_allocator( maxCommands )
 {
 	m_defaultSrcBlending	= Renderer::BlendDisabled;
 	m_defaultDstBlending	= Renderer::BlendDisabled;
 	m_defaultDepthFunction	= Renderer::Less;
 	m_defaultCullFace		= Renderer::TriangleFaceBack;
+	m_defaultPolygonMode	= Renderer::PolygonFill;
+
+	resetCounters();
+}
+
+// ** Rvm::increase
+void Rvm::increase( Counter counter, u32 amount )
+{
+	m_counters[counter] += amount;
+}
+
+// ** Rvm::counter
+s32 Rvm::counter( Counter counter ) const
+{
+	return m_counters[counter];
+}
+
+// ** Rvm::resetCounters
+void Rvm::resetCounters( void )
+{
+	memset( m_counters, 0, sizeof( m_counters ) );
+	increase( RopAllocatedMemory, sizeof( Command ) * m_allocator.size() );
+}
+
+// ** Rvm::hal
+Renderer::HalPtr Rvm::hal( void ) const
+{
+	return m_hal;
+}
+
+// ** Rvm::willRender
+bool Rvm::willRender( RenderingMode mode ) const
+{
+	return m_rasterization[mode];
 }
 
 // ** Rvm::setDefaultShader
 void Rvm::setDefaultShader( const Renderer::ShaderPtr& value )
 {
 	m_defaultShader = value;
+}
+
+// ** Rvm::setRasterization
+void Rvm::setRasterization( RenderingMode mode, const RasterizationOptions& value )
+{
+	m_rasterization[mode] = value;
+}
+
+// ** Rvm::setDefaultPolygonMode
+void Rvm::setDefaultPolygonMode( Renderer::PolygonMode value )
+{
+	m_defaultPolygonMode = value;
 }
 
 // ** Rvm::setDefaultBlending
@@ -106,7 +166,7 @@ Renderer::Shader* Rvm::findShaderById( u32 idx ) const
 }
 
 // ** Rvm::flush
-void Rvm::flush( Renderer::HalPtr hal )
+void Rvm::flush( void )
 {
 	// Sort the command buffer	
 	m_commands.sort( sortByShaderTextureMesh );
@@ -118,33 +178,38 @@ void Rvm::flush( Renderer::HalPtr hal )
 	Renderer::VertexBuffer* activeVertexBuffer = NULL;
 
 	//! Active shader
-	Renderer::Shader* activeShader   = NULL;
-	u32				  activeShaderId = -1;
+	Renderer::Shader* activeShader			= ( Renderer::Shader* )-1;
+	u8				  activeRenderingMode	= -1;
 
 	// Set the default blending function
-	hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
+	m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
 
 	// Set the default depth testing function
-	hal->setDepthTest( true, m_defaultDepthFunction );
+	m_hal->setDepthTest( true, m_defaultDepthFunction );
 
 	// Set culling
-	hal->setCulling( m_defaultCullFace );
+	m_hal->setCulling( m_defaultCullFace );
+
+	// Set polygon mode
+	m_hal->setPolygonMode( m_defaultPolygonMode );
 
 	// Perform all rendering operations
 	for( EmittedCommands::const_iterator i = m_commands.begin(), end = m_commands.end(); i != end; ++i ) {
 		const Command* cmd = *i;
 
 		// Set the shader
-		if( activeShaderId != cmd->shader ) {
-			Renderer::Shader* shader = findShaderById( cmd->shader );
-			DC_BREAK_IF( shader == NULL )
+		if( activeShader != cmd->shader ) {
+			activeShader = cmd->shader ? cmd->shader : m_defaultShader.get();
+			setShader( activeShader );
+			increase( ShaderSwitches );
+		}
 
-			if( shader != activeShader ) {
-				activeShader = shader;
-				setShader( hal, activeShader );
-			}
+		DC_BREAK_IF( activeShader == NULL );
 
-			activeShaderId = cmd->shader;
+		// Set rendering mode
+		if( activeRenderingMode != cmd->mode ) {
+			setRenderingMode( cmd->mode );
+			activeRenderingMode = cmd->mode;
 		}
 
 		// Set the instance uniforms
@@ -157,41 +222,69 @@ void Rvm::flush( Renderer::HalPtr hal )
 			Renderer::Texture* texture = cmd->textures[j];
 
 			if( texture != activeTextures[j] ) {
-				hal->setTexture( j, texture );
+				m_hal->setTexture( j, texture );
 				activeTextures[j] = texture;
+				increase( TextureSwitches );
 			}
 		}
 
 		// Set the vertex buffer
 		if( cmd->vertexBuffer != activeVertexBuffer ) {
-			hal->setVertexBuffer( cmd->vertexBuffer );
+			m_hal->setVertexBuffer( cmd->vertexBuffer );
 			activeVertexBuffer = cmd->vertexBuffer;
+			increase( VertexBufferSwitches );
 		}
 
 		// Render the mesh
-		hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
+		m_hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
+		increase( DrawIndexed );
+		increase( Triangles, cmd->indexBuffer->size() / 3 );
+		increase( Vertices, cmd->indexBuffer->size() );
 	}
 
-	// Set the default shader
-	hal->setShader( NULL );
-
-	// Set the default vertex buffer
-	hal->setVertexBuffer( NULL );
-
-	// Set default textures
-	for( s32 i = 0; i < 8; i++ ) {
-		hal->setTexture( i, NULL );
-	}
-
-	// Enable the depth test back
-	hal->setDepthTest( true, Renderer::Less );
+	// Clear the command list
+	clear();
 }
 
 // ** Rvm::clear
 void Rvm::clear( void )
 {
+	// Clear emitted commands
 	m_commands.clear();
 	m_allocator.reset();
+}
+
+// ** Rvm::reset
+void Rvm::reset( void )
+{
+	// Reset rasterization options
+	setRasterization( RenderOpaque, OpaqueRasterization );
+	setRasterization( RenderAdditive, AdditiveRasterization );
+	setRasterization( RenderTranslucent, TranslucentRasterization );
+	setRasterization( RenderCutout, CutoutRasterization );
+
+	// Reset render states
+	setDefaultBlending( Renderer::BlendDisabled, Renderer::BlendDisabled );
+	setDefaultDepthFunction( Renderer::LessEqual );
+	setDefaultCullFace( Renderer::TriangleFaceBack );
+	setDefaultPolygonMode( Renderer::PolygonFill );
+
+	// Set the default polygon mode
+	m_hal->setPolygonMode( Renderer::PolygonFill );
+
+	// Set the default shader
+	m_hal->setShader( NULL );
+
+	// Set the default vertex buffer
+	m_hal->setVertexBuffer( NULL );
+
+	// Set default textures
+	for( s32 i = 0; i < 8; i++ ) {
+		m_hal->setTexture( i, NULL );
+	}
+
+	// Enable the depth test back
+	m_hal->setDepthTest( true, Renderer::LessEqual );
 }
 
 // ** Rvm::emit
@@ -206,10 +299,48 @@ Rvm::Command* Rvm::emit( void )
 	return rop;
 }
 
-// ** Rvm::setShader
-void Rvm::setShader( Renderer::HalPtr hal, Renderer::Shader* shader )
+// ** Rvm::setRenderingMode
+void Rvm::setRenderingMode( u8 value )
 {
-	hal->setShader( shader );
+	DC_BREAK_IF( value >= TotalRenderModes )
+
+	const RasterizationOptions& options = m_rasterization[value];
+	DC_BREAK_IF( !options )
+
+	m_hal->setBlendFactors( options.m_blend[0], options.m_blend[1] );
+	m_hal->setAlphaTest( options.m_alphaTest, options.m_alphaRef );
+	m_hal->setDepthTest( options.m_depthMask, options.m_depthTest );
+	
+
+	//switch( value ) {
+	//case RenderOpaque:		m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
+	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
+	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
+	//						break;
+
+	//case RenderTranslucent:	m_hal->setBlendFactors( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
+	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
+	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
+	//						break;
+
+	//case RenderCutout:		m_hal->setBlendFactors( m_defaultSrcBlending, m_defaultDstBlending );
+	//						m_hal->setAlphaTest( Renderer::Greater, 0.5f );
+	//						m_hal->setDepthTest( true, m_defaultDepthFunction );
+	//						break;
+
+	//case RenderAdditive:	m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
+	//						m_hal->setAlphaTest( Renderer::CompareDisabled );
+	//						m_hal->setDepthTest( false, Renderer::Always );
+	//						break;
+
+	//default: DC_BREAK;
+	//}
+}
+
+// ** Rvm::setShader
+void Rvm::setShader( Renderer::Shader* shader )
+{
+	m_hal->setShader( shader );
 
 	u32 location = 0;
 
@@ -226,8 +357,24 @@ void Rvm::setShader( Renderer::HalPtr hal, Renderer::Shader* shader )
 
 	// Set the constant color value
 	if( location = shader->findUniformLocation( "u_color" ) ) {
-		shader->setVec4( location, Vec4( 0.1f, 0.1f, 0.0f, 1.0f ) );
+		shader->setVec4( location, m_registers[ConstantColor] );
 	}
+
+	// Set the light position
+	if( location = shader->findUniformLocation( "u_lightPosition" ) ) {
+		shader->setVec4( location, m_registers[LightPosition] );
+	}
+
+	// Set the light color
+	if( location = shader->findUniformLocation( "u_lightColor" ) ) {
+		shader->setVec4( location, m_registers[LightColor] );
+	}
+}
+
+// ** Rvm::setRegister
+void Rvm::setRegister( Register id, const Vec4& value )
+{
+	m_registers[id] = value;
 }
 
 // ** Rvm::setShaderUniforms
@@ -255,6 +402,8 @@ void Rvm::setShaderUniforms( Renderer::Shader* shader, const Command* cmd )
 // ** Rvm::sortByShaderTextureMesh
 bool Rvm::sortByShaderTextureMesh( const Command* a, const Command* b )
 {
+	if( a->mode != b->mode ) return a->mode < b->mode;
+	if( a->distance != b->distance ) return a->distance > b->distance;
 	if( a->shader != b->shader ) return a->shader < b->shader;
 	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
 

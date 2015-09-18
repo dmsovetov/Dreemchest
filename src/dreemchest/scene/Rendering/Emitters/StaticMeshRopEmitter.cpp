@@ -24,54 +24,23 @@
 
  **************************************************************************/
 
-#include "StaticMeshRenderPass.h"
+#include "StaticMeshRopEmitter.h"
 
 #include "../../Assets/Mesh.h"
-#include "../../Assets/Material.h"
-#include "../../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** UnlitStaticMeshRenderPass::UnlitStaticMeshRenderPass
-UnlitStaticMeshRenderPass::UnlitStaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering )
-	: StaticMeshRenderPass( entities, rendering, 1 )
+// ** StaticMeshRopEmitter::StaticMeshRopEmitter
+StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::Entities& entities, u32 features, Material::Model model )
+	: RopEmitter( entities, "StaticMeshRopEmitter" ), m_features( features ), m_model( model )
 {
 
 }
 
-// ** UnlitStaticMeshRenderPass::begin
-bool UnlitStaticMeshRenderPass::begin( u32 currentTime )
-{
-	m_rvm.setDefaultShader( m_rendering.m_shaders->shaderById( ShaderCache::Diffuse ) );
-	return StaticMeshRenderPass::begin( currentTime );
-}
-
-// ** StaticMeshRenderPass::StaticMeshRenderPass
-StaticMeshRenderPass::StaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering, u32 materialMask )
-	: RenderPass( entities, "StaticMeshRenderPass", rendering, 16000 ), m_materialMask( materialMask )
-{
-
-}
-
-// ** StaticMeshRenderPass::begin
-bool StaticMeshRenderPass::begin( u32 currentTime )
-{
-	// Clean the RVM
-	m_rvm.clear();
-	return true;
-}
-
-// ** StaticMeshRenderPass::end
-void StaticMeshRenderPass::end( void )
-{
-	// Run accumulated commands
-	m_rvm.flush( m_rendering.m_hal );
-}
-
-// ** StaticMeshRenderPass::process
-void StaticMeshRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
+// ** StaticMeshRopEmitter::emit
+void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
 {
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
@@ -88,21 +57,40 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneO
 		// Get the material for chunk
 		const MaterialPtr& material = staticMesh.material( i );
 
+		if( material.valid() && !rvm.willRender( material->renderingMode() ) ) {
+			continue;
+		}
+
 		// Emit a new render operation
-		Rvm::Command* rop = m_rvm.emit();
+		Rvm::Command* rop = rvm.emit();
 
 		// Initialize the rendering operation
 		rop->transform		= transform.matrix();
 		rop->indexBuffer	= meshData->indexBuffers[i].get();
 		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
-		rop->shader			= material.valid() ? material->shader() : Material::Null;
+		rop->mode			= RenderOpaque;
+		rop->shader			= NULL;
+		rop->distance		= 0;
 
 		if( !material.valid() ) {
 			continue;
 		}
 
+		if( m_features.is( RenderingMode ) ) {
+			rop->mode = material->renderingMode();
+		}
+
+		if( m_features.is( Shader ) ) {
+			Material::Model model = m_features.is( LightModel ) ? material->model() : m_model;
+			rop->shader = shaders.materialShader( model, material->features() ).get();
+		}
+		
+		if( m_features.is( Distance ) ) {
+			rop->distance = rop->mode == RenderAdditive || rop->mode == RenderTranslucent ? (m_transform->position() - transform.position()).length() : 0;
+		}
+		
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
-			if( (m_materialMask & (1 << j)) == 0 ) {
+			if( m_features.not( BIT( j ) ) ) {
 				continue;
 			}
 
@@ -116,7 +104,7 @@ void StaticMeshRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneO
 				continue;
 			}
 
-			AssetTexturePtr  data = image->data();
+			AssetTexturePtr data = image->data();
 			rop->textures[j] = data.valid() ? data->texture.get() : NULL;
 		}
 		

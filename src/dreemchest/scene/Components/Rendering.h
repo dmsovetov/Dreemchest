@@ -40,6 +40,11 @@ namespace Scene {
 		OverrideComponent( RenderUnlitMeshes, Component )
 	};
 
+	//! This component is attached to a camera to render forward lit meshes.
+	class RenderForwardLit : public Component {
+		OverrideComponent( RenderForwardLit, Component )
+	};
+
 	//! This component is attached to a camera to render wireframe meshes.
 	class RenderWireframeMeshes : public Component {
 	public:

@@ -24,51 +24,41 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_StaticMeshRenderPass_H__
-#define __DC_Scene_StaticMeshRenderPass_H__
+#ifndef __DC_Scene_RenderingContext_H__
+#define __DC_Scene_RenderingContext_H__
 
-#include "RenderPass.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! The mesh rendering pass
-	class StaticMeshRenderPass : public RenderPass<StaticMesh> {
+	//! Rendering context.
+	class RenderingContext : public RefCounted {
 	public:
 
-									//! Constructs the StaticMeshRenderPass instance.
-									StaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering, u32 materialMask = 0 );
+								//! Constructs the RenderingContext instance.
+								RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal )
+									: m_rvm( rvm ), m_shaders( shaders ), m_hal( hal ) {}
 
-	protected:
+		//! Returns RVM.
+		RvmPtr					rvm( void ) const { return m_rvm; }
 
-		//! Renders a single entity with a mesh
-		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
+		//! Returns shader cache.
+		ShaderCachePtr			shaders( void ) const { return m_shaders; }
 
-		//! Called every frame before any entites are rendered.
-		virtual bool				begin( u32 currentTime );
+		//! Returns hal.
+		Renderer::HalPtr		hal( void ) const { return m_hal; }
 
-		//! Called every frame after all entities has been rendered.
-		virtual void				end( void );
+	private:
 
-	protected:
-
-		u32							m_materialMask;					//!< What material layers will be used in rendering.
-	};
-
-	//! Renders unlit textured static meshes.
-	class UnlitStaticMeshRenderPass : public StaticMeshRenderPass {
-	public:
-
-									//! Constructs the WireframeRenderPass instance.
-									UnlitStaticMeshRenderPass( Ecs::Entities& entities, const Rendering& rendering );
-
-		//! Sets the default shader
-		virtual bool				begin( u32 currentTime );
+		RvmPtr					m_rvm;		//!< Rendering virtual machine.
+		ShaderCachePtr			m_shaders;	//!< Shaders cache.
+		Renderer::HalPtr		m_hal;		//!< Rendering HAL.
 	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_UnlitMeshRenderer_H__    */
+#endif    /*    !__DC_Scene_RenderingContext_H__    */

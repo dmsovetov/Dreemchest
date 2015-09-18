@@ -73,6 +73,25 @@ namespace Scene {
 	class Camera;
 	class Rotor;
 
+	class Rvm;
+
+	//! Available rendering modes.
+	enum RenderingMode {
+		  RenderOpaque		//!< Renders opaque.
+		, RenderCutout		//!< Renders object with an alpha test.
+		, RenderTranslucent	//!< Renders object with alpha blending.
+		, RenderAdditive	//!< Renders objects with additive blending.
+		, TotalRenderModes	//!< Total number of render modes.
+	};
+
+	//! Rendering mode mask.
+	enum RenderingModeMask {
+		  EnableOpaque		= BIT( RenderOpaque )		//!< Enables opaque rendering.
+		, EnableCutout		= BIT( RenderCutout )		//!< Enables cutout rendering.
+		, EnableTranslucent = BIT( RenderTranslucent )	//!< Enables translucent rendering.
+		, EnableAdditive	= BIT( RenderAdditive )		//!< Enables additive rendering.
+	};
+
 	// Alias the Ecs::Entity type
 	typedef StrongPtr<Ecs::Entity>	SceneObjectPtr;
 	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
@@ -101,6 +120,13 @@ namespace Scene {
 	dcDeclarePtrs( Box2DPhysics )
 	dcDeclarePtrs( RigidBody2D )
 
+	dcDeclarePtrs( RenderingContext )
+	dcDeclarePtrs( Rvm )
+	dcDeclarePtrs( RenderPassBase )
+	dcDeclarePtrs( RenderingSystemBase )
+	dcDeclarePtrs( UberShader )
+	dcDeclarePtrs( RopEmitterBase )
+
 	//! Container type to store scene objects.
 	typedef List<SceneObjectPtr> SceneObjectsList;
 
@@ -112,7 +138,7 @@ namespace Scene {
 		void							update( f32 dt );
 
 		//! Renders a scene.
-		void							render( void );
+		void							render( const RenderingContextPtr& context );
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
@@ -123,8 +149,9 @@ namespace Scene {
 		//! Returns the scene systems.
 		Ecs::Systems&					systems( void );
 
-		//! Returns the scene rendering systems.
-		Ecs::Systems&					renderingSystems( void );
+		//! Adds a new rendering system to the scene.
+		template<typename TRenderingSystem>
+		void							addRenderingSystem( void );
 
 		//! Creates a new scene.
 		static ScenePtr					create( void );
@@ -143,7 +170,7 @@ namespace Scene {
 		Ecs::Systems					m_systems;
 
 		//! Entity rendering systems.
-		Ecs::Systems					m_renderingSystems;
+		Array<RenderingSystemBasePtr>	m_renderingSystems;
 
 		//! All cameras that reside in scene.
 		Ecs::FamilyPtr					m_cameras;
@@ -154,6 +181,13 @@ namespace Scene {
 		//! Next scene object id.
 		Ecs::EntityId					m_nextEntityId;
 	};
+
+	// ** Scene::addRenderingSystem
+	template<typename TRenderingSystem>
+	void Scene::addRenderingSystem( void )
+	{
+		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_entities ) );
+	}
 
 #ifdef HAVE_JSON
 
@@ -241,9 +275,12 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/AssetSystem.h"
-
-	#include "Systems/Rendering/ShaderCache.h"
-	#include "Systems/Rendering/Renderers.h"
+	#include "Rendering/RenderingContext.h"
+	#include "Rendering/RenderingSystem.h"
+	#include "Rendering/ShaderCache.h"
+	#include "Rendering/Passes/DebugPasses.h"
+	#include "Rendering/Passes/BasicPasses.h"
+	#include "Rendering/ForwardLighting/LightPass.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */

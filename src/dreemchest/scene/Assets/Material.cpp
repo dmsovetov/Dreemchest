@@ -32,7 +32,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Material::Material
-Material::Material( AssetBundle* bundle, const String& uuid, const String& name ) : Asset( bundle, Asset::Material, uuid, name ), m_shader( Solid )
+Material::Material( AssetBundle* bundle, const String& uuid, const String& name )
+	: Asset( bundle, Asset::Material, uuid, name ), m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
 {
 }
 
@@ -42,16 +43,34 @@ MaterialPtr Material::create( const String& name )
 	return MaterialPtr( DC_NEW Material( NULL, name, name ) );
 }
 
-// ** Material::shader
-Material::Shader Material::shader( void ) const
+// ** Material::renderingMode
+RenderingMode Material::renderingMode( void ) const
 {
-	return m_shader;
+	return m_renderingMode;
 }
 
-// ** Material::setShader
-void Material::setShader( Shader value )
+// ** Material::setRenderingMode
+void Material::setRenderingMode( RenderingMode value )
 {
-	m_shader = value;
+	m_renderingMode = value;
+}
+
+// ** Material::lightModel
+Material::Model Material::model( void ) const
+{
+	return m_model;
+}
+
+// ** Material::setModel
+void Material::setModel( Model value )
+{
+	m_model = value;
+}
+
+// ** Material::features
+u32 Material::features( void ) const
+{
+	return m_features;
 }
 
 // ** Material::color
@@ -76,6 +95,17 @@ const ImageWPtr& Material::texture( Layer layer ) const
 void Material::setTexture( Layer layer, const ImageWPtr& value )
 {
 	m_texture[layer] = value;
+	updateMaterialFeatures();
+}
+
+// ** Material::updateMaterialFeatures
+void Material::updateMaterialFeatures( void )
+{
+	m_features = 0;
+
+	if( m_texture[Diffuse].valid() ) {
+		m_features |= FeatureDiffuse;
+	}
 }
 
 } // namespace Scene

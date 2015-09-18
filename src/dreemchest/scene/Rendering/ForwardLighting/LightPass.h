@@ -1,0 +1,86 @@
+/**************************************************************************
+
+ The MIT License (MIT)
+
+ Copyright (c) 2015 Dmitry Sovetov
+
+ https://github.com/dmsovetov
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+ **************************************************************************/
+
+#ifndef __DC_Scene_ForwardLighting_LightPass_H__
+#define __DC_Scene_ForwardLighting_LightPass_H__
+
+#include "../RenderPass.h"
+#include "../RenderingSystem.h"
+#include "../Passes/BasicPasses.h"
+
+DC_BEGIN_DREEMCHEST
+
+namespace Scene {
+
+	//! Emits render operations for static meshes affected by light sources.
+	class ForwardLightPass : public RenderPass<Light> {
+	public:
+
+								//! Constructs ForwardLightPass instance.
+								ForwardLightPass( Ecs::Entities& entities );
+
+	protected:
+
+		//! Emits render operations for a single static mesh.
+		virtual void			render( Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
+
+	protected:
+
+		//! Setups the RVM for rendering lit meshes
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+	};
+
+	//! Emits render operation for additive render mode.
+	class AdditiveLightPass : public RenderPassBase {
+	public:
+
+								//! Constructs AmbientPass instance.
+								AdditiveLightPass( Ecs::Entities& entities );
+
+	protected:
+
+		//! Setups the RVM for rendering additive layer.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+	};
+
+	//! Forward light rendering system.
+	class ForwardLightingRenderer : public RenderingSystemBase {
+	public:
+
+								ForwardLightingRenderer( Ecs::Entities& entities )
+									: RenderingSystemBase( entities, "ForwardLightingRenderer", Ecs::Aspect::all<Camera, Transform>() )
+								{
+									addPass<AmbientPass>();
+									addPass<ForwardLightPass>();
+									addPass<AdditiveLightPass>();
+								}
+	};
+
+} // namespace Scene
+
+DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_ForwardLighting_LightPass_H__    */

@@ -24,55 +24,42 @@
 
  **************************************************************************/
 
-#include "WireframeRenderPass.h"
+#include "DebugPasses.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** WireframeRenderPass::WireframeRenderPass
-WireframeRenderPass::WireframeRenderPass( Ecs::Entities& entities, const Rendering& rendering )
-	: StaticMeshRenderPass( entities, rendering )
+// ** OverdrawPass::setup
+void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
-}
-
-// ** WireframeRenderPass::render
-void WireframeRenderPass::render( const Ecs::Entity& camera, u32 currentTime, f32 dt, const Matrix4& viewProjection )
-{
-	m_settings = camera.get<RenderWireframeMeshes>();
-	StaticMeshRenderPass::render( camera, currentTime, dt, viewProjection );
-}
-
-// ** WireframeRenderPass::begin
-bool WireframeRenderPass::begin( u32 currentTime )
-{
-	if( !StaticMeshRenderPass::begin( currentTime ) ) {
-		return false;
-	}
-
-	// Set wireframe polygon mode
-	m_rendering.m_hal->setPolygonMode( Renderer::PolygonWire );
-
 	// Set the default shader
-	m_rvm.setDefaultShader( m_rendering.m_shaders->shaderById( ShaderCache::ConstantColor ) );
+	rvm.setDefaultShader( shaders.shaderById( ShaderCache::ConstantColor ) );
+
+	// Set constant color register
+	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.0f, 0.0f ) );
 
 	// Set the additive blending
-	m_rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
-
-	// Set the depth testing function
-	m_rvm.setDefaultDepthFunction( Renderer::LessEqual );
-
-	return true;
+	rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
 }
 
-// ** WireframeRenderPass::end
-void WireframeRenderPass::end( void )
+// ** WireframePass::setup
+void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
-	// Flush emitted render operations
-	StaticMeshRenderPass::end();
+	// Set wireframe polygon mode
+	rvm.setDefaultPolygonMode( Renderer::PolygonWire );
 
-	// Set fill polygon mode
-	m_rendering.m_hal->setPolygonMode( Renderer::PolygonFill );
+	// Set the default shader
+	rvm.setDefaultShader( shaders.shaderById( ShaderCache::ConstantColor ) );
+
+	// Set constant color register
+	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.1f, 0.0f ) );
+
+	// Set the additive blending
+	rvm.setDefaultBlending( Renderer::BlendOne, Renderer::BlendOne );
+
+	// Set the depth testing function
+	rvm.setDefaultDepthFunction( Renderer::LessEqual );
 }
 
 } // namespace Scene

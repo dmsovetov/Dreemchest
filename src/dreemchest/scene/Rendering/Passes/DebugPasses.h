@@ -24,36 +24,46 @@
 
  **************************************************************************/
 
-#include "SpriteTransformRenderPass.h"
+#ifndef __DC_Scene_DebugPasses_H__
+#define __DC_Scene_DebugPasses_H__
+
+#include "../RenderPass.h"
+#include "../Emitters/StaticMeshRopEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** SpriteTransformRenderPass::SpriteTransformRenderPass
-SpriteTransformRenderPass::SpriteTransformRenderPass( Ecs::Entities& entities, const Rendering& rendering ) : RenderPass2D( entities, "SpriteTransformRenderPass", rendering )
-{
-}
+	//! Renders scene overdraw.
+	class OverdrawPass : public RenderPassBase {
+	public:
 
-// ** SpriteTransformRenderPass::process
-void SpriteTransformRenderPass::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Sprite& sprite, Transform& transform )
-{
-	// Get the rotation
-	f32  angle = radians( transform.rotationZ() );
-	f32  s	   = sinf( angle );
-	f32  c	   = cosf( angle );
+								//! Constructs OverdrawPass instance.
+								OverdrawPass( Ecs::Entities& entities )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities ) ); }
 
-	// Calculate the basis vectors from rotation
-	Vec2 up   = Vec2( s, c );
-	Vec2 side = Vec2( up.y, -up.x );
+	protected:
 
-	f32  x = transform.x();
-	f32  y = transform.y();
+		//! Setups the RVM for rendering mesh overdraw.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+	};
 
-	m_rendering.m_renderer2d->line( x, y, x + side.x, y + side.y, Rgba( 1.0f, 0.0f, 0.0f ) );
-	m_rendering.m_renderer2d->line( x, y, x + up.x,   y + up.y,   Rgba( 0.0f, 1.0f, 0.0f ) );
-}
+	//! Reneders wireframe mesh overlay.
+	class WireframePass : public RenderPassBase {
+	public:
+
+								//! Constructs WireframePass instance.
+								WireframePass( Ecs::Entities& entities )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities ) ); }
+
+	protected:
+
+		//! Setups the RVM for rendering wireframe meshes.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_DebugPasses_H__    */
