@@ -40,17 +40,10 @@ ForwardLightPass::ForwardLightPass( Ecs::Entities& entities ) : RenderPass( enti
 void ForwardLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
 	// Override blend mode for opaque & cutout rendering modes
-	Rvm::RasterizationOptions additive = Rvm::OpaqueRasterization;
-	additive.m_blend[0] = additive.m_blend[1] = Renderer::BlendOne;
+	rvm.setRasterization( RenderOpaqueBit | RenderCutoutBit, Rvm::AdditiveRasterization );
 
-	rvm.setRasterization( RenderOpaque, additive );
-	rvm.setRasterization( RenderCutout, additive );
-
-	// Additive render mode can't be lit
-	rvm.setRasterization( RenderAdditive, Rvm::SkipRasterization );
-
-	// Skip translucent objects in this pass
-	rvm.setRasterization( RenderTranslucent, Rvm::SkipRasterization );
+	// Skip additive & translucent objects in this pass
+	rvm.setRasterization( RenderAdditiveBit | RenderTranslucentBit, Rvm::SkipRasterization );
 }
 
 // ** ForwardLightPass::render
@@ -78,9 +71,7 @@ AdditiveLightPass::AdditiveLightPass( Ecs::Entities& entities )
 void AdditiveLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
 	// Only additive render mode will pass through
-	rvm.setRasterization( RenderOpaque, Rvm::SkipRasterization );
-	rvm.setRasterization( RenderCutout, Rvm::SkipRasterization );
-	rvm.setRasterization( RenderTranslucent, Rvm::SkipRasterization );
+	rvm.setRasterization( RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit, Rvm::SkipRasterization );
 }
 
 // ** TranslucentLightPass::TranslucentLightPass
@@ -92,16 +83,12 @@ TranslucentLightPass::TranslucentLightPass( Ecs::Entities& entities ) : ForwardL
 // ** TranslucentLightPass::setup
 void TranslucentLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
-	// Disable all render modes except the translucent
-	rvm.setRasterization( RenderOpaque, Rvm::SkipRasterization );
-	rvm.setRasterization( RenderCutout, Rvm::SkipRasterization );
-	rvm.setRasterization( RenderAdditive, Rvm::SkipRasterization );
+	// Disable all render modes except the translucent one
+	rvm.setRasterization( RenderOpaqueBit | RenderCutoutBit | RenderAdditiveBit, Rvm::SkipRasterization );
 
 	// Override blend mode for lit translucent objects
-	Rvm::RasterizationOptions options = Rvm::TranslucentRasterization;
-	options.m_blend[0] = Renderer::BlendSrcAlpha;
-	options.m_blend[1] = Renderer::BlendOne;
-	rvm.setRasterization( RenderTranslucent, options );
+	Rvm::RasterizationOptions litTranslucent = Rvm::TranslucentRasterization.overrideBlending( Renderer::BlendSrcAlpha, Renderer::BlendOne );
+	rvm.setRasterization( RenderTranslucent, litTranslucent );
 }
 
 
