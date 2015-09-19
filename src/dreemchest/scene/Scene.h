@@ -149,6 +149,9 @@ namespace Scene {
 		//! Returns the list of scene object with specified name.
 		SceneObjectsList				findAllWithName( const String& name ) const;
 
+		//! Returns cameras that reside in scene.
+		const Ecs::FamilyPtr&			cameras( void ) const;
+
 		//! Returns the scene systems.
 		Ecs::Systems&					systems( void );
 
@@ -278,6 +281,7 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/AssetSystem.h"
+	#include "Systems/CullingSystems.h"
 	#include "Rendering/RenderingContext.h"
 	#include "Rendering/RenderingSystem.h"
 	#include "Rendering/ShaderCache.h"

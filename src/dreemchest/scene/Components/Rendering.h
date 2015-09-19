@@ -126,7 +126,7 @@ namespace Scene {
 
 									//! Constructs StaticMesh instance.
 									StaticMesh( const MeshPtr& mesh = MeshPtr() )
-										: m_mesh( mesh ) {}
+										: m_mesh( mesh ), m_visibility( ~0 ) {}
 
 		//! Returns mesh to be rendered.
 		const MeshPtr&				mesh( void ) const;
@@ -136,6 +136,12 @@ namespace Scene {
 
 		//! Returns mesh bounds.
 		const Bounds&				bounds( void ) const;
+
+		//! Returns true if the mesh is visible by camera.
+		bool						isVisible( u8 camera ) const;
+
+		//! Marks the mesh as visible from camera.
+		void						setVisibilityMask( u16 mask, bool value );
 
 		//! Returns the total number of materials.
 		u32							materialCount( void ) const;
@@ -154,6 +160,7 @@ namespace Scene {
 
 	private:
 
+		FlagSet16					m_visibility;	//!< Camera visibility mask.
 		MeshPtr						m_mesh;			//!< Mesh to be rendered.
 		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
 		Renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
@@ -249,7 +256,7 @@ namespace Scene {
 
 									//! Constructs Camera instance.
 									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
-										: m_clearMask( ClearAll ), m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
+										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
 
 		//! Returns camera clear mask.
 		u8							clearMask( void ) const;
@@ -262,6 +269,12 @@ namespace Scene {
 
 		//! Returns the clear color.
 		const Rgba&					clearColor( void ) const;
+
+		//! Returns the camera id.
+		u8							id( void ) const;
+
+		//! Sets camera id.
+		void						setId( u8 value );
 
 		//! Returns camera field of view.
 		f32							fov( void ) const;
@@ -308,6 +321,7 @@ namespace Scene {
 	private:
 
 		u8							m_clearMask;	//!< Camera clear flags.
+		u8							m_id;			//!< Unique camera id.
 		Projection					m_projection;	//!< Camera projection.
 		Rect						m_ndc;			//!< Output normalized device coordinates.
 		ViewPtr						m_view;			//!< Render view.

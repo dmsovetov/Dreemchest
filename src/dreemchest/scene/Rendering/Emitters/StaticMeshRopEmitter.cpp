@@ -42,6 +42,11 @@ StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::Entities& entities, u32 feature
 // ** StaticMeshRopEmitter::emit
 void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
 {
+	// Skip if mesh is not visible
+	if( !staticMesh.isVisible( m_camera->id() ) ) {
+		return;
+	}
+
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
 

@@ -105,6 +105,19 @@ const Bounds& StaticMesh::bounds( void ) const
 	return m_mesh.valid() ? m_mesh->bounds() : empty;
 }
 
+// ** StaticMesh::const 
+bool StaticMesh::isVisible( u8 camera ) const
+{
+	DC_BREAK_IF( camera >= 16 );
+	return m_visibility.is( BIT( camera ) );
+}
+
+// ** StaticMesh::setVisibilityMask
+void StaticMesh::setVisibilityMask( u16 mask, bool value )
+{
+	m_visibility.set( mask, value );
+}
+
 // ** StaticMesh::materialCount
 u32 StaticMesh::materialCount( void ) const
 {
@@ -207,6 +220,18 @@ u8 Camera::clearMask( void ) const
 void Camera::setClearMask( u8 value )
 {
 	m_clearMask = value;
+}
+
+// ** Camera::id
+u8 Camera::id( void ) const
+{
+	return m_id;
+}
+
+// ** Camera::setId
+void Camera::setId( u8 value )
+{
+	m_id = value;
 }
 
 // ** Camera:setFar

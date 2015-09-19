@@ -81,6 +81,12 @@ void Scene::render( const RenderingContextPtr& context )
 	context->rvm()->reset();
 }
 
+// ** Scene::cameras
+const Ecs::FamilyPtr& Scene::cameras( void ) const
+{
+	return m_cameras;
+}
+
 // ** Scene::systems
 Ecs::Systems& Scene::systems( void )
 {
