@@ -45,7 +45,7 @@ namespace Scene {
 	protected:
 
 		//! Emits render operations for a single static mesh.
-		virtual void			render( Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
 
 	protected:
 

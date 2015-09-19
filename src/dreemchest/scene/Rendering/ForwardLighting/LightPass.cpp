@@ -47,7 +47,7 @@ void ForwardLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& vie
 }
 
 // ** ForwardLightPass::render
-void ForwardLightPass::render( Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform )
+void ForwardLightPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform )
 {
 	const Rgb& color	= light.color();
 	Vec3	   position = transform.worldSpacePosition();

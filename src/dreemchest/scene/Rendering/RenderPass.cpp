@@ -54,6 +54,9 @@ void RenderPassBase::begin( RenderingContextPtr context, const Camera& camera, c
 	rvm.setViewProjection( viewProjection );
 	rvm.setDefaultShader( shaders.shaderById( ShaderCache::Null ) );
 
+	// Set matrix for batch renderer
+	context->renderer()->begin( viewProjection, Renderer::LessEqual );
+
 	// Setup rendering states
 	setup( rvm, shaders, viewProjection );
 }
@@ -73,6 +76,9 @@ void RenderPassBase::end( RenderingContextPtr context )
 {
 	// Flush emitted render operations.
 	context->rvm()->flush();
+
+	// Flush primitive renderer
+	context->renderer()->end();
 }
 
 // ** RenderPassBase::setup

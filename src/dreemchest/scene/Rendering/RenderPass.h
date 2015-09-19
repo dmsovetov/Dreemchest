@@ -84,7 +84,7 @@ namespace Scene {
 	protected:
 
 		//! Emits render operation for a single renderable entity.
-		virtual void		render( Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform );
+		virtual void		render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform );
 
 	protected:
 
@@ -108,13 +108,13 @@ namespace Scene {
 		const Ecs::EntitySet& entities = m_entities->entities();
 
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			render( rvm, shaders, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+			render( context, rvm, shaders, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}
 	}
 
 	// ** RenderPass::render
 	template<typename TRenderable>
-	void RenderPass<TRenderable>::render( Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
+	void RenderPass<TRenderable>::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
 	{
 		DC_BREAK
 	}

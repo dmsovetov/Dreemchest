@@ -74,7 +74,7 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera&
 	f32			vheight = static_cast<f32>( view->height() );
 
 	// Calculate the view-projection matrix
-	Matrix4 viewProjection = camera.calculateProjectionMatrix() * transform.matrix().inversed() /*Matrix4::lookAt( Vec3( 5, 5, 5 ), Vec3( 0, 0, 0 ), Vec3( 0, 1, 0 ) )*/;
+	Matrix4 viewProjection = camera.calculateClipSpace( transform.matrix() );
 
 	view->begin();
 	{
