@@ -28,6 +28,8 @@
 #define __DC_Scene_Systems_CullingSystems_H__
 
 #include "../Scene.h"
+
+#include "../Components/Transform.h"
 #include "../Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST
