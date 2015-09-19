@@ -24,18 +24,21 @@
 
  **************************************************************************/
 
-#include    "Hal.h"
-#include	"RenderState.h"
-#include    "BatchRenderer.h"
+#include "Hal.h"
+#include "RenderState.h"
+#include "BatchRenderer.h"
 
 #ifdef DC_THREADS
-    #include    <threads/Task/TaskManager.h>
-    #include    <threads/Thread.h>
+    #include <threads/Task/TaskManager.h>
+    #include <threads/Thread.h>
 #endif
 
 #ifdef DC_RENDERER_OPENGL
 	#include "OpenGL/OpenGLHal.h"
 #endif
+
+#undef min
+#undef max
 
 DC_BEGIN_DREEMCHEST
 
@@ -229,6 +232,18 @@ void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDecl
 void Hal::setViewport( u32 x, u32 y, u32 width, u32 height )
 {
     
+}
+
+// ** Hal::setViewport
+void Hal::setViewport( const Rect& rect )
+{
+	u32 x	   = static_cast<u32>( rect.min().x );
+	u32 y	   = static_cast<u32>( rect.min().y );
+	u32 width  = static_cast<u32>( rect.width() );
+	u32 height = static_cast<u32>( rect.height() );
+
+	setViewport( x, y, width, height );
+	setScissorTest( true, x, y, width, height );
 }
 
 // ** Hal::setColorMask

@@ -182,6 +182,9 @@ namespace Renderer {
          */
         virtual void    setViewport( u32 x, u32 y, u32 width, u32 height );
 
+		//! Sets a rendering viewport.
+		virtual void	setViewport( const Rect& rect );
+
         //! Sets a rendering color mask.
         /*!
          \param value Mask value (see ColorMask enum for details).
