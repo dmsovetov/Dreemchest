@@ -105,6 +105,8 @@ namespace Scene {
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
+	dcDeclarePtrs( StaticMesh )
+	dcDeclarePtrs( Light )
 	dcDeclarePtrs( RenderPassBase )
 	dcDeclarePtrs( ShaderCache )
 	dcDeclarePtrs( AssetBundle )
