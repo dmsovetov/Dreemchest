@@ -50,42 +50,18 @@ void RenderingSystemBase::render( RenderingContextPtr context )
 // ** RenderingSystemBase::renderFromCamera
 void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera& camera, Transform& transform )
 {
-	// Get the camera component from entity
-	u8 clearMask = camera.clearMask();
-
-	// Get the output viewport for this camera
-	Rect viewport = camera.viewport();
-
-	// Get RVM from context
-	RvmPtr rvm = context->rvm();
-
 	// Get HAL from a renderer
 	Renderer::HalPtr hal = context->hal();
 
 	// Get the view
 	const ViewPtr& view = camera.view();
 
-	// Get the viewport bounds
-	const Vec2& min		= viewport.min();
-	const Vec2& max		= viewport.max();
-	u32			width	= static_cast<u32>( max.x - min.x );
-	u32			height	= static_cast<u32>( max.y - min.y );
-	f32			vwidth  = static_cast<f32>( view->width() );
-	f32			vheight = static_cast<f32>( view->height() );
-
 	// Calculate the view-projection matrix
 	Matrix4 viewProjection = camera.calculateClipSpace( transform.matrix() );
 
 	view->begin();
 	{
-		hal->setViewport( ( u32 )min.x, ( u32 )min.y,  width, height );
-		hal->setScissorTest( true, ( u32 )min.x, ( u32 )min.y,  width, height );
-
-		if( (clearMask & Camera::ClearDisabled) == 0 ) {
-			u32 mask = ( clearMask & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
-			hal->clear( camera.clearColor(), 1.0f, 0, mask );
-			camera.setClearMask( mask | Camera::ClearDisabled ); // Clear the viewport only once per frame.
-		}
+		hal->setViewport( camera.viewport() );
 
 		for( RenderPasses::iterator i = m_passes.begin(), end = m_passes.end(); i != end; ++i ) {
 			RenderPassBasePtr& pass = *i;
@@ -95,8 +71,7 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera&
 			pass->end( context );
 		}
 
-		hal->setScissorTest( false );
-		hal->setViewport( 0, 0, ( u32 )vwidth, ( u32 )vheight );
+		hal->setViewport( view->rect() );
 	}
 	view->end();
 }

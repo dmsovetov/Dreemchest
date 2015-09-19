@@ -197,6 +197,9 @@ namespace Scene {
 		//! Returns the viewport split by it's coordinates.
 		static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
 
+		//! Returns the view rect.
+		Rect						rect( void ) const { return Rect( 0.0f, 0.0f, ( f32 )width(), ( f32 )height() ); }
+
 		//! Returns the view width.
 		virtual u32					width( void ) const { return 0; }
 
@@ -248,7 +251,6 @@ namespace Scene {
 		enum ClearFlags {
 			  ClearColor	= BIT( 0 )					//!< Camera will clear the color buffer.
 			, ClearDepth	= BIT( 1 )					//!< Camera will clear the depth buffer.
-			, ClearDisabled	= BIT( 2 )					//!< Disables clearing buffers (internal use only).
 			, ClearAll		= ClearColor | ClearDepth	//!< Camera will clear all buffers.
 		};
 

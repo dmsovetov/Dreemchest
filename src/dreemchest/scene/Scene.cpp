@@ -65,19 +65,36 @@ SceneObjectPtr Scene::createSceneObject( void )
 // ** Scene::render
 void Scene::render( const RenderingContextPtr& context )
 {
+	Renderer::HalPtr hal = context->hal();
+
+	// Clear all cameras & assign ids
+	const Ecs::EntitySet& cameras  = m_cameras->entities();
+	u8					  cameraId = 0;
+
+	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
+		Camera*		   camera = (*i)->get<Camera>();
+		const ViewPtr& view   = camera->view();
+
+		if( !view.valid() ) {
+			continue;
+		}
+
+		view->begin();
+		{
+			hal->setViewport( camera->viewport() );
+			u32 mask = ( camera->clearMask() & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( camera->clearMask() & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
+			hal->clear( camera->clearColor(), 1.0f, 0, mask );
+			hal->setViewport( view->rect() );
+		}
+		view->end();
+	}
+
 	// Update all rendering systems
 	for( u32 i = 0; i < ( u32 )m_renderingSystems.size(); i++ ) {
 		m_renderingSystems[i]->render( context );
 	}
 
-	// Now reset internal Camera::ClearDisabled flag for all cameras in scene
-	const Ecs::EntitySet& cameras = m_cameras->entities();
-
-	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-		Camera* camera = (*i)->get<Camera>();
-		camera->setClearMask( camera->clearMask() & ~Camera::ClearDisabled );
-	}
-
+	// Reset RVM
 	context->rvm()->reset();
 }
 
