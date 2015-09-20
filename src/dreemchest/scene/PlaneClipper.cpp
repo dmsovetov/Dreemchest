@@ -49,8 +49,8 @@ void PlaneClipper::add( const Plane& plane )
 	m_planes.push_back( plane );
 }
 
-// ** PlaneClipper::addFrustum
-void PlaneClipper::addFrustum( const Matrix4& matrix )
+// ** PlaneClipper::setAsFrustum
+void PlaneClipper::setAsFrustum( const Matrix4& matrix )
 {
 	const f32 *m = matrix.m;
 	Plane planes[6];
@@ -64,10 +64,31 @@ void PlaneClipper::addFrustum( const Matrix4& matrix )
 	planes[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
 	planes[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
 
+	m_planes.clear();
+
 	for( s32 i = 0; i < 6; i++ ) {
 		planes[i].normalize();
 		add( planes[i] );
 	}
+}
+
+// ** PlaneClipper::setAsBox
+void PlaneClipper::setAsBox( const Vec3& center, f32 radius )
+{
+	m_planes.clear();
+
+	Vec3 x( 1.0f, 0.0f, 0.0f );
+	Vec3 y( 0.0f, 1.0f, 0.0f );
+	Vec3 z( 0.0f, 0.0f, 1.0f );
+
+	add( Plane::calculate(  x, center - x * radius ) );
+	add( Plane::calculate( -x, center + x * radius ) );
+
+	add( Plane::calculate(  y, center - y * radius ) );
+	add( Plane::calculate( -y, center + y * radius ) );
+
+	add( Plane::calculate(  z, center - z * radius ) );
+	add( Plane::calculate( -z, center + z * radius ) );
 }
 
 // ** PlaneClipper::inside
@@ -98,9 +119,18 @@ bool PlaneClipper::inside( const Vec3& center, f32 radius ) const
 PlaneClipper PlaneClipper::createFromFrustum( const Matrix4& viewProjection, u8 id )
 {
 	PlaneClipper clipper( id );
-	clipper.addFrustum( viewProjection );
+	clipper.setAsFrustum( viewProjection );
 	return clipper;
 }
+
+// ** PlaneClipper::createFromFrustum
+PlaneClipper PlaneClipper::createFromBox( const Vec3& center, f32 radius, u8 id )
+{
+	PlaneClipper clipper( id );
+	clipper.setAsBox( center, radius );
+	return clipper;
+}
+
 
 } // namespace Scene
 

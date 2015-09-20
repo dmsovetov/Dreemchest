@@ -42,7 +42,10 @@ namespace Scene {
 		void				add( const Plane& plane );
 
 		//! Adds planes from a camera frustum.
-		void				addFrustum( const Matrix4& viewProjection );
+		void				setAsFrustum( const Matrix4& viewProjection );
+
+		//! Adds planes from a box.
+		void				setAsBox( const Vec3& center, f32 radius );
 
 		//! Returns plane clipper id.
 		u8					id( void ) const;
@@ -55,6 +58,9 @@ namespace Scene {
 
 		//! Creates the plane clipper from a camera frustum.
 		static PlaneClipper	createFromFrustum( const Matrix4& viewProjection, u8 id = 0 );
+
+		//! Creates the plane clipper from a box.
+		static PlaneClipper	createFromBox( const Vec3& center, f32 radius, u8 id = 0 );
 
 	private:
 
