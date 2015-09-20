@@ -25,31 +25,15 @@
  **************************************************************************/
 
 #include "Entity.h"
-#include "Archetype.h"
-#include "Component.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-// ** Entity::s_aliveCount
-u32 Entity::s_aliveCount = 0;
-
 // ** Entity::Entity
-Entity::Entity( Entities& entities, const EntityId& id ) : m_entities( entities ), m_id( id )
+Entity::Entity( EcsWPtr ecs, const EntityId& id ) : m_ecs( ecs ), m_id( id ), m_isRemoved( false )
 {
-	s_aliveCount++;
-}
 
-Entity::~Entity( void )
-{
-	--s_aliveCount;
-}
-
-// ** Entity::activeCount
-u32 Entity::activeCount( void )
-{
-	return s_aliveCount;
 }
 
 // ** Entity::id
@@ -64,23 +48,16 @@ const Bitset& Entity::mask( void ) const
 	return m_mask;
 }
 
-// ** Entity::isValid
-bool Entity::isValid( void ) const
+// ** Entity::queueRemoval
+void Entity::queueRemoval( void )
 {
-	return m_id != EntityId();
+	m_ecs->removeEntity( m_id );
 }
 
-// ** Entity::destroy
-void Entity::destroy( void )
+// ** Entity::markAsRemoved
+void Entity::markAsRemoved( void )
 {
-	m_mask.clear();
-	m_entities.remove( m_id );
-}
-
-// ** Entity::create
-EntityPtr Entity::create( Entities& entities, const EntityId& id )
-{
-	return EntityPtr( new Entity( entities, id ) );
+	m_isRemoved = true;
 }
 
 } // namespace Ecs

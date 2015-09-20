@@ -27,7 +27,7 @@
 #ifndef __DC_Ecs_Aspect_H__
 #define __DC_Ecs_Aspect_H__
 
-#include "Ecs.h"
+#include "../Ecs.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -48,6 +48,9 @@ namespace Ecs {
 
 		//! Retutns true if entity has an intersection with this aspect.
 		bool			hasIntersection( const EntityPtr& entity ) const;
+
+		//! Compares two aspects.
+		bool			operator < ( const Aspect& other ) const;
 
 		//! Returns an aspect with all mask.
 		template<typename TComponent0>

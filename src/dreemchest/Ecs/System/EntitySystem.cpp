@@ -25,19 +25,30 @@
  **************************************************************************/
 
 #include "EntitySystem.h"
+#include "../Entity/Aspect.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-IMPLEMENT_LOGGER(log)
-
 // ** EntitySystem::EntitySystem
-EntitySystem::EntitySystem( Entities& entities, const String& name, const Aspect& aspect ) : m_entities( entities )
+EntitySystem::EntitySystem( const String& name, const Aspect& aspect ) : System( name ), m_aspect( aspect )
 {
-	m_family = Family::create( entities, name, aspect );
-	m_family->events().subscribe<Family::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
-	m_family->events().subscribe<Family::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
+
+}
+
+// ** EntitySystem::initialize
+bool EntitySystem::initialize( EcsWPtr ecs )
+{
+	if( !System::initialize( ecs ) ) {
+		return false;
+	}
+
+	m_index = ecs->requestIndex( m_name, m_aspect );
+	m_index->events().subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
+	m_index->events().subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
+
+	return true;
 }
 
 // ** EntitySystem::begin
@@ -63,7 +74,7 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 		return;
 	}
 
-	const EntitySet& entities = m_family->entities();
+	const EntitySet& entities = m_index->entities();
 
 	for( EntitySet::const_iterator i = entities.begin(); i != entities.end(); ) {
 		const Entity& entity = *(i++)->get();
@@ -74,13 +85,13 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 }
 
 // ** EntitySystem::handleEntityAdded
-void EntitySystem::handleEntityAdded( const Family::Added& e )
+void EntitySystem::handleEntityAdded( const Index::Added& e )
 {
 	entityAdded( *e.entity.get() );
 }
 
 // ** EntitySystem::handleEntityRemoved
-void EntitySystem::handleEntityRemoved( const Family::Removed& e )
+void EntitySystem::handleEntityRemoved( const Index::Removed& e )
 {
 	entityRemoved( *e.entity.get() );
 }

@@ -27,11 +27,11 @@
 #ifndef __DC_Ecs_Component_H__
 #define __DC_Ecs_Component_H__
 
-#include "Ecs.h"
+#include "../Ecs.h"
 
-#define OverrideComponent( Type, Super )        \
-    IoOverrideSerializableSuper( Type, Super )  \
-    static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<Type>::idx() ); return result; }
+//#define OverrideComponent( Type, Super )        \
+//    IoOverrideSerializableSuper( Type, Super )  \
+//    static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<Type>::idx() ); return result; }
 
 DC_BEGIN_DREEMCHEST
 
@@ -52,10 +52,10 @@ namespace Ecs {
 	A component is all the data for one aspect of the entity. Component is just a plain
 	data and doesn't contain any processing logic.
 	*/
-	class Component : public io::Serializable {
+	class ComponentBase : public io::Serializable {
 	public:
 
-									OverrideComponent( Component, io::Serializable )
+		//							OverrideComponent( ComponentBase, io::Serializable )
 
 		//! Sets the internal data.
 		template<typename T>
@@ -73,20 +73,27 @@ namespace Ecs {
 		InternalDataHolder			m_internal;	//!< The internal data.
 	};
 
-	// ** Component::setInternal
+	// ** ComponentBase::setInternal
 	template<typename T>
-	inline void Component::setInternal( InternalBase* value )
+	inline void ComponentBase::setInternal( InternalBase* value )
 	{
 		m_internal[TypeIndex<T>::idx()] = value;
 	}
 
-	// ** Component::internal
+	// ** ComponentBase::internal
 	template<typename T>
-	inline typename Internal<T>::Ptr Component::internal( void ) const
+	inline typename Internal<T>::Ptr ComponentBase::internal( void ) const
 	{
 		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
 		return i != m_internal.end() ? i->second : Internal<T>::Ptr();
 	}
+
+	//! Generic component class.
+	template<typename T>
+	class Component : public ComponentBase {
+		IoOverrideSerializableSuper( T, ComponentBase )
+		static const Bitset& bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<T>::idx() ); return result; }
+	};
 
 } // namespace Ecs
 

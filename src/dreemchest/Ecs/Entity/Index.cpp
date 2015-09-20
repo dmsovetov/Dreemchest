@@ -24,65 +24,72 @@
 
  **************************************************************************/
 
-#ifndef __DC_Ecs_Archetype_H__
-#define __DC_Ecs_Archetype_H__
-
+#include "Index.h"
 #include "Entity.h"
-#include "Component.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	/*!
-	Archetype class is a predefined set of components that compose an entity type, this
-	simplifies the creation of complex entities.
-	*/
-	class Archetype : public RefCounted {
-	public:
+// ** Index::Index
+Index::Index( EcsWPtr ecs, const String& name, const Aspect& aspect ) : m_ecs( ecs ), m_name( name ), m_aspect( aspect )
+{
 
-									//! Constructs an Archetype instance.
-									Archetype( const EntityWPtr& entity );
-		virtual						~Archetype( void ) {}
+}
 
-		//! Returns an archetype name.
-		const String&				name( void ) const;
+Index::~Index( void )
+{
 
-		//! Returns an entity id.
-		const EntityId&				id( void ) const;
+}
 
-		//! Returns entity.
-		const EntityWPtr&			entity( void ) const;
+// ** Index::entities
+const EntitySet& Index::entities( void ) const
+{
+	return m_entities;
+}
 
-		//! Returns an entity component of specified type.
-		template<typename TComponent>
-		TComponent*					get( void ) const;
+// ** Index::size
+s32 Index::size( void ) const
+{
+	return static_cast<s32>( m_entities.size() );
+}
 
-	protected:
+// ** Index::events
+EventEmitter& Index::events( void )
+{
+	return m_eventEmitter;
+}
 
-		//! Initializes a component set.
-		static void					construct( const EntityWPtr& entity );
+// ** Index::notifyEntityChanged
+void Index::notifyEntityChanged( const EntityPtr& entity )
+{
+	bool contains   = m_entities.count( entity ) != 0;
+	bool intersects = m_aspect.hasIntersection( entity );
 
-	protected:
-
-		//! Entity handle.
-		EntityWPtr					m_entity;
-	};
-
-	// ** Archetype::get
-	template<typename TComponent>
-	inline TComponent* Archetype::get( void ) const
-	{
-		DC_BREAK_IF( m_entity.expired() );
-
-		TComponent* component = m_entity.lock()->get<TComponent>();
-		DC_BREAK_IF( component == NULL );
-
-		return component;
+	if( !contains && intersects ) {
+		processEntityAdded( entity );
 	}
+	else if( contains && !intersects ) {
+		processEntityRemoved( entity );
+	}
+}
+
+// ** Index::processEntityAdded
+void Index::processEntityAdded( const EntityPtr& entity )
+{
+	log::verbose( "%s: entity %d added\n", m_name.c_str(), entity->id() );
+	m_entities.insert( entity );
+	m_eventEmitter.emit<Added>( entity );
+}
+
+// ** Index::processEntityRemoved
+void Index::processEntityRemoved( const EntityPtr& entity )
+{
+	log::verbose( "%s: entity %d removed\n", m_name.c_str(), entity->id() );
+	m_eventEmitter.emit<Removed>( entity );
+	m_entities.erase( entity );
+}
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Ecs_Archetype_H__	*/

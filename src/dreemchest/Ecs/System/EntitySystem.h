@@ -28,8 +28,7 @@
 #define __DC_Ecs_EntitySystem_H__
 
 #include "System.h"
-#include "Family.h"
-#include "Entity.h"
+#include "../Entity/Index.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,13 +38,16 @@ namespace Ecs {
 	class EntitySystem : public System {
 	public:
 
-						//! Constructs a System instance.
-						EntitySystem( Entities& entities, const String& name, const Aspect& aspect );
-
 		//! System logic is done here.
 		virtual void	update( u32 currentTime, f32 dt );
 
+		//! Initializes the entity system.
+		virtual bool	initialize( EcsWPtr ecs );
+
 	protected:
+
+						//! Constructs a EntitySystem instance.
+						EntitySystem( const String& name, const Aspect& aspect );
 
 		//! Called every update tick before processing entities.
 		virtual bool	begin( u32 currentTime );
@@ -63,18 +65,15 @@ namespace Ecs {
 		virtual void	entityRemoved( const Entity& entity );
 
 		//! Handles an entity added event.
-		void			handleEntityAdded( const Family::Added& e );
+		void			handleEntityAdded( const Index::Added& e );
 
 		//! Handles an entity removed event.
-		void			handleEntityRemoved( const Family::Removed& e );
+		void			handleEntityRemoved( const Index::Removed& e );
 
 	protected:
 
-		//! Runtime entities.
-		Entities&		m_entities;
-
-		//! Entity family used by this system.
-		FamilyPtr		m_family;
+		Aspect			m_aspect;	//!< Entity aspect.
+		IndexPtr		m_index;	//!< Entity index used by this system.
 	};
 
 	//! A template class to process entities that contain all components from a specified set.
@@ -83,8 +82,8 @@ namespace Ecs {
 	public:
 
 						//! Constructs EntityWithComponentsSystem instance.
-						EntityWithComponentsSystem( Entities& entities, const String& name )
-							: EntitySystem( entities, name, Aspect::all<TComponent>() ) {}
+						EntityWithComponentsSystem( const String& name )
+							: EntitySystem( name, Aspect::all<TComponent>() ) {}
 
 	protected:
 
@@ -108,8 +107,8 @@ namespace Ecs {
 	public:
 
 						//! Constructs EntityWithComponentsSystem2 instance.
-						EntityWithComponentsSystem2( Entities& entities, const String& name )
-							: EntitySystem( entities, name, Aspect::all<TComponent1, TComponent2>() ) {}
+						EntityWithComponentsSystem2( const String& name )
+							: EntitySystem( name, Aspect::all<TComponent1, TComponent2>() ) {}
 
 	protected:
 
@@ -134,8 +133,8 @@ namespace Ecs {
 	public:
 
 						//! Constructs EntityWithComponentsSystem3 instance.
-						EntityWithComponentsSystem3( Entities& entities, const String& name )
-							: EntitySystem( entities, name, Aspect::all<TComponent1, TComponent2, TComponent3>() ) {}
+						EntityWithComponentsSystem3( const String& name )
+							: EntitySystem( name, Aspect::all<TComponent1, TComponent2, TComponent3>() ) {}
 
 	protected:
 

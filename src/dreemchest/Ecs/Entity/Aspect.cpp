@@ -41,6 +41,22 @@ Aspect::Aspect( AspectType type, const Bitset& mask )
 	}
 }
 
+// ** Aspect::operator <
+bool Aspect::operator < ( const Aspect& other ) const
+{
+	if( m_all != other.m_all ) {
+		return m_all < other.m_all;
+	}
+	if( m_any != other.m_any ) {
+		return m_any < other.m_any;
+	}
+	if( m_exc != other.m_exc ) {
+		return m_exc < other.m_exc;
+	}
+
+	return false;
+}
+
 // ** Aspect::hasIntersection
 bool Aspect::hasIntersection( const EntityPtr& entity ) const
 {
