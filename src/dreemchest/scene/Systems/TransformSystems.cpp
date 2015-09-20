@@ -30,6 +30,36 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------- AffineTransformSystem -------------------------------------------- //
+
+// ** AffineTransformSystem::update
+void AffineTransformSystem::update( u32 currentTime, f32 dt )
+{
+	for( u32 i = 0; i < m_transforms.size(); i++ ) {
+		Transform* transform = m_transforms[i];
+
+		Matrix4 T = Matrix4::translation( transform->position() ) * transform->rotation() * Matrix4::scale( transform->scale() );
+
+		if( transform->parent().valid() ) {
+			T = transform->parent()->matrix() * T;
+		}
+
+		transform->setMatrix( T );
+	}
+}
+
+// ** AffineTransformSystem::entityAdded
+void AffineTransformSystem::entityAdded( const Ecs::Entity& entity )
+{
+	m_transforms.push_back( entity.get<Transform>() );
+}
+
+// ** AffineTransformSystem::entityRemoved
+void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
+{
+	DC_BREAK
+}
+
 // ------------------------------------------------ FollowSystem ------------------------------------------------- //
 
 // ** FollowSystem::process

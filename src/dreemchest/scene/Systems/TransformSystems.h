@@ -34,6 +34,30 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+	//! Affine transform system calculates the transformation matricies for all transform components.
+	class AffineTransformSystem : public Ecs::EntityWithComponentsSystem<Transform> {
+	public:
+
+							//! Constructs a AffineTransformSystem instance.
+							AffineTransformSystem( Ecs::Entities& entities )
+								: EntityWithComponentsSystem( entities, "AffineTransformSystem" ) {}
+
+		//! Calculates the affine transform matrix for each transform component.
+		virtual void		update( u32 currentTime, f32 dt );
+
+	private:
+
+		//! Called when entity was added.
+		virtual void		entityAdded( const Ecs::Entity& entity );
+
+		//! Called when entity was removed.
+		virtual void		entityRemoved( const Ecs::Entity& entity );
+
+	private:
+
+		Array<Transform*>	m_transforms;	//!< Active scene transform components.
+	};
+
 	//! The RotorSystem system
 	class RotorSystem : public Ecs::EntityWithComponentsSystem2<Rotor, Transform> {
 	public:
