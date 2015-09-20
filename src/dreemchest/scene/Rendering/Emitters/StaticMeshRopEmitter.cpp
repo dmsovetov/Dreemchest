@@ -33,8 +33,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshRopEmitter::StaticMeshRopEmitter
-StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::Entities& entities, u32 features, Material::Model model )
-	: RopEmitter( entities, "StaticMeshRopEmitter" ), m_features( features ), m_model( model )
+StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features, Material::Model model )
+	: RopEmitter( ecs, "StaticMeshRopEmitter" ), m_features( features ), m_model( model )
 {
 
 }

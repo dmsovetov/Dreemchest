@@ -79,7 +79,7 @@ namespace Scene {
 	public:
 
 							//! Constructs RenderPass instance.
-							RenderPass( Ecs::Entities& entities, const String& name );
+							RenderPass( Ecs::EcsWPtr ecs, const String& name );
 
 		//! Processes the entity family and emits render operations to be executed by RVM.
 		virtual void		render( RenderingContextPtr context );
@@ -91,14 +91,14 @@ namespace Scene {
 
 	protected:
 
-		Ecs::FamilyPtr		m_entities;		//!< Entity family to be processed.
+		Ecs::IndexPtr		m_index;		//!< Entity index to be processed.
 	};
 
 	// ** RenderPass::RenderPass
 	template<typename TRenderable>
-	RenderPass<TRenderable>::RenderPass( Ecs::Entities& entities, const String& name )
+	RenderPass<TRenderable>::RenderPass( Ecs::EcsWPtr ecs, const String& name )
 	{
-		m_entities = Ecs::Family::create( entities, name, Ecs::Aspect::all<TRenderable, Transform>() );
+		m_index = ecs->requestIndex( name, Ecs::Aspect::all<TRenderable, Transform>() );
 	}
 
 	// ** RenderPass::render
@@ -108,7 +108,7 @@ namespace Scene {
 		Rvm& rvm = *context->rvm().get();
 		ShaderCache& shaders = *context->shaders().get();
 
-		const Ecs::EntitySet& entities = m_entities->entities();
+		const Ecs::EntitySet& entities = m_index->entities();
 
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
 			render( context, rvm, shaders, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );

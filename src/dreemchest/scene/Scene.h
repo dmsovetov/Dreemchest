@@ -43,9 +43,10 @@
 #include <renderer/Hal.h>
 #include <renderer/Renderer2D.h>
 
-#include <Ecs/Entity.h>
-#include <Ecs/Component.h>
-#include <Ecs/EntitySystem.h>
+#include <Ecs/Entity/Entity.h>
+#include <Ecs/Component/Component.h>
+#include <Ecs/System/EntitySystem.h>
+#include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
 
@@ -99,9 +100,6 @@ namespace Scene {
 	typedef StrongPtr<Ecs::Entity>	SceneObjectPtr;
 	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
 
-	// Alias the Ecs::Component type
-	typedef Ecs::Component			Component;
-
 	dcDeclarePtrs( Direction )
 	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( View )
@@ -132,6 +130,12 @@ namespace Scene {
 	dcDeclarePtrs( UberShader )
 	dcDeclarePtrs( RopEmitterBase )
 
+	//! Scene systems mask.
+	enum Systems {
+		  UpdateSystems = BIT( 0 )
+		, RenderSystems = BIT( 1 )
+	};
+
 	//! Container type to store scene objects.
 	typedef List<SceneObjectPtr> SceneObjectsList;
 
@@ -152,10 +156,14 @@ namespace Scene {
 		SceneObjectsList				findAllWithName( const String& name ) const;
 
 		//! Returns cameras that reside in scene.
-		const Ecs::FamilyPtr&			cameras( void ) const;
+		const Ecs::IndexPtr&			cameras( void ) const;
 
 		//! Returns the scene systems.
-		Ecs::Systems&					systems( void );
+		//Ecs::Systems&					systems( void );
+
+		//! Adds a new system to the scene.
+		template<typename TSystem, typename ... Args>
+		WeakPtr<TSystem>				addSystem( Args ... args );
 
 		//! Adds a new rendering system to the scene.
 		template<typename TRenderingSystem>
@@ -171,30 +179,27 @@ namespace Scene {
 
 	private:
 
-		//! Scene entities container.
-		Ecs::Entities					m_entities;
-
-		//! Entity update systems.
-		Ecs::Systems					m_systems;
-
-		//! Entity rendering systems.
-		Array<RenderingSystemBasePtr>	m_renderingSystems;
-
-		//! All cameras that reside in scene.
-		Ecs::FamilyPtr					m_cameras;
-
-		//! All named entities that reside in scene stored inside this family.
-		Ecs::FamilyPtr					m_named;
-
-		//! Next scene object id.
-		Ecs::EntityId					m_nextEntityId;
+		
+		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
+		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
+		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
+		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
+		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
+		Ecs::EntityId					m_nextEntityId;		//!< Next scene object id.
 	};
+
+	// ** Scene::addSystem
+	template<typename TSystem, typename ... Args>
+	WeakPtr<TSystem> Scene::addSystem( Args ... args )
+	{
+		return m_updateSystems->add<TSystem>( args... );
+	}
 
 	// ** Scene::addRenderingSystem
 	template<typename TRenderingSystem>
 	void Scene::addRenderingSystem( void )
 	{
-		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_entities ) );
+		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
 	}
 
 #ifdef HAVE_JSON
@@ -215,19 +220,19 @@ namespace Scene {
 		Ecs::EntityPtr				requestSceneObject( const String& id );
 
 		//! Returns the component by it's id.
-		Ecs::ComponentPtr			requestComponent( const String& id );
+		Ecs::ComponentBasePtr		requestComponent( const String& id );
 
 		//! Reads the Transform component from JSON object.
-		Ecs::ComponentPtr			readTransform( const Json::Value& value );
+		Ecs::ComponentBasePtr		readTransform( const Json::Value& value );
 
 		//! Reads the Renderer component from JSON object.
-		Ecs::ComponentPtr			readRenderer( const Json::Value& value );
+		Ecs::ComponentBasePtr		readRenderer( const Json::Value& value );
 
 		//! Reads the Camera component from JSON object.
-		Ecs::ComponentPtr			readCamera( const Json::Value& value );
+		Ecs::ComponentBasePtr		readCamera( const Json::Value& value );
 
 		//! Reads the Light component from JSON object.
-		Ecs::ComponentPtr			readLight( const Json::Value& value );
+		Ecs::ComponentBasePtr		readLight( const Json::Value& value );
 
 		//! Reads the Vec3 from a JSON object.
 		static Vec3					readVec3( const Json::Value& value );
@@ -247,7 +252,7 @@ namespace Scene {
 	private:
 
 		//! Component loader type.
-		typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
+		typedef cClosure<Ecs::ComponentBasePtr(const Json::Value&)> ComponentLoader;
 
 		//! Container to store all available component loaders.
 		typedef Map<String, ComponentLoader> ComponentLoaders;
@@ -256,7 +261,7 @@ namespace Scene {
 		typedef Map<String, Ecs::EntityPtr> SceneObjects;
 
 		//! Container type to store parsed components.
-		typedef Map<String, Ecs::ComponentPtr> Components;
+		typedef Map<String, Ecs::ComponentBasePtr> Components;
 
 		AssetBundlePtr				m_assets;		//!< Available assets.
 		Json::Value					m_json;			//!< Parsed JSON.

@@ -34,11 +34,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Scene object transformation component.
-	class Transform : public Component {
+	class Transform : public Ecs::Component<Transform> {
 	public:
 
-								OverrideComponent( Transform, Component )
-									
 								//! Constructs Transform instance.
 								Transform( f32 x = 0.0f, f32 y = 0.0f, f32 rotation = 0.0f, f32 sx = 1.0f, f32 sy = 1.0f, const TransformWPtr& parent = TransformWPtr() )
 									: m_parent( parent ), m_position( x, y, 0.0f ), m_rotation( Quat::rotateAroundAxis( rotation, Vec3( 0, 0, 1 ) ) ), m_scale( sx, sy, 1.0f ) {}
@@ -144,10 +142,8 @@ namespace Scene {
 	};
 
 	//! Rotates the transform
-	class Rotor : public Component {
+	class Rotor : public Ecs::Component<Rotor> {
 	public:
-
-								OverrideComponent( Rotor, Component )
 
 								//! Constructs the Rotor instance.
 								Rotor( f32 x = 0.0f, f32 y = 0.0f, f32 z = 0.0f )
@@ -170,7 +166,7 @@ namespace Scene {
 	};
 
 	//! Follows the transform
-	class Follow : public Component {
+	class Follow : public Ecs::Component<Follow> {
 	public:
 
 		//! Available follow types.
@@ -179,8 +175,6 @@ namespace Scene {
 			Smooth,		//!< Smoothly changes the transform to a target one.
 			Elastic,	//!< Calculates the spring force.
 		};
-
-								OverrideComponent( Follow, Component )
 
 								//! Constructs the Follow instance.
 								Follow( const TransformWPtr& target = TransformWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )

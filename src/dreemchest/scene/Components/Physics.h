@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Shape of an object used for hit tests and/or 2D physics.
-	class Shape2D : public Component {
+	class Shape2D : public Ecs::Component<Shape2D> {
 	public:
 
 		//! The shape part types.
@@ -82,8 +82,6 @@ namespace Scene {
 			};
 		};
 
-							OverrideComponent( Shape2D, Component )
-
 							//! Constructs Shape2D instance.
 							Shape2D( void ) {}
 
@@ -111,7 +109,7 @@ namespace Scene {
 	};
 
 	//! 2D rigid body.
-	class RigidBody2D : public Component {
+	class RigidBody2D : public Ecs::Component<RigidBody2D> {
 	public:
 
 		//! Supported rigid body types.
@@ -121,8 +119,6 @@ namespace Scene {
 			, Kinematic		//!< Kinematic rigid body.
 			, TotalTypes	//!< The total number of rigid body types.
 		};
-
-							OverrideComponent( RigidBody2D, Component )
 
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )

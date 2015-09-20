@@ -38,7 +38,7 @@ namespace Scene {
 	public:
 
 							//! Constructs the AssetSystem instance.
-							AssetSystem( Ecs::Entities& entities, Renderer::HalPtr hal );
+							AssetSystem( Renderer::HalPtr hal );
 
 	private:
 

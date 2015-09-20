@@ -40,7 +40,7 @@ namespace Scene {
 	public:
 
 							//! Constructs a MoveInDirectionSystem instance.
-							MoveInDirectionSystem( Ecs::Entities& entities );
+							MoveInDirectionSystem( void );
 
 		//! Moves the scene object
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveInDirection& move, Transform& transform );

@@ -36,20 +36,16 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! This component is attached to a camera to render unlit meshes.
-	class RenderUnlitMeshes : public Component {
-		OverrideComponent( RenderUnlitMeshes, Component )
+	class RenderUnlitMeshes : public Ecs::Component<RenderUnlitMeshes> {
 	};
 
 	//! This component is attached to a camera to render forward lit meshes.
-	class RenderForwardLit : public Component {
-		OverrideComponent( RenderForwardLit, Component )
+	class RenderForwardLit : public Ecs::Component<RenderForwardLit> {
 	};
 
 	//! This component is attached to a camera to render wireframe meshes.
-	class RenderWireframeMeshes : public Component {
+	class RenderWireframeMeshes : public Ecs::Component<RenderWireframeMeshes> {
 	public:
-
-								OverrideComponent( RenderWireframeMeshes, Component )
 
 		//! Returns mesh wireframe rendering color.
 		const Rgba&				color( void ) const;
@@ -60,20 +56,16 @@ namespace Scene {
 	};
 
 	//! This component is attached to a camera to render sprites.
-	class RenderSprites : public Component {
-		OverrideComponent( RenderSprites, Component )
+	class RenderSprites : public Ecs::Component<RenderSprites> {
 	};
 
 	//! This component is attached to a camera to debug render sprite transforms.
-	class RenderSpriteTransform : public Component {
-		OverrideComponent( RenderSpriteTransform, Component )
+	class RenderSpriteTransform : public Ecs::Component<RenderSpriteTransform> {
 	};
 
 	//! Holds the light information.
-	class Light : public Component {
+	class Light : public Ecs::Component<Light> {
 	public:
-
-									OverrideComponent( Light, Component )
 
 		//! Available light types.
 		enum Type {
@@ -119,10 +111,8 @@ namespace Scene {
 	};
 
 	//! Holds the static mesh data with per-instance materials.
-	class StaticMesh : public Component {
+	class StaticMesh : public Ecs::Component<StaticMesh> {
 	public:
-
-									OverrideComponent( StaticMesh, Component )
 
 									//! Constructs StaticMesh instance.
 									StaticMesh( const MeshPtr& mesh = MeshPtr() )
@@ -171,10 +161,8 @@ namespace Scene {
 	};
 
 	//! Holds the sprite rendering info.
-	class Sprite : public Component {
+	class Sprite : public Ecs::Component<Sprite> {
 	public:
-			
-									OverrideComponent( Sprite, Component )
 
 									//! Constructs the Sprite instance.
 									Sprite( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
@@ -241,7 +229,7 @@ namespace Scene {
 	};
 
 	//! Camera component.
-	class Camera : public Component {
+	class Camera : public Ecs::Component<Camera> {
 	public:
 
 		//! Available camera projections.
@@ -257,8 +245,6 @@ namespace Scene {
 			, ClearDepth	= BIT( 1 )					//!< Camera will clear the depth buffer.
 			, ClearAll		= ClearColor | ClearDepth	//!< Camera will clear all buffers.
 		};
-
-									OverrideComponent( Camera, Component )
 
 									//! Constructs Camera instance.
 									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )

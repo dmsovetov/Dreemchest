@@ -40,7 +40,7 @@ namespace Scene {
 	public:
 
 								//! Constructs ForwardLightPass instance.
-								ForwardLightPass( Ecs::Entities& entities );
+								ForwardLightPass( Ecs::EcsWPtr ecs );
 
 	protected:
 
@@ -58,7 +58,7 @@ namespace Scene {
 	public:
 
 								//! Constructs AdditiveLightPass instance.
-								AdditiveLightPass( Ecs::Entities& entities );
+								AdditiveLightPass( Ecs::EcsWPtr ecs );
 
 	protected:
 
@@ -71,7 +71,7 @@ namespace Scene {
 	public:
 
 								//! Constructs TranslucentLightPass instance.
-								TranslucentLightPass( Ecs::Entities& entities );
+								TranslucentLightPass( Ecs::EcsWPtr ecs );
 
 	protected:
 
@@ -83,8 +83,8 @@ namespace Scene {
 	class ForwardLightingRenderer : public RenderingSystemBase {
 	public:
 
-								ForwardLightingRenderer( Ecs::Entities& entities )
-									: RenderingSystemBase( entities, "ForwardLightingRenderer", Ecs::Aspect::all<Camera, Transform>() )
+								ForwardLightingRenderer( Ecs::EcsWPtr ecs )
+									: RenderingSystemBase( ecs, "ForwardLightingRenderer", Ecs::Aspect::all<Camera, Transform>() )
 								{
 									addPass<AmbientPass>();
 									addPass<ForwardLightPass>();

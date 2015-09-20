@@ -46,7 +46,7 @@ namespace Scene {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
-								Box2DPhysics( Ecs::Entities& entities, f32 deltaTime = 0.01f, f32 scale = 1.0f );
+								Box2DPhysics( f32 deltaTime = 0.01f, f32 scale = 1.0f );
 
 		//! Performs the ray casting and returns the closes point to the starting one.
 		bool					rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const;

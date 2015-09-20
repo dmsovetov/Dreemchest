@@ -69,10 +69,8 @@ namespace Scene {
 	};
 
 	//! Identifier component.
-	class Identifier : public Component {
+	class Identifier : public Ecs::Component<Identifier> {
 	public:
-
-								OverrideComponent( Identifier, Component )
 
 								//! Constructs the Identifier instance.
 								Identifier( const String& name = "" )
@@ -90,7 +88,7 @@ namespace Scene {
 	};
 
 	//! Moves the scene object along the input direction.
-	class MoveInDirection : public Component {
+	class MoveInDirection : public Ecs::Component<MoveInDirection> {
 	public:
 
 		//! Movement axes.
@@ -98,8 +96,6 @@ namespace Scene {
 			  XY				//!< Move along the XY axes.
 			, XZ				//!< Move along the XZ axes.
 		};
-
-								OverrideComponent( MoveInDirection, Component )
 
 								//! Constructs MoveInDirection instance.
 								MoveInDirection( Axes axes = XY, f32 speed = 1.0f, const DirectionPtr& direction = DirectionPtr() )

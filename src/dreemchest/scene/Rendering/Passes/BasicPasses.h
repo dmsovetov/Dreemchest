@@ -39,8 +39,8 @@ namespace Scene {
 	public:
 
 								//! Constructs UnlitPass instance.
-								UnlitPass( Ecs::Entities& entities )
-									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::Unlit ) ); }
+								UnlitPass( Ecs::EcsWPtr ecs )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( ecs, StaticMeshRopEmitter::Unlit ) ); }
 	};
 
 
@@ -49,8 +49,8 @@ namespace Scene {
 	public:
 
 								//! Constructs AmbientPass instance.
-								AmbientPass( Ecs::Entities& entities )
-									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::DiffuseTexture | StaticMeshRopEmitter::Shader | StaticMeshRopEmitter::RenderingMode, Material::Ambient ) ); }
+								AmbientPass( Ecs::EcsWPtr ecs )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( ecs, StaticMeshRopEmitter::DiffuseTexture | StaticMeshRopEmitter::Shader | StaticMeshRopEmitter::RenderingMode, Material::Ambient ) ); }
 
 	protected:
 

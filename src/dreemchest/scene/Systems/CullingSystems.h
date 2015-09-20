@@ -41,8 +41,8 @@ namespace Scene {
 	public:
 
 							//! Constructs FrustumCullingSystem instance.
-							FrustumCullingSystem( Ecs::Entities& entities, const Ecs::FamilyPtr& cameras )
-								: EntityWithComponentsSystem2( entities, "FrustumCulling" ), m_cameras( cameras ) {}
+							FrustumCullingSystem( const Ecs::IndexPtr& cameras )
+								: EntityWithComponentsSystem2( "FrustumCulling" ), m_cameras( cameras ) {}
 
 	protected:
 
@@ -54,7 +54,7 @@ namespace Scene {
 
 	private:
 
-		Ecs::FamilyPtr		m_cameras;	//!< All cameras used for culling.
+		Ecs::IndexPtr		m_cameras;	//!< All cameras used for culling.
 		Array<PlaneClipper>	m_frustums;	//!< Active frustums.
 	};
 

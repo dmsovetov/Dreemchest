@@ -40,8 +40,8 @@ namespace Scene {
 	public:
 
 								//! Constructs OverdrawPass instance.
-								OverdrawPass( Ecs::Entities& entities )
-									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities ) ); }
+								OverdrawPass( Ecs::EcsWPtr ecs )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( ecs ) ); }
 
 	protected:
 
@@ -54,8 +54,8 @@ namespace Scene {
 	public:
 
 								//! Constructs WireframePass instance.
-								WireframePass( Ecs::Entities& entities )
-									{ addEmitter( DC_NEW StaticMeshRopEmitter( entities ) ); }
+								WireframePass( Ecs::EcsWPtr ecs )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( ecs ) ); }
 
 	protected:
 
@@ -68,8 +68,8 @@ namespace Scene {
 	public:
 
 								//! Constructs MeshBoundsPass instance.
-								MeshBoundsPass( Ecs::Entities& entities )
-									: RenderPass( entities, "MeshBoundsPass" ) {}
+								MeshBoundsPass( Ecs::EcsWPtr ecs )
+									: RenderPass( ecs, "MeshBoundsPass" ) {}
 
 	protected:
 
@@ -82,8 +82,8 @@ namespace Scene {
 	public:
 
 								//! Constructs LightBoundsPass instance.
-								LightBoundsPass( Ecs::Entities& entities )
-									: RenderPass( entities, "LightBoundsPass" ) {}
+								LightBoundsPass( Ecs::EcsWPtr ecs )
+									: RenderPass( ecs, "LightBoundsPass" ) {}
 
 	protected:
 
@@ -95,8 +95,8 @@ namespace Scene {
 	class BoundingBoxRenderer : public RenderingSystemBase {
 	public:
 
-								BoundingBoxRenderer( Ecs::Entities& entities )
-									: RenderingSystemBase( entities, "BoundingBoxRenderer", Ecs::Aspect::all<Camera, Transform>() )
+								BoundingBoxRenderer( Ecs::EcsWPtr ecs )
+									: RenderingSystemBase( ecs, "BoundingBoxRenderer", Ecs::Aspect::all<Camera, Transform>() )
 								{
 									addPass<MeshBoundsPass>();
 									addPass<LightBoundsPass>();

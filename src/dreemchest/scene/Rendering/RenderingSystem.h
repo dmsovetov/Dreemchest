@@ -41,7 +41,7 @@ namespace Scene {
 	public:
 
 								//! Constructs the RenderingSystem instance.
-								RenderingSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect );
+								RenderingSystemBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect );
 
 		//! Adds a new render pass to this system.
 		template<typename TPass>
@@ -60,9 +60,9 @@ namespace Scene {
 		//! Container type to store nested render passes.
 		typedef Array<RenderPassBasePtr> RenderPasses;
 
-		Ecs::Entities&			m_entities;	//!< Entity system.
+		Ecs::EcsWPtr			m_ecs;		//!< Entity system.
 		String					m_name;		//!< Rendering system name.
-		Ecs::FamilyPtr			m_cameras;	//!< All active cameras.
+		Ecs::IndexPtr			m_cameras;	//!< All active cameras.
 		RenderPasses			m_passes;	//!< All render passes to be performed by this rendering system.
 	};
 
@@ -70,15 +70,15 @@ namespace Scene {
 	template<typename TPass>
 	void RenderingSystemBase::addPass( void )
 	{
-		m_passes.push_back( DC_NEW TPass( m_entities ) );
+		m_passes.push_back( DC_NEW TPass( m_ecs ) );
 	}
 
 	//! Generic class for single pass rendering systems.
 	template<typename TPass>
 	class SinglePassRenderingSystem : public RenderingSystemBase {
 	public:
-								SinglePassRenderingSystem( Ecs::Entities& entities )
-									: RenderingSystemBase( entities, "SinglePassRenderingSystem", Ecs::Aspect::all<Camera, Transform>() ) { addPass<TPass>(); }
+								SinglePassRenderingSystem( Ecs::EcsWPtr ecs )
+									: RenderingSystemBase( ecs, "SinglePassRenderingSystem", Ecs::Aspect::all<Camera, Transform>() ) { addPass<TPass>(); }
 	};
 
 } // namespace Scene

@@ -32,9 +32,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RenderingSystemBase::RenderingSystemBase
-RenderingSystemBase::RenderingSystemBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect ) : m_entities( entities ), m_name( name )
+RenderingSystemBase::RenderingSystemBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect ) : m_ecs( ecs ), m_name( name )
 {
-	m_cameras = Ecs::Family::create( entities, "Cameras", aspect );
+	m_cameras = m_ecs->requestIndex( "Cameras", aspect );
 }
 
 // ** RenderingSystemBase::render

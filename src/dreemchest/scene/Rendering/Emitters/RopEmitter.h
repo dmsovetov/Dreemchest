@@ -38,7 +38,7 @@ namespace Scene {
 	public:
 
 								//! Constructs RenderOperationEmitter instance.
-								RopEmitterBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect );
+								RopEmitterBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect );
 
 		//! Emits render operations for entities in scene.
 		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );
@@ -48,7 +48,7 @@ namespace Scene {
 
 	protected:
 
-		Ecs::FamilyPtr			m_entities;		//!< Entities used for render operation emission.
+		Ecs::IndexPtr			m_entities;		//!< Entities used for render operation emission.
 		PlaneClipper			m_clipper;		//!< Plane clipper for ROP rejection.
 		const Camera*			m_camera;		//!< Active camera.
 		const Transform*		m_transform;	//!< Active camera transform.
@@ -60,8 +60,8 @@ namespace Scene {
 	public:
 
 								//! Constructs RopEmitter instance.
-								RopEmitter( Ecs::Entities& entities, const String& name )
-									: RopEmitterBase( entities, name, Ecs::Aspect::all<TRenderable, Transform>() ) {}
+								RopEmitter( Ecs::EcsWPtr ecs, const String& name )
+									: RopEmitterBase( ecs, name, Ecs::Aspect::all<TRenderable, Transform>() ) {}
 
 		//! Emits render operations for renderable entities in scene.
 		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );

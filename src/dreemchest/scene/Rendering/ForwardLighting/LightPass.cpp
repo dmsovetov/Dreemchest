@@ -31,9 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** ForwardLightPass::ForwardLightPass
-ForwardLightPass::ForwardLightPass( Ecs::Entities& entities ) : RenderPass( entities, "ForwardLightPass" )
+ForwardLightPass::ForwardLightPass( Ecs::EcsWPtr ecs ) : RenderPass( ecs, "ForwardLightPass" )
 {
-	addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::All ) );
+	addEmitter( DC_NEW StaticMeshRopEmitter( ecs, StaticMeshRopEmitter::All ) );
 }
 
 // ** ForwardLightPass::setup
@@ -66,9 +66,9 @@ void ForwardLightPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCach
 }
 
 // ** AdditiveLightPass::AdditiveLightPass
-AdditiveLightPass::AdditiveLightPass( Ecs::Entities& entities )
+AdditiveLightPass::AdditiveLightPass( Ecs::EcsWPtr ecs )
 {
-	addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::Unlit ) );
+	addEmitter( DC_NEW StaticMeshRopEmitter( ecs, StaticMeshRopEmitter::Unlit ) );
 }
 
 // ** AdditiveLightPass::setup
@@ -79,9 +79,9 @@ void AdditiveLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& vi
 }
 
 // ** TranslucentLightPass::TranslucentLightPass
-TranslucentLightPass::TranslucentLightPass( Ecs::Entities& entities ) : ForwardLightPass( entities )
+TranslucentLightPass::TranslucentLightPass( Ecs::EcsWPtr ecs ) : ForwardLightPass( ecs )
 {
-	addEmitter( DC_NEW StaticMeshRopEmitter( entities, StaticMeshRopEmitter::Unlit ) );
+	addEmitter( DC_NEW StaticMeshRopEmitter( ecs, StaticMeshRopEmitter::Unlit ) );
 }
 
 // ** TranslucentLightPass::setup

@@ -31,9 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RopEmitterBase::RopEmitterBase
-RopEmitterBase::RopEmitterBase( Ecs::Entities& entities, const String& name, const Ecs::Aspect& aspect ) : m_camera( NULL ), m_transform( NULL )
+RopEmitterBase::RopEmitterBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect ) : m_camera( NULL ), m_transform( NULL )
 {
-	m_entities = Ecs::Family::create( entities, name, aspect );
+	m_entities = ecs->requestIndex( name, aspect );
 }
 
 // ** RopEmitterBase::emit

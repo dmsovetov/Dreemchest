@@ -49,7 +49,7 @@ namespace Scene {
 		};
 
 								//! Constructs StaticMeshEmitter instance.
-								StaticMeshRopEmitter( Ecs::Entities& entities, u32 features = 0, Material::Model model = Material::Unlit );
+								StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features = 0, Material::Model model = Material::Unlit );
 
 	private:
 

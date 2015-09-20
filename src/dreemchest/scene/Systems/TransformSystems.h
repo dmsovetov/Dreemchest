@@ -40,8 +40,8 @@ namespace Scene {
 	public:
 
 							//! Constructs a AffineTransformSystem instance.
-							AffineTransformSystem( Ecs::Entities& entities )
-								: EntityWithComponentsSystem( entities, "AffineTransformSystem" ) {}
+							AffineTransformSystem( void )
+								: EntityWithComponentsSystem( "AffineTransformSystem" ) {}
 
 		//! Calculates the affine transform matrix for each transform component.
 		virtual void		update( u32 currentTime, f32 dt );
@@ -64,8 +64,8 @@ namespace Scene {
 	public:
 
 							//! Constructs a WorldSpaceBoundingBoxSystem instance.
-							WorldSpaceBoundingBoxSystem( Ecs::Entities& entities )
-								: EntityWithComponentsSystem2( entities, "WorldSpaceBoundingBoxSystem" ) {}
+							WorldSpaceBoundingBoxSystem( void )
+								: EntityWithComponentsSystem2( "WorldSpaceBoundingBoxSystem" ) {}
 
 		//! Calculates the world space bounds for static mesh.
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
@@ -76,8 +76,8 @@ namespace Scene {
 	public:
 
 							//! Constructs a RotorSystem instance.
-							RotorSystem( Ecs::Entities& entities )
-								: EntityWithComponentsSystem2( entities, "RotorSystem" ) {}
+							RotorSystem( void )
+								: EntityWithComponentsSystem2( "RotorSystem" ) {}
 
 		//! Rotates a single entity by a rotor
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotator, Transform& transform );
@@ -88,8 +88,8 @@ namespace Scene {
 	public:
 
 							//! Constructs a FollowSystem instance.
-							FollowSystem( Ecs::Entities& entities )
-								: EntityWithComponentsSystem2( entities, "Follow" ) {}
+							FollowSystem( void )
+								: EntityWithComponentsSystem2( "Follow" ) {}
 
 		//! Follows the target transform
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
