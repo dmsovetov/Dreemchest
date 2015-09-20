@@ -53,6 +53,8 @@
 	#include <json/json.h>
 #endif
 
+#include "PlaneClipper.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
