@@ -43,9 +43,13 @@ namespace Scene {
 		//! Emits render operations for entities in scene.
 		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );
 
+		//! Sets the plane cliper.
+		void					setClipper( const PlaneClipper& value );
+
 	protected:
 
 		Ecs::FamilyPtr			m_entities;		//!< Entities used for render operation emission.
+		PlaneClipper			m_clipper;		//!< Plane clipper for ROP rejection.
 		const Camera*			m_camera;		//!< Active camera.
 		const Transform*		m_transform;	//!< Active camera transform.
 	};

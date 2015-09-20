@@ -47,6 +47,11 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 		return;
 	}
 
+	// Skip if mesh is not inside the clipper.
+	if( !m_clipper.inside( staticMesh.bounds() * transform.matrix() ) ) {
+		return;
+	}
+
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
 

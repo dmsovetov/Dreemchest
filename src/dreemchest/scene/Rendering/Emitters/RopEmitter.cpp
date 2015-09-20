@@ -43,6 +43,12 @@ void RopEmitterBase::emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera,
 	m_transform = &transform;
 }
 
+// ** RopEmitterBase::setClipper
+void RopEmitterBase::setClipper( const PlaneClipper& value )
+{
+	m_clipper = value;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

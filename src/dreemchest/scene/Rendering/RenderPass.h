@@ -57,6 +57,9 @@ namespace Scene {
 		//! Adds a new render operation emitter to this pass.
 		void						addEmitter( RopEmitterBase* emitter );
 
+		//! Sets the clipper.
+		void						setClipper( const PlaneClipper& value );
+
 		//! Emits all render operations.
 		void						emit( Rvm& rvm, ShaderCache& shaders );
 

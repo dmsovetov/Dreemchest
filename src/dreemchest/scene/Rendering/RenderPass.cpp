@@ -95,6 +95,14 @@ void RenderPassBase::emit( Rvm& rvm, ShaderCache& shaders )
 	}
 }
 
+// ** RenderPassBase::setClipper
+void RenderPassBase::setClipper( const PlaneClipper& value )
+{
+	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
+		m_emitters[i]->setClipper( value );
+	}
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
