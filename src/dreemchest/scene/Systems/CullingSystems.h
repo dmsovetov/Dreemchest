@@ -40,28 +40,22 @@ namespace Scene {
 	class FrustumCullingSystem : public Ecs::EntityWithComponentsSystem2<StaticMesh, Transform> {
 	public:
 
-						//! Constructs FrustumCullingSystem instance.
-						FrustumCullingSystem( Ecs::Entities& entities, const Ecs::FamilyPtr& cameras )
-							: EntityWithComponentsSystem2( entities, "FrustumCulling" ), m_cameras( cameras ) {}
+							//! Constructs FrustumCullingSystem instance.
+							FrustumCullingSystem( Ecs::Entities& entities, const Ecs::FamilyPtr& cameras )
+								: EntityWithComponentsSystem2( entities, "FrustumCulling" ), m_cameras( cameras ) {}
 
 	protected:
 
 		//! Calculates frustums for all cameras.
-		virtual bool	begin( u32 currentTime );
+		virtual bool		begin( u32 currentTime );
 
 		//! Perform culling of a single mesh.
-		virtual void	process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform );
 
 	private:
-		
-		//! Camera frustum.
-		struct Frustum {
-			u8		m_id;			//!< Camera id.
-			Plane	m_planes[6];	//!< Frustum planes.
-		};
 
-		Ecs::FamilyPtr	m_cameras;	//!< All cameras used for culling.
-		Array<Frustum>	m_frustums;	//!< Active frustums.
+		Ecs::FamilyPtr		m_cameras;	//!< All cameras used for culling.
+		Array<PlaneClipper>	m_frustums;	//!< Active frustums.
 	};
 
 } // namespace Scene

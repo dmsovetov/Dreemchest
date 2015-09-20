@@ -57,7 +57,7 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera&
 	const ViewPtr& view = camera.view();
 
 	// Calculate the view-projection matrix
-	Matrix4 viewProjection = camera.calculateClipSpace( transform.matrix() );
+	Matrix4 viewProjection = camera.calculateViewProjection( transform.matrix() );
 
 	view->begin();
 	{

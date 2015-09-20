@@ -44,7 +44,6 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
 		Camera*	   camera		   = (*i)->get<Camera>();
 		Transform* cameraTransform = (*i)->get<Transform>();
-		Frustum	   frustum;
 
 		if( !camera->view().valid() ) {
 			continue;
@@ -52,9 +51,8 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 
 		camera->setId( cameraId++ );
 
-		Matrix4 clip = camera->calculateClipSpace( cameraTransform->matrix() );
-		Camera::calculateFrustum( clip, frustum.m_planes );
-		frustum.m_id = camera->id();
+		Matrix4		 viewProjection = camera->calculateViewProjection( cameraTransform->matrix() );
+		PlaneClipper frustum		= PlaneClipper::createFromFrustum( viewProjection, camera->id() );
 
 		m_frustums.push_back( frustum );
 	}
@@ -68,17 +66,8 @@ void FrustumCullingSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity
 	Bounds bounds = staticMesh.bounds() * transform.matrix();
 
 	for( u32 i = 0, n = m_frustums.size(); i < n; i++ ) {
-		const Frustum& frustum = m_frustums[i];
-		bool		   inside  = true;
-
-		for( u32 j = 0; j < 6; j++ ) {
-			if( frustum.m_planes[j].isBehind( bounds ) ) {
-				inside = false;
-				break;
-			}
-		}
-
-		staticMesh.setVisibilityMask( BIT( frustum.m_id ), inside );
+		const PlaneClipper& frustum = m_frustums[i];
+		staticMesh.setVisibilityMask( BIT( frustum.id() ), frustum.inside( bounds ) );
 	}
 }
 
