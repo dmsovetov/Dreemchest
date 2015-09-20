@@ -48,7 +48,7 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 	}
 
 	// Skip if mesh is not inside the clipper.
-	if( !m_clipper.inside( staticMesh.bounds() * transform.matrix() ) ) {
+	if( !m_clipper.inside( staticMesh.worldSpaceBounds() ) ) {
 		return;
 	}
 

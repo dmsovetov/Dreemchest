@@ -66,7 +66,7 @@ void MeshBoundsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache&
 {
 	Renderer::Renderer2DPtr renderer = context->renderer();
 
-	renderer->wireBox( staticMesh.bounds() * transform.matrix(), Rgba( 1.0f, 1.0f, 0.0f, 0.25f ) );
+	renderer->wireBox( staticMesh.worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f, 0.25f ) );
 }
 
 // ** LightBoundsPass::render

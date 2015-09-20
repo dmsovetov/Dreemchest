@@ -134,8 +134,11 @@ namespace Scene {
 		//! Sets a mesh to be rendered.
 		void						setMesh( const MeshPtr& value );
 
-		//! Returns mesh bounds.
-		const Bounds&				bounds( void ) const;
+		//! Returns the mesh world space bounding box.
+		const Bounds&				worldSpaceBounds( void ) const;
+
+		//! Sets the mesh world space bounding box.
+		void						setWorldSpaceBounds( const Bounds& value );
 
 		//! Returns true if the mesh is visible by camera.
 		bool						isVisible( u8 camera ) const;
@@ -160,10 +163,11 @@ namespace Scene {
 
 	private:
 
-		FlagSet16					m_visibility;	//!< Camera visibility mask.
-		MeshPtr						m_mesh;			//!< Mesh to be rendered.
-		Array<MaterialPtr>			m_materials;	//!< Mesh materials array.
-		Renderer::TexturePtr		m_lightmap;		//!< Lightmap texture that is rendered for this mesh.
+		FlagSet16					m_visibility;		//!< Camera visibility mask.
+		MeshPtr						m_mesh;				//!< Mesh to be rendered.
+		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
+		Array<MaterialPtr>			m_materials;		//!< Mesh materials array.
+		Renderer::TexturePtr		m_lightmap;			//!< Lightmap texture that is rendered for this mesh.
 	};
 
 	//! Holds the sprite rendering info.

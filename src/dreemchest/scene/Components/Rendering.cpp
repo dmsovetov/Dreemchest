@@ -98,11 +98,16 @@ void StaticMesh::setMesh( const MeshPtr& value )
 	m_mesh = value;
 }
 
-// ** StaticMesh::bounds
-const Bounds& StaticMesh::bounds( void ) const
+// ** StaticMesh::worldSpaceBounds
+const Bounds& StaticMesh::worldSpaceBounds( void ) const
 {
-	static Bounds empty;
-	return m_mesh.valid() ? m_mesh->bounds() : empty;
+	return m_worldSpaceBounds;
+}
+
+// ** StaticMesh::setWorldSpaceBounds
+void StaticMesh::setWorldSpaceBounds( const Bounds& value )
+{
+	m_worldSpaceBounds = value;
 }
 
 // ** StaticMesh::const 

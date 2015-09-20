@@ -63,7 +63,7 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 // ** FrustumCullingSystem::process
 void FrustumCullingSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform )
 {
-	Bounds bounds = staticMesh.bounds() * transform.matrix();
+	const Bounds& bounds = staticMesh.worldSpaceBounds();
 
 	for( u32 i = 0, n = m_frustums.size(); i < n; i++ ) {
 		const PlaneClipper& frustum = m_frustums[i];

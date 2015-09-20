@@ -29,6 +29,7 @@
 
 #include "../Scene.h"
 #include "../Components/Transform.h"
+#include "../Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -56,6 +57,18 @@ namespace Scene {
 	private:
 
 		Array<Transform*>	m_transforms;	//!< Active scene transform components.
+	};
+
+	//! World space bounding box system calculates bounding volumes for static meshes in scene.
+	class WorldSpaceBoundingBoxSystem : public Ecs::EntityWithComponentsSystem2<StaticMesh, Transform> {
+	public:
+
+							//! Constructs a WorldSpaceBoundingBoxSystem instance.
+							WorldSpaceBoundingBoxSystem( Ecs::Entities& entities )
+								: EntityWithComponentsSystem2( entities, "WorldSpaceBoundingBoxSystem" ) {}
+
+		//! Calculates the world space bounds for static mesh.
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
 	};
 
 	//! The RotorSystem system

@@ -60,6 +60,18 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 	DC_BREAK
 }
 
+// -------------------------------------------- WorldSpaceBoundingBoxSystem -------------------------------------------- //
+
+// ** WorldSpaceBoundingBoxSystem::process
+void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
+{
+	if( !staticMesh.mesh().valid() ) {
+		return;
+	}
+
+	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
+}
+
 // ------------------------------------------------ FollowSystem ------------------------------------------------- //
 
 // ** FollowSystem::process
