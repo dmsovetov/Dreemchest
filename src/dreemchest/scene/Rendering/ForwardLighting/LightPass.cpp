@@ -56,6 +56,10 @@ void ForwardLightPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCach
 	rvm.setRegister( Rvm::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
 	rvm.setRegister( Rvm::LightPosition, Vec4( position.x, position.y, position.z, light.range() ) );
 
+	// Set the light clipper
+	setClipper( PlaneClipper::createFromBox( position, light.range() ) );
+
+	// Emit render operations
 	emit( rvm, shaders );
 
 	rvm.flush();
