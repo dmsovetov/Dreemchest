@@ -48,7 +48,10 @@ namespace Scene {
 									: m_parent( parent ), m_position( x, y, z ), m_scale( 1.0f, 1.0f, 1.0f ) {}
 
 		//! Returns an affine transformation matrix.
-		virtual Matrix4			matrix( void ) const;
+		virtual const Matrix4&	matrix( void ) const;
+
+		//! Sets the affine transform.
+		void					setMatrix( const Matrix4& value );
 
 		//! Returns parent transform.
 		const TransformWPtr&	parent( void ) const;
@@ -110,6 +113,9 @@ namespace Scene {
 		//! Sets the scale.
 		void					setScale( const Vec3& value );
 
+		//! Returns the scale.
+		const Vec3&				scale( void ) const;
+
 		//! Returns the X scale.
 		f32						scaleX( void ) const;
 
@@ -130,10 +136,11 @@ namespace Scene {
 
 	private:
 
-		TransformWPtr			m_parent;	//!< Parent transform.
-		Vec3					m_position;	//!< Object position.
-		Quat					m_rotation;	//!< Object rotation.
-		Vec3					m_scale;	//!< Object scale.
+		TransformWPtr			m_parent;		//!< Parent transform.
+		Vec3					m_position;		//!< Object position.
+		Quat					m_rotation;		//!< Object rotation.
+		Vec3					m_scale;		//!< Object scale.
+		Matrix4					m_transform;	//!< Affine transform matrix.
 	};
 
 	//! Rotates the transform

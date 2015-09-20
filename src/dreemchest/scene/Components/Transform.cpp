@@ -59,15 +59,15 @@ f32 Follow::springForce( void ) const
 // ------------------------------------------ Transform ------------------------------------------ //
 
 // ** Transform::matrix
-Matrix4 Transform::matrix( void ) const
+const Matrix4& Transform::matrix( void ) const
 {
-	Matrix4 T = Matrix4::translation( m_position ) * m_rotation * Matrix4::scale( m_scale );
+	return m_transform;
+}
 
-	if( m_parent != NULL ) {
-		T = m_parent->matrix() * T;
-	}
-
-	return T;
+// ** Transform::setMatrix
+void Transform::setMatrix( const Matrix4& value )
+{
+	m_transform = value;
 }
 
 // ** Transform::parent
@@ -176,6 +176,12 @@ void Transform::setRotationZ( f32 value )
 void Transform::setScale( const Vec3& value )
 {
 	m_scale = value;
+}
+
+// ** Transform::scale
+const Vec3& Transform::scale( void ) const
+{
+	return m_scale;
 }
 
 // ** Transform::scaleX
