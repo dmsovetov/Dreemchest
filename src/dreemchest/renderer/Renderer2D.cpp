@@ -161,7 +161,10 @@ void Renderer2D::begin( const Matrix4& value, Compare depthTest, BlendFactor src
 	m_hal->setDepthTest( true, depthTest );
 
 	// Enable alpha blending
-	m_hal->setBlendFactors( BlendSrcAlpha, BlendInvSrcAlpha );
+	m_hal->setBlendFactors( src, dst );
+
+	// Disable culling
+	m_hal->setCulling( TriangleFaceNone );
 }
 
 // ** Renderer2D::end

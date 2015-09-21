@@ -49,7 +49,7 @@ namespace Renderer {
 		};
 
 		//! Begins the 2D rendering.
-		void					begin( const Matrix4& value, Compare depthTest = Always );
+		void					begin( const Matrix4& value, Compare depthTest = Always, BlendFactor src = BlendSrcAlpha, BlendFactor dst = BlendInvSrcAlpha );
 
 		void					end( void );
 
