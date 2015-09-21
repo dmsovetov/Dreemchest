@@ -111,7 +111,7 @@ namespace Renderer {
          \param format  Render target pixel format.
          \return        RenderTarget instance.
          */
-        virtual RenderTarget*   createRenderTarget( u32 width, u32 height, PixelFormat format );
+        virtual RenderTargetPtr   createRenderTarget( u32 width, u32 height );
 
         //! Creates a new shader.
         /*!
@@ -150,7 +150,7 @@ namespace Renderer {
         virtual void    setShader( const ShaderPtr& shader );
 
         //! Binds a render target.
-        virtual void    setRenderTarget( RenderTarget* renderTarget );
+        virtual void    setRenderTarget( const RenderTargetPtr& renderTarget );
 
         //! Binds a texture to a specified texture sampler.
         virtual void    setTexture( u32 sampler, Texture *texture );
@@ -310,18 +310,21 @@ namespace Renderer {
         virtual void                release( void );
     };
 
-    // ** class Texture
     //! Texture is a base class for all hardware textures.
-    class dcInterface Texture : public RenderResource {
-
-        DC_DECLARE_IS( Texture2D,    Texture2D,    NULL )
-        DC_DECLARE_IS( TextureCube,  TextureCube,  NULL )
-        DC_DECLARE_IS( RenderTarget, RenderTarget, NULL )
-
+    class Texture : public RenderResource {
     public:
 
+		//! Available texture types.
+		enum Type {
+			  TextureType2D				//!< 2D texture.
+			, TextureTypeCube			//!< Cube texture.
+		};
+
                                     //! Constructs a new instance of Texture with a given pixel format.
-                                    Texture( PixelFormat format );
+                                    Texture( PixelFormat format, Type type );
+
+		//! Returns texture type.
+		Type						type( void ) const;
 
         //! Returns a texture pixel format.
         PixelFormat                 pixelFormat( void ) const;
@@ -346,24 +349,14 @@ namespace Renderer {
 
     protected:
 
-        //! Texture pixel format.
-        PixelFormat                 m_pixelFormat;
-
-        //! Pointer to a locked texture data.
-        void*                       m_locked;
-
-        //! Index of a locked texture mip level.
-        u32                         m_lockedLevel;
-
-    //    u32                         m_renderThread;
+        Type						m_type;			//!< Texture type.
+        PixelFormat                 m_pixelFormat;	//!< Texture pixel format.
+        void*                       m_locked;		//!< Pointer to a locked texture data.
+        u32                         m_lockedLevel;	//!< Index of a locked texture mip level.
     };
 
-    // ** class Texture2D
     //! Texture2D class represents a 2D texture.
-    class dcInterface Texture2D : public Texture {
-
-         DC_DECLARE_IS( Texture2D, Texture2D, this )
-
+    class Texture2D : public Texture {
     public:
 
                                     //! Constructs a new Texture2D instance.
@@ -396,19 +389,12 @@ namespace Renderer {
 
     protected:
 
-        //! Texture width.
-        u32                         m_width;
-
-        //! Texture height.
-        u32                         m_height;
+        u32                         m_width;	//!< Texture width.
+        u32                         m_height;	//!< Texture height.
     };
 
-    // ** class TextureCube
     //! A TextureCube class.
-    class dcInterface TextureCube : public Texture {
-
-        DC_DECLARE_IS( TextureCube, TextureCube, this )
-
+    class TextureCube : public Texture {
     public:
 
                                     //! Constructs a new TextureCube instance.
@@ -429,20 +415,36 @@ namespace Renderer {
 
     private:
 
-        //! Cube texture dimensions.
-        u32                         m_size;
+        u32                         m_size;	//!< Cube texture dimensions.
     };
 
-    // ** class RenderTarget
     //! A render target.
-    class dcInterface RenderTarget : public Texture2D {
-
-        DC_DECLARE_IS( RenderTarget, RenderTarget, this )
-
+    class RenderTarget : public RenderResource {
     public:
 
                                     //! Constructs a new RenderTarget instance.
-                                    RenderTarget( u32 width, u32 height, PixelFormat format );
+                                    RenderTarget( u32 width, u32 height );
+
+		//! Setups the color renderbuffer.
+		virtual bool				setColor( PixelFormat format, u32 index = 0 );
+
+		//! Setups the depth renderbuffer.
+		virtual bool				setDepth( PixelFormat format );
+
+		//! Returns the color attachment by index.
+		Texture2DPtr				color( u32 index = 0 ) const;
+
+		//! Returns render target width.
+		u32							width( void ) const;
+
+		//! Returns render target height.
+		u32							height( void ) const;
+
+	protected:
+
+		Array<Texture2DPtr>			m_color;	//!< Color attachments.
+		u32							m_width;	//!< Render target width.
+		u32							m_height;	//!< Render target height.
     };
 
     // ** class VertexDeclaration

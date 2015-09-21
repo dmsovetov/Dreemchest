@@ -73,6 +73,13 @@ PFNGLUNIFORMMATRIX4FVARBPROC		glUniformMatrix4fv = NULL;
 PFNGLDELETEFRAMEBUFFERSPROC			glDeleteFramebuffers = NULL;
 PFNGLFRAMEBUFFERTEXTURE2DPROC		glFramebufferTexture2D = NULL;
 PFNGLGENFRAMEBUFFERSPROC			glGenFramebuffers = NULL;
+PFNGLBINDFRAMEBUFFERPROC			glBindFramebuffer = NULL;
+PFNGLDELETERENDERBUFFERSPROC		glDeleteRenderbuffers = NULL;
+PFNGLGENRENDERBUFFERSPROC			glGenRenderbuffers = NULL;
+PFNGLBINDRENDERBUFFERPROC			glBindRenderbuffer = NULL;
+PFNGLRENDERBUFFERSTORAGEPROC		glRenderbufferStorage = NULL;
+PFNGLCHECKFRAMEBUFFERSTATUSPROC		glCheckFramebufferStatus = NULL;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC	glFramebufferRenderbuffer = NULL;
 
 	// ** GL_ARB_texture_compression
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC	glCompressedTexImage2D = NULL;
@@ -116,6 +123,17 @@ bool loadOpenGLExtensions( void )
 
 	glCompressedTexImage2D	= ( PFNGLCOMPRESSEDTEXIMAGE2DARBPROC )  wglGetProcAddress( "glCompressedTexImage2DARB" );
 
+	glDeleteFramebuffers	= ( PFNGLDELETEFRAMEBUFFERSPROC )		wglGetProcAddress( "glDeleteFramebuffers" );
+	glFramebufferTexture2D	= ( PFNGLFRAMEBUFFERTEXTURE2DPROC )		wglGetProcAddress( "glFramebufferTexture2D" );
+	glGenFramebuffers		= ( PFNGLGENFRAMEBUFFERSPROC )			wglGetProcAddress( "glGenFramebuffers" );
+	glBindFramebuffer		= ( PFNGLBINDFRAMEBUFFERPROC )			wglGetProcAddress( "glBindFramebuffer" );
+
+	glDeleteRenderbuffers		= ( PFNGLDELETERENDERBUFFERSPROC )		wglGetProcAddress( "glDeleteRenderbuffers" );
+	glGenRenderbuffers			= ( PFNGLGENRENDERBUFFERSPROC )			wglGetProcAddress( "glGenRenderbuffers" );
+	glBindRenderbuffer			= ( PFNGLBINDRENDERBUFFERPROC )			wglGetProcAddress( "glBindRenderbuffer" );
+	glRenderbufferStorage		= ( PFNGLRENDERBUFFERSTORAGEPROC )		wglGetProcAddress( "glRenderbufferStorage" );
+	glCheckFramebufferStatus	= ( PFNGLCHECKFRAMEBUFFERSTATUSPROC )	wglGetProcAddress( "glCheckFramebufferStatus" );
+	glFramebufferRenderbuffer	= ( PFNGLFRAMEBUFFERRENDERBUFFERPROC )	wglGetProcAddress( "glFramebufferRenderbuffer" );
 	return true;
 }
 

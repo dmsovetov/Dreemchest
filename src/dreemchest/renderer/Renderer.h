@@ -66,6 +66,7 @@ namespace Renderer {
 	dcDeclarePtrs( Texture )
 	dcDeclarePtrs( Texture2D )
 	dcDeclarePtrs( Shader )
+	dcDeclarePtrs( RenderTarget )
 
     //! Hardware rendering API.
     enum RenderingHal {
@@ -209,6 +210,8 @@ namespace Renderer {
         // ** Depth-stencil formats
         PixelD24X8,     //!< 32-bit depth stencil surface with 24-bit depth value and no stencil.
         PixelD24S8,     //!< 32-bit depth stencil surface with 24-bit depth value and 8-bit stencil.
+
+		TotalPixelFormats
     };
 
     //! A list of available primitive types.

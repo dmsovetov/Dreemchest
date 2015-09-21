@@ -149,9 +149,9 @@ TextureCube* Hal::createTextureCube( u32 size, PixelFormat format )
 }
 
 // ** Hal::createRenderTarget
-RenderTarget* Hal::createRenderTarget( u32 width, u32 height, PixelFormat format )
+RenderTargetPtr Hal::createRenderTarget( u32 width, u32 height )
 {
-    return DC_NEW RenderTarget( width, height, format );
+    return RenderTargetPtr( DC_NEW RenderTarget( width, height ) );
 }
 
 // ** Hal::createShader
@@ -205,7 +205,7 @@ void Hal::setShader( const ShaderPtr& shader )
 }
 
 // ** Hal::setRenderTarget
-void Hal::setRenderTarget( RenderTarget *renderTarget )
+void Hal::setRenderTarget( const RenderTargetPtr& renderTarget )
 {
 
 }
@@ -437,9 +437,15 @@ void RenderResource::release( void )
 // --------------------------------------------------- Texture -------------------------------------------------- //
 
 // ** Texture::Texture
-Texture::Texture( PixelFormat format ) : m_pixelFormat( format ), m_locked( NULL )
+Texture::Texture( PixelFormat format, Type type ) : m_type( type ), m_pixelFormat( format ), m_locked( NULL )
 {
 
+}
+
+// ** Texture::type
+Texture::Type Texture::type( void ) const
+{
+	return m_type;
 }
 
 // ** Texture::pixelFormat
@@ -537,7 +543,7 @@ void* Texture::locked( void ) const
 // -------------------------------------------------- Texture2D ------------------------------------------------- //
 
 // ** Texture2D::Texture2D
-Texture2D::Texture2D( u32 width, u32 height, PixelFormat format ) : Texture( format ), m_width( width ), m_height( height )
+Texture2D::Texture2D( u32 width, u32 height, PixelFormat format ) : Texture( format, TextureType2D ), m_width( width ), m_height( height )
 {
 
 }
@@ -576,7 +582,7 @@ void Texture2D::unlock( void )
 // ------------------------------------------------- TextureCube ------------------------------------------------ //
 
 // ** TextureCube::TextureCube
-TextureCube::TextureCube( u32 size, PixelFormat format ) : Texture( format ), m_size( size )
+TextureCube::TextureCube( u32 size, PixelFormat format ) : Texture( format, TextureTypeCube ), m_size( size )
 {
     
 }
@@ -602,9 +608,39 @@ void TextureCube::unlock( u32 face )
 // ------------------------------------------------ RenderTarget ------------------------------------------------ //
 
 // ** RenderTarget::RenderTarget
-RenderTarget::RenderTarget( u32 width, u32 height, PixelFormat format ) : Texture2D( width, height, format )
+RenderTarget::RenderTarget( u32 width, u32 height ) : m_width( width ), m_height( height )
 {
 
+}
+
+// ** RenderTarget::width
+u32 RenderTarget::width( void ) const
+{
+	return m_width;
+}
+
+// ** RenderTarget::height
+u32 RenderTarget::height( void ) const
+{
+	return m_height;
+}
+
+// ** RenderTarget::attach
+bool RenderTarget::setColor( PixelFormat format, u32 index )
+{
+	return false;
+}
+
+// ** RenderTarget::setDepth
+bool RenderTarget::setDepth( PixelFormat format )
+{
+	return false;
+}
+
+// ** RenderTarget:attachment
+Texture2DPtr RenderTarget::color( u32 index ) const
+{
+	return index < ( u32 )m_color.size() ? m_color[index] : Texture2DPtr();
 }
 
 // ---------------------------------------------- VertexDeclaration --------------------------------------------- //

@@ -148,20 +148,13 @@ TextureCube* OpenGLHal::createTextureCube( u32 size, PixelFormat format )
 }
 
 // ** OpenGLHal::createRenderTarget
-RenderTarget* OpenGLHal::createRenderTarget( u32 width, u32 height, PixelFormat format )
+RenderTargetPtr OpenGLHal::createRenderTarget( u32 width, u32 height )
 {
     DC_CHECK_GL;
+	DC_CHECK_GL_CONTEXT;
 
-	DC_NOT_IMPLEMENTED;
-	return NULL;
-
-    //OpenGLRenderTarget* rt    = DC_NEW OpenGLRenderTarget( width, height, format );
-    //OpenGLTexture2D*    color = ( OpenGLTexture2D* )createTexture2D( width, height, format );
-
-    //color->setData( 0, NULL );
-    //rt->setColor( color );
-    
-    //return rt;
+    OpenGLRenderTarget* rt = DC_NEW OpenGLRenderTarget( width, height );
+    return RenderTargetPtr( rt );
 }
 
 // ** OpenGLHal::createShader
@@ -233,9 +226,12 @@ void OpenGLHal::setShader( const ShaderPtr& shader )
 }
 
 // ** OpenGLHal::setRenderTarget
-void OpenGLHal::setRenderTarget( RenderTarget *renderTarget )
+void OpenGLHal::setRenderTarget( const RenderTargetPtr& renderTarget )
 {
-    DC_NOT_IMPLEMENTED;
+	DC_CHECK_GL_CONTEXT;
+	DC_CHECK_GL;
+
+    glBindFramebuffer( GL_FRAMEBUFFER, renderTarget.valid() ? static_cast<OpenGLRenderTarget*>( renderTarget.get() )->m_id : 0 );
 }
 
 // ** OpenGLHal::setTexture
@@ -756,10 +752,11 @@ GLenum OpenGLHal::textureFilter( u32 filter )
 GLenum OpenGLHal::textureType( const Texture *texture )
 {
     DC_BREAK_IF( texture == NULL );
-    
-    if( texture->isTexture2D() )    return GL_TEXTURE_2D;
-    if( texture->isTextureCube() )  return GL_TEXTURE_CUBE_MAP;
-    if( texture->isRenderTarget() ) return GL_TEXTURE_2D;
+
+	switch( texture->type() ) {
+	case Texture::TextureType2D:	return GL_TEXTURE_2D;
+	case Texture::TextureTypeCube:	return GL_TEXTURE_CUBE_MAP;
+	}
 
     DC_BREAK_IF( true );
     return 0;
@@ -772,9 +769,10 @@ GLuint OpenGLHal::textureID( const Texture *texture )
         return 0;
     }
 
-    if( texture->isTexture2D() )    return static_cast<const OpenGLTexture2D*>( texture )->m_id;
-    if( texture->isTextureCube() )  return static_cast<const OpenGLTextureCube*>( texture )->m_id;
-    if( texture->isRenderTarget() ) return static_cast<const OpenGLRenderTarget*>( texture )->m_id;
+	switch( texture->type() ) {
+	case Texture::TextureType2D:	return static_cast<const OpenGLTexture2D*>( texture )->m_id;
+    case Texture::TextureTypeCube:	return static_cast<const OpenGLTextureCube*>( texture )->m_id;
+	}
 
     DC_BREAK_IF( true );
     return 0;
@@ -801,6 +799,7 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
     case PixelRgba32F:  return GL_RGBA32F;
     case PixelRgb32F:   return GL_RGB32F;
 #endif
+	case PixelD24X8:	return GL_DEPTH_COMPONENT24;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
 
@@ -963,25 +962,68 @@ void OpenGLTextureCube::unlock( u32 face )
 // ------------------------------------------------ OpenGLRenderTarget ------------------------------------------------ //
 
 // ** OpenGLRenderTarget::OpenGLRenderTarget
-OpenGLRenderTarget::OpenGLRenderTarget( u32 width, u32 height, PixelFormat format ) : RenderTarget( width, height, format ), m_color( NULL )
+OpenGLRenderTarget::OpenGLRenderTarget( u32 width, u32 height ) : RenderTarget( width, height ), m_depth( 0 )
 {
+    DC_CHECK_GL;
+	DC_CHECK_GL_CONTEXT;
+
     glGenFramebuffers( 1, &m_id );
 }
 
 OpenGLRenderTarget::~OpenGLRenderTarget( void )
 {
+	if( m_depth ) {
+		glDeleteRenderbuffers( 1, &m_depth );
+	}
+
     glDeleteFramebuffers( 1, &m_id );
 }
 
+// ** OpenGLRenderTarget::check
+bool OpenGLRenderTarget::check( void ) const
+{
+	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+	return status == GL_FRAMEBUFFER_COMPLETE;
+}
+
 // ** OpenGLRenderTarget::setColor
-bool OpenGLRenderTarget::setColor( OpenGLTexture2D *color )
+bool OpenGLRenderTarget::setColor( PixelFormat format, u32 index )
 {
     DC_CHECK_GL;
-    
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color->id(), 0 );
-    m_color = color;
+	DC_CHECK_GL_CONTEXT;
 
-	return true;
+	OpenGLTexture2D* texture = DC_NEW OpenGLTexture2D( m_width, m_height, format );
+	texture->setData( 0, NULL );
+    
+	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->id(), 0 );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+	if( index >= m_color.size() ) {
+		m_color.resize( index + 1 );
+	}
+
+    m_color[index] = texture;
+	DC_BREAK_IF( !check() );
+
+	return check();
+}
+
+// ** OpenGLRenderTarget::setDepth
+bool OpenGLRenderTarget::setDepth( PixelFormat format )
+{
+	glGenRenderbuffers( 1, &m_depth );
+	glBindRenderbuffer( GL_RENDERBUFFER, m_depth );
+	glRenderbufferStorage( GL_RENDERBUFFER, OpenGLHal::internalImageFormat( format ), m_width, m_height );
+
+	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+	return check();
 }
 
 // ----------------------------------------------- OpenGLVertexBuffer ------------------------------------------------- //

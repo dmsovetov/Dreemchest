@@ -149,13 +149,13 @@ namespace Renderer {
         virtual void				renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
         virtual Texture2DPtr		createTexture2D( u32 width, u32 height, PixelFormat format );
         virtual TextureCube*        createTextureCube( u32 size, PixelFormat format );
-        virtual RenderTarget*       createRenderTarget( u32 width, u32 height, PixelFormat format );
+        virtual RenderTargetPtr     createRenderTarget( u32 width, u32 height );
         virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
         virtual IndexBufferPtr      createIndexBuffer( u32 count, bool GPU = true );
         virtual VertexBufferPtr		createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
 		virtual void				setPolygonMode( PolygonMode mode );
         virtual void				setShader( const ShaderPtr& shader );
-        virtual void				setRenderTarget( RenderTarget *renderTarget );
+        virtual void				setRenderTarget( const RenderTargetPtr& renderTarget );
         virtual void				setTexture( u32 sampler, Texture *texture );
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
@@ -253,16 +253,20 @@ namespace Renderer {
     friend class OpenGLHal;
     public:
 
-                                    OpenGLRenderTarget( u32 width, u32 height, PixelFormat format );
+                                    OpenGLRenderTarget( u32 width, u32 height );
         virtual                     ~OpenGLRenderTarget( void );
 
+		// ** RenderTarget
+		virtual bool				setColor( PixelFormat format, u32 index );
+		virtual bool				setDepth( PixelFormat format );
+
         // ** OpenGLRenderTarget
-        bool                        setColor( OpenGLTexture2D *color );
+		bool						check( void ) const;
 
     private:
 
         GLuint                      m_id;
-        OpenGLTexture2D*            m_color;
+		GLuint						m_depth;
     };
 
     // ** class OpenGLVertexBuffer

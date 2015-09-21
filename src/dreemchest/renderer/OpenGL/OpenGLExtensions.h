@@ -76,6 +76,13 @@ namespace Renderer {
 	extern PFNGLDELETEFRAMEBUFFERSPROC			glDeleteFramebuffers;
 	extern PFNGLFRAMEBUFFERTEXTURE2DPROC		glFramebufferTexture2D;
 	extern PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
+	extern PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
+	extern PFNGLDELETERENDERBUFFERSPROC			glDeleteRenderbuffers;
+	extern PFNGLGENRENDERBUFFERSPROC			glGenRenderbuffers;
+	extern PFNGLBINDRENDERBUFFERPROC			glBindRenderbuffer;
+	extern PFNGLRENDERBUFFERSTORAGEPROC			glRenderbufferStorage;
+	extern PFNGLCHECKFRAMEBUFFERSTATUSPROC		glCheckFramebufferStatus;
+	extern PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
 
 	// ** GL_ARB_texture_compression
 	extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2D;
