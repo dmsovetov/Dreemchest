@@ -76,83 +76,62 @@ namespace Ecs {
 		IndexPtr		m_index;	//!< Entity index used by this system.
 	};
 
-	//! A template class to process entities that contain all components from a specified set.
-	template<typename TComponent>
-	class EntityWithComponentsSystem : public EntitySystem {
+	//! Generic entity system to process entities that contain all components from a specified set.
+	template<typename ... TComponents>
+	class GenericEntitySystem : public EntitySystem {
 	public:
 
-						//! Constructs EntityWithComponentsSystem instance.
-						EntityWithComponentsSystem( const String& name )
-							: EntitySystem( name, Aspect::all<TComponent>() ) {}
+						//! Constructs GenericEntitySystem instance.
+						GenericEntitySystem( const String& name )
+							: EntitySystem( name, Aspect::all<TComponents...>() ) {}
 
 	protected:
 
-		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
-		{
-			TComponent* c = entity.get<TComponent>();
-			process( currentTime, dt, entity, *c );
-		}
+		//! Component types.
+		typedef std::tuple<TComponents...> Types;
 
-		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent& component )
-		{
-			DC_BREAK
-		}
-	};
+		//! Tuple indices
+		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
-	//! A template class to process entities that contain all components from a specified set.
-	template<typename TComponent1, typename TComponent2>
-	class EntityWithComponentsSystem2 : public EntitySystem {
-	public:
+		//! Performs an update of a system
+		virtual void	update( u32 currentTime, f32 dt );
 
-						//! Constructs EntityWithComponentsSystem2 instance.
-						EntityWithComponentsSystem2( const String& name )
-							: EntitySystem( name, Aspect::all<TComponent1, TComponent2>() ) {}
+		//! Generic processing function that should be overriden in a subclass.
+		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );
 
-	protected:
+	private:
 
-		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
-		{
-			TComponent1* c1 = entity.get<TComponent1>();
-			TComponent2* c2 = entity.get<TComponent2>();
-			process( currentTime, dt, entity, *c1, *c2 );
-		}
-
-		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent1& component1, TComponent2& component2 )
-		{
-			DC_BREAK
+		//! Dispatches the entity components to processing
+		template<s32 ... Idxs> 
+		void dispatch( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
+		{ 
+			process( currentTime, dt, entity, *entity.get<std::tuple_element<Idxs, Types>::type>()... );
 		}
 	};
 
-	//! A template class to process entities that contain all components from a specified set.
-	template<typename TComponent1, typename TComponent2, typename TComponent3>
-	class EntityWithComponentsSystem3 : public EntitySystem {
-	public:
-
-						//! Constructs EntityWithComponentsSystem3 instance.
-						EntityWithComponentsSystem3( const String& name )
-							: EntitySystem( name, Aspect::all<TComponent1, TComponent2, TComponent3>() ) {}
-
-	protected:
-
-		//! Extracts a specified components from entity and runs a processing callback.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity )
-		{
-			TComponent1* c1 = entity.get<TComponent1>();
-			TComponent2* c2 = entity.get<TComponent2>();
-			TComponent3* c3 = entity.get<TComponent3>();
-			process( currentTime, dt, entity, *c1, *c2, *c3 );
+	// ** GenericEntitySystem::update
+	template<typename ... TComponents>
+	void GenericEntitySystem<TComponents...>::update( u32 currentTime, f32 dt )
+	{
+		if( !begin( currentTime ) ) {
+			return;
 		}
 
-		//! Strong typed process method.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponent1& component1, TComponent2& component2, TComponent3& component3 )
-		{
-			DC_BREAK
+		EntitySet& entities = m_index->entities();
+
+		for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
+			dispatch( currentTime, dt, *i->get(), Indices::Indexes() );
 		}
-	};
+
+		end();	
+	}
+
+	// ** GenericEntitySystem::process
+	template<typename ... TComponents>
+	void GenericEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
+	{
+		DC_BREAK
+	}
 
 } // namespace Ecs
 

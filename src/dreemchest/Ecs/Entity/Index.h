@@ -46,6 +46,9 @@ namespace Ecs {
 		//! Returns a set of entities 
 		const EntitySet&		entities( void ) const;
 
+		//! Returns a set of entities 
+		EntitySet&				entities( void );
+
 		//! Returns event emitter
 		EventEmitter&			events( void );
 

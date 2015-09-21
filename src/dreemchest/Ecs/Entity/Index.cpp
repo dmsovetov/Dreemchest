@@ -48,6 +48,12 @@ const EntitySet& Index::entities( void ) const
 	return m_entities;
 }
 
+// ** Index::entities
+EntitySet& Index::entities( void )
+{
+	return m_entities;
+}
+
 // ** Index::size
 s32 Index::size( void ) const
 {
