@@ -46,6 +46,7 @@
 #include <Ecs/Entity/Entity.h>
 #include <Ecs/Component/Component.h>
 #include <Ecs/System/GenericEntitySystem.h>
+#include <Ecs/System/ImmutableEntitySystem.h>
 #include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
