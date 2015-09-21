@@ -92,11 +92,11 @@ namespace Scene {
 	};
 
 	//! Renders bounding boxes of scene objects.
-	class BoundingBoxRenderer : public RenderingSystemBase {
+	class BoundingVolumesRenderer : public RenderingSystem<RenderBoundingVolumes> {
 	public:
 
-								BoundingBoxRenderer( Ecs::EcsWPtr ecs )
-									: RenderingSystemBase( ecs, "BoundingBoxRenderer", Ecs::Aspect::all<Camera, Transform>() )
+								BoundingVolumesRenderer( Ecs::EcsWPtr ecs )
+									: RenderingSystem( ecs, "BoundingVolumesRenderer" )
 								{
 									addPass<MeshBoundsPass>();
 									addPass<LightBoundsPass>();

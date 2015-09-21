@@ -73,12 +73,23 @@ namespace Scene {
 		m_passes.push_back( DC_NEW TPass( m_ecs ) );
 	}
 
-	//! Generic class for single pass rendering systems.
-	template<typename TPass>
-	class SinglePassRenderingSystem : public RenderingSystemBase {
+	//! Generic render system class.
+	template<typename TRenderer>
+	class RenderingSystem : public RenderingSystemBase {
 	public:
+
+								//! Constructs RenderingSystem instance
+								RenderingSystem( Ecs::EcsWPtr ecs, const String& name )
+									: RenderingSystemBase( ecs, name, Ecs::Aspect::all<Camera, Transform, TRenderer>() ) {}								
+	};
+
+	//! Generic class for single pass rendering systems.
+	template<typename TRenderer, typename TPass>
+	class SinglePassRenderingSystem : public RenderingSystem<TRenderer> {
+	public:
+								//! Constructs SinglePassRenderingSystem instance.
 								SinglePassRenderingSystem( Ecs::EcsWPtr ecs )
-									: RenderingSystemBase( ecs, "SinglePassRenderingSystem", Ecs::Aspect::all<Camera, Transform>() ) { addPass<TPass>(); }
+									: RenderingSystem( ecs, "SinglePassRenderingSystem" ) { addPass<TPass>(); }
 	};
 
 } // namespace Scene

@@ -35,16 +35,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! This component is attached to a camera to render unlit meshes.
-	class RenderUnlitMeshes : public Ecs::Component<RenderUnlitMeshes> {
+	//! This component is attached to a camera to render unlit scene.
+	class RenderUnlit : public Ecs::Component<RenderUnlit> {
 	};
 
 	//! This component is attached to a camera to render forward lit meshes.
 	class RenderForwardLit : public Ecs::Component<RenderForwardLit> {
 	};
 
-	//! This component is attached to a camera to render wireframe meshes.
-	class RenderWireframeMeshes : public Ecs::Component<RenderWireframeMeshes> {
+	//! This component is attached to a camera to render scene wireframe.
+	class RenderWireframe : public Ecs::Component<RenderWireframe> {
 	public:
 
 		//! Returns mesh wireframe rendering color.
@@ -61,6 +61,18 @@ namespace Scene {
 
 	//! This component is attached to a camera to debug render sprite transforms.
 	class RenderSpriteTransform : public Ecs::Component<RenderSpriteTransform> {
+	};
+
+	//! This component is attached to a camera to debug scene object bounding volumes
+	class RenderBoundingVolumes : public Ecs::Component<RenderBoundingVolumes> {
+	};
+
+	//! This component is attached to a camera to render an overdraw
+	class RenderOverdraw : public Ecs::Component<RenderOverdraw> {
+	};
+
+	//! This component is attached to a camera to render an ambient lighting.
+	class RenderAmbient : public Ecs::Component<RenderAmbient> {
 	};
 
 	//! Holds the light information.

@@ -80,11 +80,11 @@ namespace Scene {
 	};
 
 	//! Forward light rendering system.
-	class ForwardLightingRenderer : public RenderingSystemBase {
+	class ForwardLightingRenderer : public RenderingSystem<RenderForwardLit> {
 	public:
 
 								ForwardLightingRenderer( Ecs::EcsWPtr ecs )
-									: RenderingSystemBase( ecs, "ForwardLightingRenderer", Ecs::Aspect::all<Camera, Transform>() )
+									: RenderingSystem( ecs, "ForwardLightingRenderer" )
 								{
 									addPass<AmbientPass>();
 									addPass<ForwardLightPass>();
