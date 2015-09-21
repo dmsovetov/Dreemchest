@@ -52,6 +52,15 @@ void ForwardLightPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCach
 	const Rgb& color	= light.color();
 	Vec3	   position = transform.worldSpacePosition();
 
+	// Check if light is in camera frustum.
+	Vec3		 range   = Vec3( light.range(), light.range(), light.range() );
+	PlaneClipper frustum = PlaneClipper::createFromFrustum( m_camera->calculateViewProjection( m_transform->matrix() ) );
+	Bounds		 bounds  = Bounds( position - range, position + range );
+
+	if( !frustum.inside( bounds ) ) {
+		return;
+	}
+
 	// Set light registers
 	rvm.setRegister( Rvm::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
 	rvm.setRegister( Rvm::LightPosition, Vec4( position.x, position.y, position.z, light.range() ) );
