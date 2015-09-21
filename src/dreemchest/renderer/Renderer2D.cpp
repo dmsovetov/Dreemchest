@@ -152,7 +152,7 @@ Renderer2DPtr Renderer2D::create( const HalPtr& hal, u32 maxVertexBufferSize )
 }
 
 // ** Renderer2D::begin
-void Renderer2D::begin( const Matrix4& value, Compare depthTest )
+void Renderer2D::begin( const Matrix4& value, Compare depthTest, BlendFactor src, BlendFactor dst )
 {
 	// Set the view-projection matrix
 	m_viewProjection = value;
@@ -292,6 +292,19 @@ void Renderer2D::orientedQuad( const Texture2DPtr& texture, f32 x, f32 y, f32 w,
     SET_VERTEX_UV( vertices[1], x + s.x + u.x, y + s.y + u.y, color, 1, 0 );
     SET_VERTEX_UV( vertices[2], x + s.x - u.x, y + s.y - u.y, color, 1, 1 );
     SET_VERTEX_UV( vertices[3], x - s.x - u.x, y - s.y - u.y, color, 0, 1 );
+
+    emitVertices( PrimTriangles, texture, vertices, 4 );
+}
+
+// ** Renderer2D::fullscreenQuad
+void Renderer2D::fullscreenQuad( const Texture2DPtr& texture, const Rgba& color )
+{
+    Vertex vertices[4];
+
+    SET_VERTEX_UV( vertices[0], -1.0f,  1.0f, color, 0, 1 );
+    SET_VERTEX_UV( vertices[1],  1.0f,  1.0f, color, 1, 1 );
+    SET_VERTEX_UV( vertices[2],  1.0f, -1.0f, color, 1, 0 );
+    SET_VERTEX_UV( vertices[3], -1.0f, -1.0f, color, 0, 0 );
 
     emitVertices( PrimTriangles, texture, vertices, 4 );
 }

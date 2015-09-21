@@ -53,6 +53,9 @@ namespace Renderer {
 
 		void					end( void );
 
+		//! Renders a fullscreen quad.
+		void					fullscreenQuad( const Texture2DPtr& texture, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Renders an oriented quad.
 		void                    orientedQuad( const Texture2DPtr& texture, f32 x, f32 y, f32 w, f32 h, const Vec2& up, const Vec2& side, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
