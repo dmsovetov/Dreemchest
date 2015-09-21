@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Moves scene object transform in direction.
-	class MoveInDirectionSystem : public Ecs::EntityWithComponentsSystem2<MoveInDirection, Transform> {
+	class MoveInDirectionSystem : public Ecs::GenericEntitySystem<MoveInDirection, Transform> {
 	public:
 
 							//! Constructs a MoveInDirectionSystem instance.

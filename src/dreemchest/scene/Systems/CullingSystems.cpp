@@ -57,7 +57,7 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 		m_frustums.push_back( frustum );
 	}
 
-	return EntityWithComponentsSystem2::begin( currentTime );
+	return GenericEntitySystem::begin( currentTime );
 }
 
 // ** FrustumCullingSystem::process

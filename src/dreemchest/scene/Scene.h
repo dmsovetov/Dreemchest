@@ -158,9 +158,6 @@ namespace Scene {
 		//! Returns cameras that reside in scene.
 		const Ecs::IndexPtr&			cameras( void ) const;
 
-		//! Returns the scene systems.
-		//Ecs::Systems&					systems( void );
-
 		//! Adds a new system to the scene.
 		template<typename TSystem, typename ... Args>
 		WeakPtr<TSystem>				addSystem( Args ... args );

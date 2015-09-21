@@ -37,12 +37,12 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Performs frustum culling for all active cameras.
-	class FrustumCullingSystem : public Ecs::EntityWithComponentsSystem2<StaticMesh, Transform> {
+	class FrustumCullingSystem : public Ecs::GenericEntitySystem<StaticMesh, Transform> {
 	public:
 
 							//! Constructs FrustumCullingSystem instance.
 							FrustumCullingSystem( const Ecs::IndexPtr& cameras )
-								: EntityWithComponentsSystem2( "FrustumCulling" ), m_cameras( cameras ) {}
+								: GenericEntitySystem( "FrustumCulling" ), m_cameras( cameras ) {}
 
 	protected:
 

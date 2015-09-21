@@ -36,12 +36,12 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Affine transform system calculates the transformation matricies for all transform components.
-	class AffineTransformSystem : public Ecs::EntityWithComponentsSystem<Transform> {
+	class AffineTransformSystem : public Ecs::GenericEntitySystem<Transform> {
 	public:
 
 							//! Constructs a AffineTransformSystem instance.
 							AffineTransformSystem( void )
-								: EntityWithComponentsSystem( "AffineTransformSystem" ) {}
+								: GenericEntitySystem( "AffineTransformSystem" ) {}
 
 		//! Calculates the affine transform matrix for each transform component.
 		virtual void		update( u32 currentTime, f32 dt );
@@ -60,36 +60,36 @@ namespace Scene {
 	};
 
 	//! World space bounding box system calculates bounding volumes for static meshes in scene.
-	class WorldSpaceBoundingBoxSystem : public Ecs::EntityWithComponentsSystem2<StaticMesh, Transform> {
+	class WorldSpaceBoundingBoxSystem : public Ecs::GenericEntitySystem<StaticMesh, Transform> {
 	public:
 
 							//! Constructs a WorldSpaceBoundingBoxSystem instance.
 							WorldSpaceBoundingBoxSystem( void )
-								: EntityWithComponentsSystem2( "WorldSpaceBoundingBoxSystem" ) {}
+								: GenericEntitySystem( "WorldSpaceBoundingBoxSystem" ) {}
 
 		//! Calculates the world space bounds for static mesh.
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
 	};
 
 	//! The RotorSystem system
-	class RotorSystem : public Ecs::EntityWithComponentsSystem2<Rotor, Transform> {
+	class RotorSystem : public Ecs::GenericEntitySystem<Rotor, Transform> {
 	public:
 
 							//! Constructs a RotorSystem instance.
 							RotorSystem( void )
-								: EntityWithComponentsSystem2( "RotorSystem" ) {}
+								: GenericEntitySystem( "RotorSystem" ) {}
 
 		//! Rotates a single entity by a rotor
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotator, Transform& transform );
 	};
 
 	//! The following system
-	class FollowSystem : public Ecs::EntityWithComponentsSystem2<Follow, Transform> {
+	class FollowSystem : public Ecs::GenericEntitySystem<Follow, Transform> {
 	public:
 
 							//! Constructs a FollowSystem instance.
 							FollowSystem( void )
-								: EntityWithComponentsSystem2( "Follow" ) {}
+								: GenericEntitySystem( "Follow" ) {}
 
 		//! Follows the target transform
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
