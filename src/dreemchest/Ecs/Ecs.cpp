@@ -116,15 +116,6 @@ void Ecs::notifyEntityChanged( const EntityId& id )
 // ** Ecs::update
 void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 {
-	// Update all system groups.
-	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
-		SystemGroupPtr& group = m_systems[i];
-
-		if( group->mask() & systems ) {
-			group->update( currentTime, dt );
-		}
-	}
-
 	// Process all changed entities.
 	while( m_changed.size() ) {
 		EntitySet changed = m_changed;
@@ -144,6 +135,15 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 
 		for( EntitySet::iterator i = removed.begin(), end = removed.end(); i != end; ++i ) {
 			m_entities.erase( (*i)->id() );
+		}
+	}
+
+	// Update all system groups.
+	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
+		SystemGroupPtr& group = m_systems[i];
+
+		if( group->mask() & systems ) {
+			group->update( currentTime, dt );
 		}
 	}
 }
