@@ -129,6 +129,10 @@ void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& ind
 	}
 
     glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, indexBuffer->pointer() + firstIndex );
+
+	if( indexBuffer->isGpu() ) {
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	}
 }
 
 // ** OpenGLHal::createTexture2D
