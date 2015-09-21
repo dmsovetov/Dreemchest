@@ -132,7 +132,7 @@ namespace Ecs {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "System/EntitySystem.h"
+	#include "System/GenericEntitySystem.h"
 	#include "Component/Component.h"
 	#include "Entity/Entity.h"
 	#include "Entity/Aspect.h"

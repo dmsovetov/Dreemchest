@@ -75,64 +75,6 @@ namespace Ecs {
 		Aspect			m_aspect;	//!< Entity aspect.
 		IndexPtr		m_index;	//!< Entity index used by this system.
 	};
-
-	//! Generic entity system to process entities that contain all components from a specified set.
-	template<typename ... TComponents>
-	class GenericEntitySystem : public EntitySystem {
-	public:
-
-						//! Constructs GenericEntitySystem instance.
-						GenericEntitySystem( const String& name )
-							: EntitySystem( name, Aspect::all<TComponents...>() ) {}
-
-	protected:
-
-		//! Component types.
-		typedef std::tuple<TComponents...> Types;
-
-		//! Tuple indices
-		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
-
-		//! Performs an update of a system
-		virtual void	update( u32 currentTime, f32 dt );
-
-		//! Generic processing function that should be overriden in a subclass.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );
-
-	private:
-
-		//! Dispatches the entity components to processing
-		template<s32 ... Idxs> 
-		void dispatch( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
-		{ 
-			process( currentTime, dt, entity, *entity.get<std::tuple_element<Idxs, Types>::type>()... );
-		}
-	};
-
-	// ** GenericEntitySystem::update
-	template<typename ... TComponents>
-	void GenericEntitySystem<TComponents...>::update( u32 currentTime, f32 dt )
-	{
-		if( !begin( currentTime ) ) {
-			return;
-		}
-
-		EntitySet& entities = m_index->entities();
-
-		for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
-			dispatch( currentTime, dt, *i->get(), Indices::Indexes() );
-		}
-
-		end();	
-	}
-
-	// ** GenericEntitySystem::process
-	template<typename ... TComponents>
-	void GenericEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
-	{
-		DC_BREAK
-	}
-
 } // namespace Ecs
 
 DC_END_DREEMCHEST
