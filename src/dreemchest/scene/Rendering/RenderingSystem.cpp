@@ -43,12 +43,12 @@ void RenderingSystemBase::render( RenderingContextPtr context )
 	const Ecs::EntitySet& entities = m_cameras->entities();
 
 	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-		renderFromCamera( context, *(*i)->get<Camera>(), *(*i)->get<Transform>() );
+		renderFromCamera( context, *i->get(), *(*i)->get<Camera>(), *(*i)->get<Transform>() );
 	}
 }
 
 // ** RenderingSystemBase::renderFromCamera
-void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Camera& camera, Transform& transform )
+void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform )
 {
 	// Get HAL from a renderer
 	Renderer::HalPtr hal = context->hal();

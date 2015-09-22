@@ -50,10 +50,10 @@ namespace Scene {
 		//! Renders all active cameras to their viewports.
 		void					render( RenderingContextPtr context );
 
-	private:
+	protected:
 
 		//! Renders the scene from a camera.
-		virtual void			renderFromCamera( RenderingContextPtr context, Camera& camera, Transform& transform );
+		virtual void			renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform );
 
 	private:
 
@@ -80,7 +80,14 @@ namespace Scene {
 
 								//! Constructs RenderingSystem instance
 								RenderingSystem( Ecs::EcsWPtr ecs, const String& name )
-									: RenderingSystemBase( ecs, name, Ecs::Aspect::all<Camera, Transform, TRenderer>() ) {}								
+									: RenderingSystemBase( ecs, name, Ecs::Aspect::all<Camera, Transform, TRenderer>() ) {}
+
+		//! Extracts the renderer component before rendering.
+		virtual void			renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform );
+
+	protected:
+
+		TRenderer*				m_renderer;	//!< Renderer component.
 	};
 
 	//! Generic class for single pass rendering systems.
