@@ -38,7 +38,7 @@
 DC_USE_DREEMCHEST
 
 // Open a platform namespace.
-using namespace platform;
+using namespace Platform;
 
 // Open a net namespace.
 using namespace net;

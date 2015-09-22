@@ -31,10 +31,6 @@
 
 #define HAVE_JSON
 
-#ifndef FOO_INCLUDED
-    #include <Foo/Foo.h>
-#endif
-
 #include <platform/Platform.h>
 #include <platform/Input.h>
 #include <platform/Window.h>

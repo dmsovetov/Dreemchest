@@ -24,21 +24,42 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_H__
-#define __DC_Event_H__
+#ifndef __Base_H__
+#define __Base_H__
 
-#include "../Dreemchest.h"
+#include <math.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <float.h>
 
-DC_BEGIN_DREEMCHEST
+#include "Preprocessor.h"
+#include "Exception.h"
+#include "Logger.h"
+#include "StringHash.h"
+#include "Format.h"
+#include "Classes.h"
+#include "UserData.h"
+#include "Guid.h"
+#include "Composition.h"
+#include "FlagSet.h"
 
-namespace event {
+#include "delegate/Closure.h"
 
-} // namespace event
+#include "memory/WeakPtr.h"
+#include "memory/StrongPtr.h"
+#include "memory/AutoPtr.h"
 
-DC_END_DREEMCHEST
+#include "Types.h"
+#include "Variant.h"
+#include "Image.h"
 
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
-#endif
+#include "math/FooMath.h"
 
-#endif	/*	!__DC_Event_H__	*/
+#include "Bitset.h"
+
+//#include "containers/Heap.h"
+#include "spatial/KdTree.h"
+
+#include "memory/ArrayAllocator.h"
+
+#endif  /*  !defined( __Base_H__ ) */

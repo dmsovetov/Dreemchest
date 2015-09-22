@@ -24,21 +24,33 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_H__
-#define __DC_Event_H__
+#ifndef __Base_Format_H__
+#define __Base_Format_H__
 
-#include "../Dreemchest.h"
+#include "Types.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace event {
+	namespace format {
 
-} // namespace event
+		//! Converts a integer value to a string.
+		inline String number( u32 value )
+		{
+			char buffer[10];
+			sprintf( buffer, "%d", value );
+			return buffer;
+		}
+
+		//! Converts a pointer value to a string.
+		inline String ptr( void* value )
+		{
+			char buffer[20];
+			sprintf( buffer, "%p", value );
+			return buffer;
+		}
+
+	} // namespace format
 
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
-#endif
-
-#endif	/*	!__DC_Event_H__	*/
+#endif	/*	!__Base_Format_H__	*/

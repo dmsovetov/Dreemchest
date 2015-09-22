@@ -1,1 +1,0 @@
-StaticLibrary( 'dEcs', sources = [ '*' ], defines = [ 'DC_BUILD_LIBRARY' ] )

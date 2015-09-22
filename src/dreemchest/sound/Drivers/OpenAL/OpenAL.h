@@ -27,7 +27,7 @@
 #ifndef __DC_OpenAL_H__
 #define __DC_OpenAL_H__
 
-#include    "../SoundEngine.h"
+#include "../SoundEngine.h"
 
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>

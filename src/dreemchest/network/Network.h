@@ -24,14 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_H__
-#define		__DC_Network_H__
+#ifndef __DC_Network_H__
+#define __DC_Network_H__
 
-#include	"../Dreemchest.h"
-
-#ifndef FOO_INCLUDED
-    #include <Foo/Foo.h>
-#endif
+#include "../Dreemchest.h"
 
 #include "../io/Io.h"
 #include "../io/streams/ByteBuffer.h"

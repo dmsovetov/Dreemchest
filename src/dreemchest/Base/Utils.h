@@ -24,21 +24,43 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_H__
-#define __DC_Event_H__
+#ifndef __Base_H__
+#define __Base_H__
 
-#include "../Dreemchest.h"
+#define FOO_INCLUDED
 
-DC_BEGIN_DREEMCHEST
-
-namespace event {
-
-} // namespace event
-
-DC_END_DREEMCHEST
-
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
+#ifdef FOO_NAMESPACE
+    #define DC_BEGIN_DREEMCHEST namespace FOO_NAMESPACE {
+    #define DC_END_DREEMCHEST   }
+    #define USING_FOO using namespace FOO_NAMESPACE;
+#else
+    #define DC_BEGIN_DREEMCHEST
+    #define DC_END_DREEMCHEST
+    #define USING_FOO
 #endif
 
-#endif	/*	!__DC_Event_H__	*/
+#include "Preprocessor.h"
+#include "Exception.h"
+#include "Logger.h"
+#include "StringHash.h"
+#include "Format.h"
+#include "Classes.h"
+#include "Bitset.h"
+#include "UserData.h"
+#include "Guid.h"
+#include "Composition.h"
+
+DC_BEGIN_DREEMCHEST
+    #include "delegate/Closure.h"
+DC_END_DREEMCHEST
+
+#include "memory/WeakPtr.h"
+#include "memory/StrongPtr.h"
+#include "memory/AutoPtr.h"
+
+#include "Types.h"
+#include "Image.h"
+
+#include "Variant.h"
+
+#endif  /*  !defined( __Base_H__ ) */

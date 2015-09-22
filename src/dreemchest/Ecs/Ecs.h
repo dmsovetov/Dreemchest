@@ -32,10 +32,6 @@
 #include "../io/serialization/Serializable.h"
 #include "../event/EventEmitter.h"
 
-#ifndef FOO_INCLUDED
-	#include <Foo/Foo.h>
-#endif
-
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {

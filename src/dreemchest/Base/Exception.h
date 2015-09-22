@@ -24,21 +24,43 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_H__
-#define __DC_Event_H__
+#ifndef __Base_Exception_H__
+#define __Base_Exception_H__
 
-#include "../Dreemchest.h"
+#include <string.h>
+
+#pragma warning( disable : 4996 )
 
 DC_BEGIN_DREEMCHEST
 
-namespace event {
+    // ** class Exception
+    class Exception {
+    public:
 
-} // namespace event
+        enum { MaxMessageLength = 4096 };
+
+        char			message[MaxMessageLength];
+                        Exception( const char *string = "" ) { strncpy( message, string, MaxMessageLength ); }
+
+    public:
+
+        static void		Error( const char *message, ... );
+    };
+
+    // ** Exception::Error
+    inline void Exception::Error( const char *message, ... ) {
+    #ifdef DC_EXCEPTIONS_ENABLED
+        va_list		ap;
+        char		formated[MaxMessageLength];
+
+        va_start( ap, message );
+        vsnprintf( formated, MaxMessageLength, message, ap );
+        va_end( ap );
+        
+        throw Exception( formated );
+    #endif
+    }
 
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
-#endif
-
-#endif	/*	!__DC_Event_H__	*/
+#endif  /*  !defined( __Base_Exception_H__ )  */

@@ -24,14 +24,10 @@
 
  **************************************************************************/
 
-#ifndef        __DC_Threads_H__
-#define        __DC_Threads_H__
+#ifndef __DC_Threads_H__
+#define __DC_Threads_H__
 
 #include "../Dreemchest.h"
-
-#ifndef FOO_INCLUDED
-	#include <Foo/Foo.h>
-#endif
 
 #include <queue>
 

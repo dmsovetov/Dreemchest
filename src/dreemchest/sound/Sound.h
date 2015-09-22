@@ -24,14 +24,10 @@
 
  **************************************************************************/
 
-#ifndef        __DC_Sound_H__
-#define        __DC_Sound_H__
+#ifndef __DC_Sound_H__
+#define __DC_Sound_H__
 
 #include "../Dreemchest.h"
-
-#ifndef FOO_INCLUDED
-    #include <Foo/Foo.h>
-#endif
 
 DC_BEGIN_DREEMCHEST
 

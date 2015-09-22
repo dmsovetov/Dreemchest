@@ -24,21 +24,35 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_H__
-#define __DC_Event_H__
-
-#include "../Dreemchest.h"
+#ifndef __Base_StringHash_H__
+#define __Base_StringHash_H__
 
 DC_BEGIN_DREEMCHEST
 
-namespace event {
+    // ** class StringHash
+    class StringHash {
+    public:
 
-} // namespace event
+        typedef unsigned long type;
+
+        // ** StringHash
+        StringHash( const char *input ) {
+            m_hash = 5381;
+            unsigned char    *str = ( unsigned char* )input;
+            int c;
+
+            while( (c = *str++) ) {
+                m_hash = ((m_hash << 5) + m_hash) + c;
+            }
+        }
+
+        operator type() const { return m_hash; }
+
+    private:
+
+        type     m_hash;
+    };
 
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
-#endif
-
-#endif	/*	!__DC_Event_H__	*/
+#endif  /*      !defined( __Base_StringHash_H__ )   */

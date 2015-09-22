@@ -47,28 +47,16 @@
     #define DC_END_DREEMCHEST
 #endif
 
+#include "Base/Base.h"
+
+/*
 #ifndef DC_BUILD_LIBRARY
-	#include <Foo/Foo.h>
-
-	#ifdef DC_PLATFORM
-		#include "platform/Platform.h"
-	#endif
-
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
-	#endif
-
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
-
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
-	
-	#ifdef DC_SCENE_ENABLED
-		#include "scene/Scene.h"
-	#endif
+	#include "Platform/Platform.h"
+	#include "Threads/Threads.h"
+	#include "Renderer/Renderer.h"
+	#include "Sound/Sound.h"
+	#include "Scene/Scene.h"
 #endif
+*/
 
 #endif  /*  !defined( DREEMCHEST_H )    */
