@@ -90,6 +90,14 @@ namespace Scene {
 		TRenderer*				m_renderer;	//!< Renderer component.
 	};
 
+	// ** RenderingSystem::renderFromCamera
+	template<typename TRenderer>
+	void RenderingSystem<TRenderer>::renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform )
+	{
+		m_renderer = entity.get<TRenderer>();
+		RenderingSystemBase::renderFromCamera( context, entity, camera, transform );
+	}
+
 	//! Generic class for single pass rendering systems.
 	template<typename TRenderer, typename TPass>
 	class SinglePassRenderingSystem : public RenderingSystem<TRenderer> {
