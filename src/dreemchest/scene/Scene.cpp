@@ -28,6 +28,7 @@
 
 #include "Rendering/RenderingSystem.h"
 #include "Rendering/Rvm.h"
+#include "Rendering/RenderTarget.h"
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
@@ -77,21 +78,21 @@ void Scene::render( const RenderingContextPtr& context )
 	u8					  cameraId = 0;
 
 	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-		Camera*		   camera = (*i)->get<Camera>();
-		const ViewPtr& view   = camera->view();
+		Camera*					camera = (*i)->get<Camera>();
+		const RenderTargetPtr&	target = camera->target();
 
-		if( !view.valid() ) {
+		if( !target.valid() ) {
 			continue;
 		}
 
-		view->begin();
+		target->begin( context );
 		{
 			hal->setViewport( camera->viewport() );
 			u32 mask = ( camera->clearMask() & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( camera->clearMask() & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
 			hal->clear( camera->clearColor(), 1.0f, 0, mask );
-			hal->setViewport( view->rect() );
+			hal->setViewport( target->rect() );
 		}
-		view->end();
+		target->end( context );
 	}
 
 	// Update all rendering systems

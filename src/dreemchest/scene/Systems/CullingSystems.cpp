@@ -45,7 +45,7 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 		Camera*	   camera		   = (*i)->get<Camera>();
 		Transform* cameraTransform = (*i)->get<Transform>();
 
-		if( !camera->view().valid() ) {
+		if( !camera->target().valid() ) {
 			continue;
 		}
 

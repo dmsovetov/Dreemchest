@@ -30,6 +30,7 @@
 #include "../Scene.h"
 #include "../Assets/Mesh.h"
 #include "../Assets/Image.h"
+#include "../Rendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -192,54 +193,6 @@ namespace Scene {
 		Rgba						m_color;	//!< Sprite color.
 	};
 
-	//! Scene rendering view.
-	class View : public RefCounted {
-	public:
-
-		virtual						~View( void ) {}
-
-		//! Returns the viewport split by it's coordinates.
-		static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
-
-		//! Returns the view rect.
-		Rect						rect( void ) const { return Rect( 0.0f, 0.0f, ( f32 )width(), ( f32 )height() ); }
-
-		//! Returns the view width.
-		virtual u32					width( void ) const { return 0; }
-
-		//! Returns the view height.
-		virtual u32					height( void ) const { return 0; }
-
-		//! Begins rendering to this view.
-		virtual void				begin( void ) const {}
-
-		//! Ends rendering to this view.
-		virtual void				end( void ) const {}
-	};
-
-	//! WindowView is used for rendering the scene to window.
-	class WindowView : public View {
-	public:
-
-		//! Returns the window width.
-		virtual u32					width( void ) const;
-
-		//! Returns the window height.
-		virtual u32					height( void ) const;
-
-		//! Creates the WindowView instance.
-		static ViewPtr				create( const Platform::WindowWPtr& window );
-
-	private:
-
-									//! Constructs the WindowView instance.
-									WindowView( const Platform::WindowWPtr& window );
-
-	private:
-
-		Platform::WindowWPtr		m_window;	//!< The output window.
-	};
-
 	//! Camera component.
 	class Camera : public Ecs::Component<Camera> {
 	public:
@@ -259,8 +212,8 @@ namespace Scene {
 		};
 
 									//! Constructs Camera instance.
-									Camera( Projection projection = Perspective, const ViewPtr& view = ViewPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
-										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_view( view ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
+									Camera( Projection projection = Perspective, const RenderTargetPtr& target = RenderTargetPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
+										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_target( target ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
 
 		//! Returns camera clear mask.
 		u8							clearMask( void ) const;
@@ -308,10 +261,10 @@ namespace Scene {
 		Rect						viewport( void ) const;
 
 		//! Sets the camera render view.
-		void						setView( const ViewPtr& value );
+		void						setTarget( const RenderTargetPtr& value );
 
 		//! Returns the camera render view.
-		const ViewPtr&				view( void ) const;
+		const RenderTargetPtr&		target( void ) const;
 
 		//! Calculates the projection matrix.
 		Matrix4						calculateProjectionMatrix( void ) const;
@@ -325,7 +278,7 @@ namespace Scene {
 		u8							m_id;			//!< Unique camera id.
 		Projection					m_projection;	//!< Camera projection.
 		Rect						m_ndc;			//!< Output normalized device coordinates.
-		ViewPtr						m_view;			//!< Render view.
+		RenderTargetPtr				m_target;		//!< Rendering target.
 		Rgba						m_clearColor;	//!< The clear color.
 		f32							m_fov;			//!< Camera field of view.
 		f32							m_near;			//!< Z-near value.

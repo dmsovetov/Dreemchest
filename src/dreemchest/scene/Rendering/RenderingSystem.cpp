@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderingSystem.h"
+#include "RenderTarget.h"
 #include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
@@ -53,13 +54,13 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Ecs::En
 	// Get HAL from a renderer
 	Renderer::HalPtr hal = context->hal();
 
-	// Get the view
-	const ViewPtr& view = camera.view();
+	// Get the render target
+	const RenderTargetPtr& target = camera.target();
 
 	// Calculate the view-projection matrix
 	Matrix4 viewProjection = camera.calculateViewProjection( transform.matrix() );
 
-	view->begin();
+	target->begin( context );
 	{
 		hal->setViewport( camera.viewport() );
 
@@ -71,9 +72,9 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Ecs::En
 			pass->end( context );
 		}
 
-		hal->setViewport( view->rect() );
+		hal->setViewport( target->rect() );
 	}
-	view->end();
+	target->end( context );
 }
 
 } // namespace Scene

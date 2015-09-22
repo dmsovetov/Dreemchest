@@ -64,7 +64,7 @@ namespace Scene {
 	DECLARE_LOG( log )
 
 	class Scene;
-	class View;
+	class RenderTarget;
 	class AssetBundle;
 	class Asset;
 		class Image;
@@ -103,7 +103,9 @@ namespace Scene {
 
 	dcDeclarePtrs( Direction )
 	dcDeclarePtrs( Scene )
-	dcDeclarePtrs( View )
+	dcDeclarePtrs( RenderTarget )
+	dcDeclarePtrs( TextureTarget )
+	dcDeclarePtrs( WindowTarget )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( StaticMesh )
@@ -298,6 +300,7 @@ DC_END_DREEMCHEST
 	#include "Systems/Input2DSystems.h"
 	#include "Systems/AssetSystem.h"
 	#include "Systems/CullingSystems.h"
+	#include "Rendering/RenderTarget.h"
 	#include "Rendering/RenderingContext.h"
 	#include "Rendering/RenderingSystem.h"
 	#include "Rendering/ShaderCache.h"

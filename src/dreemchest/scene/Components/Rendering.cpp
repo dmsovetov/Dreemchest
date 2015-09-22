@@ -173,46 +173,6 @@ const Rgba& Sprite::color( void ) const
 	return m_color;
 }
 
-// --------------------------------------------- View --------------------------------------------- //
-
-// ** View::calculateSplitRect
-Rect View::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
-{
-	// Calculate the viewport dimensions in NDC
-	f32 width  = 1.0f / nx;
-	f32 height = 1.0f / ny;
-
-	// Calculate the NDC of a viewport
-	Rect ndc = Rect( x * width, y * height, (x + 1) * width, (y + 1) * height );
-
-	return ndc;
-}
-
-// ------------------------------------------ WindowView ------------------------------------------ //
-
-// ** WindowView::WindowView
-WindowView::WindowView( const Platform::WindowWPtr& window ) : m_window( window )
-{
-}
-
-// ** WindowView::width
-u32 WindowView::width( void ) const
-{
-	return m_window->width();
-}
-
-// ** WindowView::height
-u32 WindowView::height( void ) const
-{
-	return m_window->height();
-}
-
-// ** WindowView::create
-ViewPtr WindowView::create( const Platform::WindowWPtr& window )
-{
-	return ViewPtr( DC_NEW WindowView( window ) );
-}
-
 // -------------------------------------------- Camera -------------------------------------------- //
 
 // ** Camera::clearMask
@@ -284,30 +244,30 @@ void Camera::setNdc( const Rect& value )
 // ** Camera::viewport
 Rect Camera::viewport( void ) const
 {
-	DC_BREAK_IF( m_view == NULL )
+	DC_BREAK_IF( m_target == NULL )
 
-	u32 w = m_view->width();
-	u32 h = m_view->height();
+	u32 w = m_target->width();
+	u32 h = m_target->height();
 
 	return Rect( w * m_ndc.min().x, h * m_ndc.min().y, w * m_ndc.max().x, h * m_ndc.max().y );
 }
 
 // ** Camera::setView
-void Camera::setView( const ViewPtr& value )
+void Camera::setTarget( const RenderTargetPtr& value )
 {
-	m_view = value;
+	m_target = value;
 }
 
 // ** Camera::view
-const ViewPtr& Camera::view( void ) const
+const RenderTargetPtr& Camera::target( void ) const
 {
-	return m_view;
+	return m_target;
 }
 
 // ** Camera::calculateProjectionMatrix
 Matrix4 Camera::calculateProjectionMatrix( void ) const
 {
-	DC_BREAK_IF( m_view == NULL )
+	DC_BREAK_IF( m_target == NULL )
 
 	Rect rect   = viewport();
 	f32  width  = rect.width();
