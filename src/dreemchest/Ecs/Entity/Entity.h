@@ -147,7 +147,7 @@ namespace Ecs {
 	{
 		DC_BREAK_IF( m_isRemoved );
 
-		Components::iterator i m_components.find( TypeIndex<TComponent>::idx() );
+		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
 		DC_BREAK_IF( i == m_components.end() )
 		m_mask.clear( i->second->typeIndex() );
 		m_ecs->notifyEntityChanged( m_id );
