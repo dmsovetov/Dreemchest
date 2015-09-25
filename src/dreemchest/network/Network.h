@@ -259,6 +259,12 @@ namespace net {
 		u16			code;		//!< Recorded error code.
 		String		message;	//!< Error message.
 
+		//! Compares the error with a specified code.
+		bool		operator == ( u16 error ) const { return code == error; }
+
+					//! Converts the error object to boolean value.
+					operator bool( void ) const { return code != 0; }
+
 		IoBeginSerializer
 			IoField( code )
 			IoField( message )
