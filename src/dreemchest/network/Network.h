@@ -225,6 +225,15 @@ namespace net {
         Network*                        m_parent;
     };
 
+	//! Base class for all remote call types.
+	template<typename TRemoteCall, typename TArgument, typename TResponse = Void>
+	struct RemoteCall {
+		typedef TArgument Argument;
+		typedef TResponse Response;
+		static StringHash id( void ) { return StringHash( name() ); }
+		static CString    name( void ) { return TypeInfo<TRemoteCall>::name(); }
+	};
+
 	//! Base class for all remote call argument types.
 	template<typename T>
 	struct RemoteCallArgument : public io::SerializableT<T> {
