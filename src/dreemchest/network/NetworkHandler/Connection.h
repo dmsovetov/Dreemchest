@@ -73,6 +73,7 @@ namespace net {
 		template<typename T, TemplateFunctionTypes2> void send( TemplateFunctionArgs2 );
 		template<typename T, TemplateFunctionTypes3> void send( TemplateFunctionArgs3 );
 		template<typename T, TemplateFunctionTypes4> void send( TemplateFunctionArgs4 );
+		template<typename T, TemplateFunctionTypes5> void send( TemplateFunctionArgs5 );
 
 	private:
 
@@ -185,6 +186,14 @@ namespace net {
 	inline void Connection::send( TemplateFunctionArgs4 )
 	{
 		T packet( arg0, arg1, arg2, arg3 );
+		send( &packet );
+	}
+
+	// ** Connection::send
+	template<typename T, TemplateFunctionTypes5>
+	inline void Connection::send( TemplateFunctionArgs5 )
+	{
+		T packet( arg0, arg1, arg2, arg3, arg4 );
 		send( &packet );
 	}
 
