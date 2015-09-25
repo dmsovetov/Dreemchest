@@ -56,19 +56,6 @@ namespace net {
 
 		//! Send a response to caller.
         bool operator()( const T& value, const Error& error = Error() );
-        /*
-		{
-			// ** Serialize argument to a byte buffer.
-			io::ByteBufferPtr buffer = value.writeToByteBuffer();
-
-			// ** Send an RPC response packet.
-			m_connection->send<packets::RemoteCallResponse>( m_id, TypeInfo<T>::id(), buffer->array() );
-
-			// ** Mark this response as sent.
-			m_wasSent = true;
-
-			return true;
-		}*/
 
 	private:
 
