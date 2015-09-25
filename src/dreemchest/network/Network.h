@@ -240,6 +240,11 @@ namespace net {
 	struct ReplicatedEvent : public io::SerializableT<T> {
 	};
 
+	//! Base class for all network packets.
+	template<typename T>
+	struct Packet : public io::SerializableT<T> {
+	};
+
 	//! Remote call error response.
 	struct Error : public io::SerializableT<Error> {
 		//! Error codes
