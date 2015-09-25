@@ -44,6 +44,7 @@ namespace Ecs {
 	typedef u32 EntityId;
 
 	dcDeclarePtrs( Ecs )
+	dcDeclarePtrs( EntityIdGenerator )
 	dcDeclarePtrs( Entity )
 	dcDeclarePtrs( ComponentBase )
 	dcDeclarePtrs( Index )
@@ -53,11 +54,24 @@ namespace Ecs {
 	//! Container type to store the set of entities.
 	typedef Set<EntityPtr> EntitySet;
 
-	//! Container type to store the set of components.
-	//typedef Set<ComponentBasePtr> ComponentSet;
-
 	//! Event emitter type alias.
 	typedef event::EventEmitter EventEmitter;
+
+	//! Entity id generator.
+	class EntityIdGenerator : public RefCounted {
+	public:
+
+							//! Constructs EntityIdGenerator instance.
+							EntityIdGenerator( void );
+		virtual				~EntityIdGenerator( void ) {}
+
+		//! Generates the next entity id.
+		virtual EntityId	generate( void );
+
+	private:
+
+		EntityId			m_nextId;
+	};
 
 	//! Ecs is a root class of an entity component system.
 	class Ecs : public RefCounted {
@@ -70,6 +84,9 @@ namespace Ecs {
 		\return Returns a strong pointer to created entity
 		*/
 		EntityPtr		createEntity( const EntityId& id );
+
+		//! Creates a new entity with a generated id.
+		EntityPtr		createEntity( void );
 
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
@@ -94,12 +111,12 @@ namespace Ecs {
 		}
 
 		//! Creates a new Ecs instance.
-		static EcsPtr	create( void );
+		static EcsPtr	create( const EntityIdGeneratorPtr& entityIdGenerator = DC_NEW EntityIdGenerator );
 
 	private:
 
 						//! Constructs Ecs instance.
-						Ecs( void );
+						Ecs( const EntityIdGeneratorPtr& entityIdGenerator );
 
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );

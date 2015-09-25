@@ -38,14 +38,15 @@ namespace Ecs {
 IMPLEMENT_LOGGER( log )
 
 // ** Ecs::Ecs
-Ecs::Ecs( void )
+Ecs::Ecs( const EntityIdGeneratorPtr& entityIdGenerator ) : m_entityId( entityIdGenerator )
 {
 }
 
 // ** Ecs::create
-EcsPtr Ecs::create( void )
+EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 {
-	return DC_NEW Ecs;
+	DC_BREAK_IF( entityIdGenerator == EntityIdGeneratorPtr() );
+	return DC_NEW Ecs( entityIdGenerator );
 }
 
 // ** Ecs::createEntity
@@ -55,6 +56,13 @@ EntityPtr Ecs::createEntity( const EntityId& id )
 	Entity* entity = DC_NEW Entity( this, id );
 	m_entities[id] = entity;
 	return EntityPtr( entity );
+}
+
+// ** Ecs::createEntity
+EntityPtr Ecs::createEntity( void )
+{
+	EntityId id = m_entityId->generate();
+	return createEntity( id );
 }
 
 // ** Ecs::removeEntity
@@ -146,6 +154,17 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 			group->update( currentTime, dt );
 		}
 	}
+}
+
+// ** EntityIdGenerator::EntityIdGenerator
+EntityIdGenerator::EntityIdGenerator( void ) : m_nextId( 1 )
+{
+}
+
+// ** EntityIdGenerator::generate
+EntityId EntityIdGenerator::generate( void )
+{
+	return m_nextId++;
 }
 
 } // namespace Ecs
