@@ -142,6 +142,7 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Even
 {
 	// ** Find an event handler from this event id.
 	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
+	DC_BREAK_IF( i == m_eventHandlers.end() )
 
 	if( i == m_eventHandlers.end() ) {
 		log::warn( "NetworkHandler::handleEventPacket : unknown event %d received\n", packet.eventId );
