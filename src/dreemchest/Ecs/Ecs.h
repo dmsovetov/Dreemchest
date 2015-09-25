@@ -149,6 +149,7 @@ DC_END_DREEMCHEST
 	#include "Entity/Entity.h"
 	#include "Entity/Aspect.h"
 	#include "Entity/Index.h"
+	#include "System/SystemGroup.h"
 	#include "System/GenericEntitySystem.h"
 	#include "System/ImmutableEntitySystem.h"
 #endif
