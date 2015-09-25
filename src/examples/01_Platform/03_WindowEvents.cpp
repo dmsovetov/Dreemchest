@@ -31,7 +31,7 @@
 DC_USE_DREEMCHEST
 
 // Open a platform namespace to use shorter types.
-using namespace Platform;
+using namespace platform;
 
 // This class is a key for handling events raised by Window.
 // Yes, this is a window delegate class, and it works in the
@@ -40,27 +40,27 @@ class WindowHandler : public WindowDelegate {
 
     // This method is called when mouse/touch is pressed.
     virtual void handleMouseDown( Window* window, u32 x, u32 y, int touchId ) {
-        Platform::log::msg( "handleMouseDown : %d %d\n", x, y );
+        platform::log::msg( "handleMouseDown : %d %d\n", x, y );
     }
 
     // This method is called when mouse/touch is released.
     virtual void handleMouseUp( Window* window, u32 x, u32 y, int touchId ) {
-        Platform::log::msg( "handleMouseUp : %d %d\n", x, y );
+        platform::log::msg( "handleMouseUp : %d %d\n", x, y );
     }
 
     // This method is called when mouse/touch is moved.
     virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId ) {
-        Platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
+        platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
     }
 
     // This method is called when key is pressed.
     virtual void handleKeyDown( Window* window, Key key ) {
-        Platform::log::msg( "handleKeyDown : %d\n", (int)key );
+        platform::log::msg( "handleKeyDown : %d\n", (int)key );
     }
 
     // This method is called when key is released.
     virtual void handleKeyUp( Window* window, Key key ) {
-        Platform::log::msg( "handleKeyUp : %d\n", (int)key );
+        platform::log::msg( "handleKeyUp : %d\n", (int)key );
     }
 
     // This method is called each frame
@@ -75,7 +75,7 @@ class WindowEvents : public ApplicationDelegate {
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
         
-        Platform::log::setStandardHandler();
+        platform::log::setStandardHandler();
         
         // Create a 800x600 window like we did in previous example.
         Window* window = Window::create( 800, 600 );
