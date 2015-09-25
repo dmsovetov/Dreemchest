@@ -64,6 +64,10 @@ namespace net {
 		template<typename T, typename R>
 		void					invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
 
+		//! Emits the event to this connection.
+		template<typename TEvent>
+		void					emit( const TEvent& e );
+
 		//! Sends a packet over this connection.
 		void					send( NetworkPacket* packet );
 
@@ -147,6 +151,16 @@ namespace net {
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
+
+	// ** Connection::emit
+	template<typename TEvent>
+	inline void Connection::emit( const TEvent& e )
+	{
+		// ** Serialize event to a byte buffer.
+		io::ByteBufferPtr buffer = io::BinarySerializer::write( e );
+
+		// ** Send the packet
+		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
 
 	// ** Connection::send
