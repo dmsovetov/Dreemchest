@@ -31,13 +31,13 @@
 
 #define HAVE_JSON
 
-#include <platform/Platform.h>
-#include <platform/Input.h>
-#include <platform/Window.h>
+#include <Platform/Platform.h>
+#include <Platform/Input.h>
+#include <Platform/Window.h>
 
-#include <renderer/Renderer.h>
-#include <renderer/Hal.h>
-#include <renderer/Renderer2D.h>
+#include <Renderer/Renderer.h>
+#include <Renderer/Hal.h>
+#include <Renderer/Renderer2D.h>
 
 #include <Ecs/Entity/Entity.h>
 #include <Ecs/Component/Component.h>
