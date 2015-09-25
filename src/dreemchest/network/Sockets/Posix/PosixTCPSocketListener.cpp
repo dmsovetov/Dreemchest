@@ -102,7 +102,9 @@ void PosixTCPSocketListener::update( void )
 
 	// ** Do a select
 	if( select( nfds, &read, &write, &except, &waitTime ) <= 0 ) {
-		log::error( "PosixTCPSocketListener::update : select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
+		if( PosixNetwork::lastError() ) {
+			log::error( "PosixTCPSocketListener::update : select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
+		}
 		return;
 	}
 
@@ -200,7 +202,7 @@ bool PosixTCPSocketListener::bindTo( u16 port )
     m_socket = socket( PF_INET, SOCK_STREAM, 0 );
 
 	if( !m_socket.isValid() ) {
-		log::error( "PosixTCPSocketListener::bindTo : failed to create socket, %d\n", PosixNetwork::lastError() );
+		log::error( "PosixTCPSocketListener::bindTo : failed to create socket, %d\n%s\n", PosixNetwork::lastError(), PosixNetwork::lastErrorMessage().c_str() );
 		return false;
 	}
 
