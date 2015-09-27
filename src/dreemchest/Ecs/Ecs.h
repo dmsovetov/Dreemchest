@@ -132,12 +132,13 @@ namespace Ecs {
 		//! Container type to store entity indices.
 		typedef Map<Aspect, IndexPtr>		Indices;
 
-		Entities		m_entities;	//!< Active entities reside here.
-		SystemGroups	m_systems;	//!< All systems reside in system groups.
-		Indices			m_indices;	//!< All entity indices are cached here.
+		EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
+		Entities				m_entities;	//!< Active entities reside here.
+		SystemGroups			m_systems;	//!< All systems reside in system groups.
+		Indices					m_indices;	//!< All entity indices are cached here.
 
-		EntitySet		m_changed;	//!< Entities that was changed.
-		EntitySet		m_removed;	//!< Entities that will be removed.
+		EntitySet				m_changed;	//!< Entities that was changed.
+		EntitySet				m_removed;	//!< Entities that will be removed.
 	};
 
 } // namespace Ecs

@@ -49,7 +49,6 @@
 
 #include "Base/Base.h"
 
-/*
 #ifndef DC_BUILD_LIBRARY
 	#include "Platform/Platform.h"
 	#include "Threads/Threads.h"
@@ -57,6 +56,5 @@
 	#include "Sound/Sound.h"
 	#include "Scene/Scene.h"
 #endif
-*/
 
 #endif  /*  !defined( DREEMCHEST_H )    */
