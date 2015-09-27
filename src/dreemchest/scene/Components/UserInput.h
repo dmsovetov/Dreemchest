@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Component_Input_H__
-#define __DC_Scene_Component_Input_H__
+#ifndef __DC_Scene_Component_UserInput_H__
+#define __DC_Scene_Component_UserInput_H__
 
 #include "../Scene.h"
 
@@ -121,4 +121,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Component_Input_H__    */
+#endif    /*    !__DC_Scene_Component_UserInput_H__    */

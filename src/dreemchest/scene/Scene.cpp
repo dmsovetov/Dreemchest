@@ -35,7 +35,7 @@
 #include "Components/Rendering.h"
 #include "Components/Transform.h"
 
-#include "Components/Input.h"
+#include "Components/UserInput.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "Input.h"
+#include "UserInput.h"
 
 DC_BEGIN_DREEMCHEST
 

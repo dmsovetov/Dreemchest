@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "Input2DSystems.h"
+#include "UserInputSystems.h"
 
 DC_BEGIN_DREEMCHEST
 

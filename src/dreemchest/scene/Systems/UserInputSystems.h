@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Systems_Input2DSystems_H__
-#define __DC_Scene_Systems_Input2DSystems_H__
+#ifndef __DC_Scene_Systems_UserInputSystems_H__
+#define __DC_Scene_Systems_UserInputSystems_H__
 
 #include "../Scene.h"
 #include "../Components/Transform.h"
-#include "../Components/Input.h"
+#include "../Components/UserInput.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -50,4 +50,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Systems_Input2DSystems_H__    */
+#endif    /*    !__DC_Scene_Systems_UserInputSystems_H__    */
