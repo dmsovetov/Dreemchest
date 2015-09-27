@@ -36,17 +36,17 @@ ShaderCache::ShaderCache( const String& folder, const Renderer::HalPtr& hal ) : 
 	String vertex, fragment;
 
 	if( loadFromFile( folder + "Unlit.shader", vertex, fragment ) ) {
-		m_material[Material::Unlit] = DC_NEW UberShader( vertex, fragment );
+		m_material[Material::Unlit] = DC_NEW Shader( vertex, fragment );
 		m_material[Material::Unlit]->addFeature( Material::FeatureDiffuse, "USE_DIFFUSE_MAP" );
 	}
 
 	if( loadFromFile( folder + "Ambient.shader", vertex, fragment ) ) {
-		m_material[Material::Ambient] = DC_NEW UberShader( vertex, fragment );
+		m_material[Material::Ambient] = DC_NEW Shader( vertex, fragment );
 		m_material[Material::Ambient]->addFeature( Material::FeatureDiffuse, "USE_DIFFUSE_MAP" );		
 	}
 
 	if( loadFromFile( folder + "Phong.shader", vertex, fragment ) ) {
-		m_material[Material::Phong] = DC_NEW UberShader( vertex, fragment );
+		m_material[Material::Phong] = DC_NEW Shader( vertex, fragment );
 		m_material[Material::Phong]->addFeature( Material::FeatureDiffuse, "USE_DIFFUSE_MAP" );
 	}
 }
@@ -161,21 +161,21 @@ ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 	}
 };
 
-// ------------------------------------------ UberShader ------------------------------------------ //
+// ------------------------------------------ Shader ------------------------------------------ //
 
-// ** UberShader::UberShader
-UberShader::UberShader( const String& vertex, const String& fragment ) : m_vertex( vertex ), m_fragment( fragment )
+// ** Shader::Shader
+Shader::Shader( const String& vertex, const String& fragment ) : m_vertex( vertex ), m_fragment( fragment )
 {
 }
 
-// ** UberShader::isLoaded
-bool UberShader::isLoaded( u32 features ) const
+// ** Shader::isLoaded
+bool Shader::isLoaded( u32 features ) const
 {
 	return features < static_cast<u32>( m_shaders.size() ) && m_shaders[features].valid();
 }
 
-// ** UberShader::addFeature
-void UberShader::addFeature( u32 mask, const String& name )
+// ** Shader::addFeature
+void Shader::addFeature( u32 mask, const String& name )
 {
 	Feature feature;
 	feature.mask = mask;
@@ -183,8 +183,8 @@ void UberShader::addFeature( u32 mask, const String& name )
 	m_features.push_back( feature );
 }
 
-// ** UberShader::permutation
-const Renderer::ShaderPtr& UberShader::permutation( Renderer::HalPtr hal, u32 features )
+// ** Shader::permutation
+const Renderer::ShaderPtr& Shader::permutation( Renderer::HalPtr hal, u32 features )
 {
 	// First try cached shader
 	if( isLoaded( features ) ) {

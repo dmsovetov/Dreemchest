@@ -126,7 +126,7 @@ namespace Scene {
 	dcDeclarePtrs( Rvm )
 	dcDeclarePtrs( RenderPassBase )
 	dcDeclarePtrs( RenderingSystemBase )
-	dcDeclarePtrs( UberShader )
+	dcDeclarePtrs( Shader )
 	dcDeclarePtrs( RopEmitterBase )
 
 	//! Scene systems mask.

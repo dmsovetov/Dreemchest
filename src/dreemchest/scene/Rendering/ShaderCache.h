@@ -71,15 +71,15 @@ namespace Scene {
 
 		Renderer::HalPtr			m_hal;								//!< The rendering HAL.
 		Renderer::ShaderPtr			m_shaders[TotalShaders];			//!< Cached shaders.
-		UberShaderPtr				m_material[Material::TotalModels];	//!< Unlit uber shader.
+		ShaderPtr					m_material[Material::TotalModels];	//!< Unlit uber shader.
 	};
 
-	//! Uber shader is 
-	class UberShader : public RefCounted {
+	//! Scene shader with a support of permutations.
+	class Shader : public RefCounted {
 	public:
 
-									//! Constructs the UberShader instance.
-									UberShader( const String& vertex, const String& fragment );
+									//! Constructs the Shader instance.
+									Shader( const String& vertex, const String& fragment );
 
 		//! Returns the shader permutation.
 		const Renderer::ShaderPtr&	permutation( Renderer::HalPtr hal, u32 features );
@@ -87,12 +87,12 @@ namespace Scene {
 		//! Returns true if the shader permutation is loaded.
 		bool						isLoaded( u32 features ) const;
 
-		//! Adds a feature to uber shader.
+		//! Adds a feature to shader.
 		void						addFeature( u32 mask, const String& name );
 
 	private:
 
-		//! A single uber shader feature.
+		//! A single shader feature.
 		struct Feature {
 			u32						mask;		//!< Feature mask.
 			String					name;		//!< Feature name.
