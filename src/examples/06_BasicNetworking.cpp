@@ -24,32 +24,37 @@
 
  **************************************************************************/
 
-// Include a Platform module header.
-#include <platform/Platform.h>
+// Include the engine header file.
+#include <Dreemchest.h>
 
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
+// Open a platform namespace.
+using namespace Platform;
+
+// Open a net namespace.
+using namespace net;
+
 // Application delegate is used to handle an events raised by application instance.
-class CreatingWindows : public platform::ApplicationDelegate {
+class Server : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( platform::Application* application ) {
-		platform::log::setStandardHandler();
+    virtual void handleLaunched( Application* application ) {
+        // Setup default loggers
+        Platform::log::setStandardHandler();
+        net::log::setStandardHandler();
 
-        // This line of code creates a window with 800x600 dimensions.
-        //
-        // Note: on mobile devices you won't see anything.
-        platform::Window* window = platform::Window::create( 800, 600 );
+		// Create a network interface and show host info
+		Network network;
+		net::log::msg( "IP: %s\n", network.hostIP().toString() );
+		net::log::msg( "Hostname: %s\n", network.hostName() );
+		net::log::msg( "Broadcast IP: %s\n", network.broadcastIP().toString() );
 
-        // Now we can work with a Window instance. In this example we will
-        // just set a caption for window.
-        window->setCaption( "This is how windows are created in Dreemchest." );
-
-        // You can also create another one window :)
-        platform::Window::create( 320, 240 )->setCaption( "Little window" );
+		// Now quit
+		application->quit();
     }
 };
 
-// Now declare an application entry point with CreatingWindows application delegate.
-dcDeclareApplication( new CreatingWindows )
+// Now declare an application entry point with Files application delegate.
+dcDeclareApplication( new Server )

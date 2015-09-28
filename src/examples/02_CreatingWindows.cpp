@@ -24,40 +24,32 @@
 
  **************************************************************************/
 
-// Include a Platform module header.
-#include <platform/Platform.h>
-
-// Include a Network module header.
-#include <network/Network.h>
+// Include the engine header file.
+#include <Dreemchest.h>
 
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace.
-using namespace platform;
-
-// Open a net namespace.
-using namespace net;
-
 // Application delegate is used to handle an events raised by application instance.
-class Server : public ApplicationDelegate {
+class CreatingWindows : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
-        // Setup default loggers
-        platform::log::setStandardHandler();
-        net::log::setStandardHandler();
+    virtual void handleLaunched( Platform::Application* application ) {
+		Platform::log::setStandardHandler();
 
-		// Create a network interface and show host info
-		Network network;
-		net::log::msg( "IP: %s\n", network.hostIP().toString() );
-		net::log::msg( "Hostname: %s\n", network.hostName() );
-		net::log::msg( "Broadcast IP: %s\n", network.broadcastIP().toString() );
+        // This line of code creates a window with 800x600 dimensions.
+        //
+        // Note: on mobile devices you won't see anything.
+        Platform::Window* window = Platform::Window::create( 800, 600 );
 
-		// Now quit
-		application->quit();
+        // Now we can work with a Window instance. In this example we will
+        // just set a caption for window.
+        window->setCaption( "This is how windows are created in Dreemchest." );
+
+        // You can also create another one window :)
+        Platform::Window::create( 320, 240 )->setCaption( "Little window" );
     }
 };
 
-// Now declare an application entry point with Files application delegate.
-dcDeclareApplication( new Server )
+// Now declare an application entry point with CreatingWindows application delegate.
+dcDeclareApplication( new CreatingWindows )

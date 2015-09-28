@@ -24,12 +24,8 @@
 
  **************************************************************************/
 
-// First thing we do is including a Platform module header.
-//
-// This module contains all platform-specific stuff like windows, timers,
-// application entry points, etc.
-#include <platform/Platform.h>
-
+// Include the engine header file.
+#include <Dreemchest.h>
 
 // This macro hides a 'using namespace [identifier]' expression and just
 // opens a root engine namespace.
@@ -44,17 +40,17 @@ DC_USE_DREEMCHEST
 // should be inherited from platform::ApplicationDelegate class.
 //
 // Application delegate is used to handle an events raised by application instance.
-class HelloWorld : public platform::ApplicationDelegate {
+class HelloWorld : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( platform::Application* application ) {
+    virtual void handleLaunched( Platform::Application* application ) {
         
         // The log callback can be overridden by custom function (for example to write logs to file),
         // but now we just set a standard log handler, to print all messages to console.
-        platform::log::setStandardHandler();
+        Platform::log::setStandardHandler();
 
         // Just write a message to a console.
-        platform::log::verbose( "HelloWorld application launched!\n" );
+        Platform::log::verbose( "HelloWorld application launched!\n" );
 
         // Now the hello world application is ready to quit - just do it! :)
         application->quit();

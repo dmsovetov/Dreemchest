@@ -24,19 +24,14 @@
 
  **************************************************************************/
 
-// Include a Platform module header.
-#include <platform/Platform.h>
-
-// Include a IO module header.
-//
-// This module contains all file system staff.
-#include <io/Io.h>
+// Include the engine header file.
+#include <Dreemchest.h>
 
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
 // Open a platform namespace to use shorter types.
-using namespace platform;
+using namespace Platform;
 
 // Open a io namespace.
 using namespace io;
@@ -45,7 +40,7 @@ struct A {
 	float b;
 };
 
-struct Nested : public SerializableType<Nested> {
+struct Nested : public SerializableT<Nested> {
 	String			m_a;
 	int				m_b;
 
@@ -55,7 +50,7 @@ struct Nested : public SerializableType<Nested> {
 	IoEndSerializer
 };
 
-struct Data : public SerializableType<Data> {
+struct Data : public SerializableT<Data> {
 	bool			m_boolean;
 	int				m_integer;
 	float			m_float;
@@ -81,7 +76,7 @@ class Files : public ApplicationDelegate {
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
         // Setup defaul loggers
-        platform::log::setStandardHandler();
+        Platform::log::setStandardHandler();
         io::log::setStandardHandler();
 
 		Data d1, d2, d3;
@@ -98,6 +93,8 @@ class Files : public ApplicationDelegate {
 
 		ByteBufferPtr stream = ByteBuffer::create();
 		BinaryStorage binary( stream );
+
+	#ifdef HAVE_JSON
 		JsonStorage   json;
 
 		d1.write( &binary );
@@ -107,16 +104,7 @@ class Files : public ApplicationDelegate {
 		d1.write( &json );
 		printf( "%s\n", json.toString().c_str() );
 		d3.read( &json );
-/*
-		Nested n1, n2;
-		n1.m_a = "wow";
-		n1.m_b = 23;
-
-		JsonStorage json;
-		n1.write( &json );
-
-		printf( "%s\n", json.toString().c_str() );
-	*/
+	#endif
     }
 };
 

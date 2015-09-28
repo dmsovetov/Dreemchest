@@ -24,13 +24,8 @@
 
  **************************************************************************/
 
-// Include a Platform module header.
-#include <platform/Platform.h>
-
-// Include a Network module header.
-#include <network/Network.h>
-
-#include <threads/Threads.h>
+// Include the engine header file.
+#include <Dreemchest.h>
 
 #define LOCAL_MODE	(1)
 
@@ -38,7 +33,7 @@
 DC_USE_DREEMCHEST
 
 // Open a platform namespace.
-using namespace platform;
+using namespace Platform;
 
 // Open a net namespace.
 using namespace net;
@@ -72,7 +67,7 @@ class NetworkHandlers : public ApplicationDelegate {
     virtual void handleLaunched( Application* application )
 	{
         // Setup default loggers
-        platform::log::setStandardHandler();
+        Platform::log::setStandardHandler();
         net::log::setStandardHandler();
 
 		//! Create a network interface
