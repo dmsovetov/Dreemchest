@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_H__
-#define __DC_Network_H__
+#ifndef		__DC_Network_H__
+#define		__DC_Network_H__
 
-#include "../Dreemchest.h"
+#include	"../Dreemchest.h"
 
 #include "../io/Io.h"
 #include "../io/streams/ByteBuffer.h"
@@ -260,10 +260,11 @@ namespace net {
 		enum {
 			NoError			 = 0		//!< No error recorded.
 		,	NotImplemented   = 10001
-		,	InvalidProcedure = 20001
-		,	InvalidCall		 = 30001
-		,	InvalidEnum		 = 40001
-		,	InvalidValue	 = 50001
+		,	InvalidProcedure = 10002
+		,	InvalidCall		 = 10003
+		,	InvalidEnum		 = 10004
+		,	InvalidValue	 = 10005
+		,	UserDefinedCodes = 20000
 		};
 
 					//! Constructs an Error instance.
