@@ -57,12 +57,12 @@ namespace net {
 		const NetworkAddress&	address( void ) const;
 
 		//! Invokes a remote procedure.
-		template<typename T>
-		void					invoke( CString method, const T& argument );
+		template<typename TRemoteProcedure>
+		void					invokeVoid( const typename TRemoteProcedure::Argument& argument );
 
 		//! Invokes a remote procedure.
-		template<typename T, typename R>
-		void					invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback );
+		template<typename TRemoteProcedure>
+		void					invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback );
 
 		//! Emits the event to this connection.
 		template<typename TEvent>
@@ -125,32 +125,33 @@ namespace net {
 		u32						m_totalBytesSent;
 	};
 
-	// ** Connection::invoke
-	template<typename T>
-	inline void Connection::invoke( CString method, const T& argument )
+	// ** Connection::invokeVoid
+	template<typename TRemoteProcedure>
+	inline void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
-		send<packets::RemoteCall>( 0, StringHash( method ), 0, buffer->array() );
+		send<packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
 	}
 
 	// ** Connection::invoke
-	template<typename T, typename R>
-	inline void Connection::invoke( CString method, const T& argument, const typename RemoteResponseHandler<R>::Callback& callback )
+	template<typename TRemoteProcedure>
+	inline void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;
-        TypeId  returnTypeId = TypeInfo<R>::id();
+        TypeId  returnTypeId = TypeInfo<typename TRemoteProcedure::Response>::id();
         
-		send<packets::RemoteCall>( remoteCallId, StringHash( method ), returnTypeId, buffer->array() );
+		send<packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
 		
 		// ** Create a response handler.
-		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( method, DC_NEW RemoteResponseHandler<R>( callback ) );
+		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( TRemoteProcedure::name(), DC_NEW RemoteResponseHandler<typename TRemoteProcedure::Response>( callback ) );
+	}
 
 	// ** Connection::emit
 	template<typename TEvent>

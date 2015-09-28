@@ -64,12 +64,12 @@ namespace net {
 		void					registerEvent( void );
 
 		//! Registers a remote procedure.
-		template<typename T>
-		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, Void>::Callback& callback );
+		template<typename TRemoteProcedure>
+		void					registerRemoteProcedureVoid( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, Void>::Callback& callback );
 
 		//! Registers a remote procedure.
-		template<typename T, typename R>
-		void					registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback );
+		template<typename TRemoteProcedure>
+		void					registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback );
 
 		//! Emits a network event.
 		template<typename T>
@@ -166,18 +166,18 @@ namespace net {
 		m_eventHandlers[TypeInfo<T>::id()] = DC_NEW EventHandler<T>( &m_eventEmitter );
 	}
 
-	// ** NetworkHandler::registerRemoteProcedure
-	template<typename T>
-	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, Void>::Callback& callback )
+	// ** NetworkHandler::registerRemoteProcedureVoid
+	template<typename TRemoteProcedure>
+	inline void NetworkHandler::registerRemoteProcedureVoid( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, Void>::Callback& callback )
 	{
-		m_remoteCallHandlers[StringHash( name )] = DC_NEW RemoteCallHandler<T, Void>( callback );
+		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, Void>( callback );
 	}
 
 	// ** NetworkHandler::registerRemoteProcedure
-	template<typename T, typename R>
-	inline void NetworkHandler::registerRemoteProcedure( CString name, const typename RemoteCallHandler<T, R>::Callback& callback )
+	template<typename TRemoteProcedure>
+	inline void NetworkHandler::registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback )
 	{
-		m_remoteCallHandlers[StringHash( name )] = DC_NEW RemoteCallHandler<T, R>( callback );
+		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>( callback );
 	}
 
 	// ** NetworkHandler::subscribe
