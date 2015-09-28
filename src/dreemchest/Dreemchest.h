@@ -50,11 +50,29 @@
 #include "Base/Base.h"
 
 #ifndef DC_BUILD_LIBRARY
-	#include "Platform/Platform.h"
-	#include "Threads/Threads.h"
-	#include "Renderer/Renderer.h"
-	#include "Sound/Sound.h"
-	#include "Scene/Scene.h"
+	#include <Base/Base.h>
+	#include <Network/Network.h>
+	#include <Io/Io.h>
+	#include <Event/Event.h>
+	#include <Threads/Threads.h>
+	#include <Ecs/Ecs.h>
+	#include <Platform/Platform.h>
+
+	#ifdef DC_SCENE
+		#include <Scene/Scene.h>
+	#endif
+
+	#ifdef DC_THREADS
+		#include "threads/Threads.h"
+	#endif
+
+	#ifdef DC_RENDERER
+		#include "renderer/Renderer.h"
+	#endif
+
+	#ifdef DC_SOUND
+		#include "sound/Sound.h"
+	#endif
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */
