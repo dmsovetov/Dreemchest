@@ -1,7 +1,5 @@
 Project( externals = '../../externals', paths = [ '.', '../../externals/src' ], define = [ 'DC_BUILD_LIBRARY' ] )
 
-#Module( url = 'https://github.com/dmsovetov/foo.git', folder = '../../externals/src' )
-
 SOURCES = [
 	  'Base/*'
 	, 'Ecs/*'
@@ -19,17 +17,17 @@ SOURCES = [
 	, 'Threads'
 	, 'Threads/Task'
 	, 'Threads/$(PLATFORM)'
-	, 'Sound'
-	, 'Sound/Decoders'
-	, 'Sound/Drivers'
-	, 'Sound/Drivers/$(SOUND)'
 	, 'Dreemchest.h'
 ]
 
-StaticLibrary( 'Dreemchest', sources = SOURCES )
+SOUND = []
 
-#Include( 'Ecs' )
+if Get( 'SOUND' ):
+	SOUND = [
+	  'Sound'
+	, 'Sound/Decoders'
+	, 'Sound/Drivers'
+	, 'Sound/Drivers/$(SOUND)'
+	]
 
-#for folder in Folders( '*' ):
-#	if Has( folder.name ):
-#		Include( folder.name )
+StaticLibrary( 'Dreemchest', sources = SOURCES + SOUND )
