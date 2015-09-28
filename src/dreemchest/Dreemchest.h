@@ -57,13 +57,10 @@
 	#include <Threads/Threads.h>
 	#include <Ecs/Ecs.h>
 	#include <Platform/Platform.h>
+	#include <Threads/Threads.h>
 
 	#ifdef DC_SCENE
 		#include <Scene/Scene.h>
-	#endif
-
-	#ifdef DC_THREADS
-		#include "threads/Threads.h"
 	#endif
 
 	#ifdef DC_RENDERER
