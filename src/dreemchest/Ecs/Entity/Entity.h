@@ -63,8 +63,10 @@ namespace Ecs {
 		TComponent*				attach( TComponent* component );
 
 		//! Constructs a new component and attaches it to this entity.
+	#ifndef DC_CPP11_DISABLED
 		template<typename TComponent, typename ... Args>
 		TComponent*				attach( Args ... args );
+	#endif	/*	!DC_CPP11_DISABLED	*/
 
 		//! Removes a component from this entity.
 		template<typename TComponent>
@@ -134,12 +136,14 @@ namespace Ecs {
 	}
 
 	// ** Entity::attach
+#ifndef DC_CPP11_DISABLED
 	template<typename TComponent, typename ... Args>
 	TComponent* Entity::attach( Args ... args )
 	{
 		TComponent* component = m_ecs->createComponent<TComponent>( args... );
 		return attach<TComponent>( component );
 	}
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 	// ** Entity::detach
 	template<typename TComponent>

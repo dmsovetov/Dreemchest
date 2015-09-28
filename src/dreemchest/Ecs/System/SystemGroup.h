@@ -46,9 +46,15 @@ namespace Ecs {
 		//! Update all systems in a group.
 		void				update( u32 currentTime, f32 dt );
 
-		//! Adds a new system to a group.
+		//! Constructs and adds a new system to a group.
+	#ifndef DC_CPP11_DISABLED
 		template<typename TSystem, typename ... Args>
 		WeakPtr<TSystem>	add( Args ... args );
+	#endif
+
+		//! Adds a new system to a group.
+		template<typename TSystem>
+		WeakPtr<TSystem>	add( TSystem* system );
 
 		//! Removes a system from a group.
 		template<typename TSystem>
@@ -86,13 +92,19 @@ namespace Ecs {
 	};
 
 	// ** SystemGroup::add
+#ifndef DC_CPP11_DISABLED
 	template<typename TSystem, typename ... Args>
 	WeakPtr<TSystem> SystemGroup::add( Args ... args )
 	{
+		return add( DC_NEW TSystem( args... ) );
+	}
+#endif	/*	!DC_CPP11_DISABLED	*/
+
+	template<typename TSystem>
+	WeakPtr<TSystem> SystemGroup::add( TSystem* system )
+	{
 		DC_BREAK_IF( m_isLocked );
 		DC_BREAK_IF( get<TSystem>().valid() );
-
-		StrongPtr<TSystem> system = DC_NEW TSystem( args... );
 
 		if( !system->initialize( m_ecs ) ) {
 			return WeakPtr<TSystem>();

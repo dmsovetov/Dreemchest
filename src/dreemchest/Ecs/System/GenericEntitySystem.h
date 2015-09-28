@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
+#ifndef DC_CPP11_DISABLED
+
 	//! Generic entity system to process entities that contain all components from a specified set.
 	template<typename ... TComponents>
 	class GenericEntitySystem : public EntitySystem {
@@ -89,6 +91,8 @@ namespace Ecs {
 	{
 		DC_BREAK
 	}
+
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 } // namespace Ecs
 

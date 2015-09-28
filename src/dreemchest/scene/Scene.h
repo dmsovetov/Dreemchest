@@ -31,6 +31,10 @@
 
 #define HAVE_JSON
 
+#ifdef DC_CPP11_DISABLED
+	#error C++11 should be enabled to use scene module.
+#endif
+
 #include <Platform/Platform.h>
 #include <Platform/Input.h>
 #include <Platform/Window.h>
