@@ -1,19 +1,14 @@
-examples = Executable( 'Examples', paths = [ '../dreemchest', '../modules' ] )
-examples.link( 'Dreemchest' )
-if Has( 'platform' ):
-	examples.dirs( '01_Platform/*' )
-	examples.dirs( '03_IO/*' )
-#	examples.link( 'dPlatform' )
+SOURCES = [
+	  '01_HelloWorld'
+	, '02_CreatingWindows'
+	, '03_WindowEvents'
+	, '04_RendererInitialization'
+	, '05_Files'
+	, '06_BasicNetworking'
+	, '07_TCPSockets'
+	, '08_NetworkHandlers'
+]
 
-	if iOS:
-		examples.linkExternal( Library( 'Foundation', True ), Library( 'UIKit', True ) )
-	elif MacOS:
-		examples.linkExternal( Library( 'Cocoa', True ), Library( 'QuartzCore', True ) )
-
-if Has( 'renderer' ):
-	examples.dirs( '02_Renderer/*' )
-#	examples.link( 'dRenderer' )
-	
-if Has( 'network' ):
-	examples.dirs( '04_Networking/*' )
-#	examples.link( 'dNetwork', 'dThreads' )
+for name in SOURCES:
+	Exe = Executable( name, paths = [ '../dreemchest' ], sources = [ name + '.cpp' ] )
+	Exe.link( 'Dreemchest' )

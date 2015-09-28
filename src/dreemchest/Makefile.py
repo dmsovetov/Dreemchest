@@ -1,4 +1,4 @@
-Project( externals = '../../externals', paths = [ '.', '../../externals/src' ], define = [ 'DC_BUILD_LIBRARY' ] )
+Project( externals = '../../externals', paths = [ '.', '../../externals/src' ] )
 
 SOURCES = [
 	  'Base/*'
@@ -11,8 +11,6 @@ SOURCES = [
 	, 'Network/*'
 	, 'Platform'
 	, 'Platform/$(PLATFORM)'
-	, 'Renderer'
-	, 'Renderer/$(RENDERER)'
 	, 'Scene/*'
 	, 'Threads'
 	, 'Threads/Task'
@@ -21,13 +19,30 @@ SOURCES = [
 ]
 
 SOUND = []
+RENDERER = []
 
-if Get( 'SOUND' ):
+if Get( 'sound' ):
 	SOUND = [
 	  'Sound'
 	, 'Sound/Decoders'
 	, 'Sound/Drivers'
 	, 'Sound/Drivers/$(SOUND)'
 	]
+	
+if Get( 'renderer' ):
+	RENDERER = [
+	  'Renderer'
+	, 'Renderer/$(RENDERER)'
+	, 'Renderer/$(RENDERER)/$(PLATFORM)'
+	]
 
-StaticLibrary( 'Dreemchest', sources = SOURCES + SOUND )
+Dreemchest = StaticLibrary( 'Dreemchest', sources = SOURCES + SOUND + RENDERER, defines = [ 'DC_BUILD_LIBRARY' ] )
+
+if Windows:
+	Dreemchest.linkExternal( Library( 'Winsock2', True ) )
+
+if Get( 'renderer' ):
+	Dreemchest.linkExternal( Library( Get( 'renderer' ), True ) )
+
+	if iOS:
+		Dreemchest.linkExternal( Library( 'QuartzCore', True ) )
