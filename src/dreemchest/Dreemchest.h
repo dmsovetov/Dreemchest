@@ -59,7 +59,7 @@
 	#include <Platform/Platform.h>
 	#include <Threads/Threads.h>
 
-	#ifdef DC_SCENE
+	#ifdef DC_SCENE_ENABLED
 		#include <Scene/Scene.h>
 	#endif
 
