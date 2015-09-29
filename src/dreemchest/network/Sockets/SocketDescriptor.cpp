@@ -158,6 +158,16 @@ bool SocketDescriptor::setNonBlocking( void )
 	return result != SOCKET_ERROR;
 }
 
+// ** SocketDescriptor::setNoDelay
+bool SocketDescriptor::setNoDelay( void )
+{
+	s8  noDelay = 1;
+	s32 result  = setsockopt( m_socket, IPPROTO_TCP, TCP_NODELAY, &noDelay, sizeof( noDelay ) );
+
+	DC_BREAK_IF( result == SOCKET_ERROR );
+	return result != SOCKET_ERROR;
+}
+
 // ** SocketDescriptor::enableBroadcast
 bool SocketDescriptor::enableBroadcast( void )
 {

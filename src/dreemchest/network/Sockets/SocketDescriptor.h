@@ -78,6 +78,9 @@ namespace net {
 		//! Sets this socket to non-blocking mode.
 		bool					setNonBlocking( void );
 
+		//! Disables Nagle algorithm for this socket,
+		bool					setNoDelay( void );
+
 		//! Enables broadcasts for this socket.
 		bool					enableBroadcast( void );
 

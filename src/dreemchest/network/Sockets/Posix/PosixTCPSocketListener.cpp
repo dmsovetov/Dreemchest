@@ -192,6 +192,7 @@ TCPSocketPtr PosixTCPSocketListener::acceptConnection( void )
 	}
 
 	socket.setNonBlocking();
+	m_socket.setNoDelay();
 
 	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( DC_NEW TCPClientDelegate( this ), socket, address ) ) );
 }
@@ -216,6 +217,9 @@ bool PosixTCPSocketListener::bindTo( u16 port )
 
 	// ** Set non blocking mode
 	m_socket.setNonBlocking();
+
+	// ** Set no delay
+	m_socket.setNoDelay();
 
 	// ** Listen for connections
     result = listen( m_socket, 16 );

@@ -96,6 +96,9 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 	// ** Set non blocking mode
 	m_socket.setNonBlocking();
 
+	// ** Set no delay
+	m_socket.setNoDelay();
+
 	return true;
 }
 
