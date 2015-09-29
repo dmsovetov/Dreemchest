@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include <io/Io.h>
+#include <Dreemchest.h>
 
 DC_USE_DREEMCHEST
 

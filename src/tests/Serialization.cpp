@@ -25,8 +25,9 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include <io/Io.h>
-#include <math/Vec2.h>
+#include <Dreemchest.h>
+
+#if 0
 
 #define DEFAULT_POD_VALUE( T, V ) template<> T defaultValue( void ) { return V; }
 
@@ -93,7 +94,7 @@ struct ArrayOf : public Serializable {
     Array<T>    m_value;
 
     IoBeginSerializer
-        IoArray( m_value )
+        IoField( m_value )
     IoEndSerializer
 };
 
@@ -145,13 +146,13 @@ public:
     T              source, dest;
 };
 
-struct Vector : public Serializable {
+struct _Vector : public Serializable {
     float x, y, z;
 
     void set() { x = -12.034f, y = 11.023f, z = 1.1f; }
 
-    bool operator == ( const Vector& other ) const { return x == other.x && y == other.y && z == other.z; }
-    bool operator != ( const Vector& other ) const { return x != other.x || y != other.y || z != other.z; }
+    bool operator == ( const _Vector& other ) const { return x == other.x && y == other.y && z == other.z; }
+    bool operator != ( const _Vector& other ) const { return x != other.x || y != other.y || z != other.z; }
 
     IoBeginSerializer
         IoField( x )
@@ -161,9 +162,9 @@ struct Vector : public Serializable {
 };
 
 struct Mesh : public Serializable {
-    String name;
-    Vector position;
-    Vector scale;
+    String  name;
+    _Vector position;
+    _Vector scale;
 
     void set() { name = "hello"; position.set(); scale.set(); }
 
@@ -178,8 +179,8 @@ struct Mesh : public Serializable {
 };
 
 struct SceneSettings : public Serializable {
-    Vector fogColor;
-    String name;
+    _Vector fogColor;
+    String  name;
 
     void set() { name = "sceneSettings", fogColor.set(); }
 
@@ -210,8 +211,8 @@ struct Scene : public Serializable {
     IoBeginSerializer
         IoField( settings )
         IoField( name )
-        IoArray( staticMeshes )
-        IoArray( dynamicMeshes )
+        IoField( staticMeshes )
+        IoField( dynamicMeshes )
     IoEndSerializer
 };
 
@@ -256,25 +257,25 @@ typedef testing::Types<
     , CompoundValue<String>
 
     // Complex objects
-    , Vector
+    , _Vector
     , Mesh
     , SceneSettings
     , Scene
 
     // Array of complex objects
-    , ArrayOf<Vector>
+    , ArrayOf<_Vector>
     , ArrayOf<Mesh>
     , ArrayOf<SceneSettings>
     , ArrayOf<Scene>
 
     // Compound values of objects
-    , CompoundValue<Vector>
+    , CompoundValue<_Vector>
     , CompoundValue<Mesh>
     , CompoundValue<SceneSettings>
     , CompoundValue<Scene>
-> SerializableTypes;
+> _SerializableTypes;
 
-TYPED_TEST_CASE(Serialization, SerializableTypes);
+TYPED_TEST_CASE(Serialization, _SerializableTypes);
 
 TYPED_TEST(Serialization, Binary)
 {
@@ -283,18 +284,20 @@ TYPED_TEST(Serialization, Binary)
     {
         int pos = this->buffer->position();
 
-        Storage storage( StorageBinary, this->buffer );
+        BinaryStorage storage( this->buffer );
         ASSERT_EQ(true, storage);
-        this->source.write( storage );
+        this->source.write( &storage );
         ASSERT_NE(pos, this->buffer->position());
     }
 
     {
         this->buffer->setPosition(0);
-        Storage storage( StorageBinary, this->buffer );
+        BinaryStorage storage( this->buffer );
         ASSERT_EQ(true, storage);
         ASSERT_NE(this->source, this->dest);
-        this->dest.read( storage );
+        this->dest.read( &storage );
         ASSERT_EQ(this->source, this->dest);
     }
 }
+
+#endif

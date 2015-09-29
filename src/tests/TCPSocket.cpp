@@ -31,6 +31,8 @@ DC_USE_DREEMCHEST
 
 using namespace net;
 
+Network network;
+
 struct ListenerDelegate : public TCPSocketListenerDelegate
 {
     virtual void handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
@@ -136,7 +138,7 @@ TEST_F(TCPListener, ReturnsValidPort)
     EXPECT_EQ( port, listener->port() );
 }
 
-TEST_F(TCPListener, ZeroConnectionAfterCreation)
+TEST_F(TCPListener, ZeroConnectionsAfterCreation)
 {
     EXPECT_EQ( 0, listener->connections().size() );
 }

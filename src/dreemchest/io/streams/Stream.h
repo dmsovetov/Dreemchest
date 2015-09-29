@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_Stream_H__
-#define		__DC_Io_Stream_H__
+#ifndef __DC_Io_Stream_H__
+#define __DC_Io_Stream_H__
 
-#include	"../Io.h"
+#include "../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
