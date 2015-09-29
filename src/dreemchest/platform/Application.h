@@ -34,6 +34,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
+	//! Returns current time in milliseconds.
+	extern u32 currentTime( void );
+
     //! A platform-specific application implementation interface.
     class IApplication {
     public:

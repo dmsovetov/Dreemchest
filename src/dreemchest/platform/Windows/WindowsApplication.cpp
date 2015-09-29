@@ -27,6 +27,8 @@
 #include "WindowsApplication.h"
 #include "WindowsWindow.h"
 
+#pragma comment( lib, "winmm.lib" )
+
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
@@ -35,6 +37,12 @@ namespace Platform {
 IApplication* createApplication( void )
 {
     return DC_NEW WindowsApplication;
+}
+
+// ** currentTime
+u32 currentTime( void )
+{
+	return timeGetTime();
 }
 
 // ** WindowsApplication::quit
