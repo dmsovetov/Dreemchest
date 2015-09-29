@@ -61,6 +61,7 @@ namespace Platform {
     class Application;
     class Window;
     class WindowDelegate;
+	class Arguments;
 
 	dcDeclarePtrs( WindowDelegate )
 	dcDeclarePtrs( Window )
@@ -73,6 +74,7 @@ DC_END_DREEMCHEST
     #include "Window.h"
     #include "Application.h"
 	#include "Input.h"
+	#include "Arguments.h"
 #endif
 
 #endif  /*  !defined( __DC_Platform_Platform_H__ )  */

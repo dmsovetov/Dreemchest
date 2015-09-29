@@ -37,7 +37,7 @@ extern IApplication* createApplication( void );
 Application* Application::s_application = NULL;
 
 // ** Application::Application
-Application::Application( IApplication* impl ) : m_impl( impl ), m_delegate( NULL )
+Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
     DC_BREAK_IF( s_application != NULL );
     if( !m_impl ) log::warn( "Application::Application : application interface is not implemented on current platform\n" );
@@ -49,6 +49,12 @@ Application::~Application( void )
     DC_DELETE( m_impl )
 }
 
+// ** Application::args
+const Arguments& Application::args( void ) const
+{
+	return m_arguments;
+}
+
 // ** Application::sharedInstance
 Application* Application::sharedInstance( void )
 {
@@ -56,17 +62,17 @@ Application* Application::sharedInstance( void )
 }
 
 // ** Application::create
-Application* Application::create( void )
+Application* Application::create( const Arguments& args )
 {
 #if defined( DC_PLATFORM )
     if( IApplication* impl = createApplication() ) {
-        return DC_NEW Application( impl );
+        return DC_NEW Application( args, impl );
     }
 
     return NULL;
 #endif
 
-    return DC_NEW Application( NULL );
+    return DC_NEW Application( args, NULL );
 }
 
 // ** Application::quit

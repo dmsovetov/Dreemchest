@@ -27,7 +27,8 @@
 #ifndef __DC_Platform_Application_H__
 #define __DC_Platform_Application_H__
 
-#include    "Platform.h"
+#include "Platform.h"
+#include "Arguments.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -74,11 +75,14 @@ namespace Platform {
          */
         int                     launch( ApplicationDelegate* delegate );
 
-        //! Notifies an application about a lunch.
+        //! Notifies an application about a launch.
         void                    notifyLaunched( void );
 
+		//! Returns application arguments passed on launch.
+		const Arguments&		args( void ) const;
+
         //! Creates a new Application instance.
-        static Application*     create( void );
+        static Application*     create( const Arguments& args );
 
         //! Returns a shared application instance.
         static Application*     sharedInstance( void );
@@ -86,27 +90,24 @@ namespace Platform {
     private:
 
                                 //! Constructs a new Application instance.
-                                Application( IApplication* impl );
+                                Application( const Arguments& args, IApplication* impl );
 
     private:
 
-        //! Shared application instance.
-        static Application*     s_application;
-
-        //! Platform specific application implementation.
-        IApplication*           m_impl;
-
-        //! Application delegate instance.
-        ApplicationDelegate*    m_delegate;
+        static Application*     s_application;	//!< Shared application instance.
+        IApplication*           m_impl;			//!< Platform specific application implementation.
+        ApplicationDelegate*    m_delegate;		//!< Application delegate instance.
+		Arguments				m_arguments;	//!< Passed arguments.
     };
 
 } // namespace Platform
 
 DC_END_DREEMCHEST
 
-#define dcDeclareApplication( delegate )												\
-    int main( int argc, char** argv ) {													\
-        return DC_DREEMCHEST_NS Platform::Application::create()->launch( delegate );	\
+#define dcDeclareApplication( delegate )													\
+    int main( int argc, char** argv ) {														\
+		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							\
+        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );	\
     }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */
