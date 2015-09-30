@@ -47,10 +47,13 @@ namespace net {
 								NetworkHandler( void );
 
 		//! Updates network handler.
-		virtual void			update( void );
+		virtual void			update( u32 dt );
 
-		//! Returns a current network time.
-		virtual UnixTime		currentTime( void ) const;
+		//! Returns ping rate.
+		u32						pingRate( void ) const;
+
+		//! Sets the ping rate.
+		void					setPingRate( u32 value );
 
 		//! Begins listening for broadcast messages.
 		void					listenForBroadcasts( u16 port );
@@ -103,8 +106,8 @@ namespace net {
 		//! Removes connection by socket.
 		void					removeConnection( TCPSocket* socket );
 
-		//! Handles a time sync packet.
-		virtual bool			handleTimePacket( ConnectionPtr& connection, packets::Time& packet );
+		//! Handles a ping packet.
+		virtual bool			handlePingPacket( ConnectionPtr& connection, packets::Ping& packet );
 
 		//! Handles a server detection packet.
 		virtual bool			handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
@@ -149,6 +152,12 @@ namespace net {
 
 		//! Broadcast listener socket.
 		UDPSocketPtr			m_broadcastListener;
+
+		//! Ping send rate.
+		u32						m_pingSendRate;
+
+		//! Ping time accumulator.
+		s32						m_pingTimeLeft;
 	};
 
 	// ** NetworkHandler::registerPacketHandler

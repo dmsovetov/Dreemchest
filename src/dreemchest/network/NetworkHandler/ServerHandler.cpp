@@ -55,9 +55,9 @@ ServerHandlerPtr ServerHandler::create( u16 port )
 }
 
 // ** ServerHandler::update
-void ServerHandler::update( void )
+void ServerHandler::update( u32 dt )
 {
-	NetworkHandler::update();
+	NetworkHandler::update( dt );
 	m_socketListener->update();
 }
 
@@ -71,9 +71,7 @@ bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packet
 void ServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
-
-	ConnectionPtr connection = createConnection( socket );
-	connection->send<packets::Time>( UnixTime::current().value() );
+	createConnection( socket );
 }
 
 // ** ServerHandler::processClientDisconnection
@@ -100,20 +98,6 @@ ConnectionList ServerHandler::eventListeners( void ) const
     }
     
 	return connections;
-}
-
-// ** ServerHandler::handleTimePacket
-bool ServerHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
-{
-	s32 roundTripTime = UnixTime::current() - packet.timestamp;
-
-	if( abs( packet.roundTripTime - roundTripTime ) > 1 ) {
-		packet.timestamp	 = UnixTime::current().value();
-		packet.roundTripTime = roundTripTime;
-		return NetworkHandler::handleTimePacket( connection, packet );
-	}
-
-	return true;
 }
 
 // ---------------------------------------- ServerSocketDelegate ------------------------------------//

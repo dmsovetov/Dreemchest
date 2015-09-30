@@ -34,15 +34,10 @@ namespace net {
 // -----------------------------------------ClientHandler --------------------------------------- //
 
 // ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( const TCPSocketPtr& socket ) : m_serverTimeDelta( 0 )
+ClientHandler::ClientHandler( const TCPSocketPtr& socket )
 {
 	m_connection = createConnection( socket.get() );
-}
-
-// ** ClientHandler::currentTime
-UnixTime ClientHandler::currentTime( void ) const
-{
-	return UnixTime::current() + m_serverTimeDelta;
+	setPingRate( 500 );
 }
 
 // ** ClientHandler::connection
@@ -74,9 +69,9 @@ ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port 
 }
 
 // ** ClientHandler::update
-void ClientHandler::update( void )
+void ClientHandler::update( u32 dt )
 {
-	NetworkHandler::update();
+	NetworkHandler::update( dt );
 	m_connection->socket()->update();
 }
 
@@ -84,16 +79,6 @@ void ClientHandler::update( void )
 ConnectionList ClientHandler::eventListeners( void ) const
 {
 	return ConnectionList();
-}
-
-// ** ClientHandler::handleTimePacket
-bool ClientHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
-{
-	log::verbose( "Client syncronized to server time %d (rtt %d)\n", packet.timestamp + packet.roundTripTime / 2, packet.roundTripTime );
-
-	u32 serverTime    = packet.timestamp + packet.roundTripTime / 2;
-	m_serverTimeDelta = UnixTime::current() - serverTime;
-	return NetworkHandler::handleTimePacket( connection, packet );
 }
 
 // ** ClientHandler::detectServers

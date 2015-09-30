@@ -50,8 +50,7 @@ namespace net {
 		static bool				detectServers( u16 port );
 
         // ** NetworkHandler
-		virtual UnixTime		currentTime( void ) const;
-        virtual void			update( void );
+        virtual void			update( u32 dt );
 		virtual ConnectionList	eventListeners( void ) const;
 
 	protected:
@@ -59,16 +58,9 @@ namespace net {
 								//! Constructs ClientHandler instance.
 								ClientHandler( const TCPSocketPtr& socket );
 
-		//! Handles a time sync packet.
-		virtual bool			handleTimePacket( ConnectionPtr& connection, packets::Time& packet );
-
 	private:
 
-		//! Client connection.
-		ConnectionPtr			m_connection;
-
-		//! Server time delta.
-		s32						m_serverTimeDelta;
+		ConnectionPtr			m_connection;	//!< Client connection.
     };
 
 	//! Client socket handler.

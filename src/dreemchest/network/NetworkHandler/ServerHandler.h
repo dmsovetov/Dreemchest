@@ -40,7 +40,7 @@ namespace net {
     public:
 
         // ** NetworkHandler
-        virtual void				update( void );
+        virtual void				update( u32 dt );
 		virtual ConnectionList		eventListeners( void ) const;
 
 		//! Creates a new server network handler and binds it to specified port.
@@ -56,9 +56,6 @@ namespace net {
 
 		//! Processes a client disconnection.
 		virtual void				processClientDisconnection( TCPSocket* socket );
-
-		//! Handles a time sync packet.
-		virtual bool				handleTimePacket( ConnectionPtr& connection, packets::Time& packet );
 
 		//! Handles a server detection packet.
 		virtual bool				handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );

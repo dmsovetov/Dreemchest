@@ -34,9 +34,33 @@ namespace net {
 
 // ** Connection::Connection
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 )
+	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 ), m_time( 0 ), m_roundTripTime( 0 )
 {
 
+}
+
+// ** Connection::time
+u32 Connection::time( void ) const
+{
+	return m_time;
+}
+
+// ** Connection::setTime
+void Connection::setTime( u32 value )
+{
+	m_time = value;
+}
+
+// ** Connection::roundTripTime
+u32 Connection::roundTripTime( void ) const
+{
+	return m_roundTripTime;
+}
+
+// ** Connection::setRoundTripTime
+void Connection::setRoundTripTime( u32 value )
+{
+	m_roundTripTime = value;
 }
 
 // ** Connection::totalBytesReceived
@@ -117,18 +141,18 @@ bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 }
 
 // ** Connection::update
-void Connection::update( void )
+void Connection::update( u32 dt )
 {
+	m_time += dt;
+
 	if( m_pendingRemoteCalls.empty() ) {
 		return;
 	}
 
-	UnixTime currentTime;
-
 	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
-		if( (currentTime - i->second.m_timestamp) > 60 ) {
+		if( (m_time - i->second.m_timestamp) > 60000 ) {
 			log::warn( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
-			/*i = */m_pendingRemoteCalls.erase( i );
+			i = m_pendingRemoteCalls.erase( i );
 		} else {
 			++i;
 		}

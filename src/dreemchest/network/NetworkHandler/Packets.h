@@ -39,18 +39,20 @@ namespace packets {
 	typedef Array<u8> Payload;
 
 	//! Latency test & time sync packet
-	struct Time : public io::SerializableT<Time> {
+	struct Ping : public io::SerializableT<Ping> {
+		u8				iterations;		//!< Current iteration number.
 		u32				timestamp;		//!< A timestamp value when the packet was sent.
-		s32				roundTripTime;	//!< A time took the packet to travel to target and back.
+		u32				time;			//!< Current connection time in milliseconds
 
-						//! Constructs a Time instance.
-						Time( u32 timestamp = 0, s32 roundTripTime = 0 )
-							: timestamp( timestamp ), roundTripTime( roundTripTime ) {}
+						//! Constructs a Ping instance.
+						Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
+							: iterations( iterations ), timestamp( timestamp ), time( time ) {}
 
 		//! Packet serializer
 		IoBeginSerializer
+			IoField( iterations )
 			IoField( timestamp )
-			IoField( roundTripTime )
+			IoField( time )
 		IoEndSerializer
 	};
 

@@ -49,6 +49,12 @@ namespace net {
 		//! Returns the total amount of bytes sent.
 		u32						totalBytesSent( void ) const;
 
+		//! Returns current time.
+		u32						time( void ) const;
+
+		//! Returns the round trip time.
+		u32						roundTripTime( void ) const;
+
 		//! Returns a connection TCP socket.
 		const  TCPSocketPtr&	socket( void ) const;
 		TCPSocketPtr&			socket( void );
@@ -85,7 +91,13 @@ namespace net {
 								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
 
 		//! Updates this connection
-		void					update( void );
+		void					update( u32 dt );
+
+		//! Sets the round trip time for this connection.
+		void					setRoundTripTime( u32 value );
+
+		//! Sets current time.
+		void					setTime( u32 value );
 
 		//! Handles a recieved remote call response.
 		bool					handleResponse( const packets::RemoteCallResponse& packet );
@@ -95,12 +107,12 @@ namespace net {
 		//! A helper struct to store a timestamp of an RPC call.
 		struct PendingRemoteCall {
 			String							m_name;			//!< Remote procedure name.
-			UnixTime						m_timestamp;	//!< A Unix time when a call was performed.
+			u32								m_timestamp;	//!< The time in milliseconds when a call was performed.
 			AutoPtr<IRemoteResponseHandler>	m_handler;		//!< Response handler.
 
 											//! Constructs a PendingRemoteCall instance.
 											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL )
-												: m_name( name ), m_handler( handler ) {}
+												: m_name( name ), m_handler( handler ), m_timestamp( 0 ) {}
 		};
 
 		//! A container type to store all pending remote calls.
@@ -123,6 +135,12 @@ namespace net {
 
 		//! The total amount of bytes sent.
 		u32						m_totalBytesSent;
+
+		//! Current connection time.
+		u32						m_time;
+
+		//! Current round trip time.
+		u32						m_roundTripTime;
 	};
 
 	// ** Connection::invokeVoid

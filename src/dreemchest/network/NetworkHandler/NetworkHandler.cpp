@@ -35,17 +35,29 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** NetworkHandler::NetworkHandler
-NetworkHandler::NetworkHandler( void )
+NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 )
 {
     DC_BREAK_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ) );
     
-	registerPacketHandler<packets::Time>			  ( dcThisMethod( NetworkHandler::handleTimePacket ) );
+	registerPacketHandler<packets::Ping>			  ( dcThisMethod( NetworkHandler::handlePingPacket ) );
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( NetworkHandler::handleDetectServersPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 
 	m_broadcastListener = UDPSocket::createBroadcast( DC_NEW UDPSocketNetworkDelegate( this ) );
+}
+
+// ** NetworkHandler::setPingRate
+void NetworkHandler::setPingRate( u32 value )
+{
+	m_pingSendRate = value;
+}
+
+// ** NetworkHandler::pingRate
+u32 NetworkHandler::pingRate( void ) const
+{
+	return m_pingSendRate;
 }
 
 // ** NetworkHandler::findConnectionBySocket
@@ -73,12 +85,6 @@ void NetworkHandler::removeConnection( TCPSocket* socket )
 void NetworkHandler::listenForBroadcasts( u16 port )
 {
 	m_broadcastListener->listen( port );
-}
-
-// ** NetworkHandler::currentTime
-UnixTime NetworkHandler::currentTime( void ) const
-{
-	return UnixTime::current();
 }
 
 // ** NetworkHandler::processReceivedData
@@ -124,10 +130,18 @@ ConnectionList NetworkHandler::eventListeners( void ) const
 	return ConnectionList();
 }
 
-// ** NetworkHandler::handleTimePacket
-bool NetworkHandler::handleTimePacket( ConnectionPtr& connection, packets::Time& packet )
+// ** NetworkHandler::handlePingPacket
+bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping& packet )
 {
-	connection->send<packets::Time>( packet.timestamp, packet.roundTripTime );
+	if( packet.iterations ) {
+		connection->send<packets::Ping>( packet.iterations - 1, packet.timestamp, connection->time() );
+	} else {
+		u32 rtt  = connection->time() - packet.timestamp;
+		u32 time = packet.time + rtt / 2;
+		connection->setTime( time );
+		connection->setRoundTripTime( rtt );
+	}
+	
 	return true;
 }
 
@@ -175,8 +189,27 @@ bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, 
 }
 
 // ** NetworkHandler::update
-void NetworkHandler::update( void )
+void NetworkHandler::update( u32 dt )
 {
+	bool sendPing = false;
+
+	if( m_pingSendRate ) {
+		m_pingTimeLeft -= dt;
+
+		if( m_pingTimeLeft <= 0 ) {
+			m_pingTimeLeft += m_pingSendRate;
+			sendPing = true;
+		}
+	}
+
+	// Update all connections
+	for( ConnectionBySocket::iterator i = m_connections.begin(), end = m_connections.end(); i != end; ++i ) {
+		if( sendPing ) {
+			i->second->send<packets::Ping>( 1, i->second->time() );
+		}
+
+		i->second->update( dt );
+	}
 //	if( m_broadcastListener != NULL ) {
 //		m_broadcastListener->update();
 //	}
