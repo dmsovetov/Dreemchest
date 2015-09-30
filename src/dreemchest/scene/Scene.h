@@ -191,7 +191,6 @@ namespace Scene {
 		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
 		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
-		Ecs::EntityId					m_nextEntityId;		//!< Next scene object id.
 	};
 
 	// ** Scene::addSystem

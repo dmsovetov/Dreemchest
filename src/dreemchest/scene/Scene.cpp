@@ -44,7 +44,7 @@ namespace Scene {
 IMPLEMENT_LOGGER( log )
 
 // ** Scene::Scene
-Scene::Scene( void ) : m_nextEntityId( 1 )
+Scene::Scene( void )
 {
 	m_ecs		= Ecs::Ecs::create();
 
@@ -65,7 +65,8 @@ void Scene::update( f32 dt )
 // ** Scene::createSceneObject
 SceneObjectPtr Scene::createSceneObject( void )
 {
-	return m_ecs->createEntity( m_nextEntityId++ );
+	return m_ecs->createEntity();
+}
 }
 
 // ** Scene::findSceneObject
