@@ -88,6 +88,9 @@ namespace Ecs {
 		//! Creates a new entity with a generated id.
 		EntityPtr		createEntity( void );
 
+		//! Returns the entity with specified id.
+		EntityPtr		findEntity( const EntityId& id ) const;
+
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
 

@@ -65,6 +65,13 @@ EntityPtr Ecs::createEntity( void )
 	return createEntity( id );
 }
 
+// ** Ecs::findEntity
+EntityPtr Ecs::findEntity( const EntityId& id ) const
+{
+	Entities::const_iterator i = m_entities.find( id );
+	return i != m_entities.end() ? i->second : EntityPtr();
+}
+
 // ** Ecs::removeEntity
 void Ecs::removeEntity( const EntityId& id )
 {
