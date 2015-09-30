@@ -35,9 +35,9 @@ namespace Scene {
 #ifdef DC_BOX2D_ENABLED
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
+Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale, const Vec2& gravity ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
 {
-	m_world = DC_NEW b2World( b2Vec2( 0, -9.8f ) );
+	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
 }
 
 // ** Box2DPhysics::setDeltaTime
