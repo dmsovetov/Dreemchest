@@ -68,6 +68,18 @@ SceneObjectPtr Scene::createSceneObject( void )
 	return m_ecs->createEntity( m_nextEntityId++ );
 }
 
+// ** Scene::findSceneObject
+SceneObjectPtr Scene::findSceneObject( const SceneObjectId& id ) const
+{
+	Ecs::EntityPtr entity = m_ecs->findEntity( id );
+
+	if( entity == Ecs::EntityPtr() ) {
+		return SceneObjectPtr();
+	}
+
+	return entity;
+}
+
 // ** Scene::render
 void Scene::render( const RenderingContextPtr& context )
 {

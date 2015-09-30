@@ -98,6 +98,7 @@ namespace Scene {
 	// Alias the Ecs::Entity type
 	typedef StrongPtr<Ecs::Entity>	SceneObjectPtr;
 	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
+	typedef Ecs::EntityId			SceneObjectId;
 
 	dcDeclarePtrs( Direction )
 	dcDeclarePtrs( Scene )
@@ -152,6 +153,9 @@ namespace Scene {
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
+
+		//! Returns the scene object with specified id.
+		SceneObjectPtr					findSceneObject( const SceneObjectId& id ) const;
 
 		//! Returns the list of scene object with specified name.
 		SceneObjectsList				findAllWithName( const String& name ) const;
