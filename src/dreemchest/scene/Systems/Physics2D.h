@@ -31,7 +31,7 @@
 #include "../Components/Transform.h"
 #include "../Components/Physics.h"
 
-#ifdef DC_PHYSICS2D_BOX2D
+#ifdef DC_BOX2D_ENABLED
 	#include <Box2D/Box2D.h>
 #endif
 
@@ -39,7 +39,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-#ifdef DC_PHYSICS2D_BOX2D
+#ifdef DC_BOX2D_ENABLED
 
 	//! The 2D physics system
 	class Box2DPhysics : public Ecs::GenericEntitySystem<RigidBody2D, Transform> {
@@ -111,7 +111,7 @@ namespace Scene {
 		f32						m_deltaTime;		//!< Physics delta time.
 	};
 
-#endif	/*	DC_PHYSICS2D_BOX2D	*/
+#endif	/*	DC_BOX2D_ENABLED	*/
 
 } // namespace Scene
 

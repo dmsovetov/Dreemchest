@@ -32,7 +32,7 @@ namespace Scene {
 
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
-#ifdef DC_PHYSICS2D_BOX2D
+#ifdef DC_BOX2D_ENABLED
 
 // ** Box2DPhysics::Box2DPhysics
 Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
@@ -286,7 +286,7 @@ f32 Box2DPhysics::sizeToBox2D( f32 value ) const
 	return value / m_scale;
 }
 
-#endif	/*	DC_PHYSICS2D_BOX2D	*/
+#endif	/*	DC_BOX2D_ENABLED	*/
 
 } // namespace Scene
 
