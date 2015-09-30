@@ -54,6 +54,9 @@ namespace Scene {
 		//! Returns all scene objects inside the rect.
 		SceneObjectsList		queryRect( const Rect& rect ) const;
 
+		//! Sets the physics update delta time.
+		void					setDeltaTime( f32 value );
+
 		//! Updates the physics engine state.
 		virtual bool			begin( u32 currentTime );
 

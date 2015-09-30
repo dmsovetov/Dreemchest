@@ -40,6 +40,12 @@ Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale ) : GenericEntitySystem( "B
 	m_world = DC_NEW b2World( b2Vec2( 0, -9.8f ) );
 }
 
+// ** Box2DPhysics::setDeltaTime
+void Box2DPhysics::setDeltaTime( f32 value )
+{
+	m_deltaTime = value;
+}
+
 // ** Box2DPhysics::queryRect
 SceneObjectsList Box2DPhysics::queryRect( const Rect& rect ) const
 {
