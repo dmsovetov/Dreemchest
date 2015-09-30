@@ -154,6 +154,9 @@ namespace Scene {
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
 
+		//! Creates a new scene object instance.
+		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
+
 		//! Returns the scene object with specified id.
 		SceneObjectPtr					findSceneObject( const SceneObjectId& id ) const;
 

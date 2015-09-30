@@ -67,6 +67,11 @@ SceneObjectPtr Scene::createSceneObject( void )
 {
 	return m_ecs->createEntity();
 }
+
+// ** Scene::createSceneObject
+SceneObjectPtr Scene::createSceneObject( const SceneObjectId& id )
+{
+	return m_ecs->createEntity( id );
 }
 
 // ** Scene::findSceneObject
