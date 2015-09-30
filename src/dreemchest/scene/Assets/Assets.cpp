@@ -218,7 +218,9 @@ bool AssetBundle::loadFromJson( const String& json )
 		}
 		else if( type == "material" ) {
 			MaterialPtr material = addMaterial( uuid, identifier );
+		#ifdef DC_JSON_ENABLED
 			JsonMaterialLoader::attachTo( material );
+		#endif
 		}
 		else if( type == "scene" ) {
 			AssetPtr scene = addAsset( Asset::Scene, uuid, identifier );

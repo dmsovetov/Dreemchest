@@ -111,7 +111,7 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 
 // --------------------------------------- JsonMaterialLoader --------------------------------------- //
 
-#ifdef HAVE_JSON
+#ifdef DC_JSON_ENABLED
 
 // ** JsonMaterialLoader::loadFromStream
 bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
@@ -152,7 +152,7 @@ bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPt
 	return true;
 }
 
-#endif	/*	HAVE_JSON	*/
+#endif	/*	DC_JSON_ENABLED	*/
 
 } // namespace Scene
 

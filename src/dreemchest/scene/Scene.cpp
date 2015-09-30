@@ -135,6 +135,8 @@ ScenePtr Scene::create( void )
 
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
+#ifdef DC_JSON_ENABLED
+
 // ** JsonSceneLoader::JsonSceneLoader
 JsonSceneLoader::JsonSceneLoader( void )
 {
@@ -332,6 +334,8 @@ Quat JsonSceneLoader::readQuat( const Json::Value& value )
 {
 	return Quat( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
 }
+
+#endif	/*	DC_JSON_ENABLED	*/
 
 } // namespace Scene
 

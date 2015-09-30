@@ -29,8 +29,6 @@
 
 #include "../Dreemchest.h"
 
-#define HAVE_JSON
-
 #ifdef DC_CPP11_DISABLED
 	#error C++11 should be enabled to use scene module.
 #endif
@@ -51,7 +49,7 @@
 
 #include <Io/DiskFileSystem.h>
 
-#ifdef HAVE_JSON
+#ifdef DC_JSON_ENABLED
 	#include <json/json.h>
 #endif
 
@@ -213,7 +211,7 @@ namespace Scene {
 		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
 	}
 
-#ifdef HAVE_JSON
+#ifdef DC_JSON_ENABLED
 
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader {
@@ -282,7 +280,7 @@ namespace Scene {
 		ComponentLoaders			m_loaders;		//!< Available component loaders.
 	};
 
-#endif	/*	HAVE_JSON	*/
+#endif	/*	DC_JSON_ENABLED	*/
 
 } // namespace Scene
 
