@@ -146,7 +146,7 @@ namespace Scene {
 	public:
 
 		//! Performs a scene update.
-		void							update( f32 dt );
+		void							update( u32 currentTime, f32 dt );
 
 		//! Renders a scene.
 		void							render( const RenderingContextPtr& context );

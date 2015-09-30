@@ -57,9 +57,9 @@ Scene::Scene( void )
 }
 
 // ** Scene::update
-void Scene::update( f32 dt )
+void Scene::update( u32 currentTime, f32 dt )
 {
-	m_ecs->update( 0, dt, UpdateSystems );
+	m_ecs->update( currentTime, dt, UpdateSystems );
 }
 
 // ** Scene::createSceneObject
