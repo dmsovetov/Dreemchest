@@ -61,10 +61,10 @@ namespace Scene {
 		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			entityAdded( const Ecs::Entity& entity );
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			sceneObjectRemoved( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			entityRemoved( const Ecs::Entity& entity );
 
 	private:
 

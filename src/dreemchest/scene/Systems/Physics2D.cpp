@@ -137,19 +137,21 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 	rigidBody.clear();
 }
 
-// ** Box2DPhysics::sceneObjectAdded
-void Box2DPhysics::sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
+// ** Box2DPhysics::entityAdded
+void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 {
-	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
+	Transform*	 transform = entity.get<Transform>();
+	RigidBody2D* rigidBody = entity.get<RigidBody2D>();
+	Shape2D*     shape	   = entity.get<Shape2D>();
 
-	Shape2D* shape = sceneObject.get<Shape2D>();
+	DC_BREAK_IF( rigidBody->internal<Internal>() != Internal::Ptr() )
 	DC_BREAK_IF( shape == NULL )
 	DC_BREAK_IF( shape->size() == 0 )
 
     b2BodyDef def;
 
 	// Initialize body type
-	switch( rigidBody.type() ) {
+	switch( rigidBody->type() ) {
 	case RigidBody2D::Static:		def.type = b2_staticBody;		break;
 	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;		break;
 	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;	break;
@@ -157,12 +159,12 @@ void Box2DPhysics::sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigi
 	}
 
 	// Set the initial body transform
-	def.position = positionToBox2D( transform.position() );
-	def.angle = rotationToBox2D( transform.rotationZ() );
+	def.position = positionToBox2D( transform->position() );
+	def.angle = rotationToBox2D( transform->rotationZ() );
 
 	// Construct the Box2D body and attach scene object to it
     b2Body* body = m_world->CreateBody( &def );
-	body->SetUserData( &sceneObject );
+	body->SetUserData( const_cast<Ecs::Entity*>( &entity ) );
 
 	// Initialize the body shape
 	for( u32 i = 0, n = shape->size(); i < n; i++ ) {
@@ -179,13 +181,15 @@ void Box2DPhysics::sceneObjectAdded( Ecs::Entity& sceneObject, RigidBody2D& rigi
 	}
 
 	// Attach created body to a component
-	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );
+	rigidBody->setInternal<Internal>( DC_NEW Internal( body ) );
 }
 
-// ** Box2DPhysics::sceneObjectRemoved
-void Box2DPhysics::sceneObjectRemoved( Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
+// ** Box2DPhysics::entityRemoved
+void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 {
-	Internal::Ptr physical = rigidBody.internal<Internal>();
+	RigidBody2D* rigidBody = entity.get<RigidBody2D>();
+
+	Internal::Ptr physical = rigidBody->internal<Internal>();
 	DC_BREAK_IF( physical == NULL )
 
 	b2Body* body = physical->m_body;
