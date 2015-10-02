@@ -163,6 +163,9 @@ namespace Scene {
 		//! Returns the list of scene object with specified name.
 		SceneObjectSet					findAllWithName( const String& name ) const;
 
+		//! Returns a list of scene objects that match a specified aspect.
+		SceneObjectSet					findByAspect( const Ecs::Aspect& aspect ) const;
+
 		//! Returns cameras that reside in scene.
 		const Ecs::IndexPtr&			cameras( void ) const;
 

@@ -86,6 +86,12 @@ SceneObjectPtr Scene::findSceneObject( const SceneObjectId& id ) const
 	return entity;
 }
 
+// ** Scene::findByAspect
+SceneObjectSet Scene::findByAspect( const Ecs::Aspect& aspect ) const
+{
+	return m_ecs->findByAspect( aspect );
+}
+
 // ** Scene::render
 void Scene::render( const RenderingContextPtr& context )
 {
