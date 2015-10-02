@@ -91,6 +91,9 @@ namespace Ecs {
 		//! Returns the entity with specified id.
 		EntityPtr		findEntity( const EntityId& id ) const;
 
+		//! Returns a list of entities that match a specified aspect.
+		EntitySet		findByAspect( const Aspect& aspect ) const;
+
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
 

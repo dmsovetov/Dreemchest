@@ -72,6 +72,20 @@ EntityPtr Ecs::findEntity( const EntityId& id ) const
 	return i != m_entities.end() ? i->second : EntityPtr();
 }
 
+// ** Ecs::findByAspect
+EntitySet Ecs::findByAspect( const Aspect& aspect ) const
+{
+	EntitySet result;
+
+	for( Entities::const_iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
+		if( aspect.hasIntersection( i->second ) ) {
+			result.insert( i->second );
+		}
+	}
+
+	return result;
+}
+
 // ** Ecs::removeEntity
 void Ecs::removeEntity( const EntityId& id )
 {
