@@ -47,17 +47,17 @@ void Box2DPhysics::setDeltaTime( f32 value )
 }
 
 // ** Box2DPhysics::queryRect
-SceneObjectsList Box2DPhysics::queryRect( const Rect& rect ) const
+SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 {
 	// Query callback
 	struct Callback : public b2QueryCallback {
 		virtual bool ReportFixture( b2Fixture* fixture ) {
 			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
-			m_result.push_back( entity );
+			m_result.insert( entity );
 			return true;
 		}
 
-		SceneObjectsList m_result;
+		SceneObjectSet m_result;
 	};
 
 	// Construct the AABB of a query

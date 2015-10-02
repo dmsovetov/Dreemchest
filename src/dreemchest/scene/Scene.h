@@ -138,8 +138,8 @@ namespace Scene {
 		, RenderSystems = BIT( 1 )
 	};
 
-	//! Container type to store scene objects.
-	typedef List<SceneObjectPtr> SceneObjectsList;
+	//! Container type to store a set of scene objects.
+	typedef Set<SceneObjectPtr> SceneObjectSet;
 
 	//! The root class for a scene subsystem.
 	class Scene : public RefCounted {
@@ -161,7 +161,7 @@ namespace Scene {
 		SceneObjectPtr					findSceneObject( const SceneObjectId& id ) const;
 
 		//! Returns the list of scene object with specified name.
-		SceneObjectsList				findAllWithName( const String& name ) const;
+		SceneObjectSet					findAllWithName( const String& name ) const;
 
 		//! Returns cameras that reside in scene.
 		const Ecs::IndexPtr&			cameras( void ) const;

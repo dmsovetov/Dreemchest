@@ -52,7 +52,7 @@ namespace Scene {
 		bool					rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const;
 
 		//! Returns all scene objects inside the rect.
-		SceneObjectsList		queryRect( const Rect& rect ) const;
+		SceneObjectSet			queryRect( const Rect& rect ) const;
 
 		//! Sets the physics update delta time.
 		void					setDeltaTime( f32 value );

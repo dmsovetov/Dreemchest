@@ -129,16 +129,16 @@ const Ecs::IndexPtr& Scene::cameras( void ) const
 }
 
 // ** Scene::findAllWithName
-SceneObjectsList Scene::findAllWithName( const String& name ) const
+SceneObjectSet Scene::findAllWithName( const String& name ) const
 {
 	const Ecs::EntitySet& entities = m_named->entities();
-	SceneObjectsList objects;
+	SceneObjectSet objects;
 
 	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
 		SceneObjectPtr sceneObject = *i;
 
 		if( sceneObject->get<Identifier>()->name() == name ) {
-			objects.push_back( sceneObject );
+			objects.insert( sceneObject );
 		}
 	}
 
