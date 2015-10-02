@@ -106,6 +106,9 @@ namespace net {
 	//! Connection list type.
 	typedef List<ConnectionPtr> ConnectionList;
 
+	//! Connection weak array type.
+	typedef Array<ConnectionWPtr> ConnectionWeakArray;
+
     //! A helper class to represent a network address.
     class NetworkAddress {
     public:
