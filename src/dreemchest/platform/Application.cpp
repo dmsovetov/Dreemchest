@@ -64,15 +64,11 @@ Application* Application::sharedInstance( void )
 // ** Application::create
 Application* Application::create( const Arguments& args )
 {
-#if defined( DC_PLATFORM )
     if( IApplication* impl = createApplication() ) {
         return DC_NEW Application( args, impl );
     }
 
     return NULL;
-#endif
-
-    return DC_NEW Application( args, NULL );
 }
 
 // ** Application::quit

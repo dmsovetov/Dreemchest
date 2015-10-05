@@ -64,15 +64,11 @@ Input* Input::sharedInstance( void )
 // ** Input::create
 Input* Input::create( void )
 {
-#if defined( DC_PLATFORM )
     if( IInput* impl = createInput() ) {
         return DC_NEW Input( impl );
     }
 
     return NULL;
-#endif
-
-    return DC_NEW Input( NULL );
 }
 
 // ** Input::keyDown

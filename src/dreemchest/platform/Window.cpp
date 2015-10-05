@@ -51,13 +51,11 @@ Window::~Window( void )
 // ** Window::create
 Window* Window::create( u32 width, u32 height )
 {
-#if defined( DC_PLATFORM )
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
     }
 
     return NULL;
-#endif
 
     return DC_NEW Window( NULL );
 }
