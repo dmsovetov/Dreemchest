@@ -51,8 +51,8 @@
 
     #include	<gl/gl.h>
     #include	<gl/glu.h>
-    #include	<gl/glext.h>
-    #include	<gl/wglext.h>
+	#include	"Windows/glext.h"
+	#include	"Windows/wglext.h"
 #endif
 
 #if defined( DC_PLATFORM_ANDROID )
