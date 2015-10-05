@@ -54,6 +54,9 @@ namespace Ecs {
 	//! Container type to store the set of entities.
 	typedef Set<EntityPtr> EntitySet;
 
+	//! Container type to store the list of entities.
+	typedef List<EntityPtr> EntityList;
+
 	//! Event emitter type alias.
 	typedef event::EventEmitter EventEmitter;
 
