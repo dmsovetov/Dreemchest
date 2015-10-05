@@ -1,3 +1,8 @@
+# Setup variables
+if (WIN32)
+	set(DC_PLATFORM "Windows")
+endif (WIN32)
+
 # Glob all source files
 file(GLOB_RECURSE BASE_SRCS "Base/*.cpp" "Base/*.h")
 file(GLOB_RECURSE ECS_SRCS "Ecs/*.cpp" "Ecs/*.h")
@@ -16,14 +21,25 @@ if (WIN32)
 endif(WIN32)
 
 # Platform module sources
-file(GLOB PLATFORM_SRCS "Platform/*.cpp" "Platform/*.h")
+file(GLOB PLATFORM_SRCS "Platform/*.cpp" "Platform/*.h" "Platform/${DC_PLATFORM}/*.cpp" "Platform/${DC_PLATFORM}/*.cpp")
 
-if (WIN32)
-	file(GLOB PLAT_PLATFORM_SRC "Platform/Windows/*.cpp" "Platform/Windows/*.h" )
-	add_definitions(-DDC_PLATFORM_WINDOWS)	
-endif (WIN32)
-
-file(GLOB 		  RENDERER_SRCS "Renderer/*.cpp" "Renderer/*.h")
+# Renderer module sources
+file(GLOB RENDERER_SRCS
+	"Renderer/*.cpp"
+	"Renderer/*.h"
+)
+	
+if (DC_OPENGL_ENABLED)
+	find_package(OpenGL REQUIRED)
+	file(GLOB OPENGL_SRCS
+		"Renderer/OpenGL/*.cpp"
+		"Renderer/OpenGL/*.h"
+		"Renderer/OpenGL/${DC_PLATFORM}/*.cpp"
+		"Renderer/OpenGL/${DC_PLATFORM}/*.h"
+	)
+	set(RENDERER_SRCS ${RENDERER_SRCS} ${OPENGL_SRCS})
+	add_definitions(-DDC_OPENGL_ENABLED)
+endif (DC_OPENGL_ENABLED)
 
 # Add definitions
 add_definitions(-DDC_BUILD_LIBRARY)
@@ -43,3 +59,7 @@ endif (DC_BOX2D_ENABLED)
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)
 endif (WIN32)
+
+if (DC_OPENGL_ENABLED)
+	target_link_libraries(Dreemchest ${OPENGL_gl_LIBRARY})
+endif (DC_OPENGL_ENABLED)
