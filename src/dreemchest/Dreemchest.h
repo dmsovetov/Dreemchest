@@ -50,7 +50,6 @@
 #include "Base/Base.h"
 
 #ifndef DC_BUILD_LIBRARY
-	#include <Base/Base.h>
 	#include <Network/Network.h>
 	#include <Io/Io.h>
 	#include <Event/Event.h>
