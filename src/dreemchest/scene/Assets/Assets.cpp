@@ -31,8 +31,6 @@
 #include "Mesh.h"
 #include "Loaders.h"
 
-#include <json/json.h>
-
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -194,6 +192,7 @@ AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
 // ** AssetBundle::loadFromJson
 bool AssetBundle::loadFromJson( const String& json )
 {
+#ifdef DC_JSON_ENABLED
 	Json::Value root;
 	Json::Reader reader;
 
@@ -231,6 +230,10 @@ bool AssetBundle::loadFromJson( const String& json )
 	}
 
 	return true;
+#else
+	log::warn( "AssetBundle::loadFromJson : built with no JSON support.\n" );
+	return false;
+#endif
 }
 
 // ** AssetBundle::addImage
