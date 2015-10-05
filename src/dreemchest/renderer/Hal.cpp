@@ -33,9 +33,9 @@
     #include <threads/Thread.h>
 #endif
 
-#ifdef DC_RENDERER_OPENGL
+#ifdef DC_OPENGL_ENABLED
 	#include "OpenGL/OpenGLHal.h"
-#endif
+#endif	/*	DC_OPENGL_ENABLED	*/
 
 #undef min
 #undef max
@@ -46,10 +46,10 @@ namespace Renderer {
 
 IMPLEMENT_LOGGER( log )
 
-#ifdef DC_RENDERER_OPENGL
+#ifdef DC_OPENGL_ENABLED
 	//! Platform-specific OpenGL view constructor.
 	extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
-#endif
+#endif	/*	DC_OPENGL_ENABLED	*/
 
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
@@ -83,7 +83,7 @@ Hal* Hal::create( RenderingHal renderer, RenderView* view )
 {
     switch( renderer ) {
 	case OpenGL:	
-					#ifdef DC_RENDERER_OPENGL
+					#ifdef DC_OPENGL_ENABLED
 						return DC_NEW OpenGLHal( view );
 					#else
 						log::error( "Hal::create : OpenGL renderer is not implemented\n" );
@@ -100,7 +100,7 @@ Hal* Hal::create( RenderingHal renderer, RenderView* view )
 // ** Hal::createOpenGLView
 RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 {
-#if defined( DC_RENDERER_OPENGL )
+#if defined( DC_OPENGL_ENABLED )
     return Renderer::createOpenGLView( window, depthStencil );
 #else
     log::error( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
