@@ -47,14 +47,17 @@ DC_BEGIN_DREEMCHEST
 		//! Returns GUID bytes.
 		const u8*	bytes( void ) const;
 
-		//! Compares two Entity identifiers.
+		//! Compares two GUIDs.
 		bool		operator < ( const Guid& other ) const ;
 
-		//! Compares two Entity identifiers.
+		//! Compares two GUIDs.
 		bool		operator == ( const Guid& other ) const;
 
-		//! Compares two Entity identifiers.
+		//! Compares two GUIDs.
 		bool		operator != ( const Guid& other ) const;
+
+		//! Generates the random GUID
+		static Guid	generate( void );
 
 	private:
 
@@ -89,6 +92,18 @@ DC_BEGIN_DREEMCHEST
 		DC_BREAK_IF( result.length() != 24 );
 
 		return result;
+	}
+
+	// ** Guid::generate
+	inline Guid Guid::generate( void )
+	{
+		u8 bytes[Size];
+
+		for( u8 i = 0; i < Size; i++ ) {
+			bytes[i] = rand() % 255;
+		}
+
+		return bytes;
 	}
 
 	// ** Guid::bytes
