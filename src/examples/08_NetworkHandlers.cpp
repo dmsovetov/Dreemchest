@@ -85,7 +85,7 @@ class NetworkHandlers : public ApplicationDelegate {
 		client->subscribe<ExtraEvent>( dcThisMethod( NetworkHandlers::handleExtraEvent ) );
 
 		while( true ) {
-			client->update();
+			client->update( 16 );
 		}
 	#else
 		ClientHandlerPtr client = connectToServer( application, 20000 );
@@ -121,7 +121,7 @@ class NetworkHandlers : public ApplicationDelegate {
 		int counter = 1;
 
 		while( true ) {
-			server->update();
+			server->update( 16 );
 			thread::Thread::sleep( 1 );
 
 			if( (++counter % 500) == 0 ) {
