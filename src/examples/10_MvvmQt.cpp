@@ -42,8 +42,21 @@ int main( int argc, char** argv )
 	label.setObjectName("label");
 	label.setText( "Hello" );
 
+	QLineEdit line( &dialog );
+	line.setObjectName( "line" );
+	line.setText( "Hello" );
+
 	mvvm::BoolProperty visibility;
-	new mvvm::QtVisibilityBinding( &qview, "label", visibility );
+	mvvm::BoolProperty enabled;
+	mvvm::StringProperty txt;
+	qview.bind<mvvm::QtVisibilityBinding>( "label", visibility );
+	qview.bind<mvvm::QtEnabledBinding>( "line", enabled );
+	qview.bind<mvvm::QtLineEditBinding>( "line", txt );
+
+	enabled.set( false );
+	txt.set( "hello world 123" );
+	
+//	new mvvm::QtVisibilityBinding( &qview, "label", visibility );
 
 	dialog.resize( 640, 480 );
 	dialog.show();

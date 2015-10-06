@@ -56,12 +56,14 @@ namespace mvvm {
         template<typename T, TemplateFunctionTypes3> T* attachHandler( TemplateFunctionArgs3 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2 );          }
         template<typename T, TemplateFunctionTypes4> T* attachHandler( TemplateFunctionArgs4 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2, arg3 );    }
 
+        //! Adds a new binding to view.
+        void                                            addBinding( Binding* instance );
+
+	#ifndef DC_CPP11_DISABLED
         //! Binds the property with a target.
-        template<typename T>                         void bind( void )                  { addBinding( new T( this ) );                           }
-        template<typename T, TemplateFunctionTypes1> void bind( TemplateFunctionArgs1 ) { addBinding( new T( this, arg0 ) );                     }
-        template<typename T, TemplateFunctionTypes2> void bind( TemplateFunctionArgs2 ) { addBinding( new T( this, arg0, arg1 ) );               }
-        template<typename T, TemplateFunctionTypes3> void bind( TemplateFunctionArgs3 ) { addBinding( new T( this, arg0, arg1, arg2 ) );         }
-        template<typename T, TemplateFunctionTypes4> void bind( TemplateFunctionArgs4 ) { addBinding( new T( this, arg0, arg1, arg2, arg3 ) );   }
+        template<typename TBinding, typename ... Args> 
+		void											bind( const Args& ... args );
+	#endif
 
         //! Notifies action handler about an event.
         void                                            notify( const String& event );
@@ -69,11 +71,6 @@ namespace mvvm {
         //! Clears the view data providers & handlers.
         void                                            clear( void );
 
-    private:
-
-        //! Adds a new binding to view.
-        void                                            addBinding( Binding* instance );
-        
     private:
 
         //! Actions handlers composite type.
@@ -86,6 +83,15 @@ namespace mvvm {
         ActionHandlers	                                m_actionHandlers;   //!< Action handlers composition.
 		BindingsList				                    m_bindings;			//!< Active bindings.
     };
+
+#ifndef DC_CPP11_DISABLED
+	// ** View::bind
+	template<typename TBinding, typename ... Args>
+	void View::bind( const Args& ... args )
+	{
+		addBinding( DC_NEW TBinding( this, args... ) );
+	}
+#endif
 
 } // namespace mvvm
     

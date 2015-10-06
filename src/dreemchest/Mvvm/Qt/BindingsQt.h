@@ -80,14 +80,14 @@ namespace mvvm {
         //! Handles property change.
         void                    handlePropertyChanged( const String& value );
     };
-
+*/
     //! Binds a line edit to a string.
-    class MyGUILineEditBinding : public MyGUIPropertyBinding<MyGUI::EditBox, String> {
+    class QtLineEditBinding : public QtPropertyBinding<QLineEdit, String> {
     public:
 
-                                //! Constructs MyGUILineEditBinding instance.
-                                MyGUILineEditBinding( View* view, const String& name, const GenericProperty<String>& property );
-        virtual                 ~MyGUILineEditBinding( void );
+                                //! Constructs QtLineEditBinding instance.
+                                QtLineEditBinding( View* view, const String& name, const GenericProperty<String>& property );
+        virtual                 ~QtLineEditBinding( void );
 
     private:
 
@@ -95,9 +95,9 @@ namespace mvvm {
         void                    handlePropertyChanged( const String& value );
 
         //! Handles line edit changed event.
-        void                    handleTextChanged( MyGUI::Widget* sender );
+        void                    handleTextChanged( QLineEdit* sender );
     };
-
+/*
 	//! Binds the button click event.
 	class MyGUIButtonBinding : public Binding  {
 	public:
@@ -131,13 +131,13 @@ namespace mvvm {
 
         bool                    m_isInversed;   //!< Will the binding inverse a property before the visibility change.
     };
-/*
+
     //! Binds a widget enabled/disabled flag to a property.
-    class MyGUIEnabledBinding : public MyGUIPropertyBinding<MyGUI::Widget, bool> {
+    class QtEnabledBinding : public QtPropertyBinding<QWidget, bool> {
     public:
 
-                                //! Constructs MyGUIEnabledBinding instance.
-                                MyGUIEnabledBinding( View* view, const std::string& name, const GenericProperty<bool>& property, bool inversed = false );
+                                //! Constructs QtEnabledBinding instance.
+                                QtEnabledBinding( View* view, const String& name, const GenericProperty<bool>& property, bool inversed = false );
 
         //! Handles property change.
         void                    handlePropertyChanged( const bool& value );
@@ -146,7 +146,7 @@ namespace mvvm {
 
         bool                    m_isInversed;   //!< Will the binding inverse a property before the enabled/disabled change.
     };
-	*/
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST

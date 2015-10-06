@@ -45,23 +45,23 @@ void QtVisibilityBinding::handlePropertyChanged( const Value& value )
 {
     m_widget->setVisible( m_isInversed ? !value : value );
 }
-/*
-// ----------------------------------------- MyGUIEnabledBinding ---------------------------------------- //
 
-// ** MyGUIEnabledBinding::MyGUIEnabledBinding
-MyGUIEnabledBinding::MyGUIEnabledBinding( View* view, const String& name, const Property& property, bool inversed )
-    : MyGUIPropertyBinding( view, name, property ), m_isInversed( inversed )
+// ----------------------------------------- QtEnabledBinding ---------------------------------------- //
+
+// ** QtEnabledBinding::QtEnabledBinding
+QtEnabledBinding::QtEnabledBinding( View* view, const String& name, const Property& property, bool inversed )
+    : QtPropertyBinding( view, name, property ), m_isInversed( inversed )
 {
 
 }
 
-// ** MyGUIEnabledBinding::handlePropertyChanged
-void MyGUIEnabledBinding::handlePropertyChanged( const Value& value )
+// ** QtEnabledBinding::handlePropertyChanged
+void QtEnabledBinding::handlePropertyChanged( const Value& value )
 {
     m_widget->setEnabled( m_isInversed ? !value : value );
 }
 
-
+/*
 // ---------------------------------------- MyGUIEditViewBinding ---------------------------------------- //
 
 // ** MyGUIEditViewBinding::MyGUIEditViewBinding
@@ -99,35 +99,35 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
         m_widget->setCaption( value );
     }
 }
+*/
+// ----------------------------------------- QtLineEditBinding ----------------------------------------- //
 
-// ----------------------------------------- MyGUILineEditBinding ----------------------------------------- //
-
-// ** MyGUILineEditBinding::MyGUILineEditBinding
-MyGUILineEditBinding::MyGUILineEditBinding( View* view, const String& name, const Property& property )
-    : MyGUIPropertyBinding( view, name, property )
+// ** QtLineEditBinding::QtLineEditBinding
+QtLineEditBinding::QtLineEditBinding( View* view, const String& name, const Property& property )
+    : QtPropertyBinding( view, name, property )
 {
-    m_widget->eventEditTextChange += MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
+//    m_widget->eventEditTextChange += MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
 }
 
-MyGUILineEditBinding::~MyGUILineEditBinding( void )
+QtLineEditBinding::~QtLineEditBinding( void )
 {
-    m_widget->eventEditTextChange -= MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
+ //   m_widget->eventEditTextChange -= MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
 }
 
-// ** MyGUILineEditBinding::handlePropertyChanged
-void MyGUILineEditBinding::handlePropertyChanged( const Value& value )
+// ** QtLineEditBinding::handlePropertyChanged
+void QtLineEditBinding::handlePropertyChanged( const Value& value )
 {
-    if( value != m_widget->getCaption().asUTF8() ) {
-        m_widget->setCaption( value );
+    if( value.c_str() != m_widget->text() ) {
+        m_widget->setText( value.c_str() );
     }
 }
 
-// ** MyGUILineEditBinding::handleTextChanged
-void MyGUILineEditBinding::handleTextChanged( MyGUI::Widget* sender )
+// ** QtLineEditBinding::handleTextChanged
+void QtLineEditBinding::handleTextChanged( QLineEdit* sender )
 {
-    m_property.set( m_widget->getCaption() );
+//    m_property.set( m_widget->getCaption() );
 }
-
+/*
 // ------------------------------------------ MyGUIButtonBinding ------------------------------------------ //
 
 // ** MyGUIButtonBinding::MyGUIButtonBinding
