@@ -1,7 +1,5 @@
-# Setup variables
-if (WIN32)
-	set(DC_PLATFORM "Windows")
-endif (WIN32)
+# Setup definitions
+add_definitions(-DDC_BUILD_LIBRARY)
 
 # Glob all source files
 file(GLOB_RECURSE BASE_SRCS "Base/*.cpp" "Base/*.h")

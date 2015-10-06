@@ -57,18 +57,9 @@
 	#include <Ecs/Ecs.h>
 	#include <Platform/Platform.h>
 	#include <Threads/Threads.h>
-
-	#ifdef DC_SCENE_ENABLED
-		#include <Scene/Scene.h>
-	#endif
-
-	#ifdef DC_RENDERER
-		#include "renderer/Renderer.h"
-	#endif
-
-	#ifdef DC_SOUND
-		#include "sound/Sound.h"
-	#endif
+	#include <Scene/Scene.h>
+	#include <Renderer/Renderer.h>
+	#include <Sound/Sound.h>
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */
