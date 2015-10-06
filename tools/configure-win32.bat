@@ -1,2 +1,12 @@
-python -m Pygling configure --output ../projects/ --source ../src --name dreemchest --platform Windows --threads=Windows --renderer=OpenGL
+@echo off
+
+set PROJECTS=..\Projects
+
+if exist %PROJECTS%\Windows (
+	rmdir /s /q %PROJECTS%\Windows
+)
+
+mkdir %PROJECTS%\Windows
+cd %PROJECTS%\Windows
+cmake ..\..\src -G "Visual Studio 12" -DDC_BUILD_TESTS=OFF
 pause
