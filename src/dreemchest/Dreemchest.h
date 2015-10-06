@@ -60,6 +60,7 @@
 	#include <Scene/Scene.h>
 	#include <Renderer/Renderer.h>
 	#include <Sound/Sound.h>
+	#include <Mvvm/Mvvm.h>
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */

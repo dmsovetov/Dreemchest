@@ -21,3 +21,6 @@ target_link_libraries(07_TCPSockets Dreemchest)
 
 add_executable(08_NetworkHandlers 08_NetworkHandlers.cpp)
 target_link_libraries(08_NetworkHandlers Dreemchest)
+
+add_executable(09_ModelViewViewModel 09_ModelViewViewModel.cpp)
+target_link_libraries(09_ModelViewViewModel Dreemchest)
