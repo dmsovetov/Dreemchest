@@ -2,52 +2,39 @@
 add_definitions(-DDC_BUILD_LIBRARY)
 
 # Glob all source files
-file(GLOB_RECURSE BASE_SRCS "Base/*.cpp" "Base/*.h")
-file(GLOB_RECURSE ECS_SRCS "Ecs/*.cpp" "Ecs/*.h")
-file(GLOB_RECURSE NETWORK_SRCS "Network/*.cpp" "Network/*.h")
-file(GLOB_RECURSE SCENE_SRCS "Scene/*.cpp" "Scene/*.h")
+add_directories(Base BASE_SRCS)
+add_directories(Ecs ECS_SRCS)
+add_directories(Scene SCENE_SRCS)
+add_directories(Network NETWORK_SRCS)
 
-# I/O module sources
-file(GLOB IO_SRCS "Io/*.cpp" "Io/*.h" "Io/serialization/*.cpp" "Io/serialization/*.h" "Io/streams/*.cpp" "Io/streams/*.h")
+add_files(Io IO_SRCS)
+add_files(Io/Serialization IO_SERIALIZATION_SRCS)
+add_files(Io/Streams IO_STREAMS_SRCS)
 
 # Threads module sources
-file(GLOB THREADS_SRCS "Threads/*.cpp" "Threads/*.h")
-
-if (WIN32)
-	file(GLOB PLAT_THREADS_SRC "Threads/Windows/*.cpp" "Threads/Windows/*.h" )
-	add_definitions(-DDC_THREADS_WINDOWS)
-endif(WIN32)
+if (DC_THREADS)
+	add_files(Threads THREADS_SRCS)
+	add_files(Threads/Task THREADS_TASK_SRCS)
+	add_files(Threads/${DC_THREADS} THREADS_PLATFORM_SRCS)
+endif(DC_THREADS)
 
 # Platform module sources
-file(GLOB PLATFORM_SRCS "Platform/*.cpp" "Platform/*.h" "Platform/${DC_PLATFORM}/*.cpp" "Platform/${DC_PLATFORM}/*.cpp")
+add_files(Platform PLATFORM_SRCS)
+add_files(Platform/${DC_PLATFORM} PLATFORM_IMPL_SRCS)
 
 # Renderer module sources
-file(GLOB RENDERER_SRCS
-	"Renderer/*.cpp"
-	"Renderer/*.h"
-)
-	
+add_files(Renderer RENDERER_SRCS)
+
 if (DC_OPENGL_ENABLED)
 	find_package(OpenGL REQUIRED)
-	file(GLOB OPENGL_SRCS
-		"Renderer/OpenGL/*.cpp"
-		"Renderer/OpenGL/*.h"
-		"Renderer/OpenGL/${DC_PLATFORM}/*.cpp"
-		"Renderer/OpenGL/${DC_PLATFORM}/*.h"
-	)
-	set(RENDERER_SRCS ${RENDERER_SRCS} ${OPENGL_SRCS})
+	add_files(Renderer/OpenGL OPENGL_SRCS)
+	add_files(Renderer/OpenGL/${DC_PLATFORM} OPENGL_PLATFORM_SRCS)
+	set(RENDERER_SRCS ${RENDERER_SRCS} ${OPENGL_SRCS} ${OPENGL_PLATFORM_SRCS})
 	add_definitions(-DDC_OPENGL_ENABLED)
 endif (DC_OPENGL_ENABLED)
 
-# Add definitions
-add_definitions(-DDC_BUILD_LIBRARY)
-
-if (WIN32)
-	add_definitions(-DDC_PLATFORM_WINDOWS)
-endif (WIN32)
-
 # Add the Dreemchest static library
-add_library(Dreemchest STATIC ${BASE_SRCS} ${ECS_SRCS} ${IO_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${PLAT_THREADS_SRC} ${PLAT_PLATFORM_SRC} ${PLATFORM_SRCS} ${RENDERER_SRCS})
+add_library(Dreemchest STATIC ${BASE_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS})
 
 # Link 3rd-party libraries
 if (DC_BOX2D_ENABLED)
