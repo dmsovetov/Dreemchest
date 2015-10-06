@@ -13,6 +13,12 @@ add_files(Io IO_SRCS)
 add_files(Io/Serialization IO_SERIALIZATION_SRCS)
 add_files(Io/Streams IO_STREAMS_SRCS)
 
+if (DC_QT_ENABLED)
+	add_files(Mvvm/Qt MVVM_QT_SRCS)
+	set(MVVM_SRCS ${MVVM_SRCS} ${MVVM_QT_SRCS})
+	find_package(Qt4 REQUIRED QtGui)
+endif (DC_QT_ENABLED)
+
 # Threads module sources
 if (DC_THREADS)
 	add_files(Threads THREADS_SRCS)
@@ -50,3 +56,7 @@ endif (WIN32)
 if (DC_OPENGL_ENABLED)
 	target_link_libraries(Dreemchest ${OPENGL_gl_LIBRARY})
 endif (DC_OPENGL_ENABLED)
+
+if (DC_QT_ENABLED)
+	target_link_libraries(Dreemchest Qt4::QtGui)
+endif (DC_QT_ENABLED)

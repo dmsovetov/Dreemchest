@@ -1,5 +1,5 @@
 # Set the minimum CMake version
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.2)
 
 # Include CMake globals
 include(../CMake/Globals.txt)
@@ -12,9 +12,15 @@ option(DC_BUILD_EXAMPLES "Build Dreemchest examples" ON)
 option(DC_BUILD_TESTS "Build Dreemchest tests" ON)
 option(DC_OPENGL_ENABLED "Build with OpenGL support" ON)
 option(DC_BOX2D_ENABLED "Build with Box2D support" OFF)
+option(DC_QT_ENABLED "Build with Qt support" OFF)
 
 # Add include directory
 include_directories(Dreemchest)
+
+# Setup definitions
+if (DC_QT_ENABLED)
+	add_definitions(-DDC_QT_ENABLED)
+endif (DC_QT_ENABLED)
 
 # Setup variables
 if (WIN32)

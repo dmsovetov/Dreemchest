@@ -35,6 +35,18 @@
 //       if you don't want to wrap engine code into a namespace).
 DC_USE_DREEMCHEST
 
+// Declare the string property binding
+class StringPropertyBinding : public mvvm::GenericBinding<String> {
+public:
+
+	StringPropertyBinding( const mvvm::StringProperty& property ) : GenericBinding( NULL, property ) {
+	}
+
+	virtual void handlePropertyChanged( const String& value ) {
+		printf( "Value changed: %s\n", value.c_str() );
+	}
+};
+
 
 // Now the application delegate class is declared. Application delegate class
 // should be inherited from platform::ApplicationDelegate class.
@@ -44,16 +56,9 @@ class ModelViewViewModel : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Platform::Application* application ) {
-        
-        // The log callback can be overridden by custom function (for example to write logs to file),
-        // but now we just set a standard log handler, to print all messages to console.
-        Platform::log::setStandardHandler();
-
-        // Just write a message to a console.
-        Platform::log::verbose( "HelloWorld application launched!\n" );
-
-        // Now the hello world application is ready to quit - just do it! :)
-        application->quit();
+		mvvm::StringProperty* str = new mvvm::StringProperty;
+		new StringPropertyBinding( *str );
+		str->set("lol");
     }
 };
 
