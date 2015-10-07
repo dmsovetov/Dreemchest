@@ -24,53 +24,42 @@
 
  **************************************************************************/
 
-#ifndef __DC_Mvvm_H__
-#define __DC_Mvvm_H__
+// Include the engine header file.
+#include <Dreemchest.h>
 
-#include "../Dreemchest.h"
+// Include Qt libraries
+#include <QtGui>
 
-DC_BEGIN_DREEMCHEST
+int main( int argc, char** argv )
+{
+	QApplication app( argc, argv );
 
-namespace mvvm {
+	QDialog dialog;
 
-    template<typename T> class GenericProperty;
-    template<typename T> class GenericArrayProperty;
+	mvvm::QtView qview( &dialog );
 
-    class View;
-    class Binding;
-    class Property;
-    class ActionHandler;
-    class Data;
+	QLabel label( &dialog );
+	label.setObjectName("label");
+	label.setText( "Hello" );
 
-    typedef StrongPtr<Binding> BindingPtr;
+	QLineEdit line( &dialog );
+	line.setObjectName( "line" );
+	line.setText( "Hello" );
 
-    typedef GenericProperty<bool>           BoolProperty;
-    typedef GenericProperty<s32>            IntProperty;
-    typedef GenericProperty<f32>			FloatProperty;
-    typedef GenericProperty<String>         StringProperty;
-    typedef GenericArrayProperty<String>    StringArrayProperty;
-    typedef List<BindingPtr>                BindingsList;
+	mvvm::BoolProperty visibility;
+	mvvm::BoolProperty enabled;
+	mvvm::StringProperty txt;
+	qview.bind<mvvm::QtVisibilityBinding>( "label", visibility );
+	qview.bind<mvvm::QtEnabledBinding>( "line", enabled );
+	qview.bind<mvvm::QtLineEditBinding>( "line", txt );
 
-} // namespace mvvm
+	enabled.set( false );
+	txt.set( "hello world 123" );
+	
+//	new mvvm::QtVisibilityBinding( &qview, "label", visibility );
 
-DC_END_DREEMCHEST
-
-#ifndef DC_BUILD_LIBRARY
-    #include "View.h"
-    #include "Data.h"
-    #include "ActionHandler.h"
-    #include "Property.h"
-    #include "Validation.h"
-
-    #ifdef DC_MVVM_MYGUI_ENABLED
-        #include "MyGUI/MyGUIView.h"
-        #include "MyGUI/BindingsMyGUI.h"
-    #endif
-
-	#ifdef DC_QT_ENABLED
-		#include "Qt/QtView.h"
-		#include "Qt/BindingsQt.h"
-	#endif
-#endif
-
-#endif  /*  !__DC_Mvvm_H__   */
+	dialog.resize( 640, 480 );
+	dialog.show();
+	
+	return app.exec();
+}
