@@ -32,7 +32,11 @@
 #include "../Binding.h"
 #include "../View.h"
 
-#include <QtGui>
+#if defined( DC_QT4_ENABLED )
+	#include <QtGui>
+#elif defined( DC_QT5_ENABLED )
+	#include <QtWidgets>
+#endif
 
 DC_BEGIN_DREEMCHEST
 
