@@ -25,10 +25,42 @@
  **************************************************************************/
 
 #include "QtView.h"
+#include "BindingsQt.h"
+#include "../Validation.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
+
+// ** QtView::QtView
+QtView::QtView( QWidget* widget ) : m_widget( widget )
+{
+
+}
+
+// ** QtView::widget
+QWidget* QtView::widget( void )
+{
+	return m_widget;
+}
+
+// ** QtView::bind
+void QtView::bind( const String& target, StringProperty& property )
+{
+	View::bind<QtLineEditBinding>( target, property );
+}
+
+// ** QtView::bind
+void QtView::bindEnabled( const String& target, BoolProperty& property )
+{
+	View::bind<QtEnabledBinding>( target, property );
+}
+
+// ** QtView::bind
+void QtView::validateSize( const StringProperty& target, BoolProperty& property, s32 min, s32 max )
+{
+	View::bind< SizeValidator<String> >( target, &property, min, max );
+}
 
 } // namespace mvvm
 

@@ -38,11 +38,19 @@ namespace mvvm {
 	public:
 
 					//! Constructs QtView instance.
-					QtView( QWidget* widget )
-						: m_widget( widget ) {}
+					QtView( QWidget* widget );
 
 		//! Returns parent widget.
-		QWidget*	widget( void ) { return m_widget; }
+		QWidget*	widget( void );
+
+		//! Binds the string property to a line edit.
+		void		bind( const String& target, StringProperty& property );
+
+		//! Binds enabled state to a property.
+		void		bindEnabled( const String& target, BoolProperty& property );
+
+		//! Binds the size validator to a property.
+		void		validateSize( const StringProperty& target, BoolProperty& property, s32 min, s32 max );
 
 	private:
 
