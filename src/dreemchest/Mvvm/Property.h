@@ -67,6 +67,9 @@ namespace mvvm {
 		//! Alias the strong pointer type.
 		typedef StrongPtr< GenericProperty<TValue> > Ptr;
 
+		//! Alias the weak pointer type.
+		typedef WeakPtr< GenericProperty<TValue> > WPtr;
+
 								    //! Constructs property.
 								    GenericProperty( const DataWPtr& data, const TValue& value = TValue() )
 									    : Property( data ), m_value( value ) {}

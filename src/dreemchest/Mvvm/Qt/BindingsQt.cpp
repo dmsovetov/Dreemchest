@@ -113,7 +113,7 @@ QtStackedWidgetBinding::QtStackedWidgetBinding( View* view, QStackedWidget* widg
 // ** QtStackedWidgetBinding::handlePropertyChanged
 void QtStackedWidgetBinding::handlePropertyChanged( const Value& value )
 {
-	QWidget* page = static_cast<QtView*>( m_view )->widget()->findChild<QWidget*>( value.c_str() );
+	QWidget* page = static_cast<QtView*>( m_view.get() )->widget()->findChild<QWidget*>( value.c_str() );
 	DC_BREAK_IF( page == NULL );
 
 	m_widget->setCurrentWidget( page );
@@ -156,7 +156,7 @@ void QtLineEditBinding::handlePropertyChanged( const Value& value )
 // ** QtLineEditBinding::refreshProperty
 void QtLineEditBinding::refreshProperty( void )
 {
-	m_property.set( m_widget->text().toUtf8().constData() );
+	m_property->set( m_widget->text().toUtf8().constData() );
 }
 
 // ----------------------------------------- QtLabelBinding ----------------------------------------- //

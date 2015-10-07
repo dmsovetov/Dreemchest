@@ -38,7 +38,7 @@ namespace mvvm {
 	public:
 
                                 //! Constructs Binding instance.
-                                Binding( View* view )
+                                Binding( ViewWPtr view )
                                     : m_view( view ) {}
 		virtual					~Binding( void ) {}
 
@@ -50,7 +50,7 @@ namespace mvvm {
 
     protected:
 
-        View*                   m_view; //!< Parent view controller.
+        ViewWPtr				m_view; //!< Parent view controller.
 	};
 
     //! A template class to bind a property of a specified type TProperty.
@@ -60,13 +60,13 @@ namespace mvvm {
     public:
 
         //! Alias the generic property type.
-        typedef GenericProperty<T> Property;
+        typedef WeakPtr< GenericProperty<T> > Property;
 
         //! Alias the value type.
         typedef T				Value;
 
                                 //! Constructs GenericBinding.
-                                GenericBinding( View* view, const Property& property );
+                                GenericBinding( ViewWPtr view, Property property );
         virtual                 ~GenericBinding( void );
 
     protected:
@@ -79,29 +79,29 @@ namespace mvvm {
 
     protected:
 
-        Property&               m_property; //!< Bound property.
+        Property				m_property; //!< Bound property.
     };
 
     // ** GenericBinding::GenericBinding
     template<typename T>
-    GenericBinding<T>::GenericBinding( View* view, const Property& property )
-        : Binding( view ), m_property( const_cast<Property&>( property ) )
+    GenericBinding<T>::GenericBinding( ViewWPtr view, Property property )
+        : Binding( view ), m_property( property )
     {
-        m_property.subscribe( this );
+        if( m_property.valid() ) m_property->subscribe( this );
     }
 
     // ** GenericBinding::~GenericBinding
     template<typename T>
     GenericBinding<T>::~GenericBinding( void )
     {
-        m_property.unsubscribe( this );
+        if( m_property.valid() ) m_property->unsubscribe( this );
     }
 
     // ** GenericBinding::refreshView
     template<typename T>
     void GenericBinding<T>::refreshView( void )
     {
-        handlePropertyChanged( m_property.value() );
+        handlePropertyChanged( m_property->value() );
     }
 
     // ** GenericBinding::handlePropertyChanged
@@ -117,7 +117,7 @@ namespace mvvm {
 	public:
 
 									//! Constructs GenericConverter instance.
-									GenericConverter( View* view, const GenericProperty<TInput>& input, const GenericProperty<TOutput>* output = NULL )
+									GenericConverter( ViewWPtr view, const GenericProperty<TInput>& input, const GenericProperty<TOutput>* output = NULL )
 										: GenericBinding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
 
 		//! Returns the output value.
