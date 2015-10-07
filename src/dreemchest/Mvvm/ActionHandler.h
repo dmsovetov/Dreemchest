@@ -27,26 +27,26 @@
 #ifndef __DC_Mvvm_ActionHandler_H__
 #define __DC_Mvvm_ActionHandler_H__
 
-#include "Mvvm.h"
+#include "View.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
     //! A base class for all action handlers.
-    class ActionHandler {
+    class ActionHandler : public RefCounted {
     public:
 
                                 //! Constructs ActionHandler instance.
-                                ActionHandler( View* view );
+                                ActionHandler( ViewWPtr view );
         virtual                 ~ActionHandler( void ) {}
 
         //! Handles the view event.
-        virtual void            handleEvent( const String& event );
+        virtual bool            handleEvent( const String& event );
 
     protected:
 
-        View*                   m_view;     //!< Parent UI view.
+        ViewWPtr				m_view;     //!< Parent UI view.
     };
 
 } // namespace mvvm

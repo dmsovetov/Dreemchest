@@ -76,6 +76,15 @@ namespace mvvm {
 								: QSignalDelegate( binding, widget, SIGNAL( textChanged(const QString&) ) ) {}
 	};
 
+	//! Handles the clicked signal and dispatched the event.
+	class QClickedDelegate : public QSignalDelegate {
+	public:
+
+							//! Constructs QClickedDelegate instance.
+							QClickedDelegate( BindingWPtr binding, QWidget* widget )
+								: QSignalDelegate( binding, widget, SIGNAL( clicked() ) ) {}
+	};
+
     //! A template class to bind a property to a Qt widget.
     template<typename TWidget, typename TValue, typename TSignalDelegate = QSignalDelegate>
     class QtPropertyBinding : public GenericBinding<TValue> {
@@ -147,6 +156,26 @@ namespace mvvm {
         void                    handlePropertyChanged( const String& value );
     };
 */
+	//! Binds the click event to a widget.
+	class QtPushButtonBinding : public QtPropertyBinding<QPushButton, String, QClickedDelegate> {
+    public:
+
+                                //! Constructs QtPushButtonBinding instance.
+                                QtPushButtonBinding( View* view, QPushButton* widget, const Property& property, const String& event );
+
+    private:
+
+        //! Handles property change.
+        virtual void			handlePropertyChanged( const String& value );
+
+		//! Emits the event.
+		virtual void            refreshProperty( void );
+
+	private:
+
+		String					m_event;	//!< Event dispatched on click.
+	};
+
     //! Binds a line edit to a string.
     class QtLineEditBinding : public QtPropertyBinding<QLineEdit, String, QTextChangedDelegate> {
     public:

@@ -37,11 +37,15 @@ IMPLEMENT_LOGGER( log )
 // ** View::notify
 void View::notify( const String& event )
 {
-    ActionHandlers::Parts& actionHandlers = m_actionHandlers.parts();
+	bool wasHandled = false;
 
-    for( ActionHandlers::Parts::iterator i = actionHandlers.begin(), end = actionHandlers.end(); i != end; ++i ) {
-        i->second->handleEvent( event );
+    for( ActionHandlers::iterator i = m_actionHandlers.begin(), end = m_actionHandlers.end(); i != end; ++i ) {
+        wasHandled = wasHandled || (*i)->handleEvent( event );
     }
+
+	if( !wasHandled ) {
+		log::warn( "View::notify : unhandled event '%s' emitted\n", event.c_str() );
+	}
 }
 
 // ** View::clear
@@ -59,10 +63,10 @@ void View::addBinding( Binding* instance )
     m_bindings.push_back( instance );
 }
 
-// ** View::addData
-void View::addData( const String& name, const DataPtr& data )
+// ** View::addHandler
+void View::addHandler( const ActionHandlerPtr& handler )
 {
-	m_data[name] = data;
+	m_actionHandlers.push_back( handler );
 }
 
 // ** View::findProperty
@@ -80,9 +84,9 @@ PropertyPtr View::findProperty( const String& uri )
 	String key  = uri.substr( idx + 1 );
 
 	// Find the data by name
-	DataProviders::iterator i = m_data.find( data );
+	DataProviderByName::iterator i = m_dataByName.find( data );
 
-	if( i == m_data.end() ) {
+	if( i == m_dataByName.end() ) {
 		log::error( "View::findProperty : no data with name '%s'\n", data.c_str() );
 		return PropertyPtr();
 	}

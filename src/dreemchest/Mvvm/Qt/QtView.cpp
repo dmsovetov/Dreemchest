@@ -77,7 +77,7 @@ void QtView::bindStringList( const String& target, const String& uri )
 		return;
 	}
 
-	GenericArrayProperty<String>::Ptr str = castTo<String>( property );
+	GenericProperty< Array<String> >::Ptr str = castTo< Array<String> >( property );
 
 	if( !str.valid() ) {
 		log::error( "QtView::bindStringList : failed tp cast property '%s' to a string list\n", uri.c_str() );
@@ -106,6 +106,14 @@ void QtView::bindState( const String& target, const String& uri )
 
 	QStackedWidget* widget = m_widget->findChild<QStackedWidget*>( target.c_str() );
 	addBinding( DC_NEW QtStackedWidgetBinding( this, widget, *str.get() ) );
+}
+
+// ** QtView::bindClick
+void QtView::bindClick( const String& target, const String& event )
+{
+	StringProperty dummy( NULL );
+	QPushButton* widget = m_widget->findChild<QPushButton*>( target.c_str() );
+	addBinding( DC_NEW QtPushButtonBinding( this, widget, dummy, event ) );
 }
 
 // ** QtView::bindInteger

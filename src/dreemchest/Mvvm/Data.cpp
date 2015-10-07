@@ -31,9 +31,15 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 // ** Data::Data
-Data::Data( void )
+Data::Data( const String& name ) : m_name( name )
 {
 	m_isValid = DC_NEW BoolProperty( NULL, true );
+}
+
+// ** Data::name
+const String& Data::name( void ) const
+{
+	return m_name;
 }
 
 // ** Data::validate

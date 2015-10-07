@@ -30,7 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-
 // ---------------------------------------- QtVisibilityBinding ---------------------------------------- //
 
 // ** QtVisibilityBinding::QtVisibilityBinding
@@ -59,6 +58,28 @@ QtEnabledBinding::QtEnabledBinding( View* view, QWidget* widget, const Property&
 void QtEnabledBinding::handlePropertyChanged( const Value& value )
 {
     m_widget->setEnabled( m_isInversed ? !value : value );
+}
+
+
+// ---------------------------------------- QtPushButtonBinding ---------------------------------------- //
+
+// ** QtPushButtonBinding::QtPushButtonBinding
+QtPushButtonBinding::QtPushButtonBinding( View* view, QPushButton* widget, const Property& property, const String& event )
+    : QtPropertyBinding( view, widget, property ), m_event( event )
+{
+
+}
+
+// ** QtPushButtonBinding::handlePropertyChanged
+void QtPushButtonBinding::handlePropertyChanged( const Value& value )
+{
+//    DC_BREAK
+}
+
+// ** QtPushButtonBinding::refreshProperty
+void QtPushButtonBinding::refreshProperty( void )
+{
+	m_view->notify( m_event );
 }
 
 // ---------------------------------------- QtListBoxBinding ---------------------------------------- //

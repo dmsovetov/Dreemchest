@@ -52,6 +52,9 @@ namespace mvvm {
 		//! Binds the string state to a widget.
 		void		bindState( const String& target, const String& uri );
 
+		//! Binds the click event.
+		void		bindClick( const String& target, const String& event );
+
 		//! Binds the list of strings to a widget.
 		void		bindStringList( const String& target, const String& uri );
 

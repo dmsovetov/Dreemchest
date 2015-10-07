@@ -42,9 +42,7 @@ namespace mvvm {
 	dcDeclarePtrs( Property )
 	dcDeclarePtrs( Data )
 	dcDeclarePtrs( View )
-
-    class View;
-    class ActionHandler;
+	dcDeclarePtrs( ActionHandler )
 
     typedef GenericProperty<bool>           BoolProperty;
     typedef GenericProperty<s32>            IntProperty;

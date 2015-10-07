@@ -38,7 +38,7 @@ namespace mvvm {
 	friend class Property;
     public:
 
-										Data( void );
+										Data( const String& name );
         virtual							~Data( void ) {}
 
 		//! Runs the data validation routine.
@@ -46,6 +46,9 @@ namespace mvvm {
 
 		//! Returns the property by name.
 		PropertyPtr						get( const String& name );
+
+		//! Returns the data name.
+		const String&					name( void ) const;
 
 	protected:
 
@@ -65,6 +68,7 @@ namespace mvvm {
 		//! Named property container.
 		typedef Map<String, PropertyPtr>	Properties;
 
+		String							m_name;			//!< Data name.
 		Properties						m_properties;	//!< All properties added to this data.
 		mutable BoolProperty::Ptr		m_isValid;		//!< This property is updated by the data validation routine.
     };
@@ -92,8 +96,15 @@ namespace mvvm {
 	class GenericData : public Data {
 	public:
 
-		//! Alias the data pointer type.
+		//! Alias the strong pointer type.
 		typedef StrongPtr<T> Ptr;
+
+		//! Alias the weak pointer type.
+		typedef WeakPtr<T>	WPtr;
+
+							//! Constructs GenericData instance.
+							GenericData( void )
+								: Data( TypeInfo<T>::name() ) {}
 
 		//! Createa the RemoteHost data instance.
 		template<typename ... Args>

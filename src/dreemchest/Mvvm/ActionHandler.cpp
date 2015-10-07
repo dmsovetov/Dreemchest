@@ -31,13 +31,14 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 // ** ActionHandler::ActionHandler
-ActionHandler::ActionHandler( View* view ) : m_view( view )
+ActionHandler::ActionHandler( ViewWPtr view ) : m_view( view )
 {
 }
 
 // ** ActionHandler::handleEvent
-void ActionHandler::handleEvent( const String& event )
+bool ActionHandler::handleEvent( const String& event )
 {
+	return false;
 }
 
 } // namespace mvvm

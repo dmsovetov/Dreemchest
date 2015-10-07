@@ -38,15 +38,22 @@ namespace mvvm {
     class View : public RefCounted {
     public:
 
-        //! Attaches the action handler to a view controller.
-        template<typename T>                         T* attachHandler( void )                  { return m_actionHandlers.attach<T>( this );                            }
-        template<typename T, TemplateFunctionTypes1> T* attachHandler( TemplateFunctionArgs1 ) { return m_actionHandlers.attach<T>( this, arg0 );                      }
-        template<typename T, TemplateFunctionTypes2> T* attachHandler( TemplateFunctionArgs2 ) { return m_actionHandlers.attach<T>( this, arg0, arg1 );                }
-        template<typename T, TemplateFunctionTypes3> T* attachHandler( TemplateFunctionArgs3 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2 );          }
-        template<typename T, TemplateFunctionTypes4> T* attachHandler( TemplateFunctionArgs4 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2, arg3 );    }
+		//! Adds a new event handler to this view.
+		void											addHandler( const ActionHandlerPtr& handler );
+
+	#ifndef DC_CPP11_DISABLED
+		//! A generic method to add a new event handler to this view.
+		template<typename TActionHandler, typename ... Args>
+		void											addHandler( const Args& ... args );
+	#endif	/*	!DC_CPP11_DISABLED	*/
 
 		//! Adds a new data provider to this view.
-		void											addData( const String& name, const DataPtr& data );
+		template<typename TData>
+		void											addData( const typename TData::Ptr& data );
+
+		//! Returns the data by type.
+		template<typename TData>
+		typename TData::WPtr							data( void ) const;
 
         //! Adds a new binding to view.
         void                                            addBinding( Binding* instance );
@@ -64,16 +71,47 @@ namespace mvvm {
 
     private:
 
-        //! Actions handlers composite type.
-        typedef Composition<ActionHandler>              ActionHandlers;
-
         //! Data providers container.
-		typedef Map<String, DataPtr>					DataProviders;
+		typedef Map<TypeIdx, DataPtr>					DataProviders;
+
+		//! Name to data provider mapping.
+		typedef Map<String, DataPtr>					DataProviderByName;
+
+		//! An array of action handlers.
+		typedef List<ActionHandlerPtr>					ActionHandlers;
 
 		DataProviders			                        m_data;             //!< Data providers.
-        ActionHandlers	                                m_actionHandlers;   //!< Action handlers composition.
+		DataProviderByName								m_dataByName;		//!< Data providers by name.
+        ActionHandlers	                                m_actionHandlers;   //!< Action handlers.
 		BindingsList				                    m_bindings;			//!< Active bindings.
     };
+
+	// ** View::addData
+	template<typename TData>
+	void View::addData( const typename TData::Ptr& data )
+	{
+		TypeIdx idx = GroupedTypeIndex<TData, Data>::idx();
+		m_data[idx] = data;
+		m_dataByName[data->name()] = data;
+	}
+
+	// ** View::data
+	template<typename TData>
+	typename TData::WPtr View::data( void ) const
+	{
+		TypeIdx idx = GroupedTypeIndex<TData, Data>::idx();
+		DataProviders::const_iterator i = m_data.find( idx );
+		return i != m_data.end() ? typename TData::WPtr( static_cast<TData*>( i->second.get() ) ) : typename TData::WPtr();
+	}
+
+#ifndef DC_CPP11_DISABLED
+	// ** View::addHandler
+	template<typename TActionHandler, typename ... Args>
+	void View::addHandler( const Args& ... args )
+	{
+		addHandler( DC_NEW TActionHandler( this, args... ) );
+	}
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 } // namespace mvvm
     
