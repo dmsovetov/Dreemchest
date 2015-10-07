@@ -42,8 +42,11 @@ namespace mvvm {
                                     : m_view( view ) {}
 		virtual					~Binding( void ) {}
 
-        //! Refreshes the bound data.
-        virtual void            refresh( void ) {}
+        //! Refreshes the bound view.
+        virtual void            refreshView( void ) {}
+
+        //! Refreshes the bound property.
+        virtual void            refreshProperty( void ) {}
 
     protected:
 
@@ -69,7 +72,7 @@ namespace mvvm {
     protected:
 
         //! Refreshes the bound data.
-        virtual void            refresh( void ) { handlePropertyChanged( m_property.value() ); }
+        virtual void            refreshView( void );
 
         //! Handles property change.
         virtual void            handlePropertyChanged( const Value& value );
@@ -92,6 +95,13 @@ namespace mvvm {
     GenericBinding<T>::~GenericBinding( void )
     {
         m_property.unsubscribe( this );
+    }
+
+    // ** GenericBinding::refreshView
+    template<typename T>
+    void GenericBinding<T>::refreshView( void )
+    {
+        handlePropertyChanged( m_property.value() );
     }
 
     // ** GenericBinding::handlePropertyChanged
