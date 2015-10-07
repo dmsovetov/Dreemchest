@@ -48,4 +48,9 @@ namespace mvvm {
 
 DC_END_DREEMCHEST
 
+#ifndef DC_BUILD_LIBRARY
+	#include "Qt/QtView.h"
+	#include "Qt/BindingsQt.h"
+#endif
+
 #endif  /*  !__DC_Mvvm_MyGUI_H___    */

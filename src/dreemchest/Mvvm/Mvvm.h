@@ -66,11 +66,6 @@ DC_END_DREEMCHEST
         #include "MyGUI/MyGUIView.h"
         #include "MyGUI/BindingsMyGUI.h"
     #endif
-
-	#if defined( DC_QT4_ENABLED ) || defined( DC_QT5_ENABLED )
-		#include "Qt/QtView.h"
-		#include "Qt/BindingsQt.h"
-	#endif
 #endif
 
 #endif  /*  !__DC_Mvvm_H__   */
