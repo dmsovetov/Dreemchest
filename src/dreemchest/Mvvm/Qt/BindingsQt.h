@@ -33,27 +33,81 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+	//! Handles the view change and triggers the property update.
+	class QSignalDelegate : public QObject {
+
+		Q_OBJECT
+
+	public:
+
+							//! Constructs the QSignalDelegate instance.
+							QSignalDelegate( BindingWPtr binding, QWidget* widget, CString signal = NULL );
+
+	private slots:
+
+		//! Triggers the property update
+		void				refreshProperty( void );
+
+	private:
+
+		BindingWPtr			m_binding;	//!< Binding to be refreshed.
+	};
+
+	// ** QSignalDelegate::QSignalDelegate
+	inline QSignalDelegate::QSignalDelegate( BindingWPtr binding, QWidget* widget, CString signal ) : m_binding( binding )
+	{
+		if( signal ) {
+			connect( widget, signal, this, SLOT(refreshProperty()));
+		}
+	}
+
+	// ** QSignalDelegate::refreshProperty
+	inline void QSignalDelegate::refreshProperty( void )
+	{
+		m_binding->refreshProperty();
+	}
+
+	//! Handles the textChanged signal and dispatches the event.
+	class QTextChangedDelegate : public QSignalDelegate {
+	public:
+
+							//! Constructs QTextChangedDelegate instance.
+							QTextChangedDelegate( BindingWPtr binding, QWidget* widget )
+								: QSignalDelegate( binding, widget, SIGNAL( textChanged(const QString&) ) ) {}
+	};
+
     //! A template class to bind a property to a Qt widget.
-    template<typename TWidget, typename TValue>
+    template<typename TWidget, typename TValue, typename TSignalDelegate = QSignalDelegate>
     class QtPropertyBinding : public GenericBinding<TValue> {
     public:
 
                                 //! Constructs QtPropertyBinding.
                                 QtPropertyBinding( View* view, const String& name, const GenericProperty<TValue>& property );
+		virtual					~QtPropertyBinding( void );
 
     protected:
 
-        TWidget*                m_widget;   //!< Target MyGUI widget.
+        TWidget*                m_widget;   //!< Target Qt widget.
+		TSignalDelegate*		m_delegate;	//!< Qt siagnal delegate.
     };
 
     // ** QtPropertyBinding::QtPropertyBinding
-    template<typename TWidget, typename TValue>
-    QtPropertyBinding<TWidget, TValue>::QtPropertyBinding( View* view, const String& name, const GenericProperty<TValue>& property )
+    template<typename TWidget, typename TValue, typename TSignalDelegate>
+    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, const String& name, const GenericProperty<TValue>& property )
         : GenericBinding<TValue>( view, property )
     {
         m_widget = static_cast<QtView*>( view )->widget()->findChild<TWidget*>( name.c_str() );
 	    DC_BREAK_IF( m_widget == NULL );
+		m_delegate = DC_NEW TSignalDelegate( this, m_widget );
     }
+
+    // ** QtPropertyBinding::~QtPropertyBinding
+    template<typename TWidget, typename TValue, typename TSignalDelegate>
+	QtPropertyBinding<TWidget, TValue, TSignalDelegate>::~QtPropertyBinding( void )
+	{
+		delete m_delegate;
+	}
+
 /*
 	//! Binds an array of strings to an edit view.
     class MyGUIEditViewBinding : public MyGUIPropertyBinding<MyGUI::EditBox, StringArray> {
@@ -82,7 +136,7 @@ namespace mvvm {
     };
 */
     //! Binds a line edit to a string.
-    class QtLineEditBinding : public QtPropertyBinding<QLineEdit, String> {
+    class QtLineEditBinding : public QtPropertyBinding<QLineEdit, String, QTextChangedDelegate> {
     public:
 
                                 //! Constructs QtLineEditBinding instance.
@@ -92,10 +146,10 @@ namespace mvvm {
     private:
 
         //! Handles property change.
-        void                    handlePropertyChanged( const String& value );
+        virtual void			handlePropertyChanged( const String& value );
 
-        //! Handles line edit changed event.
-        void                    handleTextChanged( QLineEdit* sender );
+		//! Updates the property value.
+		virtual void            refreshProperty( void );
     };
 /*
 	//! Binds the button click event.

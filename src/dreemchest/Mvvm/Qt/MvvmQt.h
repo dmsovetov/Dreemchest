@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Mvvm_MyGUI_H___
-#define __DC_Mvvm_MyGUI_H___
+#ifndef __DC_Mvvm_Qt_H___
+#define __DC_Mvvm_Qt_H___
 
 #include "../Mvvm.h"
 #include "../Property.h"
@@ -49,8 +49,8 @@ namespace mvvm {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "Qt/QtView.h"
-	#include "Qt/BindingsQt.h"
+	#include "QtView.h"
+	#include "BindingsQt.h"
 #endif
 
 #endif  /*  !__DC_Mvvm_MyGUI_H___    */

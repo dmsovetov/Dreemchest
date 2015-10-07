@@ -36,13 +36,12 @@ namespace mvvm {
     template<typename T> class GenericProperty;
     template<typename T> class GenericArrayProperty;
 
+	dcDeclarePtrs( Binding );
+
     class View;
-    class Binding;
     class Property;
     class ActionHandler;
     class Data;
-
-    typedef StrongPtr<Binding> BindingPtr;
 
     typedef GenericProperty<bool>           BoolProperty;
     typedef GenericProperty<s32>            IntProperty;

@@ -106,12 +106,12 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
 QtLineEditBinding::QtLineEditBinding( View* view, const String& name, const Property& property )
     : QtPropertyBinding( view, name, property )
 {
-//    m_widget->eventEditTextChange += MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
+
 }
 
 QtLineEditBinding::~QtLineEditBinding( void )
 {
- //   m_widget->eventEditTextChange -= MyGUI::newDelegate( this, &MyGUILineEditBinding::handleTextChanged );
+
 }
 
 // ** QtLineEditBinding::handlePropertyChanged
@@ -122,10 +122,10 @@ void QtLineEditBinding::handlePropertyChanged( const Value& value )
     }
 }
 
-// ** QtLineEditBinding::handleTextChanged
-void QtLineEditBinding::handleTextChanged( QLineEdit* sender )
+// ** QtLineEditBinding::refreshProperty
+void QtLineEditBinding::refreshProperty( void )
 {
-//    m_property.set( m_widget->getCaption() );
+	m_property.set( m_widget->text().toUtf8().constData() );
 }
 /*
 // ------------------------------------------ MyGUIButtonBinding ------------------------------------------ //
