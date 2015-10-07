@@ -13,6 +13,21 @@ add_files(Io IO_SRCS)
 add_files(Io/Serialization IO_SERIALIZATION_SRCS)
 add_files(Io/Streams IO_STREAMS_SRCS)
 
+# Add Qt support to MVVM module
+if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
+	add_directories(Mvvm/Qt MVVM_QT_SRCS)
+	set(MVVM_SRCS ${MVVM_SRCS} ${MVVM_QT_SRCS})
+
+	if (DC_QT_SUPPORT MATCHES "Qt4")
+		find_package(Qt4 REQUIRED QtGui)
+		
+	elseif (DC_QT_SUPPORT MATCHES "Qt5")
+		find_package(Qt5Widgets)
+		
+	endif (DC_QT_SUPPORT MATCHES "Qt4")
+	
+endif (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
+
 # Threads module sources
 if (DC_THREADS)
 	add_files(Threads THREADS_SRCS)
@@ -50,3 +65,11 @@ endif (WIN32)
 if (DC_OPENGL_ENABLED)
 	target_link_libraries(Dreemchest ${OPENGL_gl_LIBRARY})
 endif (DC_OPENGL_ENABLED)
+
+if (DC_QT_SUPPORT MATCHES "Qt4")
+	target_link_libraries(Dreemchest Qt4::QtGui)
+endif (DC_QT_SUPPORT MATCHES "Qt4")
+
+if (DC_QT_SUPPORT MATCHES "Qt5")
+	target_link_libraries(Dreemchest Qt5::Widgets)
+endif (DC_QT_SUPPORT MATCHES "Qt5")
