@@ -15,6 +15,7 @@ add_files(Io/Streams IO_STREAMS_SRCS)
 
 # Add Qt support to MVVM module
 if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
+	set(CMAKE_AUTOMOC ON)
 	add_directories(Mvvm/Qt MVVM_QT_SRCS)
 	set(MVVM_SRCS ${MVVM_SRCS} ${MVVM_QT_SRCS})
 
