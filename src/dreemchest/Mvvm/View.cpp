@@ -53,7 +53,7 @@ void View::clear( void )
 // ** View::addBinding
 void View::addBinding( Binding* instance )
 {
-    instance->refresh();
+    instance->refreshView();
     m_bindings.push_back( instance );
 }
 
