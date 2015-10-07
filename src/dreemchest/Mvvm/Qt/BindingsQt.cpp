@@ -34,8 +34,8 @@ namespace mvvm {
 // ---------------------------------------- QtVisibilityBinding ---------------------------------------- //
 
 // ** QtVisibilityBinding::QtVisibilityBinding
-QtVisibilityBinding::QtVisibilityBinding( View* view, const String& name, const Property& property, bool inversed )
-    : QtPropertyBinding( view, name, property ), m_isInversed( inversed )
+QtVisibilityBinding::QtVisibilityBinding( View* view, QWidget* widget, const Property& property, bool inversed )
+    : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
 {
 
 }
@@ -49,8 +49,8 @@ void QtVisibilityBinding::handlePropertyChanged( const Value& value )
 // ----------------------------------------- QtEnabledBinding ---------------------------------------- //
 
 // ** QtEnabledBinding::QtEnabledBinding
-QtEnabledBinding::QtEnabledBinding( View* view, const String& name, const Property& property, bool inversed )
-    : QtPropertyBinding( view, name, property ), m_isInversed( inversed )
+QtEnabledBinding::QtEnabledBinding( View* view, QWidget* widget, const Property& property, bool inversed )
+    : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
 {
 
 }
@@ -61,28 +61,43 @@ void QtEnabledBinding::handlePropertyChanged( const Value& value )
     m_widget->setEnabled( m_isInversed ? !value : value );
 }
 
-/*
-// ---------------------------------------- MyGUIEditViewBinding ---------------------------------------- //
+// ---------------------------------------- QtListBoxBinding ---------------------------------------- //
 
-// ** MyGUIEditViewBinding::MyGUIEditViewBinding
-MyGUIEditViewBinding::MyGUIEditViewBinding( View* view, const String& name, const Property& property )
-	: MyGUIPropertyBinding( view, name, property )
+// ** QtListBoxBinding::QtListBoxBinding
+QtListBoxBinding::QtListBoxBinding( View* view, QListWidget* widget, const Property& property )
+	: QtPropertyBinding( view, widget, property )
 {
 
 }
 
-// ** MyGUIEditViewBinding::handlePropertyChanged
-void MyGUIEditViewBinding::handlePropertyChanged( const Value& value )
+// ** QtListBoxBinding::handlePropertyChanged
+void QtListBoxBinding::handlePropertyChanged( const Value& value )
 {
-    m_widget->setCaption( "" );
+	m_widget->clear();
 
-	for( int i = 0, n = ( int )value.size(); i < n; i++ ) {
-		m_widget->addText( value[i] + "\n" );
+	for( s32 i = 0, n = ( s32 )value.size(); i < n; i++ ) {
+		m_widget->addItem( value[i].c_str() );
 	}
-
-	m_widget->setTextCursor( m_widget->getCaption().length() );
 }
 
+// ---------------------------------------- QtStackedWidgetBinding ---------------------------------------- //
+
+// ** QtStackedWidgetBinding::QtStackedWidgetBinding
+QtStackedWidgetBinding::QtStackedWidgetBinding( View* view, QStackedWidget* widget, const Property& property )
+	: QtPropertyBinding( view, widget, property )
+{
+
+}
+
+// ** QtStackedWidgetBinding::handlePropertyChanged
+void QtStackedWidgetBinding::handlePropertyChanged( const Value& value )
+{
+	QWidget* page = static_cast<QtView*>( m_view )->widget()->findChild<QWidget*>( value.c_str() );
+	DC_BREAK_IF( page == NULL );
+
+	m_widget->setCurrentWidget( page );
+}
+/*
 // ----------------------------------------- MyGUICaptionBinding ----------------------------------------- //
 
 // ** MyGUICaptionBinding::MyGUICaptionBinding
@@ -103,13 +118,8 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
 // ----------------------------------------- QtLineEditBinding ----------------------------------------- //
 
 // ** QtLineEditBinding::QtLineEditBinding
-QtLineEditBinding::QtLineEditBinding( View* view, const String& name, const Property& property )
-    : QtPropertyBinding( view, name, property )
-{
-
-}
-
-QtLineEditBinding::~QtLineEditBinding( void )
+QtLineEditBinding::QtLineEditBinding( View* view, QLineEdit* widget, const Property& property )
+    : QtPropertyBinding( view, widget, property )
 {
 
 }
@@ -127,6 +137,24 @@ void QtLineEditBinding::refreshProperty( void )
 {
 	m_property.set( m_widget->text().toUtf8().constData() );
 }
+
+// ----------------------------------------- QtLabelBinding ----------------------------------------- //
+
+// ** QtLabelBinding::QtLabelBinding
+QtLabelBinding::QtLabelBinding( View* view, QLabel* widget, const Property& property )
+    : QtPropertyBinding( view, widget, property )
+{
+
+}
+
+// ** QtLabelBinding::handlePropertyChanged
+void QtLabelBinding::handlePropertyChanged( const Value& value )
+{
+    if( value.c_str() != m_widget->text() ) {
+        m_widget->setText( value.c_str() );
+    }
+}
+
 /*
 // ------------------------------------------ MyGUIButtonBinding ------------------------------------------ //
 

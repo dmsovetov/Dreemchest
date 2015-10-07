@@ -63,7 +63,7 @@ namespace mvvm {
         typedef GenericProperty<T> Property;
 
         //! Alias the value type.
-        typedef T Value;
+        typedef T				Value;
 
                                 //! Constructs GenericBinding.
                                 GenericBinding( View* view, const Property& property );
@@ -118,7 +118,7 @@ namespace mvvm {
 
 									//! Constructs GenericConverter instance.
 									GenericConverter( View* view, const GenericProperty<TInput>& input, const GenericProperty<TOutput>* output = NULL )
-										: GenericBinding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ) {}
+										: GenericBinding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
 
 		//! Returns the output value.
 		const GenericProperty<TOutput>&	value( void ) const { return *m_output; }

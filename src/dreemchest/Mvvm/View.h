@@ -35,19 +35,8 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
     //! View is a base class for view renderers and is a composition of data providers and actions handlers.
-    class View {
+    class View : public RefCounted {
     public:
-
-        //! Attaches the data provider to a view controller.
-        template<typename T>                         T* attachData( void )                  { return m_data.attach<T>();                            }
-        template<typename T, TemplateFunctionTypes1> T* attachData( TemplateFunctionArgs1 ) { return m_data.attach<T>( arg0 );                      }
-        template<typename T, TemplateFunctionTypes2> T* attachData( TemplateFunctionArgs2 ) { return m_data.attach<T>( arg0, arg1 );                }
-        template<typename T, TemplateFunctionTypes3> T* attachData( TemplateFunctionArgs3 ) { return m_data.attach<T>( arg0, arg1, arg2 );          }
-        template<typename T, TemplateFunctionTypes4> T* attachData( TemplateFunctionArgs4 ) { return m_data.attach<T>( arg0, arg1, arg2, arg3 );    }
-		
-		//! Returns a data with specified type.
-        template<typename T> const T*				    data( void ) const { return m_data.get<T>(); }
-        template<typename T> T*				            data( void ) { return m_data.get<T>(); }
 
         //! Attaches the action handler to a view controller.
         template<typename T>                         T* attachHandler( void )                  { return m_actionHandlers.attach<T>( this );                            }
@@ -56,14 +45,11 @@ namespace mvvm {
         template<typename T, TemplateFunctionTypes3> T* attachHandler( TemplateFunctionArgs3 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2 );          }
         template<typename T, TemplateFunctionTypes4> T* attachHandler( TemplateFunctionArgs4 ) { return m_actionHandlers.attach<T>( this, arg0, arg1, arg2, arg3 );    }
 
+		//! Adds a new data provider to this view.
+		void											addData( const String& name, const DataPtr& data );
+
         //! Adds a new binding to view.
         void                                            addBinding( Binding* instance );
-
-	#ifndef DC_CPP11_DISABLED
-        //! Binds the property with a target.
-        template<typename TBinding, typename ... Args> 
-		void											bind( const Args& ... args );
-	#endif
 
         //! Notifies action handler about an event.
         void                                            notify( const String& event );
@@ -71,27 +57,23 @@ namespace mvvm {
         //! Clears the view data providers & handlers.
         void                                            clear( void );
 
+	protected:
+
+		//! Returns the property by a specified URI.
+		PropertyPtr										findProperty( const String& uri );
+
     private:
 
         //! Actions handlers composite type.
         typedef Composition<ActionHandler>              ActionHandlers;
 
-        //! Data providers composite type.
-        typedef Composition<Data>                       DataProviders;
+        //! Data providers container.
+		typedef Map<String, DataPtr>					DataProviders;
 
-        DataProviders			                        m_data;             //!< Data composition.
+		DataProviders			                        m_data;             //!< Data providers.
         ActionHandlers	                                m_actionHandlers;   //!< Action handlers composition.
 		BindingsList				                    m_bindings;			//!< Active bindings.
     };
-
-#ifndef DC_CPP11_DISABLED
-	// ** View::bind
-	template<typename TBinding, typename ... Args>
-	void View::bind( const Args& ... args )
-	{
-		addBinding( DC_NEW TBinding( this, args... ) );
-	}
-#endif
 
 } // namespace mvvm
     

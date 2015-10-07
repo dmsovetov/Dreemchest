@@ -33,7 +33,31 @@ namespace mvvm {
 // ** Data::Data
 Data::Data( void )
 {
+	m_isValid = DC_NEW BoolProperty( NULL, true );
+}
 
+// ** Data::validate
+bool Data::validate( void ) const
+{
+	return true;
+}
+
+// ** Data::check
+void Data::check( void )
+{
+	bool result = validate();
+	m_isValid->set( result );
+}
+
+// ** Data::get
+PropertyPtr Data::get( const String& name )
+{
+	if( name == "valid" ) {
+		return m_isValid;
+	}
+
+	Properties::iterator i = m_properties.find( name );
+	return i != m_properties.end() ? i->second : PropertyPtr();
 }
 
 } // namespace mvvm

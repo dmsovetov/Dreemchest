@@ -35,31 +35,51 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 	//! Property is an atomic item of data.
-    class Property {
+    class Property : public RefCounted {
     public:
 
+								//! Constructs Property instance.
+								Property( const DataWPtr& data )
+									: m_data( data ) {}
+
         virtual                 ~Property( void ) {}
+
+		//! Returns the property type id.
+		virtual TypeIdx			type( void ) const { return 0; }
+
+	protected:
+
+		DataWPtr				m_data;	//!< Parent data instance.
     };
 
     //! Template class to simplify the property type declaration.
-	template<typename T>
+	template<typename TValue>
 	class GenericProperty : public Property {
-    friend class GenericBinding<T>;
+    friend class GenericBinding<TValue>;
 	public:
 
         //! Alias the generic property binding.
-        typedef GenericBinding<T>   Binding;
+        typedef GenericBinding<TValue>   Binding;
+
+		//! Alias the property type.
+		typedef TValue				Type;
+
+		//! Alias the strong pointer type.
+		typedef StrongPtr< GenericProperty<TValue> > Ptr;
 
 								    //! Constructs property.
-								    GenericProperty( const T& value = T() )
-									    : m_value( value ) {}
+								    GenericProperty( const DataWPtr& data, const TValue& value = TValue() )
+									    : Property( data ), m_value( value ) {}
 
 		//! Returns property value.
-		const T&				    value( void ) const;
-		T&						    value( void );
+		const TValue&				value( void ) const;
+		TValue&						value( void );
 
 		//! Sets property value.
-		void					    set( const T& value );
+		void					    set( const TValue& value );
+
+		//! Returns the property type id.
+		virtual TypeIdx				type( void ) const;
 
     protected:
 
@@ -77,27 +97,27 @@ namespace mvvm {
         //! Container type to store bindings.
         typedef Set<Binding*>       Bindings;
 
-		T						    m_value;    //!< Actual property value.
+		TValue						m_value;    //!< Actual property value.
         Bindings                    m_bindings; //!< Bindings that are linked to this property.
 	};
 
 	// ** GenericProperty::value
-	template<typename T>
-	const T& GenericProperty<T>::value( void ) const
+	template<typename TValue>
+	const TValue& GenericProperty<TValue>::value( void ) const
 	{
 		return m_value;
 	}
 
 	// ** GenericProperty::value
-	template<typename T>
-	T& GenericProperty<T>::value( void )
+	template<typename TValue>
+	TValue& GenericProperty<TValue>::value( void )
 	{
 		return m_value;
 	}
 
 	// ** GenericProperty::set
-	template<typename T>
-	void GenericProperty<T>::set( const T& value )
+	template<typename TValue>
+	void GenericProperty<TValue>::set( const TValue& value )
 	{
 		if( value == m_value ) {
 			return;
@@ -107,41 +127,56 @@ namespace mvvm {
         notify();
 	}
 
+	// ** GenericProperty::value
+	template<typename TValue>
+	TypeIdx GenericProperty<TValue>::type( void ) const
+	{
+		return GroupedTypeIndex<TValue, Property>::idx();
+	}
+
     // ** GenericProperty::subscribe
-    template<typename T>
-    void GenericProperty<T>::subscribe( Binding* binding )
+    template<typename TValue>
+    void GenericProperty<TValue>::subscribe( Binding* binding )
     {
         m_bindings.insert( binding );
     }
 
     // ** GenericProperty::unsubscribe
-    template<typename T>
-    void GenericProperty<T>::unsubscribe( Binding* binding )
+    template<typename TValue>
+    void GenericProperty<TValue>::unsubscribe( Binding* binding )
     {
         m_bindings.erase( binding );
     }
 
     // ** GenericProperty::notify
-    template<typename T>
-    void GenericProperty<T>::notify( void )
+    template<typename TValue>
+    void GenericProperty<TValue>::notify( void )
     {
+		if( m_data.valid() ) {
+			m_data->check();
+		}
+
         for( typename Bindings::iterator i = m_bindings.begin(), end = m_bindings.end(); i != end; ++i ) {
             ( *i )->handlePropertyChanged( m_value );
         }
     }
 
     //! Generic array property type.
-    template<typename T>
-    class GenericArrayProperty : public GenericProperty< Array<T> > {
+    template<typename TValue>
+    class GenericArrayProperty : public GenericProperty< Array<TValue> > {
     public:
 
+								//! Constructs GenericArrayProperty
+								GenericArrayProperty( const DataWPtr& data )
+									: GenericProperty( data ) {}
+
         //! Pushes a new value to an array.
-        void                    push( const T& value );
+        void                    push( const TValue& value );
     };
 
     // ** GenericArrayProperty::push
-    template<typename T>
-    void GenericArrayProperty<T>::push( const T& value )
+    template<typename TValue>
+    void GenericArrayProperty<TValue>::push( const TValue& value )
     {
         this->m_value.push_back( value );
         this->notify();

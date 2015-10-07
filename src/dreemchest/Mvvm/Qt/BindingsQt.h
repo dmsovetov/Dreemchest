@@ -82,7 +82,7 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtPropertyBinding.
-                                QtPropertyBinding( View* view, const String& name, const GenericProperty<TValue>& property );
+                                QtPropertyBinding( View* view, TWidget* widget, const Property& property );
 		virtual					~QtPropertyBinding( void );
 
     protected:
@@ -93,11 +93,11 @@ namespace mvvm {
 
     // ** QtPropertyBinding::QtPropertyBinding
     template<typename TWidget, typename TValue, typename TSignalDelegate>
-    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, const String& name, const GenericProperty<TValue>& property )
-        : GenericBinding<TValue>( view, property )
+    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, TWidget* widget, const Property& property )
+        : GenericBinding<TValue>( view, property ), m_widget( widget )
     {
-        m_widget = static_cast<QtView*>( view )->widget()->findChild<TWidget*>( name.c_str() );
-	    DC_BREAK_IF( m_widget == NULL );
+    //    m_widget = static_cast<QtView*>( view )->widget()->findChild<TWidget*>( name.c_str() );
+	//    DC_BREAK_IF( m_widget == NULL );
 		m_delegate = DC_NEW TSignalDelegate( this, m_widget );
     }
 
@@ -108,13 +108,12 @@ namespace mvvm {
 		delete m_delegate;
 	}
 
-/*
-	//! Binds an array of strings to an edit view.
-    class MyGUIEditViewBinding : public MyGUIPropertyBinding<MyGUI::EditBox, StringArray> {
+	//! Binds an array of strings to a list box.
+    class QtListBoxBinding : public QtPropertyBinding<QListWidget, StringArray> {
 	public:
 
-								//! Constructs MyGUIEditViewBinding instance.
-                                MyGUIEditViewBinding( View* view, const String& name, const GenericProperty<StringArray>& property );
+								//! Constructs QtListBoxBinding instance.
+                                QtListBoxBinding( View* view, QListWidget* widget, const Property& property );
 
 	private:
 
@@ -122,6 +121,19 @@ namespace mvvm {
 		virtual void		    handlePropertyChanged( const StringArray& value );
 	};
 
+	//! Binds the string property to a stacked widget state.
+	class QtStackedWidgetBinding : public QtPropertyBinding<QStackedWidget, String> {
+	public:
+
+								//! Constructs QtStackedWidgetBinding instance.
+                                QtStackedWidgetBinding( View* view, QStackedWidget* widget, const Property& property );
+
+	private:
+
+		//! Handles property change.
+		virtual void		    handlePropertyChanged( const String& value );
+	};
+/*
     //! Binds a caption to a string.
     class MyGUICaptionBinding : public MyGUIPropertyBinding<MyGUI::TextBox, String> {
     public:
@@ -140,8 +152,7 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtLineEditBinding instance.
-                                QtLineEditBinding( View* view, const String& name, const GenericProperty<String>& property );
-        virtual                 ~QtLineEditBinding( void );
+                                QtLineEditBinding( View* view, QLineEdit* widget, const Property& property );
 
     private:
 
@@ -151,6 +162,19 @@ namespace mvvm {
 		//! Updates the property value.
 		virtual void            refreshProperty( void );
     };
+
+	//! Binds a label to a string.
+	class QtLabelBinding : public QtPropertyBinding<QLabel, String> {
+	public:
+
+                                //! Constructs QtLabelBinding instance.
+                                QtLabelBinding( View* view, QLabel* widget, const Property& property );
+
+    private:
+
+        //! Handles property change.
+        virtual void			handlePropertyChanged( const String& value );
+	};
 /*
 	//! Binds the button click event.
 	class MyGUIButtonBinding : public Binding  {
@@ -176,7 +200,7 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtVisibilityBinding instance.
-                                QtVisibilityBinding( View* view, const String& name, const GenericProperty<bool>& property, bool inversed = false );
+                                QtVisibilityBinding( View* view, QWidget* widget, const Property& property, bool inversed = false );
 
         //! Handles property change.
         void                    handlePropertyChanged( const bool& value );
@@ -191,7 +215,7 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtEnabledBinding instance.
-                                QtEnabledBinding( View* view, const String& name, const GenericProperty<bool>& property, bool inversed = false );
+                                QtEnabledBinding( View* view, QWidget* widget, const Property& property, bool inversed = false );
 
         //! Handles property change.
         void                    handlePropertyChanged( const bool& value );

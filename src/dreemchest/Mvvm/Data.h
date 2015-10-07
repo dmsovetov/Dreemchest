@@ -27,19 +27,81 @@
 #ifndef __DC_Mvvm_Data_H__
 #define __DC_Mvvm_Data_H__
 
-#include "Mvvm.h"
+#include "Property.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
     //! A base class for all view data providers.
-    class Data {
+    class Data : public RefCounted {
+	friend class Property;
     public:
 
-                                Data( void );
-        virtual                 ~Data( void ) {}
+										Data( void );
+        virtual							~Data( void ) {}
+
+		//! Runs the data validation routine.
+		void							check( void );
+
+		//! Returns the property by name.
+		PropertyPtr						get( const String& name );
+
+	protected:
+
+		//! Returns true if the data is valid.
+		virtual bool					validate( void ) const;
+
+		//! Adds a new named property.
+		template<typename TValue>
+		GenericProperty<TValue>*		add( const String& name, const TValue& value = TValue() );
+
+		//! Adds a new named array property.
+		template<typename TValue>
+		GenericArrayProperty<TValue>*	addArray( const String& name );
+
+	protected:
+
+		//! Named property container.
+		typedef Map<String, PropertyPtr>	Properties;
+
+		Properties						m_properties;	//!< All properties added to this data.
+		mutable BoolProperty::Ptr		m_isValid;		//!< This property is updated by the data validation routine.
     };
+
+	// ** Data::add
+	template<typename TValue>
+	GenericProperty<TValue>* Data::add( const String& name, const TValue& value )
+	{
+		GenericProperty<TValue>* prop = DC_NEW GenericProperty<TValue>( this, value );
+		m_properties[name] = PropertyPtr( prop );
+		return prop;
+	}
+
+	// ** Data::addArray
+	template<typename TValue>
+	GenericArrayProperty<TValue>* Data::addArray( const String& name )
+	{
+		GenericArrayProperty<TValue>* prop = DC_NEW GenericArrayProperty<TValue>( this );
+		m_properties[name] = PropertyPtr( prop );
+		return prop;
+	}
+
+	//! Generic data class.
+	template<typename T>
+	class GenericData : public Data {
+	public:
+
+		//! Alias the data pointer type.
+		typedef StrongPtr<T> Ptr;
+
+		//! Createa the RemoteHost data instance.
+		template<typename ... Args>
+		static StrongPtr<T> create( const Args& ... args )
+		{
+			return StrongPtr<T>( DC_NEW T( args... ) );
+		}
+	};
 
 } // namespace mvvm
     

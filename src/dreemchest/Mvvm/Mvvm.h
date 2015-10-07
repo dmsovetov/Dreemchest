@@ -33,15 +33,18 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+	DECLARE_LOG( log )
+
     template<typename T> class GenericProperty;
     template<typename T> class GenericArrayProperty;
 
-	dcDeclarePtrs( Binding );
+	dcDeclarePtrs( Binding )
+	dcDeclarePtrs( Property )
+	dcDeclarePtrs( Data )
+	dcDeclarePtrs( View )
 
     class View;
-    class Property;
     class ActionHandler;
-    class Data;
 
     typedef GenericProperty<bool>           BoolProperty;
     typedef GenericProperty<s32>            IntProperty;
@@ -49,6 +52,17 @@ namespace mvvm {
     typedef GenericProperty<String>         StringProperty;
     typedef GenericArrayProperty<String>    StringArrayProperty;
     typedef List<BindingPtr>                BindingsList;
+
+	//! Performs the property type cast.
+	template<typename TTargetType>
+	inline StrongPtr< GenericProperty<TTargetType> > castTo( const PropertyPtr& property )
+	{
+		if( GroupedTypeIndex<TTargetType, Property>::idx() == property->type() ) {
+			return StrongPtr< GenericProperty<TTargetType> >( static_cast<GenericProperty<TTargetType>*>( property.get() ) );
+		}
+
+		return StrongPtr< GenericProperty<TTargetType> >();
+	}
 
 } // namespace mvvm
 

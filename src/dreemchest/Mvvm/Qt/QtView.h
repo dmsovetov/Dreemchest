@@ -43,14 +43,20 @@ namespace mvvm {
 		//! Returns parent widget.
 		QWidget*	widget( void );
 
-		//! Binds the string property to a line edit.
-		void		bind( const String& target, StringProperty& property );
+		//! Binds the string property to a widget.
+		void		bindString( const String& target, const String& uri );
+
+		//! Binds the int property to a widget.
+		void		bindInteger( const String& target, const String& uri );
+
+		//! Binds the string state to a widget.
+		void		bindState( const String& target, const String& uri );
+
+		//! Binds the list of strings to a widget.
+		void		bindStringList( const String& target, const String& uri );
 
 		//! Binds enabled state to a property.
-		void		bindEnabled( const String& target, BoolProperty& property );
-
-		//! Binds the size validator to a property.
-		void		validateSize( const StringProperty& target, BoolProperty& property, s32 min, s32 max );
+		void		bindEnabled( const String& target, const String& uri );
 
 	private:
 

@@ -32,6 +32,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+IMPLEMENT_LOGGER( log )
+
 // ** View::notify
 void View::notify( const String& event )
 {
@@ -55,6 +57,43 @@ void View::addBinding( Binding* instance )
 {
     instance->refreshView();
     m_bindings.push_back( instance );
+}
+
+// ** View::addData
+void View::addData( const String& name, const DataPtr& data )
+{
+	m_data[name] = data;
+}
+
+// ** View::findProperty
+PropertyPtr View::findProperty( const String& uri )
+{
+	u32 idx = uri.find( '.' );
+
+	if( idx == String::npos ) {
+		log::error( "View::findProperty : invalid URI passed, '%s'\n", uri.c_str() );
+		return PropertyPtr();
+	}
+
+	// Split the URI
+	String data = uri.substr( 0, idx );
+	String key  = uri.substr( idx + 1 );
+
+	// Find the data by name
+	DataProviders::iterator i = m_data.find( data );
+
+	if( i == m_data.end() ) {
+		log::error( "View::findProperty : no data with name '%s'\n", data.c_str() );
+		return PropertyPtr();
+	}
+
+	PropertyPtr result = i->second->get( key );
+
+	if( !result.valid() ) {
+		log::error( "View::findProperty : data '%s' has no property with name '%s'\n", data.c_str(), key.c_str() );
+	}
+
+	return result;
 }
 
 } // namespace mvvm
