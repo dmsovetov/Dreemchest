@@ -48,6 +48,7 @@ namespace mvvm {
     typedef Property<s32>           IntProperty;
     typedef Property<f32>			FloatProperty;
     typedef Property<String>        StringProperty;
+	typedef Property<Guid>			GuidProperty;
     typedef ArrayProperty<String>   StringArrayProperty;
     typedef List<BindingPtr>        BindingsList;
 
