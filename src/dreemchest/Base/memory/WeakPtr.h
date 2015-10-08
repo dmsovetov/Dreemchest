@@ -74,6 +74,7 @@ DC_BEGIN_DREEMCHEST
 		bool				operator == ( const WeakPtr<T>& other ) const;
         bool                operator != ( T *pointer ) const;
 		bool				operator != ( const WeakPtr<T>& other ) const;
+		bool				operator < ( const WeakPtr<T>& other ) const;
     };
 
     // ** WeakPtr::WeakPtr
@@ -161,6 +162,13 @@ DC_BEGIN_DREEMCHEST
     bool WeakPtr<T>::operator != ( const WeakPtr<T>& other ) const {
         manageProxy();
         return ( m_ptr != other.get() );
+    }
+
+    // ** WeakPtr::operator <
+    template<typename T>
+    bool WeakPtr<T>::operator < ( const WeakPtr<T>& other ) const {
+        manageProxy();
+        return ( m_ptr < other.get() );
     }
 
     // ** WeakPtr::setPointer
