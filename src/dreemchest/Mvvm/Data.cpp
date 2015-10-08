@@ -37,6 +37,12 @@ Data::Data( const String& name ) : m_name( name )
 	m_isValid = DC_NEW BoolProperty( NULL, true );
 }
 
+// ** Data::isValid
+BoolProperty::WPtr Data::isValid( void ) const
+{
+	return m_isValid;
+}
+
 // ** Data::name
 const String& Data::name( void ) const
 {
@@ -50,10 +56,11 @@ bool Data::validate( void ) const
 }
 
 // ** Data::check
-void Data::check( void )
+bool Data::check( void )
 {
 	bool result = validate();
 	m_isValid->set( result );
+	return result;
 }
 
 // ** Data::get

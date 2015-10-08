@@ -41,8 +41,11 @@ namespace mvvm {
 										Data( const String& name );
         virtual							~Data( void ) {}
 
-		//! Runs the data validation routine.
-		void							check( void );
+		//! Returns the isValid property pointer.
+		BoolProperty::WPtr				isValid( void ) const;
+
+		//! Runs the data validation routine and returns the result.
+		bool							check( void );
 
 		//! Returns the property by name.
 		PropertyPtr						get( const String& name );
