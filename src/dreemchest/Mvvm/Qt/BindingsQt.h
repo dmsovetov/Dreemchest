@@ -87,7 +87,7 @@ namespace mvvm {
 
     //! A template class to bind a property to a Qt widget.
     template<typename TWidget, typename TValue, typename TSignalDelegate = QSignalDelegate>
-    class QtPropertyBinding : public GenericBinding<TValue> {
+    class QtPropertyBinding : public Binding<TValue> {
     public:
 
                                 //! Constructs QtPropertyBinding.
@@ -103,7 +103,7 @@ namespace mvvm {
     // ** QtPropertyBinding::QtPropertyBinding
     template<typename TWidget, typename TValue, typename TSignalDelegate>
     QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, TWidget* widget, const Property& property )
-        : GenericBinding<TValue>( view, property ), m_widget( widget )
+        : Binding<TValue>( view, property ), m_widget( widget )
     {
     //    m_widget = static_cast<QtView*>( view )->widget()->findChild<TWidget*>( name.c_str() );
 	//    DC_BREAK_IF( m_widget == NULL );

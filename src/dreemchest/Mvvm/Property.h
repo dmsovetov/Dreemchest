@@ -55,11 +55,8 @@ namespace mvvm {
     //! Template class to simplify the property type declaration.
 	template<typename TValue>
 	class GenericProperty : public IProperty {
-    friend class GenericBinding<TValue>;
+    friend class Binding<TValue>;
 	public:
-
-        //! Alias the generic property binding.
-        typedef GenericBinding<TValue>   Binding;
 
 		//! Alias the property type.
 		typedef TValue				Type;
@@ -87,10 +84,10 @@ namespace mvvm {
     protected:
 
         //! Subscribes to property changes.
-        void                        subscribe( Binding* binding );
+        void                        subscribe( typename Binding<TValue>::WPtr binding );
 
         //! Unsubscribes from property changes.
-        void                        unsubscribe( Binding* binding );
+        void                        unsubscribe( typename Binding<TValue>::WPtr binding );
 
         //! Notifies linked bindings about a property change.
         void                        notify( void );
@@ -98,7 +95,7 @@ namespace mvvm {
 	protected:
 
         //! Container type to store bindings.
-        typedef Set<Binding*>       Bindings;
+        typedef Set<typename Binding<TValue>::WPtr>	Bindings;
 
 		TValue						m_value;    //!< Actual property value.
         Bindings                    m_bindings; //!< Bindings that are linked to this property.
@@ -139,14 +136,14 @@ namespace mvvm {
 
     // ** GenericProperty::subscribe
     template<typename TValue>
-    void GenericProperty<TValue>::subscribe( Binding* binding )
+    void GenericProperty<TValue>::subscribe( typename Binding<TValue>::WPtr binding )
     {
         m_bindings.insert( binding );
     }
 
     // ** GenericProperty::unsubscribe
     template<typename TValue>
-    void GenericProperty<TValue>::unsubscribe( Binding* binding )
+    void GenericProperty<TValue>::unsubscribe( typename Binding<TValue>::WPtr binding )
     {
         m_bindings.erase( binding );
     }
@@ -160,7 +157,8 @@ namespace mvvm {
 		}
 
         for( typename Bindings::iterator i = m_bindings.begin(), end = m_bindings.end(); i != end; ++i ) {
-            ( *i )->handlePropertyChanged( m_value );
+			typename Binding<TValue>::WPtr binding = *i;
+            binding->handlePropertyChanged( m_value );
         }
     }
 

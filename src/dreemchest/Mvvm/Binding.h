@@ -53,21 +53,24 @@ namespace mvvm {
         ViewWPtr				m_view; //!< Parent view controller.
 	};
 
-    //! A template class to bind a property of a specified type TProperty.
+    //! A template class to bind a property of a specified type T.
     template<typename T>
-    class GenericBinding : public IBinding {
+    class Binding : public IBinding {
     friend class GenericProperty<T>;
     public:
 
         //! Alias the generic property type.
         typedef WeakPtr< GenericProperty<T> > Property;
 
+		//! Alias the weak pointer type.
+		typedef WeakPtr< Binding<T> >	WPtr;
+
         //! Alias the value type.
         typedef T				Value;
 
-                                //! Constructs GenericBinding.
-                                GenericBinding( ViewWPtr view, Property property );
-        virtual                 ~GenericBinding( void );
+                                //! Constructs Binding.
+                                Binding( ViewWPtr view, Property property );
+        virtual                 ~Binding( void );
 
     protected:
 
@@ -82,43 +85,43 @@ namespace mvvm {
         Property				m_property; //!< Bound property.
     };
 
-    // ** GenericBinding::GenericBinding
+    // ** Binding::Binding
     template<typename T>
-    GenericBinding<T>::GenericBinding( ViewWPtr view, Property property )
+    Binding<T>::Binding( ViewWPtr view, Property property )
         : IBinding( view ), m_property( property )
     {
         if( m_property.valid() ) m_property->subscribe( this );
     }
 
-    // ** GenericBinding::~GenericBinding
+    // ** Binding::~Binding
     template<typename T>
-    GenericBinding<T>::~GenericBinding( void )
+    Binding<T>::~Binding( void )
     {
         if( m_property.valid() ) m_property->unsubscribe( this );
     }
 
-    // ** GenericBinding::refreshView
+    // ** Binding::refreshView
     template<typename T>
-    void GenericBinding<T>::refreshView( void )
+    void Binding<T>::refreshView( void )
     {
         handlePropertyChanged( m_property->value() );
     }
 
-    // ** GenericBinding::handlePropertyChanged
+    // ** Binding::handlePropertyChanged
     template<typename T>
-    void GenericBinding<T>::handlePropertyChanged( const Value& property )
+    void Binding<T>::handlePropertyChanged( const Value& property )
     {
         DC_BREAK;
     }
 
 	//! Property converter binding.
 	template<typename TInput, typename TOutput>
-	class GenericConverter : public GenericBinding<TInput> {
+	class GenericConverter : public Binding<TInput> {
 	public:
 
 									//! Constructs GenericConverter instance.
 									GenericConverter( ViewWPtr view, const GenericProperty<TInput>& input, const GenericProperty<TOutput>* output = NULL )
-										: GenericBinding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
+										: Binding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
 
 		//! Returns the output value.
 		const GenericProperty<TOutput>&	value( void ) const { return *m_output; }
