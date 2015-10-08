@@ -44,6 +44,9 @@ DC_BEGIN_DREEMCHEST
 		//! Converts Guid to a string representation.
 		String		toString( void ) const;
 
+		//! Returns true if this GUID contains only zeroes.
+		bool		isNull( void ) const;
+
 		//! Returns GUID bytes.
 		const u8*	bytes( void ) const;
 
@@ -92,6 +95,18 @@ DC_BEGIN_DREEMCHEST
 		DC_BREAK_IF( result.length() != 24 );
 
 		return result;
+	}
+
+	// ** Guid::isNull
+	inline bool Guid::isNull( void ) const
+	{
+		for( s32 i = 0; i < Size; i++ ) {
+			if( m_id[i] ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	// ** Guid::generate
