@@ -33,7 +33,7 @@ namespace mvvm {
 // ---------------------------------------- QtVisibilityBinding ---------------------------------------- //
 
 // ** QtVisibilityBinding::QtVisibilityBinding
-QtVisibilityBinding::QtVisibilityBinding( View* view, QWidget* widget, const Property& property, bool inversed )
+QtVisibilityBinding::QtVisibilityBinding( View* view, QWidget* widget, BoundProperty property, bool inversed )
     : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
 {
 
@@ -48,7 +48,7 @@ void QtVisibilityBinding::handlePropertyChanged( const Value& value )
 // ----------------------------------------- QtEnabledBinding ---------------------------------------- //
 
 // ** QtEnabledBinding::QtEnabledBinding
-QtEnabledBinding::QtEnabledBinding( View* view, QWidget* widget, const Property& property, bool inversed )
+QtEnabledBinding::QtEnabledBinding( View* view, QWidget* widget, BoundProperty property, bool inversed )
     : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
 {
 
@@ -64,7 +64,7 @@ void QtEnabledBinding::handlePropertyChanged( const Value& value )
 // ---------------------------------------- QtPushButtonBinding ---------------------------------------- //
 
 // ** QtPushButtonBinding::QtPushButtonBinding
-QtPushButtonBinding::QtPushButtonBinding( View* view, QPushButton* widget, const Property& property, const String& event )
+QtPushButtonBinding::QtPushButtonBinding( View* view, QPushButton* widget, BoundProperty property, const String& event )
     : QtPropertyBinding( view, widget, property ), m_event( event )
 {
 
@@ -85,7 +85,7 @@ void QtPushButtonBinding::refreshProperty( void )
 // ---------------------------------------- QtListBoxBinding ---------------------------------------- //
 
 // ** QtListBoxBinding::QtListBoxBinding
-QtListBoxBinding::QtListBoxBinding( View* view, QListWidget* widget, const Property& property )
+QtListBoxBinding::QtListBoxBinding( View* view, QListWidget* widget, BoundProperty property )
 	: QtPropertyBinding( view, widget, property )
 {
 
@@ -104,7 +104,7 @@ void QtListBoxBinding::handlePropertyChanged( const Value& value )
 // ---------------------------------------- QtStackedWidgetBinding ---------------------------------------- //
 
 // ** QtStackedWidgetBinding::QtStackedWidgetBinding
-QtStackedWidgetBinding::QtStackedWidgetBinding( View* view, QStackedWidget* widget, const Property& property )
+QtStackedWidgetBinding::QtStackedWidgetBinding( View* view, QStackedWidget* widget, BoundProperty property )
 	: QtPropertyBinding( view, widget, property )
 {
 
@@ -139,7 +139,7 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
 // ----------------------------------------- QtLineEditBinding ----------------------------------------- //
 
 // ** QtLineEditBinding::QtLineEditBinding
-QtLineEditBinding::QtLineEditBinding( View* view, QLineEdit* widget, const Property& property )
+QtLineEditBinding::QtLineEditBinding( View* view, QLineEdit* widget, BoundProperty property )
     : QtPropertyBinding( view, widget, property )
 {
 
@@ -162,7 +162,7 @@ void QtLineEditBinding::refreshProperty( void )
 // ----------------------------------------- QtLabelBinding ----------------------------------------- //
 
 // ** QtLabelBinding::QtLabelBinding
-QtLabelBinding::QtLabelBinding( View* view, QLabel* widget, const Property& property )
+QtLabelBinding::QtLabelBinding( View* view, QLabel* widget, BoundProperty property )
     : QtPropertyBinding( view, widget, property )
 {
 

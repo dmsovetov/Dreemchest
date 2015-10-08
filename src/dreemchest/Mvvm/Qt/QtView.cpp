@@ -53,7 +53,7 @@ void QtView::bindString( const String& target, const String& uri )
 		return;
 	}
 
-	GenericProperty<String>::WPtr str = castTo<String>( property );
+	Property<String>::WPtr str = castTo<String>( property );
 
 	if( !str.valid() ) {
 		log::error( "QtView::bindString : failed tp cast property '%s' to a string\n", uri.c_str() );
@@ -77,7 +77,7 @@ void QtView::bindStringList( const String& target, const String& uri )
 		return;
 	}
 
-	GenericProperty< Array<String> >::WPtr str = castTo< Array<String> >( property );
+	Property< Array<String> >::WPtr str = castTo< Array<String> >( property );
 
 	if( !str.valid() ) {
 		log::error( "QtView::bindStringList : failed tp cast property '%s' to a string list\n", uri.c_str() );
@@ -97,7 +97,7 @@ void QtView::bindState( const String& target, const String& uri )
 		return;
 	}
 
-	GenericProperty<String>::WPtr str = castTo<String>( property );
+	Property<String>::WPtr str = castTo<String>( property );
 
 	if( !str.valid() ) {
 		log::error( "QtView::bindState : failed tp cast property '%s' to a string\n", uri.c_str() );
@@ -130,7 +130,7 @@ void QtView::bindEnabled( const String& target, const String& uri )
 		return;
 	}
 
-	GenericProperty<bool>::WPtr str = castTo<bool>( property );
+	Property<bool>::WPtr str = castTo<bool>( property );
 
 	if( !str.valid() ) {
 		log::error( "QtView::bindEnabled : failed tp cast property '%s' to a bool\n", uri.c_str() );

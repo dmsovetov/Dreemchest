@@ -35,7 +35,6 @@ namespace mvvm {
 
     //! A base class for all view data providers.
     class Data : public RefCounted {
-	friend class Property;
     public:
 
 										Data( const String& name );
@@ -60,11 +59,11 @@ namespace mvvm {
 
 		//! Adds a new named property.
 		template<typename TValue>
-		GenericProperty<TValue>*		add( const String& name, const TValue& value = TValue() );
+		Property<TValue>*				add( const String& name, const TValue& value = TValue() );
 
 		//! Adds a new named array property.
 		template<typename TValue>
-		GenericArrayProperty<TValue>*	addArray( const String& name );
+		ArrayProperty<TValue>*			addArray( const String& name );
 
 	protected:
 
@@ -78,18 +77,18 @@ namespace mvvm {
 
 	// ** Data::add
 	template<typename TValue>
-	GenericProperty<TValue>* Data::add( const String& name, const TValue& value )
+	Property<TValue>* Data::add( const String& name, const TValue& value )
 	{
-		GenericProperty<TValue>* prop = DC_NEW GenericProperty<TValue>( this, value );
+		Property<TValue>* prop = DC_NEW Property<TValue>( this, value );
 		m_properties[name] = PropertyPtr( prop );
 		return prop;
 	}
 
 	// ** Data::addArray
 	template<typename TValue>
-	GenericArrayProperty<TValue>* Data::addArray( const String& name )
+	ArrayProperty<TValue>* Data::addArray( const String& name )
 	{
-		GenericArrayProperty<TValue>* prop = DC_NEW GenericArrayProperty<TValue>( this );
+		ArrayProperty<TValue>* prop = DC_NEW ArrayProperty<TValue>( this );
 		m_properties[name] = PropertyPtr( prop );
 		return prop;
 	}

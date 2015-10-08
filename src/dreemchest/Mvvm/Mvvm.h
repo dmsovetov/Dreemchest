@@ -35,8 +35,8 @@ namespace mvvm {
 
 	DECLARE_LOG( log )
 
-    template<typename T> class GenericProperty;
-    template<typename T> class GenericArrayProperty;
+    template<typename T> class Property;
+    template<typename T> class ArrayProperty;
 
 	dcDeclareNamedPtrs( IBinding, Binding )
 	dcDeclareNamedPtrs( IProperty, Property )
@@ -44,22 +44,22 @@ namespace mvvm {
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( ActionHandler )
 
-    typedef GenericProperty<bool>           BoolProperty;
-    typedef GenericProperty<s32>            IntProperty;
-    typedef GenericProperty<f32>			FloatProperty;
-    typedef GenericProperty<String>         StringProperty;
-    typedef GenericArrayProperty<String>    StringArrayProperty;
-    typedef List<BindingPtr>                BindingsList;
+    typedef Property<bool>          BoolProperty;
+    typedef Property<s32>           IntProperty;
+    typedef Property<f32>			FloatProperty;
+    typedef Property<String>        StringProperty;
+    typedef ArrayProperty<String>   StringArrayProperty;
+    typedef List<BindingPtr>        BindingsList;
 
 	//! Performs the property type cast.
 	template<typename TTargetType>
-	inline StrongPtr< GenericProperty<TTargetType> > castTo( const PropertyPtr& property )
+	inline StrongPtr< Property<TTargetType> > castTo( const PropertyPtr& property )
 	{
-		if( GroupedTypeIndex<TTargetType, Property>::idx() == property->type() ) {
-			return StrongPtr< GenericProperty<TTargetType> >( static_cast<GenericProperty<TTargetType>*>( property.get() ) );
+		if( GroupedTypeIndex<TTargetType, IProperty>::idx() == property->type() ) {
+			return StrongPtr< Property<TTargetType> >( static_cast<Property<TTargetType>*>( property.get() ) );
 		}
 
-		return StrongPtr< GenericProperty<TTargetType> >();
+		return StrongPtr< Property<TTargetType> >();
 	}
 
 } // namespace mvvm

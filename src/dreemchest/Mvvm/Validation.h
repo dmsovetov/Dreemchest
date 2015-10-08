@@ -33,13 +33,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+#if 0
+
     //! A base template class for all property validators.
     template<typename T>
     class GenericValidator : public GenericConverter<T, bool> {
     public:
 
                                 //! Constructs GenericValidator instance.
-                                GenericValidator( View* view, const GenericProperty<T>& property, const BoolProperty* isValid )
+                                GenericValidator( View* view, const Property<T>& property, const BoolProperty* isValid )
                                     : GenericConverter<T, bool>( view, property, isValid ) {}
 
         //! Validates property.
@@ -99,6 +101,8 @@ namespace mvvm {
 		u32						m_min;	//!< Minimum size value.
 		u32						m_max;	//!< Maximum size value.
 	};
+
+#endif
 
 } // namespace mvvm
 

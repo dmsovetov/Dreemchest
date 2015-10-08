@@ -53,41 +53,36 @@ namespace mvvm {
         ViewWPtr				m_view; //!< Parent view controller.
 	};
 
-    //! A template class to bind a property of a specified type T.
-    template<typename T>
+    //! A template class to bind a property of a specified type TValue.
+    template<typename TValue>
     class Binding : public IBinding {
-    friend class GenericProperty<T>;
+    friend class Property<TValue>;
     public:
 
-        //! Alias the generic property type.
-        typedef WeakPtr< GenericProperty<T> > Property;
+		typedef WeakPtr< Property<TValue> >	BoundProperty;	//!< The bound property type.
+		typedef WeakPtr< Binding<TValue> >	WPtr;			//!< Alias the weak pointer type.
+        typedef TValue						Value;			//!< Alias the value type.
 
-		//! Alias the weak pointer type.
-		typedef WeakPtr< Binding<T> >	WPtr;
-
-        //! Alias the value type.
-        typedef T				Value;
-
-                                //! Constructs Binding.
-                                Binding( ViewWPtr view, Property property );
-        virtual                 ~Binding( void );
+											//! Constructs Binding.
+											Binding( ViewWPtr view, BoundProperty property );
+        virtual								~Binding( void );
 
     protected:
 
         //! Refreshes the bound data.
-        virtual void            refreshView( void );
+        virtual void						refreshView( void );
 
         //! Handles property change.
-        virtual void            handlePropertyChanged( const Value& value );
+        virtual void						handlePropertyChanged( const Value& value );
 
     protected:
 
-        Property				m_property; //!< Bound property.
+        BoundProperty						m_property; //!< Bound property.
     };
 
     // ** Binding::Binding
     template<typename T>
-    Binding<T>::Binding( ViewWPtr view, Property property )
+    Binding<T>::Binding( ViewWPtr view, BoundProperty property )
         : IBinding( view ), m_property( property )
     {
         if( m_property.valid() ) m_property->subscribe( this );
@@ -120,16 +115,16 @@ namespace mvvm {
 	public:
 
 									//! Constructs GenericConverter instance.
-									GenericConverter( ViewWPtr view, const GenericProperty<TInput>& input, const GenericProperty<TOutput>* output = NULL )
+									GenericConverter( ViewWPtr view, const Property<TInput>& input, const Property<TOutput>* output = NULL )
 										: Binding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
 
 		//! Returns the output value.
-		const GenericProperty<TOutput>&	value( void ) const { return *m_output; }
+		const Property<TOutput>&	value( void ) const { return *m_output; }
 
 	protected:
 
-		GenericProperty<TOutput>	m_internal;	//!< Internal output target.
-		GenericProperty<TOutput>*	m_output;	//!< Active output target.
+		Property<TOutput>			m_internal;	//!< Internal output target.
+		Property<TOutput>*			m_output;	//!< Active output target.
 	};
 
 } // namespace mvvm

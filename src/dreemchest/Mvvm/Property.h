@@ -54,21 +54,17 @@ namespace mvvm {
 
     //! Template class to simplify the property type declaration.
 	template<typename TValue>
-	class GenericProperty : public IProperty {
+	class Property : public IProperty {
     friend class Binding<TValue>;
 	public:
 
-		//! Alias the property type.
-		typedef TValue				Type;
+		typedef typename Binding<TValue>::WPtr	BindingType;	//!< Alias the binding type.
+		typedef TValue							Type;			//!< Alias the property type.
+		typedef StrongPtr< Property<TValue> >	Ptr;			//!< Alias the strong pointer type.
+		typedef WeakPtr< Property<TValue> >		WPtr;			//!< Alias the weak pointer type.
 
-		//! Alias the strong pointer type.
-		typedef StrongPtr< GenericProperty<TValue> > Ptr;
-
-		//! Alias the weak pointer type.
-		typedef WeakPtr< GenericProperty<TValue> > WPtr;
-
-								    //! Constructs property.
-								    GenericProperty( const DataWPtr& data, const TValue& value = TValue() )
+								    //! Constructs Property instance.
+								    Property( const DataWPtr& data, const TValue& value = TValue() )
 									    : IProperty( data ), m_value( value ) {}
 
 		//! Returns property value.
@@ -84,10 +80,10 @@ namespace mvvm {
     protected:
 
         //! Subscribes to property changes.
-        void                        subscribe( typename Binding<TValue>::WPtr binding );
+        void                        subscribe( BindingType binding );
 
         //! Unsubscribes from property changes.
-        void                        unsubscribe( typename Binding<TValue>::WPtr binding );
+        void                        unsubscribe( BindingType binding );
 
         //! Notifies linked bindings about a property change.
         void                        notify( void );
@@ -95,29 +91,29 @@ namespace mvvm {
 	protected:
 
         //! Container type to store bindings.
-        typedef Set<typename Binding<TValue>::WPtr>	Bindings;
+        typedef Set<BindingType>	Bindings;
 
 		TValue						m_value;    //!< Actual property value.
         Bindings                    m_bindings; //!< Bindings that are linked to this property.
 	};
 
-	// ** GenericProperty::value
+	// ** Property::value
 	template<typename TValue>
-	const TValue& GenericProperty<TValue>::value( void ) const
+	const TValue& Property<TValue>::value( void ) const
 	{
 		return m_value;
 	}
 
-	// ** GenericProperty::value
+	// ** Property::value
 	template<typename TValue>
-	TValue& GenericProperty<TValue>::value( void )
+	TValue& Property<TValue>::value( void )
 	{
 		return m_value;
 	}
 
-	// ** GenericProperty::set
+	// ** Property::set
 	template<typename TValue>
-	void GenericProperty<TValue>::set( const TValue& value )
+	void Property<TValue>::set( const TValue& value )
 	{
 		if( value == m_value ) {
 			return;
@@ -127,49 +123,49 @@ namespace mvvm {
         notify();
 	}
 
-	// ** GenericProperty::value
+	// ** Property::value
 	template<typename TValue>
-	TypeIdx GenericProperty<TValue>::type( void ) const
+	TypeIdx Property<TValue>::type( void ) const
 	{
-		return GroupedTypeIndex<TValue, Property>::idx();
+		return GroupedTypeIndex<TValue, IProperty>::idx();
 	}
 
-    // ** GenericProperty::subscribe
+    // ** Property::subscribe
     template<typename TValue>
-    void GenericProperty<TValue>::subscribe( typename Binding<TValue>::WPtr binding )
+    void Property<TValue>::subscribe( BindingType binding )
     {
         m_bindings.insert( binding );
     }
 
-    // ** GenericProperty::unsubscribe
+    // ** Property::unsubscribe
     template<typename TValue>
-    void GenericProperty<TValue>::unsubscribe( typename Binding<TValue>::WPtr binding )
+    void Property<TValue>::unsubscribe( BindingType binding )
     {
         m_bindings.erase( binding );
     }
 
-    // ** GenericProperty::notify
+    // ** Property::notify
     template<typename TValue>
-    void GenericProperty<TValue>::notify( void )
+    void Property<TValue>::notify( void )
     {
 		if( m_data.valid() ) {
 			m_data->check();
 		}
 
         for( typename Bindings::iterator i = m_bindings.begin(), end = m_bindings.end(); i != end; ++i ) {
-			typename Binding<TValue>::WPtr binding = *i;
+			BindingType binding = *i;
             binding->handlePropertyChanged( m_value );
         }
     }
 
     //! Generic array property type.
     template<typename TValue>
-    class GenericArrayProperty : public GenericProperty< Array<TValue> > {
+    class ArrayProperty : public Property< Array<TValue> > {
     public:
 
-								//! Constructs GenericArrayProperty
-								GenericArrayProperty( const DataWPtr& data )
-									: GenericProperty( data ) {}
+								//! Constructs ArrayProperty
+								ArrayProperty( const DataWPtr& data )
+									: Property( data ) {}
 
         //! Pushes a new value to an array.
         void                    push( const TValue& value );
@@ -178,17 +174,17 @@ namespace mvvm {
 		s32						size( void ) const;
     };
 
-    // ** GenericArrayProperty::push
+    // ** ArrayProperty::push
     template<typename TValue>
-    void GenericArrayProperty<TValue>::push( const TValue& value )
+    void ArrayProperty<TValue>::push( const TValue& value )
     {
         this->m_value.push_back( value );
         this->notify();
     }
 
-    // ** GenericArrayProperty::size
+    // ** ArrayProperty::size
     template<typename TValue>
-    s32 GenericArrayProperty<TValue>::size( void ) const
+    s32 ArrayProperty<TValue>::size( void ) const
     {
 		return this->m_value.size();
     }

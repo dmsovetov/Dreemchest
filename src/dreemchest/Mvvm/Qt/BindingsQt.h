@@ -91,7 +91,7 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtPropertyBinding.
-                                QtPropertyBinding( View* view, TWidget* widget, const Property& property );
+                                QtPropertyBinding( View* view, TWidget* widget, BoundProperty property );
 		virtual					~QtPropertyBinding( void );
 
     protected:
@@ -102,11 +102,9 @@ namespace mvvm {
 
     // ** QtPropertyBinding::QtPropertyBinding
     template<typename TWidget, typename TValue, typename TSignalDelegate>
-    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, TWidget* widget, const Property& property )
+    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, TWidget* widget, BoundProperty property )
         : Binding<TValue>( view, property ), m_widget( widget )
     {
-    //    m_widget = static_cast<QtView*>( view )->widget()->findChild<TWidget*>( name.c_str() );
-	//    DC_BREAK_IF( m_widget == NULL );
 		m_delegate = DC_NEW TSignalDelegate( this, m_widget );
     }
 
@@ -122,12 +120,12 @@ namespace mvvm {
 	public:
 
 								//! Constructs QtListBoxBinding instance.
-                                QtListBoxBinding( View* view, QListWidget* widget, const Property& property );
+                                QtListBoxBinding( View* view, QListWidget* widget, BoundProperty property );
 
 	private:
 
 		//! Handles property change.
-		virtual void		    handlePropertyChanged( const StringArray& value );
+		virtual void		    handlePropertyChanged( const Value& value );
 	};
 
 	//! Binds the string property to a stacked widget state.
@@ -135,12 +133,12 @@ namespace mvvm {
 	public:
 
 								//! Constructs QtStackedWidgetBinding instance.
-                                QtStackedWidgetBinding( View* view, QStackedWidget* widget, const Property& property );
+                                QtStackedWidgetBinding( View* view, QStackedWidget* widget, BoundProperty property );
 
 	private:
 
 		//! Handles property change.
-		virtual void		    handlePropertyChanged( const String& value );
+		virtual void		    handlePropertyChanged( const Value& value );
 	};
 /*
     //! Binds a caption to a string.
@@ -161,12 +159,12 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtPushButtonBinding instance.
-                                QtPushButtonBinding( View* view, QPushButton* widget, const Property& property, const String& event );
+                                QtPushButtonBinding( View* view, QPushButton* widget, BoundProperty property, const String& event );
 
     private:
 
         //! Handles property change.
-        virtual void			handlePropertyChanged( const String& value );
+        virtual void			handlePropertyChanged( const Value& value );
 
 		//! Emits the event.
 		virtual void            refreshProperty( void );
@@ -181,12 +179,12 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtLineEditBinding instance.
-                                QtLineEditBinding( View* view, QLineEdit* widget, const Property& property );
+                                QtLineEditBinding( View* view, QLineEdit* widget, BoundProperty property );
 
     private:
 
         //! Handles property change.
-        virtual void			handlePropertyChanged( const String& value );
+        virtual void			handlePropertyChanged( const Value& value );
 
 		//! Updates the property value.
 		virtual void            refreshProperty( void );
@@ -197,12 +195,12 @@ namespace mvvm {
 	public:
 
                                 //! Constructs QtLabelBinding instance.
-                                QtLabelBinding( View* view, QLabel* widget, const Property& property );
+                                QtLabelBinding( View* view, QLabel* widget, BoundProperty property );
 
     private:
 
         //! Handles property change.
-        virtual void			handlePropertyChanged( const String& value );
+        virtual void			handlePropertyChanged( const Value& value );
 	};
 /*
 	//! Binds the button click event.
@@ -229,10 +227,10 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtVisibilityBinding instance.
-                                QtVisibilityBinding( View* view, QWidget* widget, const Property& property, bool inversed = false );
+                                QtVisibilityBinding( View* view, QWidget* widget, BoundProperty property, bool inversed = false );
 
         //! Handles property change.
-        void                    handlePropertyChanged( const bool& value );
+        void                    handlePropertyChanged( const Value& value );
 
     private:
 
@@ -244,10 +242,10 @@ namespace mvvm {
     public:
 
                                 //! Constructs QtEnabledBinding instance.
-                                QtEnabledBinding( View* view, QWidget* widget, const Property& property, bool inversed = false );
+                                QtEnabledBinding( View* view, QWidget* widget, BoundProperty property, bool inversed = false );
 
         //! Handles property change.
-        void                    handlePropertyChanged( const bool& value );
+        void                    handlePropertyChanged( const Value& value );
 
     private:
 
