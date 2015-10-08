@@ -69,13 +69,13 @@ void View::addHandler( const ActionHandlerPtr& handler )
 	m_actionHandlers.push_back( handler );
 }
 
-// ** View::findProperty
-PropertyPtr View::findProperty( const String& uri )
+// ** View::findPropertyByUri
+PropertyPtr View::findPropertyByUri( const String& uri )
 {
 	u32 idx = uri.find( '.' );
 
 	if( idx == String::npos ) {
-		log::error( "View::findProperty : invalid URI passed, '%s'\n", uri.c_str() );
+		log::error( "View::findPropertyByUri : invalid URI passed, '%s'\n", uri.c_str() );
 		return PropertyPtr();
 	}
 
@@ -87,14 +87,14 @@ PropertyPtr View::findProperty( const String& uri )
 	DataProviderByName::iterator i = m_dataByName.find( data );
 
 	if( i == m_dataByName.end() ) {
-		log::error( "View::findProperty : no data with name '%s'\n", data.c_str() );
+		log::error( "View::findPropertyByUri : no data with name '%s'\n", data.c_str() );
 		return PropertyPtr();
 	}
 
 	PropertyPtr result = i->second->get( key );
 
 	if( !result.valid() ) {
-		log::error( "View::findProperty : data '%s' has no property with name '%s'\n", data.c_str(), key.c_str() );
+		log::error( "View::findPropertyByUri : data '%s' has no property with name '%s'\n", data.c_str(), key.c_str() );
 	}
 
 	return result;

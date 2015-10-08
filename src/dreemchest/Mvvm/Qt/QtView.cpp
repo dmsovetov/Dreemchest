@@ -47,65 +47,44 @@ QWidget* QtView::widget( void )
 // ** QtView::bindString
 void QtView::bindString( const String& target, const String& uri )
 {
-	PropertyPtr property = findProperty( uri );
+	Property<String>::WPtr property = findProperty<String>( uri );
 
 	if( !property.valid() ) {
 		return;
 	}
 
-	Property<String>::WPtr str = castTo<String>( property );
-
-	if( !str.valid() ) {
-		log::error( "QtView::bindString : failed tp cast property '%s' to a string\n", uri.c_str() );
-		return;
-	}
-
 	if( QLineEdit* widget = m_widget->findChild<QLineEdit*>( target.c_str() ) ) {
-		addBinding( DC_NEW QtLineEditBinding( this, widget, str ) );
+		addBinding( DC_NEW QtLineEditBinding( this, widget, property ) );
 	}
 	else if( QLabel* widget = m_widget->findChild<QLabel*>( target.c_str() ) ) {
-		addBinding( DC_NEW QtLabelBinding( this, widget, str ) );
+		addBinding( DC_NEW QtLabelBinding( this, widget, property ) );
 	}
 }
 
 // ** QtView::bindStringList
 void QtView::bindStringList( const String& target, const String& uri )
 {
-	PropertyPtr property = findProperty( uri );
+	Property<StringArray>::WPtr property = findProperty<StringArray>( uri );
 
 	if( !property.valid() ) {
 		return;
 	}
 
-	Property< Array<String> >::WPtr str = castTo< Array<String> >( property );
-
-	if( !str.valid() ) {
-		log::error( "QtView::bindStringList : failed tp cast property '%s' to a string list\n", uri.c_str() );
-		return;
-	}
-
 	QListWidget* widget = m_widget->findChild<QListWidget*>( target.c_str() );
-	addBinding( DC_NEW QtListBoxBinding( this, widget, str ) );
+	addBinding( DC_NEW QtListBoxBinding( this, widget, property ) );
 }
 
 // ** QtView::bindState
 void QtView::bindState( const String& target, const String& uri )
 {
-	PropertyPtr property = findProperty( uri );
+	Property<String>::WPtr property = findProperty<String>( uri );
 
 	if( !property.valid() ) {
 		return;
 	}
 
-	Property<String>::WPtr str = castTo<String>( property );
-
-	if( !str.valid() ) {
-		log::error( "QtView::bindState : failed tp cast property '%s' to a string\n", uri.c_str() );
-		return;
-	}
-
 	QStackedWidget* widget = m_widget->findChild<QStackedWidget*>( target.c_str() );
-	addBinding( DC_NEW QtStackedWidgetBinding( this, widget, str ) );
+	addBinding( DC_NEW QtStackedWidgetBinding( this, widget, property ) );
 }
 
 // ** QtView::bindClick
@@ -124,21 +103,14 @@ void QtView::bindInteger( const String& target, const String& uri )
 // ** QtView::bindEnabled
 void QtView::bindEnabled( const String& target, const String& uri )
 {
-	PropertyPtr property = findProperty( uri );
+	Property<bool>::WPtr property = findProperty<bool>( uri );
 
 	if( !property.valid() ) {
 		return;
 	}
 
-	Property<bool>::WPtr str = castTo<bool>( property );
-
-	if( !str.valid() ) {
-		log::error( "QtView::bindEnabled : failed tp cast property '%s' to a bool\n", uri.c_str() );
-		return;
-	}
-
 	QWidget* widget = m_widget->findChild<QWidget*>( target.c_str() );
-	addBinding( DC_NEW QtEnabledBinding( this, widget, str ) );
+	addBinding( DC_NEW QtEnabledBinding( this, widget, property ) );
 }
 
 } // namespace mvvm

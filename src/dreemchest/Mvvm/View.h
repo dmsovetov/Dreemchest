@@ -49,7 +49,7 @@ namespace mvvm {
 
 		//! Adds a new data provider to this view.
 		template<typename TData>
-		void											addData( const typename TData::Ptr& data );
+		void											addData( typename TData::Ptr data );
 
 		//! Returns the data by type.
 		template<typename TData>
@@ -67,7 +67,11 @@ namespace mvvm {
 	protected:
 
 		//! Returns the property by a specified URI.
-		PropertyPtr										findProperty( const String& uri );
+		PropertyPtr										findPropertyByUri( const String& uri );
+
+		//! Returns the property by a specified URI and type.
+		template<typename TValue>
+		typename Property<TValue>::WPtr					findProperty( const String& uri );
 
     private:
 
@@ -88,8 +92,10 @@ namespace mvvm {
 
 	// ** View::addData
 	template<typename TData>
-	void View::addData( const typename TData::Ptr& data )
+	void View::addData( typename TData::Ptr data )
 	{
+		data->check();
+
 		TypeIdx idx = GroupedTypeIndex<TData, Data>::idx();
 		m_data[idx] = data;
 		m_dataByName[data->name()] = data;
@@ -102,6 +108,26 @@ namespace mvvm {
 		TypeIdx idx = GroupedTypeIndex<TData, Data>::idx();
 		DataProviders::const_iterator i = m_data.find( idx );
 		return i != m_data.end() ? typename TData::WPtr( static_cast<TData*>( i->second.get() ) ) : typename TData::WPtr();
+	}
+
+	// ** View::findProperty
+	template<typename TValue>
+	typename Property<TValue>::WPtr View::findProperty( const String& uri )
+	{
+		PropertyPtr property = findPropertyByUri( uri );
+
+		if( !property.valid() ) {
+			return typename Property<TValue>::WPtr();
+		}
+
+		typename Property<TValue>::WPtr result = castTo<TValue>( property );
+
+		if( !result.valid() ) {
+			log::error( "View::findProperty : failed to cast property '%s' to a requested type\n", uri.c_str() );
+			return typename Property<TValue>::WPtr();
+		}
+
+		return result;
 	}
 
 #ifndef DC_CPP11_DISABLED
