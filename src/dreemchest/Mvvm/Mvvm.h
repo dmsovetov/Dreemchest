@@ -39,7 +39,7 @@ namespace mvvm {
     template<typename T> class GenericArrayProperty;
 
 	dcDeclarePtrs( Binding )
-	dcDeclarePtrs( Property )
+	dcDeclareNamedPtrs( IProperty, Property )
 	dcDeclarePtrs( Data )
 	dcDeclarePtrs( View )
 	dcDeclarePtrs( ActionHandler )

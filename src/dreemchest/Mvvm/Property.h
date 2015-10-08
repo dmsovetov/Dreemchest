@@ -35,14 +35,14 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 	//! Property is an atomic item of data.
-    class Property : public RefCounted {
+    class IProperty : public RefCounted {
     public:
 
-								//! Constructs Property instance.
-								Property( const DataWPtr& data )
+								//! Constructs IProperty instance.
+								IProperty( const DataWPtr& data )
 									: m_data( data ) {}
 
-        virtual                 ~Property( void ) {}
+        virtual                 ~IProperty( void ) {}
 
 		//! Returns the property type id.
 		virtual TypeIdx			type( void ) const { return 0; }
@@ -54,7 +54,7 @@ namespace mvvm {
 
     //! Template class to simplify the property type declaration.
 	template<typename TValue>
-	class GenericProperty : public Property {
+	class GenericProperty : public IProperty {
     friend class GenericBinding<TValue>;
 	public:
 
@@ -72,7 +72,7 @@ namespace mvvm {
 
 								    //! Constructs property.
 								    GenericProperty( const DataWPtr& data, const TValue& value = TValue() )
-									    : Property( data ), m_value( value ) {}
+									    : IProperty( data ), m_value( value ) {}
 
 		//! Returns property value.
 		const TValue&				value( void ) const;
