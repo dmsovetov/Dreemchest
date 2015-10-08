@@ -50,7 +50,7 @@ namespace thread {
         String                  status( void ) const;
 
         //! Sets a task status message.
-        void                    setStatus( const char *value );
+        void                    setStatus( CString value );
 
         //! Wait for this task to complete.
         void                    waitForCompletion( void );
@@ -61,13 +61,13 @@ namespace thread {
     private:
 
         //! Task mutex.
-        dcMutex                 m_mutex;
+        Mutex*					m_mutex;
 
         //! Task wait/completed condition.
-        dcCondition             m_condition;
+        Condition*				m_condition;
 
         //! Task progress.
-        f32                   m_progress;
+        f32						m_progress;
 
         //! A boolean flag indicating that this task is completed
         bool                    m_isCompleted;

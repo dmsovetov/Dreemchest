@@ -80,7 +80,7 @@ void TaskManager::doMainThreadTasks( void )
 }
 
 // ** TaskManager::runMainThreadTask
-dcTaskProgressWeak TaskManager::runMainThreadTask( const TaskFunction& task, void *userData, bool wait )
+TaskProgressWPtr TaskManager::runMainThreadTask( const TaskFunction& task, void *userData, bool wait )
 {
     DC_BREAK_IF( !task );
 
@@ -102,7 +102,7 @@ dcTaskProgressWeak TaskManager::runMainThreadTask( const TaskFunction& task, voi
 }
 
 // ** TaskManager::runBackgroundTask
-dcTaskProgressWeak TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const char* thread )
+TaskProgressWPtr TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const char* thread )
 {
     DC_BREAK_IF( !task );
 
@@ -115,7 +115,7 @@ dcTaskProgressWeak TaskManager::runBackgroundTask( const TaskFunction& task, voi
 }
 
 // ** TaskManager::runTask
-dcTaskProgressWeak TaskManager::runTask( const TaskFunction& task, void *userData, u32 threadId, bool wait )
+TaskProgressWPtr TaskManager::runTask( const TaskFunction& task, void *userData, u32 threadId, bool wait )
 {
     DC_BREAK_IF( !task );
 

@@ -67,7 +67,7 @@ namespace thread {
         class TaskQueue*        m_tasks;
 
         //! Thread object.
-        Thread*                 m_thread;
+        ThreadPtr				m_thread;
     };
     
 } // namespace thread

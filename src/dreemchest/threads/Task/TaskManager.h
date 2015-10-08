@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef        __DC_TaskManager_H__
-#define        __DC_TaskManager_H__
+#ifndef __DC_TaskManager_H__
+#define __DC_TaskManager_H__
 
-#include    "TaskProgress.h"
+#include "TaskProgress.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -60,7 +60,7 @@ namespace thread {
          \param thread Worker name.
          \return TaskProgress object.
          */
-        dcTaskProgressWeak      runBackgroundTask( const TaskFunction& task, void* userData = NULL, u32 priority = 0, const char* thread = NULL );
+        TaskProgressWPtr		runBackgroundTask( const TaskFunction& task, void* userData = NULL, u32 priority = 0, const char* thread = NULL );
 
         //! Adds a new task to process on main thread.
         /*!
@@ -69,7 +69,7 @@ namespace thread {
          \param wait A flag indicating that we should wait for task completion.
          \return TaskProgress object.
          */
-        dcTaskProgressWeak      runMainThreadTask( const TaskFunction& task, void* userData = NULL, bool wait = true );
+        TaskProgressWPtr		runMainThreadTask( const TaskFunction& task, void* userData = NULL, bool wait = true );
 
         //! Starts a new task with a given priority at a given worker.
         /*!
@@ -79,7 +79,7 @@ namespace thread {
          \param wait A flag indicating that we should wait for task completion.
          \return TaskProgress object.
          */
-        dcTaskProgressWeak      runTask( const TaskFunction& task, void *userData = NULL, u32 threadId = 0, bool wait = true );
+        TaskProgressWPtr		runTask( const TaskFunction& task, void *userData = NULL, u32 threadId = 0, bool wait = true );
 
         //! Processes all queued main thread tasks.
         void                    doMainThreadTasks( void );

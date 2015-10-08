@@ -69,9 +69,9 @@ void TaskQueue::pushTask( const TaskFunction& task, void *userData, TaskProgress
 // ** TaskQueue::doTask
 void TaskQueue::doTask( void )
 {
-    TaskFunction            function;
-    dcTaskProgressStrong    progress;
-    void*                   userData;
+    TaskFunction    function;
+    TaskProgressPtr progress;
+    void*           userData;
 
     {
         DC_SCOPED_LOCK( m_mutex );

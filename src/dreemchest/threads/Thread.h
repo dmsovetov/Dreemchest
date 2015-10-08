@@ -40,12 +40,10 @@ namespace thread {
     //! Thread function callback.
     typedef cClosure<void(void*)> ThreadCallback;
 
-    // ** class Thread
     //! Thread object.
-    class dcInterface Thread {
+    class dcInterface Thread : public RefCounted {
     public:
 
-                            Thread( void );
         virtual             ~Thread( void );
 
         //! Returns true is this thread is alive.
@@ -58,7 +56,7 @@ namespace thread {
         u32                 id( void ) const;
 
         //! Creates a new Thread object.
-        static Thread*      create( void );
+        static ThreadPtr	create( void );
 
         //! Puts this thread to sleep for a given amount of time.
         /*!
@@ -84,6 +82,11 @@ namespace thread {
 
 		//! Suspends execution of the calling thread until this one terminates.
 		virtual void		wait( void ) const;
+
+	protected:
+
+							//! Constructs Thread instance.
+							Thread( void );
 
     protected:
 

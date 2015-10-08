@@ -40,19 +40,19 @@ namespace thread {
         
         // ** struct Task
         struct Task {
-            u32                     m_priority; //!< Task priority, used to sort tasks inside the priority queue.
-            dcTaskProgressStrong    m_progress; //!< Task's progress object. ?? Does it thread-safe?
-            TaskFunction            m_function; //!< Task's callback function.
-            void*                   m_userData; //!< Task's associated user data.
+            u32                m_priority; //!< Task priority, used to sort tasks inside the priority queue.
+            TaskProgressPtr    m_progress; //!< Task's progress object. ?? Does it thread-safe?
+            TaskFunction       m_function; //!< Task's callback function.
+            void*              m_userData; //!< Task's associated user data.
 
-                                    //! Constructs a new Task object instance.
-                                    /*!
-                                     \param function Task callback function.
-                                     \param userData Associated task user data.
-                                     \param progress Task progress object, used to notify other threads about task status.
-                                     \param priority Task priority.
-                                     */
-                                    Task( TaskFunction function, void* userData, TaskProgress* progress, u32 priority );
+                               //! Constructs a new Task object instance.
+                               /*!
+                                  \param function Task callback function.
+                                  \param userData Associated task user data.
+                                  \param progress Task progress object, used to notify other threads about task status.
+                                  \param priority Task priority.
+                               */
+                               Task( TaskFunction function, void* userData, TaskProgress* progress, u32 priority );
 
             //! Comparison operator.
             bool operator < ( const Task& other ) const;
@@ -98,10 +98,10 @@ namespace thread {
     private:
 
         //! Task queue mutex used to lock a m_tasks variable.
-        dcMutex                 m_mutex;
+        Mutex*					m_mutex;
 
         //! Condition to wait for tasks in sleep mode.
-        dcCondition             m_condition;
+        Condition*				m_condition;
 
         //! Actual task queue.
         TaskPriorityQueue       m_tasks;

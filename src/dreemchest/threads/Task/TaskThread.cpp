@@ -44,7 +44,7 @@ TaskThread::TaskThread( const char *name, TaskQueue *queue )
 
 TaskThread::~TaskThread( void )
 {
-    DC_RELEASE( m_thread );
+
 }
 
 // ** TaskThread::taskQueue

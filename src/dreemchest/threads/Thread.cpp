@@ -53,15 +53,17 @@ Thread::~Thread( void )
 }
 
 // ** Thread::create
-Thread* Thread::create( void )
+ThreadPtr Thread::create( void )
 {
 #ifdef DC_THREADS_POSIX
-    return DC_NEW PosixThread;
+    return ThreadPtr( DC_NEW PosixThread );
 #elif DC_THREADS_WINDOWS
-    return DC_NEW WindowsThread;
+    return ThreadPtr( DC_NEW WindowsThread );
 #else
     #error Unknown threading option defined.
 #endif
+
+	return ThreadPtr();
 }
 
 // ** Thread::release

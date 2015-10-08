@@ -86,12 +86,12 @@ namespace thread {
     class ScopedLock {
     public:
 
-                    ScopedLock( dcMutex mutex ) : m_mutex( mutex ) { m_mutex->lock(); }
+                    ScopedLock( Mutex* mutex ) : m_mutex( mutex ) { m_mutex->lock(); }
                     ~ScopedLock( void ) { m_mutex->unlock(); }
 
     private:
 
-        dcMutex     m_mutex;
+        Mutex*		m_mutex;
     };
 
 } // namespace thread

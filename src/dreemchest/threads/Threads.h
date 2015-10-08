@@ -40,25 +40,19 @@
 
 DC_BEGIN_DREEMCHEST
 
-    namespace thread {
-        class Thread;
-        class Mutex;
-        class Condition;
-        class Task;
-        class TaskManager;
-        class TaskProgress;
+namespace thread {
 
-        typedef cClosure<void(TaskProgress*, void*)> TaskFunction;
-    }
+	dcDeclarePtrs( Thread )
+	dcDeclarePtrs( TaskProgress )
 
-    typedef thread::Thread*                 dcThread;
-    typedef thread::Mutex*                  dcMutex;
-    typedef thread::Condition*              dcCondition;
-    typedef thread::Task*                   dcTask;
-    typedef thread::TaskProgress*           dcTaskProgress;
-    typedef thread::TaskManager*            dcTaskManager;
+    class Mutex;
+    class Condition;
+    class Task;
+    class TaskManager;
+    class TaskProgress;
 
-    DC_DECLARE_PTRS( thread::TaskProgress, TaskProgress )
+    typedef cClosure<void(TaskProgress*, void*)> TaskFunction;
+}
 
 DC_END_DREEMCHEST
 
