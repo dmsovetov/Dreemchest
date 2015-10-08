@@ -175,6 +175,9 @@ namespace mvvm {
 
         //! Pushes a new value to an array.
         void                    push( const TValue& value );
+
+		//! Returns the array size.
+		s32						size( void ) const;
     };
 
     // ** GenericArrayProperty::push
@@ -183,6 +186,13 @@ namespace mvvm {
     {
         this->m_value.push_back( value );
         this->notify();
+    }
+
+    // ** GenericArrayProperty::size
+    template<typename TValue>
+    s32 GenericArrayProperty<TValue>::size( void ) const
+    {
+		return this->m_value.size();
     }
 
 } // namespace mvvm
