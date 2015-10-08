@@ -57,7 +57,7 @@ void View::clear( void )
 }
 
 // ** View::addBinding
-void View::addBinding( Binding* instance )
+void View::addBinding( BindingPtr instance )
 {
     instance->refreshView();
     m_bindings.push_back( instance );

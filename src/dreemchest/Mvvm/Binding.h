@@ -34,13 +34,13 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 	//! Base property binding.
-	class Binding : public RefCounted {
+	class IBinding : public RefCounted {
 	public:
 
                                 //! Constructs Binding instance.
-                                Binding( ViewWPtr view )
+                                IBinding( ViewWPtr view )
                                     : m_view( view ) {}
-		virtual					~Binding( void ) {}
+		virtual					~IBinding( void ) {}
 
         //! Refreshes the bound view.
         virtual void            refreshView( void ) {}
@@ -55,7 +55,7 @@ namespace mvvm {
 
     //! A template class to bind a property of a specified type TProperty.
     template<typename T>
-    class GenericBinding : public Binding {
+    class GenericBinding : public IBinding {
     friend class GenericProperty<T>;
     public:
 
@@ -85,7 +85,7 @@ namespace mvvm {
     // ** GenericBinding::GenericBinding
     template<typename T>
     GenericBinding<T>::GenericBinding( ViewWPtr view, Property property )
-        : Binding( view ), m_property( property )
+        : IBinding( view ), m_property( property )
     {
         if( m_property.valid() ) m_property->subscribe( this );
     }

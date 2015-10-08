@@ -56,7 +56,7 @@ namespace mvvm {
 		typename TData::WPtr							data( void ) const;
 
         //! Adds a new binding to view.
-        void                                            addBinding( Binding* instance );
+        void                                            addBinding( BindingPtr instance );
 
         //! Notifies action handler about an event.
         void                                            notify( const String& event );

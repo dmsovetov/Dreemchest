@@ -38,7 +38,7 @@ namespace mvvm {
     template<typename T> class GenericProperty;
     template<typename T> class GenericArrayProperty;
 
-	dcDeclarePtrs( Binding )
+	dcDeclareNamedPtrs( IBinding, Binding )
 	dcDeclareNamedPtrs( IProperty, Property )
 	dcDeclarePtrs( Data )
 	dcDeclarePtrs( View )
