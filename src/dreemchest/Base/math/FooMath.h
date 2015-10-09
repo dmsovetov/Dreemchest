@@ -68,6 +68,13 @@ DC_BEGIN_DREEMCHEST
 		return fabs( a - b ) <= eps && fabs( b - c ) <= eps && fabs( c - a ) <= eps;
 	}
 
+	//! Rounds the floating point number to a specified decimal place.
+	inline f32 round( f32 a, u32 decimal )
+	{
+		f32 multipler = powf( 10.0f, ( f32 )decimal );
+		return floor( a * multipler ) / multipler;
+	}
+
     //! Returns a minimum value of two.
 	template<typename T>
     inline T min2( T a, T b ) {
