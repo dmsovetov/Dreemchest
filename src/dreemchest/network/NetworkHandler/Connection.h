@@ -77,13 +77,11 @@ namespace net {
 		//! Sends a packet over this connection.
 		void					send( NetworkPacket* packet );
 
-		//! Sends a packet of a specified type over this connection.
-		template<typename T>						 void send( void );
-		template<typename T, TemplateFunctionTypes1> void send( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2> void send( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3> void send( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4> void send( TemplateFunctionArgs4 );
-		template<typename T, TemplateFunctionTypes5> void send( TemplateFunctionArgs5 );
+	#ifndef DC_CPP11_DISABLED
+		//! Generic method to construct and sent the network packet over this connection.
+		template<typename TPacket, typename ... Args>
+		void					send( const Args& ... args );
+	#endif	/*	!DC_CPP11_DISABLED	*/
 
 	private:
 
@@ -145,7 +143,7 @@ namespace net {
 
 	// ** Connection::invokeVoid
 	template<typename TRemoteProcedure>
-	inline void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
+	void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
@@ -156,7 +154,7 @@ namespace net {
 
 	// ** Connection::invoke
 	template<typename TRemoteProcedure>
-	inline void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
+	void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
@@ -173,7 +171,7 @@ namespace net {
 
 	// ** Connection::emit
 	template<typename TEvent>
-	inline void Connection::emit( const TEvent& e )
+	void Connection::emit( const TEvent& e )
 	{
 		// ** Serialize event to a byte buffer.
 		io::ByteBufferPtr buffer = io::BinarySerializer::write( e );
@@ -182,53 +180,15 @@ namespace net {
 		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
 
-	// ** Connection::send
-	template<typename T>
-	inline void Connection::send( void )
+#ifndef DC_CPP11_DISABLED
+	//! Generic method to construct and sent the network packet over this connection.
+	template<typename TPacket, typename ... Args>
+	void Connection::send( const Args& ... args )
 	{
-		T packet;
+		TPacket packet( args... );
 		send( &packet );
 	}
-
-	// ** Connection::send
-	template<typename T, TemplateFunctionTypes1>
-	inline void Connection::send( TemplateFunctionArgs1 )
-	{
-		T packet( arg0 );
-		send( &packet );
-	}
-
-	// ** Connection::send
-	template<typename T, TemplateFunctionTypes2>
-	inline void Connection::send( TemplateFunctionArgs2 )
-	{
-		T packet( arg0, arg1 );
-		send( &packet );
-	}
-
-	// ** Connection::send
-	template<typename T, TemplateFunctionTypes3>
-	inline void Connection::send( TemplateFunctionArgs3 )
-	{
-		T packet( arg0, arg1, arg2 );
-		send( &packet );
-	}
-
-	// ** Connection::send
-	template<typename T, TemplateFunctionTypes4>
-	inline void Connection::send( TemplateFunctionArgs4 )
-	{
-		T packet( arg0, arg1, arg2, arg3 );
-		send( &packet );
-	}
-
-	// ** Connection::send
-	template<typename T, TemplateFunctionTypes5>
-	inline void Connection::send( TemplateFunctionArgs5 )
-	{
-		T packet( arg0, arg1, arg2, arg3, arg4 );
-		send( &packet );
-	}
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 	//! Send a response to caller.
 	template<typename T>
