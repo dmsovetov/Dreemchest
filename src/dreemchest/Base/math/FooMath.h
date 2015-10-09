@@ -59,7 +59,7 @@ DC_BEGIN_DREEMCHEST
 
     //! Does a linear interpolation between two values.
     inline float lerp( float a, float b, float scalar ) {
-        return a * scalar + b * (1.0f - scalar);
+        return a * (1.0f - scalar) + b * scalar;
     }
 
 	//! Returns true if three float values are equal.
