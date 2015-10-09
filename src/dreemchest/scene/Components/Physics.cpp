@@ -90,6 +90,30 @@ RigidBody2D::Type RigidBody2D::type( void ) const
 	return m_type;
 }
 
+// ** RigidBody2D::linearDamping
+f32 RigidBody2D::linearDamping( void ) const
+{
+	return m_linearDamping;
+}
+
+// ** RigidBody2D::setLinearDamping
+void RigidBody2D::setLinearDamping( f32 value )
+{
+	m_linearDamping = value;
+}
+
+// ** RigidBody2D::angularDamping
+f32 RigidBody2D::angularDamping( void ) const
+{
+	return m_angularDamping;
+}
+
+// ** RigidBody2D::setAngularDamping
+void RigidBody2D::setAngularDamping( f32 value )
+{
+	m_angularDamping = value;
+}
+
 // ** RigidBody2D::torque
 f32 RigidBody2D::torque( void ) const
 {

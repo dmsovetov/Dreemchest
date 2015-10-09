@@ -136,6 +136,8 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 	f32			torque = rigidBody.torque();
 	const Vec2& force  = rigidBody.force();
 
+	body->SetLinearDamping( rigidBody.linearDamping() );
+	body->SetAngularDamping( rigidBody.angularDamping() );
 	body->ApplyTorque( -torque * mass, true );
 	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
 

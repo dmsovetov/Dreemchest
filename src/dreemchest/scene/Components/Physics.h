@@ -122,13 +122,25 @@ namespace Scene {
 
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )
-								: m_mass( mass ), m_type( type ), m_torque( 0.0f ) {}
+								: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ) {}
 
 		//! Returns the rigid body mass.
 		f32					mass( void ) const;
 
 		//! Returns the rigid body type.
 		Type				type( void ) const;
+
+		//! Returns the linear damping applied to a body.
+		f32					linearDamping( void ) const;
+
+		//! Sets the linear damping applied to a body.
+		void				setLinearDamping( f32 value );
+
+		//! Returns the angular damping applied to a body.
+		f32					angularDamping( void ) const;
+
+		//! Sets the angular damping applied to a body.
+		void				setAngularDamping( f32 value );
 
 		//! Returns the torque applied to this rigid body.
 		f32					torque( void ) const;
@@ -147,10 +159,12 @@ namespace Scene {
 
 	private:
 
-		f32					m_mass;			//!< The rigid body mass.
-		Type				m_type;			//!< The rigid body type.
-		f32					m_torque;		//!< The total torque applied.
-		Vec2				m_force;		//!< The total force applied.
+		f32					m_mass;				//!< The rigid body mass.
+		Type				m_type;				//!< The rigid body type.
+		f32					m_linearDamping;	//!< The linear damping applied to a body.
+		f32					m_angularDamping;	//!< The angular damping applied to a body.
+		f32					m_torque;			//!< The total torque applied.
+		Vec2				m_force;			//!< The total force applied.
 	};
 
 } // namespace Scene
