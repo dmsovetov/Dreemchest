@@ -138,11 +138,31 @@ void RigidBody2D::applyForce( const Vec2& value )
 	m_force += value;
 }
 
+// ** RigidBody2D::applyForceToPoint
+void RigidBody2D::applyForceToPoint( const Vec2& value, const Vec2& point )
+{
+	m_forces.push_back( AppliedForce( value, point ) );
+}
+
+// ** RigidBody2D::appliedForceCount
+u32 RigidBody2D::appliedForceCount( void ) const
+{
+	return ( u32 )m_forces.size();
+}
+
+// ** RigidBody2D::appliedForce
+const 	RigidBody2D::AppliedForce&	RigidBody2D::appliedForce( u32 index ) const
+{
+	DC_BREAK_IF( index >= appliedForceCount() );
+	return m_forces[index];
+}
+
 // ** RigidBody2D::clear
 void RigidBody2D::clear( void )
 {
 	m_torque = 0.0f;
 	m_force  = Vec2( 0.0f, 0.0f );
+	m_forces.clear();
 }
 
 } // namespace Scene

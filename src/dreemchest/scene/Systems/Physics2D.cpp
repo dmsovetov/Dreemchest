@@ -141,6 +141,13 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 	body->ApplyTorque( -torque * mass, true );
 	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
 
+	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
+		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
+		b2Vec2 value = b2Vec2( appliedForce.m_value.x * mass, appliedForce.m_value.y * mass );
+		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
+		body->ApplyForce( value, point, true );
+	}
+
 	// Clear all forces now
 	rigidBody.clear();
 }

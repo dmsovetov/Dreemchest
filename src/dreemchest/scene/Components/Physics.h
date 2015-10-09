@@ -52,7 +52,7 @@ namespace Scene {
 			f32			restitution;
 
 						//! Constructs the material instance.
-						Material( f32 density = 0.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
+						Material( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
 							: density( density ), friction( friction ), restitution( restitution ) {}
 		};
 
@@ -120,6 +120,16 @@ namespace Scene {
 			, TotalTypes	//!< The total number of rigid body types.
 		};
 
+		//! A single force applied is stored in this structure.
+		struct AppliedForce {
+							//! Constructs the AppliedForce instance.
+							AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
+								: m_value( value ), m_point( point ) {}
+
+			Vec2			m_value;			//!< The force applied.
+			Vec2			m_point;			//!< The application point.
+		};
+
 							//! Constructs the RigidBody2D instance.
 							RigidBody2D( f32 mass = 0.0f, Type type = Static )
 								: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ) {}
@@ -154,6 +164,15 @@ namespace Scene {
 		//! Applies force to the center of mass.
 		void				applyForce( const Vec2& value );
 
+		//! Applies force to a specified point.
+		void				applyForceToPoint( const Vec2& value, const Vec2& point );
+
+		//! Returns the total number of applied forces.
+		u32					appliedForceCount( void ) const;
+
+		//! Returns the applied force by index.
+		const AppliedForce&	appliedForce( u32 index ) const;
+
 		//! Clears all applied forces.
 		void				clear( void );
 
@@ -165,6 +184,7 @@ namespace Scene {
 		f32					m_angularDamping;	//!< The angular damping applied to a body.
 		f32					m_torque;			//!< The total torque applied.
 		Vec2				m_force;			//!< The total force applied.
+		Array<AppliedForce>	m_forces;			//!< All applied forces.
 	};
 
 } // namespace Scene
