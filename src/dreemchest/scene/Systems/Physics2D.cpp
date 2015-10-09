@@ -72,6 +72,30 @@ SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 	return callback.m_result;
 }
 
+// ** Box2DPhysics::querySegment
+SceneObjectSet Box2DPhysics::querySegment( const Vec2& start, const Vec2& end ) const
+{
+	DC_BREAK_IF( (start - end).length() < 1.0f );
+
+	// Ray casting callback
+	struct Callback : public b2RayCastCallback {
+		Callback( void ) {}
+
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) {
+			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
+			m_result.insert( entity );
+			return 1.0f;
+		}
+
+		SceneObjectSet	m_result;
+	};
+
+	Callback callback;
+	m_world->RayCast( &callback, positionToBox2D( start ), positionToBox2D( end ) );
+
+	return callback.m_result;
+}
+
 // ** Box2DPhysics::rayCast
 bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const
 {

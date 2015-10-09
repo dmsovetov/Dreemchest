@@ -54,6 +54,9 @@ namespace Scene {
 		//! Returns all scene objects inside the rect.
 		SceneObjectSet			queryRect( const Rect& rect ) const;
 
+		//! Returns all scene objects that are intersected by a ray.
+		SceneObjectSet			querySegment( const Vec2& start, const Vec2& end ) const;
+
 		//! Sets the physics update delta time.
 		void					setDeltaTime( f32 value );
 
