@@ -75,6 +75,9 @@ namespace net {
 	friend class ClientHandler;
 	public:
 
+							//! Constructs ClientSocketDelegate instance.
+							ClientSocketDelegate( ClientHandlerWPtr clientHandler );
+
 		//! Handles a socket disconnection.
 		virtual void		handleClosed( TCPSocket* sender );
 
@@ -84,7 +87,7 @@ namespace net {
 	private:
 
 		//! Parent client handler.
-		ClientHandler*		m_clientHandler;
+		ClientHandlerWPtr	m_clientHandler;
 	};
     
 } // namespace net

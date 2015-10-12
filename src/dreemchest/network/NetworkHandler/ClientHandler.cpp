@@ -93,11 +93,21 @@ void ClientHandler::processConnectionClosed( TCPSocket* socket )
 	m_eventEmitter.emit<ConnectionClosed>();
 }
 
-// -----------------------------------------ClientSocketDelegate --------------------------------------- //
+// ----------------------------------------- ClientSocketDelegate --------------------------------------- //
+
+// ** ClientSocketDelegate::ClientSocketDelegate
+ClientSocketDelegate::ClientSocketDelegate( ClientHandlerWPtr clientHandler ) : m_clientHandler( clientHandler )
+{
+
+}
 
 // ** ClientSocketDelegate::handleClosed
 void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 {
+	if( !m_clientHandler.valid() ) {
+		return;
+	}
+
 	log::verbose( "ClientSocketDelegate::handleClosed : connection closed\n" );
 	m_clientHandler->processConnectionClosed( sender );
 }
@@ -105,6 +115,10 @@ void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 // ** ClientSocketDelegate::handleReceivedData
 void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
+	if( !m_clientHandler.valid() ) {
+		return;
+	}
+
 	m_clientHandler->processReceivedData( sender, stream );
 }
 

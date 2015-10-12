@@ -61,6 +61,8 @@ namespace net {
 	class NetworkEvents;
     class INetwork;
 
+	dcDeclarePtrs( ClientHandler )
+
 	//! Alias io::Serializable as NetworkPacket
 	typedef io::Serializable NetworkPacket;
 
@@ -90,9 +92,6 @@ namespace net {
 
 	//! Server network handler strong ptr.
 	typedef StrongPtr<ServerHandler> ServerHandlerPtr;
-
-	//! Client network handler strong ptr.
-	typedef StrongPtr<ClientHandler> ClientHandlerPtr;
 
 	//! Connection weak ptr.
 	typedef WeakPtr<Connection> ConnectionWPtr;
