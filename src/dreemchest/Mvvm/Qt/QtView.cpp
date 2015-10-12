@@ -53,6 +53,14 @@ void QtView::bindString( const String& target, const String& uri )
 		return;
 	}
 
+	bindString( target, property );
+}
+
+// ** QtView::bindString
+void QtView::bindString( const String& target, StringProperty::WPtr property )
+{
+	DC_BREAK_IF( !property.valid() );
+
 	if( QLineEdit* widget = m_widget->findChild<QLineEdit*>( target.c_str() ) ) {
 		addBinding( DC_NEW QtLineEditBinding( this, widget, property ) );
 	}

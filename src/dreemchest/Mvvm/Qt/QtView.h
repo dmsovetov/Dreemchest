@@ -43,8 +43,15 @@ namespace mvvm {
 		//! Returns parent widget.
 		QWidget*	widget( void );
 
+		//! Adds a new converter binding to view.
+		template<typename TConverter>
+		WeakPtr<TConverter> addConverter( const String& target );
+
 		//! Binds the string property to a widget.
 		void		bindString( const String& target, const String& uri );
+
+		//! Binds the string property to a widget.
+		void		bindString( const String& target, StringProperty::WPtr property );
 
 		//! Binds the int property to a widget.
 		void		bindInteger( const String& target, const String& uri );
@@ -65,6 +72,22 @@ namespace mvvm {
 
 		QWidget*	m_widget;	//!< Parent widget.
 	};
+
+	// ** QtView::addConverter
+	template<typename TConverter>
+	WeakPtr<TConverter>  QtView::addConverter( const String& target )
+	{
+		typename TConverter::Input input = findProperty<typename TConverter::Value>( target );
+
+		if( !input.valid() ) {
+			return WeakPtr<TConverter>();
+		}
+
+		TConverter* converter = DC_NEW TConverter( this, input );
+		addBinding( converter );
+
+		return converter;
+	}
 
 } // namespace mvvm
 
