@@ -78,6 +78,10 @@ s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& e
 	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
 		const SocketDescriptor& socket = (*i)->descriptor();
 
+		if( !socket.isValid() ) {
+			continue;
+		}
+
 		FD_SET( socket, &read );
 		FD_SET( socket, &write );
 		FD_SET( socket, &except );
@@ -91,6 +95,9 @@ s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& e
 // ** PosixTCPSocketListener::update
 void PosixTCPSocketListener::update( void )
 {
+    // ** Remove closed connections
+	removeClosedConnections();
+
 	// ** Setup FD sets
 	fd_set read, write, except;
 	s32 nfds = setupFDSets( read, write, except, m_socket );
@@ -150,8 +157,11 @@ void PosixTCPSocketListener::update( void )
 			socket->close();
 		}
 	}
+}
 
-    // ** Remove closed connections
+// ** PosixTCPSocketListener::removeClosedConnections
+void PosixTCPSocketListener::removeClosedConnections( void )
+{
     for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ) {
 		if( !(*i)->isValid() ) {
             i = m_clientSockets.erase( i );

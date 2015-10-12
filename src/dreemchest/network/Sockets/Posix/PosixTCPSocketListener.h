@@ -57,6 +57,9 @@ namespace net {
 		//! Setups FD sets used in select call.
 		s32                             setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener );
 
+		//! Removes closed connections.
+		void							removeClosedConnections( void );
+
 	private:
 
 		//! TCP socket listener delegate.
