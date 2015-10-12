@@ -39,6 +39,24 @@ namespace net {
 	friend class ServerSocketDelegate;
     public:
 
+		//! ClientConnected event is emitted when a new client is connected to a server.
+		struct ClientConnected {
+									//! Constructs ClientConnected instance.
+									ClientConnected( const ConnectionPtr& connection )
+										: m_connection( connection ) {}
+
+			ConnectionPtr			m_connection;	//!< Opened connection instance.
+		};
+
+		//! ClientDisconnected event is emitted when a new client is disconnected from a server.
+		struct ClientDisconnected {
+									//! Constructs ClientDisconnected instance.
+									ClientDisconnected( const ConnectionPtr& connection )
+										: m_connection( connection ) {}
+
+			ConnectionPtr			m_connection;	//!< Closed connection instance.
+		};
+
         // ** NetworkHandler
         virtual void				update( u32 dt );
 		virtual ConnectionList		eventListeners( void ) const;

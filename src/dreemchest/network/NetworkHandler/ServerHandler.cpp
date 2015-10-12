@@ -71,14 +71,20 @@ bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packet
 void ServerHandler::processClientConnection( TCPSocket* socket )
 {
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
-	createConnection( socket );
+	ConnectionPtr connection = createConnection( socket );
+
+	m_eventEmitter.emit<ClientConnected>( connection );
 }
 
 // ** ServerHandler::processClientDisconnection
 void ServerHandler::processClientDisconnection( TCPSocket* socket )
 {
+	ConnectionPtr connection = findConnectionBySocket( socket );
+
 	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
 	removeConnection( socket );
+
+	m_eventEmitter.emit<ClientDisconnected>( connection );
 }
 
 // ** ServerHandler::eventListeners
