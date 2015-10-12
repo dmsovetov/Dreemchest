@@ -75,14 +75,14 @@ namespace net {
 	friend class ClientHandler;
 	public:
 
-							//! Constructs ClientSocketDelegate instance.
-							ClientSocketDelegate( ClientHandlerWPtr clientHandler );
-
 		//! Handles a socket disconnection.
 		virtual void		handleClosed( TCPSocket* sender );
 
 		//! Handles a received data.
 		virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
+
+		//! Sets the parent client handler.
+		void				setClientHandler( ClientHandlerWPtr value );
 
 	private:
 

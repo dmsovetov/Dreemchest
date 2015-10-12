@@ -62,8 +62,8 @@ ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port 
 		return ClientHandlerPtr();
 	}
 
-	ClientHandler* clientHandler    = DC_NEW ClientHandler( clientSocket );
-	clientDelegate->m_clientHandler = clientHandler;
+	ClientHandler* clientHandler = DC_NEW ClientHandler( clientSocket );
+	clientDelegate->setClientHandler( clientHandler );
 
 	return ClientHandlerPtr( clientHandler );
 }
@@ -95,10 +95,10 @@ void ClientHandler::processConnectionClosed( TCPSocket* socket )
 
 // ----------------------------------------- ClientSocketDelegate --------------------------------------- //
 
-// ** ClientSocketDelegate::ClientSocketDelegate
-ClientSocketDelegate::ClientSocketDelegate( ClientHandlerWPtr clientHandler ) : m_clientHandler( clientHandler )
+// ** ClientSocketDelegate::setClientHandler
+void ClientSocketDelegate::setClientHandler( ClientHandlerWPtr clientHandler )
 {
-
+	m_clientHandler = clientHandler;
 }
 
 // ** ClientSocketDelegate::handleClosed
