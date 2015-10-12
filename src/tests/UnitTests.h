@@ -24,16 +24,5 @@
 
  **************************************************************************/
 
-#include "UnitTests.h"
-
-int main( int argc, char *argv[] )
-{
-    ::testing::InitGoogleTest( &argc, argv );
-    int res = RUN_ALL_TESTS();
-
-#ifndef NDEBUG
-	DC_BREAK
-#endif
-
-	return res;
-}
+#include <gtest/gtest.h>
+#include <Dreemchest.h>

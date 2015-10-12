@@ -24,8 +24,7 @@
 
  **************************************************************************/
 
-#include <gtest/gtest.h>
-#include <Dreemchest.h>
+#include "UnitTests.h"
 
 DC_USE_DREEMCHEST
 
