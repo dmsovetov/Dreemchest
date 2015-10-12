@@ -51,6 +51,12 @@ bool EntitySystem::initialize( EcsWPtr ecs )
 	return true;
 }
 
+// ** EntitySystem::entityCount
+s32 EntitySystem::entityCount( void ) const
+{
+	return m_index->size();
+}
+
 // ** EntitySystem::begin
 bool EntitySystem::begin( u32 currentTime )
 {

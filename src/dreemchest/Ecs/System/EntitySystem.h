@@ -44,6 +44,9 @@ namespace Ecs {
 		//! Initializes the entity system.
 		virtual bool	initialize( EcsWPtr ecs );
 
+		//! Returns the total number of entities that are processed by this system.
+		s32				entityCount( void ) const;
+
 	protected:
 
 						//! Constructs a EntitySystem instance.
