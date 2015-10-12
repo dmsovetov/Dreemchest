@@ -91,7 +91,7 @@ PropertyPtr View::findPropertyByUri( const String& uri )
 		return PropertyPtr();
 	}
 
-	PropertyPtr result = i->second->get( key );
+	PropertyPtr result = i->second->resolve( key );
 
 	if( !result.valid() ) {
 		log::error( "View::findPropertyByUri : data '%s' has no property with name '%s'\n", data.c_str(), key.c_str() );
