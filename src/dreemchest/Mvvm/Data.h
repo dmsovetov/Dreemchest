@@ -49,8 +49,14 @@ namespace mvvm {
 		//! Returns the property by name.
 		PropertyPtr						get( const String& name );
 
+		//! Resolves the nested property by the URI string.
+		PropertyPtr						resolve( const String& uri );
+
 		//! Returns the data name.
 		const String&					name( void ) const;
+
+		//! Returns the data type id.
+		virtual TypeIdx					type( void ) const;
 
 	protected:
 
@@ -64,6 +70,10 @@ namespace mvvm {
 		//! Adds a new named array property.
 		template<typename TValue>
 		ArrayProperty<TValue>*			addArray( const String& name );
+
+		//! Adds a new named data property.
+		template<typename TValue>
+		DataProperty<TValue>*			addData( const String& name, StrongPtr<TValue> value = StrongPtr<TValue>() );
 
 	protected:
 
@@ -93,6 +103,15 @@ namespace mvvm {
 		return prop;
 	}
 
+	// ** Data::addData
+	template<typename TValue>
+	DataProperty<TValue>* Data::addData( const String& name, StrongPtr<TValue> value )
+	{
+		DataProperty<TValue>* prop = DC_NEW DataProperty<TValue>( this, value.valid() ? value : TValue::create() );
+		m_properties[name] = PropertyPtr( prop );
+		return prop;
+	}
+
 	//! Generic data class.
 	template<typename T>
 	class GenericData : public Data {
@@ -107,6 +126,12 @@ namespace mvvm {
 							//! Constructs GenericData instance.
 							GenericData( void )
 								: Data( TypeInfo<T>::name() ) {}
+
+		//! Returns the actual data type id.
+		virtual TypeIdx type( void ) const
+		{
+			return GroupedTypeIndex<T, Data>::idx();
+		}
 
 		//! Createa the RemoteHost data instance.
 		template<typename ... Args>

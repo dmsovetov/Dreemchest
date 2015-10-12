@@ -49,6 +49,13 @@ const String& Data::name( void ) const
 	return m_name;
 }
 
+// ** Data::type
+TypeIdx Data::type( void ) const
+{
+	DC_BREAK;
+	return 0;
+}
+
 // ** Data::validate
 bool Data::validate( void ) const
 {
@@ -72,6 +79,36 @@ PropertyPtr Data::get( const String& name )
 
 	Properties::iterator i = m_properties.find( name );
 	return i != m_properties.end() ? i->second : PropertyPtr();
+}
+
+// ** Data::resolve
+PropertyPtr Data::resolve( const String& uri )
+{
+	u32 idx = uri.find( '.' );
+
+	// No objects in URI - return the property.
+	if( idx == String::npos ) {
+		return get( uri );
+	}
+
+	// Split the URI
+	String data = uri.substr( 0, idx );
+	String key  = uri.substr( idx + 1 );
+
+	// Find the nested property.
+	PropertyPtr value = get( data );
+
+	if( !value.valid() ) {
+		return PropertyPtr();
+	}
+
+	StrongPtr< Property<DataPtr> > object = castTo<DataPtr>( value );
+
+	if( !object.valid() ) {
+		return PropertyPtr();
+	}
+
+	return object->value()->resolve( key );
 }
 
 } // namespace mvvm
