@@ -87,12 +87,19 @@ bool ClientHandler::detectServers( u16 port )
 	return true;
 }
 
+// ** ClientHandler::processConnectionClosed
+void ClientHandler::processConnectionClosed( TCPSocket* socket )
+{
+	m_eventEmitter.emit<ConnectionClosed>();
+}
+
 // -----------------------------------------ClientSocketDelegate --------------------------------------- //
 
 // ** ClientSocketDelegate::handleClosed
 void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 {
 	log::verbose( "ClientSocketDelegate::handleClosed : connection closed\n" );
+	m_clientHandler->processConnectionClosed( sender );
 }
 
 // ** ClientSocketDelegate::handleReceivedData

@@ -39,6 +39,10 @@ namespace net {
 	friend class ClientSocketDelegate;
     public:
 
+		//! ConnectionClosed event is emitted when a connection was closed.
+		struct ConnectionClosed {
+		};
+
 		//! Return current connection.
 		const ConnectionPtr&	connection( void ) const;
 		ConnectionPtr&			connection( void );
@@ -57,6 +61,9 @@ namespace net {
 
 								//! Constructs ClientHandler instance.
 								ClientHandler( const TCPSocketPtr& socket );
+
+		//! Called when a connection was closed.
+		virtual void			processConnectionClosed( TCPSocket* socket );
 
 	private:
 
