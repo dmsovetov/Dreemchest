@@ -158,6 +158,26 @@ namespace mvvm {
         }
     }
 
+	//! Generic data property type.
+	template<typename TValue>
+	class DataProperty : public Property< StrongPtr<Data> > {
+	public:
+
+								//! Constructs DataProperty instance.
+								DataProperty( const DataWPtr& data, StrongPtr<TValue> value = StrongPtr<TValue>() )
+									: Property( data, value ) {}
+
+		//! Returns the casted property value.
+		StrongPtr<TValue>		value( void ) const;
+	};
+
+	// ** DataProperty::value
+	template<typename TValue>
+	StrongPtr<TValue> DataProperty<TValue>::value( void ) const
+	{
+		return StrongPtr<TValue>( static_cast<TValue*>( m_value.get() ) );
+	}
+
     //! Generic array property type.
     template<typename TValue>
     class ArrayProperty : public Property< Array<TValue> > {
