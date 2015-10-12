@@ -56,6 +56,10 @@ namespace packets {
 		IoEndSerializer
 	};
 
+	//! Keep alive message.
+	struct KeepAlive : public Packet<KeepAlive> {
+	};
+
 	//! Server detection packet.
 	struct DetectServers : public io::SerializableT<DetectServers> {
 		String			query;	//!< A server query.

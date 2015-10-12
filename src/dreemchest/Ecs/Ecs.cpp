@@ -98,6 +98,8 @@ void Ecs::removeEntity( const EntityId& id )
 	}
 
 	i->second->markAsRemoved();
+
+	m_changed.insert( i->second );
 	m_removed.insert( i->second );
 }
 

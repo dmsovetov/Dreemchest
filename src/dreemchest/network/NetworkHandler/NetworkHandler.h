@@ -55,6 +55,12 @@ namespace net {
 		//! Sets the ping rate.
 		void					setPingRate( u32 value );
 
+		//! Returns the keep-alive time.
+		s32						keepAliveTime( void ) const;
+
+		//! Sets the keep-alive time.
+		void					setKeepAliveTime( s32 value );
+
 		//! Begins listening for broadcast messages.
 		void					listenForBroadcasts( u16 port );
 
@@ -109,6 +115,9 @@ namespace net {
 		//! Handles a ping packet.
 		virtual bool			handlePingPacket( ConnectionPtr& connection, packets::Ping& packet );
 
+		//! Handles a keep-alive message and updates the connection TTL value.
+		virtual bool			handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet );
+
 		//! Handles a server detection packet.
 		virtual bool			handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
 
@@ -158,6 +167,12 @@ namespace net {
 
 		//! Ping time accumulator.
 		s32						m_pingTimeLeft;
+
+		//! Keep alive time.
+		s32						m_keepAliveTime;
+
+		//! Keep alive send rate.
+		u32						m_keepAliveSendRate;
 	};
 
 	// ** NetworkHandler::registerPacketHandler

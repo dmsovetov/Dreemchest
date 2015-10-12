@@ -34,7 +34,7 @@ namespace net {
 
 // ** Connection::Connection
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 ), m_time( 0 ), m_roundTripTime( 0 )
+	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 ), m_time( 0 ), m_roundTripTime( 0 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
 {
 
 }
@@ -49,6 +49,30 @@ u32 Connection::time( void ) const
 void Connection::setTime( u32 value )
 {
 	m_time = value;
+}
+
+// ** Connection::timeToLive
+s32 Connection::timeToLive( void ) const
+{
+	return m_timeToLive;
+}
+
+// ** Connection::setTimeToLive
+void Connection::setTimeToLive( s32 value )
+{
+	m_timeToLive = value;
+}
+
+// ** Connection::keepAliveTimestamp
+u32 Connection::keepAliveTimestamp( void ) const
+{
+	return m_keepAliveTimestamp;
+}
+
+// ** Connection::setKeepAliveTimestamp
+void Connection::setKeepAliveTimestamp( u32 value )
+{
+	m_keepAliveTimestamp = value;
 }
 
 // ** Connection::roundTripTime
@@ -144,6 +168,7 @@ bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 void Connection::update( u32 dt )
 {
 	m_time += dt;
+	m_timeToLive -= dt;
 
 	if( m_pendingRemoteCalls.empty() ) {
 		return;

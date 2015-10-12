@@ -35,17 +35,20 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** NetworkHandler::NetworkHandler
-NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 )
+NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
 {
     DC_BREAK_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ) );
     
 	registerPacketHandler<packets::Ping>			  ( dcThisMethod( NetworkHandler::handlePingPacket ) );
+	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( NetworkHandler::handleKeepAlivePacket ) );
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( NetworkHandler::handleDetectServersPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 
 	m_broadcastListener = UDPSocket::createBroadcast( DC_NEW UDPSocketNetworkDelegate( this ) );
+
+	setKeepAliveTime( 5 );
 }
 
 // ** NetworkHandler::setPingRate
@@ -60,6 +63,19 @@ u32 NetworkHandler::pingRate( void ) const
 	return m_pingSendRate;
 }
 
+// ** NetworkHandler::setKeepAliveTime
+void NetworkHandler::setKeepAliveTime( s32 value )
+{
+	m_keepAliveTime = value * 1000;
+	m_keepAliveSendRate = static_cast<u32>( m_keepAliveTime * 0.8f );
+}
+
+// ** NetworkHandler::keepAliveTime
+s32 NetworkHandler::keepAliveTime( void ) const
+{
+	return m_keepAliveTime / 1000;
+}
+
 // ** NetworkHandler::findConnectionBySocket
 ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket ) const
 {
@@ -71,6 +87,7 @@ ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket ) const
 ConnectionPtr NetworkHandler::createConnection( TCPSocket* socket )
 {
 	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
+	connection->setTimeToLive( m_keepAliveTime );
 	m_connections[socket] = connection;
 	return connection;
 }
@@ -145,6 +162,13 @@ bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping&
 	return true;
 }
 
+// ** NetworkHandler::handleKeepAlivePacket
+bool NetworkHandler::handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet )
+{
+	connection->setTimeToLive( m_keepAliveTime );
+	return true;
+}
+
 // ** NetworkHandler::handleDetectServersPacket
 bool NetworkHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
 {
@@ -203,9 +227,21 @@ void NetworkHandler::update( u32 dt )
 	}
 
 	// Update all connections
-	for( ConnectionBySocket::iterator i = m_connections.begin(), end = m_connections.end(); i != end; ++i ) {
+	ConnectionBySocket connections = m_connections;
+
+	for( ConnectionBySocket::iterator i = connections.begin(); i != connections.end(); ++i ) {
+		if( m_keepAliveTime && i->second->timeToLive() <= 0 ) {
+			i->second->socket()->close();
+			continue;
+		}
+
 		if( sendPing ) {
 			i->second->send<packets::Ping>( 1, i->second->time() );
+		}
+
+		if( (i->second->time() - i->second->keepAliveTimestamp()) > m_keepAliveSendRate ) {
+			i->second->send<packets::KeepAlive>();
+			i->second->setKeepAliveTimestamp( i->second->time() );
 		}
 
 		i->second->update( dt );

@@ -55,6 +55,9 @@ namespace net {
 		//! Returns the round trip time.
 		u32						roundTripTime( void ) const;
 
+		//! Returns the time to live for this connection.
+		s32						timeToLive( void ) const;
+
 		//! Returns a connection TCP socket.
 		const  TCPSocketPtr&	socket( void ) const;
 		TCPSocketPtr&			socket( void );
@@ -96,6 +99,15 @@ namespace net {
 
 		//! Sets current time.
 		void					setTime( u32 value );
+
+		//! Sets the time to live for this connection.
+		void					setTimeToLive( s32 value );
+
+		//! Sets the keep-alive timestamp.
+		void					setKeepAliveTimestamp( u32 value );
+
+		//! Returns the keep-alive timestamp.
+		u32						keepAliveTimestamp( void ) const;
 
 		//! Handles a recieved remote call response.
 		bool					handleResponse( const packets::RemoteCallResponse& packet );
@@ -139,6 +151,12 @@ namespace net {
 
 		//! Current round trip time.
 		u32						m_roundTripTime;
+
+		//! Time to live.
+		s32						m_timeToLive;
+
+		//! Last keep-alive timestamp.
+		u32						m_keepAliveTimestamp;
 	};
 
 	// ** Connection::invokeVoid
