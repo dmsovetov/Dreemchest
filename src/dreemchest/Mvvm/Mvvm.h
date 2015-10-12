@@ -73,6 +73,7 @@ DC_END_DREEMCHEST
     #include "ActionHandler.h"
     #include "Property.h"
     #include "Validation.h"
+	#include "Converter.h"
 
     #ifdef DC_MVVM_MYGUI_ENABLED
         #include "MyGUI/MyGUIView.h"

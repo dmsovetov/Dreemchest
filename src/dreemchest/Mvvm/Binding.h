@@ -109,24 +109,6 @@ namespace mvvm {
         DC_BREAK;
     }
 
-	//! Property converter binding.
-	template<typename TInput, typename TOutput>
-	class GenericConverter : public Binding<TInput> {
-	public:
-
-									//! Constructs GenericConverter instance.
-									GenericConverter( ViewWPtr view, const Property<TInput>& input, const Property<TOutput>* output = NULL )
-										: Binding<TInput>( view, input ), m_output( const_cast<GenericProperty<TOutput>*>( output ? output : &m_internal ) ), m_internal( NULL ) {}
-
-		//! Returns the output value.
-		const Property<TOutput>&	value( void ) const { return *m_output; }
-
-	protected:
-
-		Property<TOutput>			m_internal;	//!< Internal output target.
-		Property<TOutput>*			m_output;	//!< Active output target.
-	};
-
 } // namespace mvvm
 
 DC_END_DREEMCHEST
