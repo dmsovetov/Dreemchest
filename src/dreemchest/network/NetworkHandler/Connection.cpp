@@ -36,7 +36,13 @@ namespace net {
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
 	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 ), m_time( 0 ), m_roundTripTime( 0 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
 {
+	memset( &m_traffic, 0, sizeof( m_traffic ) );
+}
 
+// ** Connection::traffic
+const Connection::Traffic& Connection::traffic( void ) const
+{
+	return m_traffic;
 }
 
 // ** Connection::time
@@ -169,6 +175,14 @@ void Connection::update( u32 dt )
 {
 	m_time += dt;
 	m_timeToLive -= dt;
+
+	if( m_time - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
+		m_traffic.m_sentBps		= (m_totalBytesSent	 - m_traffic.m_lastSentBytes)	  * 8;
+		m_traffic.m_receivedBps = (m_totalBytesReceived - m_traffic.m_lastReceivedBytes) * 8;
+		m_traffic.m_lastUpdateTimestamp = m_time;
+		m_traffic.m_lastSentBytes = m_totalBytesSent;
+		m_traffic.m_lastReceivedBytes = m_totalBytesReceived;
+	}
 
 	if( m_pendingRemoteCalls.empty() ) {
 		return;

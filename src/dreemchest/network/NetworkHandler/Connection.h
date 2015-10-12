@@ -40,6 +40,15 @@ namespace net {
 	friend class NetworkHandler;
 	public:
 
+		//! A helper struct to track the traffic in kbps.
+		struct Traffic {
+			u32					m_lastUpdateTimestamp;	//!< The last time the tracking was updated.
+			u32					m_sentBps;				//!< Last sent bits/s value.
+			u32					m_receivedBps;			//!< Last received bits/s value.
+			u32					m_lastSentBytes;		//!< Total sent bytes when the tacking was update.
+			u32					m_lastReceivedBytes;	//!< Total received bytes when the tacking was update.
+		};
+
 		//! Returns parent network handler.
 		NetworkHandler*			networkHandler( void ) const;
 
@@ -57,6 +66,9 @@ namespace net {
 
 		//! Returns the time to live for this connection.
 		s32						timeToLive( void ) const;
+
+		//! Returns the traffic counter.
+		const Traffic&			traffic( void ) const;
 
 		//! Returns a connection TCP socket.
 		const  TCPSocketPtr&	socket( void ) const;
@@ -157,6 +169,9 @@ namespace net {
 
 		//! Last keep-alive timestamp.
 		u32						m_keepAliveTimestamp;
+
+		//! Traffic counter.
+		Traffic					m_traffic;
 	};
 
 	// ** Connection::invokeVoid

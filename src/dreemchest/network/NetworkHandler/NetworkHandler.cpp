@@ -115,6 +115,8 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 	ConnectionPtr connection = findConnectionBySocket( socket );
 	DC_BREAK_IF( connection == NULL );
 
+	connection->m_totalBytesReceived += stream->bytesAvailable();
+
     ByteBufferPtr source( stream );
 
 	Serializables packets = BinarySerializer::read( source );
