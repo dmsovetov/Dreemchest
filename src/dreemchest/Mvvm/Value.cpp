@@ -81,7 +81,7 @@ void Value::removeBinding( BindingWPtr binding )
 // ** ObjectValue::ObjectValue
 ObjectValue::ObjectValue( void )
 {
-	m_isValid = add<Boolean>( "isValid" );
+	m_isValid = add<Boolean>( "isValid", true );
 }
 
 // ** ObjectValue::isValid
