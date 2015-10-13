@@ -254,7 +254,7 @@ namespace mvvm {
 	}
 
 	//! Array value type.
-	class Array : public Object {
+	class ArrayValue : public Object {
 	public:
 
 		//! Returns array value type.
@@ -271,7 +271,7 @@ namespace mvvm {
 
 	protected:
 
-		::Array<ValuePtr>		m_values;	//!< Actual values stored inside the array.
+		Array<ValuePtr>			m_values;	//!< Actual values stored inside the array.
 	};
 
 } // namespace mvvm

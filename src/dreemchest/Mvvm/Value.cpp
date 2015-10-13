@@ -162,18 +162,18 @@ ValueWPtr Object::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
-// ----------------------------------------------------------- Array ----------------------------------------------------------- //
+// ----------------------------------------------------------- ArrayValue ----------------------------------------------------------- //
 
 //! Returns array value type.
-ValueTypeIdx Array::type( void ) const
+ValueTypeIdx ArrayValue::type( void ) const
 {
-	return Value::valueType<Array>();
+	return Value::valueType<ArrayValue>();
 }
 
-// ** Array::is
-bool Array::is( ValueTypeIdx expected ) const
+// ** ArrayValue::is
+bool ArrayValue::is( ValueTypeIdx expected ) const
 {
-	ValueTypeIdx actual = valueType<Array>();
+	ValueTypeIdx actual = valueType<ArrayValue>();
 
 	if( expected == actual ) {
 		return true;
@@ -182,14 +182,14 @@ bool Array::is( ValueTypeIdx expected ) const
 	return Value::is( expected );
 }
 
-// ** Array::size
-s32 Array::size( void ) const
+// ** ArrayValue::size
+s32 ArrayValue::size( void ) const
 {
 	return ( s32 )m_values.size();
 }
 
-// ** Array::push
-void Array::push( const ValuePtr& value )
+// ** ArrayValue::push
+void ArrayValue::push( const ValuePtr& value )
 {
 	m_values.push_back( value );
 	notifyValueChanged();
