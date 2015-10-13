@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+IMPLEMENT_LOGGER( log )
+
 // -------------------------------------------------- BindingFactory -------------------------------------------------- //
 
 // ** BindingFactory::create
