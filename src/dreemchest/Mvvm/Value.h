@@ -163,12 +163,12 @@ namespace mvvm {
 		return a.get() == b;
 	}
 
-	//! Object class is a container of named properties.
-	class Object : public Value {
+	//! ObjectValue class is a container of named properties.
+	class ObjectValue : public Value {
 	public:
 
-											//! Constructs Object instance.
-											Object( void );
+											//! Constructs ObjectValue instance.
+											ObjectValue( void );
 
 		//! Returns the object value type index.
 		virtual ValueTypeIdx				type( void ) const;
@@ -209,9 +209,9 @@ namespace mvvm {
 		Properties							m_properties;	//!< Object properties.
 	};
 
-	// ** Object::add
+	// ** ObjectValue::add
 	template<typename TValue>
-	WeakPtr<TValue> Object::add( const String& name/*, const TValue& defaultValue*/ )
+	WeakPtr<TValue> ObjectValue::add( const String& name/*, const TValue& defaultValue*/ )
 	{
 		StrongPtr<TValue> value( DC_NEW TValue );
 		value->setParent( this );
@@ -221,7 +221,7 @@ namespace mvvm {
 
 	//! Generic object type used for object type declarations.
 	template<typename TObject>
-	class GenericObject : public Object {
+	class Object : public ObjectValue {
 	public:
 
 		typedef TObject			Type;		//!< Alias for this type.
@@ -242,26 +242,26 @@ namespace mvvm {
 		}
 	};
 
-	// ** GenericObject::type
+	// ** Object::type
 	template<typename TObject>
-	ValueTypeIdx GenericObject<TObject>::type( void ) const
+	ValueTypeIdx Object<TObject>::type( void ) const
 	{
 		return valueType<TObject>();
 	}
 
-	// ** GenericObject::is
+	// ** Object::is
 	template<typename TObject>
-	bool GenericObject<TObject>::is( ValueTypeIdx expected ) const
+	bool Object<TObject>::is( ValueTypeIdx expected ) const
 	{
 		if( expected == valueType<TObject>() ) {
 			return true;
 		}
 
-		return Object::is( expected );
+		return ObjectValue::is( expected );
 	}
 
 	//! Array value type.
-	class ArrayValue : public Object {
+	class ArrayValue : public ObjectValue {
 	public:
 
 		//! Returns array value type.

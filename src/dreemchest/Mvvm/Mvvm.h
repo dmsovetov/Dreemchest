@@ -76,7 +76,7 @@ namespace mvvm {
 	typedef void* Widget;
 
 	dcDeclareNamedPtrs( IBinding, Binding )
-	dcDeclarePtrs( Object )
+	dcDeclareNamedPtrs( ObjectValue, Object )
 	dcDeclarePtrs( Value )
 	dcDeclarePtrs( BindingFactory )
 	dcDeclarePtrs( Bindings )

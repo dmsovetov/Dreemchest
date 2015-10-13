@@ -76,24 +76,24 @@ void Value::removeBinding( BindingWPtr binding )
 	m_bindings.erase( binding );
 }
 
-// ----------------------------------------------------------- Object ----------------------------------------------------------- //
+// ----------------------------------------------------------- ObjectValue ----------------------------------------------------------- //
 
-// ** Object::Object
-Object::Object( void )
+// ** ObjectValue::ObjectValue
+ObjectValue::ObjectValue( void )
 {
 	m_isValid = add<Boolean>( "isValid" );
 }
 
-// ** Object::isValid
-Boolean::WPtr Object::isValid( void ) const
+// ** ObjectValue::isValid
+Boolean::WPtr ObjectValue::isValid( void ) const
 {
 	return m_isValid;
 }
 
-// ** Object::is
-bool Object::is( ValueTypeIdx expected ) const
+// ** ObjectValue::is
+bool ObjectValue::is( ValueTypeIdx expected ) const
 {
-	ValueTypeIdx actual = valueType<Object>();
+	ValueTypeIdx actual = valueType<ObjectValue>();
 
 	if( expected == actual ) {
 		return true;
@@ -102,41 +102,41 @@ bool Object::is( ValueTypeIdx expected ) const
 	return Value::is( expected );
 }
 
-// ** Object::type
-ValueTypeIdx Object::type( void ) const
+// ** ObjectValue::type
+ValueTypeIdx ObjectValue::type( void ) const
 {
-	return Value::valueType<Object>();
+	return Value::valueType<ObjectValue>();
 }
 
-// ** Object::validate
-bool Object::validate( void ) const
+// ** ObjectValue::validate
+bool ObjectValue::validate( void ) const
 {
 	return true;
 }
 
-// ** Object::check
-bool Object::check( void )
+// ** ObjectValue::check
+bool ObjectValue::check( void )
 {
 	bool result = validate();
 	m_isValid->set( result );
 	return result;
 }
 
-// ** Object::has
-bool Object::has( const String& name ) const
+// ** ObjectValue::has
+bool ObjectValue::has( const String& name ) const
 {
 	return m_properties.find( name ) != m_properties.end();
 }
 
-// ** Object::get
-ValueWPtr Object::get( const String& name ) const
+// ** ObjectValue::get
+ValueWPtr ObjectValue::get( const String& name ) const
 {
 	Properties::const_iterator i = m_properties.find( name );
 	return i != m_properties.end() ? i->second : ValuePtr();
 }
 
-// ** Object::resolve
-ValueWPtr Object::resolve( const String& uri ) const
+// ** ObjectValue::resolve
+ValueWPtr ObjectValue::resolve( const String& uri ) const
 {
 	u32 idx = uri.find( '.' );
 
@@ -153,7 +153,7 @@ ValueWPtr Object::resolve( const String& uri ) const
 	ValueWPtr value = get( data );
 
 	// Cast the property to object.
-	ObjectWPtr object = castTo<Object>( value );
+	ObjectWPtr object = castTo<ObjectValue>( value );
 
 	if( !object.valid() ) {
 		return ValueWPtr();
