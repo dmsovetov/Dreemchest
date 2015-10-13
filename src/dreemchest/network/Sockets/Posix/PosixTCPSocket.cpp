@@ -111,7 +111,7 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 // ** PosixTCPSocket::close
 void PosixTCPSocket::close( void )
 {
-	if( m_socket.isValid() ) {
+	if( m_socket.isValid() && m_delegate.valid() ) {
 		m_delegate->handleClosed( m_parent );
 	}
 	
