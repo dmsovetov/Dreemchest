@@ -192,6 +192,10 @@ namespace mvvm {
 	class GenericObject : public Object {
 	public:
 
+		typedef TObject			Type;		//!< Alias for this type.
+		typedef StrongPtr<Type>	Ptr;		//!< Strong pointer type.
+		typedef WeakPtr<Type>	WPtr;		//!< Weak pointer type.
+
 		//! Returns the actual object value type index.
 		virtual ValueTypeIdx	type( void ) const;
 
