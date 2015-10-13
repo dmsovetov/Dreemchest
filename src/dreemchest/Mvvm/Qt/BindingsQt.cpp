@@ -84,11 +84,13 @@ void QtPushButtonBinding::handleViewChanged( void )
 // ** QtStackedWidgetBinding::handleValueChanged
 void QtStackedWidgetBinding::handleValueChanged( void )
 {
-	DC_BREAK;
-//	QWidget* page = static_cast<QtView*>( m_view.get() )->widget()->findChild<QWidget*>( value.c_str() );
-//	DC_BREAK_IF( page == NULL );
-//
-//	m_widget->setCurrentWidget( page );
+	QStackedWidget* stackedWidget = widget();
+	QObject*		parent		  = stackedWidget->parent();
+
+	QWidget* page = parent->findChild<QWidget*>( m_property->get().c_str() );
+	DC_BREAK_IF( page == NULL );
+
+	stackedWidget->setCurrentWidget( page );
 }
 /*
 // ----------------------------------------- MyGUICaptionBinding ----------------------------------------- //
