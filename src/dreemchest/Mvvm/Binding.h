@@ -166,6 +166,12 @@ namespace mvvm {
 	class Bindings : public RefCounted {
 	public:
 
+		//! Sets the root object.
+		void							setRoot( const ObjectWPtr& value );
+
+		//! Returns the root object.
+		ObjectWPtr						root( void ) const;
+
 		//! Binds the widget to a value with specified URI.
 		bool							bind( const String& widget, const String& uri );
 

@@ -71,6 +71,18 @@ Bindings::Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root ) :
 
 }
 
+// ** Bindings::setRoot
+void Bindings::setRoot( const ObjectWPtr& value )
+{
+	m_root = value;
+}
+
+// ** Bindings::root
+ObjectWPtr Bindings::root( void ) const
+{
+	return m_root;
+}
+
 //! Binds the widget to a value with specified URI.
 bool Bindings::bind( const String& widget, const String& uri )
 {
