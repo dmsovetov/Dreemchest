@@ -131,6 +131,67 @@ void QtLabelBinding::handleValueChanged( void )
     }
 }
 
+// ------------------------------------------------- QtBindingFactory ------------------------------------------------- //
+
+// ** QtBindingFactory::QtBindingFactory
+QtBindingFactory::QtBindingFactory( void )
+{
+	registerBinding<QtLabelBinding, QLabel>();
+	registerBinding<QtLineEditBinding, QLineEdit>();
+	registerBinding<QtStackedWidgetBinding, QStackedWidget>();
+	registerBinding<QtListWidgetBinding, QListWidget>();
+	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
+	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
+	registerBinding<QtPushButtonBinding, QPushButton>( "click" );
+}
+
+// ** QtBindingFactory::create
+BindingFactoryPtr QtBindingFactory::create( void )
+{
+	return BindingFactoryPtr( DC_NEW QtBindingFactory );
+}
+
+// --------------------------------------------------- QtBindings --------------------------------------------------- //
+
+// ** QtBindings::QtBindings
+QtBindings::QtBindings( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget ) : Bindings( factory, root ), m_widget( widget )
+{
+
+}
+
+// ** QtBindings::create
+BindingsPtr QtBindings::create( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget )
+{
+	return BindingsPtr( DC_NEW QtBindings( factory, root, widget ) );
+}
+
+// ** QtBindings::resolveWidgetPrototypeChain
+WidgetPrototypeChain QtBindings::resolveWidgetPrototypeChain( const String& name ) const
+{
+	QWidget* widget = m_widget->findChild<QWidget*>( name.c_str() );
+	
+	if( !widget ) {
+		return WidgetPrototypeChain();
+	}
+
+	const QMetaObject*	 metaObject = widget->metaObject();
+	WidgetPrototypeChain result;
+
+	while( metaObject ) {
+		CString className = metaObject->className();
+		result.push_back( StringHash( className ) );
+		metaObject = metaObject->superClass();
+	}
+
+	return result;
+}
+
+// ** QtBindings::findWidget
+Widget QtBindings::findWidget( const String& name ) const
+{
+	return m_widget->findChild<QWidget*>( name.c_str() );
+}
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST

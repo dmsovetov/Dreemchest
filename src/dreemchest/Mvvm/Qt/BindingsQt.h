@@ -27,7 +27,13 @@
 #ifndef __DC_Mvvm_BindingsQt_H__
 #define __DC_Mvvm_BindingsQt_H__
 
-#include "QtView.h"
+#include "../Binding.h"
+
+#if defined( DC_QT4_ENABLED )
+	#include <QtGui>
+#elif defined( DC_QT5_ENABLED )
+	#include <QtWidgets>
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -178,6 +184,60 @@ namespace mvvm {
         //! Handles property change.
         void                    handleValueChanged( void );
     };
+
+	// ---------------------------------------------------- QtBindingFactory ---------------------------------------------------- //
+
+	//! Constructs the Qt bindings.
+	class QtBindingFactory : public BindingFactory {
+	public:
+
+		//! Creates the instance of QtBindingFactory.
+		static BindingFactoryPtr	create( void );
+
+	private:
+
+									//! Constructs the QtBindingFactory instance.
+									QtBindingFactory( void );
+
+		//! Registers the Qt binding.
+		template<typename TBinding, typename TWidget>
+		void						registerBinding( const String& widgetProperty = "" );
+	};
+
+	// ** QtBindingFactory::registerBinding
+	template<typename TBinding, typename TWidget>
+	void QtBindingFactory::registerBinding( const String& widgetProperty )
+	{
+		CString		  widgetName = TWidget::staticMetaObject.className();
+		WidgetTypeIdx widgetType = StringHash( widgetName );
+
+		BindingFactory::registerBinding<TBinding>( widgetType, widgetProperty );
+	}
+
+	// ---------------------------------------------------- QtBindings ---------------------------------------------------- //
+
+	//! Binds the Qt widgets with values.
+	class QtBindings : public Bindings {
+	public:
+
+		//! Creates the instance of QtBindings.
+		static BindingsPtr			create( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget );
+
+	protected:
+
+									//! Constructs the QtBindingFactory instance.
+									QtBindings( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget );
+
+		//! Returns the widget type index.
+		WidgetPrototypeChain		resolveWidgetPrototypeChain( const String& name ) const;
+
+		//! Returns the widget with specified name.
+		Widget						findWidget( const String& name ) const;
+
+	private:
+
+		QWidget*					m_widget;	//!< The root widget.
+	};
 
 } // namespace mvvm
 

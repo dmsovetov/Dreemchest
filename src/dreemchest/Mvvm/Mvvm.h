@@ -135,13 +135,8 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
 	#include "Value.h"
-
-    #include "View.h"
-    #include "Data.h"
-    #include "ActionHandler.h"
-    #include "Property.h"
-    #include "Validation.h"
 	#include "Converter.h"
+	#include "Binding.h"
 
     #ifdef DC_MVVM_MYGUI_ENABLED
         #include "MyGUI/MyGUIView.h"
