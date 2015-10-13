@@ -74,6 +74,12 @@ const NetworkAddress& PosixTCPSocket::address( void ) const
 	return m_address;
 }
 
+// ** PosixTCPSocket::setDelegate
+void PosixTCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
+{
+	m_delegate = value;
+}
+
 // ** PosixTCPSocket::connectTo
 bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 {
