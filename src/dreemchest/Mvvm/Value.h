@@ -254,7 +254,9 @@ namespace mvvm {
 		template<typename ... Args>
 		static Ptr				create( const Args& ... args )
 		{
-			return DC_NEW Type( args... );
+			Ptr result = DC_NEW Type( args... );
+			result->check();
+			return result;
 		}
 	};
 
