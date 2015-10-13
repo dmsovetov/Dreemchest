@@ -40,6 +40,11 @@ ClientHandler::ClientHandler( const TCPSocketPtr& socket )
 	setPingRate( 500 );
 }
 
+ClientHandler::~ClientHandler( void )
+{
+	m_connection->socket()->setDelegate( TCPSocketDelegatePtr() );
+}
+
 // ** ClientHandler::connection
 const ConnectionPtr& ClientHandler::connection( void ) const
 {

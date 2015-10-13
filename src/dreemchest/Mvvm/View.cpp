@@ -34,6 +34,8 @@ namespace mvvm {
 
 IMPLEMENT_LOGGER( log )
 
+#if 0
+
 // ** View::notify
 void View::notify( const String& event )
 {
@@ -59,7 +61,8 @@ void View::clear( void )
 // ** View::addBinding
 void View::addBinding( BindingPtr instance )
 {
-    instance->refreshView();
+	DC_BREAK;
+//    instance->refreshView();
     m_bindings.push_back( instance );
 }
 
@@ -99,6 +102,8 @@ PropertyPtr View::findPropertyByUri( const String& uri )
 
 	return result;
 }
+
+#endif
 
 } // namespace mvvm
 

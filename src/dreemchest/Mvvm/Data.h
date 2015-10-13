@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-    //! A base class for all view data providers.
+ /*   //! A base class for all view data providers.
     class Data : public RefCounted {
     public:
 
@@ -139,7 +139,7 @@ namespace mvvm {
 		{
 			return StrongPtr<T>( DC_NEW T( args... ) );
 		}
-	};
+	};*/
 
 } // namespace mvvm
     

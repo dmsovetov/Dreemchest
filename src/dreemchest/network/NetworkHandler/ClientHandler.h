@@ -43,6 +43,8 @@ namespace net {
 		struct ConnectionClosed {
 		};
 
+		virtual					~ClientHandler( void );
+
 		//! Return current connection.
 		const ConnectionPtr&	connection( void ) const;
 		ConnectionPtr&			connection( void );

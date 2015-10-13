@@ -34,6 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+#if 0
     //! View is a base class for view renderers and is a composition of data providers and actions handlers.
     class View : public RefCounted {
     public:
@@ -138,6 +139,8 @@ namespace mvvm {
 		addHandler( DC_NEW TActionHandler( this, args... ) );
 	}
 #endif	/*	!DC_CPP11_DISABLED	*/
+
+#endif
 
 } // namespace mvvm
     

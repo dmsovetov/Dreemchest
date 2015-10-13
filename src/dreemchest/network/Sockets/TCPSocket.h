@@ -41,6 +41,7 @@ namespace net {
 		InterfaceMethod( void						close( void ) )
 		InterfaceMethod( void						update( void ) )
 		InterfaceMethod( u32						sendTo( const void* buffer, u32 size ) )
+		InterfaceMethod( void						setDelegate( const TCPSocketDelegatePtr& value ) )
 	EndPrivateInterface
 
     //! TCP socket class.
@@ -76,6 +77,9 @@ namespace net {
 		\param size Data size to be sent.
 		*/
         u32							sendTo( const void* buffer, u32 size );
+
+		//! Sets the socket delegate.
+		void						setDelegate( const TCPSocketDelegatePtr& value );
 
 		//! Connects to a TCP socket at a given remote address and port.
 		static TCPSocketPtr			connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate = NULL );

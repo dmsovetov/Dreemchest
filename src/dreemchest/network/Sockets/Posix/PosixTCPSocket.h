@@ -50,6 +50,7 @@ namespace net {
         virtual void					close( void );
         virtual void					update( void );
         virtual u32						sendTo( const void* buffer, u32 size );
+		virtual void					setDelegate( const TCPSocketDelegatePtr& value );
 
     private:
 

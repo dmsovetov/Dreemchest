@@ -24,16 +24,38 @@
 
  **************************************************************************/
 
-#include "UnitTests.h"
+#include <gtest/gtest.h>
+#include <Dreemchest.h>
 
-int main( int argc, char *argv[] )
-{
-    ::testing::InitGoogleTest( &argc, argv );
-    int res = RUN_ALL_TESTS();
+class TestableObject : public mvvm::GenericObject<TestableObject> {
+public:
 
-#ifndef NDEBUG
-	DC_BREAK
-#endif
+	template<typename TValue>
+	typename WeakPtr<TValue> add( const String& name/*, const TValue& defaultValue = TValue()*/ )
+	{
+		return GenericObject::add<TValue>( name/*, defaultValue*/ );
+	}
+};
 
-	return res;
-}
+class UserInfo : public mvvm::GenericObject<UserInfo> {
+public:
+
+	UserInfo( void )
+	{
+		add<mvvm::Text>( "name" );
+		add<mvvm::Float>( "level" );
+		add<mvvm::Float>( "health" );
+	}
+};
+
+class Session : public mvvm::GenericObject<Session> {
+public:
+
+	Session( void )
+	{
+		add<mvvm::Text>( "id"/*, "session identifier"*/ );
+		add<UserInfo>( "userInfo" );
+	}
+};
+
+static const String kTestString = "hello world";

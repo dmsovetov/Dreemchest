@@ -24,8 +24,7 @@
 
  **************************************************************************/
 
-#include <gtest/gtest.h>
-#include <Dreemchest.h>
+#include "UnitTests.h"
 
 #if 0
 

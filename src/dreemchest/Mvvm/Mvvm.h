@@ -35,6 +35,7 @@ namespace mvvm {
 
 	DECLARE_LOG( log )
 
+#if 0
     template<typename T> class Property;
     template<typename T> class ArrayProperty;
 
@@ -51,23 +52,90 @@ namespace mvvm {
 	typedef Property<Guid>			GuidProperty;
     typedef ArrayProperty<String>   StringArrayProperty;
     typedef List<BindingPtr>        BindingsList;
+#endif
 
 	//! Performs the property type cast.
-	template<typename TTargetType>
-	inline StrongPtr< Property<TTargetType> > castTo( const PropertyPtr& property )
-	{
-		if( GroupedTypeIndex<TTargetType, IProperty>::idx() == property->type() ) {
-			return StrongPtr< Property<TTargetType> >( static_cast<Property<TTargetType>*>( property.get() ) );
-		}
-
-		return StrongPtr< Property<TTargetType> >();
+	template<typename T, typename S>
+	inline WeakPtr<T> castTo( WeakPtr<S> ptr ) {
+		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
 	}
 
+	//! Performs the property type cast.
+	template<typename T, typename S>
+	inline StrongPtr<T> castTo( StrongPtr<S> ptr ) {
+		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
+	}
+
+	//! Primitive value type forward declaration.
+	template<typename TValue> class PrimitiveValue;
+
+	//! Array value type forward declaration.
+	template<typename TValue> class ArrayValue;
+
+	//! Value type index.
+	typedef TypeIdx ValueTypeIdx;
+
+	//! Widget type index.
+	typedef u32		WidgetTypeIdx;
+
+	//! The widget prototype chain.
+	typedef Array<WidgetTypeIdx>	WidgetPrototypeChain;
+
+	//! Widget that is bound to a value.
+	typedef void* Widget;
+
+	dcDeclareNamedPtrs( IBinding, Binding )
+	dcDeclareNamedPtrs( ObjectValue, Object )
+	dcDeclarePtrs( Value )
+	dcDeclarePtrs( BindingFactory )
+	dcDeclarePtrs( Bindings )
+
+	typedef PrimitiveValue<bool>	Boolean;	//!< Boolean value type.
+	typedef PrimitiveValue<s32>		Integer;	//!< Integer value type.
+	typedef PrimitiveValue<f32>		Float;		//!< Floating point value type.
+	typedef PrimitiveValue<String>	Text;		//!< String value type.
+	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.	
+	typedef ArrayValue<Text>		TextArray;	//!< Array of text values.
+/*
+
+
+	//! Object type forward declaration.
+	template<typename TValue> class Object;
+
+	dcDeclareNamedPtrs( ValueBase, Value )
+	dcDeclareNamedPtrs( ObjectBase, Object )
+
+
+
+	//! Performs a primitive value cast.
+	template<typename TValue>
+	WeakPtr< Value<TValue> > valueCast( const ValueWPtr& value )
+	{
+		if( value->is<TValue>() ) {
+			return static_cast<Value<TValue>*>( value.get() );
+		}
+
+		return NULL;
+	}
+
+	//! Performs an object cast.
+	template<typename TValue>
+	WeakPtr< Object<TValue> > objectCast( const ValueWPtr& value )
+	{
+		if( value->is<TValue>() ) {
+			return static_cast<Object<TValue>*>( value.get() );
+		}
+
+		return NULL;
+	}
+*/
 } // namespace mvvm
 
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
+	#include "Value.h"
+
     #include "View.h"
     #include "Data.h"
     #include "ActionHandler.h"

@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-// ** Data::Data
+/*// ** Data::Data
 Data::Data( const String& name ) : m_name( name )
 {
 	m_isValid = DC_NEW BoolProperty( NULL, true );
@@ -84,7 +84,7 @@ PropertyPtr Data::get( const String& name )
 // ** Data::resolve
 PropertyPtr Data::resolve( const String& uri )
 {
-	u32 idx = uri.find( '.' );
+/*	u32 idx = uri.find( '.' );
 
 	// No objects in URI - return the property.
 	if( idx == String::npos ) {
@@ -110,7 +110,7 @@ PropertyPtr Data::resolve( const String& uri )
 
 	return object->value()->resolve( key );
 }
-
+*/
 } // namespace mvvm
 
 DC_END_DREEMCHEST

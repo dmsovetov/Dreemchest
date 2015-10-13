@@ -26,14 +26,43 @@
 
 #include "UnitTests.h"
 
-int main( int argc, char *argv[] )
+TEST(PrimitiveValue, Constructor)
 {
-    ::testing::InitGoogleTest( &argc, argv );
-    int res = RUN_ALL_TESTS();
+	mvvm::Text value( kTestString );
+	EXPECT_EQ( kTestString, value.get() );
+}
 
-#ifndef NDEBUG
-	DC_BREAK
-#endif
+TEST(PrimitiveValue, Setter)
+{
+	mvvm::Text value;
+	value.set( kTestString );
+	EXPECT_EQ( kTestString, value.get() );
+}
 
-	return res;
+TEST(Value, CastingToValueType)
+{
+	mvvm::ValuePtr value = DC_NEW mvvm::Text();
+	EXPECT_TRUE( mvvm::castTo<mvvm::Text>( value ).valid() );
+	EXPECT_FALSE( mvvm::castTo<mvvm::Integer>( value ).valid() );
+}
+
+TEST(Object, AddingProperties)
+{
+	TestableObject	m_object;
+	m_object.add<mvvm::Text>( "name" );
+	EXPECT_TRUE( m_object.has( "name" ) );
+}
+
+TEST(Object, CastingToValueType)
+{
+	TestableObject	m_object;
+	mvvm::ValuePtr value = DC_NEW UserInfo;
+	EXPECT_TRUE( mvvm::castTo<UserInfo>( value ).valid() );
+	EXPECT_FALSE( mvvm::castTo<Session>( value ).valid() );
+}
+
+TEST(Object, ResolvesNestedProperties)
+{
+	Session session;
+	EXPECT_TRUE( session.resolve( "userInfo.name" ).valid() );
 }

@@ -74,6 +74,12 @@ const NetworkAddress& PosixTCPSocket::address( void ) const
 	return m_address;
 }
 
+// ** PosixTCPSocket::setDelegate
+void PosixTCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
+{
+	m_delegate = value;
+}
+
 // ** PosixTCPSocket::connectTo
 bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 {
@@ -105,7 +111,7 @@ bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 // ** PosixTCPSocket::close
 void PosixTCPSocket::close( void )
 {
-	if( m_socket.isValid() ) {
+	if( m_socket.isValid() && m_delegate.valid() ) {
 		m_delegate->handleClosed( m_parent );
 	}
 	

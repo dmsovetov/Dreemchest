@@ -24,8 +24,7 @@
 
  **************************************************************************/
 
-#include <gtest/gtest.h>
-#include <network/Network.h>
+#include "UnitTests.h"
 
 DC_USE_DREEMCHEST
 
@@ -40,6 +39,7 @@ struct ListenerDelegate : public TCPSocketListenerDelegate
         receivedDataTriggered = true;
         receivedData.resize( stream->length() );
         memcpy( &receivedData[0], stream->buffer(), stream->length() );
+		stream->trimFromLeft( stream->length() );
     }
     
     virtual void handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )

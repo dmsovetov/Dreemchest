@@ -104,6 +104,13 @@ u32 TCPSocket::sendTo( const void* buffer, u32 size )
     return m_impl->sendTo( buffer, size );
 }
 
+// ** TCPSocket::setDelegate
+void TCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
+{
+	DC_CHECK_IMPL();
+	m_impl->setDelegate( value );
+}
+
 } // namespace net
 
 DC_END_DREEMCHEST
