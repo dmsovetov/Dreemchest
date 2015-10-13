@@ -32,94 +32,64 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-//// ** QtView::QtView
-//QtView::QtView( QWidget* widget ) : m_widget( widget )
-//{
-//
-//}
-//
-//// ** QtView::widget
-//QWidget* QtView::widget( void )
-//{
-//	return m_widget;
-//}
-//
-//// ** QtView::bindString
-//void QtView::bindString( const String& target, const String& uri )
-//{
-//	Property<String>::WPtr property = findProperty<String>( uri );
-//
-//	if( !property.valid() ) {
-//		return;
-//	}
-//
-//	bindString( target, property );
-//}
-//
-//// ** QtView::bindString
-//void QtView::bindString( const String& target, StringProperty::WPtr property )
-//{
-//	DC_BREAK_IF( !property.valid() );
-//
-//	if( QLineEdit* widget = m_widget->findChild<QLineEdit*>( target.c_str() ) ) {
-//		addBinding( DC_NEW QtLineEditBinding( this, widget, property ) );
-//	}
-//	else if( QLabel* widget = m_widget->findChild<QLabel*>( target.c_str() ) ) {
-//		addBinding( DC_NEW QtLabelBinding( this, widget, property ) );
-//	}
-//}
-//
-//// ** QtView::bindStringList
-//void QtView::bindStringList( const String& target, const String& uri )
-//{
-//	Property<StringArray>::WPtr property = findProperty<StringArray>( uri );
-//
-//	if( !property.valid() ) {
-//		return;
-//	}
-//
-//	QListWidget* widget = m_widget->findChild<QListWidget*>( target.c_str() );
-//	addBinding( DC_NEW QtListBoxBinding( this, widget, property ) );
-//}
-//
-//// ** QtView::bindState
-//void QtView::bindState( const String& target, const String& uri )
-//{
-//	Property<String>::WPtr property = findProperty<String>( uri );
-//
-//	if( !property.valid() ) {
-//		return;
-//	}
-//
-//	QStackedWidget* widget = m_widget->findChild<QStackedWidget*>( target.c_str() );
-//	addBinding( DC_NEW QtStackedWidgetBinding( this, widget, property ) );
-//}
-//
-//// ** QtView::bindClick
-//void QtView::bindClick( const String& target, const String& event )
-//{
-//	QPushButton* widget = m_widget->findChild<QPushButton*>( target.c_str() );
-//	addBinding( DC_NEW QtPushButtonBinding( this, widget, WeakPtr<StringProperty>(), event ) );
-//}
-//
-//// ** QtView::bindInteger
-//void QtView::bindInteger( const String& target, const String& uri )
-//{
-//
-//}
-//
-//// ** QtView::bindEnabled
-//void QtView::bindEnabled( const String& target, const String& uri )
-//{
-//	Property<bool>::WPtr property = findProperty<bool>( uri );
-//
-//	if( !property.valid() ) {
-//		return;
-//	}
-//
-//	QWidget* widget = m_widget->findChild<QWidget*>( target.c_str() );
-//	addBinding( DC_NEW QtEnabledBinding( this, widget, property ) );
-//}
+// ------------------------------------------------- QtBindingFactory ------------------------------------------------- //
+
+// ** QtBindingFactory::QtBindingFactory
+QtBindingFactory::QtBindingFactory( void )
+{
+	registerBinding<QtLabelBinding, QLabel>();
+	registerBinding<QtLineEditBinding, QLineEdit>();
+	registerBinding<QtStackedWidgetBinding, QStackedWidget>();
+	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
+	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
+}
+
+// ** QtBindingFactory::create
+BindingFactoryPtr QtBindingFactory::create( void )
+{
+	return BindingFactoryPtr( DC_NEW QtBindingFactory );
+}
+
+// --------------------------------------------------- QtBindings --------------------------------------------------- //
+
+// ** QtBindings::QtBindings
+QtBindings::QtBindings( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget ) : Bindings( factory, root ), m_widget( widget )
+{
+
+}
+
+// ** QtBindings::create
+BindingsPtr QtBindings::create( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget )
+{
+	return BindingsPtr( DC_NEW QtBindings( factory, root, widget ) );
+}
+
+// ** QtBindings::resolveWidgetPrototypeChain
+WidgetPrototypeChain QtBindings::resolveWidgetPrototypeChain( const String& name ) const
+{
+	QWidget* widget = m_widget->findChild<QWidget*>( name.c_str() );
+	
+	if( !widget ) {
+		return WidgetPrototypeChain();
+	}
+
+	const QMetaObject*	 metaObject = widget->metaObject();
+	WidgetPrototypeChain result;
+
+	while( metaObject ) {
+		CString className = metaObject->className();
+		result.push_back( StringHash( className ) );
+		metaObject = metaObject->superClass();
+	}
+
+	return result;
+}
+
+// ** QtBindings::findWidget
+Widget QtBindings::findWidget( const String& name ) const
+{
+	return m_widget->findChild<QWidget*>( name.c_str() );
+}
 
 } // namespace mvvm
 

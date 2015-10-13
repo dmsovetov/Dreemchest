@@ -72,6 +72,12 @@ namespace mvvm {
 	//! Value type index.
 	typedef TypeIdx ValueTypeIdx;
 
+	//! Widget type index.
+	typedef u32		WidgetTypeIdx;
+
+	//! The widget prototype chain.
+	typedef Array<WidgetTypeIdx>	WidgetPrototypeChain;
+
 	//! Widget that is bound to a value.
 	typedef void* Widget;
 

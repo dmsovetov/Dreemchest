@@ -126,16 +126,19 @@ namespace mvvm {
 	public:
 
 		//! Creates new binding instance by widget & value types.
-		BindingPtr			create( ValueTypeIdx valueType, ValueTypeIdx widgetType );
+		BindingPtr			create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty );
 
 		//! Registers binding with widget & value type.
-		template<typename TWidget, typename TBinding>
-		void				registerBinding( void );
+		template<typename TBinding>
+		void				registerBinding( WidgetTypeIdx widgetType, const String& widgetProperty = "" );
 
 	private:
 
+		//! Container type to store bindings by widget property.
+		typedef Map<String, BindingPtr>					BindingByProperty;
+
 		//! Container type to store widget value type to binding mapping.
-		typedef Map<ValueTypeIdx, BindingPtr>			BindingByWidgetType;
+		typedef Map<WidgetTypeIdx, BindingByProperty>	BindingByWidgetType;
 
 		//! Container type to store value type to bindings mapping.
 		typedef Map<ValueTypeIdx, BindingByWidgetType>	Bindings;
@@ -144,17 +147,16 @@ namespace mvvm {
 	};
 
 	// ** BindingFactory::registerBinding
-	template<typename TWidget, typename TBinding>
-	void BindingFactory::registerBinding( void )
+	template<typename TBinding>
+	void BindingFactory::registerBinding(  WidgetTypeIdx widgetType, const String& widgetProperty )
 	{
 		// Create binding instance
 		TBinding* binding = DC_NEW TBinding;
 
 		// Get the value types.
-		ValueTypeIdx valueTypeIdx  = binding->type();
-		ValueTypeIdx widgetTypeIdx = Value::valueType<TWidget>();
+		ValueTypeIdx valueTypeIdx = binding->type();
 
-		m_bindings[valueTypeIdx][widgetTypeIdx] = DC_NEW TBinding;
+		m_bindings[valueTypeIdx][widgetType][widgetProperty] = DC_NEW TBinding;
 	}
 
 	//! Bindings instance links a value with a single binding instance.
@@ -162,30 +164,27 @@ namespace mvvm {
 	public:
 
 		//! Binds the widget to a value with specified URI.
-		bool				bind( const String& widget, const String& uri );
+		bool							bind( const String& widget, const String& uri );
 
 		//! Binds the widget to a value.
-		bool				bind( const String& widget, const ValueWPtr& value );
-
-		//! Creates Bindings instance.
-		static BindingsPtr	create( const BindingFactoryPtr& factory, const ObjectWPtr& root );
+		bool							bind( const String& widget, const ValueWPtr& value );
 
 	protected:
 
-							//! Constructs the Bindings instance.
-							Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root );
+										//! Constructs the Bindings instance.
+										Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root );
 
 		//! Returns the widget value type.
-		ValueTypeIdx		widgetValueType( const String& widget ) const;
+		virtual WidgetPrototypeChain	resolveWidgetPrototypeChain( const String& widget ) const = 0;
 
 		//! Returns the widget by name.
-		Widget				findWidget( const String& name ) const;
+		virtual Widget					findWidget( const String& name ) const = 0;
 
 	private:
 
-		BindingFactoryPtr	m_factory;	//!< Binding factory instance.
-		ObjectWPtr			m_root;		//!< Root object.
-		List<BindingPtr>	m_bindings;	//!< All bindings that reside on a view.
+		BindingFactoryPtr				m_factory;	//!< Binding factory instance.
+		ObjectWPtr						m_root;		//!< Root object.
+		List<BindingPtr>				m_bindings;	//!< All bindings that reside on a view.
 	};
 
 } // namespace mvvm

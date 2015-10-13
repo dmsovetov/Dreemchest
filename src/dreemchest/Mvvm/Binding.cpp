@@ -33,7 +33,7 @@ namespace mvvm {
 // -------------------------------------------------- BindingFactory -------------------------------------------------- //
 
 // ** BindingFactory::create
-BindingPtr BindingFactory::create( ValueTypeIdx valueType, ValueTypeIdx widgetType )
+BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty )
 {
 	Bindings::iterator byValueType = m_bindings.find( valueType );
 
@@ -41,13 +41,24 @@ BindingPtr BindingFactory::create( ValueTypeIdx valueType, ValueTypeIdx widgetTy
 		return BindingPtr();
 	}
 
-	BindingByWidgetType::iterator byWidgetType = byValueType->second.find( widgetType );
+	BindingByWidgetType::iterator byWidgetType = byValueType->second.end();
 
+	while( byWidgetType == byValueType->second.end() && !widgetPrototype.empty() ) {
+		byWidgetType = byValueType->second.find( widgetPrototype[0] );
+		widgetPrototype.erase( widgetPrototype.begin() );
+	} 
+	
 	if( byWidgetType == byValueType->second.end() ) {
 		return BindingPtr();
 	}
 
-	return byWidgetType->second->clone();
+	BindingByProperty::iterator byProperty = byWidgetType->second.find( widgetProperty );
+
+	if( byProperty == byWidgetType->second.end() ) {
+		return BindingPtr();
+	}
+
+	return byProperty->second->clone();
 }
 
 // ----------------------------------------------------- Bindings ------------------------------------------------------ //
@@ -56,24 +67,6 @@ BindingPtr BindingFactory::create( ValueTypeIdx valueType, ValueTypeIdx widgetTy
 Bindings::Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root ) : m_factory( factory ), m_root( root )
 {
 
-}
-
-// ** Bindings::widgetValueType
-ValueTypeIdx Bindings::widgetValueType( const String& name ) const
-{
-	return 0;
-}
-
-// ** Bindings::findWidget
-Widget Bindings::findWidget( const String& name ) const
-{
-	return NULL;
-}
-
-// ** Bindings::create
-BindingsPtr Bindings::create( const BindingFactoryPtr& factory, const ObjectWPtr& root )
-{
-	return BindingsPtr( DC_NEW Bindings( factory, root ) );
 }
 
 //! Binds the widget to a value with specified URI.
@@ -88,28 +81,39 @@ bool Bindings::bind( const String& widget, const ValueWPtr& value )
 {
 	DC_BREAK_IF( !value.valid() );
 
+	// Split the widget & it's property.
+	String widgetName	  = widget;
+	String widgetProperty = "";
+
+	if( widget.find( '.' ) != String::npos ) {
+		u32 idx = widget.find( '.' );
+		widgetName	   = widget.substr( 0, idx );
+		widgetProperty = widget.substr( idx + 1 );
+	}
+
 	// Get the widget value type and widget pointer.
-	ValueTypeIdx widgetType = widgetValueType( widget );
-	Widget		 widgetPtr  = findWidget( widget );
+	WidgetPrototypeChain widgetPrototype = resolveWidgetPrototypeChain( widgetName );
+	Widget				 widgetPtr		 = findWidget( widgetName );
 
 	if( !widgetPtr ) {
-		log::error( "Bindings::bind : no widget with name '%s' found\n", widget.c_str() );
+		log::error( "Bindings::bind : no widget with name '%s' found\n", widgetName.c_str() );
 		return false;
 	}
 
 	// Create binding instance
-	BindingPtr binding = m_factory->create( value->type(), widgetType );
+	BindingPtr binding = m_factory->create( value->type(), widgetPrototype, widgetProperty );
 
 	if( !binding.valid() ) {
-		log::error( "Bindings::bind : do not know how to bind property to '%s'\n", widget.c_str() );
+		log::error( "Bindings::bind : do not know how to bind property to '%s'\n", widgetName.c_str() );
 		return false;	
 	}
 
 	if( !binding->bind( value, widgetPtr ) ) {
-		log::error( "Bindings::bind : failed to bind property to '%s'\n", widget.c_str() );
+		log::error( "Bindings::bind : failed to bind property to '%s'\n", widgetName.c_str() );
 		return false;		
 	}
 
+	binding->handleValueChanged();
 	m_bindings.push_back( binding );
 
 	return true;

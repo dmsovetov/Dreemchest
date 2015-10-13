@@ -88,31 +88,36 @@ namespace mvvm {
     //! A template class to bind a property to a Qt widget.
     template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate = QSignalDelegate>
     class QtPropertyBinding : public Binding<TBinding, TValue> {
-    public:
+	protected:
 
-                                //! Constructs QtPropertyBinding.
-                          //      QtPropertyBinding( View* view, TWidget* widget, BoundProperty property );
-		virtual					~QtPropertyBinding( void );
+		//! Binds the value to a Qt widget instance.
+		virtual bool				bind( ValueWPtr value, Widget widget );
+
+		//! Returns the type casted Qt widget pointer.
+        TWidget*					widget( void );
 
     protected:
 
-        TWidget*                m_widget;   //!< Target Qt widget.
-		TSignalDelegate*		m_delegate;	//!< Qt siagnal delegate.
+		AutoPtr<TSignalDelegate>	m_delegate;	//!< Qt siagnal delegate.
     };
 
-    // ** QtPropertyBinding::QtPropertyBinding
-//    template<typename TWidget, typename TValue, typename TSignalDelegate>
-//    QtPropertyBinding<TWidget, TValue, TSignalDelegate>::QtPropertyBinding( View* view, TWidget* widget, BoundProperty property )
-//        : Binding<TValue>( view, property ), m_widget( widget )
-//    {
-//		m_delegate = DC_NEW TSignalDelegate( this, m_widget );
-//    }
-
-    // ** QtPropertyBinding::~QtPropertyBinding
+	// ** QtPropertyBinding::bind
     template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
-	QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::~QtPropertyBinding( void )
+	bool QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::bind( ValueWPtr value, Widget widget )
 	{
-		delete m_delegate;
+		if( !Binding::bind( value, widget ) ) {
+			return false;
+		}
+
+		m_delegate = DC_NEW TSignalDelegate( this, this->widget() );
+		return true;
+	}
+
+	// ** QtPropertyBinding::widget
+    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
+	TWidget* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::widget( void )
+	{
+		return qobject_cast<TWidget*>( reinterpret_cast<QWidget*>( m_widget ) );
 	}
 
 	//! Binds an array of strings to a list box.
@@ -130,37 +135,14 @@ namespace mvvm {
 
 	//! Binds the string property to a stacked widget state.
 	class QtStackedWidgetBinding : public QtPropertyBinding<QtStackedWidgetBinding, QStackedWidget, Text> {
-	public:
-
-								//! Constructs QtStackedWidgetBinding instance.
-                           //     QtStackedWidgetBinding( View* view, QStackedWidget* widget, BoundProperty property );
-
-	private:
+	protected:
 
 		//! Handles property change.
 		virtual void		    handleValueChanged( void );
 	};
-/*
-    //! Binds a caption to a string.
-    class MyGUICaptionBinding : public MyGUIPropertyBinding<MyGUI::TextBox, String> {
-    public:
 
-                                //! Constructs MyGUICaptionBinding instance.
-                                MyGUICaptionBinding( View* view, const String& name, const GenericProperty<String>& property );
-
-    private:
-
-        //! Handles property change.
-        void                    handlePropertyChanged( const String& value );
-    };
-*/
 	//! Binds the click event to a widget.
 	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, Text, QClickedDelegate> {
-    public:
-
-                                //! Constructs QtPushButtonBinding instance.
-                          //      QtPushButtonBinding( View* view, QPushButton* widget, BoundProperty property, const String& event );
-
     private:
 
         //! Handles property change.
@@ -176,12 +158,7 @@ namespace mvvm {
 
     //! Binds a line edit to a string.
     class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text, QTextChangedDelegate> {
-    public:
-
-                                //! Constructs QtLineEditBinding instance.
-                           //     QtLineEditBinding( View* view, QLineEdit* widget, BoundProperty property );
-
-    private:
+    protected:
 
         //! Handles property change.
         virtual void			handleValueChanged( void );
@@ -192,64 +169,26 @@ namespace mvvm {
 
 	//! Binds a label to a string.
 	class QtLabelBinding : public QtPropertyBinding<QtLabelBinding, QLabel, Text> {
-	public:
-
-                                //! Constructs QtLabelBinding instance.
-                          //      QtLabelBinding( View* view, QLabel* widget, BoundProperty property );
-
-    private:
+    protected:
 
         //! Handles property change.
         virtual void			handleValueChanged( void );
 	};
-/*
-	//! Binds the button click event.
-	class MyGUIButtonBinding : public Binding  {
-	public:
 
-								//! Constructs MyGUIButtonBinding instance.
-								MyGUIButtonBinding( View* view, const String& name, const String& event );
-		virtual					~MyGUIButtonBinding( void );
-
-	private:
-
-		//! Handles button click.
-		void					handleClick( MyGUI::Widget* sender );
-
-	private:
-
-		MyGUI::Button*			m_button;	//!< Target MyGUI button.
-        String                  m_event;    //!< Bound event.
-	};
-*/
     //! Binds a widget visibility to a property.
     class QtVisibilityBinding : public QtPropertyBinding<QtVisibilityBinding, QWidget, Boolean> {
-    public:
-
-                                //! Constructs QtVisibilityBinding instance.
-                          //      QtVisibilityBinding( View* view, QWidget* widget, BoundProperty property, bool inversed = false );
+    protected:
 
         //! Handles property change.
         void                    handleValueChanged( void );
-
-    private:
-
-        bool                    m_isInversed;   //!< Will the binding inverse a property before the visibility change.
     };
 
     //! Binds a widget enabled/disabled flag to a property.
     class QtEnabledBinding : public QtPropertyBinding<QtEnabledBinding, QWidget, Boolean> {
-    public:
-
-                                //! Constructs QtEnabledBinding instance.
-                          //      QtEnabledBinding( View* view, QWidget* widget, BoundProperty property, bool inversed = false );
+    protected:
 
         //! Handles property change.
         void                    handleValueChanged( void );
-
-    private:
-
-        bool                    m_isInversed;   //!< Will the binding inverse a property before the enabled/disabled change.
     };
 
 } // namespace mvvm

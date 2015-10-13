@@ -32,43 +32,21 @@ namespace mvvm {
 
 // ---------------------------------------- QtVisibilityBinding ---------------------------------------- //
 
-// ** QtVisibilityBinding::QtVisibilityBinding
-//QtVisibilityBinding::QtVisibilityBinding( View* view, QWidget* widget, BoundProperty property, bool inversed )
-//    : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
-//{
-//
-//}
-
 // ** QtVisibilityBinding::handleValueChanged
 void QtVisibilityBinding::handleValueChanged( void )
 {
-    m_widget->setVisible( m_isInversed ? !m_property->get() : m_property->get() );
+    widget()->setVisible( m_property->get() );
 }
 
 // ----------------------------------------- QtEnabledBinding ---------------------------------------- //
 
-// ** QtEnabledBinding::QtEnabledBinding
-//QtEnabledBinding::QtEnabledBinding( View* view, QWidget* widget, BoundProperty property, bool inversed )
-//    : QtPropertyBinding( view, widget, property ), m_isInversed( inversed )
-//{
-//
-//}
-
 // ** QtEnabledBinding::handleValueChanged
 void QtEnabledBinding::handleValueChanged( void )
 {
-    m_widget->setEnabled( m_isInversed ? !m_property->get() : m_property->get() );
+    widget()->setEnabled( m_property->get() );
 }
 
-
 // ---------------------------------------- QtPushButtonBinding ---------------------------------------- //
-
-// ** QtPushButtonBinding::QtPushButtonBinding
-//QtPushButtonBinding::QtPushButtonBinding( View* view, QPushButton* widget, BoundProperty property, const String& event )
-//    : QtPropertyBinding( view, widget, property ), m_event( event )
-//{
-//
-//}
 
 // ** QtPushButtonBinding::handleValueChanged
 void QtPushButtonBinding::handleValueChanged( void )
@@ -103,13 +81,6 @@ void QtPushButtonBinding::handleViewChanged( void )
 
 // ---------------------------------------- QtStackedWidgetBinding ---------------------------------------- //
 
-// ** QtStackedWidgetBinding::QtStackedWidgetBinding
-//QtStackedWidgetBinding::QtStackedWidgetBinding( View* view, QStackedWidget* widget, BoundProperty property )
-//	: QtPropertyBinding( view, widget, property )
-//{
-//
-//}
-
 // ** QtStackedWidgetBinding::handleValueChanged
 void QtStackedWidgetBinding::handleValueChanged( void )
 {
@@ -139,70 +110,35 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
 */
 // ----------------------------------------- QtLineEditBinding ----------------------------------------- //
 
-// ** QtLineEditBinding::QtLineEditBinding
-//QtLineEditBinding::QtLineEditBinding( View* view, QLineEdit* widget, BoundProperty property )
-//    : QtPropertyBinding( view, widget, property )
-//{
-//
-//}
-
 // ** QtLineEditBinding::handleValueChanged
 void QtLineEditBinding::handleValueChanged( void )
 {
-	const String& value = m_property->get();
+	const String& value		= m_property->get();
+	QLineEdit*	  lineEdit	= widget();
 
-    if( value.c_str() != m_widget->text() ) {
-        m_widget->setText( value.c_str() );
+    if( value.c_str() != lineEdit->text() ) {
+        lineEdit->setText( value.c_str() );
     }
 }
 
 // ** QtLineEditBinding::handleViewChanged
 void QtLineEditBinding::handleViewChanged( void )
 {
-	m_property->set( m_widget->text().toUtf8().constData() );
+	m_property->set( widget()->text().toUtf8().constData() );
 }
 
 // ----------------------------------------- QtLabelBinding ----------------------------------------- //
-
-// ** QtLabelBinding::QtLabelBinding
-//QtLabelBinding::QtLabelBinding( View* view, QLabel* widget, BoundProperty property )
-//    : QtPropertyBinding( view, widget, property )
-//{
-//
-//}
 
 // ** QtLabelBinding::handleValueChanged
 void QtLabelBinding::handleValueChanged( void )
 {
 	const String& value = m_property->get();
+	QLabel*	      label	= widget();
 
-    if( value.c_str() != m_widget->text() ) {
-        m_widget->setText( value.c_str() );
+    if( value.c_str() != label->text() ) {
+        label->setText( value.c_str() );
     }
 }
-
-/*
-// ------------------------------------------ MyGUIButtonBinding ------------------------------------------ //
-
-// ** MyGUIButtonBinding::MyGUIButtonBinding
-MyGUIButtonBinding::MyGUIButtonBinding( View* view, const String& name, const String& event ) : Binding( view ), m_event( event )
-{
-	m_button = static_cast<MyGUI::Button*>( static_cast<MyGUIView*>( view )->widget()->findWidget( name ) );
-	DC_BREAK_IF( m_button == NULL );
-
-	m_button->eventMouseButtonClick += MyGUI::newDelegate( this, &MyGUIButtonBinding::handleClick );
-}
-
-MyGUIButtonBinding::~MyGUIButtonBinding( void )
-{
-	m_button->eventMouseButtonClick -= MyGUI::newDelegate( this, &MyGUIButtonBinding::handleClick );
-}
-
-// ** MyGUIButtonBinding::handleClick
-void MyGUIButtonBinding::handleClick( MyGUI::Widget* sender )
-{
-    m_view->notify( m_event );
-}*/
 
 } // namespace mvvm
 
