@@ -185,7 +185,7 @@ namespace mvvm {
 
 		BindingFactoryPtr	m_factory;	//!< Binding factory instance.
 		ObjectWPtr			m_root;		//!< Root object.
-		Array<BindingPtr>	m_bindings;	//!< All bindings that reside on a view.
+		List<BindingPtr>	m_bindings;	//!< All bindings that reside on a view.
 	};
 
 } // namespace mvvm

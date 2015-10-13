@@ -217,144 +217,27 @@ namespace mvvm {
 		return Object::is( expected );
 	}
 
-/*
-	//! Generic object type used for object type declarations.
-	template<typename TValue>
-	class Object : public ObjectBase {
+	//! Array value type.
+	class Array : public Object {
 	public:
 
-		typedef Value<TValue>	Type;	//!< Alias for this type.
-		typedef StrongPtr<Type>	Ptr;	//!< Strong pointer type.
-		typedef WeakPtr<Type>	WPtr;	//!< Weak pointer type.
+		//! Returns array value type.
+		virtual ValueTypeIdx	type( void ) const;
 
-		//! Returns the value type.
-		virtual ValueType		type( void ) const;
-	};
+		//! Returns true if the array matches the expected type.
+		virtual bool			is( ValueTypeIdx expected ) const;
 
-	// ** Object::type
-	template<typename TValue>
-	ValueTypeIfx Object<TValue>::type( void ) const
-	{
-		ValueType result = ValueBase::valueType<TValue>();
-		return result;
-	}
-*/
-/*
-	//! Observable value base class.
-	class ValueBase : public RefCounted {
-	public:
+		//! Returns array size.
+		s32						size( void ) const;
 
-		//! Notifies bindings about a change.
-		void				notify( void ) const;
-
-		//! Returns the value type.
-		virtual ValueType	type( void ) const { return 0; }
-
-		//! Returns true if the value is object.
-		virtual bool		isObject( void ) const { return false; }
-
-		//! Returns true if the value is of specified type.
-		template<typename TValue>
-		bool				is( void ) const;
-
-		//! Generates the value type id.
-		template<typename TValue>
-		static ValueType	valueType( void );
+		//! Pushes a new value to an array.
+		void					push( const ValuePtr& value );
 
 	protected:
 
-		//! Returns true if the value is of specified type.
-		virtual bool		is( ValueType type ) const;
+		::Array<ValuePtr>		m_values;	//!< Actual values stored inside the array.
 	};
 
-	// ** ValueBase::notify
-	inline void ValueBase::notify( void ) const
-	{
-	}
-
-	// ** ValueBase::is
-	template<typename TValue>
-	bool ValueBase::is( void ) const
-	{
-		return is( ValueBase::valueType<TValue>() );
-	}
-
-	// ** ValueBase::is
-	inline bool ValueBase::is( ValueType expected ) const
-	{
-		ValueType actual = type();
-		return actual == expected;
-	}
-
-	// ** ValueBase::valueType
-	template<typename TValue>
-	ValueType ValueBase::valueType( void )
-	{
-		ValueType result = GroupedTypeIndex<TValue, ValueBase>::idx();
-		return result;
-	}
-
-	//! Generic value type used for primitive type declaration.
-	template<typename TValue>
-	class Value : public ValueBase {
-	public:
-
-		typedef Value<TValue>	Type;	//!< Alias for this type.
-		typedef StrongPtr<Type>	Ptr;	//!< Strong pointer type.
-		typedef WeakPtr<Type>	WPtr;	//!< Weak pointer type.
-
-								//! Constructs Value instance.
-								Value( const TValue& value = TValue() )
-									: m_value( value ) {}
-
-		//! Returns the value type generated from TValue.
-		virtual ValueType		type( void ) const;
-
-		//! Returns property value.
-		const TValue&			get( void ) const;
-		TValue&					get( void );
-
-		//! Sets property value.
-		void					set( const TValue& value );
-
-	protected:
-
-		TValue					m_value;	//!< Actual value.
-	};
-
-	// ** Value::type
-	template<typename TValue>
-	ValueType Value<TValue>::type( void ) const
-	{
-		return ValueBase::valueType<TValue>();
-	}
-
-	// ** Value::get
-	template<typename TValue>
-	const TValue& Value<TValue>::get( void ) const
-	{
-		return m_value;
-	}
-
-	// ** Value::get
-	template<typename TValue>
-	TValue& Value<TValue>::get( void )
-	{
-		return m_value;
-	}
-
-	// ** Value::set
-	template<typename TValue>
-	void Value<TValue>::set( const TValue& value )
-	{
-		if( m_value == value ) {
-			return;
-		}
-
-		m_value = value;
-		notify();
-	}
-*/
 } // namespace mvvm
 
 DC_END_DREEMCHEST
