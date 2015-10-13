@@ -114,7 +114,7 @@ namespace mvvm {
 	template<typename TValue>
 	typename Property<TValue>::WPtr View::findProperty( const String& uri )
 	{
-		PropertyPtr property = findPropertyByUri( uri );
+	/*	PropertyPtr property = findPropertyByUri( uri );
 
 		if( !property.valid() ) {
 			return typename Property<TValue>::WPtr();
@@ -127,7 +127,9 @@ namespace mvvm {
 			return typename Property<TValue>::WPtr();
 		}
 
-		return result;
+		return result;*/
+		DC_NOT_IMPLEMENTED;
+		return WeakPtr< Property<TValue> >();
 	}
 
 #ifndef DC_CPP11_DISABLED

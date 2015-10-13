@@ -28,49 +28,52 @@
 #define __DC_Mvvm_Converter_H__
 
 #include "Binding.h"
-#include "Property.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
 	//! Property converter binding.
-	template<typename TInput, typename TOutput>
-	class Converter : public Binding<TInput> {
+	template<typename TConverter, typename TInput, typename TOutput>
+	class Converter : public Binding<TConverter, TInput> {
 	public:
 
-		typedef WeakPtr< Property<TInput> >		Input;	//!< Alias the input property type.
-		typedef WeakPtr< Property<TOutput> >	Output;	//!< Alias the output property type.
+		typedef WeakPtr<TInput>					InputWPtr;	//!< Input weak pointer type.
+		typedef WeakPtr<TOutput>				OutputWPtr;	//!< Output weak pointer type.
+
 
 												//! Constructs Converter instance.
-												Converter( ViewWPtr view, Input input, Output output = Output() )
-													: Binding<TInput>( view, input ), m_output( output.valid() ? output : &m_internal ), m_internal( NULL ) {}
+												Converter( OutputWPtr output = OutputWPtr() )
+													: m_output( output.valid() ? output : &m_internal ) {}
 
 		//! Returns the output value.
-		Output									value( void ) const { return m_output; }
+		OutputWPtr								value( void ) const { return m_output; }
 
 	protected:
 
-		Property<TOutput>						m_internal;	//!< Internal output target.
-		Output									m_output;	//!< Active output target.
+		TOutput									m_internal;	//!< Internal output target.
+		OutputWPtr								m_output;	//!< Active output target.
 	};
 
 	//! Guid to string converter
-	class GuidToStringConverter : public Converter<Guid, String> {
+	class GuidToStringConverter : public Converter<GuidToStringConverter, Guid, Text> {
 	public:
 
 									//! Constructs GuidToStringConverter instance.
-									GuidToStringConverter( ViewWPtr view, const Input& input, Output output = Output() )
-										: Converter( view, input, output ) {}
+									GuidToStringConverter( OutputWPtr output = OutputWPtr() )
+										: Converter( output ) {}
 
 	private:
 
 		//! Converts the GUID to a string.
-		virtual void				handlePropertyChanged( const Value& value )
-		{
-			m_output->set( value.toString() );
-		}							
+		virtual void				handleValueChanged( void );						
 	};
+
+	// ** GuidToStringConverter::handleValueChanged
+	inline void GuidToStringConverter::handleValueChanged( void )
+	{
+		m_output->set( m_property->get().toString() );
+	}
 
 } // namespace mvvm
 

@@ -59,7 +59,8 @@ void View::clear( void )
 // ** View::addBinding
 void View::addBinding( BindingPtr instance )
 {
-    instance->refreshView();
+	DC_BREAK;
+//    instance->refreshView();
     m_bindings.push_back( instance );
 }
 
@@ -70,7 +71,7 @@ void View::addHandler( const ActionHandlerPtr& handler )
 }
 
 // ** View::findPropertyByUri
-PropertyPtr View::findPropertyByUri( const String& uri )
+/*PropertyPtr View::findPropertyByUri( const String& uri )
 {
 	u32 idx = uri.find( '.' );
 
@@ -98,7 +99,7 @@ PropertyPtr View::findPropertyByUri( const String& uri )
 	}
 
 	return result;
-}
+}*/
 
 } // namespace mvvm
 

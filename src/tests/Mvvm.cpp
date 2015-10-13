@@ -24,38 +24,45 @@
 
  **************************************************************************/
 
-#include <gtest/gtest.h>
-#include <Dreemchest.h>
+#include "UnitTests.h"
 
-class TestableObject : public mvvm::GenericObject<TestableObject> {
-public:
+TEST(PrimitiveValue, Constructor)
+{
+	mvvm::Text value( kTestString );
+	EXPECT_EQ( kTestString, value.get() );
+}
 
-	template<typename TValue>
-	typename WeakPtr<TValue> add( const String& name/*, const TValue& defaultValue = TValue()*/ )
-	{
-		return GenericObject::add<TValue>( name/*, defaultValue*/ );
-	}
-};
+TEST(PrimitiveValue, Setter)
+{
+	mvvm::Text value;
+	value.set( kTestString );
+	EXPECT_EQ( kTestString, value.get() );
+}
 
-class UserInfo : public mvvm::GenericObject<UserInfo> {
-public:
+TEST(Value, CastingToValueType)
+{
+	mvvm::ValuePtr value = DC_NEW mvvm::Text();
+	EXPECT_TRUE( mvvm::castTo<mvvm::Text>( value ).valid() );
+	EXPECT_FALSE( mvvm::castTo<mvvm::Integer>( value ).valid() );
+}
 
-	UserInfo( void )
-	{
-		add<mvvm::Text>( "name" );
-		add<mvvm::Float>( "level" );
-		add<mvvm::Float>( "health" );
-	}
-};
+TEST(Object, AddingProperties)
+{
+	TestableObject	m_object;
+	m_object.add<mvvm::Text>( "name" );
+	EXPECT_TRUE( m_object.has( "name" ) );
+}
 
-class Session : public mvvm::GenericObject<Session> {
-public:
+TEST(Object, CastingToValueType)
+{
+	TestableObject	m_object;
+	mvvm::ValuePtr value = DC_NEW UserInfo;
+	EXPECT_TRUE( mvvm::castTo<UserInfo>( value ).valid() );
+	EXPECT_FALSE( mvvm::castTo<Session>( value ).valid() );
+}
 
-	Session( void )
-	{
-		add<mvvm::Text>( "id"/*, "session identifier"*/ );
-		add<UserInfo>( "userInfo" );
-	}
-};
-
-static const String kTestString = "hello world";
+TEST(Object, ResolvesNestedProperties)
+{
+	Session session;
+	EXPECT_TRUE( session.resolve( "userInfo.name" ).valid() );
+}

@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 	//! Qt view.
-	class QtView : public View {
+/*	class QtView : public View {
 	public:
 
 					//! Constructs QtView instance.
@@ -87,7 +87,7 @@ namespace mvvm {
 		addBinding( converter );
 
 		return converter;
-	}
+	}*/
 
 } // namespace mvvm
 

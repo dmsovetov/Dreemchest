@@ -27,7 +27,7 @@
 #ifndef __DC_Mvvm_Binding_H__
 #define __DC_Mvvm_Binding_H__
 
-#include "Mvvm.h"
+#include "Value.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,77 +37,156 @@ namespace mvvm {
 	class IBinding : public RefCounted {
 	public:
 
-                                //! Constructs Binding instance.
-                                IBinding( ViewWPtr view )
-                                    : m_view( view ) {}
 		virtual					~IBinding( void ) {}
 
+		//! Clones this binding.
+		virtual BindingPtr		clone( void ) const = 0;
+
+		//! Returns the binding value type.
+		virtual ValueTypeIdx	type( void ) const = 0;
+
+		//! Binds to a property.
+		virtual bool			bind( ValueWPtr value, Widget widget ) = 0;
+
         //! Refreshes the bound view.
-        virtual void            refreshView( void ) {}
+        virtual void            handleViewChanged( void ) = 0;
 
         //! Refreshes the bound property.
-        virtual void            refreshProperty( void ) {}
-
-    protected:
-
-        ViewWPtr				m_view; //!< Parent view controller.
+        virtual void            handleValueChanged( void ) = 0;
 	};
 
-    //! A template class to bind a property of a specified type TValue.
-    template<typename TValue>
-    class Binding : public IBinding {
-    friend class Property<TValue>;
-    public:
+	//! A template class to bind a property of a specified type TValue.
+	template<typename TBinding, typename TValue>
+	class Binding : public IBinding {
+	public:
 
-		typedef WeakPtr< Property<TValue> >	BoundProperty;	//!< The bound property type.
-		typedef WeakPtr< Binding<TValue> >	WPtr;			//!< Alias the weak pointer type.
-        typedef TValue						Value;			//!< Alias the value type.
+		virtual					~Binding( void );
 
-											//! Constructs Binding.
-											Binding( ViewWPtr view, BoundProperty property );
-        virtual								~Binding( void );
+		//! Clones this binding instance.
+		virtual BindingPtr		clone( void ) const;
 
-    protected:
+		//! Returns the binding value type.
+		virtual ValueTypeIdx	type( void ) const;
 
-        //! Refreshes the bound data.
-        virtual void						refreshView( void );
+		//! Binds to a property.
+		virtual bool			bind( ValueWPtr value, Widget widget );
 
-        //! Handles property change.
-        virtual void						handlePropertyChanged( const Value& value );
+		//! By default the binding doesn't update the value after the widget change.
+		virtual void			handleViewChanged( void ) {}
 
-    protected:
+	protected:
 
-        BoundProperty						m_property; //!< Bound property.
-    };
+		WeakPtr<TValue>			m_property;	//!< The bound property instance.
+		Widget					m_widget;	//!< Widget that is bound to value.
+	};
 
-    // ** Binding::Binding
-    template<typename T>
-    Binding<T>::Binding( ViewWPtr view, BoundProperty property )
-        : IBinding( view ), m_property( property )
-    {
-        if( m_property.valid() ) m_property->subscribe( this );
-    }
+	// ** Binding::~Binding
+	template<typename TBinding, typename TValue>
+	Binding<TBinding, TValue>::~Binding( void )
+	{
+		bind( ValueWPtr(), NULL );
+	}
 
-    // ** Binding::~Binding
-    template<typename T>
-    Binding<T>::~Binding( void )
-    {
-        if( m_property.valid() ) m_property->unsubscribe( this );
-    }
+	// ** Binding::clone
+	template<typename TBinding, typename TValue>
+	BindingPtr Binding<TBinding, TValue>::clone( void ) const
+	{
+		return DC_NEW TBinding;
+	}
 
-    // ** Binding::refreshView
-    template<typename T>
-    void Binding<T>::refreshView( void )
-    {
-        handlePropertyChanged( m_property->value() );
-    }
+	// ** Binding::clone
+	template<typename TBinding, typename TValue>
+	ValueTypeIdx Binding<TBinding, TValue>::type( void ) const
+	{
+		return Value::valueType<TValue>();
+	}
 
-    // ** Binding::handlePropertyChanged
-    template<typename T>
-    void Binding<T>::handlePropertyChanged( const Value& property )
-    {
-        DC_BREAK;
-    }
+	// ** Binding::bind
+	template<typename TBinding, typename TValue>
+	bool Binding<TBinding, TValue>::bind( ValueWPtr value, Widget widget )
+	{
+		if( m_property.valid() ) {
+			m_property->removeBinding( this );
+		}
+
+		m_property = castTo<TValue>( value );
+		m_widget   = widget;
+
+		if( !m_property.valid() ) {
+			return false;
+		}
+
+		m_property->addBinding( this );
+
+		return true;
+	}
+
+	//! Binding factory creates the binding instance by value & widget value type.
+	class BindingFactory : public RefCounted {
+	public:
+
+		//! Creates new binding instance by widget & value types.
+		BindingPtr			create( ValueTypeIdx valueType, ValueTypeIdx widgetType );
+
+		//! Registers binding with widget & value type.
+		template<typename TWidget, typename TBinding>
+		void				registerBinding( void );
+
+	private:
+
+		//! Container type to store widget value type to binding mapping.
+		typedef Map<ValueTypeIdx, BindingPtr>			BindingByWidgetType;
+
+		//! Container type to store value type to bindings mapping.
+		typedef Map<ValueTypeIdx, BindingByWidgetType>	Bindings;
+
+		Bindings			m_bindings;	//!< Registered bindings.
+	};
+
+	// ** BindingFactory::registerBinding
+	template<typename TWidget, typename TBinding>
+	void BindingFactory::registerBinding( void )
+	{
+		// Create binding instance
+		TBinding* binding = DC_NEW TBinding;
+
+		// Get the value types.
+		ValueTypeIdx valueTypeIdx  = binding->type();
+		ValueTypeIdx widgetTypeIdx = Value::valueType<TWidget>();
+
+		m_bindings[valueTypeIdx][widgetTypeIdx] = DC_NEW TBinding;
+	}
+
+	//! Bindings instance links a value with a single binding instance.
+	class Bindings : public RefCounted {
+	public:
+
+		//! Binds the widget to a value with specified URI.
+		bool				bind( const String& widget, const String& uri );
+
+		//! Binds the widget to a value.
+		bool				bind( const String& widget, const ValueWPtr& value );
+
+		//! Creates Bindings instance.
+		static BindingsPtr	create( const BindingFactoryPtr& factory, const ObjectWPtr& root );
+
+	protected:
+
+							//! Constructs the Bindings instance.
+							Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root );
+
+		//! Returns the widget value type.
+		ValueTypeIdx		widgetValueType( const String& widget ) const;
+
+		//! Returns the widget by name.
+		Widget				findWidget( const String& name ) const;
+
+	private:
+
+		BindingFactoryPtr	m_factory;	//!< Binding factory instance.
+		ObjectWPtr			m_root;		//!< Root object.
+		Array<BindingPtr>	m_bindings;	//!< All bindings that reside on a view.
+	};
 
 } // namespace mvvm
 

@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-	//! Property is an atomic item of data.
+/*	//! Property is an atomic item of data.
     class IProperty : public RefCounted {
     public:
 
@@ -207,7 +207,7 @@ namespace mvvm {
     s32 ArrayProperty<TValue>::size( void ) const
     {
 		return this->m_value.size();
-    }
+    }*/
 
 } // namespace mvvm
 
