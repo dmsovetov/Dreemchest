@@ -34,6 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+#if 0
     //! View is a base class for view renderers and is a composition of data providers and actions handlers.
     class View : public RefCounted {
     public:
@@ -114,7 +115,7 @@ namespace mvvm {
 	template<typename TValue>
 	typename Property<TValue>::WPtr View::findProperty( const String& uri )
 	{
-	/*	PropertyPtr property = findPropertyByUri( uri );
+		PropertyPtr property = findPropertyByUri( uri );
 
 		if( !property.valid() ) {
 			return typename Property<TValue>::WPtr();
@@ -127,9 +128,7 @@ namespace mvvm {
 			return typename Property<TValue>::WPtr();
 		}
 
-		return result;*/
-		DC_NOT_IMPLEMENTED;
-		return WeakPtr< Property<TValue> >();
+		return result;
 	}
 
 #ifndef DC_CPP11_DISABLED
@@ -140,6 +139,8 @@ namespace mvvm {
 		addHandler( DC_NEW TActionHandler( this, args... ) );
 	}
 #endif	/*	!DC_CPP11_DISABLED	*/
+
+#endif
 
 } // namespace mvvm
     

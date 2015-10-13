@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+#if 0
+
 // ** ActionHandler::ActionHandler
 ActionHandler::ActionHandler( ViewWPtr view ) : m_view( view )
 {
@@ -40,6 +42,8 @@ bool ActionHandler::handleEvent( const String& event )
 {
 	return false;
 }
+
+#endif
 
 } // namespace mvvm
 

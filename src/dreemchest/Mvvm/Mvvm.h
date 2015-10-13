@@ -35,6 +35,7 @@ namespace mvvm {
 
 	DECLARE_LOG( log )
 
+#if 0
     template<typename T> class Property;
     template<typename T> class ArrayProperty;
 
@@ -51,6 +52,7 @@ namespace mvvm {
 	typedef Property<Guid>			GuidProperty;
     typedef ArrayProperty<String>   StringArrayProperty;
     typedef List<BindingPtr>        BindingsList;
+#endif
 
 	//! Performs the property type cast.
 	template<typename T, typename S>
@@ -73,6 +75,7 @@ namespace mvvm {
 	//! Widget that is bound to a value.
 	typedef void* Widget;
 
+	dcDeclareNamedPtrs( IBinding, Binding )
 	dcDeclarePtrs( Object )
 	dcDeclarePtrs( Value )
 	dcDeclarePtrs( BindingFactory )

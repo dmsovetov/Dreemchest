@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+#if 0
+
     //! A base class for all action handlers.
     class ActionHandler : public RefCounted {
     public:
@@ -48,6 +50,8 @@ namespace mvvm {
 
         ViewWPtr				m_view;     //!< Parent UI view.
     };
+
+#endif
 
 } // namespace mvvm
     

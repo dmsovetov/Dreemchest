@@ -34,6 +34,8 @@ namespace mvvm {
 
 IMPLEMENT_LOGGER( log )
 
+#if 0
+
 // ** View::notify
 void View::notify( const String& event )
 {
@@ -71,7 +73,7 @@ void View::addHandler( const ActionHandlerPtr& handler )
 }
 
 // ** View::findPropertyByUri
-/*PropertyPtr View::findPropertyByUri( const String& uri )
+PropertyPtr View::findPropertyByUri( const String& uri )
 {
 	u32 idx = uri.find( '.' );
 
@@ -99,7 +101,9 @@ void View::addHandler( const ActionHandlerPtr& handler )
 	}
 
 	return result;
-}*/
+}
+
+#endif
 
 } // namespace mvvm
 
