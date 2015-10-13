@@ -148,7 +148,12 @@ namespace mvvm {
 	template<typename TValue>
 	void PrimitiveValue<TValue>::set( const TValue& value )
 	{
+		if( m_value == value ) {
+			return;
+		}
+
 		m_value = value;
+		notifyValueChanged();
 	}
 
 	//! Object class is a container of named properties.
