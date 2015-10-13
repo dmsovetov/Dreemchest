@@ -198,7 +198,11 @@ namespace mvvm {
 
 		//! Adds a new typed property to this object.
 		template<typename TValue>
-		typename WeakPtr<TValue>			add( const String& name/*, const TValue& defaultValue = TValue()*/ );
+		typename WeakPtr<TValue>			add( const String& name );
+
+		//! Adds a new typed property with a default value to this object.
+		template<typename TValue>
+		typename WeakPtr<TValue>			add( const String& name, typename TValue::ValueType defaultValue );
 
 	protected:
 
@@ -211,9 +215,20 @@ namespace mvvm {
 
 	// ** ObjectValue::add
 	template<typename TValue>
-	WeakPtr<TValue> ObjectValue::add( const String& name/*, const TValue& defaultValue*/ )
+	WeakPtr<TValue> ObjectValue::add( const String& name )
 	{
 		StrongPtr<TValue> value( DC_NEW TValue );
+		value->setParent( this );
+		m_properties[name] = value;
+		return value;
+	}
+
+	// ** ObjectValue::add
+	template<typename TValue>
+	WeakPtr<TValue> ObjectValue::add( const String& name, typename TValue::ValueType defaultValue )
+	{
+		StrongPtr<TValue> value( DC_NEW TValue );
+		value->set( defaultValue );
 		value->setParent( this );
 		m_properties[name] = value;
 		return value;
