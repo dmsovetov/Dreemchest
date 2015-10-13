@@ -90,6 +90,9 @@ namespace mvvm {
 										//! Constructs the PrimitiveValue instance.
 										PrimitiveValue( const TValue& value = TValue() );
 
+										//! Casts primitive value to a internal data type.
+										operator const TValue& ( void ) const;
+
 		//! Returns the actual value type index.
 		virtual ValueTypeIdx			type( void ) const;
 
@@ -108,6 +111,13 @@ namespace mvvm {
 	template<typename TValue>
 	PrimitiveValue<TValue>::PrimitiveValue( const TValue& value ) : m_value( value )
 	{
+	}
+
+	// ** PrimitiveValue::operator TValue
+	template<typename TValue>
+	PrimitiveValue<TValue>::operator const TValue &( void ) const
+	{
+		return m_value;
 	}
 
 	// ** PrimitiveValue::type
