@@ -156,6 +156,13 @@ namespace mvvm {
 		notifyValueChanged();
 	}
 
+	// ** operator == ( PrimitiveValue<TValue>&, TValue& )
+	template<typename TValue>
+	inline bool operator == ( const TValue& b, const PrimitiveValue<TValue>& a )
+	{
+		return a.get() == b;
+	}
+
 	//! Object class is a container of named properties.
 	class Object : public Value {
 	public:
