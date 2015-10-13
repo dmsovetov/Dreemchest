@@ -93,6 +93,9 @@ namespace mvvm {
 										//! Casts primitive value to a internal data type.
 										operator const TValue& ( void ) const;
 
+		//! Compares two values.
+		bool							operator == ( const TValue& value ) const;
+
 		//! Returns the actual value type index.
 		virtual ValueTypeIdx			type( void ) const;
 
@@ -118,6 +121,13 @@ namespace mvvm {
 	PrimitiveValue<TValue>::operator const TValue &( void ) const
 	{
 		return m_value;
+	}
+
+	// ** PrimitiveValue::operator TValue
+	template<typename TValue>
+	bool PrimitiveValue<TValue>::operator == ( const TValue& value ) const
+	{
+		return m_value == value;
 	}
 
 	// ** PrimitiveValue::type
