@@ -226,6 +226,13 @@ namespace mvvm {
 
 		//! Returns true if the object type matches the specified one.
 		virtual bool			is( ValueTypeIdx expected ) const;
+
+		//! Generic object constructor
+		template<typename ... Args>
+		static Ptr				create( const Args& ... args )
+		{
+			return DC_NEW Type( args... );
+		}
 	};
 
 	// ** GenericObject::type
