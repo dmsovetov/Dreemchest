@@ -135,6 +135,13 @@ ValueWPtr ObjectValue::get( const String& name ) const
 	return i != m_properties.end() ? i->second : ValuePtr();
 }
 
+// ** ObjectValue::set
+void ObjectValue::set( const String& name, ValuePtr value )
+{
+	value->setParent( this );
+	m_properties[name] = value;
+}
+
 // ** ObjectValue::resolve
 ValueWPtr ObjectValue::resolve( const String& uri ) const
 {

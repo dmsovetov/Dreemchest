@@ -188,6 +188,9 @@ namespace mvvm {
 		//! Returns the property value with specified name.
 		ValueWPtr							get( const String& name ) const;
 
+		//! Sets the property value.
+		void								set( const String& name, ValuePtr value );
+
 		//! Resolves the property value with specified URI.
 		ValueWPtr							resolve( const String& uri ) const;
 
@@ -218,8 +221,7 @@ namespace mvvm {
 	WeakPtr<TValue> ObjectValue::add( const String& name )
 	{
 		StrongPtr<TValue> value( DC_NEW TValue );
-		value->setParent( this );
-		m_properties[name] = value;
+		set( name, value );
 		return value;
 	}
 
@@ -229,8 +231,7 @@ namespace mvvm {
 	{
 		StrongPtr<TValue> value( DC_NEW TValue );
 		value->set( defaultValue );
-		value->setParent( this );
-		m_properties[name] = value;
+		set( name, value );
 		return value;
 	}
 
