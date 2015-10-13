@@ -120,18 +120,13 @@ namespace mvvm {
 		return qobject_cast<TWidget*>( reinterpret_cast<QWidget*>( m_widget ) );
 	}
 
-	//! Binds an array of strings to a list box.
- //   class QtListBoxBinding : public QtPropertyBinding<QListWidget, StringArray> {
-	//public:
+	//! Binds an array of strings to a list widget.
+    class QtListWidgetBinding : public QtPropertyBinding<QtListWidgetBinding, QListWidget, TextArray> {
+	protected:
 
-	//							//! Constructs QtListBoxBinding instance.
- //                          //     QtListBoxBinding( View* view, QListWidget* widget, BoundProperty property );
-
-	//private:
-
-	//	//! Handles property change.
-	//	virtual void		    handleValueChanged( void );
-	//};
+		//! Handles property change.
+		virtual void		    handleValueChanged( void );
+	};
 
 	//! Binds the string property to a stacked widget state.
 	class QtStackedWidgetBinding : public QtPropertyBinding<QtStackedWidgetBinding, QStackedWidget, Text> {
@@ -142,18 +137,11 @@ namespace mvvm {
 	};
 
 	//! Binds the click event to a widget.
-	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, Text, QClickedDelegate> {
-    private:
+	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, CommandValue, QClickedDelegate> {
+    protected:
 
-        //! Handles property change.
-        virtual void			handleValueChanged( void );
-
-		//! Emits the event.
+		//! Invokes the command.
 		virtual void            handleViewChanged( void );
-
-	private:
-
-		String					m_event;	//!< Event dispatched on click.
 	};
 
     //! Binds a line edit to a string.

@@ -48,36 +48,25 @@ void QtEnabledBinding::handleValueChanged( void )
 
 // ---------------------------------------- QtPushButtonBinding ---------------------------------------- //
 
-// ** QtPushButtonBinding::handleValueChanged
-void QtPushButtonBinding::handleValueChanged( void )
-{
-//    DC_BREAK
-}
-
 // ** QtPushButtonBinding::handleViewChanged
 void QtPushButtonBinding::handleViewChanged( void )
 {
-//	m_view->notify( m_event );
+	m_property->invoke();
 }
 
-// ---------------------------------------- QtListBoxBinding ---------------------------------------- //
+// ---------------------------------------- QtListWidgetBinding ---------------------------------------- //
 
-// ** QtListBoxBinding::QtListBoxBinding
-//QtListBoxBinding::QtListBoxBinding( View* view, QListWidget* widget, BoundProperty property )
-//	: QtPropertyBinding( view, widget, property )
-//{
-//
-//}
+// ** QtListWidgetBinding::handleValueChanged
+void QtListWidgetBinding::handleValueChanged( void )
+{
+	QListWidget* list = widget();
 
-// ** QtListBoxBinding::handleValueChanged
-//void QtListBoxBinding::handleValueChanged( void )
-//{
-//	m_widget->clear();
-//
-//	for( s32 i = 0, n = ( s32 )value.size(); i < n; i++ ) {
-//		m_widget->addItem( value[i].c_str() );
-//	}
-//}
+	list->clear();
+
+	for( s32 i = 0, n = ( s32 )m_property->size(); i < n; i++ ) {
+		list->addItem( m_property->get( i )->get().c_str() );
+	}
+}
 
 // ---------------------------------------- QtStackedWidgetBinding ---------------------------------------- //
 

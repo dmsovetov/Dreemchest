@@ -74,6 +74,9 @@ namespace mvvm {
 		//! By default the binding doesn't update the value after the widget change.
 		virtual void			handleViewChanged( void ) {}
 
+		//! By default the binding doesn't update the widget after the value change.
+		virtual void			handleValueChanged( void ) {}
+
 	protected:
 
 		WeakPtr<TValue>			m_property;	//!< The bound property instance.

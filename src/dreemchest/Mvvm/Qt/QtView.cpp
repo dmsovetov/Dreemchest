@@ -40,8 +40,10 @@ QtBindingFactory::QtBindingFactory( void )
 	registerBinding<QtLabelBinding, QLabel>();
 	registerBinding<QtLineEditBinding, QLineEdit>();
 	registerBinding<QtStackedWidgetBinding, QStackedWidget>();
+	registerBinding<QtListWidgetBinding, QListWidget>();
 	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
 	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
+	registerBinding<QtPushButtonBinding, QPushButton>( "click" );
 }
 
 // ** QtBindingFactory::create
