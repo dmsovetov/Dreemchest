@@ -169,6 +169,26 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
+// ----------------------------------------------------------- CommandValue ----------------------------------------------------------- //
+
+// ** CommandValue::is
+bool CommandValue::is( ValueTypeIdx expected ) const
+{
+	ValueTypeIdx actual = valueType<CommandValue>();
+
+	if( expected == actual ) {
+		return true;
+	}
+
+	return Value::is( expected );
+}
+
+// ** CommandValue::type
+ValueTypeIdx CommandValue::type( void ) const
+{
+	return Value::valueType<CommandValue>();
+}
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST

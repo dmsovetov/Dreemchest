@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
+	// ---------------------------------------------------------- Value ---------------------------------------------------------- //
+
 	//! Base class for a value types.
 	class Value : public RefCounted {
 	public:
@@ -76,6 +78,8 @@ namespace mvvm {
 	{
 		return GroupedTypeIndex<TValue, Value>::idx();
 	}
+
+	// ---------------------------------------------------------- PrimitiveValue ---------------------------------------------------------- //
 
 	//! Generic class to declare primitive value types.
 	template<typename TValue>
@@ -163,6 +167,8 @@ namespace mvvm {
 		return a.get() == b;
 	}
 
+	// ---------------------------------------------------------- ObjectValue ---------------------------------------------------------- //
+
 	//! ObjectValue class is a container of named properties.
 	class ObjectValue : public Value {
 	public:
@@ -220,6 +226,8 @@ namespace mvvm {
 	template<typename TValue>
 	WeakPtr<TValue> ObjectValue::add( const String& name )
 	{
+		DC_BREAK_IF( has( name ) );
+
 		StrongPtr<TValue> value( DC_NEW TValue );
 		set( name, value );
 		return value;
@@ -229,11 +237,15 @@ namespace mvvm {
 	template<typename TValue>
 	WeakPtr<TValue> ObjectValue::add( const String& name, typename TValue::ValueType defaultValue )
 	{
+		DC_BREAK_IF( has( name ) );
+
 		StrongPtr<TValue> value( DC_NEW TValue );
 		value->set( defaultValue );
 		set( name, value );
 		return value;
 	}
+
+	// ---------------------------------------------------------- Object ---------------------------------------------------------- //
 
 	//! Generic object type used for object type declarations.
 	template<typename TObject>
@@ -277,6 +289,8 @@ namespace mvvm {
 
 		return ObjectValue::is( expected );
 	}
+
+	// ---------------------------------------------------------- ArrayValue ---------------------------------------------------------- //
 
 	//! Array value type.
 	template<typename TValue>
@@ -350,6 +364,22 @@ namespace mvvm {
 		m_values.push_back( value );
 		notifyValueChanged();
 	}
+
+	// ---------------------------------------------------------- CommandValue ---------------------------------------------------------- //
+
+	//! Command value wraps the functional object inside and used to bind commands with widgets.
+	class CommandValue : public Value {
+	public:
+
+		//! Returns command value type.
+		virtual ValueTypeIdx	type( void ) const;
+
+		//! Returns true if the command matches the expected type.
+		virtual bool			is( ValueTypeIdx expected ) const;
+
+		//! Invokes the command instance.
+		virtual void			invoke( void ) = 0;
+	};
 
 } // namespace mvvm
 
