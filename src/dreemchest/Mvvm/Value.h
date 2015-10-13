@@ -279,25 +279,77 @@ namespace mvvm {
 	}
 
 	//! Array value type.
+	template<typename TValue>
 	class ArrayValue : public ObjectValue {
 	public:
 
+		typedef ArrayValue<TValue>	Type;		//!< Alias for this type.
+		typedef StrongPtr<Type>		Ptr;		//!< Strong pointer type.
+		typedef WeakPtr<Type>		WPtr;		//!< Weak pointer type.
+		typedef StrongPtr<TValue>	ItemType;	//! Alias the item type.
+
 		//! Returns array value type.
-		virtual ValueTypeIdx	type( void ) const;
+		virtual ValueTypeIdx		type( void ) const;
 
 		//! Returns true if the array matches the expected type.
-		virtual bool			is( ValueTypeIdx expected ) const;
+		virtual bool				is( ValueTypeIdx expected ) const;
 
 		//! Returns array size.
-		s32						size( void ) const;
+		s32							size( void ) const;
+
+		//! Returns the value by index.
+		const ItemType&				get( s32 index ) const;
 
 		//! Pushes a new value to an array.
-		void					push( const ValuePtr& value );
+		void						push( const ItemType& value );
 
 	protected:
 
-		Array<ValuePtr>			m_values;	//!< Actual values stored inside the array.
+		Array<ItemType>				m_values;	//!< Actual values stored inside the array.
 	};
+
+	//! Returns array value type.
+	template<typename TValue>
+	ValueTypeIdx ArrayValue<TValue>::type( void ) const
+	{
+		return Value::valueType<ArrayValue>();
+	}
+
+	// ** ArrayValue::is
+	template<typename TValue>
+	bool ArrayValue<TValue>::is( ValueTypeIdx expected ) const
+	{
+		ValueTypeIdx actual = valueType< ArrayValue<TValue> >();
+
+		if( expected == actual ) {
+			return true;
+		}
+
+		return Value::is( expected );
+	}
+
+	// ** ArrayValue::size
+	template<typename TValue>
+	s32 ArrayValue<TValue>::size( void ) const
+	{
+		return ( s32 )m_values.size();
+	}
+
+	// ** ArrayValue::size
+	template<typename TValue>
+	const typename ArrayValue<TValue>::ItemType& ArrayValue<TValue>::get( s32 index ) const
+	{
+		DC_BREAK_IF( index < 0 || index >= size() );
+		return m_values[index];
+	}
+
+	// ** ArrayValue::push
+	template<typename TValue>
+	void ArrayValue<TValue>::push( const ItemType& value )
+	{
+		m_values.push_back( value );
+		notifyValueChanged();
+	}
 
 } // namespace mvvm
 

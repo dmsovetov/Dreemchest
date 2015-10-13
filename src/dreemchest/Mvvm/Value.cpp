@@ -169,39 +169,6 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
-// ----------------------------------------------------------- ArrayValue ----------------------------------------------------------- //
-
-//! Returns array value type.
-ValueTypeIdx ArrayValue::type( void ) const
-{
-	return Value::valueType<ArrayValue>();
-}
-
-// ** ArrayValue::is
-bool ArrayValue::is( ValueTypeIdx expected ) const
-{
-	ValueTypeIdx actual = valueType<ArrayValue>();
-
-	if( expected == actual ) {
-		return true;
-	}
-
-	return Value::is( expected );
-}
-
-// ** ArrayValue::size
-s32 ArrayValue::size( void ) const
-{
-	return ( s32 )m_values.size();
-}
-
-// ** ArrayValue::push
-void ArrayValue::push( const ValuePtr& value )
-{
-	m_values.push_back( value );
-	notifyValueChanged();
-}
-
 } // namespace mvvm
 
 DC_END_DREEMCHEST

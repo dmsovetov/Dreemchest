@@ -69,6 +69,9 @@ namespace mvvm {
 	//! Primitive value type forward declaration.
 	template<typename TValue> class PrimitiveValue;
 
+	//! Array value type forward declaration.
+	template<typename TValue> class ArrayValue;
+
 	//! Value type index.
 	typedef TypeIdx ValueTypeIdx;
 
@@ -91,7 +94,8 @@ namespace mvvm {
 	typedef PrimitiveValue<s32>		Integer;	//!< Integer value type.
 	typedef PrimitiveValue<f32>		Float;		//!< Floating point value type.
 	typedef PrimitiveValue<String>	Text;		//!< String value type.
-	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.		
+	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.	
+	typedef ArrayValue<Text>		TextArray;	//!< Array of text values.
 /*
 
 
