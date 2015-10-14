@@ -91,11 +91,17 @@ namespace mvvm {
 		typedef StrongPtr<Type>			Ptr;		//!< Strong pointer type.
 		typedef WeakPtr<Type>			WPtr;		//!< Weak pointer type.
 
+										//! Constructs the PrimitiveValue instance.
+										PrimitiveValue( const TValue& value = TValue() );
+
 										//! Casts primitive value to a internal data type.
 										operator const TValue& ( void ) const;
 
 		//! Compares two values.
 		bool							operator == ( const TValue& value ) const;
+
+		//! Set the value.
+		const Type&						operator = ( const TValue& value );
 
 		//! Returns the actual value type index.
 		virtual ValueTypeIdx			type( void ) const;
@@ -108,11 +114,6 @@ namespace mvvm {
 
 		//! Creates the PrimitiveValue instance.
 		static Ptr						create( const TValue& value = TValue() );
-
-	protected:
-
-										//! Constructs the PrimitiveValue instance.
-										PrimitiveValue( const TValue& value = TValue() );
 
 	protected:
 
@@ -130,6 +131,14 @@ namespace mvvm {
 	PrimitiveValue<TValue>::operator const TValue &( void ) const
 	{
 		return m_value;
+	}
+
+	// ** PrimitiveValue::operator TValue
+	template<typename TValue>
+	const PrimitiveValue<TValue>& PrimitiveValue<TValue>::operator = ( const TValue& value )
+	{
+		m_value = value;
+		return *this;
 	}
 
 	// ** PrimitiveValue::operator TValue
