@@ -91,9 +91,6 @@ namespace mvvm {
 		typedef StrongPtr<Type>			Ptr;		//!< Strong pointer type.
 		typedef WeakPtr<Type>			WPtr;		//!< Weak pointer type.
 
-										//! Constructs the PrimitiveValue instance.
-										PrimitiveValue( const TValue& value = TValue() );
-
 										//! Casts primitive value to a internal data type.
 										operator const TValue& ( void ) const;
 
@@ -108,6 +105,14 @@ namespace mvvm {
 
 		//! Sets the property value.
 		void							set( const TValue& value );
+
+		//! Creates the PrimitiveValue instance.
+		static Ptr						create( const TValue& value = TValue() );
+
+	protected:
+
+										//! Constructs the PrimitiveValue instance.
+										PrimitiveValue( const TValue& value = TValue() );
 
 	protected:
 
@@ -132,6 +137,13 @@ namespace mvvm {
 	bool PrimitiveValue<TValue>::operator == ( const TValue& value ) const
 	{
 		return m_value == value;
+	}
+
+	// ** PrimitiveValue::type
+	template<typename TValue>
+	typename PrimitiveValue<TValue>::Ptr PrimitiveValue<TValue>::create( const TValue& value )
+	{
+		return Ptr( DC_NEW PrimitiveValue<TValue>( value ) );
 	}
 
 	// ** PrimitiveValue::type
@@ -206,8 +218,8 @@ namespace mvvm {
 		virtual bool						validate( void ) const;
 
 		//! Adds a new typed property to this object.
-		template<typename TValue>
-		typename WeakPtr<TValue>			add( const String& name );
+		template<typename TValue, typename ... Args>
+		typename WeakPtr<TValue>			add( const String& name, const Args& ... args );
 
 		//! Adds a new typed property with a default value to this object.
 		template<typename TValue>
@@ -223,12 +235,12 @@ namespace mvvm {
 	};
 
 	// ** ObjectValue::add
-	template<typename TValue>
-	WeakPtr<TValue> ObjectValue::add( const String& name )
+	template<typename TValue, typename ... Args>
+	WeakPtr<TValue> ObjectValue::add( const String& name, const Args& ... args )
 	{
 		DC_BREAK_IF( has( name ) );
 
-		StrongPtr<TValue> value( DC_NEW TValue );
+		StrongPtr<TValue> value( TValue::create( args... ) );
 		set( name, value );
 		return value;
 	}
@@ -317,12 +329,27 @@ namespace mvvm {
 		//! Pushes a new value to an array.
 		void						push( const ItemType& value );
 
+		//! Creates the ArrayValue instance.
+		static Ptr					create( void );
+
+	protected:
+
+									//! Constructs ArrayValue instance.
+									ArrayValue( void ) {}
+
 	protected:
 
 		Array<ItemType>				m_values;	//!< Actual values stored inside the array.
 	};
 
-	//! Returns array value type.
+	// ** ArrayValue::create
+	template<typename TValue>
+	typename ArrayValue<TValue>::Ptr ArrayValue<TValue>::create( void )
+	{
+		return Ptr( DC_NEW Type );
+	}
+
+	// ** ArrayValue::type
 	template<typename TValue>
 	ValueTypeIdx ArrayValue<TValue>::type( void ) const
 	{
