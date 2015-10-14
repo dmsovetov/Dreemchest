@@ -221,10 +221,6 @@ namespace mvvm {
 		template<typename TValue, typename ... Args>
 		typename WeakPtr<TValue>			add( const String& name, const Args& ... args );
 
-		//! Adds a new typed property with a default value to this object.
-		template<typename TValue>
-		typename WeakPtr<TValue>			add( const String& name, typename TValue::ValueType defaultValue );
-
 	protected:
 
 		//! Container type to store object properties.
@@ -241,18 +237,6 @@ namespace mvvm {
 		DC_BREAK_IF( has( name ) );
 
 		StrongPtr<TValue> value( TValue::create( args... ) );
-		set( name, value );
-		return value;
-	}
-
-	// ** ObjectValue::add
-	template<typename TValue>
-	WeakPtr<TValue> ObjectValue::add( const String& name, typename TValue::ValueType defaultValue )
-	{
-		DC_BREAK_IF( has( name ) );
-
-		StrongPtr<TValue> value( DC_NEW TValue );
-		value->set( defaultValue );
 		set( name, value );
 		return value;
 	}
