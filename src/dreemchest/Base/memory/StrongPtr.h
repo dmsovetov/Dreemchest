@@ -31,6 +31,8 @@
 
 DC_BEGIN_DREEMCHEST
 
+	template<typename T> class WeakPtr;
+
     // ** class StrongPtr
     template<typename T>
     class StrongPtr {
@@ -48,6 +50,8 @@ DC_BEGIN_DREEMCHEST
                                 static_cast<RefCounted*>( m_ptr )->retain();
                             }
                         }
+
+						StrongPtr( const WeakPtr<T>& other );
 
         T*              get( void ) const;
 		bool			valid( void ) const;
@@ -84,6 +88,12 @@ DC_BEGIN_DREEMCHEST
         if( m_ptr ) {
             static_cast<RefCounted*>( m_ptr )->retain();
         }
+    }
+
+    // ** StrongPtr::StrongPtr
+    template<typename T>
+    StrongPtr<T>::StrongPtr( const WeakPtr<T>& pointer ) : m_ptr( NULL ) {
+        setPointer( pointer.get() );
     }
 
     // ** StrongPtr::~StrongPtr
