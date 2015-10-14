@@ -122,6 +122,14 @@ DC_BEGIN_DREEMCHEST
         return *m_ptr;
     }
 
+    // ** WeakPtr::operator *
+    template<typename T>
+    const T& WeakPtr<T>::operator * ( void ) const {
+        manageProxy();
+        DC_BREAK_IF( m_ptr == NULL );
+        return *m_ptr;
+    }
+
     // ** WeakPtr::operator =
     template<typename T>
     WeakPtr<T>& WeakPtr<T>::operator = ( T *pointer ) {

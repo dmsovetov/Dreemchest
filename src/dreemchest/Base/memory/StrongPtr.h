@@ -137,6 +137,13 @@ DC_BEGIN_DREEMCHEST
         return *m_ptr;
     }
 
+    // ** StrongPtr::operator *
+    template<typename T>
+    const T& StrongPtr<T>::operator * ( void ) const {
+        DC_BREAK_IF( m_ptr == NULL );
+        return *m_ptr;
+    }
+
     // ** StrongPtr::operator =
     template<typename T>
     typename StrongPtr<T>::ThisType& StrongPtr<T>::operator = ( const ThisType& other ) {
