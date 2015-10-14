@@ -43,17 +43,26 @@ namespace mvvm {
 
 
 												//! Constructs Converter instance.
-												Converter( OutputWPtr output = OutputWPtr() )
-													: m_output( output.valid() ? output : &m_internal ) {}
+												Converter( OutputWPtr output = OutputWPtr() );
 
 		//! Returns the output value.
 		OutputWPtr								value( void ) const { return m_output; }
 
 	protected:
 
-		TOutput									m_internal;	//!< Internal output target.
+		typename TOutput::Ptr					m_internal;	//!< Internal output target.
 		OutputWPtr								m_output;	//!< Active output target.
 	};
+
+	// ** Converter::Converter
+	template<typename TConverter, typename TInput, typename TOutput>
+	Converter<TConverter, TInput, TOutput>::Converter( OutputWPtr output ) : m_output( output )
+	{
+		if( !output.valid() ) {
+			m_internal = TOutput::create();
+			m_output   = m_internal;
+		}
+	}
 
 	//! Guid to string converter
 	class GuidToStringConverter : public Converter<GuidToStringConverter, Guid, Text> {
