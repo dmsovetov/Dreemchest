@@ -381,6 +381,29 @@ namespace mvvm {
 		virtual void			invoke( void ) = 0;
 	};
 
+	//! Command with a functional object inside.
+	class Command : public CommandValue {
+	public:
+
+		
+		typedef cClosure<void()>	Callback;	//!< Command callback type.
+		typedef StrongPtr<Command>	Ptr;		//!< Alias the strong pointer type.
+
+
+									//! Constructs the Command instance.
+									Command( const Callback& callback );
+
+		//! Invokes the functional object.
+		virtual void				invoke( void );
+
+		//! Creates the Command instance.
+		static Ptr					create( const Callback& callback );
+
+	protected:
+
+		Callback					m_callback;	//!< Functional object to be called.
+	};
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST

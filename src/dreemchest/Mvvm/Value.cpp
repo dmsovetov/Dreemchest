@@ -189,6 +189,26 @@ ValueTypeIdx CommandValue::type( void ) const
 	return Value::valueType<CommandValue>();
 }
 
+// -------------------------------------------------------------- Command -------------------------------------------------------------- //
+
+// ** Command::Command
+Command::Command( const Callback& callback ) : m_callback( callback )
+{
+
+}
+
+// ** Command::invoke
+void Command::invoke( void )
+{
+	m_callback();
+}
+
+// ** Command::create
+Command::Ptr Command::create( const Callback& callback )
+{
+	return Ptr( DC_NEW Command( callback ) );
+}
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST
