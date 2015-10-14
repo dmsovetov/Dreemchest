@@ -64,7 +64,8 @@ void QtListWidgetBinding::handleValueChanged( void )
 	list->clear();
 
 	for( s32 i = 0, n = ( s32 )m_property->size(); i < n; i++ ) {
-		list->addItem( m_property->get( i )->get().c_str() );
+		const String& text = m_property->get( i );
+		list->addItem( text.c_str() );
 	}
 }
 

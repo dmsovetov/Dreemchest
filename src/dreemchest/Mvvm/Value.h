@@ -293,10 +293,11 @@ namespace mvvm {
 	class ArrayValue : public ObjectValue {
 	public:
 
-		typedef ArrayValue<TValue>	Type;		//!< Alias for this type.
-		typedef StrongPtr<Type>		Ptr;		//!< Strong pointer type.
-		typedef WeakPtr<Type>		WPtr;		//!< Weak pointer type.
-		typedef StrongPtr<TValue>	ItemType;	//! Alias the item type.
+		typedef ArrayValue<TValue>	Type;			//!< Alias for this type.
+		typedef StrongPtr<Type>		Ptr;			//!< Strong pointer type.
+		typedef WeakPtr<Type>		WPtr;			//!< Weak pointer type.
+		typedef StrongPtr<TValue>	ItemType;		//!< Alias the item type.
+		typedef const TValue&		ItemConstRef;	//!< Alias the reference type.
 
 		//! Returns array value type.
 		virtual ValueTypeIdx		type( void ) const;
@@ -308,7 +309,7 @@ namespace mvvm {
 		s32							size( void ) const;
 
 		//! Returns the value by index.
-		const ItemType&				get( s32 index ) const;
+		ItemConstRef				get( s32 index ) const;
 
 		//! Pushes a new value to an array.
 		void						push( const ItemType& value );
@@ -362,10 +363,10 @@ namespace mvvm {
 
 	// ** ArrayValue::size
 	template<typename TValue>
-	const typename ArrayValue<TValue>::ItemType& ArrayValue<TValue>::get( s32 index ) const
+	typename ArrayValue<TValue>::ItemConstRef ArrayValue<TValue>::get( s32 index ) const
 	{
 		DC_BREAK_IF( index < 0 || index >= size() );
-		return m_values[index];
+		return *m_values[index].get();
 	}
 
 	// ** ArrayValue::push
