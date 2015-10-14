@@ -84,9 +84,13 @@ ObjectWPtr Bindings::root( void ) const
 }
 
 //! Binds the widget to a value with specified URI.
-bool Bindings::bind( const String& widget, const String& uri )
+bool Bindings::bind( const String& widget, const String& uri, ObjectWPtr root )
 {
-	ValueWPtr value = m_root->resolve( uri );
+	if( !root.valid() ) {
+		root = m_root;
+	}
+
+	ValueWPtr value = root->resolve( uri );
 	return bind( widget, value );
 }
 

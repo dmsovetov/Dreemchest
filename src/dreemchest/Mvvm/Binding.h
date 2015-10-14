@@ -173,7 +173,7 @@ namespace mvvm {
 		ObjectWPtr						root( void ) const;
 
 		//! Binds the widget to a value with specified URI.
-		bool							bind( const String& widget, const String& uri );
+		bool							bind( const String& widget, const String& uri, ObjectWPtr root = ObjectWPtr() );
 
 		//! Binds the widget to a value.
 		bool							bind( const String& widget, const ValueWPtr& value );
