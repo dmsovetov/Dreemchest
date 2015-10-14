@@ -90,6 +90,18 @@ const Boolean& ObjectValue::isValid( void ) const
 	return *m_isValid;
 }
 
+// ** ObjectValue::keys
+Set<String> ObjectValue::keys( void ) const
+{
+	Set<String> result;
+
+	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
+		result.insert( i->first );
+	}
+
+	return result;
+}
+
 // ** ObjectValue::is
 bool ObjectValue::is( ValueTypeIdx expected ) const
 {

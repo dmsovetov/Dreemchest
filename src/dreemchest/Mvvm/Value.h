@@ -203,6 +203,9 @@ namespace mvvm {
 		//! Returns true if the object type matches the specified one.
 		virtual bool						is( ValueTypeIdx expected ) const;
 
+		//! Returns the set of keys that reside inside this object.
+		Set<String>							keys( void ) const;
+
 		//! Returns the isValid property pointer.
 		const Boolean&						isValid( void ) const;
 
