@@ -85,9 +85,9 @@ ObjectValue::ObjectValue( void )
 }
 
 // ** ObjectValue::isValid
-Boolean::WPtr ObjectValue::isValid( void ) const
+const Boolean& ObjectValue::isValid( void ) const
 {
-	return m_isValid;
+	return *m_isValid;
 }
 
 // ** ObjectValue::is

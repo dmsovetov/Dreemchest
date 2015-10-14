@@ -195,7 +195,7 @@ namespace mvvm {
 		virtual bool						is( ValueTypeIdx expected ) const;
 
 		//! Returns the isValid property pointer.
-		Boolean::WPtr						isValid( void ) const;
+		const Boolean&						isValid( void ) const;
 
 		//! Runs the data validation routine and returns the result.
 		bool								check( void );
