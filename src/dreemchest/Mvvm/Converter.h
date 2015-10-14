@@ -43,10 +43,13 @@ namespace mvvm {
 
 
 												//! Constructs Converter instance.
-												Converter( OutputWPtr output = OutputWPtr() );
+												Converter( void );
 
 		//! Returns the output value.
-		OutputWPtr								value( void ) const { return m_output; }
+		OutputWPtr								output( void ) const;
+
+		//! Sets the converter output.
+		void									setOutput( OutputWPtr value );
 
 	protected:
 
@@ -56,30 +59,54 @@ namespace mvvm {
 
 	// ** Converter::Converter
 	template<typename TConverter, typename TInput, typename TOutput>
-	Converter<TConverter, TInput, TOutput>::Converter( OutputWPtr output ) : m_output( output )
+	Converter<TConverter, TInput, TOutput>::Converter( void )
 	{
-		if( !output.valid() ) {
-			m_internal = TOutput::create();
-			m_output   = m_internal;
+		m_internal = TOutput::create();
+		m_output   = m_internal;
+	}
+
+	// ** Converter::output
+	template<typename TConverter, typename TInput, typename TOutput>
+	WeakPtr<TOutput> Converter<TConverter, TInput, TOutput>::output( void ) const
+	{
+		return m_output;
+	}
+
+	// ** Converter::setOutput
+	template<typename TConverter, typename TInput, typename TOutput>
+	void Converter<TConverter, TInput, TOutput>::setOutput( OutputWPtr value )
+	{
+		m_output = value;
+
+		if( !m_output.valid() ) {
+			m_output = m_internal;
 		}
 	}
 
-	//! Guid to string converter
-	class GuidToStringConverter : public Converter<GuidToStringConverter, Guid, Text> {
-	public:
+	//! Converts integer to a text.
+	class IntegerToTextConverter : public Converter<IntegerToTextConverter, Integer, Text> {
+	protected:
 
-									//! Constructs GuidToStringConverter instance.
-									GuidToStringConverter( OutputWPtr output = OutputWPtr() )
-										: Converter( output ) {}
+		//! Converts the integer to a string.
+		virtual void				handleValueChanged( void );		
+	};
 
-	private:
+	// ** IntegerToTextConverter::handleValueChanged
+	inline void IntegerToTextConverter::handleValueChanged( void )
+	{
+		m_output->set( std::to_string( m_property->get() ) );
+	}
+
+	//! Guid to a text converter
+	class GuidToTextConverter : public Converter<GuidToTextConverter, Guid, Text> {
+	protected:
 
 		//! Converts the GUID to a string.
 		virtual void				handleValueChanged( void );						
 	};
 
-	// ** GuidToStringConverter::handleValueChanged
-	inline void GuidToStringConverter::handleValueChanged( void )
+	// ** GuidToTextConverter::handleValueChanged
+	inline void GuidToTextConverter::handleValueChanged( void )
 	{
 		m_output->set( m_property->get().toString() );
 	}

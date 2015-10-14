@@ -35,25 +35,6 @@ namespace mvvm {
 
 	DECLARE_LOG( log )
 
-#if 0
-    template<typename T> class Property;
-    template<typename T> class ArrayProperty;
-
-	dcDeclareNamedPtrs( IBinding, Binding )
-	dcDeclareNamedPtrs( IProperty, Property )
-	dcDeclarePtrs( Data )
-	dcDeclarePtrs( View )
-	dcDeclarePtrs( ActionHandler )
-
-    typedef Property<bool>          BoolProperty;
-    typedef Property<s32>           IntProperty;
-    typedef Property<f32>			FloatProperty;
-    typedef Property<String>        StringProperty;
-	typedef Property<Guid>			GuidProperty;
-    typedef ArrayProperty<String>   StringArrayProperty;
-    typedef List<BindingPtr>        BindingsList;
-#endif
-
 	//! Performs the property type cast.
 	template<typename T, typename S>
 	inline WeakPtr<T> castTo( WeakPtr<S> ptr ) {
@@ -96,39 +77,7 @@ namespace mvvm {
 	typedef PrimitiveValue<String>	Text;		//!< String value type.
 	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.	
 	typedef ArrayValue<Text>		TextArray;	//!< Array of text values.
-/*
 
-
-	//! Object type forward declaration.
-	template<typename TValue> class Object;
-
-	dcDeclareNamedPtrs( ValueBase, Value )
-	dcDeclareNamedPtrs( ObjectBase, Object )
-
-
-
-	//! Performs a primitive value cast.
-	template<typename TValue>
-	WeakPtr< Value<TValue> > valueCast( const ValueWPtr& value )
-	{
-		if( value->is<TValue>() ) {
-			return static_cast<Value<TValue>*>( value.get() );
-		}
-
-		return NULL;
-	}
-
-	//! Performs an object cast.
-	template<typename TValue>
-	WeakPtr< Object<TValue> > objectCast( const ValueWPtr& value )
-	{
-		if( value->is<TValue>() ) {
-			return static_cast<Object<TValue>*>( value.get() );
-		}
-
-		return NULL;
-	}
-*/
 } // namespace mvvm
 
 DC_END_DREEMCHEST

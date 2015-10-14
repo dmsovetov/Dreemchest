@@ -131,11 +131,29 @@ namespace mvvm {
 		//! Creates new binding instance by widget & value types.
 		BindingPtr			create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty );
 
+		//! Creates new converter instance by input & output types.
+		BindingPtr			createConverter( ValueTypeIdx inputType, ValueTypeIdx outputType );
+
 		//! Registers binding with widget & value type.
 		template<typename TBinding>
 		void				registerBinding( WidgetTypeIdx widgetType, const String& widgetProperty = "" );
 
+		//! Registers converter instance.
+		template<typename TConverter>
+		void				registerConverter( void );
+
+	protected:
+
+							//! Constructs the BindingFactory instance.
+							BindingFactory( void );
+
 	private:
+
+		//! Container type to store converters by output type.
+		typedef Map<ValueTypeIdx, BindingPtr>				ConverterByOutputType;
+
+		//! Container type to store converters by input type.
+		typedef Map<ValueTypeIdx, ConverterByOutputType>	ConvertersByInputType;
 
 		//! Container type to store bindings by widget property.
 		typedef Map<String, BindingPtr>					BindingByProperty;
@@ -146,12 +164,13 @@ namespace mvvm {
 		//! Container type to store value type to bindings mapping.
 		typedef Map<ValueTypeIdx, BindingByWidgetType>	Bindings;
 
-		Bindings			m_bindings;	//!< Registered bindings.
+		Bindings				m_bindings;		//!< Registered bindings.
+		ConvertersByInputType	m_converters;	//!< Registered converters.
 	};
 
 	// ** BindingFactory::registerBinding
 	template<typename TBinding>
-	void BindingFactory::registerBinding(  WidgetTypeIdx widgetType, const String& widgetProperty )
+	void BindingFactory::registerBinding( WidgetTypeIdx widgetType, const String& widgetProperty )
 	{
 		// Create binding instance
 		TBinding* binding = DC_NEW TBinding;
@@ -159,7 +178,21 @@ namespace mvvm {
 		// Get the value types.
 		ValueTypeIdx valueTypeIdx = binding->type();
 
-		m_bindings[valueTypeIdx][widgetType][widgetProperty] = DC_NEW TBinding;
+		m_bindings[valueTypeIdx][widgetType][widgetProperty] = binding;
+	}
+
+	// ** BindingFactory::registerConverter
+	template<typename TConverter>
+	void BindingFactory::registerConverter( void )
+	{
+		// Create converter instance
+		TConverter* converter = DC_NEW TConverter;
+
+		// Get the converter input & output types.
+		ValueTypeIdx inputType  = converter->type();
+		ValueTypeIdx outputType = converter->output()->type();
+
+		m_converters[inputType][outputType] = converter;
 	}
 
 	//! Bindings instance links a value with a single binding instance.

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Binding.h"
+#include "Converter.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -33,6 +34,13 @@ namespace mvvm {
 IMPLEMENT_LOGGER( log )
 
 // -------------------------------------------------- BindingFactory -------------------------------------------------- //
+
+// ** BindingFactory::BindingFactory
+BindingFactory::BindingFactory( void )
+{
+	registerConverter<GuidToTextConverter>();
+	registerConverter<IntegerToTextConverter>();
+}
 
 // ** BindingFactory::create
 BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty )
@@ -61,6 +69,24 @@ BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetPrototypeChain 
 	}
 
 	return byProperty->second->clone();
+}
+
+// ** BindingFactory::createConverter
+BindingPtr BindingFactory::createConverter( ValueTypeIdx inputType, ValueTypeIdx outputType )
+{
+	ConvertersByInputType::iterator i = m_converters.find( inputType );
+
+	if( i == m_converters.end() ) {
+		return BindingPtr();
+	}
+
+	ConverterByOutputType::iterator j = i->second.find( outputType );
+
+	if( j == i->second.end() ) {
+		return BindingPtr();
+	}
+
+	return j->second->clone();
 }
 
 // ----------------------------------------------------- Bindings ------------------------------------------------------ //
