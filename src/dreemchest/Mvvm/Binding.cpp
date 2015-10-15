@@ -42,8 +42,20 @@ BindingFactory::BindingFactory( void )
 	registerConverter<IntegerToTextConverter>();
 }
 
+// ** BindingFactory::bindableValueTypes
+ValueTypes BindingFactory::bindableValueTypes( void ) const
+{
+	ValueTypes result;
+
+	for( Bindings::const_iterator i = m_bindings.begin(), end = m_bindings.end(); i != end; ++i ) {
+		result.push_back( i->first );
+	}
+
+	return result;
+}
+
 // ** BindingFactory::create
-BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty )
+BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetTypeIdx widgetType, const String& widgetProperty )
 {
 	Bindings::iterator byValueType = m_bindings.find( valueType );
 
@@ -51,12 +63,7 @@ BindingPtr BindingFactory::create( ValueTypeIdx valueType, WidgetPrototypeChain 
 		return BindingPtr();
 	}
 
-	BindingByWidgetType::iterator byWidgetType = byValueType->second.end();
-
-	while( byWidgetType == byValueType->second.end() && !widgetPrototype.empty() ) {
-		byWidgetType = byValueType->second.find( widgetPrototype[0] );
-		widgetPrototype.erase( widgetPrototype.begin() );
-	} 
+	BindingByWidgetType::iterator byWidgetType = byValueType->second.find( widgetType );
 	
 	if( byWidgetType == byValueType->second.end() ) {
 		return BindingPtr();
@@ -136,16 +143,18 @@ bool Bindings::bind( const String& widget, const ValueWPtr& value )
 	}
 
 	// Get the widget value type and widget pointer.
-	WidgetPrototypeChain widgetPrototype = resolveWidgetPrototypeChain( widgetName );
-	Widget				 widgetPtr		 = findWidget( widgetName );
+	WidgetTypeChain widgetType = resolveWidgetTypeChain( widgetName );
+	Widget			widgetPtr  = findWidget( widgetName );
 
+	return createBinding( value, widgetPtr, widgetType, widgetProperty );
+/*
 	if( !widgetPtr ) {
 		log::error( "Bindings::bind : no widget with name '%s' found\n", widgetName.c_str() );
 		return false;
 	}
 
 	// Create binding instance
-	BindingPtr binding = m_factory->create( value->type(), widgetPrototype, widgetProperty );
+	BindingPtr binding = m_factory->create( value->type(), widgetType[0], widgetProperty );
 
 	if( !binding.valid() ) {
 		log::error( "Bindings::bind : do not know how to bind property to '%s'\n", widgetName.c_str() );
@@ -160,7 +169,66 @@ bool Bindings::bind( const String& widget, const ValueWPtr& value )
 	binding->handleValueChanged();
 	m_bindings.push_back( binding );
 
-	return true;
+	return true;*/
+}
+
+// ** Bindings::createBinding
+bool Bindings::createBinding( ValueWPtr value, Widget widget, const WidgetTypeChain& widgetType, const String& key )
+{
+	// Get the set of value types that can be bound.
+	ValueTypes bindableTypes = m_factory->bindableValueTypes();
+
+	// Push the actual property type to the begining.
+	bindableTypes.insert( bindableTypes.begin(), value->type() );
+
+	// For each widget type & value type pair try to create the binding - the first one wins.
+	for( u32 i = 0, nwidgets = ( u32 )widgetType.size(); i < nwidgets; i++ ) {
+		// Iterate over types
+		for( u32 j = 0, ntypes = ( u32 )bindableTypes.size(); j < ntypes; j++ ) {
+			ValueTypeIdx valueType = bindableTypes[j];
+			BindingPtr	 binding   = m_factory->create( valueType, widgetType[i], key );
+
+			if( !binding.valid() ) {
+				continue;
+			}
+
+			// Binding found
+			if( j == 0 ) {
+				binding->bind( value, widget );
+				binding->handleValueChanged();
+				m_bindings.push_back( binding );
+				return true;
+			}
+
+			// We have to create the converter.
+			BindingPtr converter = m_factory->createConverter( value->type(), binding->type() );
+		
+			if( !converter.valid() ) {
+				log::warn( "Bindings::createBinding : no converter found to bind the value to a widget.\n" );
+				return false;
+			}
+
+			if( !converter->bind( value, NULL ) ) {
+				log::warn( "Bindings::createBinding : failed to create converter.\n" );
+				return false;				
+			}
+
+			if( !binding->bind( converter->converted(), widget ) ) {
+				log::warn( "Bindings::createBinding : failed to bind to a converted value.\n" );
+				return false;				
+			}
+
+			converter->handleValueChanged();
+			binding->handleValueChanged();
+
+			m_bindings.push_back( converter );
+			m_bindings.push_back( binding );
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace mvvm

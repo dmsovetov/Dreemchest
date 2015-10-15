@@ -102,6 +102,12 @@ void MyGUICaptionBinding::handlePropertyChanged( const Value& value )
 */
 // ----------------------------------------- QtLineEditBinding ----------------------------------------- //
 
+// ** QtLineEditBinding::createSignalDelegate
+QSignalDelegate* QtLineEditBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( textChanged(const QString&) ) );
+}
+
 // ** QtLineEditBinding::handleValueChanged
 void QtLineEditBinding::handleValueChanged( void )
 {
@@ -117,6 +123,81 @@ void QtLineEditBinding::handleValueChanged( void )
 void QtLineEditBinding::handleViewChanged( void )
 {
 	m_property->set( widget()->text().toUtf8().constData() );
+}
+
+// ----------------------------------------- QtTextEditBinding ----------------------------------------- //
+
+// ** QtTextEditBinding::createSignalDelegate
+QSignalDelegate* QtTextEditBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( textChanged() ) );
+}
+
+// ** QtTextEditBinding::handleValueChanged
+void QtTextEditBinding::handleValueChanged( void )
+{
+	const String& value		= m_property->get();
+	QTextEdit*	  textEdit	= widget();
+
+    if( value.c_str() != textEdit->toPlainText() ) {
+        textEdit->setText( value.c_str() );
+    }
+}
+
+// ** QtTextEditBinding::handleViewChanged
+void QtTextEditBinding::handleViewChanged( void )
+{
+	m_property->set( widget()->toPlainText().toUtf8().constData() );
+}
+
+// ----------------------------------------- QtSpinBoxBinding ----------------------------------------- //
+
+// ** QtSpinBoxBinding::createSignalDelegate
+QSignalDelegate* QtSpinBoxBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( valueChanged(int) ) );
+}
+
+// ** QtSpinBoxBinding::handleValueChanged
+void QtSpinBoxBinding::handleValueChanged( void )
+{
+	s32		  value = m_property->get();
+	QSpinBox* spin	= widget();
+
+    if( value != spin->value() ) {
+        spin->setValue( value );
+    }
+}
+
+// ** QtSpinBoxBinding::handleViewChanged
+void QtSpinBoxBinding::handleViewChanged( void )
+{
+	m_property->set( widget()->value() );
+}
+
+// ----------------------------------------- QtDoubleSpinBoxBinding ----------------------------------------- //
+
+// ** QtDoubleSpinBoxBinding::createSignalDelegate
+QSignalDelegate* QtDoubleSpinBoxBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( valueChanged(double) ) );
+}
+
+// ** QtDoubleSpinBoxBinding::handleValueChanged
+void QtDoubleSpinBoxBinding::handleValueChanged( void )
+{
+	f32				value = m_property->get();
+	QDoubleSpinBox* spin  = widget();
+
+    if( value != spin->value() ) {
+        spin->setValue( value );
+    }
+}
+
+// ** QtDoubleSpinBoxBinding::handleViewChanged
+void QtDoubleSpinBoxBinding::handleViewChanged( void )
+{
+	m_property->set( widget()->value() );
 }
 
 // ----------------------------------------- QtLabelBinding ----------------------------------------- //
@@ -141,6 +222,9 @@ QtBindingFactory::QtBindingFactory( void )
 	registerBinding<QtLineEditBinding, QLineEdit>();
 	registerBinding<QtStackedWidgetBinding, QStackedWidget>();
 	registerBinding<QtListWidgetBinding, QListWidget>();
+	registerBinding<QtTextEditBinding, QTextEdit>();
+	registerBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox>();
+	registerBinding<QtSpinBoxBinding, QSpinBox>();
 	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
 	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
 	registerBinding<QtPushButtonBinding, QPushButton>( "click" );
@@ -166,17 +250,17 @@ BindingsPtr QtBindings::create( const BindingFactoryPtr& factory, const ObjectWP
 	return BindingsPtr( DC_NEW QtBindings( factory, root, widget ) );
 }
 
-// ** QtBindings::resolveWidgetPrototypeChain
-WidgetPrototypeChain QtBindings::resolveWidgetPrototypeChain( const String& name ) const
+// ** QtBindings::resolveWidgetTypeChain
+WidgetTypeChain QtBindings::resolveWidgetTypeChain( const String& name ) const
 {
 	QWidget* widget = m_widget->findChild<QWidget*>( name.c_str() );
 	
 	if( !widget ) {
-		return WidgetPrototypeChain();
+		return WidgetTypeChain();
 	}
 
 	const QMetaObject*	 metaObject = widget->metaObject();
-	WidgetPrototypeChain result;
+	WidgetTypeChain result;
 
 	while( metaObject ) {
 		CString className = metaObject->className();

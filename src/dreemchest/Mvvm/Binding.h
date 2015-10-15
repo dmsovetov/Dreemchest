@@ -48,6 +48,12 @@ namespace mvvm {
 		//! Binds to a property.
 		virtual bool			bind( ValueWPtr value, Widget widget ) = 0;
 
+		//! Returns the bound value.
+		virtual ValueWPtr		value( void ) const = 0;
+
+		//! Returns the converted value.
+		virtual ValueWPtr		converted( void ) const = 0;
+
         //! Refreshes the bound view.
         virtual void            handleViewChanged( void ) = 0;
 
@@ -67,6 +73,12 @@ namespace mvvm {
 
 		//! Returns the binding value type.
 		virtual ValueTypeIdx	type( void ) const;
+
+		//! Returns the bound value.
+		virtual ValueWPtr		value( void ) const;
+
+		//! Returns the converted value.
+		virtual ValueWPtr		converted( void ) const;
 
 		//! Binds to a property.
 		virtual bool			bind( ValueWPtr value, Widget widget );
@@ -104,6 +116,20 @@ namespace mvvm {
 		return Value::valueType<TValue>();
 	}
 
+	// ** Binding::value
+	template<typename TBinding, typename TValue>
+	ValueWPtr Binding<TBinding, TValue>::value( void ) const
+	{
+		return m_property;
+	}
+
+	// ** Binding::converted
+	template<typename TBinding, typename TValue>
+	ValueWPtr Binding<TBinding, TValue>::converted( void ) const
+	{
+		return ValueWPtr();
+	}
+
 	// ** Binding::bind
 	template<typename TBinding, typename TValue>
 	bool Binding<TBinding, TValue>::bind( ValueWPtr value, Widget widget )
@@ -129,10 +155,13 @@ namespace mvvm {
 	public:
 
 		//! Creates new binding instance by widget & value types.
-		BindingPtr			create( ValueTypeIdx valueType, WidgetPrototypeChain widgetPrototype, const String& widgetProperty );
+		BindingPtr			create( ValueTypeIdx valueType, WidgetTypeIdx widgetType, const String& widgetProperty );
 
 		//! Creates new converter instance by input & output types.
 		BindingPtr			createConverter( ValueTypeIdx inputType, ValueTypeIdx outputType );
+
+		//! Returns the set of value types for which there are registered bindings.
+		ValueTypes			bindableValueTypes( void ) const;
 
 		//! Registers binding with widget & value type.
 		template<typename TBinding>
@@ -216,11 +245,14 @@ namespace mvvm {
 										//! Constructs the Bindings instance.
 										Bindings( const BindingFactoryPtr& factory, const ObjectWPtr& root );
 
-		//! Returns the widget value type.
-		virtual WidgetPrototypeChain	resolveWidgetPrototypeChain( const String& widget ) const = 0;
+		//! Returns the widget type chain.
+		virtual WidgetTypeChain			resolveWidgetTypeChain( const String& widget ) const = 0;
 
 		//! Returns the widget by name.
 		virtual Widget					findWidget( const String& name ) const = 0;
+
+		//! Binds the property to a widget.
+		bool							createBinding( ValueWPtr value, Widget widget, const WidgetTypeChain& widgetType, const String& key );
 
 	private:
 

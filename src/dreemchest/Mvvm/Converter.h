@@ -51,6 +51,9 @@ namespace mvvm {
 		//! Sets the converter output.
 		void									setOutput( OutputWPtr value );
 
+		//! Returns the converted value.
+		virtual ValueWPtr						converted( void ) const;
+
 	protected:
 
 		typename TOutput::Ptr					m_internal;	//!< Internal output target.
@@ -63,6 +66,13 @@ namespace mvvm {
 	{
 		m_internal = TOutput::create();
 		m_output   = m_internal;
+	}
+
+	// ** Converter::converted
+	template<typename TConverter, typename TInput, typename TOutput>
+	ValueWPtr Converter<TConverter, TInput, TOutput>::converted( void ) const
+	{
+		return m_output;
 	}
 
 	// ** Converter::output

@@ -310,6 +310,7 @@ namespace mvvm {
 		typedef WeakPtr<Type>		WPtr;			//!< Weak pointer type.
 		typedef StrongPtr<TValue>	ItemType;		//!< Alias the item type.
 		typedef const TValue&		ItemConstRef;	//!< Alias the reference type.
+		typedef TValue&				ItemRef;		//!< Alias the reference type.
 
 		//! Returns array value type.
 		virtual ValueTypeIdx		type( void ) const;
@@ -322,6 +323,7 @@ namespace mvvm {
 
 		//! Returns the value by index.
 		ItemConstRef				get( s32 index ) const;
+		ItemRef						get( s32 index );
 
 		//! Pushes a new value to an array.
 		void						push( const ItemType& value );
@@ -373,9 +375,17 @@ namespace mvvm {
 		return ( s32 )m_values.size();
 	}
 
-	// ** ArrayValue::size
+	// ** ArrayValue::get
 	template<typename TValue>
 	typename ArrayValue<TValue>::ItemConstRef ArrayValue<TValue>::get( s32 index ) const
+	{
+		DC_BREAK_IF( index < 0 || index >= size() );
+		return *m_values[index].get();
+	}
+
+	// ** ArrayValue::get
+	template<typename TValue>
+	typename ArrayValue<TValue>::ItemRef ArrayValue<TValue>::get( s32 index )
 	{
 		DC_BREAK_IF( index < 0 || index >= size() );
 		return *m_values[index].get();

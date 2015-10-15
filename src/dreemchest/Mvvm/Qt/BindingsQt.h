@@ -82,6 +82,15 @@ namespace mvvm {
 								: QSignalDelegate( binding, widget, SIGNAL( textChanged(const QString&) ) ) {}
 	};
 
+	//! Handles the valueChanged signal and dispatches the event.
+	class QValueChangedDelegate : public QSignalDelegate {
+	public:
+
+							//! Constructs QValueChangedDelegate instance.
+							QValueChangedDelegate( BindingWPtr binding, QWidget* widget )
+								: QSignalDelegate( binding, widget, SIGNAL( valueChanged(int) ) ) {}
+	};
+
 	//! Handles the clicked signal and dispatched the event.
 	class QClickedDelegate : public QSignalDelegate {
 	public:
@@ -100,11 +109,14 @@ namespace mvvm {
 		virtual bool				bind( ValueWPtr value, Widget widget );
 
 		//! Returns the type casted Qt widget pointer.
-        TWidget*					widget( void );
+        TWidget*					widget( void ) const;
+
+		//! Creates the signal delegate.
+		virtual QSignalDelegate*	createSignalDelegate( void );
 
     protected:
 
-		AutoPtr<TSignalDelegate>	m_delegate;	//!< Qt siagnal delegate.
+		AutoPtr<QSignalDelegate>	m_delegate;	//!< Qt siagnal delegate.
     };
 
 	// ** QtPropertyBinding::bind
@@ -115,13 +127,21 @@ namespace mvvm {
 			return false;
 		}
 
-		m_delegate = DC_NEW TSignalDelegate( this, this->widget() );
+	//	m_delegate = DC_NEW TSignalDelegate( this, this->widget() );
+		m_delegate = createSignalDelegate();
 		return true;
+	}
+
+	// ** QtPropertyBinding::createSignalDelegate
+    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
+	QSignalDelegate* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::createSignalDelegate( void )
+	{
+		return NULL;
 	}
 
 	// ** QtPropertyBinding::widget
     template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
-	TWidget* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::widget( void )
+	TWidget* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::widget( void ) const
 	{
 		return qobject_cast<TWidget*>( reinterpret_cast<QWidget*>( m_widget ) );
 	}
@@ -150,15 +170,60 @@ namespace mvvm {
 		virtual void            handleViewChanged( void );
 	};
 
+	//! Binds spin box to an integer.
+	class QtSpinBoxBinding : public QtPropertyBinding<QtSpinBoxBinding, QSpinBox, Integer, QValueChangedDelegate> {
+    protected:
+
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
+        //! Handles property change.
+        virtual void				handleValueChanged( void );
+
+		//! Updates the property value.
+		virtual void				handleViewChanged( void );	
+	};
+
+	//! Binds double spin box to an integer.
+	class QtDoubleSpinBoxBinding : public QtPropertyBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox, Float, QValueChangedDelegate> {
+    protected:
+
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
+        //! Handles property change.
+        virtual void				handleValueChanged( void );
+
+		//! Updates the property value.
+		virtual void				handleViewChanged( void );	
+	};
+
     //! Binds a line edit to a string.
     class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text, QTextChangedDelegate> {
     protected:
 
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
         //! Handles property change.
-        virtual void			handleValueChanged( void );
+        virtual void				handleValueChanged( void );
 
 		//! Updates the property value.
-		virtual void            handleViewChanged( void );
+		virtual void				handleViewChanged( void );
+    };
+
+    //! Binds a text edit to a string.
+    class QtTextEditBinding : public QtPropertyBinding<QtTextEditBinding, QTextEdit, Text, QTextChangedDelegate> {
+    protected:
+
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
+        //! Handles property change.
+        virtual void				handleValueChanged( void );
+
+		//! Updates the property value.
+		virtual void				handleViewChanged( void );
     };
 
 	//! Binds a label to a string.
@@ -166,7 +231,7 @@ namespace mvvm {
     protected:
 
         //! Handles property change.
-        virtual void			handleValueChanged( void );
+        virtual void				handleValueChanged( void );
 	};
 
     //! Binds a widget visibility to a property.
@@ -174,7 +239,7 @@ namespace mvvm {
     protected:
 
         //! Handles property change.
-        void                    handleValueChanged( void );
+        void						handleValueChanged( void );
     };
 
     //! Binds a widget enabled/disabled flag to a property.
@@ -182,7 +247,7 @@ namespace mvvm {
     protected:
 
         //! Handles property change.
-        void                    handleValueChanged( void );
+        void						handleValueChanged( void );
     };
 
 	// ---------------------------------------------------- QtBindingFactory ---------------------------------------------------- //
@@ -194,14 +259,14 @@ namespace mvvm {
 		//! Creates the instance of QtBindingFactory.
 		static BindingFactoryPtr	create( void );
 
+		//! Registers the Qt binding.
+		template<typename TBinding, typename TWidget>
+		void						registerBinding( const String& widgetProperty = "" );
+
 	private:
 
 									//! Constructs the QtBindingFactory instance.
 									QtBindingFactory( void );
-
-		//! Registers the Qt binding.
-		template<typename TBinding, typename TWidget>
-		void						registerBinding( const String& widgetProperty = "" );
 	};
 
 	// ** QtBindingFactory::registerBinding
@@ -228,8 +293,8 @@ namespace mvvm {
 									//! Constructs the QtBindingFactory instance.
 									QtBindings( const BindingFactoryPtr& factory, const ObjectWPtr& root, QWidget* widget );
 
-		//! Returns the widget type index.
-		WidgetPrototypeChain		resolveWidgetPrototypeChain( const String& name ) const;
+		//! Returns the widget type chain.
+		WidgetTypeChain				resolveWidgetTypeChain( const String& name ) const;
 
 		//! Returns the widget with specified name.
 		Widget						findWidget( const String& name ) const;
