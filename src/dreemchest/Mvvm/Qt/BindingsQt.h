@@ -244,6 +244,51 @@ namespace mvvm {
 									QtBindingFactory( void );
 	};
 
+	//! Constructs the Qt widgets.
+	class QtWidgetFactory : public RefCounted {
+	public:
+
+		//! Creates the widget for specified value type.
+		QWidget*					create( ValueTypeIdx valueType, QWidget* parent = NULL );
+
+		//! Registers the Qt widget.
+		template<typename TValue, typename TWidget>
+		void						add( void );
+
+	private:
+
+		//! A helper struct to create Qt widget factories.
+		struct Factory : public RefCounted {
+			//! Creates the widget instance.
+			virtual QWidget* create( QWidget* parent ) const = 0;
+		};
+
+		//! Container type to store registered widget factories.
+		typedef Map< ValueTypeIdx, StrongPtr<Factory> > Factories;
+
+		Factories					m_factories;	//!< Registered widget factories.
+	};
+
+	// ** QtWidgetFactory::add
+	template<typename TValue, typename TWidget>
+	void QtWidgetFactory::add( void )
+	{
+		//! Declare the custom widget factory.
+		struct WidgetFactory : public Factory {
+			virtual QWidget* create( QWidget* parent ) const { return DC_NEW TWidget( parent ); }
+		};
+
+		ValueTypeIdx valueType = Value::valueType<TValue>();
+		m_factories[valueType] = DC_NEW WidgetFactory;
+	}
+
+	// ** QtWidgetFactory::create
+	inline QWidget* QtWidgetFactory::create( ValueTypeIdx valueType, QWidget* parent )
+	{
+		Factories::const_iterator i = m_factories.find( valueType );
+		return i != m_factories.end() ? i->second->create( parent ) : NULL;
+	}
+
 	// ** QtBindingFactory::registerBinding
 	template<typename TBinding, typename TWidget>
 	void QtBindingFactory::registerBinding( const String& widgetProperty )
