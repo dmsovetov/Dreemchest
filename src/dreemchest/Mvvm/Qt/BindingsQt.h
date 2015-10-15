@@ -105,6 +105,9 @@ namespace mvvm {
     class QtPropertyBinding : public Binding<TBinding, TValue> {
 	protected:
 
+		//! Alias the widget type.
+		typedef TWidget				WidgetType;
+
 		//! Binds the value to a Qt widget instance.
 		virtual bool				bind( ValueWPtr value, Widget widget );
 

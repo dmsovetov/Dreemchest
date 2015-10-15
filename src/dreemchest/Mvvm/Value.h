@@ -218,6 +218,10 @@ namespace mvvm {
 		//! Returns the property value with specified name.
 		ValueWPtr							get( const String& name ) const;
 
+		//! Returns the type casted property or null pointer.
+		template<typename TValue>
+		typename TValue::WPtr				get( const String& name ) const;
+
 		//! Sets the property value.
 		void								set( const String& name, ValuePtr value );
 
@@ -241,6 +245,14 @@ namespace mvvm {
 		Boolean::WPtr						m_isValid;		//!< This property is updated by the data validation routine.
 		Properties							m_properties;	//!< Object properties.
 	};
+
+	// ** ObjectValue::get
+	template<typename TValue>
+	typename TValue::WPtr ObjectValue::get( const String& name ) const
+	{
+		ValueWPtr value = get( name );
+		return castTo<TValue>( value );
+	}
 
 	// ** ObjectValue::add
 	template<typename TValue, typename ... Args>
