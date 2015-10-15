@@ -73,35 +73,8 @@ namespace mvvm {
 		m_binding->handleViewChanged();
 	}
 
-	//! Handles the textChanged signal and dispatches the event.
-	class QTextChangedDelegate : public QSignalDelegate {
-	public:
-
-							//! Constructs QTextChangedDelegate instance.
-							QTextChangedDelegate( BindingWPtr binding, QWidget* widget )
-								: QSignalDelegate( binding, widget, SIGNAL( textChanged(const QString&) ) ) {}
-	};
-
-	//! Handles the valueChanged signal and dispatches the event.
-	class QValueChangedDelegate : public QSignalDelegate {
-	public:
-
-							//! Constructs QValueChangedDelegate instance.
-							QValueChangedDelegate( BindingWPtr binding, QWidget* widget )
-								: QSignalDelegate( binding, widget, SIGNAL( valueChanged(int) ) ) {}
-	};
-
-	//! Handles the clicked signal and dispatched the event.
-	class QClickedDelegate : public QSignalDelegate {
-	public:
-
-							//! Constructs QClickedDelegate instance.
-							QClickedDelegate( BindingWPtr binding, QWidget* widget )
-								: QSignalDelegate( binding, widget, SIGNAL( clicked() ) ) {}
-	};
-
     //! A template class to bind a property to a Qt widget.
-    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate = QSignalDelegate>
+    template<typename TBinding, typename TWidget, typename TValue>
     class QtPropertyBinding : public Binding<TBinding, TValue> {
 	protected:
 
@@ -123,28 +96,27 @@ namespace mvvm {
     };
 
 	// ** QtPropertyBinding::bind
-    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
-	bool QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::bind( ValueWPtr value, Widget widget )
+    template<typename TBinding, typename TWidget, typename TValue>
+	bool QtPropertyBinding<TBinding, TWidget, TValue>::bind( ValueWPtr value, Widget widget )
 	{
 		if( !Binding::bind( value, widget ) ) {
 			return false;
 		}
 
-	//	m_delegate = DC_NEW TSignalDelegate( this, this->widget() );
 		m_delegate = createSignalDelegate();
 		return true;
 	}
 
 	// ** QtPropertyBinding::createSignalDelegate
-    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
-	QSignalDelegate* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::createSignalDelegate( void )
+    template<typename TBinding, typename TWidget, typename TValue>
+	QSignalDelegate* QtPropertyBinding<TBinding, TWidget, TValue>::createSignalDelegate( void )
 	{
 		return NULL;
 	}
 
 	// ** QtPropertyBinding::widget
-    template<typename TBinding, typename TWidget, typename TValue, typename TSignalDelegate>
-	TWidget* QtPropertyBinding<TBinding, TWidget, TValue, TSignalDelegate>::widget( void ) const
+    template<typename TBinding, typename TWidget, typename TValue>
+	TWidget* QtPropertyBinding<TBinding, TWidget, TValue>::widget( void ) const
 	{
 		return qobject_cast<TWidget*>( reinterpret_cast<QWidget*>( m_widget ) );
 	}
@@ -166,7 +138,7 @@ namespace mvvm {
 	};
 
 	//! Binds the click event to a widget.
-	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, CommandValue, QClickedDelegate> {
+	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, CommandValue> {
     protected:
 
 		//! Invokes the command.
@@ -174,7 +146,7 @@ namespace mvvm {
 	};
 
 	//! Binds spin box to an integer.
-	class QtSpinBoxBinding : public QtPropertyBinding<QtSpinBoxBinding, QSpinBox, Integer, QValueChangedDelegate> {
+	class QtSpinBoxBinding : public QtPropertyBinding<QtSpinBoxBinding, QSpinBox, Integer> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -188,7 +160,7 @@ namespace mvvm {
 	};
 
 	//! Binds double spin box to an integer.
-	class QtDoubleSpinBoxBinding : public QtPropertyBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox, Float, QValueChangedDelegate> {
+	class QtDoubleSpinBoxBinding : public QtPropertyBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox, Float> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -202,7 +174,7 @@ namespace mvvm {
 	};
 
     //! Binds a line edit to a string.
-    class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text, QTextChangedDelegate> {
+    class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -216,7 +188,7 @@ namespace mvvm {
     };
 
     //! Binds a text edit to a string.
-    class QtTextEditBinding : public QtPropertyBinding<QtTextEditBinding, QTextEdit, Text, QTextChangedDelegate> {
+    class QtTextEditBinding : public QtPropertyBinding<QtTextEditBinding, QTextEdit, Text> {
     protected:
 
 		//! Creates the signal delegate instance.
