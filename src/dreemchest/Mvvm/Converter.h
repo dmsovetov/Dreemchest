@@ -107,6 +107,20 @@ namespace mvvm {
 		m_output->set( std::to_string( m_property->get() ) );
 	}
 
+	//! Converts float to a text.
+	class FloatToTextConverter : public Converter<FloatToTextConverter, Float, Text> {
+	protected:
+
+		//! Converts the float to a string.
+		virtual void				handleValueChanged( void );		
+	};
+
+	// ** FloatToTextConverter::handleValueChanged
+	inline void FloatToTextConverter::handleValueChanged( void )
+	{
+		m_output->set( std::to_string( m_property->get() ) );
+	}
+
 	//! Guid to a text converter
 	class GuidToTextConverter : public Converter<GuidToTextConverter, Guid, Text> {
 	protected:

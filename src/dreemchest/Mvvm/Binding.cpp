@@ -39,6 +39,7 @@ IMPLEMENT_LOGGER( log )
 BindingFactory::BindingFactory( void )
 {
 	registerConverter<GuidToTextConverter>();
+	registerConverter<FloatToTextConverter>();
 	registerConverter<IntegerToTextConverter>();
 }
 
