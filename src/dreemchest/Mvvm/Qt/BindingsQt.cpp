@@ -69,6 +69,40 @@ void QtListWidgetBinding::handleValueChanged( void )
 	}
 }
 
+// ---------------------------------------- QtComboBoxBinding ---------------------------------------- //
+
+// ** QtComboBoxBinding::handleValueChanged
+void QtComboBoxBinding::handleValueChanged( void )
+{
+	QComboBox* combo = widget();
+
+	combo->clear();
+
+	for( s32 i = 0, n = m_property->size(); i < n; i++ ) {
+		combo->insertItem( i, m_property->get( i ).get().c_str() );
+	}
+}
+
+// ----------------------------------- QtComboBoxSelectedTextBinding ----------------------------------- //
+
+// ** QtComboBoxSelectedTextBinding::createSignalDelegate
+QSignalDelegate* QtComboBoxSelectedTextBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( currentIndexChanged(int) ) );
+}
+
+// ** QtComboBoxSelectedTextBinding::handleValueChanged
+void QtComboBoxSelectedTextBinding::handleValueChanged( void )
+{
+	widget()->setCurrentText( m_property->get().c_str() );
+}
+
+// ** QtComboBoxSelectedTextBinding::handleViewChanged
+void QtComboBoxSelectedTextBinding::handleViewChanged( void )
+{
+	m_property->set( widget()->currentText().toUtf8().constData() );
+}
+
 // ---------------------------------------- QtStackedWidgetBinding ---------------------------------------- //
 
 // ** QtStackedWidgetBinding::handleValueChanged
@@ -225,6 +259,10 @@ QtBindingFactory::QtBindingFactory( void )
 	registerBinding<QtTextEditBinding, QTextEdit>();
 	registerBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox>();
 	registerBinding<QtSpinBoxBinding, QSpinBox>();
+
+	registerBinding<QtComboBoxBinding, QComboBox>();
+	registerBinding<QtComboBoxSelectedTextBinding, QComboBox>( "selectedText" );
+
 	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
 	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
 	registerBinding<QtPushButtonBinding, QPushButton>( "click" );

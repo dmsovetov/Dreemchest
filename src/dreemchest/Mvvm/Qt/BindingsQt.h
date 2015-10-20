@@ -173,6 +173,28 @@ namespace mvvm {
 		virtual void				handleViewChanged( void );	
 	};
 
+	//! Binds a text array to a combo box.
+	class QtComboBoxBinding : public QtPropertyBinding<QtComboBoxBinding, QComboBox, TextArray> {
+	protected:
+
+        //! Handles property change.
+        virtual void				handleValueChanged( void );
+	};
+
+	//! Binds a combo box selected item to a text value.
+	class QtComboBoxSelectedTextBinding : public QtPropertyBinding<QtComboBoxSelectedTextBinding, QComboBox, Text> {
+	protected:
+
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
+        //! Handles property change.
+        virtual void				handleValueChanged( void );
+
+		//! Updates the property value.
+		virtual void				handleViewChanged( void );
+	};
+
     //! Binds a line edit to a string.
     class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text> {
     protected:
