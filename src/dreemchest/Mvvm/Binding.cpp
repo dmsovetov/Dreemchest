@@ -148,24 +148,7 @@ bool Bindings::bind( const String& widget, const ValueWPtr& value )
 	Widget			widgetPtr  = findWidget( widgetName );
 
 	return createBinding( value, widgetPtr, widgetType, widgetProperty );
-/*
-	if( !widgetPtr ) {
-		log::error( "Bindings::bind : no widget with name '%s' found\n", widgetName.c_str() );
-		return false;
-	}
-
-	// Create binding instance
-	BindingPtr binding = m_factory->create( value->type(), widgetType[0], widgetProperty );
-
-	if( !binding.valid() ) {
-		log::error( "Bindings::bind : do not know how to bind property to '%s'\n", widgetName.c_str() );
-		return false;	
-	}
-
-	if( !binding->bind( value, widgetPtr ) ) {
-		log::error( "Bindings::bind : failed to bind property to '%s'\n", widgetName.c_str() );
-		return false;		
-	}
+}
 
 	binding->handleValueChanged();
 	m_bindings.push_back( binding );
