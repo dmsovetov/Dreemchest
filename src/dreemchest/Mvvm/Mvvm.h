@@ -79,6 +79,7 @@ namespace mvvm {
 	typedef PrimitiveValue<f32>		Float;		//!< Floating point value type.
 	typedef PrimitiveValue<String>	Text;		//!< String value type.
 	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.	
+	typedef PrimitiveValue<Vec2>	Point2;		//!< 2-dimensional point type.
 	typedef ArrayValue<Text>		TextArray;	//!< Array of text values.
 
 } // namespace mvvm
