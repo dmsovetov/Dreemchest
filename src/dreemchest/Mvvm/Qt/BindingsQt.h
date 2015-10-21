@@ -75,7 +75,7 @@ namespace mvvm {
 
     //! A template class to bind a property to a Qt widget.
     template<typename TBinding, typename TWidget, typename TValue>
-    class QtPropertyBinding : public Binding<TBinding, TValue> {
+    class QtWidgetBinding : public Binding<TBinding, TValue> {
 	protected:
 
 		//! Alias the widget type.
@@ -95,9 +95,9 @@ namespace mvvm {
 		AutoPtr<QSignalDelegate>	m_delegate;	//!< Qt siagnal delegate.
     };
 
-	// ** QtPropertyBinding::bind
+	// ** QtWidgetBinding::bind
     template<typename TBinding, typename TWidget, typename TValue>
-	bool QtPropertyBinding<TBinding, TWidget, TValue>::bind( ValueWPtr value, Widget widget )
+	bool QtWidgetBinding<TBinding, TWidget, TValue>::bind( ValueWPtr value, Widget widget )
 	{
 		if( !Binding::bind( value, widget ) ) {
 			return false;
@@ -107,22 +107,52 @@ namespace mvvm {
 		return true;
 	}
 
-	// ** QtPropertyBinding::createSignalDelegate
+	// ** QtWidgetBinding::createSignalDelegate
     template<typename TBinding, typename TWidget, typename TValue>
-	QSignalDelegate* QtPropertyBinding<TBinding, TWidget, TValue>::createSignalDelegate( void )
+	QSignalDelegate* QtWidgetBinding<TBinding, TWidget, TValue>::createSignalDelegate( void )
 	{
 		return NULL;
 	}
 
-	// ** QtPropertyBinding::widget
+	// ** QtWidgetBinding::widget
     template<typename TBinding, typename TWidget, typename TValue>
-	TWidget* QtPropertyBinding<TBinding, TWidget, TValue>::widget( void ) const
+	TWidget* QtWidgetBinding<TBinding, TWidget, TValue>::widget( void ) const
 	{
 		return qobject_cast<TWidget*>( reinterpret_cast<QWidget*>( m_widget ) );
 	}
 
+    //! A template class to bind a property to a Qt graphics item.
+    template<typename TBinding, typename TGraphicsItem, typename TValue>
+    class QtGraphicsItemBinding : public Binding<TBinding, TValue> {
+	protected:
+
+		//! Binds the value to a Qt widget instance.
+		virtual bool				bind( ValueWPtr value, TGraphicsItem* widget );
+
+		//! Returns the type casted Qt graphics item pointer.
+        TGraphicsItem*				instance( void ) const;
+    };
+
+	// ** QtGraphicsItemBinding::bind
+    template<typename TBinding, typename TGraphicsItem, typename TValue>
+	bool QtGraphicsItemBinding<TBinding, TGraphicsItem, TValue>::bind( ValueWPtr value, TGraphicsItem* widget )
+	{
+		if( !Binding::bind( value, widget ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// ** QtGraphicsItemBinding::widget
+    template<typename TBinding, typename TGraphicsItem, typename TValue>
+	TGraphicsItem* QtGraphicsItemBinding<TBinding, TGraphicsItem, TValue>::instance( void ) const
+	{
+		return reinterpret_cast<TGraphicsItem*>( m_widget );
+	}
+
 	//! Binds an array of strings to a list widget.
-    class QtListWidgetBinding : public QtPropertyBinding<QtListWidgetBinding, QListWidget, TextArray> {
+    class QtListWidgetBinding : public QtWidgetBinding<QtListWidgetBinding, QListWidget, TextArray> {
 	protected:
 
 		//! Handles property change.
@@ -130,7 +160,7 @@ namespace mvvm {
 	};
 
 	//! Binds the string property to a stacked widget state.
-	class QtStackedWidgetBinding : public QtPropertyBinding<QtStackedWidgetBinding, QStackedWidget, Text> {
+	class QtStackedWidgetBinding : public QtWidgetBinding<QtStackedWidgetBinding, QStackedWidget, Text> {
 	protected:
 
 		//! Handles property change.
@@ -138,7 +168,7 @@ namespace mvvm {
 	};
 
 	//! Binds the click event to a widget.
-	class QtPushButtonBinding : public QtPropertyBinding<QtPushButtonBinding, QPushButton, CommandValue> {
+	class QtPushButtonBinding : public QtWidgetBinding<QtPushButtonBinding, QPushButton, CommandValue> {
     protected:
 
 		//! Invokes the command.
@@ -146,7 +176,7 @@ namespace mvvm {
 	};
 
 	//! Binds spin box to an integer.
-	class QtSpinBoxBinding : public QtPropertyBinding<QtSpinBoxBinding, QSpinBox, Integer> {
+	class QtSpinBoxBinding : public QtWidgetBinding<QtSpinBoxBinding, QSpinBox, Integer> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -160,7 +190,7 @@ namespace mvvm {
 	};
 
 	//! Binds double spin box to an integer.
-	class QtDoubleSpinBoxBinding : public QtPropertyBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox, Float> {
+	class QtDoubleSpinBoxBinding : public QtWidgetBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox, Float> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -174,7 +204,7 @@ namespace mvvm {
 	};
 
 	//! Binds a text array to a combo box.
-	class QtComboBoxBinding : public QtPropertyBinding<QtComboBoxBinding, QComboBox, TextArray> {
+	class QtComboBoxBinding : public QtWidgetBinding<QtComboBoxBinding, QComboBox, TextArray> {
 	protected:
 
         //! Handles property change.
@@ -182,7 +212,7 @@ namespace mvvm {
 	};
 
 	//! Binds a combo box selected item to a text value.
-	class QtComboBoxSelectedTextBinding : public QtPropertyBinding<QtComboBoxSelectedTextBinding, QComboBox, Text> {
+	class QtComboBoxSelectedTextBinding : public QtWidgetBinding<QtComboBoxSelectedTextBinding, QComboBox, Text> {
 	protected:
 
 		//! Creates the signal delegate instance.
@@ -196,7 +226,7 @@ namespace mvvm {
 	};
 
     //! Binds a line edit to a string.
-    class QtLineEditBinding : public QtPropertyBinding<QtLineEditBinding, QLineEdit, Text> {
+    class QtLineEditBinding : public QtWidgetBinding<QtLineEditBinding, QLineEdit, Text> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -210,7 +240,7 @@ namespace mvvm {
     };
 
     //! Binds a text edit to a string.
-    class QtTextEditBinding : public QtPropertyBinding<QtTextEditBinding, QTextEdit, Text> {
+    class QtTextEditBinding : public QtWidgetBinding<QtTextEditBinding, QTextEdit, Text> {
     protected:
 
 		//! Creates the signal delegate instance.
@@ -224,7 +254,7 @@ namespace mvvm {
     };
 
 	//! Binds a label to a string.
-	class QtLabelBinding : public QtPropertyBinding<QtLabelBinding, QLabel, Text> {
+	class QtLabelBinding : public QtWidgetBinding<QtLabelBinding, QLabel, Text> {
     protected:
 
         //! Handles property change.
@@ -232,7 +262,7 @@ namespace mvvm {
 	};
 
     //! Binds a widget visibility to a property.
-    class QtVisibilityBinding : public QtPropertyBinding<QtVisibilityBinding, QWidget, Boolean> {
+    class QtVisibilityBinding : public QtWidgetBinding<QtVisibilityBinding, QWidget, Boolean> {
     protected:
 
         //! Handles property change.
@@ -240,7 +270,7 @@ namespace mvvm {
     };
 
     //! Binds a widget enabled/disabled flag to a property.
-    class QtEnabledBinding : public QtPropertyBinding<QtEnabledBinding, QWidget, Boolean> {
+    class QtEnabledBinding : public QtWidgetBinding<QtEnabledBinding, QWidget, Boolean> {
     protected:
 
         //! Handles property change.

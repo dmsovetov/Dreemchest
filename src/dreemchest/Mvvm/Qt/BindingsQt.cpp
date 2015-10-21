@@ -260,8 +260,8 @@ QtBindingFactory::QtBindingFactory( void )
 	registerBinding<QtDoubleSpinBoxBinding, QDoubleSpinBox>();
 	registerBinding<QtSpinBoxBinding, QSpinBox>();
 
-	registerBinding<QtComboBoxBinding, QComboBox>();
-	registerBinding<QtComboBoxSelectedTextBinding, QComboBox>( "selectedText" );
+	registerBinding<QtComboBoxBinding, QComboBox>( "items" );
+	registerBinding<QtComboBoxSelectedTextBinding, QComboBox>();
 
 	registerBinding<QtEnabledBinding, QWidget>( "enabled" );
 	registerBinding<QtVisibilityBinding, QWidget>( "visible" );
@@ -291,7 +291,7 @@ BindingsPtr QtBindings::create( const BindingFactoryPtr& factory, const ObjectWP
 // ** QtBindings::resolveWidgetTypeChain
 WidgetTypeChain QtBindings::resolveWidgetTypeChain( const String& name ) const
 {
-	QWidget* widget = m_widget->findChild<QWidget*>( name.c_str() );
+	QWidget* widget = name.size() ? m_widget->findChild<QWidget*>( name.c_str() ) : m_widget;
 	
 	if( !widget ) {
 		return WidgetTypeChain();
@@ -312,7 +312,7 @@ WidgetTypeChain QtBindings::resolveWidgetTypeChain( const String& name ) const
 // ** QtBindings::findWidget
 Widget QtBindings::findWidget( const String& name ) const
 {
-	return m_widget->findChild<QWidget*>( name.c_str() );
+	return name.size() ? m_widget->findChild<QWidget*>( name.c_str() ) : m_widget;
 }
 
 } // namespace mvvm
