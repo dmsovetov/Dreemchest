@@ -220,7 +220,7 @@ namespace mvvm {
 
 		//! Returns the type casted property or null pointer.
 		template<typename TValue>
-		typename TValue::WPtr				get( const String& name ) const;
+		typename TValue::WPtr				resolve( const String& name ) const;
 
 		//! Sets the property value.
 		void								set( const String& name, ValuePtr value );
@@ -246,11 +246,11 @@ namespace mvvm {
 		Properties							m_properties;	//!< Object properties.
 	};
 
-	// ** ObjectValue::get
+	// ** ObjectValue::resolve
 	template<typename TValue>
-	typename TValue::WPtr ObjectValue::get( const String& name ) const
+	typename TValue::WPtr ObjectValue::resolve( const String& name ) const
 	{
-		ValueWPtr value = get( name );
+		ValueWPtr value = resolve( name );
 		return castTo<TValue>( value );
 	}
 
