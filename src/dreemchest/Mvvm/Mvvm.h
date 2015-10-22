@@ -74,13 +74,14 @@ namespace mvvm {
 	dcDeclarePtrs( BindingFactory )
 	dcDeclarePtrs( Bindings )
 
-	typedef PrimitiveValue<bool>	Boolean;	//!< Boolean value type.
-	typedef PrimitiveValue<s32>		Integer;	//!< Integer value type.
-	typedef PrimitiveValue<f32>		Float;		//!< Floating point value type.
-	typedef PrimitiveValue<String>	Text;		//!< String value type.
-	typedef PrimitiveValue<::Guid>	Guid;		//!< Guid value type.	
-	typedef PrimitiveValue<Vec2>	Point2;		//!< 2-dimensional point type.
-	typedef ArrayValue<Text>		TextArray;	//!< Array of text values.
+	typedef PrimitiveValue<bool>	Boolean;		//!< Boolean value type.
+	typedef PrimitiveValue<s32>		Integer;		//!< Integer value type.
+	typedef PrimitiveValue<f32>		Float;			//!< Floating point value type.
+	typedef PrimitiveValue<String>	Text;			//!< String value type.
+	typedef PrimitiveValue<::Guid>	Guid;			//!< Guid value type.	
+	typedef PrimitiveValue<Vec2>	Point2;			//!< 2-dimensional point type.
+	typedef ArrayValue<Text>		TextArray;		//!< Array of text values.
+	typedef ArrayValue<Point2>		Point2Array;	//!< Array of 2-dimensional points.
 
 } // namespace mvvm
 
