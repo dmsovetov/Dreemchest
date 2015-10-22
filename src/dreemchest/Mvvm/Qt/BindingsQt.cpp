@@ -48,6 +48,12 @@ void QtEnabledBinding::handleValueChanged( void )
 
 // ---------------------------------------- QtPushButtonBinding ---------------------------------------- //
 
+// ** QtPushButtonBinding::createSignalDelegate
+QSignalDelegate* QtPushButtonBinding::createSignalDelegate( void )
+{
+	return DC_NEW QSignalDelegate( this, widget(), SIGNAL( clicked() ) );
+}
+
 // ** QtPushButtonBinding::handleViewChanged
 void QtPushButtonBinding::handleViewChanged( void )
 {

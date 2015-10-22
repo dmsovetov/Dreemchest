@@ -76,7 +76,7 @@ namespace mvvm {
     //! A template class to bind a property to a Qt widget.
     template<typename TBinding, typename TWidget, typename TValue>
     class QtWidgetBinding : public Binding<TBinding, TValue> {
-	protected:
+	public:
 
 		//! Alias the widget type.
 		typedef TWidget				WidgetType;
@@ -124,7 +124,7 @@ namespace mvvm {
     //! A template class to bind a property to a Qt graphics item.
     template<typename TBinding, typename TGraphicsItem, typename TValue>
     class QtGraphicsItemBinding : public Binding<TBinding, TValue> {
-	protected:
+	public:
 
 		//! Binds the value to a Qt widget instance.
 		virtual bool				bind( ValueWPtr value, TGraphicsItem* widget );
@@ -171,8 +171,11 @@ namespace mvvm {
 	class QtPushButtonBinding : public QtWidgetBinding<QtPushButtonBinding, QPushButton, CommandValue> {
     protected:
 
+		//! Creates the signal delegate instance.
+		virtual QSignalDelegate*	createSignalDelegate( void );
+
 		//! Invokes the command.
-		virtual void            handleViewChanged( void );
+		virtual void				handleViewChanged( void );
 	};
 
 	//! Binds spin box to an integer.
