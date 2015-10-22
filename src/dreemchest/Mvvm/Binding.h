@@ -234,6 +234,9 @@ namespace mvvm {
 		//! Returns the root object.
 		ObjectWPtr						root( void ) const;
 
+		//! Adds a new binding instance.
+		void							addBinding( BindingPtr binding );
+
 		//! Binds the widget to a value with specified URI.
 		bool							bind( const String& widget, const String& uri, ObjectWPtr root = ObjectWPtr() );
 

@@ -150,10 +150,11 @@ bool Bindings::bind( const String& widget, const ValueWPtr& value )
 	return createBinding( value, widgetPtr, widgetType, widgetProperty );
 }
 
+// ** Bindings::addBinding
+void Bindings::addBinding( BindingPtr binding )
+{
 	binding->handleValueChanged();
-	m_bindings.push_back( binding );
-
-	return true;*/
+	m_bindings.push_back( binding );	
 }
 
 // ** Bindings::createBinding
