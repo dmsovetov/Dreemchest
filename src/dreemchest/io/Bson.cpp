@@ -57,6 +57,16 @@ Bson::Bson( bool value ) : m_type( boolean ), m_boolean( value )
 }
 
 // ** Bson::Bson
+Bson::Bson( s16 value ) : m_type( int16 ), m_int32( value )
+{
+}
+
+// ** Bson::Bson
+Bson::Bson( u16 value ) : m_type( int16 ), m_int32( value )
+{
+}
+
+// ** Bson::Bson
 Bson::Bson( s32 value ) : m_type( int32 ), m_int32( value )
 {
 }
@@ -126,6 +136,24 @@ Bson& Bson::operator []( CString key )
 {
 	DC_BREAK_IF( m_type != object );
 	return (*m_object)[key];
+}
+
+// ** Bson::operator <<
+Bson& Bson::operator << ( CString value )
+{
+	if( m_key.empty() ) {
+		m_key = value;
+	} else {
+		(*this)[m_key] = value;
+		m_key = "";
+	}
+	return *this;
+}
+
+// ** Bson::operator <<
+Bson& Bson::operator << ( const String& value )
+{
+	return this->operator << ( value.c_str() );
 }
 
 // ** Bson::type

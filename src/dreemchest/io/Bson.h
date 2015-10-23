@@ -119,7 +119,16 @@ namespace io {
 		const Bson&			operator []( const String& key ) const;
 		Bson&				operator []( const String& key );
 
-		//! Returns the BSON value type.
+		//! Appends the value to a Bson object.
+		Bson&				operator << ( CString key );
+
+		//! Appends the value to a Bson object.
+		Bson&				operator << ( const String& key );
+
+		template<typename TValue>
+		Bson&				operator << ( const TValue& value );
+
+		//! Returns the Bson value type.
 		Type				type( void ) const;
 
 		//! Returns the boolean value of this Bson instance.
@@ -181,8 +190,18 @@ namespace io {
 			ValueArray*	m_array;
 		};
 
-		Type	m_type;
+		Type	m_type;		//!< Bson value type.
+		String	m_key;		//!< Active bson key.
 	};
+
+	template<typename TValue>
+	Bson& Bson::operator << ( const TValue& value )
+	{
+		DC_BREAK_IF( m_key.empty() );
+		(*this)[m_key] = value;
+		m_key = "";
+		return *this;
+	}
 
 } // namespace io
 
