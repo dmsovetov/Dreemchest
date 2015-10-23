@@ -91,6 +91,9 @@ namespace io {
 							//! Constructs Bson instance from value.
 							Bson( const String& value );
 
+							//! Constructs Bson instance from value.
+							Bson( CString value );
+
 							//! Copies the Bson instance.
 							Bson( const Bson& other );
 
@@ -98,6 +101,9 @@ namespace io {
 
 							//! Converts BSON value to a boolean.
 							operator bool( void ) const;
+
+		//! Copies the Bson instance.
+		const Bson&			operator = ( const Bson& other );
 
 		//! Cleans up the Bson instance.
 		void				clear( void );
@@ -116,14 +122,35 @@ namespace io {
 		//! Returns the BSON value type.
 		Type				type( void ) const;
 
-		//! Converts BSON value to a boolean value.
+		//! Returns the boolean value of this Bson instance.
 		bool				asBool( void ) const;
 
-		//! Converts BSON value to an integer.
-		f64					asInt( void ) const;
+		//! Returns the byte value of this Bson instance.
+		u8					asByte( void ) const;
 
-		//! Converts BSON value to a string.
-		String				asString( void ) const;
+		//! Returns the short value of this Bson instance.
+		u16					asShort( void ) const;
+
+		//! Returns the int value of this Bson instance.
+		u32					asInt( void ) const;
+
+		//! Returns the long value of this Bson instance.
+		u64					asLong( void ) const;
+
+		//! Returns the float value of this Bson instance.
+		f32					asFloat( void ) const;
+
+		//! Returns the double value of this Bson instance.
+		f64					asDouble( void ) const;
+
+		//! Returns the string value of this Bson instance.
+		const String&		asString( void ) const;
+
+		//! Returns object properties.
+		const KeyValue&		properties( void ) const;
+
+		//! Returns array items.
+		const ValueArray&	items( void ) const;
 
 		//! Writes BSON to a binary stream.
 		s32					write( StreamPtr stream ) const;

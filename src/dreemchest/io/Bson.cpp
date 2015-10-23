@@ -67,7 +67,17 @@ Bson::Bson( f32 value ) : m_type( float32 ), m_float32( value )
 }
 
 // ** Bson::Bson
+Bson::Bson( f64 value ) : m_type( float64 ), m_float64( value )
+{
+}
+
+// ** Bson::Bson
 Bson::Bson( const String& value ) : m_type( string ), m_string( DC_NEW String( value ) )
+{
+}
+
+// ** Bson::Bson
+Bson::Bson( CString value ) : m_type( string ), m_string( DC_NEW String( value ) )
 {
 }
 
@@ -81,6 +91,13 @@ Bson::Bson( const Bson& other ) : m_type( other.m_type )
 Bson::~Bson( void )
 {
 	clear();
+}
+
+// ** Bson::operator =
+const Bson& Bson::operator = ( const Bson& other )
+{
+	set( other );
+	return *this;
 }
 
 // ** Bson::operator []
@@ -111,13 +128,86 @@ Bson& Bson::operator []( CString key )
 	return (*m_object)[key];
 }
 
+// ** Bson::type
+Bson::Type Bson::type( void ) const
+{
+	return m_type;
+}
+
+// ** Bson::properties
+const Bson::KeyValue& Bson::properties( void ) const
+{
+	DC_BREAK_IF( m_type != object );
+	return *m_object;
+}
+
+// ** Bson::items
+const Bson::ValueArray& Bson::items( void ) const
+{
+	DC_BREAK_IF( m_type != array );
+	return *m_array;
+}
+
+// ** Bson::asBool
+bool Bson::asBool( void ) const
+{
+	return m_boolean;
+}
+
+// ** Bson::asByte
+u8 Bson::asByte( void ) const
+{
+	return m_int8;
+}
+
+// ** Bson::asShort
+u16 Bson::asShort( void ) const
+{
+	return m_int16;
+}
+
+// ** Bson::asInt
+u32 Bson::asInt( void ) const
+{
+	return m_int32;
+}
+
+// ** Bson::asFloat
+f32 Bson::asFloat( void ) const
+{
+	return m_float32;
+}
+
+// ** Bson::asDouble
+f64 Bson::asDouble( void ) const
+{
+	return m_float64;
+}
+
+// ** Bson::asString
+const String& Bson::asString( void ) const
+{
+	return *m_string;
+}
+
 // ** Bson::set
 void Bson::set( const Bson& value )
 {
+	m_type = value.m_type;
+
 	switch( m_type ) {
+	case null:		break;
 	case boolean:	m_boolean = value.m_boolean;
 					break;
+	case int8:		m_int8 = value.m_int8;
+					break;
+	case int16:		m_int16 = value.m_int16;
+					break;
 	case int32:		m_int32 = value.m_int32;
+					break;
+	case float32:	m_float32 = value.m_float32;
+					break;
+	case float64:	m_float64 = value.m_float64;
 					break;
 	case string:	m_string = DC_NEW String( *value.m_string );
 					break;
