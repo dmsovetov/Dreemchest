@@ -108,6 +108,7 @@ DC_END_DREEMCHEST
 	#include "FileSystem.h"
 	#include "Archive.h"
     #include "DiskFileSystem.h"
+	#include "Bson.h"
 #endif
 
 #endif /*   !defined( __DC_Io_Io_H__ )   */

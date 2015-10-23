@@ -1,0 +1,164 @@
+/**************************************************************************
+
+ The MIT License (MIT)
+
+ Copyright (c) 2015 Dmitry Sovetov
+
+ https://github.com/dmsovetov
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+ **************************************************************************/
+
+#ifndef __DC_Io_Bson_H__
+#define __DC_Io_Bson_H__
+
+#include "Io.h"
+
+DC_BEGIN_DREEMCHEST
+
+namespace io {
+
+	//! BSON is a binary key-value storage type.
+	class Bson {
+	public:
+
+		//! BSON value types.
+		enum Type {
+			  null
+			, boolean
+			, int8
+			, int16
+			, int32
+			, int64
+			, float32
+			, float64
+			, string
+			, array
+			, object
+		};
+
+		typedef Map<String, Bson>	KeyValue;	//!< Key-value storage used to hold object properties.
+		typedef Array<Bson>			ValueArray;	//!< Array of BSON values.
+
+							//! Constructs Bson instance.
+							Bson( void );
+
+							//! Constructs Bson instance of specified type.
+							Bson( Type type );
+
+							//! Constructs Bson instance from value.
+							Bson( bool value );
+
+							//! Constructs Bson instance from value.
+							Bson( u8 value );
+
+							//! Constructs Bson instance from value.
+							Bson( s8 value );
+
+							//! Constructs Bson instance from value.
+							Bson( u16 value );
+
+							//! Constructs Bson instance from value.
+							Bson( s16 value );
+
+							//! Constructs Bson instance from value.
+							Bson( u32 value );
+
+							//! Constructs Bson instance from value.
+							Bson( s32 value );
+							
+							//! Constructs Bson instance from value.
+							Bson( f32 value );
+
+							//! Constructs Bson instance from value.
+							Bson( f64 value );
+
+							//! Constructs Bson instance from value.
+							Bson( const String& value );
+
+							//! Copies the Bson instance.
+							Bson( const Bson& other );
+
+		virtual				~Bson( void );
+
+							//! Converts BSON value to a boolean.
+							operator bool( void ) const;
+
+		//! Cleans up the Bson instance.
+		void				clear( void );
+
+		//! Copies the Bson instance.
+		void				set( const Bson& value );
+
+		//! Returns the object property with specified key.
+		const Bson&			operator []( CString key ) const;
+		Bson&				operator []( CString key );
+
+		//! Returns the object property with specified key.
+		const Bson&			operator []( const String& key ) const;
+		Bson&				operator []( const String& key );
+
+		//! Returns the BSON value type.
+		Type				type( void ) const;
+
+		//! Converts BSON value to a boolean value.
+		bool				asBool( void ) const;
+
+		//! Converts BSON value to an integer.
+		f64					asInt( void ) const;
+
+		//! Converts BSON value to a string.
+		String				asString( void ) const;
+
+		//! Writes BSON to a binary stream.
+		s32					write( StreamPtr stream ) const;
+
+		//! Reads BSON from a binary stream.
+		s32					read( StreamPtr stream );
+
+	private:
+
+		//! Writes the BSON value to a binary stream.
+		void				writeValue( StreamPtr stream ) const;
+
+		//! Reads BSON from a binary stream.
+		void				readValue( StreamPtr stream );
+
+	private:
+
+		union {
+			bool		m_boolean;
+			u8			m_int8;
+			u16			m_int16;
+			u32			m_int32;
+			u64			m_int64;
+			f32			m_float32;
+			f64			m_float64;
+			String*		m_string;
+			KeyValue*	m_object;
+			ValueArray*	m_array;
+		};
+
+		Type	m_type;
+	};
+
+} // namespace io
+
+DC_END_DREEMCHEST
+
+#endif		/*	!__DC_Io_Bson_H__	*/
