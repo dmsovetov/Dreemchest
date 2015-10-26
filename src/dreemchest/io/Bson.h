@@ -224,12 +224,21 @@ namespace io {
 		String	m_key;		//!< Active bson key.
 	};
 
+	// ** Bson::operator <<
 	template<typename TValue>
 	Bson& Bson::operator << ( const TValue& value )
 	{
-		DC_BREAK_IF( m_key.empty() );
-		(*this)[m_key] = value;
-		m_key = "";
+		DC_BREAK_IF( m_type != object && m_type != array );
+
+		if( m_type == object ) {
+			DC_BREAK_IF( m_key.empty() );
+			(*this)[m_key] = value;
+			m_key = "";		
+		}
+		else if( m_type == array ) {
+			m_array->push_back( value );
+		}
+
 		return *this;
 	}
 
