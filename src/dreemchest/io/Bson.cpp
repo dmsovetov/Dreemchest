@@ -110,6 +110,66 @@ const Bson& Bson::operator = ( const Bson& other )
 	return *this;
 }
 
+// ** Bson::operator bool
+Bson::operator bool( void ) const
+{
+	return m_boolean;
+}
+
+// ** Bson::operator u8
+Bson::operator u8( void ) const
+{
+	return m_int8;
+}
+
+// ** Bson::operator s8
+Bson::operator s8( void ) const
+{
+	return m_int8;
+}
+
+// ** Bson::operator u16
+Bson::operator u16( void ) const
+{
+	return m_int16;
+}
+
+// ** Bson::operator s16
+Bson::operator s16( void ) const
+{
+	return m_int16;
+}
+
+// ** Bson::operator u32
+Bson::operator u32( void ) const
+{
+	return m_int32;
+}
+
+// ** Bson::operator s32
+Bson::operator s32( void ) const
+{
+	return m_int32;
+}
+
+// ** Bson::operator f32
+Bson::operator f32( void ) const
+{
+	return m_float32;
+}
+
+// ** Bson::operator f64
+Bson::operator f64( void ) const
+{
+	return m_float64;
+}
+
+// ** Bson::operator String
+Bson::operator String( void ) const
+{
+	return *m_string;
+}
+
 // ** Bson::operator []
 const Bson& Bson::operator []( const String& key ) const
 {
