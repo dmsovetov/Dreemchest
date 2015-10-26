@@ -65,7 +65,7 @@ f32 Arguments::number( const String& name, f32 defaultValue ) const
 		return defaultValue;
 	}
 
-	return atof( m_values.find( name )->second.c_str() );
+	return static_cast<f32>( atof( m_values.find( name )->second.c_str() ) );
 }
 
 // ** Arguments::string
