@@ -191,6 +191,9 @@ namespace io {
 		//! Returns array items.
 		const ValueArray&	items( void ) const;
 
+		//! Returns the Bson object property with specified name.
+		const Bson&			get( const String& key, const Bson& defaultValue = null ) const;
+
 		//! Writes BSON to a binary stream.
 		s32					write( StreamPtr stream ) const;
 

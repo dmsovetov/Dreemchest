@@ -242,6 +242,17 @@ const Bson::ValueArray& Bson::items( void ) const
 	return *m_array;
 }
 
+// ** Bson::get
+const Bson& Bson::get( const String& key, const Bson& defaultValue ) const
+{
+	if( m_type != object ) {
+		return defaultValue;
+	}
+
+	KeyValue::const_iterator i = m_object->find( key );
+	return i != m_object->end() ? i->second : defaultValue;
+}
+
 // ** Bson::asBool
 bool Bson::asBool( void ) const
 {
