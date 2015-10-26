@@ -39,12 +39,6 @@ void Value::setParent( ObjectWPtr value )
 	m_parent = value;
 }
 
-// ** Value::type
-ValueTypeIdx Value::type( void ) const
-{
-	return 0;
-}
-
 // ** Value::is
 bool Value::is( ValueTypeIdx expected ) const
 {
@@ -181,6 +175,44 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
+// ** ObjectValue::bson
+io::Bson ObjectValue::bson( void ) const
+{
+	io::Bson result( io::Bson::object );
+
+	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
+		const String& key = i->first;
+
+		if( key == "isValid" ) {
+			continue;
+		}
+
+		io::Bson value = i->second->bson();
+
+		if( value.isNull() ) {
+			continue;
+		}
+
+		result[key] = i->second->bson();
+	}
+
+	return result;
+}
+
+// ** ObjectValue::setBson
+void ObjectValue::setBson( const io::Bson& value )
+{
+	const io::Bson::KeyValue& kv = value.properties();
+
+	for( io::Bson::KeyValue::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
+		ValueWPtr value = get( i->first );
+
+		if( value.valid() ) {
+			value->setBson( i->second );
+		}
+	}
+}
+
 // ----------------------------------------------------------- CommandValue ----------------------------------------------------------- //
 
 // ** CommandValue::is
@@ -199,6 +231,18 @@ bool CommandValue::is( ValueTypeIdx expected ) const
 ValueTypeIdx CommandValue::type( void ) const
 {
 	return Value::valueType<CommandValue>();
+}
+
+//! Returns the BSON object that represents this value.
+io::Bson CommandValue::bson( void ) const
+{
+	return io::Bson::null;
+}
+
+//! Sets the BSON object that represents this value.
+void CommandValue::setBson( const io::Bson& value )
+{
+
 }
 
 // -------------------------------------------------------------- Command -------------------------------------------------------------- //

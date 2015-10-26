@@ -29,11 +29,41 @@
 
 #include "../Dreemchest.h"
 
+#include "../Io/Bson.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
 	DECLARE_LOG( log )
+
+	//! Generic class to convert between the value type & BSON.
+	template<typename TValue>
+	struct BsonConverter {
+		//! Converts to BSON from a value.
+		static io::Bson	to( const TValue& value ) { return io::Bson( value ); }
+
+		//! Converts from a value to a BSON.
+		static TValue	from( const io::Bson& value ) { return static_cast<TValue>( value ); }
+	};
+
+	//! Converts between the GUID and BSON.
+	struct GuidBsonConverter {
+		//! Converts to BSON from a value.
+		static io::Bson	to( const ::Guid& value ) { return io::Bson( value.toString() ); }
+
+		//! Converts from a value to a BSON.
+		static ::Guid	from( const io::Bson& value ) { return value.asString(); }	
+	};
+
+	//! Converts between the Vec2 and BSON.
+	struct Vec2BsonConverter {
+		//! Converts to BSON from a value.
+		static io::Bson	to( const Vec2& value );
+
+		//! Converts from a value to a BSON.
+		static Vec2		from( const io::Bson& value );			
+	};
 
 	//! Performs the property type cast.
 	template<typename T, typename S>
@@ -48,7 +78,7 @@ namespace mvvm {
 	}
 
 	//! Primitive value type forward declaration.
-	template<typename TValue> class PrimitiveValue;
+	template< typename TValue, typename TBsonConverter = BsonConverter<TValue> > class PrimitiveValue;
 
 	//! Array value type forward declaration.
 	template<typename TValue> class ArrayValue;
@@ -74,14 +104,14 @@ namespace mvvm {
 	dcDeclarePtrs( BindingFactory )
 	dcDeclarePtrs( Bindings )
 
-	typedef PrimitiveValue<bool>	Boolean;		//!< Boolean value type.
-	typedef PrimitiveValue<s32>		Integer;		//!< Integer value type.
-	typedef PrimitiveValue<f32>		Float;			//!< Floating point value type.
-	typedef PrimitiveValue<String>	Text;			//!< String value type.
-	typedef PrimitiveValue<::Guid>	Guid;			//!< Guid value type.	
-	typedef PrimitiveValue<Vec2>	Point2;			//!< 2-dimensional point type.
-	typedef ArrayValue<Text>		TextArray;		//!< Array of text values.
-	typedef ArrayValue<Point2>		Point2Array;	//!< Array of 2-dimensional points.
+	typedef PrimitiveValue<bool>						Boolean;		//!< Boolean value type.
+	typedef PrimitiveValue<s32>							Integer;		//!< Integer value type.
+	typedef PrimitiveValue<f32>							Float;			//!< Floating point value type.
+	typedef PrimitiveValue<String>						Text;			//!< String value type.
+	typedef PrimitiveValue<::Guid, GuidBsonConverter>	Guid;			//!< Guid value type.	
+	typedef PrimitiveValue<Vec2, Vec2BsonConverter>		Point2;			//!< 2-dimensional point type.
+	typedef ArrayValue<Text>							TextArray;		//!< Array of text values.
+	typedef ArrayValue<Point2>							Point2Array;	//!< Array of 2-dimensional points.
 
 } // namespace mvvm
 

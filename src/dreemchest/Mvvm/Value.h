@@ -41,14 +41,20 @@ namespace mvvm {
 
 		virtual						~Value( void ) {}
 
-		//! Returns the value type.
-		virtual ValueTypeIdx		type( void ) const;
-
 		//! Returns true if the value type matches the specified one.
 		virtual bool				is( ValueTypeIdx expected ) const;
 
 		//! Notifies bindings about a value change.
 		virtual void				notifyValueChanged( void );
+
+		//! Returns the value type.
+		virtual ValueTypeIdx		type( void ) const = 0;
+
+		//! Returns the BSON object that represents this value.
+		virtual io::Bson			bson( void ) const = 0;
+
+		//! Sets the BSON object that represents this value.
+		virtual void				setBson( const io::Bson& value ) = 0;
 
 		//! Generates the value type index.
 		template<typename TValue>
@@ -82,12 +88,13 @@ namespace mvvm {
 	// ---------------------------------------------------------- PrimitiveValue ---------------------------------------------------------- //
 
 	//! Generic class to declare primitive value types.
-	template<typename TValue>
+	template<typename TValue, typename TBsonConverter>
 	class PrimitiveValue : public Value {
 	public:
 
+		typedef PrimitiveValue<TValue, TBsonConverter> Type;		//!< Alias for this type.
+
 		typedef TValue					ValueType;	//! Alias the value type.
-		typedef PrimitiveValue<TValue>	Type;		//!< Alias for this type.
 		typedef StrongPtr<Type>			Ptr;		//!< Strong pointer type.
 		typedef WeakPtr<Type>			WPtr;		//!< Weak pointer type.
 
@@ -106,6 +113,12 @@ namespace mvvm {
 		//! Returns the actual value type index.
 		virtual ValueTypeIdx			type( void ) const;
 
+		//! Returns the BSON object that represents this value.
+		virtual io::Bson				bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void					setBson( const io::Bson& value );
+
 		//! Returns the property value.
 		const TValue&					get( void ) const;
 
@@ -121,57 +134,71 @@ namespace mvvm {
 	};
 
 	// ** PrimitiveValue::PrimitiveValue
-	template<typename TValue>
-	PrimitiveValue<TValue>::PrimitiveValue( const TValue& value ) : m_value( value )
+	template<typename TValue, typename TBsonConverter>
+	PrimitiveValue<TValue, TBsonConverter>::PrimitiveValue( const TValue& value ) : m_value( value )
 	{
 	}
 
 	// ** PrimitiveValue::operator TValue
-	template<typename TValue>
-	PrimitiveValue<TValue>::operator const TValue &( void ) const
+	template<typename TValue, typename TBsonConverter>
+	PrimitiveValue<TValue, TBsonConverter>::operator const TValue &( void ) const
 	{
 		return m_value;
 	}
 
 	// ** PrimitiveValue::operator TValue
-	template<typename TValue>
-	const PrimitiveValue<TValue>& PrimitiveValue<TValue>::operator = ( const TValue& value )
+	template<typename TValue, typename TBsonConverter>
+	const PrimitiveValue<TValue, TBsonConverter>& PrimitiveValue<TValue, TBsonConverter>::operator = ( const TValue& value )
 	{
 		m_value = value;
 		return *this;
 	}
 
 	// ** PrimitiveValue::operator TValue
-	template<typename TValue>
-	bool PrimitiveValue<TValue>::operator == ( const TValue& value ) const
+	template<typename TValue, typename TBsonConverter>
+	bool PrimitiveValue<TValue, TBsonConverter>::operator == ( const TValue& value ) const
 	{
 		return m_value == value;
 	}
 
 	// ** PrimitiveValue::type
-	template<typename TValue>
-	typename PrimitiveValue<TValue>::Ptr PrimitiveValue<TValue>::create( const TValue& value )
+	template<typename TValue, typename TBsonConverter>
+	typename PrimitiveValue<TValue, TBsonConverter>::Ptr PrimitiveValue<TValue, TBsonConverter>::create( const TValue& value )
 	{
-		return Ptr( DC_NEW PrimitiveValue<TValue>( value ) );
+		return Ptr( DC_NEW PrimitiveValue<TValue, TBsonConverter>( value ) );
 	}
 
 	// ** PrimitiveValue::type
-	template<typename TValue>
-	ValueTypeIdx PrimitiveValue<TValue>::type( void ) const
+	template<typename TValue, typename TBsonConverter>
+	ValueTypeIdx PrimitiveValue<TValue, TBsonConverter>::type( void ) const
 	{
 		return Value::valueType<Type>();
 	}
 
+	// ** PrimitiveValue::bson
+	template<typename TValue, typename TBsonConverter>
+	io::Bson PrimitiveValue<TValue, TBsonConverter>::bson( void ) const
+	{
+		return TBsonConverter::to( m_value );
+	}
+
+	// ** PrimitiveValue::setBson
+	template<typename TValue, typename TBsonConverter>
+	void PrimitiveValue<TValue, TBsonConverter>::setBson( const io::Bson& value )
+	{
+		m_value = TBsonConverter::from( value );
+	}
+
 	// ** PrimitiveValue::get
-	template<typename TValue>
-	const TValue& PrimitiveValue<TValue>::get( void ) const
+	template<typename TValue, typename TBsonConverter>
+	const TValue& PrimitiveValue<TValue, TBsonConverter>::get( void ) const
 	{
 		return m_value;
 	}
 
 	// ** PrimitiveValue::set
-	template<typename TValue>
-	void PrimitiveValue<TValue>::set( const TValue& value )
+	template<typename TValue, typename TBsonConverter>
+	void PrimitiveValue<TValue, TBsonConverter>::set( const TValue& value )
 	{
 		if( m_value == value ) {
 			return;
@@ -199,6 +226,12 @@ namespace mvvm {
 
 		//! Returns the object value type index.
 		virtual ValueTypeIdx				type( void ) const;
+
+		//! Returns the BSON object that represents this value.
+		virtual io::Bson					bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void						setBson( const io::Bson& value );
 
 		//! Returns true if the object type matches the specified one.
 		virtual bool						is( ValueTypeIdx expected ) const;
@@ -327,6 +360,12 @@ namespace mvvm {
 		//! Returns array value type.
 		virtual ValueTypeIdx		type( void ) const;
 
+		//! Returns the BSON object that represents this value.
+		virtual io::Bson			bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void				setBson( const io::Bson& value );
+
 		//! Returns true if the array matches the expected type.
 		virtual bool				is( ValueTypeIdx expected ) const;
 
@@ -411,6 +450,27 @@ namespace mvvm {
 		notifyValueChanged();
 	}
 
+	// ** ArrayValue::bson
+	template<typename TValue>
+	io::Bson ArrayValue<TValue>::bson( void ) const
+	{
+		io::Bson result( io::Bson::array );
+
+		for( s32 i = 0, n = size(); i < n; i++ ) {
+			result << m_values[i]->bson();
+		}
+
+		return result;
+	}
+
+	// ** ArrayValue::setBson
+	template<typename TValue>
+	void ArrayValue<TValue>::setBson( const io::Bson& value )
+	{
+		DC_NOT_IMPLEMENTED
+	}
+
+
 	// ---------------------------------------------------------- CommandValue ---------------------------------------------------------- //
 
 	//! Command value wraps the functional object inside and used to bind commands with widgets.
@@ -419,6 +479,12 @@ namespace mvvm {
 
 		//! Returns command value type.
 		virtual ValueTypeIdx	type( void ) const;
+
+		//! Returns the BSON object that represents this value.
+		virtual io::Bson		bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void			setBson( const io::Bson& value );
 
 		//! Returns true if the command matches the expected type.
 		virtual bool			is( ValueTypeIdx expected ) const;
