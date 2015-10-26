@@ -216,6 +216,12 @@ Bson& Bson::operator << ( const String& value )
 	return this->operator << ( value.c_str() );
 }
 
+// ** Bson::isNull
+bool Bson::isNull( void ) const
+{
+	return m_type == null;
+}
+
 // ** Bson::type
 Bson::Type Bson::type( void ) const
 {

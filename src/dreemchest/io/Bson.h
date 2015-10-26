@@ -155,6 +155,9 @@ namespace io {
 		template<typename TValue>
 		Bson&				operator << ( const TValue& value );
 
+		//! Returns true if the Bson value is null.
+		bool				isNull( void ) const;
+
 		//! Returns the Bson value type.
 		Type				type( void ) const;
 
