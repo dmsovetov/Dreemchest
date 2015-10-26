@@ -41,6 +41,9 @@ DC_BEGIN_DREEMCHEST
 					//! Constructs Guid identifier from bytes.
 					Guid( const u8* id );
 
+					//! Constructs Guid identifier from a string.
+					Guid( const String& str );
+
 		//! Converts Guid to a string representation.
 		String		toString( void ) const;
 
@@ -78,6 +81,12 @@ DC_BEGIN_DREEMCHEST
 	inline Guid::Guid( const u8* id )
 	{
 		memcpy( m_id, id, Size );
+	}
+
+	// ** Guid::Guid
+	inline Guid::Guid( const String& str )
+	{
+		DC_NOT_IMPLEMENTED
 	}
 
 	// ** Guid::toString
