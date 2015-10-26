@@ -100,7 +100,34 @@ namespace io {
 		virtual				~Bson( void );
 
 							//! Converts BSON value to a boolean.
-							operator bool( void ) const;
+		explicit			operator bool( void ) const;
+
+							//! Converts BSON value to u8 value.
+		explicit			operator u8( void ) const;
+
+							//! Converts BSON value to s8 value.
+		explicit			operator s8( void ) const;
+
+							//! Converts BSON value to u16 value.
+		explicit			operator u16( void ) const;
+
+							//! Converts BSON value to s16 value.
+		explicit			operator s16( void ) const;
+
+							//! Converts BSON value to u32 value.
+		explicit			operator u32( void ) const;
+
+							//! Converts BSON value to s32 value.
+		explicit			operator s32( void ) const;
+
+							//! Converts BSON value to f32 value.
+		explicit			operator f32( void ) const;
+
+							//! Converts BSON value to f64 value.
+		explicit			operator f64( void ) const;
+
+							//! Converts BSON value to f64 value.
+		explicit			operator String( void ) const;
 
 		//! Copies the Bson instance.
 		const Bson&			operator = ( const Bson& other );
