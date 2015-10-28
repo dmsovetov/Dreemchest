@@ -60,7 +60,7 @@ namespace Ecs {
 
 		//! Attaches the created component to an entity.
 		template<typename TComponent>
-		TComponent*				attach( TComponent* component );
+		TComponent*				attachComponent( TComponent* component );
 
 		//! Constructs a new component and attaches it to this entity.
 	#ifndef DC_CPP11_DISABLED
@@ -120,9 +120,9 @@ namespace Ecs {
 		return result;
 	}
 
-	// ** Entity::attach
+	// ** Entity::attachComponent
 	template<typename TComponent>
-	TComponent* Entity::attach( TComponent* component )
+	TComponent* Entity::attachComponent( TComponent* component )
 	{
 		DC_BREAK_IF( m_isRemoved );
 		DC_BREAK_IF( has<TComponent>() );
@@ -141,7 +141,7 @@ namespace Ecs {
 	TComponent* Entity::attach( Args ... args )
 	{
 		TComponent* component = m_ecs->createComponent<TComponent>( args... );
-		return attach<TComponent>( component );
+		return attachComponent<TComponent>( component );
 	}
 #endif	/*	!DC_CPP11_DISABLED	*/
 
