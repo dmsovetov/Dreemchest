@@ -75,7 +75,8 @@ void Value::removeBinding( BindingWPtr binding )
 // ** ObjectValue::ObjectValue
 ObjectValue::ObjectValue( void )
 {
-	m_isValid = add<Boolean>( "isValid", true );
+	m_isValid = value<Boolean>( "isValid", true );
+	value<BoolCommand>( "save", dcThisMethod( ObjectValue::save ) );
 }
 
 // ** ObjectValue::isValid

@@ -236,6 +236,9 @@ namespace mvvm {
 		//! Returns true if the object type matches the specified one.
 		virtual bool						is( ValueTypeIdx expected ) const;
 
+		//! Saves this object.
+		virtual bool						save( void );
+
 		//! Returns the set of keys that reside inside this object.
 		Set<String>							keys( void ) const;
 
@@ -268,7 +271,7 @@ namespace mvvm {
 
 		//! Adds a new typed property to this object.
 		template<typename TValue, typename ... Args>
-		typename WeakPtr<TValue>			add( const String& name, const Args& ... args );
+		WeakPtr<TValue>						value( const String& name, const Args& ... args );
 
 	protected:
 
@@ -287,9 +290,9 @@ namespace mvvm {
 		return castTo<TValue>( value );
 	}
 
-	// ** ObjectValue::add
+	// ** ObjectValue::value
 	template<typename TValue, typename ... Args>
-	WeakPtr<TValue> ObjectValue::add( const String& name, const Args& ... args )
+	WeakPtr<TValue> ObjectValue::value( const String& name, const Args& ... args )
 	{
 		DC_BREAK_IF( has( name ) );
 
