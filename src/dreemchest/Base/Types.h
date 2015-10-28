@@ -29,17 +29,18 @@
 
 #define DC_TYPES_INCLUDED
 
-#include    <string>
-#include    <vector>
-#include    <map>
-#include    <list>
-#include    <set>
-#include	<algorithm>
-#include	<stack>
+#include <string>
+#include  <vector>
+#include <map>
+#include <list>
+#include <set>
+#include <algorithm>
+#include <stack>
 
-#include	<stdlib.h>
-#include	<stdio.h>
-#include	<stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <sstream>
 
 DC_BEGIN_DREEMCHEST
 
@@ -124,6 +125,15 @@ DC_BEGIN_DREEMCHEST
         f32     min;
         f32     max;
     };
+
+	//! Convert value to a string.
+	template< typename T>
+	String toString( const T& n )
+    {
+        std::ostringstream stm;
+        stm << n ;
+        return stm.str();
+    }
 
 DC_END_DREEMCHEST
 

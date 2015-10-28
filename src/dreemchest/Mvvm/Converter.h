@@ -104,7 +104,7 @@ namespace mvvm {
 	// ** IntegerToTextConverter::handleValueChanged
 	inline void IntegerToTextConverter::handleValueChanged( void )
 	{
-		m_output->set( std::to_string( m_property->get() ) );
+		m_output->set( toString( m_property->get() ) );
 	}
 
 	//! Converts float to a text.
@@ -118,7 +118,7 @@ namespace mvvm {
 	// ** FloatToTextConverter::handleValueChanged
 	inline void FloatToTextConverter::handleValueChanged( void )
 	{
-		m_output->set( std::to_string( m_property->get() ) );
+		m_output->set( toString( m_property->get() ) );
 	}
 
 	//! Guid to a text converter
