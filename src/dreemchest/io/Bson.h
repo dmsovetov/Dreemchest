@@ -48,6 +48,7 @@ namespace io {
 			, float32
 			, float64
 			, string
+			, guid
 			, array
 			, object
 		};
@@ -93,6 +94,9 @@ namespace io {
 
 							//! Constructs Bson instance from value.
 							Bson( CString value );
+
+							//! Constructs Bson instance from value.
+							Bson( const Guid& value );
 
 							//! Copies the Bson instance.
 							Bson( const Bson& other );
@@ -152,8 +156,13 @@ namespace io {
 		//! Appends the value to a Bson object.
 		Bson&				operator << ( const String& key );
 
+		//! Append the value to a Bson object.
 		template<typename TValue>
 		Bson&				operator << ( const TValue& value );
+
+		//! Append the array of values to a Bson object.
+		template<typename TValue>
+		Bson&				operator << ( const Array<TValue>& values );
 
 		//! Returns true if the Bson value is null.
 		bool				isNull( void ) const;
@@ -181,6 +190,9 @@ namespace io {
 
 		//! Returns the double value of this Bson instance.
 		f64					asDouble( void ) const;
+
+		//! Returns the GUID value of this Bson instance.
+		const Guid&			asGuid( void ) const;
 
 		//! Returns the string value of this Bson instance.
 		const String&		asString( void ) const;
@@ -224,6 +236,7 @@ namespace io {
 			u64			m_int64;
 			f32			m_float32;
 			f64			m_float64;
+			Guid*		m_guid;
 			String*		m_string;
 			KeyValue*	m_object;
 			ValueArray*	m_array;
@@ -249,6 +262,21 @@ namespace io {
 		}
 
 		return *this;
+	}
+
+	// ** Bson::operator <<
+	template<typename TValue>
+	Bson& Bson::operator << ( const Array<TValue>& value )
+	{
+		DC_BREAK_IF( m_type != object && m_type != array );
+
+		Bson items( array );
+
+		for( u32 i = 0, n = ( u32 )value.size(); i < n; i++ ) {
+			items << value[i];
+		}
+
+		return *this << items;
 	}
 
 } // namespace io

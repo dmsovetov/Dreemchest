@@ -92,6 +92,11 @@ Bson::Bson( CString value ) : m_type( string ), m_string( DC_NEW String( value )
 }
 
 // ** Bson::Bson
+Bson::Bson( const Guid& value ) : m_type( guid ), m_guid( DC_NEW Guid( value ) )
+{
+}
+
+// ** Bson::Bson
 Bson::Bson( const Bson& other ) : m_type( other.m_type )
 {
 	set( other );
@@ -289,6 +294,12 @@ f64 Bson::asDouble( void ) const
 	return m_float64;
 }
 
+// ** Bson::asGuid
+const Guid& Bson::asGuid( void ) const
+{
+	return *m_guid;
+}
+
 // ** Bson::asString
 const String& Bson::asString( void ) const
 {
@@ -316,6 +327,8 @@ void Bson::set( const Bson& value )
 					break;
 	case string:	m_string = DC_NEW String( *value.m_string );
 					break;
+	case guid:		m_guid	 = DC_NEW Guid( *value.m_guid );
+					break;
 	case array:		m_array  = DC_NEW ValueArray( *value.m_array );
 					break;
 	case object:	m_object = DC_NEW KeyValue( *value.m_object );
@@ -337,6 +350,9 @@ void Bson::clear( void )
 	case float32:
 	case float64:
 	case string:	break;
+	case guid:		delete m_guid;
+					m_guid = NULL;
+					break;
 	case array:		delete m_array;
 					m_array = NULL;
 					break;
@@ -378,14 +394,15 @@ void Bson::writeValue( StreamPtr stream ) const
 
 	// Now write the value.
 	switch( type ) {
-	case boolean:	stream->write( &m_boolean, 1 );				break;
-	case int8:		stream->write( &m_int8, 1 );				break;
-	case int16:		stream->write( &m_int16, 2 );				break;
-	case int32:		stream->write( &m_int32, 4 );				break;
-	case int64:		stream->write( &m_int64, 8 );				break;
-	case float32:	stream->write( &m_float32, 4 );				break;
-	case float64:	stream->write( &m_float64, 8 );				break;
-	case string:	stream->writeString( m_string->c_str() );	break;
+	case boolean:	stream->write( &m_boolean, 1 );					break;
+	case int8:		stream->write( &m_int8, 1 );					break;
+	case int16:		stream->write( &m_int16, 2 );					break;
+	case int32:		stream->write( &m_int32, 4 );					break;
+	case int64:		stream->write( &m_int64, 8 );					break;
+	case float32:	stream->write( &m_float32, 4 );					break;
+	case float64:	stream->write( &m_float64, 8 );					break;
+	case string:	stream->writeString( m_string->c_str() );		break;
+	case guid:		stream->write( m_guid->bytes(), Guid::Size );	break;
 
 	case object:	{
 						for( KeyValue::const_iterator i = m_object->begin(), end = m_object->end(); i != end; ++i ) {
@@ -448,6 +465,12 @@ void Bson::readValue( StreamPtr stream )
 	case int64:		stream->read( &m_int64, 8 );		break;
 	case float32:	stream->read( &m_float32, 4 );		break;
 	case float64:	stream->read( &m_float64, 8 );		break;
+	case guid:		{
+						u8 bytes[Guid::Size];
+						stream->read( bytes, Guid::Size );
+						m_guid = DC_NEW Guid( bytes );
+					}
+					break;
 
 	case object:	{
 						m_object = DC_NEW KeyValue;
