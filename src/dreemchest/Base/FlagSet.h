@@ -64,7 +64,7 @@ DC_BEGIN_DREEMCHEST
 		bool		is( T mask ) const;
 
 		//! Returns true if the specified bit mask is not set.
-        bool		not( T mask ) const;
+        bool		disabled( T mask ) const;
 
 	private:
 
@@ -116,9 +116,9 @@ DC_BEGIN_DREEMCHEST
 		return ( m_mask & mask ) ? true : false;
 	}
     
-	// ** FlagSet::not
+	// ** FlagSet::disabled
 	template<typename T>
-	inline bool FlagSet<T>::not( T mask ) const {
+	inline bool FlagSet<T>::disabled( T mask ) const {
 		return ( m_mask & mask ) ? false : true;
 	}
 

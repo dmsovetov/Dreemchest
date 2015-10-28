@@ -100,7 +100,7 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 		}
 		
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
-			if( m_features.not( BIT( j ) ) ) {
+			if( m_features.disabled( BIT( j ) ) ) {
 				continue;
 			}
 
