@@ -52,10 +52,10 @@ DC_BEGIN_DREEMCHEST
 		Array( void ) {}
 
 		//! Constructs an Array instance with a single item inside.
-		Array( const T& value ) { push_back( value ); }
+		Array( const T& value ) { this->push_back( value ); }
 
 		//! Appends a new value to an array.
-		Array& operator << ( const T& value ) { push_back( value ); }
+		Array& operator << ( const T& value ) { this->push_back( value ); }
 	};
 
 	template<typename T>
