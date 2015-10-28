@@ -531,6 +531,53 @@ namespace mvvm {
 		Callback					m_callback;	//!< Functional object to be called.
 	};
 
+	//! Generic class to declare commands.
+	template<typename TCallback>
+	class GenericCommand : public CommandValue {
+	public:
+
+		typedef GenericCommand<TCallback>	Type;		//!< Generic command type.
+		typedef TCallback					Callback;	//!< Command callback type.
+		typedef StrongPtr<Type>				Ptr;		//!< Alias the strong pointer type.
+
+
+											//! Constructs the GenericCommand instance.
+											GenericCommand( const TCallback& callback );
+
+		//! Invokes the functional object.
+		virtual void						invoke( void );
+
+		//! Creates the Command instance.
+		static Ptr							create( const TCallback& callback );
+
+	protected:
+
+		TCallback							m_callback;	//!< Functional object to be called.
+	};
+
+	// ** GenericCommand::GenericCommand
+	template<typename TCallback>
+	GenericCommand<TCallback>::GenericCommand( const TCallback& callback ) : m_callback( callback )
+	{
+
+	}
+
+	// ** GenericCommand::invoke
+	template<typename TCallback>
+	void GenericCommand<TCallback>::invoke( void )
+	{
+		m_callback();
+	}
+
+	// ** GenericCommand::create
+	template<typename TCallback>
+	typename GenericCommand<TCallback>::Ptr GenericCommand<TCallback>::create( const TCallback& callback )
+	{
+		return Ptr( DC_NEW Type( callback ) );
+	}
+
+	typedef GenericCommand< cClosure<bool()> > BoolCommand;
+
 } // namespace mvvm
 
 DC_END_DREEMCHEST

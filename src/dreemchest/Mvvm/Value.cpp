@@ -85,6 +85,12 @@ const Boolean& ObjectValue::isValid( void ) const
 	return *m_isValid;
 }
 
+// ** ObjectValue::save
+bool ObjectValue::save( void )
+{
+	return false;
+}
+
 // ** ObjectValue::keys
 Set<String> ObjectValue::keys( void ) const
 {
