@@ -67,6 +67,12 @@ void BinaryStorage::write( const void* ptr, u32 size )
 	m_stream->write( ptr, size );
 }
 
+// ** BinaryStorage::stream
+StreamPtr BinaryStorage::stream( void ) const
+{
+	return m_stream;
+}
+
 // --------------------------------------- KeyValueStorage --------------------------------------- //
 
 // ** KeyValueStorage::KeyValueStorage

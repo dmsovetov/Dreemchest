@@ -77,6 +77,9 @@ namespace io {
 		//! Reads the specified amount of bytes from a binary storage.
 		virtual void	read( void* ptr, u32 size ) const;
 
+		//! Returns the binary stream instance.
+		StreamPtr		stream( void ) const;
+
 		//! Returns the total number of bytes available in this storage.
 		s32				bytesAvailable( void ) const;
 
