@@ -104,7 +104,7 @@ namespace Scene {
 	public:
 								//! Constructs SinglePassRenderingSystem instance.
 								SinglePassRenderingSystem( Ecs::EcsWPtr ecs )
-									: RenderingSystem( ecs, "SinglePassRenderingSystem" ) { addPass<TPass>(); }
+									: RenderingSystem<TRenderer>( ecs, "SinglePassRenderingSystem" ) { this->template addPass<TPass>(); }
 	};
 
 } // namespace Scene
