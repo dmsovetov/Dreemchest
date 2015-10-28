@@ -125,6 +125,8 @@ bool Bindings::bind( const String& widget, const String& uri, ObjectWPtr root )
 	}
 
 	ValueWPtr value = root->resolve( uri );
+	DC_BREAK_IF( !value.valid() );
+
 	return bind( widget, value );
 }
 
