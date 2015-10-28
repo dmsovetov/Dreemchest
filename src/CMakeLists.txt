@@ -32,6 +32,11 @@ if (WIN32)
 	set(DC_PLATFORM "Windows")
 	set(DC_THREADS "Windows")
 	add_definitions(-DDC_PLATFORM_WINDOWS -DDC_THREADS_WINDOWS)
+elseif (ANDROID)
+	set(DC_PLATFORM "Android")
+	set(DC_THREADS "Posix")
+	set(DC_OPENGL_ENABLED OFF)
+	add_definitions(-DDC_PLATFORM_ANDROID -DDC_THREADS_POSIX)
 endif (WIN32)
 
 # Add child projects
