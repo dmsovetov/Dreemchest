@@ -152,14 +152,14 @@ DC_BEGIN_DREEMCHEST
 
 	// ** KdTree::root
 	template<typename TItem, u16 K, typename TBalancer>
-	typename const KdTree<TItem, K, TBalancer>::Node& KdTree<TItem, K, TBalancer>::root( void ) const
+	const typename KdTree<TItem, K, TBalancer>::Node& KdTree<TItem, K, TBalancer>::root( void ) const
 	{
 		return m_root;
 	}
 
 	// ** KdTree::nearest
 	template<typename TItem, u16 K, typename TBalancer>
-	typename const TItem& KdTree<TItem, K, TBalancer>::nearest( const f32 point[K] ) const
+	const TItem& KdTree<TItem, K, TBalancer>::nearest( const f32 point[K] ) const
 	{
 		const Node* node = &m_root;
 
@@ -218,7 +218,7 @@ DC_BEGIN_DREEMCHEST
 	template<typename TItem, u16 K, typename TBalancer>
 	typename KdTree<TItem, K, TBalancer>::Items KdTree<TItem, K, TBalancer>::neighbors( const f32 point[K], f32 radius ) const
 	{
-		typename Items items;
+		Items items;
 		neighbors( items, point, radius * radius, &m_root );
 		return items;
 	}
