@@ -45,7 +45,18 @@
 DC_BEGIN_DREEMCHEST
 
 	template<typename T>
-	class Array : public std::vector<T> {};
+	class Array : public std::vector<T> {
+	public:
+
+		//! Constructs an empty Array instance.
+		Array( void ) {}
+
+		//! Constructs an Array instance with a single item inside.
+		Array( const T& value ) { push_back( value ); }
+
+		//! Appends a new value to an array.
+		Array& operator << ( const T& value ) { push_back( value ); }
+	};
 
 	template<typename T>
 	class Stack : public std::stack<T> {};
@@ -76,6 +87,7 @@ DC_BEGIN_DREEMCHEST
     typedef std::string             String;
     typedef Array<String>			StringArray;
 	typedef List<String>			StringList;
+	typedef Array<class Guid>		GuidArray;
 
 	template<typename T>
 	class Hash : public std::map<strhash, T> {};
