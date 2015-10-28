@@ -64,7 +64,7 @@ namespace Ecs {
 		template<s32 ... Idxs> 
 		void dispatch( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
 		{ 
-			process( currentTime, dt, entity, *entity.get<std::tuple_element<Idxs, Types>::type>()... );
+			process( currentTime, dt, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
 		}
 	};
 
@@ -79,7 +79,7 @@ namespace Ecs {
 		EntitySet& entities = m_index->entities();
 
 		for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
-			dispatch( currentTime, dt, *i->get(), Indices::Indexes() );
+			dispatch( currentTime, dt, *i->get(), typename Indices::Indexes() );
 		}
 
 		end();	

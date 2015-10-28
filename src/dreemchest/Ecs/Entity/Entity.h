@@ -27,7 +27,7 @@
 #ifndef __DC_Ecs_Entity_H__
 #define __DC_Ecs_Entity_H__
 
-#include "../Ecs.h"
+#include "../Component/Component.h"
 
 DC_BEGIN_DREEMCHEST
 

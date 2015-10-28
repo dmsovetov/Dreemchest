@@ -85,7 +85,12 @@ namespace Ecs {
 	inline typename Internal<T>::Ptr ComponentBase::internal( void ) const
 	{
 		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
-		return i != m_internal.end() ? i->second : Internal<T>::Ptr();
+
+		if( i != m_internal.end() ) {
+			return i->second;
+		}
+
+		return typename Internal<T>::Ptr();
 	}
 
 	//! Generic component class.
