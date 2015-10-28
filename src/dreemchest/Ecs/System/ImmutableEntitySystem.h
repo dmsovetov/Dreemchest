@@ -77,7 +77,7 @@ namespace Ecs {
 		template<s32 Index = 0>
 		void extract( const Entity& entity )
 		{
-			typedef std::tuple_element<Index, Types>::type T;
+			typedef typename std::tuple_element<Index, Types>::type T;
 			std::get<Index>( m_cache ).push_back( entity.get<T>() );
 
 			extract<Index + 1>( entity );
