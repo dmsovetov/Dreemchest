@@ -83,12 +83,14 @@ namespace Ecs {
 			extract<Index + 1>( entity );
 		}
 
+	#ifndef ANDROID // Does not compile with NDK :(
 		//! Terminates the recursion
 		template<>
-		void extract<sizeof...(TComponents)>( const Entity& entity )
+		void ImmutableEntitySystem<TComponents...>::extract<sizeof...(TComponents)>( const Entity& entity )
 		{
-
+	
 		}
+	#endif	/*	!ANDROID	*/
 
 	protected:
 
