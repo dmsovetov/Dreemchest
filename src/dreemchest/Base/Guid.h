@@ -30,7 +30,7 @@
 DC_BEGIN_DREEMCHEST
 
 	//! 12-byte globaly unique identifier.
-	struct Guid {
+	class Guid {
 	public:
 
 					enum { Size = 12 };
@@ -43,6 +43,9 @@ DC_BEGIN_DREEMCHEST
 
 					//! Constructs Guid identifier from a string.
 					Guid( const String& str );
+
+					//! Guid to String convertion operator.
+					operator String( void ) const;
 
 		//! Converts Guid to a string representation.
 		String		toString( void ) const;
@@ -87,6 +90,12 @@ DC_BEGIN_DREEMCHEST
 	inline Guid::Guid( const String& str )
 	{
 		DC_NOT_IMPLEMENTED
+	}
+
+	// ** Guid::operator Strin
+	inline Guid::operator String( void ) const
+	{
+		return toString();
 	}
 
 	// ** Guid::toString
