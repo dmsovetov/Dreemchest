@@ -85,6 +85,18 @@ namespace mvvm {
 		return GroupedTypeIndex<TValue, Value>::idx();
 	}
 
+	//! Performs the property type cast.
+	template<typename T, typename S>
+	inline WeakPtr<T> castTo( WeakPtr<S> ptr ) {
+		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
+	}
+
+	//! Performs the property type cast.
+	template<typename T, typename S>
+	inline StrongPtr<T> castTo( StrongPtr<S> ptr ) {
+		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
+	}
+
 	// ---------------------------------------------------------- PrimitiveValue ---------------------------------------------------------- //
 
 	//! Generic class to declare primitive value types.

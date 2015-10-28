@@ -65,18 +65,6 @@ namespace mvvm {
 		static Vec2		from( const io::Bson& value );			
 	};
 
-	//! Performs the property type cast.
-	template<typename T, typename S>
-	inline WeakPtr<T> castTo( WeakPtr<S> ptr ) {
-		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
-	}
-
-	//! Performs the property type cast.
-	template<typename T, typename S>
-	inline StrongPtr<T> castTo( StrongPtr<S> ptr ) {
-		return ptr.valid() && ptr->is( Value::valueType<T>() ) ? static_cast<T*>( ptr.get() ) : NULL;
-	}
-
 	//! Primitive value type forward declaration.
 	template< typename TValue, typename TBsonConverter = BsonConverter<TValue> > class PrimitiveValue;
 
