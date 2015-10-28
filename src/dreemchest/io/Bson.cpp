@@ -491,6 +491,18 @@ void Bson::readValue( StreamPtr stream )
 	}
 }
 
+// ** Bson::read
+void Bson::read( const Storage* storage )
+{
+	read( storage->isBinaryStorage()->stream() );
+}
+
+// ** Bson::write
+void Bson::write( Storage* storage ) const
+{
+	write( storage->isBinaryStorage()->stream() );
+}
+
 } // namespace io
 
 DC_END_DREEMCHEST

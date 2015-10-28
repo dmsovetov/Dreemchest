@@ -27,14 +27,14 @@
 #ifndef __DC_Io_Bson_H__
 #define __DC_Io_Bson_H__
 
-#include "Io.h"
+#include "serialization/Serializable.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace io {
 
 	//! BSON is a binary key-value storage type.
-	class Bson {
+	class Bson : public Serializable {
 	public:
 
 		//! BSON value types.
@@ -199,6 +199,12 @@ namespace io {
 
 		//! Reads BSON from a binary stream.
 		s32					read( StreamPtr stream );
+
+		//! Reads data from a storage.
+		virtual void		read( const Storage* storage );
+
+		//! Writes data to a storage.
+		virtual void		write( Storage* storage ) const;
 
 	private:
 
