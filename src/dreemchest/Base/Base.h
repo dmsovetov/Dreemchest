@@ -56,6 +56,7 @@
 #include "math/FooMath.h"
 
 #include "Bitset.h"
+#include "AbstractFactory.h"
 
 //#include "containers/Heap.h"
 #include "spatial/KdTree.h"
