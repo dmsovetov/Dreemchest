@@ -469,7 +469,7 @@ namespace mvvm {
 	template<typename TValue>
 	io::Bson ArrayValue<TValue>::bson( void ) const
 	{
-		io::Bson result( io::Bson::array );
+		io::Bson result = io::Bson::array();
 
 		for( s32 i = 0, n = size(); i < n; i++ ) {
 			result << m_values[i]->bson();

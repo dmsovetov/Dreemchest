@@ -185,7 +185,7 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 // ** ObjectValue::bson
 io::Bson ObjectValue::bson( void ) const
 {
-	io::Bson result( io::Bson::object );
+	io::Bson result = io::Bson::object();
 
 	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
 		const String& key = i->first;
@@ -243,7 +243,7 @@ ValueTypeIdx CommandValue::type( void ) const
 //! Returns the BSON object that represents this value.
 io::Bson CommandValue::bson( void ) const
 {
-	return io::Bson::null;
+	return io::Bson::kNull;
 }
 
 //! Sets the BSON object that represents this value.
