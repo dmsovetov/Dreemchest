@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 namespace io {
 
 // ** Bson::Bson
-Bson::Bson( void ) : m_type( null )
+Bson::Bson( void ) : m_type( kNull )
 {
 }
 
@@ -41,65 +41,65 @@ Bson::Bson( void ) : m_type( null )
 Bson::Bson( Type type ) : m_type( type )
 {
 	switch( type ) {
-	case string:	m_string = DC_NEW String;
+	case kString:	m_string = DC_NEW String;
 					break;
-	case object:	m_object = DC_NEW KeyValue;
+	case kObject:	m_object = DC_NEW KeyValue;
 					break;
-	case array:		m_array  = DC_NEW ValueArray;
+	case kArray:	m_array  = DC_NEW ValueArray;
 					break;
 	default:		break;
 	}
 }
 
 // ** Bson::Bson
-Bson::Bson( bool value ) : m_type( boolean ), m_boolean( value )
+Bson::Bson( bool value ) : m_type( kBoolean ), m_boolean( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( s16 value ) : m_type( int16 ), m_int32( value )
+Bson::Bson( s16 value ) : m_type( kInt16 ), m_int32( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( u16 value ) : m_type( int16 ), m_int32( value )
+Bson::Bson( u16 value ) : m_type( kInt16 ), m_int32( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( s32 value ) : m_type( int32 ), m_int32( value )
+Bson::Bson( s32 value ) : m_type( kInt32 ), m_int32( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( f32 value ) : m_type( float32 ), m_float32( value )
+Bson::Bson( f32 value ) : m_type( kFloat32 ), m_float32( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( f64 value ) : m_type( float64 ), m_float64( value )
+Bson::Bson( f64 value ) : m_type( kFloat64 ), m_float64( value )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( const String& value ) : m_type( string ), m_string( DC_NEW String( value ) )
+Bson::Bson( const String& value ) : m_type( kString ), m_string( DC_NEW String( value ) )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( CString value ) : m_type( string ), m_string( DC_NEW String( value ) )
+Bson::Bson( CString value ) : m_type( kString ), m_string( DC_NEW String( value ) )
 {
 }
 
 // ** Bson::Bson
-Bson::Bson( const Guid& value ) : m_type( guid ), m_guid( DC_NEW Guid( value ) )
+Bson::Bson( const Guid& value ) : m_type( kGuid ), m_guid( DC_NEW Guid( value ) )
 {
 }
 
 // ** Bson::Bson
 Bson::Bson( const Bson& other ) : m_type( other.m_type )
 {
-	set( other );
+	setBson( other );
 }
 
 // ** Bson::~Bson
@@ -108,10 +108,22 @@ Bson::~Bson( void )
 	clear();
 }
 
+// ** Bson::object
+Bson Bson::object( void )
+{
+	return Bson( kObject );
+}
+
+// ** Bson::array
+Bson Bson::array( void )
+{
+	return Bson( kArray );
+}
+
 // ** Bson::operator =
 const Bson& Bson::operator = ( const Bson& other )
 {
-	set( other );
+	setBson( other );
 	return *this;
 }
 
@@ -178,28 +190,28 @@ Bson::operator String( void ) const
 // ** Bson::operator []
 const Bson& Bson::operator []( const String& key ) const
 {
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
 // ** Bson::operator []
 const Bson& Bson::operator []( CString key ) const
 {
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
 // ** Bson::operator []
 Bson& Bson::operator []( const String& key )
 {
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
 // ** Bson::operator []
 Bson& Bson::operator []( CString key )
 {
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
@@ -224,7 +236,7 @@ Bson& Bson::operator << ( const String& value )
 // ** Bson::isNull
 bool Bson::isNull( void ) const
 {
-	return m_type == null;
+	return m_type == kNull;
 }
 
 // ** Bson::type
@@ -236,21 +248,21 @@ Bson::Type Bson::type( void ) const
 // ** Bson::properties
 const Bson::KeyValue& Bson::properties( void ) const
 {
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 	return *m_object;
 }
 
 // ** Bson::items
 const Bson::ValueArray& Bson::items( void ) const
 {
-	DC_BREAK_IF( m_type != array );
+	DC_BREAK_IF( m_type != kArray );
 	return *m_array;
 }
 
 // ** Bson::get
 const Bson& Bson::get( const String& key, const Bson& defaultValue ) const
 {
-	if( m_type != object ) {
+	if( m_type != kObject ) {
 		return defaultValue;
 	}
 
@@ -306,32 +318,32 @@ const String& Bson::asString( void ) const
 	return *m_string;
 }
 
-// ** Bson::set
-void Bson::set( const Bson& value )
+// ** Bson::setBson
+void Bson::setBson( const Bson& value )
 {
 	m_type = value.m_type;
 
 	switch( m_type ) {
-	case null:		break;
-	case boolean:	m_boolean = value.m_boolean;
+	case kNull:		break;
+	case kBoolean:	m_boolean = value.m_boolean;
 					break;
-	case int8:		m_int8 = value.m_int8;
+	case kInt8:		m_int8 = value.m_int8;
 					break;
-	case int16:		m_int16 = value.m_int16;
+	case kInt16:	m_int16 = value.m_int16;
 					break;
-	case int32:		m_int32 = value.m_int32;
+	case kInt32:	m_int32 = value.m_int32;
 					break;
-	case float32:	m_float32 = value.m_float32;
+	case kFloat32:	m_float32 = value.m_float32;
 					break;
-	case float64:	m_float64 = value.m_float64;
+	case kFloat64:	m_float64 = value.m_float64;
 					break;
-	case string:	m_string = DC_NEW String( *value.m_string );
+	case kString:	m_string = DC_NEW String( *value.m_string );
 					break;
-	case guid:		m_guid	 = DC_NEW Guid( *value.m_guid );
+	case kGuid:		m_guid	 = DC_NEW Guid( *value.m_guid );
 					break;
-	case array:		m_array  = DC_NEW ValueArray( *value.m_array );
+	case kArray:	m_array  = DC_NEW ValueArray( *value.m_array );
 					break;
-	case object:	m_object = DC_NEW KeyValue( *value.m_object );
+	case kObject:	m_object = DC_NEW KeyValue( *value.m_object );
 					break;
 	default:		DC_BREAK;
 	}
@@ -341,34 +353,34 @@ void Bson::set( const Bson& value )
 void Bson::clear( void )
 {
 	switch( m_type ) {
-	case null:
-	case boolean:
-	case int8:
-	case int16:
-	case int32:
-	case int64:
-	case float32:
-	case float64:
-	case string:	break;
-	case guid:		delete m_guid;
+	case kNull:
+	case kBoolean:
+	case kInt8:
+	case kInt16:
+	case kInt32:
+	case kInt64:
+	case kFloat32:
+	case kFloat64:
+	case kString:	break;
+	case kGuid:		delete m_guid;
 					m_guid = NULL;
 					break;
-	case array:		delete m_array;
+	case kArray:		delete m_array;
 					m_array = NULL;
 					break;
-	case object:	delete m_object;
+	case kObject:	delete m_object;
 					break;
 	default:		DC_BREAK;
 	}
 
-	m_type = null;
+	m_type = kNull;
 }
 
 // ** Bson::write
 s32 Bson::write( StreamPtr stream ) const
 {
 	DC_BREAK_IF( !stream.valid() );
-	DC_BREAK_IF( m_type != object );
+	DC_BREAK_IF( m_type != kObject );
 
 	// Bson layout type placeholder.
 	u32 type  = 0;
@@ -394,17 +406,18 @@ void Bson::writeValue( StreamPtr stream ) const
 
 	// Now write the value.
 	switch( type ) {
-	case boolean:	stream->write( &m_boolean, 1 );					break;
-	case int8:		stream->write( &m_int8, 1 );					break;
-	case int16:		stream->write( &m_int16, 2 );					break;
-	case int32:		stream->write( &m_int32, 4 );					break;
-	case int64:		stream->write( &m_int64, 8 );					break;
-	case float32:	stream->write( &m_float32, 4 );					break;
-	case float64:	stream->write( &m_float64, 8 );					break;
-	case string:	stream->writeString( m_string->c_str() );		break;
-	case guid:		stream->write( m_guid->bytes(), Guid::Size );	break;
+	case kNull:		break;
+	case kBoolean:	stream->write( &m_boolean, 1 );					break;
+	case kInt8:		stream->write( &m_int8, 1 );					break;
+	case kInt16:	stream->write( &m_int16, 2 );					break;
+	case kInt32:	stream->write( &m_int32, 4 );					break;
+	case kInt64:	stream->write( &m_int64, 8 );					break;
+	case kFloat32:	stream->write( &m_float32, 4 );					break;
+	case kFloat64:	stream->write( &m_float64, 8 );					break;
+	case kString:	stream->writeString( m_string->c_str() );		break;
+	case kGuid:		stream->write( m_guid->bytes(), Guid::Size );	break;
 
-	case object:	{
+	case kObject:	{
 						for( KeyValue::const_iterator i = m_object->begin(), end = m_object->end(); i != end; ++i ) {
 							stream->writeString( i->first.c_str() );
 							i->second.writeValue( stream );
@@ -413,7 +426,7 @@ void Bson::writeValue( StreamPtr stream ) const
 					}
 					break;
 
-	case array:		{
+	case kArray:	{
 						DC_BREAK_IF( m_array->size() >= USHRT_MAX );
 
 						u16 count = m_array->size();
@@ -459,20 +472,21 @@ void Bson::readValue( StreamPtr stream )
 	stream->read( &m_type, 1 );
 
 	switch( m_type ) {
-	case int8:		stream->read( &m_int8, 1 );			break;
-	case int16:		stream->read( &m_int16, 2 );		break;
-	case int32:		stream->read( &m_int32, 4 );		break;
-	case int64:		stream->read( &m_int64, 8 );		break;
-	case float32:	stream->read( &m_float32, 4 );		break;
-	case float64:	stream->read( &m_float64, 8 );		break;
-	case guid:		{
+	case kNull:		break;
+	case kInt8:		stream->read( &m_int8, 1 );			break;
+	case kInt16:	stream->read( &m_int16, 2 );		break;
+	case kInt32:	stream->read( &m_int32, 4 );		break;
+	case kInt64:	stream->read( &m_int64, 8 );		break;
+	case kFloat32:	stream->read( &m_float32, 4 );		break;
+	case kFloat64:	stream->read( &m_float64, 8 );		break;
+	case kGuid:		{
 						u8 bytes[Guid::Size];
 						stream->read( bytes, Guid::Size );
 						m_guid = DC_NEW Guid( bytes );
 					}
 					break;
 
-	case object:	{
+	case kObject:	{
 						m_object = DC_NEW KeyValue;
 
 						while( stream->hasDataLeft() ) {
@@ -491,7 +505,7 @@ void Bson::readValue( StreamPtr stream )
 					}
 					break;
 
-	case array:		{
+	case kArray:	{
 						m_array = DC_NEW ValueArray;
 
 						u16 count;
@@ -504,7 +518,7 @@ void Bson::readValue( StreamPtr stream )
 					}
 					break;
 
-	case string:	{
+	case kString:	{
 						m_string = DC_NEW String;
 						stream->readString( *m_string );
 					}

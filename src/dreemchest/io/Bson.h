@@ -39,18 +39,18 @@ namespace io {
 
 		//! BSON value types.
 		enum Type {
-			  null
-			, boolean
-			, int8
-			, int16
-			, int32
-			, int64
-			, float32
-			, float64
-			, string
-			, guid
-			, array
-			, object
+			  kNull
+			, kBoolean
+			, kInt8
+			, kInt16
+			, kInt32
+			, kInt64
+			, kFloat32
+			, kFloat64
+			, kString
+			, kGuid
+			, kArray
+			, kObject
 		};
 
 		typedef Map<String, Bson>	KeyValue;	//!< Key-value storage used to hold object properties.
@@ -98,6 +98,10 @@ namespace io {
 							//! Constructs Bson instance from value.
 							Bson( const Guid& value );
 
+							//! Constructs Bson array instance from value.
+							template<typename TValue>
+							Bson( const Array<TValue>& value );
+
 							//! Copies the Bson instance.
 							Bson( const Bson& other );
 
@@ -140,7 +144,7 @@ namespace io {
 		void				clear( void );
 
 		//! Copies the Bson instance.
-		void				set( const Bson& value );
+		void				setBson( const Bson& value );
 
 		//! Returns the object property with specified key.
 		const Bson&			operator []( CString key ) const;
@@ -204,7 +208,7 @@ namespace io {
 		const ValueArray&	items( void ) const;
 
 		//! Returns the Bson object property with specified name.
-		const Bson&			get( const String& key, const Bson& defaultValue = null ) const;
+		const Bson&			get( const String& key, const Bson& defaultValue = kNull ) const;
 
 		//! Writes BSON to a binary stream.
 		s32					write( StreamPtr stream ) const;
@@ -217,6 +221,12 @@ namespace io {
 
 		//! Writes data to a storage.
 		virtual void		write( Storage* storage ) const;
+
+		//! Constructs and returns the Bson object.
+		static Bson			object( void );
+
+		//! Constructs and returns the Bson array.
+		static Bson			array( void );
 
 	private:
 
@@ -246,18 +256,31 @@ namespace io {
 		String	m_key;		//!< Active bson key.
 	};
 
+	// ** Bson::Bson
+	template<typename TValue>
+	Bson::Bson( const Array<TValue>& value )
+	{
+		Bson items = array();
+
+		for( u32 i = 0, n = ( u32 )value.size(); i < n; i++ ) {
+			items << value[i];
+		}
+
+		setBson( items );
+	}
+
 	// ** Bson::operator <<
 	template<typename TValue>
 	Bson& Bson::operator << ( const TValue& value )
 	{
-		DC_BREAK_IF( m_type != object && m_type != array );
+		DC_BREAK_IF( m_type != kObject && m_type != kArray );
 
-		if( m_type == object ) {
+		if( m_type == kObject ) {
 			DC_BREAK_IF( m_key.empty() );
 			(*this)[m_key] = value;
 			m_key = "";		
 		}
-		else if( m_type == array ) {
+		else if( m_type == kArray ) {
 			m_array->push_back( value );
 		}
 
@@ -268,9 +291,9 @@ namespace io {
 	template<typename TValue>
 	Bson& Bson::operator << ( const Array<TValue>& value )
 	{
-		DC_BREAK_IF( m_type != object && m_type != array );
+		DC_BREAK_IF( m_type != kObject && m_type != kArray );
 
-		Bson items( array );
+		Bson items = array();
 
 		for( u32 i = 0, n = ( u32 )value.size(); i < n; i++ ) {
 			items << value[i];
