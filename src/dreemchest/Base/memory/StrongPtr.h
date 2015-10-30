@@ -121,27 +121,27 @@ DC_BEGIN_DREEMCHEST
     template<typename T>
     T* StrongPtr<T>::operator -> ( void ) {
         DC_BREAK_IF( m_ptr == NULL );
-        return ( T* )m_ptr;
+        return static_cast<T*>( m_ptr );
     }
 
     template<typename T>
     const T* StrongPtr<T>::operator -> ( void ) const {
         DC_BREAK_IF( m_ptr == NULL );
-        return ( T* )m_ptr;
+        return static_cast<const T*>( m_ptr );
     }
 
     // ** StrongPtr::operator *
     template<typename T>
     T& StrongPtr<T>::operator * ( void ) {
         DC_BREAK_IF( m_ptr == NULL );
-        return *m_ptr;
+        return *static_cast<T*>( m_ptr );
     }
 
     // ** StrongPtr::operator *
     template<typename T>
     const T& StrongPtr<T>::operator * ( void ) const {
         DC_BREAK_IF( m_ptr == NULL );
-        return *m_ptr;
+        return *static_cast<const T*>( m_ptr );
     }
 
     // ** StrongPtr::operator =
