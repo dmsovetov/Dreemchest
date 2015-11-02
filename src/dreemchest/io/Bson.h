@@ -146,6 +146,10 @@ namespace io {
 		//! Copies the Bson instance.
 		void				setBson( const Bson& value );
 
+		//! Returns the array item with specified index.
+		const Bson&			operator []( s32 index ) const;
+		Bson&				operator []( s32 index );
+
 		//! Returns the object property with specified key.
 		const Bson&			operator []( CString key ) const;
 		Bson&				operator []( CString key );

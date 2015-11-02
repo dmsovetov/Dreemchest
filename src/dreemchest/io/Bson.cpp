@@ -188,6 +188,20 @@ Bson::operator String( void ) const
 }
 
 // ** Bson::operator []
+const Bson& Bson::operator []( s32 index ) const
+{
+	DC_BREAK_IF( m_type != kArray );
+	return (*m_array)[index];
+}
+
+// ** Bson::operator []
+Bson& Bson::operator []( s32 index )
+{
+	DC_BREAK_IF( m_type != kArray );
+	return (*m_array)[index];
+}
+
+// ** Bson::operator []
 const Bson& Bson::operator []( const String& key ) const
 {
 	DC_BREAK_IF( m_type != kObject );
