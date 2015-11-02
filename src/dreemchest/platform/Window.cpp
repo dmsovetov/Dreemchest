@@ -51,13 +51,15 @@ Window::~Window( void )
 // ** Window::create
 Window* Window::create( u32 width, u32 height )
 {
+#ifdef DC_PLATFORM_ANDROID
+	DC_NOT_IMPLEMENTED
+#else
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
     }
+#endif
 
     return NULL;
-
-    return DC_NEW Window( NULL );
 }
 
 // ** Window::release

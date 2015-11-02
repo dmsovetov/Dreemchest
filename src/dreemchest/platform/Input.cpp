@@ -64,9 +64,11 @@ Input* Input::sharedInstance( void )
 // ** Input::create
 Input* Input::create( void )
 {
+#if defined( DC_PLATFORM_WIN32 ) || defined( DC_PLATFORM_OSX )
     if( IInput* impl = createInput() ) {
         return DC_NEW Input( impl );
     }
+#endif
 
     return NULL;
 }
