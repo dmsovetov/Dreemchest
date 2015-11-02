@@ -52,7 +52,7 @@ DC_BEGIN_DREEMCHEST
 		//! Constructs a new object instance.
 		Ptr construct( const TTypeId& id ) const
 		{
-			Factories::const_iterator i = m_factories.find( id );
+			typename Factories::const_iterator i = m_factories.find( id );
 
 			if( i == m_factories.end() ) {
 				return Ptr();
