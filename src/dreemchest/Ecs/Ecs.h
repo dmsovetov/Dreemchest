@@ -30,6 +30,7 @@
 #include "../Dreemchest.h"
 
 #include "../io/serialization/Serializable.h"
+#include "../io/Bson.h"
 #include "../event/EventEmitter.h"
 
 DC_BEGIN_DREEMCHEST
@@ -46,7 +47,7 @@ namespace Ecs {
 	dcDeclarePtrs( Ecs )
 	dcDeclarePtrs( EntityIdGenerator )
 	dcDeclarePtrs( Entity )
-	dcDeclarePtrs( ComponentBase )
+	dcDeclareNamedPtrs( ComponentBase, Component )
 	dcDeclarePtrs( Index )
 	dcDeclarePtrs( System )
 	dcDeclarePtrs( SystemGroup )

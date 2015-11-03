@@ -86,7 +86,7 @@ namespace Ecs {
 	private:
 
 		//! Container type to store components.
-		typedef Map<TypeIdx, ComponentBasePtr> Components;
+		typedef Map<TypeIdx, ComponentPtr> Components;
 
 		EcsWPtr					m_ecs;			//!< Parent ECS instance.
 		EntityId				m_id;			//!< Entity identifier.
