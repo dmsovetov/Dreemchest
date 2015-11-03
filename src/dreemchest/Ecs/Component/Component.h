@@ -65,6 +65,14 @@ namespace Ecs {
 		template<typename T>
 		typename Internal<T>::Ptr	internal( void ) const;
 
+	#ifndef DC_BSON_DISABLED
+		//! Returns the component BSON.
+		virtual io::Bson			bson( void ) const;
+
+		//! Sets the component BSON.
+		virtual void				setBson( const io::Bson& value );
+	#endif	/*	!DC_BSON_DISABLED	*/
+
 	private:
 
 		//! Container type to store internal system state inside a component.
@@ -93,11 +101,34 @@ namespace Ecs {
 		return typename Internal<T>::Ptr();
 	}
 
+#if !DC_BSON_DISABLED
+	// ** ComponentBase::bson
+	inline io::Bson ComponentBase::bson( void ) const
+	{
+		log::warn( "Component::bson : is not implemented for '%s'\n", typeName() );
+		return io::Bson::kNull;
+	}
+
+	// ** ComponentBase::setBson
+	inline void ComponentBase::setBson( const io::Bson& value )
+	{
+		log::warn( "Component::setBson : is not implemented for '%s'\n", typeName() );
+	}
+#endif	/*	!DC_BSON_DISABLED	*/
+
 	//! Generic component class.
 	template<typename T>
 	class Component : public ComponentBase {
 		IoOverrideSerializableSuper( T, ComponentBase )
-		static const Bitset& bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<T>::idx() ); return result; }
+
+
+		//! Weak pointer type.
+		typedef WeakPtr<T>		WPtr;
+
+		//! Strong pointer type.
+		typedef StrongPtr<T>	Ptr;
+
+		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<T>::idx() ); return result; }
 	};
 
 } // namespace Ecs
