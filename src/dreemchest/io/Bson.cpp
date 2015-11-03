@@ -394,7 +394,6 @@ void Bson::clear( void )
 s32 Bson::write( StreamPtr stream ) const
 {
 	DC_BREAK_IF( !stream.valid() );
-	DC_BREAK_IF( m_type != kObject );
 
 	// Bson layout type placeholder.
 	u32 type  = 0;
