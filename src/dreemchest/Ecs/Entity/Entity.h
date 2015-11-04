@@ -44,11 +44,21 @@ namespace Ecs {
 	friend class Ecs;
 	public:
 
+		//! Container type to store components.
+		typedef Map<TypeIdx, ComponentPtr> Components;
+
 		//! Returns an entity identifier.
 		const EntityId&			id( void ) const;
 
 		//! Returns a component mask.
 		const Bitset&			mask( void ) const;
+
+		//! Returns entity components.
+		const Components&		components( void ) const;
+		Components&				components( void );
+
+		//! Returns parent entity component system.
+		EcsWPtr					ecs( void ) const;
 
 		//! Returns true if entity has a component of given type.
 		template<typename TComponent>
@@ -84,9 +94,6 @@ namespace Ecs {
 		void					markAsRemoved( void );
 
 	private:
-
-		//! Container type to store components.
-		typedef Map<TypeIdx, ComponentPtr> Components;
 
 		EcsWPtr					m_ecs;			//!< Parent ECS instance.
 		EntityId				m_id;			//!< Entity identifier.
