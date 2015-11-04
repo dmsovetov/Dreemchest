@@ -29,10 +29,6 @@
 
 #include "../Ecs.h"
 
-//#define OverrideComponent( Type, Super )        \
-//    IoOverrideSerializableSuper( Type, Super )  \
-//    static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<Type>::idx() ); return result; }
-
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
@@ -54,8 +50,6 @@ namespace Ecs {
 	*/
 	class ComponentBase : public io::Serializable {
 	public:
-
-		//							OverrideComponent( ComponentBase, io::Serializable )
 
 		//! Sets the internal data.
 		template<typename T>
