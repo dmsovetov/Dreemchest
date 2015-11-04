@@ -66,6 +66,18 @@ const Bitset& Entity::mask( void ) const
 	return m_mask;
 }
 
+// ** Entity::components
+const Entity::Components& Entity::components( void ) const
+{
+	return m_components;
+}
+
+// ** Entity::components
+Entity::Components& Entity::components( void )
+{
+	return m_components;
+}
+
 // ** Entity::queueRemoval
 void Entity::queueRemoval( void )
 {
