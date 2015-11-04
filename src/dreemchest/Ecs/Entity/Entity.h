@@ -144,7 +144,11 @@ namespace Ecs {
 
 		m_components[idx] = component;
 		m_mask.set( idx );
-		m_ecs->notifyEntityChanged( m_id );
+		
+		if( m_ecs.valid() ) {
+			m_ecs->notifyEntityChanged( m_id );
+		}
+		
 		return component;	
 	}
 
