@@ -113,6 +113,8 @@ namespace Ecs {
 	//! Generic component class.
 	template<typename T>
 	class Component : public ComponentBase {
+	public:
+
 		IoOverrideSerializableSuper( T, ComponentBase )
 
 
