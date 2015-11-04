@@ -31,9 +31,27 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 // ** Entity::Entity
-Entity::Entity( EcsWPtr ecs, const EntityId& id ) : m_ecs( ecs ), m_id( id ), m_isRemoved( false )
+Entity::Entity( void ) : m_isRemoved( false )
 {
 
+}
+
+// ** Entity::setEcs
+void Entity::setEcs( EcsWPtr value )
+{
+	m_ecs = value;
+}
+
+// ** Entity::ecs
+EcsWPtr Entity::ecs( void ) const
+{
+	return m_ecs;
+}
+
+// ** Entity::setId
+void Entity::setId( const EntityId& value )
+{
+	m_id = value;
 }
 
 // ** Entity::id

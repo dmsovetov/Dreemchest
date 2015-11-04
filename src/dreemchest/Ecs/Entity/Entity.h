@@ -85,13 +85,19 @@ namespace Ecs {
 		//! Queues removal of this entity from the world and all systems.
 		void					queueRemoval( void );
 
-	private:
+	protected:
 
 								//! Constructs Entity instance.
-								Entity( EcsWPtr ecs, const EntityId& id );
+								Entity( void );
 
 		//! Marks this entity as queued for removal.
 		void					markAsRemoved( void );
+
+		//! Sets the entity id.
+		void					setId( const EntityId& value );
+
+		//! Sets the parent entity component system reference.
+		void					setEcs( EcsWPtr value );
 
 	private:
 
