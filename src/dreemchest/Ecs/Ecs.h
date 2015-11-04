@@ -48,6 +48,7 @@ namespace Ecs {
 	dcDeclarePtrs( EntityIdGenerator )
 	dcDeclarePtrs( Entity )
 	dcDeclareNamedPtrs( ComponentBase, Component )
+	dcDeclareNamedPtrs( ArchetypeBase, Archetype )
 	dcDeclarePtrs( Index )
 	dcDeclarePtrs( System )
 	dcDeclarePtrs( SystemGroup )
@@ -81,6 +82,28 @@ namespace Ecs {
 	class Ecs : public RefCounted {
 	friend class Entity;
 	public:
+
+		//! Creates the archetype instance by name.
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId() );
+
+		//! Creates the component instance by name.
+		ComponentPtr	createComponentByName( const String& name ) const;
+
+		//! Creates a new archetype instance.
+		template<typename TArchetype>
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId() );
+		
+		//! Creates a new component instance.
+		template<typename TComponent>
+		StrongPtr<TComponent>	createComponent( void ) const;
+
+		//! Registers the archetype type.
+		template<typename TArchetype>
+		bool			registerArchetype( void );
+
+		//! Registers the component type.
+		template<typename TComponent>
+		bool			registerComponent( void );
 
 		//! Creates a new entity.
 		/*!
@@ -131,6 +154,9 @@ namespace Ecs {
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );
 
+		//! Registers the new entity.
+		void			registerEntity( EntityPtr entity, const EntityId& id );
+
 	private:
 
 		//! Container type to store all active entities.
@@ -142,6 +168,12 @@ namespace Ecs {
 		//! Container type to store entity indices.
 		typedef Map<Aspect, IndexPtr>		Indices;
 
+		//! Data factory type.
+		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
+
+		//! Archetype factory type.
+		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
+
 		EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
 		Entities				m_entities;	//!< Active entities reside here.
 		SystemGroups			m_systems;	//!< All systems reside in system groups.
@@ -149,7 +181,38 @@ namespace Ecs {
 
 		EntitySet				m_changed;	//!< Entities that was changed.
 		EntitySet				m_removed;	//!< Entities that will be removed.
+
+		ComponentFactory		m_componentFactory;		//!< Component object factory.
+		ArchetypeFactory		m_archetypeFactory;		//!< Archetype object factory.
 	};
+
+	// ** Ecs::registerArchetype
+	template<typename TArchetype>
+	bool Ecs::registerArchetype( void )
+	{
+		return m_archetypeFactory.declare<TArchetype>();
+	}
+
+	// ** Ecs::registerComponent
+	template<typename TComponent>
+	bool Ecs::registerComponent( void )
+	{
+		return m_componentFactory.declare<TComponent>();
+	}
+
+	// ** Ecs::createArchetype
+	template<typename TArchetype>
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id )
+	{
+		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id ).get() );
+	}
+		
+	// ** Ecs::createComponent
+	template<typename TComponent>
+	StrongPtr<TComponent> Ecs::createComponent( void ) const
+	{
+		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name() ).get() );
+	}
 
 } // namespace Ecs
 
@@ -160,6 +223,7 @@ DC_END_DREEMCHEST
 	#include "Entity/Entity.h"
 	#include "Entity/Aspect.h"
 	#include "Entity/Index.h"
+	#include "Entity/Archetype.h"
 	#include "System/SystemGroup.h"
 	#include "System/GenericEntitySystem.h"
 	#include "System/ImmutableEntitySystem.h"

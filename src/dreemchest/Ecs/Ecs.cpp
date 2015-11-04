@@ -29,6 +29,7 @@
 
 #include "Entity/Entity.h"
 #include "Entity/Index.h"
+#include "Entity/Archetype.h"
 #include "System/SystemGroup.h"
 
 DC_BEGIN_DREEMCHEST
@@ -49,13 +50,58 @@ EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 	return DC_NEW Ecs( entityIdGenerator );
 }
 
+// ** Ecs::registerEntity
+void Ecs::registerEntity( EntityPtr entity, const EntityId& id )
+{
+	DC_BREAK_IF( isUsedId( id ) );
+
+	// Setup entity
+	entity->setEcs( this );
+	entity->setId( id );
+
+	// Register the entity
+	m_entities[id] = entity;
+}
+
+// ** Ecs::createArchetypeByName
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id )
+{
+	// Create archetype instance by name
+	ArchetypePtr instance = m_archetypeFactory.construct( name );
+
+	// Ensure we found the archetype type
+	if( !instance.valid() ) {
+		log::error( "Ecs::createArchetypeByName : unknown archetype '%s'\n", name.c_str() );
+		return ArchetypePtr();
+	}
+
+	// Initialize the entity id
+	EntityId eid = eid.isNull() ? m_entityId->generate() : id;
+
+	// Register the entity
+	registerEntity( instance, id );
+
+	// Construct the archetype
+	instance->construct();
+
+	return instance;
+}
+
+// ** Ecs::createComponentByName
+ComponentPtr Ecs::createComponentByName( const String& name ) const
+{
+	return m_componentFactory.construct( name );
+}
+
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )
 {
 	DC_BREAK_IF( isUsedId( id ) );
-	Entity* entity = DC_NEW Entity( this, id );
-	m_entities[id] = entity;
-	return EntityPtr( entity );
+
+	EntityPtr entity( DC_NEW Entity );
+	registerEntity( entity, id );
+
+	return entity;
 }
 
 // ** Ecs::createEntity
