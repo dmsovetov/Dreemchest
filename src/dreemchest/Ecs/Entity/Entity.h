@@ -40,7 +40,7 @@ namespace Ecs {
 	game data. Entity's behaviour in a game world is defined by a set of
 	data components.
 	*/
-	class Entity : public RefCounted {
+	class Entity : public io::Serializable {
 	friend class Ecs;
 	public:
 
@@ -72,8 +72,8 @@ namespace Ecs {
 		template<typename TComponent>
 		TComponent*				attachComponent( TComponent* component );
 
-		//! Constructs a new component and attaches it to this entity.
 	#ifndef DC_CPP11_DISABLED
+		//! Constructs a new component and attaches it to this entity.
 		template<typename TComponent, typename ... Args>
 		TComponent*				attach( Args ... args );
 	#endif	/*	!DC_CPP11_DISABLED	*/
