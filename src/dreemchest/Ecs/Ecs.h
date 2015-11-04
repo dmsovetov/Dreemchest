@@ -42,7 +42,11 @@ namespace Ecs {
 	class Aspect;
 
 	//! Entity id type.
+#if DC_ECS_INTEGER_IDS
 	typedef u32 EntityId;
+#else
+	typedef Guid EntityId;
+#endif
 
 	dcDeclarePtrs( Ecs )
 	dcDeclarePtrs( EntityIdGenerator )

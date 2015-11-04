@@ -226,14 +226,21 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 }
 
 // ** EntityIdGenerator::EntityIdGenerator
-EntityIdGenerator::EntityIdGenerator( void ) : m_nextId( 1 )
+EntityIdGenerator::EntityIdGenerator( void )
 {
+#if DC_ECS_INTEGER_IDS
+	m_nextId = 1;
+#endif
 }
 
 // ** EntityIdGenerator::generate
 EntityId EntityIdGenerator::generate( void )
 {
+#if DC_ECS_INTEGER_IDS
 	return m_nextId++;
+#else
+	return Guid::generate();
+#endif
 }
 
 } // namespace Ecs
