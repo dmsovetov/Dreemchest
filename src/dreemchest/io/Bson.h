@@ -232,6 +232,12 @@ namespace io {
 		//! Constructs and returns the Bson array.
 		static Bson			array( void );
 
+		//! Static empty BSON array.
+		static const Bson	kEmptyArray;
+
+		//! Static empty BSON object.
+		static const Bson	kEmptyObject;
+
 	private:
 
 		//! Writes the BSON value to a binary stream.

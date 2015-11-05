@@ -32,6 +32,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
+// ** Bson::kEmptyArray
+const Bson Bson::kEmptyArray( Bson::kArray );
+
+// ** Bson::kEmptyObject
+const Bson Bson::kEmptyObject( Bson::kObject );
+
 // ** Bson::Bson
 Bson::Bson( void ) : m_type( kNull )
 {
