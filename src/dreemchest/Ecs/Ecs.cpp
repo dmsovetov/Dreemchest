@@ -76,10 +76,10 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id 
 	}
 
 	// Initialize the entity id
-	EntityId eid = eid.isNull() ? m_entityId->generate() : id;
+	EntityId eid = id.isNull() ? m_entityId->generate() : id;
 
 	// Register the entity
-	registerEntity( instance, id );
+	registerEntity( instance, eid );
 
 	// Construct the archetype
 	instance->construct();
