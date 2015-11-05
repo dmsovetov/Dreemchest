@@ -51,6 +51,10 @@ namespace Ecs {
 	class ComponentBase : public io::Serializable {
 	public:
 
+									//! Constructs ComponentBase instance.
+									ComponentBase( void )
+										: m_flags( 0 ) {}
+
 		//! Sets the internal data.
 		template<typename T>
 		void						setInternal( InternalBase* value );
@@ -58,6 +62,12 @@ namespace Ecs {
 		//! Returns the internal data.
 		template<typename T>
 		typename Internal<T>::Ptr	internal( void ) const;
+
+		//! Returns component flags.
+		u32							flags( void ) const;
+
+		//! Sets component flags.
+		void						setFlags( u32 value );
 
 	#ifndef DC_BSON_DISABLED
 		//! Returns the component BSON.
@@ -73,6 +83,7 @@ namespace Ecs {
 		typedef Map< TypeIdx, StrongPtr<InternalBase> > InternalDataHolder;
 
 		InternalDataHolder			m_internal;	//!< The internal data.
+		u32							m_flags;	//!< Component flags.
 	};
 
 	// ** ComponentBase::setInternal
@@ -109,6 +120,18 @@ namespace Ecs {
 		log::warn( "Component::setBson : is not implemented for '%s'\n", typeName() );
 	}
 #endif	/*	!DC_BSON_DISABLED	*/
+
+	// ** ComponentBase::flags
+	inline u32 ComponentBase::flags( void ) const
+	{
+		return m_flags;
+	}
+
+	// ** ComponentBase::setFlags
+	inline void ComponentBase::setFlags( u32 value )
+	{
+		m_flags = value;
+	}
 
 	//! Generic component class.
 	template<typename T>
