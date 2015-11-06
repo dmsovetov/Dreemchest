@@ -88,18 +88,18 @@ namespace Ecs {
 	public:
 
 		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId() );
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull );
 
 		//! Creates the component instance by name.
-		ComponentPtr	createComponentByName( const String& name ) const;
+		ComponentPtr	createComponentByName( const String& name, const io::Bson& data = io::Bson::kNull ) const;
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId() );
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull );
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
-		StrongPtr<TComponent>	createComponent( void ) const;
+		StrongPtr<TComponent>	createComponent( const io::Bson& data = io::Bson::kNull ) const;
 
 		//! Registers the archetype type.
 		template<typename TArchetype>
@@ -161,6 +161,9 @@ namespace Ecs {
 		//! Registers the new entity.
 		void			registerEntity( EntityPtr entity, const EntityId& id );
 
+		//! Generates the unique entity id.
+		EntityId		generateId( void );
+
 	private:
 
 		//! Container type to store all active entities.
@@ -206,16 +209,16 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id )
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const io::Bson& data )
 	{
-		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id ).get() );
+		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
 	}
 		
 	// ** Ecs::createComponent
 	template<typename TComponent>
-	StrongPtr<TComponent> Ecs::createComponent( void ) const
+	StrongPtr<TComponent> Ecs::createComponent( const io::Bson& data  ) const
 	{
-		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name() ).get() );
+		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
 	}
 
 } // namespace Ecs

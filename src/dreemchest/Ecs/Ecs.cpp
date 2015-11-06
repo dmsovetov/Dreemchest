@@ -52,6 +52,18 @@ EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 	return DC_NEW Ecs( entityIdGenerator );
 }
 
+// ** Ecs::generateId
+EntityId Ecs::generateId( void )
+{
+	EntityId id;
+
+	do {
+		id = m_entityId->generate();
+	} while( isUsedId( id ) );
+
+	return id;
+}
+
 // ** Ecs::registerEntity
 void Ecs::registerEntity( EntityPtr entity, const EntityId& id )
 {
@@ -66,7 +78,7 @@ void Ecs::registerEntity( EntityPtr entity, const EntityId& id )
 }
 
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id )
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const io::Bson& data )
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
@@ -78,7 +90,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id 
 	}
 
 	// Initialize the entity id
-	EntityId eid = id.isNull() ? m_entityId->generate() : id;
+	EntityId eid = id.isNull() ? generateId() : id;
 
 	// Register the entity
 	registerEntity( instance, eid );
@@ -86,13 +98,24 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id 
 	// Construct the archetype
 	instance->construct();
 
+	// Load from data
+	if( !data.isNull() ) {
+		instance->setBson( data );
+	}
+
 	return instance;
 }
 
 // ** Ecs::createComponentByName
-ComponentPtr Ecs::createComponentByName( const String& name ) const
+ComponentPtr Ecs::createComponentByName( const String& name, const io::Bson& data ) const
 {
-	return m_componentFactory.construct( name );
+	ComponentPtr instance = m_componentFactory.construct( name );
+
+	if( instance.valid() && !data.isNull() ) {
+		instance->setBson( data );
+	}
+
+	return instance;
 }
 
 // ** Ecs::createEntity
@@ -109,7 +132,7 @@ EntityPtr Ecs::createEntity( const EntityId& id )
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( void )
 {
-	EntityId id = m_entityId->generate();
+	EntityId id = generateId();
 	return createEntity( id );
 }
 
