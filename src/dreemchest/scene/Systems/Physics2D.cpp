@@ -282,11 +282,14 @@ void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape )
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
 
-	polygon.m_count = shape.polygon.count;
+	Array<b2Vec2> points;
 
 	for( u32 i = 0; i < shape.polygon.count; i++ ) {
-		polygon.m_vertices[i] = positionToBox2D( Vec3( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1], 0.0f ) );
+		b2Vec2 position = positionToBox2D( Vec3( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1], 0.0f ) );
+		points.push_back( position );
 	}
+
+	polygon.Set( &points[0], points.size() );
 
 	fixture.shape = &polygon;
 
