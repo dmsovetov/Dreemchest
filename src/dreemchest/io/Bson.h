@@ -288,11 +288,12 @@ namespace io {
 		if( m_type == kObject ) {
 			DC_BREAK_IF( m_key.empty() );
 			(*this)[m_key] = value;
-			m_key = "";		
 		}
 		else if( m_type == kArray ) {
 			m_array->push_back( value );
 		}
+
+		m_key = "";	
 
 		return *this;
 	}
