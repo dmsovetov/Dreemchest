@@ -30,6 +30,8 @@
 #include "../Sockets/TCPSocket.h"
 #include "../Sockets/TCPStream.h"
 
+#define DEBUG_TTL_DISABLED	(1)
+
 DC_BEGIN_DREEMCHEST
 
 namespace net {
@@ -232,19 +234,23 @@ void NetworkHandler::update( u32 dt )
 	ConnectionBySocket connections = m_connections;
 
 	for( ConnectionBySocket::iterator i = connections.begin(); i != connections.end(); ++i ) {
+	#if !DEBUG_TTL_DISABLED
 		if( m_keepAliveTime && i->second->timeToLive() <= 0 ) {
 			i->second->socket()->close();
 			continue;
 		}
+	#endif
 
 		if( sendPing ) {
 			i->second->send<packets::Ping>( 1, i->second->time() );
 		}
 
+	#if !DEBUG_TTL_DISABLED
 		if( (i->second->time() - i->second->keepAliveTimestamp()) > m_keepAliveSendRate ) {
 			i->second->send<packets::KeepAlive>();
 			i->second->setKeepAliveTimestamp( i->second->time() );
 		}
+	#endif
 
 		i->second->update( dt );
 	}
