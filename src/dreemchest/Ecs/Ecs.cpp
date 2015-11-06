@@ -32,6 +32,8 @@
 #include "Entity/Archetype.h"
 #include "System/SystemGroup.h"
 
+#include <time.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
@@ -230,6 +232,8 @@ EntityIdGenerator::EntityIdGenerator( void )
 {
 #if DC_ECS_INTEGER_IDS
 	m_nextId = 1;
+#else
+	srand( static_cast<u32>( time( NULL ) ) );
 #endif
 }
 
