@@ -76,6 +76,24 @@ void Shape2D::addRect( f32 width, f32 height, f32 x, f32 y, const Material& mate
 	m_parts.push_back( part );
 }
 
+// ** Shape2D::addPolygon
+void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& material )
+{
+	DC_BREAK_IF( count > Part::MaxVertices );
+
+	Part part;
+	part.type = Polygon;
+	part.material = material;
+	part.polygon.count = count;
+
+	for( u32 i = 0; i < count; i++ ) {
+		part.polygon.vertices[i * 2 + 0] = vertices[i].x;
+		part.polygon.vertices[i * 2 + 1] = vertices[i].y;
+	}
+
+	m_parts.push_back( part );
+}
+
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
 
 // ** RigidBody2D::mass

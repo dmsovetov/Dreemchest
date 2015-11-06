@@ -58,6 +58,8 @@ namespace Scene {
 
 		//! The shape is composed from parts.
 		struct Part {
+			enum { MaxVertices = 8 };		//!< Maximum number of polygon vertices.
+
 			Type		type;				//!< Shape type.
 			Material	material;			//! Shape material.
 
@@ -76,8 +78,8 @@ namespace Scene {
 				} rect;		//!< Rectangle shape data.
 
 				struct {
-					f32		vertices[8];	//!< Polygon vertices.
-					u32		count;			//!< Polygon vertex count.
+					f32		vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
+					u32		count;								//!< Polygon vertex count.
 				} polygon;	//! Polygon shape data.
 			};
 		};
