@@ -134,6 +134,9 @@ namespace Ecs {
 		//! Removes an entity by it's id.
 		void			removeEntity( const EntityId& id );
 
+		//! Adds a new entity.
+		void			addEntity( EntityPtr entity );
+
 		//! Returns true if an entity with specified id exists.
 		bool			isUsedId( const EntityId& id ) const;
 
@@ -157,9 +160,6 @@ namespace Ecs {
 
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );
-
-		//! Registers the new entity.
-		void			registerEntity( EntityPtr entity, const EntityId& id );
 
 		//! Generates the unique entity id.
 		EntityId		generateId( void );

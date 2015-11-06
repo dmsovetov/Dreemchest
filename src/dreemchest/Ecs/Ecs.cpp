@@ -64,14 +64,16 @@ EntityId Ecs::generateId( void )
 	return id;
 }
 
-// ** Ecs::registerEntity
-void Ecs::registerEntity( EntityPtr entity, const EntityId& id )
+// ** Ecs::addEntity
+void Ecs::addEntity( EntityPtr entity )
 {
+	DC_BREAK_IF( !entity.valid() );
+
+	const EntityId& id = entity->id();
 	DC_BREAK_IF( isUsedId( id ) );
 
 	// Setup entity
 	entity->setEcs( this );
-	entity->setId( id );
 
 	// Register the entity
 	m_entities[id] = entity;
@@ -91,9 +93,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Initialize the entity id
 	EntityId eid = id.isNull() ? generateId() : id;
-
-	// Register the entity
-	registerEntity( instance, eid );
+	instance->setId( eid );
 
 	// Construct the archetype
 	instance->construct();
@@ -124,7 +124,8 @@ EntityPtr Ecs::createEntity( const EntityId& id )
 	DC_BREAK_IF( isUsedId( id ) );
 
 	EntityPtr entity( DC_NEW Entity );
-	registerEntity( entity, id );
+	entity->setId( id );
+	addEntity( entity );
 
 	return entity;
 }
