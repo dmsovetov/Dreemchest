@@ -83,7 +83,11 @@ DC_BEGIN_DREEMCHEST
 	// ** Guid::Guid
 	inline Guid::Guid( const u8* id )
 	{
-		memcpy( m_id, id, Size );
+		if( id ) {
+			memcpy( m_id, id, Size );
+		} else {
+			memset( m_id, 0, Size );
+		}
 	}
 
 	// ** Guid::Guid
