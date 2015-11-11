@@ -198,7 +198,7 @@ namespace mvvm {
 	template<typename TValue, typename TBsonConverter>
 	void PrimitiveValue<TValue, TBsonConverter>::setBson( const io::Bson& value )
 	{
-		m_value = TBsonConverter::from( value );
+		set( TBsonConverter::from( value ) );
 	}
 
 	// ** PrimitiveValue::get
