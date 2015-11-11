@@ -67,7 +67,7 @@ io::Bson ArchetypeBase::bson( void ) const
 // ** ArchetypeBase::setBson
 void ArchetypeBase::setBson( const io::Bson& value )
 {
-	DC_BREAK_IF( value["Type"].asString() != typeName() );
+	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
 
 	Components& items = components();
 
