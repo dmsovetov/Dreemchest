@@ -63,6 +63,16 @@ Bson::Bson( bool value ) : m_type( kBoolean ), m_boolean( value )
 }
 
 // ** Bson::Bson
+Bson::Bson( u8 value ) : m_type( kInt8 ), m_int8( value )
+{
+}
+
+// ** Bson::Bson
+Bson::Bson( s8 value ) : m_type( kInt8 ), m_int8( value )
+{
+}
+
+// ** Bson::Bson
 Bson::Bson( s16 value ) : m_type( kInt16 ), m_int32( value )
 {
 }
