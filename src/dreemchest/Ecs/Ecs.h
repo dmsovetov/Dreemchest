@@ -88,14 +88,18 @@ namespace Ecs {
 	public:
 
 		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull );
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull ) const;
 
 		//! Creates the component instance by name.
 		ComponentPtr	createComponentByName( const String& name, const io::Bson& data = io::Bson::kNull ) const;
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull );
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull ) const;
+
+		//! Creates an array of archetype instances from data.
+		template<typename TArchetype>
+		Array<StrongPtr<TArchetype>>	createArchetypes( const io::Bson& data ) const;
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
@@ -162,7 +166,7 @@ namespace Ecs {
 		void			notifyEntityChanged( const EntityId& id );
 
 		//! Generates the unique entity id.
-		EntityId		generateId( void );
+		EntityId		generateId( void ) const;
 
 	private:
 
@@ -181,16 +185,16 @@ namespace Ecs {
 		//! Archetype factory type.
 		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
 
-		EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
-		Entities				m_entities;	//!< Active entities reside here.
-		SystemGroups			m_systems;	//!< All systems reside in system groups.
-		Indices					m_indices;	//!< All entity indices are cached here.
+		mutable EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
+		Entities						m_entities;	//!< Active entities reside here.
+		SystemGroups					m_systems;	//!< All systems reside in system groups.
+		Indices							m_indices;	//!< All entity indices are cached here.
 
-		EntitySet				m_changed;	//!< Entities that was changed.
-		EntitySet				m_removed;	//!< Entities that will be removed.
+		EntitySet						m_changed;	//!< Entities that was changed.
+		EntitySet						m_removed;	//!< Entities that will be removed.
 
-		ComponentFactory		m_componentFactory;		//!< Component object factory.
-		ArchetypeFactory		m_archetypeFactory;		//!< Archetype object factory.
+		ComponentFactory				m_componentFactory;		//!< Component object factory.
+		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
 	};
 
 	// ** Ecs::registerArchetype
@@ -209,9 +213,23 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const io::Bson& data )
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const io::Bson& data ) const
 	{
 		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
+	}
+
+	// ** Ecs::createArchetypes
+	template<typename TArchetype>
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const io::Bson& data ) const
+	{
+		Array<StrongPtr<TArchetype>> result;
+
+		for( s32 i = 0, n = data.items().size(); i < n; i++ ) {
+			const io::Bson& item = data[i];
+			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), item ) );
+		}
+
+		return result;
 	}
 		
 	// ** Ecs::createComponent

@@ -53,7 +53,7 @@ EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 }
 
 // ** Ecs::generateId
-EntityId Ecs::generateId( void )
+EntityId Ecs::generateId( void ) const
 {
 	EntityId id;
 
@@ -80,10 +80,11 @@ void Ecs::addEntity( EntityPtr entity )
 }
 
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const io::Bson& data )
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const io::Bson& data ) const
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
+	DC_BREAK_IF( !instance.valid() );
 
 	// Ensure we found the archetype type
 	if( !instance.valid() ) {
