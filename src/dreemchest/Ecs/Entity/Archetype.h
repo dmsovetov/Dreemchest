@@ -37,6 +37,8 @@ namespace Ecs {
 	class ArchetypeBase : public Entity {
 	public:
 
+							ClassEnableTypeInfoSuper( ArchetypeBase, Entity )
+
 		//! Constructs archetype instance by adding all components.
 		virtual void		construct( void ) = 0;
 
@@ -60,22 +62,14 @@ namespace Ecs {
 	class Archetype : public ArchetypeBase {
 	public:
 
+										ClassEnableTypeInfoSuper( TArchetype, ArchetypeBase )
+
 		//! Weak pointer type.
 		typedef WeakPtr<TArchetype>		WPtr;
 
 		//! Strong pointer type.
 		typedef StrongPtr<TArchetype>	Ptr;
-
-		//! Returns the archetype type name.
-		virtual CString					typeName( void ) const;
 	};
-
-	// ** Archetype::typeName
-	template<typename TArchetype>
-	CString Archetype<TArchetype>::typeName( void ) const
-	{
-		return TypeInfo<TArchetype>::name();
-	}
 
 } // namespace Ecs
 

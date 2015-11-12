@@ -44,6 +44,8 @@ namespace Ecs {
 	friend class Ecs;
 	public:
 
+								ClassEnableTypeInfoSuper( Entity, io::Serializable )
+
 		//! Container type to store components.
 		typedef Map<TypeIdx, ComponentPtr> Components;
 
