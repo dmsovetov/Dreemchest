@@ -85,6 +85,9 @@ namespace io {
         //! Creates a byte buffer from data.
         static ByteBufferPtr    createFromData( const u8* pointer, s32 size );
 
+		//! Creates a byte buffer from an array of bytes.
+		static ByteBufferPtr	createFromArray( const Array<u8>& data );
+
     protected:
 
                                 //! Constructs a memory stream from data.

@@ -52,13 +52,19 @@ ByteBuffer::~ByteBuffer( void )
 // ** ByteBuffer::create
 ByteBufferPtr ByteBuffer::create( s32 size )
 {
-    return ByteBufferPtr( new ByteBuffer( NULL, size ) );
+    return ByteBufferPtr( DC_NEW ByteBuffer( NULL, size ) );
 }
 
 // ** ByteBuffer::createFromData
 ByteBufferPtr ByteBuffer::createFromData( const u8* pointer, s32 size )
 {
-    return ByteBufferPtr( new ByteBuffer( pointer, size ) );
+    return ByteBufferPtr( DC_NEW ByteBuffer( pointer, size ) );
+}
+
+// ** ByteBuffer::createFromArray
+ByteBufferPtr ByteBuffer::createFromArray( const Array<u8>& data )
+{
+    return ByteBufferPtr( DC_NEW ByteBuffer( &data[0], data.size() ) );
 }
 
 // ** ByteBuffer::fill
