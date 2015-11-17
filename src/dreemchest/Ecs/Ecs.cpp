@@ -77,6 +77,9 @@ void Ecs::addEntity( EntityPtr entity )
 
 	// Register the entity
 	m_entities[id] = entity;
+
+	// Queue entity for notification.
+	m_changed.insert( entity );
 }
 
 // ** Ecs::createArchetypeByName
