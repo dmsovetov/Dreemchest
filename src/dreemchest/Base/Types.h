@@ -147,6 +147,19 @@ DC_BEGIN_DREEMCHEST
         return stm.str();
     }
 
+	//! Convert the byte value to a string.
+	inline String toByteString( u8 value )
+	{
+		static const s8 digits[] = "0123456789abcdef";
+
+		String result = "";
+
+		result += digits[(value >> 4) & 0xf];
+		result += digits[(value >> 0) & 0xf];
+
+		return result;
+	}
+
 DC_END_DREEMCHEST
 
 #endif        /*    !__DC_TYPES_H__    */
