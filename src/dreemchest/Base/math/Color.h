@@ -81,6 +81,9 @@ DC_BEGIN_DREEMCHEST
         Rgb             operator + ( float scalar ) const;
         Rgb             operator - ( float scalar ) const;
 
+		//! Returns the color hash string.
+		String			hashString( void ) const;
+
         //! Calculates color luminance,
         float           luminance( void ) const;
 
@@ -89,6 +92,12 @@ DC_BEGIN_DREEMCHEST
 
         //! Converts color to RGBM LDR encoded value.
         RgbmLdr         rgbm( void ) const;
+
+		//! Constructs Rgb color instance from bytes.
+		static Rgb		fromBytes( u8 r, u8 g, u8 b );
+
+		//! Constructs Rgb color instance from hash string.
+		static Rgb		fromHashString( const String& value );
 
     public:
 
@@ -112,6 +121,12 @@ DC_BEGIN_DREEMCHEST
     {
 
     }
+
+	// ** Rgb::hashString
+	inline String Rgb::hashString( void ) const
+	{
+		return "#" + toByteString( static_cast<u8>( r * 255 ) ) + toByteString( static_cast<u8>( g * 255 ) ) + toByteString( static_cast<u8>( b * 255 ) );
+	}
 
     // ** Rgb::luminance
     inline float Rgb::luminance( void ) const {
@@ -197,6 +212,31 @@ DC_BEGIN_DREEMCHEST
         return Rgb( r - scalar, g - scalar, b - scalar );
     }
 
+	// ** Rgb::fromBytes
+	inline Rgb Rgb::fromBytes( u8 r, u8 g, u8 b ) {
+		return Rgb( r / 255.0f, g / 255.0f, b / 255.0f );
+	}
+
+	// ** Rgb::fromHashString
+	inline Rgb Rgb::fromHashString( const String& value )
+	{
+		DC_BREAK_IF( value[0] != '#' );
+
+		s8* error;
+		u64 hex = strtoul( value.c_str() + 1, &error, 16 );
+
+		if( *error ) {
+			DC_BREAK;
+			return Rgb();
+		}
+
+		u8 r = (hex >> 16) & 0xFF;
+		u8 g = (hex >>  8) & 0xFF;
+		u8 b = (hex >>  0) & 0xFF;
+
+		return Rgb::fromBytes( r, g, b );
+	}
+
     /*!
      Rgba color value.
      */
@@ -216,6 +256,9 @@ DC_BEGIN_DREEMCHEST
         Rgba            operator + ( const Rgba& other ) const;
         Rgba            operator * ( const Rgba& other ) const;
         Rgba            operator / ( float scalar ) const;
+
+		//! Constructs Rgba color instance from bytes.
+		static Rgba		fromBytes( u8 r, u8 g, u8 b, u8 a = 255 );
 
     public:
 
@@ -288,6 +331,11 @@ DC_BEGIN_DREEMCHEST
     inline Rgba Rgba::operator / ( float scalar ) const {
         return Rgba( r / scalar, g / scalar, b / scalar, a / scalar );
     }
+
+	// ** Rgba::fromBytes
+	inline Rgba Rgba::fromBytes( u8 r, u8 g, u8 b, u8 a ) {
+		return Rgba( r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f );
+	}
 
 
     // ** Rgb::Rgb
