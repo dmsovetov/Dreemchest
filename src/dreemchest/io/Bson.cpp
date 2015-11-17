@@ -248,12 +248,20 @@ Bson& Bson::operator []( CString key )
 // ** Bson::operator <<
 Bson& Bson::operator << ( CString value )
 {
-	if( m_key.empty() ) {
-		m_key = value;
-	} else {
-		(*this)[m_key] = value;
-		m_key = "";
+	if( m_type == kObject ) {
+		if( m_key.empty() ) {
+			m_key = value;
+			return *this;
+		} else {
+			(*this)[m_key] = value;
+		}
 	}
+	else if( m_type == kArray ) {
+		m_array->push_back( value );
+	}
+
+	m_key = "";	
+
 	return *this;
 }
 
