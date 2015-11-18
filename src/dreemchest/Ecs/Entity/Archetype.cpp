@@ -57,8 +57,14 @@ io::Bson ArchetypeBase::bson( void ) const
 	const Components& items = components();
 
 	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
-		CString key = i->second->typeName();
-		result[key] = i->second->bson();
+		CString  key  = i->second->typeName();
+		io::Bson data = i->second->bson();
+
+		if( data.isNull() ) {
+			continue;
+		}
+
+		result[key] = data;
 	}
 
 	return result;
