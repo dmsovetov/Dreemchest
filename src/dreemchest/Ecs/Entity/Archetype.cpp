@@ -71,9 +71,39 @@ void ArchetypeBase::setBson( const io::Bson& value )
 
 	Components& items = components();
 
+	// Load all added components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString key = i->second->typeName();
 		i->second->setBson( value.get( key ) );
+	}
+	
+	// Create components from BSON
+	const io::Bson::KeyValue& kv = value.properties();
+
+	for( io::Bson::KeyValue::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+		if( i->first == "Type" || i->first == "_id" ) {
+			continue;
+		}
+
+		bool hasComponent = false;
+
+		for( Components::iterator j = items.begin(); j != items.end(); ++j ) {
+			if( j->second->typeName() == i->first ) {
+				hasComponent = true;
+				break;
+			}
+		}
+
+		if( hasComponent ) {
+			continue;
+		}
+
+		if( i->second.isNull() ) {
+			continue;
+		}
+
+		ComponentPtr component = ecs()->createComponentByName( i->first, i->second );
+		attachComponent( component.get() );
 	}
 }
 

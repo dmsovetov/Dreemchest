@@ -102,6 +102,9 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 	// Construct the archetype
 	instance->construct();
 
+	// Set the parent ECS
+	instance->setEcs( const_cast<Ecs*>( this ) );
+
 	// Load from data
 	if( !data.isNull() ) {
 		instance->setBson( data );
@@ -114,6 +117,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 ComponentPtr Ecs::createComponentByName( const String& name, const io::Bson& data ) const
 {
 	ComponentPtr instance = m_componentFactory.construct( name );
+	DC_BREAK_IF( !instance.valid() );
 
 	if( instance.valid() && !data.isNull() ) {
 		instance->setBson( data );
@@ -211,7 +215,10 @@ SystemGroupPtr Ecs::createGroup( const String& name, u32 mask )
 // ** Ecs::notifyEntityChanged
 void Ecs::notifyEntityChanged( const EntityId& id )
 {
-	DC_BREAK_IF( !isUsedId( id ) );
+	if( !isUsedId( id ) ) {
+		log::error( "Ecs::notifyEntityChanged : no such entity ID %s\n", id.toString().c_str() );
+		return;
+	}
 
 	Entities::iterator i = m_entities.find( id );
 
