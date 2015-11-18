@@ -88,10 +88,10 @@ namespace net {
 	typedef StrongPtr<TCPSocketListenerDelegate> TCPSocketListenerDelegatePtr;
 
 	//! Network handler strong ptr.
-	typedef StrongPtr<NetworkHandler> NetworkHandlerPtr;
+	dcDeclarePtrs( NetworkHandler );
 
 	//! Server network handler strong ptr.
-	typedef StrongPtr<ServerHandler> ServerHandlerPtr;
+	dcDeclarePtrs( ServerHandler );
 
 	//! Connection weak ptr.
 	typedef WeakPtr<Connection> ConnectionWPtr;

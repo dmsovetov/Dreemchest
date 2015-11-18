@@ -70,7 +70,7 @@ DC_BEGIN_DREEMCHEST
     template<typename K, typename V, typename P = std::less<K> >
     class Map : public std::map<K, V, P> {};
 
-	struct Void {};
+	struct Void { template<typename T> void read( const T& ) {} };
 
     typedef double                  f64;
     typedef float                   f32;
