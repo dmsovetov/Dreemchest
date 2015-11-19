@@ -523,6 +523,7 @@ void Bson::readValue( StreamPtr stream )
 
 	switch( m_type ) {
 	case kNull:		break;
+	case kBoolean:	stream->read( &m_boolean, 1 );		break;
 	case kInt8:		stream->read( &m_int8, 1 );			break;
 	case kInt16:	stream->read( &m_int16, 2 );		break;
 	case kInt32:	stream->read( &m_int32, 4 );		break;
