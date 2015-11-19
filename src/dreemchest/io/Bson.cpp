@@ -342,13 +342,29 @@ u32 Bson::asInt( void ) const
 // ** Bson::asFloat
 f32 Bson::asFloat( void ) const
 {
-	return m_float32;
+	switch( m_type ) {
+	case kInt8:		return static_cast<f32>( m_int8 );
+	case kInt16:	return static_cast<f32>( m_int16 );
+	case kInt32:	return static_cast<f32>( m_int32 );
+	case kInt64:	return static_cast<f32>( m_int64 );
+	case kFloat32:	return m_float32;
+	case kFloat64:	return static_cast<f32>( m_float64 );
+	}
+	return 0.0f;
 }
 
 // ** Bson::asDouble
 f64 Bson::asDouble( void ) const
 {
-	return m_float64;
+	switch( m_type ) {
+	case kInt8:		return static_cast<f32>( m_int8 );
+	case kInt16:	return static_cast<f32>( m_int16 );
+	case kInt32:	return static_cast<f32>( m_int32 );
+	case kInt64:	return static_cast<f32>( m_int64 );
+	case kFloat32:	return m_float32;
+	case kFloat64:	return static_cast<f32>( m_float64 );
+	}
+	return 0.0f;;
 }
 
 // ** Bson::asLong
