@@ -52,6 +52,12 @@ EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 	return DC_NEW Ecs( entityIdGenerator );
 }
 
+// ** Ecs::setEntityIdGenerator
+void Ecs::setEntityIdGenerator( const EntityIdGeneratorPtr& value )
+{
+	m_entityId = value;
+}
+
 // ** Ecs::generateId
 EntityId Ecs::generateId( void ) const
 {

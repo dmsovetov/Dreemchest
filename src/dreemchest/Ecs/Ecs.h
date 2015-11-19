@@ -147,6 +147,9 @@ namespace Ecs {
 		//! Updates the entity component system.
 		void			update( u32 currentTime, f32 dt, u32 systems = ~0 );
 
+		//! Sets the entity id generator to be used.
+		void			setEntityIdGenerator( const EntityIdGeneratorPtr& value );
+
 		//! Constructs a new component of specified type.
 		template<typename TComponent, typename ... Args>
 		TComponent*		createComponent( Args ... args )
