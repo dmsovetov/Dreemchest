@@ -351,6 +351,12 @@ f64 Bson::asDouble( void ) const
 	return m_float64;
 }
 
+// ** Bson::asLong
+u64 Bson::asLong( void ) const
+{
+	return m_int64;
+}
+
 // ** Bson::asGuid
 const Guid& Bson::asGuid( void ) const
 {
