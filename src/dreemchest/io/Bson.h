@@ -207,6 +207,7 @@ namespace io {
 
 		//! Returns object properties.
 		const KeyValue&		properties( void ) const;
+		KeyValue&			properties( void );
 
 		//! Returns array items.
 		const ValueArray&	items( void ) const;

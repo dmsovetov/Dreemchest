@@ -290,6 +290,13 @@ const Bson::KeyValue& Bson::properties( void ) const
 	return *m_object;
 }
 
+// ** Bson::properties
+Bson::KeyValue& Bson::properties( void )
+{
+	DC_BREAK_IF( m_type != kObject );
+	return *m_object;
+}
+
 // ** Bson::items
 const Bson::ValueArray& Bson::items( void ) const
 {
