@@ -125,7 +125,17 @@ ComponentPtr Ecs::createComponentByName( const String& name, const io::Bson& dat
 	ComponentPtr instance = m_componentFactory.construct( name );
 	DC_BREAK_IF( !instance.valid() );
 
-	if( instance.valid() && !data.isNull() ) {
+	// Ensure we found the component type
+	if( !instance.valid() ) {
+		log::error( "Ecs::createComponentByName : unknown component '%s'\n", name.c_str() );
+		return ComponentPtr();
+	}
+
+	// Set the parent ECS
+	instance->setEcs( const_cast<Ecs*>( this ) );
+
+	// Load from data
+	if( !data.isNull() ) {
 		instance->setBson( data );
 	}
 
