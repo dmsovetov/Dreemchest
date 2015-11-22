@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_ModifierContainer_H__
-#define		__DC_ModifierContainer_H__
+#ifndef __DC_Particles_ModifierContainer_H__
+#define __DC_Particles_ModifierContainer_H__
 
 /*
  =========================================================================================
@@ -85,4 +85,4 @@ namespace particles {
     
 } // namespace dreemchest
 
-#endif		/*	!__DC_ModifierContainer_H__	*/
+#endif /*	!__DC_Particles_ModifierContainer_H__	*/

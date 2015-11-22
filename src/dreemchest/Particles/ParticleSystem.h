@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_ParticleSystem_H__
-#define		__DC_ParticleSystem_H__
+#ifndef __DC_Particles_ParticleSystem_H__
+#define __DC_Particles_ParticleSystem_H__
 
 /*
  =========================================================================================
@@ -103,4 +103,4 @@ namespace particles {
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_ParticleSystem_H__	*/
+#endif		/*	!__DC_Particles_ParticleSystem_H__	*/

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Renderers_H__
-#define		__DC_Renderers_H__
+#ifndef __DC_Particles_Renderers_H__
+#define __DC_Particles_Renderers_H__
 
 /*
  =========================================================================================
@@ -137,4 +137,4 @@ namespace particles {
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_Parameter_H__	*/
+#endif		/*	!__DC_Particles_Parameter_H__	*/

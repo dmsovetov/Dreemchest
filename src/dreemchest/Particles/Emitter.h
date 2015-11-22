@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Emitter_H__
-#define		__DC_Emitter_H__
+#ifndef __DC_Particles_Emitter_H__
+#define __DC_Particles_Emitter_H__
 
 /*
  =========================================================================================
@@ -114,4 +114,4 @@ namespace particles {
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_Emitter_H__	*/
+#endif /*	!__DC_Particles_Emitter_H__	*/

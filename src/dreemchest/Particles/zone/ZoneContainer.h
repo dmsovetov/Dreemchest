@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_ZoneContainer_H__
-#define		__DC_ZoneContainer_H__
+#ifndef __DC_Particles_ZoneContainer_H__
+#define __DC_Particles_ZoneContainer_H__
 
 /*
  =========================================================================================
@@ -88,4 +88,4 @@ namespace particles {
     
 } // namespace dreemchest
 
-#endif		/*	!__DC_ZoneContainer_H__	*/
+#endif /*	!__DC_Particles_ZoneContainer_H__	*/

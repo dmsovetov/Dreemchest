@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Parameter_H__
-#define		__DC_Parameter_H__
+#ifndef __DC_Particles_Parameter_H__
+#define __DC_Particles_Parameter_H__
 
 /*
  =========================================================================================
@@ -35,7 +35,7 @@
  =========================================================================================
  */
 
-#include	"../ParticleModelNode.h"
+#include "../ParticleModelNode.h"
 
 #define SampleParameter( parameter, default )  ((parameter) ? (parameter)->sample( scalar, default ) : (default))
 #define SampleKoeficient( parameter, default ) SampleParameter( parameter, default * 100.0f ) * 0.01f
@@ -130,4 +130,4 @@ namespace particles {
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_Parameter_H__	*/
+#endif /*	!__DC_Particles_Parameter_H__	*/

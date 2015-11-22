@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_ParameterContainer_H__
-#define		__DC_ParameterContainer_H__
+#ifndef __DC_Particles_ParameterContainer_H__
+#define __DC_Particles_ParameterContainer_H__
 
 /*
  =========================================================================================
@@ -35,7 +35,7 @@
  =========================================================================================
  */
 
-#include    "Parameter.h"
+#include "Parameter.h"
 
 /*
  =========================================================================================
@@ -89,4 +89,4 @@ namespace particles {
     
 } // namespace dreemchest
 
-#endif		/*	!__DC_ParameterContainer_H__	*/
+#endif /*	!__DC_Particles_ParameterContainer_H__	*/

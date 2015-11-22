@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_ParticleModelNode_H__
-#define		__DC_ParticleModelNode_H__
+#ifndef __DC_Particles_ParticleModelNode_H__
+#define __DC_Particles_ParticleModelNode_H__
 
 /*
  =========================================================================================
@@ -71,4 +71,4 @@ namespace particles {
 
 } // namespace dreemchest
 
-#endif		/*	!__DC_ParticleModelNode_H__	*/
+#endif /*	!__DC_Particles_ParticleModelNode_H__	*/
