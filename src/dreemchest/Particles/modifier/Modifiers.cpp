@@ -34,9 +34,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ---------------------------------------- Modifier ---------------------------------------- //
 
@@ -51,9 +51,9 @@ Modifier::Modifier( void )
 Modifier* Modifier::create( ModifierType type )
 {
 	switch( type ) {
-	case ModifierType::Friction:	 return DC_NEW Friction;
-	case ModifierType::Force:		 return DC_NEW Force;
-	case ModifierType::ForceField:	 return DC_NEW ForceField;
+	case ModifierFriction:		return DC_NEW Friction;
+	case ModifierForce:			return DC_NEW Force;
+	case ModifierForceField:	return DC_NEW ForceField;
 	}
 
 	DC_BREAK;
@@ -122,7 +122,7 @@ void ForceField::apply( float dt, float scalar, Particles *particles )
 	float r = SampleParameter( &m_radius, 0.0f );
 	float f = SampleParameter( &m_force, 0.0f );
 
-    vec2  position = vec2( x, y );
+    Vec2  position = Vec2( x, y );
     float radius   = r * r;
     float force    = f * dt;
     
@@ -132,7 +132,7 @@ void ForceField::apply( float dt, float scalar, Particles *particles )
 
         for( int j = 0; j < count; j++ ) {
             sParticle&  particle  = particles[j];
-            vec2        direction = particle.m_position - position;
+            Vec2        direction = particle.m_position - position;
             float       distance  = direction.Normalize();
 
             if( distance > r ) {
@@ -212,6 +212,6 @@ void Force::apply( float dt, float scalar, Particles *particles )
 */
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

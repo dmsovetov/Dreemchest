@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** class EmitterModel
 	class EmitterModel : public ModifierContainer {
@@ -59,8 +59,8 @@ namespace particles {
                             EmitterModel( void );
                             ~EmitterModel( void );
 
-		const vec2&			position( void ) const;
-		void				setPosition( const vec2& value );
+		const Vec2&			position( void ) const;
+		void				setPosition( const Vec2& value );
 		float				duration( void ) const;
 		void				setDuration( float value );
 		const char*			name( void ) const;
@@ -78,7 +78,7 @@ namespace particles {
 	private:
 
 		ParticleModelArray	m_particles;
-		vec2				m_position;
+		Vec2				m_position;
 		float				m_duration;
 		bool				m_isLooped;
 		std::string			m_name;
@@ -94,8 +94,8 @@ namespace particles {
 		int					aliveCount( void ) const;
 		bool				hasEnded( void ) const;
 
-		int					update( float dt, const vec2& position );
-        void                warmUp( float dt, const vec2& position );
+		int					update( float dt, const Vec2& position );
+        void                warmUp( float dt, const Vec2& position );
 		void				render( dcBatchRenderer renderer );
 
 	private:
@@ -110,8 +110,8 @@ namespace particles {
 		int					m_aliveCount;
 	};
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_Emitter_H__	*/

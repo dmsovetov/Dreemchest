@@ -29,7 +29,7 @@
 #include	"Renderers.h"
 #include    "zone/Zones.h"
 
-#include	"../asset/TextureAsset.h"
+//#include	"../asset/TextureAsset.h"
 
 #define     ScalarParam( name ) m_scalar[name] ? &m_scalar[name] : NULL
 #define     ColorParam( name )  m_color[name]  ? &m_color[name]  : NULL
@@ -42,9 +42,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ----------------------------------------------- ParticleModel ----------------------------------------------- //
 
@@ -56,8 +56,8 @@ ParticleModel::ParticleModel( void )
 	m_texture			= NULL;
 	m_maxSnapshots		= sParticle::MaxSnapshots;
 
-	setBlendMode( BlendMode::Normal );
-	setRendererType( RendererType::Quads );
+	setBlendMode( BlendNormal );
+	setRendererType( RenderQuads );
 
 	// ** Register parameters
 	registerParameter( "Emission", &m_scalar[Emission], sParameterInfo::Initial );
@@ -99,8 +99,9 @@ ParticleModel::ParticleModel( void )
 
 ParticleModel::~ParticleModel( void )
 {
-	DC_RELEASE( m_texture );
-	delete m_particleRenderer;
+	DC_NOT_IMPLEMENTED;
+//	DC_RELEASE( m_texture );
+//	delete m_particleRenderer;
 }
 
 // ** ParticleModel::createInstance
@@ -142,17 +143,18 @@ dcTextureAsset ParticleModel::texture( void ) const
 // ** ParticleModel::setTexture
 void ParticleModel::setTexture( dcTextureAsset value )
 {
-	DC_RELEASE( m_texture );
-
-	if( (m_texture = value) ) {
-		m_texture->Ref();
-	}
+	DC_NOT_IMPLEMENTED;
+//	DC_RELEASE( m_texture );
+//
+//	if( (m_texture = value) ) {
+//		m_texture->Ref();
+//	}
 }
 
 // ** ParticleModel::rendererType
 RendererType ParticleModel::rendererType( void ) const
 {
-	return m_particleRenderer ? m_particleRenderer->type() : RendererType::Total;
+	return m_particleRenderer ? m_particleRenderer->type() : TotalRenderTypes;
 }
 
 // ** ParticleModel::blendMode
@@ -208,7 +210,7 @@ int ParticleModel::snapshotsToSave( void ) const
 {
 	RendererType rendererType = m_particleRenderer->type();
 
-	if( (rendererType == RendererType::Paths) || (rendererType == RendererType::ThickPaths) ) {
+	if( (rendererType == RenderPaths) || (rendererType == RenderThickPaths) ) {
 		return m_maxSnapshots;
 	}
 
@@ -222,7 +224,7 @@ void ParticleModel::render( dcBatchRenderer renderer, const sParticle *particles
 }
 
 // ** ParticleModel::init
-int ParticleModel::init( Zone *zone, sParticle *particles, const vec2& position, int count, float scalar ) const
+int ParticleModel::init( Zone *zone, sParticle *particles, const Vec2& position, int count, float scalar ) const
 {
     if( !count ) {
         return 0;
@@ -238,7 +240,7 @@ int ParticleModel::init( Zone *zone, sParticle *particles, const vec2& position,
 	const Parameter *direction       = ScalarParam( Direction );
 	const Parameter *rotation        = ScalarParam( Rotation );
 
-	Rgb white( White );
+	Rgb white( 1.0f, 1.0f, 1.0f );
 	int snapshotCount = snapshotsToSave();
 
 	for( int i = 0; i < count; i++ ) {
@@ -249,13 +251,13 @@ int ParticleModel::init( Zone *zone, sParticle *particles, const vec2& position,
 		particle.m_angular.torque       = SampleParameter( torque, 0.0f );
 		particle.m_size.initial         = SampleParameter( size, 5.0f );
 		particle.m_life.fade            = 1.0f / SampleParameter( life, 1.0f );
-        particle.m_color.current.rgb    = White;
+        particle.m_color.current.Rgb    = white;
         particle.m_color.current.alpha  = 1.0f;
 		particle.m_color.initial.alpha  = SampleKoeficient( transparency, 1 );
-        particle.m_color.initial.rgb    = SampleParameter( color, white );
+        particle.m_color.initial.Rgb    = SampleParameter( color, white );
 		particle.m_direction            = SampleParameter( direction, 0.0f );
 		particle.m_rotation             = SampleParameter( rotation, 0.0f );
-		particle.m_force.velocity       = vec2( 0, 0 );
+		particle.m_force.velocity       = Vec2( 0, 0 );
 		particle.m_life.age             = 0.0f;
         particle.m_position             = zone ? zone->generateRandomPoint( scalar, position ) : position;
 
@@ -286,7 +288,7 @@ void ParticleModel::savePaths( sParticle* items, int itemCount ) const
 		}
 
 		particle.m_snapshots[0].pos   = particle.m_position;
-		particle.m_snapshots[0].color = particle.m_color.current.rgb;
+		particle.m_snapshots[0].color = particle.m_color.current.Rgb;
 		particle.m_snapshots[0].alpha = particle.m_color.current.alpha;
 		particle.m_snapshots[0].size  = particle.m_size.current;
 	}
@@ -297,14 +299,14 @@ void ParticleModel::initSnapshots( sParticle& particle, int count ) const
 {
 	for( int i = 0; i < count; i++ ) {
 		particle.m_snapshots[i].pos   = particle.m_position;
-		particle.m_snapshots[i].color = particle.m_color.current.rgb;
+		particle.m_snapshots[i].color = particle.m_color.current.Rgb;
 		particle.m_snapshots[i].alpha = particle.m_color.current.alpha;
 		particle.m_snapshots[i].size  = particle.m_size.current;
 	}
 }
 
 // ** ParticleModel::update
-int ParticleModel::update( sParticle *particles, int count, float dt, vec2 *min, vec2 *max ) const
+int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min, Vec2 *max ) const
 {
 	const Parameter *color           = ColorParam( ColorOverLife );
 	const Parameter *alpha           = ScalarParam( TransparencyOverLife );
@@ -314,11 +316,11 @@ int ParticleModel::update( sParticle *particles, int count, float dt, vec2 *min,
 	const Parameter *size            = ScalarParam( SizeOverLife );
 
 	int aliveCount = 0;
-	Rgb white( White );
+	Rgb white( 1.0f, 1.0f, 1.0f );
 
 	// ** Reset in-out parameters
-	if( max ) *max = vec2( -FLT_MAX, -FLT_MAX );
-	if( min ) *min = vec2(  FLT_MAX,  FLT_MAX );
+	if( max ) *max = Vec2( -FLT_MAX, -FLT_MAX );
+	if( min ) *min = Vec2(  FLT_MAX,  FLT_MAX );
 
 	// ** Particles
 	for( int i = 0; i < count; i++ ) {
@@ -336,15 +338,15 @@ int ParticleModel::update( sParticle *particles, int count, float dt, vec2 *min,
 		}
 
 		particle.m_direction            += particle.m_angular.velocity    * SampleKoeficient( angularVelocity,  1.0f );
-		particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * vec2::FromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
+		particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * Vec2::fromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
 		particle.m_rotation             += particle.m_angular.torque      * SampleKoeficient( torque,           1.0f ) * dt;
-        particle.m_color.current.rgb     = particle.m_color.initial.rgb   * SampleParameter( color, white );
+        particle.m_color.current.Rgb     = particle.m_color.initial.Rgb   * SampleParameter( color, white );
 		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleKoeficient( alpha,            1.0f );
 		particle.m_size.current          = particle.m_size.initial        * SampleKoeficient( size,             1.0f );
 
-		if( m_blendMode != BlendMode::Normal ) {
+		if( m_blendMode != BlendNormal ) {
 			float alpha = particle.m_color.initial.alpha;
-			particle.m_color.current.rgb = particle.m_color.initial.rgb * particle.m_color.current.alpha;
+			particle.m_color.current.Rgb = particle.m_color.initial.Rgb * particle.m_color.current.alpha;
 			particle.m_color.initial.alpha = alpha;
 		}
 
@@ -392,7 +394,7 @@ int Particles::aliveCount( void ) const
 }
 
 // ** Particles::update
-int Particles::update( Zone *zone, float dt, const vec2& position, float scalar, bool noEmission )
+int Particles::update( Zone *zone, float dt, const Vec2& position, float scalar, bool noEmission )
 {
 	m_time          += dt;
     m_emissionTime  += dt;
@@ -437,6 +439,6 @@ void Particles::render( dcBatchRenderer renderer )
     m_model->render( renderer, m_particles, m_aliveCount );
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

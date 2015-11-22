@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** class ParticleSystemModel
 	class ParticleSystemModel : public ModifierContainer {
@@ -79,8 +79,8 @@ namespace particles {
 									ParticleSystem( const ParticleSystemModel *model );
 									~ParticleSystem( void );
 
-		const vec2&					position( void ) const;
-		void						setPosition( const vec2& value );
+		const Vec2&					position( void ) const;
+		void						setPosition( const Vec2& value );
 		float						timeScale( void ) const;
 		void						setTimeScale( float value );
 		int							aliveCount( void ) const;
@@ -94,13 +94,13 @@ namespace particles {
 
 		const ParticleSystemModel*	m_model;
 		EmitterArray				m_emitters;
-		vec2						m_position;
+		Vec2						m_position;
 		float						m_timeScale;
 		int							m_aliveCount;
 	};
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif		/*	!__DC_Particles_ParticleSystem_H__	*/

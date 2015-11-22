@@ -45,20 +45,20 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** struct sParticle
 	struct sParticle {
 		enum { MaxSnapshots = 64 };
 
-		vec2    m_position;
+		Vec2    m_position;
 		float   m_rotation;
 		float   m_direction;
 
 		struct {
-			vec2    velocity;
+			Vec2    velocity;
 		} m_force;
 
 		struct {
@@ -77,12 +77,12 @@ namespace particles {
 
 		struct {
             struct {
-                Rgb     rgb;
+                Rgb     Rgb;
                 float   alpha;
             } initial;
             
             struct {
-                Rgb     rgb;
+                Rgb     Rgb;
                 float   alpha;
             } current;
 		} m_color;
@@ -93,7 +93,7 @@ namespace particles {
 		} m_size;
 
 		struct {
-			vec2    pos;
+			Vec2    pos;
 			Rgb     color;
 			float	alpha;
 			float   size;
@@ -153,8 +153,8 @@ namespace particles {
 		int						maxSnapshots( void ) const;
 		void					setMaxSnapshots( int value );
 
-		int                     update( sParticle *items, int itemCount, float dt, vec2 *min = NULL, vec2 *max = NULL ) const;
-		int                     init( Zone *zone, sParticle *items, const vec2& pos, int itemCount, float scalar ) const;
+		int                     update( sParticle *items, int itemCount, float dt, Vec2 *min = NULL, Vec2 *max = NULL ) const;
+		int                     init( Zone *zone, sParticle *items, const Vec2& pos, int itemCount, float scalar ) const;
 		void					savePaths( sParticle* items, int itemCount ) const;
 		void					render( dcBatchRenderer renderer, const sParticle *items, int itemCount ) const;
 
@@ -187,7 +187,7 @@ namespace particles {
 
 		int						aliveCount( void ) const;
 
-		int						update( Zone *zone, float dt, const vec2& position, float scalar, bool noEmission );
+		int						update( Zone *zone, float dt, const Vec2& position, float scalar, bool noEmission );
 		void					render( dcBatchRenderer renderer );
 
 	private:
@@ -196,12 +196,12 @@ namespace particles {
 		sParticle*				m_particles;
 		int						m_count;
 		int						m_aliveCount;
-		vec2					m_min, m_max;
+		Vec2					m_min, m_max;
 		float					m_time, m_emissionTime, m_snapshotTime;
 	};
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif	/*	!__DC_Particles_ParticleBundle_H__	*/

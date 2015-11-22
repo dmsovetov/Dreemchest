@@ -48,9 +48,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
     typedef Curve<float>    CurveScalar;
     typedef Curve<Rgb>      CurveRgb;
@@ -100,7 +100,7 @@ namespace particles {
 
         void                    clear( void );
         float                   sample( float scalar, float defaultValue = 0.0f ) const;
-        Rgb                     sample( float scalar, const Rgb& defaultValue = White ) const;
+        Rgb                     sample( float scalar, const Rgb& defaultValue = Rgb( 1.0f, 1.0f, 1.0f ) ) const;
 
         operator bool( void ) const { return m_isEnabled; }
 
@@ -126,8 +126,8 @@ namespace particles {
         };
     };
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_Parameter_H__	*/

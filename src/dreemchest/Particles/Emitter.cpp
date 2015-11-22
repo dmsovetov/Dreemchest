@@ -38,17 +38,17 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ---------------------------------- EmitterModel ------------------------------------- //
 
 // ** EmitterModel::EmitterModel
 EmitterModel::EmitterModel( void ) : m_position( 0, 0 ), m_duration( 1.0f ), m_isLooped( true )
 {
-    registerZone( "Disk", ZoneType::Disk );
-    registerZone( "Line", ZoneType::Line );
+    registerZone( "Disk", ZoneDisk );
+    registerZone( "Line", ZoneLine );
 }
 
 EmitterModel::~EmitterModel( void )
@@ -59,13 +59,13 @@ EmitterModel::~EmitterModel( void )
 }
 
 // ** EmitterModel::position
-const vec2& EmitterModel::position( void ) const
+const Vec2& EmitterModel::position( void ) const
 {
 	return m_position;
 }
 
 // ** EmitterModel::setPosition
-void EmitterModel::setPosition( const vec2& value )
+void EmitterModel::setPosition( const Vec2& value )
 {
 	m_position = value;
 }
@@ -185,13 +185,13 @@ bool Emitter::hasEnded( void ) const
 }
 
 // ** Emitter::update
-int Emitter::update( float dt, const vec2& position )
+int Emitter::update( float dt, const Vec2& position )
 {
     const float duration = m_model->duration();
 	bool		ended	 = updateTime( dt );
 
     Zone*       zone = m_model->zone();
-    const vec2& pos  = m_model->position();
+    const Vec2& pos  = m_model->position();
 
 	m_aliveCount = 0;
 
@@ -223,7 +223,7 @@ bool Emitter::updateTime( float dt )
 }
 
 // ** Emitter::warmUp
-void Emitter::warmUp( float dt, const vec2& position )
+void Emitter::warmUp( float dt, const Vec2& position )
 {
     int iterations = m_model->duration() / dt;
 
@@ -240,6 +240,6 @@ void Emitter::render( dcBatchRenderer renderer )
 	}
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

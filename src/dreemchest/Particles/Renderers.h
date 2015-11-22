@@ -45,14 +45,14 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
     // ** struct sParticleVertex
     struct sParticleVertex {
-        vec2        pos;
-        rgba        color;
+        Vec2        pos;
+        Rgba        color;
     };
 
     // ** class Renderer
@@ -63,7 +63,7 @@ namespace particles {
         virtual                     ~Renderer( void );
 
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
-        virtual RendererType		type( void ) const { return RendererType::Total; }
+        virtual RendererType		type( void ) const { return TotalRenderTypes; }
         static Renderer*            createRenderer( RendererType type );
     };
 
@@ -74,7 +74,7 @@ namespace particles {
                                     PointRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Points; }
+        virtual RendererType		type( void ) const { return RenderPoints; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -85,7 +85,7 @@ namespace particles {
                                     QuadRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Quads; }
+        virtual RendererType		type( void ) const { return RenderQuads; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -96,7 +96,7 @@ namespace particles {
                                     LineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Lines; }
+        virtual RendererType		type( void ) const { return RenderLines; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -107,7 +107,7 @@ namespace particles {
                                     ThickLineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::ThickLines; }
+        virtual RendererType		type( void ) const { return RenderThickLines; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -118,7 +118,7 @@ namespace particles {
                                     PathRenderer( void );
 
         // ** Renderer
-        virtual RendererType	    type( void ) const { return RendererType::Paths; }
+        virtual RendererType	    type( void ) const { return RenderPaths; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -129,12 +129,12 @@ namespace particles {
                                     ThickPathRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::ThickPaths; }
+        virtual RendererType		type( void ) const { return RenderThickPaths; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif		/*	!__DC_Particles_Parameter_H__	*/

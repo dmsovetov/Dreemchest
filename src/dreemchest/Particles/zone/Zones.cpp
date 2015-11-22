@@ -34,9 +34,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ------------------------------------------------- Zone ------------------------------------------------- //
 
@@ -44,9 +44,9 @@ namespace particles {
 Zone* Zone::create( ZoneType type )
 {
     switch( type ) {
-    case ZoneType::None: return NULL;
-    case ZoneType::Disk: return DC_NEW DiskZone;
-    case ZoneType::Line: return DC_NEW LineZone;
+    case ZoneNone: return NULL;
+    case ZoneDisk: return DC_NEW DiskZone;
+    case ZoneLine: return DC_NEW LineZone;
     }
 
 	DC_BREAK
@@ -63,12 +63,12 @@ DiskZone::DiskZone( void )
 }
 
 // ** DiskZone::generateRandomPoint
-vec2 DiskZone::generateRandomPoint( float scalar, const vec2& center ) const
+Vec2 DiskZone::generateRandomPoint( float scalar, const Vec2& center ) const
 {
 	float inner = SampleParameter( &m_innerRadius, 0.0f );
 	float outer = SampleParameter( &m_outerRadius, 0.0f );
 
-    vec2  direction = vec2::RandDirection();
+    Vec2  direction = Vec2::randDirection();
     float distance  = RANDOM_SCALAR( inner, outer );
 
     return center + direction * distance;
@@ -84,17 +84,17 @@ LineZone::LineZone( void )
 }
 
 // ** LineZone::generateRandomPoint
-vec2 LineZone::generateRandomPoint( float scalar, const vec2& center ) const
+Vec2 LineZone::generateRandomPoint( float scalar, const Vec2& center ) const
 {
 	float length = SampleParameter( &m_length, 0.0f );
 	float angle  = SampleParameter( &m_angle, 0.0f );
 
-    vec2  direction = vec2::FromAngle( angle );
+    Vec2  direction = Vec2::fromAngle( angle );
     float distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );
 
     return center + direction * distance;
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

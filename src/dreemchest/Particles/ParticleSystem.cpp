@@ -36,9 +36,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ------------------------------------------ ParticleSystemModel ------------------------------------------ //
 
@@ -111,13 +111,13 @@ ParticleSystem::~ParticleSystem( void )
 }
 
 // ** ParticleSystem::position
-const vec2& ParticleSystem::position( void ) const
+const Vec2& ParticleSystem::position( void ) const
 {
 	return m_position;
 }
 
 // ** ParticleSystem::setPosition
-void ParticleSystem::setPosition( const vec2& value )
+void ParticleSystem::setPosition( const Vec2& value )
 {
 	m_position = value;
 }
@@ -180,6 +180,6 @@ void ParticleSystem::render( dcBatchRenderer renderer )
 	}
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

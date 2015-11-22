@@ -34,9 +34,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ** ParameterContainer::totalParameters
 int ParameterContainer::totalParameters( void ) const
@@ -71,11 +71,11 @@ void ParameterContainer::registerParameter( const char *name, Parameter *paramet
 	sParameterInfo info;
 	info.m_name = name;
 	info.m_parameter = parameter;
-	info.m_flags.On( flags );
+	info.m_flags.on( flags );
 
 	m_parameters.push_back( info );
 }
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST

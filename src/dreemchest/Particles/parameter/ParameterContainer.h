@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** struct sParameterInfo
 	struct sParameterInfo {
@@ -58,7 +58,7 @@ namespace particles {
 
 		std::string		m_name;
 		Parameter*		m_parameter;
-		cFlagSet8		m_flags;
+		FlagSet8		m_flags;
 	};
 
 	// ** class ParameterContainer
@@ -85,8 +85,8 @@ namespace particles {
 		ParameterInfoArray		m_parameters;
 	};
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ParameterContainer_H__	*/

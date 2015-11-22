@@ -34,9 +34,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // -------------------------------------------------------- Parameter -------------------------------------------------------- //
 
@@ -61,11 +61,11 @@ Parameter::~Parameter( void )
 void Parameter::clear( void )
 {
     switch( m_type ) {
-    case Scalar: m_scalar->curves[0].Clear();
-                 m_scalar->curves[1].Clear();
+    case Scalar: m_scalar->curves[0].clear();
+                 m_scalar->curves[1].clear();
                  break;
-    case Color:  m_color->curves[0].Clear();
-                 m_color->curves[1].Clear();
+    case Color:  m_color->curves[0].clear();
+                 m_color->curves[1].clear();
                  break;
     default:     DC_BREAK;
     }
@@ -86,27 +86,27 @@ float Parameter::sample( float scalar, float defaultValue ) const
 
 	switch( m_mode ) {
 	case Constant:			{
-								m_scalar->curves[0].Sample( 0, result );
+								m_scalar->curves[0].sample( 0, result );
 							}
 							break;
 	case RandomConst:		{
 								float a, b;
-								m_scalar->curves[0].Sample( 0, a );
-								m_scalar->curves[1].Sample( 0, b );
+								m_scalar->curves[0].sample( 0, a );
+								m_scalar->curves[1].sample( 0, b );
 
 								result = RANDOM_SCALAR( a, b );
 							}
 							break;
 
 	case Interpolate:		{
-								m_scalar->curves[0].Sample( scalar, result );
+								m_scalar->curves[0].sample( scalar, result );
 							}
 							break;
 
 	case RandomInterpolate:	{
 								float a, b;
-								m_scalar->curves[0].Sample( scalar, a );
-								m_scalar->curves[1].Sample( scalar, b );
+								m_scalar->curves[0].sample( scalar, a );
+								m_scalar->curves[1].sample( scalar, b );
 
 								result = RANDOM_SCALAR( a, b );	
 							}
@@ -131,27 +131,27 @@ Rgb Parameter::sample( float scalar, const Rgb& defaultValue ) const
 
 	switch( m_mode ) {
 	case Constant:			{
-								m_color->curves[0].Sample( 0, result );
+								m_color->curves[0].sample( 0, result );
 							}
 							break;
 	case RandomConst:		{
 								Rgb a, b;
-								m_color->curves[0].Sample( 0, a );
-								m_color->curves[1].Sample( 0, b );
+								m_color->curves[0].sample( 0, a );
+								m_color->curves[1].sample( 0, b );
 
 								result = RANDOM_COLOR( a, b );
 							}
 							break;
 
 	case Interpolate:		{
-								m_color->curves[0].Sample( scalar, result );
+								m_color->curves[0].sample( scalar, result );
 							}
 							break;
 
 	case RandomInterpolate:	{
 								Rgb a, b;
-								m_color->curves[0].Sample( scalar, a );
-								m_color->curves[1].Sample( scalar, b );
+								m_color->curves[0].sample( scalar, a );
+								m_color->curves[1].sample( scalar, b );
 
 								result = RANDOM_COLOR( a, b );	
 							}
@@ -211,17 +211,17 @@ void Parameter::setType( eType value )
 
     switch( m_type ) {
     case Scalar: m_scalar = DC_NEW sScalarCurves;
-				 m_scalar->curves[Min].Insert( 0, 0.0f, 0.0f );
-				 m_scalar->curves[Min].Insert( 1, 1.0f, 0.0f );
-				 m_scalar->curves[Max].Insert( 0, 0.0f, 0.0f );
-				 m_scalar->curves[Max].Insert( 1, 1.0f, 0.0f );
+				 m_scalar->curves[Min].insert( 0, 0.0f, 0.0f );
+				 m_scalar->curves[Min].insert( 1, 1.0f, 0.0f );
+				 m_scalar->curves[Max].insert( 0, 0.0f, 0.0f );
+				 m_scalar->curves[Max].insert( 1, 1.0f, 0.0f );
 				 break;
 
     case Color:  m_color = DC_NEW sColorCurves;
-				 m_color->curves[Min].Insert( 0, 0.0f, White );
-				 m_color->curves[Min].Insert( 1, 1.0f, White );
-				 m_color->curves[Max].Insert( 0, 0.0f, White );
-				 m_color->curves[Max].Insert( 1, 1.0f, White );
+				 m_color->curves[Min].insert( 0, 0.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
+				 m_color->curves[Min].insert( 1, 1.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
+				 m_color->curves[Max].insert( 0, 0.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
+				 m_color->curves[Max].insert( 1, 1.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
 				 break;
 
     default:	 break;
@@ -244,8 +244,8 @@ void Parameter::setEnabled( bool value )
 int Parameter::totalKeyframes( int curve ) const
 {
     switch( m_type ) {
-    case Scalar: return m_scalar->curves[curve].GetTotalKeyframes();
-    case Color:  return m_color->curves[curve].GetTotalKeyframes();
+    case Scalar: return m_scalar->curves[curve].keyframeCount();
+    case Color:  return m_color->curves[curve].keyframeCount();
     default:     break;
     }
 
@@ -262,8 +262,8 @@ void Parameter::setConstant( float value )
 
 	setMode( Constant );
 
-	m_scalar->curves[Min].Clear();
-	m_scalar->curves[Min].Insert( 0, 0.0f, value );
+	m_scalar->curves[Min].clear();
+	m_scalar->curves[Min].insert( 0, 0.0f, value );
 }
 
 // ** Parameter::setRange
@@ -275,11 +275,11 @@ void Parameter::setRange( float min, float max )
 
 	setMode( RandomConst );
 
-	m_scalar->curves[Min].Clear();
-	m_scalar->curves[Min].Insert( 0, 0.0f, min );
+	m_scalar->curves[Min].clear();
+	m_scalar->curves[Min].insert( 0, 0.0f, min );
 
-	m_scalar->curves[Max].Clear();
-	m_scalar->curves[Max].Insert( 0, 0.0f, max );
+	m_scalar->curves[Max].clear();
+	m_scalar->curves[Max].insert( 0, 0.0f, max );
 }
 
 // ** Parameter::data
@@ -291,9 +291,9 @@ FloatArray Parameter::data( int curve ) const
     case Scalar:    {
                         const CurveScalar& c = m_scalar->curves[curve];
         
-                        for( int i = 0, n = c.GetTotalKeyframes(); i < n; i++ ) {
-                            const CurveScalar::sKeyframe& kf = c.GetKeyframe( i );
-                            result.push_back( kf.m_scalar );
+                        for( int i = 0, n = c.keyframeCount(); i < n; i++ ) {
+                            const CurveScalar::Keyframe& kf = c.keyframe( i );
+                            result.push_back( kf.m_time );
                             result.push_back( kf.m_value );
                         }
                     }
@@ -302,9 +302,9 @@ FloatArray Parameter::data( int curve ) const
     case Color:     {
                         const CurveRgb& c = m_color->curves[curve];
 
-                        for( int i = 0, n = c.GetTotalKeyframes(); i < n; i++ ) {
-                            const CurveRgb::sKeyframe& kf = c.GetKeyframe( i );
-                            result.push_back( kf.m_scalar );
+                        for( int i = 0, n = c.keyframeCount(); i < n; i++ ) {
+                            const CurveRgb::Keyframe& kf = c.keyframe( i );
+                            result.push_back( kf.m_time );
                             result.push_back( kf.m_value.r );
                             result.push_back( kf.m_value.g );
                             result.push_back( kf.m_value.b );
@@ -326,9 +326,9 @@ void Parameter::setData( const FloatArray& data, int curve )
                         CurveScalar& c = m_scalar->curves[curve];
 						const int    k = 2;
 
-						c.Clear();
+						c.clear();
                         for( int i = 0, n = ( int )data.size() / k; i < n; i++ ) {
-                            c.Insert( c.GetTotalKeyframes(), data[i * k + 0], data[i * k + 1] );
+                            c.insert( c.keyframeCount(), data[i * k + 0], data[i * k + 1] );
                         }
                     }
                     break;
@@ -337,9 +337,9 @@ void Parameter::setData( const FloatArray& data, int curve )
                         CurveRgb& c = m_color->curves[curve];
 						const int k = 4;
 
-						c.Clear();
+						c.clear();
                         for( int i = 0, n = ( int )data.size() / k; i < n; i++ ) {
-                            c.Insert( c.GetTotalKeyframes(), data[i * k + 0], Rgb( &data[i * k + 1] ) );
+                            c.insert( c.keyframeCount(), data[i * k + 0], Rgb( &data[i * k + 1] ) );
                         }
                     }
                     break;
@@ -348,6 +348,6 @@ void Parameter::setData( const FloatArray& data, int curve )
     }
 }
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST

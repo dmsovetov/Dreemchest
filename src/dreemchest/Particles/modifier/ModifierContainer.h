@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** struct sModifierInfo
 	struct sModifierInfo {
@@ -81,8 +81,8 @@ namespace particles {
 		ModifierArray			m_modifiers;
     };
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ModifierContainer_H__	*/

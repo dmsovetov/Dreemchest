@@ -36,9 +36,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ** ZoneContainer::ZoneContainer
 ZoneContainer::ZoneContainer( void ) : m_zone( NULL )
@@ -92,7 +92,7 @@ void ZoneContainer::setZone( const char *name )
 // ** ZoneContainer::registerZone
 void ZoneContainer::registerZone( const char *name, ZoneType type )
 {
-    DC_BREAK_IF( findZoneByName( name ) != ZoneType::None );
+    DC_BREAK_IF( findZoneByName( name ) != ZoneNone );
 
     sZoneInfo zone;
     zone.m_name = name;
@@ -110,9 +110,9 @@ ZoneType ZoneContainer::findZoneByName( const char *name ) const
         }
     }
 
-    return ZoneType::None;
+    return ZoneNone;
 }
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST

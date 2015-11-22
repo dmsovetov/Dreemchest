@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
     // ** class Zone
     class Zone : public ParameterContainer {
@@ -61,7 +61,7 @@ namespace particles {
         static Zone*        create( ZoneType type );
 
         virtual ZoneType	type( void ) const                                         = 0;
-        virtual vec2        generateRandomPoint( float scalar, const vec2& center ) const = 0;
+        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const = 0;
     };
 
     // ** class DiskZone
@@ -71,8 +71,8 @@ namespace particles {
                             DiskZone( void );
 
         // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneType::Disk; }
-        virtual vec2        generateRandomPoint( float scalar, const vec2& center ) const;
+        virtual ZoneType	type( void ) const { return ZoneDisk; }
+        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
 
     private:
 
@@ -87,8 +87,8 @@ namespace particles {
                             LineZone( void );
 
         // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneType::Line; }
-        virtual vec2        generateRandomPoint( float scalar, const vec2& center ) const;
+        virtual ZoneType	type( void ) const { return ZoneLine; }
+        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
 
     private:
 
@@ -96,8 +96,8 @@ namespace particles {
         Parameter           m_length;
     };
 
-} // namespace particles
+} // namespace Particles
 
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ParticleZones_H__	*/

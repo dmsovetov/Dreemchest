@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
     // ** struct sZoneInfo
     struct sZoneInfo {
@@ -84,8 +84,8 @@ namespace particles {
         Zone*               m_zone;
     };
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ZoneContainer_H__	*/

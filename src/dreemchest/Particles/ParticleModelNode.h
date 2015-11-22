@@ -35,7 +35,7 @@
  =========================================================================================
  */
 
-#include	"../Common.h"
+#include "../Dreemchest.h"
 
 /*
  =========================================================================================
@@ -45,30 +45,88 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 	// ** class IParticleModelNode
 	class IParticleModelNode {
-
-		DC_DECLARE_IS( ParticleSystemModel, ParticleSystem,		NULL );
-		DC_DECLARE_IS( EmitterModel,		Emitter,			NULL );
-		DC_DECLARE_IS( ParticleModel,		Particles,			NULL );
-		DC_DECLARE_IS( Parameter,			Parameter,			NULL );
-		DC_DECLARE_IS( ParameterContainer,	ParameterContainer,	NULL );
-		DC_DECLARE_IS( Modifier,			Modifier,			NULL );
-		DC_DECLARE_IS( ModifierContainer,	ModifierContainer,	NULL );
-        DC_DECLARE_IS( ZoneContainer,       ZoneContainer,      NULL );
-		DC_DECLARE_IS( Zone,				Zone,				NULL );
-	
 	public:
 
 		virtual						~IParticleModelNode( void ) {}
 	};
 
-} // namespace particles
+	typedef Array<f32> FloatArray;
 
-} // namespace dreemchest
+	//! Available particle modifiers types.
+	enum ModifierType {
+		ModifierFriction,
+		ModifierForce,
+		ModifierForceField,
+
+		TotalModifierTypes
+	};
+        
+	//! Particle rendering modes.
+	enum RendererType {
+		RenderPoints,
+        RenderQuads,
+        RenderLines,
+        RenderThickLines,
+        RenderPaths,
+        RenderThickPaths,
+
+        TotalRenderTypes,
+	};
+
+	//! Particle blending modes.
+	enum BlendMode {
+		BlendNormal,
+		BlendAdditive,
+		BlendPremultiplied,
+
+		TotalBlendModes
+	};
+
+    //! Particle emission zones.
+    enum ZoneType {
+		ZoneNone,
+        ZoneDisk,
+        ZoneLine,
+
+        TotalZoneTypes,
+    };
+
+	class IParticleModelNode;
+		class Parameter;
+		class ParameterContainer;
+			class Zone;
+            class ZoneContainer;
+                class Modifier;
+                class ModifierContainer;
+                    class ParticleSystemModel;
+                    class EmitterModel;
+                    class ParticleModel;
+
+	class Renderer;
+	class ParticleSystem;
+	class Emitter;
+	class Particles;
+
+	struct sParticle;
+
+	typedef Array<Modifier*>		ModifierArray;
+	typedef Array<EmitterModel*>	EmitterModelArray;
+	typedef Array<ParticleModel*>	ParticleModelArray;
+	typedef Array<Emitter*>			EmitterArray;
+	typedef Array<Particles*>		ParticlesArray;
+	typedef List<sParticle*>		ParticleItemList;
+
+	typedef void*					dcBatchRenderer;
+	typedef void*					dcTextureAsset;
+
+} // namespace Particles
+
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ParticleModelNode_H__	*/

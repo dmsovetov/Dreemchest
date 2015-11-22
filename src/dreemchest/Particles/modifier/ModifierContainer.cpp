@@ -36,9 +36,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
 // ** ModifierContainer::ModifierContainer
 ModifierContainer::ModifierContainer( void )
@@ -96,6 +96,6 @@ void ModifierContainer::registerModifier( const char *name, Modifier *modifier )
 	m_modifierInfo.push_back( info );
 }
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST

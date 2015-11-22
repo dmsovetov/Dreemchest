@@ -45,9 +45,9 @@
  =========================================================================================
  */
 
-namespace dreemchest {
+DC_BEGIN_DREEMCHEST
 
-namespace particles {
+namespace Particles {
 
     // ** class Modifier
     class Modifier : public ZoneContainer {
@@ -123,8 +123,8 @@ namespace particles {
         bool                m_isQuadratic;
     };
 
-} // namespace particles
+} // namespace Particles
     
-} // namespace dreemchest
+DC_END_DREEMCHEST
 
 #endif /*	!__DC_Particles_ParticleModifiers_H__	*/
