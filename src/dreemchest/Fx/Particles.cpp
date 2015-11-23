@@ -136,6 +136,30 @@ void Particles::setMaxSnapshots( s32 value )
 	m_maxSnapshots = max2( 4, value );
 }
 
+// ** Particles::scalarParameter
+const Parameter& Particles::scalarParameter( ScalarParameter parameter ) const
+{
+	return m_scalar[parameter];
+}
+
+// ** Particles::scalarParameter
+Parameter& Particles::scalarParameter( ScalarParameter parameter )
+{
+	return m_scalar[parameter];
+}
+
+// ** Particles::colorParameter
+const Parameter& Particles::colorParameter( ColorParameter parameter ) const
+{
+	return m_color[parameter];
+}
+
+// ** Particles::colorParameter
+Parameter& Particles::colorParameter( ColorParameter parameter )
+{
+	return m_color[parameter];
+}
+
 // ** Particles::snapshotsToSave
 s32 Particles::snapshotsToSave( void ) const
 {
@@ -164,7 +188,7 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
 	const Parameter* rotation        = ScalarParam( Rotation );
 
 	Rgb white( 1.0f, 1.0f, 1.0f );
-	int snapshotCount = snapshotsToSave();
+	s32 snapshotCount = snapshotsToSave();
 
 	for( s32 i = 0; i < count; i++ ) {
 		Particle& particle = particles[i];
@@ -233,14 +257,14 @@ void Particles::initSnapshots( Particle& particle, s32 count ) const
 // ** Particles::update
 s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) const
 {
-	const Parameter *color           = ColorParam( ColorOverLife );
-	const Parameter *alpha           = ScalarParam( TransparencyOverLife );
-	const Parameter *velocity        = ScalarParam( VelocityOverLife );
-	const Parameter *torque          = ScalarParam( TorqueOverLife );
-	const Parameter *angularVelocity = ScalarParam( AngularVelocityOverLife );
-	const Parameter *size            = ScalarParam( SizeOverLife );
+	const Parameter* color           = ColorParam( ColorOverLife );
+	const Parameter* alpha           = ScalarParam( TransparencyOverLife );
+	const Parameter* velocity        = ScalarParam( VelocityOverLife );
+	const Parameter* torque          = ScalarParam( TorqueOverLife );
+	const Parameter* angularVelocity = ScalarParam( AngularVelocityOverLife );
+	const Parameter* size            = ScalarParam( SizeOverLife );
 
-	int aliveCount = 0;
+	s32 aliveCount = 0;
 	Rgb white( 1.0f, 1.0f, 1.0f );
 
 	// ** Reset in-out parameters
@@ -300,9 +324,27 @@ ParticlesInstance::ParticlesInstance( ParticlesWPtr particles ) : m_particles( p
 }
 
 // ** ParticlesInstance::aliveCount
-int ParticlesInstance::aliveCount( void ) const
+s32 ParticlesInstance::aliveCount( void ) const
 {
 	return m_aliveCount;
+}
+
+// ** ParticlesInstance::items
+const Particle* ParticlesInstance::items( void ) const
+{
+	return &m_items[0];
+}
+
+// ** ParticlesInstance::blendingMode
+BlendingMode ParticlesInstance::blendingMode( void ) const
+{
+	return m_particles->blendingMode();
+}
+
+// ** ParticlesInstance::renderingMode
+RenderingMode ParticlesInstance::renderingMode( void ) const
+{
+	return m_particles->renderingMode();
 }
 
 // ** ParticlesInstance::update
@@ -331,7 +373,7 @@ s32 ParticlesInstance::update( const ZoneWPtr& zone, f32 dt, const Vec3& positio
     f32 emission = m_particles->emission( scalar );
 
     if( emission > 0.0f ) {
-        deadCount       = std::min( deadCount, ( s32 )floor( m_emissionTime * emission ) );
+        deadCount       = min2( deadCount, ( s32 )floor( m_emissionTime * emission ) );
         m_emissionTime -= deadCount / emission;
 
         DC_BREAK_IF( m_emissionTime < 0.0f );

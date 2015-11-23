@@ -109,6 +109,12 @@ namespace Fx {
 		//! Returns true if the particle emission is ended.
 		bool					hasEnded( void ) const;
 
+		//! Returns the total number of particles.
+		s32						particlesCount( void ) const;
+
+		//! Returns the particles instance.
+		ParticlesInstanceWPtr	particles( s32 index ) const;
+
 		//! Performs the emitter instance update.
 		s32						update( f32 dt, const Vec3& position );
 

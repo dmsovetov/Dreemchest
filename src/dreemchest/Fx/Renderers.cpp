@@ -27,201 +27,220 @@
 #include "Renderers.h"
 
 #include "Particles.h"
+#include "ParticleSystem.h"
+#include "Emitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-// -------------------------------------- Renderer -------------------------------------- //
+// -------------------------------------- ParticleRenderer -------------------------------------- //
 
-// ** Renderer::Renderer
-Renderer::Renderer( void )
+// ** ParticleRenderer::ParticleRenderer
+ParticleRenderer::ParticleRenderer( const IRenderingInterfacePtr& renderingInterface ) : m_renderingInterface( renderingInterface )
 {
+
 }
 
-// ** Renderer::~Renderer
-Renderer::~Renderer( void )
-{
-}
-
-// ** Renderer::createRenderer
-Renderer* Renderer::createRenderer( RenderingMode type )
+// ** ParticleRenderer::create
+ParticleRendererPtr ParticleRenderer::create( RenderingMode type, const IRenderingInterfacePtr& renderingInterface )
 {
     switch( type ) {
-    case RenderPoints:      return DC_NEW PointRenderer;
-    case RenderQuads:       return DC_NEW QuadRenderer;
-    case RenderLines:       return DC_NEW LineRenderer;
-    case RenderThickLines:  return DC_NEW ThickLineRenderer;
-    case RenderPaths:       return DC_NEW PathRenderer;
-    case RenderThickPaths:  return DC_NEW ThickPathRenderer;
-    default:				return NULL;
+    case RenderPoints:      return ParticleRendererPtr( DC_NEW PointRenderer( renderingInterface ) );
+    case RenderQuads:       return ParticleRendererPtr( DC_NEW QuadRenderer( renderingInterface ) );
+    case RenderLines:       return ParticleRendererPtr( DC_NEW LineRenderer( renderingInterface ) );
+    case RenderThickLines:  return ParticleRendererPtr( DC_NEW ThickLineRenderer( renderingInterface ) );
+    case RenderPaths:       return ParticleRendererPtr( DC_NEW PathRenderer( renderingInterface ) );
+    case RenderThickPaths:  return ParticleRendererPtr( DC_NEW ThickPathRenderer( renderingInterface ) );
+    default:				break;
     }
 
-    return NULL;
+	DC_BREAK;
+    return ParticleRendererPtr();
 }
 
-// ** Renderer::render
-void Renderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
-{
-	//switch( blendMode ) {
-	//case BlendMode::Normal:			renderer->setBlendMode( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
-	//								break;
-	//case BlendMode::Additive:		renderer->setBlendMode( renderer::BlendOne, renderer::BlendOne );
-	//								break;
-	//case BlendMode::Premultiplied:	renderer->setBlendMode( renderer::BlendOne, renderer::BlendInvSrcAlpha );
-	//								break;
-	//}
-}
+// ------------------------------------ PointRenderer ------------------------------------ //
 
 // ** PointRenderer::PointRenderer
-PointRenderer::PointRenderer( void )
+PointRenderer::PointRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
-    
+
 }
 
 // ** PointRenderer::render
-void PointRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void PointRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
-
-    //renderer->renderPointArray( NULL, &particles->m_position, &particles->m_color, &particles->m_size, sizeof( sParticle ), count );
-    //renderer->flush();
+	DC_NOT_IMPLEMENTED
+//	m_renderingInterface->renderPoints( &particles->m_position, &particles->m_color.current, &particles->m_size.current, count, sizeof( Particle ) );
+//	m_renderingInterface->flush();
 }
 
 // ------------------------------------ QuadRenderer ------------------------------------ //
 
 // ** QuadRenderer::QuadRenderer
-QuadRenderer::QuadRenderer( void )
+QuadRenderer::QuadRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
 
 }
 
 // ** QuadRenderer::render
-void QuadRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void QuadRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
+    Vec2 up, side;
 
- //   Vec2 up, side;
+    for( int i = 0; i < count; i++ ) {
+        const Particle& p         = particles[i];
+        const Vec2&		 position = p.m_position;
+        Rgba			 color    = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
 
-	//dcTexture   tex   = texture ? texture->GetTexturePointer() : NULL;
-	//dcTexture2D tex2d = tex ? tex->isTexture2D() : NULL;
-	//vec4		uv	  = texture ? texture->GetUv() : vec4( 0, 0, 0, 0 );
+        f32 c = cosf( radians( p.m_rotation ) );
+        f32 s = sinf( radians( p.m_rotation ) );
 
- //   // ** Triangulate particles
- //   for( int i = 0; i < count; i++ ) {
- //       const sParticle& p        = particles[i];
- //       const Vec2&		 position = p.m_position;
- //       Rgba			 color    = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        up.x    = c; up.y   = -s;
+        side.x  = s; side.y =  c;
 
- //       float c = cosf( radians( p.m_rotation ) );
- //       float s = sinf( radians( p.m_rotation ) );
+        m_renderingInterface->renderOrientedQuadUV( texture, position.x, position.y, p.m_size.current * 0.5f, p.m_size.current * 0.5f, up, side, color );
+    }
 
- //       up.x    = c; up.y   = -s;
- //       side.x  = s; side.y =  c;
-
- //       renderer->renderOrientedQuadUV( tex2d, position.x, position.y, p.m_size.current * 0.5f, p.m_size.current * 0.5f, up, side, uv, color );
- //   }
-
- //   renderer->flush();
+    m_renderingInterface->flush();
 }
 
 // ------------------------------------ LineRenderer ------------------------------------ //
 
 // ** LineRenderer::LineRenderer
-LineRenderer::LineRenderer( void )
+LineRenderer::LineRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
 
 }
 
 // ** LineRenderer::render
-void LineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void LineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
+    for( s32 i = 0; i < count; i++ ) {
+        const Particle& p = particles[i];
 
-    //for( int i = 0; i < count; i++ ) {
-    //    const sParticle& p = particles[i];
+        Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        const Vec2& end   = p.m_position;
+        const Vec2& start = end + Vec2::fromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
 
-    //    Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
-    //    const Vec2& end   = p.m_position;
-    //    const Vec2& start = end + Vec2::FromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
+        m_renderingInterface->renderLine( start.x, start.y, end.x, end.y, color, Rgba( color.r, color.g, color.b, 0 ) );
+    }
 
-    //    renderer->renderLine( start.x, start.y, end.x, end.y, color, Rgba( ( unsigned int )color.r, color.g, color.b, 0 ) );
-    //}
-
-    //renderer->flush();
+    m_renderingInterface->flush();
 }
 
 // ---------------------------------- ThickLineRenderer ------------------------------------ //
 
 // ** ThickLineRenderer::ThickLineRenderer
-ThickLineRenderer::ThickLineRenderer( void )
+ThickLineRenderer::ThickLineRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
 
 }
 
 // ** ThickLineRenderer::render
-void ThickLineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void ThickLineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
+    for( s32 i = 0; i < count; i++ ) {
+        const Particle& p = particles[i];
 
-	//dcTexture   tex   = texture ? texture->GetTexturePointer() : NULL;
-	//dcTexture2D tex2d = tex ? tex->isTexture2D() : NULL;
+        Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        const Vec2& end   = p.m_position;
+        const Vec2& start = end + Vec2::fromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
 
- //   // ** Triangulate particles
- //   for( int i = 0; i < count; i++ ) {
- //       const sParticle& p = particles[i];
-
- //       Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
- //       const Vec2& end   = p.m_position;
- //       const Vec2& start = end + Vec2::FromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
-
- //       renderer->renderThickLine( tex2d, start.x, start.y, end.x, end.y, p.m_size.current, p.m_size.current, color, Rgba( ( unsigned int )color.r, color.g, color.b, 0 ) );
- //   }
- //   
- //   renderer->flush();
+        m_renderingInterface->renderThickLine( texture, start.x, start.y, end.x, end.y, p.m_size.current, p.m_size.current, color, Rgba( color.r, color.g, color.b, 0 ) );
+    }
+    
+    m_renderingInterface->flush();
 }
 
 // ------------------------------------ PathRenderer ------------------------------------ //
 
 // ** PathRenderer::PathRenderer
-PathRenderer::PathRenderer( void )
+PathRenderer::PathRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
 
 }
 
 // ** PathRenderer::render
-void PathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void PathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
-
-    //for( int i = 0; i < count; i++ ) {
-    //    renderer->renderLineStrip( &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, sizeof( particles[i].m_snapshots[0] ), sParticle::MaxSnapshots, particles[i].m_color.current.alpha );
-    //}
-    //renderer->flush();
+    for( s32 i = 0; i < count; i++ ) {
+        m_renderingInterface->renderLineStrip( &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ), particles[i].m_color.current.alpha );
+    }
+    m_renderingInterface->flush();
 }
 
 // ---------------------------------- ThickPathRenderer ------------------------------------ //
 
-// ** ThickPathRenderer::ThickPathRenderer
-ThickPathRenderer::ThickPathRenderer( void )
+ThickPathRenderer::ThickPathRenderer( const IRenderingInterfacePtr& renderingInterface ) : ParticleRenderer( renderingInterface )
 {
 
 }
 
 // ** ThickPathRenderer::render
-void ThickPathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
+void ThickPathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-	Renderer::render( renderer, texture, blendMode, particles, count );
-
-	//dcTexture   tex   = texture ? texture->GetTexturePointer() : NULL;
-	//dcTexture2D tex2d = tex ? tex->isTexture2D() : NULL;
-
- //   for( int i = 0; i < count; i++ ) {
- //       renderer->renderThickLineStrip( tex2d, &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, &particles[i].m_snapshots->size, sizeof( particles[i].m_snapshots[0] ), sParticle::MaxSnapshots, particles[i].m_color.current.alpha );
- //   }
- //   renderer->flush();
+    for( s32 i = 0; i < count; i++ ) {
+        m_renderingInterface->renderThickLineStrip( texture, &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, &particles[i].m_snapshots->size,  Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ),particles[i].m_color.current.alpha );
+    }
+    m_renderingInterface->flush();
 }
 
+// ---------------------------------------------------- BuiltInRenderingInterface ---------------------------------------------------- //
+
+// ** BuiltInRenderingInterface::BuiltInRenderingInterface
+BuiltInRenderingInterface::BuiltInRenderingInterface( Renderer::Renderer2DPtr renderer ) : m_renderer( renderer )
+{
+
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride )
+{
+	DC_NOT_IMPLEMENTED;
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride )
+{
+	m_renderer->points( position, color, size, count, stride );
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
+{
+	m_renderer->orientedQuad( Renderer::Texture2DWPtr(), x, y, width, height, up, side, color );
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 )
+{
+	m_renderer->line( x1, y1, x2, y2, color1, color2 );
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 )
+{
+	DC_NOT_IMPLEMENTED;
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha )
+{
+	DC_NOT_IMPLEMENTED;
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha )
+{
+	DC_NOT_IMPLEMENTED;
+}
+
+// ** uiltInRenderingInterface::renderPoints
+void BuiltInRenderingInterface::flush( void )
+{
+	m_renderer->flush();
+}
 
 } // namespace Fx
 

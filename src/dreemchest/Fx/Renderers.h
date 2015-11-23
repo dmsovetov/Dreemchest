@@ -29,92 +29,182 @@
 
 #include "Emitter.h"
 
+#include "../Renderer/Hal.h"
+#include "../Renderer/Renderer2D.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-    // ** struct sParticleVertex
-    struct sParticleVertex {
-        Vec2        pos;
-        Rgba        color;
+    //! Particle vertex struct used for rendering.
+    struct ParticleVertex {
+        Vec3        pos;		//!< Vertex position.
+        Rgba        color;		//!< Vertex color.
     };
 
-    // ** class Renderer
-    class Renderer : public RefCounted {
+	//! Hardware rendering texture.
+	class ITexture : public RefCounted {
+	public:
+
+		virtual						~ITexture( void ) {}
+	};
+
+	//! Hardware rendering interface.
+	class IRenderingInterface : public RefCounted {
+	public:
+
+		virtual						~IRenderingInterface( void ) {}
+
+		//! Renders an array of 3d points.
+		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
+
+		//! Renders an array of 2d points.
+		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
+
+		//! Renders the oriented 2d quad.
+		virtual void				renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) = 0;
+
+		//! Renders the 2d line segment.
+		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 ) = 0;
+
+		//! Renders the 2d thick line.
+		virtual void				renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) = 0;
+
+		//! Renders the 2d line strip.
+		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
+
+		//! Renders the 2d thick line strip.
+		virtual void				renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
+
+		//! Flushes the accumulated particles.
+		virtual void				flush( void ) = 0;
+	};
+
+	//! The built-in rendering interface.
+	class BuiltInRenderingInterface : public IRenderingInterface {
+	public:
+
+									//! Constructs the BuiltInRenderingInterface instance.
+									BuiltInRenderingInterface( Renderer::Renderer2DPtr renderer );
+
+		//! Renders an array of 3d points.
+		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+
+		//! Renders an array of 2d points.
+		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+
+		//! Renders the oriented 2d quad.
+		virtual void				renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
+
+		//! Renders the 2d line segment.
+		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 );
+
+		//! Renders the 2d thick line.
+		virtual void				renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
+
+		//! Renders the 2d line strip.
+		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f );
+
+		//! Renders the 2d thick line strip.
+		virtual void				renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
+
+		//! Flushes the accumulated particles.
+		virtual void				flush( void );
+
+	private:
+
+		Renderer::Renderer2DPtr		m_renderer;	//!< 2d rendering interface.
+	};
+
+    //! Base class for all particle renderers.
+    class ParticleRenderer : public RefCounted {
     public:
 
-                                    Renderer( void );
-        virtual                     ~Renderer( void );
+		virtual                     ~ParticleRenderer( void ) {}
 
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
-        virtual RenderingMode		type( void ) const { return TotalRenderingModes; }
-        static Renderer*            createRenderer( RenderingMode type );
+		//! Returns the particle renderer type.
+        virtual RenderingMode		type( void ) const = 0;
+
+		//! Renders the particles with a specified blending mode & texture.
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count ) = 0;
+
+		//! Creates the particle renderer instance by type.
+        static ParticleRendererPtr	create( RenderingMode type, const IRenderingInterfacePtr& renderingInterface );
+
+	protected:
+
+									//! Constructs ParticleRenderer instance.
+									ParticleRenderer( const IRenderingInterfacePtr& renderingInterface );
+
+	protected:
+
+		IRenderingInterfacePtr		m_renderingInterface;
     };
 
     // ** class PointRenderer
-    class PointRenderer : public Renderer {
+    class PointRenderer : public ParticleRenderer {
     public:
         
-                                    PointRenderer( void );
+                                    PointRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderPoints; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class QuadRenderer
-    class QuadRenderer : public Renderer {
+    class QuadRenderer : public ParticleRenderer {
     public:
 
-                                    QuadRenderer( void );
+                                    QuadRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderQuads; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class LineRenderer
-    class LineRenderer : public Renderer {
+    class LineRenderer : public ParticleRenderer {
     public:
 
-                                    LineRenderer( void );
+                                    LineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderLines; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class ThickLineRenderer
-    class ThickLineRenderer : public Renderer {
+    class ThickLineRenderer : public ParticleRenderer {
     public:
 
-                                    ThickLineRenderer( void );
+                                    ThickLineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickLines; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class PathRenderer
-    class PathRenderer : public Renderer {
+    class PathRenderer : public ParticleRenderer {
     public:
 
-                                    PathRenderer( void );
+                                    PathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode	    type( void ) const { return RenderPaths; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class ThickPathRenderer
-    class ThickPathRenderer : public Renderer {
+    class ThickPathRenderer : public ParticleRenderer {
     public:
 
-                                    ThickPathRenderer( void );
+                                    ThickPathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickPaths; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
     };
 
 } // namespace Fx

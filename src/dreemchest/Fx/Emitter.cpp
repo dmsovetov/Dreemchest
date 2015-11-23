@@ -160,6 +160,19 @@ s32 EmitterInstance::aliveCount( void ) const
 	return m_aliveCount;
 }
 
+// ** EmitterInstance::particlesCount
+s32 EmitterInstance::particlesCount( void ) const
+{
+	return static_cast<s32>( m_particles.size() );
+}
+
+// ** EmitterInstance::particles
+ParticlesInstanceWPtr EmitterInstance::particles( s32 index ) const
+{
+	DC_BREAK_IF( index < 0 || index >= particlesCount() );
+	return m_particles[index];
+}
+
 // ** EmitterInstance::hasEnded
 bool EmitterInstance::hasEnded( void ) const
 {

@@ -87,9 +87,10 @@ namespace Fx {
 	//! Particles contains an array of particles and a set of simulation parameters.
 	class Particles : public RefCounted {
 	friend class Emitter;
+	public:
 
 		//! Available particle scalar parameters.
-		enum eScalarParameter {
+		enum ScalarParameter {
 			Emission,
 			Life,
 			Direction,
@@ -109,7 +110,7 @@ namespace Fx {
 		};
 
         //! Available particle color parameters.
-        enum eColorParameter {
+        enum ColorParameter {
             Color,
             ColorOverLife,
 
@@ -151,6 +152,14 @@ namespace Fx {
 		//! Sets the maximum number of snapshots to save.
 		void					setMaxSnapshots( s32 value );
 
+		//! Returns the scalar parameter.
+		const Parameter&		scalarParameter( ScalarParameter parameter ) const;
+		Parameter&				scalarParameter( ScalarParameter parameter );
+
+		//! Returns the color parameter.
+		const Parameter&		colorParameter( ColorParameter parameter ) const;
+		Parameter&				colorParameter( ColorParameter parameter );
+
 		//! Updates the group of particles.
 		s32                     update( Particle* items, s32 itemCount, f32 dt, Bounds* bounds = NULL ) const;
 
@@ -191,6 +200,15 @@ namespace Fx {
 
 		//! Returns the total number of alive particles.
 		s32						aliveCount( void ) const;
+
+		//! Returns the particle items.
+		const Particle*			items( void ) const;
+
+		//! Returns the particle blending mode.
+		BlendingMode			blendingMode( void ) const;
+
+		//! Returns the particle rendering mode.
+		RenderingMode			renderingMode( void ) const;
 
 		//! Updates the particles.
 		s32						update( const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );

@@ -78,7 +78,7 @@ ParticleSystemInstancePtr ParticleSystem::createInstance( void ) const
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
 
 // ** ParticleSystemInstance::ParticleSystemInstance
-ParticleSystemInstance::ParticleSystemInstance( ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 )
+ParticleSystemInstance::ParticleSystemInstance( ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 ), m_timeScale( 1.0f )
 {
 	for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
 		m_emitters.push_back( m_particleSystem->emitter( i )->createInstance() );
@@ -115,6 +115,19 @@ s32 ParticleSystemInstance::aliveCount( void ) const
 	return m_aliveCount;
 }
 
+// ** ParticleSystemInstance::emitterCount
+s32 ParticleSystemInstance::emitterCount( void ) const
+{
+	return static_cast<s32>( m_emitters.size() );
+}
+
+// ** ParticleSystemInstance::emitter
+EmitterInstanceWPtr ParticleSystemInstance::emitter( s32 index ) const
+{
+	DC_BREAK_IF( index < 0 || index >= emitterCount() );
+	return m_emitters[index];
+}
+
 // ** ParticleSystemInstance::hasEnded
 bool ParticleSystemInstance::hasEnded( void ) const
 {
@@ -133,7 +146,7 @@ s32 ParticleSystemInstance::update( f32 dt )
 	m_aliveCount = 0;
 
 	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
-		m_aliveCount += m_emitters[i]->update( dt, m_position );
+		m_aliveCount += m_emitters[i]->update( dt * m_timeScale, m_position );
 	}
 
 	return m_aliveCount;

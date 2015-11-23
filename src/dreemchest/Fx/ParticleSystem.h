@@ -78,6 +78,12 @@ namespace Fx {
 		//! Returns the total number of alive particles.
 		s32							aliveCount( void ) const;
 
+		//! Returns the total number of emitters.
+		s32							emitterCount( void ) const;
+
+		//! Returns the emitter instance.
+		EmitterInstanceWPtr			emitter( s32 index ) const;
+
 		//! Returns true if the particle system has ended the playback.
 		bool						hasEnded( void ) const;
 

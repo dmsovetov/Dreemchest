@@ -33,25 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	class ParticleModel;
-	class Zone;
-	class Modifier;
-//	class Emitter;
-//	class Particles;
-	class Renderer;
-//	class EmitterModel;
-//	class ParticleSystem;
-	struct sParticle;
-
-	typedef u32 dcTextureAsset;
-	typedef u32 dcBatchRenderer;
-
 	typedef Array<f32> FloatArray;
-	typedef Array<Modifier*> ModifierArray;
-//	typedef Array<ParticleModel*> ParticleModelArray;
-//	typedef Array<Particles*> ParticlesArray;
-//	typedef Array<EmitterModel*> EmitterModelArray;
-//	typedef Array<Emitter*> EmitterArray;
+
+	struct Particle;
 
 	dcDeclarePtrs( Emitter )
 	dcDeclarePtrs( EmitterInstance )
@@ -60,6 +44,9 @@ namespace Fx {
 	dcDeclarePtrs( ParticleSystem )
 	dcDeclarePtrs( ParticleSystemInstance )
 	dcDeclarePtrs( Zone )
+	dcDeclarePtrs( ParticleRenderer )
+	dcDeclarePtrs( IRenderingInterface )
+	dcDeclarePtrs( ITexture )
 
 	//! Container type to store particle system emitters.
 	typedef Array<EmitterPtr>			EmittersArray;
@@ -110,5 +97,12 @@ namespace Fx {
 } // namespace Fx
 
 DC_END_DREEMCHEST
+
+#ifndef DC_BUILD_LIBRARY
+	#include "ParticleSystem.h"
+	#include "Emitter.h"
+	#include "Particles.h"
+	#include "Renderers.h"
+#endif
 
 #endif	/*	!__DC_Fx_H__	*/
