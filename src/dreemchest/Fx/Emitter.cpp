@@ -27,6 +27,7 @@
 #include "Emitter.h"
 
 #include "Particles.h"
+#include "Zones.h"
 
 #define EmitterParam( name ) m_parameter[name] ? &m_parameter[name] : NULL;
 
@@ -34,170 +35,168 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-// ---------------------------------- EmitterModel ------------------------------------- //
+// ---------------------------------------- Emitter ---------------------------------------- //
 
-// ** EmitterModel::EmitterModel
-EmitterModel::EmitterModel( void ) : m_position( 0, 0 ), m_duration( 1.0f ), m_isLooped( true )
+// ** Emitter::Emitter
+Emitter::Emitter( void ) : m_position( 0.0f, 0.0f, 0.0f ), m_duration( 1.0f ), m_isLooped( true )
 {
-//    registerZone( "Disk", ZoneType::ZoneDisk );
-//    registerZone( "Line", ZoneType::ZoneLine );
+
 }
 
-EmitterModel::~EmitterModel( void )
-{
-	for( int i = 0, n = totalParticles(); i < n; i++ ) {
-		delete m_particles[i];
-	}
-}
-
-// ** EmitterModel::position
-const Vec2& EmitterModel::position( void ) const
+// ** Emitter::position
+const Vec3& Emitter::position( void ) const
 {
 	return m_position;
 }
 
-// ** EmitterModel::setPosition
-void EmitterModel::setPosition( const Vec2& value )
+// ** Emitter::setPosition
+void Emitter::setPosition( const Vec3& value )
 {
 	m_position = value;
 }
 
-// ** EmitterModel::duration
-float EmitterModel::duration( void ) const
+// ** Emitter::duration
+f32 Emitter::duration( void ) const
 {
 	return m_duration;
 }
 
-// ** EmitterModel::setDuration
-void EmitterModel::setDuration( float value )
+// ** Emitter::setDuration
+void Emitter::setDuration( f32 value )
 {
-	m_duration = std::max( value, 0.1f );
+	m_duration = max2( value, 0.1f );
 }
 
-// ** EmitterModel::name
-const char* EmitterModel::name( void ) const
+// ** Emitter::name
+const String& Emitter::name( void ) const
 {
-	return m_name.c_str();
+	return m_name;
 }
 
-// ** EmitterModel::setName
-void EmitterModel::setName( const char *value )
+// ** Emitter::setName
+void Emitter::setName( const String& value )
 {
 	m_name = value;
 }
 
-// ** EmitterModel::isLooped
-bool EmitterModel::isLooped( void ) const
+// ** Emitter::isLooped
+bool Emitter::isLooped( void ) const
 {
 	return m_isLooped;
 }
 
-// ** EmitterModel::setLooped
-void EmitterModel::setLooped( bool value )
+// ** Emitter::setLooped
+void Emitter::setLooped( bool value )
 {
 	m_isLooped = value;
 }
 
-// ** EmitterModel::totalParticles
-int EmitterModel::totalParticles( void ) const
+// ** Emitter::zone
+ZoneWPtr Emitter::zone( void ) const
 {
-	return ( int )m_particles.size();
+	return m_zone;
 }
 
-// ** EmitterModel::particles
-ParticleModel* EmitterModel::particles( int index ) const
+// ** Emitter::setZone
+void Emitter::setZone( const ZonePtr& value )
 {
-	DC_BREAK_IF( index < 0 || index >= totalParticles() );
+	m_zone = value;
+}
+
+// ** Emitter::particlesCount
+s32 Emitter::particlesCount( void ) const
+{
+	return static_cast<s32>( m_particles.size() );
+}
+
+// ** Emitter::particles
+ParticlesWPtr Emitter::particles( s32 index ) const
+{
+	DC_BREAK_IF( index < 0 || index >= particlesCount() );
 	return m_particles[index];
 }
 
-// ** EmitterModel::removeParticles
-void EmitterModel::removeParticles( ParticleModel *particle )
+// ** Emitter::removeParticles
+void Emitter::removeParticles( const ParticlesWPtr& particles )
 {
-	ParticleModelArray::iterator i = std::find( m_particles.begin(), m_particles.end(), particle );
+	ParticlesArray::iterator i = std::find( m_particles.begin(), m_particles.end(), particles );
+
 	if( i == m_particles.end() ) {
 		DC_BREAK;
 		return;
 	}
 
-	delete *i;
 	m_particles.erase( i );
 }
 
-// ** EmitterModel::createParticles
-ParticleModel* EmitterModel::createParticles( void )
+// ** Emitter::addParticles
+ParticlesWPtr Emitter::addParticles( void )
 {
-	ParticleModel *particle = DC_NEW ParticleModel;
+	Particles *particle = DC_NEW Particles;
 	m_particles.push_back( particle );
 
 	return particle;
 }
 
-// ** EmitterModel::createInstance
-Emitter* EmitterModel::createInstance( void ) const
+// ** Emitter::createInstance
+EmitterInstancePtr Emitter::createInstance( void ) const
 {
-	return DC_NEW Emitter( this );
+	return DC_NEW EmitterInstance( const_cast<Emitter*>( this ) );
 }
 
-// ------------------------------------- Emitter ---------------------------------------- //
+// ------------------------------------- EmitterInstance ---------------------------------------- //
 
-// ** Emitter::Emitter
-Emitter::Emitter( const EmitterModel *model ) : m_model( model ), m_time( 0.0f ), m_aliveCount( 0 )
+// ** EmitterInstance::EmitterInstance
+EmitterInstance::EmitterInstance( EmitterWPtr emitter ) : m_emitter( emitter ), m_time( 0.0f ), m_aliveCount( 0 )
 {
-	for( int i = 0, n = m_model->totalParticles(); i < n; i++ ) {
-		m_particles.push_back( m_model->particles( i )->createInstance() );
+	for( int i = 0, n = m_emitter->particlesCount(); i < n; i++ ) {
+		m_particles.push_back( m_emitter->particles( i )->createInstance() );
 	}
 }
 
-Emitter::~Emitter( void )
-{
-	for( int i = 0, n = ( int )m_particles.size(); i < n; i++ ) {
-		delete m_particles[i];
-	}
-}
-
-// ** Emitter::aliveCount
-int Emitter::aliveCount( void ) const
+// ** EmitterInstance::aliveCount
+s32 EmitterInstance::aliveCount( void ) const
 {
 	return m_aliveCount;
 }
 
-// ** Emitter::hasEnded
-bool Emitter::hasEnded( void ) const
+// ** EmitterInstance::hasEnded
+bool EmitterInstance::hasEnded( void ) const
 {
-	if( m_model->isLooped() ) {
+	if( m_emitter->isLooped() ) {
 		return false;
 	}
 
-	if( m_time < m_model->duration() ) {
+	if( m_time < m_emitter->duration() ) {
 		return false;
 	}
 
 	return m_aliveCount == 0;
 }
 
-// ** Emitter::update
-int Emitter::update( float dt, const Vec2& position )
+// ** EmitterInstance::update
+s32 EmitterInstance::update( f32 dt, const Vec3& position )
 {
-    const float duration = m_model->duration();
-	bool		ended	 = updateTime( dt );
+    f32		    duration = m_emitter->duration();
+    ZoneWPtr    zone	 = m_emitter->zone();
+    const Vec3& pos		 = m_emitter->position();
 
-    Zone*       zone = m_model->zone();
-    const Vec2& pos  = m_model->position();
+	// Update the emitter time
+	bool ended = updateTime( dt );
 
 	m_aliveCount = 0;
 
-	for( int i = 0, n = ( int )m_particles.size(); i < n; i++ ) {
+	for( u32 i = 0, n = ( u32 )m_particles.size(); i < n; i++ ) {
 		m_aliveCount += m_particles[i]->update( zone, dt, position + pos, m_time / duration, ended );
 	}
 
 	return m_aliveCount;
 }
 
-// ** Emitter::updateTime
-bool Emitter::updateTime( float dt )
+// ** EmitterInstance::updateTime
+bool EmitterInstance::updateTime( f32 dt )
 {
-	float duration = m_model->duration();
+	f32 duration = m_emitter->duration();
 
 	m_time += dt;
 
@@ -205,7 +204,7 @@ bool Emitter::updateTime( float dt )
 		return false;
 	}
 
-	if( m_model->isLooped() ) {
+	if( m_emitter->isLooped() ) {
 		m_time -= floor( m_time / duration ) * duration;
 	} else {
 		m_time = duration;
@@ -214,22 +213,14 @@ bool Emitter::updateTime( float dt )
 	return true;
 }
 
-// ** Emitter::warmUp
-void Emitter::warmUp( float dt, const Vec2& position )
+// ** EmitterInstance::warmUp
+void EmitterInstance::warmUp( f32 dt, const Vec3& position )
 {
-    int iterations = static_cast<int>( m_model->duration() / dt );
+    s32 iterations = static_cast<s32>( m_emitter->duration() / dt );
 
-    for( int i = 0; i < iterations; i++ ) {
+    for( s32 i = 0; i < iterations; i++ ) {
         update( dt, position );
     }
-}
-
-// ** Emitter::render
-void Emitter::render( dcBatchRenderer renderer )
-{
-	for( int i = 0, n = ( int )m_particles.size(); i < n; i++ ) {
-		m_particles[i]->render( renderer );
-	}
 }
 
 } // namespace Fx

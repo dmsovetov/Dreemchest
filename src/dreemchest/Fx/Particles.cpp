@@ -27,7 +27,7 @@
 #include "Particles.h"
 
 #include "Renderers.h"
-#include "Zone/Zones.h"
+#include "Zones.h"
 
 #define ScalarParam( name ) m_scalar[name] ? &m_scalar[name] : NULL
 #define ColorParam( name )  m_color[name]  ? &m_color[name]  : NULL
@@ -36,39 +36,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-// ----------------------------------------------- ParticleModel ----------------------------------------------- //
+// ----------------------------------------------- Particles ----------------------------------------------- //
 
-// ** ParticleModel::ParticleModel
-ParticleModel::ParticleModel( void )
+// ** Particles::Particles
+Particles::Particles( void ) : m_count( 1 ), m_maxSnapshots( Particle::MaxSnapshots )
 {
-	m_count				= 1;
-	m_particleRenderer  = NULL;
-	m_texture			= NULL;
-	m_maxSnapshots		= sParticle::MaxSnapshots;
+	setBlendingMode( BlendAlpha );
+	setRenderingMode( RenderQuads );
 
-	setBlendMode( BlendAlpha );
-	setRendererType( RenderQuads );
-
-	// ** Register parameters
-//	registerParameter( "Emission", &m_scalar[Emission], sParameterInfo::Initial );
-//	registerParameter( "Life", &m_scalar[Life], sParameterInfo::Initial );
-//	registerParameter( "Direction", &m_scalar[Direction], sParameterInfo::Initial );
-//	registerParameter( "Size", &m_scalar[Size], sParameterInfo::Initial );
-//	registerParameter( "Transparency", &m_scalar[Transparency], sParameterInfo::Initial );
-//	registerParameter( "Velocity", &m_scalar[Velocity], sParameterInfo::Initial );
-//	registerParameter( "AngularVelocity", &m_scalar[AngularVelocity], sParameterInfo::Initial );
-//	registerParameter( "Torque", &m_scalar[Torque], sParameterInfo::Initial );
-//	registerParameter( "Rotation", &m_scalar[Rotation], sParameterInfo::Initial );
-//	registerParameter( "SizeOverLife", &m_scalar[SizeOverLife], sParameterInfo::Lifetime );
-//	registerParameter( "TransparencyOverLife", &m_scalar[TransparencyOverLife], sParameterInfo::Lifetime );
-//	registerParameter( "VelocityOverLife", &m_scalar[VelocityOverLife], sParameterInfo::Lifetime );
-//	registerParameter( "AngularVelocityOverLife", &m_scalar[AngularVelocityOverLife], sParameterInfo::Lifetime );
-//	registerParameter( "TorqueOverLife", &m_scalar[TorqueOverLife], sParameterInfo::Lifetime );
-
-//    registerParameter( "Color", &m_color[Color], sParameterInfo::Initial );
-//    registerParameter( "ColorOverLife", &m_color[ColorOverLife], sParameterInfo::Lifetime );
-
-    for( int i = 0; i < TotalColorParameters; i++ ) {
+    for( s32 i = 0; i < TotalColorParameters; i++ ) {
         m_color[i].setType( Parameter::Color );
     }
 
@@ -87,152 +63,111 @@ ParticleModel::ParticleModel( void )
 	m_scalar[TorqueOverLife].setConstant( 1.0f );
 };
 
-ParticleModel::~ParticleModel( void )
+// ** Particles::createInstance
+ParticlesInstancePtr Particles::createInstance( void ) const
 {
-//	DC_RELEASE( m_texture );
-	delete m_particleRenderer;
+	return ParticlesInstancePtr( DC_NEW ParticlesInstance( const_cast<Particles*>( this ) ) );
 }
 
-// ** ParticleModel::createInstance
-Particles* ParticleModel::createInstance( void ) const
-{
-	return DC_NEW Particles( this );
-}
-
-// ** ParticleModel::count
-int ParticleModel::count( void ) const
+// ** Particles::count
+s32 Particles::count( void ) const
 {
 	return m_count;
 }
 
-// ** ParticleModel::setCount
-void ParticleModel::setCount( int value )
+// ** Particles::setCount
+void Particles::setCount( s32 value )
 {
 	m_count = value;
 }
 
-// ** ParticleModel::name
-const char* ParticleModel::name( void ) const
+// ** Particles::name
+const String& Particles::name( void ) const
 {
-	return m_name.c_str();
+	return m_name;
 }
 
-// ** ParticleModel::setName
-void ParticleModel::setName( const char *value )
+// ** Particles::setName
+void Particles::setName( const String& value )
 {
 	m_name = value;
 }
 
-// ** ParticleModel::texture
-dcTextureAsset ParticleModel::texture( void ) const
+// ** Particles::blendingMode
+BlendingMode Particles::blendingMode( void ) const
 {
-	return m_texture;
+	return m_blendingMode;
 }
 
-// ** ParticleModel::setTexture
-void ParticleModel::setTexture( dcTextureAsset value )
+// ** Particles::setBlendingMode
+void Particles::setBlendingMode( BlendingMode value )
 {
-//	DC_RELEASE( m_texture );
-//
-//	if( (m_texture = value) ) {
-//		m_texture->Ref();
-//	}
+	m_blendingMode = value;
 }
 
-// ** ParticleModel::rendererType
-RendererType ParticleModel::rendererType( void ) const
+// ** Particles::renderingMode
+RenderingMode Particles::renderingMode( void ) const
 {
-	return m_particleRenderer ? m_particleRenderer->type() : TotalRendererTypes;
+	return m_renderingMode;
 }
 
-// ** ParticleModel::blendMode
-BlendMode ParticleModel::blendMode( void ) const
+// ** Particles::setRenderingMode
+void Particles::setRenderingMode( RenderingMode value )
 {
-	return m_blendMode;
+	m_renderingMode = value;
 }
 
-// ** ParticleModel::setBlendMode
-void ParticleModel::setBlendMode( BlendMode value )
-{
-	m_blendMode = value;
-}
-
-// ** ParticleModel::setRendererType
-void ParticleModel::setRendererType( RendererType value )
-{
-	if( m_particleRenderer && m_particleRenderer->type() == value ) {
-		return;
-	}
-
-	delete m_particleRenderer;
-	m_particleRenderer = Renderer::createRenderer( value );
-}
-
-// ** ParticleModel::renderer
-Renderer* ParticleModel::renderer( void ) const
-{
-	return m_particleRenderer;
-}
-
-// ** ParticleModel::emission
-float ParticleModel::emission( float scalar ) const
+// ** Particles::emission
+f32 Particles::emission( f32 scalar ) const
 {
     const Parameter *emission = ScalarParam( Emission );
     return SampleParameter( emission, -1.0f );
 }
 
-// ** ParticleModel::maxSnapshots
-int ParticleModel::maxSnapshots( void ) const
+// ** Particles::maxSnapshots
+s32 Particles::maxSnapshots( void ) const
 {
 	return m_maxSnapshots;
 }
 
-// ** ParticleModel::setMaxSnapshots
-void ParticleModel::setMaxSnapshots( int value )
+// ** Particles::setMaxSnapshots
+void Particles::setMaxSnapshots( s32 value )
 {
-	m_maxSnapshots = std::max( 4, value );
+	m_maxSnapshots = max2( 4, value );
 }
 
-// ** ParticleModel::snapshotsToSave
-int ParticleModel::snapshotsToSave( void ) const
+// ** Particles::snapshotsToSave
+s32 Particles::snapshotsToSave( void ) const
 {
-	RendererType rendererType = m_particleRenderer->type();
-
-	if( (rendererType == RenderPaths) || (rendererType == RenderThickPaths) ) {
+	if( (m_renderingMode == RenderPaths) || (m_renderingMode == RenderThickPaths) ) {
 		return m_maxSnapshots;
 	}
 
 	return 0;
 }
 
-// ** ParticleModel::render
-void ParticleModel::render( dcBatchRenderer renderer, const sParticle *particles, int count ) const
-{
-	m_particleRenderer->render( renderer, m_texture, m_blendMode, particles, count );
-}
-
-// ** ParticleModel::init
-int ParticleModel::init( Zone *zone, sParticle *particles, const Vec2& position, int count, float scalar ) const
+// ** Particles::init
+s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& position, s32 count, f32 scalar ) const
 {
     if( !count ) {
         return 0;
     }
 
-    const Parameter *color           = ColorParam( Color );
-	const Parameter *velocity        = ScalarParam( Velocity );
-	const Parameter *angularVelocity = ScalarParam( AngularVelocity );
-	const Parameter *torque          = ScalarParam( Torque );
-	const Parameter *size            = ScalarParam( Size );
-	const Parameter *life            = ScalarParam( Life );
-	const Parameter *transparency    = ScalarParam( Transparency );
-	const Parameter *direction       = ScalarParam( Direction );
-	const Parameter *rotation        = ScalarParam( Rotation );
+    const Parameter* color           = ColorParam( Color );
+	const Parameter* velocity        = ScalarParam( Velocity );
+	const Parameter* angularVelocity = ScalarParam( AngularVelocity );
+	const Parameter* torque          = ScalarParam( Torque );
+	const Parameter* size            = ScalarParam( Size );
+	const Parameter* life            = ScalarParam( Life );
+	const Parameter* transparency    = ScalarParam( Transparency );
+	const Parameter* direction       = ScalarParam( Direction );
+	const Parameter* rotation        = ScalarParam( Rotation );
 
 	Rgb white( 1.0f, 1.0f, 1.0f );
 	int snapshotCount = snapshotsToSave();
 
-	for( int i = 0; i < count; i++ ) {
-		sParticle& particle = particles[i];
+	for( s32 i = 0; i < count; i++ ) {
+		Particle& particle = particles[i];
 
 		particle.m_linear.velocity      = SampleParameter( velocity, 0.0f );
 		particle.m_angular.velocity     = SampleParameter( angularVelocity, 0.0f );
@@ -247,7 +182,9 @@ int ParticleModel::init( Zone *zone, sParticle *particles, const Vec2& position,
 		particle.m_rotation             = SampleParameter( rotation, 0.0f );
 		particle.m_force.velocity       = Vec2( 0, 0 );
 		particle.m_life.age             = 0.0f;
-        particle.m_position             = zone ? zone->generateRandomPoint( scalar, position ) : position;
+
+		Vec3 pos = zone.valid() ? zone->generateRandomPoint( scalar, position ) : position;
+        particle.m_position = Vec2( pos.x, pos.y );
 
 		// ** Init snapshots
 		if( snapshotCount ) {
@@ -260,13 +197,13 @@ int ParticleModel::init( Zone *zone, sParticle *particles, const Vec2& position,
     return count;
 }
 
-// ** ParticleModel::savePaths
-void ParticleModel::savePaths( sParticle* items, int itemCount ) const
+// ** Particles::savePaths
+void Particles::savePaths( Particle* items, s32 itemCount ) const
 {
-	int snapshotCount = snapshotsToSave();
+	s32 snapshotCount = snapshotsToSave();
 
-	for( int i = 0; i < itemCount; i++ ) {
-		sParticle& particle = items[i];
+	for( s32 i = 0; i < itemCount; i++ ) {
+		Particle& particle = items[i];
 
 		for( int j = snapshotCount - 2; j >= 1; j-- ) {
 			particle.m_snapshots[j].pos   = particle.m_snapshots[j - 1].pos;
@@ -282,10 +219,10 @@ void ParticleModel::savePaths( sParticle* items, int itemCount ) const
 	}
 }
 
-// ** ParticleModel::initSnapshots
-void ParticleModel::initSnapshots( sParticle& particle, int count ) const
+// ** Particles::initSnapshots
+void Particles::initSnapshots( Particle& particle, s32 count ) const
 {
-	for( int i = 0; i < count; i++ ) {
+	for( s32 i = 0; i < count; i++ ) {
 		particle.m_snapshots[i].pos   = particle.m_position;
 		particle.m_snapshots[i].color = particle.m_color.current.Rgb;
 		particle.m_snapshots[i].alpha = particle.m_color.current.alpha;
@@ -293,8 +230,8 @@ void ParticleModel::initSnapshots( sParticle& particle, int count ) const
 	}
 }
 
-// ** ParticleModel::update
-int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min, Vec2 *max ) const
+// ** Particles::update
+s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) const
 {
 	const Parameter *color           = ColorParam( ColorOverLife );
 	const Parameter *alpha           = ScalarParam( TransparencyOverLife );
@@ -307,13 +244,12 @@ int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min,
 	Rgb white( 1.0f, 1.0f, 1.0f );
 
 	// ** Reset in-out parameters
-	if( max ) *max = Vec2( -FLT_MAX, -FLT_MAX );
-	if( min ) *min = Vec2(  FLT_MAX,  FLT_MAX );
+	if( bounds ) *bounds = Bounds();
 
 	// ** Particles
-	for( int i = 0; i < count; i++ ) {
-		sParticle& particle = particles[i];
-        float      scalar   = 0.0f;
+	for( s32 i = 0; i < count; i++ ) {
+		Particle& particle = particles[i];
+        f32       scalar   = 0.0f;
         
         particle.m_life.age += particle.m_life.fade * dt;
 		scalar               = particle.m_life.age;
@@ -332,21 +268,15 @@ int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min,
 		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleKoeficient( alpha,            1.0f );
 		particle.m_size.current          = particle.m_size.initial        * SampleKoeficient( size,             1.0f );
 
-		if( m_blendMode != BlendAlpha ) {
-			float alpha = particle.m_color.initial.alpha;
+		if( m_blendingMode != BlendAlpha ) {
+			f32 alpha = particle.m_color.initial.alpha;
 			particle.m_color.current.Rgb = particle.m_color.initial.Rgb * particle.m_color.current.alpha;
 			particle.m_color.initial.alpha = alpha;
 		}
 
 		// ** Update bounds
-		if( min && max ) {
-			float x = particle.m_position.x;
-			float y = particle.m_position.y;
-
-			if( x > max->x )			max->x = x;
-			else if( x < min->x )	min->x = x;
-			if( y > max->y )			max->y = y;
-			else if( y < min->y )	min->y = y;
+		if( bounds ) {
+			*bounds += Vec3( particle.m_position.x, particle.m_position.y, 0.0f );
 		}
 
 		// ** Increase alive counter
@@ -356,57 +286,52 @@ int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min,
 	return aliveCount;
 }
 
-// ------------------------------------------------- Particles ------------------------------------------------- //
+// ------------------------------------------------- ParticlesInstance ------------------------------------------------- //
 
-// ** Particles::Particles
-Particles::Particles( const ParticleModel *model ) : m_model( model ), m_particles( NULL ), m_count( model->count() ), m_aliveCount( 0 ), m_time( 0.0f ), m_emissionTime( 0.0f ), m_snapshotTime( 0.0f )
+// ** ParticlesInstance::ParticlesInstance
+ParticlesInstance::ParticlesInstance( ParticlesWPtr particles ) : m_particles( particles ), m_aliveCount( 0 ), m_time( 0.0f ), m_emissionTime( 0.0f ), m_snapshotTime( 0.0f )
 {
-	m_count		= m_model->count();
-	m_particles = new sParticle[m_count];
+	m_items.resize( m_particles->count() );
 
-    for( int i = 0; i < m_count; i++ ) {
-        m_particles[i].m_life.age  = 2.0f;
-        m_particles[i].m_life.fade = 0.0f;
+    for( u32 i = 0, n = m_particles->count(); i < n; i++ ) {
+        m_items[i].m_life.age  = 2.0f;
+        m_items[i].m_life.fade = 0.0f;
     }
 }
 
-Particles::~Particles( void )
-{
-	delete[]m_particles;
-}
-
-// ** Particles::aliveCount
-int Particles::aliveCount( void ) const
+// ** ParticlesInstance::aliveCount
+int ParticlesInstance::aliveCount( void ) const
 {
 	return m_aliveCount;
 }
 
-// ** Particles::update
-int Particles::update( Zone *zone, float dt, const Vec2& position, float scalar, bool noEmission )
+// ** ParticlesInstance::update
+s32 ParticlesInstance::update( const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission )
 {
 	m_time          += dt;
     m_emissionTime  += dt;
 
     // ** Update particles
-	m_aliveCount  = m_model->update( m_particles, m_aliveCount, dt, &m_min, &m_max );
+	m_aliveCount  = m_particles->update( &m_items[0], m_aliveCount, dt, &m_bounds );
 
 	// ** Save particle snapshots for paths
 	if( (m_time - m_snapshotTime) >= 0.01f ) {
-		m_model->savePaths( m_particles, m_aliveCount );
+		m_particles->savePaths( &m_items[0], m_aliveCount );
 		m_snapshotTime = m_time;
 	}
 
     // ** Calculate dead count
-    int deadCount = m_count - m_aliveCount;
+    s32 deadCount = ( s32 )m_items.size() - m_aliveCount;
 
 	if( deadCount == 0 || noEmission ) {
         return m_aliveCount;
     }
 
     // ** Calculate emission amount
-    float emission = m_model->emission( scalar );
+    f32 emission = m_particles->emission( scalar );
+
     if( emission > 0.0f ) {
-        deadCount       = std::min( deadCount, ( int )floor( m_emissionTime * emission ) );
+        deadCount       = std::min( deadCount, ( s32 )floor( m_emissionTime * emission ) );
         m_emissionTime -= deadCount / emission;
 
         DC_BREAK_IF( m_emissionTime < 0.0f );
@@ -416,15 +341,9 @@ int Particles::update( Zone *zone, float dt, const Vec2& position, float scalar,
 		m_emissionTime	= 0.0f;
 	}
 
-    m_aliveCount += m_model->init( zone, m_particles + m_aliveCount, position, deadCount, scalar );
+    m_aliveCount += m_particles->init( zone, &m_items[0] + m_aliveCount, position, deadCount, scalar );
 
 	return m_aliveCount;
-}
-
-// ** Particles::render
-void Particles::render( dcBatchRenderer renderer )
-{
-    m_model->render( renderer, m_particles, m_aliveCount );
 }
 
 } // namespace Fx

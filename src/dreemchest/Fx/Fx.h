@@ -36,11 +36,11 @@ namespace Fx {
 	class ParticleModel;
 	class Zone;
 	class Modifier;
-	class Emitter;
-	class Particles;
+//	class Emitter;
+//	class Particles;
 	class Renderer;
-	class EmitterModel;
-	class ParticleSystem;
+//	class EmitterModel;
+//	class ParticleSystem;
 	struct sParticle;
 
 	typedef u32 dcTextureAsset;
@@ -48,10 +48,26 @@ namespace Fx {
 
 	typedef Array<f32> FloatArray;
 	typedef Array<Modifier*> ModifierArray;
-	typedef Array<ParticleModel*> ParticleModelArray;
-	typedef Array<Particles*> ParticlesArray;
-	typedef Array<EmitterModel*> EmitterModelArray;
-	typedef Array<Emitter*> EmitterArray;
+//	typedef Array<ParticleModel*> ParticleModelArray;
+//	typedef Array<Particles*> ParticlesArray;
+//	typedef Array<EmitterModel*> EmitterModelArray;
+//	typedef Array<Emitter*> EmitterArray;
+
+	dcDeclarePtrs( Emitter )
+	dcDeclarePtrs( EmitterInstance )
+	dcDeclarePtrs( Particles )
+	dcDeclarePtrs( ParticlesInstance )
+	dcDeclarePtrs( ParticleSystem )
+	dcDeclarePtrs( ParticleSystemInstance )
+	dcDeclarePtrs( Zone )
+
+	//! Container type to store particle system emitters.
+	typedef Array<EmitterPtr>			EmittersArray;
+	typedef Array<EmitterInstancePtr>	EmitterInstancesArray;
+
+	//! Container type to store particles.
+	typedef Array<ParticlesPtr>			ParticlesArray;
+	typedef Array<ParticlesInstancePtr>	ParticlesInstancesArray;
 
 	//! Modifier type.
 	enum ModifierType {
@@ -62,8 +78,8 @@ namespace Fx {
 		TotalModifierTypes
 	};
         
-	//! Particle rendering types.
-	enum RendererType {
+	//! Particle rendering modes.
+	enum RenderingMode {
 		RenderPoints,
         RenderQuads,
         RenderLines,
@@ -71,16 +87,16 @@ namespace Fx {
         RenderPaths,
         RenderThickPaths,
 
-        TotalRendererTypes,
+        TotalRenderingModes,
 	};
 
-	//! Rendering blend modes.
-	enum BlendMode {
+	//! Rendering blending modes.
+	enum BlendingMode {
 		BlendAlpha,
 		BlendAdditive,
 		BlendPremultiplied,
 
-		TotalBlendModes
+		TotalBlendingModes
 	};
 
     //! Available particle emission zones.

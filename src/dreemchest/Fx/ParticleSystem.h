@@ -33,54 +33,72 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	// ** class ParticleSystemModel
-	class ParticleSystemModel : public RefCounted {
-
-		DC_DECLARE_IS( ParticleSystemModel, ParticleSystem, this );
-
-	public:
-
-							ParticleSystemModel( void );
-							~ParticleSystemModel( void );
-
-		int					totalEmitters( void ) const;
-		EmitterModel*		emitter( int index ) const;
-
-		void				removeEmitter( EmitterModel *emitter );
-		EmitterModel*		createEmitter( void );
-
-		ParticleSystem*		createInstance( void ) const;
-
-	private:
-
-		EmitterModelArray	m_emitters;
-	};
-
-	// ** class ParticleSystem
+	//! Root particle system type. Contains an array of particle emitters.
 	class ParticleSystem : public RefCounted {
 	public:
 
-									ParticleSystem( const ParticleSystemModel *model );
-									~ParticleSystem( void );
 
-		const Vec2&					position( void ) const;
-		void						setPosition( const Vec2& value );
-		float						timeScale( void ) const;
-		void						setTimeScale( float value );
-		int							aliveCount( void ) const;
-		bool						hasEnded( void ) const;
+		//! Returns the total number of emitters inside this particle system.
+		s32							emitterCount( void ) const;
 
-		int							update( float dt );
-		void						render( dcBatchRenderer renderer );
-        void                        warmUp( float dt = 0.1f );
+		//! Returns an emitter by index.
+		EmitterWPtr					emitter( s32 index ) const;
+
+		//! Removes an emitter.
+		void						removeEmitter( const EmitterWPtr& emitter );
+
+		//! Adds a new emitter.
+		EmitterWPtr					addEmitter( void );
+
+		//! Creates a new instance if a particle system.
+		ParticleSystemInstancePtr	createInstance( void ) const;
 
 	private:
 
-		const ParticleSystemModel*	m_model;
-		EmitterArray				m_emitters;
-		Vec2						m_position;
-		float						m_timeScale;
-		int							m_aliveCount;
+		EmittersArray				m_emitters;	//!< All particle emitters.
+	};
+
+	//! A single particle system instance.
+	class ParticleSystemInstance : public RefCounted {
+	friend class ParticleSystem;
+	public:
+
+		//! Returns the particle system instance position.
+		const Vec3&					position( void ) const;
+
+		//! Sets the particle system instance position.
+		void						setPosition( const Vec3& value );
+
+		//! Returns the time scaling factor.
+		f32							timeScale( void ) const;
+
+		//! Sets the time scaling factor.
+		void						setTimeScale( f32 value );
+
+		//! Returns the total number of alive particles.
+		s32							aliveCount( void ) const;
+
+		//! Returns true if the particle system has ended the playback.
+		bool						hasEnded( void ) const;
+
+		//! Performs the particle system update.
+		s32							update( f32 dt );
+
+		//! Performs the particle system warmup with a specified time delta.
+        void                        warmUp( f32 dt = 0.1f );
+
+	private:
+
+									//! Constructs ParticleSystemInstance instance.
+									ParticleSystemInstance( ParticleSystemWPtr particleSystem );
+
+	private:
+
+		ParticleSystemWPtr			m_particleSystem;	//!< Parent particle system.
+		EmitterInstancesArray		m_emitters;			//!< Array of emitter instances.
+		Vec3						m_position;			//!< Current instance position.
+		f32							m_timeScale;		//!< The time scaling factor.
+		s32							m_aliveCount;		//!< The total number of alive particles.
 	};
 
 } // namespace Fx

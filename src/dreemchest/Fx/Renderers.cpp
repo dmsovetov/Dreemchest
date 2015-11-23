@@ -45,7 +45,7 @@ Renderer::~Renderer( void )
 }
 
 // ** Renderer::createRenderer
-Renderer* Renderer::createRenderer( RendererType type )
+Renderer* Renderer::createRenderer( RenderingMode type )
 {
     switch( type ) {
     case RenderPoints:      return DC_NEW PointRenderer;
@@ -61,7 +61,7 @@ Renderer* Renderer::createRenderer( RendererType type )
 }
 
 // ** Renderer::render
-void Renderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void Renderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	//switch( blendMode ) {
 	//case BlendMode::Normal:			renderer->setBlendMode( renderer::BlendSrcAlpha, renderer::BlendInvSrcAlpha );
@@ -80,7 +80,7 @@ PointRenderer::PointRenderer( void )
 }
 
 // ** PointRenderer::render
-void PointRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void PointRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 
@@ -97,7 +97,7 @@ QuadRenderer::QuadRenderer( void )
 }
 
 // ** QuadRenderer::render
-void QuadRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void QuadRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 
@@ -134,7 +134,7 @@ LineRenderer::LineRenderer( void )
 }
 
 // ** LineRenderer::render
-void LineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void LineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 
@@ -160,7 +160,7 @@ ThickLineRenderer::ThickLineRenderer( void )
 }
 
 // ** ThickLineRenderer::render
-void ThickLineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void ThickLineRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 
@@ -190,7 +190,7 @@ PathRenderer::PathRenderer( void )
 }
 
 // ** PathRenderer::render
-void PathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void PathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 
@@ -209,7 +209,7 @@ ThickPathRenderer::ThickPathRenderer( void )
 }
 
 // ** ThickPathRenderer::render
-void ThickPathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count )
+void ThickPathRenderer::render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count )
 {
 	Renderer::render( renderer, texture, blendMode, particles, count );
 

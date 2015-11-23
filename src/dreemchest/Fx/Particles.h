@@ -27,69 +27,68 @@
 #ifndef __DC_Fx_ParticleBundle_H__
 #define __DC_Fx_ParticleBundle_H__
 
-#include "Parameter/Parameter.h"
+#include "Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	// ** struct sParticle
-	struct sParticle {
+	//! A single particle item.
+	struct Particle {
 		enum { MaxSnapshots = 64 };
 
-		Vec2    m_position;
-		float   m_rotation;
-		float   m_direction;
+		Vec2    m_position;		//!< Particle position.
+		f32		m_rotation;		//!< Particle rotation.
+		f32		m_direction;	//!< Particle movement direction.
 
 		struct {
-			Vec2    velocity;
+			Vec2    velocity;	//!< The force applied to a particle.
 		} m_force;
 
 		struct {
-			float   velocity;
+			f32		velocity;	//!< Particle linear velocity.
 		} m_linear;
 
 		struct {
-			float   velocity;
-			float   torque;
+			f32		velocity;	//!< Particle angular velocity.
+			f32		torque;		//!< Particle torque.
 		} m_angular;
 
 		struct {
-			float   age;
-			float   fade;
+			f32		age;		//!< Particle age.
+			f32		fade;		//!< Particle life fade.
 		} m_life;
 
 		struct {
             struct {
                 Rgb     Rgb;
-                float   alpha;
+                f32		alpha;
             } initial;
             
             struct {
                 Rgb     Rgb;
-                float   alpha;
+                f32		alpha;
             } current;
 		} m_color;
 
 		struct {
-			float   initial;
-			float   current;
+			f32		initial;
+			f32		current;
 		} m_size;
 
 		struct {
 			Vec2    pos;
 			Rgb     color;
-			float	alpha;
-			float   size;
+			f32		alpha;
+			f32		size;
 		} m_snapshots[MaxSnapshots];
 	};
 
-	// ** class ParticleModel
-	class ParticleModel : public RefCounted {
+	//! Particles contains an array of particles and a set of simulation parameters.
+	class Particles : public RefCounted {
+	friend class Emitter;
 
-		DC_DECLARE_IS( ParticleModel, Particles, this );
-
-		// ** enum eScalarParameter
+		//! Available particle scalar parameters.
 		enum eScalarParameter {
 			Emission,
 			Life,
@@ -109,7 +108,7 @@ namespace Fx {
 			TotalScalarParameters
 		};
 
-        // ** enum eColorParameter
+        //! Available particle color parameters.
         enum eColorParameter {
             Color,
             ColorOverLife,
@@ -119,69 +118,97 @@ namespace Fx {
 
 	public:
 
-								ParticleModel( void );
-								~ParticleModel( void );
+		//! Returns the maximum number of particles.
+		s32						count( void ) const;
 
-		int						count( void ) const;
-		void					setCount( int value );
-		dcTextureAsset			texture( void ) const;
-		void					setTexture( dcTextureAsset value );
-		RendererType			rendererType( void ) const;
-		void					setRendererType( RendererType value );
-		Renderer*				renderer( void ) const;
-		BlendMode				blendMode( void ) const;
-		void					setBlendMode( BlendMode value );
-		const char*				name( void ) const;
-		void					setName( const char *value );
-        float                   emission( float scalar ) const;
-		int						maxSnapshots( void ) const;
-		void					setMaxSnapshots( int value );
+		//! Sets the maximum number of particles.
+		void					setCount( s32 value );
 
-		int                     update( sParticle *items, int itemCount, float dt, Vec2 *min = NULL, Vec2 *max = NULL ) const;
-		int                     init( Zone *zone, sParticle *items, const Vec2& pos, int itemCount, float scalar ) const;
-		void					savePaths( sParticle* items, int itemCount ) const;
-		void					render( dcBatchRenderer renderer, const sParticle *items, int itemCount ) const;
+		//! Returns the particle rendering mode.
+		RenderingMode			renderingMode( void ) const;
 
-		Particles*				createInstance( void ) const;
+		//! Sets the particle rendering mode.
+		void					setRenderingMode( RenderingMode value );
+
+		//! Returns the particle blending mode.
+		BlendingMode			blendingMode( void ) const;
+
+		//! Sets the particle blending mode.
+		void					setBlendingMode( BlendingMode value );
+
+		//! Returns the particles name.
+		const String&			name( void ) const;
+
+		//! Sets the particles name.
+		void					setName( const String& value );
+
+		//! Returns the emission rate at specified time
+        f32						emission( f32 scalar ) const;
+
+		//! Returns the maximum number of snapshots to save.
+		s32						maxSnapshots( void ) const;
+
+		//! Sets the maximum number of snapshots to save.
+		void					setMaxSnapshots( s32 value );
+
+		//! Updates the group of particles.
+		s32                     update( Particle* items, s32 itemCount, f32 dt, Bounds* bounds = NULL ) const;
+
+		//! Initializes a new group of particles.
+		s32                     init( const ZoneWPtr& zone, Particle *items, const Vec3& pos, s32 itemCount, f32 scalar ) const;
+
+		//! Saves the particles snapshots.
+		void					savePaths( Particle* items, s32 itemCount ) const;
+
+		ParticlesInstancePtr	createInstance( void ) const;
 
 	private:
 
-		void					initSnapshots( sParticle& particle, int count ) const;
-		int						snapshotsToSave( void ) const;
+								Particles( void );
+
+		//! Initializes the particle snapshots.
+		void					initSnapshots( Particle& particle, s32 count ) const;
+
+		//! Returns the total number of snapshots to save.
+		s32						snapshotsToSave( void ) const;
 
 	private:
 
-		BlendMode				m_blendMode;
-		Renderer*				m_particleRenderer;
-		dcTextureAsset			m_texture;
-		int						m_count;
-		int						m_maxSnapshots;
-		std::string				m_name;
+		BlendingMode			m_blendingMode;						//!< Particle blending mode.
+		RenderingMode			m_renderingMode;					//!< Particle rendering mode.
+		s32						m_count;							//!< The maximum number of particles.
+		s32						m_maxSnapshots;						//!< The maximum number of particle snapshots to save.
+		String					m_name;								//!< Particles name.
         
-        Parameter               m_scalar[TotalScalarParameters];
-        Parameter               m_color[TotalColorParameters];
+        Parameter               m_scalar[TotalScalarParameters];	//!< Particle scalar parameters.
+        Parameter               m_color[TotalColorParameters];		//!< Particle color parameters.
 	};
 
-	// ** class Particles
-	class Particles : public RefCounted {
+	//! The particles instance.
+	class ParticlesInstance : public RefCounted {
+	friend class Particles;
 	public:
 
-								Particles( const ParticleModel *model );
-								~Particles( void );
+		//! Returns the total number of alive particles.
+		s32						aliveCount( void ) const;
 
-		int						aliveCount( void ) const;
-
-		int						update( Zone *zone, float dt, const Vec2& position, float scalar, bool noEmission );
-		void					render( dcBatchRenderer renderer );
+		//! Updates the particles.
+		s32						update( const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );
 
 	private:
 
-		const ParticleModel*	m_model;
-		sParticle*				m_particles;
-		int						m_count;
-		int						m_aliveCount;
-		Vec2					m_min, m_max;
-		float					m_time, m_emissionTime, m_snapshotTime;
+								//! Constructs the ParticlesInstance instance.
+								ParticlesInstance( ParticlesWPtr particles );
+
+	private:
+
+		ParticlesWPtr			m_particles;	//!< Parent particles.
+		Array<Particle>			m_items;		//!< An array of particle items.
+		s32						m_aliveCount;	//!< The total number of alive particles.
+		Bounds					m_bounds;		//!< Particles bounding box.
+		f32						m_time;			//!< Current particles time.
+		f32						m_emissionTime;
+		f32						m_snapshotTime;
 	};
 
 } // namespace Fx

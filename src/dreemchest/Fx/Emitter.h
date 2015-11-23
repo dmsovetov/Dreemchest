@@ -33,67 +33,102 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	// ** class EmitterModel
-	class EmitterModel : public RefCounted {
-
-		DC_DECLARE_IS( EmitterModel, Emitter, this );
-
+	//! Particle emitter contains the emission zone & particle emission parameters. Contains an array of particles.
+	class Emitter : public RefCounted {
+	friend class ParticleSystem;
 	public:
 
-                            EmitterModel( void );
-                            ~EmitterModel( void );
+		//! Returns the particle emitter local position
+		const Vec3&				position( void ) const;
 
-		const Vec2&			position( void ) const;
-		void				setPosition( const Vec2& value );
-		float				duration( void ) const;
-		void				setDuration( float value );
-		const char*			name( void ) const;
-		void				setName( const char *value );
-		bool				isLooped( void ) const;
-		void				setLooped( bool value );
-		int					totalParticles( void ) const;
-		ParticleModel*		particles( int index ) const;
-		Zone*				zone( void ) const { return m_zone; }
+		//! Sets the local position of a particle emitter.
+		void					setPosition( const Vec3& value );
 
-		void				removeParticles( ParticleModel *particle );
-		ParticleModel*		createParticles( void );
+		//! Returns the total emission duration.
+		f32						duration( void ) const;
 
-		Emitter*			createInstance( void ) const;
+		//! Sets the total emission duration.
+		void					setDuration( f32 value );
+
+		//! Returns the emitter name.
+		const String&			name( void ) const;
+
+		//! Sets the emitter name.
+		void					setName( const String& value );
+
+		//! Returns true if the particle emission is looped.
+		bool					isLooped( void ) const;
+
+		//! Sets the particle emission looping.
+		void					setLooped( bool value );
+
+		//! Returns the total number of particles inside this emitter.
+		s32						particlesCount( void ) const;
+
+		//! Returns the particles by index.
+		ParticlesWPtr			particles( s32 index ) const;
+
+		//! Returns the emission zone.
+		ZoneWPtr				zone( void ) const;
+
+		//! Sets the emission zone.
+		void					setZone( const ZonePtr& value );
+
+		//! Removes particles from emitter.
+		void					removeParticles( const ParticlesWPtr& particles );
+
+		//! Adds particles to an emitter.
+		ParticlesWPtr			addParticles( void );
+
+		//! Creates the particle emitter instance.
+		EmitterInstancePtr		createInstance( void ) const;
 
 	private:
 
-		ParticleModelArray	m_particles;
-		Vec2				m_position;
-		Zone*				m_zone;
-		float				m_duration;
-		bool				m_isLooped;
-		std::string			m_name;
+								//! Constructs the Emitter instance.
+								Emitter( void );
+
+	private:
+
+		ParticlesArray			m_particles;	//!< All particles that are emitted by this emitter.
+		Vec3					m_position;		//!< Local particle emitter position.
+		ZonePtr					m_zone;			//!< Particle emission zone.
+		f32						m_duration;		//!< Total particle emission duration in seconds.
+		bool					m_isLooped;		//!< Flag indicating that particle emission is looped.
+		String					m_name;			//!< Particle emitter name.
 	};
 
-	// ** class Emitter
-	class Emitter : public RefCounted {
+	//! Particle emitter instance.
+	class EmitterInstance : public RefCounted {
+	friend class Emitter;
 	public:
 
-							Emitter( const EmitterModel *model );
-							~Emitter( void );
+		//! Returns the total number of alive particles.
+		s32						aliveCount( void ) const;
 
-		int					aliveCount( void ) const;
-		bool				hasEnded( void ) const;
+		//! Returns true if the particle emission is ended.
+		bool					hasEnded( void ) const;
 
-		int					update( float dt, const Vec2& position );
-        void                warmUp( float dt, const Vec2& position );
-		void				render( dcBatchRenderer renderer );
+		//! Performs the emitter instance update.
+		s32						update( f32 dt, const Vec3& position );
 
-	private:
-
-		bool				updateTime( float dt );
+		//! Performs the emitter warm up.
+        void					warmUp( f32 dt, const Vec3& position );
 
 	private:
 
-		const EmitterModel*	m_model;
-		ParticlesArray		m_particles;
-		float				m_time;
-		int					m_aliveCount;
+								//! Constructs EmitterInstance instance.
+								EmitterInstance( EmitterWPtr emitter );
+
+		//! Updates the current emitter time.
+		bool					updateTime( f32 dt );
+
+	private:
+
+		EmitterWPtr				m_emitter;		//!< Parent particle emitter.
+		ParticlesInstancesArray	m_particles;	//!< Array of particles instances.
+		f32						m_time;			//!< Current emitter time.
+		s32						m_aliveCount;	//!< The total number of alive particles.
 	};
 
 } // namespace Fx

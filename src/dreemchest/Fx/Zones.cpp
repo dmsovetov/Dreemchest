@@ -33,58 +33,55 @@ namespace Fx {
 // ------------------------------------------------- Zone ------------------------------------------------- //
 
 // ** Zone::create
-Zone* Zone::create( ZoneType type )
+ZonePtr Zone::create( ZoneType type )
 {
     switch( type ) {
-    case TotalZoneTypes: return NULL;
-    case ZoneDisk:		 return DC_NEW DiskZone;
-    case ZoneLine:		 return DC_NEW LineZone;
+    case ZoneDisk: return ZonePtr( DC_NEW DiskZone );
+    case ZoneLine: return ZonePtr( DC_NEW LineZone );
     }
 
 	DC_BREAK
-    return NULL;
+    return ZonePtr();
 }
 
 // ------------------------------------------------- DiskZone ------------------------------------------------- //
 
-// ** DiskZone::DiskZone
-DiskZone::DiskZone( void )
+// ** DiskZone::type
+ZoneType DiskZone::type( void ) const
 {
-//	registerParameter( "Inner", &m_innerRadius, sParameterInfo::Lifetime );
-//	registerParameter( "Outer", &m_outerRadius, sParameterInfo::Lifetime );
+	return ZoneDisk;
 }
 
 // ** DiskZone::generateRandomPoint
-Vec2 DiskZone::generateRandomPoint( float scalar, const Vec2& center ) const
+Vec3 DiskZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
-	float inner = SampleParameter( &m_innerRadius, 0.0f );
-	float outer = SampleParameter( &m_outerRadius, 0.0f );
+	f32 inner = SampleParameter( &m_innerRadius, 0.0f );
+	f32 outer = SampleParameter( &m_outerRadius, 0.0f );
 
     Vec2  direction = Vec2::randDirection();
-    float distance  = RANDOM_SCALAR( inner, outer );
+    f32   distance  = RANDOM_SCALAR( inner, outer );
 
-    return center + direction * distance;
+    return center + Vec3( direction.x, direction.y, 0.0f ) * distance;
 }
 
 // ------------------------------------------------- LineZone ------------------------------------------------- //
 
-// ** LineZone::LineZone
-LineZone::LineZone( void )
+// ** LineZone::type
+ZoneType LineZone::type( void ) const
 {
-//	registerParameter( "Angle", &m_angle, sParameterInfo::Lifetime );
-//	registerParameter( "Length", &m_length, sParameterInfo::Lifetime );
+	return ZoneLine;
 }
 
 // ** LineZone::generateRandomPoint
-Vec2 LineZone::generateRandomPoint( float scalar, const Vec2& center ) const
+Vec3 LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
 	float length = SampleParameter( &m_length, 0.0f );
 	float angle  = SampleParameter( &m_angle, 0.0f );
 
     Vec2  direction = Vec2::fromAngle( angle );
-    float distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );
+    f32   distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );
 
-    return center + direction * distance;
+    return center + Vec3( direction.x, direction.y, 0.0f ) * distance;
 }
 
 } // namespace Fx

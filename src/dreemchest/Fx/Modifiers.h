@@ -27,7 +27,7 @@
 #ifndef	__DC_Fx_ParticleModifiers_H__
 #define	__DC_Fx_ParticleModifiers_H__
 
-#include "../Parameter/Parameter.h"
+#include "Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 

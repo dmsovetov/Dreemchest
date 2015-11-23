@@ -27,57 +27,58 @@
 #ifndef __DC_Fx_ParticleZones_H__
 #define __DC_Fx_ParticleZones_H__
 
-#include "../Parameter/Parameter.h"
+#include "Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-    // ** class Zone
+    //! Base class for zone types.
     class Zone : public RefCounted {
-
-		DC_DECLARE_IS( Zone, Zone, this );
-
     public:
 
         virtual             ~Zone( void ) {}
 
-        static Zone*        create( ZoneType type );
+		//! Creates the zone by type.
+        static ZonePtr      create( ZoneType type );
 
-        virtual ZoneType	type( void ) const												= 0;
-        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const	= 0;
+		//! Returns the zone type.
+        virtual ZoneType	type( void ) const											= 0;
+
+		//! Generates the random point inside the zone.
+        virtual Vec3        generateRandomPoint( f32 scalar, const Vec3& center ) const	= 0;
     };
 
-    // ** class DiskZone
+    //! Disk zone generates points bewteen the inner and outer radii.
     class DiskZone : public Zone {
     public:
 
-                            DiskZone( void );
+        //! Returns the zone type.
+        virtual ZoneType	type( void ) const;
 
-        // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneDisk; }
-        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
+		//! Generates the random point inside the disk.
+        virtual Vec3        generateRandomPoint( f32 scalar, const Vec3& center ) const;
 
     private:
 
-        Parameter           m_innerRadius;
-        Parameter           m_outerRadius;
+        Parameter           m_innerRadius;	//!< Zone inner radius.
+        Parameter           m_outerRadius;	//!< Zone outer radius.
     };
 
-    // ** class LineZone
+    //! Line zone generates points on a line segment.
     class LineZone : public Zone {
     public:
 
-                            LineZone( void );
+        //! Returns the zone type.
+        virtual ZoneType	type( void ) const;
 
-        // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneLine; }
-        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
+		//! Generates the random point on line segment.
+        virtual Vec3        generateRandomPoint( f32 scalar, const Vec3& center ) const;
 
     private:
 
-        Parameter           m_angle;
-        Parameter           m_length;
+        Parameter           m_angle;	//!< Line segment rotation.
+        Parameter           m_length;	//!< Line segment length.
     };
 
 } // namespace Fx

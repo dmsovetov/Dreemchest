@@ -32,110 +32,93 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-// ------------------------------------------ ParticleSystemModel ------------------------------------------ //
+// ------------------------------------------ ParticleSystem ------------------------------------------ //
 
-// ** ParticleSystemModel::ParticleSystemModel
-ParticleSystemModel::ParticleSystemModel( void )
+// ** ParticleSystem::emitterCount
+s32 ParticleSystem::emitterCount( void ) const
 {
+	return static_cast<s32>( m_emitters.size() );
 }
 
-ParticleSystemModel::~ParticleSystemModel( void )
+// ** ParticleSystem::emitter
+EmitterWPtr ParticleSystem::emitter( s32 index ) const
 {
-	for( int i = 0, n = totalEmitters(); i < n; i++ ) {
-		delete m_emitters[i];
-	}
-}
-
-// ** ParticleSystemModel::totalEmitters
-int ParticleSystemModel::totalEmitters( void ) const
-{
-	return ( int )m_emitters.size();
-}
-
-// ** ParticleSystemModel::emitter
-EmitterModel* ParticleSystemModel::emitter( int index ) const
-{
-	DC_BREAK_IF( index < 0 || index >= totalEmitters() );
+	DC_BREAK_IF( index < 0 || index >= emitterCount() );
 	return m_emitters[index];
 }
 
-// ** ParticleSystemModel::removeEmitter
-void ParticleSystemModel::removeEmitter( EmitterModel *emitter )
+// ** ParticleSystem::removeEmitter
+void ParticleSystem::removeEmitter( const EmitterWPtr& emitter )
 {
-	EmitterModelArray::iterator i = std::find( m_emitters.begin(), m_emitters.end(), emitter );
+	EmittersArray::iterator i = std::find( m_emitters.begin(), m_emitters.end(), emitter );
+
 	if( i == m_emitters.end() ) {
 		DC_BREAK;
 		return;
 	}
 
-	delete *i;
 	m_emitters.erase( i );
 }
 
-// ** ParticleSystemModel::createEmitter
-EmitterModel* ParticleSystemModel::createEmitter( void )
+// ** ParticleSystem::addEmitter
+EmitterWPtr ParticleSystem::addEmitter( void )
 {
-	EmitterModel *emitter = DC_NEW EmitterModel;
+	Emitter* emitter = DC_NEW Emitter;
 	m_emitters.push_back( emitter );
 
 	return emitter;
 }
 
-// ** ParticleSystemModel::createInstance
-ParticleSystem* ParticleSystemModel::createInstance( void ) const
+// ** ParticleSystem::createInstance
+ParticleSystemInstancePtr ParticleSystem::createInstance( void ) const
 {
-	return DC_NEW ParticleSystem( this );
+	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( const_cast<ParticleSystem*>( this ) ) );
 }
 
-// ** ParticleSystem::ParticleSystem
-ParticleSystem::ParticleSystem( const ParticleSystemModel *model ) : m_model( model ), m_position( 0, 0 ), m_aliveCount( 0 )
+// ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
+
+// ** ParticleSystemInstance::ParticleSystemInstance
+ParticleSystemInstance::ParticleSystemInstance( ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 )
 {
-	for( int i = 0, n = m_model->totalEmitters(); i < n; i++ ) {
-		m_emitters.push_back( m_model->emitter( i )->createInstance() );
+	for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
+		m_emitters.push_back( m_particleSystem->emitter( i )->createInstance() );
 	}
 }
 
-ParticleSystem::~ParticleSystem( void )
-{
-	for( int i = 0, n = ( int )m_emitters.size(); i < n; i++ ) {
-		delete m_emitters[i];
-	}
-}
-
-// ** ParticleSystem::position
-const Vec2& ParticleSystem::position( void ) const
+// ** ParticleSystemInstance::position
+const Vec3& ParticleSystemInstance::position( void ) const
 {
 	return m_position;
 }
 
-// ** ParticleSystem::setPosition
-void ParticleSystem::setPosition( const Vec2& value )
+// ** ParticleSystemInstance::setPosition
+void ParticleSystemInstance::setPosition( const Vec3& value )
 {
 	m_position = value;
 }
 
-// ** ParticleSystem::timeScale
-float ParticleSystem::timeScale( void ) const
+// ** ParticleSystemInstance::timeScale
+f32 ParticleSystemInstance::timeScale( void ) const
 {
 	return m_timeScale;
 }
 
-// ** ParticleSystem::setTimeScale
-void ParticleSystem::setTimeScale( float value )
+// ** ParticleSystemInstance::setTimeScale
+void ParticleSystemInstance::setTimeScale( f32 value )
 {
 	m_timeScale = value;
 }
 
-// ** ParticleSystem::aliveCount
-int ParticleSystem::aliveCount( void ) const
+// ** ParticleSystemInstance::aliveCount
+s32 ParticleSystemInstance::aliveCount( void ) const
 {
 	return m_aliveCount;
 }
 
-// ** ParticleSystem::hasEnded
-bool ParticleSystem::hasEnded( void ) const
+// ** ParticleSystemInstance::hasEnded
+bool ParticleSystemInstance::hasEnded( void ) const
 {
-	for( int i = 0, n = ( int )m_emitters.size(); i < n; i++ ) {
+	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
 		if( !m_emitters[i]->hasEnded() ) {
 			return false;
 		}
@@ -144,31 +127,23 @@ bool ParticleSystem::hasEnded( void ) const
 	return true;
 }
 
-// ** ParticleSystem::update
-int ParticleSystem::update( float dt )
+// ** ParticleSystemInstance::update
+s32 ParticleSystemInstance::update( f32 dt )
 {
 	m_aliveCount = 0;
 
-	for( int i = 0, n = ( int )m_emitters.size(); i < n; i++ ) {
+	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
 		m_aliveCount += m_emitters[i]->update( dt, m_position );
 	}
 
 	return m_aliveCount;
 }
 
-// ** ParticleSystem::warmUp
-void ParticleSystem::warmUp( float dt )
+// ** ParticleSystemInstance::warmUp
+void ParticleSystemInstance::warmUp( f32 dt )
 {
-	for( int i = 0, n = ( int )m_emitters.size(); i < n; i++ ) {
+	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
 		m_emitters[i]->warmUp( dt, m_position );
-	}
-}
-
-// ** ParticleSystem::render
-void ParticleSystem::render( dcBatchRenderer renderer )
-{
-	for( int i = 0, n = ( int )m_emitters.size(); i < n; i++ ) {
-		m_emitters[i]->render( renderer );
 	}
 }
 

@@ -27,7 +27,7 @@
 #ifndef __DC_Fx_Parameter_H__
 #define __DC_Fx_Parameter_H__
 
-#include "../Fx.h"
+#include "Fx.h"
 
 #define SampleParameter( parameter, default )  ((parameter) ? (parameter)->sample( scalar, default ) : (default))
 #define SampleKoeficient( parameter, default ) SampleParameter( parameter, default * 100.0f ) * 0.01f

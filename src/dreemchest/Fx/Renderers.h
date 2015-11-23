@@ -46,9 +46,9 @@ namespace Fx {
                                     Renderer( void );
         virtual                     ~Renderer( void );
 
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
-        virtual RendererType		type( void ) const { return TotalRendererTypes; }
-        static Renderer*            createRenderer( RendererType type );
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return TotalRenderingModes; }
+        static Renderer*            createRenderer( RenderingMode type );
     };
 
     // ** class PointRenderer
@@ -58,8 +58,8 @@ namespace Fx {
                                     PointRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::RenderPoints; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return RenderPoints; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
     // ** class QuadRenderer
@@ -69,8 +69,8 @@ namespace Fx {
                                     QuadRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::RenderQuads; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return RenderQuads; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
     // ** class LineRenderer
@@ -80,8 +80,8 @@ namespace Fx {
                                     LineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::RenderLines; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return RenderLines; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
     // ** class ThickLineRenderer
@@ -91,8 +91,8 @@ namespace Fx {
                                     ThickLineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::RenderThickLines; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return RenderThickLines; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
     // ** class PathRenderer
@@ -102,8 +102,8 @@ namespace Fx {
                                     PathRenderer( void );
 
         // ** Renderer
-        virtual RendererType	    type( void ) const { return RendererType::RenderPaths; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode	    type( void ) const { return RenderPaths; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
     // ** class ThickPathRenderer
@@ -113,8 +113,8 @@ namespace Fx {
                                     ThickPathRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::RenderThickPaths; }
-        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
+        virtual RenderingMode		type( void ) const { return RenderThickPaths; }
+        virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendingMode blendMode, const sParticle *particles, int count );
     };
 
 } // namespace Fx
