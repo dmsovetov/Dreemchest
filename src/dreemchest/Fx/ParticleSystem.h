@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef __DC_ParticleSystem_H__
-#define __DC_ParticleSystem_H__
+#ifndef __DC_Fx_ParticleSystem_H__
+#define __DC_Fx_ParticleSystem_H__
 
-#include "Modifier/ModifierContainer.h"
+#include "Fx.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
 	// ** class ParticleSystemModel
-	class ParticleSystemModel : public ModifierContainer {
+	class ParticleSystemModel : public RefCounted {
 
 		DC_DECLARE_IS( ParticleSystemModel, ParticleSystem, this );
 
@@ -57,7 +57,7 @@ namespace Fx {
 	};
 
 	// ** class ParticleSystem
-	class ParticleSystem {
+	class ParticleSystem : public RefCounted {
 	public:
 
 									ParticleSystem( const ParticleSystemModel *model );
@@ -87,4 +87,4 @@ namespace Fx {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_ParticleSystem_H__	*/
+#endif		/*	!__DC_Fx_ParticleSystem_H__	*/

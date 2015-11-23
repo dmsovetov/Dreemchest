@@ -48,13 +48,13 @@ Renderer::~Renderer( void )
 Renderer* Renderer::createRenderer( RendererType type )
 {
     switch( type ) {
-    case RendererType::Points:      return DC_NEW PointRenderer;
-    case RendererType::Quads:       return DC_NEW QuadRenderer;
-    case RendererType::Lines:       return DC_NEW LineRenderer;
-    case RendererType::ThickLines:  return DC_NEW ThickLineRenderer;
-    case RendererType::Paths:       return DC_NEW PathRenderer;
-    case RendererType::ThickPaths:  return DC_NEW ThickPathRenderer;
-    default:						return NULL;
+    case RenderPoints:      return DC_NEW PointRenderer;
+    case RenderQuads:       return DC_NEW QuadRenderer;
+    case RenderLines:       return DC_NEW LineRenderer;
+    case RenderThickLines:  return DC_NEW ThickLineRenderer;
+    case RenderPaths:       return DC_NEW PathRenderer;
+    case RenderThickPaths:  return DC_NEW ThickPathRenderer;
+    default:				return NULL;
     }
 
     return NULL;

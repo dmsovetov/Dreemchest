@@ -36,9 +36,9 @@ namespace Fx {
 Zone* Zone::create( ZoneType type )
 {
     switch( type ) {
-    case ZoneType::None: return NULL;
-    case ZoneType::Disk: return DC_NEW DiskZone;
-    case ZoneType::Line: return DC_NEW LineZone;
+    case TotalZoneTypes: return NULL;
+    case ZoneDisk:		 return DC_NEW DiskZone;
+    case ZoneLine:		 return DC_NEW LineZone;
     }
 
 	DC_BREAK
@@ -50,8 +50,8 @@ Zone* Zone::create( ZoneType type )
 // ** DiskZone::DiskZone
 DiskZone::DiskZone( void )
 {
-	registerParameter( "Inner", &m_innerRadius, sParameterInfo::Lifetime );
-	registerParameter( "Outer", &m_outerRadius, sParameterInfo::Lifetime );
+//	registerParameter( "Inner", &m_innerRadius, sParameterInfo::Lifetime );
+//	registerParameter( "Outer", &m_outerRadius, sParameterInfo::Lifetime );
 }
 
 // ** DiskZone::generateRandomPoint
@@ -71,8 +71,8 @@ Vec2 DiskZone::generateRandomPoint( float scalar, const Vec2& center ) const
 // ** LineZone::LineZone
 LineZone::LineZone( void )
 {
-	registerParameter( "Angle", &m_angle, sParameterInfo::Lifetime );
-	registerParameter( "Length", &m_length, sParameterInfo::Lifetime );
+//	registerParameter( "Angle", &m_angle, sParameterInfo::Lifetime );
+//	registerParameter( "Length", &m_length, sParameterInfo::Lifetime );
 }
 
 // ** LineZone::generateRandomPoint

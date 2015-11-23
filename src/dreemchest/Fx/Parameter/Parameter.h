@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Parameter_H__
-#define __DC_Parameter_H__
+#ifndef __DC_Fx_Parameter_H__
+#define __DC_Fx_Parameter_H__
 
-#include "../ParticleModelNode.h"
+#include "../Fx.h"
 
 #define SampleParameter( parameter, default )  ((parameter) ? (parameter)->sample( scalar, default ) : (default))
 #define SampleKoeficient( parameter, default ) SampleParameter( parameter, default * 100.0f ) * 0.01f
@@ -40,7 +40,7 @@ namespace Fx {
     typedef Curve<Rgb>      CurveRgb;
 
     // ** class Parameter
-    class Parameter : public IParticleModelNode {
+    class Parameter {
         
         DC_DECLARE_IS( Parameter, Parameter, this );
 
@@ -114,4 +114,4 @@ namespace Fx {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Parameter_H__	*/
+#endif		/*	!__DC_Fx_Parameter_H__	*/

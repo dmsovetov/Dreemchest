@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef __DC_ParticleZones_H__
-#define __DC_ParticleZones_H__
+#ifndef __DC_Fx_ParticleZones_H__
+#define __DC_Fx_ParticleZones_H__
 
-#include "../Parameter/ParameterContainer.h"
+#include "../Parameter/Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
     // ** class Zone
-    class Zone : public ParameterContainer {
+    class Zone : public RefCounted {
 
 		DC_DECLARE_IS( Zone, Zone, this );
 
@@ -44,8 +44,8 @@ namespace Fx {
 
         static Zone*        create( ZoneType type );
 
-        virtual ZoneType	type( void ) const                                         = 0;
-        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const = 0;
+        virtual ZoneType	type( void ) const												= 0;
+        virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const	= 0;
     };
 
     // ** class DiskZone
@@ -55,7 +55,7 @@ namespace Fx {
                             DiskZone( void );
 
         // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneType::Disk; }
+        virtual ZoneType	type( void ) const { return ZoneDisk; }
         virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
 
     private:
@@ -71,7 +71,7 @@ namespace Fx {
                             LineZone( void );
 
         // ** Zone
-        virtual ZoneType	type( void ) const { return ZoneType::Line; }
+        virtual ZoneType	type( void ) const { return ZoneLine; }
         virtual Vec2        generateRandomPoint( float scalar, const Vec2& center ) const;
 
     private:
@@ -84,4 +84,4 @@ namespace Fx {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_ParticleZones_H__	*/
+#endif		/*	!__DC_Fx_ParticleZones_H__	*/

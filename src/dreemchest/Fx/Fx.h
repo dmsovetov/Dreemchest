@@ -24,49 +24,75 @@
 
  **************************************************************************/
 
-#ifndef	__DC_ModifierContainer_H__
-#define	__DC_ModifierContainer_H__
+#ifndef __DC_Fx_H__
+#define __DC_Fx_H__
 
-#include "../Zone/ZoneContainer.h"
+#include "../Dreemchest.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	// ** struct sModifierInfo
-	struct sModifierInfo {
-		std::string			m_name;
-		Modifier*			m_modifier;
+	class ParticleModel;
+	class Zone;
+	class Modifier;
+	class Emitter;
+	class Particles;
+	class Renderer;
+	class EmitterModel;
+	class ParticleSystem;
+	struct sParticle;
+
+	typedef u32 dcTextureAsset;
+	typedef u32 dcBatchRenderer;
+
+	typedef Array<f32> FloatArray;
+	typedef Array<Modifier*> ModifierArray;
+	typedef Array<ParticleModel*> ParticleModelArray;
+	typedef Array<Particles*> ParticlesArray;
+	typedef Array<EmitterModel*> EmitterModelArray;
+	typedef Array<Emitter*> EmitterArray;
+
+	//! Modifier type.
+	enum ModifierType {
+		ModifierFriction,
+		ModifierForce,
+		ModifierForceField,
+
+		TotalModifierTypes
+	};
+        
+	//! Particle rendering types.
+	enum RendererType {
+		RenderPoints,
+        RenderQuads,
+        RenderLines,
+        RenderThickLines,
+        RenderPaths,
+        RenderThickPaths,
+
+        TotalRendererTypes,
 	};
 
-    // ** class ModifierContainer
-    class ModifierContainer : public ZoneContainer {
+	//! Rendering blend modes.
+	enum BlendMode {
+		BlendAlpha,
+		BlendAdditive,
+		BlendPremultiplied,
 
-		DC_DECLARE_IS( ModifierContainer, ModifierContainer, this );
+		TotalBlendModes
+	};
 
-		typedef std::vector<sModifierInfo> ModifierInfoArray;
+    //! Available particle emission zones.
+    enum ZoneType {
+        ZoneDisk,
+        ZoneLine,
 
-    public:
-
-								ModifierContainer( void );
-        virtual					~ModifierContainer( void );
-
-		int						totalModifiers( void ) const;
-		const sModifierInfo&	modifierInfo( int index ) const;
-		Modifier*				findModifierByName( const char *name ) const;
-
-	protected:
-
-		void					registerModifier( const char *name, Modifier *parameter );
-
-	private:
-
-		ModifierInfoArray		m_modifierInfo;
-		ModifierArray			m_modifiers;
-    };
+        TotalZoneTypes,
+	};
 
 } // namespace Fx
-    
+
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_ModifierContainer_H__	*/
+#endif	/*	!__DC_Fx_H__	*/

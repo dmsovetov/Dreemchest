@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_ParticleBundle_H__
-#define __DC_ParticleBundle_H__
+#ifndef __DC_Fx_ParticleBundle_H__
+#define __DC_Fx_ParticleBundle_H__
 
-#include "Modifier/ModifierContainer.h"
+#include "Parameter/Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -85,7 +85,7 @@ namespace Fx {
 	};
 
 	// ** class ParticleModel
-	class ParticleModel : public ModifierContainer {
+	class ParticleModel : public RefCounted {
 
 		DC_DECLARE_IS( ParticleModel, Particles, this );
 
@@ -163,7 +163,7 @@ namespace Fx {
 	};
 
 	// ** class Particles
-	class Particles {
+	class Particles : public RefCounted {
 	public:
 
 								Particles( const ParticleModel *model );
@@ -188,4 +188,4 @@ namespace Fx {
     
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_ParticleBundle_H__	*/
+#endif		/*	!__DC_Fx_ParticleBundle_H__	*/

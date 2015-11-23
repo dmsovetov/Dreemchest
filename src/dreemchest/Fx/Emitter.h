@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef __DC_Emitter_H__
-#define __DC_Emitter_H__
+#ifndef __DC_Fx_Emitter_H__
+#define __DC_Fx_Emitter_H__
 
-#include "Modifier/ModifierContainer.h"
+#include "Fx.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
 	// ** class EmitterModel
-	class EmitterModel : public ModifierContainer {
+	class EmitterModel : public RefCounted {
 
 		DC_DECLARE_IS( EmitterModel, Emitter, this );
 
@@ -53,6 +53,7 @@ namespace Fx {
 		void				setLooped( bool value );
 		int					totalParticles( void ) const;
 		ParticleModel*		particles( int index ) const;
+		Zone*				zone( void ) const { return m_zone; }
 
 		void				removeParticles( ParticleModel *particle );
 		ParticleModel*		createParticles( void );
@@ -63,13 +64,14 @@ namespace Fx {
 
 		ParticleModelArray	m_particles;
 		Vec2				m_position;
+		Zone*				m_zone;
 		float				m_duration;
 		bool				m_isLooped;
 		std::string			m_name;
 	};
 
 	// ** class Emitter
-	class Emitter {
+	class Emitter : public RefCounted {
 	public:
 
 							Emitter( const EmitterModel *model );
@@ -98,4 +100,4 @@ namespace Fx {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Emitter_H__	*/
+#endif		/*	!__DC_Fx_Emitter_H__	*/

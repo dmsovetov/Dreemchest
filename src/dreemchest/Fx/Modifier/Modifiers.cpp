@@ -82,11 +82,11 @@ void Modifier::setEnabled( bool value )
 // ** ForceField::ForceField
 ForceField::ForceField( void )
 {
-	registerParameter( "PositionX", &m_x, sParameterInfo::Lifetime );
-	registerParameter( "PositionY", &m_y, sParameterInfo::Lifetime );
+//	registerParameter( "PositionX", &m_x, sParameterInfo::Lifetime );
+//	registerParameter( "PositionY", &m_y, sParameterInfo::Lifetime );
 //	registerParameter( "PositionZ", &m_z, sParameterInfo::Lifetime );
-	registerParameter( "Force", &m_force, sParameterInfo::Lifetime );
-	registerParameter( "Radius", &m_radius, sParameterInfo::Lifetime );
+//	registerParameter( "Force", &m_force, sParameterInfo::Lifetime );
+//	registerParameter( "Radius", &m_radius, sParameterInfo::Lifetime );
 
     m_isQuadratic = true;
 }
@@ -147,7 +147,7 @@ void ForceField::apply( float dt, float scalar, Particles *particles )
 // ** Friction::Friction
 Friction::Friction( void )
 {
-    registerParameter( "Value", &m_value, sParameterInfo::Lifetime );
+
 }
 
 // ** Friction::apply
@@ -177,8 +177,8 @@ void Friction::apply( float dt, float scalar, Particles *particles )
 // ** Force::Force
 Force::Force( void )
 {
-    registerParameter( "ForceX", &m_x, sParameterInfo::Lifetime );
-	registerParameter( "ForceY", &m_y, sParameterInfo::Lifetime );
+//    registerParameter( "ForceX", &m_x, sParameterInfo::Lifetime );
+//	registerParameter( "ForceY", &m_y, sParameterInfo::Lifetime );
 //	registerParameter( "ForceZ", &m_z, sParameterInfo::Lifetime );
 }
 

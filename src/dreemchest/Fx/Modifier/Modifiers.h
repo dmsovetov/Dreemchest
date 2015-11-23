@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef	__DC_ParticleModifiers_H__
-#define	__DC_ParticleModifiers_H__
+#ifndef	__DC_Fx_ParticleModifiers_H__
+#define	__DC_Fx_ParticleModifiers_H__
 
-#include "../Zone/ZoneContainer.h"
+#include "../Parameter/Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
     // ** class Modifier
-    class Modifier : public ZoneContainer {
+    class Modifier : public RefCounted {
 
 		DC_DECLARE_IS( Modifier, Modifier, this );
 
@@ -111,4 +111,4 @@ namespace Fx {
     
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_ParticleModifiers_H__	*/
+#endif		/*	!__DC_Fx_ParticleModifiers_H__	*/

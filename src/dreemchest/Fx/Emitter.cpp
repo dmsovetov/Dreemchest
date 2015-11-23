@@ -39,8 +39,8 @@ namespace Fx {
 // ** EmitterModel::EmitterModel
 EmitterModel::EmitterModel( void ) : m_position( 0, 0 ), m_duration( 1.0f ), m_isLooped( true )
 {
-    registerZone( "Disk", ZoneType::Disk );
-    registerZone( "Line", ZoneType::Line );
+//    registerZone( "Disk", ZoneType::ZoneDisk );
+//    registerZone( "Line", ZoneType::ZoneLine );
 }
 
 EmitterModel::~EmitterModel( void )

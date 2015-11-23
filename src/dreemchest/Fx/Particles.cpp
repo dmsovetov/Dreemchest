@@ -46,27 +46,27 @@ ParticleModel::ParticleModel( void )
 	m_texture			= NULL;
 	m_maxSnapshots		= sParticle::MaxSnapshots;
 
-	setBlendMode( BlendMode::Normal );
-	setRendererType( RendererType::Quads );
+	setBlendMode( BlendAlpha );
+	setRendererType( RenderQuads );
 
 	// ** Register parameters
-	registerParameter( "Emission", &m_scalar[Emission], sParameterInfo::Initial );
-	registerParameter( "Life", &m_scalar[Life], sParameterInfo::Initial );
-	registerParameter( "Direction", &m_scalar[Direction], sParameterInfo::Initial );
-	registerParameter( "Size", &m_scalar[Size], sParameterInfo::Initial );
-	registerParameter( "Transparency", &m_scalar[Transparency], sParameterInfo::Initial );
-	registerParameter( "Velocity", &m_scalar[Velocity], sParameterInfo::Initial );
-	registerParameter( "AngularVelocity", &m_scalar[AngularVelocity], sParameterInfo::Initial );
-	registerParameter( "Torque", &m_scalar[Torque], sParameterInfo::Initial );
-	registerParameter( "Rotation", &m_scalar[Rotation], sParameterInfo::Initial );
-	registerParameter( "SizeOverLife", &m_scalar[SizeOverLife], sParameterInfo::Lifetime );
-	registerParameter( "TransparencyOverLife", &m_scalar[TransparencyOverLife], sParameterInfo::Lifetime );
-	registerParameter( "VelocityOverLife", &m_scalar[VelocityOverLife], sParameterInfo::Lifetime );
-	registerParameter( "AngularVelocityOverLife", &m_scalar[AngularVelocityOverLife], sParameterInfo::Lifetime );
-	registerParameter( "TorqueOverLife", &m_scalar[TorqueOverLife], sParameterInfo::Lifetime );
+//	registerParameter( "Emission", &m_scalar[Emission], sParameterInfo::Initial );
+//	registerParameter( "Life", &m_scalar[Life], sParameterInfo::Initial );
+//	registerParameter( "Direction", &m_scalar[Direction], sParameterInfo::Initial );
+//	registerParameter( "Size", &m_scalar[Size], sParameterInfo::Initial );
+//	registerParameter( "Transparency", &m_scalar[Transparency], sParameterInfo::Initial );
+//	registerParameter( "Velocity", &m_scalar[Velocity], sParameterInfo::Initial );
+//	registerParameter( "AngularVelocity", &m_scalar[AngularVelocity], sParameterInfo::Initial );
+//	registerParameter( "Torque", &m_scalar[Torque], sParameterInfo::Initial );
+//	registerParameter( "Rotation", &m_scalar[Rotation], sParameterInfo::Initial );
+//	registerParameter( "SizeOverLife", &m_scalar[SizeOverLife], sParameterInfo::Lifetime );
+//	registerParameter( "TransparencyOverLife", &m_scalar[TransparencyOverLife], sParameterInfo::Lifetime );
+//	registerParameter( "VelocityOverLife", &m_scalar[VelocityOverLife], sParameterInfo::Lifetime );
+//	registerParameter( "AngularVelocityOverLife", &m_scalar[AngularVelocityOverLife], sParameterInfo::Lifetime );
+//	registerParameter( "TorqueOverLife", &m_scalar[TorqueOverLife], sParameterInfo::Lifetime );
 
-    registerParameter( "Color", &m_color[Color], sParameterInfo::Initial );
-    registerParameter( "ColorOverLife", &m_color[ColorOverLife], sParameterInfo::Lifetime );
+//    registerParameter( "Color", &m_color[Color], sParameterInfo::Initial );
+//    registerParameter( "ColorOverLife", &m_color[ColorOverLife], sParameterInfo::Lifetime );
 
     for( int i = 0; i < TotalColorParameters; i++ ) {
         m_color[i].setType( Parameter::Color );
@@ -198,7 +198,7 @@ int ParticleModel::snapshotsToSave( void ) const
 {
 	RendererType rendererType = m_particleRenderer->type();
 
-	if( (rendererType == RendererType::Paths) || (rendererType == RendererType::ThickPaths) ) {
+	if( (rendererType == RenderPaths) || (rendererType == RenderThickPaths) ) {
 		return m_maxSnapshots;
 	}
 
@@ -332,7 +332,7 @@ int ParticleModel::update( sParticle *particles, int count, float dt, Vec2 *min,
 		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleKoeficient( alpha,            1.0f );
 		particle.m_size.current          = particle.m_size.initial        * SampleKoeficient( size,             1.0f );
 
-		if( m_blendMode != BlendMode::Normal ) {
+		if( m_blendMode != BlendAlpha ) {
 			float alpha = particle.m_color.initial.alpha;
 			particle.m_color.current.Rgb = particle.m_color.initial.Rgb * particle.m_color.current.alpha;
 			particle.m_color.initial.alpha = alpha;

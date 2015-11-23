@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Renderers_H__
-#define __DC_Renderers_H__
+#ifndef __DC_Fx_Renderers_H__
+#define __DC_Fx_Renderers_H__
 
 #include "Emitter.h"
 
@@ -40,7 +40,7 @@ namespace Fx {
     };
 
     // ** class Renderer
-    class Renderer {
+    class Renderer : public RefCounted {
     public:
 
                                     Renderer( void );
@@ -58,7 +58,7 @@ namespace Fx {
                                     PointRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Points; }
+        virtual RendererType		type( void ) const { return RendererType::RenderPoints; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -69,7 +69,7 @@ namespace Fx {
                                     QuadRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Quads; }
+        virtual RendererType		type( void ) const { return RendererType::RenderQuads; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -80,7 +80,7 @@ namespace Fx {
                                     LineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::Lines; }
+        virtual RendererType		type( void ) const { return RendererType::RenderLines; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -91,7 +91,7 @@ namespace Fx {
                                     ThickLineRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::ThickLines; }
+        virtual RendererType		type( void ) const { return RendererType::RenderThickLines; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -102,7 +102,7 @@ namespace Fx {
                                     PathRenderer( void );
 
         // ** Renderer
-        virtual RendererType	    type( void ) const { return RendererType::Paths; }
+        virtual RendererType	    type( void ) const { return RendererType::RenderPaths; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -113,7 +113,7 @@ namespace Fx {
                                     ThickPathRenderer( void );
 
         // ** Renderer
-        virtual RendererType		type( void ) const { return RendererType::ThickPaths; }
+        virtual RendererType		type( void ) const { return RendererType::RenderThickPaths; }
         virtual void                render( dcBatchRenderer renderer, dcTextureAsset texture, BlendMode blendMode, const sParticle *particles, int count );
     };
 
@@ -121,4 +121,4 @@ namespace Fx {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Renderers_H__	*/
+#endif		/*	!__DC_Fx_Renderers_H__	*/
