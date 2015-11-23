@@ -88,6 +88,11 @@ Bson::Bson( s32 value ) : m_type( kInt32 ), m_int32( value )
 }
 
 // ** Bson::Bson
+Bson::Bson( u32 value ) : m_type( kInt32 ), m_int32( value )
+{
+}
+
+// ** Bson::Bson
 Bson::Bson( f32 value ) : m_type( kFloat32 ), m_float32( value )
 {
 }
