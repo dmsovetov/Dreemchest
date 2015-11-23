@@ -49,7 +49,7 @@ namespace Ecs {
 		//! Constructs and adds a new system to a group.
 	#ifndef DC_CPP11_DISABLED
 		template<typename TSystem, typename ... Args>
-		WeakPtr<TSystem>	add( Args ... args );
+		WeakPtr<TSystem>	add( const Args& ... args );
 	#endif
 
 		//! Adds a new system to a group.
@@ -94,7 +94,7 @@ namespace Ecs {
 	// ** SystemGroup::add
 #ifndef DC_CPP11_DISABLED
 	template<typename TSystem, typename ... Args>
-	WeakPtr<TSystem> SystemGroup::add( Args ... args )
+	WeakPtr<TSystem> SystemGroup::add( const Args& ... args )
 	{
 		return add( DC_NEW TSystem( args... ) );
 	}
