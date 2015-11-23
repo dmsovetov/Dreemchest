@@ -62,8 +62,11 @@ namespace Renderer {
 		//! Renders a single point.
 		void					point( f32 x, f32 y, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders an array of 2d points.
+		void					points( const Vec2* points, const Rgba* colors, const f32* sizes, s32 count, s32 stride );
+
 		//! Renders the line segment.
-		void					line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		void					line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1 = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), const Rgba& color2 = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 		//! Renders the line segment in 3D space.
 		void					line( const Vec3& start, const Vec3& end, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -74,6 +77,9 @@ namespace Renderer {
 		//! Renders a wire sphere in 3D space.
 		void					wireSphere( const Vec3& center, f32 radius, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders the accumulated mesh vertices and resets the vertex buffer.
+		void					flush( void );
+
 		//! Creates a new instance of Renderer2D.
 		static Renderer2DPtr	create( const HalPtr& hal, u32 maxVertexBufferSize = 1024 );
 
@@ -81,9 +87,6 @@ namespace Renderer {
 
 								//! Constructs the Renderer2D instance.
 								Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize );
-
-		//! Renders the accumulated mesh vertices and resets the vertex buffer.
-		void					flush( void );
 
 		//! Pushes a new set of vertices to a buffer.
 		void					emitVertices( PrimitiveType primitiveType, const Texture2DPtr& texture, const Vertex* vertices, u32 count );

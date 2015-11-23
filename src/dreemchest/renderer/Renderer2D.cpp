@@ -189,13 +189,19 @@ void Renderer2D::point( f32 x, f32 y, const Rgba& color )
 	emitVertices( PrimPoints, Texture2DPtr(), &vertex, 1 );
 }
 
+// ** Renderer2D::points
+void Renderer2D::points( const Vec2* points, const Rgba* colors, const f32* sizes, s32 count, s32 stride )
+{
+	DC_NOT_IMPLEMENTED;
+}
+
 // ** Renderer2D::line
-void Renderer2D::line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color )
+void Renderer2D::line( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 )
 {
 	Vertex vertices[2];
 
-	SET_VERTEX( vertices[0], x1, y1, color );
-	SET_VERTEX( vertices[1], x2, y2, color );
+	SET_VERTEX( vertices[0], x1, y1, color1 );
+	SET_VERTEX( vertices[1], x2, y2, color2 );
 
 	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
 }
