@@ -77,30 +77,29 @@ namespace event {
         virtual	~EventEmitter( void ) {}
 
 		//! Callback type wrapper.
-		template<typename T>
+		template<typename TEvent>
 		struct Callback {
 			//! Callback type alias.
-			typedef typename detail::EventListener<T>::Callback Type;
+			typedef typename detail::EventListener<TEvent>::Callback Type;
 		};
 
 		//! Subscribes for an event.
-		template<typename T>
-        void subscribe( const typename Callback<T>::Type& callback );
+		template<typename TEvent>
+        void subscribe( const typename Callback<TEvent>::Type& callback );
 
 		//! Removes an event listener.
-		template<typename T>
-		void unsubscribe( const typename Callback<T>::Type& callback );
+		template<typename TEvent>
+		void unsubscribe( const typename Callback<TEvent>::Type& callback );
 
 		//! Emits a global event.
-		template<typename T>
-		void emit( const T& e );
+		template<typename TEvent>
+		void emit( const TEvent& e );
 
 		//! Constructs and emits a new event instance.
-		template<typename T>							void emit( void );
-		template<typename T, TemplateFunctionTypes1>	void emit( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2>	void emit( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3>	void emit( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4>	void emit( TemplateFunctionArgs4 );
+	#ifndef DC_CPP11_DISABLED
+		template<typename TEvent, typename ... TArgs>
+		void emit( const TArgs& ... args );
+	#endif
 
 	private:
 
@@ -115,29 +114,29 @@ namespace event {
 	};
 
 	// ** EventEmitter::subscribe
-	template<typename T>
-	inline void EventEmitter::subscribe( const typename Callback<T>::Type& callback )
+	template<typename TEvent>
+	inline void EventEmitter::subscribe( const typename Callback<TEvent>::Type& callback )
 	{
-		TypeIdx idx = TypeIndex<T>::idx();
+		TypeIdx idx = TypeIndex<TEvent>::idx();
 
 		if( m_subscribers.count( idx ) == 0 ) {
 			m_subscribers[idx] = Listeners();
 		}
 
-        m_subscribers[idx].push_back( DC_NEW detail::EventListener<T>( callback ) );
+        m_subscribers[idx].push_back( DC_NEW detail::EventListener<TEvent>( callback ) );
 	}
 
 	// ** EventEmitter::unsubscribe
-	template<typename T>
-	inline void EventEmitter::unsubscribe( const typename Callback<T>::Type& callback )
+	template<typename TEvent>
+	inline void EventEmitter::unsubscribe( const typename Callback<TEvent>::Type& callback )
 	{
-		TypeIdx idx = TypeIndex<T>::idx();
+		TypeIdx idx = TypeIndex<TEvent>::idx();
 
 		if( m_subscribers.count( idx ) == 0 ) {
 			return;
 		}
 
-		typedef detail::EventListener<T> EventListenerType;
+		typedef detail::EventListener<TEvent> EventListenerType;
 		Listeners& listeners = m_subscribers[idx];
 
 		for( Listeners::iterator i = listeners.begin(); i != listeners.end(); )
@@ -152,10 +151,10 @@ namespace event {
 	}
 
 	// ** EventEmitter::emit
-	template<typename T>
-	inline void EventEmitter::emit( const T& e )
+	template<typename TEvent>
+	inline void EventEmitter::emit( const TEvent& e )
 	{
-		TypeIdx idx = TypeIndex<T>::idx();
+		TypeIdx idx = TypeIndex<TEvent>::idx();
 		Subscribers::iterator i = m_subscribers.find( idx );
 
 		if( i == m_subscribers.end() ) {
@@ -167,45 +166,17 @@ namespace event {
 		}
 	}
 
-	// ** EventEmitter::emit
-	template<typename T>
-	inline void EventEmitter::emit( void )
-	{
-		T e;
-		emit( e );
-	}
+#ifndef DC_CPP11_DISABLED
 
 	// ** EventEmitter::emit
-	template<typename T, TemplateFunctionTypes1>
-	inline void EventEmitter::emit( TemplateFunctionArgs1 )
+	template<typename TEvent, typename ... TArgs>
+	inline void EventEmitter::emit( const TArgs& ... args )
 	{
-		T e( arg0 );
+		TEvent e( args... );
 		emit( e );
 	}
 
-	// ** EventEmitter::send
-	template<typename T, TemplateFunctionTypes2>
-	inline void EventEmitter::emit( TemplateFunctionArgs2 )
-	{
-		T e( arg0, arg1 );
-		emit( e );
-	}
-
-	// ** EventEmitter::send
-	template<typename T, TemplateFunctionTypes3>
-	inline void EventEmitter::emit( TemplateFunctionArgs3 )
-	{
-		T e( arg0, arg1, arg2 );
-		emit( e );
-	}
-
-	// ** EventEmitter::send
-	template<typename T, TemplateFunctionTypes4>
-	inline void EventEmitter::emit( TemplateFunctionArgs4 )
-	{
-		T e( arg0, arg1, arg2, arg3 );
-		emit( e );
-	}
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 	namespace detail {
 
