@@ -224,6 +224,9 @@ LRESULT WindowsWindow::windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARA
 	case WM_LBUTTONUP:		window->owner()->notifyMouseUp( LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
+	case WM_MOUSEMOVE:		window->owner()->notifyMouseMove( LOWORD( lParam ), HIWORD( lParam ), LOWORD( lParam ), HIWORD( lParam ) );
+							break;
+
 	case WM_RBUTTONDOWN:	break;
 
 	case WM_RBUTTONUP:		break;

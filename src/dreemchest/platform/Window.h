@@ -80,13 +80,13 @@ namespace Platform {
 		virtual void			handleClosed( Window* window ) {}
 
         //! Handles mouse pressed event.
-        virtual void            handleMouseDown( Window* window, u32 x, u32 y, int touchId = -1 ) {}
+        virtual void            handleMouseDown( Window* window, u32 x, u32 y, s32 touchId = -1 ) {}
 
         //! Handles mouse released event.
-        virtual void            handleMouseUp( Window* window, u32 x, u32 y, int touchId = -1 ) {}
+        virtual void            handleMouseUp( Window* window, u32 x, u32 y, s32 touchId = -1 ) {}
 
         //! Handles mouse moved event.
-        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId = -1 ) {}
+        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, s32 touchId = -1 ) {}
 
         //! Handles key pressed event.
         virtual void            handleKeyDown( Window* window, Key key ) {}
@@ -140,13 +140,13 @@ namespace Platform {
         void                    notifyUpdate( void );
 
         //! Notifies window that mouse was pressed.
-        void                    notifyMouseDown( u32 x, u32 y, int touchId = -1 );
+        void                    notifyMouseDown( u32 x, u32 y, s32 touchId = -1 );
 
         //! Notifies window that mouse was released.
-        void                    notifyMouseUp( u32 x, u32 y, int touchId = -1 );
+        void                    notifyMouseUp( u32 x, u32 y, s32 touchId = -1 );
 
         //! Notifies window that mouse was moved.
-        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId = -1 );
+        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, s32 touchId = -1 );
 
         //! Notifies window that key was pressed.
         void                    notifyKeyDown( Key key );
