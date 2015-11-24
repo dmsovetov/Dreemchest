@@ -14,6 +14,14 @@ add_files(Io IO_SRCS)
 add_files(Io/Serialization IO_SERIALIZATION_SRCS)
 add_files(Io/Streams IO_STREAMS_SRCS)
 
+# Locate the JSON library
+find_package(Jsoncpp)
+
+if (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
+	add_definitions(-DDC_JSON_ENABLED)
+	include_directories(${JSONCPP_INCLUDE_DIR})
+endif (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
+
 # Add Qt support to MVVM module
 if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
 	set(CMAKE_AUTOMOC ON)
@@ -59,6 +67,10 @@ add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS}
 if (DC_BOX2D_ENABLED)
 	target_link_libraries(Dreemchest Box2D)
 endif (DC_BOX2D_ENABLED)
+
+if (JSONCPP_LIBRARY)
+	target_link_libraries(Dreemchest ${JSONCPP_LIBRARY})
+endif (JSONCPP_LIBRARY)
 
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)
