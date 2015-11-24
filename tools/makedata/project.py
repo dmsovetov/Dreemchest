@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 #
 # The MIT License (MIT)
 #
@@ -24,7 +24,10 @@
 #
 #################################################################################
 
-import os, json, yaml, collections, shutil, actions
+import os, json, collections, shutil, actions, module
+
+# Import the YAML parsing module
+yaml = module.require('yaml', True)
 
 # Saves object to a JSON file
 def save_to_json(file_name, data):
@@ -445,6 +448,193 @@ class material:
         # Save parsed scene to a JSON file
         save_to_json(output, result)
 
+# The curve class
+class Curve:
+    # Constructs the curve instance
+    def __init__(self):
+        self._keyframes = []
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        return self._keyframes
+
+    # Parses the curve from object
+    def parse(self, object):
+        for v in object['m_Curve']:
+            self._keyframes.append(v['time'])
+            self._keyframes.append(v['value'])
+
+# Parameter type enumeration
+class ParameterType:
+    VALUE = -1
+    CONSTANT = 0
+    CURVE = 1
+    RANDOM_BETWEEN_CURVES = 2
+    RANDOM_BETWEEN_CONSTANTS = 3
+
+# The particle system property value
+class Value:
+    # Constructs the ConstantParameter instance
+    def __init__(self):
+        self._value = None
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        return self._value
+
+    # Parses the parameter from an object
+    def parse(self, object):
+        self._value = object
+
+# The particle system parameter class
+class ConstantParameter:
+    # Constructs the ConstantParameter instance
+    def __init__(self):
+        self._value = 0
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        return dict(type='constant', value=self._value)
+
+    # Parses the parameter from an object
+    def parse(self, object):
+        assert object['minMaxState'] == ParameterType.CONSTANT
+        self._value = object['scalar']
+
+# The particle system curve parameter
+class CurveParameter:
+    # Constructs the ConstantParameter instance
+    def __init__(self):
+        self._value = Curve()
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        return dict(type='curve', value=self._value.data)
+
+    # Parses the parameter from an object
+    def parse(self, object):
+        assert object['minMaxState'] == ParameterType.CURVE
+        self._value.parse(object['maxCurve'])
+
+# Particle system module
+class ParticleSystemModule:
+    # Constructs the ParticleSystemModule instance
+    def __init__(self, name):
+        self._name = name
+        self._parameters = dict()
+
+    # Returns the module name
+    @property
+    def name(self):
+        return self._name
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        result = dict()
+
+        for k, v in self._parameters.items():
+            result[k] = v.data
+
+        return result
+
+    # Adds the named parameter to module
+    def add_parameter(self, name, parameter):
+        self._parameters[name] = parameter
+
+# Particle system asset
+class ParticleSystem:
+    # Constructs the ParticleSystem instance
+    def __init__(self):
+        self._modules = {}
+
+    # Adds the module to particle system
+    def add_module(self, name, module):
+        self._modules[name] = module
+
+    # Parses the parameter object
+    def _parse_parameter(self, object):
+        type = object['minMaxState'] if isinstance(object, dict) else ParameterType.VALUE
+        parameter = None
+
+        if type == ParameterType.VALUE: parameter = Value()
+        elif type == ParameterType.CONSTANT: parameter = ConstantParameter()
+        elif type == ParameterType.CURVE: parameter = CurveParameter()
+
+        parameter.parse(object)
+
+        return parameter
+
+    # Performs particle system parsing from an object
+    def parse(self, object):
+        for k, v in object.items():
+            if not isinstance(v, dict):
+                continue
+
+            if not 'enabled' in v.keys():
+                continue
+
+            if v['enabled'] == 0:
+                continue
+
+            particle_module = None
+
+            if k == 'ForceModule':
+                particle_module = ParticleSystemModule('Force')
+                particle_module.add_parameter('x', self._parse_parameter(v['x']))
+                particle_module.add_parameter('y', self._parse_parameter(v['y']))
+                particle_module.add_parameter('z', self._parse_parameter(v['z']))
+            elif k == 'InitialModule':
+                particle_module = ParticleSystemModule('Emitter')
+                particle_module.add_parameter('startLifetime', self._parse_parameter(v['startLifetime']))
+                particle_module.add_parameter('startSpeed', self._parse_parameter(v['startSpeed']))
+                particle_module.add_parameter('startSize', self._parse_parameter(v['startSize']))
+                particle_module.add_parameter('startRotation', self._parse_parameter(v['startRotation']))
+                particle_module.add_parameter('maxNumParticles', self._parse_parameter(v['maxNumParticles']))
+                particle_module.add_parameter('lengthInSec', self._parse_parameter(object['lengthInSec']))
+                particle_module.add_parameter('speed', self._parse_parameter(object['speed']))
+                particle_module.add_parameter('looping', self._parse_parameter(object['looping']))
+                particle_module.add_parameter('moveWithTransform', self._parse_parameter(object['moveWithTransform']))
+            elif k == 'EmissionModule':
+                particle_module = ParticleSystemModule('Emission')
+                particle_module.add_parameter('rate', self._parse_parameter(v['rate']))
+
+            if particle_module is not None:
+                self._modules[particle_module.name] = particle_module
+
+    # Returns the data object serializable to JSON
+    @property
+    def data(self):
+        result = dict()
+
+        for k, v in self._modules.items():
+            result[k] = v.data
+
+        return result
+
+# Performs the particle system parsing
+class ParticleSystemParser:
+    # Converts particles to JSON
+    @staticmethod
+    def convert(assets, source, output):
+        objects = yaml_objects(source)
+        result  = None
+
+        for k, v in objects.items():
+            if not 'ParticleSystem' in v.keys():
+                continue
+
+            result = ParticleSystem()
+            result.parse(v['ParticleSystem'])
+            break
+
+        # Save parsed scene to a JSON file
+        if result is not None:
+            save_to_json(output, result.data)
 
 # Parses assets from a path
 def parse_assets(path):
@@ -486,6 +676,18 @@ def import_assets(assets, source, output):
             actions.convert_fbx({}, paths.source, dest)()
         elif item.type == assets.Texture:
             actions.convert_to_raw({}, paths.source, dest)()
+
+# Imports all particle systems
+def import_particles(assets, source, output):
+    for item in assets.filter_by_type(assets.Prefab):
+        paths = item.format_paths(source, output)
+        dest = os.path.join(output, item.uuid)
+
+    #    if not item.uuid in assets.used_assets.keys():
+    #        continue
+
+        print 'Importing particles', item.full_path
+        ParticleSystemParser.convert(assets, paths.source, dest)
 
 # Renderer patcher
 RendererPatcher = {

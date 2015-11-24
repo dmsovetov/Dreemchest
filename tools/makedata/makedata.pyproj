@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
-    <CommandLineArguments>-s D:\Projects\warfall\src\project -o D:\Projects\warfall\build\project -w 1 -a import</CommandLineArguments>
+    <CommandLineArguments>-s "C:\Users\dm\Documents\New Unity Project 1" -o "D:\BFG9000\externals\src\dreemchest\src\examples" -w 1 -a import</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
@@ -27,6 +27,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cache.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="module.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="signature.py">

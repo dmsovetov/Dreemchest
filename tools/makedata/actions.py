@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 #
 # The MIT License (MIT)
 #
@@ -24,8 +24,10 @@
 #
 #################################################################################
 
-import shutil, os, struct, fbx, collections
-from PIL import Image, ImageOps
+import shutil, os, struct, collections, module
+
+fbx = module.require('fbx')
+PIL = module.require('PIL')
 
 # action
 class action:

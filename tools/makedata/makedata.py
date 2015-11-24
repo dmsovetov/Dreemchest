@@ -1,4 +1,4 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 
 #################################################################################
 #
@@ -85,6 +85,9 @@ def import_project(args, source, output):
 
     # Import materials
     project.import_materials(assets, source, output)
+
+    # Import particles
+    project.import_particles(assets, source, output)
 
     # Import assets
     project.import_assets(assets, source, output)
