@@ -198,23 +198,23 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 		}
 
 		// Read the component
-		Ecs::ComponentBasePtr component = requestComponent( i.key().asString() );
+		Ecs::ComponentPtr component = requestComponent( i.key().asString() );
 
 		// Get the scene object to attach the component to.
 		Ecs::EntityPtr entity = requestSceneObject( i->get( "sceneObject", Json::Value() ).asString() );
 
 		// Attach the component.
-		entity->attach( component.get() );
+		entity->attachComponent( component.get() );
 	}
 
 	// Update the scene to populate all families and systems
-	m_scene->update( 0.0f );
+	m_scene->update( 0, 0.0f );
 
 	return true;
 }
 
 // ** JsonSceneLoader::requestComponent
-Ecs::ComponentBasePtr JsonSceneLoader::requestComponent( const String& id )
+Ecs::ComponentPtr JsonSceneLoader::requestComponent( const String& id )
 {
 	Components::iterator i = m_components.find( id );
 
@@ -233,11 +233,11 @@ Ecs::ComponentBasePtr JsonSceneLoader::requestComponent( const String& id )
 
 	if( j == m_loaders.end() ) {
 		log::error( "JsonSceneLoader::requestComponent : unknown object type '%s'\n", type.c_str() );
-		return Ecs::ComponentBasePtr();
+		return Ecs::ComponentPtr();
 	}
 
 	// Read the component.
-	Ecs::ComponentBasePtr component = j->second( data );
+	Ecs::ComponentPtr component = j->second( data );
 
 	// Save parsed component
 	m_components[id] = component;
@@ -264,7 +264,7 @@ Ecs::EntityPtr JsonSceneLoader::requestSceneObject( const String& id )
 }
 
 // ** JsonSceneLoader::readTransform
-Ecs::ComponentBasePtr JsonSceneLoader::readTransform( const Json::Value& value )
+Ecs::ComponentPtr JsonSceneLoader::readTransform( const Json::Value& value )
 {
 	Vec3 position = readVec3( value["position"] );
 	Vec3 scale    = readVec3( value["scale"] );
@@ -278,7 +278,7 @@ Ecs::ComponentBasePtr JsonSceneLoader::readTransform( const Json::Value& value )
 	Json::Value parent = value["parent"];
 
 	if( parent != Json::nullValue ) {
-		Ecs::ComponentBasePtr component = requestComponent( parent.asString() );
+		Ecs::ComponentPtr component = requestComponent( parent.asString() );
 		result->setParent( castTo<Transform>( component.get() ) );
 	}
 
@@ -286,7 +286,7 @@ Ecs::ComponentBasePtr JsonSceneLoader::readTransform( const Json::Value& value )
 }
 
 // ** JsonSceneLoader::readCamera
-Ecs::ComponentBasePtr JsonSceneLoader::readCamera( const Json::Value& value )
+Ecs::ComponentPtr JsonSceneLoader::readCamera( const Json::Value& value )
 {
 	Camera* result = DC_NEW Camera;
 	result->setFov( value["fov"].asFloat() );
@@ -299,7 +299,7 @@ Ecs::ComponentBasePtr JsonSceneLoader::readCamera( const Json::Value& value )
 }
 
 // ** JsonSceneLoader::readRenderer
-Ecs::ComponentBasePtr JsonSceneLoader::readRenderer( const Json::Value& value )
+Ecs::ComponentPtr JsonSceneLoader::readRenderer( const Json::Value& value )
 {
 	StaticMesh* result = DC_NEW StaticMesh;
 	String		asset  = value["asset"].asString();
@@ -316,7 +316,7 @@ Ecs::ComponentBasePtr JsonSceneLoader::readRenderer( const Json::Value& value )
 }
 
 // ** JsonSceneLoader::readLight
-Ecs::ComponentBasePtr JsonSceneLoader::readLight( const Json::Value& value )
+Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 {
 	Light::Type types[] = { Light::Spot, Light::Directional, Light::Point };
 

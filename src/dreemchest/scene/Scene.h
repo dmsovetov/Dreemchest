@@ -238,19 +238,19 @@ namespace Scene {
 		Ecs::EntityPtr				requestSceneObject( const String& id );
 
 		//! Returns the component by it's id.
-		Ecs::ComponentBasePtr		requestComponent( const String& id );
+		Ecs::ComponentPtr			requestComponent( const String& id );
 
 		//! Reads the Transform component from JSON object.
-		Ecs::ComponentBasePtr		readTransform( const Json::Value& value );
+		Ecs::ComponentPtr			readTransform( const Json::Value& value );
 
 		//! Reads the Renderer component from JSON object.
-		Ecs::ComponentBasePtr		readRenderer( const Json::Value& value );
+		Ecs::ComponentPtr			readRenderer( const Json::Value& value );
 
 		//! Reads the Camera component from JSON object.
-		Ecs::ComponentBasePtr		readCamera( const Json::Value& value );
+		Ecs::ComponentPtr			readCamera( const Json::Value& value );
 
 		//! Reads the Light component from JSON object.
-		Ecs::ComponentBasePtr		readLight( const Json::Value& value );
+		Ecs::ComponentPtr			readLight( const Json::Value& value );
 
 		//! Reads the Vec3 from a JSON object.
 		static Vec3					readVec3( const Json::Value& value );
@@ -270,7 +270,7 @@ namespace Scene {
 	private:
 
 		//! Component loader type.
-		typedef cClosure<Ecs::ComponentBasePtr(const Json::Value&)> ComponentLoader;
+		typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
 
 		//! Container to store all available component loaders.
 		typedef Map<String, ComponentLoader> ComponentLoaders;
@@ -279,7 +279,7 @@ namespace Scene {
 		typedef Map<String, Ecs::EntityPtr> SceneObjects;
 
 		//! Container type to store parsed components.
-		typedef Map<String, Ecs::ComponentBasePtr> Components;
+		typedef Map<String, Ecs::ComponentPtr> Components;
 
 		AssetBundlePtr				m_assets;		//!< Available assets.
 		Json::Value					m_json;			//!< Parsed JSON.
