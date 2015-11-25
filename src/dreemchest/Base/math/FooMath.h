@@ -58,7 +58,9 @@ DC_BEGIN_DREEMCHEST
     }
 
     //! Does a linear interpolation between two values.
-    inline float lerp( float a, float b, float scalar ) {
+	template<typename TValue>
+    TValue lerp( TValue a, TValue b, f32 scalar )
+	{
         return a * (1.0f - scalar) + b * scalar;
     }
 
