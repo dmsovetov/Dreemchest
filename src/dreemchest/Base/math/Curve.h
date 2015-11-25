@@ -64,6 +64,9 @@ DC_BEGIN_DREEMCHEST
 		//! Inserts a new keyframe at specified index.
         void                    insert( s32 index, f32 time, const T& value );
 
+		//! Pushes a new keyframe to the end of an array.
+		Curve<T>&				push( f32 time, const T& value );
+
 		//! Sets the keyframe at specified index.
         void                    set( s32 index, f32 time, const T& value );
 
@@ -169,6 +172,14 @@ DC_BEGIN_DREEMCHEST
     {
         DC_BREAK_IF( index < 0 );
         m_keyframes.insert( m_keyframes.begin() + index, Keyframe( time, value ) );
+    }
+
+    // ** Curve::insert
+    template<typename T>
+    Curve<T>& Curve<T>::push( f32 time, const T& value )
+    {
+        m_keyframes.push_back( Keyframe( time, value ) );
+		return *this;
     }
 
     // ** Curve::remove
