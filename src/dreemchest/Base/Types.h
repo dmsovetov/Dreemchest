@@ -129,6 +129,13 @@ DC_BEGIN_DREEMCHEST
 		return items[rand() % items.size()];
 	}
 
+	//! Returns the random value in specified range
+	template<typename TValue>
+	TValue randomValue( const TValue& min, const TValue& max )
+	{
+		return lerp( min, max, rand() / f32( RAND_MAX ) );
+	}
+
     //! Helper struct to hold a numeric range.
     struct Range {
                 Range( f32 min = 0.0f, f32 max = 0.0f )
