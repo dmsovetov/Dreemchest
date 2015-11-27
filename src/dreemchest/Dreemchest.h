@@ -49,6 +49,10 @@
 
 #include "Base/Base.h"
 
+#ifdef DC_JSON_ENABLED
+	#include <json/json.h>
+#endif
+
 #ifndef DC_BUILD_LIBRARY
 	#include <Network/Network.h>
 	#include <Io/Io.h>

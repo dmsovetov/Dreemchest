@@ -329,36 +329,6 @@ Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 	return result;
 }
 
-// ** JsonSceneLoader::readVec3
-Vec3 JsonSceneLoader::readVec3( const Json::Value& value )
-{
-	return Vec3( value[0].asFloat(), value[1].asFloat(), value[2].asFloat() );
-}
-
-// ** JsonSceneLoader::readRect
-Rect JsonSceneLoader::readRect( const Json::Value& value )
-{
-	return Rect( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
-}
-
-// ** JsonSceneLoader::readRgba
-Rgba JsonSceneLoader::readRgba( const Json::Value& value )
-{
-	return Rgba( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
-}
-
-// ** JsonSceneLoader::readRgb
-Rgb JsonSceneLoader::readRgb( const Json::Value& value )
-{
-	return Rgb( value[0].asFloat(), value[1].asFloat(), value[2].asFloat() );
-}
-
-// ** JsonSceneLoader::readQuat
-Quat JsonSceneLoader::readQuat( const Json::Value& value )
-{
-	return Quat( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
-}
-
 #endif	/*	DC_JSON_ENABLED	*/
 
 } // namespace Scene

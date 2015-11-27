@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
+	DECLARE_LOG(log)
+
 	typedef Array<f32> FloatArray;
 
 	struct Particle;
@@ -58,40 +60,52 @@ namespace Fx {
 
 	//! Modifier type.
 	enum ModifierType {
-		ModifierFriction,
-		ModifierForce,
-		ModifierForceField,
+		  ModifierFriction
+		, ModifierForce
+		, ModifierForceField
 
-		TotalModifierTypes
+		, TotalModifierTypes
 	};
         
 	//! Particle rendering modes.
 	enum RenderingMode {
-		RenderPoints,
-        RenderQuads,
-        RenderLines,
-        RenderThickLines,
-        RenderPaths,
-        RenderThickPaths,
+		  RenderPoints
+		, RenderQuads
+        , RenderLines
+        , RenderThickLines
+        , RenderPaths
+        , RenderThickPaths
 
-        TotalRenderingModes,
+        , TotalRenderingModes
 	};
 
 	//! Rendering blending modes.
 	enum BlendingMode {
-		BlendAlpha,
-		BlendAdditive,
-		BlendPremultiplied,
+		  BlendAlpha
+		, BlendAdditive
+		, BlendPremultiplied
 
-		TotalBlendingModes
+		, TotalBlendingModes
+	};
+
+	//! Parameter sampling mode.
+	enum SamplingMode {
+		  SampleConstant
+		, SampleCurve
+		, SampleRandomBetweenConstants
+		, SampleRandomBetweenCurves
+		
+		, TotalSamplingModes
 	};
 
     //! Available particle emission zones.
     enum ZoneType {
-        ZoneDisk,
-        ZoneLine,
+          ZoneDisk
+        , ZoneLine
+		, ZoneBox
+		, ZoneHemiSphere
 
-        TotalZoneTypes,
+        , TotalZoneTypes
 	};
 
 } // namespace Fx

@@ -44,23 +44,46 @@ Particles::Particles( void ) : m_count( 1 ), m_maxSnapshots( Particle::MaxSnapsh
 	setBlendingMode( BlendAlpha );
 	setRenderingMode( RenderQuads );
 
-    for( s32 i = 0; i < TotalColorParameters; i++ ) {
-        m_color[i].setType( Parameter::Color );
-    }
-
 	// ** Set default values for parameters
-	m_scalar[Life].setRange( 0.5f, 1.0f );
-	m_scalar[Emission].setConstant( 1.0f );
-	m_scalar[Direction].setRange( 0.0f, 360.0f );
-	m_scalar[Rotation].setRange( -180.0f, 180.0f );
-	m_scalar[Velocity].setRange( 25.0f, 50.0f );
-	m_scalar[Size].setConstant( 10.0f );
+	m_scalar[Life].setSamplingMode( SampleRandomBetweenConstants );
+	m_scalar[Life].curve( FloatParameter::Lower ).push( 0.0f, 0.5f );
+	m_scalar[Life].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
 
-	m_scalar[SizeOverLife].setConstant( 1.0f );
-	m_scalar[TransparencyOverLife].setConstant( 1.0f );
-	m_scalar[VelocityOverLife].setConstant( 1.0f );
-	m_scalar[AngularVelocityOverLife].setConstant( 1.0f );
-	m_scalar[TorqueOverLife].setConstant( 1.0f );
+	m_scalar[Emission].setSamplingMode( SampleConstant );
+	m_scalar[Emission].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[Direction].setSamplingMode( SampleRandomBetweenConstants );
+	m_scalar[Direction].curve( FloatParameter::Lower ).push( 0.0f,   0.0f );
+	m_scalar[Direction].curve( FloatParameter::Upper ).push( 0.0f, 360.0f );
+
+	m_scalar[Rotation].setSamplingMode( SampleRandomBetweenConstants );
+	m_scalar[Rotation].curve( FloatParameter::Lower ).push( 0.0f, -180.0f );
+	m_scalar[Rotation].curve( FloatParameter::Upper ).push( 0.0f,  180.0f );
+
+//	m_scalar[Velocity].setSamplingMode( SampleRandomBetweenConstants );
+//	m_scalar[Velocity].curve( FloatParameter::Lower ).push( 0.0f, 25.0f );
+//	m_scalar[Velocity].curve( FloatParameter::Upper ).push( 0.0f, 50.0f );
+
+	m_scalar[Size].setSamplingMode( SampleConstant );
+	m_scalar[Size].curve( FloatParameter::Lower ).push( 0.0f, 10.0f );
+
+	m_scalar[SizeOverLife].setSamplingMode( SampleConstant );
+	m_scalar[SizeOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[TransparencyOverLife].setSamplingMode( SampleConstant );
+	m_scalar[TransparencyOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[VelocityXOverLife].setSamplingMode( SampleConstant );
+	m_scalar[VelocityXOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[VelocityYOverLife].setSamplingMode( SampleConstant );
+	m_scalar[VelocityYOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[AngularVelocityOverLife].setSamplingMode( SampleConstant );
+	m_scalar[AngularVelocityOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
+
+	m_scalar[TorqueOverLife].setSamplingMode( SampleConstant );
+	m_scalar[TorqueOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
 };
 
 // ** Particles::createInstance
@@ -93,6 +116,41 @@ void Particles::setName( const String& value )
 	m_name = value;
 }
 
+// ** Particles::burstCount
+s32 Particles::burstCount( void ) const
+{
+	return ( s32 )m_bursts.size();
+}
+
+// ** Particles::burst
+const ParticleBurst& Particles::burst( s32 index ) const
+{
+	DC_BREAK_IF( index < 0 || index >= burstCount() );
+	return m_bursts[index];
+}
+
+// ** Particles::addBurst
+void Particles::addBurst( f32 time, s32 count )
+{
+	ParticleBurst burst;
+	burst.time			= time;
+	burst.count			= count;
+	burst.lastIteration	= 0;
+	m_bursts.push_back( burst );
+}
+
+// ** Particles::material
+const String& Particles::material( void ) const
+{
+	return m_material;
+}
+
+// ** Particles::setMaterial
+void Particles::setMaterial( const String& value )
+{
+	m_material = value;
+}
+
 // ** Particles::blendingMode
 BlendingMode Particles::blendingMode( void ) const
 {
@@ -120,7 +178,7 @@ void Particles::setRenderingMode( RenderingMode value )
 // ** Particles::emission
 f32 Particles::emission( f32 scalar ) const
 {
-    const Parameter *emission = ScalarParam( Emission );
+    const FloatParameter *emission = ScalarParam( Emission );
     return SampleParameter( emission, -1.0f );
 }
 
@@ -137,25 +195,25 @@ void Particles::setMaxSnapshots( s32 value )
 }
 
 // ** Particles::scalarParameter
-const Parameter& Particles::scalarParameter( ScalarParameter parameter ) const
+const FloatParameter& Particles::scalarParameter( ScalarParameter parameter ) const
 {
 	return m_scalar[parameter];
 }
 
 // ** Particles::scalarParameter
-Parameter& Particles::scalarParameter( ScalarParameter parameter )
+FloatParameter& Particles::scalarParameter( ScalarParameter parameter )
 {
 	return m_scalar[parameter];
 }
 
 // ** Particles::colorParameter
-const Parameter& Particles::colorParameter( ColorParameter parameter ) const
+const RgbParameter& Particles::colorParameter( ColorParameter parameter ) const
 {
 	return m_color[parameter];
 }
 
 // ** Particles::colorParameter
-Parameter& Particles::colorParameter( ColorParameter parameter )
+RgbParameter& Particles::colorParameter( ColorParameter parameter )
 {
 	return m_color[parameter];
 }
@@ -177,15 +235,19 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
         return 0;
     }
 
-    const Parameter* color           = ColorParam( Color );
-	const Parameter* velocity        = ScalarParam( Velocity );
-	const Parameter* angularVelocity = ScalarParam( AngularVelocity );
-	const Parameter* torque          = ScalarParam( Torque );
-	const Parameter* size            = ScalarParam( Size );
-	const Parameter* life            = ScalarParam( Life );
-	const Parameter* transparency    = ScalarParam( Transparency );
-	const Parameter* direction       = ScalarParam( Direction );
-	const Parameter* rotation        = ScalarParam( Rotation );
+    const RgbParameter*   color           = ColorParam( Color );
+	const FloatParameter* accelerationX   = ScalarParam( AccelerationX );
+	const FloatParameter* accelerationY   = ScalarParam( AccelerationY );
+	const FloatParameter* accelerationZ   = ScalarParam( AccelerationZ );
+	const FloatParameter* angularVelocity = ScalarParam( AngularVelocity );
+	const FloatParameter* speed           = ScalarParam( Speed );
+	const FloatParameter* torque          = ScalarParam( Torque );
+	const FloatParameter* size            = ScalarParam( Size );
+	const FloatParameter* life            = ScalarParam( Life );
+	const FloatParameter* transparency    = ScalarParam( Transparency );
+	const FloatParameter* direction       = ScalarParam( Direction );
+	const FloatParameter* rotation        = ScalarParam( Rotation );
+	const FloatParameter* gravity         = ScalarParam( Gravity );
 
 	Rgb white( 1.0f, 1.0f, 1.0f );
 	s32 snapshotCount = snapshotsToSave();
@@ -193,22 +255,22 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
 	for( s32 i = 0; i < count; i++ ) {
 		Particle& particle = particles[i];
 
-		particle.m_linear.velocity      = SampleParameter( velocity, 0.0f );
+		particle.m_force.acceleration	= Vec3( SampleParameter( accelerationX, 0.0f ), SampleParameter( accelerationY, 0.0f ) - SampleParameter( gravity, 0.0f ), SampleParameter( accelerationZ, 0.0f ) );
 		particle.m_angular.velocity     = SampleParameter( angularVelocity, 0.0f );
 		particle.m_angular.torque       = SampleParameter( torque, 0.0f );
 		particle.m_size.initial         = SampleParameter( size, 5.0f );
-		particle.m_life.fade            = 1.0f / SampleParameter( life, 1.0f );
+		particle.m_life.initial			= SampleParameter( life, 1.0f );
+		particle.m_life.current			= particle.m_life.initial;
         particle.m_color.current.Rgb    = Rgb( 1.0f, 1.0f, 1.0f );
         particle.m_color.current.alpha  = 1.0f;
-		particle.m_color.initial.alpha  = SampleKoeficient( transparency, 1 );
+		particle.m_color.initial.alpha  = SampleParameter( transparency, 1 );
         particle.m_color.initial.Rgb    = SampleParameter( color, white );
 		particle.m_direction            = SampleParameter( direction, 0.0f );
 		particle.m_rotation             = SampleParameter( rotation, 0.0f );
-		particle.m_force.velocity       = Vec2( 0, 0 );
-		particle.m_life.age             = 0.0f;
 
-		Vec3 pos = zone.valid() ? zone->generateRandomPoint( scalar, position ) : position;
-        particle.m_position = Vec2( pos.x, pos.y );
+		Zone::Point point		  = zone.valid() ? zone->generateRandomPoint( scalar, position ) : position;
+        particle.m_position		  = point.position;
+		particle.m_force.velocity = point.direction * SampleParameter( speed, 0.0f );
 
 		// ** Init snapshots
 		if( snapshotCount ) {
@@ -257,15 +319,21 @@ void Particles::initSnapshots( Particle& particle, s32 count ) const
 // ** Particles::update
 s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) const
 {
-	const Parameter* color           = ColorParam( ColorOverLife );
-	const Parameter* alpha           = ScalarParam( TransparencyOverLife );
-	const Parameter* velocity        = ScalarParam( VelocityOverLife );
-	const Parameter* torque          = ScalarParam( TorqueOverLife );
-	const Parameter* angularVelocity = ScalarParam( AngularVelocityOverLife );
-	const Parameter* size            = ScalarParam( SizeOverLife );
+	const RgbParameter*   color           = ColorParam( ColorOverLife );
+	const FloatParameter* alpha           = ScalarParam( TransparencyOverLife );
+	const FloatParameter* velocityX       = ScalarParam( VelocityXOverLife );
+	const FloatParameter* velocityY       = ScalarParam( VelocityYOverLife );
+	const FloatParameter* velocityZ       = ScalarParam( VelocityZOverLife );
+	const FloatParameter* accelerationX   = ScalarParam( AccelerationXOverLife );
+	const FloatParameter* accelerationY   = ScalarParam( AccelerationYOverLife );
+	const FloatParameter* accelerationZ   = ScalarParam( AccelerationZOverLife );
+	const FloatParameter* torque          = ScalarParam( TorqueOverLife );
+	const FloatParameter* angularVelocity = ScalarParam( AngularVelocityOverLife );
+	const FloatParameter* size            = ScalarParam( SizeOverLife );
 
-	s32 aliveCount = 0;
-	Rgb white( 1.0f, 1.0f, 1.0f );
+	s32  aliveCount = 0;
+	Rgb  white( 1.0f, 1.0f, 1.0f );
+	Vec3 zero( 0.0f, 0.0f, 0.0f );
 
 	// ** Reset in-out parameters
 	if( bounds ) *bounds = Bounds();
@@ -274,23 +342,29 @@ s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) 
 	for( s32 i = 0; i < count; i++ ) {
 		Particle& particle = particles[i];
         f32       scalar   = 0.0f;
-        
-        particle.m_life.age += particle.m_life.fade * dt;
-		scalar               = particle.m_life.age;
 
-		if( scalar > 1.0f ) {
+		particle.m_life.current -= dt;
+		scalar = 1.0f - particle.m_life.current / particle.m_life.initial;
+
+		if( particle.m_life.current < 0.0f ) {
             count        = count - 1;
             particles[i] = particles[count];
             i            = i - 1;
 			continue;
 		}
+		
+		Vec3 velocity = Vec3( SampleParameter( velocityX, 0.0f ), SampleParameter( velocityY, 0.0f ), SampleParameter( velocityZ, 0.0f ) );
+	//	Vec3 force    = Vec3( SampleParameter( accelerationX, 0.0f ), SampleParameter( accelerationY, 0.0f ), SampleParameter( accelerationZ, 0.0f ) );
 
 		particle.m_direction            += particle.m_angular.velocity    * SampleKoeficient( angularVelocity,  1.0f );
-		particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * Vec2::fromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
-		particle.m_rotation             += particle.m_angular.torque      * SampleKoeficient( torque,           1.0f ) * dt;
+		particle.m_force.velocity		+= particle.m_force.acceleration * dt;
+		particle.m_position			    += (velocity + particle.m_force.velocity) * dt;
+		particle.m_rotation				+= particle.m_angular.velocity * dt;
+	//	particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * Vec2::fromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
+	//	particle.m_rotation             += particle.m_angular.torque      * SampleKoeficient( torque,           1.0f ) * dt;
         particle.m_color.current.Rgb     = particle.m_color.initial.Rgb   * SampleParameter( color, white );
-		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleKoeficient( alpha,            1.0f );
-		particle.m_size.current          = particle.m_size.initial        * SampleKoeficient( size,             1.0f );
+		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleParameter(  alpha,            1.0f );
+		particle.m_size.current          = particle.m_size.initial        * SampleParameter( size,             1.0f );
 
 		if( m_blendingMode != BlendAlpha ) {
 			f32 alpha = particle.m_color.initial.alpha;
@@ -317,10 +391,9 @@ ParticlesInstance::ParticlesInstance( ParticlesWPtr particles ) : m_particles( p
 {
 	m_items.resize( m_particles->count() );
 
-    for( u32 i = 0, n = m_particles->count(); i < n; i++ ) {
-        m_items[i].m_life.age  = 2.0f;
-        m_items[i].m_life.fade = 0.0f;
-    }
+	for( s32 i = 0; i < particles->burstCount(); i++ ) {
+		m_bursts.push_back( particles->burst( i ) );
+	}
 }
 
 // ** ParticlesInstance::aliveCount
@@ -348,28 +421,28 @@ RenderingMode ParticlesInstance::renderingMode( void ) const
 }
 
 // ** ParticlesInstance::update
-s32 ParticlesInstance::update( const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission )
+s32 ParticlesInstance::update( s32 iteration, const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission )
 {
 	m_time          += dt;
     m_emissionTime  += dt;
 
-    // ** Update particles
+    // Update particles
 	m_aliveCount  = m_particles->update( &m_items[0], m_aliveCount, dt, &m_bounds );
 
-	// ** Save particle snapshots for paths
+	// Save particle snapshots for paths
 	if( (m_time - m_snapshotTime) >= 0.01f ) {
 		m_particles->savePaths( &m_items[0], m_aliveCount );
 		m_snapshotTime = m_time;
 	}
 
-    // ** Calculate dead count
+    // Calculate dead count
     s32 deadCount = ( s32 )m_items.size() - m_aliveCount;
 
 	if( deadCount == 0 || noEmission ) {
         return m_aliveCount;
     }
 
-    // ** Calculate emission amount
+    // Calculate emission amount
     f32 emission = m_particles->emission( scalar );
 
     if( emission > 0.0f ) {
@@ -381,6 +454,19 @@ s32 ParticlesInstance::update( const ZoneWPtr& zone, f32 dt, const Vec3& positio
 	else if( emission == 0.0f ) {
 		deadCount		= 0;
 		m_emissionTime	= 0.0f;
+	}
+
+	//  Emit particles by bursts
+	for( u32 i = 0, n = ( u32 )m_bursts.size(); i < n; i++ ) {
+		if( m_bursts[i].lastIteration == iteration ) {
+			continue;
+		}
+
+		if( m_bursts[i].time <= m_time ) {
+			printf( "Emitting burst of %d particles\n", m_bursts[i].count );
+			deadCount += m_bursts[i].count;
+			m_bursts[i].lastIteration = iteration;
+		}
 	}
 
     m_aliveCount += m_particles->init( zone, &m_items[0] + m_aliveCount, position, deadCount, scalar );

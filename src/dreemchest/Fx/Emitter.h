@@ -135,6 +135,7 @@ namespace Fx {
 		ParticlesInstancesArray	m_particles;	//!< Array of particles instances.
 		f32						m_time;			//!< Current emitter time.
 		s32						m_aliveCount;	//!< The total number of alive particles.
+		s32						m_iteration;	//!< Current iteration index.
 	};
 
 } // namespace Fx

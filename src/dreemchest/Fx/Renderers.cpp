@@ -89,9 +89,9 @@ void QuadRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, 
     Vec2 up, side;
 
     for( int i = 0; i < count; i++ ) {
-        const Particle& p         = particles[i];
-        const Vec2&		 position = p.m_position;
-        Rgba			 color    = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        const Particle& p        = particles[i];
+        Vec2		    position = Vec2( p.m_position.x, p.m_position.y );
+        Rgba			color    = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
 
         f32 c = cosf( radians( p.m_rotation ) );
         f32 s = sinf( radians( p.m_rotation ) );
@@ -119,9 +119,9 @@ void LineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, 
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
-        Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
-        const Vec2& end   = p.m_position;
-        const Vec2& start = end + Vec2::fromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
+        Rgba color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        Vec2 end   = Vec2( p.m_position.x, p.m_position.y );
+        Vec2 start = end + Vec2::fromAngle( p.m_direction ) /** Vec2( p.m_velocity.x, p.m_velocity.y ) + Vec2( p.m_force.velocity.x, p.m_force.velocity.y )*/;
 
         m_renderingInterface->renderLine( start.x, start.y, end.x, end.y, color, Rgba( color.r, color.g, color.b, 0 ) );
     }
@@ -143,9 +143,9 @@ void ThickLineRenderer::render( const ITextureWPtr& texture, BlendingMode blendM
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
-        Rgba        color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
-        const Vec2& end   = p.m_position;
-        const Vec2& start = end + Vec2::fromAngle( p.m_direction ) * p.m_linear.velocity + p.m_force.velocity;
+        Rgba color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        Vec2 end   = Vec2( p.m_position.x, p.m_position.y );
+        Vec2 start = end + Vec2::fromAngle( p.m_direction ) /** Vec2( p.m_velocity.x, p.m_velocity.y ) + Vec2( p.m_force.velocity.x, p.m_force.velocity.y )*/;
 
         m_renderingInterface->renderThickLine( texture, start.x, start.y, end.x, end.y, p.m_size.current, p.m_size.current, color, Rgba( color.r, color.g, color.b, 0 ) );
     }
@@ -164,10 +164,11 @@ PathRenderer::PathRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 // ** PathRenderer::render
 void PathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-    for( s32 i = 0; i < count; i++ ) {
-        m_renderingInterface->renderLineStrip( &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ), particles[i].m_color.current.alpha );
-    }
-    m_renderingInterface->flush();
+	DC_NOT_IMPLEMENTED
+//    for( s32 i = 0; i < count; i++ ) {
+//        m_renderingInterface->renderLineStrip( &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ), particles[i].m_color.current.alpha );
+//    }
+//    m_renderingInterface->flush();
 }
 
 // ---------------------------------- ThickPathRenderer ------------------------------------ //
@@ -180,10 +181,11 @@ ThickPathRenderer::ThickPathRenderer( const IRenderingInterfacePtr& renderingInt
 // ** ThickPathRenderer::render
 void ThickPathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
 {
-    for( s32 i = 0; i < count; i++ ) {
-        m_renderingInterface->renderThickLineStrip( texture, &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, &particles[i].m_snapshots->size,  Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ),particles[i].m_color.current.alpha );
-    }
-    m_renderingInterface->flush();
+	DC_NOT_IMPLEMENTED
+//    for( s32 i = 0; i < count; i++ ) {
+//        m_renderingInterface->renderThickLineStrip( texture, &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, &particles[i].m_snapshots->size,  Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ),particles[i].m_color.current.alpha );
+//    }
+//    m_renderingInterface->flush();
 }
 
 // ---------------------------------------------------- BuiltInRenderingInterface ---------------------------------------------------- //

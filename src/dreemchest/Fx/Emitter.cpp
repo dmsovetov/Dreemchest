@@ -147,7 +147,7 @@ EmitterInstancePtr Emitter::createInstance( void ) const
 // ------------------------------------- EmitterInstance ---------------------------------------- //
 
 // ** EmitterInstance::EmitterInstance
-EmitterInstance::EmitterInstance( EmitterWPtr emitter ) : m_emitter( emitter ), m_time( 0.0f ), m_aliveCount( 0 )
+EmitterInstance::EmitterInstance( EmitterWPtr emitter ) : m_emitter( emitter ), m_time( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 )
 {
 	for( int i = 0, n = m_emitter->particlesCount(); i < n; i++ ) {
 		m_particles.push_back( m_emitter->particles( i )->createInstance() );
@@ -200,7 +200,7 @@ s32 EmitterInstance::update( f32 dt, const Vec3& position )
 	m_aliveCount = 0;
 
 	for( u32 i = 0, n = ( u32 )m_particles.size(); i < n; i++ ) {
-		m_aliveCount += m_particles[i]->update( zone, dt, position + pos, m_time / duration, ended );
+		m_aliveCount += m_particles[i]->update( m_iteration, zone, dt, position + pos, m_time / duration, ended );
 	}
 
 	return m_aliveCount;
@@ -218,6 +218,7 @@ bool EmitterInstance::updateTime( f32 dt )
 	}
 
 	if( m_emitter->isLooped() ) {
+		m_iteration++;
 		m_time -= floor( m_time / duration ) * duration;
 	} else {
 		m_time = duration;

@@ -75,6 +75,7 @@ DC_BEGIN_DREEMCHEST
 
 		//! Returns the keyframe by index.
         const Keyframe&			keyframe( s32 index ) const;
+		Keyframe&				keyframe( s32 index );
 
     private:
 
@@ -102,6 +103,14 @@ DC_BEGIN_DREEMCHEST
     // ** Curve::keyframe
     template<typename T>
     const typename Curve<T>::Keyframe& Curve<T>::keyframe( s32 index ) const
+    {
+        DC_BREAK_IF( index < 0 || index >= keyframeCount() );
+        return m_keyframes[index];
+    }
+
+    // ** Curve::keyframe
+    template<typename T>
+    typename Curve<T>::Keyframe& Curve<T>::keyframe( s32 index )
     {
         DC_BREAK_IF( index < 0 || index >= keyframeCount() );
         return m_keyframes[index];

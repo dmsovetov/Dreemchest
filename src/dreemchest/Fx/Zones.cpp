@@ -38,6 +38,7 @@ ZonePtr Zone::create( ZoneType type )
     switch( type ) {
     case ZoneDisk: return ZonePtr( DC_NEW DiskZone );
     case ZoneLine: return ZonePtr( DC_NEW LineZone );
+	case ZoneBox:  return ZonePtr( DC_NEW BoxZone );
     }
 
 	DC_BREAK
@@ -46,6 +47,13 @@ ZonePtr Zone::create( ZoneType type )
 
 // ------------------------------------------------- DiskZone ------------------------------------------------- //
 
+// ** DiskZone::DiskZone
+DiskZone::DiskZone( f32 innerRadius, f32 outerRadius )
+{
+	m_innerRadius.setConstant( innerRadius );
+	m_outerRadius.setConstant( outerRadius );
+}
+
 // ** DiskZone::type
 ZoneType DiskZone::type( void ) const
 {
@@ -53,7 +61,7 @@ ZoneType DiskZone::type( void ) const
 }
 
 // ** DiskZone::generateRandomPoint
-Vec3 DiskZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
+Zone::Point DiskZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
 	f32 inner = SampleParameter( &m_innerRadius, 0.0f );
 	f32 outer = SampleParameter( &m_outerRadius, 0.0f );
@@ -61,10 +69,66 @@ Vec3 DiskZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
     Vec2  direction = Vec2::randDirection();
     f32   distance  = RANDOM_SCALAR( inner, outer );
 
-    return center + Vec3( direction.x, direction.y, 0.0f ) * distance;
+    return Point( center + Vec3( direction.x, direction.y, 0.0f ) * distance, Vec3( direction.x, direction.y, 0.0f ) );
+}
+
+// ------------------------------------------------- BoxZone ------------------------------------------------- //
+
+// ** BoxZone::BoxZone
+BoxZone::BoxZone( f32 width, f32 height, f32 depth )
+{
+	m_width.setConstant( width );
+	m_height.setConstant( height );
+	m_depth.setConstant( depth );
+}
+
+// ** BoxZone::type
+ZoneType BoxZone::type( void ) const
+{
+	return ZoneBox;
+}
+
+// ** BoxZone::generateRandomPoint
+Zone::Point BoxZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
+{
+	f32 hw = SampleParameter( &m_width,  0.0f ) * 0.5f;
+	f32 hh = SampleParameter( &m_height, 0.0f ) * 0.5f;
+	f32 hd = SampleParameter( &m_depth,  0.0f ) * 0.5f;
+
+	Vec3 min( -hw, -hh, -hd );
+	Vec3 max(  hw,  hh,  hd );
+
+	return Point( center + randomValue( min, max ), Vec3( 0.0f, 1.0f, 0.0f ) );
+}
+
+// ------------------------------------------------- HemiSphereZone ------------------------------------------------- //
+
+// ** HemiSphereZone::HemiSphereZone
+HemiSphereZone::HemiSphereZone( f32 radius )
+{
+	m_radius.setConstant( radius );
+}
+
+// ** HemiSphereZone::type
+ZoneType HemiSphereZone::type( void ) const
+{
+	return ZoneHemiSphere;
+}
+
+// ** HemiSphereZone::generateRandomPoint
+Zone::Point HemiSphereZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
+{
+	Vec3 direction = Vec3::randomHemisphereDirection( Vec3( 0.0f, 1.0f, 0.0f ) );
+	return Point( center, direction );
 }
 
 // ------------------------------------------------- LineZone ------------------------------------------------- //
+
+// ** LineZone::LineZone
+LineZone::LineZone( f32 length )
+{
+	m_length.setConstant( length );
+}
 
 // ** LineZone::type
 ZoneType LineZone::type( void ) const
@@ -73,7 +137,7 @@ ZoneType LineZone::type( void ) const
 }
 
 // ** LineZone::generateRandomPoint
-Vec3 LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
+Zone::Point LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
 	float length = SampleParameter( &m_length, 0.0f );
 	float angle  = SampleParameter( &m_angle, 0.0f );
@@ -81,7 +145,7 @@ Vec3 LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
     Vec2  direction = Vec2::fromAngle( angle );
     f32   distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );
 
-    return center + Vec3( direction.x, direction.y, 0.0f ) * distance;
+    return Point( center + Vec3( direction.x, direction.y, 0.0f ) * distance );
 }
 
 } // namespace Fx

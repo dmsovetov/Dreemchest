@@ -27,10 +27,16 @@
 #include "ParticleSystem.h"
 
 #include "Emitter.h"
+#include "Particles.h"
+#include "Zones.h"
+
+#include "../Io/DiskFileSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
+
+IMPLEMENT_LOGGER(log)
 
 // ------------------------------------------ ParticleSystem ------------------------------------------ //
 
@@ -73,6 +79,35 @@ EmitterWPtr ParticleSystem::addEmitter( void )
 ParticleSystemInstancePtr ParticleSystem::createInstance( void ) const
 {
 	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( const_cast<ParticleSystem*>( this ) ) );
+}
+
+// ** ParticleSystem::createFromJson
+ParticleSystemPtr ParticleSystem::createFromJson( const String& fileName, f32 scalingFactor )
+{
+#ifdef DC_JSON_ENABLED
+	// Read the JSON file
+	String json = io::DiskFileSystem::readTextFile( fileName );
+
+	if( json == "" ) {
+		log::warn( "ParticleSystem::createFromJson : %s, file not found or empty JSON\n", fileName.c_str() );
+		return ParticleSystemPtr();
+	}
+
+	// Create particle system instance
+	ParticleSystemPtr particleSystem( DC_NEW ParticleSystem );
+
+	// Load particle system from JSON
+	JsonParticleSystemLoader loader;
+
+	if( !loader.load( particleSystem, json, scalingFactor ) ) {
+		return ParticleSystemPtr();
+	}
+
+	return particleSystem;
+#else
+	log::error( "ParticleSystem::createFromJson : failed to load particle system, built with no JSON support.\n" );
+	return ParticleSystemPtr();
+#endif
 }
 
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
@@ -158,6 +193,232 @@ void ParticleSystemInstance::warmUp( f32 dt )
 	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
 		m_emitters[i]->warmUp( dt, m_position );
 	}
+}
+
+// -------------------------------------- JsonParticleSystemLoader -------------------------------------- //
+
+// ** JsonParticleSystemLoader::readRenderer
+bool JsonParticleSystemLoader::readRenderer( const Json::Value& object )
+{
+	// Find the emitter by id
+	String id = object["sceneObject"].asString();
+	EmitterWPtr emitter = m_emitters.find( id )->second;
+
+	// Set the particles texture.
+	emitter->particles( 0 )->setMaterial( object["materials"][0].asString() );
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readEmitter
+bool JsonParticleSystemLoader::readEmitter( const Json::Value& object )
+{
+	// Add the emitter to a particle system.
+	String id = object["id"].asString();
+	m_emitters[id] = m_particleSystem->addEmitter();
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readParticles
+bool JsonParticleSystemLoader::readParticles( const Json::Value& object )
+{
+	// Get the parent scene object
+	String id = object["sceneObject"].asString();
+
+	// Find emitter by id
+	EmitterWPtr emitter = m_emitters.find( id )->second;
+
+	// Add particles to the emitter
+	ParticlesWPtr particles = emitter->addParticles();
+
+	// Setup emitter
+	emitter->setLooped( object["isLooped"].asBool() );
+	emitter->setDuration( object["duration"].asFloat() );
+
+	// Setup zone
+	Json::Value shape = object["shape"];
+
+	switch( shape["type"].asInt() ) {
+	case 2: emitter->setZone( DC_NEW HemiSphereZone( shape["radius"].asFloat() * m_scalingFactor ) ); break;
+	case 5: emitter->setZone( DC_NEW BoxZone( shape["width"].asFloat() * m_scalingFactor, shape["height"].asFloat() * m_scalingFactor, shape["depth"].asFloat() * m_scalingFactor ) ); break;
+	default: DC_NOT_IMPLEMENTED;
+	}
+
+	// Setup particles
+	for( Json::ValueIterator i = object.begin(), end = object.end(); i != end; ++i ) {
+		if( !i->isObject() ) {
+			continue;
+		}
+
+		// Find the module loader
+		ModuleLoaders::const_iterator j = m_moduleLoaders.find( i.key().asString() );
+
+		if( j == m_moduleLoaders.end() ) {
+			printf( "unhandled module %s\n", i.key().asString().c_str() );
+			continue;
+		}
+
+		j->second( particles, *i );
+	}
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readColor
+bool JsonParticleSystemLoader::readColor( ParticlesWPtr particles, const Json::Value& object )
+{
+	readColorParameter( particles->colorParameter( Particles::ColorOverLife ), object["rgb"] );
+	readScalarParameter( particles->scalarParameter( Particles::TransparencyOverLife ), object["alpha"] );
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readEmission
+bool JsonParticleSystemLoader::readEmission( ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Particles::Emission ), object["rate"] );
+
+	Json::Value bursts = object.get( "bursts", Json::Value::null );
+
+	for( s32 i = 0, n = bursts.size() / 2; i < n; i++ ) {
+		particles->addBurst( bursts[i * 2 + 0].asFloat(), bursts[i * 2 + 1].asInt() );
+	}
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readAcceleration
+bool JsonParticleSystemLoader::readAcceleration( ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Particles::AccelerationXOverLife ), object["x"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::AccelerationYOverLife ), object["y"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::AccelerationZOverLife ), object["z"], m_scalingFactor );
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readVelocity
+bool JsonParticleSystemLoader::readVelocity( ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Particles::VelocityXOverLife ), object["x"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::VelocityYOverLife ), object["y"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::VelocityZOverLife ), object["z"], m_scalingFactor );
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readSize
+bool JsonParticleSystemLoader::readSize( ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Particles::SizeOverLife ), object["curve"] );
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readAngularVelocity
+bool JsonParticleSystemLoader::readAngularVelocity( ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Particles::AngularVelocity ), object["curve"] );
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readInitial
+bool JsonParticleSystemLoader::readInitial( ParticlesWPtr particles, const Json::Value& object )
+{
+	particles->setCount( object["maxParticles"].asInt() );
+
+	readColorParameter( particles->colorParameter( Particles::Color ), object["rgb"] );
+	readScalarParameter( particles->scalarParameter( Particles::Life ), object["life"] );
+	readScalarParameter( particles->scalarParameter( Particles::Transparency ), object["alpha"] );
+	readScalarParameter( particles->scalarParameter( Particles::Size ), object["size"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::Speed ), object["speed"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::Gravity ), object["gravity"], m_scalingFactor );
+
+	return true;
+}
+
+// ** JsonParticleSystemLoader::readColorParameter
+void JsonParticleSystemLoader::readColorParameter( RgbParameter& parameter, const Json::Value& object )
+{
+	DC_BREAK_IF( !object.isArray() );
+
+	parameter.setEnabled( true );
+
+	switch( object.size() ) {
+	case 2:		{
+					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+				}
+				break;
+
+	case 3:		{
+					parameter.setConstant( readRgb( object ) );
+				}
+				break;
+
+	default:	{
+					parameter.setCurve( readFloats( object ) );
+				}
+				break;
+	}
+}
+
+// ** JsonParticleSystemLoader::readScalarParameter
+void JsonParticleSystemLoader::readScalarParameter( FloatParameter& parameter, const Json::Value& object, f32 scalingFactor )
+{
+	s32 size = object.isArray() ? object.size() : 1;
+
+	switch( size ) {
+	case 1:		{
+					parameter.setConstant( object.asFloat() );
+				}
+				break;
+	case 2:		{
+					if( object[0].isArray() ) {
+						parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+					} else {
+						FloatArray range = readFloats( object );
+						parameter.setRandomBetweenConstants( range[0], range[1] );
+					}
+				}
+				break;
+
+	case 3:		{
+					DC_NOT_IMPLEMENTED
+				}
+				break;
+
+	default:	{
+					parameter.setCurve( readFloats( object ) );
+				}
+	}
+
+	parameter.setEnabled( true );
+	parameter.scale( scalingFactor );
+}
+
+// ** JsonParticleSystemLoader::load
+bool JsonParticleSystemLoader::load( ParticleSystemWPtr particleSystem, const String& json, f32 scalingFactor )
+{
+	// Save the particle system reference.
+	m_particleSystem = particleSystem;
+
+	// Sets the particle system scaling factor.
+	m_scalingFactor = scalingFactor;
+
+	m_moduleLoaders["color"]			= dcThisMethod( JsonParticleSystemLoader::readColor );
+	m_moduleLoaders["emission"]			= dcThisMethod( JsonParticleSystemLoader::readEmission );
+	m_moduleLoaders["velocity"]			= dcThisMethod( JsonParticleSystemLoader::readVelocity );
+	m_moduleLoaders["acceleration"]		= dcThisMethod( JsonParticleSystemLoader::readAcceleration );
+	m_moduleLoaders["angularVelocity"]	= dcThisMethod( JsonParticleSystemLoader::readAngularVelocity );
+	m_moduleLoaders["size"]				= dcThisMethod( JsonParticleSystemLoader::readSize );
+	m_moduleLoaders["initial"]			= dcThisMethod( JsonParticleSystemLoader::readInitial );
+
+	registerLoader( "Particles", dcThisMethod( JsonParticleSystemLoader::readParticles ) );
+	registerLoader( "SceneObject", dcThisMethod( JsonParticleSystemLoader::readEmitter ) );
+	registerLoader( "ParticleRenderer", dcThisMethod( JsonParticleSystemLoader::readRenderer ) );
+
+	JsonLoaderBase::load( json );
+
+	return true;
 }
 
 } // namespace Fx

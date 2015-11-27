@@ -37,26 +37,23 @@ namespace Fx {
 	struct Particle {
 		enum { MaxSnapshots = 64 };
 
-		Vec2    m_position;		//!< Particle position.
-		f32		m_rotation;		//!< Particle rotation.
-		f32		m_direction;	//!< Particle movement direction.
+		Vec3    m_position;			//!< Particle position.
+		f32		m_rotation;			//!< Particle rotation.
+		f32		m_direction;		//!< Particle movement direction.
 
 		struct {
-			Vec2    velocity;	//!< The force applied to a particle.
+			Vec3    velocity;		//!< The force applied to a particle.
+			Vec3	acceleration;	//!< Particle acceleration due to applied force.
 		} m_force;
 
 		struct {
-			f32		velocity;	//!< Particle linear velocity.
-		} m_linear;
-
-		struct {
-			f32		velocity;	//!< Particle angular velocity.
-			f32		torque;		//!< Particle torque.
+			f32		velocity;		//!< Particle angular velocity.
+			f32		torque;			//!< Particle torque.
 		} m_angular;
 
 		struct {
-			f32		age;		//!< Particle age.
-			f32		fade;		//!< Particle life fade.
+			f32		current;		//!< Particle life left in seconds.
+			f32		initial;		//!< Particle life fade.
 		} m_life;
 
 		struct {
@@ -77,11 +74,18 @@ namespace Fx {
 		} m_size;
 
 		struct {
-			Vec2    pos;
+			Vec3    pos;
 			Rgb     color;
 			f32		alpha;
 			f32		size;
 		} m_snapshots[MaxSnapshots];
+	};
+
+	//! Particle bursts structure.
+	struct ParticleBurst {
+		f32					time;			//!< The burst time.
+		s32					count;			//!< The number of particles to burst.
+		s32					lastIteration;	//!< Last iteration number the burst was emitted.
 	};
 
 	//! Particles contains an array of particles and a set of simulation parameters.
@@ -98,8 +102,17 @@ namespace Fx {
 			SizeOverLife,
 			Transparency,
 			TransparencyOverLife,
-			Velocity,
-			VelocityOverLife,
+			Speed,
+			Gravity,
+			AccelerationX,
+			AccelerationY,
+			AccelerationZ,
+			VelocityXOverLife,
+			VelocityYOverLife,
+			VelocityZOverLife,
+			AccelerationXOverLife,
+			AccelerationYOverLife,
+			AccelerationZOverLife,
 			AngularVelocity,
 			AngularVelocityOverLife,
 			Torque,
@@ -137,6 +150,21 @@ namespace Fx {
 		//! Sets the particle blending mode.
 		void					setBlendingMode( BlendingMode value );
 
+		//! Returns the particle material name.
+		const String&			material( void ) const;
+
+		//! Sets the particle material name.
+		void					setMaterial( const String& value );
+
+		//! Adds burst item.
+		void					addBurst( f32 time, s32 count );
+
+		//! Returns the total number of bursts.
+		s32						burstCount( void ) const;
+
+		//! Returns the burst by index.
+		const ParticleBurst&	burst( s32 index ) const;
+
 		//! Returns the particles name.
 		const String&			name( void ) const;
 
@@ -153,12 +181,12 @@ namespace Fx {
 		void					setMaxSnapshots( s32 value );
 
 		//! Returns the scalar parameter.
-		const Parameter&		scalarParameter( ScalarParameter parameter ) const;
-		Parameter&				scalarParameter( ScalarParameter parameter );
+		const FloatParameter&	scalarParameter( ScalarParameter parameter ) const;
+		FloatParameter&			scalarParameter( ScalarParameter parameter );
 
 		//! Returns the color parameter.
-		const Parameter&		colorParameter( ColorParameter parameter ) const;
-		Parameter&				colorParameter( ColorParameter parameter );
+		const RgbParameter&		colorParameter( ColorParameter parameter ) const;
+		RgbParameter&			colorParameter( ColorParameter parameter );
 
 		//! Updates the group of particles.
 		s32                     update( Particle* items, s32 itemCount, f32 dt, Bounds* bounds = NULL ) const;
@@ -188,9 +216,11 @@ namespace Fx {
 		s32						m_count;							//!< The maximum number of particles.
 		s32						m_maxSnapshots;						//!< The maximum number of particle snapshots to save.
 		String					m_name;								//!< Particles name.
+		String					m_material;							//!< Particles material name.
+		Array<ParticleBurst>	m_bursts;							//!< Particle bursts.
         
-        Parameter               m_scalar[TotalScalarParameters];	//!< Particle scalar parameters.
-        Parameter               m_color[TotalColorParameters];		//!< Particle color parameters.
+        FloatParameter          m_scalar[TotalScalarParameters];	//!< Particle scalar parameters.
+        RgbParameter            m_color[TotalColorParameters];		//!< Particle color parameters.
 	};
 
 	//! The particles instance.
@@ -211,7 +241,7 @@ namespace Fx {
 		RenderingMode			renderingMode( void ) const;
 
 		//! Updates the particles.
-		s32						update( const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );
+		s32						update( s32 iteration, const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );
 
 	private:
 
@@ -225,6 +255,7 @@ namespace Fx {
 		s32						m_aliveCount;	//!< The total number of alive particles.
 		Bounds					m_bounds;		//!< Particles bounding box.
 		f32						m_time;			//!< Current particles time.
+		Array<ParticleBurst>	m_bursts;		//!< Available particle bursts.
 		f32						m_emissionTime;
 		f32						m_snapshotTime;
 	};

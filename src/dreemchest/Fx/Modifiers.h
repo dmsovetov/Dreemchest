@@ -69,7 +69,7 @@ namespace Fx {
 
     private:
 
-		Parameter			m_value;
+		FloatParameter		m_value;
     };
 
     // ** class Force
@@ -83,7 +83,7 @@ namespace Fx {
 
     private:
 
-        Parameter			m_x, m_y, m_z;
+        FloatParameter		m_x, m_y, m_z;
     };
 
     // ** class ForceField
@@ -101,9 +101,9 @@ namespace Fx {
 
     private:
 
-		Parameter			m_x, m_y, m_z;
-		Parameter			m_force;
-		Parameter			m_radius;
+		FloatParameter		m_x, m_y, m_z;
+		FloatParameter		m_force;
+		FloatParameter		m_radius;
         bool                m_isQuadratic;
     };
 

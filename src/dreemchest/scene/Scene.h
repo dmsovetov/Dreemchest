@@ -48,10 +48,7 @@
 #include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
-
-#ifdef DC_JSON_ENABLED
-	#include <json/json.h>
-#endif
+#include <Io/JsonLoader.h>
 
 #include "PlaneClipper.h"
 
@@ -223,7 +220,7 @@ namespace Scene {
 #ifdef DC_JSON_ENABLED
 
 	//! Loads the scene from JSON file.
-	class JsonSceneLoader {
+	class JsonSceneLoader : public io::JsonLoaderBase {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.
@@ -251,21 +248,6 @@ namespace Scene {
 
 		//! Reads the Light component from JSON object.
 		Ecs::ComponentPtr			readLight( const Json::Value& value );
-
-		//! Reads the Vec3 from a JSON object.
-		static Vec3					readVec3( const Json::Value& value );
-
-		//! Reads the Rect from a JSON object.
-		static Rect					readRect( const Json::Value& value );
-
-		//! Reads the Rgba from JSON object.
-		static Rgba					readRgba( const Json::Value& value );
-
-		//! Reads the Rgba from JSON object.
-		static Rgb					readRgb( const Json::Value& value );
-
-		//! Reads the Quat from JSON object.
-		static Quat					readQuat( const Json::Value& value );
 
 	private:
 

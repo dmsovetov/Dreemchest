@@ -30,314 +30,77 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-// -------------------------------------------------------- Parameter -------------------------------------------------------- //
-
-// ** Parameter::Parameter
-Parameter::Parameter( void ) : m_mode( Constant ), m_type( Unknown ), m_scalar( NULL )
+// ** FloatParameter::setData
+void FloatParameter::setData( const FloatArray& value, CurveIndex index )
 {
-    m_isEnabled = false;
+	CurveType& target = this->curve( index );
 
-    setType( Scalar );
-}
-
-Parameter::~Parameter( void )
-{
-    switch( m_type ) {
-    case Scalar: delete m_scalar;	break;
-    case Color:  delete m_color;	break;
-    default:						break;
-    }
-}
-
-// ** Parameter::clear
-void Parameter::clear( void )
-{
-    switch( m_type ) {
-    case Scalar: m_scalar->curves[0].clear();
-                 m_scalar->curves[1].clear();
-                 break;
-    case Color:  m_color->curves[0].clear();
-                 m_color->curves[1].clear();
-                 break;
-    default:     DC_BREAK;
-    }
-}
-
-// ** Parameter::sample
-float Parameter::sample( float scalar, float defaultValue ) const
-{
-    DC_BREAK_IF( scalar < 0.0f || scalar > 1.0f );
-
-    // ** Parameter type doesn't match a request
-    if( m_type != Scalar ) {
-        return defaultValue;
-    }
-
-    // ** Set result to a default value
-    float result = defaultValue;
-
-	switch( m_mode ) {
-	case Constant:			{
-								m_scalar->curves[0].value( 0, result );
-							}
-							break;
-	case RandomConst:		{
-								float a, b;
-								m_scalar->curves[0].value( 0, a );
-								m_scalar->curves[1].value( 0, b );
-
-								result = RANDOM_SCALAR( a, b );
-							}
-							break;
-
-	case Interpolate:		{
-								m_scalar->curves[0].sample( scalar, result );
-							}
-							break;
-
-	case RandomInterpolate:	{
-								float a, b;
-								m_scalar->curves[0].sample( scalar, a );
-								m_scalar->curves[1].sample( scalar, b );
-
-								result = RANDOM_SCALAR( a, b );	
-							}
-							break;
+	target.clear();
+	for( s32 i = 0, n = ( s32 )value.size(); i < n / 2; i++ ) {
+		target.push( value[i * 2 + 0], value[i * 2 + 1] );
 	}
-
-    return result;
 }
 
-// ** Parameter::sample
-Rgb Parameter::sample( float scalar, const Rgb& defaultValue ) const
+// ** FloatParameter::setCurve
+void FloatParameter::setCurve( const FloatArray& value )
 {
-    DC_BREAK_IF( scalar < 0.0f || scalar > 1.0f );
+	setSamplingMode( SampleCurve );
+	setData( value, Lower );
+}
 
-    // ** Parameter type doesn't match a request
-    if( m_type != Color ) {
-        return defaultValue;
-    }
+// ** FloatParameter::setRandomBetweenCurves
+void FloatParameter::setRandomBetweenCurves( const FloatArray& min, const FloatArray& max )
+{
+	setSamplingMode( SampleRandomBetweenCurves );
+	setData( min, Lower );
+	setData( max, Upper );
+}
 
-    // ** Set result to a default value
-    Rgb result = defaultValue;
+// ** FloatParameter::setRandomBetweenConstants
+void FloatParameter::setRandomBetweenConstants( f32 min, f32 max )
+{
+	setSamplingMode( SampleRandomBetweenConstants );
+	curve( Lower ).clear();
+	curve( Lower ).push( 0.0f, min );
+	curve( Upper ).clear();
+	curve( Upper ).push( 0.0f, max );
+}
 
-	switch( m_mode ) {
-	case Constant:			{
-								m_color->curves[0].value( 0, result );
-							}
-							break;
-	case RandomConst:		{
-								Rgb a, b;
-								m_color->curves[0].value( 0, a );
-								m_color->curves[1].value( 0, b );
+// ** Vec3Parameter::setData
+void Vec3Parameter::setData( const FloatArray& value, CurveIndex index )
+{
+	CurveType& target = this->curve( index );
 
-								result = RANDOM_COLOR( a, b );
-							}
-							break;
-
-	case Interpolate:		{
-								m_color->curves[0].sample( scalar, result );
-							}
-							break;
-
-	case RandomInterpolate:	{
-								Rgb a, b;
-								m_color->curves[0].sample( scalar, a );
-								m_color->curves[1].sample( scalar, b );
-
-								result = RANDOM_COLOR( a, b );	
-							}
-							break;
+	target.clear();
+	for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
+		target.push( value[i * 4 + 0], Vec3( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
 	}
-
-    return result;
 }
 
-// ** Parameter::scalarCurve
-CurveScalar* Parameter::scalarCurve( int curve ) const
+// ** RgbParameter::setData
+void RgbParameter::setData( const FloatArray& value, CurveIndex index )
 {
-    return m_type == Scalar ? &m_scalar->curves[curve] : NULL;
-}
+	CurveType& target = this->curve( index );
 
-// ** Parameter::scalarCurve
-CurveRgb* Parameter::colorCurve( int curve ) const
-{
-    return m_type == Color ? &m_color->curves[curve] : NULL;
-}
-
-// ** Parameter::setMode
-void Parameter::setMode( eMode value )
-{
-	m_mode = value;
-}
-
-// ** Parameter::mode
-Parameter::eMode Parameter::mode( void ) const
-{
-	return m_mode;
-}
-
-// ** Parameter::type
-Parameter::eType Parameter::type( void ) const
-{
-    return m_type;
-}
-
-// ** Parameter::setType
-void Parameter::setType( eType value )
-{
-    // ** The new type matches the previous one
-    if( m_type == value ) {
-        return;
-    }
-
-    // ** Delete previous data
-    switch( m_type ) {
-    case Scalar: delete m_scalar; break;
-    case Color:  delete m_color;  break;
-    default:                      break;
-    }
-
-    // ** Set the new type and create data
-    m_type = value;
-
-    switch( m_type ) {
-    case Scalar: m_scalar = DC_NEW sScalarCurves;
-				 m_scalar->curves[Min].insert( 0, 0.0f, 0.0f );
-				 m_scalar->curves[Min].insert( 1, 1.0f, 0.0f );
-				 m_scalar->curves[Max].insert( 0, 0.0f, 0.0f );
-				 m_scalar->curves[Max].insert( 1, 1.0f, 0.0f );
-				 break;
-
-    case Color:  m_color = DC_NEW sColorCurves;
-				 m_color->curves[Min].insert( 0, 0.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
-				 m_color->curves[Min].insert( 1, 1.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
-				 m_color->curves[Max].insert( 0, 0.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
-				 m_color->curves[Max].insert( 1, 1.0f, Rgb( 1.0f, 1.0f, 1.0f ) );
-				 break;
-
-    default:	 break;
-    }
-}
-
-// ** Parameter::isEnabled
-bool Parameter::isEnabled( void ) const
-{
-    return m_isEnabled;
-}
-
-// ** Parameter::setEnabled
-void Parameter::setEnabled( bool value )
-{
-    m_isEnabled = value;
-}
-
-// ** Parameter::totalKeyframes
-int Parameter::totalKeyframes( int curve ) const
-{
-    switch( m_type ) {
-    case Scalar: return m_scalar->curves[curve].keyframeCount();
-    case Color:  return m_color->curves[curve].keyframeCount();
-    default:     break;
-    }
-
-    DC_BREAK;
-    return 0;
-}
-
-// ** Parameter::setConstant
-void Parameter::setConstant( float value )
-{
-	if( m_type != Scalar ) {
-		return;
+	target.clear();
+	for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
+		target.push( value[i * 4 + 0], Rgb( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
 	}
-
-	setMode( Constant );
-
-	m_scalar->curves[Min].clear();
-	m_scalar->curves[Min].insert( 0, 0.0f, value );
 }
 
-// ** Parameter::setRange
-void Parameter::setRange( float min, float max )
+// ** RgbParameter::setCurve
+void RgbParameter::setCurve( const FloatArray& value )
 {
-	if( m_type != Scalar ) {
-		return;
-	}
-
-	setMode( RandomConst );
-
-	m_scalar->curves[Min].clear();
-	m_scalar->curves[Min].insert( 0, 0.0f, min );
-
-	m_scalar->curves[Max].clear();
-	m_scalar->curves[Max].insert( 0, 0.0f, max );
+	setSamplingMode( SampleCurve );
+	setData( value, Lower );
 }
 
-// ** Parameter::data
-FloatArray Parameter::data( int curve ) const
+// ** RgbParameter::setRandomBetweenCurves
+void RgbParameter::setRandomBetweenCurves( const FloatArray& min, const FloatArray& max )
 {
-    FloatArray result;
-    
-    switch( m_type ) {
-    case Scalar:    {
-                        const CurveScalar& c = m_scalar->curves[curve];
-        
-                        for( int i = 0, n = c.keyframeCount(); i < n; i++ ) {
-                            const CurveScalar::Keyframe& kf = c.keyframe( i );
-                            result.push_back( kf.m_time );
-                            result.push_back( kf.m_value );
-                        }
-                    }
-                    break;
-
-    case Color:     {
-                        const CurveRgb& c = m_color->curves[curve];
-
-                        for( int i = 0, n = c.keyframeCount(); i < n; i++ ) {
-                            const CurveRgb::Keyframe& kf = c.keyframe( i );
-                            result.push_back( kf.m_time );
-                            result.push_back( kf.m_value.r );
-                            result.push_back( kf.m_value.g );
-                            result.push_back( kf.m_value.b );
-                        }
-                    }
-                    break;
-
-    default:        break;
-    }
-
-	return result;
-}
-
-// ** Parameter::setData
-void Parameter::setData( const FloatArray& data, int curve )
-{
-    switch( m_type ) {
-    case Scalar:    {
-                        CurveScalar& c = m_scalar->curves[curve];
-						const int    k = 2;
-
-						c.clear();
-                        for( int i = 0, n = ( int )data.size() / k; i < n; i++ ) {
-                            c.insert( c.keyframeCount(), data[i * k + 0], data[i * k + 1] );
-                        }
-                    }
-                    break;
-
-    case Color:     {
-                        CurveRgb& c = m_color->curves[curve];
-						const int k = 4;
-
-						c.clear();
-                        for( int i = 0, n = ( int )data.size() / k; i < n; i++ ) {
-                            c.insert( c.keyframeCount(), data[i * k + 0], Rgb( &data[i * k + 1] ) );
-                        }
-                    }
-                    break;
-
-    default:        break;
-    }
+	setSamplingMode( SampleRandomBetweenCurves );
+	setData( min, Lower );
+	setData( max, Upper );
 }
 
 } // namespace Fx
