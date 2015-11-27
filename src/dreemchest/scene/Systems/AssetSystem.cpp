@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** AssetSystem::AssetSystem
-AssetSystem::AssetSystem( Renderer::HalPtr hal ) : EntitySystem( "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite>() ), m_hal( hal )
+AssetSystem::AssetSystem( Renderer::HalPtr hal ) : EntitySystem( "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite, Particles>() ), m_hal( hal )
 {
 
 }
@@ -49,6 +49,11 @@ void AssetSystem::entityAdded( const Ecs::Entity& entity )
 	}
 	if( Sprite* sprite = entity.has<Sprite>() ) {
 		queueSprite( sprite );
+	}
+	if( Particles* particles = entity.has<Particles>() ) {
+		if( particles->material().valid() ) {
+			queueMaterialAsset( particles->material() );
+		}
 	}
 }
 
