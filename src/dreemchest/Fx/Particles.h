@@ -156,6 +156,9 @@ namespace Fx {
 		//! Sets the particle material name.
 		void					setMaterial( const String& value );
 
+		//! Returns parent emitter.
+		EmitterWPtr				emitter( void ) const;
+
 		//! Adds burst item.
 		void					addBurst( f32 time, s32 count );
 
@@ -201,7 +204,7 @@ namespace Fx {
 
 	private:
 
-								Particles( void );
+								Particles( EmitterWPtr emitter );
 
 		//! Initializes the particle snapshots.
 		void					initSnapshots( Particle& particle, s32 count ) const;
@@ -211,6 +214,7 @@ namespace Fx {
 
 	private:
 
+		EmitterWPtr				m_emitter;							//!< Parent emitter instance.
 		BlendingMode			m_blendingMode;						//!< Particle blending mode.
 		RenderingMode			m_renderingMode;					//!< Particle rendering mode.
 		s32						m_count;							//!< The maximum number of particles.

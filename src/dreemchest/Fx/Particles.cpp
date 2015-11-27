@@ -39,7 +39,7 @@ namespace Fx {
 // ----------------------------------------------- Particles ----------------------------------------------- //
 
 // ** Particles::Particles
-Particles::Particles( void ) : m_count( 1 ), m_maxSnapshots( Particle::MaxSnapshots )
+Particles::Particles( EmitterWPtr emitter ) : m_emitter( emitter ), m_count( 1 ), m_maxSnapshots( Particle::MaxSnapshots )
 {
 	setBlendingMode( BlendAlpha );
 	setRenderingMode( RenderQuads );
@@ -90,6 +90,12 @@ Particles::Particles( void ) : m_count( 1 ), m_maxSnapshots( Particle::MaxSnapsh
 ParticlesInstancePtr Particles::createInstance( IMaterialFactoryWPtr materialFactory ) const
 {
 	return ParticlesInstancePtr( DC_NEW ParticlesInstance( materialFactory, const_cast<Particles*>( this ) ) );
+}
+
+// ** Particles::emitter
+EmitterWPtr Particles::emitter( void ) const
+{
+	return m_emitter;
 }
 
 // ** Particles::count

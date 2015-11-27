@@ -133,7 +133,7 @@ void Emitter::removeParticles( const ParticlesWPtr& particles )
 // ** Emitter::addParticles
 ParticlesWPtr Emitter::addParticles( void )
 {
-	Particles *particle = DC_NEW Particles;
+	Particles *particle = DC_NEW Particles( this );
 	m_particles.push_back( particle );
 
 	return particle;
