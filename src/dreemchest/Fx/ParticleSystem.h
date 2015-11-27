@@ -56,8 +56,11 @@ namespace Fx {
 		//! Creates a new instance if a particle system.
 		ParticleSystemInstancePtr	createInstance( void ) const;
 
+		//! Creates the ParticleSystem instance and loads it from file.
+		static ParticleSystemPtr	createFromFile( const String& fileName, f32 scalingFactor = 1.0f );
+
 		//! Creates the ParticleSystem instance and loads it from JSON string.
-		static ParticleSystemPtr	createFromJson( const String& fileName, f32 scalingFactor = 1.0f );
+		static ParticleSystemPtr	createFromJson( const String& json, f32 scalingFactor = 1.0f );
 
 	private:
 

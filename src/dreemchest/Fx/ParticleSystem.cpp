@@ -81,18 +81,20 @@ ParticleSystemInstancePtr ParticleSystem::createInstance( void ) const
 	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( const_cast<ParticleSystem*>( this ) ) );
 }
 
-// ** ParticleSystem::createFromJson
-ParticleSystemPtr ParticleSystem::createFromJson( const String& fileName, f32 scalingFactor )
+// ** ParticleSystem::createFromFile
+ParticleSystemPtr ParticleSystem::createFromFile( const String& fileName, f32 scalingFactor )
 {
-#ifdef DC_JSON_ENABLED
 	// Read the JSON file
 	String json = io::DiskFileSystem::readTextFile( fileName );
 
-	if( json == "" ) {
-		log::warn( "ParticleSystem::createFromJson : %s, file not found or empty JSON\n", fileName.c_str() );
-		return ParticleSystemPtr();
-	}
+	// Load particle system
+	return createFromJson( json );
+}
 
+// ** ParticleSystem::createFromJson
+ParticleSystemPtr ParticleSystem::createFromJson( const String& json, f32 scalingFactor )
+{
+#ifdef DC_JSON_ENABLED
 	// Create particle system instance
 	ParticleSystemPtr particleSystem( DC_NEW ParticleSystem );
 
