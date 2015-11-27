@@ -91,6 +91,20 @@ namespace Scene {
 		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
 	};
 
+	//! Renders bounding boxes of particle systems.
+	class ParticlesBoundsPass : public RenderPass<Particles> {
+	public:
+
+								//! Constructs ParticlesBoundsPass instance.
+								ParticlesBoundsPass( Ecs::EcsWPtr ecs )
+									: RenderPass( ecs, "ParticlesBoundsPass" ) {}
+
+	protected:
+
+		//! Renders bounding box of a single light.
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform );
+	};
+
 	//! Renders bounding boxes of scene objects.
 	class BoundingVolumesRenderer : public RenderingSystem<RenderBoundingVolumes> {
 	public:
@@ -100,6 +114,7 @@ namespace Scene {
 								{
 									addPass<MeshBoundsPass>();
 									addPass<LightBoundsPass>();
+									addPass<ParticlesBoundsPass>();
 								}
 	};
 

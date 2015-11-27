@@ -77,6 +77,14 @@ void LightBoundsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache
 	renderer->wireSphere( transform.worldSpacePosition(), light.range(), light.color() );
 }
 
+// ** ParticlesBoundsPass::render
+void ParticlesBoundsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform )
+{
+	Renderer::Renderer2DPtr renderer = context->renderer();
+
+	renderer->wireBox( particles.instance()->bounds(), Rgba( 1.0f, 1.0f, 0.0f, 0.25f ) );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
