@@ -36,7 +36,7 @@ class action:
 
     # call
     def __call__(self, type):
-        print type, '<=', self.source
+        print(type, '<=', self.source)
         self.item['type'] = type
 
 # copy
@@ -47,7 +47,7 @@ class copy(action):
 
     # call
     def __call__(self):
-        print 'Copying', self.source, 'from', self.dest
+        print('Copying', self.source, 'from', self.dest)
         shutil.copyfile(self.source, self.dest)
 
 # image
@@ -77,7 +77,7 @@ class compress(action):
 
     # call
     def __call__(self):
-        print 'Compress', self.source
+        print('Compress', self.source)
 
 # png_quant
 class png_quant(action):
@@ -131,7 +131,7 @@ class convert_fbx(action):
         status   = importer.Initialize(self.source)
 
         if status == False:
-           print 'ERROR:', self.source
+           print('ERROR:', self.source)
            return
 
         scene = fbx.FbxScene.Create(manager, 'Scene')

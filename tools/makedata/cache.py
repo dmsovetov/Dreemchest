@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 #
 # The MIT License (MIT)
 #
@@ -36,7 +36,7 @@ class Cache:
         self._cursor = self._db.cursor()
 
         if first_use:
-            print 'Creating cache...'
+            print('Creating cache...')
             self._query('CREATE TABLE resources(key text, data text)')
 
     # Saves resource info to cache

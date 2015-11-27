@@ -376,7 +376,7 @@ def import_scenes(assets, source, output):
     #    if item.file_name.find('Debug') == -1:
     #        continue
 
-        print 'Importing scene', item.full_path
+        print('Importing scene', item.full_path)
         Scene.convert(assets, paths.source, dest)
 
 # Import used materials
@@ -388,7 +388,7 @@ def import_materials(assets, source, output):
         if assets.should_strip(item):
             continue
 
-        print 'Importing material', item.full_path
+        print('Importing material', item.full_path)
         material.convert(assets, paths.source, dest)
 
 # Imports all used assets
@@ -411,6 +411,6 @@ def import_prefabs(assets, source, output):
         if assets.should_strip(item):
             continue
 
-        print 'Importing prefab', item.full_path
+        print('Importing prefab', item.full_path)
         assets.use(item.uuid)
         Scene.convert(assets, paths.source, dest)

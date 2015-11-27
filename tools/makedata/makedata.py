@@ -145,7 +145,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.makedirs(args.output)
 
-    print '---', 'Building [', args.platform, '] data package to [', args.output, '] with [', args.compression, '] texture compression', '---'
+    print('---', 'Building [', args.platform, '] data package to [', args.output, '] with [', args.compression, '] texture compression', '---')
     start = time.time()
 
     try:
@@ -154,6 +154,6 @@ if __name__ == "__main__":
         elif args.action == 'import':
             import_project(args, args.source, args.output)
     except ExportError as e:
-        print e.message
+        print(e.message)
 
-    print '---', int(time.time() - start), 'seconds'
+    print('---', int(time.time() - start), 'seconds')

@@ -100,7 +100,7 @@ class Assets:
 
     # Saves the asset bundle JSON
     def save(self, folder):
-        print 'Saving assets..'
+        print('Saving assets..')
 
         file_name = os.path.join(folder, 'assets.json')
 
@@ -121,7 +121,7 @@ class Assets:
 
     # Parses the project assets
     def parse(self):
-        print 'Parsing assets from', self._path
+        print('Parsing assets from', self._path)
 
         for folder, dirs, files in os.walk(os.path.join(self._path, 'Assets')):
             for file in files:
@@ -132,7 +132,7 @@ class Assets:
                     meta = yaml.from_file(full_path)
                     self._files[meta['guid']] = Asset(name, os.path.relpath(os.path.join(folder, name), self._path), meta)
 
-        print len(self._files), 'assets parsed'
+        print(len(self._files), 'assets parsed')
 
     # Marks an asset as used
     def use(self, uuid):
@@ -149,7 +149,7 @@ class Assets:
             file = self._files[guid]
 
             if not guid in self._usedAssets.keys():
-                print file.fullPath, 'used'
+                print(file.fullPath, 'used')
                 self._usedAssets[guid] = file
 
             return file

@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 #
 # The MIT License (MIT)
 #
@@ -31,7 +31,7 @@ Item = collections.namedtuple('Item', ['path', 'info'])
 
 # Scans the directory recursively and returns the list of outdated files
 def find_outdated(path):
-    print 'Scanning', path
+    print('Scanning', path)
 
     result = {}
 
