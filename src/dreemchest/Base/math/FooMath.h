@@ -61,7 +61,7 @@ DC_BEGIN_DREEMCHEST
 	template<typename TValue>
     TValue lerp( TValue a, TValue b, f32 scalar )
 	{
-        return a * (1.0f - scalar) + b * scalar;
+        return static_cast<TValue>( a * (1.0f - scalar) + b * scalar );
     }
 
 	//! Returns true if three float values are equal.
