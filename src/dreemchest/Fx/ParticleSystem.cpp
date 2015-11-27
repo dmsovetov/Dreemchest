@@ -187,7 +187,13 @@ Bounds ParticleSystemInstance::bounds( void ) const
 		EmitterInstanceWPtr emitter = this->emitter( i );
 
 		for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
-			result += emitter->particles( j )->bounds();
+			ParticlesInstanceWPtr particles = emitter->particles( j );
+
+			if( !particles->aliveCount() ) {
+				continue;
+			}
+
+			result += particles->bounds();
 		}
 	}
 
