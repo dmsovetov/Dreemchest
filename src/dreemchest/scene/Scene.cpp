@@ -195,10 +195,20 @@ ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json
 // ** JsonSceneLoader::JsonSceneLoader
 JsonSceneLoader::JsonSceneLoader( void )
 {
-	m_loaders["Transform"]	= dcThisMethod( JsonSceneLoader::readTransform );
-	m_loaders["Renderer"]	= dcThisMethod( JsonSceneLoader::readRenderer );
-	m_loaders["Camera"]		= dcThisMethod( JsonSceneLoader::readCamera );
-	m_loaders["Light"]		= dcThisMethod( JsonSceneLoader::readLight );
+	m_loaders["Transform"]				= dcThisMethod( JsonSceneLoader::readTransform );
+	m_loaders["Renderer"]				= dcThisMethod( JsonSceneLoader::readRenderer );
+	m_loaders["Camera"]					= dcThisMethod( JsonSceneLoader::readCamera );
+	m_loaders["Light"]					= dcThisMethod( JsonSceneLoader::readLight );
+	m_loaders["Particles"]				= dcThisMethod( JsonSceneLoader::readParticles );
+
+	m_moduleLoaders["color"]			= dcThisMethod( JsonSceneLoader::readModuleColor );
+	m_moduleLoaders["emission"]			= dcThisMethod( JsonSceneLoader::readModuleEmission );
+	m_moduleLoaders["velocity"]			= dcThisMethod( JsonSceneLoader::readModuleVelocity );
+	m_moduleLoaders["acceleration"]		= dcThisMethod( JsonSceneLoader::readModuleAcceleration );
+	m_moduleLoaders["angularVelocity"]	= dcThisMethod( JsonSceneLoader::readModuleAngularVelocity );
+	m_moduleLoaders["size"]				= dcThisMethod( JsonSceneLoader::readModuleSize );
+	m_moduleLoaders["initial"]			= dcThisMethod( JsonSceneLoader::readModuleInitial );
+	m_moduleLoaders["shape"]			= dcThisMethod( JsonSceneLoader::readModuleShape );
 }
 
 // ** JsonSceneLoader::load
@@ -230,6 +240,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 
 		// Read the component
 		Ecs::ComponentPtr component = requestComponent( i.key().asString() );
+		DC_BREAK_IF( !component.valid() );
 
 		// Get the scene object to attach the component to.
 		Ecs::EntityPtr entity = requestSceneObject( i->get( "sceneObject", Json::Value() ).asString() );
@@ -358,6 +369,194 @@ Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 	result->setType( types[value["type"].asInt()] );
 
 	return result;
+}
+
+// ** JsonSceneLoader::readParticles
+Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
+{
+	using namespace Fx;
+
+	// Create the particle system
+	ParticleSystemPtr particleSystem( DC_NEW ParticleSystem );
+
+	// Add an emitter
+	EmitterWPtr emitter = particleSystem->addEmitter();
+
+	// Setup emitter
+	emitter->setLooped( value["isLooped"].asBool() );
+	emitter->setDuration( value["duration"].asFloat() );
+
+	// Add particles to the emitter
+	Fx::ParticlesWPtr particles = emitter->addParticles();
+
+	// Setup material
+	particles->setMaterial( value["material"].asString() );
+
+	// Setup particles
+	for( Json::ValueConstIterator i = value.begin(), end = value.end(); i != end; ++i ) {
+		if( !i->isObject() ) {
+			continue;
+		}
+
+		// Find the module loader
+		ModuleLoaders::const_iterator j = m_moduleLoaders.find( i.key().asString() );
+
+		if( j == m_moduleLoaders.end() ) {
+			printf( "unhandled module %s\n", i.key().asString().c_str() );
+			continue;
+		}
+
+		j->second( particles, *i );
+	}
+
+	return DC_NEW Particles( particleSystem );
+}
+
+// ** JsonSceneLoader::readModuleShape
+bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	Fx::EmitterWPtr emitter = particles->emitter();
+
+	switch( object["type"].asInt() ) {
+	case 2:		emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) );
+				break;
+
+	case 5:		emitter->setZone( DC_NEW Fx::BoxZone( object["width"].asFloat(), object["height"].asFloat(), object["depth"].asFloat() ) );
+				break;
+
+	default:	DC_NOT_IMPLEMENTED;
+	}
+
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleColor
+bool JsonSceneLoader::readModuleColor( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readColorParameter( particles->colorParameter( Fx::Particles::ColorOverLife ), object["rgb"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::TransparencyOverLife ), object["alpha"] );
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleEmission
+bool JsonSceneLoader::readModuleEmission( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Emission ), object["rate"] );
+
+	Json::Value bursts = object.get( "bursts", Json::Value::null );
+
+	for( s32 i = 0, n = bursts.size() / 2; i < n; i++ ) {
+		particles->addBurst( bursts[i * 2 + 0].asFloat(), bursts[i * 2 + 1].asInt() );
+	}
+
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleAcceleration
+bool JsonSceneLoader::readModuleAcceleration( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationXOverLife ), object["x"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationYOverLife ), object["y"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationZOverLife ), object["z"] );
+
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleVelocity
+bool JsonSceneLoader::readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Fx::Particles::VelocityXOverLife ), object["x"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::VelocityYOverLife ), object["y"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::VelocityZOverLife ), object["z"] );
+
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleSize
+bool JsonSceneLoader::readModuleSize( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Fx::Particles::SizeOverLife ), object["curve"] );
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleAngularVelocity
+bool JsonSceneLoader::readModuleAngularVelocity( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	readScalarParameter( particles->scalarParameter( Fx::Particles::AngularVelocity ), object["curve"] );
+	return true;
+}
+
+// ** JsonSceneLoader::readModuleInitial
+bool JsonSceneLoader::readModuleInitial( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+	particles->setCount( object["maxParticles"].asInt() );
+
+	readColorParameter( particles->colorParameter( Fx::Particles::Color ), object["rgb"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Life ), object["life"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Transparency ), object["alpha"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Size ), object["size"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Speed ), object["speed"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Gravity ), object["gravity"] );
+
+	return true;
+}
+
+// ** JsonSceneLoader::readColorParameter
+void JsonSceneLoader::readColorParameter( Fx::RgbParameter& parameter, const Json::Value& object )
+{
+	DC_BREAK_IF( !object.isArray() );
+
+	parameter.setEnabled( true );
+
+	switch( object.size() ) {
+	case 2:		{
+					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+				}
+				break;
+
+	case 3:		{
+					parameter.setConstant( readRgb( object ) );
+				}
+				break;
+
+	default:	{
+					parameter.setCurve( readFloats( object ) );
+				}
+				break;
+	}
+}
+
+// ** JsonSceneLoader::readScalarParameter
+void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const Json::Value& object )
+{
+	s32 size = object.isArray() ? object.size() : 1;
+
+	switch( size ) {
+	case 1:		{
+					parameter.setConstant( object.asFloat() );
+				}
+				break;
+	case 2:		{
+					if( object[0].isArray() ) {
+						parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+					} else {
+						Fx::FloatArray range = readFloats( object );
+						parameter.setRandomBetweenConstants( range[0], range[1] );
+					}
+				}
+				break;
+
+	case 3:		{
+					DC_NOT_IMPLEMENTED
+				}
+				break;
+
+	default:	{
+					parameter.setCurve( readFloats( object ) );
+				}
+	}
+
+	parameter.setEnabled( true );
 }
 
 #endif	/*	DC_JSON_ENABLED	*/

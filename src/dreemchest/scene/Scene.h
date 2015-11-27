@@ -50,6 +50,12 @@
 #include <Io/DiskFileSystem.h>
 #include <Io/JsonLoader.h>
 
+#include <Fx/ParticleSystem.h>
+#include <Fx/Particles.h>
+#include <Fx/Emitter.h>
+#include <Fx/Renderers.h>
+#include <Fx/Zones.h>
+
 #include "PlaneClipper.h"
 
 DC_BEGIN_DREEMCHEST
@@ -257,10 +263,49 @@ namespace Scene {
 		//! Reads the Light component from JSON object.
 		Ecs::ComponentPtr			readLight( const Json::Value& value );
 
+		//! Reads the Particles component from JSON object.
+		Ecs::ComponentPtr			readParticles( const Json::Value& value );
+
+		//! Reads the shape module from JSON object.
+		bool						readModuleShape( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the color module from JSON object.
+		bool						readModuleColor( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the emission module from JSON object.
+		bool						readModuleEmission( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the size module from JSON object.
+		bool						readModuleSize( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the rotation module from JSON object.
+		bool						readModuleAngularVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the acceleration module from JSON object.
+		bool						readModuleAcceleration( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the velocity module from JSON object.
+		bool						readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the initial module from JSON object.
+		bool						readModuleInitial( Fx::ParticlesWPtr particles, const Json::Value& object );
+
+		//! Reads the color parameter from JSON object.
+		void						readColorParameter( Fx::RgbParameter& parameter, const Json::Value& object );
+
+		//! Reads the scalar parameter from JSON object.
+		void						readScalarParameter( Fx::FloatParameter& parameter, const Json::Value& object );
+
 	private:
 
 		//! Component loader type.
 		typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
+
+		//! Particle system module loader
+		typedef cClosure<bool(Fx::ParticlesWPtr, const Json::Value&)> ModuleLoader;
+
+		//! Container type to store particle module loaders.
+		typedef Map<String, ModuleLoader>	ModuleLoaders;
 
 		//! Container to store all available component loaders.
 		typedef Map<String, ComponentLoader> ComponentLoaders;
@@ -271,12 +316,13 @@ namespace Scene {
 		//! Container type to store parsed components.
 		typedef Map<String, Ecs::ComponentPtr> Components;
 
-		AssetBundlePtr				m_assets;		//!< Available assets.
-		Json::Value					m_json;			//!< Parsed JSON.
-		ScenePtr					m_scene;		//!< The scene to be loaded.
-		SceneObjects				m_sceneObjects;	//!< Parsed scene objects.
-		Components					m_components;	//!< Parsed components.
-		ComponentLoaders			m_loaders;		//!< Available component loaders.
+		AssetBundlePtr				m_assets;			//!< Available assets.
+		Json::Value					m_json;				//!< Parsed JSON.
+		ScenePtr					m_scene;			//!< The scene to be loaded.
+		SceneObjects				m_sceneObjects;		//!< Parsed scene objects.
+		Components					m_components;		//!< Parsed components.
+		ComponentLoaders			m_loaders;			//!< Available component loaders.
+		ModuleLoaders				m_moduleLoaders;	//!< Available module loaders.
 	};
 
 #endif	/*	DC_JSON_ENABLED	*/
