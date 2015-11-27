@@ -237,6 +237,9 @@ namespace Fx {
 		//! Returns the particle blending mode.
 		BlendingMode			blendingMode( void ) const;
 
+		//! Returns the particles bounding box.
+		const Bounds&			bounds( void ) const;
+
 		//! Returns the particle rendering mode.
 		RenderingMode			renderingMode( void ) const;
 

@@ -178,6 +178,22 @@ bool ParticleSystemInstance::hasEnded( void ) const
 	return true;
 }
 
+// ** ParticleSystemInstance::bounds
+Bounds ParticleSystemInstance::bounds( void ) const
+{
+	Bounds result;
+
+	for( s32 i = 0, ne = emitterCount(); i < ne; i++ ) {
+		EmitterInstanceWPtr emitter = this->emitter( i );
+
+		for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
+			result += emitter->particles( j )->bounds();
+		}
+	}
+
+	return result;
+}
+
 // ** ParticleSystemInstance::update
 s32 ParticleSystemInstance::update( f32 dt )
 {

@@ -436,6 +436,12 @@ void ParticlesInstance::setMaterial( const IMaterialWPtr& value )
 	m_material = value;
 }
 
+// ** ParticlesInstance::bounds
+const Bounds& ParticlesInstance::bounds( void ) const
+{
+	return m_bounds;
+}
+
 // ** ParticlesInstance::update
 s32 ParticlesInstance::update( s32 iteration, const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission )
 {

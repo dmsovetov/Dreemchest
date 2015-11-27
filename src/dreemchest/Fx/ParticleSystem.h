@@ -93,6 +93,9 @@ namespace Fx {
 		//! Returns the emitter instance.
 		EmitterInstanceWPtr			emitter( s32 index ) const;
 
+		//! Returns the particle system bounding box.
+		Bounds						bounds( void ) const;
+
 		//! Returns true if the particle system has ended the playback.
 		bool						hasEnded( void ) const;
 
