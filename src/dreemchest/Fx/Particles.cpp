@@ -380,7 +380,8 @@ s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) 
 
 		// ** Update bounds
 		if( bounds ) {
-			*bounds += Vec3( particle.m_position.x, particle.m_position.y, 0.0f );
+			*bounds += Vec3( particle.m_position.x - particle.m_size.current * 0.5f, particle.m_position.y - particle.m_size.current * 0.5f, 0.0f );
+			*bounds += Vec3( particle.m_position.x + particle.m_size.current * 0.5f, particle.m_position.y + particle.m_size.current * 0.5f, 0.0f );
 		}
 
 		// ** Increase alive counter
