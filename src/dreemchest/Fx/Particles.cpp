@@ -497,6 +497,9 @@ s32 ParticlesInstance::update( s32 iteration, const ZoneWPtr& zone, f32 dt, cons
 		}
 	}
 
+	// Clamp dead particles count
+	deadCount = min2( deadCount, ( s32 )m_items.size() - 1 );
+
     m_aliveCount += m_particles->init( zone, &m_items[0] + m_aliveCount, position, deadCount, scalar );
 
 	return m_aliveCount;
