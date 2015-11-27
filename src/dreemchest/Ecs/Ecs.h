@@ -129,6 +129,9 @@ namespace Ecs {
 		//! Returns a list of entities that match a specified aspect.
 		EntitySet		findByAspect( const Aspect& aspect ) const;
 
+		//! Rebuild all system indices.
+		void			rebuildSystems( void );
+
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
 

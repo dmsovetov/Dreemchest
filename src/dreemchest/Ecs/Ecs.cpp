@@ -243,6 +243,18 @@ void Ecs::notifyEntityChanged( const EntityId& id )
 	}
 }
 
+// ** Ecs::rebuildSystems
+void Ecs::rebuildSystems( void )
+{
+	// Process all entities
+	for( Entities::iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
+		// Notify each index
+		for( Indices::iterator j = m_indices.begin(), jend = m_indices.end(); j != jend; j++ ) {
+			j->second->notifyEntityChanged( i->second );
+		}		
+	}
+}
+
 // ** Ecs::update
 void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 {
