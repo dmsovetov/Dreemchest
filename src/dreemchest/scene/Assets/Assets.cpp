@@ -134,15 +134,9 @@ AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( p
 }
 
 // ** AssetBundle::createFromJson
-AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& fileName )
+AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& json )
 {
-	// Read the JSON file
-	String json = io::DiskFileSystem::readTextFile( fileName );
-
-	if( json == "" ) {
-		log::warn( "AssetBundle::createFromJson : %s, file not found or empty JSON\n", fileName.c_str() );
-		return AssetBundlePtr();
-	}
+	DC_BREAK_IF( json.empty() );
 
 	// Create asset bundle instance
 	AssetBundlePtr assetBundle( DC_NEW AssetBundle( name, path ) );
@@ -153,6 +147,21 @@ AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& 
 	}
 
 	return assetBundle;
+}
+
+// ** AssetBundle::createFromFile
+AssetBundlePtr AssetBundle::createFromFile( const String& name, const io::Path& path, const String& fileName )
+{
+	// Read the JSON file
+	String json = io::DiskFileSystem::readTextFile( fileName );
+
+	if( json == "" ) {
+		log::warn( "AssetBundle::createFromFile : %s, file not found or empty JSON\n", fileName.c_str() );
+		return AssetBundlePtr();
+	}
+
+	// Create from JSON string.
+	return createFromJson( name, path, json );
 }
 
 // ** AssetBundle::name

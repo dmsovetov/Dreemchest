@@ -174,7 +174,10 @@ namespace Scene {
 		MeshPtr					addMesh( const String& uuid, const String& name );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
-		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& fileName );
+		static AssetBundlePtr	createFromFile( const String& name, const io::Path& path, const String& fileName );
+
+		//! Creates an AssetBundle instance and loads it from a JSON string.
+		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& json );
 
 	private:
 
