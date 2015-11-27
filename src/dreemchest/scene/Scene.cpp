@@ -157,6 +157,37 @@ ScenePtr Scene::create( void )
 	return ScenePtr( DC_NEW Scene );
 }
 
+// ** Scene::createFromFile
+ScenePtr Scene::createFromFile( const AssetBundlePtr& assets, const String& fileName )
+{
+	// Read the JSON file
+	String json = io::DiskFileSystem::readTextFile( fileName );
+
+	// Load the scene
+	return createFromJson( assets, json );
+}
+
+// ** Scene::createFromJson
+ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json )
+{
+#ifdef DC_JSON_ENABLED
+	// Create scene instance
+	ScenePtr scene( DC_NEW Scene );
+
+	// Load scene from JSON
+	JsonSceneLoader loader;
+
+	if( !loader.load( scene, assets, json ) ) {
+		return ScenePtr();
+	}
+
+	return scene;
+#else
+	log::error( "Scene::createFromJson : failed to load scene, built with no JSON support.\n" );
+	return ScenePtr();
+#endif
+}
+
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
 #ifdef DC_JSON_ENABLED

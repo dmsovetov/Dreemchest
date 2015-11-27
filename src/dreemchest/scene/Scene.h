@@ -178,8 +178,14 @@ namespace Scene {
 		template<typename TRenderingSystem>
 		void							addRenderingSystem( void );
 
-		//! Creates a new scene.
+		//! Creates an empty scene.
 		static ScenePtr					create( void );
+
+		//! Creates scene and loads it from JSON file.
+		static ScenePtr					createFromFile( const AssetBundlePtr& assets, const String& fileName );
+
+		//! Creates scene and loads it from JSON string.
+		static ScenePtr					createFromJson( const AssetBundlePtr& assets, const String& json );
 
 	private:
 
@@ -188,7 +194,6 @@ namespace Scene {
 
 	private:
 
-		
 		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
 		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
@@ -200,7 +205,9 @@ namespace Scene {
 	template<typename TSystem, typename ... Args>
 	WeakPtr<TSystem> Scene::addSystem( Args ... args )
 	{
-		return m_updateSystems->add<TSystem>( args... );
+		WeakPtr<TSystem> system = m_updateSystems->add<TSystem>( args... );
+		m_ecs->rebuildSystems();
+		return system;
 	}
 
 	// ** Scene::system
@@ -215,6 +222,7 @@ namespace Scene {
 	void Scene::addRenderingSystem( void )
 	{
 		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
+		m_ecs->rebuildSystems();
 	}
 
 #ifdef DC_JSON_ENABLED
