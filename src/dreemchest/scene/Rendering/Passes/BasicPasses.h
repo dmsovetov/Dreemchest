@@ -58,6 +58,24 @@ namespace Scene {
 		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
 	};
 
+	//! Renders particle systems.
+	class ParticleSystemsPass : public RenderPass<Particles> {
+	public:
+
+								//! Constructs ParticleSystemsPass instance.
+								ParticleSystemsPass( Ecs::EcsWPtr ecs )
+									: RenderPass( ecs, "ParticleSystemsPass" ) {}
+
+	protected:
+
+		//! Renders the particle system.
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform );
+
+	private:
+
+		Fx::ParticleRendererPtr	m_renderer;	//!< Particle renderer instance.
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

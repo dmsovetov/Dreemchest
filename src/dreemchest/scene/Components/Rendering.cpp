@@ -159,6 +159,32 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 	m_lightmap = value;
 }
 
+// ------------------------------------------- Particles ----------------------------------------- //
+
+// ** Particles::Particles
+Particles::Particles( const Fx::ParticleSystemPtr& particleSystem ) : m_particleSystem( particleSystem )
+{
+	m_instance = m_particleSystem->createInstance( Fx::IMaterialFactoryWPtr() );
+}
+
+// ** Particles::instance
+Fx::ParticleSystemInstanceWPtr Particles::instance( void ) const
+{
+	return m_instance;
+}
+
+// ** Particles::material
+MaterialWPtr Particles::material( void ) const
+{
+	return m_material;
+}
+
+// ** Particles::setMaterial
+void Particles::setMaterial( const MaterialPtr& value )
+{
+	m_material = value;
+}
+
 // ---------------------------------------------- Sprite ---------------------------------------------- //
 
 // ** Sprite::image

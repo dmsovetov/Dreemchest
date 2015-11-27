@@ -40,6 +40,29 @@ void AmbientPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProj
 	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.2f, 0.2f, 0.2f ) );
 }
 
+// ** ParticleSystemsPass::render
+void ParticleSystemsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform )
+{
+	using namespace Fx;
+
+	Renderer::Renderer2DPtr renderer = context->renderer();
+
+	if( !m_renderer.valid() ) {
+		m_renderer = ParticleRenderer::create( RenderQuads, DC_NEW BuiltInRenderingInterface( renderer ) );
+	}
+
+	ParticleSystemInstanceWPtr instance = particles.instance();
+
+	for( s32 i = 0, ne = instance->emitterCount(); i < ne; i++ ) {
+		EmitterInstanceWPtr emitter = instance->emitter( i );
+
+		for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
+			ParticlesInstanceWPtr particles = emitter->particles( j );
+			m_renderer->render( particles->material(), Fx::BlendAdditive, particles->items(), particles->aliveCount() );
+		}
+	}
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

@@ -72,7 +72,7 @@ void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity&
 	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
 }
 
-// ------------------------------------------------ FollowSystem ------------------------------------------------- //
+// -------------------------------------------------- FollowSystem ----------------------------------------------------- //
 
 // ** FollowSystem::process
 void FollowSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform )
@@ -121,6 +121,23 @@ void RotorSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Ro
 	transform.setRotationX( transform.rotationX() + rotor.x() * dt );
 	transform.setRotationY( transform.rotationY() + rotor.y() * dt );
 	transform.setRotationZ( transform.rotationZ() + rotor.z() * dt );
+}
+
+// ---------------------------------------------- ParticlesSystem -------------------------------------------- //
+
+// ** ParticlesSystem::process
+void ParticlesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform )
+{
+	using namespace Fx;
+
+	// Get the particles instance
+	ParticleSystemInstanceWPtr instance = particles.instance();
+
+	// Set the transform
+	instance->setPosition( transform.worldSpacePosition() );
+
+	// Update particles
+	instance->update( dt );
 }
 
 } // namespace Scene

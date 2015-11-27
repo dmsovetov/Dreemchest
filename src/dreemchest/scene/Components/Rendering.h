@@ -76,6 +76,10 @@ namespace Scene {
 	class RenderAmbient : public Ecs::Component<RenderAmbient> {
 	};
 
+	//! This component is attached to a camera to render particles.
+	class RenderParticles : public Ecs::Component<RenderParticles> {
+	};
+
 	//! Holds the light information.
 	class Light : public Ecs::Component<Light> {
 	public:
@@ -191,6 +195,30 @@ namespace Scene {
 
 		ImagePtr					m_image;	//!< Sprite image.
 		Rgba						m_color;	//!< Sprite color.
+	};
+
+	//! Holds the particle system instance to be rendered.
+	class Particles : public Ecs::Component<Particles> {
+	public:
+
+										//! Constructs Particles instance.
+										Particles( const Fx::ParticleSystemPtr& particleSystem = Fx::ParticleSystemPtr() );
+
+		//! Returns particle system instance.
+		Fx::ParticleSystemInstanceWPtr	instance( void ) const;
+
+		//! Returns the material particles material.
+		MaterialWPtr					material( void ) const;
+
+		//! Sets the particles material.
+		void							setMaterial( const MaterialPtr& value );
+
+	private:
+
+		
+		Fx::ParticleSystemPtr			m_particleSystem;	//!< Particle system.
+		Fx::ParticleSystemInstancePtr	m_instance;			//!< Particle system instance.
+		MaterialWPtr					m_material;			//!< Particle system material.
 	};
 
 	//! Camera component.

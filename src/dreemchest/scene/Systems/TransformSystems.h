@@ -105,6 +105,18 @@ namespace Scene {
 		};
 	};
 
+	//! Particles update system
+	class ParticlesSystem : public Ecs::GenericEntitySystem<Particles, Transform> {
+	public:
+
+							//! Constructs a ParticlesSystem instance.
+							ParticlesSystem( void )
+								: GenericEntitySystem( "Particles" ) {}
+
+		//! Updates the particle system.
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform );
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
