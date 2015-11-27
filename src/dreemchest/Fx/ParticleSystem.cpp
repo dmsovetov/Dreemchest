@@ -250,7 +250,7 @@ bool JsonParticleSystemLoader::readParticles( const Json::Value& object )
 	}
 
 	// Setup particles
-	for( Json::ValueIterator i = object.begin(), end = object.end(); i != end; ++i ) {
+	for( Json::ValueConstIterator i = object.begin(), end = object.end(); i != end; ++i ) {
 		if( !i->isObject() ) {
 			continue;
 		}
