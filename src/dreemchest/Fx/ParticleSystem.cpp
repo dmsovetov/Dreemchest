@@ -197,6 +197,8 @@ void ParticleSystemInstance::warmUp( f32 dt )
 
 // -------------------------------------- JsonParticleSystemLoader -------------------------------------- //
 
+#ifdef DC_JSON_ENABLED
+
 // ** JsonParticleSystemLoader::readRenderer
 bool JsonParticleSystemLoader::readRenderer( const Json::Value& object )
 {
@@ -420,6 +422,8 @@ bool JsonParticleSystemLoader::load( ParticleSystemWPtr particleSystem, const St
 
 	return true;
 }
+
+#endif	/*	DC_JSON_ENABLED	*/
 
 } // namespace Fx
 

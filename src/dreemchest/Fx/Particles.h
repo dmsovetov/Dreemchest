@@ -58,12 +58,12 @@ namespace Fx {
 
 		struct {
             struct {
-                Rgb     Rgb;
+                Rgb     rgb;
                 f32		alpha;
             } initial;
             
             struct {
-                Rgb     Rgb;
+                Rgb     rgb;
                 f32		alpha;
             } current;
 		} m_color;

@@ -91,7 +91,7 @@ void QuadRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, 
     for( int i = 0; i < count; i++ ) {
         const Particle& p        = particles[i];
         Vec2		    position = Vec2( p.m_position.x, p.m_position.y );
-        Rgba			color    = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        Rgba			color    = Rgba( p.m_color.current.rgb.r, p.m_color.current.rgb.g, p.m_color.current.rgb.b, p.m_color.current.alpha );
 
         f32 c = cosf( radians( p.m_rotation ) );
         f32 s = sinf( radians( p.m_rotation ) );
@@ -119,7 +119,7 @@ void LineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, 
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
-        Rgba color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        Rgba color = Rgba( p.m_color.current.rgb.r, p.m_color.current.rgb.g, p.m_color.current.rgb.b, p.m_color.current.alpha );
         Vec2 end   = Vec2( p.m_position.x, p.m_position.y );
         Vec2 start = end + Vec2::fromAngle( p.m_direction ) /** Vec2( p.m_velocity.x, p.m_velocity.y ) + Vec2( p.m_force.velocity.x, p.m_force.velocity.y )*/;
 
@@ -143,7 +143,7 @@ void ThickLineRenderer::render( const ITextureWPtr& texture, BlendingMode blendM
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
-        Rgba color = Rgba( p.m_color.current.Rgb.r, p.m_color.current.Rgb.g, p.m_color.current.Rgb.b, p.m_color.current.alpha );
+        Rgba color = Rgba( p.m_color.current.rgb.r, p.m_color.current.rgb.g, p.m_color.current.rgb.b, p.m_color.current.alpha );
         Vec2 end   = Vec2( p.m_position.x, p.m_position.y );
         Vec2 start = end + Vec2::fromAngle( p.m_direction ) /** Vec2( p.m_velocity.x, p.m_velocity.y ) + Vec2( p.m_force.velocity.x, p.m_force.velocity.y )*/;
 

@@ -261,10 +261,10 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
 		particle.m_size.initial         = SampleParameter( size, 5.0f );
 		particle.m_life.initial			= SampleParameter( life, 1.0f );
 		particle.m_life.current			= particle.m_life.initial;
-        particle.m_color.current.Rgb    = Rgb( 1.0f, 1.0f, 1.0f );
+        particle.m_color.current.rgb    = Rgb( 1.0f, 1.0f, 1.0f );
         particle.m_color.current.alpha  = 1.0f;
 		particle.m_color.initial.alpha  = SampleParameter( transparency, 1 );
-        particle.m_color.initial.Rgb    = SampleParameter( color, white );
+        particle.m_color.initial.rgb    = SampleParameter( color, white );
 		particle.m_direction            = SampleParameter( direction, 0.0f );
 		particle.m_rotation             = SampleParameter( rotation, 0.0f );
 
@@ -299,7 +299,7 @@ void Particles::savePaths( Particle* items, s32 itemCount ) const
 		}
 
 		particle.m_snapshots[0].pos   = particle.m_position;
-		particle.m_snapshots[0].color = particle.m_color.current.Rgb;
+		particle.m_snapshots[0].color = particle.m_color.current.rgb;
 		particle.m_snapshots[0].alpha = particle.m_color.current.alpha;
 		particle.m_snapshots[0].size  = particle.m_size.current;
 	}
@@ -310,7 +310,7 @@ void Particles::initSnapshots( Particle& particle, s32 count ) const
 {
 	for( s32 i = 0; i < count; i++ ) {
 		particle.m_snapshots[i].pos   = particle.m_position;
-		particle.m_snapshots[i].color = particle.m_color.current.Rgb;
+		particle.m_snapshots[i].color = particle.m_color.current.rgb;
 		particle.m_snapshots[i].alpha = particle.m_color.current.alpha;
 		particle.m_snapshots[i].size  = particle.m_size.current;
 	}
@@ -362,13 +362,13 @@ s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) 
 		particle.m_rotation				+= particle.m_angular.velocity * dt;
 	//	particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * Vec2::fromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
 	//	particle.m_rotation             += particle.m_angular.torque      * SampleKoeficient( torque,           1.0f ) * dt;
-        particle.m_color.current.Rgb     = particle.m_color.initial.Rgb   * SampleParameter( color, white );
+        particle.m_color.current.rgb     = particle.m_color.initial.rgb   * SampleParameter( color, white );
 		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleParameter(  alpha,            1.0f );
 		particle.m_size.current          = particle.m_size.initial        * SampleParameter( size,             1.0f );
 
 		if( m_blendingMode != BlendAlpha ) {
 			f32 alpha = particle.m_color.initial.alpha;
-			particle.m_color.current.Rgb = particle.m_color.initial.Rgb * particle.m_color.current.alpha;
+			particle.m_color.current.rgb = particle.m_color.initial.rgb * particle.m_color.current.alpha;
 			particle.m_color.initial.alpha = alpha;
 		}
 

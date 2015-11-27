@@ -129,6 +129,10 @@ DC_BEGIN_DREEMCHEST
 		return items[rand() % items.size()];
 	}
 
+	//! Forward declaration of lerp function
+	template<typename TValue>
+    TValue lerp( TValue a, TValue b, f32 scalar );
+
 	//! Returns the random value in specified range
 	template<typename TValue>
 	TValue randomValue( const TValue& min, const TValue& max )
