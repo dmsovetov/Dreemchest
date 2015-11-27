@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
-    <CommandLineArguments>-s "C:\Users\dm\Documents\New Unity Project 1" -o "D:\BFG9000\externals\src\dreemchest\src\examples" -w 1 -a import</CommandLineArguments>
+    <CommandLineArguments>-s "D:\BFG9000\sandbox\particles" -o "D:\BFG9000\externals\src\dreemchest\src\examples\assets" -w 1 -a import --use-uuids 1</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
@@ -32,6 +32,27 @@
     <Compile Include="module.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="unity\assets.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\asset_type.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\parameter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\patcher.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\scene.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\yaml.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="unity\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="signature.py">
       <SubType>Code</SubType>
     </Compile>
@@ -42,9 +63,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="makedata.py" />
-    <Compile Include="project.py">
+    <Compile Include="unity\project.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="unity\" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

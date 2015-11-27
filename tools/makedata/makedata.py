@@ -26,7 +26,7 @@
 #
 #################################################################################
 
-import argparse, time, files, os, actions, tasks, project
+import argparse, time, files, os, actions, tasks, unity
 
 # substitute_variables
 def substitute_variables( args, *variables ):
@@ -78,19 +78,19 @@ class ExportError(Exception):
 # Imports the project
 def import_project(args, source, output):
     # Parse project assets
-    assets = project.parse_assets(source)
+    assets = unity.project.parse_assets(args)
     
     # Import scenes
-    project.import_scenes(assets, source, output)
+    unity.project.import_scenes(assets, source, output)
+
+    # Import prefabs
+    unity.project.import_prefabs(assets, source, output)
 
     # Import materials
-    project.import_materials(assets, source, output)
-
-    # Import particles
-    project.import_particles(assets, source, output)
+    unity.project.import_materials(assets, source, output)
 
     # Import assets
-    project.import_assets(assets, source, output)
+    unity.project.import_assets(assets, source, output)
 
     # Save the assets
     assets.save(output)
@@ -130,6 +130,8 @@ if __name__ == "__main__":
     parser.add_argument( "-w",  "--workers",     type = int,  default  = 8,                                  help = "The number of concurrent workers." )
     parser.add_argument( "-q",  "--quality",     type = str,  default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
     parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
+    parser.add_argument( "--strip-unused",       type = bool, default  = False,                              help = "The unused assets won't be imported." )
+    parser.add_argument( "--use-uuids",          type = int,  default  = 0,                                  help = "The UUIDs will be used instead of file names." )
 
     args = parser.parse_args()
 
@@ -153,6 +155,5 @@ if __name__ == "__main__":
             import_project(args, args.source, args.output)
     except ExportError as e:
         print e.message
-
 
     print '---', int(time.time() - start), 'seconds'

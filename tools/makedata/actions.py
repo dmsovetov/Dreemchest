@@ -24,10 +24,9 @@
 #
 #################################################################################
 
-import shutil, os, struct, collections, module
+import shutil, os, struct, collections, module, fbx
 
-fbx = module.require('fbx')
-PIL = module.require('PIL')
+from PIL import Image, ImageOps
 
 # action
 class action:
@@ -99,6 +98,9 @@ class convert_to_raw(image):
     def __call__(self):
         img = image.__call__(self)
 
+        if img is None:
+            return
+
         width = img.size[0]
         height = img.size[1]
         channels = 3 if img.mode == 'RGB' else 4
@@ -107,7 +109,7 @@ class convert_to_raw(image):
         self.item['format'] = 'raw'
 
         with open(self.dest, 'wb') as fh:
-            pixels = img.tostring()
+            pixels = img.tobytes()
             data = struct.pack('HHB%us' % len(pixels), width, height, channels, pixels)
             fh.write(data)
             fh.close()
