@@ -68,7 +68,7 @@ PointRenderer::PointRenderer( const IRenderingInterfacePtr& renderingInterface )
 }
 
 // ** PointRenderer::render
-void PointRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void PointRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //	m_renderingInterface->renderPoints( &particles->m_position, &particles->m_color.current, &particles->m_size.current, count, sizeof( Particle ) );
@@ -84,7 +84,7 @@ QuadRenderer::QuadRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** QuadRenderer::render
-void QuadRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void QuadRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
     Vec2 up, side;
 
@@ -96,10 +96,10 @@ void QuadRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, 
         f32 c = cosf( radians( p.m_rotation ) );
         f32 s = sinf( radians( p.m_rotation ) );
 
-        up.x    = c; up.y   = -s;
-        side.x  = s; side.y =  c;
+        up.x   = c; up.y   = -s;
+        side.x = s; side.y =  c;
 
-        m_renderingInterface->renderOrientedQuadUV( texture, position.x, position.y, p.m_size.current * 0.5f, p.m_size.current * 0.5f, up, side, color );
+        m_renderingInterface->renderOrientedQuadUV( material, position.x, position.y, p.m_size.current * 0.5f, p.m_size.current * 0.5f, up, side, color );
     }
 
     m_renderingInterface->flush();
@@ -114,7 +114,7 @@ LineRenderer::LineRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** LineRenderer::render
-void LineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void LineRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
@@ -138,7 +138,7 @@ ThickLineRenderer::ThickLineRenderer( const IRenderingInterfacePtr& renderingInt
 }
 
 // ** ThickLineRenderer::render
-void ThickLineRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void ThickLineRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
@@ -147,7 +147,7 @@ void ThickLineRenderer::render( const ITextureWPtr& texture, BlendingMode blendM
         Vec2 end   = Vec2( p.m_position.x, p.m_position.y );
         Vec2 start = end + Vec2::fromAngle( p.m_direction ) /** Vec2( p.m_velocity.x, p.m_velocity.y ) + Vec2( p.m_force.velocity.x, p.m_force.velocity.y )*/;
 
-        m_renderingInterface->renderThickLine( texture, start.x, start.y, end.x, end.y, p.m_size.current, p.m_size.current, color, Rgba( color.r, color.g, color.b, 0 ) );
+        m_renderingInterface->renderThickLine( material, start.x, start.y, end.x, end.y, p.m_size.current, p.m_size.current, color, Rgba( color.r, color.g, color.b, 0 ) );
     }
     
     m_renderingInterface->flush();
@@ -162,7 +162,7 @@ PathRenderer::PathRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** PathRenderer::render
-void PathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void PathRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {
@@ -179,7 +179,7 @@ ThickPathRenderer::ThickPathRenderer( const IRenderingInterfacePtr& renderingInt
 }
 
 // ** ThickPathRenderer::render
-void ThickPathRenderer::render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count )
+void ThickPathRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {
@@ -209,7 +209,7 @@ void BuiltInRenderingInterface::renderPoints( const Vec2* position, const Rgba* 
 }
 
 // ** uiltInRenderingInterface::renderPoints
-void BuiltInRenderingInterface::renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
+void BuiltInRenderingInterface::renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
 {
 	m_renderer->orientedQuad( Renderer::Texture2DWPtr(), x, y, width, height, up, side, color );
 }
@@ -221,7 +221,7 @@ void BuiltInRenderingInterface::renderLine( f32 x1, f32 y1, f32 x2, f32 y2, cons
 }
 
 // ** uiltInRenderingInterface::renderPoints
-void BuiltInRenderingInterface::renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 )
+void BuiltInRenderingInterface::renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 )
 {
 	DC_NOT_IMPLEMENTED;
 }
@@ -233,7 +233,7 @@ void BuiltInRenderingInterface::renderLineStrip( const Vec2* position, const Rgb
 }
 
 // ** uiltInRenderingInterface::renderPoints
-void BuiltInRenderingInterface::renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha )
+void BuiltInRenderingInterface::renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha )
 {
 	DC_NOT_IMPLEMENTED;
 }

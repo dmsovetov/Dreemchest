@@ -54,7 +54,7 @@ namespace Fx {
 		EmitterWPtr					addEmitter( void );
 
 		//! Creates a new instance if a particle system.
-		ParticleSystemInstancePtr	createInstance( void ) const;
+		ParticleSystemInstancePtr	createInstance( IMaterialFactoryWPtr materialFactory ) const;
 
 		//! Creates the ParticleSystem instance and loads it from file.
 		static ParticleSystemPtr	createFromFile( const String& fileName, f32 scalingFactor = 1.0f );
@@ -105,7 +105,7 @@ namespace Fx {
 	private:
 
 									//! Constructs ParticleSystemInstance instance.
-									ParticleSystemInstance( ParticleSystemWPtr particleSystem );
+									ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem );
 
 	private:
 

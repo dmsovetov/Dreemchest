@@ -48,7 +48,8 @@ namespace Fx {
 	dcDeclarePtrs( Zone )
 	dcDeclarePtrs( ParticleRenderer )
 	dcDeclarePtrs( IRenderingInterface )
-	dcDeclarePtrs( ITexture )
+	dcDeclarePtrs( IMaterial )
+	dcDeclarePtrs( IMaterialFactory )
 
 	//! Container type to store particle system emitters.
 	typedef Array<EmitterPtr>			EmittersArray;

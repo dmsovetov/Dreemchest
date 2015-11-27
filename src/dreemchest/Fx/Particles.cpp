@@ -87,9 +87,9 @@ Particles::Particles( void ) : m_count( 1 ), m_maxSnapshots( Particle::MaxSnapsh
 };
 
 // ** Particles::createInstance
-ParticlesInstancePtr Particles::createInstance( void ) const
+ParticlesInstancePtr Particles::createInstance( IMaterialFactoryWPtr materialFactory ) const
 {
-	return ParticlesInstancePtr( DC_NEW ParticlesInstance( const_cast<Particles*>( this ) ) );
+	return ParticlesInstancePtr( DC_NEW ParticlesInstance( materialFactory, const_cast<Particles*>( this ) ) );
 }
 
 // ** Particles::count
@@ -387,12 +387,16 @@ s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) 
 // ------------------------------------------------- ParticlesInstance ------------------------------------------------- //
 
 // ** ParticlesInstance::ParticlesInstance
-ParticlesInstance::ParticlesInstance( ParticlesWPtr particles ) : m_particles( particles ), m_aliveCount( 0 ), m_time( 0.0f ), m_emissionTime( 0.0f ), m_snapshotTime( 0.0f )
+ParticlesInstance::ParticlesInstance( IMaterialFactoryWPtr materialFactory, ParticlesWPtr particles ) : m_particles( particles ), m_aliveCount( 0 ), m_time( 0.0f ), m_emissionTime( 0.0f ), m_snapshotTime( 0.0f )
 {
 	m_items.resize( m_particles->count() );
 
 	for( s32 i = 0; i < particles->burstCount(); i++ ) {
 		m_bursts.push_back( particles->burst( i ) );
+	}
+
+	if( materialFactory.valid() ) {
+		m_material = materialFactory->createMaterial( particles->material() );
 	}
 }
 
@@ -418,6 +422,18 @@ BlendingMode ParticlesInstance::blendingMode( void ) const
 RenderingMode ParticlesInstance::renderingMode( void ) const
 {
 	return m_particles->renderingMode();
+}
+
+// ** ParticlesInstance::material
+IMaterialWPtr ParticlesInstance::material( void ) const
+{
+	return m_material;
+}
+
+// ** ParticlesInstance::setMaterial
+void ParticlesInstance::setMaterial( const IMaterialWPtr& value )
+{
+	m_material = value;
 }
 
 // ** ParticlesInstance::update
@@ -463,7 +479,6 @@ s32 ParticlesInstance::update( s32 iteration, const ZoneWPtr& zone, f32 dt, cons
 		}
 
 		if( m_bursts[i].time <= m_time ) {
-			printf( "Emitting burst of %d particles\n", m_bursts[i].count );
 			deadCount += m_bursts[i].count;
 			m_bursts[i].lastIteration = iteration;
 		}

@@ -42,11 +42,21 @@ namespace Fx {
         Rgba        color;		//!< Vertex color.
     };
 
-	//! Hardware rendering texture.
-	class ITexture : public RefCounted {
+	//! Rendering material interface.
+	class IMaterial : public RefCounted {
 	public:
 
-		virtual						~ITexture( void ) {}
+		virtual						~IMaterial( void ) {}
+	};
+
+	//! Material factory interface.
+	class IMaterialFactory : public RefCounted {
+	public:
+
+		virtual						~IMaterialFactory( void ) {}
+
+		//! Creates a new material instance.
+		virtual IMaterialPtr		createMaterial( const String& identifier ) = 0;
 	};
 
 	//! Hardware rendering interface.
@@ -62,19 +72,19 @@ namespace Fx {
 		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
 
 		//! Renders the oriented 2d quad.
-		virtual void				renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) = 0;
+		virtual void				renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) = 0;
 
 		//! Renders the 2d line segment.
 		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 ) = 0;
 
 		//! Renders the 2d thick line.
-		virtual void				renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) = 0;
+		virtual void				renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) = 0;
 
 		//! Renders the 2d line strip.
 		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
 
 		//! Renders the 2d thick line strip.
-		virtual void				renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
+		virtual void				renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
 
 		//! Flushes the accumulated particles.
 		virtual void				flush( void ) = 0;
@@ -94,19 +104,19 @@ namespace Fx {
 		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride );
 
 		//! Renders the oriented 2d quad.
-		virtual void				renderOrientedQuadUV( const ITextureWPtr& texture, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
+		virtual void				renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
 
 		//! Renders the 2d line segment.
 		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 );
 
 		//! Renders the 2d thick line.
-		virtual void				renderThickLine( const ITextureWPtr& texture, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
+		virtual void				renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
 
 		//! Renders the 2d line strip.
 		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f );
 
 		//! Renders the 2d thick line strip.
-		virtual void				renderThickLineStrip( const ITextureWPtr& texture, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
+		virtual void				renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
 
 		//! Flushes the accumulated particles.
 		virtual void				flush( void );
@@ -126,7 +136,7 @@ namespace Fx {
         virtual RenderingMode		type( void ) const = 0;
 
 		//! Renders the particles with a specified blending mode & texture.
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, s32 count ) = 0;
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count ) = 0;
 
 		//! Creates the particle renderer instance by type.
         static ParticleRendererPtr	create( RenderingMode type, const IRenderingInterfacePtr& renderingInterface );
@@ -149,7 +159,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderPoints; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class QuadRenderer
@@ -160,7 +170,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderQuads; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class LineRenderer
@@ -171,7 +181,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderLines; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class ThickLineRenderer
@@ -182,7 +192,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickLines; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class PathRenderer
@@ -193,7 +203,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode	    type( void ) const { return RenderPaths; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
     // ** class ThickPathRenderer
@@ -204,7 +214,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickPaths; }
-        virtual void                render( const ITextureWPtr& texture, BlendingMode blendMode, const Particle *particles, int count );
+        virtual void                render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, int count );
     };
 
 } // namespace Fx

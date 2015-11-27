@@ -29,6 +29,7 @@
 #include "Emitter.h"
 #include "Particles.h"
 #include "Zones.h"
+#include "Renderers.h"
 
 #include "../Io/DiskFileSystem.h"
 
@@ -76,9 +77,9 @@ EmitterWPtr ParticleSystem::addEmitter( void )
 }
 
 // ** ParticleSystem::createInstance
-ParticleSystemInstancePtr ParticleSystem::createInstance( void ) const
+ParticleSystemInstancePtr ParticleSystem::createInstance( IMaterialFactoryWPtr materialFactory ) const
 {
-	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( const_cast<ParticleSystem*>( this ) ) );
+	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( materialFactory, const_cast<ParticleSystem*>( this ) ) );
 }
 
 // ** ParticleSystem::createFromFile
@@ -115,10 +116,10 @@ ParticleSystemPtr ParticleSystem::createFromJson( const String& json, f32 scalin
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
 
 // ** ParticleSystemInstance::ParticleSystemInstance
-ParticleSystemInstance::ParticleSystemInstance( ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 ), m_timeScale( 1.0f )
+ParticleSystemInstance::ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 ), m_timeScale( 1.0f )
 {
 	for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
-		m_emitters.push_back( m_particleSystem->emitter( i )->createInstance() );
+		m_emitters.push_back( m_particleSystem->emitter( i )->createInstance( materialFactory ) );
 	}
 }
 

@@ -197,7 +197,7 @@ namespace Fx {
 		//! Saves the particles snapshots.
 		void					savePaths( Particle* items, s32 itemCount ) const;
 
-		ParticlesInstancePtr	createInstance( void ) const;
+		ParticlesInstancePtr	createInstance( IMaterialFactoryWPtr materialFactory ) const;
 
 	private:
 
@@ -240,13 +240,19 @@ namespace Fx {
 		//! Returns the particle rendering mode.
 		RenderingMode			renderingMode( void ) const;
 
+		//! Returns the particles material.
+		IMaterialWPtr			material( void ) const;
+
+		//! Sets the particles material.
+		void					setMaterial( const IMaterialWPtr& value );
+
 		//! Updates the particles.
 		s32						update( s32 iteration, const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );
 
 	private:
 
 								//! Constructs the ParticlesInstance instance.
-								ParticlesInstance( ParticlesWPtr particles );
+								ParticlesInstance( IMaterialFactoryWPtr materialFactory, ParticlesWPtr particles );
 
 	private:
 
@@ -256,6 +262,7 @@ namespace Fx {
 		Bounds					m_bounds;		//!< Particles bounding box.
 		f32						m_time;			//!< Current particles time.
 		Array<ParticleBurst>	m_bursts;		//!< Available particle bursts.
+		IMaterialPtr			m_material;		//!< Particle material reference.
 		f32						m_emissionTime;
 		f32						m_snapshotTime;
 	};

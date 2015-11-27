@@ -81,7 +81,7 @@ namespace Fx {
 		ParticlesWPtr			addParticles( void );
 
 		//! Creates the particle emitter instance.
-		EmitterInstancePtr		createInstance( void ) const;
+		EmitterInstancePtr		createInstance( IMaterialFactoryWPtr materialFactory ) const;
 
 	private:
 
@@ -124,7 +124,7 @@ namespace Fx {
 	private:
 
 								//! Constructs EmitterInstance instance.
-								EmitterInstance( EmitterWPtr emitter );
+								EmitterInstance( IMaterialFactoryWPtr materialFactory, EmitterWPtr emitter );
 
 		//! Updates the current emitter time.
 		bool					updateTime( f32 dt );

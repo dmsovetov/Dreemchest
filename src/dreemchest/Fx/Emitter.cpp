@@ -28,6 +28,7 @@
 
 #include "Particles.h"
 #include "Zones.h"
+#include "Renderers.h"
 
 #define EmitterParam( name ) m_parameter[name] ? &m_parameter[name] : NULL;
 
@@ -139,18 +140,18 @@ ParticlesWPtr Emitter::addParticles( void )
 }
 
 // ** Emitter::createInstance
-EmitterInstancePtr Emitter::createInstance( void ) const
+EmitterInstancePtr Emitter::createInstance( IMaterialFactoryWPtr materialFactory ) const
 {
-	return DC_NEW EmitterInstance( const_cast<Emitter*>( this ) );
+	return DC_NEW EmitterInstance( materialFactory, const_cast<Emitter*>( this ) );
 }
 
 // ------------------------------------- EmitterInstance ---------------------------------------- //
 
 // ** EmitterInstance::EmitterInstance
-EmitterInstance::EmitterInstance( EmitterWPtr emitter ) : m_emitter( emitter ), m_time( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 )
+EmitterInstance::EmitterInstance( IMaterialFactoryWPtr materialFactory, EmitterWPtr emitter ) : m_emitter( emitter ), m_time( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 )
 {
 	for( int i = 0, n = m_emitter->particlesCount(); i < n; i++ ) {
-		m_particles.push_back( m_emitter->particles( i )->createInstance() );
+		m_particles.push_back( m_emitter->particles( i )->createInstance( materialFactory ) );
 	}
 }
 
