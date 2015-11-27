@@ -141,7 +141,7 @@ void Particles::addBurst( f32 time, s32 count )
 	ParticleBurst burst;
 	burst.time			= time;
 	burst.count			= count;
-	burst.lastIteration	= 0;
+	burst.lastIteration	= -1;
 	m_bursts.push_back( burst );
 }
 

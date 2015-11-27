@@ -231,6 +231,8 @@ bool EmitterInstance::updateTime( f32 dt )
 // ** EmitterInstance::warmUp
 void EmitterInstance::warmUp( f32 dt, const Vec3& position )
 {
+	DC_BREAK_IF( m_emitter->isLooped() );
+
     s32 iterations = static_cast<s32>( m_emitter->duration() / dt );
 
     for( s32 i = 0; i < iterations; i++ ) {
