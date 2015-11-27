@@ -88,7 +88,7 @@ ParticleSystemPtr ParticleSystem::createFromFile( const String& fileName, f32 sc
 	String json = io::DiskFileSystem::readTextFile( fileName );
 
 	// Load particle system
-	return createFromJson( json );
+	return createFromJson( json, scalingFactor );
 }
 
 // ** ParticleSystem::createFromJson
