@@ -131,7 +131,7 @@ if __name__ == "__main__":
     parser.add_argument( "-q",  "--quality",     type = str,  default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
     parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
     parser.add_argument( "--strip-unused",       type = bool, default  = False,                              help = "The unused assets won't be imported." )
-    parser.add_argument( "--use-uuids",          type = int,  default  = 0,                                  help = "The UUIDs will be used instead of file names." )
+    parser.add_argument( "--use-uuids",          type = int,  default  = 1,                                  help = "The UUIDs will be used instead of file names." )
 
     args = parser.parse_args()
 

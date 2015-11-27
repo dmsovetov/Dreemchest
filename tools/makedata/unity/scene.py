@@ -48,26 +48,31 @@ class Scene:
 
         # Only this object types will be exported
         types = {
-	        'GameObject', 'Transform', 'Renderer', 'Camera', 'Light', 'ParticleSystem', 'ParticleSystemRenderer'
+	        'GameObject', 'Transform', 'Renderer', 'Camera', 'Light', 'ParticleSystem'
         }
 
         # Resulting object
         result = {}
         meshes = {}
+        particles = {}
 
-        # Collect all mesh filters
+        # Collect all mesh filters & particle renderers
         for id, object in objects.items():
             # Get the object type
             type = [key for key in object.keys() if key != 'id'][0]
-            
-            if type != 'MeshFilter':
+
+            # Skip objects with no m_GameObject reference
+            if 'm_GameObject' not in object[type]:
                 continue
 
             # Get the parent scene object
-            sceneObject = object['MeshFilter']['m_GameObject']['fileID']
+            sceneObject = object[type]['m_GameObject']['fileID']
 
             # Save the mesh filter asset
-            meshes[sceneObject] = object['MeshFilter']['m_Mesh']['guid']
+            if type == 'MeshFilter':
+                meshes[sceneObject] = object[type]['m_Mesh']['guid']
+            elif type == 'ParticleSystemRenderer':
+                particles[sceneObject] = object[type]['m_Materials'][0]['guid']
 
         # Patch objects
         for id, object in objects.items():
@@ -87,6 +92,8 @@ class Scene:
             # Link the mesh asset with renderer
             if type == 'Renderer':
                 data['asset'] = self._assets.use(meshes[sceneObject])
+            elif type == 'ParticleSystem':
+                data['material'] = self._assets.use(particles[sceneObject])
 
             # Remove properties with None values
             for k, v in data.items():

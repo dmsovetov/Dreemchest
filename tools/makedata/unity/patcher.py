@@ -356,9 +356,12 @@ CameraPatcher = {
 def radians_to_degrees(value):
     return value * 180 / math.pi
 
+def rescale(value):
+    return value * 75
+
 def multiply(factor):
     def _(value):
-        return value * factor
+        return rescale(value * factor)
     return _
 
 # InitialModulePatcher
@@ -366,9 +369,9 @@ InitialModulePatcher = {
       'gravityModifier': Patcher.rename('gravity', multiply(20))
     , 'maxNumParticles': Patcher.rename('maxParticles')
     , 'startLifetime': Patcher.curve('life')
-    , 'startSpeed': Patcher.curve('speed')
+    , 'startSpeed': Patcher.curve('speed', rescale)
     , 'startColor': Patcher.gradient('rgb', 'alpha')
-    , 'startSize': Patcher.curve('size')
+    , 'startSize': Patcher.curve('size', rescale)
     , 'startRotation': Patcher.curve('rotation', radians_to_degrees)
 }
 
@@ -395,27 +398,27 @@ ColorModulePatcher = {
 
 # VelocityModulePatcher
 VelocityModulePatcher = {
-      'x': Patcher.curve('x')
-    , 'y': Patcher.curve('y')
-    , 'z': Patcher.curve('z')
+      'x': Patcher.curve('x', rescale)
+    , 'y': Patcher.curve('y', rescale)
+    , 'z': Patcher.curve('z', rescale)
 }
 
 # ForceModulePatcher
 ForceModulePatcher = {
-      'x': Patcher.curve('x')
-    , 'y': Patcher.curve('y')
-    , 'z': Patcher.curve('z')
+      'x': Patcher.curve('x', rescale)
+    , 'y': Patcher.curve('y', rescale)
+    , 'z': Patcher.curve('z', rescale)
 }
 
 # ShapeModulePatcher
 ShapeModulePatcher = {
       'type': Patcher.rename('type')
-    , 'radius': Patcher.rename('radius')
+    , 'radius': Patcher.rename('radius', rescale)
     , 'angle': Patcher.rename('angle')
-    , 'length': Patcher.rename('length')
-    , 'boxX': Patcher.rename('width')
-    , 'boxY': Patcher.rename('height')
-    , 'boxZ': Patcher.rename('depth')
+    , 'length': Patcher.rename('length', rescale)
+    , 'boxX': Patcher.rename('width', rescale)
+    , 'boxY': Patcher.rename('height', rescale)
+    , 'boxZ': Patcher.rename('depth', rescale)
     , 'arc': Patcher.rename('arc')
     , 'randomDirection': Patcher.rename('randomDirection')
 }
