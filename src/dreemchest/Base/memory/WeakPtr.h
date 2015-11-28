@@ -232,6 +232,9 @@ DC_BEGIN_DREEMCHEST
         }
     }
 
+	typedef StrongPtr<RefCounted> RefCountedPtr;
+	typedef WeakPtr<RefCounted>	  RefCountedWPtr;
+
 DC_END_DREEMCHEST
 
 #endif    /*    !__Base_WeakPtr_H__    */
