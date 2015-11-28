@@ -74,7 +74,8 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 			void main()
 			{
                 vec4 color   = texture2D( u_texture, v_tex0 );
-				gl_FragColor = color * v_color;
+				vec4 final	 = color * v_color;
+				gl_FragColor = vec4( final.rgb * final.a, final.a );
 			} ) );
 
 	m_shaders[ShaderDefault] = m_hal->createShader(
@@ -195,6 +196,7 @@ void Renderer2D::setBlendMode( BlendingMode blending )
 	switch( blending ) {
 	case BlendingDisabled:	m_hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
 							break;
+	case BlendingAlpha:		m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendInvSrcAlpha );
 							break;
 	case BlendingAdditive:	m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 							break;
