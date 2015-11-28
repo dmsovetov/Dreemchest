@@ -152,7 +152,7 @@ Renderer2DPtr Renderer2D::create( const HalPtr& hal, u32 maxVertexBufferSize )
 }
 
 // ** Renderer2D::begin
-void Renderer2D::begin( const Matrix4& value, Compare depthTest, BlendFactor src, BlendFactor dst )
+void Renderer2D::begin( const Matrix4& value, Compare depthTest, BlendingMode blending )
 {
 	// Set the view-projection matrix
 	m_viewProjection = value;
@@ -160,8 +160,8 @@ void Renderer2D::begin( const Matrix4& value, Compare depthTest, BlendFactor src
 	// Disable the depth test for 2d rendering
 	m_hal->setDepthTest( true, depthTest );
 
-	// Enable alpha blending
-	m_hal->setBlendFactors( src, dst );
+	// Setup blending
+	setBlendMode( blending );
 
 	// Disable culling
 	m_hal->setCulling( TriangleFaceNone );
@@ -176,8 +176,33 @@ void Renderer2D::end( void )
 	// Set the default depth test function
 	m_hal->setDepthTest( true, Less );
 
-	// Disable alpha blending
-	m_hal->setBlendFactors( BlendDisabled, BlendDisabled );
+	// Disable blending
+	setBlendMode( BlendingDisabled );
+}
+
+// ** Renderer2D::setBlendMode
+void Renderer2D::setBlendMode( BlendingMode blending )
+{
+	// This blending mode is already set
+	if( m_state.blending == blending ) {
+		return;
+	}
+
+	// Flush buffer before chaning the blending mode
+	flush();
+
+	// Set blend factors
+	switch( blending ) {
+	case BlendingDisabled:	m_hal->setBlendFactors( Renderer::BlendDisabled, Renderer::BlendDisabled );
+							break;
+							break;
+	case BlendingAdditive:	m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
+							break;
+	default:				DC_BREAK;
+	}
+
+	// Save active blending mode
+	m_state.blending = blending;
 }
 
 // ** Renderer2D::point
@@ -367,7 +392,7 @@ void Renderer2D::flush( void )
 void Renderer2D::emitVertices( PrimitiveType primitiveType, const Texture2DPtr& texture, const Vertex* vertices, u32 count )
 {
     u32   indexCount = indexCountForPrimitives( primitiveType, count );
-	State state		 = State( primitiveType, texture );
+	State state		 = State( primitiveType, texture, m_state.blending );
 
 	// Flush the mesh if state was changed
 	if( state != m_state ) {

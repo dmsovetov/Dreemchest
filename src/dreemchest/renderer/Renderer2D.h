@@ -37,6 +37,13 @@ namespace Renderer {
 	class Renderer2D : public RefCounted {
 	public:
 
+		//! Available blending modes.
+		enum BlendingMode {
+			  BlendingDisabled		//!< The blending is disabled.
+			, BlendingAlpha			//!< Use the alpha blending.
+			, BlendingAdditive		//!< Use the additive blending.
+		};
+
 		//! Render vertex.
 		struct Vertex {
 			f32					x, y, z;		//!< Vertex coordinate.
@@ -49,7 +56,7 @@ namespace Renderer {
 		};
 
 		//! Begins the 2D rendering.
-		void					begin( const Matrix4& value, Compare depthTest = Always, BlendFactor src = BlendSrcAlpha, BlendFactor dst = BlendInvSrcAlpha );
+		void					begin( const Matrix4& value, Compare depthTest = Always, BlendingMode blending = BlendingAlpha );
 
 		void					end( void );
 
@@ -76,6 +83,9 @@ namespace Renderer {
 
 		//! Renders a wire sphere in 3D space.
 		void					wireSphere( const Vec3& center, f32 radius, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+		//! Sets the blend mode.
+		void					setBlendMode( BlendingMode value );
 
 		//! Renders the accumulated mesh vertices and resets the vertex buffer.
 		void					flush( void );
@@ -107,19 +117,20 @@ namespace Renderer {
 		struct State {
 			PrimitiveType		primitiveType;		//!< Active primitive type.
 			Texture2DPtr		texture;			//!< Active texture.
+			BlendingMode		blending;			//!< Active blending mode.
 			u32					nVertices;			//!< Total number of emitted vertices.
 			u32					nIndices;			//!< Total number of emitted indices.
 
 								//! Constructs the State instance.
 								State( void )
-									: primitiveType( TotalPrimitiveTypes ), nVertices( 0 ), nIndices( 0 ) {}
+									: primitiveType( TotalPrimitiveTypes ), nVertices( 0 ), nIndices( 0 ), blending( BlendingDisabled ) {}
 
 								//! Constructs the State instance.
-								State( PrimitiveType primitiveType, const Texture2DPtr& texture )
-									: primitiveType( primitiveType ), texture( texture ), nVertices( 0 ), nIndices( 0 ) {}
+								State( PrimitiveType primitiveType, const Texture2DPtr& texture, BlendingMode blending )
+									: primitiveType( primitiveType ), texture( texture ), nVertices( 0 ), nIndices( 0 ), blending( blending ) {}
 
 			//! Compares two states.
-			bool				operator != ( const State& other ) const { return primitiveType != other.primitiveType || texture != other.texture; }
+			bool				operator != ( const State& other ) const { return primitiveType != other.primitiveType || texture != other.texture || blending != other.blending; }
 		};
 
 		HalPtr					m_hal;									//!< Rendering HAL.
