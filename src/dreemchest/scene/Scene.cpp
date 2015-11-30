@@ -214,6 +214,31 @@ JsonSceneLoader::JsonSceneLoader( void )
 // ** JsonSceneLoader::load
 bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const String& json )
 {
+	// Declare the particle material factory.
+	struct ParticleMaterialFactory : public Fx::IMaterialFactory {
+
+		//! Constructs ParticleMaterialFactory instance.
+		ParticleMaterialFactory( AssetBundleWPtr assets )
+			: m_assets( assets ) {}
+
+
+		//! Creates a new material instance.
+		virtual Fx::IMaterialPtr createMaterial( const String& identifier )
+		{
+			MaterialPtr material = m_assets->find<Material>( identifier );
+	
+			if( !material.valid() ) {
+				return Fx::IMaterialPtr();
+			}
+
+			return DC_NEW Fx::IMaterial( material );
+		}
+
+	private:
+
+		AssetBundleWPtr	m_assets;	//!< Asset bundle to use.		
+	};
+
 	Json::Reader reader;
 
 	// Parse the JSON string
@@ -226,6 +251,9 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 
 	// Save the scene reference.
 	m_scene = scene;
+
+	// Construct the particle material instance.
+	m_particleMaterialFactory = Fx::IMaterialFactoryPtr( DC_NEW ParticleMaterialFactory( assets ) );
 
 	// Read objects from JSON
 	for( Json::ValueIterator i = m_json.begin(), end = m_json.end(); i != end; ++i ) {
@@ -374,13 +402,11 @@ Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 // ** JsonSceneLoader::readParticles
 Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
 {
-	using namespace Fx;
-
 	// Create the particle system
-	ParticleSystemPtr particleSystem( DC_NEW ParticleSystem );
+	Fx::ParticleSystemPtr particleSystem( DC_NEW Fx::ParticleSystem );
 
 	// Add an emitter
-	EmitterWPtr emitter = particleSystem->addEmitter();
+	Fx::EmitterWPtr emitter = particleSystem->addEmitter();
 
 	// Setup emitter
 	emitter->setLooped( value["isLooped"].asBool() );
@@ -402,14 +428,21 @@ Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
 		ModuleLoaders::const_iterator j = m_moduleLoaders.find( i.key().asString() );
 
 		if( j == m_moduleLoaders.end() ) {
-			printf( "unhandled module %s\n", i.key().asString().c_str() );
+			log::warn( "JsonSceneLoader::readParticles : unhandled module %s\n", i.key().asString().c_str() );
 			continue;
 		}
 
 		j->second( particles, *i );
 	}
 
-	return DC_NEW Particles( particleSystem );
+	// Create particles instance
+	Fx::ParticleSystemInstancePtr instance = particleSystem->createInstance( m_particleMaterialFactory );
+
+	// Create Particles component instance
+	Particles* component = DC_NEW Particles( particleSystem, instance );
+	component->setMaterial( m_assets->find<Material>( particles->material() ) );
+
+	return component;
 }
 
 // ** JsonSceneLoader::readModuleShape
@@ -558,6 +591,41 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 
 	parameter.setEnabled( true );
 }
+
+/*//! Particle material factory.
+class ParticleMaterialFactory : public Fx::IMaterialFactory {
+public:
+
+								//! Constructs ParticleMaterialFactory instance.
+								ParticleMaterialFactory( AssetBundleWPtr assets );
+	virtual						~ParticleMaterialFactory( void ) {}
+
+	//! Creates a new material instance.
+	virtual Fx::IMaterialPtr	createMaterial( const String& identifier );
+
+private:
+
+	AssetBundleWPtr				m_assets;	//!< Asset bundle to use.
+};
+
+// ** JsonSceneLoader::ParticleMaterialFactory::ParticleMaterialFactory
+JsonSceneLoader::ParticleMaterialFactory::ParticleMaterialFactory( AssetBundleWPtr assets )
+	: m_assets( assets )
+{
+
+}
+
+// ** JsonSceneLoader::ParticleMaterialFactory::createMaterial
+Fx::IMaterialPtr JsonSceneLoader::ParticleMaterialFactory::createMaterial( const String& identifier )
+{
+	MaterialPtr material = m_assets->find<Material>( identifier );
+	
+	if( !material.valid() ) {
+		return Fx::IMaterialPtr();
+	}
+
+	return DC_NEW Fx::IMaterial( material );
+}*/
 
 #endif	/*	DC_JSON_ENABLED	*/
 

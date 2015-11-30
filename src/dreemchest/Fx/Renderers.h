@@ -46,7 +46,17 @@ namespace Fx {
 	class IMaterial : public RefCounted {
 	public:
 
+									//! Constructs IMaterial instance.
+									IMaterial( RefCountedPtr data = RefCountedPtr() )
+										: m_data( data ) {}
 		virtual						~IMaterial( void ) {}
+
+		//! Returns the raw material pointer.
+		virtual RefCountedPtr		get( void ) const { return m_data; }
+
+	private:
+
+		RefCountedPtr				m_data;	//!< Implementation reference.
 	};
 
 	//! Material factory interface.

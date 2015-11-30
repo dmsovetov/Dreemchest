@@ -316,13 +316,14 @@ namespace Scene {
 		//! Container type to store parsed components.
 		typedef Map<String, Ecs::ComponentPtr> Components;
 
-		AssetBundlePtr				m_assets;			//!< Available assets.
-		Json::Value					m_json;				//!< Parsed JSON.
-		ScenePtr					m_scene;			//!< The scene to be loaded.
-		SceneObjects				m_sceneObjects;		//!< Parsed scene objects.
-		Components					m_components;		//!< Parsed components.
-		ComponentLoaders			m_loaders;			//!< Available component loaders.
-		ModuleLoaders				m_moduleLoaders;	//!< Available module loaders.
+		AssetBundlePtr				m_assets;					//!< Available assets.
+		Json::Value					m_json;						//!< Parsed JSON.
+		ScenePtr					m_scene;					//!< The scene to be loaded.
+		SceneObjects				m_sceneObjects;				//!< Parsed scene objects.
+		Components					m_components;				//!< Parsed components.
+		ComponentLoaders			m_loaders;					//!< Available component loaders.
+		ModuleLoaders				m_moduleLoaders;			//!< Available module loaders.
+		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
 	};
 
 #endif	/*	DC_JSON_ENABLED	*/

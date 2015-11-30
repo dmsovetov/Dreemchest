@@ -202,7 +202,7 @@ namespace Scene {
 	public:
 
 										//! Constructs Particles instance.
-										Particles( const Fx::ParticleSystemPtr& particleSystem = Fx::ParticleSystemPtr() );
+										Particles( const Fx::ParticleSystemPtr& particleSystem = Fx::ParticleSystemPtr(), const Fx::ParticlesInstancePtr& instance = Fx::ParticlesInstancePtr() );
 
 		//! Returns particle system instance.
 		Fx::ParticleSystemInstanceWPtr	instance( void ) const;
