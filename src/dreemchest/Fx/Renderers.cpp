@@ -93,8 +93,8 @@ void QuadRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode
         Vec2		    position = Vec2( p.m_position.x, p.m_position.y );
         Rgba			color    = Rgba( p.m_color.current.rgb.r, p.m_color.current.rgb.g, p.m_color.current.rgb.b, p.m_color.current.alpha );
 
-        f32 c = cosf( radians( p.m_rotation ) );
-        f32 s = sinf( radians( p.m_rotation ) );
+        f32 c = sinf( radians( p.m_rotation ) );
+        f32 s = cosf( radians( p.m_rotation ) );
 
         up.x   = c; up.y   = -s;
         side.x = s; side.y =  c;

@@ -37,6 +37,7 @@ namespace Fx {
 	struct Particle {
 		enum { MaxSnapshots = 64 };
 
+		u8		m_index;			//!< Particle randomization index.
 		Vec3    m_position;			//!< Particle position.
 		f32		m_rotation;			//!< Particle rotation.
 		f32		m_direction;		//!< Particle movement direction.

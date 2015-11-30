@@ -29,8 +29,8 @@
 
 #include "Fx.h"
 
-#define SampleParameter( parameter, default )  ((parameter) ? (parameter)->sample( scalar, default ) : (default))
-#define SampleKoeficient( parameter, default ) SampleParameter( parameter, default * 100.0f ) * 0.01f
+#define SampleParameter( idx, parameter, default )  ((parameter) ? (parameter)->sample( idx, scalar, default ) : (default))
+#define SampleKoeficient( idx, parameter, default ) SampleParameter( idx, parameter, default * 100.0f ) * 0.01f
 
 DC_BEGIN_DREEMCHEST
 
@@ -47,6 +47,9 @@ namespace Fx {
 			, Upper				//!< Parameter upper bounds.
 			, TotalCurveIndices	//!< The total number of curve indices.
 		};
+
+		//! Compile time constant to define the randomization of particle lifetime parameters.
+		enum { LifetimeRandomizationCount = 100 };
 
 		//! Alias the curve type.
 		typedef Curve<TValue>	CurveType;
@@ -80,13 +83,17 @@ namespace Fx {
 		CurveType&				curve( CurveIndex index );
 
 		//! Samples the parameter at specified time.
-		TValue					sample( f32 scalar, const TValue& defaultValue = TValue() ) const;
+		TValue					sample( s32 particleIndex, f32 scalar, const TValue& defaultValue = TValue() ) const;
+
+		//! Generates the particle curves.
+		void					constructLifetimeCurves( void );
 
 	private:
 
 		bool					m_isEnabled;					//!< The flag indicating that parameter is enabled.
 		SamplingMode			m_mode;							//!< The parameter sampling mode.
 		CurveType				m_curves[TotalCurveIndices];	//!< Minimum and maximum curves.
+		Array<CurveType>		m_particleCurves;				//!< Used for randomization of lifetime parameters.
 	};
 
 	// ** Parameter::Parameter
@@ -165,9 +172,34 @@ namespace Fx {
 		m_mode = value;
 	}
 
+	// ** Parameter::constructLifetimeCurves
+	template<typename TValue>
+	void Parameter<TValue>::constructLifetimeCurves(  void )
+	{
+		s32				 size  = m_curves[Lower].keyframeCount() > m_curves[Upper].keyframeCount() ? m_curves[Lower].keyframeCount() : m_curves[Upper].keyframeCount();
+		const CurveType& curve = m_curves[Lower].keyframeCount() > m_curves[Upper].keyframeCount() ? m_curves[Lower] : m_curves[Upper];
+
+		for( s32 i = 0; i < LifetimeRandomizationCount; i++ ) {
+			CurveType random;
+
+			for( s32 j = 0; j < size; j++ ) {
+				const typename CurveType::Keyframe& keyframe = curve.keyframe( j );
+				TValue a, b;
+				m_curves[Lower].sample( keyframe.m_time, a );
+				m_curves[Upper].sample( keyframe.m_time, b );
+
+				TValue result = randomValue( a, b );	
+
+				random.push( keyframe.m_time, result );
+			}
+
+			m_particleCurves.push_back( random );
+		}
+	}
+
 	// ** Parameter::sample
 	template<typename TValue>
-	TValue Parameter<TValue>::sample( f32 scalar, const TValue& defaultValue ) const
+	TValue Parameter<TValue>::sample( s32 particleIndex, f32 scalar, const TValue& defaultValue ) const
 	{
 		DC_BREAK_IF( scalar < 0.0f || scalar > 1.0f );
 
@@ -194,11 +226,12 @@ namespace Fx {
 											break;
 
 		case SampleRandomBetweenCurves:		{
-												TValue a, b;
-												m_curves[Lower].sample( scalar, a );
-												m_curves[Upper].sample( scalar, b );
+											//	TValue a, b;
+											//	m_curves[Lower].sample( scalar, a );
+											//	m_curves[Upper].sample( scalar, b );
 
-												result = randomValue( a, b );	
+											//	result = randomValue( a, b );
+												m_particleCurves[particleIndex].sample( scalar, result );
 											}
 											break;
 		}

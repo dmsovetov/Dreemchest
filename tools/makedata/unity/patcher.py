@@ -357,7 +357,7 @@ def radians_to_degrees(value):
     return value * 180 / math.pi
 
 def rescale(value):
-    return value * 75
+    return value * 100
 
 def multiply(factor):
     def _(value):

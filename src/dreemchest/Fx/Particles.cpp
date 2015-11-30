@@ -185,7 +185,7 @@ void Particles::setRenderingMode( RenderingMode value )
 f32 Particles::emission( f32 scalar ) const
 {
     const FloatParameter *emission = ScalarParam( Emission );
-    return SampleParameter( emission, -1.0f );
+    return SampleParameter( 0, emission, -1.0f );
 }
 
 // ** Particles::maxSnapshots
@@ -261,22 +261,23 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
 	for( s32 i = 0; i < count; i++ ) {
 		Particle& particle = particles[i];
 
-		particle.m_force.acceleration	= Vec3( SampleParameter( accelerationX, 0.0f ), SampleParameter( accelerationY, 0.0f ) - SampleParameter( gravity, 0.0f ), SampleParameter( accelerationZ, 0.0f ) );
-		particle.m_angular.velocity     = SampleParameter( angularVelocity, 0.0f );
-		particle.m_angular.torque       = SampleParameter( torque, 0.0f );
-		particle.m_size.initial         = SampleParameter( size, 5.0f );
-		particle.m_life.initial			= SampleParameter( life, 1.0f );
+		particle.m_index				= rand() % FloatParameter::LifetimeRandomizationCount;
+		particle.m_force.acceleration	= Vec3( SampleParameter( particle.m_index, accelerationX, 0.0f ), SampleParameter( particle.m_index, accelerationY, 0.0f ) - SampleParameter( particle.m_index, gravity, 0.0f ), SampleParameter( particle.m_index, accelerationZ, 0.0f ) );
+		particle.m_angular.velocity     = SampleParameter( particle.m_index, angularVelocity, 0.0f );
+		particle.m_angular.torque       = SampleParameter( particle.m_index, torque, 0.0f );
+		particle.m_size.initial         = SampleParameter( particle.m_index, size, 5.0f );
+		particle.m_life.initial			= SampleParameter( particle.m_index, life, 1.0f );
 		particle.m_life.current			= particle.m_life.initial;
         particle.m_color.current.rgb    = Rgb( 1.0f, 1.0f, 1.0f );
         particle.m_color.current.alpha  = 1.0f;
-		particle.m_color.initial.alpha  = SampleParameter( transparency, 1 );
-        particle.m_color.initial.rgb    = SampleParameter( color, white );
-		particle.m_direction            = SampleParameter( direction, 0.0f );
-		particle.m_rotation             = SampleParameter( rotation, 0.0f );
+		particle.m_color.initial.alpha  = SampleParameter( particle.m_index, transparency, 1 );
+        particle.m_color.initial.rgb    = SampleParameter( particle.m_index, color, white );
+		particle.m_direction            = SampleParameter( particle.m_index, direction, 0.0f );
+		particle.m_rotation             = SampleParameter( particle.m_index, rotation, 0.0f );
 
-		Zone::Point point		  = zone.valid() ? zone->generateRandomPoint( scalar, position ) : position;
+		Zone::Point point		  = zone.valid() ? zone->generateRandomPoint( scalar, position ) : Zone::Point( position, Vec3( 0.0f, 1.0f, 0.0f ) );
         particle.m_position		  = point.position;
-		particle.m_force.velocity = point.direction * SampleParameter( speed, 0.0f );
+		particle.m_force.velocity = point.direction * SampleParameter( particle.m_index, speed, 0.0f );
 
 		// ** Init snapshots
 		if( snapshotCount ) {
@@ -359,18 +360,15 @@ s32 Particles::update( Particle* particles, s32 count, f32 dt, Bounds* bounds ) 
 			continue;
 		}
 		
-		Vec3 velocity = Vec3( SampleParameter( velocityX, 0.0f ), SampleParameter( velocityY, 0.0f ), SampleParameter( velocityZ, 0.0f ) );
-	//	Vec3 force    = Vec3( SampleParameter( accelerationX, 0.0f ), SampleParameter( accelerationY, 0.0f ), SampleParameter( accelerationZ, 0.0f ) );
+		Vec3 velocity = Vec3( SampleParameter( particle.m_index, velocityX, 0.0f ), SampleParameter( particle.m_index, velocityY, 0.0f ), SampleParameter( particle.m_index, velocityZ, 0.0f ) );
 
-		particle.m_direction            += particle.m_angular.velocity    * SampleKoeficient( angularVelocity,  1.0f );
+		particle.m_direction            += particle.m_angular.velocity    * SampleKoeficient( particle.m_index, angularVelocity,  1.0f );
 		particle.m_force.velocity		+= particle.m_force.acceleration * dt;
 		particle.m_position			    += (velocity + particle.m_force.velocity) * dt;
 		particle.m_rotation				+= particle.m_angular.velocity * dt;
-	//	particle.m_position             += particle.m_linear.velocity     * SampleKoeficient( velocity,         1.0f ) * Vec2::fromAngle( particle.m_direction ) * dt + particle.m_force.velocity * dt;
-	//	particle.m_rotation             += particle.m_angular.torque      * SampleKoeficient( torque,           1.0f ) * dt;
-        particle.m_color.current.rgb     = particle.m_color.initial.rgb   * SampleParameter( color, white );
-		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleParameter(  alpha,            1.0f );
-		particle.m_size.current          = particle.m_size.initial        * SampleParameter( size,             1.0f );
+        particle.m_color.current.rgb     = particle.m_color.initial.rgb   * SampleParameter( particle.m_index, color, white );
+		particle.m_color.current.alpha   = particle.m_color.initial.alpha * SampleParameter( particle.m_index, alpha,            1.0f );
+		particle.m_size.current          = particle.m_size.initial        * SampleParameter( particle.m_index, size,             1.0f );
 
 		if( m_blendingMode != BlendAlpha ) {
 			f32 alpha = particle.m_color.initial.alpha;

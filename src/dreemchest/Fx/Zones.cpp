@@ -63,8 +63,8 @@ ZoneType DiskZone::type( void ) const
 // ** DiskZone::generateRandomPoint
 Zone::Point DiskZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
-	f32 inner = SampleParameter( &m_innerRadius, 0.0f );
-	f32 outer = SampleParameter( &m_outerRadius, 0.0f );
+	f32 inner = SampleParameter( 0, &m_innerRadius, 0.0f );
+	f32 outer = SampleParameter( 0, &m_outerRadius, 0.0f );
 
     Vec2  direction = Vec2::randDirection();
     f32   distance  = RANDOM_SCALAR( inner, outer );
@@ -91,9 +91,9 @@ ZoneType BoxZone::type( void ) const
 // ** BoxZone::generateRandomPoint
 Zone::Point BoxZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
-	f32 hw = SampleParameter( &m_width,  0.0f ) * 0.5f;
-	f32 hh = SampleParameter( &m_height, 0.0f ) * 0.5f;
-	f32 hd = SampleParameter( &m_depth,  0.0f ) * 0.5f;
+	f32 hw = SampleParameter( 0, &m_width,  0.0f ) * 0.5f;
+	f32 hh = SampleParameter( 0, &m_height, 0.0f ) * 0.5f;
+	f32 hd = SampleParameter( 0, &m_depth,  0.0f ) * 0.5f;
 
 	Vec3 min( -hw, -hh, -hd );
 	Vec3 max(  hw,  hh,  hd );
@@ -139,8 +139,8 @@ ZoneType LineZone::type( void ) const
 // ** LineZone::generateRandomPoint
 Zone::Point LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 {
-	float length = SampleParameter( &m_length, 0.0f );
-	float angle  = SampleParameter( &m_angle, 0.0f );
+	float length = SampleParameter( 0, &m_length, 0.0f );
+	float angle  = SampleParameter( 0, &m_angle, 0.0f );
 
     Vec2  direction = Vec2::fromAngle( angle );
     f32   distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );

@@ -47,7 +47,7 @@ namespace Fx {
 								: position( position ), direction( direction ) {}
 		};
 
-        virtual             ~Zone( void ) {}
+        virtual             ~Zone( void ) { DC_BREAK; }
 
 		//! Creates the zone by type.
         static ZonePtr      create( ZoneType type );

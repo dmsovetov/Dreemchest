@@ -544,6 +544,7 @@ void JsonSceneLoader::readColorParameter( Fx::RgbParameter& parameter, const Jso
 	switch( object.size() ) {
 	case 2:		{
 					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+					parameter.constructLifetimeCurves();
 				}
 				break;
 
@@ -572,6 +573,7 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 	case 2:		{
 					if( object[0].isArray() ) {
 						parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+						parameter.constructLifetimeCurves();
 					} else {
 						Fx::FloatArray range = readFloats( object );
 						parameter.setRandomBetweenConstants( range[0], range[1] );
@@ -591,41 +593,6 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 
 	parameter.setEnabled( true );
 }
-
-/*//! Particle material factory.
-class ParticleMaterialFactory : public Fx::IMaterialFactory {
-public:
-
-								//! Constructs ParticleMaterialFactory instance.
-								ParticleMaterialFactory( AssetBundleWPtr assets );
-	virtual						~ParticleMaterialFactory( void ) {}
-
-	//! Creates a new material instance.
-	virtual Fx::IMaterialPtr	createMaterial( const String& identifier );
-
-private:
-
-	AssetBundleWPtr				m_assets;	//!< Asset bundle to use.
-};
-
-// ** JsonSceneLoader::ParticleMaterialFactory::ParticleMaterialFactory
-JsonSceneLoader::ParticleMaterialFactory::ParticleMaterialFactory( AssetBundleWPtr assets )
-	: m_assets( assets )
-{
-
-}
-
-// ** JsonSceneLoader::ParticleMaterialFactory::createMaterial
-Fx::IMaterialPtr JsonSceneLoader::ParticleMaterialFactory::createMaterial( const String& identifier )
-{
-	MaterialPtr material = m_assets->find<Material>( identifier );
-	
-	if( !material.valid() ) {
-		return Fx::IMaterialPtr();
-	}
-
-	return DC_NEW Fx::IMaterial( material );
-}*/
 
 #endif	/*	DC_JSON_ENABLED	*/
 

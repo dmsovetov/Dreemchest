@@ -367,6 +367,16 @@ DC_BEGIN_DREEMCHEST
 		f32		m_strata;	//!< The strata size.
 	};
 
+	//! Returns the random 3D vector in specified range.
+	template<>
+	inline Vec3 randomValue<Vec3>( const Vec3& min, const Vec3& max )
+	{
+		return Vec3(
+				  randomValue( min.x, max.x )
+				, randomValue( min.y, max.y )
+				, randomValue( min.z, max.z ) );
+	}
+
 DC_END_DREEMCHEST
 
 #endif  /*  !defined( __Base_Vec3_H__ )  */
