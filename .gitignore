@@ -33,6 +33,7 @@ dependency
 projects
 src/modules
 src/dreemchest/externals/src
+src/examples/assets
 externals/src
 *.suo
 *.pyc
