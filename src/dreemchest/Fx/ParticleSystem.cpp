@@ -263,6 +263,9 @@ bool JsonParticleSystemLoader::readParticles( const Json::Value& object )
 	emitter->setLooped( object["isLooped"].asBool() );
 	emitter->setDuration( object["duration"].asFloat() );
 
+	// Setup material
+	particles->setMaterial( object["material"].asString() );
+
 	// Setup zone
 	Json::Value shape = object["shape"];
 
@@ -373,6 +376,7 @@ void JsonParticleSystemLoader::readColorParameter( RgbParameter& parameter, cons
 	switch( object.size() ) {
 	case 2:		{
 					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+					parameter.constructLifetimeCurves();
 				}
 				break;
 
@@ -401,6 +405,7 @@ void JsonParticleSystemLoader::readScalarParameter( FloatParameter& parameter, c
 	case 2:		{
 					if( object[0].isArray() ) {
 						parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
+						parameter.constructLifetimeCurves();
 					} else {
 						FloatArray range = readFloats( object );
 						parameter.setRandomBetweenConstants( range[0], range[1] );
