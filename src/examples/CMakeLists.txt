@@ -37,3 +37,6 @@ if (DC_SOUND_ENABLED)
 	add_executable(12_Sound 12_Sound.cpp)
 	target_link_libraries(12_Sound Dreemchest)
 endif (DC_SOUND_ENABLED)
+
+add_executable(13_Scene 13_Scene.cpp)
+target_link_libraries(13_Scene Dreemchest)
