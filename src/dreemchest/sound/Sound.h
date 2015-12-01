@@ -31,57 +31,57 @@
 
 DC_BEGIN_DREEMCHEST
 
-    namespace sound {
+namespace Sound {
 
-        DECLARE_LOG( log )
+    DECLARE_LOG( log )
 
-        class SoundFx;
-        class SoundChannel;
-        class SoundData;
-        class SoundGroup;
-        class Fader;
+    class IStreamOpener;
+    class ISoundStream;
 
-        class SoundEngine;
-        class SoundSource;
-        class IStreamOpener;
-        class ISoundStream;
-        class SoundDecoder;
-        class SoundBuffer;
+    //! Supported sound sample formats.
+    enum SoundSampleFormat {
+        SoundSampleMono8,       //!< 8-bit mono.
+        SoundSampleMono16,      //!< 16-bit mono.
+        SoundSampleStereo8,     //!< 8-bit stereo.
+        SoundSampleStereo16,    //!< 16-bit stereo.
+    };
 
-        // ** enum SoundSampleFormat
-        enum SoundSampleFormat {
-            SoundSampleMono8,       //!< 8-bit mono.
-            SoundSampleMono16,      //!< 16-bit mono.
-            SoundSampleStereo8,     //!< 8-bit stereo.
-            SoundSampleStereo16,    //!< 16-bit stereo.
-        };
+    //! Supported sound container formats.
+    enum SoundFormat {
+        SoundFormatUnknown = 0, //!< Unknown file format.
+        SoundFormatWav,         //!< Wave sound format.
+        SoundFormatOgg,         //!< Ogg vorbis.
+        SoundFormatMp3,         //!< MP3
+    };
 
-        // ** enum SoundFormat
-        enum SoundFormat {
-            SoundFormatUnknown = 0, //!< Unknown file format.
-            SoundFormatWav,         //!< Wave sound format.
-            SoundFormatOgg,         //!< Ogg vorbis.
-            SoundFormatMp3,         //!< MP3
-        };
+	dcDeclarePtrs( SoundFx )
+	dcDeclarePtrs( SoundChannel )
+	dcDeclarePtrs( SoundData )
+	dcDeclarePtrs( SoundGroup )
+	dcDeclarePtrs( SoundEvent )
+	dcDeclarePtrs( Fader )
 
-        typedef std::vector<SoundSource*>   SoundSourceArray;
-        typedef std::vector<SoundData*>     SoundDataArray;
+	dcDeclarePtrs( SoundEngine )
+	dcDeclarePtrs( SoundBuffer )
+	dcDeclarePtrs( SoundDecoder )
+	dcDeclarePtrs( SoundSource )
 
-    } // namespace sound
+	//! Container type to store sound data by identifier.
+    typedef Hash<SoundDataPtr> Sounds;
 
-    typedef sound::SoundEngine*         dcSoundEngine;
-    typedef sound::SoundSource*         dcSoundSource;
-    typedef sound::SoundDecoder*        dcSoundDecoder;
-    typedef sound::SoundFx*             dcSoundFx;
-    typedef sound::SoundChannel*        dcSoundChannel;
+	//! Container type to store sound groups by name.
+    typedef Hash<SoundGroupPtr> SoundGroups;
 
-    DC_DECLARE_PTRS( sound::SoundData,      SoundData )
-    DC_DECLARE_PTRS( sound::SoundChannel,   SoundChannel )
-    DC_DECLARE_PTRS( sound::SoundGroup,     SoundGroup )
-    DC_DECLARE_PTRS( sound::SoundBuffer,    SoundBuffer );
+	//! Container type to store sound events by identifier.
+    typedef Hash<SoundEventPtr> SoundEvents;
 
-    typedef std::vector<dcSoundChannelStrong>  SoundChannelArray;
-    typedef std::vector<dcSoundChannelWeak>    SoundChannelWeakArray;
+	//! Container type to store sound channel weak pointers.
+	typedef Array<SoundChannelWPtr> SoundChannelsWeak;
+
+	//! Container type to store sound channel strong pointers.
+	typedef Array<SoundChannelPtr> SoundChannels;
+
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

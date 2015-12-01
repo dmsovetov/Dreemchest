@@ -27,18 +27,18 @@
 #ifndef __DC_OpenALBuffer_H__
 #define __DC_OpenALBuffer_H__
 
-#include    "OpenAL.h"
-#include    "../SoundBuffer.h"
+#include "OpenAL.h"
+#include "../SoundBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class OpenALBuffer
     class OpenALBuffer : public SoundBuffer {
     public:
 
-                                OpenALBuffer( SoundDecoder* data, u32 chunks, u32 pcmSize );
+                                OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize );
                                 ~OpenALBuffer( void );
 
         // ** SoundBuffer
@@ -58,7 +58,7 @@ namespace sound {
         ALuint                  m_format;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

@@ -27,43 +27,42 @@
 #ifndef __DC_SoundEngine_H__
 #define __DC_SoundEngine_H__
 
-#include    "../Sound.h"
+#include "../Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
-    // ** class SoundEngine
     //! Hardware sound engine, used for creating hardware sound sources and buffers.
-    class SoundEngine {
+    class SoundEngine : public RefCounted {
     public:
 
                                 SoundEngine( void );
         virtual                 ~SoundEngine( void );
 
         //! Creates a new hardware sound source.
-        virtual SoundSource*    createSource( void );
+        virtual SoundSourcePtr	createSource( void );
 
         //! Creates a new hardware sound buffer.
         /*!
          \param decoder Sound decoder used to read PCM sound samples from input stream.
          \param chunks
          */
-        virtual SoundBuffer*    createBuffer( SoundDecoder* decoder, u32 chunks );
+        virtual SoundBufferPtr	createBuffer( SoundDecoderPtr decoder, u32 chunks );
 
         //! Creates a sound decoder with a given input stream and file format.
-        SoundDecoder*           createSoundDecoder( ISoundStream* stream, SoundFormat format = SoundFormatUnknown );
+        SoundDecoderPtr         createSoundDecoder( ISoundStream* stream, SoundFormat format = SoundFormatUnknown );
 
     private:
 
         //! Creates a sound decoder instance for a given format.
-        SoundDecoder*           createSoundDecoder( SoundFormat format ) const;
+        SoundDecoderPtr			createSoundDecoder( SoundFormat format ) const;
 
         //! Creates a sound decoder with a given input stream and file format.
-        SoundDecoder*           createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format );
+        SoundDecoderPtr			createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format );
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

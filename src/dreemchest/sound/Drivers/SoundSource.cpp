@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "SoundSource.h"
-#include    "SoundBuffer.h"
+#include "SoundSource.h"
+#include "SoundBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundSource::SoundSource
 SoundSource::SoundSource( void ) : m_state( Unknown ), m_isLooped( false ), m_volume( 1.0f ), m_pitch( 1.0f )
@@ -48,13 +48,13 @@ void SoundSource::update( void )
 }
 
 // ** SoundSource::buffer
-SoundBuffer* SoundSource::buffer( void ) const
+SoundBufferWPtr SoundSource::buffer( void ) const
 {
-    return m_buffer.get();
+    return m_buffer;
 }
 
 // ** SoundSource::setBuffer
-void SoundSource::setBuffer( SoundBuffer* value )
+void SoundSource::setBuffer( SoundBufferPtr value )
 {
     m_buffer = value;
 }
@@ -107,6 +107,6 @@ void SoundSource::setPitch( f32 value )
     m_pitch = value;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

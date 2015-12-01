@@ -27,18 +27,17 @@
 #ifndef __DC_SoundFader_H__
 #define __DC_SoundFader_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     //! Fader callback type.
-    typedef cClosure<void(class Fader*)> FaderCallback;
+    typedef cClosure<void(FaderWPtr)> FaderCallback;
 
-    // ** class Fader
     //! Fader object is used to fade sound source parameters.
-    class Fader {
+    class Fader : public RefCounted {
     public:
 
                             //! Constructs a new Fader object.
@@ -78,7 +77,7 @@ namespace sound {
         FaderCallback       m_callback;
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

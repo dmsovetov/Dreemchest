@@ -24,23 +24,26 @@
 
  **************************************************************************/
 
-#include    "SoundBuffer.h"
+#include "SoundBuffer.h"
+#include "SoundSource.h"
 
-#include    "../Decoders/SoundDecoder.h"
+#include "../Decoders/SoundDecoder.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundBuffer::SoundBuffer
-SoundBuffer::SoundBuffer( SoundDecoder* decoder, u32 chunks ) : m_decoder( decoder ), m_size( 0 ), m_chunks( chunks )
+SoundBuffer::SoundBuffer( SoundDecoderPtr decoder, u32 chunks ) : m_decoder( decoder ), m_size( 0 ), m_chunks( chunks )
 {
-    if( decoder ) m_size = decoder->size();
+    if( decoder.valid() ) {
+		m_size = decoder->size();
+	}
 }
 
 SoundBuffer::~SoundBuffer( void )
 {
-    DC_DELETE( m_decoder );
+
 }
 
 // ** SoundBuffer::chunks
@@ -50,7 +53,7 @@ u32 SoundBuffer::chunks( void ) const
 }
 
 // ** SoundBuffer::decoder
-SoundDecoder* SoundBuffer::decoder( void ) const
+SoundDecoderWPtr SoundBuffer::decoder( void ) const
 {
     return m_decoder;
 }
@@ -62,23 +65,23 @@ u64 SoundBuffer::size( void ) const
 }
 
 // ** SoundBuffer::attachToSource
-void SoundBuffer::attachToSource( SoundSource* target )
+void SoundBuffer::attachToSource( SoundSourceWPtr target )
 {
 
 }
 
 // ** SoundBuffer::detachFromSource
-void SoundBuffer::detachFromSource( SoundSource* target )
+void SoundBuffer::detachFromSource( SoundSourceWPtr target )
 {
 
 }
 
 // ** SoundBuffer::updateStream
-bool SoundBuffer::updateStream( SoundSource* target, bool isLooped )
+bool SoundBuffer::updateStream( SoundSourceWPtr target, bool isLooped )
 {
     return false;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#include    "OpenALSource.h"
-#include    "OpenALBuffer.h"
-#include    "OpenAL.h"
+#include "OpenALSource.h"
+#include "OpenALBuffer.h"
+#include "OpenAL.h"
 
-#include    "../../Decoders/SoundDecoder.h"
+#include "../../Decoders/SoundDecoder.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** OpenALSource::s_aliveCount
 u32 OpenALSource::s_aliveCount = 0;
@@ -151,6 +151,6 @@ void OpenALSource::update( void )
     }
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

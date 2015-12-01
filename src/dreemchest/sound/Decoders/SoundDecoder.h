@@ -27,15 +27,14 @@
 #ifndef __DC_SoundDecoder_H__
 #define __DC_SoundDecoder_H__
 
-#include    "../Sound.h"
+#include "../Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
-    // ** class SoundDecoder
     //! SoundDecoder class is used for reading PCM samples from input stream.
-    class SoundDecoder {
+    class SoundDecoder : public RefCounted {
     public:
 
                                     SoundDecoder( void );
@@ -79,7 +78,7 @@ namespace sound {
         SoundSampleFormat           m_format;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#include    "SoundData.h"
-#include    "SoundFx.h"
-#include    "SoundGroup.h"
-#include    "Drivers/SoundBuffer.h"
+#include "SoundData.h"
+#include "SoundFx.h"
+#include "SoundGroup.h"
+#include "Drivers/SoundBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundData::SoundData
-SoundData::SoundData( SoundFx* sfx, const char* identifier, const char* uri, const SoundGroup* group ) : m_soundFx( sfx ), m_uri( uri ), m_group( group ), m_pcm( NULL )
+SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group ) : m_soundFx( sfx ), m_uri( uri ), m_group( group ), m_pcm( NULL )
 {
     m_identifier        = identifier;
     m_type              = 0;
@@ -53,13 +53,13 @@ SoundData::~SoundData( void )
 }
 
 // ** SoundData::identifier
-const char* SoundData::identifier( void ) const
+CString SoundData::identifier( void ) const
 {
     return m_identifier.c_str();
 }
 
 // ** SoundData::setIdentifier
-void SoundData::setIdentifier( const char *value )
+void SoundData::setIdentifier( CString value )
 {
     DC_BREAK_IF( value == NULL );
     DC_BREAK_IF( value && (strlen( value ) == 0) );
@@ -68,25 +68,25 @@ void SoundData::setIdentifier( const char *value )
 }
 
 // ** SoundData::uri
-const char* SoundData::uri( void ) const
+CString SoundData::uri( void ) const
 {
     return m_uri.c_str();
 }
 
 // ** SoundData::setUri
-void SoundData::setUri( const char* uri )
+void SoundData::setUri( CString uri )
 {
     m_uri = uri;
 }
 
 // ** SoundData::group
-const SoundGroup* SoundData::group( void ) const
+SoundGroupWPtr SoundData::group( void ) const
 {
     return m_group;
 }
 
 // ** SoundData::setGroup
-void SoundData::setGroup( const SoundGroup *value )
+void SoundData::setGroup( SoundGroupWPtr value )
 {
     m_group = value;
 }
@@ -182,7 +182,7 @@ SoundDataInfo SoundData::data( void ) const
 
     result.identifier       = m_identifier;
     result.uri              = m_uri;
-    result.group            = m_group ? m_group->identifier() : "";
+    result.group            = m_group.valid() ? m_group->identifier() : "";
     result.type             = m_type;
     result.loading          = m_loading;
     result.fadeTime         = m_fadeTime;
@@ -214,13 +214,13 @@ void SoundData::setData( const SoundDataInfo& value )
 }
 
 // ** SoundData::pcm
-SoundBuffer* SoundData::pcm( void ) const
+SoundBufferWPtr SoundData::pcm( void ) const
 {
-    return m_pcm.get();
+    return m_pcm;
 }
 
 // ** SoundData::setPcm
-void SoundData::setPcm( SoundBuffer *value )
+void SoundData::setPcm( SoundBufferPtr value )
 {
     m_pcm = value;
 }
@@ -237,6 +237,6 @@ f32 SoundData::pitchForSound( void ) const
     return m_pitch * RANDOM_SCALAR( m_pitchModifier.min, m_pitchModifier.max );
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

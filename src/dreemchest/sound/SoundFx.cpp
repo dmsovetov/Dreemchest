@@ -24,22 +24,26 @@
 
  **************************************************************************/
 
-#include    "SoundFx.h"
+#include "SoundFx.h"
 
-#include    "SoundChannel.h"
-#include    "SoundGroup.h"
-#include    "SoundData.h"
-#include    "SoundEvent.h"
-#include    "SoundStream.h"
+#include "SoundChannel.h"
+#include "SoundGroup.h"
+#include "SoundData.h"
+#include "SoundEvent.h"
+#include "SoundStream.h"
 
-#include    "Decoders/SoundDecoder.h"
-#include    "Drivers/SoundSource.h"
-#include    "Drivers/SoundBuffer.h"
-#include    "Drivers/OpenAL/OpenAL.h"
+#include "Decoders/SoundDecoder.h"
+#include "Drivers/SoundSource.h"
+#include "Drivers/SoundBuffer.h"
+#include "Drivers/SoundEngine.h"
+
+#ifdef DC_HAVE_OPENAL
+	#include "Drivers/OpenAL/OpenAL.h"
+#endif	/*	DC_HAVE_OPENAL	*/
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 IMPLEMENT_LOGGER( log )
 
@@ -51,7 +55,7 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpener* streamOpener ) : m_hal( NULL ), m
     switch( hal ) {
     case None:      m_hal = NULL;           break;
     case Default:   
-                    #ifdef HAVE_OPENAL
+                    #ifdef DC_HAVE_OPENAL
                         m_hal = DC_NEW OpenAL;
                     #else
                         log::error( "SoundFx::SoundFx : the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
@@ -64,15 +68,14 @@ SoundFx::~SoundFx( void )
 {
     reset();
     delete m_streamOpener;
-    delete m_hal;
 }
 
 // ** SoundFx::createGroup
-SoundGroup* SoundFx::createGroup( const char *identifier )
+SoundGroupWPtr SoundFx::createGroup( CString identifier )
 {
     DC_BREAK_IF( identifier == NULL );
 
-    if( findGroupByName( identifier ) ) {
+    if( findGroupByName( identifier ).valid() ) {
         log::warn( "SoundFx::createGroup : failed to create group, group with a same name '%s' found\n", identifier );
         return NULL;
     }
@@ -86,13 +89,13 @@ SoundGroup* SoundFx::createGroup( const char *identifier )
 }
 
 // ** SoundFx::createSound
-SoundData* SoundFx::createSound( const char *identifier, const char* uri, const SoundGroup* group )
+SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupWPtr group )
 {
     DC_BREAK_IF( identifier == NULL );
     DC_BREAK_IF( uri == NULL );
 
-    // ** Ensure we don't have a sound with a same name.
-    if( findSoundByName( identifier ) ) {
+    // Ensure we don't have a sound with a same name.
+    if( findSoundByName( identifier ).valid() ) {
         log::warn( "SoundFx::createSound : failed to create sound, sound with a same name '%s' found\n", identifier );
         return NULL;
     }
@@ -107,11 +110,11 @@ SoundData* SoundFx::createSound( const char *identifier, const char* uri, const 
 }
 
 // ** SoundFx::createEvent
-SoundEvent* SoundFx::createEvent( const char* identifier )
+SoundEventWPtr SoundFx::createEvent( CString identifier )
 {
     DC_BREAK_IF( identifier == NULL )
 
-    if( findEventByName( identifier ) ) {
+    if( findEventByName( identifier ).valid() ) {
         log::warn( "SoundFx::createEvent : failed to create event, sound with a same name '%s' found\n", identifier );
         return NULL;
     }
@@ -125,40 +128,40 @@ SoundEvent* SoundFx::createEvent( const char* identifier )
 }
 
 // ** SoundFx::findSoundByName
-SoundData* SoundFx::findSoundByName( const char* identifier )
+SoundDataWPtr SoundFx::findSoundByName( CString identifier )
 {
     Sounds::iterator i = m_sounds.find( StringHash( identifier ) );
 
     if( i != m_sounds.end() ) {
-        return i->second.get();
+        return i->second;
     }
 
-    return NULL;
+    return SoundDataWPtr();
 }
 
 // ** SoundFx::removeSoundByName
-void SoundFx::removeSoundByName( const char* identifier )
+void SoundFx::removeSoundByName( CString identifier )
 {
     DC_BREAK_IF( identifier == NULL );
     m_sounds.erase( StringHash( identifier ) );
 }
 
 // ** SoundFx::renameSound
-bool SoundFx::renameSound( const char* identifier, const char* newName )
+bool SoundFx::renameSound( CString identifier, CString newName )
 {
-    // ** Sound with a same name exists
-    if( findSoundByName( newName ) ) {
+    // Sound with a same name exists
+    if( findSoundByName( newName ).valid() ) {
         return false;
     }
 
-    // ** Get the sound
-    dcSoundDataStrong sound = findSoundByName( identifier );
+    // Get the sound
+    SoundDataPtr sound = findSoundByName( identifier );
 
     if( sound == NULL ) {
         return false;
     }
 
-    // ** Rename sound
+    // Rename sound
     removeSoundByName( identifier );
 
     strhash hash = StringHash( newName );
@@ -170,40 +173,40 @@ bool SoundFx::renameSound( const char* identifier, const char* newName )
 }
 
 // ** SoundFx::findGroupByName
-SoundGroup* SoundFx::findGroupByName( const char* identifier )
+SoundGroupWPtr SoundFx::findGroupByName( CString identifier )
 {
     SoundGroups::iterator i = m_groups.find( StringHash( identifier ) );
 
     if( i != m_groups.end() ) {
-        return i->second.get();
+        return i->second;
     }
 
-    return NULL;
+    return SoundGroupWPtr();
 }
 
 // ** SoundFx::removeGroupByName
-void SoundFx::removeGroupByName( const char* identifier )
+void SoundFx::removeGroupByName( CString identifier )
 {
     DC_BREAK_IF( identifier == NULL );
     m_groups.erase( StringHash( identifier ) );
 }
 
 // ** SoundFx::renameGroup
-bool SoundFx::renameGroup( const char* identifier, const char* newName )
+bool SoundFx::renameGroup( CString identifier, CString newName )
 {
-    // ** Group with a same name exists
-    if( findGroupByName( newName ) ) {
+    // Group with a same name exists
+    if( findGroupByName( newName ).valid() ) {
         return false;
     }
 
-    // ** Get the sound
-    dcSoundGroupStrong group = findGroupByName( identifier );
+    // Get the sound
+    SoundGroupPtr group = findGroupByName( identifier );
 
     if( group == NULL ) {
         return false;
     }
 
-    // ** Rename group
+    // Rename group
     removeGroupByName( identifier );
 
     strhash hash = StringHash( newName );
@@ -215,7 +218,7 @@ bool SoundFx::renameGroup( const char* identifier, const char* newName )
 }
 
 // ** SoundFx::findEventByName
-SoundEvent* SoundFx::findEventByName( const char *identifier )
+SoundEventWPtr SoundFx::findEventByName( CString identifier )
 {
     SoundEvents::iterator i = m_events.find( StringHash( identifier ) );
 
@@ -223,11 +226,11 @@ SoundEvent* SoundFx::findEventByName( const char *identifier )
         return i->second;
     }
 
-    return NULL;
+    return SoundEventWPtr();
 }
 
 // ** SoundFx::createSource
-SoundSource* SoundFx::createSource( SoundData *data ) const
+SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
 {
     DC_BREAK_IF( data == NULL );
     
@@ -237,8 +240,8 @@ SoundSource* SoundFx::createSource( SoundData *data ) const
     }
 
     // ** Create sound source
-    SoundSource* source = m_hal->createSource();
-    if( !source ) {
+    SoundSourcePtr source = m_hal->createSource();
+    if( !source.valid() ) {
         log::error( "SoundFx::createSource : failed to create sound source for '%s'\n", data->identifier() );
         return NULL;
     }
@@ -252,25 +255,25 @@ SoundSource* SoundFx::createSource( SoundData *data ) const
 }
 
 // ** SoundFx::createBuffer
-SoundBuffer* SoundFx::createBuffer( SoundData *data ) const
+SoundBufferPtr SoundFx::createBuffer( SoundDataWPtr data )
 {
     DC_BREAK_IF( data == NULL );
 
-    if( !m_hal ) {
+    if( !m_hal.valid() ) {
         log::error( "SoundFx::createBuffer : failed to create sound buffer for '%s', no HAL created.\n", data->identifier() );
         return NULL;
     }
 
     // ** Create sound decoder
-    SoundDecoder* decoder = createDecoder( data );
-    if( !decoder && !data->pcm() ) {
+    SoundDecoderPtr decoder = createDecoder( data );
+    if( !decoder.valid() && !data->pcm().valid() ) {
         log::error( "SoundFx::createBuffer : failed to create sound decoder for '%s'\n", data->identifier() );
         return NULL;
     }
 
     // ** Create buffer
     switch( data->loading() ) {
-    case SoundData::Decode:     if( !data->pcm() ) {
+    case SoundData::Decode:     if( !data->pcm().valid() ) {
                                     data->setPcm( m_hal->createBuffer( decoder, 1 ) );
                                 }
                                 return data->pcm();
@@ -283,10 +286,10 @@ SoundBuffer* SoundFx::createBuffer( SoundData *data ) const
 }
 
 // ** SoundFx::createDecoder
-SoundDecoder* SoundFx::createDecoder( const SoundData *data ) const
+SoundDecoderPtr SoundFx::createDecoder( SoundDataWPtr data )
 {
-    SoundDecoder* decoder   = NULL;
-    ISoundStream* stream    = m_streamOpener->open( data->uri() );
+    SoundDecoderPtr decoder;
+    ISoundStream*   stream = m_streamOpener->open( data->uri() );
 
     if( !stream ) {
         log::error( "SoundFx::createDecoder : failed to open sound stream %s\n", data->uri() );
@@ -294,7 +297,7 @@ SoundDecoder* SoundFx::createDecoder( const SoundData *data ) const
     }
 
     switch( data->loading() ) {
-    case SoundData::Decode:     if( !data->pcm() ) {
+    case SoundData::Decode:     if( !data->pcm().valid() ) {
                                     decoder = m_hal->createSoundDecoder( stream, SoundFormatOgg );
                                 } else {
                                     stream->release();
@@ -313,10 +316,10 @@ SoundDecoder* SoundFx::createDecoder( const SoundData *data ) const
 }
 
 // ** SoundFx::event
-dcSoundChannelStrong SoundFx::event( const char *identifier )
+SoundChannelPtr SoundFx::event( CString identifier )
 {
-    // ** Get the event by name
-    SoundEvent* event = findEventByName( identifier );
+    // Find the event by name
+    SoundEventWPtr event = findEventByName( identifier );
 
     if( event == NULL ) {
         log::error( "SoundFx::event : no such event '%s'\n", identifier );
@@ -335,10 +338,10 @@ dcSoundChannelStrong SoundFx::event( const char *identifier )
 }
 
 // ** SoundFx::play
-dcSoundChannelStrong SoundFx::play( const char *identifier )
+SoundChannelPtr SoundFx::play( CString identifier )
 {
-    // ** Get the sound data by name
-    SoundData* data = findSoundByName( identifier );
+    // Find the sound data by name
+    SoundDataWPtr data = findSoundByName( identifier );
 
     if( data == NULL ) {
         log::error( "SoundFx::play : no such sound '%s'\n", identifier );
@@ -346,10 +349,10 @@ dcSoundChannelStrong SoundFx::play( const char *identifier )
     }
 
     // ** Get the sound group
-    SoundGroup* group = const_cast<SoundGroup*>( data->group() );
+    SoundGroupWPtr group = data->group();
 
     // ** Ensure we have a free playback slot
-    if( group && !group->requestSlot( data ) ) {
+    if( group.valid() && !group->requestSlot( data ) ) {
         return NULL;
     }
 
@@ -357,9 +360,9 @@ dcSoundChannelStrong SoundFx::play( const char *identifier )
     cleanupChannels();
 
     // ** Create a sound source
-    SoundSource* source = createSource( data );
+    SoundSourcePtr source = createSource( data );
 
-    if( !source ) {
+    if( !source.valid() ) {
         log::error( "SoundFx::play : failed to start playback for '%s', no sound source created\n", identifier );
         return NULL;
     }
@@ -371,7 +374,7 @@ dcSoundChannelStrong SoundFx::play( const char *identifier )
     m_channels.push_back( channel );
 
     // ** Add sound to a group
-    if( group ) {
+    if( group.valid() ) {
         group->addSound( channel );
     }
 
@@ -381,10 +384,10 @@ dcSoundChannelStrong SoundFx::play( const char *identifier )
 }
 
 // ** SoundFx::playWithParameters
-dcSoundChannelStrong SoundFx::playWithParameters( const char *identifier, bool loop, f32 fade )
+SoundChannelPtr SoundFx::playWithParameters( CString identifier, bool loop, f32 fade )
 {
     DC_NOT_IMPLEMENTED;
-    return NULL;
+    return SoundChannelPtr();
 }
 
 // ** SoundFx::data
@@ -415,23 +418,23 @@ void SoundFx::setData( const SoundFxInfo& value )
     for( u32 i = 0, n = ( u32 )value.groups.size(); i < n; i++ ) {
         const SoundGroupInfo& data = value.groups[i];
 
-        SoundGroup* group = createGroup( data.identifier.c_str() );
+        SoundGroupWPtr group = createGroup( data.identifier.c_str() );
         group->setData( data );
     }
 
     // ** Deserialize sounds
     for( u32 i = 0, n = ( u32 )value.sounds.size(); i < n; i++ ) {
         const SoundDataInfo& data  = value.sounds[i];
-        SoundGroup*          group = findGroupByName( data.group.c_str() );
+        SoundGroupWPtr       group = findGroupByName( data.group.c_str() );
 
-        SoundData* sound = createSound( data.identifier.c_str(), data.uri.c_str(), group );
+        SoundDataWPtr sound = createSound( data.identifier.c_str(), data.uri.c_str(), group );
         sound->setData( data );
     }
 
     // ** Deserialize events
     for( u32 i = 0, n = ( u32 )value.events.size(); i < n; i++ ) {
         const SoundEventInfo& data = value.events[i];
-        SoundEvent* event = createEvent( data.identifier.c_str() );
+        SoundEventWPtr event = createEvent( data.identifier.c_str() );
         event->setData( data );
     }
 }
@@ -548,6 +551,6 @@ void SoundFx::cleanupChannels( void )
     }
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

@@ -29,12 +29,12 @@
 
 #include "../SoundEngine.h"
 
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class OpenAL
     class OpenAL : public SoundEngine {
@@ -44,8 +44,8 @@ namespace sound {
         virtual                 ~OpenAL( void );
 
         // ** SoundEngine
-        virtual SoundSource*    createSource( void );
-        virtual SoundBuffer*    createBuffer( SoundDecoder* decoder, u32 chunks );
+        virtual SoundSourcePtr createSource( void );
+        virtual SoundBufferPtr createBuffer( SoundDecoderPtr decoder, u32 chunks );
 
         // ** OpenAL
         static ALuint           soundSampleFormat( SoundSampleFormat format );
@@ -59,7 +59,7 @@ namespace sound {
         ALCcontext*             m_context;
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

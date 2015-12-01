@@ -24,17 +24,19 @@
 
  **************************************************************************/
 
-#include    "SoundEngine.h"
+#include "SoundEngine.h"
+#include "SoundSource.h"
+#include "SoundBuffer.h"
 
-#include    "../Decoders/WavSoundDecoder.h"
+#include "../Decoders/WavSoundDecoder.h"
 
-#ifdef HAVE_VORBIS
+#ifdef DC_HAVE_VORBIS
     #include "../Decoders/OggSoundDecoder.h"
 #endif
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundEngine::SoundEngine
 SoundEngine::SoundEngine( void )
@@ -48,34 +50,34 @@ SoundEngine::~SoundEngine( void )
 }
 
 // ** SoundEngine::createSource
-SoundSource* SoundEngine::createSource( void )
+SoundSourcePtr SoundEngine::createSource( void )
 {
-    return NULL;
+    return SoundSourcePtr();
 }
 
 // ** SoundEngine::createBuffer
-SoundBuffer* SoundEngine::createBuffer( SoundDecoder* decoder, u32 chunks )
+SoundBufferPtr SoundEngine::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 {
-    return NULL;
+    return SoundBufferPtr();
 }
 
 // ** SoundEngine::createSoundDecoder
-SoundDecoder* SoundEngine::createSoundDecoder( SoundFormat format ) const
+SoundDecoderPtr SoundEngine::createSoundDecoder( SoundFormat format ) const
 {
     switch( format ) {
     case SoundFormatUnknown:    log::warn( "SoundEngine::createSoundDecoder : unknown sound format\n" );
-                                return NULL;
+                                return SoundDecoderPtr();
 
     case SoundFormatWav:        return DC_NEW WavSoundDecoder;
     case SoundFormatMp3:
-                            #ifdef HAVE_MP3
+                            #ifdef DC_HAVE_MP3
                                 return DC_NEW Mp3SoundDecoder;
                             #else
                                 log::warn( "SoundEngine::createSoundDecoder : MP3 sound decoder is not supported\n" );
                             #endif
                             break;
     case SoundFormatOgg:
-                            #ifdef HAVE_VORBIS
+                            #ifdef DC_HAVE_VORBIS
                                 return DC_NEW OggSoundDecoder;
                             #else
                                 log::warn( "SoundEngine::createSoundDecoder : Vorbis sound decoder is not supported\n" );
@@ -87,15 +89,15 @@ SoundDecoder* SoundEngine::createSoundDecoder( SoundFormat format ) const
 }
 
 // ** SoundEngine::createSoundDecoderWithFormat
-SoundDecoder* SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format )
+SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format )
 {
     DC_BREAK_IF( stream == NULL );
 
-    SoundDecoder* soundDecoder = createSoundDecoder( format );
+    SoundDecoderPtr soundDecoder = createSoundDecoder( format );
 
-    if( !soundDecoder ) {
+    if( !soundDecoder.valid() ) {
         log::error( "OpenAL::createSoundDecoder : failed to open file\n" );
-        return NULL;
+        return SoundDecoderPtr();
     }
 
     if( soundDecoder->open( stream ) ) {
@@ -103,15 +105,15 @@ SoundDecoder* SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, S
     }
 
     log::error( "OpenAL::createSoundDecoder : unknown file format\n" );
-    return NULL;
+    return SoundDecoderPtr();
 }
 
 // ** SoundEngine::createSoundDecoder
-SoundDecoder* SoundEngine::createSoundDecoder( ISoundStream* stream, SoundFormat format )
+SoundDecoderPtr SoundEngine::createSoundDecoder( ISoundStream* stream, SoundFormat format )
 {
     return createSoundDecoderWithFormat( stream, format );
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

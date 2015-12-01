@@ -27,11 +27,11 @@
 #ifndef __DC_SoundChannel_H__
 #define __DC_SoundChannel_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class SoundChannel
     //! A SoundChannel object represents a single sound playback.
@@ -52,7 +52,7 @@ namespace sound {
         void                setVolume( f32 value );
 
         //! Returns a pointer to an attached sound data.
-        const SoundData*    sound( void ) const;
+        SoundDataWPtr		sound( void ) const;
 
         //! Pauses a sound playback with a given fade in time.
         /*!
@@ -79,7 +79,7 @@ namespace sound {
                              \param data Attached sound data instance.
                              \param source Hardware sound source.
                              */
-                            SoundChannel( const SoundData* data, SoundSource* source );
+                            SoundChannel( SoundDataWPtr data, SoundSourcePtr source );
         virtual             ~SoundChannel( void );
 
         //! Does a sound channel update (sound streaming, fading, stopping).
@@ -89,28 +89,28 @@ namespace sound {
         bool                update( f32 dt );
 
         //! Fade in callback.
-        void                onFadeIn( Fader* fader );
+        void                onFadeIn( FaderWPtr fader );
         //! Fade out callback.
-        void                onFadeOut( Fader* fader );
+        void                onFadeOut( FaderWPtr fader );
         //! Fade in callback that is called after stopping the sound playback.
-        void                onStopped( Fader* fader );
+        void                onStopped( FaderWPtr fader );
 
     private:
 
         //! Hardware sound source used for sound playback.
-        SoundSource*        m_source;
+        SoundSourcePtr		m_source;
 
         //! Fade instance to fade in/out sound volume.
-        Fader*              m_volumeFader;
+        FaderPtr            m_volumeFader;
 
         //! Attached sound data, PCM sound samples are come from here.
-        const SoundData*    m_sound;
+        SoundDataWPtr		m_sound;
 
         //! Sound channel volume.
         f32                 m_volume;
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

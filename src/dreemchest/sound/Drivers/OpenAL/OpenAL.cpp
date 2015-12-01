@@ -24,18 +24,18 @@
 
  **************************************************************************/
 
-#include    "OpenAL.h"
+#include "OpenAL.h"
 
-#include    "OpenALSource.h"
-#include    "OpenALBuffer.h"
+#include "OpenALSource.h"
+#include "OpenALBuffer.h"
 
-#include    "../../Decoders/SoundDecoder.h"
+#include "../../Decoders/SoundDecoder.h"
 
-#define     MAX_PCM_SIZE    10024
+#define MAX_PCM_SIZE    10024
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** OpenAL::OpenAL
 OpenAL::OpenAL( void )
@@ -121,18 +121,18 @@ void OpenAL::dumpErrors( const char *label )
 }
 
 // ** OpenAL::createSource
-SoundSource* OpenAL::createSource( void )
+SoundSourcePtr OpenAL::createSource( void )
 {
     return DC_NEW OpenALSource;
 }
 
 // ** OpenAL::createBuffer
-SoundBuffer* OpenAL::createBuffer( SoundDecoder* decoder, u32 chunks )
+SoundBufferPtr OpenAL::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 {
     DC_BREAK_IF( decoder == NULL );
     return DC_NEW OpenALBuffer( decoder, chunks, chunks == 1 ? decoder->size() : 16536 );
 }
 
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST

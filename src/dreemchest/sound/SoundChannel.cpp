@@ -24,25 +24,25 @@
 
  **************************************************************************/
 
-#include    "SoundChannel.h"
-#include    "Fader.h"
-#include    "Decoders/SoundDecoder.h"
-#include    "Drivers/SoundSource.h"
+#include "SoundChannel.h"
+#include "Fader.h"
+#include "Decoders/SoundDecoder.h"
+#include "Drivers/SoundSource.h"
+#include "SoundData.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundChannel::SoundChannel
-SoundChannel::SoundChannel( const SoundData* data, SoundSource* source ) : m_source( source ), m_volumeFader( NULL ), m_sound( data ), m_volume( 1.0f )
+SoundChannel::SoundChannel( SoundDataWPtr data, SoundSourcePtr source ) : m_source( source ), m_volumeFader( NULL ), m_sound( data ), m_volume( 1.0f )
 {
 
 }
 
 SoundChannel::~SoundChannel( void )
 {
-    delete m_volumeFader;
-    delete m_source;
+
 }
 
 // ** SoundChannel::volume
@@ -70,7 +70,7 @@ bool SoundChannel::isStopped( void ) const
 }
 
 // ** SoundChannel::sound
-const SoundData* SoundChannel::sound( void ) const
+SoundDataWPtr SoundChannel::sound( void ) const
 {
     return m_sound;
 }
@@ -78,7 +78,7 @@ const SoundData* SoundChannel::sound( void ) const
 // ** SoundChannel::pause
 void SoundChannel::pause( f32 fade )
 {
-    if( m_volumeFader ) {
+    if( m_volumeFader.valid() ) {
         DC_BREAK;
         return;
     }
@@ -89,7 +89,7 @@ void SoundChannel::pause( f32 fade )
 // ** SoundChannel::resume
 void SoundChannel::resume( f32 fade )
 {
-    if( m_volumeFader ) {
+    if( m_volumeFader.valid() ) {
         DC_BREAK;
         return;
     }
@@ -108,7 +108,7 @@ void SoundChannel::stop( f32 fade )
         return;
     }
 
-    if( m_volumeFader ) {
+    if( m_volumeFader.valid() ) {
         return;
     }
 
@@ -120,40 +120,36 @@ bool SoundChannel::update( f32 dt )
 {
     m_source->update();
 
-    // ** Update volume fader
-    if( m_volumeFader ) m_source->setVolume( m_volumeFader->update( dt ) );
+    // Update volume fader
+    if( m_volumeFader.valid() ) {
+		m_source->setVolume( m_volumeFader->update( dt ) );
+	}
 
     return m_source->state() == SoundSource::Stopped;
 }
 
 // ** SoundChannel::onFadeIn
-void SoundChannel::onFadeIn( Fader *fader )
+void SoundChannel::onFadeIn( FaderWPtr fader )
 {
     m_source->setVolume( fader->value() );
-
-    delete m_volumeFader;
-    m_volumeFader = NULL;
+    m_volumeFader = FaderPtr();
 }
 
 // ** SoundChannel::onFadeOut
-void SoundChannel::onFadeOut( Fader *fader )
+void SoundChannel::onFadeOut( FaderWPtr fader )
 {
     m_source->setState( SoundSource::Paused );
     m_source->setVolume( 0.0f );
-    
-    delete m_volumeFader;
-    m_volumeFader = NULL;
+    m_volumeFader = FaderPtr();
 }
 
 // ** SoundChannel::onStopped
-void SoundChannel::onStopped( Fader *fader )
+void SoundChannel::onStopped( FaderWPtr fader )
 {
     m_source->setState( SoundSource::Stopped );
-    
-    delete m_volumeFader;
-    m_volumeFader = NULL;
+    m_volumeFader = FaderPtr();
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

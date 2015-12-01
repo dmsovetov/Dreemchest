@@ -27,18 +27,16 @@
 #ifndef __DC_SoundSource_H__
 #define __DC_SoundSource_H__
 
-#include    "../Sound.h"
+#include "../Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
-    // ** class SoundSource
     //! SoundSource represents a hardware sound source.
-    class SoundSource {
+    class SoundSource : public RefCounted {
     public:
 
-        // ** enum SourceState
         //! Sound source state.
         enum SourceState {
             Unknown,    //!< The sound source state is unknown.
@@ -56,10 +54,10 @@ namespace sound {
         virtual void            update( void );
 
         //! Returns a pointer to attached hardware sound buffer.
-        virtual SoundBuffer*    buffer( void ) const;
+        virtual SoundBufferWPtr buffer( void ) const;
 
         //! Sets a hardware sound buffer.
-        virtual void            setBuffer( SoundBuffer* value );
+        virtual void            setBuffer( SoundBufferPtr value );
 
         //! Returns a sound source current state.
         virtual SourceState     state( void ) const;
@@ -88,7 +86,7 @@ namespace sound {
     protected:
 
         //! Strong pointer to a hardware sound buffer.
-        dcSoundBufferStrong     m_buffer;
+        SoundBufferPtr			m_buffer;
 
         //! Sound source state.
         SourceState             m_state;
@@ -103,7 +101,7 @@ namespace sound {
         f32                     m_pitch;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

@@ -24,16 +24,16 @@
 
  **************************************************************************/
 
-#include    "SoundGroup.h"
-#include    "SoundChannel.h"
-#include    "SoundData.h"
+#include "SoundGroup.h"
+#include "SoundChannel.h"
+#include "SoundData.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundGroup::SoundGroup
-SoundGroup::SoundGroup( const char *identifier )
+SoundGroup::SoundGroup( CString identifier )
 {
     m_identifier = identifier;
     m_slotCount  = 4;
@@ -48,13 +48,13 @@ SoundGroup::~SoundGroup( void )
 }
 
 // ** SoundGroup::identifier
-const char* SoundGroup::identifier( void ) const
+CString SoundGroup::identifier( void ) const
 {
     return m_identifier.c_str();
 }
 
 // ** SoundGroup::setIdentifier
-void SoundGroup::setIdentifier( const char *value )
+void SoundGroup::setIdentifier( CString value )
 {
     m_identifier = value;
 }
@@ -138,7 +138,7 @@ void SoundGroup::setData( const SoundGroupInfo& value )
 }
 
 // ** SoundGroup::addSound
-void SoundGroup::addSound( const dcSoundChannelWeak& channel )
+void SoundGroup::addSound( const SoundChannelWPtr& channel )
 {
     DC_BREAK_IF( activeSlotCount() + 1 > m_slotCount );
     m_slots.push_back( channel );
@@ -162,19 +162,19 @@ void SoundGroup::update( void )
 }
 
 // ** SoundGroup::requestSlot
-bool SoundGroup::requestSlot( const SoundData *data )
+bool SoundGroup::requestSlot( SoundDataWPtr data )
 {
-    // ** Force group update if it's full, probably we have some stopped channels that waste slots
+    // Force group update if it's full, probably we have some stopped channels that waste slots
     if( !hasFreeSlots() ) {
         update();
     }
 
-    // ** The group is not full - return true
+    // The group is not full - return true
     if( hasFreeSlots() ) {
         return true;
     }
 
-    // ** The group is full - search for a free slot
+    // The group is full - search for a free slot
     s32 index = -1;
 
     switch( m_behaviour ) {
@@ -184,12 +184,12 @@ bool SoundGroup::requestSlot( const SoundData *data )
     case ReplaceLowestOldest:   index = findLowestOldest( data->priority() );   break;
     }
 
-    // ** No free slot found - return false
+    // No free slot found - return false
     if( index == -1 ) {
         return false;
     }
 
-    // ** Stop a freed slot an remove it from a list
+    // Stop a freed slot an remove it from a list
     m_slots[index]->stop( m_fadeTime );
     m_slots.erase( m_slots.begin() + index );
 
@@ -230,6 +230,6 @@ s32 SoundGroup::findLowestOldest( u32 priority ) const
     return -1;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

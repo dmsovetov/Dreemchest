@@ -24,25 +24,25 @@
 
  **************************************************************************/
 
-#include    "OpenALBuffer.h"
-#include    "OpenALSource.h"
-#include    "OpenAL.h"
+#include "OpenALBuffer.h"
+#include "OpenALSource.h"
+#include "OpenAL.h"
 
-#include    "../../Decoders/SoundDecoder.h"
+#include "../../Decoders/SoundDecoder.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** OpenALBuffer::OpenALBuffer
-OpenALBuffer::OpenALBuffer( SoundDecoder* data, u32 chunks, u32 pcmSize ) : SoundBuffer( data, chunks )
+OpenALBuffer::OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize ) : SoundBuffer( data, chunks )
 {
     // ** Resize buffer id array
     m_buffers.resize( m_chunks );
 
     // ** Initialize variables
     m_pcmSize = pcmSize;
-    m_pcm     = new u8[pcmSize];
+    m_pcm     = DC_NEW u8[pcmSize];
     m_format  = OpenAL::soundSampleFormat( data->format() );
 
     // ** Generate buffers
@@ -60,7 +60,7 @@ OpenALBuffer::OpenALBuffer( SoundDecoder* data, u32 chunks, u32 pcmSize ) : Soun
     // ** If the buffer is not streamed - cleanup data right now
     if( chunks == 1 ) {
         DC_DELETE_ARRAY( m_pcm );
-        DC_DELETE( m_decoder );
+        m_decoder = SoundDecoderPtr();
     }
 
     OpenAL::dumpErrors( "OpenALBuffer::OpenALBuffer" );
@@ -182,6 +182,6 @@ bool OpenALBuffer::updateStream( SoundSource* target, bool isLooped )
     return false;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

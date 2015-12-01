@@ -27,15 +27,11 @@
 #ifndef __DC_SoundFx_H__
 #define __DC_SoundFx_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
-
-    typedef Hash<dcSoundDataStrong>    Sounds;
-    typedef Hash<dcSoundGroupStrong>   SoundGroups;
-    typedef Hash<class SoundEvent*>    SoundEvents;
+namespace Sound {
 
     // ** struct SoundFxInfo
     struct SoundFxInfo {
@@ -45,7 +41,7 @@ namespace sound {
     };
 
     // ** class SoundFx
-    class SoundFx {
+    class SoundFx : public RefCounted {
     public:
 
         // ** enum eSoundHal
@@ -75,7 +71,7 @@ namespace sound {
             \param fade Volume fade in time (milliseconds).
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        dcSoundChannelStrong    playWithParameters( const char *identifier, bool loop, f32 fade );
+        SoundChannelPtr			playWithParameters( CString identifier, bool loop, f32 fade );
 
         //! Starts a playback of a single sound.
         /*!
@@ -85,7 +81,7 @@ namespace sound {
             \param identifier Sound identifier to play.
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        dcSoundChannelStrong    play( const char *identifier );
+        SoundChannelPtr			play( CString identifier );
 
         //! Triggers an event.
         /*!
@@ -94,24 +90,24 @@ namespace sound {
             \param identifier Event identifier to play.
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        dcSoundChannelStrong    event( const char *identifier );
+        SoundChannelPtr			event( CString identifier );
 
         //! Returns a group by a given name (NULL if no such group found).
-        SoundGroup*             findGroupByName( const char *identifier );
+        SoundGroupWPtr          findGroupByName( CString identifier );
         //! Removes a sound group by a given name.
-        void                    removeGroupByName( const char *identifier );
+        void                    removeGroupByName( CString identifier );
         //! Renames a sound group.
-        bool                    renameGroup( const char *identifier, const char *newName );
+        bool                    renameGroup( CString identifier, CString newName );
 
         //! Returns a sound data by a given name (NULL if no such sound found).
-        SoundData*              findSoundByName( const char *identifier );
+        SoundDataWPtr           findSoundByName( CString identifier );
         //! Removes a sound data by a given name.
-        void                    removeSoundByName( const char *identifier );
+        void                    removeSoundByName( CString identifier );
         //! Renames a sound data.
-        bool                    renameSound( const char *identifier, const char *newName );
+        bool                    renameSound( CString identifier, CString newName );
 
         //! Returns an event by a given name (NULL if no such sound found).
-        SoundEvent*             findEventByName( const char *identifier );
+        SoundEventWPtr			findEventByName( CString identifier );
 
         //! Creates a new sound group.
         /*!
@@ -122,7 +118,7 @@ namespace sound {
             \param info Sound group initial parameters.
             \return created SoundGroup instance, otherwise NULL.
         */
-        SoundGroup*             createGroup( const char *identifier );
+        SoundGroupWPtr			createGroup( CString identifier );
 
         //! Creates a new sound.
         /*!
@@ -134,7 +130,7 @@ namespace sound {
             \param info Sound initial parameters.
             \return created SoundData instance, otherwise NULL.
         */
-        SoundData*              createSound( const char *identifier, const char* uri, const SoundGroup* group = NULL );
+        SoundDataWPtr           createSound( CString identifier, CString uri, SoundGroupWPtr group = SoundGroupWPtr() );
 
         //! Creates a new sound event.
         /*!
@@ -144,7 +140,7 @@ namespace sound {
             \param identifier Sound event identifier.
             \return Created SoundEvent instance, otherwise NULL.
         */
-        SoundEvent*             createEvent( const char *identifier );
+        SoundEventWPtr          createEvent( CString identifier );
 
         //! Loads a sound fx from a serialized data
         /*!
@@ -187,7 +183,7 @@ namespace sound {
             \param data Sound data instance.
             \return Created SoundSource instance, otherwise NULL.
         */
-        SoundSource*            createSource( SoundData* data ) const;
+        SoundSourcePtr          createSource( SoundDataWPtr data );
 
         //! Creates a sound buffer for a given sound data.
         /*!
@@ -197,10 +193,10 @@ namespace sound {
             \param data Source data instance.
             \return Creates SoundBuffer instance, otherwise NULL.
         */
-        SoundBuffer*            createBuffer( SoundData *data ) const;
+        SoundBufferPtr          createBuffer( SoundDataWPtr data );
 
         //! Creates a decoder for a given sound source.
-        SoundDecoder*           createDecoder( const SoundData* data ) const;
+        SoundDecoderPtr         createDecoder( SoundDataWPtr data );
 
         //! Removes all stopped sound channels from an update queue.
         void                    cleanupChannels( void );
@@ -208,13 +204,13 @@ namespace sound {
     private:
 
         //! Sound engine HAL.
-        SoundEngine*            m_hal;
+        SoundEnginePtr          m_hal;
 
         //! Stream opener interface.
         IStreamOpener*          m_streamOpener;
 
         //! Array of sound channels the are now playing.
-        SoundChannelArray       m_channels;
+        SoundChannels			m_channels;
 
         //! Sounds registered inside this SoundFx.
         /*! Contains pairs of (strhash, sound data pointer). */
@@ -229,7 +225,7 @@ namespace sound {
         SoundEvents             m_events;
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

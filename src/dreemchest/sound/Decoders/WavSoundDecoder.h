@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class WavSoundDecoder
     class WavSoundDecoder : public SoundDecoder {
@@ -72,7 +72,7 @@ namespace sound {
         u32                    m_pcmDataOffset;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

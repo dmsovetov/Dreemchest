@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#include    "SoundEvent.h"
+#include "SoundEvent.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundEvent::SoundEvent
 SoundEvent::SoundEvent( const char* identifier ) : m_identifier( identifier ), m_lastPlayedIndex( -1 )
@@ -118,6 +118,6 @@ void SoundEvent::setData( const SoundEventInfo& value )
     m_type              = static_cast<EventType>( value.type );
 }
 
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST

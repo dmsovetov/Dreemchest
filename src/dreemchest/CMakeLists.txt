@@ -60,8 +60,36 @@ if (DC_OPENGL_ENABLED)
 	add_definitions(-DDC_OPENGL_ENABLED)
 endif (DC_OPENGL_ENABLED)
 
+# Sound module sources
+if (DC_SOUND_ENABLED)
+	find_package(OpenAL)
+	
+	add_files(Sound SOUND_SRCS)
+	add_files(Sound/Drivers SOUND_DRIVERS_SRCS)
+
+	if (OPENAL_FOUND)
+		add_definitions(-DDC_HAVE_OPENAL)
+		add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
+		include_directories(${OPENAL_INCLUDE_DIR})
+	endif (OPENAL_FOUND)
+
+	set(SOUND_DECODERS_SRCS
+		Sound/Decoders/SoundDecoder.cpp
+		Sound/Decoders/SoundDecoder.h
+		Sound/Decoders/WavSoundDecoder.cpp
+		Sound/Decoders/WavSoundDecoder.h)
+
+	if (DC_VORBIS_ENABLED)
+		set(SOUND_DECODERS_SRCS ${SOUND_DECODERS_SRCS} Sound/Decoders/OggSoundDecoder.cpp Sound/Decoders/OggSoundDecoder.h)
+	endif (DC_VORBIS_ENABLED)
+
+	source_group("Code\\Sound\\Decoders" FILES ${SOUND_DECODERS_SRCS})
+
+	set (SOUND_SRCS ${SOUND_SRCS} ${SOUND_DRIVERS_SRCS} ${SOUND_DECODERS_SRCS} ${SOUND_OPENAL_SRCS})
+endif (DC_SOUND_ENABLED)
+
 # Add the Dreemchest static library
-add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS})
+add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS})
 
 # Link 3rd-party libraries
 if (DC_BOX2D_ENABLED)
@@ -71,6 +99,10 @@ endif (DC_BOX2D_ENABLED)
 if (JSONCPP_LIBRARY)
 	target_link_libraries(Dreemchest ${JSONCPP_LIBRARY})
 endif (JSONCPP_LIBRARY)
+
+if (OPENAL_LIBRARY)
+	target_link_libraries(Dreemchest ${OPENAL_LIBRARY})
+endif (OPENAL_LIBRARY)
 
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)

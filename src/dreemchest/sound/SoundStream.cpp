@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ---------------------------------------- StandardStreamOpener ---------------------------------------- //
 
@@ -109,6 +109,6 @@ u32 StandardSoundStream::position( void ) const
     return ftell( m_file );
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

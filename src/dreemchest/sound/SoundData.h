@@ -27,11 +27,11 @@
 #ifndef __DC_SoundData_H__
 #define __DC_SoundData_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** struct SoundDataInfo
     struct SoundDataInfo {
@@ -72,21 +72,21 @@ namespace sound {
                                 \param uri Sound asset unique identifier.
                                 \param group The sound group this sound belongs to. Pass NULL for orphan sounds.
                              */
-                            SoundData( SoundFx* sfx, const char* identifier, const char* uri, const SoundGroup* group );
+                            SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group );
                             ~SoundData( void );
 
         //! Returns a sound identifier.
-        const char*         identifier( void ) const;
+        CString				identifier( void ) const;
         //! Sets a sound identifier.
-        void                setIdentifier( const char *value );
+        void                setIdentifier( CString value );
         //! Returns a sound URI identifier.
-        const char*         uri( void ) const;
+        CString				uri( void ) const;
         //! Sets a sound URI identifier.
-        void                setUri( const char* value );
+        void                setUri( CString value );
         //! Returns a pointer to a sound group (NULL for orphan sounds).
-        const SoundGroup*   group( void ) const;
+		SoundGroupWPtr		group( void ) const;
         //! Sets a pointer to a sound group.
-        void                setGroup( const SoundGroup* value );
+        void                setGroup( SoundGroupWPtr value );
         //! Returns a sound type.
         u32                 type( void ) const;
         //! Sets a sound type.
@@ -120,9 +120,9 @@ namespace sound {
         //! Loads a serialized sound data.
         void                setData( const SoundDataInfo& value );
         //! Returns a sound buffer with decoded PCM data.
-        SoundBuffer*        pcm( void ) const;
+        SoundBufferWPtr     pcm( void ) const;
         //! Sets a sound buffer with decoded PCM data.
-        void                setPcm( SoundBuffer* value );
+        void                setPcm( SoundBufferPtr value );
         //! Calculates and returns a sound volume with a random modifier applied.
         f32                 volumeForSound( void ) const;
         //! Calculates and returns a sound pitch with a random modifier applied.
@@ -131,13 +131,13 @@ namespace sound {
     private:
 
         //! Parent sound fx.
-        SoundFx*            m_soundFx;
+        SoundFxWPtr			m_soundFx;
         //! Sound identifier.
         String              m_identifier;
         //! Asset associated with this sound.
         String              m_uri;
         //! The group this sound belongs to.
-        const SoundGroup*   m_group;
+        SoundGroupWPtr		m_group;
         //! Sound type.
         u32                 m_type;
         //! The flag indicating the loading behaviour for this sound.
@@ -157,10 +157,10 @@ namespace sound {
         //! Sound playback priority.
         u32                 m_priority;
         //! Decoded PCM data.
-        dcSoundBufferStrong m_pcm;
+        SoundBufferPtr		m_pcm;
     };
     
-} // namespace sound
+} // namespace Sound
     
 DC_END_DREEMCHEST
 

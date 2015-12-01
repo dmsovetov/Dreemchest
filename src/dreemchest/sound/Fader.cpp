@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#include    "Fader.h"
+#include "Fader.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** Fader::Fader
 Fader::Fader( f32 start, f32 end, f32 duration, FaderCallback callback ) : m_start( start ), m_end( end ), m_duration( duration ), m_time( 0.0f ), m_callback( callback )
@@ -56,6 +56,6 @@ f32 Fader::update( f32 dt )
     return result;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

@@ -27,11 +27,11 @@
 #ifndef __DC_SoundGroup_H__
 #define __DC_SoundGroup_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** struct SoundGroupInfo
     struct SoundGroupInfo {
@@ -42,7 +42,6 @@ namespace sound {
         f32        fadeTime;
     };
 
-    // ** class SoundGroup
     //! SoundGroup instance is a home for SoundChannel instances that are playing sounds.
     /*!
      Each sound playback resides inside the group. For example, short sound effects are put
@@ -52,8 +51,6 @@ namespace sound {
     class SoundGroup : public RefCounted {
     friend class SoundFx;
     public:
-
-        // ** enum Behaviour
         //! Behaviour of the sound group when it's full.
         enum Behaviour {
             Skip,                   //!< Don't play the sound.
@@ -68,17 +65,17 @@ namespace sound {
                                 /*!
                                     \param identifier The sound group identifier.
                                  */
-                                SoundGroup( const char *identifier );
+                                SoundGroup( CString identifier );
                                 ~SoundGroup( void );
 
         //! Returns true if the group has free playback slots.
         bool                    hasFreeSlots( void ) const;
 
         //! Returns a group identifier.
-        const char*             identifier( void ) const;
+        CString					identifier( void ) const;
 
         //! Sets a group identifier.
-        void                    setIdentifier( const char* value );
+        void                    setIdentifier( CString value );
 
         //! Sets the count of playback slots (maximum sounds that can be playing simultaneously).
         void                    setSlotCount( u32 value );
@@ -124,10 +121,10 @@ namespace sound {
          \param data Sound data.
          \return True if a group has a free slot, otherwise false.
          */
-        bool                    requestSlot( const SoundData* data );
+        bool                    requestSlot( SoundDataWPtr data );
 
         //! Pushes a sound channel to a group.
-        void                    addSound( const dcSoundChannelWeak& channel );
+        void                    addSound( const SoundChannelWPtr& channel );
 
         //! Returns an index of a lowest playback slot.
         s32                     findLowestSlot( u32 priority ) const;
@@ -150,13 +147,13 @@ namespace sound {
         u32                     m_threshold;
 
         //! Sound channel slots.
-        SoundChannelWeakArray   m_slots;
+        SoundChannelsWeak		m_slots;
         
         //! Fade out time.
         f32                     m_fadeTime;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

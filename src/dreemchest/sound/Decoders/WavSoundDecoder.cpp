@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "WavSoundDecoder.h"
-#include    "../SoundStream.h"
+#include "WavSoundDecoder.h"
+#include "../SoundStream.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** WavSoundDecoder::~WavSoundDecoder
 WavSoundDecoder::~WavSoundDecoder( void )
@@ -115,6 +115,6 @@ void WavSoundDecoder::seek( u32 pos )
     m_stream->setPosition( pos );
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

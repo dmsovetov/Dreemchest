@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "SoundDecoder.h"
-#include    "../SoundStream.h"
+#include "SoundDecoder.h"
+#include "../SoundStream.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** SoundDecoder::SoundDecoder
 SoundDecoder::SoundDecoder( void )
@@ -89,6 +89,6 @@ u32 SoundDecoder::size( void ) const
     return 0;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

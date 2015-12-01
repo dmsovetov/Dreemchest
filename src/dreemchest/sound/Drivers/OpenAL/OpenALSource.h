@@ -27,12 +27,12 @@
 #ifndef __DC_OpenALSound_H__
 #define __DC_OpenALSound_H__
 
-#include    "OpenAL.h"
-#include    "../SoundSource.h"
+#include "OpenAL.h"
+#include "../SoundSource.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class OpenALSource
     class OpenALSource : public SoundSource {
@@ -56,7 +56,7 @@ namespace sound {
         static u32              s_aliveCount;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

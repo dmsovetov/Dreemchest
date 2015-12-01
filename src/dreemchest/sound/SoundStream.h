@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class ISoundStream
     //! Input stream interface used to read sound files.
@@ -129,7 +129,7 @@ namespace sound {
         u32                         m_length;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

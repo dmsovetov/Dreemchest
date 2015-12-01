@@ -27,11 +27,11 @@
 #ifndef __DC_SoundEvent_H__
 #define __DC_SoundEvent_H__
 
-#include    "Sound.h"
+#include "Sound.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** struct SoundEventInfo
     struct SoundEventInfo {
@@ -41,14 +41,12 @@ namespace sound {
         Array<String>   sounds;
     };
 
-    // ** class SoundEvent
     //! SoundEvent class represents a set of sounds, that are played
     //! when we raise an event from a SoundFx instance.
-    class SoundEvent {
+    class SoundEvent : public RefCounted {
     friend class SoundFx;
     public:
 
-        // ** enum eEventType
         //! Event types.
         enum EventType {
             Random,         //!< Plays a random sound when event is triggered.
@@ -69,15 +67,15 @@ namespace sound {
                             /*!
                                 \param info The sound event info.
                             */
-                            SoundEvent( const char* identifier );
+                            SoundEvent( CString identifier );
                             ~SoundEvent( void );
 
         //! Returns a sound event identifier.
-        const char*         identifier( void ) const;
+        CString				identifier( void ) const;
         //! Sets a sound event identifier.
-        void                setIdentifier( const char *value );
+        void                setIdentifier( CString value );
         //! Returns a pointer to a sound data for event playback.
-        const char*         requestIdentifier( void ) const;
+        CString				requestIdentifier( void ) const;
         //! Returns a random sound index.
         u32                 generateSoundIndex( void ) const;
         //! Returns a serialized sound event data.
@@ -99,7 +97,7 @@ namespace sound {
         EventType           m_type;
     };
     
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 
