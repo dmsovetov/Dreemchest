@@ -29,6 +29,7 @@
 #include "Image.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Terrain.h"
 #include "Loaders.h"
 
 DC_BEGIN_DREEMCHEST
@@ -132,6 +133,13 @@ void Asset::unload( void )
 AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( path ), m_name( name )
 {
 }
+
+// ** AssetBundle::create
+AssetBundlePtr AssetBundle::create( const String& name )
+{
+	return AssetBundlePtr( DC_NEW AssetBundle( name, io::Path() ) );
+}
+
 
 // ** AssetBundle::createFromJson
 AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& json )
@@ -268,6 +276,19 @@ MeshPtr AssetBundle::addMesh( const String& uuid, const String& name )
 
 	return mesh;
 }
+
+// ** AssetBundle::addTerrain
+TerrainPtr AssetBundle::addTerrain( const String& uuid, const String& name, u32 size )
+{
+	log::msg( "Adding terrain '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
+
+	TerrainPtr terrain( DC_NEW Terrain( this, uuid, name, size ) );
+	m_assets[StringHash( uuid.c_str() )] = terrain;
+	m_assets[StringHash( name.c_str() )] = terrain;
+
+	return terrain;
+}
+
 
 // ** AssetBundle::addMaterial
 MaterialPtr AssetBundle::addMaterial( const String& uuid, const String& name )

@@ -71,6 +71,7 @@ namespace Scene {
 		class Image;
 		class Mesh;
 		class Material;
+		class Terrain;
 
 	class Transform;
 	class StaticMesh;
@@ -121,6 +122,7 @@ namespace Scene {
 	dcDeclarePtrs( Image )
 	dcDeclarePtrs( Mesh )
 	dcDeclarePtrs( Material )
+	dcDeclarePtrs( Terrain )
 
 	dcDeclarePtrs( AssetTexture )
 	dcDeclarePtrs( AssetMesh )
@@ -340,6 +342,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
+	#include "Assets/Terrain.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/UserInputSystems.h"

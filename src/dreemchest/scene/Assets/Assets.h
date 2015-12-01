@@ -62,8 +62,9 @@ namespace Scene {
 			  Image				= BIT( 0 )
 			, Material			= BIT( 1 )
 			, Mesh				= BIT( 2 )
-			, Scene				= BIT( 3 )
-			, TotalAssetTypes	= 3
+			, Terrain			= BIT( 3 )
+			, Scene				= BIT( 4 )
+			, TotalAssetTypes	= 5
 			, All				= ~0
 		};
 
@@ -167,11 +168,17 @@ namespace Scene {
 		//! Creates the new Material asset inside this bundle.
 		MaterialPtr				addMaterial( const String& uuid, const String& name );
 
+		//! Creates the new Terrain asset inside this bundle.
+		TerrainPtr				addTerrain( const String& uuid, const String& name, u32 size );
+
 		//! Creates the new Asset inside this bundle.
 		AssetPtr				addAsset( Asset::Type type, const String& uuid, const String& name );
 
 		//! Creates the new Mesh asset inside this bundle.
 		MeshPtr					addMesh( const String& uuid, const String& name );
+
+		//! Creates an AssetBundle instance and loads it from a JSON file.
+		static AssetBundlePtr	create( const String& name );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	createFromFile( const String& name, const io::Path& path, const String& fileName );
