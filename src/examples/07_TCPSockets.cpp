@@ -103,7 +103,7 @@ public:
 	Application* m_application;
 };
 
-thread::Thread* serverThread = NULL;
+thread::ThreadPtr serverThread;
 
 // Application delegate is used to handle an events raised by application instance.
 class Server : public ApplicationDelegate {

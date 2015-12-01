@@ -38,7 +38,7 @@ using namespace Platform;
 // Open a net namespace.
 using namespace net;
 
-thread::Thread* serverThread = NULL;
+thread::ThreadPtr serverThread;
 
 // Application delegate is used to handle an events raised by application instance.
 class NetworkHandlers : public ApplicationDelegate {
