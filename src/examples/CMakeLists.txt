@@ -29,3 +29,11 @@ if (DC_QT_ENABLED)
 	add_executable(10_MvvmQt 10_MvvmQt.cpp)
 	target_link_libraries(10_MvvmQt Dreemchest)
 endif (DC_QT_ENABLED)
+
+add_executable(11_Particles 11_Particles.cpp)
+target_link_libraries(11_Particles Dreemchest)
+
+if (DC_SOUND_ENABLED)
+	add_executable(12_Sound 12_Sound.cpp)
+	target_link_libraries(12_Sound Dreemchest)
+endif (DC_SOUND_ENABLED)
