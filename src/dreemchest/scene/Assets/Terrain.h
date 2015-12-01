@@ -59,11 +59,17 @@ namespace Scene {
 		//! Returns terrain height at specified vertex.
 		u16						height( u32 x, u32 z ) const;
 
+		//! Sets the terrain heightmap.
+		void					setHeightmap( const Array<u16>& value );
+
 		//! Returns terrain chunk vertex buffer.
 		Array<Vertex>			chunkVertexBuffer( u32 x, u32 z ) const;
 
 		//! Returns terrain chunk index buffer.
 		Array<u16>				chunkIndexBuffer( void ) const;
+
+		//! Creates the chunk mesh.
+		MeshPtr					createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const;
 
 	private:
 

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Terrain.h"
+#include "Mesh.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -64,6 +65,13 @@ u16 Terrain::height( u32 x, u32 z ) const
 	return m_heightmap[z * (m_size + 1) + x];
 }
 
+// ** Terrain::setHeightmap
+void Terrain::setHeightmap( const Array<u16>& value )
+{
+	DC_BREAK_IF( value.size() != m_heightmap.size() );
+	m_heightmap = value;
+}
+
 // ** Terrain::chunkVertexBuffer
 Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 {
@@ -84,7 +92,7 @@ Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 	for( s32 i = 0; i <= kChunkSize; i++ ) {
 		for( s32 j = 0; j <= kChunkSize; j++ ) {
 			Vertex& vertex = vertices[i * stride + j];
-			u16		height = this->height( x * kChunkSize + j, z * kChunkSize + i );
+			f32		height = this->height( x * kChunkSize + j, z * kChunkSize + i ) / 65535.0f;
 
 			vertex.position = Vec3( ( f32 )j, ( f32 )height, ( f32 )i );
 			vertex.normal   = Vec3( 0.0f, 1.0f, 0.0f );
@@ -109,8 +117,8 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 	indices.resize( stride * stride * 6 );
 
 	// Fill index buffer
-	for( s32 i = 0; i <= kChunkSize; i++ ) {
-		for( s32 j = 0; j <= kChunkSize; j++ ) {
+	for( s32 i = 0; i < kChunkSize; i++ ) {
+		for( s32 j = 0; j < kChunkSize; j++ ) {
 			indices[idx + 0] = (i    ) * stride + (j    );
 			indices[idx + 1] = (i + 1) * stride + (j    );
 			indices[idx + 2] = (i    ) * stride + (j + 1);
@@ -124,6 +132,46 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 	}
 
 	return indices;
+}
+
+// ** Terrain::createChunkMesh
+MeshPtr Terrain::createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const
+{
+	// Create an empty mesh
+	MeshPtr mesh = Mesh::create();
+
+	// Get the chunk buffers
+	Array<Vertex> vertices = chunkVertexBuffer( x, z );
+	Array<u16>	  indices  = chunkIndexBuffer();
+
+	// Construct mesh render data
+	AssetMesh* data = DC_NEW AssetMesh;
+	Bounds bounds;
+
+	Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0" );
+	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertices.size() );
+	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indices.size() );
+
+	Vertex* locked = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
+	memcpy( locked, &vertices[0], sizeof( Vertex ) * vertices.size() );
+
+	for( u32 i = 0; i < vertices.size(); i++ ) {
+		bounds += vertices[i].position;
+	}
+
+	vertexBuffer->unlock();
+
+	u16* lockedIndices = indexBuffer->lock();
+	memcpy( lockedIndices, &indices[0], sizeof( u16 ) * indices.size() );
+	indexBuffer->unlock();
+
+	data->vertexBuffers.push_back( vertexBuffer );
+	data->indexBuffers.push_back( indexBuffer );
+
+	mesh->setData( data );
+	mesh->setBounds( bounds );
+
+	return mesh;
 }
 
 } // namespace Scene

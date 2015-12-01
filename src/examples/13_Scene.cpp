@@ -47,7 +47,7 @@ public:
     WindowHandler( HalWPtr hal, SceneWPtr scene )
 		: m_hal( hal ), m_scene( scene )
 	{
-		RvmPtr rvm( DC_NEW Rvm( hal, 1024 ) );
+		RvmPtr rvm( DC_NEW Rvm( hal, 8000 ) );
 		ShaderCachePtr shaders( DC_NEW ShaderCache( "D:\\BFG9000\\externals\\src\\dreemchest\\src\\dreemchest\\scene\\Rendering\\Shaders", m_hal ) );
 		Renderer2DPtr renderer2d = Renderer2D::create( hal, 1024 );
 
@@ -86,6 +86,7 @@ class ParticleSystems : public ApplicationDelegate {
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
 		::Scene::log::setStandardHandler();
+		::Renderer::log::setStandardHandler();
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
@@ -102,27 +103,43 @@ class ParticleSystems : public ApplicationDelegate {
 
 		// Create an empty asset bundle
 		m_assets = AssetBundle::create( "assets" );
+
+		m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
+
 		TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
 
-/*		for( s32 i = 0; i < terrain->chunkCount(); i++ ) {
+		for( s32 i = 0; i < terrain->chunkCount(); i++ ) {
 			for( s32 j = 0; j < terrain->chunkCount(); j++ ) {
-				Array<Terrain::Vertex> vertices = terrain->chunkVertexBuffer( j, i );
-				Array<u16>			   indices  = terrain->chunkIndexBuffer();
+				SceneObjectPtr chunk = m_scene->createSceneObject();
+				MeshPtr		   mesh  = terrain->createChunkMesh( m_hal, j, i );
+
+				chunk->attach<StaticMesh>( mesh );
+				chunk->attach<::Scene::Transform>( j * Terrain::kChunkSize, -4, i * Terrain::kChunkSize, ::Scene::Transform::WPtr() );
 			}
-		}*/
+		}
 
 		m_scene->addSystem<AssetSystem>( m_hal );
 		m_scene->addSystem<AffineTransformSystem>();
 		m_scene->addSystem<ParticlesSystem>();
+		m_scene->addSystem<MoveInDirectionSystem>();
+		m_scene->addSystem<WorldSpaceBoundingBoxSystem>();
+		m_scene->addSystem<FrustumCullingSystem>( m_scene->cameras() );
 		
 		m_scene->addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
+		m_scene->addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 		m_scene->addRenderingSystem<BoundingVolumesRenderer>();
+		m_scene->addRenderingSystem<ForwardLightingRenderer>();
+
+		DirectionPtr wasdDirection = DC_NEW DirectionFromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 
 		SceneObjectPtr camera = m_scene->createSceneObject();
 		camera->attach<Camera>( Camera::Perspective, WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
 		camera->attach<RenderParticles>();
+	//	camera->attach<RenderForwardLit>();
+		camera->attach<RenderWireframe>();
 		camera->attach<::Scene::Transform>();
-		camera->attach<RenderBoundingVolumes>();
+		camera->attach<MoveInDirection>( MoveInDirection::XZ, 60.0f, wasdDirection );
+	//	camera->attach<RenderBoundingVolumes>();
 
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
@@ -133,6 +150,7 @@ class ParticleSystems : public ApplicationDelegate {
 	Renderer::HalPtr	m_hal;
 	ScenePtr			m_scene;
 	AssetBundlePtr		m_assets;
+	AssetBundlePtr		m_meshes;
 };
 
 // Now declare an application entry point with Particles application delegate.

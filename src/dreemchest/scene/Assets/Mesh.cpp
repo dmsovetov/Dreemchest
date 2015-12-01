@@ -47,6 +47,12 @@ void Mesh::setBounds( const Bounds& value )
 	m_bounds = value;
 }
 
+// ** Mesh::create
+MeshPtr Mesh::create( void )
+{
+	return MeshPtr( DC_NEW Mesh( AssetBundle::create("").get(), "", "" ) );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

@@ -46,6 +46,9 @@ namespace Scene {
 		//! Sets mesh bounds.
 		void					setBounds( const Bounds& value );
 
+		//! Creates an empty mesh instance.
+		static MeshPtr			create( void );
+
 	private:
 
 								//! Constructs Mesh instance.
