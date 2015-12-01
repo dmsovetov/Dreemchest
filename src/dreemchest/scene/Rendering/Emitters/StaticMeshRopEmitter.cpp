@@ -67,7 +67,10 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 		// Get the material for chunk
 		const MaterialPtr& material = staticMesh.material( i );
 
-		if( material.valid() && !rvm.willRender( material->renderingMode() ) ) {
+		// Get the rendering mode from material or use opaque by default
+		::Scene::RenderingMode renderingMode = material.valid() ? material->renderingMode() : RenderOpaque;
+
+		if( !rvm.willRender( renderingMode ) ) {
 			continue;
 		}
 
