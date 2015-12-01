@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 # Include CMake globals
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../CMake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../CMake")
 include(../CMake/Globals.txt)
 
 # Declare the project
@@ -13,6 +13,7 @@ option(DC_BUILD_EXAMPLES "Build Dreemchest examples" ON)
 option(DC_BUILD_TESTS "Build Dreemchest tests" OFF)
 option(DC_OPENGL_ENABLED "Build with OpenGL support" ON)
 option(DC_BOX2D_ENABLED "Build with Box2D support" OFF)
+option(DC_SOUND_ENABLED "Build with sound support" OFF)
 set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt5")
 set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Qt4" "Qt5")
 
