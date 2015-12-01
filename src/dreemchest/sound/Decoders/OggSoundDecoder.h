@@ -27,14 +27,14 @@
 #ifndef __DC_OggSoundDecoder_H__
 #define __DC_OggSoundDecoder_H__
 
-#include    "SoundDecoder.h"
+#include "SoundDecoder.h"
 
-#include	<vorbis/codec.h>
-#include	<vorbis/vorbisfile.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
     // ** class cOggSoundDecoder
     class OggSoundDecoder : public SoundDecoder {
@@ -45,7 +45,7 @@ namespace sound {
         virtual                 ~OggSoundDecoder( void );
 
         // ** SoundDecoder
-        virtual bool            open( ISoundStream* stream );
+        virtual bool            open( ISoundStreamPtr stream );
         virtual void            close( void );
         virtual u32             read( u8 *buffer, u32 size );
         virtual void            seek( u32 pos );
@@ -65,7 +65,7 @@ namespace sound {
         vorbis_info*            m_vorbisInfo;
     };
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST
 

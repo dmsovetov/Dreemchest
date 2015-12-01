@@ -63,10 +63,11 @@ endif (DC_OPENGL_ENABLED)
 # Sound module sources
 if (DC_SOUND_ENABLED)
 	find_package(OpenAL)
+	find_package(OggVorbis)
 	
 	add_files(Sound SOUND_SRCS)
 	add_files(Sound/Drivers SOUND_DRIVERS_SRCS)
-
+	
 	if (OPENAL_FOUND)
 		add_definitions(-DDC_HAVE_OPENAL)
 		add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
@@ -79,9 +80,11 @@ if (DC_SOUND_ENABLED)
 		Sound/Decoders/WavSoundDecoder.cpp
 		Sound/Decoders/WavSoundDecoder.h)
 
-	if (DC_VORBIS_ENABLED)
+	if (OGGVORBIS_FOUND)
+		add_definitions(-DDC_HAVE_VORBIS)
 		set(SOUND_DECODERS_SRCS ${SOUND_DECODERS_SRCS} Sound/Decoders/OggSoundDecoder.cpp Sound/Decoders/OggSoundDecoder.h)
-	endif (DC_VORBIS_ENABLED)
+		include_directories(${OGGVORBIS_INCLUDE_DIR})
+	endif (OGGVORBIS_FOUND)
 
 	source_group("Code\\Sound\\Decoders" FILES ${SOUND_DECODERS_SRCS})
 
@@ -103,6 +106,10 @@ endif (JSONCPP_LIBRARY)
 if (OPENAL_LIBRARY)
 	target_link_libraries(Dreemchest ${OPENAL_LIBRARY})
 endif (OPENAL_LIBRARY)
+
+if (OGGVORBIS_FOUND)
+	target_link_libraries(Dreemchest ${OGGVORBIS_LIBRARIES})
+endif (OGGVORBIS_FOUND)
 
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)

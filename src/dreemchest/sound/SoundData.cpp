@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Sound {
 
 // ** SoundData::SoundData
-SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group ) : m_soundFx( sfx ), m_uri( uri ), m_group( group ), m_pcm( NULL )
+SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group ) : m_soundFx( sfx ), m_uri( uri ), m_group( group ), m_pcm( NULL ), m_format( SoundFormatUnknown )
 {
     m_identifier        = identifier;
     m_type              = 0;
@@ -65,6 +65,18 @@ void SoundData::setIdentifier( CString value )
     DC_BREAK_IF( value && (strlen( value ) == 0) );
     
     m_identifier = value;
+}
+
+// ** SoundData::format
+SoundContainerFormat SoundData::format( void ) const
+{
+    return m_format;
+}
+
+// ** SoundData::setFormat
+void SoundData::setFormat( SoundContainerFormat value )
+{
+    m_format = value;
 }
 
 // ** SoundData::uri

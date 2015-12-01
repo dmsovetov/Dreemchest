@@ -53,12 +53,6 @@ namespace Sound {
 
     public:
 
-                                //! Constructs a new SoundFx object.
-                                /*!
-                                 \param hal Used hardware abstraction layer.
-                                 \param streamOpener A stream opener interface used to load sounds.
-                                 */
-                                SoundFx( SoundHal hal = Default, IStreamOpener* streamOpener = NULL );
         virtual                 ~SoundFx( void );
 
         //! Starts a playback of a single sound.
@@ -126,8 +120,8 @@ namespace Sound {
             If the sound with a same name is found, the call is ignored.
 
             \param identifier Sound identifier.
-            \param asset Asset associated with this sound.
-            \param info Sound initial parameters.
+            \param uri Asset associated with this sound.
+            \param group Sound group.
             \return created SoundData instance, otherwise NULL.
         */
         SoundDataWPtr           createSound( CString identifier, CString uri, SoundGroupWPtr group = SoundGroupWPtr() );
@@ -173,7 +167,17 @@ namespace Sound {
         //! Returns a reference to a sound container.
         const Sounds&           sounds( void ) const;
 
+		//! Creates the SoundFx instance.
+		static SoundFxPtr		create( SoundHal hal = Default, IStreamOpenerPtr streamOpener = IStreamOpenerPtr() );
+
     private:
+
+                                //! Constructs a new SoundFx object.
+                                /*!
+                                 \param hal Used hardware abstraction layer.
+                                 \param streamOpener A stream opener interface used to load sounds.
+                                 */
+                                SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener );
 
         //! Creates a sound playback source for a given sound data.
         /*!
@@ -207,7 +211,7 @@ namespace Sound {
         SoundEnginePtr          m_hal;
 
         //! Stream opener interface.
-        IStreamOpener*          m_streamOpener;
+        IStreamOpenerPtr		m_streamOpener;
 
         //! Array of sound channels the are now playing.
         SoundChannels			m_channels;

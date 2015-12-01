@@ -73,6 +73,9 @@ namespace io {
         //! Returns a data pointer to current stream position.
         const u8*               current( void ) const;
 
+		//! Constructs the copy of a byte array.
+		ByteBufferPtr			copy( void ) const;
+
         //! Trims a specified amount of bytes from the beginning of a stream.
         void                    trimFromLeft( s32 size );
 

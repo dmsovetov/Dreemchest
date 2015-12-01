@@ -50,7 +50,7 @@ IMPLEMENT_LOGGER( log )
 // ------------------------------------------------------ SoundFx ------------------------------------------------------ //
 
 // ** SoundFx::SoundFx
-SoundFx::SoundFx( SoundHal hal, IStreamOpener* streamOpener ) : m_hal( NULL ), m_streamOpener( streamOpener ? streamOpener : DC_NEW StandardStreamOpener )
+SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener ) : m_hal( NULL ), m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
 {
     switch( hal ) {
     case None:      m_hal = NULL;           break;
@@ -67,7 +67,12 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpener* streamOpener ) : m_hal( NULL ), m
 SoundFx::~SoundFx( void )
 {
     reset();
-    delete m_streamOpener;
+}
+
+// ** SoundFx::create
+SoundFxPtr SoundFx::create( SoundHal hal, IStreamOpenerPtr streamOpener )
+{
+	return SoundFxPtr( DC_NEW SoundFx( hal, streamOpener ) );
 }
 
 // ** SoundFx::createGroup
@@ -289,26 +294,26 @@ SoundBufferPtr SoundFx::createBuffer( SoundDataWPtr data )
 SoundDecoderPtr SoundFx::createDecoder( SoundDataWPtr data )
 {
     SoundDecoderPtr decoder;
-    ISoundStream*   stream = m_streamOpener->open( data->uri() );
+    ISoundStreamPtr stream = m_streamOpener->open( data->uri() );
 
-    if( !stream ) {
+    if( !stream.valid() ) {
         log::error( "SoundFx::createDecoder : failed to open sound stream %s\n", data->uri() );
-        return NULL;
+        return SoundDecoderPtr();
     }
 
     switch( data->loading() ) {
     case SoundData::Decode:     if( !data->pcm().valid() ) {
-                                    decoder = m_hal->createSoundDecoder( stream, SoundFormatOgg );
+                                    decoder = m_hal->createSoundDecoder( stream, data->format() );
                                 } else {
-                                    stream->release();
+                                //    stream->release();
                                 }
                                 break;
 
-    case SoundData::LoadToRam:  decoder = m_hal->createSoundDecoder( stream->loadToRam(), SoundFormatOgg );
-                                stream->release();
+    case SoundData::LoadToRam:  decoder = m_hal->createSoundDecoder( stream->loadToRam(), data->format() );
+                                //stream->release();
                                 break;
 
-    case SoundData::Stream:     decoder = m_hal->createSoundDecoder( stream, SoundFormatOgg );
+    case SoundData::Stream:     decoder = m_hal->createSoundDecoder( stream, data->format() );
                                 break;
     }
 

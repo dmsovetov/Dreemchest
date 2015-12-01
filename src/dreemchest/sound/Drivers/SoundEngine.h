@@ -51,15 +51,15 @@ namespace Sound {
         virtual SoundBufferPtr	createBuffer( SoundDecoderPtr decoder, u32 chunks );
 
         //! Creates a sound decoder with a given input stream and file format.
-        SoundDecoderPtr         createSoundDecoder( ISoundStream* stream, SoundFormat format = SoundFormatUnknown );
+        SoundDecoderPtr         createSoundDecoder( ISoundStreamPtr stream, SoundContainerFormat format = SoundFormatUnknown );
 
     private:
 
         //! Creates a sound decoder instance for a given format.
-        SoundDecoderPtr			createSoundDecoder( SoundFormat format ) const;
+        SoundDecoderPtr			createSoundDecoder( SoundContainerFormat format ) const;
 
         //! Creates a sound decoder with a given input stream and file format.
-        SoundDecoderPtr			createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format );
+        SoundDecoderPtr			createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format );
     };
     
 } // namespace Sound

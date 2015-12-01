@@ -103,6 +103,12 @@ s32 ByteBuffer::length( void ) const
     return ( u64 )m_buffer.size();
 }
 
+// ** ByteBuffer::copy
+ByteBufferPtr ByteBuffer::copy( void ) const
+{
+	return ByteBuffer::createFromArray( m_buffer );
+}
+
 // ** ByteBuffer::trimFromLeft
 void ByteBuffer::trimFromLeft( s32 size )
 {

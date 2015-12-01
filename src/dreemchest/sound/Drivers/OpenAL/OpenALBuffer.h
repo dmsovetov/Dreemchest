@@ -42,9 +42,9 @@ namespace Sound {
                                 ~OpenALBuffer( void );
 
         // ** SoundBuffer
-        virtual void            attachToSource( SoundSource* target );
-        virtual void            detachFromSource( SoundSource* target );
-        virtual bool            updateStream( SoundSource* target, bool isLooped );
+        virtual void            attachToSource( SoundSourceWPtr target );
+        virtual void            detachFromSource( SoundSourceWPtr target );
+        virtual bool            updateStream( SoundSourceWPtr target, bool isLooped );
 
     private:
 
@@ -52,7 +52,7 @@ namespace Sound {
 
     private:
 
-        std::vector<ALuint>     m_buffers;
+        Array<ALuint>			m_buffers;
         u32                     m_pcmSize;
         u8*                     m_pcm;
         ALuint                  m_format;

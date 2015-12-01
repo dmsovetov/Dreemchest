@@ -41,7 +41,7 @@ namespace Sound {
         virtual                     ~SoundDecoder( void );
 
         //! Initializes sound decoder with a given input stream.
-        virtual bool                open( ISoundStream* stream );
+        virtual bool                open( ISoundStreamPtr stream );
 
         //! Closes sound decoder and releases an input stream.
         virtual void                close( void );
@@ -69,7 +69,7 @@ namespace Sound {
     protected:
 
         //! Attached sound stream.
-        ISoundStream*               m_stream;
+        ISoundStreamPtr				m_stream;
 
         //! Sample rate.
         u32                         m_rate;

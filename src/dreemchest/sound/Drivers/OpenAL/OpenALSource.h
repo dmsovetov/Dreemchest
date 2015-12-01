@@ -44,7 +44,7 @@ namespace Sound {
 
         // ** SoundSource
         virtual void            update( void );
-        virtual void            setBuffer( SoundBuffer* value );
+        virtual void            setBuffer( SoundBufferPtr value );
         virtual SourceState     state( void ) const;
         virtual void            setState( SourceState value );
         virtual void            setVolume( f32 value );

@@ -37,7 +37,7 @@ WavSoundDecoder::~WavSoundDecoder( void )
 }
 
 // ** WavSoundDecoder::Open
-bool WavSoundDecoder::open( ISoundStream* stream )
+bool WavSoundDecoder::open( ISoundStreamPtr stream )
 {
     SoundDecoder::open( stream );
 

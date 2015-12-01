@@ -42,8 +42,8 @@ namespace Sound {
         virtual                 ~WavSoundDecoder( void );
 
         // ** SoundDecoder
-        virtual bool            open( ISoundStream* stream );
-        virtual u32            read( u8 *buffer, u32 size );
+        virtual bool            open( ISoundStreamPtr stream );
+        virtual u32             read( u8 *buffer, u32 size );
         virtual void            seek( u32 pos );
         virtual u32             size( void ) const;
 

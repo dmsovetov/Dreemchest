@@ -65,7 +65,7 @@ OpenALSource::~OpenALSource( void )
 }
 
 // ** OpenALSource::setBuffer
-void OpenALSource::setBuffer( SoundBuffer *value )
+void OpenALSource::setBuffer( SoundBufferPtr value )
 {
     if( m_buffer != NULL ) {
         setState( Stopped );
@@ -108,7 +108,7 @@ void OpenALSource::setState( SourceState value )
 
     OpenAL::dumpErrors( "OpenALSource::setState" );
     if( state() != value ) {
-        printf( "OpenALSource::setState : failed to change source state\n" );
+        log::warn( "OpenALSource::setState : failed to change source state\n" );
     }
 }
 
@@ -133,6 +133,8 @@ void OpenALSource::setPitch( f32 value )
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {
+	DC_BREAK_IF( !m_buffer.valid() );
+
     // ** Ensure we have a valid source state for a streamed sources
     if( m_state != state() && m_buffer->chunks() > 1 ) {
         setState( m_state );

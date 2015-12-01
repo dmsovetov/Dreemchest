@@ -33,12 +33,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace Sound {
 
-    // ** class ISoundStream
     //! Input stream interface used to read sound files.
-    class ISoundStream {
+    class ISoundStream : public RefCounted {
     public:
 
-        // ** SeekOrigin
         //! Seek file origin.
         enum SeekOrigin {
             SeekSet,    //!< Seek from the begining of a stream.
@@ -50,9 +48,6 @@ namespace Sound {
 
         //! Returns a length of input stream in bytes.
         virtual u32                 length( void ) const                                        = 0;
-
-        //! Releases this input stream.
-        virtual void                release( void )                                             = 0;
 
         //! Reads data from input stream to a buffer.
         /*!
@@ -73,12 +68,11 @@ namespace Sound {
         virtual u32                 position( void ) const                                      = 0;
 
         //! Reads all stream content to memory and returns a memory input stream.
-        virtual ISoundStream*       loadToRam( void ) const                                     = 0;
+        virtual ISoundStreamPtr		loadToRam( void ) const                                     = 0;
     };
 
-    // ** class IStreamOpener
     //! Interface used to open input streams.
-    class IStreamOpener {
+    class IStreamOpener : public RefCounted {
     public:
 
         virtual                 ~IStreamOpener( void ) {}
@@ -88,46 +82,58 @@ namespace Sound {
          \param uri Stream URI.
          \return ISoundStream object.
          */
-        virtual ISoundStream*   open( const char* uri ) = 0;
+        virtual ISoundStreamPtr	open( CString uri ) = 0;
     };
 
-    // ** class StandardStreamOpener
     //! Standard file opener.
     class StandardStreamOpener : public IStreamOpener {
     public:
-        
-        
+
         // ** IStreamOpener
-        virtual ISoundStream*   open( const char* uri );
+        virtual ISoundStreamPtr	open( CString uri );
     };
 
-    // ** class StandardSoundStream
     //! Standard input stream.
     class StandardSoundStream : public ISoundStream {
     public:
 
-        virtual                     ~StandardSoundStream( void );
-
         // ** ISoundStream
         virtual u32                 length( void ) const;
-        virtual void                release( void );
         virtual u32                 read( void* buffer, u32 size );
         virtual void                setPosition( u32 offset, SeekOrigin origin = SeekSet );
         virtual u32                 position( void ) const;
-        virtual ISoundStream*       loadToRam( void ) const;
+        virtual ISoundStreamPtr		loadToRam( void ) const;
 
         // ** StandardSoundStream
-        static ISoundStream*        open( const char* uri );
+        static ISoundStreamPtr		open( CString uri );
 
     private:
 
-                                    StandardSoundStream( FILE* file );
+                                    StandardSoundStream( io::StreamPtr stream );
 
     private:
 
-        FILE*                       m_file;
-        u32                         m_length;
+        io::StreamPtr				m_stream;	//!< Input stream.
     };
+
+	//! Memory input stream.
+	class MemorySoundStream : public ISoundStream {
+    public:
+
+									MemorySoundStream( io::ByteBufferPtr data );
+        virtual                     ~MemorySoundStream( void );
+
+        // ** ISoundStream
+        virtual u32                 length( void ) const;
+        virtual u32                 read( void* buffer, u32 size );
+        virtual void                setPosition( u32 offset, SeekOrigin origin = SeekSet );
+        virtual u32                 position( void ) const;
+        virtual ISoundStreamPtr		loadToRam( void ) const;
+
+    private:
+
+        io::ByteBufferPtr			m_data;		//!< Data buffer.
+	};
 
 } // namespace Sound
 

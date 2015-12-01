@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "OggSoundDecoder.h"
-#include    "../SoundStream.h"
+#include "OggSoundDecoder.h"
+#include "../SoundStream.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace sound {
+namespace Sound {
 
 // ** OggSoundDecoder::~OggSoundDecoder
 OggSoundDecoder::~OggSoundDecoder( void )
@@ -38,7 +38,7 @@ OggSoundDecoder::~OggSoundDecoder( void )
 }
 
 // ** OggSoundDecoder::open
-bool OggSoundDecoder::open( ISoundStream* stream )
+bool OggSoundDecoder::open( ISoundStreamPtr stream )
 {
     ov_callbacks    cb;
 
@@ -51,14 +51,14 @@ bool OggSoundDecoder::open( ISoundStream* stream )
 
     SoundDecoder::open( stream );
 
-    if( ov_open_callbacks( m_stream, m_vorbisFile, NULL, -1, cb ) < 0 ) {
+    if( ov_open_callbacks( m_stream.get(), m_vorbisFile, NULL, -1, cb ) < 0 ) {
         log::error( "OggSoundDecoder::Open : ov_open_callbacks failed\n" );
         return false;
     }
 
-    m_vorbisComment    = ov_comment( m_vorbisFile, -1 );
+    m_vorbisComment = ov_comment( m_vorbisFile, -1 );
     m_vorbisInfo    = ov_info( m_vorbisFile, -1 );
-    m_rate            = m_vorbisInfo->rate;
+    m_rate          = m_vorbisInfo->rate;
     m_format        = ( m_vorbisInfo->channels == 1 ) ? SoundSampleMono16 : SoundSampleStereo16;
 
     return true;
@@ -141,6 +141,6 @@ s32 OggSoundDecoder::closeOgg( void *source ) {
     return 0;
 }
 
-} // namespace sound
+} // namespace Sound
 
 DC_END_DREEMCHEST

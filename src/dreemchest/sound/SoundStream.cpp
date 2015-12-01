@@ -33,80 +33,112 @@ namespace Sound {
 // ---------------------------------------- StandardStreamOpener ---------------------------------------- //
 
 // ** StandardStreamOpener::open
-ISoundStream* StandardStreamOpener::open( const char* uri )
+ISoundStreamPtr StandardStreamOpener::open( CString uri )
 {
     return StandardSoundStream::open( uri );
 }
 
-// ---------------------------------------- StandardSoundStream ----------------------------------------- //
+// ------------------------------------------ StandardSoundStream ------------------------------------------- //
 
 // ** StandardSoundStream::StandardSoundStream
-StandardSoundStream::StandardSoundStream( FILE* file ) : m_file( file )
+StandardSoundStream::StandardSoundStream( io::StreamPtr stream ) : m_stream( stream )
 {
-    u32 savedPosition = position();
-    setPosition( 0, SeekEnd );
-    m_length = position();
-    setPosition( savedPosition, SeekSet );
-}
 
-StandardSoundStream::~StandardSoundStream( void )
-{
-    fclose( m_file );
 }
 
 // ** StandardSoundStream::open
-ISoundStream* StandardSoundStream::open( const char* uri )
+ISoundStreamPtr StandardSoundStream::open( CString uri )
 {
-    FILE* file = fopen( uri, "rb" );
-    return file ? DC_NEW StandardSoundStream( file ) : NULL;
-}
-
-// ** StandardSoundStream::release
-void StandardSoundStream::release( void )
-{
-    delete this;
+	io::DiskFileSystem diskFileSystem;
+    io::StreamPtr	   stream = diskFileSystem.openFile( uri );
+    return stream.valid() ? DC_NEW StandardSoundStream( stream ) : NULL;
 }
 
 // ** StandardSoundStream::length
 u32 StandardSoundStream::length( void ) const
 {
-    return m_length;
+    return m_stream->length();
 }
 
 // ** StandardSoundStream::loadToRam
-ISoundStream* StandardSoundStream::loadToRam( void ) const
+ISoundStreamPtr StandardSoundStream::loadToRam( void ) const
 {
-    DC_NOT_IMPLEMENTED;
-    return NULL;
+    AutoPtr<u8> data = DC_NEW u8[m_stream->length()];
+	m_stream->read( data.get(), m_stream->length() );
+	return DC_NEW MemorySoundStream( io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
 }
 
 // ** StandardSoundStream::read
 u32 StandardSoundStream::read( void* buffer, u32 size )
 {
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
-
-    return fread( buffer, 1, size, m_file );
+    return m_stream->read( buffer, size );
 }
 
 // ** StandardSoundStream::setPosition
 void StandardSoundStream::setPosition( u32 offset, SeekOrigin origin )
 {
-    u32 result = 0;
-
     switch( origin ) {
-    case SeekSet: result = fseek( m_file, offset, SEEK_SET ); break;
-    case SeekCur: result = fseek( m_file, offset, SEEK_CUR ); break;
-    case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
+	case SeekSet: m_stream->setPosition( offset, io::SeekSet ); break;
+    case SeekCur: m_stream->setPosition( offset, io::SeekCur ); break;
+    case SeekEnd: m_stream->setPosition( offset, io::SeekEnd ); break;
     }
-    
-    DC_BREAK_IF( result != 0 );
 }
 
 // ** StandardSoundStream::position
 u32 StandardSoundStream::position( void ) const
 {
-    return ftell( m_file );
+    return m_stream->position();
+}
+
+// ---------------------------------------- MemorySoundStream ----------------------------------------- //
+
+// ** MemorySoundStream::MemorySoundStream
+MemorySoundStream::MemorySoundStream( io::ByteBufferPtr data ) : m_data( data )
+{
+
+}
+
+MemorySoundStream::~MemorySoundStream( void )
+{
+
+}
+
+// ** MemorySoundStream::length
+u32 MemorySoundStream::length( void ) const
+{
+    return m_data->length();
+}
+
+// ** MemorySoundStream::loadToRam
+ISoundStreamPtr MemorySoundStream::loadToRam( void ) const
+{
+    return ISoundStreamPtr( DC_NEW MemorySoundStream( m_data->copy() ) );
+}
+
+// ** MemorySoundStream::read
+u32 MemorySoundStream::read( void* buffer, u32 size )
+{
+	if( m_data->bytesAvailable() < size ) {
+		return 0;
+	}
+
+    return m_data->read( buffer, size );
+}
+
+// ** MemorySoundStream::setPosition
+void MemorySoundStream::setPosition( u32 offset, SeekOrigin origin )
+{
+    switch( origin ) {
+	case SeekSet: m_data->setPosition( offset, io::SeekSet ); break;
+    case SeekCur: m_data->setPosition( offset, io::SeekCur ); break;
+    case SeekEnd: m_data->setPosition( offset, io::SeekEnd ); break;
+    }
+}
+
+// ** MemorySoundStream::position
+u32 MemorySoundStream::position( void ) const
+{
+    return m_data->position();
 }
 
 } // namespace Sound

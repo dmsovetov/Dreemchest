@@ -62,7 +62,7 @@ SoundBufferPtr SoundEngine::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 }
 
 // ** SoundEngine::createSoundDecoder
-SoundDecoderPtr SoundEngine::createSoundDecoder( SoundFormat format ) const
+SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) const
 {
     switch( format ) {
     case SoundFormatUnknown:    log::warn( "SoundEngine::createSoundDecoder : unknown sound format\n" );
@@ -70,28 +70,28 @@ SoundDecoderPtr SoundEngine::createSoundDecoder( SoundFormat format ) const
 
     case SoundFormatWav:        return DC_NEW WavSoundDecoder;
     case SoundFormatMp3:
-                            #ifdef DC_HAVE_MP3
-                                return DC_NEW Mp3SoundDecoder;
-                            #else
-                                log::warn( "SoundEngine::createSoundDecoder : MP3 sound decoder is not supported\n" );
-                            #endif
-                            break;
+								#ifdef DC_HAVE_MP3
+									return DC_NEW Mp3SoundDecoder;
+								#else
+									log::warn( "SoundEngine::createSoundDecoder : MP3 sound decoder is not supported\n" );
+								#endif
+								break;
     case SoundFormatOgg:
-                            #ifdef DC_HAVE_VORBIS
-                                return DC_NEW OggSoundDecoder;
-                            #else
-                                log::warn( "SoundEngine::createSoundDecoder : Vorbis sound decoder is not supported\n" );
-                            #endif
-                            break;
+								#ifdef DC_HAVE_VORBIS
+									return DC_NEW OggSoundDecoder;
+								#else
+									log::warn( "SoundEngine::createSoundDecoder : Vorbis sound decoder is not supported\n" );
+								#endif
+								break;
     }
 
     return NULL;
 }
 
 // ** SoundEngine::createSoundDecoderWithFormat
-SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream, SoundFormat format )
+SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format )
 {
-    DC_BREAK_IF( stream == NULL );
+    DC_BREAK_IF( !stream.valid() );
 
     SoundDecoderPtr soundDecoder = createSoundDecoder( format );
 
@@ -109,7 +109,7 @@ SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStream* stream,
 }
 
 // ** SoundEngine::createSoundDecoder
-SoundDecoderPtr SoundEngine::createSoundDecoder( ISoundStream* stream, SoundFormat format )
+SoundDecoderPtr SoundEngine::createSoundDecoder( ISoundStreamPtr stream, SoundContainerFormat format )
 {
     return createSoundDecoderWithFormat( stream, format );
 }

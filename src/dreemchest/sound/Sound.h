@@ -29,14 +29,14 @@
 
 #include "../Dreemchest.h"
 
+#include <Io/Streams/ByteBuffer.h>
+#include <Io/DiskFileSystem.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace Sound {
 
     DECLARE_LOG( log )
-
-    class IStreamOpener;
-    class ISoundStream;
 
     //! Supported sound sample formats.
     enum SoundSampleFormat {
@@ -47,7 +47,7 @@ namespace Sound {
     };
 
     //! Supported sound container formats.
-    enum SoundFormat {
+    enum SoundContainerFormat {
         SoundFormatUnknown = 0, //!< Unknown file format.
         SoundFormatWav,         //!< Wave sound format.
         SoundFormatOgg,         //!< Ogg vorbis.
@@ -65,6 +65,9 @@ namespace Sound {
 	dcDeclarePtrs( SoundBuffer )
 	dcDeclarePtrs( SoundDecoder )
 	dcDeclarePtrs( SoundSource )
+
+	dcDeclarePtrs( IStreamOpener )
+	dcDeclarePtrs( ISoundStream )
 
 	//! Container type to store sound data by identifier.
     typedef Hash<SoundDataPtr> Sounds;
@@ -91,6 +94,7 @@ DC_END_DREEMCHEST
     #include "SoundGroup.h"
     #include "SoundEvent.h"
     #include "SoundChannel.h"
+	#include "SoundStream.h"
 #endif
 
 #endif    /*    !__DC_Sound_H__    */

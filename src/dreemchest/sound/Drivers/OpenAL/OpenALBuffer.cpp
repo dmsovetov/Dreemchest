@@ -75,18 +75,18 @@ OpenALBuffer::~OpenALBuffer( void )
 }
 
 // ** OpenALBuffer::attachToSource
-void OpenALBuffer::attachToSource( SoundSource* target )
+void OpenALBuffer::attachToSource( SoundSourceWPtr target )
 {
     DC_BREAK_IF( target == NULL );
 
-    ALuint source = static_cast<OpenALSource*>( target )->m_id;
+    ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
     alSourceQueueBuffers( source, m_buffers.size(), &m_buffers[0] );
     OpenAL::dumpErrors( "OpenALBuffer::attachToSource" );
 }
 
 // ** OpenALBuffer::detachFromSource
-void OpenALBuffer::detachFromSource( SoundSource* target )
+void OpenALBuffer::detachFromSource( SoundSourceWPtr target )
 {
     DC_BREAK_IF( target == NULL );
 
@@ -94,7 +94,7 @@ void OpenALBuffer::detachFromSource( SoundSource* target )
 
     ALint  queued, state;
     ALuint bufferId;
-    ALuint source = static_cast<OpenALSource*>( target )->m_id;
+    ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
     alGetSourcei( source, AL_SOURCE_STATE, &state );
     DC_BREAK_IF( state != AL_STOPPED );
@@ -122,7 +122,7 @@ bool OpenALBuffer::readSoundDecoder( ALuint target, u32 size )
 }
 
 // ** OpenALBuffer::updateStream
-bool OpenALBuffer::updateStream( SoundSource* target, bool isLooped )
+bool OpenALBuffer::updateStream( SoundSourceWPtr target, bool isLooped )
 {
     DC_BREAK_IF( target == NULL );
 
@@ -132,7 +132,7 @@ bool OpenALBuffer::updateStream( SoundSource* target, bool isLooped )
 
     OpenAL::flushErrors();
 
-    ALuint source = static_cast<OpenALSource*>( target )->m_id;
+    ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
     // ** Ensure the streamed sound is not looped
     ALint state;

@@ -33,7 +33,6 @@ namespace Sound {
 
 // ** SoundDecoder::SoundDecoder
 SoundDecoder::SoundDecoder( void )
-    : m_stream( NULL )
 {
 }
 
@@ -43,20 +42,20 @@ SoundDecoder::~SoundDecoder( void )
 }
 
 // ** SoundDecoder::open
-bool SoundDecoder::open( ISoundStream* stream )
+bool SoundDecoder::open( ISoundStreamPtr stream )
 {
-    if( !stream ) {
+    if( !stream.valid() ) {
         return false;
     }
 
     m_stream = stream;
-    return m_stream != NULL;
+    return m_stream.valid();
 }
 
 // ** SoundDecoder::close
 void SoundDecoder::close( void )
 {
-    DC_RELEASE( m_stream );
+    m_stream = ISoundStreamPtr();
 }
 
 // ** SoundDecoder::read
