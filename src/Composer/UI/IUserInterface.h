@@ -24,33 +24,27 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_IMainWindow_H__
-#define __DC_Composer_IMainWindow_H__
+#ifndef __DC_Composer_IUserInterface_H__
+#define __DC_Composer_IUserInterface_H__
 
-#include "IUserInterface.h"
+#include "../Composer.h"
 
 namespace Ui {
 
-	//! Factory method used for main window creation.
-	extern IMainWindowPtr createMainWindow( const String& title );
-
-	//! Main application window interface.
-	class IMainWindow : public IUserInterface {
+	//! Public user interface class.
+	class IUserInterface : public RefCounted {
 	public:
 
-		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr	addToolBar( void )						= 0;
-	
-		//! Removes the toolbar from a window.
-		virtual void			removeToolBar( IToolBarWPtr toolBar )	= 0;
-	
-		//! Adds a new menu to window.
-		virtual IMenuWPtr		addMenu( const String& text )			= 0;
-	
-		//! Removes the menu from a window.
-		virtual void			removeMenu( IMenuWPtr menu )			= 0;
+		virtual						~IUserInterface( void ) {}
+
+		//! Returns the raw private implementation pointer.
+		virtual void*				ptr( void ) const = 0;
+
+		//! Returns the private interface.
+		template<typename T>
+		T*							privateInterface( void ) const { return reinterpret_cast<T*>( ptr() ); }
 	};
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_MainWindow_H__	*/
+#endif	/*	!__DC_Composer_IUserInterface_H__	*/

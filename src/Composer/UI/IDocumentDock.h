@@ -24,33 +24,28 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_IMainWindow_H__
-#define __DC_Composer_IMainWindow_H__
+#ifndef __DC_Composer_IDocumentDock_H__
+#define __DC_Composer_IDocumentDock_H__
 
 #include "IUserInterface.h"
 
 namespace Ui {
 
-	//! Factory method used for main window creation.
-	extern IMainWindowPtr createMainWindow( const String& title );
-
-	//! Main application window interface.
-	class IMainWindow : public IUserInterface {
+	//! Document docking window interface.
+	class IDocumentDock : public IUserInterface {
 	public:
 
-		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr	addToolBar( void )						= 0;
-	
-		//! Removes the toolbar from a window.
-		virtual void			removeToolBar( IToolBarWPtr toolBar )	= 0;
-	
-		//! Adds a new menu to window.
-		virtual IMenuWPtr		addMenu( const String& text )			= 0;
-	
-		//! Removes the menu from a window.
-		virtual void			removeMenu( IMenuWPtr menu )			= 0;
+		//! Returns the rendering frame used for this document dock.
+		virtual IRenderingFrameWPtr	renderingFrame( void )							= 0;
+
+		//! Sets the rendering frame.
+		virtual void				setRenderingFrame( IRenderingFramePtr value )	= 0;
+
+		//! Returns an attached asset editor.
+		//virtual cAssetEditor*		GetEditor( void ) const							= 0;
 	};
+
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_MainWindow_H__	*/
+#endif	/*	!__DC_Composer_IDocumentDock_H__	*/

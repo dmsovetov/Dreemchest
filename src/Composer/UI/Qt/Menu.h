@@ -28,51 +28,12 @@
 #define __DC_Composer_Menu_H__
 
 #include "../IMenu.h"
+#include "UserInterface.h"
 
 namespace Ui {
 
-	//! Delegate object to bind Qt signals to a callback functions.
-	class SignalDelegate : public QObject {
-
-		Q_OBJECT
-
-	public:
-
-		//! Callback type used by this signal delegate.
-		typedef std::function<void()>	Callback;
-
-										//! Constructs the SignalDelegate instance.
-										SignalDelegate( Callback callback, QObject* sender, CString signal );
-
-	private slots:
-
-		//! Processes the emitted signal.
-		virtual void					emitted( void );
-
-	private:
-
-		Callback						m_callback;	//!< Callback function.
-	};
-
-	//! Generic class to declare Qt interface implementations.
-	template<typename TBase, typename TPrivate>
-	class Interface : public TBase {
-	public:
-
-									//! Constructs the Interface instance.
-									Interface( TPrivate* instance )
-										: m_private( instance ) {}
-
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
-
-	protected:
-
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
-	};
-
 	//! Menu action Qt implementation
-	class Action : public Interface<IAction, QAction> {
+	class Action : public UserInterface<IAction, QAction> {
 	public:
 
 										//! Constructs Action instance.
@@ -115,12 +76,12 @@ namespace Ui {
 	
 	private:
 
-		AutoPtr<SignalDelegate>			m_signal;	//!< Signal delegate.
+		SignalDelegatePtr				m_signal;	//!< Signal delegate.
 		ActionCallback					m_callback;	//!< Menu action callback.
 	};
 
 	//! Tool bar Qt implementation.
-	class ToolBar : public Interface<IToolBar, QToolBar> {
+	class ToolBar : public UserInterface<IToolBar, QToolBar> {
 	public:
 
 									//! Constructs ToolBar instance.
@@ -137,7 +98,7 @@ namespace Ui {
 	};
 
 	//! Menu Qt implementation.
-	class Menu : public Interface<IMenu, QMenu> {
+	class Menu : public UserInterface<IMenu, QMenu> {
 	public:
 
 									//! Constructs Menu instance.

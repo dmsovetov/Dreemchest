@@ -25,27 +25,14 @@
  **************************************************************************/
 
 #include "Menu.h"
+#include "SignalDelegate.h"
 
 namespace Ui {
-
-// ------------------------------------------ SignalDelegate -------------------------------------------- //
-
-// ** SignalDelegate::SignalDelegate
-SignalDelegate::SignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
-{
-	connect( sender, signal, this, SLOT(emitted()) );
-}
-
-// ** SignalDelegate::emitted
-void SignalDelegate::emitted( void )
-{
-	m_callback();
-}
 
 // ---------------------------------------------- ToolBar ----------------------------------------------- //
 
 // ** ToolBar::ToolBar
-ToolBar::ToolBar( QWidget* parent ) : Interface( new QToolBar( parent ) )
+ToolBar::ToolBar( QWidget* parent ) : UserInterface( new QToolBar( parent ) )
 {
 
 }
@@ -71,7 +58,7 @@ void ToolBar::addSeparator( void )
 // ----------------------------------------------- Action ----------------------------------------------- //
 
 // ** Action::Action
-Action::Action( QWidget* parent, const String& text, ActionCallback callback ) : Interface( new QAction( text.c_str(), parent ) ), m_callback( callback )
+Action::Action( QWidget* parent, const String& text, ActionCallback callback ) : UserInterface( new QAction( text.c_str(), parent ) ), m_callback( callback )
 {
 	m_signal = new SignalDelegate( BindSignal( Action::triggered ), m_private.get(), SIGNAL(triggered()) );
 }
@@ -145,7 +132,7 @@ void Action::setIcon( const String& value )
 // ------------------------------------------------ Menu ------------------------------------------------ //
 
 // ** Menu::Menu
-Menu::Menu( QWidget *parent ) : Interface( new QMenu( parent ) )
+Menu::Menu( QWidget *parent ) : UserInterface( new QMenu( parent ) )
 {
 }
 

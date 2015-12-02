@@ -27,6 +27,8 @@
 #include "MainWindow.h"
 #include "Menu.h"
 
+#include "RenderingFrame.h"
+
 namespace Ui {
 
 // ** createMainWindow
@@ -36,7 +38,7 @@ IMainWindowPtr createMainWindow( const String& title )
 }
 
 // ** MainWindow::MainWindow
-MainWindow::MainWindow( const String& title ) : Interface( new QMainWindow )
+MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
 {
 #ifdef NDEBUG
 	m_private->setWindowState( Qt::WindowMaximized );

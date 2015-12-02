@@ -34,6 +34,7 @@
 #ifdef DC_QT4_ENABLED
 	#include <QtGui>
 	#include <QtCore>
+	#include <QtOpenGL>
 
 	#define Q_DECL_OVERRIDE override
 #elif DC_QT5_ENABLED
@@ -46,6 +47,11 @@ namespace Ui {
 	dcDeclarePtrs( IAction )
 	dcDeclarePtrs( IMenu )
 	dcDeclarePtrs( IToolBar )
+	dcDeclarePtrs( IRenderingFrame )
+	dcDeclarePtrs( IDocumentDock )
+
+	//! Auto ptr type for signal delegate instances.
+	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
 
 	//! Menu action callback type.
 	typedef std::function<void(IActionWPtr)> ActionCallback;
@@ -56,6 +62,16 @@ namespace Ui {
 class Composer {
 public:
 
+	//! Available menues
+	enum Menu {
+		  FileMenu
+		, EditMenu
+		, ViewMenu
+		, AssetsMenu
+		
+		, TotalMenues
+	};
+
 	//! Creates the Composer instance.
 	static Composer*	create( Ui::IMainWindowPtr mainWindow );
 
@@ -64,9 +80,19 @@ private:
 						//! Constructs Composer instance.
 						Composer( Ui::IMainWindowPtr mainWindow );
 
+	//! Creates a new project.
+	void				onCreateProject( Ui::IActionWPtr action );
+
+	//! Opens an existing project.
+	void				onOpenProject( Ui::IActionWPtr action );
+
+	//! Imports new assets to project.
+	void				onImportAssets( Ui::IActionWPtr action );
+
 private:
 
-	Ui::IMainWindowPtr	m_mainWindow;	//!< Main composer window.
+	Ui::IMainWindowPtr	m_mainWindow;			//!< Main composer window.
+	Ui::IMenuWPtr		m_menues[TotalMenues];	//!< Default menues.
 };
 
 #endif	/*	!__DC_Composer_H__	*/

@@ -9,8 +9,8 @@ add_directories(. SRCS)
 
 # Setup the Qt library
 if (DC_QT_SUPPORT MATCHES "Qt4")
-	find_package(Qt4 REQUIRED QtGui)
-	set(QT_LIBRARIES Qt4::QtGui)
+	find_package(Qt4 REQUIRED QtGui QtOpenGL)
+	set(QT_LIBRARIES Qt4::QtGui Qt4::QtOpenGL)
 	
 elseif (DC_QT_SUPPORT MATCHES "Qt5")
 	find_package(Qt5Widgets)

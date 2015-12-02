@@ -27,17 +27,45 @@
 #include "Composer.h"
 
 #include "UI/IMainWindow.h"
+#include "UI/IMenu.h"
 
 // ** Composer::Composer
 Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
 {
+	// Add default menues
+	m_menues[FileMenu]	 = mainWindow->addMenu( "&File" );
+	m_menues[EditMenu]	 = mainWindow->addMenu( "&Edit" );
+	m_menues[ViewMenu]	 = mainWindow->addMenu( "&View" );
+	m_menues[AssetsMenu] = mainWindow->addMenu( "&Assets" );
 
+	// Add actions
+	m_menues[FileMenu]->addAction( "Create Project", BindAction( Composer::onCreateProject ) );
+	m_menues[FileMenu]->addAction( "Open Project", BindAction( Composer::onOpenProject ) );
+	m_menues[AssetsMenu]->addAction( "Import Assets", BindAction( Composer::onImportAssets ) );
 }
 
 // ** Composer::create
 Composer* Composer::create( Ui::IMainWindowPtr mainWindow )
 {
 	return new Composer( mainWindow );
+}
+
+// ** Composer::onCreateProject
+void Composer::onCreateProject( Ui::IActionWPtr action )
+{
+
+}
+
+// ** Composer::onOpenProject
+void Composer::onOpenProject( Ui::IActionWPtr action )
+{
+
+}
+
+// ** Composer::onImportAssets
+void Composer::onImportAssets( Ui::IActionWPtr action )
+{
+
 }
 
 // ** main

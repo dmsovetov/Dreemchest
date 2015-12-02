@@ -24,33 +24,20 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_IMainWindow_H__
-#define __DC_Composer_IMainWindow_H__
-
-#include "IUserInterface.h"
+#include "SignalDelegate.h"
 
 namespace Ui {
 
-	//! Factory method used for main window creation.
-	extern IMainWindowPtr createMainWindow( const String& title );
+// ** SignalDelegate::SignalDelegate
+SignalDelegate::SignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
+{
+	connect( sender, signal, this, SLOT(emitted()) );
+}
 
-	//! Main application window interface.
-	class IMainWindow : public IUserInterface {
-	public:
-
-		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr	addToolBar( void )						= 0;
-	
-		//! Removes the toolbar from a window.
-		virtual void			removeToolBar( IToolBarWPtr toolBar )	= 0;
-	
-		//! Adds a new menu to window.
-		virtual IMenuWPtr		addMenu( const String& text )			= 0;
-	
-		//! Removes the menu from a window.
-		virtual void			removeMenu( IMenuWPtr menu )			= 0;
-	};
+// ** SignalDelegate::emitted
+void SignalDelegate::emitted( void )
+{
+	m_callback();
+}
 
 } // namespace Ui
-
-#endif	/*	!__DC_Composer_MainWindow_H__	*/

@@ -28,12 +28,12 @@
 #define __DC_Composer_MainWindow_H__
 
 #include "../IMainWindow.h"
-#include "Menu.h"
+#include "UserInterface.h"
 
 namespace Ui {
 
 	//! Main application window Qt implementation
-	class MainWindow : public Interface<IMainWindow, QMainWindow> {
+	class MainWindow : public UserInterface<IMainWindow, QMainWindow> {
 	public:
 
 										//! Constructs MainWindow instance.

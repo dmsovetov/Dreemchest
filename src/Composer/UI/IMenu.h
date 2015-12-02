@@ -27,9 +27,9 @@
 #ifndef __DC_Composer_IMenu_H__
 #define __DC_Composer_IMenu_H__
 
-#include "../Composer.h"
+#include "IUserInterface.h"
 
-#define BindAction( target ) std::bind( &target, std::placeholders::_1 )
+#define BindAction( target ) std::bind( &target, this, std::placeholders::_1 )
 #define BindSignal( target ) std::bind( &target, this )
 
 namespace Ui {
@@ -42,25 +42,9 @@ namespace Ui {
 		, ItemHidden	= BIT( 3 )	//!< Menu action is hidden.
 	};
 
-	//! Public UI interface class.
-	class IInterface : public RefCounted {
-	public:
-
-		virtual						~IInterface( void ) {}
-
-		//! Returns the raw private implementation pointer.
-		virtual void*				ptr( void ) const = 0;
-
-		//! Returns the private interface.
-		template<typename T>
-		T*							privateInterface( void ) const { return reinterpret_cast<T*>( ptr() ); }
-	};
-
 	//! Menu action interface
-	class IAction : public IInterface {
+	class IAction : public IUserInterface {
 	public:
-
-		virtual						~IAction( void ) {}
 
 		//! Returns the checked state of a menu action.
 		virtual bool				isChecked( void ) const				= 0;
@@ -88,10 +72,8 @@ namespace Ui {
 	};
 
 	//! Toolbar interface.
-	class IToolBar : public IInterface {
+	class IToolBar : public IUserInterface {
 	public:
-
-		virtual						~IToolBar( void ) {}
 
 		//! Adds an action to a toolbar.
 		virtual void				addAction( IActionWPtr action )		= 0;
@@ -104,11 +86,9 @@ namespace Ui {
 	};
 
 	//! Menu interface
-	class IMenu : public IInterface {
+	class IMenu : public IUserInterface {
 	public:
 
-		virtual						~IMenu( void ) {}
-	
 		//! Adds new action to a menu.
 		virtual IActionWPtr			addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 ) = 0;
 	
