@@ -29,7 +29,44 @@
 
 #include <Dreemchest.h>
 
-#include <QtWidgets>
-#include <QtCore>
+#include <functional>
+
+#ifdef DC_QT4_ENABLED
+	#include <QtGui>
+	#include <QtCore>
+
+	#define Q_DECL_OVERRIDE override
+#elif DC_QT5_ENABLED
+	#error Qt5 headers here!
+#endif
+
+namespace Ui {
+
+	dcDeclarePtrs( IMainWindow )
+	dcDeclarePtrs( IAction )
+	dcDeclarePtrs( IMenu )
+	dcDeclarePtrs( IToolBar )
+
+	//! Menu action callback type.
+	typedef std::function<void(IActionWPtr)> ActionCallback;
+
+} // namespace Ui
+
+//! Root composer class.
+class Composer {
+public:
+
+	//! Creates the Composer instance.
+	static Composer*	create( Ui::IMainWindowPtr mainWindow );
+
+private:
+
+						//! Constructs Composer instance.
+						Composer( Ui::IMainWindowPtr mainWindow );
+
+private:
+
+	Ui::IMainWindowPtr	m_mainWindow;	//!< Main composer window.
+};
 
 #endif	/*	!__DC_Composer_H__	*/

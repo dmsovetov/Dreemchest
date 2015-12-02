@@ -24,32 +24,35 @@
 
  **************************************************************************/
 
-#include "Composer.h"
+#ifndef __DC_Composer_IMainWindow_H__
+#define __DC_Composer_IMainWindow_H__
 
-#include "UI/IMainWindow.h"
+#include "IMenu.h"
 
-// ** Composer::Composer
-Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
-{
+namespace Ui {
 
-}
+	//! Factory method used for main window creation.
+	extern IMainWindowPtr createMainWindow( const String& title );
 
-// ** Composer::create
-Composer* Composer::create( Ui::IMainWindowPtr mainWindow )
-{
-	return new Composer( mainWindow );
-}
+	//! Main application window interface.
+	class IMainWindow : public IInterface {
+	public:
 
-// ** main
-int main(int argc, char *argv[])
-{
-	QCoreApplication::setLibraryPaths( QCoreApplication::libraryPaths() << "." << "imageformats" << "platforms" );
+		virtual					~IMainWindow( void ) {}
+	
+		//! Adds a new toolbar to window.
+		virtual IToolBarWPtr	addToolBar( void )						= 0;
+	
+		//! Removes the toolbar from a window.
+		virtual void			removeToolBar( IToolBarWPtr toolBar )	= 0;
+	
+		//! Adds a new menu to window.
+		virtual IMenuWPtr		addMenu( const String& text )			= 0;
+	
+		//! Removes the menu from a window.
+		virtual void			removeMenu( IMenuWPtr menu )			= 0;
+	};
 
-    QApplication app( argc, argv );
-    app.setApplicationName( "Dreemchest Composer" );
+} // namespace Ui
 
-	Ui::IMainWindowPtr mainWindow = Ui::createMainWindow( "Dreemchest Composer" );
-	Composer::create( mainWindow );
-
-    return app.exec();
-}
+#endif	/*	!__DC_Composer_MainWindow_H__	*/
