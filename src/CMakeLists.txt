@@ -14,6 +14,7 @@ option(DC_BUILD_TESTS "Build Dreemchest tests" OFF)
 option(DC_OPENGL_ENABLED "Build with OpenGL support" ON)
 option(DC_BOX2D_ENABLED "Build with Box2D support" OFF)
 option(DC_SOUND_ENABLED "Build with sound support" OFF)
+option(DC_COMPOSER_ENABLED "Build Dreemchest Composer" OFF)
 set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt5")
 set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Qt4" "Qt5")
 
@@ -23,10 +24,10 @@ include_directories(Dreemchest)
 # Setup definitions
 if (DC_QT_SUPPORT MATCHES "Qt4")
 	add_definitions(-DDC_QT4_ENABLED)
-	
+	set(DC_QT_ENABLED ON)
 elseif (DC_QT_SUPPORT MATCHES "Qt5")
 	add_definitions(-DDC_QT5_ENABLED)
-	
+	set(DC_QT_ENABLED ON)
 endif (DC_QT_SUPPORT MATCHES "Qt4")
 
 # Setup variables
@@ -52,3 +53,11 @@ if (DC_BUILD_TESTS)
 	find_package(GTest REQUIRED)
 	add_subdirectory(Tests)
 endif (DC_BUILD_TESTS)
+
+if (DC_COMPOSER_ENABLED)
+	if (NOT DC_QT_ENABLED)
+		message(FATAL_ERROR "Dreemchest Composer build requested but no Qt found.")
+	endif (NOT DC_QT_ENABLED)
+	
+	add_subdirectory(Composer)
+endif (DC_COMPOSER_ENABLED)
