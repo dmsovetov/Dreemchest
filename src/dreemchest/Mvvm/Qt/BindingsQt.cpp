@@ -100,7 +100,12 @@ QSignalDelegate* QtComboBoxSelectedTextBinding::createSignalDelegate( void )
 // ** QtComboBoxSelectedTextBinding::handleValueChanged
 void QtComboBoxSelectedTextBinding::handleValueChanged( void )
 {
+#ifdef DC_QT4_ENABLED
+	s32 index = widget()->findText( m_property->get().c_str() );
+	widget()->setCurrentIndex( index );
+#elif DC_QT5_ENABLED
 	widget()->setCurrentText( m_property->get().c_str() );
+#endif
 }
 
 // ** QtComboBoxSelectedTextBinding::handleViewChanged
