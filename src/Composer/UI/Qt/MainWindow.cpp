@@ -352,8 +352,14 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	// Create the asset tree
 	m_assetTree = new AssetTree( project, m_assetFilesModel.get() );
 
-	// Add dock
+	// Setup status bar
+	m_private->statusBar()->show();
+
+	// Add dock windows
 	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
+	addDock( "Inspector", new QTreeView, Qt::RightDockWidgetArea );
+	addDock( "Hierarchy", new QTreeView, Qt::RightDockWidgetArea );
+	addDock( "Output", new QTreeView, Qt::BottomDockWidgetArea );
 
 	// Add document document placeholder
 	m_documentPlaceholder = createDocumentPlaceholder();
