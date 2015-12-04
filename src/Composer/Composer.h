@@ -49,6 +49,15 @@ namespace Ui {
 	dcDeclarePtrs( IToolBar )
 	dcDeclarePtrs( IRenderingFrame )
 	dcDeclarePtrs( IDocumentDock )
+	dcDeclarePtrs( IFileSystem )
+	dcDeclarePtrs( IAssetTree )
+
+	//! Message status.
+	enum MessageStatus {
+		  MessageInfo		//!< The information message.
+		, MessageWarning	//!< The warning message.
+		, MessageError		//!< The error message.
+	};
 
 	//! Auto ptr type for signal delegate instances.
 	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
@@ -59,7 +68,7 @@ namespace Ui {
 } // namespace Ui
 
 //! Root composer class.
-class Composer {
+class Composer : public RefCounted {
 public:
 
 	//! Available menues
@@ -72,8 +81,49 @@ public:
 		, TotalMenues
 	};
 
+	//! Event is emitted when the project is created.
+	struct ProjectCreated {
+								//! Constructs ProjectCreated event.
+								ProjectCreated( Project::ProjectWPtr project );
+
+		Project::ProjectWPtr	project;	//!< Created project.
+	};
+
+	//! Event is emitted when the project was opened.
+	struct ProjectOpened {
+								//! Constructs ProjectOpened event.
+								ProjectOpened( Project::ProjectWPtr project );
+
+		Project::ProjectWPtr	project;	//!< Opened project.
+	};
+
+	//! Event is emitted when the project was closed.
+	struct ProjectClosed {
+								//! Constructs ProjectClosed event.
+								ProjectClosed( Project::ProjectWPtr project );
+
+		Project::ProjectPtr		project;	//!< Closed project.
+	};
+
+	//! Generic method to subscribe for events.
+	template<typename TEvent>
+    void subscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback )
+	{
+		m_event.subscribe<TEvent>( callback );
+	}
+
+	//! Generic method to unsubscribe from events.
+	template<typename TEvent>
+	void unsubscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback )
+	{
+		m_event.unsubscribe<TEvent>( callback );
+	}
+
 	//! Creates the Composer instance.
-	static Composer*	create( Ui::IMainWindowPtr mainWindow );
+	static ComposerPtr	create( void );
+
+	//! Returns the Composer instance.
+	static ComposerWPtr	instance( void );
 
 private:
 
@@ -81,18 +131,27 @@ private:
 						Composer( Ui::IMainWindowPtr mainWindow );
 
 	//! Creates a new project.
-	void				onCreateProject( Ui::IActionWPtr action );
+	void				menuCreateProject( Ui::IActionWPtr action );
 
 	//! Opens an existing project.
-	void				onOpenProject( Ui::IActionWPtr action );
+	void				menuOpenProject( Ui::IActionWPtr action );
 
-	//! Imports new assets to project.
-	void				onImportAssets( Ui::IActionWPtr action );
+	//! Opens the existing project at path.
+	void				openExistingProject( const String& path );
+
+	//! Creates new project at path.
+	void				createNewProject( const String& path );
+
+	//! Performs the composer initialization.
+	bool				initialize( void );
 
 private:
 
+	static ComposerWPtr	s_instance;				//!< Shared composer instance.
 	Ui::IMainWindowPtr	m_mainWindow;			//!< Main composer window.
 	Ui::IMenuWPtr		m_menues[TotalMenues];	//!< Default menues.
+	Project::ProjectPtr	m_project;				//!< Active project.
+	event::EventEmitter	m_event;				//!< Event emitter.
 };
 
 #endif	/*	!__DC_Composer_H__	*/

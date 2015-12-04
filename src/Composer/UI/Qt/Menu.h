@@ -104,6 +104,12 @@ namespace Ui {
 									//! Constructs Menu instance.
 									Menu( QWidget* parent );
 
+		//! Clears this menu.
+		virtual void				clear( void );
+
+		//! Adds new submenu.
+		virtual IMenuWPtr			addMenu( const String& text );
+
 		//! Adds new action to a menu.
 		virtual IActionWPtr			addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
 	
@@ -115,9 +121,13 @@ namespace Ui {
 
 		//! Sets the menu title.
 		virtual void				setTitle( const String& value );
+
+		//! Shows the menu at specified coordinates.
+		virtual void				exec( s32 x, s32 y );
 	
 	private:
 
+		QVector<IMenuPtr>			m_menues;	//!< All nested menues reside here.
 		QVector<IActionPtr>			m_actions;	//!< All added actions reside here.
 	};
 

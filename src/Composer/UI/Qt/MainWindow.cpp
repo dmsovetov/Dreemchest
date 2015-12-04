@@ -28,6 +28,10 @@
 #include "Menu.h"
 
 #include "RenderingFrame.h"
+#include "FileSystem.h"
+#include "AssetTree.h"
+
+#include "../../Project/Project.h"
 
 namespace Ui {
 
@@ -49,6 +53,42 @@ MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
     m_private->setUnifiedTitleAndToolBarOnMac( true );
 	m_private->show();
 	m_private->setWindowTitle( title.c_str() );
+}
+
+// ** MainWindow::initialize
+bool MainWindow::initialize( ComposerWPtr composer )
+{
+	// Create the file system
+	m_fileSystem = new FileSystem( m_private.get() );
+
+	// Listen for events
+	composer->subscribe<Composer::ProjectOpened>( dcThisMethod( MainWindow::onProjectOpened ) );
+	composer->subscribe<Composer::ProjectClosed>( dcThisMethod( MainWindow::onProjectClosed ) );
+
+	return true;
+}
+
+// ** MainWindow::message
+void MainWindow::message( const String& text, MessageStatus status )
+{
+	switch( status ) {
+	case MessageInfo:		QMessageBox::information( m_private.get(), m_private->windowTitle(), text.c_str() );	break;
+	case MessageWarning:	QMessageBox::warning( m_private.get(), m_private->windowTitle(), text.c_str() );		break;
+	case MessageError:		QMessageBox::critical( m_private.get(), m_private->windowTitle(), text.c_str() );		break;
+	default:				DC_BREAK;
+	}
+}
+
+// ** MainWindow::fileSystem
+IFileSystemWPtr MainWindow::fileSystem( void ) const
+{
+	return m_fileSystem;
+}
+
+// ** MainWindow::assetTree
+IAssetTreeWPtr MainWindow::assetTree( void ) const
+{
+	return m_assetTree;
 }
 
 // ** MainWindow::addMenu
@@ -73,6 +113,16 @@ IToolBarWPtr MainWindow::addToolBar( void )
 	return toolBar;
 }
 
+// ** MainWindow::addDock
+QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea, Qt::DockWidgetArea allowedDockAreas )
+{
+	QDockWidget* dock = new QDockWidget( name, m_private.get() );
+	dock->setAllowedAreas( allowedDockAreas );
+	dock->setWidget( widget );
+	m_private->addDockWidget( initialDockArea, dock );
+	return dock;
+}
+
 // ** MainWindow::removeToolBar
 void MainWindow::removeToolBar( IToolBarWPtr toolBar )
 {
@@ -89,6 +139,30 @@ void MainWindow::removeMenu( IMenuWPtr menu )
 	}
 
 	m_menues.remove( index );
+}
+
+// ** MainWindow::onProjectOpened
+void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
+{
+	// Get the project from event
+	Project::ProjectWPtr project = e.project;
+
+	// Create the file system model used by project
+	m_fileSystemModel = new QFileSystemModel( m_private.get() );
+	m_fileSystemModel->setRootPath( project->assetsAbsolutePath().c_str() );
+	m_fileSystemModel->setReadOnly( false );
+
+	// Create the asset tree
+	m_assetTree = new AssetTree( project, m_fileSystemModel.get() );
+
+	// Add dock
+	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
+}
+
+// ** MainWindow::onProjectClosed
+void MainWindow::onProjectClosed( const Composer::ProjectClosed& e )
+{
+	DC_BREAK;
 }
 
 } // namespace Ui

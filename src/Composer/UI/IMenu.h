@@ -57,6 +57,9 @@ namespace Ui {
 	
 		//! Sets the visibility state of a menu action.
 		virtual void				setVisible( bool value )			= 0;
+
+		//! Sets the disabled state of a menu action.
+		virtual void				setDisabled( bool value )			= 0;
 	
 		//! Returns the menu action text.
 		virtual String				text( void ) const					= 0;
@@ -89,6 +92,12 @@ namespace Ui {
 	class IMenu : public IUserInterface {
 	public:
 
+		//! Clears this menu.
+		virtual void				clear( void ) = 0;
+
+		//! Adds new submenu.
+		virtual IMenuWPtr			addMenu( const String& text ) = 0;
+
 		//! Adds new action to a menu.
 		virtual IActionWPtr			addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 ) = 0;
 	
@@ -100,6 +109,9 @@ namespace Ui {
 
 		//! Sets the menu title.
 		virtual void				setTitle( const String& value ) = 0;
+
+		//! Shows the menu at specified coordinates.
+		virtual void				exec( s32 x, s32 y ) = 0;
 	};
 
 } // namespace Ui

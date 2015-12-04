@@ -28,42 +28,144 @@
 
 #include "UI/IMainWindow.h"
 #include "UI/IMenu.h"
+#include "UI/IFileSystem.h"
+#include "UI/IAssetTree.h"
+
+#include "Project/Project.h"
+
+#ifdef emit
+	#undef emit
+#endif
+
+// ** Composer::s_instance
+ComposerWPtr Composer::s_instance = ComposerWPtr();
 
 // ** Composer::Composer
 Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
 {
-	// Add default menues
-	m_menues[FileMenu]	 = mainWindow->addMenu( "&File" );
-	m_menues[EditMenu]	 = mainWindow->addMenu( "&Edit" );
-	m_menues[ViewMenu]	 = mainWindow->addMenu( "&View" );
-	m_menues[AssetsMenu] = mainWindow->addMenu( "&Assets" );
-
-	// Add actions
-	m_menues[FileMenu]->addAction( "Create Project", BindAction( Composer::onCreateProject ) );
-	m_menues[FileMenu]->addAction( "Open Project", BindAction( Composer::onOpenProject ) );
-	m_menues[AssetsMenu]->addAction( "Import Assets", BindAction( Composer::onImportAssets ) );
+	s_instance = this;
 }
 
 // ** Composer::create
-Composer* Composer::create( Ui::IMainWindowPtr mainWindow )
+ComposerPtr Composer::create( void )
 {
-	return new Composer( mainWindow );
+	// Create the main window
+	Ui::IMainWindowPtr mainWindow = Ui::createMainWindow( "Dreemchest Composer" );
+	
+	// Create the composer instance
+	ComposerPtr composer = new Composer( mainWindow );
+
+	// Initialize the composer
+	if( !composer->initialize() ) {
+		return ComposerPtr();
+	}
+
+	return composer;
 }
 
-// ** Composer::onCreateProject
-void Composer::onCreateProject( Ui::IActionWPtr action )
+// ** Composer::initialize
+bool Composer::initialize( void )
+{
+	// Initialize the main window
+	if( !m_mainWindow->initialize( this ) ) {
+		return false;
+	}
+
+	// Add default menues
+	m_menues[FileMenu] = m_mainWindow->addMenu( "&File" );
+
+	// Add actions
+	m_menues[FileMenu]->addAction( "Create Project", BindAction( Composer::menuCreateProject ), "Ctrl+N" );
+	m_menues[FileMenu]->addAction( "Open Project", BindAction( Composer::menuOpenProject ), "Ctrl+O" );
+
+	return true;
+}
+
+// ** Composer::menuCreateProject
+void Composer::menuCreateProject( Ui::IActionWPtr action )
+{
+	// Get the file system interface
+	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+
+	// Select the directory
+	String path = fs->selectExistingDirectory( "Create Project" );
+
+	if( path == "" ) {
+		return;
+	}
+
+	createNewProject( path );
+}
+
+// ** Composer::menuOpenProject
+void Composer::menuOpenProject( Ui::IActionWPtr action )
+{
+	// Get the file system interface
+	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+
+	// Select the directory
+	String path = fs->selectExistingDirectory( "Open Project" );
+
+	if( path == "" ) {
+		return;
+	}
+
+	openExistingProject( path );
+}
+
+// ** Composer::createNewProject
+void Composer::createNewProject( const String& path )
+{
+	// Get the file system interface
+	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+
+	// Create project instance
+	m_project = Project::Project::create( m_mainWindow, path );
+
+	// Create all project folders
+	for( s32 i = 0; i < Project::Project::TotalPaths; i++ ) {
+		fs->createDirectory( m_project->absolutePath( i ) );
+	}
+
+	// Emit the event
+	m_event.emit<ProjectCreated>( m_project );
+
+	// Open created project
+	openExistingProject( path );
+}
+
+// ** Composer::openExistingProject
+void Composer::openExistingProject( const String& path )
+{
+	// Create project instance
+	m_project = Project::Project::create( m_mainWindow, path );
+
+	// Emit the event
+	m_event.emit<ProjectOpened>( m_project );
+
+	// Setup menues
+	m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );
+	m_menues[ViewMenu]	 = m_mainWindow->addMenu( "&View" );
+	m_menues[AssetsMenu] = m_mainWindow->addMenu( "&Assets" );
+
+	// Fill assets menu
+	m_project->fillAssetMenu( m_menues[AssetsMenu] );
+}
+
+// ** Composer::ProjectOpened::ProjectOpened
+Composer::ProjectOpened::ProjectOpened( Project::ProjectWPtr project ) : project( project )
 {
 
 }
 
-// ** Composer::onOpenProject
-void Composer::onOpenProject( Ui::IActionWPtr action )
+// ** Composer::ProjectClosed::ProjectClosed
+Composer::ProjectClosed::ProjectClosed( Project::ProjectWPtr project ) : project( project )
 {
 
 }
 
-// ** Composer::onImportAssets
-void Composer::onImportAssets( Ui::IActionWPtr action )
+// ** Composer::ProjectCreated::ProjectCreated
+Composer::ProjectCreated::ProjectCreated( Project::ProjectWPtr project ) : project( project )
 {
 
 }
@@ -76,8 +178,11 @@ int main(int argc, char *argv[])
     QApplication app( argc, argv );
     app.setApplicationName( "Dreemchest Composer" );
 
-	Ui::IMainWindowPtr mainWindow = Ui::createMainWindow( "Dreemchest Composer" );
-	Composer::create( mainWindow );
+	ComposerPtr composer = Composer::create();
+
+	if( !composer.valid() ) {
+		return -1;
+	}
 
     return app.exec();
 }

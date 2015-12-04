@@ -50,11 +50,37 @@ namespace Ui {
 	
 		//! Removes the menu from a window.
 		virtual void					removeMenu( IMenuWPtr menu );
+
+		//! Performs the main window initialization.
+		virtual bool					initialize( ComposerWPtr composer );
+
+		//! Shows the message box.
+		virtual void					message( const String& text, MessageStatus status = MessageInfo );
+
+		//! Returns the file system instance.
+		virtual IFileSystemWPtr			fileSystem( void ) const;
+
+		//! Returns the asset tree instance.
+		virtual IAssetTreeWPtr			assetTree( void ) const;
+
+	private:
+
+		//! Creates the dock widget.
+		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetArea allowedDockAreas = Qt::AllDockWidgetAreas );
+
+		//! Handles the ProjectOpened event.
+		void							onProjectOpened( const Composer::ProjectOpened& e );
+
+		//! Handles the ProjectClosed event.
+		void							onProjectClosed( const Composer::ProjectClosed& e );
 	
 	private:
 
-		QVector<IMenuPtr>				m_menues;	//!< All added menues reside here.
-		QVector<IToolBarPtr>			m_toolbars;	//!< All added toolbars reside here.
+		QVector<IMenuPtr>				m_menues;			//!< All added menues reside here.
+		QVector<IToolBarPtr>			m_toolbars;			//!< All added toolbars reside here.
+		IFileSystemPtr					m_fileSystem;		//!< File system interface.
+		IAssetTreePtr					m_assetTree;		//!< Asset tree instance.
+		AutoPtr<QFileSystemModel>		m_fileSystemModel;	//!< Shared file system model.
 	};
 
 } // namespace Ui

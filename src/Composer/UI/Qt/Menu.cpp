@@ -136,6 +136,24 @@ Menu::Menu( QWidget *parent ) : UserInterface( new QMenu( parent ) )
 {
 }
 
+// ** Menu::clear
+void Menu::clear( void )
+{
+	m_private->clear();
+}
+
+// ** Menu::addMenu
+IMenuWPtr Menu::addMenu( const String& text )
+{
+	Menu* menu = new Menu( m_private.get() );
+	menu->setTitle( text.c_str() );
+	m_private->addMenu( menu->privateInterface<QMenu>() );
+
+	m_menues.append( menu );
+
+	return menu;
+}
+
 // ** Menu::addAction
 IActionWPtr Menu::addAction( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
 {
@@ -178,6 +196,12 @@ void Menu::addSeparator( void )
 void Menu::setTitle( const String& value )
 {
 	m_private->setTitle( value.c_str() );
+}
+
+// ** Menu::exec
+void Menu::exec( s32 x, s32 y )
+{
+	m_private->exec( QPoint( x, y ) );
 }
 
 } // namespace Ui
