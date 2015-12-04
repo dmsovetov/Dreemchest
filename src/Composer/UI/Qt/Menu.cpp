@@ -63,6 +63,12 @@ Action::Action( QWidget* parent, const String& text, ActionCallback callback ) :
 	m_signal = new SignalDelegate( BindSignal( Action::triggered ), m_private.get(), SIGNAL(triggered()) );
 }
 
+// ** Action::Action
+Action::Action( QAction* action ) : UserInterface( action )
+{
+
+}
+
 // ** Action::triggered
 void Action::triggered( void )
 {

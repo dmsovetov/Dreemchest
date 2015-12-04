@@ -37,6 +37,9 @@ namespace Ui {
 
 										//! Constructs Action instance.
 										Action( QWidget* parent, const String& text, ActionCallback callback );
+
+										//! Constructs Action instance.
+										Action( QAction* action );
 								
 		//! Returns the checked state of a menu action.
 		virtual bool					isChecked( void ) const;
