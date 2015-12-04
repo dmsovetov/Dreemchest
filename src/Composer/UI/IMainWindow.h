@@ -54,7 +54,10 @@ namespace Ui {
 		virtual bool			initialize( ComposerWPtr composer )		= 0;
 
 		//! Shows the message box.
-		virtual void			message( const String& text, MessageStatus status = MessageInfo ) = 0;
+		virtual void				message( const String& text, MessageStatus status = MessageInfo ) const = 0;
+
+		//! Shows the message box with yes, no, cancel buttons.
+		virtual MessageBoxResult	messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const = 0;
 
 		//! Returns the file system instance.
 		virtual IFileSystemWPtr	fileSystem( void ) const				= 0;

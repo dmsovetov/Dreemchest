@@ -69,7 +69,7 @@ bool MainWindow::initialize( ComposerWPtr composer )
 }
 
 // ** MainWindow::message
-void MainWindow::message( const String& text, MessageStatus status )
+void MainWindow::message( const String& text, MessageStatus status ) const
 {
 	switch( status ) {
 	case MessageInfo:		QMessageBox::information( m_private.get(), m_private->windowTitle(), text.c_str() );	break;
@@ -77,6 +77,30 @@ void MainWindow::message( const String& text, MessageStatus status )
 	case MessageError:		QMessageBox::critical( m_private.get(), m_private->windowTitle(), text.c_str() );		break;
 	default:				DC_BREAK;
 	}
+}
+
+// ** MainWindow::message
+MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const String& info, MessageStatus status ) const
+{
+	QMessageBox msgBox;
+	msgBox.setText( text.c_str() );
+	msgBox.setInformativeText( info.c_str() );
+	msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
+	msgBox.setDefaultButton( QMessageBox::Cancel );
+
+	switch( status ) {
+	case MessageInfo:		msgBox.setIcon( QMessageBox::Information );		break;
+	case MessageWarning:	msgBox.setIcon( QMessageBox::Warning );			break;
+	case MessageError:		msgBox.setIcon( QMessageBox::Critical );		break;
+	default:				DC_BREAK;
+	}
+	
+	switch( msgBox.exec() ) {
+	case QMessageBox::Yes:		return MessageBoxYes;
+	case QMessageBox::No:		return MessageBoxNo;
+	}
+
+	return MessageBoxCancel;
 }
 
 // ** MainWindow::fileSystem

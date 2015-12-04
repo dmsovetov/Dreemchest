@@ -59,6 +59,13 @@ namespace Ui {
 		, MessageError		//!< The error message.
 	};
 
+	//! Message box result.
+	enum MessageBoxResult {
+		  MessageBoxYes		//!< Yes button was clicked.
+		, MessageBoxNo		//!< No button was clicked.
+		, MessageBoxCancel	//!< Cancel button was clicked.
+	};
+
 	//! Auto ptr type for signal delegate instances.
 	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
 
