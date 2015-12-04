@@ -34,6 +34,9 @@ namespace Ui {
 
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
 	class QAssetTree : public QTreeView {
+
+		Q_OBJECT
+
 	public:
 
 								//! Constructs asset tree bound to a specified path.
@@ -55,6 +58,11 @@ namespace Ui {
 
 		//! Handles the context menu requests.
 		virtual void			contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
+
+	private slots:
+
+		//! Handles the doubleClicked signal.
+		void					itemDoubleClicked( const QModelIndex& index ) const;
 
 	private:
 

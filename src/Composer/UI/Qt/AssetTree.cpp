@@ -70,6 +70,8 @@ QAssetTree::QAssetTree( Project::ProjectWPtr project, QFileSystemModel* model ) 
 	for( s32 i = 1, n = m_model->columnCount(); i < n; i++ ) {
 		hideColumn( i );
 	}
+
+	connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
 }
 
 // ** QAssetTree::setParent
@@ -98,6 +100,16 @@ void QAssetTree::contextMenuEvent( QContextMenuEvent *e )
 
     m_project->fillAssetMenu( menu, m_parent );
     menu->exec( e->globalPos().x(), e->globalPos().y() );
+}
+
+// ** QAssetTree::itemDoubleClicked
+void QAssetTree::itemDoubleClicked( const QModelIndex& index ) const
+{
+	if( m_model->isDir( index ) ) {
+		return;
+	}
+
+	DC_BREAK;
 }
 
 // ** QAssetTree::selection
