@@ -24,39 +24,52 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_UserInterface_H__
-#define __DC_Composer_Qt_UserInterface_H__
+#ifndef __DC_Composer_Qt_AssetFilesModel_H__
+#define __DC_Composer_Qt_AssetFilesModel_H__
 
 #include "../IUserInterface.h"
-#include "../IDocumentDock.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
 
 namespace Ui {
 
-	class AssetFilesModel;
-	class DocumentDock;
+	//! Asset files model.
+	class AssetFilesModel : public QFileSystemModel {
 
-	//! Generic class to declare Qt interface implementations.
-	template<typename TBase, typename TPrivate>
-	class UserInterface : public TBase {
+		Q_OBJECT
+
 	public:
 
-									//! Constructs the UserInterface instance.
-									UserInterface( TPrivate* instance )
-										: m_private( instance ) {}
-
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
+							//! Constructs AssetFilesModel
+							AssetFilesModel( QObject* parent, const String& path );
 
 	protected:
 
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
+		//! Returns the model data by index.
+		virtual QVariant	data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+
+		//! Sets the model data by index.
+		virtual bool		setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
+
+		virtual bool		beginMoveRows(const QModelIndex & sourceParent, int sourceFirst, int sourceLast, const QModelIndex & destinationParent, int destinationChild);
+
+	private slots:
+
+		void				layoutChanged( void );
+
+		//! Handles added assets signal.
+		void				assetsAdded( const QModelIndex& parent, int start, int end );
+
+		//! Handles removed assets signal.
+		void				assetsAboutToBeRemoved( const QModelIndex& parent, int start, int end );
+
+		//! Handles renamed asset signal.
+		void				assetRenamed( const QString& path, const QString& oldName, const QString& newName );
+
+	private:
+
+		bool				m_isEditingModel;	//!< The model editing is in progress.
+		QSet<QString>		m_skipAddRemove;	//!< This set contains paths to all assets that were renamed or moved.
 	};
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_Qt_UserInterface_H__	*/
+#endif	/*	!__DC_Composer_Qt_AssetFilesModel_H__	*/

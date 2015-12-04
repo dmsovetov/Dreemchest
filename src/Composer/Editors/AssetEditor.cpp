@@ -28,5 +28,22 @@
 
 namespace Editors {
 
+// ** AssetEditor::hasChanges
+bool AssetEditor::hasChanges( void ) const
+{
+	return true;
+}
+
+// ** AssetEditor::setAsset
+void AssetEditor::setAsset( const Ui::FileInfo& value )
+{
+	m_asset = value;
+}
+
+// ** AssetEditor::setAsset
+const Ui::FileInfo&  AssetEditor::asset( void ) const
+{
+	return m_asset;
+}
 
 } // namespace Editors

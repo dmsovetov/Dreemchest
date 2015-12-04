@@ -30,8 +30,11 @@
 #include "RenderingFrame.h"
 #include "FileSystem.h"
 #include "AssetTree.h"
+#include "AssetFilesModel.h"
+#include "DocumentDock.h"
 
 #include "../../Project/Project.h"
+#include "../../Editors/AssetEditor.h"
 
 namespace Ui {
 
@@ -44,6 +47,9 @@ IMainWindowPtr createMainWindow( const String& title )
 // ** MainWindow::MainWindow
 MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
 {
+	// Setup the share OpenGL format
+	QRenderingFrame::setupOpenGLFormat();
+
 #ifdef NDEBUG
 	m_private->setWindowState( Qt::WindowMaximized );
 #else
@@ -138,7 +144,7 @@ IToolBarWPtr MainWindow::addToolBar( void )
 }
 
 // ** MainWindow::addDock
-QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea, Qt::DockWidgetArea allowedDockAreas )
+QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea, Qt::DockWidgetAreas allowedDockAreas )
 {
 	QDockWidget* dock = new QDockWidget( name, m_private.get() );
 	dock->setAllowedAreas( allowedDockAreas );
@@ -165,6 +171,175 @@ void MainWindow::removeMenu( IMenuWPtr menu )
 	m_menues.remove( index );
 }
 
+// ** MainWindow::dockAssetEditor
+IDocumentDockWPtr MainWindow::dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const FileInfo& fileInfo )
+{
+	DC_BREAK_IF( !assetEditor.valid() );
+
+	// First lookup the exising document
+	IDocumentDockWPtr existing = findDocument( fileInfo );
+
+	if( existing.valid() ) {
+		existing->privateInterface<QDocumentDock>()->raise();
+		return existing;
+	}
+
+	// Create the document instance
+	DocumentDock* dock = new DocumentDock( this, assetEditor, fileInfo.baseName, m_private.get() );
+	m_private->addDockWidget( Qt::LeftDockWidgetArea, dock->privateInterface<QDocumentDock>() );
+
+	// Find opened documents of a same type
+	DocumentsWeak documents = findDocuments( fileInfo );
+	QDockWidget*  tabifyTo  = NULL;
+
+	if( documents.empty() ) {
+		tabifyTo = m_documentPlaceholder.get();
+		m_documentPlaceholder->hide();
+	} else {
+		tabifyTo = documents[0]->privateInterface<QDocumentDock>();
+	}
+
+	m_private->tabifyDockWidget( tabifyTo, dock->privateInterface<QDocumentDock>() );
+
+	// Set the document as active
+	setActiveDocument( dock );
+
+	//editor->AttachToDock( dock );
+	//editor->Edit( item );
+
+	// Save created document
+	m_documents.append( dock );
+
+	return dock;
+}
+
+// ** MainWindow::closeDocument
+bool MainWindow::closeDocument( IDocumentDockWPtr document )
+{
+	// Find the document
+	int index = m_documents.indexOf( document );
+
+	if( index == -1 ) {
+		DC_BREAK;
+		return false;
+	}
+
+	// Ensure that document is saved
+	if( !ensureSaved( document ) ) {
+		return false;
+	}
+
+	// Remove the document dock widget
+	m_private->removeDockWidget( document->privateInterface<QDocumentDock>() );
+
+	// Invalidate active document
+	if( m_activeDocument == document ) {
+		m_activeDocument = IDocumentDockWPtr();
+	}
+
+	// Remove from documents
+	m_documents.remove( index );
+
+	// Show the placeholder if all documents are now closed
+	if( !m_documents.empty() ) {
+		return true;
+	}
+
+	m_documentPlaceholder->show();
+	m_documentPlaceholder->raise();
+
+	return true;
+}
+
+// ** MainWindow::findDocument
+IDocumentDockWPtr MainWindow::findDocument( const FileInfo& fileInfo ) const
+{
+	foreach( IDocumentDockWPtr document, m_documents ) {
+		if( document->assetEditor()->asset().path == fileInfo.path ) {
+			return document;
+		}
+	}
+
+	return IDocumentDockWPtr();
+}
+
+// ** MainWindow::findDocuments
+DocumentsWeak MainWindow::findDocuments( const FileInfo& fileInfo ) const
+{
+	DocumentsWeak documents;
+
+	foreach( IDocumentDockWPtr document, m_documents ) {
+		if( document->assetEditor()->asset().ext == fileInfo.ext ) {
+			documents.push_back( document );
+		}
+	}
+
+	return documents;
+}
+
+// ** MainWindow::setActiveDocument
+void MainWindow::setActiveDocument( IDocumentDockWPtr document )
+{
+	DC_BREAK_IF( !document.valid() )
+
+	// This document is already set as active
+	if( m_activeDocument == document ) {
+		return;
+	}
+
+	// Notify the active document about moving to background.
+	if( m_activeDocument.valid() ) {
+		m_activeDocument->assetEditor()->notifyEnterBackground();
+	}
+
+	// Set new active document
+	m_activeDocument = document;
+
+	// Notify active document about moving to foreground.
+	if( m_activeDocument.valid() ) {
+		// Raise the document dock widget
+		m_activeDocument->privateInterface<QDocumentDock>()->raise();
+
+		// Notify the asset editor
+		m_activeDocument->assetEditor()->notifyEnterForeground();
+	}
+}
+
+// ** MainWindow::ensureSaved
+bool MainWindow::ensureSaved( IDocumentDockWPtr document ) const
+{
+	// Get the attached asset editor.
+	Editors::AssetEditorWPtr assetEditor = document->assetEditor();
+
+	// The document has no unsaved changes.
+	if( !assetEditor->hasChanges() ) {
+		return true;
+	}
+
+	// Show the message box
+	String			 message = "Do you want to save changes to " + assetEditor->asset().baseName + "?";
+	String			 info	 = "Your changes will be lost if you don't save them";
+	MessageBoxResult result  = messageYesNoCancel( message, info, MessageWarning );
+
+	switch( result ) {
+	case MessageBoxCancel:	return false;
+	case MessageBoxYes:		assetEditor->save();
+	case MessageBoxNo:		break;
+	}
+
+	return true;
+}
+
+// ** MainWindow::createDocumentPlaceholder
+QDockWidget* MainWindow::createDocumentPlaceholder( void ) const
+{
+	QDockWidget* placeholder = new QDockWidget;
+	placeholder->setObjectName( "DOCK_DOCUMENT_PLACEHOLDER" );
+	placeholder->setAllowedAreas( Qt::AllDockWidgetAreas );
+	placeholder->setTitleBarWidget( new QWidget( NULL ) );
+	return placeholder;
+}
+
 // ** MainWindow::onProjectOpened
 void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 {
@@ -172,15 +347,17 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	Project::ProjectWPtr project = e.project;
 
 	// Create the file system model used by project
-	m_fileSystemModel = new QFileSystemModel( m_private.get() );
-	m_fileSystemModel->setRootPath( project->assetsAbsolutePath().c_str() );
-	m_fileSystemModel->setReadOnly( false );
+	m_assetFilesModel = new AssetFilesModel( m_private.get(), project->assetsAbsolutePath() );
 
 	// Create the asset tree
-	m_assetTree = new AssetTree( project, m_fileSystemModel.get() );
+	m_assetTree = new AssetTree( project, m_assetFilesModel.get() );
 
 	// Add dock
 	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
+
+	// Add document document placeholder
+	m_documentPlaceholder = createDocumentPlaceholder();
+	m_private->addDockWidget( Qt::TopDockWidgetArea, m_documentPlaceholder.get() );
 }
 
 // ** MainWindow::onProjectClosed

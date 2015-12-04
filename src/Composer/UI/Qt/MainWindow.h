@@ -27,7 +27,6 @@
 #ifndef __DC_Composer_MainWindow_H__
 #define __DC_Composer_MainWindow_H__
 
-#include "../IMainWindow.h"
 #include "UserInterface.h"
 
 namespace Ui {
@@ -54,8 +53,23 @@ namespace Ui {
 		//! Performs the main window initialization.
 		virtual bool					initialize( ComposerWPtr composer );
 
+		//! Constructs a new asset editor dock window or brings to front the existing one.
+		virtual IDocumentDockWPtr		dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo );
+
+		//! Closes the document.
+		virtual bool					closeDocument( IDocumentDockWPtr document );
+
+		//! Returns the opened document editor by asset.
+		virtual IDocumentDockWPtr		findDocument( const FileInfo& fileInfo ) const;
+
+		//! Returns an array of opened documents with a same type.
+		virtual DocumentsWeak			findDocuments( const FileInfo& fileInfo ) const;
+
 		//! Shows the message box.
-		virtual void					message( const String& text, MessageStatus status = MessageInfo );
+		virtual void					message( const String& text, MessageStatus status = MessageInfo ) const;
+
+		//! Shows the message box with yes, no, cancel buttons.
+		virtual MessageBoxResult		messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const;
 
 		//! Returns the file system instance.
 		virtual IFileSystemWPtr			fileSystem( void ) const;
@@ -63,10 +77,19 @@ namespace Ui {
 		//! Returns the asset tree instance.
 		virtual IAssetTreeWPtr			assetTree( void ) const;
 
+		//! Sets an active document.
+		virtual void					setActiveDocument( IDocumentDockWPtr dock );
+
 	private:
 
+		//! Creates the default document placeholder.
+		QDockWidget*					createDocumentPlaceholder( void ) const;
+
+		//! Ensures that the document was saved before closing.
+		bool							ensureSaved( IDocumentDockWPtr document ) const;
+
 		//! Creates the dock widget.
-		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetArea allowedDockAreas = Qt::AllDockWidgetAreas );
+		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetAreas allowedDockAreas = Qt::AllDockWidgetAreas );
 
 		//! Handles the ProjectOpened event.
 		void							onProjectOpened( const Composer::ProjectOpened& e );
@@ -76,11 +99,14 @@ namespace Ui {
 	
 	private:
 
-		QVector<IMenuPtr>				m_menues;			//!< All added menues reside here.
-		QVector<IToolBarPtr>			m_toolbars;			//!< All added toolbars reside here.
-		IFileSystemPtr					m_fileSystem;		//!< File system interface.
-		IAssetTreePtr					m_assetTree;		//!< Asset tree instance.
-		AutoPtr<QFileSystemModel>		m_fileSystemModel;	//!< Shared file system model.
+		QVector<IMenuPtr>				m_menues;				//!< All added menues reside here.
+		QVector<IToolBarPtr>			m_toolbars;				//!< All added toolbars reside here.
+		QVector<IDocumentDockPtr>		m_documents;			//!< All opened documents reside here.
+		IDocumentDockWPtr				m_activeDocument;		//!< An active document.
+		IFileSystemPtr					m_fileSystem;			//!< File system interface.
+		IAssetTreePtr					m_assetTree;			//!< Asset tree instance.
+		AutoPtr<AssetFilesModel>		m_assetFilesModel;		//!< Shared asset files model.
+		AutoPtr<QDockWidget>			m_documentPlaceholder;	//!< Document placeholder.
 	};
 
 } // namespace Ui

@@ -52,6 +52,16 @@ namespace Ui {
 	dcDeclarePtrs( IFileSystem )
 	dcDeclarePtrs( IAssetTree )
 
+	//! File info struct.
+	struct FileInfo {
+		String		path;			//!< The file absolute path.
+		String		directory;		//!< Parent directory absolute path.
+		String		baseName;		//!< The file base name.
+		String		fileName;		//!< The base name with extension.
+		String		ext;			//!< The file extension.
+		u32			timestamp;		//!< The file timestamp.
+	};
+
 	//! Message status.
 	enum MessageStatus {
 		  MessageInfo		//!< The information message.
@@ -69,10 +79,78 @@ namespace Ui {
 	//! Auto ptr type for signal delegate instances.
 	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
 
+	//! Container type to store array of documents.
+	typedef Array<IDocumentDockWPtr> DocumentsWeak;
+
 	//! Menu action callback type.
 	typedef std::function<void(IActionWPtr)> ActionCallback;
 
 } // namespace Ui
+
+namespace Editors {
+
+	dcDeclarePtrs( AssetEditor )
+
+} // namespace Editors
+
+namespace Project {
+
+	dcDeclarePtrs( Project )
+
+/*	#define dcDeclareEventID( ... )
+	#define dcBeginClass( ... )
+	#define dcEndClass
+
+	struct sForEachFileCallback {};
+
+	typedef void* dcDiskFileSystem;
+	typedef void* dcTask;
+
+	struct _Context {
+	};
+	typedef _Context* dcContext;
+
+	namespace reflection {
+		struct cObject { cObject( dcContext ctx ) {} void SetClass( CString value ) {} };
+	}
+
+	namespace asset {
+		struct Asset {};
+		struct cAssetManager {};
+	}
+
+	typedef asset::Asset* dcAsset;
+
+	namespace event {
+		struct EventDispatcher { EventDispatcher( dcContext ctx ) {} String m_type; };
+		struct Event { Event( dcContext ctx ) {} String m_type; };
+	}
+
+	typedef event::Event* dcEvent;
+
+    class cProject;
+    class ProjectModel;
+    class Configuration;
+    class Files;
+    class Item;
+    class Meta;
+		class ComponentMeta;
+		class ImageMeta;
+    class Cache;
+        class ClassCache;
+        class BuildCache;
+
+    typedef cClosure<void(Item*, void*)>    ProjectItemIterator;
+
+    typedef std::vector<Item*>      ProjectItemArray;
+    typedef std::stack<Item*>       ProjectItemStack;
+    typedef std::list<Item*>        ProjectItemList;
+    typedef std::set<Item*>         ProjectItemSet;
+    typedef std::map<const Item*, const Item*>  MapItemToItem;*/
+
+} // namespace Project
+
+dcDeclarePtrs( Composer )
 
 //! Root composer class.
 class Composer : public RefCounted {

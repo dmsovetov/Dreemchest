@@ -95,13 +95,22 @@ FileInfo FileSystem::extractFileInfo( const String& path ) const
 	QFileInfo info( path.c_str() );
 
 	// Fill the resulting struct
+	FileInfo result = convertFileInfo( info );
+
+	return result;
+}
+
+// ** FileSystem::convertFileInfo
+FileInfo FileSystem::convertFileInfo( const QFileInfo& fileInfo )
+{
 	FileInfo result;
-	result.path			= path;
-	result.baseName		= info.baseName().toAscii().constData();
-	result.ext			= info.suffix().toAscii().constData();
+
+	result.path			= fileInfo.absoluteFilePath().toAscii().constData();
+	result.baseName		= fileInfo.baseName().toAscii().constData();
+	result.ext			= fileInfo.suffix().toAscii().constData();
 	result.fileName		= result.ext == "" ? result.baseName : (result.baseName + "." + result.ext);
-	result.directory	= info.absoluteDir().path().toAscii().constData();
-	result.timestamp	= info.lastModified().toTime_t();
+	result.directory	= fileInfo.absoluteDir().path().toAscii().constData();
+	result.timestamp	= fileInfo.lastModified().toTime_t();
 
 	return result;
 }

@@ -31,16 +31,6 @@
 
 namespace Ui {
 
-	//! File info struct.
-	struct FileInfo {
-		String					path;			//!< The file absolute path.
-		String					directory;		//!< Parent directory absolute path.
-		String					baseName;		//!< The file base name.
-		String					fileName;		//!< The base name with extension.
-		String					ext;			//!< The file extension.
-		u32						timestamp;		//!< The file timestamp.
-	};
-
 	//! File system interface.
 	class IFileSystem : public RefCounted {
 	public:

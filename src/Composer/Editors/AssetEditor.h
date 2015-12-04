@@ -31,6 +31,33 @@
 
 namespace Editors {
 
+	//! Base class for all asset editors.
+	class AssetEditor : public RefCounted {
+	public:
+
+		//! Asset editor has entered the foreground.
+		virtual void		notifyEnterForeground( void ) {}
+
+		//! Asset editor has entered the background.
+		virtual void		notifyEnterBackground( void ) {}
+
+		//! Saves the asset to disk.
+		virtual void		save( void ) {}
+
+		//! Returns true if the document has changes.
+		bool				hasChanges( void ) const;
+
+		//! Sets the edited asset.
+		void				setAsset( const Ui::FileInfo& value );
+
+		//! Returns the edited asset.
+		const Ui::FileInfo&	asset( void ) const;
+
+	protected:
+
+		Ui::FileInfo		m_asset;	//!< An edited asset.
+	};
+
 } // namespace Editors
 
 #endif	/*	!__DC_Composer_AssetEditor_H__	*/

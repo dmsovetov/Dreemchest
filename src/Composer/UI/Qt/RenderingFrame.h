@@ -28,7 +28,6 @@
 #define __DC_Composer_Qt_RenderingFrame_H__
 
 #include "UserInterface.h"
-#include "../IRenderingFrame.h"
 
 namespace Ui {
 
@@ -40,6 +39,9 @@ namespace Ui {
 		static QGLFormat			kOpenGLFormat;
 
 									QRenderingFrame( const QGLWidget* shareWidget, QWidget* parent );
+
+		//! Performs the setup of a shared OpenGL format.
+		static void					setupOpenGLFormat( void );
 
 	protected:
 

@@ -27,7 +27,6 @@
 #ifndef __DC_Composer_Menu_H__
 #define __DC_Composer_Menu_H__
 
-#include "../IMenu.h"
 #include "UserInterface.h"
 
 namespace Ui {

@@ -28,7 +28,6 @@
 #define __DC_Composer_Qt_AssetTree_H__
 
 #include "UserInterface.h"
-#include "../IAssetTree.h"
 
 namespace Ui {
 
@@ -40,7 +39,7 @@ namespace Ui {
 	public:
 
 								//! Constructs asset tree bound to a specified path.
-								QAssetTree( Project::ProjectWPtr project, QFileSystemModel* model );
+								QAssetTree( Project::ProjectWPtr project, AssetFilesModel* model );
 
 		//! Returns the selected items.
 		StringArray				selection( void ) const;
@@ -62,13 +61,13 @@ namespace Ui {
 	private slots:
 
 		//! Handles the doubleClicked signal.
-		void					itemDoubleClicked( const QModelIndex& index ) const;
+		void					itemDoubleClicked( const QModelIndex& index );
 
 	private:
 
 		IAssetTreeWPtr			m_parent;	//!< Parent AssetTree instance.
 		Project::ProjectWPtr	m_project;	//!< Parent project instance.
-		QFileSystemModel*		m_model;	//!< File system model used.
+		AssetFilesModel*		m_model;	//!< File system model used.
 	};
 
 	//! Asset tree widget.
@@ -76,7 +75,7 @@ namespace Ui {
 	public:
 
 								//! Constructs asset tree bound to a specified path.
-								AssetTree( Project::ProjectWPtr project, QFileSystemModel* model );
+								AssetTree( Project::ProjectWPtr project, AssetFilesModel* model );
 
 		//! Returns the selected items.
 		virtual StringArray		selection( void ) const;

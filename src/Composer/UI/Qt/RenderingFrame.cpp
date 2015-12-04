@@ -50,19 +50,25 @@ QRenderingFrame::QRenderingFrame( const QGLWidget* shareWidget, QWidget *parent 
 }
 
 // ** QRenderingFrame::SetupOpenGLFormat
-//void QRenderingFrame::SetupOpenGLFormat( void )
-//{
-//	gOpenGLFormat.setSwapInterval( 1 );
-//	gOpenGLFormat.setSampleBuffers( true );
-//	gOpenGLFormat.setSamples( 8 );
-//    
-//    QGLWidget *glTestWidget = new QGLWidget( gOpenGLFormat );
-//    if( !glTestWidget->isValid() ) {
-//        gOpenGLFormat = QGLFormat::defaultFormat();
-//        gOpenGLFormat.setDirectRendering( false );
-//    }
-//    delete glTestWidget;
-//}
+void QRenderingFrame::setupOpenGLFormat( void )
+{
+	// Construct the custom OpenGL format
+	kOpenGLFormat.setSwapInterval( 1 );
+	kOpenGLFormat.setSampleBuffers( true );
+	kOpenGLFormat.setSamples( 8 );
+    
+	// Construct the test QGLWidget
+    AutoPtr<QGLWidget> widget = new QGLWidget( kOpenGLFormat );
+
+	// The QGLWidget was successfully initialized - use this format
+	if( widget->isValid() ) {
+		return;
+	}
+
+	// Fallback to default one
+    kOpenGLFormat = QGLFormat::defaultFormat();
+    kOpenGLFormat.setDirectRendering( false );
+}
 
 // ** QRenderingFrame::BeginRendering
 //void QRenderingFrame::BeginRendering( int interval )

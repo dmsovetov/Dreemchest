@@ -71,6 +71,9 @@ namespace Ui {
 		//! Browses to a selected path.
 		virtual bool			browse( const String& path );
 
+		//! Converts the QFileInfo to Ui::FileInfo.
+		static FileInfo			convertFileInfo( const QFileInfo& fileInfo );
+
 	private:
 
 		QWidget*				m_parent;	//!< The parent QWidget to be used.

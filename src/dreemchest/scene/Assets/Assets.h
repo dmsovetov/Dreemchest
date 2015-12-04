@@ -64,7 +64,8 @@ namespace Scene {
 			, Mesh				= BIT( 2 )
 			, Terrain			= BIT( 3 )
 			, Scene				= BIT( 4 )
-			, TotalAssetTypes	= 5
+			, Folder			= BIT( 5 )
+			, TotalAssetTypes	= 6
 			, All				= ~0
 		};
 

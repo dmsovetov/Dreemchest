@@ -27,6 +27,9 @@
 #include "AssetTree.h"
 
 #include "Menu.h"
+#include "AssetFilesModel.h"
+#include "FileSystem.h"
+#include "DocumentDock.h"
 #include "../../Project/Project.h"
 
 namespace Ui {
@@ -34,7 +37,7 @@ namespace Ui {
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project, QFileSystemModel* model ) : UserInterface( new QAssetTree( project, model ) )
+AssetTree::AssetTree( Project::ProjectWPtr project, AssetFilesModel* model ) : UserInterface( new QAssetTree( project, model ) )
 {
 	m_private->setParent( this );
 }
@@ -54,13 +57,14 @@ void AssetTree::expandSelectedItems( void )
 // ------------------------------------------------ QAssetTree ------------------------------------------------ //
 
 // ** QAssetTree::QAssetTree
-QAssetTree::QAssetTree( Project::ProjectWPtr project, QFileSystemModel* model ) : m_project( project ), m_model( model )
+QAssetTree::QAssetTree( Project::ProjectWPtr project, AssetFilesModel* model ) : m_project( project ), m_model( model )
 {
 	setModel( m_model );
 	setRootIndex( m_model->index( m_model->rootPath() ) );
 	setHeaderHidden( true );
 	setDragEnabled( true );
 	setDropIndicatorShown( true );
+	setDragDropOverwriteMode( true );
 	setSelectionMode( ExtendedSelection );
 	setDragDropMode( InternalMove );
 	setEditTriggers( EditTrigger::EditKeyPressed );
@@ -103,13 +107,17 @@ void QAssetTree::contextMenuEvent( QContextMenuEvent *e )
 }
 
 // ** QAssetTree::itemDoubleClicked
-void QAssetTree::itemDoubleClicked( const QModelIndex& index ) const
+void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 {
 	if( m_model->isDir( index ) ) {
 		return;
 	}
 
-	DC_BREAK;
+	// Convert the file info
+	FileInfo fileInfo = FileSystem::convertFileInfo( m_model->fileInfo( index ) );
+
+	// Open the asset editor
+	m_project->openAssetEditor( fileInfo );
 }
 
 // ** QAssetTree::selection

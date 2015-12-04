@@ -30,15 +30,20 @@
 #include "../UI/IMenu.h"
 #include "../UI/IFileSystem.h"
 #include "../UI/IAssetTree.h"
+#include "../UI/IDocumentDock.h"
 
 namespace Project {
 
 // ** Project::Project
 Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mainWindow( mainWindow )
 {
+	// Construct the built-in paths.
 	m_paths[RootPath]	= path;
 	m_paths[AssetsPath]	= path + "Assets";
 	m_paths[CachePath]	= path + "Cache";
+
+	// Declare asset editors.
+	m_assetEditors.declare<Editors::AssetEditor>( "scene" );
 }
 
 // ** Project::create
@@ -108,6 +113,27 @@ void Project::createAsset( const String& name, const String& ext )
 
 	// Expand parent item
 	m_mainWindow->assetTree()->expandSelectedItems();
+}
+
+// ** Project::openAssetEditor
+Ui::IDocumentDockWPtr Project::openAssetEditor( const Ui::FileInfo& fileInfo )
+{
+	// Construct the asset editor by file extension
+	AssetEditorFactory::Ptr assetEditor = m_assetEditors.construct( fileInfo.ext );
+
+	// No asset editor found - open the asset file with standard editor
+	if( !assetEditor.valid() ) {
+		m_mainWindow->fileSystem()->browse( fileInfo.path );
+		return Ui::IDocumentDockWPtr();
+	}
+
+	// Set an asset
+	assetEditor->setAsset( fileInfo );
+	
+	// Dock the editor to main window
+	Ui::IDocumentDockWPtr result = m_mainWindow->dockAssetEditor( assetEditor, fileInfo );
+	
+	return result;
 }
 
 // ** Project::menuImportAssets

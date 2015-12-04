@@ -39,19 +39,19 @@ namespace Ui {
 	public:
 
 		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr	addToolBar( void )						= 0;
+		virtual IToolBarWPtr		addToolBar( void )						= 0;
 	
 		//! Removes the toolbar from a window.
-		virtual void			removeToolBar( IToolBarWPtr toolBar )	= 0;
+		virtual void				removeToolBar( IToolBarWPtr toolBar )	= 0;
 	
 		//! Adds a new menu to window.
-		virtual IMenuWPtr		addMenu( const String& text )			= 0;
+		virtual IMenuWPtr			addMenu( const String& text )			= 0;
 	
 		//! Removes the menu from a window.
-		virtual void			removeMenu( IMenuWPtr menu )			= 0;
+		virtual void				removeMenu( IMenuWPtr menu )			= 0;
 
 		//! Performs the main window initialization.
-		virtual bool			initialize( ComposerWPtr composer )		= 0;
+		virtual bool				initialize( ComposerWPtr composer )		= 0;
 
 		//! Shows the message box.
 		virtual void				message( const String& text, MessageStatus status = MessageInfo ) const = 0;
@@ -59,11 +59,26 @@ namespace Ui {
 		//! Shows the message box with yes, no, cancel buttons.
 		virtual MessageBoxResult	messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const = 0;
 
+		//! Constructs a new asset editor dock window or brings to front the existing one.
+		virtual IDocumentDockWPtr	dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo ) = 0;
+
+		//! Closes the document.
+		virtual bool				closeDocument( IDocumentDockWPtr document ) = 0;
+
+		//! Returns the opened document editor by asset.
+		virtual IDocumentDockWPtr	findDocument( const FileInfo& fileInfo ) const = 0;
+
+		//! Returns an array of opened documents with a same type.
+		virtual DocumentsWeak		findDocuments( const FileInfo& fileInfo ) const = 0;
+
 		//! Returns the file system instance.
-		virtual IFileSystemWPtr	fileSystem( void ) const				= 0;
+		virtual IFileSystemWPtr		fileSystem( void ) const				= 0;
 
 		//! Returns the asset tree instance.
-		virtual IAssetTreeWPtr	assetTree( void ) const					= 0;
+		virtual IAssetTreeWPtr		assetTree( void ) const					= 0;
+
+		//! Sets an active document.
+		virtual void				setActiveDocument( IDocumentDockWPtr dock ) = 0;
 	};
 
 } // namespace Ui

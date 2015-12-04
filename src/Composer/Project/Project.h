@@ -28,6 +28,7 @@
 #define __DC_Composer_Project_H__
 
 #include "../Composer.h"
+#include "../Editors/AssetEditor.h"
 
 namespace Project {
 
@@ -52,6 +53,9 @@ namespace Project {
 
 		//! Returns project assets absolute path.
 		String				assetsAbsolutePath( void ) const;
+
+		//! Opens the asset editor.
+		Ui::IDocumentDockWPtr	openAssetEditor( const Ui::FileInfo& fileInfo );
 
 		//! Creates new Project instance.
 		static ProjectPtr	create( Ui::IMainWindowWPtr mainWindow, const io::Path& path );
@@ -87,8 +91,12 @@ namespace Project {
 
 	private:
 
+		//! Alias the asset editor factory type.
+		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
+
 		Ui::IMainWindowWPtr m_mainWindow;			//!< Main window instance.
 		io::Path			m_paths[TotalPaths];	//!< Project path.
+		AssetEditorFactory	m_assetEditors;			//!< Asset editor factory.
 	};
 
 } // namespace Project
