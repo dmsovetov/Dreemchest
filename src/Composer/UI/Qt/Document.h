@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_DocumentDock_H__
-#define __DC_Composer_Qt_DocumentDock_H__
+#ifndef __DC_Composer_Qt_Document_H__
+#define __DC_Composer_Qt_Document_H__
 
 #include "UserInterface.h"
 
@@ -39,7 +39,7 @@ namespace Ui {
 	public:
 
 											//! Constructs the QDocumentDock instance.
-											QDocumentDock( DocumentDock* document, const QString& title, QWidget* parent );
+											QDocumentDock( Document* document, const QString& title, QWidget* parent );
 	private:
 
 		//! Handles the closed event.
@@ -52,16 +52,16 @@ namespace Ui {
 
 	private:
 
-		DocumentDock*						m_document;	//!< Parent document dock.
+		Document*							m_document;	//!< Parent document dock.
 	};
 
-	//! Document dock Qt implementation.
-	class DocumentDock : public UserInterface<IDocumentDock, QDocumentDock> {
+	//! Document Qt implementation.
+	class Document : public UserInterface<IDocument, QDocumentDock> {
 	friend class QDocumentDock;
 	public:
 
-											//! Constructs the DocumentDock instance.
-											DocumentDock( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent );
+											//! Constructs the Document instance.
+											Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent );
 
 		//! Returns the rendering frame used for this document dock.
 		virtual IRenderingFrameWPtr			renderingFrame( void );
@@ -75,10 +75,10 @@ namespace Ui {
 	private:
 
 		//! Sets this document as active.
-		void								activateDocument( void );
+		void								activate( void );
 
 		//! Closes this document.
-		bool								closeDocument( void );
+		bool								close( void );
 
 	private:
 
@@ -88,4 +88,4 @@ namespace Ui {
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_Qt_DocumentDock_H__	*/
+#endif	/*	!__DC_Composer_Qt_Document_H__	*/

@@ -55,7 +55,7 @@ namespace Project {
 		String				assetsAbsolutePath( void ) const;
 
 		//! Opens the asset editor.
-		Ui::IDocumentDockWPtr	openAssetEditor( const Ui::FileInfo& fileInfo );
+		Ui::IDocumentWPtr	editAsset( const Ui::FileInfo& fileInfo );
 
 		//! Creates new Project instance.
 		static ProjectPtr	create( Ui::IMainWindowWPtr mainWindow, const io::Path& path );

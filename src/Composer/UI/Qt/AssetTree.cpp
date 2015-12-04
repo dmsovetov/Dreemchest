@@ -29,7 +29,7 @@
 #include "Menu.h"
 #include "AssetFilesModel.h"
 #include "FileSystem.h"
-#include "DocumentDock.h"
+#include "Document.h"
 #include "../../Project/Project.h"
 
 namespace Ui {
@@ -117,7 +117,7 @@ void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 	FileInfo fileInfo = FileSystem::convertFileInfo( m_model->fileInfo( index ) );
 
 	// Open the asset editor
-	m_project->openAssetEditor( fileInfo );
+	m_project->editAsset( fileInfo );
 }
 
 // ** QAssetTree::selection

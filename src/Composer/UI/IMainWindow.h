@@ -60,13 +60,13 @@ namespace Ui {
 		virtual MessageBoxResult	messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const = 0;
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		virtual IDocumentDockWPtr	dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo ) = 0;
+		virtual IDocumentWPtr		editDocument( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo ) = 0;
 
 		//! Closes the document.
-		virtual bool				closeDocument( IDocumentDockWPtr document ) = 0;
+		virtual bool				closeDocument( IDocumentWPtr document ) = 0;
 
 		//! Returns the opened document editor by asset.
-		virtual IDocumentDockWPtr	findDocument( const FileInfo& fileInfo ) const = 0;
+		virtual IDocumentWPtr		findDocument( const FileInfo& fileInfo ) const = 0;
 
 		//! Returns an array of opened documents with a same type.
 		virtual DocumentsWeak		findDocuments( const FileInfo& fileInfo ) const = 0;
@@ -78,7 +78,7 @@ namespace Ui {
 		virtual IAssetTreeWPtr		assetTree( void ) const					= 0;
 
 		//! Sets an active document.
-		virtual void				setActiveDocument( IDocumentDockWPtr dock ) = 0;
+		virtual void				setActiveDocument( IDocumentWPtr dock ) = 0;
 	};
 
 } // namespace Ui

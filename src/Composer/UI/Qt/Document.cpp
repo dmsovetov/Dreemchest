@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "DocumentDock.h"
+#include "Document.h"
 
 #include "MainWindow.h"
 #include "../../Editors/AssetEditor.h"
@@ -34,7 +34,7 @@ namespace Ui {
 // ------------------------------------------- QDocumentDock ------------------------------------------- //
 
 // ** QDocumentDock::QDocumentDock
-QDocumentDock::QDocumentDock( DocumentDock* document, const QString& title, QWidget* parent ) : QDockWidget( title, parent ), m_document( document )
+QDocumentDock::QDocumentDock( Document* document, const QString& title, QWidget* parent ) : QDockWidget( title, parent ), m_document( document )
 {
 	connect( this, SIGNAL(visibilityChanged(bool)), this, SLOT(visibilityChanged(bool)) );
 }
@@ -43,7 +43,7 @@ QDocumentDock::QDocumentDock( DocumentDock* document, const QString& title, QWid
 void QDocumentDock::visibilityChanged( bool visible )
 {
 	if( visible ) {
-		m_document->activateDocument();
+		m_document->activate();
 	}
 }
 
@@ -51,7 +51,7 @@ void QDocumentDock::visibilityChanged( bool visible )
 void QDocumentDock::closeEvent( QCloseEvent *e )
 {
 	// Close the document
-	if( !m_document->closeDocument() ) {
+	if( !m_document->close() ) {
 		e->ignore();
 	} else {
 		// Process the event
@@ -59,41 +59,41 @@ void QDocumentDock::closeEvent( QCloseEvent *e )
 	}
 }
 
-// ------------------------------------------- DocumentDock ------------------------------------------- //
+// ---------------------------------------------- Document ---------------------------------------------- //
 
-// ** DocumentDock::DocumentDock
-DocumentDock::DocumentDock( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent )
+// ** Document::Document
+Document::Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent )
 	: UserInterface( new QDocumentDock( this, title.c_str(), parent ) ), m_mainWindow( mainWindow ), m_assetEditor( assetEditor )
 {
 
 }
 
-// ** DocumentDock::renderingFrame
-IRenderingFrameWPtr DocumentDock::renderingFrame( void )
+// ** Document::renderingFrame
+IRenderingFrameWPtr Document::renderingFrame( void )
 {
 	DC_NOT_IMPLEMENTED
 }
 
-// ** DocumentDock::setRenderingFrame
-void DocumentDock::setRenderingFrame( IRenderingFramePtr value )
+// ** Document::setRenderingFrame
+void Document::setRenderingFrame( IRenderingFramePtr value )
 {
 	DC_NOT_IMPLEMENTED
 }
 
-// ** DocumentDock::assetEditor
-Editors::AssetEditorWPtr DocumentDock::assetEditor( void ) const
+// ** Document::assetEditor
+Editors::AssetEditorWPtr Document::assetEditor( void ) const
 {
 	return m_assetEditor;
 }
 
-// ** DocumentDock::activateDocument
-void DocumentDock::activateDocument( void )
+// ** Document::activate
+void Document::activate( void )
 {
 	m_mainWindow->setActiveDocument( this );
 }
 
-// ** DocumentDock::closeDocument
-bool DocumentDock::closeDocument( void )
+// ** Document::close
+bool Document::close( void )
 {
 	return m_mainWindow->closeDocument( this );
 }

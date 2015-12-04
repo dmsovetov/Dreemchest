@@ -31,7 +31,7 @@
 #include "FileSystem.h"
 #include "AssetTree.h"
 #include "AssetFilesModel.h"
-#include "DocumentDock.h"
+#include "Document.h"
 
 #include "../../Project/Project.h"
 #include "../../Editors/AssetEditor.h"
@@ -171,13 +171,13 @@ void MainWindow::removeMenu( IMenuWPtr menu )
 	m_menues.remove( index );
 }
 
-// ** MainWindow::dockAssetEditor
-IDocumentDockWPtr MainWindow::dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const FileInfo& fileInfo )
+// ** MainWindow::editDocument
+IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const FileInfo& fileInfo )
 {
 	DC_BREAK_IF( !assetEditor.valid() );
 
 	// First lookup the exising document
-	IDocumentDockWPtr existing = findDocument( fileInfo );
+	IDocumentWPtr existing = findDocument( fileInfo );
 
 	if( existing.valid() ) {
 		existing->privateInterface<QDocumentDock>()->raise();
@@ -185,8 +185,8 @@ IDocumentDockWPtr MainWindow::dockAssetEditor( Editors::AssetEditorWPtr assetEdi
 	}
 
 	// Create the document instance
-	DocumentDock* dock = new DocumentDock( this, assetEditor, fileInfo.baseName, m_private.get() );
-	m_private->addDockWidget( Qt::LeftDockWidgetArea, dock->privateInterface<QDocumentDock>() );
+	Document* document = new Document( this, assetEditor, fileInfo.baseName, m_private.get() );
+	m_private->addDockWidget( Qt::LeftDockWidgetArea, document->privateInterface<QDocumentDock>() );
 
 	// Find opened documents of a same type
 	DocumentsWeak documents = findDocuments( fileInfo );
@@ -199,22 +199,22 @@ IDocumentDockWPtr MainWindow::dockAssetEditor( Editors::AssetEditorWPtr assetEdi
 		tabifyTo = documents[0]->privateInterface<QDocumentDock>();
 	}
 
-	m_private->tabifyDockWidget( tabifyTo, dock->privateInterface<QDocumentDock>() );
+	m_private->tabifyDockWidget( tabifyTo, document->privateInterface<QDocumentDock>() );
 
 	// Set the document as active
-	setActiveDocument( dock );
+	setActiveDocument( document );
 
 	//editor->AttachToDock( dock );
 	//editor->Edit( item );
 
 	// Save created document
-	m_documents.append( dock );
+	m_documents.append( document );
 
-	return dock;
+	return document;
 }
 
 // ** MainWindow::closeDocument
-bool MainWindow::closeDocument( IDocumentDockWPtr document )
+bool MainWindow::closeDocument( IDocumentWPtr document )
 {
 	// Find the document
 	int index = m_documents.indexOf( document );
@@ -234,7 +234,7 @@ bool MainWindow::closeDocument( IDocumentDockWPtr document )
 
 	// Invalidate active document
 	if( m_activeDocument == document ) {
-		m_activeDocument = IDocumentDockWPtr();
+		m_activeDocument = IDocumentWPtr();
 	}
 
 	// Remove from documents
@@ -252,15 +252,15 @@ bool MainWindow::closeDocument( IDocumentDockWPtr document )
 }
 
 // ** MainWindow::findDocument
-IDocumentDockWPtr MainWindow::findDocument( const FileInfo& fileInfo ) const
+IDocumentWPtr MainWindow::findDocument( const FileInfo& fileInfo ) const
 {
-	foreach( IDocumentDockWPtr document, m_documents ) {
+	foreach( IDocumentWPtr document, m_documents ) {
 		if( document->assetEditor()->asset().path == fileInfo.path ) {
 			return document;
 		}
 	}
 
-	return IDocumentDockWPtr();
+	return IDocumentWPtr();
 }
 
 // ** MainWindow::findDocuments
@@ -268,7 +268,7 @@ DocumentsWeak MainWindow::findDocuments( const FileInfo& fileInfo ) const
 {
 	DocumentsWeak documents;
 
-	foreach( IDocumentDockWPtr document, m_documents ) {
+	foreach( IDocumentWPtr document, m_documents ) {
 		if( document->assetEditor()->asset().ext == fileInfo.ext ) {
 			documents.push_back( document );
 		}
@@ -278,7 +278,7 @@ DocumentsWeak MainWindow::findDocuments( const FileInfo& fileInfo ) const
 }
 
 // ** MainWindow::setActiveDocument
-void MainWindow::setActiveDocument( IDocumentDockWPtr document )
+void MainWindow::setActiveDocument( IDocumentWPtr document )
 {
 	DC_BREAK_IF( !document.valid() )
 
@@ -306,7 +306,7 @@ void MainWindow::setActiveDocument( IDocumentDockWPtr document )
 }
 
 // ** MainWindow::ensureSaved
-bool MainWindow::ensureSaved( IDocumentDockWPtr document ) const
+bool MainWindow::ensureSaved( IDocumentWPtr document ) const
 {
 	// Get the attached asset editor.
 	Editors::AssetEditorWPtr assetEditor = document->assetEditor();

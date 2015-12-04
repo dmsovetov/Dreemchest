@@ -24,18 +24,18 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_IDocumentDock_H__
-#define __DC_Composer_IDocumentDock_H__
+#ifndef __DC_Composer_IDocument_H__
+#define __DC_Composer_IDocument_H__
 
 #include "IUserInterface.h"
 
 namespace Ui {
 
-	//! Document docking window interface.
-	class IDocumentDock : public IUserInterface {
+	//! Document window interface.
+	class IDocument : public IUserInterface {
 	public:
 
-		//! Returns the rendering frame used for this document dock.
+		//! Returns the rendering frame used by this document.
 		virtual IRenderingFrameWPtr			renderingFrame( void )							= 0;
 
 		//! Sets the rendering frame.
@@ -48,4 +48,4 @@ namespace Ui {
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_IDocumentDock_H__	*/
+#endif	/*	!__DC_Composer_IDocument_H__	*/

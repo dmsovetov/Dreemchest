@@ -54,13 +54,13 @@ namespace Ui {
 		virtual bool					initialize( ComposerWPtr composer );
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		virtual IDocumentDockWPtr		dockAssetEditor( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo );
+		virtual IDocumentWPtr			editDocument( Editors::AssetEditorWPtr assetEditor, const Ui::FileInfo& fileInfo );
 
 		//! Closes the document.
-		virtual bool					closeDocument( IDocumentDockWPtr document );
+		virtual bool					closeDocument( IDocumentWPtr document );
 
 		//! Returns the opened document editor by asset.
-		virtual IDocumentDockWPtr		findDocument( const FileInfo& fileInfo ) const;
+		virtual IDocumentWPtr			findDocument( const FileInfo& fileInfo ) const;
 
 		//! Returns an array of opened documents with a same type.
 		virtual DocumentsWeak			findDocuments( const FileInfo& fileInfo ) const;
@@ -78,7 +78,7 @@ namespace Ui {
 		virtual IAssetTreeWPtr			assetTree( void ) const;
 
 		//! Sets an active document.
-		virtual void					setActiveDocument( IDocumentDockWPtr dock );
+		virtual void					setActiveDocument( IDocumentWPtr dock );
 
 	private:
 
@@ -86,7 +86,7 @@ namespace Ui {
 		QDockWidget*					createDocumentPlaceholder( void ) const;
 
 		//! Ensures that the document was saved before closing.
-		bool							ensureSaved( IDocumentDockWPtr document ) const;
+		bool							ensureSaved( IDocumentWPtr document ) const;
 
 		//! Creates the dock widget.
 		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetAreas allowedDockAreas = Qt::AllDockWidgetAreas );
@@ -101,8 +101,8 @@ namespace Ui {
 
 		QVector<IMenuPtr>				m_menues;				//!< All added menues reside here.
 		QVector<IToolBarPtr>			m_toolbars;				//!< All added toolbars reside here.
-		QVector<IDocumentDockPtr>		m_documents;			//!< All opened documents reside here.
-		IDocumentDockWPtr				m_activeDocument;		//!< An active document.
+		QVector<IDocumentPtr>			m_documents;			//!< All opened documents reside here.
+		IDocumentWPtr					m_activeDocument;		//!< An active document.
 		IFileSystemPtr					m_fileSystem;			//!< File system interface.
 		IAssetTreePtr					m_assetTree;			//!< Asset tree instance.
 		AutoPtr<AssetFilesModel>		m_assetFilesModel;		//!< Shared asset files model.

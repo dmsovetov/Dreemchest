@@ -48,7 +48,7 @@ namespace Ui {
 	dcDeclarePtrs( IMenu )
 	dcDeclarePtrs( IToolBar )
 	dcDeclarePtrs( IRenderingFrame )
-	dcDeclarePtrs( IDocumentDock )
+	dcDeclarePtrs( IDocument )
 	dcDeclarePtrs( IFileSystem )
 	dcDeclarePtrs( IAssetTree )
 
@@ -80,7 +80,7 @@ namespace Ui {
 	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
 
 	//! Container type to store array of documents.
-	typedef Array<IDocumentDockWPtr> DocumentsWeak;
+	typedef Array<IDocumentWPtr> DocumentsWeak;
 
 	//! Menu action callback type.
 	typedef std::function<void(IActionWPtr)> ActionCallback;

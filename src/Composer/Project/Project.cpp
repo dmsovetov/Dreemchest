@@ -30,7 +30,7 @@
 #include "../UI/IMenu.h"
 #include "../UI/IFileSystem.h"
 #include "../UI/IAssetTree.h"
-#include "../UI/IDocumentDock.h"
+#include "../UI/IDocument.h"
 
 namespace Project {
 
@@ -115,8 +115,8 @@ void Project::createAsset( const String& name, const String& ext )
 	m_mainWindow->assetTree()->expandSelectedItems();
 }
 
-// ** Project::openAssetEditor
-Ui::IDocumentDockWPtr Project::openAssetEditor( const Ui::FileInfo& fileInfo )
+// ** Project::editAsset
+Ui::IDocumentWPtr Project::editAsset( const Ui::FileInfo& fileInfo )
 {
 	// Construct the asset editor by file extension
 	AssetEditorFactory::Ptr assetEditor = m_assetEditors.construct( fileInfo.ext );
@@ -124,14 +124,14 @@ Ui::IDocumentDockWPtr Project::openAssetEditor( const Ui::FileInfo& fileInfo )
 	// No asset editor found - open the asset file with standard editor
 	if( !assetEditor.valid() ) {
 		m_mainWindow->fileSystem()->browse( fileInfo.path );
-		return Ui::IDocumentDockWPtr();
+		return Ui::IDocumentWPtr();
 	}
 
 	// Set an asset
 	assetEditor->setAsset( fileInfo );
 	
 	// Dock the editor to main window
-	Ui::IDocumentDockWPtr result = m_mainWindow->dockAssetEditor( assetEditor, fileInfo );
+	Ui::IDocumentWPtr result = m_mainWindow->editDocument( assetEditor, fileInfo );
 	
 	return result;
 }

@@ -28,7 +28,7 @@
 #define __DC_Composer_Qt_UserInterface_H__
 
 #include "../IUserInterface.h"
-#include "../IDocumentDock.h"
+#include "../IDocument.h"
 #include "../IMainWindow.h"
 #include "../IAssetTree.h"
 #include "../IMainWindow.h"
@@ -38,7 +38,7 @@
 namespace Ui {
 
 	class AssetFilesModel;
-	class DocumentDock;
+	class Document;
 
 	//! Generic class to declare Qt interface implementations.
 	template<typename TBase, typename TPrivate>
