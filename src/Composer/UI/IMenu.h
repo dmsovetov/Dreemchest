@@ -95,6 +95,9 @@ namespace Ui {
 		//! Clears this menu.
 		virtual void				clear( void ) = 0;
 
+		//! Returns the total number of items inside the menu.
+		virtual s32					size( void ) const = 0;
+
 		//! Adds new submenu.
 		virtual IMenuWPtr			addMenu( const String& text ) = 0;
 
