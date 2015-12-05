@@ -127,9 +127,6 @@ Ui::IDocumentWPtr Project::editAsset( const Ui::FileInfo& fileInfo )
 		return Ui::IDocumentWPtr();
 	}
 
-	// Set an asset
-	assetEditor->setAsset( fileInfo );
-	
 	// Dock the editor to main window
 	Ui::IDocumentWPtr result = m_mainWindow->editDocument( assetEditor, fileInfo );
 	

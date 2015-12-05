@@ -102,10 +102,10 @@ namespace Ui {
 		virtual void				handleFocusOut( void ) {}
 
 		//! Handles the key pressed event.
-		virtual void				handleKeyPress( const Platform::Key& key ) {}
+		virtual void				handleKeyPress( Platform::Key key ) {}
 
 		//! Handles the key released event.
-		virtual void				handleKeyRelease( const Platform::Key& key ) {}
+		virtual void				handleKeyRelease( Platform::Key key ) {}
 
 		//! Handles the context menu event.
 		virtual void				handleContextMenu( IMenuWPtr menu ) {}

@@ -98,6 +98,7 @@ namespace Ui {
 namespace Editors {
 
 	dcDeclarePtrs( AssetEditor )
+	dcDeclarePtrs( VisualEditor )
 
 } // namespace Editors
 

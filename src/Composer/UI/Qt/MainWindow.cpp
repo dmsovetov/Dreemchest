@@ -212,7 +212,13 @@ IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, co
 	}
 
 	// Create the document instance
-	Document* document = new Document( this, assetEditor, fileInfo.baseName, m_private.get() );
+	IDocumentPtr document( new Document( this, assetEditor, fileInfo.baseName, m_private.get() ) );
+
+	// Initialize the asset editor with a document
+	if( !assetEditor->initialize( fileInfo, document ) ) {
+		return IDocumentWPtr();
+	}
+
 	m_private->addDockWidget( Qt::LeftDockWidgetArea, document->privateInterface<QDocumentDock>() );
 
 	// Find opened documents of a same type
@@ -230,9 +236,6 @@ IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, co
 
 	// Set the document as active
 	setActiveDocument( document );
-
-	//editor->AttachToDock( dock );
-	//editor->Edit( item );
 
 	// Save created document
 	m_documents.append( document );

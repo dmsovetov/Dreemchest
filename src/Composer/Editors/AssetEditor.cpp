@@ -34,16 +34,25 @@ bool AssetEditor::hasChanges( void ) const
 	return true;
 }
 
-// ** AssetEditor::setAsset
-void AssetEditor::setAsset( const Ui::FileInfo& value )
+// ** AssetEditor::initialize
+bool AssetEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document )
 {
-	m_asset = value;
+	m_asset		= asset;
+	m_document	= document;
+
+	return true;
 }
 
 // ** AssetEditor::setAsset
 const Ui::FileInfo&  AssetEditor::asset( void ) const
 {
 	return m_asset;
+}
+
+// ** AssetEditor::setAsset
+Ui::IDocumentWPtr AssetEditor::document( void ) const
+{
+	return m_document;
 }
 
 } // namespace Editors
