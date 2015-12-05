@@ -44,6 +44,21 @@ IMainWindowPtr createMainWindow( const String& title )
 	return IMainWindowPtr( new MainWindow( title ) );
 }
 
+// ** convertKey
+Platform::Key convertKey( s32 key )
+{
+	switch( key ) {
+	case Qt::Key_Back:		return Platform::Key::Back;
+	case Qt::Key_Delete:	return Platform::Key::Delete;
+	case Qt::Key_Left:		return Platform::Key::Left;
+	case Qt::Key_Right:		return Platform::Key::Right;
+	case Qt::Key_Up:		return Platform::Key::Up;
+	case Qt::Key_Down:		return Platform::Key::Down;
+	}
+
+	return Platform::Key::Total;
+}
+
 // ** MainWindow::MainWindow
 MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
 {

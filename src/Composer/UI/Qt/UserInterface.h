@@ -39,6 +39,8 @@ namespace Ui {
 
 	class AssetFilesModel;
 	class Document;
+	//! Converts the Qt key index to engine key.
+	extern Platform::Key convertKey( s32 key );
 
 	//! Generic class to declare Qt interface implementations.
 	template<typename TBase, typename TPrivate>
