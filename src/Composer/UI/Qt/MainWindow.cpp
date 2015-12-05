@@ -65,6 +65,12 @@ MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
 	// Setup the share OpenGL format
 	QRenderingFrame::setupOpenGLFormat();
 
+	// Create the shared OpenGL context
+	m_sharedRenderingContext = new RenderingFrame( NULL, m_private.get() );
+	m_sharedRenderingContext->privateInterface<QRenderingFrame>()->makeCurrent();
+	m_sharedRenderingContext->privateInterface<QRenderingFrame>()->hide();
+	m_private->setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
+
 #ifdef NDEBUG
 	m_private->setWindowState( Qt::WindowMaximized );
 #else
@@ -122,6 +128,12 @@ MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const Strin
 	}
 
 	return MessageBoxCancel;
+}
+
+// ** MainWindow::sharedRenderingContext
+IRenderingFrameWPtr MainWindow::sharedRenderingContext( void ) const
+{
+	return m_sharedRenderingContext;
 }
 
 // ** MainWindow::fileSystem

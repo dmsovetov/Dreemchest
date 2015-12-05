@@ -36,13 +36,13 @@ namespace Ui {
 	public:
 
 		//! Returns the rendering frame used by this document.
-		virtual IRenderingFrameWPtr			renderingFrame( void )							= 0;
+		virtual IRenderingFrameWPtr			renderingFrame( void )			= 0;
 
-		//! Sets the rendering frame.
-		virtual void						setRenderingFrame( IRenderingFramePtr value )	= 0;
+		//! Attaches the rendering frame to this document.
+		virtual IRenderingFrameWPtr			attachRenderingFrame( void )	= 0;
 
 		//! Returns an attached asset editor.
-		virtual Editors::AssetEditorWPtr	assetEditor( void ) const						= 0;
+		virtual Editors::AssetEditorWPtr	assetEditor( void ) const		= 0;
 	};
 
 

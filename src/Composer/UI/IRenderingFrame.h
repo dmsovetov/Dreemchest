@@ -28,6 +28,7 @@
 #define __DC_Composer_IRenderingFrame_H__
 
 #include "IUserInterface.h"
+#include "IMenu.h"
 
 namespace Ui {
 
@@ -36,34 +37,90 @@ namespace Ui {
 	public:
 
 		//! Copy action was triggered.
-		//virtual void				handleCopy( void )								= 0;
+		//virtual void						handleCopy( void )								= 0;
 
 		//! Cut action was triggered.
-		//virtual void				handleCut( void )								= 0;
+		//virtual void						handleCut( void )								= 0;
 
 		//! Paste action was triggered.
-		//virtual void				handlePaste( void )								= 0;
+		//virtual void						handlePaste( void )								= 0;
+
+		//! Sets the rendering frame delegate.
+		virtual void						setDelegate( IRenderingFrameDelegateWPtr value )= 0;
+
+		//! Returns the rendering frame delegate.
+		virtual IRenderingFrameDelegateWPtr	delegate( void ) const							= 0;
 
 		//! Sets the cursor.
-		virtual void				setCursor( const String& cursor, bool centered )= 0;
+		virtual void						setCursor( const String& cursor, bool centered )= 0;
+
+		//! Sets the rendering interval.
+		virtual void						setInterval( s32 value )						= 0;
 
 		//! Returns the rendering frame width.
-		virtual s32					width( void ) const								= 0;
+		virtual s32							width( void ) const								= 0;
 
 		//! Returns the rendering frame height.
-		virtual s32					height( void ) const							= 0;
+		virtual s32							height( void ) const							= 0;
 
 		//! Enables or disables the continuous rendering.
-		virtual void				setContinuousRendering( bool value )			= 0;
+		virtual void						setContinuousRendering( bool value )			= 0;
 
 		//! Returns true if the continuous rendering is enabled.
-		virtual bool				isContinuousRendering( void ) const				= 0;
+		virtual bool						isContinuousRendering( void ) const				= 0;
 
 		//! Performs the rendering frame update.
-		//virtual void				update( void )									= 0;
+		//virtual void						update( void )									= 0;
 
 		//! Sets the focus to this rendering frame
-		virtual void				setFocused( void )								= 0;
+		virtual void						setFocused( void )								= 0;
+	};
+
+	//! Rendering frame delegate to process events.
+	class IRenderingFrameDelegate : public RefCounted {
+	public:
+
+		//! Handles the update event.
+		virtual void				handleUpdate( void ) {}
+
+		//! Handles the resize event.
+		virtual void				handleResize( s32 width, s32 height ) {}
+
+		//! Handles the mouse pressed event.
+		virtual void				handleMousePress( s32 x, s32 y, MouseButton button ) {}
+
+		//! Handles the mouse released event.
+		virtual void				handleMouseRelease( s32 x, s32 y, MouseButton button ) {}
+
+		//! Handles the mouse moved event.
+		virtual void				handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY ) {}
+
+		//! Handles the focus in event.
+		virtual void				handleFocusIn( void ) {}
+
+		//! Handles the focus out event.
+		virtual void				handleFocusOut( void ) {}
+
+		//! Handles the key pressed event.
+		virtual void				handleKeyPress( const Platform::Key& key ) {}
+
+		//! Handles the key released event.
+		virtual void				handleKeyRelease( const Platform::Key& key ) {}
+
+		//! Handles the context menu event.
+		virtual void				handleContextMenu( IMenuWPtr menu ) {}
+
+		//! Handles the mouse wheel event.
+		virtual void				handleMouseWheel( s32 delta ) {}
+
+		//! Handles the drag enter event.
+		virtual bool				handleDragEnter( void ) { return false; }
+
+		//! Handles the drag move event.
+		virtual void				handleDragMove( s32 x, s32 y ) {}
+
+		//! Handles the drop move event.
+		virtual void				handleDrop( s32 x, s32 y ) {}
 	};
 
 } // namespace Ui

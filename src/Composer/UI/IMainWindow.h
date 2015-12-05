@@ -79,6 +79,9 @@ namespace Ui {
 
 		//! Sets an active document.
 		virtual void				setActiveDocument( IDocumentWPtr dock ) = 0;
+
+		//! Returns the shared rendering context.
+		virtual IRenderingFrameWPtr	sharedRenderingContext( void ) const	= 0;
 	};
 
 } // namespace Ui

@@ -48,6 +48,7 @@ namespace Ui {
 	dcDeclarePtrs( IMenu )
 	dcDeclarePtrs( IToolBar )
 	dcDeclarePtrs( IRenderingFrame )
+	dcDeclarePtrs( IRenderingFrameDelegate )
 	dcDeclarePtrs( IDocument )
 	dcDeclarePtrs( IFileSystem )
 	dcDeclarePtrs( IAssetTree )
@@ -74,6 +75,13 @@ namespace Ui {
 		  MessageBoxYes		//!< Yes button was clicked.
 		, MessageBoxNo		//!< No button was clicked.
 		, MessageBoxCancel	//!< Cancel button was clicked.
+	};
+
+	//! Mouse buttons.
+	enum MouseButton {
+		  LeftMouseButton	//!< Left mouse button.
+		, RightMouseButton	//!< Right mouse button.
+		, MiddleMouseButton	//!< Middle mouse button.
 	};
 
 	//! Auto ptr type for signal delegate instances.

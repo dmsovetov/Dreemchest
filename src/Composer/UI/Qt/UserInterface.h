@@ -39,6 +39,8 @@ namespace Ui {
 
 	class AssetFilesModel;
 	class Document;
+	class RenderingFrame;
+
 	//! Converts the Qt key index to engine key.
 	extern Platform::Key convertKey( s32 key );
 

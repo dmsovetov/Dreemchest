@@ -27,6 +27,7 @@
 #include "Document.h"
 
 #include "MainWindow.h"
+#include "RenderingFrame.h"
 #include "../../Editors/AssetEditor.h"
 
 namespace Ui {
@@ -71,13 +72,26 @@ Document::Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEdi
 // ** Document::renderingFrame
 IRenderingFrameWPtr Document::renderingFrame( void )
 {
-	DC_NOT_IMPLEMENTED
+	return m_renderingFrame;
 }
 
-// ** Document::setRenderingFrame
-void Document::setRenderingFrame( IRenderingFramePtr value )
+// ** Document::attachRenderingFrame
+IRenderingFrameWPtr Document::attachRenderingFrame( void )
 {
-	DC_NOT_IMPLEMENTED
+	DC_BREAK_IF( m_renderingFrame.valid() );
+
+	// Get the shared rendering context
+	IRenderingFrameWPtr sharedContext = m_mainWindow->sharedRenderingContext();
+
+	// Create the rendering frame instance
+	m_renderingFrame = new RenderingFrame( sharedContext->privateInterface<QRenderingFrame>(), m_private.get() );
+	m_renderingFrame->setInterval( 10 );
+	m_renderingFrame->privateInterface<QRenderingFrame>()->makeCurrent();
+
+	// Set the rendering frame as a main widget of a dock widget
+	m_private->setWidget( m_renderingFrame->privateInterface<QRenderingFrame>() );
+
+	return m_renderingFrame;
 }
 
 // ** Document::assetEditor

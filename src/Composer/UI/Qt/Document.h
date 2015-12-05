@@ -66,8 +66,8 @@ namespace Ui {
 		//! Returns the rendering frame used for this document dock.
 		virtual IRenderingFrameWPtr			renderingFrame( void );
 
-		//! Sets the rendering frame.
-		virtual void						setRenderingFrame( IRenderingFramePtr value );
+		//! Attaches the rendering frame to this document.
+		virtual IRenderingFrameWPtr			attachRenderingFrame( void );
 
 		//! Returns an attached asset editor.
 		virtual Editors::AssetEditorWPtr	assetEditor( void ) const;
@@ -82,8 +82,9 @@ namespace Ui {
 
 	private:
 
-		IMainWindowWPtr						m_mainWindow;	//!< Parent main window.
-		Editors::AssetEditorPtr				m_assetEditor;	//!< Asset editor attached to this document dock.
+		IMainWindowWPtr						m_mainWindow;		//!< Parent main window.
+		IRenderingFramePtr					m_renderingFrame;	//!< The attached rendering frame.
+		Editors::AssetEditorPtr				m_assetEditor;		//!< Asset editor attached to this document dock.
 	};
 
 } // namespace Ui

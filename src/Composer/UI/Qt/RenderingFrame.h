@@ -38,10 +38,14 @@ namespace Ui {
 		//! Shared OpenGL format.
 		static QGLFormat			kOpenGLFormat;
 
-									QRenderingFrame( const QGLWidget* shareWidget, QWidget* parent );
+									//! Constructs QRenderingFrame instance.
+									QRenderingFrame( RenderingFrame* parentRenderingFrame, const QGLWidget* sharedWidget, QWidget* parent );
 
 		//! Performs the setup of a shared OpenGL format.
 		static void					setupOpenGLFormat( void );
+
+		//! Sets the rendering interval.
+		virtual void				setInterval( s32 value );
 
 	protected:
 
@@ -92,59 +96,51 @@ namespace Ui {
 
 		//! Overrides the OpenGL widget initialization.
 		virtual void				initializeGL( void ) Q_DECL_OVERRIDE;
+
+	private:
+
+		RenderingFrame*				m_parent;		//!< Parent rendering frame instance.
+		s32							m_timer;		//!< The rendering timer.
+		bool						m_hasLostFocus;	//!< Indicates that focus was lost.
 	};
 
 	//! RenderingFrame Qt implementation.
 	class RenderingFrame : public UserInterface<IRenderingFrame, QRenderingFrame> {
 	public:
 
-									RenderingFrame( const QGLWidget* shareWidget, QWidget* parent );
+											RenderingFrame( const QGLWidget* sharedWidget, QWidget* parent );
 
-		//! Copy action was triggered.
-		//virtual void				handleCopy( void );
+		//! Sets the rendering frame delegate.
+		virtual void						setDelegate( IRenderingFrameDelegateWPtr value );
 
-		//! Cut action was triggered.
-		//virtual void				handleCut( void );
-
-		//! Paste action was triggered.
-		//virtual void				handlePaste( void );
+		//! Returns the rendering frame delegate.
+		virtual IRenderingFrameDelegateWPtr	delegate( void ) const;
 
 		//! Sets the cursor.
-		virtual void				setCursor( const String& cursor, bool centered );
+		virtual void						setCursor( const String& cursor, bool centered );
 
 		//! Returns the rendering frame width.
-		virtual s32					width( void ) const;
+		virtual s32							width( void ) const;
 
 		//! Returns the rendering frame height.
-		virtual s32					height( void ) const;
+		virtual s32							height( void ) const;
+
+		//! Sets the rendering interval.
+		virtual void						setInterval( s32 value );
 
 		//! Enables or disables the continuous rendering.
-		virtual void				setContinuousRendering( bool value );
+		virtual void						setContinuousRendering( bool value );
 
 		//! Returns true if the continuous rendering is enabled.
-		virtual bool				isContinuousRendering( void ) const;
-
-		//! Performs the rendering frame update.
-		//virtual void				update( void );
+		virtual bool						isContinuousRendering( void ) const;
 
 		//! Sets the focus to this rendering frame
-		virtual void				setFocused( void );
-
-		// ** QRenderingFrame
-	//	void				BeginRendering( int interval );
-	//	void				EndRendering( void );
-	//	bool				IsRendering( void ) const { return timer != -1; }
-
-	//	static void			SetupOpenGLFormat( void );
+		virtual void						setFocused( void );
 
 	private:
 		
-		bool						m_isContinuousRendering;	//!< Continuous rendering flag.
-
-	//	static QGLFormat	gOpenGLFormat;
-
-	//	int					timer;
-	//	bool				isContinuousRendering, updateView, hasLostFocus;
+		IRenderingFrameDelegateWPtr			m_delegate;					//!< An attached delegate.
+		bool								m_isContinuousRendering;	//!< Continuous rendering flag.
 	};
 
 } // namespace Ui

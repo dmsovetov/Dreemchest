@@ -80,6 +80,9 @@ namespace Ui {
 		//! Sets an active document.
 		virtual void					setActiveDocument( IDocumentWPtr dock );
 
+		//! Returns the shared rendering context.
+		virtual IRenderingFrameWPtr		sharedRenderingContext( void ) const;
+
 	private:
 
 		//! Creates the default document placeholder.
@@ -99,14 +102,15 @@ namespace Ui {
 	
 	private:
 
-		QVector<IMenuPtr>				m_menues;				//!< All added menues reside here.
-		QVector<IToolBarPtr>			m_toolbars;				//!< All added toolbars reside here.
-		QVector<IDocumentPtr>			m_documents;			//!< All opened documents reside here.
-		IDocumentWPtr					m_activeDocument;		//!< An active document.
-		IFileSystemPtr					m_fileSystem;			//!< File system interface.
-		IAssetTreePtr					m_assetTree;			//!< Asset tree instance.
-		AutoPtr<AssetFilesModel>		m_assetFilesModel;		//!< Shared asset files model.
-		AutoPtr<QDockWidget>			m_documentPlaceholder;	//!< Document placeholder.
+		QVector<IMenuPtr>				m_menues;					//!< All added menues reside here.
+		QVector<IToolBarPtr>			m_toolbars;					//!< All added toolbars reside here.
+		QVector<IDocumentPtr>			m_documents;				//!< All opened documents reside here.
+		IDocumentWPtr					m_activeDocument;			//!< An active document.
+		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
+		IFileSystemPtr					m_fileSystem;				//!< File system interface.
+		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
+		AutoPtr<AssetFilesModel>		m_assetFilesModel;			//!< Shared asset files model.
+		AutoPtr<QDockWidget>			m_documentPlaceholder;		//!< Document placeholder.
 	};
 
 } // namespace Ui

@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderingFrame.h"
+#include "Menu.h"
 
 namespace Ui {
 
@@ -34,12 +35,12 @@ namespace Ui {
 QGLFormat QRenderingFrame::kOpenGLFormat;
 
 // ** QRenderingFrame::QRenderingFrame
-QRenderingFrame::QRenderingFrame( const QGLWidget* shareWidget, QWidget *parent ) : QGLWidget( kOpenGLFormat, parent, shareWidget )
+QRenderingFrame::QRenderingFrame( RenderingFrame* parentRenderingFrame, const QGLWidget* sharedWidget, QWidget* parent )
+	: QGLWidget( kOpenGLFormat, parent, sharedWidget ), m_parent( parentRenderingFrame ), m_timer( -1 ), m_hasLostFocus( false )
 {
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
-//	timer					= -1;
 //	isContinuousRendering	= false;
 //	updateView				= false;
 //	hasLostFocus			= false;
@@ -70,12 +71,12 @@ void QRenderingFrame::setupOpenGLFormat( void )
     kOpenGLFormat.setDirectRendering( false );
 }
 
-// ** QRenderingFrame::BeginRendering
-//void QRenderingFrame::BeginRendering( int interval )
-//{
-//	EndRendering();
-//	timer = startTimer( interval );
-//}
+// ** QRenderingFrame::setInterval
+void QRenderingFrame::setInterval( s32 value )
+{
+	killTimer( m_timer );
+	m_timer = startTimer( value );
+}
 
 // ** QRenderingFrame::EndRendering
 //void QRenderingFrame::EndRendering( void )
@@ -85,185 +86,231 @@ void QRenderingFrame::setupOpenGLFormat( void )
 //}
 
 // ** QRenderingFrame::mousePressEvent
-void QRenderingFrame::mousePressEvent( QMouseEvent *event )
+void QRenderingFrame::mousePressEvent( QMouseEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//setFocus();
-	//e->SetMouseEvent( 0, event->pos().x(), event->pos().y() );
+	// Set the focus to this widget
+	setFocus();
 
-	//switch( event->button() ) {
-	//case Qt::LeftButton:	e->button = ed::sRenderingFrameEvent::LeftButton;	break;
-	//case Qt::RightButton:	e->button = ed::sRenderingFrameEvent::RightButton;	break;
-	//case Qt::MidButton:		e->button = ed::sRenderingFrameEvent::MiddleButton;	break;
-	//}
+	// Get the mouse button from event
+	MouseButton button;
 
-	//DispatchEvent( ed::sRenderingFrameEvent::TapDown, e );
+	switch( e->button() ) {
+	case Qt::LeftButton:	button = LeftMouseButton;	break;
+	case Qt::RightButton:	button = RightMouseButton;	break;
+	case Qt::MidButton:		button = MiddleMouseButton;	break;	
+	}
+
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleMousePress( e->pos().x(), e->pos().y(), button );
+	}
 }
 
 // ** QRenderingFrame::mouseReleaseEvent
-void QRenderingFrame::mouseReleaseEvent( QMouseEvent *event )
+void QRenderingFrame::mouseReleaseEvent( QMouseEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetMouseEvent( 0, event->pos().x(), event->pos().y() );
+	// Get the mouse button from event
+	MouseButton button;
 
-	//switch( event->button() ) {
-	//case Qt::LeftButton:	e->button = ed::sRenderingFrameEvent::LeftButton;	break;
-	//case Qt::RightButton:	e->button = ed::sRenderingFrameEvent::RightButton;	break;
-	//case Qt::MidButton:		e->button = ed::sRenderingFrameEvent::MiddleButton;	break;
-	//}
+	switch( e->button() ) {
+	case Qt::LeftButton:	button = LeftMouseButton;	break;
+	case Qt::RightButton:	button = RightMouseButton;	break;
+	case Qt::MidButton:		button = MiddleMouseButton;	break;	
+	}
 
-	//DispatchEvent( ed::sRenderingFrameEvent::TapUp, e );
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleMouseRelease( e->pos().x(), e->pos().y(), button );
+	}
 }
 
 // ** QRenderingFrame::wheelEvent
-void QRenderingFrame::wheelEvent( QWheelEvent *event )
+void QRenderingFrame::wheelEvent( QWheelEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetWheel( event->delta() );
-	//DispatchEvent( ed::sRenderingFrameEvent::Wheel, e );
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleMouseWheel( e->delta() );
+	}
 }
 
 // ** QRenderingFrame::resizeEvent
-void QRenderingFrame::resizeEvent( QResizeEvent *event )
+void QRenderingFrame::resizeEvent( QResizeEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//int w = event->size().width();
-	//int h = event->size().height();
+	// Get the new size
+	s32 w = e->size().width();
+	s32 h = e->size().height();
 
-	//resizeGL( w, h );
-	//e->SetResize( w, h );
-	//DispatchEvent( ed::sRenderingFrameEvent::Resize, e );
+	// Process the resize by QGLWidget
+	resizeGL( w, h );
+
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleResize( w, h );
+	}
 }
 
 // ** QRenderingFrame::dragEnterEvent
-void QRenderingFrame::dragEnterEvent( QDragEnterEvent *event )
+void QRenderingFrame::dragEnterEvent( QDragEnterEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	//e->mimeData()
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetDragEvent( event->mimeData(), 0, 0 );
-	//e->Ref();
-	//DispatchEvent( ed::sRenderingFrameEvent::DragEnter, e );
+	if( !delegate.valid() ) {
+		return;
+	}
 
-	//if( !e->cancel ) {
-	//	event->acceptProposedAction();
-	//}
-
-	//e->Unref();
+	if( delegate->handleDragEnter() ) {
+		e->acceptProposedAction();
+	}
 }
 
 // ** QRenderingFrame::dragMoveEvent
-void QRenderingFrame::dragMoveEvent( QDragMoveEvent *event )
+void QRenderingFrame::dragMoveEvent( QDragMoveEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	//e->mimeData()
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetDragEvent( event->mimeData(), event->pos().x(), event->pos().y() );
-	//DispatchEvent( ed::sRenderingFrameEvent::DragMove, e );
+	if( delegate.valid() ) {
+		delegate->handleDragMove( e->pos().x(), e->pos().y() );
+	}
 }
 
 // ** QRenderingFrame::dropEvent
-void QRenderingFrame::dropEvent( QDropEvent *event )
+void QRenderingFrame::dropEvent( QDropEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	//e->mimeData()
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetDragEvent( event->mimeData(), event->pos().x(), event->pos().y() );
-	//DispatchEvent( ed::sRenderingFrameEvent::DragDrop, e );
+	if( delegate.valid() ) {
+		delegate->handleDrop( e->pos().x(), e->pos().y() );
+	}
 }
 
 // ** QRenderingFrame::contextMenuEvent
-void QRenderingFrame::contextMenuEvent( QContextMenuEvent *event )
+void QRenderingFrame::contextMenuEvent( QContextMenuEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//QComposerMenu *contextMenu = new QComposerMenu( this );
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetMouseEvent( 0, event->globalX(), event->globalY() );
-	//e->contextMenu = contextMenu;
-	//DispatchEvent( ed::sRenderingFrameEvent::ContextMenu, e );
+	if( !delegate.valid() ) {
+		return;
+	}
 
-	//contextMenu->Exec( event->globalX(), event->globalY() );
-	//delete contextMenu;
+	// Populate the menu by delegate
+	IMenuPtr menu( new Menu( this ) );
+    delegate->handleContextMenu( menu );
+
+	// Skip empty menues
+	if( !menu->size() ) {
+		return;
+	}
+
+	// Show the context menu
+    menu->exec( e->globalPos().x(), e->globalPos().y() );
 }
 
 // ** QRenderingFrame::mouseMoveEvent
-void QRenderingFrame::mouseMoveEvent( QMouseEvent *event )
+void QRenderingFrame::mouseMoveEvent( QMouseEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//e->SetMouseEvent( 0, event->pos().x(), event->pos().y() );
-	//e->globalX = event->globalPos().x();
-	//e->globalY = event->globalPos().y();
-	//DispatchEvent( ed::sRenderingFrameEvent::TapMove, e );
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleMouseMove( e->pos().x(), e->pos().y(), e->globalPos().x(), e->globalPos().y() );
+	}
 }
 
 // ** QRenderingFrame::keyPressEvent
-void QRenderingFrame::keyPressEvent( QKeyEvent *event )
+void QRenderingFrame::keyPressEvent( QKeyEvent* e )
 {
-	//int k = event->key();
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//e->key = ConvertKey( event->key() );
-
-	//DispatchEvent( ed::sRenderingFrameEvent::KeyDown, e );
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleKeyPress( convertKey( e->key() ) );
+	}
 }
 
 // ** QRenderingFrame::keyReleaseEvent
-void QRenderingFrame::keyReleaseEvent( QKeyEvent *event )
+void QRenderingFrame::keyReleaseEvent( QKeyEvent* e )
 {
-	//ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//e->key = ConvertKey( event->key() );
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//DispatchEvent( ed::sRenderingFrameEvent::KeyUp, e );
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleKeyRelease( convertKey( e->key() ) );
+	}
 }
 
 // ** QRenderingFrame::timerEvent
 void QRenderingFrame::timerEvent( QTimerEvent *event )
 {
-	//if( isVisible() && (isContinuousRendering || hasFocus() || updateView) ) {
-	//	update();
-	//}
+	bool shouldUpdate = m_parent->isContinuousRendering() || hasFocus();
+
+	if( isVisible() && shouldUpdate ) {
+		update();
+	}
 }
 
 // ** QRenderingFrame::focusInEvent
-void QRenderingFrame::focusInEvent( QFocusEvent *event )
+void QRenderingFrame::focusInEvent( QFocusEvent* e )
 {
-	QGLWidget::focusInEvent( event );
+	QGLWidget::focusInEvent( e );
 
-	//if( hasLostFocus ) {
-	//	ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//	DispatchEvent( ed::sRenderingFrameEvent::FocusIn, e );
-	//	hasLostFocus = false;
-	//}
+	if( !m_hasLostFocus ) {
+		return;
+	}
+
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
+
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleFocusIn();
+	}
+
+	m_hasLostFocus = false;
 }
 
 // ** QRenderingFrame::focusOutEvent
-void QRenderingFrame::focusOutEvent( QFocusEvent *event )
+void QRenderingFrame::focusOutEvent( QFocusEvent* e )
 {
-	QGLWidget::focusOutEvent( event );
+	QGLWidget::focusOutEvent( e );
 
-	//if( event->reason() != Qt::PopupFocusReason ) {
-	//	ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//	DispatchEvent( ed::sRenderingFrameEvent::FocusOut, e );
-	//	hasLostFocus = true;
-	//}
+	if( e->reason() == Qt::PopupFocusReason ) {
+		return;
+	}
+
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
+
+	// Notify the delegate
+	if( delegate.valid() ) {
+		delegate->handleFocusOut();
+	}
+
+	m_hasLostFocus = true;
 }
 
 // ** QRenderingFrame::initializeGL
 void QRenderingFrame::initializeGL( void )
 {
-	//qglClearColor( Qt::white );
+
 }
 
 // ** QRenderingFrame::paintGL
 void QRenderingFrame::paintGL( void )
 {
- //   ed::sRenderingFrameEvent *e = new ed::sRenderingFrameEvent;
-	//DispatchEvent( ed::sRenderingFrameEvent::Update, e );
+	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	//// ** Workaround for rendering states
-	//glEnable( GL_TEXTURE_2D );
+	if( delegate.valid() ) {
+		delegate->handleUpdate();
+	}
 }
 
 //// ** QRenderingFrame::OnCopy
@@ -303,6 +350,12 @@ void QRenderingFrame::paintGL( void )
 
 // ----------------------------------------------- RenderingFrame ----------------------------------------------- //
 
+// ** RenderingFrame::RenderingFrame
+RenderingFrame::RenderingFrame( const QGLWidget* sharedWidget, QWidget* parent ) : UserInterface( new QRenderingFrame( this, sharedWidget, parent ) )
+{
+
+}
+
 // ** RenderingFrame::width
 s32 RenderingFrame::width( void ) const
 {
@@ -320,6 +373,12 @@ s32 RenderingFrame::height( void ) const
 //{
 //	updateView = true;
 //}
+
+// ** RenderingFrame::setInterval
+void RenderingFrame::setInterval( s32 value )
+{
+	m_private->setInterval( value );
+}
 
 // ** RenderingFrame::setFocused
 void RenderingFrame::setFocused( void )
@@ -366,6 +425,18 @@ void RenderingFrame::setContinuousRendering( bool value )
 bool RenderingFrame::isContinuousRendering( void ) const
 {
 	return m_isContinuousRendering;
+}
+
+// ** RenderingFrame::setDelegate
+void RenderingFrame::setDelegate( IRenderingFrameDelegateWPtr value )
+{
+	m_delegate = value;
+}
+
+// ** RenderingFrame::delegate
+IRenderingFrameDelegateWPtr RenderingFrame::delegate( void ) const
+{
+	return m_delegate;
 }
 
 } // namespace Ui
