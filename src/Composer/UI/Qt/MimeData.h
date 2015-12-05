@@ -24,44 +24,49 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_UserInterface_H__
-#define __DC_Composer_Qt_UserInterface_H__
+#ifndef __DC_Composer_MimeData_H__
+#define __DC_Composer_MimeData_H__
 
-#include "../IUserInterface.h"
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
-#include "../IMimeData.h"
+#include "UserInterface.h"
 
 namespace Ui {
 
-	class AssetFilesModel;
-	class Document;
-	class RenderingFrame;
+	//! Composer MIME data.
+	class QComposerMime : public QMimeData {
+		
+		Q_OBJECT
 
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
-
-	//! Generic class to declare Qt interface implementations.
-	template<typename TBase, typename TPrivate>
-	class UserInterface : public TBase {
 	public:
 
-									//! Constructs the UserInterface instance.
-									UserInterface( TPrivate* instance )
-										: m_private( instance ) {}
+								//! Constructs QComposerMime instance.
+								QComposerMime( const QString& format );
 
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
+		//! Returns an attached MIME data.
+		IMimeDataWPtr			mime( void ) const;
 
-	protected:
+		//! Sets an attached MIME data.
+		void					setMime( IMimeDataPtr value );
 
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
+	private:
+
+		IMimeDataPtr			m_mime;	//!< Attached MIME.
+	};
+
+	//! MIME data Qt implementation.
+	class MimeData : public IMimeData {
+	public:
+
+							//! Constructs the MimeData instance.
+							MimeData( QComposerMime* mime );
+
+		//! Returns true if the MIME data contains the specified format.
+		virtual bool		hasFormat( const String& value ) const;
+
+	public:
+
+		QComposerMime*		m_mime;	//!< Internal MIME data instance.
 	};
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_Qt_UserInterface_H__	*/
+#endif	/*	!__DC_Composer_MimeData_H__	*/

@@ -69,13 +69,13 @@ namespace Editors {
 		virtual void					handleKeyRelease( Platform::Key key ) {}
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( void ) { return false; }
+		virtual bool					handleDragEnter( Ui::IMimeDataWPtr mime ) { return false; }
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( s32 x, s32 y ) {}
+		virtual void					handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the drop event.
-		virtual void					handleDrop( s32 x, s32 y ) {}
+		virtual void					handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the context menu event.
 		virtual void					handleContextMenu( Ui::IMenuWPtr menu );
@@ -143,13 +143,13 @@ namespace Editors {
 		virtual void					handleContextMenu( Ui::IMenuWPtr menu );
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( void );
+		virtual bool					handleDragEnter( Ui::IMimeDataWPtr mime );
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( s32 x, s32 y );
+		virtual void					handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y );
 
 		//! Handles the drop move event.
-		virtual void					handleDrop( s32 x, s32 y );
+		virtual void					handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y );
 
 	private:
 

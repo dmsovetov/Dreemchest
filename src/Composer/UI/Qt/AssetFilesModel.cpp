@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "AssetFilesModel.h"
+#include "MimeData.h"
 
 namespace Ui {
 
@@ -38,6 +39,17 @@ AssetFilesModel::AssetFilesModel( QObject* parent, const String& path ) : m_isEd
 	connect( this, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(assetsAdded(const QModelIndex&, int, int)) );
 	connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)), this, SLOT(assetsAboutToBeRemoved(const QModelIndex&, int, int)) );
 	connect( this, SIGNAL(fileRenamed(const QString&, const QString&, const QString&)), this, SLOT(assetRenamed(const QString&, const QString&, const QString&)) );
+}
+
+// ** AssetFilesModel::mimeData
+QMimeData* AssetFilesModel::mimeData( const QModelIndexList& indexes ) const
+{
+	QComposerMime* mime = new QComposerMime( "Dreemchest/Asset" );
+	IMimeDataPtr   data = new MimeData( mime );
+
+	mime->setMime( data );
+
+	return mime;
 }
 
 // ** AssetFilesModel::data

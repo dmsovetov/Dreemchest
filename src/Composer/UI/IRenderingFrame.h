@@ -29,6 +29,7 @@
 
 #include "IUserInterface.h"
 #include "IMenu.h"
+#include "IMimeData.h"
 
 namespace Ui {
 
@@ -114,13 +115,13 @@ namespace Ui {
 		virtual void				handleMouseWheel( s32 delta ) {}
 
 		//! Handles the drag enter event.
-		virtual bool				handleDragEnter( void ) { return false; }
+		virtual bool				handleDragEnter( IMimeDataWPtr mime ) { return false; }
 
 		//! Handles the drag move event.
-		virtual void				handleDragMove( s32 x, s32 y ) {}
+		virtual void				handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the drop move event.
-		virtual void				handleDrop( s32 x, s32 y ) {}
+		virtual void				handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) {}
 	};
 
 } // namespace Ui

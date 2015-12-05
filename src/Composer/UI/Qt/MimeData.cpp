@@ -24,44 +24,38 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_UserInterface_H__
-#define __DC_Composer_Qt_UserInterface_H__
-
-#include "../IUserInterface.h"
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
-#include "../IMimeData.h"
+#include "MimeData.h"
 
 namespace Ui {
 
-	class AssetFilesModel;
-	class Document;
-	class RenderingFrame;
+// ** QComposerMime::QComposerMime
+QComposerMime::QComposerMime( const QString& format )
+{
+	setData( format, QByteArray() );
+}
 
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
+// ** QComposerMime::mime
+IMimeDataWPtr QComposerMime::mime( void ) const
+{
+	return m_mime;
+}
 
-	//! Generic class to declare Qt interface implementations.
-	template<typename TBase, typename TPrivate>
-	class UserInterface : public TBase {
-	public:
+// ** QComposerMime::setMime
+void QComposerMime::setMime( IMimeDataPtr mime )
+{
+	m_mime = mime;
+}
 
-									//! Constructs the UserInterface instance.
-									UserInterface( TPrivate* instance )
-										: m_private( instance ) {}
+// ** MimeData::MimeData
+MimeData::MimeData( QComposerMime* mime ) : m_mime( mime )
+{
 
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
+}
 
-	protected:
-
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
-	};
+// ** MimeData::hasFormat
+bool MimeData::hasFormat( const String& value ) const
+{
+	return m_mime->hasFormat( value.c_str() );
+}
 
 } // namespace Ui
-
-#endif	/*	!__DC_Composer_Qt_UserInterface_H__	*/

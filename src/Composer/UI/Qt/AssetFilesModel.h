@@ -43,6 +43,9 @@ namespace Ui {
 
 	protected:
 
+		//! Returns the MIME data for a specified index.
+		virtual QMimeData*	mimeData( const QModelIndexList& indexes ) const;
+
 		//! Returns the model data by index.
 		virtual QVariant	data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
 

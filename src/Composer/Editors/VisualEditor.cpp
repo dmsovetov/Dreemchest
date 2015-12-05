@@ -180,21 +180,21 @@ void RenderingFrameDelegate::handleKeyRelease( Platform::Key key )
 }
 
 // ** RenderingFrameDelegate::handleDragEnter
-bool RenderingFrameDelegate::handleDragEnter( void )
+bool RenderingFrameDelegate::handleDragEnter( Ui::IMimeDataWPtr mime )
 {
-	return m_editor->handleDragEnter();
+	return m_editor->handleDragEnter( mime );
 }
 
 // ** RenderingFrameDelegate::handleDragMove
-void RenderingFrameDelegate::handleDragMove( s32 x, s32 y )
+void RenderingFrameDelegate::handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y )
 {
-	m_editor->handleDragMove( x, y );
+	m_editor->handleDragMove( mime, x, y );
 }
 
 // ** RenderingFrameDelegate::handleDrop
-void RenderingFrameDelegate::handleDrop( s32 x, s32 y )
+void RenderingFrameDelegate::handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y )
 {
-	m_editor->handleDrop( x, y );
+	m_editor->handleDrop( mime, x, y );
 }
 
 // ** RenderingFrameDelegate::handleContextMenu

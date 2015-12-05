@@ -24,44 +24,21 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_UserInterface_H__
-#define __DC_Composer_Qt_UserInterface_H__
+#ifndef __DC_Composer_IMimeData_H__
+#define __DC_Composer_IMimeData_H__
 
-#include "../IUserInterface.h"
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
-#include "../IMimeData.h"
+#include "IUserInterface.h"
 
 namespace Ui {
 
-	class AssetFilesModel;
-	class Document;
-	class RenderingFrame;
-
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
-
-	//! Generic class to declare Qt interface implementations.
-	template<typename TBase, typename TPrivate>
-	class UserInterface : public TBase {
+	//! MIME data interface used by drag & drop operations.
+	class IMimeData : public RefCounted {
 	public:
 
-									//! Constructs the UserInterface instance.
-									UserInterface( TPrivate* instance )
-										: m_private( instance ) {}
-
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
-
-	protected:
-
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
+		//! Returns true if the MIME data contains the specified format.
+		virtual bool		hasFormat( const String& value ) const = 0;
 	};
 
 } // namespace Ui
 
-#endif	/*	!__DC_Composer_Qt_UserInterface_H__	*/
+#endif	/*	!__DC_Composer_IMimeData_H__	*/

@@ -52,6 +52,7 @@ namespace Ui {
 	dcDeclarePtrs( IDocument )
 	dcDeclarePtrs( IFileSystem )
 	dcDeclarePtrs( IAssetTree )
+	dcDeclarePtrs( IMimeData )
 
 	//! File info struct.
 	struct FileInfo {
@@ -86,6 +87,9 @@ namespace Ui {
 
 	//! Auto ptr type for signal delegate instances.
 	typedef AutoPtr<class SignalDelegate> SignalDelegatePtr;
+
+	//! Container type to store file info.
+	typedef Array<FileInfo> FileInfoArray;
 
 	//! Container type to store array of documents.
 	typedef Array<IDocumentWPtr> DocumentsWeak;

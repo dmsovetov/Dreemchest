@@ -26,6 +26,7 @@
 
 #include "RenderingFrame.h"
 #include "Menu.h"
+#include "MimeData.h"
 
 namespace Ui {
 
@@ -160,14 +161,15 @@ void QRenderingFrame::resizeEvent( QResizeEvent* e )
 // ** QRenderingFrame::dragEnterEvent
 void QRenderingFrame::dragEnterEvent( QDragEnterEvent* e )
 {
-	//e->mimeData()
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
 	if( !delegate.valid() ) {
 		return;
 	}
 
-	if( delegate->handleDragEnter() ) {
+	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+
+	if( mime && delegate->handleDragEnter( mime->mime() ) ) {
 		e->acceptProposedAction();
 	}
 }
@@ -175,22 +177,32 @@ void QRenderingFrame::dragEnterEvent( QDragEnterEvent* e )
 // ** QRenderingFrame::dragMoveEvent
 void QRenderingFrame::dragMoveEvent( QDragMoveEvent* e )
 {
-	//e->mimeData()
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	if( delegate.valid() ) {
-		delegate->handleDragMove( e->pos().x(), e->pos().y() );
+	if( !delegate.valid() ) {
+		return;
+	}
+
+	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+
+	if( mime ) {
+		delegate->handleDragMove( mime->mime(), e->pos().x(), e->pos().y() );
 	}
 }
 
 // ** QRenderingFrame::dropEvent
 void QRenderingFrame::dropEvent( QDropEvent* e )
 {
-	//e->mimeData()
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
-	if( delegate.valid() ) {
-		delegate->handleDrop( e->pos().x(), e->pos().y() );
+	if( !delegate.valid() ) {
+		return;
+	}
+
+	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+
+	if( mime ) {
+		delegate->handleDrop( mime->mime(), e->pos().x(), e->pos().y() );
 	}
 }
 
