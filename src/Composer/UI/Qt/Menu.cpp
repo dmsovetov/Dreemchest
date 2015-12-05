@@ -148,6 +148,13 @@ void Menu::clear( void )
 	m_private->clear();
 }
 
+// ** Menu::size
+s32 Menu::size( void ) const
+{
+	return m_private->actions().size();
+}
+
+
 // ** Menu::addMenu
 IMenuWPtr Menu::addMenu( const String& text )
 {
