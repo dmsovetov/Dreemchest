@@ -159,6 +159,10 @@ namespace Scene {
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
 
+		//! Creates an archetype instance.
+		template<typename TArchetype>
+		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const io::Bson& data = io::Bson::kNull );
+
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
 
@@ -231,6 +235,13 @@ namespace Scene {
 	{
 		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
 		m_ecs->rebuildSystems();
+	}
+
+	// ** Scene::createArchetype
+	template<typename TArchetype>
+	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const io::Bson& data )
+	{
+		return m_ecs->createArchetype<TArchetype>( id, data );
 	}
 
 #ifdef DC_JSON_ENABLED
