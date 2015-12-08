@@ -37,6 +37,9 @@ namespace Project {
 // ** Project::Project
 Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mainWindow( mainWindow )
 {
+	// Save project name
+	m_name = path.last();
+
 	// Construct the built-in paths.
 	m_paths[RootPath]	= path;
 	m_paths[AssetsPath]	= path + "Assets";
@@ -50,6 +53,12 @@ Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mai
 ProjectPtr Project::create( Ui::IMainWindowWPtr mainWindow, const io::Path& path )
 {
 	return ProjectPtr( new Project( mainWindow, path ) );
+}
+
+// ** Project::name
+const String& Project::name( void ) const
+{
+	return m_name;
 }
 
 // ** Project::absolutePath

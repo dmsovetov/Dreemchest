@@ -48,6 +48,9 @@ namespace Project {
 		//! Fills an asset menu.
 		void				fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree = Ui::IAssetTreeWPtr() );
 
+		//! Returns project name.
+		const String&		name( void ) const;
+
 		//! Returns project absoulte path.
 		String				absolutePath( s32 index ) const;
 
@@ -94,6 +97,7 @@ namespace Project {
 		//! Alias the asset editor factory type.
 		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
 
+		String				m_name;					//!< Project name.
 		Ui::IMainWindowWPtr m_mainWindow;			//!< Main window instance.
 		io::Path			m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory	m_assetEditors;			//!< Asset editor factory.

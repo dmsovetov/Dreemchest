@@ -394,6 +394,9 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	// Add document document placeholder
 	m_documentPlaceholder = createDocumentPlaceholder();
 	m_private->addDockWidget( Qt::TopDockWidgetArea, m_documentPlaceholder.get() );
+
+	// Update window caption
+	m_private->setWindowTitle( e.project->name().c_str() + QString( " - Dreemchest Composer" ) );
 }
 
 // ** MainWindow::onProjectClosed
