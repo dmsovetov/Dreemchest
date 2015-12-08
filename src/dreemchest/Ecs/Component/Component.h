@@ -69,12 +69,6 @@ namespace Ecs {
 		//! Sets component flags.
 		void						setFlags( u32 value );
 
-		//! Returns parent entity component system.
-		EcsWPtr						ecs( void ) const;
-
-		//! Sets the parent entity component system reference.
-		void						setEcs( EcsWPtr value );
-
 	#ifndef DC_BSON_DISABLED
 		//! Returns the component BSON.
 		virtual io::Bson			bson( void ) const;
@@ -90,7 +84,6 @@ namespace Ecs {
 
 		InternalDataHolder			m_internal;	//!< The internal data.
 		u32							m_flags;	//!< Component flags.
-		EcsWPtr						m_ecs;		//!< Parent entity component system instance.
 	};
 
 	// ** ComponentBase::setInternal
@@ -111,18 +104,6 @@ namespace Ecs {
 		}
 
 		return typename Internal<T>::Ptr();
-	}
-
-	// ** ComponentBase::setEcs
-	inline void ComponentBase::setEcs( EcsWPtr value )
-	{
-		m_ecs = value;
-	}
-
-	// ** ComponentBase::ecs
-	inline EcsWPtr ComponentBase::ecs( void ) const
-	{
-		return m_ecs;
 	}
 
 #if !DC_BSON_DISABLED

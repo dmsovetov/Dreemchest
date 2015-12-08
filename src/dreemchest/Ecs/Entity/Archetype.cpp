@@ -80,7 +80,6 @@ void ArchetypeBase::setBson( const io::Bson& value )
 	// Load all added components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString key = i->second->typeName();
-		i->second->setEcs( ecs() );
 		i->second->setBson( value.get( key ) );
 	}
 	

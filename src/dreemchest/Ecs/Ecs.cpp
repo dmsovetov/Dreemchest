@@ -131,9 +131,6 @@ ComponentPtr Ecs::createComponentByName( const String& name, const io::Bson& dat
 		return ComponentPtr();
 	}
 
-	// Set the parent ECS
-	instance->setEcs( const_cast<Ecs*>( this ) );
-
 	// Load from data
 	if( !data.isNull() ) {
 		instance->setBson( data );
