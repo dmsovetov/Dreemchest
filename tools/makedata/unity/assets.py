@@ -136,6 +136,9 @@ class Assets:
 
     # Marks an asset as used
     def use(self, uuid):
+        if not uuid in self._files:
+            return None
+
         asset = self._files[uuid]
 
         if not uuid in self._used_assets.keys():
