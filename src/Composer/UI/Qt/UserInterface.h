@@ -35,10 +35,12 @@
 #include "../IMenu.h"
 #include "../IRenderingFrame.h"
 #include "../IMimeData.h"
+#include "../IAssetsModel.h"
 
 namespace Ui {
 
 	class QAssetsModel;
+	class AssetsModel;
 	class Document;
 	class RenderingFrame;
 

@@ -24,20 +24,15 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#include "ImageImporter.h"
 
-namespace Ui {
+namespace Importers {
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
+// ** ImageImporterTIF::import
+bool ImageImporterTIF::import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const
 {
-	connect( sender, signal, this, SLOT(emitted()) );
+	DC_NOT_IMPLEMENTED;
+	return true;
 }
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
-{
-	m_callback();
-}
-
-} // namespace Ui
+} // namespace Importers

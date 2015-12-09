@@ -26,6 +26,7 @@
 
 #include "AssetsModel.h"
 #include "MimeData.h"
+#include "SignalDelegate.h"
 
 namespace Ui {
 
@@ -39,12 +40,14 @@ QString QAsset::kExtension = "asset";
 // ** QAsset::QAssetInfo
 QAsset::QAsset( const QFileInfo& fileInfo ) : m_fileInfo( fileInfo )
 {
-	m_metaFileName = absoluteFilePath() + "." + kExtension;
+	m_uuid			= QUuid::createUuid();
+	m_metaFileName  = absoluteFilePath() + "." + kExtension;
 }
 
 // ** QAsset::QAsset
 QAsset::QAsset( const QString& path ) : m_fileInfo( path )
 {
+	m_uuid		   = QUuid::createUuid();
 	m_metaFileName = absoluteFilePath() + "." + kExtension;
 }
 
@@ -72,10 +75,16 @@ const QFileInfo& QAsset::fileInfo( void ) const
 	return m_fileInfo;
 }
 
-// ** QAsset::generateId
-QUuid QAsset::generateId( void )
+// ** QAsset::uuid
+const QUuid& QAsset::uuid( void ) const
 {
-	return QUuid::createUuid();
+	return m_uuid;
+}
+
+// ** QAsset::updateFileInfo
+void QAsset::updateFileInfo( const QString& path )
+{
+	m_fileInfo = QFileInfo( path );
 }
 
 // ** QAsset::metaFileName
@@ -83,50 +92,6 @@ const QString& QAsset::metaFileName( void ) const
 {
 	return m_metaFileName;
 }
-
-// ** QAsset::metaFileExists.
-//bool QAsset::metaFileExists( void ) const
-//{
-//	return QFile( metaFileName() ).exists();
-//}
-
-// ** QAsset::createMetaFile
-//bool QAsset::createMetaFile( void )
-//{
-//	QFile file( metaFileName() );
-//
-//	if( !file.open( QFile::WriteOnly ) ) {
-//		return false;
-//	}
-//
-//	QTextStream in( &file );
-//	in << "uuid: " << generateId().toString() << "\n";
-//	in << "timestamp: " << m_fileInfo.lastModified().toTime_t();
-//
-//	file.close();
-//	return true;
-//}
-
-// ** QAsset::removeMetaFile
-//void QAsset::removeMetaFile( void )
-//{
-//	QDir().remove( metaFileName() );
-//}
-
-// ** QAsset::updateMetaFileName
-//void QAsset::updateMetaFileName( const QString& oldPath )
-//{
-//	QString oldName = oldPath + "." + kExtension;
-//	QString newName = absoluteFilePath() + "." + kExtension;
-//
-//	if( oldName == newName ) {
-//		return;
-//	}
-//
-//	bool result = QDir().rename( oldName, newName );
-//	m_metaFileName = newName;
-//	Q_ASSERT( result );
-//}
 
 // ** QAsset::readMetaFile
 QString QAsset::readMetaFile( void ) const
@@ -155,8 +120,6 @@ QMetaFiles::QMetaFiles( QObject* parent ) : QObject( parent )
 // ** QMetaFiles::addMetaFile
 void QMetaFiles::addMetaFile( const QAsset& asset ) const
 {
-	qDebug() << "Asset added:" << asset.absoluteFilePath();
-
 	// Get asset meta file name
 	const QString& metaFileName = asset.metaFileName();
 
@@ -175,7 +138,11 @@ void QMetaFiles::addMetaFile( const QAsset& asset ) const
 // ** QMetaFiles::removeMetaFile
 void QMetaFiles::removeMetaFile( const QAsset& asset ) const
 {
-	qDebug() << "Asset removed:" << asset.absoluteFilePath();
+	const QString& metaFileName = asset.metaFileName();
+
+	if( !QFile( metaFileName ).exists() ) {
+		return;
+	}
 
 	bool result = QDir().remove( asset.metaFileName() );
 	Q_ASSERT( result );
@@ -184,8 +151,6 @@ void QMetaFiles::removeMetaFile( const QAsset& asset ) const
 // ** QMetaFiles::renameMetaFile
 void QMetaFiles::renameMetaFile( const QAsset& asset, const QString& oldName, const QString& newName ) const
 {
-	qDebug() << "Asset renamed:" << oldName << "->" << newName;
-
 	QString oldMetaFile = asset.fileInfo().dir().absoluteFilePath( oldName ) + "." + QAsset::kExtension;
 	QString newMetaFile = asset.metaFileName();
 
@@ -200,8 +165,6 @@ void QMetaFiles::renameMetaFile( const QAsset& asset, const QString& oldName, co
 // ** QMetaFiles::moveMetaFile
 void QMetaFiles::moveMetaFile( const QAsset& asset, const QString& oldPath, const QString& newPath ) const
 {
-	qDebug() << "Asset moved:" << oldPath << "->" << newPath;
-
 	QString oldMetaFile = oldPath + "." + QAsset::kExtension;
 	QString newMetaFile = asset.metaFileName();
 
@@ -622,7 +585,7 @@ bool QAssetsModel::move( Item* item, const QString& source, const QString& desti
 	m_watcher->addPath( destination );
 
 	// Update asset info
-	item->data() = QAsset( destination );
+	item->data().updateFileInfo( destination );
 
 	return true;
 }
@@ -714,6 +677,81 @@ void QAssetsModel::directoryChanged( const QString& path )
 		#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
 		}
 	}
+}
+
+// ------------------------------------------------------ QAssetsModelDispatcher ----------------------------------------------------- //
+
+// ** QAssetsModelDispatcher::QAssetsModelDispatcher
+QAssetsModelDispatcher::QAssetsModelDispatcher( QAssetsModel* model, IAssetsModelDelegateWPtr delegate ) : m_delegate( delegate )
+{
+	connect( model, SIGNAL(assetAdded(const QAsset&)), this, SLOT(dispatchAssetAdded(const QAsset&)) );
+	connect( model, SIGNAL(assetRemoved(const QAsset&)), this, SLOT(dispatchAssetRemoved(const QAsset&)) );
+	connect( model, SIGNAL(assetChanged(const QAsset&)), this, SLOT(dispatchAssetChanged(const QAsset&)) );
+}
+
+// ** QAssetsModelDispatcher::delegate
+IAssetsModelDelegateWPtr QAssetsModelDispatcher::delegate( void ) const
+{
+	return m_delegate;
+}
+
+// ** QAssetsModelDispatcher::delegate
+void QAssetsModelDispatcher::dispatchAssetAdded( const QAsset& asset )
+{
+	if( m_delegate.valid() ) {
+		m_delegate->handleAssetAdded( extractAsset( asset ) );
+	}
+}
+
+// ** QAssetsModelDispatcher::delegate
+void QAssetsModelDispatcher::dispatchAssetRemoved( const QAsset& asset )
+{
+	if( m_delegate.valid() ) {
+		m_delegate->handleAssetRemoved( extractAsset( asset ) );
+	}
+}
+
+// ** QAssetsModelDispatcher::delegate
+void QAssetsModelDispatcher::dispatchAssetChanged( const QAsset& asset )
+{
+	if( m_delegate.valid() ) {
+		m_delegate->handleAssetChanged( extractAsset( asset ) );
+	}
+}
+
+// ** QAssetsModelDispatcher::extractAsset
+Asset QAssetsModelDispatcher::extractAsset( const QAsset& asset ) const
+{
+	// Clean the UUID
+	QString uuid = asset.uuid().toString().replace( "{", "" ).replace( "}", "" ).replace( "-", "" );
+
+	// Setup asset
+	Asset result;
+	result.absoluteFilePath = asset.absoluteFilePath().toStdString();
+	result.ext				= asset.fileInfo().completeSuffix().toStdString();
+	result.metaInfo			= io::Bson::object() << "uuid" << uuid.toStdString();
+
+	return result;
+}
+
+// ----------------------------------------------------------- AssetsModel ----------------------------------------------------------- //
+
+// ** AssetsModel::AssetsModel
+AssetsModel::AssetsModel( QObject* parent ) : UserInterface( new QAssetsModel( parent ) )
+{
+
+}
+
+// ** AssetsModel::setDelegate
+void AssetsModel::setDelegate( IAssetsModelDelegateWPtr value )
+{
+	m_dispatcher = new QAssetsModelDispatcher( m_private.get(), value );
+}
+
+// ** AssetsModel::delegate
+IAssetsModelDelegateWPtr AssetsModel::delegate( void ) const
+{
+	return m_dispatcher.get() ? m_dispatcher->delegate() : IAssetsModelDelegateWPtr();
 }
 
 #else

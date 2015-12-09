@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Project.h"
+#include "Cache.h"
 
 #include "../UI/IMainWindow.h"
 #include "../UI/IMenu.h"
@@ -32,7 +33,13 @@
 #include "../UI/IAssetTree.h"
 #include "../UI/IDocument.h"
 
+#ifdef emit
+	#undef emit
+#endif
+
 namespace Project {
+
+// --------------------------------------------------------- Project --------------------------------------------------------- //
 
 // ** Project::Project
 Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mainWindow( mainWindow )
@@ -47,6 +54,13 @@ Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mai
 
 	// Declare asset editors.
 	m_assetEditors.declare<Editors::AssetEditor>( "scene" );
+
+	// Create delegate
+	m_delegate = new AssetsModelDelegate( this );
+	mainWindow->assetsModel()->setDelegate( m_delegate );
+
+	// Create project cache
+	m_cache = new Cache( mainWindow->fileSystem(), this );
 }
 
 // ** Project::create
@@ -209,6 +223,31 @@ void Project::menuShowInExplorer( Ui::IActionWPtr action )
 
 	// Browse to asset
 	m_mainWindow->fileSystem()->browse( fileInfo.ext == "" ? fileInfo.path : fileInfo.directory );
+}
+
+// ----------------------------------------------------- AssetsModelDelegate ------------------------------------------------------ //
+
+// ** AssetsModelDelegate::AssetsModelDelegate
+AssetsModelDelegate::AssetsModelDelegate( ProjectWPtr project ) : m_project( project )
+{
+}
+
+// ** AssetsModelDelegate::AssetsModelDelegate
+void AssetsModelDelegate::handleAssetAdded( const Ui::Asset& asset )
+{
+	m_project->m_events.emit<Project::AssetAdded>( asset );
+}
+
+// ** AssetsModelDelegate::AssetsModelDelegate
+void AssetsModelDelegate::handleAssetRemoved( const Ui::Asset& asset )
+{
+	m_project->m_events.emit<Project::AssetRemoved>( asset );
+}
+
+// ** AssetsModelDelegate::AssetsModelDelegate
+void AssetsModelDelegate::handleAssetChanged( const Ui::Asset& asset )
+{
+	m_project->m_events.emit<Project::AssetChanged>( asset );
 }
 
 } // namespace Project

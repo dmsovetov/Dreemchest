@@ -75,7 +75,7 @@ namespace Ui {
 	public:
 
 								//! Constructs asset tree bound to a specified path.
-								AssetTree( Project::ProjectWPtr project, QAssetsModel* model );
+								AssetTree( Project::ProjectWPtr project, IAssetsModelWPtr model );
 
 		//! Returns the selected items.
 		virtual StringArray		selection( void ) const;

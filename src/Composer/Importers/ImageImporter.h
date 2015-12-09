@@ -24,20 +24,21 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#ifndef __DC_Composer_ImageImporter_H__
+#define __DC_Composer_ImageImporter_H__
 
-namespace Ui {
+#include "AssetImporter.h"
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
-{
-	connect( sender, signal, this, SLOT(emitted()) );
-}
+namespace Importers {
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
-{
-	m_callback();
-}
+	//! Imports the TIF image.
+	class ImageImporterTIF : public AssetImporter {
+	public:
 
-} // namespace Ui
+		//! Performs importing of a TIF image.
+		virtual bool		import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
+	};
+
+} // namespace Importers
+
+#endif	/*	!__DC_Composer_ImageImporter_H__	*/

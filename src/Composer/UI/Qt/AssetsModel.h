@@ -35,6 +35,7 @@ namespace Ui {
 
 	//! Asset info.
 	class QAsset {
+	friend class QAssetsModel;
 	public:
 
 		//! Meta file extension to use.
@@ -46,11 +47,11 @@ namespace Ui {
 							//! Constructs QAsset instance from absolute path.
 							QAsset( const QString& path );
 
-		//! Generates a new asset UUID.
-		static QUuid		generateId( void );
-
 		//! Returns meta-file name.
 		const QString&		metaFileName( void ) const;
+
+		//! Returns unique identifier.
+		const QUuid&		uuid( void ) const;
 
 		//! Returns asset name.
 		QString				name( void ) const;
@@ -61,18 +62,6 @@ namespace Ui {
 		//! Returns asset absolute file path.
 		QString				absoluteFilePath( void ) const;
 
-		//! Returns true if meta-file exists.
-		//bool				metaFileExists( void ) const;
-
-		//! Creates meta file.
-		//bool				createMetaFile( void );
-
-		//! Removes meta file.
-		//void				removeMetaFile( void );
-
-		//! Renames meta file.
-		//void				updateMetaFileName( const QString& oldPath );
-
 		//! Loads meta file to string.
 		QString				readMetaFile( void ) const;
 
@@ -81,6 +70,12 @@ namespace Ui {
 
 	private:
 
+		//! Updates file info.
+		void				updateFileInfo( const QString& path );
+
+	private:
+
+		QUuid				m_uuid;			//!< Unique identifier.
 		QFileInfo			m_fileInfo;		//!< Asset file info.
 		QString				m_metaFileName;	//!< Last known meta-file name.
 	};
@@ -263,6 +258,58 @@ namespace Ui {
 	#if DEV_BACKGROUND_ASSET_LOADING
 		QList<QFutureWatcher<void>*>	m_scanWatchers;	//!< Future watchers used for asset folder scanning.
 	#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
+	};
+
+	//! Dispatches assets model signals to delegate.
+	class QAssetsModelDispatcher : public QObject {
+
+		Q_OBJECT
+
+	public:
+
+											//! Constructs QAssetsModelDispatcher instance.
+											QAssetsModelDispatcher( QAssetsModel* model, IAssetsModelDelegateWPtr delegate );
+
+		//! Returns the attached delegate.
+		virtual IAssetsModelDelegateWPtr	delegate( void ) const;
+
+	private:
+
+		//! Extract asset info from QAsset.
+		Asset								extractAsset( const QAsset& asset ) const;
+
+	private Q_SLOTS:
+
+		//! Dispatches asset added event to delegate.
+		void								dispatchAssetAdded( const QAsset& asset );
+
+		//! Dispatches asset removed event to delegate.
+		void								dispatchAssetRemoved( const QAsset& asset );
+
+		//! Dispatches asset changed event to delegate.
+		void								dispatchAssetChanged( const QAsset& asset );
+
+	private:
+
+		IAssetsModelDelegateWPtr			m_delegate;	//!< Target delegate.
+	};
+
+	//! Assets model Qt implementation.
+	class AssetsModel : public UserInterface<IAssetsModel, QAssetsModel> {
+	public:
+
+											//! Constructs AssetsModel instance.
+											AssetsModel( QObject* parent );
+
+		//! Sets the assets model delegate.
+		virtual void						setDelegate( IAssetsModelDelegateWPtr value );
+
+		//! Returns the assets model delegate.
+		virtual IAssetsModelDelegateWPtr	delegate( void ) const;
+
+	private:
+
+		AutoPtr<QAssetsModelDispatcher>		m_dispatcher;		//!< Assets model signal dispatcher.
 	};
 
 #else

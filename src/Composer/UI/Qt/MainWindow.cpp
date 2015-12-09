@@ -71,6 +71,10 @@ MainWindow::MainWindow( const String& title ) : UserInterface( new QMainWindow )
 	m_sharedRenderingContext->privateInterface<QRenderingFrame>()->hide();
 	m_private->setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
 
+	// Create assets model
+	m_assetsModel = new AssetsModel( m_private.get() );
+	m_assetsModel->privateInterface<QAssetsModel>()->setReadOnly( false );
+
 #ifdef NDEBUG
 	m_private->setWindowState( Qt::WindowMaximized );
 #else
@@ -146,6 +150,12 @@ IFileSystemWPtr MainWindow::fileSystem( void ) const
 IAssetTreeWPtr MainWindow::assetTree( void ) const
 {
 	return m_assetTree;
+}
+
+// ** MainWindow::assetsModel
+IAssetsModelWPtr MainWindow::assetsModel( void ) const
+{
+	return m_assetsModel;
 }
 
 // ** MainWindow::addMenu
@@ -377,9 +387,7 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	Project::ProjectWPtr project = e.project;
 
 	// Create the file system model used by project
-	m_assetsModel = new QAssetsModel( m_private.get() );
-	m_assetsModel->setRootPath( project->assetsAbsolutePath().c_str() );
-	m_assetsModel->setReadOnly( false );
+	m_assetsModel->privateInterface<QAssetsModel>()->setRootPath( project->assetsAbsolutePath().c_str() );
 
 	// Create the asset tree
 	m_assetTree = new AssetTree( project, m_assetsModel.get() );

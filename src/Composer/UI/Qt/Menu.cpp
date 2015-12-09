@@ -60,7 +60,7 @@ void ToolBar::addSeparator( void )
 // ** Action::Action
 Action::Action( QWidget* parent, const String& text, ActionCallback callback ) : UserInterface( new QAction( text.c_str(), parent ) ), m_callback( callback )
 {
-	m_signal = new SignalDelegate( BindSignal( Action::triggered ), m_private.get(), SIGNAL(triggered()) );
+	m_signal = new QSignalDelegate( BindSignal( Action::triggered ), m_private.get(), SIGNAL(triggered()) );
 }
 
 // ** Action::Action

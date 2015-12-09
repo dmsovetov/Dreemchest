@@ -37,7 +37,7 @@ namespace Ui {
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project, QAssetsModel* model ) : UserInterface( new QAssetTree( project, model ) )
+AssetTree::AssetTree( Project::ProjectWPtr project, IAssetsModelWPtr model ) : UserInterface( new QAssetTree( project, model->privateInterface<QAssetsModel>() ) )
 {
 	m_private->setParent( this );
 }
