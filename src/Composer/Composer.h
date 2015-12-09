@@ -38,7 +38,8 @@
 
 	#define Q_DECL_OVERRIDE override
 #elif DC_QT5_ENABLED
-	#error Qt5 headers here!
+	#include <QtWidgets>
+	#include <QtOpenGL>
 #endif
 
 namespace Ui {

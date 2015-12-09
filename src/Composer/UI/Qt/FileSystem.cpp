@@ -37,7 +37,11 @@ FileSystem::FileSystem( QWidget* parent ) : m_parent( parent )
 // ** FileSystem::documentsLocation
 String FileSystem::documentsLocation( void ) const
 {
-	return QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ).toAscii().constData();
+#ifdef DC_QT4_ENABLED
+	return QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ).toStdString();
+#elif DC_QT5_ENABLED
+	return QStandardPaths::standardLocations( QStandardPaths::DocumentsLocation ).at( 0 ).toStdString();
+#endif	/*	DC_QT4_ENABLED	*/
 }
 
 // ** FileSystem::selectExistingDirectory
@@ -45,7 +49,7 @@ String FileSystem::selectExistingDirectory( const String& title, const String& d
 {
 	QString base   = dir == "" ? documentsLocation().c_str() : dir.c_str();
 	QString result = QFileDialog::getExistingDirectory( m_parent, title.c_str(), base );
-	return result.toAscii().constData();
+	return result.toStdString();
 }
 
 // ** FileSystem::selectExistingFiles
@@ -62,7 +66,7 @@ StringArray FileSystem::selectExistingFiles( const String& title, const String& 
 	StringArray result;
 
 	for( int i = 0; i < absolute.size(); i++ ) {
-		result.push_back( absolute.at( i ).toAscii().constData() );
+		result.push_back( absolute.at( i ).toStdString() );
 	}
 
 	return result;
@@ -105,11 +109,11 @@ FileInfo FileSystem::convertFileInfo( const QFileInfo& fileInfo )
 {
 	FileInfo result;
 
-	result.path			= fileInfo.absoluteFilePath().toAscii().constData();
-	result.baseName		= fileInfo.baseName().toAscii().constData();
-	result.ext			= fileInfo.suffix().toAscii().constData();
+	result.path			= fileInfo.absoluteFilePath().toStdString();
+	result.baseName		= fileInfo.baseName().toStdString();
+	result.ext			= fileInfo.suffix().toStdString();
 	result.fileName		= result.ext == "" ? result.baseName : (result.baseName + "." + result.ext);
-	result.directory	= fileInfo.absoluteDir().path().toAscii().constData();
+	result.directory	= fileInfo.absoluteDir().path().toStdString();
 	result.timestamp	= fileInfo.lastModified().toTime_t();
 
 	return result;

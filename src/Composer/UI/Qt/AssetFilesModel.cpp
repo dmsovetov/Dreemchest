@@ -104,7 +104,7 @@ void AssetFilesModel::assetsAdded( const QModelIndex& parent, int start, int end
 			continue;
 		}
 
-		printf( "Added: %s\n", info.absoluteFilePath().toAscii().constData(), idx.internalPointer() );
+		printf( "Added: %s\n", info.absoluteFilePath().toStdString().c_str(), idx.internalPointer() );
 	}
 }
 
@@ -120,7 +120,7 @@ void AssetFilesModel::assetsAboutToBeRemoved( const QModelIndex& parent, int sta
 			continue;
 		}
 
-		printf( "Removed: %s\n", info.absoluteFilePath().toAscii().constData(), idx.internalPointer() );
+		printf( "Removed: %s\n", info.absoluteFilePath().toStdString().c_str(), idx.internalPointer() );
 	}
 }
 
@@ -130,8 +130,8 @@ void AssetFilesModel::assetRenamed( const QString& path, const QString& oldName,
 	m_skipAddRemove.insert( path + "/" + newName );
 	m_skipAddRemove.insert( path + "/" + oldName );
 
-	String oldn = (path + "/" + oldName).toAscii().constData();
-	String newn = (path + "/" + newName).toAscii().constData();
+	String oldn = (path + "/" + oldName).toStdString();
+	String newn = (path + "/" + newName).toStdString();
 	printf( "Renamed: %s -> %s\n", oldn.c_str(), newn.c_str() );
 }
 

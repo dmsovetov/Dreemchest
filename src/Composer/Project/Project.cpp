@@ -93,7 +93,7 @@ void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree )
 		menu->addAction( "Open", BindAction( Project::menuOpenAsset ) )->setDisabled( !singleSelection );
 		menu->addAction( "Delete", BindAction( Project::menuDeleteAsset ) )->setDisabled( !singleSelection );
 		menu->addSeparator();
-		menu->addAction( "Show in Explorer", BindAction( Project::menuShowInExplorer ) )->setDisabled( !singleSelection );
+		menu->addAction( "Show in Explorer", BindAction( Project::menuShowInExplorer ) )->setDisabled( !singleSelection && !assetTree->selection().empty() );
 	} else {
 		menu->addSeparator();
 		menu->addAction( "Browse...", BindAction( Project::menuBrowseAssets ) );
@@ -203,10 +203,9 @@ void Project::menuShowInExplorer( Ui::IActionWPtr action )
 
 	// Get the selected items
 	StringArray selected = m_mainWindow->assetTree()->selection();
-	DC_BREAK_IF( selected.empty() );
 
 	// Get the file info
-	Ui::FileInfo fileInfo = fs->extractFileInfo( selected[0] );
+	Ui::FileInfo fileInfo = fs->extractFileInfo( selected.empty() ? assetsAbsolutePath() : selected[0] );
 
 	// Browse to asset
 	m_mainWindow->fileSystem()->browse( fileInfo.ext == "" ? fileInfo.path : fileInfo.directory );

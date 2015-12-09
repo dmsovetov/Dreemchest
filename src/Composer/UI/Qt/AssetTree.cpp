@@ -126,7 +126,7 @@ StringArray QAssetTree::selection( void ) const
 	StringArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
-		result.push_back( m_model->fileInfo( idx ).absoluteFilePath().toAscii().constData() );
+		result.push_back( m_model->fileInfo( idx ).absoluteFilePath().toStdString() );
 	}
 
 	return result;

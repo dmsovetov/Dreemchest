@@ -114,7 +114,7 @@ void Action::setVisible( bool value )
 // ** Action::text
 String Action::text( void ) const
 {
-	return m_private->text().toAscii().constData();
+	return m_private->text().toStdString();
 }
 
 // ** Action::setText
