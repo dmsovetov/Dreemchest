@@ -73,7 +73,7 @@ void ServerHandler::processClientConnection( TCPSocket* socket )
 	log::verbose( "Client %s connected to server\n", socket->address().toString() );
 	ConnectionPtr connection = createConnection( socket );
 
-	m_eventEmitter.emit<ClientConnected>( connection );
+	m_eventEmitter.notify<ClientConnected>( connection );
 }
 
 // ** ServerHandler::processClientDisconnection
@@ -84,7 +84,7 @@ void ServerHandler::processClientDisconnection( TCPSocket* socket )
 	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
 	removeConnection( socket );
 
-	m_eventEmitter.emit<ClientDisconnected>( connection );
+	m_eventEmitter.notify<ClientDisconnected>( connection );
 }
 
 // ** ServerHandler::eventListeners

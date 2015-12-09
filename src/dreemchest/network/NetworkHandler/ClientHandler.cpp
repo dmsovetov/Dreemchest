@@ -95,7 +95,7 @@ bool ClientHandler::detectServers( u16 port )
 // ** ClientHandler::processConnectionClosed
 void ClientHandler::processConnectionClosed( TCPSocket* socket )
 {
-	m_eventEmitter.emit<ConnectionClosed>();
+	m_eventEmitter.notify<ConnectionClosed>();
 }
 
 // ----------------------------------------- ClientSocketDelegate --------------------------------------- //
