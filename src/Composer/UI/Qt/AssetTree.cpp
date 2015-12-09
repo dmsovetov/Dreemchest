@@ -27,7 +27,7 @@
 #include "AssetTree.h"
 
 #include "Menu.h"
-#include "AssetFilesModel.h"
+#include "AssetsModel.h"
 #include "FileSystem.h"
 #include "Document.h"
 #include "../../Project/Project.h"
@@ -37,7 +37,7 @@ namespace Ui {
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project, AssetFilesModel* model ) : UserInterface( new QAssetTree( project, model ) )
+AssetTree::AssetTree( Project::ProjectWPtr project, QAssetsModel* model ) : UserInterface( new QAssetTree( project, model ) )
 {
 	m_private->setParent( this );
 }
@@ -57,7 +57,7 @@ void AssetTree::expandSelectedItems( void )
 // ------------------------------------------------ QAssetTree ------------------------------------------------ //
 
 // ** QAssetTree::QAssetTree
-QAssetTree::QAssetTree( Project::ProjectWPtr project, AssetFilesModel* model ) : m_project( project ), m_model( model )
+QAssetTree::QAssetTree( Project::ProjectWPtr project, QAssetsModel* model ) : m_project( project ), m_model( model )
 {
 	setModel( m_model );
 	setRootIndex( m_model->index( m_model->rootPath() ) );
@@ -114,7 +114,7 @@ void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 	}
 
 	// Convert the file info
-	FileInfo fileInfo = FileSystem::convertFileInfo( m_model->fileInfo( index ) );
+	FileInfo fileInfo = FileSystem::convertFileInfo( m_model->asset( index ).fileInfo() );
 
 	// Open the asset editor
 	m_project->editAsset( fileInfo );
@@ -126,7 +126,7 @@ StringArray QAssetTree::selection( void ) const
 	StringArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
-		result.push_back( m_model->fileInfo( idx ).absoluteFilePath().toStdString() );
+		result.push_back( m_model->asset( idx ).absoluteFilePath().toStdString() );
 	}
 
 	return result;

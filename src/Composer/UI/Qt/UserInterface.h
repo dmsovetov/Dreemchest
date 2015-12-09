@@ -38,7 +38,7 @@
 
 namespace Ui {
 
-	class AssetFilesModel;
+	class QAssetsModel;
 	class Document;
 	class RenderingFrame;
 

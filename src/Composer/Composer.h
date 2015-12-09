@@ -28,8 +28,10 @@
 #define __DC_Composer_H__
 
 #include <Dreemchest.h>
-
 #include <functional>
+
+#define DEV_CUSTOM_ASSET_MODEL			(1)
+#define DEV_BACKGROUND_ASSET_LOADING	(0)
 
 #ifdef DC_QT4_ENABLED
 	#include <QtGui>

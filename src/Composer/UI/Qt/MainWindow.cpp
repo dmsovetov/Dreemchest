@@ -30,7 +30,7 @@
 #include "RenderingFrame.h"
 #include "FileSystem.h"
 #include "AssetTree.h"
-#include "AssetFilesModel.h"
+#include "AssetsModel.h"
 #include "Document.h"
 
 #include "../../Project/Project.h"
@@ -377,10 +377,12 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	Project::ProjectWPtr project = e.project;
 
 	// Create the file system model used by project
-	m_assetFilesModel = new AssetFilesModel( m_private.get(), project->assetsAbsolutePath() );
+	m_assetsModel = new QAssetsModel( m_private.get() );
+	m_assetsModel->setRootPath( project->assetsAbsolutePath().c_str() );
+	m_assetsModel->setReadOnly( false );
 
 	// Create the asset tree
-	m_assetTree = new AssetTree( project, m_assetFilesModel.get() );
+	m_assetTree = new AssetTree( project, m_assetsModel.get() );
 
 	// Setup status bar
 	m_private->statusBar()->show();

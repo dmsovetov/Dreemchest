@@ -109,7 +109,7 @@ namespace Ui {
 		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
 		IFileSystemPtr					m_fileSystem;				//!< File system interface.
 		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
-		AutoPtr<AssetFilesModel>		m_assetFilesModel;			//!< Shared asset files model.
+		AutoPtr<QAssetsModel>			m_assetsModel;				//!< Shared assets model.
 		AutoPtr<QDockWidget>			m_documentPlaceholder;		//!< Document placeholder.
 	};
 
