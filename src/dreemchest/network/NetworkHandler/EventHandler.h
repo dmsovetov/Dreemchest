@@ -65,7 +65,7 @@ namespace net {
 	template<typename T>
 	inline bool EventHandler<T>::handle( ConnectionPtr& connection, const packets::Event& packet )
 	{
-        m_eventEmitter->emit( io::BinarySerializer::read<T>( packet.payload ) );
+        m_eventEmitter->notify( io::BinarySerializer::read<T>( packet.payload ) );
 		return true;
 	}
 

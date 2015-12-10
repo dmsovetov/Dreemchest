@@ -24,20 +24,35 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#include "AssetImpor.h"
 
-namespace Ui {
+namespace Editors {
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
+// ** AssetEditor::hasChanges
+bool AssetEditor::hasChanges( void ) const
 {
-	connect( sender, signal, this, SLOT(emitted()) );
+	return true;
 }
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
+// ** AssetEditor::initialize
+bool AssetEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document )
 {
-	m_callback();
+	m_asset		= asset;
+	m_document	= document;
+
+	return true;
 }
 
-} // namespace Ui
+// ** AssetEditor::setAsset
+const Ui::FileInfo&  AssetEditor::asset( void ) const
+{
+	return m_asset;
+}
+
+// ** AssetEditor::setAsset
+Ui::IDocumentWPtr AssetEditor::document( void ) const
+{
+	return m_document;
+}
+
+} // namespace Editors

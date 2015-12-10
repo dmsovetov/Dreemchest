@@ -32,7 +32,7 @@
 namespace Ui {
 
 	//! Delegate object to bind Qt signals to a callback functions.
-	class SignalDelegate : public QObject {
+	class QSignalDelegate : public QObject {
 
 		Q_OBJECT
 
@@ -41,8 +41,8 @@ namespace Ui {
 		//! Callback type used by this signal delegate.
 		typedef std::function<void()>	Callback;
 
-										//! Constructs the SignalDelegate instance.
-										SignalDelegate( Callback callback, QObject* sender, CString signal );
+										//! Constructs the QSignalDelegate instance.
+										QSignalDelegate( Callback callback, QObject* sender, CString signal );
 
 	private slots:
 

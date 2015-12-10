@@ -24,20 +24,23 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#ifndef __DC_Composer_AssetImporter_H__
+#define __DC_Composer_AssetImporter_H__
 
-namespace Ui {
+#include "../Composer.h"
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
-{
-	connect( sender, signal, this, SLOT(emitted()) );
-}
+#include "../UI/IFileSystem.h"
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
-{
-	m_callback();
-}
+namespace Importers {
 
-} // namespace Ui
+	//! Base class for all asset importers.
+	class AssetImporter : public RefCounted {
+	public:
+
+		//! Imports an asset to project cache.
+		virtual bool	import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const = 0;
+	};
+
+} // namespace Importers
+
+#endif	/*	!__DC_Composer_AssetImporter_H__	*/

@@ -42,7 +42,7 @@ namespace event {
             virtual         ~Listener( void ) {}
             
             //! Emits event to listener.
-            virtual void    emit( const void* e ) = 0;
+            virtual void    notify( const void* e ) = 0;
         };
         
         //! Event listener with a type.
@@ -61,7 +61,7 @@ namespace event {
 			bool			operator == ( const Callback& callback ) const { return m_callback == callback; }
             
             //! Calls a callback function with a casted event.
-            virtual void    emit( const void* e ) { m_callback( *reinterpret_cast<const T*>( e ) ); }
+            virtual void    notify( const void* e ) { m_callback( *reinterpret_cast<const T*>( e ) ); }
             
         private:
             
@@ -93,12 +93,12 @@ namespace event {
 
 		//! Emits a global event.
 		template<typename TEvent>
-		void emit( const TEvent& e );
+		void notify( const TEvent& e );
 
 		//! Constructs and emits a new event instance.
 	#ifndef DC_CPP11_DISABLED
 		template<typename TEvent, typename ... TArgs>
-		void emit( const TArgs& ... args );
+		void notify( const TArgs& ... args );
 	#endif
 
 	private:
@@ -150,9 +150,9 @@ namespace event {
 		}
 	}
 
-	// ** EventEmitter::emit
+	// ** EventEmitter::notify
 	template<typename TEvent>
-	inline void EventEmitter::emit( const TEvent& e )
+	inline void EventEmitter::notify( const TEvent& e )
 	{
 		TypeIdx idx = TypeIndex<TEvent>::idx();
 		Subscribers::iterator i = m_subscribers.find( idx );
@@ -162,18 +162,18 @@ namespace event {
 		}
 
 		for( u32 j = 0, n = ( u32 )i->second.size(); j < n; j++ ) {
-            i->second[j]->emit( &e );
+            i->second[j]->notify( &e );
 		}
 	}
 
 #ifndef DC_CPP11_DISABLED
 
-	// ** EventEmitter::emit
+	// ** EventEmitter::notify
 	template<typename TEvent, typename ... TArgs>
-	inline void EventEmitter::emit( const TArgs& ... args )
+	inline void EventEmitter::notify( const TArgs& ... args )
 	{
 		TEvent e( args... );
-		emit( e );
+		notify( e );
 	}
 
 #endif	/*	!DC_CPP11_DISABLED	*/

@@ -77,6 +77,9 @@ namespace Ui {
 		//! Returns the asset tree instance.
 		virtual IAssetTreeWPtr			assetTree( void ) const;
 
+		//! Returns the assets model instance.
+		virtual IAssetsModelWPtr		assetsModel( void ) const;
+
 		//! Sets an active document.
 		virtual void					setActiveDocument( IDocumentWPtr dock );
 
@@ -109,7 +112,7 @@ namespace Ui {
 		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
 		IFileSystemPtr					m_fileSystem;				//!< File system interface.
 		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
-		AutoPtr<AssetFilesModel>		m_assetFilesModel;			//!< Shared asset files model.
+		IAssetsModelPtr					m_assetsModel;				//!< Shared assets model.
 		AutoPtr<QDockWidget>			m_documentPlaceholder;		//!< Document placeholder.
 	};
 

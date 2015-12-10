@@ -78,7 +78,7 @@ namespace Ui {
 	
 	private:
 
-		SignalDelegatePtr				m_signal;	//!< Signal delegate.
+		QSignalDelegatePtr				m_signal;	//!< Signal delegate.
 		ActionCallback					m_callback;	//!< Menu action callback.
 	};
 

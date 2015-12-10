@@ -77,6 +77,9 @@ namespace Ui {
 		//! Returns the asset tree instance.
 		virtual IAssetTreeWPtr		assetTree( void ) const					= 0;
 
+		//! Returns the assets model instance.
+		virtual IAssetsModelWPtr	assetsModel( void ) const				= 0;
+
 		//! Sets an active document.
 		virtual void				setActiveDocument( IDocumentWPtr dock ) = 0;
 

@@ -39,7 +39,7 @@ namespace Ui {
 	public:
 
 								//! Constructs asset tree bound to a specified path.
-								QAssetTree( Project::ProjectWPtr project, AssetFilesModel* model );
+								QAssetTree( Project::ProjectWPtr project, QAssetsModel* model );
 
 		//! Returns the selected items.
 		StringArray				selection( void ) const;
@@ -67,7 +67,7 @@ namespace Ui {
 
 		IAssetTreeWPtr			m_parent;	//!< Parent AssetTree instance.
 		Project::ProjectWPtr	m_project;	//!< Parent project instance.
-		AssetFilesModel*		m_model;	//!< File system model used.
+		QAssetsModel*			m_model;	//!< File system model used.
 	};
 
 	//! Asset tree widget.
@@ -75,7 +75,7 @@ namespace Ui {
 	public:
 
 								//! Constructs asset tree bound to a specified path.
-								AssetTree( Project::ProjectWPtr project, AssetFilesModel* model );
+								AssetTree( Project::ProjectWPtr project, IAssetsModelWPtr model );
 
 		//! Returns the selected items.
 		virtual StringArray		selection( void ) const;

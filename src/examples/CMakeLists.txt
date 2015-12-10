@@ -22,12 +22,12 @@ target_link_libraries(07_TCPSockets Dreemchest)
 add_executable(08_NetworkHandlers 08_NetworkHandlers.cpp)
 target_link_libraries(08_NetworkHandlers Dreemchest)
 
-add_executable(09_ModelViewViewModel 09_ModelViewViewModel.cpp)
-target_link_libraries(09_ModelViewViewModel Dreemchest)
+#add_executable(09_ModelViewViewModel 09_ModelViewViewModel.cpp)
+#target_link_libraries(09_ModelViewViewModel Dreemchest)
 
 if (DC_QT_ENABLED)
-	add_executable(10_MvvmQt 10_MvvmQt.cpp)
-	target_link_libraries(10_MvvmQt Dreemchest)
+#	add_executable(10_MvvmQt 10_MvvmQt.cpp)
+#	target_link_libraries(10_MvvmQt Dreemchest)
 endif (DC_QT_ENABLED)
 
 add_executable(11_Particles 11_Particles.cpp)

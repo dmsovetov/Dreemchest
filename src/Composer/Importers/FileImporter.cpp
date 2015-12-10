@@ -24,20 +24,17 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#include "FileImporter.h"
 
-namespace Ui {
+namespace Importers {
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
+// ** FileImporter::import
+bool FileImporter::import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const
 {
-	connect( sender, signal, this, SLOT(emitted()) );
+	bool result = fs->copyFile( asset.absoluteFilePath, path.c_str() );
+	DC_BREAK_IF( !result );
+
+	return result;
 }
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
-{
-	m_callback();
-}
-
-} // namespace Ui
+} // namespace Importers

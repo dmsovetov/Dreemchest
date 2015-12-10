@@ -24,20 +24,38 @@
 
  **************************************************************************/
 
-#include "SignalDelegate.h"
+#ifndef __DC_Composer_IAssetsModel_H__
+#define __DC_Composer_IAssetsModel_H__
+
+#include "IUserInterface.h"
 
 namespace Ui {
 
-// ** QSignalDelegate::QSignalDelegate
-QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
-{
-	connect( sender, signal, this, SLOT(emitted()) );
-}
+	//! Assets model interface.
+	class IAssetsModel : public IUserInterface {
+	public:
 
-// ** QSignalDelegate::emitted
-void QSignalDelegate::emitted( void )
-{
-	m_callback();
-}
+		//! Sets the assets model delegate.
+		virtual void						setDelegate( IAssetsModelDelegateWPtr value )	= 0;
+
+		//! Returns the assets model delegate.
+		virtual IAssetsModelDelegateWPtr	delegate( void ) const							= 0;
+	};
+
+	//! Assets model delegate to process events.
+	class IAssetsModelDelegate : public RefCounted {
+	public:
+
+		//! Handles the asset added event.
+		virtual void				handleAssetAdded( const Asset& asset ) {}
+
+		//! Handles the asset removed event.
+		virtual void				handleAssetRemoved( const Asset& asset ) {}
+
+		//! Handles the asset changed event.
+		virtual void				handleAssetChanged( const Asset& asset ) {}
+	};
 
 } // namespace Ui
+
+#endif	/*	!__DC_Composer_IAssetsModel_H__	*/

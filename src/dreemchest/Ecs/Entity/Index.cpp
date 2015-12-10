@@ -85,14 +85,14 @@ void Index::processEntityAdded( const EntityPtr& entity )
 {
 	log::verbose( "%s: entity %d added\n", m_name.c_str(), entity->id() );
 	m_entities.insert( entity );
-	m_eventEmitter.emit<Added>( entity );
+	m_eventEmitter.notify<Added>( entity );
 }
 
 // ** Index::processEntityRemoved
 void Index::processEntityRemoved( const EntityPtr& entity )
 {
 	log::verbose( "%s: entity %d removed\n", m_name.c_str(), entity->id() );
-	m_eventEmitter.emit<Removed>( entity );
+	m_eventEmitter.notify<Removed>( entity );
 	m_entities.erase( entity );
 }
 

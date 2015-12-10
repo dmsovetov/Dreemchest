@@ -21,12 +21,31 @@ option(DC_BOX2D_ENABLED "Build with Box2D support" OFF)
 option(DC_SOUND_ENABLED "Build with sound support" OFF)
 option(DC_COMPOSER_ENABLED "Build Dreemchest Composer" OFF)
 set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt5")
-set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Qt4" "Qt5")
+set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 
 # Add include directory
 include_directories(Dreemchest)
 
 # Setup definitions
+if (DC_QT_SUPPORT MATCHES "Auto")
+	find_package(Qt4)
+	find_package(Qt5Widgets)
+	
+	if (Qt4_FOUND AND Qt5Widgets_FOUND)
+		message(FATAL_ERROR "Both Qt4 and Qt5 found, you should use manually which version to use.")
+	endif (Qt4_FOUND AND Qt5Widgets_FOUND)
+	
+	if (Qt4_FOUND)
+		set(DC_QT_SUPPORT "Qt4")
+	elseif (Qt5Widgets_FOUND)
+		set(DC_QT_SUPPORT "Qt5")
+		set(DC_QT_PATH ${_qt5Core_install_prefix})
+	else (Qt4_FOUND)
+		message(WARNING "Qt library not found, disabling Qt support.")
+		set(DC_QT_SUPPORT "Disabled")
+	endif (Qt4_FOUND)
+endif (DC_QT_SUPPORT MATCHES "Auto")
+
 if (DC_QT_SUPPORT MATCHES "Qt4")
 	add_definitions(-DDC_QT4_ENABLED)
 	set(DC_QT_ENABLED ON)
