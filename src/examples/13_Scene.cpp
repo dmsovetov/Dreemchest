@@ -108,8 +108,8 @@ class ParticleSystems : public ApplicationDelegate {
 
 		TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
 
-		for( s32 i = 0; i < terrain->chunkCount(); i++ ) {
-			for( s32 j = 0; j < terrain->chunkCount(); j++ ) {
+		for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
+			for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
 				SceneObjectPtr chunk = m_scene->createSceneObject();
 				MeshPtr		   mesh  = terrain->createChunkMesh( m_hal, j, i );
 
@@ -119,18 +119,8 @@ class ParticleSystems : public ApplicationDelegate {
 		}
 
 		m_scene->addSystem<AssetSystem>( m_hal );
-		m_scene->addSystem<AffineTransformSystem>();
-		m_scene->addSystem<ParticlesSystem>();
-		m_scene->addSystem<MoveInDirectionSystem>();
-		m_scene->addSystem<WorldSpaceBoundingBoxSystem>();
-		m_scene->addSystem<FrustumCullingSystem>( m_scene->cameras() );
-		
-		m_scene->addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
-		m_scene->addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
-		m_scene->addRenderingSystem<BoundingVolumesRenderer>();
-		m_scene->addRenderingSystem<ForwardLightingRenderer>();
 
-		DirectionPtr wasdDirection = DC_NEW DirectionFromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
+		Vec3BindingPtr wasdDirection = DC_NEW Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 
 		SceneObjectPtr camera = m_scene->createSceneObject();
 		camera->attach<Camera>( Camera::Perspective, WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
@@ -138,7 +128,7 @@ class ParticleSystems : public ApplicationDelegate {
 	//	camera->attach<RenderForwardLit>();
 		camera->attach<RenderWireframe>();
 		camera->attach<::Scene::Transform>();
-		camera->attach<MoveInDirection>( MoveInDirection::XZ, 60.0f, wasdDirection );
+		camera->attach<MoveAlongAxes>( 60.0f, true, wasdDirection );
 	//	camera->attach<RenderBoundingVolumes>();
 
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
