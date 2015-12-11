@@ -100,6 +100,24 @@ void Transform::setPosition( const Vec3& value )
 	m_position = value;
 }
 
+// ** Transform::axisX
+Vec3 Transform::axisX( void ) const
+{
+	return m_rotation.rotate( Vec3( 1.0f, 0.0f, 0.0f ) );
+}
+
+// ** Transform::axisY
+Vec3 Transform::axisY( void ) const
+{
+	return m_rotation.rotate( Vec3( 0.0f, 1.0f, 0.0f ) );
+}
+
+// ** Transform::axisZ
+Vec3 Transform::axisZ( void ) const
+{
+	return m_rotation.rotate( Vec3( 0.0f, 0.0f, 1.0f ) );
+}
+
 // ** Transform::x
 f32 Transform::x( void ) const
 {
@@ -128,6 +146,13 @@ void Transform::setY( f32 value )
 const Quat& Transform::rotation( void ) const
 {
 	return m_rotation;
+}
+
+// ** Transform::rotate
+void Transform::rotate( f32 angle, f32 x, f32 y, f32 z )
+{
+	Quat r = Quat::rotateAroundAxis( angle, Vec3( x, y, z ) );
+	m_rotation = m_rotation * r;
 }
 
 // ** Transform::setRotation

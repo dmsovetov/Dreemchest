@@ -30,48 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------------ Direction ------------------------------------------------ //
-
-// ** Direction::Direction
-Direction::Direction( const Vec3& direction ) : m_direction( direction )
-{
-
-}
-
-// ** Direction::get
-Vec3 Direction::get( void ) const
-{
-	return m_direction;
-}
-
-// ------------------------------------------ DirectionFromKeyboard ------------------------------------------ //
-
-// ** DirectionFromKeyboard::DirectionFromKeyboard
-DirectionFromKeyboard::DirectionFromKeyboard( Platform::Key::Mapping left, Platform::Key::Mapping right, Platform::Key::Mapping up, Platform::Key::Mapping down )
-	: m_left( left ), m_right( right ), m_up( up ), m_down( down )
-{
-	m_input = Platform::Input::sharedInstance();
-}
-
-// ** DirectionFromKeyboard::get
-Vec3 DirectionFromKeyboard::get( void ) const
-{
-	// Resulting direction
-	Vec3 direction( 0.0f, 0.0f, 0.0f );
-
-	// Get the movement direction
-		 if( m_input->keyDown( m_left ) )  direction.x = -1.0f;
-	else if( m_input->keyDown( m_right ) ) direction.x =  1.0f;
-
-		 if( m_input->keyDown( m_up ) )    direction.y =  1.0f;
-	else if( m_input->keyDown( m_down ) )  direction.y = -1.0f;
-
-	// Normalize the direction
-	direction.normalize();
-
-	return direction;
-}
-
 // ----------------------------------------------- Identifier ------------------------------------------------ //
 
 // ** Identifier::name
@@ -86,24 +44,50 @@ void Identifier::setName( const String& value )
 	m_name = value;
 }
 
-// --------------------------------------------- MoveInDirection --------------------------------------------- //
+// --------------------------------------------- MoveAlongAxes --------------------------------------------- //
 
-// ** MoveInDirection::speed
-f32 MoveInDirection::speed( void ) const
+// ** MoveAlongAxes::speed
+f32 MoveAlongAxes::speed( void ) const
 {
 	return m_speed;
 }
 
-// ** MoveByInput::axes
-MoveInDirection::Axes MoveInDirection::axes( void ) const
+// ** MoveAlongAxes::isLocal
+bool MoveAlongAxes::isLocal( void ) const
 {
-	return m_axes;
+	return m_isLocal;
 }
 
-// ** MoveInDirection::direction
-Vec3 MoveInDirection::direction( void ) const
+// ** MoveAlongAxes::delta
+Vec3 MoveAlongAxes::delta( void ) const
 {
-	return m_direction->get();
+	return m_delta->get();
+}
+
+// --------------------------------------------- RotateAroundAxes --------------------------------------------- //
+
+// ** RotateAroundAxes::speed
+f32 RotateAroundAxes::speed( void ) const
+{
+	return m_speed;
+}
+
+// ** RotateAroundAxes::setSpeed
+void RotateAroundAxes::setSpeed( f32 value )
+{
+	m_speed = value;
+}
+
+// ** RotateAroundAxes::isLocal
+bool RotateAroundAxes::isLocal( void ) const
+{
+	return m_isLocal;
+}
+
+// ** RotateAroundAxes::delta
+Vec3 RotateAroundAxes::delta( void ) const
+{
+	return m_delta->get();
 }
 
 } // namespace Scene

@@ -104,7 +104,6 @@ namespace Scene {
 	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
 	typedef Ecs::EntityId			SceneObjectId;
 
-	dcDeclarePtrs( Direction )
 	dcDeclarePtrs( Scene )
 	dcDeclarePtrs( RenderTarget )
 	dcDeclarePtrs( TextureTarget )
@@ -136,6 +135,8 @@ namespace Scene {
 	dcDeclarePtrs( RenderingSystemBase )
 	dcDeclarePtrs( Shader )
 	dcDeclarePtrs( RopEmitterBase )
+
+	dcDeclarePtrs( Vec3Binding )
 
 	//! Scene systems mask.
 	enum Systems {

@@ -27,46 +27,12 @@
 #ifndef __DC_Scene_Component_UserInput_H__
 #define __DC_Scene_Component_UserInput_H__
 
+#include "../Bindings.h"
 #include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
-
-	//! Constant direction, can be subclassed to implement a different direction behaviour.
-	class Direction : public RefCounted {
-	public:
-
-								//! Constructs the Direction instance
-								Direction( const Vec3& direction = Vec3( 0.0f, 0.0f, 0.0f ) );
-		virtual					~Direction( void ) {}
-
-		//! Returns the direction.
-		virtual Vec3			get( void ) const;
-
-	protected:
-
-		Vec3					m_direction;	//!< The direction value.
-	};
-
-	//! Calculates the direction vector from the keyboard input.
-	class DirectionFromKeyboard : public Direction {
-	public:
-
-								//! Constructs the DirectionFromKeyboard instance.
-								DirectionFromKeyboard( Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total );
-
-		//! Calculates the direction.
-		virtual Vec3			get( void ) const;
-
-	private:
-
-		Platform::Input*		m_input;		//!< The input used.
-		Platform::Key::Mapping	m_left;			//!< Left key mapping
-		Platform::Key::Mapping	m_right;		//!< Right key mapping
-		Platform::Key::Mapping	m_up;			//!< Up key mapping
-		Platform::Key::Mapping	m_down;			//!< Down key mapping
-	};
 
 	//! Identifier component.
 	class Identifier : public Ecs::Component<Identifier> {
@@ -87,34 +53,65 @@ namespace Scene {
 		String					m_name;	//!< Scene object name.
 	};
 
-	//! Moves the scene object along the input direction.
-	class MoveInDirection : public Ecs::Component<MoveInDirection> {
+	//! Moves the scene object transform along the coordinate axes.
+	class MoveAlongAxes : public Ecs::Component<MoveAlongAxes> {
 	public:
 
 		//! Movement axes.
-		enum Axes {
-			  XY				//!< Move along the XY axes.
-			, XZ				//!< Move along the XZ axes.
-		};
+	//	enum Axes {
+	//		  XY				//!< Move along the XY axes.
+	//		, XZ				//!< Move along the XZ axes.
+	//	};
 
-								//! Constructs MoveInDirection instance.
-								MoveInDirection( Axes axes = XY, f32 speed = 1.0f, const DirectionPtr& direction = DirectionPtr() )
-									: m_axes( axes ), m_speed( speed ), m_direction( direction ) {}
+								//! Constructs MoveAlongAxes instance.
+								MoveAlongAxes( /*Axes axes = XY,*/ f32 speed = 1.0f, bool isLocal = false, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: /*m_axes( axes ),*/m_isLocal( isLocal ), m_speed( speed ), m_delta( delta ) {}
 
 		//! Returns the movement speed.
 		f32						speed( void ) const;
 
 		//! Movement axes.
-		Axes					axes( void ) const;
+		//Axes					axes( void ) const;
 
-		//! Returns the movement direction.
-		Vec3					direction( void ) const;
+		//! Returns true if local axes should be used.
+		bool					isLocal( void ) const;
+
+		//! Returns the movement delta values.
+		Vec3					delta( void ) const;
 
 	private:
 
-		Axes					m_axes;			//!< Movement is performed along this axes.
-		f32						m_speed;		//!< Movement speed.
-		DirectionPtr			m_direction;	//!< Movement direction.
+		//Axes					m_axes;		//!< Movement is performed along this axes.
+		bool					m_isLocal;	//!< Use local axes.
+		f32						m_speed;	//!< Movement speed.
+		Vec3BindingPtr			m_delta;	//!< Movement deltas.
+	};
+
+	//! Rotates the scene object transform around axes.
+	class RotateAroundAxes : public Ecs::Component<RotateAroundAxes> {
+	public:
+
+								//! Constructs RotateAroundAxes instance.
+								RotateAroundAxes( f32 speed = 1.0f, bool isLocal = false, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: m_isLocal( isLocal ), m_speed( speed ), m_delta( delta ) {}
+
+		//! Returns the rotation speed.
+		f32						speed( void ) const;
+
+		//! Sets the rotation speed.
+		void					setSpeed( f32 value );
+
+		//! Returns true if local axes should be used.
+		bool					isLocal( void ) const;
+
+		//! Returns rotation delta values.
+		Vec3					delta( void ) const;
+
+	private:
+
+		bool					m_isLocal;	//!< Use local axes.
+		f32						m_speed;	//!< Rotation speed.
+		Vec3BindingPtr			m_delta;	//!< Rotation delta values.
 	};
 
 } // namespace Scene

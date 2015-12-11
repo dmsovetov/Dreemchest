@@ -30,29 +30,68 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** MoveInDirectionSystem::MoveInDirectionSystem
-MoveInDirectionSystem::MoveInDirectionSystem( void ) : GenericEntitySystem( "MoveInDirection" )
+// ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //
+
+// ** MoveAlongAxesSystem::MoveAlongAxesSystem
+MoveAlongAxesSystem::MoveAlongAxesSystem( void ) : GenericEntitySystem( "MoveAlongAxesSystem" )
 {
 
 }
 
-// ** MoveInDirectionSystem::process
-void MoveInDirectionSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveInDirection& move, Transform& transform )
+// ** MoveAlongAxesSystem::process
+void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform )
 {
-	Vec3 direction = move.direction();
+	// Get movement values
+	Vec3 movement = moveAlongAxes.delta() * moveAlongAxes.speed() * dt;
 
-	DC_BREAK_IF( direction.length() > 1.0f )
+	// Update the position
+	if( !moveAlongAxes.isLocal() ) {
+		transform.setPosition( transform.position() + movement );
+	} else {
+		transform.setPosition( transform.position() + transform.axisX() * movement.x );
+		transform.setPosition( transform.position() + transform.axisY() * movement.y );
+		transform.setPosition( transform.position() + transform.axisZ() * movement.z );
+	}
+}
 
-	// Scale direction by speed
-	direction = direction * move.speed();
+// ------------------------------------------------------- RotateAroundAxesSystem ------------------------------------------------------- //
 
-	// Update the transform
-	switch( move.axes() ) {
-	case MoveInDirection::XY:	transform.setPosition( transform.position() + Vec3( direction.x, direction.y, 0.0f )  * dt );
-								break;
+// ** RotateAroundAxesSystem::RotateAroundAxesSystem
+RotateAroundAxesSystem::RotateAroundAxesSystem( void ) : GenericEntitySystem( "RotateAroundAxesSystem" )
+{
 
-	case MoveInDirection::XZ:	transform.setPosition( transform.position() + Vec3( direction.x, 0.0f, -direction.y ) * dt );
-								break;
+}
+
+// ** RotateAroundAxesSystem::process
+void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform )
+{
+	// Get rotation values
+	Vec3 rotation = rotateAroundAxes.delta() * rotateAroundAxes.speed() * dt;
+
+	// Rotate the transform
+	if( !rotateAroundAxes.isLocal() ) {
+		if( fabs( rotation.x ) > 0.001f ) {
+			transform.rotate( rotation.x, 1.0f, 0.0f, 0.0f );
+		}
+		if( fabs( rotation.y ) > 0.001f ) {
+			transform.rotate( rotation.y, 0.0f, 1.0f, 0.0f );
+		}
+		if( fabs( rotation.z ) > 0.001f ) {
+			transform.rotate( rotation.z, 0.0f, 0.0f, 1.0f );
+		}
+	} else {
+		if( fabs( rotation.x ) > 0.001f ) {
+			Vec3 axis = transform.axisX();
+			transform.rotate( rotation.x, axis.x, axis.y, axis.z );
+		}
+		if( fabs( rotation.y ) > 0.001f ) {
+			Vec3 axis = transform.axisY();
+			transform.rotate( rotation.y, axis.x, axis.y, axis.z );
+		}
+		if( fabs( rotation.z ) > 0.001f ) {
+			Vec3 axis = transform.axisZ();
+			transform.rotate( rotation.z, axis.x, axis.y, axis.z );
+		}
 	}
 }
 

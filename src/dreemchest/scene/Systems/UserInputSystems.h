@@ -35,15 +35,26 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Moves scene object transform in direction.
-	class MoveInDirectionSystem : public Ecs::GenericEntitySystem<MoveInDirection, Transform> {
+	//! Moves scene object transform along coordinate axes.
+	class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxes, Transform> {
 	public:
 
-							//! Constructs a MoveInDirectionSystem instance.
-							MoveInDirectionSystem( void );
+							//! Constructs a MoveAlongAxesSystem instance.
+							MoveAlongAxesSystem( void );
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveInDirection& move, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform );
+	};
+
+	//! Rotates scene object transform around axes.
+	class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxes, Transform> {
+	public:
+
+							//! Constructs a RotateAroundAxesSystem instance.
+							RotateAroundAxesSystem( void );
+
+		//! Moves the scene object
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform );
 	};
 
 } // namespace Scene

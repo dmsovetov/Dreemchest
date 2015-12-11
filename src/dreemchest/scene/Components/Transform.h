@@ -45,6 +45,10 @@ namespace Scene {
 								Transform( f32 x, f32 y, f32 z, const TransformWPtr& parent = TransformWPtr() )
 									: m_parent( parent ), m_position( x, y, z ), m_scale( 1.0f, 1.0f, 1.0f ) {}
 
+								//! Constructs Transform instance.
+								Transform( s32 x, s32 y, s32 z, const TransformWPtr& parent = TransformWPtr() )
+									: m_parent( parent ), m_position( x, y, z ), m_scale( 1.0f, 1.0f, 1.0f ) {}
+
 		//! Returns an affine transformation matrix.
 		virtual const Matrix4&	matrix( void ) const;
 
@@ -59,6 +63,15 @@ namespace Scene {
 
 		//! Calculates the world space position.
 		Vec3					worldSpacePosition( void ) const;
+
+		//! Returns the X axis.
+		Vec3					axisX( void ) const;
+
+		//! Returns the Y axis.
+		Vec3					axisY( void ) const;
+
+		//! Returns the Z axis.
+		Vec3					axisZ( void ) const;
 
 		//! Returns transformation position.
 		const Vec3&				position( void ) const;
@@ -86,6 +99,9 @@ namespace Scene {
 
 		//! Returns the transform rotation quaternion.
 		const Quat&				rotation( void ) const;
+
+		//! Rotates the transform around an axis.
+		void					rotate( f32 angle, f32 x, f32 y, f32 z ); 
 
 		//! Sets the transform rotation quaternion.
 		void					setRotation( const Quat& value );
