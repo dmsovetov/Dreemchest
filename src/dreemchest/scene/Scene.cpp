@@ -29,11 +29,20 @@
 #include "Rendering/RenderingSystem.h"
 #include "Rendering/Rvm.h"
 #include "Rendering/RenderTarget.h"
+#include "Rendering/Passes/DebugPasses.h"
+#include "Rendering/Passes/BasicPasses.h"
+#include "Rendering/ForwardLighting/LightPass.h"
+
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
+
 #include "Components/Rendering.h"
 #include "Components/Transform.h"
+
+#include "Systems/TransformSystems.h"
+#include "Systems/UserInputSystems.h"
+#include "Systems/CullingSystems.h"
 
 #include "Components/UserInput.h"
 
@@ -54,6 +63,20 @@ Scene::Scene( void )
 
 	// Create system groups.
 	m_updateSystems = m_ecs->createGroup( "Update", UpdateSystems );
+
+	// Add default update systems.
+	addSystem<AffineTransformSystem>();
+	addSystem<ParticlesSystem>();
+	addSystem<MoveAlongAxesSystem>();
+	addSystem<RotateAroundAxesSystem>();
+	addSystem<WorldSpaceBoundingBoxSystem>();
+	addSystem<FrustumCullingSystem>( cameras() );
+		
+	// Add default render systems.
+	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
+	addRenderingSystem<BoundingVolumesRenderer>();
+	addRenderingSystem<ForwardLightingRenderer>();
 }
 
 // ** Scene::update
