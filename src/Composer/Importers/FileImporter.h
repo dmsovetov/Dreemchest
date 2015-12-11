@@ -29,6 +29,8 @@
 
 #include "AssetImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Importers {
 
 	//! Imports the file by copying it to a cache.
@@ -36,9 +38,11 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a file.
-		virtual bool		import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
+		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
 	};
 
 } // namespace Importers
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_FileImporter_H__	*/

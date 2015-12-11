@@ -26,10 +26,12 @@
 
 #include "FileImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Importers {
 
 // ** FileImporter::import
-bool FileImporter::import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const
+bool FileImporter::import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const
 {
 	bool result = fs->copyFile( asset.absoluteFilePath, path.c_str() );
 	DC_BREAK_IF( !result );
@@ -38,3 +40,5 @@ bool FileImporter::import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const
 }
 
 } // namespace Importers
+
+DC_END_COMPOSER

@@ -29,6 +29,8 @@
 
 #include "AssetImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Importers {
 
 	//! Imports the TIF image.
@@ -36,9 +38,11 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TIF image.
-		virtual bool		import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
+		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
 	};
 
 } // namespace Importers
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_ImageImporter_H__	*/

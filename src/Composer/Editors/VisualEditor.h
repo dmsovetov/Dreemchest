@@ -29,6 +29,8 @@
 
 #include "AssetEditor.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Editors {
 
 	//! Base class for all visual asset editors.
@@ -40,12 +42,15 @@ namespace Editors {
 										VisualEditor( void );
 
 		//! Performs the visual editor initialization.
-		virtual bool					initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document );
+		virtual bool					initialize( const Asset& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
+
+		//! Returns rendering HAL.
+		Renderer::HalWPtr				hal( void ) const;
 
 	private:
 
 		//! Update the editor scene.
-		virtual void					update( void );
+		virtual void					update( f32 dt );
 
 		//! Handles the viewport resize.
 		virtual void					handleResize( s32 width, s32 height );
@@ -69,13 +74,13 @@ namespace Editors {
 		virtual void					handleKeyRelease( Platform::Key key ) {}
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( Ui::IMimeDataWPtr mime ) { return false; }
+		virtual bool					handleDragEnter( IMimeDataWPtr mime ) { return false; }
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y ) {}
+		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the drop event.
-		virtual void					handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y ) {}
+		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the context menu event.
 		virtual void					handleContextMenu( Ui::IMenuWPtr menu );
@@ -90,7 +95,7 @@ namespace Editors {
 		virtual void					beginFrameRendering( void );
 
 		//! Performs actual frame rendering.
-		virtual void					render( void ) {}
+		virtual void					render( f32 dt ) {}
 
 		//! Ends the frame rendering.
 		virtual void					endFrameRendering( void );
@@ -110,46 +115,46 @@ namespace Editors {
 										RenderingFrameDelegate( VisualEditorWPtr editor );
 
 		//! Handles the update event.
-		virtual void					handleUpdate( void );
+		virtual void					handleUpdate( f32 dt ) DC_DECL_OVERRIDE;
 
 		//! Handles the resize event.
-		virtual void					handleResize( s32 width, s32 height );
+		virtual void					handleResize( s32 width, s32 height ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse pressed event.
-		virtual void					handleMousePress( s32 x, s32 y, Ui::MouseButton button );
+		virtual void					handleMousePress( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse released event.
-		virtual void					handleMouseRelease( s32 x, s32 y, Ui::MouseButton button );
+		virtual void					handleMouseRelease( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse moved event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY );
+		virtual void					handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse wheel event.
-		virtual void					handleMouseWheel( s32 delta );
+		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
 
 		//! Handles the focus in event.
-		virtual void					handleFocusIn( void );
+		virtual void					handleFocusIn( void ) DC_DECL_OVERRIDE;
 
 		//! Handles the focus out event.
-		virtual void					handleFocusOut( void );
+		virtual void					handleFocusOut( void ) DC_DECL_OVERRIDE;
 
 		//! Handles the key pressed event.
-		virtual void					handleKeyPress( Platform::Key key );
+		virtual void					handleKeyPress( Platform::Key key ) DC_DECL_OVERRIDE;
 
 		//! Handles the key released event.
-		virtual void					handleKeyRelease( Platform::Key key );
+		virtual void					handleKeyRelease( Platform::Key key ) DC_DECL_OVERRIDE;
 
 		//! Handles the context menu event.
-		virtual void					handleContextMenu( Ui::IMenuWPtr menu );
+		virtual void					handleContextMenu( Ui::IMenuWPtr menu ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( Ui::IMimeDataWPtr mime );
+		virtual bool					handleDragEnter( IMimeDataWPtr mime ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y );
+		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 		//! Handles the drop move event.
-		virtual void					handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y );
+		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -157,5 +162,7 @@ namespace Editors {
 	};
 
 } // namespace Editors
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_VisualEditor_H__	*/

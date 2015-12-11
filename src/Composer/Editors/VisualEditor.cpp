@@ -26,6 +26,8 @@
 
 #include "VisualEditor.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Editors {
 
 // ----------------------------------------------- VisualEditor ----------------------------------------------- //
@@ -37,7 +39,7 @@ VisualEditor::VisualEditor( void )
 }
 
 // ** VisualEditor::initialize
-bool VisualEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document )
+bool VisualEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 {
 	// Perform basic initialization first.
 	if( !AssetEditor::initialize( asset, document ) ) {
@@ -54,6 +56,7 @@ bool VisualEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr docu
 	// Attach the rendering frame delegate.
 	m_renderingFrameDelegate = new RenderingFrameDelegate( this );
 	frame->setDelegate( m_renderingFrameDelegate );
+	frame->makeCurrent();
 
 	// Create the rendering HAL.
 	m_hal = Renderer::Hal::create( Renderer::OpenGL );
@@ -61,11 +64,17 @@ bool VisualEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr docu
 	return true;
 }
 
+// ** VisualEditor::hal
+Renderer::HalWPtr VisualEditor::hal( void ) const
+{
+	return m_hal;
+}
+
 // ** VisualEditor::update
-void VisualEditor::update( void )
+void VisualEditor::update( f32 dt )
 {
 	beginFrameRendering();
-	render();
+	render( dt );
 	endFrameRendering();
 }
 
@@ -132,9 +141,9 @@ RenderingFrameDelegate::RenderingFrameDelegate( VisualEditorWPtr editor ) : m_ed
 }
 
 // ** RenderingFrameDelegate::handleUpdate
-void RenderingFrameDelegate::handleUpdate( void )
+void RenderingFrameDelegate::handleUpdate( f32 dt )
 {
-	m_editor->update();
+	m_editor->update( dt );
 }
 
 // ** RenderingFrameDelegate::handleUpdate
@@ -180,19 +189,19 @@ void RenderingFrameDelegate::handleKeyRelease( Platform::Key key )
 }
 
 // ** RenderingFrameDelegate::handleDragEnter
-bool RenderingFrameDelegate::handleDragEnter( Ui::IMimeDataWPtr mime )
+bool RenderingFrameDelegate::handleDragEnter( IMimeDataWPtr mime )
 {
 	return m_editor->handleDragEnter( mime );
 }
 
 // ** RenderingFrameDelegate::handleDragMove
-void RenderingFrameDelegate::handleDragMove( Ui::IMimeDataWPtr mime, s32 x, s32 y )
+void RenderingFrameDelegate::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 {
 	m_editor->handleDragMove( mime, x, y );
 }
 
 // ** RenderingFrameDelegate::handleDrop
-void RenderingFrameDelegate::handleDrop( Ui::IMimeDataWPtr mime, s32 x, s32 y )
+void RenderingFrameDelegate::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
 	m_editor->handleDrop( mime, x, y );
 }
@@ -216,3 +225,5 @@ void RenderingFrameDelegate::handleFocusOut( void )
 }
 
 } // namespace Editors
+
+DC_END_COMPOSER

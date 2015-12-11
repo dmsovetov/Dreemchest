@@ -28,9 +28,12 @@
 #define __DC_Composer_AssetEditor_H__
 
 #include "../Composer.h"
+#include "../IMimeData.h"
 
-#include "../UI/IDocument.h"
-#include "../UI/IRenderingFrame.h"
+#include "../Widgets/IDocument.h"
+#include "../Widgets/IRenderingFrame.h"
+
+DC_BEGIN_COMPOSER
 
 namespace Editors {
 
@@ -45,7 +48,7 @@ namespace Editors {
 		virtual void		notifyEnterBackground( void ) {}
 
 		//! Performs asset editor initialization.
-		virtual bool		initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document );
+		virtual bool		initialize( const Asset& asset, Ui::IDocumentWPtr document );
 
 		//! Saves the asset to disk.
 		virtual void		save( void ) {}
@@ -54,7 +57,7 @@ namespace Editors {
 		bool				hasChanges( void ) const;
 
 		//! Returns the edited asset.
-		const Ui::FileInfo&	asset( void ) const;
+		const Asset&		asset( void ) const;
 
 		//! Returns the parent document.
 		Ui::IDocumentWPtr	document( void ) const;
@@ -62,9 +65,11 @@ namespace Editors {
 	protected:
 
 		Ui::IDocumentWPtr	m_document;	//!< Parent document.
-		Ui::FileInfo		m_asset;	//!< An edited asset.
+		Asset				m_asset;	//!< An asset being edited.
 	};
 
 } // namespace Editors
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_AssetEditor_H__	*/

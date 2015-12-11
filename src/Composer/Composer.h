@@ -32,6 +32,7 @@
 
 #define DEV_CUSTOM_ASSET_MODEL			(1)
 #define DEV_BACKGROUND_ASSET_LOADING	(0)
+#define DEV_USE_DOCK_INDICATOR			(1)
 
 #ifdef DC_QT4_ENABLED
 	#include <QtGui>
@@ -44,22 +45,84 @@
 	#include <QtOpenGL>
 #endif
 
-#define DC_DECL_OVERRIDE override
+#define DC_BEGIN_COMPOSER	/*namespace Composer {*/
+#define DC_END_COMPOSER		/*}*/
 
-namespace Ui {
+DC_BEGIN_COMPOSER
 
-	dcDeclarePtrs( IMainWindow )
-	dcDeclarePtrs( IAction )
-	dcDeclarePtrs( IMenu )
-	dcDeclarePtrs( IToolBar )
-	dcDeclarePtrs( IRenderingFrame )
-	dcDeclarePtrs( IRenderingFrameDelegate )
-	dcDeclarePtrs( IDocument )
+	namespace Ui {
+
+		dcDeclarePtrs( IMainWindow )
+		dcDeclarePtrs( IAction )
+		dcDeclarePtrs( IMenu )
+		dcDeclarePtrs( IToolBar )
+		dcDeclarePtrs( IRenderingFrame )
+		dcDeclarePtrs( IRenderingFrameDelegate )
+		dcDeclarePtrs( IDocument )
+		dcDeclarePtrs( IAssetTree )
+
+		//! Message status.
+		enum MessageStatus {
+			  MessageInfo		//!< The information message.
+			, MessageWarning	//!< The warning message.
+			, MessageError		//!< The error message.
+		};
+
+		//! Message box result.
+		enum MessageBoxResult {
+			  MessageBoxYes		//!< Yes button was clicked.
+			, MessageBoxNo		//!< No button was clicked.
+			, MessageBoxCancel	//!< Cancel button was clicked.
+		};
+
+		//! Mouse buttons.
+		enum MouseButton {
+			  LeftMouseButton	//!< Left mouse button.
+			, RightMouseButton	//!< Right mouse button.
+			, MiddleMouseButton	//!< Middle mouse button.
+		};
+
+		//! Auto ptr type for signal delegate instances.
+		typedef AutoPtr<class QSignalDelegate> QSignalDelegatePtr;
+
+		//! Container type to store array of documents.
+		typedef Array<IDocumentWPtr> DocumentsWeak;
+
+		//! Menu action callback type.
+		typedef std::function<void(IActionWPtr)> ActionCallback;
+
+		//! Factory method used for main window creation.
+		extern IMainWindowPtr createMainWindow( const String& title );
+
+	} // namespace Ui
+
+	namespace Editors {
+
+		dcDeclarePtrs( AssetEditor )
+		dcDeclarePtrs( VisualEditor )
+
+	} // namespace Editors
+
+	namespace Importers {
+
+		dcDeclarePtrs( AssetImporter )
+
+	} // namespace Importers
+
+	namespace Project {
+
+		dcDeclarePtrs( Project )
+		dcDeclarePtrs( Cache )
+
+	} // namespace Project
+
+	dcDeclarePtrs( Composer )
 	dcDeclarePtrs( IFileSystem )
-	dcDeclarePtrs( IAssetsModel )
-	dcDeclarePtrs( IAssetsModelDelegate )
-	dcDeclarePtrs( IAssetTree )
 	dcDeclarePtrs( IMimeData )
+	dcDeclarePtrs( AssetsModel )
+
+	//! Factory method used for assets model creation.
+	extern AssetsModelPtr createAssetsModel( void );
 
 	//! File info struct.
 	struct FileInfo {
@@ -71,158 +134,147 @@ namespace Ui {
 		u32			timestamp;		//!< The file timestamp.
 	};
 
+	//! Container type to store file info.
+	typedef Array<FileInfo> FileInfoArray;
+
 	//! Asset info struct.
 	struct Asset {
 		String		ext;				//!< Asset's type.
+		String		name;				//!< Asset name.
 		String		absoluteFilePath;	//!< Absolute file path.
 		io::Bson	metaInfo;			//!< Attached metainfo.
+
+		//! Returns true if two assets are the same.
+		bool			operator == ( const Asset& other ) const { return uuid() == other.uuid(); }
 
 		//! Return asset UUID.
 		const String&	uuid( void ) const { return metaInfo["uuid"].asString(); }
 	};
 
-	//! Message status.
-	enum MessageStatus {
-		  MessageInfo		//!< The information message.
-		, MessageWarning	//!< The warning message.
-		, MessageError		//!< The error message.
+	//! Base class for event emitter classes.
+	class EventEmitter : public RefCounted {
+	public:
+
+		//! Subscribes for a project event.
+		template<typename TEvent>
+		void						subscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.subscribe<TEvent>( callback ); }
+
+		//! Removes an event listener.
+		template<typename TEvent>
+		void						unsubscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
+
+		//! Constructs and emits a new event instance.
+		template<typename TEvent, typename ... TArgs>
+		void						notify( const TArgs& ... args ) { m_eventEmitter.notify<TEvent, TArgs...>( args... ); }
+
+	protected:
+
+		event::EventEmitter			m_eventEmitter;	//!< Event emitter instance.
 	};
 
-	//! Message box result.
-	enum MessageBoxResult {
-		  MessageBoxYes		//!< Yes button was clicked.
-		, MessageBoxNo		//!< No button was clicked.
-		, MessageBoxCancel	//!< Cancel button was clicked.
+	//! Base interface class.
+	class IInterface : public EventEmitter {
+	public:
+
+		virtual						~IInterface( void ) {}
+
+		//! Returns the raw private implementation pointer.
+		virtual void*				ptr( void ) const = 0;
+
+		//! Returns the private interface.
+		template<typename T>
+		T*							privateInterface( void ) const { return reinterpret_cast<T*>( ptr() ); }
 	};
 
-	//! Mouse buttons.
-	enum MouseButton {
-		  LeftMouseButton	//!< Left mouse button.
-		, RightMouseButton	//!< Right mouse button.
-		, MiddleMouseButton	//!< Middle mouse button.
+	//! Generic class to declare interface implementations.
+	template<typename TBase, typename TPrivate>
+	class PrivateInterface : public TBase {
+	public:
+
+									//! Constructs the PrivateInterface instance.
+									PrivateInterface( TPrivate* instance )
+										: m_private( instance ) {}
+
+		//! Returns the private interface.
+		virtual void*				ptr( void ) const { return m_private.get(); }
+
+	protected:
+
+		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
 	};
 
-	//! Auto ptr type for signal delegate instances.
-	typedef AutoPtr<class QSignalDelegate> QSignalDelegatePtr;
+	//! Root composer class.
+	class Composer : public EventEmitter {
+	public:
 
-	//! Container type to store file info.
-	typedef Array<FileInfo> FileInfoArray;
-
-	//! Container type to store array of documents.
-	typedef Array<IDocumentWPtr> DocumentsWeak;
-
-	//! Menu action callback type.
-	typedef std::function<void(IActionWPtr)> ActionCallback;
-
-} // namespace Ui
-
-namespace Editors {
-
-	dcDeclarePtrs( AssetEditor )
-	dcDeclarePtrs( VisualEditor )
-
-} // namespace Editors
-
-namespace Importers {
-
-	dcDeclarePtrs( AssetImporter )
-
-} // namespace Importers
-
-namespace Project {
-
-	dcDeclarePtrs( Project )
-	dcDeclarePtrs( Cache )
-
-} // namespace Project
-
-dcDeclarePtrs( Composer )
-
-//! Root composer class.
-class Composer : public RefCounted {
-public:
-
-	//! Available menues
-	enum Menu {
-		  FileMenu
-		, EditMenu
-		, ViewMenu
-		, AssetsMenu
+		//! Available menues
+		enum Menu {
+			  FileMenu
+			, EditMenu
+			, ViewMenu
+			, AssetsMenu
 		
-		, TotalMenues
+			, TotalMenues
+		};
+
+		//! Event is emitted when the project is created.
+		struct ProjectCreated {
+									//! Constructs ProjectCreated event.
+									ProjectCreated( Project::ProjectWPtr project );
+
+			Project::ProjectWPtr	project;	//!< Created project.
+		};
+
+		//! Event is emitted when the project was opened.
+		struct ProjectOpened {
+									//! Constructs ProjectOpened event.
+									ProjectOpened( Project::ProjectWPtr project );
+
+			Project::ProjectWPtr	project;	//!< Opened project.
+		};
+
+		//! Event is emitted when the project was closed.
+		struct ProjectClosed {
+									//! Constructs ProjectClosed event.
+									ProjectClosed( Project::ProjectWPtr project );
+
+			Project::ProjectPtr		project;	//!< Closed project.
+		};
+
+		//! Opens the existing project at path.
+		void				openProject( const String& path );
+
+		//! Creates new project at path.
+		void				createProject( const String& path );
+
+		//! Creates the Composer instance.
+		static ComposerPtr	create( void );
+
+		//! Returns the Composer instance.
+		static ComposerWPtr	instance( void );
+
+	private:
+
+							//! Constructs Composer instance.
+							Composer( Ui::IMainWindowPtr mainWindow );
+
+		//! Creates a new project.
+		void				menuCreateProject( Ui::IActionWPtr action );
+
+		//! Opens an existing project.
+		void				menuOpenProject( Ui::IActionWPtr action );
+
+		//! Performs the composer initialization.
+		bool				initialize( void );
+
+	private:
+
+		static ComposerWPtr	s_instance;				//!< Shared composer instance.
+		Ui::IMainWindowPtr	m_mainWindow;			//!< Main composer window.
+		Ui::IMenuWPtr		m_menues[TotalMenues];	//!< Default menues.
+		Project::ProjectPtr	m_project;				//!< Active project.
 	};
 
-	//! Event is emitted when the project is created.
-	struct ProjectCreated {
-								//! Constructs ProjectCreated event.
-								ProjectCreated( Project::ProjectWPtr project );
-
-		Project::ProjectWPtr	project;	//!< Created project.
-	};
-
-	//! Event is emitted when the project was opened.
-	struct ProjectOpened {
-								//! Constructs ProjectOpened event.
-								ProjectOpened( Project::ProjectWPtr project );
-
-		Project::ProjectWPtr	project;	//!< Opened project.
-	};
-
-	//! Event is emitted when the project was closed.
-	struct ProjectClosed {
-								//! Constructs ProjectClosed event.
-								ProjectClosed( Project::ProjectWPtr project );
-
-		Project::ProjectPtr		project;	//!< Closed project.
-	};
-
-	//! Generic method to subscribe for events.
-	template<typename TEvent>
-    void subscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback )
-	{
-		m_event.subscribe<TEvent>( callback );
-	}
-
-	//! Generic method to unsubscribe from events.
-	template<typename TEvent>
-	void unsubscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback )
-	{
-		m_event.unsubscribe<TEvent>( callback );
-	}
-
-	//! Creates the Composer instance.
-	static ComposerPtr	create( void );
-
-	//! Returns the Composer instance.
-	static ComposerWPtr	instance( void );
-
-private:
-
-						//! Constructs Composer instance.
-						Composer( Ui::IMainWindowPtr mainWindow );
-
-	//! Creates a new project.
-	void				menuCreateProject( Ui::IActionWPtr action );
-
-	//! Opens an existing project.
-	void				menuOpenProject( Ui::IActionWPtr action );
-
-	//! Opens the existing project at path.
-	void				openExistingProject( const String& path );
-
-	//! Creates new project at path.
-	void				createNewProject( const String& path );
-
-	//! Performs the composer initialization.
-	bool				initialize( void );
-
-private:
-
-	static ComposerWPtr	s_instance;				//!< Shared composer instance.
-	Ui::IMainWindowPtr	m_mainWindow;			//!< Main composer window.
-	Ui::IMenuWPtr		m_menues[TotalMenues];	//!< Default menues.
-	Project::ProjectPtr	m_project;				//!< Active project.
-	event::EventEmitter	m_event;				//!< Event emitter.
-};
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_H__	*/

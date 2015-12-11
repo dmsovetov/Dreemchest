@@ -24,13 +24,45 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_AssetsModel_H__
+#define __DC_Composer_AssetsModel_H__
+
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+	//! Assets model interface.
+	class AssetsModel : public IInterface {
+	public:
 
+		//! This event is emitted when a new asset was added to a project.
+		struct Added {
+							Added( const Asset& asset )
+								: asset( asset ) {}
+			Asset			asset;	//!< Asset that was added.
+		};
 
-} // namespace Editors
+		//! This event is emitted when a new asset was removed from a project.
+		struct Removed {
+							Removed( const Asset& asset )
+								: asset( asset ) {}
+			Asset			asset;	//!< Asset that was removed.
+		};
+
+		//! This event is emitted when a new asset was changed.
+		struct Changed {
+							Changed( const Asset& asset )
+								: asset( asset ) {}
+			Asset			asset;	//!< Asset that was changed.
+		};
+
+		//! Sets root model path.
+		virtual void		setRootPath( const String& value ) = 0;
+
+		//! Sets the read-only flag.
+		virtual void		setReadOnly( bool value ) = 0;
+	};
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_AssetsModel_H__	*/

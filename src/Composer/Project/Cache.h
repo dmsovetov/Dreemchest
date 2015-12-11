@@ -30,52 +30,55 @@
 #include "Project.h"
 #include "../Importers/AssetImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Project {
 
 	//! Manages the project cache.
 	class Cache : public RefCounted {
 	friend class Project;
-	public:
-
 	private:
 
-								//! Constructs Cache instance.
-								Cache( Ui::IFileSystemWPtr fileSystem, ProjectWPtr project );
-		virtual					~Cache( void );
+									//! Constructs Cache instance.
+									Cache( IFileSystemWPtr fileSystem, const io::Path& path, AssetsModelWPtr assetsModel );
+		virtual						~Cache( void );
 
 		//! Adds an asset to cache.
-		void					handleAssetAdded( const Project::AssetAdded& e );
+		void						handleAssetAdded( const AssetsModel::Added& e );
 
 		//! Removes an asset from cache.
-		void					handleAssetRemoved( const Project::AssetRemoved& e );
+		void						handleAssetRemoved( const AssetsModel::Removed& e );
 
 		//! Performs caching of a changed asset.
-		void					handleAssetChanged( const Project::AssetChanged& e );
+		void						handleAssetChanged( const AssetsModel::Changed& e );
 
 	private:
 
 		//! Puts an asset to cache.
-		bool					putToCache( const Ui::Asset& asset );
+		bool						putToCache( const Asset& asset );
 
 		//! Removes an asset from cache.
-		void					removeFromCache( const Ui::Asset& asset );
+		void						removeFromCache( const Asset& asset );
 
 		//! Returns asset cache path.
-		io::Path				cacheFileFromAsset( const Ui::Asset& asset ) const;
+		io::Path					cacheFileFromAsset( const Asset& asset ) const;
 
 		//! Returns asset cache folder.
-		io::Path				cacheFolderFromAsset( const Ui::Asset& asset ) const;
+		io::Path					cacheFolderFromAsset( const Asset& asset ) const;
 
 	private:
 
 		//! Alias the asset importer factory type.
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
-		ProjectWPtr				m_project;			//!< Parent project instance.
-		Ui::IFileSystemWPtr		m_fileSystem;		//!< File system to use.
-		AssetImporterFactory	m_assetImporters;	//!< Asset importer factory.
+		IFileSystemWPtr				m_fileSystem;		//!< File system to use.
+		io::Path					m_path;				//!< Root cache folder path.
+		AssetsModelWPtr				m_assetsModel;		//!< Assets model to use.
+		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
 	};
 
 } // namespace Project
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_Cache_H__	*/

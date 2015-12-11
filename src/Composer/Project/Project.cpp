@@ -27,15 +27,20 @@
 #include "Project.h"
 #include "Cache.h"
 
-#include "../UI/IMainWindow.h"
-#include "../UI/IMenu.h"
-#include "../UI/IFileSystem.h"
-#include "../UI/IAssetTree.h"
-#include "../UI/IDocument.h"
+#include "../IFileSystem.h"
+
+#include "../Widgets/IMainWindow.h"
+#include "../Widgets/IMenu.h"
+#include "../Widgets/IAssetTree.h"
+#include "../Widgets/IDocument.h"
+
+#include "../Editors/SceneEditor.h"
 
 #ifdef emit
 	#undef emit
 #endif
+
+DC_BEGIN_COMPOSER
 
 namespace Project {
 
@@ -53,14 +58,17 @@ Project::Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path ) : m_mai
 	m_paths[CachePath]	= path + "Cache";
 
 	// Declare asset editors.
-	m_assetEditors.declare<Editors::AssetEditor>( "scene" );
+	m_assetEditors.declare<Editors::SceneEditor>( "scene" );
 
-	// Create delegate
-	m_delegate = new AssetsModelDelegate( this );
-	mainWindow->assetsModel()->setDelegate( m_delegate );
+	// Create assets model
+	m_assetsModel = createAssetsModel();
 
 	// Create project cache
-	m_cache = new Cache( mainWindow->fileSystem(), this );
+	m_cache = new Cache( mainWindow->fileSystem(), absolutePath( CachePath ), m_assetsModel );
+
+	// Setup assets model after creating cache
+	m_assetsModel->setReadOnly( false );
+	m_assetsModel->setRootPath( assetsAbsolutePath() );
 }
 
 // ** Project::create
@@ -73,6 +81,12 @@ ProjectPtr Project::create( Ui::IMainWindowWPtr mainWindow, const io::Path& path
 const String& Project::name( void ) const
 {
 	return m_name;
+}
+
+// ** Project::assetsModel
+AssetsModelWPtr Project::assetsModel( void ) const
+{
+	return m_assetsModel;
 }
 
 // ** Project::absolutePath
@@ -118,7 +132,7 @@ void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree )
 void Project::createAsset( const String& name, const String& ext )
 {
 	// Get the file system instance
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Get the parent folder
 	StringArray selected = m_mainWindow->assetTree()->selection();
@@ -138,20 +152,20 @@ void Project::createAsset( const String& name, const String& ext )
 	m_mainWindow->assetTree()->expandSelectedItems();
 }
 
-// ** Project::editAsset
-Ui::IDocumentWPtr Project::editAsset( const Ui::FileInfo& fileInfo )
+// ** Project::edit
+Ui::IDocumentWPtr Project::edit( const Asset& asset )
 {
 	// Construct the asset editor by file extension
-	AssetEditorFactory::Ptr assetEditor = m_assetEditors.construct( fileInfo.ext );
+	AssetEditorFactory::Ptr assetEditor = m_assetEditors.construct( asset.ext );
 
 	// No asset editor found - open the asset file with standard editor
 	if( !assetEditor.valid() ) {
-		m_mainWindow->fileSystem()->browse( fileInfo.path );
+		m_mainWindow->fileSystem()->browse( asset.absoluteFilePath );
 		return Ui::IDocumentWPtr();
 	}
 
 	// Dock the editor to main window
-	Ui::IDocumentWPtr result = m_mainWindow->editDocument( assetEditor, fileInfo );
+	Ui::IDocumentWPtr result = m_mainWindow->editDocument( assetEditor, asset );
 	
 	return result;
 }
@@ -160,7 +174,7 @@ Ui::IDocumentWPtr Project::editAsset( const Ui::FileInfo& fileInfo )
 void Project::menuImportAssets( Ui::IActionWPtr action )
 {
 	// Get the file system instance
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Select files
 	StringArray files = fs->selectExistingFiles( "Import Assets" );
@@ -172,7 +186,7 @@ void Project::menuImportAssets( Ui::IActionWPtr action )
 	// Copy selected files
 	for( s32 i = 0, n = ( s32 )files.size(); i < n; i++ ) {
 		// Get the file info
-		Ui::FileInfo info = fs->extractFileInfo( files[i] );
+		FileInfo info = fs->extractFileInfo( files[i] );
 
 		// Copy the file
 		fs->copyFile( files[i], assetsAbsolutePath() + "/" + info.fileName );
@@ -213,41 +227,18 @@ void Project::menuBrowseAssets( Ui::IActionWPtr action )
 void Project::menuShowInExplorer( Ui::IActionWPtr action )
 {
 	// Get the file system instance
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Get the selected items
 	StringArray selected = m_mainWindow->assetTree()->selection();
 
 	// Get the file info
-	Ui::FileInfo fileInfo = fs->extractFileInfo( selected.empty() ? assetsAbsolutePath() : selected[0] );
+	FileInfo fileInfo = fs->extractFileInfo( selected.empty() ? assetsAbsolutePath() : selected[0] );
 
 	// Browse to asset
 	m_mainWindow->fileSystem()->browse( fileInfo.ext == "" ? fileInfo.path : fileInfo.directory );
 }
 
-// ----------------------------------------------------- AssetsModelDelegate ------------------------------------------------------ //
-
-// ** AssetsModelDelegate::AssetsModelDelegate
-AssetsModelDelegate::AssetsModelDelegate( ProjectWPtr project ) : m_project( project )
-{
-}
-
-// ** AssetsModelDelegate::AssetsModelDelegate
-void AssetsModelDelegate::handleAssetAdded( const Ui::Asset& asset )
-{
-	m_project->m_events.emit<Project::AssetAdded>( asset );
-}
-
-// ** AssetsModelDelegate::AssetsModelDelegate
-void AssetsModelDelegate::handleAssetRemoved( const Ui::Asset& asset )
-{
-	m_project->m_events.emit<Project::AssetRemoved>( asset );
-}
-
-// ** AssetsModelDelegate::AssetsModelDelegate
-void AssetsModelDelegate::handleAssetChanged( const Ui::Asset& asset )
-{
-	m_project->m_events.emit<Project::AssetChanged>( asset );
-}
-
 } // namespace Project
+
+DC_END_COMPOSER

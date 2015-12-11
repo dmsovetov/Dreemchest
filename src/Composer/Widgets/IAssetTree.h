@@ -24,13 +24,31 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_IAssetTree_H__
+#define __DC_Composer_IAssetTree_H__
+
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
 
+	//! Asset tree interface.
+	class IAssetTree : public IInterface {
+	public:
 
-} // namespace Editors
+		//! Returns the selected items.
+		virtual StringArray	selection( void ) const = 0;
+
+		//! Expands the selected items.
+		virtual void		expandSelectedItems( void )	= 0;
+
+		//! Sets asset tree model.
+		virtual void		setModel( AssetsModelWPtr value ) = 0;
+	};
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_IAssetTree_H__	*/

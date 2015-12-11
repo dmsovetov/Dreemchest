@@ -24,13 +24,21 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_IMimeData_H__
+#define __DC_Composer_IMimeData_H__
+
+#include "Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+	//! MIME data interface used by drag & drop operations.
+	class IMimeData : public RefCounted {
+	public:
 
-
-} // namespace Editors
+		//! Returns true if the MIME data contains the specified format.
+		virtual bool		hasFormat( const String& value ) const = 0;
+	};
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_IMimeData_H__	*/

@@ -25,17 +25,19 @@
  **************************************************************************/
 
 #include "Composer.h"
+#include "IFileSystem.h"
 
-#include "UI/IMainWindow.h"
-#include "UI/IMenu.h"
-#include "UI/IFileSystem.h"
-#include "UI/IAssetTree.h"
+#include "Widgets/IMainWindow.h"
+#include "Widgets/IMenu.h"
+#include "Widgets/IAssetTree.h"
 
 #include "Project/Project.h"
 
 #ifdef emit
 	#undef emit
 #endif
+
+DC_BEGIN_COMPOSER
 
 // ** Composer::s_instance
 ComposerWPtr Composer::s_instance = ComposerWPtr();
@@ -87,7 +89,7 @@ bool Composer::initialize( void )
 void Composer::menuCreateProject( Ui::IActionWPtr action )
 {
 	// Get the file system interface
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Create Project" );
@@ -96,14 +98,14 @@ void Composer::menuCreateProject( Ui::IActionWPtr action )
 		return;
 	}
 
-	createNewProject( path );
+	createProject( path );
 }
 
 // ** Composer::menuOpenProject
 void Composer::menuOpenProject( Ui::IActionWPtr action )
 {
 	// Get the file system interface
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Open Project" );
@@ -112,14 +114,14 @@ void Composer::menuOpenProject( Ui::IActionWPtr action )
 		return;
 	}
 
-	openExistingProject( path );
+	openProject( path );
 }
 
-// ** Composer::createNewProject
-void Composer::createNewProject( const String& path )
+// ** Composer::createProject
+void Composer::createProject( const String& path )
 {
 	// Get the file system interface
-	Ui::IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	IFileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Create project instance
 	m_project = Project::Project::create( m_mainWindow, path );
@@ -130,20 +132,20 @@ void Composer::createNewProject( const String& path )
 	}
 
 	// Emit the event
-	m_event.emit<ProjectCreated>( m_project );
+	notify<ProjectCreated>( m_project );
 
 	// Open created project
-	openExistingProject( path );
+	openProject( path );
 }
 
-// ** Composer::openExistingProject
-void Composer::openExistingProject( const String& path )
+// ** Composer::openProject
+void Composer::openProject( const String& path )
 {
 	// Create project instance
 	m_project = Project::Project::create( m_mainWindow, path );
 
 	// Emit the event
-	m_event.emit<ProjectOpened>( m_project );
+	notify<ProjectOpened>( m_project );
 
 	// Setup menues
 	m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );
@@ -172,6 +174,8 @@ Composer::ProjectCreated::ProjectCreated( Project::ProjectWPtr project ) : proje
 
 }
 
+DC_END_COMPOSER
+
 // ** main
 int main(int argc, char *argv[])
 {
@@ -185,6 +189,8 @@ int main(int argc, char *argv[])
 	if( !composer.valid() ) {
 		return -1;
 	}
+
+	composer->openProject( "~TestProject" );
 
     return app.exec();
 }

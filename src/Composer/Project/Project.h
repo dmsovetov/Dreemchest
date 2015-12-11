@@ -29,8 +29,9 @@
 
 #include "../Composer.h"
 #include "../Editors/AssetEditor.h"
+#include "../Models/AssetsModel.h"
 
-#include "../UI/IAssetsModel.h"
+DC_BEGIN_COMPOSER
 
 namespace Project {
 
@@ -54,6 +55,9 @@ namespace Project {
 		//! Returns project name.
 		const String&				name( void ) const;
 
+		//! Returns project assets model.
+		AssetsModelWPtr				assetsModel( void ) const;
+
 		//! Returns project absoulte path.
 		String						absolutePath( s32 index ) const;
 
@@ -61,39 +65,10 @@ namespace Project {
 		String						assetsAbsolutePath( void ) const;
 
 		//! Opens the asset editor.
-		Ui::IDocumentWPtr			editAsset( const Ui::FileInfo& fileInfo );
-
-		//! Subscribes for a project event.
-		template<typename TEvent>
-		void						subscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_events.subscribe<TEvent>( callback ); }
-
-		//! Removes an event listener.
-		template<typename TEvent>
-		void						unsubscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_events.unsubscribe<TEvent>( callback ); }
+		Ui::IDocumentWPtr			edit( const Asset& asset );
 
 		//! Creates new Project instance.
 		static ProjectPtr			create( Ui::IMainWindowWPtr mainWindow, const io::Path& path );
-
-		//! This event is emitted when a new asset was added to a project.
-		struct AssetAdded {
-									AssetAdded( const Ui::Asset& asset )
-										: asset( asset ) {}
-			Ui::Asset				asset;	//!< Asset that was added.
-		};
-
-		//! This event is emitted when a new asset was removed from a project.
-		struct AssetRemoved {
-									AssetRemoved( const Ui::Asset& asset )
-										: asset( asset ) {}
-			Ui::Asset				asset;	//!< Asset that was removed.
-		};
-
-		//! This event is emitted when a new asset was changed.
-		struct AssetChanged {
-									AssetChanged( const Ui::Asset& asset )
-										: asset( asset ) {}
-			Ui::Asset				asset;	//!< Asset that was changed.
-		};
 
 	private:
 
@@ -131,34 +106,14 @@ namespace Project {
 
 		String						m_name;					//!< Project name.
 		Ui::IMainWindowWPtr			m_mainWindow;			//!< Main window instance.
-		Ui::IAssetsModelDelegatePtr	m_delegate;				//!< Assets model delegate.
+		AssetsModelPtr				m_assetsModel;			//!< Assets model.
 		io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
 		CachePtr					m_cache;				//!< The project cache.
-		event::EventEmitter			m_events;				//!< Project event emitter.
-	};
-
-	//! Project assets model delegate.
-	class AssetsModelDelegate : public Ui::IAssetsModelDelegate {
-	public:
-
-							//! Constructs the AssetsModelDelegate instance.
-							AssetsModelDelegate( ProjectWPtr project );
-
-		//! Handles the asset added event.
-		virtual void		handleAssetAdded( const Ui::Asset& asset );
-
-		//! Handles the asset removed event.
-		virtual void		handleAssetRemoved( const Ui::Asset& asset );
-
-		//! Handles the asset changed event.
-		virtual void		handleAssetChanged( const Ui::Asset& asset );
-
-	private:
-
-		ProjectWPtr			m_project;	//!< Parent project.
 	};
 
 } // namespace Project
+
+DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_Project_H__	*/

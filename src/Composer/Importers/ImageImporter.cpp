@@ -26,13 +26,17 @@
 
 #include "ImageImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Importers {
 
 // ** ImageImporterTIF::import
-bool ImageImporterTIF::import( Ui::IFileSystemWPtr fs, const Ui::Asset& asset, const io::Path& path ) const
+bool ImageImporterTIF::import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const
 {
 	DC_NOT_IMPLEMENTED;
 	return true;
 }
 
 } // namespace Importers
+
+DC_END_COMPOSER

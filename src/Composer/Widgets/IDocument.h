@@ -24,13 +24,32 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_IDocument_H__
+#define __DC_Composer_IDocument_H__
+
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
+
+	//! Document window interface.
+	class IDocument : public IInterface {
+	public:
+
+		//! Returns the rendering frame used by this document.
+		virtual IRenderingFrameWPtr			renderingFrame( void )			= 0;
+
+		//! Attaches the rendering frame to this document.
+		virtual IRenderingFrameWPtr			attachRenderingFrame( void )	= 0;
+
+		//! Returns an attached asset editor.
+		virtual Editors::AssetEditorWPtr	assetEditor( void ) const		= 0;
+	};
 
 
-} // namespace Editors
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_IDocument_H__	*/

@@ -24,13 +24,24 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#include "SignalDelegate.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
 
+// ** QSignalDelegate::QSignalDelegate
+QSignalDelegate::QSignalDelegate( Callback callback, QObject* sender, CString signal ) : m_callback( callback )
+{
+	connect( sender, signal, this, SLOT(emitted()) );
+}
 
-} // namespace Editors
+// ** QSignalDelegate::emitted
+void QSignalDelegate::emitted( void )
+{
+	m_callback();
+}
+
+} // namespace Ui
 
 DC_END_COMPOSER

@@ -24,13 +24,40 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_Qt_SignalDelegate_H__
+#define __DC_Composer_Qt_SignalDelegate_H__
+
+#include "Widget.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
 
+	//! Delegate object to bind Qt signals to a callback functions.
+	class QSignalDelegate : public QObject {
 
-} // namespace Editors
+		Q_OBJECT
+
+	public:
+
+		//! Callback type used by this signal delegate.
+		typedef std::function<void()>	Callback;
+
+										//! Constructs the QSignalDelegate instance.
+										QSignalDelegate( Callback callback, QObject* sender, CString signal );
+
+	private slots:
+
+		//! Processes the emitted signal.
+		virtual void					emitted( void );
+
+	private:
+
+		Callback						m_callback;	//!< Callback function.
+	};
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_Qt_SignalDelegate_H__	*/

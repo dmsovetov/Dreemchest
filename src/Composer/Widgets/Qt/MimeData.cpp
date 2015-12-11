@@ -24,13 +24,42 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#include "MimeData.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
 
+// ** QComposerMime::QComposerMime
+QComposerMime::QComposerMime( const QString& format )
+{
+	setData( format, QByteArray() );
+}
 
-} // namespace Editors
+// ** QComposerMime::mime
+IMimeDataWPtr QComposerMime::mime( void ) const
+{
+	return m_mime;
+}
+
+// ** QComposerMime::setMime
+void QComposerMime::setMime( IMimeDataPtr mime )
+{
+	m_mime = mime;
+}
+
+// ** MimeData::MimeData
+MimeData::MimeData( QComposerMime* mime ) : m_mime( mime )
+{
+
+}
+
+// ** MimeData::hasFormat
+bool MimeData::hasFormat( const String& value ) const
+{
+	return m_mime->hasFormat( value.c_str() );
+}
+
+} // namespace Ui
 
 DC_END_COMPOSER

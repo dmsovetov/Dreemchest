@@ -30,45 +30,53 @@
 #include "../Importers/ImageImporter.h"
 #include "../Importers/FileImporter.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Project {
 
 // ** Cache::Cache
-Cache::Cache( Ui::IFileSystemWPtr fileSystem, ProjectWPtr project ) : m_project( project ), m_fileSystem( fileSystem )
+Cache::Cache( IFileSystemWPtr fileSystem, const io::Path& path, AssetsModelWPtr assetsModel ) : m_fileSystem( fileSystem ), m_path( path ), m_assetsModel( assetsModel )
 {
 	// Declare asset importers.
 	m_assetImporters.declare<Importers::FileImporter>( "tif" );
 	m_assetImporters.declare<Importers::FileImporter>( "fbx" );
+	m_assetImporters.declare<Importers::FileImporter>( "prefab" );
+	m_assetImporters.declare<Importers::FileImporter>( "mat" );
+	m_assetImporters.declare<Importers::FileImporter>( "tga" );
 
 	// Subscribe for project event
-	m_project->subscribe<Project::AssetAdded>( dcThisMethod( Cache::handleAssetAdded ) );
-	m_project->subscribe<Project::AssetRemoved>( dcThisMethod( Cache::handleAssetRemoved ) );
-	m_project->subscribe<Project::AssetChanged>( dcThisMethod( Cache::handleAssetChanged ) );
+	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Cache::handleAssetAdded ) );
+	m_assetsModel->subscribe<AssetsModel::Removed>( dcThisMethod( Cache::handleAssetRemoved ) );
+	m_assetsModel->subscribe<AssetsModel::Changed>( dcThisMethod( Cache::handleAssetChanged ) );
 }
 
 Cache::~Cache( void )
 {
+	m_assetsModel->unsubscribe<AssetsModel::Added>( dcThisMethod( Cache::handleAssetAdded ) );
+	m_assetsModel->unsubscribe<AssetsModel::Removed>( dcThisMethod( Cache::handleAssetRemoved ) );
+	m_assetsModel->unsubscribe<AssetsModel::Changed>( dcThisMethod( Cache::handleAssetChanged ) );
 }
 
 // ** Cache::handleAssetAdded
-void Cache::handleAssetAdded( const Project::AssetAdded& e )
+void Cache::handleAssetAdded( const AssetsModel::Added& e )
 {
 	putToCache( e.asset );
 }
 
 // ** Cache::handleAssetRemoved
-void Cache::handleAssetRemoved( const Project::AssetRemoved& e )
+void Cache::handleAssetRemoved( const AssetsModel::Removed& e )
 {
 	removeFromCache( e.asset );
 }
 
 // ** Cache::handleAssetChanged
-void Cache::handleAssetChanged( const Project::AssetChanged& e )
+void Cache::handleAssetChanged( const AssetsModel::Changed& e )
 {
 	putToCache( e.asset );
 }
 
 // ** Cache::putToCache
-bool Cache::putToCache( const Ui::Asset& asset )
+bool Cache::putToCache( const Asset& asset )
 {
 	// Create an asset importer for
 	Importers::AssetImporterPtr importer = m_assetImporters.construct( asset.ext );
@@ -97,25 +105,27 @@ bool Cache::putToCache( const Ui::Asset& asset )
 }
 
 // ** Cache::removeFromCache
-void Cache::removeFromCache( const Ui::Asset& asset )
+void Cache::removeFromCache( const Asset& asset )
 {
 	qDebug() << "CACHE: removed" << asset.absoluteFilePath.c_str();
 	DC_BREAK
 }
 
 // ** Cache::cacheFolderFromAsset
-io::Path Cache::cacheFileFromAsset( const Ui::Asset& asset ) const
+io::Path Cache::cacheFileFromAsset( const Asset& asset ) const
 {
 	return cacheFolderFromAsset( asset ) + asset.uuid();
 }
 
 // ** Cache::cacheFolderFromAsset
-io::Path Cache::cacheFolderFromAsset( const Ui::Asset& asset ) const
+io::Path Cache::cacheFolderFromAsset( const Asset& asset ) const
 {
 	const String& uuid   = asset.uuid();
 	String		  folder = String() + uuid[0] + uuid[1];
 
-	return io::Path( m_project->absolutePath( Project::CachePath ) ) + folder;
+	return m_path + folder;
 }
 
 } // namespace Project
+
+DC_END_COMPOSER

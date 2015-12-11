@@ -26,6 +26,8 @@
 
 #include "AssetEditor.h"
 
+DC_BEGIN_COMPOSER
+
 namespace Editors {
 
 // ** AssetEditor::hasChanges
@@ -35,7 +37,7 @@ bool AssetEditor::hasChanges( void ) const
 }
 
 // ** AssetEditor::initialize
-bool AssetEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr document )
+bool AssetEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 {
 	m_asset		= asset;
 	m_document	= document;
@@ -44,7 +46,7 @@ bool AssetEditor::initialize( const Ui::FileInfo& asset, Ui::IDocumentWPtr docum
 }
 
 // ** AssetEditor::setAsset
-const Ui::FileInfo&  AssetEditor::asset( void ) const
+const Asset&  AssetEditor::asset( void ) const
 {
 	return m_asset;
 }
@@ -56,3 +58,5 @@ Ui::IDocumentWPtr AssetEditor::document( void ) const
 }
 
 } // namespace Editors
+
+DC_END_COMPOSER

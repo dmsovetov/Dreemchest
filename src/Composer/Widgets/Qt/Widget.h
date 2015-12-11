@@ -24,13 +24,28 @@
 
  **************************************************************************/
 
-#include "AssetImporter.h"
+#ifndef __DC_Composer_Qt_Widget_H__
+#define __DC_Composer_Qt_Widget_H__
+
+#include "../IDocument.h"
+#include "../IMainWindow.h"
+#include "../IAssetTree.h"
+#include "../IMainWindow.h"
+#include "../IMenu.h"
+#include "../IRenderingFrame.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Editors {
+namespace Ui {
 
+	class Document;
+	class RenderingFrame;
 
-} // namespace Editors
+	//! Converts the Qt key index to engine key.
+	extern Platform::Key convertKey( s32 key );
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_Qt_Widget_H__	*/
