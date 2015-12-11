@@ -33,6 +33,13 @@
 // ** Bit shifting
 #define BIT( bit )                ( 1 << bit )
 
+// Override specifier
+#ifndef DC_CPP11_DISABLED
+	#define DC_DECL_OVERRIDE override
+#else
+	#define DC_DECL_OVERRIDE
+#endif	/*	!DC_CPP11_DISABLED	*/
+
 // ** Memory management
 #define DC_RELEASE( object )        if( object != NULL ) { object->release(); object = NULL; }
 #define DC_DELETE( pointer )        delete pointer;  pointer = NULL;
