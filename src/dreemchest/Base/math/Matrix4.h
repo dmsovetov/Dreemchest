@@ -66,6 +66,9 @@ DC_BEGIN_DREEMCHEST
 		//! Returns the matrix row by index.
 		Vec4			row( int index ) const;
 
+		//! Returns the matrix value.
+		float			value( int row, int col ) const;
+
         //! Calculate the inverse matrix.
         Matrix4         inversed( void ) const;
 
@@ -235,62 +238,73 @@ DC_BEGIN_DREEMCHEST
         return m[index];
     }
 
+	// ** Matrix4::value
+	inline float Matrix4::value( int row, int col ) const
+	{
+		return m[row * 4 + col];
+	}
+
     // ** Matrix4::inversed
 	inline Matrix4 Matrix4::inversed( void ) const
     {
-		Matrix4 result;
-		float d12, d13, d23, d24, d34, d41;
+		f32 m00 = value(0,0), m01 = value(0,1), m02 = value(0,2), m03 = value(0,3);
+		f32 m10 = value(1,0), m11 = value(1,1), m12 = value(1,2), m13 = value(1,3);
+		f32 m20 = value(2,0), m21 = value(2,1), m22 = value(2,2), m23 = value(2,3);
+		f32 m30 = value(3,0), m31 = value(3,1), m32 = value(3,2), m33 = value(3,3);
 
-		d12 = m[2]  * m[7]  - m[3]  * m[6];
-		d13 = m[2]  * m[11] - m[3]  * m[10];
-		d23 = m[6]  * m[11] - m[7]  * m[10];
-		d24 = m[6]  * m[15] - m[7]  * m[14];
-		d34 = m[10] * m[15] - m[11] * m[14];
-		d41 = m[14] * m[3]  - m[15] * m[2];
+		f32 v0 = m20 * m31 - m21 * m30;
+		f32 v1 = m20 * m32 - m22 * m30;
+		f32 v2 = m20 * m33 - m23 * m30;
+		f32 v3 = m21 * m32 - m22 * m31;
+		f32 v4 = m21 * m33 - m23 * m31;
+		f32 v5 = m22 * m33 - m23 * m32;
 
-		result[0] =   m[5] * d34 - m[9] * d24 + m[13] * d23;
-		result[1] = -(m[1] * d34 + m[9] * d41 + m[13] * d13);
-		result[2] =   m[1] * d24 + m[5] * d41 + m[13] * d12;
-		result[3] = -(m[1] * d23 - m[5] * d13 + m[9]  * d12);
+		f32 t00 = + (v5 * m11 - v4 * m12 + v3 * m13);
+		f32 t10 = - (v5 * m10 - v2 * m12 + v1 * m13);
+		f32 t20 = + (v4 * m10 - v2 * m11 + v0 * m13);
+		f32 t30 = - (v3 * m10 - v1 * m11 + v0 * m12);
 
-		float determinant = m[0] * result[0] +
-							m[4] * result[1] +
-							m[8] * result[2] +
-							m[12] * result[3];
+		f32 invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
 
-		if( determinant == 0.0 ) {
-			return Matrix4();
-		}
+		f32 d00 = t00 * invDet;
+		f32 d10 = t10 * invDet;
+		f32 d20 = t20 * invDet;
+		f32 d30 = t30 * invDet;
 
-		float invDeterminant = 1.0f / determinant;
-			
-		result[0] *= invDeterminant;
-		result[1] *= invDeterminant;
-		result[2] *= invDeterminant;
-		result[3] *= invDeterminant;
+		f32 d01 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		f32 d11 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		f32 d21 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		f32 d31 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
 
-		result[4] = -(m[4] * d34 - m[8] * d24 + m[12] * d23) * invDeterminant;
-		result[5] =   m[0] * d34 + m[8] * d41 + m[12] * d13  * invDeterminant;
-		result[6] = -(m[0] * d24 + m[4] * d41 + m[12] * d12) * invDeterminant;
-		result[7] =   m[0] * d23 - m[4] * d13 + m[8]  * d12  * invDeterminant;
+		v0 = m10 * m31 - m11 * m30;
+		v1 = m10 * m32 - m12 * m30;
+		v2 = m10 * m33 - m13 * m30;
+		v3 = m11 * m32 - m12 * m31;
+		v4 = m11 * m33 - m13 * m31;
+		v5 = m12 * m33 - m13 * m32;
 
-		d12 = m[0]  * m[5]  - m[1]  * m[12];
-		d13 = m[0]  * m[9]  - m[1]  * m[8];
-		d23 = m[4]  * m[9]  - m[5]  * m[8];
-		d24 = m[4]  * m[13] - m[5]  * m[12];
-		d34 = m[8]  * m[13] - m[9]  * m[12];
-		d41 = m[12] * m[1]  - m[13] * m[0];
+		f32 d02 = + (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		f32 d12 = - (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		f32 d22 = + (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		f32 d32 = - (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
 
-		result[8]  =   m[7] * d34 - m[11] * d24 + m[15] * d23  * invDeterminant;
-		result[9]  = -(m[3] * d34 + m[11] * d41 + m[15] * d13) * invDeterminant;
-		result[10] =   m[3] * d24 + m[7]  * d41 + m[15] * d12  * invDeterminant;
-		result[11] = -(m[3] * d23 - m[7]  * d13 + m[11] * d12) * invDeterminant;
-		result[12] = -(m[6] * d34 - m[10] * d24 + m[14] * d23) * invDeterminant;
-		result[13] =   m[2] * d34 + m[10] * d41 + m[14] * d13  * invDeterminant;
-		result[14] = -(m[2] * d24 + m[6]  * d41 + m[14] * d12) * invDeterminant;
-		result[15] =   m[2] * d23 - m[6]  * d13 + m[10] * d12  * invDeterminant;
+		v0 = m21 * m10 - m20 * m11;
+		v1 = m22 * m10 - m20 * m12;
+		v2 = m23 * m10 - m20 * m13;
+		v3 = m22 * m11 - m21 * m12;
+		v4 = m23 * m11 - m21 * m13;
+		v5 = m23 * m12 - m22 * m13;
 
-        return result;
+		f32 d03 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		f32 d13 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		f32 d23 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		f32 d33 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+		return Matrix4(
+			d00, d01, d02, d03,
+			d10, d11, d12, d13,
+			d20, d21, d22, d23,
+			d30, d31, d32, d33);
 	}
 
 	// ** Matrix4::transposed

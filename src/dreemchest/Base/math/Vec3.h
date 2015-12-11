@@ -37,6 +37,7 @@ DC_BEGIN_DREEMCHEST
 
                     Vec3( void );
                     Vec3( float x, float y, float z );
+					Vec3( int x, int y, int z );
                     Vec3( const float* v );
 
         bool        operator == ( const Vec3& other ) const;
@@ -94,6 +95,12 @@ DC_BEGIN_DREEMCHEST
 
     // ** Vec3::Vec3
     inline Vec3::Vec3( float x, float y, float z ) : x( x ), y( y ), z( z )
+    {
+
+    }
+
+    // ** Vec3::Vec3
+    inline Vec3::Vec3( int x, int y, int z ) : x( ( float )x ), y( ( float )y ), z( ( float )z )
     {
 
     }
