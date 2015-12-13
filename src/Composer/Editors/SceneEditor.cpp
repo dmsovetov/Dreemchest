@@ -106,7 +106,7 @@ Scene::SceneObjectPtr SceneEditor::addCamera( Scene::RenderTargetPtr renderTarge
 void SceneEditor::handleMousePress( s32 x, s32 y, Ui::MouseButton button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->attach<Scene::RotateAroundAxes>( 10.0f, ::Scene::CSLocalX, new Scene::Vec3FromMouse );
+		m_camera->attach<Scene::RotateAroundAxes>( 10.0f, ::Scene::CSLocalX, new Scene::Vec3FromMouse )->setRangeForAxis( ::Scene::AxisY, Range( 0.0f, 180.0f ) );
 	}
 }
 
