@@ -41,10 +41,7 @@
 #include "Components/Transform.h"
 
 #include "Systems/TransformSystems.h"
-#include "Systems/UserInputSystems.h"
 #include "Systems/CullingSystems.h"
-
-#include "Components/UserInput.h"
 
 DC_BEGIN_DREEMCHEST
 
