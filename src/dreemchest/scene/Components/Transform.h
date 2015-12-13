@@ -157,30 +157,6 @@ namespace Scene {
 		Matrix4					m_transform;	//!< Affine transform matrix.
 	};
 
-	//! Rotates the transform
-	class Rotor : public Ecs::Component<Rotor> {
-	public:
-
-								//! Constructs the Rotor instance.
-								Rotor( f32 x = 0.0f, f32 y = 0.0f, f32 z = 0.0f )
-									: m_x( x ), m_y( y ), m_z( z ) {}
-
-		//! Returns the X rotation speed.
-		f32						x( void ) const;
-
-		//! Returns the Y rotation speed.
-		f32						y( void ) const;
-
-		//! Returns the Z rotation speed.
-		f32						z( void ) const;
-
-	private:
-
-		f32						m_x;	//!< The X rotation speed.
-		f32						m_y;	//!< The Y rotation speed.
-		f32						m_z;	//!< The Z rotation speed.
-	};
-
 	//! Follows the transform
 	class Follow : public Ecs::Component<Follow> {
 	public:

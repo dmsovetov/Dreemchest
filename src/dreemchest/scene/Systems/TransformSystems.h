@@ -71,18 +71,6 @@ namespace Scene {
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
 	};
 
-	//! The RotorSystem system
-	class RotorSystem : public Ecs::GenericEntitySystem<Rotor, Transform> {
-	public:
-
-							//! Constructs a RotorSystem instance.
-							RotorSystem( void )
-								: GenericEntitySystem( "RotorSystem" ) {}
-
-		//! Rotates a single entity by a rotor
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotator, Transform& transform );
-	};
-
 	//! The following system
 	class FollowSystem : public Ecs::GenericEntitySystem<Follow, Transform> {
 	public:

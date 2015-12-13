@@ -245,26 +245,6 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
-// ------------------------------------------ Rotor ------------------------------------------ //
-
-// ** Rotor::x
-f32 Rotor::x( void ) const
-{
-	return m_x;
-}
-
-// ** Rotor::y
-f32 Rotor::y( void ) const
-{
-	return m_y;
-}
-
-// ** Rotor::z
-f32 Rotor::z( void ) const
-{
-	return m_z;
-}
-
 } // namespace Scene
 
 DC_END_DREEMCHEST

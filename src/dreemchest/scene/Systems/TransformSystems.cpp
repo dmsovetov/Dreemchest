@@ -113,16 +113,6 @@ void FollowSystem::sceneObjectAdded( Ecs::Entity& sceneObject, Follow& follow, T
 	follow.setInternal<Internal>( DC_NEW Internal );
 }
 
-// ----------------------------------------------- RotorSystem ----------------------------------------------- //
-
-// ** RotorSystem::process
-void RotorSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Rotor& rotor, Transform& transform )
-{
-	transform.setRotationX( transform.rotationX() + rotor.x() * dt );
-	transform.setRotationY( transform.rotationY() + rotor.y() * dt );
-	transform.setRotationZ( transform.rotationZ() + rotor.z() * dt );
-}
-
 // ---------------------------------------------- ParticlesSystem -------------------------------------------- //
 
 // ** ParticlesSystem::process
