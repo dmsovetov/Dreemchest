@@ -96,7 +96,7 @@ Scene::SceneObjectPtr SceneEditor::addCamera( Scene::RenderTargetPtr renderTarge
 //	camera->attach<RenderForwardLit>();
 	camera->attach<RenderWireframe>();
 	camera->attach<::Scene::Transform>();
-	camera->attach<MoveAlongAxes>( 60.0f, true, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
+	camera->attach<MoveAlongAxes>( 60.0f, ::Scene::CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
 //	camera->attach<RenderBoundingVolumes>();
 
 	return camera;
@@ -106,7 +106,7 @@ Scene::SceneObjectPtr SceneEditor::addCamera( Scene::RenderTargetPtr renderTarge
 void SceneEditor::handleMousePress( s32 x, s32 y, Ui::MouseButton button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->attach<Scene::RotateAroundAxes>( 10.0f, true, new Scene::Vec3FromMouse );
+		m_camera->attach<Scene::RotateAroundAxes>( 10.0f, ::Scene::CSLocalX, new Scene::Vec3FromMouse );
 	}
 }
 
