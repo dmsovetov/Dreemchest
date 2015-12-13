@@ -44,14 +44,21 @@ void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneOb
 	// Get movement values
 	Vec3 movement = moveAlongAxes.delta() * moveAlongAxes.speed() * dt;
 
+	// Get the coordinate system flags.
+	u8 cs = moveAlongAxes.coordinateSystem();
+
+	// Construct the coordinate system axes
+	Vec3 axes[] = {
+		  cs & CSLocalX ? transform.axisX() : Vec3( 1.0f, 0.0f, 0.0f )
+		, cs & CSLocalY ? transform.axisY() : Vec3( 0.0f, 1.0f, 0.0f )
+		, cs & CSLocalZ ? transform.axisZ() : Vec3( 0.0f, 0.0f, 1.0f )
+	};
+
 	// Update the position
-	if( !moveAlongAxes.isLocal() ) {
-		transform.setPosition( transform.position() + movement );
-	} else {
-		transform.setPosition( transform.position() + transform.axisX() * movement.x );
-		transform.setPosition( transform.position() + transform.axisY() * movement.y );
-		transform.setPosition( transform.position() + transform.axisZ() * movement.z );
-	}
+	transform.setPosition( transform.position() + axes[0] * movement.x );
+	transform.setPosition( transform.position() + axes[1] * movement.y );
+	transform.setPosition( transform.position() + axes[2] * movement.z );
+
 }
 
 // ------------------------------------------------------- RotateAroundAxesSystem ------------------------------------------------------- //
@@ -68,30 +75,25 @@ void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& scen
 	// Get rotation values
 	Vec3 rotation = rotateAroundAxes.delta() * rotateAroundAxes.speed() * dt;
 
+	// Get the coordinate system flags.
+	u8 cs = rotateAroundAxes.coordinateSystem();
+
+	// Construct the coordinate system axes
+	Vec3 axes[] = {
+		  cs & CSLocalX ? transform.axisX() : Vec3( 1.0f, 0.0f, 0.0f )
+		, cs & CSLocalY ? transform.axisY() : Vec3( 0.0f, 1.0f, 0.0f )
+		, cs & CSLocalZ ? transform.axisZ() : Vec3( 0.0f, 0.0f, 1.0f )
+	};
+
 	// Rotate the transform
-	if( !rotateAroundAxes.isLocal() ) {
-		if( fabs( rotation.x ) > 0.001f ) {
-			transform.rotate( rotation.x, 1.0f, 0.0f, 0.0f );
-		}
-		if( fabs( rotation.y ) > 0.001f ) {
-			transform.rotate( rotation.y, 0.0f, 1.0f, 0.0f );
-		}
-		if( fabs( rotation.z ) > 0.001f ) {
-			transform.rotate( rotation.z, 0.0f, 0.0f, 1.0f );
-		}
-	} else {
-		if( fabs( rotation.x ) > 0.001f ) {
-			Vec3 axis = transform.axisX();
-			transform.rotate( rotation.x, axis.x, axis.y, axis.z );
-		}
-		if( fabs( rotation.y ) > 0.001f ) {
-			Vec3 axis = transform.axisY();
-			transform.rotate( rotation.y, axis.x, axis.y, axis.z );
-		}
-		if( fabs( rotation.z ) > 0.001f ) {
-			Vec3 axis = transform.axisZ();
-			transform.rotate( rotation.z, axis.x, axis.y, axis.z );
-		}
+	if( fabs( rotation.x ) > 0.001f ) {
+		transform.rotate( rotation.x, axes[0].x, axes[0].y, axes[0].z );
+	}
+	if( fabs( rotation.y ) > 0.001f ) {
+		transform.rotate( rotation.y, axes[1].x, axes[1].y, axes[1].z );
+	}
+	if( fabs( rotation.z ) > 0.001f ) {
+		transform.rotate( rotation.z, axes[2].x, axes[2].y, axes[2].z );
 	}
 }
 

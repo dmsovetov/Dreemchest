@@ -52,10 +52,10 @@ f32 MoveAlongAxes::speed( void ) const
 	return m_speed;
 }
 
-// ** MoveAlongAxes::isLocal
-bool MoveAlongAxes::isLocal( void ) const
+// ** MoveAlongAxes::coordinateSystem
+u8 MoveAlongAxes::coordinateSystem( void ) const
 {
-	return m_isLocal;
+	return m_coordinateSystem;
 }
 
 // ** MoveAlongAxes::delta
@@ -78,10 +78,10 @@ void RotateAroundAxes::setSpeed( f32 value )
 	m_speed = value;
 }
 
-// ** RotateAroundAxes::isLocal
-bool RotateAroundAxes::isLocal( void ) const
+// ** RotateAroundAxes::coordinateSystem
+u8 RotateAroundAxes::coordinateSystem( void ) const
 {
-	return m_isLocal;
+	return m_coordinateSystem;
 }
 
 // ** RotateAroundAxes::delta

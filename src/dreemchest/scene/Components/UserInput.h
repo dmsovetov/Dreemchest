@@ -34,6 +34,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+	//! Bitset flags used in transformations.
+	enum CoordinateSystemFlags {
+		  CSLocalX	= BIT( 0 )							//!< Use local X axis for transformations.
+		, CSLocalY	= BIT( 1 )							//!< Use local Y axis for transformations.
+		, CSLocalZ	= BIT( 2 )							//!< Use local Z axis for transformations.
+		, CSLocal	= CSLocalX | CSLocalY | CSLocalZ	//!< Use the local coordinate system for transformations.
+		, CSWorld	= 0									//!< Use the world coordinate system for transformations.
+	};
+
 	//! Identifier component.
 	class Identifier : public Ecs::Component<Identifier> {
 	public:
@@ -57,34 +66,24 @@ namespace Scene {
 	class MoveAlongAxes : public Ecs::Component<MoveAlongAxes> {
 	public:
 
-		//! Movement axes.
-	//	enum Axes {
-	//		  XY				//!< Move along the XY axes.
-	//		, XZ				//!< Move along the XZ axes.
-	//	};
-
 								//! Constructs MoveAlongAxes instance.
-								MoveAlongAxes( /*Axes axes = XY,*/ f32 speed = 1.0f, bool isLocal = false, const Vec3BindingPtr& delta = Vec3BindingPtr() )
-									: /*m_axes( axes ),*/m_isLocal( isLocal ), m_speed( speed ), m_delta( delta ) {}
+								MoveAlongAxes( f32 speed = 1.0f, u8 coordinateSystem = CSWorld, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) {}
 
 		//! Returns the movement speed.
 		f32						speed( void ) const;
 
-		//! Movement axes.
-		//Axes					axes( void ) const;
-
-		//! Returns true if local axes should be used.
-		bool					isLocal( void ) const;
+		//! Returns the coordinate system used for transformations.
+		u8						coordinateSystem( void ) const;
 
 		//! Returns the movement delta values.
 		Vec3					delta( void ) const;
 
 	private:
 
-		//Axes					m_axes;		//!< Movement is performed along this axes.
-		bool					m_isLocal;	//!< Use local axes.
-		f32						m_speed;	//!< Movement speed.
-		Vec3BindingPtr			m_delta;	//!< Movement deltas.
+		u8						m_coordinateSystem;	//!< Coordinate system flags.
+		f32						m_speed;			//!< Movement speed.
+		Vec3BindingPtr			m_delta;			//!< Movement deltas.
 	};
 
 	//! Rotates the scene object transform around axes.
@@ -92,8 +91,8 @@ namespace Scene {
 	public:
 
 								//! Constructs RotateAroundAxes instance.
-								RotateAroundAxes( f32 speed = 1.0f, bool isLocal = false, const Vec3BindingPtr& delta = Vec3BindingPtr() )
-									: m_isLocal( isLocal ), m_speed( speed ), m_delta( delta ) {}
+								RotateAroundAxes( f32 speed = 1.0f, u8 coordinateSystem = CSWorld, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) {}
 
 		//! Returns the rotation speed.
 		f32						speed( void ) const;
@@ -101,17 +100,17 @@ namespace Scene {
 		//! Sets the rotation speed.
 		void					setSpeed( f32 value );
 
-		//! Returns true if local axes should be used.
-		bool					isLocal( void ) const;
+		//! Returns the coordinate system used for transformations.
+		u8						coordinateSystem( void ) const;
 
 		//! Returns rotation delta values.
 		Vec3					delta( void ) const;
 
 	private:
 
-		bool					m_isLocal;	//!< Use local axes.
-		f32						m_speed;	//!< Rotation speed.
-		Vec3BindingPtr			m_delta;	//!< Rotation delta values.
+		u8						m_coordinateSystem;	//!< Coordinate system flags.
+		f32						m_speed;			//!< Rotation speed.
+		Vec3BindingPtr			m_delta;			//!< Rotation delta values.
 	};
 
 } // namespace Scene
