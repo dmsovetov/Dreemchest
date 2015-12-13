@@ -78,26 +78,26 @@ DC_BEGIN_DREEMCHEST
 	}
 
     //! Returns a minimum value of two.
-	template<typename T>
-    inline T min2( T a, T b ) {
+	template<typename TValue>
+    TValue min2( const TValue& a, const TValue& b ) {
         return a < b ? a : b;
     }
 
     //! Returns a minimum value of three.
-	template<typename T>
-    inline T min3( T a, T b, T c ) {
+	template<typename TValue>
+    TValue min3( const TValue& a, const TValue& b, const TValue& c ) {
         return min2( a, min2( b, c ) );
     }
 
     //! Returns a maximum value of two.
-	template<typename T>
-    inline T max2( T a, T b ) {
+	template<typename TValue>
+    TValue max2( const TValue& a, const TValue& b ) {
         return a > b ? a : b;
     }
 
     //! Returns a maximum value of three.
-	template<typename T>
-    inline T max3( T a, T b, T c ) {
+	template<typename TValue>
+    TValue max3( const TValue& a, const TValue& b, const TValue& c ) {
         return max2( a, max2( b, c ) );
     }
 
