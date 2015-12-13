@@ -158,6 +158,15 @@ namespace Scene {
 		Matrix4					m_transform;	//!< Affine transform matrix.
 	};
 
+	//! The coordinate system axes.
+	enum CoordinateSystemAxis {
+		  AxisX						//!< The X axis.
+		, AxisY						//!< The Y axis.
+		, AxisZ						//!< The Z axis.
+		
+		, TotalCoordinateSystemAxes	//!< The total number of coordinate system axes.
+	};
+
 	//! Bitset flags used in transformations.
 	enum CoordinateSystemFlags {
 		  CSLocalX	= BIT( 0 )							//!< Use local X axis for transformations.
