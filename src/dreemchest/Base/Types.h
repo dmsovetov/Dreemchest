@@ -142,11 +142,11 @@ DC_BEGIN_DREEMCHEST
 
     //! Helper struct to hold a numeric range.
     struct Range {
-                Range( f32 min = 0.0f, f32 max = 0.0f )
+                Range( f32 min = -FLT_MAX, f32 max = FLT_MAX )
                     : min( min ), max( max ) {}
 
-        f32     min;
-        f32     max;
+        f32     min;	//! The minimum range value.
+        f32     max;	//! The maximum range value.
     };
 
 	//! Convert value to a string.
