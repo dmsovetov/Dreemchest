@@ -152,7 +152,7 @@ const Quat& Transform::rotation( void ) const
 void Transform::rotate( f32 angle, f32 x, f32 y, f32 z )
 {
 	Quat r = Quat::rotateAroundAxis( angle, Vec3( x, y, z ) );
-	m_rotation = m_rotation * r;
+	m_rotation = r * m_rotation;
 }
 
 // ** Transform::setRotation
