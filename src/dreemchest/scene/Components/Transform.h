@@ -28,6 +28,7 @@
 #define __DC_Scene_Component_Transform_H__
 
 #include "../Scene.h"
+#include "../Bindings.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -155,6 +156,85 @@ namespace Scene {
 		Quat					m_rotation;		//!< Object rotation.
 		Vec3					m_scale;		//!< Object scale.
 		Matrix4					m_transform;	//!< Affine transform matrix.
+	};
+
+	//! Bitset flags used in transformations.
+	enum CoordinateSystemFlags {
+		  CSLocalX	= BIT( 0 )							//!< Use local X axis for transformations.
+		, CSLocalY	= BIT( 1 )							//!< Use local Y axis for transformations.
+		, CSLocalZ	= BIT( 2 )							//!< Use local Z axis for transformations.
+		, CSLocal	= CSLocalX | CSLocalY | CSLocalZ	//!< Use the local coordinate system for transformations.
+		, CSWorld	= 0									//!< Use the world coordinate system for transformations.
+	};
+
+	//! Identifier component.
+	class Identifier : public Ecs::Component<Identifier> {
+	public:
+
+								//! Constructs the Identifier instance.
+								Identifier( const String& name = "" )
+									: m_name( name ) {}
+
+		//! Returns the identifier.
+		const String&			name( void ) const;
+
+		//! Sets the identifier.
+		void					setName( const String& value );
+
+	private:
+
+		String					m_name;	//!< Scene object name.
+	};
+
+	//! Moves the scene object transform along the coordinate axes.
+	class MoveAlongAxes : public Ecs::Component<MoveAlongAxes> {
+	public:
+
+								//! Constructs MoveAlongAxes instance.
+								MoveAlongAxes( f32 speed = 1.0f, u8 coordinateSystem = CSWorld, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) {}
+
+		//! Returns the movement speed.
+		f32						speed( void ) const;
+
+		//! Returns the coordinate system used for transformations.
+		u8						coordinateSystem( void ) const;
+
+		//! Returns the movement delta values.
+		Vec3					delta( void ) const;
+
+	private:
+
+		u8						m_coordinateSystem;	//!< Coordinate system flags.
+		f32						m_speed;			//!< Movement speed.
+		Vec3BindingPtr			m_delta;			//!< Movement deltas.
+	};
+
+	//! Rotates the scene object transform around axes.
+	class RotateAroundAxes : public Ecs::Component<RotateAroundAxes> {
+	public:
+
+								//! Constructs RotateAroundAxes instance.
+								RotateAroundAxes( f32 speed = 1.0f, u8 coordinateSystem = CSWorld, const Vec3BindingPtr& delta = Vec3BindingPtr() )
+									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) {}
+
+		//! Returns the rotation speed.
+		f32						speed( void ) const;
+
+		//! Sets the rotation speed.
+		void					setSpeed( f32 value );
+
+		//! Returns the coordinate system used for transformations.
+		u8						coordinateSystem( void ) const;
+
+		//! Returns rotation delta values.
+		Vec3					delta( void ) const;
+
+	private:
+
+		u8						m_coordinateSystem;	//!< Coordinate system flags.
+		f32						m_speed;			//!< Rotation speed.
+		Vec3BindingPtr			m_delta;			//!< Rotation delta values.
 	};
 
 	//! Follows the transform

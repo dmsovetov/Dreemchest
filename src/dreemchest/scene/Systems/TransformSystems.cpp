@@ -72,6 +72,73 @@ void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity&
 	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
 }
 
+// ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //
+
+// ** MoveAlongAxesSystem::MoveAlongAxesSystem
+MoveAlongAxesSystem::MoveAlongAxesSystem( void ) : GenericEntitySystem( "MoveAlongAxesSystem" )
+{
+
+}
+
+// ** MoveAlongAxesSystem::process
+void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform )
+{
+	// Get movement values
+	Vec3 movement = moveAlongAxes.delta() * moveAlongAxes.speed() * dt;
+
+	// Get the coordinate system flags.
+	u8 cs = moveAlongAxes.coordinateSystem();
+
+	// Construct the coordinate system axes
+	Vec3 axes[] = {
+		  cs & CSLocalX ? transform.axisX() : Vec3( 1.0f, 0.0f, 0.0f )
+		, cs & CSLocalY ? transform.axisY() : Vec3( 0.0f, 1.0f, 0.0f )
+		, cs & CSLocalZ ? transform.axisZ() : Vec3( 0.0f, 0.0f, 1.0f )
+	};
+
+	// Update the position
+	transform.setPosition( transform.position() + axes[0] * movement.x );
+	transform.setPosition( transform.position() + axes[1] * movement.y );
+	transform.setPosition( transform.position() + axes[2] * movement.z );
+
+}
+
+// ------------------------------------------------------- RotateAroundAxesSystem ------------------------------------------------------- //
+
+// ** RotateAroundAxesSystem::RotateAroundAxesSystem
+RotateAroundAxesSystem::RotateAroundAxesSystem( void ) : GenericEntitySystem( "RotateAroundAxesSystem" )
+{
+
+}
+
+// ** RotateAroundAxesSystem::process
+void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform )
+{
+	// Get rotation values
+	Vec3 rotation = rotateAroundAxes.delta() * rotateAroundAxes.speed() * dt;
+
+	// Get the coordinate system flags.
+	u8 cs = rotateAroundAxes.coordinateSystem();
+
+	// Construct the coordinate system axes
+	Vec3 axes[] = {
+		  cs & CSLocalX ? transform.axisX() : Vec3( 1.0f, 0.0f, 0.0f )
+		, cs & CSLocalY ? transform.axisY() : Vec3( 0.0f, 1.0f, 0.0f )
+		, cs & CSLocalZ ? transform.axisZ() : Vec3( 0.0f, 0.0f, 1.0f )
+	};
+
+	// Rotate the transform
+	if( fabs( rotation.x ) > 0.001f ) {
+		transform.rotate( rotation.x, axes[0].x, axes[0].y, axes[0].z );
+	}
+	if( fabs( rotation.y ) > 0.001f ) {
+		transform.rotate( rotation.y, axes[1].x, axes[1].y, axes[1].z );
+	}
+	if( fabs( rotation.z ) > 0.001f ) {
+		transform.rotate( rotation.z, axes[2].x, axes[2].y, axes[2].z );
+	}
+}
+
 // -------------------------------------------------- FollowSystem ----------------------------------------------------- //
 
 // ** FollowSystem::process

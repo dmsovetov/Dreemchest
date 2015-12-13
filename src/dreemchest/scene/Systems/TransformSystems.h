@@ -71,6 +71,28 @@ namespace Scene {
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
 	};
 
+	//! Moves scene object transform along coordinate axes.
+	class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxes, Transform> {
+	public:
+
+							//! Constructs a MoveAlongAxesSystem instance.
+							MoveAlongAxesSystem( void );
+
+		//! Moves the scene object
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform );
+	};
+
+	//! Rotates scene object transform around axes.
+	class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxes, Transform> {
+	public:
+
+							//! Constructs a RotateAroundAxesSystem instance.
+							RotateAroundAxesSystem( void );
+
+		//! Moves the scene object
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform );
+	};
+
 	//! The following system
 	class FollowSystem : public Ecs::GenericEntitySystem<Follow, Transform> {
 	public:

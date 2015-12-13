@@ -245,6 +245,66 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
+// ----------------------------------------------- Identifier ------------------------------------------------ //
+
+// ** Identifier::name
+const String& Identifier::name( void ) const
+{
+	return m_name;
+}
+
+// ** Identifier::setName
+void Identifier::setName( const String& value )
+{
+	m_name = value;
+}
+
+// --------------------------------------------- MoveAlongAxes --------------------------------------------- //
+
+// ** MoveAlongAxes::speed
+f32 MoveAlongAxes::speed( void ) const
+{
+	return m_speed;
+}
+
+// ** MoveAlongAxes::coordinateSystem
+u8 MoveAlongAxes::coordinateSystem( void ) const
+{
+	return m_coordinateSystem;
+}
+
+// ** MoveAlongAxes::delta
+Vec3 MoveAlongAxes::delta( void ) const
+{
+	return m_delta->get();
+}
+
+// --------------------------------------------- RotateAroundAxes --------------------------------------------- //
+
+// ** RotateAroundAxes::speed
+f32 RotateAroundAxes::speed( void ) const
+{
+	return m_speed;
+}
+
+// ** RotateAroundAxes::setSpeed
+void RotateAroundAxes::setSpeed( f32 value )
+{
+	m_speed = value;
+}
+
+// ** RotateAroundAxes::coordinateSystem
+u8 RotateAroundAxes::coordinateSystem( void ) const
+{
+	return m_coordinateSystem;
+}
+
+// ** RotateAroundAxes::delta
+Vec3 RotateAroundAxes::delta( void ) const
+{
+	return m_delta->get();
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
