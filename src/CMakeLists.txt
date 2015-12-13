@@ -28,8 +28,8 @@ include_directories(Dreemchest)
 
 # Setup definitions
 if (DC_QT_SUPPORT MATCHES "Auto")
-	find_package(Qt4)
-	find_package(Qt5Widgets)
+	find_package(Qt4 QUIET)
+	find_package(Qt5Widgets QUIET)
 	
 	if (Qt4_FOUND AND Qt5Widgets_FOUND)
 		message(FATAL_ERROR "Both Qt4 and Qt5 found, you should use manually which version to use.")
