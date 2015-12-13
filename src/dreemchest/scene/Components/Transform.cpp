@@ -279,6 +279,18 @@ Vec3 MoveAlongAxes::delta( void ) const
 	return m_delta->get();
 }
 
+// ** MoveAlongAxes::rangeForAxis
+const Range& MoveAlongAxes::rangeForAxis( CoordinateSystemAxis axis ) const
+{
+	return m_range[axis];
+}
+
+// ** MoveAlongAxes::setRangeForAxis
+void MoveAlongAxes::setRangeForAxis( CoordinateSystemAxis axis, const Range& value )
+{
+	m_range[axis] = value;
+}
+
 // --------------------------------------------- RotateAroundAxes --------------------------------------------- //
 
 // ** RotateAroundAxes::speed
@@ -303,6 +315,18 @@ u8 RotateAroundAxes::coordinateSystem( void ) const
 Vec3 RotateAroundAxes::delta( void ) const
 {
 	return m_delta->get();
+}
+
+// ** RotateAroundAxes::rangeForAxis
+const Range& RotateAroundAxes::rangeForAxis( CoordinateSystemAxis axis ) const
+{
+	return m_range[axis];
+}
+
+// ** RotateAroundAxes::setRangeForAxis
+void RotateAroundAxes::setRangeForAxis( CoordinateSystemAxis axis, const Range& value )
+{
+	m_range[axis] = value;
 }
 
 } // namespace Scene

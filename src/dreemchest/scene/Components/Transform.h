@@ -212,11 +212,18 @@ namespace Scene {
 		//! Returns the movement delta values.
 		Vec3					delta( void ) const;
 
+		//! Sets the range for each of axes.
+		void					setRangeForAxis( CoordinateSystemAxis axis, const Range& value );
+
+		//! Returns the range for a specified axis.
+		const Range&			rangeForAxis( CoordinateSystemAxis axis ) const;
+
 	private:
 
-		u8						m_coordinateSystem;	//!< Coordinate system flags.
-		f32						m_speed;			//!< Movement speed.
-		Vec3BindingPtr			m_delta;			//!< Movement deltas.
+		u8						m_coordinateSystem;					//!< Coordinate system flags.
+		f32						m_speed;							//!< Movement speed.
+		Vec3BindingPtr			m_delta;							//!< Movement deltas.
+		Range					m_range[TotalCoordinateSystemAxes];	//!< Range for each of CS axes.
 	};
 
 	//! Rotates the scene object transform around axes.
@@ -239,11 +246,18 @@ namespace Scene {
 		//! Returns rotation delta values.
 		Vec3					delta( void ) const;
 
+		//! Sets the range for each of axes.
+		void					setRangeForAxis( CoordinateSystemAxis axis, const Range& value );
+
+		//! Returns the range for a specified axis.
+		const Range&			rangeForAxis( CoordinateSystemAxis axis ) const;
+
 	private:
 
-		u8						m_coordinateSystem;	//!< Coordinate system flags.
-		f32						m_speed;			//!< Rotation speed.
-		Vec3BindingPtr			m_delta;			//!< Rotation delta values.
+		u8						m_coordinateSystem;					//!< Coordinate system flags.
+		f32						m_speed;							//!< Rotation speed.
+		Vec3BindingPtr			m_delta;							//!< Rotation delta values.
+		Range					m_range[TotalCoordinateSystemAxes];	//!< Range for each of CS axes.
 	};
 
 	//! Follows the transform
