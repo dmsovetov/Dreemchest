@@ -96,7 +96,11 @@ void DockIndicator::end( QDockWidget* dock )
 QImage DockIndicator::widgetToImage( QWidget* widget, QPainter::CompositionMode mode ) const
 {
 	// Render the dock widget to image
+#ifdef DC_QT4_ENABLED
+	QImage im = QPixmap::grabWidget( widget ).toImage();
+#elif DC_QT5_ENABLED
 	QImage im = widget->grab().toImage();
+#endif	/*	DC_QT4_ENABLED	*/
 
 	// Construct the destination image
 	QImage result = QImage( im.size(), QImage::Format_ARGB32_Premultiplied );
