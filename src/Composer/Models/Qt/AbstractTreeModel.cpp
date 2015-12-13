@@ -168,6 +168,17 @@ bool QAbstractTreeModel::moveRows( const QModelIndex& sourceParent, int sourceRo
 	return true;
 }
 
+#ifdef DC_QT4_ENABLED
+
+// ** QAbstractTreeModel::moveRow
+bool QAbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow, const QModelIndex& destinationParent, int destinationChild )
+{
+	moveRows( sourceParent, sourceRow, 1, destinationParent, destinationChild );
+	return true;
+}
+
+#endif	/*	DC_QT4_ENABLED	*/
+
 // ** QAbstractTreeModel::parent
 QModelIndex QAbstractTreeModel::parent( const QModelIndex& child ) const
 {

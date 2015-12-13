@@ -68,8 +68,16 @@ DC_BEGIN_COMPOSER
 		//! Handles the drop operation.
 		virtual bool			dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
 
+	#ifdef DC_QT4_ENABLED
+		//! Moves a single row
+		bool					moveRow( const QModelIndex& sourceParent, int sourceRow, const QModelIndex& destinationParent, int destinationChild );
+
+		//! Moves the set of rows from source parent to destination parent.
+		bool					moveRows( const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent, int destinationChild );
+	#elif DC_QT5_ENABLED
 		//! Handles move operation.
 		virtual bool			moveRows( const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent, int destinationChild ) Q_DECL_OVERRIDE;
+	#endif	/*	DC_QT4_ENABLED	*/
 
 	protected:
 
