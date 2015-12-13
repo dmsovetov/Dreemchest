@@ -101,6 +101,12 @@ DC_BEGIN_DREEMCHEST
         return max2( a, max2( b, c ) );
     }
 
+	//! Clamps the value to a specified range.
+	template<typename TValue>
+	TValue clamp( const TValue& value, const TValue& min, const TValue& max ) {
+		return min2( max2( value, min ), max );
+	}
+
     //! Converts degrees to radians
     inline float radians( float degrees ) {
         return (degrees) / 180.0f * Pi;
