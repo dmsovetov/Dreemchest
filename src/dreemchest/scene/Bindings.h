@@ -43,6 +43,9 @@ namespace Scene {
 		//! Returns the value.
 		virtual Vec3			get( void ) const;
 
+		//! Sets the value
+		void					set( const Vec3& value );
+
 	protected:
 
 		Vec3					m_value;	//!< The direction value.

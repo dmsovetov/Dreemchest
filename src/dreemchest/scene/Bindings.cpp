@@ -44,6 +44,12 @@ Vec3 Vec3Binding::get( void ) const
 	return m_value;
 }
 
+// ** Vec3Binding::set
+void Vec3Binding::set( const Vec3& value )
+{
+	m_value = value;
+}
+
 // ---------------------------------------------- Vec3FromKeyboard --------------------------------------------- //
 
 // ** Vec3FromKeyboard::Vec3FromKeyboard
