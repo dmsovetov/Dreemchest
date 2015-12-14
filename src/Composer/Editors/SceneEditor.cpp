@@ -74,6 +74,8 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 
 	// Create the camera.
 	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
+	m_camera->setMovementEnabled( false );
+	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );
 	m_camera->attach<Scene::RenderWireframe>();
 	m_camera->attach<Scene::RenderBoundingVolumes>();
