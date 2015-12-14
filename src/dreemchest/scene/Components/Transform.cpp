@@ -329,6 +329,18 @@ void RotateAroundAxes::setRangeForAxis( CoordinateSystemAxis axis, const Range& 
 	m_range[axis] = value;
 }
 
+// ** RotateAroundAxes::rotationForAxis
+f32 RotateAroundAxes::rotationForAxis( CoordinateSystemAxis axis ) const
+{
+	return m_rotation[axis];
+}
+
+// ** RotateAroundAxes::setRotationForAxis
+void RotateAroundAxes::setRotationForAxis( CoordinateSystemAxis axis, f32 value )
+{
+	m_rotation[axis] = value;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

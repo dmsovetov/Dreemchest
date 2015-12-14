@@ -96,11 +96,15 @@ void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneOb
 		, cs & CSLocalZ ? transform.axisZ() : Vec3( 0.0f, 0.0f, 1.0f )
 	};
 
-	// Update the position
-	transform.setPosition( transform.position() + axes[AxisX] * movement.x );
-	transform.setPosition( transform.position() + axes[AxisY] * movement.y );
-	transform.setPosition( transform.position() + axes[AxisZ] * movement.z );
+	// Calculate new position values
+	Vec3 position = transform.position() + axes[AxisX] * movement.x + axes[AxisY] * movement.y + axes[AxisZ] * movement.z;
 
+	position.x = moveAlongAxes.rangeForAxis( AxisX ).clamp( position.x );
+	position.y = moveAlongAxes.rangeForAxis( AxisY ).clamp( position.y );
+	position.z = moveAlongAxes.rangeForAxis( AxisZ ).clamp( position.z );
+
+	// Set the position
+	transform.setPosition( position );
 }
 
 // ------------------------------------------------------- RotateAroundAxesSystem ------------------------------------------------------- //
@@ -128,17 +132,29 @@ void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& scen
 	};
 
 	// Rotate the transform
-	if( fabs( rotation.x ) > 0.001f ) {
-		const Vec3& axis = axes[AxisX];
-		transform.rotate( rotation.x, axis.x, axis.y, axis.z );
-	}
-	if( fabs( rotation.y ) > 0.001f ) {
-		const Vec3& axis = axes[AxisY];
-		transform.rotate( rotation.y, axis.x, axis.y, axis.z );
-	}
-	if( fabs( rotation.z ) > 0.001f ) {
-		const Vec3& axis = axes[AxisZ];
-		transform.rotate( rotation.z, axis.x, axis.y, axis.z );
+	for( s32 i = 0; i < TotalCoordinateSystemAxes; i++ ) {
+		CoordinateSystemAxis axis = static_cast<CoordinateSystemAxis>( i );
+
+		// Get the rotation delta
+		f32 delta = rotation[i];
+
+		// No rotation around this axis - skip
+		if( fabs( delta ) <= 0.001f ) {
+			continue;
+		}
+
+		// Get current rotation around an axis and check overflow
+		f32 rotation = rotateAroundAxes.rotationForAxis( axis );
+
+		if( !rotateAroundAxes.rangeForAxis( axis ).contains( rotation + delta ) ) {
+			continue;
+		}
+
+		rotateAroundAxes.setRotationForAxis( axis, rotation + delta );
+
+		// Apply rotation
+		const Vec3& a = axes[axis];
+		transform.rotate( delta, a.x, a.y, a.z );
 	}
 }
 

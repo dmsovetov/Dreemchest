@@ -232,7 +232,7 @@ namespace Scene {
 
 								//! Constructs RotateAroundAxes instance.
 								RotateAroundAxes( f32 speed = 1.0f, u8 coordinateSystem = CSWorld, const Vec3BindingPtr& delta = Vec3BindingPtr() )
-									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) {}
+									: m_coordinateSystem( coordinateSystem ), m_speed( speed ), m_delta( delta ) { memset( m_rotation, 0, sizeof( m_rotation ) ); }
 
 		//! Returns the rotation speed.
 		f32						speed( void ) const;
@@ -246,18 +246,25 @@ namespace Scene {
 		//! Returns rotation delta values.
 		Vec3					delta( void ) const;
 
-		//! Sets the range for each of axes.
-		void					setRangeForAxis( CoordinateSystemAxis axis, const Range& value );
-
 		//! Returns the range for a specified axis.
 		const Range&			rangeForAxis( CoordinateSystemAxis axis ) const;
 
+		//! Sets the range for each of axes.
+		void					setRangeForAxis( CoordinateSystemAxis axis, const Range& value );
+
+		//! Returns the accumulated rotation value for a specified axis.
+		f32						rotationForAxis( CoordinateSystemAxis axis ) const;
+
+		//! Sets the rotation value for a specified axis.
+		void					setRotationForAxis( CoordinateSystemAxis axis, f32 value );
+
 	private:
 
-		u8						m_coordinateSystem;					//!< Coordinate system flags.
-		f32						m_speed;							//!< Rotation speed.
-		Vec3BindingPtr			m_delta;							//!< Rotation delta values.
-		Range					m_range[TotalCoordinateSystemAxes];	//!< Range for each of CS axes.
+		u8						m_coordinateSystem;						//!< Coordinate system flags.
+		f32						m_speed;								//!< Rotation speed.
+		Vec3BindingPtr			m_delta;								//!< Rotation delta values.
+		Range					m_range[TotalCoordinateSystemAxes];		//!< Range for each of CS axes.
+		f32						m_rotation[TotalCoordinateSystemAxes];	//!< Contains the accumulated rotation values.
 	};
 
 	//! Follows the transform
