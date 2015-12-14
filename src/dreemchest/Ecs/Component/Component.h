@@ -43,17 +43,23 @@ namespace Ecs {
 		typedef StrongPtr<T> Ptr;	//!< The internal data pointer.
 	};
 
+	//! Internal component flags.
+	enum ComponentFlags {
+		IsEnabled = BIT( 31 )	//!< Indicates that a component is enabled.
+	};
+
 	//! A base class for all components.
 	/*!
 	A component is all the data for one aspect of the entity. Component is just a plain
 	data and doesn't contain any processing logic.
 	*/
 	class ComponentBase : public io::Serializable {
+	friend class Entity;
 	public:
 
 									//! Constructs ComponentBase instance.
 									ComponentBase( void )
-										: m_flags( 0 ) {}
+										: m_flags( IsEnabled ) {}
 
 		//! Sets the internal data.
 		template<typename T>
@@ -69,6 +75,9 @@ namespace Ecs {
 		//! Sets component flags.
 		void						setFlags( u32 value );
 
+		//! Returns true if component is enabled.
+		bool						isEnabled( void ) const;
+
 	#ifndef DC_BSON_DISABLED
 		//! Returns the component BSON.
 		virtual io::Bson			bson( void ) const;
@@ -77,13 +86,18 @@ namespace Ecs {
 		virtual void				setBson( const io::Bson& value );
 	#endif	/*	!DC_BSON_DISABLED	*/
 
-	private:
+	protected:
+
+		//! Sets the component's enabled flag.
+		void						setEnabled( bool value );
+
+	protected:
 
 		//! Container type to store internal system state inside a component.
 		typedef Map< TypeIdx, StrongPtr<InternalBase> > InternalDataHolder;
 
 		InternalDataHolder			m_internal;	//!< The internal data.
-		u32							m_flags;	//!< Component flags.
+		FlagSet32					m_flags;	//!< Component flags.
 	};
 
 	// ** ComponentBase::setInternal
@@ -131,6 +145,18 @@ namespace Ecs {
 	inline void ComponentBase::setFlags( u32 value )
 	{
 		m_flags = value;
+	}
+
+	// ** ComponentBase::isEnabled
+	inline bool ComponentBase::isEnabled( void ) const
+	{
+		return m_flags.is( IsEnabled );
+	}
+
+	// ** ComponentBase::setEnabled
+	inline void ComponentBase::setEnabled( bool value )
+	{
+		m_flags.set( IsEnabled, value );
 	}
 
 	//! Generic component class.

@@ -90,6 +90,20 @@ void Entity::markAsRemoved( void )
 	m_isRemoved = true;
 }
 
+// ** Entity::updateComponentBit
+void Entity::updateComponentBit( u32 bit, bool value )
+{
+	if( value ) {
+		m_mask.set( bit );
+	} else {
+		m_mask.clear( bit );
+	}
+	
+	if( m_ecs.valid() ) {
+		m_ecs->notifyEntityChanged( m_id );
+	}
+}
+
 } // namespace Ecs
 
 DC_END_DREEMCHEST

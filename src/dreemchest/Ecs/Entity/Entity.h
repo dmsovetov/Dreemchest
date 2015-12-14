@@ -70,6 +70,18 @@ namespace Ecs {
 		template<typename TComponent>
 		TComponent*				get( void ) const;
 
+		//! Enables the component of specified type.
+		template<typename TComponent>
+		void					enable( void );
+
+		//! Disables the component of specified type.
+		template<typename TComponent>
+		void					disable( void );
+
+		//! Returns true if the component of specified type is enabled.
+		template<typename TComponent>
+		void					isEnabled( void ) const;
+
 		//! Attaches the created component to an entity.
 		template<typename TComponent>
 		TComponent*				attachComponent( TComponent* component );
@@ -100,6 +112,9 @@ namespace Ecs {
 
 		//! Sets the parent entity component system reference.
 		void					setEcs( EcsWPtr value );
+
+		//! Updates the entity component mask.
+		void					updateComponentBit( u32 bit, bool value );
 
 	private:
 
@@ -145,13 +160,34 @@ namespace Ecs {
 		TypeIdx idx = component->typeIndex();
 
 		m_components[idx] = component;
-		m_mask.set( idx );
-		
-		if( m_ecs.valid() ) {
-			m_ecs->notifyEntityChanged( m_id );
-		}
+		updateComponentBit( idx, true );
 		
 		return component;	
+	}
+
+	// ** Entity::enable
+	template<typename TComponent>
+	void Entity::enable( void )
+	{
+		TComponent* component = get<TComponent>();
+		component->setEnabled( true );
+		updateComponentBit( component->typeIndex(), true );
+	}
+
+	// ** Entity::disable
+	template<typename TComponent>
+	void Entity::disable( void )
+	{
+		TComponent* component = get<TComponent>();
+		component->setEnabled( true );
+		updateComponentBit( component->typeIndex(), false );		
+	}
+
+	// ** Entity::isEnabled
+	template<typename TComponent>
+	void Entity::isEnabled( void ) const
+	{
+		return get<TComponent>->isEnabled();
 	}
 
 	// ** Entity::attach
@@ -171,9 +207,8 @@ namespace Ecs {
 		DC_BREAK_IF( m_isRemoved );
 
 		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
-		DC_BREAK_IF( i == m_components.end() )
-		m_mask.clear( i->second->typeIndex() );
-		m_ecs->notifyEntityChanged( m_id );
+		DC_BREAK_IF( i == m_components.end() );
+		updateComponentBit( i->second->typeIndex(), false );
 		m_components.erase( i );
 	}
 
