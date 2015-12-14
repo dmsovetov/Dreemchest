@@ -29,6 +29,7 @@
 
 #include "../Importers/ImageImporter.h"
 #include "../Importers/FileImporter.h"
+#include "../Importers/MeshImporter.h"
 
 DC_BEGIN_COMPOSER
 
@@ -38,11 +39,15 @@ namespace Project {
 Cache::Cache( IFileSystemWPtr fileSystem, const io::Path& path, AssetsModelWPtr assetsModel ) : m_fileSystem( fileSystem ), m_path( path ), m_assetsModel( assetsModel )
 {
 	// Declare asset importers.
-	m_assetImporters.declare<Importers::FileImporter>( "tif" );
-	m_assetImporters.declare<Importers::FileImporter>( "fbx" );
-	m_assetImporters.declare<Importers::FileImporter>( "prefab" );
-	m_assetImporters.declare<Importers::FileImporter>( "mat" );
-	m_assetImporters.declare<Importers::FileImporter>( "tga" );
+#ifdef HAVE_TIFF
+	m_assetImporters.declare<Importers::ImageImporterTIF>( "tif" );
+#endif	/*	HAVE_TIFF	*/
+
+#ifdef HAVE_FBX
+	m_assetImporters.declare<Importers::MeshImporterFBX>( "fbx" );
+#endif	/*	HAVE_FBX	*/
+
+	m_assetImporters.declare<Importers::ImageImporterTGA>( "tga" );
 
 	// Subscribe for project event
 	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Cache::handleAssetAdded ) );

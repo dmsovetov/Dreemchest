@@ -38,7 +38,7 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a file.
-		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
+		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
 	};
 
 } // namespace Importers

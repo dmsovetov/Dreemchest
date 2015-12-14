@@ -33,13 +33,61 @@ DC_BEGIN_COMPOSER
 
 namespace Importers {
 
+	//! Base class for all image importers.
+	class ImageImporter : public AssetImporter {
+	public:
+
+		//! Writes the imported image to file.
+		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
+
+	private:
+
+		//! Imports an image from file.
+		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) = 0;
+
+	protected:
+
+		//! Imported image.
+		struct Image {
+			u16				width;		//!< Image width.
+			u16				height;		//!< Image height.
+			u8				channels;	//!< Image channels.
+			Array<u8>		pixels;		//!< Image pixel buffer.
+		};
+
+		Image				m_image;	//!< The imported image.
+	};
+
+	//! Imports the TGA image.
+	class ImageImporterTGA : public ImageImporter {
+	public:
+
+		//! Performs importing of a TGA image.
+		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
+
+	private:
+
+		//! Reads 16-bit image.
+		void				readPixels16( io::StreamPtr stream, Image& image, u16 width, u16 height ) const;
+
+		//! Reads 24/32-bit image.
+		void				readPixels( io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const;
+
+		//! Swaps red & blue channels.
+		void				swapChannels( Image& image ) const;
+	};
+
+#ifdef HAVE_TIFF
+
 	//! Imports the TIF image.
-	class ImageImporterTIF : public AssetImporter {
+	class ImageImporterTIF : public ImageImporter {
 	public:
 
 		//! Performs importing of a TIF image.
-		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) const DC_DECL_OVERRIDE;
+		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
 	};
+
+#endif	/*	HAVE_TIFF	*/
 
 } // namespace Importers
 
