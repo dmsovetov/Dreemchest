@@ -73,7 +73,11 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 	}
 
 	// Create the camera.
-	m_camera = addCamera( FrameTarget::create( document->renderingFrame() ) );
+	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
+	m_camera->setClearColor( backgroundColor() );
+	m_camera->attach<Scene::RenderWireframe>();
+	m_camera->attach<Scene::RenderBoundingVolumes>();
+	m_scene->addSceneObject( m_camera );
 
 	return true;
 }
@@ -91,30 +95,12 @@ void SceneEditor::render( f32 dt )
 	m_cursorMovement->set( Vec3() );
 }
 
-// ** SceneEditor::addCamera
-Scene::SceneObjectPtr SceneEditor::addCamera( Scene::RenderTargetPtr renderTarget )
-{
-	using namespace Scene;
-
-	SceneObjectPtr camera = m_scene->createSceneObject();
-	camera->attach<Camera>( Camera::Perspective, renderTarget, Rgb::fromHashString( "#484848" ) );
-	camera->attach<RenderParticles>();
-//	camera->attach<RenderForwardLit>();
-	camera->attach<RenderWireframe>();
-	camera->attach<::Scene::Transform>();
-	camera->attach<RotateAroundAxes>( 10.0f, CSLocalX, m_cursorMovement )->setRangeForAxis( ::Scene::AxisX, Range( -90.0f, 90.0f ) );
-	camera->disable<RotateAroundAxes>();
-	MoveAlongAxes* m = camera->attach<MoveAlongAxes>( 60.0f, CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
-	camera->attach<RenderBoundingVolumes>();
-
-	return camera;
-}
-
 // ** SceneEditor::handleMousePress
 void SceneEditor::handleMousePress( s32 x, s32 y, u8 button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->enable<Scene::RotateAroundAxes>();
+		m_camera->setRotationEnabled( true );
+		m_camera->setMovementEnabled( true );
 	}
 }
 
@@ -122,7 +108,8 @@ void SceneEditor::handleMousePress( s32 x, s32 y, u8 button )
 void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->disable<Scene::RotateAroundAxes>();
+		m_camera->setRotationEnabled( false );
+		m_camera->setMovementEnabled( false );
 	}
 }
 

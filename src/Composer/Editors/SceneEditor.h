@@ -54,14 +54,11 @@ namespace Editors {
 		//! Handles the mouse move event.
 		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
 
-		//! Adds new camera instance to the scene.
-		Scene::SceneObjectPtr			addCamera( Scene::RenderTargetPtr renderTarget );
-
 	private:
 
 		Scene::ScenePtr					m_scene;			//!< Actual scene.
 		Scene::RenderingContextPtr		m_renderingContext;	//!< Scene rendering context.
-		Scene::SceneObjectPtr			m_camera;			//!< Main editor camera.
+		Scene::SpectatorCameraPtr		m_camera;			//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
 
 		Scene::AssetBundlePtr			m_assets;			//!< Assets bundle.

@@ -47,6 +47,9 @@ namespace Editors {
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;
 
+		//! Returns the background color.
+		const Rgba&						backgroundColor( void ) const;
+
 	private:
 
 		//! Update the editor scene.

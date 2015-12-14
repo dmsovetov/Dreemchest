@@ -70,6 +70,12 @@ Renderer::HalWPtr VisualEditor::hal( void ) const
 	return m_hal;
 }
 
+// ** VisualEditor::backgroundColor
+const Rgba& VisualEditor::backgroundColor( void ) const
+{
+	return m_backgroundColor;
+}
+
 // ** VisualEditor::update
 void VisualEditor::update( f32 dt )
 {
