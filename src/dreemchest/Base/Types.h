@@ -30,7 +30,7 @@
 #define DC_TYPES_INCLUDED
 
 #include <string>
-#include  <vector>
+#include <vector>
 #include <map>
 #include <list>
 #include <set>
@@ -139,15 +139,6 @@ DC_BEGIN_DREEMCHEST
 	{
 		return lerp( min, max, rand() / f32( RAND_MAX ) );
 	}
-
-    //! Helper struct to hold a numeric range.
-    struct Range {
-                Range( f32 min = -FLT_MAX, f32 max = FLT_MAX )
-                    : min( min ), max( max ) {}
-
-        f32     min;	//! The minimum range value.
-        f32     max;	//! The maximum range value.
-    };
 
 	//! Convert value to a string.
 	template< typename T>

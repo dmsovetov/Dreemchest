@@ -127,6 +127,21 @@ DC_BEGIN_DREEMCHEST
 	#endif
 	}
 
+    //! Helper struct to hold a numeric range.
+    struct Range {
+                Range( f32 min = -FLT_MAX, f32 max = FLT_MAX )
+                    : min( min ), max( max ) {}
+
+        f32     min;	//! The minimum range value.
+        f32     max;	//! The maximum range value.
+
+		//! Clamps the input value to a range.
+		f32		clamp( f32 value ) const { return :: DC_DREEMCHEST_NS clamp( value, min, max ); }
+
+		//! Returns true if the value is inside the range.
+		bool	contains( f32 value ) const { return value >= min && value <= max; }
+    };
+
 DC_END_DREEMCHEST
 
 #include "Color.h"
