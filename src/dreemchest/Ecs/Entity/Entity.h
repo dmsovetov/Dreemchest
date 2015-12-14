@@ -78,9 +78,13 @@ namespace Ecs {
 		template<typename TComponent>
 		void					disable( void );
 
+		//! Enables of disables the component of specified type.
+		template<typename TComponent>
+		void					setComponentEnabled( bool value );
+
 		//! Returns true if the component of specified type is enabled.
 		template<typename TComponent>
-		void					isEnabled( void ) const;
+		bool					isEnabled( void ) const;
 
 		//! Attaches the created component to an entity.
 		template<typename TComponent>
@@ -169,25 +173,30 @@ namespace Ecs {
 	template<typename TComponent>
 	void Entity::enable( void )
 	{
-		TComponent* component = get<TComponent>();
-		component->setEnabled( true );
-		updateComponentBit( component->typeIndex(), true );
+		setComponentEnabled<TComponent>( true );
 	}
 
 	// ** Entity::disable
 	template<typename TComponent>
 	void Entity::disable( void )
 	{
+		setComponentEnabled<TComponent>( false );	
+	}
+
+	// ** Entity::setComponentEnabled
+	template<typename TComponent>
+	void Entity::setComponentEnabled( bool value )
+	{
 		TComponent* component = get<TComponent>();
-		component->setEnabled( true );
-		updateComponentBit( component->typeIndex(), false );		
+		component->setEnabled( value );
+		updateComponentBit( component->typeIndex(), value );		
 	}
 
 	// ** Entity::isEnabled
 	template<typename TComponent>
-	void Entity::isEnabled( void ) const
+	bool Entity::isEnabled( void ) const
 	{
-		return get<TComponent>->isEnabled();
+		return get<TComponent>()->isEnabled();
 	}
 
 	// ** Entity::attach
