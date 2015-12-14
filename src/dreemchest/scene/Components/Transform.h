@@ -246,6 +246,12 @@ namespace Scene {
 		//! Returns rotation delta values.
 		Vec3					delta( void ) const;
 
+		//! Returns the rotation binding.
+		Vec3BindingWPtr			binding( void ) const;
+
+		//! Sets the rotation binding.
+		void					setBinding( const Vec3BindingPtr& value );
+
 		//! Returns the range for a specified axis.
 		const Range&			rangeForAxis( CoordinateSystemAxis axis ) const;
 

@@ -317,6 +317,18 @@ Vec3 RotateAroundAxes::delta( void ) const
 	return m_delta->get();
 }
 
+// ** RotateAroundAxes::binding
+Vec3BindingWPtr RotateAroundAxes::binding( void ) const
+{
+	return m_delta;
+}
+
+// ** RotateAroundAxes::setBinding
+void RotateAroundAxes::setBinding( const Vec3BindingPtr& value )
+{
+	m_delta = value;
+}
+
 // ** RotateAroundAxes::rangeForAxis
 const Range& RotateAroundAxes::rangeForAxis( CoordinateSystemAxis axis ) const
 {
