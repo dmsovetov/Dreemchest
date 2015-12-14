@@ -39,6 +39,7 @@ DC_BEGIN_DREEMCHEST
 				Vec2( float value );
                 Vec2( float x, float y );
                 Vec2( const float* v );
+				Vec2( const double* v );
 
         float&  operator[]( int index );
         float   operator[]( int index ) const;
@@ -94,6 +95,12 @@ DC_BEGIN_DREEMCHEST
 
     // ** Vec2::Vec2
     inline Vec2::Vec2( const float* v ) : x( v[0] ), y( v[1] )
+    {
+
+    }
+
+    // ** Vec2::Vec2
+    inline Vec2::Vec2( const double* v ) : x( ( float )v[0] ), y( ( float )v[1] )
     {
 
     }
