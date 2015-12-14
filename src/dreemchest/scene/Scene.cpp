@@ -94,6 +94,20 @@ SceneObjectPtr Scene::createSceneObject( const SceneObjectId& id )
 	return m_ecs->createEntity( id );
 }
 
+// ** Scene::addSceneObject
+void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
+{
+	DC_BREAK_IF( !sceneObject.valid() );
+	m_ecs->addEntity( sceneObject );
+}
+
+// ** Scene::removeSceneObject
+void Scene::removeSceneObject( const SceneObjectPtr& sceneObject )
+{
+	DC_BREAK_IF( !sceneObject.valid() );
+	m_ecs->removeEntity( sceneObject->id() );
+}
+
 // ** Scene::findSceneObject
 SceneObjectPtr Scene::findSceneObject( const SceneObjectId& id ) const
 {

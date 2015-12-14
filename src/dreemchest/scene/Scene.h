@@ -42,6 +42,7 @@
 #include <Renderer/Renderer2D.h>
 
 #include <Ecs/Entity/Entity.h>
+#include <Ecs/Entity/Archetype.h>
 #include <Ecs/Component/Component.h>
 #include <Ecs/System/GenericEntitySystem.h>
 #include <Ecs/System/ImmutableEntitySystem.h>
@@ -159,6 +160,12 @@ namespace Scene {
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
+
+		//! Adds new scene object to scene.
+		void							addSceneObject( const SceneObjectPtr& sceneObject );
+
+		//! Removes scene object to scene.
+		void							removeSceneObject( const SceneObjectPtr& sceneObject );
 
 		//! Creates an archetype instance.
 		template<typename TArchetype>
