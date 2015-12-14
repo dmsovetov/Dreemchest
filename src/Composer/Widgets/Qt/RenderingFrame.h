@@ -101,10 +101,12 @@ namespace Ui {
 
 	private:
 
-		RenderingFrame*				m_parent;		//!< Parent rendering frame instance.
-		s32							m_timer;		//!< The rendering timer.
-		bool						m_hasLostFocus;	//!< Indicates that focus was lost.
-		QTime						m_deltaTime;	//!< Tracks the delta time.
+		RenderingFrame*				m_parent;			//!< Parent rendering frame instance.
+		s32							m_timer;			//!< The rendering timer.
+		bool						m_hasLostFocus;		//!< Indicates that focus was lost.
+		QTime						m_deltaTime;		//!< Tracks the delta time.
+		FlagSet8					m_isMouseButtons;	//!< Current mouse state.
+		QPoint						m_lastCursorPos;	//!< Last known cursor position.
 	};
 
 	//! RenderingFrame Qt implementation.

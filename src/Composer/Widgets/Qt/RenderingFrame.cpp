@@ -86,7 +86,7 @@ void QRenderingFrame::mousePressEvent( QMouseEvent* e )
 	setFocus();
 
 	// Get the mouse button from event
-	MouseButton button;
+	u8 button;
 
 	switch( e->button() ) {
 	case Qt::LeftButton:	button = LeftMouseButton;	break;
@@ -98,6 +98,12 @@ void QRenderingFrame::mousePressEvent( QMouseEvent* e )
 	if( delegate.valid() ) {
 		delegate->handleMousePress( e->pos().x(), e->pos().y(), button );
 	}
+
+	// Save current cursor position
+	m_lastCursorPos = e->pos();
+
+	// Enable mouse down flag
+	m_isMouseButtons.on( button );
 }
 
 // ** QRenderingFrame::mouseReleaseEvent
@@ -106,7 +112,7 @@ void QRenderingFrame::mouseReleaseEvent( QMouseEvent* e )
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
 	// Get the mouse button from event
-	MouseButton button;
+	u8 button;
 
 	switch( e->button() ) {
 	case Qt::LeftButton:	button = LeftMouseButton;	break;
@@ -118,6 +124,9 @@ void QRenderingFrame::mouseReleaseEvent( QMouseEvent* e )
 	if( delegate.valid() ) {
 		delegate->handleMouseRelease( e->pos().x(), e->pos().y(), button );
 	}
+
+	// Disable mouse down flag
+	m_isMouseButtons.off( button );
 }
 
 // ** QRenderingFrame::wheelEvent
@@ -222,11 +231,20 @@ void QRenderingFrame::contextMenuEvent( QContextMenuEvent* e )
 // ** QRenderingFrame::mouseMoveEvent
 void QRenderingFrame::mouseMoveEvent( QMouseEvent* e )
 {
+	// No mouse button pressed - return
+	if( !m_isMouseButtons ) {
+		return;
+	}
+
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
+
+	// Calculate mouse movement delta
+	QPoint delta = e->pos() - m_lastCursorPos;
+	m_lastCursorPos = e->pos();
 
 	// Notify the delegate
 	if( delegate.valid() ) {
-		delegate->handleMouseMove( e->pos().x(), e->pos().y(), e->globalPos().x(), e->globalPos().y() );
+		delegate->handleMouseMove( e->pos().x(), e->pos().y(), delta.x(), delta.y(), m_isMouseButtons );
 	}
 }
 

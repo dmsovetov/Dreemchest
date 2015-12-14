@@ -46,13 +46,13 @@ namespace Editors {
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
+		virtual void					handleMousePress( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseRelease( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 sx, s32 sy, s32 ex, s32 ey, s32 dx, s32 dy ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
 
 		//! Adds new camera instance to the scene.
 		Scene::SceneObjectPtr			addCamera( Scene::RenderTargetPtr renderTarget );
@@ -62,6 +62,7 @@ namespace Editors {
 		Scene::ScenePtr					m_scene;			//!< Actual scene.
 		Scene::RenderingContextPtr		m_renderingContext;	//!< Scene rendering context.
 		Scene::SceneObjectPtr			m_camera;			//!< Main editor camera.
+		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
 
 		Scene::AssetBundlePtr			m_assets;			//!< Assets bundle.
 		Scene::SceneObjectPtr			m_chunk;			//!< Loaded terrain.

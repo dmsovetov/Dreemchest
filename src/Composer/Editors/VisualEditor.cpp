@@ -97,19 +97,19 @@ void VisualEditor::handleResize( s32 width, s32 height )
 }
 
 // ** VisualEditor::handleMousePress
-void VisualEditor::handleMousePress( s32 x, s32 y, Ui::MouseButton button )
+void VisualEditor::handleMousePress( s32 x, s32 y, u8 button )
 {
 
 }
 
 // ** VisualEditor::handleMouseRelease
-void VisualEditor::handleMouseRelease( s32 x, s32 y, Ui::MouseButton button )
+void VisualEditor::handleMouseRelease( s32 x, s32 y, u8 button )
 {
 
 }
 
 // ** VisualEditor::handleMouseMove
-void VisualEditor::handleMouseMove( s32 sx, s32 sy, s32 ex, s32 ey, s32 dx, s32 dy )
+void VisualEditor::handleMouseMove( s32 sx, s32 sy, s32 dx, s32 dy, u8 buttons )
 {
 
 }
@@ -153,21 +153,21 @@ void RenderingFrameDelegate::handleResize( s32 width, s32 height )
 }
 
 // ** RenderingFrameDelegate::handleMousePress
-void RenderingFrameDelegate::handleMousePress( s32 x, s32 y, Ui::MouseButton button )
+void RenderingFrameDelegate::handleMousePress( s32 x, s32 y, u8 button )
 {
 	m_editor->handleMousePress( x, y, button );
 }
 
 // ** RenderingFrameDelegate::handleMouseRelease
-void RenderingFrameDelegate::handleMouseRelease( s32 x, s32 y, Ui::MouseButton button )
+void RenderingFrameDelegate::handleMouseRelease( s32 x, s32 y, u8 button )
 {
 	m_editor->handleMouseRelease( x, y, button );
 }
 
 // ** RenderingFrameDelegate::handleMouseMove
-void RenderingFrameDelegate::handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY )
+void RenderingFrameDelegate::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 {
-	m_editor->handleMouseMove( x, y, globalX, globalY, 0, 0 );
+	m_editor->handleMouseMove( x, y, dx, dy, buttons );
 }
 
 // ** RenderingFrameDelegate::handleMouseWheel

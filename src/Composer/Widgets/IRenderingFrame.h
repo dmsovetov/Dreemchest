@@ -80,13 +80,13 @@ namespace Ui {
 		virtual void				handleResize( s32 width, s32 height ) {}
 
 		//! Handles the mouse pressed event.
-		virtual void				handleMousePress( s32 x, s32 y, MouseButton button ) {}
+		virtual void				handleMousePress( s32 x, s32 y, u8 button ) {}
 
 		//! Handles the mouse released event.
-		virtual void				handleMouseRelease( s32 x, s32 y, MouseButton button ) {}
+		virtual void				handleMouseRelease( s32 x, s32 y, u8 button ) {}
 
 		//! Handles the mouse moved event.
-		virtual void				handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY ) {}
+		virtual void				handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) {}
 
 		//! Handles the focus in event.
 		virtual void				handleFocusIn( void ) {}

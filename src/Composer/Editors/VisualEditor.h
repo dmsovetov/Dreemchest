@@ -56,13 +56,13 @@ namespace Editors {
 		virtual void					handleResize( s32 width, s32 height );
 
 		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, Ui::MouseButton button );
+		virtual void					handleMousePress( s32 x, s32 y, u8 button );
 
 		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, Ui::MouseButton button );
+		virtual void					handleMouseRelease( s32 x, s32 y, u8 button );
 
 		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 sx, s32 sy, s32 ex, s32 ey, s32 dx, s32 dy );
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons );
 
 		//! Handles the mouse wheel event.
 		virtual void					handleMouseWheel( s32 delta ) {}
@@ -121,13 +121,13 @@ namespace Editors {
 		virtual void					handleResize( s32 width, s32 height ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse pressed event.
-		virtual void					handleMousePress( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
+		virtual void					handleMousePress( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse released event.
-		virtual void					handleMouseRelease( s32 x, s32 y, Ui::MouseButton button ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseRelease( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse moved event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 globalX, s32 globalY ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse wheel event.
 		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;

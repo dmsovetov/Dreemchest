@@ -75,11 +75,11 @@ DC_BEGIN_COMPOSER
 			, MessageBoxCancel	//!< Cancel button was clicked.
 		};
 
-		//! Mouse buttons.
-		enum MouseButton {
-			  LeftMouseButton	//!< Left mouse button.
-			, RightMouseButton	//!< Right mouse button.
-			, MiddleMouseButton	//!< Middle mouse button.
+		//! Mouse buttons bitset flags.
+		enum MouseButtonFlags {
+			  LeftMouseButton	= BIT( 0 )	//!< Left mouse button.
+			, RightMouseButton	= BIT( 1 )	//!< Right mouse button.
+			, MiddleMouseButton	= BIT( 2 )	//!< Middle mouse button.
 		};
 
 		//! Auto ptr type for signal delegate instances.

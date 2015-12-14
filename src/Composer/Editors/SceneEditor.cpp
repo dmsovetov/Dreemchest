@@ -46,6 +46,9 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 
 	m_renderingContext = Scene::RenderingContextPtr( DC_NEW Scene::RenderingContext( rvm, shaders, hal, renderer2d ) );
 
+	// Create cursor binding
+	m_cursorMovement = new Scene::Vec3Binding;
+
 	// Create the scene.
 	m_scene = Scene::Scene::create();
 	m_scene->addSystem<Scene::AssetSystem>( hal );
@@ -83,6 +86,9 @@ void SceneEditor::render( f32 dt )
 
 	// Render the scene
 	m_scene->render( m_renderingContext );
+
+	// Reset the cursor movement
+	m_cursorMovement->set( Vec3() );
 }
 
 // ** SceneEditor::addCamera
@@ -96,32 +102,34 @@ Scene::SceneObjectPtr SceneEditor::addCamera( Scene::RenderTargetPtr renderTarge
 //	camera->attach<RenderForwardLit>();
 	camera->attach<RenderWireframe>();
 	camera->attach<::Scene::Transform>();
-	camera->attach<MoveAlongAxes>( 60.0f, ::Scene::CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
-//	camera->attach<RenderBoundingVolumes>();
+	camera->attach<RotateAroundAxes>( 10.0f, CSLocalX, m_cursorMovement )->setRangeForAxis( ::Scene::AxisX, Range( -90.0f, 90.0f ) );
+	camera->disable<RotateAroundAxes>();
+	MoveAlongAxes* m = camera->attach<MoveAlongAxes>( 60.0f, CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
+	camera->attach<RenderBoundingVolumes>();
 
 	return camera;
 }
 
 // ** SceneEditor::handleMousePress
-void SceneEditor::handleMousePress( s32 x, s32 y, Ui::MouseButton button )
+void SceneEditor::handleMousePress( s32 x, s32 y, u8 button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->attach<Scene::RotateAroundAxes>( 10.0f, ::Scene::CSLocalX, new Scene::Vec3FromMouse )->setRangeForAxis( ::Scene::AxisY, Range( 0.0f, 180.0f ) );
+		m_camera->enable<Scene::RotateAroundAxes>();
 	}
 }
 
 // ** SceneEditor::handleMouseRelease
-void SceneEditor::handleMouseRelease( s32 x, s32 y, Ui::MouseButton button )
+void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 button )
 {
 	if( button == Ui::RightMouseButton ) {
-		m_camera->detach<Scene::RotateAroundAxes>();
+		m_camera->disable<Scene::RotateAroundAxes>();
 	}
 }
 
 // ** SceneEditor::handleMouseMove
-void SceneEditor::handleMouseMove( s32 sx, s32 sy, s32 ex, s32 ey, s32 dx, s32 dy )
+void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 {
-
+	m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
 }
 
 } // namespace Editors
