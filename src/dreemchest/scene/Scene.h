@@ -139,6 +139,8 @@ namespace Scene {
 
 	dcDeclarePtrs( Vec3Binding )
 
+	dcDeclarePtrs( SpectatorCamera )
+
 	//! Scene systems mask.
 	enum Systems {
 		  UpdateSystems = BIT( 0 )
@@ -365,6 +367,7 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/AssetSystem.h"
 	#include "Systems/CullingSystems.h"
+	#include "Archetypes/Camera.h"
 	#include "Rendering/RenderTarget.h"
 	#include "Rendering/RenderingContext.h"
 	#include "Rendering/RenderingSystem.h"
