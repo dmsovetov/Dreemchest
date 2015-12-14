@@ -30,12 +30,6 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ** QComposerMime::QComposerMime
-QComposerMime::QComposerMime( const QString& format )
-{
-	setData( format, QByteArray() );
-}
-
 // ** QComposerMime::mime
 IMimeDataWPtr QComposerMime::mime( void ) const
 {
@@ -49,9 +43,15 @@ void QComposerMime::setMime( IMimeDataPtr mime )
 }
 
 // ** MimeData::MimeData
-MimeData::MimeData( QComposerMime* mime ) : m_mime( mime )
+MimeData::MimeData( QComposerMime* mime, const io::Bson& data ) : m_mime( mime ), m_data( data )
 {
 
+}
+
+// ** MimeData::data
+const io::Bson& MimeData::data( void ) const
+{
+	return m_data;
 }
 
 // ** MimeData::hasFormat

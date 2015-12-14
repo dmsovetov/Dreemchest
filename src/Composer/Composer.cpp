@@ -42,6 +42,9 @@ DC_BEGIN_COMPOSER
 // ** Composer::s_instance
 ComposerWPtr Composer::s_instance = ComposerWPtr();
 
+// ** Composer::kAssetMime
+const String Composer::kAssetMime = "dreemchest/x-asset";
+
 // ** Composer::Composer
 Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
 {

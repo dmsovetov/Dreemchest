@@ -40,9 +40,6 @@ namespace Ui {
 
 	public:
 
-								//! Constructs QComposerMime instance.
-								QComposerMime( const QString& format );
-
 		//! Returns an attached MIME data.
 		IMimeDataWPtr			mime( void ) const;
 
@@ -58,15 +55,19 @@ namespace Ui {
 	class MimeData : public IMimeData {
 	public:
 
-							//! Constructs the MimeData instance.
-							MimeData( QComposerMime* mime );
+								//! Constructs the MimeData instance.
+								MimeData( QComposerMime* mime, const io::Bson& data = io::Bson::kNull );
 
 		//! Returns true if the MIME data contains the specified format.
-		virtual bool		hasFormat( const String& value ) const;
+		virtual bool			hasFormat( const String& value ) const;
+
+		//! Returns an attached data.
+		virtual const io::Bson&	data( void ) const;
 
 	public:
 
-		QComposerMime*		m_mime;	//!< Internal MIME data instance.
+		QComposerMime*			m_mime;	//!< Internal MIME data instance.
+		io::Bson				m_data;	//!< Attached data.
 	};
 
 } // namespace Ui

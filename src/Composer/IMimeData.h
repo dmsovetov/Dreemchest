@@ -36,7 +36,10 @@ DC_BEGIN_COMPOSER
 	public:
 
 		//! Returns true if the MIME data contains the specified format.
-		virtual bool		hasFormat( const String& value ) const = 0;
+		virtual bool			hasFormat( const String& value ) const = 0;
+
+		//! Returns an attached data.
+		virtual const io::Bson&	data( void ) const = 0;
 	};
 
 DC_END_COMPOSER

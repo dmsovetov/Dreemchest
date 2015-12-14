@@ -82,6 +82,12 @@ Qt::DropActions QAbstractTreeModel::supportedDropActions( void ) const
     return Qt::MoveAction;
 }
 
+// ** QAbstractTreeModel::createMimeData
+QMimeData* QAbstractTreeModel::createMimeData( const QModelIndexList& indexes ) const
+{
+	return new QMimeData;
+}
+
 // ** QAbstractTreeModel::mimeData
 QMimeData* QAbstractTreeModel::mimeData( const QModelIndexList& indexes ) const
 {
@@ -94,7 +100,7 @@ QMimeData* QAbstractTreeModel::mimeData( const QModelIndexList& indexes ) const
 	}
 
 	// Construct the MIME data
-	QMimeData* data = new QMimeData;
+	QMimeData* data = createMimeData( indexes );
 	data->setData( mimeTypes().at( 0 ), encodedData );
 
 	return data;

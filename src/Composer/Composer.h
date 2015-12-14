@@ -207,6 +207,9 @@ DC_BEGIN_COMPOSER
 	class Composer : public EventEmitter {
 	public:
 
+		//! Asset MIME type string.
+		static const String kAssetMime;
+
 		//! Available menues
 		enum Menu {
 			  FileMenu

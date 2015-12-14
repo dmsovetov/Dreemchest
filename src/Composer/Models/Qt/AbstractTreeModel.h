@@ -124,6 +124,9 @@ DC_BEGIN_COMPOSER
 		//! Constructs new item instance.
 		virtual TreeItem*		createItem( void ) const = 0;
 
+		//! Constructs the MIME data instance.
+		virtual QMimeData*		createMimeData( const QModelIndexList& indexes ) const;
+
 		//! Processes the item movement action.
 		virtual bool			moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const;
 
@@ -131,7 +134,7 @@ DC_BEGIN_COMPOSER
 		virtual void			removeItem( TreeItem* item );
 
 		//! Adds item to a model.
-		virtual void		addItem( TreeItem* item, TreeItem* parent );
+		virtual void			addItem( TreeItem* item, TreeItem* parent );
 
 		//! Returns the tree item instance by index.
 		TreeItem*				itemAtIndex( const QModelIndex& index ) const;

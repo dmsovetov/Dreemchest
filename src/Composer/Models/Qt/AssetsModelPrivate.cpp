@@ -26,6 +26,8 @@
 
 #include "AssetsModelPrivate.h"
 
+#include "../../Widgets/Qt/MimeData.h"
+
 DC_BEGIN_COMPOSER
 
 #if DEV_CUSTOM_ASSET_MODEL
@@ -536,6 +538,28 @@ QString QAssetsModel::constructAbsoluteFileName( const Item* item, const Item* p
 QString QAssetsModel::constructRelativeFileName( const Item* item, const Item* parent ) const
 {
 	return m_directory.dir().relativeFilePath( constructAbsoluteFileName( item, parent ) );
+}
+
+// ** QAssetsModel::mimeTypes
+QStringList QAssetsModel::mimeTypes( void ) const
+{
+	return QStringList() << Composer::kAssetMime.c_str();
+}
+
+// ** QAssetsModel::createMimeData
+QMimeData* QAssetsModel::createMimeData( const QModelIndexList& indexes ) const
+{
+	// Serialize asset data
+	io::Bson data = io::Bson::array();
+
+	foreach( const QModelIndex& index, indexes ) {
+		const QAsset& asset = this->asset( index );
+		data << (io::Bson::object() << "type" << asset.fileInfo().completeSuffix().toStdString() << "uuid" << asset.uuid().toString().toStdString());
+	}
+
+	Ui::QComposerMime* mime = new Ui::QComposerMime;
+	mime->setMime( new Ui::MimeData( mime, data ) );
+	return mime;
 }
 
 // ** QAssetsModel::data

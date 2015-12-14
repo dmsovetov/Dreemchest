@@ -236,6 +236,12 @@ DC_BEGIN_COMPOSER
 		//! Adds item to a model.
 		virtual void			addItem( TreeItem* item, TreeItem* parent ) Q_DECL_OVERRIDE;
 
+		//! Creates the MIME data instance.
+		virtual QMimeData*		createMimeData( const QModelIndexList& indexes ) const Q_DECL_OVERRIDE;
+
+		//! Returns the MIME data list.
+		virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
+
 		//! Returns the data from the specified index.
 		virtual QVariant		data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
 

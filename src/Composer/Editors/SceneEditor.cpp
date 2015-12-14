@@ -119,6 +119,30 @@ void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 	m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
 }
 
+// ** SceneEditor::handleDragEnter
+bool SceneEditor::handleDragEnter( IMimeDataWPtr mime )
+{
+	return mime->hasFormat( Composer::kAssetMime );
+}
+
+// ** SceneEditor::handleDragMove
+void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
+{
+}
+
+// ** SceneEditor::handleDrop
+void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
+{
+	const io::Bson& data = mime->data();
+	DC_BREAK_IF( data.isNull() );
+
+	const io::Bson::ValueArray& items = data.items();
+
+	for( s32 i = 0, n = ( s32 )items.size(); i < n; i++ ) {
+		qDebug() << "Will place" << items[i].get( "uuid", "" ).asString().c_str();
+	}
+}
+
 } // namespace Editors
 
 DC_END_COMPOSER

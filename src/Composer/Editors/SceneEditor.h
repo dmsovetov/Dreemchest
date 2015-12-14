@@ -54,6 +54,15 @@ namespace Editors {
 		//! Handles the mouse move event.
 		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
 
+		//! Handles the drag enter event.
+		virtual bool					handleDragEnter( IMimeDataWPtr mime ) DC_DECL_OVERRIDE;
+
+		//! Handles the drag move event.
+		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+
+		//! Handles the drop event.
+		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+
 	private:
 
 		Scene::ScenePtr					m_scene;			//!< Actual scene.
