@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "Bson.h"
+#include "KeyValue.h"
 
 #include "streams/Stream.h"
 
@@ -32,24 +32,24 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-// ** Bson::kEmptyArray
-const Bson Bson::kEmptyArray( Bson::kArray );
+// ** KeyValue::kEmptyArray
+const KeyValue KeyValue::kEmptyArray( KeyValue::kArray );
 
-// ** Bson::kEmptyObject
-const Bson Bson::kEmptyObject( Bson::kObject );
+// ** KeyValue::kEmptyObject
+const KeyValue KeyValue::kEmptyObject( KeyValue::kObject );
 
-// ** Bson::Bson
-Bson::Bson( void ) : m_type( kNull )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( void ) : m_type( kNull )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( Type type ) : m_type( type )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( Type type ) : m_type( type )
 {
 	switch( type ) {
 	case kString:	m_string = DC_NEW String;
 					break;
-	case kObject:	m_object = DC_NEW KeyValue;
+	case kObject:	m_object = DC_NEW Properties;
 					break;
 	case kArray:	m_array  = DC_NEW ValueArray;
 					break;
@@ -57,201 +57,201 @@ Bson::Bson( Type type ) : m_type( type )
 	}
 }
 
-// ** Bson::Bson
-Bson::Bson( bool value ) : m_type( kBoolean ), m_boolean( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( bool value ) : m_type( kBoolean ), m_boolean( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( u8 value ) : m_type( kInt8 ), m_int8( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( u8 value ) : m_type( kInt8 ), m_int8( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( s8 value ) : m_type( kInt8 ), m_int8( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( s8 value ) : m_type( kInt8 ), m_int8( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( s16 value ) : m_type( kInt16 ), m_int32( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( s16 value ) : m_type( kInt16 ), m_int32( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( u16 value ) : m_type( kInt16 ), m_int32( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( u16 value ) : m_type( kInt16 ), m_int32( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( s32 value ) : m_type( kInt32 ), m_int32( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( s32 value ) : m_type( kInt32 ), m_int32( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( u32 value ) : m_type( kInt32 ), m_int32( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( u32 value ) : m_type( kInt32 ), m_int32( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( f32 value ) : m_type( kFloat32 ), m_float32( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( f32 value ) : m_type( kFloat32 ), m_float32( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( f64 value ) : m_type( kFloat64 ), m_float64( value )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( f64 value ) : m_type( kFloat64 ), m_float64( value )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( const String& value ) : m_type( kString ), m_string( DC_NEW String( value ) )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const String& value ) : m_type( kString ), m_string( DC_NEW String( value ) )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( CString value ) : m_type( kString ), m_string( DC_NEW String( value ) )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( CString value ) : m_type( kString ), m_string( DC_NEW String( value ) )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( const Guid& value ) : m_type( kGuid ), m_guid( DC_NEW Guid( value ) )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Guid& value ) : m_type( kGuid ), m_guid( DC_NEW Guid( value ) )
 {
 }
 
-// ** Bson::Bson
-Bson::Bson( const Bson& other ) : m_type( other.m_type )
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const KeyValue& other ) : m_type( other.m_type )
 {
-	setBson( other );
+	setKeyValue( other );
 }
 
-// ** Bson::~Bson
-Bson::~Bson( void )
+// ** KeyValue::~KeyValue
+KeyValue::~KeyValue( void )
 {
 	clear();
 }
 
-// ** Bson::object
-Bson Bson::object( void )
+// ** KeyValue::object
+KeyValue KeyValue::object( void )
 {
-	return Bson( kObject );
+	return KeyValue( kObject );
 }
 
-// ** Bson::array
-Bson Bson::array( void )
+// ** KeyValue::array
+KeyValue KeyValue::array( void )
 {
-	return Bson( kArray );
+	return KeyValue( kArray );
 }
 
-// ** Bson::operator =
-const Bson& Bson::operator = ( const Bson& other )
+// ** KeyValue::operator =
+const KeyValue& KeyValue::operator = ( const KeyValue& other )
 {
-	setBson( other );
+	setKeyValue( other );
 	return *this;
 }
 
-// ** Bson::operator bool
-Bson::operator bool( void ) const
+// ** KeyValue::operator bool
+KeyValue::operator bool( void ) const
 {
 	return m_boolean;
 }
 
-// ** Bson::operator u8
-Bson::operator u8( void ) const
+// ** KeyValue::operator u8
+KeyValue::operator u8( void ) const
 {
 	return m_int8;
 }
 
-// ** Bson::operator s8
-Bson::operator s8( void ) const
+// ** KeyValue::operator s8
+KeyValue::operator s8( void ) const
 {
 	return m_int8;
 }
 
-// ** Bson::operator u16
-Bson::operator u16( void ) const
+// ** KeyValue::operator u16
+KeyValue::operator u16( void ) const
 {
 	return m_int16;
 }
 
-// ** Bson::operator s16
-Bson::operator s16( void ) const
+// ** KeyValue::operator s16
+KeyValue::operator s16( void ) const
 {
 	return m_int16;
 }
 
-// ** Bson::operator u32
-Bson::operator u32( void ) const
+// ** KeyValue::operator u32
+KeyValue::operator u32( void ) const
 {
 	return m_int32;
 }
 
-// ** Bson::operator s32
-Bson::operator s32( void ) const
+// ** KeyValue::operator s32
+KeyValue::operator s32( void ) const
 {
 	return m_int32;
 }
 
-// ** Bson::operator f32
-Bson::operator f32( void ) const
+// ** KeyValue::operator f32
+KeyValue::operator f32( void ) const
 {
 	return m_float32;
 }
 
-// ** Bson::operator f64
-Bson::operator f64( void ) const
+// ** KeyValue::operator f64
+KeyValue::operator f64( void ) const
 {
 	return m_float64;
 }
 
-// ** Bson::operator String
-Bson::operator String( void ) const
+// ** KeyValue::operator String
+KeyValue::operator String( void ) const
 {
 	return *m_string;
 }
 
-// ** Bson::operator []
-const Bson& Bson::operator []( s32 index ) const
+// ** KeyValue::operator []
+const KeyValue& KeyValue::operator []( s32 index ) const
 {
 	DC_BREAK_IF( m_type != kArray );
 	return (*m_array)[index];
 }
 
-// ** Bson::operator []
-Bson& Bson::operator []( s32 index )
+// ** KeyValue::operator []
+KeyValue& KeyValue::operator []( s32 index )
 {
 	DC_BREAK_IF( m_type != kArray );
 	return (*m_array)[index];
 }
 
-// ** Bson::operator []
-const Bson& Bson::operator []( const String& key ) const
+// ** KeyValue::operator []
+const KeyValue& KeyValue::operator []( const String& key ) const
 {
 	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
-// ** Bson::operator []
-const Bson& Bson::operator []( CString key ) const
+// ** KeyValue::operator []
+const KeyValue& KeyValue::operator []( CString key ) const
 {
 	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
-// ** Bson::operator []
-Bson& Bson::operator []( const String& key )
+// ** KeyValue::operator []
+KeyValue& KeyValue::operator []( const String& key )
 {
 	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
-// ** Bson::operator []
-Bson& Bson::operator []( CString key )
+// ** KeyValue::operator []
+KeyValue& KeyValue::operator []( CString key )
 {
 	DC_BREAK_IF( m_type != kObject );
 	return (*m_object)[key];
 }
 
-// ** Bson::operator <<
-Bson& Bson::operator << ( CString value )
+// ** KeyValue::operator <<
+KeyValue& KeyValue::operator << ( CString value )
 {
 	if( m_type == kObject ) {
 		if( m_key.empty() ) {
@@ -270,82 +270,82 @@ Bson& Bson::operator << ( CString value )
 	return *this;
 }
 
-// ** Bson::operator <<
-Bson& Bson::operator << ( const String& value )
+// ** KeyValue::operator <<
+KeyValue& KeyValue::operator << ( const String& value )
 {
 	return this->operator << ( value.c_str() );
 }
 
-// ** Bson::isNull
-bool Bson::isNull( void ) const
+// ** KeyValue::isNull
+bool KeyValue::isNull( void ) const
 {
 	return m_type == kNull;
 }
 
-// ** Bson::type
-Bson::Type Bson::type( void ) const
+// ** KeyValue::type
+KeyValue::Type KeyValue::type( void ) const
 {
 	return m_type;
 }
 
-// ** Bson::properties
-const Bson::KeyValue& Bson::properties( void ) const
+// ** KeyValue::properties
+const KeyValue::Properties& KeyValue::properties( void ) const
 {
 	DC_BREAK_IF( m_type != kObject );
 	return *m_object;
 }
 
-// ** Bson::properties
-Bson::KeyValue& Bson::properties( void )
+// ** KeyValue::properties
+KeyValue::Properties& KeyValue::properties( void )
 {
 	DC_BREAK_IF( m_type != kObject );
 	return *m_object;
 }
 
-// ** Bson::items
-const Bson::ValueArray& Bson::items( void ) const
+// ** KeyValue::items
+const KeyValue::ValueArray& KeyValue::items( void ) const
 {
 	DC_BREAK_IF( m_type != kArray );
 	return *m_array;
 }
 
-// ** Bson::get
-const Bson& Bson::get( const String& key, const Bson& defaultValue ) const
+// ** KeyValue::get
+const KeyValue& KeyValue::get( const String& key, const KeyValue& defaultValue ) const
 {
 	if( m_type != kObject ) {
 		return defaultValue;
 	}
 
-	KeyValue::const_iterator i = m_object->find( key );
+	Properties::const_iterator i = m_object->find( key );
 	return i != m_object->end() ? i->second : defaultValue;
 }
 
-// ** Bson::asBool
-bool Bson::asBool( void ) const
+// ** KeyValue::asBool
+bool KeyValue::asBool( void ) const
 {
 	return m_boolean;
 }
 
-// ** Bson::asByte
-u8 Bson::asByte( void ) const
+// ** KeyValue::asByte
+u8 KeyValue::asByte( void ) const
 {
 	return m_int8;
 }
 
-// ** Bson::asShort
-u16 Bson::asShort( void ) const
+// ** KeyValue::asShort
+u16 KeyValue::asShort( void ) const
 {
 	return m_int16;
 }
 
-// ** Bson::asInt
-u32 Bson::asInt( void ) const
+// ** KeyValue::asInt
+u32 KeyValue::asInt( void ) const
 {
 	return m_int32;
 }
 
-// ** Bson::asFloat
-f32 Bson::asFloat( void ) const
+// ** KeyValue::asFloat
+f32 KeyValue::asFloat( void ) const
 {
 	switch( m_type ) {
 	case kInt8:		return static_cast<f32>( m_int8 );
@@ -358,8 +358,8 @@ f32 Bson::asFloat( void ) const
 	return 0.0f;
 }
 
-// ** Bson::asDouble
-f64 Bson::asDouble( void ) const
+// ** KeyValue::asDouble
+f64 KeyValue::asDouble( void ) const
 {
 	switch( m_type ) {
 	case kInt8:		return static_cast<f32>( m_int8 );
@@ -372,26 +372,26 @@ f64 Bson::asDouble( void ) const
 	return 0.0f;;
 }
 
-// ** Bson::asLong
-u64 Bson::asLong( void ) const
+// ** KeyValue::asLong
+u64 KeyValue::asLong( void ) const
 {
 	return m_int64;
 }
 
-// ** Bson::asGuid
-const Guid& Bson::asGuid( void ) const
+// ** KeyValue::asGuid
+const Guid& KeyValue::asGuid( void ) const
 {
 	return *m_guid;
 }
 
-// ** Bson::asString
-const String& Bson::asString( void ) const
+// ** KeyValue::asString
+const String& KeyValue::asString( void ) const
 {
 	return *m_string;
 }
 
-// ** Bson::setBson
-void Bson::setBson( const Bson& value )
+// ** KeyValue::setKeyValue
+void KeyValue::setKeyValue( const KeyValue& value )
 {
 	m_type = value.m_type;
 
@@ -415,14 +415,14 @@ void Bson::setBson( const Bson& value )
 					break;
 	case kArray:	m_array  = DC_NEW ValueArray( *value.m_array );
 					break;
-	case kObject:	m_object = DC_NEW KeyValue( *value.m_object );
+	case kObject:	m_object = DC_NEW Properties( *value.m_object );
 					break;
 	default:		DC_BREAK;
 	}
 }
 
-// ** Bson::clear
-void Bson::clear( void )
+// ** KeyValue::clear
+void KeyValue::clear( void )
 {
 	switch( m_type ) {
 	case kNull:
@@ -448,12 +448,12 @@ void Bson::clear( void )
 	m_type = kNull;
 }
 
-// ** Bson::write
-s32 Bson::write( StreamPtr stream ) const
+// ** KeyValue::write
+s32 KeyValue::write( StreamPtr stream ) const
 {
 	DC_BREAK_IF( !stream.valid() );
 
-	// Bson layout type placeholder.
+	// KeyValue layout type placeholder.
 	u32 type  = 0;
 
 	// Save the starting position
@@ -468,8 +468,8 @@ s32 Bson::write( StreamPtr stream ) const
 	return stream->position() - start;
 }
 
-// ** Bson::writeValue
-void Bson::writeValue( StreamPtr stream ) const
+// ** KeyValue::writeValue
+void KeyValue::writeValue( StreamPtr stream ) const
 {
 	// Write value type.
 	u8 type = m_type;
@@ -489,7 +489,7 @@ void Bson::writeValue( StreamPtr stream ) const
 	case kGuid:		stream->write( m_guid->bytes(), Guid::Size );	break;
 
 	case kObject:	{
-						for( KeyValue::const_iterator i = m_object->begin(), end = m_object->end(); i != end; ++i ) {
+						for( Properties::const_iterator i = m_object->begin(), end = m_object->end(); i != end; ++i ) {
 							stream->writeString( i->first.c_str() );
 							i->second.writeValue( stream );
 						}
@@ -513,15 +513,15 @@ void Bson::writeValue( StreamPtr stream ) const
 	}
 }
 
-// ** Bson::read
-s32 Bson::read( StreamPtr stream )
+// ** KeyValue::read
+s32 KeyValue::read( StreamPtr stream )
 {
 	DC_BREAK_IF( !stream.valid() );
 
 	// Save the starting position
 	s32 start = stream->position();
 
-	// Bson layout type placeholder.
+	// KeyValue layout type placeholder.
 	u32 type = 0;
 
 	// Read the layout type.
@@ -533,8 +533,8 @@ s32 Bson::read( StreamPtr stream )
 	return stream->position() - start;
 }
 
-// ** Bson::readValue
-void Bson::readValue( StreamPtr stream )
+// ** KeyValue::readValue
+void KeyValue::readValue( StreamPtr stream )
 {
 	// Clean old data.
 	clear();
@@ -559,7 +559,7 @@ void Bson::readValue( StreamPtr stream )
 					break;
 
 	case kObject:	{
-						m_object = DC_NEW KeyValue;
+						m_object = DC_NEW Properties;
 
 						while( stream->hasDataLeft() ) {
 							String key;
@@ -571,7 +571,7 @@ void Bson::readValue( StreamPtr stream )
 								break;
 							}
 
-							(*m_object)[key] = Bson();
+							(*m_object)[key] = KeyValue();
 							(*m_object)[key].readValue( stream );
 						}
 					}
@@ -600,14 +600,14 @@ void Bson::readValue( StreamPtr stream )
 	}
 }
 
-// ** Bson::read
-void Bson::read( const Storage* storage )
+// ** KeyValue::read
+void KeyValue::read( const Storage* storage )
 {
 	read( storage->isBinaryStorage()->stream() );
 }
 
-// ** Bson::write
-void Bson::write( Storage* storage ) const
+// ** KeyValue::write
+void KeyValue::write( Storage* storage ) const
 {
 	write( storage->isBinaryStorage()->stream() );
 }

@@ -80,10 +80,10 @@ namespace Ecs {
 
 	#ifndef DC_BSON_DISABLED
 		//! Returns the component BSON.
-		virtual Io::Bson			bson( void ) const;
+		virtual Io::KeyValue			bson( void ) const;
 
 		//! Sets the component BSON.
-		virtual void				setBson( const Io::Bson& value );
+		virtual void				setBson( const Io::KeyValue& value );
 	#endif	/*	!DC_BSON_DISABLED	*/
 
 	protected:
@@ -122,14 +122,14 @@ namespace Ecs {
 
 #if !DC_BSON_DISABLED
 	// ** ComponentBase::bson
-	inline Io::Bson ComponentBase::bson( void ) const
+	inline Io::KeyValue ComponentBase::bson( void ) const
 	{
 		log::warn( "Component::bson : is not implemented for '%s'\n", typeName() );
-		return Io::Bson::kNull;
+		return Io::KeyValue::kNull;
 	}
 
 	// ** ComponentBase::setBson
-	inline void ComponentBase::setBson( const Io::Bson& value )
+	inline void ComponentBase::setBson( const Io::KeyValue& value )
 	{
 		log::warn( "Component::setBson : is not implemented for '%s'\n", typeName() );
 	}

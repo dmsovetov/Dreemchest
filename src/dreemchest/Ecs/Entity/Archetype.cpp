@@ -33,7 +33,7 @@ namespace Ecs {
 // ** ArchetypeBase::read
 void ArchetypeBase::read( const Io::Storage* storage )
 {
-	Io::Bson bson;
+	Io::KeyValue bson;
 	bson.read( storage );
 
 	construct();
@@ -47,9 +47,9 @@ void ArchetypeBase::write( Io::Storage* storage ) const
 }
 
 // ** ArchetypeBase::bson
-Io::Bson ArchetypeBase::bson( void ) const
+Io::KeyValue ArchetypeBase::bson( void ) const
 {
-	Io::Bson result = Io::Bson::object();
+	Io::KeyValue result = Io::KeyValue::object();
 
 	result["Type"] = typeName();
 	result["_id"]  = id();
@@ -58,7 +58,7 @@ Io::Bson ArchetypeBase::bson( void ) const
 
 	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString  key  = i->second->typeName();
-		Io::Bson data = i->second->bson();
+		Io::KeyValue data = i->second->bson();
 
 		if( data.isNull() ) {
 			continue;
@@ -71,7 +71,7 @@ Io::Bson ArchetypeBase::bson( void ) const
 }
 
 // ** ArchetypeBase::setBson
-void ArchetypeBase::setBson( const Io::Bson& value )
+void ArchetypeBase::setBson( const Io::KeyValue& value )
 {
 	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
 
@@ -84,9 +84,9 @@ void ArchetypeBase::setBson( const Io::Bson& value )
 	}
 	
 	// Create components from BSON
-	const Io::Bson::KeyValue& kv = value.properties();
+	const Io::KeyValue::Properties& kv = value.properties();
 
-	for( Io::Bson::KeyValue::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+	for( Io::KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
 		if( i->first == "Type" || i->first == "_id" ) {
 			continue;
 		}

@@ -50,10 +50,10 @@ namespace Ecs {
 		virtual void		write( Io::Storage* storage ) const;
 
 		//! Returns the archetype BSON.
-		Io::Bson			bson( void ) const;
+		Io::KeyValue			bson( void ) const;
 
 		//! Sets the archetype BSON.
-		void				setBson( const Io::Bson& value );
+		void				setBson( const Io::KeyValue& value );
 	#endif	/*	!DC_BSON_DISABLED	*/
 	};
 

@@ -29,7 +29,7 @@
 
 #include "../Dreemchest.h"
 
-#include "../Io/Bson.h"
+#include "../Io/KeyValue.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,28 +41,28 @@ namespace mvvm {
 	template<typename TValue>
 	struct BsonConverter {
 		//! Converts to BSON from a value.
-		static Io::Bson	to( const TValue& value ) { return Io::Bson( value ); }
+		static Io::KeyValue	to( const TValue& value ) { return Io::KeyValue( value ); }
 
 		//! Converts from a value to a BSON.
-		static TValue	from( const Io::Bson& value ) { return static_cast<TValue>( value ); }
+		static TValue		from( const Io::KeyValue& value ) { return static_cast<TValue>( value ); }
 	};
 
 	//! Converts between the GUID and BSON.
 	struct GuidBsonConverter {
 		//! Converts to BSON from a value.
-		static Io::Bson	to( const ::Guid& value ) { return Io::Bson( value.toString() ); }
+		static Io::KeyValue	to( const ::Guid& value ) { return Io::KeyValue( value.toString() ); }
 
 		//! Converts from a value to a BSON.
-		static ::Guid	from( const Io::Bson& value ) { return value.asString(); }	
+		static ::Guid		from( const Io::KeyValue& value ) { return value.asString(); }	
 	};
 
 	//! Converts between the Vec2 and BSON.
 	struct Vec2BsonConverter {
 		//! Converts to BSON from a value.
-		static Io::Bson	to( const Vec2& value );
+		static Io::KeyValue	to( const Vec2& value );
 
 		//! Converts from a value to a BSON.
-		static Vec2		from( const Io::Bson& value );			
+		static Vec2			from( const Io::KeyValue& value );			
 	};
 
 	//! Primitive value type forward declaration.
