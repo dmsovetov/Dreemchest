@@ -754,7 +754,7 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
 									KeyValue kv( kArray );
 
 									for( s32 i = 0, n = json.size(); i < n; i++ ) {
-										kv[i] = fromJson( json[i] );
+										kv << fromJson( json[i] );
 									}
 
 									return kv;
