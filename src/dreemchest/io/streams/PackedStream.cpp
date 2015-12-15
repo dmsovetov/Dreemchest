@@ -57,19 +57,19 @@ void PackedStream::reopen( void )
 }
 
 // ** PackedStream::read
-s32 PackedStream::read( void* buffer, s32 size )
+s32 PackedStream::read( void* buffer, s32 size ) const
 {
-    DC_BREAK_IF( m_file == NULL );
+    DC_BREAK_IF( !m_file.valid() );
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
 
-    return readFile( ( u8* )buffer, size );
+    return const_cast<PackedStream*>( this )->readFile( ( u8* )buffer, size );
 }
 
 // ** PackedStream::setPosition
 void PackedStream::setPosition( s32 offset, SeekOrigin origin )
 {
-	DC_BREAK_IF( m_file == NULL );
+	DC_BREAK_IF( !m_file.valid() );
 
 	u64 currentPos = position();
 	u64 targetPos	= 0;

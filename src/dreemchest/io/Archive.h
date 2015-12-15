@@ -79,13 +79,13 @@ namespace Io {
         virtual                 ~Archive( void );
 
         //! Opens a file for reading from this archive.
-		virtual StreamPtr       openFile( const Path& fileName ) const;
+		virtual StreamPtr       openFile( const Path& fileName ) const DC_DECL_OVERRIDE;
 
         //! Opens a file from this archive, only reading is supported.
-		virtual StreamPtr       openFile( const Path& fileName, StreamMode mode ) const;
+		virtual StreamPtr       openFile( const Path& fileName, StreamMode mode ) const DC_DECL_OVERRIDE;
 
         //! Returns true if the file with a given name exists inside an archive.
-		virtual bool            fileExists( const Path& fileName ) const;
+		virtual bool            fileExists( const Path& fileName ) const DC_DECL_OVERRIDE;
 
         // ** Archive
         void                    release( void );

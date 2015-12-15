@@ -46,16 +46,16 @@ namespace Io {
 		virtual					~PackedStream( void );
 
 		//! Returns a decompressed file length.
-        virtual s32             length( void ) const;
+        virtual s32             length( void ) const DC_DECL_OVERRIDE;
 
         //! Returns a current file position.
-        virtual s32             position( void ) const;
+        virtual s32             position( void ) const DC_DECL_OVERRIDE;
 
         //! Sets a position inside the file.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet );
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
 
         //! Reads data from file.
-        virtual s32             read( void *buffer, s32 size );
+        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
 
         // ** PackedStream
         void                    reopen( void );

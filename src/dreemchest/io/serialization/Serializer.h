@@ -130,16 +130,16 @@ namespace Io {
 									: TypeSerializer<T>( key, value ) {}
 
 		//! Writes object to a binary storage.
-		virtual void			write( BinaryStorage* ar );
+		virtual void			write( BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Reads object from a binary storage.
-		virtual void			read( const BinaryStorage* ar );
+		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Writes object to a key-value storage.
-		virtual void			write( KeyValueStorage* storage );
+		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads object from a key-value storage.
-		virtual void			read( const KeyValueStorage* storage );
+		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 	};
 
 	//! String serializer type.
@@ -151,16 +151,16 @@ namespace Io {
 									: TypeSerializer( key, value ) {}
 
 		//! Writes string to a binary storage.
-		virtual void			write( BinaryStorage* ar );
+		virtual void			write( BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Reads string from binary storage.
-		virtual void			read( const BinaryStorage* ar );
+		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Writes string to a key-value storage.
-		virtual void			write( KeyValueStorage* storage );
+		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads string from a key-value storage.
-		virtual void			read( const KeyValueStorage* storage );
+		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 	};
 
 	//! Collection serializer type.
@@ -172,16 +172,16 @@ namespace Io {
 									: TypeSerializer<TCollection>( key, value ) {}
 
 		//! Writes collection to a binary storage.
-		virtual void			write( BinaryStorage* ar );
+		virtual void			write( BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a binary storage.
-		virtual void			read( const BinaryStorage* ar );
+		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Writes collection to a key-value storage.
-		virtual void			write( KeyValueStorage* storage );
+		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a key-value storage.
-		virtual void			read( const KeyValueStorage* storage );
+		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 	};
 
 	//! Collection of serializable objects.
@@ -193,16 +193,16 @@ namespace Io {
 									: TypeSerializer<TCollection>( key, value ) {}
 
 		//! Writes collection to a binary storage.
-		virtual void			write( BinaryStorage* ar );
+		virtual void			write( BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a binary storage.
-		virtual void			read( const BinaryStorage* ar );
+		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
 		//! Writes collection to a key-value storage.
-		virtual void			write( KeyValueStorage* storage );
+		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a key-value storage.
-		virtual void			read( const KeyValueStorage* storage );
+		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 	};
 
 	//! Value serialization type.

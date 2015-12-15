@@ -169,25 +169,25 @@ namespace Io {
 		virtual						~JsonStorage( void );
 
 		//! Writes a value to a specified key of a storage.
-		virtual void				write( const Key& key, const Variant& value );
+		virtual void				write( const Key& key, const Variant& value ) DC_DECL_OVERRIDE;
 
 		//! Reads a value at a specified key from a storage.
-		virtual Variant				read( const Key& key ) const;
+		virtual Variant				read( const Key& key ) const DC_DECL_OVERRIDE;
 
 		//! Writes a new object to a specified key of a storage.
-		virtual KeyValueStoragePtr	object( const Key& key );
+		virtual KeyValueStoragePtr	object( const Key& key ) DC_DECL_OVERRIDE;
 
 		//! Reads an object from a specified key of a storage.
-		virtual KeyValueStoragePtr	object( const Key& key ) const;
+		virtual KeyValueStoragePtr	object( const Key& key ) const DC_DECL_OVERRIDE;
 
 		//! Writes a new array to a specified key of a storage.
-		virtual KeyValueStoragePtr	array( const Key& key );
+		virtual KeyValueStoragePtr	array( const Key& key ) DC_DECL_OVERRIDE;
 
 		//! Reads an array from a specified key of a storage.
-		virtual KeyValueStoragePtr	array( const Key& key ) const;
+		virtual KeyValueStoragePtr	array( const Key& key ) const DC_DECL_OVERRIDE;
 
 		//! Returns a total number of entries that exist inside this key-value storage.
-		virtual u32					size( void ) const;
+		virtual u32					size( void ) const DC_DECL_OVERRIDE;
 
 		//! Converts a storage to JSON string.
 		String						toString( void ) const;

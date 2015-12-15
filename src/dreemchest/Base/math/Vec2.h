@@ -38,6 +38,7 @@ DC_BEGIN_DREEMCHEST
                 Vec2( void );
 				Vec2( float value );
                 Vec2( float x, float y );
+				Vec2( int x, int y );
                 Vec2( const float* v );
 				Vec2( const double* v );
 
@@ -89,6 +90,12 @@ DC_BEGIN_DREEMCHEST
 
     // ** Vec2::Vec2
     inline Vec2::Vec2( float x, float y ) : x( x ), y( y )
+    {
+
+    }
+
+    // ** Vec2::Vec2
+    inline Vec2::Vec2( int x, int y ) : x( ( float )x ), y( ( float )y )
     {
 
     }

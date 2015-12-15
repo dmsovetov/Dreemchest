@@ -44,13 +44,13 @@ namespace Io {
 		virtual					~DiskFileSystem( void );
 
 		//! Opens a file at path for reading.
-		virtual StreamPtr       openFile( const Path& path ) const;
+		virtual StreamPtr       openFile( const Path& path ) const DC_DECL_OVERRIDE;
 
         //! Opens a file at path.
-		virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const;
+		virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const DC_DECL_OVERRIDE;
 
         //! Checks if file exists at path.
-		virtual bool			fileExists( const Path& path ) const;
+		virtual bool			fileExists( const Path& path ) const DC_DECL_OVERRIDE;
 
 		//! Sets a base directory.
         /*!
