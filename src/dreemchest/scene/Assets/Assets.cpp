@@ -314,6 +314,25 @@ AssetPtr AssetBundle::addAsset( Asset::Type type, const String& uuid, const Stri
 	return asset;
 }
 
+// ** AssetBundle::removeAsset
+void AssetBundle::removeAsset( const String& uuid )
+{
+	Assets::iterator i = m_assets.find( StringHash( uuid.c_str() ) );
+
+	if( i == m_assets.end() ) {
+		log::warn( "AssetBundle::removeAsset : '%s' is not a valid asset id\n", uuid.c_str() );
+		return;
+	}
+
+	Assets::iterator j = m_assets.find( StringHash( i->second->name().c_str() ) );
+
+	if( j != m_assets.end() ) {
+		m_assets.erase( j );
+	}
+
+	m_assets.erase( i );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

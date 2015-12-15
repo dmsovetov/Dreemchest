@@ -178,6 +178,9 @@ namespace Scene {
 		//! Creates the new Mesh asset inside this bundle.
 		MeshPtr					addMesh( const String& uuid, const String& name );
 
+		//! Removes an Asset from bundle by UUID.
+		void					removeAsset( const String& uuid );
+
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	create( const String& name );
 
