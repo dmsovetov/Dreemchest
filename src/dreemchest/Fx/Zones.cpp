@@ -122,6 +122,28 @@ Zone::Point HemiSphereZone::generateRandomPoint( f32 scalar, const Vec3& center 
 	return Point( center, direction );
 }
 
+// ------------------------------------------------- SphereZone ------------------------------------------------- //
+
+// ** SphereZone::SphereZone
+SphereZone::SphereZone( f32 radius )
+{
+	m_radius.setConstant( radius );
+}
+
+// ** SphereZone::type
+ZoneType SphereZone::type( void ) const
+{
+	return ZoneSphere;
+}
+
+// ** SphereZone::generateRandomPoint
+Zone::Point SphereZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
+{
+	Vec3 direction = Vec3::randomDirection();
+	f32  radius	   = SampleParameter( 0, &m_radius, 0.0f );
+	return Point( center + direction * radius, direction );
+}
+
 // ------------------------------------------------- LineZone ------------------------------------------------- //
 
 // ** LineZone::LineZone

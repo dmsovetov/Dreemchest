@@ -108,7 +108,25 @@ namespace Fx {
         //! Returns the zone type.
         virtual ZoneType	type( void ) const;
 
-		//! Generates the random point on line segment.
+		//! Generates the random point inside the hemisphere.
+        virtual Point       generateRandomPoint( f32 scalar, const Vec3& center ) const;
+
+	private:
+
+		 FloatParameter		m_radius;	//!< Hemisphere raius.
+	};
+
+	//! Sphere zone generates point inside the sphere or on it's shell.
+	class SphereZone : public Zone {
+	public:
+
+							//! Constructs the SphereZone instance.
+							SphereZone( f32 radius = 0.0f );
+
+        //! Returns the zone type.
+        virtual ZoneType	type( void ) const;
+
+		//! Generates the random point inside the sphere.
         virtual Point       generateRandomPoint( f32 scalar, const Vec3& center ) const;
 
 	private:
