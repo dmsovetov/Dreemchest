@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** FileStream::s_openFileCount
 u32 FileStream::s_openFileCount = 0;
@@ -160,6 +160,6 @@ s32 FileStream::length( void ) const
 	return m_length;
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

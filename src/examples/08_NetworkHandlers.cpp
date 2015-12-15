@@ -43,7 +43,7 @@ thread::ThreadPtr serverThread;
 // Application delegate is used to handle an events raised by application instance.
 class NetworkHandlers : public ApplicationDelegate {
 
-	struct LolEvent : public io::Serializable {
+	struct LolEvent : public Io::Serializable {
 		ClassEnableTypeId( LolEvent )
 		ClassEnableCloning( LolEvent )
 
@@ -58,7 +58,7 @@ class NetworkHandlers : public ApplicationDelegate {
 		LolEvent( int x = 0, std::string bar = "" ) : x( x ), bar( bar ) {}
 	};
 
-	struct ExtraEvent : public io::Serializable {
+	struct ExtraEvent : public Io::Serializable {
 		ClassEnableTypeId( ExtraEvent )
 		ClassEnableCloning( ExtraEvent )
 	};

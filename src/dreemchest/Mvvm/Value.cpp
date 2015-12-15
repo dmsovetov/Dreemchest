@@ -183,9 +183,9 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 }
 
 // ** ObjectValue::bson
-io::Bson ObjectValue::bson( void ) const
+Io::Bson ObjectValue::bson( void ) const
 {
-	io::Bson result = io::Bson::object();
+	Io::Bson result = Io::Bson::object();
 
 	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
 		const String& key = i->first;
@@ -194,7 +194,7 @@ io::Bson ObjectValue::bson( void ) const
 			continue;
 		}
 
-		io::Bson value = i->second->bson();
+		Io::Bson value = i->second->bson();
 
 		if( value.isNull() ) {
 			continue;
@@ -207,11 +207,11 @@ io::Bson ObjectValue::bson( void ) const
 }
 
 // ** ObjectValue::setBson
-void ObjectValue::setBson( const io::Bson& value )
+void ObjectValue::setBson( const Io::Bson& value )
 {
-	const io::Bson::KeyValue& kv = value.properties();
+	const Io::Bson::KeyValue& kv = value.properties();
 
-	for( io::Bson::KeyValue::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
+	for( Io::Bson::KeyValue::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
 		ValueWPtr value = get( i->first );
 
 		if( value.valid() ) {
@@ -241,13 +241,13 @@ ValueTypeIdx CommandValue::type( void ) const
 }
 
 //! Returns the BSON object that represents this value.
-io::Bson CommandValue::bson( void ) const
+Io::Bson CommandValue::bson( void ) const
 {
-	return io::Bson::kNull;
+	return Io::Bson::kNull;
 }
 
 //! Sets the BSON object that represents this value.
-void CommandValue::setBson( const io::Bson& value )
+void CommandValue::setBson( const Io::Bson& value )
 {
 
 }

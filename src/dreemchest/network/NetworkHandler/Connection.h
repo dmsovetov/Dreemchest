@@ -179,7 +179,7 @@ namespace net {
 	void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
+		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
 		send<packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
@@ -190,7 +190,7 @@ namespace net {
 	void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::BinarySerializer::write( argument );
+		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;
@@ -207,7 +207,7 @@ namespace net {
 	void Connection::emit( const TEvent& e )
 	{
 		// ** Serialize event to a byte buffer.
-		io::ByteBufferPtr buffer = io::BinarySerializer::write( e );
+		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
 
 		// ** Send the packet
 		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
@@ -228,7 +228,7 @@ namespace net {
 	inline bool Response<T>::operator()( const T& value, const Error& error )
 	{
 		// ** Serialize argument to a byte buffer.
-		io::ByteBufferPtr buffer = io::BinarySerializer::write( value );
+		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
 
 		// ** Send an RPC response packet.
 		m_connection->send<packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );

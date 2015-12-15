@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#include	"Path.h"
+#include "Path.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** Path::Path
 Path::Path( void )
@@ -200,6 +200,6 @@ StringList Path::split( CString str )
     return result;
 }
 
-} // namespace io
+} // namespace Io
     
 DC_END_DREEMCHEST

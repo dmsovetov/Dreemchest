@@ -161,7 +161,7 @@ namespace Scene {
 		AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All ) const;
 
 		//! Returns the full asset path by an identifier.
-		io::Path				assetPathByIdentifier( const String& name ) const;
+		Io::Path				assetPathByIdentifier( const String& name ) const;
 
 		//! Creates the new Image asset inside this bundle.
 		ImagePtr				addImage( const String& uuid, const String& name, u32 width, u32 height );
@@ -188,18 +188,18 @@ namespace Scene {
 		void					setUuidFileNames( bool value );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
-		static AssetBundlePtr	create( const String& name, const io::Path& path = io::Path() );
+		static AssetBundlePtr	create( const String& name, const Io::Path& path = Io::Path() );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
-		static AssetBundlePtr	createFromFile( const String& name, const io::Path& path, const String& fileName );
+		static AssetBundlePtr	createFromFile( const String& name, const Io::Path& path, const String& fileName );
 
 		//! Creates an AssetBundle instance and loads it from a JSON string.
-		static AssetBundlePtr	createFromJson( const String& name, const io::Path& path, const String& json );
+		static AssetBundlePtr	createFromJson( const String& name, const Io::Path& path, const String& json );
 
 	private:
 
 								//! Constructs AssetBundle instance.
-								AssetBundle( const String& name, const io::Path& path );
+								AssetBundle( const String& name, const Io::Path& path );
 
 		//! Loads assets from JSON string.
 		bool					loadFromJson( const String& json );
@@ -209,7 +209,7 @@ namespace Scene {
 		//! Container type to store available assets.
 		typedef Hash<AssetPtr>	Assets;
 
-		io::Path				m_path;				//!< Asset bundle physical path.
+		Io::Path				m_path;				//!< Asset bundle physical path.
 		String					m_name;				//!< Asset bundle name.
 		Assets					m_assets;			//!< Identifier to asset mapping.
 		bool					m_uuidFileNames;	//!< Are the UUID file names used.

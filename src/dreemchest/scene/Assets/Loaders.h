@@ -42,7 +42,7 @@ namespace Scene {
 	public:
 
 		//! Loads an asset data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const { return false; }
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const { return false; }
 	};
 
 	//! Loads an image from a raw pixel buffer format.
@@ -54,7 +54,7 @@ namespace Scene {
 								: m_image( image ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( ImagePtr image ) {
@@ -84,7 +84,7 @@ namespace Scene {
 								: m_mesh( mesh ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( MeshPtr mesh ) {
@@ -108,7 +108,7 @@ namespace Scene {
 								: m_material( material ) {}
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const;
+		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const;
 
 		//! Attaches this loader to an asset.
 		static void			attachTo( MaterialPtr material ) {

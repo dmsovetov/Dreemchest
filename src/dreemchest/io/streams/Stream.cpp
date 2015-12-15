@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include	"Stream.h"
-#include	"ByteBuffer.h"
+#include "Stream.h"
+#include "ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** Stream::Stream
 Stream::Stream( void )
@@ -122,6 +122,6 @@ s32 Stream::write( const void* buffer, s32 size )
     return 0;
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

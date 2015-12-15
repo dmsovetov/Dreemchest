@@ -99,10 +99,10 @@ bool Asset::load( const Renderer::HalPtr& hal )
 
 	m_state = Loading;
 
-	io::DiskFileSystem fileSystem;
-	io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() ) );
+	Io::DiskFileSystem fileSystem;
+	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() ) );
 
-	if( stream == io::StreamPtr() ) {
+	if( stream == Io::StreamPtr() ) {
 		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
 		m_state = LoadingError;
 		return false;
@@ -130,18 +130,18 @@ void Asset::unload( void )
 // ---------------------------------------- AssetBundle ------------------------------------------- //
 
 // ** AssetBundle::AssetBundle
-AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( path ), m_name( name ), m_uuidFileNames( true )
+AssetBundle::AssetBundle( const String& name, const Io::Path& path ) : m_path( path ), m_name( name ), m_uuidFileNames( true )
 {
 }
 
 // ** AssetBundle::create
-AssetBundlePtr AssetBundle::create( const String& name, const io::Path& path )
+AssetBundlePtr AssetBundle::create( const String& name, const Io::Path& path )
 {
 	return AssetBundlePtr( DC_NEW AssetBundle( name, path ) );
 }
 
 // ** AssetBundle::createFromJson
-AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& json )
+AssetBundlePtr AssetBundle::createFromJson( const String& name, const Io::Path& path, const String& json )
 {
 	DC_BREAK_IF( json.empty() );
 
@@ -157,10 +157,10 @@ AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& 
 }
 
 // ** AssetBundle::createFromFile
-AssetBundlePtr AssetBundle::createFromFile( const String& name, const io::Path& path, const String& fileName )
+AssetBundlePtr AssetBundle::createFromFile( const String& name, const Io::Path& path, const String& fileName )
 {
 	// Read the JSON file
-	String json = io::DiskFileSystem::readTextFile( fileName );
+	String json = Io::DiskFileSystem::readTextFile( fileName );
 
 	if( json == "" ) {
 		log::warn( "AssetBundle::createFromFile : %s, file not found or empty JSON\n", fileName.c_str() );
@@ -190,7 +190,7 @@ void AssetBundle::setUuidFileNames( bool value )
 }
 
 // ** AssetBundle::assetPathByIdentifier
-io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
+Io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
 {
 	AssetPtr asset = findAsset( name );
 

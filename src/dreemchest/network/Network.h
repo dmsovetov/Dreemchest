@@ -63,8 +63,8 @@ namespace net {
 
 	dcDeclarePtrs( ClientHandler )
 
-	//! Alias io::Serializable as NetworkPacket
-	typedef io::Serializable NetworkPacket;
+	//! Alias Io::Serializable as NetworkPacket
+	typedef Io::Serializable NetworkPacket;
 
 	//! TCP socket strong ptr.
 	typedef StrongPtr<TCPSocket> TCPSocketPtr;
@@ -238,26 +238,26 @@ namespace net {
 
 	//! Base class for all remote call argument types.
 	template<typename T>
-	struct RemoteCallArgument : public io::SerializableT<T> {
+	struct RemoteCallArgument : public Io::SerializableT<T> {
 	};
 
 	//! Base call for all remote call response types.
 	template<typename T>
-	struct RemoteCallResponse : public io::SerializableT<T> {
+	struct RemoteCallResponse : public Io::SerializableT<T> {
 	};
 
 	//! Base class for all replicated event types.
 	template<typename T>
-	struct ReplicatedEvent : public io::SerializableT<T> {
+	struct ReplicatedEvent : public Io::SerializableT<T> {
 	};
 
 	//! Base class for all network packets.
 	template<typename T>
-	struct Packet : public io::SerializableT<T> {
+	struct Packet : public Io::SerializableT<T> {
 	};
 
 	//! Remote call error response.
-	struct Error : public io::SerializableT<Error> {
+	struct Error : public Io::SerializableT<Error> {
 		//! Error codes
 		enum {
 			NoError			 = 0		//!< No error recorded.

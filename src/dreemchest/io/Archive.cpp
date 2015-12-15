@@ -24,23 +24,23 @@
 
  **************************************************************************/
 
-#include	"Archive.h"
+#include "Archive.h"
 
-#include    "streams/FileStream.h"
-#include    "streams/PackedStream.h"
-#include    "DiskFileSystem.h"
+#include "streams/FileStream.h"
+#include "streams/PackedStream.h"
+#include "DiskFileSystem.h"
 
 #ifdef HAVE_ZLIB
 	#include "processors/ZLibBufferCompressor.h"
 #endif
 
 #ifdef HAVE_FASTLZ
-	#include    "processors/FastLZBufferCompressor.h"
+	#include "processors/FastLZBufferCompressor.h"
 #endif
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** Archive::Archive
 Archive::Archive( const DiskFileSystem *diskFileSystem ) : m_diskFileSystem( diskFileSystem ), m_file( NULL )
@@ -320,6 +320,6 @@ void Archive::writeFileInfo( const sFileInfo *file )
     m_file->write( &file->m_offset, sizeof( file->m_offset ) );
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

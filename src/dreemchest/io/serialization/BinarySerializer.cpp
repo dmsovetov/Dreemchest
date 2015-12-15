@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** SerializableTypes::s_typeById
 SerializableTypes::TypeById SerializableTypes::s_typeById;
@@ -149,6 +149,6 @@ ByteBufferPtr BinarySerializer::write( const Serializable& data )
 	return stream;
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

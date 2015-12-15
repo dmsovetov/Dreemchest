@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_Serializable_H__
-#define		__DC_Io_Serializable_H__
+#ifndef __DC_Io_Serializable_H__
+#define __DC_Io_Serializable_H__
 
-#include	"Serializer.h"
+#include "Serializer.h"
 
-#define IoRegisterType( Type ) io::SerializableTypes::registerType<Type>();
+#define IoRegisterType( Type ) Io::SerializableTypes::registerType<Type>();
 
 #define IoOverrideSerializable( Type )                              \
     virtual Serializable* clone( void ) const { return new Type; }  \
@@ -40,15 +40,15 @@
     ClassEnableTypeInfoSuper( Type, Super )
 
 #define IoBeginSerializer							        \
-	virtual io::SerializerList serializers( void ) const {  \
-		io::SerializerList result;
+	virtual Io::SerializerList serializers( void ) const {  \
+		Io::SerializerList result;
 
 #define IoBeginSerializerSuper( Base )				        \
-	virtual io::SerializerList serializers( void ) const {  \
-	io::SerializerList result = Base::serializers();
+	virtual Io::SerializerList serializers( void ) const {  \
+	Io::SerializerList result = Base::serializers();
 
 #define IoField( name )	\
-    result.push_back( io::Serializer::create( #name, this->name ) );
+    result.push_back( Io::Serializer::create( #name, this->name ) );
 
 #define IoEndSerializer	\
 		return result;	\
@@ -56,7 +56,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     //! Base interface class for all serializable data structs.
     class ISerializable : public RefCounted {
@@ -191,7 +191,7 @@ namespace io {
 		}
 	}
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

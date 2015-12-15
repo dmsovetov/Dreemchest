@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef __Io_Serializer_H__
-#define __Io_Serializer_H__
+#ifndef __DC_Io_Serializer_H__
+#define __DC_Io_Serializer_H__
 
 #include "Storage.h"
 #include "BinarySerializer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
     
     template<typename T>
     class SerializableT;
@@ -489,8 +489,8 @@ namespace io {
 		//}
 	}
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__Io_Serializer_H__	*/
+#endif	/*	!__DC_Io_Serializer_H__	*/

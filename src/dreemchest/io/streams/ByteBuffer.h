@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_ByteBuffer_H__
-#define		__DC_Io_ByteBuffer_H__
+#ifndef __DC_Io_ByteBuffer_H__
+#define __DC_Io_ByteBuffer_H__
 
-#include	"Stream.h"
+#include "Stream.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! ByteBuffer class represents a stream located in RAM.
 	class dcInterface ByteBuffer : public Stream {
@@ -105,7 +105,7 @@ namespace io {
         Array<u8>               m_buffer;
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

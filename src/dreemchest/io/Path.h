@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_IOPath_H__
-#define		__DC_Io_IOPath_H__
+#ifndef __DC_Io_IOPath_H__
+#define __DC_Io_IOPath_H__
 
-#include	"Io.h"
+#include "Io.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     //! A helper class to work with file paths.
     class Path {
@@ -101,7 +101,7 @@ namespace io {
         StringList          m_items;
     };
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

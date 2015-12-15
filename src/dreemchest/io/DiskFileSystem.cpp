@@ -24,13 +24,13 @@
 
  **************************************************************************/
 
-#include	"DiskFileSystem.h"
-#include	"streams/FileStream.h"
-#include    "Archive.h"
+#include "DiskFileSystem.h"
+#include "streams/FileStream.h"
+#include "Archive.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** DiskFileSystem::DiskFileSystem
 DiskFileSystem::DiskFileSystem( void )
@@ -241,6 +241,6 @@ ArchivePtr DiskFileSystem::findPackage( const Path& fileName )
 //	return m_baseDir;
 //}
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

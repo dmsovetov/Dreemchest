@@ -24,14 +24,14 @@
  
 **************************************************************************/
 
-#ifndef __DC_Io_Io_H__
-#define __DC_Io_Io_H__
+#ifndef __DC_Io_H__
+#define __DC_Io_H__
 
 #include "../Dreemchest.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     DECLARE_LOG( log )
 
@@ -94,7 +94,7 @@ namespace io {
 	//! Key-value storage strong ptr.
 	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 
@@ -111,4 +111,4 @@ DC_END_DREEMCHEST
 	#include "Bson.h"
 #endif
 
-#endif /*   !defined( __DC_Io_Io_H__ )   */
+#endif /*   !defined( __DC_Io_H__ )   */

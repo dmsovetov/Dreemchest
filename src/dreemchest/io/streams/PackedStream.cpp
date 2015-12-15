@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include	"PackedStream.h"
-#include    "../Archive.h"
+#include "PackedStream.h"
+#include "../Archive.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** PackedStream::PackedStream
 PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor, s32 fileSize, s32 fileOffset )
@@ -168,6 +168,6 @@ void PackedStream::decompressChunk( void )
     DC_BREAK_IF( m_bytesAvailable > CHUNK_SIZE * 2 );
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

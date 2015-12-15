@@ -132,10 +132,10 @@ TCPSocketPtr& Connection::socket( void )
 // ** Connection::send
 void Connection::send( NetworkPacket* packet )
 {
-	io::ByteBufferPtr buffer = io::ByteBuffer::create();
+	Io::ByteBufferPtr buffer = Io::ByteBuffer::create();
 
 	// ** Write packet to binary stream
-	u32 bytesWritten = io::BinarySerializer::write( buffer, packet );
+	u32 bytesWritten = Io::BinarySerializer::write( buffer, packet );
 
 	// ** Send binary data to socket
 	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );

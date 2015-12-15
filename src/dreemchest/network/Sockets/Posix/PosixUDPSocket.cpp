@@ -36,7 +36,7 @@ namespace net {
 PosixUDPSocket::PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast ) : m_delegate( delegate )
 {
     m_socket = socket( AF_INET, SOCK_DGRAM, 0 );
-    m_buffer = io::ByteBuffer::create( 4096 );
+    m_buffer = Io::ByteBuffer::create( 4096 );
 
 	if( m_delegate == NULL ) {
 		m_delegate = UDPSocketDelegatePtr( DC_NEW UDPSocketDelegate );

@@ -55,7 +55,7 @@ namespace net {
 		UDPSocketDelegatePtr	m_delegate;
 
 		//! Socket receive buffer.
-		io::ByteBufferPtr		m_buffer;
+		Io::ByteBufferPtr		m_buffer;
     };
     
 } // namespace net

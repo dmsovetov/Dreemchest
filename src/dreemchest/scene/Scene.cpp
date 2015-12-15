@@ -195,7 +195,7 @@ ScenePtr Scene::create( void )
 ScenePtr Scene::createFromFile( const AssetBundlePtr& assets, const String& fileName )
 {
 	// Read the JSON file
-	String json = io::DiskFileSystem::readTextFile( fileName );
+	String json = Io::DiskFileSystem::readTextFile( fileName );
 
 	// Load the scene
 	return createFromJson( assets, json );

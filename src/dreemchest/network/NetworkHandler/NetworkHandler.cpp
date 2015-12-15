@@ -109,7 +109,7 @@ void NetworkHandler::listenForBroadcasts( u16 port )
 // ** NetworkHandler::processReceivedData
 void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
-	using namespace io;
+	using namespace Io;
 
 	log::verbose( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 

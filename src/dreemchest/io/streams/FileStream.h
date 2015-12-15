@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_HDDFile_H__
-#define		__DC_Io_HDDFile_H__
+#ifndef __DC_Io_HDDFile_H__
+#define __DC_Io_HDDFile_H__
 
-#include	"Stream.h"
-#include    "../Path.h"
+#include "Stream.h"
+#include "../Path.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
         
 	//! A FileStream class is used for work with physical files.
 	class FileStream : public Stream {
@@ -91,7 +91,7 @@ namespace io {
         static u32              s_openFileCount;
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

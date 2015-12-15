@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_FileSystem_H__
-#define		__DC_Io_FileSystem_H__
+#ifndef __DC_Io_FileSystem_H__
+#define __DC_Io_FileSystem_H__
 
-#include	"Io.h"
+#include "Io.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! FileSystem class is a base for all other file systems, like disk file system or archive.
     class dcInterface FileSystem : public RefCounted {
@@ -75,7 +75,7 @@ namespace io {
                                 FileSystem( void );
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

@@ -44,16 +44,16 @@ namespace Ecs {
 
 	#ifndef DC_BSON_DISABLED
 		//! Reads archetype from a storage.
-		virtual void		read( const io::Storage* storage );
+		virtual void		read( const Io::Storage* storage );
 
 		//! Writes archetype to a storage.
-		virtual void		write( io::Storage* storage ) const;
+		virtual void		write( Io::Storage* storage ) const;
 
 		//! Returns the archetype BSON.
-		io::Bson			bson( void ) const;
+		Io::Bson			bson( void ) const;
 
 		//! Sets the archetype BSON.
-		void				setBson( const io::Bson& value );
+		void				setBson( const Io::Bson& value );
 	#endif	/*	!DC_BSON_DISABLED	*/
 	};
 

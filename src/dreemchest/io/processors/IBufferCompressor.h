@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_IBufferCompressor_H__
-#define		__DC_Io_IBufferCompressor_H__
+#ifndef __DC_Io_IBufferCompressor_H__
+#define __DC_Io_IBufferCompressor_H__
 
-#include	"../Io.h"
+#include "../Io.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	// ** class IBufferCompressor
 	class IBufferCompressor {
@@ -43,7 +43,7 @@ namespace io {
         virtual s32     decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )  = 0;
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

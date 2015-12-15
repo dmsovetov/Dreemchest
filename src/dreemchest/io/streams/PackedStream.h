@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_PackedStream_H__
-#define		__DC_Io_PackedStream_H__
+#ifndef __DC_Io_PackedStream_H__
+#define __DC_Io_PackedStream_H__
 
-#include	"Stream.h"
+#include "Stream.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
         
     class IBufferCompressor;
 
@@ -77,7 +77,7 @@ namespace io {
         u8*						m_buffer;
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

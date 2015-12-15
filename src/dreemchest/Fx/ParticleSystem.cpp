@@ -86,7 +86,7 @@ ParticleSystemInstancePtr ParticleSystem::createInstance( IMaterialFactoryWPtr m
 ParticleSystemPtr ParticleSystem::createFromFile( const String& fileName, f32 scalingFactor )
 {
 	// Read the JSON file
-	String json = io::DiskFileSystem::readTextFile( fileName );
+	String json = Io::DiskFileSystem::readTextFile( fileName );
 
 	// Load particle system
 	return createFromJson( json, scalingFactor );

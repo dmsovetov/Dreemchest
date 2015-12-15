@@ -171,7 +171,7 @@ namespace Scene {
 
 		//! Creates an archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const io::Bson& data = io::Bson::kNull );
+		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const Io::Bson& data = Io::Bson::kNull );
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
@@ -249,7 +249,7 @@ namespace Scene {
 
 	// ** Scene::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const io::Bson& data )
+	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const Io::Bson& data )
 	{
 		return m_ecs->createArchetype<TArchetype>( id, data );
 	}
@@ -257,7 +257,7 @@ namespace Scene {
 #ifdef HAVE_JSON
 
 	//! Loads the scene from JSON file.
-	class JsonSceneLoader : public io::JsonLoaderBase {
+	class JsonSceneLoader : public Io::JsonLoaderBase {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.

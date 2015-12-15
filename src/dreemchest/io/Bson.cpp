@@ -30,7 +30,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** Bson::kEmptyArray
 const Bson Bson::kEmptyArray( Bson::kArray );
@@ -612,6 +612,6 @@ void Bson::write( Storage* storage ) const
 	write( storage->isBinaryStorage()->stream() );
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

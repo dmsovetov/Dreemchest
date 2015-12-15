@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** ByteBuffer::ByteBuffer
 ByteBuffer::ByteBuffer( const u8* pointer, s32 size ) : m_position( 0 )
@@ -177,6 +177,6 @@ void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
 	}
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

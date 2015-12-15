@@ -34,7 +34,7 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 
 // Open a io namespace.
-using namespace io;
+using namespace Io;
 
 struct A {
 	float b;
@@ -77,7 +77,7 @@ class Files : public ApplicationDelegate {
     virtual void handleLaunched( Application* application ) {
         // Setup defaul loggers
         Platform::log::setStandardHandler();
-        io::log::setStandardHandler();
+        Io::log::setStandardHandler();
 
 		Data d1, d2, d3;
 		d1.m_boolean = true;

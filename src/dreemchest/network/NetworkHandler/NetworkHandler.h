@@ -179,7 +179,7 @@ namespace net {
 	template<typename T>
 	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
-		io::SerializableTypes::registerType<T>();
+		Io::SerializableTypes::registerType<T>();
 		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
 
@@ -221,7 +221,7 @@ namespace net {
 		}
 
 		// ** Serialize event to a byte buffer.
-		io::ByteBufferPtr buffer = io::BinarySerializer::write( e );
+		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
 
 		for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
             const_cast<ConnectionPtr&>( *i )->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );

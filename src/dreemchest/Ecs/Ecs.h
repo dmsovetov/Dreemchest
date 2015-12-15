@@ -88,22 +88,22 @@ namespace Ecs {
 	public:
 
 		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull ) const;
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Io::Bson& data = Io::Bson::kNull ) const;
 
 		//! Creates the component instance by name.
-		ComponentPtr	createComponentByName( const String& name, const io::Bson& data = io::Bson::kNull ) const;
+		ComponentPtr	createComponentByName( const String& name, const Io::Bson& data = Io::Bson::kNull ) const;
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const io::Bson& data = io::Bson::kNull ) const;
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Io::Bson& data = Io::Bson::kNull ) const;
 
 		//! Creates an array of archetype instances from data.
 		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const io::Bson& data ) const;
+		Array<StrongPtr<TArchetype>>	createArchetypes( const Io::Bson& data ) const;
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
-		StrongPtr<TComponent>	createComponent( const io::Bson& data = io::Bson::kNull ) const;
+		StrongPtr<TComponent>	createComponent( const Io::Bson& data = Io::Bson::kNull ) const;
 
 		//! Registers the archetype type.
 		template<typename TArchetype>
@@ -219,19 +219,19 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const io::Bson& data ) const
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Io::Bson& data ) const
 	{
 		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
 	}
 
 	// ** Ecs::createArchetypes
 	template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const io::Bson& data ) const
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Io::Bson& data ) const
 	{
 		Array<StrongPtr<TArchetype>> result;
 
 		for( s32 i = 0, n = data.items().size(); i < n; i++ ) {
-			const io::Bson& item = data[i];
+			const Io::Bson& item = data[i];
 			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), item ) );
 		}
 
@@ -240,7 +240,7 @@ namespace Ecs {
 		
 	// ** Ecs::createComponent
 	template<typename TComponent>
-	StrongPtr<TComponent> Ecs::createComponent( const io::Bson& data  ) const
+	StrongPtr<TComponent> Ecs::createComponent( const Io::Bson& data  ) const
 	{
 		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
 	}

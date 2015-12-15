@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 #ifdef HAVE_JSON
 

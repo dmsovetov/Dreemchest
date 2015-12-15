@@ -35,7 +35,7 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 	//! A TCP stream class.
-	class TCPStream : public io::ByteBuffer {
+	class TCPStream : public Io::ByteBuffer {
 	public:
 
 		//! Socket pull result

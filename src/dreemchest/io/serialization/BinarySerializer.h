@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef __Io_BinarySerializer_H__
-#define __Io_BinarySerializer_H__
+#ifndef __DC_Io_BinarySerializer_H__
+#define __DC_Io_BinarySerializer_H__
 
 #include "Storage.h"
 #include "../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! BinarySerializer class writes serializable types to binary storage.
 	class BinarySerializer {
@@ -98,8 +98,8 @@ namespace io {
 		return data;
 	}
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__Io_BinarySerializer_H__	*/
+#endif	/*	!__DC_Io_BinarySerializer_H__	*/

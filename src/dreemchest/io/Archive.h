@@ -24,16 +24,16 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_Archive_H__
-#define		__DC_Io_Archive_H__
+#ifndef __DC_Io_Archive_H__
+#define __DC_Io_Archive_H__
 
-#include    "FileSystem.h"
-#include    "processors/IBufferCompressor.h"
-#include    "Path.h"
+#include "FileSystem.h"
+#include "processors/IBufferCompressor.h"
+#include "Path.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     // ** eCompressor
     enum eCompressor {
@@ -124,7 +124,7 @@ namespace io {
         Path                    m_fileName;
     };
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

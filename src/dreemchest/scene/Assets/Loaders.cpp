@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------ RawImageLoader ------------------------------------------ //
 
 // ** RawImageLoader::loadFromStream
-bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
 {
 	u16 width, height;
 	u8  channels;
@@ -59,7 +59,7 @@ bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr ha
 // ------------------------------------------ RawMeshLoader ------------------------------------------ //
 
 // ** RawMeshLoader::loadFromStream
-bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
 {
 	u32 chunkCount, vertexCount, indexCount;
 	
@@ -87,7 +87,7 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 			stream->read( v->tex1, sizeof( v->tex1 ) );
 
 			for( u32 j = 0; j < 3; j++ ) {
-				v->position[j] *= 0.01f;
+			//	v->position[j] *= 0.01f;
 			}
 
 			bounds += v->position;
@@ -114,7 +114,7 @@ bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal
 #ifdef HAVE_JSON
 
 // ** JsonMaterialLoader::loadFromStream
-bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const io::StreamPtr& stream ) const
+bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
 {
 	String json;
 	json.resize( stream->length() );

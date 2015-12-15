@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_DiskFileSystem_H__
-#define		__DC_Io_DiskFileSystem_H__
+#ifndef __DC_Io_DiskFileSystem_H__
+#define __DC_Io_DiskFileSystem_H__
 
-#include	"FileSystem.h"
-#include    "Path.h"
+#include "FileSystem.h"
+#include "Path.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! DiskFileSystem class is an interface to work with physical file system.
 	class dcInterface DiskFileSystem : public FileSystem {
@@ -112,7 +112,7 @@ namespace io {
         Path                    m_baseDir;
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

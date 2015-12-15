@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include	"FileSystem.h"
-#include	"streams/ByteBuffer.h"
+#include "FileSystem.h"
+#include "streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 IMPLEMENT_LOGGER( log )
 
@@ -66,6 +66,6 @@ bool FileSystem::fileExists( const Path& path ) const
     return false;
 }
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

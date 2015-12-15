@@ -39,7 +39,7 @@ namespace packets {
 	typedef Array<u8> Payload;
 
 	//! Latency test & time sync packet
-	struct Ping : public io::SerializableT<Ping> {
+	struct Ping : public Io::SerializableT<Ping> {
 		u8				iterations;		//!< Current iteration number.
 		u32				timestamp;		//!< A timestamp value when the packet was sent.
 		u32				time;			//!< Current connection time in milliseconds
@@ -61,7 +61,7 @@ namespace packets {
 	};
 
 	//! Server detection packet.
-	struct DetectServers : public io::SerializableT<DetectServers> {
+	struct DetectServers : public Io::SerializableT<DetectServers> {
 		String			query;	//!< A server query.
 
 						//! Constructs DetectServers instance.
@@ -75,7 +75,7 @@ namespace packets {
 	};
 
 	//! Network event packet
-	struct Event : public io::SerializableT<Event> {
+	struct Event : public Io::SerializableT<Event> {
 		TypeId			eventId;
 		Payload			payload;
 
@@ -91,7 +91,7 @@ namespace packets {
 	};
 
 	//! RPC call packet.
-	struct RemoteCall : public io::SerializableT<RemoteCall> {
+	struct RemoteCall : public Io::SerializableT<RemoteCall> {
 		u16			id;
 		u32			method;
 		TypeId		returnType;
@@ -111,7 +111,7 @@ namespace packets {
 	};
 
 	//! RPC call response
-	struct RemoteCallResponse : public io::SerializableT<RemoteCallResponse> {
+	struct RemoteCallResponse : public Io::SerializableT<RemoteCallResponse> {
 		u16			id;
 		Error		error;
 		TypeId		returnType;

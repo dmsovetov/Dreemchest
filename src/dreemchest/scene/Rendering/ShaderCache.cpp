@@ -88,7 +88,7 @@ bool ShaderCache::loadFromFile( const String& fileName, String& vertex, String& 
 	static CString fragmentShaderMarker = "[FragmentShader]";
 
 	// Read the code from a text file
-	String code = io::DiskFileSystem::readTextFile( fileName );
+	String code = Io::DiskFileSystem::readTextFile( fileName );
 
 	// Extract vertex/fragment shader code blocks
 	u32 vertexBegin = code.find( vertexShaderMarker );

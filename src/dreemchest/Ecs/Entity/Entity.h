@@ -40,11 +40,11 @@ namespace Ecs {
 	game data. Entity's behaviour in a game world is defined by a set of
 	data components.
 	*/
-	class Entity : public io::Serializable {
+	class Entity : public Io::Serializable {
 	friend class Ecs;
 	public:
 
-								ClassEnableTypeInfoSuper( Entity, io::Serializable )
+								ClassEnableTypeInfoSuper( Entity, Io::Serializable )
 
 		//! Container type to store components.
 		typedef Map<TypeIdx, ComponentPtr> Components;

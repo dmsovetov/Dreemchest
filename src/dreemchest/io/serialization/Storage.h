@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Io_Storage_H__
-#define		__DC_Io_Storage_H__
+#ifndef __DC_Io_Storage_H__
+#define __DC_Io_Storage_H__
 
-#include	"../Io.h"
-#include    "../streams/Stream.h"
+#include "../Io.h"
+#include "../streams/Stream.h"
 
 #ifdef HAVE_JSONCPP
 	#include <json/json.h>
@@ -36,7 +36,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! Basic data storage interface
 	class Storage : public RefCounted {
@@ -208,7 +208,7 @@ namespace io {
 
 #endif	// HAVE_JSONCPP
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

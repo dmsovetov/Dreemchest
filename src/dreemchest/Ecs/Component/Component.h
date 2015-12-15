@@ -53,7 +53,7 @@ namespace Ecs {
 	A component is all the data for one aspect of the entity. Component is just a plain
 	data and doesn't contain any processing logic.
 	*/
-	class ComponentBase : public io::Serializable {
+	class ComponentBase : public Io::Serializable {
 	friend class Entity;
 	public:
 
@@ -80,10 +80,10 @@ namespace Ecs {
 
 	#ifndef DC_BSON_DISABLED
 		//! Returns the component BSON.
-		virtual io::Bson			bson( void ) const;
+		virtual Io::Bson			bson( void ) const;
 
 		//! Sets the component BSON.
-		virtual void				setBson( const io::Bson& value );
+		virtual void				setBson( const Io::Bson& value );
 	#endif	/*	!DC_BSON_DISABLED	*/
 
 	protected:
@@ -122,14 +122,14 @@ namespace Ecs {
 
 #if !DC_BSON_DISABLED
 	// ** ComponentBase::bson
-	inline io::Bson ComponentBase::bson( void ) const
+	inline Io::Bson ComponentBase::bson( void ) const
 	{
 		log::warn( "Component::bson : is not implemented for '%s'\n", typeName() );
-		return io::Bson::kNull;
+		return Io::Bson::kNull;
 	}
 
 	// ** ComponentBase::setBson
-	inline void ComponentBase::setBson( const io::Bson& value )
+	inline void ComponentBase::setBson( const Io::Bson& value )
 	{
 		log::warn( "Component::setBson : is not implemented for '%s'\n", typeName() );
 	}

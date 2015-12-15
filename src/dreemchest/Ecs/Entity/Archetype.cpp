@@ -31,9 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 // ** ArchetypeBase::read
-void ArchetypeBase::read( const io::Storage* storage )
+void ArchetypeBase::read( const Io::Storage* storage )
 {
-	io::Bson bson;
+	Io::Bson bson;
 	bson.read( storage );
 
 	construct();
@@ -41,15 +41,15 @@ void ArchetypeBase::read( const io::Storage* storage )
 }
 
 // ** ArchetypeBase::write
-void ArchetypeBase::write( io::Storage* storage ) const
+void ArchetypeBase::write( Io::Storage* storage ) const
 {
 	bson().write( storage );
 }
 
 // ** ArchetypeBase::bson
-io::Bson ArchetypeBase::bson( void ) const
+Io::Bson ArchetypeBase::bson( void ) const
 {
-	io::Bson result = io::Bson::object();
+	Io::Bson result = Io::Bson::object();
 
 	result["Type"] = typeName();
 	result["_id"]  = id();
@@ -58,7 +58,7 @@ io::Bson ArchetypeBase::bson( void ) const
 
 	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString  key  = i->second->typeName();
-		io::Bson data = i->second->bson();
+		Io::Bson data = i->second->bson();
 
 		if( data.isNull() ) {
 			continue;
@@ -71,7 +71,7 @@ io::Bson ArchetypeBase::bson( void ) const
 }
 
 // ** ArchetypeBase::setBson
-void ArchetypeBase::setBson( const io::Bson& value )
+void ArchetypeBase::setBson( const Io::Bson& value )
 {
 	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
 
@@ -84,9 +84,9 @@ void ArchetypeBase::setBson( const io::Bson& value )
 	}
 	
 	// Create components from BSON
-	const io::Bson::KeyValue& kv = value.properties();
+	const Io::Bson::KeyValue& kv = value.properties();
 
-	for( io::Bson::KeyValue::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+	for( Io::Bson::KeyValue::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
 		if( i->first == "Type" || i->first == "_id" ) {
 			continue;
 		}

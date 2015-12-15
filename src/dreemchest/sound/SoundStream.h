@@ -109,18 +109,18 @@ namespace Sound {
 
     private:
 
-                                    StandardSoundStream( io::StreamPtr stream );
+                                    StandardSoundStream( Io::StreamPtr stream );
 
     private:
 
-        io::StreamPtr				m_stream;	//!< Input stream.
+        Io::StreamPtr				m_stream;	//!< Input stream.
     };
 
 	//! Memory input stream.
 	class MemorySoundStream : public ISoundStream {
     public:
 
-									MemorySoundStream( io::ByteBufferPtr data );
+									MemorySoundStream( Io::ByteBufferPtr data );
         virtual                     ~MemorySoundStream( void );
 
         // ** ISoundStream
@@ -132,7 +132,7 @@ namespace Sound {
 
     private:
 
-        io::ByteBufferPtr			m_data;		//!< Data buffer.
+        Io::ByteBufferPtr			m_data;		//!< Data buffer.
 	};
 
 } // namespace Sound

@@ -122,7 +122,7 @@ namespace Fx {
 #ifdef HAVE_JSON
 
 	//! Loads the particle system from JSON file.
-	class JsonParticleSystemLoader : public io::JsonLoaderBase {
+	class JsonParticleSystemLoader : public Io::JsonLoaderBase {
 	public:
 
 		//! Loads the particle system from string.

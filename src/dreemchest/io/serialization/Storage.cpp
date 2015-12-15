@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ----------------------------------------BinaryStorage ------------------------------------------//
 
@@ -247,6 +247,6 @@ String JsonStorage::toString( void ) const
 
 #endif
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

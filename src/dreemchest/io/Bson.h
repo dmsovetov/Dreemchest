@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! BSON is a binary key-value storage type.
 	class Bson : public Serializable {
@@ -314,7 +314,7 @@ namespace io {
 		return *this << items;
 	}
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

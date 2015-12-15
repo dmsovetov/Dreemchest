@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 	//! Basic stream class.
     class dcInterface Stream : public RefCounted {
@@ -86,7 +86,7 @@ namespace io {
                                 Stream( void );
 	};
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 
