@@ -178,6 +178,9 @@ namespace Io {
 		//! Returns the KeyValue value type.
 		Type				type( void ) const;
 
+		//! Returns the KeyValue array size.
+		s32					size( void ) const;
+
 		//! Returns the boolean value of this KeyValue instance.
 		bool				asBool( void ) const;
 
@@ -188,7 +191,7 @@ namespace Io {
 		u16					asShort( void ) const;
 
 		//! Returns the int value of this KeyValue instance.
-		u32					asInt( void ) const;
+		s32					asInt( void ) const;
 
 		//! Returns the long value of this KeyValue instance.
 		u64					asLong( void ) const;
@@ -204,6 +207,20 @@ namespace Io {
 
 		//! Returns the string value of this KeyValue instance.
 		const String&		asString( void ) const;
+
+		//! Converts KeyValue to a JSON string.
+		static String		stringify( const KeyValue& kv, bool formatted = false );
+
+		//! Parses KeyValue from a JSON string.
+		static KeyValue		parse( const String& text );
+
+	#ifdef HAVE_JSON
+		//! Converts KeyValue to JSON object.
+		static Json::Value	toJson( const KeyValue& kv );
+
+		//! Constructs KeyValue from JSON object.
+		static KeyValue		fromJson( const Json::Value& json );
+	#endif	/*	HAVE_JSON*/
 
 		//! Returns object properties.
 		const Properties&	properties( void ) const;

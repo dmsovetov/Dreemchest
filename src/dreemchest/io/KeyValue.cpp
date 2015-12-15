@@ -309,6 +309,13 @@ const KeyValue::ValueArray& KeyValue::items( void ) const
 	return *m_array;
 }
 
+// ** KeyValue::size
+s32 KeyValue::size( void ) const
+{
+	return m_type == kArray ? m_array->size() : 0;
+}
+
+
 // ** KeyValue::get
 const KeyValue& KeyValue::get( const String& key, const KeyValue& defaultValue ) const
 {
@@ -339,9 +346,18 @@ u16 KeyValue::asShort( void ) const
 }
 
 // ** KeyValue::asInt
-u32 KeyValue::asInt( void ) const
+s32 KeyValue::asInt( void ) const
 {
-	return m_int32;
+	switch( m_type ) {
+	case kInt8:		return static_cast<s32>( m_int8 );
+	case kInt16:	return static_cast<s32>( m_int16 );
+	case kInt32:	return m_int32;
+	case kInt64:	return static_cast<s32>( m_int64 );
+	case kFloat32:	return static_cast<u32>( m_float32 );
+	case kFloat64:	return static_cast<u32>( m_float64 );
+	}
+
+	return 0;
 }
 
 // ** KeyValue::asFloat
@@ -355,6 +371,7 @@ f32 KeyValue::asFloat( void ) const
 	case kFloat32:	return m_float32;
 	case kFloat64:	return static_cast<f32>( m_float64 );
 	}
+
 	return 0.0f;
 }
 
@@ -362,14 +379,15 @@ f32 KeyValue::asFloat( void ) const
 f64 KeyValue::asDouble( void ) const
 {
 	switch( m_type ) {
-	case kInt8:		return static_cast<f32>( m_int8 );
-	case kInt16:	return static_cast<f32>( m_int16 );
-	case kInt32:	return static_cast<f32>( m_int32 );
-	case kInt64:	return static_cast<f32>( m_int64 );
-	case kFloat32:	return m_float32;
-	case kFloat64:	return static_cast<f32>( m_float64 );
+	case kInt8:		return static_cast<f64>( m_int8 );
+	case kInt16:	return static_cast<f64>( m_int16 );
+	case kInt32:	return static_cast<f64>( m_int32 );
+	case kInt64:	return static_cast<f64>( m_int64 );
+	case kFloat32:	return static_cast<f64>( m_float32 );
+	case kFloat64:	return m_float64;
 	}
-	return 0.0f;;
+
+	return 0.0;
 }
 
 // ** KeyValue::asLong
@@ -611,6 +629,119 @@ void KeyValue::write( Storage* storage ) const
 {
 	write( storage->isBinaryStorage()->stream() );
 }
+
+// ** KeyValue::stringify
+String KeyValue::stringify( const KeyValue& kv, bool formatted )
+{
+#ifdef HAVE_JSON
+	Json::Value json = toJson( kv );
+	return formatted ? json.toStyledString() : Json::FastWriter().write( json );
+#else
+	log::error( "KeyValue::stringify : failed to convert to string, built with no JSON support.\n" );
+	return "";
+#endif	/*	HAVE_JSON	*/
+}
+
+// ** KeyValue::parse
+KeyValue KeyValue::parse( const String& text )
+{
+#ifdef HAVE_JSON
+	Json::Value json;
+	Json::Reader reader;
+	
+	if( !reader.parse( text, json ) ) {
+		log::warn( "KeyValue::parse : failed to parse JSON string.\n" );
+		return kNull;
+	}
+
+	return fromJson( json );
+#else
+	log::error( "KeyValue::parse : failed to parse from string, built with no JSON support.\n" );
+	return "";
+#endif	/*	HAVE_JSON	*/
+}
+
+#ifdef HAVE_JSON
+
+// ** KeyValue::toJson
+Json::Value KeyValue::toJson( const KeyValue& kv )
+{
+	switch( kv.type() ) {
+	case kNull:		return Json::Value::null;		break;
+	case kBoolean:	return kv.asBool();				break;
+	case kInt8:		
+	case kInt16:
+	case kInt32:
+	case kInt64:	return kv.asInt();				break;
+	case kFloat32:
+	case kFloat64:	return kv.asDouble();			break;
+	case kString:	return kv.asString();			break;
+	case kGuid:		return kv.asGuid().toString();	break;
+	case kArray:	{
+						Json::Value	json( Json::arrayValue );
+
+						for( s32 i = 0, n = kv.size(); i < n; i++ ) {
+							json[i] = toJson( kv[i] );
+						}
+
+						return json;
+					}
+					break;
+	case kObject:	{
+						Json::Value		  json( Json::objectValue );
+						const Properties& properties = kv.properties();
+
+						for( Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
+							json[i->first] = toJson( i->second );
+						}
+
+						return json;
+					}
+					break;
+	default:		DC_BREAK;
+	}
+
+	return Json::Value::null;
+}
+
+// ** KeyValue::fromJson
+KeyValue KeyValue::fromJson( const Json::Value& json )
+{
+	switch( json.type() ) {
+	case Json::nullValue:		return kNull;
+	case Json::intValue:		return json.asInt();
+	case Json::uintValue:		return json.asUInt();
+	case Json::realValue:		return json.asDouble();
+	case Json::stringValue:		return json.asString();
+	case Json::booleanValue:	return json.asBool();
+	case Json::arrayValue:		{
+									KeyValue kv( kArray );
+
+									for( s32 i = 0, n = json.size(); i < n; i++ ) {
+										kv[i] = fromJson( json[i] );
+									}
+
+									return kv;
+								}
+								break;
+	case Json::objectValue:		{
+									KeyValue kv( kObject );
+
+									for( Json::Value::const_iterator i = json.begin(), end = json.end(); i != end; i++ ) {
+										String key = i.key().asString();
+										kv[key] = fromJson( *i );
+									}
+
+									return kv;
+								}
+								break;
+	default:					DC_BREAK;
+	}
+
+	return kNull;
+}
+
+#endif	/*	HAVE_JSON*/
 
 } // namespace Io
 
