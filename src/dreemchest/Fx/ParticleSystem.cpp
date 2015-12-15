@@ -95,7 +95,7 @@ ParticleSystemPtr ParticleSystem::createFromFile( const String& fileName, f32 sc
 // ** ParticleSystem::createFromJson
 ParticleSystemPtr ParticleSystem::createFromJson( const String& json, f32 scalingFactor )
 {
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 	// Create particle system instance
 	ParticleSystemPtr particleSystem( DC_NEW ParticleSystem );
 
@@ -110,7 +110,7 @@ ParticleSystemPtr ParticleSystem::createFromJson( const String& json, f32 scalin
 #else
 	log::error( "ParticleSystem::createFromJson : failed to load particle system, built with no JSON support.\n" );
 	return ParticleSystemPtr();
-#endif
+#endif	/*	HAVE_JSON	*/
 }
 
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
@@ -222,7 +222,7 @@ void ParticleSystemInstance::warmUp( f32 dt )
 
 // -------------------------------------- JsonParticleSystemLoader -------------------------------------- //
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 // ** JsonParticleSystemLoader::readRenderer
 bool JsonParticleSystemLoader::readRenderer( const Json::Value& object )
@@ -453,7 +453,7 @@ bool JsonParticleSystemLoader::load( ParticleSystemWPtr particleSystem, const St
 	return true;
 }
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Fx
 

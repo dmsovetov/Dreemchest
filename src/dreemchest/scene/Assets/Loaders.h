@@ -97,7 +97,7 @@ namespace Scene {
 		mutable MeshPtr		m_mesh;	//!< Target mesh to load data into
 	};
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 	//! Loads a material from a JSON format.
 	class JsonMaterialLoader : public AssetLoader {
@@ -121,7 +121,7 @@ namespace Scene {
 		mutable MaterialPtr	m_material;	//!< Target material to load data into
 	};
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

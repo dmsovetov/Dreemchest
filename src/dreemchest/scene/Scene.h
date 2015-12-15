@@ -254,7 +254,7 @@ namespace Scene {
 		return m_ecs->createArchetype<TArchetype>( id, data );
 	}
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader : public io::JsonLoaderBase {
@@ -349,7 +349,7 @@ namespace Scene {
 		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
 	};
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

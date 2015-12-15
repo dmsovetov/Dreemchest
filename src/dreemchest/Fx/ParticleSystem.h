@@ -119,7 +119,7 @@ namespace Fx {
 		s32							m_aliveCount;		//!< The total number of alive particles.
 	};
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 	//! Loads the particle system from JSON file.
 	class JsonParticleSystemLoader : public io::JsonLoaderBase {
@@ -183,7 +183,7 @@ namespace Fx {
 		f32							m_scalingFactor;	//!< The particle system scaling factor.
 	};
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Fx
 

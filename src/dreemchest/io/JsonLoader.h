@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 	//! Base class for all JSON object loaders.
 	class JsonLoaderBase {
@@ -84,7 +84,7 @@ namespace io {
 		Json::Value					m_json;		//!< Parsed JSON object.
 	};
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Io
 

@@ -18,7 +18,7 @@ add_files(Io/Streams IO_STREAMS_SRCS)
 find_package(Jsoncpp)
 
 if (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
-	add_definitions(-DDC_JSON_ENABLED)
+	add_definitions(-DHAVE_JSON)
 	include_directories(${JSONCPP_INCLUDE_DIR})
 endif (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
 

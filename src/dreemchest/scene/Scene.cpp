@@ -204,7 +204,7 @@ ScenePtr Scene::createFromFile( const AssetBundlePtr& assets, const String& file
 // ** Scene::createFromJson
 ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json )
 {
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 	// Create scene instance
 	ScenePtr scene( DC_NEW Scene );
 
@@ -219,12 +219,12 @@ ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json
 #else
 	log::error( "Scene::createFromJson : failed to load scene, built with no JSON support.\n" );
 	return ScenePtr();
-#endif
+#endif	/*	HAVE_JSON	*/
 }
 
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 // ** JsonSceneLoader::JsonSceneLoader
 JsonSceneLoader::JsonSceneLoader( void )
@@ -628,7 +628,7 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 	parameter.setEnabled( true );
 }
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

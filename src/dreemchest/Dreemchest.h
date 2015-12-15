@@ -49,9 +49,9 @@
 
 #include "Base/Base.h"
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 	#include <json/json.h>
-#endif
+#endif	/*	HAVE_JSON	*/
 
 #ifndef DC_BUILD_LIBRARY
 	#include <Network/Network.h>

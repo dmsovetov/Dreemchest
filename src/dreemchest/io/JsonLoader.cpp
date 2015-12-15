@@ -30,7 +30,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace io {
 
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 
 // ** JsonLoaderBase::load
 bool JsonLoaderBase::load( const String& json )
@@ -129,7 +129,7 @@ Array<f32> JsonLoaderBase::readFloats( const Json::Value& value )
 	return result;
 }
 
-#endif	/*	DC_JSON_ENABLED	*/
+#endif	/*	HAVE_JSON	*/
 
 } // namespace Io
 

@@ -226,7 +226,7 @@ AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
 // ** AssetBundle::loadFromJson
 bool AssetBundle::loadFromJson( const String& json )
 {
-#ifdef DC_JSON_ENABLED
+#ifdef HAVE_JSON
 	Json::Value root;
 	Json::Reader reader;
 
@@ -251,9 +251,7 @@ bool AssetBundle::loadFromJson( const String& json )
 		}
 		else if( type == "material" ) {
 			MaterialPtr material = addMaterial( uuid, identifier );
-		#ifdef DC_JSON_ENABLED
 			JsonMaterialLoader::attachTo( material );
-		#endif
 		}
 		else if( type == "scene" ) {
 			AssetPtr scene = addAsset( Asset::Scene, uuid, identifier );
@@ -267,7 +265,7 @@ bool AssetBundle::loadFromJson( const String& json )
 #else
 	log::warn( "AssetBundle::loadFromJson : built with no JSON support.\n" );
 	return false;
-#endif
+#endif	/*	HAVE_JSON	*/
 }
 
 // ** AssetBundle::addImage
