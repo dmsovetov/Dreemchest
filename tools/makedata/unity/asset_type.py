@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 #
 # The MIT License (MIT)
 #
@@ -29,12 +29,12 @@ import os
 # Asset type 
 class AssetType:
     UNKNOWN = 'unknown'
-    MESH = 'mesh'
-    SCENE = 'scene'
-    TEXTURE = 'image'
-    PREFAB = 'prefab'
-    LIGHTMAP = 'lightmap'
-    MATERIAL = 'material'
+    MESH = 'Mesh'
+    SCENE = 'Scene'
+    TEXTURE = 'Image'
+    PREFAB = 'Prefab'
+    LIGHTMAP = 'Lightmap'
+    MATERIAL = 'Material'
 
     # Maps file extensions to asset types
     Extensions = dict(

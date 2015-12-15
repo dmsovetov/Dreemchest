@@ -121,7 +121,7 @@ class Assets:
 
     # Parses the project assets
     def parse(self):
-        print('Parsing assets from', self._path)
+        print('Parsing assets from {0}'.format(self._path))
 
         for folder, dirs, files in os.walk(os.path.join(self._path, 'Assets')):
             for file in files:
@@ -132,7 +132,7 @@ class Assets:
                     meta = yaml.from_file(full_path)
                     self._files[meta['guid']] = Asset(name, os.path.relpath(os.path.join(folder, name), self._path), meta)
 
-        print(len(self._files), 'assets parsed')
+        print('{0} assets parsed'.format(len(self._files)))
 
     # Marks an asset as used
     def use(self, uuid):

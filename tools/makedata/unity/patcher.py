@@ -25,7 +25,7 @@
 #################################################################################
 
 import math
-from parameter import ParameterType, Curve, Gradient
+from parameter import ParameterType, Curve, Gradient, Rgba
 
 # Patches the object properties
 class Patcher:
@@ -194,6 +194,10 @@ class Patcher:
             elif type == ParameterType.RANDOM_BETWEEN_CURVES:
                 object[self._color_name] = [min.rgb, max.rgb]
                 object[self._transparency_name] = [min.alpha, max.alpha]
+            elif type == ParameterType.CONSTANT:
+                rgba = Rgba(value['maxColor']['rgba'])
+                object[self._color_name] = [rgba.red, rgba.green, rgba.blue]
+                object[self._transparency_name] = rgba.alpha
             else:
                 object[self._color_name] = max.constant_rgb
                 object[self._transparency_name] = max.constant_alpha
@@ -361,12 +365,12 @@ def rescale(value):
 
 def multiply(factor):
     def _(value):
-        return rescale(value * factor)
+        return rescale(float(value) * factor)
     return _
 
 # InitialModulePatcher
 InitialModulePatcher = {
-      'gravityModifier': Patcher.rename('gravity', multiply(20))
+      'gravityModifier': Patcher.rename('gravity', multiply(12))
     , 'maxNumParticles': Patcher.rename('maxParticles')
     , 'startLifetime': Patcher.curve('life')
     , 'startSpeed': Patcher.curve('speed', rescale)

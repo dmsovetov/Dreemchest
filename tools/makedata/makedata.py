@@ -81,7 +81,8 @@ def import_project(args, source, output):
     assets = unity.project.parse_assets(args)
     
     # Import scenes
-    unity.project.import_scenes(assets, source, output)
+    if args.skip_scenes == 0:
+        unity.project.import_scenes(assets, source, output)
 
     # Import prefabs
     unity.project.import_prefabs(assets, source, output)
@@ -132,6 +133,7 @@ if __name__ == "__main__":
     parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
     parser.add_argument( "--strip-unused",       type = bool, default  = False,                              help = "The unused assets won't be imported." )
     parser.add_argument( "--use-uuids",          type = int,  default  = 1,                                  help = "The UUIDs will be used instead of file names." )
+    parser.add_argument( "--skip-scenes",        type = int,  default  = 0,                                  help = "Scenes wont be imported." )
 
     args = parser.parse_args()
 
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output):
         os.makedirs(args.output)
 
-    print('---', 'Building [', args.platform, '] data package to [', args.output, '] with [', args.compression, '] texture compression', '---')
+    print('--- Building [{0}] data package to [{1}] with [{2}] texture compression ---'.format(args.platform, args.output, args.compression) )
     start = time.time()
 
     try:
@@ -156,4 +158,4 @@ if __name__ == "__main__":
     except ExportError as e:
         print(e.message)
 
-    print('---', int(time.time() - start), 'seconds')
+    print('--- {0} seconds ---'.format(int(time.time() - start)))

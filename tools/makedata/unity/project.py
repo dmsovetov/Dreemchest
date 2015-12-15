@@ -55,6 +55,7 @@ class ShapeType:
     SPHERE = 0
     SPHERE_SHELL = 1
     HEMISPHERE = 2
+    HEMISPHERE_SHELL = 3
     CONE = 4
     CONE_SHELL = 7
     CONE_VOLUME = 8
@@ -376,7 +377,7 @@ def import_scenes(assets, source, output):
     #    if item.file_name.find('Debug') == -1:
     #        continue
 
-        print('Importing scene', item.full_path)
+        print('Importing scene {0}'.format(item.full_path))
         Scene.convert(assets, paths.source, dest)
 
 # Import used materials
@@ -388,7 +389,7 @@ def import_materials(assets, source, output):
         if assets.should_strip(item):
             continue
 
-        print('Importing material', item.full_path)
+        print('Importing material {0}'.format(item.full_path))
         material.convert(assets, paths.source, dest)
 
 # Imports all used assets
@@ -411,6 +412,9 @@ def import_prefabs(assets, source, output):
         if assets.should_strip(item):
             continue
 
-        print('Importing prefab', item.full_path)
+    #    if item.identifier != 'engine_fire':
+    #        continue
+
+        print('Importing prefab {0}'.format(item.full_path))
         assets.use(item.uuid)
         Scene.convert(assets, paths.source, dest)
