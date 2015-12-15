@@ -43,47 +43,6 @@ Particles::Particles( EmitterWPtr emitter ) : m_emitter( emitter ), m_count( 1 )
 {
 	setBlendingMode( BlendAlpha );
 	setRenderingMode( RenderQuads );
-
-	// ** Set default values for parameters
-	m_scalar[Life].setSamplingMode( SampleRandomBetweenConstants );
-	m_scalar[Life].curve( FloatParameter::Lower ).push( 0.0f, 0.5f );
-	m_scalar[Life].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[Emission].setSamplingMode( SampleConstant );
-	m_scalar[Emission].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[Direction].setSamplingMode( SampleRandomBetweenConstants );
-	m_scalar[Direction].curve( FloatParameter::Lower ).push( 0.0f,   0.0f );
-	m_scalar[Direction].curve( FloatParameter::Upper ).push( 0.0f, 360.0f );
-
-	m_scalar[Rotation].setSamplingMode( SampleRandomBetweenConstants );
-	m_scalar[Rotation].curve( FloatParameter::Lower ).push( 0.0f, -180.0f );
-	m_scalar[Rotation].curve( FloatParameter::Upper ).push( 0.0f,  180.0f );
-
-//	m_scalar[Velocity].setSamplingMode( SampleRandomBetweenConstants );
-//	m_scalar[Velocity].curve( FloatParameter::Lower ).push( 0.0f, 25.0f );
-//	m_scalar[Velocity].curve( FloatParameter::Upper ).push( 0.0f, 50.0f );
-
-	m_scalar[Size].setSamplingMode( SampleConstant );
-	m_scalar[Size].curve( FloatParameter::Lower ).push( 0.0f, 10.0f );
-
-	m_scalar[SizeOverLife].setSamplingMode( SampleConstant );
-	m_scalar[SizeOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[TransparencyOverLife].setSamplingMode( SampleConstant );
-	m_scalar[TransparencyOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[VelocityXOverLife].setSamplingMode( SampleConstant );
-	m_scalar[VelocityXOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[VelocityYOverLife].setSamplingMode( SampleConstant );
-	m_scalar[VelocityYOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[AngularVelocityOverLife].setSamplingMode( SampleConstant );
-	m_scalar[AngularVelocityOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
-
-	m_scalar[TorqueOverLife].setSamplingMode( SampleConstant );
-	m_scalar[TorqueOverLife].curve( FloatParameter::Lower ).push( 0.0f, 1.0f );
 };
 
 // ** Particles::createInstance
