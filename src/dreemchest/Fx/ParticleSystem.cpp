@@ -269,7 +269,13 @@ bool JsonParticleSystemLoader::readParticles( const Json::Value& object )
 	// Setup zone
 	Json::Value shape = object["shape"];
 
-	switch( shape["type"].asInt() ) {
+	int type = shape["type"].asInt();
+
+	switch( type ) {
+	case 4: break;	// not implemented
+	case 0: break;
+	case 1: emitter->setZone( DC_NEW SphereZone( shape["radius"].asFloat() * m_scalingFactor ) ); break;
+	case 3:
 	case 2: emitter->setZone( DC_NEW HemiSphereZone( shape["radius"].asFloat() * m_scalingFactor ) ); break;
 	case 5: emitter->setZone( DC_NEW BoxZone( shape["width"].asFloat() * m_scalingFactor, shape["height"].asFloat() * m_scalingFactor, shape["depth"].asFloat() * m_scalingFactor ) ); break;
 	default: DC_NOT_IMPLEMENTED;
@@ -288,7 +294,7 @@ bool JsonParticleSystemLoader::readParticles( const Json::Value& object )
 			printf( "unhandled module %s\n", i.key().asString().c_str() );
 			continue;
 		}
-
+		
 		j->second( particles, *i );
 	}
 
@@ -362,6 +368,7 @@ bool JsonParticleSystemLoader::readInitial( ParticlesWPtr particles, const Json:
 	readScalarParameter( particles->scalarParameter( Particles::Size ), object["size"], m_scalingFactor );
 	readScalarParameter( particles->scalarParameter( Particles::Speed ), object["speed"], m_scalingFactor );
 	readScalarParameter( particles->scalarParameter( Particles::Gravity ), object["gravity"], m_scalingFactor );
+	readScalarParameter( particles->scalarParameter( Particles::Rotation ), object["rotation"], m_scalingFactor );
 
 	return true;
 }
