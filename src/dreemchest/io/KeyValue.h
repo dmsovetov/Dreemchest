@@ -175,6 +175,12 @@ namespace Io {
 		//! Returns true if the KeyValue value is null.
 		bool				isNull( void ) const;
 
+		//! Returns true if the KeyValue value is an object.
+		bool				isObject( void ) const;
+
+		//! Returns true if the KeyValue value is array.
+		bool				isArray( void ) const;
+
 		//! Returns the KeyValue value type.
 		Type				type( void ) const;
 
@@ -185,16 +191,28 @@ namespace Io {
 		bool				asBool( void ) const;
 
 		//! Returns the byte value of this KeyValue instance.
-		u8					asByte( void ) const;
+		s8					asByte( void ) const;
+
+		//! Returns the unsigned byte value of this KeyValue instance.
+		u8					asUByte( void ) const;
 
 		//! Returns the short value of this KeyValue instance.
-		u16					asShort( void ) const;
+		s16					asShort( void ) const;
+
+		//! Returns the unsigned short value of this KeyValue instance.
+		u16					asUShort( void ) const;
 
 		//! Returns the int value of this KeyValue instance.
 		s32					asInt( void ) const;
 
+		//! Returns the unsigned int value of this KeyValue instance.
+		u32					asUInt( void ) const;
+
 		//! Returns the long value of this KeyValue instance.
-		u64					asLong( void ) const;
+		s64					asLong( void ) const;
+
+		//! Returns the unsigned long value of this KeyValue instance.
+		u64					asULong( void ) const;
 
 		//! Returns the float value of this KeyValue instance.
 		f32					asFloat( void ) const;

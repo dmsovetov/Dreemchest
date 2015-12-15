@@ -282,6 +282,18 @@ bool KeyValue::isNull( void ) const
 	return m_type == kNull;
 }
 
+// ** KeyValue::isObject
+bool KeyValue::isObject( void ) const
+{
+	return m_type == kObject;
+}
+
+// ** KeyValue::isArray
+bool KeyValue::isArray( void ) const
+{
+	return m_type == kArray;
+}
+
 // ** KeyValue::type
 KeyValue::Type KeyValue::type( void ) const
 {
@@ -334,13 +346,25 @@ bool KeyValue::asBool( void ) const
 }
 
 // ** KeyValue::asByte
-u8 KeyValue::asByte( void ) const
+s8 KeyValue::asByte( void ) const
+{
+	return m_int8;
+}
+
+// ** KeyValue::asUByte
+u8 KeyValue::asUByte( void ) const
 {
 	return m_int8;
 }
 
 // ** KeyValue::asShort
-u16 KeyValue::asShort( void ) const
+s16 KeyValue::asShort( void ) const
+{
+	return m_int16;
+}
+
+// ** KeyValue::asUShort
+u16 KeyValue::asUShort( void ) const
 {
 	return m_int16;
 }
@@ -358,6 +382,12 @@ s32 KeyValue::asInt( void ) const
 	}
 
 	return 0;
+}
+
+// ** KeyValue::asUInt
+u32 KeyValue::asUInt( void ) const
+{
+	return asInt();
 }
 
 // ** KeyValue::asFloat
@@ -391,7 +421,13 @@ f64 KeyValue::asDouble( void ) const
 }
 
 // ** KeyValue::asLong
-u64 KeyValue::asLong( void ) const
+s64 KeyValue::asLong( void ) const
+{
+	return m_int64;
+}
+
+// ** KeyValue::asULong
+u64 KeyValue::asULong( void ) const
 {
 	return m_int64;
 }
@@ -657,7 +693,7 @@ KeyValue KeyValue::parse( const String& text )
 	return fromJson( json );
 #else
 	log::error( "KeyValue::parse : failed to parse from string, built with no JSON support.\n" );
-	return "";
+	return kNull;
 #endif	/*	HAVE_JSON	*/
 }
 
