@@ -167,7 +167,7 @@ bool ImageImporterTIF::importImage( IFileSystemWPtr fs, const Asset& asset, cons
 	m_image.channels = 4;
 	m_image.pixels.resize( width * height * 4 );
 
-	for( s32 i = 0; i < npixels; i++ ) {
+	for( u32 i = 0; i < npixels; i++ ) {
 		m_image.pixels[i * 4 + 0] = TIFFGetR( raster[i] );
 		m_image.pixels[i * 4 + 1] = TIFFGetG( raster[i] );
 		m_image.pixels[i * 4 + 2] = TIFFGetB( raster[i] );

@@ -53,9 +53,10 @@ namespace Importers {
 
 		//! Mesh vertex format
 		struct Vertex {
-			Vec3			position;	//!< Vertex position.
-			Vec3			normal;		//!< Vertex normal.
-			Vec2			uv[2];		//!< Vertex uv.
+			enum { MaxTexCoords = 2 };
+			Vec3			position;			//!< Vertex position.
+			Vec3			normal;				//!< Vertex normal.
+			Vec2			uv[MaxTexCoords];	//!< Vertex uv.
 		};
 
 		//! Vertex comparison functor.
@@ -95,9 +96,9 @@ namespace Importers {
 
 	private:
 
-		FbxManager*			m_manager;	//!< FBX manager instance.
+		static FbxManager*	s_manager;	//!< FBX manager instance.
+		static FbxImporter*	s_importer;	//!< FBX scene importer instance.
 		FbxScene*			m_scene;	//!< Imported FBX scene.
-		FbxImporter*		m_importer;	//!< FBX scene importer instance.
 	};
 
 #endif	/*	HAVE_FBX	*/

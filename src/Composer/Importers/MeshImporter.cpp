@@ -98,41 +98,48 @@ bool MeshImporter::VertexCompare::operator()( const Vertex& a, const Vertex& b )
 
 // ---------------------------------------------------- MeshImporterFBX ---------------------------------------------------- //
 
+// ** MeshImporterFBX::s_manager
+FbxManager* MeshImporterFBX::s_manager = NULL;
+
+// ** MeshImporterFBX::s_importer
+FbxImporter* MeshImporterFBX::s_importer = NULL;
+
 // ** MeshImporterFBX::MeshImporterFBX
-MeshImporterFBX::MeshImporterFBX( void ) : m_manager( NULL ), m_scene( NULL ), m_importer( NULL )
+MeshImporterFBX::MeshImporterFBX( void ) : m_scene( NULL )
 {
+	// Create the FBX manager instance
+	if( !s_manager ) {
+		s_manager = FbxManager::Create();
+		DC_BREAK_IF( !s_manager );
+	}
+
+	// Create an importer
+	if( !s_importer ) {
+		s_importer = FbxImporter::Create( s_manager, "" );
+		DC_BREAK_IF( !s_importer );
+	}
 }
 
 MeshImporterFBX::~MeshImporterFBX( void )
 {
 	if( m_scene ) m_scene->Destroy();
-	if( m_importer ) m_importer->Destroy();
-	if( m_manager ) m_manager->Destroy();
 }
 
 // ** MeshImporterFBX::importNodes
 bool MeshImporterFBX::importNodes( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
 {
-	// Create the FBX manager instance
-	m_manager = FbxManager::Create();
-	DC_BREAK_IF( !m_manager );
-
 	// Create the scene instance
-	m_scene = FbxScene::Create( m_manager, "" );
+	m_scene = FbxScene::Create( s_manager, "" );
 	DC_BREAK_IF( !m_scene );
 
-	// Create an importer
-	m_importer = FbxImporter::Create( m_manager, "" );
-	DC_BREAK_IF( !m_importer );
-
 	// Initialize the importer by providing a filename.
-	if( !m_importer->Initialize( asset.absoluteFilePath.c_str(), -1, m_manager->GetIOSettings() ) ) {
+	if( !s_importer->Initialize( asset.absoluteFilePath.c_str(), -1, s_manager->GetIOSettings() ) ) {
 		DC_BREAK;
 		return false;
 	}
 
 	// Import the scene
-	if( !m_importer->Import( m_scene ) ) {
+	if( !s_importer->Import( m_scene ) ) {
 		DC_BREAK;
 		return false;
 	}
@@ -181,7 +188,7 @@ void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
 {
 	// Triangulate mesh node
 	if( !mesh->IsTriangleMesh() ) {
-		FbxGeometryConverter converter( m_manager );
+		FbxGeometryConverter converter( s_manager );
 		converter.Triangulate( node->GetNodeAttribute(), true );
 		mesh = static_cast<FbxMesh*>( node->GetNodeAttribute() );
 	}
@@ -194,7 +201,10 @@ void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
 	// Extract the texture coordinate names
     FbxStringList texCoordNames;
     mesh->GetUVSetNames( texCoordNames );
-	DC_BREAK_IF( texCoordNames.GetCount() <= 0 || texCoordNames.GetCount() > 2 );
+	
+	while( texCoordNames.GetCount() > Vertex::MaxTexCoords ) {
+		texCoordNames.RemoveLast();
+	}
 
 	// Vertex attributes
 	Array<FbxVector2>	texCoords;
