@@ -135,11 +135,10 @@ AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( p
 }
 
 // ** AssetBundle::create
-AssetBundlePtr AssetBundle::create( const String& name )
+AssetBundlePtr AssetBundle::create( const String& name, const io::Path& path )
 {
-	return AssetBundlePtr( DC_NEW AssetBundle( name, io::Path() ) );
+	return AssetBundlePtr( DC_NEW AssetBundle( name, path ) );
 }
-
 
 // ** AssetBundle::createFromJson
 AssetBundlePtr AssetBundle::createFromJson( const String& name, const io::Path& path, const String& json )
@@ -325,7 +324,18 @@ AssetPtr AssetBundle::addAsset( Asset::Type type, const String& uuid, const Stri
 {
 	log::msg( "Adding asset '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
 
-	AssetPtr asset( DC_NEW Asset( this, type, uuid, name ) );
+	AssetPtr asset;
+
+	switch( type ) {
+	case Asset::Mesh:	asset = DC_NEW Mesh( this, uuid, name );
+						RawMeshLoader::attachTo( asset );
+						break;
+	case Asset::Image:	asset = DC_NEW Image( this, uuid, name, 0, 0 );
+						RawImageLoader::attachTo( asset );
+						break;
+	default:			asset = DC_NEW Asset( this, type, uuid, name );		break;
+	}
+
 	m_assets[StringHash( uuid.c_str() )] = asset;
 	m_assets[StringHash( name.c_str() )] = asset;
 

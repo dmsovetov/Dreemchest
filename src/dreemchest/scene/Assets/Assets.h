@@ -188,7 +188,7 @@ namespace Scene {
 		void					setUuidFileNames( bool value );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
-		static AssetBundlePtr	create( const String& name );
+		static AssetBundlePtr	create( const String& name, const io::Path& path = io::Path() );
 
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	createFromFile( const String& name, const io::Path& path, const String& fileName );
