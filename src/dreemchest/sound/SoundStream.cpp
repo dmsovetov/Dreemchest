@@ -41,7 +41,7 @@ ISoundStreamPtr StandardStreamOpener::open( CString uri )
 // ------------------------------------------ StandardSoundStream ------------------------------------------- //
 
 // ** StandardSoundStream::StandardSoundStream
-StandardSoundStream::StandardSoundStream( io::StreamPtr stream ) : m_stream( stream )
+StandardSoundStream::StandardSoundStream( Io::StreamPtr stream ) : m_stream( stream )
 {
 
 }
@@ -49,8 +49,8 @@ StandardSoundStream::StandardSoundStream( io::StreamPtr stream ) : m_stream( str
 // ** StandardSoundStream::open
 ISoundStreamPtr StandardSoundStream::open( CString uri )
 {
-	io::DiskFileSystem diskFileSystem;
-    io::StreamPtr	   stream = diskFileSystem.openFile( uri );
+	Io::DiskFileSystem diskFileSystem;
+    Io::StreamPtr	   stream = diskFileSystem.openFile( uri );
     return stream.valid() ? DC_NEW StandardSoundStream( stream ) : NULL;
 }
 
@@ -65,7 +65,7 @@ ISoundStreamPtr StandardSoundStream::loadToRam( void ) const
 {
     AutoPtr<u8> data = DC_NEW u8[m_stream->length()];
 	m_stream->read( data.get(), m_stream->length() );
-	return DC_NEW MemorySoundStream( io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
+	return DC_NEW MemorySoundStream( Io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
 }
 
 // ** StandardSoundStream::read
@@ -78,9 +78,9 @@ u32 StandardSoundStream::read( void* buffer, u32 size )
 void StandardSoundStream::setPosition( u32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-	case SeekSet: m_stream->setPosition( offset, io::SeekSet ); break;
-    case SeekCur: m_stream->setPosition( offset, io::SeekCur ); break;
-    case SeekEnd: m_stream->setPosition( offset, io::SeekEnd ); break;
+	case SeekSet: m_stream->setPosition( offset, Io::SeekSet ); break;
+    case SeekCur: m_stream->setPosition( offset, Io::SeekCur ); break;
+    case SeekEnd: m_stream->setPosition( offset, Io::SeekEnd ); break;
     }
 }
 
@@ -93,7 +93,7 @@ u32 StandardSoundStream::position( void ) const
 // ---------------------------------------- MemorySoundStream ----------------------------------------- //
 
 // ** MemorySoundStream::MemorySoundStream
-MemorySoundStream::MemorySoundStream( io::ByteBufferPtr data ) : m_data( data )
+MemorySoundStream::MemorySoundStream( Io::ByteBufferPtr data ) : m_data( data )
 {
 
 }
@@ -129,9 +129,9 @@ u32 MemorySoundStream::read( void* buffer, u32 size )
 void MemorySoundStream::setPosition( u32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-	case SeekSet: m_data->setPosition( offset, io::SeekSet ); break;
-    case SeekCur: m_data->setPosition( offset, io::SeekCur ); break;
-    case SeekEnd: m_data->setPosition( offset, io::SeekEnd ); break;
+	case SeekSet: m_data->setPosition( offset, Io::SeekSet ); break;
+    case SeekCur: m_data->setPosition( offset, Io::SeekCur ); break;
+    case SeekEnd: m_data->setPosition( offset, Io::SeekEnd ); break;
     }
 }
 
