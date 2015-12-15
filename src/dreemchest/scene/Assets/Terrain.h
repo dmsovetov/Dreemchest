@@ -50,6 +50,9 @@ namespace Scene {
 
 								ClassEnableTypeInfoSuper( Terrain, Asset )
 
+								//! Constructs Terrain instance.
+								Terrain( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u32 size = 0 );
+
 		//! Returns terrain size.
 		u32						size( void ) const;
 
@@ -70,11 +73,6 @@ namespace Scene {
 
 		//! Creates the chunk mesh.
 		MeshPtr					createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const;
-
-	private:
-
-								//! Constructs Terrain instance.
-								Terrain( AssetBundle* bundle, const String& uuid, const String& name, u32 size );
 
 	private:
 

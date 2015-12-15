@@ -40,16 +40,14 @@ namespace Scene {
 
 								ClassEnableTypeInfoSuper( Image, Asset )
 
+								//! Constructs Image instance.
+								Image( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u16 width = 0, u16 height = 0 );
+
 		//! Returns image width.
 		u16						width( void ) const;
 
 		//! Returns image height.
 		u16						height( void ) const;
-
-	private:
-
-								//! Constructs Image instance.
-								Image( AssetBundle* bundle, const String& uuid, const String& name, u16 width, u16 height );
 
 	private:
 

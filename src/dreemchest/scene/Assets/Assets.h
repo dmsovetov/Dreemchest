@@ -53,6 +53,7 @@ namespace Scene {
 
 	//! Basic scene asset
 	class Asset : public RefCounted {
+	friend class AssetBundle;
 	public:
 
 								ClassEnableTypeInfo( Asset )
@@ -63,7 +64,7 @@ namespace Scene {
 			, Material			= BIT( 1 )
 			, Mesh				= BIT( 2 )
 			, Terrain			= BIT( 3 )
-			, Scene				= BIT( 4 )
+			, Prefab			= BIT( 4 )
 			, Folder			= BIT( 5 )
 			, TotalAssetTypes	= 6
 			, All				= ~0
@@ -79,7 +80,7 @@ namespace Scene {
 		};
 
 								//! Constructs Asset instance.
-								Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name );
+								Asset( AssetBundle* bundle = NULL, Type type = TotalAssetTypes, const String& uuid = String(), const String& name = String() );
 
 		//! Returns asset type.
 		Type					type( void ) const;
@@ -96,6 +97,12 @@ namespace Scene {
 		//! Returns asset uuid.
 		const String&			uuid( void ) const;
 
+		//! Returns asset timestamp.
+		u32						timestamp( void ) const;
+
+		//! Sets asset timestamp.
+		void					setTimestamp( u32 value );
+
 		//! Returns asset state.
 		State					state( void ) const;
 
@@ -108,17 +115,35 @@ namespace Scene {
 		//! Loads an asset.
 		bool					load( const Renderer::HalPtr& hal );
 
+		//! Returns asset data as key-value object.
+		virtual Io::KeyValue	keyValue( void ) const;
+
+		//! Reads asset data from key-value object.
+		virtual bool			setKeyValue( const Io::KeyValue& value );
+
 		//! Unloads asset.
 		virtual void			unload( void );
 
+		//! Returns asset name from type.
+		static String			typeToString( Asset::Type type );
+
+		//! Returns asset type from name.
+		static Asset::Type		typeFromString( const String& type );
+
 	private:
 
-		AssetLoaderPtr			m_loader;	//!< Asset loader instance.
-		AssetBundleWPtr			m_bundle;	//!< Parent asset bundle.
-		Type					m_type;		//!< Asset type.
-		String					m_name;		//!< Asset name.
-		String					m_uuid;		//!< Asset UUID.
-		State					m_state;	//!< Asset state.
+		//! Sets asset UUID.
+		void					setUuid( const String& value );
+
+	private:
+
+		AssetLoaderPtr			m_loader;		//!< Asset loader instance.
+		AssetBundleWPtr			m_bundle;		//!< Parent asset bundle.
+		Type					m_type;			//!< Asset type.
+		String					m_name;			//!< Asset name.
+		String					m_uuid;			//!< Asset UUID.
+		State					m_state;		//!< Asset state.
+		u32						m_timestamp;	//!< Last known asset file timestamp.
 	};
 
 	//! Generic asset class to derive other asset types from it.
@@ -172,8 +197,14 @@ namespace Scene {
 		//! Creates the new Terrain asset inside this bundle.
 		TerrainPtr				addTerrain( const String& uuid, const String& name, u32 size );
 
-		//! Creates the new Asset inside this bundle.
-		AssetPtr				addAsset( Asset::Type type, const String& uuid, const String& name );
+		//! Creates the new Asset and loads it from key-value data.
+		AssetPtr				createAssetFromData( const Io::KeyValue& data ) const;
+
+		//! Creates new Asset by type.
+		AssetPtr				createAssetByType( Asset::Type type ) const;
+
+		//! Adds an asset to this bundle.
+		void					addAsset( AssetPtr asset );
 
 		//! Creates the new Mesh asset inside this bundle.
 		MeshPtr					addMesh( const String& uuid, const String& name );
@@ -187,32 +218,40 @@ namespace Scene {
 		//! Sets the UUID file names flag.
 		void					setUuidFileNames( bool value );
 
-		//! Creates an AssetBundle instance and loads it from a JSON file.
+		//! Creates an empty AssetBundle instance.
 		static AssetBundlePtr	create( const String& name, const Io::Path& path = Io::Path() );
 
-		//! Creates an AssetBundle instance and loads it from a JSON file.
+		//! Creates an AssetBundle instance and loads it from a key-value file.
 		static AssetBundlePtr	createFromFile( const String& name, const Io::Path& path, const String& fileName );
 
-		//! Creates an AssetBundle instance and loads it from a JSON string.
-		static AssetBundlePtr	createFromJson( const String& name, const Io::Path& path, const String& json );
+		//! Creates an AssetBundle instance and loads it from a key-value string.
+		static AssetBundlePtr	createFromString( const String& name, const Io::Path& path, const String& text );
 
 	private:
 
 								//! Constructs AssetBundle instance.
 								AssetBundle( const String& name, const Io::Path& path );
 
-		//! Loads assets from JSON string.
-		bool					loadFromJson( const String& json );
+		//! Loads assets from key-value string.
+		bool					loadFromString( const String& text );
 
 	private:
 
 		//! Container type to store available assets.
 		typedef Hash<AssetPtr>	Assets;
 
+		//! Asset factory type.
+		typedef AbstractFactory<Asset, Asset::Type>	AssetFactory;
+
+		//! Container type to map from string to asset type.
+		typedef Map<String, Asset::Type> AssetTypeByName;
+
 		Io::Path				m_path;				//!< Asset bundle physical path.
 		String					m_name;				//!< Asset bundle name.
 		Assets					m_assets;			//!< Identifier to asset mapping.
 		bool					m_uuidFileNames;	//!< Are the UUID file names used.
+		AssetFactory			m_factory;			//!< Asset factory.
+		AssetTypeByName			m_typeByName;		//!< Asset type by name.
 	};
 
 	// ** AssetBundle::find

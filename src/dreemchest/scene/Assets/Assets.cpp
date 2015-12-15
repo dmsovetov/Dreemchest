@@ -29,6 +29,7 @@
 #include "Image.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Prefab.h"
 #include "Terrain.h"
 #include "Loaders.h"
 
@@ -40,9 +41,9 @@ namespace Scene {
 
 // ** Asset::Asset
 Asset::Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name )
-	: m_bundle( bundle ), m_type( type ), m_uuid( uuid ), m_name( name ), m_state( Unknown )
+	: m_bundle( bundle ), m_type( type ), m_uuid( uuid ), m_name( name ), m_state( Unknown ), m_timestamp( 0 )
 {
-	DC_BREAK_IF( bundle == NULL )
+//	DC_BREAK_IF( bundle == NULL )
 }
 
 // ** Asset::type
@@ -61,6 +62,24 @@ const String& Asset::name( void ) const
 const String& Asset::uuid( void ) const
 {
 	return m_uuid;
+}
+
+// ** Asset::setUuid
+void Asset::setUuid( const String& value )
+{
+	m_uuid = value;
+}
+
+// ** Asset::timestamp
+u32 Asset::timestamp( void ) const
+{
+	return m_timestamp;
+}
+
+// ** Asset::setTimestamp
+void Asset::setTimestamp( u32 value )
+{
+	m_timestamp = value;
 }
 
 // ** Asset::state
@@ -87,6 +106,23 @@ void Asset::setLoader( const AssetLoaderPtr& value )
 	m_loader = value;
 }
 
+// ** Asset::keyValue
+Io::KeyValue Asset::keyValue( void ) const
+{
+	return Io::KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
+}
+
+// ** Asset::setKeyValue
+bool Asset::setKeyValue( const Io::KeyValue& value )
+{
+	DC_BREAK_IF( !value.isObject() );
+
+	m_uuid		= value.get( "uuid", "" ).asString();
+	m_timestamp = value.get( "timestamp", 0 ).asUInt();
+
+	return m_uuid != "";
+}
+
 // ** Asset::load
 bool Asset::load( const Renderer::HalPtr& hal )
 {
@@ -100,7 +136,7 @@ bool Asset::load( const Renderer::HalPtr& hal )
 	m_state = Loading;
 
 	Io::DiskFileSystem fileSystem;
-	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() ) );
+	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() != "" ? name() : uuid() ) );
 
 	if( stream == Io::StreamPtr() ) {
 		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
@@ -127,11 +163,46 @@ void Asset::unload( void )
 	m_state = Unloaded;
 }
 
+// ** Asset::typeFromString
+Asset::Type Asset::typeFromString( const String& type )
+{
+	if( type == "Mesh" )	 return Asset::Mesh;
+	if( type == "Image" )	 return Asset::Image;
+	if( type == "Prefab" )	 return Asset::Prefab;
+	if( type == "Scene" )	 return Asset::Prefab;
+	if( type == "Terrain" )	 return Asset::Terrain;
+	if( type == "Material" ) return Asset::Material;
+
+	DC_BREAK;
+	return Asset::TotalAssetTypes;
+}
+
+// ** Asset::typeToString
+String Asset::typeToString( Asset::Type type )
+{
+	switch( type ) {
+	case Asset::Mesh:		return "Mesh";
+	case Asset::Image:		return "Image";
+	case Asset::Prefab:		return "Prefab";
+	case Asset::Terrain:	return "Terrain";
+	case Asset::Material:	return "Material";
+	}
+
+	DC_BREAK;
+	return "";
+}
+
 // ---------------------------------------- AssetBundle ------------------------------------------- //
 
 // ** AssetBundle::AssetBundle
 AssetBundle::AssetBundle( const String& name, const Io::Path& path ) : m_path( path ), m_name( name ), m_uuidFileNames( true )
 {
+	// Declare asset types
+	m_factory.declare<Mesh>( Asset::Mesh );
+	m_factory.declare<Material>( Asset::Material );
+	m_factory.declare<Image>( Asset::Image );
+	m_factory.declare<Prefab>( Asset::Prefab );
+	m_factory.declare<Terrain>( Asset::Terrain );
 }
 
 // ** AssetBundle::create
@@ -140,16 +211,16 @@ AssetBundlePtr AssetBundle::create( const String& name, const Io::Path& path )
 	return AssetBundlePtr( DC_NEW AssetBundle( name, path ) );
 }
 
-// ** AssetBundle::createFromJson
-AssetBundlePtr AssetBundle::createFromJson( const String& name, const Io::Path& path, const String& json )
+// ** AssetBundle::createFromString
+AssetBundlePtr AssetBundle::createFromString( const String& name, const Io::Path& path, const String& text )
 {
-	DC_BREAK_IF( json.empty() );
+	DC_BREAK_IF( text.empty() );
 
 	// Create asset bundle instance
 	AssetBundlePtr assetBundle( DC_NEW AssetBundle( name, path ) );
 
-	// Load assets from JSON
-	if( !assetBundle->loadFromJson( json ) ) {
+	// Load assets from key-value
+	if( !assetBundle->loadFromString( text ) ) {
 		return AssetBundlePtr();
 	}
 
@@ -159,16 +230,28 @@ AssetBundlePtr AssetBundle::createFromJson( const String& name, const Io::Path& 
 // ** AssetBundle::createFromFile
 AssetBundlePtr AssetBundle::createFromFile( const String& name, const Io::Path& path, const String& fileName )
 {
-	// Read the JSON file
-	String json = Io::DiskFileSystem::readTextFile( fileName );
+	// Read the key-value file
+	String text = Io::DiskFileSystem::readTextFile( fileName );
 
-	if( json == "" ) {
-		log::warn( "AssetBundle::createFromFile : %s, file not found or empty JSON\n", fileName.c_str() );
+	if( text == "" ) {
+		log::warn( "AssetBundle::createFromFile : %s, file does not exist or empty\n", fileName.c_str() );
 		return AssetBundlePtr();
 	}
 
-	// Create from JSON string.
-	return createFromJson( name, path, json );
+	// Create from key-value string.
+	return createFromString( name, path, text );
+}
+
+// ** AssetBundle::createAssetByType
+AssetPtr AssetBundle::createAssetByType( Asset::Type type ) const
+{
+	AssetPtr asset = m_factory.construct( type );
+
+	if( asset.valid() ) {
+		asset->setUuid( Guid::generate().toString() );
+	}
+
+	return asset;
 }
 
 // ** AssetBundle::name
@@ -223,49 +306,58 @@ AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
 	return i->second;
 }
 
-// ** AssetBundle::loadFromJson
-bool AssetBundle::loadFromJson( const String& json )
+// ** AssetBundle::loadFromString
+bool AssetBundle::loadFromString( const String& text )
 {
-#ifdef HAVE_JSON
-	Json::Value root;
-	Json::Reader reader;
+	// Parse key-value from string
+	Io::KeyValue kv = Io::KeyValue::parse( text );
 
-	if( !reader.parse( json, root ) ) {
+	// Failed to parse
+	if( kv.isNull() ) {
 		return false;
 	}
 
-	for( u32 i = 0, n = root.size(); i < n; i++ ) {
-		const Json::Value& item = root[i];
+	// Add all assets to bundle
+	for( s32 i = 0, n = kv.size(); i < n; i++ ) {
+		// Create asset instance from data
+		AssetPtr asset = createAssetFromData( kv[i] );
 
-		String identifier = item["identifier"].asString();
-		String uuid		  = item["uuid"].asString();
-		String type		  = item["type"].asString();
+		// Failed to constuct asset
+		if( !asset.valid() ) {
+			continue;
+		}
 
-		if( type == "image" ) {
-			ImagePtr image = addImage( uuid, identifier, item["width"].asInt(), item["height"].asInt() );
-			RawImageLoader::attachTo( image );
+		// Add asset loaders
+		switch( asset->type() ) {
+		case Asset::Material:	JsonMaterialLoader::attachTo( asset );	break;
+		case Asset::Image:		RawImageLoader::attachTo( asset );		break;
 		}
-		else if( type == "mesh" ) {
-			MeshPtr mesh = addMesh( uuid, identifier );
-			RawMeshLoader::attachTo( mesh );
-		}
-		else if( type == "material" ) {
-			MaterialPtr material = addMaterial( uuid, identifier );
-			JsonMaterialLoader::attachTo( material );
-		}
-		else if( type == "scene" ) {
-			AssetPtr scene = addAsset( Asset::Scene, uuid, identifier );
-		}
-		else {
-			log::warn( "AssetBundle::loadFromJson : unknown asset type '%s'\n", type.c_str() );
-		}
+
+		addAsset( asset );
 	}
 
 	return true;
-#else
-	log::warn( "AssetBundle::loadFromJson : built with no JSON support.\n" );
-	return false;
-#endif	/*	HAVE_JSON	*/
+}
+
+// ** AssetBundle::addAsset
+void AssetBundle::addAsset( AssetPtr asset )
+{
+	log::msg( "Adding asset '%s' to bundle '%s'...\n", asset->name().c_str(), m_name.c_str() );
+
+	// Register an asset by it's UUID
+	const String& uuid = asset->uuid();
+	DC_BREAK_IF( uuid.empty() );
+
+	m_assets[StringHash( uuid.c_str() )] = asset;
+
+	// Register an asset by it's name
+	const String& name = asset->name();
+
+	if( !name.empty() ) {
+		m_assets[StringHash( asset->name().c_str() )] = asset;
+	}
+
+	asset->m_bundle = this;
 }
 
 // ** AssetBundle::addImage
@@ -304,7 +396,6 @@ TerrainPtr AssetBundle::addTerrain( const String& uuid, const String& name, u32 
 	return terrain;
 }
 
-
 // ** AssetBundle::addMaterial
 MaterialPtr AssetBundle::addMaterial( const String& uuid, const String& name )
 {
@@ -317,25 +408,26 @@ MaterialPtr AssetBundle::addMaterial( const String& uuid, const String& name )
 	return material;
 }
 
-// ** AssetBundle::addAsset
-AssetPtr AssetBundle::addAsset( Asset::Type type, const String& uuid, const String& name )
+// ** AssetBundle::createAssetFromData
+AssetPtr AssetBundle::createAssetFromData( const Io::KeyValue& kv ) const
 {
-	log::msg( "Adding asset '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
+	DC_BREAK_IF( !kv.isObject() );
 
-	AssetPtr asset;
+	// Get asset type by name.
+	Asset::Type type = Asset::typeFromString( kv.get( "type", "" ).asString() );
 
-	switch( type ) {
-	case Asset::Mesh:	asset = DC_NEW Mesh( this, uuid, name );
-						RawMeshLoader::attachTo( asset );
-						break;
-	case Asset::Image:	asset = DC_NEW Image( this, uuid, name, 0, 0 );
-						RawImageLoader::attachTo( asset );
-						break;
-	default:			asset = DC_NEW Asset( this, type, uuid, name );		break;
+	// Create asset instance by type name
+	AssetPtr asset = createAssetByType( type );
+
+	// Unknown asset type - return null
+	if( !asset.valid() ) {
+		return AssetPtr();
 	}
 
-	m_assets[StringHash( uuid.c_str() )] = asset;
-	m_assets[StringHash( name.c_str() )] = asset;
+	// Load asset from key-value data
+	if( !asset->setKeyValue( kv ) ) {
+		return AssetPtr();
+	}
 
 	return asset;
 }

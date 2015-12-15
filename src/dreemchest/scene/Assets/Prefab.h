@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Mesh_H__
-#define __DC_Scene_Mesh_H__
+#ifndef __DC_Scene_Prefab_H__
+#define __DC_Scene_Prefab_H__
 
 #include "Assets.h"
 
@@ -33,32 +33,18 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Mesh data container.
-	class Mesh : public AssetWithData<AssetMesh> {
-	friend class AssetBundle;
+	//! Prefab scene asset.
+	class Prefab : public Asset {
 	public:
 
-								ClassEnableTypeInfoSuper( Mesh, Asset )
+								ClassEnableTypeInfoSuper( Prefab, Asset )
 
-								//! Constructs Mesh instance.
-								Mesh( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String() );
-
-		//! Returns mesh bounds.
-		const Bounds&			bounds( void ) const;
-
-		//! Sets mesh bounds.
-		void					setBounds( const Bounds& value );
-
-		//! Creates an empty mesh instance.
-		static MeshPtr			create( void );
-
-	private:
-
-		Bounds					m_bounds;		//!< Bounding box of a mesh.
+								//! Constructs Prefab instance.
+								Prefab( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u16 width = 0, u16 height = 0 );
 	};
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Mesh_H__    */
+#endif    /*    !__DC_Scene___DC_Scene_Prefab_H___H__    */

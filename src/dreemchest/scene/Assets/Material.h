@@ -61,6 +61,9 @@ namespace Scene {
             TotalMaterialLayers
         };
 
+									//! Constructs Material instance.
+									Material( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String() );
+
 		//! Returns material rendering mode.
 		RenderingMode				renderingMode( void ) const;
 
@@ -92,9 +95,6 @@ namespace Scene {
 		static MaterialPtr			create( const String& name );
 
 	private:
-
-									//! Constructs Material instance.
-									Material( AssetBundle* bundle, const String& uuid, const String& name );
 
 		//! Updates material features.
 		void						updateMaterialFeatures( void );
