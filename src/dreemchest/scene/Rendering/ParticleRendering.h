@@ -41,28 +41,28 @@ namespace Scene {
 									ParticleRenderingInterface( Renderer::Renderer2DPtr renderer );
 
 		//! Renders an array of 3D points.
-		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride ) DC_DECL_OVERRIDE;
 
 		//! Renders an array of 2D points.
-		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride ) DC_DECL_OVERRIDE;
 
 		//! Renders the oriented 2D quad.
-		virtual void				renderOrientedQuadUV( const Fx::IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
+		virtual void				renderOrientedQuadUV( const Fx::IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) DC_DECL_OVERRIDE;
 
 		//! Renders the 2D line segment.
-		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 );
+		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 ) DC_DECL_OVERRIDE;
 
 		//! Renders the 2D thick line.
-		virtual void				renderThickLine( const Fx::IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
+		virtual void				renderThickLine( const Fx::IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) DC_DECL_OVERRIDE;
 
 		//! Renders the 2D line strip.
-		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f );
+		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f ) DC_DECL_OVERRIDE;
 
 		//! Renders the 2D thick line strip.
-		virtual void				renderThickLineStrip( const Fx::IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
+		virtual void				renderThickLineStrip( const Fx::IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) DC_DECL_OVERRIDE;
 
 		//! Flushes the accumulated particles.
-		virtual void				flush( void );
+		virtual void				flush( void ) DC_DECL_OVERRIDE;
 
 	private:
 

@@ -61,16 +61,16 @@ namespace Scene {
 		void					setDeltaTime( f32 value );
 
 		//! Updates the physics engine state.
-		virtual bool			begin( u32 currentTime );
+		virtual bool			begin( u32 currentTime ) DC_DECL_OVERRIDE;
 
 		//! Synchronizes the scene object transform with a rigid body.
-		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform );
+		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			entityAdded( const Ecs::Entity& entity );
+		virtual void			entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			entityRemoved( const Ecs::Entity& entity );
+		virtual void			entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 	private:
 

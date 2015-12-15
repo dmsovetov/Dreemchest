@@ -82,7 +82,7 @@ namespace Scene {
 							RenderPass( Ecs::EcsWPtr ecs, const String& name );
 
 		//! Processes the entity family and emits render operations to be executed by RVM.
-		virtual void		render( RenderingContextPtr context );
+		virtual void		render( RenderingContextPtr context ) DC_DECL_OVERRIDE;
 
 	protected:
 

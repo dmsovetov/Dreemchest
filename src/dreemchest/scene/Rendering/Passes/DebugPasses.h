@@ -46,7 +46,7 @@ namespace Scene {
 	protected:
 
 		//! Setups the RVM for rendering mesh overdraw.
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Reneders wireframe mesh overlay.
@@ -60,7 +60,7 @@ namespace Scene {
 	protected:
 
 		//! Setups the RVM for rendering wireframe meshes.
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Renders bounding boxes of meshes.
@@ -74,7 +74,7 @@ namespace Scene {
 	protected:
 
 		//! Renders bounding box of a single static mesh.
-		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Renders bounding boxes of lights.
@@ -88,7 +88,7 @@ namespace Scene {
 	protected:
 
 		//! Renders bounding box of a single light.
-		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Renders bounding boxes of particle systems.
@@ -102,7 +102,7 @@ namespace Scene {
 	protected:
 
 		//! Renders bounding box of a single light.
-		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Renders bounding boxes of scene objects.

@@ -43,10 +43,10 @@ namespace Scene {
 	private:
 
 		//! Checks if an entity contains any components that contain assets and queues them for loading.
-		virtual void		entityAdded( const Ecs::Entity& entity );
+		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 		//! Tracks the asset loading.
-		virtual void		update( u32 currentTime, f32 dt );
+		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
 
 		//! Queues static mesh assets.
 		void				queueStaticMesh( StaticMesh* mesh );

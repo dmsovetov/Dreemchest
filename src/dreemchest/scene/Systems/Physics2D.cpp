@@ -51,7 +51,7 @@ SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 {
 	// Query callback
 	struct Callback : public b2QueryCallback {
-		virtual bool ReportFixture( b2Fixture* fixture ) {
+		virtual bool ReportFixture( b2Fixture* fixture ) DC_DECL_OVERRIDE {
 			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
 			m_result.insert( entity );
 			return true;
@@ -81,7 +81,7 @@ SceneObjectSet Box2DPhysics::querySegment( const Vec2& start, const Vec2& end ) 
 	struct Callback : public b2RayCastCallback {
 		Callback( void ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) {
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) DC_DECL_OVERRIDE {
 			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
 			m_result.insert( entity );
 			return 1.0f;
@@ -103,7 +103,7 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 	struct Callback : public b2RayCastCallback {
 		Callback( void ) : m_hasIntersection( false ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) {
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) DC_DECL_OVERRIDE {
 			m_result = point;
 			m_hasIntersection = true;
 			return 0.0f;

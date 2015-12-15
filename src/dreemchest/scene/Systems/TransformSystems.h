@@ -44,15 +44,15 @@ namespace Scene {
 								: GenericEntitySystem( "AffineTransformSystem" ) {}
 
 		//! Calculates the affine transform matrix for each transform component.
-		virtual void		update( u32 currentTime, f32 dt );
+		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
 
 	private:
 
 		//! Called when entity was added.
-		virtual void		entityAdded( const Ecs::Entity& entity );
+		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 		//! Called when entity was removed.
-		virtual void		entityRemoved( const Ecs::Entity& entity );
+		virtual void		entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -68,7 +68,7 @@ namespace Scene {
 								: GenericEntitySystem( "WorldSpaceBoundingBoxSystem" ) {}
 
 		//! Calculates the world space bounds for static mesh.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Moves scene object transform along coordinate axes.
@@ -79,7 +79,7 @@ namespace Scene {
 							MoveAlongAxesSystem( void );
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Rotates scene object transform around axes.
@@ -90,7 +90,7 @@ namespace Scene {
 							RotateAroundAxesSystem( void );
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! The following system
@@ -102,10 +102,10 @@ namespace Scene {
 								: GenericEntitySystem( "Follow" ) {}
 
 		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Attaches the internal following data to an added scene object.
-		virtual void		sceneObjectAdded( Ecs::Entity& sceneObject, Follow& follow, Transform& transform );
+		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -124,7 +124,7 @@ namespace Scene {
 								: GenericEntitySystem( "Particles" ) {}
 
 		//! Updates the particle system.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform );
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 } // namespace Scene

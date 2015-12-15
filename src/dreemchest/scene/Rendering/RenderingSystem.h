@@ -83,7 +83,7 @@ namespace Scene {
 									: RenderingSystemBase( ecs, name, Ecs::Aspect::all<Camera, Transform, TRenderer>() ) {}
 
 		//! Extracts the renderer component before rendering.
-		virtual void			renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform );
+		virtual void			renderFromCamera( RenderingContextPtr context, Ecs::Entity& entity, Camera& camera, Transform& transform ) DC_DECL_OVERRIDE;
 
 	protected:
 

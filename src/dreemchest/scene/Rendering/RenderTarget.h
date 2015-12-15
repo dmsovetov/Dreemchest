@@ -63,10 +63,10 @@ namespace Scene {
 	public:
 
 		//! Returns the window width.
-		virtual u32					width( void ) const;
+		virtual u32					width( void ) const DC_DECL_OVERRIDE;
 
 		//! Returns the window height.
-		virtual u32					height( void ) const;
+		virtual u32					height( void ) const DC_DECL_OVERRIDE;
 
 		//! Creates the WindowView instance.
 		static WindowTargetPtr		create( const Platform::WindowWPtr& window );
@@ -89,16 +89,16 @@ namespace Scene {
 		Renderer::RenderTargetPtr	rt( void ) const;
 
 		//! Returns the render target width.
-		virtual u32					width( void ) const;
+		virtual u32					width( void ) const DC_DECL_OVERRIDE;
 
 		//! Returns the render target height.
-		virtual u32					height( void ) const;
+		virtual u32					height( void ) const DC_DECL_OVERRIDE;
 
 		//! Begins rendering to this view.
-		virtual void				begin( RenderingContextPtr context ) const;
+		virtual void				begin( RenderingContextPtr context ) const DC_DECL_OVERRIDE;
 
 		//! Ends rendering to this view.
-		virtual void				end( RenderingContextPtr context ) const;
+		virtual void				end( RenderingContextPtr context ) const DC_DECL_OVERRIDE;
 
 		//! Creates the TextureTarget instance.
 		static RenderTargetPtr		create( const Renderer::RenderTargetPtr& rt );

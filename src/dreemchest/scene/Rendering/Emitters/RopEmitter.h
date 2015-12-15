@@ -64,7 +64,7 @@ namespace Scene {
 									: RopEmitterBase( ecs, name, Ecs::Aspect::all<TRenderable, Transform>() ) {}
 
 		//! Emits render operations for renderable entities in scene.
-		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );
+		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform ) DC_DECL_OVERRIDE;
 
 	protected:
 

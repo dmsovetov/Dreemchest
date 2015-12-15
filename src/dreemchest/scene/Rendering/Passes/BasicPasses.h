@@ -55,7 +55,7 @@ namespace Scene {
 	protected:
 
 		//! Setups the RVM for rendering ambient.
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Renders particle systems.
@@ -69,7 +69,7 @@ namespace Scene {
 	protected:
 
 		//! Renders the particle system.
-		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Particles& particles, const Transform& transform ) DC_DECL_OVERRIDE;
 
 	private:
 

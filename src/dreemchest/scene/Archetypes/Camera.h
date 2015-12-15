@@ -61,7 +61,7 @@ namespace Scene {
 	protected:
 
 		//! Constructs the SpectatorCamera instance.
-		virtual void				construct( void );
+		virtual void				construct( void ) DC_DECL_OVERRIDE;
 	};
 
 } // namespace Scene

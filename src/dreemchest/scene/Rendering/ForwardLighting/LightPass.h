@@ -45,12 +45,12 @@ namespace Scene {
 	protected:
 
 		//! Emits render operations for a single static mesh.
-		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform );
+		virtual void			render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Light& light, const Transform& transform ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Setups the RVM for rendering lit meshes
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Emits render operation for additive render mode.
@@ -63,7 +63,7 @@ namespace Scene {
 	protected:
 
 		//! Setups the RVM for rendering additive layer.
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Emits render operations for translucent objects.
@@ -76,7 +76,7 @@ namespace Scene {
 	protected:
 
 		//! Setups the RVM for rendering translucent layer.
-		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
 	//! Forward light rendering system.

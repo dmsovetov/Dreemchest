@@ -193,10 +193,10 @@ void FollowSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, F
 	
 }
 
-// ** FollowSystem::sceneObjectAdded
-void FollowSystem::sceneObjectAdded( Ecs::Entity& sceneObject, Follow& follow, Transform& transform )
+// ** FollowSystem::entityAdded
+void FollowSystem::entityAdded( const Ecs::Entity& entity )
 {
-	follow.setInternal<Internal>( DC_NEW Internal );
+	entity.get<Follow>()->setInternal<Internal>( DC_NEW Internal );
 }
 
 // ---------------------------------------------- ParticlesSystem -------------------------------------------- //

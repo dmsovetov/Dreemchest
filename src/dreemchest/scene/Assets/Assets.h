@@ -139,7 +139,7 @@ namespace Scene {
 									: Asset( bundle, type, uuid, name ) {}
 
 		//! Unloads the asset data.
-		virtual void			unload( void ) { m_data = StrongPtr<TData>(); Asset::unload(); }
+		virtual void			unload( void ) DC_DECL_OVERRIDE { m_data = StrongPtr<TData>(); Asset::unload(); }
 
 	private:
 

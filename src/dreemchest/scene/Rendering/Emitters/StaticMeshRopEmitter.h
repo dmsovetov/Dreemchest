@@ -54,7 +54,7 @@ namespace Scene {
 	private:
 
 		//! Emits render operations for all static meshes in scene.
-		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform );
+		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
 
 	private:
 
