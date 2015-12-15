@@ -181,6 +181,12 @@ namespace Scene {
 		//! Removes an Asset from bundle by UUID.
 		void					removeAsset( const String& uuid );
 
+		//! Returns true if UUID file names should be used.
+		bool					uuidFileNames( void ) const;
+
+		//! Sets the UUID file names flag.
+		void					setUuidFileNames( bool value );
+
 		//! Creates an AssetBundle instance and loads it from a JSON file.
 		static AssetBundlePtr	create( const String& name );
 
@@ -206,6 +212,7 @@ namespace Scene {
 		io::Path				m_path;				//!< Asset bundle physical path.
 		String					m_name;				//!< Asset bundle name.
 		Assets					m_assets;			//!< Identifier to asset mapping.
+		bool					m_uuidFileNames;	//!< Are the UUID file names used.
 	};
 
 	// ** AssetBundle::find

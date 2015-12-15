@@ -130,7 +130,7 @@ void Asset::unload( void )
 // ---------------------------------------- AssetBundle ------------------------------------------- //
 
 // ** AssetBundle::AssetBundle
-AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( path ), m_name( name )
+AssetBundle::AssetBundle( const String& name, const io::Path& path ) : m_path( path ), m_name( name ), m_uuidFileNames( true )
 {
 }
 
@@ -178,6 +178,18 @@ const String& AssetBundle::name( void ) const
 	return m_name;
 }
 
+// ** AssetBundle::uuidFileNames
+bool AssetBundle::uuidFileNames( void ) const
+{
+	return m_uuidFileNames;
+}
+
+// ** AssetBundle::setUuidFileNames
+void AssetBundle::setUuidFileNames( bool value )
+{
+	m_uuidFileNames = value;
+}
+
 // ** AssetBundle::assetPathByIdentifier
 io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
 {
@@ -187,7 +199,13 @@ io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
 		return "";
 	}
 
-	return m_path + asset->uuid();
+	String uuid = asset->uuid();
+
+	if( m_uuidFileNames ) {
+		uuid = String() + uuid[0] + uuid[1] + "/" + uuid;
+	}
+
+	return m_path + uuid;
 }
 
 // ** AssetBundle::findAsset
