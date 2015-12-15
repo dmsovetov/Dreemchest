@@ -416,6 +416,7 @@ void JsonParticleSystemLoader::readScalarParameter( FloatParameter& parameter, c
 					} else {
 						FloatArray range = readFloats( object );
 						parameter.setRandomBetweenConstants( range[0], range[1] );
+						parameter.constructLifetimeCurves();
 					}
 				}
 				break;

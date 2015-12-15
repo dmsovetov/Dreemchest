@@ -564,6 +564,7 @@ bool JsonSceneLoader::readModuleInitial( Fx::ParticlesWPtr particles, const Json
 	readScalarParameter( particles->scalarParameter( Fx::Particles::Size ), object["size"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::Speed ), object["speed"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::Gravity ), object["gravity"] );
+	readScalarParameter( particles->scalarParameter( Fx::Particles::Rotation ), object["rotation"] );
 
 	return true;
 }
@@ -611,6 +612,7 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 					} else {
 						Fx::FloatArray range = readFloats( object );
 						parameter.setRandomBetweenConstants( range[0], range[1] );
+						parameter.constructLifetimeCurves();
 					}
 				}
 				break;

@@ -105,6 +105,7 @@ namespace Fx {
         , ZoneLine
 		, ZoneBox
 		, ZoneHemiSphere
+		, ZoneSphere
 
         , TotalZoneTypes
 	};
