@@ -333,12 +333,6 @@ bool AssetBundle::loadFromString( const String& text )
 			continue;
 		}
 
-		// Add asset loaders
-		switch( asset->type() ) {
-		case Asset::Material:	JsonMaterialLoader::attachTo( asset );	break;
-		case Asset::Image:		RawImageLoader::attachTo( asset );		break;
-		}
-
 		addAsset( asset );
 	}
 
@@ -363,7 +357,15 @@ void AssetBundle::addAsset( AssetPtr asset )
 		m_assets[StringHash( asset->name().c_str() )] = asset;
 	}
 
-	asset->m_bundle = this;
+	//! WORKAROUND: add asset loaders
+	switch( asset->type() ) {
+	case Asset::Material:	JsonMaterialLoader::attachTo( asset );	break;
+	case Asset::Image:		RawImageLoader::attachTo( asset );		break;
+	case Asset::Mesh:		RawMeshLoader::attachTo( asset );		break;
+	}
+
+	// Set parent bundle
+	asset->setBundle( this );
 }
 
 // ** AssetBundle::addImage
