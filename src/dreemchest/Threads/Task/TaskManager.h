@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Threads {
 
     //! Contains working threads and dispatches tasks to them.
-    class dcInterface TaskManager {
+    class dcInterface TaskManager : public RefCounted {
 
         typedef Hash<TaskThreadPtr>  TaskThreads;
 
@@ -46,9 +46,6 @@ namespace Threads {
         };
         
     public:
-
-                                //! Task manager constructor.
-                                TaskManager( void );
 
         //! Starts a new background task with a given priority at a given worker.
         /*!
@@ -85,7 +82,13 @@ namespace Threads {
         //! Rerturns an amount of queued background tasks.
         u32                     totalBackgroundTasks( void ) const;
 
+		//! Creates task manager instance.
+		static TaskManagerPtr	create( void );
+
     private:
+
+		                        //! Task manager constructor.
+                                TaskManager( void );
 
         //! Starts a new thread with a given name and task queue.
         /*!

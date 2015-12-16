@@ -53,6 +53,12 @@ TaskManager::TaskManager( void )
     startTaskThread( "Asset", DC_NEW TaskQueue );
 }
 
+// ** TaskManager::create
+TaskManagerPtr TaskManager::create( void )
+{
+	return TaskManagerPtr( DC_NEW TaskManager );
+}
+
 // ** TaskManager::totalBackgroundTasks
 u32 TaskManager::totalBackgroundTasks( void ) const
 {
