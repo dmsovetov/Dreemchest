@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Threads {
 
     //! TaskThread object with associated task queue, used for background task processing.
-    class TaskThread {
+    class TaskThread : public RefCounted {
     public:
 
 
@@ -43,11 +43,10 @@ namespace Threads {
                                  \param name Task thread name.
                                  \param queue Task thread queue.
                                  */
-                                TaskThread( const char* name, class TaskQueue* queue );
-                                ~TaskThread( void );
+                                TaskThread( const String& name, TaskQueueWPtr queue );
 
         //! Returns a pointer to thread task queue.
-        class TaskQueue*        taskQueue( void ) const;
+        TaskQueueWPtr			taskQueue( void ) const;
         
         //! Returns a thread identifier.
         u32                     threadId( void ) const;
@@ -63,7 +62,7 @@ namespace Threads {
         String                  m_name;
 
         //! Task queue.
-        class TaskQueue*        m_tasks;
+        TaskQueueWPtr			m_tasks;
 
         //! Thread object.
         ThreadPtr				m_thread;

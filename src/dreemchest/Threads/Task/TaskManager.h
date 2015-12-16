@@ -36,7 +36,7 @@ namespace Threads {
     //! Contains working threads and dispatches tasks to them.
     class dcInterface TaskManager {
 
-        typedef Hash<class TaskThread*>  TaskThreads;
+        typedef Hash<TaskThreadPtr>  TaskThreads;
 
         // ** enum eBuiltInQueue
         enum eBuiltInQueue {
@@ -49,8 +49,6 @@ namespace Threads {
 
                                 //! Task manager constructor.
                                 TaskManager( void );
-                                //! Task manager destructor.
-                                ~TaskManager( void );
 
         //! Starts a new background task with a given priority at a given worker.
         /*!
@@ -60,7 +58,7 @@ namespace Threads {
          \param thread Worker name.
          \return TaskProgress object.
          */
-        TaskProgressWPtr		runBackgroundTask( const TaskFunction& task, void* userData = NULL, u32 priority = 0, const char* thread = NULL );
+        TaskProgressPtr			runBackgroundTask( const TaskFunction& task, void* userData = NULL, u32 priority = 0, const String& thread = "" );
 
         //! Adds a new task to process on main thread.
         /*!
@@ -69,7 +67,7 @@ namespace Threads {
          \param wait A flag indicating that we should wait for task completion.
          \return TaskProgress object.
          */
-        TaskProgressWPtr		runMainThreadTask( const TaskFunction& task, void* userData = NULL, bool wait = true );
+        TaskProgressPtr			runMainThreadTask( const TaskFunction& task, void* userData = NULL, bool wait = true );
 
         //! Starts a new task with a given priority at a given worker.
         /*!
@@ -79,7 +77,7 @@ namespace Threads {
          \param wait A flag indicating that we should wait for task completion.
          \return TaskProgress object.
          */
-        TaskProgressWPtr		runTask( const TaskFunction& task, void *userData = NULL, u32 threadId = 0, bool wait = true );
+        TaskProgressPtr			runTask( const TaskFunction& task, void *userData = NULL, u32 threadId = 0, bool wait = true );
 
         //! Processes all queued main thread tasks.
         void                    doMainThreadTasks( void );
@@ -94,26 +92,26 @@ namespace Threads {
          \param name Thread name.
          \param queue Task queue object.
          */
-        void                    startTaskThread( const char* name, class TaskQueue* queue );
+        void                    startTaskThread( const String& name, TaskQueueWPtr queue );
 
         //! Returns a pointer to TaskQueue object with a given name.
         /*!
          \param name Task queue name.
          \returns TaskQueue object if found, otherwise NULL.
          */
-        class TaskQueue*        taskQueue( const char *name ) const;
+        TaskQueueWPtr			taskQueue( const String& name ) const;
 
         //! Returns a pointer to TaskQueue object with a given thread id.
         /*!
          \param name Thread id.
          \returns TaskQueue object if found, otherwise NULL.
          */
-        class TaskQueue*        taskQueue( u32 threadId ) const;
+       TaskQueueWPtr			taskQueue( u32 threadId ) const;
 
     private:
 
         //! Array of built-in task queues.
-        class TaskQueue*        m_taskQueues[TotalBuiltInQueues];
+        TaskQueuePtr			m_taskQueues[TotalBuiltInQueues];
 
         //! Started task threads.
         TaskThreads             m_taskThreads;

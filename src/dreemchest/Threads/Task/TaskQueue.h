@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Threads {
 
     //! Task queue object.
-    class TaskQueue {
+    class TaskQueue : public RefCounted {
     friend class TaskThread;
         
         // ** struct Task
@@ -51,7 +51,7 @@ namespace Threads {
                                   \param progress Task progress object, used to notify other threads about task status.
                                   \param priority Task priority.
                                */
-                               Task( TaskFunction function, void* userData, TaskProgress* progress, u32 priority );
+                               Task( TaskFunction function, void* userData, TaskProgressPtr progress, u32 priority );
 
             //! Comparison operator.
             bool operator < ( const Task& other ) const;
@@ -67,7 +67,6 @@ namespace Threads {
 
                                 //! Constructs a new TaskQueue instance.
                                 TaskQueue( void );
-                                ~TaskQueue( void );
 
         //! Put's this task queue to sleep until new tasks are added.
         void                    waitForTasks( void );
@@ -79,7 +78,7 @@ namespace Threads {
          \param progress Task progress object.
          \param priority Task priority.
          */
-        void                    pushTask( const TaskFunction& task, void* userData, TaskProgress* progress, u32 priority );
+        void                    pushTask( const TaskFunction& task, void* userData, TaskProgressPtr progress, u32 priority );
 
         //! Does a next task in queue.
         /*!
@@ -97,10 +96,10 @@ namespace Threads {
     private:
 
         //! Task queue mutex used to lock a m_tasks variable.
-        Mutex*					m_mutex;
+        MutexPtr				m_mutex;
 
         //! Condition to wait for tasks in sleep mode.
-        Condition*				m_condition;
+        ConditionPtr			m_condition;
 
         //! Actual task queue.
         TaskPriorityQueue       m_tasks;

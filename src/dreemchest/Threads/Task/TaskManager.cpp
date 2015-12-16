@@ -53,17 +53,6 @@ TaskManager::TaskManager( void )
     startTaskThread( "Asset", DC_NEW TaskQueue );
 }
 
-TaskManager::~TaskManager( void )
-{
-    for( u32 i = 0; i < TotalBuiltInQueues; i++ ) {
-        delete m_taskQueues[i];
-    }
-
-    for( TaskThreads::iterator i = m_taskThreads.begin(), end = m_taskThreads.end(); i != end; i++ ) {
-        delete i->second;
-    }
-}
-
 // ** TaskManager::totalBackgroundTasks
 u32 TaskManager::totalBackgroundTasks( void ) const
 {
@@ -73,18 +62,19 @@ u32 TaskManager::totalBackgroundTasks( void ) const
 // ** TaskManager::doMainThreadTasks
 void TaskManager::doMainThreadTasks( void )
 {
-    TaskQueue *queue = m_taskQueues[MainQueue];
+    TaskQueuePtr& queue = m_taskQueues[MainQueue];
+
     while( queue->hasTasks() ) {
         queue->doTask();
     }
 }
 
 // ** TaskManager::runMainThreadTask
-TaskProgressWPtr TaskManager::runMainThreadTask( const TaskFunction& task, void *userData, bool wait )
+TaskProgressPtr TaskManager::runMainThreadTask( const TaskFunction& task, void *userData, bool wait )
 {
     DC_BREAK_IF( !task );
 
-    TaskProgress *progress = DC_NEW TaskProgress;
+    TaskProgressPtr progress = DC_NEW TaskProgress;
     if( m_mainThread != Thread::currentThread() ) {
         m_taskQueues[MainQueue]->pushTask( task, userData, progress, 0 );
         if( wait ) {
@@ -96,18 +86,17 @@ TaskProgressWPtr TaskManager::runMainThreadTask( const TaskFunction& task, void 
     }
 
     task( progress, userData );
-    delete progress;
-    
-    return NULL;
+
+    return TaskProgressPtr();
 }
 
 // ** TaskManager::runBackgroundTask
-TaskProgressWPtr TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const char* thread )
+TaskProgressPtr TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const String& thread )
 {
     DC_BREAK_IF( !task );
 
-    TaskProgress *progress  = DC_NEW TaskProgress;
-    TaskQueue    *queue     = taskQueue( thread );
+    TaskProgressPtr progress  = DC_NEW TaskProgress;
+    TaskQueueWPtr   queue     = taskQueue( thread );
     DC_BREAK_IF( queue == NULL );
     queue->pushTask( task, userData, progress, priority );
 
@@ -115,12 +104,12 @@ TaskProgressWPtr TaskManager::runBackgroundTask( const TaskFunction& task, void*
 }
 
 // ** TaskManager::runTask
-TaskProgressWPtr TaskManager::runTask( const TaskFunction& task, void *userData, u32 threadId, bool wait )
+TaskProgressPtr TaskManager::runTask( const TaskFunction& task, void *userData, u32 threadId, bool wait )
 {
     DC_BREAK_IF( !task );
 
-    TaskProgress *progress = DC_NEW TaskProgress;
-    TaskQueue    *queue    = taskQueue( threadId );
+    TaskProgressPtr progress = DC_NEW TaskProgress;
+    TaskQueueWPtr   queue    = taskQueue( threadId );
     DC_BREAK_IF( queue == NULL );
     queue->pushTask( task, userData, progress, 0 );
 
@@ -128,10 +117,10 @@ TaskProgressWPtr TaskManager::runTask( const TaskFunction& task, void *userData,
 }
 
 // ** TaskManager::taskQueue
-TaskQueue* TaskManager::taskQueue( const char *name ) const
+TaskQueueWPtr TaskManager::taskQueue( const String& name ) const
 {
-    if( name ) {
-        TaskThreads::const_iterator i = m_taskThreads.find( StringHash( name ) );
+    if( name != "" ) {
+        TaskThreads::const_iterator i = m_taskThreads.find( StringHash( name.c_str() ) );
 
         if( i != m_taskThreads.end() ) {
             return i->second->taskQueue();
@@ -144,7 +133,7 @@ TaskQueue* TaskManager::taskQueue( const char *name ) const
 }
 
 // ** TaskManager::taskQueue
-TaskQueue* TaskManager::taskQueue( u32 threadId ) const
+TaskQueueWPtr TaskManager::taskQueue( u32 threadId ) const
 {
     if( threadId == m_mainThread ) {
         return m_taskQueues[MainQueue];
@@ -160,13 +149,13 @@ TaskQueue* TaskManager::taskQueue( u32 threadId ) const
 }
 
 // ** TaskManager::startTaskThread
-void TaskManager::startTaskThread( const char *name, TaskQueue *queue )
+void TaskManager::startTaskThread( const String& name, TaskQueueWPtr queue )
 {
     DC_BREAK_IF( queue == NULL );
     
-    strhash     hash        = StringHash( name );
-    TaskThread *taskThread  = DC_NEW TaskThread( name, queue );
-    m_taskThreads[hash]     = taskThread;
+    strhash       hash        = StringHash( name.c_str() );
+    TaskThreadPtr taskThread  = DC_NEW TaskThread( name, queue );
+    m_taskThreads[hash]		  = taskThread;
 }
 
 } // namespace Threads

@@ -34,20 +34,15 @@ DC_BEGIN_DREEMCHEST
 namespace Threads {
         
     //! Mutex object.
-    class dcInterface Mutex {
+    class dcInterface Mutex : public RefCounted {
     public:
-
-        virtual             ~Mutex( void );
-
-        //! Releases this Mutex object.
-        void                release( void );
 
         //! Creates a new Mutex object.
         /*!
          \param recursive Flag indicating that a recursive mutex should be created.
          \return Mutex object.
          */
-        static Mutex*       create( bool recursive = false );
+        static MutexPtr     create( bool recursive = false );
 
         //! Tries to lock this mutex, returns true if the lock is successfull
         //! (mutex was not locked before this call), otherwise returns false.
@@ -61,16 +56,11 @@ namespace Threads {
     };
 
     //! Condition object.
-    class dcInterface Condition {
+    class dcInterface Condition : public RefCounted {
     public:
 
-        virtual             ~Condition( void );
-
-        //! Releases this Condition object.
-        void                release( void );
-
         //! Creates a new Condition object.
-        static Condition*   create( void );
+        static ConditionPtr create( void );
 
         //! Waits for this condition to trigger.
         virtual void        wait( void )    = 0;
@@ -83,12 +73,12 @@ namespace Threads {
     class ScopedLock {
     public:
 
-                    ScopedLock( Mutex* mutex ) : m_mutex( mutex ) { m_mutex->lock(); }
+                    ScopedLock( MutexWPtr mutex ) : m_mutex( mutex ) { m_mutex->lock(); }
                     ~ScopedLock( void ) { m_mutex->unlock(); }
 
     private:
 
-        Mutex*		m_mutex;
+        MutexWPtr	m_mutex;
     };
 
 } // namespace Threads

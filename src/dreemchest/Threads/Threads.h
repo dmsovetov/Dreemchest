@@ -42,14 +42,15 @@ namespace Threads {
 
 	dcDeclarePtrs( Thread )
 	dcDeclarePtrs( TaskProgress )
+	dcDeclarePtrs( Mutex )
+	dcDeclarePtrs( Condition )
+	dcDeclarePtrs( Task )
+	dcDeclarePtrs( TaskManager )
+	dcDeclarePtrs( TaskProgress )
+	dcDeclarePtrs( TaskQueue )
+	dcDeclarePtrs( TaskThread )
 
-    class Mutex;
-    class Condition;
-    class Task;
-    class TaskManager;
-    class TaskProgress;
-
-    typedef cClosure<void(TaskProgress*, void*)> TaskFunction;
+    typedef cClosure<void(TaskProgressWPtr, void*)> TaskFunction;
 }
 
 DC_END_DREEMCHEST

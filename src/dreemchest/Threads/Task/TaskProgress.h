@@ -61,10 +61,10 @@ namespace Threads {
     private:
 
         //! Task mutex.
-        Mutex*					m_mutex;
+        MutexPtr				m_mutex;
 
         //! Task wait/completed condition.
-        Condition*				m_condition;
+        ConditionPtr			m_condition;
 
         //! Task progress.
         f32						m_progress;

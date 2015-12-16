@@ -44,10 +44,10 @@ TaskProgress::~TaskProgress( void )
 
     {
         DC_SCOPED_LOCK( m_mutex );
-        DC_RELEASE( m_condition );
+        m_condition = ConditionPtr();
     }
     
-    DC_RELEASE( m_mutex );
+    m_mutex = MutexPtr();
 }
 
 // ** TaskProgress::progress

@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 namespace Threads {
 
 // ** TaskThread::TaskThread
-TaskThread::TaskThread( const char *name, TaskQueue *queue )
+TaskThread::TaskThread( const String& name, TaskQueueWPtr queue )
 {
     m_name   = name;
     m_thread = Thread::create();
@@ -42,13 +42,8 @@ TaskThread::TaskThread( const char *name, TaskQueue *queue )
     m_thread->start( dcThisMethod( TaskThread::run ), NULL );
 }
 
-TaskThread::~TaskThread( void )
-{
-
-}
-
 // ** TaskThread::taskQueue
-TaskQueue* TaskThread::taskQueue( void ) const
+TaskQueueWPtr TaskThread::taskQueue( void ) const
 {
     return m_tasks;
 }

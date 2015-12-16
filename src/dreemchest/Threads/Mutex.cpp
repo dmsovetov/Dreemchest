@@ -38,50 +38,28 @@ DC_BEGIN_DREEMCHEST
 
 namespace Threads {
 
-// ** Mutex::Mutex
-Mutex::~Mutex( void )
-{
-}
-
 // ** Mutex::create
-Mutex* Mutex::create( bool recursive )
+MutexPtr Mutex::create( bool recursive )
 {
 #ifdef DC_THREADS_POSIX
-    return DC_NEW PosixMutex( recursive );
+    return MutexPtr( DC_NEW PosixMutex( recursive ) );
 #elif DC_THREADS_WINDOWS
-    return DC_NEW WindowsMutex;
+    return MutexPtr( DC_NEW WindowsMutex );
 #else
     #error Unknown threading option defined.
 #endif
-}
-
-// ** Mutex::Release
-void Mutex::release( void )
-{
-    delete this;
-}
-
-// ** Condition::Condition
-Condition::~Condition( void )
-{
 }
 
 // ** Condition::create
-Condition* Condition::create( void )
+ConditionPtr Condition::create( void )
 {
 #ifdef DC_THREADS_POSIX
-    return DC_NEW PosixCondition;
+    return ConditionPtr( DC_NEW PosixCondition );
 #elif DC_THREADS_WINDOWS
-    return DC_NEW WindowsCondition;
+    return ConditionPtr( DC_NEW WindowsCondition );
 #else
     #error Unknown threading option defined.
 #endif
-}
-
-// ** Condition::release
-void Condition::release( void )
-{
-    delete this;
 }
 
 } // namespace Threads

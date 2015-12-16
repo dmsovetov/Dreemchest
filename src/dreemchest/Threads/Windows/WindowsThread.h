@@ -40,20 +40,20 @@ namespace Threads {
 	class WindowsThread : public Thread {
 	public:
 
-						WindowsThread( void );
-		virtual			~WindowsThread( void );
+							WindowsThread( void );
+		virtual				~WindowsThread( void ) DC_DECL_OVERRIDE;
 
 		// ** Thread
-		virtual void	start( const ThreadCallback& callback, void *userData ) DC_DECL_OVERRIDE;
-		virtual void	wait( void ) const DC_DECL_OVERRIDE;
+		virtual void		start( const ThreadCallback& callback, void *userData ) DC_DECL_OVERRIDE;
+		virtual void		wait( void ) const DC_DECL_OVERRIDE;
 
 	private:
 
-		static void		threadProc( void *data );
+		static void			threadProc( void *data );
 
 	private:
 
-		HANDLE			m_handle;
+		HANDLE				m_handle;
 	};
 
 	// ** class WindowsMutex
@@ -61,7 +61,7 @@ namespace Threads {
 	public:
 
 							WindowsMutex( void );
-		virtual				~WindowsMutex( void );
+		virtual				~WindowsMutex( void ) DC_DECL_OVERRIDE;
 
 		// ** Mutex
 		virtual bool		tryLock( void ) DC_DECL_OVERRIDE;

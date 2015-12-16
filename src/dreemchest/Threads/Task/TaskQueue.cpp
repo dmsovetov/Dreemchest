@@ -38,12 +38,6 @@ TaskQueue::TaskQueue( void )
     m_condition = Condition::create();
 }
     
-TaskQueue::~TaskQueue( void )
-{
-    DC_RELEASE( m_condition );
-    DC_RELEASE( m_mutex );
-}
-
 // ** TaskQueue::hasTasks
 bool TaskQueue::hasTasks( void ) const
 {
@@ -59,7 +53,7 @@ u32 TaskQueue::size( void ) const
 }
 
 // ** TaskQueue::pushTask
-void TaskQueue::pushTask( const TaskFunction& task, void *userData, TaskProgress *progress, u32 priority )
+void TaskQueue::pushTask( const TaskFunction& task, void *userData, TaskProgressPtr progress, u32 priority )
 {
     DC_SCOPED_LOCK( m_mutex );
     m_tasks.push( Task( task, userData, progress, priority ) );
@@ -99,7 +93,7 @@ void TaskQueue::waitForTasks( void )
 }
 
 // ** TaskQueue::Task::Task
-TaskQueue::Task::Task( TaskFunction function, void *userData, TaskProgress *progress, u32 priority )
+TaskQueue::Task::Task( TaskFunction function, void *userData, TaskProgressPtr progress, u32 priority )
 {
     m_function = function;
     m_userData = userData;
