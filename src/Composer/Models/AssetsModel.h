@@ -61,6 +61,22 @@ DC_BEGIN_COMPOSER
 										: AssetEvent( file ) {}
 		};
 
+		//! This event is emitted when scanning progress was started.
+		struct ScanningStarted {
+		};
+
+		//! This event is emitted when scanning progress was completed.
+		struct ScanningCompleted {
+		};
+
+		//! This event is emitted when directory was scanned.
+		struct FolderScanned {
+									FolderScanned( s32 leftToScan )
+										: leftToScan( leftToScan ) {}
+
+			s32						leftToScan;	//!< The total number of items left to scan.
+		};
+
 		//! Sets root model path.
 		virtual void				setRootPath( const String& value ) = 0;
 

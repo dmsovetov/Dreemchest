@@ -210,12 +210,6 @@ QAssetFileSystemModel::QAssetFileSystemModel( AssetsModel* parentAssetsModel, QO
 	connect( this, SIGNAL(fileRenamed(const QString&, const QString&, const QString&)), this, SLOT(assetRenamed(const QString&, const QString&, const QString&)) );
 }
 
-// ** QAssetFileSystemModel::mimeData
-//QStringList QAssetFileSystemModel::mimeTypes( void ) const 
-//{
-//	return QStringList() << QString::fromStdString( Composer::kAssetMime ) << QFileSystemModel::mimeTypes() ;
-//}
-
 // ** QAssetFileSystemModel::dropMimeData
 bool QAssetFileSystemModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
 {
@@ -281,18 +275,38 @@ bool QAssetFileSystemModel::setData( const QModelIndex& index, const QVariant& v
 // ** QAssetFileSystemModel::scanLoadedDirectory
 void QAssetFileSystemModel::scanLoadedDirectory( const QString& path )
 {
+	// Remove this path from folders for scanning
+	m_foldersToScan.remove( path );
+
+	// Get the index by path
 	QModelIndex parent = index( path );
 
+	// Scan each child
 	for( int i = 0; i < rowCount( parent ); i++ ) {
 		QModelIndex child = index( i, 0, parent );
 
+		// Only directories will be scanned
 		if( !fileInfo( child ).isDir() ) {
 			continue;
 		}
 
-		if( canFetchMore( child ) ) {
-			fetchMore( child );
+		// Nothing to scan
+		if( !canFetchMore( child ) ) {
+			continue;
 		}
+
+		// Add this path to set
+		m_foldersToScan << fileInfo( child ).absoluteFilePath();
+
+		// Fetch data
+		fetchMore( child );
+	}
+
+	// Emit the events
+	if( m_foldersToScan.size() ) {
+		m_parent->notify<AssetsModel::FolderScanned>( m_foldersToScan.size() );
+	} else {
+		m_parent->notify<AssetsModel::ScanningCompleted>();
 	}
 }
 
@@ -397,6 +411,7 @@ String QAssetFileSystemModel::uuid( const FileInfoWPtr& assetFile ) const
 // ** QAssetFileSystemModel::assetFile
 FileInfoPtr QAssetFileSystemModel::assetFile( const QModelIndex& index ) const
 {
+	DC_BREAK_IF( !index.isValid() );
 	return FileInfoPtr( new Ui::FileInfoPrivate( fileInfo( index ) ) );
 }
 

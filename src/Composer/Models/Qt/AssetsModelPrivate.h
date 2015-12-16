@@ -169,6 +169,7 @@ DC_BEGIN_COMPOSER
 		QString					m_metaFileExtension;	//!< Meta file extension.
 		bool					m_isEditingModel;		//!< The model editing is in progress.
 		mutable QSet<QString>	m_wasMoved;				//!< Set of file names that were moved.
+		mutable QSet<QString>	m_foldersToScan;		//!< Set of paths waiting for scan.
 	};
 
 	//! Filters asset model before displaying.
