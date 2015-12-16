@@ -348,7 +348,15 @@ void AssetBundle::addAsset( AssetPtr asset )
 	const String& uuid = asset->uuid();
 	DC_BREAK_IF( uuid.empty() );
 
-	m_assets[StringHash( uuid.c_str() )] = asset;
+	// Check that this UUID is unique
+	StringHash hashUuid( uuid.c_str() );
+
+	if( m_assets.count( hashUuid ) ) {
+		log::error( "AssetBundle::addAsset : asset bundle '%s' already contains an asset '%s'\n", m_name.c_str(), uuid.c_str() );
+		return;
+	}
+
+	m_assets[hashUuid] = asset;
 
 	// Register an asset by it's name
 	const String& name = asset->name();
