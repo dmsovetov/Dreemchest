@@ -65,6 +65,9 @@ namespace Project {
 
 	private:
 
+		//! Adds an asset from a file info.
+		void						addAssetFile( const FileInfoWPtr& fileInfo );
+
 		//! Puts an asset to cache.
 		bool						putToCache( const FileInfoWPtr& fileInfo, const String& uuid );
 

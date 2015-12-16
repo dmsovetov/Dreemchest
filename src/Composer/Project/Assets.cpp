@@ -106,29 +106,7 @@ Scene::Asset::Type Assets::assetTypeFromExtension( const String& extension ) con
 // ** Assets::handleAssetAdded
 void Assets::handleAssetAdded( const AssetsModel::Added& e )
 {
-	// Read the meta data
-	Io::KeyValue meta = m_assetsModel->metaData( e.file );
-
-	// Added asset
-	Scene::AssetPtr asset;
-
-	// Create asset from data or create the new one
-	if( !meta.isNull() ) {
-		asset = m_bundle->createAssetFromData( meta );
-	} else {
-		asset = createAssetForFile( e.file );
-	}
-
-	if( !asset.valid() ) {
-		return;
-	}
-
-	// Add asset to bundle
-	qDebug() << "Added" << e.file->fileName().c_str();
-	m_bundle->addAsset( asset );
-
-	// Put asset to cache
-	putToCache( e.file, asset->uuid() );
+	addAssetFile( e.file );
 }
 
 // ** Assets::handleAssetRemoved
@@ -152,6 +130,34 @@ void Assets::handleAssetChanged( const AssetsModel::Changed& e )
 
 	// Update asset's cache
 	putToCache( e.file, uuid );
+}
+
+// ** Assets::addAssetFile
+void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
+{
+	// Read the meta data
+	Io::KeyValue meta = m_assetsModel->metaData( fileInfo );
+
+	// Added asset
+	Scene::AssetPtr asset;
+
+	// Create asset from data or create the new one
+	if( !meta.isNull() ) {
+		asset = m_bundle->createAssetFromData( meta );
+	} else {
+		asset = createAssetForFile( fileInfo );
+	}
+
+	if( !asset.valid() ) {
+		return;
+	}
+
+	// Add asset to bundle
+	qDebug() << "Added" << fileInfo->fileName().c_str();
+	m_bundle->addAsset( asset );
+
+	// Put asset to cache
+	putToCache( fileInfo, asset->uuid() );
 }
 
 // ** Assets::putToCache
