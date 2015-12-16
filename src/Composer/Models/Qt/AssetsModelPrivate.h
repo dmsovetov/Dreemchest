@@ -28,6 +28,7 @@
 #define __DC_Composer_Qt_AssetsModelPrivate_H__
 
 #include "AbstractTreeModel.h"
+#include "FileSystemModel.h"
 #include "../AssetsModel.h"
 
 DC_BEGIN_COMPOSER
@@ -36,273 +37,170 @@ DC_BEGIN_COMPOSER
 
 #if DEV_CUSTOM_ASSET_MODEL
 
-	//! Asset info.
-	class QAsset {
-	friend class QAssetsModel;
-	friend class QMetaFiles;
-	public:
-
-		//! Meta file extension to use.
-		static QString		kExtension;
-
-							//! Constructs QAsset instance.
-							QAsset( const QFileInfo& fileInfo = QFileInfo() );
-
-							//! Constructs QAsset instance from absolute path.
-							QAsset( const QString& path );
-
-		//! Returns meta-file name.
-		const QString&		metaFileName( void ) const;
-
-		//! Returns unique identifier.
-		const QUuid&		uuid( void ) const;
-
-		//! Returns asset name.
-		QString				name( void ) const;
-
-		//! Returns asset name with extension.
-		QString				fileName( void ) const;
-
-		//! Returns asset absolute file path.
-		QString				absoluteFilePath( void ) const;
-
-		//! Loads meta file to string.
-		QString				readMetaFile( void ) const;
-
-		//! Returns asset file info.
-		const QFileInfo&	fileInfo( void ) const;
-
-	private:
-
-		//! Updates file info.
-		void				updateFileInfo( const QString& path );
-
-		//! Updates meta file name.
-		void				updateMetaFileName( void );
-
-	private:
-
-		QUuid				m_uuid;			//!< Unique identifier.
-		QFileInfo			m_fileInfo;		//!< Asset file info.
-		QString				m_metaFileName;	//!< Last known meta-file name.
-	};
-
-	//! Keeps track of meta files.
-	class QMetaFiles : public QObject {
-		
-		Q_OBJECT
-
-	public:
-
-							//! Constructs QMetaFiles instance.
-							explicit QMetaFiles( QObject* parent = NULL );
-
-	private Q_SLOTS:
-
-
-		//! Adds new meta file when asset was added.
-		void				addMetaFile( const QAsset& asset ) const;
-
-		//! Removes meta file when asset was removed.
-		void				removeMetaFile( const QAsset& asset ) const;
-
-		//! Renames meta file when an asset was renamed.
-		void				renameMetaFile( const QAsset& asset, const QString& oldName, const QString& newName ) const;
-
-		//! Moves meta file when an asset was moved.
-		void				moveMetaFile( const QAsset& asset, const QString& oldPath, const QString& newPath ) const;
-	};
-
 	//! Asset files model.
-	class QAssetsModel : public QGenericTreeModel<QAsset> {
+	class QAssetsModel : public QLocalFileSystemModel {
 
 		Q_OBJECT
-
-	Q_SIGNALS:
-
-	#if DEV_BACKGROUND_ASSET_LOADING
-		//! Emitted when the model loading was started.
-		void					loadingStarted( void );
-
-		//! Emitted when the model loading was finished.
-		void					loadingFinished( void );
-	#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
-
-		//! Emitted when a new asset was added.
-		void					assetAdded( const QAsset& asset ) const;
-
-		//! Emitted when an asset was removed.
-		void					assetRemoved( const QAsset& asset ) const;
-
-		//! Emitted when an asset was changed.
-		void					assetChanged( const QAsset& asset ) const;
-
-		//! Emitted when an asset was renamed.
-		void					assetRenamed( const QAsset& asset, const QString& oldName, const QString& newName ) const;
-
-		//! Emitted when an asset was moved.
-		void					assetMoved( const QAsset& asset, const QString& oldPath, const QString& newPath ) const;
-
-		//! Emitted when the asset movement operation was failed.
-		void					failedToMove( const QAsset& asset, const QString& newPath ) const;
-
-		//! Emitted when the rename operation was failed.
-		void					failedToRename( const QAsset& asset, const QString& newName ) const;
-
-		//! Emitted when the remove operation was failed.
-		void					failedToRemove( const QAsset& asset ) const;
 
 	public:
 
 								//! Constructs the QAssetsModel instance.
-		explicit				QAssetsModel( QObject* parent = NULL );
-		virtual					~QAssetsModel( void );
+		explicit				QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent = NULL );
 
-		//! Returns true if the model supports background loading.
-		bool					supportsBackgroundLoading( void ) const;
+		//! Returns assets UUID for a specified asset file.
+		String					uuid( const FileInfoWPtr& assetFile ) const;
 
-		//! Returns the root assets path.
-		QString					rootPath( void ) const;
+		//! Updates meta data for specified asset file.
+		void					setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data );
 
-		//! Sets the root assets path.
-		void					setRootPath( const QString& value );
+		//! Returns meta data for a specified asset file.
+		Io::KeyValue			metaData( const FileInfoWPtr& assetFile ) const;
 
-		//! Returns the read-only flag.
-		bool					isReadOnly( void ) const;
-
-		//! Sets the read-only flag.
-		void					setReadOnly( bool value );
-
-		//! Returns index for a specified asset path.
-		QModelIndex				index( const QString& path ) const;
-
-		//! Removes an asset at specified index.
-		void					remove( const QModelIndex& index );
-
-		//! Returns true if an asset at specified index is a directory.
-		bool					isDir( const QModelIndex& index ) const;
-
-		//! Returns an asset at specified index.
-		const QAsset&			asset( const QModelIndex& index ) const;
+		//! Returns asset file info by model index.
+		FileInfoPtr				assetFile( const QModelIndex& index ) const;
 
 	private:
 
-		//! Scans the selected folder.
-		void					scan( const QString& path, TreeItem* parent = NULL );
-
-	#if DEV_BACKGROUND_ASSET_LOADING
-		//! Scans the selected folder in background.
-		void					scanInBackground( const QString& path, TreeItem* parent = NULL );
-
-		//! Scans the selected folder.
-		static void				workerScan( QAssetsModel* model, const QString& path );
-	#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
-
-		//! Moves or renames item.
-		bool					move( Item* item, const QString& source, const QString& destination ) const;
-
-		//! Constructs an absolute asset file name from item.
-		QString					constructAbsoluteFileName( const Item* item, const Item* parent ) const;
-
-		//! Constructs the relative asset file name from item.
-		QString					constructRelativeFileName( const Item* item, const Item* parent ) const;
-
-		//! Returns item at specified path.
-		Item*					itemAtPath( const QString& path, const TreeItem* root ) const;
-
-		//! Returns the directory listing.
-		QFileInfoList			listDirectory( const QString& path ) const;
-
-		//! Adds asset to file system watcher.
-		void					watch( const Item* item );
-
-		//! Removes asset from file system watcher.
-		void					unwatch( const Item* item );
-
 		//! Returns true if the file should not be put to model.
-		bool					shouldSkipFile( const QFileInfo& fileInfo ) const;
+		virtual bool			shouldSkipFile( const QFileInfo& file ) const Q_DECL_OVERRIDE;
 
-	protected:
-
-		//! Returns the item flags.
-		virtual Qt::ItemFlags	flags( const QModelIndex& index ) const Q_DECL_OVERRIDE;
-
-		//! Performs the asset file movement
-		virtual bool			moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const Q_DECL_OVERRIDE;
-
-		//! Removes item from a model.
-		virtual void			removeItem( TreeItem* item ) Q_DECL_OVERRIDE;
-
-		//! Adds item to a model.
-		virtual void			addItem( TreeItem* item, TreeItem* parent ) Q_DECL_OVERRIDE;
-
-		//! Creates the MIME data instance.
-		virtual QMimeData*		createMimeData( const QModelIndexList& indexes ) const Q_DECL_OVERRIDE;
-
-		//! Returns the MIME data list.
+		//! Returns list of MIME types.
 		virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
 
-		//! Returns the data from the specified index.
-		virtual QVariant		data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+		//! Returns the meta file name from file info.
+		QString					metaFileName( const FileInfoWPtr& assetFile ) const;
 
-		//! Writes new data to model at specified index.
-		virtual bool			setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
+		//! Returns the meta file name from absolute file path.
+		QString					metaFileNameFromPath( const QString& fileName ) const;
+
+		//! Renames meta file.
+		bool					renameMetaFile( const QString& oldFileName, const QString& newFileName );
 
 	private slots:
 
-		//! Handles the file changed signal.
-		void					fileChanged( const QString& fileName );
+		//! Processes an added file.
+		void					fileAdded( const QFileInfo& file );
 
-		//! Handles the directory changed signal.
-		void					directoryChanged( const QString& path );
+		//! Processes removed file.
+		void					fileRemoved( const QFileInfo& file );
 
-	#if DEV_BACKGROUND_ASSET_LOADING
-		void					scanFinished( void );
-	#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
+		//! Processes the file change.
+		void					fileChanged( const QFileInfo& file );
+
+		//! Processes the file rename.
+		void					fileRenamed( const QFileInfo& file, const QString& oldFileName, const QString& newFileName );
+
+		//! Processes the file movement.
+		void					fileMoved( const QFileInfo& file, const QString& oldFileName, const QString& newFileName );
 
 	private:
 
-		QFileInfo				m_directory;	//!< Root assets directory.
-		QFileIconProvider*		m_iconProvider;	//!< Icon provider to use.
-		QFileSystemWatcher*		m_watcher;		//!< File system watcher.
-		bool					m_isReadOnly;	//!< Is model a read-only.
-		QMetaFiles*				m_metaFiles;	//!< Tracks meta files associated with assets.
-
-	#if DEV_BACKGROUND_ASSET_LOADING
-		QList<QFutureWatcher<void>*>	m_scanWatchers;	//!< Future watchers used for asset folder scanning.
-	#endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
+		AssetsModel*			m_parent;				//!< Parent assets model.
+		QString					m_metaFileExtension;	//!< Meta file extension.
 	};
 
-	//! Dispatches assets model signals to delegate.
-	class QAssetsModelDispatcher : public QObject {
+#else
+
+	//! Asset file system model.
+	class QAssetFileSystemModel : public QFileSystemModel {
 
 		Q_OBJECT
 
 	public:
 
-											//! Constructs QAssetsModelDispatcher instance.
-											QAssetsModelDispatcher( AssetsModelWPtr model );
+								//! Constructs QAssetFileSystemModel
+		explicit				QAssetFileSystemModel( AssetsModel* parentAssetsModel, QObject* parent = NULL );
+
+		//! Returns assets UUID for a specified asset file.
+		String					uuid( const FileInfoWPtr& assetFile ) const;
+
+		//! Updates meta data for specified asset file.
+		void					setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data );
+
+		//! Returns meta data for a specified asset file.
+		Io::KeyValue			metaData( const FileInfoWPtr& assetFile ) const;
+
+		//! Returns asset file info by model index.
+		FileInfoPtr				assetFile( const QModelIndex& index ) const;
+
+	protected:
+
+		//! Returns the MIME types list.
+		//virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
+
+		//! Returns the model data by index.
+		virtual QVariant		data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+
+		//! Sets the model data by index.
+		virtual bool			setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
+
+		//! Handles the drop operation.
+		virtual bool			dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
+
+		//! Returns the meta file name from file info.
+		QString					metaFileName( const FileInfoWPtr& assetFile ) const;
+
+		//! Returns the meta file name from absolute file path.
+		QString					metaFileNameFromPath( const QString& fileName ) const;
+
+		//! Renames meta file.
+		bool					renameMetaFile( const QString& oldFileName, const QString& newFileName );
+
+		//! Returns true if this file was just moved.
+		bool					wasMoved( const FileInfoWPtr& assetFile ) const;
+
+	private slots:
+
+		//! Handles added assets signal.
+		void					assetsAdded( const QModelIndex& parent, int start, int end );
+
+		//! Handles removed assets signal.
+		void					assetsRemoved( const QModelIndex& parent, int start, int end );
+
+		//! Handles renamed asset signal.
+		void					assetRenamed( const QString& path, const QString& oldName, const QString& newName );
+
+		//! Scans the directory when it's loaded.
+		void					scanLoadedDirectory( const QString& path );
 
 	private:
 
-		//! Extract asset info from QAsset.
-		Asset								extractAsset( const QAsset& asset ) const;
-
-	private Q_SLOTS:
-
-		//! Dispatches asset added event to delegate.
-		void								dispatchAssetAdded( const QAsset& asset );
-
-		//! Dispatches asset removed event to delegate.
-		void								dispatchAssetRemoved( const QAsset& asset );
-
-		//! Dispatches asset changed event to delegate.
-		void								dispatchAssetChanged( const QAsset& asset );
-
-	private:
-
-		AssetsModelWPtr						m_model;	//!< Target delegate.
+		AssetsModel*			m_parent;				//!< Parent assets model.
+		QString					m_metaFileExtension;	//!< Meta file extension.
+		bool					m_isEditingModel;		//!< The model editing is in progress.
+		mutable QSet<QString>	m_wasMoved;				//!< Set of file names that were moved.
 	};
+
+	//! Filters asset model before displaying.
+	class QAssetsModel : public QSortFilterProxyModel {
+	public:
+
+										//! Constructs QAssetsModel instance.
+										QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent = NULL );
+
+		//! Returns root model index.
+		QModelIndex						root( void ) const;
+
+		//! Returns internal model pointer.
+		QAssetFileSystemModel*			model( void ) const;
+
+		//! Returns asset file info by model index.
+		FileInfoPtr						assetFile( const QModelIndex& index ) const;
+
+		//! Removes asset file by index.
+		void							remove( const QModelIndex& index );
+
+	protected:
+
+		//! Returns true if the item in the row indicated by the given row and parent should be included in the model.
+		virtual bool					filterAcceptsRow( int row, const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+
+	private:
+
+		AutoPtr<QAssetFileSystemModel>	m_model;	//!< Actual assets model.
+	};
+
+#endif	/*	DEV_CUSTOM_ASSET_MODEL	*/
 
 	//! Assets model Qt implementation.
 	class AssetsModelPrivate : public PrivateInterface<AssetsModel, QAssetsModel> {
@@ -312,59 +210,23 @@ DC_BEGIN_COMPOSER
 											AssetsModelPrivate( QObject* parent = NULL );
 
 		//! Sets root model path.
-		virtual void						setRootPath( const String& value );
+		virtual void						setRootPath( const String& value ) DC_DECL_OVERRIDE;
 
 		//! Sets the read-only flag.
-		virtual void						setReadOnly( bool value );
+		virtual void						setReadOnly( bool value ) DC_DECL_OVERRIDE;
 
-	private:
+		//! Returns assets UUID for a specified asset file.
+		virtual String						uuid( const FileInfoWPtr& assetFile ) const DC_DECL_OVERRIDE;
 
-		AutoPtr<QAssetsModelDispatcher>		m_dispatcher;		//!< Assets model signal dispatcher.
+		//! Updates meta data for specified asset file.
+		virtual void						setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data ) DC_DECL_OVERRIDE;
+
+		//! Returns meta data for a specified asset file.
+		virtual Io::KeyValue				metaData( const FileInfoWPtr& assetFile ) const DC_DECL_OVERRIDE;
+
+		//! Returns meta data for a specified asset file name.
+		virtual Io::KeyValue				metaData( const String& assetFileName ) const;
 	};
-
-#else
-	//! Asset files model.
-	class AssetsModel : public QFileSystemModel {
-
-		Q_OBJECT
-
-	public:
-
-							//! Constructs AssetsModel
-							AssetsModel( QObject* parent, const String& path );
-
-	protected:
-
-		//! Returns the MIME data for a specified index.
-		virtual QMimeData*	mimeData( const QModelIndexList& indexes ) const;
-
-		//! Returns the model data by index.
-		virtual QVariant	data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
-
-		//! Sets the model data by index.
-		virtual bool		setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
-
-		virtual bool		beginMoveRows(const QModelIndex & sourceParent, int sourceFirst, int sourceLast, const QModelIndex & destinationParent, int destinationChild);
-
-	private slots:
-
-		void				layoutChanged( void );
-
-		//! Handles added assets signal.
-		void				assetsAdded( const QModelIndex& parent, int start, int end );
-
-		//! Handles removed assets signal.
-		void				assetsAboutToBeRemoved( const QModelIndex& parent, int start, int end );
-
-		//! Handles renamed asset signal.
-		void				assetRenamed( const QString& path, const QString& oldName, const QString& newName );
-
-	private:
-
-		bool				m_isEditingModel;	//!< The model editing is in progress.
-		QSet<QString>		m_skipAddRemove;	//!< This set contains paths to all assets that were renamed or moved.
-	};
-#endif	/*	DEV_CUSTOM_ASSET_MODEL	*/
 
 DC_END_COMPOSER
 

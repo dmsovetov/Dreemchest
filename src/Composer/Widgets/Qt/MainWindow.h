@@ -41,49 +41,49 @@ namespace Ui {
 										MainWindow( const String& title );
 									
 		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr			addToolBar( void );
+		virtual IToolBarWPtr			addToolBar( void ) DC_DECL_OVERRIDE;
 	
 		//! Removes the toolbar from a window.
-		virtual void					removeToolBar( IToolBarWPtr toolBar );
+		virtual void					removeToolBar( IToolBarWPtr toolBar ) DC_DECL_OVERRIDE;
 	
 		//! Adds a new menu to window.
-		virtual IMenuWPtr				addMenu( const String& text );
+		virtual IMenuWPtr				addMenu( const String& text ) DC_DECL_OVERRIDE;
 	
 		//! Removes the menu from a window.
-		virtual void					removeMenu( IMenuWPtr menu );
+		virtual void					removeMenu( IMenuWPtr menu ) DC_DECL_OVERRIDE;
 
 		//! Performs the main window initialization.
-		virtual bool					initialize( ComposerWPtr composer );
+		virtual bool					initialize( ComposerWPtr composer ) DC_DECL_OVERRIDE;
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		virtual IDocumentWPtr			editDocument( Editors::AssetEditorWPtr assetEditor, const Asset& asset );
+		virtual IDocumentWPtr			editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset ) DC_DECL_OVERRIDE;
 
 		//! Closes the document.
-		virtual bool					closeDocument( IDocumentWPtr document );
+		virtual bool					closeDocument( IDocumentWPtr document ) DC_DECL_OVERRIDE;
 
 		//! Returns the opened document editor by asset.
-		virtual IDocumentWPtr			findDocument( const Asset& asset ) const;
+		virtual IDocumentWPtr			findDocument( const Scene::AssetWPtr& asset ) const DC_DECL_OVERRIDE;
 
 		//! Returns an array of opened documents with a same type.
-		virtual DocumentsWeak			findDocuments( const Asset& asset ) const;
+		virtual DocumentsWeak			findDocuments( const Scene::AssetWPtr& asset ) const DC_DECL_OVERRIDE;
 
 		//! Shows the message box.
-		virtual void					message( const String& text, MessageStatus status = MessageInfo ) const;
+		virtual void					message( const String& text, MessageStatus status = MessageInfo ) const DC_DECL_OVERRIDE;
 
 		//! Shows the message box with yes, no, cancel buttons.
-		virtual MessageBoxResult		messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const;
+		virtual MessageBoxResult		messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const DC_DECL_OVERRIDE;
 
 		//! Returns the file system instance.
-		virtual IFileSystemWPtr			fileSystem( void ) const;
+		virtual FileSystemWPtr			fileSystem( void ) const DC_DECL_OVERRIDE;
 
 		//! Returns the asset tree instance.
-		virtual IAssetTreeWPtr			assetTree( void ) const;
+		virtual IAssetTreeWPtr			assetTree( void ) const DC_DECL_OVERRIDE;
 
 		//! Sets an active document.
-		virtual void					setActiveDocument( IDocumentWPtr dock );
+		virtual void					setActiveDocument( IDocumentWPtr dock ) DC_DECL_OVERRIDE;
 
 		//! Returns the shared rendering context.
-		virtual IRenderingFrameWPtr		sharedRenderingContext( void ) const;
+		virtual IRenderingFrameWPtr		sharedRenderingContext( void ) const DC_DECL_OVERRIDE;
 
 	private:
 
@@ -106,8 +106,9 @@ namespace Ui {
 		QVector<IDocumentPtr>			m_documents;				//!< All opened documents reside here.
 		IDocumentWPtr					m_activeDocument;			//!< An active document.
 		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
-		IFileSystemPtr					m_fileSystem;				//!< File system interface.
+		FileSystemPtr					m_fileSystem;				//!< File system interface.
 		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
+		Project::ProjectWPtr			m_project;					//!< Opened project.
 	};
 
 } // namespace Ui

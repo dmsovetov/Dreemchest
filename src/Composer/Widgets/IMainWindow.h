@@ -59,19 +59,19 @@ namespace Ui {
 		virtual MessageBoxResult	messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const = 0;
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		virtual IDocumentWPtr		editDocument( Editors::AssetEditorWPtr assetEditor, const Asset& asset ) = 0;
+		virtual IDocumentWPtr		editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset ) = 0;
 
 		//! Closes the document.
 		virtual bool				closeDocument( IDocumentWPtr document ) = 0;
 
 		//! Returns the opened document editor by asset.
-		virtual IDocumentWPtr		findDocument( const Asset& asset ) const = 0;
+		virtual IDocumentWPtr		findDocument( const Scene::AssetWPtr& asset ) const = 0;
 
 		//! Returns an array of opened documents with a same type.
-		virtual DocumentsWeak		findDocuments( const Asset& asset ) const = 0;
+		virtual DocumentsWeak		findDocuments( const Scene::AssetWPtr& asset ) const = 0;
 
 		//! Returns the file system instance.
-		virtual IFileSystemWPtr		fileSystem( void ) const				= 0;
+		virtual FileSystemWPtr		fileSystem( void ) const				= 0;
 
 		//! Returns the asset tree instance.
 		virtual IAssetTreeWPtr		assetTree( void ) const					= 0;

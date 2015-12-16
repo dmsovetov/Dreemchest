@@ -33,41 +33,22 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Composer MIME data.
-	class QComposerMime : public QMimeData {
-		
-		Q_OBJECT
-
-	public:
-
-		//! Returns an attached MIME data.
-		IMimeDataWPtr			mime( void ) const;
-
-		//! Sets an attached MIME data.
-		void					setMime( IMimeDataPtr value );
-
-	private:
-
-		IMimeDataPtr			m_mime;	//!< Attached MIME.
-	};
-
 	//! MIME data Qt implementation.
 	class MimeData : public IMimeData {
 	public:
 
-								//! Constructs the MimeData instance.
-								MimeData( QComposerMime* mime, const io::Bson& data = io::Bson::kNull );
+									//! Constructs the MimeData instance.
+									MimeData( const QMimeData* mime );
 
 		//! Returns true if the MIME data contains the specified format.
-		virtual bool			hasFormat( const String& value ) const;
+		virtual bool				hasFormat( const String& value ) const;
 
-		//! Returns an attached data.
-		virtual const io::Bson&	data( void ) const;
+		//! Returns an attached array of strings.
+		virtual StringArray			strings( void ) const;
 
 	public:
 
-		QComposerMime*			m_mime;	//!< Internal MIME data instance.
-		io::Bson				m_data;	//!< Attached data.
+		const QMimeData*			m_mime;	//!< Internal MIME data instance.
 	};
 
 } // namespace Ui

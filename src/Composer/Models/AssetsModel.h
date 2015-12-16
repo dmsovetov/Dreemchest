@@ -35,32 +35,49 @@ DC_BEGIN_COMPOSER
 	class AssetsModel : public IInterface {
 	public:
 
+		//! Base class for all asset events.
+		struct AssetEvent {
+									AssetEvent( const FileInfoPtr& file )
+										: file( file ) {}
+
+			FileInfoPtr				file;	//!< Asset file info.
+		};
+
 		//! This event is emitted when a new asset was added to a project.
-		struct Added {
-							Added( const Asset& asset )
-								: asset( asset ) {}
-			Asset			asset;	//!< Asset that was added.
+		struct Added : public AssetEvent {
+									Added( const FileInfoPtr& file )
+										: AssetEvent( file ) {}
 		};
 
 		//! This event is emitted when a new asset was removed from a project.
-		struct Removed {
-							Removed( const Asset& asset )
-								: asset( asset ) {}
-			Asset			asset;	//!< Asset that was removed.
+		struct Removed : public AssetEvent {
+									Removed( const FileInfoPtr& file )
+										: AssetEvent( file ) {}
 		};
 
 		//! This event is emitted when a new asset was changed.
-		struct Changed {
-							Changed( const Asset& asset )
-								: asset( asset ) {}
-			Asset			asset;	//!< Asset that was changed.
+		struct Changed : public AssetEvent {
+									Changed( const FileInfoPtr& file )
+										: AssetEvent( file ) {}
 		};
 
 		//! Sets root model path.
-		virtual void		setRootPath( const String& value ) = 0;
+		virtual void				setRootPath( const String& value ) = 0;
 
 		//! Sets the read-only flag.
-		virtual void		setReadOnly( bool value ) = 0;
+		virtual void				setReadOnly( bool value ) = 0;
+
+		//! Returns assets UUID for a specified asset file.
+		virtual String				uuid( const FileInfoWPtr& assetFile ) const = 0;
+
+		//! Updates meta data for specified asset file.
+		virtual void				setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data ) = 0;
+
+		//! Returns meta data for a specified asset file.
+		virtual Io::KeyValue		metaData( const FileInfoWPtr& assetFile ) const = 0;
+
+		//! Returns meta data for a specified asset file name.
+		virtual Io::KeyValue		metaData( const String& assetFileName ) const = 0;
 	};
 
 DC_END_COMPOSER

@@ -25,15 +25,16 @@
  **************************************************************************/
 
 #include "SceneEditor.h"
+#include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Editors {
 
 // ** SceneEditor::initialize
-bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
+bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document )
 {
-	if( !VisualEditor::initialize( asset, document ) ) {
+	if( !VisualEditor::initialize( project, asset, document ) ) {
 		return false;
 	}
 
@@ -42,7 +43,7 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 	Renderer::Renderer2DPtr renderer2d = Renderer::Renderer2D::create( hal, 1024 );
 
 	Scene::RvmPtr rvm( DC_NEW Scene::Rvm( hal, 8000 ) );
-	Scene::ShaderCachePtr shaders( DC_NEW Scene::ShaderCache( "D:\\BFG9000\\externals\\src\\dreemchest\\src\\dreemchest\\scene\\Rendering\\Shaders", hal ) );
+	Scene::ShaderCachePtr shaders( DC_NEW Scene::ShaderCache( "D:\\BFG9000\\externals\\src\\dreemchest\\src\\dreemchest\\scene\\Rendering\\Shaders\\", hal ) );
 
 	m_renderingContext = Scene::RenderingContextPtr( DC_NEW Scene::RenderingContext( rvm, shaders, hal, renderer2d ) );
 
@@ -54,23 +55,23 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 	m_scene->addSystem<Scene::AssetSystem>( hal );
 
 	// Create assets.
-	m_assets = Scene::AssetBundle::create( "assets" );
+	//m_assets = Scene::AssetBundle::create( "assets" );
 
-	Scene::TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
+	//Scene::TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
 
-	for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
-		for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
-			Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
-			Scene::MeshPtr		  mesh  = terrain->createChunkMesh( hal, j, i );
+	//for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
+	//	for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
+	//		Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
+	//		Scene::MeshPtr		  mesh  = terrain->createChunkMesh( hal, j, i );
 
-			if( !m_chunk.valid() ) {
-				m_chunk = chunk;
-			}
+	//		if( !m_chunk.valid() ) {
+	//			m_chunk = chunk;
+	//		}
 
-			chunk->attach<Scene::StaticMesh>( mesh );
-			chunk->attach<Scene::Transform>( j * Scene::Terrain::kChunkSize, -4, i * Scene::Terrain::kChunkSize, ::Scene::Transform::WPtr() );
-		}
-	}
+	//		chunk->attach<Scene::StaticMesh>( mesh );
+	//		chunk->attach<Scene::Transform>( j * Scene::Terrain::kChunkSize, -4, i * Scene::Terrain::kChunkSize, ::Scene::Transform::WPtr() );
+	//	}
+	//}
 
 	// Create the camera.
 	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
@@ -78,7 +79,8 @@ bool SceneEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );
 	m_camera->attach<Scene::RenderWireframe>();
-	m_camera->attach<Scene::RenderBoundingVolumes>();
+	m_camera->attach<Scene::RenderForwardLit>();
+	//m_camera->attach<Scene::RenderBoundingVolumes>();
 	m_scene->addSceneObject( m_camera );
 
 	return true;
@@ -135,13 +137,34 @@ void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 // ** SceneEditor::handleDrop
 void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
-	const io::Bson& data = mime->data();
-	DC_BREAK_IF( data.isNull() );
+	// Get an array of attached assets
+	StringArray assets = mime->strings();
 
-	const io::Bson::ValueArray& items = data.items();
+	// Add assets to scene
+	for( s32 i = 0, n = ( s32 )assets.size(); i < n; i++ ) {
+		// Read an attached meta data
+		Io::KeyValue meta = m_project->assetsModel()->metaData( assets[i] );
 
-	for( s32 i = 0, n = ( s32 )items.size(); i < n; i++ ) {
-		qDebug() << "Will place" << items[i].get( "uuid", "" ).asString().c_str();
+		if( meta.isNull() ) {
+			continue;
+		}
+
+		// Find asset by UUID.
+		Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
+		DC_BREAK_IF( !asset.valid() );
+
+		switch( asset->type() ) {
+		case Scene::Asset::Mesh:	{
+										Scene::MeshPtr mesh  = castTo<Scene::Mesh>( asset.get() );
+
+										Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
+										sceneObject->attach<Scene::StaticMesh>( mesh );
+										sceneObject->attach<Scene::Transform>( 0, 0, 0 );
+									}
+									break;
+		}
+
+	//	qDebug() << "Will place" << items[i].get( "uuid", "" ).asString().c_str();
 	}
 }
 

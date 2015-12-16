@@ -42,30 +42,31 @@ namespace Editors {
 	public:
 
 		//! Asset editor has entered the foreground.
-		virtual void		notifyEnterForeground( void ) {}
+		virtual void			notifyEnterForeground( void ) {}
 
 		//! Asset editor has entered the background.
-		virtual void		notifyEnterBackground( void ) {}
+		virtual void			notifyEnterBackground( void ) {}
 
 		//! Performs asset editor initialization.
-		virtual bool		initialize( const Asset& asset, Ui::IDocumentWPtr document );
+		virtual bool			initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document );
 
 		//! Saves the asset to disk.
-		virtual void		save( void ) {}
+		virtual void			save( void ) {}
 
 		//! Returns true if the document has changes.
-		bool				hasChanges( void ) const;
+		bool					hasChanges( void ) const;
 
 		//! Returns the edited asset.
-		const Asset&		asset( void ) const;
+		Scene::AssetWPtr		asset( void ) const;
 
 		//! Returns the parent document.
-		Ui::IDocumentWPtr	document( void ) const;
+		Ui::IDocumentWPtr		document( void ) const;
 
 	protected:
 
-		Ui::IDocumentWPtr	m_document;	//!< Parent document.
-		Asset				m_asset;	//!< An asset being edited.
+		Project::ProjectWPtr	m_project;	//!< Parent project instance.
+		Ui::IDocumentWPtr		m_document;	//!< Parent document.
+		Scene::AssetPtr			m_asset;	//!< An asset being edited.
 	};
 
 } // namespace Editors

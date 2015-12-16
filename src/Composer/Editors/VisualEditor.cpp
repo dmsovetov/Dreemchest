@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "VisualEditor.h"
+#include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
 
@@ -39,10 +40,10 @@ VisualEditor::VisualEditor( void )
 }
 
 // ** VisualEditor::initialize
-bool VisualEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
+bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document )
 {
 	// Perform basic initialization first.
-	if( !AssetEditor::initialize( asset, document ) ) {
+	if( !AssetEditor::initialize( project, asset, document ) ) {
 		return false;
 	}
 

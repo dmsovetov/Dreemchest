@@ -42,7 +42,7 @@ namespace Editors {
 										VisualEditor( void );
 
 		//! Performs the visual editor initialization.
-		virtual bool					initialize( const Asset& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
 
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;

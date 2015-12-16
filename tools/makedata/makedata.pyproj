@@ -13,7 +13,7 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
-    <CommandLineArguments>-s "D:\BFG9000\sandbox\particles" -o "D:\BFG9000\externals\src\dreemchest\src\examples\assets" -w 1 -a import --use-uuids 1</CommandLineArguments>
+    <CommandLineArguments>-s "D:\BFG9000\sandbox\particles" -o "D:\BFG9000\externals\src\dreemchest\Build\assets" -w 1 -a import --use-uuids 0 --skip-scenes 1</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />

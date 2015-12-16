@@ -40,7 +40,7 @@ namespace Editors {
 	protected:
 
 		//! Performs the scene editor initialization.
-		virtual bool					initialize( const Asset& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
 
 		//! Renders the scene.
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
@@ -70,8 +70,8 @@ namespace Editors {
 		Scene::SpectatorCameraPtr		m_camera;			//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
 
-		Scene::AssetBundlePtr			m_assets;			//!< Assets bundle.
-		Scene::SceneObjectPtr			m_chunk;			//!< Loaded terrain.
+	//	Scene::AssetBundlePtr			m_assets;			//!< Assets bundle.
+	//	Scene::SceneObjectPtr			m_chunk;			//!< Loaded terrain.
 	};
 
 	//! FrameTarget is used for rendering the scene to rendering frame.

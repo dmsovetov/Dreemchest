@@ -43,7 +43,7 @@ DC_BEGIN_COMPOSER
 ComposerWPtr Composer::s_instance = ComposerWPtr();
 
 // ** Composer::kAssetMime
-const String Composer::kAssetMime = "dreemchest/x-asset";
+const String Composer::kAssetMime = "text/uri-list";
 
 // ** Composer::Composer
 Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
@@ -92,7 +92,7 @@ bool Composer::initialize( void )
 void Composer::menuCreateProject( Ui::IActionWPtr action )
 {
 	// Get the file system interface
-	IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Create Project" );
@@ -108,7 +108,7 @@ void Composer::menuCreateProject( Ui::IActionWPtr action )
 void Composer::menuOpenProject( Ui::IActionWPtr action )
 {
 	// Get the file system interface
-	IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Open Project" );
@@ -124,7 +124,7 @@ void Composer::menuOpenProject( Ui::IActionWPtr action )
 void Composer::createProject( const String& path )
 {
 	// Get the file system interface
-	IFileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Create project instance
 	m_project = Project::Project::create( m_mainWindow, path );

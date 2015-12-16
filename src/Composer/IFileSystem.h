@@ -31,11 +31,36 @@
 
 DC_BEGIN_COMPOSER
 
-	//! File system interface.
-	class IFileSystem : public RefCounted {
+	//! File info interface.
+	class FileInfo : public RefCounted {
 	public:
 
-		virtual					~IFileSystem( void ) {}
+		virtual					~FileInfo( void ) {}
+
+		//! Returns the file extension.
+		virtual String			extension( void ) const = 0;
+
+		//! Returns the file timestamp.
+		virtual u32				timestamp( void ) const = 0;
+
+		//! Returns the file name.
+		virtual String			fileName( void ) const = 0;
+
+		//! Returns absolute directory path of a file.
+		virtual String			dir( void ) const = 0;
+
+		//! Returns absolute file path.
+		virtual String			absolutePath( void ) const = 0;
+
+		//! Returns true if this is a directory.
+		virtual bool			isDir( void ) const = 0;
+	};
+
+	//! File system interface.
+	class FileSystem : public RefCounted {
+	public:
+
+		virtual					~FileSystem( void ) {}
 
 		//! Returns the user's documents location.
 		virtual String			documentsLocation( void ) const = 0;
@@ -50,7 +75,7 @@ DC_BEGIN_COMPOSER
 		virtual bool			fileExists( const String& path ) const = 0;
 
 		//! Extracts the file info from path.
-		virtual FileInfo		extractFileInfo( const String& path ) const = 0;
+		virtual FileInfoPtr		extractFileInfo( const String& path ) const = 0;
 
 		//! Selects an existing directory.
 		virtual String			selectExistingDirectory( const String& title, const String& dir = "" ) const = 0;

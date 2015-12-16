@@ -44,7 +44,7 @@ namespace Ui {
 									QAssetTree( Project::ProjectWPtr project );
 
 		//! Returns the selected items.
-		StringArray					selection( void ) const;
+		FileInfoArray				selection( void ) const;
 
 		//! Expands the selected items.
 		void						expandSelectedItems( void );
@@ -83,13 +83,13 @@ namespace Ui {
 									AssetTree( Project::ProjectWPtr project );
 
 		//! Returns the selected items.
-		virtual StringArray			selection( void ) const;
+		virtual FileInfoArray		selection( void ) const DC_DECL_OVERRIDE;
 
 		//! Expands the selected items.
-		virtual void				expandSelectedItems( void );
+		virtual void				expandSelectedItems( void ) DC_DECL_OVERRIDE;
 
 		//! Sets asset tree model.
-		virtual void				setModel( AssetsModelWPtr value );
+		virtual void				setModel( AssetsModelWPtr value ) DC_DECL_OVERRIDE;
 	};
 
 } // namespace Ui

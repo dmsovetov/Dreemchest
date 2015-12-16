@@ -30,7 +30,7 @@
 #include <Dreemchest.h>
 #include <functional>
 
-#define DEV_CUSTOM_ASSET_MODEL			(1)
+#define DEV_CUSTOM_ASSET_MODEL			(0)
 #define DEV_BACKGROUND_ASSET_LOADING	(0)
 #define DEV_USE_DOCK_INDICATOR			(1)
 
@@ -112,44 +112,21 @@ DC_BEGIN_COMPOSER
 	namespace Project {
 
 		dcDeclarePtrs( Project )
-		dcDeclarePtrs( Cache )
+		dcDeclarePtrs( Assets )
 
 	} // namespace Project
 
 	dcDeclarePtrs( Composer )
-	dcDeclarePtrs( IFileSystem )
+	dcDeclarePtrs( FileSystem )
+	dcDeclarePtrs( FileInfo )
 	dcDeclarePtrs( IMimeData )
 	dcDeclarePtrs( AssetsModel )
 
 	//! Factory method used for assets model creation.
 	extern AssetsModelPtr createAssetsModel( void );
 
-	//! File info struct.
-	struct FileInfo {
-		String		path;			//!< The file absolute path.
-		String		directory;		//!< Parent directory absolute path.
-		String		baseName;		//!< The file base name.
-		String		fileName;		//!< The base name with extension.
-		String		ext;			//!< The file extension.
-		u32			timestamp;		//!< The file timestamp.
-	};
-
 	//! Container type to store file info.
-	typedef Array<FileInfo> FileInfoArray;
-
-	//! Asset info struct.
-	struct Asset {
-		String		ext;				//!< Asset's type.
-		String		name;				//!< Asset name.
-		String		absoluteFilePath;	//!< Absolute file path.
-		io::Bson	metaInfo;			//!< Attached metainfo.
-
-		//! Returns true if two assets are the same.
-		bool			operator == ( const Asset& other ) const { return uuid() == other.uuid(); }
-
-		//! Return asset UUID.
-		const String&	uuid( void ) const { return metaInfo["uuid"].asString(); }
-	};
+	typedef Array<FileInfoPtr> FileInfoArray;
 
 	//! Base class for event emitter classes.
 	class EventEmitter : public RefCounted {

@@ -38,3 +38,7 @@ externals/src
 *.suo
 *.pyc
 .idea
+
+~TestProject
+Build/*.dll
+assets

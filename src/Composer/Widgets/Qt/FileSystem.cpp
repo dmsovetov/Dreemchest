@@ -30,14 +30,60 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ** FileSystem::FileSystem
-FileSystem::FileSystem( QWidget* parent ) : m_parent( parent )
+// ------------------------------------------------------------ FileInfoPrivate ------------------------------------------------------------ //
+
+// ** FileInfoPrivate::FileInfoPrivate
+FileInfoPrivate::FileInfoPrivate( const QFileInfo& fileInfo ) : m_fileInfo( fileInfo )
 {
 
 }
 
-// ** FileSystem::documentsLocation
-String FileSystem::documentsLocation( void ) const
+// ** FileInfoPrivate::extension
+String FileInfoPrivate::extension( void ) const
+{
+	return m_fileInfo.completeSuffix().toLower().toStdString();
+}
+
+// ** FileInfoPrivate::timestamp
+u32 FileInfoPrivate::timestamp( void ) const
+{
+	return m_fileInfo.lastModified().toTime_t();
+}
+
+// ** FileInfoPrivate::fileName
+String FileInfoPrivate::fileName( void ) const
+{
+	return m_fileInfo.baseName().toStdString();
+}
+
+// ** FileInfoPrivate::dir
+String FileInfoPrivate::dir( void ) const
+{
+	return m_fileInfo.absolutePath().toStdString();
+}
+
+// ** FileInfoPrivate::absolutePath
+String FileInfoPrivate::absolutePath( void ) const
+{
+	return m_fileInfo.absoluteFilePath().toStdString();
+}
+
+// ** FileInfoPrivate::isDir
+bool FileInfoPrivate::isDir( void ) const
+{
+	return m_fileInfo.isDir();
+}
+
+// ----------------------------------------------------------- FileSystemPrivate ----------------------------------------------------------- //
+
+// ** FileSystemPrivate::FileSystemPrivate
+FileSystemPrivate::FileSystemPrivate( QWidget* parent ) : m_parent( parent )
+{
+
+}
+
+// ** FileSystemPrivate::documentsLocation
+String FileSystemPrivate::documentsLocation( void ) const
 {
 #ifdef DC_QT4_ENABLED
 	return QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ).toStdString();
@@ -46,16 +92,16 @@ String FileSystem::documentsLocation( void ) const
 #endif	/*	DC_QT4_ENABLED	*/
 }
 
-// ** FileSystem::selectExistingDirectory
-String FileSystem::selectExistingDirectory( const String& title, const String& dir ) const
+// ** FileSystemPrivate::selectExistingDirectory
+String FileSystemPrivate::selectExistingDirectory( const String& title, const String& dir ) const
 {
 	QString base   = dir == "" ? documentsLocation().c_str() : dir.c_str();
 	QString result = QFileDialog::getExistingDirectory( m_parent, title.c_str(), base );
 	return result.toStdString();
 }
 
-// ** FileSystem::selectExistingFiles
-StringArray FileSystem::selectExistingFiles( const String& title, const String& ext, const String& dir ) const
+// ** FileSystemPrivate::selectExistingFiles
+StringArray FileSystemPrivate::selectExistingFiles( const String& title, const String& ext, const String& dir ) const
 {
 	QString		empty;
 	QString		base     = dir == "" ? documentsLocation().c_str() : dir.c_str();
@@ -74,15 +120,15 @@ StringArray FileSystem::selectExistingFiles( const String& title, const String& 
 	return result;
 }
 
-// ** FileSystem::fileExists
-bool FileSystem::fileExists( const String& path ) const
+// ** FileSystemPrivate::fileExists
+bool FileSystemPrivate::fileExists( const String& path ) const
 {
 	bool result = QFile::exists( path.c_str() );
 	return result;
 }
 
-// ** FileSystem::removeFile
-bool FileSystem::removeFile( const String& path )
+// ** FileSystemPrivate::removeFile
+bool FileSystemPrivate::removeFile( const String& path )
 {
 	if( !QFile::exists( path.c_str() ) ) {
 		return true;
@@ -95,34 +141,26 @@ bool FileSystem::removeFile( const String& path )
 }
 
 //! Extracts the file info from path.
-FileInfo FileSystem::extractFileInfo( const String& path ) const
+FileInfoPtr FileSystemPrivate::extractFileInfo( const String& path ) const
 {
 	// Construct the file info from path
 	QFileInfo info( path.c_str() );
 
 	// Fill the resulting struct
-	FileInfo result = convertFileInfo( info );
+	FileInfoPtr result = convertFileInfo( info );
 
 	return result;
 }
 
-// ** FileSystem::convertFileInfo
-FileInfo FileSystem::convertFileInfo( const QFileInfo& fileInfo )
+// ** FileSystemPrivate::convertFileInfo
+FileInfoPtr FileSystemPrivate::convertFileInfo( const QFileInfo& fileInfo )
 {
-	FileInfo result;
-
-	result.path			= fileInfo.absoluteFilePath().toStdString();
-	result.baseName		= fileInfo.baseName().toStdString();
-	result.ext			= fileInfo.suffix().toStdString();
-	result.fileName		= result.ext == "" ? result.baseName : (result.baseName + "." + result.ext);
-	result.directory	= fileInfo.absoluteDir().path().toStdString();
-	result.timestamp	= fileInfo.lastModified().toTime_t();
-
+	FileInfoPtr result( new FileInfoPrivate( fileInfo ) );
 	return result;
 }
 
-// ** FileSystem::copyFile
-bool FileSystem::copyFile( const String& source, const String& dest, bool force )
+// ** FileSystemPrivate::copyFile
+bool FileSystemPrivate::copyFile( const String& source, const String& dest, bool force )
 {
 	// Fail copy if the source file does not exist.
 	if( !fileExists( source ) ) {
@@ -131,8 +169,8 @@ bool FileSystem::copyFile( const String& source, const String& dest, bool force 
 
 	// Create paths if the file creation is forces
 	if( force ) {
-		FileInfo info = extractFileInfo( dest );
-		createDirectory( info.directory );		
+		FileInfoPtr info = extractFileInfo( dest );
+		createDirectory( info->dir() );		
 	}
 
 	// Remove the file if it exists
@@ -144,8 +182,8 @@ bool FileSystem::copyFile( const String& source, const String& dest, bool force 
 	return result;
 }
 
-// ** FileSystem::createDirectory
-bool FileSystem::createDirectory( const String& path )
+// ** FileSystemPrivate::createDirectory
+bool FileSystemPrivate::createDirectory( const String& path )
 {
 	if( QDir( path.c_str() ).exists() ) {
 		return true;
@@ -157,8 +195,8 @@ bool FileSystem::createDirectory( const String& path )
 	return result;
 }
 
-// ** FileSystem::createFile
-bool FileSystem::createFile( const String& path )
+// ** FileSystemPrivate::createFile
+bool FileSystemPrivate::createFile( const String& path )
 {
 	if( fileExists( path ) ) {
 		return false;
@@ -170,8 +208,8 @@ bool FileSystem::createFile( const String& path )
 	return result;
 }
 
-// ** FileSystem::generateFileName
-String FileSystem::generateFileName( const String& path, const String& name, const String& ext ) const
+// ** FileSystemPrivate::generateFileName
+String FileSystemPrivate::generateFileName( const String& path, const String& name, const String& ext ) const
 {
 	QDir dir( path.c_str() );
 
@@ -191,8 +229,8 @@ String FileSystem::generateFileName( const String& path, const String& name, con
 	return "";
 }
 
-// ** FileSystem::browse
-bool FileSystem::browse( const String& path )
+// ** FileSystemPrivate::browse
+bool FileSystemPrivate::browse( const String& path )
 {
 	bool result = QDesktopServices::openUrl( QString( path.c_str() ) );
 	DC_BREAK_IF( !result );

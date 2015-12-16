@@ -37,15 +37,15 @@ namespace Importers {
 // -------------------------------------------------- ImageImporter ------------------------------------------------- //
 
 // ** ImageImporter::import
-bool ImageImporter::import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
+bool ImageImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	// Import image from file
-	if( !importImage( fs, asset, path ) ) {
+	if( !importImage( fs, sourceFileName ) ) {
 		return false;
 	}
 
 	// Write imported image to a binary stream
-	io::StreamPtr stream = openWriteStream( path );
+	Io::StreamPtr stream = openWriteStream( destinationFileName );
 	DC_BREAK_IF( !stream.valid() );
 
 	stream->write( &m_image.width, 2 );
@@ -59,10 +59,10 @@ bool ImageImporter::import( IFileSystemWPtr fs, const Asset& asset, const io::Pa
 // ------------------------------------------------ ImageImporterTGA ------------------------------------------------ //
 
 // ** ImageImporterTGA::importImage
-bool ImageImporterTGA::importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
+bool ImageImporterTGA::importImage( FileSystemWPtr fs, const Io::Path& sourceFileName )
 {
 	// Open the file
-	io::StreamPtr stream = openReadStream( asset.absoluteFilePath );
+	Io::StreamPtr stream = openReadStream( sourceFileName );
 	DC_BREAK_IF( !stream.valid() );
 
 	if( !stream.valid() ) {
@@ -73,15 +73,15 @@ bool ImageImporterTGA::importImage( IFileSystemWPtr fs, const Asset& asset, cons
 	u8 len, imageType, bitsPerPixel;
 	u16 width, height;
 	stream->read( &len, 1 );
-	stream->setPosition( 1, io::SeekCur );
+	stream->setPosition( 1, Io::SeekCur );
 
 	stream->read( &imageType, 1 );
-	stream->setPosition( 9, io::SeekCur );
+	stream->setPosition( 9, Io::SeekCur );
 
 	stream->read( &width, 2 );
 	stream->read( &height, 2 );
 	stream->read( &bitsPerPixel, 1 );
-	stream->setPosition( len + 1, io::SeekCur );
+	stream->setPosition( len + 1, Io::SeekCur );
 
 	// Read an image
 	DC_BREAK_IF( imageType == 10 );	// RLE-encoded images are not supported yet.
@@ -96,7 +96,7 @@ bool ImageImporterTGA::importImage( IFileSystemWPtr fs, const Asset& asset, cons
 }
 
 // ** ImageImporterTGA::readPixels16
-void ImageImporterTGA::readPixels16( io::StreamPtr stream, Image& image, u16 width, u16 height ) const
+void ImageImporterTGA::readPixels16( Io::StreamPtr stream, Image& image, u16 width, u16 height ) const
 {
 	image.channels	= 3;
 	image.width		= width;
@@ -114,7 +114,7 @@ void ImageImporterTGA::readPixels16( io::StreamPtr stream, Image& image, u16 wid
 }
 
 // ** ImageImporterTGA::readPixels
-void ImageImporterTGA::readPixels( io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const
+void ImageImporterTGA::readPixels( Io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const
 {
 	image.channels	= bitsPerPixel / 8;
 	image.width		= width;
@@ -141,10 +141,10 @@ void ImageImporterTGA::swapChannels( Image& image ) const
 // ------------------------------------------------ ImageImporterTIF ------------------------------------------------ //
 
 // ** ImageImporterTIF::import
-bool ImageImporterTIF::importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
+bool ImageImporterTIF::importImage( FileSystemWPtr fs, const Io::Path& sourceFileName )
 {
 	// Open the TIFF file
-	TIFF* tif = TIFFOpen( asset.absoluteFilePath.c_str(), "r" );
+	TIFF* tif = TIFFOpen( sourceFileName.c_str(), "r" );
 	DC_BREAK_IF( !tif );
 
 	// Extract image dimensions

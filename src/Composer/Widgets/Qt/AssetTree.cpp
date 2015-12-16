@@ -45,7 +45,7 @@ AssetTree::AssetTree( Project::ProjectWPtr project ) : PrivateInterface( new QAs
 }
 
 // ** AssetTree::selection
-StringArray AssetTree::selection( void ) const
+FileInfoArray AssetTree::selection( void ) const
 {
 	return m_private->selection();
 }
@@ -90,6 +90,15 @@ void QAssetTree::setModel( AssetsModelWPtr value )
 {
 	m_model = value;
 	QTreeView::setModel( m_model->privateInterface<QAssetsModel>() );
+
+#if !DEV_CUSTOM_ASSET_MODEL
+	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
+	setRootIndex( model->root() );
+
+	for( s32 i = 1; i < model->columnCount(); i++ ) {
+		setColumnHidden( i, true );
+	}
+#endif	/*	!DEV_CUSTOM_ASSET_MODEL	*/
 }
 
 // ** QAssetTree::keyPressEvent
@@ -121,33 +130,37 @@ void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 {
 	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
 
-	if( model->isDir( index ) ) {
+	// Get the file info by index
+	FileInfoPtr file = model->assetFile( index );
+
+	if( file->isDir() ) {
 		return;
 	}
 
-	// Get an asset from index
-	const QAsset& asset = model->asset( index );
+	// Read the corresponding meta data
+	Io::KeyValue data = m_model->metaData( file );
 
-	// Convert the asset info
-	Asset assetInfo;
-	assetInfo.absoluteFilePath = asset.absoluteFilePath().toStdString();
-	assetInfo.ext			   = asset.fileInfo().completeSuffix().toStdString();
-	assetInfo.name			   = asset.name().toStdString();
-	assetInfo.metaInfo		   = io::Bson::object() << "uuid" << asset.uuid().toString().toStdString();
+	if( !data.isObject() ) {
+		return;
+	}
 
 	// Open the asset editor
-	m_project->edit( assetInfo );
+	m_project->edit( data["uuid"].asString(), file );
 }
 
 // ** QAssetTree::selection
-StringArray QAssetTree::selection( void ) const
+FileInfoArray QAssetTree::selection( void ) const
 {
 	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
 
-	StringArray result;
+	FileInfoArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
+	#if DEV_CUSTOM_ASSET_MODEL
 		result.push_back( model->asset( idx ).absoluteFilePath().toStdString() );
+	#else
+		result.push_back( model->assetFile( idx ) );
+	#endif
 	}
 
 	return result;

@@ -33,48 +33,78 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! File system interface Qt implementation.
-	class FileSystem : public IFileSystem {
+	//! File info interface, Qt implementation.
+	class FileInfoPrivate : public FileInfo {
 	public:
 
-								//! Constructs FileSystem instance.
-								FileSystem( QWidget* parent );
+								//! Constructs FileInfoPrivate instance.
+								FileInfoPrivate( const QFileInfo& fileInfo );
+
+		//! Returns the file extension.
+		virtual String			extension( void ) const DC_DECL_OVERRIDE;
+
+		//! Returns the file timestamp.
+		virtual u32				timestamp( void ) const DC_DECL_OVERRIDE;
+
+		//! Returns the file name.
+		virtual String			fileName( void ) const DC_DECL_OVERRIDE;
+
+		//! Returns absolute directory path of a file.
+		virtual String			dir( void ) const DC_DECL_OVERRIDE;
+
+		//! Returns absolute file path.
+		virtual String			absolutePath( void ) const DC_DECL_OVERRIDE;
+
+		//! Returns true if this is a directory.
+		virtual bool			isDir( void ) const DC_DECL_OVERRIDE;
+
+	private:
+
+		QFileInfo				m_fileInfo;	//!< Actual file info.
+	};
+
+	//! File system interface Qt implementation.
+	class FileSystemPrivate : public FileSystem {
+	public:
+
+								//! Constructs FileSystemPrivate instance.
+								FileSystemPrivate( QWidget* parent );
 
 		//! Returns the user's documents location.
-		virtual String			documentsLocation( void ) const;
+		virtual String			documentsLocation( void ) const DC_DECL_OVERRIDE;
 
 		//! Copies the file from one location to another.
-		virtual bool			copyFile( const String& source, const String& dest, bool force = false );
+		virtual bool			copyFile( const String& source, const String& dest, bool force = false ) DC_DECL_OVERRIDE;
 
 		//! Returns true if the file exists.
-		virtual bool			fileExists( const String& path ) const;
+		virtual bool			fileExists( const String& path ) const DC_DECL_OVERRIDE;
 
 		//! Removes the existing file.
-		virtual bool			removeFile( const String& path );
+		virtual bool			removeFile( const String& path ) DC_DECL_OVERRIDE;
 
 		//! Extracts the file info from path.
-		virtual FileInfo		extractFileInfo( const String& path ) const;
+		virtual FileInfoPtr		extractFileInfo( const String& path ) const DC_DECL_OVERRIDE;
 
 		//! Selects an existing directory.
-		virtual String			selectExistingDirectory( const String& title, const String& dir = "" ) const;
+		virtual String			selectExistingDirectory( const String& title, const String& dir = "" ) const DC_DECL_OVERRIDE;
 
 		//! Selects existing files.
-		virtual StringArray		selectExistingFiles( const String& title, const String& ext = "*.*", const String& dir = "" ) const;
+		virtual StringArray		selectExistingFiles( const String& title, const String& ext = "*.*", const String& dir = "" ) const DC_DECL_OVERRIDE;
 
 		//! Creates a new directory if it does not exists.
-		virtual bool			createDirectory( const String& path );
+		virtual bool			createDirectory( const String& path ) DC_DECL_OVERRIDE;
 
 		//! Creates an empty file at specified path.
-		virtual bool			createFile( const String& path );
+		virtual bool			createFile( const String& path ) DC_DECL_OVERRIDE;
 
 		//! Generates the file name that does not exist at specified path.
-		virtual String			generateFileName( const String& path, const String& name, const String& ext ) const;
+		virtual String			generateFileName( const String& path, const String& name, const String& ext ) const DC_DECL_OVERRIDE;
 
 		//! Browses to a selected path.
 		virtual bool			browse( const String& path );
 
-		//! Converts the QFileInfo to Ui::FileInfo.
-		static FileInfo			convertFileInfo( const QFileInfo& fileInfo );
+		//! Converts the QFileInfo to FileInfo.
+		static FileInfoPtr		convertFileInfo( const QFileInfo& fileInfo );
 
 	private:
 

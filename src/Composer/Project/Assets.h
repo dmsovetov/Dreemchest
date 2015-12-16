@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Cache_H__
-#define __DC_Composer_Cache_H__
+#ifndef __DC_Composer_Assets_H__
+#define __DC_Composer_Assets_H__
 
 #include "Project.h"
 #include "../Importers/AssetImporter.h"
@@ -34,14 +34,25 @@ DC_BEGIN_COMPOSER
 
 namespace Project {
 
-	//! Manages the project cache.
-	class Cache : public RefCounted {
+	//! Manages the project cache & available assets.
+	class Assets : public RefCounted {
 	friend class Project;
+	public:
+
+		//! Returns asset bundle.
+		Scene::AssetBundleWPtr		bundle( void ) const;
+
+		//! Registers the mapping from extension to asset type.
+		void						registerExtension( const String& ext, Scene::Asset::Type type );
+
+		//! Returns asset type by extension.
+		Scene::Asset::Type			assetTypeFromExtension( const String& ext ) const;
+
 	private:
 
-									//! Constructs Cache instance.
-									Cache( IFileSystemWPtr fileSystem, const io::Path& path, AssetsModelWPtr assetsModel );
-		virtual						~Cache( void );
+									//! Constructs Assets instance.
+									Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr assetsModel );
+		virtual						~Assets( void );
 
 		//! Adds an asset to cache.
 		void						handleAssetAdded( const AssetsModel::Added& e );
@@ -55,30 +66,38 @@ namespace Project {
 	private:
 
 		//! Puts an asset to cache.
-		bool						putToCache( const Asset& asset );
+		bool						putToCache( const FileInfoWPtr& fileInfo, const String& uuid );
 
 		//! Removes an asset from cache.
-		void						removeFromCache( const Asset& asset );
+		void						removeFromCache( const String& uuid );
 
 		//! Returns asset cache path.
-		io::Path					cacheFileFromAsset( const Asset& asset ) const;
+		Io::Path					cacheFileFromUuid( const String& uuid ) const;
 
 		//! Returns asset cache folder.
-		io::Path					cacheFolderFromAsset( const Asset& asset ) const;
+		Io::Path					cacheFolderFromUuid( const String& uuid ) const;
+
+		//! Creates new asset instance by a specified extension.
+		Scene::AssetPtr				createAssetForFile( const FileInfoWPtr& fileInfo );
 
 	private:
 
 		//! Alias the asset importer factory type.
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
-		IFileSystemWPtr				m_fileSystem;		//!< File system to use.
-		io::Path					m_path;				//!< Root cache folder path.
+		//! Alias the ext to asset type mapping.
+		typedef Map<String, Scene::Asset::Type> AssetTypes;
+
+		FileSystemWPtr				m_fileSystem;		//!< File system to use.
+		Io::Path					m_path;				//!< Root cache folder path.
 		AssetsModelWPtr				m_assetsModel;		//!< Assets model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
+		AssetTypes					m_assetTypes;		//!< Registered asset types.
+		Scene::AssetBundlePtr		m_bundle;			//!< Asset bundle.
 	};
 
 } // namespace Project
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Cache_H__	*/
+#endif	/*	!__DC_Composer_Assets_H__	*/

@@ -39,15 +39,15 @@ namespace Importers {
 	public:
 
 		//! Imports an asset to project cache.
-		virtual bool			import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) = 0;
+		virtual bool			import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) = 0;
 
 	protected:
 
 		//! Opens the binary stream for writing.
-		virtual io::StreamPtr	openWriteStream( const io::Path& path ) const { return io::DiskFileSystem().openFile( path, io::BinaryWriteStream ); }
+		virtual Io::StreamPtr	openWriteStream( const Io::Path& path ) const { return Io::DiskFileSystem().openFile( path, Io::BinaryWriteStream ); }
 
 		//! Opens the binary stream for reading.
-		virtual io::StreamPtr	openReadStream( const io::Path& path ) const { return io::DiskFileSystem().openFile( path, io::BinaryReadStream ); }
+		virtual Io::StreamPtr	openReadStream( const Io::Path& path ) const { return Io::DiskFileSystem().openFile( path, Io::BinaryReadStream ); }
 	};
 
 } // namespace Importers

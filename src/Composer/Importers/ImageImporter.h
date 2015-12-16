@@ -38,12 +38,12 @@ namespace Importers {
 	public:
 
 		//! Writes the imported image to file.
-		virtual bool		import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
+		virtual bool		import( FileSystemWPtr fs,const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
 
 	private:
 
 		//! Imports an image from file.
-		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) = 0;
+		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) = 0;
 
 	protected:
 
@@ -63,15 +63,15 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TGA image.
-		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
+		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
 
 	private:
 
 		//! Reads 16-bit image.
-		void				readPixels16( io::StreamPtr stream, Image& image, u16 width, u16 height ) const;
+		void				readPixels16( Io::StreamPtr stream, Image& image, u16 width, u16 height ) const;
 
 		//! Reads 24/32-bit image.
-		void				readPixels( io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const;
+		void				readPixels( Io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const;
 
 		//! Swaps red & blue channels.
 		void				swapChannels( Image& image ) const;
@@ -84,7 +84,7 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TIF image.
-		virtual bool		importImage( IFileSystemWPtr fs, const Asset& asset, const io::Path& path ) DC_DECL_OVERRIDE;
+		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
 	};
 
 #endif	/*	HAVE_TIFF	*/

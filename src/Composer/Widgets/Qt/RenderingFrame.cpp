@@ -167,9 +167,9 @@ void QRenderingFrame::dragEnterEvent( QDragEnterEvent* e )
 		return;
 	}
 
-	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+	IMimeDataPtr mime( new MimeData( e->mimeData() ) );
 
-	if( mime && delegate->handleDragEnter( mime->mime() ) ) {
+	if( delegate->handleDragEnter( mime ) ) {
 		e->acceptProposedAction();
 	}
 }
@@ -183,11 +183,9 @@ void QRenderingFrame::dragMoveEvent( QDragMoveEvent* e )
 		return;
 	}
 
-	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+	IMimeDataPtr mime( new MimeData( e->mimeData() ) );
 
-	if( mime ) {
-		delegate->handleDragMove( mime->mime(), e->pos().x(), e->pos().y() );
-	}
+	delegate->handleDragMove( mime, e->pos().x(), e->pos().y() );
 }
 
 // ** QRenderingFrame::dropEvent
@@ -199,11 +197,9 @@ void QRenderingFrame::dropEvent( QDropEvent* e )
 		return;
 	}
 
-	const QComposerMime* mime = qobject_cast<const QComposerMime*>( e->mimeData() );
+	IMimeDataPtr mime( new MimeData( e->mimeData() ) );
 
-	if( mime ) {
-		delegate->handleDrop( mime->mime(), e->pos().x(), e->pos().y() );
-	}
+	delegate->handleDrop( mime, e->pos().x(), e->pos().y() );
 }
 
 // ** QRenderingFrame::contextMenuEvent

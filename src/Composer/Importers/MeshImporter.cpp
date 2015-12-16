@@ -33,15 +33,15 @@ namespace Importers {
 // ------------------------------------------------------ MeshImporter ------------------------------------------------------ //
 
 // ** MeshImporter::import
-bool MeshImporter::import( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
+bool MeshImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	// Import mesh nodes from file
-	if( !importNodes( fs, asset, path ) ) {
+	if( !importNodes( fs, sourceFileName ) ) {
 		return false;
 	}
 
 	// Write nodes to file
-	io::StreamPtr stream = openWriteStream( path );
+	Io::StreamPtr stream = openWriteStream( destinationFileName );
 	DC_BREAK_IF( !stream.valid() );
 
 	s32 chunkCount = ( s32 )m_nodes.size();
@@ -126,14 +126,14 @@ MeshImporterFBX::~MeshImporterFBX( void )
 }
 
 // ** MeshImporterFBX::importNodes
-bool MeshImporterFBX::importNodes( IFileSystemWPtr fs, const Asset& asset, const io::Path& path )
+bool MeshImporterFBX::importNodes( FileSystemWPtr fs, const Io::Path& sourceFileName )
 {
 	// Create the scene instance
 	m_scene = FbxScene::Create( s_manager, "" );
 	DC_BREAK_IF( !m_scene );
 
 	// Initialize the importer by providing a filename.
-	if( !s_importer->Initialize( asset.absoluteFilePath.c_str(), -1, s_manager->GetIOSettings() ) ) {
+	if( !s_importer->Initialize( sourceFileName.c_str() ) ) {
 		DC_BREAK;
 		return false;
 	}

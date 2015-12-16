@@ -49,6 +49,8 @@ namespace Project {
 			, TotalPaths	//!< The total number of project paths.
 		};
 
+									~Project( void );
+
 		//! Fills an asset menu.
 		void						fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree = Ui::IAssetTreeWPtr() );
 
@@ -58,6 +60,9 @@ namespace Project {
 		//! Returns project assets model.
 		AssetsModelWPtr				assetsModel( void ) const;
 
+		//! Returns an asset bundle.
+		Scene::AssetBundleWPtr		assets( void ) const;
+
 		//! Returns project absoulte path.
 		String						absolutePath( s32 index ) const;
 
@@ -65,15 +70,15 @@ namespace Project {
 		String						assetsAbsolutePath( void ) const;
 
 		//! Opens the asset editor.
-		Ui::IDocumentWPtr			edit( const Asset& asset );
+		Ui::IDocumentWPtr			edit( const String& uuid, const FileInfoWPtr& fileInfo );
 
 		//! Creates new Project instance.
-		static ProjectPtr			create( Ui::IMainWindowWPtr mainWindow, const io::Path& path );
+		static ProjectPtr			create( Ui::IMainWindowWPtr mainWindow, const Io::Path& path );
 
 	private:
 
 									//! Constructs Project instance.
-									Project( Ui::IMainWindowWPtr mainWindow, const io::Path& path );
+									Project( Ui::IMainWindowWPtr mainWindow, const Io::Path& path );
 
 		//! Creates new asset with specified name at selected folder.
 		void						createAsset( const String& name, const String& ext );
@@ -107,9 +112,9 @@ namespace Project {
 		String						m_name;					//!< Project name.
 		Ui::IMainWindowWPtr			m_mainWindow;			//!< Main window instance.
 		AssetsModelPtr				m_assetsModel;			//!< Assets model.
-		io::Path					m_paths[TotalPaths];	//!< Project path.
+		Io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
-		CachePtr					m_cache;				//!< The project cache.
+		AssetsPtr					m_assets;				//!< The project assets.
 	};
 
 } // namespace Project

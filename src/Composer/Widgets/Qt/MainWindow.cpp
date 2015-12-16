@@ -81,7 +81,8 @@ MainWindow::MainWindow( const String& title ) : PrivateInterface( new QMainWindo
 	//m_private->setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
 
 #ifdef NDEBUG
-	m_private->setWindowState( Qt::WindowMaximized );
+	//m_private->setWindowState( Qt::WindowMaximized );
+	m_private->resize( 1024, 768 );
 #else
 	m_private->resize( 1024, 768 );
 #endif
@@ -95,7 +96,7 @@ MainWindow::MainWindow( const String& title ) : PrivateInterface( new QMainWindo
 bool MainWindow::initialize( ComposerWPtr composer )
 {
 	// Create the file system
-	m_fileSystem = new FileSystem( m_private.get() );
+	m_fileSystem = new FileSystemPrivate( m_private.get() );
 
 	// Listen for events
 	composer->subscribe<Composer::ProjectOpened>( dcThisMethod( MainWindow::onProjectOpened ) );
@@ -146,7 +147,7 @@ IRenderingFrameWPtr MainWindow::sharedRenderingContext( void ) const
 }
 
 // ** MainWindow::fileSystem
-IFileSystemWPtr MainWindow::fileSystem( void ) const
+FileSystemWPtr MainWindow::fileSystem( void ) const
 {
 	return m_fileSystem;
 }
@@ -213,7 +214,7 @@ void MainWindow::removeMenu( IMenuWPtr menu )
 }
 
 // ** MainWindow::editDocument
-IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const Asset& asset )
+IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset )
 {
 	DC_BREAK_IF( !assetEditor.valid() );
 
@@ -226,10 +227,10 @@ IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, co
 	}
 
 	// Create the document instance
-	IDocumentPtr document( new Document( this, assetEditor, asset.name ) );
+	IDocumentPtr document( new Document( this, assetEditor, asset->name() ) );
 
 	// Initialize the asset editor with a document
-	if( !assetEditor->initialize( asset, document ) ) {
+	if( !assetEditor->initialize( m_project, asset, document ) ) {
 		return IDocumentWPtr();
 	}
 
@@ -288,7 +289,7 @@ bool MainWindow::closeDocument( IDocumentWPtr document )
 }
 
 // ** MainWindow::findDocument
-IDocumentWPtr MainWindow::findDocument( const Asset& asset ) const
+IDocumentWPtr MainWindow::findDocument( const Scene::AssetWPtr& asset ) const
 {
 	foreach( IDocumentWPtr document, m_documents ) {
 		if( document->assetEditor()->asset() == asset ) {
@@ -300,12 +301,12 @@ IDocumentWPtr MainWindow::findDocument( const Asset& asset ) const
 }
 
 // ** MainWindow::findDocuments
-DocumentsWeak MainWindow::findDocuments( const Asset& asset ) const
+DocumentsWeak MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
 {
 	DocumentsWeak documents;
 
 	foreach( IDocumentWPtr document, m_documents ) {
-		if( document->assetEditor()->asset().ext == asset.ext ) {
+		if( document->assetEditor()->asset()->type() == asset->type() ) {
 			documents.push_back( document );
 		}
 	}
@@ -353,7 +354,7 @@ bool MainWindow::ensureSaved( IDocumentWPtr document ) const
 	}
 
 	// Show the message box
-	String			 message = "Do you want to save changes to " + assetEditor->asset().name + "?";
+	String			 message = "Do you want to save changes to " + assetEditor->asset()->name() + "?";
 	String			 info	 = "Your changes will be lost if you don't save them";
 	MessageBoxResult result  = messageYesNoCancel( message, info, MessageWarning );
 
@@ -370,11 +371,11 @@ bool MainWindow::ensureSaved( IDocumentWPtr document ) const
 void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 {
 	// Get the project from event
-	Project::ProjectWPtr project = e.project;
+	m_project = e.project;
 
 	// Create the asset tree
-	m_assetTree = new AssetTree( project );
-	m_assetTree->setModel( e.project->assetsModel() );
+	m_assetTree = new AssetTree( m_project );
+	m_assetTree->setModel( m_project->assetsModel() );
 
 	// Setup status bar
 	m_private->statusBar()->show();
@@ -386,12 +387,13 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
 
 	// Update window caption
-	m_private->setWindowTitle( e.project->name().c_str() + QString( " - Dreemchest Composer" ) );
+	m_private->setWindowTitle( m_project->name().c_str() + QString( " - Dreemchest Composer" ) );
 }
 
 // ** MainWindow::onProjectClosed
 void MainWindow::onProjectClosed( const Composer::ProjectClosed& e )
 {
+	m_project = Project::ProjectWPtr();
 	DC_BREAK;
 }
 

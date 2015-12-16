@@ -38,13 +38,13 @@ namespace Ui {
 	public:
 
 		//! Returns the selected items.
-		virtual StringArray	selection( void ) const = 0;
+		virtual FileInfoArray	selection( void ) const = 0;
 
 		//! Expands the selected items.
-		virtual void		expandSelectedItems( void )	= 0;
+		virtual void			expandSelectedItems( void )	= 0;
 
 		//! Sets asset tree model.
-		virtual void		setModel( AssetsModelWPtr value ) = 0;
+		virtual void			setModel( AssetsModelWPtr value ) = 0;
 	};
 
 } // namespace Ui

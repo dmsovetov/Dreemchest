@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "AssetEditor.h"
+#include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
 
@@ -37,8 +38,9 @@ bool AssetEditor::hasChanges( void ) const
 }
 
 // ** AssetEditor::initialize
-bool AssetEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
+bool AssetEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document )
 {
+	m_project	= project;
 	m_asset		= asset;
 	m_document	= document;
 
@@ -46,7 +48,7 @@ bool AssetEditor::initialize( const Asset& asset, Ui::IDocumentWPtr document )
 }
 
 // ** AssetEditor::setAsset
-const Asset&  AssetEditor::asset( void ) const
+Scene::AssetWPtr AssetEditor::asset( void ) const
 {
 	return m_asset;
 }
