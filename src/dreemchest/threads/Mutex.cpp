@@ -24,19 +24,19 @@
 
  **************************************************************************/
 
-#include    "Mutex.h"
+#include "Mutex.h"
 
 #ifdef DC_THREADS_POSIX
-    #include    "Posix/PosixMutex.h"
+    #include "Posix/PosixMutex.h"
 #elif DC_THREADS_WINDOWS
-    #include    "Windows/WindowsThread.h"
+    #include "Windows/WindowsThread.h"
 #else
     #error Unknown threading option defined.
 #endif
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** Mutex::Mutex
 Mutex::~Mutex( void )
@@ -84,6 +84,6 @@ void Condition::release( void )
     delete this;
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

@@ -38,7 +38,7 @@ using namespace Platform;
 // Open a net namespace.
 using namespace net;
 
-thread::ThreadPtr serverThread;
+Threads::ThreadPtr serverThread;
 
 // Application delegate is used to handle an events raised by application instance.
 class NetworkHandlers : public ApplicationDelegate {
@@ -75,7 +75,7 @@ class NetworkHandlers : public ApplicationDelegate {
 
 	#if LOCAL_MODE
 		ServerHandlerPtr server = startServer( application, 20000 );
-		serverThread = thread::Thread::create();
+		serverThread = Threads::Thread::create();
 		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
 
 		ClientHandlerPtr client = connectToServer( application, 20000 );
@@ -122,7 +122,7 @@ class NetworkHandlers : public ApplicationDelegate {
 
 		while( true ) {
 			server->update( 16 );
-			thread::Thread::sleep( 1 );
+			Threads::Thread::sleep( 1 );
 
 			if( (++counter % 500) == 0 ) {
 				printf( "emit : %d\n", counter );

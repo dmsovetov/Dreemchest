@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "Thread.h"
+#include "Thread.h"
 
 #ifdef DC_THREADS_POSIX
-    #include    "Posix/PosixThread.h"
+    #include "Posix/PosixThread.h"
 #elif DC_THREADS_WINDOWS
-    #include    "Windows/WindowsThread.h"
+    #include "Windows/WindowsThread.h"
 #else
     #error Unknown threading option defined.
 #endif
@@ -40,7 +40,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** Thread::Thread
 Thread::Thread( void ) : m_isAlive( false ), m_userData( NULL ), m_id( 0 )
@@ -130,6 +130,6 @@ u64 Thread::currentThread( void )
 #endif
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

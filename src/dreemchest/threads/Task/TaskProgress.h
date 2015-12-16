@@ -24,16 +24,16 @@
 
  **************************************************************************/
 
-#ifndef        __DC_TaskProgress_H__
-#define        __DC_TaskProgress_H__
+#ifndef __DC_Threads_TaskProgress_H__
+#define __DC_Threads_TaskProgress_H__
 
-#include    "../Threads.h"
+#include "../Threads.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
-    // ** class TaskProgress
+    //! Tracks the task progress.
     class dcInterface TaskProgress : public RefCounted {
     public:
 
@@ -41,7 +41,7 @@ namespace thread {
                                 ~TaskProgress( void );
 
         //! Returns a task progress.
-        f32                   progress( void ) const;
+        f32						progress( void ) const;
 
         //! Sets a task progress.
         void                    setProgress( f32 value );
@@ -76,8 +76,8 @@ namespace thread {
         String                  m_status;
     };
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_TaskProgress_H__    */
+#endif    /*    !__DC_Threads_TaskProgress_H__    */

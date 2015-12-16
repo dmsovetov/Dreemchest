@@ -24,16 +24,15 @@
 
  **************************************************************************/
 
-#ifndef        __DC_TaskThread_H__
-#define        __DC_TaskThread_H__
+#ifndef __DC_Threads_TaskThread_H__
+#define __DC_Threads_TaskThread_H__
 
-#include    "../Threads.h"
+#include "../Threads.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
-    // ** class TaskThread
     //! TaskThread object with associated task queue, used for background task processing.
     class TaskThread {
     public:
@@ -70,8 +69,8 @@ namespace thread {
         ThreadPtr				m_thread;
     };
     
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_TaskQueue_H__    */
+#endif    /*    !__DC_Threads_TaskQueue_H__    */

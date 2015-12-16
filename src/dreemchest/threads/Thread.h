@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef        __DC_Thread_H__
-#define        __DC_Thread_H__
+#ifndef __DC_Threads_Thread_H__
+#define __DC_Threads_Thread_H__
 
-#include    "Threads.h"
+#include "Threads.h"
 
 #ifdef DC_PLATFORM_WINDOWS
     #undef Yield
@@ -35,7 +35,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
     //! Thread function callback.
     typedef cClosure<void(void*)> ThreadCallback;
@@ -103,8 +103,8 @@ namespace thread {
         u32                 m_id;
     };
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Thread_H__    */
+#endif    /*    !__DC_Threads_Thread_H__    */

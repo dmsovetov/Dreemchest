@@ -61,7 +61,7 @@ public:
         // First clear a viewport with a color
         m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
 
-		thread::Thread::sleep( 30 );
+		Threads::Thread::sleep( 30 );
 
 		m_scene->update( 0, 0.03f );
 		m_scene->render( m_renderingContext );

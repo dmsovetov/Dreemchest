@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#include	"WindowsThread.h"
+#include "WindowsThread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** WindowsThread::WindowsThread
 WindowsThread::WindowsThread( void ) : m_handle( NULL )
@@ -128,6 +128,6 @@ void WindowsCondition::trigger( void )
 	LeaveCriticalSection( &m_criticalSection );
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

@@ -29,18 +29,16 @@
 
 #include "../Dreemchest.h"
 
-#include <queue>
-
 // --------------------------------------- Module macroses --------------------------------------- //
 
 #define DC_SCOPED_LOCK( mutex ) \
-            thread::ScopedLock mutex##ScopedLock( mutex )
+            Threads::ScopedLock mutex##ScopedLock( mutex )
 
 // ---------------------------------- Module types and namespaces -------------------------------- //
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 	dcDeclarePtrs( Thread )
 	dcDeclarePtrs( TaskProgress )

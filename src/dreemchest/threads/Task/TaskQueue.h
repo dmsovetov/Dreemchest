@@ -31,9 +31,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
-    // ** class TaskQueue
     //! Task queue object.
     class TaskQueue {
     friend class TaskThread;
@@ -107,7 +106,7 @@ namespace thread {
         TaskPriorityQueue       m_tasks;
     };
     
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 

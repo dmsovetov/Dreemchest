@@ -24,16 +24,16 @@
 
  **************************************************************************/
 
-#include    "TaskManager.h"
-#include    "TaskQueue.h"
-#include    "TaskThread.h"
-#include    "TaskProgress.h"
+#include "TaskManager.h"
+#include "TaskQueue.h"
+#include "TaskThread.h"
+#include "TaskProgress.h"
 
-#include    "../Thread.h"
+#include "../Thread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** TaskManager::TaskManager
 TaskManager::TaskManager( void )
@@ -169,6 +169,6 @@ void TaskManager::startTaskThread( const char *name, TaskQueue *queue )
     m_taskThreads[hash]     = taskThread;
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

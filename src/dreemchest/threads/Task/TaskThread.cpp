@@ -24,13 +24,13 @@
 
  **************************************************************************/
 
-#include    "TaskThread.h"
-#include    "TaskQueue.h"
-#include    "../Thread.h"
+#include "TaskThread.h"
+#include "TaskQueue.h"
+#include "../Thread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** TaskThread::TaskThread
 TaskThread::TaskThread( const char *name, TaskQueue *queue )
@@ -71,6 +71,6 @@ void TaskThread::run( void *userData )
     }
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

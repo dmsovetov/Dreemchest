@@ -24,16 +24,16 @@
 
  **************************************************************************/
 
-#ifndef __DC_TaskManager_H__
-#define __DC_TaskManager_H__
+#ifndef __DC_Threads_TaskManager_H__
+#define __DC_Threads_TaskManager_H__
 
 #include "TaskProgress.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
-    // ** class TaskManager
+    //! Contains working threads and dispatches tasks to them.
     class dcInterface TaskManager {
 
         typedef Hash<class TaskThread*>  TaskThreads;
@@ -122,8 +122,8 @@ namespace thread {
         u64                     m_mainThread;
     };
     
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_TaskManager_H__    */
+#endif    /*    !__DC_Threads_TaskManager_H__    */

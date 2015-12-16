@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "TaskProgress.h"
-#include    "../Mutex.h"
+#include "TaskProgress.h"
+#include "../Mutex.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** TaskProgress::TaskProgress
 TaskProgress::TaskProgress( void ) : m_isCompleted( false )
@@ -97,6 +97,6 @@ void TaskProgress::complete( void )
     m_isCompleted = true;
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

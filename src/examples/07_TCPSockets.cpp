@@ -92,7 +92,7 @@ public:
 
 		const char* response = "ping";
 		socket->sendTo( response, strlen( response ) );
-		thread::Thread::sleep( 1000 );
+		Threads::Thread::sleep( 1000 );
 
 		counter++;
 		if( counter >= 5 ) {
@@ -103,7 +103,7 @@ public:
 	Application* m_application;
 };
 
-thread::ThreadPtr serverThread;
+Threads::ThreadPtr serverThread;
 
 // Application delegate is used to handle an events raised by application instance.
 class Server : public ApplicationDelegate {
@@ -119,7 +119,7 @@ class Server : public ApplicationDelegate {
 		Network network;
 
 		TCPSocketListenerPtr server = startServer( application, 20000 );
-		serverThread = thread::Thread::create();
+		serverThread = Threads::Thread::create();
 		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
 
 		TCPSocketPtr client = connectToServer( application, 20000 );
@@ -151,7 +151,7 @@ class Server : public ApplicationDelegate {
 	{
 		while( true ) {
 			reinterpret_cast<TCPSocketListener*>( userData )->update();
-			thread::Thread::sleep( 1 );
+			Threads::Thread::sleep( 1 );
 		}
 	}
 

@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef		__DC_WindowsThread_H__
-#define		__DC_WindowsThread_H__
+#ifndef __DC_Threads_WindowsThread_H__
+#define __DC_Threads_WindowsThread_H__
 
-#include	"../Thread.h"
-#include	"../Mutex.h"
+#include "../Thread.h"
+#include "../Mutex.h"
 
-#include	<windows.h>
+#include <windows.h>
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 	// ** class WindowsThread
 	class WindowsThread : public Thread {
@@ -44,8 +44,8 @@ namespace thread {
 		virtual			~WindowsThread( void );
 
 		// ** Thread
-		virtual void	start( const ThreadCallback& callback, void *userData );
-		virtual void	wait( void ) const;
+		virtual void	start( const ThreadCallback& callback, void *userData ) DC_DECL_OVERRIDE;
+		virtual void	wait( void ) const DC_DECL_OVERRIDE;
 
 	private:
 
@@ -64,9 +64,9 @@ namespace thread {
 		virtual				~WindowsMutex( void );
 
 		// ** Mutex
-		virtual bool		tryLock( void );
-		virtual void		lock( void );
-		virtual void		unlock( void );
+		virtual bool		tryLock( void ) DC_DECL_OVERRIDE;
+		virtual void		lock( void ) DC_DECL_OVERRIDE;
+		virtual void		unlock( void ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -81,8 +81,8 @@ namespace thread {
 		virtual             ~WindowsCondition( void );
 
 		// ** Condition
-        virtual void        wait( void );
-        virtual void        trigger( void );
+        virtual void        wait( void ) DC_DECL_OVERRIDE;
+        virtual void        trigger( void ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -90,8 +90,8 @@ namespace thread {
 		CONDITION_VARIABLE	m_condition;
 	};
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Win32Thread_H__	*/
+#endif		/*	!__DC_Threads_Win32Thread_H__	*/

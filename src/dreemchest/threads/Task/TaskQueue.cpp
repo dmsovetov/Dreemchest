@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include    "TaskQueue.h"
-#include    "../Mutex.h"
+#include "TaskQueue.h"
+#include "../Mutex.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** TaskQueue::TaskQueue
 TaskQueue::TaskQueue( void )
@@ -119,6 +119,6 @@ TaskQueue::Task::operator TaskFunction ( void ) const
     return m_function;
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

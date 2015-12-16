@@ -24,21 +24,20 @@
 
  **************************************************************************/
 
-#ifndef        __DC_Mutex_H__
-#define        __DC_Mutex_H__
+#ifndef __DC_Threads_Mutex_H__
+#define __DC_Threads_Mutex_H__
 
-#include    "Threads.h"
+#include "Threads.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
         
-    // ** class Mutex
     //! Mutex object.
     class dcInterface Mutex {
     public:
 
-        virtual                ~Mutex( void );
+        virtual             ~Mutex( void );
 
         //! Releases this Mutex object.
         void                release( void );
@@ -61,7 +60,6 @@ namespace thread {
         virtual void        unlock( void )  = 0;
     };
 
-    // ** class Condition
     //! Condition object.
     class dcInterface Condition {
     public:
@@ -81,7 +79,6 @@ namespace thread {
         virtual void        trigger( void ) = 0;
     };
 
-    // ** class ScopedLock
     //! A helper struct to lock a mutex by a C++ scope.
     class ScopedLock {
     public:
@@ -94,8 +91,8 @@ namespace thread {
         Mutex*		m_mutex;
     };
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Mutex_H__    */
+#endif    /*    !__DC_Threads_Mutex_H__    */
