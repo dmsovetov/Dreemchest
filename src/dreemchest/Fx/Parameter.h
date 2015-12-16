@@ -212,15 +212,11 @@ namespace Fx {
 											}
 											break;
 		case SampleRandomBetweenConstants:	{
-												if( m_particleCurves.empty() ) {
-													TValue a, b;
-													m_curves[Lower].value( 0, a );
-													m_curves[Upper].value( 0, b );
+												TValue a, b;
+												m_curves[Lower].value( 0, a );
+												m_curves[Upper].value( 0, b );
 
-													result = randomValue( a, b );
-												} else {
-													m_particleCurves[particleIndex].sample( scalar, result );
-												}
+												result = randomValue( a, b );
 											}
 											break;
 

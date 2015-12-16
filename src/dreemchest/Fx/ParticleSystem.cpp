@@ -336,9 +336,26 @@ bool JsonParticleSystemLoader::readAcceleration( ParticlesWPtr particles, const 
 // ** JsonParticleSystemLoader::readVelocity
 bool JsonParticleSystemLoader::readVelocity( ParticlesWPtr particles, const Json::Value& object )
 {
-	readScalarParameter( particles->scalarParameter( Particles::VelocityXOverLife ), object["x"], m_scalingFactor );
-	readScalarParameter( particles->scalarParameter( Particles::VelocityYOverLife ), object["y"], m_scalingFactor );
-	readScalarParameter( particles->scalarParameter( Particles::VelocityZOverLife ), object["z"], m_scalingFactor );
+	Fx::FloatParameter& x = particles->scalarParameter( Fx::Particles::VelocityXOverLife );
+	Fx::FloatParameter& y = particles->scalarParameter( Fx::Particles::VelocityYOverLife );
+	Fx::FloatParameter& z = particles->scalarParameter( Fx::Particles::VelocityZOverLife );
+
+	readScalarParameter( x, object["x"] );
+	readScalarParameter( y, object["y"] );
+	readScalarParameter( z, object["z"] );
+
+	if( x.samplingMode() == Fx::SampleRandomBetweenConstants ) {
+		x.setSamplingMode( Fx::SampleRandomBetweenCurves );
+		x.constructLifetimeCurves();
+	}
+	if( y.samplingMode() == Fx::SampleRandomBetweenConstants ) {
+		y.setSamplingMode( Fx::SampleRandomBetweenCurves );
+		y.constructLifetimeCurves();
+	}
+	if( z.samplingMode() == Fx::SampleRandomBetweenConstants ) {
+		z.setSamplingMode( Fx::SampleRandomBetweenCurves );
+		z.constructLifetimeCurves();
+	}
 
 	return true;
 }
@@ -376,63 +393,50 @@ bool JsonParticleSystemLoader::readInitial( ParticlesWPtr particles, const Json:
 // ** JsonParticleSystemLoader::readColorParameter
 void JsonParticleSystemLoader::readColorParameter( RgbParameter& parameter, const Json::Value& object )
 {
-	DC_BREAK_IF( !object.isArray() );
+	String type = object.get( "type", "" ).asString();
 
 	parameter.setEnabled( true );
 
-	switch( object.size() ) {
-	case 2:		{
-					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
-					parameter.constructLifetimeCurves();
-				}
-				break;
-
-	case 3:		{
-					parameter.setConstant( readRgb( object ) );
-				}
-				break;
-
-	default:	{
-					parameter.setCurve( readFloats( object ) );
-				}
-				break;
+	if( type == "curve" ) {
+		parameter.setCurve( readFloats( object["value"] ) );
+	}
+	else if( type == "constant" ) {
+		parameter.setConstant( readRgb( object["value"] ) );
+	}
+	else {
+		DC_BREAK;
 	}
 }
 
 // ** JsonParticleSystemLoader::readScalarParameter
 void JsonParticleSystemLoader::readScalarParameter( FloatParameter& parameter, const Json::Value& object, f32 scalingFactor )
 {
-	s32 size = object.isArray() ? object.size() : 1;
+	parameter.setEnabled( true );
 
-	switch( size ) {
-	case 1:		{
-					parameter.setConstant( object.asFloat() );
-				}
-				break;
-	case 2:		{
-					if( object[0].isArray() ) {
-						parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
-						parameter.constructLifetimeCurves();
-					} else {
-						FloatArray range = readFloats( object );
-						parameter.setRandomBetweenConstants( range[0], range[1] );
-						parameter.constructLifetimeCurves();
-					}
-				}
-				break;
-
-	case 3:		{
-					DC_NOT_IMPLEMENTED
-				}
-				break;
-
-	default:	{
-					parameter.setCurve( readFloats( object ) );
-				}
+	if( object.isDouble() ) {
+		parameter.setConstant( object.asFloat() );
+		return;
 	}
 
-	parameter.setEnabled( true );
-	parameter.scale( scalingFactor );
+	String type = object.get( "type", "" ).asString();
+
+	if( type == "curve" ) {
+		parameter.setCurve( readFloats( object["value"] ) );
+	}
+	else if( type == "constant" ) {
+		parameter.setConstant( object["value"].asFloat() );
+	}
+	else if( type == "randomBetweenConstants" ) {
+		Fx::FloatArray range = readFloats( object["value"] );
+		parameter.setRandomBetweenConstants( range[0], range[1] );
+	}
+	else if( type == "randomBetweenCurves" ) {
+		parameter.setRandomBetweenCurves( readFloats( object["value"][0] ), readFloats( object["value"][1] ) );
+		parameter.constructLifetimeCurves();
+	}
+	else {
+		DC_BREAK;
+	}
 }
 
 // ** JsonParticleSystemLoader::load

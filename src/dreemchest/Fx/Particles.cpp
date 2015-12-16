@@ -234,7 +234,7 @@ s32 Particles::init( const ZoneWPtr& zone, Particle* particles, const Vec3& posi
 		particle.m_direction            = SampleParameter( particle.m_index, direction, 0.0f );
 		particle.m_rotation             = SampleParameter( particle.m_index, rotation, 0.0f );
 
-		Zone::Point point		  = zone.valid() ? zone->generateRandomPoint( scalar, position ) : Zone::Point( position, Vec3( 0.0f, 1.0f, 0.0f ) );
+		Zone::Point point		  = zone.valid() ? zone->generateRandomPoint( scalar, position ) : Zone::Point( position, Vec3( 0.0f, 0.0f, 0.0f ) );
         particle.m_position		  = point.position;
 		particle.m_force.velocity = point.direction * SampleParameter( particle.m_index, speed, 0.0f );
 
@@ -454,8 +454,12 @@ s32 ParticlesInstance::update( s32 iteration, const ZoneWPtr& zone, f32 dt, cons
 		}
 	}
 
+	if( deadCount == 0 ) {
+		return m_aliveCount;
+	}
+
 	// Clamp dead particles count
-	deadCount = min2( deadCount, ( s32 )m_items.size() - 1 );
+	deadCount = max2( 1, min2( deadCount, ( s32 )m_items.size() - 1 ) );
 
     m_aliveCount += m_particles->init( zone, &m_items[0] + m_aliveCount, position, deadCount, scalar );
 
