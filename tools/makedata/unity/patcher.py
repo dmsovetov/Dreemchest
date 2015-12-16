@@ -143,10 +143,10 @@ class Patcher:
             min.parse(value['minCurve'], scalar, self.converter)
             max.parse(value['maxCurve'], scalar, self.converter)
 
-            if type == ParameterType.CONSTANT: object[self.name] = max.constant
-            elif type == ParameterType.RANDOM_BETWEEN_CONSTANTS: object[self.name] = [min.constant, max.constant]
-            elif type == ParameterType.CURVE: object[self.name] = max.data
-            elif type == ParameterType.RANDOM_BETWEEN_CURVES: object[self.name] = [min.data, max.data]
+            if type == ParameterType.CONSTANT: object[self.name] = dict(type='constant', value=max.constant)
+            elif type == ParameterType.RANDOM_BETWEEN_CONSTANTS: object[self.name] = dict(type='randomBetweenConstants', value=[min.constant, max.constant])
+            elif type == ParameterType.CURVE: object[self.name] = dict(type='curve', value=max.data)
+            elif type == ParameterType.RANDOM_BETWEEN_CURVES: object[self.name] = dict(type='randomBetweenCurves', value=[min.data, max.data])
 
             if property != self.name:
                 del object[property]
@@ -189,18 +189,18 @@ class Patcher:
             assert 'transparency' not in object.keys()
 
             if type == ParameterType.CURVE:
-                object[self._color_name] = max.rgb
-                object[self._transparency_name] = max.alpha
+                object[self._color_name] = dict(type="curve", value=max.rgb)
+                object[self._transparency_name] = dict(type="curve", value=max.alpha)
             elif type == ParameterType.RANDOM_BETWEEN_CURVES:
-                object[self._color_name] = [min.rgb, max.rgb]
-                object[self._transparency_name] = [min.alpha, max.alpha]
+                object[self._color_name] = dict(type="randomBetweenCurves", value=[min.rgb, max.rgb])
+                object[self._transparency_name] = dict(type="randomBetweenCurves", value=[min.alpha, max.alpha])
             elif type == ParameterType.CONSTANT:
                 rgba = Rgba(value['maxColor']['rgba'])
-                object[self._color_name] = [rgba.red, rgba.green, rgba.blue]
-                object[self._transparency_name] = rgba.alpha
+                object[self._color_name] = dict(type="constant", value=[rgba.red, rgba.green, rgba.blue])
+                object[self._transparency_name] = dict(type="constant", value=rgba.alpha)
             else:
-                object[self._color_name] = max.constant_rgb
-                object[self._transparency_name] = max.constant_alpha
+                object[self._color_name] = dict(type="curve", value=max.constant_rgb)
+                object[self._transparency_name] = dict(type="curve", value=max.constant_alpha)
 
             del object[property]
 
