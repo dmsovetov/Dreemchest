@@ -70,6 +70,12 @@ void Asset::setUuid( const String& value )
 	m_uuid = value;
 }
 
+// ** Asset::setBundle
+void Asset::setBundle( AssetBundleWPtr value )
+{
+	m_bundle = value;
+}
+
 // ** Asset::timestamp
 u32 Asset::timestamp( void ) const
 {

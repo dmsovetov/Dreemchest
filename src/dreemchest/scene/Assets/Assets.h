@@ -135,6 +135,9 @@ namespace Scene {
 		//! Sets asset UUID.
 		void					setUuid( const String& value );
 
+		//! Sets parent asset bundle.
+		void					setBundle( AssetBundleWPtr value );
+
 	private:
 
 		AssetLoaderPtr			m_loader;		//!< Asset loader instance.
