@@ -52,7 +52,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 
 	// Create the scene.
 	m_scene = Scene::Scene::create();
-	m_scene->addSystem<Scene::AssetSystem>( hal );
+	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create assets.
 	//m_assets = Scene::AssetBundle::create( "assets" );

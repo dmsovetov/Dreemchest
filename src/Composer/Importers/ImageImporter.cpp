@@ -45,7 +45,7 @@ bool ImageImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, c
 	}
 
 	// Write imported image to a binary stream
-	Io::StreamPtr stream = openWriteStream( destinationFileName );
+	Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
 	DC_BREAK_IF( !stream.valid() );
 
 	stream->write( &m_image.width, 2 );
@@ -62,7 +62,7 @@ bool ImageImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, c
 bool ImageImporterTGA::importImage( FileSystemWPtr fs, const Io::Path& sourceFileName )
 {
 	// Open the file
-	Io::StreamPtr stream = openReadStream( sourceFileName );
+	Io::StreamPtr stream = Io::DiskFileSystem::open( sourceFileName );
 	DC_BREAK_IF( !stream.valid() );
 
 	if( !stream.valid() ) {

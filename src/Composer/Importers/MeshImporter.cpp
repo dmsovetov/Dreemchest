@@ -41,7 +41,7 @@ bool MeshImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, co
 	}
 
 	// Write nodes to file
-	Io::StreamPtr stream = openWriteStream( destinationFileName );
+	Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
 	DC_BREAK_IF( !stream.valid() );
 
 	s32 chunkCount = ( s32 )m_nodes.size();
