@@ -521,8 +521,7 @@ namespace Renderer {
         VertexElement           m_vertexElements[VertexAttributesTotal];
     };
 
-    // ** class VertexBuffer
-    //! Vertex buffer class.
+	//! Vertex buffer class.
     class dcInterface VertexBuffer : public RenderResource {
     public:
 
@@ -553,6 +552,10 @@ namespace Renderer {
         //! Unlocks a vertex buffer.
         virtual void                unlock( void );
 
+		//! Lockes a vertex buffer and performs the type cast.
+		template<typename TVertex>
+		TVertex*					lock( void );
+
     protected:
 
         //! Vertex declaration.
@@ -567,6 +570,13 @@ namespace Renderer {
         //! Is it a GPU-side vertex buffer?
 		bool						m_isGpu;
     };
+
+	// ** VertexBuffer::lock
+	template<typename TVertex>
+	TVertex* VertexBuffer::lock( void )
+	{
+		return reinterpret_cast<TVertex*>( lock() );
+	}
 
     // ** class IndexBuffer
     class dcInterface IndexBuffer : public RenderResource {
