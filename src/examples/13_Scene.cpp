@@ -104,21 +104,21 @@ class ParticleSystems : public ApplicationDelegate {
 		// Create an empty asset bundle
 		m_assets = AssetBundle::create( "assets" );
 
-		m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
+		//m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
 
-		TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
+		//TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
 
-		for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
-			for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
-				SceneObjectPtr chunk = m_scene->createSceneObject();
-				MeshPtr		   mesh  = terrain->createChunkMesh( m_hal, j, i );
+		//for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
+		//	for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
+		//		SceneObjectPtr chunk = m_scene->createSceneObject();
+		//		MeshPtr		   mesh  = terrain->createChunkMesh( m_hal, j, i );
 
-				chunk->attach<StaticMesh>( mesh );
-				chunk->attach<::Scene::Transform>( j * Terrain::kChunkSize, -4, i * Terrain::kChunkSize, ::Scene::Transform::WPtr() );
-			}
-		}
+		//		chunk->attach<StaticMesh>( mesh );
+		//		chunk->attach<::Scene::Transform>( j * Terrain::kChunkSize, -4, i * Terrain::kChunkSize, ::Scene::Transform::WPtr() );
+		//	}
+		//}
 
-		m_scene->addSystem<AssetSystem>( m_hal );
+		m_scene->addSystem<AssetSystem>( m_assets );
 
 		Vec3BindingPtr wasdDirection = DC_NEW Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 

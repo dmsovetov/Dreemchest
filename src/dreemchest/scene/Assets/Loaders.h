@@ -95,8 +95,6 @@ namespace Scene {
 		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 	};
 
-#ifdef HAVE_JSON
-
 	//! Loads a material from a JSON format.
 	class MaterialLoader : public GenericAssetLoader<Material> {
 	public:
@@ -104,8 +102,6 @@ namespace Scene {
 		//! Loads image data from an input stream.
 		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 	};
-
-#endif	/*	HAVE_JSON	*/
 
 } // namespace Scene
 

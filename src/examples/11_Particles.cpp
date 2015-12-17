@@ -63,7 +63,7 @@ public:
         // First clear a viewport with a color
         m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
 
-		thread::Thread::sleep( 30 );
+		Threads::Thread::sleep( 30 );
 
 		m_scene->update( 0, 0.03f );
 		m_scene->render( m_renderingContext );
@@ -128,7 +128,7 @@ class ParticleSystems : public ApplicationDelegate {
 		m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
 		m_scene  = Scene::Scene::createFromFile( m_assets, "assets/7d0a92f3e153365498704e1b5a277ec6" );
 
-		m_scene->addSystem<Scene::AssetSystem>( m_hal );
+		m_scene->addSystem<Scene::AssetSystem>( m_assets );
 		m_scene->addSystem<Scene::AffineTransformSystem>();
 		m_scene->addSystem<Scene::ParticlesSystem>();
 		

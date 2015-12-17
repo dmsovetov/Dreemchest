@@ -119,8 +119,6 @@ bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, con
 
 // --------------------------------------- MaterialLoader --------------------------------------- //
 
-#ifdef HAVE_JSON
-
 // ** MaterialLoader::loadFromStream
 bool MaterialLoader::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
 {
@@ -129,6 +127,7 @@ bool MaterialLoader::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, co
 		return false;
 	}
 
+#ifdef HAVE_JSON
 	String json;
 	json.resize( stream->length() );
 	stream->read( &json[0], stream->length() );
@@ -163,9 +162,10 @@ bool MaterialLoader::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, co
 	m_asset->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
 
 	return true;
-}
-
+#else
+	return false;
 #endif	/*	HAVE_JSON	*/
+}
 
 } // namespace Scene
 
