@@ -82,6 +82,29 @@ namespace Scene {
 
 	class Rvm;
 
+	//! Rendering context asset id.
+	class RenderingAssetId {
+	public:
+
+					//! Constructs RenderingAssetId instance.
+					RenderingAssetId( void )
+						: m_value( 0 ) {}
+
+					//! Constructs RenderingAssetId instance.
+					RenderingAssetId( u32 value )
+						: m_value( value ) {}
+
+					//! Converts rendering id to an integer.
+					operator u32( void ) const { return m_value; }
+
+					//! Returns true if this is a valid id.
+					operator bool( void ) const { return m_value != 0; }
+
+	private:
+
+		u32			m_value;	//!< Actual value.
+	};
+
 	//! Available rendering modes.
 	enum RenderingMode {
 		  RenderOpaque		//!< Renders opaque.
@@ -98,6 +121,15 @@ namespace Scene {
 		, RenderTranslucentBit	= BIT( RenderTranslucent )	//!< Translucent rendering bit.
 		, RenderAdditiveBit		= BIT( RenderAdditive )		//!< Additive rendering bit.
 		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
+	};
+
+	//! Available asset formats.
+	enum AssetFormat {
+		  AssetFormatImageRaw	//!< Loads an image data from a raw pixel buffer format.
+		, AssetFormatMesh		//!< Loads a mesh data from a raw format.
+		, AssetFormatMaterial	//!< Loads material from a text key-value format.
+
+		, TotalAssetFormats		//!< The total number of asset formats.
 	};
 
 	// Alias the Ecs::Entity type

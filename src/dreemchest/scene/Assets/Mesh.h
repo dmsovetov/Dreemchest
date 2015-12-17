@@ -34,27 +34,72 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Mesh data container.
-	class Mesh : public AssetWithData<AssetMesh> {
-	friend class AssetBundle;
+	class Mesh : public Asset {
+	friend class RenderingContext;
 	public:
+
+		//! Mesh vertex.
+		struct Vertex {
+			enum { MaxTexCoords = 2 };
+			Vec3				position;			//!< Vertex position.
+			Vec3				normal;				//!< Vertex normal.
+			Vec2				uv[MaxTexCoords];	//!< Texture coordinates.
+		};
+
+		typedef Array<Vertex>	VertexBuffer;		//!< Mesh vertex buffer type.
+		typedef Array<u16>		IndexBuffer;		//!< Mesh index buffer type.
 
 								ClassEnableTypeInfoSuper( Mesh, Asset )
 
 								//! Constructs Mesh instance.
-								Mesh( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String() );
+								Mesh( void );
 
 		//! Returns mesh bounds.
 		const Bounds&			bounds( void ) const;
 
-		//! Sets mesh bounds.
-		void					setBounds( const Bounds& value );
+		//! Returns the total number of mesh chunks.
+		s32						chunkCount( void ) const;
+
+		//! Sets the total number of mesh chunks.
+		void					setChunkCount( s32 value );
+
+		//! Returns vertex buffer for a specified mesh chunk.
+		const VertexBuffer&		vertexBuffer( s32 chunk ) const;
+
+		//! Sets chunk vertex buffer.
+		void					setVertexBuffer( s32 chunk, const VertexBuffer& value );
+
+		//! Returns index buffer for a specified mesh chunk.
+		const IndexBuffer&		indexBuffer( s32 chunk ) const;
+
+		//! Sets chunk index buffer.
+		void					setIndexBuffer( s32 chunk, const IndexBuffer& value );
+
+		//! Updates mesh bounds.
+		void					updateBounds( void );
+
+		//! Returns internal rendering id for a mesh node.
+		const RenderingAssetId&	chunkId( s32 chunk ) const;
 
 		//! Creates an empty mesh instance.
 		static MeshPtr			create( void );
 
 	private:
 
-		Bounds					m_bounds;		//!< Bounding box of a mesh.
+		//! Sets internal rendering id for a mesh node.
+		void					setId( s32 chunk, const RenderingAssetId& value );
+
+	private:
+
+		//! Internal mesh chunk.
+		struct Chunk {
+			VertexBuffer		vertices;	//!< Mesh node vertices.
+			IndexBuffer			indices;	//!< Mesh node indices.
+			RenderingAssetId	id;			//!< Internal rendering id.
+		};
+
+		Bounds					m_bounds;	//!< Bounding box of a mesh.
+		Array<Chunk>			m_chunks;	//!< Mesh chunks.
 	};
 
 } // namespace Scene

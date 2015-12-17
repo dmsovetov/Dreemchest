@@ -31,8 +31,56 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Mesh::Mesh
-Mesh::Mesh( AssetBundle* bundle, const String& uuid, const String& name ) : AssetWithData( bundle, Asset::Mesh, uuid, name )
+Mesh::Mesh( void ) : Asset( NULL, Asset::Mesh, "", "" )
 {
+	setFormat( AssetFormatMesh );
+}
+
+// ** Mesh::chunkCount
+s32 Mesh::chunkCount( void ) const
+{
+	return ( s32 )m_chunks.size();
+}
+
+// ** Mesh::setChunkCount
+void Mesh::setChunkCount( s32 value )
+{
+	m_chunks.resize( value );
+}
+
+// ** Mesh::chunkId
+const RenderingAssetId& Mesh::chunkId( s32 chunk ) const
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	return m_chunks[chunk].id;
+}
+
+// ** Mesh::vertexBuffer
+const Mesh::VertexBuffer& Mesh::vertexBuffer( s32 chunk ) const
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	return m_chunks[chunk].vertices;
+}
+
+// ** Mesh::setVertexBuffer
+void Mesh::setVertexBuffer( s32 chunk, const VertexBuffer& value )
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	m_chunks[chunk].vertices = value;
+}
+
+// ** Mesh::indexBuffer
+const Mesh::IndexBuffer& Mesh::indexBuffer( s32 chunk ) const
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	return m_chunks[chunk].indices;
+}
+
+// ** Mesh::setIndexBuffer
+void Mesh::setIndexBuffer( s32 chunk, const IndexBuffer& value )
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	m_chunks[chunk].indices = value;
 }
 
 // ** Mesh::bounds
@@ -41,16 +89,27 @@ const Bounds& Mesh::bounds( void ) const
 	return m_bounds;
 }
 
-// ** Mesh::setBounds
-void Mesh::setBounds( const Bounds& value )
+// ** Mesh::updateBounds
+void Mesh::updateBounds( void )
 {
-	m_bounds = value;
+	m_bounds = Bounds();
+
+	// For each chunk
+	for( s32 i = 0, n = chunkCount(); i < n; i++ ) {
+		// Get the chunk's vertex buffer
+		const VertexBuffer& vertices = vertexBuffer( i );
+
+		// For each vertex
+		for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ ) {
+			m_bounds += vertices[j].position;
+		}
+	}
 }
 
 // ** Mesh::create
 MeshPtr Mesh::create( void )
 {
-	return MeshPtr( DC_NEW Mesh( AssetBundle::create("").get(), "", "" ) );
+	return MeshPtr( DC_NEW Mesh );
 }
 
 } // namespace Scene

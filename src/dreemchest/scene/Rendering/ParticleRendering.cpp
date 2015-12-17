@@ -56,7 +56,10 @@ void ParticleRenderingInterface::renderOrientedQuadUV( const Fx::IMaterialWPtr& 
 {
 	MaterialPtr			 mat = static_cast<Material*>( material->get().get() );
 	ImagePtr			 img = mat->texture( Material::Diffuse );
-	Renderer::TexturePtr tex = img.valid() ? (img->data().valid() ? img->data()->texture : Renderer::TexturePtr()) : Renderer::TexturePtr();
+
+	DC_NOT_IMPLEMENTED;
+	Renderer::TexturePtr tex;
+//	Renderer::TexturePtr tex = img.valid() ? (img->data().valid() ? img->data()->texture : Renderer::TexturePtr()) : Renderer::TexturePtr();
 
 	// Material blending mapping
 	Renderer::Renderer2D::BlendingMode blending[TotalRenderModes] = {

@@ -217,17 +217,18 @@ void Rvm::flush( void )
 		}
 
 		// Set the vertex buffer
-		if( cmd->vertexBuffer != activeVertexBuffer ) {
-			m_hal->setVertexBuffer( cmd->vertexBuffer );
-			activeVertexBuffer = cmd->vertexBuffer;
-			increase( VertexBufferSwitches );
-		}
+		DC_NOT_IMPLEMENTED;
+	//	if( cmd->vertexBuffer != activeVertexBuffer ) {
+	//		m_hal->setVertexBuffer( cmd->vertexBuffer );
+	//		activeVertexBuffer = cmd->vertexBuffer;
+	//		increase( VertexBufferSwitches );
+	//	}
 
 		// Render the mesh
-		m_hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
-		increase( DrawIndexed );
-		increase( Triangles, cmd->indexBuffer->size() / 3 );
-		increase( Vertices, cmd->indexBuffer->size() );
+	//	m_hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
+	//	increase( DrawIndexed );
+	//	increase( Triangles, cmd->indexBuffer->size() / 3 );
+	//	increase( Vertices, cmd->indexBuffer->size() );
 	}
 
 	// Clear the command list
@@ -366,7 +367,8 @@ bool Rvm::sortByShaderTextureMesh( const Command* a, const Command* b )
 	if( a->mode != b->mode ) return a->mode < b->mode;
 	if( a->distance != b->distance ) return a->distance > b->distance;
 	if( a->shader != b->shader ) return a->shader < b->shader;
-	if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
+	if( a->mesh != b->mesh ) return a->mesh > b->mesh;
+	//if( a->vertexBuffer != b->vertexBuffer ) return a->vertexBuffer > b->vertexBuffer;
 
 	for( u32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
 		if( a->textures[i] != b->textures[i] ) return a->textures[i] > b->textures[i];

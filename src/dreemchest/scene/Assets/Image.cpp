@@ -31,21 +31,123 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Image::Image
-Image::Image( AssetBundle* bundle, const String& uuid, const String& name, u16 width, u16 height )
-	: AssetWithData( bundle, Asset::Image, uuid, name ), m_width( width ), m_height( height )
+Image::Image( void )
+	: Asset( NULL, Asset::Image, "", "" ), m_width( 0 ), m_height( 0 ), m_bytesPerPixel( 0 )
 {
+	setFormat( AssetFormatImageRaw );
+	setMipLevelCount( 1 );
+	setBytesPerPixel( 4 );
+}
+
+// ** Image::id
+const RenderingAssetId& Image::id( void ) const
+{
+	return m_id;
+}
+
+// ** Image::setId
+void Image::setId( const RenderingAssetId& value )
+{
+	m_id = value;
 }
 
 // ** Image::width
-u16 Image::width( void ) const
+s32 Image::width( void ) const
 {
 	return m_width;
 }
 
+// ** Image::setWidth
+void Image::setWidth( s32 value )
+{
+	m_width = value;
+}
+
 // ** Image::height
-u16 Image::height( void ) const
+s32 Image::height( void ) const
 {
 	return m_height;
+}
+
+// ** Image::setHeight
+void Image::setHeight( s32 value )
+{
+	m_height = value;
+}
+
+// ** Image::bytesPerPixel
+s32 Image::bytesPerPixel( void ) const
+{
+	return m_bytesPerPixel;
+}
+
+// ** Image::setBytesPerPixel
+void Image::setBytesPerPixel( s32 value )
+{
+	m_bytesPerPixel = value;
+}
+
+// ** Image::mipLevelCount
+s32 Image::mipLevelCount( void ) const
+{
+	return ( s32 )m_mips.size();
+}
+
+// ** Image::setMipLevelCount
+void Image::setMipLevelCount( s32 value )
+{
+	m_mips.resize( value );
+}
+
+// ** Image::mipLevel
+const ByteArray& Image::mipLevel( s32 index ) const
+{
+	DC_BREAK_IF( index < 0 || index >= mipLevelCount() );
+
+	const ByteArray& pixels = m_mips[index];
+	DC_BREAK_IF( pixels.empty() );
+
+	return pixels;
+}
+
+// ** Image::setMipLevel
+void Image::setMipLevel( s32 index, const ByteArray& value )
+{
+	DC_BREAK_IF( index < 0 || index >= mipLevelCount() );
+	m_mips[index] = value;
+}
+
+// ** Image::mipLevelWidth
+s32 Image::mipLevelWidth( s32 index ) const
+{
+	s32 result = m_width;
+
+	while( index-- ) {
+		result = result >> 1;
+	}
+
+	return result;
+}
+
+// ** Image::mipLevelHeight
+s32 Image::mipLevelHeight( s32 index ) const
+{
+	s32 result = m_width;
+
+	while( index-- ) {
+		result = result >> 1;
+	}
+
+	return result;
+}
+
+// ** Image::dispose
+void Image::dispose( void )
+{
+	Asset::dispose();
+
+	m_mips.clear();
+	setMipLevelCount( 1 );
 }
 
 } // namespace Scene

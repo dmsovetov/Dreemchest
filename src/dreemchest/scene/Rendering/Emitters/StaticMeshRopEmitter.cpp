@@ -54,16 +54,10 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
-
-	// Get the mesh data
-	AssetMeshPtr meshData = mesh->data();
-
-	if( !meshData.valid() ) {
-		return;
-	}
+	DC_BREAK_IF( !mesh.valid() );
 
 	// Emit render operation for each mesh chunk
-	for( u32 i = 0, n = ( u32 )meshData->vertexBuffers.size(); i < n; i++ ) {
+	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
 		// Get the material for chunk
 		const MaterialPtr& material = staticMesh.material( i );
 
@@ -79,8 +73,7 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 
 		// Initialize the rendering operation
 		rop->transform		= transform.matrix();
-		rop->indexBuffer	= meshData->indexBuffers[i].get();
-		rop->vertexBuffer	= meshData->vertexBuffers[i].get();
+		rop->mesh			= mesh->chunkId( i );
 		rop->mode			= RenderOpaque;
 		rop->shader			= NULL;
 		rop->distance		= 0;
@@ -117,8 +110,9 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 				continue;
 			}
 
-			AssetTexturePtr data = image->data();
-			rop->textures[j] = data.valid() ? data->texture.get() : NULL;
+			DC_NOT_IMPLEMENTED;
+		//	AssetTexturePtr data = image->data();
+		//	rop->textures[j] = data.valid() ? data->texture.get() : NULL;
 		}
 		
 	}

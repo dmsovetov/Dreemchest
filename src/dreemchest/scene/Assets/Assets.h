@@ -34,22 +34,16 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Asset data stores the loaded asset data (HAL texture, vertex buffers, etc.).
-	class AssetData : public RefCounted {
-	public:
-	};
-
-	//! The loaded HAL texture.
-	class AssetTexture : public AssetData {
-	public:
-		Renderer::TexturePtr	texture;	//!< Reference to a loaded texture.
-	};
+	//class AssetData : public RefCounted {
+	//public:
+	//};
 
 	//! The loaded mesh data.
-	class AssetMesh : public AssetData {
-	public:
-		Array<Renderer::VertexBufferPtr>	vertexBuffers;	//!< Mesh vertex buffers.
-		Array<Renderer::IndexBufferPtr>		indexBuffers;	//!< Mesh index buffers.
-	};
+	//class AssetMesh : public AssetData {
+	//public:
+	//	Array<Renderer::VertexBufferPtr>	vertexBuffers;	//!< Mesh vertex buffers.
+	//	Array<Renderer::IndexBufferPtr>		indexBuffers;	//!< Mesh index buffers.
+	//};
 
 	//! Basic scene asset
 	class Asset : public RefCounted {
@@ -85,11 +79,11 @@ namespace Scene {
 		//! Returns asset type.
 		Type					type( void ) const;
 
-		//! Returns the loader attached to an asset.
-		const AssetLoaderPtr&	loader( void ) const;
+		//! Returns the asset format.
+		AssetFormat				format( void ) const;
 
-		//! Sets the asset loader.
-		void					setLoader( const AssetLoaderPtr& value );
+		//! Sets the asset format.
+		void					setFormat( AssetFormat value );
 
 		//! Returns asset name.
 		const String&			name( void ) const;
@@ -112,17 +106,14 @@ namespace Scene {
 		//! Returns the root asset bundle.
 		const AssetBundleWPtr&	bundle( void ) const;
 
-		//! Loads an asset.
-		bool					load( const Renderer::HalPtr& hal );
-
 		//! Returns asset data as key-value object.
 		virtual Io::KeyValue	keyValue( void ) const;
 
 		//! Reads asset data from key-value object.
 		virtual bool			setKeyValue( const Io::KeyValue& value );
 
-		//! Unloads asset.
-		virtual void			unload( void );
+		//! Unloads asset data.
+		virtual void			dispose( void );
 
 		//! Returns asset name from type.
 		static String			typeToString( Asset::Type type );
@@ -138,9 +129,12 @@ namespace Scene {
 		//! Sets parent asset bundle.
 		void					setBundle( AssetBundleWPtr value );
 
+		//! Sets asset name.
+		void					setName( const String& value );
+
 	private:
 
-		AssetLoaderPtr			m_loader;		//!< Asset loader instance.
+		AssetFormat				m_format;		//!< Asset format.
 		AssetBundleWPtr			m_bundle;		//!< Parent asset bundle.
 		Type					m_type;			//!< Asset type.
 		String					m_name;			//!< Asset name.
@@ -167,7 +161,7 @@ namespace Scene {
 									: Asset( bundle, type, uuid, name ) {}
 
 		//! Unloads the asset data.
-		virtual void			unload( void ) DC_DECL_OVERRIDE { m_data = StrongPtr<TData>(); Asset::unload(); }
+		virtual void			dispose( void ) DC_DECL_OVERRIDE { m_data = StrongPtr<TData>(); Asset::dispose(); }
 
 	private:
 
@@ -191,15 +185,6 @@ namespace Scene {
 		//! Returns the full asset path by an identifier.
 		Io::Path				assetPathByIdentifier( const String& name ) const;
 
-		//! Creates the new Image asset inside this bundle.
-		ImagePtr				addImage( const String& uuid, const String& name, u32 width, u32 height );
-
-		//! Creates the new Material asset inside this bundle.
-		MaterialPtr				addMaterial( const String& uuid, const String& name );
-
-		//! Creates the new Terrain asset inside this bundle.
-		TerrainPtr				addTerrain( const String& uuid, const String& name, u32 size );
-
 		//! Creates the new Asset and loads it from key-value data.
 		AssetPtr				createAssetFromData( const Io::KeyValue& data ) const;
 
@@ -208,9 +193,6 @@ namespace Scene {
 
 		//! Adds an asset to this bundle.
 		void					addAsset( AssetPtr asset );
-
-		//! Creates the new Mesh asset inside this bundle.
-		MeshPtr					addMesh( const String& uuid, const String& name );
 
 		//! Removes an Asset from bundle by UUID.
 		void					removeAsset( const String& uuid );

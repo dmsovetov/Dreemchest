@@ -30,15 +30,19 @@
 #include "../Assets/Image.h"
 #include "../Assets/Material.h"
 #include "../Assets/Mesh.h"
+#include "../Assets/Loaders.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
 // ** AssetSystem::AssetSystem
-AssetSystem::AssetSystem( Renderer::HalPtr hal ) : EntitySystem( "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite, Particles>() ), m_hal( hal )
+AssetSystem::AssetSystem( AssetBundleWPtr assets ) : EntitySystem( "AssetSystem", Ecs::Aspect::any<StaticMesh, Sprite, Particles>() ), m_assets( assets )
 {
-
+	// Declare available asset loaders
+	m_loaders.declare<ImageLoaderRAW>( AssetFormatImageRaw );
+	m_loaders.declare<MeshLoaderRAW>( AssetFormatMesh );
+	m_loaders.declare<MaterialLoader>( AssetFormatMaterial );
 }
 
 // ** AssetSystem::entityAdded
@@ -70,9 +74,22 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 	// Pop it from queue
 	m_queue.pop_front();
 
-	// Load an asset
-	asset->load( m_hal );
+	// Find an asset load for a specified format
+	AssetLoaderPtr loader = m_loaders.construct( asset->format() );
 
+	if( !loader.valid() ) {
+		DC_BREAK;
+		log::error( "AssetSystem::update : asset '%s' has invalid asset format\n", asset->name().c_str() );
+		return;
+	}
+
+	// Open the data stream
+	Io::StreamPtr stream = openFileStream( asset );
+
+	// Load an asset data
+	loader->loadFromStream( m_assets, asset, stream );
+
+	//! WORKAROUND: queue material textures for loading.
 	if( Material* material = castTo<Material>( asset.get() ) ) {
 		for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
 			ImageWPtr image = material->texture( static_cast<Material::Layer>( i ) );
@@ -82,6 +99,26 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 			}
 		}
 	}
+}
+
+// ** AssetSystem::openFileStream
+Io::StreamPtr AssetSystem::openFileStream( AssetWPtr asset ) const
+{
+	// Get an asset name
+	String name = asset->name();
+
+	// No name - use the UUID
+	if( name == "" ) {
+		name = asset->uuid();
+	}
+
+	// Construct the file path
+	Io::Path fileName = m_assets->assetPathByIdentifier( name );
+
+	// Open the file stream
+	Io::StreamPtr stream = Io::DiskFileSystem::open( fileName );
+
+	return stream;
 }
 
 // ** AssetSystem::queueSprite

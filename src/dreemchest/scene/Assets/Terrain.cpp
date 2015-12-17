@@ -140,36 +140,38 @@ MeshPtr Terrain::createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const
 	// Create an empty mesh
 	MeshPtr mesh = Mesh::create();
 
-	// Get the chunk buffers
-	Array<Vertex> vertices = chunkVertexBuffer( x, z );
-	Array<u16>	  indices  = chunkIndexBuffer();
+	DC_NOT_IMPLEMENTED;
 
-	// Construct mesh render data
-	AssetMesh* data = DC_NEW AssetMesh;
-	Bounds bounds;
+	//// Get the chunk buffers
+	//Array<Vertex> vertices = chunkVertexBuffer( x, z );
+	//Array<u16>	  indices  = chunkIndexBuffer();
 
-	Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0" );
-	Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertices.size() );
-	Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indices.size() );
+	//// Construct mesh render data
+	//AssetMesh* data = DC_NEW AssetMesh;
+	//Bounds bounds;
 
-	Vertex* locked = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
-	memcpy( locked, &vertices[0], sizeof( Vertex ) * vertices.size() );
+	//Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0" );
+	//Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertices.size() );
+	//Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indices.size() );
 
-	for( u32 i = 0; i < vertices.size(); i++ ) {
-		bounds += vertices[i].position;
-	}
+	//Vertex* locked = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
+	//memcpy( locked, &vertices[0], sizeof( Vertex ) * vertices.size() );
 
-	vertexBuffer->unlock();
+	//for( u32 i = 0; i < vertices.size(); i++ ) {
+	//	bounds += vertices[i].position;
+	//}
 
-	u16* lockedIndices = indexBuffer->lock();
-	memcpy( lockedIndices, &indices[0], sizeof( u16 ) * indices.size() );
-	indexBuffer->unlock();
+	//vertexBuffer->unlock();
 
-	data->vertexBuffers.push_back( vertexBuffer );
-	data->indexBuffers.push_back( indexBuffer );
+	//u16* lockedIndices = indexBuffer->lock();
+	//memcpy( lockedIndices, &indices[0], sizeof( u16 ) * indices.size() );
+	//indexBuffer->unlock();
 
-	mesh->setData( data );
-	mesh->setBounds( bounds );
+	//data->vertexBuffers.push_back( vertexBuffer );
+	//data->indexBuffers.push_back( indexBuffer );
+
+	//mesh->setData( data );
+	//mesh->setBounds( bounds );
 
 	return mesh;
 }

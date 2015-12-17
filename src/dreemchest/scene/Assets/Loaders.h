@@ -42,33 +42,45 @@ namespace Scene {
 	public:
 
 		//! Loads an asset data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const { return false; }
+		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) { return false; }
 	};
 
-	//! Loads an image from a raw pixel buffer format.
-	class RawImageLoader : public AssetLoader {
+	//! Generic asset loader type to subclass custom asset loaders from.
+	template<typename TAsset>
+	class GenericAssetLoader : public AssetLoader {
 	public:
 
-							//! Constructs the RawImageLoader instance.
-							RawImageLoader( ImagePtr image )
-								: m_image( image ) {}
+		//! Starts loading an asset from input stream.
+		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
+
+	protected:
+
+		WeakPtr<TAsset>		m_asset;	//!< Target asset to load data into.
+	};
+
+	// ** GenericAssetLoader::loadFromStream
+	template<typename TAsset>
+	bool GenericAssetLoader<TAsset>::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
+	{
+		DC_BREAK_IF( !asset.valid() );
+
+		// Type cast an asset.
+		m_asset = castTo<TAsset>( asset.get() );
+		DC_BREAK_IF( !m_asset.valid() );
+
+		return m_asset.valid();		
+	}
+
+	//! Loads an image from a raw pixel buffer format.
+	class ImageLoaderRAW : public GenericAssetLoader<Image> {
+	public:
 
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const DC_DECL_OVERRIDE;
-
-		//! Attaches this loader to an asset.
-		static void			attachTo( ImagePtr image ) {
-			AssetLoaderPtr loader( DC_NEW RawImageLoader( image ) );
-			image->setLoader( loader );
-		}
-
-	private:
-
-		mutable ImagePtr	m_image;	//!< Target image to load data into.
+		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 	};
 
 	//! Loads a mesh from a raw format.
-	class RawMeshLoader : public AssetLoader {
+	class MeshLoaderRAW : public GenericAssetLoader<Mesh> {
 	public:
 
 		//! Fat mesh vertex.
@@ -79,46 +91,18 @@ namespace Scene {
 			f32				tex1[2];		//!< UV layer 1.
 		};
 
-							//! Constructs the RawMeshLoader instance.
-							RawMeshLoader( MeshPtr mesh )
-								: m_mesh( mesh ) {}
-
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const DC_DECL_OVERRIDE;
-
-		//! Attaches this loader to an asset.
-		static void			attachTo( MeshPtr mesh ) {
-			AssetLoaderPtr loader( DC_NEW RawMeshLoader( mesh ) );
-			mesh->setLoader( loader );
-		}
-
-	private:
-
-		mutable MeshPtr		m_mesh;	//!< Target mesh to load data into
+		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 	};
 
 #ifdef HAVE_JSON
 
 	//! Loads a material from a JSON format.
-	class JsonMaterialLoader : public AssetLoader {
+	class MaterialLoader : public GenericAssetLoader<Material> {
 	public:
 
-							//! Constructs the JsonMaterialLoader instance.
-							JsonMaterialLoader( MaterialPtr material )
-								: m_material( material ) {}
-
 		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const DC_DECL_OVERRIDE;
-
-		//! Attaches this loader to an asset.
-		static void			attachTo( MaterialPtr material ) {
-			AssetLoaderPtr loader( DC_NEW JsonMaterialLoader( material ) );
-			material->setLoader( loader );
-		}
-
-	private:
-
-		mutable MaterialPtr	m_material;	//!< Target material to load data into
+		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 	};
 
 #endif	/*	HAVE_JSON	*/

@@ -38,7 +38,7 @@ namespace Scene {
 	public:
 
 							//! Constructs the AssetSystem instance.
-							AssetSystem( Renderer::HalPtr hal );
+							AssetSystem( AssetBundleWPtr assets );
 
 	private:
 
@@ -47,6 +47,9 @@ namespace Scene {
 
 		//! Tracks the asset loading.
 		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+
+		//! Opens asset data stream.
+		Io::StreamPtr		openFileStream( AssetWPtr asset ) const;
 
 		//! Queues static mesh assets.
 		void				queueStaticMesh( StaticMesh* mesh );
@@ -65,8 +68,12 @@ namespace Scene {
 
 	private:
 
-		Renderer::HalPtr	m_hal;		//!< Rendering HAL.
+		//! Asset loaders factory type.
+		typedef AbstractFactory<AssetLoader, AssetFormat>	AssetLoaders;
+
+		AssetBundleWPtr		m_assets;	//!< Parent asset bundle.
 		List<AssetWPtr>		m_queue;	//!< Asset loading queue.
+		AssetLoaders		m_loaders;	//!< Available asset loaders.
 	};
 
 } // namespace Scene

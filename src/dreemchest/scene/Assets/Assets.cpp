@@ -31,7 +31,6 @@
 #include "Mesh.h"
 #include "Prefab.h"
 #include "Terrain.h"
-#include "Loaders.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -43,7 +42,7 @@ namespace Scene {
 Asset::Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name )
 	: m_bundle( bundle ), m_type( type ), m_uuid( uuid ), m_name( name ), m_state( Unknown ), m_timestamp( 0 )
 {
-//	DC_BREAK_IF( bundle == NULL )
+
 }
 
 // ** Asset::type
@@ -101,15 +100,15 @@ bool Asset::needsLoading( void ) const
 }
 
 // ** Asset::loader
-const AssetLoaderPtr& Asset::loader( void ) const
+AssetFormat Asset::format( void ) const
 {
-	return m_loader;
+	return m_format;
 }
 
-// ** Asset::setLoader
-void Asset::setLoader( const AssetLoaderPtr& value )
+// ** Asset::setFormat
+void Asset::setFormat( AssetFormat value )
 {
-	m_loader = value;
+	m_format = value;
 }
 
 // ** Asset::keyValue
@@ -130,41 +129,41 @@ bool Asset::setKeyValue( const Io::KeyValue& value )
 }
 
 // ** Asset::load
-bool Asset::load( const Renderer::HalPtr& hal )
-{
-	if( m_loader == AssetLoaderPtr() ) {
-		log::verbose( "Asset::load : %s, has no asset loader\n", name().c_str() );
-		return true;
-	}
+//bool Asset::load( const Renderer::HalPtr& hal )
+//{
+//	if( m_loader == AssetLoaderPtr() ) {
+//		log::verbose( "Asset::load : %s, has no asset loader\n", name().c_str() );
+//		return true;
+//	}
+//
+//	DC_BREAK_IF( !needsLoading() );
+//
+//	m_state = Loading;
+//
+//	Io::DiskFileSystem fileSystem;
+//	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() != "" ? name() : uuid() ) );
+//
+//	if( stream == Io::StreamPtr() ) {
+//		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
+//		m_state = LoadingError;
+//		return false;
+//	}
+//
+//	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
+//
+//	if( !m_loader->loadFromStream( m_bundle, this, hal, stream ) ) {
+//		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
+//		m_state = LoadingError;
+//		return false;
+//	}
+//
+//	m_state = Loaded;
+//
+//	return true;
+//}
 
-	DC_BREAK_IF( !needsLoading() );
-
-	m_state = Loading;
-
-	Io::DiskFileSystem fileSystem;
-	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() != "" ? name() : uuid() ) );
-
-	if( stream == Io::StreamPtr() ) {
-		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
-		m_state = LoadingError;
-		return false;
-	}
-
-	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
-
-	if( !m_loader->loadFromStream( m_bundle, hal, stream ) ) {
-		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
-		m_state = LoadingError;
-		return false;
-	}
-
-	m_state = Loaded;
-
-	return true;
-}
-
-// ** Asset::unload
-void Asset::unload( void )
+// ** Asset::dispose
+void Asset::dispose( void )
 {
 	m_state = Unloaded;
 }
@@ -365,63 +364,8 @@ void AssetBundle::addAsset( AssetPtr asset )
 		m_assets[StringHash( asset->name().c_str() )] = asset;
 	}
 
-	//! WORKAROUND: add asset loaders
-	switch( asset->type() ) {
-	case Asset::Material:	JsonMaterialLoader::attachTo( asset );	break;
-	case Asset::Image:		RawImageLoader::attachTo( asset );		break;
-	case Asset::Mesh:		RawMeshLoader::attachTo( asset );		break;
-	}
-
 	// Set parent bundle
 	asset->setBundle( this );
-}
-
-// ** AssetBundle::addImage
-ImagePtr AssetBundle::addImage( const String& uuid, const String& name, u32 width, u32 height )
-{
-	log::msg( "Adding image '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
-
-	ImagePtr image( DC_NEW Image( this, uuid, name, width, height ) );
-	m_assets[StringHash( uuid.c_str() )] = image;
-	m_assets[StringHash( name.c_str() )] = image;
-
-	return image;
-}
-
-// ** AssetBundle::addMesh
-MeshPtr AssetBundle::addMesh( const String& uuid, const String& name )
-{
-	log::msg( "Adding mesh '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
-
-	MeshPtr mesh( DC_NEW Mesh( this, uuid, name ) );
-	m_assets[StringHash( uuid.c_str() )] = mesh;
-	m_assets[StringHash( name.c_str() )] = mesh;
-
-	return mesh;
-}
-
-// ** AssetBundle::addTerrain
-TerrainPtr AssetBundle::addTerrain( const String& uuid, const String& name, u32 size )
-{
-	log::msg( "Adding terrain '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
-
-	TerrainPtr terrain( DC_NEW Terrain( this, uuid, name, size ) );
-	m_assets[StringHash( uuid.c_str() )] = terrain;
-	m_assets[StringHash( name.c_str() )] = terrain;
-
-	return terrain;
-}
-
-// ** AssetBundle::addMaterial
-MaterialPtr AssetBundle::addMaterial( const String& uuid, const String& name )
-{
-	log::msg( "Adding material '%s' to bundle '%s'...\n", name.c_str(), m_name.c_str() );
-
-	MaterialPtr material( DC_NEW Material( this, uuid, name ) );
-	m_assets[StringHash( uuid.c_str() )] = material;
-	m_assets[StringHash( name.c_str() )] = material;
-
-	return material;
 }
 
 // ** AssetBundle::createAssetFromData

@@ -34,26 +34,70 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! 2D image asset
-	class Image : public AssetWithData<AssetTexture> {
-	friend class AssetBundle;
+	class Image : public Asset {
+	friend class RenderingContext;
 	public:
 
 								ClassEnableTypeInfoSuper( Image, Asset )
 
-								//! Constructs Image instance.
-								Image( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u16 width = 0, u16 height = 0 );
+								//! Constructs an empty Image instance.
+								Image( void );
 
 		//! Returns image width.
-		u16						width( void ) const;
+		s32						width( void ) const;
+
+		//! Sets image width.
+		void					setWidth( s32 value );
 
 		//! Returns image height.
-		u16						height( void ) const;
+		s32						height( void ) const;
+
+		//! Sets image height.
+		void					setHeight( s32 value );
+
+		//! Returns the bytes per pixel value.
+		s32						bytesPerPixel( void ) const;
+
+		//! Sets the bytes per pixel value.
+		void					setBytesPerPixel( s32 value );
+
+		//! Returns the total number of mip levels.
+		s32						mipLevelCount( void ) const;
+
+		//! Sets the total number of mip levels.
+		void					setMipLevelCount( s32 value );
+
+		//! Returns image pixels at specified mip level.
+		const ByteArray&		mipLevel( s32 index ) const;
+
+		//! Set image pixels at specified mip level.
+		void					setMipLevel( s32 index, const ByteArray& value );
+
+		//! Returns the mip level width.
+		s32						mipLevelWidth( s32 index ) const;
+
+		//! Returns the mip level height.
+		s32						mipLevelHeight( s32 index ) const;
+
+		//! Returns the internal rendering id.
+		const RenderingAssetId&	id( void ) const;
+
+		//! Destroys the loaded image data.
+		virtual void			dispose( void ) DC_DECL_OVERRIDE;
 
 	private:
 
-		u16						m_width;	//!< Image width.
-		u16						m_height;	//!< Image height.
-		u8						m_channels;	//!< Image channels.
+		//! Sets the internal rendering id.
+		void					setId( const RenderingAssetId& value );
+
+	private:
+
+		RenderingAssetId		m_id;				//!< Rendering identifier.
+		s32						m_width;			//!< Image base mip level width.
+		s32						m_height;			//!< Image base mip level height.
+		s32						m_bytesPerPixel;	//!< Number of bytes used to encode a single image pixel.
+		u8						m_channels;			//!< Image channels.
+		Array<ByteArray>		m_mips;				//!< Actual image pixels.
 	};
 
 } // namespace Scene

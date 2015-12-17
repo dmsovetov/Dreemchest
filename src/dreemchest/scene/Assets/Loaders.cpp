@@ -30,92 +30,105 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------ RawImageLoader ------------------------------------------ //
+// ------------------------------------------ ImageLoaderRAW ------------------------------------------ //
 
-// ** RawImageLoader::loadFromStream
-bool RawImageLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
+// ** ImageLoaderRAW::loadFromStream
+bool ImageLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
 {
+	// Call the base loadFromStream to init the asset pointer
+	if( !GenericAssetLoader::loadFromStream( assets, asset, stream ) ) {
+		return false;
+	}
+
 	u16 width, height;
 	u8  channels;
 
+	// Read image info
 	stream->read( &width, 2 );
 	stream->read( &height, 2 );
 	stream->read( &channels, 1 );
 
-	u8* pixels = DC_NEW u8[width * height * channels];
-	stream->read( pixels, width * height * channels );
+	// Read image pixels
+	ByteArray pixels;
+	pixels.resize( width * height * channels );
+	stream->read( &pixels[0], pixels.size() );
 
-	Renderer::Texture2DPtr texture = hal->createTexture2D( width, height, channels == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
-	texture->setData( 0, pixels );
-	delete[]pixels;
-
-	AssetTexture* data = DC_NEW AssetTexture;
-	data->texture = texture;
-	m_image->setData( data );
+	// Setup image asset
+	m_asset->setWidth( width );
+	m_asset->setHeight( height );
+	m_asset->setBytesPerPixel( channels );
+	m_asset->setMipLevelCount( 1 );
+	m_asset->setMipLevel( 0, pixels );
 
 	return true;
 }
 
-// ------------------------------------------ RawMeshLoader ------------------------------------------ //
+// ------------------------------------------ MeshLoaderRAW ------------------------------------------ //
 
-// ** RawMeshLoader::loadFromStream
-bool RawMeshLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
+// ** MeshLoaderRAW::loadFromStream
+bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
 {
-	u32 chunkCount, vertexCount, indexCount;
-	
-	AssetMesh* data = DC_NEW AssetMesh;
-	Bounds bounds;
+	// Call the base loadFromStream to init the asset pointer
+	if( !GenericAssetLoader::loadFromStream( assets, asset, stream ) ) {
+		return false;
+	}
 
+	// Read the total number of mesh chunks
+	u32 chunkCount;
 	stream->read( &chunkCount, 4 );
 
+	// Set the total number of mesh chunks
+	m_asset->setChunkCount( chunkCount );
+
 	for( u32 i = 0; i < chunkCount; i++ ) {
+		// Read the total number of vertices & indices
+		u32 vertexCount, indexCount;
 		stream->read( &vertexCount, 4 );
 		stream->read( &indexCount, 4 );
 
-		Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
-		Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount );
-		Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indexCount );
+		// Read vertex buffer
+		Mesh::VertexBuffer vertices;
+		vertices.resize( vertexCount );
 
-		Vertex* vertices = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
+		for( u32 j = 0; j < vertexCount; j++ ) {
+			Mesh::Vertex* v = &vertices[i];
 
-		for( u32 i = 0; i < vertexCount; i++ ) {
-			Vertex* v = vertices + i;
-
-			stream->read( v->position, sizeof( v->position ) );
-			stream->read( v->normal, sizeof( v->normal ) );
-			stream->read( v->tex0, sizeof( v->tex0 ) );
-			stream->read( v->tex1, sizeof( v->tex1 ) );
-
-			for( u32 j = 0; j < 3; j++ ) {
-			//	v->position[j] *= 0.01f;
-			}
-
-			bounds += v->position;
+			stream->read( &v->position.x, sizeof( v->position ) );
+			stream->read( &v->normal.x, sizeof( v->normal ) );
+			stream->read( &v->uv[0].x, sizeof( v->uv[0] ) );
+			stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );			
 		}
 
-		vertexBuffer->unlock();
+		// Set chunk vertex buffer.
+		m_asset->setVertexBuffer( i, vertices );
 
-		u16* indices = indexBuffer->lock();
-		stream->read( indices, sizeof( u16 ) * indexCount );
-		indexBuffer->unlock();
+		// Read index buffer
+		Mesh::IndexBuffer indices;
+		indices.resize( indexCount );
+		stream->read( &indices[0], indices.size() );
 
-		data->vertexBuffers.push_back( vertexBuffer );
-		data->indexBuffers.push_back( indexBuffer );
+		// Set chunk index buffer
+		m_asset->setIndexBuffer( i, indices );
 	}
 
-	m_mesh->setData( data );
-	m_mesh->setBounds( bounds );
+	// Update node bounds
+	m_asset->updateBounds();
 
 	return true;
 }
 
-// --------------------------------------- JsonMaterialLoader --------------------------------------- //
+// --------------------------------------- MaterialLoader --------------------------------------- //
 
 #ifdef HAVE_JSON
 
-// ** JsonMaterialLoader::loadFromStream
-bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPtr hal, const Io::StreamPtr& stream ) const
+// ** MaterialLoader::loadFromStream
+bool MaterialLoader::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
 {
+	// Call the base loadFromStream to init the asset pointer
+	if( !GenericAssetLoader::loadFromStream( assets, asset, stream ) ) {
+		return false;
+	}
+
 	String json;
 	json.resize( stream->length() );
 	stream->read( &json[0], stream->length() );
@@ -133,21 +146,21 @@ bool JsonMaterialLoader::loadFromStream( AssetBundleWPtr assets, Renderer::HalPt
 	Json::Value parameters = root["parameters"];
 
 	if( shader.find( "cutout" ) != String::npos ) {
-		m_material->setRenderingMode( RenderCutout );
+		m_asset->setRenderingMode( RenderCutout );
 	}
 	else if( shader.find( "transparent" ) != String::npos ) {
-		m_material->setRenderingMode( RenderTranslucent );
+		m_asset->setRenderingMode( RenderTranslucent );
 	}
 	else if( shader.find( "additive" ) != String::npos ) {
-		m_material->setRenderingMode( RenderAdditive );
+		m_asset->setRenderingMode( RenderAdditive );
 	}
 	else {
-		m_material->setRenderingMode( RenderOpaque );
+		m_asset->setRenderingMode( RenderOpaque );
 	}
 	
-	m_material->setModel( Material::Phong );
-	m_material->setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
-	m_material->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
+	m_asset->setModel( Material::Phong );
+	m_asset->setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
+	m_asset->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
 
 	return true;
 }
