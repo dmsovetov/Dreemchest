@@ -91,12 +91,12 @@ bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, con
 		vertices.resize( vertexCount );
 
 		for( u32 j = 0; j < vertexCount; j++ ) {
-			Mesh::Vertex* v = &vertices[i];
+			Mesh::Vertex* v = &vertices[j];
 
 			stream->read( &v->position.x, sizeof( v->position ) );
 			stream->read( &v->normal.x, sizeof( v->normal ) );
 			stream->read( &v->uv[0].x, sizeof( v->uv[0] ) );
-			stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );			
+			stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );
 		}
 
 		// Set chunk vertex buffer.
@@ -105,7 +105,7 @@ bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, con
 		// Read index buffer
 		Mesh::IndexBuffer indices;
 		indices.resize( indexCount );
-		stream->read( &indices[0], indices.size() );
+		stream->read( &indices[0], indices.size() * sizeof( u16 ) );
 
 		// Set chunk index buffer
 		m_asset->setIndexBuffer( i, indices );
