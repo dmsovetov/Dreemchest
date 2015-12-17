@@ -87,7 +87,7 @@ namespace Scene {
 	private:
 
 		//! Sets internal rendering id for a mesh node.
-		void					setId( s32 chunk, const RenderingAssetId& value );
+		void					setChunkId( s32 chunk, const RenderingAssetId& value );
 
 	private:
 
