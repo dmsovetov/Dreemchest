@@ -89,6 +89,7 @@ DC_BEGIN_DREEMCHEST
     typedef Array<String>			StringArray;
 	typedef List<String>			StringList;
 	typedef Array<class Guid>		GuidArray;
+	typedef Array<u8>				ByteArray;
 
 	template<typename T>
 	class Hash : public std::map<strhash, T> {};
