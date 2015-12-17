@@ -33,18 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Asset data stores the loaded asset data (HAL texture, vertex buffers, etc.).
-	//class AssetData : public RefCounted {
-	//public:
-	//};
-
-	//! The loaded mesh data.
-	//class AssetMesh : public AssetData {
-	//public:
-	//	Array<Renderer::VertexBufferPtr>	vertexBuffers;	//!< Mesh vertex buffers.
-	//	Array<Renderer::IndexBufferPtr>		indexBuffers;	//!< Mesh index buffers.
-	//};
-
 	//! Basic scene asset
 	class Asset : public RefCounted {
 	friend class AssetBundle;
@@ -141,31 +129,6 @@ namespace Scene {
 		String					m_uuid;			//!< Asset UUID.
 		State					m_state;		//!< Asset state.
 		u32						m_timestamp;	//!< Last known asset file timestamp.
-	};
-
-	//! Generic asset class to derive other asset types from it.
-	template<typename TData>
-	class AssetWithData : public Asset {
-	public:
-
-		//! Returns the asset data.
-		const StrongPtr<TData>&	data( void ) const { return m_data; }
-
-		//! Sets the asset data.
-		void					setData( const StrongPtr<TData>& value ) { m_data = value; }
-
-	protected:
-
-								//! Constructs AssetWithData instance.
-								AssetWithData( AssetBundle* bundle, Type type, const String& uuid, const String& name )
-									: Asset( bundle, type, uuid, name ) {}
-
-		//! Unloads the asset data.
-		virtual void			dispose( void ) DC_DECL_OVERRIDE { m_data = StrongPtr<TData>(); Asset::dispose(); }
-
-	private:
-
-		StrongPtr<TData>		m_data;		//!< Loaded asset data.
 	};
 
 	//! Contains asset meta information & caches loaded assets.
