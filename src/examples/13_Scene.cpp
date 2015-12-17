@@ -47,11 +47,7 @@ public:
     WindowHandler( HalWPtr hal, SceneWPtr scene )
 		: m_hal( hal ), m_scene( scene )
 	{
-		RvmPtr rvm( DC_NEW Rvm( hal, 8000 ) );
-		ShaderCachePtr shaders( DC_NEW ShaderCache( "D:\\BFG9000\\externals\\src\\dreemchest\\src\\dreemchest\\scene\\Rendering\\Shaders", m_hal ) );
-		Renderer2DPtr renderer2d = Renderer2D::create( hal, 1024 );
-
-		m_renderingContext = RenderingContextPtr( DC_NEW RenderingContext( rvm, shaders, hal, renderer2d ) );
+		m_renderingContext = RenderingContext::create( hal );
 	}
 
     // Called each frame and renders a single frame
