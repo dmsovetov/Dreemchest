@@ -128,6 +128,7 @@ namespace Scene {
 		  AssetFormatImageRaw	//!< Loads an image data from a raw pixel buffer format.
 		, AssetFormatMesh		//!< Loads a mesh data from a raw format.
 		, AssetFormatMaterial	//!< Loads material from a text key-value format.
+		, AssetFormatGenerated	//!< This is a generated asset - nothing to load from stream.
 
 		, TotalAssetFormats		//!< The total number of asset formats.
 	};

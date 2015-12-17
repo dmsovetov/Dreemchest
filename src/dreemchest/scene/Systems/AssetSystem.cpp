@@ -74,6 +74,11 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 	// Pop it from queue
 	m_queue.pop_front();
 
+	// This asset does not require loading
+	if( asset->format() == AssetFormatGenerated ) {
+		return;
+	}
+
 	// Find an asset load for a specified format
 	AssetLoaderPtr loader = m_loaders.construct( asset->format() );
 
