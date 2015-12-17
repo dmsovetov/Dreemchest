@@ -134,6 +134,41 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 	return indices;
 }
 
+// ** Terrain::createMesh
+MeshPtr Terrain::createMesh( void ) const
+{
+	// Create an empty mesh
+	MeshPtr mesh = Mesh::create();
+
+	// Set the number of mesh chunks
+	mesh->setChunkCount( chunkCount() * chunkCount() );
+
+	// Disable loading
+	mesh->setFormat( AssetFormatGenerated );
+
+	// Construct chunks
+	u32 chunk = 0;
+
+	for( u32 i = 0; i < chunkCount(); i++ ) {
+		for( u32 j = 0; j < chunkCount(); j++ ) {
+			// Get the chunk buffers
+			VertexBuffer vertices = chunkVertexBuffer( i, j );
+			IndexBuffer  indices  = chunkIndexBuffer();
+
+			// Set chunk mesh
+			setMeshChunk( mesh, chunk, vertices, indices, i * kChunkSize, j * kChunkSize );
+
+			// Increase the chunk index
+			chunk++;
+		}
+	}
+
+	// Now update the mesh bounding box
+	mesh->updateBounds();
+
+	return mesh;
+}
+
 // ** Terrain::createChunkMesh
 MeshPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 {
@@ -141,8 +176,8 @@ MeshPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 	MeshPtr mesh = Mesh::create();
 
 	// Get the chunk buffers
-	Array<Vertex> vertices = chunkVertexBuffer( x, z );
-	Array<u16>	  indices  = chunkIndexBuffer();
+	VertexBuffer vertices = chunkVertexBuffer( x, z );
+	IndexBuffer  indices  = chunkIndexBuffer();
 
 	// Set the number of mesh chunks
 	mesh->setChunkCount( 1 );
@@ -151,22 +186,29 @@ MeshPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 	mesh->setFormat( AssetFormatGenerated );
 
 	// Set the chunk data
-	Mesh::VertexBuffer vb;
-	vb.resize( vertices.size() );
-
-	for( u32 i = 0, n = ( u32 )vertices.size(); i < n; i++ ) {
-		vb[i].position = vertices[i].position;
-		vb[i].normal = vertices[i].normal;
-		vb[i].uv[0] = vertices[i].uv;
-	}
-
-	mesh->setVertexBuffer( 0, vb );
-	mesh->setIndexBuffer( 0, indices );
+	setMeshChunk( mesh, 0, vertices, indices );
 
 	// Now update the mesh bounding box
 	mesh->updateBounds();
 
 	return mesh;
+}
+
+// ** Terrain::setMeshChunk
+void Terrain::setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x, u32 z ) const
+{
+	// Set the chunk data
+	Mesh::VertexBuffer vb;
+	vb.resize( vertices.size() );
+
+	for( u32 i = 0, n = ( u32 )vertices.size(); i < n; i++ ) {
+		vb[i].position = vertices[i].position + Vec3( x, 0, z );
+		vb[i].normal = vertices[i].normal;
+		vb[i].uv[0] = vertices[i].uv;
+	}
+
+	mesh->setVertexBuffer( chunk, vb );
+	mesh->setIndexBuffer( chunk, indices );
 }
 
 } // namespace Scene

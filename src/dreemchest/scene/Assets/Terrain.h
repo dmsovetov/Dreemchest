@@ -48,6 +48,10 @@ namespace Scene {
 			Vec2				uv;			//!< Vertex UV coordinate.
 		};
 
+		typedef Array<Vertex>	VertexBuffer;	//!< Terrain vertex buffer type.
+		typedef Array<u16>		IndexBuffer;	//!< Terrain index buffer type.
+		typedef Array<u16>		Heightmap;		//!< Terrain heightmap type.
+
 								ClassEnableTypeInfoSuper( Terrain, Asset )
 
 								//! Constructs Terrain instance.
@@ -63,13 +67,13 @@ namespace Scene {
 		u16						height( u32 x, u32 z ) const;
 
 		//! Sets the terrain heightmap.
-		void					setHeightmap( const Array<u16>& value );
+		void					setHeightmap( const Heightmap& value );
 
 		//! Returns terrain chunk vertex buffer.
-		Array<Vertex>			chunkVertexBuffer( u32 x, u32 z ) const;
+		VertexBuffer			chunkVertexBuffer( u32 x, u32 z ) const;
 
 		//! Returns terrain chunk index buffer.
-		Array<u16>				chunkIndexBuffer( void ) const;
+		IndexBuffer				chunkIndexBuffer( void ) const;
 
 		//! Creates the chunk mesh.
 		MeshPtr					createChunkMesh( u32 x, u32 z ) const;
@@ -79,8 +83,13 @@ namespace Scene {
 
 	private:
 
+		//! Adds the mesh node constructed from chunk buffers.
+		void					setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x = 0, u32 z = 0 ) const;
+
+	private:
+
 		u32						m_size;			//!< Terrain size.
-		Array<u16>				m_heightmap;	//!< Terrain heightmap.
+		Heightmap				m_heightmap;	//!< Terrain heightmap.
 	};
 
 } // namespace Scene
