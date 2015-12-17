@@ -40,7 +40,7 @@ StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features, Mate
 }
 
 // ** StaticMeshRopEmitter::emit
-void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
+void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
 {
 	// Skip if mesh is not visible
 	if( !staticMesh.isVisible( m_camera->id() ) ) {
@@ -58,6 +58,14 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 
 	// Emit render operation for each mesh chunk
 	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
+		// Get the renderable id
+		const RenderingAssetId* id = &mesh->chunkId( i );
+
+		// Ensure we have a renderable for this mesh chunk
+		if( !(*id) ) {
+			id = &ctx.uploadRenderable( mesh, i );
+		}
+
 		// Get the material for chunk
 		const MaterialPtr& material = staticMesh.material( i );
 
@@ -73,7 +81,7 @@ void StaticMeshRopEmitter::emit( Rvm& rvm, ShaderCache& shaders, const StaticMes
 
 		// Initialize the rendering operation
 		rop->transform		= transform.matrix();
-		rop->mesh			= mesh->chunkId( i );
+		rop->mesh			= *id;
 		rop->mode			= RenderOpaque;
 		rop->shader			= NULL;
 		rop->distance		= 0;

@@ -41,7 +41,7 @@ namespace Scene {
 								RopEmitterBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect );
 
 		//! Emits render operations for entities in scene.
-		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );
+		virtual void			emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform );
 
 		//! Sets the plane cliper.
 		void					setClipper( const PlaneClipper& value );
@@ -64,30 +64,30 @@ namespace Scene {
 									: RopEmitterBase( ecs, name, Ecs::Aspect::all<TRenderable, Transform>() ) {}
 
 		//! Emits render operations for renderable entities in scene.
-		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void			emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Emits render operation for a single renderable entity.
-		virtual void			emit( Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform );
+		virtual void			emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform );
 	};
 
 	// ** RopEmitter::emit
 	template<typename TRenderable>
-	void RopEmitter<TRenderable>::emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform )
+	void RopEmitter<TRenderable>::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform )
 	{
-		RopEmitterBase::emit( rvm, shaders, camera, transform );
+		RopEmitterBase::emit( ctx, rvm, shaders, camera, transform );
 
 		const Ecs::EntitySet& entities = m_entities->entities();
 
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			emit( rvm, shaders, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+			emit( ctx, rvm, shaders, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}
 	}
 
 	// ** RopEmitter::emit
 	template<typename TRenderable>
-	void RopEmitter<TRenderable>::emit( Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
+	void RopEmitter<TRenderable>::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
 	{
 		DC_BREAK
 	}

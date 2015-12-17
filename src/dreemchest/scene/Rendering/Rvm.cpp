@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Rvm.h"
+#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -64,6 +65,12 @@ Rvm::Rvm( Renderer::HalPtr hal, u32 maxCommands ) : m_hal( hal ), m_allocator( m
 	m_defaultPolygonMode	= Renderer::PolygonFill;
 
 	resetCounters();
+}
+
+// ** Rvm::setRenderingContext
+void Rvm::setRenderingContext( RenderingContextWPtr value )
+{
+	m_renderingContext = value;
 }
 
 // ** Rvm::increase
@@ -217,18 +224,19 @@ void Rvm::flush( void )
 		}
 
 		// Set the vertex buffer
-		DC_NOT_IMPLEMENTED;
-	//	if( cmd->vertexBuffer != activeVertexBuffer ) {
-	//		m_hal->setVertexBuffer( cmd->vertexBuffer );
-	//		activeVertexBuffer = cmd->vertexBuffer;
-	//		increase( VertexBufferSwitches );
-	//	}
+		const RenderingContext::Renderable& renderable = m_renderingContext->renderable( cmd->mesh );
+
+		if( renderable.vertexBuffer != activeVertexBuffer ) {
+			m_hal->setVertexBuffer( renderable.vertexBuffer );
+			activeVertexBuffer = renderable.vertexBuffer.get();
+			increase( VertexBufferSwitches );
+		}
 
 		// Render the mesh
-	//	m_hal->renderIndexed( Renderer::PrimTriangles, cmd->indexBuffer, 0, cmd->indexBuffer->size() );
-	//	increase( DrawIndexed );
-	//	increase( Triangles, cmd->indexBuffer->size() / 3 );
-	//	increase( Vertices, cmd->indexBuffer->size() );
+		m_hal->renderIndexed( renderable.primitiveType, renderable.indexBuffer, 0, renderable.indexBuffer->size() );
+		increase( DrawIndexed );
+		increase( Triangles, renderable.indexBuffer->size() / 3 );
+		increase( Vertices, renderable.indexBuffer->size() );
 	}
 
 	// Clear the command list
@@ -345,13 +353,15 @@ void Rvm::setShaderUniforms( Renderer::Shader* shader, const Command* cmd )
 	u32 location = 0;
 
 	// Set colors
-	for( u32 i = 0; i < 8; i++ ) {
-		if( !cmd->colors[i] ) {
-			continue;
-		}
+	if( cmd->colors ) {
+		for( u32 i = 0; i < 8; i++ ) {
+			if( !cmd->colors[i] ) {
+				continue;
+			}
 
-		if( location = shader->findUniformLocation( s_colorsUniformNames[i] ) ) {
-			shader->setVec4( location, Vec4( cmd->colors[i]->r, cmd->colors[i]->g, cmd->colors[i]->b, cmd->colors[i]->a ) );
+			if( location = shader->findUniformLocation( s_colorsUniformNames[i] ) ) {
+				shader->setVec4( location, Vec4( cmd->colors[i]->r, cmd->colors[i]->g, cmd->colors[i]->b, cmd->colors[i]->a ) );
+			}
 		}
 	}
 

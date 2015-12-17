@@ -69,7 +69,7 @@ void ForwardLightPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCach
 	setClipper( PlaneClipper::createFromBox( position, light.range() ) );
 
 	// Emit render operations
-	emit( rvm, shaders );
+	emit( *context.get(), rvm, shaders );
 
 	rvm.flush();
 }

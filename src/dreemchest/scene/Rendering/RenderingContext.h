@@ -37,28 +37,50 @@ namespace Scene {
 	class RenderingContext : public RefCounted {
 	public:
 
-								//! Constructs the RenderingContext instance.
-								RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal, Renderer::Renderer2DPtr renderer )
-									: m_rvm( rvm ), m_shaders( shaders ), m_hal( hal ), m_renderer( renderer ) {}
+		//! Renderable item.
+		struct Renderable {
+										//! Constructs Renderable instance
+										Renderable( Renderer::PrimitiveType primitiveType = Renderer::TotalPrimitiveTypes, Renderer::VertexBufferPtr vertexBuffer = Renderer::VertexBufferPtr(), Renderer::IndexBufferPtr indexBuffer = Renderer::IndexBufferPtr() )
+											: primitiveType( primitiveType ), vertexBuffer( vertexBuffer ), indexBuffer( indexBuffer ) {}
+
+			Renderer::PrimitiveType		primitiveType;	//!< Rendering primitive type.
+			Renderer::VertexBufferPtr	vertexBuffer;	//!< Renderable vertex buffer.
+			Renderer::IndexBufferPtr	indexBuffer;	//!< Renderable index buffer.
+		};
+
+		//! Returns the renderable by index.
+		const Renderable&					renderable( u32 index ) const;
 
 		//! Returns RVM.
-		RvmPtr					rvm( void ) const { return m_rvm; }
+		RvmPtr								rvm( void ) const;
 
 		//! Returns shader cache.
-		ShaderCachePtr			shaders( void ) const { return m_shaders; }
+		ShaderCachePtr						shaders( void ) const;
 
 		//! Returns hal.
-		Renderer::HalPtr		hal( void ) const { return m_hal; }
+		Renderer::HalPtr					hal( void ) const;
 
 		//! Returns renderer.
-		Renderer::Renderer2DPtr	renderer( void ) const { return m_renderer; }
+		Renderer::Renderer2DPtr				renderer( void ) const;
+
+		//! Creates renderable asset from a mesh and uploads it to GPU.
+		const RenderingAssetId&				uploadRenderable( MeshWPtr mesh, s32 chunk );
+
+		//! Creates new rendering context.
+		static RenderingContextPtr			create( const Renderer::HalPtr& hal );
 
 	private:
 
-		RvmPtr					m_rvm;		//!< Rendering virtual machine.
-		ShaderCachePtr			m_shaders;	//!< Shaders cache.
-		Renderer::HalPtr		m_hal;		//!< Rendering HAL.
-		Renderer::Renderer2DPtr	m_renderer;	//!< Rendering interface.
+											//! Constructs the RenderingContext instance.
+											RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal, Renderer::Renderer2DPtr renderer );
+
+	private:
+
+		RvmPtr								m_rvm;			//!< Rendering virtual machine.
+		ShaderCachePtr						m_shaders;		//!< Shaders cache.
+		Renderer::HalPtr					m_hal;			//!< Rendering HAL.
+		Renderer::Renderer2DPtr				m_renderer;		//!< Rendering interface.
+		Array<Renderable>					m_renderables;	//!< All renderable assets reside here.
 	};
 
 } // namespace Scene

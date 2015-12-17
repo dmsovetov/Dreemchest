@@ -66,9 +66,10 @@ void RenderPassBase::render( RenderingContextPtr context )
 {
 	Rvm& rvm = *context->rvm().get();
 	ShaderCache& shaders = *context->shaders().get();
+	RenderingContext& ctx = *context.get();
 
 	// Emit render operations
-	emit( rvm, shaders );
+	emit( ctx, rvm, shaders );
 }
 
 // ** RenderPassBase::end
@@ -88,10 +89,10 @@ void RenderPassBase::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewP
 }
 
 // ** RenderPassBase::emit
-void RenderPassBase::emit( Rvm& rvm, ShaderCache& shaders )
+void RenderPassBase::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders )
 {
 	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
-		m_emitters[i]->emit( rvm, shaders, *m_camera, *m_transform );
+		m_emitters[i]->emit( ctx, rvm, shaders, *m_camera, *m_transform );
 	}
 }
 

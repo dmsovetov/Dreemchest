@@ -37,7 +37,7 @@ RopEmitterBase::RopEmitterBase( Ecs::EcsWPtr ecs, const String& name, const Ecs:
 }
 
 // ** RopEmitterBase::emit
-void RopEmitterBase::emit( Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform )
+void RopEmitterBase::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const Camera& camera, const Transform& transform )
 {
 	m_camera    = &camera;
 	m_transform = &transform;

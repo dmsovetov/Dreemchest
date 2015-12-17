@@ -61,7 +61,7 @@ namespace Scene {
 		void						setClipper( const PlaneClipper& value );
 
 		//! Emits all render operations.
-		void						emit( Rvm& rvm, ShaderCache& shaders );
+		void						emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders );
 
 		//! Setups the rendering states before rendering.
 		virtual void				setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection );

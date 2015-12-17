@@ -108,6 +108,9 @@ namespace Scene {
 										//! Constructs the Rvm
 										Rvm( Renderer::HalPtr hal, u32 maxCommands );
 
+		//! Sets available renderables.
+		void							setRenderingContext( RenderingContextWPtr value );
+
 		//! Resets internal states to default.
 		void							reset( void );
 
@@ -200,6 +203,8 @@ namespace Scene {
 		s32								m_counters[TotalCounters];			//!< Stats counters.
 		Vec4							m_registers[TotalRegisters];		//!< Constant registers.
 		RasterizationOptions			m_rasterization[TotalRenderModes];	//!< Render mode rasterization options.
+
+		RenderingContextWPtr			m_renderingContext;					//!< Parent rendering context.
 
 		Renderer::ShaderPtr				m_defaultShader;					//!< The default shader to use.
 		Renderer::TriangleFace			m_defaultCullFace;					//!< The default cull face side.
