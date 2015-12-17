@@ -100,6 +100,9 @@ namespace Io {
 		//! Reads the text file content.
 		static String			readTextFile( const Path& fileName );
 
+		//! Opens the file for reading.
+		static StreamPtr		open( const Path& fileName, StreamMode mode = BinaryReadStream );
+
 	protected:
 
         //! List of loaded file archives.

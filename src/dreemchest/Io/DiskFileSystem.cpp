@@ -42,6 +42,14 @@ DiskFileSystem::~DiskFileSystem( void )
 
 }
 
+// ** DiskFileSystem::open
+StreamPtr DiskFileSystem::open( const Path& fileName, StreamMode mode )
+{
+	Io::DiskFileSystem fs;
+	StreamPtr stream = fs.openFile( fileName, mode );
+	return stream;
+}
+
 // ** DiskFileSystem::openFile
 StreamPtr DiskFileSystem::openFile( const Path& fileName, StreamMode mode ) const
 {
@@ -143,10 +151,9 @@ bool DiskFileSystem::fileExistsAtPath( const Path& fileName )
 // ** DiskFileSystem::readTextFile
 String DiskFileSystem::readTextFile( const Path& fileName )
 {
-	DiskFileSystem fileSystem;
-	StreamPtr file = fileSystem.openFile( fileName );
+	StreamPtr file = open( fileName );
 
-	if( file == StreamPtr() ) {
+	if( !file.valid() ) {
 		return "";
 	}
 
