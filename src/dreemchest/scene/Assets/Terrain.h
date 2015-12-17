@@ -72,7 +72,10 @@ namespace Scene {
 		Array<u16>				chunkIndexBuffer( void ) const;
 
 		//! Creates the chunk mesh.
-		MeshPtr					createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const;
+		MeshPtr					createChunkMesh( u32 x, u32 z ) const;
+
+		//! Creates the mesh for whole terrain.
+		MeshPtr					createMesh( void ) const;
 
 	private:
 

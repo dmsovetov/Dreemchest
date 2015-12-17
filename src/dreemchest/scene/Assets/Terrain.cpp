@@ -135,43 +135,36 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 }
 
 // ** Terrain::createChunkMesh
-MeshPtr Terrain::createChunkMesh( Renderer::HalPtr hal, u32 x, u32 z ) const
+MeshPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 {
 	// Create an empty mesh
 	MeshPtr mesh = Mesh::create();
 
-	DC_NOT_IMPLEMENTED;
+	// Get the chunk buffers
+	Array<Vertex> vertices = chunkVertexBuffer( x, z );
+	Array<u16>	  indices  = chunkIndexBuffer();
 
-	//// Get the chunk buffers
-	//Array<Vertex> vertices = chunkVertexBuffer( x, z );
-	//Array<u16>	  indices  = chunkIndexBuffer();
+	// Set the number of mesh chunks
+	mesh->setChunkCount( 1 );
 
-	//// Construct mesh render data
-	//AssetMesh* data = DC_NEW AssetMesh;
-	//Bounds bounds;
+	// Disable loading
+	mesh->setFormat( AssetFormatGenerated );
 
-	//Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0" );
-	//Renderer::VertexBufferPtr	   vertexBuffer = hal->createVertexBuffer( vertexFormat, vertices.size() );
-	//Renderer::IndexBufferPtr	   indexBuffer  = hal->createIndexBuffer( indices.size() );
+	// Set the chunk data
+	Mesh::VertexBuffer vb;
+	vb.resize( vertices.size() );
 
-	//Vertex* locked = reinterpret_cast<Vertex*>( vertexBuffer->lock() );
-	//memcpy( locked, &vertices[0], sizeof( Vertex ) * vertices.size() );
+	for( u32 i = 0, n = ( u32 )vertices.size(); i < n; i++ ) {
+		vb[i].position = vertices[i].position;
+		vb[i].normal = vertices[i].normal;
+		vb[i].uv[0] = vertices[i].uv;
+	}
 
-	//for( u32 i = 0; i < vertices.size(); i++ ) {
-	//	bounds += vertices[i].position;
-	//}
+	mesh->setVertexBuffer( 0, vb );
+	mesh->setIndexBuffer( 0, indices );
 
-	//vertexBuffer->unlock();
-
-	//u16* lockedIndices = indexBuffer->lock();
-	//memcpy( lockedIndices, &indices[0], sizeof( u16 ) * indices.size() );
-	//indexBuffer->unlock();
-
-	//data->vertexBuffers.push_back( vertexBuffer );
-	//data->indexBuffers.push_back( indexBuffer );
-
-	//mesh->setData( data );
-	//mesh->setBounds( bounds );
+	// Now update the mesh bounding box
+	mesh->updateBounds();
 
 	return mesh;
 }
