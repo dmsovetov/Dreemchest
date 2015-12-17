@@ -39,13 +39,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	}
 
 	// Create rendering context.
-	Renderer::HalWPtr hal = this->hal();
-	Renderer::Renderer2DPtr renderer2d = Renderer::Renderer2D::create( hal, 1024 );
-
-	Scene::RvmPtr rvm( DC_NEW Scene::Rvm( hal, 8000 ) );
-	Scene::ShaderCachePtr shaders( DC_NEW Scene::ShaderCache( "D:\\BFG9000\\externals\\src\\dreemchest\\src\\dreemchest\\scene\\Rendering\\Shaders\\", hal ) );
-
-	m_renderingContext = Scene::RenderingContextPtr( DC_NEW Scene::RenderingContext( rvm, shaders, hal, renderer2d ) );
+	m_renderingContext = Scene::RenderingContext::create( hal() );
 
 	// Create cursor binding
 	m_cursorMovement = new Scene::Vec3Binding;
@@ -54,24 +48,25 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_scene = Scene::Scene::create();
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
-	// Create assets.
-	//m_assets = Scene::AssetBundle::create( "assets" );
+	// Create terrain.
+	Scene::TerrainPtr terrain = new Scene::Terrain( m_project->assets().get(), "terrain", "terrain", 128 );
 
-	//Scene::TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
+	{
+		Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
+		Scene::MeshPtr		  mesh  = terrain->createMesh();
+		chunk->attach<Scene::StaticMesh>( mesh );
+		chunk->attach<Scene::Transform>();
+	}
 
-	//for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
-	//	for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
-	//		Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
-	//		Scene::MeshPtr		  mesh  = terrain->createChunkMesh( hal, j, i );
+/*	for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
+		for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
+			Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
+			Scene::MeshPtr		  mesh  = terrain->createChunkMesh( j, i );
 
-	//		if( !m_chunk.valid() ) {
-	//			m_chunk = chunk;
-	//		}
-
-	//		chunk->attach<Scene::StaticMesh>( mesh );
-	//		chunk->attach<Scene::Transform>( j * Scene::Terrain::kChunkSize, -4, i * Scene::Terrain::kChunkSize, ::Scene::Transform::WPtr() );
-	//	}
-	//}
+			chunk->attach<Scene::StaticMesh>( mesh );
+			chunk->attach<Scene::Transform>( j * Scene::Terrain::kChunkSize, -4, i * Scene::Terrain::kChunkSize, Scene::Transform::WPtr() );
+		}
+	}*/
 
 	// Create the camera.
 	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
@@ -79,8 +74,8 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );
 	m_camera->attach<Scene::RenderWireframe>();
-	m_camera->attach<Scene::RenderForwardLit>();
-	//m_camera->attach<Scene::RenderBoundingVolumes>();
+	//m_camera->attach<Scene::RenderForwardLit>();
+	m_camera->attach<Scene::RenderBoundingVolumes>();
 	m_scene->addSceneObject( m_camera );
 
 	return true;
