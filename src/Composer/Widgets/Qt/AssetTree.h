@@ -33,6 +33,41 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
+	//! Asset selector widget.
+	class QAssetSelector : public QWidget {
+
+		Q_OBJECT
+		Q_PROPERTY( Scene::AssetWPtr value READ value WRITE setValue NOTIFY valueChanged USER true )
+
+	Q_SIGNALS:
+
+		//! Emitted when the selected asset was changed.
+		void				valueChanged( void );
+
+	public:
+
+							//! Constructs QAssetSelector widget.
+							QAssetSelector( u32 mask = ~0, QWidget* parent = NULL );
+
+		//! Returns the selected asset.
+		Scene::AssetWPtr	value( void ) const;
+
+		//! Sets the selected asset.
+		void				setValue( const Scene::AssetWPtr& value );
+
+	private:
+
+		//! Event filter to handle drop events.
+		virtual bool		eventFilter( QObject* target, QEvent* e ) Q_DECL_OVERRIDE;
+
+	private:
+
+		QLineEdit*			m_line;		//!< Asset selector line edit.
+		QToolButton*		m_button;	//!< Asset selector button.
+		u32					m_mask;		//!< Accepted asset types.
+		Scene::AssetWPtr	m_asset;	//!< The selected asset.
+	};
+
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
 	class QAssetTree : public QTreeView {
 
@@ -63,16 +98,29 @@ namespace Ui {
 		//! Handles the context menu requests.
 		virtual void				contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
 
+		//! Resets the selection changed flag.
+		virtual void				mousePressEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
+
+		//! Handles the asset selection.
+		virtual void				mouseReleaseEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
+
+		//! Binds the selected asset to an object inspector.
+		void						bindToInspector( const QModelIndexList& selection );
+
 	private slots:
 
 		//! Handles the doubleClicked signal.
 		void						itemDoubleClicked( const QModelIndex& index );
 
+		//! Handles the selectionChanged signal of QItemSelectionModel.
+		void						selectionChanged( const QItemSelection& selected, const QItemSelection& deselected );
+
 	private:
 
-		IAssetTreeWPtr				m_parent;	//!< Parent AssetTree instance.
-		Project::ProjectWPtr		m_project;	//!< Parent project instance.
-		AssetsModelWPtr				m_model;	//!< File system model used.
+		IAssetTreeWPtr				m_parent;			//!< Parent AssetTree instance.
+		Project::ProjectWPtr		m_project;			//!< Parent project instance.
+		AssetsModelWPtr				m_model;			//!< File system model used.
+		bool						m_selectionChanged;	//!< This flag indicates that selection was changed.
 	};
 
 	//! Asset tree widget.

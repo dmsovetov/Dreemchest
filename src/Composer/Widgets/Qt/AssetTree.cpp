@@ -29,12 +29,97 @@
 #include "Menu.h"
 #include "FileSystem.h"
 #include "Document.h"
+#include "MimeData.h"
+#include "ObjectInspectorPrivate.h"
+#include "../../Models/Qt/PropertyModelPrivate.h"
 #include "../../Models/Qt/AssetsModelPrivate.h"
 #include "../../Project/Project.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
+
+// ------------------------------------------------ QAssetSelector ------------------------------------------------ //
+
+// ** QAssetSelector::QAssetSelector
+QAssetSelector::QAssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
+{
+	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
+
+	m_line = new QLineEdit;
+	m_line->installEventFilter( this );
+	m_line->setReadOnly( true );
+
+	QHBoxLayout* layout = new QHBoxLayout( this );
+	layout->addWidget( m_line );
+	layout->addWidget( new QToolButton );
+	layout->setMargin( 0 );
+	layout->setSpacing( 1 );
+}
+
+// ** QAssetSelector::eventFilter
+bool QAssetSelector::eventFilter( QObject* target, QEvent* e )
+{
+    switch( e->type() ) {
+    case QEvent::DragEnter: {
+								QDragEnterEvent* de = static_cast<QDragEnterEvent*>( e );
+
+								// MIME data does not contain an accepted format.
+								if( !de->mimeData()->hasFormat( Composer::kAssetMime.c_str() ) ) {
+									return true;
+								}
+
+								// Only single assets are accepted
+								if( de->mimeData()->urls().size() > 1 ) {
+									return true;
+								}
+
+								// Decode asset
+								Scene::AssetPtr asset = Composer::instance()->assetFromMime( new MimeData( de->mimeData() ) );
+
+								// Check asset type
+								if( !asset.valid() || (asset->type() & m_mask) == 0 ) {
+									return true;
+								}
+
+								// Accept this action
+								de->acceptProposedAction();
+							}
+							return true;
+
+    case QEvent::Drop:		{
+								QDropEvent* de = static_cast<QDropEvent*>( e );
+
+								// Decode asset
+								Scene::AssetWPtr asset = Composer::instance()->assetFromMime( new MimeData( de->mimeData() ) );
+								
+								// Set the value
+								setValue( asset );
+
+								// Emit the signal
+								emit valueChanged();
+							}
+							return true;
+    }
+
+    return false;
+}
+
+// ** QAssetSelector::assetChanged
+Scene::AssetWPtr QAssetSelector::value( void ) const
+{
+	return m_asset;
+}
+
+// ** QAssetSelector::assetChanged
+void QAssetSelector::setValue( const Scene::AssetWPtr& value )
+{
+	// Save the asset pointer
+	m_asset = value;
+
+	// Update the text field
+	m_line->setText( m_asset.valid() ? QString::fromStdString( m_asset->name() ) : "" );
+}
 
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
@@ -65,7 +150,7 @@ void AssetTree::setModel( AssetsModelWPtr value )
 // ------------------------------------------------ QAssetTree ------------------------------------------------ //
 
 // ** QAssetTree::QAssetTree
-QAssetTree::QAssetTree( Project::ProjectWPtr project ) : m_project( project )
+QAssetTree::QAssetTree( Project::ProjectWPtr project ) : m_project( project ), m_selectionChanged( false )
 {
 	setHeaderHidden( true );
 	setDragEnabled( true );
@@ -77,6 +162,7 @@ QAssetTree::QAssetTree( Project::ProjectWPtr project ) : m_project( project )
 	viewport()->setAcceptDrops( true );
 
 	connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
+	connect( selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(selectionChanged(const QItemSelection&, const QItemSelection&)) );
 }
 
 // ** QAssetTree::setParent
@@ -146,6 +232,79 @@ void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 
 	// Open the asset editor
 	m_project->edit( data["uuid"].asString(), file );
+}
+
+// ** QAssetTree::mousePressEvent
+void QAssetTree::mousePressEvent( QMouseEvent* e )
+{
+	// Reset the flag
+	m_selectionChanged = false;
+
+	// Run the base class method
+	QTreeView::mousePressEvent( e );
+}
+
+// ** QAssetTree::mouseReleaseEvent
+void QAssetTree::mouseReleaseEvent( QMouseEvent* e )
+{
+	QTreeView::mouseReleaseEvent( e );
+
+	// The selection was not changed - skip
+	if( !m_selectionChanged ) {
+		return;
+	}
+
+	// Bind to an object inspector
+	bindToInspector( selectedIndexes() );
+
+	// Reset the flag
+	m_selectionChanged = false;
+}
+
+// ** QAssetTree::selectionChanged
+void QAssetTree::selectionChanged( const QItemSelection& selected, const QItemSelection& deselected )
+{
+	m_selectionChanged = true;
+}
+
+// ** QAssetTree::bindToInspector
+void QAssetTree::bindToInspector( const QModelIndexList& indexes )
+{
+	// More that one item selected - do nothing
+	if( indexes.size() > 1 ) {
+		return;
+	}
+
+	// Get the inspector widget
+	ObjectInspectorWPtr inspector = Composer::instance()->window()->objectInspector();
+
+	// The asset was deselected - hide inspector
+	if( indexes.empty() ) {
+		inspector->setModel( PropertyModelWPtr() );
+		return;
+	}
+
+	// Get the asset file by index
+	FileInfoPtr file = m_model->privateInterface<QAssetsModel>()->assetFile( indexes[0] );
+
+	// No meta data found - skip
+	if( !m_model->hasMetaData( file ) ) {
+		return;
+	}
+
+	// Extract the UUID from file asset
+	String uuid = m_model->uuid( file );
+
+	// Find asset by UUID
+	Scene::AssetWPtr asset = m_project->assets()->findAsset( uuid );
+	DC_BREAK_IF( !asset.valid() );
+	
+	// Bind the selected asset to an object inspector.
+	switch( asset->type() ) {
+	case Scene::Asset::Material:	inspector->setModel( createMaterialModel( castTo<Scene::Material>( asset.get() ) ) );
+									break;
+	default:						inspector->setModel( PropertyModelWPtr() );
+	}
 }
 
 // ** QAssetTree::selection
