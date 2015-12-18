@@ -60,6 +60,9 @@ DC_BEGIN_DREEMCHEST
         //! Returns a maximum bound point.
         const Vec3&     max( void ) const;
 
+		//! Returns the bounding box center point.
+		Vec3			center( void ) const;
+
         //! Returns bounds width.
         float           width( void ) const;
 
@@ -108,6 +111,11 @@ DC_BEGIN_DREEMCHEST
     inline const Vec3& Bounds::max( void ) const {
         return m_max;
     }
+
+	// ** Bounds::center
+	inline Vec3 Bounds::center( void ) const {
+		return (m_max + m_min) * 0.5f;
+	}
 
     // ** Bounds::width
     inline float Bounds::width( void ) const {
