@@ -98,7 +98,7 @@ Zone::Point BoxZone::generateRandomPoint( f32 scalar, const Vec3& center ) const
 	Vec3 min( -hw, -hh, -hd );
 	Vec3 max(  hw,  hh,  hd );
 
-	return Point( center + randomValue( min, max ), Vec3( 0.0f, 1.0f, 0.0f ) );
+	return Point( center + randomValue( min, max ), Vec3( 0.0f, 0.0f, 0.0f ) );
 }
 
 // ------------------------------------------------- HemiSphereZone ------------------------------------------------- //
