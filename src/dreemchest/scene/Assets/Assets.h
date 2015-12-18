@@ -160,6 +160,9 @@ namespace Scene {
 		//! Removes an Asset from bundle by UUID.
 		void					removeAsset( const String& uuid );
 
+		//! Sets asset name.
+		bool					setAssetName( AssetWPtr asset, const String& value );
+
 		//! Returns true if UUID file names should be used.
 		bool					uuidFileNames( void ) const;
 

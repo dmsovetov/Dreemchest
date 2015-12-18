@@ -57,6 +57,13 @@ const String& Asset::name( void ) const
 	return m_name;
 }
 
+// ** Asset::setName
+void Asset::setName( const String& value )
+{
+	m_name = value;
+}
+
+
 // ** Asset::uuid
 const String& Asset::uuid( void ) const
 {
@@ -127,40 +134,6 @@ bool Asset::setKeyValue( const Io::KeyValue& value )
 
 	return m_uuid != "";
 }
-
-// ** Asset::load
-//bool Asset::load( const Renderer::HalPtr& hal )
-//{
-//	if( m_loader == AssetLoaderPtr() ) {
-//		log::verbose( "Asset::load : %s, has no asset loader\n", name().c_str() );
-//		return true;
-//	}
-//
-//	DC_BREAK_IF( !needsLoading() );
-//
-//	m_state = Loading;
-//
-//	Io::DiskFileSystem fileSystem;
-//	Io::StreamPtr      stream = fileSystem.openFile( m_bundle->assetPathByIdentifier( name() != "" ? name() : uuid() ) );
-//
-//	if( stream == Io::StreamPtr() ) {
-//		log::warn( "Asset::load : failed to open file for '%s.%s'\n", m_bundle->name().c_str(), name().c_str() );
-//		m_state = LoadingError;
-//		return false;
-//	}
-//
-//	log::msg( "Loading asset '%s.%s'...\n", m_bundle->name().c_str(), name().c_str() );
-//
-//	if( !m_loader->loadFromStream( m_bundle, this, hal, stream ) ) {
-//		log::warn( "Asset::load : do not know how to load asset '%s' of type %d\n", m_name.c_str(), m_type );
-//		m_state = LoadingError;
-//		return false;
-//	}
-//
-//	m_state = Loaded;
-//
-//	return true;
-//}
 
 // ** Asset::dispose
 void Asset::dispose( void )
@@ -358,11 +331,7 @@ void AssetBundle::addAsset( AssetPtr asset )
 	m_assets[hashUuid] = asset;
 
 	// Register an asset by it's name
-	const String& name = asset->name();
-
-	if( !name.empty() ) {
-		m_assets[StringHash( asset->name().c_str() )] = asset;
-	}
+	setAssetName( asset, asset->name() );
 
 	// Set parent bundle
 	asset->setBundle( this );
@@ -409,6 +378,31 @@ void AssetBundle::removeAsset( const String& uuid )
 	}
 
 	m_assets.erase( i );
+}
+
+// ** AssetBundle::setAssetName
+bool AssetBundle::setAssetName( AssetWPtr asset, const String& value )
+{
+	StringHash oldName( asset->name().c_str() );
+	StringHash newName( value.c_str() );
+
+	// Names should be unique
+	if( m_assets.count( newName ) ) {
+		return false;
+	}
+
+	// Remove previous name
+	m_assets.erase( oldName );
+
+	// If the asset name is not empty - register it.
+	if( value != "" ) {
+		m_assets[newName] = asset;
+	}
+
+	// Set the asset name.
+	asset->setName( value );
+
+	return true;
 }
 
 } // namespace Scene
