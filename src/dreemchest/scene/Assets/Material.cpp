@@ -36,6 +36,9 @@ Material::Material( AssetBundle* bundle, const String& uuid, const String& name 
 	: Asset( bundle, Asset::Material, uuid, name ), m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
 {
 	setFormat( AssetFormatMaterial );
+
+	setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
+	setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
 }
 
 // ** Material::create
