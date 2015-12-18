@@ -26,6 +26,8 @@
 
 #include "Bindings.h"
 
+#include "Components/Transform.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -106,6 +108,20 @@ Vec3 Vec3FromMouse::get( void ) const
 	m_lastPosition = pos;
 
 	return Vec3( -dy, -dx, 0.0f ) * m_scaleFactor;
+}
+
+// ---------------------------------------------- Vec3FromTransform --------------------------------------------- //
+
+// ** Vec3FromTransform::Vec3FromTransform
+Vec3FromTransform::Vec3FromTransform( const TransformWPtr& transform ) : m_transform( transform )
+{
+
+}
+
+// ** Vec3FromTransform::get
+Vec3 Vec3FromTransform::get( void ) const
+{
+	return m_transform->position();
 }
 
 } // namespace Scene

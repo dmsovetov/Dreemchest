@@ -87,6 +87,21 @@ namespace Scene {
 		mutable Vec2			m_lastPosition;	//!< Last cursor position.
 	};
 
+	//! Extracts the position from a transform component.
+	class Vec3FromTransform : public Vec3Binding {
+	public:
+
+								//! Constructs Vec3FromTransform instance.
+								Vec3FromTransform( const TransformWPtr& transform = TransformWPtr() );
+
+		//! Extracts the position from a Transform
+		virtual Vec3			get( void ) const DC_DECL_OVERRIDE;
+
+	private:
+
+		TransformWPtr			m_transform;	//!< Source transform.
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
