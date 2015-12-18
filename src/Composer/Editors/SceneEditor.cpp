@@ -61,16 +61,6 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 		chunk->attach<Scene::Transform>();
 	}
 
-/*	for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
-		for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
-			Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
-			Scene::MeshPtr		  mesh  = terrain->createChunkMesh( j, i );
-
-			chunk->attach<Scene::StaticMesh>( mesh );
-			chunk->attach<Scene::Transform>( j * Scene::Terrain::kChunkSize, -4, i * Scene::Terrain::kChunkSize, Scene::Transform::WPtr() );
-		}
-	}*/
-
 	// Create the camera.
 	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
 	m_camera->setMovementEnabled( false );

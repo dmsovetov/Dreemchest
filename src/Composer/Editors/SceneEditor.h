@@ -69,6 +69,8 @@ namespace Editors {
 		//! Scene editor has entered the background.
 		virtual void					notifyEnterBackground( Ui::IMainWindowWPtr window ) DC_DECL_OVERRIDE;
 
+		//! Handles the scene object double click in scene hierarchy widget.
+		void							handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleClicked& e );
 
 		//! Places the mesh at specified point.
 		Scene::SceneObjectPtr			placeMesh( Scene::MeshPtr mesh, const Vec3& point );
