@@ -114,6 +114,9 @@ DC_BEGIN_COMPOSER
 		//! Returns assets UUID for a specified asset file.
 		String					uuid( const FileInfoWPtr& assetFile ) const;
 
+		//! Returns true if the meta data exists for an asset file.
+		bool					hasMetaData( const FileInfoWPtr& assetFile ) const;
+
 		//! Updates meta data for specified asset file.
 		void					setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data );
 
@@ -215,6 +218,9 @@ DC_BEGIN_COMPOSER
 
 		//! Returns assets UUID for a specified asset file.
 		virtual String						uuid( const FileInfoWPtr& assetFile ) const DC_DECL_OVERRIDE;
+
+		//! Returns true if the meta data exists for an asset file.
+		virtual bool						hasMetaData( const FileInfoWPtr& assetFile ) const DC_DECL_OVERRIDE;
 
 		//! Updates meta data for specified asset file.
 		virtual void						setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data ) DC_DECL_OVERRIDE;

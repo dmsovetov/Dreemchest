@@ -408,6 +408,13 @@ String QAssetFileSystemModel::uuid( const FileInfoWPtr& assetFile ) const
 	return data.get( "uuid", "" ).asString();
 }
 
+// ** QAssetFileSystemModel::hasMetaData
+bool QAssetFileSystemModel::hasMetaData( const FileInfoWPtr& assetFile ) const
+{
+	DC_BREAK_IF( !assetFile.valid() );
+	return QFile::exists( metaFileName( assetFile ) );
+}
+
 // ** QAssetFileSystemModel::assetFile
 FileInfoPtr QAssetFileSystemModel::assetFile( const QModelIndex& index ) const
 {
@@ -540,6 +547,12 @@ void AssetsModelPrivate::setReadOnly( bool value )
 String AssetsModelPrivate::uuid( const FileInfoWPtr& assetFile ) const
 {
 	return m_private->model()->uuid( assetFile );
+}
+
+// ** AssetsModelPrivate::hasMetaData
+bool AssetsModelPrivate::hasMetaData( const FileInfoWPtr& assetFile ) const
+{
+	return m_private->model()->hasMetaData( assetFile );
 }
 
 // ** AssetsModelPrivate::setMetaData
