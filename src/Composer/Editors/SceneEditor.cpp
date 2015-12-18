@@ -48,6 +48,9 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_scene = Scene::Scene::create();
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
+	// Create the scene model
+	m_sceneModel = createSceneModel( m_scene );
+
 	// Create terrain.
 	Scene::TerrainPtr terrain = new Scene::Terrain( m_project->assets().get(), "terrain", "terrain", 128 );
 
@@ -73,6 +76,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->setMovementEnabled( false );
 	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );
+	m_camera->attach<SceneEditorInternal>();
 	m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderForwardLit>();
 	m_camera->attach<Scene::RenderBoundingVolumes>();
@@ -92,6 +96,27 @@ void SceneEditor::render( f32 dt )
 
 	// Reset the cursor movement
 	m_cursorMovement->set( Vec3() );
+}
+
+
+// ** SceneEditor::notifyEnterForeground
+void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
+{
+	// Set this model
+	window->sceneTree()->setModel( m_sceneModel );
+
+	// Subscribe for event
+	window->sceneTree()->subscribe<Ui::ISceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+}
+
+// ** SceneEditor::notifyEnterBackground
+void SceneEditor::notifyEnterBackground( Ui::IMainWindowWPtr window )
+{
+	// Set empty model
+	window->sceneTree()->setModel( SceneModelPtr() );
+
+	// Unsubscribe for event
+	window->sceneTree()->unsubscribe<Ui::ISceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
 }
 
 // ** SceneEditor::handleMousePress

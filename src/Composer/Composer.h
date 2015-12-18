@@ -99,8 +99,14 @@ DC_BEGIN_COMPOSER
 
 	namespace Editors {
 
+		//! This component marks scene objects as internally used by scene editor.
+		class SceneEditorInternal : public Ecs::Component<SceneEditorInternal> {
+		public:
+		};
+
 		dcDeclarePtrs( AssetEditor )
 		dcDeclarePtrs( VisualEditor )
+		dcDeclarePtrs( SceneEditor )
 
 	} // namespace Editors
 

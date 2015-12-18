@@ -324,7 +324,7 @@ void MainWindow::setActiveDocument( IDocumentWPtr document )
 
 	// Notify the active document about moving to background.
 	if( m_activeDocument.valid() ) {
-		m_activeDocument->assetEditor()->notifyEnterBackground();
+		m_activeDocument->assetEditor()->notifyEnterBackground( this );
 	}
 
 	// Set new active document
@@ -336,7 +336,7 @@ void MainWindow::setActiveDocument( IDocumentWPtr document )
 		m_activeDocument->privateInterface<QDocumentDock>()->raise();
 
 		// Notify the asset editor
-		m_activeDocument->assetEditor()->notifyEnterForeground();
+		m_activeDocument->assetEditor()->notifyEnterForeground( this );
 	}
 }
 

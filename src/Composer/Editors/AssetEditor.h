@@ -32,6 +32,9 @@
 
 #include "../Widgets/IDocument.h"
 #include "../Widgets/IRenderingFrame.h"
+#include "../Widgets/IMainWindow.h"
+#include "../Widgets/ISceneTree.h"
+#include "../Models/SceneModel.h"
 
 DC_BEGIN_COMPOSER
 
@@ -42,10 +45,10 @@ namespace Editors {
 	public:
 
 		//! Asset editor has entered the foreground.
-		virtual void			notifyEnterForeground( void ) {}
+		virtual void			notifyEnterForeground( Ui::IMainWindowWPtr window ) {}
 
 		//! Asset editor has entered the background.
-		virtual void			notifyEnterBackground( void ) {}
+		virtual void			notifyEnterBackground( Ui::IMainWindowWPtr window ) {}
 
 		//! Performs asset editor initialization.
 		virtual bool			initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document );

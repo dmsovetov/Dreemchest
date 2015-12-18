@@ -63,6 +63,12 @@ namespace Editors {
 		//! Handles the drop event.
 		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
+		//! Scene editor has entered the foreground.
+		virtual void					notifyEnterForeground( Ui::IMainWindowWPtr window ) DC_DECL_OVERRIDE;
+
+		//! Scene editor has entered the background.
+		virtual void					notifyEnterBackground( Ui::IMainWindowWPtr window ) DC_DECL_OVERRIDE;
+
 
 		//! Places the mesh at specified point.
 		Scene::SceneObjectPtr			placeMesh( Scene::MeshPtr mesh, const Vec3& point );
@@ -73,6 +79,7 @@ namespace Editors {
 	private:
 
 		Scene::ScenePtr					m_scene;			//!< Actual scene.
+		SceneModelPtr					m_sceneModel;		//!< Scene model used by user interface.
 		Scene::RenderingContextPtr		m_renderingContext;	//!< Scene rendering context.
 		Scene::SpectatorCameraPtr		m_camera;			//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
