@@ -88,6 +88,24 @@ void SceneEditor::render( f32 dt )
 	m_cursorMovement->set( Vec3() );
 }
 
+// ** SceneEditor::handleSceneObjectDoubleClicked
+void SceneEditor::handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleClicked& e )
+{
+	// Remove the previous component
+	if( m_camera->has<Scene::MoveTo>() ) {
+		m_camera->detach<Scene::MoveTo>();
+	}
+
+	// Get the  mesh bounding box
+	Bounds bounds = e.sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
+
+	// Calculate new camera position by subtracting
+	// the view direction from scene object position
+	Vec3 position = bounds.center() + m_camera->view() * max3( bounds.width(), bounds.height(), bounds.depth() ) + 1.0f;
+
+	// Attach the moving component
+	m_camera->attach<Scene::MoveTo>( new Scene::Vec3Binding( position ), false, Scene::MoveTo::Smooth, 16.0f );
+}
 
 // ** SceneEditor::notifyEnterForeground
 void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
