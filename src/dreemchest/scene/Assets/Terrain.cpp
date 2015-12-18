@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// --------------------------------------------------------------------- Terrain --------------------------------------------------------------------- //
+
 // ** Terrain::kChunkSize
 s32 Terrain::kChunkSize = 32;
 
@@ -39,37 +41,21 @@ s32 Terrain::kMaxSize = 2048;
 
 // ** Terrain::Terrain
 Terrain::Terrain( AssetBundle* bundle, const String& uuid, const String& name, u32 size )
-	: Asset( bundle, Asset::Terrain, uuid, name ), m_size( size )
+	: Asset( bundle, Asset::Terrain, uuid, name ), m_heightmap( size )
 {
-	DC_BREAK_IF( (size % kChunkSize) != 0 )
-
-	m_heightmap.resize( (size + 1) * (size + 1) );
-	memset( &m_heightmap[0], 0, m_heightmap.size() * sizeof( u16 ) );
+	DC_BREAK_IF( (size % kChunkSize) != 0 );
 }
 
 // ** Terrain::size
 u32 Terrain::size( void ) const
 {
-	return m_size;
+	return m_heightmap.size();
 }
 
 // ** Terrain::chunkCount
 u32 Terrain::chunkCount( void ) const
 {
-	return m_size / kChunkSize;
-}
-
-// ** Terrain::height
-u16 Terrain::height( u32 x, u32 z ) const
-{
-	return m_heightmap[z * (m_size + 1) + x];
-}
-
-// ** Terrain::setHeightmap
-void Terrain::setHeightmap( const Array<u16>& value )
-{
-	DC_BREAK_IF( value.size() != m_heightmap.size() );
-	m_heightmap = value;
+	return m_heightmap.size() / kChunkSize;
 }
 
 // ** Terrain::chunkVertexBuffer
@@ -79,7 +65,7 @@ Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 	DC_BREAK_IF( z >= chunkCount() )
 
 	// UV tiling
-	f32 uvSize = 1.0f / m_size;
+	f32 uvSize = 1.0f / m_heightmap.size();
 
 	// Vertex stride
 	s32 stride = kChunkSize + 1;
@@ -92,7 +78,7 @@ Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 	for( s32 i = 0; i <= kChunkSize; i++ ) {
 		for( s32 j = 0; j <= kChunkSize; j++ ) {
 			Vertex& vertex = vertices[i * stride + j];
-			f32		height = this->height( x * kChunkSize + j, z * kChunkSize + i ) / 65535.0f;
+			f32		height = m_heightmap.height( x * kChunkSize + j, z * kChunkSize + i );
 
 			vertex.position = Vec3( ( f32 )j, ( f32 )height, ( f32 )i );
 			vertex.normal   = Vec3( 0.0f, 1.0f, 0.0f );
@@ -209,6 +195,47 @@ void Terrain::setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertic
 
 	mesh->setVertexBuffer( chunk, vb );
 	mesh->setIndexBuffer( chunk, indices );
+}
+
+// --------------------------------------------------------------------- Heightmap ---------------------------------------------------------------------- //
+
+// ** Heightmap::Heightmap
+Heightmap::Heightmap( u32 size ) : m_size( size )
+{
+	// Allocate the heightmap.
+	m_buffer.resize( (size + 1) * (size + 1) );
+	memset( &m_buffer[0], 0, sizeof( u16 ) * m_buffer.size() );
+}
+
+// ** Heightmap::size
+u32 Heightmap::size( void ) const
+{
+	return m_size;
+}
+
+// ** Heightmap::height
+Heightmap::Type Heightmap::height( u32 x, u32 z ) const
+{
+	DC_BREAK_IF( x > m_size || z > m_size );
+	return m_buffer[z * (m_size + 1) + x];
+}
+
+// ** Heightmap::setHeight
+void Heightmap::setHeight( u32 x, u32 z, Type value )
+{
+	DC_BREAK_IF( x > m_size || z > m_size );
+	m_buffer[z * (m_size + 1) + x] = value;
+}
+
+// ** Heightmap::set
+void Heightmap::set( StrongPtr<Generator> generator )
+{
+	// Generate heightmap
+	for( u32 z = 0; z <= m_size; z++ ) {
+		for( u32 x = 0; x <= m_size; x++ ) {
+			setHeight( x, z, generator->calculate( x, z ) );
+		}
+	}
 }
 
 } // namespace Scene

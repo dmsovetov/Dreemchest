@@ -33,6 +33,75 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+	//! Heightmap wrapping class.
+	class Heightmap {
+	public:
+
+		typedef u16				Type;	//!< Single heightmap pixel type.
+		typedef Array<Type>		Buffer;	//!< Heightmap buffer.
+
+		//! Base class to declare custom heightmap generators.
+		class Generator : public RefCounted {
+		public:
+
+			//! Calculates the height at specified point.
+			virtual Type		calculate( u32 x, u32 z ) = 0;
+		};
+
+								//! Constructs the Heightmap instance.
+								Heightmap( u32 size );
+
+		//! Returns heightmap size.
+		u32						size( void ) const;
+
+		//! Returns height at specified coordinate.
+		Type					height( u32 x, u32 z ) const;
+
+		//! Sets height at specified coordinate.
+		void					setHeight( u32 x, u32 z, Type value );
+
+		//! Constructs the heightmap from a callback.
+		void					set( StrongPtr<Generator> generator );
+
+		//! Fills the heightmap with a constant height value.
+		class ConstantHeight : public Generator {
+		public:
+
+								//! Constructs ConstantHeight instance.
+								ConstantHeight( Type value = 0 )
+									: m_value( value ) {}
+
+			//! Returns the constant terrain height.
+			virtual Type		calculate( u32 x, u32 z ) DC_DECL_OVERRIDE { return m_value; }
+
+		private:
+
+			Type				m_value;	//!< Constant height value.
+		};
+
+		//! Fills the heightmap with a noise.
+		class Noise : public Generator {
+		public:
+
+								//! Constructs Noise instance.
+								Noise( Type min = 0, Type max = ~0 )
+									: m_min( min ), m_max( max ) {}
+
+			//! Returns the random terrain height.
+			virtual Type		calculate( u32 x, u32 z ) DC_DECL_OVERRIDE { return randomValue( m_min, m_max ); }
+
+		private:
+
+			Type				m_min;		//!< Minimum height value.
+			Type				m_max;		//!< Maximum height value.
+		};
+
+	private:
+
+		u32						m_size;		//!< Heightmap size.
+		Buffer					m_buffer;	//!< Actual heightmap buffer.
+	};
+
 	//! Heightmap base terrain.
 	class Terrain : public Asset {
 	friend class AssetBundle;
@@ -50,7 +119,6 @@ namespace Scene {
 
 		typedef Array<Vertex>	VertexBuffer;	//!< Terrain vertex buffer type.
 		typedef Array<u16>		IndexBuffer;	//!< Terrain index buffer type.
-		typedef Array<u16>		Heightmap;		//!< Terrain heightmap type.
 
 								ClassEnableTypeInfoSuper( Terrain, Asset )
 
@@ -62,12 +130,6 @@ namespace Scene {
 
 		//! Returns terrain chunk count.
 		u32						chunkCount( void ) const;
-
-		//! Returns terrain height at specified vertex.
-		u16						height( u32 x, u32 z ) const;
-
-		//! Sets the terrain heightmap.
-		void					setHeightmap( const Heightmap& value );
 
 		//! Returns terrain chunk vertex buffer.
 		VertexBuffer			chunkVertexBuffer( u32 x, u32 z ) const;
@@ -88,7 +150,6 @@ namespace Scene {
 
 	private:
 
-		u32						m_size;			//!< Terrain size.
 		Heightmap				m_heightmap;	//!< Terrain heightmap.
 	};
 
