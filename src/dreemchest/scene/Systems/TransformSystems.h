@@ -93,16 +93,16 @@ namespace Scene {
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
-	//! The following system
-	class FollowSystem : public Ecs::GenericEntitySystem<Follow, Transform> {
+	//! The moving to target system
+	class MoveToSystem : public Ecs::GenericEntitySystem<MoveTo, Transform> {
 	public:
 
 							//! Constructs a FollowSystem instance.
-							FollowSystem( void )
-								: GenericEntitySystem( "Follow" ) {}
+							MoveToSystem( void )
+								: GenericEntitySystem( "MoveToSystem" ) {}
 
 		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Attaches the internal following data to an added scene object.
 		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;

@@ -273,8 +273,8 @@ namespace Scene {
 		f32						m_rotation[TotalCoordinateSystemAxes];	//!< Contains the accumulated rotation values.
 	};
 
-	//! Follows the transform
-	class Follow : public Ecs::Component<Follow> {
+	//! Moves the transform to a target position.
+	class MoveTo : public Ecs::Component<MoveTo> {
 	public:
 
 		//! Available follow types.
@@ -284,15 +284,18 @@ namespace Scene {
 			Elastic,	//!< Calculates the spring force.
 		};
 
-								//! Constructs the Follow instance.
-								Follow( const TransformWPtr& target = TransformWPtr(), Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )
-									: m_target( target ), m_type( type ), m_damping( damping ), m_springForce( springForce ) {}
+								//! Constructs the MoveTo instance.
+								MoveTo( const Vec3BindingPtr& target = Vec3BindingPtr(), bool isContinuous = true, Type type = Immediate, f32 damping = 0.25f, f32 springForce = 0.1f )
+									: m_target( target ), m_isContinuous( isContinuous ), m_type( type ), m_damping( damping ), m_springForce( springForce ) {}
 
-		//! Returns the target transform.
-		const TransformWPtr&	target( void ) const;
+		//! Returns the target position.
+		Vec3					target( void ) const;
 
 		//! Returns the follow type
 		Type					type( void ) const;
+
+		//! Returns true if the move to is continuous.
+		bool					isContinuous( void ) const;
 
 		//! Returns the damping factor.
 		f32						damping( void ) const;
@@ -302,7 +305,8 @@ namespace Scene {
 
 	private:
 
-		TransformWPtr			m_target;		//!< The transform to follow.
+		Vec3BindingPtr			m_target;		//!< The transform to follow.
+		bool					m_isContinuous;	//!< If the move to is no continuous it will be detached once the target is reached.
 		Type					m_type;			//!< The following type.
 		f32						m_damping;		//!< Damping factor.
 		f32						m_springForce;	//!< The spring force.

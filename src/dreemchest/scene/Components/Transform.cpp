@@ -30,28 +30,34 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------- Follow ------------------------------------------- //
+// ------------------------------------------- MoveTo ------------------------------------------- //
 
-// ** Follow::target
-const TransformWPtr& Follow::target( void ) const
+// ** MoveTo::target
+Vec3 MoveTo::target( void ) const
 {
-	return m_target;
+	return m_target->get();
 }
 
-// ** Follow::type
-Follow::Type Follow::type( void ) const
+// ** MoveTo::isContinuous
+bool MoveTo::isContinuous( void ) const
+{
+	return m_isContinuous;
+}
+
+// ** MoveTo::type
+MoveTo::Type MoveTo::type( void ) const
 {
 	return m_type;
 }
 
-// ** Follow::damping
-f32 Follow::damping( void ) const
+// ** MoveTo::damping
+f32 MoveTo::damping( void ) const
 {
 	return m_damping;
 }
 
-// ** Follow::springForce
-f32 Follow::springForce( void ) const
+// ** MoveTo::springForce
+f32 MoveTo::springForce( void ) const
 {
 	return m_springForce;
 }

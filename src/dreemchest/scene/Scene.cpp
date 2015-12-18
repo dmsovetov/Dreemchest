@@ -65,6 +65,7 @@ Scene::Scene( void )
 	addSystem<AffineTransformSystem>();
 	addSystem<ParticlesSystem>();
 	addSystem<MoveAlongAxesSystem>();
+	addSystem<MoveToSystem>();
 	addSystem<RotateAroundAxesSystem>();
 	addSystem<WorldSpaceBoundingBoxSystem>();
 	addSystem<FrustumCullingSystem>( cameras() );

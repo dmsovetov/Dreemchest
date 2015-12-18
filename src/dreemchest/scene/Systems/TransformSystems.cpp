@@ -57,7 +57,12 @@ void AffineTransformSystem::entityAdded( const Ecs::Entity& entity )
 // ** AffineTransformSystem::entityRemoved
 void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 {
-	DC_BREAK
+	// Find the transform
+	Array<Transform*>::iterator i = std::find( m_transforms.begin(), m_transforms.end(), entity.has<Transform>() );
+	DC_BREAK_IF( i == m_transforms.end() );
+
+	// Remove it from an array
+	m_transforms.erase( i );
 }
 
 // -------------------------------------------- WorldSpaceBoundingBoxSystem -------------------------------------------- //
@@ -158,45 +163,55 @@ void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& scen
 	}
 }
 
-// -------------------------------------------------- FollowSystem ----------------------------------------------------- //
+// -------------------------------------------------- MoveToSystem ----------------------------------------------------- //
 
-// ** FollowSystem::process
-void FollowSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Follow& follow, Transform& transform )
+// ** MoveToSystem::process
+void MoveToSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& moveTo, Transform& transform )
 {
-	const TransformWPtr& target = follow.target();
-	DC_BREAK_IF( target == NULL )
+	// Get the move target.
+	Vec3 target = moveTo.target();
 
-	switch( follow.type() ) {
-	case Follow::Immediate:	transform.setPosition( target->position() );
+	// Check if we have reached the target
+	if( !moveTo.isContinuous() ) {
+		f32 distance = (target - transform.position()).length();
+
+		if( distance < 0.1f ) {
+			sceneObject.detach<MoveTo>();
+			return;
+		}
+	}
+
+	switch( moveTo.type() ) {
+	case MoveTo::Immediate:	transform.setPosition( target );
 							break;
 
-	case Follow::Smooth:	{
-								Vec3 dir = target->position() - transform.position();
-								transform.setPosition( transform.position() + dir * follow.damping() * dt );
+	case MoveTo::Smooth:	{
+								Vec3 dir = target - transform.position();
+								transform.setPosition( transform.position() + dir * moveTo.damping() * dt );
 							}
 							break;
 
-	case Follow::Elastic:	{
-								Internal::Ptr internal = follow.internal<Internal>();
+	case MoveTo::Elastic:	{
+								Internal::Ptr internal = moveTo.internal<Internal>();
 
-								Vec3 direction = target->position() - transform.position();
+								Vec3 direction = target - transform.position();
 
-								internal->m_force += direction * follow.springForce();
+								internal->m_force += direction * moveTo.springForce();
 								Vec3 velocity = internal->m_force;
 
 								transform.setPosition( transform.position() + velocity * dt );
 
-								internal->m_force *= 1.0f - (follow.damping() * dt);
+								internal->m_force *= 1.0f - (moveTo.damping() * dt);
 							}
 							break;
 	}
 	
 }
 
-// ** FollowSystem::entityAdded
-void FollowSystem::entityAdded( const Ecs::Entity& entity )
+// ** MoveToSystem::entityAdded
+void MoveToSystem::entityAdded( const Ecs::Entity& entity )
 {
-	entity.get<Follow>()->setInternal<Internal>( DC_NEW Internal );
+	entity.get<MoveTo>()->setInternal<Internal>( DC_NEW Internal );
 }
 
 // ---------------------------------------------- ParticlesSystem -------------------------------------------- //
