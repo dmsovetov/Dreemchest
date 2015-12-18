@@ -71,10 +71,10 @@ Scene::Scene( void )
 	addSystem<FrustumCullingSystem>( cameras() );
 		
 	// Add default render systems.
-	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 	addRenderingSystem<BoundingVolumesRenderer>();
 	addRenderingSystem<ForwardLightingRenderer>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 }
 
 // ** Scene::update
