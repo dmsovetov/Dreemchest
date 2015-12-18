@@ -100,6 +100,9 @@ void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
 {
 	DC_BREAK_IF( !sceneObject.valid() );
 	m_ecs->addEntity( sceneObject );
+
+	// Emit the event
+	notify<SceneObjectAdded>( sceneObject );
 }
 
 // ** Scene::removeSceneObject
@@ -107,6 +110,9 @@ void Scene::removeSceneObject( const SceneObjectPtr& sceneObject )
 {
 	DC_BREAK_IF( !sceneObject.valid() );
 	m_ecs->removeEntity( sceneObject->id() );
+
+	// Emit the event
+	notify<SceneObjectRemoved>( sceneObject );
 }
 
 // ** Scene::findSceneObject

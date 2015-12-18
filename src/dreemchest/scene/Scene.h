@@ -57,6 +57,8 @@
 #include <Fx/Renderers.h>
 #include <Fx/Zones.h>
 
+#include <Event/EventEmitter.h>
+
 #include "PlaneClipper.h"
 
 DC_BEGIN_DREEMCHEST
@@ -183,8 +185,11 @@ namespace Scene {
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;
 
+	//! Container type to store a set of assets.
+	typedef Set<AssetPtr> AssetSet;
+
 	//! The root class for a scene subsystem.
-	class Scene : public RefCounted {
+	class Scene : public event::RefCountedEventEmitter {
 	public:
 
 		//! Performs a scene update.
@@ -241,6 +246,20 @@ namespace Scene {
 
 		//! Creates scene and loads it from JSON string.
 		static ScenePtr					createFromJson( const AssetBundlePtr& assets, const String& json );
+
+		//! This event is emitted when a new scene object was added.
+		struct SceneObjectAdded {
+										SceneObjectAdded( SceneObjectPtr sceneObject )
+											: sceneObject( sceneObject ) {}
+			SceneObjectPtr				sceneObject;	//!< The scene object that was added.
+		};
+
+		//! This event is emitted when the scene object was removed.
+		struct SceneObjectRemoved {
+										SceneObjectRemoved( SceneObjectPtr sceneObject )
+											: sceneObject( sceneObject ) {}
+			SceneObjectPtr				sceneObject;	//!< The scene object that was removed.		
+		};
 
 	private:
 
