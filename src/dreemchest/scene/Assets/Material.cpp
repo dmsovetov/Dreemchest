@@ -98,6 +98,18 @@ void Material::setTexture( Layer layer, const ImageWPtr& value )
 	updateMaterialFeatures();
 }
 
+// ** Material::diffuse
+ImageWPtr Material::diffuse( void ) const
+{
+	return texture( Diffuse );
+}
+
+// ** Material::setDiffuse
+void Material::setDiffuse( ImageWPtr value )
+{
+	setTexture( Diffuse, value );
+}
+
 // ** Material::updateMaterialFeatures
 void Material::updateMaterialFeatures( void )
 {

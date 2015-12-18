@@ -55,10 +55,17 @@ namespace Scene {
 
 		//! Material layers.
         enum Layer {
-            Diffuse,
-            Specular,
-			Tint,
-            TotalMaterialLayers
+              Diffuse				//!< Diffuse color layer.
+            , Specular				//!< Specular color layer.
+			, Normal				//!< Normal map layer.
+			, Heightmap				//!< Heightmap layer.
+			, AmbientOcclusion		//!< Ambient occlusion layer.
+			, Emission				//!< Emission color layer.
+			, DiffuseDetail			//!< Diffuse map detail layer.
+			, NormalDetail			//!< Normal map detail layer.
+			, Tint					//!< Tint color layer.
+
+            , TotalMaterialLayers	//!< The total number of material layers.
         };
 
 									//! Constructs Material instance.
@@ -90,6 +97,12 @@ namespace Scene {
 
 		//! Sets material texture.
 		void						setTexture( Layer layer, const ImageWPtr& value );
+
+		//! Returns the diffuse material texture.
+		ImageWPtr					diffuse( void ) const;
+
+		//! Sets the diffuse material texture.
+		void						setDiffuse( ImageWPtr value );
 
 		//! Creates a new Material instance.
 		static MaterialPtr			create( const String& name );
