@@ -54,6 +54,12 @@ Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
 	Scene::log::setStandardHandler();
 }
 
+// ** Composer::instance
+ComposerWPtr Composer::instance( void )
+{
+	return s_instance;
+}
+
 // ** Composer::create
 ComposerPtr Composer::create( void )
 {
