@@ -30,7 +30,7 @@
 DC_BEGIN_COMPOSER
 
 // ** QMaterialModel::QMaterialModel
-QMaterialModel::QMaterialModel( Scene::MaterialWPtr material, QObject* parent ) : QPropertyModel( parent )
+QMaterialModel::QMaterialModel( Scene::MaterialWPtr material, QObject* parent ) : QPropertyModel( parent ), m_material( material )
 {
 	addEnum<Scene::RenderingMode, QRenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, material.get() ), BindSetter( Scene::Material::setRenderingMode, material.get() ) );
 	addEnum<Scene::Material::Model, QLightingModel>( "Lighting Model", BindGetter( Scene::Material::model, material.get() ), BindSetter( Scene::Material::setModel, material.get() ) );

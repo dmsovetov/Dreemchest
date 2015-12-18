@@ -36,6 +36,13 @@ DC_BEGIN_COMPOSER
 	public:
 
 		QMaterialModel( Scene::MaterialWPtr material, QObject* parent = NULL );
+
+		//! Called each time object property was changed.
+		virtual void		objectChanged( void ) DC_DECL_OVERRIDE { m_material->bundle()->queueForLoading( m_material ); }
+
+	private:
+
+		Scene::MaterialWPtr m_material;
 	};
 
 	//! Material asset model private interface.

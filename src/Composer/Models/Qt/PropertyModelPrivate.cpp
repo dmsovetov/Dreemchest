@@ -83,6 +83,8 @@ bool QPropertyModel::setData( const QModelIndex& index, const QVariant& value, i
 	int idx = index.column();
 	m_properties[idx]->set( idx, value );
 
+	objectChanged();
+
 	return true;
 }
 

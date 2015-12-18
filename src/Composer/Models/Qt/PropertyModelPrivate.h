@@ -190,6 +190,9 @@ DC_BEGIN_COMPOSER
 		//! Returns the model index.
 		virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
 
+		//! Called each time object property was changed.
+		virtual void		objectChanged( void ) {}
+
 	protected:
 
 		Array<PropertyPtr>	m_properties;	//!< Exposed object properties.
