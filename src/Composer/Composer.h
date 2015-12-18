@@ -50,6 +50,12 @@
 
 DC_BEGIN_COMPOSER
 
+	// Declare Qt metatypes
+	Q_DECLARE_METATYPE( Scene::AssetWPtr )
+	Q_DECLARE_METATYPE( Scene::ImageWPtr )
+	Q_DECLARE_METATYPE( Scene::RenderingMode )
+	Q_DECLARE_METATYPE( Scene::Material::Model )
+
 	namespace Ui {
 
 		dcDeclarePtrs( IMainWindow )
@@ -61,6 +67,7 @@ DC_BEGIN_COMPOSER
 		dcDeclarePtrs( IDocument )
 		dcDeclarePtrs( IAssetTree )
 		dcDeclarePtrs( ISceneTree )
+		dcDeclarePtrs( ObjectInspector )
 
 		//! Message status.
 		enum MessageStatus {
@@ -137,8 +144,8 @@ DC_BEGIN_COMPOSER
 	//! Factory method used for scene model creation.
 	extern SceneModelPtr createSceneModel( Scene::SceneWPtr scene );
 
-	//! Factory method used for material inspector creation.
-	extern MaterialInspectorPtr createMaterialInspector( Scene::MaterialWPtr material );
+	//! Factory method used for material model creation.
+	extern PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material );
 
 	//! Container type to store file info.
 	typedef Array<FileInfoPtr> FileInfoArray;
@@ -216,43 +223,49 @@ DC_BEGIN_COMPOSER
 		};
 
 		//! Opens the existing project at path.
-		void				openProject( const String& path );
+		void					openProject( const String& path );
 
 		//! Creates new project at path.
-		void				createProject( const String& path );
+		void					createProject( const String& path );
+
+		//! Returns opened project pointer.
+		Project::ProjectWPtr	project( void ) const;
+
+		//! Returns main window pointer.
+		Ui::IMainWindowWPtr		window( void ) const;
 
 		//! Extracts an asset set from MIME data.
-		Scene::AssetSet		assetsFromMime( IMimeDataWPtr mime ) const;
+		Scene::AssetSet			assetsFromMime( IMimeDataWPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Scene::AssetPtr		assetFromMime( IMimeDataWPtr mime ) const;
+		Scene::AssetPtr			assetFromMime( IMimeDataWPtr mime ) const;
 
 		//! Creates the Composer instance.
-		static ComposerPtr	create( void );
+		static ComposerPtr		create( void );
 
 		//! Returns the Composer instance.
-		static ComposerWPtr	instance( void );
+		static ComposerWPtr		instance( void );
 
 	private:
 
-							//! Constructs Composer instance.
-							Composer( Ui::IMainWindowPtr mainWindow );
+								//! Constructs Composer instance.
+								Composer( Ui::IMainWindowPtr mainWindow );
 
 		//! Creates a new project.
-		void				menuCreateProject( Ui::IActionWPtr action );
+		void					menuCreateProject( Ui::IActionWPtr action );
 
 		//! Opens an existing project.
-		void				menuOpenProject( Ui::IActionWPtr action );
+		void					menuOpenProject( Ui::IActionWPtr action );
 
 		//! Performs the composer initialization.
-		bool				initialize( void );
+		bool					initialize( void );
 
 	private:
 
-		static ComposerWPtr	s_instance;				//!< Shared composer instance.
-		Ui::IMainWindowPtr	m_mainWindow;			//!< Main composer window.
-		Ui::IMenuWPtr		m_menues[TotalMenues];	//!< Default menues.
-		Project::ProjectPtr	m_project;				//!< Active project.
+		static ComposerWPtr		s_instance;				//!< Shared composer instance.
+		Ui::IMainWindowPtr		m_mainWindow;			//!< Main composer window.
+		Ui::IMenuWPtr			m_menues[TotalMenues];	//!< Default menues.
+		Project::ProjectPtr		m_project;				//!< Active project.
 	};
 
 DC_END_COMPOSER

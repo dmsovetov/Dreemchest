@@ -60,6 +60,18 @@ ComposerWPtr Composer::instance( void )
 	return s_instance;
 }
 
+// ** Composer::project
+Project::ProjectWPtr Composer::project( void ) const
+{
+	return m_project;
+}
+
+// ** Composer::window
+Ui::IMainWindowWPtr Composer::window( void ) const
+{
+	return m_mainWindow;
+}
+
 // ** Composer::create
 ComposerPtr Composer::create( void )
 {
