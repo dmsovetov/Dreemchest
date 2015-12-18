@@ -49,6 +49,15 @@ namespace Scene {
 		//! Returns true if camera movement is enabled.
 		bool						isMovementEnabled( void ) const;
 
+		//! Returns the camera view vector.
+		Vec3						view( void ) const;
+
+		//! Returns the camera position.
+		const Vec3&					position( void ) const;
+
+		//! Sets the camera position.
+		void						setPosition( const Vec3& value );
+
 		//! Returns the clear color.
 		const Rgba&					clearColor( void ) const;
 

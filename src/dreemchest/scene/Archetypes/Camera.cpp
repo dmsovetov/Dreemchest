@@ -67,6 +67,24 @@ bool SpectatorCamera::isMovementEnabled( void ) const
 	return isEnabled<MoveAlongAxes>();
 }
 
+// ** SpectatorCamera::view
+Vec3 SpectatorCamera::view( void ) const
+{
+	return get<Transform>()->axisZ();
+}
+
+// ** SpectatorCamera::position
+const Vec3& SpectatorCamera::position( void ) const
+{
+	return get<Transform>()->position();
+}
+
+// ** SpectatorCamera::setPosition
+void SpectatorCamera::setPosition( const Vec3& value )
+{
+	get<Transform>()->setPosition( value );
+}
+
 // ** SpectatorCamera::setClearColor
 void SpectatorCamera::setClearColor( const Rgba& value )
 {
