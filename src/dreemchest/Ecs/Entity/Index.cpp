@@ -72,6 +72,10 @@ void Index::notifyEntityChanged( const EntityPtr& entity )
 	bool contains   = m_entities.count( entity ) != 0;
 	bool intersects = m_aspect.hasIntersection( entity );
 
+	if( entity->flags() & Entity::Removed ) {
+		intersects = false;
+	}
+
 	if( !contains && intersects ) {
 		processEntityAdded( entity );
 	}
