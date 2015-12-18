@@ -130,6 +130,11 @@ bool MaterialLoader::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, co
 #ifdef HAVE_JSON
 	String json;
 	json.resize( stream->length() );
+
+	if( json.empty() ) {
+		return true;
+	}
+
 	stream->read( &json[0], stream->length() );
 
 	Json::Reader reader;

@@ -35,6 +35,7 @@ namespace Scene {
 Material::Material( AssetBundle* bundle, const String& uuid, const String& name )
 	: Asset( bundle, Asset::Material, uuid, name ), m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
 {
+	setFormat( AssetFormatMaterial );
 }
 
 // ** Material::create

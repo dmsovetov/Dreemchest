@@ -114,7 +114,7 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 			const ImageWPtr& image = material->texture( layer );
 
-			if( !image.valid() ) {
+			if( !image.valid() || image->state() != Asset::Loaded ) {
 				continue;
 			}
 
