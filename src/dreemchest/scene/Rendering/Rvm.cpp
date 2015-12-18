@@ -214,7 +214,7 @@ void Rvm::flush( void )
 
 		// Set the texture
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
-			Renderer::Texture* texture = cmd->textures[j];
+			Renderer::Texture* texture = cmd->textures[j] ? m_renderingContext->texture( cmd->textures[j] ).get() : NULL;
 
 			if( texture != activeTextures[j] ) {
 				m_hal->setTexture( j, texture );

@@ -30,6 +30,7 @@
 #include "ShaderCache.h"
 
 #include "../Assets/Mesh.h"
+#include "../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -61,6 +62,13 @@ const RenderingContext::Renderable& RenderingContext::renderable( u32 index ) co
 {
 	DC_BREAK_IF( index == 0 );
 	return m_renderables[index - 1];
+}
+
+// ** RenderingContext::texture
+const Renderer::TexturePtr& RenderingContext::texture( u32 index ) const
+{
+	DC_BREAK_IF( index == 0 );
+	return m_textures[index - 1];
 }
 
 // ** RenderingContext::rvm
@@ -132,6 +140,23 @@ const RenderingAssetId& RenderingContext::uploadRenderable( MeshWPtr mesh, s32 c
 	mesh->setChunkId( chunk, m_renderables.size() );
 
 	return mesh->chunkId( chunk );
+}
+
+// ** RenderingContext::uploadRenderable
+const RenderingAssetId& RenderingContext::uploadTexture( ImageWPtr image )
+{
+	DC_BREAK_IF( !image.valid() );
+
+	Renderer::Texture2DPtr texture = m_hal->createTexture2D( image->width(), image->height(), image->bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+	texture->setData( 0, &image->mipLevel( 0 )[0] );
+
+	// Add texture
+	m_textures.push_back( texture );
+
+	// Set the rendering asset id.
+	image->setId( m_textures.size() );
+
+	return image->id();
 }
 
 } // namespace Scene

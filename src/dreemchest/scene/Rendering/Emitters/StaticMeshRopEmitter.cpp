@@ -118,9 +118,14 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 				continue;
 			}
 
-			DC_NOT_IMPLEMENTED;
-		//	AssetTexturePtr data = image->data();
-		//	rop->textures[j] = data.valid() ? data->texture.get() : NULL;
+			// Get the texture id
+			const RenderingAssetId* id = &image->id();
+		
+			if( !(*id) ) {
+				id = &ctx.uploadTexture( image );
+			}
+
+			rop->textures[j] = *id;
 		}
 		
 	}
