@@ -63,6 +63,11 @@ void Asset::setName( const String& value )
 	m_name = value;
 }
 
+// ** Asset::bundle
+AssetBundleWPtr Asset::bundle( void ) const
+{
+	return m_bundle;
+}
 
 // ** Asset::uuid
 const String& Asset::uuid( void ) const
@@ -98,6 +103,12 @@ void Asset::setTimestamp( u32 value )
 Asset::State Asset::state( void ) const
 {
 	return m_state;
+}
+
+// ** Asset::setState
+void Asset::setState( Asset::State value )
+{
+	m_state = value;
 }
 
 // ** Asset::needsLoading
@@ -236,6 +247,28 @@ AssetPtr AssetBundle::createAssetByType( Asset::Type type ) const
 const String& AssetBundle::name( void ) const
 {
 	return m_name;
+}
+
+// ** AssetBundle::queueForLoading
+void AssetBundle::queueForLoading( AssetWPtr asset )
+{
+	if( asset->state() == Asset::Loaded ) {
+		asset->setState( Asset::Outdated );
+	}
+
+	m_waitingForLoading.insert( asset );
+}
+
+// ** AssetBundle::removeFromLoading
+void AssetBundle::removeFromLoading( AssetWPtr asset )
+{
+	m_waitingForLoading.erase( asset );
+}
+
+// ** AssetBundle::waitingForLoading
+AssetSet AssetBundle::waitingForLoading( void ) const
+{
+	return m_waitingForLoading;
 }
 
 // ** AssetBundle::uuidFileNames

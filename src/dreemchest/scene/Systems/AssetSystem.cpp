@@ -64,6 +64,14 @@ void AssetSystem::entityAdded( const Ecs::Entity& entity )
 // ** AssetSystem::update
 void AssetSystem::update( u32 currentTime, f32 dt )
 {
+	// Put assets from bundle to a queue
+	AssetSet assets = m_assets->waitingForLoading();
+
+	for( AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; ++i ) {
+		queueAsset( *i );
+		m_assets->removeFromLoading( *i );
+	}
+
 	if( m_queue.empty() ) {
 		return;
 	}
@@ -90,6 +98,12 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 
 	// Open the data stream
 	Io::StreamPtr stream = openFileStream( asset );
+
+	if( !stream.valid() ) {
+		DC_BREAK;
+		log::error( "AssetSystem::update : failed to open the file stream for '%s'\n", asset->name().c_str() );
+		return;
+	}
 
 	// Load an asset data
 	loader->loadFromStream( m_assets, asset, stream );

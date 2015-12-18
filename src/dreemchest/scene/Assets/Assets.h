@@ -58,6 +58,7 @@ namespace Scene {
 			Unloaded,		//!< The asset is unloaded.
 			Loading,		//!< The asset is now loading.
 			Loaded,			//!< The asset is loaded.
+			Outdated,		//!< The asset should be reloaded.
 			LoadingError	//! An error was encountered while loading an asset.
 		};
 
@@ -88,11 +89,14 @@ namespace Scene {
 		//! Returns asset state.
 		State					state( void ) const;
 
+		//! Sets asset state.
+		void					setState( Asset::State value );
+
 		//! Returns true if an asset needs to be loaded.
 		bool					needsLoading( void ) const;
 
 		//! Returns the root asset bundle.
-		const AssetBundleWPtr&	bundle( void ) const;
+		AssetBundleWPtr			bundle( void ) const;
 
 		//! Returns asset data as key-value object.
 		virtual Io::KeyValue	keyValue( void ) const;
@@ -163,6 +167,15 @@ namespace Scene {
 		//! Sets asset name.
 		bool					setAssetName( AssetWPtr asset, const String& value );
 
+		//! Queues an asset for loading.
+		void					queueForLoading( AssetWPtr asset );
+
+		//! Removes an asset from loading queue.
+		void					removeFromLoading( AssetWPtr asset );
+
+		//! Returns an assets queued for loading.
+		AssetSet				waitingForLoading( void ) const;
+
 		//! Returns true if UUID file names should be used.
 		bool					uuidFileNames( void ) const;
 
@@ -197,12 +210,13 @@ namespace Scene {
 		//! Container type to map from string to asset type.
 		typedef Map<String, Asset::Type> AssetTypeByName;
 
-		Io::Path				m_path;				//!< Asset bundle physical path.
-		String					m_name;				//!< Asset bundle name.
-		Assets					m_assets;			//!< Identifier to asset mapping.
-		bool					m_uuidFileNames;	//!< Are the UUID file names used.
-		AssetFactory			m_factory;			//!< Asset factory.
-		AssetTypeByName			m_typeByName;		//!< Asset type by name.
+		Io::Path				m_path;					//!< Asset bundle physical path.
+		String					m_name;					//!< Asset bundle name.
+		Assets					m_assets;				//!< Identifier to asset mapping.
+		bool					m_uuidFileNames;		//!< Are the UUID file names used.
+		AssetFactory			m_factory;				//!< Asset factory.
+		AssetTypeByName			m_typeByName;			//!< Asset type by name.
+		AssetSet				m_waitingForLoading;	//!< Assets waiting for loading.
 	};
 
 	// ** AssetBundle::find

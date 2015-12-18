@@ -40,17 +40,6 @@ namespace Scene {
 							//! Constructs the AssetSystem instance.
 							AssetSystem( AssetBundleWPtr assets );
 
-	private:
-
-		//! Checks if an entity contains any components that contain assets and queues them for loading.
-		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
-
-		//! Tracks the asset loading.
-		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
-
-		//! Opens asset data stream.
-		Io::StreamPtr		openFileStream( AssetWPtr asset ) const;
-
 		//! Queues static mesh assets.
 		void				queueStaticMesh( StaticMesh* mesh );
 
@@ -65,6 +54,17 @@ namespace Scene {
 
 		//! Queues an asset for loading.
 		void				queueAsset( AssetWPtr asset );
+
+	private:
+
+		//! Checks if an entity contains any components that contain assets and queues them for loading.
+		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+
+		//! Tracks the asset loading.
+		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+
+		//! Opens asset data stream.
+		Io::StreamPtr		openFileStream( AssetWPtr asset ) const;
 
 	private:
 
