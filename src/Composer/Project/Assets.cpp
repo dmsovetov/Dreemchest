@@ -152,6 +152,9 @@ void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 		return;
 	}
 
+	// Set asset name
+	m_bundle->setAssetName( asset, fileInfo->fileName() );
+
 	// Add asset to bundle
 	qDebug() << "Added" << fileInfo->fileName().c_str();
 	m_bundle->addAsset( asset );
