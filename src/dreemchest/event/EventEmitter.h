@@ -178,6 +178,27 @@ namespace event {
 
 #endif	/*	!DC_CPP11_DISABLED	*/
 
+	//! Base class for ref counted event emitter classes.
+	class RefCountedEventEmitter : public RefCounted {
+	public:
+
+		//! Subscribes for a project event.
+		template<typename TEvent>
+		void						subscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.subscribe<TEvent>( callback ); }
+
+		//! Removes an event listener.
+		template<typename TEvent>
+		void						unsubscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
+
+		//! Constructs and emits a new event instance.
+		template<typename TEvent, typename ... TArgs>
+		void						notify( const TArgs& ... args ) { m_eventEmitter.notify<TEvent, TArgs...>( args... ); }
+
+	protected:
+
+		EventEmitter				m_eventEmitter;	//!< Event emitter instance.
+	};
+
 	namespace detail {
 
 		//! Event interface
