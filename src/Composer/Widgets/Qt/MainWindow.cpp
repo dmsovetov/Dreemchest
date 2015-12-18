@@ -276,21 +276,14 @@ bool MainWindow::closeDocument( IDocumentWPtr document )
 		return false;
 	}
 
+	// Change active document
+	setActiveDocument( (m_documents.size() - 1) ? m_documents[index - 1] : IDocumentWPtr() );
+
 	// Remove the document dock widget
 	m_private->removeDockWidget( document->privateInterface<QDocumentDock>() );
 
-	// Invalidate active document
-	if( m_activeDocument == document ) {
-		m_activeDocument = IDocumentWPtr();
-	}
-
 	// Remove from documents
 	m_documents.remove( index );
-
-	// Show the placeholder if all documents are now closed
-	if( !m_documents.empty() ) {
-		return true;
-	}
 
 	return true;
 }
@@ -324,8 +317,6 @@ DocumentsWeak MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
 // ** MainWindow::setActiveDocument
 void MainWindow::setActiveDocument( IDocumentWPtr document )
 {
-	DC_BREAK_IF( !document.valid() )
-
 	// This document is already set as active
 	if( m_activeDocument == document ) {
 		return;
