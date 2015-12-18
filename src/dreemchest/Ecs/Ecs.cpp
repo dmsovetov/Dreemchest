@@ -146,7 +146,7 @@ EntityPtr Ecs::createEntity( const EntityId& id )
 
 	EntityPtr entity( DC_NEW Entity );
 	entity->setId( id );
-	addEntity( entity );
+	//addEntity( entity );
 
 	return entity;
 }
