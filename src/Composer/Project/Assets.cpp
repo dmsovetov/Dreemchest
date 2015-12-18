@@ -51,6 +51,7 @@ Assets::Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr
 #endif	/*	HAVE_FBX	*/
 
 	m_assetImporters.declare<Importers::ImageImporterTGA>( "tga" );
+	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
 	// Subscribe for assets model event
 	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
