@@ -129,6 +129,7 @@ DC_BEGIN_COMPOSER
 	dcDeclarePtrs( IMimeData )
 	dcDeclarePtrs( AssetsModel )
 	dcDeclarePtrs( SceneModel )
+	dcDeclarePtrs( PropertyModel )
 
 	//! Factory method used for assets model creation.
 	extern AssetsModelPtr createAssetsModel( void );
