@@ -125,32 +125,17 @@ DC_BEGIN_COMPOSER
 	//! Factory method used for assets model creation.
 	extern AssetsModelPtr createAssetsModel( void );
 
+	//! Factory method used for scene model creation.
+	extern SceneModelPtr createSceneModel( Scene::SceneWPtr scene );
+
+	//! Factory method used for material inspector creation.
+	extern MaterialInspectorPtr createMaterialInspector( Scene::MaterialWPtr material );
+
 	//! Container type to store file info.
 	typedef Array<FileInfoPtr> FileInfoArray;
 
-	//! Base class for event emitter classes.
-	class EventEmitter : public RefCounted {
-	public:
-
-		//! Subscribes for a project event.
-		template<typename TEvent>
-		void						subscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.subscribe<TEvent>( callback ); }
-
-		//! Removes an event listener.
-		template<typename TEvent>
-		void						unsubscribe( const typename event::EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
-
-		//! Constructs and emits a new event instance.
-		template<typename TEvent, typename ... TArgs>
-		void						notify( const TArgs& ... args ) { m_eventEmitter.notify<TEvent, TArgs...>( args... ); }
-
-	protected:
-
-		event::EventEmitter			m_eventEmitter;	//!< Event emitter instance.
-	};
-
 	//! Base interface class.
-	class IInterface : public EventEmitter {
+	class IInterface : public event::RefCountedEventEmitter {
 	public:
 
 		virtual						~IInterface( void ) {}
@@ -181,7 +166,7 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Root composer class.
-	class Composer : public EventEmitter {
+	class Composer : public event::RefCountedEventEmitter {
 	public:
 
 		//! Asset MIME type string.
