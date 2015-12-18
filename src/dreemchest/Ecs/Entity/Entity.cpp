@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 // ** Entity::Entity
-Entity::Entity( void ) : m_isRemoved( false )
+Entity::Entity( void ) : m_flags( 0 )
 {
 
 }
@@ -87,7 +87,19 @@ void Entity::queueRemoval( void )
 // ** Entity::markAsRemoved
 void Entity::markAsRemoved( void )
 {
-	m_isRemoved = true;
+	m_flags.on( Removed );
+}
+
+// ** Entity::flags
+u8 Entity::flags( void ) const
+{
+	return m_flags;
+}
+
+// ** Entity::setFlags
+void Entity::setFlags( u8 value )
+{
+	m_flags = value;
 }
 
 // ** Entity::updateComponentBit

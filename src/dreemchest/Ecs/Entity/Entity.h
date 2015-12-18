@@ -44,6 +44,13 @@ namespace Ecs {
 	friend class Ecs;
 	public:
 
+		//! Available entity flags
+		enum Flags {
+			  Disabled	 = BIT( 0 )	//!< Marks this entity as disabled.
+			, Removed	 = BIT( 1 ) //!< Marks this entity as removed.
+			, TotalFlags = 2		//!< Total number of entity flags.
+		};
+
 								ClassEnableTypeInfoSuper( Entity, Io::Serializable )
 
 		//! Container type to store components.
@@ -54,6 +61,12 @@ namespace Ecs {
 
 		//! Returns a component mask.
 		const Bitset&			mask( void ) const;
+
+		//! Returns entity flags.
+		u8						flags( void ) const;
+
+		//! Sets entity flags.
+		void					setFlags( u8 value );
 
 		//! Returns entity components.
 		const Components&		components( void ) const;
@@ -126,14 +139,14 @@ namespace Ecs {
 		EntityId				m_id;			//!< Entity identifier.
 		Components				m_components;	//!< Attached components.
 		Bitset					m_mask;			//!< Component mask.
-		bool					m_isRemoved;	//!< Entity is queued for removal.
+		FlagSet8				m_flags;		//!< Entity flags.
 	};
 
 	// ** Entity::has
 	template<typename TComponent>
 	TComponent* Entity::has( void ) const
 	{
-		DC_BREAK_IF( m_isRemoved );
+	//	DC_BREAK_IF( m_flags.is( Removed ) );
 		Components::const_iterator i = m_components.find( TypeIndex<TComponent>::idx() );
 		return i == m_components.end() ? NULL : static_cast<TComponent*>( i->second.get() );
 	}
@@ -142,7 +155,7 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::get( void ) const
 	{
-		DC_BREAK_IF( m_isRemoved );
+		DC_BREAK_IF( m_flags.is( Removed ) );
 
 		TypeIdx idx = TypeIndex<TComponent>::idx();
 		Components::const_iterator i = m_components.find( idx );
@@ -158,7 +171,7 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::attachComponent( TComponent* component )
 	{
-		DC_BREAK_IF( m_isRemoved );
+		DC_BREAK_IF( m_flags.is( Removed ) );
 		DC_BREAK_IF( has<TComponent>() );
 
 		TypeIdx idx = component->typeIndex();
@@ -213,7 +226,7 @@ namespace Ecs {
 	template<typename TComponent>
 	void Entity::detach( void )
 	{
-		DC_BREAK_IF( m_isRemoved );
+		DC_BREAK_IF( m_flags.is( Removed ) );
 
 		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
 		DC_BREAK_IF( i == m_components.end() );
