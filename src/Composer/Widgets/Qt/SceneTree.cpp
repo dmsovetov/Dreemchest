@@ -59,7 +59,7 @@ QSceneTree::QSceneTree( SceneTree* parent ) : m_parent( parent )
 	setDragEnabled( true );
 	setDropIndicatorShown( true );
 	setDragDropOverwriteMode( true );
-	setDragDropMode( InternalMove );
+	setDragDropMode( DragDrop );
 	viewport()->setAcceptDrops( true );
 
 	connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
