@@ -1,5 +1,5 @@
 [VertexShader]
-#version 140
+#version 120
 
 uniform mat4 u_vp, u_transform;
 varying vec3 v_normal;
@@ -18,7 +18,7 @@ void main()
 }
 
 [FragmentShader]
-#version 140
+#version 120
 
 #ifdef USE_DIFFUSE_MAP
 	uniform sampler2D u_tex0;

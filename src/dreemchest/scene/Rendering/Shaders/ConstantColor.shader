@@ -1,5 +1,5 @@
 [VertexShader]
-#version 140
+#version 120
 
 uniform mat4 u_vp, u_transform;
 
@@ -8,7 +8,7 @@ void main() {
 }
 
 [FragmentShader]
-#version 140
+#version 120
 
 uniform vec4 u_color;
 
