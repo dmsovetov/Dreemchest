@@ -125,9 +125,6 @@ DC_BEGIN_COMPOSER
 
 	protected:
 
-		//! Returns the MIME types list.
-		//virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
-
 		//! Returns the model data by index.
 		virtual QVariant		data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
 

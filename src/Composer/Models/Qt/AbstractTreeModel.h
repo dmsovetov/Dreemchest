@@ -185,6 +185,9 @@ DC_BEGIN_COMPOSER
 			TItemData			m_data;	//! Actual item data.
 		};
 
+		//! Returns index for an item data.
+		QModelIndex				indexFromData( const TItemData& data, const TreeItem* root = NULL );
+
 		//! Creates the tree item instance.
 		virtual TreeItem*		createItem( void ) const Q_DECL_OVERRIDE;
 
@@ -242,6 +245,35 @@ DC_BEGIN_COMPOSER
 	bool QGenericTreeModel<TItemData>::moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const
 	{
 		return moveItem( static_cast<Item*>( sourceParent ), static_cast<Item*>( destinationParent ), static_cast<Item*>( item ), destinationRow );
+	}
+
+	// ** QGenericTreeModel::indexFromData
+	template<typename TItemData>
+	QModelIndex QGenericTreeModel<TItemData>::indexFromData( const TItemData& data, const TreeItem* root )
+	{
+		root = root ? root : this->root();
+
+		for( int i = 0, n = root->childCount(); i < n; i++ ) {
+			// Type-cast the item
+			Item* item = static_cast<Item*>( root->child( i ) );
+
+			// Get asset data from item
+			const TItemData& file = item->data();
+
+			// Compare attached data
+			if( item->data() == data ) {
+				return indexFromItem( item );
+			}
+
+			// Check children
+			QModelIndex nested = indexFromData( data, item );
+
+			if( nested.isValid() ) {
+				return nested;
+			}
+		}
+
+		return QModelIndex();
 	}
 
 DC_END_COMPOSER
