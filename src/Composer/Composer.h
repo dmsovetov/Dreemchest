@@ -220,6 +220,12 @@ DC_BEGIN_COMPOSER
 		//! Creates new project at path.
 		void				createProject( const String& path );
 
+		//! Extracts an asset set from MIME data.
+		Scene::AssetSet		assetsFromMime( IMimeDataWPtr mime ) const;
+
+		//! Extracts a single asset from MIME data.
+		Scene::AssetPtr		assetFromMime( IMimeDataWPtr mime ) const;
+
 		//! Creates the Composer instance.
 		static ComposerPtr	create( void );
 

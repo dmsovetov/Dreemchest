@@ -75,9 +75,6 @@ namespace Editors {
 		//! Places the mesh at specified point.
 		Scene::SceneObjectPtr			placeMesh( Scene::MeshPtr mesh, const Vec3& point );
 
-		//! Extarcts an asset set from MIME data.
-		Scene::AssetSet					assetsFromMime( IMimeDataWPtr mime ) const;
-
 	private:
 
 		Scene::ScenePtr					m_scene;			//!< Actual scene.

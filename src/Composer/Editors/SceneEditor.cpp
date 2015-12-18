@@ -168,7 +168,7 @@ void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
 	// Extract assets from MIME data
-	Scene::AssetSet assets = assetsFromMime( mime );
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
 
 	// Places assets to scene
 	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; ++i ) {
@@ -179,32 +179,6 @@ void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 									break;
 		}
 	}
-}
-
-// ** SceneEditor::assetsFromMime
-Scene::AssetSet SceneEditor::assetsFromMime( IMimeDataWPtr mime ) const
-{
-	// Resulting asset set
-	Scene::AssetSet result;
-
-	// Get an array of attached assets
-	StringArray assets = mime->strings();
-
-	// Add assets to scene
-	for( s32 i = 0, n = ( s32 )assets.size(); i < n; i++ ) {
-		// Read an attached meta data
-		Io::KeyValue meta = m_project->assetsModel()->metaData( assets[i] );
-		DC_BREAK_IF( !meta.isObject() );
-
-		// Find asset by UUID.
-		Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
-		DC_BREAK_IF( !asset.valid() );
-
-		// Add to set.
-		result.insert( asset );
-	}
-
-	return result;
 }
 
 // ** SceneEditor::placeMesh
