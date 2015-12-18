@@ -63,6 +63,13 @@ namespace Editors {
 		//! Handles the drop event.
 		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
+
+		//! Places the mesh at specified point.
+		Scene::SceneObjectPtr			placeMesh( Scene::MeshPtr mesh, const Vec3& point );
+
+		//! Extarcts an asset set from MIME data.
+		Scene::AssetSet					assetsFromMime( IMimeDataWPtr mime ) const;
+
 	private:
 
 		Scene::ScenePtr					m_scene;			//!< Actual scene.

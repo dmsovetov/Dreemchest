@@ -132,6 +132,26 @@ void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 // ** SceneEditor::handleDrop
 void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
+	// Extract assets from MIME data
+	Scene::AssetSet assets = assetsFromMime( mime );
+
+	// Places assets to scene
+	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; ++i ) {
+		Scene::AssetPtr asset = *i;
+
+		switch( asset->type() ) {
+		case Scene::Asset::Mesh:	placeMesh( castTo<Scene::Mesh>( asset.get() ), m_camera->get<Scene::Transform>()->position() );
+									break;
+		}
+	}
+}
+
+// ** SceneEditor::assetsFromMime
+Scene::AssetSet SceneEditor::assetsFromMime( IMimeDataWPtr mime ) const
+{
+	// Resulting asset set
+	Scene::AssetSet result;
+
 	// Get an array of attached assets
 	StringArray assets = mime->strings();
 
@@ -139,28 +159,29 @@ void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 	for( s32 i = 0, n = ( s32 )assets.size(); i < n; i++ ) {
 		// Read an attached meta data
 		Io::KeyValue meta = m_project->assetsModel()->metaData( assets[i] );
-
-		if( meta.isNull() ) {
-			continue;
-		}
+		DC_BREAK_IF( !meta.isObject() );
 
 		// Find asset by UUID.
 		Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
 		DC_BREAK_IF( !asset.valid() );
 
-		switch( asset->type() ) {
-		case Scene::Asset::Mesh:	{
-										Scene::MeshPtr mesh  = castTo<Scene::Mesh>( asset.get() );
-
-										Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
-										sceneObject->attach<Scene::StaticMesh>( mesh );
-										sceneObject->attach<Scene::Transform>( 0, 0, 0 );
-									}
-									break;
-		}
-
-	//	qDebug() << "Will place" << items[i].get( "uuid", "" ).asString().c_str();
+		// Add to set.
+		result.insert( asset );
 	}
+
+	return result;
+}
+
+// ** SceneEditor::placeMesh
+Scene::SceneObjectPtr SceneEditor::placeMesh( Scene::MeshPtr mesh, const Vec3& point )
+{
+	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
+	sceneObject->attach<Scene::Identifier>( mesh->name() );
+	sceneObject->attach<Scene::StaticMesh>( mesh );
+	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
+	m_scene->addSceneObject( sceneObject );
+
+	return sceneObject;
 }
 
 } // namespace Editors
