@@ -24,39 +24,42 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_Widget_H__
-#define __DC_Composer_Qt_Widget_H__
+#ifndef __DC_Composer_Qt_EnumModels_H__
+#define __DC_Composer_Qt_EnumModels_H__
 
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../ISceneTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
+#include "../../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Ui {
-
-	class Document;
-	class RenderingFrame;
-
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
-
-	//! Enumeration combo box.
-	template<typename TModel>
-	class QEnumComboBox : public QComboBox {
+	//! Base class for all enumeration models.
+	class QEnumerationModel : public QStringListModel {
 	public:
 
-						//! Constructs QEnumComboBox instance
-						QEnumComboBox( QWidget* parent = NULL )
-							: QComboBox( parent ) { setModel( new TModel ); }
+		//! Returns the integer value from string.
+		int					fromString( const QString& value ) const { return stringList().indexOf( value ); }
+
+		//! Returns the string from enum value.
+		QString				toString( int value ) const { return stringList().at( value ); }
 	};
 
-} // namespace Ui
+	class QRenderingModeModel : public QEnumerationModel {
+	public:
+
+		QRenderingModeModel( void )
+		{
+			setStringList( QStringList() << "Opaque" << "Cutout" << "Translucent" << "Additive" );
+		}
+	};
+
+	class QLightingModel : public QEnumerationModel {
+	public:
+
+		QLightingModel( void )
+		{
+			setStringList( QStringList() << "Unlit" << "Ambient" << "Phong" );
+		}
+	};
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_Widget_H__	*/
+#endif	/*	!__DC_Composer_Qt_EnumModels_H__	*/
