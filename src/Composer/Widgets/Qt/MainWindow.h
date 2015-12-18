@@ -82,6 +82,9 @@ namespace Ui {
 		//! Returns the scene tree instance.
 		virtual ISceneTreeWPtr			sceneTree( void ) const DC_DECL_OVERRIDE;
 
+		//! Returns the object inspector instance.
+		virtual ObjectInspectorWPtr		objectInspector( void ) const DC_DECL_OVERRIDE;
+
 		//! Sets an active document.
 		virtual void					setActiveDocument( IDocumentWPtr dock ) DC_DECL_OVERRIDE;
 
@@ -112,6 +115,7 @@ namespace Ui {
 		FileSystemPtr					m_fileSystem;				//!< File system interface.
 		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
 		ISceneTreePtr					m_sceneTree;				//!< Scene tree instance.
+		ObjectInspectorPtr				m_objectInspector;			//!< Object inspector instance.
 		Project::ProjectWPtr			m_project;					//!< Opened project.
 	};
 

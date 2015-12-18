@@ -79,6 +79,9 @@ namespace Ui {
 		//! Returns the scene tree instance.
 		virtual ISceneTreeWPtr		sceneTree( void ) const					= 0;
 
+		//! Returns the object inspector instance.
+		virtual ObjectInspectorWPtr	objectInspector( void ) const			= 0;
+
 		//! Sets an active document.
 		virtual void				setActiveDocument( IDocumentWPtr dock ) = 0;
 

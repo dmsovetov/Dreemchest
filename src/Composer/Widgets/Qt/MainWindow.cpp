@@ -32,6 +32,7 @@
 #include "AssetTree.h"
 #include "SceneTree.h"
 #include "Document.h"
+#include "ObjectInspectorPrivate.h"
 
 #include "../../Project/Project.h"
 #include "../../Editors/AssetEditor.h"
@@ -163,6 +164,12 @@ IAssetTreeWPtr MainWindow::assetTree( void ) const
 ISceneTreeWPtr MainWindow::sceneTree( void ) const
 {
 	return m_sceneTree;
+}
+
+// ** MainWindow::objectInspector
+ObjectInspectorWPtr MainWindow::objectInspector( void ) const
+{
+	return m_objectInspector;
 }
 
 // ** MainWindow::addMenu
@@ -378,11 +385,14 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	// Create the scene tree
 	m_sceneTree = new SceneTree;
 
+	// Create the object inspector
+	m_objectInspector = new ObjectInspectorPrivate( m_private.get() );
+
 	// Setup status bar
 	m_private->statusBar()->show();
 
 	// Add dock windows
-	addDock( "Inspector", new QTreeView, Qt::RightDockWidgetArea );
+	addDock( "Inspector", m_objectInspector->privateInterface<QObjectInspector>(), Qt::RightDockWidgetArea );
 	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
 	addDock( "Hierarchy", m_sceneTree->privateInterface<QSceneTree>(), Qt::LeftDockWidgetArea );
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
