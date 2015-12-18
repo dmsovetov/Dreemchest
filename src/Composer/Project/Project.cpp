@@ -73,6 +73,7 @@ Project::Project( Ui::IMainWindowWPtr mainWindow, const Io::Path& path ) : m_mai
 	m_assets->registerExtension( "fbx", Scene::Asset::Mesh );
 	m_assets->registerExtension( "scene", Scene::Asset::Prefab );
 	m_assets->registerExtension( "prefab", Scene::Asset::Prefab );
+	m_assets->registerExtension( "material", Scene::Asset::Material );
 
 	// Setup assets model after creating cache
 	m_assetsModel->setReadOnly( false );
@@ -130,6 +131,7 @@ void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree )
 	Ui::IMenuWPtr create = menu->addMenu( "Create" );
 	create->addAction( "Folder", BindAction( Project::menuCreateFolder ) );
 	create->addAction( "Scene", BindAction( Project::menuCreateScene ) );
+	create->addAction( "Material", BindAction( Project::menuCreateMaterial ) );
 
 	menu->addAction( "Import Assets", BindAction( Project::menuImportAssets ) );
 	menu->addSeparator();
@@ -226,6 +228,12 @@ void Project::menuCreateFolder( Ui::IActionWPtr action )
 void Project::menuCreateScene( Ui::IActionWPtr action )
 {
 	createAsset( "Scene", "scene" );
+}
+
+// ** Project::menuCreateMaterial
+void Project::menuCreateMaterial( Ui::IActionWPtr action )
+{
+	createAsset( "Material", "material" );
 }
 
 // ** Project::menuOpenAsset

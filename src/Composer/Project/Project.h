@@ -92,6 +92,9 @@ namespace Project {
 		//! Creates new scene.
 		void						menuCreateScene( Ui::IActionWPtr action );
 
+		//! Creates new material.
+		void						menuCreateMaterial( Ui::IActionWPtr action );
+
 		//! Opens an asset for editing.
 		void						menuOpenAsset( Ui::IActionWPtr action );
 
