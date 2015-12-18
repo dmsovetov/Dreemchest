@@ -59,6 +59,8 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 		Scene::MeshPtr		  mesh  = terrain->createMesh();
 		chunk->attach<Scene::StaticMesh>( mesh );
 		chunk->attach<Scene::Transform>();
+		chunk->attach<Scene::Identifier>( "Terrain" );
+		m_scene->addSceneObject( chunk );
 	}
 
 	// Create the camera.

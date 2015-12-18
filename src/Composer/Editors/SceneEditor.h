@@ -85,9 +85,6 @@ namespace Editors {
 		Scene::RenderingContextPtr		m_renderingContext;	//!< Scene rendering context.
 		Scene::SpectatorCameraPtr		m_camera;			//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
-
-	//	Scene::AssetBundlePtr			m_assets;			//!< Assets bundle.
-	//	Scene::SceneObjectPtr			m_chunk;			//!< Loaded terrain.
 	};
 
 	//! FrameTarget is used for rendering the scene to rendering frame.
