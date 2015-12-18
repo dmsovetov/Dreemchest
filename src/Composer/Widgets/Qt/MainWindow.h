@@ -79,6 +79,9 @@ namespace Ui {
 		//! Returns the asset tree instance.
 		virtual IAssetTreeWPtr			assetTree( void ) const DC_DECL_OVERRIDE;
 
+		//! Returns the scene tree instance.
+		virtual ISceneTreeWPtr			sceneTree( void ) const DC_DECL_OVERRIDE;
+
 		//! Sets an active document.
 		virtual void					setActiveDocument( IDocumentWPtr dock ) DC_DECL_OVERRIDE;
 
@@ -108,6 +111,7 @@ namespace Ui {
 		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
 		FileSystemPtr					m_fileSystem;				//!< File system interface.
 		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
+		ISceneTreePtr					m_sceneTree;				//!< Scene tree instance.
 		Project::ProjectWPtr			m_project;					//!< Opened project.
 	};
 

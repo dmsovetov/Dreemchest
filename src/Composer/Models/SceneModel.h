@@ -24,29 +24,19 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_Widget_H__
-#define __DC_Composer_Qt_Widget_H__
+#ifndef __DC_Composer_SceneModel_H__
+#define __DC_Composer_SceneModel_H__
 
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../ISceneTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-namespace Ui {
+	//! Scene model interface.
+	class SceneModel : public IInterface {
+	public:
 
-	class Document;
-	class RenderingFrame;
-
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
-
-} // namespace Ui
+	};
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_Widget_H__	*/
+#endif	/*	!__DC_Composer_SceneModel_H__	*/

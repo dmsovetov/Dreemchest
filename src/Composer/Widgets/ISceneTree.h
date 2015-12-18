@@ -24,29 +24,32 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_Widget_H__
-#define __DC_Composer_Qt_Widget_H__
+#ifndef __DC_Composer_ISceneTree_H__
+#define __DC_Composer_ISceneTree_H__
 
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../ISceneTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	class Document;
-	class RenderingFrame;
+	//! Scene hierarchy interface.
+	class ISceneTree : public IInterface {
+	public:
 
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
+		//! This event is emitted when user double clicks the scene object.
+		struct DoubleClicked {
+									DoubleClicked( Scene::SceneObjectWPtr sceneObject )
+										: sceneObject( sceneObject ) {}
+			Scene::SceneObjectWPtr	sceneObject;	//!< Double clicked scene object.
+		};
+
+		//! Sets scene tree model.
+		virtual void				setModel( SceneModelWPtr value ) = 0;
+	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_Widget_H__	*/
+#endif	/*	!__DC_Composer_ISceneTree_H__	*/

@@ -60,6 +60,7 @@ DC_BEGIN_COMPOSER
 		dcDeclarePtrs( IRenderingFrameDelegate )
 		dcDeclarePtrs( IDocument )
 		dcDeclarePtrs( IAssetTree )
+		dcDeclarePtrs( ISceneTree )
 
 		//! Message status.
 		enum MessageStatus {
@@ -121,6 +122,7 @@ DC_BEGIN_COMPOSER
 	dcDeclarePtrs( FileInfo )
 	dcDeclarePtrs( IMimeData )
 	dcDeclarePtrs( AssetsModel )
+	dcDeclarePtrs( SceneModel )
 
 	//! Factory method used for assets model creation.
 	extern AssetsModelPtr createAssetsModel( void );

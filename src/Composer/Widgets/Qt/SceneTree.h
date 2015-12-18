@@ -24,29 +24,62 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_Widget_H__
-#define __DC_Composer_Qt_Widget_H__
+#ifndef __DC_Composer_Qt_SceneTree_H__
+#define __DC_Composer_Qt_SceneTree_H__
 
-#include "../IDocument.h"
-#include "../IMainWindow.h"
-#include "../IAssetTree.h"
-#include "../ISceneTree.h"
-#include "../IMainWindow.h"
-#include "../IMenu.h"
-#include "../IRenderingFrame.h"
+#include "Widget.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	class Document;
-	class RenderingFrame;
+	class SceneTree;
 
-	//! Converts the Qt key index to engine key.
-	extern Platform::Key convertKey( s32 key );
+	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
+	class QSceneTree : public QTreeView {
+
+		Q_OBJECT
+
+	public:
+
+									//! Constructs scene tree instance.
+									QSceneTree( SceneTree* parent );
+
+		//! Sets asset tree model.
+		void						setModel( SceneModelWPtr value );
+
+	protected:
+
+		//! Handles the deletion and renaming items.
+		virtual void				keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
+
+		//! Handles the context menu requests.
+		virtual void				contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
+
+	private slots:
+
+		//! Handles the doubleClicked signal.
+		void						itemDoubleClicked( const QModelIndex& index );
+
+	private:
+
+		SceneModelWPtr				m_model;	//!< File system model used.
+		SceneTree*					m_parent;	//!< Parent scene tree instance.
+	};
+
+	//! Scene tree widget.
+	class SceneTree : public PrivateInterface<ISceneTree, QSceneTree> {
+	public:
+
+									//! Constructs scene tree instance.
+									SceneTree( void );
+
+		//! Sets scene tree model.
+		virtual void				setModel( SceneModelWPtr value ) DC_DECL_OVERRIDE;
+	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_Widget_H__	*/
+#endif	/*	!__DC_Composer_Qt_SceneTree_H__	*/

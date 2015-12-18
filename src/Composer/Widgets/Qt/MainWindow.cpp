@@ -30,6 +30,7 @@
 #include "RenderingFrame.h"
 #include "FileSystem.h"
 #include "AssetTree.h"
+#include "SceneTree.h"
 #include "Document.h"
 
 #include "../../Project/Project.h"
@@ -156,6 +157,12 @@ FileSystemWPtr MainWindow::fileSystem( void ) const
 IAssetTreeWPtr MainWindow::assetTree( void ) const
 {
 	return m_assetTree;
+}
+
+// ** MainWindow::sceneTree
+ISceneTreeWPtr MainWindow::sceneTree( void ) const
+{
+	return m_sceneTree;
 }
 
 // ** MainWindow::addMenu
@@ -377,13 +384,16 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	m_assetTree = new AssetTree( m_project );
 	m_assetTree->setModel( m_project->assetsModel() );
 
+	// Create the scene tree
+	m_sceneTree = new SceneTree;
+
 	// Setup status bar
 	m_private->statusBar()->show();
 
 	// Add dock windows
 	addDock( "Inspector", new QTreeView, Qt::RightDockWidgetArea );
 	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
-	addDock( "Hierarchy", new QTreeView, Qt::LeftDockWidgetArea );
+	addDock( "Hierarchy", m_sceneTree->privateInterface<QSceneTree>(), Qt::LeftDockWidgetArea );
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
 
 	// Update window caption
