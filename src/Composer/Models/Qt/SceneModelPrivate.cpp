@@ -26,6 +26,8 @@
 
 #include "SceneModelPrivate.h"
 
+#include "../../Widgets/Qt/MimeData.h"
+
 DC_BEGIN_COMPOSER
 
 // ** createSceneModel
@@ -111,6 +113,101 @@ bool QSceneModel::setData( const QModelIndex& index, const QVariant& value, int 
 	}
 
 	return true;
+}
+
+// ** QSceneModel::dropMimeData
+bool QSceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
+{
+	// Check if we a trying to drop an asset.
+	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
+		return QGenericTreeModel::dropMimeData( data, action, row, column, parent );
+	}
+
+	// Get the acceptable drop action
+	AssetAction assetAction = acceptableAssetAction( data, action, row, column, parent );
+
+	if( !assetAction ) {
+		return false;
+	}
+
+	// Get the target scene object.
+	Scene::SceneObjectWPtr target = assetAction.sceneObject;
+
+	switch( assetAction.type ) {
+	case AssetAction::PlaceMesh:		break;
+	case AssetAction::AssignMaterial:	{
+											if( !target.valid() ) {
+												return false;
+											}
+
+											// Cast asset to a material
+											Scene::MaterialPtr material = castTo<Scene::Material>( assetAction.assets.begin()->get() );
+											DC_BREAK_IF( !material.valid() );
+
+											// Load material
+											m_scene->system<Scene::AssetSystem>()->queueMaterialAsset( material );
+
+											// Set mesh material
+											target->get<Scene::StaticMesh>()->setMaterial( 0, material );
+										}
+										break;
+	}
+
+	return true;
+}
+
+// ** QSceneModel::canDropMimeData
+bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
+{
+	// Check if we a trying to drop an asset.
+	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
+		return QGenericTreeModel::canDropMimeData( data, action, row, column, parent );
+	}
+
+	// Get the acceptable drop action
+	AssetAction assetAction = acceptableAssetAction( data, action, row, column, parent );
+
+	if( !assetAction ) {
+		return false;
+	}
+
+	return true;
+}
+
+// ** QSceneModel::acceptableDropAction
+QSceneModel::AssetAction QSceneModel::acceptableAssetAction( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
+{
+	// Extract an assets from MIME data
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
+	
+	// No valid asset found - can't drop
+	if( assets.empty() ) {
+		return AssetAction::Invalid;
+	}
+
+	// Get the target model index we are goind to drop an asset
+	QModelIndex index = this->index( row, column, parent );
+	qDebug() << index.isValid() << row << column << parent.isValid();
+
+	// Get the scene object at current index
+	//Scene::SceneObjectWPtr sceneObject = index.isValid() ? dataAt( index ) : Scene::SceneObjectWPtr();
+	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
+
+	// Check if we have droppable assets
+	AssetAction assetAction( AssetAction::Invalid, assets, sceneObject );
+
+	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
+		switch( (*i)->type() ) {
+		case Scene::Asset::Mesh:		assetAction.type = AssetAction::PlaceMesh;
+										break;
+		case Scene::Asset::Material:	if( !sceneObject.valid() || sceneObject->has<Scene::StaticMesh>() ) {
+											assetAction.type = AssetAction::AssignMaterial;
+										}
+										break;
+		}
+	}
+
+	return assetAction;
 }
 
 // ** QSceneModel::handleSceneObjectAdded

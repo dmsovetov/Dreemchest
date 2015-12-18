@@ -46,6 +46,31 @@ DC_BEGIN_COMPOSER
 
 	private:
 
+		//! Available drop action.
+		struct AssetAction {
+			//! Available asset drop action types.
+			enum Type {
+				  Invalid			//!< The drop action is invalid.
+				, PlaceMesh			//!< Mesh asset can be dropped.
+				, AssignMaterial	//!< Material can be assigned.
+			};
+
+									//! Constructs AssetAction instance.
+									AssetAction( Type type, Scene::AssetSet assets, Scene::SceneObjectWPtr sceneObject )
+										: type( type ), sceneObject( sceneObject ), assets( assets ) {}
+
+									//! Constructs AssetAction instance from type.
+									AssetAction( Type type )
+										: type( type ) {}
+
+									//! Returns true if this is a valid action.
+									operator bool( void ) const { return type != Invalid; }
+
+			Type					type;			//!< Drop action type.
+			Scene::SceneObjectWPtr	sceneObject;	//!< Target scene object.
+			Scene::AssetSet			assets;			//!< Asset set that should be used.
+		};
+
 		//! Returns the item flags.
 		virtual Qt::ItemFlags	flags( const QModelIndex& index ) const Q_DECL_OVERRIDE;
 
@@ -58,11 +83,20 @@ DC_BEGIN_COMPOSER
 		//! Changes the scene object parent transform.
 		virtual bool			moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const DC_DECL_OVERRIDE;
 
+		//! Handles the drop operation.
+		virtual bool			dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
+
+		//! Checks if the MIME data can be dropped to an item.
+		virtual bool			canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+
 		//! Handles scene object addition.
 		void					handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e );
 
 		//! Handles scene object removal.
 		void					handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemoved& e );
+
+		//! Returns the acceptable asset drop action.
+		AssetAction				acceptableAssetAction( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const;
 
 	private:
 
