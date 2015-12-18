@@ -75,6 +75,8 @@ DC_BEGIN_DREEMCHEST
         bool                operator != ( T *pointer ) const;
 		bool				operator != ( const WeakPtr<T>& other ) const;
 		bool				operator < ( const WeakPtr<T>& other ) const;
+
+		typedef T Type;
     };
 
     // ** WeakPtr::WeakPtr
