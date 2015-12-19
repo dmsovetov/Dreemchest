@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "SceneEditor.h"
+#include "Gizmo.h"
 #include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
@@ -47,6 +48,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	// Create the scene.
 	m_scene = Scene::Scene::create();
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
+	m_scene->addRenderingSystem<GizmoRenderingSystem>();
 
 	// Create the scene model
 	m_sceneModel = createSceneModel( m_scene );
@@ -72,6 +74,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderForwardLit>();
 	m_camera->attach<Scene::RenderBoundingVolumes>();
+	m_camera->attach<RenderGizmo>();
 	m_scene->addSceneObject( m_camera );
 
 	return true;
