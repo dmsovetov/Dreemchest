@@ -257,6 +257,9 @@ DC_BEGIN_DREEMCHEST
         Rgba            operator * ( const Rgba& other ) const;
         Rgba            operator / ( float scalar ) const;
 
+		//! Returns the color with modulated alpha by a given factor.
+		Rgba			transparent( f32 factor ) const;
+
 		//! Constructs Rgba color instance from bytes.
 		static Rgba		fromBytes( u8 r, u8 g, u8 b, u8 a = 255 );
 
@@ -331,6 +334,11 @@ DC_BEGIN_DREEMCHEST
     inline Rgba Rgba::operator / ( float scalar ) const {
         return Rgba( r / scalar, g / scalar, b / scalar, a / scalar );
     }
+
+	// ** Rgba::transparent
+	inline Rgba Rgba::transparent( f32 factor ) const {
+		return Rgba( r, g, b, a * factor );
+	}
 
 	// ** Rgba::fromBytes
 	inline Rgba Rgba::fromBytes( u8 r, u8 g, u8 b, u8 a ) {
