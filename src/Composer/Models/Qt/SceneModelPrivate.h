@@ -86,8 +86,10 @@ DC_BEGIN_COMPOSER
 		//! Handles the drop operation.
 		virtual bool			dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
 
+	#ifdef DC_QT5_ENABLED
 		//! Checks if the MIME data can be dropped to an item.
 		virtual bool			canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+	#endif	/*	DC_QT5_ENABLED	*/
 
 		//! Handles scene object addition.
 		void					handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e );

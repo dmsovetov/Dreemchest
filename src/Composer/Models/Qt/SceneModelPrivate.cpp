@@ -156,6 +156,8 @@ bool QSceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, in
 	return true;
 }
 
+#ifdef DC_QT5_ENABLED
+
 // ** QSceneModel::canDropMimeData
 bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
 {
@@ -173,6 +175,8 @@ bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action,
 
 	return true;
 }
+
+#endif	/*	DC_QT5_ENABLED	*/
 
 // ** QSceneModel::acceptableDropAction
 QSceneModel::AssetAction QSceneModel::acceptableAssetAction( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
