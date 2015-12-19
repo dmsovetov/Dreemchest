@@ -54,6 +54,9 @@ namespace Editors {
 		//! Handles the mouse move event.
 		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
 
+		//! Handles the mouse wheel event.
+		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
+
 		//! Handles the drag enter event.
 		virtual bool					handleDragEnter( IMimeDataWPtr mime ) DC_DECL_OVERRIDE;
 

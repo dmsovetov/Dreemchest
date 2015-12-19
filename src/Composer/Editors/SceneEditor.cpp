@@ -153,6 +153,12 @@ void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 	m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
 }
 
+// ** SceneEditor::handleMouseWheel
+void SceneEditor::handleMouseWheel( s32 delta )
+{
+	m_camera->setPosition( m_camera->position() - m_camera->view() * delta * 0.01f );
+}
+
 // ** SceneEditor::handleDragEnter
 bool SceneEditor::handleDragEnter( IMimeDataWPtr mime )
 {
