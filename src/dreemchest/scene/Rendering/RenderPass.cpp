@@ -75,11 +75,11 @@ void RenderPassBase::render( RenderingContextPtr context )
 // ** RenderPassBase::end
 void RenderPassBase::end( RenderingContextPtr context )
 {
-	// Flush emitted render operations.
-	context->rvm()->flush();
-
 	// Flush primitive renderer
 	context->renderer()->end();
+
+	// Flush emitted render operations.
+	context->rvm()->flush();
 }
 
 // ** RenderPassBase::setup
