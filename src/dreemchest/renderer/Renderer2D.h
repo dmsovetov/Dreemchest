@@ -66,6 +66,12 @@ namespace Renderer {
 		//! Renders an oriented quad.
 		void                    orientedQuad( const Texture2DPtr& texture, f32 x, f32 y, f32 w, f32 h, const Vec2& up, const Vec2& side, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders a filled quad with four vertices.
+		void					quad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+		//! Renders a wireframe quad with four vertices.
+		void					wireQuad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Renders a single point.
 		void					point( f32 x, f32 y, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
@@ -80,6 +86,9 @@ namespace Renderer {
 
 		//! Renders bounding box in 3D space.
 		void					wireBox( const Bounds& bounds, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+		//! Renders the wireframe cone.
+		void					wireCone( const Vec3& bottom, const Vec3& top, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 		//! Renders a wire sphere in 3D space.
 		void					wireSphere( const Vec3& center, f32 radius, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );

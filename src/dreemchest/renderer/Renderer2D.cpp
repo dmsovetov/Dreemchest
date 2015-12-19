@@ -94,7 +94,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 
 			void main()
 			{
-				gl_FragColor = v_color;
+				gl_FragColor = vec4( v_color.rgb * v_color.a, v_color.a );
 			} ) );
 
 	// Create vertex declarations
@@ -242,6 +242,59 @@ void Renderer2D::line( const Vec3& start, const Vec3& end, const Rgba& color )
 	SET_VERTEX3( vertices[1], end, color );
 
 	emitVertices( PrimLines, Texture2DPtr(), vertices, 2 );
+}
+
+// ** Renderer2D::wireCone
+void Renderer2D::wireCone( const Vec3& bottom, const Vec3& top, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color )
+{
+	Vec3 prev;
+
+	for( s32 i = 0, n = sides; i <= n; i++ ) {
+		f32  angle = radians( i * (360.0f / n) );
+		Vec3 side  = (u * cosf( angle ) + v * sinf( angle )) * radius;
+		Vec3 end   = bottom + side;
+
+		line( top, end, color );
+
+		if( i != 0 ) {
+			line( prev, end, color );
+		}
+
+		prev = end;
+	}
+}
+
+// ** Renderer2D::quad
+void Renderer2D::quad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color )
+{
+    Vertex vertices[4];
+
+    SET_VERTEX3( vertices[0], a, color );
+    SET_VERTEX3( vertices[1], b, color );
+    SET_VERTEX3( vertices[2], c, color );
+    SET_VERTEX3( vertices[3], d, color );
+
+    emitVertices( PrimTriangles, Texture2DPtr(), vertices, 4 );
+}
+
+// ** Renderer2D::wireQuad
+void Renderer2D::wireQuad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color )
+{
+    Vertex vertices[8];
+
+    SET_VERTEX3( vertices[0], a, color );
+    SET_VERTEX3( vertices[1], b, color );
+
+    SET_VERTEX3( vertices[2], b, color );
+    SET_VERTEX3( vertices[3], c, color );
+
+    SET_VERTEX3( vertices[4], c, color );
+    SET_VERTEX3( vertices[5], d, color );
+
+    SET_VERTEX3( vertices[6], d, color );
+    SET_VERTEX3( vertices[7], a, color );
+
+    emitVertices( PrimLines, Texture2DPtr(), vertices, 4 );
 }
 
 // ** Renderer2D::wireBox
