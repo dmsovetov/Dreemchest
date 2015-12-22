@@ -56,8 +56,7 @@ s32 FixedTimeStep::stepCount( void )
 
 	// Calculate the iterations count.
 	s32 count = m_accumulated / m_dt;
-	//m_accumulated = m_accumulated - count * m_dt;
-	m_accumulated = 0;
+	m_accumulated = m_accumulated - count * m_dt;
 
 	return count;
 }
