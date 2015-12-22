@@ -75,6 +75,7 @@ DC_END_DREEMCHEST
     #include "Application.h"
 	#include "Input.h"
 	#include "Arguments.h"
+	#include "Time.h"
 #endif
 
 #endif  /*  !defined( __DC_Platform_Platform_H__ )  */
