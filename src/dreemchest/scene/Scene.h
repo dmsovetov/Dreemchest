@@ -175,6 +175,7 @@ namespace Scene {
 	dcDeclarePtrs( Vec3Binding )
 
 	dcDeclarePtrs( SpectatorCamera )
+	dcDeclarePtrs( Camera2D )
 
 	//! Scene systems mask.
 	enum Systems {
