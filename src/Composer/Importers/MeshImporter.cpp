@@ -49,8 +49,13 @@ bool MeshImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, co
 
 	for( s32 i = 0; i < chunkCount; i++ ) {
 		// Get mesh buffers
-		const MeshNode::VertexBuffer& vertices = m_nodes[i].vertexBuffer();
-		const MeshNode::IndexBuffer&  indices  = m_nodes[i].indexBuffer();
+		const Mesh::VertexBuffer& vertices = m_nodes[i].mesh.vertexBuffer();
+		const Mesh::IndexBuffer&  indices  = m_nodes[i].mesh.indexBuffer();
+
+		// Write texture base name to stream
+		FileInfoPtr fileInfo = fs->extractFileInfo( m_nodes[i].texture );
+		String	    fileName = fileInfo->fileName();
+		stream->writeString( fileName.c_str() );
 
 		// Write buffer size to stream
 		s32 vertexCount = ( s32 )vertices.size();
@@ -247,7 +252,44 @@ void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
     }
 
 	// Push imported node to an array
-	m_nodes.push_back( meshIndexer );
+	Node result;
+	result.mesh = meshIndexer;
+	result.texture = extractDiffuseTexture( node );
+	m_nodes.push_back( result );
+}
+
+// ** MeshImporterFBX::extractDiffuseTexture
+String MeshImporterFBX::extractDiffuseTexture( FbxNode* node ) const
+{
+	// Get total number of materials inside node
+	s32 materialCount = node->GetMaterialCount();
+	DC_BREAK_IF( materialCount != 1 );
+
+	// Resulting texture array
+	StringArray textures;
+
+	for( s32 i = 0; i < materialCount; i++ ) {
+		// Get the surface material by index
+		FbxSurfaceMaterial* material = node->GetMaterial( i );
+		DC_BREAK_IF( material == NULL );
+
+		// Get the diffuse material
+		FbxProperty diffuse = material->FindProperty( FbxSurfaceMaterial::sDiffuse );
+	
+		s32 layersCount = diffuse.GetSrcObjectCount<FbxLayeredTexture>();
+		DC_BREAK_IF( layersCount > 0 );
+
+        s32 textureCount = diffuse.GetSrcObjectCount<FbxTexture>();
+		DC_BREAK_IF( textureCount != 1 );
+
+        for( s32 j = 0; j < textureCount; j++ )
+        {
+            FbxFileTexture* texture = FbxCast<FbxFileTexture>( FbxCast<FbxTexture>( diffuse.GetSrcObject<FbxTexture>(j) ) );
+			textures.push_back( texture->GetFileName() );
+        }
+	}
+
+	return textures[0];
 }
 
 #endif	/*	HAVE_FBX	*/

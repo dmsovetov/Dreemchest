@@ -66,9 +66,16 @@ namespace Importers {
 		};
 
 		//! Alias the mesh indexer type.
-		typedef MeshIndexer<Vertex, VertexCompare> MeshNode;
+		typedef MeshIndexer<Vertex, VertexCompare> Mesh;
 
-		Array<MeshNode>		m_nodes;	//!< Imported mesh nodes.
+		//! Mesh node.
+		struct Node {
+			String			material;	//!< Mesh material name.
+			String			texture;	//!< Mesh texture name.
+			Mesh			mesh;		//!< Actual mesh data.
+		};
+
+		Array<Node>			m_nodes;	//!< Imported mesh nodes.
 	};
 
 #ifdef HAVE_FBX
@@ -93,6 +100,9 @@ namespace Importers {
 
 		//! Imports the mesh from FBX scene node.
 		void				importMesh( FbxNode* node, FbxMesh* mesh );
+
+		//! Extracts the diffuse texture file name from a node.
+		String				extractDiffuseTexture( FbxNode* node ) const;
 
 	private:
 
