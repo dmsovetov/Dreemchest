@@ -159,7 +159,13 @@ bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping&
 	} else {
 		u32 rtt  = connection->time() - packet.timestamp;
 		u32 time = packet.time + rtt / 2;
-		connection->setTime( time );
+
+		if( abs( ( s64 )time - connection->time() ) > 5 ) {
+			log::warn( "Time error: %d ms\n", time - connection->time() );
+			connection->setTime( time );
+		}
+
+		
 		connection->setRoundTripTime( rtt );
 	}
 	
