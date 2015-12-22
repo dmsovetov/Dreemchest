@@ -122,7 +122,7 @@ void Mesh::updateBounds( void )
 
 		// For each vertex
 		for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ ) {
-			m_bounds += vertices[j].position;
+			m_bounds << vertices[j].position;
 		}
 	}
 }
