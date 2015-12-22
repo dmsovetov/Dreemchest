@@ -189,7 +189,7 @@ void Connection::update( u32 dt )
 	}
 
 	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
-		if( (m_time - i->second.m_timestamp) > 60000 ) {
+		if( i->second.m_timeLeft < 0 ) {
 			log::warn( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
 			i = m_pendingRemoteCalls.erase( i );
 		} else {

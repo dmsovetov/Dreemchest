@@ -129,12 +129,12 @@ namespace net {
 		//! A helper struct to store a timestamp of an RPC call.
 		struct PendingRemoteCall {
 			String							m_name;			//!< Remote procedure name.
-			u32								m_timestamp;	//!< The time in milliseconds when a call was performed.
+			s32								m_timeLeft;		//!< The time left to wait for a response to this call.
 			AutoPtr<IRemoteResponseHandler>	m_handler;		//!< Response handler.
 
 											//! Constructs a PendingRemoteCall instance.
-											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL )
-												: m_name( name ), m_handler( handler ), m_timestamp( 0 ) {}
+											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL, s32 timeLeft = 60000 )
+												: m_name( name ), m_handler( handler ), m_timeLeft( timeLeft ) {}
 		};
 
 		//! A container type to store all pending remote calls.
