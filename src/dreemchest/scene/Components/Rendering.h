@@ -300,6 +300,12 @@ namespace Scene {
 		//! Calculates the view projection matrix.
 		Matrix4						calculateViewProjection( const Matrix4& transform ) const;
 
+		//! Converts from screen space to world space.
+		bool						toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const;
+
+		//! Converts from world space to screen space.
+		bool						toScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
+
 	private:
 
 		u8							m_clearMask;	//!< Camera clear flags.

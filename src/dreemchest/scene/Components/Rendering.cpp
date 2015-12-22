@@ -315,6 +315,67 @@ Matrix4 Camera::calculateViewProjection( const Matrix4& transform ) const
 	return calculateProjectionMatrix() * transform.inversed() /*Matrix4::lookAt( Vec3( 5, 5, 5 ), Vec3( 0, 0, 0 ), Vec3( 0, 1, 0 ) )*/;
 }
 
+// ** Camera::toWorldSpace
+bool Camera::toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const
+{
+	// Get the camera viewport rect.
+	Rect viewport = this->viewport();
+
+	// Convert to normalized device coordinates.
+	f32 nx = (screen.x - viewport.left()  ) / viewport.width()  * 2.0f - 1.0f;
+	f32 ny = (screen.y - viewport.bottom()) / viewport.height() * 2.0f - 1.0f;
+	f32 nz =  screen.z * 2.0f - 1.0f;
+
+	// Calculate the inversed view projection matrix.
+	Matrix4 proj = calculateProjectionMatrix();
+	Matrix4 vp   = transform * proj.inversed();
+
+	// Transform the NDC point to a world space
+	Vec4 worldSpace = vp * Vec4( nx, ny, nz );
+
+	if( worldSpace.w == 0.0f ) {
+		return false;
+	}
+
+	worldSpace.w = 1.0f / worldSpace.w;
+
+	// Calculate resulting value
+	world.x = worldSpace.x * worldSpace.w;
+	world.y = worldSpace.y * worldSpace.w;
+	world.z = worldSpace.z * worldSpace.w;
+
+	return true;
+}
+
+// ** Camera::toScreenSpace
+bool Camera::toScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const
+{
+	// Calculate the view projection matrix.
+	Matrix4 vp = calculateViewProjection( transform );
+
+	// Transform the input point.
+	Vec4 projected = vp * Vec4( world.x, world.y, world.z );
+
+	if( projected.w == 0.0f ) {
+		return false;
+	}
+
+	// Perspective divide
+	projected.x /= projected.w;
+	projected.y /= projected.w;
+	projected.z /= projected.w;
+
+	// Get the camera viewport rect
+	Rect viewport = this->viewport();
+
+	// Map from [-1; 1] range to viewport
+	screen.x = viewport.min().x + viewport.width()  * (projected.x * 0.5f + 0.5f);
+	screen.y = viewport.min().y + viewport.height() * (projected.y * 0.5f + 0.5f);
+	screen.z = projected.z * 0.5f + 0.5f;
+
+	return true;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
