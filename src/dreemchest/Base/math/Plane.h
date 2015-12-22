@@ -68,6 +68,12 @@ DC_BEGIN_DREEMCHEST
 		//! Normalizes the plane.
 		void			normalize( void );
 
+		//! Returns plane normal.
+		const Vec3&		normal( void ) const;
+
+		//! Returns plane distance.
+		f32				distance( void ) const;
+
         //! Create plane from point and normal.
         static Plane    calculate( const Vec3& normal, const Vec3& point );
 
@@ -126,6 +132,18 @@ DC_BEGIN_DREEMCHEST
         f32 distanceToPoint = m_normal * point + m_distance;
         return point - m_normal * distanceToPoint;
     }
+
+	// ** Plane::normal
+	inline const Vec3& Plane::normal( void ) const
+	{
+		return m_normal;
+	}
+
+	// ** Plane::distance
+	inline f32 Plane::distance( void ) const
+	{
+		return m_distance;
+	}
 
 DC_END_DREEMCHEST
 

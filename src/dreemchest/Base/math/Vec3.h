@@ -65,6 +65,18 @@ DC_BEGIN_DREEMCHEST
         //! Returns an ordinal axis.
         Vec3        ordinal( void ) const;
 
+		//! Returns the zero vector.
+		static Vec3	zero( void );
+
+		//! Returns the X axis vector.
+		static Vec3 axisX( void );
+
+		//! Returns the Y axis vector.
+		static Vec3 axisY( void );
+
+		//! Returns the Z axis vector.
+		static Vec3 axisZ( void );
+
         //! Rotates around an axis.
         static Vec3 rotateAroundAxis( const Vec3& axis, float theta, const Vec3& point );
 
@@ -263,6 +275,30 @@ DC_BEGIN_DREEMCHEST
 
         return result;
     }
+
+	// ** Vec3::zero
+	inline Vec3	Vec3::zero( void )
+	{
+		return Vec3( 0.0f, 0.0f, 0.0f );
+	}
+
+	// ** Vec3::axisX
+	inline Vec3 Vec3::axisX( void )
+	{
+		return Vec3( 1.0f, 0.0f, 0.0f );
+	}
+
+	// ** Vec3::axisY
+	inline Vec3 Vec3::axisY( void )
+	{
+		return Vec3( 0.0f, 1.0f, 0.0f );
+	}
+
+	// ** Vec3::axisZ
+	inline Vec3 Vec3::axisZ( void )
+	{
+		return Vec3( 0.0f, 0.0f, 1.0f );
+	}
 
     // ** Vec3::randomInSphere
     inline Vec3 Vec3::randomInSphere( const Vec3& center, float radius )

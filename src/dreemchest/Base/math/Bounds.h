@@ -43,13 +43,16 @@ DC_BEGIN_DREEMCHEST
         Bounds( Vec3 min = Vec3( FLT_MAX, FLT_MAX, FLT_MAX ), Vec3 max = Vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX ) );
 
         //! Adds a new point to a bounding box (extends a bounds if needed).
-        const Bounds&   operator += ( const Vec3& point );
+        Bounds&			operator << ( const Vec3& point );
 
         //! Adds two bounding volumes.
         const Bounds&   operator += ( const Bounds& other );
 
 		//! Returns a transformed bounding box.
 		Bounds			operator * ( const Matrix4& transform ) const;
+
+		//! Scales the bounding box by a specified value.
+		Bounds			operator * ( f32 value ) const;
 
         //! Returns a bounds volume.
         float           volume( void ) const;
@@ -63,6 +66,24 @@ DC_BEGIN_DREEMCHEST
 		//! Returns the bounding box center point.
 		Vec3			center( void ) const;
 
+		//! Returns the bounding box left center point.
+		Vec3			leftCenter( void ) const;
+
+		//! Returns the bounding box right center point.
+		Vec3			rightCenter( void ) const;
+
+		//! Returns the bounding box top center point.
+		Vec3			topCenter( void ) const;
+
+		//! Returns the bounding box bottom center point.
+		Vec3			bottomCenter( void ) const;
+
+		//! Returns the bounding box near center point.
+		Vec3			nearCenter( void ) const;
+
+		//! Returns the bounding box far center point.
+		Vec3			farCenter( void ) const;
+
         //! Returns bounds width.
         float           width( void ) const;
 
@@ -74,6 +95,9 @@ DC_BEGIN_DREEMCHEST
 
         //! Returns a random point in bounding box.
         Vec3            randomPointInside( void ) const;
+
+		//! Constructs bounding box from an array of points.
+		static Bounds	fromPoints( const Vec3* points, s32 count );
 
     private:
 
@@ -117,6 +141,42 @@ DC_BEGIN_DREEMCHEST
 		return (m_max + m_min) * 0.5f;
 	}
 
+	// ** Bounds::leftCenter
+	inline Vec3 Bounds::leftCenter( void ) const
+	{
+		return center() - Vec3::axisX() * width() * 0.5f;
+	}
+
+	// ** Bounds::rightCenter
+	inline Vec3 Bounds::rightCenter( void ) const
+	{
+		return center() + Vec3::axisX() * width() * 0.5f;
+	}
+
+	// ** Bounds::topCenter
+	inline Vec3 Bounds::topCenter( void ) const
+	{
+		return center() + Vec3::axisY() * height() * 0.5f;
+	}
+
+	// ** Bounds::bottomCenter
+	inline Vec3 Bounds::bottomCenter( void ) const
+	{
+		return center() - Vec3::axisY() * height() * 0.5f;
+	}
+
+	// ** Bounds::nearCenter
+	inline Vec3 Bounds::nearCenter( void ) const
+	{
+		return center() - Vec3::axisZ() * depth() * 0.5f;
+	}
+
+	// ** Bounds::farCenter
+	inline Vec3 Bounds::farCenter( void ) const
+	{
+		return center() + Vec3::axisZ() * depth() * 0.5f;
+	}
+
     // ** Bounds::width
     inline float Bounds::width( void ) const {
         return fabsf( m_max.x - m_min.x );
@@ -132,8 +192,8 @@ DC_BEGIN_DREEMCHEST
         return fabsf( m_max.z - m_min.z );
     }
 
-    // ** Bounds::operator +=
-    inline const Bounds& Bounds::operator += ( const Vec3& point ) {
+    // ** Bounds::operator <<
+    inline Bounds& Bounds::operator << ( const Vec3& point ) {
         for( int i = 0; i < 3; i++ ) {
             m_min[i] = min2( m_min[i], point[i] );
             m_max[i] = max2( m_max[i], point[i] );
@@ -143,8 +203,8 @@ DC_BEGIN_DREEMCHEST
 
     // ** Bounds::operator +=
     inline const Bounds& Bounds::operator += ( const Bounds& other ) {
-        *this += other.m_min;
-        *this += other.m_max;
+        *this << other.m_min;
+        *this << other.m_max;
         return *this;
     }
 
@@ -170,6 +230,24 @@ DC_BEGIN_DREEMCHEST
 		return result;
     }
 
+    // ** Bounds::operator *
+    inline Bounds Bounds::operator * ( f32 value ) const
+	{
+		return Bounds( m_min * value, m_max * value );
+    }
+
+	// ** Bounds::fromPoints
+	inline Bounds Bounds::fromPoints( const Vec3* points, s32 count )
+	{
+		Bounds result;
+
+		for( s32 i = 0; i < count; i++ ) {
+			result += points[i];
+		}
+
+		return result;
+	}
+
 	//! A 2d bounding rectangle class.
 	class Rect {
 	public:
@@ -185,6 +263,18 @@ DC_BEGIN_DREEMCHEST
 
 		//! Returns the lower right bounding rect corner.
 		const Vec2&		max( void ) const;
+
+		//! Returns the left side of a rectangle.
+		f32				left( void ) const;
+
+		//! Returns the right side of a rectangle.
+		f32				right( void ) const;
+
+		//! Returns the top side of a rectangle.
+		f32				top( void ) const;
+
+		//! Returns the bottom side of a rectangle.
+		f32				bottom( void ) const;
 
 		//! Returns rectangle width.
 		f32				width( void ) const;
@@ -220,6 +310,30 @@ DC_BEGIN_DREEMCHEST
 	inline const Vec2& Rect::max( void ) const
 	{
 		return m_max;
+	}
+
+	// ** Rect::left
+	inline f32 Rect::left( void ) const
+	{
+		return m_min.x;
+	}
+
+	// ** Rect::right
+	inline f32 Rect::right( void ) const
+	{
+		return m_max.x;
+	}
+
+	// ** Rect::top
+	inline f32 Rect::top( void ) const
+	{
+		return m_max.y;
+	}
+
+	// ** Rect::bottom
+	inline f32 Rect::bottom( void ) const
+	{
+		return m_min.y;
 	}
 
 	// ** Rect::min
