@@ -154,10 +154,12 @@ void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 	}
 
 	// Set asset name
-	m_bundle->setAssetName( asset, fileInfo->fileName() );
+	String name = fileInfo->relativePath( m_assetsModel->rootPath() );
+	bool result = m_bundle->setAssetName( asset, name );
+	DC_BREAK_IF( !result );
 
 	// Add asset to bundle
-	qDebug() << "Added" << fileInfo->fileName().c_str();
+	qDebug() << "Added" << asset->name().c_str();
 	m_bundle->addAsset( asset );
 
 	// Put asset to cache
