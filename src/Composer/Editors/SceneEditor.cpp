@@ -48,7 +48,6 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	// Create the scene.
 	m_scene = Scene::Scene::create();
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
-	m_scene->addRenderingSystem<GizmoRenderingSystem>();
 
 	// Create the scene model
 	m_sceneModel = createSceneModel( m_scene );
@@ -63,6 +62,13 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 		chunk->attach<Scene::Transform>();
 		chunk->attach<Scene::Identifier>( "Terrain" );
 		m_scene->addSceneObject( chunk );
+	// Create grid.
+	{
+		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
+		grid->attach<Grid>();
+		grid->attach<Scene::Transform>();
+		grid->attach<SceneEditorInternal>();
+		m_scene->addSceneObject( grid );
 	}
 
 	// Create the camera.
@@ -76,6 +82,10 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->attach<Scene::RenderBoundingVolumes>();
 	m_camera->attach<RenderGizmo>();
 	m_scene->addSceneObject( m_camera );
+
+	// Add gizmo systems
+	m_scene->addSystem<TranslationGizmoSystem>( m_camera );
+	m_scene->addRenderingSystem<SceneHelpersRenderer>();
 
 	return true;
 }
