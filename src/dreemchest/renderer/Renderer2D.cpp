@@ -398,6 +398,21 @@ void Renderer2D::fullscreenQuad( const Texture2DPtr& texture, const Rgba& color 
     emitVertices( PrimTriangles, texture, vertices, 4 );
 }
 
+// ** Renderer2D::pushTransform
+void Renderer2D::pushTransform( const Matrix4& matrix )
+{
+	flush();
+	m_transformStack.push( matrix );
+}
+
+// ** Renderer2D::popTransform
+void Renderer2D::popTransform( void )
+{
+	DC_BREAK_IF( m_transformStack.empty() );
+	flush();
+	m_transformStack.pop();
+}
+
 // ** Renderer2D::flush
 void Renderer2D::flush( void )
 {
@@ -418,11 +433,11 @@ void Renderer2D::flush( void )
 		ShaderPtr shader = m_shaders[ShaderTextured];
 		m_hal->setShader( shader );
 		shader->setInt( shader->findUniformLocation( "u_tex0" ), 0 );
-		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), m_viewProjection );
+		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), m_transformStack.empty() ? m_viewProjection : m_viewProjection * m_transformStack.top() );
 	} else {
 		ShaderPtr shader = m_shaders[ShaderDefault];
 		m_hal->setShader( shader );
-		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), m_viewProjection );
+		shader->setMatrix( shader->findUniformLocation( "u_mvp" ), m_transformStack.empty() ? m_viewProjection : m_viewProjection * m_transformStack.top() );
 	}
 
 	// Set render states

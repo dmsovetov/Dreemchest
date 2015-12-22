@@ -99,6 +99,12 @@ namespace Renderer {
 		//! Renders the accumulated mesh vertices and resets the vertex buffer.
 		void					flush( void );
 
+		//! Pushes the model transform matrix.
+		void					pushTransform( const Matrix4& matrix );
+
+		//! Pops the model transform matrix.
+		void					popTransform( void );
+
 		//! Creates a new instance of Renderer2D.
 		static Renderer2DPtr	create( const HalPtr& hal, u32 maxVertexBufferSize = 1024 );
 
@@ -144,6 +150,7 @@ namespace Renderer {
 
 		HalPtr					m_hal;									//!< Rendering HAL.
 		Matrix4					m_viewProjection;						//!< The view-projection matrix.
+		Stack<Matrix4>			m_transformStack;						//!< Model transform stack.
 		VertexBufferPtr			m_vertexBuffer;							//!< This vertex buffer stores a generated 2D mesh.
 		Vertex*					m_vertices;								//!< Locked vertex buffer.
 		IndexBufferPtr			m_indexBuffers[TotalPrimitiveTypes];	//!< Index buffers for each primitive type.
