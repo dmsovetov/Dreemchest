@@ -40,7 +40,7 @@ DC_BEGIN_DREEMCHEST
          \param min A bounds minimum point.
          \param max A bounds maximum point.
          */
-        Bounds( Vec3 min = Vec3( FLT_MAX, FLT_MAX, FLT_MAX ), Vec3 max = Vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX ) );
+        explicit		Bounds( Vec3 min = Vec3( FLT_MAX, FLT_MAX, FLT_MAX ), Vec3 max = Vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX ) );
 
         //! Adds a new point to a bounding box (extends a bounds if needed).
         Bounds&			operator << ( const Vec3& point );
@@ -224,7 +224,7 @@ DC_BEGIN_DREEMCHEST
 		Bounds result;
 
 		for( s32 i = 0; i < 8; i++ ) {
-			result += transform * vertices[i];
+			result << transform * vertices[i];
 		}
 
 		return result;
@@ -242,7 +242,7 @@ DC_BEGIN_DREEMCHEST
 		Bounds result;
 
 		for( s32 i = 0; i < count; i++ ) {
-			result += points[i];
+			result << points[i];
 		}
 
 		return result;
