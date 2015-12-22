@@ -31,28 +31,165 @@
 
 DC_BEGIN_COMPOSER
 
+	//! Grid component used for grid rendering in visual editors.
+	class Grid : public Ecs::Component<Grid> {
+	public:
+
+		//! Available grid features.
+		enum Features {
+			  Cells		= BIT( 0 )	//!< Cells will be rendered.
+			, Basis		= BIT( 1 )	//!< Basis will be rendered.
+			, Outline	= BIT( 2 )	//!< Outline will be rendered
+			, Axes		= BIT( 3 )	//!< Axes will be rendered.
+		};
+
+							Grid( f32 size = 100.0f, f32 cellSize = 1.0f, u8 features = ~0 )
+								: m_size( size ), m_cellSize( cellSize ), m_features( features ) {}
+
+		//! Returns grid size.
+		f32					size( void ) const;
+
+		//! Returns grid cell size.
+		f32					cellSize( void ) const;
+
+		//! Returns grid features.
+		const FlagSet8&		features( void ) const;
+
+	private:
+
+		f32					m_size;		//!< Grid size.
+		f32					m_cellSize;	//!< Cell size.
+		FlagSet8			m_features;	//!< Grid rendering features.
+	};
+
+	//! Shared transformation gizmo data.
+	struct Gizmo {
+		//! Transformation types.
+		enum Transform {
+			  Nothing			//!< Transform nothing by this gizmo.
+			, X					//!< Transform X axis.
+			, Y					//!< Transform Y axis.
+			, Z					//!< Transform Z axis.
+			, XY				//!< Transform X & Y axes.
+			, YZ				//!< Transform Y & Z axes.
+			, XZ				//!< Transfrom X & Z axes.
+			
+			, TotalTransforms	//!< The total number of gizmo transforms.
+		};
+
+		//! Available gizmo states.
+		enum State {
+			  Idle		//!< Gizmo does not have any highlighted parts & not locked.
+			, Active	//!< Gizmo has a highlighted part.
+			, Locked	//!< Gizmo is now being transformed.
+		};
+
+						//! Constructs Gizmo instance.
+						Gizmo( void )
+							: state( Idle ), transform( Nothing ) {}
+
+		Vec3			offset;		//!< Gizmo offset.
+		State			state;		//!< Current gizmo state.
+		Transform		transform;	//!< Transformation applied by gizmo.
+		Plane			plane;		//!< Plane to use for transformations.
+	};
+
 	//! Translation gizmo component.
 	class TranslationGizmo : public Ecs::Component<TranslationGizmo> {
 	public:
 
-						//! Construct TranslationGizmo instance.
-						TranslationGizmo( f32 orthRadius = 0.05f, f32 scalingFactor = 0.2f );
+							//! Construct TranslationGizmo instance.
+							TranslationGizmo( f32 orthRadius = 0.05f, f32 scalingFactor = 0.2f, f32 selectorScale = 0.35f );
 
 		//! Returns the scaling factor of a gizmo.
-		f32				scalingFactor( void ) const;
+		f32					scalingFactor( void ) const;
 
 		//! Returns the orth radius.
-		f32				orthRadius( void ) const;
+		f32					orthRadius( void ) const;
+
+		//! Returns the selector bounding box.
+		Bounds				selectorBoundingBox( Gizmo::Transform transform ) const;
+
+		//! Returns the active transform.
+		Gizmo::Transform	activeTransform( void ) const;
+
+		//! Sets active transform.
+		void				setActiveTransform( Gizmo::Transform value );
+
+		//! Returns gizmo state.
+		Gizmo::State		state( void ) const;
+
+		//! Locks this gizmo with specified origin point.
+		void				lock( const Plane& plane, const Vec3& origin );
+
+		//! Unlocks this gizmo.
+		void				unlock( void );
+
+		//! Returns grabbed offset from gizmo position to mouse point.
+		const Vec3&			offset( void ) const;
+
+		//! Returns active transformation plane.
+		const Plane&		plane( void ) const;
 
 	private:
 
-		f32				m_scalingFactor;	//!< The gizmo scaling factor.
-		f32				m_orthRadius;		//!< Orth radius.
+		f32					m_scalingFactor;	//!< The gizmo scaling factor.
+		f32					m_selectorScale;	//!< The selector plane size.
+		f32					m_orthRadius;		//!< Orth radius.
+		Gizmo				m_gizmo;			//!< Actual gizmo data.
+	};
+
+	//! Translates the transforms by a translation gizmo.
+	class TranslationGizmoSystem : public Ecs::GenericEntitySystem<TranslationGizmo, Scene::Transform> {
+	public:
+
+									//! Constructs TranslationGizmoSystem instance
+									TranslationGizmoSystem( Scene::SpectatorCameraWPtr camera );
+
+		//! Sets cursor position.
+		void						setCursor( u32 x, u32 y, u8 buttons );
+
+		//! Processes the single translation gizmo.
+		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity, TranslationGizmo& gizmo, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+
+	private:
+
+		//! Returns the selection from a mouse ray.
+		Gizmo::Transform			findTransformByRay( TranslationGizmo& gizmo, f32 scale, const Ray& ray ) const;
+
+		//! Selects the best matching plane from a ray.
+		Plane						findBestPlane( Gizmo::Transform transform, const Vec3& position, const Ray& ray ) const;
+
+	private:
+
+		Vec2						m_cursor;	//!< Last known cursor position.
+		Scene::SpectatorCameraWPtr	m_camera;	//!< Camera instance used for ray casting.
+		FlagSet8					m_buttons;	//!< Mouse buttons state.
 	};
 
 	//! Gizmo rendering component.
 	class RenderGizmo : public Ecs::Component<RenderGizmo> {
 	public:
+	};
+
+	//! Renders the grid.
+	class GridPass : public Scene::RenderPass<Grid> {
+	public:
+
+						//! Constructs GridPass instance.
+						GridPass( Ecs::EcsWPtr ecs )
+							: RenderPass( ecs, "GridPass" ) {}
+
+	protected:
+
+		//! Renders the mesh of a single grid instance.
+		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Grid& grid, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
+
+		//! Renders grid with specified cell size and dimensions.
+		void			renderGrid( Renderer::Renderer2DWPtr renderer, f32 cellSize, f32 size, const Rgba& color ) const;
+
+		//! Renders origin cross.
+		void			renderCross( Renderer::Renderer2DWPtr renderer, f32 size, const Rgba& color ) const;
 	};
 
 	//! Renders active translation gizmos.
@@ -69,8 +206,17 @@ DC_BEGIN_COMPOSER
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TranslationGizmo& gizmo, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
-	//! Scene editor gizmo renderer type.
-	typedef Scene::SinglePassRenderingSystem<RenderGizmo, TranslationGizmoPass> GizmoRenderingSystem;
+	//! Scene editor helpers renderer type.
+	class SceneHelpersRenderer : public Scene::RenderingSystem<RenderGizmo> {
+	public:
+
+								SceneHelpersRenderer( Ecs::EcsWPtr ecs )
+									: RenderingSystem( ecs, "SceneHelpersRenderer" )
+								{
+									addPass<TranslationGizmoPass>();
+									addPass<GridPass>();
+								}
+	};
 
 DC_END_COMPOSER
 
