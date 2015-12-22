@@ -63,6 +63,12 @@ namespace Scene {
 		//! Sets the total number of mesh chunks.
 		void					setChunkCount( s32 value );
 
+		//! Sets chunk texture name.
+		void					setTexture( s32 chunk, const String& value );
+
+		//! Returns chunk texture name.
+		const String&			texture( s32 chunk ) const;
+
 		//! Returns vertex buffer for a specified mesh chunk.
 		const VertexBuffer&		vertexBuffer( s32 chunk ) const;
 
@@ -93,6 +99,7 @@ namespace Scene {
 
 		//! Internal mesh chunk.
 		struct Chunk {
+			String				texture;	//!< Mesh node texture name.
 			VertexBuffer		vertices;	//!< Mesh node vertices.
 			IndexBuffer			indices;	//!< Mesh node indices.
 			RenderingAssetId	id;			//!< Internal rendering id.

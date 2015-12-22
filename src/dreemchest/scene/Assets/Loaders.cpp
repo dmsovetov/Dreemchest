@@ -81,6 +81,10 @@ bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, con
 	m_asset->setChunkCount( chunkCount );
 
 	for( u32 i = 0; i < chunkCount; i++ ) {
+		// Read chunk texture name
+		String texture;
+		stream->readString( texture );
+
 		// Read the total number of vertices & indices
 		u32 vertexCount, indexCount;
 		stream->read( &vertexCount, 4 );
@@ -109,6 +113,9 @@ bool MeshLoaderRAW::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, con
 
 		// Set chunk index buffer
 		m_asset->setIndexBuffer( i, indices );
+
+		// Set chunk texture
+		m_asset->setTexture( i, texture );
 	}
 
 	// Update node bounds

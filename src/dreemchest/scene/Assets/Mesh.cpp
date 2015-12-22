@@ -62,6 +62,20 @@ void Mesh::setChunkId( s32 chunk, const RenderingAssetId& value )
 	m_chunks[chunk].id = value;
 }
 
+// ** Mesh::setTexture
+void Mesh::setTexture( s32 chunk, const String& value )
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	m_chunks[chunk].texture = value;
+}
+
+// ** Mesh::texture
+const String& Mesh::texture( s32 chunk ) const
+{
+	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
+	return m_chunks[chunk].texture;
+}
+
 // ** Mesh::vertexBuffer
 const Mesh::VertexBuffer& Mesh::vertexBuffer( s32 chunk ) const
 {
