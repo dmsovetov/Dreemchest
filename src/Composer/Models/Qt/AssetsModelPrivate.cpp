@@ -529,6 +529,12 @@ AssetsModelPrivate::AssetsModelPrivate( QObject* parent ) : PrivateInterface( ne
 
 }
 
+// ** AssetsModelPrivate::rootPath
+String AssetsModelPrivate::rootPath( void ) const
+{
+	return m_private->model()->rootPath().toStdString();
+}
+
 // ** AssetsModelPrivate::setRootPath
 void AssetsModelPrivate::setRootPath( const String& value )
 {

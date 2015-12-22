@@ -210,6 +210,9 @@ DC_BEGIN_COMPOSER
 											//! Constructs AssetsModelPrivate instance.
 											AssetsModelPrivate( QObject* parent = NULL );
 
+		//! Returns root model path.
+		virtual String						rootPath( void ) const DC_DECL_OVERRIDE;
+
 		//! Sets root model path.
 		virtual void						setRootPath( const String& value ) DC_DECL_OVERRIDE;
 

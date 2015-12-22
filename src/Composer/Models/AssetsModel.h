@@ -77,6 +77,9 @@ DC_BEGIN_COMPOSER
 			s32						leftToScan;	//!< The total number of items left to scan.
 		};
 
+		//! Returns roo model path.
+		virtual String				rootPath( void ) const = 0;
+
 		//! Sets root model path.
 		virtual void				setRootPath( const String& value ) = 0;
 
