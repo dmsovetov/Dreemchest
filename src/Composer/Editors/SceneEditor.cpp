@@ -186,6 +186,9 @@ void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 // ** SceneEditor::handleDrop
 void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
+	// Construct the view ray from cursor position.
+	Ray ray = m_camera->toWorldSpace( x, m_camera->get<Scene::Camera>()->target()->height() - y );
+
 	// Extract assets from MIME data
 	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
 
@@ -194,7 +197,7 @@ void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 		Scene::AssetPtr asset = *i;
 
 		switch( asset->type() ) {
-		case Scene::Asset::Mesh:	placeMesh( castTo<Scene::Mesh>( asset.get() ), m_camera->get<Scene::Transform>()->position() );
+		case Scene::Asset::Mesh:	placeMesh( castTo<Scene::Mesh>( asset.get() ), m_camera->position() + ray.direction() * 5.0f );
 									break;
 		}
 	}
