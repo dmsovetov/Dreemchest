@@ -143,8 +143,12 @@ namespace Scene {
 		const String&			name( void ) const;
 
 		//! Returns an asset of template type T with specified name.
-		template<typename T>
-		StrongPtr<T>			find( const String& name );
+		template<typename TAsset>
+		StrongPtr<TAsset>		find( const String& name );
+
+		//! Returns asset set of specified type.
+		template<typename TAsset>
+		Set<StrongPtr<TAsset>>	findByType( void ) const;
 
 		//! Returns asset by name.
 		AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All ) const;
@@ -232,6 +236,23 @@ namespace Scene {
 		T* casted = castTo<T>( asset.get() );
 
 		return StrongPtr<T>( casted );
+	}
+
+	// ** AssetBundle::find
+	template<typename TAsset>
+	Set<StrongPtr<TAsset>> AssetBundle::findByType( void ) const
+	{
+		Set<StrongPtr<TAsset>> result;
+
+		for( Assets::const_iterator i = m_assets.begin(), end = m_assets.end(); i != end; ++i ) {
+			StrongPtr<TAsset> asset = castTo<TAsset>( i->second.get() );
+
+			if( asset.valid() ) {
+				result.insert( asset );
+			}
+		}
+
+		return result;
 	}
 
 } // namespace Scene
