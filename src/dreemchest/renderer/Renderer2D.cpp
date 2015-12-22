@@ -297,6 +297,35 @@ void Renderer2D::wireQuad( const Vec3& a, const Vec3& b, const Vec3& c, const Ve
     emitVertices( PrimLines, Texture2DPtr(), vertices, 4 );
 }
 
+// ** Renderer2D::box
+void Renderer2D::box( const Bounds& bounds, const Rgba& color )
+{
+	Vec3 x = Vec3( bounds.width(), 0.0f, 0.0f );
+	Vec3 y = Vec3( 0.0f, bounds.height(), 0.0f );
+	Vec3 z = Vec3( 0.0f, 0.0f, bounds.depth() );
+
+	const Vec3& min = bounds.min();
+	const Vec3& max = bounds.max();
+
+	// Render the bottom side
+	quad( min, min + x, min + x + z, min + z, color );
+
+	// Render the top side
+	quad( min + y, min + x + y, min + x + z + y, min + z + y, color );
+
+	// Render the left side
+	quad( min, min + y, min + y + z, min + z, color );
+
+	// Render the right side
+	quad( min + x, min + y + x, min + y + z + x, min + z + x, color );
+
+	// Render near side
+	quad( min, min + y, min + y + x, min + x, color );
+
+	// Render far side
+	quad( min + z, min + y + z, min + y + x + z, min + x + z, color );
+}
+
 // ** Renderer2D::wireBox
 void Renderer2D::wireBox( const Bounds& bounds, const Rgba& color )
 {

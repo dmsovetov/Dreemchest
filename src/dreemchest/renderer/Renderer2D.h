@@ -87,6 +87,9 @@ namespace Renderer {
 		//! Renders bounding box in 3D space.
 		void					wireBox( const Bounds& bounds, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders filled bounding bix in 3D space.
+		void					box( const Bounds& bounds, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Renders the wireframe cone.
 		void					wireCone( const Vec3& bottom, const Vec3& top, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
