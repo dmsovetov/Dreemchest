@@ -167,8 +167,8 @@ DC_BEGIN_COMPOSER
 		FlagSet8					m_buttons;	//!< Mouse buttons state.
 	};
 
-	//! Gizmo rendering component.
-	class RenderGizmo : public Ecs::Component<RenderGizmo> {
+	//! Scene helpers rendering component.
+	class RenderSceneHelpers : public Ecs::Component<RenderSceneHelpers> {
 	public:
 	};
 
@@ -207,7 +207,7 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Scene editor helpers renderer type.
-	class SceneHelpersRenderer : public Scene::RenderingSystem<RenderGizmo> {
+	class SceneHelpersRenderer : public Scene::RenderingSystem<RenderSceneHelpers> {
 	public:
 
 								SceneHelpersRenderer( Ecs::EcsWPtr ecs )

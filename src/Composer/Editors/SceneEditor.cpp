@@ -80,7 +80,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderForwardLit>();
 	m_camera->attach<Scene::RenderBoundingVolumes>();
-	m_camera->attach<RenderGizmo>();
+	m_camera->attach<RenderSceneHelpers>();
 	m_scene->addSceneObject( m_camera );
 
 	// Add gizmo systems
