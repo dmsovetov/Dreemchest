@@ -34,6 +34,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// --------------------------------------------------------------------- SpectatorCamera --------------------------------------------------------------------- //
+
 // ** SpectatorCamera::construct
 void SpectatorCamera::construct( void )
 {
@@ -126,6 +128,52 @@ SpectatorCameraPtr SpectatorCamera::create( const RenderTargetPtr& renderTarget,
 	if( cursor.valid() ) {
 		instance->get<RotateAroundAxes>()->setBinding( cursor );
 	}
+
+	return instance;
+}
+
+// --------------------------------------------------------------------- Camera2D --------------------------------------------------------------------- //
+
+// ** Camera2D::construct
+void Camera2D::construct( void )
+{
+	attach<Camera>( Camera::OrthoCenter );
+	attach<Transform>();
+}
+
+// ** Camera2D::zoom
+f32 Camera2D::zoom( void ) const
+{
+	return 1.0f / get<Transform>()->scaleX();
+}
+
+// ** Camera2D::setZoom
+void Camera2D::setZoom( f32 value )
+{
+	value = 1.0f / value;
+	get<Transform>()->setScale( Vec3( value, value, value ) );
+}
+
+// ** Camera2D::pan
+Vec2 Camera2D::pan( void ) const
+{
+	const Vec3& position = get<Transform>()->position();
+	return Vec2( position.x, position.y );
+}
+
+// ** Camera2D::setPan
+void Camera2D::setPan( const Vec2& value )
+{
+	get<Transform>()->setPosition( Vec3( value.x, value.y, 0.0f ) );
+}
+
+// ** Camera2D::create
+Camera2DPtr Camera2D::create( const RenderTargetPtr& renderTarget )
+{
+	Camera2DPtr instance( DC_NEW Camera2D );
+
+	instance->construct();
+	instance->get<Camera>()->setTarget( renderTarget );
 
 	return instance;
 }

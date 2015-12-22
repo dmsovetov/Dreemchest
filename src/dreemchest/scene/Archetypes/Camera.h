@@ -75,6 +75,31 @@ namespace Scene {
 		//! Constructs the SpectatorCamera instance.
 		virtual void				construct( void ) DC_DECL_OVERRIDE;
 	};
+	
+	//! Orthogonal 2D camera.
+	class Camera2D : public Ecs::Archetype<Camera2D> {
+	public:
+
+		//! Returns current zoom value.
+		f32							zoom( void ) const;
+
+		//! Sets the zoom value.
+		void						setZoom( f32 value );
+
+		//! Returns panning.
+		Vec2						pan( void ) const;
+
+		//! Sets panning.
+		void						setPan( const Vec2& value );
+
+		//! Creates the 2D camera instance.
+		static Camera2DPtr			create( const RenderTargetPtr& renderTarget );
+
+	protected:
+
+		//! Constructs the Camera2D instance.
+		virtual void				construct( void ) DC_DECL_OVERRIDE;
+	};
 
 } // namespace Scene
 
