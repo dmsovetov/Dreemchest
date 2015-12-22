@@ -1,4 +1,4 @@
-set(FBX_LIBNAME "libfbxsdk")
+set(FBX_LIBNAME "libfbxsdk-md")
 set(FBX_ARCH x86)
 
 if (CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")
@@ -21,6 +21,8 @@ find_library(FBX_LIBRARY_DEBUG ${FBX_LIBNAME}
     PATHS ${FBX_SEARCH_PATHS}
     PATH_SUFFIXES "lib/${FBX_LIBDIR}/${FBX_ARCH}/debug")
 
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(FbxSdk DEFAULT_MSG FBX_LIBNAME JSONCPP_INCLUDE_DIR)
 
 if (FBX_INCLUDE_DIR AND FBX_LIBRARY_DEBUG AND FBX_LIBRARY_RELEASE)
 	if(NOT FBX_FOUND)
