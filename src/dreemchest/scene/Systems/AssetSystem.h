@@ -55,6 +55,9 @@ namespace Scene {
 		//! Queues an asset for loading.
 		void				queueAsset( AssetWPtr asset );
 
+		//! Loads an asset.
+		bool				load( AssetWPtr asset ) const;
+
 	private:
 
 		//! Checks if an entity contains any components that contain assets and queues them for loading.

@@ -61,6 +61,51 @@ void AssetSystem::entityAdded( const Ecs::Entity& entity )
 	}
 }
 
+// ** AssetSystem::load
+bool AssetSystem::load( AssetWPtr asset ) const
+{
+	// Asset does not need loading - skip
+	if( !asset->needsLoading() ) {
+		return true;
+	}
+
+	// This asset does not require loading
+	if( asset->format() == AssetFormatGenerated ) {
+		return true;
+	}
+
+	// Switch asset state
+	asset->setState( Asset::Loading );
+
+	// Find an asset load for a specified format
+	AssetLoaderPtr loader = m_loaders.construct( asset->format() );
+
+	if( !loader.valid() ) {
+		DC_BREAK;
+		asset->setState( Asset::LoadingError );
+		log::error( "AssetSystem::load : asset '%s' has invalid asset format\n", asset->name().c_str() );
+		return false;
+	}
+
+	// Open the data stream
+	Io::StreamPtr stream = openFileStream( asset );
+
+	if( !stream.valid() ) {
+		DC_BREAK;
+		asset->setState( Asset::LoadingError );
+		log::error( "AssetSystem::load : failed to open the file stream for '%s'\n", asset->name().c_str() );
+		return false;
+	}
+
+	// Load an asset data
+	bool result = loader->loadFromStream( m_assets, asset, stream );
+
+	// Switch asset state
+	asset->setState( result ? Asset::Loaded : Asset::LoadingError );
+
+	return result;
+}
+
 // ** AssetSystem::update
 void AssetSystem::update( u32 currentTime, f32 dt )
 {
@@ -82,39 +127,10 @@ void AssetSystem::update( u32 currentTime, f32 dt )
 	// Pop it from queue
 	m_queue.pop_front();
 
-	// This asset does not require loading
-	if( asset->format() == AssetFormatGenerated ) {
+	// Load an asset
+	if( !load( asset ) ) {
 		return;
 	}
-
-	// Switch asset state
-	asset->setState( Asset::Loading );
-
-	// Find an asset load for a specified format
-	AssetLoaderPtr loader = m_loaders.construct( asset->format() );
-
-	if( !loader.valid() ) {
-		DC_BREAK;
-		asset->setState( Asset::LoadingError );
-		log::error( "AssetSystem::update : asset '%s' has invalid asset format\n", asset->name().c_str() );
-		return;
-	}
-
-	// Open the data stream
-	Io::StreamPtr stream = openFileStream( asset );
-
-	if( !stream.valid() ) {
-		DC_BREAK;
-		asset->setState( Asset::LoadingError );
-		log::error( "AssetSystem::update : failed to open the file stream for '%s'\n", asset->name().c_str() );
-		return;
-	}
-
-	// Load an asset data
-	bool result = loader->loadFromStream( m_assets, asset, stream );
-
-	// Switch asset state
-	asset->setState( result ? Asset::Loaded : Asset::LoadingError );
 
 	//! WORKAROUND: queue material textures for loading.
 	if( Material* material = castTo<Material>( asset.get() ) ) {
