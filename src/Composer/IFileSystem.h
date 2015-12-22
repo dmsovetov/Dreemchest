@@ -52,6 +52,9 @@ DC_BEGIN_COMPOSER
 		//! Returns absolute file path.
 		virtual String			absolutePath( void ) const = 0;
 
+		//! Returns relative file name to a specified path.
+		virtual String			relativePath( const String& path ) const = 0;
+
 		//! Returns true if this is a directory.
 		virtual bool			isDir( void ) const = 0;
 	};

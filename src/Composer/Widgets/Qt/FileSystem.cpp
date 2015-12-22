@@ -68,6 +68,13 @@ String FileInfoPrivate::absolutePath( void ) const
 	return m_fileInfo.absoluteFilePath().toStdString();
 }
 
+// ** FileInfoPrivate::relativePath
+String FileInfoPrivate::relativePath( const String& path ) const
+{
+	QDir root( QString::fromStdString( path ) );
+	return root.relativeFilePath( m_fileInfo.absoluteFilePath() ).toStdString();
+}
+
 // ** FileInfoPrivate::isDir
 bool FileInfoPrivate::isDir( void ) const
 {

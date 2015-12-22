@@ -55,6 +55,9 @@ namespace Ui {
 		//! Returns absolute file path.
 		virtual String			absolutePath( void ) const DC_DECL_OVERRIDE;
 
+		//! Returns relative file name to a specified path.
+		virtual String			relativePath( const String& path ) const DC_DECL_OVERRIDE;
+
 		//! Returns true if this is a directory.
 		virtual bool			isDir( void ) const DC_DECL_OVERRIDE;
 
