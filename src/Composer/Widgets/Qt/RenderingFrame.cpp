@@ -227,11 +227,6 @@ void QRenderingFrame::contextMenuEvent( QContextMenuEvent* e )
 // ** QRenderingFrame::mouseMoveEvent
 void QRenderingFrame::mouseMoveEvent( QMouseEvent* e )
 {
-	// No mouse button pressed - return
-	if( !m_isMouseButtons ) {
-		return;
-	}
-
 	IRenderingFrameDelegateWPtr delegate = m_parent->delegate();
 
 	// Calculate mouse movement delta
