@@ -152,6 +152,7 @@ DC_END_DREEMCHEST
 #include "Matrix4.h"
 #include "Bounds.h"
 #include "Plane.h"
+#include "Ray.h"
 #include "Graph.h"
 #include "FixedPointNumber.h"
 #include "Curve.h"
