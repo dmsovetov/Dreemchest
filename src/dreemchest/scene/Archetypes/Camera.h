@@ -64,6 +64,9 @@ namespace Scene {
 		//! Sets the clear color.
 		void						setClearColor( const Rgba& value );
 
+		//! Construct the view ray from screen space coordinates.
+		Ray							toWorldSpace( u32 x, u32 y ) const;
+
 		//! Creates the spectator camera instance.
 		static SpectatorCameraPtr	create( const RenderTargetPtr& renderTarget, const Vec3BindingPtr& cursor = Vec3BindingPtr() );
 

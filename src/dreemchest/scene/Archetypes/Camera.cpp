@@ -43,6 +43,24 @@ void SpectatorCamera::construct( void )
 	attach<MoveAlongAxes>( 60.0f, CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
 }
 
+// ** SpectatorCamera::toWorldSpace
+Ray SpectatorCamera::toWorldSpace( u32 x, u32 y ) const
+{
+	// Get components.
+	CameraWPtr    camera	= get<Camera>();
+	TransformWPtr transform = get<Transform>();
+
+	// Calculate near & far points in world space.
+	Vec3 near, far;
+	camera->toWorldSpace( Vec3( x, y, 0 ), near, transform->matrix() );
+	camera->toWorldSpace( Vec3( x,y, 1 ), far, transform->matrix() );
+
+	// Calculate direction
+	Vec3 dir = Vec3::normalize( far - near );
+
+	return Ray( transform->worldSpacePosition(), dir );
+}
+
 // ** SpectatorCamera::setRotationEnabled
 void SpectatorCamera::setRotationEnabled( bool value )
 {
