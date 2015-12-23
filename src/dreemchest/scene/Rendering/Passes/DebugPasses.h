@@ -30,6 +30,7 @@
 #include "../RenderPass.h"
 #include "../RenderingSystem.h"
 #include "../Emitters/StaticMeshRopEmitter.h"
+#include "../../Components/Debug.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -116,6 +117,26 @@ namespace Scene {
 									addPass<LightBoundsPass>();
 									addPass<ParticlesBoundsPass>();
 								}
+	};
+
+	//! Renders the debug grid.
+	class GridPass : public RenderPass<Grid> {
+	public:
+
+						//! Constructs GridPass instance.
+						GridPass( Ecs::EcsWPtr ecs )
+							: RenderPass( ecs, "GridPass" ) {}
+
+	protected:
+
+		//! Renders the mesh of a single grid instance.
+		virtual void	render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Grid& grid, const Transform& transform ) DC_DECL_OVERRIDE;
+
+		//! Renders grid with specified cell size and dimensions.
+		void			renderGrid( Renderer::Renderer2DWPtr renderer, f32 cellSize, f32 size, const Rgba& color ) const;
+
+		//! Renders origin cross.
+		void			renderCross( Renderer::Renderer2DWPtr renderer, f32 size, const Rgba& color ) const;
 	};
 
 } // namespace Scene

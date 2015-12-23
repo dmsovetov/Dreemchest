@@ -85,6 +85,71 @@ void ParticlesBoundsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderC
 	renderer->wireBox( particles.instance()->bounds(), Rgba( 1.0f, 1.0f, 0.0f, 0.25f ) );
 }
 
+// -------------------------------------------------------- GridPass -------------------------------------------------------- //
+
+// ** GridPass::render
+void GridPass::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const Grid& grid, const Transform& transform )
+{
+	Renderer::Renderer2DPtr renderer = context->renderer();
+
+	renderer->pushTransform( transform.matrix() );
+
+	// Get grid features
+	FlagSet8 features = grid.features();
+
+	// Render grid cells
+	if( features.is( Grid::Cells ) ) {
+		// Render with a cell size
+		renderGrid( renderer, grid.cellSize() * 1.0f, grid.size(), Rgba( 0.0f, 0.0f, 0.0f, 0.05f ) );
+
+		// Render with a cell x5 size
+		renderGrid( renderer, grid.cellSize() * 5.0f, grid.size(), Rgba( 0.0f, 0.0f, 0.0f, 0.1f ) );
+	}
+
+	// Render axes
+	if( features.is( Grid::Axes ) ) {
+		renderCross( renderer, grid.size(), Rgba( 1.0f, 1.0f, 1.0f, 0.2f ) );
+	}
+
+	// Render basis
+	if( features.is( Grid::Basis ) ) {
+		renderer->line( Vec3( 0.0f, 0.0f, 0.0f ), Vec3( 1.0f, 0.0f, 0.0f ), Rgba::fromBytes( 240,  68,  31 ) );
+		renderer->line( Vec3( 0.0f, 0.0f, 0.0f ), Vec3( 0.0f, 1.0f, 0.0f ), Rgba::fromBytes( 187, 237,  82 ) );
+		renderer->line( Vec3( 0.0f, 0.0f, 0.0f ), Vec3( 0.0f, 0.0f, 1.0f ), Rgba::fromBytes(  61, 133, 236 ) );
+	}
+
+	// Render outline
+	if( features.is( Grid::Outline ) ) {
+		f32 s = grid.size() * 0.5f;
+		renderer->wireBox( Bounds( Vec3( -s, 0.0f, -s ), Vec3( s, 0.0f, s ) ), Rgba( 1.0f, 1.0f, 0.0f, 0.2f ) );
+	}
+
+	renderer->popTransform();
+}
+
+// ** GridPass::renderGrid
+void GridPass::renderGrid( Renderer::Renderer2DWPtr renderer, f32 cellSize, f32 size, const Rgba& color ) const
+{
+	s32 n = static_cast<s32>( floor( size / cellSize ) / 2.0f );
+
+	for( s32 i = -n; i <= n; i++ ) {
+		renderer->line( Vec3( i * cellSize, 0.0f, -cellSize * n ), Vec3( i * cellSize, 0.0f, cellSize * n ), color );
+	}
+
+	for( s32 i = -n; i <= n; i++ ) {
+		renderer->line( Vec3( -cellSize * n, 0.0f, i * cellSize ), Vec3( cellSize * n, 0.0f, i * cellSize ), color );
+	}
+}
+
+// ** GridPass::renderCross
+void GridPass::renderCross( Renderer::Renderer2DWPtr renderer, f32 size, const Rgba& color ) const
+{
+	f32 s = size * 0.5f;
+
+	renderer->line( Vec3( -s, 0.0f, 0.0f ), Vec3( s, 0.0f, 0.0f ), color );
+	renderer->line( Vec3( 0.0f, 0.0f, -s ), Vec3( 0.0f, 0.0f, s ), color );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

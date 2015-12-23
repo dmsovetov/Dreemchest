@@ -46,14 +46,10 @@ namespace Scene {
 
 	//! This component is attached to a camera to render scene wireframe.
 	class RenderWireframe : public Ecs::Component<RenderWireframe> {
-	public:
+	};
 
-		//! Returns mesh wireframe rendering color.
-		const Rgba&				color( void ) const;
-
-	private:
-
-		Rgba					m_color;	//!< Mesh wireframe color.
+	//! This component is attached to a camera to render debug grid.
+	class RenderGrid : public Ecs::Component<RenderGrid> {
 	};
 
 	//! This component is attached to a camera to render sprites.
