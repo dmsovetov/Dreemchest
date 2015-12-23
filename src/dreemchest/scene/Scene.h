@@ -125,6 +125,22 @@ namespace Scene {
 		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
 	};
 
+	//! 3 coordinate plane types.
+	enum CoordinatePlane {
+		  PlaneXY				//!< The XY coordinate plane.
+		, PlaneYZ				//!< The YZ coordinate plane.
+		, PlaneXZ				//!< The XZ coordinate plane.
+
+		, TotalCoordinatePlanes	//!< The total number of coordinate planes.
+	};
+
+	//! Coordinate plane bit masks.
+	enum CoordinatePlaneBit {
+		  PlaneXYBit	= BIT( PlaneXY )	//!< The XY coordinate plane bit mask.
+		, PlaneYZBit	= BIT( PlaneYZ )	//!< The YZ coordinate plane bit mask.
+		, PlaneXZBit	= BIT( PlaneXZ )	//!< The XZ coordinate plane bit mask.
+	};
+
 	//! Available asset formats.
 	enum AssetFormat {
 		  AssetFormatImageRaw	//!< Loads an image data from a raw pixel buffer format.
