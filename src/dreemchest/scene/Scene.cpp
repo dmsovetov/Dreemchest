@@ -371,6 +371,8 @@ Ecs::EntityPtr JsonSceneLoader::requestSceneObject( const String& id )
 	sceneObject->attach<Identifier>( data["name"].asString() );
 	m_sceneObjects[id] = sceneObject;
 
+	m_scene->addSceneObject( sceneObject );
+
 	return sceneObject;
 }
 
