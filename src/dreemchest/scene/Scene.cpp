@@ -609,28 +609,6 @@ void JsonSceneLoader::readColorParameter( Fx::RgbParameter& parameter, const Jso
 	else {
 		DC_BREAK;
 	}
-
-	//DC_BREAK_IF( !object.isArray() );
-
-	//parameter.setEnabled( true );
-
-	//switch( object.size() ) {
-	//case 2:		{
-	//				parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
-	//				parameter.constructLifetimeCurves();
-	//			}
-	//			break;
-
-	//case 3:		{
-	//				parameter.setConstant( readRgb( object ) );
-	//			}
-	//			break;
-
-	//default:	{
-	//				parameter.setCurve( readFloats( object ) );
-	//			}
-	//			break;
-	//}
 }
 
 // ** JsonSceneLoader::readScalarParameter
@@ -662,37 +640,6 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 	else {
 		DC_BREAK;
 	}
-
-	//s32 size = object.isArray() ? object.size() : 1;
-
-	//switch( size ) {
-	//case 1:		{
-	//				parameter.setConstant( object.asFloat() );
-	//			}
-	//			break;
-	//case 2:		{
-	//				if( object[0].isArray() ) {
-	//					parameter.setRandomBetweenCurves( readFloats( object[0] ), readFloats( object[1] ) );
-	//					parameter.constructLifetimeCurves();
-	//				} else {
-	//					Fx::FloatArray range = readFloats( object );
-	//					parameter.setRandomBetweenConstants( range[0], range[1] );
-	//				//	parameter.constructLifetimeCurves();
-	//				}
-	//			}
-	//			break;
-
-	//case 3:		{
-	//				DC_NOT_IMPLEMENTED
-	//			}
-	//			break;
-
-	//default:	{
-	//				parameter.setCurve( readFloats( object ) );
-	//			}
-	//}
-
-	//parameter.setEnabled( true );
 }
 
 #endif	/*	HAVE_JSON	*/
