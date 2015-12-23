@@ -51,7 +51,7 @@ f32 Grid::cellSize( void ) const
 // ** Grid::features
 const FlagSet8& Grid::features( void ) const
 {
-	return m_features & 15;
+	return m_features;
 }
 
 } // namespace Scene
