@@ -73,8 +73,10 @@ Scene::Scene( void )
 	// Add default render systems.
 	addRenderingSystem<BoundingVolumesRenderer>();
 	addRenderingSystem<ForwardLightingRenderer>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderUnlit, UnlitPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
 }
 
 // ** Scene::update
