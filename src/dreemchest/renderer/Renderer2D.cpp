@@ -264,6 +264,24 @@ void Renderer2D::wireCone( const Vec3& bottom, const Vec3& top, const Vec3& u, c
 	}
 }
 
+// ** Renderer2D::wireCircle
+void Renderer2D::wireCircle( const Vec3 position, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color )
+{
+	Vec3 prev;
+
+	for( s32 i = 0, n = sides; i <= n; i++ ) {
+		f32  angle = radians( i * (360.0f / n) );
+		Vec3 side  = (u * cosf( angle ) + v * sinf( angle )) * radius;
+		Vec3 end   = position + side;
+
+		if( i != 0 ) {
+			line( prev, end, color );
+		}
+
+		prev = end;
+	}
+}
+
 // ** Renderer2D::quad
 void Renderer2D::quad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color )
 {

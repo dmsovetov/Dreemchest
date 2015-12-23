@@ -96,6 +96,9 @@ namespace Renderer {
 		//! Renders a wire sphere in 3D space.
 		void					wireSphere( const Vec3& center, f32 radius, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders a wire circle.
+		void					wireCircle( const Vec3 position, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Sets the blend mode.
 		void					setBlendMode( BlendingMode value );
 
