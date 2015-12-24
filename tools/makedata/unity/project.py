@@ -36,10 +36,12 @@ class material:
     @staticmethod
     def convert(assets, source, output):
         objects = yaml.objects_from_file(source)
-        assert len(objects) == 1
         result = None
 
         for k, v in objects.items():
+            if k != 'Material':
+                continue
+
             result   = v['Material']
             properties = patcher.Patcher.patch(assets, result['m_SavedProperties'], patcher.MaterialPropertiesPatcher)
             result = patcher.Patcher.patch(assets, result, patcher.MaterialPatcher)
