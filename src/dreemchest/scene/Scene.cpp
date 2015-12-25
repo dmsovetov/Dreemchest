@@ -57,6 +57,7 @@ Scene::Scene( void )
 	// Create entity indices
 	m_cameras	= m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() );
 	m_named		= m_ecs->requestIndex( "Named Entities", Ecs::Aspect::all<Identifier>() );
+	m_meshes	= m_ecs->requestIndex( "Static Meshes", Ecs::Aspect::all<StaticMesh>() );
 
 	// Create system groups.
 	m_updateSystems = m_ecs->createGroup( "Update", UpdateSystems );
@@ -192,6 +193,43 @@ SceneObjectSet Scene::findAllWithName( const String& name ) const
 	}
 
 	return objects;
+}
+
+// ** Scene::queryRay
+RayTracingResultArray Scene::queryRay( const Ray& ray, const FlagSet8& flags ) const
+{
+	// Get entity set from index
+	const Ecs::EntitySet& entities = m_meshes->entities();
+
+	// Resulting array
+	RayTracingResultArray results;
+
+	// Iterate over all meshes in scene an store all that are intersected by a ray.
+	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+		// Get the world space bounding box of a mesh.
+		const Bounds& bounds = (*i)->get<StaticMesh>()->worldSpaceBounds();
+
+		// Check for intersection.
+		RayTracingResult result( *i );
+
+		if( ray.intersects( bounds, &result.point, &result.time ) ) {
+			results.push_back( result );
+		}
+	}
+
+	// Sort results
+	if( flags.is( QueryBackToFront ) ) {
+		std::sort( results.begin(), results.end(), std::greater<RayTracingResult>() );
+	} else {
+		std::sort( results.begin(), results.end(), std::less<RayTracingResult>() );
+	}
+
+	// Remove all elements except the first one if single result requested
+	if( !results.empty() && flags.is( QuerySingle ) ) {
+		results.erase( results.begin() + 1, results.end() );
+	}
+
+	return results;
 }
 
 // ** Scene::create

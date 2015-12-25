@@ -199,11 +199,37 @@ namespace Scene {
 		, RenderSystems = BIT( 1 )
 	};
 
+	//! Scene query mask flags.
+	enum SceneQueryFlags {
+		  QuerySingle		= BIT( 0 )	//!< Scene query will result a sinle best matching result.
+		, QueryBackToFront	= BIT( 1 )	//!< Scene query will return results in back to front order. 
+	};
+
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;
 
 	//! Container type to store a set of assets.
 	typedef Set<AssetPtr> AssetSet;
+
+	//! A helper struct to store results of a scene ray tracing.
+	struct RayTracingResult {
+		SceneObjectWPtr		sceneObject;	//!< The scene object hit.
+		Vec3				point;			//!< The intersection world space point.
+		f32					time;			//!< The distance value in range [0, 1] from ray origin to a hit point.
+
+							//! Constructs RayTracingResult instance.
+							RayTracingResult( SceneObjectWPtr sceneObject = SceneObjectWPtr(), const Vec3& point = Vec3( 0, 0, 0 ), f32 time = -1.0f )
+								: sceneObject( sceneObject ), point( point ), time( time ) {}
+
+							//! Returns true if this is a valid result (contains a hit scene object).
+							operator bool( void ) const { return sceneObject.valid(); }
+
+							//! Returns true if this ray tracing result has a smaller time value.
+		bool				operator < ( const RayTracingResult& other ) const { return time < other.time; }
+	};
+
+	//! Array of ray tracing results.
+	typedef Array<RayTracingResult> RayTracingResultArray;
 
 	//! The root class for a scene subsystem.
 	class Scene : public event::RefCountedEventEmitter {
@@ -239,6 +265,9 @@ namespace Scene {
 
 		//! Returns a list of scene objects that match a specified aspect.
 		SceneObjectSet					findByAspect( const Ecs::Aspect& aspect ) const;
+
+		//! Performs the ray tracing.
+		RayTracingResultArray			queryRay( const Ray& ray, const FlagSet8& flags = QuerySingle ) const;
 
 		//! Returns cameras that reside in scene.
 		const Ecs::IndexPtr&			cameras( void ) const;
@@ -290,6 +319,7 @@ namespace Scene {
 		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
 		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
+		Ecs::IndexPtr					m_meshes;			//!< All static meshes that reside in scene.
 	};
 
 	// ** Scene::addSystem
