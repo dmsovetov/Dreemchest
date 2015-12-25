@@ -135,6 +135,22 @@ EmitterInstanceWPtr ParticleSystemInstance::emitter( s32 index ) const
 	return m_emitters[index];
 }
 
+// ** ParticleSystemInstance::stop
+void ParticleSystemInstance::stop( void )
+{
+	for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
+		emitter( i )->setStopped( true );
+	}
+}
+
+// ** ParticleSystemInstance::play
+void ParticleSystemInstance::play( void )
+{
+	for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
+		emitter( i )->setStopped( false );
+	}
+}
+
 // ** ParticleSystemInstance::hasEnded
 bool ParticleSystemInstance::hasEnded( void ) const
 {

@@ -231,7 +231,7 @@ EmitterInstancePtr Emitter::createInstance( IMaterialFactoryWPtr materialFactory
 
 // ** EmitterInstance::EmitterInstance
 EmitterInstance::EmitterInstance( IMaterialFactoryWPtr materialFactory, EmitterWPtr emitter )
-	: m_emitter( emitter ), m_time( 0.0f ), m_timeEmission( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 )
+	: m_emitter( emitter ), m_time( 0.0f ), m_timeEmission( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 ), m_isStopped( false )
 {
 	// Construct nested particles
 	for( int i = 0, n = m_emitter->particlesCount(); i < n; i++ ) {
@@ -242,6 +242,18 @@ EmitterInstance::EmitterInstance( IMaterialFactoryWPtr materialFactory, EmitterW
 	for( s32 i = 0; i < emitter->burstCount(); i++ ) {
 		m_bursts.push_back( emitter->burst( i ) );
 	}
+}
+
+// ** EmitterInstance::isStopped
+bool EmitterInstance::isStopped( void ) const
+{
+	return m_isStopped;
+}
+
+// ** EmitterInstance::setStopped
+void EmitterInstance::setStopped( bool value )
+{
+	m_isStopped = value;
 }
 
 // ** EmitterInstance::calculateEmissionCount
@@ -337,7 +349,7 @@ s32 EmitterInstance::update( f32 dt, const Vec3& position )
 		// We have dead particles - ready to emit
 		s32 deadCount = particles->maxCount() - count;
 
-		if( deadCount && !ended ) {
+		if( deadCount && !ended && !m_isStopped ) {
 			s32 emissionCount = calculateEmissionCount( m_time / duration, deadCount );
 
 			if( emissionCount ) {

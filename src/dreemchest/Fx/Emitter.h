@@ -150,6 +150,12 @@ namespace Fx {
 		//! Performs the emitter warm up.
         void					warmUp( f32 dt, const Vec3& position );
 
+		//! Returns true if this emitter is now stopped.
+		bool					isStopped( void ) const;
+
+		//! Sets the stopped state of an emitter.
+		void					setStopped( bool value );
+
 	private:
 
 								//! Constructs EmitterInstance instance.
@@ -170,6 +176,7 @@ namespace Fx {
 		s32						m_aliveCount;		//!< The total number of alive particles.
 		s32						m_iteration;		//!< Current iteration index.
 		Array<ParticleBurst>	m_bursts;			//!< Particle bursts.
+		bool					m_isStopped;		//!< Indicated that a particle emitter is stopped.
 	};
 
 } // namespace Fx
