@@ -535,7 +535,7 @@ bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::
 
 	switch( object["type"].asInt() ) {
 	case 4: break;	// not implemented
-	case 0: break;
+	case 0:
 	case 1: emitter->setZone( DC_NEW Fx::SphereZone( object["radius"].asFloat() ) ); break;
 	case 3:
 	case 2: emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) ); break;
