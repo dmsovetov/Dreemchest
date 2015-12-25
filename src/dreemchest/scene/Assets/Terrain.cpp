@@ -41,7 +41,7 @@ s32 Terrain::kMaxSize = 2048;
 
 // ** Terrain::Terrain
 Terrain::Terrain( AssetBundle* bundle, const String& uuid, const String& name, u32 size )
-	: Asset( bundle, Asset::Terrain, uuid, name ), m_heightmap( size )
+	: Asset( bundle, Asset::Terrain, uuid, name ), m_heightmap( size ), m_maxHeight( static_cast<f32>( size ) )
 {
 	DC_BREAK_IF( (size % kChunkSize) != 0 );
 }
@@ -52,10 +52,59 @@ u32 Terrain::size( void ) const
 	return m_heightmap.size();
 }
 
+// ** Terrain::maxHeight
+f32 Terrain::maxHeight( void ) const
+{
+	return m_maxHeight;
+}
+
 // ** Terrain::chunkCount
 u32 Terrain::chunkCount( void ) const
 {
 	return m_heightmap.size() / kChunkSize;
+}
+
+// ** Terrain::heightAtVertex
+f32 Terrain::heightAtVertex( s32 x, s32 z ) const
+{
+	return f32( m_heightmap.height( x, z ) ) / m_heightmap.maxValue() * m_maxHeight;
+}
+
+// ** Terrain::height
+f32 Terrain::height( f32 x, f32 z ) const
+{
+	if( x < 0.0f || x > size() ) return -1.0f;
+	if( z < 0.0f || z > size() ) return -1.0f;
+
+	// Convert to cell coordinates
+	s32 hx = static_cast<s32>( floor( x ) );
+	s32 hz = static_cast<s32>( floor( z ) );
+
+	// Calculate the fraction values
+	f32 fx = x - hx;
+	f32 fz = z - hz;
+
+	// Calculate interpolated terrain height
+	f32 height = 0.0f;
+
+	height += heightAtVertex( hx    , hz     ) * (1.0f - fx) * (1.0f - fz);
+	height += heightAtVertex( hx + 1, hz     ) * (       fx) * (1.0f - fz);
+	height += heightAtVertex( hx    , hz + 1 ) * (1.0f - fx) * (       fz);
+	height += heightAtVertex( hx + 1, hz + 1 ) * (       fx) * (       fz);
+
+	return height;
+}
+
+// ** Terrain::heightmap
+const Heightmap& Terrain::heightmap( void ) const
+{
+	return m_heightmap;
+}
+
+// ** Terrain::heightmap
+Heightmap& Terrain::heightmap( void )
+{
+	return m_heightmap;
 }
 
 // ** Terrain::chunkVertexBuffer
@@ -78,7 +127,7 @@ Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 	for( s32 i = 0; i <= kChunkSize; i++ ) {
 		for( s32 j = 0; j <= kChunkSize; j++ ) {
 			Vertex& vertex = vertices[i * stride + j];
-			f32		height = m_heightmap.height( x * kChunkSize + j, z * kChunkSize + i );
+			f32		height = heightAtVertex( x * kChunkSize + j, z * kChunkSize + i );/*m_heightmap.height( x * kChunkSize + j, z * kChunkSize + i ) / f32( USHRT_MAX ) * m_maxHeight*/;
 
 			vertex.position = Vec3( ( f32 )j, ( f32 )height, ( f32 )i );
 			vertex.normal   = Vec3( 0.0f, 1.0f, 0.0f );
@@ -211,6 +260,14 @@ Heightmap::Heightmap( u32 size ) : m_size( size )
 u32 Heightmap::size( void ) const
 {
 	return m_size;
+}
+
+// ** Heightmap::maxValue
+Heightmap::Type Heightmap::maxValue( void ) const
+{
+	Type value = ~static_cast<Type>( 0 );
+	DC_BREAK_IF( value < 0 );
+	return value;
 }
 
 // ** Heightmap::height

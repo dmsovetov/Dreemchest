@@ -63,6 +63,9 @@ namespace Scene {
 		//! Constructs the heightmap from a callback.
 		void					set( StrongPtr<Generator> generator );
 
+		//! Returns the maximum value that can be stored inside this heightmap.
+		Type					maxValue( void ) const;
+
 		//! Fills the heightmap with a constant height value.
 		class ConstantHeight : public Generator {
 		public:
@@ -128,6 +131,19 @@ namespace Scene {
 		//! Returns terrain size.
 		u32						size( void ) const;
 
+		//! Returns the interpolated height of a terrain at specified point.
+		f32						height( f32 x, f32 z ) const;
+
+		//! Returns the height value of a vertex.
+		f32						heightAtVertex( s32 x, s32 z ) const;
+
+		//! Returns maximum terrain height.
+		f32						maxHeight( void ) const;
+
+		//! Returns terrain heightmap.
+		const Heightmap&		heightmap( void ) const;
+		Heightmap&				heightmap( void );
+
 		//! Returns terrain chunk count.
 		u32						chunkCount( void ) const;
 
@@ -151,6 +167,7 @@ namespace Scene {
 	private:
 
 		Heightmap				m_heightmap;	//!< Terrain heightmap.
+		f32						m_maxHeight;	//!< Maximum terrain height.
 	};
 
 } // namespace Scene
