@@ -48,17 +48,11 @@ DC_BEGIN_DREEMCHEST
 		//! Returns ray direction.
 		const Vec3& direction( void ) const;
 
-		//! Returns true if the ray intersects bounding box.
-		bool		intersects( const Bounds& bounds ) const;
-
 		//! Returns true if the ray intersects bounding box & calculates intersection point.
-		bool		intersects( const Bounds& bounds, Vec3& point ) const;
-
-		//! Returns true if the ray intersects plane.
-		bool		intersects( const Plane& plane ) const;
+		bool		intersects( const Bounds& bounds, Vec3* point = NULL, f32* time = NULL ) const;
 
 		//! Returns true if the ray intersects plane & calculates intersection point.
-		bool		intersects( const Plane& plane, Vec3& point ) const;
+		bool		intersects( const Plane& plane, Vec3* point = NULL, f32* time = NULL ) const;
 
 	private:
 
@@ -99,149 +93,18 @@ DC_BEGIN_DREEMCHEST
 	}
 
 	// ** Ray::intersects
-	inline bool Ray::intersects( const Plane& plane, Vec3& point ) const
+	inline bool Ray::intersects( const Plane& plane, Vec3* point, f32* time ) const
 	{
 		f32 t = -(plane.distance() + plane.normal() * m_origin) / (plane.normal() * m_direction);
-		point = m_origin + m_direction * t;
+
+		if( point ) *point = m_origin + m_direction * t;
+		if( time ) *time = t;
+		
 		return true;
 	}
 
 	// ** Ray::intersects
-	inline bool Ray::intersects( const Bounds& bounds ) const
-	{
-		Vec3 rayDelta = m_direction * 999999.0f;
-		const Vec3& min = bounds.min();
-		const Vec3& max = bounds.max();
-
-		bool inside = true;
-		f32 xt, yt, zt;
-
-		if( m_origin.x < min.x) {
-			xt = min.x - m_origin.x;
-
-			if( xt > rayDelta.x ) {
-				return false;
-			}
-
-			xt /= rayDelta.x; 
-			inside = false;
-		} 
-		else if( m_origin.x > max.x ) {
-			xt = max.x - m_origin.x;
-
-			if( xt < rayDelta.x ) {
-				return false;
-			}
-
-			xt /= rayDelta.x;
-			inside = false;
-		} 
-		else {
-			xt = -1.0f; 
-		}
-
-		if( m_origin.y < min.y ) {
-			yt = min.y - m_origin.y;
-
-			if( yt > rayDelta.y ) {
-				return false;
-			}
-
-			yt /= rayDelta.y;
-			inside = false;
-		} 
-		else if( m_origin.y > max.y ) {
-			yt = max.y - m_origin.y;
-
-			if( yt < rayDelta.y ) {
-				return false;
-			}
-
-			yt /= rayDelta.y;
-			inside = false;
-		} 
-		else {
-			yt = -1.0f;
-		}
-
-		if( m_origin.z < min.z ) {
-			zt = min.z - m_origin.z;
-
-			if( zt > rayDelta.z ) {
-				return false;
-			}
-
-			zt /= rayDelta.z;
-			inside = false;
-		} 
-		else if( m_origin.z > max.z ) {
-			zt = max.z - m_origin.z;
-
-			if( zt < rayDelta.z ) {
-				return false;
-			}
-
-			zt /= rayDelta.z;
-			inside = false;
-		} 
-		else {
-			zt = -1.0f;
-		}
-
-		if( inside ) {
-			return true;
-		}
-		f32 t = xt;
-
-		if( yt > t ) {
-			t = yt;
-		}
-
-		if( zt > t ) {
-			t = zt;
-		}
-
-		if( t == xt ) {
-			f32 y = m_origin.y + rayDelta.y * t;
-			f32 z = m_origin.z + rayDelta.z * t;
-
-			if( y < min.y || y > max.y ) {
-				return false;
-			}
-			else if( z < min.z || z > max.z ) {
-				return false;
-			}
-		}
-		else if( t == yt ) {
-			f32 x = m_origin.x + rayDelta.x * t;
-			f32 z = m_origin.z + rayDelta.z * t;
-
-			if( x < min.x || x > max.x ) {
-				return false;
-			}
-			else if( z < min.z || z > max.z ) {
-				return false;
-			}
-		}
-		else {
-		//	_ASSERTE( t == zt );
-
-			f32 x = m_origin.x + rayDelta.x * t;
-			f32 y = m_origin.y + rayDelta.y * t;
-
-			if( x < min.x || x > max.x ) {
-				return false;
-			}
-			else if( y < min.y || y > max.y ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// ** Ray::intersects
-	inline bool Ray::intersects( const Bounds& bounds, Vec3& intersectionPoint ) const
+	inline bool Ray::intersects( const Bounds& bounds, Vec3* point, f32* time ) const
 	{
 		Vec3 rayDelta = m_direction * 999999.0f;
 		const Vec3& min = bounds.min();
@@ -333,9 +196,9 @@ DC_BEGIN_DREEMCHEST
 		}
 
 		if( inside ) {
-			intersectionPoint = Vec3( m_origin.x + rayDelta.x * t,
-									  m_origin.y + rayDelta.y * t,
-									  m_origin.z + rayDelta.z * t );
+			if( point ) *point = Vec3( m_origin.x + rayDelta.x * t, m_origin.y + rayDelta.y * t, m_origin.z + rayDelta.z * t );
+			if( time ) *time = t;
+
 			return true;
 		}
 
@@ -375,9 +238,8 @@ DC_BEGIN_DREEMCHEST
 			}
 		}
 
-		intersectionPoint = Vec3( m_origin.x + rayDelta.x * t,
-								  m_origin.y + rayDelta.y * t,
-								  m_origin.z + rayDelta.z * t );
+		if( point ) *point = Vec3( m_origin.x + rayDelta.x * t, m_origin.y + rayDelta.y * t, m_origin.z + rayDelta.z * t );
+		if( time ) *time = t;
 
 		return true;
 	}
