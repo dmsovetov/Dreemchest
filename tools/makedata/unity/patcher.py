@@ -39,6 +39,7 @@ class Patcher:
         # __call__
         def __call__(self, assets, object, property):
             if self.name == property:
+                object[property] = self.converter(object[property]) if self.converter is not None else object[property]
                 return
 
             object[self.name] = self.converter(object[property]) if self.converter is not None else object[property]
