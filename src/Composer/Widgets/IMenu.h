@@ -80,13 +80,22 @@ namespace Ui {
 	class IToolBar : public IInterface {
 	public:
 
-		//! Adds an action to a toolbar.
+		//! Adds an action to a tool bar.
 		virtual void				addAction( IActionWPtr action )		= 0;
-	
-		//! Removes an action from a toolbar.
+
+		//! Creates new action owned by this tool bar.
+		virtual IActionWPtr			addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 ) = 0;
+
+		//! Begins the action group construction.
+		virtual void				beginActionGroup( void ) = 0;
+
+		//! Ends the action group construction.
+		virtual void				endActionGroup( void ) = 0;
+
+		//! Removes an action from a tool bar.
 		virtual void				removeAction( IActionWPtr action )	= 0;
 	
-		//! Adds a separator to a toolbar.
+		//! Adds a separator to a tool bar.
 		virtual void				addSeparator( void )				= 0;
 	};
 

@@ -42,7 +42,41 @@ ToolBar::ToolBar( QWidget* parent ) : PrivateInterface( new QToolBar( parent ) )
 // ** ToolBar::addAction
 void ToolBar::addAction( IActionWPtr action )
 {
-	m_private->addAction( action->privateInterface<QAction>() );
+	QToolButton* button = new QToolButton( m_private.get() );
+	button->setDefaultAction( action->privateInterface<QAction>() );
+	button->setMaximumSize( QSize( 24, 24 ) );
+
+	m_private->addWidget( button );
+}
+
+// ** ToolBar::addAction
+IActionWPtr ToolBar::addAction( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
+{
+	IActionPtr action = Action::create( text, callback, shortcut, icon, flags );
+	m_actions.append( action );
+	m_group.append( action );
+
+	addAction( action );
+
+	return action;
+}
+
+// ** ToolBar::beginActionGroup
+void ToolBar::beginActionGroup( void )
+{
+	m_group.clear();
+}
+
+// ** ToolBar::endActionGroup
+void ToolBar::endActionGroup( void )
+{
+	DC_BREAK_IF( m_group.empty() );
+
+	QActionGroup* group = new QActionGroup( m_private.get() );
+
+	foreach( IActionWPtr action, m_group ) {
+		group->addAction( action->privateInterface<QAction>() );
+	}
 }
 
 // ** ToolBar::removeAction
@@ -137,6 +171,21 @@ void Action::setIcon( const String& value )
 	m_private->setIcon( QIcon( value.c_str() ) );
 }
 
+// ** Action::create
+IActionPtr Action::create( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
+{
+	Action* action = new Action( NULL, text, callback );
+
+	action->setDisabled( flags & ItemDisabled );
+	action->setCheckable( flags & (ItemCheckable | ItemChecked) );
+	action->setChecked( flags & ItemChecked );
+	action->setVisible( (flags & ItemHidden) == 0 );
+	action->setIcon( icon );
+	action->setShortcut( shortcut );
+
+	return action;
+}
+
 // ------------------------------------------------ Menu ------------------------------------------------ //
 
 // ** Menu::Menu
@@ -172,14 +221,7 @@ IMenuWPtr Menu::addMenu( const String& text )
 // ** Menu::addAction
 IActionWPtr Menu::addAction( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
 {
-	Action* action = new Action( m_private.get(), text, callback );
-
-	action->setDisabled( flags & ItemDisabled );
-	action->setCheckable( flags & (ItemCheckable | ItemChecked) );
-	action->setChecked( flags & ItemChecked );
-	action->setVisible( (flags & ItemHidden) == 0 );
-	action->setIcon( icon );
-	action->setShortcut( shortcut );
+	IActionPtr action = Action::create( text, callback, shortcut, icon, flags );
 
 	m_actions.append( action );
 

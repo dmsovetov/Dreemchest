@@ -72,6 +72,9 @@ namespace Ui {
 	
 		//! Sets the menu action icon.
 		virtual void					setIcon( const String& value );
+
+		//! Creates new Action instance.
+		static IActionPtr				create( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
 	
 	private:
 
@@ -91,14 +94,28 @@ namespace Ui {
 									//! Constructs ToolBar instance.
 									ToolBar( QWidget* parent );
 
-		//! Adds an action to a toolbar.
+		//! Adds an action to a tool bar.
 		virtual void				addAction( IActionWPtr action );
-	
-		//! Removes an action from a toolbar.
+
+		//! Creates new action owned by this tool bar.
+		virtual IActionWPtr			addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
+
+		//! Begins the action group construction.
+		virtual void				beginActionGroup( void );
+
+		//! Ends the action group construction.
+		virtual void				endActionGroup( void );
+
+		//! Removes an action from a tool bar.
 		virtual void				removeAction( IActionWPtr action );
 	
-		//! Adds a separator to a toolbar.
+		//! Adds a separator to a tool bar.
 		virtual void				addSeparator( void );
+
+	private:
+
+		QVector<IActionPtr>			m_actions;	//!< Actions owned by this toolbar.
+		QVector<IActionWPtr>		m_group;	//!< The action group being constructed.
 	};
 
 	//! Menu Qt implementation.
