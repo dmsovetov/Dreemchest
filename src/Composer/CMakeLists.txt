@@ -7,6 +7,9 @@ set(CMAKE_AUTOMOC ON)
 # Automatically run uic when needed.
 set(CMAKE_AUTOUIC ON)
 
+# Automatically run rcc when needed.
+set(CMAKE_AUTORCC ON)
+
 add_directories(. SRCS)
 
 # Libraries to link with Composer
@@ -49,7 +52,7 @@ if (TIFF_FOUND)
 endif()
 
 # Create the Composer executable
-add_executable(${TARGET_NAME} WIN32 ${SRCS})
+add_executable(${TARGET_NAME} WIN32 ${SRCS} Resources/Resources.qrc)
  
 # Link dependencies
 target_link_libraries(${TARGET_NAME} ${LIBRARIES})

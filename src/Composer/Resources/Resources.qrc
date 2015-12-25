@@ -1,0 +1,25 @@
+<RCC>
+  <qresource prefix="Scene">
+    <file>Scene/bricks.png</file>
+    <file>Scene/camera.png</file>
+    <file>Scene/cursor.png</file>
+    <file>Scene/lightbulb.png</file>
+    <file>Scene/lightbulb_off.png</file>
+    <file>Scene/magnet.png</file>
+    <file>Scene/move.png</file>
+    <file>Scene/rotate.png</file>
+    <file>Scene/scale.png</file>
+  </qresource>
+  <qresource prefix="Common">
+    <file>Common/copy.png</file>
+    <file>Common/cut.png</file>
+    <file>Common/magnifier.png</file>
+    <file>Common/new.png</file>
+    <file>Common/open.png</file>
+    <file>Common/file.png</file>
+    <file>Common/paste.png</file>
+    <file>Common/redo.png</file>
+    <file>Common/save.png</file>
+    <file>Common/undo.png</file>
+  </qresource>
+</RCC>
