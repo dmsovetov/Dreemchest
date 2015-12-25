@@ -27,11 +27,18 @@
 #ifndef __DC_Fx_Emitter_H__
 #define __DC_Fx_Emitter_H__
 
-#include "Fx.h"
+#include "Parameter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
+
+	//! Particle bursts structure.
+	struct ParticleBurst {
+		f32					time;			//!< The burst time.
+		s32					count;			//!< The number of particles to burst.
+		s32					lastIteration;	//!< Last iteration number the burst was emitted.
+	};
 
 	//! Particle emitter contains the emission zone & particle emission parameters. Contains an array of particles.
 	class Emitter : public RefCounted {
@@ -56,6 +63,19 @@ namespace Fx {
 		//! Sets the emitter name.
 		void					setName( const String& value );
 
+		//! Returns particle emission parameter.
+		const FloatParameter&	emission( void ) const;
+		FloatParameter&			emission( void );
+
+		//! Adds burst item.
+		void					addBurst( f32 time, s32 count );
+
+		//! Returns the total number of bursts.
+		s32						burstCount( void ) const;
+
+		//! Returns the burst by index.
+		const ParticleBurst&	burst( s32 index ) const;
+
 		//! Returns true if the particle emission is looped.
 		bool					isLooped( void ) const;
 
@@ -74,8 +94,14 @@ namespace Fx {
 		//! Sets the emission zone.
 		void					setZone( const ZonePtr& value );
 
+		//! Adds new emission module instance.
+		void					addModule( const ModulePtr& module );
+
 		//! Removes particles from emitter.
 		void					removeParticles( const ParticlesWPtr& particles );
+
+		//! Emits new particles.
+		void					emit( Particle* particles, s32 first, s32 last, const Vec3& position, f32 time ) const;
 
 		//! Adds particles to an emitter.
 		ParticlesWPtr			addParticles( void );
@@ -96,6 +122,9 @@ namespace Fx {
 		f32						m_duration;		//!< Total particle emission duration in seconds.
 		bool					m_isLooped;		//!< Flag indicating that particle emission is looped.
 		String					m_name;			//!< Particle emitter name.
+		Array<ModulePtr>		m_modules;		//!< Modules used by this emitter to construct particles.
+		FloatParameter			m_emission;		//!< Particle emission parameter.
+		Array<ParticleBurst>	m_bursts;		//!< Particle bursts (additional to standard emission).
 	};
 
 	//! Particle emitter instance.
@@ -129,13 +158,18 @@ namespace Fx {
 		//! Updates the current emitter time.
 		bool					updateTime( f32 dt );
 
+		//! Calculates the number of particles to emit.
+		s32						calculateEmissionCount( f32 scalar, s32 maxCount );
+
 	private:
 
-		EmitterWPtr				m_emitter;		//!< Parent particle emitter.
-		ParticlesInstancesArray	m_particles;	//!< Array of particles instances.
-		f32						m_time;			//!< Current emitter time.
-		s32						m_aliveCount;	//!< The total number of alive particles.
-		s32						m_iteration;	//!< Current iteration index.
+		EmitterWPtr				m_emitter;			//!< Parent particle emitter.
+		ParticlesInstancesArray	m_particles;		//!< Array of particles instances.
+		f32						m_time;				//!< Current emitter time.
+		f32						m_timeEmission;		//!< Emission timer.
+		s32						m_aliveCount;		//!< The total number of alive particles.
+		s32						m_iteration;		//!< Current iteration index.
+		Array<ParticleBurst>	m_bursts;			//!< Particle bursts.
 	};
 
 } // namespace Fx

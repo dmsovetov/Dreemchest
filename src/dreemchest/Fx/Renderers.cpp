@@ -68,7 +68,7 @@ PointRenderer::PointRenderer( const IRenderingInterfacePtr& renderingInterface )
 }
 
 // ** PointRenderer::render
-void PointRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void PointRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //	m_renderingInterface->renderPoints( &particles->m_position, &particles->m_color.current, &particles->m_size.current, count, sizeof( Particle ) );
@@ -84,8 +84,31 @@ QuadRenderer::QuadRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** QuadRenderer::render
-void QuadRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void QuadRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
+    Vec2 up, side;
+	const Vec3*				position	 = particles->position;
+	const Particle::Scalar* transparency = particles->transparency;
+	const f32*				rotation	 = particles->rotation;
+	const Particle::Scalar* size		 = particles->size;
+	const Particle::Color*	color		 = particles->color;
+
+    for( int i = 0; i < count; i++ ) {
+        Vec2		    pos = Vec2( position[i].x, position[i].y );
+        Rgba			clr = Rgba( color[i].current.r, color[i].current.g, color[i].current.b, transparency[i].current );
+
+        f32 c = sinf( radians( rotation[i] ) );
+        f32 s = cosf( radians( rotation[i] ) );
+
+        up.x   = c; up.y   = -s;
+        side.x = s; side.y =  c;
+
+        m_renderingInterface->renderOrientedQuadUV( material, pos.x, pos.y, size[i].current * 0.5f, size[i].current * 0.5f, up, side, clr );
+    }
+
+    m_renderingInterface->flush();
+
+#if 0
     Vec2 up, side;
 
     for( int i = 0; i < count; i++ ) {
@@ -103,6 +126,7 @@ void QuadRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode
     }
 
     m_renderingInterface->flush();
+#endif
 }
 
 // ------------------------------------ LineRenderer ------------------------------------ //
@@ -114,8 +138,9 @@ LineRenderer::LineRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** LineRenderer::render
-void LineRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void LineRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
+#if 0
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
@@ -127,6 +152,9 @@ void LineRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode
     }
 
     m_renderingInterface->flush();
+#else
+	DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ---------------------------------- ThickLineRenderer ------------------------------------ //
@@ -138,8 +166,9 @@ ThickLineRenderer::ThickLineRenderer( const IRenderingInterfacePtr& renderingInt
 }
 
 // ** ThickLineRenderer::render
-void ThickLineRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void ThickLineRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
+#if 0
     for( s32 i = 0; i < count; i++ ) {
         const Particle& p = particles[i];
 
@@ -151,6 +180,9 @@ void ThickLineRenderer::render( const IMaterialWPtr& material, BlendingMode blen
     }
     
     m_renderingInterface->flush();
+#else
+	DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ------------------------------------ PathRenderer ------------------------------------ //
@@ -162,7 +194,7 @@ PathRenderer::PathRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 }
 
 // ** PathRenderer::render
-void PathRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void PathRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {
@@ -179,7 +211,7 @@ ThickPathRenderer::ThickPathRenderer( const IRenderingInterfacePtr& renderingInt
 }
 
 // ** ThickPathRenderer::render
-void ThickPathRenderer::render( const IMaterialWPtr& material, BlendingMode blendMode, const Particle *particles, s32 count )
+void ThickPathRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
 	DC_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {

@@ -33,104 +33,51 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	//! A single particle item.
+	//! Particle contains data for each of used modules.
 	struct Particle {
-		enum { MaxSnapshots = 64 };
+		//! Stores the particle life time.
+		struct Life {
+			f32		current;		//!< Particle's life left in seconds.
+			f32		initial;		//!< Particle's initial life.
+			f32		scalar;			//!< Particle's parameter scalar.
+		};
 
-		u8		m_index;			//!< Particle randomization index.
-		Vec3    m_position;			//!< Particle position.
-		f32		m_rotation;			//!< Particle rotation.
-		f32		m_direction;		//!< Particle movement direction.
+		//! Stores the data of a scalar particle parameter.
+		struct Scalar {
+			f32		initial;		//!< Initial parameter value.
+			f32		current;		//!< Current parameter value.
+		};
 
-		struct {
-			Vec3    velocity;		//!< The force applied to a particle.
+		//! Stores aggregated forces applied to particle.
+		struct Force {
+			Vec3    velocity;		//!< Additional particle velocity due to particle acceleration.
 			Vec3	acceleration;	//!< Particle acceleration due to applied force.
-		} m_force;
+		};
 
-		struct {
-			f32		velocity;		//!< Particle angular velocity.
-			f32		torque;			//!< Particle torque.
-		} m_angular;
+		//! Stores particle color.
+		struct Color {
+			Rgb		initial;		//!< Initial particle color.
+			Rgb		current;		//!< Current particle color.
+		};
 
-		struct {
-			f32		current;		//!< Particle life left in seconds.
-			f32		initial;		//!< Particle life fade.
-		} m_life;
+		u32*			indices;			//!< Particle indices.
+		Vec3*			position;			//!< Particle position.
+		f32*			rotation;			//!< Particle rotation.
+		Life*			life;				//!< Particle life.
+		Scalar*			size;				//!< Particle size.
+		Scalar*			transparency;		//!< Particle transparency.
+		Color*			color;				//!< Particle color.
+		Scalar*			angularVelocity;	//!< Particle angular velocity.
+		Force*			force;				//!< Particle external forces.
 
-		struct {
-            struct {
-                Rgb     rgb;
-                f32		alpha;
-            } initial;
-            
-            struct {
-                Rgb     rgb;
-                f32		alpha;
-            } current;
-		} m_color;
-
-		struct {
-			f32		initial;
-			f32		current;
-		} m_size;
-
-		struct {
-			Vec3    pos;
-			Rgb     color;
-			f32		alpha;
-			f32		size;
-		} m_snapshots[MaxSnapshots];
-	};
-
-	//! Particle bursts structure.
-	struct ParticleBurst {
-		f32					time;			//!< The burst time.
-		s32					count;			//!< The number of particles to burst.
-		s32					lastIteration;	//!< Last iteration number the burst was emitted.
+						//! Constructs Particle instance.
+						Particle( void )
+							: indices( NULL ), position( NULL ), rotation( NULL ), life( NULL ), size( NULL ), transparency( NULL ), color( NULL ), angularVelocity( NULL ), force( NULL ) {}
 	};
 
 	//! Particles contains an array of particles and a set of simulation parameters.
 	class Particles : public RefCounted {
 	friend class Emitter;
-	public:
-
-		//! Available particle scalar parameters.
-		enum ScalarParameter {
-			Emission,
-			Life,
-			Direction,
-			Size,
-			SizeOverLife,
-			Transparency,
-			TransparencyOverLife,
-			Speed,
-			Gravity,
-			AccelerationX,
-			AccelerationY,
-			AccelerationZ,
-			VelocityXOverLife,
-			VelocityYOverLife,
-			VelocityZOverLife,
-			AccelerationXOverLife,
-			AccelerationYOverLife,
-			AccelerationZOverLife,
-			AngularVelocity,
-			AngularVelocityOverLife,
-			Torque,
-			TorqueOverLife,
-			Rotation,
-
-			TotalScalarParameters
-		};
-
-        //! Available particle color parameters.
-        enum ColorParameter {
-            Color,
-            ColorOverLife,
-
-            TotalColorParameters
-        };
-
 	public:
 
 		//! Returns the maximum number of particles.
@@ -145,12 +92,6 @@ namespace Fx {
 		//! Sets the particle rendering mode.
 		void					setRenderingMode( RenderingMode value );
 
-		//! Returns the particle blending mode.
-		BlendingMode			blendingMode( void ) const;
-
-		//! Sets the particle blending mode.
-		void					setBlendingMode( BlendingMode value );
-
 		//! Returns the particle material name.
 		const String&			material( void ) const;
 
@@ -160,87 +101,51 @@ namespace Fx {
 		//! Returns parent emitter.
 		EmitterWPtr				emitter( void ) const;
 
-		//! Adds burst item.
-		void					addBurst( f32 time, s32 count );
-
-		//! Returns the total number of bursts.
-		s32						burstCount( void ) const;
-
-		//! Returns the burst by index.
-		const ParticleBurst&	burst( s32 index ) const;
-
 		//! Returns the particles name.
 		const String&			name( void ) const;
 
 		//! Sets the particles name.
 		void					setName( const String& value );
 
-		//! Returns the emission rate at specified time
-        f32						emission( f32 scalar ) const;
-
-		//! Returns the maximum number of snapshots to save.
-		s32						maxSnapshots( void ) const;
-
-		//! Sets the maximum number of snapshots to save.
-		void					setMaxSnapshots( s32 value );
-
-		//! Returns the scalar parameter.
-		const FloatParameter&	scalarParameter( ScalarParameter parameter ) const;
-		FloatParameter&			scalarParameter( ScalarParameter parameter );
-
-		//! Returns the color parameter.
-		const RgbParameter&		colorParameter( ColorParameter parameter ) const;
-		RgbParameter&			colorParameter( ColorParameter parameter );
+		//! Adds new module instance.
+		void					addModule( const ModulePtr& module );
 
 		//! Updates the group of particles.
-		s32                     update( Particle* items, s32 itemCount, f32 dt, Bounds* bounds = NULL ) const;
+		void					update( Particle* items, s32 first, s32 last, f32 dt ) const;
 
-		//! Initializes a new group of particles.
-		s32                     init( const ZoneWPtr& zone, Particle *items, const Vec3& pos, s32 itemCount, f32 scalar ) const;
-
-		//! Saves the particles snapshots.
-		void					savePaths( Particle* items, s32 itemCount ) const;
-
+		//! Creates particles instance with a specified material factory.
 		ParticlesInstancePtr	createInstance( IMaterialFactoryWPtr materialFactory ) const;
 
 	private:
 
+								//! Constructs Particles instance.
 								Particles( EmitterWPtr emitter );
-
-		//! Initializes the particle snapshots.
-		void					initSnapshots( Particle& particle, s32 count ) const;
-
-		//! Returns the total number of snapshots to save.
-		s32						snapshotsToSave( void ) const;
 
 	private:
 
 		EmitterWPtr				m_emitter;							//!< Parent emitter instance.
-		BlendingMode			m_blendingMode;						//!< Particle blending mode.
 		RenderingMode			m_renderingMode;					//!< Particle rendering mode.
 		s32						m_count;							//!< The maximum number of particles.
-		s32						m_maxSnapshots;						//!< The maximum number of particle snapshots to save.
 		String					m_name;								//!< Particles name.
 		String					m_material;							//!< Particles material name.
-		Array<ParticleBurst>	m_bursts;							//!< Particle bursts.
-        
-        FloatParameter          m_scalar[TotalScalarParameters];	//!< Particle scalar parameters.
-        RgbParameter            m_color[TotalColorParameters];		//!< Particle color parameters.
+		Array<ModulePtr>		m_modules;							//!< Life time modules used by this particle system.
 	};
 
 	//! The particles instance.
 	class ParticlesInstance : public RefCounted {
 	friend class Particles;
+	friend class EmitterInstance;
 	public:
 
 		//! Returns the total number of alive particles.
 		s32						aliveCount( void ) const;
 
-		//! Returns the particle items.
-		const Particle*			items( void ) const;
+		//! Returns the maximum number of particles.
+		s32						maxCount( void ) const;
 
-		//! Returns the particle blending mode.
-		BlendingMode			blendingMode( void ) const;
+		//! Returns the particle items.
+		const Particle&			items( void ) const;
+		Particle&				items( void );
 
 		//! Returns the particles bounding box.
 		const Bounds&			bounds( void ) const;
@@ -255,24 +160,23 @@ namespace Fx {
 		void					setMaterial( const IMaterialWPtr& value );
 
 		//! Updates the particles.
-		s32						update( s32 iteration, const ZoneWPtr& zone, f32 dt, const Vec3& position, f32 scalar, bool noEmission );
+		s32						update( f32 dt );
 
 	private:
 
 								//! Constructs the ParticlesInstance instance.
 								ParticlesInstance( IMaterialFactoryWPtr materialFactory, ParticlesWPtr particles );
 
+		//! Adds alive particles.
+		void					addAliveCount( s32 value );
+
 	private:
 
 		ParticlesWPtr			m_particles;	//!< Parent particles.
-		Array<Particle>			m_items;		//!< An array of particle items.
+		Particle				m_items;		//!< Particle simulation data stored here.
 		s32						m_aliveCount;	//!< The total number of alive particles.
 		Bounds					m_bounds;		//!< Particles bounding box.
-		f32						m_time;			//!< Current particles time.
-		Array<ParticleBurst>	m_bursts;		//!< Available particle bursts.
 		IMaterialPtr			m_material;		//!< Particle material reference.
-		f32						m_emissionTime;
-		f32						m_snapshotTime;
 	};
 
 } // namespace Fx

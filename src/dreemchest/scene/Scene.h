@@ -56,6 +56,7 @@
 #include <Fx/Emitter.h>
 #include <Fx/Renderers.h>
 #include <Fx/Zones.h>
+#include <Fx/Modules.h>
 
 #include <Event/EventEmitter.h>
 

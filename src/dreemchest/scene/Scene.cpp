@@ -534,13 +534,13 @@ bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::
 	Fx::EmitterWPtr emitter = particles->emitter();
 
 	switch( object["type"].asInt() ) {
-	case 2:		emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) );
-				break;
-
-	case 5:		emitter->setZone( DC_NEW Fx::BoxZone( object["width"].asFloat(), object["height"].asFloat(), object["depth"].asFloat() ) );
-				break;
-
-	default:	DC_NOT_IMPLEMENTED;
+	case 4: break;	// not implemented
+	case 0: break;
+	case 1: emitter->setZone( DC_NEW Fx::SphereZone( object["radius"].asFloat() ) ); break;
+	case 3:
+	case 2: emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) ); break;
+	case 5: emitter->setZone( DC_NEW Fx::BoxZone( object["width"].asFloat(), object["height"].asFloat(), object["depth"].asFloat() ) ); break;
+	default: DC_NOT_IMPLEMENTED;
 	}
 
 	return true;
@@ -549,20 +549,26 @@ bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::
 // ** JsonSceneLoader::readModuleColor
 bool JsonSceneLoader::readModuleColor( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
-	readColorParameter( particles->colorParameter( Fx::Particles::ColorOverLife ), object["rgb"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::TransparencyOverLife ), object["alpha"] );
+	Fx::Color* color = DC_NEW Fx::Color;
+	readColorParameter( color->get(), object["rgb"] );
+	particles->addModule( color );
+
+	Fx::Transparency* transparency = DC_NEW Fx::Transparency;
+	readScalarParameter( transparency->get(), object["alpha"] );
+	particles->addModule( transparency );
+
 	return true;
 }
 
 // ** JsonSceneLoader::readModuleEmission
 bool JsonSceneLoader::readModuleEmission( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Emission ), object["rate"] );
+	readScalarParameter( particles->emitter()->emission(), object["rate"] );
 
 	Json::Value bursts = object.get( "bursts", Json::Value::null );
 
 	for( s32 i = 0, n = bursts.size() / 2; i < n; i++ ) {
-		particles->addBurst( bursts[i * 2 + 0].asFloat(), bursts[i * 2 + 1].asInt() );
+		particles->emitter()->addBurst( bursts[i * 2 + 0].asFloat(), bursts[i * 2 + 1].asInt() );
 	}
 
 	return true;
@@ -571,19 +577,25 @@ bool JsonSceneLoader::readModuleEmission( Fx::ParticlesWPtr particles, const Jso
 // ** JsonSceneLoader::readModuleAcceleration
 bool JsonSceneLoader::readModuleAcceleration( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
+#if 0
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationXOverLife ), object["x"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationYOverLife ), object["y"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationZOverLife ), object["z"] );
-
+#else
+	DC_BREAK
+#endif
 	return true;
 }
 
 // ** JsonSceneLoader::readModuleVelocity
 bool JsonSceneLoader::readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
-	Fx::FloatParameter& x = particles->scalarParameter( Fx::Particles::VelocityXOverLife );
-	Fx::FloatParameter& y = particles->scalarParameter( Fx::Particles::VelocityYOverLife );
-	Fx::FloatParameter& z = particles->scalarParameter( Fx::Particles::VelocityZOverLife );
+	Fx::LinearVelocity* module = DC_NEW Fx::LinearVelocity;
+	particles->addModule( module );
+
+	Fx::FloatParameter& x = module->x();
+	Fx::FloatParameter& y = module->y();
+	Fx::FloatParameter& z = module->z();
 
 	readScalarParameter( x, object["x"] );
 	readScalarParameter( y, object["y"] );
@@ -608,14 +620,22 @@ bool JsonSceneLoader::readModuleVelocity( Fx::ParticlesWPtr particles, const Jso
 // ** JsonSceneLoader::readModuleSize
 bool JsonSceneLoader::readModuleSize( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
-	readScalarParameter( particles->scalarParameter( Fx::Particles::SizeOverLife ), object["curve"] );
+	Fx::Size* module = DC_NEW Fx::Size;
+	readScalarParameter( module->get(), object["curve"] );
+	particles->addModule( module );
+
 	return true;
 }
 
 // ** JsonSceneLoader::readModuleAngularVelocity
 bool JsonSceneLoader::readModuleAngularVelocity( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
-	readScalarParameter( particles->scalarParameter( Fx::Particles::AngularVelocity ), object["curve"] );
+	Fx::InitialAngularVelocity* module = DC_NEW Fx::InitialAngularVelocity;
+	readScalarParameter( module->get(), object["curve"] );
+	particles->emitter()->addModule( module );
+
+	particles->addModule( DC_NEW Fx::Rotation );
+
 	return true;
 }
 
@@ -624,13 +644,44 @@ bool JsonSceneLoader::readModuleInitial( Fx::ParticlesWPtr particles, const Json
 {
 	particles->setCount( object["maxParticles"].asInt() );
 
-	readColorParameter( particles->colorParameter( Fx::Particles::Color ), object["rgb"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Life ), object["life"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Transparency ), object["alpha"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Size ), object["size"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Speed ), object["speed"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Gravity ), object["gravity"] );
-	readScalarParameter( particles->scalarParameter( Fx::Particles::Rotation ), object["rotation"] );
+	Fx::EmitterWPtr emitter = particles->emitter();
+
+	{
+		Fx::InitialColor* module = DC_NEW Fx::InitialColor;
+		readColorParameter( module->get(), object["rgb"] );
+		emitter->addModule( module );
+	}
+	{
+		Fx::InitialLife* module = DC_NEW Fx::InitialLife;
+		readScalarParameter( module->get(), object["life"] );
+		emitter->addModule( module );
+	}
+	{
+		Fx::InitialTransparency* module = DC_NEW Fx::InitialTransparency;
+		readScalarParameter( module->get(), object["alpha"] );
+		emitter->addModule( module );
+	}
+
+	{
+		Fx::InitialSize* module = DC_NEW Fx::InitialSize;
+		readScalarParameter( module->get(), object["size"] );
+		emitter->addModule( module );
+	}
+	{
+		Fx::InitialSpeed* module = DC_NEW Fx::InitialSpeed;
+		readScalarParameter( module->get(), object["speed"] );
+		emitter->addModule( module );
+	}
+	{
+		Fx::InitialGravity* module = DC_NEW Fx::InitialGravity;
+		readScalarParameter( module->get(), object["gravity"] );
+		emitter->addModule( module );
+	}
+	{
+		Fx::InitialRotation* module = DC_NEW Fx::InitialRotation;
+		readScalarParameter( module->get(), object["rotation"] );
+		emitter->addModule( module );
+	}
 
 	return true;
 }

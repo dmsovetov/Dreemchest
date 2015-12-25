@@ -63,33 +63,9 @@ public:
 		m_scene->update( 0, 0.03f );
 		m_scene->render( m_renderingContext );
 
-		{
-			Renderer::Renderer2DPtr renderer = m_renderingContext->renderer();
-			Rgba color = Rgba( 0.35f, 0.35f, 0.35f );
-
-			renderer->begin( Matrix4::ortho( 0, 800, 0, 600, -1, 1 ) );
-			for( s32 i = 1; i < 10; i++ ) {
-				renderer->line( i * 100, 0, i * 100, 800, color, color );
-			}
-			for( s32 i = 1; i < 10; i++ ) {
-				renderer->line( 0, i * 100, 800, i * 100, color, color );
-			}
-
-		//	StrongPtr<Scene::AssetTexture> tex = m_assets->find<Scene::Image>( "images/smoke" )->data();
-		//	renderer->orientedQuad( tex.valid() ? tex->texture : Renderer::Texture2DPtr(), 100, 100, 100, 100, Vec2( 0, 1 ), Vec2( 1, 0 ) );
-			renderer->end();
-		}
-
-
         // And now just present all rendered data to the screen
         m_hal->present();
     }
-
-	virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId = -1 )
-	{
-	//	m_particleSystem->setPosition( Vec3( 400, 300, 0 ) );
-	//	m_particleSystem->setPosition( Vec3( ex, 600 - ey, 0.0f ) );
-	}
 
     // The previously created HAL instance.
     HalWPtr	m_hal;
@@ -119,26 +95,26 @@ class ParticleSystems : public ApplicationDelegate {
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Hal::create( OpenGL, view );
 
+		Fx::log::setStandardHandler();
+
 		// Create the particle system
 		m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
-		m_scene  = Scene::Scene::createFromFile( m_assets, "assets/7d0a92f3e153365498704e1b5a277ec6" );
+		m_assets->setUuidFileNames( false );
 
+		m_scene = Scene::Scene::createFromFile( m_assets, "assets/platform_smoke.prefab" );
 		m_scene->addSystem<Scene::AssetSystem>( m_assets );
-		m_scene->addSystem<Scene::AffineTransformSystem>();
-		m_scene->addSystem<Scene::ParticlesSystem>();
-		
-		m_scene->addRenderingSystem<Scene::SinglePassRenderingSystem<Scene::RenderParticles, Scene::ParticleSystemsPass>>();
-		m_scene->addRenderingSystem<Scene::BoundingVolumesRenderer>();
 
-		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
-		camera->attach<Scene::Camera>( Scene::Camera::Ortho, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
+		Scene::Camera2DPtr camera = Scene::Camera2D::create( Scene::WindowTarget::create( window ) );
 		camera->attach<Scene::RenderParticles>();
-		camera->attach<Scene::Transform>();
-		//camera->attach<Scene::RenderBoundingVolumes>();
+		camera->attach<Scene::RenderGrid>();
+		camera->get<Scene::Camera>()->setClearColor( Rgba( 0.5f, 0.5f, 0.5f ) );
+		m_scene->addSceneObject( camera );
 
-		Scene::SceneObjectSet objects = m_scene->findAllWithName( "smoke" );
-		(*objects.begin())->get<Scene::Transform>()->setPosition( Vec3( 100, 100, 0 ) );
-
+		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
+		grid->attach<Scene::Grid>( 1000.0f, 10.0f );
+		grid->attach<Scene::Transform>()->rotate( 90.0f, 1.0f, 0.0f, 0.0f );
+		m_scene->addSceneObject( grid );
+		
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
         // Finally set the window delegate to handle updates.

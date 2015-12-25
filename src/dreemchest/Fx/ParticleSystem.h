@@ -53,14 +53,10 @@ namespace Fx {
 		//! Adds a new emitter.
 		EmitterWPtr					addEmitter( void );
 
+		void						addEmitter( EmitterPtr e ) { m_emitters.push_back( e ); }
+
 		//! Creates a new instance if a particle system.
 		ParticleSystemInstancePtr	createInstance( IMaterialFactoryWPtr materialFactory ) const;
-
-		//! Creates the ParticleSystem instance and loads it from file.
-		static ParticleSystemPtr	createFromFile( const String& fileName, f32 scalingFactor = 1.0f );
-
-		//! Creates the ParticleSystem instance and loads it from JSON string.
-		static ParticleSystemPtr	createFromJson( const String& json, f32 scalingFactor = 1.0f );
 
 	private:
 
@@ -118,72 +114,6 @@ namespace Fx {
 		f32							m_timeScale;		//!< The time scaling factor.
 		s32							m_aliveCount;		//!< The total number of alive particles.
 	};
-
-#ifdef HAVE_JSON
-
-	//! Loads the particle system from JSON file.
-	class JsonParticleSystemLoader : public Io::JsonLoaderBase {
-	public:
-
-		//! Loads the particle system from string.
-		bool						load( ParticleSystemWPtr particleSystem, const String& json, f32 scalingFactor );
-
-	private:
-
-		//! Reads particles from JSON object.
-		bool						readParticles( const Json::Value& object );
-
-		//! Reads emitter from JSON object.
-		bool						readEmitter( const Json::Value& object );
-
-		//! Reads renderer from JSON object.
-		bool						readRenderer( const Json::Value& object );
-
-		//! Reads the color module from JSON object.
-		bool						readColor( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the emission module from JSON object.
-		bool						readEmission( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the size module from JSON object.
-		bool						readSize( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the rotation module from JSON object.
-		bool						readAngularVelocity( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the acceleration module from JSON object.
-		bool						readAcceleration( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the velocity module from JSON object.
-		bool						readVelocity( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the initial module from JSON object.
-		bool						readInitial( ParticlesWPtr particles, const Json::Value& object );
-
-		//! Reads the color parameter from JSON object.
-		void						readColorParameter( RgbParameter& parameter, const Json::Value& object );
-
-		//! Reads the scalar parameter from JSON object.
-		void						readScalarParameter( FloatParameter& parameter, const Json::Value& object, f32 scalingFactor = 1.0f );
-
-	private:
-
-		//! Particle module loader
-		typedef cClosure<bool(ParticlesWPtr, const Json::Value&)>	ModuleLoader;
-
-		//! Container type to store particle module loaders.
-		typedef Map<String, ModuleLoader>		ModuleLoaders;
-
-		//! Container type to store emitters.
-		typedef Map<String, EmitterWPtr>		Emitters;
-
-		Emitters					m_emitters;			//!< Loaded emitters.
-		ModuleLoaders				m_moduleLoaders;	//!< Available module loaders.
-		ParticleSystemWPtr			m_particleSystem;	//!< Particle system to be parsed.
-		f32							m_scalingFactor;	//!< The particle system scaling factor.
-	};
-
-#endif	/*	HAVE_JSON	*/
 
 } // namespace Fx
 

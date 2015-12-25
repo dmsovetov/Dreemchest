@@ -57,7 +57,7 @@ void ParticleSystemsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderC
 
 		for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
 			Fx::ParticlesInstanceWPtr particles = emitter->particles( j );
-			m_renderer->render( particles->material(), Fx::BlendAdditive, particles->items(), particles->aliveCount() );
+			m_renderer->render( particles->material(), &particles->items(), particles->aliveCount() );
 		}
 	}
 }

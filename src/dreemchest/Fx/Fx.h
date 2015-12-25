@@ -51,6 +51,8 @@ namespace Fx {
 	dcDeclarePtrs( IMaterial )
 	dcDeclarePtrs( IMaterialFactory )
 
+	dcDeclareNamedPtrs( AbstractModule, Module )
+
 	//! Container type to store particle system emitters.
 	typedef Array<EmitterPtr>			EmittersArray;
 	typedef Array<EmitterInstancePtr>	EmitterInstancesArray;
@@ -119,6 +121,7 @@ DC_END_DREEMCHEST
 	#include "Emitter.h"
 	#include "Particles.h"
 	#include "Renderers.h"
+	#include "Modules.h"
 #endif
 
 #endif	/*	!__DC_Fx_H__	*/
