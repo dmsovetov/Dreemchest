@@ -203,6 +203,9 @@ namespace Scene {
 		//! Returns particle system instance.
 		Fx::ParticleSystemInstanceWPtr	instance( void ) const;
 
+		//! Returns particle system.
+		Fx::ParticleSystemWPtr			particles( void ) const;
+
 		//! Returns the material particles material.
 		MaterialWPtr					material( void ) const;
 

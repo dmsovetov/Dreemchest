@@ -173,6 +173,12 @@ Fx::ParticleSystemInstanceWPtr Particles::instance( void ) const
 	return m_instance;
 }
 
+// ** Particles::particles
+Fx::ParticleSystemWPtr Particles::particles( void ) const
+{
+	return m_particleSystem;
+}
+
 // ** Particles::material
 MaterialWPtr Particles::material( void ) const
 {
