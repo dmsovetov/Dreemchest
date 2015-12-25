@@ -31,9 +31,9 @@
 DC_BEGIN_COMPOSER
 
 // ** createSceneModel
-SceneModelPtr createSceneModel( Scene::SceneWPtr scene )
+SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene )
 {
-	return new SceneModelPrivate( scene );
+	return new SceneModelPrivate( assets, scene );
 }
 
 // ----------------------------------------------------- QSceneModel ----------------------------------------------------- //
@@ -44,6 +44,12 @@ QSceneModel::QSceneModel( SceneModelPrivate* parentSceneModel, Scene::SceneWPtr 
 {
 	m_scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( QSceneModel::handleSceneObjectAdded ) );
 	m_scene->subscribe<Scene::Scene::SceneObjectRemoved>( dcThisMethod( QSceneModel::handleSceneObjectRemoved ) );
+}
+
+// ** QSceneModel::scene
+Scene::SceneWPtr QSceneModel::scene( void ) const
+{
+	return m_scene;
 }
 
 // ** QSceneModel::remove
@@ -123,37 +129,23 @@ bool QSceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, in
 		return QGenericTreeModel::dropMimeData( data, action, row, column, parent );
 	}
 
+	// Extract an assets from MIME data
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
+
+	// Extract target sccene object from model index
+	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
+
 	// Get the acceptable drop action
-	AssetAction assetAction = acceptableAssetAction( data, action, row, column, parent );
+	SceneModel::AssetAction assetAction = m_parent->acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
 
 	if( !assetAction ) {
 		return false;
 	}
 
-	// Get the target scene object.
-	Scene::SceneObjectWPtr target = assetAction.sceneObject;
-
-	switch( assetAction.type ) {
-	case AssetAction::PlaceMesh:		break;
-	case AssetAction::AssignMaterial:	{
-											if( !target.valid() ) {
-												return false;
-											}
-
-											// Cast asset to a material
-											Scene::MaterialPtr material = castTo<Scene::Material>( assetAction.assets.begin()->get() );
-											DC_BREAK_IF( !material.valid() );
-
-											// Load material
-											m_scene->system<Scene::AssetSystem>()->queueMaterialAsset( material );
-
-											// Set mesh material
-											target->get<Scene::StaticMesh>()->setMaterial( 0, material );
-										}
-										break;
-	}
-
-	return true;
+	// Perform an action.
+	bool result = m_parent->performAssetAction( assetAction );
+	
+	return result;
 }
 
 #ifdef DC_QT5_ENABLED
@@ -166,8 +158,14 @@ bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action,
 		return QGenericTreeModel::canDropMimeData( data, action, row, column, parent );
 	}
 
+	// Extract an assets from MIME data
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
+
+	// Extract target sccene object from model index
+	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
+
 	// Get the acceptable drop action
-	AssetAction assetAction = acceptableAssetAction( data, action, row, column, parent );
+	SceneModel::AssetAction assetAction = m_parent->acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
 
 	if( !assetAction ) {
 		return false;
@@ -178,47 +176,13 @@ bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action,
 
 #endif	/*	DC_QT5_ENABLED	*/
 
-// ** QSceneModel::acceptableDropAction
-QSceneModel::AssetAction QSceneModel::acceptableAssetAction( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
-{
-	// Extract an assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
-	
-	// No valid asset found - can't drop
-	if( assets.empty() ) {
-		return AssetAction::Invalid;
-	}
-
-	// Get the target model index we are goind to drop an asset
-	QModelIndex index = this->index( row, column, parent );
-	qDebug() << index.isValid() << row << column << parent.isValid();
-
-	// Get the scene object at current index
-	//Scene::SceneObjectWPtr sceneObject = index.isValid() ? dataAt( index ) : Scene::SceneObjectWPtr();
-	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
-
-	// Check if we have droppable assets
-	AssetAction assetAction( AssetAction::Invalid, assets, sceneObject );
-
-	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
-		switch( (*i)->type() ) {
-		case Scene::Asset::Mesh:		assetAction.type = AssetAction::PlaceMesh;
-										break;
-		case Scene::Asset::Material:	if( !sceneObject.valid() || sceneObject->has<Scene::StaticMesh>() ) {
-											assetAction.type = AssetAction::AssignMaterial;
-										}
-										break;
-		}
-	}
-
-	return assetAction;
-}
-
 // ** QSceneModel::handleSceneObjectAdded
 void QSceneModel::handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e )
 {
-	// Ignore internal scene objects.
-	if( e.sceneObject->has<Editors::SceneEditorInternal>() ) {
+	DC_BREAK_IF( !e.sceneObject->has<Editors::SceneEditorInternal>() );
+
+	// Ignore private scene objects.
+	if( e.sceneObject->has<Editors::SceneEditorInternal>()->isPrivate() ) {
 		return;
 	}
 
@@ -246,30 +210,152 @@ void QSceneModel::handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemov
 // ** QSceneModel::moveItem
 bool QSceneModel::moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const
 {
-	// Get item transform
-	Scene::TransformWPtr child = item->data()->get<Scene::Transform>();
-
-	// Get the parent transform
-	Scene::TransformWPtr parent = destinationParent ? destinationParent->data()->get<Scene::Transform>() : Scene::TransformWPtr();
-
-	//! WORKAROUND: convert to local space of a new parent
-	Vec3 position = child->worldSpacePosition() - (parent.valid() ? parent->worldSpacePosition() : Vec3( 0, 0, 0 ));
-	Quat rotation = -(parent.valid() ? parent->rotation() : Quat()) * ((parent.valid() ? parent->rotation() : Quat()) * child->rotation());
-	child->setPosition( position );
-	child->setRotation( rotation );
-
-	// Now change the parent transform of a child
-	child->setParent( parent );
-
+	m_parent->changeSceneObjectParent( item->data(), destinationParent ? destinationParent->data() : Scene::SceneObjectWPtr() );
 	return true;
 }
 
 // -------------------------------------------------- SceneModelPrivate -------------------------------------------------- //
 
 // ** SceneModelPrivate::SceneModelPrivate
-SceneModelPrivate::SceneModelPrivate( Scene::SceneWPtr scene ) : PrivateInterface( new QSceneModel( this, scene ) )
+SceneModelPrivate::SceneModelPrivate( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene ) : PrivateInterface( new QSceneModel( this, scene ) ), m_assets( assets )
 {
 
+}
+
+// ** SceneModelPrivate::changeSceneObjectParent
+void SceneModelPrivate::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent )
+{
+	DC_BREAK_IF( !sceneObject.valid() );
+
+	// Get item transform
+	Scene::TransformWPtr childTransform = sceneObject->get<Scene::Transform>();
+
+	// Get the parent transform
+	Scene::TransformWPtr parentTransform = parent.valid() ? parent->get<Scene::Transform>() : Scene::TransformWPtr();
+
+	//! WORKAROUND: convert to local space of a new parent
+	Vec3 position = childTransform->worldSpacePosition() - (parent.valid() ? parentTransform->worldSpacePosition() : Vec3( 0, 0, 0 ));
+	Quat rotation = -(parent.valid() ? parentTransform->rotation() : Quat()) * ((parent.valid() ? parentTransform->rotation() : Quat()) * childTransform->rotation());
+	childTransform->setPosition( position );
+	childTransform->setRotation( rotation );
+
+	// Now change the parent transform of a child
+	childTransform->setParent( parentTransform );
+}
+
+// ** SceneModelPrivate::acceptableDropAction
+SceneModel::AssetAction SceneModelPrivate::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
+{
+	// No valid assets - can't drop
+	if( assets.empty() ) {
+		return AssetAction::Invalid;
+	}
+
+	// Check if we have droppable assets
+	AssetAction assetAction( AssetAction::Invalid, assets, target, point );
+
+	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
+		switch( (*i)->type() ) {
+		case Scene::Asset::Mesh:		assetAction.type = AssetAction::PlaceMesh;
+										break;
+
+		case Scene::Asset::Material:	if( !target.valid() || target->has<Scene::StaticMesh>() ) {
+											assetAction.type = AssetAction::AssignMaterial;
+										}
+										break;
+		}
+	}
+
+	return assetAction;
+}
+
+// ** SceneModelPrivate::performAssetAction
+bool SceneModelPrivate::performAssetAction( const AssetAction& action )
+{
+	// Get the target scene object.
+	Scene::SceneObjectWPtr target = action.sceneObject;
+
+	switch( action.type ) {
+	case AssetAction::PlaceMesh:		{
+											Scene::SceneObjectWPtr object = placeStaticMesh( castTo<Scene::Mesh>( action.assets.begin()->get() ), action.point );
+											DC_BREAK_IF( !object.valid() );
+
+											if( target.valid() ) {
+												object->get<Scene::Transform>()->setParent( target->get<Scene::Transform>() );
+											}
+										}
+										break;
+	case AssetAction::AssignMaterial:	{
+											if( !target.valid() ) {
+												return false;
+											}
+
+											applyMaterial( target, 0, castTo<Scene::Material>( action.assets.begin()->get() ) );
+										}
+
+										break;
+	}
+
+	return true;
+}
+
+// ** SceneModelPrivate::applyMaterial
+void SceneModelPrivate::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material )
+{
+	DC_BREAK_IF( !target.valid() );
+	DC_BREAK_IF( !target->has<Scene::StaticMesh>() );
+	DC_BREAK_IF( !material.valid() );
+
+	// Queue material for loading.
+	material->bundle()->queueForLoading( material );
+
+	// Set mesh material
+	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
+}
+
+// ** SceneModelPrivate::placeStaticMesh
+Scene::SceneObjectWPtr SceneModelPrivate::placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point )
+{
+	DC_BREAK_IF( !mesh.valid() );
+
+	// Get the scene
+	Scene::SceneWPtr scene = m_private->scene();
+
+	// Load the mesh
+	scene->system<Scene::AssetSystem>()->load( mesh );
+
+	// Construct scene object
+	Scene::SceneObjectPtr sceneObject = scene->createSceneObject();
+	sceneObject->attach<Scene::Identifier>( mesh->name() );
+	sceneObject->attach<Scene::StaticMesh>( mesh );
+	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
+	sceneObject->attach<Editors::SceneEditorInternal>( sceneObject );
+	scene->addSceneObject( sceneObject );
+
+	// Get all materials
+	Set<Scene::MaterialPtr> materials = m_assets->findByType<Scene::Material>();
+
+	// Apply materials
+	for( s32 i = 0; i < mesh->chunkCount(); i++ ) {
+		// Get chunk texture name
+		const String& texture = mesh->texture( i );
+
+		// Find material by name
+		for( Set<Scene::MaterialPtr>::const_iterator j = materials.begin(), end = materials.end(); j != end; ++j ) {
+			if( j->get()->name().find( texture + ".material" ) == String::npos ) {
+				continue;
+			}
+
+			sceneObject->get<Scene::StaticMesh>()->setMaterial( i, *j );
+			break;
+		}
+
+		if( !sceneObject->get<Scene::StaticMesh>()->material( i ).valid() ) {
+			qDebug() << "Material" << texture.c_str() << "not found";
+		}
+	}
+
+	return sceneObject;
 }
 
 DC_END_COMPOSER

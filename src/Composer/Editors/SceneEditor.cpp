@@ -50,7 +50,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create the scene model
-	m_sceneModel = createSceneModel( m_scene );
+	m_sceneModel = createSceneModel( m_project->assets(), m_scene );
 
 	// Create terrain.
 	Scene::TerrainPtr terrain = new Scene::Terrain( m_project->assets().get(), "terrain", "terrain", 128 );

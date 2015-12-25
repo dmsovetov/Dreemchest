@@ -142,7 +142,7 @@ DC_BEGIN_COMPOSER
 	extern AssetsModelPtr createAssetsModel( void );
 
 	//! Factory method used for scene model creation.
-	extern SceneModelPtr createSceneModel( Scene::SceneWPtr scene );
+	extern SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene );
 
 	//! Factory method used for material model creation.
 	extern PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material );

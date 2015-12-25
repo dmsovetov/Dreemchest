@@ -44,32 +44,10 @@ DC_BEGIN_COMPOSER
 		//! Removes the scene object at specified index.
 		void					remove( const QModelIndex& index );
 
+		//! Returns scene instance.
+		Scene::SceneWPtr		scene( void ) const;
+
 	private:
-
-		//! Available drop action.
-		struct AssetAction {
-			//! Available asset drop action types.
-			enum Type {
-				  Invalid			//!< The drop action is invalid.
-				, PlaceMesh			//!< Mesh asset can be dropped.
-				, AssignMaterial	//!< Material can be assigned.
-			};
-
-									//! Constructs AssetAction instance.
-									AssetAction( Type type, Scene::AssetSet assets, Scene::SceneObjectWPtr sceneObject )
-										: type( type ), sceneObject( sceneObject ), assets( assets ) {}
-
-									//! Constructs AssetAction instance from type.
-									AssetAction( Type type )
-										: type( type ) {}
-
-									//! Returns true if this is a valid action.
-									operator bool( void ) const { return type != Invalid; }
-
-			Type					type;			//!< Drop action type.
-			Scene::SceneObjectWPtr	sceneObject;	//!< Target scene object.
-			Scene::AssetSet			assets;			//!< Asset set that should be used.
-		};
 
 		//! Returns the item flags.
 		virtual Qt::ItemFlags	flags( const QModelIndex& index ) const Q_DECL_OVERRIDE;
@@ -97,9 +75,6 @@ DC_BEGIN_COMPOSER
 		//! Handles scene object removal.
 		void					handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemoved& e );
 
-		//! Returns the acceptable asset drop action.
-		AssetAction				acceptableAssetAction( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const;
-
 	private:
 
 		SceneModelPrivate*		m_parent;	//!< Parent scene model.
@@ -110,8 +85,27 @@ DC_BEGIN_COMPOSER
 	class SceneModelPrivate : public PrivateInterface<SceneModel, QSceneModel> {
 	public:
 
-								//! Constructs SceneModelPrivate instance.
-								SceneModelPrivate( Scene::SceneWPtr scene );
+										//! Constructs SceneModelPrivate instance.
+										SceneModelPrivate( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene );
+
+		//! Returns an acceptable drop action by a set of assets & target scene object
+		virtual AssetAction				acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const DC_DECL_OVERRIDE;
+
+		//! Handles an asset drop action to a target scene object & world space point.
+		virtual bool					performAssetAction( const AssetAction& action ) DC_DECL_OVERRIDE;
+
+		//! Applies material to a static mesh.
+		virtual void					applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material ) DC_DECL_OVERRIDE;
+
+		//! Places mesh instance to scene at specified world space point.
+		virtual Scene::SceneObjectWPtr	placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point ) DC_DECL_OVERRIDE;
+
+		//! Changes the parent of a scene object to a new one.
+		virtual void					changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) DC_DECL_OVERRIDE;
+
+	private:
+
+		Scene::AssetBundleWPtr			m_assets;	//!< Assets model to use by this scene.
 	};
 
 DC_END_COMPOSER
