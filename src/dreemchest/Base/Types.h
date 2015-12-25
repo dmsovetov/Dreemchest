@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <stack>
 #include <queue>
+#include <functional>
 
 #include <stdlib.h>
 #include <stdio.h>
