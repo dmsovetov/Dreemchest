@@ -217,12 +217,15 @@ s32 ParticlesInstance::update( f32 dt )
 	// Update particles
 	m_particles->update( particles, 0, m_aliveCount, dt );
 
-	// Calculate alive particles count.
-	s32 count = m_aliveCount;
+	// Calculate alive particles count & particle bounding box.
+	s32    count = m_aliveCount;
+	Bounds bounds;
 	
 	for( s32 i = 0; i < count; i++ ) {
 		// Particle is alive - skip it
 		if( m_items.life[i].current >= 0.0f ) {
+			f32 size = -particles->size[i].current;
+			bounds << particles->position[i] - Vec3( size, size, size ) << particles->position[i] + Vec3( size, size, size );
 			continue;
 		}
 
@@ -246,6 +249,9 @@ s32 ParticlesInstance::update( f32 dt )
 
 	// Save alive count
 	m_aliveCount = count;
+
+	// Save particle bounds
+	m_bounds = bounds;
 
 	return m_aliveCount;
 }
