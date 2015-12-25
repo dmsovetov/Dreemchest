@@ -86,7 +86,7 @@ void Light::setRange( f32 value )
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
-const MeshPtr& StaticMesh::mesh( void ) const
+MeshWPtr StaticMesh::mesh( void ) const
 {
 	return m_mesh;
 }

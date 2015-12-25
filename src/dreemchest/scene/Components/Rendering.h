@@ -132,7 +132,7 @@ namespace Scene {
 										: m_mesh( mesh ), m_visibility( ~0 ) {}
 
 		//! Returns mesh to be rendered.
-		const MeshPtr&				mesh( void ) const;
+		MeshWPtr					mesh( void ) const;
 
 		//! Sets a mesh to be rendered.
 		void						setMesh( const MeshPtr& value );
