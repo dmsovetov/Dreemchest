@@ -62,6 +62,9 @@ DC_BEGIN_DREEMCHEST
         //! Returns a vector length.
         float       length( void ) const;
 
+		//! Returns a vector squared length.
+		float		lengthSqr( void ) const;
+
         //! Returns an ordinal axis.
         Vec3        ordinal( void ) const;
 
@@ -231,7 +234,12 @@ DC_BEGIN_DREEMCHEST
 
     // ** Vec3::length
     inline float Vec3::length( void ) const {
-        return sqrt( x*x + y*y + z*z ) ;
+        return sqrt( lengthSqr() );
+    }
+
+    // ** Vec3::lengthSqr
+    inline float Vec3::lengthSqr( void ) const {
+        return x*x + y*y + z*z;
     }
 
     // ** Vec3::normalize
