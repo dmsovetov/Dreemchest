@@ -48,39 +48,6 @@ bool ArcballRotationTool::isLocked( void ) const
 	return m_isLocked;
 }
 
-#if DEV_SCREENSPACE_ARCBALL
-
-// ** ArcballRotationTool::lock
-void ArcballRotationTool::lock( s32 x, s32 y )
-{
-	DC_BREAK_IF( m_isLocked );
-
-	m_lastX		= x;
-	m_lastY		= y;
-	m_isLocked	= true;
-}
-
-// ** ArcballRotationTool::lastX
-s32 ArcballRotationTool::lastX( void ) const
-{
-	return m_lastX;
-}
-
-// ** ArcballRotationTool::lastY
-s32 ArcballRotationTool::lastY( void ) const
-{
-	return m_lastY;
-}
-
-// ** ArcballRotationTool::setLastCursor
-void ArcballRotationTool::setLastCursor( s32 x, s32 y )
-{
-	m_lastX = x;
-	m_lastY = y;
-}
-
-#else
-
 // ** ArcballRotationTool::lock
 void ArcballRotationTool::lock( const Quat& rotation, const Vec3& direction )
 {
@@ -102,8 +69,6 @@ const Quat& ArcballRotationTool::initialRotation( void ) const
 {
 	return m_initialRotation;
 }
-
-#endif	/*	DEV_SCREENSPACE_ARCBALL	*/
 
 // ** ArcballRotationTool::unlock
 void ArcballRotationTool::unlock( void )
@@ -136,64 +101,14 @@ void ArcballRotationToolSystem::process( u32 currentTime, f32 dt, Ecs::Entity& e
 		}
 	}
 
-#if DEV_SCREENSPACE_ARCBALL
-	// Compute the deltas of cursor movement.
-	f32 dx = (m_cursor->x() - tool.lastX()) * 0.5f;
-	f32 dy = (m_cursor->y() - tool.lastY()) * 0.5f;
+	Vec3 direction;
+	mapToVector( tool, transform, m_cursor->pos(), direction );
 
-	// Construct quaternions.
-	Quat x = Quat::rotateAroundAxis(  dx, m_camera->up() );
-	Quat y = Quat::rotateAroundAxis( -dy, m_camera->side() );
+	Vec3 v0 = m_camera->get<Scene::Transform>()->rotation().rotate( tool.initialDirection() );
+	Vec3 v1 = m_camera->get<Scene::Transform>()->rotation().rotate( direction );
 
-	// Apply rotations.
-	transform.setRotation( x * y * transform.rotation() );
-
-	// Update last used cursor coordinates.
-	tool.setLastCursor( m_cursor->x(), m_cursor->y() );
-#else
-	Vec3 point;
-
-	// Skip if there is no intersection of a view ray & arcball sphere.
-	if( !findIntersectionPoint( tool, transform, point ) ) {
-		return;
-	}
-
-	// Construct the vector to an intersection point.
-	Vec3 direction = Vec3::normalize( point - transform.position() );
-
-	// Calculate the cosine of an angle between the initial direction and current vector.
-	f32 angle = direction * tool.initialDirection();
-
-	if( angle >= 1.0f ) {
-		return;
-	}
-
-	// Calculate the rotation axis as a cross product of two vectors.
-	Vec3 axis = Vec3::normalize( direction % tool.initialDirection() );
-
-	// Construct the rotation quaternion.
-	Quat r = Quat::rotateAroundAxis( -degrees( acos( angle ) ), axis );
-
-	transform.setRotation( r * tool.initialRotation() );
-#endif
-}
-
-// ** ArcballRotationToolSystem::findIntersectionPoint
-bool ArcballRotationToolSystem::findIntersectionPoint( ArcballRotationTool& tool, Scene::Transform& transform, Vec3& point ) const
-{
-	// Get the view ray from cursor.
-	const Ray& ray = m_cursor->ray();
-
-	// Get the scale factor based on distance to camera
-	f32 scale = (m_camera->position() - transform.worldSpacePosition()).length();
-
-	// Construct the arcball sphere in world space coordinates.
-	Sphere arcball( transform.position(), tool.radius() * scale );
-
-	// Find the intersection point of a view ray & tool sphere
-	bool result = ray.intersects( arcball, &point );
-
-	return result;
+	Quat drag = Quat( v0 % v1, v0 * v1 );
+	transform.setRotation( drag * tool.initialRotation() );
 }
 
 // ** ArcballRotationToolSystem::handleMousePressed
@@ -213,21 +128,31 @@ void ArcballRotationToolSystem::handleMousePressed( const Editors::Cursor::Press
 		ArcballRotationTool& arcball	= *(*i)->get<ArcballRotationTool>();
 		Scene::Transform&	 transform	= *(*i)->get<Scene::Transform>();
 
-		// Find the intersection point
-		Vec3 point;
-
-		if( !findIntersectionPoint( arcball, transform, point ) ) {
+		// Map cursor coordinates to a direction on an arcball sphere
+		Vec3 direction;
+		if( !mapToVector( arcball, transform, m_cursor->pos(), direction ) ) {
 			continue;
 		}
 
-	#if DEV_SCREENSPACE_ARCBALL
-		// Save initial cursor coordinates
-		arcball.lock( m_cursor->x(), m_cursor->y() );
-	#else
-		// Save the initial rotation & vector to intersection point.
-		arcball.lock( transform.rotation(), Vec3::normalize( point - transform.position() ) );
-	#endif	/*	DEV_SCREENSPACE_ARCBALL	*/
+		// Lock an arcball
+		arcball.lock( transform.rotation(), direction );
 	}
+}
+
+// ** ArcballRotationToolSystem::mapToVector
+bool ArcballRotationToolSystem::mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const
+{
+	// Calculate arcball radius based on distance to camera.
+	f32 radius = arcball.radius() * (m_camera->position() - transform.worldSpacePosition()).length();
+
+	// Construct the arcball sphere.
+	Sphere sphere = Sphere( transform.worldSpacePosition(), radius );
+
+	// Project it onto the screen plane.
+	Circle circle = m_camera->get<Scene::Camera>()->sphereToScreenSpace( sphere, m_camera->get<Scene::Transform>() );
+
+	// Map the cursor point to a vector on a sphere.
+	return circle.mapToSphere( cursor, direction );
 }
 
 // ** ArcballRotationToolSystem::handleMouseReleased

@@ -30,8 +30,6 @@
 #include "../Composer.h"
 #include "../Editors/VisualEditor.h"
 
-#define DEV_SCREENSPACE_ARCBALL	(1)
-
 DC_BEGIN_COMPOSER
 
 	//! Arcball rotation tool component.
@@ -50,19 +48,6 @@ DC_BEGIN_COMPOSER
 		//! Unlocks the arcball tool.
 		void						unlock( void );
 
-	#if DEV_SCREENSPACE_ARCBALL
-		//! Locks the arcball tool.
-		void						lock( s32 x, s32 y );
-
-		//! Returns last used X cursor coordinate.
-		s32							lastX( void ) const;
-
-		//! Returns last used Y cursor coordinate.
-		s32							lastY( void ) const;
-
-		//! Sets last used cursor coordinates.
-		void						setLastCursor( s32 x, s32 y );
-	#else
 		//! Locks the arcball tool.
 		void						lock( const Quat& rotation, const Vec3& direction );
 
@@ -71,18 +56,12 @@ DC_BEGIN_COMPOSER
 
 		//! Returns the initial rotation.
 		const Quat&					initialRotation( void ) const;
-	#endif	/*	DEV_SCREENSPACE_ARCBALL	*/
 
 	private:
 
 		f32							m_radius;			//!< Tool radius.
-	#if DEV_SCREENSPACE_ARCBALL
-		s32							m_lastX;			//!< Last used X cursor coordinate.
-		s32							m_lastY;			//!< Last used Y cursor coordinate.
-	#else
 		Quat						m_initialRotation;	//!< Initial transform rotation.
 		Vec3						m_initialDirection;	//!< Initial vector.
-	#endif	/*	DEV_SCREENSPACE_ARCBALL	*/
 		bool						m_isLocked;			//!< Marks this arcball as locked.
 	};
 
@@ -104,8 +83,8 @@ DC_BEGIN_COMPOSER
 		//! Handles mouse released event.
 		void						handleMouseReleased( const Editors::Cursor::Released& e );
 
-		//! Finds the intersection point of a view ray & arcball.
-		bool						findIntersectionPoint( ArcballRotationTool& tool, Scene::Transform& transform, Vec3& point ) const;
+		//! Maps the screen space coordinates to a unit vector on arcball.
+		bool						mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
 
 	private:
 
