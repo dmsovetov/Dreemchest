@@ -99,6 +99,9 @@ namespace Renderer {
 		//! Renders a wire circle.
 		void					wireCircle( const Vec3 position, const Vec3& u, const Vec3& v, f32 radius, s32 sides, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+		//! Renders a wire half circle.
+		void					wireHalfCircle( const Vec3 position, const Vec3& u, const Vec3& v, const Vec3& w, f32 radius, s32 sides, const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
 		//! Sets the blend mode.
 		void					setBlendMode( BlendingMode value );
 

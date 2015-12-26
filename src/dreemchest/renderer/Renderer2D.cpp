@@ -282,6 +282,28 @@ void Renderer2D::wireCircle( const Vec3 position, const Vec3& u, const Vec3& v, 
 	}
 }
 
+// ** Renderer2D::wireHalfCircle
+void Renderer2D::wireHalfCircle( const Vec3 position, const Vec3& u, const Vec3& v, const Vec3& w, f32 radius, s32 sides, const Rgba& color )
+{
+	Vec3 prev;
+
+	for( s32 i = 0, n = sides; i <= n; i++ ) {
+		f32  angle = radians( i * (360.0f / n) );
+		Vec3 side  = (u * cosf( angle ) + v * sinf( angle )) * radius;
+		Vec3 end   = position + side;
+
+		if( i != 0 ) {
+			f32 dp = w * Vec3::normalize( end );
+
+			if( dp > 0.0f ) {
+				line( prev, end, color.transparent( dp < 0.25 ? dp : 1.0f ) );
+			}
+		}
+
+		prev = end;
+	}
+}
+
 // ** Renderer2D::quad
 void Renderer2D::quad( const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Rgba& color )
 {
