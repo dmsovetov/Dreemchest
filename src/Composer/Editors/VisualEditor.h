@@ -59,6 +59,9 @@ namespace Editors {
 		//! Returns cursor Y position.
 		s32				y( void ) const;
 
+		//! Returns cursor position.
+		Vec2			pos( void ) const;
+
 		//! Returns cursor view ray.
 		const Ray&		ray( void ) const;
 

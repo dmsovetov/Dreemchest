@@ -45,6 +45,12 @@ s32 Cursor::y( void ) const
 	return m_y;
 }
 
+// ** Cursor::pos
+Vec2 Cursor::pos( void ) const
+{
+	return Vec2( x(), y() );
+}
+
 // ** Cursor::ray
 const Ray& Cursor::ray( void ) const
 {
