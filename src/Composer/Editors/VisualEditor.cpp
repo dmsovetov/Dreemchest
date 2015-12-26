@@ -31,12 +31,58 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
+// ------------------------------------------------- Cursor --------------------------------------------------- //
+
+// ** Cursor::x
+s32 Cursor::x( void ) const
+{
+	return m_x;
+}
+
+// ** Cursor::y
+s32 Cursor::y( void ) const
+{
+	return m_y;
+}
+
+// ** Cursor::ray
+const Ray& Cursor::ray( void ) const
+{
+	return m_ray;
+}
+
+// ** Cursor::buttons
+const FlagSet8& Cursor::buttons( void ) const
+{
+	return m_buttons;
+}
+
+// ** Cursor::setPosition
+void Cursor::setPosition( s32 x, s32 y )
+{
+	m_x = x;
+	m_y = y;
+}
+
+// ** Cursor::setButtons
+void Cursor::setButtons( const FlagSet8& buttons )
+{
+	m_buttons = buttons;
+}
+
+// ** Cursor::setRay
+void Cursor::setRay( const Ray& value )
+{
+	m_ray = value;
+}
+
 // ----------------------------------------------- VisualEditor ----------------------------------------------- //
 
 // ** VisualEditor::VisualEditor
 VisualEditor::VisualEditor( void )
 {
 	m_backgroundColor = Rgba( 0.5f, 0.5f, 0.5f );
+	m_cursor		  = new Cursor();
 }
 
 // ** VisualEditor::initialize
@@ -69,6 +115,12 @@ bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetP
 Renderer::HalWPtr VisualEditor::hal( void ) const
 {
 	return m_hal;
+}
+
+// ** VisualEditor::cursor
+CursorWPtr VisualEditor::cursor( void ) const
+{
+	return m_cursor;
 }
 
 // ** VisualEditor::backgroundColor
@@ -106,19 +158,31 @@ void VisualEditor::handleResize( s32 width, s32 height )
 // ** VisualEditor::handleMousePress
 void VisualEditor::handleMousePress( s32 x, s32 y, u8 button )
 {
+	// Update button mask
+	FlagSet8 buttons = m_cursor->buttons();
+	buttons.on( button );
+	m_cursor->setButtons( buttons );
 
+	m_cursor->notify<Cursor::Pressed>( m_cursor, button );
 }
 
 // ** VisualEditor::handleMouseRelease
 void VisualEditor::handleMouseRelease( s32 x, s32 y, u8 button )
 {
+	// Update button mask
+	FlagSet8 buttons = m_cursor->buttons();
+	buttons.off( button );
+	m_cursor->setButtons( buttons );
 
+	// Emit the event
+	m_cursor->notify<Cursor::Released>( m_cursor, button );
 }
 
 // ** VisualEditor::handleMouseMove
-void VisualEditor::handleMouseMove( s32 sx, s32 sy, s32 dx, s32 dy, u8 buttons )
+void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 {
-
+	m_cursor->setPosition( x, m_document->renderingFrame()->height() - y );
+	m_cursor->setButtons( buttons );
 }
 
 // ** VisualEditor::handleContextMenu

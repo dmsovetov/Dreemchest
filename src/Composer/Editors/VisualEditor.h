@@ -33,6 +33,55 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
+	//! Cursor interface emits events when mouse pressed/released/moved.
+	class Cursor : public event::RefCountedEventEmitter {
+	public:
+
+		//! This event is emitted when mouse is pressed.
+		struct Pressed {
+						Pressed( CursorWPtr cursor, u8 buttons )
+							: cursor( cursor ), buttons( buttons ) {}
+			CursorWPtr	cursor;
+			FlagSet8	buttons;
+		};
+
+		//! This event is emitted when mouse is released.
+		struct Released {
+						Released( CursorWPtr cursor, u8 buttons )
+							: cursor( cursor ), buttons( buttons ) {}
+			CursorWPtr	cursor;
+			FlagSet8	buttons;
+		};
+
+		//! Returns cursor X position.
+		s32				x( void ) const;
+
+		//! Returns cursor Y position.
+		s32				y( void ) const;
+
+		//! Returns cursor view ray.
+		const Ray&		ray( void ) const;
+
+		//! Returns button mask.
+		const FlagSet8&	buttons( void ) const;
+
+		//! Set the cursor position.
+		void			setPosition( s32 x, s32 y );
+
+		//! Sets button mask.
+		void			setButtons( const FlagSet8& mask );
+
+		//! sets the cursor view ray.
+		void			setRay( const Ray& value );
+
+	private:
+
+		s32				m_x;		//!< Cursor X position.
+		s32				m_y;		//!< Cursor Y position.
+		Ray				m_ray;		//!< Cursor view ray.
+		FlagSet8		m_buttons;	//!< Mouse buttons mask.
+	};
+
 	//! Base class for all visual asset editors.
 	class VisualEditor : public AssetEditor {
 	friend class RenderingFrameDelegate;
@@ -47,10 +96,13 @@ namespace Editors {
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;
 
+		//! Returns cursor binding.
+		CursorWPtr						cursor( void ) const;
+
 		//! Returns the background color.
 		const Rgba&						backgroundColor( void ) const;
 
-	private:
+	protected:
 
 		//! Update the editor scene.
 		virtual void					update( f32 dt );
@@ -108,6 +160,7 @@ namespace Editors {
 		Renderer::HalPtr				m_hal;						//!< Rendering HAL instance.
 		Rgba							m_backgroundColor;			//!< The background color.
 		Ui::IRenderingFrameDelegatePtr	m_renderingFrameDelegate;	//!< Rendering frame delegate.
+		CursorPtr						m_cursor;					//!< Mouse cursor binding.
 	};
 
 	//! Visual editor rendering frame delegate.
