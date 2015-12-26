@@ -41,6 +41,8 @@ DC_BEGIN_DREEMCHEST
                     Vec3( const float* v );
 					Vec3( const double* v );
 
+					operator Vec2( void ) const;
+
         bool        operator == ( const Vec3& other ) const;
         float&      operator[]( int index );
         float       operator[]( int index ) const;
@@ -132,6 +134,12 @@ DC_BEGIN_DREEMCHEST
     {
 
     }
+
+	// ** Vec3::Vec2
+	inline Vec3::operator Vec2( void ) const
+	{
+		return Vec2( x, y );
+	}
 
     // ** Vec3::operator[]
     inline float Vec3::operator[]( int index ) const {
