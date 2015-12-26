@@ -77,6 +77,15 @@ DC_BEGIN_DREEMCHEST
         //! Create plane from point and normal.
         static Plane    calculate( const Vec3& normal, const Vec3& point );
 
+		//! Returns the XY plane that passes through a point.
+		static Plane	xy( const Vec3& point = Vec3() );
+
+		//! Returns the YZ plane that passes through a point.
+		static Plane	yz( const Vec3& point = Vec3() );
+
+		//! Returns the XZ plane that passes through a point.
+		static Plane	xz( const Vec3& point = Vec3() );
+
     private:
 
         //! Plane normal.
@@ -90,6 +99,24 @@ DC_BEGIN_DREEMCHEST
     inline Plane Plane::calculate( const Vec3& normal, const Vec3& point ) {
         return Plane( normal, -(normal * point) );
     }
+
+	// ** Plane::xy
+	Plane Plane::xy( const Vec3& point )
+	{
+		return Plane::calculate( Vec3::axisZ(), point );
+	}
+
+	// ** Plane::yz
+	Plane Plane::yz( const Vec3& point )
+	{
+		return Plane::calculate( Vec3::axisX(), point );
+	}
+
+	// ** Plane::xz
+	Plane Plane::xz( const Vec3& point )
+	{
+		return Plane::calculate( Vec3::axisY(), point );
+	}
 
 	// ** Plane::normalize
 	inline void Plane::normalize( void ) {
