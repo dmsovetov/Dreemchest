@@ -101,19 +101,19 @@ DC_BEGIN_DREEMCHEST
     }
 
 	// ** Plane::xy
-	Plane Plane::xy( const Vec3& point )
+	inline Plane Plane::xy( const Vec3& point )
 	{
 		return Plane::calculate( Vec3::axisZ(), point );
 	}
 
 	// ** Plane::yz
-	Plane Plane::yz( const Vec3& point )
+	inline Plane Plane::yz( const Vec3& point )
 	{
 		return Plane::calculate( Vec3::axisX(), point );
 	}
 
 	// ** Plane::xz
-	Plane Plane::xz( const Vec3& point )
+	inline Plane Plane::xz( const Vec3& point )
 	{
 		return Plane::calculate( Vec3::axisY(), point );
 	}
