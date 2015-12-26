@@ -122,8 +122,6 @@ DC_BEGIN_DREEMCHEST
 	// ** Quat::rotateAroundAxis
 	inline Quat Quat::rotateAroundAxis( float angle, const Vec3& axis )
 	{
-		assert( fabs( 1.0f - axis.length() ) < 0.0001f );
-
 		float alpha = radians( angle );
 		float sine	= sinf( alpha / 2.0f );
 
