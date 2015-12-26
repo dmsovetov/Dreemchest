@@ -25,7 +25,11 @@
  **************************************************************************/
 
 #include "SceneEditor.h"
-#include "Gizmo.h"
+#include "../Systems/TranslationTool.h"
+#include "../Systems/RotationTool.h"
+#include "../Systems/ArcballRotationTool.h"
+#include "../Systems/Rendering.h"
+#include "../Systems/Terrain.h"
 #include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
@@ -84,7 +88,9 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_scene->addSceneObject( m_camera );
 
 	// Add gizmo systems
-	m_scene->addSystem<TranslationGizmoSystem>( m_camera );
+	m_scene->addSystem<TranslationToolSystem>( cursor(), m_camera );
+	m_scene->addSystem<ArcballRotationToolSystem>( cursor(), m_camera );
+	m_scene->addSystem<RotationToolSystem>( m_camera );
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
 
 	return true;
