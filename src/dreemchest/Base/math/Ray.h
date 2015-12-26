@@ -54,6 +54,9 @@ DC_BEGIN_DREEMCHEST
 		//! Returns true if the ray intersects plane & calculates intersection point.
 		bool		intersects( const Plane& plane, Vec3* point = NULL, f32* time = NULL ) const;
 
+		//! Returns true if the ray intersects sphere.
+		bool		intersects( const Sphere& sphere, Vec3* point = NULL, f32* time = NULL, Vec3* normal = NULL ) const;
+
 	private:
 
 		Vec3		m_origin;		//!< Ray origin.
@@ -242,6 +245,38 @@ DC_BEGIN_DREEMCHEST
 		if( time ) *time = t;
 
 		return true;
+	}
+
+	// ** Ray::intersects
+	inline bool Ray::intersects( const Sphere& sphere, Vec3* point, f32* time, Vec3* normal ) const
+	{
+		const Vec3& center = sphere.center();
+		f32			radius = sphere.radius();
+
+		f32 a = m_direction * m_direction;
+		f32 b = m_direction * (m_origin * 2.0f - center);
+		f32 c = center * center + m_origin * m_origin - 2.0f * (m_origin * center) - radius * radius;
+		f32 d = b * b + -4.0f * a * c;
+
+		// No ray intersection
+		if( d < 0 ) {
+			return false;
+		}
+
+		d = sqrtf( d );
+
+		// Ray can intersect the sphere, solve the closer hitpoint
+		f32 t = -0.5f * (b + d) / a;
+
+		if( t <= 0.0f ) {
+			return false;
+		}
+
+		if( time )   *time   = t;
+		if( point )  *point  = m_origin + m_direction * t;
+		if( normal ) *normal = ((m_origin + m_direction * t) - center) / radius;
+
+		return true;	
 	}
 
 DC_END_DREEMCHEST
