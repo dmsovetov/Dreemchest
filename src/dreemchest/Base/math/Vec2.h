@@ -62,6 +62,9 @@ DC_BEGIN_DREEMCHEST
 		//! Returns the vector length.
 		float	length( void ) const;
 
+		//! Returns the squared vector length.
+		float	lengthSqr( void ) const;
+
 		//! Returns the normalized vector.
 		static Vec2	normalized( const Vec2& v );
 
@@ -203,7 +206,13 @@ DC_BEGIN_DREEMCHEST
 	// ** Vec2::length
 	inline float Vec2::length( void ) const
 	{
-		return sqrtf( x * x + y * y );
+		return sqrtf( lengthSqr() );
+	}
+
+	// ** Vec2::lengthSqr
+	inline float Vec2::lengthSqr( void ) const
+	{
+		return x * x + y * y;
 	}
 
 	// ** Vec2::normalized
