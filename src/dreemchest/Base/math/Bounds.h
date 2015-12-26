@@ -442,6 +442,9 @@ DC_BEGIN_DREEMCHEST
 		//! Returns true if the point lies on a circumference.
 		bool		isCircumference( const Vec2& point, f32 eps ) const;
 
+		//! Returns the nearest tangent line to a point.
+		Vec2		nearestTangent( const Vec2& point ) const;
+
 		//! Maps point to a direction vector on a 3D sphere,
 		bool		mapToSphere( const Vec2& point, Vec3& direction ) const;
 
@@ -491,6 +494,13 @@ DC_BEGIN_DREEMCHEST
 	inline bool Circle::isCircumference( const Vec2& point, f32 eps ) const
 	{
 		return fabs( m_radius - (point - m_center).length() ) <= eps;
+	}
+
+	// ** Circle::nearestTangen
+	inline Vec2 Circle::nearestTangent( const Vec2& point ) const
+	{
+		Vec2 r = Vec2::normalized( point - center() );
+		return Vec2( r.y, -r.x );
 	}
 
 	// ** Circle::mapToSphere
