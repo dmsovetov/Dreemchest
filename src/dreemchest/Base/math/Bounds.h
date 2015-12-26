@@ -348,6 +348,68 @@ DC_BEGIN_DREEMCHEST
 		return m_max.y - m_min.y;
 	}
 
+	//! 3D sphere class.
+	class Sphere {
+	public:
+
+					//! Constructs Sphere instance.
+					Sphere( void )
+						: m_center( 0.0f, 0.0f, 0.0f ), m_radius( 0.0f ) {}
+
+					Sphere( const Vec3& center, f32 radius )
+						: m_center( center ), m_radius( radius ) {}
+
+					//! Returns true if this sphere has a non-zero positive radius.
+					operator bool( void ) const;
+
+		//! Returns sphere center point.
+		const Vec3&	center( void ) const;
+
+		//! Sets sphere center point.
+		void		setCenter( const Vec3& value );
+
+		//! Returns sphere radius.
+		f32			radius( void ) const;
+
+		//! Sets sphere radius.
+		void		setRadius( f32 value );
+
+	private:
+
+		Vec3		m_center;	//!< The center point of a sphere.
+		f32			m_radius;	//!< The sphere radius.
+	};
+
+	// ** Sphere::operator bool
+	inline Sphere::operator bool( void ) const
+	{
+		return m_radius > 0.0f;
+	}
+
+	// ** Sphere::center
+	inline const Vec3& Sphere::center( void ) const
+	{
+		return m_center;
+	}
+
+	// ** Sphere::setCenter
+	inline void Sphere::setCenter( const Vec3& value )
+	{
+		m_center = value;
+	}
+
+	// ** Sphere::radius
+	inline f32 Sphere::radius( void ) const
+	{
+		return m_radius;
+	}
+
+	// ** Sphere::setRadius
+	inline void Sphere::setRadius( f32 value )
+	{
+		m_radius = value;
+	}
+
 DC_END_DREEMCHEST
 
 #endif  /*  !defined( __Base_Bounds_H__ )  */
