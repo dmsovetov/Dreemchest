@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Rendering.h"
+#include "Transform.h"
 
 #include "../Assets/Mesh.h"
 #include "../Assets/Material.h"
@@ -353,8 +354,8 @@ bool Camera::toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& trans
 	return true;
 }
 
-// ** Camera::toScreenSpace
-bool Camera::toScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const
+// ** Camera::pointToScreenSpace
+bool Camera::pointToScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const
 {
 	// Calculate the view projection matrix.
 	Matrix4 vp = calculateViewProjection( transform );
@@ -380,6 +381,26 @@ bool Camera::toScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& tran
 	screen.z = projected.z * 0.5f + 0.5f;
 
 	return true;
+}
+
+// ** Camera::sphereToScreenSpace
+Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const
+{
+	Vec3 center, tangent;
+
+	// Extract the transformation matrix
+	Matrix4 T = transform->matrix();
+
+	// Project the center point of a sphere to a screen space.
+	pointToScreenSpace( sphere.center(), center, T );
+
+	// Project the tangent point on sphere to a screen space.
+	pointToScreenSpace( sphere.center() + transform->axisX() * sphere.radius(), tangent, T );
+
+	// Caclulate the screen space radius.
+	f32 radius = (tangent - center).length();
+
+	return Circle( center, radius );
 }
 
 } // namespace Scene

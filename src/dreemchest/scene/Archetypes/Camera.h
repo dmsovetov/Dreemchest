@@ -73,6 +73,9 @@ namespace Scene {
 		//! Construct the view ray from screen space coordinates.
 		Ray							toWorldSpace( u32 x, u32 y ) const;
 
+		//! Projects the point in world space to a screen space.
+		bool						toScreenSpace( const Vec3& world, Vec3& screen ) const;
+
 		//! Creates the spectator camera instance.
 		static SpectatorCameraPtr	create( const RenderTargetPtr& renderTarget, const Vec3BindingPtr& cursor = Vec3BindingPtr() );
 

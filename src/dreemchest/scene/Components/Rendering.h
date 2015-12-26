@@ -303,7 +303,10 @@ namespace Scene {
 		bool						toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const;
 
 		//! Converts from world space to screen space.
-		bool						toScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
+		bool						pointToScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
+
+		//! Projects the bounding sphere to a screen space.
+		Circle						sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
 
 	private:
 

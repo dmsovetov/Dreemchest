@@ -63,6 +63,12 @@ Ray SpectatorCamera::toWorldSpace( u32 x, u32 y ) const
 	return Ray( transform->worldSpacePosition(), dir );
 }
 
+// ** SpectatorCamera::toScreenSpace
+bool SpectatorCamera::toScreenSpace( const Vec3& world, Vec3& screen ) const
+{
+	return get<Camera>()->pointToScreenSpace( world, screen, get<Transform>()->matrix() );
+}
+
 // ** SpectatorCamera::setRotationEnabled
 void SpectatorCamera::setRotationEnabled( bool value )
 {
