@@ -93,6 +93,18 @@ Vec3 SpectatorCamera::view( void ) const
 	return get<Transform>()->axisZ();
 }
 
+// ** SpectatorCamera::side
+Vec3 SpectatorCamera::side( void ) const
+{
+	return get<Transform>()->axisX();
+}
+
+// ** SpectatorCamera::up
+Vec3 SpectatorCamera::up( void ) const
+{
+	return get<Transform>()->axisY();
+}
+
 // ** SpectatorCamera::position
 const Vec3& SpectatorCamera::position( void ) const
 {

@@ -52,6 +52,12 @@ namespace Scene {
 		//! Returns the camera view vector.
 		Vec3						view( void ) const;
 
+		//! Returns the camera side vector.
+		Vec3						side( void ) const;
+
+		//! Returns the camera up vector.
+		Vec3						up( void ) const;
+
 		//! Returns the camera position.
 		const Vec3&					position( void ) const;
 
