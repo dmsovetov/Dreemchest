@@ -410,6 +410,100 @@ DC_BEGIN_DREEMCHEST
 		m_radius = value;
 	}
 
+	//! Circle class.
+	class Circle {
+	public:
+
+					//! Constructs Circle instance.
+					Circle( void )
+						: m_center( 0.0f, 0.0f ), m_radius( 0.0f ) {}
+
+					Circle( const Vec2& center, f32 radius )
+						: m_center( center ), m_radius( radius ) {}
+
+					//! Returns true if this circle has a non-zero positive radius.
+					operator bool( void ) const;
+
+		//! Returns circle center point.
+		const Vec2&	center( void ) const;
+
+		//! Sets circle center point.
+		void		setCenter( const Vec2& value );
+
+		//! Returns circle radius.
+		f32			radius( void ) const;
+
+		//! Sets circle radius.
+		void		setRadius( f32 value );		
+
+		//! Maps point to a direction vector on a 3D sphere,
+		bool		mapToSphere( const Vec2& point, Vec3& direction ) const;
+
+	private:
+
+		Vec2		m_center;	//!< Circle center.
+		f32			m_radius;	//!< Circle radius.
+	};
+
+	// ** Circle::operator bool
+	inline Circle::operator bool( void ) const
+	{
+		return m_radius > 0.0f;
+	}
+
+	// ** Circle::center
+	inline const Vec2& Circle::center( void ) const
+	{
+		return m_center;
+	}
+
+	// ** Circle::setCenter
+	inline void Circle::setCenter( const Vec2& value )
+	{
+		m_center = value;
+	}
+
+	// ** Circle::radius
+	inline f32 Circle::radius( void ) const
+	{
+		return m_radius;
+	}
+
+	// ** Circle::setRadius
+	inline void Circle::setRadius( f32 value )
+	{
+		m_radius = value;
+	}
+
+	// ** Circle::mapToSphere
+	inline bool Circle::mapToSphere( const Vec2& point, Vec3& direction ) const
+	{
+		// Get the cursor position relative to a center of sphere.
+		Vec2 r = (point - m_center);
+
+		// Caclulate the distance from a center to cursor position.
+		f32 distance = r.length();
+
+		// Outside of a circle - clamp to a radius
+		bool inside = distance <= m_radius;
+
+		if( !inside ) {
+			r = Vec2::normalized( r ) * m_radius * 0.99f;
+		}
+
+		// Now calculate the Z coordinate of 3D point.
+		// Given the sphere equation: X^2 + Y^2 + Z^2 = R^2
+		// X, Y, R are known, so just solve for Z:
+		// Z = sqrt( R^2 - X^2 - Y^2 ) (positive square root is taken).
+		f32 m = m_radius * m_radius - r.x * r.x - r.y * r.y;
+		f32 z = sqrtf( m_radius * m_radius - r.x * r.x - r.y * r.y );
+
+		// Construct the final result
+		direction = Vec3::normalize( Vec3( r.x, r.y, z ) );
+
+		return inside;
+	}
+
 DC_END_DREEMCHEST
 
 #endif  /*  !defined( __Base_Bounds_H__ )  */
