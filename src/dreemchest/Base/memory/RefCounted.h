@@ -149,7 +149,6 @@ DC_BEGIN_DREEMCHEST
     // ** RefCounted::~RefCounted
     inline RefCounted::~RefCounted( void )
     {
-        DC_BREAK_IF( m_references != 0 );
         if( m_weakProxy ) {
             m_weakProxy->setAlive( false );
             m_weakProxy->release();
