@@ -269,7 +269,8 @@ s32 EmitterInstance::calculateEmissionCount( f32 scalar, s32 maxCount )
         count = min2( maxCount, ( s32 )floor( m_timeEmission * rate ) );
         m_timeEmission -= count / rate;
 
-        DC_BREAK_IF( m_timeEmission < 0.0f );
+        // Emission time can't be less than zero
+		m_timeEmission = max2( m_timeEmission, 0.0f );
     }
 	else if( rate == 0.0f ) {
 		count			= 0;
