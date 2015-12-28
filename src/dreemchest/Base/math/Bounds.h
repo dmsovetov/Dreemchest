@@ -55,7 +55,7 @@ DC_BEGIN_DREEMCHEST
 		Bounds			operator * ( f32 value ) const;
 
         //! Returns a bounds volume.
-        float           volume( void ) const;
+        f32				volume( void ) const;
 
         //! Returns a minimum bound point.
         const Vec3&     min( void ) const;
@@ -85,13 +85,16 @@ DC_BEGIN_DREEMCHEST
 		Vec3			farCenter( void ) const;
 
         //! Returns bounds width.
-        float           width( void ) const;
+        f32				width( void ) const;
 
         //! Returns bounds height.
-        float           height( void ) const;
+        f32				height( void ) const;
 
         //! Returns bounds depth.
-        float           depth( void ) const;
+        f32				depth( void ) const;
+
+		//! Returns true if the point is inside the bounding box.
+		bool			contains( const Vec3& point ) const;
 
         //! Returns a random point in bounding box.
         Vec3            randomPointInside( void ) const;
@@ -122,7 +125,7 @@ DC_BEGIN_DREEMCHEST
     }
 
     // ** Bounds::volume
-    inline float Bounds::volume( void ) const {
+    inline f32 Bounds::volume( void ) const {
         return (m_max.x - m_min.x) * (m_max.y - m_min.y) * (m_max.z - m_min.z);
     }
 
@@ -178,18 +181,28 @@ DC_BEGIN_DREEMCHEST
 	}
 
     // ** Bounds::width
-    inline float Bounds::width( void ) const {
+    inline f32 Bounds::width( void ) const {
         return fabsf( m_max.x - m_min.x );
     }
 
     // ** Bounds::height
-    inline float Bounds::height( void ) const {
+    inline f32 Bounds::height( void ) const {
         return fabsf( m_max.y - m_min.y );
     }
 
     // ** Bounds::depth
-    inline float Bounds::depth( void ) const {
+    inline f32 Bounds::depth( void ) const {
         return fabsf( m_max.z - m_min.z );
+    }
+
+    // ** Bounds::contains
+    inline bool Bounds::contains( const Vec3& point ) const
+	{
+        if( point.x < m_min.x || point.x > m_max.x ) return false;
+		if( point.y < m_min.y || point.y > m_max.y ) return false;
+		if( point.z < m_min.z || point.z > m_max.z ) return false;
+
+		return true;
     }
 
     // ** Bounds::operator <<
