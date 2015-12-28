@@ -80,11 +80,11 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 		return;
 	}
 
-	const EntitySet& entities = m_index->entities();
+	EntitySet& entities = m_index->entities();
 
-	for( EntitySet::const_iterator i = entities.begin(); i != entities.end(); ) {
-		const Entity& entity = *(i++)->get();
-		process( currentTime, dt, const_cast<Entity&>( entity ) );
+	for( EntitySet::iterator i = entities.begin(); i != entities.end(); ) {
+		Entity& entity = *(i++)->get();
+		process( currentTime, dt, entity );
 	}
 
 	end();
