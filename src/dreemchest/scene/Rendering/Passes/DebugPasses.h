@@ -50,6 +50,20 @@ namespace Scene {
 		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;
 	};
 
+	//! Outputs vertex normals to framebuffer.
+	class VertexNormalsPass : public RenderPassBase {
+	public:
+
+								//! Constructs VertexNormalsPass instance.
+								VertexNormalsPass( Ecs::EcsWPtr ecs )
+									{ addEmitter( DC_NEW StaticMeshRopEmitter( ecs ) ); }
+
+	protected:
+
+		//! Setups the RVM for rendering vertex normals.
+		virtual void			setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection ) DC_DECL_OVERRIDE;	
+	};
+
 	//! Reneders wireframe mesh overlay.
 	class WireframePass : public RenderPassBase {
 	public:

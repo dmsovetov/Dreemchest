@@ -115,6 +115,7 @@ bool ShaderCache::loadFromFile( const String& fileName, String& vertex, String& 
 CString ShaderCache::s_shaderName[TotalShaders] = {
 	  "Pink"
 	, "ConstantColor"
+	, "Normals"
 };
 
 // ** ShaderCache::s_shaderName
@@ -156,6 +157,26 @@ ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 
 			void main() {
 				gl_FragColor = u_color;
+			}
+		)
+	},
+
+	// ** Output normals as color.
+	{
+		CODE(
+			uniform mat4 u_vp, u_transform;
+			varying vec3 v_normal;
+
+			void main() {
+				v_normal	= gl_Normal;
+				gl_Position = u_vp * u_transform * gl_Vertex;
+			}
+		),
+		CODE(
+			varying vec3 v_normal;
+
+			void main() {
+				gl_FragColor = vec4( v_normal * 0.5 + 0.5, 1.0 );
 			}
 		)
 	}

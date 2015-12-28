@@ -52,6 +52,10 @@ namespace Scene {
 	class RenderGrid : public Ecs::Component<RenderGrid> {
 	};
 
+	//! This component is attached to a camera to render vertex normals.
+	class RenderVertexNormals : public Ecs::Component<RenderVertexNormals> {
+	};
+
 	//! This component is attached to a camera to render sprites.
 	class RenderSprites : public Ecs::Component<RenderSprites> {
 	};

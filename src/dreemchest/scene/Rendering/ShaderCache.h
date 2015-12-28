@@ -42,6 +42,7 @@ namespace Scene {
 		enum ShaderId {
 			  Null
 			, ConstantColor
+			, Normals
 			, TotalShaders
 		};
 

@@ -43,6 +43,13 @@ void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewPro
 	rvm.setRegister( Rvm::ConstantColor, Vec4( 0.1f, 0.0f, 0.0f ) );
 }
 
+// ** VertexNormalsPass::setup
+void VertexNormalsPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
+{
+	// Set the default shader
+	rvm.setDefaultShader( shaders.shaderById( ShaderCache::Normals ) );
+}
+
 // ** WireframePass::setup
 void WireframePass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
