@@ -127,10 +127,10 @@ Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 	for( s32 i = 0; i <= kChunkSize; i++ ) {
 		for( s32 j = 0; j <= kChunkSize; j++ ) {
 			Vertex& vertex = vertices[i * stride + j];
-			f32		height = heightAtVertex( x * kChunkSize + j, z * kChunkSize + i );/*m_heightmap.height( x * kChunkSize + j, z * kChunkSize + i ) / f32( USHRT_MAX ) * m_maxHeight*/;
+			f32		height = heightAtVertex( x * kChunkSize + j, z * kChunkSize + i );
 
 			vertex.position = Vec3( ( f32 )j, ( f32 )height, ( f32 )i );
-			vertex.normal   = Vec3( 0.0f, 1.0f, 0.0f );
+			vertex.normal   = m_heightmap.normal( x * kChunkSize + j, z * kChunkSize + i );
 			vertex.uv		= Vec2( vertex.position.x, vertex.position.z ) * uvSize;
 		}
 	}
@@ -282,6 +282,30 @@ void Heightmap::setHeight( u32 x, u32 z, Type value )
 {
 	DC_BREAK_IF( x > m_size || z > m_size );
 	m_buffer[z * (m_size + 1) + x] = value;
+}
+
+// ** Heightmap::normal
+Vec3 Heightmap::normal( u32 x, u32 z ) const
+{
+	// Compute the X gradient
+    f32 dx = height( x < m_size - 1 ? x + 1 : x, z ) - height( x > 0 ? x - 1 : x, z );
+
+    if( x == 0 || x == m_size - 1 ) {
+        dx *= 2;
+	}
+
+	// Compute the Z gradient
+    f32 dy = height( x, z < m_size-1 ? z + 1 : z ) - height( x, z > 0 ?  z - 1 : z );
+
+    if( z == 0 || z == m_size - 1 ) {
+        dy *= 2;
+	}
+
+	// Normalize
+	Vec3 normal( -dx, 2.0f, dy );
+	normal.normalize();
+
+	return normal;
 }
 
 // ** Heightmap::set

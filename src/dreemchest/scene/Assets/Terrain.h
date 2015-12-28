@@ -60,6 +60,9 @@ namespace Scene {
 		//! Sets height at specified coordinate.
 		void					setHeight( u32 x, u32 z, Type value );
 
+		//! Returns normal at specified coordinate.
+		Vec3					normal( u32 x, u32 z ) const;
+
 		//! Constructs the heightmap from a callback.
 		void					set( StrongPtr<Generator> generator );
 
