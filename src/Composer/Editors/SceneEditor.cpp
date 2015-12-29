@@ -25,11 +25,11 @@
  **************************************************************************/
 
 #include "SceneEditor.h"
-#include "../Systems/TranslationTool.h"
-#include "../Systems/RotationTool.h"
-#include "../Systems/ArcballRotationTool.h"
-#include "../Systems/Rendering.h"
+#include "../Systems/Transform/TranslationTool.h"
+#include "../Systems/Transform/RotationTool.h"
+#include "../Systems/Transform/ArcballRotationTool.h"
 #include "../Systems/Terrain/TerrainEditing.h"
+#include "../Systems/Rendering.h"
 #include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER

@@ -28,7 +28,6 @@
 #define __DC_Composer_RotationTool_H__
 
 #include "Gizmo.h"
-#include "../Editors/VisualEditor.h"
 
 DC_BEGIN_COMPOSER
 

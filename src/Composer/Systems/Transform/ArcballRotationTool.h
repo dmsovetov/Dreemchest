@@ -27,8 +27,7 @@
 #ifndef __DC_Composer_Systems_ArcballRotationTool_H__
 #define __DC_Composer_Systems_ArcballRotationTool_H__
 
-#include "../Composer.h"
-#include "../Editors/VisualEditor.h"
+#include "Gizmo.h"
 
 DC_BEGIN_COMPOSER
 

@@ -27,9 +27,9 @@
 #ifndef __DC_Composer_Rendering_H__
 #define __DC_Composer_Rendering_H__
 
-#include "RotationTool.h"
-#include "TranslationTool.h"
-#include "ArcballRotationTool.h"
+#include "Transform/RotationTool.h"
+#include "Transform/TranslationTool.h"
+#include "Transform/ArcballRotationTool.h"
 #include "Terrain/TerrainEditing.h"
 
 DC_BEGIN_COMPOSER
