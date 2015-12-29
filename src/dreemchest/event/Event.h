@@ -37,8 +37,4 @@ namespace event {
 
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-	#include "EventEmitter.h"
-#endif
-
 #endif	/*	!__DC_Event_H__	*/

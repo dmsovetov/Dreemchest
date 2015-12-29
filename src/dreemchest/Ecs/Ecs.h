@@ -31,7 +31,6 @@
 
 #include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
-#include "../event/EventEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -62,9 +61,6 @@ namespace Ecs {
 
 	//! Container type to store the list of entities.
 	typedef List<EntityPtr> EntityList;
-
-	//! Event emitter type alias.
-	typedef event::EventEmitter EventEmitter;
 
 	//! Entity id generator.
 	class EntityIdGenerator : public RefCounted {

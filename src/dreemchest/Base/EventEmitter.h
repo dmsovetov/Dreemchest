@@ -24,15 +24,11 @@
 
  **************************************************************************/
 
-#ifndef __DC_Event_EventEmitter_H__
-#define __DC_Event_EventEmitter_H__
-
-#include "Event.h"
+#ifndef __DC_Base_EventEmitter_H__
+#define __DC_Base_EventEmitter_H__
 
 DC_BEGIN_DREEMCHEST
 
-namespace event {
-    
     namespace detail {
         
         //! Event listener subscribtion
@@ -190,82 +186,82 @@ namespace event {
 		template<typename TEvent>
 		void						unsubscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
 
+	#ifndef DC_CPP11_DISABLED
 		//! Constructs and emits a new event instance.
 		template<typename TEvent, typename ... TArgs>
 		void						notify( const TArgs& ... args ) { m_eventEmitter.notify<TEvent, TArgs...>( args... ); }
+	#endif	/*	!DC_CPP11_DISABLED	*/
 
 	protected:
 
 		EventEmitter				m_eventEmitter;	//!< Event emitter instance.
 	};
 
-	namespace detail {
+	//namespace detail {
 
-		//! Event interface
-		class IQueuedEvent {
-		public:
+	//	//! Event interface
+	//	class IQueuedEvent {
+	//	public:
 
-			virtual			~IQueuedEvent( void ) {}
-			virtual void	emit( EventEmitter& emitter ) = 0;
-		};
+	//		virtual			~IQueuedEvent( void ) {}
+	//		virtual void	emit( EventEmitter& emitter ) = 0;
+	//	};
 
-		//! Typed event.
-		template<typename T>
-		class QueuedEvent : public IQueuedEvent {
-		public:
+	//	//! Typed event.
+	//	template<typename T>
+	//	class QueuedEvent : public IQueuedEvent {
+	//	public:
 
-							//! Constructs a QueuedEvent instance.
-							QueuedEvent( const T& e )
-								: m_event( e ) {}
+	//						//! Constructs a QueuedEvent instance.
+	//						QueuedEvent( const T& e )
+	//							: m_event( e ) {}
 
-			//! Emits an event.
-			virtual void	emit( EventEmitter& emitter ) { emitter.emit( m_event ); }
+	//		//! Emits an event.
+	//		virtual void	emit( EventEmitter& emitter ) { emitter.emit( m_event ); }
 
-		private:
+	//	private:
 
-			//! Stored event data.
-			T				m_event;
-		};
+	//		//! Stored event data.
+	//		T				m_event;
+	//	};
 
-		//! Event queue is used for cross-thread event emitting.
-		class EventQueue {
-		public:
+	//	//! Event queue is used for cross-thread event emitting.
+	//	class EventQueue {
+	//	public:
 
-			//! Queues a new event.
-			template<typename T>
-			void			queue( const T& e );
+	//		//! Queues a new event.
+	//		template<typename T>
+	//		void			queue( const T& e );
 
-			//! Emits all queued events.
-			void			emit( EventEmitter& emitter );
+	//		//! Emits all queued events.
+	//		void			emit( EventEmitter& emitter );
 
-		private:
+	//	private:
 
-			//! Queued events.
-			Array<IQueuedEvent*>	m_events;
-		};
+	//		//! Queued events.
+	//		Array<IQueuedEvent*>	m_events;
+	//	};
 
-		// ** EventQueue::queue
-		template<typename T>
-		inline void EventQueue::queue( const T& e )
-		{
-		//	m_events.push_back( new QueuedEvent( e ) );
-		}
+	//	// ** EventQueue::queue
+	//	template<typename T>
+	//	inline void EventQueue::queue( const T& e )
+	//	{
+	//	//	m_events.push_back( new QueuedEvent( e ) );
+	//	}
 
-		// ** EventQueue::emit
-		inline void EventQueue::emit( EventEmitter& emitter )
-		{
-			for( u32 i = 0, n = m_events.size(); i < n; i++ ) {
-				m_events[i]->emit( emitter );
-				delete m_events[i];
-			}
+	//	// ** EventQueue::emit
+	//	inline void EventQueue::emit( EventEmitter& emitter )
+	//	{
+	//		for( u32 i = 0, n = m_events.size(); i < n; i++ ) {
+	//			m_events[i]->emit( emitter );
+	//			delete m_events[i];
+	//		}
 
-			m_events.clear();
-		}
+	//		m_events.clear();
+	//	}
 
-	} // namespace detail
-
-} // namespace event
+	//} // namespace detail
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Event_EventEmitter_H__	*/
+#endif	/*	!__DC_Base_EventEmitter_H__	*/

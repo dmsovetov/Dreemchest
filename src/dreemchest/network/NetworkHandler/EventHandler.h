@@ -49,7 +49,7 @@ namespace net {
 	public:
 
 								//! Constructs EventHandler instance.
-								EventHandler( event::EventEmitter* eventEmitter )
+								EventHandler( EventEmitter* eventEmitter )
 									: m_eventEmitter( eventEmitter ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
@@ -58,7 +58,7 @@ namespace net {
 	private:
 
 		//! Parent event emitter.
-		event::EventEmitter*	m_eventEmitter;
+		EventEmitter*			m_eventEmitter;
 	};
 
 	// ** EventHandler::handle

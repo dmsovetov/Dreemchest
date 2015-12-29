@@ -93,7 +93,7 @@ namespace net {
 
 		//! Subscribes for a network event of a specified type.
 		template<typename T>
-		void					subscribe( const typename event::EventEmitter::Callback<T>::Type& callback );
+		void					subscribe( const typename EventEmitter::Callback<T>::Type& callback );
 
 	protected:
 
@@ -157,7 +157,7 @@ namespace net {
 		ConnectionBySocket		m_connections;
 
 		//! Network event emitter.
-		event::EventEmitter		m_eventEmitter;
+		EventEmitter			m_eventEmitter;
 
 		//! Broadcast listener socket.
 		UDPSocketPtr			m_broadcastListener;
@@ -206,7 +206,7 @@ namespace net {
 
 	// ** NetworkHandler::subscribe
 	template<typename T>
-	inline void NetworkHandler::subscribe( const typename event::EventEmitter::Callback<T>::Type& callback )
+	inline void NetworkHandler::subscribe( const typename EventEmitter::Callback<T>::Type& callback )
 	{
 		m_eventEmitter.subscribe<T>( callback );
 	}

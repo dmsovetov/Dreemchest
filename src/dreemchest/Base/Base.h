@@ -63,4 +63,6 @@
 
 #include "memory/ArrayAllocator.h"
 
+#include "EventEmitter.h"
+
 #endif  /*  !defined( __Base_H__ ) */

@@ -58,8 +58,6 @@
 #include <Fx/Zones.h>
 #include <Fx/Modules.h>
 
-#include <Event/EventEmitter.h>
-
 #include "PlaneClipper.h"
 
 DC_BEGIN_DREEMCHEST
@@ -233,7 +231,7 @@ namespace Scene {
 	typedef Array<RayTracingResult> RayTracingResultArray;
 
 	//! The root class for a scene subsystem.
-	class Scene : public event::RefCountedEventEmitter {
+	class Scene : public RefCountedEventEmitter {
 	public:
 
 		//! Performs a scene update.
