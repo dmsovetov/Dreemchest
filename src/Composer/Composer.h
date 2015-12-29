@@ -109,6 +109,40 @@ DC_BEGIN_COMPOSER
 		//! This component marks scene objects as internally used by scene editor.
 		class SceneEditorInternal : public Ecs::Component<SceneEditorInternal> {
 		public:
+
+			//! Scene object editor flags.
+			enum Flags {
+				  Selected		= BIT( 0 )	//!< The scene object is now selected.
+				, Highlighted	= BIT( 1 )	//!< The scene object is highlighted.
+				, Private		= BIT( 2 )	//!< Private scene objects should not be displayed in scene hierarchy window.
+				, Freezed		= BIT( 3 )	//!< Freezed scene objects can't be selected by mouse.
+			};
+
+									//! Constructs SceneEditorInternal instance.
+									SceneEditorInternal( Scene::SceneObjectWPtr parent = Scene::SceneObjectWPtr(), u8 flags = 0 );
+
+			//! Returns parent scene object.
+			Scene::SceneObjectWPtr	parent( void ) const;
+
+			//! Returns true if this scene object is private.
+			bool					isPrivate( void ) const;
+
+			//! Returns true if this scene object is highlighted.
+			bool					isHighlighted( void ) const;
+
+			//! Marks this scene object as highlighted.
+			void					setHighlighted( bool value );
+
+			//! Returns true if this scene object is selected.
+			bool					isSelected( void ) const;
+
+			//! Marks this scene object as selected.
+			void					setSelected( bool value );
+
+		private:
+
+			FlagSet8				m_flags;	//!< Bitset mask.
+			Scene::SceneObjectWPtr	m_parent;	//!< Parent scene object.
 		};
 
 		dcDeclarePtrs( AssetEditor )

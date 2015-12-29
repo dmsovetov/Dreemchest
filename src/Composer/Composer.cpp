@@ -39,6 +39,57 @@
 
 DC_BEGIN_COMPOSER
 
+namespace Editors {
+
+// --------------------------------------------------------------- SceneEditorInternal -------------------------------------------------------------- //
+
+// ** SceneEditorInternal::SceneEditorInternal
+SceneEditorInternal::SceneEditorInternal( Scene::SceneObjectWPtr parent, u8 flags ) : m_parent( parent ), m_flags( flags )
+{
+
+}
+
+// ** SceneEditorInternal::parent
+Scene::SceneObjectWPtr SceneEditorInternal::parent( void ) const
+{
+	return m_parent;
+}
+
+// ** SceneEditorInternal::isPrivate
+bool SceneEditorInternal::isPrivate( void ) const
+{
+	return m_flags.is( Private );
+}
+
+// ** SceneEditorInternal::isHighlighted
+bool SceneEditorInternal::isHighlighted( void ) const
+{
+	return m_flags.is( Highlighted );
+}
+
+// ** SceneEditorInternal::setHighlighted
+void SceneEditorInternal::setHighlighted( bool value )
+{
+	m_flags.set( Highlighted, value );
+}
+
+// ** SceneEditorInternal::isSelected
+bool SceneEditorInternal::isSelected( void ) const
+{
+	return m_flags.is( Selected );
+}
+
+// ** SceneEditorInternal::setSelected
+void SceneEditorInternal::setSelected( bool value )
+{
+	m_flags.set( Selected, value );
+}
+
+
+} // namespace Editors
+
+// -------------------------------------------------------------------- Composer -------------------------------------------------------------------- //
+
 // ** Composer::s_instance
 ComposerWPtr Composer::s_instance = ComposerWPtr();
 
