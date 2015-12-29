@@ -238,6 +238,9 @@ void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
 				mesh->GetPolygonVertexUV( i, j, texCoordNames.GetStringAt( k ), texCoords[k], pUnmapped );
 			}
 
+			// Get normal
+			mesh->GetPolygonVertexNormal( i, j, normal );
+
 			// Initialize vertex
             Vertex vertex;
             vertex.position = Vec3( position );
