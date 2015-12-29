@@ -79,11 +79,11 @@ DC_BEGIN_DREEMCHEST
 			typedef typename detail::EventListener<TEvent>::Callback Type;
 		};
 
-		//! Subscribes for an event.
+		//! Subscribes to an event of type TEvent.
 		template<typename TEvent>
         void subscribe( const typename Callback<TEvent>::Type& callback );
 
-		//! Removes an event listener.
+		//! Unsubscribes from an event of type TEvent.
 		template<typename TEvent>
 		void unsubscribe( const typename Callback<TEvent>::Type& callback );
 
@@ -91,8 +91,8 @@ DC_BEGIN_DREEMCHEST
 		template<typename TEvent>
 		void notify( const TEvent& e );
 
-		//! Constructs and emits a new event instance.
 	#ifndef DC_CPP11_DISABLED
+        //! Constructs and emits a new event instance.
 		template<typename TEvent, typename ... TArgs>
 		void notify( const TArgs& ... args );
 	#endif
@@ -178,11 +178,11 @@ DC_BEGIN_DREEMCHEST
 	class RefCountedEventEmitter : public RefCounted {
 	public:
 
-		//! Subscribes for a project event.
+		//! Subscribes to an event of type TEvent.
 		template<typename TEvent>
 		void						subscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.subscribe<TEvent>( callback ); }
 
-		//! Removes an event listener.
+		//! Unsubscribes from an event of type TEvent.
 		template<typename TEvent>
 		void						unsubscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
 
@@ -196,6 +196,35 @@ DC_BEGIN_DREEMCHEST
 
 		EventEmitter				m_eventEmitter;	//!< Event emitter instance.
 	};
+
+#ifndef DC_CPP11_DISABLED
+    //! Event emitter class used for injection.
+    template<typename TBase>
+    class InjectedEventEmitter : public TBase {
+	public:
+
+                                    //! Constructs InjectedEventEmitter instance by passing arguments to TBase's constructor.
+                                    template<typename ... TArgs>
+                                    InjectedEventEmitter( TArgs ... args )
+                                        : TBase( args... ) {}
+
+		//! Subscribes to an event of type TEvent.
+		template<typename TEvent>
+		void						subscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.subscribe<TEvent>( callback ); }
+
+		//! Unsubscribes from an event of type TEvent.
+		template<typename TEvent>
+		void						unsubscribe( const typename EventEmitter::Callback<TEvent>::Type& callback ) { m_eventEmitter.unsubscribe<TEvent>( callback ); }
+
+		//! Constructs and emits a new event instance.
+		template<typename TEvent, typename ... TArgs>
+		void						notify( const TArgs& ... args ) { m_eventEmitter.notify<TEvent, TArgs...>( args... ); }
+	
+	protected:
+
+		EventEmitter				m_eventEmitter;	//!< Event emitter instance.
+    };
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 	//namespace detail {
 
