@@ -196,7 +196,8 @@ DC_BEGIN_COMPOSER
 	dcDeclarePtrs( FileSystem )
 	dcDeclarePtrs( FileInfo )
 	dcDeclarePtrs( IMimeData )
-	dcDeclarePtrs( AssetsModel )
+	qDeclarePtrs( AssetsModel )
+    qDeclarePtrs( FilteredAssetsModel )
 	qDeclarePtrs( PropertyModel )
     qDeclarePtrs( SceneModel )
 

@@ -24,23 +24,23 @@
 
  **************************************************************************/
 
-#ifndef __Composer_Qt_AbstractTreeModel_H__
-#define __Composer_Qt_AbstractTreeModel_H__
+#ifndef __Composer_AbstractTreeModel_H__
+#define __Composer_AbstractTreeModel_H__
 
-#include "../../Composer.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 	//! Basic tree model.
-	class QAbstractTreeModel : public QAbstractItemModel {
+	class AbstractTreeModel : public QAbstractItemModel {
 
 		Q_OBJECT
 
 	public:
 
-								//! Constructs QAbstractTreeModel instance.
-								explicit QAbstractTreeModel( int columnCount = 1, QObject* parent = NULL );
-		virtual					~QAbstractTreeModel( void );
+								//! Constructs AbstractTreeModel instance.
+								explicit AbstractTreeModel( int columnCount = 1, QObject* parent = NULL );
+		virtual					~AbstractTreeModel( void );
 
 		//! Clears the model.
 		void					clear( void );
@@ -156,12 +156,12 @@ DC_BEGIN_COMPOSER
 
 	//! Generic tree model.
 	template<typename TItemData>
-	class QGenericTreeModel : public QAbstractTreeModel {
+	class GenericTreeModel : public AbstractTreeModel {
 	public:
 
-								//! Constructs QGenericTreeModel instance.
-								explicit QGenericTreeModel( int columnCount = 1, QObject* parent = NULL )
-									: QAbstractTreeModel( columnCount, parent ) {}
+								//! Constructs GenericTreeModel instance.
+								explicit GenericTreeModel( int columnCount = 1, QObject* parent = NULL )
+									: AbstractTreeModel( columnCount, parent ) {}
 
 		//! Returns the item data at specified index.
 		const TItemData&		dataAt( const QModelIndex& index ) const;
@@ -204,9 +204,9 @@ DC_BEGIN_COMPOSER
 		virtual bool			moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const { return true; }
 	};
 
-	// ** QGenericTreeModel::dataAt
+	// ** GenericTreeModel::dataAt
 	template<typename TItemData>
-	const TItemData& QGenericTreeModel<TItemData>::dataAt( const QModelIndex& index ) const
+	const TItemData& GenericTreeModel<TItemData>::dataAt( const QModelIndex& index ) const
 	{
 		static TItemData kInvalid;
 
@@ -217,39 +217,39 @@ DC_BEGIN_COMPOSER
 		return kInvalid;
 	}
 
-	// ** QGenericTreeModel::createItem
+	// ** GenericTreeModel::createItem
 	template<typename TItemData>
-	QAbstractTreeModel::TreeItem* QGenericTreeModel<TItemData>::createItem( void ) const
+	AbstractTreeModel::TreeItem* GenericTreeModel<TItemData>::createItem( void ) const
 	{
 		return new Item;
 	}
 
-	// ** QGenericTreeModel::createItem
+	// ** GenericTreeModel::createItem
 	template<typename TItemData>
-	typename QGenericTreeModel<TItemData>::Item* QGenericTreeModel<TItemData>::createItem( const TItemData& data ) const
+	typename GenericTreeModel<TItemData>::Item* GenericTreeModel<TItemData>::createItem( const TItemData& data ) const
 	{
 		Item* item = static_cast<Item*>( createItem() );
 		item->data() = data;
 		return item;
 	}
 
-	// ** QGenericTreeModel::itemAtIndex
+	// ** GenericTreeModel::itemAtIndex
 	template<typename TItemData>
-	typename QGenericTreeModel<TItemData>::Item* QGenericTreeModel<TItemData>::itemAtIndex( const QModelIndex& index ) const
+	typename GenericTreeModel<TItemData>::Item* GenericTreeModel<TItemData>::itemAtIndex( const QModelIndex& index ) const
 	{
-		return static_cast<Item*>( QAbstractTreeModel::itemAtIndex( index ) );
+		return static_cast<Item*>( AbstractTreeModel::itemAtIndex( index ) );
 	}
 
-	// ** QGenericTreeModel::moveItem
+	// ** GenericTreeModel::moveItem
 	template<typename TItemData>
-	bool QGenericTreeModel<TItemData>::moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const
+	bool GenericTreeModel<TItemData>::moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const
 	{
 		return moveItem( static_cast<Item*>( sourceParent ), static_cast<Item*>( destinationParent ), static_cast<Item*>( item ), destinationRow );
 	}
 
-	// ** QGenericTreeModel::indexFromData
+	// ** GenericTreeModel::indexFromData
 	template<typename TItemData>
-	QModelIndex QGenericTreeModel<TItemData>::indexFromData( const TItemData& data, const TreeItem* root )
+	QModelIndex GenericTreeModel<TItemData>::indexFromData( const TItemData& data, const TreeItem* root )
 	{
 		root = root ? root : this->root();
 
@@ -278,4 +278,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__Composer_Qt_AbstractTreeModel_H__	*/
+#endif	/*	!__Composer_AbstractTreeModel_H__	*/

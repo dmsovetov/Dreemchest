@@ -90,6 +90,9 @@ namespace Ui {
 		//! Sets asset tree model.
 		void						setModel( AssetsModelWPtr value );
 
+        //! Returns asset model.
+        AssetsModelWPtr             model( void ) const;
+
 	protected:
 
 		//! Handles the deletion and renaming items.
@@ -119,7 +122,7 @@ namespace Ui {
 
 		IAssetTreeWPtr				m_parent;			//!< Parent AssetTree instance.
 		Project::ProjectWPtr		m_project;			//!< Parent project instance.
-		AssetsModelWPtr				m_model;			//!< File system model used.
+		FilteredAssetsModelPtr	    m_proxy;			//!< Filtered assets model to be used.
 		bool						m_selectionChanged;	//!< This flag indicates that selection was changed.
 	};
 

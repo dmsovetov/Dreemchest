@@ -28,27 +28,27 @@
 
 DC_BEGIN_COMPOSER
 
-// --------------------------------------------------------- QAbstractTreeModel --------------------------------------------------------- //
+// --------------------------------------------------------- AbstractTreeModel --------------------------------------------------------- //
 
-// ** QAbstractTreeModel::QAbstractTreeModel
-QAbstractTreeModel::QAbstractTreeModel( int columnCount, QObject* parent ) : QAbstractItemModel( parent ), m_columnCount( columnCount )
+// ** AbstractTreeModel::AbstractTreeModel
+AbstractTreeModel::AbstractTreeModel( int columnCount, QObject* parent ) : QAbstractItemModel( parent ), m_columnCount( columnCount )
 {
 
 }
 
-QAbstractTreeModel::~QAbstractTreeModel( void )
+AbstractTreeModel::~AbstractTreeModel( void )
 {
 
 }
 
-// ** QAbstractTreeModel::root
-QAbstractTreeModel::TreeItem* QAbstractTreeModel::root( void ) const
+// ** AbstractTreeModel::root
+AbstractTreeModel::TreeItem* AbstractTreeModel::root( void ) const
 {
 	return &m_root;
 }
 
-// ** QAbstractTreeModel::clear
-void QAbstractTreeModel::clear( void )
+// ** AbstractTreeModel::clear
+void AbstractTreeModel::clear( void )
 {
 	QModelIndex index = indexFromItem( root() );
 
@@ -57,8 +57,8 @@ void QAbstractTreeModel::clear( void )
 	endRemoveRows();
 }
 
-// ** QAbstractTreeModel::index
-QModelIndex QAbstractTreeModel::index( int row, int column, const QModelIndex& parent ) const
+// ** AbstractTreeModel::index
+QModelIndex AbstractTreeModel::index( int row, int column, const QModelIndex& parent ) const
 {
 	if( !hasIndex( row, column, parent ) ) {
 		return QModelIndex();
@@ -76,20 +76,20 @@ QModelIndex QAbstractTreeModel::index( int row, int column, const QModelIndex& p
 	return index;
 }
 
-// ** QAbstractTreeModel::supportedDropActions
-Qt::DropActions QAbstractTreeModel::supportedDropActions( void ) const
+// ** AbstractTreeModel::supportedDropActions
+Qt::DropActions AbstractTreeModel::supportedDropActions( void ) const
 {
     return Qt::MoveAction;
 }
 
-// ** QAbstractTreeModel::createMimeData
-QMimeData* QAbstractTreeModel::createMimeData( const QModelIndexList& indexes ) const
+// ** AbstractTreeModel::createMimeData
+QMimeData* AbstractTreeModel::createMimeData( const QModelIndexList& indexes ) const
 {
 	return new QMimeData;
 }
 
-// ** QAbstractTreeModel::mimeData
-QMimeData* QAbstractTreeModel::mimeData( const QModelIndexList& indexes ) const
+// ** AbstractTreeModel::mimeData
+QMimeData* AbstractTreeModel::mimeData( const QModelIndexList& indexes ) const
 {
 	// Serialize TreeItem pointers to stream
     QByteArray encodedData;
@@ -106,8 +106,8 @@ QMimeData* QAbstractTreeModel::mimeData( const QModelIndexList& indexes ) const
 	return data;
 }
 
-// ** QAbstractTreeModel::dropMimeData
-bool QAbstractTreeModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
+// ** AbstractTreeModel::dropMimeData
+bool AbstractTreeModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
 {
 	if( action == Qt::IgnoreAction ) {
 		return true;
@@ -144,8 +144,8 @@ bool QAbstractTreeModel::dropMimeData( const QMimeData* data, Qt::DropAction act
 	return true;
 }
 
-// ** QAbstractTreeModel::moveRows
-bool QAbstractTreeModel::moveRows( const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent, int destinationChild )
+// ** AbstractTreeModel::moveRows
+bool AbstractTreeModel::moveRows( const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent, int destinationChild )
 {
 	// Get the source parent item
 	TreeItem* sourceParentItem = itemAtIndex( sourceParent );
@@ -176,8 +176,8 @@ bool QAbstractTreeModel::moveRows( const QModelIndex& sourceParent, int sourceRo
 
 #ifdef DC_QT4_ENABLED
 
-// ** QAbstractTreeModel::moveRow
-bool QAbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow, const QModelIndex& destinationParent, int destinationChild )
+// ** AbstractTreeModel::moveRow
+bool AbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow, const QModelIndex& destinationParent, int destinationChild )
 {
 	moveRows( sourceParent, sourceRow, 1, destinationParent, destinationChild );
 	return true;
@@ -185,8 +185,8 @@ bool QAbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow
 
 #endif	/*	DC_QT4_ENABLED	*/
 
-// ** QAbstractTreeModel::parent
-QModelIndex QAbstractTreeModel::parent( const QModelIndex& child ) const
+// ** AbstractTreeModel::parent
+QModelIndex AbstractTreeModel::parent( const QModelIndex& child ) const
 {
     if( !child.isValid() ) {
         return QModelIndex();
@@ -202,8 +202,8 @@ QModelIndex QAbstractTreeModel::parent( const QModelIndex& child ) const
 	return indexFromItem( p );
 }
 
-// ** QAbstractTreeModel::rowCount
-int QAbstractTreeModel::rowCount( const QModelIndex& parent ) const
+// ** AbstractTreeModel::rowCount
+int AbstractTreeModel::rowCount( const QModelIndex& parent ) const
 {
     if( parent.column() > 0 ) {
         return 0;
@@ -218,14 +218,14 @@ int QAbstractTreeModel::rowCount( const QModelIndex& parent ) const
     return parentItem->childCount();
 }
 
-// ** QAbstractTreeModel::columnCount
-int QAbstractTreeModel::columnCount( const QModelIndex& parent ) const
+// ** AbstractTreeModel::columnCount
+int AbstractTreeModel::columnCount( const QModelIndex& parent ) const
 {
 	return m_columnCount;
 }
 
-// ** QAbstractTreeModel::itemAtIndex
-QAbstractTreeModel::TreeItem* QAbstractTreeModel::itemAtIndex( const QModelIndex& index ) const
+// ** AbstractTreeModel::itemAtIndex
+AbstractTreeModel::TreeItem* AbstractTreeModel::itemAtIndex( const QModelIndex& index ) const
 {
 	if( !index.isValid() ) {
 		return root();
@@ -234,8 +234,8 @@ QAbstractTreeModel::TreeItem* QAbstractTreeModel::itemAtIndex( const QModelIndex
 	return reinterpret_cast<TreeItem*>( index.internalPointer() );
 }
 
-// ** QAbstractTreeModel::parentIndexFromItem
-QModelIndex QAbstractTreeModel::parentIndexFromItem( const TreeItem* item ) const
+// ** AbstractTreeModel::parentIndexFromItem
+QModelIndex AbstractTreeModel::parentIndexFromItem( const TreeItem* item ) const
 {
 	if( item->parent() == root() ) {
 		return QModelIndex();
@@ -244,8 +244,8 @@ QModelIndex QAbstractTreeModel::parentIndexFromItem( const TreeItem* item ) cons
 	return indexFromItem( item->parent() );
 }
 
-// ** QAbstractTreeModel::indexFromItem
-QModelIndex QAbstractTreeModel::indexFromItem( const TreeItem* item ) const
+// ** AbstractTreeModel::indexFromItem
+QModelIndex AbstractTreeModel::indexFromItem( const TreeItem* item ) const
 {
 	if( !item ) {
 		return QModelIndex();
@@ -255,14 +255,14 @@ QModelIndex QAbstractTreeModel::indexFromItem( const TreeItem* item ) const
 	return createIndex( row != -1 ? row : 0, 0, ( void* )item );
 }
 
-// ** QAbstractTreeModel::moveItem
-bool QAbstractTreeModel::moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const
+// ** AbstractTreeModel::moveItem
+bool AbstractTreeModel::moveItem( TreeItem* sourceParent, TreeItem* destinationParent, TreeItem* item, int destinationRow ) const
 {
 	return true;
 }
 
-// ** QAbstractTreeModel::addAsset
-void QAbstractTreeModel::addItem( TreeItem* item, TreeItem* parent )
+// ** AbstractTreeModel::addAsset
+void AbstractTreeModel::addItem( TreeItem* item, TreeItem* parent )
 {
 	// Get index
 	QModelIndex index = indexFromItem( parent );
@@ -284,8 +284,8 @@ void QAbstractTreeModel::addItem( TreeItem* item, TreeItem* parent )
 	emit dataChanged( index, index );
 }
 
-// ** QAbstractTreeModel::removeItem
-void QAbstractTreeModel::removeItem( TreeItem* item )
+// ** AbstractTreeModel::removeItem
+void AbstractTreeModel::removeItem( TreeItem* item )
 {
 	// Get index
 	int row = item->row();
@@ -303,27 +303,27 @@ void QAbstractTreeModel::removeItem( TreeItem* item )
 	emit dataChanged( index, index );
 }
 
-// ------------------------------------------------------ QAbstractTreeModel::TreeItem ------------------------------------------------------ //
+// ------------------------------------------------------ AbstractTreeModel::TreeItem ------------------------------------------------------ //
 
-// ** QAbstractTreeModel::TreeItem::TreeItem
-QAbstractTreeModel::TreeItem::TreeItem( TreeItem* parent ) : m_parent( parent )
+// ** AbstractTreeModel::TreeItem::TreeItem
+AbstractTreeModel::TreeItem::TreeItem( TreeItem* parent ) : m_parent( parent )
 {
 }
 
-QAbstractTreeModel::TreeItem::~TreeItem( void )
+AbstractTreeModel::TreeItem::~TreeItem( void )
 {
 	qDeleteAll( m_children );
 }
 
-// ** QAbstractTreeModel::TreeItem::clear
-void QAbstractTreeModel::TreeItem::clear( void )
+// ** AbstractTreeModel::TreeItem::clear
+void AbstractTreeModel::TreeItem::clear( void )
 {
 	qDeleteAll( m_children );
 	m_children.clear();
 }
 
-// ** QAbstractTreeModel::TreeItem::row
-int QAbstractTreeModel::TreeItem::row( void ) const
+// ** AbstractTreeModel::TreeItem::row
+int AbstractTreeModel::TreeItem::row( void ) const
 {
 	if( !m_parent ) {
 		return -1;
@@ -332,21 +332,21 @@ int QAbstractTreeModel::TreeItem::row( void ) const
 	return m_parent->m_children.indexOf( const_cast<TreeItem*>( this ) );
 }
 
-// ** QAbstractTreeModel::TreeItem::child
-QAbstractTreeModel::TreeItem* QAbstractTreeModel::TreeItem::child( int index ) const
+// ** AbstractTreeModel::TreeItem::child
+AbstractTreeModel::TreeItem* AbstractTreeModel::TreeItem::child( int index ) const
 {
 	return m_children.at( index );
 }
 
-// ** QAbstractTreeModel::TreeItem::addChild
-void QAbstractTreeModel::TreeItem::addChild( TreeItem* child )
+// ** AbstractTreeModel::TreeItem::addChild
+void AbstractTreeModel::TreeItem::addChild( TreeItem* child )
 {
 	// Set this item as parent of child
 	child->setParent( this, childCount() );
 }
 
-// ** QAbstractTreeModel::TreeItem::removeChild
-void QAbstractTreeModel::TreeItem::removeChild( TreeItem* child )
+// ** AbstractTreeModel::TreeItem::removeChild
+void AbstractTreeModel::TreeItem::removeChild( TreeItem* child )
 {
 	// Find child
 	int index = m_children.indexOf( child );
@@ -356,20 +356,20 @@ void QAbstractTreeModel::TreeItem::removeChild( TreeItem* child )
 	m_children.remove( index );
 }
 
-// ** QAbstractTreeModel::TreeItem::parent
-QAbstractTreeModel::TreeItem* QAbstractTreeModel::TreeItem::parent( void ) const
+// ** AbstractTreeModel::TreeItem::parent
+AbstractTreeModel::TreeItem* AbstractTreeModel::TreeItem::parent( void ) const
 {
 	return m_parent;
 }
 
-// ** QAbstractTreeModel::TreeItem::childCount
-int QAbstractTreeModel::TreeItem::childCount( void ) const
+// ** AbstractTreeModel::TreeItem::childCount
+int AbstractTreeModel::TreeItem::childCount( void ) const
 {
 	return m_children.count();
 }
 
-// ** QAbstractTreeModel::TreeItem::setRow
-void QAbstractTreeModel::TreeItem::setRow( int value )
+// ** AbstractTreeModel::TreeItem::setRow
+void AbstractTreeModel::TreeItem::setRow( int value )
 {
 	int row = this->row();
 
@@ -380,8 +380,8 @@ void QAbstractTreeModel::TreeItem::setRow( int value )
 	m_parent->m_children.insert( value, this );
 }
 
-// ** QAbstractTreeModel::TreeItem::setParent
-void QAbstractTreeModel::TreeItem::setParent( TreeItem* parent, int row )
+// ** AbstractTreeModel::TreeItem::setParent
+void AbstractTreeModel::TreeItem::setParent( TreeItem* parent, int row )
 {
 	// Remove from an old parent
 	int oldRow = this->row();

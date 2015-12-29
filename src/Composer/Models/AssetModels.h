@@ -48,4 +48,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_AssetModels_H__	*/
+#endif	/*	!__DC_Composer_AssetModels_H__	*/

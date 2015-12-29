@@ -54,16 +54,16 @@ Assets::Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
 	// Subscribe for assets model event
-	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel->subscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel->subscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
+	m_assetsModel.lock()->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
+	m_assetsModel.lock()->subscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
+	m_assetsModel.lock()->subscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
 }
 
 Assets::~Assets( void )
 {
-	m_assetsModel->unsubscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel->unsubscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel->unsubscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
+	m_assetsModel.lock()->unsubscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
+	m_assetsModel.lock()->unsubscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
+	m_assetsModel.lock()->unsubscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
 }
 
 // ** Assets::bundle
@@ -86,7 +86,7 @@ Scene::AssetPtr Assets::createAssetForFile( const FileInfoWPtr& fileInfo )
 	}
 
 	// Set meta file
-	m_assetsModel->setMetaData( fileInfo, asset->keyValue() );
+	m_assetsModel.lock()->setMetaData( fileInfo, asset->keyValue() );
 
 	return asset;
 }
@@ -114,7 +114,7 @@ void Assets::handleAssetAdded( const AssetsModel::Added& e )
 void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( e.file );
+	String uuid = m_assetsModel.lock()->uuid( e.file );
 
 	// Remove asset from bundle
 	m_bundle->removeAsset( uuid );
@@ -127,7 +127,7 @@ void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
 void Assets::handleAssetChanged( const AssetsModel::Changed& e )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( e.file );
+	String uuid = m_assetsModel.lock()->uuid( e.file );
 
 	// Update asset's cache
 	putToCache( e.file, uuid );
@@ -137,7 +137,7 @@ void Assets::handleAssetChanged( const AssetsModel::Changed& e )
 void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 {
 	// Read the meta data
-	Io::KeyValue meta = m_assetsModel->metaData( fileInfo );
+	Io::KeyValue meta = m_assetsModel.lock()->metaData( fileInfo );
 
 	// Added asset
 	Scene::AssetPtr asset;
@@ -154,7 +154,7 @@ void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 	}
 
 	// Set asset name
-	String name = fileInfo->relativePath( m_assetsModel->rootPath() );
+	String name = fileInfo->relativePath( m_assetsModel.lock()->rootPath() );
 	bool result = m_bundle->setAssetName( asset, name );
 	DC_BREAK_IF( !result );
 

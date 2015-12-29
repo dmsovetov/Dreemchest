@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_FileSystemModel_H__
-#define __DC_Composer_FileSystemModel_H__
+#ifndef __DC_Composer_LocalFileSystemModel_H__
+#define __DC_Composer_LocalFileSystemModel_H__
 
 #include "AbstractTreeModel.h"
 
 DC_BEGIN_COMPOSER
 
 	//! File system model.
-	class QLocalFileSystemModel : public QGenericTreeModel<QFileInfo> {
+	class LocalFileSystemModel : public GenericTreeModel<QFileInfo> {
 
 		Q_OBJECT
 
@@ -72,9 +72,9 @@ DC_BEGIN_COMPOSER
 
 	public:
 
-								//! Constructs the QLocalFileSystemModel instance.
-		explicit				QLocalFileSystemModel( QObject* parent = NULL );
-		virtual					~QLocalFileSystemModel( void );
+								//! Constructs the LocalFileSystemModel instance.
+		explicit				LocalFileSystemModel( QObject* parent = NULL );
+		virtual					~LocalFileSystemModel( void );
 
 		//! Returns true if the model supports background loading.
 		bool					supportsBackgroundLoading( void ) const;
@@ -186,4 +186,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_FileSystemModel_H__	*/
+#endif	/*	!__DC_Composer_LocalFileSystemModel_H__	*/

@@ -24,19 +24,19 @@
 
  **************************************************************************/
 
-#include "AssetsModelPrivate.h"
+#include "AssetsModel.h"
 
-#include "../../Widgets/Qt/MimeData.h"
-#include "../../Widgets/Qt/FileSystem.h"
+#include "../Widgets/Qt/MimeData.h"
+#include "../Widgets/Qt/FileSystem.h"
 
 DC_BEGIN_COMPOSER
 
-// ----------------------------------------------------------- QAssetsModel ----------------------------------------------------------- //
+// ----------------------------------------------------------- AssetsModelFilter ----------------------------------------------------------- //
 
 #if DEV_CUSTOM_ASSET_MODEL
 
-// ** QAssetsModel::QAssetsModel
-QAssetsModel::QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent )
+// ** AssetsModelFilter::AssetsModelFilter
+AssetsModelFilter::AssetsModelFilter( AssetsModel* parentAssetsModel, QObject* parent )
 	: QLocalFileSystemModel( parent ), m_parent( parentAssetsModel ), m_metaFileExtension( "asset" )
 {
 	connect( this, SIGNAL(fileAdded(const QFileInfo&)), this, SLOT(fileAdded(const QFileInfo&)) );
@@ -46,8 +46,8 @@ QAssetsModel::QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent )
 	connect( this, SIGNAL(fileMoved(const QFileInfo&, const QString&, const QString&)), this, SLOT(fileMoved(const QFileInfo&, const QString&, const QString&)) );
 }
 
-// ** QAssetsModel::fileAdded
-void QAssetsModel::fileAdded( const QFileInfo& file )
+// ** AssetsModelFilter::fileAdded
+void AssetsModelFilter::fileAdded( const QFileInfo& file )
 {
 	// Construct file info
 	FileInfoPtr fileInfo( new Ui::FileInfoPrivate( file ) );
@@ -56,8 +56,8 @@ void QAssetsModel::fileAdded( const QFileInfo& file )
 	m_parent->notify<AssetsModel::Added>( fileInfo );
 }
 
-// ** QAssetsModel::fileRemoved
-void QAssetsModel::fileRemoved( const QFileInfo& file )
+// ** AssetsModelFilter::fileRemoved
+void AssetsModelFilter::fileRemoved( const QFileInfo& file )
 {
 	qDebug() << file.absoluteFilePath();
 
@@ -72,8 +72,8 @@ void QAssetsModel::fileRemoved( const QFileInfo& file )
 	Q_ASSERT( result );
 }
 
-// ** QAssetsModel::fileChanged
-void QAssetsModel::fileChanged( const QFileInfo& file )
+// ** AssetsModelFilter::fileChanged
+void AssetsModelFilter::fileChanged( const QFileInfo& file )
 {
 	// Construct file info
 	FileInfoPtr fileInfo( new Ui::FileInfoPrivate( file ) );
@@ -82,20 +82,20 @@ void QAssetsModel::fileChanged( const QFileInfo& file )
 	m_parent->notify<AssetsModel::Removed>( fileInfo );
 }
 
-// ** QAssetsModel::fileRenamed
-void QAssetsModel::fileRenamed( const QFileInfo& file, const QString& oldFileName, const QString& newFileName )
+// ** AssetsModelFilter::fileRenamed
+void AssetsModelFilter::fileRenamed( const QFileInfo& file, const QString& oldFileName, const QString& newFileName )
 {
 	renameMetaFile( oldFileName, newFileName );
 }
 
-// ** QAssetsModel::fileMoved
-void QAssetsModel::fileMoved( const QFileInfo& file, const QString& oldFileName, const QString& newFileName )
+// ** AssetsModelFilter::fileMoved
+void AssetsModelFilter::fileMoved( const QFileInfo& file, const QString& oldFileName, const QString& newFileName )
 {
 	renameMetaFile( oldFileName, newFileName );
 }
 
-// ** QAssetsModel::renameMetaFile
-bool QAssetsModel::renameMetaFile( const QString& oldFileName, const QString& newFileName )
+// ** AssetsModelFilter::renameMetaFile
+bool AssetsModelFilter::renameMetaFile( const QString& oldFileName, const QString& newFileName )
 {
 	// Construct the old meta file name
 	QString oldMetaFile = metaFileNameFromPath( oldFileName );
@@ -119,8 +119,8 @@ bool QAssetsModel::renameMetaFile( const QString& oldFileName, const QString& ne
 	return result;
 }
 
-// ** QAssetsModel::uuid
-String QAssetsModel::uuid( const FileInfoWPtr& assetFile ) const
+// ** AssetsModelFilter::uuid
+String AssetsModelFilter::uuid( const FileInfoWPtr& assetFile ) const
 {
 	// Read the meta data
 	Io::KeyValue data = metaData( assetFile );
@@ -133,14 +133,14 @@ String QAssetsModel::uuid( const FileInfoWPtr& assetFile ) const
 	return data.get( "uuid", "" ).asString();
 }
 
-// ** QAssetsModel::assetFile
-FileInfoPtr QAssetsModel::assetFile( const QModelIndex& index ) const
+// ** AssetsModelFilter::assetFile
+FileInfoPtr AssetsModelFilter::assetFile( const QModelIndex& index ) const
 {
 	return FileInfoPtr( new Ui::FileInfoPrivate( fileInfo( index ) ) );
 }
 
-// ** QAssetsModel::setMetaData
-void QAssetsModel::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
+// ** AssetsModelFilter::setMetaData
+void AssetsModelFilter::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
 {
 	// Write meta data to file
 	QFile metaFile( metaFileName( assetFile ) );
@@ -154,8 +154,8 @@ void QAssetsModel::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValu
 	metaFile.close();
 }
 
-// ** QAssetsModel::metaData
-Io::KeyValue QAssetsModel::metaData( const FileInfoWPtr& assetFile ) const
+// ** AssetsModelFilter::metaData
+Io::KeyValue AssetsModelFilter::metaData( const FileInfoWPtr& assetFile ) const
 {
 	QFile metaFile( metaFileName( assetFile ) );
 
@@ -172,35 +172,35 @@ Io::KeyValue QAssetsModel::metaData( const FileInfoWPtr& assetFile ) const
 	return Io::KeyValue::parse( json.toStdString() );
 }
 
-// ** QAssetsModel::metaFileName
-QString QAssetsModel::metaFileName( const FileInfoWPtr& assetFile ) const
+// ** AssetsModelFilter::metaFileName
+QString AssetsModelFilter::metaFileName( const FileInfoWPtr& assetFile ) const
 {
 	return metaFileNameFromPath( QString::fromStdString( assetFile->absolutePath() ) );
 	return QString::fromStdString( assetFile->absolutePath() ) + "." + m_metaFileExtension;
 }
 
-// ** QAssetsModel::metaFileNameFromPath
-QString QAssetsModel::metaFileNameFromPath( const QString& fileName ) const
+// ** AssetsModelFilter::metaFileNameFromPath
+QString AssetsModelFilter::metaFileNameFromPath( const QString& fileName ) const
 {
 	return fileName + "." + m_metaFileExtension;
 }
 
-// ** QAssetsModel::shouldSkipFile
-bool QAssetsModel::shouldSkipFile( const QFileInfo& file ) const
+// ** AssetsModelFilter::shouldSkipFile
+bool AssetsModelFilter::shouldSkipFile( const QFileInfo& file ) const
 {
 	return file.completeSuffix().endsWith( m_metaFileExtension );
 }
 
-// ** QAssetsModel::mimeTypes
-QStringList QAssetsModel::mimeTypes( void ) const
+// ** AssetsModelFilter::mimeTypes
+QStringList AssetsModelFilter::mimeTypes( void ) const
 {
 	return QStringList() << Composer::kAssetMime.c_str();
 }
 
 #else
 
-// ** QAssetFileSystemModel::QAssetFileSystemModel
-QAssetFileSystemModel::QAssetFileSystemModel( AssetsModel* parentAssetsModel, QObject* parent ) : QFileSystemModel( parent ), m_parent( parentAssetsModel ), m_isEditingModel( false ), m_metaFileExtension( "asset" )
+// ** AssetsModel::AssetsModel
+AssetsModel::AssetsModel( QObject* parent ) : InjectedEventEmitter( parent ), m_isEditingModel( false ), m_metaFileExtension( "asset" )
 {
 	setReadOnly( false );
 
@@ -210,8 +210,8 @@ QAssetFileSystemModel::QAssetFileSystemModel( AssetsModel* parentAssetsModel, QO
 	connect( this, SIGNAL(fileRenamed(const QString&, const QString&, const QString&)), this, SLOT(assetRenamed(const QString&, const QString&, const QString&)) );
 }
 
-// ** QAssetFileSystemModel::dropMimeData
-bool QAssetFileSystemModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
+// ** AssetsModel::dropMimeData
+bool AssetsModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
 {
 	Q_ASSERT( action == Qt::MoveAction );
 
@@ -238,8 +238,8 @@ bool QAssetFileSystemModel::dropMimeData( const QMimeData* data, Qt::DropAction 
 	return true;
 }
 
-// ** QAssetFileSystemModel::data
-QVariant QAssetFileSystemModel::data( const QModelIndex& index, int role ) const
+// ** AssetsModel::data
+QVariant AssetsModel::data( const QModelIndex& index, int role ) const
 {
 	if( !index.isValid() ) {
 		return QVariant();
@@ -253,8 +253,8 @@ QVariant QAssetFileSystemModel::data( const QModelIndex& index, int role ) const
 	return QFileSystemModel::data( index, role );
 }
 
-// ** QAssetFileSystemModel::setData
-bool QAssetFileSystemModel::setData( const QModelIndex& index, const QVariant& value, int role )
+// ** AssetsModel::setData
+bool AssetsModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
 	if( index.isValid() && role == Qt::EditRole ) {
 		m_isEditingModel = true;
@@ -272,8 +272,8 @@ bool QAssetFileSystemModel::setData( const QModelIndex& index, const QVariant& v
 	return QFileSystemModel::setData( index, value, role );
 }
 
-// ** QAssetFileSystemModel::scanLoadedDirectory
-void QAssetFileSystemModel::scanLoadedDirectory( const QString& path )
+// ** AssetsModel::scanLoadedDirectory
+void AssetsModel::scanLoadedDirectory( const QString& path )
 {
 	// Remove this path from folders for scanning
 	m_foldersToScan.remove( path );
@@ -304,14 +304,14 @@ void QAssetFileSystemModel::scanLoadedDirectory( const QString& path )
 
 	// Emit the events
 	if( m_foldersToScan.size() ) {
-		m_parent->notify<AssetsModel::FolderScanned>( m_foldersToScan.size() );
+		notify<AssetsModel::FolderScanned>( m_foldersToScan.size() );
 	} else {
-		m_parent->notify<AssetsModel::ScanningCompleted>();
+		notify<AssetsModel::ScanningCompleted>();
 	}
 }
 
-// ** QAssetFileSystemModel::assetsAdded
-void QAssetFileSystemModel::assetsAdded( const QModelIndex& parent, int start, int end )
+// ** AssetsModel::assetsAdded
+void AssetsModel::assetsAdded( const QModelIndex& parent, int start, int end )
 {
 	for( s32 i = start; i <= end; i++ ) {
 		// Get index
@@ -326,12 +326,12 @@ void QAssetFileSystemModel::assetsAdded( const QModelIndex& parent, int start, i
 		}
 
 		// Dispatch an event
-		m_parent->notify<AssetsModel::Added>( file );
+		notify<AssetsModel::Added>( file );
 	}
 }
 
-// ** QAssetFileSystemModel::assetsRemoved
-void QAssetFileSystemModel::assetsRemoved( const QModelIndex& parent, int start, int end )
+// ** AssetsModel::assetsRemoved
+void AssetsModel::assetsRemoved( const QModelIndex& parent, int start, int end )
 {
 	for( s32 i = start; i <= end; i++ ) {
 		QModelIndex idx	 = index( i, 0, parent );
@@ -345,7 +345,7 @@ void QAssetFileSystemModel::assetsRemoved( const QModelIndex& parent, int start,
 		}
 
 		// Dispatch an event
-		m_parent->notify<AssetsModel::Removed>( fileInfo );
+		notify<AssetsModel::Removed>( fileInfo );
 
 		// Remove meta file
 		bool result = QDir().remove( metaFileName( fileInfo ) );
@@ -353,8 +353,8 @@ void QAssetFileSystemModel::assetsRemoved( const QModelIndex& parent, int start,
 	}
 }
 
-// ** QAssetFileSystemModel::assetRenamed
-void QAssetFileSystemModel::assetRenamed( const QString& path, const QString& oldName, const QString& newName )
+// ** AssetsModel::assetRenamed
+void AssetsModel::assetRenamed( const QString& path, const QString& oldName, const QString& newName )
 {
 	QString oldFileName = QDir::cleanPath( path + "/" + oldName );
 	QString newFileName = QDir::cleanPath( path + "/" + newName );
@@ -362,15 +362,15 @@ void QAssetFileSystemModel::assetRenamed( const QString& path, const QString& ol
 	renameMetaFile( oldFileName, newFileName );
 }
 
-// ** QAssetFileSystemModel::wasMoved
-bool QAssetFileSystemModel::wasMoved( const FileInfoWPtr& assetFile ) const
+// ** AssetsModel::wasMoved
+bool AssetsModel::wasMoved( const FileInfoWPtr& assetFile ) const
 {
 	DC_BREAK_IF( !assetFile.valid() );
 	return m_wasMoved.remove( QString::fromStdString( assetFile->absolutePath() ) );
 }
 
-// ** QAssetFileSystemModel::renameMetaFile
-bool QAssetFileSystemModel::renameMetaFile( const QString& oldFileName, const QString& newFileName )
+// ** AssetsModel::renameMetaFile
+bool AssetsModel::renameMetaFile( const QString& oldFileName, const QString& newFileName )
 {
 	// Construct the old meta file name
 	QString oldMetaFile = metaFileNameFromPath( oldFileName );
@@ -394,8 +394,8 @@ bool QAssetFileSystemModel::renameMetaFile( const QString& oldFileName, const QS
 	return result;
 }
 
-// ** QAssetFileSystemModel::uuid
-String QAssetFileSystemModel::uuid( const FileInfoWPtr& assetFile ) const
+// ** AssetsModel::uuid
+String AssetsModel::uuid( const FileInfoWPtr& assetFile ) const
 {
 	// Read the meta data
 	Io::KeyValue data = metaData( assetFile );
@@ -408,22 +408,22 @@ String QAssetFileSystemModel::uuid( const FileInfoWPtr& assetFile ) const
 	return data.get( "uuid", "" ).asString();
 }
 
-// ** QAssetFileSystemModel::hasMetaData
-bool QAssetFileSystemModel::hasMetaData( const FileInfoWPtr& assetFile ) const
+// ** AssetsModel::hasMetaData
+bool AssetsModel::hasMetaData( const FileInfoWPtr& assetFile ) const
 {
 	DC_BREAK_IF( !assetFile.valid() );
 	return QFile::exists( metaFileName( assetFile ) );
 }
 
-// ** QAssetFileSystemModel::assetFile
-FileInfoPtr QAssetFileSystemModel::assetFile( const QModelIndex& index ) const
+// ** AssetsModel::assetFile
+FileInfoPtr AssetsModel::assetFile( const QModelIndex& index ) const
 {
 	DC_BREAK_IF( !index.isValid() );
 	return FileInfoPtr( new Ui::FileInfoPrivate( fileInfo( index ) ) );
 }
 
-// ** QAssetFileSystemModel::setMetaData
-void QAssetFileSystemModel::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
+// ** AssetsModel::setMetaData
+void AssetsModel::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
 {
 	// Write meta data to file
 	QFile metaFile( metaFileName( assetFile ) );
@@ -437,8 +437,8 @@ void QAssetFileSystemModel::setMetaData( const FileInfoWPtr& assetFile, const Io
 	metaFile.close();
 }
 
-// ** QAssetFileSystemModel::metaData
-Io::KeyValue QAssetFileSystemModel::metaData( const FileInfoWPtr& assetFile ) const
+// ** AssetsModel::metaData
+Io::KeyValue AssetsModel::metaData( const FileInfoWPtr& assetFile ) const
 {
 	QFile metaFile( metaFileName( assetFile ) );
 
@@ -455,32 +455,52 @@ Io::KeyValue QAssetFileSystemModel::metaData( const FileInfoWPtr& assetFile ) co
 	return Io::KeyValue::parse( json.toStdString() );
 }
 
-// ** QAssetFileSystemModel::metaFileName
-QString QAssetFileSystemModel::metaFileName( const FileInfoWPtr& assetFile ) const
+// ** AssetsModel::metaFileName
+QString AssetsModel::metaFileName( const FileInfoWPtr& assetFile ) const
 {
 	return metaFileNameFromPath( QString::fromStdString( assetFile->absolutePath() ) );
 	return QString::fromStdString( assetFile->absolutePath() ) + "." + m_metaFileExtension;
 }
 
-// ** QAssetFileSystemModel::metaFileNameFromPath
-QString QAssetFileSystemModel::metaFileNameFromPath( const QString& fileName ) const
+// ** AssetsModel::metaFileNameFromPath
+QString AssetsModel::metaFileNameFromPath( const QString& fileName ) const
 {
 	return fileName + "." + m_metaFileExtension;
 }
 
-// ----------------------------------------------------------- QAssetsModel ----------------------------------------------------------- //
-
-// ** QAssetsModel::QAssetsModel
-QAssetsModel::QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent ) : QSortFilterProxyModel( parent )
+// ** AssetsModel::rootPath
+String AssetsModel::rootPath( void ) const
 {
-	m_model = new QAssetFileSystemModel( parentAssetsModel, this );
-	setSourceModel( m_model.get() );
+	return QFileSystemModel::rootPath().toStdString();
 }
 
-// ** QAssetsModel::filterAcceptsRow
-bool QAssetsModel::filterAcceptsRow( int row, const QModelIndex& parent ) const
+// ** AssetsModel::setRootPath
+void AssetsModel::setRootPath( const String& value )
 {
-	QFileInfo file = m_model->fileInfo( m_model->index( row, 0, parent ) );
+	blockSignals( true );
+	QFileSystemModel::setRootPath( value.c_str() );
+	blockSignals( false );
+}
+
+// ** AssetsModel::metaData
+Io::KeyValue AssetsModel::metaData( const String& assetFileName ) const
+{
+	return metaData( new Ui::FileInfoPrivate( QFileInfo( assetFileName.c_str() ) ) );
+}
+
+// ----------------------------------------------------------- FilteredAssetsModel ----------------------------------------------------------- //
+
+// ** FilteredAssetsModel::FilteredAssetsModel
+FilteredAssetsModel::FilteredAssetsModel( AssetsModelWPtr assetsModel, QObject* parent ) : QSortFilterProxyModel( parent )
+{
+	m_model = assetsModel;
+	setSourceModel( m_model.lock().data() );
+}
+
+// ** FilteredAssetsModel::filterAcceptsRow
+bool FilteredAssetsModel::filterAcceptsRow( int row, const QModelIndex& parent ) const
+{
+	QFileInfo file = m_model.lock()->fileInfo( m_model.lock()->index( row, 0, parent ) );
 
 	if( file.suffix().toLower() == "asset" ) {
 		return false;
@@ -489,28 +509,28 @@ bool QAssetsModel::filterAcceptsRow( int row, const QModelIndex& parent ) const
 	return true;
 }
 
-// ** QAssetsModel::model
-QAssetFileSystemModel* QAssetsModel::model( void ) const
+// ** FilteredAssetsModel::model
+AssetsModelWPtr FilteredAssetsModel::model( void ) const
 {
-	return m_model.get();
+	return m_model;
 }
 
-// ** QAssetsModel::root
-QModelIndex QAssetsModel::root( void ) const
+// ** FilteredAssetsModel::root
+QModelIndex FilteredAssetsModel::root( void ) const
 {
-	return mapFromSource( m_model->index( m_model->rootPath() ) );
+	return mapFromSource( m_model.lock()->index( QString::fromStdString( m_model.lock()->rootPath() ) ) );
 }
 
-// ** QAssetsModel::assetFile
-FileInfoPtr QAssetsModel::assetFile( const QModelIndex& index ) const
+// ** FilteredAssetsModel::assetFile
+FileInfoPtr FilteredAssetsModel::assetFile( const QModelIndex& index ) const
 {
-	return m_model->assetFile( mapToSource( index ) );
+	return m_model.lock()->assetFile( mapToSource( index ) );
 }
 
-// ** QAssetsModel::remove
-void QAssetsModel::remove( const QModelIndex& index )
+// ** FilteredAssetsModel::remove
+void FilteredAssetsModel::remove( const QModelIndex& index )
 {
-	m_model->remove( mapToSource( index ) );
+	m_model.lock()->remove( mapToSource( index ) );
 }
 
 #endif	/*	DEV_CUSTOM_ASSET_MODEL	*/
@@ -518,65 +538,65 @@ void QAssetsModel::remove( const QModelIndex& index )
 // ** createAssetsModel
 AssetsModelPtr createAssetsModel( void )
 {
-	return new AssetsModelPrivate;
+	return AssetsModelPtr( new AssetsModel );
 }
 
-// ----------------------------------------------------------- AssetsModelPrivate ----------------------------------------------------------- //
-
-// ** AssetsModelPrivate::AssetsModelPrivate
-AssetsModelPrivate::AssetsModelPrivate( QObject* parent ) : PrivateInterface( new QAssetsModel( this, parent ) )
-{
-
-}
-
-// ** AssetsModelPrivate::rootPath
-String AssetsModelPrivate::rootPath( void ) const
-{
-	return m_private->model()->rootPath().toStdString();
-}
-
-// ** AssetsModelPrivate::setRootPath
-void AssetsModelPrivate::setRootPath( const String& value )
-{
-	m_private->model()->blockSignals( true );
-	m_private->model()->setRootPath( value.c_str() );
-	m_private->model()->blockSignals( false );
-}
-
-// ** AssetsModelPrivate::setReadOnly
-void AssetsModelPrivate::setReadOnly( bool value )
-{
-	m_private->model()->setReadOnly( value );
-}
-
-// ** AssetsModelPrivate::uuid
-String AssetsModelPrivate::uuid( const FileInfoWPtr& assetFile ) const
-{
-	return m_private->model()->uuid( assetFile );
-}
-
-// ** AssetsModelPrivate::hasMetaData
-bool AssetsModelPrivate::hasMetaData( const FileInfoWPtr& assetFile ) const
-{
-	return m_private->model()->hasMetaData( assetFile );
-}
-
-// ** AssetsModelPrivate::setMetaData
-void AssetsModelPrivate::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
-{
-	m_private->model()->setMetaData( assetFile, data );
-}
-
-// ** AssetsModelPrivate::metaData
-Io::KeyValue AssetsModelPrivate::metaData( const FileInfoWPtr& assetFile ) const
-{
-	return m_private->model()->metaData( assetFile );
-}
-
-// ** AssetsModelPrivate::metaData
-Io::KeyValue AssetsModelPrivate::metaData( const String& assetFileName ) const
-{
-	return metaData( new Ui::FileInfoPrivate( QFileInfo( assetFileName.c_str() ) ) );
-}
+//// ----------------------------------------------------------- AssetsModelPrivate ----------------------------------------------------------- //
+//
+//// ** AssetsModelPrivate::AssetsModelPrivate
+//AssetsModelPrivate::AssetsModelPrivate( QObject* parent ) : PrivateInterface( new AssetsModelFilter( this, parent ) )
+//{
+//
+//}
+//
+//// ** AssetsModelPrivate::rootPath
+//String AssetsModelPrivate::rootPath( void ) const
+//{
+//	return m_private->model()->rootPath().toStdString();
+//}
+//
+//// ** AssetsModelPrivate::setRootPath
+//void AssetsModelPrivate::setRootPath( const String& value )
+//{
+//	m_private->model()->blockSignals( true );
+//	m_private->model()->setRootPath( value.c_str() );
+//	m_private->model()->blockSignals( false );
+//}
+//
+//// ** AssetsModelPrivate::setReadOnly
+//void AssetsModelPrivate::setReadOnly( bool value )
+//{
+//	m_private->model()->setReadOnly( value );
+//}
+//
+//// ** AssetsModelPrivate::uuid
+//String AssetsModelPrivate::uuid( const FileInfoWPtr& assetFile ) const
+//{
+//	return m_private->model()->uuid( assetFile );
+//}
+//
+//// ** AssetsModelPrivate::hasMetaData
+//bool AssetsModelPrivate::hasMetaData( const FileInfoWPtr& assetFile ) const
+//{
+//	return m_private->model()->hasMetaData( assetFile );
+//}
+//
+//// ** AssetsModelPrivate::setMetaData
+//void AssetsModelPrivate::setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data )
+//{
+//	m_private->model()->setMetaData( assetFile, data );
+//}
+//
+//// ** AssetsModelPrivate::metaData
+//Io::KeyValue AssetsModelPrivate::metaData( const FileInfoWPtr& assetFile ) const
+//{
+//	return m_private->model()->metaData( assetFile );
+//}
+//
+//// ** AssetsModelPrivate::metaData
+//Io::KeyValue AssetsModelPrivate::metaData( const String& assetFileName ) const
+//{
+//	return metaData( new Ui::FileInfoPrivate( QFileInfo( assetFileName.c_str() ) ) );
+//}
 
 DC_END_COMPOSER

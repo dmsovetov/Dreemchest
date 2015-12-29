@@ -37,7 +37,7 @@ SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr 
 }
 
 // ** SceneModel::SceneModel
-SceneModel::SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent ) : QGenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
+SceneModel::SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
 {
 	scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( SceneModel::handleSceneObjectAdded ) );
 	scene->subscribe<Scene::Scene::SceneObjectRemoved>( dcThisMethod( SceneModel::handleSceneObjectRemoved ) );
@@ -68,7 +68,7 @@ void SceneModel::remove( const QModelIndex& index )
 // ** SceneModel::flags
 Qt::ItemFlags SceneModel::flags( const QModelIndex& index ) const
 {
-	return QGenericTreeModel::flags( index ) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
+	return GenericTreeModel::flags( index ) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
 }
 
 // ** SceneModel::data
@@ -93,7 +93,7 @@ bool SceneModel::setData( const QModelIndex& index, const QVariant& value, int r
 {
 	// Skip all roles except the editing one
 	if( role != Qt::EditRole ) {
-		return QGenericTreeModel::setData( index, value, role );
+		return GenericTreeModel::setData( index, value, role );
 	}
 
 	// Get the name from value
@@ -123,7 +123,7 @@ bool SceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int
 {
 	// Check if we a trying to drop an asset.
 	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
-		return QGenericTreeModel::dropMimeData( data, action, row, column, parent );
+		return GenericTreeModel::dropMimeData( data, action, row, column, parent );
 	}
 
 	// Extract an assets from MIME data
@@ -152,7 +152,7 @@ bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, 
 {
 	// Check if we a trying to drop an asset.
 	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
-		return QGenericTreeModel::canDropMimeData( data, action, row, column, parent );
+		return GenericTreeModel::canDropMimeData( data, action, row, column, parent );
 	}
 
 	// Extract an assets from MIME data

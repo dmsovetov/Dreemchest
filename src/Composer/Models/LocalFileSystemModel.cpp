@@ -24,12 +24,12 @@
 
  **************************************************************************/
 
-#include "FileSystemModel.h"
+#include "LocalFileSystemModel.h"
 
 DC_BEGIN_COMPOSER
 
-// ** QLocalFileSystemModel::QLocalFileSystemModel
-QLocalFileSystemModel::QLocalFileSystemModel( QObject* parent ) : QGenericTreeModel( 1, parent ), m_isReadOnly( true )
+// ** LocalFileSystemModel::LocalFileSystemModel
+LocalFileSystemModel::LocalFileSystemModel( QObject* parent ) : GenericTreeModel( 1, parent ), m_isReadOnly( true )
 {
 #if DEV_BACKGROUND_ASSET_LOADING
 	//qRegisterMetaType<QAsset>( "QAsset" );
@@ -47,20 +47,20 @@ QLocalFileSystemModel::QLocalFileSystemModel( QObject* parent ) : QGenericTreeMo
 	connect( m_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryChanged(QString)) );
 }
 
-QLocalFileSystemModel::~QLocalFileSystemModel( void )
+LocalFileSystemModel::~LocalFileSystemModel( void )
 {
 	delete m_iconProvider;
 	delete m_watcher;
 }
 
-// ** QLocalFileSystemModel::rootPath
-QString QLocalFileSystemModel::rootPath( void ) const
+// ** LocalFileSystemModel::rootPath
+QString LocalFileSystemModel::rootPath( void ) const
 {
 	return m_directory.absolutePath();
 }
 
-// ** QLocalFileSystemModel::setRootPath
-void QLocalFileSystemModel::setRootPath( const QString& value )
+// ** LocalFileSystemModel::setRootPath
+void LocalFileSystemModel::setRootPath( const QString& value )
 {
 	// Add path to watcher
 	m_watcher->removePaths( m_watcher->directories() + m_watcher->files() );
@@ -80,20 +80,20 @@ void QLocalFileSystemModel::setRootPath( const QString& value )
 #endif	/*	DEV_BACKGROUND_ASSET_LOADING */
 }
 
-// ** QLocalFileSystemModel::isReadOnly
-bool QLocalFileSystemModel::isReadOnly( void ) const
+// ** LocalFileSystemModel::isReadOnly
+bool LocalFileSystemModel::isReadOnly( void ) const
 {
 	return m_isReadOnly;
 }
 
-// ** QLocalFileSystemModel::setReadOnly
-void QLocalFileSystemModel::setReadOnly( bool value )
+// ** LocalFileSystemModel::setReadOnly
+void LocalFileSystemModel::setReadOnly( bool value )
 {
 	m_isReadOnly = value;
 }
 
-// ** QLocalFileSystemModel::index
-QModelIndex QLocalFileSystemModel::index( const QString& path ) const
+// ** LocalFileSystemModel::index
+QModelIndex LocalFileSystemModel::index( const QString& path ) const
 {
 	// Find item at path.
 	Item* item = itemAtPath( path, root() );
@@ -104,8 +104,8 @@ QModelIndex QLocalFileSystemModel::index( const QString& path ) const
 	return index;
 }
 
-// ** QLocalFileSystemModel::remove
-void QLocalFileSystemModel::remove( const QModelIndex& index )
+// ** LocalFileSystemModel::remove
+void LocalFileSystemModel::remove( const QModelIndex& index )
 {
 	// A local helper structure to recursively delete directories & files
 	struct Recursive {
@@ -148,23 +148,23 @@ void QLocalFileSystemModel::remove( const QModelIndex& index )
 	}
 }
 
-// ** QLocalFileSystemModel::fileInfo
-const QFileInfo& QLocalFileSystemModel::fileInfo( const QModelIndex& index ) const
+// ** LocalFileSystemModel::fileInfo
+const QFileInfo& LocalFileSystemModel::fileInfo( const QModelIndex& index ) const
 {
 	return dataAt( index );
 }
 
-// ** QLocalFileSystemModel::isDir
-bool QLocalFileSystemModel::isDir( const QModelIndex& index ) const
+// ** LocalFileSystemModel::isDir
+bool LocalFileSystemModel::isDir( const QModelIndex& index ) const
 {
 	return fileInfo( index ).isDir();
 }
 
-// ** QLocalFileSystemModel::flags
-Qt::ItemFlags QLocalFileSystemModel::flags( const QModelIndex& index ) const
+// ** LocalFileSystemModel::flags
+Qt::ItemFlags LocalFileSystemModel::flags( const QModelIndex& index ) const
 {
 	if( m_isReadOnly ) {
-		return QGenericTreeModel::flags( index );
+		return GenericTreeModel::flags( index );
 	}
 
 	// Initialize default flags.
@@ -187,8 +187,8 @@ Qt::ItemFlags QLocalFileSystemModel::flags( const QModelIndex& index ) const
 	return Qt::ItemIsDragEnabled | defaultFlags;
 }
 
-// ** QLocalFileSystemModel::supportsBackgroundLoading
-bool QLocalFileSystemModel::supportsBackgroundLoading( void ) const
+// ** LocalFileSystemModel::supportsBackgroundLoading
+bool LocalFileSystemModel::supportsBackgroundLoading( void ) const
 {
 #if DEV_BACKGROUND_ASSET_LOADING
 	return true;
@@ -199,8 +199,8 @@ bool QLocalFileSystemModel::supportsBackgroundLoading( void ) const
 
 #if DEV_BACKGROUND_ASSET_LOADING
 
-// ** QLocalFileSystemModel::scanInBackground
-void QLocalFileSystemModel::scanInBackground( const QString& path, TreeItem* parent )
+// ** LocalFileSystemModel::scanInBackground
+void LocalFileSystemModel::scanInBackground( const QString& path, TreeItem* parent )
 {
 	// Emit signal about loading start
 	if( m_scanWatchers.empty() ) {
@@ -208,7 +208,7 @@ void QLocalFileSystemModel::scanInBackground( const QString& path, TreeItem* par
 	}
 
 	// Construct future object
-	QFuture<void> future = QtConcurrent::run( &QLocalFileSystemModel::workerScan, this, path );
+	QFuture<void> future = QtConcurrent::run( &LocalFileSystemModel::workerScan, this, path );
 
 	// Construct future watcher
 	QFutureWatcher<void>* watcher = new QFutureWatcher<void>;
@@ -218,14 +218,14 @@ void QLocalFileSystemModel::scanInBackground( const QString& path, TreeItem* par
 	m_scanWatchers.push_back( watcher );
 }
 
-// ** QLocalFileSystemModel::workerScan
-void QLocalFileSystemModel::workerScan( QLocalFileSystemModel* model, const QString& path )
+// ** LocalFileSystemModel::workerScan
+void LocalFileSystemModel::workerScan( LocalFileSystemModel* model, const QString& path )
 {
 	model->scan( path );
 }
 
-// ** QLocalFileSystemModel::scanFinished
-void QLocalFileSystemModel::scanFinished( void )
+// ** LocalFileSystemModel::scanFinished
+void LocalFileSystemModel::scanFinished( void )
 {
 	// Type cast watcher
 	QFutureWatcher<void>* watcher = static_cast<QFutureWatcher<void>*>( qobject_cast<QFutureWatcherBase*>( sender() ) );
@@ -244,8 +244,8 @@ void QLocalFileSystemModel::scanFinished( void )
 
 #endif	/*	DEV_BACKGROUND_ASSET_LOADING	*/
 
-// ** QLocalFileSystemModel::scan
-void QLocalFileSystemModel::scan( const QString& path, TreeItem* parent )
+// ** LocalFileSystemModel::scan
+void LocalFileSystemModel::scan( const QString& path, TreeItem* parent )
 {
 	// List all files & directories at specified path
 	QFileInfoList items = listDirectory( path );
@@ -263,8 +263,8 @@ void QLocalFileSystemModel::scan( const QString& path, TreeItem* parent )
 	}
 }
 
-// ** QLocalFileSystemModel::listDirectory
-QFileInfoList QLocalFileSystemModel::listDirectory( const QString& path ) const
+// ** LocalFileSystemModel::listDirectory
+QFileInfoList LocalFileSystemModel::listDirectory( const QString& path ) const
 {
 	QFileInfoList list = QDir( path ).entryInfoList( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
 	QFileInfoList result;
@@ -280,31 +280,31 @@ QFileInfoList QLocalFileSystemModel::listDirectory( const QString& path ) const
 	return result;
 }
 
-// ** QLocalFileSystemModel::shouldSkipFile
-bool QLocalFileSystemModel::shouldSkipFile( const QFileInfo& fileInfo ) const
+// ** LocalFileSystemModel::shouldSkipFile
+bool LocalFileSystemModel::shouldSkipFile( const QFileInfo& fileInfo ) const
 {
 	return false;
 }
 
-// ** QLocalFileSystemModel::watch
-void QLocalFileSystemModel::watch( const Item* item )
+// ** LocalFileSystemModel::watch
+void LocalFileSystemModel::watch( const Item* item )
 {
 	m_watcher->addPath( item->data().absoluteFilePath() );
 }
 
-// ** QLocalFileSystemModel::unwatch
-void QLocalFileSystemModel::unwatch( const Item* item )
+// ** LocalFileSystemModel::unwatch
+void LocalFileSystemModel::unwatch( const Item* item )
 {
 	m_watcher->removePath( item->data().absoluteFilePath() );
 }
 
-// ** QLocalFileSystemModel::addAsset
-void QLocalFileSystemModel::addItem( TreeItem* item, TreeItem* parent )
+// ** LocalFileSystemModel::addAsset
+void LocalFileSystemModel::addItem( TreeItem* item, TreeItem* parent )
 {
 	Item* asset = static_cast<Item*>( item );
 
 	// Add item to model
-	QGenericTreeModel::addItem( item, parent );
+	GenericTreeModel::addItem( item, parent );
 
 	// Add path to watcher
 	watch( asset );
@@ -313,8 +313,8 @@ void QLocalFileSystemModel::addItem( TreeItem* item, TreeItem* parent )
 	emit fileAdded( asset->data() );
 }
 
-// ** QLocalFileSystemModel::removeAsset
-void QLocalFileSystemModel::removeItem( TreeItem* item )
+// ** LocalFileSystemModel::removeAsset
+void LocalFileSystemModel::removeItem( TreeItem* item )
 {
 	Item* asset = static_cast<Item*>( item );
 
@@ -325,11 +325,11 @@ void QLocalFileSystemModel::removeItem( TreeItem* item )
 	emit fileRemoved( asset->data() );
 
 	// Remove item
-	QGenericTreeModel::removeItem( item );
+	GenericTreeModel::removeItem( item );
 }
 
-// ** QLocalFileSystemModel::moveItem
-bool QLocalFileSystemModel::moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const
+// ** LocalFileSystemModel::moveItem
+bool LocalFileSystemModel::moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const
 {
 	const QFileInfo& asset = item->data();
 
@@ -349,8 +349,8 @@ bool QLocalFileSystemModel::moveItem( Item* sourceParent, Item* destinationParen
 	return true;
 }
 
-// ** QLocalFileSystemModel::constructAbsoluteFileName
-QString QLocalFileSystemModel::constructAbsoluteFileName( const Item* item, const Item* parent ) const
+// ** LocalFileSystemModel::constructAbsoluteFileName
+QString LocalFileSystemModel::constructAbsoluteFileName( const Item* item, const Item* parent ) const
 {
 	// Get the parent absolute path
 	QString directory = parent ? parent->data().absoluteFilePath() : m_directory.absoluteFilePath();
@@ -361,14 +361,14 @@ QString QLocalFileSystemModel::constructAbsoluteFileName( const Item* item, cons
 	return QDir::cleanPath( fileName );
 }
 
-// ** QLocalFileSystemModel::constructRelativeFileName
-QString QLocalFileSystemModel::constructRelativeFileName( const Item* item, const Item* parent ) const
+// ** LocalFileSystemModel::constructRelativeFileName
+QString LocalFileSystemModel::constructRelativeFileName( const Item* item, const Item* parent ) const
 {
 	return m_directory.dir().relativeFilePath( constructAbsoluteFileName( item, parent ) );
 }
 
-// ** QLocalFileSystemModel::data
-QVariant QLocalFileSystemModel::data( const QModelIndex& index, int role ) const
+// ** LocalFileSystemModel::data
+QVariant LocalFileSystemModel::data( const QModelIndex& index, int role ) const
 {
 	Item* item = itemAtIndex( index );
 
@@ -381,12 +381,12 @@ QVariant QLocalFileSystemModel::data( const QModelIndex& index, int role ) const
 	return QVariant();
 }
 
-// ** QLocalFileSystemModel::setData
-bool QLocalFileSystemModel::setData( const QModelIndex& index, const QVariant& value, int role )
+// ** LocalFileSystemModel::setData
+bool LocalFileSystemModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
 	// Skip all roles except the editing one
 	if( role != Qt::EditRole ) {
-		return QGenericTreeModel::setData( index, value, role );
+		return GenericTreeModel::setData( index, value, role );
 	}
 
 	// Get the item at index
@@ -418,8 +418,8 @@ bool QLocalFileSystemModel::setData( const QModelIndex& index, const QVariant& v
 	return true;
 }
 
-// ** QLocalFileSystemModel::move
-bool QLocalFileSystemModel::move( Item* item, const QString& source, const QString& destination ) const
+// ** LocalFileSystemModel::move
+bool LocalFileSystemModel::move( Item* item, const QString& source, const QString& destination ) const
 {
 	// Rename file
 	if( !QDir().rename( source, destination ) ) {
@@ -436,8 +436,8 @@ bool QLocalFileSystemModel::move( Item* item, const QString& source, const QStri
 	return true;
 }
 
-// ** QLocalFileSystemModel::itemAtPath
-QLocalFileSystemModel::Item* QLocalFileSystemModel::itemAtPath( const QString& fileName, const TreeItem* root ) const
+// ** LocalFileSystemModel::itemAtPath
+LocalFileSystemModel::Item* LocalFileSystemModel::itemAtPath( const QString& fileName, const TreeItem* root ) const
 {
 	root = root ? root : this->root();
 
@@ -462,8 +462,8 @@ QLocalFileSystemModel::Item* QLocalFileSystemModel::itemAtPath( const QString& f
 	return NULL;
 }
 
-// ** QLocalFileSystemModel::fileChanged
-void QLocalFileSystemModel::fileChanged( const QString& fileName )
+// ** LocalFileSystemModel::fileChanged
+void LocalFileSystemModel::fileChanged( const QString& fileName )
 {
 	// Get the item from path
 	TreeItem* item = itemAtPath( fileName, root() );
@@ -483,8 +483,8 @@ void QLocalFileSystemModel::fileChanged( const QString& fileName )
 	}
 }
 
-// ** QLocalFileSystemModel::directoryChanged
-void QLocalFileSystemModel::directoryChanged( const QString& path )
+// ** LocalFileSystemModel::directoryChanged
+void LocalFileSystemModel::directoryChanged( const QString& path )
 {
 	qDebug() << "Changed" << path;
 

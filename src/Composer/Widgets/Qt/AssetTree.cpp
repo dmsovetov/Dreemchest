@@ -32,7 +32,7 @@
 #include "MimeData.h"
 #include "ObjectInspectorPrivate.h"
 #include "../../Models/PropertyModel.h"
-#include "../../Models/Qt/AssetsModelPrivate.h"
+#include "../../Models/AssetsModel.h"
 #include "../../Project/Project.h"
 
 DC_BEGIN_COMPOSER
@@ -171,17 +171,22 @@ void QAssetTree::setParent( IAssetTreeWPtr value )
 	m_parent = value;
 }
 
+// ** QAssetTree::model
+AssetsModelWPtr QAssetTree::model( void ) const
+{
+    return m_proxy->model();
+}
+
 // ** QAssetTree::setModel
 void QAssetTree::setModel( AssetsModelWPtr value )
 {
-	m_model = value;
-	QTreeView::setModel( m_model->privateInterface<QAssetsModel>() );
+	m_proxy = FilteredAssetsModelPtr( new FilteredAssetsModel( value, this ) );
+	QTreeView::setModel( m_proxy.data() );
 
 #if !DEV_CUSTOM_ASSET_MODEL
-	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
-	setRootIndex( model->root() );
+	setRootIndex( m_proxy->root() );
 
-	for( s32 i = 1; i < model->columnCount(); i++ ) {
+	for( s32 i = 1; i < m_proxy->columnCount(); i++ ) {
 		setColumnHidden( i, true );
 	}
 #endif	/*	!DEV_CUSTOM_ASSET_MODEL	*/
@@ -190,7 +195,7 @@ void QAssetTree::setModel( AssetsModelWPtr value )
 // ** QAssetTree::keyPressEvent
 void QAssetTree::keyPressEvent( QKeyEvent *event )
 {
-	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
+	FilteredAssetsModel* model = m_proxy.data();
 
     switch( event->key() ) {
     case Qt::Key_Delete:	foreach( QModelIndex idx, selectedIndexes() ) {
@@ -214,17 +219,17 @@ void QAssetTree::contextMenuEvent( QContextMenuEvent *e )
 // ** QAssetTree::itemDoubleClicked
 void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 {
-	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
+	FilteredAssetsModel* proxy = m_proxy.data();
 
 	// Get the file info by index
-	FileInfoPtr file = model->assetFile( index );
+	FileInfoPtr file = proxy->assetFile( index );
 
 	if( file->isDir() ) {
 		return;
 	}
 
 	// Read the corresponding meta data
-	Io::KeyValue data = m_model->metaData( file );
+	Io::KeyValue data = model().lock()->metaData( file );
 
 	if( !data.isObject() ) {
 		return;
@@ -285,15 +290,18 @@ void QAssetTree::bindToInspector( const QModelIndexList& indexes )
 	}
 
 	// Get the asset file by index
-	FileInfoPtr file = m_model->privateInterface<QAssetsModel>()->assetFile( indexes[0] );
+	FileInfoPtr file = m_proxy->assetFile( indexes[0] );
+
+    // Lock parent asset model
+    AssetsModelPtr model = this->model().lock();
 
 	// No meta data found - skip
-	if( !m_model->hasMetaData( file ) ) {
+	if( !model->hasMetaData( file ) ) {
 		return;
 	}
 
 	// Extract the UUID from file asset
-	String uuid = m_model->uuid( file );
+	String uuid = model->uuid( file );
 
 	// Find asset by UUID
 	Scene::AssetWPtr asset = m_project->assets()->findAsset( uuid );
@@ -310,15 +318,15 @@ void QAssetTree::bindToInspector( const QModelIndexList& indexes )
 // ** QAssetTree::selection
 FileInfoArray QAssetTree::selection( void ) const
 {
-	QAssetsModel* model = m_model->privateInterface<QAssetsModel>();
+	FilteredAssetsModel* proxy = m_proxy.data();
 
 	FileInfoArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
 	#if DEV_CUSTOM_ASSET_MODEL
-		result.push_back( model->asset( idx ).absoluteFilePath().toStdString() );
+		result.push_back( proxy->asset( idx ).absoluteFilePath().toStdString() );
 	#else
-		result.push_back( model->assetFile( idx ) );
+		result.push_back( proxy->assetFile( idx ) );
 	#endif
 	}
 

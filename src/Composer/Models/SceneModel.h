@@ -27,12 +27,12 @@
 #ifndef __DC_Composer_SceneModel_H__
 #define __DC_Composer_SceneModel_H__
 
-#include "Qt/AbstractTreeModel.h"
+#include "AbstractTreeModel.h"
 
 DC_BEGIN_COMPOSER
 
 	//! Scene model used by UI views and scene editor.
-	class SceneModel : public QGenericTreeModel<Scene::SceneObjectWPtr> {
+	class SceneModel : public GenericTreeModel<Scene::SceneObjectWPtr> {
 	public:
 
 		//! Available asset drop action.

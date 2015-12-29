@@ -268,7 +268,7 @@ Scene::AssetSet Composer::assetsFromMime( IMimeDataWPtr mime ) const
 	// Add assets to scene
 	for( s32 i = 0, n = ( s32 )assets.size(); i < n; i++ ) {
 		// Read an attached meta data
-		Io::KeyValue meta = m_project->assetsModel()->metaData( assets[i] );
+		Io::KeyValue meta = m_project->assetsModel().lock()->metaData( assets[i] );
 
 		if( meta.isNull() ) {
 			continue;	// Unsupported asset type or just a folder
