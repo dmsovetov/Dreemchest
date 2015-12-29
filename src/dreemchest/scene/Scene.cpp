@@ -78,6 +78,7 @@ Scene::Scene( void )
 	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
+	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
 }
 
 // ** Scene::update
