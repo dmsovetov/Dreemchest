@@ -257,6 +257,15 @@ DC_BEGIN_COMPOSER
 		//! Opens an existing project.
 		void					menuOpenProject( Ui::IActionWPtr action );
 
+		//! Saves current project.
+		void					menuSaveProject( Ui::IActionWPtr action );
+
+		//! Undo the last action.
+		void					menuUndo( Ui::IActionWPtr action );
+
+		//! Redo the last action.
+		void					menuRedo( Ui::IActionWPtr action );
+
 		//! Performs the composer initialization.
 		bool					initialize( void );
 

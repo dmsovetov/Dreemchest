@@ -99,10 +99,25 @@ bool Composer::initialize( void )
 
 	// Add default menues
 	m_menues[FileMenu] = m_mainWindow->addMenu( "&File" );
+	m_menues[EditMenu] = m_mainWindow->addMenu( "&Edit" );
 
 	// Add actions
-	m_menues[FileMenu]->addAction( "Create Project", BindAction( Composer::menuCreateProject ), "Ctrl+N" );
-	m_menues[FileMenu]->addAction( "Open Project", BindAction( Composer::menuOpenProject ), "Ctrl+O" );
+	Ui::IActionWPtr create	= m_menues[FileMenu]->addAction( "&Create Project", BindAction( Composer::menuCreateProject ), "Ctrl+N", ":Common/Common/new.png" );
+	Ui::IActionWPtr open	= m_menues[FileMenu]->addAction( "&Open Project", BindAction( Composer::menuOpenProject ), "Ctrl+O", ":Common/Common/open.png" );
+	Ui::IActionWPtr save	= m_menues[FileMenu]->addAction( "&Save Project", BindAction( Composer::menuSaveProject ), "Ctrl+S", ":Common/Common/save.png" );
+
+	// Add actions
+	Ui::IActionWPtr undo	= m_menues[EditMenu]->addAction( "&Undo", BindAction( Composer::menuUndo ), "Ctrl+Z", ":Common/Common/undo.png" );
+	Ui::IActionWPtr redo	= m_menues[EditMenu]->addAction( "&Redo", BindAction( Composer::menuRedo ), "Ctrl+Y", ":Common/Common/redo.png" );
+
+	// Create tool bars
+	Ui::IToolBarWPtr tools = m_mainWindow->addToolBar();
+	tools->addAction( create );
+	tools->addAction( open );
+	tools->addAction( save );
+	tools->addSeparator();
+	tools->addAction( undo );
+	tools->addAction( redo );
 
 	return true;
 }
@@ -137,6 +152,24 @@ void Composer::menuOpenProject( Ui::IActionWPtr action )
 	}
 
 	openProject( path );
+}
+
+// ** Composer::menuSaveProject
+void Composer::menuSaveProject( Ui::IActionWPtr action )
+{
+	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
+}
+
+// ** Composer::menuUndo
+void Composer::menuUndo( Ui::IActionWPtr action )
+{
+	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
+}
+
+// ** Composer::menuRedo
+void Composer::menuRedo( Ui::IActionWPtr action )
+{
+	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
 
 // ** Composer::createProject
@@ -213,7 +246,7 @@ void Composer::openProject( const String& path )
 	notify<ProjectOpened>( m_project );
 
 	// Setup menues
-	m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );
+	//m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );
 	m_menues[ViewMenu]	 = m_mainWindow->addMenu( "&View" );
 	m_menues[AssetsMenu] = m_mainWindow->addMenu( "&Assets" );
 
