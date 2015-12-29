@@ -104,6 +104,13 @@ void VisualEditor::endFrameRendering( void )
 	m_hal->present();
 }
 
+// ** VisualEditor::constructViewRay
+Ray VisualEditor::constructViewRay( s32 x, s32 y ) const
+{
+    y = m_document->renderingFrame()->height() - y;
+    return m_viewport->constructViewRay( x, y );
+}
+
 // ** VisualEditor::handleUpdate
 void VisualEditor::handleResize( s32 width, s32 height )
 {

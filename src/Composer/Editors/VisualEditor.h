@@ -55,6 +55,9 @@ namespace Editors {
 
 	protected:
 
+        //! Computes the view ray at specified coordinates.
+        Ray                             constructViewRay( s32 x, s32 y ) const;
+
 		//! Update the editor scene.
 		virtual void					update( f32 dt );
 
