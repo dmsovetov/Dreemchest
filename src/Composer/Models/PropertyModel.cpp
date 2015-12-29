@@ -24,61 +24,61 @@
 
  **************************************************************************/
 
-#include "PropertyModelPrivate.h"
+#include "PropertyModel.h"
 
 DC_BEGIN_COMPOSER
 
-// ** QPropertyModel::QPropertyModel
-QPropertyModel::QPropertyModel( QObject* parent ) : QAbstractItemModel( parent )
+// ** PropertyModel::PropertyModel
+PropertyModel::PropertyModel( QObject* parent ) : QAbstractItemModel( parent )
 {
 
 }
 
-// ** QPropertyModel::propertyCount
-int QPropertyModel::propertyCount( void ) const
+// ** PropertyModel::propertyCount
+int PropertyModel::propertyCount( void ) const
 {
 	return ( int )m_properties.size();
 }
 
-// ** QPropertyModel::propertyName
-QString QPropertyModel::propertyName( int index ) const
+// ** PropertyModel::propertyName
+QString PropertyModel::propertyName( int index ) const
 {
 	return m_properties[index]->name();
 }
 
-// ** QPropertyModel::propertyType
-QString QPropertyModel::propertyType( int index ) const
+// ** PropertyModel::propertyType
+QString PropertyModel::propertyType( int index ) const
 {
 	return m_properties[index]->type();
 }
 
-// ** QPropertyModel::rowCount
-int QPropertyModel::rowCount( const QModelIndex& parent ) const
+// ** PropertyModel::rowCount
+int PropertyModel::rowCount( const QModelIndex& parent ) const
 {
 	return 1;
 }
 
-// ** QPropertyModel::parent
-QModelIndex QPropertyModel::parent( const QModelIndex& child ) const
+// ** PropertyModel::parent
+QModelIndex PropertyModel::parent( const QModelIndex& child ) const
 {
 	return QModelIndex();
 }
 
-// ** QPropertyModel::columnCount
-int QPropertyModel::columnCount( const QModelIndex& parent ) const
+// ** PropertyModel::columnCount
+int PropertyModel::columnCount( const QModelIndex& parent ) const
 {
 	return propertyCount();
 }
 
-// ** QPropertyModel::data
-QVariant QPropertyModel::data( const QModelIndex& index, int role ) const
+// ** PropertyModel::data
+QVariant PropertyModel::data( const QModelIndex& index, int role ) const
 {
 	int idx = index.column();
 	return m_properties[idx]->get( idx );
 }
 
-// ** QPropertyModel::setData
-bool QPropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
+// ** PropertyModel::setData
+bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
 	int idx = index.column();
 	m_properties[idx]->set( idx, value );
@@ -88,8 +88,8 @@ bool QPropertyModel::setData( const QModelIndex& index, const QVariant& value, i
 	return true;
 }
 
-// ** QPropertyModel::index
-QModelIndex QPropertyModel::index( int row, int column, const QModelIndex& parent ) const
+// ** PropertyModel::index
+QModelIndex PropertyModel::index( int row, int column, const QModelIndex& parent ) const
 {
 	return createIndex( row, column, ( void* )NULL );
 }

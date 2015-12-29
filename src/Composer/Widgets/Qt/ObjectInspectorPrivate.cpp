@@ -28,8 +28,8 @@
 
 #include "AssetTree.h"
 
-#include "../../Models/Qt/PropertyModelPrivate.h"
-#include "../../Models/Qt/EnumModels.h"
+#include "../../Models/PropertyModel.h"
+#include "../../Models/EnumModels.h"
 
 DC_BEGIN_COMPOSER
 
@@ -68,13 +68,13 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 	delete m_mapper; m_mapper = NULL;
 
 	// Return if the model is not valid
-	if( !value.valid() ) {
+	if( value.isNull() ) {
 		return;
 	}
 
 	// Create the mapper.
 	m_mapper = new QDataWidgetMapper( this );
-	m_mapper->setModel( m_model->privateInterface<QPropertyModel>() );
+	m_mapper->setModel( m_model.data() );
 
 	// Create root layout.
 	m_layout = new QFormLayout( this );
@@ -82,8 +82,8 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 	// Construct property widgets.
 	for( s32 i = 0, n = m_model->propertyCount(); i < n; i++ ) {
 		// Get the property type & name
-		String type = m_model->propertyType( i );
-		String name = m_model->propertyName( i );
+		QString type = m_model->propertyType( i );
+		QString name = m_model->propertyName( i );
 
 		// Construct the widget according to the type
 		QWidget* widget = NULL;
@@ -93,18 +93,18 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
 		}
 		else if( type == "Scene::RenderingMode" ) {
-			widget = new QEnumComboBox<QRenderingModeModel>();
+			widget = new QEnumComboBox<RenderingModeModel>();
 		}
 		else if( type == "Scene::Material::Model" ) {
-			widget = new QEnumComboBox<QLightingModel>();
+			widget = new QEnumComboBox<LightingModel>();
 		}
 		else {
-			qWarning() << "Property" << name.c_str() << "has unhnadled type" << type.c_str();
+			qWarning() << "Property" << name << "has unhnadled type" << type;
 			continue;
 		}
 
 		// Add widget
-		m_layout->addRow( name.c_str(), widget );
+		m_layout->addRow( name, widget );
 		m_mapper->addMapping( widget, i );
 	}
 

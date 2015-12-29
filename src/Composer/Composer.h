@@ -197,7 +197,7 @@ DC_BEGIN_COMPOSER
 	dcDeclarePtrs( FileInfo )
 	dcDeclarePtrs( IMimeData )
 	dcDeclarePtrs( AssetsModel )
-	dcDeclarePtrs( PropertyModel )
+	qDeclarePtrs( PropertyModel )
     qDeclarePtrs( SceneModel )
 
 	//! Factory method used for assets model creation.

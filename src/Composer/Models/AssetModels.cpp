@@ -24,42 +24,23 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_EnumModels_H__
-#define __DC_Composer_Qt_EnumModels_H__
-
-#include "../../Composer.h"
+#include "AssetModels.h"
+#include "EnumModels.h"
 
 DC_BEGIN_COMPOSER
 
-	//! Base class for all enumeration models.
-	class QEnumerationModel : public QStringListModel {
-	public:
+// ** MaterialModel::MaterialModel
+MaterialModel::MaterialModel( Scene::MaterialWPtr material, QObject* parent ) : PropertyModel( parent ), m_material( material )
+{
+	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, material.get() ), BindSetter( Scene::Material::setRenderingMode, material.get() ) );
+	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, material.get() ), BindSetter( Scene::Material::setModel, material.get() ) );
+	addAsset<Scene::ImageWPtr>( "Diffuse", BindGetter( Scene::Material::diffuse, material.get() ), BindSetter( Scene::Material::setDiffuse, material.get() ) );
+}
 
-		//! Returns the integer value from string.
-		int					fromString( const QString& value ) const { return stringList().indexOf( value ); }
-
-		//! Returns the string from enum value.
-		QString				toString( int value ) const { return stringList().at( value ); }
-	};
-
-	class QRenderingModeModel : public QEnumerationModel {
-	public:
-
-		QRenderingModeModel( void )
-		{
-			setStringList( QStringList() << "Opaque" << "Cutout" << "Translucent" << "Additive" );
-		}
-	};
-
-	class QLightingModel : public QEnumerationModel {
-	public:
-
-		QLightingModel( void )
-		{
-			setStringList( QStringList() << "Unlit" << "Ambient" << "Phong" );
-		}
-	};
+// ** createMaterialModel
+PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material )
+{
+	return PropertyModelPtr( new MaterialModel( material ) );
+}
 
 DC_END_COMPOSER
-
-#endif	/*	!__DC_Composer_Qt_EnumModels_H__	*/

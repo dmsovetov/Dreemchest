@@ -24,35 +24,42 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_AssetModels_H__
-#define __DC_Composer_Qt_AssetModels_H__
+#ifndef __DC_Composer_EnumModels_H__
+#define __DC_Composer_EnumModels_H__
 
-#include "PropertyModelPrivate.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-	//! Material asset model.
-	class QMaterialModel : public QPropertyModel {
+	//! Base class for all enumeration models.
+	class EnumerationModel : public QStringListModel {
 	public:
 
-		QMaterialModel( Scene::MaterialWPtr material, QObject* parent = NULL );
+		//! Returns the integer value from string.
+		int					fromString( const QString& value ) const { return stringList().indexOf( value ); }
 
-		//! Called each time object property was changed.
-		virtual void		objectChanged( void ) DC_DECL_OVERRIDE { m_material->bundle()->queueForLoading( m_material ); }
-
-	private:
-
-		Scene::MaterialWPtr m_material;
+		//! Returns the string from enum value.
+		QString				toString( int value ) const { return stringList().at( value ); }
 	};
 
-	//! Material asset model private interface.
-	class MaterialModelPrivate : public GenericPropertyModel<QMaterialModel> {
+	class RenderingModeModel : public EnumerationModel {
 	public:
 
-		MaterialModelPrivate( Scene::MaterialWPtr material )
-			: GenericPropertyModel( new QMaterialModel( material ) ) {}
+		RenderingModeModel( void )
+		{
+			setStringList( QStringList() << "Opaque" << "Cutout" << "Translucent" << "Additive" );
+		}
+	};
+
+	class LightingModel : public EnumerationModel {
+	public:
+
+		LightingModel( void )
+		{
+			setStringList( QStringList() << "Unlit" << "Ambient" << "Phong" );
+		}
 	};
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_AssetModels_H__	*/
+#endif	/*	!__DC_Composer_EnumModels_H__	*/

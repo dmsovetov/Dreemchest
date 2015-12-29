@@ -24,23 +24,28 @@
 
  **************************************************************************/
 
-#include "AssetModels.h"
-#include "EnumModels.h"
+#ifndef __DC_Composer_AssetModels_H__
+#define __DC_Composer_AssetModels_H__
+
+#include "PropertyModel.h"
 
 DC_BEGIN_COMPOSER
 
-// ** QMaterialModel::QMaterialModel
-QMaterialModel::QMaterialModel( Scene::MaterialWPtr material, QObject* parent ) : QPropertyModel( parent ), m_material( material )
-{
-	addEnum<Scene::RenderingMode, QRenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, material.get() ), BindSetter( Scene::Material::setRenderingMode, material.get() ) );
-	addEnum<Scene::Material::Model, QLightingModel>( "Lighting Model", BindGetter( Scene::Material::model, material.get() ), BindSetter( Scene::Material::setModel, material.get() ) );
-	addAsset<Scene::ImageWPtr>( "Diffuse", BindGetter( Scene::Material::diffuse, material.get() ), BindSetter( Scene::Material::setDiffuse, material.get() ) );
-}
+	//! Material asset model.
+	class MaterialModel : public PropertyModel {
+	public:
 
-// ** createMaterialModel
-PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material )
-{
-	return PropertyModelPtr( new MaterialModelPrivate( material ) );
-}
+                            //! Constructs MaterialModel instance.
+		                    MaterialModel( Scene::MaterialWPtr material, QObject* parent = NULL );
+
+		//! Called each time object property was changed.
+		virtual void		objectChanged( void ) DC_DECL_OVERRIDE { m_material->bundle()->queueForLoading( m_material ); }
+
+	private:
+
+		Scene::MaterialWPtr m_material;
+	};
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_Qt_AssetModels_H__	*/

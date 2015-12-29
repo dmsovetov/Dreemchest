@@ -31,7 +31,7 @@
 #include "Document.h"
 #include "MimeData.h"
 #include "ObjectInspectorPrivate.h"
-#include "../../Models/Qt/PropertyModelPrivate.h"
+#include "../../Models/PropertyModel.h"
 #include "../../Models/Qt/AssetsModelPrivate.h"
 #include "../../Project/Project.h"
 
