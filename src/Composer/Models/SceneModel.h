@@ -27,12 +27,12 @@
 #ifndef __DC_Composer_SceneModel_H__
 #define __DC_Composer_SceneModel_H__
 
-#include "../Composer.h"
+#include "Qt/AbstractTreeModel.h"
 
 DC_BEGIN_COMPOSER
 
-	//! Scene model interface.
-	class SceneModel : public IInterface {
+	//! Scene model used by UI views and scene editor.
+	class SceneModel : public QGenericTreeModel<Scene::SceneObjectWPtr> {
 	public:
 
 		//! Available asset drop action.
@@ -61,23 +61,65 @@ DC_BEGIN_COMPOSER
 			Vec3						point;			//!< Target world space point.
 		};
 
+										//! Constructs SceneModel instance.
+										SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent = NULL );
+
+		//! Returns scene instance.
+		Scene::SceneWPtr		        scene( void ) const;
+
 		//! Returns an acceptable drop action by a set of assets & target scene object
-		virtual AssetAction				acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point = Vec3( 0, 0, 0 ) ) const = 0;
+		AssetAction				        acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const;
 
 		//! Handles an asset drop action to a target scene object & world space point.
-		virtual bool					performAssetAction( const AssetAction& action ) = 0;
+		bool					        performAssetAction( const AssetAction& action );
 
 		//! Applies material to a static mesh.
-		virtual void					applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material ) = 0;
-
-		//! Places mesh instance to scene at specified world space point.
-		virtual Scene::SceneObjectWPtr	placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point ) = 0;
+		void					        applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material );
 
 		//! Places terrain instance to a scene at specified world space point.
-		virtual Scene::SceneObjectWPtr	placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point ) = 0;
+		Scene::SceneObjectWPtr	        placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point );
+
+		//! Places mesh instance to scene at specified world space point.
+		Scene::SceneObjectWPtr	        placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point );
 
 		//! Changes the parent of a scene object to a new one.
-		virtual void					changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) = 0;
+		void					        changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) const;
+
+		//! Removes the scene object at specified index.
+		void					        remove( const QModelIndex& index );
+
+	private:
+
+		//! Returns the item flags.
+		virtual Qt::ItemFlags	        flags( const QModelIndex& index ) const Q_DECL_OVERRIDE;
+
+		//! Returns the model data by index.
+		virtual QVariant		        data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+
+		//! Writes new data to model at specified index.
+		virtual bool			        setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
+
+		//! Changes the scene object parent transform.
+		virtual bool			        moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const DC_DECL_OVERRIDE;
+
+		//! Handles the drop operation.
+		virtual bool			        dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
+
+	#ifdef DC_QT5_ENABLED
+		//! Checks if the MIME data can be dropped to an item.
+		virtual bool			        canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+	#endif	/*	DC_QT5_ENABLED	*/
+
+		//! Handles scene object addition.
+		void					        handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e );
+
+		//! Handles scene object removal.
+		void					        handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemoved& e );
+
+	private:
+
+		Scene::AssetBundleWPtr			m_assets;	//!< Assets model to use by this scene.
+        Scene::SceneWPtr		        m_scene;	//!< Actual scene.
 	};
 
 DC_END_COMPOSER

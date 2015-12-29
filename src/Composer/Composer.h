@@ -45,6 +45,10 @@
 	#include <QtOpenGL>
 #endif
 
+#define qDeclarePtrs( T )							\
+		    typedef QSharedPointer<class T>	T##Ptr;	\
+	        typedef QWeakPointer<class T>	T##WPtr;
+
 #define DC_BEGIN_COMPOSER	/*namespace Composer {*/
 #define DC_END_COMPOSER		/*}*/
 
@@ -193,8 +197,8 @@ DC_BEGIN_COMPOSER
 	dcDeclarePtrs( FileInfo )
 	dcDeclarePtrs( IMimeData )
 	dcDeclarePtrs( AssetsModel )
-	dcDeclarePtrs( SceneModel )
 	dcDeclarePtrs( PropertyModel )
+    qDeclarePtrs( SceneModel )
 
 	//! Factory method used for assets model creation.
 	extern AssetsModelPtr createAssetsModel( void );

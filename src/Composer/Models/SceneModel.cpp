@@ -24,36 +24,33 @@
 
  **************************************************************************/
 
-#include "SceneModelPrivate.h"
+#include "SceneModel.h"
 
-#include "../../Widgets/Qt/MimeData.h"
+#include "../Widgets/Qt/MimeData.h"
 
 DC_BEGIN_COMPOSER
 
 // ** createSceneModel
 SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene )
 {
-	return new SceneModelPrivate( assets, scene );
+	return SceneModelPtr( new SceneModel( assets, scene ) );
 }
 
-// ----------------------------------------------------- QSceneModel ----------------------------------------------------- //
-
-// ** QSceneModel::QSceneModel
-QSceneModel::QSceneModel( SceneModelPrivate* parentSceneModel, Scene::SceneWPtr scene, QObject* parent )
-	: QGenericTreeModel( 1, parent ), m_parent( parentSceneModel ), m_scene( scene )
+// ** SceneModel::SceneModel
+SceneModel::SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent ) : QGenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
 {
-	m_scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( QSceneModel::handleSceneObjectAdded ) );
-	m_scene->subscribe<Scene::Scene::SceneObjectRemoved>( dcThisMethod( QSceneModel::handleSceneObjectRemoved ) );
+	scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( SceneModel::handleSceneObjectAdded ) );
+	scene->subscribe<Scene::Scene::SceneObjectRemoved>( dcThisMethod( SceneModel::handleSceneObjectRemoved ) );
 }
 
-// ** QSceneModel::scene
-Scene::SceneWPtr QSceneModel::scene( void ) const
+// ** SceneModel::scene
+Scene::SceneWPtr SceneModel::scene( void ) const
 {
-	return m_scene;
+    return m_scene;
 }
 
-// ** QSceneModel::remove
-void QSceneModel::remove( const QModelIndex& index )
+// ** SceneModel::remove
+void SceneModel::remove( const QModelIndex& index )
 {
 	// First remove children
 	for( s32 i = 0; i < rowCount( index ); i++ ) {
@@ -65,17 +62,17 @@ void QSceneModel::remove( const QModelIndex& index )
 	DC_BREAK_IF( !sceneObject.valid() );
 
 	// Remove scene object
-	m_scene->removeSceneObject( sceneObject );
+	scene()->removeSceneObject( sceneObject );
 }
 
-// ** QSceneModel::flags
-Qt::ItemFlags QSceneModel::flags( const QModelIndex& index ) const
+// ** SceneModel::flags
+Qt::ItemFlags SceneModel::flags( const QModelIndex& index ) const
 {
 	return QGenericTreeModel::flags( index ) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
 }
 
-// ** QSceneModel::data
-QVariant QSceneModel::data( const QModelIndex& index, int role ) const
+// ** SceneModel::data
+QVariant SceneModel::data( const QModelIndex& index, int role ) const
 {
 	// Get the scene object by index
 	Scene::SceneObjectWPtr sceneObject = dataAt( index );
@@ -91,8 +88,8 @@ QVariant QSceneModel::data( const QModelIndex& index, int role ) const
 	return QVariant();
 }
 
-// ** QSceneModel::setData
-bool QSceneModel::setData( const QModelIndex& index, const QVariant& value, int role )
+// ** SceneModel::setData
+bool SceneModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
 	// Skip all roles except the editing one
 	if( role != Qt::EditRole ) {
@@ -121,8 +118,8 @@ bool QSceneModel::setData( const QModelIndex& index, const QVariant& value, int 
 	return true;
 }
 
-// ** QSceneModel::dropMimeData
-bool QSceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
+// ** SceneModel::dropMimeData
+bool SceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent )
 {
 	// Check if we a trying to drop an asset.
 	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
@@ -136,22 +133,22 @@ bool QSceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, in
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
 
 	// Get the acceptable drop action
-	SceneModel::AssetAction assetAction = m_parent->acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
+	AssetAction assetAction = acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
 
 	if( !assetAction ) {
 		return false;
 	}
 
 	// Perform an action.
-	bool result = m_parent->performAssetAction( assetAction );
+	bool result = performAssetAction( assetAction );
 	
 	return result;
 }
 
 #ifdef DC_QT5_ENABLED
 
-// ** QSceneModel::canDropMimeData
-bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
+// ** SceneModel::canDropMimeData
+bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) const
 {
 	// Check if we a trying to drop an asset.
 	if( !data->hasFormat( Composer::kAssetMime.c_str() ) ) {
@@ -165,7 +162,7 @@ bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action,
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
 
 	// Get the acceptable drop action
-	SceneModel::AssetAction assetAction = m_parent->acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
+	AssetAction assetAction = acceptableAssetAction( assets, sceneObject, Vec3( 0, 0, 0 ) );
 
 	if( !assetAction ) {
 		return false;
@@ -176,8 +173,8 @@ bool QSceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action,
 
 #endif	/*	DC_QT5_ENABLED	*/
 
-// ** QSceneModel::handleSceneObjectAdded
-void QSceneModel::handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e )
+// ** SceneModel::handleSceneObjectAdded
+void SceneModel::handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e )
 {
 	DC_BREAK_IF( !e.sceneObject->has<Editors::SceneEditorInternal>() );
 
@@ -193,8 +190,8 @@ void QSceneModel::handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& 
 	addItem( item, NULL );
 }
 
-// ** QSceneModel::handleSceneObjectRemoved
-void QSceneModel::handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemoved& e )
+// ** SceneModel::handleSceneObjectRemoved
+void SceneModel::handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemoved& e )
 {
 	// Get the model index by scene object.
 	QModelIndex idx = indexFromData( e.sceneObject );
@@ -207,23 +204,15 @@ void QSceneModel::handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemov
 	removeItem( item );
 }
 
-// ** QSceneModel::moveItem
-bool QSceneModel::moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const
+// ** SceneModel::moveItem
+bool SceneModel::moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const
 {
-	m_parent->changeSceneObjectParent( item->data(), destinationParent ? destinationParent->data() : Scene::SceneObjectWPtr() );
+	changeSceneObjectParent( item->data(), destinationParent ? destinationParent->data() : Scene::SceneObjectWPtr() );
 	return true;
 }
 
-// -------------------------------------------------- SceneModelPrivate -------------------------------------------------- //
-
-// ** SceneModelPrivate::SceneModelPrivate
-SceneModelPrivate::SceneModelPrivate( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene ) : PrivateInterface( new QSceneModel( this, scene ) ), m_assets( assets )
-{
-
-}
-
-// ** SceneModelPrivate::changeSceneObjectParent
-void SceneModelPrivate::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent )
+// ** SceneModel::changeSceneObjectParent
+void SceneModel::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) const
 {
 	DC_BREAK_IF( !sceneObject.valid() );
 
@@ -243,8 +232,8 @@ void SceneModelPrivate::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObj
 	childTransform->setParent( parentTransform );
 }
 
-// ** SceneModelPrivate::acceptableDropAction
-SceneModel::AssetAction SceneModelPrivate::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
+// ** SceneModel::acceptableDropAction
+SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
 {
 	// No valid assets - can't drop
 	if( assets.empty() ) {
@@ -269,8 +258,8 @@ SceneModel::AssetAction SceneModelPrivate::acceptableAssetAction( const Scene::A
 	return assetAction;
 }
 
-// ** SceneModelPrivate::performAssetAction
-bool SceneModelPrivate::performAssetAction( const AssetAction& action )
+// ** SceneModel::performAssetAction
+bool SceneModel::performAssetAction( const AssetAction& action )
 {
 	// Get the target scene object.
 	Scene::SceneObjectWPtr target = action.sceneObject;
@@ -299,8 +288,8 @@ bool SceneModelPrivate::performAssetAction( const AssetAction& action )
 	return true;
 }
 
-// ** SceneModelPrivate::applyMaterial
-void SceneModelPrivate::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material )
+// ** SceneModel::applyMaterial
+void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material )
 {
 	DC_BREAK_IF( !target.valid() );
 	DC_BREAK_IF( !target->has<Scene::StaticMesh>() );
@@ -313,11 +302,11 @@ void SceneModelPrivate::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, 
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
 }
 
-// ** SceneModelPrivate::placeTerrain
-Scene::SceneObjectWPtr SceneModelPrivate::placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point )
+// ** SceneModel::placeTerrain
+Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point )
 {
 	// Get the scene.
-	Scene::SceneWPtr scene = m_private->scene();
+	Scene::SceneWPtr scene = m_scene;
 
 	// Create root scene object.
 	Scene::SceneObjectPtr root = scene->createSceneObject();
@@ -344,24 +333,21 @@ Scene::SceneObjectWPtr SceneModelPrivate::placeTerrain( Scene::TerrainWPtr terra
 	return root;
 }
 
-// ** SceneModelPrivate::placeStaticMesh
-Scene::SceneObjectWPtr SceneModelPrivate::placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point )
+// ** SceneModel::placeStaticMesh
+Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point )
 {
 	DC_BREAK_IF( !mesh.valid() );
 
-	// Get the scene
-	Scene::SceneWPtr scene = m_private->scene();
-
 	// Load the mesh
-	scene->system<Scene::AssetSystem>()->load( mesh );
+	m_scene->system<Scene::AssetSystem>()->load( mesh );
 
 	// Construct scene object
-	Scene::SceneObjectPtr sceneObject = scene->createSceneObject();
+	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
 	sceneObject->attach<Scene::Identifier>( mesh->name() );
 	sceneObject->attach<Scene::StaticMesh>( mesh );
 	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
 	sceneObject->attach<Editors::SceneEditorInternal>( sceneObject );
-	scene->addSceneObject( sceneObject );
+	m_scene->addSceneObject( sceneObject );
 
 	// Get all materials
 	Set<Scene::MaterialPtr> materials = m_assets->findByType<Scene::Material>();

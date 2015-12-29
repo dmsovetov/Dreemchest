@@ -27,7 +27,7 @@
 #include "SceneTree.h"
 
 #include "Menu.h"
-#include "../../Models/Qt/SceneModelPrivate.h"
+#include "../../Models/SceneModel.h"
 
 DC_BEGIN_COMPOSER
 
@@ -69,13 +69,13 @@ QSceneTree::QSceneTree( SceneTree* parent ) : m_parent( parent )
 void QSceneTree::setModel( SceneModelWPtr value )
 {
 	m_model = value;
-	QTreeView::setModel( m_model.valid() ? m_model->privateInterface<QSceneModel>() : NULL );
+	QTreeView::setModel( m_model.lock().data() );
 }
 
 // ** QSceneTree::keyPressEvent
 void QSceneTree::keyPressEvent( QKeyEvent *event )
 {
-	QSceneModel* model = m_model->privateInterface<QSceneModel>();
+	SceneModelPtr model = m_model.lock();
 
     switch( event->key() ) {
     case Qt::Key_Delete:	foreach( QModelIndex idx, selectedIndexes() ) {
@@ -99,7 +99,7 @@ void QSceneTree::contextMenuEvent( QContextMenuEvent *e )
 // ** QSceneTree::itemDoubleClicked
 void QSceneTree::itemDoubleClicked( const QModelIndex& index )
 {
-	QSceneModel* model = m_model->privateInterface<QSceneModel>();
+	SceneModelPtr model = m_model.lock();
 
 	// Get the scene object by index.
 	Scene::SceneObjectWPtr sceneObject = model->dataAt( index );

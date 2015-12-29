@@ -318,7 +318,7 @@ void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
 
 	// Get the asset action
-	SceneModelPrivate::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );
+	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );
 
 	if( action ) {
 		m_sceneModel->performAssetAction( action );
