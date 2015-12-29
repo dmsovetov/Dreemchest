@@ -104,10 +104,10 @@ namespace Scene {
 		//! Returns the camera that owns this cursor.
 		SceneObjectWPtr		camera( void ) const;
 
-	private:
-
 		//! Constructs the world space ray at specified viewport coordinates.
 		Ray					constructViewRay( s32 x, s32 y ) const;
+
+	private:
 
 		//! Updates viewport cursor position.
 		void				setCursor( s32 x, s32 y );
