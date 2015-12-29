@@ -156,6 +156,7 @@ namespace Scene {
 	typedef Ecs::EntityId			SceneObjectId;
 
 	dcDeclarePtrs( Scene )
+	dcDeclarePtrs( Viewport )
 	dcDeclarePtrs( RenderTarget )
 	dcDeclarePtrs( TextureTarget )
 	dcDeclarePtrs( WindowTarget )
@@ -454,6 +455,7 @@ namespace Scene {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
+	#include "Viewport.h"
 	#include "Components/Rendering.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"
@@ -461,6 +463,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
+	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/AssetSystem.h"
