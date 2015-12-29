@@ -140,8 +140,14 @@ namespace Scene {
 		//! Returns the height value of a vertex.
 		f32						heightAtVertex( s32 x, s32 z ) const;
 
+        //! Returns true if the specified coordinates map to a valid vertex.
+        bool                    hasVertex( s32 x, s32 z ) const;
+
 		//! Returns maximum terrain height.
 		f32						maxHeight( void ) const;
+
+		//! Finds the terrain & ray intersection point.
+		Vec3				    rayMarch( const Ray& ray, f32 epsilon = 0.001f ) const;
 
 		//! Returns terrain heightmap.
 		const Heightmap&		heightmap( void ) const;

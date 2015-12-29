@@ -64,6 +64,13 @@ u32 Terrain::chunkCount( void ) const
 	return m_heightmap.size() / kChunkSize;
 }
 
+// ** Terrain::hasVertex
+bool Terrain::hasVertex( s32 x, s32 z ) const
+{
+	bool invalid = x < 0 || z < 0 || x > size() || z > size();
+	return !invalid;
+}
+
 // ** Terrain::heightAtVertex
 f32 Terrain::heightAtVertex( s32 x, s32 z ) const
 {
@@ -97,6 +104,44 @@ f32 Terrain::height( f32 x, f32 z ) const
 	height += heightAtVertex( hx + 1, hz + 1 ) * (       fx) * (       fz);
 
 	return height;
+}
+
+// ** Terrain::rayMarch
+Vec3 Terrain::rayMarch( const Ray& ray, f32 epsilon ) const
+{
+	f32 dt		= 0.5f;
+	f32 scalar	= 0.5f;
+	f32 step	= 0.25f;
+	Vec3 point;
+
+	do {
+		// Get the point on ray
+		point = ray.origin() + ray.direction() * 1000.0f * scalar;
+
+		// Get height at point
+		f32 height = this->height( point.x, point.z );
+
+		// Check the height difference, if it's less than epsilon - intersection point is found.
+		if( fabs( height - point.y ) <= epsilon ) {
+			break;
+		}
+
+		// Select the next segment of a ray based on height difference
+		if( height < point.y ) {
+			f32 newScalar = scalar + step;
+			dt = newScalar - scalar;
+			scalar = newScalar;
+		}
+		else if( height > point.y ) {
+			f32 newScalar = scalar - step;
+			dt = scalar - newScalar;
+			scalar = newScalar;
+		}
+
+		step *= 0.5f;
+	} while( dt >= 0.00001f );
+
+	return point;
 }
 
 // ** Terrain::heightmap
@@ -299,14 +344,14 @@ Vec3 Heightmap::normal( u32 x, u32 z ) const
 	}
 
 	// Compute the Z gradient
-    f32 dy = height( x, z < m_size-1 ? z + 1 : z ) - height( x, z > 0 ?  z - 1 : z );
+    f32 dz = height( x, z < m_size-1 ? z + 1 : z ) - height( x, z > 0 ?  z - 1 : z );
 
     if( z == 0 || z == m_size - 1 ) {
-        dy *= 2;
+        dz *= 2;
 	}
 
 	// Normalize
-	Vec3 normal( -dx, 2.0f, dy );
+	Vec3 normal( -dx, 2.0f, dz );
 	normal.normalize();
 
 	return normal;
