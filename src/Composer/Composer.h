@@ -106,6 +106,30 @@ DC_BEGIN_COMPOSER
 
 	namespace Editors {
 
+		//! This marks terrain chunks.
+		class TerrainChunk : public Ecs::Component<TerrainChunk> {
+		public:
+
+									//! Constructs TerrainChunk instance.
+									TerrainChunk( Scene::TerrainPtr chunk = Scene::TerrainPtr(), u32 x = 0, u32 z = 0 )
+										: m_terrain( chunk ), m_x( x ), m_z( z ) {}
+
+			//! Returns terrain instance.
+			Scene::TerrainWPtr		terrain( void ) const { return m_terrain; }
+
+			//! Returns chunk X.
+			u32						x( void ) const { return m_x; } // column
+
+			//! Returns chunk Y.
+			u32						z( void ) const { return m_z; } // row
+
+		private:
+
+			Scene::TerrainPtr		m_terrain;	//!< Terrain asset.
+			u32						m_x;		//!< Chunk X coordinate.
+			u32						m_z;		//!< Chunk Z coordinate.
+		};
+
 		//! This component marks scene objects as internally used by scene editor.
 		class SceneEditorInternal : public Ecs::Component<SceneEditorInternal> {
 		public:

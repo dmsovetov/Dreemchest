@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Terrain_H__
-#define __DC_Composer_Terrain_H__
+#ifndef __DC_Composer_TerrainEditing_H__
+#define __DC_Composer_TerrainEditing_H__
 
-#include "../Composer.h"
+#include "../../Composer.h"
 
 DC_BEGIN_COMPOSER
 
@@ -35,8 +35,17 @@ DC_BEGIN_COMPOSER
 	class TerrainTool : public Ecs::Component<TerrainTool> {
 	public:
 
+		//! Available tool types.
+		enum Type {
+			  Raise
+			, Lower
+			, Flatten
+			, Level
+			, Smooth
+		};
+
 							//! Constructs TerrainTool instance.
-							TerrainTool( Scene::TerrainWPtr terrain = Scene::TerrainWPtr(), f32 radius = 1.0f );
+							TerrainTool( Scene::TerrainWPtr terrain = Scene::TerrainWPtr(), f32 radius = 1.0f, f32 strength = 0.1f );
 
 		//! Returns tool radius.
 		f32					radius( void ) const;
@@ -44,33 +53,68 @@ DC_BEGIN_COMPOSER
 		//! Sets tool radius.
 		void				setRadius( f32 value );
 
+		//! Returns tool strength.
+		f32					strength( void ) const;
+
+		//! Sets tool strength.
+		void				setStrength( f32 value );
+
 		//! Returns the affected terrain.
 		Scene::TerrainWPtr	terrain( void ) const;
+
+		//! Returns the influence at specified distance.
+		f32					influence( f32 distance ) const;
+
+		//! Returns tool type.
+		Type				type( void ) const;
+
+		//! Sets tool type.
+		void				setType( Type value );
 
 	private:
 
 		f32					m_radius;	//!< Terrain tool radius.
+		f32					m_strength;	//!< Terrain tool strength.
+		Type				m_type;		//!< Tool type.
+
 		Scene::TerrainWPtr	m_terrain;	//!< Affected terrain instance.
 	};
 
 	//! Used for terrain heightmap editing.
-	class TerrainHeightmapSystem : public Ecs::GenericEntitySystem<Editors::TerrainChunk, Scene::StaticMesh, Scene::Transform> {
+	class TerrainHeightmapSystem : public Scene::GenericTouchSystem<TerrainHeightmapSystem, Editors::TerrainChunk, Scene::StaticMesh, Scene::Transform> {
 	public:
 
 							//! Constructs TerrainHeightmapSystem instance.
-							TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Editors::CursorWPtr cursor );
+							TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Scene::ViewportWPtr viewport );
 
 	protected:
 
 		//! Edits the terrain chunk.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& entity, Editors::TerrainChunk& chunk, Scene::StaticMesh& mesh, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, Editors::TerrainChunk& chunk, Scene::StaticMesh& mesh, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Finds the heightmap & ray intersection point.
-		Vec3				findTerrainIntersection( Scene::TerrainWPtr terrain, const Ray& ray, f32 epsilon = 0.001f ) const;
+		//! Returns true if the point is inside the chunk.
+		bool				isPointInside( const Vec3& point, f32 radius, const Editors::TerrainChunk& chunk ) const;
+
+        //! Applies the lowering tool.
+        f32                 applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+
+        //! Applies the raising tool.
+        f32                 applyRaising( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+
+        //! Applies the flattening tool.
+        f32                 applyFlattening( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+
+        //! Applies the leveling tool.
+        f32                 applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+
+        //! Applies the smoothing tool.
+        f32                 applySmoothing( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+
+        //! Returns an average terrain height around the specified point with given radius.
+        f32                 calculateAverageHeight( Scene::TerrainWPtr terrain, s32 x, s32 z, s32 radius ) const;
 
 	private:
 
-		Editors::CursorWPtr		m_cursor;	//!< Cursor binding.
 		Scene::SceneObjectWPtr	m_tool;		//!< Terrain tool instance.
 	};
 
@@ -90,4 +134,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Terrain_H__	*/
+#endif	/*	!__DC_Composer_TerrainEditing_H__	*/

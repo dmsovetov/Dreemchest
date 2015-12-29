@@ -30,7 +30,7 @@
 #include "RotationTool.h"
 #include "TranslationTool.h"
 #include "ArcballRotationTool.h"
-#include "Terrain.h"
+#include "Terrain/TerrainEditing.h"
 
 DC_BEGIN_COMPOSER
 
