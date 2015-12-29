@@ -318,7 +318,7 @@ void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
 
 	// Get the asset action
-	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + viewport()->ray().direction() * 5.0f );
+	SceneModelPrivate::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );
 
 	if( action ) {
 		m_sceneModel->performAssetAction( action );
@@ -384,7 +384,7 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 Scene::SceneObjectWPtr SceneEditor::findSceneObjectAtPoint( s32 x, s32 y ) const
 {
 	// Query scene object by ray
-	Scene::RayTracingResultArray sceneObjects = m_scene->queryRay( viewport()->ray() );
+	Scene::RayTracingResultArray sceneObjects = m_scene->queryRay( constructViewRay( x, y ) );
 
 	// Get the hit scene object.
 	Scene::SceneObjectWPtr target = !sceneObjects.empty() ? sceneObjects[0].sceneObject : Scene::SceneObjectWPtr();
