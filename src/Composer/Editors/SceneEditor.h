@@ -39,6 +39,14 @@ namespace Editors {
 
 	protected:
 
+		//! Transformation tool types.
+		enum ActiveTransformTool {
+			  NoTransformTool		//!< All transformation tools are disabled.
+			, TransformTranslate	//!< Translation tool is now active.
+			, TransformRotate		//!< Rotation tool is now active.
+			, TransformScale		//!< Scaling tool is now active.
+		};
+
 		//! Performs the scene editor initialization.
 		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
 
@@ -75,16 +83,61 @@ namespace Editors {
 		//! Handles the scene object double click in scene hierarchy widget.
 		void							handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleClicked& e );
 
-		//! Places the mesh at specified point.
-		Scene::SceneObjectPtr			placeMesh( Scene::MeshPtr mesh, const Vec3& point );
+		//! Disables all transform tools.
+		void							menuTransformSelect( Ui::IActionWPtr action );
+
+		//! Activates translation transform tool.
+		void							menuTransformTranslate( Ui::IActionWPtr action );
+
+		//! Activates rotation transform tool.
+		void							menuTransformRotate( Ui::IActionWPtr action );
+
+		//! Activates scaling transform tool.
+		void							menuTransformScale( Ui::IActionWPtr action );
+
+		//! Activates terrain raising tool.
+		void							menuTerrainRaise( Ui::IActionWPtr action );
+
+		//! Activates terrain lowering tool.
+		void							menuTerrainLower( Ui::IActionWPtr action );
+
+		//! Activates terrain flattening tool.
+		void							menuTerrainFlatten( Ui::IActionWPtr action );
+
+		//! Activates terrain leveling tool.
+		void							menuTerrainLevel( Ui::IActionWPtr action );
+
+		//! Activates terrain smoothing tool.
+		void							menuTerrainSmooth( Ui::IActionWPtr action );
+
+		//! Returns the nearest scene object underneath the mouse cursor.
+		Scene::SceneObjectWPtr			findSceneObjectAtPoint( s32 x, s32 y ) const;
+
+		//! Highlights the scene object.
+		void							highlightSceneObject( Scene::SceneObjectWPtr sceneObject );
+
+		//! Selects the scene object.
+		void							selectSceneObject( Scene::SceneObjectWPtr sceneObject );
+
+		//! Sets active transform tool.
+		void							setTransformTool( ActiveTransformTool tool );
+
+		//! Binds transformation tool gizmo to a scene object.
+		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTransformTool tool ) const;
 
 	private:
 
-		Scene::ScenePtr					m_scene;			//!< Actual scene.
-		SceneModelPtr					m_sceneModel;		//!< Scene model used by user interface.
-		Scene::RenderingContextPtr		m_renderingContext;	//!< Scene rendering context.
-		Scene::SpectatorCameraPtr		m_camera;			//!< Main editor camera.
-		Scene::Vec3BindingPtr			m_cursorMovement;	//!< Cursor to Vec3 binding.
+		Scene::ScenePtr					m_scene;					//!< Actual scene.
+		SceneModelPtr					m_sceneModel;				//!< Scene model used by user interface.
+		Scene::RenderingContextPtr		m_renderingContext;			//!< Scene rendering context.
+		Scene::SpectatorCameraPtr		m_camera;					//!< Main editor camera.
+		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
+
+		Ui::IToolBarPtr					m_tools;					//!< Scene editor toolbar.
+		ActiveTransformTool				m_activeTransformTool;		//!< Active translation tool.
+
+		Scene::SceneObjectWPtr			m_activeSceneObject;		//!< The scene object underneath the mouse cursor is stored here.
+		Scene::SceneObjectWPtr			m_selectedSceneObject;		//!< The selected scene object.
 	};
 
 	//! FrameTarget is used for rendering the scene to rendering frame.

@@ -29,7 +29,7 @@
 #include "../Systems/RotationTool.h"
 #include "../Systems/ArcballRotationTool.h"
 #include "../Systems/Rendering.h"
-#include "../Systems/Terrain.h"
+#include "../Systems/Terrain/TerrainEditing.h"
 #include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
@@ -42,6 +42,9 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	if( !VisualEditor::initialize( project, asset, document ) ) {
 		return false;
 	}
+
+	// Set the default transform tool
+	setTransformTool( NoTransformTool );
 
 	// Create rendering context.
 	m_renderingContext = Scene::RenderingContext::create( hal() );
@@ -57,21 +60,31 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_sceneModel = createSceneModel( m_project->assets(), m_scene );
 
 	// Create terrain.
-	Scene::TerrainPtr terrain = new Scene::Terrain( m_project->assets().get(), "terrain", "terrain", 128 );
-
 	{
-		Scene::SceneObjectPtr chunk = m_scene->createSceneObject();
-		Scene::MeshPtr		  mesh  = terrain->createMesh();
-		chunk->attach<Scene::StaticMesh>( mesh );
-		chunk->attach<Scene::Transform>();
-		chunk->attach<Scene::Identifier>( "Terrain" );
-		m_scene->addSceneObject( chunk );
+		Scene::TerrainPtr terrain1 = new Scene::Terrain( m_project->assets().get(), "terrain1", "terrain1", 128 );
+		m_sceneModel->placeTerrain( terrain1, Vec3( 0, 0, 0 ) );
+		//Scene::TerrainPtr terrain2 = new Scene::Terrain( m_project->assets().get(), "terrain2", "terrain2", 128 );
+		//m_sceneModel->placeTerrain( terrain2, Vec3( 128, 0, 0 ) );
+		//Scene::TerrainPtr terrain3 = new Scene::Terrain( m_project->assets().get(), "terrain3", "terrain3", 128 );
+		//m_sceneModel->placeTerrain( terrain3, Vec3( 0, 0, 128 ) );
+		//Scene::TerrainPtr terrain4 = new Scene::Terrain( m_project->assets().get(), "terrain4", "terrain4", 128 );
+		//m_sceneModel->placeTerrain( terrain4, Vec3( 128, 0, 128 ) );
+
+		Scene::SceneObjectPtr tool = m_scene->createSceneObject();
+		tool->attach<Scene::Transform>();
+		tool->attach<TerrainTool>( terrain1, 10.0f );
+		tool->attach<SceneEditorInternal>( tool, SceneEditorInternal::Private );
+		m_scene->addSceneObject( tool );
+
+		m_scene->addSystem<TerrainHeightmapSystem>( tool, viewport() );
+	}
+
 	// Create grid.
 	{
 		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
-		grid->attach<Grid>();
+		grid->attach<Scene::Grid>();
 		grid->attach<Scene::Transform>();
-		grid->attach<SceneEditorInternal>();
+		grid->attach<SceneEditorInternal>( grid, SceneEditorInternal::Private );
 		m_scene->addSceneObject( grid );
 	}
 
@@ -80,17 +93,20 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_camera->setMovementEnabled( false );
 	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );
-	m_camera->attach<SceneEditorInternal>();
+	m_camera->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
+	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
 	m_camera->attach<Scene::RenderWireframe>();
-	//m_camera->attach<Scene::RenderForwardLit>();
+	m_camera->attach<Scene::RenderVertexNormals>();
+	//m_camera->attach<Scene::RenderUnlit>();
 	m_camera->attach<Scene::RenderBoundingVolumes>();
 	m_camera->attach<RenderSceneHelpers>();
 	m_scene->addSceneObject( m_camera );
+	viewport()->setCamera( m_camera );
 
 	// Add gizmo systems
-	m_scene->addSystem<TranslationToolSystem>( cursor(), m_camera );
-	m_scene->addSystem<ArcballRotationToolSystem>( cursor(), m_camera );
-	m_scene->addSystem<RotationToolSystem>( m_camera );
+	m_scene->addSystem<TranslationToolSystem>( viewport() );
+	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
+	m_scene->addSystem<RotationToolSystem>( viewport() );
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
 
 	return true;
@@ -131,6 +147,31 @@ void SceneEditor::handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleCl
 // ** SceneEditor::notifyEnterForeground
 void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
 {
+	// Create the tool bar
+	DC_BREAK_IF( m_tools.valid() );
+	m_tools = window->addToolBar();
+
+	m_tools->beginActionGroup();
+	{
+		m_tools->addAction( "Select", BindAction( SceneEditor::menuTransformSelect ), "", ":Scene/Scene/cursor.png", Ui::ItemCheckable | Ui::ItemChecked );
+		m_tools->addAction( "Translate", BindAction( SceneEditor::menuTransformTranslate ), "", ":Scene/Scene/move.png", Ui::ItemCheckable );
+		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
+		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
+	}
+	m_tools->endActionGroup();
+
+	m_tools->addSeparator();
+
+	m_tools->beginActionGroup();
+	{
+		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked );
+		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+		m_tools->addAction( "Level Terrain", BindAction( SceneEditor::menuTerrainLevel ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+		m_tools->addAction( "Flatten Terrain", BindAction( SceneEditor::menuTerrainFlatten ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+		m_tools->addAction( "Smooth Terrain", BindAction( SceneEditor::menuTerrainSmooth ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+	}
+	m_tools->endActionGroup();
+
 	// Set this model
 	window->sceneTree()->setModel( m_sceneModel );
 
@@ -141,11 +182,69 @@ void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
 // ** SceneEditor::notifyEnterBackground
 void SceneEditor::notifyEnterBackground( Ui::IMainWindowWPtr window )
 {
+	// Remove tool bar
+	window->removeToolBar( m_tools );
+	m_tools = Ui::IToolBarPtr();
+
 	// Set empty model
 	window->sceneTree()->setModel( SceneModelPtr() );
 
 	// Unsubscribe for event
 	window->sceneTree()->unsubscribe<Ui::ISceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+}
+
+// ** SceneEditor::menuTransformSelect
+void SceneEditor::menuTransformSelect( Ui::IActionWPtr action )
+{
+	setTransformTool( NoTransformTool );
+}
+
+// ** SceneEditor::menuTransformTranslate
+void SceneEditor::menuTransformTranslate( Ui::IActionWPtr action )
+{
+	setTransformTool( TransformTranslate );
+}
+
+// ** SceneEditor::menuTransformRotate
+void SceneEditor::menuTransformRotate( Ui::IActionWPtr action )
+{
+	setTransformTool( TransformRotate );
+}
+
+// ** SceneEditor::menuTransformScale
+void SceneEditor::menuTransformScale( Ui::IActionWPtr action )
+{
+	setTransformTool( TransformScale );
+}
+
+// ** SceneEditor::menuTerrainRaise
+void SceneEditor::menuTerrainRaise( Ui::IActionWPtr action )
+{
+    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Raise );
+}
+
+// ** SceneEditor::menuTerrainLower
+void SceneEditor::menuTerrainLower( Ui::IActionWPtr action )
+{
+    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Lower );
+}
+
+// ** SceneEditor::menuTerrainFlatten
+void SceneEditor::menuTerrainFlatten( Ui::IActionWPtr action )
+{
+    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Flatten );
+}
+
+// ** SceneEditor::menuTerrainLevel
+void SceneEditor::menuTerrainLevel( Ui::IActionWPtr action )
+{
+    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Level );
+}
+
+// ** SceneEditor::menuTerrainSmooth
+void SceneEditor::menuTerrainSmooth( Ui::IActionWPtr action )
+{
+    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Smooth );
 }
 
 // ** SceneEditor::handleMousePress
@@ -167,6 +266,13 @@ void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 buttons )
 	if( buttons & Ui::RightMouseButton ) {
 		m_camera->setRotationEnabled( false );
 		m_camera->setMovementEnabled( false );
+	}
+	else if( buttons & Ui::LeftMouseButton ) {
+		// Get the scene object underneath the mouse cursor
+		Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
+
+		// Select it
+		selectSceneObject( target );
 	}
 }
 
@@ -195,38 +301,133 @@ bool SceneEditor::handleDragEnter( IMimeDataWPtr mime )
 // ** SceneEditor::handleDragMove
 void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 {
+	// Get the scene object underneath the mouse cursor
+	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
+
+	// Highlight it
+	highlightSceneObject( target );
 }
 
 // ** SceneEditor::handleDrop
 void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
 {
-	// Construct the view ray from cursor position.
-	Ray ray = m_camera->toWorldSpace( x, m_camera->get<Scene::Camera>()->target()->height() - y );
+	// Get the scene object underneath the mouse cursor
+	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
 	// Extract assets from MIME data
 	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
 
-	// Places assets to scene
-	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; ++i ) {
-		Scene::AssetPtr asset = *i;
+	// Get the asset action
+	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + viewport()->ray().direction() * 5.0f );
 
-		switch( asset->type() ) {
-		case Scene::Asset::Mesh:	placeMesh( castTo<Scene::Mesh>( asset.get() ), m_camera->position() + ray.direction() * 5.0f );
-									break;
-		}
+	if( action ) {
+		m_sceneModel->performAssetAction( action );
+	}
+
+	// Reset the highlight indicator
+	highlightSceneObject( Scene::SceneObjectWPtr() );
+}
+
+// ** SceneEditor::highlightSceneObject
+void SceneEditor::highlightSceneObject( Scene::SceneObjectWPtr sceneObject )
+{
+	// This object is already highlighted - skip
+	if( sceneObject == m_activeSceneObject ) {
+		return;
+	}
+
+	// Only one scene object can be highlighted at a time
+	if( m_activeSceneObject.valid() ) {
+		m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( false );
+	}
+
+	// Store this object
+	m_activeSceneObject = sceneObject;
+
+	// Mark it as highlighted
+	if( m_activeSceneObject.valid() ) {
+		m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( true );
 	}
 }
 
-// ** SceneEditor::placeMesh
-Scene::SceneObjectPtr SceneEditor::placeMesh( Scene::MeshPtr mesh, const Vec3& point )
+// ** SceneEditor::selectSceneObject
+void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 {
-	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
-	sceneObject->attach<Scene::Identifier>( mesh->name() );
-	sceneObject->attach<Scene::StaticMesh>( mesh );
-	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
-	m_scene->addSceneObject( sceneObject );
+	// This object is already selected - skip
+	if( sceneObject == m_selectedSceneObject ) {
+		return;
+	}
 
-	return sceneObject;
+	// Only one scene object can be selected at a time
+	if( m_selectedSceneObject.valid() ) {
+		// Remove the selected flag
+		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( false );
+		
+		// Ensure the deselected object has no gizmos
+		bindTransformGizmo( m_selectedSceneObject, NoTransformTool );
+	}
+
+	// Store this object
+	m_selectedSceneObject = sceneObject;
+
+	// Mark it as selected
+	if( m_selectedSceneObject.valid() ) {
+		// Add the selected flag
+		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+
+		// Bind the gizmo for an active transformation tool
+		bindTransformGizmo( m_selectedSceneObject, m_activeTransformTool );
+	}
+}
+
+// ** SceneEditor::findSceneObjectAtPoint
+Scene::SceneObjectWPtr SceneEditor::findSceneObjectAtPoint( s32 x, s32 y ) const
+{
+	// Query scene object by ray
+	Scene::RayTracingResultArray sceneObjects = m_scene->queryRay( viewport()->ray() );
+
+	// Get the hit scene object.
+	Scene::SceneObjectWPtr target = !sceneObjects.empty() ? sceneObjects[0].sceneObject : Scene::SceneObjectWPtr();
+
+	return target;
+}
+
+// ** SceneEditor::setTransformTool
+void SceneEditor::setTransformTool( ActiveTransformTool tool )
+{
+	// This tool is already activated
+	if( tool == m_activeTransformTool ) {
+		return;
+	}
+
+	// Set active tool
+	m_activeTransformTool = tool;
+
+	// Bind the gizmo to selected object
+	if( m_selectedSceneObject.valid() ) {
+		bindTransformGizmo( m_selectedSceneObject, m_activeTransformTool );
+	}
+}
+
+// ** SceneEditor::bindTransformGizmo
+void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTransformTool tool ) const
+{
+	DC_BREAK_IF( !sceneObject.valid() );
+
+	// First remove all transform tool gizmos
+	if( sceneObject->has<TranslationTool>() )		sceneObject->detach<TranslationTool>();
+	if( sceneObject->has<RotationTool>() )			sceneObject->detach<RotationTool>();
+	if( sceneObject->has<ArcballRotationTool>() )	sceneObject->detach<ArcballRotationTool>();
+
+	// Now add the gizmo
+	switch( tool ) {
+	case TransformTranslate:	sceneObject->attach<TranslationTool>();
+								break;
+
+	case TransformRotate:		sceneObject->attach<ArcballRotationTool>();
+								sceneObject->attach<RotationTool>();
+								break;
+	}
 }
 
 } // namespace Editors
