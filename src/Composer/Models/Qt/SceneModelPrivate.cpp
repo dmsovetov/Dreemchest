@@ -313,6 +313,37 @@ void SceneModelPrivate::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, 
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
 }
 
+// ** SceneModelPrivate::placeTerrain
+Scene::SceneObjectWPtr SceneModelPrivate::placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point )
+{
+	// Get the scene.
+	Scene::SceneWPtr scene = m_private->scene();
+
+	// Create root scene object.
+	Scene::SceneObjectPtr root = scene->createSceneObject();
+	root->attach<Editors::SceneEditorInternal>( root );
+	root->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
+	root->attach<Scene::Identifier>( "Terrain" );
+	scene->addSceneObject( root );
+
+	// Add chunks
+	for( u32 z = 0; z < terrain->chunkCount(); z++ ) {
+		for( u32 x = 0; x < terrain->chunkCount(); x++ ) {
+			Scene::SceneObjectPtr chunk = scene->createSceneObject();
+			Scene::MeshPtr		  mesh  = terrain->createChunkMesh( x, z );
+
+			chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
+			chunk->attach<Scene::StaticMesh>( mesh );
+			chunk->attach<Editors::TerrainChunk>( terrain, x, z );
+			chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
+			
+			scene->addSceneObject( chunk );
+		}
+	}
+
+	return root;
+}
+
 // ** SceneModelPrivate::placeStaticMesh
 Scene::SceneObjectWPtr SceneModelPrivate::placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point )
 {

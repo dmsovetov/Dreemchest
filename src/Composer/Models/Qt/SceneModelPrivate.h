@@ -97,6 +97,9 @@ DC_BEGIN_COMPOSER
 		//! Applies material to a static mesh.
 		virtual void					applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material ) DC_DECL_OVERRIDE;
 
+		//! Places terrain instance to a scene at specified world space point.
+		virtual Scene::SceneObjectWPtr	placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point ) DC_DECL_OVERRIDE;
+
 		//! Places mesh instance to scene at specified world space point.
 		virtual Scene::SceneObjectWPtr	placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point ) DC_DECL_OVERRIDE;
 
