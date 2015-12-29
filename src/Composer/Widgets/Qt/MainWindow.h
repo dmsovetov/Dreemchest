@@ -77,7 +77,7 @@ namespace Ui {
 		virtual FileSystemWPtr			fileSystem( void ) const DC_DECL_OVERRIDE;
 
 		//! Returns the asset tree instance.
-		virtual IAssetTreeWPtr			assetTree( void ) const DC_DECL_OVERRIDE;
+		virtual AssetTreeWPtr			assetTree( void ) const DC_DECL_OVERRIDE;
 
 		//! Returns the scene tree instance.
 		virtual ISceneTreeWPtr			sceneTree( void ) const DC_DECL_OVERRIDE;
@@ -113,7 +113,7 @@ namespace Ui {
 		IDocumentWPtr					m_activeDocument;			//!< An active document.
 		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
 		FileSystemPtr					m_fileSystem;				//!< File system interface.
-		IAssetTreePtr					m_assetTree;				//!< Asset tree instance.
+		AssetTreePtr					m_assetTree;				//!< Asset tree instance.
 		ISceneTreePtr					m_sceneTree;				//!< Scene tree instance.
 		ObjectInspectorPtr				m_objectInspector;			//!< Object inspector instance.
 		Project::ProjectWPtr			m_project;					//!< Opened project.

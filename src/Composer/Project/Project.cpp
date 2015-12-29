@@ -31,7 +31,7 @@
 
 #include "../Widgets/IMainWindow.h"
 #include "../Widgets/IMenu.h"
-#include "../Widgets/IAssetTree.h"
+#include "../Widgets/AssetTree.h"
 #include "../Widgets/IDocument.h"
 
 #include "../Editors/SceneEditor.h"
@@ -123,7 +123,7 @@ String Project::assetsAbsolutePath( void ) const
 }
 
 // ** Project::fillAssetMenu
-void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree )
+void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::AssetTree* assetTree )
 {
 	// Clear the menu
 	menu->clear();
@@ -136,7 +136,7 @@ void Project::fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree )
 	menu->addAction( "Import Assets", BindAction( Project::menuImportAssets ) );
 	menu->addSeparator();
 
-	if( assetTree.valid() ) {
+	if( assetTree ) {
 		bool singleSelection = assetTree->selection().size() == 1;
 
 		menu->addAction( "Open", BindAction( Project::menuOpenAsset ) )->setDisabled( !singleSelection );
@@ -156,8 +156,9 @@ void Project::createAsset( const String& name, const String& ext )
 	FileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Get the parent folder
-	FileInfoArray selected = m_mainWindow->assetTree()->selection();
-	String		  path	   = selected.empty() ? assetsAbsolutePath() : selected[0]->absolutePath();
+    Ui::AssetTreePtr assetTree = m_mainWindow->assetTree().lock();
+	FileInfoArray    selected  = assetTree->selection();
+	String		     path	   = selected.empty() ? assetsAbsolutePath() : selected[0]->absolutePath();
 
 	// Generate the file name
 	String fileName = fs->generateFileName( path, name, ext );
@@ -170,7 +171,7 @@ void Project::createAsset( const String& name, const String& ext )
 	}
 
 	// Expand parent item
-	m_mainWindow->assetTree()->expandSelectedItems();
+	assetTree->expandSelectedItems();
 }
 
 // ** Project::edit
@@ -261,7 +262,8 @@ void Project::menuShowInExplorer( Ui::IActionWPtr action )
 	FileSystemWPtr fs = m_mainWindow->fileSystem();
 
 	// Get the selected items
-	FileInfoArray selected = m_mainWindow->assetTree()->selection();
+    Ui::AssetTreePtr assetTree = m_mainWindow->assetTree();
+	FileInfoArray    selected  = assetTree->selection();
 
 	// Get the file info
 	FileInfoPtr fileInfo = selected.empty() ? fs->extractFileInfo( assetsAbsolutePath() ) : selected[0];

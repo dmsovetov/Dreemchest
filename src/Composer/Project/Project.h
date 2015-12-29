@@ -52,7 +52,7 @@ namespace Project {
 									~Project( void );
 
 		//! Fills an asset menu.
-		void						fillAssetMenu( Ui::IMenuWPtr menu, Ui::IAssetTreeWPtr assetTree = Ui::IAssetTreeWPtr() );
+		void						fillAssetMenu( Ui::IMenuWPtr menu, Ui::AssetTree* assetTree = NULL );
 
 		//! Returns project name.
 		const String&				name( void ) const;

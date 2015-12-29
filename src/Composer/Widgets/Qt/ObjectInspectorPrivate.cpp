@@ -26,7 +26,8 @@
 
 #include "ObjectInspectorPrivate.h"
 
-#include "AssetTree.h"
+#include "../AssetTree.h"
+#include "Widget.h"
 
 #include "../../Models/PropertyModel.h"
 #include "../../Models/EnumModels.h"
@@ -89,7 +90,7 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 		QWidget* widget = NULL;
 
 		if( type == "Scene::ImageWPtr" ) {
-			widget = new QAssetSelector( Scene::Asset::Image );
+			widget = new AssetSelector( Scene::Asset::Image );
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
 		}
 		else if( type == "Scene::RenderingMode" ) {

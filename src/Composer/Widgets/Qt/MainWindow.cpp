@@ -29,7 +29,7 @@
 
 #include "RenderingFrame.h"
 #include "FileSystem.h"
-#include "AssetTree.h"
+#include "../AssetTree.h"
 #include "SceneTree.h"
 #include "Document.h"
 #include "ObjectInspectorPrivate.h"
@@ -155,7 +155,7 @@ FileSystemWPtr MainWindow::fileSystem( void ) const
 }
 
 // ** MainWindow::assetTree
-IAssetTreeWPtr MainWindow::assetTree( void ) const
+AssetTreeWPtr MainWindow::assetTree( void ) const
 {
 	return m_assetTree;
 }
@@ -379,7 +379,7 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	m_project = e.project;
 
 	// Create the asset tree
-	m_assetTree = new AssetTree( m_project );
+	m_assetTree = AssetTreePtr::create( m_project );
 	m_assetTree->setModel( m_project->assetsModel() );
 
 	// Create the scene tree
@@ -393,7 +393,7 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 
 	// Add dock windows
 	addDock( "Inspector", m_objectInspector->privateInterface<QObjectInspector>(), Qt::RightDockWidgetArea );
-	addDock( "Assets", m_assetTree->privateInterface<QAssetTree>(), Qt::RightDockWidgetArea );
+	addDock( "Assets", m_assetTree.data(), Qt::RightDockWidgetArea );
 	addDock( "Hierarchy", m_sceneTree->privateInterface<QSceneTree>(), Qt::LeftDockWidgetArea );
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
 

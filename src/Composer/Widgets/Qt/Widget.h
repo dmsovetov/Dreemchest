@@ -29,7 +29,6 @@
 
 #include "../IDocument.h"
 #include "../IMainWindow.h"
-#include "../IAssetTree.h"
 #include "../ISceneTree.h"
 #include "../IMainWindow.h"
 #include "../IMenu.h"

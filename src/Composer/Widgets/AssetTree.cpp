@@ -26,23 +26,23 @@
 
 #include "AssetTree.h"
 
-#include "Menu.h"
-#include "FileSystem.h"
-#include "Document.h"
-#include "MimeData.h"
-#include "ObjectInspectorPrivate.h"
-#include "../../Models/PropertyModel.h"
-#include "../../Models/AssetsModel.h"
-#include "../../Project/Project.h"
+#include "Qt/Menu.h"
+#include "Qt/FileSystem.h"
+#include "Qt/Document.h"
+#include "Qt/MimeData.h"
+#include "Qt/ObjectInspectorPrivate.h"
+#include "../Models/PropertyModel.h"
+#include "../Models/AssetsModel.h"
+#include "../Project/Project.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ------------------------------------------------ QAssetSelector ------------------------------------------------ //
+// ------------------------------------------------ AssetSelector ------------------------------------------------ //
 
-// ** QAssetSelector::QAssetSelector
-QAssetSelector::QAssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
+// ** AssetSelector::AssetSelector
+AssetSelector::AssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
 {
 	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
 
@@ -57,8 +57,8 @@ QAssetSelector::QAssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ),
 	layout->setSpacing( 1 );
 }
 
-// ** QAssetSelector::eventFilter
-bool QAssetSelector::eventFilter( QObject* target, QEvent* e )
+// ** AssetSelector::eventFilter
+bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 {
     switch( e->type() ) {
     case QEvent::DragEnter: {
@@ -105,14 +105,14 @@ bool QAssetSelector::eventFilter( QObject* target, QEvent* e )
     return false;
 }
 
-// ** QAssetSelector::assetChanged
-Scene::AssetWPtr QAssetSelector::value( void ) const
+// ** AssetSelector::assetChanged
+Scene::AssetWPtr AssetSelector::value( void ) const
 {
 	return m_asset;
 }
 
-// ** QAssetSelector::assetChanged
-void QAssetSelector::setValue( const Scene::AssetWPtr& value )
+// ** AssetSelector::setValue
+void AssetSelector::setValue( const Scene::AssetWPtr& value )
 {
 	// Save the asset pointer
 	m_asset = value;
@@ -124,33 +124,7 @@ void QAssetSelector::setValue( const Scene::AssetWPtr& value )
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project ) : PrivateInterface( new QAssetTree( project ) )
-{
-	m_private->setParent( this );
-}
-
-// ** AssetTree::selection
-FileInfoArray AssetTree::selection( void ) const
-{
-	return m_private->selection();
-}
-
-// ** AssetTree::expandSelectedItems
-void AssetTree::expandSelectedItems( void )
-{
-	return m_private->expandSelectedItems();
-}
-
-// ** AssetTree::setModel
-void AssetTree::setModel( AssetsModelWPtr value )
-{
-	m_private->setModel( value );
-}
-
-// ------------------------------------------------ QAssetTree ------------------------------------------------ //
-
-// ** QAssetTree::QAssetTree
-QAssetTree::QAssetTree( Project::ProjectWPtr project ) : m_project( project ), m_selectionChanged( false )
+AssetTree::AssetTree( Project::ProjectWPtr project ) : m_project( project ), m_selectionChanged( false )
 {
 	setHeaderHidden( true );
 	setDragEnabled( true );
@@ -165,20 +139,14 @@ QAssetTree::QAssetTree( Project::ProjectWPtr project ) : m_project( project ), m
 	connect( selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(selectionChanged(const QItemSelection&, const QItemSelection&)) );
 }
 
-// ** QAssetTree::setParent
-void QAssetTree::setParent( IAssetTreeWPtr value )
-{
-	m_parent = value;
-}
-
-// ** QAssetTree::model
-AssetsModelWPtr QAssetTree::model( void ) const
+// ** AssetTree::model
+AssetsModelWPtr AssetTree::model( void ) const
 {
     return m_proxy->model();
 }
 
-// ** QAssetTree::setModel
-void QAssetTree::setModel( AssetsModelWPtr value )
+// ** AssetTree::setModel
+void AssetTree::setModel( AssetsModelWPtr value )
 {
 	m_proxy = FilteredAssetsModelPtr( new FilteredAssetsModel( value, this ) );
 	QTreeView::setModel( m_proxy.data() );
@@ -192,8 +160,8 @@ void QAssetTree::setModel( AssetsModelWPtr value )
 #endif	/*	!DEV_CUSTOM_ASSET_MODEL	*/
 }
 
-// ** QAssetTree::keyPressEvent
-void QAssetTree::keyPressEvent( QKeyEvent *event )
+// ** AssetTree::keyPressEvent
+void AssetTree::keyPressEvent( QKeyEvent *event )
 {
 	FilteredAssetsModel* model = m_proxy.data();
 
@@ -207,17 +175,17 @@ void QAssetTree::keyPressEvent( QKeyEvent *event )
     QTreeView::keyPressEvent( event );
 }
 
-// ** QAssetTree::contextMenuEvent
-void QAssetTree::contextMenuEvent( QContextMenuEvent *e )
+// ** AssetTree::contextMenuEvent
+void AssetTree::contextMenuEvent( QContextMenuEvent *e )
 {
 	IMenuPtr menu( new Menu( this ) );
 
-    m_project->fillAssetMenu( menu, m_parent );
+    m_project->fillAssetMenu( menu, this );
     menu->exec( e->globalPos().x(), e->globalPos().y() );
 }
 
-// ** QAssetTree::itemDoubleClicked
-void QAssetTree::itemDoubleClicked( const QModelIndex& index )
+// ** AssetTree::itemDoubleClicked
+void AssetTree::itemDoubleClicked( const QModelIndex& index )
 {
 	FilteredAssetsModel* proxy = m_proxy.data();
 
@@ -239,8 +207,8 @@ void QAssetTree::itemDoubleClicked( const QModelIndex& index )
 	m_project->edit( data["uuid"].asString(), file );
 }
 
-// ** QAssetTree::mousePressEvent
-void QAssetTree::mousePressEvent( QMouseEvent* e )
+// ** AssetTree::mousePressEvent
+void AssetTree::mousePressEvent( QMouseEvent* e )
 {
 	// Reset the flag
 	m_selectionChanged = false;
@@ -249,8 +217,8 @@ void QAssetTree::mousePressEvent( QMouseEvent* e )
 	QTreeView::mousePressEvent( e );
 }
 
-// ** QAssetTree::mouseReleaseEvent
-void QAssetTree::mouseReleaseEvent( QMouseEvent* e )
+// ** AssetTree::mouseReleaseEvent
+void AssetTree::mouseReleaseEvent( QMouseEvent* e )
 {
 	QTreeView::mouseReleaseEvent( e );
 
@@ -266,14 +234,14 @@ void QAssetTree::mouseReleaseEvent( QMouseEvent* e )
 	m_selectionChanged = false;
 }
 
-// ** QAssetTree::selectionChanged
-void QAssetTree::selectionChanged( const QItemSelection& selected, const QItemSelection& deselected )
+// ** AssetTree::selectionChanged
+void AssetTree::selectionChanged( const QItemSelection& selected, const QItemSelection& deselected )
 {
 	m_selectionChanged = true;
 }
 
-// ** QAssetTree::bindToInspector
-void QAssetTree::bindToInspector( const QModelIndexList& indexes )
+// ** AssetTree::bindToInspector
+void AssetTree::bindToInspector( const QModelIndexList& indexes )
 {
 	// More that one item selected - do nothing
 	if( indexes.size() > 1 ) {
@@ -315,8 +283,8 @@ void QAssetTree::bindToInspector( const QModelIndexList& indexes )
 	}
 }
 
-// ** QAssetTree::selection
-FileInfoArray QAssetTree::selection( void ) const
+// ** AssetTree::selection
+FileInfoArray AssetTree::selection( void ) const
 {
 	FilteredAssetsModel* proxy = m_proxy.data();
 
@@ -333,8 +301,8 @@ FileInfoArray QAssetTree::selection( void ) const
 	return result;
 }
 
-// ** QAssetTree::expandSelectedItems
-void QAssetTree::expandSelectedItems( void )
+// ** AssetTree::expandSelectedItems
+void AssetTree::expandSelectedItems( void )
 {
 	foreach( QModelIndex idx, selectedIndexes() ) {
 		expand( idx );

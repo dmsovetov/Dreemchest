@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_AssetTree_H__
-#define __DC_Composer_Qt_AssetTree_H__
+#ifndef __DC_Composer_AssetTree_H__
+#define __DC_Composer_AssetTree_H__
 
-#include "Widget.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
 	//! Asset selector widget.
-	class QAssetSelector : public QWidget {
+	class AssetSelector : public QWidget {
 
 		Q_OBJECT
 		Q_PROPERTY( Scene::AssetWPtr value READ value WRITE setValue NOTIFY valueChanged USER true )
@@ -46,8 +46,8 @@ namespace Ui {
 
 	public:
 
-							//! Constructs QAssetSelector widget.
-							QAssetSelector( u32 mask = ~0, QWidget* parent = NULL );
+							//! Constructs AssetSelector widget.
+							AssetSelector( u32 mask = ~0, QWidget* parent = NULL );
 
 		//! Returns the selected asset.
 		Scene::AssetWPtr	value( void ) const;
@@ -69,23 +69,20 @@ namespace Ui {
 	};
 
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
-	class QAssetTree : public QTreeView {
+	class AssetTree : public QTreeView {
 
 		Q_OBJECT
 
 	public:
 
 									//! Constructs asset tree bound to a specified path.
-									QAssetTree( Project::ProjectWPtr project );
+									AssetTree( Project::ProjectWPtr project );
 
 		//! Returns the selected items.
 		FileInfoArray				selection( void ) const;
 
 		//! Expands the selected items.
 		void						expandSelectedItems( void );
-
-		//! Sets the parent asset tree.
-		void						setParent( IAssetTreeWPtr value );
 
 		//! Sets asset tree model.
 		void						setModel( AssetsModelWPtr value );
@@ -120,31 +117,13 @@ namespace Ui {
 
 	private:
 
-		IAssetTreeWPtr				m_parent;			//!< Parent AssetTree instance.
 		Project::ProjectWPtr		m_project;			//!< Parent project instance.
 		FilteredAssetsModelPtr	    m_proxy;			//!< Filtered assets model to be used.
 		bool						m_selectionChanged;	//!< This flag indicates that selection was changed.
-	};
-
-	//! Asset tree widget.
-	class AssetTree : public PrivateInterface<IAssetTree, QAssetTree> {
-	public:
-
-									//! Constructs asset tree bound to a specified path.
-									AssetTree( Project::ProjectWPtr project );
-
-		//! Returns the selected items.
-		virtual FileInfoArray		selection( void ) const DC_DECL_OVERRIDE;
-
-		//! Expands the selected items.
-		virtual void				expandSelectedItems( void ) DC_DECL_OVERRIDE;
-
-		//! Sets asset tree model.
-		virtual void				setModel( AssetsModelWPtr value ) DC_DECL_OVERRIDE;
 	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_AssetTree_H__	*/
+#endif	/*	!__DC_Composer_AssetTree_H__	*/

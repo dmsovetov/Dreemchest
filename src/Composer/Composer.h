@@ -62,6 +62,8 @@ DC_BEGIN_COMPOSER
 
 	namespace Ui {
 
+        qDeclarePtrs( AssetTree )
+
 		dcDeclarePtrs( IMainWindow )
 		dcDeclarePtrs( IAction )
 		dcDeclarePtrs( IMenu )
@@ -69,7 +71,6 @@ DC_BEGIN_COMPOSER
 		dcDeclarePtrs( IRenderingFrame )
 		dcDeclarePtrs( IRenderingFrameDelegate )
 		dcDeclarePtrs( IDocument )
-		dcDeclarePtrs( IAssetTree )
 		dcDeclarePtrs( ISceneTree )
 		dcDeclarePtrs( ObjectInspector )
 

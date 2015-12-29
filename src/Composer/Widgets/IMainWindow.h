@@ -74,7 +74,7 @@ namespace Ui {
 		virtual FileSystemWPtr		fileSystem( void ) const				= 0;
 
 		//! Returns the asset tree instance.
-		virtual IAssetTreeWPtr		assetTree( void ) const					= 0;
+		virtual AssetTreeWPtr		assetTree( void ) const					= 0;
 
 		//! Returns the scene tree instance.
 		virtual ISceneTreeWPtr		sceneTree( void ) const					= 0;

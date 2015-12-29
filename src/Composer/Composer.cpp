@@ -29,7 +29,7 @@
 
 #include "Widgets/IMainWindow.h"
 #include "Widgets/IMenu.h"
-#include "Widgets/IAssetTree.h"
+#include "Widgets/AssetTree.h"
 
 #include "Project/Project.h"
 
