@@ -160,7 +160,7 @@ void TranslationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs
 							}
 
 							// Apply translation
-							transform.setPosition( gizmo.transform().position() + offset );
+							transform.setPosition( gizmo.transform()->position() + offset );
 						}
 						break;
 	}

@@ -125,7 +125,7 @@ void RotationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::E
 							}
 
                             // Apply rotation
-                            transform.setRotation( rotation * gizmo.transform().rotation() );
+                            transform.setRotation( rotation * gizmo.transform()->rotation() );
 						}
 						break;
 	}

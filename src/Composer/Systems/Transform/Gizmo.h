@@ -70,7 +70,7 @@ DC_BEGIN_COMPOSER
 		const Vec2&				tangent( void ) const;
 
 		//! Returns initial transform.
-		const Scene::Transform&	transform( void ) const;
+		Scene::TransformWPtr	transform( void ) const;
 
 		//! Activates the specified transform type.
 		void					activate( u8 value );
@@ -88,7 +88,7 @@ DC_BEGIN_COMPOSER
 
 		State					m_state;		//!< Current gizmo state.
 		u8						m_type;			//!< Selected transform type.
-		Scene::Transform		m_transform;	//!< Initial transform.
+		Scene::TransformPtr		m_transform;	//!< Initial transform.
 		Vec2					m_cursor;		//!< Initial cursor position.
 		Ray						m_ray;			//!< Initial view ray.
 		Vec2					m_tangent;		//!< Tangent axis to a grab point.

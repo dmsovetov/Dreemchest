@@ -88,7 +88,7 @@ const Vec2& Gizmo::cursor( void ) const
 }
 
 // ** Gizmo::transform
-const Scene::Transform& Gizmo::transform( void ) const
+Scene::TransformWPtr Gizmo::transform( void ) const
 {
 	return m_transform;
 }
@@ -100,7 +100,7 @@ void Gizmo::lock( const Scene::Transform& transform, const Vec2& cursor, const R
 	m_ray		= ray;
 	m_cursor	= cursor;
 	m_tangent	= tangent;
-	m_transform = transform;
+	m_transform = new Scene::Transform( transform );
 }
 
 // ** Gizmo::unlock
