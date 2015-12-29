@@ -73,6 +73,9 @@ DC_BEGIN_COMPOSER
 		//! Places mesh instance to scene at specified world space point.
 		virtual Scene::SceneObjectWPtr	placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point ) = 0;
 
+		//! Places terrain instance to a scene at specified world space point.
+		virtual Scene::SceneObjectWPtr	placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point ) = 0;
+
 		//! Changes the parent of a scene object to a new one.
 		virtual void					changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) = 0;
 	};
