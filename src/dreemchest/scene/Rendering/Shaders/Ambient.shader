@@ -2,7 +2,6 @@
 #version 120
 
 uniform mat4 u_vp, u_transform;
-varying vec3 v_normal;
 
 #ifdef USE_DIFFUSE_MAP
 	varying vec2 v_uv0;

@@ -123,7 +123,7 @@ PlaneClipper PlaneClipper::createFromFrustum( const Matrix4& viewProjection, u8 
 	return clipper;
 }
 
-// ** PlaneClipper::createFromFrustum
+// ** PlaneClipper::createFromBox
 PlaneClipper PlaneClipper::createFromBox( const Vec3& center, f32 radius, u8 id )
 {
 	PlaneClipper clipper( id );
