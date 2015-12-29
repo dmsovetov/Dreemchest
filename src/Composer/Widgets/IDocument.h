@@ -38,7 +38,7 @@ namespace Ui {
 	public:
 
 		//! Returns the rendering frame used by this document.
-		virtual IRenderingFrameWPtr			renderingFrame( void )			= 0;
+		virtual IRenderingFrameWPtr			renderingFrame( void ) const	= 0;
 
 		//! Attaches the rendering frame to this document.
 		virtual IRenderingFrameWPtr			attachRenderingFrame( void )	= 0;

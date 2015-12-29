@@ -72,7 +72,7 @@ Document::Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEdi
 }
 
 // ** Document::renderingFrame
-IRenderingFrameWPtr Document::renderingFrame( void )
+IRenderingFrameWPtr Document::renderingFrame( void ) const
 {
 	return m_renderingFrame;
 }

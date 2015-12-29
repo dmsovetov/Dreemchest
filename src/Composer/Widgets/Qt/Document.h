@@ -66,7 +66,7 @@ namespace Ui {
 											Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent = NULL );
 
 		//! Returns the rendering frame used for this document dock.
-		virtual IRenderingFrameWPtr			renderingFrame( void );
+		virtual IRenderingFrameWPtr			renderingFrame( void ) const;
 
 		//! Attaches the rendering frame to this document.
 		virtual IRenderingFrameWPtr			attachRenderingFrame( void );
