@@ -151,7 +151,7 @@ DC_BEGIN_COMPOSER
 	typedef Array<FileInfoPtr> FileInfoArray;
 
 	//! Base interface class.
-	class IInterface : public event::RefCountedEventEmitter {
+	class IInterface : public RefCountedEventEmitter {
 	public:
 
 		virtual						~IInterface( void ) {}
@@ -182,7 +182,7 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Root composer class.
-	class Composer : public event::RefCountedEventEmitter {
+	class Composer : public RefCountedEventEmitter {
 	public:
 
 		//! Asset MIME type string.
