@@ -60,10 +60,8 @@ namespace Platform {
 
     class Application;
     class Window;
-    class WindowDelegate;
 	class Arguments;
 
-	dcDeclarePtrs( WindowDelegate )
 	dcDeclarePtrs( Window )
 
 } // namespace Platform

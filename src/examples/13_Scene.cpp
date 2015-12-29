@@ -39,43 +39,6 @@ using namespace Renderer;
 // Open the Scene namespace.
 using namespace Scene;
 
-// This class will handle notifyUpdate and just clear the viewport
-class WindowHandler : public WindowDelegate {
-public:
-    
-    // Constructs the WindowHandler with a particle system instance.
-    WindowHandler( HalWPtr hal, SceneWPtr scene )
-		: m_hal( hal ), m_scene( scene )
-	{
-		m_renderingContext = RenderingContext::create( hal );
-	}
-
-    // Called each frame and renders a single frame
-    virtual void handleUpdate( Window* window ) {
-		Rgb clearColor = Rgb::fromHashString( "#314D79" );
-
-        // First clear a viewport with a color
-        m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
-
-		Threads::Thread::sleep( 30 );
-
-		m_scene->update( 0, 0.03f );
-		m_scene->render( m_renderingContext );
-
-        // And now just present all rendered data to the screen
-        m_hal->present();
-    }
-
-    // The previously created HAL instance.
-    HalWPtr	m_hal;
-
-	//! Loaded scene instance.
-	SceneWPtr			m_scene;
-
-	//! Scene rendering context.
-	RenderingContextPtr	m_renderingContext;
-};
-
 // Application delegate is used to handle an events raised by application instance.
 class ParticleSystems : public ApplicationDelegate {
 
@@ -93,6 +56,7 @@ class ParticleSystems : public ApplicationDelegate {
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Hal::create( OpenGL, view );
+        m_renderingContext = RenderingContext::create( m_hal );
 
 		// Create the particle system
 		m_scene = ::Scene::Scene::create();
@@ -129,14 +93,33 @@ class ParticleSystems : public ApplicationDelegate {
 
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
-        // Finally set the window delegate to handle updates.
-        window->setDelegate( new WindowHandler( m_hal, m_scene ) );
+        // Finally subscribe to updates events.
+        window->subscribe<Window::Update>( dcThisMethod( ParticleSystems::handleUpdate ) );
+    }
+
+    // Called each frame and renders a single frame
+    virtual void handleUpdate( const Window::Update& e ) {
+		Rgb clearColor = Rgb::fromHashString( "#314D79" );
+
+        // First clear a viewport with a color
+        m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
+
+		Threads::Thread::sleep( 30 );
+
+		m_scene->update( 0, 0.03f );
+		m_scene->render( m_renderingContext );
+
+        // And now just present all rendered data to the screen
+        m_hal->present();
     }
 
 	Renderer::HalPtr	m_hal;
 	ScenePtr			m_scene;
 	AssetBundlePtr		m_assets;
 	AssetBundlePtr		m_meshes;
+
+	//! Scene rendering context.
+	RenderingContextPtr	m_renderingContext;
 };
 
 // Now declare an application entry point with Particles application delegate.

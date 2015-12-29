@@ -33,42 +33,6 @@ DC_USE_DREEMCHEST
 // Open a platform namespace to use shorter types.
 using namespace Platform;
 
-// This class is a key for handling events raised by Window.
-// Yes, this is a window delegate class, and it works in the
-// same way as an application delegate.
-class WindowHandler : public WindowDelegate {
-
-    // This method is called when mouse/touch is pressed.
-    virtual void handleMouseDown( Window* window, u32 x, u32 y, int touchId ) {
-        Platform::log::msg( "handleMouseDown : %d %d\n", x, y );
-    }
-
-    // This method is called when mouse/touch is released.
-    virtual void handleMouseUp( Window* window, u32 x, u32 y, int touchId ) {
-        Platform::log::msg( "handleMouseUp : %d %d\n", x, y );
-    }
-
-    // This method is called when mouse/touch is moved.
-    virtual void handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, int touchId ) {
-        Platform::log::msg( "handleMouseMove : %d %d\n", ex, ey );
-    }
-
-    // This method is called when key is pressed.
-    virtual void handleKeyDown( Window* window, Key key ) {
-        Platform::log::msg( "handleKeyDown : %d\n", (int)key );
-    }
-
-    // This method is called when key is released.
-    virtual void handleKeyUp( Window* window, Key key ) {
-        Platform::log::msg( "handleKeyUp : %d\n", (int)key );
-    }
-
-    // This method is called each frame
-    virtual void handleUpdate( Window* window ) {
-        
-    }
-};
-
 // Application delegate is used to handle an events raised by application instance.
 class WindowEvents : public ApplicationDelegate {
 
@@ -80,8 +44,43 @@ class WindowEvents : public ApplicationDelegate {
         // Create a 800x600 window like we did in previous example.
         Window* window = Window::create( 800, 600 );
 
-        // Now set a window delegate.
-        window->setDelegate( new WindowHandler );
+        // Now subscribe for window events.
+        window->subscribe<Window::TouchBegan>( dcThisMethod( WindowEvents::handleTouchBegan ) );
+        window->subscribe<Window::TouchEnded>( dcThisMethod( WindowEvents::handleTouchEnded ) );
+        window->subscribe<Window::TouchMoved>( dcThisMethod( WindowEvents::handleTouchMoved ) );
+        window->subscribe<Window::KeyPressed>( dcThisMethod( WindowEvents::handleKeyPressed ) );
+        window->subscribe<Window::KeyReleased>( dcThisMethod( WindowEvents::handleKeyReleased ) );
+        window->subscribe<Window::Update>( dcThisMethod( WindowEvents::handleUpdate ) );
+    }
+
+    // This method is called when mouse/touch is pressed.
+    void handleTouchBegan( const Window::TouchBegan& e ) {
+        Platform::log::msg( "handleMouseDown : %d %d\n", e.x, e.y );
+    }
+
+    // This method is called when mouse/touch is released.
+    void handleTouchEnded( const Window::TouchEnded& e ) {
+        Platform::log::msg( "handleMouseUp : %d %d\n", e.x, e.y );
+    }
+
+    // This method is called when mouse/touch is moved.
+    void handleTouchMoved( const Window::TouchMoved& e ) {
+        Platform::log::msg( "handleMouseMove : %d %d\n", e.x, e.y );
+    }
+
+    // This method is called when key is pressed.
+    void handleKeyPressed( const Window::KeyPressed& e ) {
+        Platform::log::msg( "handleKeyDown : %d\n", e.key );
+    }
+
+    // This method is called when key is released.
+    void handleKeyReleased( const Window::KeyReleased& e ) {
+        Platform::log::msg( "handleKeyUp : %d\n", e.key );
+    }
+
+    // This method is called each frame
+   void handleUpdate( const Window::Update& e ) {
+        
     }
 };
 

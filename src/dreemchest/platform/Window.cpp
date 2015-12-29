@@ -65,10 +65,6 @@ Window* Window::create( u32 width, u32 height )
 // ** Window::release
 void Window::release( void )
 {
-	if( m_delegate != NULL ) {
-		m_delegate->handleClosed( this );
-	}
-
 	if( m_impl ) {
 		m_impl->close();
 	}
@@ -111,12 +107,6 @@ void Window::mapCursorToWindow( s32& x, s32& y ) const
 	m_impl->mapCursorToWindow( x, y );
 }
 
-// ** Window::setDelegate
-void Window::setDelegate( WindowDelegate* delegate )
-{
-    m_delegate = delegate;
-}
-
 // ** Window::caption
 String Window::caption( void ) const
 {
@@ -153,49 +143,37 @@ void* Window::handle( void ) const
 // ** Window::notifyUpdate
 void Window::notifyUpdate( void )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleUpdate( this );
-    }
+	notify<Update>( Update( this ) );
 }
 
 // ** Window::notifyMouseUp
 void Window::notifyMouseUp( u32 x, u32 y, int touchId )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleMouseUp( this, x, y, touchId );
-    }
+	notify<TouchEnded>( TouchEnded( this, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseDown
 void Window::notifyMouseDown( u32 x, u32 y, int touchId )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleMouseDown( this, x, y, touchId );
-    }
+	notify<TouchBegan>( TouchBegan( this, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseMove
 void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleMouseMove( this, sx, sy, ex, ey, touchId );
-    }
+	notify<TouchMoved>( TouchMoved( this, sx, sx, touchId ) );
 }
 
 // ** Window::notifyKeyDown
 void Window::notifyKeyDown( Key key )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleKeyDown( this, key );
-    }
+	notify<KeyPressed>( KeyPressed( this, key ) );
 }
 
 // ** Window::notifyKeyUp
 void Window::notifyKeyUp( Key key )
 {
-    if( m_delegate != NULL ) {
-        m_delegate->handleKeyUp( this, key );
-    }
+	notify<KeyReleased>( KeyReleased( this, key ) );
 }
 
 } // namespace Platform

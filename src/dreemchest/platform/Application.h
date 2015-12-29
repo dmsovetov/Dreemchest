@@ -57,6 +57,23 @@ namespace Platform {
         virtual void            handleLaunched( Application* application ) {}
     };
 
+	//! Base class for windowed applications.
+	class WindowedApplicationDelegate : public ApplicationDelegate {
+	public:
+
+		//! Abstract method to be overridden in a subclass to setup application after window creation.
+		virtual bool			initialize( void ) = 0;
+
+	private:
+
+        //! Handles the application start and creates the window.
+        virtual void            handleLaunched( Application* application ) DC_DECL_OVERRIDE;
+
+	protected:
+
+		WindowPtr				m_window;	//!< Main application window.
+	};
+
     //! Application class is an entry point for applications.
     class Application {
     public:

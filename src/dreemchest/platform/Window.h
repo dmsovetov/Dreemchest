@@ -67,36 +67,8 @@ namespace Platform {
         virtual Window*         owner( void ) const         = 0;
     };
 
-    //! WindiwDelegate is used to handle events raised by windows.
-    class WindowDelegate : public RefCounted {
-    public:
-
-        virtual                 ~WindowDelegate( void ) {}
-
-        //! Handles window frame update.
-        virtual void            handleUpdate( Window* window ) {}
-
-		//! Handles a window close.
-		virtual void			handleClosed( Window* window ) {}
-
-        //! Handles mouse pressed event.
-        virtual void            handleMouseDown( Window* window, u32 x, u32 y, s32 touchId = -1 ) {}
-
-        //! Handles mouse released event.
-        virtual void            handleMouseUp( Window* window, u32 x, u32 y, s32 touchId = -1 ) {}
-
-        //! Handles mouse moved event.
-        virtual void            handleMouseMove( Window* window, u32 sx, u32 sy, u32 ex, u32 ey, s32 touchId = -1 ) {}
-
-        //! Handles key pressed event.
-        virtual void            handleKeyDown( Window* window, Key key ) {}
-
-        //! Handles key released event.
-        virtual void            handleKeyUp( Window* window, Key key ) {}
-    };
-
     //! A platform-specific work with windows.
-    class Window : public RefCounted {
+    class Window : public RefCountedEventEmitter {
     public:
 
         virtual                 ~Window( void );
@@ -112,9 +84,6 @@ namespace Platform {
         
         //! Sets a window caption.
         void                    setCaption( const String& value );
-
-        //! Sets a window event delegate.
-        void                    setDelegate( WindowDelegate* delegate );
 
         //! Returns window width.
         u32                     width( void ) const;
@@ -154,6 +123,73 @@ namespace Platform {
         //! Notifies window that key was released.
         void                    notifyKeyUp( Key key );
 
+		//! Base class for all window events.
+		struct Event {
+						//! Constructs Event instance.
+						Event( WindowWPtr window )
+							: window( window ) {}
+			WindowWPtr	window;	//!< Weak pointer to a window that emitted this event.
+		};
+
+		//! This event is emitted each frame.
+		struct Update : public Event {
+						//! Constructs Update instance.
+						Update( WindowWPtr window )
+							: Event( window ) {}
+		};
+
+		//! Base class for all touch events.
+		struct TouchEvent : public Event {
+						//! Constructs TouchEvent instance.
+						TouchEvent( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+							: Event( window ), x( x ), y( y ), id( id ) {}
+
+			s32			x;	//!< Touch X window coordinate.
+			s32			y;	//!< Touch Y window coordinate.
+			s32			id;	//!< Touch identifier.
+		};
+
+		//! This event is emitted when user touches the window.
+		struct TouchBegan : public TouchEvent {
+						//! Constructs TouchBegan instance.
+						TouchBegan( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+							: TouchEvent( window, x, y, id ) {}
+		};
+
+		//! This event is emitted when user's touch was ended.
+		struct TouchEnded : public TouchEvent {
+						//! Constructs TouchEnded instance.
+						TouchEnded( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+							: TouchEvent( window, x, y, id ) {}
+		};
+
+		//! This event is emitted when user's touch was moved.
+		struct TouchMoved : public TouchEvent {
+						//! Constructs TouchMoved instance.
+						TouchMoved( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+							: TouchEvent( window, x, y, id ) {}
+		};
+
+	#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_OSX )
+		//! This event is emitted when user presses the key.
+		struct KeyPressed : public Event {
+						//! Constructs KeyPressed instance.
+						KeyPressed( WindowWPtr window, Key key )
+							: Event( window ), key( key ) {}
+
+			Key			key;	//!< Pressed key.	
+		};
+
+		//! This event is emitted when user releases the key.
+		struct KeyReleased : public Event {
+						//! Constructs KeyReleased instance.
+						KeyReleased( WindowWPtr window, Key key )
+							: Event( window ), key( key ) {}
+
+			Key			key;	//!< Released key.	
+		};
+	#endif	/*	DC_PLATFORM_WINDOWS || DC_PLATFORM_OSX	*/
+
     private:
 
                                 //! Constructs a new Window instance.
@@ -163,9 +199,6 @@ namespace Platform {
 
         //! Platform-spefific implementation.
         IWindow*                m_impl;
-
-        //! Event delegate.
-        WindowDelegatePtr		m_delegate;
     };
 
 } // namespace Platform

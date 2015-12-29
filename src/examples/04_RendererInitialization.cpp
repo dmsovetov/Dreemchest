@@ -36,27 +36,6 @@ using namespace Platform;
 // Open a renderer namespace.
 using namespace Renderer;
 
-// This class will handle notifyUpdate and just clear the viewport
-class WindowHandler : public WindowDelegate {
-public:
-    
-    // Constructs a WindowHandler instance, we pass a HAL pointer
-    // to be able to clear the viewport.
-    WindowHandler( Hal* hal ) : m_hal( hal ) {}
-
-    // Called each frame and renders a single frame
-    virtual void handleUpdate( Window* window ) {
-        // First clear a viewport with a color
-        m_hal->clear( Rgba( 0.3f, 0.3f, 0.3f ) );
-
-        // And now just present all rendered data to the screen
-        m_hal->present();
-    }
-
-    // The previously created HAL instance.
-    Hal* m_hal;
-};
-
 // Application delegate is used to handle an events raised by application instance.
 class RendererInitialization : public ApplicationDelegate {
 
@@ -73,11 +52,22 @@ class RendererInitialization : public ApplicationDelegate {
         RenderView* view   = Hal::createOpenGLView( window->handle() );
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
-        Hal* hal = Hal::create( OpenGL, view );
+        m_hal = Hal::create( OpenGL, view );
 
-        // Finally set the window delegate to handle updates.
-        window->setDelegate( new WindowHandler( hal ) );
+        // Finally subscribe to updates events.
+        window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleUpdate ) );
     }
+
+    // Called each frame and renders a single frame
+    virtual void handleUpdate( const Window::Update& e ) {
+        // First clear a viewport with a color
+        m_hal->clear( Rgba( 0.3f, 0.3f, 0.3f ) );
+
+        // And now just present all rendered data to the screen
+        m_hal->present();
+    }
+
+    HalPtr m_hal;   //!< Rendering HAL.
 };
 
 // Now declare an application entry point with RendererInitialization application delegate.
