@@ -80,6 +80,10 @@ f32 Terrain::height( f32 x, f32 z ) const
 	s32 hx = static_cast<s32>( floor( x ) );
 	s32 hz = static_cast<s32>( floor( z ) );
 
+	// Make sure that we are using right indices
+	if( hx + 1 >= size() ) hx--;
+	if( hz + 1 >= size() ) hz--;
+
 	// Calculate the fraction values
 	f32 fx = x - hx;
 	f32 fz = z - hz;
