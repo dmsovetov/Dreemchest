@@ -149,18 +149,22 @@ void SceneEditor::notifyEnterBackground( Ui::IMainWindowWPtr window )
 }
 
 // ** SceneEditor::handleMousePress
-void SceneEditor::handleMousePress( s32 x, s32 y, u8 button )
+void SceneEditor::handleMousePress( s32 x, s32 y, u8 buttons )
 {
-	if( button == Ui::RightMouseButton ) {
+	VisualEditor::handleMousePress( x, y, buttons );
+
+	if( buttons & Ui::RightMouseButton ) {
 		m_camera->setRotationEnabled( true );
 		m_camera->setMovementEnabled( true );
 	}
 }
 
 // ** SceneEditor::handleMouseRelease
-void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 button )
+void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 buttons )
 {
-	if( button == Ui::RightMouseButton ) {
+	VisualEditor::handleMouseRelease( x, y, buttons );
+
+	if( buttons & Ui::RightMouseButton ) {
 		m_camera->setRotationEnabled( false );
 		m_camera->setMovementEnabled( false );
 	}
@@ -169,6 +173,10 @@ void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 button )
 // ** SceneEditor::handleMouseMove
 void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 {
+	// Run the base class method to update the cursor
+	VisualEditor::handleMouseMove( x, y, dx, dy, buttons );
+
+	// Update cursor movement
 	m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
 }
 
