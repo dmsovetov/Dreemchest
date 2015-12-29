@@ -40,19 +40,8 @@ DC_BEGIN_COMPOSER
 		static Rgba		kGreen;
 		static Rgba		kBlue;
 		static Rgba		kActive;
-
-		//! Transformation types.
-		enum Transform {
-			  X					//!< Transform X axis.
-			, Y					//!< Transform Y axis.
-			, Z					//!< Transform Z axis.
-			, XY				//!< Transform X & Y axes.
-			, YZ				//!< Transform Y & Z axes.
-			, XZ				//!< Transfrom X & Z axes.
-			, Nothing			//!< Transform nothing by this gizmo.
-			
-			, TotalTransforms	//!< The total number of gizmo transforms.
-		};
+		static Rgba		kScreen;
+		static Rgba		kArcball;
 
 		//! Available gizmo states.
 		enum State {
@@ -61,37 +50,48 @@ DC_BEGIN_COMPOSER
 			, Locked	//!< Gizmo is now being transformed.
 		};
 
-							//! Constructs Gizmo instance.
-							Gizmo( void )
-								: m_state( Idle ), m_transform( Nothing ) {}
+								//! Constructs Gizmo instance.
+								Gizmo( void )
+									: m_state( Idle ), m_type( 0 ) {}
 
 		//! Returns gizmo state.
-		Gizmo::State		state( void ) const;
+		State					state( void ) const;
 
-		//! Returns the active transform.
-		Gizmo::Transform	activeTransform( void ) const;
+		//! Returns the selected type.
+		u8						type( void ) const;
 
-		//! Sets active transform.
-		void				setActiveTransform( Gizmo::Transform value );
+		//! Returns initial cursor position.
+		const Vec2&				cursor( void ) const;
 
-		//! Returns grabbed offset from gizmo position to mouse point.
-		const Vec3&			offset( void ) const;
+		//! Returns initial view ray.
+		const Ray&				ray( void ) const;
 
-		//! Returns active transformation plane.
-		const Plane&		plane( void ) const;
+		//! Returns screen space tangent axis.
+		const Vec2&				tangent( void ) const;
+
+		//! Returns initial transform.
+		const Scene::Transform&	transform( void ) const;
+
+		//! Activates the specified transform type.
+		void					activate( u8 value );
+
+		//! Deactivates the gizmo.
+		void					deactivate( void );
 
 		//! Locks this gizmo with specified origin point.
-		void				lock( const Plane& plane, const Vec3& origin );
+		void					lock( const Scene::Transform& transform, const Vec2& cursor, const Ray& ray = Ray(), const Vec2& tangent = Vec2() );
 
 		//! Unlocks this gizmo.
-		void				unlock( void );
+		void					unlock( void );
 
 	private:
 
-		Vec3				m_offset;		//!< Gizmo offset.
-		State				m_state;		//!< Current gizmo state.
-		Transform			m_transform;	//!< Transformation applied by gizmo.
-		Plane				m_plane;		//!< Plane to use for transformations.
+		State					m_state;		//!< Current gizmo state.
+		u8						m_type;			//!< Selected transform type.
+		Scene::Transform		m_transform;	//!< Initial transform.
+		Vec2					m_cursor;		//!< Initial cursor position.
+		Ray						m_ray;			//!< Initial view ray.
+		Vec2					m_tangent;		//!< Tangent axis to a grab point.
 	};
 
 DC_END_COMPOSER

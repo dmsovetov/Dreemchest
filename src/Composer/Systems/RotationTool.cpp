@@ -31,14 +31,26 @@ DC_BEGIN_COMPOSER
 // ---------------------------------------------------------- RotationTool ---------------------------------------------------------- //
 
 // ** RotationTool::RotationTool
-RotationTool::RotationTool( f32 scalingFactor ) : m_scalingFactor( scalingFactor )
+RotationTool::RotationTool( f32 radius, f32 screenSpaceRadiusScale, f32 width ) : m_radius( radius ), m_screenSpaceRadiusScale( screenSpaceRadiusScale ), m_width( width )
 {
 }
 
-// ** RotationTool::scalingFactor
-f32 RotationTool::scalingFactor( void ) const
+// ** RotationTool::width
+f32 RotationTool::width( void ) const
 {
-	return m_scalingFactor;
+	return m_width;
+}
+
+// ** RotationTool::radius
+f32 RotationTool::radius( void ) const
+{
+	return m_radius;
+}
+
+// ** RotationTool::screenSpaceRadius
+f32 RotationTool::screenSpaceRadius( void ) const
+{
+	return radius() * m_screenSpaceRadiusScale;
 }
 
 // ** RotationTool::gizmo
@@ -53,128 +65,155 @@ Gizmo& RotationTool::gizmo( void )
 	return m_gizmo;
 }
 
+// ** RotationTool::isLocked
+bool RotationTool::isLocked( void ) const
+{
+	return m_gizmo.state() == Gizmo::Locked;
+}
+
 // ------------------------------------------------------- RotationToolSystem ------------------------------------------------------- //
 
 // ** RotationToolSystem::RotationToolSystem
-RotationToolSystem::RotationToolSystem( Scene::SpectatorCameraWPtr camera ) : GenericEntitySystem( "RotationToolSystem" ), m_camera( camera ), m_buttons( 0 )
+RotationToolSystem::RotationToolSystem( Scene::ViewportWPtr viewport ) : GenericTouchSystem( viewport )
 {
 
 }
 
-// ** RotationToolSystem::setCursor
-void RotationToolSystem::setCursor( u32 x, u32 y, u8 buttons )
+// ** RotationToolSystem::touchMovedEvent
+void RotationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
 {
-	m_cursor.x = x;
-	m_cursor.y = y;
-	m_buttons  = buttons;
-}
+	// Get gizmo data
+	Gizmo& gizmo = tool.gizmo();
 
-// ** RotationToolSystem::process
-void RotationToolSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
-{
 	// Get the world space gizmo position.
 	Vec3 position = transform.worldSpacePosition();
 
 	// Calculate the scale factor of a gizmo.
-	f32 scale = (m_camera->position() - position).length() /** tool.scalingFactor()*/;
+	f32 scale = (m_viewport->eye() - position).length();
 
-	// Construct the view ray from cursor coordinates.
-	Ray ray = m_camera->toWorldSpace( m_cursor.x, m_cursor.y );
+	// Get the camera ray.
+	const Ray& ray = m_viewport->ray();
 
-	// Intersection point
-	Vec3 intersection;
-	Plane plane;
-
-	// Find the highlighted transform.
-	Gizmo::Transform activeTransform = findTransformByRay( tool, position, plane, intersection, scale, ray * transform.matrix().inversed() );
-
-	// Get gizmo data
-	Gizmo& gizmo = tool.gizmo();
-
-	static s32 lastCursor = 0;
-
+	// Update the gizmo according to it's state
 	switch( gizmo.state() ) {
-	case Gizmo::Idle:	gizmo.setActiveTransform( activeTransform );
-						break;
-
-	case Gizmo::Active:	gizmo.setActiveTransform( activeTransform );
-
-						if( m_buttons.is( Ui::LeftMouseButton ) && gizmo.activeTransform() != Gizmo::Nothing ) {
-							gizmo.lock( plane, intersection );
-							lastCursor = m_cursor.y;
+	case Gizmo::Active:
+	case Gizmo::Idle:	{
+							u8 axis = mapRayToAxis( tool, transform, scale, ray * transform.matrix().inversed(), Vec2() );
+							if( axis != RotationTool::Null ) {
+								gizmo.activate( axis );
+							} else {
+								gizmo.deactivate();
+							}
 						}
 						break;
+	case Gizmo::Locked:	{
+        				    f32  a        = gizmo.tangent() * gizmo.cursor();
+				            f32  b        = gizmo.tangent() * m_viewport->pos();
+                            f32  angle    = b - a;
+                            Quat rotation;
 
-	case Gizmo::Locked:	if( m_buttons.is( Ui::LeftMouseButton ) ) {
-							// Find the intersection point
-							bool hasIntersection = ray.intersects( gizmo.plane(), &intersection );
-							DC_BREAK_IF( !hasIntersection );
-
-							// 
-							f32 d = 0.0f;
-							Vec3 a;
-
-							// Calculate final position value
-							switch( gizmo.activeTransform() ) {
-							case Gizmo::X:	{
-												a = transform.axisX();
-												d = (m_cursor.y - lastCursor);
-												lastCursor = m_cursor.y;
-											}
-											break;
-							case Gizmo::Y:	{
-												a = transform.axisY();
-												d = (m_cursor.y - lastCursor);
-												lastCursor = m_cursor.y;
-											}
-											break;
-							case Gizmo::Z:	{
-												a = transform.axisZ();
-												d = (m_cursor.y - lastCursor);
-												lastCursor = m_cursor.y;
-											}
-											break;
+                            // Calculate the rotation quaternion
+							switch( gizmo.type() ) {
+							case RotationTool::Screen:	rotation = Quat::rotateAroundAxis( angle, Vec3::normalize( transform.position() - m_viewport->eye() ) );
+														break;
+                            case RotationTool::X:       rotation = Quat::rotateAroundAxis( angle, transform.axisX() );
+                                                        break;
+                            case RotationTool::Y:       rotation = Quat::rotateAroundAxis( angle, transform.axisY() );
+                                                        break;
+                            case RotationTool::Z:       rotation = Quat::rotateAroundAxis( angle, transform.axisZ() );
+                                                        break;
 							}
 
-							transform.rotate( d, a.x, a.y, a.z );
-						}
-						else {
-							gizmo.unlock();
+                            // Apply rotation
+                            transform.setRotation( rotation * gizmo.transform().rotation() );
 						}
 						break;
 	}
 }
 
-// ** RotationToolSystem::findTransformByRay
-Gizmo::Transform RotationToolSystem::findTransformByRay( RotationTool& tool, const Vec3& position, Plane& plane, Vec3& intersection, f32 scale, const Ray& ray ) const
+// ** RotationToolSystem::mapRayToAxis
+u8 RotationToolSystem::mapRayToAxis( RotationTool& tool, Scene::Transform& transform, f32 scale, const Ray& ray, Vec2& axis ) const
 {
 	// Construct planes
-	Plane planes[] = {
-		  Plane::calculate( Vec3::axisX(), position )
-		, Plane::calculate( Vec3::axisY(), position )
-		, Plane::calculate( Vec3::axisZ(), position )
-	};
+	Plane planes[] = { Plane::yz(), Plane::xz(), Plane::xy() };
 
-	f32  distance = FLT_MAX;
-	f32  radius = tool.scalingFactor() * scale;
-	Gizmo::Transform transform = Gizmo::Nothing;
+	// Calculate scaled radius
+	f32 radius = tool.radius() * scale;
 
-	for( s32 i = 0; i < 3; i++ ) {
-		if( !ray.intersects( planes[i], &intersection ) ) {
+	// Project the center point of a tool to a screen space.
+	Vec3 center;
+	m_viewport->camera()->get<Scene::Camera>()->pointToScreenSpace( transform.worldSpacePosition(), center, m_viewport->camera()->get<Scene::Transform>()->matrix() );
+
+	// Find the ray with an axis rotation indicators.
+	for( s32 i = 0; i < RotationTool::Arcball; i++ ) {
+		// Find the intersection point with plane and view ray.
+		Vec3 point;
+
+		if( !ray.intersects( planes[i], &point ) ) {
 			continue;
 		}
 
-		f32 d = (position - intersection).length();
+		// Calculate distance to a center of a gizmo
+		f32 distance = point.length();
 
-		if( fabs( radius - d ) > 0.01f * scale ) {
-			continue;
+		if( fabs( distance - radius ) <= tool.width() * scale * 0.001f ) {
+            axis = Vec2::normalized( m_viewport->pos() - ( Vec2 )center ).perp();
+			return i;
 		}
-
-		plane = planes[i];
-		transform = static_cast<Gizmo::Transform>( i );
 	}
 
-	return transform;
+	// Do we have the intersection with a screen space rotation indicator?
+	Circle circle = m_viewport->camera()->get<Scene::Camera>()->sphereToScreenSpace( Sphere( transform.worldSpacePosition(), tool.screenSpaceRadius() * scale ), m_viewport->camera()->get<Scene::Transform>() );
+
+	if( circle.isCircumference( m_viewport->pos(), tool.width() ) ) {
+		axis = circle.nearestTangent( m_viewport->pos() );
+		return RotationTool::Screen;
+	}
+
+	return RotationTool::Null;
+}
+
+// ** RotationToolSystem::touchBeganEvent
+void RotationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
+{
+	// Process only left mouse button clicks
+	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+		return;
+	}
+
+	// Get the camera ray.
+	const Ray& ray = m_viewport->ray();
+
+	// Get the world space gizmo position.
+	Vec3 position = transform.worldSpacePosition();
+
+	// Calculate the scale factor of a gizmo.
+	f32 scale = (m_viewport->eye() - position).length();
+
+	// Find the highlighted transform.
+	Vec2 axis;
+	u8 activeTransform = mapRayToAxis( tool, transform, scale, ray * transform.matrix().inversed(), axis );
+
+	if( activeTransform == RotationTool::Null ) {
+		return;
+	}
+
+	// Lock the tool.
+	tool.gizmo().lock( transform, m_viewport->pos(), m_viewport->ray(), axis );
+}
+
+// ** RotationToolSystem::touchEndedEvent
+void RotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
+{
+	// Process only left mouse button clicks
+	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+		return;
+	}
+
+	// If it's locked - unlock it
+	if( tool.isLocked() ) {
+		tool.gizmo().unlock();
+	}
 }
 
 // -------------------------------------------------------- RotationToolPass -------------------------------------------------------- //
@@ -196,32 +235,41 @@ void RotationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& r
 	Vec3 az = Vec3::axisZ() * scale;
 
 	// Get active selector
-	u8 selection = tool.gizmo().activeTransform();
+	u8 type = tool.gizmo().type();
 
 	// Construct selecto colors.
-	Rgba xColor  = selection == Gizmo::X  ? Gizmo::kActive : Gizmo::kRed;
-	Rgba yColor  = selection == Gizmo::Y  ? Gizmo::kActive : Gizmo::kGreen;
-	Rgba zColor  = selection == Gizmo::Z  ? Gizmo::kActive : Gizmo::kBlue;
+	Rgba xColor  = type == RotationTool::X		? Gizmo::kActive : Gizmo::kRed;
+	Rgba yColor  = type == RotationTool::Y		? Gizmo::kActive : Gizmo::kGreen;
+	Rgba zColor  = type == RotationTool::Z		? Gizmo::kActive : Gizmo::kBlue;
+	Rgba sColor  = type == RotationTool::Screen ? Gizmo::kActive : Gizmo::kScreen;
 
 	// Get the camera view direction
 	Vec3 view = m_transform->axisZ();
 
 	// Push gizmo model transform.
 	renderer->pushTransform( transform.matrix() );
+	{
+		// Render circle for X axis.
+		renderer->wireCircle( Vec3( 0.0f, 0.0f, 0.0f ), ay, az, tool.radius(), 32, xColor );
 
-	// Render circle for X axis.
-	renderer->wireHalfCircle( Vec3( 0.0f, 0.0f, 0.0f ), ay, az, Vec3( 0.0f, view.y, view.z ), tool.scalingFactor(), 32, xColor );
+		// Render circle for Y axis.
+		renderer->wireCircle( Vec3( 0.0f, 0.0f, 0.0f ), ax, az, tool.radius(), 32, yColor );
 
-	// Render circle for Y axis.
-	renderer->wireHalfCircle( Vec3( 0.0f, 0.0f, 0.0f ), ax, az, Vec3( view.x, 0.0f, view.z ), tool.scalingFactor(), 32, yColor );
-
-	// Render circle for Z axis.
-	renderer->wireHalfCircle( Vec3( 0.0f, 0.0f, 0.0f ), ax, ay, Vec3( view.x, view.y, 0.0f ), tool.scalingFactor(), 32, zColor );
-
+		// Render circle for Z axis.
+		renderer->wireCircle( Vec3( 0.0f, 0.0f, 0.0f ), ax, ay, tool.radius(), 32, zColor );
+	}
 	// Pop gizmo transform matrix
 	renderer->popTransform();
 
-	renderer->box( Bounds( tool.gizmo().offset() - Vec3( 0.01f, 0.01f, 0.01f ), tool.gizmo().offset() + Vec3( 0.01f, 0.01f, 0.01f ) ) );
+	// Render tilt circle
+	{
+		// Get the camera axes to align the circle
+		Vec3 side = m_transform->axisX();
+		Vec3 up	  = m_transform->axisY();
+
+		// Render the circle
+		renderer->wireCircle( transform.position(), side, up, tool.screenSpaceRadius() * scale, 32, sColor );
+	}
 }
 
 DC_END_COMPOSER

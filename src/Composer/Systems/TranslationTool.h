@@ -36,6 +36,17 @@ DC_BEGIN_COMPOSER
 	class TranslationTool : public Ecs::Component<TranslationTool> {
 	public:
 
+		//! Available transformation axes.
+		enum Axis {
+			  X				//!< Translate along the X axis.
+			, Y				//!< Translate along th Y axis.
+			, Z				//!< Translate along th Z axis.
+			, XY			//!< Translate on XY plane.
+			, YZ			//!< Translate on YZ plane.
+			, XZ			//!< Translate on XZ plane.
+			, Null			//!< No transformation axis selected.
+		};
+
 							//! Construct TranslationTool instance.
 							TranslationTool( f32 orthRadius = 0.05f, f32 scalingFactor = 0.2f, f32 selectorScale = 0.35f );
 
@@ -46,10 +57,7 @@ DC_BEGIN_COMPOSER
 		f32					orthRadius( void ) const;
 
 		//! Returns the selector bounding box.
-		Bounds				selectorBoundingBox( Gizmo::Transform transform ) const;
-
-		//! Returns true if this gizmo is active (has a highlighted transform indicator).
-		bool				isActive( void ) const;
+		Bounds				selectorBoundingBox( u8 idx ) const;
 
 		//! Returns true if this gizmo is locked.
 		bool				isLocked( void ) const;
@@ -67,35 +75,28 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Translates the transforms by a translation tool.
-	class TranslationToolSystem : public Ecs::GenericEntitySystem<TranslationTool, Scene::Transform> {
+	class TranslationToolSystem : public Scene::GenericTouchSystem<TranslationToolSystem, TranslationTool, Scene::Transform> {
 	public:
 
 									//! Constructs TranslationToolSystem instance
-									TranslationToolSystem( Editors::CursorWPtr cursor, Scene::SpectatorCameraWPtr camera );
-
-		//! Processes the single translation tool.
-		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
-
-	protected:
-
-		//! Handles mouse pressed event.
-		void						handleMousePressed( const Editors::Cursor::Pressed& e );
-
-		//! Handles mouse released event.
-		void						handleMouseReleased( const Editors::Cursor::Released& e );
+									TranslationToolSystem( Scene::ViewportWPtr viewport );
 
 	private:
 
-		//! Returns the selection from a mouse ray.
-		Gizmo::Transform			findTransformByRay( TranslationTool& tool, f32 scale, const Ray& ray ) const;
+		//! Handles mouse moved event and transforms object by active tool.
+		virtual void				touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Selects the best matching plane from a ray.
-		Plane						findBestPlane( Gizmo::Transform transform, const Vec3& position, const Ray& ray ) const;
+		//! Handles mouse pressed event and locks the selected tool.
+		virtual void				touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-	private:
+		//! Handles mouse pressed event and unlocks all locked tools.
+		virtual void				touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		Editors::CursorWPtr			m_cursor;	//!< Cursor binding to use.
-		Scene::SpectatorCameraWPtr	m_camera;	//!< Camera instance used for ray casting.
+		//! Maps the view ray to a transformation axis.
+		u8							mapRayToAxis( TranslationTool& tool, f32 scale, const Ray& ray ) const;
+
+		//! Maps the view ray to an intersection point.
+		Vec3						mapRayToPoint( TranslationTool& tool, const Scene::Transform& transform, f32 scale, const Ray& ray );
 	};
 
 	//! Renders active translation tools.

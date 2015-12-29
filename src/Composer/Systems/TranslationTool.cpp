@@ -36,12 +36,6 @@ TranslationTool::TranslationTool( f32 orthRadius, f32 scalingFactor, f32 selecto
 {
 }
 
-// ** TranslationTool:isActive
-bool TranslationTool::isActive( void ) const
-{
-	return m_gizmo.activeTransform() != Gizmo::Nothing;
-}
-
 // ** TranslationTool:isLocked
 bool TranslationTool::isLocked( void ) const
 {
@@ -73,7 +67,7 @@ Gizmo& TranslationTool::gizmo( void )
 }
 
 // ** TranslationTool::selectorBoundingBox
-Bounds TranslationTool::selectorBoundingBox( Gizmo::Transform transform ) const
+Bounds TranslationTool::selectorBoundingBox( u8 idx ) const
 {
 	// Get the axes vectors
 	Vec3 x = Vec3::axisX();
@@ -85,13 +79,14 @@ Bounds TranslationTool::selectorBoundingBox( Gizmo::Transform transform ) const
 	f32 s = m_selectorScale;
 
 	// Construct selector bounding boxes
-	switch( transform ) {
-	case Gizmo::X:	return Bounds() << x * s << x + (y + z) * r << x - (y + z) * r;
-	case Gizmo::Y:	return Bounds() << y * s << y + (x + z) * r << y - (x + z) * r;
-	case Gizmo::Z:	return Bounds() << z * s << z + (y + x) * r << z - (y + x) * r;
-	case Gizmo::XY:	return Bounds() << x * s << (x + y) * s << y * s;
-	case Gizmo::YZ:	return Bounds() << y * s << (y + z) * s << z * s;
-	case Gizmo::XZ:	return Bounds() << x * s << (x + z) * s << z * s;
+	switch( idx ) {
+	case X:		return Bounds() << x * s << x + (y + z) * r << x - (y + z) * r;
+	case Y:		return Bounds() << y * s << y + (x + z) * r << y - (x + z) * r;
+	case Z:		return Bounds() << z * s << z + (y + x) * r << z - (y + x) * r;
+	case XY:	return Bounds() << x * s << (x + y) * s << y * s;
+	case YZ:	return Bounds() << y * s << (y + z) * s << z * s;
+	case XZ:	return Bounds() << x * s << (x + z) * s << z * s;
+	default:	DC_BREAK;
 	}
 
 	return Bounds();
@@ -100,14 +95,13 @@ Bounds TranslationTool::selectorBoundingBox( Gizmo::Transform transform ) const
 // ------------------------------------------------------- TranslationToolSystem ------------------------------------------------------- //
 
 // ** TranslationToolSystem::TranslationToolSystem
-TranslationToolSystem::TranslationToolSystem( Editors::CursorWPtr cursor, Scene::SpectatorCameraWPtr camera ) : GenericEntitySystem( "TranslationToolSystem" ), m_cursor( cursor ), m_camera( camera )
+TranslationToolSystem::TranslationToolSystem( Scene::ViewportWPtr viewport ) : GenericTouchSystem( viewport )
 {
-	cursor->subscribe<Editors::Cursor::Pressed>( dcThisMethod( TranslationToolSystem::handleMousePressed ) );
-	cursor->subscribe<Editors::Cursor::Released>( dcThisMethod( TranslationToolSystem::handleMouseReleased ) );
+
 }
 
-// ** TranslationToolSystem::process
-void TranslationToolSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
+// ** TranslationToolSystem::touchMovedEvent
+void TranslationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
 {
 	// Get gizmo data
 	Gizmo& gizmo = tool.gizmo();
@@ -116,156 +110,146 @@ void TranslationToolSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entit
 	Vec3 position = transform.worldSpacePosition();
 
 	// Calculate the scale factor of a gizmo.
-	f32 scale = (m_camera->position() - position).length() * tool.scalingFactor();
+	f32 scale = (m_viewport->eye() - position).length() * tool.scalingFactor();
 
 	// Get the camera ray.
-	const Ray& ray = m_cursor->ray();
+	const Ray& ray = m_viewport->ray();
 
 	// Update the gizmo according to it's state
 	switch( gizmo.state() ) {
 	case Gizmo::Active:
 	case Gizmo::Idle:	{
-							Gizmo::Transform activeTransform = findTransformByRay( tool, scale, ray * transform.matrix().inversed() );
-							gizmo.setActiveTransform( activeTransform );
+							u8 type = mapRayToAxis( tool, scale, ray * transform.matrix().inversed() );
+							
+							if( type != TranslationTool::Null ) {
+								gizmo.activate( type );
+							} else {
+								gizmo.deactivate();
+							}
 						}
 						break;
 	case Gizmo::Locked:	{
-							// Find the intersection point
-							Vec3 intersection;
-							bool hasIntersection = ray.intersects( gizmo.plane(), &intersection );
-							DC_BREAK_IF( !hasIntersection );
+							// Find initial intersection point.
+							Vec3 start = mapRayToPoint( tool, transform, scale, gizmo.ray() );
 
-							// Calculate final position value
-							Vec3 result = position + gizmo.offset();
+							// Find current intersection point.
+							Vec3 end = mapRayToPoint( tool, transform, scale, m_viewport->ray() );
 
-							// Cancel some axes
-							switch( gizmo.activeTransform() ) {
-							case Gizmo::X:  result.x = intersection.x;
-											break;
-							case Gizmo::Y:  result.y = intersection.y;
-											break;
-							case Gizmo::Z:  result.z = intersection.z;
-											break;
-							case Gizmo::XY: result.x = intersection.x;
-											result.y = intersection.y;
-											break;
-							case Gizmo::YZ: result.y = intersection.y;
-											result.z = intersection.z;
-											break;
-							case Gizmo::XZ: result.x = intersection.x;
-											result.z = intersection.z;
-											break;
+							// Caclulate translation delta.
+							Vec3 delta = end - start;
+
+							// Calculate final offset.
+							Vec3 offset;
+
+							switch( gizmo.type() ) {
+							case TranslationTool::X:	offset.x = delta.x;
+														break;
+							case TranslationTool::Y:	offset.y = delta.y;
+														break;
+							case TranslationTool::Z:	offset.z = delta.z;
+														break;
+							case TranslationTool::XY:	offset.x = delta.x;
+														offset.y = delta.y;
+														break;
+							case TranslationTool::YZ:	offset.y = delta.y;
+														offset.z = delta.z;
+														break;
+							case TranslationTool::XZ:	offset.x = delta.x;
+														offset.z = delta.z;
+														break;
 							}
 
-							result = result - gizmo.offset();
-
-							// Apply transformation
-							transform.setPosition( result );
+							// Apply translation
+							transform.setPosition( gizmo.transform().position() + offset );
 						}
 						break;
 	}
 }
 
-// ** TranslationToolSystem::handleMousePressed
-void TranslationToolSystem::handleMousePressed( const Editors::Cursor::Pressed& e )
+// ** TranslationToolSystem::touchBeganEvent
+void TranslationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
 	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
 		return;
 	}
-
-	// Get the entity set
-	Ecs::EntitySet& entities = m_index->entities();
 
 	// Get the camera ray.
-	const Ray& ray = m_cursor->ray();
+	const Ray& ray = m_viewport->ray();
 
-	// Process each gizmo and lock the selected.
-	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-		// Get the translation tool component.
-		TranslationTool* tool = (*i)->get<TranslationTool>();
+	// Get the world space gizmo position.
+	Vec3 position = transform.worldSpacePosition();
 
-		// If this gizmo is not active - skip it
-		if( !tool->isActive() ) {
-			continue;
-		}
+	// Calculate the scale factor of a gizmo.
+	f32 scale = (m_viewport->eye() - position).length();
 
-		// Get the world space transform of this gizmo.
-		Vec3 position = (*i)->get<Scene::Transform>()->worldSpacePosition();
+	// Map current view ray to an axis selector.
+	u8 axis = mapRayToAxis( tool, scale, m_viewport->ray() * transform.matrix().inversed() );
 
-		// Find the view ray and gizmo transform plane intersection
-		Vec3 intersection;
-		Plane plane = findBestPlane( tool->gizmo().activeTransform(), position, ray );
-		bool hasIntersection = ray.intersects( plane, &intersection );
-		DC_BREAK_IF( !hasIntersection );
-
-		// Lock the gizmo until mouse is released
-		tool->gizmo().lock( plane, intersection - position );
+	// Lock the gizmo until mouse is released
+	if( axis != TranslationTool::Null ) {
+		tool.gizmo().lock( transform, m_viewport->pos(), m_viewport->ray() );
 	}
 }
 
-// ** TranslationToolSystem::handleMouseReleased
-void TranslationToolSystem::handleMouseReleased( const Editors::Cursor::Released& e )
+// ** TranslationToolSystem::touchEndedEvent
+void TranslationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
 	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
 		return;
 	}
 
-	// Get the entity set
-	Ecs::EntitySet& entities = m_index->entities();
-
-	// Unlock all locked gizmos
-	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-		// Get the translation tool component.
-		TranslationTool* tool = (*i)->get<TranslationTool>();
-
-		// If it's locked - unlock it
-		if( tool->isLocked() ) {
-			tool->gizmo().unlock();
-		}
+	// If it's locked - unlock it
+	if( tool.isLocked() ) {
+		tool.gizmo().unlock();
 	}
 }
 
-// ** TranslationToolSystem::findBestPlane
-Plane TranslationToolSystem::findBestPlane( Gizmo::Transform transform, const Vec3& position, const Ray& ray ) const
+// ** TranslationToolSystem::mapRayToPoint
+Vec3 TranslationToolSystem::mapRayToPoint( TranslationTool& tool, const Scene::Transform& transform, f32 scale, const Ray& ray )
 {
-	// Construct planes
-	Plane xy = Plane::calculate( Vec3::axisZ(), position );
-	Plane yz = Plane::calculate( Vec3::axisX(), position );
-	Plane xz = Plane::calculate( Vec3::axisY(), position );
+	// Get the world space transform of this gizmo.
+	Vec3 position = transform.worldSpacePosition();
 
-	// Set of valid planes for each transform type
-	Plane planes[][2] = {
-		  { xy, xz }
-		, { yz, xy }
-		, { yz, xz }
-		, { xy, xy }
-		, { yz, yz }
-		, { xz, xz }
-	};
+	// Select the best plane for selected transform axis.
+	Plane a, b, best;
 
-	// Select the best plane for active transform
-	const Plane& a = planes[transform][0];
-	const Plane& b = planes[transform][1];
-
-	if( fabs( a.normal() * ray.direction() ) > fabs( b.normal() * ray.direction() ) ) {
-		return a;
+	switch( tool.gizmo().type() ) {
+	case TranslationTool::X:	a = Plane::xy( position );
+								b = Plane::xz( position );
+								break;
+	case TranslationTool::Y:	a = Plane::yz( position );
+								b = Plane::xy( position );
+								break;
+	case TranslationTool::Z:	a = Plane::yz( position );
+								b = Plane::xz( position );
+								break;
+	case TranslationTool::XY:	a = b = Plane::xy( position );
+								break;
+	case TranslationTool::YZ:	a = b = Plane::yz( position );
+								break;
+	case TranslationTool::XZ:	a = b = Plane::xz( position );
+								break;
 	}
 
-	return b;
+	best = fabs( a.normal() * ray.direction() ) > fabs( b.normal() * ray.direction() ) ? a : b;
+
+	// Find the view ray and gizmo transform plane intersection
+	Vec3 point;
+	bool hasIntersection = ray.intersects( best, &point );
+	DC_BREAK_IF( !hasIntersection );
+
+	return point;
 }
 
-// ** TranslationToolSystem::findTransformByRay
-Gizmo::Transform TranslationToolSystem::findTransformByRay( TranslationTool& tool, f32 scale, const Ray& ray ) const
+// ** TranslationToolSystem::mapRayToAxis
+u8 TranslationToolSystem::mapRayToAxis( TranslationTool& tool, f32 scale, const Ray& ray ) const
 {
 	// Find the ray with a gizmo intersection.
-	for( s32 i = 0; i < Gizmo::Nothing; i++ ) {
-		// Type cast the counter to transform.
-		Gizmo::Transform transform = static_cast<Gizmo::Transform>( i );
-
+	for( s32 i = 0; i < TranslationTool::Null; i++ ) {
 		// Get the selector bounding box
-		Bounds bounds = tool.selectorBoundingBox( transform ) * scale;
+		Bounds bounds = tool.selectorBoundingBox( i ) * scale;
 
 		// Check for intersection.
 		if( !ray.intersects( bounds ) ) {
@@ -273,10 +257,10 @@ Gizmo::Transform TranslationToolSystem::findTransformByRay( TranslationTool& too
 		}
 
 		// Selector found - finish.
-		return transform;
+		return i;
 	}
 
-	return Gizmo::Nothing;
+	return TranslationTool::Null;
 }
 
 // -------------------------------------------------------- TranslationToolPass -------------------------------------------------------- //
@@ -296,15 +280,15 @@ void TranslationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm
 	f32 scale = (m_transform->position() - pos).length() * tool.scalingFactor();
 
 	// Get the selector bounding boxes.
-	Bounds x  = tool.selectorBoundingBox( Gizmo::X  ) * scale;
-	Bounds y  = tool.selectorBoundingBox( Gizmo::Y  ) * scale;
-	Bounds z  = tool.selectorBoundingBox( Gizmo::Z  ) * scale;
-	Bounds xz = tool.selectorBoundingBox( Gizmo::XZ ) * scale;
-	Bounds yz = tool.selectorBoundingBox( Gizmo::YZ ) * scale;
-	Bounds xy = tool.selectorBoundingBox( Gizmo::XY ) * scale;
+	Bounds x  = tool.selectorBoundingBox( TranslationTool::X  ) * scale;
+	Bounds y  = tool.selectorBoundingBox( TranslationTool::Y  ) * scale;
+	Bounds z  = tool.selectorBoundingBox( TranslationTool::Z  ) * scale;
+	Bounds xz = tool.selectorBoundingBox( TranslationTool::XZ ) * scale;
+	Bounds yz = tool.selectorBoundingBox( TranslationTool::YZ ) * scale;
+	Bounds xy = tool.selectorBoundingBox( TranslationTool::XY ) * scale;
 
 	// Get active selector
-	u8 selection = tool.gizmo().activeTransform();
+	u8 type = tool.gizmo().type();
 
 	// Get the transform axes.
 	Vec3 ax = Vec3::axisX() * scale;
@@ -312,12 +296,12 @@ void TranslationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm
 	Vec3 az = Vec3::axisZ() * scale;
 
 	// Construct selecto colors.
-	Rgba xColor  = selection == Gizmo::X  ? Gizmo::kActive : Gizmo::kRed;
-	Rgba yColor  = selection == Gizmo::Y  ? Gizmo::kActive : Gizmo::kGreen;
-	Rgba zColor  = selection == Gizmo::Z  ? Gizmo::kActive : Gizmo::kBlue;
-	Rgba xzColor = selection == Gizmo::XZ ? Gizmo::kActive : Gizmo::kGreen;
-	Rgba yzColor = selection == Gizmo::YZ ? Gizmo::kActive : Gizmo::kRed;
-	Rgba xyColor = selection == Gizmo::XY ? Gizmo::kActive : Gizmo::kBlue;
+	Rgba xColor  = type == TranslationTool::X  ? Gizmo::kActive : Gizmo::kRed;
+	Rgba yColor  = type == TranslationTool::Y  ? Gizmo::kActive : Gizmo::kGreen;
+	Rgba zColor  = type == TranslationTool::Z  ? Gizmo::kActive : Gizmo::kBlue;
+	Rgba xzColor = type == TranslationTool::XZ ? Gizmo::kActive : Gizmo::kGreen;
+	Rgba yzColor = type == TranslationTool::YZ ? Gizmo::kActive : Gizmo::kRed;
+	Rgba xyColor = type == TranslationTool::XY ? Gizmo::kActive : Gizmo::kBlue;
 
 	// Render XZ selector.
 	renderer->box( xz, xzColor.transparent( 0.1f ) );

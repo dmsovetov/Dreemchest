@@ -36,45 +36,64 @@ DC_BEGIN_COMPOSER
 	class RotationTool: public Ecs::Component<RotationTool> {
 	public:
 
-							//! Construct RotationTool instance.
-							RotationTool( f32 scalingFactor = 0.175f );
+		//! Transformation axes.
+		enum Axis {
+			  X					//!< Rotate around the X axis.
+			, Y					//!< Rotate around the Y axis.
+			, Z					//!< Rotate around the Z axis.
+			, Arcball			//!< Use arcball for a free rotation.
+			, Screen			//!< Rotate in screen soace.
+			, Null				//!< Transform nothing by this gizmo.
+		};
 
-		//! Returns the scaling factor of a gizmo.
-		f32					scalingFactor( void ) const;
+
+								//! Construct RotationTool instance.
+								RotationTool( f32 radius = 0.175f, f32 screenSpaceRadiusScale = 1.2f, f32 width = 5.0f );
+
+		//! Returns the radius of a gizmo.
+		f32						radius( void ) const;
+
+		//! Returns the scale factor of a screen space rotation indicator.
+		f32						screenSpaceRadius( void ) const;
+
+		//! Returns the selector width.
+		f32						width( void ) const;
+
+		//! Returns true if this gizmo is locked.
+		bool					isLocked( void ) const;
 
 		//! Returns gizmo data.
-		const Gizmo&		gizmo( void ) const;
-		Gizmo&				gizmo( void );
+		const Gizmo&			gizmo( void ) const;
+		Gizmo&					gizmo( void );
 
 	private:
 
-		f32					m_scalingFactor;	//!< The gizmo scaling factor.
-		Gizmo				m_gizmo;			//!< Actual gizmo state.
+		f32						m_radius;					//!< The gizmo radius.
+		f32						m_width;					//!< The axis selector width.
+		f32						m_screenSpaceRadiusScale;	//!< The screen space rotation indicator scale factor.
+		Gizmo					m_gizmo;					//!< Actual gizmo state.
 	};
 
 	//! Rotates transform by a rotation tool.
-	class RotationToolSystem : public Ecs::GenericEntitySystem<RotationTool, Scene::Transform> {
+	class RotationToolSystem : public Scene::GenericTouchSystem<RotationToolSystem, RotationTool, Scene::Transform> {
 	public:
 
 									//! Constructs RotationToolSystem instance
-									RotationToolSystem( Scene::SpectatorCameraWPtr camera );
+									RotationToolSystem( Scene::ViewportWPtr viewport );
 
-		//! Sets cursor position.
-		void						setCursor( u32 x, u32 y, u8 buttons );
+	protected:
 
-		//! Processes the single rotation tool.
-		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+		//! Handles mouse moved event and transforms object by active tool.
+		virtual void				touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-	private:
+		//! Handles mouse pressed event and locks the selected tool.
+		virtual void				touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Returns the selection from a mouse ray.
-		Gizmo::Transform			findTransformByRay( RotationTool& tool, const Vec3& position, Plane& plane, Vec3& intersection, f32 scale, const Ray& ray ) const;
+		//! Handles mouse pressed event and unlocks all locked tools.
+		virtual void				touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-	private:
-
-		Vec2						m_cursor;	//!< Last known cursor position.
-		Scene::SpectatorCameraWPtr	m_camera;	//!< Camera instance used for ray casting.
-		FlagSet8					m_buttons;	//!< Mouse buttons state.
+		//! Maps the view ray to a transformation axis.
+		u8							mapRayToAxis( RotationTool& tool, Scene::Transform& transform, f32 scale, const Ray& ray, Vec2& axis ) const;
 	};
 
 	//! Renders active rotation tools.

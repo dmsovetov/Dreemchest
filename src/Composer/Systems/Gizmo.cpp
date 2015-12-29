@@ -40,17 +40,27 @@ Rgba Gizmo::kBlue = Rgba::fromBytes( 61, 133, 236 );
 // ** Gizmo::kActive
 Rgba Gizmo::kActive = Rgba::fromBytes( 255, 255, 0 );
 
-// ** Gizmo::activeTransform
-Gizmo::Transform Gizmo::activeTransform( void ) const
+// ** Gizmo::kScreen
+Rgba Gizmo::kScreen = Rgba( 0.8f, 0.8f, 0.8f );
+
+// ** Gizmo::type
+u8 Gizmo::type( void ) const
 {
-	return m_transform;
+	return m_type;
 }
 
-// ** Gizmo::setActiveTransform
-void Gizmo::setActiveTransform( Gizmo::Transform value )
+// ** Gizmo::activate
+void Gizmo::activate( u8 value )
 {
-	m_transform = value;
-	m_state	    = value == Gizmo::Nothing ? Gizmo::Idle : Gizmo::Active;
+	m_type  = value;
+	m_state = Gizmo::Active;
+}
+
+// ** Gizmo::deactivate
+void Gizmo::deactivate( void )
+{
+	m_state = Gizmo::Idle;
+	m_type  = ~0;
 }
 
 // ** Gizmo::state
@@ -59,25 +69,38 @@ Gizmo::State Gizmo::state( void ) const
 	return m_state;
 }
 
-// ** Gizmo::offset
-const Vec3& Gizmo::offset( void ) const
+// ** Gizmo::ray
+const Ray& Gizmo::ray( void ) const
 {
-	return m_offset;
+	return m_ray;
 }
 
-// ** Gizmo::plane
-const Plane& Gizmo::plane( void ) const
+// ** Gizmo::tangent
+const Vec2& Gizmo::tangent( void ) const
 {
-	return m_plane;
+	return m_tangent;
+}
+
+// ** Gizmo::cursor
+const Vec2& Gizmo::cursor( void ) const
+{
+	return m_cursor;
+}
+
+// ** Gizmo::transform
+const Scene::Transform& Gizmo::transform( void ) const
+{
+	return m_transform;
 }
 
 // ** Gizmo::lock
-void Gizmo::lock( const Plane& plane, const Vec3& offset )
+void Gizmo::lock( const Scene::Transform& transform, const Vec2& cursor, const Ray& ray, const Vec2& tangent )
 {
-	DC_BREAK_IF( state() != Gizmo::Active );
-	m_offset = offset;
-	m_state  = Gizmo::Locked;
-	m_plane  = plane;
+	m_state		= Gizmo::Locked;
+	m_ray		= ray;
+	m_cursor	= cursor;
+	m_tangent	= tangent;
+	m_transform = transform;
 }
 
 // ** Gizmo::unlock

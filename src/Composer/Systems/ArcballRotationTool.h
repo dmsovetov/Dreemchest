@@ -66,30 +66,25 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Rotates the transforms by an arcball rotation tool.
-	class ArcballRotationToolSystem : public Ecs::GenericEntitySystem<ArcballRotationTool, Scene::Transform> {
+	class ArcballRotationToolSystem : public Scene::GenericTouchSystem<ArcballRotationToolSystem, ArcballRotationTool, Scene::Transform> {
 	public:
 
 									//! Constructs ArcballRotationToolSystem instance
-									ArcballRotationToolSystem( Editors::CursorWPtr cursor, Scene::SpectatorCameraWPtr camera );
-
-		//! Processes the single arcball rotation tool.
-		virtual void				process( u32 currentTime, f32 dt, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+									ArcballRotationToolSystem( Scene::ViewportWPtr viewport );
 
 	protected:
 
-		//! Handles mouse pressed event.
-		void						handleMousePressed( const Editors::Cursor::Pressed& e );
+		//! Handles mouse moved event and rotates active arcball.
+		virtual void				touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Handles mouse released event.
-		void						handleMouseReleased( const Editors::Cursor::Released& e );
+		//! Handles mouse pressed event and locks the selected arcball.
+		virtual void				touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+
+		//! Handles mouse pressed event and unlocks all locked arcballs.
+		virtual void				touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Maps the screen space coordinates to a unit vector on arcball.
 		bool						mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
-
-	private:
-
-		Editors::CursorWPtr			m_cursor;	//!< Cursor binding to use.
-		Scene::SpectatorCameraWPtr	m_camera;	//!< Camera instance used for ray casting.
 	};
 
 	//! Renders the arcball rotation tool indicator.
