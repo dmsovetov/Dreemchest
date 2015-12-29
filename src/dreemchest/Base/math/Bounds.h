@@ -513,7 +513,7 @@ DC_BEGIN_DREEMCHEST
 	inline Vec2 Circle::nearestTangent( const Vec2& point ) const
 	{
 		Vec2 r = Vec2::normalized( point - center() );
-		return Vec2( r.y, -r.x );
+		return r.perp();
 	}
 
 	// ** Circle::mapToSphere

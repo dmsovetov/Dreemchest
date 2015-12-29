@@ -65,6 +65,9 @@ DC_BEGIN_DREEMCHEST
 		//! Returns the squared vector length.
 		float	lengthSqr( void ) const;
 
+        //! Returns a perpendicular vector to a this one.
+        Vec2    perp( void ) const;
+
 		//! Returns the normalized vector.
 		static Vec2	normalized( const Vec2& v );
 
@@ -214,6 +217,12 @@ DC_BEGIN_DREEMCHEST
 	{
 		return x * x + y * y;
 	}
+
+    // ** Vec2::perp
+    inline Vec2 Vec2::perp( void ) const
+    {
+        return Vec2( y, -x );
+    }
 
 	// ** Vec2::normalized
 	inline Vec2 Vec2::normalized( const Vec2& v )
