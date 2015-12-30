@@ -27,9 +27,10 @@
 #include "Inspector.h"
 
 #include "AssetTree.h"
+#include "ComboBox.h"
 
 #include "../Models/PropertyModel.h"
-#include "../Models/EnumModels.h"
+#include "../Models/EnumerationModel.h"
 
 DC_BEGIN_COMPOSER
 
@@ -93,10 +94,10 @@ void Inspector::setModel( PropertyModelQPtr value )
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
 		}
 		else if( type == "Scene::RenderingMode" ) {
-			widget = new QEnumComboBox<RenderingModeModel>();
+			widget = new RenderingModeComboBox;
 		}
 		else if( type == "Scene::Material::Model" ) {
-			widget = new QEnumComboBox<LightingModel>();
+			widget = new LightingComboBox;
 		}
 		else {
 			qWarning() << "Property" << name << "has unhnadled type" << type;

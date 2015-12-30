@@ -121,18 +121,11 @@ DC_BEGIN_COMPOSER
 		//! Menu action callback type.
 		typedef std::function<void(ActionQPtr)> ActionCallback;
 
-	    //! Enumeration combo box.
-	    template<typename TModel>
-	    class QEnumComboBox : public QComboBox {
-	    public:
-
-						    //! Constructs QEnumComboBox instance
-						    QEnumComboBox( QWidget* parent = NULL )
-							    : QComboBox( parent ) { setModel( new TModel ); }
-	    };
-
 	    //! Converts the Qt key index to engine key.
 	    extern Platform::Key convertKey( s32 key );
+
+        //! Forward declaration of enumeration combo box.
+        template<typename TModel> class EnumerationComboBox;
 
 	} // namespace Ui
 

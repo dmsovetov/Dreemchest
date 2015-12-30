@@ -24,15 +24,16 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_EnumModels_H__
-#define __DC_Composer_EnumModels_H__
+#ifndef __DC_Composer_EnumerationModel_H__
+#define __DC_Composer_EnumerationModel_H__
 
 #include "../Composer.h"
 
-#define qDeclareEnumeration( name, items )                             \
+#define qDeclareEnumeration( name, items )                                  \
 	struct name##Model : public EnumerationModel {                          \
 		name##Model( void ) { setStringList( QStringList() << items ); }    \
-	};
+	};                                                                      \
+    typedef Ui::EnumerationComboBox<name##Model> name##ComboBox;
 
 DC_BEGIN_COMPOSER
 
@@ -52,4 +53,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_EnumModels_H__	*/
+#endif	/*	!__DC_Composer_EnumerationModel_H__	*/

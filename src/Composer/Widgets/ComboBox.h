@@ -24,17 +24,33 @@
 
  **************************************************************************/
 
-#include "AssetModels.h"
-#include "EnumerationModel.h"
+#ifndef __DC_Composer_ComboBox_H__
+#define __DC_Composer_ComboBox_H__
+
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-// ** MaterialModel::MaterialModel
-MaterialModel::MaterialModel( Scene::MaterialWPtr material, QObject* parent ) : PropertyModel( parent ), m_material( material )
-{
-	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, material.get() ), BindSetter( Scene::Material::setRenderingMode, material.get() ) );
-	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, material.get() ), BindSetter( Scene::Material::setModel, material.get() ) );
-	addAsset<Scene::ImageWPtr>( "Diffuse", BindGetter( Scene::Material::diffuse, material.get() ), BindSetter( Scene::Material::setDiffuse, material.get() ) );
-}
+namespace Ui {
+
+	//! Enumeration combo box.
+	template<typename TModel>
+	class EnumerationComboBox : public QComboBox {
+	public:
+
+						//! Constructs EnumerationComboBox instance
+						EnumerationComboBox( QWidget* parent = NULL );
+	};
+
+    // ** EnumerationComboBox::EnumerationComboBox
+    template<typename TModel>
+    EnumerationComboBox<TModel>::EnumerationComboBox( QWidget* parent ) : QComboBox( parent )
+    {
+        setModel( new TModel );
+    }
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_ComboBox_H__	*/
