@@ -89,7 +89,7 @@ void SceneEditorInternal::setSelected( bool value )
 const String Composer::kAssetMime = "text/uri-list";
 
 // ** Composer::Composer
-Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv )
+Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_project( NULL )
 {
     // Set application name
     setApplicationName( "Dreemchest Composer" );
@@ -103,7 +103,7 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv )
 }
 
 // ** Composer::project
-Project::ProjectWPtr Composer::project( void ) const
+Project::ProjectQPtr Composer::project( void ) const
 {
 	return m_project;
 }
@@ -200,11 +200,14 @@ void Composer::menuRedo( Ui::ActionQPtr action )
 // ** Composer::createProject
 void Composer::createProject( const String& path )
 {
+    // Close active project
+    closeProject();
+
 	// Get the file system interface
 	FileSystemQPtr fs = m_mainWindow->fileSystem();
 
 	// Create project instance
-	m_project = Project::Project::create( m_mainWindow, path );
+	m_project = new Project::Project( this, m_mainWindow, path );
 
 	// Create all project folders
 	for( s32 i = 0; i < Project::Project::TotalPaths; i++ ) {
@@ -212,10 +215,26 @@ void Composer::createProject( const String& path )
 	}
 
 	// Emit the signal
-    emit projectCreated( m_project.get() );
+    emit projectCreated( m_project );
 
 	// Open created project
 	openProject( path );
+}
+
+// ** Composer::closeProject
+void Composer::closeProject( void )
+{
+    // No project opened
+    if( !m_project ) {
+        return;
+    }
+
+    // Emit the signal
+    emit projectClosed( m_project );
+
+    // Destroy project
+    delete m_project;
+    m_project = NULL;
 }
 
 // ** Composer::assetFromMime
@@ -264,11 +283,14 @@ Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 // ** Composer::openProject
 void Composer::openProject( const String& path )
 {
+    // Close active project
+    closeProject();
+
 	// Create project instance
-	m_project = Project::Project::create( m_mainWindow, path );
+	m_project = new Project::Project( this, m_mainWindow, path );
 
 	// Emit the signal
-    emit projectOpened( m_project.get() );
+    emit projectOpened( m_project );
 
 	// Setup menues
 	//m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );

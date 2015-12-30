@@ -387,7 +387,7 @@ void MainWindow::createProjectInterface( Project::Project* project )
 // ** MainWindow::destroyProjectInterface
 void MainWindow::destroyProjectInterface( Project::Project* project )
 {
-	m_project = Project::ProjectWPtr();
+	m_project = Project::ProjectQPtr();
 	DC_BREAK;
 }
 

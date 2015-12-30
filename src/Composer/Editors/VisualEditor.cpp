@@ -41,7 +41,7 @@ VisualEditor::VisualEditor( void )
 }
 
 // ** VisualEditor::initialize
-bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
+bool VisualEditor::initialize( Project::ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
 {
 	// Perform basic initialization first.
 	if( !AssetEditor::initialize( project, asset, document ) ) {

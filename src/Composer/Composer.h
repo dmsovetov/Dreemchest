@@ -203,7 +203,7 @@ DC_BEGIN_COMPOSER
 
 	namespace Project {
 
-		dcDeclarePtrs( Project )
+		qDeclarePtr( Project )
 		dcDeclarePtrs( Assets )
 
 	} // namespace Project
@@ -260,8 +260,11 @@ DC_BEGIN_COMPOSER
 		//! Creates new project at path.
 		void					createProject( const String& path );
 
+        //! Closes an opened project.
+        void                    closeProject( void );
+
 		//! Returns opened project.
-		Project::ProjectWPtr	project( void ) const;
+		Project::ProjectQPtr	project( void ) const;
 
 		//! Returns main window.
 		Ui::MainWindowQPtr		window( void ) const;
@@ -296,7 +299,7 @@ DC_BEGIN_COMPOSER
 
 		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
 		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
-		Project::ProjectPtr		m_project;				//!< Active project.
+		Project::ProjectQPtr    m_project;				//!< Active project.
 	};
 
 DC_END_COMPOSER

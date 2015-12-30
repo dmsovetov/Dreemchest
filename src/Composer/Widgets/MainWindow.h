@@ -113,7 +113,7 @@ namespace Ui {
 		AssetTreeQPtr					m_assetTree;				//!< Asset tree instance.
 		SceneTreeQPtr					m_sceneTree;				//!< Scene tree instance.
 		InspectorQPtr				    m_inspector;			    //!< Object inspector instance.
-		Project::ProjectWPtr			m_project;					//!< Opened project.
+		Project::ProjectQPtr			m_project;					//!< Opened project.
 	};
 
 } // namespace Ui

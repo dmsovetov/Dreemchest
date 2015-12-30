@@ -47,7 +47,7 @@ namespace Project {
 // --------------------------------------------------------- Project --------------------------------------------------------- //
 
 // ** Project::Project
-Project::Project( Ui::MainWindowQPtr mainWindow, const Io::Path& path ) : m_mainWindow( mainWindow )
+Project::Project( QObject* parent, Ui::MainWindowQPtr mainWindow, const Io::Path& path ) : QObject( parent ), m_mainWindow( mainWindow )
 {
 	// Save project name
 	m_name = path.last();
@@ -83,12 +83,6 @@ Project::Project( Ui::MainWindowQPtr mainWindow, const Io::Path& path ) : m_main
 Project::~Project( void )
 {
 
-}
-
-// ** Project::create
-ProjectPtr Project::create( Ui::MainWindowQPtr mainWindow, const Io::Path& path )
-{
-	return ProjectPtr( new Project( mainWindow, path ) );
 }
 
 // ** Project::name

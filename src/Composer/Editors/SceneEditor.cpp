@@ -44,7 +44,7 @@ SceneEditor::SceneEditor( void ) : m_tools( NULL )
 }
 
 // ** SceneEditor::initialize
-bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
+bool SceneEditor::initialize( Project::ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
 {
 	if( !VisualEditor::initialize( project, asset, document ) ) {
 		return false;

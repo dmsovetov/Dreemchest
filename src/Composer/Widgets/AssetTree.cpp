@@ -125,7 +125,7 @@ void AssetSelector::setValue( const Scene::AssetWPtr& value )
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project, QWidget* parent ) : QTreeView( parent ), m_project( project ), m_selectionChanged( false )
+AssetTree::AssetTree( Project::ProjectQPtr project, QWidget* parent ) : QTreeView( parent ), m_project( project ), m_selectionChanged( false )
 {
 	setHeaderHidden( true );
 	setDragEnabled( true );

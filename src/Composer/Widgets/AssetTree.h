@@ -76,7 +76,7 @@ namespace Ui {
 	public:
 
 									//! Constructs asset tree bound to a specified path.
-									AssetTree( Project::ProjectWPtr project, QWidget* parent );
+									AssetTree( Project::ProjectQPtr project, QWidget* parent );
 
 		//! Returns the selected items.
 		FileInfoArray				selection( void ) const;
@@ -117,7 +117,7 @@ namespace Ui {
 
 	private:
 
-		Project::ProjectWPtr		m_project;			//!< Parent project instance.
+		Project::ProjectQPtr		m_project;			//!< Parent project instance.
 		FilteredAssetsModelQPtr	    m_proxy;			//!< Filtered assets model to be used.
 		bool						m_selectionChanged;	//!< This flag indicates that selection was changed.
 	};

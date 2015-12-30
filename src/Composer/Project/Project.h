@@ -36,7 +36,8 @@ DC_BEGIN_COMPOSER
 namespace Project {
 
 	//! Represents active project.
-	class Project : public RefCounted {
+	class Project : public QObject {
+    friend class Composer;
 	public:
 
 		//! Built-in project paths.
@@ -71,13 +72,10 @@ namespace Project {
 		//! Opens the asset editor.
 		Ui::DocumentQPtr			edit( const String& uuid, const FileInfo& fileInfo );
 
-		//! Creates new Project instance.
-		static ProjectPtr			create( Ui::MainWindowQPtr mainWindow, const Io::Path& path );
-
 	private:
 
 									//! Constructs Project instance.
-									Project( Ui::MainWindowQPtr mainWindow, const Io::Path& path );
+									Project( QObject* parent, Ui::MainWindowQPtr mainWindow, const Io::Path& path );
 
 		//! Creates new asset with specified name at selected folder.
 		void						createAsset( const String& name, const String& ext );
