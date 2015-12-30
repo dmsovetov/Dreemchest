@@ -50,9 +50,6 @@ bool SceneEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset,
 		return false;
 	}
 
-	// Set the default transform tool
-	setTransformTool( NoTransformTool );
-
 	// Create rendering context.
 	m_renderingContext = Scene::RenderingContext::create( hal() );
 
@@ -77,13 +74,13 @@ bool SceneEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset,
 		//Scene::TerrainPtr terrain4 = new Scene::Terrain( m_project->assets().get(), "terrain4", "terrain4", 128 );
 		//m_sceneModel->placeTerrain( terrain4, Vec3( 128, 0, 128 ) );
 
-		Scene::SceneObjectPtr tool = m_scene->createSceneObject();
-		tool->attach<Scene::Transform>();
-		tool->attach<TerrainTool>( terrain1, 10.0f );
-		tool->attach<SceneEditorInternal>( tool, SceneEditorInternal::Private );
-		m_scene->addSceneObject( tool );
+		m_terrainTool = m_scene->createSceneObject();
+		m_terrainTool->attach<Scene::Transform>();
+		m_terrainTool->attach<TerrainTool>( terrain1, 10.0f );
+		m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
+		m_scene->addSceneObject( m_terrainTool );
 
-		m_scene->addSystem<TerrainHeightmapSystem>( tool, viewport() );
+		m_scene->addSystem<TerrainHeightmapSystem>( m_terrainTool, viewport() );
 	}
 
 	// Create grid.
@@ -115,6 +112,9 @@ bool SceneEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset,
 	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
 	m_scene->addSystem<RotationToolSystem>( viewport() );
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
+
+	// Set the default tool
+	setTool( NoTool );
 
 	return true;
 }
@@ -164,14 +164,12 @@ void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 		m_tools->addAction( "Translate", BindAction( SceneEditor::menuTransformTranslate ), "", ":Scene/Scene/move.png", Ui::ItemCheckable );
 		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
 		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
-	}
-	m_tools->endActionGroup();
-
-	m_tools->addSeparator();
-
-	m_tools->beginActionGroup();
-	{
-		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked );
+        m_tools->addSeparator();
+        m_tools->addWidget( new TransformBasisComboBox );
+        m_tools->addSeparator();
+        m_tools->addWidget( new TransformPivotComboBox );
+	    m_tools->addSeparator();
+		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
 		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
 		m_tools->addAction( "Level Terrain", BindAction( SceneEditor::menuTerrainLevel ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
 		m_tools->addAction( "Flatten Terrain", BindAction( SceneEditor::menuTerrainFlatten ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
@@ -203,55 +201,60 @@ void SceneEditor::notifyEnterBackground( Ui::MainWindowQPtr window )
 // ** SceneEditor::menuTransformSelect
 void SceneEditor::menuTransformSelect( Ui::ActionQPtr action )
 {
-	setTransformTool( NoTransformTool );
+	setTool( NoTool );
 }
 
 // ** SceneEditor::menuTransformTranslate
 void SceneEditor::menuTransformTranslate( Ui::ActionQPtr action )
 {
-	setTransformTool( TransformTranslate );
+	setTool( ToolTranslate );
 }
 
 // ** SceneEditor::menuTransformRotate
 void SceneEditor::menuTransformRotate( Ui::ActionQPtr action )
 {
-	setTransformTool( TransformRotate );
+	setTool( ToolRotate );
 }
 
 // ** SceneEditor::menuTransformScale
 void SceneEditor::menuTransformScale( Ui::ActionQPtr action )
 {
-	setTransformTool( TransformScale );
+	setTool( ToolScale );
 }
 
 // ** SceneEditor::menuTerrainRaise
 void SceneEditor::menuTerrainRaise( Ui::ActionQPtr action )
 {
-    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Raise );
+    setTool( ToolRaiseTerrain );
+    m_terrainTool->get<TerrainTool>()->setType( TerrainTool::Raise );
 }
 
 // ** SceneEditor::menuTerrainLower
 void SceneEditor::menuTerrainLower( Ui::ActionQPtr action )
 {
-    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Lower );
+    setTool( ToolLowerTerrain );
+    m_terrainTool->get<TerrainTool>()->setType( TerrainTool::Lower );
 }
 
 // ** SceneEditor::menuTerrainFlatten
 void SceneEditor::menuTerrainFlatten( Ui::ActionQPtr action )
 {
-    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Flatten );
+    setTool( ToolFlattenTerrain );
+    m_terrainTool->get<TerrainTool>()->setType( TerrainTool::Flatten );
 }
 
 // ** SceneEditor::menuTerrainLevel
 void SceneEditor::menuTerrainLevel( Ui::ActionQPtr action )
 {
-    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Level );
+    setTool( ToolLevelTerrain );
+    m_terrainTool->get<TerrainTool>()->setType( TerrainTool::Level );
 }
 
 // ** SceneEditor::menuTerrainSmooth
 void SceneEditor::menuTerrainSmooth( Ui::ActionQPtr action )
 {
-    m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Smooth );
+    setTool( ToolSmoothTerrain );
+    m_terrainTool->get<TerrainTool>()->setType( TerrainTool::Smooth );
 }
 
 // ** SceneEditor::handleMousePress
@@ -371,7 +374,7 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( false );
 		
 		// Ensure the deselected object has no gizmos
-		bindTransformGizmo( m_selectedSceneObject, NoTransformTool );
+		bindTransformGizmo( m_selectedSceneObject, NoTool );
 	}
 
 	// Store this object
@@ -383,7 +386,7 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
 
 		// Bind the gizmo for an active transformation tool
-		bindTransformGizmo( m_selectedSceneObject, m_activeTransformTool );
+		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
 	}
 }
 
@@ -399,25 +402,32 @@ Scene::SceneObjectWPtr SceneEditor::findSceneObjectAtPoint( s32 x, s32 y ) const
 	return target;
 }
 
-// ** SceneEditor::setTransformTool
-void SceneEditor::setTransformTool( ActiveTransformTool tool )
+// ** SceneEditor::setTool
+void SceneEditor::setTool( ActiveTool tool )
 {
 	// This tool is already activated
-	if( tool == m_activeTransformTool ) {
+	if( tool == m_activeTool ) {
 		return;
 	}
 
 	// Set active tool
-	m_activeTransformTool = tool;
+	m_activeTool = tool;
 
 	// Bind the gizmo to selected object
 	if( m_selectedSceneObject.valid() ) {
-		bindTransformGizmo( m_selectedSceneObject, m_activeTransformTool );
+		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
 	}
+
+    // Now the terrain tool
+    if( tool < ToolRaiseTerrain ) {
+        m_terrainTool->disable<TerrainTool>();
+    } else {
+        m_terrainTool->enable<TerrainTool>();
+    }
 }
 
 // ** SceneEditor::bindTransformGizmo
-void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTransformTool tool ) const
+void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const
 {
 	DC_BREAK_IF( !sceneObject.valid() );
 
@@ -428,12 +438,12 @@ void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, Active
 
 	// Now add the gizmo
 	switch( tool ) {
-	case TransformTranslate:	sceneObject->attach<TranslationTool>();
-								break;
+	case ToolTranslate:	sceneObject->attach<TranslationTool>();
+						break;
 
-	case TransformRotate:		sceneObject->attach<ArcballRotationTool>();
-								sceneObject->attach<RotationTool>();
-								break;
+	case ToolRotate:	sceneObject->attach<ArcballRotationTool>();
+						sceneObject->attach<RotationTool>();
+						break;
 	}
 }
 

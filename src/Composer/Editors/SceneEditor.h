@@ -45,12 +45,17 @@ namespace Editors {
 
 	protected:
 
-		//! Transformation tool types.
-		enum ActiveTransformTool {
-			  NoTransformTool		//!< All transformation tools are disabled.
-			, TransformTranslate	//!< Translation tool is now active.
-			, TransformRotate		//!< Rotation tool is now active.
-			, TransformScale		//!< Scaling tool is now active.
+		//! Scene editing tool types.
+		enum ActiveTool {
+			  NoTool		        //!< All tools are disabled.
+			, ToolTranslate	        //!< Translation tool is now active.
+			, ToolRotate		    //!< Rotation tool is now active.
+			, ToolScale		        //!< Scaling tool is now active.
+            , ToolRaiseTerrain      //!< Terrain raising tool is now active.
+            , ToolLowerTerrain      //!< Terrain lowering tool is now active.
+            , ToolFlattenTerrain    //!< Terrain flattening tool is now active.
+            , ToolLevelTerrain      //!< Terrain leveling tool is now active.
+            , ToolSmoothTerrain     //!< Terrain smoothing tool is now active.
 		};
 
 
@@ -124,10 +129,10 @@ namespace Editors {
 		void							selectSceneObject( Scene::SceneObjectWPtr sceneObject );
 
 		//! Sets active transform tool.
-		void							setTransformTool( ActiveTransformTool tool );
+		void							setTool( ActiveTool tool );
 
 		//! Binds transformation tool gizmo to a scene object.
-		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTransformTool tool ) const;
+		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const;
 
     private Q_SLOTS:
 
@@ -144,7 +149,8 @@ namespace Editors {
 		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
 
 		Ui::ToolBarQPtr					m_tools;					//!< Scene editor toolbar.
-		ActiveTransformTool				m_activeTransformTool;		//!< Active translation tool.
+		ActiveTool				        m_activeTool;		        //!< Active editing tool.
+        Scene::SceneObjectPtr           m_terrainTool;              //!< Terrain tool scene object.
 
 		Scene::SceneObjectWPtr			m_activeSceneObject;		//!< The scene object underneath the mouse cursor is stored here.
 		Scene::SceneObjectWPtr			m_selectedSceneObject;		//!< The selected scene object.

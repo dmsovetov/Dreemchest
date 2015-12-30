@@ -33,8 +33,10 @@
 #include "../Widgets/MainWindow.h"
 #include "../Widgets/SceneTree.h"
 #include "../Widgets/RenderingFrame.h"
+#include "../Widgets/ComboBox.h"
 
 #include "../Models/SceneModel.h"
+#include "../Models/EnumerationModel.h"
 
 DC_BEGIN_COMPOSER
 

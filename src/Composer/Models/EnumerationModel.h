@@ -51,6 +51,9 @@ DC_BEGIN_COMPOSER
     qDeclareEnumeration( RenderingMode, "Opaque" << "Cutout" << "Translucent" << "Additive" )
     qDeclareEnumeration( Lighting, "Unlit" << "Ambient" << "Phong" )
 
+    qDeclareEnumeration( TransformBasis, "Local" << "World" << "Camera" )
+    qDeclareEnumeration( TransformPivot, "Individual" << "Median Point" )
+
 DC_END_COMPOSER
 
 #endif	/*	!__DC_Composer_EnumerationModel_H__	*/

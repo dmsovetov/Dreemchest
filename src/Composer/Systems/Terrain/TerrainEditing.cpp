@@ -101,6 +101,10 @@ TerrainHeightmapSystem::TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Sce
 // ** TerrainHeightmapSystem::touchMovedEvent
 void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, Editors::TerrainChunk& chunk, Scene::StaticMesh& mesh, Scene::Transform& transform )
 {
+    if( !m_tool->isEnabled<TerrainTool>() ) {
+        return;
+    }
+
 	// Find the intersection point of ray & terrain
 	Vec3 point = chunk.terrain()->rayMarch( m_viewport->ray() );
 
