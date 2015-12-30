@@ -47,7 +47,7 @@ namespace Project {
 // --------------------------------------------------------- Project --------------------------------------------------------- //
 
 // ** Project::Project
-Project::Project( QObject* parent, Ui::MainWindowQPtr mainWindow, const Io::Path& path ) : QObject( parent ), m_mainWindow( mainWindow )
+Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 {
 	// Save project name
 	m_name = path.last();
@@ -150,7 +150,7 @@ void Project::createAsset( const String& name, const String& ext )
 	FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Get the parent folder
-	FileInfoArray     selected = m_mainWindow->assetTree()->selection();
+	FileInfoArray     selected = qMainWindow->assetTree()->selection();
 	String		      path	   = selected.empty() ? assetsAbsolutePath() : selected[0].absolutePath();
 
 	// Generate the file name
@@ -164,7 +164,7 @@ void Project::createAsset( const String& name, const String& ext )
 	}
 
 	// Expand parent item
-	m_mainWindow->assetTree()->expandSelectedItems();
+	qMainWindow->assetTree()->expandSelectedItems();
 }
 
 // ** Project::edit
@@ -184,7 +184,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 	DC_BREAK_IF( !asset.valid() );
 
 	// Dock the editor to main window
-	Ui::DocumentQPtr result = m_mainWindow->editDocument( assetEditor, asset );
+	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, asset );
 	
 	return result;
 }
@@ -233,13 +233,13 @@ void Project::menuCreateMaterial( Ui::ActionQPtr action )
 // ** Project::menuOpenAsset
 void Project::menuOpenAsset( Ui::ActionQPtr action )
 {
-	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
+	qMainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
 
 // ** Project::menuDeleteAsset
 void Project::menuDeleteAsset( Ui::ActionQPtr action )
 {
-	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
+	qMainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
 
 // ** Project::menuBrowseAssets
@@ -255,7 +255,7 @@ void Project::menuShowInExplorer( Ui::ActionQPtr action )
 	FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Get the selected items
-	FileInfoArray selected = m_mainWindow->assetTree()->selection();
+	FileInfoArray selected = qMainWindow->assetTree()->selection();
 
 	// Get the file info
 	FileInfo fileInfo = selected.empty() ? fs->extractFileInfo( assetsAbsolutePath() ) : selected[0];

@@ -207,7 +207,7 @@ void Composer::createProject( const String& path )
     closeProject();
 
 	// Create project instance
-	m_project = new Project::Project( this, m_mainWindow, path );
+	m_project = new Project::Project( this, path );
 
 	// Create all project folders
 	for( s32 i = 0; i < Project::Project::TotalPaths; i++ ) {
@@ -287,7 +287,7 @@ void Composer::openProject( const String& path )
     closeProject();
 
 	// Create project instance
-	m_project = new Project::Project( this, m_mainWindow, path );
+	m_project = new Project::Project( this, path );
 
 	// Emit the signal
     emit projectOpened( m_project );

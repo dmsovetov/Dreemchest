@@ -75,7 +75,7 @@ namespace Project {
 	private:
 
 									//! Constructs Project instance.
-									Project( QObject* parent, Ui::MainWindowQPtr mainWindow, const Io::Path& path );
+									Project( QObject* parent, const Io::Path& path );
 
 		//! Creates new asset with specified name at selected folder.
 		void						createAsset( const String& name, const String& ext );
@@ -110,7 +110,6 @@ namespace Project {
 		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
 
 		String						m_name;					//!< Project name.
-		Ui::MainWindowQPtr			m_mainWindow;			//!< Main window instance.
 		AutoPtr<AssetsModel>		m_assetsModel;			//!< Assets model.
 		Io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
