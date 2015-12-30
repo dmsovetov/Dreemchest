@@ -34,7 +34,7 @@
 DC_BEGIN_COMPOSER
 
 // ** Assets::Assets
-Assets::Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsModel ) : QObject( parent ), m_path( path ), m_assetsModel( assetsModel )
+Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
 {
 	// Create an asset bundle
 	m_bundle = Scene::AssetBundle::create( "Assets", path );
@@ -52,9 +52,9 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsMod
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
 	// Connect to asset model signals
-    connect( m_assetsModel, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
-    connect( m_assetsModel, SIGNAL(fileRemoved(const FileInfo&)), this, SLOT(removeFromCache(const FileInfo&)) );
-    connect( m_assetsModel, SIGNAL(fileChanged(const FileInfo&)), this, SLOT(updateAssetCache(const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileRemoved(const FileInfo&)), this, SLOT(removeFromCache(const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileChanged(const FileInfo&)), this, SLOT(updateAssetCache(const FileInfo&)) );
 }
 
 // ** Assets::bundle
@@ -77,7 +77,7 @@ Scene::AssetPtr Assets::createAssetForFile( const FileInfo& fileInfo )
 	}
 
 	// Set meta file
-	m_assetsModel->setMetaData( fileInfo, asset->keyValue() );
+	m_assetFileSystem->setMetaData( fileInfo, asset->keyValue() );
 
 	return asset;
 }
@@ -99,7 +99,7 @@ Scene::Asset::Type Assets::assetTypeFromExtension( const String& extension ) con
 void Assets::removeAssetFromCache( const FileInfo& file )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( file );
+	String uuid = m_assetFileSystem->uuid( file );
 
 	// Remove asset from bundle
 	m_bundle->removeAsset( uuid );
@@ -112,7 +112,7 @@ void Assets::removeAssetFromCache( const FileInfo& file )
 void Assets::updateAssetCache( const FileInfo& file )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( file );
+	String uuid = m_assetFileSystem->uuid( file );
 
 	// Update asset's cache
 	putToCache( file, uuid );
@@ -122,7 +122,7 @@ void Assets::updateAssetCache( const FileInfo& file )
 void Assets::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
-	Io::KeyValue meta = m_assetsModel->metaData( fileInfo );
+	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
 
 	// Added asset
 	Scene::AssetPtr asset;
@@ -139,7 +139,7 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 	}
 
 	// Set asset name
-	String name = fileInfo.relativePath( m_assetsModel->rootPath() );
+	String name = fileInfo.relativePath( m_assetFileSystem->rootPath() );
 	bool result = m_bundle->setAssetName( asset, name );
 	DC_BREAK_IF( !result );
 

@@ -57,10 +57,10 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_assetEditors.declare<Editors::SceneEditor>( "scene" );
 
 	// Create assets bundle & model
-	m_assetsModel = new AssetsModel( this );
+	m_assetFileSystem = new AssetFileSystemModel( this );
 
 	// Create project cache
-	m_assets = new Assets( this, absolutePath( CachePath ), m_assetsModel );
+	m_assets = new Assets( this, absolutePath( CachePath ), m_assetFileSystem );
 
 	// Register asset types
 	m_assets->registerExtension( "", Scene::Asset::Folder );
@@ -72,8 +72,8 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_assets->registerExtension( "material", Scene::Asset::Material );
 
 	// Setup assets model after creating cache
-	m_assetsModel->setReadOnly( false );
-	m_assetsModel->setRootPath( assetsAbsolutePath() );
+	m_assetFileSystem->setReadOnly( false );
+	m_assetFileSystem->setRootPath( assetsAbsolutePath() );
 }
 
 Project::~Project( void )
@@ -87,10 +87,10 @@ const String& Project::name( void ) const
 	return m_name;
 }
 
-// ** Project::assetsModel
-AssetsModelQPtr Project::assetsModel( void ) const
+// ** Project::assetFileSystem
+AssetFileSystemModelQPtr Project::assetFileSystem( void ) const
 {
-	return m_assetsModel;
+	return m_assetFileSystem;
 }
 
 // ** Project::assets

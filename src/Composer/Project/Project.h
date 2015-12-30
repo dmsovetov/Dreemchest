@@ -29,7 +29,7 @@
 
 #include "../Composer.h"
 #include "../Editors/AssetEditor.h"
-#include "../Models/AssetsModel.h"
+#include "../Models/AssetFileSystemModel.h"
 
 DC_BEGIN_COMPOSER
 
@@ -56,7 +56,7 @@ DC_BEGIN_COMPOSER
 		const String&				name( void ) const;
 
 		//! Returns project assets model.
-		AssetsModelQPtr				assetsModel( void ) const;
+		AssetFileSystemModelQPtr    assetFileSystem( void ) const;
 
 		//! Returns an asset bundle.
 		Scene::AssetBundleWPtr		assets( void ) const;
@@ -108,7 +108,7 @@ DC_BEGIN_COMPOSER
 		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
 
 		String						m_name;					//!< Project name.
-		AssetsModelQPtr             m_assetsModel;			//!< Assets model.
+		AssetFileSystemModelQPtr    m_assetFileSystem;		//!< Asset file system model.
 		Io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
 		AssetsQPtr					m_assets;				//!< The project assets.

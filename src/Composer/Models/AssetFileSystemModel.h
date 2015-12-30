@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_AssetsModel_H__
-#define __DC_Composer_AssetsModel_H__
+#ifndef __DC_Composer_AssetFileSystemModel_H__
+#define __DC_Composer_AssetFileSystemModel_H__
 
 #include "AbstractTreeModel.h"
 
 DC_BEGIN_COMPOSER
 
 	//! Asset file system model.
-	class AssetsModel : public QFileSystemModel {
+	class AssetFileSystemModel : public QFileSystemModel {
 
 		Q_OBJECT
 
@@ -58,8 +58,8 @@ DC_BEGIN_COMPOSER
 
 	public:
 
-								//! Constructs AssetsModel instance
-		explicit				AssetsModel( QObject* parent );
+								//! Constructs AssetFileSystemModel instance
+		explicit				AssetFileSystemModel( QObject* parent );
 
 		//! Returns assets UUID for a specified asset file.
 		String					uuid( const FileInfo& assetFile ) const;
@@ -135,13 +135,13 @@ DC_BEGIN_COMPOSER
 	public:
 
 										//! Constructs FilteredAssetsModel instance.
-										FilteredAssetsModel( AssetsModelQPtr assetsModel, QObject* parent );
+										FilteredAssetsModel( AssetFileSystemModelQPtr assetFileSystem, QObject* parent );
 
 		//! Returns root model index.
 		QModelIndex						root( void ) const;
 
 		//! Returns internal model pointer.
-		AssetsModelQPtr			        model( void ) const;
+		AssetFileSystemModelQPtr	    model( void ) const;
 
 		//! Returns asset file info by model index.
 		FileInfo						assetFile( const QModelIndex& index ) const;
@@ -156,9 +156,9 @@ DC_BEGIN_COMPOSER
 
 	private:
 
-		AssetsModelQPtr	                m_model;	//!< Actual assets model.
+		AssetFileSystemModelQPtr	    m_model;	//!< Actual assets model.
 	};
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_AssetsModel_H__	*/
+#endif	/*	!__DC_Composer_AssetFileSystemModel_H__	*/

@@ -85,10 +85,10 @@ namespace Ui {
 		void						expandSelectedItems( void );
 
 		//! Sets asset tree model.
-		void						setModel( AssetsModelQPtr value );
+		void						setModel( AssetFileSystemModelQPtr value );
 
         //! Returns asset model.
-        AssetsModelQPtr             model( void ) const;
+        AssetFileSystemModelQPtr    model( void ) const;
 
 	protected:
 

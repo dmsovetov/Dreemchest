@@ -206,7 +206,7 @@ DC_BEGIN_COMPOSER
 	qDeclarePtr( Composer )
     qDeclarePtr( FileSystem )
     qDeclarePtr( SceneModel )
-    qDeclarePtr( AssetsModel )
+    qDeclarePtr( AssetFileSystemModel )
     qDeclarePtr( FilteredAssetsModel )
     qDeclarePtr( PropertyModel )
 

@@ -263,7 +263,7 @@ Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 	// Add assets to scene
 	foreach( QUrl url, assets ) {
 		// Read an attached meta data
-		Io::KeyValue meta = m_project->assetsModel()->metaData( url.toLocalFile().toStdString() );
+		Io::KeyValue meta = m_project->assetFileSystem()->metaData( url.toLocalFile().toStdString() );
 
 		if( meta.isNull() ) {
 			continue;	// Unsupported asset type or just a folder

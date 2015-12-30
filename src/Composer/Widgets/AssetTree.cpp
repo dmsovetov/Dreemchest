@@ -32,7 +32,7 @@
 
 #include "../Models/AssetModels.h"
 #include "../Models/PropertyModel.h"
-#include "../Models/AssetsModel.h"
+#include "../Models/AssetFileSystemModel.h"
 #include "../Project/Project.h"
 #include "../FileSystem.h"
 
@@ -141,13 +141,13 @@ AssetTree::AssetTree( ProjectQPtr project, QWidget* parent ) : QTreeView( parent
 }
 
 // ** AssetTree::model
-AssetsModelQPtr AssetTree::model( void ) const
+AssetFileSystemModelQPtr AssetTree::model( void ) const
 {
     return m_proxy->model();
 }
 
 // ** AssetTree::setModel
-void AssetTree::setModel( AssetsModelQPtr value )
+void AssetTree::setModel( AssetFileSystemModelQPtr value )
 {
 	m_proxy = new FilteredAssetsModel( value, this );
 	QTreeView::setModel( m_proxy );

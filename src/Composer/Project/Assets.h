@@ -52,7 +52,7 @@ DC_BEGIN_COMPOSER
 	private:
 
 									//! Constructs Assets instance.
-									Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsModel );
+									Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem );
 
 		//! Puts an asset to cache.
 		bool						putToCache( const FileInfo& fileInfo, const String& uuid );
@@ -89,7 +89,7 @@ DC_BEGIN_COMPOSER
 		typedef Map<String, Scene::Asset::Type> AssetTypes;
 
 		Io::Path					m_path;				//!< Root cache folder path.
-		AssetsModelQPtr				m_assetsModel;		//!< Assets model to use.
+		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
 		Scene::AssetBundlePtr		m_bundle;			//!< Asset bundle.

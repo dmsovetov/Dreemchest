@@ -354,7 +354,7 @@ void MainWindow::createProjectInterface( Project* project )
 
 	// Create the asset tree
 	m_assetTree = new AssetTree( m_project, this );
-	m_assetTree->setModel( m_project->assetsModel() );
+	m_assetTree->setModel( m_project->assetFileSystem() );
 
 	// Create the scene tree
 	m_sceneTree = new SceneTree( this );
