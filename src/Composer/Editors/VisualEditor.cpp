@@ -245,7 +245,7 @@ bool VisualEditor::eventFilter( QObject* sender, QEvent* e )
                                             if( menu->size() ) {
                                                 menu->exec( ce->globalPos() );
                                             }
-                                            delete ce;
+                                            delete menu;
                                             return true;
                                         }
     case QEvent::Resize:                {
