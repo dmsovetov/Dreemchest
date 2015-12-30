@@ -64,7 +64,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset,
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create the scene model
-	m_sceneModel = new SceneModel( m_project->assets(), m_scene, NULL );
+	m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
 
 	// Create terrain.
 	{
