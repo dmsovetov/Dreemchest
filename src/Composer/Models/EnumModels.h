@@ -29,6 +29,11 @@
 
 #include "../Composer.h"
 
+#define qDeclareEnumeration( name, items )                             \
+	struct name##Model : public EnumerationModel {                          \
+		name##Model( void ) { setStringList( QStringList() << items ); }    \
+	};
+
 DC_BEGIN_COMPOSER
 
 	//! Base class for all enumeration models.
@@ -42,23 +47,8 @@ DC_BEGIN_COMPOSER
 		QString				toString( int value ) const { return stringList().at( value ); }
 	};
 
-	class RenderingModeModel : public EnumerationModel {
-	public:
-
-		RenderingModeModel( void )
-		{
-			setStringList( QStringList() << "Opaque" << "Cutout" << "Translucent" << "Additive" );
-		}
-	};
-
-	class LightingModel : public EnumerationModel {
-	public:
-
-		LightingModel( void )
-		{
-			setStringList( QStringList() << "Unlit" << "Ambient" << "Phong" );
-		}
-	};
+    qDeclareEnumeration( RenderingMode, "Opaque" << "Cutout" << "Translucent" << "Additive" )
+    qDeclareEnumeration( Lighting, "Unlit" << "Ambient" << "Phong" )
 
 DC_END_COMPOSER
 
