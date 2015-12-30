@@ -97,6 +97,9 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
     // Create the main window
     m_mainWindow = new Ui::MainWindow( applicationName() );
 
+    // Create the file system
+	m_fileSystem = new FileSystem( this );
+
     // Setup default log handlers
 	Renderer::log::setStandardHandler();
 	Scene::log::setStandardHandler();
@@ -112,6 +115,12 @@ Project::ProjectQPtr Composer::project( void ) const
 Ui::MainWindowQPtr Composer::window( void ) const
 {
 	return m_mainWindow;
+}
+
+// ** Composer::fileSystem
+FileSystemQPtr Composer::fileSystem( void ) const
+{
+	return m_fileSystem;
 }
 
 // ** Composer::initialize
@@ -150,11 +159,8 @@ bool Composer::initialize( void )
 // ** Composer::menuCreateProject
 void Composer::menuCreateProject( Ui::ActionQPtr action )
 {
-	// Get the file system interface
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
-
 	// Select the directory
-	String path = fs->selectExistingDirectory( "Create Project" );
+	String path = m_fileSystem->selectExistingDirectory( "Create Project" );
 
 	if( path == "" ) {
 		return;
@@ -166,11 +172,8 @@ void Composer::menuCreateProject( Ui::ActionQPtr action )
 // ** Composer::menuOpenProject
 void Composer::menuOpenProject( Ui::ActionQPtr action )
 {
-	// Get the file system interface
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
-
 	// Select the directory
-	String path = fs->selectExistingDirectory( "Open Project" );
+	String path = m_fileSystem->selectExistingDirectory( "Open Project" );
 
 	if( path == "" ) {
 		return;
@@ -203,15 +206,12 @@ void Composer::createProject( const String& path )
     // Close active project
     closeProject();
 
-	// Get the file system interface
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
-
 	// Create project instance
 	m_project = new Project::Project( this, m_mainWindow, path );
 
 	// Create all project folders
 	for( s32 i = 0; i < Project::Project::TotalPaths; i++ ) {
-		fs->createDirectory( m_project->absolutePath( i ) );
+		m_fileSystem->createDirectory( m_project->absolutePath( i ) );
 	}
 
 	// Emit the signal

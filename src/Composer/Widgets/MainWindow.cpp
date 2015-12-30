@@ -91,9 +91,6 @@ MainWindow::MainWindow( const QString& title ) : m_assetTree( NULL ), m_activeDo
 // ** MainWindow::initialize
 bool MainWindow::initialize( ComposerQPtr composer )
 {
-	// Create the file system
-	m_fileSystem = new FileSystem( this );
-
 	// Listen for signals
     connect( composer, SIGNAL(projectOpened(Project::Project*)), this, SLOT(createProjectInterface(Project::Project*)) );
     connect( composer, SIGNAL(projectClosed(Project::Project*)), this, SLOT(destroyProjectInterface(Project::Project*)) );
@@ -140,12 +137,6 @@ MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const Strin
 RenderingFrameQPtr MainWindow::sharedRenderingContext( void ) const
 {
 	return m_sharedRenderingContext;
-}
-
-// ** MainWindow::fileSystem
-FileSystemQPtr MainWindow::fileSystem( void ) const
-{
-	return m_fileSystem;
 }
 
 // ** MainWindow::assetTree

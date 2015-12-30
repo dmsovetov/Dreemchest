@@ -70,9 +70,6 @@ namespace Ui {
 		//! Shows the message box with yes, no, cancel buttons.
 		MessageBoxResult		        messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const;
 
-		//! Returns the file system instance.
-		FileSystemQPtr			        fileSystem( void ) const;
-
 		//! Returns the asset tree instance.
 		AssetTreeQPtr			        assetTree( void ) const;
 
@@ -109,7 +106,6 @@ namespace Ui {
 		QVector<DocumentQPtr>			m_documents;				//!< All opened documents reside here.
 		DocumentQPtr					m_activeDocument;			//!< An active document.
 		RenderingFrameQPtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
-		FileSystemQPtr					m_fileSystem;				//!< File system interface.
 		AssetTreeQPtr					m_assetTree;				//!< Asset tree instance.
 		SceneTreeQPtr					m_sceneTree;				//!< Scene tree instance.
 		InspectorQPtr				    m_inspector;			    //!< Object inspector instance.

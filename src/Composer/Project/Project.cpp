@@ -64,7 +64,7 @@ Project::Project( QObject* parent, Ui::MainWindowQPtr mainWindow, const Io::Path
 	m_assetsModel = new AssetsModel( NULL );
 
 	// Create project cache
-	m_assets = new Assets( mainWindow->fileSystem(), absolutePath( CachePath ), m_assetsModel.get() );
+	m_assets = new Assets( qComposer->fileSystem(), absolutePath( CachePath ), m_assetsModel.get() );
 
 	// Register asset types
 	m_assets->registerExtension( "", Scene::Asset::Folder );
@@ -147,7 +147,7 @@ void Project::fillAssetMenu( Ui::MenuQPtr menu, Ui::AssetTree* assetTree )
 void Project::createAsset( const String& name, const String& ext )
 {
 	// Get the file system instance
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Get the parent folder
 	FileInfoArray     selected = m_mainWindow->assetTree()->selection();
@@ -175,7 +175,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 
 	// No asset editor found - open the asset file with standard editor
 	if( !assetEditor.valid() ) {
-		m_mainWindow->fileSystem()->browse( fileInfo.absolutePath() );
+		qComposer->fileSystem()->browse( fileInfo.absolutePath() );
 		return NULL;
 	}
 
@@ -193,7 +193,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 void Project::menuImportAssets( Ui::ActionQPtr action )
 {
 	// Get the file system instance
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Select files
 	StringArray files = fs->selectExistingFiles( "Import Assets" );
@@ -245,14 +245,14 @@ void Project::menuDeleteAsset( Ui::ActionQPtr action )
 // ** Project::menuBrowseAssets
 void Project::menuBrowseAssets( Ui::ActionQPtr action )
 {
-	m_mainWindow->fileSystem()->browse( assetsAbsolutePath() );
+	qComposer->fileSystem()->browse( assetsAbsolutePath() );
 }
 
 // ** Project::menuShowInExplorer
 void Project::menuShowInExplorer( Ui::ActionQPtr action )
 {
 	// Get the file system instance
-	FileSystemQPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Get the selected items
 	FileInfoArray selected = m_mainWindow->assetTree()->selection();
@@ -261,7 +261,7 @@ void Project::menuShowInExplorer( Ui::ActionQPtr action )
 	FileInfo fileInfo = selected.empty() ? fs->extractFileInfo( assetsAbsolutePath() ) : selected[0];
 
 	// Browse to asset
-	m_mainWindow->fileSystem()->browse( fileInfo.isDir() ? fileInfo.absolutePath() : fileInfo.dir() );
+	fs->browse( fileInfo.isDir() ? fileInfo.absolutePath() : fileInfo.dir() );
 }
 
 } // namespace Project

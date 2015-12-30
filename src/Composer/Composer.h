@@ -269,6 +269,9 @@ DC_BEGIN_COMPOSER
 		//! Returns main window.
 		Ui::MainWindowQPtr		window( void ) const;
 
+		//! Returns the file system instance.
+		FileSystemQPtr	        fileSystem( void ) const;
+
 		//! Performs the composer initialization.
 		bool					initialize( void );
 
@@ -300,6 +303,7 @@ DC_BEGIN_COMPOSER
 		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
 		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
 		Project::ProjectQPtr    m_project;				//!< Active project.
+        FileSystemQPtr		    m_fileSystem;		    //!< File system interface.
 	};
 
 DC_END_COMPOSER
