@@ -32,8 +32,6 @@
 
 DC_BEGIN_COMPOSER
 
-namespace Project {
-
 	//! Manages the project cache & available assets.
 	class Assets : public QObject {
 	friend class Project;
@@ -96,8 +94,6 @@ namespace Project {
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
 		Scene::AssetBundlePtr		m_bundle;			//!< Asset bundle.
 	};
-
-} // namespace Project
 
 DC_END_COMPOSER
 

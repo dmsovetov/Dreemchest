@@ -33,8 +33,6 @@
 
 DC_BEGIN_COMPOSER
 
-namespace Project {
-
 	//! Represents active project.
 	class Project : public QObject {
     friend class Composer;
@@ -115,8 +113,6 @@ namespace Project {
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
 		AssetsQPtr					m_assets;				//!< The project assets.
 	};
-
-} // namespace Project
 
 DC_END_COMPOSER
 

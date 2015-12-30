@@ -92,8 +92,8 @@ MainWindow::MainWindow( const QString& title ) : m_assetTree( NULL ), m_activeDo
 bool MainWindow::initialize( ComposerQPtr composer )
 {
 	// Listen for signals
-    connect( composer, SIGNAL(projectOpened(Project::Project*)), this, SLOT(createProjectInterface(Project::Project*)) );
-    connect( composer, SIGNAL(projectClosed(Project::Project*)), this, SLOT(destroyProjectInterface(Project::Project*)) );
+    connect( composer, SIGNAL(projectOpened(Project*)), this, SLOT(createProjectInterface(Project*)) );
+    connect( composer, SIGNAL(projectClosed(Project*)), this, SLOT(destroyProjectInterface(Project*)) );
 
 	return true;
 }
@@ -343,7 +343,7 @@ bool MainWindow::ensureSaved( DocumentQPtr document ) const
 }
 
 // ** MainWindow::createProjectInterface
-void MainWindow::createProjectInterface( Project::Project* project )
+void MainWindow::createProjectInterface( Project* project )
 {
     DC_BREAK_IF( m_assetTree );
     DC_BREAK_IF( m_sceneTree );
@@ -376,9 +376,9 @@ void MainWindow::createProjectInterface( Project::Project* project )
 }
 
 // ** MainWindow::destroyProjectInterface
-void MainWindow::destroyProjectInterface( Project::Project* project )
+void MainWindow::destroyProjectInterface( Project* project )
 {
-	m_project = Project::ProjectQPtr();
+	m_project = NULL;
 	DC_BREAK;
 }
 

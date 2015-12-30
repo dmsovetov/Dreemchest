@@ -96,10 +96,10 @@ namespace Ui {
     private slots:
 
 		//! Handles the ProjectOpened event.
-		void							createProjectInterface( Project::Project* project );
+		void							createProjectInterface( Project* project );
 
 		//! Handles the ProjectClosed event.
-		void							destroyProjectInterface( Project::Project* project );
+		void							destroyProjectInterface( Project* project );
 	
 	private:
 
@@ -109,7 +109,7 @@ namespace Ui {
 		AssetTreeQPtr					m_assetTree;				//!< Asset tree instance.
 		SceneTreeQPtr					m_sceneTree;				//!< Scene tree instance.
 		InspectorQPtr				    m_inspector;			    //!< Object inspector instance.
-		Project::ProjectQPtr			m_project;					//!< Opened project.
+		ProjectQPtr			            m_project;					//!< Opened project.
 	};
 
 } // namespace Ui

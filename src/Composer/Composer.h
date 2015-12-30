@@ -201,12 +201,8 @@ DC_BEGIN_COMPOSER
 
 	} // namespace Importers
 
-	namespace Project {
-
-		qDeclarePtr( Project )
-		qDeclarePtr( Assets )
-
-	} // namespace Project
+	qDeclarePtr( Project )
+	qDeclarePtr( Assets )
 
 	qDeclarePtr( Composer )
     qDeclarePtr( FileSystem )
@@ -228,13 +224,13 @@ DC_BEGIN_COMPOSER
 	Q_SIGNALS:
 
 		//! Event is emitted when the project is created.
-		void				projectCreated( Project::Project* project );
+		void				projectCreated( Project* project );
 
         //! Event is emitted when the project was opened.
-        void				projectOpened( Project::Project* project );
+        void				projectOpened( Project* project );
 
         //! Event is emitted when the project was closed.
-        void				projectClosed( Project::Project* project );
+        void				projectClosed( Project* project );
 
 	public:
 
@@ -264,7 +260,7 @@ DC_BEGIN_COMPOSER
         void                    closeProject( void );
 
 		//! Returns opened project.
-		Project::ProjectQPtr	project( void ) const;
+		ProjectQPtr	            project( void ) const;
 
 		//! Returns main window.
 		Ui::MainWindowQPtr		window( void ) const;
@@ -302,7 +298,7 @@ DC_BEGIN_COMPOSER
 
 		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
 		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
-		Project::ProjectQPtr    m_project;				//!< Active project.
+		ProjectQPtr             m_project;				//!< Active project.
         FileSystemQPtr		    m_fileSystem;		    //!< File system interface.
 	};
 

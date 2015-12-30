@@ -42,10 +42,6 @@
 
 DC_BEGIN_COMPOSER
 
-namespace Project {
-
-// --------------------------------------------------------- Project --------------------------------------------------------- //
-
 // ** Project::Project
 Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 {
@@ -263,7 +259,5 @@ void Project::menuShowInExplorer( Ui::ActionQPtr action )
 	// Browse to asset
 	fs->browse( fileInfo.isDir() ? fileInfo.absolutePath() : fileInfo.dir() );
 }
-
-} // namespace Project
 
 DC_END_COMPOSER

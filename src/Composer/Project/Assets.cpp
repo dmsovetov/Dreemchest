@@ -33,8 +33,6 @@
 
 DC_BEGIN_COMPOSER
 
-namespace Project {
-
 // ** Assets::Assets
 Assets::Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsModel ) : QObject( parent ), m_path( path ), m_assetsModel( assetsModel )
 {
@@ -208,7 +206,5 @@ Io::Path Assets::cacheFolderFromUuid( const String& uuid ) const
 	String folder = String() + uuid[0] + uuid[1];
 	return m_path + folder;
 }
-
-} // namespace Project
 
 DC_END_COMPOSER

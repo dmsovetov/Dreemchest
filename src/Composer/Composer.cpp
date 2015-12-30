@@ -106,7 +106,7 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 }
 
 // ** Composer::project
-Project::ProjectQPtr Composer::project( void ) const
+ProjectQPtr Composer::project( void ) const
 {
 	return m_project;
 }
@@ -207,10 +207,10 @@ void Composer::createProject( const String& path )
     closeProject();
 
 	// Create project instance
-	m_project = new Project::Project( this, path );
+	m_project = new Project( this, path );
 
 	// Create all project folders
-	for( s32 i = 0; i < Project::Project::TotalPaths; i++ ) {
+	for( s32 i = 0; i < Project::TotalPaths; i++ ) {
 		m_fileSystem->createDirectory( m_project->absolutePath( i ) );
 	}
 
@@ -287,7 +287,7 @@ void Composer::openProject( const String& path )
     closeProject();
 
 	// Create project instance
-	m_project = new Project::Project( this, path );
+	m_project = new Project( this, path );
 
 	// Emit the signal
     emit projectOpened( m_project );

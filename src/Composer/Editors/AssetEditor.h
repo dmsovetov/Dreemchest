@@ -51,7 +51,7 @@ namespace Editors {
 		virtual void			notifyEnterBackground( Ui::MainWindowQPtr window ) {}
 
 		//! Performs asset editor initialization.
-		virtual bool			initialize( Project::ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document );
+		virtual bool			initialize( ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document );
 
 		//! Saves the asset to disk.
 		virtual void			save( void ) {}
@@ -67,7 +67,7 @@ namespace Editors {
 
 	protected:
 
-		Project::ProjectQPtr	m_project;	//!< Parent project instance.
+		ProjectQPtr	            m_project;	//!< Parent project instance.
 		Ui::DocumentQPtr		m_document;	//!< Parent document.
 		Scene::AssetPtr			m_asset;	//!< An asset being edited.
 	};
