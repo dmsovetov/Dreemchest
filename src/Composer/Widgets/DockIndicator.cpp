@@ -207,6 +207,14 @@ bool DockIndicator::eventFilter( QObject* sender, QEvent* e )
 
 	// Process an event from a dock widget
 	if( QDockWidget* dock = qobject_cast<QDockWidget*>( sender ) ) {
+        // Type cast the mouse event
+        QMouseEvent* me = static_cast<QMouseEvent*>( e );
+
+        if( me->button() != Qt::LeftButton ) {
+            return false;
+        }
+
+        // Process the mouse event
 		switch( type ) {
 		case QEvent::MouseButtonPress:		begin( dock );	return true;
 		case QEvent::MouseButtonRelease:	end( dock );	return false;
