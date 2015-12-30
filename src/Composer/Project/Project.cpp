@@ -167,10 +167,10 @@ void Project::createAsset( const String& name, const String& ext )
 Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 {
 	// Construct the asset editor by file extension
-	AssetEditorFactory::Ptr assetEditor = m_assetEditors.construct( fileInfo.extension() );
+	Editors::AssetEditorQPtr assetEditor = m_assetEditors.construct( fileInfo.extension() );
 
 	// No asset editor found - open the asset file with standard editor
-	if( !assetEditor.valid() ) {
+	if( !assetEditor ) {
 		qComposer->fileSystem()->browse( fileInfo.absolutePath() );
 		return NULL;
 	}

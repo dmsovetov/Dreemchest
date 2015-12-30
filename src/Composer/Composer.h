@@ -188,9 +188,9 @@ DC_BEGIN_COMPOSER
 			Scene::SceneObjectWPtr	m_parent;	//!< Parent scene object.
 		};
 
-		dcDeclarePtrs( AssetEditor )
-		dcDeclarePtrs( VisualEditor )
-		dcDeclarePtrs( SceneEditor )
+		qDeclarePtr( AssetEditor )
+		qDeclarePtr( VisualEditor )
+		qDeclarePtr( SceneEditor )
 
 	} // namespace Editors
 

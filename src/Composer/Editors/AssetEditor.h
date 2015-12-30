@@ -41,7 +41,7 @@ DC_BEGIN_COMPOSER
 namespace Editors {
 
 	//! Base class for all asset editors.
-	class AssetEditor : public RefCounted {
+	class AssetEditor : public QObject {
 	public:
 
 		//! Asset editor has entered the foreground.

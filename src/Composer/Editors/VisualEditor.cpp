@@ -159,7 +159,7 @@ void VisualEditor::handleFocusOut( void )
 // ------------------------------------------ RenderingFrameDelegate ------------------------------------------ //
 
 // ** RenderingFrameDelegate::RenderingFrameDelegate
-RenderingFrameDelegate::RenderingFrameDelegate( VisualEditorWPtr editor ) : m_editor( editor )
+RenderingFrameDelegate::RenderingFrameDelegate( VisualEditorQPtr editor ) : m_editor( editor )
 {
 
 }

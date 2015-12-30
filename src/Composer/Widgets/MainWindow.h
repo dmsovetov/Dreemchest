@@ -53,7 +53,7 @@ namespace Ui {
 		bool					        initialize( ComposerQPtr composer );
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		DocumentQPtr			        editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset );
+		DocumentQPtr			        editDocument( Editors::AssetEditorQPtr assetEditor, const Scene::AssetPtr& asset );
 
 		//! Closes the document.
 		bool					        closeDocument( DocumentQPtr document );

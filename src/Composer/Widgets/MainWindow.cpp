@@ -194,9 +194,9 @@ QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::Dock
 }
 
 // ** MainWindow::editDocument
-DocumentQPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset )
+DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, const Scene::AssetPtr& asset )
 {
-	DC_BREAK_IF( !assetEditor.valid() );
+	DC_BREAK_IF( !assetEditor );
 
 	// First lookup the exising document
 	DocumentQPtr existing = findDocument( asset );
@@ -321,7 +321,7 @@ void MainWindow::setActiveDocument( DocumentQPtr document )
 bool MainWindow::ensureSaved( DocumentQPtr document ) const
 {
 	// Get the attached asset editor.
-	Editors::AssetEditorWPtr assetEditor = document->assetEditor();
+	Editors::AssetEditorQPtr assetEditor = document->assetEditor();
 
 	// The document has no unsaved changes.
 	if( !assetEditor->hasChanges() ) {

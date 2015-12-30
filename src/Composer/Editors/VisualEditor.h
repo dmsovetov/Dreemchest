@@ -122,7 +122,7 @@ namespace Editors {
 	public:
 
 										//! Constructs the RenderingFrameDelegate instance.
-										RenderingFrameDelegate( VisualEditorWPtr editor );
+										RenderingFrameDelegate( VisualEditorQPtr editor );
 
 		//! Handles the update event.
 		virtual void					handleUpdate( f32 dt ) DC_DECL_OVERRIDE;
@@ -168,7 +168,7 @@ namespace Editors {
 
 	private:
 
-		VisualEditorWPtr				m_editor;	//!< Parent visual editor.
+		VisualEditorQPtr				m_editor;	//!< Parent visual editor.
 	};
 
 } // namespace Editors

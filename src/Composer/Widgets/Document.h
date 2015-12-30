@@ -41,7 +41,7 @@ namespace Ui {
 	public:
 
 									//! Constructs the Document instance.
-									Document( MainWindowQPtr parent, Editors::AssetEditorPtr assetEditor, const QString& title );
+									Document( MainWindowQPtr parent, Editors::AssetEditorQPtr assetEditor, const QString& title );
 
 
 		//! Returns the rendering frame used for this document dock.
@@ -51,7 +51,7 @@ namespace Ui {
 		RenderingFrameQPtr			attachRenderingFrame( void );
 
 		//! Returns an attached asset editor.
-		Editors::AssetEditorWPtr	assetEditor( void ) const;
+		Editors::AssetEditorQPtr	assetEditor( void ) const;
 
 	private:
 
@@ -67,7 +67,7 @@ namespace Ui {
 
 		MainWindowQPtr				m_mainWindow;		//!< Parent main window.
 		RenderingFrameQPtr			m_renderingFrame;	//!< The attached rendering frame.
-		Editors::AssetEditorPtr		m_assetEditor;		//!< Asset editor attached to this document dock
+		Editors::AssetEditorQPtr    m_assetEditor;		//!< Asset editor attached to this document dock
 	};
 
 } // namespace Ui

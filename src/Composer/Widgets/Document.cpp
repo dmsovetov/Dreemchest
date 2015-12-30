@@ -36,9 +36,10 @@ DC_BEGIN_COMPOSER
 namespace Ui {
 
 // ** Document::Document
-Document::Document( MainWindowQPtr parent, Editors::AssetEditorPtr assetEditor, const QString& title )
+Document::Document( MainWindowQPtr parent, Editors::AssetEditorQPtr assetEditor, const QString& title )
     : QDockWidget( title, NULL ), m_mainWindow( parent ), m_assetEditor( assetEditor ), m_renderingFrame( NULL )
 {
+    assetEditor->setParent( this );
 	connect( this, SIGNAL(visibilityChanged(bool)), this, SLOT(visibilityChanged(bool)) );
 }
 
@@ -88,7 +89,7 @@ RenderingFrameQPtr Document::attachRenderingFrame( void )
 }
 
 // ** Document::assetEditor
-Editors::AssetEditorWPtr Document::assetEditor( void ) const
+Editors::AssetEditorQPtr Document::assetEditor( void ) const
 {
 	return m_assetEditor;
 }
