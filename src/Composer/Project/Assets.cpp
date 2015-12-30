@@ -36,7 +36,7 @@ DC_BEGIN_COMPOSER
 namespace Project {
 
 // ** Assets::Assets
-Assets::Assets( const Io::Path& path, AssetsModelQPtr assetsModel ) : m_path( path ), m_assetsModel( assetsModel )
+Assets::Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsModel ) : QObject( parent ), m_path( path ), m_assetsModel( assetsModel )
 {
 	// Create an asset bundle
 	m_bundle = Scene::AssetBundle::create( "Assets", path );
@@ -53,17 +53,10 @@ Assets::Assets( const Io::Path& path, AssetsModelQPtr assetsModel ) : m_path( pa
 	m_assetImporters.declare<Importers::ImageImporterTGA>( "tga" );
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
-	// Subscribe for assets model event
-	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel->subscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel->subscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
-}
-
-Assets::~Assets( void )
-{
-	m_assetsModel->unsubscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel->unsubscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel->unsubscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
+	// Connect to asset model signals
+    connect( m_assetsModel, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
+    connect( m_assetsModel, SIGNAL(fileRemoved(const FileInfo&)), this, SLOT(removeFromCache(const FileInfo&)) );
+    connect( m_assetsModel, SIGNAL(fileChanged(const FileInfo&)), this, SLOT(updateAssetCache(const FileInfo&)) );
 }
 
 // ** Assets::bundle
@@ -104,17 +97,11 @@ Scene::Asset::Type Assets::assetTypeFromExtension( const String& extension ) con
 	return i != m_assetTypes.end() ? i->second : Scene::Asset::TotalAssetTypes;
 }
 
-// ** Assets::handleAssetAdded
-void Assets::handleAssetAdded( const AssetsModel::Added& e )
-{
-	addAssetFile( e.file );
-}
-
-// ** Assets::handleAssetRemoved
-void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
+// ** Assets::removeAssetFromCache
+void Assets::removeAssetFromCache( const FileInfo& file )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( e.file );
+	String uuid = m_assetsModel->uuid( file );
 
 	// Remove asset from bundle
 	m_bundle->removeAsset( uuid );
@@ -123,14 +110,14 @@ void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
 	removeFromCache( uuid );
 }
 
-// ** Assets::handleAssetChanged
-void Assets::handleAssetChanged( const AssetsModel::Changed& e )
+// ** Assets::updateAssetCache
+void Assets::updateAssetCache( const FileInfo& file )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel->uuid( e.file );
+	String uuid = m_assetsModel->uuid( file );
 
 	// Update asset's cache
-	putToCache( e.file, uuid );
+	putToCache( file, uuid );
 }
 
 // ** Assets::addAssetFile

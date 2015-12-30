@@ -110,10 +110,10 @@ namespace Project {
 		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
 
 		String						m_name;					//!< Project name.
-		AutoPtr<AssetsModel>		m_assetsModel;			//!< Assets model.
+		AssetsModelQPtr             m_assetsModel;			//!< Assets model.
 		Io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
-		AssetsPtr					m_assets;				//!< The project assets.
+		AssetsQPtr					m_assets;				//!< The project assets.
 	};
 
 } // namespace Project

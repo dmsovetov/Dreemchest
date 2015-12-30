@@ -101,9 +101,29 @@ DC_BEGIN_COMPOSER
 #else
 
 	//! Asset file system model.
-	class AssetsModel : public InjectedEventEmitter<QFileSystemModel> {
+	class AssetsModel : public QFileSystemModel {
 
 		Q_OBJECT
+
+    Q_SIGNALS:
+
+		//! This event is emitted when a new asset file was added to a project.
+        void                    fileAdded( const FileInfo& file );
+
+		//! This event is emitted when a new asset file was removed from a project.
+        void                    fileRemoved( const FileInfo& file );
+
+		//! This event is emitted when a new asset file was changed.
+        void                    fileChanged( const FileInfo& file );
+
+		//! This event is emitted when scanning progress was started.
+        void                    scanningStarted( void );
+
+		//! This event is emitted when scanning progress was completed.
+        void                    scanningCompleted( void );
+
+		//! This event is emitted when directory was scanned.
+        void                    folderScanned( s32 leftToScan );
 
 	public:
 
@@ -133,48 +153,6 @@ DC_BEGIN_COMPOSER
 
 		//! Returns meta data for a specified asset file name.
 		Io::KeyValue			metaData( const String& assetFileName ) const;
-
-		//! Base class for all asset events.
-		struct AssetEvent {
-								AssetEvent( const FileInfo& file )
-									: file( file ) {}
-
-			FileInfo			file;	//!< Asset file info.
-		};
-
-		//! This event is emitted when a new asset was added to a project.
-		struct Added : public AssetEvent {
-								Added( const FileInfo& file )
-									: AssetEvent( file ) {}
-		};
-
-		//! This event is emitted when a new asset was removed from a project.
-		struct Removed : public AssetEvent {
-								Removed( const FileInfo& file )
-									: AssetEvent( file ) {}
-		};
-
-		//! This event is emitted when a new asset was changed.
-		struct Changed : public AssetEvent {
-								Changed( const FileInfo& file )
-									: AssetEvent( file ) {}
-		};
-
-		//! This event is emitted when scanning progress was started.
-		struct ScanningStarted {
-		};
-
-		//! This event is emitted when scanning progress was completed.
-		struct ScanningCompleted {
-		};
-
-		//! This event is emitted when directory was scanned.
-		struct FolderScanned {
-								FolderScanned( s32 leftToScan )
-									: leftToScan( leftToScan ) {}
-
-			s32					leftToScan;	//!< The total number of items left to scan.
-		};
 
 	protected:
 

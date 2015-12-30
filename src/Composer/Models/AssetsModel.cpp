@@ -199,7 +199,7 @@ QStringList AssetsModelFilter::mimeTypes( void ) const
 #else
 
 // ** AssetsModel::AssetsModel
-AssetsModel::AssetsModel( QObject* parent ) : InjectedEventEmitter( parent ), m_isEditingModel( false ), m_metaFileExtension( "asset" )
+AssetsModel::AssetsModel( QObject* parent ) : QFileSystemModel( parent ), m_isEditingModel( false ), m_metaFileExtension( "asset" )
 {
 	setReadOnly( false );
 
@@ -303,9 +303,9 @@ void AssetsModel::scanLoadedDirectory( const QString& path )
 
 	// Emit the events
 	if( m_foldersToScan.size() ) {
-		notify<AssetsModel::FolderScanned>( m_foldersToScan.size() );
+        emit folderScanned( m_foldersToScan.size() );
 	} else {
-		notify<AssetsModel::ScanningCompleted>();
+        emit scanningCompleted();
 	}
 }
 
@@ -324,8 +324,8 @@ void AssetsModel::assetsAdded( const QModelIndex& parent, int start, int end )
 			continue;
 		}
 
-		// Dispatch an event
-		notify<AssetsModel::Added>( file );
+		// Emit the signal
+        emit fileAdded( file );
 	}
 }
 
@@ -336,18 +336,18 @@ void AssetsModel::assetsRemoved( const QModelIndex& parent, int start, int end )
 		QModelIndex idx	 = index( i, 0, parent );
 
 		// Construct file info
-		FileInfo fileInfo = assetFile( idx );
+		FileInfo file = assetFile( idx );
 
 		// Meta file does not exist - do nothing
-		if( !QFile::exists( metaFileName( fileInfo ) ) ) {
+		if( !QFile::exists( metaFileName( file ) ) ) {
 			continue;
 		}
 
 		// Dispatch an event
-		notify<AssetsModel::Removed>( fileInfo );
+        emit fileRemoved( file );
 
 		// Remove meta file
-		bool result = QDir().remove( metaFileName( fileInfo ) );
+		bool result = QDir().remove( metaFileName( file ) );
 		Q_ASSERT( result );
 	}
 }

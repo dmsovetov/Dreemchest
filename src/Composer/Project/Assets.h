@@ -35,8 +35,11 @@ DC_BEGIN_COMPOSER
 namespace Project {
 
 	//! Manages the project cache & available assets.
-	class Assets : public RefCounted {
+	class Assets : public QObject {
 	friend class Project;
+
+        Q_OBJECT
+
 	public:
 
 		//! Returns asset bundle.
@@ -51,22 +54,7 @@ namespace Project {
 	private:
 
 									//! Constructs Assets instance.
-									Assets( const Io::Path& path, AssetsModelQPtr assetsModel );
-		virtual						~Assets( void );
-
-		//! Adds an asset to cache.
-		void						handleAssetAdded( const AssetsModel::Added& e );
-
-		//! Removes an asset from cache.
-		void						handleAssetRemoved( const AssetsModel::Removed& e );
-
-		//! Performs caching of a changed asset.
-		void						handleAssetChanged( const AssetsModel::Changed& e );
-
-	private:
-
-		//! Adds an asset from a file info.
-		void						addAssetFile( const FileInfo& fileInfo );
+									Assets( QObject* parent, const Io::Path& path, AssetsModelQPtr assetsModel );
 
 		//! Puts an asset to cache.
 		bool						putToCache( const FileInfo& fileInfo, const String& uuid );
@@ -82,6 +70,17 @@ namespace Project {
 
 		//! Creates new asset instance by a specified extension.
 		Scene::AssetPtr				createAssetForFile( const FileInfo& fileInfo );
+
+    private slots:
+
+        //! Adds an asset to cache.
+		void						addAssetFile( const FileInfo& file );
+
+		//! Removes an asset from cache.
+		void						removeAssetFromCache( const FileInfo& file );
+
+		//! Performs caching of a changed asset.
+		void						updateAssetCache( const FileInfo& file );
 
 	private:
 

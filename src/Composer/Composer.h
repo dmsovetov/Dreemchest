@@ -204,7 +204,7 @@ DC_BEGIN_COMPOSER
 	namespace Project {
 
 		qDeclarePtr( Project )
-		dcDeclarePtrs( Assets )
+		qDeclarePtr( Assets )
 
 	} // namespace Project
 
