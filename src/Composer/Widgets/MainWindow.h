@@ -27,74 +27,68 @@
 #ifndef __DC_Composer_MainWindow_H__
 #define __DC_Composer_MainWindow_H__
 
-#include "Widget.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
 	//! Main application window Qt implementation
-	class MainWindow : public PrivateInterface<IMainWindow, QMainWindow> {
+	class MainWindow : public QMainWindow {
 	public:
 
 										//! Constructs MainWindow instance.
 										MainWindow( const String& title );
 									
 		//! Adds a new toolbar to window.
-		virtual IToolBarWPtr			addToolBar( void ) DC_DECL_OVERRIDE;
-	
-		//! Removes the toolbar from a window.
-		virtual void					removeToolBar( IToolBarWPtr toolBar ) DC_DECL_OVERRIDE;
+		ToolBarQPtr			            addToolBar( void );
 	
 		//! Adds a new menu to window.
-		virtual IMenuWPtr				addMenu( const String& text ) DC_DECL_OVERRIDE;
+		MenuQPtr				        addMenu( const String& text );
 	
-		//! Removes the menu from a window.
-		virtual void					removeMenu( IMenuWPtr menu ) DC_DECL_OVERRIDE;
-
 		//! Performs the main window initialization.
-		virtual bool					initialize( ComposerWPtr composer ) DC_DECL_OVERRIDE;
+		bool					        initialize( ComposerWPtr composer );
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		virtual IDocumentWPtr			editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset ) DC_DECL_OVERRIDE;
+		DocumentQPtr			        editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset );
 
 		//! Closes the document.
-		virtual bool					closeDocument( IDocumentWPtr document ) DC_DECL_OVERRIDE;
+		bool					        closeDocument( DocumentQPtr document );
 
 		//! Returns the opened document editor by asset.
-		virtual IDocumentWPtr			findDocument( const Scene::AssetWPtr& asset ) const DC_DECL_OVERRIDE;
+		DocumentQPtr			        findDocument( const Scene::AssetWPtr& asset ) const;
 
 		//! Returns an array of opened documents with a same type.
-		virtual DocumentsWeak			findDocuments( const Scene::AssetWPtr& asset ) const DC_DECL_OVERRIDE;
+		QVector<DocumentQPtr>			findDocuments( const Scene::AssetWPtr& asset ) const;
 
 		//! Shows the message box.
-		virtual void					message( const String& text, MessageStatus status = MessageInfo ) const DC_DECL_OVERRIDE;
+		void					        message( const String& text, MessageStatus status = MessageInfo ) const;
 
 		//! Shows the message box with yes, no, cancel buttons.
-		virtual MessageBoxResult		messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const DC_DECL_OVERRIDE;
+		MessageBoxResult		        messageYesNoCancel( const String& text, const String& info, MessageStatus status = MessageInfo ) const;
 
 		//! Returns the file system instance.
-		virtual FileSystemWPtr			fileSystem( void ) const DC_DECL_OVERRIDE;
+		FileSystemQPtr			        fileSystem( void ) const;
 
 		//! Returns the asset tree instance.
-		virtual AssetTreeWPtr			assetTree( void ) const DC_DECL_OVERRIDE;
+		AssetTreeQPtr			        assetTree( void ) const;
 
 		//! Returns the scene tree instance.
-		virtual ISceneTreeWPtr			sceneTree( void ) const DC_DECL_OVERRIDE;
+		SceneTreeQPtr			        sceneTree( void ) const;
 
 		//! Returns the object inspector instance.
-		virtual ObjectInspectorWPtr		objectInspector( void ) const DC_DECL_OVERRIDE;
+		InspectorQPtr		            inspector( void ) const;
 
 		//! Sets an active document.
-		virtual void					setActiveDocument( IDocumentWPtr dock ) DC_DECL_OVERRIDE;
+		void					        setActiveDocument( DocumentQPtr dock );
 
 		//! Returns the shared rendering context.
-		virtual IRenderingFrameWPtr		sharedRenderingContext( void ) const DC_DECL_OVERRIDE;
+		RenderingFrameQPtr		        sharedRenderingContext( void ) const;
 
 	private:
 
 		//! Ensures that the document was saved before closing.
-		bool							ensureSaved( IDocumentWPtr document ) const;
+		bool							ensureSaved( DocumentQPtr document ) const;
 
 		//! Creates the dock widget.
 		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetAreas allowedDockAreas = Qt::AllDockWidgetAreas, QDockWidget* destination = NULL );
@@ -107,15 +101,13 @@ namespace Ui {
 	
 	private:
 
-		QVector<IMenuPtr>				m_menues;					//!< All added menues reside here.
-		QVector<IToolBarPtr>			m_toolbars;					//!< All added toolbars reside here.
-		QVector<IDocumentPtr>			m_documents;				//!< All opened documents reside here.
-		IDocumentWPtr					m_activeDocument;			//!< An active document.
-		IRenderingFramePtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
-		FileSystemPtr					m_fileSystem;				//!< File system interface.
-		AssetTreePtr					m_assetTree;				//!< Asset tree instance.
-		ISceneTreePtr					m_sceneTree;				//!< Scene tree instance.
-		ObjectInspectorPtr				m_objectInspector;			//!< Object inspector instance.
+		QVector<DocumentQPtr>			m_documents;				//!< All opened documents reside here.
+		DocumentQPtr					m_activeDocument;			//!< An active document.
+		RenderingFrameQPtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
+		FileSystemQPtr					m_fileSystem;				//!< File system interface.
+		AssetTreeQPtr					m_assetTree;				//!< Asset tree instance.
+		SceneTreeQPtr					m_sceneTree;				//!< Scene tree instance.
+		InspectorQPtr				    m_inspector;			    //!< Object inspector instance.
 		Project::ProjectWPtr			m_project;					//!< Opened project.
 	};
 

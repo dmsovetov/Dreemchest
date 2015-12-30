@@ -151,7 +151,7 @@ DC_BEGIN_COMPOSER
 	public:
 
 							//! Constructs PropertyModel
-							explicit PropertyModel( QObject* parent = NULL );
+							explicit PropertyModel( QObject* parent );
 
 		//! Returns the total number of properties exposed.
 		int					propertyCount( void ) const;

@@ -28,12 +28,12 @@
 #define __DC_Composer_AssetEditor_H__
 
 #include "../Composer.h"
-#include "../IMimeData.h"
 
-#include "../Widgets/IDocument.h"
-#include "../Widgets/IRenderingFrame.h"
-#include "../Widgets/IMainWindow.h"
-#include "../Widgets/ISceneTree.h"
+#include "../Widgets/Document.h"
+#include "../Widgets/MainWindow.h"
+#include "../Widgets/SceneTree.h"
+#include "../Widgets/RenderingFrame.h"
+
 #include "../Models/SceneModel.h"
 
 DC_BEGIN_COMPOSER
@@ -45,13 +45,13 @@ namespace Editors {
 	public:
 
 		//! Asset editor has entered the foreground.
-		virtual void			notifyEnterForeground( Ui::IMainWindowWPtr window ) {}
+		virtual void			notifyEnterForeground( Ui::MainWindowQPtr window ) {}
 
 		//! Asset editor has entered the background.
-		virtual void			notifyEnterBackground( Ui::IMainWindowWPtr window ) {}
+		virtual void			notifyEnterBackground( Ui::MainWindowQPtr window ) {}
 
 		//! Performs asset editor initialization.
-		virtual bool			initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document );
+		virtual bool			initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document );
 
 		//! Saves the asset to disk.
 		virtual void			save( void ) {}
@@ -63,12 +63,12 @@ namespace Editors {
 		Scene::AssetWPtr		asset( void ) const;
 
 		//! Returns the parent document.
-		Ui::IDocumentWPtr		document( void ) const;
+		Ui::DocumentQPtr		document( void ) const;
 
 	protected:
 
 		Project::ProjectWPtr	m_project;	//!< Parent project instance.
-		Ui::IDocumentWPtr		m_document;	//!< Parent document.
+		Ui::DocumentQPtr		m_document;	//!< Parent document.
 		Scene::AssetPtr			m_asset;	//!< An asset being edited.
 	};
 

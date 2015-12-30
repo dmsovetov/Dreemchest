@@ -38,12 +38,12 @@ namespace Importers {
 	public:
 
 		//! Writes the imported image to file.
-		virtual bool		import( FileSystemWPtr fs,const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
+		virtual bool		import( FileSystemQPtr fs,const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
 
 	private:
 
 		//! Imports an image from file.
-		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) = 0;
+		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) = 0;
 
 	protected:
 
@@ -63,7 +63,7 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TGA image.
-		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
+		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -84,7 +84,7 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TIF image.
-		virtual bool		importImage( FileSystemWPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
+		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
 	};
 
 #endif	/*	HAVE_TIFF	*/

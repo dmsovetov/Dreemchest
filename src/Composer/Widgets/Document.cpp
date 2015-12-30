@@ -28,33 +28,33 @@
 
 #include "MainWindow.h"
 #include "RenderingFrame.h"
-#include "../../Editors/AssetEditor.h"
+
+#include "../Editors/AssetEditor.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ------------------------------------------- QDocumentDock ------------------------------------------- //
-
-// ** QDocumentDock::QDocumentDock
-QDocumentDock::QDocumentDock( Document* document, const QString& title, QWidget* parent ) : QDockWidget( title, parent ), m_document( document )
+// ** Document::Document
+Document::Document( MainWindowQPtr parent, Editors::AssetEditorPtr assetEditor, const QString& title )
+    : QDockWidget( title, NULL ), m_mainWindow( parent ), m_assetEditor( assetEditor ), m_renderingFrame( NULL )
 {
 	connect( this, SIGNAL(visibilityChanged(bool)), this, SLOT(visibilityChanged(bool)) );
 }
 
-// ** QDocumentDock::visibilityChanged
-void QDocumentDock::visibilityChanged( bool visible )
+// ** Document::visibilityChanged
+void Document::visibilityChanged( bool visible )
 {
 	if( visible ) {
-		m_document->activate();
+		m_mainWindow->setActiveDocument( this );
 	}
 }
 
-// ** QDocumentDock::closeEvent
-void QDocumentDock::closeEvent( QCloseEvent *e )
+// ** Document::closeEvent
+void Document::closeEvent( QCloseEvent *e )
 {
 	// Close the document
-	if( !m_document->close() ) {
+	if( !m_mainWindow->closeDocument( this ) ) {
 		e->ignore();
 	} else {
 		// Process the event
@@ -62,36 +62,27 @@ void QDocumentDock::closeEvent( QCloseEvent *e )
 	}
 }
 
-// ---------------------------------------------- Document ---------------------------------------------- //
-
-// ** Document::Document
-Document::Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent )
-	: PrivateInterface( new QDocumentDock( this, title.c_str(), parent ) ), m_mainWindow( mainWindow ), m_assetEditor( assetEditor )
-{
-
-}
-
 // ** Document::renderingFrame
-IRenderingFrameWPtr Document::renderingFrame( void ) const
+RenderingFrameQPtr Document::renderingFrame( void ) const
 {
 	return m_renderingFrame;
 }
 
 // ** Document::attachRenderingFrame
-IRenderingFrameWPtr Document::attachRenderingFrame( void )
+RenderingFrameQPtr Document::attachRenderingFrame( void )
 {
-	DC_BREAK_IF( m_renderingFrame.valid() );
+	DC_BREAK_IF( m_renderingFrame );
 
 	// Get the shared rendering context
-	IRenderingFrameWPtr sharedContext = m_mainWindow->sharedRenderingContext();
+	RenderingFrameQPtr sharedContext = m_mainWindow->sharedRenderingContext();
 
 	// Create the rendering frame instance
-	m_renderingFrame = new RenderingFrame( sharedContext->privateInterface<QRenderingFrame>(), m_private.get() );
+	m_renderingFrame = new RenderingFrame( sharedContext, this );
 	m_renderingFrame->setInterval( 10 );
-	m_renderingFrame->privateInterface<QRenderingFrame>()->makeCurrent();
+	m_renderingFrame->makeCurrent();
 
 	// Set the rendering frame as a main widget of a dock widget
-	m_private->setWidget( m_renderingFrame->privateInterface<QRenderingFrame>() );
+	setWidget( m_renderingFrame );
 
 	return m_renderingFrame;
 }
@@ -100,18 +91,6 @@ IRenderingFrameWPtr Document::attachRenderingFrame( void )
 Editors::AssetEditorWPtr Document::assetEditor( void ) const
 {
 	return m_assetEditor;
-}
-
-// ** Document::activate
-void Document::activate( void )
-{
-	m_mainWindow->setActiveDocument( this );
-}
-
-// ** Document::close
-bool Document::close( void )
-{
-	return m_mainWindow->closeDocument( this );
 }
 
 } // namespace Ui

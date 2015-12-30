@@ -45,9 +45,17 @@
 	#include <QtOpenGL>
 #endif
 
+#define qCheckParent( object )          \
+            if( (object) == NULL )  {   \
+                qWarning() << "Object has no parent" << __FUNCTION__ << __FILE__ << __LINE__;   \
+            }
+
 #define qDeclarePtrs( T )							\
 		    typedef QSharedPointer<class T>	T##Ptr;	\
 	        typedef QWeakPointer<class T>	T##WPtr;
+
+#define qDeclarePtr( T )		        \
+		    typedef class T* T##QPtr;
 
 #define DC_BEGIN_COMPOSER	/*namespace Composer {*/
 #define DC_END_COMPOSER		/*}*/
@@ -62,17 +70,17 @@ DC_BEGIN_COMPOSER
 
 	namespace Ui {
 
-        qDeclarePtrs( AssetTree )
+        qDeclarePtr( AssetTree )
+        qDeclarePtr( MainWindow )
+        qDeclarePtr( Document )
+        qDeclarePtr( SceneTree )
+        qDeclarePtr( Inspector )
+		qDeclarePtr( Action )
+		qDeclarePtr( Menu )
+		qDeclarePtr( ToolBar )
+		qDeclarePtr( RenderingFrame )
 
-		dcDeclarePtrs( IMainWindow )
-		dcDeclarePtrs( IAction )
-		dcDeclarePtrs( IMenu )
-		dcDeclarePtrs( IToolBar )
-		dcDeclarePtrs( IRenderingFrame )
 		dcDeclarePtrs( IRenderingFrameDelegate )
-		dcDeclarePtrs( IDocument )
-		dcDeclarePtrs( ISceneTree )
-		dcDeclarePtrs( ObjectInspector )
 
 		//! Message status.
 		enum MessageStatus {
@@ -95,17 +103,21 @@ DC_BEGIN_COMPOSER
 			, MiddleMouseButton	= BIT( 2 )	//!< Middle mouse button.
 		};
 
-		//! Auto ptr type for signal delegate instances.
-		typedef AutoPtr<class QSignalDelegate> QSignalDelegatePtr;
-
-		//! Container type to store array of documents.
-		typedef Array<IDocumentWPtr> DocumentsWeak;
-
 		//! Menu action callback type.
-		typedef std::function<void(IActionWPtr)> ActionCallback;
+		typedef std::function<void(ActionQPtr)> ActionCallback;
 
-		//! Factory method used for main window creation.
-		extern IMainWindowPtr createMainWindow( const String& title );
+	    //! Enumeration combo box.
+	    template<typename TModel>
+	    class QEnumComboBox : public QComboBox {
+	    public:
+
+						    //! Constructs QEnumComboBox instance
+						    QEnumComboBox( QWidget* parent = NULL )
+							    : QComboBox( parent ) { setModel( new TModel ); }
+	    };
+
+	    //! Converts the Qt key index to engine key.
+	    extern Platform::Key convertKey( s32 key );
 
 	} // namespace Ui
 
@@ -194,25 +206,17 @@ DC_BEGIN_COMPOSER
 	} // namespace Project
 
 	dcDeclarePtrs( Composer )
-	dcDeclarePtrs( FileSystem )
-	dcDeclarePtrs( FileInfo )
-	dcDeclarePtrs( IMimeData )
-	qDeclarePtrs( AssetsModel )
-    qDeclarePtrs( FilteredAssetsModel )
-	qDeclarePtrs( PropertyModel )
-    qDeclarePtrs( SceneModel )
 
-	//! Factory method used for assets model creation.
-	extern AssetsModelPtr createAssetsModel( void );
+    qDeclarePtr( FileSystem )
+    qDeclarePtr( SceneModel )
+    qDeclarePtr( AssetsModel )
+    qDeclarePtr( FilteredAssetsModel )
+    qDeclarePtr( PropertyModel )
 
-	//! Factory method used for scene model creation.
-	extern SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene );
-
-	//! Factory method used for material model creation.
-	extern PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material );
+    typedef const QMimeData* MimeDataQPtr;
 
 	//! Container type to store file info.
-	typedef Array<FileInfoPtr> FileInfoArray;
+	typedef QVector<class FileInfo> FileInfoArray;
 
 	//! Base interface class.
 	class IInterface : public RefCountedEventEmitter {
@@ -296,13 +300,13 @@ DC_BEGIN_COMPOSER
 		Project::ProjectWPtr	project( void ) const;
 
 		//! Returns main window pointer.
-		Ui::IMainWindowWPtr		window( void ) const;
+		Ui::MainWindowQPtr		window( void ) const;
 
 		//! Extracts an asset set from MIME data.
-		Scene::AssetSet			assetsFromMime( IMimeDataWPtr mime ) const;
+		Scene::AssetSet			assetsFromMime( MimeDataQPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Scene::AssetPtr			assetFromMime( IMimeDataWPtr mime ) const;
+		Scene::AssetPtr			assetFromMime( MimeDataQPtr mime ) const;
 
 		//! Creates the Composer instance.
 		static ComposerPtr		create( void );
@@ -313,22 +317,22 @@ DC_BEGIN_COMPOSER
 	private:
 
 								//! Constructs Composer instance.
-								Composer( Ui::IMainWindowPtr mainWindow );
+								Composer( Ui::MainWindowQPtr mainWindow );
 
 		//! Creates a new project.
-		void					menuCreateProject( Ui::IActionWPtr action );
+		void					menuCreateProject( Ui::ActionQPtr action );
 
 		//! Opens an existing project.
-		void					menuOpenProject( Ui::IActionWPtr action );
+		void					menuOpenProject( Ui::ActionQPtr action );
 
 		//! Saves current project.
-		void					menuSaveProject( Ui::IActionWPtr action );
+		void					menuSaveProject( Ui::ActionQPtr action );
 
 		//! Undo the last action.
-		void					menuUndo( Ui::IActionWPtr action );
+		void					menuUndo( Ui::ActionQPtr action );
 
 		//! Redo the last action.
-		void					menuRedo( Ui::IActionWPtr action );
+		void					menuRedo( Ui::ActionQPtr action );
 
 		//! Performs the composer initialization.
 		bool					initialize( void );
@@ -336,8 +340,8 @@ DC_BEGIN_COMPOSER
 	private:
 
 		static ComposerWPtr		s_instance;				//!< Shared composer instance.
-		Ui::IMainWindowPtr		m_mainWindow;			//!< Main composer window.
-		Ui::IMenuWPtr			m_menues[TotalMenues];	//!< Default menues.
+		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
+		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
 		Project::ProjectPtr		m_project;				//!< Active project.
 	};
 

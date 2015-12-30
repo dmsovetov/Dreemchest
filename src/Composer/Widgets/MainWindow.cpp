@@ -25,17 +25,17 @@
  **************************************************************************/
 
 #include "MainWindow.h"
-#include "Menu.h"
 
-#include "RenderingFrame.h"
-#include "FileSystem.h"
-#include "../AssetTree.h"
-#include "SceneTree.h"
+#include "AssetTree.h"
 #include "Document.h"
-#include "ObjectInspectorPrivate.h"
+#include "SceneTree.h"
+#include "Inspector.h"
+#include "Menu.h"
+#include "RenderingFrame.h"
 
-#include "../../Project/Project.h"
-#include "../../Editors/AssetEditor.h"
+#include "../FileSystem.h"
+#include "../Project/Project.h"
+#include "../Editors/AssetEditor.h"
 
 #if DEV_USE_DOCK_INDICATOR
 	#include "DockIndicator.h"
@@ -44,12 +44,6 @@
 DC_BEGIN_COMPOSER
 
 namespace Ui {
-
-// ** createMainWindow
-IMainWindowPtr createMainWindow( const String& title )
-{
-	return IMainWindowPtr( new MainWindow( title ) );
-}
 
 // ** convertKey
 Platform::Key convertKey( s32 key )
@@ -67,38 +61,38 @@ Platform::Key convertKey( s32 key )
 }
 
 // ** MainWindow::MainWindow
-MainWindow::MainWindow( const String& title ) : PrivateInterface( new QMainWindow )
+MainWindow::MainWindow( const String& title ) : m_assetTree( NULL ), m_activeDocument( NULL ), m_sceneTree( NULL ), m_inspector( NULL )
 {
 #if DEV_USE_DOCK_INDICATOR
 	// Add the dock indicator widget
-	new DockIndicator( m_private.get() );
+	new DockIndicator( this );
 #endif	/*	DEV_USE_DOCK_INDICATOR	*/
 
 	// Setup the share OpenGL format
-	QRenderingFrame::setupOpenGLFormat();
+	RenderingFrame::setupOpenGLFormat();
 
 	// Create the shared OpenGL context
-	m_sharedRenderingContext = new RenderingFrame( NULL, m_private.get() );
-	m_sharedRenderingContext->privateInterface<QRenderingFrame>()->hide();
-	//m_private->setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
+	m_sharedRenderingContext = new RenderingFrame( NULL, this );
+	m_sharedRenderingContext->hide();
+	//setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
 
 #ifdef NDEBUG
-	//m_private->setWindowState( Qt::WindowMaximized );
-	m_private->resize( 1024, 768 );
+	//setWindowState( Qt::WindowMaximized );
+	resize( 1024, 768 );
 #else
-	m_private->resize( 1024, 768 );
+	resize( 1024, 768 );
 #endif
 
-    m_private->setUnifiedTitleAndToolBarOnMac( true );
-	m_private->show();
-	m_private->setWindowTitle( title.c_str() );
+    setUnifiedTitleAndToolBarOnMac( true );
+	show();
+	setWindowTitle( title.c_str() );
 }
 
 // ** MainWindow::initialize
 bool MainWindow::initialize( ComposerWPtr composer )
 {
 	// Create the file system
-	m_fileSystem = new FileSystemPrivate( m_private.get() );
+	m_fileSystem = new FileSystem( this );
 
 	// Listen for events
 	composer->subscribe<Composer::ProjectOpened>( dcThisMethod( MainWindow::onProjectOpened ) );
@@ -111,9 +105,9 @@ bool MainWindow::initialize( ComposerWPtr composer )
 void MainWindow::message( const String& text, MessageStatus status ) const
 {
 	switch( status ) {
-	case MessageInfo:		QMessageBox::information( m_private.get(), m_private->windowTitle(), text.c_str() );	break;
-	case MessageWarning:	QMessageBox::warning( m_private.get(), m_private->windowTitle(), text.c_str() );		break;
-	case MessageError:		QMessageBox::critical( m_private.get(), m_private->windowTitle(), text.c_str() );		break;
+	case MessageInfo:		QMessageBox::information( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );	break;
+	case MessageWarning:	QMessageBox::warning( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
+	case MessageError:		QMessageBox::critical( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
 	default:				DC_BREAK;
 	}
 }
@@ -143,53 +137,52 @@ MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const Strin
 }
 
 // ** MainWindow::sharedRenderingContext
-IRenderingFrameWPtr MainWindow::sharedRenderingContext( void ) const
+RenderingFrameQPtr MainWindow::sharedRenderingContext( void ) const
 {
 	return m_sharedRenderingContext;
 }
 
 // ** MainWindow::fileSystem
-FileSystemWPtr MainWindow::fileSystem( void ) const
+FileSystemQPtr MainWindow::fileSystem( void ) const
 {
 	return m_fileSystem;
 }
 
 // ** MainWindow::assetTree
-AssetTreeWPtr MainWindow::assetTree( void ) const
+AssetTreeQPtr MainWindow::assetTree( void ) const
 {
 	return m_assetTree;
 }
 
 // ** MainWindow::sceneTree
-ISceneTreeWPtr MainWindow::sceneTree( void ) const
+SceneTreeQPtr MainWindow::sceneTree( void ) const
 {
 	return m_sceneTree;
 }
 
-// ** MainWindow::objectInspector
-ObjectInspectorWPtr MainWindow::objectInspector( void ) const
+// ** MainWindow::inspector
+InspectorQPtr MainWindow::inspector( void ) const
 {
-	return m_objectInspector;
+	return m_inspector;
 }
 
 // ** MainWindow::addMenu
-IMenuWPtr MainWindow::addMenu( const String& title )
+MenuQPtr MainWindow::addMenu( const String& title )
 {
-	QMenuBar* bar  = m_private->menuBar();
+	QMenuBar* bar  = menuBar();
 	Menu*	  menu = new Menu( bar );
 
-	menu->setTitle( title );
-	bar->addMenu( menu->privateInterface<QMenu>() );
-	m_menues.append( menu );
+	menu->setTitle( QString::fromStdString( title ) );
+	bar->addMenu( menu );
 
 	return menu;
 }
 
 // ** MainWindow::addToolBar
-IToolBarWPtr MainWindow::addToolBar( void )
+ToolBarQPtr MainWindow::addToolBar( void )
 {
-	ToolBar *toolBar = new ToolBar( m_private.get() );
-	m_private->addToolBar( toolBar->privateInterface<QToolBar>() );
+	ToolBar* toolBar = new ToolBar( this );
+	QMainWindow::addToolBar( toolBar );
 
 	return toolBar;
 }
@@ -200,62 +193,45 @@ QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::Dock
 	QDockWidget* dock = new QDockWidget( name );
 	dock->setAllowedAreas( allowedDockAreas );
 	dock->setWidget( widget );
-	m_private->addDockWidget( initialDockArea, dock );
+	addDockWidget( initialDockArea, dock );
 
 	if( destination ) {
-		m_private->tabifyDockWidget( dock, destination );
+		tabifyDockWidget( dock, destination );
 	}
 
 	return dock;
 }
 
-// ** MainWindow::removeToolBar
-void MainWindow::removeToolBar( IToolBarWPtr toolBar )
-{
-	m_private->removeToolBar( toolBar->privateInterface<QToolBar>() );
-}
-
-// ** MainWindow::removeMenu
-void MainWindow::removeMenu( IMenuWPtr menu )
-{
-	s32 index = m_menues.indexOf( menu );
-
-	if( index == -1 ) {
-		return;
-	}
-
-	m_menues.remove( index );
-}
-
 // ** MainWindow::editDocument
-IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset )
+DocumentQPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset )
 {
 	DC_BREAK_IF( !assetEditor.valid() );
 
 	// First lookup the exising document
-	IDocumentWPtr existing = findDocument( asset );
+	DocumentQPtr existing = findDocument( asset );
 
-	if( existing.valid() ) {
-		existing->privateInterface<QDocumentDock>()->raise();
+	if( existing ) {
+		existing->raise();
 		return existing;
 	}
 
 	// Create the document instance
-	IDocumentPtr document( new Document( this, assetEditor, asset->name() ) );
+	DocumentQPtr document = new Document( this, assetEditor, QString::fromStdString( asset->name() ) );
 
 	// Initialize the asset editor with a document
 	if( !assetEditor->initialize( m_project, asset, document ) ) {
-		return IDocumentWPtr();
+        delete document;
+		return NULL;
 	}
 
-	m_private->addDockWidget( Qt::LeftDockWidgetArea, document->privateInterface<QDocumentDock>() );
+	addDockWidget( Qt::LeftDockWidgetArea, document );
 
 	// Find opened documents of a same type
-	DocumentsWeak documents = findDocuments( asset );
+	QVector<DocumentQPtr> documents = findDocuments( asset );
 
 	if( documents.size() ) {
-		QDockWidget*tabifyTo = documents[0]->privateInterface<QDocumentDock>();
-		m_private->tabifyDockWidget( tabifyTo, document->privateInterface<QDocumentDock>() );
+		QDockWidget* tabifyTo = documents[0];
+		tabifyDockWidget( tabifyTo, document );
 	}
 
 	// Set the document as active
@@ -268,7 +244,7 @@ IDocumentWPtr MainWindow::editDocument( Editors::AssetEditorWPtr assetEditor, co
 }
 
 // ** MainWindow::closeDocument
-bool MainWindow::closeDocument( IDocumentWPtr document )
+bool MainWindow::closeDocument( DocumentQPtr document )
 {
 	// Find the document
 	int index = m_documents.indexOf( document );
@@ -284,37 +260,40 @@ bool MainWindow::closeDocument( IDocumentWPtr document )
 	}
 
 	// Change active document
-	setActiveDocument( (m_documents.size() - 1) ? m_documents[index - 1] : IDocumentWPtr() );
+	setActiveDocument( (m_documents.size() - 1) ? m_documents[index - 1] : NULL );
 
 	// Remove the document dock widget
-	m_private->removeDockWidget( document->privateInterface<QDocumentDock>() );
+	removeDockWidget( document );
 
 	// Remove from documents
 	m_documents.remove( index );
+
+    // Delete document
+    delete document;
 
 	return true;
 }
 
 // ** MainWindow::findDocument
-IDocumentWPtr MainWindow::findDocument( const Scene::AssetWPtr& asset ) const
+DocumentQPtr MainWindow::findDocument( const Scene::AssetWPtr& asset ) const
 {
-	foreach( IDocumentWPtr document, m_documents ) {
+	foreach( DocumentQPtr document, m_documents ) {
 		if( document->assetEditor()->asset() == asset ) {
 			return document;
 		}
 	}
 
-	return IDocumentWPtr();
+	return NULL;
 }
 
 // ** MainWindow::findDocuments
-DocumentsWeak MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
+QVector<DocumentQPtr> MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
 {
-	DocumentsWeak documents;
+	QVector<DocumentQPtr> documents;
 
-	foreach( IDocumentWPtr document, m_documents ) {
+	foreach( DocumentQPtr document, m_documents ) {
 		if( document->assetEditor()->asset()->type() == asset->type() ) {
-			documents.push_back( document );
+			documents.append( document );
 		}
 	}
 
@@ -322,7 +301,7 @@ DocumentsWeak MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
 }
 
 // ** MainWindow::setActiveDocument
-void MainWindow::setActiveDocument( IDocumentWPtr document )
+void MainWindow::setActiveDocument( DocumentQPtr document )
 {
 	// This document is already set as active
 	if( m_activeDocument == document ) {
@@ -330,7 +309,7 @@ void MainWindow::setActiveDocument( IDocumentWPtr document )
 	}
 
 	// Notify the active document about moving to background.
-	if( m_activeDocument.valid() ) {
+	if( m_activeDocument ) {
 		m_activeDocument->assetEditor()->notifyEnterBackground( this );
 	}
 
@@ -338,9 +317,9 @@ void MainWindow::setActiveDocument( IDocumentWPtr document )
 	m_activeDocument = document;
 
 	// Notify active document about moving to foreground.
-	if( m_activeDocument.valid() ) {
+	if( m_activeDocument ) {
 		// Raise the document dock widget
-		m_activeDocument->privateInterface<QDocumentDock>()->raise();
+		m_activeDocument->raise();
 
 		// Notify the asset editor
 		m_activeDocument->assetEditor()->notifyEnterForeground( this );
@@ -348,7 +327,7 @@ void MainWindow::setActiveDocument( IDocumentWPtr document )
 }
 
 // ** MainWindow::ensureSaved
-bool MainWindow::ensureSaved( IDocumentWPtr document ) const
+bool MainWindow::ensureSaved( DocumentQPtr document ) const
 {
 	// Get the attached asset editor.
 	Editors::AssetEditorWPtr assetEditor = document->assetEditor();
@@ -375,30 +354,34 @@ bool MainWindow::ensureSaved( IDocumentWPtr document ) const
 // ** MainWindow::onProjectOpened
 void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 {
+    DC_BREAK_IF( m_assetTree );
+    DC_BREAK_IF( m_sceneTree );
+    DC_BREAK_IF( m_inspector );
+
 	// Get the project from event
 	m_project = e.project;
 
 	// Create the asset tree
-	m_assetTree = AssetTreePtr::create( m_project );
+	m_assetTree = new AssetTree( m_project, this );
 	m_assetTree->setModel( m_project->assetsModel() );
 
 	// Create the scene tree
-	m_sceneTree = new SceneTree;
+	m_sceneTree = new SceneTree( this );
 
 	// Create the object inspector
-	m_objectInspector = new ObjectInspectorPrivate( m_private.get() );
+	m_inspector = new Inspector( this );
 
 	// Setup status bar
-	m_private->statusBar()->show();
+	statusBar()->show();
 
 	// Add dock windows
-	addDock( "Inspector", m_objectInspector->privateInterface<QObjectInspector>(), Qt::RightDockWidgetArea );
-	addDock( "Assets", m_assetTree.data(), Qt::RightDockWidgetArea );
-	addDock( "Hierarchy", m_sceneTree->privateInterface<QSceneTree>(), Qt::LeftDockWidgetArea );
+	addDock( "Inspector", m_inspector, Qt::RightDockWidgetArea );
+	addDock( "Assets", m_assetTree, Qt::RightDockWidgetArea );
+	addDock( "Hierarchy", m_sceneTree, Qt::LeftDockWidgetArea );
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
 
 	// Update window caption
-	m_private->setWindowTitle( m_project->name().c_str() + QString( " - Dreemchest Composer" ) );
+	setWindowTitle( m_project->name().c_str() + QString( " - Dreemchest Composer" ) );
 }
 
 // ** MainWindow::onProjectClosed

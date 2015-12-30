@@ -24,73 +24,54 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_Document_H__
-#define __DC_Composer_Qt_Document_H__
+#ifndef __DC_Composer_Document_H__
+#define __DC_Composer_Document_H__
 
-#include "Widget.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Subclass of a QDockWidget.
-	class QDocumentDock : public QDockWidget {
+	//! Subclass of a QDockWidget that contains single opened document.
+	class Document : public QDockWidget {
 
 		Q_OBJECT
 
 	public:
 
-											//! Constructs the QDocumentDock instance.
-											QDocumentDock( Document* document, const QString& title, QWidget* parent );
+									//! Constructs the Document instance.
+									Document( MainWindowQPtr parent, Editors::AssetEditorPtr assetEditor, const QString& title );
+
+
+		//! Returns the rendering frame used for this document dock.
+		RenderingFrameQPtr			renderingFrame( void ) const;
+
+		//! Attaches the rendering frame to this document.
+		RenderingFrameQPtr			attachRenderingFrame( void );
+
+		//! Returns an attached asset editor.
+		Editors::AssetEditorWPtr	assetEditor( void ) const;
+
 	private:
 
 		//! Handles the closed event.
-		virtual void						closeEvent( QCloseEvent *e ) Q_DECL_OVERRIDE;
+		virtual void				closeEvent( QCloseEvent *e ) Q_DECL_OVERRIDE;
 
 	private slots:
 
 		//! Handles the visibility changed signal
-		void								visibilityChanged( bool visible );
+		void						visibilityChanged( bool visible );
 
-	private:
+    private:
 
-		Document*							m_document;	//!< Parent document dock.
-	};
-
-	//! Document Qt implementation.
-	class Document : public PrivateInterface<IDocument, QDocumentDock> {
-	friend class QDocumentDock;
-	public:
-
-											//! Constructs the Document instance.
-											Document( IMainWindowWPtr mainWindow, Editors::AssetEditorPtr assetEditor, const String& title, QWidget* parent = NULL );
-
-		//! Returns the rendering frame used for this document dock.
-		virtual IRenderingFrameWPtr			renderingFrame( void ) const;
-
-		//! Attaches the rendering frame to this document.
-		virtual IRenderingFrameWPtr			attachRenderingFrame( void );
-
-		//! Returns an attached asset editor.
-		virtual Editors::AssetEditorWPtr	assetEditor( void ) const;
-
-	private:
-
-		//! Sets this document as active.
-		void								activate( void );
-
-		//! Closes this document.
-		bool								close( void );
-
-	private:
-
-		IMainWindowWPtr						m_mainWindow;		//!< Parent main window.
-		IRenderingFramePtr					m_renderingFrame;	//!< The attached rendering frame.
-		Editors::AssetEditorPtr				m_assetEditor;		//!< Asset editor attached to this document dock.
+		MainWindowQPtr				m_mainWindow;		//!< Parent main window.
+		RenderingFrameQPtr			m_renderingFrame;	//!< The attached rendering frame.
+		Editors::AssetEditorPtr		m_assetEditor;		//!< Asset editor attached to this document dock
 	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_Document_H__	*/
+#endif	/*	!__DC_Composer_Document_H__	*/

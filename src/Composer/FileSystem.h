@@ -24,81 +24,83 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_IFileSystem_H__
-#define __DC_Composer_IFileSystem_H__
+#ifndef __DC_Composer_FileSystem_H__
+#define __DC_Composer_FileSystem_H__
 
 #include "Composer.h"
 
 DC_BEGIN_COMPOSER
 
-	//! File info interface.
-	class FileInfo : public RefCounted {
+	//! Qt File info extension
+	class FileInfo : public QFileInfo {
 	public:
 
-		virtual					~FileInfo( void ) {}
+                                //! Constructs FileInfo instance from file path.
+                                FileInfo( const String& path );
+
+								//! Constructs FileInfo instance.
+								FileInfo( const QFileInfo& fileInfo = QFileInfo() );
 
 		//! Returns the file extension.
-		virtual String			extension( void ) const = 0;
+		String			        extension( void ) const;
 
 		//! Returns the file timestamp.
-		virtual u32				timestamp( void ) const = 0;
+		u32				        timestamp( void ) const;
 
 		//! Returns the file name.
-		virtual String			fileName( void ) const = 0;
+		String			        fileName( void ) const;
 
 		//! Returns absolute directory path of a file.
-		virtual String			dir( void ) const = 0;
+		String			        dir( void ) const;
 
 		//! Returns absolute file path.
-		virtual String			absolutePath( void ) const = 0;
+		String			        absolutePath( void ) const;
 
 		//! Returns relative file name to a specified path.
-		virtual String			relativePath( const String& path ) const = 0;
-
-		//! Returns true if this is a directory.
-		virtual bool			isDir( void ) const = 0;
+		String			        relativePath( const String& path ) const;
 	};
 
-	//! File system interface.
-	class FileSystem : public RefCounted {
+	//! File system interface based on Qt file methods.
+	class FileSystem : public QObject {
 	public:
 
-		virtual					~FileSystem( void ) {}
+								//! Constructs FileSystem instance.
+								FileSystem( QObject* parent );
 
 		//! Returns the user's documents location.
-		virtual String			documentsLocation( void ) const = 0;
-		
-		//! Copies the file from one location to another.
-		virtual bool			copyFile( const String& source, const String& dest, bool force = false ) = 0;
+		String			        documentsLocation( void ) const;
 
-		//! Removes the existing file.
-		virtual bool			removeFile( const String& path ) = 0;
+		//! Copies the file from one location to another.
+		bool			        copyFile( const String& source, const String& dest, bool force = false );
 
 		//! Returns true if the file exists.
-		virtual bool			fileExists( const String& path ) const = 0;
+		bool			        fileExists( const String& path ) const;
+
+		//! Removes the existing file.
+		bool			        removeFile( const String& path );
 
 		//! Extracts the file info from path.
-		virtual FileInfoPtr		extractFileInfo( const String& path ) const = 0;
+		FileInfo		        extractFileInfo( const String& path ) const;
 
 		//! Selects an existing directory.
-		virtual String			selectExistingDirectory( const String& title, const String& dir = "" ) const = 0;
+		String			        selectExistingDirectory( const String& title, const String& dir = "" ) const;
 
 		//! Selects existing files.
-		virtual StringArray		selectExistingFiles( const String& title, const String& ext = "*.*", const String& dir = "" ) const = 0;
+		StringArray		        selectExistingFiles( const String& title, const String& ext = "*.*", const String& dir = "" ) const;
 
 		//! Creates a new directory if it does not exists.
-		virtual bool			createDirectory( const String& path ) = 0;
+		bool			        createDirectory( const String& path );
 
 		//! Creates an empty file at specified path.
-		virtual bool			createFile( const String& path ) = 0;
+		bool			        createFile( const String& path );
 
 		//! Generates the file name that does not exist at specified path.
-		virtual String			generateFileName( const String& path, const String& name, const String& ext ) const = 0;
+		String			        generateFileName( const String& path, const String& name, const String& ext ) const;
 
 		//! Browses to a selected path.
-		virtual bool			browse( const String& path ) = 0;
+		bool			        browse( const String& path );
 	};
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_IFileSystem_H__	*/
+#endif	/*	!__DC_Composer_FileSystem_H__	*/

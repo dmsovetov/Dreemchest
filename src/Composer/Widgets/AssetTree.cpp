@@ -26,14 +26,15 @@
 
 #include "AssetTree.h"
 
-#include "Qt/Menu.h"
-#include "Qt/FileSystem.h"
-#include "Qt/Document.h"
-#include "Qt/MimeData.h"
-#include "Qt/ObjectInspectorPrivate.h"
+#include "Document.h"
+#include "Inspector.h"
+#include "Menu.h"
+
+#include "../Models/AssetModels.h"
 #include "../Models/PropertyModel.h"
 #include "../Models/AssetsModel.h"
 #include "../Project/Project.h"
+#include "../FileSystem.h"
 
 DC_BEGIN_COMPOSER
 
@@ -75,7 +76,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								}
 
 								// Decode asset
-								Scene::AssetPtr asset = Composer::instance()->assetFromMime( new MimeData( de->mimeData() ) );
+								Scene::AssetPtr asset = Composer::instance()->assetFromMime( de->mimeData() );
 
 								// Check asset type
 								if( !asset.valid() || (asset->type() & m_mask) == 0 ) {
@@ -91,7 +92,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								QDropEvent* de = static_cast<QDropEvent*>( e );
 
 								// Decode asset
-								Scene::AssetWPtr asset = Composer::instance()->assetFromMime( new MimeData( de->mimeData() ) );
+								Scene::AssetWPtr asset = Composer::instance()->assetFromMime( de->mimeData() );
 								
 								// Set the value
 								setValue( asset );
@@ -124,7 +125,7 @@ void AssetSelector::setValue( const Scene::AssetWPtr& value )
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
 
 // ** AssetTree::AssetTree
-AssetTree::AssetTree( Project::ProjectWPtr project ) : m_project( project ), m_selectionChanged( false )
+AssetTree::AssetTree( Project::ProjectWPtr project, QWidget* parent ) : QTreeView( parent ), m_project( project ), m_selectionChanged( false )
 {
 	setHeaderHidden( true );
 	setDragEnabled( true );
@@ -140,16 +141,16 @@ AssetTree::AssetTree( Project::ProjectWPtr project ) : m_project( project ), m_s
 }
 
 // ** AssetTree::model
-AssetsModelWPtr AssetTree::model( void ) const
+AssetsModelQPtr AssetTree::model( void ) const
 {
     return m_proxy->model();
 }
 
 // ** AssetTree::setModel
-void AssetTree::setModel( AssetsModelWPtr value )
+void AssetTree::setModel( AssetsModelQPtr value )
 {
-	m_proxy = FilteredAssetsModelPtr( new FilteredAssetsModel( value, this ) );
-	QTreeView::setModel( m_proxy.data() );
+	m_proxy = new FilteredAssetsModel( value, this );
+	QTreeView::setModel( m_proxy );
 
 #if !DEV_CUSTOM_ASSET_MODEL
 	setRootIndex( m_proxy->root() );
@@ -163,11 +164,9 @@ void AssetTree::setModel( AssetsModelWPtr value )
 // ** AssetTree::keyPressEvent
 void AssetTree::keyPressEvent( QKeyEvent *event )
 {
-	FilteredAssetsModel* model = m_proxy.data();
-
     switch( event->key() ) {
     case Qt::Key_Delete:	foreach( QModelIndex idx, selectedIndexes() ) {
-								model->remove( idx );
+								m_proxy->remove( idx );
 							}
 							break;
     }
@@ -178,26 +177,24 @@ void AssetTree::keyPressEvent( QKeyEvent *event )
 // ** AssetTree::contextMenuEvent
 void AssetTree::contextMenuEvent( QContextMenuEvent *e )
 {
-	IMenuPtr menu( new Menu( this ) );
+	MenuQPtr menu = new Menu( this );
 
     m_project->fillAssetMenu( menu, this );
-    menu->exec( e->globalPos().x(), e->globalPos().y() );
+    menu->exec( e->globalPos() );
 }
 
 // ** AssetTree::itemDoubleClicked
 void AssetTree::itemDoubleClicked( const QModelIndex& index )
 {
-	FilteredAssetsModel* proxy = m_proxy.data();
-
 	// Get the file info by index
-	FileInfoPtr file = proxy->assetFile( index );
+	FileInfo file = m_proxy->assetFile( index );
 
-	if( file->isDir() ) {
+	if( file.isDir() ) {
 		return;
 	}
 
 	// Read the corresponding meta data
-	Io::KeyValue data = model().lock()->metaData( file );
+	Io::KeyValue data = model()->metaData( file );
 
 	if( !data.isObject() ) {
 		return;
@@ -249,27 +246,24 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	}
 
 	// Get the inspector widget
-	ObjectInspectorWPtr inspector = Composer::instance()->window()->objectInspector();
+	InspectorQPtr inspector = Composer::instance()->window()->inspector();
 
 	// The asset was deselected - hide inspector
 	if( indexes.empty() ) {
-		inspector->setModel( PropertyModelWPtr() );
+		inspector->setModel( NULL );
 		return;
 	}
 
 	// Get the asset file by index
-	FileInfoPtr file = m_proxy->assetFile( indexes[0] );
-
-    // Lock parent asset model
-    AssetsModelPtr model = this->model().lock();
+	FileInfo file = m_proxy->assetFile( indexes[0] );
 
 	// No meta data found - skip
-	if( !model->hasMetaData( file ) ) {
+	if( !model()->hasMetaData( file ) ) {
 		return;
 	}
 
 	// Extract the UUID from file asset
-	String uuid = model->uuid( file );
+	String uuid = model()->uuid( file );
 
 	// Find asset by UUID
 	Scene::AssetWPtr asset = m_project->assets()->findAsset( uuid );
@@ -277,24 +271,22 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	
 	// Bind the selected asset to an object inspector.
 	switch( asset->type() ) {
-	case Scene::Asset::Material:	inspector->setModel( createMaterialModel( castTo<Scene::Material>( asset.get() ) ) );
+	case Scene::Asset::Material:	inspector->setModel( new MaterialModel( castTo<Scene::Material>( asset.get() ), this ) );
 									break;
-	default:						inspector->setModel( PropertyModelWPtr() );
+	default:						inspector->setModel( NULL );
 	}
 }
 
 // ** AssetTree::selection
 FileInfoArray AssetTree::selection( void ) const
 {
-	FilteredAssetsModel* proxy = m_proxy.data();
-
 	FileInfoArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
 	#if DEV_CUSTOM_ASSET_MODEL
-		result.push_back( proxy->asset( idx ).absoluteFilePath().toStdString() );
+		result.push_back( m_proxy->asset( idx ).absoluteFilePath().toStdString() );
 	#else
-		result.push_back( proxy->assetFile( idx ) );
+		result.push_back( m_proxy->assetFile( idx ) );
 	#endif
 	}
 

@@ -42,12 +42,12 @@ namespace Importers {
 	public:
 
 		//! Writes imported mesh nodes to a file.
-		virtual bool		import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
+		virtual bool		import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Imports mesh nodes from a file.
-		virtual bool		importNodes( FileSystemWPtr fs, const Io::Path& sourceFileName ) = 0;
+		virtual bool		importNodes( FileSystemQPtr fs, const Io::Path& sourceFileName ) = 0;
 
 	protected:
 
@@ -90,7 +90,7 @@ namespace Importers {
 	private:
 
 		//! Imports mesh nodes from FBX file.
-		virtual bool		importNodes( FileSystemWPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
+		virtual bool		importNodes( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
 
 		//! Imports the FBX scene node.
 		void				importNode( FbxNode* node );

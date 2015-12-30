@@ -26,19 +26,12 @@
 
 #include "SceneModel.h"
 
-#include "../Widgets/Qt/MimeData.h"
-
 DC_BEGIN_COMPOSER
-
-// ** createSceneModel
-SceneModelPtr createSceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene )
-{
-	return SceneModelPtr( new SceneModel( assets, scene ) );
-}
 
 // ** SceneModel::SceneModel
 SceneModel::SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
 {
+    qCheckParent( parent )
 	scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( SceneModel::handleSceneObjectAdded ) );
 	scene->subscribe<Scene::Scene::SceneObjectRemoved>( dcThisMethod( SceneModel::handleSceneObjectRemoved ) );
 }
@@ -127,7 +120,7 @@ bool SceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
@@ -156,7 +149,7 @@ bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, 
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( new Ui::MimeData( data ) );
+	Scene::AssetSet assets = Composer::instance()->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();

@@ -37,6 +37,9 @@ namespace Editors {
 	class SceneEditor : public VisualEditor {
 	public:
 
+                                        //! Constructs SceneEditor instance.
+                                        SceneEditor( void );
+
 	protected:
 
 		//! Transformation tool types.
@@ -47,8 +50,9 @@ namespace Editors {
 			, TransformScale		//!< Scaling tool is now active.
 		};
 
+
 		//! Performs the scene editor initialization.
-		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
 
 		//! Renders the scene.
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
@@ -66,49 +70,49 @@ namespace Editors {
 		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( IMimeDataWPtr mime ) DC_DECL_OVERRIDE;
+		virtual bool					handleDragEnter( MimeDataQPtr mime ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 		//! Handles the drop event.
-		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 		//! Scene editor has entered the foreground.
-		virtual void					notifyEnterForeground( Ui::IMainWindowWPtr window ) DC_DECL_OVERRIDE;
+		virtual void					notifyEnterForeground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
 
 		//! Scene editor has entered the background.
-		virtual void					notifyEnterBackground( Ui::IMainWindowWPtr window ) DC_DECL_OVERRIDE;
+		virtual void					notifyEnterBackground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
 
 		//! Handles the scene object double click in scene hierarchy widget.
-		void							handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleClicked& e );
+		void							handleSceneObjectDoubleClicked( const Ui::SceneTree::DoubleClicked& e );
 
 		//! Disables all transform tools.
-		void							menuTransformSelect( Ui::IActionWPtr action );
+		void							menuTransformSelect( Ui::ActionQPtr action );
 
 		//! Activates translation transform tool.
-		void							menuTransformTranslate( Ui::IActionWPtr action );
+		void							menuTransformTranslate( Ui::ActionQPtr action );
 
 		//! Activates rotation transform tool.
-		void							menuTransformRotate( Ui::IActionWPtr action );
+		void							menuTransformRotate( Ui::ActionQPtr action );
 
 		//! Activates scaling transform tool.
-		void							menuTransformScale( Ui::IActionWPtr action );
+		void							menuTransformScale( Ui::ActionQPtr action );
 
 		//! Activates terrain raising tool.
-		void							menuTerrainRaise( Ui::IActionWPtr action );
+		void							menuTerrainRaise( Ui::ActionQPtr action );
 
 		//! Activates terrain lowering tool.
-		void							menuTerrainLower( Ui::IActionWPtr action );
+		void							menuTerrainLower( Ui::ActionQPtr action );
 
 		//! Activates terrain flattening tool.
-		void							menuTerrainFlatten( Ui::IActionWPtr action );
+		void							menuTerrainFlatten( Ui::ActionQPtr action );
 
 		//! Activates terrain leveling tool.
-		void							menuTerrainLevel( Ui::IActionWPtr action );
+		void							menuTerrainLevel( Ui::ActionQPtr action );
 
 		//! Activates terrain smoothing tool.
-		void							menuTerrainSmooth( Ui::IActionWPtr action );
+		void							menuTerrainSmooth( Ui::ActionQPtr action );
 
 		//! Returns the nearest scene object underneath the mouse cursor.
 		Scene::SceneObjectWPtr			findSceneObjectAtPoint( s32 x, s32 y ) const;
@@ -128,12 +132,12 @@ namespace Editors {
 	private:
 
 		Scene::ScenePtr					m_scene;					//!< Actual scene.
-		SceneModelPtr					m_sceneModel;				//!< Scene model used by user interface.
+		AutoPtr<SceneModel>				m_sceneModel;				//!< Scene model used by user interface.
 		Scene::RenderingContextPtr		m_renderingContext;			//!< Scene rendering context.
 		Scene::SpectatorCameraPtr		m_camera;					//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
 
-		Ui::IToolBarPtr					m_tools;					//!< Scene editor toolbar.
+		Ui::ToolBarQPtr					m_tools;					//!< Scene editor toolbar.
 		ActiveTransformTool				m_activeTransformTool;		//!< Active translation tool.
 
 		Scene::SceneObjectWPtr			m_activeSceneObject;		//!< The scene object underneath the mouse cursor is stored here.
@@ -151,17 +155,17 @@ namespace Editors {
 		virtual u32						height( void ) const { return m_frame->height(); }
 
 		//! Creates the WindowView instance.
-		static Scene::RenderTargetPtr	create( const Ui::IRenderingFrameWPtr& frame ) { return new FrameTarget( frame ); }
+		static Scene::RenderTargetPtr	create( const Ui::RenderingFrameQPtr& frame ) { return new FrameTarget( frame ); }
 
 	private:
 
 										//! Constructs the WindowTarget instance.
-										FrameTarget( const Ui::IRenderingFrameWPtr& frame )
+										FrameTarget( const Ui::RenderingFrameQPtr& frame )
 											: m_frame( frame ) {}
 
 	private:
 
-		Ui::IRenderingFrameWPtr			m_frame;	//!< The output frame.
+		Ui::RenderingFrameQPtr			m_frame;	//!< The output frame.
 	};
 
 } // namespace Editors

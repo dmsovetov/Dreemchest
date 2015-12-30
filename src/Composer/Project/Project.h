@@ -52,13 +52,13 @@ namespace Project {
 									~Project( void );
 
 		//! Fills an asset menu.
-		void						fillAssetMenu( Ui::IMenuWPtr menu, Ui::AssetTree* assetTree = NULL );
+		void						fillAssetMenu( Ui::MenuQPtr menu, Ui::AssetTree* assetTree = NULL );
 
 		//! Returns project name.
 		const String&				name( void ) const;
 
 		//! Returns project assets model.
-		AssetsModelWPtr				assetsModel( void ) const;
+		AssetsModelQPtr				assetsModel( void ) const;
 
 		//! Returns an asset bundle.
 		Scene::AssetBundleWPtr		assets( void ) const;
@@ -70,42 +70,42 @@ namespace Project {
 		String						assetsAbsolutePath( void ) const;
 
 		//! Opens the asset editor.
-		Ui::IDocumentWPtr			edit( const String& uuid, const FileInfoWPtr& fileInfo );
+		Ui::DocumentQPtr			edit( const String& uuid, const FileInfo& fileInfo );
 
 		//! Creates new Project instance.
-		static ProjectPtr			create( Ui::IMainWindowWPtr mainWindow, const Io::Path& path );
+		static ProjectPtr			create( Ui::MainWindowQPtr mainWindow, const Io::Path& path );
 
 	private:
 
 									//! Constructs Project instance.
-									Project( Ui::IMainWindowWPtr mainWindow, const Io::Path& path );
+									Project( Ui::MainWindowQPtr mainWindow, const Io::Path& path );
 
 		//! Creates new asset with specified name at selected folder.
 		void						createAsset( const String& name, const String& ext );
 
 		//! Imports assets to project.
-		void						menuImportAssets( Ui::IActionWPtr action );
+		void						menuImportAssets( Ui::ActionQPtr action );
 
 		//! Creates new folder.
-		void						menuCreateFolder( Ui::IActionWPtr action );
+		void						menuCreateFolder( Ui::ActionQPtr action );
 
 		//! Creates new scene.
-		void						menuCreateScene( Ui::IActionWPtr action );
+		void						menuCreateScene( Ui::ActionQPtr action );
 
 		//! Creates new material.
-		void						menuCreateMaterial( Ui::IActionWPtr action );
+		void						menuCreateMaterial( Ui::ActionQPtr action );
 
 		//! Opens an asset for editing.
-		void						menuOpenAsset( Ui::IActionWPtr action );
+		void						menuOpenAsset( Ui::ActionQPtr action );
 
 		//! Deletes the selected asset(s).
-		void						menuDeleteAsset( Ui::IActionWPtr action );
+		void						menuDeleteAsset( Ui::ActionQPtr action );
 
 		//! Browses the selected asset.
-		void						menuBrowseAssets( Ui::IActionWPtr action );
+		void						menuBrowseAssets( Ui::ActionQPtr action );
 
 		//! Shows the selected asset in explorer.
-		void						menuShowInExplorer( Ui::IActionWPtr action );
+		void						menuShowInExplorer( Ui::ActionQPtr action );
 
 	private:
 
@@ -113,8 +113,8 @@ namespace Project {
 		typedef AbstractFactory<Editors::AssetEditor, String> AssetEditorFactory;
 
 		String						m_name;					//!< Project name.
-		Ui::IMainWindowWPtr			m_mainWindow;			//!< Main window instance.
-		AssetsModelPtr				m_assetsModel;			//!< Assets model.
+		Ui::MainWindowQPtr			m_mainWindow;			//!< Main window instance.
+		AutoPtr<AssetsModel>		m_assetsModel;			//!< Assets model.
 		Io::Path					m_paths[TotalPaths];	//!< Project path.
 		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
 		AssetsPtr					m_assets;				//!< The project assets.

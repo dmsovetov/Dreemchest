@@ -28,6 +28,7 @@
 #define __DC_Composer_Qt_AssetsModelPrivate_H__
 
 #include "AbstractTreeModel.h"
+#include "../FileSystem.h"
 
 DC_BEGIN_COMPOSER
 
@@ -46,16 +47,16 @@ DC_BEGIN_COMPOSER
 		explicit				QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent = NULL );
 
 		//! Returns assets UUID for a specified asset file.
-		String					uuid( const FileInfoWPtr& assetFile ) const;
+		String					uuid( const FileInfo& assetFile ) const;
 
 		//! Updates meta data for specified asset file.
-		void					setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data );
+		void					setMetaData( const FileInfo& assetFile, const Io::KeyValue& data );
 
 		//! Returns meta data for a specified asset file.
-		Io::KeyValue			metaData( const FileInfoWPtr& assetFile ) const;
+		Io::KeyValue			metaData( const FileInfo& assetFile ) const;
 
 		//! Returns asset file info by model index.
-		FileInfoPtr				assetFile( const QModelIndex& index ) const;
+		FileInfo				assetFile( const QModelIndex& index ) const;
 
 	private:
 
@@ -66,7 +67,7 @@ DC_BEGIN_COMPOSER
 		virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
 
 		//! Returns the meta file name from file info.
-		QString					metaFileName( const FileInfoWPtr& assetFile ) const;
+		QString					metaFileName( const FileInfo& assetFile ) const;
 
 		//! Returns the meta file name from absolute file path.
 		QString					metaFileNameFromPath( const QString& fileName ) const;
@@ -107,22 +108,22 @@ DC_BEGIN_COMPOSER
 	public:
 
 								//! Constructs AssetsModel instance
-		explicit				AssetsModel( QObject* parent = NULL );
+		explicit				AssetsModel( QObject* parent );
 
 		//! Returns assets UUID for a specified asset file.
-		String					uuid( const FileInfoWPtr& assetFile ) const;
+		String					uuid( const FileInfo& assetFile ) const;
 
 		//! Returns true if the meta data exists for an asset file.
-		bool					hasMetaData( const FileInfoWPtr& assetFile ) const;
+		bool					hasMetaData( const FileInfo& assetFile ) const;
 
 		//! Updates meta data for specified asset file.
-		void					setMetaData( const FileInfoWPtr& assetFile, const Io::KeyValue& data );
+		void					setMetaData( const FileInfo& assetFile, const Io::KeyValue& data );
 
 		//! Returns meta data for a specified asset file.
-		Io::KeyValue			metaData( const FileInfoWPtr& assetFile ) const;
+		Io::KeyValue			metaData( const FileInfo& assetFile ) const;
 
 		//! Returns asset file info by model index.
-		FileInfoPtr				assetFile( const QModelIndex& index ) const;
+		FileInfo				assetFile( const QModelIndex& index ) const;
 
 		//! Returns root model path.
 		String					rootPath( void ) const;
@@ -135,27 +136,27 @@ DC_BEGIN_COMPOSER
 
 		//! Base class for all asset events.
 		struct AssetEvent {
-								AssetEvent( const FileInfoPtr& file )
+								AssetEvent( const FileInfo& file )
 									: file( file ) {}
 
-			FileInfoPtr			file;	//!< Asset file info.
+			FileInfo			file;	//!< Asset file info.
 		};
 
 		//! This event is emitted when a new asset was added to a project.
 		struct Added : public AssetEvent {
-								Added( const FileInfoPtr& file )
+								Added( const FileInfo& file )
 									: AssetEvent( file ) {}
 		};
 
 		//! This event is emitted when a new asset was removed from a project.
 		struct Removed : public AssetEvent {
-								Removed( const FileInfoPtr& file )
+								Removed( const FileInfo& file )
 									: AssetEvent( file ) {}
 		};
 
 		//! This event is emitted when a new asset was changed.
 		struct Changed : public AssetEvent {
-								Changed( const FileInfoPtr& file )
+								Changed( const FileInfo& file )
 									: AssetEvent( file ) {}
 		};
 
@@ -187,7 +188,7 @@ DC_BEGIN_COMPOSER
 		virtual bool			dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;
 
 		//! Returns the meta file name from file info.
-		QString					metaFileName( const FileInfoWPtr& assetFile ) const;
+		QString					metaFileName( const FileInfo& assetFile ) const;
 
 		//! Returns the meta file name from absolute file path.
 		QString					metaFileNameFromPath( const QString& fileName ) const;
@@ -196,7 +197,7 @@ DC_BEGIN_COMPOSER
 		bool					renameMetaFile( const QString& oldFileName, const QString& newFileName );
 
 		//! Returns true if this file was just moved.
-		bool					wasMoved( const FileInfoWPtr& assetFile ) const;
+		bool					wasMoved( const FileInfo& assetFile ) const;
 
 	private slots:
 
@@ -225,16 +226,16 @@ DC_BEGIN_COMPOSER
 	public:
 
 										//! Constructs FilteredAssetsModel instance.
-										FilteredAssetsModel( AssetsModelWPtr assetsModel, QObject* parent = NULL );
+										FilteredAssetsModel( AssetsModelQPtr assetsModel, QObject* parent );
 
 		//! Returns root model index.
 		QModelIndex						root( void ) const;
 
 		//! Returns internal model pointer.
-		AssetsModelWPtr			        model( void ) const;
+		AssetsModelQPtr			        model( void ) const;
 
 		//! Returns asset file info by model index.
-		FileInfoPtr						assetFile( const QModelIndex& index ) const;
+		FileInfo						assetFile( const QModelIndex& index ) const;
 
 		//! Removes asset file by index.
 		void							remove( const QModelIndex& index );
@@ -246,7 +247,7 @@ DC_BEGIN_COMPOSER
 
 	private:
 
-		AssetsModelWPtr	                m_model;	//!< Actual assets model.
+		AssetsModelQPtr	                m_model;	//!< Actual assets model.
 	};
 
 #endif	/*	DEV_CUSTOM_ASSET_MODEL	*/

@@ -36,7 +36,7 @@ DC_BEGIN_COMPOSER
 namespace Project {
 
 // ** Assets::Assets
-Assets::Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr assetsModel ) : m_fileSystem( fileSystem ), m_path( path ), m_assetsModel( assetsModel )
+Assets::Assets( FileSystemQPtr fileSystem, const Io::Path& path, AssetsModelQPtr assetsModel ) : m_fileSystem( fileSystem ), m_path( path ), m_assetsModel( assetsModel )
 {
 	// Create an asset bundle
 	m_bundle = Scene::AssetBundle::create( "Assets", path );
@@ -54,16 +54,16 @@ Assets::Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
 	// Subscribe for assets model event
-	m_assetsModel.lock()->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel.lock()->subscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel.lock()->subscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
+	m_assetsModel->subscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
+	m_assetsModel->subscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
+	m_assetsModel->subscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
 }
 
 Assets::~Assets( void )
 {
-	m_assetsModel.lock()->unsubscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
-	m_assetsModel.lock()->unsubscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
-	m_assetsModel.lock()->unsubscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
+	m_assetsModel->unsubscribe<AssetsModel::Added>( dcThisMethod( Assets::handleAssetAdded ) );
+	m_assetsModel->unsubscribe<AssetsModel::Removed>( dcThisMethod( Assets::handleAssetRemoved ) );
+	m_assetsModel->unsubscribe<AssetsModel::Changed>( dcThisMethod( Assets::handleAssetChanged ) );
 }
 
 // ** Assets::bundle
@@ -73,10 +73,10 @@ Scene::AssetBundleWPtr Assets::bundle( void ) const
 }
 
 // ** Assets::createAssetForFile
-Scene::AssetPtr Assets::createAssetForFile( const FileInfoWPtr& fileInfo )
+Scene::AssetPtr Assets::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Scene::Asset::Type type = assetTypeFromExtension( fileInfo->extension() );
+	Scene::Asset::Type type = assetTypeFromExtension( fileInfo.extension() );
 
 	// Create asset by type
 	Scene::AssetPtr asset = m_bundle->createAssetByType( type );
@@ -86,7 +86,7 @@ Scene::AssetPtr Assets::createAssetForFile( const FileInfoWPtr& fileInfo )
 	}
 
 	// Set meta file
-	m_assetsModel.lock()->setMetaData( fileInfo, asset->keyValue() );
+	m_assetsModel->setMetaData( fileInfo, asset->keyValue() );
 
 	return asset;
 }
@@ -114,7 +114,7 @@ void Assets::handleAssetAdded( const AssetsModel::Added& e )
 void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel.lock()->uuid( e.file );
+	String uuid = m_assetsModel->uuid( e.file );
 
 	// Remove asset from bundle
 	m_bundle->removeAsset( uuid );
@@ -127,17 +127,17 @@ void Assets::handleAssetRemoved( const AssetsModel::Removed& e )
 void Assets::handleAssetChanged( const AssetsModel::Changed& e )
 {
 	// Get the asset UUID.
-	String uuid = m_assetsModel.lock()->uuid( e.file );
+	String uuid = m_assetsModel->uuid( e.file );
 
 	// Update asset's cache
 	putToCache( e.file, uuid );
 }
 
 // ** Assets::addAssetFile
-void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
+void Assets::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
-	Io::KeyValue meta = m_assetsModel.lock()->metaData( fileInfo );
+	Io::KeyValue meta = m_assetsModel->metaData( fileInfo );
 
 	// Added asset
 	Scene::AssetPtr asset;
@@ -154,7 +154,7 @@ void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 	}
 
 	// Set asset name
-	String name = fileInfo->relativePath( m_assetsModel.lock()->rootPath() );
+	String name = fileInfo.relativePath( m_assetsModel->rootPath() );
 	bool result = m_bundle->setAssetName( asset, name );
 	DC_BREAK_IF( !result );
 
@@ -167,10 +167,10 @@ void Assets::addAssetFile( const FileInfoWPtr& fileInfo )
 }
 
 // ** Assets::putToCache
-bool Assets::putToCache( const FileInfoWPtr& fileInfo, const String& uuid )
+bool Assets::putToCache( const FileInfo& fileInfo, const String& uuid )
 {
 	// Create an asset importer for
-	Importers::AssetImporterPtr importer = m_assetImporters.construct( fileInfo->extension() );
+	Importers::AssetImporterPtr importer = m_assetImporters.construct( fileInfo.extension() );
 
 	if( !importer.valid() ) {
 		return false;
@@ -192,10 +192,10 @@ bool Assets::putToCache( const FileInfoWPtr& fileInfo, const String& uuid )
 	}
 
 	// Perform asset caching.
-	bool result = importer->import( m_fileSystem, fileInfo->absolutePath(), AssetsFilePath );
+	bool result = importer->import( m_fileSystem, fileInfo.absolutePath(), AssetsFilePath );
 	DC_BREAK_IF( !result );
 
-	qDebug() << "Cached" << fileInfo->fileName().c_str();
+	qDebug() << "Cached" << fileInfo.fileName().c_str();
 
 	return result;
 }

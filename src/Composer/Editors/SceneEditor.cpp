@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "SceneEditor.h"
+#include "../Widgets/Menu.h"
 #include "../Systems/Transform/TranslationTool.h"
 #include "../Systems/Transform/RotationTool.h"
 #include "../Systems/Transform/ArcballRotationTool.h"
@@ -36,8 +37,14 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
+// ** SceneEditor::SceneEditor
+SceneEditor::SceneEditor( void ) : m_tools( NULL )
+{
+
+}
+
 // ** SceneEditor::initialize
-bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document )
+bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
 {
 	if( !VisualEditor::initialize( project, asset, document ) ) {
 		return false;
@@ -57,7 +64,7 @@ bool SceneEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPt
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create the scene model
-	m_sceneModel = createSceneModel( m_project->assets(), m_scene );
+	m_sceneModel = new SceneModel( m_project->assets(), m_scene, NULL );
 
 	// Create terrain.
 	{
@@ -126,7 +133,7 @@ void SceneEditor::render( f32 dt )
 }
 
 // ** SceneEditor::handleSceneObjectDoubleClicked
-void SceneEditor::handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleClicked& e )
+void SceneEditor::handleSceneObjectDoubleClicked( const Ui::SceneTree::DoubleClicked& e )
 {
 	// Remove the previous component
 	if( m_camera->has<Scene::MoveTo>() ) {
@@ -145,10 +152,10 @@ void SceneEditor::handleSceneObjectDoubleClicked( const Ui::ISceneTree::DoubleCl
 }
 
 // ** SceneEditor::notifyEnterForeground
-void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
+void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 {
 	// Create the tool bar
-	DC_BREAK_IF( m_tools.valid() );
+	DC_BREAK_IF( m_tools );
 	m_tools = window->addToolBar();
 
 	m_tools->beginActionGroup();
@@ -173,76 +180,76 @@ void SceneEditor::notifyEnterForeground( Ui::IMainWindowWPtr window )
 	m_tools->endActionGroup();
 
 	// Set this model
-	window->sceneTree()->setModel( m_sceneModel );
+	window->sceneTree()->setModel( m_sceneModel.get() );
 
 	// Subscribe for event
-	window->sceneTree()->subscribe<Ui::ISceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+	window->sceneTree()->subscribe<Ui::SceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
 }
 
 // ** SceneEditor::notifyEnterBackground
-void SceneEditor::notifyEnterBackground( Ui::IMainWindowWPtr window )
+void SceneEditor::notifyEnterBackground( Ui::MainWindowQPtr window )
 {
 	// Remove tool bar
 	window->removeToolBar( m_tools );
-	m_tools = Ui::IToolBarPtr();
+	m_tools = Ui::ToolBarQPtr();
 
 	// Set empty model
-	window->sceneTree()->setModel( SceneModelPtr() );
+	window->sceneTree()->setModel( NULL );
 
 	// Unsubscribe for event
-	window->sceneTree()->unsubscribe<Ui::ISceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+	window->sceneTree()->unsubscribe<Ui::SceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
 }
 
 // ** SceneEditor::menuTransformSelect
-void SceneEditor::menuTransformSelect( Ui::IActionWPtr action )
+void SceneEditor::menuTransformSelect( Ui::ActionQPtr action )
 {
 	setTransformTool( NoTransformTool );
 }
 
 // ** SceneEditor::menuTransformTranslate
-void SceneEditor::menuTransformTranslate( Ui::IActionWPtr action )
+void SceneEditor::menuTransformTranslate( Ui::ActionQPtr action )
 {
 	setTransformTool( TransformTranslate );
 }
 
 // ** SceneEditor::menuTransformRotate
-void SceneEditor::menuTransformRotate( Ui::IActionWPtr action )
+void SceneEditor::menuTransformRotate( Ui::ActionQPtr action )
 {
 	setTransformTool( TransformRotate );
 }
 
 // ** SceneEditor::menuTransformScale
-void SceneEditor::menuTransformScale( Ui::IActionWPtr action )
+void SceneEditor::menuTransformScale( Ui::ActionQPtr action )
 {
 	setTransformTool( TransformScale );
 }
 
 // ** SceneEditor::menuTerrainRaise
-void SceneEditor::menuTerrainRaise( Ui::IActionWPtr action )
+void SceneEditor::menuTerrainRaise( Ui::ActionQPtr action )
 {
     m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Raise );
 }
 
 // ** SceneEditor::menuTerrainLower
-void SceneEditor::menuTerrainLower( Ui::IActionWPtr action )
+void SceneEditor::menuTerrainLower( Ui::ActionQPtr action )
 {
     m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Lower );
 }
 
 // ** SceneEditor::menuTerrainFlatten
-void SceneEditor::menuTerrainFlatten( Ui::IActionWPtr action )
+void SceneEditor::menuTerrainFlatten( Ui::ActionQPtr action )
 {
     m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Flatten );
 }
 
 // ** SceneEditor::menuTerrainLevel
-void SceneEditor::menuTerrainLevel( Ui::IActionWPtr action )
+void SceneEditor::menuTerrainLevel( Ui::ActionQPtr action )
 {
     m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Level );
 }
 
 // ** SceneEditor::menuTerrainSmooth
-void SceneEditor::menuTerrainSmooth( Ui::IActionWPtr action )
+void SceneEditor::menuTerrainSmooth( Ui::ActionQPtr action )
 {
     m_scene->findByAspect( Ecs::Aspect::all<TerrainTool>() ).begin()->get()->get<TerrainTool>()->setType( TerrainTool::Smooth );
 }
@@ -293,13 +300,13 @@ void SceneEditor::handleMouseWheel( s32 delta )
 }
 
 // ** SceneEditor::handleDragEnter
-bool SceneEditor::handleDragEnter( IMimeDataWPtr mime )
+bool SceneEditor::handleDragEnter( MimeDataQPtr mime )
 {
-	return mime->hasFormat( Composer::kAssetMime );
+	return mime->hasFormat( QString::fromStdString( Composer::kAssetMime ) );
 }
 
 // ** SceneEditor::handleDragMove
-void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
+void SceneEditor::handleDragMove( MimeDataQPtr mime, s32 x, s32 y )
 {
 	// Get the scene object underneath the mouse cursor
 	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
@@ -309,7 +316,7 @@ void SceneEditor::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
 }
 
 // ** SceneEditor::handleDrop
-void SceneEditor::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
+void SceneEditor::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 {
 	// Get the scene object underneath the mouse cursor
 	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );

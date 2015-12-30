@@ -25,10 +25,9 @@
  **************************************************************************/
 
 #include "Composer.h"
-#include "IFileSystem.h"
 
-#include "Widgets/IMainWindow.h"
-#include "Widgets/IMenu.h"
+#include "Widgets/Menu.h"
+#include "Widgets/MainWindow.h"
 #include "Widgets/AssetTree.h"
 
 #include "Project/Project.h"
@@ -97,7 +96,7 @@ ComposerWPtr Composer::s_instance = ComposerWPtr();
 const String Composer::kAssetMime = "text/uri-list";
 
 // ** Composer::Composer
-Composer::Composer( Ui::IMainWindowPtr mainWindow ) : m_mainWindow( mainWindow )
+Composer::Composer( Ui::MainWindowQPtr mainWindow ) : m_mainWindow( mainWindow )
 {
 	s_instance = this;
 
@@ -118,7 +117,7 @@ Project::ProjectWPtr Composer::project( void ) const
 }
 
 // ** Composer::window
-Ui::IMainWindowWPtr Composer::window( void ) const
+Ui::MainWindowQPtr Composer::window( void ) const
 {
 	return m_mainWindow;
 }
@@ -127,7 +126,7 @@ Ui::IMainWindowWPtr Composer::window( void ) const
 ComposerPtr Composer::create( void )
 {
 	// Create the main window
-	Ui::IMainWindowPtr mainWindow = Ui::createMainWindow( "Dreemchest Composer" );
+	Ui::MainWindowQPtr mainWindow = new Ui::MainWindow( "Dreemchest Composer" );
 	
 	// Create the composer instance
 	ComposerPtr composer = new Composer( mainWindow );
@@ -153,16 +152,16 @@ bool Composer::initialize( void )
 	m_menues[EditMenu] = m_mainWindow->addMenu( "&Edit" );
 
 	// Add actions
-	Ui::IActionWPtr create	= m_menues[FileMenu]->addAction( "&Create Project", BindAction( Composer::menuCreateProject ), "Ctrl+N", ":Common/Common/new.png" );
-	Ui::IActionWPtr open	= m_menues[FileMenu]->addAction( "&Open Project", BindAction( Composer::menuOpenProject ), "Ctrl+O", ":Common/Common/open.png" );
-	Ui::IActionWPtr save	= m_menues[FileMenu]->addAction( "&Save Project", BindAction( Composer::menuSaveProject ), "Ctrl+S", ":Common/Common/save.png" );
+	Ui::ActionQPtr create	= m_menues[FileMenu]->addAction( "&Create Project", BindAction( Composer::menuCreateProject ), "Ctrl+N", ":Common/Common/new.png" );
+	Ui::ActionQPtr open	= m_menues[FileMenu]->addAction( "&Open Project", BindAction( Composer::menuOpenProject ), "Ctrl+O", ":Common/Common/open.png" );
+	Ui::ActionQPtr save	= m_menues[FileMenu]->addAction( "&Save Project", BindAction( Composer::menuSaveProject ), "Ctrl+S", ":Common/Common/save.png" );
 
 	// Add actions
-	Ui::IActionWPtr undo	= m_menues[EditMenu]->addAction( "&Undo", BindAction( Composer::menuUndo ), "Ctrl+Z", ":Common/Common/undo.png" );
-	Ui::IActionWPtr redo	= m_menues[EditMenu]->addAction( "&Redo", BindAction( Composer::menuRedo ), "Ctrl+Y", ":Common/Common/redo.png" );
+	Ui::ActionQPtr undo	= m_menues[EditMenu]->addAction( "&Undo", BindAction( Composer::menuUndo ), "Ctrl+Z", ":Common/Common/undo.png" );
+	Ui::ActionQPtr redo	= m_menues[EditMenu]->addAction( "&Redo", BindAction( Composer::menuRedo ), "Ctrl+Y", ":Common/Common/redo.png" );
 
 	// Create tool bars
-	Ui::IToolBarWPtr tools = m_mainWindow->addToolBar();
+	Ui::ToolBarQPtr tools = m_mainWindow->addToolBar();
 	tools->addAction( create );
 	tools->addAction( open );
 	tools->addAction( save );
@@ -174,10 +173,10 @@ bool Composer::initialize( void )
 }
 
 // ** Composer::menuCreateProject
-void Composer::menuCreateProject( Ui::IActionWPtr action )
+void Composer::menuCreateProject( Ui::ActionQPtr action )
 {
 	// Get the file system interface
-	FileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Create Project" );
@@ -190,10 +189,10 @@ void Composer::menuCreateProject( Ui::IActionWPtr action )
 }
 
 // ** Composer::menuOpenProject
-void Composer::menuOpenProject( Ui::IActionWPtr action )
+void Composer::menuOpenProject( Ui::ActionQPtr action )
 {
 	// Get the file system interface
-	FileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = m_mainWindow->fileSystem();
 
 	// Select the directory
 	String path = fs->selectExistingDirectory( "Open Project" );
@@ -206,19 +205,19 @@ void Composer::menuOpenProject( Ui::IActionWPtr action )
 }
 
 // ** Composer::menuSaveProject
-void Composer::menuSaveProject( Ui::IActionWPtr action )
+void Composer::menuSaveProject( Ui::ActionQPtr action )
 {
 	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
 
 // ** Composer::menuUndo
-void Composer::menuUndo( Ui::IActionWPtr action )
+void Composer::menuUndo( Ui::ActionQPtr action )
 {
 	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
 
 // ** Composer::menuRedo
-void Composer::menuRedo( Ui::IActionWPtr action )
+void Composer::menuRedo( Ui::ActionQPtr action )
 {
 	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
 }
@@ -227,7 +226,7 @@ void Composer::menuRedo( Ui::IActionWPtr action )
 void Composer::createProject( const String& path )
 {
 	// Get the file system interface
-	FileSystemWPtr fs = m_mainWindow->fileSystem();
+	FileSystemQPtr fs = m_mainWindow->fileSystem();
 
 	// Create project instance
 	m_project = Project::Project::create( m_mainWindow, path );
@@ -245,7 +244,7 @@ void Composer::createProject( const String& path )
 }
 
 // ** Composer::assetFromMime
-Scene::AssetPtr Composer::assetFromMime( IMimeDataWPtr mime ) const
+Scene::AssetPtr Composer::assetFromMime( MimeDataQPtr mime ) const
 {
 	Scene::AssetSet assets = assetsFromMime( mime );
 
@@ -257,18 +256,18 @@ Scene::AssetPtr Composer::assetFromMime( IMimeDataWPtr mime ) const
 }
 
 // ** Composer::assetsFromMime
-Scene::AssetSet Composer::assetsFromMime( IMimeDataWPtr mime ) const
+Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 {
 	// Resulting asset set
 	Scene::AssetSet result;
 
 	// Get an array of attached assets
-	StringArray assets = mime->strings();
+	QList<QUrl> assets = mime->urls();
 
 	// Add assets to scene
-	for( s32 i = 0, n = ( s32 )assets.size(); i < n; i++ ) {
+	foreach( QUrl url, assets ) {
 		// Read an attached meta data
-		Io::KeyValue meta = m_project->assetsModel().lock()->metaData( assets[i] );
+		Io::KeyValue meta = m_project->assetsModel()->metaData( url.toLocalFile().toStdString() );
 
 		if( meta.isNull() ) {
 			continue;	// Unsupported asset type or just a folder

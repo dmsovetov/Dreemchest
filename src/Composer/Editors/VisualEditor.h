@@ -42,7 +42,7 @@ namespace Editors {
 										VisualEditor( void );
 
 		//! Performs the visual editor initialization.
-		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
 
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;
@@ -83,16 +83,16 @@ namespace Editors {
 		virtual void					handleKeyRelease( Platform::Key key ) {}
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( IMimeDataWPtr mime ) { return false; }
+		virtual bool					handleDragEnter( MimeDataQPtr mime ) { return false; }
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) {}
+		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the drop event.
-		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) {}
+		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) {}
 
 		//! Handles the context menu event.
-		virtual void					handleContextMenu( Ui::IMenuWPtr menu );
+		virtual void					handleContextMenu( Ui::MenuQPtr menu );
 
 		//! Handles the focus in event.
 		virtual void					handleFocusIn( void );
@@ -155,16 +155,16 @@ namespace Editors {
 		virtual void					handleKeyRelease( Platform::Key key ) DC_DECL_OVERRIDE;
 
 		//! Handles the context menu event.
-		virtual void					handleContextMenu( Ui::IMenuWPtr menu ) DC_DECL_OVERRIDE;
+		virtual void					handleContextMenu( Ui::MenuQPtr menu ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( IMimeDataWPtr mime ) DC_DECL_OVERRIDE;
+		virtual bool					handleDragEnter( MimeDataQPtr mime ) DC_DECL_OVERRIDE;
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 		//! Handles the drop move event.
-		virtual void					handleDrop( IMimeDataWPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
 
 	private:
 

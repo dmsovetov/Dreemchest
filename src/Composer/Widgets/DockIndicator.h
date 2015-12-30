@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_DockIndicator_H__
-#define __DC_Composer_Qt_DockIndicator_H__
+#ifndef __DC_Composer_DockIndicator_H__
+#define __DC_Composer_DockIndicator_H__
 
-#include "Widget.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
@@ -99,4 +99,4 @@ namespace Ui {
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_DockIndicator_H__	*/
+#endif	/*	!__DC_Composer_DockIndicator_H__	*/

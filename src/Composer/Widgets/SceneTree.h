@@ -24,40 +24,58 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_SignalDelegate_H__
-#define __DC_Composer_Qt_SignalDelegate_H__
+#ifndef __DC_Composer_Qt_SceneTree_H__
+#define __DC_Composer_Qt_SceneTree_H__
 
-#include "Widget.h"
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Delegate object to bind Qt signals to a callback functions.
-	class QSignalDelegate : public QObject {
+	class SceneTree;
+
+	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
+	class SceneTree : public InjectedEventEmitter<QTreeView> {
 
 		Q_OBJECT
 
 	public:
 
-		//! Callback type used by this signal delegate.
-		typedef std::function<void()>	Callback;
+									//! Constructs SceneTree instance.
+									SceneTree( QWidget* parent );
 
-										//! Constructs the QSignalDelegate instance.
-										QSignalDelegate( Callback callback, QObject* sender, CString signal );
+		//! Sets asset tree model.
+		void						setModel( SceneModelQPtr value );
+
+		//! This event is emitted when user double clicks the scene object.
+		struct DoubleClicked {
+									DoubleClicked( Scene::SceneObjectWPtr sceneObject )
+										: sceneObject( sceneObject ) {}
+			Scene::SceneObjectWPtr	sceneObject;	//!< Double clicked scene object.
+		};
+
+	protected:
+
+		//! Handles the deletion and renaming items.
+		virtual void				keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
+
+		//! Handles the context menu requests.
+		virtual void				contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
 
 	private slots:
 
-		//! Processes the emitted signal.
-		virtual void					emitted( void );
+		//! Handles the doubleClicked signal.
+		void						itemDoubleClicked( const QModelIndex& index );
 
 	private:
 
-		Callback						m_callback;	//!< Callback function.
+		SceneModelQPtr				m_model;	//!< File system model used.
+		SceneTree*					m_parent;	//!< Parent scene tree instance.
 	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_SignalDelegate_H__	*/
+#endif	/*	!__DC_Composer_Qt_SceneTree_H__	*/

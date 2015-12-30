@@ -37,10 +37,4 @@ MaterialModel::MaterialModel( Scene::MaterialWPtr material, QObject* parent ) : 
 	addAsset<Scene::ImageWPtr>( "Diffuse", BindGetter( Scene::Material::diffuse, material.get() ), BindSetter( Scene::Material::setDiffuse, material.get() ) );
 }
 
-// ** createMaterialModel
-PropertyModelPtr createMaterialModel( Scene::MaterialWPtr material )
-{
-	return PropertyModelPtr( new MaterialModel( material ) );
-}
-
 DC_END_COMPOSER

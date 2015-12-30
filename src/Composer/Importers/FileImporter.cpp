@@ -31,7 +31,7 @@ DC_BEGIN_COMPOSER
 namespace Importers {
 
 // ** FileImporter::import
-bool FileImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
+bool FileImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	bool result = fs->copyFile( sourceFileName.c_str(), destinationFileName.c_str() );
 	DC_BREAK_IF( !result );

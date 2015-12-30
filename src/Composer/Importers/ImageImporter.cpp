@@ -37,7 +37,7 @@ namespace Importers {
 // -------------------------------------------------- ImageImporter ------------------------------------------------- //
 
 // ** ImageImporter::import
-bool ImageImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
+bool ImageImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	// Import image from file
 	if( !importImage( fs, sourceFileName ) ) {
@@ -59,7 +59,7 @@ bool ImageImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, c
 // ------------------------------------------------ ImageImporterTGA ------------------------------------------------ //
 
 // ** ImageImporterTGA::importImage
-bool ImageImporterTGA::importImage( FileSystemWPtr fs, const Io::Path& sourceFileName )
+bool ImageImporterTGA::importImage( FileSystemQPtr fs, const Io::Path& sourceFileName )
 {
 	// Open the file
 	Io::StreamPtr stream = Io::DiskFileSystem::open( sourceFileName );
@@ -141,7 +141,7 @@ void ImageImporterTGA::swapChannels( Image& image ) const
 // ------------------------------------------------ ImageImporterTIF ------------------------------------------------ //
 
 // ** ImageImporterTIF::import
-bool ImageImporterTIF::importImage( FileSystemWPtr fs, const Io::Path& sourceFileName )
+bool ImageImporterTIF::importImage( FileSystemQPtr fs, const Io::Path& sourceFileName )
 {
 	// Open the TIFF file
 	TIFF* tif = TIFFOpen( sourceFileName.c_str(), "r" );

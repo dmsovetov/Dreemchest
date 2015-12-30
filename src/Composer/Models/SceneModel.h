@@ -62,7 +62,7 @@ DC_BEGIN_COMPOSER
 		};
 
 										//! Constructs SceneModel instance.
-										SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent = NULL );
+										SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent );
 
 		//! Returns scene instance.
 		Scene::SceneWPtr		        scene( void ) const;

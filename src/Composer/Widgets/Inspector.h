@@ -24,36 +24,37 @@
 
  **************************************************************************/
 
-#include "MimeData.h"
+#ifndef __DC_Composer_Inspector_H__
+#define __DC_Composer_Inspector_H__
+
+#include "../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ** MimeData::MimeData
-MimeData::MimeData( const QMimeData* mime ) : m_mime( mime )
-{
+	//! Object inspector widget.
+	class Inspector : public QWidget {
 
-}
+		Q_OBJECT
 
-// ** MimeData::hasFormat
-bool MimeData::hasFormat( const String& value ) const
-{
-	return m_mime->hasFormat( value.c_str() );
-}
+	public:
 
-// ** MimeData::strings
-StringArray MimeData::strings( void ) const
-{
-	StringArray result;
+								//! Constructs Inspector instance.
+								Inspector( QWidget* parent = NULL );
 
-	foreach( const QUrl& url, m_mime->urls() ) {
-		result.push_back( url.toLocalFile().toStdString() );
-	}
+		//! Sets the property model.
+		void					setModel( PropertyModelQPtr value );
 
-	return result;
-}
+	private:
+
+		AutoPtr<PropertyModel>  m_model;	//!< Object properties model used.
+		QFormLayout*			m_layout;	//!< Root layout.
+		QDataWidgetMapper*		m_mapper;	//!< Data widget mapper.
+	};
 
 } // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_Inspector_H__	*/

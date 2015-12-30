@@ -28,7 +28,7 @@
 #define __DC_Composer_AssetImporter_H__
 
 #include "../Composer.h"
-#include "../IFileSystem.h"
+#include "../FileSystem.h"
 
 DC_BEGIN_COMPOSER
 
@@ -39,7 +39,7 @@ namespace Importers {
 	public:
 
 		//! Imports an asset to project cache.
-		virtual bool			import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) = 0;
+		virtual bool			import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) = 0;
 	};
 
 } // namespace Importers

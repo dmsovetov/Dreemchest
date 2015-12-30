@@ -41,7 +41,7 @@ VisualEditor::VisualEditor( void )
 }
 
 // ** VisualEditor::initialize
-bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::IDocumentWPtr document )
+bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
 {
 	// Perform basic initialization first.
 	if( !AssetEditor::initialize( project, asset, document ) ) {
@@ -49,9 +49,9 @@ bool VisualEditor::initialize( Project::ProjectWPtr project, const Scene::AssetP
 	}
 
 	// Attach the rendering frame to this document.
-	Ui::IRenderingFrameWPtr frame = document->attachRenderingFrame();
+	Ui::RenderingFrameQPtr frame = document->attachRenderingFrame();
 
-	if( !frame.valid() ) {
+	if( !frame ) {
 		return false;
 	}
 
@@ -139,7 +139,7 @@ void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
 }
 
 // ** VisualEditor::handleContextMenu
-void VisualEditor::handleContextMenu( Ui::IMenuWPtr menu )
+void VisualEditor::handleContextMenu( Ui::MenuQPtr menu )
 {
 
 }
@@ -213,25 +213,25 @@ void RenderingFrameDelegate::handleKeyRelease( Platform::Key key )
 }
 
 // ** RenderingFrameDelegate::handleDragEnter
-bool RenderingFrameDelegate::handleDragEnter( IMimeDataWPtr mime )
+bool RenderingFrameDelegate::handleDragEnter( MimeDataQPtr mime )
 {
 	return m_editor->handleDragEnter( mime );
 }
 
 // ** RenderingFrameDelegate::handleDragMove
-void RenderingFrameDelegate::handleDragMove( IMimeDataWPtr mime, s32 x, s32 y )
+void RenderingFrameDelegate::handleDragMove( MimeDataQPtr mime, s32 x, s32 y )
 {
 	m_editor->handleDragMove( mime, x, y );
 }
 
 // ** RenderingFrameDelegate::handleDrop
-void RenderingFrameDelegate::handleDrop( IMimeDataWPtr mime, s32 x, s32 y )
+void RenderingFrameDelegate::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 {
 	m_editor->handleDrop( mime, x, y );
 }
 
 // ** RenderingFrameDelegate::handleContextMenu
-void RenderingFrameDelegate::handleContextMenu( Ui::IMenuWPtr menu )
+void RenderingFrameDelegate::handleContextMenu( Ui::MenuQPtr menu )
 {
 	m_editor->handleContextMenu( menu );
 }

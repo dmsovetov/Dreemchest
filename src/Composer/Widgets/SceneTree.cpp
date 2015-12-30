@@ -27,30 +27,14 @@
 #include "SceneTree.h"
 
 #include "Menu.h"
-#include "../../Models/SceneModel.h"
+#include "../Models/SceneModel.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ------------------------------------------------ SceneTree ------------------------------------------------ //
-
 // ** SceneTree::SceneTree
-SceneTree::SceneTree( void ) : PrivateInterface( new QSceneTree( this ) )
-{
-
-}
-
-// ** SceneTree::setModel
-void SceneTree::setModel( SceneModelWPtr value )
-{
-	m_private->setModel( value );
-}
-
-// ------------------------------------------------ QSceneTree ------------------------------------------------ //
-
-// ** QSceneTree::QSceneTree
-QSceneTree::QSceneTree( SceneTree* parent ) : m_parent( parent )
+SceneTree::SceneTree( QWidget* parent ) : InjectedEventEmitter( parent )
 {
 	setHeaderHidden( true );
 	setEditTriggers( EditTrigger::EditKeyPressed );
@@ -65,21 +49,19 @@ QSceneTree::QSceneTree( SceneTree* parent ) : m_parent( parent )
 	connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
 }
 
-// ** QSceneTree::setModel
-void QSceneTree::setModel( SceneModelWPtr value )
+// ** SceneTree::setModel
+void SceneTree::setModel( SceneModelQPtr value )
 {
 	m_model = value;
-	QTreeView::setModel( m_model.lock().data() );
+	QTreeView::setModel( m_model );
 }
 
-// ** QSceneTree::keyPressEvent
-void QSceneTree::keyPressEvent( QKeyEvent *event )
+// ** SceneTree::keyPressEvent
+void SceneTree::keyPressEvent( QKeyEvent *event )
 {
-	SceneModelPtr model = m_model.lock();
-
     switch( event->key() ) {
     case Qt::Key_Delete:	foreach( QModelIndex idx, selectedIndexes() ) {
-								model->remove( idx );
+								m_model->remove( idx );
 							}
 							break;
     }
@@ -87,25 +69,23 @@ void QSceneTree::keyPressEvent( QKeyEvent *event )
     QTreeView::keyPressEvent( event );
 }
 
-// ** QSceneTree::contextMenuEvent
-void QSceneTree::contextMenuEvent( QContextMenuEvent *e )
+// ** SceneTree::contextMenuEvent
+void SceneTree::contextMenuEvent( QContextMenuEvent *e )
 {
-	IMenuPtr menu( new Menu( this ) );
+	MenuQPtr menu( new Menu( this ) );
 
 //    m_project->fillAssetMenu( menu, m_parent );
-    menu->exec( e->globalPos().x(), e->globalPos().y() );
+    menu->exec( e->globalPos() );
 }
 
-// ** QSceneTree::itemDoubleClicked
-void QSceneTree::itemDoubleClicked( const QModelIndex& index )
+// ** SceneTree::itemDoubleClicked
+void SceneTree::itemDoubleClicked( const QModelIndex& index )
 {
-	SceneModelPtr model = m_model.lock();
-
 	// Get the scene object by index.
-	Scene::SceneObjectWPtr sceneObject = model->dataAt( index );
+	Scene::SceneObjectWPtr sceneObject = m_model->dataAt( index );
 
 	// Emit the event.
-	m_parent->notify<ISceneTree::DoubleClicked>( sceneObject );
+	notify<SceneTree::DoubleClicked>( sceneObject );
 }
 
 } // namespace Ui

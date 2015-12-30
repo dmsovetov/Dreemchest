@@ -33,7 +33,7 @@ namespace Importers {
 // ------------------------------------------------------ MeshImporter ------------------------------------------------------ //
 
 // ** MeshImporter::import
-bool MeshImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
+bool MeshImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	// Import mesh nodes from file
 	if( !importNodes( fs, sourceFileName ) ) {
@@ -53,8 +53,8 @@ bool MeshImporter::import( FileSystemWPtr fs, const Io::Path& sourceFileName, co
 		const Mesh::IndexBuffer&  indices  = m_nodes[i].mesh.indexBuffer();
 
 		// Write texture base name to stream
-		FileInfoPtr fileInfo = fs->extractFileInfo( m_nodes[i].texture );
-		String	    fileName = fileInfo->fileName();
+		FileInfo fileInfo = fs->extractFileInfo( m_nodes[i].texture );
+		String	 fileName = fileInfo.fileName();
 		stream->writeString( fileName.c_str() );
 
 		// Write buffer size to stream
@@ -131,7 +131,7 @@ MeshImporterFBX::~MeshImporterFBX( void )
 }
 
 // ** MeshImporterFBX::importNodes
-bool MeshImporterFBX::importNodes( FileSystemWPtr fs, const Io::Path& sourceFileName )
+bool MeshImporterFBX::importNodes( FileSystemQPtr fs, const Io::Path& sourceFileName )
 {
 	// Create the scene instance
 	m_scene = FbxScene::Create( s_manager, "" );

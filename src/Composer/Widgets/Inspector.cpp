@@ -24,13 +24,12 @@
 
  **************************************************************************/
 
-#include "ObjectInspectorPrivate.h"
+#include "Inspector.h"
 
-#include "../AssetTree.h"
-#include "Widget.h"
+#include "AssetTree.h"
 
-#include "../../Models/PropertyModel.h"
-#include "../../Models/EnumModels.h"
+#include "../Models/PropertyModel.h"
+#include "../Models/EnumModels.h"
 
 DC_BEGIN_COMPOSER
 
@@ -52,14 +51,14 @@ void qDeleteLayout( QLayout* layout )
 	delete layout;
 }
 
-// ** QObjectInspector::QObjectInspector
-QObjectInspector::QObjectInspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_mapper( NULL )
+// ** Inspector::Inspector
+Inspector::Inspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_mapper( NULL )
 {
 
 }
 
-// ** QObjectInspector::setModel
-void QObjectInspector::setModel( PropertyModelWPtr value )
+// ** Inspector::setModel
+void Inspector::setModel( PropertyModelQPtr value )
 {
 	// Set the model
 	m_model = value;
@@ -69,13 +68,13 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 	delete m_mapper; m_mapper = NULL;
 
 	// Return if the model is not valid
-	if( value.isNull() ) {
+	if( !m_model.get() ) {
 		return;
 	}
 
 	// Create the mapper.
 	m_mapper = new QDataWidgetMapper( this );
-	m_mapper->setModel( m_model.data() );
+	m_mapper->setModel( m_model.get() );
 
 	// Create root layout.
 	m_layout = new QFormLayout( this );
@@ -112,18 +111,6 @@ void QObjectInspector::setModel( PropertyModelWPtr value )
 	// Finish construction
 	m_mapper->toFirst();
 	m_mapper->setSubmitPolicy( QDataWidgetMapper::AutoSubmit );
-}
-
-// ** ObjectInspectorPrivate::ObjectInspectorPrivate
-ObjectInspectorPrivate::ObjectInspectorPrivate( QWidget* parent ) : PrivateInterface( new QObjectInspector( parent ) )
-{
-
-}
-
-// ** ObjectInspectorPrivate::setModel
-void ObjectInspectorPrivate::setModel( PropertyModelWPtr value )
-{
-	m_private->setModel( value );
 }
 
 } // namespace Ui

@@ -51,7 +51,7 @@ namespace Project {
 	private:
 
 									//! Constructs Assets instance.
-									Assets( FileSystemWPtr fileSystem, const Io::Path& path, AssetsModelWPtr assetsModel );
+									Assets( FileSystemQPtr fileSystem, const Io::Path& path, AssetsModelQPtr assetsModel );
 		virtual						~Assets( void );
 
 		//! Adds an asset to cache.
@@ -66,10 +66,10 @@ namespace Project {
 	private:
 
 		//! Adds an asset from a file info.
-		void						addAssetFile( const FileInfoWPtr& fileInfo );
+		void						addAssetFile( const FileInfo& fileInfo );
 
 		//! Puts an asset to cache.
-		bool						putToCache( const FileInfoWPtr& fileInfo, const String& uuid );
+		bool						putToCache( const FileInfo& fileInfo, const String& uuid );
 
 		//! Removes an asset from cache.
 		void						removeFromCache( const String& uuid );
@@ -81,7 +81,7 @@ namespace Project {
 		Io::Path					cacheFolderFromUuid( const String& uuid ) const;
 
 		//! Creates new asset instance by a specified extension.
-		Scene::AssetPtr				createAssetForFile( const FileInfoWPtr& fileInfo );
+		Scene::AssetPtr				createAssetForFile( const FileInfo& fileInfo );
 
 	private:
 
@@ -91,9 +91,9 @@ namespace Project {
 		//! Alias the ext to asset type mapping.
 		typedef Map<String, Scene::Asset::Type> AssetTypes;
 
-		FileSystemWPtr				m_fileSystem;		//!< File system to use.
+		FileSystemQPtr				m_fileSystem;		//!< File system to use.
 		Io::Path					m_path;				//!< Root cache folder path.
-		AssetsModelWPtr				m_assetsModel;		//!< Assets model to use.
+		AssetsModelQPtr				m_assetsModel;		//!< Assets model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
 		Scene::AssetBundlePtr		m_bundle;			//!< Asset bundle.
