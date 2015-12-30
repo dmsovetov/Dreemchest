@@ -34,7 +34,7 @@ DC_BEGIN_COMPOSER
 namespace Ui {
 
 // ** SceneTree::SceneTree
-SceneTree::SceneTree( QWidget* parent ) : InjectedEventEmitter( parent )
+SceneTree::SceneTree( QWidget* parent ) : QTreeView( parent )
 {
 	setHeaderHidden( true );
 	setEditTriggers( EditTrigger::EditKeyPressed );
@@ -85,7 +85,7 @@ void SceneTree::itemDoubleClicked( const QModelIndex& index )
 	Scene::SceneObjectWPtr sceneObject = m_model->dataAt( index );
 
 	// Emit the event.
-	notify<SceneTree::DoubleClicked>( sceneObject );
+    emit sceneObjectDoubleClicked( sceneObject );
 }
 
 } // namespace Ui

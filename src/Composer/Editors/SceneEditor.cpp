@@ -132,8 +132,8 @@ void SceneEditor::render( f32 dt )
 	m_cursorMovement->set( Vec3() );
 }
 
-// ** SceneEditor::handleSceneObjectDoubleClicked
-void SceneEditor::handleSceneObjectDoubleClicked( const Ui::SceneTree::DoubleClicked& e )
+// ** SceneEditor::navigateToObject
+void SceneEditor::navigateToObject( Scene::SceneObjectWPtr sceneObject )
 {
 	// Remove the previous component
 	if( m_camera->has<Scene::MoveTo>() ) {
@@ -141,7 +141,7 @@ void SceneEditor::handleSceneObjectDoubleClicked( const Ui::SceneTree::DoubleCli
 	}
 
 	// Get the  mesh bounding box
-	Bounds bounds = e.sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
+	Bounds bounds = sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
 
 	// Calculate new camera position by subtracting
 	// the view direction from scene object position
@@ -183,7 +183,7 @@ void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 	window->sceneTree()->setModel( m_sceneModel.get() );
 
 	// Subscribe for event
-	window->sceneTree()->subscribe<Ui::SceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+    connect( window->sceneTree(), SIGNAL(sceneObjectDoubleClicked(Scene::SceneObjectWPtr)), this, SLOT(navigateToObject(Scene::SceneObjectWPtr)) );
 }
 
 // ** SceneEditor::notifyEnterBackground
@@ -197,7 +197,7 @@ void SceneEditor::notifyEnterBackground( Ui::MainWindowQPtr window )
 	window->sceneTree()->setModel( NULL );
 
 	// Unsubscribe for event
-	window->sceneTree()->unsubscribe<Ui::SceneTree::DoubleClicked>( dcThisMethod( SceneEditor::handleSceneObjectDoubleClicked ) );
+    disconnect( window->sceneTree(), SIGNAL(sceneObjectDoubleClicked(Scene::SceneObjectWPtr)), this, SLOT(navigateToObject(Scene::SceneObjectWPtr)) );
 }
 
 // ** SceneEditor::menuTransformSelect

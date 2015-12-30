@@ -33,12 +33,15 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	class SceneTree;
-
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
-	class SceneTree : public InjectedEventEmitter<QTreeView> {
+	class SceneTree : public QTreeView {
 
 		Q_OBJECT
+
+    Q_SIGNALS:
+
+        //! This event is emitted when user double clicks the scene object.
+        void                        sceneObjectDoubleClicked( Scene::SceneObjectWPtr sceneObject );
 
 	public:
 
@@ -47,13 +50,6 @@ namespace Ui {
 
 		//! Sets asset tree model.
 		void						setModel( SceneModelQPtr value );
-
-		//! This event is emitted when user double clicks the scene object.
-		struct DoubleClicked {
-									DoubleClicked( Scene::SceneObjectWPtr sceneObject )
-										: sceneObject( sceneObject ) {}
-			Scene::SceneObjectWPtr	sceneObject;	//!< Double clicked scene object.
-		};
 
 	protected:
 

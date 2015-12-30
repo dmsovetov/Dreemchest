@@ -35,6 +35,9 @@ namespace Editors {
 
 	//! Scene editor.
 	class SceneEditor : public VisualEditor {
+
+        Q_OBJECT
+
 	public:
 
                                         //! Constructs SceneEditor instance.
@@ -84,9 +87,6 @@ namespace Editors {
 		//! Scene editor has entered the background.
 		virtual void					notifyEnterBackground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
 
-		//! Handles the scene object double click in scene hierarchy widget.
-		void							handleSceneObjectDoubleClicked( const Ui::SceneTree::DoubleClicked& e );
-
 		//! Disables all transform tools.
 		void							menuTransformSelect( Ui::ActionQPtr action );
 
@@ -128,6 +128,12 @@ namespace Editors {
 
 		//! Binds transformation tool gizmo to a scene object.
 		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTransformTool tool ) const;
+
+    private Q_SLOTS:
+
+        //! Handles the scene object double click in scene hierarchy widget.
+		void							navigateToObject( Scene::SceneObjectWPtr sceneObject );
+
 
 	private:
 
