@@ -64,7 +64,7 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_assetsModel = new AssetsModel( NULL );
 
 	// Create project cache
-	m_assets = new Assets( qComposer->fileSystem(), absolutePath( CachePath ), m_assetsModel.get() );
+	m_assets = new Assets( absolutePath( CachePath ), m_assetsModel.get() );
 
 	// Register asset types
 	m_assets->registerExtension( "", Scene::Asset::Folder );

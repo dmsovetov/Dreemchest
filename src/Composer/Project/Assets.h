@@ -51,7 +51,7 @@ namespace Project {
 	private:
 
 									//! Constructs Assets instance.
-									Assets( FileSystemQPtr fileSystem, const Io::Path& path, AssetsModelQPtr assetsModel );
+									Assets( const Io::Path& path, AssetsModelQPtr assetsModel );
 		virtual						~Assets( void );
 
 		//! Adds an asset to cache.
@@ -91,7 +91,6 @@ namespace Project {
 		//! Alias the ext to asset type mapping.
 		typedef Map<String, Scene::Asset::Type> AssetTypes;
 
-		FileSystemQPtr				m_fileSystem;		//!< File system to use.
 		Io::Path					m_path;				//!< Root cache folder path.
 		AssetsModelQPtr				m_assetsModel;		//!< Assets model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.

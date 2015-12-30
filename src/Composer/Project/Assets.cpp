@@ -36,7 +36,7 @@ DC_BEGIN_COMPOSER
 namespace Project {
 
 // ** Assets::Assets
-Assets::Assets( FileSystemQPtr fileSystem, const Io::Path& path, AssetsModelQPtr assetsModel ) : m_fileSystem( fileSystem ), m_path( path ), m_assetsModel( assetsModel )
+Assets::Assets( const Io::Path& path, AssetsModelQPtr assetsModel ) : m_path( path ), m_assetsModel( assetsModel )
 {
 	// Create an asset bundle
 	m_bundle = Scene::AssetBundle::create( "Assets", path );
@@ -176,23 +176,26 @@ bool Assets::putToCache( const FileInfo& fileInfo, const String& uuid )
 		return false;
 	}
 
+    // Get the shared file system instance
+    FileSystemQPtr fs = qComposer->fileSystem();
+
 	// Create the Assets folder
 	Io::Path AssetsFolderPath = cacheFolderFromUuid( uuid );
 
-	if( !m_fileSystem->fileExists( AssetsFolderPath.c_str() ) ) {
-		m_fileSystem->createDirectory( AssetsFolderPath.c_str() );
+	if( !fs->fileExists( AssetsFolderPath.c_str() ) ) {
+		fs->createDirectory( AssetsFolderPath.c_str() );
 	}
 
 	// Get Assets file path
 	Io::Path AssetsFilePath = cacheFileFromUuid( uuid );
 
 	// Don't Assets twice
-	if( m_fileSystem->fileExists( AssetsFilePath.c_str() ) ) {
+	if( fs->fileExists( AssetsFilePath.c_str() ) ) {
 		return true;
 	}
 
 	// Perform asset caching.
-	bool result = importer->import( m_fileSystem, fileInfo.absolutePath(), AssetsFilePath );
+	bool result = importer->import( fs, fileInfo.absolutePath(), AssetsFilePath );
 	DC_BREAK_IF( !result );
 
 	qDebug() << "Cached" << fileInfo.fileName().c_str();
@@ -203,7 +206,7 @@ bool Assets::putToCache( const FileInfo& fileInfo, const String& uuid )
 // ** Assets::removeFromCache
 void Assets::removeFromCache( const String& uuid )
 {
-	m_fileSystem->removeFile( cacheFileFromUuid( uuid ).c_str() );
+	qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid ).c_str() );
 }
 
 // ** Assets::cacheFolderFromUuid
