@@ -34,9 +34,6 @@ DC_BEGIN_DREEMCHEST
 	class AbstractFactory {
 	public:
 
-		//! Base strong pointer type.
-		typedef StrongPtr<TBase>	Ptr;
-
 		//! Registers the new object factory.
 		template<typename TDerived>
 		bool declare( const TTypeId& id )
@@ -50,12 +47,12 @@ DC_BEGIN_DREEMCHEST
 		}
 
 		//! Constructs a new object instance.
-		Ptr construct( const TTypeId& id ) const
+		TBase* construct( const TTypeId& id ) const
 		{
 			typename Factories::const_iterator i = m_factories.find( id );
 
 			if( i == m_factories.end() ) {
-				return Ptr();
+				return NULL;
 			}
 
 			return i->second->create();
@@ -66,14 +63,14 @@ DC_BEGIN_DREEMCHEST
 		//! Object factory base.
 		struct Factory : public RefCounted {
 			//! Creates new object instance.
-			virtual Ptr	create( void ) const = 0;
+			virtual TBase*	create( void ) const = 0;
 		};
 
 		//! Generic object factory.
 		template<typename TDerived>
 		struct TypeFactory : public Factory {
 			//! Creates a new instance of TDerived type.
-			virtual Ptr create( void ) const { return Ptr( DC_NEW TDerived ); }
+			virtual TBase* create( void ) const { return DC_NEW TDerived; }
 		};
 
 		//! Factory strong pointer type.
@@ -92,7 +89,7 @@ DC_BEGIN_DREEMCHEST
 	public:
 
 		//! Constructs the object by type id.
-		StrongPtr<TBase> construct( TypeIdx id ) const
+		TBase* construct( TypeIdx id ) const
 		{
 			return m_factory.construct( id );
 		}
@@ -132,7 +129,7 @@ DC_BEGIN_DREEMCHEST
 	public:
 
 		//! Constructs the object by type id.
-		StrongPtr<TBase> construct( const String& id ) const
+		TBase* construct( const String& id ) const
 		{
 			return m_factory.construct( id );
 		}
@@ -146,7 +143,7 @@ DC_BEGIN_DREEMCHEST
 
 		//! Constructs a new object instance.
 		template<typename TDerived>
-		StrongPtr<TDerived> construct( void ) const
+		TBase* construct( void ) const
 		{
 			return m_factory.construct( generateTypeName<TDerived>() );
 		}
