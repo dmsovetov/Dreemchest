@@ -322,7 +322,7 @@ void SceneEditor::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
 	// Extract assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( mime );
+	Scene::AssetSet assets = qComposer->assetsFromMime( mime );
 
 	// Get the asset action
 	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );

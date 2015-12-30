@@ -120,7 +120,7 @@ bool SceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( data );
+	Scene::AssetSet assets = qComposer->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
@@ -149,7 +149,7 @@ bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, 
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = Composer::instance()->assetsFromMime( data );
+	Scene::AssetSet assets = qComposer->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();

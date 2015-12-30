@@ -35,10 +35,13 @@ namespace Ui {
 
 	//! Main application window Qt implementation
 	class MainWindow : public QMainWindow {
+
+        Q_OBJECT
+
 	public:
 
 										//! Constructs MainWindow instance.
-										MainWindow( const String& title );
+										MainWindow( const QString& title );
 									
 		//! Adds a new toolbar to window.
 		ToolBarQPtr			            addToolBar( void );
@@ -47,7 +50,7 @@ namespace Ui {
 		MenuQPtr				        addMenu( const String& text );
 	
 		//! Performs the main window initialization.
-		bool					        initialize( ComposerWPtr composer );
+		bool					        initialize( ComposerQPtr composer );
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
 		DocumentQPtr			        editDocument( Editors::AssetEditorWPtr assetEditor, const Scene::AssetPtr& asset );
@@ -93,11 +96,13 @@ namespace Ui {
 		//! Creates the dock widget.
 		QDockWidget*					addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea = Qt::LeftDockWidgetArea, Qt::DockWidgetAreas allowedDockAreas = Qt::AllDockWidgetAreas, QDockWidget* destination = NULL );
 
+    private slots:
+
 		//! Handles the ProjectOpened event.
-		void							onProjectOpened( const Composer::ProjectOpened& e );
+		void							createProjectInterface( Project::Project* project );
 
 		//! Handles the ProjectClosed event.
-		void							onProjectClosed( const Composer::ProjectClosed& e );
+		void							destroyProjectInterface( Project::Project* project );
 	
 	private:
 

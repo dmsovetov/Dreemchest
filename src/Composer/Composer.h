@@ -57,6 +57,9 @@
 #define qDeclarePtr( T )		        \
 		    typedef class T* T##QPtr;
 
+#define qComposer    qobject_cast<Composer*>( qApp )
+#define qMainWindow  qComposer->window()
+
 #define DC_BEGIN_COMPOSER	/*namespace Composer {*/
 #define DC_END_COMPOSER		/*}*/
 
@@ -205,8 +208,7 @@ DC_BEGIN_COMPOSER
 
 	} // namespace Project
 
-	dcDeclarePtrs( Composer )
-
+	qDeclarePtr( Composer )
     qDeclarePtr( FileSystem )
     qDeclarePtr( SceneModel )
     qDeclarePtr( AssetsModel )
@@ -250,7 +252,21 @@ DC_BEGIN_COMPOSER
 	};
 
 	//! Root composer class.
-	class Composer : public RefCountedEventEmitter {
+	class Composer : public QApplication {
+
+        Q_OBJECT
+
+	Q_SIGNALS:
+
+		//! Event is emitted when the project is created.
+		void				projectCreated( Project::Project* project );
+
+        //! Event is emitted when the project was opened.
+        void				projectOpened( Project::Project* project );
+
+        //! Event is emitted when the project was closed.
+        void				projectClosed( Project::Project* project );
+
 	public:
 
 		//! Asset MIME type string.
@@ -259,36 +275,15 @@ DC_BEGIN_COMPOSER
 		//! Available menues
 		enum Menu {
 			  FileMenu
-			, EditMenu
+			, EditMenu 
 			, ViewMenu
 			, AssetsMenu
 		
 			, TotalMenues
 		};
 
-		//! Event is emitted when the project is created.
-		struct ProjectCreated {
-									//! Constructs ProjectCreated event.
-									ProjectCreated( Project::ProjectWPtr project );
-
-			Project::ProjectWPtr	project;	//!< Created project.
-		};
-
-		//! Event is emitted when the project was opened.
-		struct ProjectOpened {
-									//! Constructs ProjectOpened event.
-									ProjectOpened( Project::ProjectWPtr project );
-
-			Project::ProjectWPtr	project;	//!< Opened project.
-		};
-
-		//! Event is emitted when the project was closed.
-		struct ProjectClosed {
-									//! Constructs ProjectClosed event.
-									ProjectClosed( Project::ProjectWPtr project );
-
-			Project::ProjectPtr		project;	//!< Closed project.
-		};
+                                //! Constructs Composer instance.
+								Composer( int argc, char ** argv );
 
 		//! Opens the existing project at path.
 		void					openProject( const String& path );
@@ -296,11 +291,14 @@ DC_BEGIN_COMPOSER
 		//! Creates new project at path.
 		void					createProject( const String& path );
 
-		//! Returns opened project pointer.
+		//! Returns opened project.
 		Project::ProjectWPtr	project( void ) const;
 
-		//! Returns main window pointer.
+		//! Returns main window.
 		Ui::MainWindowQPtr		window( void ) const;
+
+		//! Performs the composer initialization.
+		bool					initialize( void );
 
 		//! Extracts an asset set from MIME data.
 		Scene::AssetSet			assetsFromMime( MimeDataQPtr mime ) const;
@@ -308,16 +306,7 @@ DC_BEGIN_COMPOSER
 		//! Extracts a single asset from MIME data.
 		Scene::AssetPtr			assetFromMime( MimeDataQPtr mime ) const;
 
-		//! Creates the Composer instance.
-		static ComposerPtr		create( void );
-
-		//! Returns the Composer instance.
-		static ComposerWPtr		instance( void );
-
 	private:
-
-								//! Constructs Composer instance.
-								Composer( Ui::MainWindowQPtr mainWindow );
 
 		//! Creates a new project.
 		void					menuCreateProject( Ui::ActionQPtr action );
@@ -334,12 +323,8 @@ DC_BEGIN_COMPOSER
 		//! Redo the last action.
 		void					menuRedo( Ui::ActionQPtr action );
 
-		//! Performs the composer initialization.
-		bool					initialize( void );
-
 	private:
 
-		static ComposerWPtr		s_instance;				//!< Shared composer instance.
 		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
 		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
 		Project::ProjectPtr		m_project;				//!< Active project.

@@ -37,7 +37,6 @@ namespace Project {
 
 	//! Represents active project.
 	class Project : public RefCounted {
-	friend class AssetsModelDelegate;
 	public:
 
 		//! Built-in project paths.

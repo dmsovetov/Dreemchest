@@ -32,10 +32,6 @@
 
 #include "Project/Project.h"
 
-#ifdef emit
-	#undef emit
-#endif
-
 DC_BEGIN_COMPOSER
 
 namespace Editors {
@@ -89,25 +85,21 @@ void SceneEditorInternal::setSelected( bool value )
 
 // -------------------------------------------------------------------- Composer -------------------------------------------------------------------- //
 
-// ** Composer::s_instance
-ComposerWPtr Composer::s_instance = ComposerWPtr();
-
 // ** Composer::kAssetMime
 const String Composer::kAssetMime = "text/uri-list";
 
 // ** Composer::Composer
-Composer::Composer( Ui::MainWindowQPtr mainWindow ) : m_mainWindow( mainWindow )
+Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv )
 {
-	s_instance = this;
+    // Set application name
+    setApplicationName( "Dreemchest Composer" );
 
+    // Create the main window
+    m_mainWindow = new Ui::MainWindow( applicationName() );
+
+    // Setup default log handlers
 	Renderer::log::setStandardHandler();
 	Scene::log::setStandardHandler();
-}
-
-// ** Composer::instance
-ComposerWPtr Composer::instance( void )
-{
-	return s_instance;
 }
 
 // ** Composer::project
@@ -123,21 +115,21 @@ Ui::MainWindowQPtr Composer::window( void ) const
 }
 
 // ** Composer::create
-ComposerPtr Composer::create( void )
-{
-	// Create the main window
-	Ui::MainWindowQPtr mainWindow = new Ui::MainWindow( "Dreemchest Composer" );
-	
-	// Create the composer instance
-	ComposerPtr composer = new Composer( mainWindow );
-
-	// Initialize the composer
-	if( !composer->initialize() ) {
-		return ComposerPtr();
-	}
-
-	return composer;
-}
+//ComposerPtr Composer::create( void )
+//{
+//	// Create the main window
+//	Ui::MainWindowQPtr mainWindow = new Ui::MainWindow( "Dreemchest Composer" );
+//	
+//	// Create the composer instance
+//	ComposerPtr composer = new Composer( mainWindow );
+//
+//	// Initialize the composer
+//	if( !composer->initialize() ) {
+//		return ComposerPtr();
+//	}
+//
+//	return composer;
+//}
 
 // ** Composer::initialize
 bool Composer::initialize( void )
@@ -236,8 +228,8 @@ void Composer::createProject( const String& path )
 		fs->createDirectory( m_project->absolutePath( i ) );
 	}
 
-	// Emit the event
-	notify<ProjectCreated>( m_project );
+	// Emit the signal
+    emit projectCreated( m_project.get() );
 
 	// Open created project
 	openProject( path );
@@ -292,8 +284,8 @@ void Composer::openProject( const String& path )
 	// Create project instance
 	m_project = Project::Project::create( m_mainWindow, path );
 
-	// Emit the event
-	notify<ProjectOpened>( m_project );
+	// Emit the signal
+    emit projectOpened( m_project.get() );
 
 	// Setup menues
 	//m_menues[EditMenu]	 = m_mainWindow->addMenu( "&Edit" );
@@ -304,24 +296,6 @@ void Composer::openProject( const String& path )
 	m_project->fillAssetMenu( m_menues[AssetsMenu] );
 }
 
-// ** Composer::ProjectOpened::ProjectOpened
-Composer::ProjectOpened::ProjectOpened( Project::ProjectWPtr project ) : project( project )
-{
-
-}
-
-// ** Composer::ProjectClosed::ProjectClosed
-Composer::ProjectClosed::ProjectClosed( Project::ProjectWPtr project ) : project( project )
-{
-
-}
-
-// ** Composer::ProjectCreated::ProjectCreated
-Composer::ProjectCreated::ProjectCreated( Project::ProjectWPtr project ) : project( project )
-{
-
-}
-
 DC_END_COMPOSER
 
 // ** main
@@ -329,16 +303,14 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication::setLibraryPaths( QCoreApplication::libraryPaths() << "." << "imageformats" << "platforms" );
 
-    QApplication app( argc, argv );
-    app.setApplicationName( "Dreemchest Composer" );
+    Composer app( argc, argv );
 
-	ComposerPtr composer = Composer::create();
-
-	if( !composer.valid() ) {
-		return -1;
-	}
-
-	composer->openProject( "~TestProject" );
+    if( !app.initialize() ) {
+        return -1;
+    }
+    
+    // Open the project
+	app.openProject( "~TestProject" );
 
     return app.exec();
 }

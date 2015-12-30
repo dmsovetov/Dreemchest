@@ -61,7 +61,7 @@ Platform::Key convertKey( s32 key )
 }
 
 // ** MainWindow::MainWindow
-MainWindow::MainWindow( const String& title ) : m_assetTree( NULL ), m_activeDocument( NULL ), m_sceneTree( NULL ), m_inspector( NULL )
+MainWindow::MainWindow( const QString& title ) : m_assetTree( NULL ), m_activeDocument( NULL ), m_sceneTree( NULL ), m_inspector( NULL )
 {
 #if DEV_USE_DOCK_INDICATOR
 	// Add the dock indicator widget
@@ -85,18 +85,18 @@ MainWindow::MainWindow( const String& title ) : m_assetTree( NULL ), m_activeDoc
 
     setUnifiedTitleAndToolBarOnMac( true );
 	show();
-	setWindowTitle( title.c_str() );
+	setWindowTitle( title );
 }
 
 // ** MainWindow::initialize
-bool MainWindow::initialize( ComposerWPtr composer )
+bool MainWindow::initialize( ComposerQPtr composer )
 {
 	// Create the file system
 	m_fileSystem = new FileSystem( this );
 
-	// Listen for events
-	composer->subscribe<Composer::ProjectOpened>( dcThisMethod( MainWindow::onProjectOpened ) );
-	composer->subscribe<Composer::ProjectClosed>( dcThisMethod( MainWindow::onProjectClosed ) );
+	// Listen for signals
+    connect( composer, SIGNAL(projectOpened(Project::Project*)), this, SLOT(createProjectInterface(Project::Project*)) );
+    connect( composer, SIGNAL(projectClosed(Project::Project*)), this, SLOT(destroyProjectInterface(Project::Project*)) );
 
 	return true;
 }
@@ -351,15 +351,15 @@ bool MainWindow::ensureSaved( DocumentQPtr document ) const
 	return true;
 }
 
-// ** MainWindow::onProjectOpened
-void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
+// ** MainWindow::createProjectInterface
+void MainWindow::createProjectInterface( Project::Project* project )
 {
     DC_BREAK_IF( m_assetTree );
     DC_BREAK_IF( m_sceneTree );
     DC_BREAK_IF( m_inspector );
 
 	// Get the project from event
-	m_project = e.project;
+	m_project = project;
 
 	// Create the asset tree
 	m_assetTree = new AssetTree( m_project, this );
@@ -381,11 +381,11 @@ void MainWindow::onProjectOpened( const Composer::ProjectOpened& e )
 	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
 
 	// Update window caption
-	setWindowTitle( m_project->name().c_str() + QString( " - Dreemchest Composer" ) );
+	setWindowTitle( m_project->name().c_str() + QString( " - " + windowTitle() ) );
 }
 
-// ** MainWindow::onProjectClosed
-void MainWindow::onProjectClosed( const Composer::ProjectClosed& e )
+// ** MainWindow::destroyProjectInterface
+void MainWindow::destroyProjectInterface( Project::Project* project )
 {
 	m_project = Project::ProjectWPtr();
 	DC_BREAK;

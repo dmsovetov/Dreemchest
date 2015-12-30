@@ -47,7 +47,7 @@ AssetSelector::AssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m
 {
 	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
 
-	m_line = new QLineEdit;
+	m_line = new QLineEdit( this );
 	m_line->installEventFilter( this );
 	m_line->setReadOnly( true );
 
@@ -76,7 +76,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								}
 
 								// Decode asset
-								Scene::AssetPtr asset = Composer::instance()->assetFromMime( de->mimeData() );
+								Scene::AssetPtr asset = qComposer->assetFromMime( de->mimeData() );
 
 								// Check asset type
 								if( !asset.valid() || (asset->type() & m_mask) == 0 ) {
@@ -92,7 +92,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								QDropEvent* de = static_cast<QDropEvent*>( e );
 
 								// Decode asset
-								Scene::AssetWPtr asset = Composer::instance()->assetFromMime( de->mimeData() );
+								Scene::AssetWPtr asset = qComposer->assetFromMime( de->mimeData() );
 								
 								// Set the value
 								setValue( asset );
@@ -246,7 +246,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	}
 
 	// Get the inspector widget
-	InspectorQPtr inspector = Composer::instance()->window()->inspector();
+	InspectorQPtr inspector = qMainWindow->inspector();
 
 	// The asset was deselected - hide inspector
 	if( indexes.empty() ) {
