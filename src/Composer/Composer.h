@@ -220,37 +220,6 @@ DC_BEGIN_COMPOSER
 	//! Container type to store file info.
 	typedef QVector<class FileInfo> FileInfoArray;
 
-	//! Base interface class.
-	class IInterface : public RefCountedEventEmitter {
-	public:
-
-		virtual						~IInterface( void ) {}
-
-		//! Returns the raw private implementation pointer.
-		virtual void*				ptr( void ) const = 0;
-
-		//! Returns the private interface.
-		template<typename T>
-		T*							privateInterface( void ) const { return reinterpret_cast<T*>( ptr() ); }
-	};
-
-	//! Generic class to declare interface implementations.
-	template<typename TBase, typename TPrivate>
-	class PrivateInterface : public TBase {
-	public:
-
-									//! Constructs the PrivateInterface instance.
-									PrivateInterface( TPrivate* instance )
-										: m_private( instance ) {}
-
-		//! Returns the private interface.
-		virtual void*				ptr( void ) const { return m_private.get(); }
-
-	protected:
-
-		AutoPtr<TPrivate>			m_private;	//!< Actual implementation instance.
-	};
-
 	//! Root composer class.
 	class Composer : public QApplication {
 

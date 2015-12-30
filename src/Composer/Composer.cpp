@@ -114,23 +114,6 @@ Ui::MainWindowQPtr Composer::window( void ) const
 	return m_mainWindow;
 }
 
-// ** Composer::create
-//ComposerPtr Composer::create( void )
-//{
-//	// Create the main window
-//	Ui::MainWindowQPtr mainWindow = new Ui::MainWindow( "Dreemchest Composer" );
-//	
-//	// Create the composer instance
-//	ComposerPtr composer = new Composer( mainWindow );
-//
-//	// Initialize the composer
-//	if( !composer->initialize() ) {
-//		return ComposerPtr();
-//	}
-//
-//	return composer;
-//}
-
 // ** Composer::initialize
 bool Composer::initialize( void )
 {
