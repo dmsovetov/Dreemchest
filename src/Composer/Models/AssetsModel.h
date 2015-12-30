@@ -24,81 +24,12 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Qt_AssetsModelPrivate_H__
-#define __DC_Composer_Qt_AssetsModelPrivate_H__
+#ifndef __DC_Composer_AssetsModel_H__
+#define __DC_Composer_AssetsModel_H__
 
 #include "AbstractTreeModel.h"
-#include "../FileSystem.h"
 
 DC_BEGIN_COMPOSER
-
-	class AssetsModelPrivate;
-
-#if DEV_CUSTOM_ASSET_MODEL
-
-	//! Asset files model.
-	class QAssetsModel : public QLocalFileSystemModel {
-
-		Q_OBJECT
-
-	public:
-
-								//! Constructs the QAssetsModel instance.
-		explicit				QAssetsModel( AssetsModel* parentAssetsModel, QObject* parent = NULL );
-
-		//! Returns assets UUID for a specified asset file.
-		String					uuid( const FileInfo& assetFile ) const;
-
-		//! Updates meta data for specified asset file.
-		void					setMetaData( const FileInfo& assetFile, const Io::KeyValue& data );
-
-		//! Returns meta data for a specified asset file.
-		Io::KeyValue			metaData( const FileInfo& assetFile ) const;
-
-		//! Returns asset file info by model index.
-		FileInfo				assetFile( const QModelIndex& index ) const;
-
-	private:
-
-		//! Returns true if the file should not be put to model.
-		virtual bool			shouldSkipFile( const QFileInfo& file ) const Q_DECL_OVERRIDE;
-
-		//! Returns list of MIME types.
-		virtual QStringList		mimeTypes( void ) const Q_DECL_OVERRIDE;
-
-		//! Returns the meta file name from file info.
-		QString					metaFileName( const FileInfo& assetFile ) const;
-
-		//! Returns the meta file name from absolute file path.
-		QString					metaFileNameFromPath( const QString& fileName ) const;
-
-		//! Renames meta file.
-		bool					renameMetaFile( const QString& oldFileName, const QString& newFileName );
-
-	private slots:
-
-		//! Processes an added file.
-		void					fileAdded( const QFileInfo& file );
-
-		//! Processes removed file.
-		void					fileRemoved( const QFileInfo& file );
-
-		//! Processes the file change.
-		void					fileChanged( const QFileInfo& file );
-
-		//! Processes the file rename.
-		void					fileRenamed( const QFileInfo& file, const QString& oldFileName, const QString& newFileName );
-
-		//! Processes the file movement.
-		void					fileMoved( const QFileInfo& file, const QString& oldFileName, const QString& newFileName );
-
-	private:
-
-		AssetsModel*			m_parent;				//!< Parent assets model.
-		QString					m_metaFileExtension;	//!< Meta file extension.
-	};
-
-#else
 
 	//! Asset file system model.
 	class AssetsModel : public QFileSystemModel {
@@ -228,8 +159,6 @@ DC_BEGIN_COMPOSER
 		AssetsModelQPtr	                m_model;	//!< Actual assets model.
 	};
 
-#endif	/*	DEV_CUSTOM_ASSET_MODEL	*/
-
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_AssetsModelPrivate_H__	*/
+#endif	/*	!__DC_Composer_Qt_AssetsModel_H__	*/

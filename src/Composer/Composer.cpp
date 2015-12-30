@@ -26,6 +26,8 @@
 
 #include "Composer.h"
 
+#include "FileSystem.h"
+
 #include "Widgets/Menu.h"
 #include "Widgets/MainWindow.h"
 #include "Widgets/AssetTree.h"

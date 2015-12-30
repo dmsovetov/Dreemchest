@@ -152,13 +152,13 @@ void AssetTree::setModel( AssetsModelQPtr value )
 	m_proxy = new FilteredAssetsModel( value, this );
 	QTreeView::setModel( m_proxy );
 
-#if !DEV_CUSTOM_ASSET_MODEL
+    // Set the root index
 	setRootIndex( m_proxy->root() );
 
+    // Hide columns
 	for( s32 i = 1; i < m_proxy->columnCount(); i++ ) {
 		setColumnHidden( i, true );
 	}
-#endif	/*	!DEV_CUSTOM_ASSET_MODEL	*/
 }
 
 // ** AssetTree::keyPressEvent
@@ -283,11 +283,7 @@ FileInfoArray AssetTree::selection( void ) const
 	FileInfoArray result;
 
 	foreach( QModelIndex idx, selectedIndexes() ) {
-	#if DEV_CUSTOM_ASSET_MODEL
-		result.push_back( m_proxy->asset( idx ).absoluteFilePath().toStdString() );
-	#else
 		result.push_back( m_proxy->assetFile( idx ) );
-	#endif
 	}
 
 	return result;

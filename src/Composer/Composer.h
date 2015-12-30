@@ -30,7 +30,6 @@
 #include <Dreemchest.h>
 #include <functional>
 
-#define DEV_CUSTOM_ASSET_MODEL			(0)
 #define DEV_BACKGROUND_ASSET_LOADING	(0)
 #define DEV_USE_DOCK_INDICATOR			(1)
 
