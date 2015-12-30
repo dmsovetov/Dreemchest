@@ -45,7 +45,7 @@ DC_BEGIN_COMPOSER
 		};
 
 							//! Constructs TerrainTool instance.
-							TerrainTool( Scene::TerrainWPtr terrain = Scene::TerrainWPtr(), f32 radius = 1.0f, f32 strength = 0.1f );
+							TerrainTool( Scene::TerrainWPtr terrain = Scene::TerrainWPtr(), f32 radius = 1.0f, f32 strength = 0.1f, f32 exp = 1.0f );
 
 		//! Returns tool radius.
 		f32					radius( void ) const;
@@ -71,11 +71,18 @@ DC_BEGIN_COMPOSER
 		//! Sets tool type.
 		void				setType( Type value );
 
+        //! Returns tool exponentiation factor.
+        f32                 exp( void ) const;
+
+        //! Sets tool exponentiation factor.
+        void                setExp( f32 value );
+
 	private:
 
 		f32					m_radius;	//!< Terrain tool radius.
 		f32					m_strength;	//!< Terrain tool strength.
 		Type				m_type;		//!< Tool type.
+        f32                 m_exp;      //!< Tool exponentiation factor.
 
 		Scene::TerrainWPtr	m_terrain;	//!< Affected terrain instance.
 	};

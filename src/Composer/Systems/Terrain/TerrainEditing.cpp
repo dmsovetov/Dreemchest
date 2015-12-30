@@ -32,7 +32,7 @@ DC_BEGIN_COMPOSER
 // --------------------------------------------------------------------- TerrainTool ------------------------------------------------------------------------ //
 
 // ** TerrainTool::TerrainTool
-TerrainTool::TerrainTool( Scene::TerrainWPtr terrain, f32 radius, f32 strength ) : m_radius( radius ), m_terrain( terrain ), m_strength( strength ), m_type( Raise )
+TerrainTool::TerrainTool( Scene::TerrainWPtr terrain, f32 radius, f32 strength, f32 exp ) : m_radius( radius ), m_terrain( terrain ), m_strength( strength ), m_type( Raise ), m_exp( exp )
 {
 
 }
@@ -61,6 +61,18 @@ void TerrainTool::setStrength( f32 value )
 	m_strength = value;
 }
 
+// ** TerrainTool::exp
+f32 TerrainTool::exp( void ) const
+{
+    return m_exp;
+}
+
+// ** TerrainTool::setExp
+void TerrainTool::setExp( f32 value )
+{
+    m_exp = value;
+}
+
 // ** TerrainTool::terrain
 Scene::TerrainWPtr TerrainTool::terrain( void ) const
 {
@@ -75,7 +87,8 @@ f32 TerrainTool::influence( f32 distance ) const
 	}
 
     DC_BREAK_IF( m_strength < 0.0f || m_strength > 1.0f );
-	return sinf( 1.0f - distance / m_radius ) * m_strength;
+    f32 factor = distance / m_radius;
+	return sinf( 1.0f - powf( factor, m_exp ) ) * m_strength;
 }
 
 // ** TerrainTool::type
