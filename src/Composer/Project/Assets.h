@@ -54,12 +54,6 @@ DC_BEGIN_COMPOSER
 									//! Constructs Assets instance.
 									Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem );
 
-		//! Puts an asset to cache.
-		bool						putToCache( const FileInfo& fileInfo, const String& uuid );
-
-		//! Removes an asset from cache.
-		void						removeFromCache( const String& uuid );
-
 		//! Returns asset cache path.
 		Io::Path					cacheFileFromUuid( const String& uuid ) const;
 
@@ -75,10 +69,10 @@ DC_BEGIN_COMPOSER
 		void						addAssetFile( const FileInfo& file );
 
 		//! Removes an asset from cache.
-		void						removeAssetFromCache( const FileInfo& file );
+		void						removeAssetFromCache( const QString& uuid, const FileInfo& file );
 
 		//! Performs caching of a changed asset.
-		void						updateAssetCache( const FileInfo& file );
+		bool						updateAssetCache( const QString& uuid, const FileInfo& file );
 
 	private:
 

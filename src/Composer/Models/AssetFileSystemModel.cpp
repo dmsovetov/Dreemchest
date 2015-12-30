@@ -176,7 +176,7 @@ void AssetFileSystemModel::assetsRemoved( const QModelIndex& parent, int start, 
 		}
 
 		// Dispatch an event
-        emit fileRemoved( file );
+        emit fileRemoved( QString::fromStdString( uuid( file ) ), file );
 
 		// Remove meta file
 		bool result = QDir().remove( metaFileName( file ) );

@@ -53,8 +53,8 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
-    connect( m_assetFileSystem, SIGNAL(fileRemoved(const FileInfo&)), this, SLOT(removeFromCache(const FileInfo&)) );
-    connect( m_assetFileSystem, SIGNAL(fileChanged(const FileInfo&)), this, SLOT(updateAssetCache(const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileRemoved(const QString&, const FileInfo&)), this, SLOT(removeFromCache(const QString&, const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileChanged(const QString&, const FileInfo&)), this, SLOT(updateAssetCache(const QString&, const FileInfo&)) );
 }
 
 // ** Assets::bundle
@@ -96,26 +96,50 @@ Scene::Asset::Type Assets::assetTypeFromExtension( const String& extension ) con
 }
 
 // ** Assets::removeAssetFromCache
-void Assets::removeAssetFromCache( const FileInfo& file )
+void Assets::removeAssetFromCache( const QString& uuid, const FileInfo& file )
 {
-	// Get the asset UUID.
-	String uuid = m_assetFileSystem->uuid( file );
-
 	// Remove asset from bundle
-	m_bundle->removeAsset( uuid );
+	m_bundle->removeAsset( uuid.toStdString() );
 
 	// Remove asset from cache
-	removeFromCache( uuid );
+    qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid.toStdString() ).c_str() );
 }
 
 // ** Assets::updateAssetCache
-void Assets::updateAssetCache( const FileInfo& file )
+bool Assets::updateAssetCache( const QString& uuid, const FileInfo& file )
 {
-	// Get the asset UUID.
-	String uuid = m_assetFileSystem->uuid( file );
+	// Create an asset importer for
+	Importers::AssetImporterPtr importer = m_assetImporters.construct( file.extension() );
 
-	// Update asset's cache
-	putToCache( file, uuid );
+	if( !importer.valid() ) {
+		return false;
+	}
+
+    // Get the shared file system instance
+    FileSystemQPtr fs = qComposer->fileSystem();
+
+	// Create the Assets folder
+	Io::Path AssetsFolderPath = cacheFolderFromUuid( uuid.toStdString() );
+
+	if( !fs->fileExists( AssetsFolderPath.c_str() ) ) {
+		fs->createDirectory( AssetsFolderPath.c_str() );
+	}
+
+	// Get Assets file path
+	Io::Path AssetsFilePath = cacheFileFromUuid( uuid.toStdString() );
+
+	// Don't Assets twice
+	if( fs->fileExists( AssetsFilePath.c_str() ) ) {
+		return true;
+	}
+
+	// Perform asset caching.
+	bool result = importer->import( fs, file.absolutePath(), AssetsFilePath );
+	DC_BREAK_IF( !result );
+
+	qDebug() << "Cached" << file.fileName().c_str();
+
+	return result;
 }
 
 // ** Assets::addAssetFile
@@ -148,50 +172,7 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 	m_bundle->addAsset( asset );
 
 	// Put asset to cache
-	putToCache( fileInfo, asset->uuid() );
-}
-
-// ** Assets::putToCache
-bool Assets::putToCache( const FileInfo& fileInfo, const String& uuid )
-{
-	// Create an asset importer for
-	Importers::AssetImporterPtr importer = m_assetImporters.construct( fileInfo.extension() );
-
-	if( !importer.valid() ) {
-		return false;
-	}
-
-    // Get the shared file system instance
-    FileSystemQPtr fs = qComposer->fileSystem();
-
-	// Create the Assets folder
-	Io::Path AssetsFolderPath = cacheFolderFromUuid( uuid );
-
-	if( !fs->fileExists( AssetsFolderPath.c_str() ) ) {
-		fs->createDirectory( AssetsFolderPath.c_str() );
-	}
-
-	// Get Assets file path
-	Io::Path AssetsFilePath = cacheFileFromUuid( uuid );
-
-	// Don't Assets twice
-	if( fs->fileExists( AssetsFilePath.c_str() ) ) {
-		return true;
-	}
-
-	// Perform asset caching.
-	bool result = importer->import( fs, fileInfo.absolutePath(), AssetsFilePath );
-	DC_BREAK_IF( !result );
-
-	qDebug() << "Cached" << fileInfo.fileName().c_str();
-
-	return result;
-}
-
-// ** Assets::removeFromCache
-void Assets::removeFromCache( const String& uuid )
-{
-	qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid ).c_str() );
+	updateAssetCache( QString::fromStdString( asset->uuid() ), fileInfo );
 }
 
 // ** Assets::cacheFolderFromUuid

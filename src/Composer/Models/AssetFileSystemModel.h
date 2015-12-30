@@ -42,10 +42,10 @@ DC_BEGIN_COMPOSER
         void                    fileAdded( const FileInfo& file );
 
 		//! This event is emitted when a new asset file was removed from a project.
-        void                    fileRemoved( const FileInfo& file );
+        void                    fileRemoved( const QString& uuid, const FileInfo& file );
 
 		//! This event is emitted when a new asset file was changed.
-        void                    fileChanged( const FileInfo& file );
+        void                    fileChanged( const QString& uuid, const FileInfo& file );
 
 		//! This event is emitted when scanning progress was started.
         void                    scanningStarted( void );
