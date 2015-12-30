@@ -170,7 +170,7 @@ void TranslationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs
 void TranslationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 
@@ -196,7 +196,7 @@ void TranslationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs
 void TranslationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, TranslationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 

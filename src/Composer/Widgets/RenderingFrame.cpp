@@ -36,7 +36,7 @@ QGLFormat RenderingFrame::kOpenGLFormat;
 
 // ** RenderingFrame::RenderingFrame
 RenderingFrame::RenderingFrame( const QGLWidget* sharedWidget, QWidget* parent )
-	: QGLWidget( kOpenGLFormat, parent, sharedWidget ), m_timer( -1 ), m_hasLostFocus( false )
+	: QGLWidget( kOpenGLFormat, parent, sharedWidget ), m_timer( -1 )/*, m_hasLostFocus( false )*/
 {
 	setAcceptDrops( true );
 	setMouseTracking( true );
@@ -74,210 +74,14 @@ void RenderingFrame::setInterval( s32 value )
 	m_deltaTime.start();
 }
 
-// ** RenderingFrame::mousePressEvent
-void RenderingFrame::mousePressEvent( QMouseEvent* e )
-{
-	// Set the focus to this widget
-	setFocus();
-
-	// Get the mouse button from event
-	u8 button;
-
-	switch( e->button() ) {
-	case Qt::LeftButton:	button = LeftMouseButton;	break;
-	case Qt::RightButton:	button = RightMouseButton;	break;
-	case Qt::MidButton:		button = MiddleMouseButton;	break;	
-	}
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleMousePress( e->pos().x(), e->pos().y(), button );
-	}
-
-	// Save current cursor position
-	m_lastCursorPos = e->pos();
-
-	// Enable mouse down flag
-	m_isMouseButtons.on( button );
-}
-
-// ** RenderingFrame::mouseReleaseEvent
-void RenderingFrame::mouseReleaseEvent( QMouseEvent* e )
-{
-	// Get the mouse button from event
-	u8 button;
-
-	switch( e->button() ) {
-	case Qt::LeftButton:	button = LeftMouseButton;	break;
-	case Qt::RightButton:	button = RightMouseButton;	break;
-	case Qt::MidButton:		button = MiddleMouseButton;	break;	
-	}
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleMouseRelease( e->pos().x(), e->pos().y(), button );
-	}
-
-	// Disable mouse down flag
-	m_isMouseButtons.off( button );
-}
-
-// ** RenderingFrame::wheelEvent
-void RenderingFrame::wheelEvent( QWheelEvent* e )
-{
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleMouseWheel( e->delta() );
-	}
-}
-
-// ** RenderingFrame::resizeEvent
-void RenderingFrame::resizeEvent( QResizeEvent* e )
-{
-	// Get the new size
-	s32 w = e->size().width();
-	s32 h = e->size().height();
-
-	// Process the resize by QGLWidget
-	resizeGL( w, h );
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleResize( w, h );
-	}
-}
-
-// ** RenderingFrame::dragEnterEvent
-void RenderingFrame::dragEnterEvent( QDragEnterEvent* e )
-{
-	if( !m_delegate.valid() ) {
-		return;
-	}
-
-	if( m_delegate->handleDragEnter( e->mimeData() ) ) {
-		e->acceptProposedAction();
-	}
-}
-
-// ** RenderingFrame::dragMoveEvent
-void RenderingFrame::dragMoveEvent( QDragMoveEvent* e )
-{
-	if( !m_delegate.valid() ) {
-		return;
-	}
-
-	m_delegate->handleDragMove( e->mimeData(), e->pos().x(), e->pos().y() );
-}
-
-// ** RenderingFrame::dropEvent
-void RenderingFrame::dropEvent( QDropEvent* e )
-{
-	if( !m_delegate.valid() ) {
-		return;
-	}
-
-	m_delegate->handleDrop( e->mimeData(), e->pos().x(), e->pos().y() );
-}
-
-// ** RenderingFrame::contextMenuEvent
-void RenderingFrame::contextMenuEvent( QContextMenuEvent* e )
-{
-	if( !m_delegate.valid() ) {
-		return;
-	}
-
-	// Populate the menu by delegate
-	MenuQPtr menu = new Menu( this );
-    m_delegate->handleContextMenu( menu );
-
-	// Skip empty menues
-	if( !menu->size() ) {
-		return;
-	}
-
-	// Show the context menu
-    menu->exec( e->globalPos() );
-}
-
-// ** RenderingFrame::mouseMoveEvent
-void RenderingFrame::mouseMoveEvent( QMouseEvent* e )
-{
-	// Calculate mouse movement delta
-	QPoint delta = e->pos() - m_lastCursorPos;
-	m_lastCursorPos = e->pos();
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleMouseMove( e->pos().x(), e->pos().y(), delta.x(), delta.y(), m_isMouseButtons );
-	}
-}
-
-// ** RenderingFrame::keyPressEvent
-void RenderingFrame::keyPressEvent( QKeyEvent* e )
-{
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleKeyPress( convertKey( e->key() ) );
-	}
-}
-
-// ** RenderingFrame::keyReleaseEvent
-void RenderingFrame::keyReleaseEvent( QKeyEvent* e )
-{
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleKeyRelease( convertKey( e->key() ) );
-	}
-}
-
 // ** RenderingFrame::timerEvent
 void RenderingFrame::timerEvent( QTimerEvent *event )
 {
 	bool shouldUpdate = isContinuousRendering() || hasFocus();
 
 	if( isVisible() && shouldUpdate ) {
-		update();
+		QGLWidget::update();
 	}
-}
-
-// ** RenderingFrame::focusInEvent
-void RenderingFrame::focusInEvent( QFocusEvent* e )
-{
-	QGLWidget::focusInEvent( e );
-
-	if( !m_hasLostFocus ) {
-		return;
-	}
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleFocusIn();
-	}
-
-	m_hasLostFocus = false;
-}
-
-// ** RenderingFrame::focusOutEvent
-void RenderingFrame::focusOutEvent( QFocusEvent* e )
-{
-	QGLWidget::focusOutEvent( e );
-
-	if( e->reason() == Qt::PopupFocusReason ) {
-		return;
-	}
-
-	// Notify the delegate
-	if( m_delegate.valid() ) {
-		m_delegate->handleFocusOut();
-	}
-
-	m_hasLostFocus = true;
-}
-
-// ** RenderingFrame::initializeGL
-void RenderingFrame::initializeGL( void )
-{
-
 }
 
 // ** RenderingFrame::paintGL
@@ -287,9 +91,8 @@ void RenderingFrame::paintGL( void )
 	f32 dt = m_deltaTime.elapsed() * 0.001f;
 	m_deltaTime.restart();
 
-	if( m_delegate.valid() ) {
-		m_delegate->handleUpdate( dt );
-	}
+    // Emit the signal
+    emit update( dt );
 }
 
 // ** RenderingFrame::setCursor
@@ -331,18 +134,6 @@ void RenderingFrame::setContinuousRendering( bool value )
 bool RenderingFrame::isContinuousRendering( void ) const
 {
 	return m_isContinuousRendering;
-}
-
-// ** RenderingFrame::setDelegate
-void RenderingFrame::setDelegate( IRenderingFrameDelegateWPtr value )
-{
-	m_delegate = value;
-}
-
-// ** RenderingFrame::delegate
-IRenderingFrameDelegateWPtr RenderingFrame::delegate( void ) const
-{
-	return m_delegate;
 }
 
 } // namespace Ui

@@ -82,8 +82,6 @@ DC_BEGIN_COMPOSER
 		qDeclarePtr( ToolBar )
 		qDeclarePtr( RenderingFrame )
 
-		dcDeclarePtrs( IRenderingFrameDelegate )
-
 		//! Message status.
 		enum MessageStatus {
 			  MessageInfo		//!< The information message.
@@ -98,12 +96,27 @@ DC_BEGIN_COMPOSER
 			, MessageBoxCancel	//!< Cancel button was clicked.
 		};
 
-		//! Mouse buttons bitset flags.
-		enum MouseButtonFlags {
-			  LeftMouseButton	= BIT( 0 )	//!< Left mouse button.
-			, RightMouseButton	= BIT( 1 )	//!< Right mouse button.
-			, MiddleMouseButton	= BIT( 2 )	//!< Middle mouse button.
-		};
+        //! A helper struct to store the mouse button.
+        struct MouseButtons : public FlagSet8 {
+            //! Mouse button bit mask.
+            enum {
+			      Left	    = Qt::LeftButton	//!< Left mouse button.
+			    , Right	    = Qt::RightButton	//!< Right mouse button.
+			    , Middle    = Qt::MiddleButton	//!< Middle mouse button.
+            };
+
+                        //! Constructs MouseButtons instance from Qt enum.
+                        MouseButtons( Qt::MouseButton button = Qt::NoButton )
+                        {
+                            switch( button ) {
+	                        case Qt::LeftButton:	on( Left );	    break;
+	                        case Qt::RightButton:	on( Right );	break;
+	                        case Qt::MidButton:		on( Middle );	break;	
+                            }
+                        }
+
+                        //! Constructs
+        };
 
 		//! Menu action callback type.
 		typedef std::function<void(ActionQPtr)> ActionCallback;

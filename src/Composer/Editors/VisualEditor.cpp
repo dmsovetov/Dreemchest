@@ -26,6 +26,7 @@
 
 #include "VisualEditor.h"
 #include "../Project/Project.h"
+#include "../Widgets/Menu.h"
 
 DC_BEGIN_COMPOSER
 
@@ -34,7 +35,7 @@ namespace Editors {
 // ----------------------------------------------- VisualEditor ----------------------------------------------- //
 
 // ** VisualEditor::VisualEditor
-VisualEditor::VisualEditor( void )
+VisualEditor::VisualEditor( void ) : m_hasLostFocus( true )
 {
 	m_backgroundColor = Rgba( 0.5f, 0.5f, 0.5f );
 	m_viewport		  = new Scene::Viewport( Scene::SceneObjectWPtr() );
@@ -55,9 +56,11 @@ bool VisualEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset
 		return false;
 	}
 
+    // Connect to an update signal
+    connect( frame, SIGNAL(update(f32)), this, SLOT(renderingFrameUpdate(f32)) );
+
 	// Attach the rendering frame delegate.
-	m_renderingFrameDelegate = new RenderingFrameDelegate( this );
-	frame->setDelegate( m_renderingFrameDelegate );
+    frame->installEventFilter( this );
 	frame->makeCurrent();
 
 	// Create the rendering HAL.
@@ -118,21 +121,21 @@ void VisualEditor::handleResize( s32 width, s32 height )
 }
 
 // ** VisualEditor::handleMousePress
-void VisualEditor::handleMousePress( s32 x, s32 y, u8 button )
+void VisualEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
 	m_viewport->touchBegan( x, y, m_viewport->flags() | button );
 }
 
 // ** VisualEditor::handleMouseRelease
-void VisualEditor::handleMouseRelease( s32 x, s32 y, u8 button )
+void VisualEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
 	m_viewport->touchEnded( x, y, button );
 }
 
 // ** VisualEditor::handleMouseMove
-void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
+void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
 	y = m_document->renderingFrame()->height() - y;
 	m_viewport->touchMoved( x, y, buttons );
@@ -156,96 +159,113 @@ void VisualEditor::handleFocusOut( void )
 
 }
 
-// ------------------------------------------ RenderingFrameDelegate ------------------------------------------ //
-
-// ** RenderingFrameDelegate::RenderingFrameDelegate
-RenderingFrameDelegate::RenderingFrameDelegate( VisualEditorQPtr editor ) : m_editor( editor )
+// ** VisualEditor::renderingFrameUpdate
+void VisualEditor::renderingFrameUpdate( f32 dt )
 {
-
+    update( dt );
 }
 
-// ** RenderingFrameDelegate::handleUpdate
-void RenderingFrameDelegate::handleUpdate( f32 dt )
+// ** VisualEditor::eventFilter
+bool VisualEditor::eventFilter( QObject* sender, QEvent* e )
 {
-	m_editor->update( dt );
-}
+    // Ensure the sender is a rendering frame
+    Ui::RenderingFrame* frame = qobject_cast<Ui::RenderingFrame*>( sender );
+    DC_BREAK_IF( !frame );
 
-// ** RenderingFrameDelegate::handleUpdate
-void RenderingFrameDelegate::handleResize( s32 width, s32 height )
-{
-	m_editor->handleResize( width, height );
-}
+    // Process an event
+    switch( e->type() ) {
+    case QEvent::MouseButtonPress:		{
+                                            QMouseEvent*     me     = static_cast<QMouseEvent*>( e );
+                                            Ui::MouseButtons button = me->button();
+                                            handleMousePress( me->pos().x(), me->pos().y(), button );
+                                            m_lastCursorPos = me->pos();
+                                            m_mouseButtons.on( button );
+                                            return true;
+                                        }
+	case QEvent::MouseButtonRelease:	{
+                                            QMouseEvent*     me     = static_cast<QMouseEvent*>( e );
+                                            Ui::MouseButtons button = me->button();
+                                            handleMouseRelease( me->pos().x(), me->pos().y(), me->button() );
+                                            m_mouseButtons.off( button );
+                                            return true;
+                                        }
+    case QEvent::MouseMove:             {
+                                            QMouseEvent* me = static_cast<QMouseEvent*>( e );
+                                            QPoint delta = me->pos() - m_lastCursorPos;
+                                            handleMouseMove( me->pos().x(), me->pos().y(), delta.x(), delta.y(), m_mouseButtons );
+                                            m_lastCursorPos = me->pos();
+                                            return true;
+                                        }
+    case QEvent::Wheel:                 {
+                                            QWheelEvent* we = static_cast<QWheelEvent*>( e );
+                                            handleMouseWheel( we->delta() );
+                                            return true;
+                                        }
+    case QEvent::DragEnter:             {
+                                            QDragEnterEvent* de = static_cast<QDragEnterEvent*>( e );
+                                            if( handleDragEnter( de->mimeData() ) ) {
+                                                de->acceptProposedAction();
+                                            }
+                                            return true;
+                                        }
+    case QEvent::DragMove:              {
+                                            QDragMoveEvent* de = static_cast<QDragMoveEvent*>( e );
+                                            handleDragMove( de->mimeData(), de->pos().x(), de->pos().y() );
+                                            return true;
+                                        }
+    case QEvent::Drop:                  {
+                                            QDropEvent* de = static_cast<QDropEvent*>( e );
+                                            handleDrop( de->mimeData(), de->pos().x(), de->pos().y() );
+                                            return true;
+                                        }
+    case QEvent::FocusIn:               {
+                                            QFocusEvent* fe = static_cast<QFocusEvent*>( e );
 
-// ** RenderingFrameDelegate::handleMousePress
-void RenderingFrameDelegate::handleMousePress( s32 x, s32 y, u8 button )
-{
-	m_editor->handleMousePress( x, y, button );
-}
+                                            if( m_hasLostFocus ) {
+                                                handleFocusIn();
+                                                m_hasLostFocus = false;
+                                            }
+                                            return true;
+                                        }
+    case QEvent::FocusOut:              {
+                                            QFocusEvent* fe = static_cast<QFocusEvent*>( e );
 
-// ** RenderingFrameDelegate::handleMouseRelease
-void RenderingFrameDelegate::handleMouseRelease( s32 x, s32 y, u8 button )
-{
-	m_editor->handleMouseRelease( x, y, button );
-}
+                                            if( fe->reason() != Qt::PopupFocusReason && !m_hasLostFocus ) {
+                                                handleFocusOut();
+                                                m_hasLostFocus = true;
+                                            }
+                                            return true;
+                                        }
+    case QEvent::ContextMenu:           {
+                                            QContextMenuEvent* ce = static_cast<QContextMenuEvent*>( e );
 
-// ** RenderingFrameDelegate::handleMouseMove
-void RenderingFrameDelegate::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
-{
-	m_editor->handleMouseMove( x, y, dx, dy, buttons );
-}
+                                            Ui::MenuQPtr menu = new Ui::Menu( frame );
+                                            handleContextMenu( menu );
 
-// ** RenderingFrameDelegate::handleMouseWheel
-void RenderingFrameDelegate::handleMouseWheel( s32 delta )
-{
-	m_editor->handleMouseWheel( delta );
-}
+                                            if( menu->size() ) {
+                                                menu->exec( ce->globalPos() );
+                                            }
+                                            delete ce;
+                                            return true;
+                                        }
+    case QEvent::Resize:                {
+                                            QResizeEvent* re = static_cast<QResizeEvent*>( e );
+                                            handleResize( re->size().width(), re->size().height() );
+                                            return true;
+                                        }
+    case QEvent::KeyPress:              {
+                                            QKeyEvent* ke = static_cast<QKeyEvent*>( e );
+                                            handleKeyPress( Ui::convertKey( ke->key() ) );
+                                            return true;
+                                        }
+    case QEvent::KeyRelease:            {
+                                            QKeyEvent* ke = static_cast<QKeyEvent*>( e );
+                                            handleKeyRelease( Ui::convertKey( ke->key() ) );
+                                            return true;
+                                        }
+    }
 
-// ** RenderingFrameDelegate::handleKeyPress
-void RenderingFrameDelegate::handleKeyPress( Platform::Key key )
-{
-	m_editor->handleKeyPress( key );
-}
-
-// ** RenderingFrameDelegate::handleKeyRelease
-void RenderingFrameDelegate::handleKeyRelease( Platform::Key key )
-{
-	m_editor->handleKeyRelease( key );
-}
-
-// ** RenderingFrameDelegate::handleDragEnter
-bool RenderingFrameDelegate::handleDragEnter( MimeDataQPtr mime )
-{
-	return m_editor->handleDragEnter( mime );
-}
-
-// ** RenderingFrameDelegate::handleDragMove
-void RenderingFrameDelegate::handleDragMove( MimeDataQPtr mime, s32 x, s32 y )
-{
-	m_editor->handleDragMove( mime, x, y );
-}
-
-// ** RenderingFrameDelegate::handleDrop
-void RenderingFrameDelegate::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
-{
-	m_editor->handleDrop( mime, x, y );
-}
-
-// ** RenderingFrameDelegate::handleContextMenu
-void RenderingFrameDelegate::handleContextMenu( Ui::MenuQPtr menu )
-{
-	m_editor->handleContextMenu( menu );
-}
-
-// ** RenderingFrameDelegate::handleFocusIn
-void RenderingFrameDelegate::handleFocusIn( void )
-{
-	m_editor->handleFocusIn();
-}
-
-// ** RenderingFrameDelegate::handleFocusOut
-void RenderingFrameDelegate::handleFocusOut( void )
-{
-	m_editor->handleFocusOut();
+    return false;
 }
 
 } // namespace Editors

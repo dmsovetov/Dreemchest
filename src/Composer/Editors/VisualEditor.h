@@ -35,7 +35,9 @@ namespace Editors {
 
 	//! Base class for all visual asset editors.
 	class VisualEditor : public AssetEditor {
-	friend class RenderingFrameDelegate;
+
+        Q_OBJECT
+
 	public:
 
 										//! Constructs the VisualEditor instance.
@@ -65,13 +67,13 @@ namespace Editors {
 		virtual void					handleResize( s32 width, s32 height );
 
 		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, u8 button );
+		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button );
 
 		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, u8 button );
+		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button );
 
 		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons );
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons );
 
 		//! Handles the mouse wheel event.
 		virtual void					handleMouseWheel( s32 delta ) {}
@@ -109,66 +111,24 @@ namespace Editors {
 		//! Ends the frame rendering.
 		virtual void					endFrameRendering( void );
 
+    private:
+
+        //! Event filter to process rendering frame events.
+        bool                            eventFilter( QObject* sender, QEvent* e ) Q_DECL_OVERRIDE;
+
+    private slots:
+
+        //! Handles an update signal and renders the frame.
+        void                            renderingFrameUpdate( f32 dt );
+
 	private:
 
 		Renderer::HalPtr				m_hal;						//!< Rendering HAL instance.
 		Rgba							m_backgroundColor;			//!< The background color.
-		Ui::IRenderingFrameDelegatePtr	m_renderingFrameDelegate;	//!< Rendering frame delegate.
 		Scene::ViewportPtr				m_viewport;					//!< Scene viewport.
-	};
-
-	//! Visual editor rendering frame delegate.
-	class RenderingFrameDelegate : public Ui::IRenderingFrameDelegate {
-	public:
-
-										//! Constructs the RenderingFrameDelegate instance.
-										RenderingFrameDelegate( VisualEditorQPtr editor );
-
-		//! Handles the update event.
-		virtual void					handleUpdate( f32 dt ) DC_DECL_OVERRIDE;
-
-		//! Handles the resize event.
-		virtual void					handleResize( s32 width, s32 height ) DC_DECL_OVERRIDE;
-
-		//! Handles the mouse pressed event.
-		virtual void					handleMousePress( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
-
-		//! Handles the mouse released event.
-		virtual void					handleMouseRelease( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
-
-		//! Handles the mouse moved event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
-
-		//! Handles the mouse wheel event.
-		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
-
-		//! Handles the focus in event.
-		virtual void					handleFocusIn( void ) DC_DECL_OVERRIDE;
-
-		//! Handles the focus out event.
-		virtual void					handleFocusOut( void ) DC_DECL_OVERRIDE;
-
-		//! Handles the key pressed event.
-		virtual void					handleKeyPress( Platform::Key key ) DC_DECL_OVERRIDE;
-
-		//! Handles the key released event.
-		virtual void					handleKeyRelease( Platform::Key key ) DC_DECL_OVERRIDE;
-
-		//! Handles the context menu event.
-		virtual void					handleContextMenu( Ui::MenuQPtr menu ) DC_DECL_OVERRIDE;
-
-		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( MimeDataQPtr mime ) DC_DECL_OVERRIDE;
-
-		//! Handles the drag move event.
-		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
-
-		//! Handles the drop move event.
-		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
-
-	private:
-
-		VisualEditorQPtr				m_editor;	//!< Parent visual editor.
+        QPoint                          m_lastCursorPos;            //!< Last tracked cursor position.
+        Ui::MouseButtons                m_mouseButtons;             //!< Bitmask to store pressed mouse buttons.
+        bool                            m_hasLostFocus;             //!< Indicates that the focus was lost.
 	};
 
 } // namespace Editors

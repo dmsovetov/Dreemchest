@@ -255,26 +255,26 @@ void SceneEditor::menuTerrainSmooth( Ui::ActionQPtr action )
 }
 
 // ** SceneEditor::handleMousePress
-void SceneEditor::handleMousePress( s32 x, s32 y, u8 buttons )
+void SceneEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& buttons )
 {
 	VisualEditor::handleMousePress( x, y, buttons );
 
-	if( buttons & Ui::RightMouseButton ) {
+	if( buttons & Ui::MouseButtons::Right ) {
 		m_camera->setRotationEnabled( true );
 		m_camera->setMovementEnabled( true );
 	}
 }
 
 // ** SceneEditor::handleMouseRelease
-void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 buttons )
+void SceneEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& buttons )
 {
 	VisualEditor::handleMouseRelease( x, y, buttons );
 
-	if( buttons & Ui::RightMouseButton ) {
+	if( buttons & Ui::MouseButtons::Right ) {
 		m_camera->setRotationEnabled( false );
 		m_camera->setMovementEnabled( false );
 	}
-	else if( buttons & Ui::LeftMouseButton ) {
+	else if( buttons & Ui::MouseButtons::Left ) {
 		// Get the scene object underneath the mouse cursor
 		Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
@@ -284,7 +284,7 @@ void SceneEditor::handleMouseRelease( s32 x, s32 y, u8 buttons )
 }
 
 // ** SceneEditor::handleMouseMove
-void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons )
+void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
 	// Run the base class method to update the cursor
 	VisualEditor::handleMouseMove( x, y, dx, dy, buttons );

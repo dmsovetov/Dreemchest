@@ -114,7 +114,7 @@ void ArcballRotationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e,
 void ArcballRotationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, ArcballRotationTool& arcball, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 
@@ -148,7 +148,7 @@ bool ArcballRotationToolSystem::mapToVector( const ArcballRotationTool& arcball,
 void ArcballRotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, ArcballRotationTool& arcball, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 

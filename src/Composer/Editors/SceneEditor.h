@@ -58,13 +58,13 @@ namespace Editors {
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
+		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, u8 button ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, u8 buttons ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons ) DC_DECL_OVERRIDE;
 
 		//! Handles the mouse wheel event.
 		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;

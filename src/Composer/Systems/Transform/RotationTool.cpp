@@ -177,7 +177,7 @@ u8 RotationToolSystem::mapRayToAxis( RotationTool& tool, Scene::Transform& trans
 void RotationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 
@@ -206,7 +206,7 @@ void RotationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::E
 void RotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, RotationTool& tool, Scene::Transform& transform )
 {
 	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::LeftMouseButton ) ) {
+	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 

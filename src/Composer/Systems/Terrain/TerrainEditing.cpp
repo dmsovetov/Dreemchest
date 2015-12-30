@@ -112,7 +112,7 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 	Vec3 position = transform.matrix().inversed() * m_tool->get<Scene::Transform>()->position();
 
 	// No mouse buttons pressed - tool is not working
-	if( !m_viewport->flags().is( Ui::LeftMouseButton ) ) {
+	if( !m_viewport->flags().is( Ui::MouseButtons::Left ) ) {
 		return;
 	}
 
