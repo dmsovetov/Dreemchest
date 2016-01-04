@@ -534,14 +534,16 @@ Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
 bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::Value& object )
 {
 	Fx::EmitterWPtr emitter = particles->emitter();
+    s32             type    = object["type"].asInt();
 
-	switch( object["type"].asInt() ) {
+	switch( type ) {
 	case 4: break;	// not implemented
 	case 0:
 	case 1: emitter->setZone( DC_NEW Fx::SphereZone( object["radius"].asFloat() ) ); break;
 	case 3:
 	case 2: emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) ); break;
 	case 5: emitter->setZone( DC_NEW Fx::BoxZone( object["width"].asFloat(), object["height"].asFloat(), object["depth"].asFloat() ) ); break;
+    case 12: emitter->setZone( DC_NEW Fx::LineZone( object["radius"].asFloat() ) ); break;
 	default: DC_NOT_IMPLEMENTED;
 	}
 

@@ -164,7 +164,7 @@ Zone::Point LineZone::generateRandomPoint( f32 scalar, const Vec3& center ) cons
 	float length = SampleParameter( 0, &m_length, 0.0f );
 	float angle  = SampleParameter( 0, &m_angle, 0.0f );
 
-    Vec2  direction = Vec2::fromAngle( angle );
+    Vec2  direction = Vec2::fromAngle( angle + 90.0f );
     f32   distance  = RANDOM_SCALAR( -length * 0.5f, length * 0.5f );
 
     return Point( center + Vec3( direction.x, direction.y, 0.0f ) * distance );

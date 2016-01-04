@@ -69,7 +69,6 @@ void SoundChannel::setPosition( const Vec3& value )
     m_source->setPosition( value );
 }
 
-
 // ** SoundChannel::isPlaying
 bool SoundChannel::isPlaying( void ) const
 {
