@@ -66,7 +66,7 @@ class SoundPlayback : public ApplicationDelegate {
 				sfx->play( "air_raid_m" );
 			}
 
-			thread::Thread::sleep( 10 );
+			Threads::Thread::sleep( 10 );
 		}
     }
 
