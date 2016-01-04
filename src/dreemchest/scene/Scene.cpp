@@ -286,6 +286,7 @@ JsonSceneLoader::JsonSceneLoader( void )
 	m_moduleLoaders["color"]			= dcThisMethod( JsonSceneLoader::readModuleColor );
 	m_moduleLoaders["emission"]			= dcThisMethod( JsonSceneLoader::readModuleEmission );
 	m_moduleLoaders["velocity"]			= dcThisMethod( JsonSceneLoader::readModuleVelocity );
+    m_moduleLoaders["limitVelocity"]    = dcThisMethod( JsonSceneLoader::readModuleLimitVelocity );
 	m_moduleLoaders["acceleration"]		= dcThisMethod( JsonSceneLoader::readModuleAcceleration );
 	m_moduleLoaders["angularVelocity"]	= dcThisMethod( JsonSceneLoader::readModuleAngularVelocity );
 	m_moduleLoaders["size"]				= dcThisMethod( JsonSceneLoader::readModuleSize );
@@ -616,6 +617,17 @@ bool JsonSceneLoader::readModuleVelocity( Fx::ParticlesWPtr particles, const Jso
 	}
 
 	return true;
+}
+
+// ** JsonSceneLoader::readModuleLimitVelocity
+bool JsonSceneLoader::readModuleLimitVelocity( Fx::ParticlesWPtr particles, const Json::Value& object )
+{
+    Fx::LimitVelocity* module = DC_NEW Fx::LimitVelocity;
+    particles->addModule( module );
+
+    readScalarParameter( module->get(), object["magnitude"] );
+
+    return true;
 }
 
 // ** JsonSceneLoader::readModuleSize

@@ -409,6 +409,9 @@ namespace Scene {
 		//! Reads the velocity module from JSON object.
 		bool						readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
 
+		//! Reads the limit velocity module from JSON object.
+		bool						readModuleLimitVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+
 		//! Reads the initial module from JSON object.
 		bool						readModuleInitial( Fx::ParticlesWPtr particles, const Json::Value& object );
 
