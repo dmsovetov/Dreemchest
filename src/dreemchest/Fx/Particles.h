@@ -62,6 +62,7 @@ namespace Fx {
 
 		u32*			indices;			//!< Particle indices.
 		Vec3*			position;			//!< Particle position.
+        Vec3*           velocity;           //!< Particle linear velocity.
 		f32*			rotation;			//!< Particle rotation.
 		Life*			life;				//!< Particle life.
 		Scalar*			size;				//!< Particle size.

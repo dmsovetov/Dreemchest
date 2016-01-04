@@ -77,20 +77,38 @@ FloatParameter&	LinearVelocity::z( void )
 // ** LinearVelocity::update
 void LinearVelocity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	const Particle::Life* life	  = particles->life;
-	const u32*			  indices = particles->indices;
-
-	Vec3 velocity;
+	const Particle::Life* life	   = particles->life;
+	const u32*			  indices  = particles->indices;
+    Vec3*                 velocity = particles->velocity;
 
 	for( s32 i = first; i < last; i++ ) {
 		f32 scalar = life[i].scalar;
 		u32 idx	   = indices[i];
 
-		velocity.x = m_velocity[0].sample( idx, scalar, 0.0f );
-		velocity.y = m_velocity[1].sample( idx, scalar, 0.0f );
-		velocity.z = m_velocity[2].sample( idx, scalar, 0.0f );
+        velocity[i].x += m_velocity[0].sample( idx, scalar, 0.0f );
+        velocity[i].y += m_velocity[1].sample( idx, scalar, 0.0f );
+        velocity[i].z += m_velocity[2].sample( idx, scalar, 0.0f );
+	}
+}
 
-		particles->position[i] += velocity * state.m_dt;
+// ----------------------------------------------------- LimitVelocity ----------------------------------------------------- //
+
+// ** LimitVelocity::update
+void LimitVelocity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
+{
+	const Particle::Life* life	   = particles->life;
+	const u32*			  indices  = particles->indices;
+    Vec3*                 velocity = particles->velocity;
+
+	for( s32 i = first; i < last; i++ ) {
+        f32 maximum = m_value.sample( indices[i], life[i].scalar, 0.0f );
+		f32 current = velocity[i].length();
+
+        if( current <= maximum ) {
+            continue;
+        }
+
+        velocity[i] = velocity[i] / current * maximum;
 	}
 }
 
@@ -210,12 +228,26 @@ void InitialGravity::update( Particle* particles, s32 first, s32 last, const Sim
 // ** Acceleration::update
 void Acceleration::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Force* force		= particles->force;
-	Vec3*			 position	= particles->position;
+    Vec3*            velocity = particles->velocity;
+	Particle::Force* force	  = particles->force;
 
 	for( s32 i = first; i < last; i++ ) {
-		force[i].velocity += force[i].acceleration * state.m_dt;
-		position[i] += force[i].velocity * state.m_dt;
+	    force[i].velocity += force[i].acceleration * state.m_dt;
+        velocity[i]        = force[i].velocity;
+	}
+}
+
+// ------------------------------------------------------------ Position ------------------------------------------------------------- //
+
+// ** Position::update
+void Position::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
+{
+    const Vec3* velocity = particles->velocity;
+    const Particle::Force* force	  = particles->force;
+	Vec3*	    position = particles->position;
+
+	for( s32 i = first; i < last; i++ ) {
+		position[i] += (velocity[i] /*+ force[i].velocity*/) * state.m_dt;
 	}
 }
 

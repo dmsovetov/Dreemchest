@@ -49,10 +49,13 @@ namespace Fx {
 
 		//! Returns module name.
 		virtual String			name( void ) const = 0;
+
+        //! Returns module update priority.
+        virtual s32             priority( void ) const = 0;
 	};
 
 	//! Generic class to simplify new module declaraion.
-	template<typename TModule, typename TParameter>
+	template<typename TModule, typename TParameter, s32 TPriority = 0>
 	class Module : public AbstractModule {
 	public:
 
@@ -63,34 +66,44 @@ namespace Fx {
 		//! Returns module name.
 		virtual String			name( void ) const DC_DECL_OVERRIDE;
 
+       //! Returns module execution priority.
+        virtual s32             priority( void ) const DC_DECL_OVERRIDE;
+
 	protected:
 
 		TParameter				m_value;	//!< Parameter curve.
 	};
 
 	// ** Module::get
-	template<typename TModule, typename TParameter>
-	const TParameter& Module<TModule, TParameter>::get( void ) const
+	template<typename TModule, typename TParameter, s32 TPriority>
+	const TParameter& Module<TModule, TParameter, TPriority>::get( void ) const
 	{
 		return m_value;
 	}
 
 	// ** Module::get
-	template<typename TModule, typename TParameter>
-	TParameter& Module<TModule, TParameter>::get( void )
+	template<typename TModule, typename TParameter, s32 TPriority>
+	TParameter& Module<TModule, TParameter, TPriority>::get( void )
 	{
 		return m_value;
 	}
 
 	// ** Module::name
-	template<typename TModule, typename TParameter>
-	String Module<TModule, TParameter>::name( void ) const
+	template<typename TModule, typename TParameter, s32 TPriority>
+	String Module<TModule, TParameter, TPriority>::name( void ) const
 	{
 		return TypeInfo<TModule>::name();
 	}
 
+	// ** Module::priority
+	template<typename TModule, typename TParameter, s32 TPriority>
+	s32 Module<TModule, TParameter, TPriority>::priority( void ) const
+	{
+		return TPriority;
+	}
+
 	//! Initial life module setups the spawned particle.
-	class InitialLife : public Module<InitialLife, FloatParameter> {
+	class InitialLife : public Module<InitialLife, FloatParameter, -1> {
 	protected:
 
 		//! Initializes the particle life properties.
@@ -98,7 +111,7 @@ namespace Fx {
 	};
 
 	//! Life module controls the particle life and calculates scalar value used to sample parameters.
-	class Life : public Module<Life, FloatParameter> {
+	class Life : public Module<Life, FloatParameter, -1> {
 	protected:
 
 		//! Computes current life for each particle.
@@ -119,7 +132,10 @@ namespace Fx {
 		FloatParameter&		z( void );
 
 		//! Returns module name.
-		virtual String		name( void ) const { return "LinearVelocity"; }
+		virtual String		name( void ) const DC_DECL_OVERRIDE { return "LinearVelocity"; }
+
+		//! Returns module execution priority.
+		virtual s32		    priority( void ) const DC_DECL_OVERRIDE { return 2; }
 
 	protected:
 
@@ -130,6 +146,14 @@ namespace Fx {
 
 		FloatParameter		m_velocity[3];	//!< Linear velocity along coordinate axes.
 	};
+
+    //! Clamp velocity module limits the maxiumum particle vlocity.
+    class LimitVelocity : public Module<LimitVelocity, FloatParameter, 3> {
+    protected:
+
+		//! Clamps the particle's velocity.
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+    };
 
 	//! Sets the initial particle size.
 	class InitialSize : public Module<InitialSize, FloatParameter> {
@@ -204,12 +228,28 @@ namespace Fx {
 	};
 
 	//! Modifies particle position by a velocity due to applied forces.
-	class Acceleration : public Module<Acceleration, FloatParameter> {
+	class Acceleration : public Module<Acceleration, FloatParameter, 1> {
 	protected:
 
 		//! Calculates additional particle velocity based on acceleration. 
 		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;	
 	};
+
+    //! Modifies particle position by an aggregated linear velocity.
+    class Position : public AbstractModule {
+    protected:
+
+		//! Returns module name.
+		virtual String		name( void ) const DC_DECL_OVERRIDE { return "Position"; }
+
+		//! Returns module execution priority.
+		virtual s32		    priority( void ) const DC_DECL_OVERRIDE { return INT_MAX; }
+
+	protected:
+
+		//! Updates particle position according to a linear velocity.
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+    };
 
 	//! Sets the initial particle color.
 	class InitialColor : public Module<InitialColor, RgbParameter> {

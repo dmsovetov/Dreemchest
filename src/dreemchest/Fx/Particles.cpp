@@ -46,7 +46,8 @@ Particles::Particles( EmitterWPtr emitter ) : m_emitter( emitter ), m_count( 1 )
 
 	// Add default particle modules
 	addModule( DC_NEW Life );
-	addModule( DC_NEW Acceleration );
+	addModule( DC_NEW Position );
+    addModule( DC_NEW Acceleration );
 };
 
 // ** Particles::createInstance
@@ -112,9 +113,17 @@ void Particles::setRenderingMode( RenderingMode value )
 // ** Particles::addModule
 void Particles::addModule( const ModulePtr& module )
 {
+    // Add new module
 	DC_BREAK_IF( !module.valid() );
 	log::verbose( "%s particle module added\n", module->name().c_str() );
 	m_modules.push_back( module );
+
+    // Sort by execution priority
+    struct Priority {
+        static bool less ( const ModulePtr& a, const ModulePtr& b ) { return a->priority() < b->priority(); }
+    };
+
+    std::sort( m_modules.begin(), m_modules.end(), Priority::less );
 }
 
 // ** Particles::update
@@ -141,6 +150,7 @@ ParticlesInstance::ParticlesInstance( IMaterialFactoryWPtr materialFactory, Part
 
 	m_items.life			= new Particle::Life[count];
 	m_items.position		= new Vec3[count];
+    m_items.velocity        = new Vec3[count];
 	m_items.size			= new Particle::Scalar[count];
 	m_items.indices			= new u32[count];
 	m_items.transparency	= new Particle::Scalar[count];
