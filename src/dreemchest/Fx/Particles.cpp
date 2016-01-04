@@ -30,6 +30,8 @@
 #include "Zones.h"
 #include "Modules.h"
 
+#include <time.h>
+
 #define ScalarParam( name ) m_scalar[name] ? &m_scalar[name] : NULL
 #define ColorParam( name )  m_color[name]  ? &m_color[name]  : NULL
 
@@ -135,10 +137,25 @@ void Particles::update( Particle* particles, s32 first, s32 last, f32 dt ) const
 	state.m_dt		  = dt;
 	state.m_time	  = 0.0f;
 
+    Map<String, clock_t> time;
+
 	// Run all life time modules
 	for( s32 i = 0, n = ( s32 )m_modules.size(); i < n; i++ ) {
+        clock_t t = clock();
 		m_modules[i]->update( particles, first, last, state );
+        time[m_modules[i]->name()] = clock() - t;
 	}
+
+    String x;
+    for( Map<String, clock_t>::const_iterator i = time.begin(), end = time.end(); i != end; ++i ) {
+        s32 t = f32( i->second ) / CLOCKS_PER_SEC * 1000.0f;
+
+        if( t > 1 )
+            x += i->first + ": " + toString( s32( t ) ) + "ms ";
+    }
+
+    if( x != "" )
+        printf( "Particles %d: %s\n", last - first, x.c_str() );
 }
 
 // ------------------------------------------------- ParticlesInstance ------------------------------------------------- //
