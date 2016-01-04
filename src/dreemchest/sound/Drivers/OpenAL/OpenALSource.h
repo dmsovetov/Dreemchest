@@ -49,6 +49,7 @@ namespace Sound {
         virtual void            setState( SourceState value );
         virtual void            setVolume( f32 value );
         virtual void            setPitch( f32 value );
+        virtual void            setPosition( const Vec3& value );
 
     private:
 

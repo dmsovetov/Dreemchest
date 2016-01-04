@@ -133,6 +133,13 @@ SoundBufferPtr OpenAL::createBuffer( SoundDecoderPtr decoder, u32 chunks )
     return DC_NEW OpenALBuffer( decoder, chunks, chunks == 1 ? decoder->size() : 16536 );
 }
 
+// ** OpenAL::setPosition
+void OpenAL::setPosition( const Vec3& value )
+{
+    ALfloat v[3] = { value.x, value.y, value.z };
+    alListenerfv( AL_POSITION, v );
+}
+
 } // namespace Sound
     
 DC_END_DREEMCHEST

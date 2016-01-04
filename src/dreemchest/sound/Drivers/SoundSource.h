@@ -83,6 +83,12 @@ namespace Sound {
         //! Sets the looping of a sound source.
         virtual void            setLooped( bool value );
 
+        //! Returns the source source position.
+        virtual const Vec3&     position( void ) const;
+
+        //! Sets source source position.
+        virtual void            setPosition( const Vec3& value );
+
     protected:
 
         //! Strong pointer to a hardware sound buffer.
@@ -99,6 +105,9 @@ namespace Sound {
 
         //! Sound source pitch.
         f32                     m_pitch;
+
+        //! Source source position.
+        Vec3                    m_position;
     };
 
 } // namespace Sound

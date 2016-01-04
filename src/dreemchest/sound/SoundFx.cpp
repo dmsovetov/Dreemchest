@@ -320,6 +320,12 @@ SoundDecoderPtr SoundFx::createDecoder( SoundDataWPtr data )
     return decoder;
 }
 
+// ** SoundFx::setListenerPosition
+void SoundFx::setListenerPosition( const Vec3& value )
+{
+    m_hal->setPosition( value );
+}
+
 // ** SoundFx::event
 SoundChannelPtr SoundFx::event( CString identifier )
 {

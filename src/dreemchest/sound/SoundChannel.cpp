@@ -57,6 +57,19 @@ void SoundChannel::setVolume( f32 value )
     m_volume = value;
 }
 
+// ** SoundChannel::position
+const Vec3& SoundChannel::position( void ) const
+{
+    return m_source->position();
+}
+
+// ** SoundChannel::setPosition
+void SoundChannel::setPosition( const Vec3& value )
+{
+    m_source->setPosition( value );
+}
+
+
 // ** SoundChannel::isPlaying
 bool SoundChannel::isPlaying( void ) const
 {

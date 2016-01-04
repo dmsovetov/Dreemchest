@@ -40,6 +40,9 @@ namespace Sound {
                                 SoundEngine( void );
         virtual                 ~SoundEngine( void );
 
+        //! Sets the listener position.
+        virtual void            setPosition( const Vec3& value ) = 0;
+
         //! Creates a new hardware sound source.
         virtual SoundSourcePtr	createSource( void );
 

@@ -86,6 +86,9 @@ namespace Sound {
         */
         SoundChannelPtr			event( CString identifier );
 
+        //! Sets the listener position.
+        void                    setListenerPosition( const Vec3& value );
+
         //! Returns a group by a given name (NULL if no such group found).
         SoundGroupWPtr          findGroupByName( CString identifier );
         //! Removes a sound group by a given name.

@@ -51,6 +51,12 @@ namespace Sound {
         //! Sets a sound channel volume.
         void                setVolume( f32 value );
 
+        //! Returns the sound source position.
+        const Vec3&         position( void ) const;
+
+        //! Sets the source source position.
+        void                setPosition( const Vec3& value );
+
         //! Returns a pointer to an attached sound data.
         SoundDataWPtr		sound( void ) const;
 

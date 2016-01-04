@@ -44,8 +44,9 @@ namespace Sound {
         virtual                 ~OpenAL( void );
 
         // ** SoundEngine
-        virtual SoundSourcePtr createSource( void );
-        virtual SoundBufferPtr createBuffer( SoundDecoderPtr decoder, u32 chunks );
+        virtual SoundSourcePtr  createSource( void );
+        virtual SoundBufferPtr  createBuffer( SoundDecoderPtr decoder, u32 chunks );
+        virtual void            setPosition( const Vec3& value );
 
         // ** OpenAL
         static ALuint           soundSampleFormat( SoundSampleFormat format );

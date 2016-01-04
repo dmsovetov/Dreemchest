@@ -130,6 +130,15 @@ void OpenALSource::setPitch( f32 value )
     OpenAL::dumpErrors( "OpenALSource::setPitch" );
 }
 
+// ** OpenALSource::setPosition
+void OpenALSource::setPosition( const Vec3& value )
+{
+    SoundSource::setPosition( value );
+
+    ALfloat v[3] = { value.x, value.y, value.z };
+    alSourcefv( m_id, AL_POSITION, v );
+}
+
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {

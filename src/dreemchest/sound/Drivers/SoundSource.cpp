@@ -107,6 +107,18 @@ void SoundSource::setPitch( f32 value )
     m_pitch = value;
 }
 
+// ** SoundSource::position
+const Vec3& SoundSource::position( void ) const
+{
+    return m_position;
+}
+
+// ** SoundSource::setPosition
+void SoundSource::setPosition( const Vec3& value )
+{
+    m_position = value;
+}
+
 } // namespace Sound
 
 DC_END_DREEMCHEST
