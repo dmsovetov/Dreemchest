@@ -428,6 +428,11 @@ ShapeModulePatcher = {
     , 'randomDirection': Patcher.rename('randomDirection')
 }
 
+# ClampVelocity
+ClampVelocityPatcher = {
+      'magnitude': Patcher.curve('magnitude', rescale)
+}
+
 # ParticleSystem
 ParticleSystemPatcher = {
       'lengthInSec': Patcher.rename('duration')
@@ -441,6 +446,7 @@ ParticleSystemPatcher = {
     , 'ColorModule': Patcher.module('color', ColorModulePatcher)
     , 'VelocityModule': Patcher.module('velocity', VelocityModulePatcher)
     , 'ForceModulePatcher': Patcher.module('acceleration', ForceModulePatcher)
+    , 'ClampVelocityModule': Patcher.module('limitVelocity', ClampVelocityPatcher)
     , 'ShapeModule': Patcher.module('shape', ShapeModulePatcher)
     , 'm_GameObject': Patcher.reference('sceneObject')
 }
