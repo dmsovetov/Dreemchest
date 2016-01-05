@@ -65,6 +65,19 @@ namespace Ecs {
     //! Container type to store an array of entities.
     typedef Array<EntityPtr> EntityArray;
 
+    //! Converts container of archetypes to an array of entities.
+    template<typename TContainer>
+    EntityArray toEntityArray( const TContainer& container )
+    {
+        EntityArray result;
+
+        for( typename TContainer::const_iterator i = container.begin(), end = container.end(); i != end; ++i ) {
+            result.push_back( *i );
+        }
+
+        return result;
+    }
+
 	//! Entity id generator.
 	class EntityIdGenerator : public RefCounted {
 	public:
