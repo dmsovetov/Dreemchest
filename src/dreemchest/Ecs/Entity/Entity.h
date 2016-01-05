@@ -169,7 +169,7 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::get( void ) const
 	{
-		DC_BREAK_IF( m_flags.is( Removed ) );
+	//	DC_BREAK_IF( m_flags.is( Removed ) );
 
 		TypeIdx idx = TypeIndex<TComponent>::idx();
 		Components::const_iterator i = m_components.find( idx );
