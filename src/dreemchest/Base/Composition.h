@@ -40,12 +40,20 @@ DC_BEGIN_DREEMCHEST
 		//! Container type to store composition parts.
 		typedef Map<TypeIdx, TPart*>	Parts;
 
+        //! Destroys composition
+        virtual ~Composition( void )
+        {
+            clear();
+        }
+
+    #ifndef DC_CPP11_DISABLED
         //! Attaches a composition item.
-        template<typename T>                         T* attach( void )                  { return set<T>( new T );                           }
-        template<typename T, TemplateFunctionTypes1> T* attach( TemplateFunctionArgs1 ) { return set<T>( new T( arg0 ) );                   }
-        template<typename T, TemplateFunctionTypes2> T* attach( TemplateFunctionArgs2 ) { return set<T>( new T( arg0, arg1 ) );             }
-        template<typename T, TemplateFunctionTypes3> T* attach( TemplateFunctionArgs3 ) { return set<T>( new T( arg0, arg1, arg2 ) );       }
-        template<typename T, TemplateFunctionTypes4> T* attach( TemplateFunctionArgs4 ) { return set<T>( new T( arg0, arg1, arg2, arg3 ) ); }
+        template<typename TType, typename ... TArgs>
+        TType* attach( const TArgs& ... args )
+        {
+            return set<TType>( new TType( args... ) )
+        }
+    #endif  /*  !DC_CPP11_DISABLED  */
 
         //! Clears a composition.
         void clear( void )
@@ -67,7 +75,7 @@ DC_BEGIN_DREEMCHEST
 		template<typename T>
 		T* get( void )
 		{
-			typename Parts::iterator i = m_composition.find( TypeIndex<T>::idx() );
+			typename Parts::iterator i = m_composition.find( typeIdx<T>() );
 			return i != m_composition.end() ? static_cast<T*>( i->second ) : NULL;
 		}
 
@@ -75,14 +83,14 @@ DC_BEGIN_DREEMCHEST
 		template<typename T>
 		bool has( void ) const
 		{
-			return m_composition.find( TypeIndex<T>::idx() ) != m_composition.end();
+			return m_composition.find( typeIdx<T>() ) != m_composition.end();
 		}
 
 		//! Removes the composition part of specified type T.
 		template<typename T>
 		void detach( void )
 		{
-			typename Parts::iterator i = m_composition.find( TypeIndex<T>::idx() );
+			typename Parts::iterator i = m_composition.find( typeIdx<T>() );
 
 			if( i != m_composition.end() ) {
 				delete static_cast<T*>( i->second );
@@ -96,11 +104,18 @@ DC_BEGIN_DREEMCHEST
 
     private:
 
+        //! Generates composition type index.
+        template<typename TType>
+        TypeIdx typeIdx( void ) const
+        {
+            return GroupedTypeIndex<TType, Composition<TPart>>::idx();
+        }
+
         //! Sets a part of composition to a specified type T.
 		template<typename T>
 		T* set( T* instance )
 		{
-			m_composition[TypeIndex<T>::idx()] = instance;
+			m_composition[typeIdx<T>()] = instance;
 			return instance;
 		}
 
