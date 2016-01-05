@@ -62,6 +62,9 @@ namespace Ecs {
 	//! Container type to store the list of entities.
 	typedef List<EntityPtr> EntityList;
 
+    //! Container type to store an array of entities.
+    typedef Array<EntityPtr> EntityArray;
+
 	//! Entity id generator.
 	class EntityIdGenerator : public RefCounted {
 	public:
