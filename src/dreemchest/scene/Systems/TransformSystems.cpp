@@ -79,12 +79,6 @@ void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity&
 
 // ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //
 
-// ** MoveAlongAxesSystem::MoveAlongAxesSystem
-MoveAlongAxesSystem::MoveAlongAxesSystem( void ) : GenericEntitySystem( "MoveAlongAxesSystem" )
-{
-
-}
-
 // ** MoveAlongAxesSystem::process
 void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform )
 {
@@ -113,12 +107,6 @@ void MoveAlongAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneOb
 }
 
 // ------------------------------------------------------- RotateAroundAxesSystem ------------------------------------------------------- //
-
-// ** RotateAroundAxesSystem::RotateAroundAxesSystem
-RotateAroundAxesSystem::RotateAroundAxesSystem( void ) : GenericEntitySystem( "RotateAroundAxesSystem" )
-{
-
-}
 
 // ** RotateAroundAxesSystem::process
 void RotateAroundAxesSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform )

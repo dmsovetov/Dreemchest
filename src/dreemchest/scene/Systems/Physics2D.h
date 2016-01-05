@@ -42,7 +42,7 @@ namespace Scene {
 #ifdef DC_BOX2D_ENABLED
 
 	//! The 2D physics system
-	class Box2DPhysics : public Ecs::GenericEntitySystem<RigidBody2D, Transform> {
+	class Box2DPhysics : public Ecs::GenericEntitySystem<Box2DPhysics, RigidBody2D, Transform> {
 	public:
 
 								//! Constructs the Box2DPhysics instance.

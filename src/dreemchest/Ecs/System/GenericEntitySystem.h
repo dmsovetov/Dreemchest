@@ -36,12 +36,12 @@ namespace Ecs {
 #ifndef DC_CPP11_DISABLED
 
 	//! Generic entity system to process entities that contain all components from a specified set.
-	template<typename ... TComponents>
+	template<typename TSystem, typename ... TComponents>
 	class GenericEntitySystem : public EntitySystem {
 	public:
 
 						//! Constructs GenericEntitySystem instance.
-						GenericEntitySystem( const String& name )
+						GenericEntitySystem( const String& name = TypeInfo<TSystem>::name() )
 							: EntitySystem( name, Aspect::all<TComponents...>() ) {}
 
 	protected:
@@ -69,8 +69,8 @@ namespace Ecs {
 	};
 
 	// ** GenericEntitySystem::update
-	template<typename ... TComponents>
-	void GenericEntitySystem<TComponents...>::update( u32 currentTime, f32 dt )
+	template<typename TSystem, typename ... TComponents>
+	void GenericEntitySystem<TSystem, TComponents...>::update( u32 currentTime, f32 dt )
 	{
 		if( !begin( currentTime ) ) {
 			return;
@@ -86,8 +86,8 @@ namespace Ecs {
 	}
 
 	// ** GenericEntitySystem::process
-	template<typename ... TComponents>
-	void GenericEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
+	template<typename TSystem, typename ... TComponents>
+	void GenericEntitySystem<TSystem, TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
 	{
 		DC_BREAK
 	}

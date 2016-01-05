@@ -36,12 +36,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Affine transform system calculates the transformation matricies for all transform components.
-	class AffineTransformSystem : public Ecs::GenericEntitySystem<Transform> {
-	public:
-
-							//! Constructs a AffineTransformSystem instance.
-							AffineTransformSystem( void )
-								: GenericEntitySystem( "AffineTransformSystem" ) {}
+	class AffineTransformSystem : public Ecs::GenericEntitySystem<AffineTransformSystem, Transform> {
+    protected:
 
 		//! Calculates the affine transform matrix for each transform component.
 		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
@@ -60,46 +56,32 @@ namespace Scene {
 	};
 
 	//! World space bounding box system calculates bounding volumes for static meshes in scene.
-	class WorldSpaceBoundingBoxSystem : public Ecs::GenericEntitySystem<StaticMesh, Transform> {
-	public:
-
-							//! Constructs a WorldSpaceBoundingBoxSystem instance.
-							WorldSpaceBoundingBoxSystem( void )
-								: GenericEntitySystem( "WorldSpaceBoundingBoxSystem" ) {}
+	class WorldSpaceBoundingBoxSystem : public Ecs::GenericEntitySystem<WorldSpaceBoundingBoxSystem, StaticMesh, Transform> {
+	protected:
 
 		//! Calculates the world space bounds for static mesh.
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Moves scene object transform along coordinate axes.
-	class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxes, Transform> {
-	public:
-
-							//! Constructs a MoveAlongAxesSystem instance.
-							MoveAlongAxesSystem( void );
+	class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxesSystem, MoveAlongAxes, Transform> {
+    protected:
 
 		//! Moves the scene object
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! Rotates scene object transform around axes.
-	class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxes, Transform> {
-	public:
-
-							//! Constructs a RotateAroundAxesSystem instance.
-							RotateAroundAxesSystem( void );
+	class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxesSystem, RotateAroundAxes, Transform> {
+    protected:
 
 		//! Moves the scene object
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) DC_DECL_OVERRIDE;
 	};
 
 	//! The moving to target system
-	class MoveToSystem : public Ecs::GenericEntitySystem<MoveTo, Transform> {
-	public:
-
-							//! Constructs a FollowSystem instance.
-							MoveToSystem( void )
-								: GenericEntitySystem( "MoveToSystem" ) {}
+	class MoveToSystem : public Ecs::GenericEntitySystem<MoveToSystem, MoveTo, Transform> {
+    protected:
 
 		//! Follows the target transform
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) DC_DECL_OVERRIDE;
@@ -116,12 +98,8 @@ namespace Scene {
 	};
 
 	//! Particles update system
-	class ParticlesSystem : public Ecs::GenericEntitySystem<Particles, Transform> {
-	public:
-
-							//! Constructs a ParticlesSystem instance.
-							ParticlesSystem( void )
-								: GenericEntitySystem( "Particles" ) {}
+	class ParticlesSystem : public Ecs::GenericEntitySystem<ParticlesSystem, Particles, Transform> {
+    protected:
 
 		//! Updates the particle system.
 		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) DC_DECL_OVERRIDE;
