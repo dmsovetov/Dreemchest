@@ -63,6 +63,9 @@ namespace Scene {
 		//! Updates the physics engine state.
 		virtual bool			begin( u32 currentTime ) DC_DECL_OVERRIDE;
 
+        //! Dispatches recorded collision events.
+        virtual void            end( void ) DC_DECL_OVERRIDE;
+
 		//! Synchronizes the scene object transform with a rigid body.
 		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
@@ -71,6 +74,24 @@ namespace Scene {
 
 		//! Destroys the Box2D rigid body of a removed scene object.
 		virtual void			entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+
+        //! Emitted when two bodies begin to touch.
+        struct CollisionBegin {
+                                //! Constructs CollisionBegin instance.
+                                CollisionBegin( SceneObjectWPtr first, SceneObjectWPtr second )
+                                    : first( first ), second( second ) {}
+            SceneObjectWPtr     first;  //!< First collision object.
+            SceneObjectWPtr     second; //!< Second collision object.
+        };
+
+        //! Emitted when two bodies cease to touch.
+        struct CollisionEnd {
+                                //! Constructs CollisionEnd instance.
+                                CollisionEnd( SceneObjectWPtr first, SceneObjectWPtr second )
+                                    : first( first ), second( second ) {}
+            SceneObjectWPtr     first;  //!< First collision object.
+            SceneObjectWPtr     second; //!< Second collision object.
+        };
 
 	private:
 
@@ -103,6 +124,8 @@ namespace Scene {
 
 	private:
 
+        class Collisions;
+
 		//! Holds the per-instance internal physics data inside the component.
 		struct Internal : public Ecs::Internal<Internal> {
 								//! Constructs the Internal instance.
@@ -113,6 +136,7 @@ namespace Scene {
 		};
 
 		AutoPtr<b2World>		m_world;			//!< The Box2D physics world.
+        AutoPtr<Collisions>     m_collisions;       //!< Collision listener interface.
 		f32						m_scale;			//!< Physics world scale.
 		f32						m_deltaTime;		//!< Physics delta time.
 	};

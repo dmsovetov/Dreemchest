@@ -30,14 +30,120 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
-
 #ifdef DC_BOX2D_ENABLED
+
+// ------------------------------------------------ Box2DPhysics::Collisions ------------------------------------------------ //
+
+// ** Box2DPhysics::Collisions
+class Box2DPhysics::Collisions : public b2ContactListener {
+public:
+
+    //! Collision event data.
+    struct Event {
+        //! Collision event type.
+        enum Type {
+              Begin //!< Contact begin.
+            , End   //!< Contact end.
+        };
+
+                    //! Constructs empty Event instance.
+                    Event( void )
+                        {}
+                    //! Constructs Event instance.
+                    Event( Type type, b2Body* first, b2Body* second )
+                        : type( type ), first( first ), second( second ) {}
+
+        b2Body*     first;  //!< First contact body.
+        b2Body*     second; //!< Second contact body.
+        Type        type;   //!< Collision type.
+    };
+
+    //! Clears recorded events.
+    void            clear( void );
+
+    //! Returns total number of recorded events.
+    s32             eventCount( void ) const;
+
+    //! Returns recorded event by index.
+    const Event&    event( s32 index ) const;
+
+protected:
+
+    //! Called by Box2D when two fixtures begin to touch.
+    virtual void    BeginContact( b2Contact* contact ) DC_DECL_OVERRIDE;
+
+    //! Called by Box2D when two fixtures cease to touch.
+    virtual void    EndContact( b2Contact* contact ) DC_DECL_OVERRIDE;
+
+private:
+
+    Array<Event>    m_events;   //!< Recorded events.
+};
+
+// ** Box2DPhysics::Collisions::clear
+void Box2DPhysics::Collisions::clear( void )
+{
+    m_events.clear();
+}
+
+// ** Box2DPhysics::Collisions::eventCount
+s32 Box2DPhysics::Collisions::eventCount( void ) const
+{
+    return ( s32 )m_events.size();
+}
+
+// ** Box2DPhysics::Collisions::event
+const Box2DPhysics::Collisions::Event& Box2DPhysics::Collisions::event( s32 index ) const
+{
+    DC_BREAK_IF( index < 0 || index >= eventCount() );
+    return m_events[index];
+}
+
+// ** Box2DPhysics::Collisions::BeginContact
+void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
+{
+    // Get contact bodies
+    b2Body* first  = contact->GetFixtureA()->GetBody();
+    b2Body* second = contact->GetFixtureB()->GetBody();
+
+    // Bodies with no user data don't trigger collision events
+    if( !first->GetUserData() || !second->GetUserData() ) {
+        return;
+    }
+
+    // Record an event.
+    m_events.push_back( Event( Event::Begin, first, second ) );
+}
+
+// ** Box2DPhysics::Collisions::EndContact
+void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
+{
+    // Get contact bodies
+    b2Body* first  = contact->GetFixtureA()->GetBody();
+    b2Body* second = contact->GetFixtureB()->GetBody();
+
+    // Bodies with no user data don't trigger collision events
+    if( !first->GetUserData() || !second->GetUserData() ) {
+        return;
+    }
+
+    // Record an event.
+    m_events.push_back( Event( Event::End, first, second ) );
+}
+
+// ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
 Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale, const Vec2& gravity ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
 {
+    // Create Box2D world instance
 	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
+
+    // Create collisions
+    m_collisions = DC_NEW Collisions;
+
+    // Set contact listener
+    m_world->SetContactListener( m_collisions.get() );
 }
 
 // ** Box2DPhysics::setDeltaTime
@@ -135,9 +241,36 @@ bool Box2DPhysics::begin( u32 currentTime )
 	return true;
 }
 
+// ** Box2DPhysics::end
+void Box2DPhysics::end( void )
+{
+    // Dispatch all recorded events
+    for( s32 i = 0, n = m_collisions->eventCount(); i < n; i++ ) {
+        // Get collision event by index
+        const Collisions::Event& e = m_collisions->event( i );
+
+        // Get scene objects from collision event
+        SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( e.first->GetUserData() );
+        SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( e.second->GetUserData() );
+
+        // Emit an event
+        switch( e.type ) {
+        case Collisions::Event::Begin:  notify<CollisionBegin>( first, second );    break;
+        case Collisions::Event::End:    notify<CollisionEnd>( first, second );      break;
+        }
+    }
+
+    // Clear recorded collision events
+    m_collisions->clear();
+}
+
 // ** Box2DPhysics::process
 void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
 {
+    if( rigidBody.type() == RigidBody2D::Kinematic ) {
+        rigidBody.internal<Internal>()->m_body->SetTransform( positionToBox2D( Vec2( transform.x(), transform.y() ) ), rotationToBox2D( transform.rotationZ() ) );
+    }
+
 	if( rigidBody.type() != RigidBody2D::Dynamic ) {
 		return;
 	}
