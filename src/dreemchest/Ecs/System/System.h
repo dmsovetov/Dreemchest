@@ -40,7 +40,7 @@ namespace Ecs {
 	performing global actions on every Entity that possesses a Component of
 	the same aspect as that System.
 	*/
-	class System : public RefCounted {
+	class System : public RefCountedEventEmitter {
 	public:
 
 		virtual			~System( void ) {}
