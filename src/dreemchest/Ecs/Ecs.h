@@ -81,6 +81,41 @@ namespace Ecs {
 		EntityId			m_nextId;
 	};
 
+    //! Ecs serialization context.
+    class SerializationContext : public Composition<RefCounted> {
+    public:
+
+                                //! Constructs SerializationContext instance.
+                                SerializationContext( EcsWPtr ecs );
+
+        //! Returns parent entity component system.
+        EcsWPtr                 ecs( void ) const;
+
+        //! Returns an entity by unique id.
+        virtual EntityPtr       findById( const EntityId& id ) const;
+
+        //! Returns an archetype instance by unique id.
+        template<typename TArchetype>
+        StrongPtr<TArchetype>   find( const EntityId& id ) const;
+
+        //! Creates component by name.
+        virtual ComponentPtr    createComponent( const String& name ) const;
+
+    private:
+
+        EcsWPtr                 m_ecs;  //!< Parent entity component system.
+    };
+
+    // ** SerializationContext::find
+    template<typename TArchetype>
+    StrongPtr<TArchetype> SerializationContext::find( const EntityId& id ) const
+    {
+        EntityPtr entity = findById( id );
+        StrongPtr<TArchetype> instance = castTo<TArchetype>( entity.get() );
+        DC_BREAK_IF( !instance.valid() );
+        return instance;
+    }
+
 	//! Ecs is a root class of an entity component system.
 	class Ecs : public RefCounted {
 	friend class Entity;

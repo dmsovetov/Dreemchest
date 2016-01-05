@@ -40,6 +40,8 @@ namespace Ecs {
 
 IMPLEMENT_LOGGER( log )
 
+// -------------------------------------------------------------- Ecs -------------------------------------------------------------- //
+
 // ** Ecs::Ecs
 Ecs::Ecs( const EntityIdGeneratorPtr& entityIdGenerator ) : m_entityId( entityIdGenerator )
 {
@@ -305,6 +307,32 @@ EntityId EntityIdGenerator::generate( void )
 #else
 	return Guid::generate();
 #endif
+}
+
+// ---------------------------------------------------------- SerializationContext ---------------------------------------------------------- //
+
+// ** SerializationContext::SerializationContext
+SerializationContext::SerializationContext( EcsWPtr ecs ) : m_ecs( ecs )
+{
+
+}
+
+// ** SerializationContext::ecs
+EcsWPtr SerializationContext::ecs( void ) const
+{
+    return m_ecs;
+}
+
+// ** SerializationContext::findById
+EntityPtr SerializationContext::findById( const EntityId& id ) const
+{
+    return m_ecs->findEntity( id );
+}
+
+// ** SerializationContext::createComponent
+ComponentPtr SerializationContext::createComponent( const String& name ) const
+{
+    return m_ecs->createComponentByName( name );
 }
 
 } // namespace Ecs
