@@ -57,6 +57,8 @@ namespace Ecs {
 	friend class Entity;
 	public:
 
+                                    ClassEnableTypeInfoSuper( ComponentBase, Io::Serializable )
+
 									//! Constructs ComponentBase instance.
 									ComponentBase( void )
 										: m_flags( IsEnabled ) {}
@@ -78,13 +80,19 @@ namespace Ecs {
 		//! Returns true if component is enabled.
 		bool						isEnabled( void ) const;
 
-	#ifndef DC_BSON_DISABLED
-		//! Returns the component BSON.
-		virtual Io::KeyValue			bson( void ) const;
+	#ifndef DC_ECS_NO_SERIALIZATION
+		//! Reads component from a storage.
+		virtual void		        read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
 
-		//! Sets the component BSON.
-		virtual void				setBson( const Io::KeyValue& value );
-	#endif	/*	!DC_BSON_DISABLED	*/
+		//! Writes component to a storage.
+		virtual void		        write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
+
+		//! Writes this component to a key-value archive.
+		virtual void                serialize( SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads this component from a key-value archive.
+		virtual void		        deserialize( SerializationContext& ctx, const Io::KeyValue& value );
+	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	protected:
 
@@ -121,17 +129,37 @@ namespace Ecs {
 	}
 
 #if !DC_BSON_DISABLED
-	// ** ComponentBase::bson
-	inline Io::KeyValue ComponentBase::bson( void ) const
+	// ** ComponentBase::read
+	inline void ComponentBase::read( const Io::Storage* storage )
 	{
-		log::warn( "Component::bson : is not implemented for '%s'\n", typeName() );
-		return Io::KeyValue::kNull;
+	    Io::KeyValue ar;
+        ar.read( storage );
+
+        SerializationContext ctx( NULL );
+        deserialize( ctx, ar );
 	}
 
-	// ** ComponentBase::setBson
-	inline void ComponentBase::setBson( const Io::KeyValue& value )
+	// ** ComponentBase::read
+	inline void ComponentBase::write( Io::Storage* storage ) const
 	{
-		log::warn( "Component::setBson : is not implemented for '%s'\n", typeName() );
+        SerializationContext ctx( NULL );
+        Io::KeyValue ar;
+
+        serialize( ctx, ar );
+	    ar.write( storage );
+	}
+
+	// ** ComponentBase::serialize
+	inline void ComponentBase::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
+	{
+        ar = Io::KeyValue::kNull;
+		log::warn( "Component::serialize : is not implemented for '%s'\n", typeName() );
+	}
+
+	// ** ComponentBase::deserialize
+	inline void ComponentBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
+	{
+		log::warn( "Component::deserialize : is not implemented for '%s'\n", typeName() );
 	}
 #endif	/*	!DC_BSON_DISABLED	*/
 
@@ -164,7 +192,7 @@ namespace Ecs {
 	class Component : public ComponentBase {
 	public:
 
-		IoOverrideSerializableSuper( T, ComponentBase )
+		                        ClassEnableTypeInfoSuper( T, ComponentBase )
 
 
 		//! Weak pointer type.

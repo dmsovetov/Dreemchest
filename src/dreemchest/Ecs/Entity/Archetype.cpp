@@ -30,87 +30,14 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-// ** ArchetypeBase::read
-void ArchetypeBase::read( const Io::Storage* storage )
+// ** ArchetypeBase::deserialize
+void ArchetypeBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
 {
-	Io::KeyValue bson;
-	bson.read( storage );
+    if( components().empty() ) {
+        construct();
+    }
 
-	construct();
-	setBson( bson );
-}
-
-// ** ArchetypeBase::write
-void ArchetypeBase::write( Io::Storage* storage ) const
-{
-	bson().write( storage );
-}
-
-// ** ArchetypeBase::bson
-Io::KeyValue ArchetypeBase::bson( void ) const
-{
-	Io::KeyValue result = Io::KeyValue::object();
-
-	result["Type"] = typeName();
-	result["_id"]  = id();
-
-	const Components& items = components();
-
-	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
-		CString  key  = i->second->typeName();
-		Io::KeyValue data = i->second->bson();
-
-		if( data.isNull() ) {
-			continue;
-		}
-
-		result[key] = data;
-	}
-
-	return result;
-}
-
-// ** ArchetypeBase::setBson
-void ArchetypeBase::setBson( const Io::KeyValue& value )
-{
-	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
-
-	Components& items = components();
-
-	// Load all added components
-	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
-		CString key = i->second->typeName();
-		i->second->setBson( value.get( key ) );
-	}
-	
-	// Create components from BSON
-	const Io::KeyValue::Properties& kv = value.properties();
-
-	for( Io::KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
-		if( i->first == "Type" || i->first == "_id" ) {
-			continue;
-		}
-
-		bool hasComponent = false;
-
-		for( Components::iterator j = items.begin(); j != items.end(); ++j ) {
-			if( j->second->typeName() == i->first ) {
-				hasComponent = true;
-				break;
-			}
-		}
-
-		if( hasComponent ) {
-			continue;
-		}
-
-		if( i->second.isNull() ) {
-			continue;
-		}
-
-		ComponentPtr component = ecs()->createComponentByName( i->first, i->second );
-		attachComponent( component.get() );
-	}
+    Entity::deserialize( ctx, value );
 }
 
 } // namespace Ecs

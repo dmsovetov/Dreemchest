@@ -103,6 +103,20 @@ namespace Ecs {
 		template<typename TComponent>
 		TComponent*				attachComponent( TComponent* component );
 
+    #ifndef DC_ECS_NO_SERIALIZATION
+		//! Reads archetype from a storage.
+		virtual void		    read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
+
+		//! Writes archetype to a storage.
+		virtual void		    write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
+
+		//! Writes this entity to a key-value archive.
+		virtual void            serialize( SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads this entity from a key-value archive.
+		virtual void		    deserialize( SerializationContext& ctx, const Io::KeyValue& value );
+    #endif  /*  !DC_ECS_NO_SERIALIZATION    */
+
 	#ifndef DC_CPP11_DISABLED
 		//! Constructs a new component and attaches it to this entity.
 		template<typename TComponent, typename ... Args>

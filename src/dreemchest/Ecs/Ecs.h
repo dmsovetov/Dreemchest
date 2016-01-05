@@ -131,6 +131,10 @@ namespace Ecs {
 		template<typename TArchetype>
 		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Io::KeyValue& data = Io::KeyValue::kNull ) const;
 
+        //! Clones an archetype instance.
+        template<typename TArchetype>
+        StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const;
+
 		//! Creates an array of archetype instances from data.
 		template<typename TArchetype>
 		Array<StrongPtr<TArchetype>>	createArchetypes( const Io::KeyValue& data ) const;
@@ -257,6 +261,21 @@ namespace Ecs {
 	{
 		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
 	}
+
+    // ** Ecs::cloneArchetype
+    template<typename TArchetype>
+    StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const
+    {
+        // Serialize source to a key-value archive
+        Io::KeyValue ar;
+        SerializationContext ctx( const_cast<Ecs*>( this ) );
+        source->serialize( ctx, ar );
+
+        // Create archetype instance
+        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, ar );
+
+        return instance;
+    }
 
 	// ** Ecs::createArchetypes
 	template<typename TArchetype>

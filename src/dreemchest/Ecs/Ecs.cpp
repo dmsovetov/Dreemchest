@@ -115,7 +115,8 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Load from data
 	if( !data.isNull() ) {
-		instance->setBson( data );
+        SerializationContext ctx( const_cast<Ecs*>( this ) );
+		instance->deserialize( ctx, data );
 	}
 
 	return instance;
@@ -135,7 +136,8 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 
 	// Load from data
 	if( !data.isNull() ) {
-		instance->setBson( data );
+        SerializationContext ctx( const_cast<Ecs*>( this ) );
+		instance->deserialize( ctx, data );
 	}
 
 	return instance;

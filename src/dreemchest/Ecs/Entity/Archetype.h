@@ -42,19 +42,10 @@ namespace Ecs {
 		//! Constructs archetype instance by adding all components.
 		virtual void		construct( void ) = 0;
 
-	#ifndef DC_BSON_DISABLED
-		//! Reads archetype from a storage.
-		virtual void		read( const Io::Storage* storage );
-
-		//! Writes archetype to a storage.
-		virtual void		write( Io::Storage* storage ) const;
-
-		//! Returns the archetype BSON.
-		Io::KeyValue			bson( void ) const;
-
-		//! Sets the archetype BSON.
-		void				setBson( const Io::KeyValue& value );
-	#endif	/*	!DC_BSON_DISABLED	*/
+	#ifndef DC_ECS_NO_SERIALIZATION
+		//! Constructs archetype instance before deserialization.
+		virtual void		deserialize( SerializationContext& ctx, const Io::KeyValue& value ) DC_DECL_OVERRIDE;
+	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 	};
 
 	//! Generic archetype class to declare archetypes.

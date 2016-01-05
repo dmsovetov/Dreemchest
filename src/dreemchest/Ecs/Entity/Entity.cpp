@@ -116,6 +116,99 @@ void Entity::updateComponentBit( u32 bit, bool value )
 	}
 }
 
+#ifndef DC_ECS_NO_SERIALIZATION
+
+// ** Entity::read
+void Entity::read( const Io::Storage* storage )
+{
+	Io::KeyValue ar;
+    ar.read( storage );
+
+    SerializationContext ctx( ecs() );
+    deserialize( ctx, ar );
+}
+
+// ** Entity::write
+void Entity::write( Io::Storage* storage ) const
+{
+    SerializationContext ctx( ecs() );
+    Io::KeyValue ar;
+
+    serialize( ctx, ar );
+	ar.write( storage );
+}
+
+// ** Entity::serialize
+void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+	ar = Io::KeyValue::object();
+
+	ar["Type"] = typeName();
+	ar["_id"]  = id();
+
+	const Components& items = components();
+
+	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
+		CString      key = i->second->typeName();
+		Io::KeyValue component;
+
+        i->second->serialize( ctx, component );
+
+		if( ar.isNull() ) {
+			continue;
+		}
+
+		ar[key] = component;
+	}
+}
+
+// ** Entity::deserialize
+void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
+{
+	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
+
+	Components& items = components();
+
+	// Load all attached components
+	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
+		CString      key = i->second->typeName();
+        Io::KeyValue ar;
+        i->second->deserialize( ctx, value.get( key ) );
+	}
+	
+	// Create components from key-value archive
+	const Io::KeyValue::Properties& kv = value.properties();
+
+	for( Io::KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+		if( i->first == "Type" || i->first == "_id" ) {
+			continue;
+		}
+
+		bool hasComponent = false;
+
+		for( Components::iterator j = items.begin(); j != items.end(); ++j ) {
+			if( j->second->typeName() == i->first ) {
+				hasComponent = true;
+				break;
+			}
+		}
+
+		if( hasComponent ) {
+			continue;
+		}
+
+		if( i->second.isNull() ) {
+			continue;
+		}
+
+		ComponentPtr component = ctx.createComponent( i->first );
+        component->deserialize( ctx, i->second );
+		attachComponent( component.get() );
+	}
+}
+
+#endif  /*  !DC_ECS_NO_SERIALIZATION    */
+
 } // namespace Ecs
 
 DC_END_DREEMCHEST
