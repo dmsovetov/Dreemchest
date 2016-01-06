@@ -118,6 +118,56 @@ KeyValue::KeyValue( const Guid& value ) : m_type( kGuid ), m_guid( DC_NEW Guid( 
 }
 
 // ** KeyValue::KeyValue
+KeyValue::KeyValue( const Vec2& value ) : m_type( kVec2 )
+{
+    m_vector[0] = value.x;
+    m_vector[1] = value.y;
+}
+
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Vec3& value ) : m_type( kVec3 )
+{
+    m_vector[0] = value.x;
+    m_vector[1] = value.y;
+    m_vector[2] = value.z;
+}
+
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Vec4& value ) : m_type( kVec4 )
+{
+    m_vector[0] = value.x;
+    m_vector[1] = value.y;
+    m_vector[2] = value.z;
+    m_vector[3] = value.w;
+}
+
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Quat& value ) : m_type( kQuat )
+{
+    m_vector[0] = value.x;
+    m_vector[1] = value.y;
+    m_vector[2] = value.z;
+    m_vector[3] = value.w;
+}
+
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Rgb& value ) : m_type( kRgb )
+{
+    m_vector[0] = value.r;
+    m_vector[1] = value.g;
+    m_vector[2] = value.b;
+}
+
+// ** KeyValue::KeyValue
+KeyValue::KeyValue( const Rgba& value ) : m_type( kRgba )
+{
+    m_vector[0] = value.r;
+    m_vector[1] = value.g;
+    m_vector[2] = value.b;
+    m_vector[3] = value.a;
+}
+
+// ** KeyValue::KeyValue
 KeyValue::KeyValue( const KeyValue& other ) : m_type( other.m_type )
 {
 	setKeyValue( other );
@@ -420,6 +470,96 @@ f64 KeyValue::asDouble( void ) const
 	return 0.0;
 }
 
+// ** KeyValue::asVec2
+Vec2 KeyValue::asVec2( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Vec2( m_vector );
+	}
+
+	return Vec2( 0.0f, 0.0f );
+}
+
+// ** KeyValue::asVec3
+Vec3 KeyValue::asVec3( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Vec3( m_vector );
+	}
+
+	return Vec3();
+}
+
+// ** KeyValue::asVec4
+Vec4 KeyValue::asVec4( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Vec4( m_vector );
+	}
+
+	return Vec4();
+}
+
+// ** KeyValue::asQuat
+Quat KeyValue::asQuat( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Quat( m_vector[0], m_vector[1], m_vector[2], m_vector[3] );
+	}
+
+	return Quat();
+}
+
+// ** KeyValue::asRgb
+Rgb KeyValue::asRgb( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Rgb( m_vector );
+	}
+
+	return Rgb();
+}
+
+// ** KeyValue::asRgba
+Rgba KeyValue::asRgba( void ) const
+{
+	switch( m_type ) {
+	case kVec2:		
+	case kVec3:
+	case kVec4:
+	case kQuat:
+	case kRgb:
+	case kRgba:	    return Rgba( m_vector );
+	}
+
+	return Rgba();
+}
+
 // ** KeyValue::asLong
 s64 KeyValue::asLong( void ) const
 {
@@ -471,6 +611,13 @@ void KeyValue::setKeyValue( const KeyValue& value )
 					break;
 	case kObject:	m_object = DC_NEW Properties( *value.m_object );
 					break;
+    case kVec2:
+    case kVec3:
+    case kVec4:
+    case kQuat:
+    case kRgb:
+    case kRgba:     memcpy( m_vector, value.m_vector, sizeof( m_vector ) );
+                    break;
 	default:		DC_BREAK;
 	}
 }
@@ -487,11 +634,17 @@ void KeyValue::clear( void )
 	case kInt64:
 	case kFloat32:
 	case kFloat64:
+    case kVec2:
+    case kVec3:
+    case kVec4:
+    case kQuat:
+    case kRgb:
+    case kRgba:
 	case kString:	break;
 	case kGuid:		delete m_guid;
 					m_guid = NULL;
 					break;
-	case kArray:		delete m_array;
+	case kArray:	delete m_array;
 					m_array = NULL;
 					break;
 	case kObject:	delete m_object;
@@ -703,16 +856,22 @@ KeyValue KeyValue::parse( const String& text )
 Json::Value KeyValue::toJson( const KeyValue& kv )
 {
 	switch( kv.type() ) {
-	case kNull:		return Json::Value::null;		break;
-	case kBoolean:	return kv.asBool();				break;
+	case kNull:		return Json::Value::null;
+	case kBoolean:	return kv.asBool();
 	case kInt8:		
 	case kInt16:
 	case kInt32:
-	case kInt64:	return kv.asInt();				break;
+	case kInt64:	return kv.asInt();
 	case kFloat32:
-	case kFloat64:	return kv.asDouble();			break;
-	case kString:	return kv.asString();			break;
-	case kGuid:		return kv.asGuid().toString();	break;
+	case kFloat64:	return kv.asDouble();
+	case kString:	return kv.asString();
+	case kGuid:		return toJson( object() << "typeID" << "guid" << "value" << kv.asGuid().toString() );
+    case kVec2:     return toJson( object() <<  "x" << kv.asVec2().x <<  "y" << kv.asVec2().y );
+    case kVec3:     return toJson( object() <<  "x" << kv.asVec3().x <<  "y" << kv.asVec3().y <<  "z" << kv.asVec3().z );
+    case kVec4:     return toJson( object() <<  "x" << kv.asVec4().x <<  "y" << kv.asVec4().y <<  "z" << kv.asVec4().z <<  "w" << kv.asVec4().w );
+    case kQuat:     return toJson( object() << "qx" << kv.asQuat().x << "qy" << kv.asQuat().y << "qz" << kv.asQuat().z << "qw" << kv.asQuat().w );
+    case kRgb:      return toJson( object() <<  "r" << kv.asRgb().r  <<  "g" << kv.asRgb().g  <<  "b" << kv.asRgb().b );
+    case kRgba:     return toJson( object() <<  "r" << kv.asRgba().r <<  "g" << kv.asRgba().g  <<  "b" << kv.asRgba().b  <<  "a" << kv.asRgba().a );
 	case kArray:	{
 						Json::Value	json( Json::arrayValue );
 
@@ -761,6 +920,7 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
 								}
 								break;
 	case Json::objectValue:		{
+                                    DC_BREAK_IF( !json["typeID"].isNull() );
 									KeyValue kv( kObject );
 
 									for( Json::Value::const_iterator i = json.begin(), end = json.end(); i != end; i++ ) {

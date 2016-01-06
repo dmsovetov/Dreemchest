@@ -49,6 +49,12 @@ namespace Io {
 			, kFloat64
 			, kString
 			, kGuid
+            , kVec2
+            , kVec3
+            , kVec4
+            , kQuat
+            , kRgb
+            , kRgba
 			, kArray
 			, kObject
 		};
@@ -97,6 +103,24 @@ namespace Io {
 
 							//! Constructs KeyValue instance from value.
 							KeyValue( const Guid& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Vec2& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Vec3& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Vec4& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Quat& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Rgb& value );
+
+							//! Constructs KeyValue instance from value.
+							KeyValue( const Rgba& value );
 
 							//! Constructs KeyValue array instance from value.
 							template<typename TValue>
@@ -220,6 +244,24 @@ namespace Io {
 		//! Returns the double value of this KeyValue instance.
 		f64					asDouble( void ) const;
 
+        //! Returns the Vec2 value of this KeyValue instance.
+        Vec2                asVec2( void ) const;
+
+        //! Returns the Vec3 value of this KeyValue instance.
+        Vec3                asVec3( void ) const;
+
+        //! Returns the Vec4 value of this KeyValue instance.
+        Vec4                asVec4( void ) const;
+
+        //! Returns the Vec2 value of this KeyValue instance.
+        Quat                asQuat( void ) const;
+
+        //! Returns the Vec2 value of this KeyValue instance.
+        Rgb                 asRgb( void ) const;
+
+        //! Returns the Vec2 value of this KeyValue instance.
+        Rgba                asRgba( void ) const;
+
 		//! Returns the GUID value of this KeyValue instance.
 		const Guid&			asGuid( void ) const;
 
@@ -292,6 +334,7 @@ namespace Io {
 			u64			m_int64;
 			f32			m_float32;
 			f64			m_float64;
+            f32         m_vector[4];
 			Guid*		m_guid;
 			String*		m_string;
 			Properties*	m_object;
