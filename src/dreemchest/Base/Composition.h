@@ -33,36 +33,30 @@ DC_BEGIN_DREEMCHEST
 	/*!
 	 Composite type owns it's parts and they get destroyed with a parent object.
 	 */
-	template<typename TPart>
 	class Composition {
 	public:
 
 		//! Container type to store composition parts.
-		typedef Map<TypeIdx, TPart*>	Parts;
+		typedef Map<TypeIdx, void*>	Parts;
 
         //! Destroys composition
         virtual ~Composition( void )
         {
-            clear();
         }
-
-    #ifndef DC_CPP11_DISABLED
-        //! Attaches a composition item.
-        template<typename TType, typename ... TArgs>
-        TType* attach( const TArgs& ... args )
-        {
-            return set<TType>( new TType( args... ) )
-        }
-    #endif  /*  !DC_CPP11_DISABLED  */
 
         //! Clears a composition.
         void clear( void )
         {
-            for( typename Parts::iterator i = m_composition.begin(), end = m_composition.end(); i != end; ++i ) {
-                delete i->second;
-            }
             m_composition.clear();
         }
+
+        //! Sets a part of composition to a specified type T.
+		template<typename T>
+		T* set( T* instance )
+		{
+			m_composition[typeIdx<T>()] = instance;
+			return instance;
+		}
 
 		//! Returns a pointer to a composition part with specified type T.
 		template<typename T>
@@ -88,12 +82,11 @@ DC_BEGIN_DREEMCHEST
 
 		//! Removes the composition part of specified type T.
 		template<typename T>
-		void detach( void )
+		void remove( void )
 		{
 			typename Parts::iterator i = m_composition.find( typeIdx<T>() );
 
 			if( i != m_composition.end() ) {
-				delete static_cast<T*>( i->second );
 				m_composition.erase( i );
 			}
 		}
@@ -108,16 +101,8 @@ DC_BEGIN_DREEMCHEST
         template<typename TType>
         TypeIdx typeIdx( void ) const
         {
-            return GroupedTypeIndex<TType, Composition<TPart>>::idx();
+            return GroupedTypeIndex<TType, Composition>::idx();
         }
-
-        //! Sets a part of composition to a specified type T.
-		template<typename T>
-		T* set( T* instance )
-		{
-			m_composition[typeIdx<T>()] = instance;
-			return instance;
-		}
 
 	private:
 
