@@ -902,6 +902,116 @@ Json::Value KeyValue::toJson( const KeyValue& kv )
 // ** KeyValue::fromJson
 KeyValue KeyValue::fromJson( const Json::Value& json )
 {
+    // Internal parsing helper
+    struct Parser {
+        static bool vec2( const Json::Value& json, Vec2& result )
+        {
+            Json::Value x = json.get( "x", Json::Value::null );
+            Json::Value y = json.get( "y", Json::Value::null );
+
+            if( x.isNull() || y.isNull() ) {
+                return false;
+            }
+
+            result.x = x.asFloat();
+            result.y = y.asFloat();
+            return true;
+        }
+
+        static bool vec3( const Json::Value& json, Vec3& result )
+        {
+            Json::Value x = json.get( "x", Json::Value::null );
+            Json::Value y = json.get( "y", Json::Value::null );
+            Json::Value z = json.get( "z", Json::Value::null );
+
+            if( x.isNull() || y.isNull() || z.isNull() ) {
+                return false;
+            }
+
+            result.x = x.asFloat();
+            result.y = y.asFloat();
+            result.z = z.asFloat();
+            return true;
+        }
+
+        static bool vec4( const Json::Value& json, Vec4& result )
+        {
+            Json::Value x = json.get( "x", Json::Value::null );
+            Json::Value y = json.get( "y", Json::Value::null );
+            Json::Value z = json.get( "z", Json::Value::null );
+            Json::Value w = json.get( "w", Json::Value::null );
+
+            if( x.isNull() || y.isNull() || z.isNull() || w.isNull() ) {
+                return false;
+            }
+
+            result.x = x.asFloat();
+            result.y = y.asFloat();
+            result.z = z.asFloat();
+            result.w = w.asFloat();
+            return true;
+        }
+
+        static bool quat( const Json::Value& json, Quat& result )
+        {
+            Json::Value x = json.get( "qx", Json::Value::null );
+            Json::Value y = json.get( "qy", Json::Value::null );
+            Json::Value z = json.get( "qz", Json::Value::null );
+            Json::Value w = json.get( "qw", Json::Value::null );
+
+            if( x.isNull() || y.isNull() || z.isNull() || w.isNull() ) {
+                return false;
+            }
+
+            result.x = x.asFloat();
+            result.y = y.asFloat();
+            result.z = z.asFloat();
+            result.w = w.asFloat();
+            return true;
+        }
+
+        static bool rgb( const Json::Value& json, Rgb& result )
+        {
+            Json::Value r = json.get( "r", Json::Value::null );
+            Json::Value g = json.get( "g", Json::Value::null );
+            Json::Value b = json.get( "b", Json::Value::null );
+
+            if( r.isNull() || g.isNull() || b.isNull() ) {
+                return false;
+            }
+
+            result.r = r.asFloat();
+            result.g = g.asFloat();
+            result.b = b.asFloat();
+            return true;
+        }
+
+        static bool rgba( const Json::Value& json, Rgba& result )
+        {
+            Json::Value r = json.get( "r", Json::Value::null );
+            Json::Value g = json.get( "g", Json::Value::null );
+            Json::Value b = json.get( "b", Json::Value::null );
+            Json::Value a = json.get( "a", Json::Value::null );
+
+            if( r.isNull() || g.isNull() || b.isNull() || a.isNull() ) {
+                return false;
+            }
+
+            result.r = r.asFloat();
+            result.g = g.asFloat();
+            result.b = b.asFloat();
+            result.a = a.asFloat();
+            return true;
+        }
+    };
+
+    Vec2 vec2;
+    Vec3 vec3;
+    Vec4 vec4;
+    Quat quat;
+    Rgb  rgb;
+    Rgba rgba;
+
 	switch( json.type() ) {
 	case Json::nullValue:		return kNull;
 	case Json::intValue:		return json.asInt();
@@ -920,6 +1030,13 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
 								}
 								break;
 	case Json::objectValue:		{
+                                    if( Parser::quat( json, quat ) ) return quat;
+                                    if( Parser::rgba( json, rgba ) ) return rgba;
+                                    if( Parser::rgb( json, rgb ) ) return rgb;
+                                    if( Parser::vec4( json, vec4 ) ) return vec4;
+                                    if( Parser::vec3( json, vec3 ) ) return vec3;
+                                    if( Parser::vec2( json, vec2 ) ) return vec2;
+
                                     DC_BREAK_IF( !json["typeID"].isNull() );
 									KeyValue kv( kObject );
 
