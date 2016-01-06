@@ -148,6 +148,18 @@ void Transform::setY( f32 value )
 	m_position.y = value;
 }
 
+// ** Transform::z
+f32 Transform::z( void ) const
+{
+	return m_position.z;
+}
+
+// ** Transform::setZ
+void Transform::setZ( f32 value )
+{
+	m_position.z = value;
+}
+
 // ** Transform::rotation
 const Quat& Transform::rotation( void ) const
 {
