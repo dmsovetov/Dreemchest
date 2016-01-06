@@ -305,6 +305,13 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 		body->ApplyForce( value, point, true );
 	}
 
+    for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
+ 		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
+		b2Vec2 value = b2Vec2( appliedImpulse.m_value.x * mass, appliedImpulse.m_value.y * mass );
+		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
+		body->ApplyLinearImpulse( value, point, true );   
+    }
+
 	// Clear all forces now
 	rigidBody.clear();
 }

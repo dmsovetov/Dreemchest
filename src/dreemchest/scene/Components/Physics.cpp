@@ -207,14 +207,39 @@ void RigidBody2D::applyForceToPoint( const Vec2& value, const Vec2& point )
 	m_forces.push_back( AppliedForce( value, point ) );
 }
 
+// ** RigidBody2D::applyImpulse
+void RigidBody2D::applyImpulse( const Vec2& value )
+{
+    m_impulses.push_back( AppliedForce( value, Vec2( 0.0f, 0.0f ) ) );
+}
+
+// ** RigidBody2D::applyImpulseToPoint
+void RigidBody2D::applyImpulseToPoint( const Vec2& value, const Vec2& point )
+{
+    m_impulses.push_back( AppliedForce( value, point ) );
+}
+
 // ** RigidBody2D::appliedForceCount
 u32 RigidBody2D::appliedForceCount( void ) const
 {
 	return ( u32 )m_forces.size();
 }
 
+// ** RigidBody2D::appliedImpulse
+const RigidBody2D::AppliedForce& RigidBody2D::appliedImpulse( u32 index ) const
+{
+	DC_BREAK_IF( index >= appliedImpulseCount() );
+	return m_impulses[index];
+}
+
+// ** RigidBody2D::appliedImpulseCount
+u32 RigidBody2D::appliedImpulseCount( void ) const
+{
+	return ( u32 )m_impulses.size();
+}
+
 // ** RigidBody2D::appliedForce
-const 	RigidBody2D::AppliedForce&	RigidBody2D::appliedForce( u32 index ) const
+const RigidBody2D::AppliedForce& RigidBody2D::appliedForce( u32 index ) const
 {
 	DC_BREAK_IF( index >= appliedForceCount() );
 	return m_forces[index];
@@ -226,6 +251,7 @@ void RigidBody2D::clear( void )
 	m_torque = 0.0f;
 	m_force  = Vec2( 0.0f, 0.0f );
 	m_forces.clear();
+    m_impulses.clear();
 }
 
 } // namespace Scene

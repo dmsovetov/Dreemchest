@@ -131,14 +131,14 @@ namespace Scene {
 			, TotalTypes	//!< The total number of rigid body types.
 		};
 
-		//! A single force applied is stored in this structure.
+		//! A single force or impulse applied is stored in this structure.
 		struct AppliedForce {
 							//! Constructs the AppliedForce instance.
 							AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
 								: m_value( value ), m_point( point ) {}
 
-			Vec2			m_value;			//!< The force applied.
-			Vec2			m_point;			//!< The application point.
+			Vec2			m_value;    //!< The force applied.
+			Vec2			m_point;    //!< The application point.
 		};
 
 							//! Constructs the RigidBody2D instance.
@@ -178,11 +178,23 @@ namespace Scene {
 		//! Applies force to a specified point.
 		void				applyForceToPoint( const Vec2& value, const Vec2& point );
 
+        //! Applies linear impulse to the center of mass.
+        void                applyImpulse( const Vec2& value );
+
+        //! Applies linear impulse to a specified point.
+        void                applyImpulseToPoint( const Vec2& value, const Vec2& point );
+
 		//! Returns the total number of applied forces.
 		u32					appliedForceCount( void ) const;
 
 		//! Returns the applied force by index.
 		const AppliedForce&	appliedForce( u32 index ) const;
+
+        //! Returns the total number of applied impulses.
+        u32                 appliedImpulseCount( void ) const;
+
+        //! Returns the applied impulse by index.
+        const AppliedForce& appliedImpulse( u32 index ) const;
 
 		//! Clears all applied forces.
 		void				clear( void );
@@ -196,6 +208,7 @@ namespace Scene {
 		f32					m_torque;			//!< The total torque applied.
 		Vec2				m_force;			//!< The total force applied.
 		Array<AppliedForce>	m_forces;			//!< All applied forces.
+        Array<AppliedForce> m_impulses;         //!< All applied impulses.
 	};
 
 } // namespace Scene
