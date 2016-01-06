@@ -108,7 +108,12 @@ namespace Scene {
 		//! Adds a new polygon shape part.
 		void				addPolygon( const Vec2* vertices, u32 count, const Material& material = Material() );
 
+		//! Writes 2D shape to a key-value archive.
+		virtual void        serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const DC_DECL_OVERRIDE;
+
 		//! Reads 2D shape from a key-value archive.
+		virtual void		deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar ) DC_DECL_OVERRIDE;
+
 	private:
 
 		Array<Part>			m_parts;	//!< Shape parts.
