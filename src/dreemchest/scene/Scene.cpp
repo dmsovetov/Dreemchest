@@ -179,6 +179,12 @@ const Ecs::IndexPtr& Scene::cameras( void ) const
 	return m_cameras;
 }
 
+// ** Scene::ecs
+Ecs::EcsWPtr Scene::ecs( void ) const
+{
+    return m_ecs;
+}
+
 // ** Scene::findAllWithName
 SceneObjectSet Scene::findAllWithName( const String& name ) const
 {

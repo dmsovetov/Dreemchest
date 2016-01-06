@@ -272,6 +272,9 @@ namespace Scene {
 		//! Returns cameras that reside in scene.
 		const Ecs::IndexPtr&			cameras( void ) const;
 
+        //! Returns internal entity component system instance.
+        Ecs::EcsWPtr                    ecs( void ) const;
+
 		//! Returns a scene system of specified type.
 		template<typename TSystem>
 		WeakPtr<TSystem>				system( void ) const;
