@@ -154,7 +154,7 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 
         i->second->serialize( ctx, component );
 
-		if( ar.isNull() ) {
+		if( component.isNull() ) {
 			continue;
 		}
 
