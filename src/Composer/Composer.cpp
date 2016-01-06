@@ -187,7 +187,9 @@ void Composer::menuOpenProject( Ui::ActionQPtr action )
 // ** Composer::menuSaveProject
 void Composer::menuSaveProject( Ui::ActionQPtr action )
 {
-	m_mainWindow->message( "Not implemented yet.", Ui::MessageWarning );
+	if( Ui::DocumentQPtr document = m_mainWindow->activeDocument() ) {
+        document->assetEditor()->save();
+    }
 }
 
 // ** Composer::menuUndo

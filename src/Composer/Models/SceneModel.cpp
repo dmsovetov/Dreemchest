@@ -303,6 +303,7 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainWPtr terrain, con
 
 	// Create root scene object.
 	Scene::SceneObjectPtr root = scene->createSceneObject();
+    root->setSerializable( true );
 	root->attach<Editors::SceneEditorInternal>( root );
 	root->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
 	root->attach<Scene::Identifier>( "Terrain" );
@@ -336,6 +337,7 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshWPtr mesh, const 
 
 	// Construct scene object
 	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
+    sceneObject->setSerializable( true );
 	sceneObject->attach<Scene::Identifier>( mesh->name() );
 	sceneObject->attach<Scene::StaticMesh>( mesh );
 	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );

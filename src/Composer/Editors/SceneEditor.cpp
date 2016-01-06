@@ -57,7 +57,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_cursorMovement = new Scene::Vec3Binding;
 
 	// Create the scene.
-	m_scene = Scene::Scene::create();
+	//m_scene = Scene::Scene::create();
+    m_scene = loadFromFile( m_asset.absoluteFilePath() );
 	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create the scene model
@@ -65,8 +66,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 
 	// Create terrain.
 	{
-		Scene::TerrainPtr terrain1 = new Scene::Terrain( m_project->assets().get(), "terrain1", "terrain1", 128 );
-		m_sceneModel->placeTerrain( terrain1, Vec3( 0, 0, 0 ) );
+		//Scene::TerrainPtr terrain1 = new Scene::Terrain( m_project->assets().get(), "terrain1", "terrain1", 128 );
+		//m_sceneModel->placeTerrain( terrain1, Vec3( 0, 0, 0 ) );
 		//Scene::TerrainPtr terrain2 = new Scene::Terrain( m_project->assets().get(), "terrain2", "terrain2", 128 );
 		//m_sceneModel->placeTerrain( terrain2, Vec3( 128, 0, 0 ) );
 		//Scene::TerrainPtr terrain3 = new Scene::Terrain( m_project->assets().get(), "terrain3", "terrain3", 128 );
@@ -76,7 +77,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 
 		m_terrainTool = m_scene->createSceneObject();
 		m_terrainTool->attach<Scene::Transform>();
-		m_terrainTool->attach<TerrainTool>( terrain1, 10.0f );
+		m_terrainTool->attach<TerrainTool>( /*terrain1*/Scene::TerrainPtr(), 10.0f );
 		m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
 		m_scene->addSceneObject( m_terrainTool );
 
@@ -130,6 +131,68 @@ void SceneEditor::render( f32 dt )
 
 	// Reset the cursor movement
 	m_cursorMovement->set( Vec3() );
+}
+
+struct Null : public Ecs::Component<Null> {};
+
+// ** SceneEditor::save
+void SceneEditor::save( void )
+{
+    // Get the set of objects to be serialized
+    Scene::SceneObjectSet objects = m_scene->findByAspect( Ecs::Aspect::exclude<Null>() );
+
+    // Create serialization context
+    Ecs::SerializationContext ctx( m_scene->ecs() );
+    Io::KeyValue ar = Io::KeyValue::object();
+
+    // Write each object to a root key-value archive
+    for( Scene::SceneObjectSet::const_iterator i = objects.begin(), end = objects.end(); i != end; ++i ) {
+        if( !(*i)->isSerializable() ) {
+            continue;
+        }
+
+        Io::KeyValue object;
+        (*i)->serialize( ctx, object );
+        ar[(*i)->id().toString()] = object;
+    }
+
+    // Write the serialized data to file
+    qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::KeyValue::stringify( ar, true ) ) );
+}
+
+// ** SceneEditor::loadFromFile
+Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
+{
+    // Create scene instance
+    Scene::ScenePtr scene = Scene::Scene::create();
+
+    // Read the file contents
+    QString data = qComposer->fileSystem()->readTextFile( fileName );
+
+    if( data.isEmpty() ) {
+        return scene;
+    }
+
+    // Create serialization context
+    Ecs::SerializationContext ctx( scene->ecs() );
+    ctx.set<Scene::AssetBundle>( m_project->assets().get() );
+
+    Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
+
+    // Read each object from a root key-value archive
+    for( Io::KeyValue::Properties::const_iterator i = ar.properties().begin(), end = ar.properties().end(); i != end; ++i ) {
+        // Create entity instance by a type name
+        Ecs::EntityPtr entity = ctx.createEntity( i->second["Type"].asString() );
+        entity->attach<SceneEditorInternal>( entity );
+
+        // Read entity from data
+        entity->deserialize( ctx, i->second );
+
+        // Add entity to scene
+        scene->addSceneObject( entity );
+    }
+
+    return scene;
 }
 
 // ** SceneEditor::navigateToObject

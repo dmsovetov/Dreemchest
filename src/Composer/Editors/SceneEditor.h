@@ -65,6 +65,9 @@ namespace Editors {
 		//! Renders the scene.
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
 
+        //! Saves the scene to file.
+        virtual void                    save( void ) DC_DECL_OVERRIDE;
+
 		//! Handles the mouse press event.
 		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
 
@@ -133,6 +136,9 @@ namespace Editors {
 
 		//! Binds transformation tool gizmo to a scene object.
 		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const;
+
+        //! Loads scene from a file.
+        Scene::ScenePtr                 loadFromFile( const QString& fileName ) const;
 
     private Q_SLOTS:
 
