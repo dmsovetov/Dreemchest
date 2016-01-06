@@ -38,8 +38,8 @@ void Shape2D::clear( void )
 	m_parts.clear();
 }
 
-// ** Shape2D::size
-u32 Shape2D::size( void ) const
+// ** Shape2D::partCount
+u32 Shape2D::partCount( void ) const
 {
 	return ( u32 )m_parts.size();
 }
@@ -47,8 +47,14 @@ u32 Shape2D::size( void ) const
 // ** Shape2D::part
 const Shape2D::Part& Shape2D::part( u32 index ) const
 {
-	DC_BREAK_IF( index >= size() )
+	DC_BREAK_IF( index >= partCount() )
 	return m_parts[index];
+}
+
+// ** Shape2D::addPart
+void Shape2D::addPart( const Part& part )
+{
+    m_parts.push_back( part );
 }
 
 // ** Shape2D::addCircle
@@ -60,7 +66,7 @@ void Shape2D::addCircle( f32 radius, f32 x, f32 y, const Material& material )
 	part.circle.radius = radius;
 	part.circle.x = x;
 	part.circle.y = y;
-	m_parts.push_back( part );
+    addPart( part );
 }
 
 // ** Shape2D::addRect
@@ -73,7 +79,7 @@ void Shape2D::addRect( f32 width, f32 height, f32 x, f32 y, const Material& mate
 	part.rect.height = height;
 	part.rect.x = x;
 	part.rect.y = y;
-	m_parts.push_back( part );
+	addPart( part );
 }
 
 // ** Shape2D::addPolygon
@@ -91,7 +97,8 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 		part.polygon.vertices[i * 2 + 1] = vertices[i].y;
 	}
 
-	m_parts.push_back( part );
+	addPart( part );
+}
 }
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //

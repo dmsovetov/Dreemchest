@@ -234,7 +234,7 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 	return callback.m_hasIntersection;
 }
 
-// ** Box2DPhysics::update
+// ** Box2DPhysics::begin
 bool Box2DPhysics::begin( u32 currentTime )
 {
 	m_world->Step( m_deltaTime, 6, 2 );
@@ -318,7 +318,7 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 
 	DC_BREAK_IF( rigidBody->internal<Internal>() != Internal::Ptr() )
 	DC_BREAK_IF( shape == NULL )
-	DC_BREAK_IF( shape->size() == 0 )
+	DC_BREAK_IF( shape->partCount() == 0 )
 
     b2BodyDef def;
 
@@ -339,7 +339,7 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 	body->SetUserData( const_cast<Ecs::Entity*>( &entity ) );
 
 	// Initialize the body shape
-	for( u32 i = 0, n = shape->size(); i < n; i++ ) {
+	for( u32 i = 0, n = shape->partCount(); i < n; i++ ) {
 		// Get the shape part by index
 		const Shape2D::Part& part = shape->part( i );
 

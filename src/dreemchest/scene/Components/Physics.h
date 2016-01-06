@@ -91,10 +91,13 @@ namespace Scene {
 		void				clear( void );
 
 		//! Returns the total number of nested shapes.
-		u32					size( void ) const;
+		u32					partCount( void ) const;
 
 		//! Returns the nested shape by index.
 		const Part&			part( u32 index ) const;
+
+        //! Adds a new shape part.
+        void                addPart( const Part& part );
 
 		//! Adds a new circle shape part.
 		void				addCircle( f32 radius, f32 x = 0, f32 y = 0, const Material& material = Material() );
