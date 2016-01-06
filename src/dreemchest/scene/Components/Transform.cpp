@@ -291,6 +291,18 @@ void Identifier::setName( const String& value )
 	m_name = value;
 }
 
+// ** Identifier::serialize
+void Identifier::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    ar = Io::KeyValue::object() << "value" << name();
+}
+
+// ** Identifier::deserialize
+void Identifier::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    m_name = ar["value"].asString();
+}
+
 // --------------------------------------------- MoveAlongAxes --------------------------------------------- //
 
 // ** MoveAlongAxes::speed

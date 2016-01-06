@@ -198,6 +198,14 @@ namespace Scene {
 		//! Sets the identifier.
 		void					setName( const String& value );
 
+    protected:
+
+        //! Writes the identifier to a key-value archive.
+		virtual void            serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads the identifier from a key-value archive.
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+
 	private:
 
 		String					m_name;	//!< Scene object name.
