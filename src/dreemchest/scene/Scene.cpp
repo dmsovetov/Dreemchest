@@ -79,6 +79,12 @@ Scene::Scene( void )
 	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
+
+    // Register component types
+    m_ecs->registerComponent<Identifier>();
+    m_ecs->registerComponent<StaticMesh>();
+    m_ecs->registerComponent<Camera>();
+    m_ecs->registerComponent<Transform>();
 }
 
 // ** Scene::update
