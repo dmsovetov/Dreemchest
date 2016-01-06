@@ -179,7 +179,7 @@ void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) c
 
     for( u32 i = 0, n = materialCount(); i < n; i++ ) {
         MaterialPtr m = material( i );
-        materials << m.valid() ? m->uuid() : "";
+        materials << (m.valid() ? m->uuid() : "");
     }
 
     ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
