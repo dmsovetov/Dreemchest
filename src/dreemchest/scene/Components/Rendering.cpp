@@ -188,7 +188,20 @@ void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) c
 // ** StaticMesh::deserialize
 void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
 {
-    DC_BREAK;
+    AssetBundle* assets = ctx.get<AssetBundle>();
+    
+    if( !assets ) {
+        log::error( "StaticMesh::deserialize : no AssetBundle attached to serialization context.\n" );
+        return;
+    }
+
+    const Io::KeyValue& materials = ar["materials"];
+
+    for( s32 i = 0, n = materials.size(); i < n; i++ ) {
+        setMaterial( i, assets->find<Material>( materials[i].asString() ) );
+    }
+
+    m_mesh = assets->find<Mesh>( ar["asset"].asString() );
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
