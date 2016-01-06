@@ -108,6 +108,7 @@ namespace Scene {
 		//! Adds a new polygon shape part.
 		void				addPolygon( const Vec2* vertices, u32 count, const Material& material = Material() );
 
+		//! Reads 2D shape from a key-value archive.
 	private:
 
 		Array<Part>			m_parts;	//!< Shape parts.

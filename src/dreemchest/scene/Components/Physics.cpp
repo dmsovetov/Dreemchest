@@ -99,6 +99,44 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 
 	addPart( part );
 }
+
+// ** Shape2D::serialize
+void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    switch( m_parts[0].type ) {
+    case Polygon:   {
+                        Io::KeyValue vertices = Io::KeyValue::array();
+
+                        for( s32 i = 0; i < m_parts[0].polygon.count / 2; i++ ) {
+                            vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
+                        }
+
+                        ar = Io::KeyValue::object() << "type" << "polygon" << "vertices" << vertices;
+                    }
+                    break;
+    default:        DC_BREAK;
+    }
+}
+
+// ** Shape2D::deserialize
+void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    // Get shape type
+    const String& type = ar.get( "type", "" ).asString();
+
+    if( type == "polygon" ) {
+        const Io::KeyValue& vertices = ar.get( "vertices" );
+        Array<Vec2>         points;
+
+        for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
+            points.push_back( Vec2( vertices[i * 2 + 0].asFloat(), vertices[i * 2 + 1].asFloat() ) );
+        }
+
+        addPolygon( &points[0], points.size() );
+    }
+    else {
+        DC_BREAK;
+    }
 }
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
