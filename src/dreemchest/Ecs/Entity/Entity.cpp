@@ -155,8 +155,9 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 {
 	ar = Io::KeyValue::object();
 
-	ar["Type"] = typeName();
-	ar["_id"]  = id();
+	ar["Type"]  = typeName();
+	ar["_id"]   = id().toString();
+    ar["flags"] = static_cast<u8>( m_flags );
 
 	const Components& items = components();
 
@@ -175,24 +176,26 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 }
 
 // ** Entity::deserialize
-void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
+void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
 {
-	DC_BREAK_IF( value.get( "Type", "" ).asString() != typeName() );
+	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
 
 	Components& items = components();
+
+    // Set flags
+    m_flags = ar["flags"].asUByte();
 
 	// Load all attached components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString      key = i->second->typeName();
-        Io::KeyValue ar;
-        i->second->deserialize( ctx, value.get( key ) );
+        i->second->deserialize( ctx, ar.get( key ) );
 	}
 	
 	// Create components from key-value archive
-	const Io::KeyValue::Properties& kv = value.properties();
+	const Io::KeyValue::Properties& kv = ar.properties();
 
 	for( Io::KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
-		if( i->first == "Type" || i->first == "_id" ) {
+		if( i->first == "Type" || i->first == "_id" || i->first == "flags" ) {
 			continue;
 		}
 
