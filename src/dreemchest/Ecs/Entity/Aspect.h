@@ -52,29 +52,23 @@ namespace Ecs {
 		//! Compares two aspects.
 		bool			operator < ( const Aspect& other ) const;
 
+    #ifndef DC_CPP11_DISABLED
 		//! Returns an aspect with all mask.
-		template<typename TComponent0>
-		static Aspect	all( void );
-
-		//! Returns an aspect with all mask.
-		template<typename TComponent0, typename TComponent1>
-		static Aspect	all( void );
-
-		//! Returns an aspect with all mask.
-		template<typename TComponent0, typename TComponent1, typename TComponent2>
+		template<typename... TComponents>
 		static Aspect	all( void );
 
 		//! Returns an aspect with any mask.
-		template<typename TComponent0>
+		template<typename... TComponents>
 		static Aspect	any( void );
 
-		//! Returns an aspect with any mask.
-		template<typename TComponent0, typename TComponent1>
-		static Aspect	any( void );
+        //! Returns an aspect with exclusion mask.
+		template<typename... TComponents>
+		static Aspect	exclude( void );
 
-		//! Returns an aspect with any mask.
-		template<typename TComponent0, typename TComponent1, typename TComponent2>
-		static Aspect	any( void );
+        //! Expands the variadic template arguments to a components bitset.
+        template<typename... TComponents>
+        static Bitset   expandComponentBits( void );
+    #endif  /*  !DC_CPP11_DISABLED  */
 
 	private:
 
@@ -83,41 +77,42 @@ namespace Ecs {
 		Bitset			m_exc;	//!< Entity should not contain a components from this set.
 	};
 
+#ifndef DC_CPP11_DISABLED
 	// ** Aspect::all
-	template<typename TComponent0>
-	inline Aspect Aspect::all( void ) {
-		return Aspect( All, TComponent0::bit() );
-	}
-
-	// ** Aspect::all
-	template<typename TComponent0, typename TComponent1>
-	inline Aspect Aspect::all( void ) {
-		return Aspect( All, TComponent0::bit() | TComponent1::bit() );
-	}
-
-	// ** Aspect::all
-	template<typename TComponent0, typename TComponent1, typename TComponent2>
-	inline Aspect Aspect::all( void ) {
-		return Aspect( All, TComponent0::bit() | TComponent1::bit() | TComponent2::bit() );
+	template<typename... TComponents>
+	Aspect Aspect::all( void )
+    {
+		return Aspect( All, expandComponentBits<TComponents...>() );
 	}
 
 	// ** Aspect::any
-	template<typename TComponent0>
-	inline Aspect Aspect::any( void ) {
-		return Aspect( Any, TComponent0::bit() );
+	template<typename... TComponents>
+	Aspect Aspect::any( void )
+    {
+		return Aspect( Any, expandComponentBits<TComponents...>() );
 	}
 
-	// ** Aspect::any
-	template<typename TComponent0, typename TComponent1>
-	inline Aspect Aspect::any( void ) {
-		return Aspect( Any, TComponent0::bit() | TComponent1::bit() );
+	// ** Aspect::exclude
+	template<typename... TComponents>
+	Aspect Aspect::exclude( void )
+    {
+		return Aspect( Exclude, expandComponentBits<TComponents...>() );
 	}
 
-	// ** Aspect::any
-	template<typename TComponent0, typename TComponent1, typename TComponent2>
-	inline Aspect Aspect::any( void ) {
-		return Aspect( Any, TComponent0::bit() | TComponent1::bit() | TComponent2::bit() );
-	}
+    // ** Aspect::expandComponentBits
+    template<typename... TComponents>
+    Bitset Aspect::expandComponentBits( void )
+    {
+        Bitset bits[] = { TComponents::bit()... };
+        Bitset result;
+
+        for( s32 i = 0, n = sizeof( bits ) / sizeof( bits[0] ); i < n; i++ ) {
+            result = result | bits[i];
+        }
+
+        return result;
+    }
+#endif  /*  !DC_CPP11_DISABLED  */
 
 } // namespace Ecs
 
