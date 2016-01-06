@@ -149,6 +149,14 @@ namespace Scene {
 		//! Sets the Z scale.
 		void					setScaleZ( f32 value );
 
+    protected:
+
+        //! Writes the transform data to a key-value archive.
+		virtual void            serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads the transform data from a key-value archive.
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+
 	private:
 
 		TransformWPtr			m_parent;		//!< Parent transform.

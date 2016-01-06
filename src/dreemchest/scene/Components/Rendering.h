@@ -119,6 +119,14 @@ namespace Scene {
 		//! Sets the light influence range.
 		void						setRange( f32 value );
 
+    protected:
+
+        //! Writes the light data to a key-value archive.
+		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads the light data from a key-value archive.
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+
 	private:
 
 		Type						m_type;			//!< Light type.
@@ -167,6 +175,14 @@ namespace Scene {
 
 		//! Sets a lightmap texture.
 		void						setLightmap( const Renderer::TexturePtr& value );
+
+    protected:
+
+        //! Writes the static mesh data to a key-value archive.
+		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads the static mesh data from a key-value archive.
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
 
 	private:
 
@@ -311,6 +327,14 @@ namespace Scene {
 
 		//! Projects the bounding sphere to a screen space.
 		Circle						sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
+
+    protected:
+
+        //! Writes the camera data to a key-value archive.
+		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+
+		//! Reads the camera data from a key-value archive.
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
 
 	private:
 

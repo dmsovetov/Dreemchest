@@ -84,6 +84,18 @@ void Light::setRange( f32 value )
 	m_range = value;
 }
 
+// ** Light::serialize
+void Light::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    DC_BREAK;
+}
+
+// ** Light::deserialize
+void Light::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    DC_BREAK;
+}
+
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
@@ -158,6 +170,25 @@ const Renderer::TexturePtr& StaticMesh::lightmap( void ) const
 void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 {
 	m_lightmap = value;
+}
+
+// ** StaticMesh::serialize
+void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    Io::KeyValue materials = Io::KeyValue::array();
+
+    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
+        MaterialPtr m = material( i );
+        materials << m.valid() ? m->uuid() : "";
+    }
+
+    ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
+}
+
+// ** StaticMesh::deserialize
+void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    DC_BREAK;
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -401,6 +432,23 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 	f32 radius = (tangent - center).length();
 
 	return Circle( center, radius );
+}
+
+// ** Camera::serialize
+void Camera::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    ar = Io::KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
+}
+
+// ** Camera::deserialize
+void Camera::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    m_clearMask     = ar["clearMask"].asUByte();
+    m_projection    = static_cast<Projection>( ar["projection"].asInt() );
+    m_clearColor    = ar["clearColor"].asRgba();
+    m_fov           = ar["fov"].asFloat();
+    m_near          = ar["near"].asFloat();
+    m_far           = ar["far"].asFloat();
 }
 
 } // namespace Scene

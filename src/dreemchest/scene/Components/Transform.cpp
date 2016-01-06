@@ -263,6 +263,20 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
+// ** Transform::serialize
+void Transform::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+{
+    ar = Io::KeyValue::object() << "position" << position() << "rotation" << rotation() << "scale" << scale() << "parent" << m_parent.get();
+}
+
+// ** Transform::deserialize
+void Transform::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+{
+    m_position = ar["position"].asVec3();
+    m_rotation = ar["rotation"].asQuat();
+    m_scale    = ar["scale"].asVec3();
+}
+
 // ----------------------------------------------- Identifier ------------------------------------------------ //
 
 // ** Identifier::name
