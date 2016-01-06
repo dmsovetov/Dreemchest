@@ -337,6 +337,16 @@ ComponentPtr SerializationContext::createComponent( const String& name ) const
     return m_ecs->createComponentByName( name );
 }
 
+// ** SerializationContext::createEntity
+EntityPtr SerializationContext::createEntity( const String& name ) const
+{
+    if( name == "Entity" ) {
+        return const_cast<SerializationContext*>( this )->m_ecs->createEntity();
+    }
+
+    return m_ecs->createArchetypeByName( name );
+}
+
 } // namespace Ecs
 
 DC_END_DREEMCHEST

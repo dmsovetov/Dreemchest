@@ -95,7 +95,7 @@ namespace Ecs {
 	};
 
     //! Ecs serialization context.
-    class SerializationContext : public Composition<RefCounted> {
+    class SerializationContext : public Composition {
     public:
 
                                 //! Constructs SerializationContext instance.
@@ -112,7 +112,10 @@ namespace Ecs {
         StrongPtr<TArchetype>   find( const EntityId& id ) const;
 
         //! Creates component by name.
-        virtual ComponentPtr    createComponent( const String& name ) const;
+        ComponentPtr            createComponent( const String& name ) const;
+
+        //! Creates entity by class name.
+        EntityPtr               createEntity( const String& name ) const;
 
     private:
 
