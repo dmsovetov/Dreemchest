@@ -353,7 +353,7 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 	switch( m_projection ) {
 	case Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
 	case Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
-	case OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, -height * 0.5f, height * 0.5f, -10000, 10000 );
+	case OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
 	default:			DC_BREAK;
 	}
 
