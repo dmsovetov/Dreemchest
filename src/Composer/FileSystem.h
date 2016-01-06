@@ -97,6 +97,9 @@ DC_BEGIN_COMPOSER
         //! Writes string to a text file.
         bool                    writeTextFile( const QString& path, const QString& data );
 
+        //! Reads string from a text file.
+        QString                 readTextFile( const QString& path );
+
 		//! Generates the file name that does not exist at specified path.
 		String			        generateFileName( const String& path, const String& name, const String& ext ) const;
 

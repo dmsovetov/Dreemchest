@@ -250,4 +250,23 @@ bool FileSystem::writeTextFile( const QString& path, const QString& data )
     return true;
 }
 
+// ** FileSystem::readTextFile
+QString FileSystem::readTextFile( const QString& path )
+{
+    QFile file( path );
+
+    if( !file.open( QIODevice::ReadOnly ) ) {
+        QString();
+    }
+
+    QString data;
+    QTextStream stream( &file );
+
+    while( !stream.atEnd() ) {
+        data += stream.readLine(); 
+    }
+
+    return data;
+}
+
 DC_END_COMPOSER
