@@ -53,16 +53,16 @@ namespace Ui {
 		bool					        initialize( ComposerQPtr composer );
 
 		//! Constructs a new asset editor dock window or brings to front the existing one.
-		DocumentQPtr			        editDocument( Editors::AssetEditorQPtr assetEditor, const Scene::AssetPtr& asset );
+		DocumentQPtr			        editDocument( Editors::AssetEditorQPtr assetEditor, const FileInfo& asset );
 
 		//! Closes the document.
 		bool					        closeDocument( DocumentQPtr document );
 
 		//! Returns the opened document editor by asset.
-		DocumentQPtr			        findDocument( const Scene::AssetWPtr& asset ) const;
+		DocumentQPtr			        findDocument( const FileInfo& asset ) const;
 
 		//! Returns an array of opened documents with a same type.
-		QVector<DocumentQPtr>			findDocuments( const Scene::AssetWPtr& asset ) const;
+		QVector<DocumentQPtr>			findDocuments( const FileInfo& asset ) const;
 
 		//! Shows the message box.
 		void					        message( const String& text, MessageStatus status = MessageInfo ) const;

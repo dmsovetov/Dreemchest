@@ -194,7 +194,7 @@ QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::Dock
 }
 
 // ** MainWindow::editDocument
-DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, const Scene::AssetPtr& asset )
+DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, const FileInfo& asset )
 {
 	DC_BREAK_IF( !assetEditor );
 
@@ -207,7 +207,7 @@ DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, con
 	}
 
 	// Create the document instance
-	DocumentQPtr document = new Document( this, assetEditor, QString::fromStdString( asset->name() ) );
+	DocumentQPtr document = new Document( this, assetEditor, QString::fromStdString( asset.fileName() ) );
 
 	// Initialize the asset editor with a document
 	if( !assetEditor->initialize( m_project, asset, document ) ) {
@@ -266,7 +266,7 @@ bool MainWindow::closeDocument( DocumentQPtr document )
 }
 
 // ** MainWindow::findDocument
-DocumentQPtr MainWindow::findDocument( const Scene::AssetWPtr& asset ) const
+DocumentQPtr MainWindow::findDocument( const FileInfo& asset ) const
 {
 	foreach( DocumentQPtr document, m_documents ) {
 		if( document->assetEditor()->asset() == asset ) {
@@ -278,12 +278,12 @@ DocumentQPtr MainWindow::findDocument( const Scene::AssetWPtr& asset ) const
 }
 
 // ** MainWindow::findDocuments
-QVector<DocumentQPtr> MainWindow::findDocuments( const Scene::AssetWPtr& asset ) const
+QVector<DocumentQPtr> MainWindow::findDocuments( const FileInfo& asset ) const
 {
 	QVector<DocumentQPtr> documents;
 
 	foreach( DocumentQPtr document, m_documents ) {
-		if( document->assetEditor()->asset()->type() == asset->type() ) {
+		if( document->assetEditor()->asset().extension() == asset.extension() ) {
 			documents.append( document );
 		}
 	}
@@ -329,7 +329,7 @@ bool MainWindow::ensureSaved( DocumentQPtr document ) const
 	}
 
 	// Show the message box
-	String			 message = "Do you want to save changes to " + assetEditor->asset()->name() + "?";
+	String			 message = "Do you want to save changes to " + assetEditor->asset().fileName() + "?";
 	String			 info	 = "Your changes will be lost if you don't save them";
 	MessageBoxResult result  = messageYesNoCancel( message, info, MessageWarning );
 

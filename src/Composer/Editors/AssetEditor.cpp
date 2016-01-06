@@ -38,7 +38,7 @@ bool AssetEditor::hasChanges( void ) const
 }
 
 // ** AssetEditor::initialize
-bool AssetEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
+bool AssetEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document )
 {
 	m_project	= project;
 	m_asset		= asset;
@@ -48,7 +48,7 @@ bool AssetEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset,
 }
 
 // ** AssetEditor::setAsset
-Scene::AssetWPtr AssetEditor::asset( void ) const
+const FileInfo& AssetEditor::asset( void ) const
 {
 	return m_asset;
 }

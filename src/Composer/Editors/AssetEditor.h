@@ -28,6 +28,7 @@
 #define __DC_Composer_AssetEditor_H__
 
 #include "../Composer.h"
+#include "../FileSystem.h"
 
 #include "../Widgets/Document.h"
 #include "../Widgets/MainWindow.h"
@@ -53,7 +54,7 @@ namespace Editors {
 		virtual void			notifyEnterBackground( Ui::MainWindowQPtr window ) {}
 
 		//! Performs asset editor initialization.
-		virtual bool			initialize( ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document );
+		virtual bool			initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document );
 
 		//! Saves the asset to disk.
 		virtual void			save( void ) {}
@@ -62,7 +63,7 @@ namespace Editors {
 		bool					hasChanges( void ) const;
 
 		//! Returns the edited asset.
-		Scene::AssetWPtr		asset( void ) const;
+		const FileInfo&		    asset( void ) const;
 
 		//! Returns the parent document.
 		Ui::DocumentQPtr		document( void ) const;
@@ -71,7 +72,7 @@ namespace Editors {
 
 		ProjectQPtr	            m_project;	//!< Parent project instance.
 		Ui::DocumentQPtr		m_document;	//!< Parent document.
-		Scene::AssetPtr			m_asset;	//!< An asset being edited.
+		FileInfo			    m_asset;	//!< An asset being edited.
 	};
 
 } // namespace Editors

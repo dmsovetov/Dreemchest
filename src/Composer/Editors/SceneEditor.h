@@ -60,7 +60,7 @@ namespace Editors {
 
 
 		//! Performs the scene editor initialization.
-		virtual bool					initialize( ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
 
 		//! Renders the scene.
 		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;

@@ -180,7 +180,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 	DC_BREAK_IF( !asset.valid() );
 
 	// Dock the editor to main window
-	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, asset );
+	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, fileInfo );
 	
 	return result;
 }

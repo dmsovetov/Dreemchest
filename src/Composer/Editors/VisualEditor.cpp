@@ -42,7 +42,7 @@ VisualEditor::VisualEditor( void ) : m_hasLostFocus( true )
 }
 
 // ** VisualEditor::initialize
-bool VisualEditor::initialize( ProjectQPtr project, const Scene::AssetPtr& asset, Ui::DocumentQPtr document )
+bool VisualEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document )
 {
 	// Perform basic initialization first.
 	if( !AssetEditor::initialize( project, asset, document ) ) {
