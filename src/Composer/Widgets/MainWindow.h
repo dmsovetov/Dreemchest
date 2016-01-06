@@ -79,6 +79,9 @@ namespace Ui {
 		//! Returns the object inspector instance.
 		InspectorQPtr		            inspector( void ) const;
 
+        //! Returns an active document.
+        DocumentQPtr                    activeDocument( void ) const;
+
 		//! Sets an active document.
 		void					        setActiveDocument( DocumentQPtr dock );
 

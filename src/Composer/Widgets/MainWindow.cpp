@@ -291,6 +291,12 @@ QVector<DocumentQPtr> MainWindow::findDocuments( const FileInfo& asset ) const
 	return documents;
 }
 
+// ** MainWindow::activeDocument
+DocumentQPtr MainWindow::activeDocument( void ) const
+{
+    return m_activeDocument;
+}
+
 // ** MainWindow::setActiveDocument
 void MainWindow::setActiveDocument( DocumentQPtr document )
 {
