@@ -60,6 +60,18 @@ const EntityId& Entity::id( void ) const
 	return m_id;
 }
 
+// ** Entity::isSerializable
+bool Entity::isSerializable( void ) const
+{
+    return m_flags.is( Serializable );
+}
+
+// ** Entity::setSerializable
+void Entity::setSerializable( bool value )
+{
+    m_flags.set( Serializable, value );
+}
+
 // ** Entity::mask
 const Bitset& Entity::mask( void ) const
 {

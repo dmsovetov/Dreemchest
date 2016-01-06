@@ -46,9 +46,10 @@ namespace Ecs {
 
 		//! Available entity flags
 		enum Flags {
-			  Disabled	 = BIT( 0 )	//!< Marks this entity as disabled.
-			, Removed	 = BIT( 1 ) //!< Marks this entity as removed.
-			, TotalFlags = 2		//!< Total number of entity flags.
+			  Disabled	    = BIT( 0 )	//!< Marks this entity as disabled.
+			, Removed	    = BIT( 1 )  //!< Marks this entity as removed.
+            , Serializable  = BIT( 2 )  //!< Marks this entity as serializable.
+			, TotalFlags    = 3		    //!< Total number of entity flags.
 		};
 
 								ClassEnableTypeInfoSuper( Entity, Io::Serializable )
@@ -67,6 +68,12 @@ namespace Ecs {
 
 		//! Sets entity flags.
 		void					setFlags( u8 value );
+
+        //! Returns true if this entity is serializable.
+        bool                    isSerializable( void ) const;
+
+        //! Sets entity's serializable flag.
+        void                    setSerializable( bool value );
 
 		//! Returns entity components.
 		const Components&		components( void ) const;
