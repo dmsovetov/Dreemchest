@@ -107,7 +107,7 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) cons
     case Polygon:   {
                         Io::KeyValue vertices = Io::KeyValue::array();
 
-                        for( s32 i = 0; i < m_parts[0].polygon.count / 2; i++ ) {
+                        for( u32 i = 0; i < m_parts[0].polygon.count / 2; i++ ) {
                             vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
                         }
 
@@ -245,6 +245,25 @@ const RigidBody2D::AppliedForce& RigidBody2D::appliedForce( u32 index ) const
 	return m_forces[index];
 }
 
+// ** RigidBody2D::collisionEventCount
+u32 RigidBody2D::collisionEventCount( void ) const
+{
+    return ( u32 )m_collisionEvents.size();
+}
+
+// ** RigidBody2D::collisionEvent
+const RigidBody2D::CollisionEvent& RigidBody2D::collisionEvent( u32 index ) const
+{
+    DC_BREAK_IF( index < 0 || index >= collisionEventCount() );
+    return m_collisionEvents[index];
+}
+
+// ** RigidBody2D::queueCollisionEvent
+void RigidBody2D::queueCollisionEvent( const CollisionEvent& e )
+{
+    m_collisionEvents.push_back( e );
+}
+
 // ** RigidBody2D::clear
 void RigidBody2D::clear( void )
 {
@@ -252,6 +271,12 @@ void RigidBody2D::clear( void )
 	m_force  = Vec2( 0.0f, 0.0f );
 	m_forces.clear();
     m_impulses.clear();
+}
+
+// ** RigidBody2D::clearEvents
+void RigidBody2D::clearEvents( void )
+{
+    m_collisionEvents.clear();
 }
 
 } // namespace Scene

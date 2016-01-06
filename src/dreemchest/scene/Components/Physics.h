@@ -133,82 +133,114 @@ namespace Scene {
 
 		//! A single force or impulse applied is stored in this structure.
 		struct AppliedForce {
-							//! Constructs the AppliedForce instance.
-							AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
-								: m_value( value ), m_point( point ) {}
+							    //! Constructs the AppliedForce instance.
+							    AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
+								    : m_value( value ), m_point( point ) {}
 
-			Vec2			m_value;    //!< The force applied.
-			Vec2			m_point;    //!< The application point.
+			Vec2			    m_value;    //!< The force applied.
+			Vec2			    m_point;    //!< The application point.
 		};
 
-							//! Constructs the RigidBody2D instance.
-							RigidBody2D( f32 mass = 0.0f, Type type = Static )
-								: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ) {}
+        //! Collision event data.
+        struct CollisionEvent {
+            //! Collision event type.
+            enum Type {
+                  Begin     //!< Contact begin event.
+                , End       //!< Contact end event.
+            };
+
+                                //! Constructs empty CollisionEvent instance.
+                                CollisionEvent( void )
+                                    {}
+                                //! Constructs Event instance.
+                                CollisionEvent( Type type, SceneObjectWPtr other )
+                                    : type( type ), other( other ) {}
+
+            SceneObjectWPtr     other;  //!< First contact body.
+            Type                type;   //!< Collision type.
+        };
+
+							    //! Constructs the RigidBody2D instance.
+							    RigidBody2D( f32 mass = 0.0f, Type type = Static )
+								    : m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ) {}
 
 		//! Returns the rigid body mass.
-		f32					mass( void ) const;
+		f32					    mass( void ) const;
 
 		//! Returns the rigid body type.
-		Type				type( void ) const;
+		Type				    type( void ) const;
 
 		//! Returns the linear damping applied to a body.
-		f32					linearDamping( void ) const;
+		f32					    linearDamping( void ) const;
 
 		//! Sets the linear damping applied to a body.
-		void				setLinearDamping( f32 value );
+		void				    setLinearDamping( f32 value );
 
 		//! Returns the angular damping applied to a body.
-		f32					angularDamping( void ) const;
+		f32					    angularDamping( void ) const;
 
 		//! Sets the angular damping applied to a body.
-		void				setAngularDamping( f32 value );
+		void				    setAngularDamping( f32 value );
 
 		//! Returns the torque applied to this rigid body.
-		f32					torque( void ) const;
+		f32					    torque( void ) const;
 
 		//! Applies the torque to the rigid body.
-		void				applyTorque( f32 value );
+		void				    applyTorque( f32 value );
 
 		//! Returns the force applied to this rigid body.
-		const Vec2&			force( void ) const;
+		const Vec2&			    force( void ) const;
 
 		//! Applies force to the center of mass.
-		void				applyForce( const Vec2& value );
+		void				    applyForce( const Vec2& value );
 
 		//! Applies force to a specified point.
-		void				applyForceToPoint( const Vec2& value, const Vec2& point );
+		void				    applyForceToPoint( const Vec2& value, const Vec2& point );
 
         //! Applies linear impulse to the center of mass.
-        void                applyImpulse( const Vec2& value );
+        void                    applyImpulse( const Vec2& value );
 
         //! Applies linear impulse to a specified point.
-        void                applyImpulseToPoint( const Vec2& value, const Vec2& point );
+        void                    applyImpulseToPoint( const Vec2& value, const Vec2& point );
 
 		//! Returns the total number of applied forces.
-		u32					appliedForceCount( void ) const;
+		u32					    appliedForceCount( void ) const;
 
 		//! Returns the applied force by index.
-		const AppliedForce&	appliedForce( u32 index ) const;
+		const AppliedForce&	    appliedForce( u32 index ) const;
 
         //! Returns the total number of applied impulses.
-        u32                 appliedImpulseCount( void ) const;
+        u32                     appliedImpulseCount( void ) const;
 
         //! Returns the applied impulse by index.
-        const AppliedForce& appliedImpulse( u32 index ) const;
+        const AppliedForce&     appliedImpulse( u32 index ) const;
 
-		//! Clears all applied forces.
-		void				clear( void );
+        //! Returns the total number of queued events.
+        u32                     collisionEventCount( void ) const;
+
+        //! Returns the collision event by index.
+        const CollisionEvent&   collisionEvent( u32 index ) const;
+
+        //! Queues new collision event.
+        void                    queueCollisionEvent( const CollisionEvent& e );
+
+        //! Clears all queued events.
+        void                    clearEvents( void );
+
+		//! Clears all applied forces and impulses.
+		void				    clear( void );
 
 	private:
 
-		f32					m_mass;				//!< The rigid body mass.
-		Type				m_type;				//!< The rigid body type.
-		f32					m_linearDamping;	//!< The linear damping applied to a body.
-		f32					m_angularDamping;	//!< The angular damping applied to a body.
-		f32					m_torque;			//!< The total torque applied.
-		Vec2				m_force;			//!< The total force applied.
-		Array<AppliedForce>	m_forces;			//!< All applied forces.
-        Array<AppliedForce> m_impulses;         //!< All applied impulses.
+		f32					    m_mass;				//!< The rigid body mass.
+		Type				    m_type;				//!< The rigid body type.
+		f32					    m_linearDamping;	//!< The linear damping applied to a body.
+		f32					    m_angularDamping;	//!< The angular damping applied to a body.
+		f32					    m_torque;			//!< The total torque applied.
+		Vec2				    m_force;			//!< The total force applied.
+		Array<AppliedForce>	    m_forces;			//!< All applied forces.
+        Array<AppliedForce>     m_impulses;         //!< All applied impulses.
+        Array<CollisionEvent>   m_collisionEvents;  //!< All collision events recorded since on simulation step.
 	};
 
 } // namespace Scene

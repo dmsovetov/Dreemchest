@@ -253,10 +253,23 @@ void Box2DPhysics::end( void )
         SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( e.first->GetUserData() );
         SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( e.second->GetUserData() );
 
-        // Emit an event
+        // Emit an event and push it to component's event queue
         switch( e.type ) {
-        case Collisions::Event::Begin:  notify<CollisionBegin>( first, second );    break;
-        case Collisions::Event::End:    notify<CollisionEnd>( first, second );      break;
+        case Collisions::Event::Begin:  {
+                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second ) );
+                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first ) );
+
+                                            notify<CollisionBegin>( first, second );
+                                        }
+                                        break;
+
+        case Collisions::Event::End:    {
+                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, second ) );
+                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, first ) );
+
+                                            notify<CollisionEnd>( first, second );
+                                        }
+                                        break;
         }
     }
 
@@ -314,6 +327,9 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 
 	// Clear all forces now
 	rigidBody.clear();
+
+    // Clear all queued events from last simulation step
+    rigidBody.clearEvents();
 }
 
 // ** Box2DPhysics::entityAdded
