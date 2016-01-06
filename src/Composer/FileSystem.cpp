@@ -235,4 +235,19 @@ bool FileSystem::browse( const String& path )
 	return result;
 }
 
+// ** FileSystem::writeTextFile
+bool FileSystem::writeTextFile( const QString& path, const QString& data )
+{
+    QFile file( path );
+
+    if( !file.open( QIODevice::WriteOnly ) ) {
+        return false;
+    }
+
+    QTextStream stream( &file );
+    stream << data << endl;
+    
+    return true;
+}
+
 DC_END_COMPOSER

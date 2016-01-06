@@ -94,6 +94,9 @@ DC_BEGIN_COMPOSER
 		//! Creates an empty file at specified path.
 		bool			        createFile( const String& path );
 
+        //! Writes string to a text file.
+        bool                    writeTextFile( const QString& path, const QString& data );
+
 		//! Generates the file name that does not exist at specified path.
 		String			        generateFileName( const String& path, const String& name, const String& ext ) const;
 
