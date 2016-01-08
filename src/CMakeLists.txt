@@ -70,6 +70,12 @@ endif (WIN32)
 # Add child projects
 add_subdirectory(Dreemchest)
 
+if (DC_WITH_RELIGHT)
+	add_definitions(-DHAVE_RELIGHT)
+	add_subdirectory(Relight/src)
+	include_directories(Relight/src)
+endif ()
+
 if (DC_BUILD_EXAMPLES)
 	add_subdirectory(Examples)
 endif (DC_BUILD_EXAMPLES)

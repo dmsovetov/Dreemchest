@@ -34,6 +34,11 @@ elseif (DC_QT_SUPPORT MATCHES "Qt5")
 	
 endif (DC_QT_SUPPORT MATCHES "Qt4")
 
+# Link with Relight
+if (DC_WITH_RELIGHT)
+	set(LIBRARIES ${LIBRARIES} Relight)
+endif ()
+
 # Find FBX SDK
 find_package(FBX)
 
