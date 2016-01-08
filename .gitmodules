@@ -1,0 +1,3 @@
+[submodule "src/Relight"]
+	path = src/Relight
+	url = https://github.com/dmsovetov/relight.git
