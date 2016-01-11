@@ -70,10 +70,10 @@ namespace Scene {
 		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void			entityAdded( const Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void			entityRemoved( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
 
         //! Emitted when two bodies begin to touch.
         struct CollisionBegin {

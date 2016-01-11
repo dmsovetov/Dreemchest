@@ -333,20 +333,18 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 }
 
 // ** Box2DPhysics::entityAdded
-void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
+void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBody, Transform& transform )
 {
-	Transform*	 transform = entity.get<Transform>();
-	RigidBody2D* rigidBody = entity.get<RigidBody2D>();
-	Shape2D*     shape	   = entity.get<Shape2D>();
+	Shape2D* shape = entity.get<Shape2D>();
 
-	DC_BREAK_IF( rigidBody->internal<Internal>() != Internal::Ptr() )
+	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
 	DC_BREAK_IF( shape == NULL )
 	DC_BREAK_IF( shape->partCount() == 0 )
 
     b2BodyDef def;
 
 	// Initialize body type
-	switch( rigidBody->type() ) {
+	switch( rigidBody.type() ) {
 	case RigidBody2D::Static:		def.type = b2_staticBody;		break;
 	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;		break;
 	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;	break;
@@ -354,8 +352,8 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 	}
 
 	// Set the initial body transform
-	def.position = positionToBox2D( transform->position() );
-	def.angle = rotationToBox2D( transform->rotationZ() );
+	def.position = positionToBox2D( transform.position() );
+	def.angle = rotationToBox2D( transform.rotationZ() );
 
 	// Construct the Box2D body and attach scene object to it
     b2Body* body = m_world->CreateBody( &def );
@@ -376,14 +374,13 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 	}
 
 	// Attach created body to a component
-	rigidBody->setInternal<Internal>( DC_NEW Internal( body ) );
+	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );
 }
 
 // ** Box2DPhysics::entityRemoved
 void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 {
-	RigidBody2D* rigidBody = entity.get<RigidBody2D>();
-
+    RigidBody2D* rigidBody = entity.get<RigidBody2D>();
 	Internal::Ptr physical = rigidBody->internal<Internal>();
 	DC_BREAK_IF( physical == NULL )
 
