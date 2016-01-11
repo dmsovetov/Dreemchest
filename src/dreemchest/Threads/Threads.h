@@ -32,7 +32,7 @@
 // --------------------------------------- Module macroses --------------------------------------- //
 
 #define DC_SCOPED_LOCK( mutex ) \
-            Threads::ScopedLock mutex##ScopedLock( mutex )
+            DC_DREEMCHEST_NS Threads::ScopedLock mutex##ScopedLock( mutex )
 
 // ---------------------------------- Module types and namespaces -------------------------------- //
 
