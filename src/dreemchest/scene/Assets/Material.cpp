@@ -32,19 +32,10 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Material::Material
-Material::Material( AssetBundle* bundle, const String& uuid, const String& name )
-	: Asset( bundle, Asset::Material, uuid, name ), m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
+Material::Material( void ) : m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
 {
-	setFormat( AssetFormatMaterial );
-
 	setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
 	setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
-}
-
-// ** Material::create
-MaterialPtr Material::create( const String& name )
-{
-	return MaterialPtr( DC_NEW Material( NULL, name, name ) );
 }
 
 // ** Material::renderingMode
@@ -90,26 +81,26 @@ void Material::setColor( Layer layer, const Rgba& value )
 }
 
 // ** Material::texture
-const ImageWPtr& Material::texture( Layer layer ) const
+const AssetWPtr& Material::texture( Layer layer ) const
 {
 	return m_texture[layer];
 }
 
 // ** Material::setTexture
-void Material::setTexture( Layer layer, const ImageWPtr& value )
+void Material::setTexture( Layer layer, const AssetWPtr& value )
 {
 	m_texture[layer] = value;
 	updateMaterialFeatures();
 }
 
 // ** Material::diffuse
-ImageWPtr Material::diffuse( void ) const
+AssetWPtr Material::diffuse( void ) const
 {
 	return texture( Diffuse );
 }
 
 // ** Material::setDiffuse
-void Material::setDiffuse( ImageWPtr value )
+void Material::setDiffuse( AssetWPtr value )
 {
 	setTexture( Diffuse, value );
 }

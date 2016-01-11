@@ -40,8 +40,8 @@ s32 Terrain::kChunkSize = 32;
 s32 Terrain::kMaxSize = 2048;
 
 // ** Terrain::Terrain
-Terrain::Terrain( AssetBundle* bundle, const String& uuid, const String& name, u32 size )
-	: Asset( bundle, Asset::Terrain, uuid, name ), m_heightmap( size ), m_maxHeight( static_cast<f32>( size ) )
+Terrain::Terrain( u32 size )
+	: m_heightmap( size ), m_maxHeight( static_cast<f32>( size ) )
 {
 	DC_BREAK_IF( (size % kChunkSize) != 0 );
 }
@@ -219,16 +219,13 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 }
 
 // ** Terrain::createMesh
-MeshPtr Terrain::createMesh( void ) const
+AssetPtr Terrain::createMesh( void ) const
 {
 	// Create an empty mesh
-	MeshPtr mesh = Mesh::create();
+	Mesh mesh;
 
 	// Set the number of mesh chunks
-	mesh->setChunkCount( chunkCount() * chunkCount() );
-
-	// Disable loading
-	mesh->setFormat( AssetFormatGenerated );
+	mesh.setChunkCount( chunkCount() * chunkCount() );
 
 	// Construct chunks
 	u32 chunk = 0;
@@ -248,38 +245,35 @@ MeshPtr Terrain::createMesh( void ) const
 	}
 
 	// Now update the mesh bounding box
-	mesh->updateBounds();
+	mesh.updateBounds();
 
-	return mesh;
+	return Asset::create<Mesh>( mesh );
 }
 
 // ** Terrain::createChunkMesh
-MeshPtr Terrain::createChunkMesh( u32 x, u32 z ) const
+AssetPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 {
 	// Create an empty mesh
-	MeshPtr mesh = Mesh::create();
+	Mesh mesh;
 
 	// Get the chunk buffers
 	VertexBuffer vertices = chunkVertexBuffer( x, z );
 	IndexBuffer  indices  = chunkIndexBuffer();
 
 	// Set the number of mesh chunks
-	mesh->setChunkCount( 1 );
-
-	// Disable loading
-	mesh->setFormat( AssetFormatGenerated );
+	mesh.setChunkCount( 1 );
 
 	// Set the chunk data
 	setMeshChunk( mesh, 0, vertices, indices );
 
 	// Now update the mesh bounding box
-	mesh->updateBounds();
+	mesh.updateBounds();
 
-	return mesh;
+	return Asset::create<Mesh>( mesh );
 }
 
 // ** Terrain::setMeshChunk
-void Terrain::setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x, u32 z ) const
+void Terrain::setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x, u32 z ) const
 {
 	// Set the chunk data
 	Mesh::VertexBuffer vb;
@@ -291,8 +285,8 @@ void Terrain::setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertic
 		vb[i].uv[0] = vertices[i].uv;
 	}
 
-	mesh->setVertexBuffer( chunk, vb );
-	mesh->setIndexBuffer( chunk, indices );
+	mesh.setVertexBuffer( chunk, vb );
+	mesh.setIndexBuffer( chunk, indices );
 }
 
 // --------------------------------------------------------------------- Heightmap ---------------------------------------------------------------------- //

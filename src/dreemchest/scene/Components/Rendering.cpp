@@ -99,13 +99,13 @@ void Light::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
-MeshWPtr StaticMesh::mesh( void ) const
+AssetWPtr StaticMesh::mesh( void ) const
 {
 	return m_mesh;
 }
 
 // ** StaticMesh::setMesh
-void StaticMesh::setMesh( const MeshPtr& value )
+void StaticMesh::setMesh( const AssetPtr& value )
 {
 	DC_BREAK_IF( !value.valid() );
 	m_mesh = value;
@@ -143,13 +143,13 @@ u32 StaticMesh::materialCount( void ) const
 }
 
 // ** StaticMesh::material
-MaterialPtr StaticMesh::material( u32 index ) const
+AssetPtr StaticMesh::material( u32 index ) const
 {
-	return index < materialCount() ? m_materials[index] : MaterialPtr();
+	return index < materialCount() ? m_materials[index] : AssetPtr();
 }
 
 // ** StaticMesh::setMaterial
-void StaticMesh::setMaterial( u32 index, const MaterialPtr& value )
+void StaticMesh::setMaterial( u32 index, const AssetPtr& value )
 {
 	DC_BREAK_IF( index > 8 );
 
@@ -175,33 +175,35 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
 {
-    Io::KeyValue materials = Io::KeyValue::array();
+    DC_NOT_IMPLEMENTED
+    //Io::KeyValue materials = Io::KeyValue::array();
 
-    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
-        MaterialPtr m = material( i );
-        materials << (m.valid() ? m->uuid() : "");
-    }
+    //for( u32 i = 0, n = materialCount(); i < n; i++ ) {
+    //    MaterialPtr m = material( i );
+    //    materials << (m.valid() ? m->uuid() : "");
+    //}
 
-    ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
+    //ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
 }
 
 // ** StaticMesh::deserialize
 void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
 {
-    AssetBundle* assets = ctx.get<AssetBundle>();
-    
-    if( !assets ) {
-        log::error( "StaticMesh::deserialize : no AssetBundle attached to serialization context.\n" );
-        return;
-    }
+    DC_NOT_IMPLEMENTED
+    //AssetBundle* assets = ctx.get<AssetBundle>();
+    //
+    //if( !assets ) {
+    //    log::error( "StaticMesh::deserialize : no AssetBundle attached to serialization context.\n" );
+    //    return;
+    //}
 
-    const Io::KeyValue& materials = ar["materials"];
+    //const Io::KeyValue& materials = ar["materials"];
 
-    for( s32 i = 0, n = materials.size(); i < n; i++ ) {
-        setMaterial( i, assets->find<Material>( materials[i].asString() ) );
-    }
+    //for( s32 i = 0, n = materials.size(); i < n; i++ ) {
+    //    setMaterial( i, assets->find<Material>( materials[i].asString() ) );
+    //}
 
-    m_mesh = assets->find<Mesh>( ar["asset"].asString() );
+    //m_mesh = assets->find<Mesh>( ar["asset"].asString() );
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -225,13 +227,13 @@ Fx::ParticleSystemWPtr Particles::particles( void ) const
 }
 
 // ** Particles::material
-MaterialWPtr Particles::material( void ) const
+AssetWPtr Particles::material( void ) const
 {
 	return m_material;
 }
 
 // ** Particles::setMaterial
-void Particles::setMaterial( const MaterialPtr& value )
+void Particles::setMaterial( const AssetPtr& value )
 {
 	m_material = value;
 }
@@ -239,7 +241,7 @@ void Particles::setMaterial( const MaterialPtr& value )
 // ---------------------------------------------- Sprite ---------------------------------------------- //
 
 // ** Sprite::image
-const ImagePtr& Sprite::image( void ) const
+const AssetPtr& Sprite::image( void ) const
 {
 	return m_image;
 }

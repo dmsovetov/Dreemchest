@@ -169,6 +169,8 @@ Renderer::Shader* Rvm::findShaderById( u32 idx ) const
 // ** Rvm::flush
 void Rvm::flush( void )
 {
+    DC_NOT_IMPLEMENTED
+#if 0
 	// Sort the command buffer	
 	m_commands.sort( sortByShaderTextureMesh );
 
@@ -241,6 +243,7 @@ void Rvm::flush( void )
 
 	// Clear the command list
 	clear();
+#endif
 }
 
 // ** Rvm::clear

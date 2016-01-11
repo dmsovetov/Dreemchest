@@ -54,23 +54,24 @@ void ParticleRenderingInterface::renderPoints( const Vec2* position, const Rgba*
 // ** ParticleRenderingInterface::renderPoints
 void ParticleRenderingInterface::renderOrientedQuadUV( const Fx::IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
 {
-	MaterialPtr			 mat = static_cast<Material*>( material->get().get() );
-	ImagePtr			 img = mat->texture( Material::Diffuse );
-
-	DC_NOT_IMPLEMENTED;
-	Renderer::TexturePtr tex;
-//	Renderer::TexturePtr tex = img.valid() ? (img->data().valid() ? img->data()->texture : Renderer::TexturePtr()) : Renderer::TexturePtr();
-
-	// Material blending mapping
-	Renderer::Renderer2D::BlendingMode blending[TotalRenderModes] = {
-		  Renderer::Renderer2D::BlendingDisabled	// RenderOpaque
-		, Renderer::Renderer2D::BlendingDisabled	// RenderCutout
-		, Renderer::Renderer2D::BlendingAlpha		// RenderTranslucent
-		, Renderer::Renderer2D::BlendingAdditive	// RenderAdditive
-	};
-
-	m_renderer->setBlendMode( blending[mat->renderingMode()] );
-	m_renderer->orientedQuad( tex, x, y, width, height, up, side, color );
+    DC_NOT_IMPLEMENTED;
+//	MaterialPtr			 mat = static_cast<Material*>( material->get().get() );
+//	ImagePtr			 img = mat->texture( Material::Diffuse );
+//
+//	DC_NOT_IMPLEMENTED;
+//	Renderer::TexturePtr tex;
+////	Renderer::TexturePtr tex = img.valid() ? (img->data().valid() ? img->data()->texture : Renderer::TexturePtr()) : Renderer::TexturePtr();
+//
+//	// Material blending mapping
+//	Renderer::Renderer2D::BlendingMode blending[TotalRenderModes] = {
+//		  Renderer::Renderer2D::BlendingDisabled	// RenderOpaque
+//		, Renderer::Renderer2D::BlendingDisabled	// RenderCutout
+//		, Renderer::Renderer2D::BlendingAlpha		// RenderTranslucent
+//		, Renderer::Renderer2D::BlendingAdditive	// RenderAdditive
+//	};
+//
+//	m_renderer->setBlendMode( blending[mat->renderingMode()] );
+//	m_renderer->orientedQuad( tex, x, y, width, height, up, side, color );
 }
 
 // ** ParticleRenderingInterface::renderPoints

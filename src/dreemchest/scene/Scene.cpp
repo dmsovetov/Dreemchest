@@ -320,13 +320,14 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 		//! Creates a new material instance.
 		virtual Fx::IMaterialPtr createMaterial( const String& identifier )
 		{
-			MaterialPtr material = m_assets->find<Material>( identifier );
+            DC_NOT_IMPLEMENTED
+			//MaterialPtr material = m_assets->find<Material>( identifier );
 	
-			if( !material.valid() ) {
-				return Fx::IMaterialPtr();
-			}
+			//if( !material.valid() ) {
+			//	return Fx::IMaterialPtr();
+			//}
 
-			return DC_NEW Fx::IMaterial( material );
+			//return DC_NEW Fx::IMaterial( material );
 		}
 
 	private:
@@ -468,18 +469,20 @@ Ecs::ComponentPtr JsonSceneLoader::readCamera( const Json::Value& value )
 // ** JsonSceneLoader::readRenderer
 Ecs::ComponentPtr JsonSceneLoader::readRenderer( const Json::Value& value )
 {
-	StaticMesh* result = DC_NEW StaticMesh;
-	String		asset  = value["asset"].asString();
+    DC_NOT_IMPLEMENTED;
+    return Ecs::ComponentPtr();
+	//StaticMesh* result = DC_NEW StaticMesh;
+	//String		asset  = value["asset"].asString();
 
-	result->setMesh( m_assets->find<Mesh>( asset ) );
+	//result->setMesh( m_assets->find<Mesh>( asset ) );
 
-	Json::Value materials = value["materials"];
+	//Json::Value materials = value["materials"];
 
-	for( u32 i = 0; i < materials.size(); i++ ) {
-		result->setMaterial( i, m_assets->find<Material>( materials[i].asString() ) );
-	}
+	//for( u32 i = 0; i < materials.size(); i++ ) {
+	//	result->setMaterial( i, m_assets->find<Material>( materials[i].asString() ) );
+	//}
 
-	return result;
+	//return result;
 }
 
 // ** JsonSceneLoader::readLight
@@ -537,7 +540,9 @@ Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
 
 	// Create Particles component instance
 	Particles* component = DC_NEW Particles( particleSystem, instance );
-	component->setMaterial( m_assets->find<Material>( particles->material() ) );
+
+    DC_NOT_IMPLEMENTED;
+	//component->setMaterial( m_assets->find<Material>( particles->material() ) );
 
 	return component;
 }

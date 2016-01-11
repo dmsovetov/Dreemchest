@@ -78,7 +78,7 @@ class ParticleSystems : public ApplicationDelegate {
 		//	}
 		//}
 
-		m_scene->addSystem<AssetSystem>( m_assets );
+		//m_scene->addSystem<AssetSystem>( m_assets );
 
 		Vec3BindingPtr wasdDirection = DC_NEW Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 

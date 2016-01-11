@@ -39,16 +39,21 @@ namespace Scene {
 // ------------------------------------------- Asset ------------------------------------------- //
 
 // ** Asset::Asset
-Asset::Asset( AssetBundle* bundle, Type type, const String& uuid, const String& name )
-	: m_bundle( bundle ), m_type( type ), m_uuid( uuid ), m_name( name ), m_state( Unknown ), m_timestamp( 0 )
+Asset::Asset( AssetBundle* bundle, const String& uuid, const String& name )
+	: m_bundle( bundle ), m_uuid( uuid ), m_name( name ), m_state( Unknown ), m_timestamp( 0 ), m_data( NULL ), m_typeId( -1 )
 {
 
 }
 
-// ** Asset::type
-Asset::Type Asset::type( void ) const
+Asset::~Asset( void )
 {
-	return m_type;
+    delete m_data;
+}
+
+// ** Asset::type
+AssetTypeId Asset::type( void ) const
+{
+	return m_typeId;
 }
 
 // ** Asset::name
@@ -61,12 +66,6 @@ const String& Asset::name( void ) const
 void Asset::setName( const String& value )
 {
 	m_name = value;
-}
-
-// ** Asset::bundle
-AssetBundleWPtr Asset::bundle( void ) const
-{
-	return m_bundle;
 }
 
 // ** Asset::uuid
@@ -91,12 +90,6 @@ void Asset::setBundle( AssetBundleWPtr value )
 u32 Asset::timestamp( void ) const
 {
 	return m_timestamp;
-}
-
-// ** Asset::setTimestamp
-void Asset::setTimestamp( u32 value )
-{
-	m_timestamp = value;
 }
 
 // ** Asset::state
@@ -130,56 +123,56 @@ void Asset::setFormat( AssetFormat value )
 }
 
 // ** Asset::keyValue
-Io::KeyValue Asset::keyValue( void ) const
-{
-	return Io::KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
-}
+//Io::KeyValue Asset::keyValue( void ) const
+//{
+//	return Io::KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
+//}
 
 // ** Asset::setKeyValue
-bool Asset::setKeyValue( const Io::KeyValue& value )
-{
-	DC_BREAK_IF( !value.isObject() );
-
-	m_uuid		= value.get( "uuid", "" ).asString();
-	m_timestamp = value.get( "timestamp", 0 ).asUInt();
-
-	return m_uuid != "";
-}
+//bool Asset::setKeyValue( const Io::KeyValue& value )
+//{
+//	DC_BREAK_IF( !value.isObject() );
+//
+//	m_uuid		= value.get( "uuid", "" ).asString();
+//	m_timestamp = value.get( "timestamp", 0 ).asUInt();
+//
+//	return m_uuid != "";
+//}
 
 // ** Asset::dispose
-void Asset::dispose( void )
-{
-	m_state = Unloaded;
-}
+//void Asset::dispose( void )
+//{
+//	m_state = Unloaded;
+//}
 
 // ** Asset::typeFromString
-Asset::Type Asset::typeFromString( const String& type )
-{
-	if( type == "Mesh" )	 return Asset::Mesh;
-	if( type == "Image" )	 return Asset::Image;
-	if( type == "Prefab" )	 return Asset::Prefab;
-	if( type == "Scene" )	 return Asset::Prefab;
-	if( type == "Terrain" )	 return Asset::Terrain;
-	if( type == "Material" ) return Asset::Material;
-
-	DC_BREAK;
-	return Asset::TotalAssetTypes;
-}
+//Asset::Type Asset::typeFromString( const String& type )
+//{
+//	if( type == "Mesh" )	 return Asset::Mesh;
+//	if( type == "Image" )	 return Asset::Image;
+//	if( type == "Prefab" )	 return Asset::Prefab;
+//	if( type == "Scene" )	 return Asset::Prefab;
+//	if( type == "Terrain" )	 return Asset::Terrain;
+//	if( type == "Material" ) return Asset::Material;
+//
+//	DC_BREAK;
+//	return Asset::TotalAssetTypes;
+//}
 
 // ** Asset::typeToString
-String Asset::typeToString( Asset::Type type )
-{
-	switch( type ) {
-	case Asset::Mesh:		return "Mesh";
-	case Asset::Image:		return "Image";
-	case Asset::Prefab:		return "Prefab";
-	case Asset::Terrain:	return "Terrain";
-	case Asset::Material:	return "Material";
-	}
-
-	DC_BREAK;
-	return "";
-}
+//String Asset::typeToString( Asset::Type type )
+//{
+//	switch( type ) {
+//	case Asset::Mesh:		return "Mesh";
+//	case Asset::Image:		return "Image";
+//	case Asset::Prefab:		return "Prefab";
+//	case Asset::Terrain:	return "Terrain";
+//	case Asset::Material:	return "Material";
+//	}
+//
+//	DC_BREAK;
+//	return "";
+//}
 
 // ---------------------------------------- AssetBundle ------------------------------------------- //
 
@@ -187,11 +180,11 @@ String Asset::typeToString( Asset::Type type )
 AssetBundle::AssetBundle( const String& name, const Io::Path& path ) : m_path( path ), m_name( name ), m_uuidFileNames( true )
 {
 	// Declare asset types
-	m_factory.declare<Mesh>( Asset::Mesh );
-	m_factory.declare<Material>( Asset::Material );
-	m_factory.declare<Image>( Asset::Image );
-	m_factory.declare<Prefab>( Asset::Prefab );
-	m_factory.declare<Terrain>( Asset::Terrain );
+	//m_factory.declare<Mesh>( Asset::Mesh );
+	//m_factory.declare<Material>( Asset::Material );
+	//m_factory.declare<Image>( Asset::Image );
+	//m_factory.declare<Prefab>( Asset::Prefab );
+	//m_factory.declare<Terrain>( Asset::Terrain );
 }
 
 // ** AssetBundle::create
@@ -208,10 +201,11 @@ AssetBundlePtr AssetBundle::createFromString( const String& name, const Io::Path
 	// Create asset bundle instance
 	AssetBundlePtr assetBundle( DC_NEW AssetBundle( name, path ) );
 
+    DC_NOT_IMPLEMENTED
 	// Load assets from key-value
-	if( !assetBundle->loadFromString( text ) ) {
-		return AssetBundlePtr();
-	}
+	//if( !assetBundle->loadFromString( text ) ) {
+	//	return AssetBundlePtr();
+	//}
 
 	return assetBundle;
 }
@@ -232,16 +226,16 @@ AssetBundlePtr AssetBundle::createFromFile( const String& name, const Io::Path& 
 }
 
 // ** AssetBundle::createAssetByType
-AssetPtr AssetBundle::createAssetByType( Asset::Type type ) const
-{
-	AssetPtr asset = m_factory.construct( type );
-
-	if( asset.valid() ) {
-		asset->setUuid( Guid::generate().toString() );
-	}
-
-	return asset;
-}
+//AssetPtr AssetBundle::createAssetByType( Asset::Type type ) const
+//{
+//	AssetPtr asset = m_factory.construct( type );
+//
+//	if( asset.valid() ) {
+//		asset->setUuid( Guid::generate().toString() );
+//	}
+//
+//	return asset;
+//}
 
 // ** AssetBundle::name
 const String& AssetBundle::name( void ) const
@@ -250,26 +244,26 @@ const String& AssetBundle::name( void ) const
 }
 
 // ** AssetBundle::queueForLoading
-void AssetBundle::queueForLoading( AssetWPtr asset )
-{
-	if( asset->state() == Asset::Loaded ) {
-		asset->setState( Asset::Outdated );
-	}
-
-	m_waitingForLoading.insert( asset );
-}
+//void AssetBundle::queueForLoading( AssetWPtr asset )
+//{
+//	if( asset->state() == Asset::Loaded ) {
+//		asset->setState( Asset::Outdated );
+//	}
+//
+//	m_waitingForLoading.insert( asset );
+//}
 
 // ** AssetBundle::removeFromLoading
-void AssetBundle::removeFromLoading( AssetWPtr asset )
-{
-	m_waitingForLoading.erase( asset );
-}
+//void AssetBundle::removeFromLoading( AssetWPtr asset )
+//{
+//	m_waitingForLoading.erase( asset );
+//}
 
 // ** AssetBundle::waitingForLoading
-AssetSet AssetBundle::waitingForLoading( void ) const
-{
-	return m_waitingForLoading;
-}
+//AssetSet AssetBundle::waitingForLoading( void ) const
+//{
+//	return m_waitingForLoading;
+//}
 
 // ** AssetBundle::uuidFileNames
 bool AssetBundle::uuidFileNames( void ) const
@@ -284,65 +278,65 @@ void AssetBundle::setUuidFileNames( bool value )
 }
 
 // ** AssetBundle::assetPathByIdentifier
-Io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
-{
-	AssetPtr asset = findAsset( name );
-
-	if( asset == AssetPtr() ) {
-		return "";
-	}
-
-	String uuid = asset->uuid();
-
-	if( m_uuidFileNames ) {
-		uuid = String() + uuid[0] + uuid[1] + "/" + uuid;
-	}
-
-	return m_path + uuid;
-}
+//Io::Path AssetBundle::assetPathByIdentifier( const String& name ) const
+//{
+//	AssetPtr asset = findAsset( name );
+//
+//	if( asset == AssetPtr() ) {
+//		return "";
+//	}
+//
+//	String uuid = asset->uuid();
+//
+//	if( m_uuidFileNames ) {
+//		uuid = String() + uuid[0] + uuid[1] + "/" + uuid;
+//	}
+//
+//	return m_path + uuid;
+//}
 
 // ** AssetBundle::findAsset
-AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
-{
-	Assets::const_iterator i = m_assets.find( StringHash( name.c_str() ) );
-
-	if( i == m_assets.end() ) {
-		return AssetPtr();
-	}
-
-	if( (i->second->type() & expectedType) == 0 ) {
-		return AssetPtr();
-	}
-
-	return i->second;
-}
+//AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
+//{
+//	Assets::const_iterator i = m_assets.find( StringHash( name.c_str() ) );
+//
+//	if( i == m_assets.end() ) {
+//		return AssetPtr();
+//	}
+//
+//	if( (i->second->type() & expectedType) == 0 ) {
+//		return AssetPtr();
+//	}
+//
+//	return i->second;
+//}
 
 // ** AssetBundle::loadFromString
-bool AssetBundle::loadFromString( const String& text )
-{
-	// Parse key-value from string
-	Io::KeyValue kv = Io::KeyValue::parse( text );
-
-	// Failed to parse
-	if( kv.isNull() ) {
-		return false;
-	}
-
-	// Add all assets to bundle
-	for( s32 i = 0, n = kv.size(); i < n; i++ ) {
-		// Create asset instance from data
-		AssetPtr asset = createAssetFromData( kv[i] );
-
-		// Failed to constuct asset
-		if( !asset.valid() ) {
-			continue;
-		}
-
-		addAsset( asset );
-	}
-
-	return true;
-}
+//bool AssetBundle::loadFromString( const String& text )
+//{
+//	// Parse key-value from string
+//	Io::KeyValue kv = Io::KeyValue::parse( text );
+//
+//	// Failed to parse
+//	if( kv.isNull() ) {
+//		return false;
+//	}
+//
+//	// Add all assets to bundle
+//	for( s32 i = 0, n = kv.size(); i < n; i++ ) {
+//		// Create asset instance from data
+//		AssetPtr asset = createAssetFromData( kv[i] );
+//
+//		// Failed to constuct asset
+//		if( !asset.valid() ) {
+//			continue;
+//		}
+//
+//		addAsset( asset );
+//	}
+//
+//	return true;
+//}
 
 // ** AssetBundle::addAsset
 void AssetBundle::addAsset( AssetPtr asset )
@@ -371,28 +365,28 @@ void AssetBundle::addAsset( AssetPtr asset )
 }
 
 // ** AssetBundle::createAssetFromData
-AssetPtr AssetBundle::createAssetFromData( const Io::KeyValue& kv ) const
-{
-	DC_BREAK_IF( !kv.isObject() );
-
-	// Get asset type by name.
-	Asset::Type type = Asset::typeFromString( kv.get( "type", "" ).asString() );
-
-	// Create asset instance by type name
-	AssetPtr asset = createAssetByType( type );
-
-	// Unknown asset type - return null
-	if( !asset.valid() ) {
-		return AssetPtr();
-	}
-
-	// Load asset from key-value data
-	if( !asset->setKeyValue( kv ) ) {
-		return AssetPtr();
-	}
-
-	return asset;
-}
+//AssetPtr AssetBundle::createAssetFromData( const Io::KeyValue& kv ) const
+//{
+//	DC_BREAK_IF( !kv.isObject() );
+//
+//	// Get asset type by name.
+//	Asset::Type type = Asset::typeFromString( kv.get( "type", "" ).asString() );
+//
+//	// Create asset instance by type name
+//	AssetPtr asset = createAssetByType( type );
+//
+//	// Unknown asset type - return null
+//	if( !asset.valid() ) {
+//		return AssetPtr();
+//	}
+//
+//	// Load asset from key-value data
+//	if( !asset->setKeyValue( kv ) ) {
+//		return AssetPtr();
+//	}
+//
+//	return asset;
+//}
 
 // ** AssetBundle::removeAsset
 void AssetBundle::removeAsset( const String& uuid )

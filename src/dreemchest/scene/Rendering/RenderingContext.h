@@ -37,23 +37,6 @@ namespace Scene {
 	class RenderingContext : public RefCounted {
 	public:
 
-		//! Renderable item.
-		struct Renderable {
-										//! Constructs Renderable instance
-										Renderable( Renderer::PrimitiveType primitiveType = Renderer::TotalPrimitiveTypes, Renderer::VertexBufferPtr vertexBuffer = Renderer::VertexBufferPtr(), Renderer::IndexBufferPtr indexBuffer = Renderer::IndexBufferPtr() )
-											: primitiveType( primitiveType ), vertexBuffer( vertexBuffer ), indexBuffer( indexBuffer ) {}
-
-			Renderer::PrimitiveType		primitiveType;	//!< Rendering primitive type.
-			Renderer::VertexBufferPtr	vertexBuffer;	//!< Renderable vertex buffer.
-			Renderer::IndexBufferPtr	indexBuffer;	//!< Renderable index buffer.
-		};
-
-		//! Returns the renderable by index.
-		const Renderable&					renderable( u32 index ) const;
-
-		//! Returns the texture by index.
-		const Renderer::TexturePtr&			texture( u32 index ) const;
-
 		//! Returns RVM.
 		RvmPtr								rvm( void ) const;
 
@@ -65,12 +48,6 @@ namespace Scene {
 
 		//! Returns renderer.
 		Renderer::Renderer2DPtr				renderer( void ) const;
-
-		//! Creates renderable asset from a mesh and uploads it to GPU.
-		const RenderingAssetId&				uploadRenderable( MeshWPtr mesh, s32 chunk );
-
-		//! Constructs texture from image asset and loads it to GPU.
-		const RenderingAssetId&				uploadTexture( ImageWPtr image );
 
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( const Renderer::HalPtr& hal );
@@ -86,8 +63,6 @@ namespace Scene {
 		ShaderCachePtr						m_shaders;		//!< Shaders cache.
 		Renderer::HalPtr					m_hal;			//!< Rendering HAL.
 		Renderer::Renderer2DPtr				m_renderer;		//!< Rendering interface.
-		Array<Renderable>					m_renderables;	//!< All renderable assets reside here.
-		Array<Renderer::TexturePtr>			m_textures;		//!< All textures reside here.
 	};
 
 } // namespace Scene

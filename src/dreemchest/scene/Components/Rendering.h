@@ -140,14 +140,14 @@ namespace Scene {
 	public:
 
 									//! Constructs StaticMesh instance.
-									StaticMesh( const MeshPtr& mesh = MeshPtr() )
+									StaticMesh( const AssetPtr& mesh = AssetPtr() )
 										: m_mesh( mesh ), m_visibility( ~0 ) {}
 
 		//! Returns mesh to be rendered.
-		MeshWPtr					mesh( void ) const;
+		AssetWPtr					mesh( void ) const;
 
 		//! Sets a mesh to be rendered.
-		void						setMesh( const MeshPtr& value );
+		void						setMesh( const AssetPtr& value );
 
 		//! Returns the mesh world space bounding box.
 		const Bounds&				worldSpaceBounds( void ) const;
@@ -165,10 +165,10 @@ namespace Scene {
 		u32							materialCount( void ) const;
 
 		//! Returns the material by index.
-		MaterialPtr					material( u32 index ) const;
+		AssetPtr					material( u32 index ) const;
 
 		//! Sets the material by index.
-		void						setMaterial( u32 index, const MaterialPtr& value );
+		void						setMaterial( u32 index, const AssetPtr& value );
 
 		//! Returns a lightmap texture.
 		const Renderer::TexturePtr&	lightmap( void ) const;
@@ -187,9 +187,9 @@ namespace Scene {
 	private:
 
 		FlagSet16					m_visibility;		//!< Camera visibility mask.
-		MeshPtr						m_mesh;				//!< Mesh to be rendered.
+		AssetPtr				    m_mesh;				//!< Mesh to be rendered.
 		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
-		Array<MaterialPtr>			m_materials;		//!< Mesh materials array.
+		Array<AssetPtr>			    m_materials;		//!< Mesh materials array.
 		Renderer::TexturePtr		m_lightmap;			//!< Lightmap texture that is rendered for this mesh.
 	};
 
@@ -198,18 +198,18 @@ namespace Scene {
 	public:
 
 									//! Constructs the Sprite instance.
-									Sprite( const ImagePtr& image = ImagePtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+									Sprite( const AssetPtr& image = AssetPtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
 										: m_image( image ), m_color( color ) {}
 
 		//! Returns the sprite image.
-		const ImagePtr&				image( void ) const;
+		const AssetPtr&				image( void ) const;
 
 		//! Returns the sprite color.
 		const Rgba&					color( void ) const;
 
 	private:
 
-		ImagePtr					m_image;	//!< Sprite image.
+		AssetPtr					m_image;	//!< Sprite image.
 		Rgba						m_color;	//!< Sprite color.
 	};
 
@@ -227,17 +227,17 @@ namespace Scene {
 		Fx::ParticleSystemWPtr			particles( void ) const;
 
 		//! Returns the material particles material.
-		MaterialWPtr					material( void ) const;
+		AssetWPtr					    material( void ) const;
 
 		//! Sets the particles material.
-		void							setMaterial( const MaterialPtr& value );
+		void							setMaterial( const AssetPtr& value );
 
 	private:
 
 		
 		Fx::ParticleSystemPtr			m_particleSystem;	//!< Particle system.
 		Fx::ParticleSystemInstancePtr	m_instance;			//!< Particle system instance.
-		MaterialWPtr					m_material;			//!< Particle system material.
+		AssetWPtr					    m_material;			//!< Particle system material.
 	};
 
 	//! Camera component.

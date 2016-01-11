@@ -57,20 +57,6 @@ RenderingContextPtr RenderingContext::create( const HalPtr& hal )
 	return RenderingContextPtr( DC_NEW RenderingContext( rvm, shaders, hal, renderer2d ) );
 }
 
-// ** RenderingContext::renderable
-const RenderingContext::Renderable& RenderingContext::renderable( u32 index ) const
-{
-	DC_BREAK_IF( index == 0 );
-	return m_renderables[index - 1];
-}
-
-// ** RenderingContext::texture
-const Renderer::TexturePtr& RenderingContext::texture( u32 index ) const
-{
-	DC_BREAK_IF( index == 0 );
-	return m_textures[index - 1];
-}
-
 // ** RenderingContext::rvm
 RvmPtr RenderingContext::rvm( void ) const
 {
@@ -93,70 +79,6 @@ HalPtr RenderingContext::hal( void ) const
 Renderer2DPtr RenderingContext::renderer( void ) const
 {
 	return m_renderer;
-}
-
-// ** RenderingContext::uploadRenderable
-const RenderingAssetId& RenderingContext::uploadRenderable( MeshWPtr mesh, s32 chunk )
-{
-	DC_BREAK_IF( !mesh.valid() );
-
-	// Get chunk mesh buffers
-	const Mesh::VertexBuffer& vertices = mesh->vertexBuffer( chunk );
-	const Mesh::IndexBuffer&  indices  = mesh->indexBuffer( chunk );
-
-	u32 vertexCount = ( u32 )vertices.size();
-	u32 indexCount = ( u32 )indices.size();
-
-	// Create GPU buffers.
-	VertexDeclarationPtr vertexFormat = m_hal->createVertexDeclaration( "P3:N:T0:T1" );
-	VertexBufferPtr	     vertexBuffer = m_hal->createVertexBuffer( vertexFormat, vertexCount );
-	IndexBufferPtr	     indexBuffer  = m_hal->createIndexBuffer( indexCount );
-
-	// Upload the vertex data
-	Mesh::Vertex* vertex = vertexBuffer->lock<Mesh::Vertex>();
-
-	for( u32 i = 0; i < vertexCount; i++ ) {
-		vertex->position = vertices[i].position;
-		vertex->normal = vertices[i].normal;
-
-		for( u32 j = 0; j < Mesh::Vertex::MaxTexCoords; j++ ) {
-			vertex->uv[j] = vertices[i].uv[j];
-		}
-		
-		vertex++;	
-	}
-
-	vertexBuffer->unlock();
-
-	// Upload the index data
-	u16* index = indexBuffer->lock();
-	memcpy( index, &indices[0], indices.size() * sizeof( u16 ) );
-	indexBuffer->unlock();
-
-	// Create the renderable.
-	m_renderables.push_back( Renderable( PrimTriangles, vertexBuffer, indexBuffer ) );
-
-	// Set the rendering asset id.
-	mesh->setChunkId( chunk, m_renderables.size() );
-
-	return mesh->chunkId( chunk );
-}
-
-// ** RenderingContext::uploadRenderable
-const RenderingAssetId& RenderingContext::uploadTexture( ImageWPtr image )
-{
-	DC_BREAK_IF( !image.valid() );
-
-	Renderer::Texture2DPtr texture = m_hal->createTexture2D( image->width(), image->height(), image->bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
-	texture->setData( 0, &image->mipLevel( 0 )[0] );
-
-	// Add texture
-	m_textures.push_back( texture );
-
-	// Set the rendering asset id.
-	image->setId( m_textures.size() );
-
-	return image->id();
 }
 
 } // namespace Scene

@@ -33,12 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Mesh material class.
-	class Material : public Asset {
-	friend class AssetBundle;
+	//! Material class.
+	class Material {
 	public:
-
-									ClassEnableTypeInfoSuper( Material, Asset )
 
 		//! Material features.
 		enum Feature {
@@ -69,7 +66,7 @@ namespace Scene {
         };
 
 									//! Constructs Material instance.
-									Material( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String() );
+									Material( void );
 
 		//! Returns material rendering mode.
 		RenderingMode				renderingMode( void ) const;
@@ -93,19 +90,16 @@ namespace Scene {
 		void						setColor( Layer layer, const Rgba& value );
 
         //! Returns a material texture.
-        const ImageWPtr&			texture( Layer layer ) const;
+        const AssetWPtr&			texture( Layer layer ) const;
 
 		//! Sets material texture.
-		void						setTexture( Layer layer, const ImageWPtr& value );
+		void						setTexture( Layer layer, const AssetWPtr& value );
 
 		//! Returns the diffuse material texture.
-		ImageWPtr					diffuse( void ) const;
+		AssetWPtr					diffuse( void ) const;
 
 		//! Sets the diffuse material texture.
-		void						setDiffuse( ImageWPtr value );
-
-		//! Creates a new Material instance.
-		static MaterialPtr			create( const String& name );
+		void						setDiffuse( AssetWPtr value );
 
 	private:
 
@@ -118,7 +112,7 @@ namespace Scene {
 		RenderingMode				m_renderingMode;				//!< Material blending.
 		u32							m_features;						//!< Used material features.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
-		ImageWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
+		AssetWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
 	};
 
 } // namespace Scene

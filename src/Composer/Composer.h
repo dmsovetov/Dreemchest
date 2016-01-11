@@ -66,7 +66,7 @@ DC_BEGIN_COMPOSER
 
 	// Declare Qt metatypes
 	Q_DECLARE_METATYPE( Scene::AssetWPtr )
-	Q_DECLARE_METATYPE( Scene::ImageWPtr )
+	//Q_DECLARE_METATYPE( Scene::ImageWPtr )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
 	Q_DECLARE_METATYPE( Scene::Material::Model )
 

@@ -31,9 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Mesh::Mesh
-Mesh::Mesh( void ) : Asset( NULL, Asset::Mesh, "", "" )
+Mesh::Mesh( void )
 {
-	setFormat( AssetFormatMesh );
+
 }
 
 // ** Mesh::chunkCount
@@ -46,20 +46,6 @@ s32 Mesh::chunkCount( void ) const
 void Mesh::setChunkCount( s32 value )
 {
 	m_chunks.resize( value );
-}
-
-// ** Mesh::chunkId
-const RenderingAssetId& Mesh::chunkId( s32 chunk ) const
-{
-	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
-	return m_chunks[chunk].id;
-}
-
-// ** Mesh::setChunkId
-void Mesh::setChunkId( s32 chunk, const RenderingAssetId& value )
-{
-	DC_BREAK_IF( chunk < 0 || chunk >= chunkCount() );
-	m_chunks[chunk].id = value;
 }
 
 // ** Mesh::setTexture
@@ -125,12 +111,6 @@ void Mesh::updateBounds( void )
 			m_bounds << vertices[j].position;
 		}
 	}
-}
-
-// ** Mesh::create
-MeshPtr Mesh::create( void )
-{
-	return MeshPtr( DC_NEW Mesh );
 }
 
 } // namespace Scene

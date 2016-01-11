@@ -30,11 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** Prefab::Prefab
-Prefab::Prefab( AssetBundle* bundle, const String& uuid, const String& name, u16 width, u16 height )
-	: Asset( bundle, Asset::Prefab, uuid, name )
-{
-}
 
 } // namespace Scene
 

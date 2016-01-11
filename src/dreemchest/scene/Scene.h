@@ -36,6 +36,7 @@
 #include <Platform/Platform.h>
 #include <Platform/Input.h>
 #include <Platform/Window.h>
+#include <Platform/Time.h>
 
 #include <Renderer/Renderer.h>
 #include <Renderer/Hal.h>
@@ -70,10 +71,11 @@ namespace Scene {
 	class RenderTarget;
 	class AssetBundle;
 	class Asset;
-		class Image;
-		class Mesh;
-		class Material;
-		class Terrain;
+
+	class Image;
+	class Mesh;
+	class Material;
+	class Terrain;
 
 	class Transform;
 	class StaticMesh;
@@ -82,29 +84,6 @@ namespace Scene {
 	class Rotor;
 
 	class Rvm;
-
-	//! Rendering context asset id.
-	class RenderingAssetId {
-	public:
-
-					//! Constructs RenderingAssetId instance.
-					RenderingAssetId( void )
-						: m_value( 0 ) {}
-
-					//! Constructs RenderingAssetId instance.
-					RenderingAssetId( u32 value )
-						: m_value( value ) {}
-
-					//! Converts rendering id to an integer.
-					operator u32( void ) const { return m_value; }
-
-					//! Returns true if this is a valid id.
-					operator bool( void ) const { return m_value != 0; }
-
-	private:
-
-		u32			m_value;	//!< Actual value.
-	};
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -169,14 +148,13 @@ namespace Scene {
 	dcDeclarePtrs( AssetBundle )
 	dcDeclarePtrs( AssetLoader )
 	dcDeclarePtrs( Asset )
-	dcDeclarePtrs( AssetData )
-	dcDeclarePtrs( Image )
-	dcDeclarePtrs( Mesh )
-	dcDeclarePtrs( Material )
-	dcDeclarePtrs( Terrain )
+	//dcDeclarePtrs( Image )
+	//dcDeclarePtrs( Mesh )
+	//dcDeclarePtrs( Material )
+	//dcDeclarePtrs( Terrain )
 
-	dcDeclarePtrs( AssetTexture )
-	dcDeclarePtrs( AssetMesh )
+	//dcDeclarePtrs( AssetTexture )
+	//dcDeclarePtrs( AssetMesh )
 
 	dcDeclarePtrs( Box2DPhysics )
 	dcDeclarePtrs( RigidBody2D )
@@ -472,7 +450,6 @@ DC_END_DREEMCHEST
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
-	#include "Systems/AssetSystem.h"
 	#include "Systems/CullingSystems.h"
 	#include "Archetypes/Camera.h"
 	#include "Rendering/RenderTarget.h"

@@ -34,13 +34,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Prefab scene asset.
-	class Prefab : public Asset {
+	class Prefab {
 	public:
-
-								ClassEnableTypeInfoSuper( Prefab, Asset )
-
-								//! Constructs Prefab instance.
-								Prefab( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u16 width = 0, u16 height = 0 );
 	};
 
 } // namespace Scene

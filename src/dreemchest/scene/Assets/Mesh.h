@@ -34,8 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Mesh data container.
-	class Mesh : public Asset {
-	friend class RenderingContext;
+	class Mesh {
 	public:
 
 		//! Mesh vertex.
@@ -48,8 +47,6 @@ namespace Scene {
 
 		typedef Array<Vertex>	VertexBuffer;		//!< Mesh vertex buffer type.
 		typedef Array<u16>		IndexBuffer;		//!< Mesh index buffer type.
-
-								ClassEnableTypeInfoSuper( Mesh, Asset )
 
 								//! Constructs Mesh instance.
 								Mesh( void );
@@ -84,17 +81,6 @@ namespace Scene {
 		//! Updates mesh bounds.
 		void					updateBounds( void );
 
-		//! Returns internal rendering id for a mesh node.
-		const RenderingAssetId&	chunkId( s32 chunk ) const;
-
-		//! Creates an empty mesh instance.
-		static MeshPtr			create( void );
-
-	private:
-
-		//! Sets internal rendering id for a mesh node.
-		void					setChunkId( s32 chunk, const RenderingAssetId& value );
-
 	private:
 
 		//! Internal mesh chunk.
@@ -102,7 +88,6 @@ namespace Scene {
 			String				texture;	//!< Mesh node texture name.
 			VertexBuffer		vertices;	//!< Mesh node vertices.
 			IndexBuffer			indices;	//!< Mesh node indices.
-			RenderingAssetId	id;			//!< Internal rendering id.
 		};
 
 		Bounds					m_bounds;	//!< Bounding box of a mesh.

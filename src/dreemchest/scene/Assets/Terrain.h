@@ -109,8 +109,7 @@ namespace Scene {
 	};
 
 	//! Heightmap base terrain.
-	class Terrain : public Asset {
-	friend class AssetBundle;
+	class Terrain {
 	public:
 
 		static s32				kChunkSize;	//!< Single terrain chunk size.
@@ -126,10 +125,8 @@ namespace Scene {
 		typedef Array<Vertex>	VertexBuffer;	//!< Terrain vertex buffer type.
 		typedef Array<u16>		IndexBuffer;	//!< Terrain index buffer type.
 
-								ClassEnableTypeInfoSuper( Terrain, Asset )
-
 								//! Constructs Terrain instance.
-								Terrain( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String(), u32 size = 0 );
+								Terrain( u32 size = 0 );
 
 		//! Returns terrain size.
 		u32						size( void ) const;
@@ -163,15 +160,15 @@ namespace Scene {
 		IndexBuffer				chunkIndexBuffer( void ) const;
 
 		//! Creates the chunk mesh.
-		MeshPtr					createChunkMesh( u32 x, u32 z ) const;
+		AssetPtr				createChunkMesh( u32 x, u32 z ) const;
 
 		//! Creates the mesh for whole terrain.
-		MeshPtr					createMesh( void ) const;
+		AssetPtr				createMesh( void ) const;
 
 	private:
 
 		//! Adds the mesh node constructed from chunk buffers.
-		void					setMeshChunk( MeshWPtr mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x = 0, u32 z = 0 ) const;
+		void					setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x = 0, u32 z = 0 ) const;
 
 	private:
 

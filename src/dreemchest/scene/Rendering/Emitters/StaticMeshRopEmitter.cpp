@@ -42,6 +42,8 @@ StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features, Mate
 // ** StaticMeshRopEmitter::emit
 void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
 {
+    DC_NOT_IMPLEMENTED
+#if 0
 	// Skip if mesh is not visible
 	if( !staticMesh.isVisible( m_camera->id() ) ) {
 		return;
@@ -126,9 +128,9 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 			}
 
 			rop->textures[j] = *id;
-		}
-		
+		}	
 	}
+#endif
 }
 
 } // namespace Scene

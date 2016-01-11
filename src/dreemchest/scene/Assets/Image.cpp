@@ -32,23 +32,9 @@ namespace Scene {
 
 // ** Image::Image
 Image::Image( void )
-	: Asset( NULL, Asset::Image, "", "" ), m_width( 0 ), m_height( 0 ), m_bytesPerPixel( 0 )
 {
-	setFormat( AssetFormatImageRaw );
 	setMipLevelCount( 1 );
 	setBytesPerPixel( 4 );
-}
-
-// ** Image::id
-const RenderingAssetId& Image::id( void ) const
-{
-	return m_id;
-}
-
-// ** Image::setId
-void Image::setId( const RenderingAssetId& value )
-{
-	m_id = value;
 }
 
 // ** Image::width
@@ -139,15 +125,6 @@ s32 Image::mipLevelHeight( s32 index ) const
 	}
 
 	return result;
-}
-
-// ** Image::dispose
-void Image::dispose( void )
-{
-	Asset::dispose();
-
-	m_mips.clear();
-	setMipLevelCount( 1 );
 }
 
 } // namespace Scene

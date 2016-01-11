@@ -33,12 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! 2D image asset
-	class Image : public Asset {
-	friend class RenderingContext;
+	//! 2D image data
+	class Image {
 	public:
-
-								ClassEnableTypeInfoSuper( Image, Asset )
 
 								//! Constructs an empty Image instance.
 								Image( void );
@@ -79,20 +76,8 @@ namespace Scene {
 		//! Returns the mip level height.
 		s32						mipLevelHeight( s32 index ) const;
 
-		//! Returns the internal rendering id.
-		const RenderingAssetId&	id( void ) const;
-
-		//! Destroys the loaded image data.
-		virtual void			dispose( void ) DC_DECL_OVERRIDE;
-
 	private:
 
-		//! Sets the internal rendering id.
-		void					setId( const RenderingAssetId& value );
-
-	private:
-
-		RenderingAssetId		m_id;				//!< Rendering identifier.
 		s32						m_width;			//!< Image base mip level width.
 		s32						m_height;			//!< Image base mip level height.
 		s32						m_bytesPerPixel;	//!< Number of bytes used to encode a single image pixel.

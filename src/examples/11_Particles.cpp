@@ -67,7 +67,7 @@ public:
 		m_assets->setUuidFileNames( false );
 
 		m_scene = Scene::Scene::createFromFile( m_assets, "assets/smoke_missile.prefab" );
-		m_scene->addSystem<Scene::AssetSystem>( m_assets );
+		//m_scene->addSystem<Scene::AssetSystem>( m_assets );
 
 		m_scene->findAllWithName( "smoke_missile" ).begin()->get()->get<Scene::Transform>()->setPosition( Vec3( -1000, 0, 0 ) );
 		m_scene->findAllWithName( "smoke_missile" ).begin()->get()->attach<Scene::MoveAlongAxes>( 1000.0f, Scene::CSWorld, new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );

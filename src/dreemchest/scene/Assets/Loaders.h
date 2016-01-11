@@ -37,71 +37,71 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Base class for all asset loaders.
-	class AssetLoader : public RefCounted {
-	public:
+	////! Base class for all asset loaders.
+	//class AssetLoader : public RefCounted {
+	//public:
 
-		//! Loads an asset data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) { return false; }
-	};
+	//	//! Loads an asset data from an input stream.
+	//	virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) { return false; }
+	//};
 
-	//! Generic asset loader type to subclass custom asset loaders from.
-	template<typename TAsset>
-	class GenericAssetLoader : public AssetLoader {
-	public:
+	////! Generic asset loader type to subclass custom asset loaders from.
+	//template<typename TAsset>
+	//class GenericAssetLoader : public AssetLoader {
+	//public:
 
-		//! Starts loading an asset from input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
+	//	//! Starts loading an asset from input stream.
+	//	virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
 
-	protected:
+	//protected:
 
-		WeakPtr<TAsset>		m_asset;	//!< Target asset to load data into.
-	};
+	//	WeakPtr<TAsset>		m_asset;	//!< Target asset to load data into.
+	//};
 
-	// ** GenericAssetLoader::loadFromStream
-	template<typename TAsset>
-	bool GenericAssetLoader<TAsset>::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
-	{
-		DC_BREAK_IF( !asset.valid() );
+	//// ** GenericAssetLoader::loadFromStream
+	//template<typename TAsset>
+	//bool GenericAssetLoader<TAsset>::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
+	//{
+	//	DC_BREAK_IF( !asset.valid() );
 
-		// Type cast an asset.
-		m_asset = castTo<TAsset>( asset.get() );
-		DC_BREAK_IF( !m_asset.valid() );
+	//	// Type cast an asset.
+	//	m_asset = castTo<TAsset>( asset.get() );
+	//	DC_BREAK_IF( !m_asset.valid() );
 
-		return m_asset.valid();		
-	}
+	//	return m_asset.valid();		
+	//}
 
-	//! Loads an image from a raw pixel buffer format.
-	class ImageLoaderRAW : public GenericAssetLoader<Image> {
-	public:
+	////! Loads an image from a raw pixel buffer format.
+	//class ImageLoaderRAW : public GenericAssetLoader<Image> {
+	//public:
 
-		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
-	};
+	//	//! Loads image data from an input stream.
+	//	virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
+	//};
 
-	//! Loads a mesh from a raw format.
-	class MeshLoaderRAW : public GenericAssetLoader<Mesh> {
-	public:
+	////! Loads a mesh from a raw format.
+	//class MeshLoaderRAW : public GenericAssetLoader<Mesh> {
+	//public:
 
-		//! Fat mesh vertex.
-		struct Vertex {
-			f32				position[3];	//!< Vertex position.
-			f32				normal[3];		//!< Vertex normal.
-			f32				tex0[2];		//!< UV layer 0.
-			f32				tex1[2];		//!< UV layer 1.
-		};
+	//	//! Fat mesh vertex.
+	//	struct Vertex {
+	//		f32				position[3];	//!< Vertex position.
+	//		f32				normal[3];		//!< Vertex normal.
+	//		f32				tex0[2];		//!< UV layer 0.
+	//		f32				tex1[2];		//!< UV layer 1.
+	//	};
 
-		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
-	};
+	//	//! Loads image data from an input stream.
+	//	virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
+	//};
 
-	//! Loads a material from a JSON format.
-	class MaterialLoader : public GenericAssetLoader<Material> {
-	public:
+	////! Loads a material from a JSON format.
+	//class MaterialLoader : public GenericAssetLoader<Material> {
+	//public:
 
-		//! Loads image data from an input stream.
-		virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
-	};
+	//	//! Loads image data from an input stream.
+	//	virtual bool		loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream ) DC_DECL_OVERRIDE;
+	//};
 
 } // namespace Scene
 

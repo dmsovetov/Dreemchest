@@ -33,40 +33,28 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Asset type id.
+    typedef TypeIdx AssetTypeId;
+
 	//! Basic scene asset
 	class Asset : public RefCounted {
 	friend class AssetBundle;
 	public:
 
-								ClassEnableTypeInfo( Asset )
-
-		//! Available asset types.
-		enum Type {
-			  Image				= BIT( 0 )
-			, Material			= BIT( 1 )
-			, Mesh				= BIT( 2 )
-			, Terrain			= BIT( 3 )
-			, Prefab			= BIT( 4 )
-			, Folder			= BIT( 5 )
-			, TotalAssetTypes	= 6
-			, All				= ~0
-		};
-
 		//! Asset loading state.
 		enum State {
 			Unknown,		//!< The asset state is unknown.
-			Unloaded,		//!< The asset is unloaded.
 			Loading,		//!< The asset is now loading.
 			Loaded,			//!< The asset is loaded.
-			Outdated,		//!< The asset should be reloaded.
-			LoadingError	//! An error was encountered while loading an asset.
+			LoadingError	//!< An error was encountered while loading an asset.
 		};
 
 								//! Constructs Asset instance.
-								Asset( AssetBundle* bundle = NULL, Type type = TotalAssetTypes, const String& uuid = String(), const String& name = String() );
+								Asset( AssetBundle* bundle = NULL, const String& uuid = String(), const String& name = String() );
+                                ~Asset( void );
 
-		//! Returns asset type.
-		Type					type( void ) const;
+		//! Returns asset type id.
+		AssetTypeId			    type( void ) const;
 
 		//! Returns the asset format.
 		AssetFormat				format( void ) const;
@@ -80,38 +68,46 @@ namespace Scene {
 		//! Returns asset uuid.
 		const String&			uuid( void ) const;
 
-		//! Returns asset timestamp.
+		//! Returns asset data timestamp.
 		u32						timestamp( void ) const;
-
-		//! Sets asset timestamp.
-		void					setTimestamp( u32 value );
 
 		//! Returns asset state.
 		State					state( void ) const;
 
 		//! Sets asset state.
-		void					setState( Asset::State value );
+		void					setState( State value );
 
 		//! Returns true if an asset needs to be loaded.
 		bool					needsLoading( void ) const;
 
-		//! Returns the root asset bundle.
-		AssetBundleWPtr			bundle( void ) const;
+        //! Returns an attached asset data.
+        template<typename T>
+        const T&                get( void ) const;
+
+        //! Updates an attached asset data.
+        template<typename T>
+        void                    set( const T& value );
+
+        //! Returns true if an asset's data matches the specified type.
+        template<typename T>
+        bool                    is( void ) const;
 
 		//! Returns asset data as key-value object.
-		virtual Io::KeyValue	keyValue( void ) const;
+		//virtual Io::KeyValue	keyValue( void ) const;
 
 		//! Reads asset data from key-value object.
-		virtual bool			setKeyValue( const Io::KeyValue& value );
+		//virtual bool			setKeyValue( const Io::KeyValue& value );
 
 		//! Unloads asset data.
-		virtual void			dispose( void );
+		//virtual void			dispose( void );
 
-		//! Returns asset name from type.
-		static String			typeToString( Asset::Type type );
+        //! Returns an asset type id.
+        template<typename T>
+        static AssetTypeId      assetTypeId( void );
 
-		//! Returns asset type from name.
-		static Asset::Type		typeFromString( const String& type );
+        //! Creates new asset instance.
+        template<typename T>
+        static AssetPtr         create( const T& value );
 
 	private:
 
@@ -128,12 +124,59 @@ namespace Scene {
 
 		AssetFormat				m_format;		//!< Asset format.
 		AssetBundleWPtr			m_bundle;		//!< Parent asset bundle.
-		Type					m_type;			//!< Asset type.
 		String					m_name;			//!< Asset name.
-		String					m_uuid;			//!< Asset UUID.
+		String					m_uuid;			//!< Unique asset identifier.
 		State					m_state;		//!< Asset state.
 		u32						m_timestamp;	//!< Last known asset file timestamp.
+        void*                   m_data;         //!< Stored asset data.
+        AssetTypeId             m_typeId;       //!< Asset type id.
 	};
+
+    // ** Asset::get
+    template<typename T>
+    const T& Asset::get( void ) const
+    {
+        DC_BREAK_IF( !is<T>() );
+        return *reinterpret_cast<T*>( m_data );
+    }
+
+    // ** Asset::set
+    template<typename T>
+    void Asset::set( const T& value )
+    {
+        if( m_typeId == -1 ) {
+            m_typeId = assetTypeId<T>();
+            m_data = DC_NEW T( value );
+        } else {
+            DC_BREAK_IF( !is<T>() );
+            *reinterpret_cast<T*>( m_data ) = value;
+        }
+
+        m_timestamp = Platform::currentTime();
+    }
+
+    // ** Asset::is
+    template<typename T>
+    bool Asset::is( void ) const
+    {
+        return m_typeId == assetTypeId<T>();
+    }
+
+    // ** Asset::assetTypeId
+    template<typename T>
+    AssetTypeId Asset::assetTypeId( void )
+    {
+        return GroupedTypeIndex<T, Asset>::idx();
+    }
+
+    // ** Asset::create
+    template<typename T>
+    AssetPtr Asset::create( const T& value )
+    {
+        Asset* instance = DC_NEW Asset;
+        instance->set<T>( value );
+        return instance;
+    }
 
 	//! Contains asset meta information & caches loaded assets.
 	class AssetBundle : public RefCounted {
@@ -143,24 +186,24 @@ namespace Scene {
 		const String&			name( void ) const;
 
 		//! Returns an asset of template type T with specified name.
-		template<typename TAsset>
-		StrongPtr<TAsset>		find( const String& name );
+		//template<typename TAsset>
+		//StrongPtr<TAsset>		find( const String& name );
 
 		//! Returns asset set of specified type.
-		template<typename TAsset>
-		Set<StrongPtr<TAsset>>	findByType( void ) const;
+		//template<typename TAsset>
+		//Set<StrongPtr<TAsset>>	findByType( void ) const;
 
 		//! Returns asset by name.
-		AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All ) const;
+		//AssetPtr				findAsset( const String& name, u32 expectedType = Asset::All ) const;
 
 		//! Returns the full asset path by an identifier.
-		Io::Path				assetPathByIdentifier( const String& name ) const;
+		//Io::Path				assetPathByIdentifier( const String& name ) const;
 
 		//! Creates the new Asset and loads it from key-value data.
-		AssetPtr				createAssetFromData( const Io::KeyValue& data ) const;
+		//AssetPtr				createAssetFromData( const Io::KeyValue& data ) const;
 
 		//! Creates new Asset by type.
-		AssetPtr				createAssetByType( Asset::Type type ) const;
+		//AssetPtr				createAssetByType( AssetTypeId type ) const;
 
 		//! Adds an asset to this bundle.
 		void					addAsset( AssetPtr asset );
@@ -172,13 +215,13 @@ namespace Scene {
 		bool					setAssetName( AssetWPtr asset, const String& value );
 
 		//! Queues an asset for loading.
-		void					queueForLoading( AssetWPtr asset );
+		//void					queueForLoading( AssetWPtr asset );
 
 		//! Removes an asset from loading queue.
-		void					removeFromLoading( AssetWPtr asset );
+		//void					removeFromLoading( AssetWPtr asset );
 
 		//! Returns an assets queued for loading.
-		AssetSet				waitingForLoading( void ) const;
+		//AssetSet				waitingForLoading( void ) const;
 
 		//! Returns true if UUID file names should be used.
 		bool					uuidFileNames( void ) const;
@@ -201,7 +244,7 @@ namespace Scene {
 								AssetBundle( const String& name, const Io::Path& path );
 
 		//! Loads assets from key-value string.
-		bool					loadFromString( const String& text );
+		//bool					loadFromString( const String& text );
 
 	private:
 
@@ -209,51 +252,51 @@ namespace Scene {
 		typedef Hash<AssetPtr>	Assets;
 
 		//! Asset factory type.
-		typedef AbstractFactory<Asset, Asset::Type>	AssetFactory;
+		//typedef AbstractFactory<Asset, AssetTypeId>	AssetFactory;
 
 		//! Container type to map from string to asset type.
-		typedef Map<String, Asset::Type> AssetTypeByName;
+		//typedef Map<String, Asset::Type> AssetTypeByName;
 
 		Io::Path				m_path;					//!< Asset bundle physical path.
 		String					m_name;					//!< Asset bundle name.
 		Assets					m_assets;				//!< Identifier to asset mapping.
 		bool					m_uuidFileNames;		//!< Are the UUID file names used.
-		AssetFactory			m_factory;				//!< Asset factory.
-		AssetTypeByName			m_typeByName;			//!< Asset type by name.
-		AssetSet				m_waitingForLoading;	//!< Assets waiting for loading.
+		//AssetFactory			m_factory;				//!< Asset factory.
+		//AssetTypeByName			m_typeByName;			//!< Asset type by name.
+		//AssetSet				m_waitingForLoading;	//!< Assets waiting for loading.
 	};
 
 	// ** AssetBundle::find
-	template<typename T>
-	StrongPtr<T> AssetBundle::find( const String& name )
-	{
-		AssetPtr asset = findAsset( name );
+	//template<typename T>
+	//StrongPtr<T> AssetBundle::find( const String& name )
+	//{
+	//	AssetPtr asset = findAsset( name );
 
-		if( asset == AssetPtr() ) {
-			return StrongPtr<T>();
-		}
+	//	if( asset == AssetPtr() ) {
+	//		return StrongPtr<T>();
+	//	}
 
-		T* casted = castTo<T>( asset.get() );
+	//	T* casted = castTo<T>( asset.get() );
 
-		return StrongPtr<T>( casted );
-	}
+	//	return StrongPtr<T>( casted );
+	//}
 
 	// ** AssetBundle::find
-	template<typename TAsset>
-	Set<StrongPtr<TAsset>> AssetBundle::findByType( void ) const
-	{
-		Set<StrongPtr<TAsset>> result;
+	//template<typename TAsset>
+	//Set<StrongPtr<TAsset>> AssetBundle::findByType( void ) const
+	//{
+	//	Set<StrongPtr<TAsset>> result;
 
-		for( Assets::const_iterator i = m_assets.begin(), end = m_assets.end(); i != end; ++i ) {
-			StrongPtr<TAsset> asset = castTo<TAsset>( i->second.get() );
+	//	for( Assets::const_iterator i = m_assets.begin(), end = m_assets.end(); i != end; ++i ) {
+	//		StrongPtr<TAsset> asset = castTo<TAsset>( i->second.get() );
 
-			if( asset.valid() ) {
-				result.insert( asset );
-			}
-		}
+	//		if( asset.valid() ) {
+	//			result.insert( asset );
+	//		}
+	//	}
 
-		return result;
-	}
+	//	return result;
+	//}
 
 } // namespace Scene
 
