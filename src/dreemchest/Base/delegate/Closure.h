@@ -106,8 +106,8 @@
 #undef ARGS
 #undef DETAIL_NUM
 //---------------------------------------------------------------------------
-#define CLOSURE(pobj, pfunc) (detail::closure(pobj, pfunc).create<pfunc>(pobj))
-#define SCLOSURE(pfunc) (detail::closure(0, pfunc).create<pfunc>(0))
+#define CLOSURE(pobj, pfunc) (::detail::closure(pobj, pfunc).create<pfunc>(pobj))
+#define SCLOSURE(pfunc) (::detail::closure(0, pfunc).create<pfunc>(0))
 //---------------------------------------------------------------------------
 #endif
 //---------------------------------------------------------------------------

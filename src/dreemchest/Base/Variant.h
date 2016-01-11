@@ -477,14 +477,14 @@ DC_BEGIN_DREEMCHEST
 	template<typename T>
 	inline const T& Variant::as( const T& defaultValue ) const
 	{
-		::impl::ValueType<T>* casted = castTo< ::impl::ValueType<T> >( m_value.get() );
+		::DC_DREEMCHEST_NS impl::ValueType<T>* casted = castTo< ::DC_DREEMCHEST_NS impl::ValueType<T> >( m_value.get() );
 		return casted ? casted->get() : defaultValue;
 	}
 	
 	// ** Variant::isValid
 	inline bool Variant::isValid( void ) const
 	{
-		return m_value != ::impl::ValuePtr();
+		return m_value != ::DC_DREEMCHEST_NS impl::ValuePtr();
 	}
 
 	// ** Variant::type

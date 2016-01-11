@@ -50,10 +50,10 @@ namespace mvvm {
 	//! Converts between the GUID and BSON.
 	struct GuidBsonConverter {
 		//! Converts to BSON from a value.
-		static Io::KeyValue	to( const ::Guid& value ) { return Io::KeyValue( value.toString() ); }
+		static Io::KeyValue	to( const :: DC_DREEMCHEST_NS Guid& value ) { return Io::KeyValue( value.toString() ); }
 
 		//! Converts from a value to a BSON.
-		static ::Guid		from( const Io::KeyValue& value ) { return value.asString(); }	
+		static :: DC_DREEMCHEST_NS Guid		from( const Io::KeyValue& value ) { return value.asString(); }	
 	};
 
 	//! Converts between the Vec2 and BSON.
@@ -96,7 +96,7 @@ namespace mvvm {
 	typedef PrimitiveValue<s32>							Integer;		//!< Integer value type.
 	typedef PrimitiveValue<f32>							Float;			//!< Floating point value type.
 	typedef PrimitiveValue<String>						Text;			//!< String value type.
-	typedef PrimitiveValue<::Guid, GuidBsonConverter>	Guid;			//!< Guid value type.	
+	typedef PrimitiveValue<:: DC_DREEMCHEST_NS Guid, GuidBsonConverter>	Guid;			//!< Guid value type.	
 	typedef PrimitiveValue<Vec2, Vec2BsonConverter>		Point2;			//!< 2-dimensional point type.
 	typedef ArrayValue<Text>							TextArray;		//!< Array of text values.
 	typedef ArrayValue<Point2>							Point2Array;	//!< Array of 2-dimensional points.
