@@ -46,16 +46,17 @@ public:
             , End   //!< Contact end.
         };
 
-                    //! Constructs empty Event instance.
-                    Event( void )
-                        {}
-                    //! Constructs Event instance.
-                    Event( Type type, b2Body* first, b2Body* second )
-                        : type( type ), first( first ), second( second ) {}
+                        //! Constructs empty Event instance.
+                        Event( void )
+                            {}
+                        //! Constructs Event instance.
+                        Event( Type type, b2Body* first, b2Body* second, const Array<b2Vec2>& points = Array<b2Vec2>() )
+                            : type( type ), first( first ), second( second ), points( points ) {}
 
-        b2Body*     first;  //!< First contact body.
-        b2Body*     second; //!< Second contact body.
-        Type        type;   //!< Collision type.
+        b2Body*         first;  //!< First contact body.
+        b2Body*         second; //!< Second contact body.
+        Type            type;   //!< Collision type.
+        Array<b2Vec2>   points; //!< Contact points.
     };
 
     //! Clears recorded events.
@@ -111,8 +112,19 @@ void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
         return;
     }
 
+    // Get contact points
+    Array<b2Vec2>     points;
+    const b2Manifold* manifold = contact->GetManifold();
+    b2WorldManifold   worldManifold;
+
+    contact->GetWorldManifold( &worldManifold );
+   
+    for( s32 i = 0, n = manifold->pointCount; i < n; i++ ) {
+        points.push_back( worldManifold.points[i] );
+    }
+
     // Record an event.
-    m_events.push_back( Event( Event::Begin, first, second ) );
+    m_events.push_back( Event( Event::Begin, first, second, points ) );
 }
 
 // ** Box2DPhysics::Collisions::EndContact
@@ -253,11 +265,18 @@ void Box2DPhysics::end( void )
         SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( e.first->GetUserData() );
         SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( e.second->GetUserData() );
 
+        // Convert Box2D contact points to world space.
+        Array<Vec2> points;
+
+        for( s32 j = 0, m = ( s32 )e.points.size(); j < m; j++ ) {
+            points.push_back( positionFromBox2D( e.points[j] ) );
+        }
+
         // Emit an event and push it to component's event queue
         switch( e.type ) {
         case Collisions::Event::Begin:  {
-                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second ) );
-                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first ) );
+                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second, points ) );
+                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first, points ) );
 
                                             notify<CollisionBegin>( first, second );
                                         }
