@@ -446,7 +446,7 @@ f32 KeyValue::asFloat( void ) const
 	switch( m_type ) {
 	case kInt8:		return static_cast<f32>( m_int8 );
 	case kInt16:	return static_cast<f32>( m_int16 );
-	case kInt32:	return static_cast<f32>( m_int32 );
+	case kInt32:	return static_cast<f32>( static_cast<s32>( m_int32 ) );
 	case kInt64:	return static_cast<f32>( m_int64 );
 	case kFloat32:	return m_float32;
 	case kFloat64:	return static_cast<f32>( m_float64 );
