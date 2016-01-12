@@ -107,7 +107,7 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) cons
     case Polygon:   {
                         Io::KeyValue vertices = Io::KeyValue::array();
 
-                        for( u32 i = 0; i < m_parts[0].polygon.count / 2; i++ ) {
+                        for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
                             vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
                         }
 
