@@ -351,43 +351,6 @@ DC_BEGIN_DREEMCHEST
         return m_data[id];
     }
 
-    //! Slot container with a fixed size. Issues opaque handles that act as weak references to slots.
-    template<typename TValue, s32 TSize, s32 TBitsIndex = 12, s32 TBitsGeneration = 20>
-    class FixedSlots : public Slots<TValue, TBitsIndex, TBitsGeneration> {
-    public:
-
-        //! Store the container size.
-        enum { Capacity = TSize };
-
-                        //! Constructs FixedSlots instance.
-                        FixedSlots( void );
-
-        //! Adds the value to a container and returns it's ID.
-        ID              add( const TValue& value );
-    };
-
-    // ** FixedSlots::FixedSlots
-    template<typename TValue, s32 TSize, s32 TBitsIndex, s32 TBitsGeneration>
-    FixedSlots<TValue, TSize, TBitsIndex, TBitsGeneration>::FixedSlots( void ) : Slots( TSize )
-    {
-
-    }
-
-    // ** FixedSlots::add
-    template<typename TValue, s32 TSize, s32 TBitsIndex, s32 TBitsGeneration>
-    typename FixedSlots<TValue, TSize, TBitsIndex, TBitsGeneration>::ID FixedSlots<TValue, TSize, TBitsIndex, TBitsGeneration>::add( const TValue& value )
-    {
-        // Reserve the slot
-        ID id = m_handles.allocate();
-
-        // Copy value to a slot
-        if( id.isValid() ) {
-            m_data[id] = value;
-        }
-
-        return id;
-    }
-
 DC_END_DREEMCHEST
 
 #endif  /*  !__Base_Containers_Slots_H__    */
