@@ -31,7 +31,7 @@
 #define CODE( ... ) #__VA_ARGS__
 
 // ** Bit shifting
-#define BIT( bit )                ( 1 << bit )
+#define BIT( bit )                ( 1 << (bit) )
 
 // Override specifier
 #ifndef DC_CPP11_DISABLED
