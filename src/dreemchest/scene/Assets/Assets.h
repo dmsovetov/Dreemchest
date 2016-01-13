@@ -41,36 +41,9 @@ namespace Scene {
 
     private:
 
-        //! Base class for an asset pool.
-        struct AbstractAssetPool {
-            virtual         ~AbstractAssetPool( void ) {}
-        };
-
-        //! Generic type to declare an asset pool to store assets of specified type.
-        template<typename TAsset>
-        struct AssetPool : public AbstractAssetPool {
-            Slots<TAsset>   slots; //!< Asset slots used by this pool.
-        };
-
-        //! Returns the asset pool of specified type (creates a new one if it does not exist yet).
-        template<typename TAsset>
-        AssetPool<TAsset>*  requestAssetPool( void ) const;
-
-    private:
-
-        //! Container type to store asset pools.
-        typedef Map<TypeIdx, AbstractAssetPool*> AssetPools;
-
-        mutable AssetPools  m_pools;    //!< Asset type to pool mapping.
+        //! Container type to store all available assets.
+        typedef Hash<Asset> AssetInfo;
     };
-
-    // ** Assets::~Assets
-    inline Assets::~Assets( void )
-    {
-        for( AssetPools::iterator i = m_pools.begin(), end = m_pools.end(); i != end; ++i ) {
-            delete i->second;
-        }
-    }
 
     // --------------------------------------------------------------------------------------------------------------------------------- //
 
