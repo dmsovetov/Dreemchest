@@ -96,13 +96,13 @@ namespace Scene {
 	private:
 
 		//! Adds a circle fixture to a body.
-		void					addCircleFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Adds a rectangular fixture to a body.
-		void					addRectFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Adds a polygonal fixture to a body.
-		void					addPolygonFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Converts position from Box2D space to a scene space.
 		Vec3					positionFromBox2D( const b2Vec2& position ) const;

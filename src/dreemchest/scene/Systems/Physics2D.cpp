@@ -383,13 +383,20 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBod
 		// Get the shape part by index
 		const Shape2D::Part& part = shape->part( i );
 
+        // Setup fixture collision filter
+        b2Filter filter;
+        filter.categoryBits = rigidBody.category();
+        filter.maskBits     = rigidBody.collisionMask();
+
 		// Initialize Box2D fixture
 		switch( part.type ) {
-		case Shape2D::Circle:	addCircleFixture( body, part );		break;
-		case Shape2D::Rect:		addRectFixture( body, part );		break;
-		case Shape2D::Polygon:	addPolygonFixture( body, part );	break;
+		case Shape2D::Circle:	addCircleFixture( body, filter, part );		break;
+		case Shape2D::Rect:		addRectFixture( body, filter, part );		break;
+		case Shape2D::Polygon:	addPolygonFixture( body, filter, part );	break;
 		default:				DC_BREAK;
 		}
+
+        
 	}
 
 	// Attach created body to a component
@@ -411,7 +418,7 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 }
 
 // ** Box2DPhysics::addCircleFixture
-void Box2DPhysics::addCircleFixture( b2Body* body, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
 {
 	b2FixtureDef fixture;
 	b2CircleShape circle;
@@ -419,16 +426,18 @@ void Box2DPhysics::addCircleFixture( b2Body* body, const Shape2D::Part& shape ) 
 	fixture.density = shape.material.density;
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
+    fixture.filter = filter;
 
 	circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
 	circle.m_radius = sizeToBox2D( shape.circle.radius );
 	fixture.shape = &circle;
 
-	body->CreateFixture( &fixture );
+	b2Fixture* result = body->CreateFixture( &fixture );
+    return result;
 }
 
 // ** Box2DPhysics::addRectFixture
-void Box2DPhysics::addRectFixture( b2Body* body, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -436,16 +445,18 @@ void Box2DPhysics::addRectFixture( b2Body* body, const Shape2D::Part& shape ) co
 	fixture.density = shape.material.density;
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
+    fixture.filter = filter;
 
 	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
 	polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
 	fixture.shape = &polygon;
 
-	body->CreateFixture( &fixture );
+	b2Fixture* result = body->CreateFixture( &fixture );
+    return result;
 }
 
 // ** Box2DPhysics::addPolygonFixture
-void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -453,6 +464,7 @@ void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape )
 	fixture.density = shape.material.density;
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
+    fixture.filter = filter;
 
 	Array<b2Vec2> points;
 
@@ -465,7 +477,8 @@ void Box2DPhysics::addPolygonFixture( b2Body* body, const Shape2D::Part& shape )
 
 	fixture.shape = &polygon;
 
-	body->CreateFixture( &fixture );
+	b2Fixture* result = body->CreateFixture( &fixture );
+    return result;
 }
 
 // ** Box2DPhysics::positionFromBox2D

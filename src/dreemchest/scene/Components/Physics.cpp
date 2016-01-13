@@ -141,6 +141,12 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
 
+// ** RigidBody2D::RigidBody2D
+RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask )
+	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask )
+{
+}
+
 // ** RigidBody2D::mass
 f32 RigidBody2D::mass( void ) const
 {
@@ -199,6 +205,18 @@ const Vec2& RigidBody2D::force( void ) const
 void RigidBody2D::applyForce( const Vec2& value )
 {
 	m_force += value;
+}
+
+// ** RigidBody2D::category
+u16 RigidBody2D::category( void ) const
+{
+    return m_category;
+}
+
+// ** RigidBody2D::collisionMask
+u16 RigidBody2D::collisionMask( void ) const
+{
+    return m_collisionMask;
 }
 
 // ** RigidBody2D::applyForceToPoint
