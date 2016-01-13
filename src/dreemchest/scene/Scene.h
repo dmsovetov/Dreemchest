@@ -81,9 +81,11 @@ namespace Scene {
 	class StaticMesh;
 	class Sprite;
 	class Camera;
-	class Rotor;
 
 	class Rvm;
+
+    //! Forward declaration of an AssetHandle type.
+    template<typename TAsset> class AssetHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -447,6 +449,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
+    #include "Assets/AssetHandle.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
