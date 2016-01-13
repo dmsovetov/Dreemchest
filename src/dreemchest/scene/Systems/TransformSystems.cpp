@@ -74,7 +74,8 @@ void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity&
 		return;
 	}
 
-	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->get<Mesh>().bounds() * transform.matrix() );
+    DC_NOT_IMPLEMENTED;
+//	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->get<Mesh>().bounds() * transform.matrix() );
 }
 
 // ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //

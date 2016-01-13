@@ -268,12 +268,15 @@ ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json
 	// Create scene instance
 	ScenePtr scene( DC_NEW Scene );
 
+#if 0
 	// Load scene from JSON
 	JsonSceneLoader loader;
 
 	if( !loader.load( scene, assets, json ) ) {
 		return ScenePtr();
 	}
+#endif
+    DC_NOT_IMPLEMENTED
 
 	return scene;
 #else
@@ -285,6 +288,8 @@ ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
 #ifdef HAVE_JSON
+
+#if 0
 
 // ** JsonSceneLoader::JsonSceneLoader
 JsonSceneLoader::JsonSceneLoader( void )
@@ -766,6 +771,8 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 		DC_BREAK;
 	}
 }
+
+#endif
 
 #endif	/*	HAVE_JSON	*/
 

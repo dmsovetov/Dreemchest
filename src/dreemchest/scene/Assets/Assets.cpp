@@ -26,17 +26,11 @@
 
 #include "Assets.h"
 
-#include "Image.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Prefab.h"
-#include "Terrain.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------- Asset ------------------------------------------- //
+/*// ------------------------------------------- Asset ------------------------------------------- //
 
 // ** Asset::Asset
 Asset::Asset( AssetBundle* bundle, const String& uuid, const String& name )
@@ -430,7 +424,7 @@ bool AssetBundle::setAssetName( AssetWPtr asset, const String& value )
 	asset->setName( value );
 
 	return true;
-}
+}*/
 
 } // namespace Scene
 

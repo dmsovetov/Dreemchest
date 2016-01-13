@@ -27,13 +27,54 @@
 #ifndef __DC_Scene_Assets_H__
 #define __DC_Scene_Assets_H__
 
-#include "../Scene.h"
+#include "Asset.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Asset type id.
+    //! Root interface to access all available assets.
+    class Assets : public RefCounted {
+    public:
+
+                            ~Assets( void );
+
+    private:
+
+        //! Base class for an asset pool.
+        struct AbstractAssetPool {
+            virtual         ~AbstractAssetPool( void ) {}
+        };
+
+        //! Generic type to declare an asset pool to store assets of specified type.
+        template<typename TAsset>
+        struct AssetPool : public AbstractAssetPool {
+            Slots<TAsset>   slots; //!< Asset slots used by this pool.
+        };
+
+        //! Returns the asset pool of specified type (creates a new one if it does not exist yet).
+        template<typename TAsset>
+        AssetPool<TAsset>*  requestAssetPool( void ) const;
+
+    private:
+
+        //! Container type to store asset pools.
+        typedef Map<TypeIdx, AbstractAssetPool*> AssetPools;
+
+        mutable AssetPools  m_pools;    //!< Asset type to pool mapping.
+    };
+
+    // ** Assets::~Assets
+    inline Assets::~Assets( void )
+    {
+        for( AssetPools::iterator i = m_pools.begin(), end = m_pools.end(); i != end; ++i ) {
+            delete i->second;
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------------------- //
+
+ /*   //! Asset type id.
     typedef TypeIdx AssetTypeId;
 
 	//! Basic scene asset
@@ -296,7 +337,7 @@ namespace Scene {
 	//	}
 
 	//	return result;
-	//}
+	//}*/
 
 } // namespace Scene
 

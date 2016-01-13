@@ -338,6 +338,8 @@ namespace Scene {
 
 #ifdef HAVE_JSON
 
+#if 0
+
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader : public Io::JsonLoaderBase {
 	public:
@@ -433,6 +435,8 @@ namespace Scene {
 		ModuleLoaders				m_moduleLoaders;			//!< Available module loaders.
 		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
 	};
+
+#endif
 
 #endif	/*	HAVE_JSON	*/
 

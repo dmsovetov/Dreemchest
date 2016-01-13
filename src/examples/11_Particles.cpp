@@ -63,7 +63,7 @@ public:
 		m_renderingContext = Scene::RenderingContext::create( m_hal );
 
 		// Create the particle system
-		m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
+		//m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
 		m_assets->setUuidFileNames( false );
 
 		m_scene = Scene::Scene::createFromFile( m_assets, "assets/smoke_missile.prefab" );

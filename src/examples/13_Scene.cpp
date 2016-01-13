@@ -62,7 +62,7 @@ class ParticleSystems : public ApplicationDelegate {
 		m_scene = ::Scene::Scene::create();
 
 		// Create an empty asset bundle
-		m_assets = AssetBundle::create( "assets" );
+		//m_assets = AssetBundle::create( "assets" );
 
 		//m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
 
