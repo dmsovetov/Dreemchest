@@ -123,6 +123,9 @@ namespace Scene {
 	class RigidBody2D : public Ecs::Component<RigidBody2D> {
 	public:
 
+        //! The default rigid body category
+        enum { DefaultCategory = BIT( 0 ) };
+
 		//! Supported rigid body types.
 		enum Type {
 			  Static = 0	//!< Static rigid body.
@@ -153,16 +156,16 @@ namespace Scene {
                                 CollisionEvent( void )
                                     {}
                                 //! Constructs Event instance.
-                                CollisionEvent( Type type, SceneObjectWPtr other )
-                                    : type( type ), other( other ) {}
+                                CollisionEvent( Type type, SceneObjectWPtr other, const Array<Vec2>& points = Array<Vec2>() )
+                                    : type( type ), other( other ), points( points ) {}
 
             SceneObjectWPtr     other;  //!< First contact body.
             Type                type;   //!< Collision type.
+            Array<Vec2>         points; //!< Collision points.
         };
 
 							    //! Constructs the RigidBody2D instance.
-							    RigidBody2D( f32 mass = 0.0f, Type type = Static )
-								    : m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ) {}
+							    RigidBody2D( f32 mass = 0.0f, Type type = Static, u16 category = DefaultCategory, u16 collisionMask = ~0 );
 
 		//! Returns the rigid body mass.
 		f32					    mass( void ) const;
@@ -215,6 +218,12 @@ namespace Scene {
         //! Returns the applied impulse by index.
         const AppliedForce&     appliedImpulse( u32 index ) const;
 
+        //! Returns catergory mask assigned to this rigid body.
+        u16                     category( void ) const;
+
+        //! Returns the collision mask asigned to this rigid body.
+        u16                     collisionMask( void ) const;
+
         //! Returns the total number of queued events.
         u32                     collisionEventCount( void ) const;
 
@@ -241,6 +250,8 @@ namespace Scene {
 		Array<AppliedForce>	    m_forces;			//!< All applied forces.
         Array<AppliedForce>     m_impulses;         //!< All applied impulses.
         Array<CollisionEvent>   m_collisionEvents;  //!< All collision events recorded since on simulation step.
+        u16                     m_category;         //!< Rigid body category used in collision filtering.
+        u16                     m_collisionMask;    //!< Collision mask used to filter collisions.
 	};
 
 } // namespace Scene

@@ -72,7 +72,7 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 		const MaterialPtr& material = staticMesh.material( i );
 
 		// Get the rendering mode from material or use opaque by default
-		::Scene::RenderingMode renderingMode = material.valid() ? material->renderingMode() : RenderOpaque;
+		::DC_DREEMCHEST_NS Scene::RenderingMode renderingMode = material.valid() ? material->renderingMode() : RenderOpaque;
 
 		if( !rvm.willRender( renderingMode ) ) {
 			continue;

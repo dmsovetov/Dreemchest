@@ -156,7 +156,7 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 	ar = Io::KeyValue::object();
 
 	ar["Type"]  = typeName();
-	ar["_id"]   = id().toString();
+	ar["_id"]   = id()/*.toString()*/;
     ar["flags"] = static_cast<u8>( m_flags );
 
 	const Components& items = components();

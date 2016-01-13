@@ -70,10 +70,10 @@ namespace Scene {
 		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void			entityAdded( const Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void			entityRemoved( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
 
         //! Emitted when two bodies begin to touch.
         struct CollisionBegin {
@@ -96,13 +96,13 @@ namespace Scene {
 	private:
 
 		//! Adds a circle fixture to a body.
-		void					addCircleFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Adds a rectangular fixture to a body.
-		void					addRectFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Adds a polygonal fixture to a body.
-		void					addPolygonFixture( b2Body* body, const Shape2D::Part& shape ) const;
+		b2Fixture*				addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const;
 
 		//! Converts position from Box2D space to a scene space.
 		Vec3					positionFromBox2D( const b2Vec2& position ) const;

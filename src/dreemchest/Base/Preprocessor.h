@@ -31,7 +31,7 @@
 #define CODE( ... ) #__VA_ARGS__
 
 // ** Bit shifting
-#define BIT( bit )                ( 1 << bit )
+#define BIT( bit )                ( 1 << (bit) )
 
 // Override specifier
 #ifndef DC_CPP11_DISABLED
@@ -55,16 +55,16 @@
 
 // ** Smart ptrs
 #define        DC_DECLARE_PTRS( type, name )								\
-                typedef WeakPtr<class type>			dc##name##Weak;			\
-                typedef StrongPtr<class type>		dc##name##Strong;
+                typedef DC_DREEMCHEST_NS WeakPtr<class type>    dc##name##Weak;			\
+                typedef DC_DREEMCHEST_NS StrongPtr<class type>  dc##name##Strong;
 
 #define dcDeclarePtrs( T )							\
-				typedef StrongPtr<class T>	T##Ptr;	\
-				typedef WeakPtr<class T>	T##WPtr;
+				typedef DC_DREEMCHEST_NS StrongPtr<class T>	T##Ptr;	\
+				typedef DC_DREEMCHEST_NS WeakPtr<class T>	T##WPtr;
 
 #define dcDeclareNamedPtrs( T, name )					\
-				typedef StrongPtr<class T>	name##Ptr;	\
-				typedef WeakPtr<class T>	name##WPtr;
+				typedef DC_DREEMCHEST_NS StrongPtr<class T>	name##Ptr;	\
+				typedef DC_DREEMCHEST_NS WeakPtr<class T>	name##WPtr;
 
 // ** Random
 #define		RANDOM_SCALAR( min, max ) ((rand() / float( RAND_MAX ) * ( (max) - (min) )) + (min))

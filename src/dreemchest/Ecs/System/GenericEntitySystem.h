@@ -53,18 +53,31 @@ namespace Ecs {
 		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
 		//! Performs an update of a system
-		virtual void	update( u32 currentTime, f32 dt );
+		virtual void	update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+
+		//! Called when entity was added.
+		virtual void	entityAdded( const Entity& entity ) DC_DECL_OVERRIDE;
 
 		//! Generic processing function that should be overriden in a subclass.
 		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );
+
+		//! Called when entity was added.
+        virtual void	entityAdded( const Entity& entity, TComponents& ... components ) {}
 
 	private:
 
 		//! Dispatches the entity components to processing
 		template<s32 ... Idxs> 
-		void dispatch( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
+		void dispatchProcess( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
 		{ 
 			process( currentTime, dt, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+		}
+
+		//! Calls entityAdded method with components
+		template<s32 ... Idxs> 
+		void dispatchEntityAdded( const Entity& entity, IndexesTuple<Idxs...> const& )  
+		{ 
+			entityAdded( entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
 		}
 	};
 
@@ -79,10 +92,17 @@ namespace Ecs {
 		EntitySet& entities = m_index->entities();
 
 		for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
-			dispatch( currentTime, dt, *i->get(), typename Indices::Indexes() );
+			dispatchProcess( currentTime, dt, *i->get(), typename Indices::Indexes() );
 		}
 
 		end();	
+	}
+
+	// ** GenericEntitySystem::entityAdded
+	template<typename TSystem, typename ... TComponents>
+	void GenericEntitySystem<TSystem, TComponents...>::entityAdded( const Entity& entity )
+	{
+		dispatchEntityAdded( entity, typename Indices::Indexes() );
 	}
 
 	// ** GenericEntitySystem::process
