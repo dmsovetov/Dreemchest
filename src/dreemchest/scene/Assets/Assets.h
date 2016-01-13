@@ -39,10 +39,15 @@ namespace Scene {
 
                             ~Assets( void );
 
+        //! Adds new asset.
+
+
     private:
 
         //! Container type to store all available assets.
         typedef Hash<Asset> AssetInfo;
+
+        AssetInfo           m_assetInfo;    //!< All added assets reside here.
     };
 
     // --------------------------------------------------------------------------------------------------------------------------------- //

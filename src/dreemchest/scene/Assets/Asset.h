@@ -43,6 +43,9 @@ namespace Scene {
 	class _Asset {
 	public:
 
+        //! Alias an asset type.
+        typedef TypeIdx         Type;
+
 		//! Returns asset name.
 		const String&			name( void ) const;
 
@@ -52,12 +55,23 @@ namespace Scene {
         //! Returns an asset file path.
         const String&           filePath( void ) const;
 
+        //! Returns an asset type id.
+        template<typename TAsset>
+        static Type             assetType( void );
+
 	private:
 
         String					m_uniqueId;	    //!< This id is used to reference asset.
 		String					m_name;			//!< Asset name.
         String                  m_filePath;     //!< Physical file path.
 	};
+
+    // ** Asset::assetType
+    template<typename TAsset>
+    _Asset::Type _Asset::assetType( void )
+    {
+        return GroupedTypeIndex<TAsset, _Asset>::idx();
+    }
 
 } // namespace Scene
 
