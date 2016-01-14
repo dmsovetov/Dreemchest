@@ -344,6 +344,11 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 		body->ApplyLinearImpulse( value, point, true );   
     }
 
+    // This rigid body was moved - sync the Box2D body with it
+    if( rigidBody.wasMoved() ) {
+        body->SetTransform( positionToBox2D( rigidBody.movedTo() ), body->GetAngle() );
+    }
+
 	// Clear all forces now
 	rigidBody.clear();
 

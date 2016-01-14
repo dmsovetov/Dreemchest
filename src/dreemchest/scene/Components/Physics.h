@@ -185,6 +185,15 @@ namespace Scene {
 		//! Sets the angular damping applied to a body.
 		void				    setAngularDamping( f32 value );
 
+        //! Moves the rigid body to a specified position.
+        void                    moveTo( const Vec2& position );
+
+        //! Returns the position this rigid body was moved to.
+        const Vec2&             movedTo( void ) const;
+
+        //! Returns true if the rigid body was moved outside the physics engine step.
+        bool                    wasMoved( void ) const;
+
 		//! Returns the torque applied to this rigid body.
 		f32					    torque( void ) const;
 
@@ -252,6 +261,8 @@ namespace Scene {
         Array<CollisionEvent>   m_collisionEvents;  //!< All collision events recorded since on simulation step.
         u16                     m_category;         //!< Rigid body category used in collision filtering.
         u16                     m_collisionMask;    //!< Collision mask used to filter collisions.
+        Vec2                    m_movedTo;          //!< World-space position this rigid body was moved.
+        bool                    m_wasMoved;         //!< Indicates that rigid body was moved.
 	};
 
 } // namespace Scene
