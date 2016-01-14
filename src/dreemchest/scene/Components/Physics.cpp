@@ -143,7 +143,7 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
 
 // ** RigidBody2D::RigidBody2D
 RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask )
-	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask ), m_wasMoved( false )
+	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask )
 {
 }
 
@@ -187,7 +187,7 @@ void RigidBody2D::setAngularDamping( f32 value )
 void RigidBody2D::moveTo( const Vec2& position )
 {
     m_movedTo  = position;
-    m_wasMoved = true;
+    m_flags.on( WasMoved );
 }
 
 // ** RigidBody2D::movedTo
@@ -199,7 +199,19 @@ const Vec2& RigidBody2D::movedTo( void ) const
 // ** RigidBody2D::wasMoved
 bool RigidBody2D::wasMoved( void ) const
 {
-    return m_wasMoved;
+    return m_flags.is( WasMoved );
+}
+
+// ** RigidBody2D::putToRest
+void RigidBody2D::putToRest( void )
+{
+    m_flags.on( WasPutToRest );
+}
+
+// ** RigidBody2D::wasPutToRest
+bool RigidBody2D::wasPutToRest( void ) const
+{
+    return m_flags.is( WasPutToRest );
 }
 
 // ** RigidBody2D::torque
@@ -306,7 +318,7 @@ void RigidBody2D::clear( void )
 {
 	m_torque = 0.0f;
 	m_force  = Vec2( 0.0f, 0.0f );
-    m_wasMoved = false;
+    m_flags.off( WasPutToRest | WasMoved );
 	m_forces.clear();
     m_impulses.clear();
 }

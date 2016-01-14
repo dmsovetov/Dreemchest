@@ -194,6 +194,12 @@ namespace Scene {
         //! Returns true if the rigid body was moved outside the physics engine step.
         bool                    wasMoved( void ) const;
 
+        //! Resets linear & angular velocities of a body and places the body to a rest.
+        void                    putToRest( void );
+
+        //! Returns true if velocities were rest.
+        bool                    wasPutToRest( void ) const;
+
 		//! Returns the torque applied to this rigid body.
 		f32					    torque( void ) const;
 
@@ -250,6 +256,12 @@ namespace Scene {
 
 	private:
 
+        //! Internal physical body flags.
+        enum {
+              WasMoved      = BIT( 0 )  //!< Rigid body was moved.
+            , WasPutToRest  = BIT( 1 )  //!< Rigid body was put to rest.
+        };
+
 		f32					    m_mass;				//!< The rigid body mass.
 		Type				    m_type;				//!< The rigid body type.
 		f32					    m_linearDamping;	//!< The linear damping applied to a body.
@@ -262,7 +274,7 @@ namespace Scene {
         u16                     m_category;         //!< Rigid body category used in collision filtering.
         u16                     m_collisionMask;    //!< Collision mask used to filter collisions.
         Vec2                    m_movedTo;          //!< World-space position this rigid body was moved.
-        bool                    m_wasMoved;         //!< Indicates that rigid body was moved.
+        FlagSet8                m_flags;            //!< State flags.
 	};
 
 } // namespace Scene
