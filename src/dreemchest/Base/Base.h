@@ -43,7 +43,6 @@
 #include "Composition.h"
 #include "FlagSet.h"
 
-#include "Containers/FixedSlots.h"
 #include "Containers/Slots.h"
 
 #include "delegate/Closure.h"
