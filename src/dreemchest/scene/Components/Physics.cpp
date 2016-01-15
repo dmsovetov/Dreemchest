@@ -183,6 +183,37 @@ void RigidBody2D::setAngularDamping( f32 value )
 	m_angularDamping = value;
 }
 
+// ** RigidBody2D::moveTo
+void RigidBody2D::moveTo( const Vec2& position )
+{
+    m_movedTo  = position;
+    m_flags.on( WasMoved );
+}
+
+// ** RigidBody2D::movedTo
+const Vec2& RigidBody2D::movedTo( void ) const
+{
+    return m_movedTo;
+}
+
+// ** RigidBody2D::wasMoved
+bool RigidBody2D::wasMoved( void ) const
+{
+    return m_flags.is( WasMoved );
+}
+
+// ** RigidBody2D::putToRest
+void RigidBody2D::putToRest( void )
+{
+    m_flags.on( WasPutToRest );
+}
+
+// ** RigidBody2D::wasPutToRest
+bool RigidBody2D::wasPutToRest( void ) const
+{
+    return m_flags.is( WasPutToRest );
+}
+
 // ** RigidBody2D::torque
 f32 RigidBody2D::torque( void ) const
 {
@@ -287,6 +318,7 @@ void RigidBody2D::clear( void )
 {
 	m_torque = 0.0f;
 	m_force  = Vec2( 0.0f, 0.0f );
+    m_flags.off( WasPutToRest | WasMoved );
 	m_forces.clear();
     m_impulses.clear();
 }

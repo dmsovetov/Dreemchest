@@ -316,9 +316,20 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 	// Get the body transform
 	const b2Transform& rigidBodyTransform = body->GetTransform();
 
+    // This rigid body was moved - sync the Box2D body with it
+    if( rigidBody.wasMoved() ) {
+        body->SetTransform( positionToBox2D( rigidBody.movedTo() ), rigidBodyTransform.q.GetAngle() );
+    }
+
 	// Update the Transform2D instance
 	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+
+    // Rigid body was put to rest - clear velocities
+    if( rigidBody.wasPutToRest() ) {
+        body->SetLinearVelocity( b2Vec2( 0.0f, 0.0f ) );
+        body->SetAngularVelocity( 0.0f );
+    }
 
 	// Now apply forces
 	f32			mass   = body->GetMass();
