@@ -24,22 +24,50 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Prefab_H__
-#define __DC_Scene_Prefab_H__
+#ifndef __DC_Scene_AssetFormat_H__
+#define __DC_Scene_AssetFormat_H__
 
-#include "Assets.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Prefab scene asset.
-	class Prefab {
-	public:
-	};
+    //! Generic base class for all asset format parsers.
+    template<typename TAsset>
+    class AssetFormat {
+    public:
+
+        //! Performs an asset data parsing from a stream.
+        virtual bool    parse( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
+    };
+
+    //! Loads an image from a raw pixel buffer format.
+    class ImageFormatRaw : public AssetFormat<Image> {
+    protected:
+
+        //! Loads image data from an input stream.
+        virtual bool    parse( Io::StreamPtr stream, Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+    };
+
+    //! Loads a mesh from a raw binary format.
+    class MeshFormatRaw : public AssetFormat<Mesh> {
+    protected:
+
+        //! Loads mesh data from an input stream.
+        virtual bool    parse( Io::StreamPtr stream, Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
+    };
+
+    //! Loads a material from a key-value storage.
+    class MaterialFormatKeyValue : public AssetFormat<Material> {
+    protected:
+
+        //! Loads material data from an input stream.
+        virtual bool    parse( Io::StreamPtr stream, Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+    };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Prefab_H__    */
+#endif    /*    !__DC_Scene_AssetFormat_H__    */

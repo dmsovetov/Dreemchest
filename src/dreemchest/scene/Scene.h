@@ -69,8 +69,8 @@ namespace Scene {
 
 	class Scene;
 	class RenderTarget;
-	class AssetBundle;
 	class Asset;
+    class Assets;
 
 	class Image;
 	class Mesh;
@@ -119,16 +119,6 @@ namespace Scene {
 		  PlaneXYBit	= BIT( PlaneXY )	//!< The XY coordinate plane bit mask.
 		, PlaneYZBit	= BIT( PlaneYZ )	//!< The YZ coordinate plane bit mask.
 		, PlaneXZBit	= BIT( PlaneXZ )	//!< The XZ coordinate plane bit mask.
-	};
-
-	//! Available asset formats.
-	enum AssetFormat {
-		  AssetFormatImageRaw	//!< Loads an image data from a raw pixel buffer format.
-		, AssetFormatMesh		//!< Loads a mesh data from a raw format.
-		, AssetFormatMaterial	//!< Loads material from a text key-value format.
-		, AssetFormatGenerated	//!< This is a generated asset - nothing to load from stream.
-
-		, TotalAssetFormats		//!< The total number of asset formats.
 	};
 
 	// Alias the Ecs::Entity type
