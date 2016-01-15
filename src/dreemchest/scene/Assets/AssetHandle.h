@@ -36,11 +36,8 @@ namespace Scene {
     //! This handles are issued by an Assets class and are the only way the outer world can access an asset.
     template<typename TAsset>
     class AssetHandle {
-    friend class Assets;
+    friend typename AssetPool<TAsset>;
     public:
-
-        typedef Slots<TAsset>       Pool;   //!< Alias the asset pool type.
-        typedef typename Pool::ID   ID;     //!< Alias the asset id type.
 
         //! This operator is used to access actual asset data.
         TAsset*                     operator -> ( void );
@@ -52,17 +49,17 @@ namespace Scene {
     private:
 
                                     //! Constructs the AssetHandle instance.
-                                    AssetHandle( const Pool* pool, ID id );
+                                    AssetHandle( const AssetPool<TAsset>& pool, AssetSlot slot );
 
     private:
 
-        const Pool*                 m_pool; //!< An asset pool that issued this handle.
-        ID                          m_id;   //!< Actual asset id.
+        const AssetPool<TAsset>&    m_pool; //!< An asset pool that issued this handle.
+        AssetSlot                   m_slot; //!< Asset slot.
     };
 
     // ** AssetHandle::AssetHandle
     template<typename TAsset>
-    AssetHandle<TAsset>::AssetHandle( const Pool* pool, ID id ) : m_pool( pool ), m_id( id )
+    AssetHandle<TAsset>::AssetHandle( const AssetPool<TAsset>& pool, AssetSlot slot ) : m_pool( pool ), m_slot( slot )
     {
     
     }
@@ -71,21 +68,21 @@ namespace Scene {
     template<typename TAsset>
     TAsset* AssetHandle<TAsset>::operator -> ( void )
     {
-        return isValid() ? &m_pool->get( m_id ) : NULL;
+        return isValid() ? const_cast<TAsset*>( &m_pool.assetAtSlot( m_slot ) ) : NULL;
     }
 
     // ** AssetHandle::operator ->
     template<typename TAsset>
     const TAsset* AssetHandle<TAsset>::operator -> ( void ) const
     {
-        return isValid() ? &m_pool->get( m_id ) : NULL;
+        return isValid() ? &m_pool.assetAtSlot( m_slot ) : NULL;
     }
 
     // ** AssetHandle::isValid
     template<typename TAsset>
     bool AssetHandle<TAsset>::isValid( void ) const
     {
-        return m_pool->has( m_id );
+        return m_pool.isValidSlot( m_slot );
     }
 
 } // namespace Scene

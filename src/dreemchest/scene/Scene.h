@@ -70,6 +70,7 @@ namespace Scene {
 	class Scene;
 	class RenderTarget;
 	class Asset;
+
     class Assets;
 
 	class Image;
@@ -84,8 +85,20 @@ namespace Scene {
 
 	class Rvm;
 
+    //! Asset slot handle
+    typedef OpaqueHandle<12, 20> AssetSlot;
+
     //! Forward declaration of an AssetHandle type.
     template<typename TAsset> class AssetHandle;
+
+    //! Forward declaration of an AssetFormat type.
+    template<typename TAsset> class AssetFormat;
+
+    //! Forward declaration of an AssetPool type.
+    template<typename TAsset> class AssetPool;
+
+    //! Asset identifier type.
+    typedef String AssetId;
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -140,13 +153,6 @@ namespace Scene {
 	dcDeclarePtrs( AssetBundle )
 	dcDeclarePtrs( AssetLoader )
 	dcDeclarePtrs( Asset )
-	//dcDeclarePtrs( Image )
-	//dcDeclarePtrs( Mesh )
-	//dcDeclarePtrs( Material )
-	//dcDeclarePtrs( Terrain )
-
-	//dcDeclarePtrs( AssetTexture )
-	//dcDeclarePtrs( AssetMesh )
 
 	dcDeclarePtrs( Box2DPhysics )
 	dcDeclarePtrs( RigidBody2D )
@@ -444,6 +450,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
     #include "Assets/AssetHandle.h"
+    #include "Assets/AssetFormat.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
