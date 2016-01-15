@@ -64,9 +64,9 @@ public:
 
 		// Create the particle system
 		//m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
-		m_assets->setUuidFileNames( false );
+		//m_assets->setUuidFileNames( false );
 
-		m_scene = Scene::Scene::createFromFile( m_assets, "assets/smoke_missile.prefab" );
+		//m_scene = Scene::Scene::createFromFile( m_assets, "assets/smoke_missile.prefab" );
 		//m_scene->addSystem<Scene::AssetSystem>( m_assets );
 
 		m_scene->findAllWithName( "smoke_missile" ).begin()->get()->get<Scene::Transform>()->setPosition( Vec3( -1000, 0, 0 ) );
@@ -109,7 +109,7 @@ public:
 	}
 
 	Renderer::HalPtr		m_hal;
-	Scene::AssetBundlePtr	m_assets;
+	//Scene::AssetBundlePtr	m_assets;
 	Scene::ScenePtr			m_scene;
 	Platform::FixedTimeStep	m_timeStep;
 	//! Scene rendering context.

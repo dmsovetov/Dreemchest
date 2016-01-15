@@ -115,8 +115,8 @@ class ParticleSystems : public ApplicationDelegate {
 
 	Renderer::HalPtr	m_hal;
 	ScenePtr			m_scene;
-	AssetBundlePtr		m_assets;
-	AssetBundlePtr		m_meshes;
+//	AssetBundlePtr		m_assets;
+//	AssetBundlePtr		m_meshes;
 
 	//! Scene rendering context.
 	RenderingContextPtr	m_renderingContext;
