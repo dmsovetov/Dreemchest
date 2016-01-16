@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** FrustumCullingSystem::begin
-bool FrustumCullingSystem::begin( u32 currentTime )
+bool FrustumCullingSystem::begin( u32 currentTime, f32 dt )
 {
 	// Clear frustums
 	m_frustums.clear();
@@ -57,7 +57,7 @@ bool FrustumCullingSystem::begin( u32 currentTime )
 		m_frustums.push_back( frustum );
 	}
 
-	return GenericEntitySystem::begin( currentTime );
+	return GenericEntitySystem::begin( currentTime, dt );
 }
 
 // ** FrustumCullingSystem::process

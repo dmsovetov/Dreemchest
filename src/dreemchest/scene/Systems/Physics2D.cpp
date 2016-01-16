@@ -247,7 +247,7 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 }
 
 // ** Box2DPhysics::begin
-bool Box2DPhysics::begin( u32 currentTime )
+bool Box2DPhysics::begin( u32 currentTime, f32 dt )
 {
 	m_world->Step( m_deltaTime, 6, 2 );
 	return true;

@@ -53,7 +53,7 @@ namespace Ecs {
 						EntitySystem( const String& name, const Aspect& aspect );
 
 		//! Called every update tick before processing entities.
-		virtual bool	begin( u32 currentTime );
+		virtual bool	begin( u32 currentTime, f32 dt );
 
 		//! Called every update tick after all entities are processed.
 		virtual void	end( void );

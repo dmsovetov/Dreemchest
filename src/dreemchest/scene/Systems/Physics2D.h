@@ -61,7 +61,7 @@ namespace Scene {
 		void					setDeltaTime( f32 value );
 
 		//! Updates the physics engine state.
-		virtual bool			begin( u32 currentTime ) DC_DECL_OVERRIDE;
+		virtual bool			begin( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
 
         //! Dispatches recorded collision events.
         virtual void            end( void ) DC_DECL_OVERRIDE;
