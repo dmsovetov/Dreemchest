@@ -46,7 +46,7 @@ namespace Scene {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
-								Box2DPhysics( f32 deltaTime = 0.01f, f32 scale = 1.0f, const Vec2& gravity = Vec2( 0.0f, -9.8f ) );
+								Box2DPhysics( f32 timeStep = 1.0f / 120.0f, f32 scale = 1.0f, const Vec2& gravity = Vec2( 0.0f, -9.8f ) );
 
 		//! Performs the ray casting and returns the closes point to the starting one.
 		bool					rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const;
@@ -57,8 +57,8 @@ namespace Scene {
 		//! Returns all scene objects that are intersected by a ray.
 		SceneObjectSet			querySegment( const Vec2& start, const Vec2& end ) const;
 
-		//! Sets the physics update delta time.
-		void					setDeltaTime( f32 value );
+		//! Sets the physics fixed time step.
+		void					setTimeStep( f32 value );
 
 		//! Updates the physics engine state.
 		virtual bool			begin( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
@@ -135,10 +135,12 @@ namespace Scene {
 			b2Body*				m_body;				//!< The attached Box2D body.
 		};
 
-		AutoPtr<b2World>		m_world;			//!< The Box2D physics world.
-        AutoPtr<Collisions>     m_collisions;       //!< Collision listener interface.
-		f32						m_scale;			//!< Physics world scale.
-		f32						m_deltaTime;		//!< Physics delta time.
+		AutoPtr<b2World>		m_world;			    //!< The Box2D physics world.
+        AutoPtr<Collisions>     m_collisions;           //!< Collision listener interface.
+		f32						m_scale;			    //!< Physics world scale.
+		f32						m_timeStep;		        //!< Physics fixed time step.
+        s32                     m_maxSimulationSteps;   //!< Maximum number of simulation steps to stop the spiral of death on low frame rates.
+        f32                     m_accumulator;          //!< Accumulated time that is split into fixed steps.
 	};
 
 #endif	/*	DC_BOX2D_ENABLED	*/
