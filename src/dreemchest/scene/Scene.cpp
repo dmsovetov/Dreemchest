@@ -252,7 +252,7 @@ ScenePtr Scene::create( void )
 }
 
 // ** Scene::createFromFile
-ScenePtr Scene::createFromFile( const AssetBundlePtr& assets, const String& fileName )
+ScenePtr Scene::createFromFile( const Assets& assets, const String& fileName )
 {
 	// Read the JSON file
 	String json = Io::DiskFileSystem::readTextFile( fileName );
@@ -262,21 +262,18 @@ ScenePtr Scene::createFromFile( const AssetBundlePtr& assets, const String& file
 }
 
 // ** Scene::createFromJson
-ScenePtr Scene::createFromJson( const AssetBundlePtr& assets, const String& json )
+ScenePtr Scene::createFromJson( const Assets& assets, const String& json )
 {
 #ifdef HAVE_JSON
 	// Create scene instance
 	ScenePtr scene( DC_NEW Scene );
 
-#if 0
 	// Load scene from JSON
 	JsonSceneLoader loader;
 
 	if( !loader.load( scene, assets, json ) ) {
 		return ScenePtr();
 	}
-#endif
-    DC_NOT_IMPLEMENTED
 
 	return scene;
 #else

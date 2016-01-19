@@ -81,26 +81,26 @@ void Material::setColor( Layer layer, const Rgba& value )
 }
 
 // ** Material::texture
-const AssetWPtr& Material::texture( Layer layer ) const
+ImageHandle Material::texture( Layer layer ) const
 {
 	return m_texture[layer];
 }
 
 // ** Material::setTexture
-void Material::setTexture( Layer layer, const AssetWPtr& value )
+void Material::setTexture( Layer layer, ImageHandle value )
 {
 	m_texture[layer] = value;
 	updateMaterialFeatures();
 }
 
 // ** Material::diffuse
-AssetWPtr Material::diffuse( void ) const
+ImageHandle Material::diffuse( void ) const
 {
 	return texture( Diffuse );
 }
 
 // ** Material::setDiffuse
-void Material::setDiffuse( AssetWPtr value )
+void Material::setDiffuse( ImageHandle value )
 {
 	setTexture( Diffuse, value );
 }
@@ -110,7 +110,7 @@ void Material::updateMaterialFeatures( void )
 {
 	m_features = 0;
 
-	if( m_texture[Diffuse].valid() ) {
+	if( m_texture[Diffuse].isValid() ) {
 		m_features |= FeatureDiffuse;
 	}
 }

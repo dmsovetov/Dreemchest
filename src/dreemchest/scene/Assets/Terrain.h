@@ -160,10 +160,10 @@ namespace Scene {
 		IndexBuffer				chunkIndexBuffer( void ) const;
 
 		//! Creates the chunk mesh.
-		AssetPtr				createChunkMesh( u32 x, u32 z ) const;
+		Mesh				    createChunkMesh( u32 x, u32 z ) const;
 
 		//! Creates the mesh for whole terrain.
-		AssetPtr				createMesh( void ) const;
+		Mesh				    createMesh( void ) const;
 
 	private:
 

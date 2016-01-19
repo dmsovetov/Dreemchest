@@ -90,16 +90,16 @@ namespace Scene {
 		void						setColor( Layer layer, const Rgba& value );
 
         //! Returns a material texture.
-        const AssetWPtr&			texture( Layer layer ) const;
+        ImageHandle			        texture( Layer layer ) const;
 
 		//! Sets material texture.
-		void						setTexture( Layer layer, const AssetWPtr& value );
+		void						setTexture( Layer layer, ImageHandle value );
 
 		//! Returns the diffuse material texture.
-		AssetWPtr					diffuse( void ) const;
+		ImageHandle					diffuse( void ) const;
 
 		//! Sets the diffuse material texture.
-		void						setDiffuse( AssetWPtr value );
+		void						setDiffuse( ImageHandle value );
 
 	private:
 
@@ -112,7 +112,7 @@ namespace Scene {
 		RenderingMode				m_renderingMode;				//!< Material blending.
 		u32							m_features;						//!< Used material features.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
-		AssetWPtr					m_texture[TotalMaterialLayers];	//!< Material textures.
+		ImageHandle					m_texture[TotalMaterialLayers];	//!< Material textures.
 	};
 
 } // namespace Scene

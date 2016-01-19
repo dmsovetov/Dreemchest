@@ -28,8 +28,7 @@
 #define __DC_Scene_Component_Rendering_H__
 
 #include "../Scene.h"
-#include "../Assets/Mesh.h"
-#include "../Assets/Image.h"
+#include "../Assets/AssetHandle.h"
 #include "../Rendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
@@ -140,14 +139,14 @@ namespace Scene {
 	public:
 
 									//! Constructs StaticMesh instance.
-									StaticMesh( const AssetPtr& mesh = AssetPtr() )
+									StaticMesh( const MeshHandle mesh = MeshHandle() )
 										: m_mesh( mesh ), m_visibility( ~0 ) {}
 
 		//! Returns mesh to be rendered.
-		AssetWPtr					mesh( void ) const;
+		MeshHandle					mesh( void ) const;
 
 		//! Sets a mesh to be rendered.
-		void						setMesh( const AssetPtr& value );
+		void						setMesh( MeshHandle value );
 
 		//! Returns the mesh world space bounding box.
 		const Bounds&				worldSpaceBounds( void ) const;
@@ -165,10 +164,10 @@ namespace Scene {
 		u32							materialCount( void ) const;
 
 		//! Returns the material by index.
-		AssetPtr					material( u32 index ) const;
+		MaterialHandle				material( u32 index ) const;
 
 		//! Sets the material by index.
-		void						setMaterial( u32 index, const AssetPtr& value );
+		void						setMaterial( u32 index, MaterialHandle value );
 
 		//! Returns a lightmap texture.
 		const Renderer::TexturePtr&	lightmap( void ) const;
@@ -187,9 +186,9 @@ namespace Scene {
 	private:
 
 		FlagSet16					m_visibility;		//!< Camera visibility mask.
-		AssetPtr				    m_mesh;				//!< Mesh to be rendered.
+		MeshHandle				    m_mesh;				//!< Mesh to be rendered.
 		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
-		Array<AssetPtr>			    m_materials;		//!< Mesh materials array.
+		Array<MaterialHandle>	    m_materials;		//!< Mesh materials array.
 		Renderer::TexturePtr		m_lightmap;			//!< Lightmap texture that is rendered for this mesh.
 	};
 
@@ -198,18 +197,18 @@ namespace Scene {
 	public:
 
 									//! Constructs the Sprite instance.
-									Sprite( const AssetPtr& image = AssetPtr(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+									Sprite( ImageHandle image = ImageHandle(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
 										: m_image( image ), m_color( color ) {}
 
 		//! Returns the sprite image.
-		const AssetPtr&				image( void ) const;
+		ImageHandle				    image( void ) const;
 
 		//! Returns the sprite color.
 		const Rgba&					color( void ) const;
 
 	private:
 
-		AssetPtr					m_image;	//!< Sprite image.
+		ImageHandle					m_image;	//!< Sprite image.
 		Rgba						m_color;	//!< Sprite color.
 	};
 
@@ -227,17 +226,17 @@ namespace Scene {
 		Fx::ParticleSystemWPtr			particles( void ) const;
 
 		//! Returns the material particles material.
-		AssetWPtr					    material( void ) const;
+		MaterialHandle					material( void ) const;
 
 		//! Sets the particles material.
-		void							setMaterial( const AssetPtr& value );
+		void							setMaterial( MaterialHandle value );
 
 	private:
 
 		
 		Fx::ParticleSystemPtr			m_particleSystem;	//!< Particle system.
 		Fx::ParticleSystemInstancePtr	m_instance;			//!< Particle system instance.
-		AssetWPtr					    m_material;			//!< Particle system material.
+		MaterialHandle				    m_material;			//!< Particle system material.
 	};
 
 	//! Camera component.

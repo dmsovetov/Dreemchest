@@ -219,7 +219,7 @@ Array<u16> Terrain::chunkIndexBuffer( void ) const
 }
 
 // ** Terrain::createMesh
-AssetPtr Terrain::createMesh( void ) const
+Mesh Terrain::createMesh( void ) const
 {
 	// Create an empty mesh
 	Mesh mesh;
@@ -247,11 +247,11 @@ AssetPtr Terrain::createMesh( void ) const
 	// Now update the mesh bounding box
 	mesh.updateBounds();
 
-	return Asset::create<Mesh>( mesh );
+	return mesh;
 }
 
 // ** Terrain::createChunkMesh
-AssetPtr Terrain::createChunkMesh( u32 x, u32 z ) const
+Mesh Terrain::createChunkMesh( u32 x, u32 z ) const
 {
 	// Create an empty mesh
 	Mesh mesh;
@@ -269,7 +269,7 @@ AssetPtr Terrain::createChunkMesh( u32 x, u32 z ) const
 	// Now update the mesh bounding box
 	mesh.updateBounds();
 
-	return Asset::create<Mesh>( mesh );
+	return mesh;
 }
 
 // ** Terrain::setMeshChunk

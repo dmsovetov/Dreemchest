@@ -26,6 +26,8 @@
 
 #include "TransformSystems.h"
 
+#include "../Assets/Mesh.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -70,12 +72,11 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 // ** WorldSpaceBoundingBoxSystem::process
 void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
-	if( !staticMesh.mesh().valid() ) {
+	if( !staticMesh.mesh().isValid() ) {
 		return;
 	}
 
-    DC_NOT_IMPLEMENTED;
-//	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->get<Mesh>().bounds() * transform.matrix() );
+	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
 }
 
 // ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //

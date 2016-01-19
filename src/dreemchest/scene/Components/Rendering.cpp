@@ -99,15 +99,15 @@ void Light::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
-AssetWPtr StaticMesh::mesh( void ) const
+MeshHandle StaticMesh::mesh( void ) const
 {
 	return m_mesh;
 }
 
 // ** StaticMesh::setMesh
-void StaticMesh::setMesh( const AssetPtr& value )
+void StaticMesh::setMesh( MeshHandle value )
 {
-	DC_BREAK_IF( !value.valid() );
+	DC_BREAK_IF( !value.isValid() );
 	m_mesh = value;
 }
 
@@ -143,13 +143,13 @@ u32 StaticMesh::materialCount( void ) const
 }
 
 // ** StaticMesh::material
-AssetPtr StaticMesh::material( u32 index ) const
+MaterialHandle StaticMesh::material( u32 index ) const
 {
-	return index < materialCount() ? m_materials[index] : AssetPtr();
+	return index < materialCount() ? m_materials[index] : MaterialHandle();
 }
 
 // ** StaticMesh::setMaterial
-void StaticMesh::setMaterial( u32 index, const AssetPtr& value )
+void StaticMesh::setMaterial( u32 index, MaterialHandle value )
 {
 	DC_BREAK_IF( index > 8 );
 
@@ -227,13 +227,13 @@ Fx::ParticleSystemWPtr Particles::particles( void ) const
 }
 
 // ** Particles::material
-AssetWPtr Particles::material( void ) const
+MaterialHandle Particles::material( void ) const
 {
 	return m_material;
 }
 
 // ** Particles::setMaterial
-void Particles::setMaterial( const AssetPtr& value )
+void Particles::setMaterial( MaterialHandle value )
 {
 	m_material = value;
 }
@@ -241,7 +241,7 @@ void Particles::setMaterial( const AssetPtr& value )
 // ---------------------------------------------- Sprite ---------------------------------------------- //
 
 // ** Sprite::image
-const AssetPtr& Sprite::image( void ) const
+ImageHandle Sprite::image( void ) const
 {
 	return m_image;
 }

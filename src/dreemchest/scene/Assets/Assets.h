@@ -27,7 +27,8 @@
 #ifndef __DC_Scene_Assets_H__
 #define __DC_Scene_Assets_H__
 
-#include "Asset.h"
+#include "AssetHandle.h"
+#include "AssetPool.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,16 +40,101 @@ namespace Scene {
 
                             ~Assets( void );
 
-        //! Adds new asset.
+        //! Adds new asset of specified type.
+        template<typename TAsset>
+        AssetHandle<TAsset> add( const AssetId& id, AssetFormat<TAsset>* format );
 
+        //! Removes an asset of specified type.
+        template<typename TAsset>
+        void                remove( const AssetId& id );
+
+        //! Returns an asset of specified type.
+        template<typename TAsset>
+        AssetHandle<TAsset> get( const AssetId& id ) const;
 
     private:
 
-        //! Container type to store all available assets.
-        typedef Hash<Asset> AssetInfo;
+        //! Returns the asset pool by it's type or creates a new one.
+        template<typename TAsset>
+        AssetPool<TAsset>*  requestAssetPool( void );
 
-        AssetInfo           m_assetInfo;    //!< All added assets reside here.
+        //! Returns the asset pool by it's type.
+        template<typename TAsset>
+        AssetPool<TAsset>*  findAssetPool( void ) const;
+
+    private:
+
+        //! Container type to store all available asset pools.
+        typedef Map<TypeIdx, AbstractAssetPool*> AssetPools;
+
+        AssetPools          m_assetPools;   //!< All added asset pools reside here.
     };
+
+    // ** Assets::add
+    template<typename TAsset>
+    AssetHandle<TAsset> Assets::add( const AssetId& id, AssetFormat<TAsset>* format )
+    {
+        AssetPool<TAsset>* pool = requestAssetPool<TAsset>();
+        DC_BREAK_IF( pool == NULL );
+        return pool->add( id, format );
+    }
+
+    // ** Assets::remove
+    template<typename TAsset>
+    void Assets::remove( const AssetId& id )
+    {
+        AssetPool<TAsset>* pool = requestAssetPool<TAsset>();
+        DC_BREAK_IF( pool == NULL );
+        pool->remove( id );
+    }
+
+    // ** Assets::get
+    template<typename TAsset>
+    AssetHandle<TAsset> Assets::get( const AssetId& id ) const
+    {
+        if( AssetPool<TAsset>* pool = findAssetPool<TAsset>() ) {
+            return pool->get( id );
+        }
+       
+        return AssetHandle<TAsset>();
+    }
+
+    // ** Assets::requestAssetPool
+    template<typename TAsset>
+    AssetPool<TAsset>* Assets::requestAssetPool( void )
+    {
+        // Generate asset type
+        TypeIdx idx = GroupedTypeIndex<TAsset, Assets>::idx();
+
+        // Lookup the pool
+        AssetPools::iterator i = m_assetPools.find( idx );
+
+        if( i != m_assetPools.end() ) {
+            return static_cast<AssetPool<TAsset>*>( i->second );
+        }
+
+        AssetPool<TAsset>* pool = DC_NEW AssetPool<TAsset>;
+        m_assetPools[idx] = pool;
+
+        return pool;
+    }
+
+    // ** Assets::findAssetPool
+    template<typename TAsset>
+    AssetPool<TAsset>* Assets::findAssetPool( void ) const
+    {
+        // Generate asset type
+        TypeIdx idx = GroupedTypeIndex<TAsset, Assets>::idx();
+
+        // Lookup the pool
+        AssetPools::const_iterator i = m_assetPools.find( idx );
+
+        if( i == m_assetPools.end() ) {
+            return NULL;
+        }
+
+        return static_cast<AssetPool<TAsset>*>( i->second );
+    }
 
     // --------------------------------------------------------------------------------------------------------------------------------- //
 

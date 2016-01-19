@@ -69,8 +69,6 @@ namespace Scene {
 
 	class Scene;
 	class RenderTarget;
-	class Asset;
-
     class Assets;
 
 	class Image;
@@ -102,6 +100,18 @@ namespace Scene {
 
     //! Asset identifier type.
     typedef String AssetId;
+
+    //! Image handle type.
+    typedef AssetHandle<class Image> ImageHandle;
+
+    //! Mesh handle type.
+    typedef AssetHandle<class Mesh> MeshHandle;
+
+    //! Material handle type.
+    typedef AssetHandle<class Material> MaterialHandle;
+
+    //! Terrain handle type.
+    typedef AssetHandle<class Terrain> TerrainHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -153,9 +163,6 @@ namespace Scene {
 	dcDeclarePtrs( Light )
 	dcDeclarePtrs( RenderPassBase )
 	dcDeclarePtrs( ShaderCache )
-	dcDeclarePtrs( AssetBundle )
-	dcDeclarePtrs( AssetLoader )
-	dcDeclarePtrs( Asset )
 
 	dcDeclarePtrs( Box2DPhysics )
 	dcDeclarePtrs( RigidBody2D )
@@ -186,9 +193,6 @@ namespace Scene {
 
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;
-
-	//! Container type to store a set of assets.
-	typedef Set<AssetPtr> AssetSet;
 
 	//! A helper struct to store results of a scene ray tracing.
 	struct RayTracingResult {
@@ -270,10 +274,10 @@ namespace Scene {
 		static ScenePtr					create( void );
 
 		//! Creates scene and loads it from JSON file.
-		static ScenePtr					createFromFile( const AssetBundlePtr& assets, const String& fileName );
+		static ScenePtr					createFromFile( const Assets& assets, const String& fileName );
 
 		//! Creates scene and loads it from JSON string.
-		static ScenePtr					createFromJson( const AssetBundlePtr& assets, const String& json );
+		static ScenePtr					createFromJson( const Assets& assets, const String& json );
 
 		//! This event is emitted when a new scene object was added.
 		struct SceneObjectAdded {
@@ -337,8 +341,6 @@ namespace Scene {
 
 #ifdef HAVE_JSON
 
-#if 0
-
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader : public Io::JsonLoaderBase {
 	public:
@@ -347,7 +349,7 @@ namespace Scene {
 									JsonSceneLoader( void );
 
 		//! Loads the scene from string.
-		bool						load( ScenePtr scene, const AssetBundlePtr& assets, const String& json );
+		bool						load( ScenePtr scene, const Assets& assets, const String& json );
 
 	private:
 
@@ -425,7 +427,7 @@ namespace Scene {
 		//! Container type to store parsed components.
 		typedef Map<String, Ecs::ComponentPtr> Components;
 
-		AssetBundlePtr				m_assets;					//!< Available assets.
+		const Assets&				m_assets;					//!< Available assets.
 		Json::Value					m_json;						//!< Parsed JSON.
 		ScenePtr					m_scene;					//!< The scene to be loaded.
 		SceneObjects				m_sceneObjects;				//!< Parsed scene objects.
@@ -434,8 +436,6 @@ namespace Scene {
 		ModuleLoaders				m_moduleLoaders;			//!< Available module loaders.
 		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
 	};
-
-#endif
 
 #endif	/*	HAVE_JSON	*/
 

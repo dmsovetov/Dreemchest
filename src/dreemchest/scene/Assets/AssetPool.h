@@ -33,9 +33,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Base class for all asset pools.
+    class AbstractAssetPool {
+    public:
+
+        virtual                     ~AbstractAssetPool( void ) {}
+    };
+
     //! Generic class to store all available assets of type TAsset.
     template<typename TAsset>
-    class AssetPool {
+    class AssetPool : public AbstractAssetPool {
     friend typename AssetHandle<TAsset>;
     friend typename AssetWriteLock<TAsset>;
     public:
@@ -146,7 +153,10 @@ namespace Scene {
     typename AssetPool<TAsset>::Handle AssetPool<TAsset>::get( const AssetId& id )
     {
         AssetSlotsById::const_iterator i = m_slotById.find( id );
-        DC_BREAK_IF( i == m_slotById.end() );
+
+        if( i == m_slotById.end() ) {
+            return Handle();
+        }
 
         return Handle( *this, i->second );
     }
@@ -158,7 +168,7 @@ namespace Scene {
         return m_assets.get( slot );
     }
 
-    // ** // ** AssetPool::isValidSlot
+    // ** AssetPool::isValidSlot
     template<typename TAsset>
     bool AssetPool<TAsset>::isValidSlot( SlotIndex32 slot ) const
     {

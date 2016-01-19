@@ -30,6 +30,14 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** Assets::Assets
+Assets::~Assets( void )
+{
+    for( AssetPools::iterator i = m_assetPools.begin(), end = m_assetPools.end(); i != end; ++i ) {
+        delete i->second;
+    }
+}
+
 /*// ------------------------------------------- Asset ------------------------------------------- //
 
 // ** Asset::Asset
