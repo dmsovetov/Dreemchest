@@ -101,6 +101,22 @@ namespace Scene {
     //! Asset identifier type.
     typedef String AssetId;
 
+    //! Asset type id.
+    typedef TypeIdx AssetTypeId;
+
+    //! Abstract asset handle.
+    class Asset {
+    public:
+
+    private:
+
+        AssetTypeId         m_type; //!< Asset type.
+        SlotIndex32         m_slot; //!< Asset slot.
+    };
+
+    //! Set of assets.
+    typedef Set<Asset> AssetSet;
+
     //! Image handle type.
     typedef AssetHandle<class Image> ImageHandle;
 
@@ -346,10 +362,10 @@ namespace Scene {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.
-									JsonSceneLoader( void );
+									JsonSceneLoader( const Assets& assets );
 
 		//! Loads the scene from string.
-		bool						load( ScenePtr scene, const Assets& assets, const String& json );
+		bool						load( ScenePtr scene, const String& json );
 
 	private:
 
@@ -452,6 +468,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
+    #include "Assets/Prefab.h"
     #include "Assets/AssetHandle.h"
     #include "Assets/AssetPool.h"
     #include "Assets/AssetFormat.h"

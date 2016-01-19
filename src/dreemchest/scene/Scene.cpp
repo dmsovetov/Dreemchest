@@ -269,9 +269,9 @@ ScenePtr Scene::createFromJson( const Assets& assets, const String& json )
 	ScenePtr scene( DC_NEW Scene );
 
 	// Load scene from JSON
-	JsonSceneLoader loader;
+	JsonSceneLoader loader( assets );
 
-	if( !loader.load( scene, assets, json ) ) {
+	if( !loader.load( scene, json ) ) {
 		return ScenePtr();
 	}
 
@@ -286,10 +286,8 @@ ScenePtr Scene::createFromJson( const Assets& assets, const String& json )
 
 #ifdef HAVE_JSON
 
-#if 0
-
 // ** JsonSceneLoader::JsonSceneLoader
-JsonSceneLoader::JsonSceneLoader( void )
+JsonSceneLoader::JsonSceneLoader( const Assets& assets ) : m_assets( assets )
 {
 	m_loaders["Transform"]				= dcThisMethod( JsonSceneLoader::readTransform );
 	m_loaders["Renderer"]				= dcThisMethod( JsonSceneLoader::readRenderer );
@@ -309,13 +307,13 @@ JsonSceneLoader::JsonSceneLoader( void )
 }
 
 // ** JsonSceneLoader::load
-bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const String& json )
+bool JsonSceneLoader::load( ScenePtr scene, const String& json )
 {
 	// Declare the particle material factory.
 	struct ParticleMaterialFactory : public Fx::IMaterialFactory {
 
 		//! Constructs ParticleMaterialFactory instance.
-		ParticleMaterialFactory( AssetBundleWPtr assets )
+		ParticleMaterialFactory( const Assets& assets )
 			: m_assets( assets ) {}
 
 
@@ -334,7 +332,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 
 	private:
 
-		AssetBundleWPtr	m_assets;	//!< Asset bundle to use.		
+		const Assets&	m_assets;	//!< Asset bundle to use.		
 	};
 
 	Json::Reader reader;
@@ -344,14 +342,11 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 		return false;
 	}
 
-	// Set the asset bundle reference
-	m_assets = assets;
-
 	// Save the scene reference.
 	m_scene = scene;
 
 	// Construct the particle material instance.
-	m_particleMaterialFactory = Fx::IMaterialFactoryPtr( DC_NEW ParticleMaterialFactory( assets ) );
+	m_particleMaterialFactory = Fx::IMaterialFactoryPtr( DC_NEW ParticleMaterialFactory( m_assets ) );
 
 	// Read objects from JSON
 	for( Json::ValueIterator i = m_json.begin(), end = m_json.end(); i != end; ++i ) {
@@ -768,8 +763,6 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 		DC_BREAK;
 	}
 }
-
-#endif
 
 #endif	/*	HAVE_JSON	*/
 

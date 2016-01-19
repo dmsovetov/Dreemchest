@@ -44,47 +44,47 @@ DC_BEGIN_COMPOSER
 			, Smooth
 		};
 
-							//! Constructs TerrainTool instance.
-							TerrainTool( Scene::TerrainWPtr terrain = Scene::TerrainWPtr(), f32 radius = 1.0f, f32 strength = 0.1f, f32 exp = 1.0f );
+							    //! Constructs TerrainTool instance.
+							    TerrainTool( Scene::TerrainHandle terrain = Scene::TerrainHandle(), f32 radius = 1.0f, f32 strength = 0.1f, f32 exp = 1.0f );
 
 		//! Returns tool radius.
-		f32					radius( void ) const;
+		f32					    radius( void ) const;
 
 		//! Sets tool radius.
-		void				setRadius( f32 value );
+		void				    setRadius( f32 value );
 
 		//! Returns tool strength.
-		f32					strength( void ) const;
+		f32					    strength( void ) const;
 
 		//! Sets tool strength.
-		void				setStrength( f32 value );
+		void				    setStrength( f32 value );
 
 		//! Returns the affected terrain.
-		Scene::TerrainWPtr	terrain( void ) const;
+		Scene::TerrainHandle    terrain( void ) const;
 
 		//! Returns the influence at specified distance.
-		f32					influence( f32 distance ) const;
+		f32					    influence( f32 distance ) const;
 
 		//! Returns tool type.
-		Type				type( void ) const;
+		Type				    type( void ) const;
 
 		//! Sets tool type.
-		void				setType( Type value );
+		void				    setType( Type value );
 
         //! Returns tool exponentiation factor.
-        f32                 exp( void ) const;
+        f32                     exp( void ) const;
 
         //! Sets tool exponentiation factor.
-        void                setExp( f32 value );
+        void                    setExp( f32 value );
 
 	private:
 
-		f32					m_radius;	//!< Terrain tool radius.
-		f32					m_strength;	//!< Terrain tool strength.
-		Type				m_type;		//!< Tool type.
-        f32                 m_exp;      //!< Tool exponentiation factor.
+		f32					    m_radius;	//!< Terrain tool radius.
+		f32					    m_strength;	//!< Terrain tool strength.
+		Type				    m_type;		//!< Tool type.
+        f32                     m_exp;      //!< Tool exponentiation factor.
 
-		Scene::TerrainWPtr	m_terrain;	//!< Affected terrain instance.
+		Scene::TerrainHandle	m_terrain;	//!< Affected terrain instance.
 	};
 
 	//! Used for terrain heightmap editing.
@@ -103,22 +103,22 @@ DC_BEGIN_COMPOSER
 		bool				isPointInside( const Vec3& point, f32 radius, const Editors::TerrainChunk& chunk ) const;
 
         //! Applies the lowering tool.
-        f32                 applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+        f32                 applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
 
         //! Applies the raising tool.
-        f32                 applyRaising( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+        f32                 applyRaising( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
 
         //! Applies the flattening tool.
-        f32                 applyFlattening( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+        f32                 applyFlattening( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
 
         //! Applies the leveling tool.
-        f32                 applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+        f32                 applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
 
         //! Applies the smoothing tool.
-        f32                 applySmoothing( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const;
+        f32                 applySmoothing( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
 
         //! Returns an average terrain height around the specified point with given radius.
-        f32                 calculateAverageHeight( Scene::TerrainWPtr terrain, s32 x, s32 z, s32 radius ) const;
+        f32                 calculateAverageHeight( Scene::TerrainHandle terrain, s32 x, s32 z, s32 radius ) const;
 
 	private:
 

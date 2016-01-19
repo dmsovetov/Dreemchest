@@ -30,11 +30,13 @@
 DC_BEGIN_COMPOSER
 
 // ** MaterialModel::MaterialModel
-MaterialModel::MaterialModel( Scene::MaterialWPtr material, QObject* parent ) : PropertyModel( parent ), m_material( material )
+MaterialModel::MaterialModel( Scene::MaterialHandle material, QObject* parent ) : PropertyModel( parent ), m_material( material )
 {
-	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, material.get() ), BindSetter( Scene::Material::setRenderingMode, material.get() ) );
-	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, material.get() ), BindSetter( Scene::Material::setModel, material.get() ) );
-	addAsset<Scene::ImageWPtr>( "Diffuse", BindGetter( Scene::Material::diffuse, material.get() ), BindSetter( Scene::Material::setDiffuse, material.get() ) );
+    DC_NOT_IMPLEMENTED
+//    const Scene::Material& instance = material.readLock();
+//	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, instance ), BindSetter( Scene::Material::setRenderingMode, instance ) );
+//	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, instance ), BindSetter( Scene::Material::setModel, instance ) );
+//	addAsset<Scene::ImageHandle>( "Diffuse", BindGetter( Scene::Material::diffuse, instance ), BindSetter( Scene::Material::setDiffuse, instance ) );
 }
 
 DC_END_COMPOSER

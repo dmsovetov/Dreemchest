@@ -32,7 +32,7 @@ DC_BEGIN_COMPOSER
 // --------------------------------------------------------------------- TerrainTool ------------------------------------------------------------------------ //
 
 // ** TerrainTool::TerrainTool
-TerrainTool::TerrainTool( Scene::TerrainWPtr terrain, f32 radius, f32 strength, f32 exp ) : m_radius( radius ), m_terrain( terrain ), m_strength( strength ), m_type( Raise ), m_exp( exp )
+TerrainTool::TerrainTool( Scene::TerrainHandle terrain, f32 radius, f32 strength, f32 exp ) : m_radius( radius ), m_terrain( terrain ), m_strength( strength ), m_type( Raise ), m_exp( exp )
 {
 
 }
@@ -74,7 +74,7 @@ void TerrainTool::setExp( f32 value )
 }
 
 // ** TerrainTool::terrain
-Scene::TerrainWPtr TerrainTool::terrain( void ) const
+Scene::TerrainHandle TerrainTool::terrain( void ) const
 {
 	return m_terrain;
 }
@@ -138,6 +138,7 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 		return;
 	}
 
+#if 0
 	// Get terrain heightmap.
 	Scene::TerrainWPtr terrain   = chunk.terrain();
 	Scene::Heightmap&  heightmap = terrain->heightmap();
@@ -207,6 +208,9 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 
 	// Rebuild terrain mesh.
 	mesh.mesh()->invalidateRenderable();
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ** TerrainHeightmapSystem::isPointInside
@@ -219,19 +223,19 @@ bool TerrainHeightmapSystem::isPointInside( const Vec3& point, f32 radius, const
 }
 
 // ** TerrainHeightmapSystem::applyLowering
-f32 TerrainHeightmapSystem::applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const
+f32 TerrainHeightmapSystem::applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
     return vertex.y - influence;
 }
 
 // ** TerrainHeightmapSystem::applyRaising
-f32 TerrainHeightmapSystem::applyRaising( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const
+f32 TerrainHeightmapSystem::applyRaising( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
     return vertex.y + influence;
 }
 
 // ** TerrainHeightmapSystem::applyFlattening
-f32 TerrainHeightmapSystem::applyFlattening( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const
+f32 TerrainHeightmapSystem::applyFlattening( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
     // Calculate avarage terrain height in affected radius.
     f32 average = calculateAverageHeight( terrain, x, z, 10 );
@@ -249,7 +253,7 @@ f32 TerrainHeightmapSystem::applyFlattening( const Vec3& vertex, s32 x, s32 z, S
 }
 
 // ** TerrainHeightmapSystem::applyLeveling
-f32 TerrainHeightmapSystem::applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const
+f32 TerrainHeightmapSystem::applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
     // Calculate target height.
     f32 height = terrain->maxHeight() * strength;
@@ -264,7 +268,7 @@ f32 TerrainHeightmapSystem::applyLeveling( const Vec3& vertex, s32 x, s32 z, Sce
 }
 
 // ** TerrainHeightmapSystem::applySmoothing
-f32 TerrainHeightmapSystem::applySmoothing( const Vec3& vertex, s32 x, s32 z, Scene::TerrainWPtr terrain, f32 influence, f32 strength ) const
+f32 TerrainHeightmapSystem::applySmoothing( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
     // Calculate avarage terrain height around the vertex.
     f32 average = calculateAverageHeight( terrain, x, z, 1 );
@@ -290,7 +294,7 @@ f32 TerrainHeightmapSystem::applySmoothing( const Vec3& vertex, s32 x, s32 z, Sc
 }
 
 // ** TerrainHeightmapSystem::calculateAverageHeight
-f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainWPtr terrain, s32 x, s32 z, s32 radius ) const
+f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain, s32 x, s32 z, s32 radius ) const
 {
     f32 average = 0.0f;
     s32 count   = 0;
@@ -322,7 +326,7 @@ void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rv
 	s32 x = transform.position().x;
 	s32 z = transform.position().z;
 
-	Scene::TerrainWPtr terrain = tool.terrain();
+	Scene::TerrainHandle terrain = tool.terrain();
 
 	for( s32 j = z - r; j < z + r; j++ ) {
 		for( s32 i = x - r; i < x + r; i++ ) {

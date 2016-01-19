@@ -29,7 +29,7 @@
 DC_BEGIN_COMPOSER
 
 // ** SceneModel::SceneModel
-SceneModel::SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
+SceneModel::SceneModel( Scene::Assets& assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
 {
     qCheckParent( parent )
 	scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( SceneModel::handleSceneObjectAdded ) );
@@ -228,6 +228,7 @@ void SceneModel::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Sc
 // ** SceneModel::acceptableDropAction
 SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
 {
+#if 0
 	// No valid assets - can't drop
 	if( assets.empty() ) {
 		return AssetAction::Invalid;
@@ -249,11 +250,16 @@ SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet
 	}
 
 	return assetAction;
+#else
+    DC_NOT_IMPLEMENTED;
+    return AssetAction( AssetAction::Invalid );
+#endif
 }
 
 // ** SceneModel::performAssetAction
 bool SceneModel::performAssetAction( const AssetAction& action )
 {
+#if 0
 	// Get the target scene object.
 	Scene::SceneObjectWPtr target = action.sceneObject;
 
@@ -279,24 +285,32 @@ bool SceneModel::performAssetAction( const AssetAction& action )
 	}
 
 	return true;
+#else
+    DC_NOT_IMPLEMENTED
+    return false;
+#endif
 }
 
 // ** SceneModel::applyMaterial
-void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material )
+void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialHandle material )
 {
+#if 0
 	DC_BREAK_IF( !target.valid() );
 	DC_BREAK_IF( !target->has<Scene::StaticMesh>() );
-	DC_BREAK_IF( !material.valid() );
+	DC_BREAK_IF( !material.isValid() );
 
 	// Queue material for loading.
 	material->bundle()->queueForLoading( material );
 
 	// Set mesh material
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
+#else
+    DC_NOT_IMPLEMENTED;
+#endif
 }
 
 // ** SceneModel::placeTerrain
-Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point )
+Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainHandle terrain, const Vec3& point )
 {
 	// Get the scene.
 	Scene::SceneWPtr scene = m_scene;
@@ -313,12 +327,13 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainWPtr terrain, con
 	for( u32 z = 0; z < terrain->chunkCount(); z++ ) {
 		for( u32 x = 0; x < terrain->chunkCount(); x++ ) {
 			Scene::SceneObjectPtr chunk = scene->createSceneObject();
-			Scene::MeshPtr		  mesh  = terrain->createChunkMesh( x, z );
+			Scene::Mesh		      mesh  = terrain->createChunkMesh( x, z );
 
-			chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
-			chunk->attach<Scene::StaticMesh>( mesh );
-			chunk->attach<Editors::TerrainChunk>( terrain, x, z );
-			chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
+            DC_NOT_IMPLEMENTED
+		//	chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
+		//	chunk->attach<Scene::StaticMesh>( mesh );
+		//	chunk->attach<Editors::TerrainChunk>( terrain, x, z );
+		//	chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
 			
 			scene->addSceneObject( chunk );
 		}
@@ -328,12 +343,10 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainWPtr terrain, con
 }
 
 // ** SceneModel::placeStaticMesh
-Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point )
+Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, const Vec3& point )
 {
-	DC_BREAK_IF( !mesh.valid() );
-
-	// Load the mesh
-	m_scene->system<Scene::AssetSystem>()->load( mesh );
+#if 0
+	DC_BREAK_IF( !mesh.isValid() );
 
 	// Construct scene object
 	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
@@ -368,6 +381,10 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshWPtr mesh, const 
 	}
 
 	return sceneObject;
+#else
+    DC_NOT_IMPLEMENTED;
+    return Scene::SceneObjectWPtr();
+#endif
 }
 
 DC_END_COMPOSER

@@ -65,7 +65,7 @@
 DC_BEGIN_COMPOSER
 
 	// Declare Qt metatypes
-	Q_DECLARE_METATYPE( Scene::AssetWPtr )
+	//Q_DECLARE_METATYPE( Scene::AssetWPtr )
 	//Q_DECLARE_METATYPE( Scene::ImageWPtr )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
 	Q_DECLARE_METATYPE( Scene::Material::Model )
@@ -136,11 +136,11 @@ DC_BEGIN_COMPOSER
 		public:
 
 									//! Constructs TerrainChunk instance.
-									TerrainChunk( Scene::TerrainPtr chunk = Scene::TerrainPtr(), u32 x = 0, u32 z = 0 )
+									TerrainChunk( Scene::TerrainHandle chunk = Scene::TerrainHandle(), u32 x = 0, u32 z = 0 )
 										: m_terrain( chunk ), m_x( x ), m_z( z ) {}
 
 			//! Returns terrain instance.
-			Scene::TerrainWPtr		terrain( void ) const { return m_terrain; }
+			Scene::TerrainHandle    terrain( void ) const { return m_terrain; }
 
 			//! Returns chunk X.
 			u32						x( void ) const { return m_x; } // column
@@ -150,7 +150,7 @@ DC_BEGIN_COMPOSER
 
 		private:
 
-			Scene::TerrainPtr		m_terrain;	//!< Terrain asset.
+			Scene::TerrainHandle    m_terrain;	//!< Terrain asset.
 			u32						m_x;		//!< Chunk X coordinate.
 			u32						m_z;		//!< Chunk Z coordinate.
 		};
@@ -280,7 +280,7 @@ DC_BEGIN_COMPOSER
 		Scene::AssetSet			assetsFromMime( MimeDataQPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Scene::AssetPtr			assetFromMime( MimeDataQPtr mime ) const;
+		Scene::Asset			assetFromMime( MimeDataQPtr mime ) const;
 
 	private:
 

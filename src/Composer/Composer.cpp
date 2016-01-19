@@ -242,12 +242,12 @@ void Composer::closeProject( void )
 }
 
 // ** Composer::assetFromMime
-Scene::AssetPtr Composer::assetFromMime( MimeDataQPtr mime ) const
+Scene::Asset Composer::assetFromMime( MimeDataQPtr mime ) const
 {
 	Scene::AssetSet assets = assetsFromMime( mime );
 
 	if( assets.empty() ) {
-		return Scene::AssetPtr();
+		return Scene::Asset();
 	}
 
 	return *assets.begin();
@@ -273,12 +273,13 @@ Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 
 		DC_BREAK_IF( !meta.isObject() );
 
+        DC_NOT_IMPLEMENTED;
 		// Find asset by UUID.
-		Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
-		DC_BREAK_IF( !asset.valid() );
+		//Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
+		//DC_BREAK_IF( !asset.valid() );
 
 		// Add to set.
-		result.insert( asset );
+		//result.insert( asset );
 	}
 
 	return result;

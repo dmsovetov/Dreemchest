@@ -37,7 +37,8 @@ DC_BEGIN_COMPOSER
 Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
 {
 	// Create an asset bundle
-	m_bundle = Scene::AssetBundle::create( "Assets", path );
+	//m_bundle = Scene::AssetBundle::create( "Assets", path );
+    qWarning() << "Assets::Assets : no assets path set.";
 
 	// Declare asset importers.
 #ifdef HAVE_TIFF
@@ -58,17 +59,19 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
 }
 
 // ** Assets::bundle
-Scene::AssetBundleWPtr Assets::bundle( void ) const
+Scene::Assets& Assets::bundle( void ) const
 {
-	return m_bundle;
+    DC_NOT_IMPLEMENTED; // remove cast
+	return const_cast<Scene::Assets&>( m_bundle );
 }
 
 // ** Assets::createAssetForFile
-Scene::AssetPtr Assets::createAssetForFile( const FileInfo& fileInfo )
+Scene::Asset Assets::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Scene::Asset::Type type = assetTypeFromExtension( fileInfo.extension() );
+	Scene::AssetTypeId type = assetTypeFromExtension( fileInfo.extension() );
 
+#if 0
 	// Create asset by type
 	Scene::AssetPtr asset = m_bundle->createAssetByType( type );
 
@@ -78,28 +81,36 @@ Scene::AssetPtr Assets::createAssetForFile( const FileInfo& fileInfo )
 
 	// Set meta file
 	m_assetFileSystem->setMetaData( fileInfo, asset->keyValue() );
+    return asset;
 
-	return asset;
+#else
+    DC_NOT_IMPLEMENTED
+    return Scene::Asset();
+#endif
 }
 
 // ** Assets::registerExtension
-void Assets::registerExtension( const String& extension, Scene::Asset::Type type )
+void Assets::registerExtension( const String& extension, Scene::AssetTypeId type )
 {
 	m_assetTypes[extension] = type;
 }
 
 // ** Assets::assetTypeFromExtension
-Scene::Asset::Type Assets::assetTypeFromExtension( const String& extension ) const
+Scene::AssetTypeId Assets::assetTypeFromExtension( const String& extension ) const
 {
 	AssetTypes::const_iterator i = m_assetTypes.find( extension );
-	return i != m_assetTypes.end() ? i->second : Scene::Asset::TotalAssetTypes;
+	return i != m_assetTypes.end() ? i->second : ~0;
 }
 
 // ** Assets::removeAssetFromCache
 void Assets::removeAssetFromCache( const QString& uuid, const FileInfo& file )
 {
+#if 0
 	// Remove asset from bundle
 	m_bundle->removeAsset( uuid.toStdString() );
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 
 	// Remove asset from cache
     qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid.toStdString() ).c_str() );
@@ -147,7 +158,7 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
 	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
-
+#if 0
 	// Added asset
 	Scene::AssetPtr asset;
 
@@ -173,6 +184,9 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 
 	// Put asset to cache
 	updateAssetCache( QString::fromStdString( asset->uuid() ), fileInfo );
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ** Assets::cacheFolderFromUuid

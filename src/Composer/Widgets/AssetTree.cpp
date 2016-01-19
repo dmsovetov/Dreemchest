@@ -45,7 +45,8 @@ namespace Ui {
 // ** AssetSelector::AssetSelector
 AssetSelector::AssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
 {
-	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
+    DC_NOT_IMPLEMENTED
+//	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
 
 	m_line = new QLineEdit( this );
 	m_line->installEventFilter( this );
@@ -75,6 +76,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 									return true;
 								}
 
+                            #if 0
 								// Decode asset
 								Scene::AssetPtr asset = qComposer->assetFromMime( de->mimeData() );
 
@@ -82,6 +84,9 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								if( !asset.valid() || (asset->type() & m_mask) == 0 ) {
 									return true;
 								}
+                            #else
+                                DC_NOT_IMPLEMENTED
+                            #endif
 
 								// Accept this action
 								de->acceptProposedAction();
@@ -91,11 +96,15 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
     case QEvent::Drop:		{
 								QDropEvent* de = static_cast<QDropEvent*>( e );
 
+                            #if 0
 								// Decode asset
 								Scene::AssetWPtr asset = qComposer->assetFromMime( de->mimeData() );
 								
 								// Set the value
 								setValue( asset );
+                            #else
+                                DC_NOT_IMPLEMENTED
+                            #endif
 
 								// Emit the signal
 								emit valueChanged();
@@ -107,19 +116,23 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 }
 
 // ** AssetSelector::assetChanged
-Scene::AssetWPtr AssetSelector::value( void ) const
+Scene::Asset AssetSelector::value( void ) const
 {
 	return m_asset;
 }
 
 // ** AssetSelector::setValue
-void AssetSelector::setValue( const Scene::AssetWPtr& value )
+void AssetSelector::setValue( const Scene::Asset& value )
 {
+#if 0
 	// Save the asset pointer
 	m_asset = value;
 
 	// Update the text field
 	m_line->setText( m_asset.valid() ? QString::fromStdString( m_asset->name() ) : "" );
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
@@ -265,6 +278,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	// Extract the UUID from file asset
 	String uuid = model()->uuid( file );
 
+#if 0
 	// Find asset by UUID
 	Scene::AssetWPtr asset = m_project->assets()->findAsset( uuid );
 	DC_BREAK_IF( !asset.valid() );
@@ -275,6 +289,9 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 									break;
 	default:						inspector->setModel( NULL );
 	}
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 }
 
 // ** AssetTree::selection

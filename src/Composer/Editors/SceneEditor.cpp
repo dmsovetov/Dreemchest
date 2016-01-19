@@ -57,9 +57,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_cursorMovement = new Scene::Vec3Binding;
 
 	// Create the scene.
-	//m_scene = Scene::Scene::create();
     m_scene = loadFromFile( m_asset.absoluteFilePath() );
-	m_scene->addSystem<Scene::AssetSystem>( m_project->assets() );
 
 	// Create the scene model
 	m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
@@ -77,7 +75,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 
 		m_terrainTool = m_scene->createSceneObject();
 		m_terrainTool->attach<Scene::Transform>();
-		m_terrainTool->attach<TerrainTool>( /*terrain1*/Scene::TerrainPtr(), 10.0f );
+		m_terrainTool->attach<TerrainTool>( /*terrain1*/Scene::TerrainHandle(), 10.0f );
 		m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
 		m_scene->addSceneObject( m_terrainTool );
 
@@ -175,7 +173,8 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
     // Create serialization context
     Ecs::SerializationContext ctx( scene->ecs() );
-    ctx.set<Scene::AssetBundle>( m_project->assets().get() );
+    DC_NOT_IMPLEMENTED;
+    //ctx.set<Scene::AssetBundle>( m_project->assets().get() );
 
     Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
 

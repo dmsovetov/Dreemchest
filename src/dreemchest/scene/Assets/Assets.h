@@ -52,6 +52,10 @@ namespace Scene {
         template<typename TAsset>
         AssetHandle<TAsset> get( const AssetId& id ) const;
 
+        //! Returns an asset type id.
+        template<typename TAsset>
+        static AssetTypeId  assetTypeId( void );
+
     private:
 
         //! Returns the asset pool by it's type or creates a new one.
@@ -103,16 +107,12 @@ namespace Scene {
     template<typename TAsset>
     AssetPool<TAsset>* Assets::requestAssetPool( void )
     {
-        // Generate asset type
-        TypeIdx idx = GroupedTypeIndex<TAsset, Assets>::idx();
-
-        // Lookup the pool
-        AssetPools::iterator i = m_assetPools.find( idx );
-
-        if( i != m_assetPools.end() ) {
-            return static_cast<AssetPool<TAsset>*>( i->second );
+        // Find existing asset pool
+        if( AssetPool<TAsset>* existingAssetPool = findAssetPool<TAsset>() ) {
+            return existingAssetPool;
         }
 
+        // Create a new one
         AssetPool<TAsset>* pool = DC_NEW AssetPool<TAsset>;
         m_assetPools[idx] = pool;
 
@@ -124,7 +124,7 @@ namespace Scene {
     AssetPool<TAsset>* Assets::findAssetPool( void ) const
     {
         // Generate asset type
-        TypeIdx idx = GroupedTypeIndex<TAsset, Assets>::idx();
+        AssetTypeId assetType = assetTypeId<TAsset>();
 
         // Lookup the pool
         AssetPools::const_iterator i = m_assetPools.find( idx );
@@ -134,6 +134,13 @@ namespace Scene {
         }
 
         return static_cast<AssetPool<TAsset>*>( i->second );
+    }
+
+    // ** Assets::assetTypeId
+    template<typename TAsset>
+    AssetTypeId Assets::assetTypeId( void )
+    {
+        return GroupedTypeIndex<TAsset, Assets>::idx();
     }
 
     // --------------------------------------------------------------------------------------------------------------------------------- //

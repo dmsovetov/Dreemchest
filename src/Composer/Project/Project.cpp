@@ -54,7 +54,7 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_paths[CachePath]	= path + "Cache";
 
 	// Declare asset editors.
-	m_assetEditors.declare<Editors::SceneEditor>( "scene" );
+	m_assetEditors.declare<Editors::SceneEditor>( Scene::Assets::assetTypeId<Scene::Prefab>() );
 
 	// Create assets bundle & model
 	m_assetFileSystem = new AssetFileSystemModel( this );
@@ -63,13 +63,13 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_assets = new Assets( this, absolutePath( CachePath ), m_assetFileSystem );
 
 	// Register asset types
-	m_assets->registerExtension( "", Scene::Asset::Folder );
-	m_assets->registerExtension( "tga", Scene::Asset::Image );
-	m_assets->registerExtension( "tif", Scene::Asset::Image );
-	m_assets->registerExtension( "fbx", Scene::Asset::Mesh );
-	m_assets->registerExtension( "scene", Scene::Asset::Prefab );
-	m_assets->registerExtension( "prefab", Scene::Asset::Prefab );
-	m_assets->registerExtension( "material", Scene::Asset::Material );
+	//m_assets->registerExtension( "", Scene::Asset::Folder );
+	m_assets->registerExtension( "tga", Scene::Assets::assetTypeId<Scene::Image>() );
+	m_assets->registerExtension( "tif", Scene::Assets::assetTypeId<Scene::Image>() );
+	m_assets->registerExtension( "fbx", Scene::Assets::assetTypeId<Scene::Mesh>() );
+	m_assets->registerExtension( "scene", Scene::Assets::assetTypeId<Scene::Prefab>() );
+	m_assets->registerExtension( "prefab", Scene::Assets::assetTypeId<Scene::Prefab>() );
+	m_assets->registerExtension( "material", Scene::Assets::assetTypeId<Scene::Material>() );
 
 	// Setup assets model after creating cache
 	m_assetFileSystem->setReadOnly( false );
@@ -94,7 +94,7 @@ AssetFileSystemModelQPtr Project::assetFileSystem( void ) const
 }
 
 // ** Project::assets
-Scene::AssetBundleWPtr Project::assets( void ) const
+Scene::Assets& Project::assets( void ) const
 {
 	return m_assets->bundle();
 }
@@ -166,8 +166,11 @@ void Project::createAsset( const String& name, const String& ext )
 // ** Project::edit
 Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 {
-	// Construct the asset editor by file extension
-	Editors::AssetEditorQPtr assetEditor = m_assetEditors.construct( fileInfo.extension() );
+    // Get the asset type by extension
+    Scene::AssetTypeId assetType = m_assets->assetTypeFromExtension( fileInfo.extension() );
+
+	// Construct the asset editor by asset type
+	Editors::AssetEditorQPtr assetEditor = m_assetEditors.construct( assetType );
 
 	// No asset editor found - open the asset file with standard editor
 	if( !assetEditor ) {
@@ -175,9 +178,13 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 		return NULL;
 	}
 
+#if 0
 	// Find asset by UUID
 	Scene::AssetPtr asset = m_assets->bundle()->findAsset( uuid );
 	DC_BREAK_IF( !asset.valid() );
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 
 	// Dock the editor to main window
 	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, fileInfo );

@@ -62,7 +62,7 @@ DC_BEGIN_COMPOSER
 		};
 
 										//! Constructs SceneModel instance.
-										SceneModel( Scene::AssetBundleWPtr assets, Scene::SceneWPtr scene, QObject* parent );
+										SceneModel( Scene::Assets& assets, Scene::SceneWPtr scene, QObject* parent );
 
 		//! Returns scene instance.
 		Scene::SceneWPtr		        scene( void ) const;
@@ -74,13 +74,13 @@ DC_BEGIN_COMPOSER
 		bool					        performAssetAction( const AssetAction& action );
 
 		//! Applies material to a static mesh.
-		void					        applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialWPtr material );
+		void					        applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialHandle material );
 
 		//! Places terrain instance to a scene at specified world space point.
-		Scene::SceneObjectWPtr	        placeTerrain( Scene::TerrainWPtr terrain, const Vec3& point );
+		Scene::SceneObjectWPtr	        placeTerrain( Scene::TerrainHandle terrain, const Vec3& point );
 
 		//! Places mesh instance to scene at specified world space point.
-		Scene::SceneObjectWPtr	        placeStaticMesh( Scene::MeshWPtr mesh, const Vec3& point );
+		Scene::SceneObjectWPtr	        placeStaticMesh( Scene::MeshHandle mesh, const Vec3& point );
 
 		//! Changes the parent of a scene object to a new one.
 		void					        changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) const;
@@ -118,7 +118,7 @@ DC_BEGIN_COMPOSER
 
 	private:
 
-		Scene::AssetBundleWPtr			m_assets;	//!< Assets model to use by this scene.
+		Scene::Assets&			        m_assets;	//!< Assets use by this scene.
         Scene::SceneWPtr		        m_scene;	//!< Actual scene.
 	};
 

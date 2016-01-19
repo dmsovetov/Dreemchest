@@ -35,15 +35,15 @@ DC_BEGIN_COMPOSER
 	class MaterialModel : public PropertyModel {
 	public:
 
-                            //! Constructs MaterialModel instance.
-		                    MaterialModel( Scene::MaterialWPtr material, QObject* parent = NULL );
+                                //! Constructs MaterialModel instance.
+		                        MaterialModel( Scene::MaterialHandle material, QObject* parent = NULL );
 
 		//! Called each time object property was changed.
-		virtual void		objectChanged( void ) DC_DECL_OVERRIDE { m_material->bundle()->queueForLoading( m_material ); }
+		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE { m_material.writeLock(); }
 
 	private:
 
-		Scene::MaterialWPtr m_material;
+		Scene::MaterialHandle   m_material;
 	};
 
 DC_END_COMPOSER

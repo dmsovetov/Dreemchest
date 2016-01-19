@@ -90,8 +90,12 @@ void Inspector::setModel( PropertyModelQPtr value )
 		QWidget* widget = NULL;
 
 		if( type == "Scene::ImageWPtr" ) {
+        #if 0
 			widget = new AssetSelector( Scene::Asset::Image );
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
+        #else
+            DC_NOT_IMPLEMENTED
+        #endif
 		}
 		else if( type == "Scene::RenderingMode" ) {
 			widget = new RenderingModeComboBox;

@@ -41,13 +41,13 @@ DC_BEGIN_COMPOSER
 	public:
 
 		//! Returns asset bundle.
-		Scene::AssetBundleWPtr		bundle( void ) const;
+		Scene::Assets&		        bundle( void ) const;
 
 		//! Registers the mapping from extension to asset type.
-		void						registerExtension( const String& ext, Scene::Asset::Type type );
+		void						registerExtension( const String& ext, Scene::AssetTypeId type );
 
 		//! Returns asset type by extension.
-		Scene::Asset::Type			assetTypeFromExtension( const String& ext ) const;
+		Scene::AssetTypeId			assetTypeFromExtension( const String& ext ) const;
 
 	private:
 
@@ -61,7 +61,7 @@ DC_BEGIN_COMPOSER
 		Io::Path					cacheFolderFromUuid( const String& uuid ) const;
 
 		//! Creates new asset instance by a specified extension.
-		Scene::AssetPtr				createAssetForFile( const FileInfo& fileInfo );
+		Scene::Asset				createAssetForFile( const FileInfo& fileInfo );
 
     private slots:
 
@@ -80,13 +80,13 @@ DC_BEGIN_COMPOSER
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
 		//! Alias the ext to asset type mapping.
-		typedef Map<String, Scene::Asset::Type> AssetTypes;
+		typedef Map<String, Scene::AssetTypeId> AssetTypes;
 
 		Io::Path					m_path;				//!< Root cache folder path.
 		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
-		Scene::AssetBundlePtr		m_bundle;			//!< Asset bundle.
+		Scene::Assets		        m_bundle;			//!< Asset bundle.
 	};
 
 DC_END_COMPOSER
