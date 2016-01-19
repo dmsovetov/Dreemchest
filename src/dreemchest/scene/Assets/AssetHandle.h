@@ -39,9 +39,23 @@ namespace Scene {
     friend typename AssetPool<TAsset>;
     public:
 
-        //! This operator is used to access actual asset data.
-        TAsset*                     operator -> ( void );
+                                    //! Constructs an empty AssetHandle instance.
+                                    AssetHandle( void );
+
+                                    //! Constructs AssetHandle instance from another one.
+                                    AssetHandle( const AssetHandle<TAsset>& other );
+
+        //! Copies an asset handle.
+        const AssetHandle<TAsset>&  operator = ( const AssetHandle<TAsset>& other );
+
+        //! This operator is used for read-only access to actual asset data.
         const TAsset*               operator -> ( void ) const;
+
+        //! Returns the read-only asset data and updates the last usage timestamp.
+        const TAsset&               readLock( void ) const;
+
+        //! Returns the write lock used to update an asset data.
+        AssetWriteLock<TAsset>      writeLock( void );
 
         //! Returns true if this asset handle is still valid.
         bool                        isValid( void ) const;
@@ -49,40 +63,119 @@ namespace Scene {
     private:
 
                                     //! Constructs the AssetHandle instance.
-                                    AssetHandle( const AssetPool<TAsset>& pool, AssetSlot slot );
+                                    AssetHandle( const AssetPool<TAsset>& pool, SlotIndex32 slot );
 
     private:
 
-        const AssetPool<TAsset>&    m_pool; //!< An asset pool that issued this handle.
-        AssetSlot                   m_slot; //!< Asset slot.
+        const AssetPool<TAsset>*    m_pool; //!< An asset pool that issued this handle.
+        SlotIndex32                 m_slot; //!< Asset slot.
     };
 
     // ** AssetHandle::AssetHandle
     template<typename TAsset>
-    AssetHandle<TAsset>::AssetHandle( const AssetPool<TAsset>& pool, AssetSlot slot ) : m_pool( pool ), m_slot( slot )
+    AssetHandle<TAsset>::AssetHandle( void ) : m_pool( NULL )
+    {
+    
+    }
+
+    // ** AssetHandle::AssetHandle
+    template<typename TAsset>
+    AssetHandle<TAsset>::AssetHandle( const AssetPool<TAsset>& pool, SlotIndex32 slot ) : m_pool( &pool ), m_slot( slot )
+    {
+    
+    }
+
+    // ** AssetHandle::AssetHandle
+    template<typename TAsset>
+    AssetHandle<TAsset>::AssetHandle( const AssetHandle<TAsset>& other ) : m_pool( other.m_pool ), m_slot( other.m_slot )
     {
     
     }
 
     // ** AssetHandle::operator ->
     template<typename TAsset>
-    TAsset* AssetHandle<TAsset>::operator -> ( void )
+    const AssetHandle<TAsset>& AssetHandle<TAsset>::operator = ( const AssetHandle<TAsset>& other )
     {
-        return isValid() ? const_cast<TAsset*>( &m_pool.assetAtSlot( m_slot ) ) : NULL;
+        m_pool = other.m_pool;
+        m_slot = other.m_slot;
+        return *this;
     }
 
     // ** AssetHandle::operator ->
     template<typename TAsset>
     const TAsset* AssetHandle<TAsset>::operator -> ( void ) const
     {
-        return isValid() ? &m_pool.assetAtSlot( m_slot ) : NULL;
+        return isValid() ? &m_pool->assetAtSlot( m_slot ) : NULL;
     }
 
     // ** AssetHandle::isValid
     template<typename TAsset>
     bool AssetHandle<TAsset>::isValid( void ) const
     {
-        return m_pool.isValidSlot( m_slot );
+        return m_pool && m_pool->isValidSlot( m_slot );
+    }
+
+    // ** AssetHandle::readLock
+    template<typename TAsset>
+    const TAsset& AssetHandle<TAsset>::readLock( void ) const
+    {
+        DC_BREAK_IF( !isValid() );
+
+        // Update the used timestamp
+        m_pool->updateLastUsed( m_slot );
+
+        // Resolve reference
+        return *operator->();
+    }
+
+    // ** AssetHandle::writeLock
+    template<typename TAsset>
+    AssetWriteLock<TAsset> AssetHandle<TAsset>::writeLock( void )
+    {
+        return AssetWriteLock<TAsset>( m_pool, m_slot );
+    }
+
+    //! Asset write lock is used for updating asset data.
+    template<typename TAsset>
+    class AssetWriteLock {
+    friend typename AssetHandle<TAsset>;
+    public:
+
+                                    ~AssetWriteLock( void );
+
+        //! This operator is used for write access to actual asset data.
+        TAsset*                     operator -> ( void );
+
+    private:
+
+                                    //! Constructs AssetWriteLock instance.
+                                    AssetWriteLock( const AssetPool<TAsset>* pool, SlotIndex32 slot );
+
+    private:
+
+        const AssetPool<TAsset>*    m_pool; //!< An asset pool that issued this handle.
+        SlotIndex32                 m_slot; //!< Asset slot.
+    };
+
+    // ** AssetWriteLock::AssetWriteLock
+    template<typename TAsset>
+    AssetWriteLock<TAsset>::AssetWriteLock( const AssetPool<TAsset>* pool, SlotIndex32 slot ) : m_pool( pool ), m_slot( slot )
+    {
+        DC_BREAK_IF( m_pool == NULL )
+    }
+
+    // ** AssetWriteLock::AssetWriteLock
+    template<typename TAsset>
+    AssetWriteLock<TAsset>::~AssetWriteLock( void )
+    {
+        m_pool->updateLastModified( m_slot );
+    }
+
+    // ** AssetWriteLock::operator ->
+    template<typename TAsset>
+    TAsset* AssetWriteLock<TAsset>::operator -> ( void )
+    {
+        return &const_cast<TAsset&>( m_pool->assetAtSlot( m_slot ) );
     }
 
 } // namespace Scene

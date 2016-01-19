@@ -33,45 +33,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Forward declaration of an abstract asset format.
-    class AbstractAssetFormat;
-
-    //! Base class for all asset pools.
-    class AbstractAssetPool {
-    protected:
-
-        //! Info about a single asset file.
-        struct File {
-            AssetId                 uniqueId;   //!< Unique file id.
-            AssetSlot               asset;      //!< Handle to an asset stored inside the pool.
-            AbstractAssetFormat*    format;     //!< Asset format used for loading this asset.
-
-                                    //! Constructs File instance.
-                                    File( const AssetId& uniqueId = AssetId(), AssetSlot asset = AssetSlot(), AbstractAssetFormat* format = NULL )
-                                        : uniqueId( uniqueId ), asset( asset ), format( format ) {}
-        };
-
-        //! Returns an asset file by it's id.
-        const File&                 findFile( const AssetId& id ) const;
-
-        //! Adds new file with a specified id and format.
-        void                        addFile( const AssetId& id, AssetSlot asset, AbstractAssetFormat* format );
-
-        //! Removes an asset file by it's id, returns the associated asset handle to release an asset data.
-        AssetSlot                   removeFile( const AssetId& id );
-
-    private:
-
-        //! Container type to store all available asset files.
-        typedef Map<AssetId, File>  AssetFiles;
-
-        AssetFiles                  m_files;    //!< Available asset files.
-    };
-
     //! Generic class to store all available assets of type TAsset.
     template<typename TAsset>
-    class AssetPool : public AbstractAssetPool {
+    class AssetPool {
     friend typename AssetHandle<TAsset>;
+    friend typename AssetWriteLock<TAsset>;
     public:
 
         //! Alias for an asset handle type.
@@ -89,14 +55,52 @@ namespace Scene {
     protected:
 
         //! Returns an asset data by slot handle.
-        const TAsset&               assetAtSlot( AssetSlot slot ) const;
+        const TAsset&               assetAtSlot( SlotIndex32 slot ) const;
 
         //! Returns true if the specified asset slot handle is valid.
-        bool                        isValidSlot( AssetSlot slot ) const;
+        bool                        isValidSlot( SlotIndex32 slot ) const;
+
+        //! Updates last use timestamp of an asset at specified slot.
+        void                        updateLastUsed( SlotIndex32 slot ) const;
+
+        //! Updates last modified timestamp of an asset at specified slot.
+        void                        updateLastModified( SlotIndex32 slot ) const;
 
     protected:
 
-        Slots<TAsset, AssetSlot>    m_assets;    //!< Asset data for each asset file is stored here.
+        //! Subclass of an asset to add internal pool data.
+        class AssetInternal : public TAsset {
+        public:
+
+                                    //! Constructs AssetInternal instance.
+                                    AssetInternal( void )
+                                        : m_lastModified( 0 ), m_lastUsed( 0 ) {}
+
+            //! Sets asset identifier.
+            void                    setUniqueId( const AssetId& value ) { m_uniqueId = value; }
+
+            //! Sets asset format.
+            void                    setFormat( AssetFormat<TAsset>* value ) { m_format = value; }
+
+            //! Set last used timestamp of an asset.
+            void                    setLastUsed( u32 value ) const { m_lastUsed = value; }
+
+            //! Updates last modified timestamp of an asset.
+            void                    setLastModified( u32 value ) const { m_lastModified = value; }
+
+        private:
+
+            mutable u32             m_lastModified;     //!< Last time this asset was modified.
+            mutable u32             m_lastUsed;         //!< Last time this asset was used.
+            AssetId                 m_uniqueId;         //!< Unique asset id.
+            AssetFormat<TAsset>*    m_format;           //!< Asset format used for loading this asset.
+        };
+
+        //! Container type to store unique id to an asset slot mapping.
+        typedef Map<AssetId, SlotIndex32>   AssetSlotsById;
+
+        Slots<AssetInternal, SlotIndex32>   m_assets;   //!< Asset data for each asset file is stored here.
+        AssetSlotsById                      m_slotById; //!< AssetId to handle mapping.
     };
 
     // ** AssetPool::add
@@ -104,52 +108,81 @@ namespace Scene {
     typename AssetPool<TAsset>::Handle AssetPool<TAsset>::add( const AssetId& id, AssetFormat<TAsset>* format )
     {
         DC_BREAK_IF( format == NULL );
+        DC_BREAK_IF( m_slotById.find( id ) != m_slotById.end() );
 
-        // First reserve the slot for an asset data
-        AssetSlot asset = m_assets.add( TAsset() );
+        // First reserve the slot for an asset data.
+        SlotIndex32 slot = m_assets.reserve();
 
-        // Now add an asset file associated with this asset handle
-        addFile( id, asset, format );
+        // Setup internal asset data.
+        AssetInternal& internal = m_assets.get( slot );
+        internal.setUniqueId( id );
+        internal.setFormat( format );
+
+        // Now register unique id associated with this asset slot.
+        m_slotById[id] = slot;
 
         // Construct an asset handle.
-        return Handle( *this, asset );
+        return Handle( *this, slot );
     }
 
     // ** AssetPool::remove
     template<typename TAsset>
     bool AssetPool<TAsset>::remove( const AssetId& id )
     {
-        // Remove the file by id and store the associated asset handle
-        AssetSlot asset = removeFile( id );
+        // Find handle by id.
+        AssetSlotsById::iterator i = m_slotById.find( id );
+        DC_BREAK_IF( i == m_slotById.end() );
+
+        // Store the slot before and remove the handle mapping.
+        SlotIndex32 slot = i->second;
+        m_slotById.erase( i );
 
         // Now release an asset data
-        return m_assets.remove( asset );
+        return m_assets.remove( slot );
     }
 
     // ** AssetPool::get
     template<typename TAsset>
     typename AssetPool<TAsset>::Handle AssetPool<TAsset>::get( const AssetId& id )
     {
-        // First find an asset file by it.
-        const File& file = findFile( id );
-        DC_BREAK_IF( !m_assets.has( file.asset ) );
+        AssetSlotsById::const_iterator i = m_slotById.find( id );
+        DC_BREAK_IF( i == m_slotById.end() );
 
-        // Now construct an asset handle.
-        return Handle( *this, file.asset );
+        return Handle( *this, i->second );
     }
 
     // ** AssetPool::assetAtSlot
     template<typename TAsset>
-    const TAsset& AssetPool<TAsset>::assetAtSlot( AssetSlot slot ) const
+    const TAsset& AssetPool<TAsset>::assetAtSlot( SlotIndex32 slot ) const
     {
         return m_assets.get( slot );
     }
 
     // ** // ** AssetPool::isValidSlot
     template<typename TAsset>
-    bool AssetPool<TAsset>::isValidSlot( AssetSlot slot ) const
+    bool AssetPool<TAsset>::isValidSlot( SlotIndex32 slot ) const
     {
         return m_assets.has( slot );
+    }
+
+    // ** AssetPool::updateLastUsed
+    template<typename TAsset>
+    void AssetPool<TAsset>::updateLastUsed( SlotIndex32 slot ) const
+    {
+        DC_BREAK_IF( !isValidSlot( slot ) );
+
+        const AssetInternal& asset = m_assets.get( slot );
+        asset.setLastUsed( Platform::currentTime() );
+    }
+
+    // ** AssetPool::updateLastModified
+    template<typename TAsset>
+    void AssetPool<TAsset>::updateLastModified( SlotIndex32 slot ) const
+    {
+        DC_BREAK_IF( !isValidSlot( slot ) );
+
+        const AssetInternal& asset = m_assets.get( slot );
+        asset.setLastModified( Platform::currentTime() );
     }
 
 } // namespace Scene

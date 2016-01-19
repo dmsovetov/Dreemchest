@@ -85,11 +85,14 @@ namespace Scene {
 
 	class Rvm;
 
-    //! Asset slot handle
-    typedef OpaqueHandle<12, 20> AssetSlot;
+    //! Opaque 32 bit handle.
+    typedef OpaqueHandle<12, 20> SlotIndex32;
 
     //! Forward declaration of an AssetHandle type.
     template<typename TAsset> class AssetHandle;
+
+    //! Forward declaration of an asset AssetWriteLock type.
+    template<typename TAsset> class AssetWriteLock;
 
     //! Forward declaration of an AssetFormat type.
     template<typename TAsset> class AssetFormat;
@@ -450,6 +453,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
     #include "Assets/AssetHandle.h"
+    #include "Assets/AssetPool.h"
     #include "Assets/AssetFormat.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
