@@ -182,31 +182,33 @@ void Transform::setRotation( const Quat& value )
 // ** Transform::rotationX
 f32 Transform::rotationX( void ) const
 {
-	return m_rotation.x;
+    DC_NOT_IMPLEMENTED;
+    return 0.0f;
 }
 
 // ** Transform::setRotationX
 void Transform::setRotationX( f32 value )
 {
-	m_rotation.x = value;
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 1.0f, 0.0f, 0.0f ) );
 }
 
 // ** Transform::rotationY
 f32 Transform::rotationY( void ) const
 {
-	return m_rotation.y;
+    DC_NOT_IMPLEMENTED;
+	return 0.0f;
 }
 
 // ** Transform::setRotationY
 void Transform::setRotationY( f32 value )
 {
-	m_rotation.y = value;
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0.0f, 1.0f, 0.0f ) );
 }
 
 // ** Transform::rotationZ
 f32 Transform::rotationZ( void ) const
 {
-	return m_rotation.z;
+    return m_rotation.roll();
 }
 
 // ** Transform::setRotationZ
