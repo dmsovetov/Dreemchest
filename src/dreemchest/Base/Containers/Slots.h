@@ -137,6 +137,15 @@ DC_BEGIN_DREEMCHEST
     template<typename TValue, typename THandle>
     THandle Slots<TValue, THandle>::add( const TValue& value )
     {
+        Handle handle = reserve();
+        m_data[handle] = value;
+        return handle;
+    }
+
+    // ** Slots::reserve
+    template<typename TValue, typename THandle>
+    THandle Slots<TValue, THandle>::reserve( void )
+    {
         // Maximum capacity reached - expand
         if( freeCount() == 0 ) {
             s32 count = static_cast<s32>( capacity() * 0.25f );
@@ -146,9 +155,6 @@ DC_BEGIN_DREEMCHEST
         // Reserve the slot
         Handle handle = allocate();
         DC_BREAK_IF( !handle.isValid() );
-
-        // Copy value to a slot
-        m_data[handle] = value;
 
         return handle;
     }
