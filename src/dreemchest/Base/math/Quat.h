@@ -56,6 +56,15 @@ DC_BEGIN_DREEMCHEST
 		//! Converts quaternion to an Euler angles vector, where X is bank, Y is heading and Z is attitude.
 		Vec3		euler( void ) const;
 
+        //! Calculates the local yaw element of this quaternion.
+        f32         yaw( void ) const;
+
+        //! Calculates the local pitch element of this quaternion.
+        f32         pitch( void ) const;
+
+        //! Calculates the local roll element of this quaternion.
+        f32         roll( void ) const;
+
 		//! Rotates point by a quaternion.
 		Vec3		rotate( const Vec3& point ) const;
 
@@ -111,6 +120,46 @@ DC_BEGIN_DREEMCHEST
 					, degrees( atan2( 2*y*w - 2*x*z, 1 - 2*y2 - 2*z2 ) )
 					, degrees( asin ( 2*x*y + 2*z*w ) ) );
 	}
+
+    // ** Quat::yaw
+    inline f32 Quat::yaw( void ) const
+    {
+		float x2 = 2.0f * x;
+		float y2 = 2.0f * y;
+		float z2 = 2.0f * z;
+		float wy = y2 * w;
+		float xx = x2 * x;
+		float xz = z2 * x;
+		float yy = y2 * y;
+
+		return degrees( atan2( xz + wy, 1.0f - (xx + yy) ) );
+    }
+
+    // ** Quat::pitch
+    inline f32 Quat::pitch( void ) const
+    {
+		float x2  = 2.0f * x;
+		float z2  = 2.0f * z;
+		float wx = x2 * w;
+		float xx = x2 * x;
+		float yz = z2 * y;
+		float zz = z2 * z;
+
+		return degrees( atan2( yz + wx, 1.0f - (xx + zz) ) );
+    }
+
+    // ** Quat::roll
+    inline f32 Quat::roll( void ) const
+    {
+		float y2  = 2.0f * y;
+		float z2  = 2.0f * z;
+		float wz = z2 * w;
+		float xy = y2 * x;
+		float yy = y2 * y;
+		float zz = z2 * z;
+
+		return degrees( atan2( xy + wz, 1.0f - (yy + zz) ) );
+    }
 
 	// ** Quat::rotate
 	inline Vec3 Quat::rotate( const Vec3& v ) const
