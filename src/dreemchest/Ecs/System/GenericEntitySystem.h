@@ -85,7 +85,7 @@ namespace Ecs {
 	template<typename TSystem, typename ... TComponents>
 	void GenericEntitySystem<TSystem, TComponents...>::update( u32 currentTime, f32 dt )
 	{
-		if( !begin( currentTime ) ) {
+		if( !begin( currentTime, dt ) ) {
 			return;
 		}
 

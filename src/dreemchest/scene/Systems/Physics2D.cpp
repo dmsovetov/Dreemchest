@@ -146,10 +146,16 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale, const Vec2& gravity ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_deltaTime( deltaTime )
+Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
 {
     // Create Box2D world instance
 	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
+
+    // Disable automatic force clearing
+    m_world->SetAutoClearForces( false );
+
+    // Ensure that continuous physics is enabled.
+    m_world->SetContinuousPhysics( true );
 
     // Create collisions
     m_collisions = DC_NEW Collisions;
@@ -158,10 +164,10 @@ Box2DPhysics::Box2DPhysics( f32 deltaTime, f32 scale, const Vec2& gravity ) : Ge
     m_world->SetContactListener( m_collisions.get() );
 }
 
-// ** Box2DPhysics::setDeltaTime
-void Box2DPhysics::setDeltaTime( f32 value )
+// ** Box2DPhysics::setTimeStep
+void Box2DPhysics::setTimeStep( f32 value )
 {
-	m_deltaTime = value;
+	m_timeStep = value;
 }
 
 // ** Box2DPhysics::queryRect
@@ -247,9 +253,26 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 }
 
 // ** Box2DPhysics::begin
-bool Box2DPhysics::begin( u32 currentTime )
+bool Box2DPhysics::begin( u32 currentTime, f32 dt )
 {
-	m_world->Step( m_deltaTime, 6, 2 );
+    // Increase the time accumulator
+    m_accumulator += dt;
+
+    // Calculate the total number of simulation steps to perform
+    s32 steps = static_cast<s32>( floor( m_accumulator / m_timeStep ) );
+    
+    // Clamp step count
+    steps = min2( steps, m_maxSimulationSteps );
+
+    // Simulate physics
+    while( steps-- ) {
+        m_world->Step( m_timeStep, 8, 4 );
+        m_accumulator -= m_timeStep;
+    }
+
+    // Clear applied forces
+    m_world->ClearForces();
+
 	return true;
 }
 
@@ -375,15 +398,16 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBod
 
 	// Initialize body type
 	switch( rigidBody.type() ) {
-	case RigidBody2D::Static:		def.type = b2_staticBody;		break;
-	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;		break;
-	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;	break;
+	case RigidBody2D::Static:		def.type    = b2_staticBody;	break;
+	case RigidBody2D::Dynamic:		def.type    = b2_dynamicBody;   break;
+	case RigidBody2D::Kinematic:	def.type    = b2_kinematicBody; break;
 	default:						DC_BREAK;
 	}
 
 	// Set the initial body transform
 	def.position = positionToBox2D( transform.position() );
 	def.angle = rotationToBox2D( transform.rotationZ() );
+    def.bullet = rigidBody.isBullet();
 
 	// Construct the Box2D body and attach scene object to it
     b2Body* body = m_world->CreateBody( &def );

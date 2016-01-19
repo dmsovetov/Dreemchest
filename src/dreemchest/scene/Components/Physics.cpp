@@ -142,9 +142,10 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
 
 // ** RigidBody2D::RigidBody2D
-RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask )
+RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask, bool isBullet )
 	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask )
 {
+    m_flags.set( IsBullet, isBullet );
 }
 
 // ** RigidBody2D::mass
@@ -212,6 +213,12 @@ void RigidBody2D::putToRest( void )
 bool RigidBody2D::wasPutToRest( void ) const
 {
     return m_flags.is( WasPutToRest );
+}
+
+// ** RigidBody2D::isBullet
+bool RigidBody2D::isBullet( void ) const
+{
+    return m_flags.is( IsBullet );
 }
 
 // ** RigidBody2D::torque

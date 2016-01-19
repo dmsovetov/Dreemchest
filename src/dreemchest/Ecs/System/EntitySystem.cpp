@@ -58,7 +58,7 @@ s32 EntitySystem::entityCount( void ) const
 }
 
 // ** EntitySystem::begin
-bool EntitySystem::begin( u32 currentTime )
+bool EntitySystem::begin( u32 currentTime, f32 dt )
 {
 	return true;
 }
@@ -76,7 +76,7 @@ void EntitySystem::process( u32 currentTime, f32 dt, Entity& entity )
 // ** EntitySystem::update
 void EntitySystem::update( u32 currentTime, f32 dt )
 {
-	if( !begin( currentTime ) ) {
+	if( !begin( currentTime, dt ) ) {
 		return;
 	}
 
