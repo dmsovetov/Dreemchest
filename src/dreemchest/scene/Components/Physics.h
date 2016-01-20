@@ -185,6 +185,12 @@ namespace Scene {
 		//! Sets the angular damping applied to a body.
 		void				    setAngularDamping( f32 value );
 
+        //! Returns gravity scale for this body.
+        f32                     gravityScale( void ) const;
+
+        //! Sets gravity scale for this body.
+        void                    setGravityScale( f32 value );
+
         //! Moves the rigid body to a specified position.
         void                    moveTo( const Vec2& position );
 
@@ -272,6 +278,7 @@ namespace Scene {
 		f32					    m_angularDamping;	//!< The angular damping applied to a body.
 		f32					    m_torque;			//!< The total torque applied.
 		Vec2				    m_force;			//!< The total force applied.
+        f32                     m_gravityScale;     //!< Body's gravity scale.
 		Array<AppliedForce>	    m_forces;			//!< All applied forces.
         Array<AppliedForce>     m_impulses;         //!< All applied impulses.
         Array<CollisionEvent>   m_collisionEvents;  //!< All collision events recorded since on simulation step.

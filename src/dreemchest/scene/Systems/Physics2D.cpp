@@ -363,6 +363,7 @@ void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, R
 	body->SetAngularDamping( rigidBody.angularDamping() );
 	body->ApplyTorque( -torque * mass, true );
 	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
+    body->SetGravityScale( rigidBody.gravityScale() );
 
 	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
 		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
