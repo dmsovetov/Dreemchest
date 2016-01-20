@@ -214,7 +214,7 @@ f32 Transform::rotationZ( void ) const
 // ** Transform::setRotationZ
 void Transform::setRotationZ( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0.0f, 0.0f, 1.0f ) );
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0.0f, 0.0f, -1.0f ) );
 }
 
 // ** Transform::setScale
