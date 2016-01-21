@@ -42,7 +42,7 @@ namespace Scene {
 #ifdef DC_BOX2D_ENABLED
 
 	//! The 2D physics system
-	class Box2DPhysics : public Ecs::GenericEntitySystem<Box2DPhysics, RigidBody2D, Transform> {
+	class Box2DPhysics : public Ecs::EntitySystem {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
@@ -60,17 +60,11 @@ namespace Scene {
 		//! Sets the physics fixed time step.
 		void					setTimeStep( f32 value );
 
-		//! Updates the physics engine state.
-		virtual bool			begin( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
-
-        //! Dispatches recorded collision events.
-        virtual void            end( void ) DC_DECL_OVERRIDE;
-
-		//! Synchronizes the scene object transform with a rigid body.
-		virtual void			process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
+        //! Updates the physics state.
+        virtual void	        update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			entityAdded( const Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void			entityAdded( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
 
 		//! Destroys the Box2D rigid body of a removed scene object.
 		virtual void			entityRemoved( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
@@ -121,6 +115,21 @@ namespace Scene {
 
 		//! Converts rotation from scene space to a Box2D space.
 		f32						rotationToBox2D( f32 angle ) const;
+
+        //! Prepares the Box2D body for simulation by applying forces, impulses, etc.
+        void                    prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, Transform& transform );
+
+        //! Updates the scene transform by a Box2D body transform.
+        void                    updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform );
+
+        //! Simulates the physics with a fixed time step.
+        void                    simulatePhysics( f32 dt );
+
+        //! Returns the Box2D body attached to this rigid body.
+        b2Body*                 extractPhysicalBody( const RigidBody2D& rigidBody ) const;
+
+        //! Pushes the collision events to a respective bodies.
+        void                    dispatchCollisionEvents( void );
 
 	private:
 
