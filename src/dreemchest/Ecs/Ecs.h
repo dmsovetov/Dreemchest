@@ -186,6 +186,12 @@ namespace Ecs {
 		//! Rebuild all system indices.
 		void			rebuildSystems( void );
 
+        //! Rebuild indices for changed entitites.
+        void            rebuildChangedEntities( void );
+
+        //! Cleans up removed entities.
+        void            cleanupRemovedEntities( void );
+
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
 
