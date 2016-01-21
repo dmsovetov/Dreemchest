@@ -48,7 +48,14 @@ void SystemGroup::update( u32 currentTime, f32 dt )
 	m_isLocked = true;
 
 	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
+        // Update the system
 		m_systems[i].m_system->update( currentTime, dt );
+
+    #if DC_ECS_ITERATIVE_INDEX_REBUILD
+        // Now rebuild & cleanup entities
+        m_ecs->rebuildChangedEntities();
+        m_ecs->cleanupRemovedEntities();
+    #endif  /*  DC_ECS_ITERATIVE_INDEX_REBUILD  */
 	}
 
 	m_isLocked = false;

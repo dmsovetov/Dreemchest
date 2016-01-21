@@ -32,6 +32,8 @@
 #include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
 
+#define DC_ECS_ITERATIVE_INDEX_REBUILD (1)  // Enable to rebuild indicies after each system update
+
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
