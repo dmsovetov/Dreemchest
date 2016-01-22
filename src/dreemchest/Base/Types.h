@@ -143,13 +143,27 @@ DC_BEGIN_DREEMCHEST
 		return lerp( min, max, rand() / f32( RAND_MAX ) );
 	}
 
-	//! Convert value to a string.
+	//! Converts value to a string.
 	template< typename T>
 	String toString( const T& n )
     {
         std::ostringstream stm;
         stm << n ;
         return stm.str();
+    }
+
+    //! Converts value to a bit string.
+    template<typename TValue>
+    String toBitString( TValue x )
+    {
+        s32    nBits  = sizeof( TValue ) * 8;
+        String result = "";
+
+        for( u32 i = (1 << (nBits - 1)); i > 0; i >>= 1 ) {
+            result += ((x & z) == z) ? "1" : "0";
+        }
+
+        return result;
     }
 
 	//! Convert the byte value to a string.
