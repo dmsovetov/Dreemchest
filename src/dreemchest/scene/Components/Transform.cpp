@@ -208,13 +208,14 @@ void Transform::setRotationY( f32 value )
 // ** Transform::rotationZ
 f32 Transform::rotationZ( void ) const
 {
-    return m_rotation.roll();
+    //!! This -1 multiplication looks like a bug in roll computation :(
+    return m_rotation.roll() * (-1.0f);
 }
 
 // ** Transform::setRotationZ
 void Transform::setRotationZ( f32 value )
 {
-	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0.0f, 0.0f, -1.0f ) );
+	m_rotation = Quat::rotateAroundAxis( value, Vec3( 0.0f, 0.0f, 1.0f ) );
 }
 
 // ** Transform::setScale
