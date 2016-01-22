@@ -187,8 +187,15 @@ void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
 
 	// Load all attached components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
-		CString      key = i->second->typeName();
-        i->second->deserialize( ctx, ar.get( key ) );
+		CString key = i->second->typeName();
+        const Io::KeyValue& kv = ar.get( key );
+
+        if( kv.isNull() ) {
+            log::verbose( "Entity::deserialize : no data for component '%s'\n", key );
+            continue;
+        }
+
+        i->second->deserialize( ctx, kv );
 	}
 	
 	// Create components from key-value archive
