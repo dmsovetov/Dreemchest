@@ -91,7 +91,7 @@ void Transform::setParent( const TransformWPtr& value )
 // ** Transform::worldSpacePosition
 Vec3 Transform::worldSpacePosition( void ) const
 {
-	return matrix() * Vec3( 0.0f, 0.0f, 0.0f );
+	return matrix() * Vec3::zero();
 }
 
 // ** Transform::position
@@ -109,19 +109,40 @@ void Transform::setPosition( const Vec3& value )
 // ** Transform::axisX
 Vec3 Transform::axisX( void ) const
 {
-	return m_rotation.rotate( Vec3( 1.0f, 0.0f, 0.0f ) );
+	return m_rotation.rotate( Vec3::axisX() );
+}
+
+// ** Transform::worldSpaceAxisX
+Vec3 Transform::worldSpaceAxisX( void ) const
+{
+    Vec3 axis = Vec3::axisX();
+    return matrix() * Vec4( axis.x, axis.y, axis.z, 0.0f );
 }
 
 // ** Transform::axisY
 Vec3 Transform::axisY( void ) const
 {
-	return m_rotation.rotate( Vec3( 0.0f, 1.0f, 0.0f ) );
+	return m_rotation.rotate( Vec3::axisY() );
+}
+
+// ** Transform::worldSpaceAxisY
+Vec3 Transform::worldSpaceAxisY( void ) const
+{
+    Vec3 axis = Vec3::axisY();
+    return matrix() * Vec4( axis.x, axis.y, axis.z, 0.0f );
 }
 
 // ** Transform::axisZ
 Vec3 Transform::axisZ( void ) const
 {
-	return m_rotation.rotate( Vec3( 0.0f, 0.0f, 1.0f ) );
+	return m_rotation.rotate( Vec3::axisZ() );
+}
+
+// ** Transform::worldSpaceAxisZ
+Vec3 Transform::worldSpaceAxisZ( void ) const
+{
+    Vec3 axis = Vec3::axisZ();
+    return matrix() * Vec4( axis.x, axis.y, axis.z, 0.0f );
 }
 
 // ** Transform::x

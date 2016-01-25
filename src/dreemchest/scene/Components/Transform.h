@@ -65,14 +65,23 @@ namespace Scene {
 		//! Calculates the world space position.
 		Vec3					worldSpacePosition( void ) const;
 
-		//! Returns the X axis.
+		//! Calculates the local X axis.
 		Vec3					axisX( void ) const;
 
-		//! Returns the Y axis.
+        //! Calculates the world space X axis.
+        Vec3                    worldSpaceAxisX( void ) const;
+
+		//! Calculates the local Y axis.
 		Vec3					axisY( void ) const;
 
-		//! Returns the Z axis.
+        //! Calculates the world space Y axis.
+        Vec3                    worldSpaceAxisY( void ) const;
+
+		//! Calculates the local Z axis.
 		Vec3					axisZ( void ) const;
+
+        //! Calculates the world space Z axis.
+        Vec3                    worldSpaceAxisZ( void ) const;
 
 		//! Returns transformation position.
 		const Vec3&				position( void ) const;
