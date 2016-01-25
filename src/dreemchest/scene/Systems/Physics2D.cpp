@@ -392,6 +392,7 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
 
 	body->SetLinearDamping( rigidBody.linearDamping() );
 	body->SetAngularDamping( rigidBody.angularDamping() );
+    body->SetLinearVelocity( positionToBox2D( rigidBody.linearVelocity() ) );
 	body->ApplyTorque( -torque * mass, true );
 	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
@@ -423,6 +424,9 @@ void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transf
 	// Update the Transform2D instance
 	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+
+    // Update the body's linear velocity
+    rigidBody.setLinearVelocity( positionFromBox2D( body->GetLinearVelocity() ) );
 }
 
 // ** Box2DPhysics::dispatchCollisionEvents
@@ -512,6 +516,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 		default:				DC_BREAK;
 		}
 	}
+
+    // Now set the mass
+    updateMass( rigidBody, body->GetMass() );
 
 	// Attach created body to a component
 	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );

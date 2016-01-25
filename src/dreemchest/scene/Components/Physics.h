@@ -121,6 +121,7 @@ namespace Scene {
 
 	//! 2D rigid body.
 	class RigidBody2D : public Ecs::Component<RigidBody2D> {
+    friend class Physics2D;
 	public:
 
         //! The default rigid body category
@@ -254,6 +255,14 @@ namespace Scene {
         //! Returns the collision event by index.
         const CollisionEvent&   collisionEvent( u32 index ) const;
 
+        //! Returns linear velocity of a body.
+        const Vec2&             linearVelocity( void ) const;
+
+        //! Sets linear velocity of a body.
+        void                    setLinearVelocity( const Vec2& value );
+
+    private:
+
         //! Queues new collision event.
         void                    queueCollisionEvent( const CollisionEvent& e );
 
@@ -262,6 +271,9 @@ namespace Scene {
 
 		//! Clears all applied forces and impulses.
 		void				    clear( void );
+
+        //! Updates mass of a body.
+        void                    updateMass( f32 value );
 
 	private:
 
@@ -286,6 +298,7 @@ namespace Scene {
         u16                     m_collisionMask;    //!< Collision mask used to filter collisions.
         Vec2                    m_movedTo;          //!< World-space position this rigid body was moved.
         FlagSet8                m_flags;            //!< State flags.
+        Vec2                    m_linearVelocity;   //!< Linear velocity of a body.
 	};
 
 } // namespace Scene
