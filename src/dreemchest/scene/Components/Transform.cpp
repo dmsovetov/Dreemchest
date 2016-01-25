@@ -229,8 +229,7 @@ void Transform::setRotationY( f32 value )
 // ** Transform::rotationZ
 f32 Transform::rotationZ( void ) const
 {
-    //!! This -1 multiplication looks like a bug in roll computation :(
-    return m_rotation.roll() * (-1.0f);
+    return m_rotation.roll();
 }
 
 // ** Transform::setRotationZ
