@@ -146,7 +146,7 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : GenericEntitySystem( "Box2DPhysics" ), m_scale( scale ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : EntitySystem( "Box2DPhysics", Ecs::Aspect::all<RigidBody2D, Transform>() ), m_scale( scale ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
 {
     // Create Box2D world instance
 	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
@@ -252,8 +252,44 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 	return callback.m_hasIntersection;
 }
 
-// ** Box2DPhysics::begin
-bool Box2DPhysics::begin( u32 currentTime, f32 dt )
+// ** Box2DPhysics::update
+void Box2DPhysics::update( u32 currentTime, f32 dt )
+{
+    Ecs::EntitySet& entities = m_index->entities();
+
+    // First apply all forces and impulses to each Box2D physical body
+    for( Ecs::EntitySet::iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+        RigidBody2D& rigidBody = *(*i)->get<RigidBody2D>();
+
+        // Skip static bodies
+        if( rigidBody.type() == RigidBody2D::Static ) {
+            continue;
+        }
+
+        prepareForSimulation( extractPhysicalBody( rigidBody ), rigidBody, *(*i)->get<Transform>() );
+    }
+
+    // Now simulate the physics with a fixed time step
+    simulatePhysics( dt );
+
+    // Now apply physics transform to a scene transform & dispatch collision events.
+    for( Ecs::EntitySet::iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+        RigidBody2D& rigidBody = *(*i)->get<RigidBody2D>();
+
+        // Skip static bodies
+        if( rigidBody.type() == RigidBody2D::Static ) {
+            continue;
+        }
+
+        updateTransform( extractPhysicalBody( rigidBody ), rigidBody, *(*i)->get<Transform>() );
+    }
+
+    // Finally dispatch collision events
+    dispatchCollisionEvents();
+}
+
+// ** Box2DPhysics::simulatePhysics
+void Box2DPhysics::simulatePhysics( f32 dt )
 {
     // Increase the time accumulator
     m_accumulator += dt;
@@ -272,12 +308,85 @@ bool Box2DPhysics::begin( u32 currentTime, f32 dt )
 
     // Clear applied forces
     m_world->ClearForces();
-
-	return true;
 }
 
-// ** Box2DPhysics::end
-void Box2DPhysics::end( void )
+// ** Box2DPhysics::extractPhysicalBody
+b2Body* Box2DPhysics::extractPhysicalBody( const RigidBody2D& rigidBody ) const
+{
+	Internal::Ptr physical = rigidBody.internal<Internal>();
+	DC_BREAK_IF( physical == NULL );
+	return physical->m_body;
+}
+
+// ** Box2DPhysics::prepareForSimulation
+void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
+{
+    DC_BREAK_IF( rigidBody.type() != RigidBody2D::Kinematic && rigidBody.type() != RigidBody2D::Dynamic );
+
+    // Kinematic bodies inherit scene transform
+    if( rigidBody.type() == RigidBody2D::Kinematic ) {
+        body->SetTransform( positionToBox2D( Vec2( transform.x(), transform.y() ) ), rotationToBox2D( transform.rotationZ() ) );
+    }
+
+	// Get the body transform
+	const b2Transform& rigidBodyTransform = body->GetTransform();
+
+    // This rigid body was moved - sync the Box2D body with it
+    if( rigidBody.wasMoved() ) {
+        body->SetTransform( positionToBox2D( rigidBody.movedTo() ), rigidBodyTransform.q.GetAngle() );
+    }
+
+    // Rigid body was put to rest - clear velocities
+    if( rigidBody.wasPutToRest() ) {
+        body->SetLinearVelocity( b2Vec2( 0.0f, 0.0f ) );
+        body->SetAngularVelocity( 0.0f );
+    }
+
+	// Now apply forces
+	f32			mass   = body->GetMass();
+	f32			torque = rigidBody.torque();
+	const Vec2& force  = rigidBody.force();
+
+	body->SetLinearDamping( rigidBody.linearDamping() );
+	body->SetAngularDamping( rigidBody.angularDamping() );
+	body->ApplyTorque( -torque * mass, true );
+	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
+    body->SetGravityScale( rigidBody.gravityScale() );
+
+	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
+		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
+		b2Vec2 value = b2Vec2( appliedForce.m_value.x * mass, appliedForce.m_value.y * mass );
+		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
+		body->ApplyForce( value, point, true );
+	}
+
+    for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
+ 		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
+		b2Vec2 value = b2Vec2( appliedImpulse.m_value.x * mass, appliedImpulse.m_value.y * mass );
+		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
+		body->ApplyLinearImpulse( value, point, true );   
+    }
+
+	// Clear all forces now
+	rigidBody.clear();
+
+    // Clear all queued events from last simulation step
+    rigidBody.clearEvents();
+}
+
+// ** Box2DPhysics::updateTransfor
+void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
+{
+	// Get the body transform
+	const b2Transform& rigidBodyTransform = body->GetTransform();
+
+	// Update the Transform2D instance
+	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
+	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+}
+
+// ** Box2DPhysics::dispatchCollisionEvents
+void Box2DPhysics::dispatchCollisionEvents( void )
 {
     // Dispatch all recorded events
     for( s32 i = 0, n = m_collisions->eventCount(); i < n; i++ ) {
@@ -319,76 +428,12 @@ void Box2DPhysics::end( void )
     m_collisions->clear();
 }
 
-// ** Box2DPhysics::process
-void Box2DPhysics::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RigidBody2D& rigidBody, Transform& transform )
-{
-    if( rigidBody.type() == RigidBody2D::Kinematic ) {
-        rigidBody.internal<Internal>()->m_body->SetTransform( positionToBox2D( Vec2( transform.x(), transform.y() ) ), rotationToBox2D( transform.rotationZ() ) );
-    }
-
-	if( rigidBody.type() != RigidBody2D::Dynamic ) {
-		return;
-	}
-
-	// Get the Box2D body
-	Internal::Ptr physical = rigidBody.internal<Internal>();
-	DC_BREAK_IF( physical == NULL );
-
-	b2Body* body = physical->m_body;
-
-	// Get the body transform
-	const b2Transform& rigidBodyTransform = body->GetTransform();
-
-    // This rigid body was moved - sync the Box2D body with it
-    if( rigidBody.wasMoved() ) {
-        body->SetTransform( positionToBox2D( rigidBody.movedTo() ), rigidBodyTransform.q.GetAngle() );
-    }
-
-	// Update the Transform2D instance
-	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
-	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
-
-    // Rigid body was put to rest - clear velocities
-    if( rigidBody.wasPutToRest() ) {
-        body->SetLinearVelocity( b2Vec2( 0.0f, 0.0f ) );
-        body->SetAngularVelocity( 0.0f );
-    }
-
-	// Now apply forces
-	f32			mass   = body->GetMass();
-	f32			torque = rigidBody.torque();
-	const Vec2& force  = rigidBody.force();
-
-	body->SetLinearDamping( rigidBody.linearDamping() );
-	body->SetAngularDamping( rigidBody.angularDamping() );
-	body->ApplyTorque( -torque * mass, true );
-	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
-
-	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
-		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
-		b2Vec2 value = b2Vec2( appliedForce.m_value.x * mass, appliedForce.m_value.y * mass );
-		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
-		body->ApplyForce( value, point, true );
-	}
-
-    for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
- 		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
-		b2Vec2 value = b2Vec2( appliedImpulse.m_value.x * mass, appliedImpulse.m_value.y * mass );
-		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
-		body->ApplyLinearImpulse( value, point, true );   
-    }
-
-	// Clear all forces now
-	rigidBody.clear();
-
-    // Clear all queued events from last simulation step
-    rigidBody.clearEvents();
-}
-
 // ** Box2DPhysics::entityAdded
-void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBody, Transform& transform )
+void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 {
-	Shape2D* shape = entity.get<Shape2D>();
+	Shape2D*     shape      =  entity.get<Shape2D>();
+    RigidBody2D& rigidBody  = *entity.get<RigidBody2D>();
+    Transform&   transform  = *entity.get<Transform>();
 
 	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
 	DC_BREAK_IF( shape == NULL )
@@ -398,9 +443,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBod
 
 	// Initialize body type
 	switch( rigidBody.type() ) {
-	case RigidBody2D::Static:		def.type    = b2_staticBody;	break;
-	case RigidBody2D::Dynamic:		def.type    = b2_dynamicBody;   break;
-	case RigidBody2D::Kinematic:	def.type    = b2_kinematicBody; break;
+	case RigidBody2D::Static:		def.type = b2_staticBody;	    break;
+	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;      break;
+	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;    break;
 	default:						DC_BREAK;
 	}
 
@@ -430,8 +475,6 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity, RigidBody2D& rigidBod
 		case Shape2D::Polygon:	addPolygonFixture( body, filter, part );	break;
 		default:				DC_BREAK;
 		}
-
-        
 	}
 
 	// Attach created body to a component

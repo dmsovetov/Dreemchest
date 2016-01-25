@@ -256,10 +256,9 @@ void Ecs::rebuildSystems( void )
 	}
 }
 
-// ** Ecs::update
-void Ecs::update( u32 currentTime, f32 dt, u32 systems )
+// ** Ecs::rebuildChangedEntities
+void Ecs::rebuildChangedEntities( void )
 {
-	// Process all changed entities.
 	while( m_changed.size() ) {
 		EntitySet changed = m_changed;
 		m_changed.clear();
@@ -270,8 +269,11 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 			}
 		}
 	}
+}
 
-	// Remove all queued entities
+// ** Ecs::cleanupRemovedEntities
+void Ecs::cleanupRemovedEntities( void )
+{
 	while( m_removed.size() ) {
 		EntitySet removed = m_removed;
 		m_removed.clear();
@@ -280,6 +282,16 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 			m_entities.erase( (*i)->id() );
 		}
 	}
+}
+
+// ** Ecs::update
+void Ecs::update( u32 currentTime, f32 dt, u32 systems )
+{
+	// Process all changed entities.
+    rebuildChangedEntities();
+
+	// Remove all queued entities
+    cleanupRemovedEntities();
 
 	// Update all system groups.
 	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {

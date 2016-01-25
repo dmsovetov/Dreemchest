@@ -32,6 +32,8 @@
 #include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
 
+#define DC_ECS_ITERATIVE_INDEX_REBUILD (1)  // Enable to rebuild indicies after each system update
+
 DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
@@ -185,6 +187,12 @@ namespace Ecs {
 
 		//! Rebuild all system indices.
 		void			rebuildSystems( void );
+
+        //! Rebuild indices for changed entitites.
+        void            rebuildChangedEntities( void );
+
+        //! Cleans up removed entities.
+        void            cleanupRemovedEntities( void );
 
 		//! Creates a new system group.
 		SystemGroupPtr	createGroup( const String& name, u32 mask );
