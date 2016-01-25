@@ -54,7 +54,7 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_paths[CachePath]	= path + "Cache";
 
 	// Declare asset editors.
-	m_assetEditors.declare<Editors::SceneEditor>( Scene::Assets::assetTypeId<Scene::Prefab>() );
+	m_assetEditors.declare<Editors::SceneEditor>( Scene::AssetType::fromClass<Scene::Prefab>() );
 
 	// Create assets bundle & model
 	m_assetFileSystem = new AssetFileSystemModel( this );
@@ -64,12 +64,12 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 
 	// Register asset types
 	//m_assets->registerExtension( "", Scene::Asset::Folder );
-	m_assets->registerExtension( "tga", Scene::Assets::assetTypeId<Scene::Image>() );
-	m_assets->registerExtension( "tif", Scene::Assets::assetTypeId<Scene::Image>() );
-	m_assets->registerExtension( "fbx", Scene::Assets::assetTypeId<Scene::Mesh>() );
-	m_assets->registerExtension( "scene", Scene::Assets::assetTypeId<Scene::Prefab>() );
-	m_assets->registerExtension( "prefab", Scene::Assets::assetTypeId<Scene::Prefab>() );
-	m_assets->registerExtension( "material", Scene::Assets::assetTypeId<Scene::Material>() );
+	m_assets->registerExtension( "tga", Scene::AssetType::fromClass<Scene::Image>() );
+	m_assets->registerExtension( "tif", Scene::AssetType::fromClass<Scene::Image>() );
+	m_assets->registerExtension( "fbx", Scene::AssetType::fromClass<Scene::Mesh>() );
+	m_assets->registerExtension( "scene", Scene::AssetType::fromClass<Scene::Prefab>() );
+	m_assets->registerExtension( "prefab", Scene::AssetType::fromClass<Scene::Prefab>() );
+	m_assets->registerExtension( "material", Scene::AssetType::fromClass<Scene::Material>() );
 
 	// Setup assets model after creating cache
 	m_assetFileSystem->setReadOnly( false );
@@ -167,7 +167,7 @@ void Project::createAsset( const String& name, const String& ext )
 Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 {
     // Get the asset type by extension
-    Scene::AssetTypeId assetType = m_assets->assetTypeFromExtension( fileInfo.extension() );
+    Scene::AssetType assetType = m_assets->assetTypeFromExtension( fileInfo.extension() );
 
 	// Construct the asset editor by asset type
 	Editors::AssetEditorQPtr assetEditor = m_assetEditors.construct( assetType );

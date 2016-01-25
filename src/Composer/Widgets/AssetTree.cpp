@@ -278,20 +278,17 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	// Extract the UUID from file asset
 	String uuid = model()->uuid( file );
 
-#if 0
 	// Find asset by UUID
-	Scene::AssetWPtr asset = m_project->assets()->findAsset( uuid );
-	DC_BREAK_IF( !asset.valid() );
+	Scene::AssetHandle asset = m_project->assets().findAsset( uuid );
+	DC_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.
-	switch( asset->type() ) {
-	case Scene::Asset::Material:	inspector->setModel( new MaterialModel( castTo<Scene::Material>( asset.get() ), this ) );
-									break;
-	default:						inspector->setModel( NULL );
-	}
-#else
-    DC_NOT_IMPLEMENTED
-#endif
+    qWarning() << "AssetTree::bindToInspector : asset to inspector binding is disabled.";
+	//switch( asset->type() ) {
+	//case Scene::Asset::Material:	inspector->setModel( new MaterialModel( castTo<Scene::Material>( asset.get() ), this ) );
+	//								break;
+	//default:						inspector->setModel( NULL );
+	//}
 }
 
 // ** AssetTree::selection

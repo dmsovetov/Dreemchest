@@ -39,7 +39,11 @@ DC_BEGIN_COMPOSER
 		                        MaterialModel( Scene::MaterialHandle material, QObject* parent = NULL );
 
 		//! Called each time object property was changed.
-		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE { m_material.writeLock(); }
+		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE
+        {
+            DC_NOT_IMPLEMENTED;
+        //    m_material.writeLock();
+        }
 
 	private:
 

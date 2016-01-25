@@ -66,40 +66,35 @@ Scene::Assets& Assets::bundle( void ) const
 }
 
 // ** Assets::createAssetForFile
-Scene::Asset Assets::createAssetForFile( const FileInfo& fileInfo )
+Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Scene::AssetTypeId type = assetTypeFromExtension( fileInfo.extension() );
+	Scene::AssetType type = assetTypeFromExtension( fileInfo.extension() );
 
-#if 0
+    if( !type.isValid() ) {
+        return Scene::AssetHandle();
+    }
+
 	// Create asset by type
-	Scene::AssetPtr asset = m_bundle->createAssetByType( type );
-
-	if( !asset.valid() ) {
-		return Scene::AssetPtr();
-	}
+	Scene::AssetHandle asset = m_bundle.addAsset( type, Guid::generate().toString(), "" );
+    DC_BREAK_IF( !asset.isValid() );
 
 	// Set meta file
-	m_assetFileSystem->setMetaData( fileInfo, asset->keyValue() );
+	m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() );
     return asset;
-
-#else
-    DC_NOT_IMPLEMENTED
-    return Scene::Asset();
-#endif
 }
 
 // ** Assets::registerExtension
-void Assets::registerExtension( const String& extension, Scene::AssetTypeId type )
+void Assets::registerExtension( const String& extension, Scene::AssetType type )
 {
 	m_assetTypes[extension] = type;
 }
 
 // ** Assets::assetTypeFromExtension
-Scene::AssetTypeId Assets::assetTypeFromExtension( const String& extension ) const
+Scene::AssetType Assets::assetTypeFromExtension( const String& extension ) const
 {
 	AssetTypes::const_iterator i = m_assetTypes.find( extension );
-	return i != m_assetTypes.end() ? i->second : ~0;
+	return i != m_assetTypes.end() ? i->second : Scene::AssetType::Invalid;
 }
 
 // ** Assets::removeAssetFromCache
@@ -158,35 +153,31 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
 	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
-#if 0
+
 	// Added asset
-	Scene::AssetPtr asset;
+	Scene::AssetHandle asset;
 
 	// Create asset from data or create the new one
 	if( !meta.isNull() ) {
-		asset = m_bundle->createAssetFromData( meta );
+	//	asset = m_bundle->createAssetFromData( meta );
+        DC_NOT_IMPLEMENTED;
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}
 
-	if( !asset.valid() ) {
+	if( !asset.isValid() ) {
 		return;
 	}
 
 	// Set asset name
 	String name = fileInfo.relativePath( m_assetFileSystem->rootPath() );
-	bool result = m_bundle->setAssetName( asset, name );
-	DC_BREAK_IF( !result );
-
-	// Add asset to bundle
-	qDebug() << "Added" << asset->name().c_str();
-	m_bundle->addAsset( asset );
+	asset->setName( name );
 
 	// Put asset to cache
-	updateAssetCache( QString::fromStdString( asset->uuid() ), fileInfo );
-#else
-    DC_NOT_IMPLEMENTED
-#endif
+	updateAssetCache( QString::fromStdString( asset->uniqueId() ), fileInfo );
+
+	// Write message to a console
+	qDebug() << "Added" << asset->name().c_str();
 }
 
 // ** Assets::cacheFolderFromUuid

@@ -280,7 +280,7 @@ DC_BEGIN_COMPOSER
 		Scene::AssetSet			assetsFromMime( MimeDataQPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Scene::Asset			assetFromMime( MimeDataQPtr mime ) const;
+		Scene::AssetHandle	    assetFromMime( MimeDataQPtr mime ) const;
 
 	private:
 

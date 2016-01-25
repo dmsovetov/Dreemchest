@@ -242,12 +242,12 @@ void Composer::closeProject( void )
 }
 
 // ** Composer::assetFromMime
-Scene::Asset Composer::assetFromMime( MimeDataQPtr mime ) const
+Scene::AssetHandle Composer::assetFromMime( MimeDataQPtr mime ) const
 {
 	Scene::AssetSet assets = assetsFromMime( mime );
 
 	if( assets.empty() ) {
-		return Scene::Asset();
+		return Scene::AssetHandle();
 	}
 
 	return *assets.begin();
