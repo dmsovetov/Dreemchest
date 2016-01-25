@@ -139,6 +139,13 @@ const Asset* AssetHandle::operator -> ( void ) const
     return isValid() ? &m_assets->assetAtSlot( m_slot ) : NULL;
 }
 
+// ** AssetHandle::operator ->
+Asset* AssetHandle::operator -> ( void )
+{
+    return isValid() ? const_cast<Asset*>( &m_assets->assetAtSlot( m_slot ) ) : NULL;
+}
+
+
 // ** AssetHandle::isValid
 bool AssetHandle::isValid( void ) const
 {

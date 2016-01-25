@@ -124,6 +124,7 @@ namespace Scene {
 
         //! This operator is used for read-only access to actual asset data.
         const Asset*                operator -> ( void ) const;
+        Asset*                      operator -> ( void );
 
         //! Returns true if this asset handle is still valid.
         bool                        isValid( void ) const;
@@ -138,6 +139,8 @@ namespace Scene {
         const Assets*               m_assets;   //!< An assets manager that issued this handle.
         SlotIndex32                 m_slot;     //!< Asset slot.
     };
+
+    typedef Set<AssetHandle> AssetSet;
 
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
