@@ -105,6 +105,7 @@ namespace Scene {
         AssetType                   m_type;     //!< Asset type.
         AssetId                     m_uniqueId; //!< Unique asset id.
         String                      m_fileName; //!< Asset file name.
+        String                      m_name;     //!< Asset name.
     };
 
     //! This handle are issued by an Assets class and are the only way the outer world can access an asset.
