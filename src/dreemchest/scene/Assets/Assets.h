@@ -34,6 +34,50 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Asset type id.
+    class AssetType {
+    public:
+
+        //! Invalid asset type constant.
+        static const AssetType      Invalid;
+
+
+                                    //! Constructs invalid Asset type.
+                                    AssetType( void );
+
+                                    //! Copies AssetType instance.
+                                    AssetType( const AssetType& other );
+
+        //! Compares two asset types.
+        bool                        operator == ( const AssetType& other ) const;
+
+        //! Compares two asset type.
+        bool                        operator < ( const AssetType& other ) const;
+
+        //! Returns true if this is a valid asset type.
+        bool                        isValid( void ) const;
+
+        //! Returns an asset type for specified class.
+        template<typename TAsset>
+        static AssetType            fromClass( void );
+
+    private:
+
+                                    //! Constructs AssetType instance.
+                                    AssetType( TypeIdx type );
+
+    private:
+
+        TypeIdx                     m_type; //!< Actual asset type value.
+    };
+
+    // ** Assets::fromClass
+    template<typename TAsset>
+    AssetType AssetType::fromClass( void )
+    {
+        return GroupedTypeIndex<TAsset, AssetType>::idx();
+    }
+
     //! Asset class instance stores info about a single asset.
     class Asset {
     public:

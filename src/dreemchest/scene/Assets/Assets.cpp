@@ -30,6 +30,45 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------- AssetType -------------------------------------------- //
+
+// ** AssetType::Invalid
+const AssetType AssetType::Invalid;
+
+// ** AssetType::AssetType
+AssetType::AssetType( void ) : m_type( ~0 )
+{
+}
+
+// ** AssetType::AssetType
+AssetType::AssetType( const AssetType& other ) : m_type( other.m_type )
+{
+}
+
+// ** AssetType::AssetType
+AssetType::AssetType( TypeIdx type ) : m_type( type )
+{
+
+}
+
+// ** AssetType::operator ==
+bool AssetType::operator == ( const AssetType& other ) const
+{
+    return m_type == other.m_type;
+}
+
+// ** AssetType::operator <
+bool AssetType::operator < ( const AssetType& other ) const
+{
+    return m_type < other.m_type;
+}
+
+// ** AssetType::isValid
+bool AssetType::isValid( void ) const
+{
+    return !(*this == Invalid);
+}
+
 // ------------------------------------------- AssetHandle ------------------------------------------- //
 
 // ** AssetHandle::AssetHandle
