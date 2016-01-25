@@ -103,9 +103,6 @@ namespace Scene {
     //! Asset identifier type.
     typedef String AssetId;
 
-    //! Asset type id.
-    typedef TypeIdx AssetType;
-
 #if ASSET_DEPRECATED
     //! Set of assets.
     typedef Set<Asset> AssetSet;
