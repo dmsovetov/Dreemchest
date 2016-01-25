@@ -88,6 +88,18 @@ namespace Scene {
                                     //! Constructs Asset instance.
                                     Asset( AssetType type, const AssetId& uniqueId, const String& fileName );
 
+        //! Returns asset unique id.
+        const AssetId&              uniqueId( void ) const;
+
+        //! Returns asset type.
+        const AssetType&            type( void ) const;
+
+        //! Returns asset name.
+        const String&               name( void ) const;
+
+        //! Sets asset name.
+        void                        setName( const String& value );
+
     private:
 
         AssetType                   m_type;     //!< Asset type.

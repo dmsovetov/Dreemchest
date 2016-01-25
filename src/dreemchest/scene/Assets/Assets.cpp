@@ -69,6 +69,42 @@ bool AssetType::isValid( void ) const
     return !(*this == Invalid);
 }
 
+// ---------------------------------------------- Asset ---------------------------------------------- //
+
+// ** Asset::Asset
+Asset::Asset( void )
+{
+}
+
+// ** Asset::Asset
+Asset::Asset( AssetType type, const AssetId& uniqueId, const String& fileName ) : m_type( type ), m_uniqueId( uniqueId ), m_fileName( fileName )
+{
+}
+
+// ** Asset::type
+const AssetType& Asset::type( void ) const
+{
+    return m_type;
+}
+
+// ** Asset::uniqueId
+const AssetId& Asset::uniqueId( void ) const
+{
+    return m_uniqueId;
+}
+
+// ** Asset::name
+const String& Asset::name( void ) const
+{
+    return m_name;
+}
+
+// ** Asset::setName
+void Asset::setName( const String& value )
+{
+    m_name = value;
+}
+
 // ------------------------------------------- AssetHandle ------------------------------------------- //
 
 // ** AssetHandle::AssetHandle
