@@ -148,7 +148,7 @@ bool AssetHandle::isValid( void ) const
 // --------------------------------------------- Assets --------------------------------------------- //
 
 // ** Assets::add
-AssetHandle Assets::addAsset( TypeId type, const AssetId& uniqueId, const String& fileName )
+AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName )
 {
     DC_BREAK_IF( m_slotById.find( uniqueId ) != m_slotById.end() );
 

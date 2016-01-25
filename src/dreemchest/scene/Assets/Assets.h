@@ -144,7 +144,7 @@ namespace Scene {
     public:
 
         //! Adds new asset with unique id.
-        AssetHandle                 addAsset( TypeId type, const AssetId& uniqueId, const String& fileName );
+        AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );
