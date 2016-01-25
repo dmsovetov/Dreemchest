@@ -199,6 +199,8 @@ namespace Ecs {
 
 		m_components[idx] = component;
 		updateComponentBit( idx, true );
+
+        component->setParentEntity( this );
 		
 		return component;	
 	}
@@ -252,6 +254,7 @@ namespace Ecs {
 		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
 		DC_BREAK_IF( i == m_components.end() );
 		updateComponentBit( i->second->typeIndex(), false );
+        i->second->setParentEntity( NULL );
 		m_components.erase( i );
 	}
 

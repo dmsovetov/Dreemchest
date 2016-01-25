@@ -80,6 +80,9 @@ namespace Ecs {
 		//! Returns true if component is enabled.
 		bool						isEnabled( void ) const;
 
+        //! Returns parent entity instance.
+        EntityWPtr                  entity( void ) const;
+
 	#ifndef DC_ECS_NO_SERIALIZATION
 		//! Reads component from a storage.
 		virtual void		        read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
@@ -99,11 +102,15 @@ namespace Ecs {
 		//! Sets the component's enabled flag.
 		void						setEnabled( bool value );
 
+        //! Sets the component's parent entity.
+        void                        setParentEntity( const EntityWPtr& value );
+
 	protected:
 
 		//! Container type to store internal system state inside a component.
 		typedef Map< TypeIdx, StrongPtr<InternalBase> > InternalDataHolder;
 
+        EntityWPtr                  m_entity;   //!< Entity instance this component is attached to.
 		InternalDataHolder			m_internal;	//!< The internal data.
 		FlagSet32					m_flags;	//!< Component flags.
 	};
@@ -186,6 +193,19 @@ namespace Ecs {
 	{
 		m_flags.set( IsEnabled, value );
 	}
+
+    // ** ComponentBase::entity
+    inline EntityWPtr ComponentBase::entity( void ) const
+    {
+        return m_entity;
+    }
+
+    // ** ComponentBase::setParentEntity
+    inline void ComponentBase::setParentEntity( const EntityWPtr& value )
+    {
+        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value );
+        m_entity = value;
+    }
 
 	//! Generic component class.
 	template<typename T>
