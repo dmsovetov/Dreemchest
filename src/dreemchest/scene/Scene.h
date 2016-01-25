@@ -86,11 +86,13 @@ namespace Scene {
     //! Opaque 32 bit handle.
     typedef OpaqueHandle<12, 20> SlotIndex32;
 
+#if ASSET_DEPRECATED
     //! Forward declaration of an AssetHandle type.
     template<typename TAsset> class AssetHandle;
 
     //! Forward declaration of an asset AssetWriteLock type.
     template<typename TAsset> class AssetWriteLock;
+#endif
 
     //! Forward declaration of an AssetFormat type.
     template<typename TAsset> class AssetFormat;
@@ -102,18 +104,9 @@ namespace Scene {
     typedef String AssetId;
 
     //! Asset type id.
-    typedef TypeIdx AssetTypeId;
+    typedef TypeIdx AssetType;
 
-    //! Abstract asset handle.
-    class Asset {
-    public:
-
-    private:
-
-        AssetTypeId         m_type; //!< Asset type.
-        SlotIndex32         m_slot; //!< Asset slot.
-    };
-
+#if ASSET_DEPRECATED
     //! Set of assets.
     typedef Set<Asset> AssetSet;
 
@@ -128,6 +121,12 @@ namespace Scene {
 
     //! Terrain handle type.
     typedef AssetHandle<class Terrain> TerrainHandle;
+#else
+    typedef s32 ImageHandle;
+    typedef s32 MeshHandle;
+    typedef s32 MaterialHandle;
+    typedef s32 TerrainHandle;
+#endif
 
 	//! Available rendering modes.
 	enum RenderingMode {

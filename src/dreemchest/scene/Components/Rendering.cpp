@@ -107,7 +107,8 @@ MeshHandle StaticMesh::mesh( void ) const
 // ** StaticMesh::setMesh
 void StaticMesh::setMesh( MeshHandle value )
 {
-	DC_BREAK_IF( !value.isValid() );
+    DC_NOT_IMPLEMENTED
+//	DC_BREAK_IF( !value.isValid() );
 	m_mesh = value;
 }
 

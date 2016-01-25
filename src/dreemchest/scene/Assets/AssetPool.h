@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if ASSET_DEPRECATED
+
     //! Base class for all asset pools.
     class AbstractAssetPool {
     public:
@@ -194,6 +196,7 @@ namespace Scene {
         const AssetInternal& asset = m_assets.get( slot );
         asset.setLastModified( Platform::currentTime() );
     }
+#endif
 
 } // namespace Scene
 

@@ -34,6 +34,86 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Asset class instance stores info about a single asset.
+    class Asset {
+    public:
+
+                                    //! Constructs empty Asset instance.
+                                    Asset( void );
+
+                                    //! Constructs Asset instance.
+                                    Asset( AssetType type, const AssetId& uniqueId, const String& fileName );
+
+    private:
+
+        AssetType                   m_type;     //!< Asset type.
+        AssetId                     m_uniqueId; //!< Unique asset id.
+        String                      m_fileName; //!< Asset file name.
+    };
+
+    //! This handle are issued by an Assets class and are the only way the outer world can access an asset.
+    class AssetHandle {
+    friend class Assets;
+    public:
+
+                                    //! Constructs an empty AssetHandle instance.
+                                    AssetHandle( void );
+
+                                    //! Constructs AssetHandle instance from another one.
+                                    AssetHandle( const AssetHandle& other );
+
+        //! Copies an asset handle.
+        const AssetHandle&          operator = ( const AssetHandle& other );
+
+        //! This operator is used for read-only access to actual asset data.
+        const Asset*                operator -> ( void ) const;
+
+        //! Returns true if this asset handle is still valid.
+        bool                        isValid( void ) const;
+
+    private:
+
+                                    //! Constructs the AssetHandle instance.
+                                    AssetHandle( const Assets* assets, SlotIndex32 slot );
+
+    private:
+
+        const Assets*               m_assets;   //!< An assets manager that issued this handle.
+        SlotIndex32                 m_slot;     //!< Asset slot.
+    };
+
+    //! Root interface to access all available assets.
+    class Assets : public RefCounted {
+    friend class AssetHandle;
+    public:
+
+        //! Adds new asset with unique id.
+        AssetHandle                 addAsset( TypeId type, const AssetId& uniqueId, const String& fileName );
+
+        //! Removes asset by a unique id.
+        bool                        removeAsset( const AssetId& uniqueId );
+
+        //! Returns an asset by it's id.
+        AssetHandle                 findAsset( const AssetId& id ) const;
+
+    private:
+
+        //! Returns an asset by slot handle.
+        const Asset&                assetAtSlot( SlotIndex32 slot ) const;
+
+        //! Returns true if the specified asset slot handle is valid.
+        bool                        isValidSlot( SlotIndex32 slot ) const;
+
+    private:
+
+        //! Container type to store unique id to an asset slot mapping.
+        typedef Map<AssetId, SlotIndex32>   AssetSlotsById;
+
+        Slots<Asset, SlotIndex32>   m_assets;   //!< All available assets.
+        AssetSlotsById              m_slotById; //!< AssetId to handle mapping.
+    };
+
+#if ASSET_DEPRECATED
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
     public:
@@ -142,7 +222,7 @@ namespace Scene {
     {
         return GroupedTypeIndex<TAsset, Assets>::idx();
     }
-
+#endif
     // --------------------------------------------------------------------------------------------------------------------------------- //
 
  /*   //! Asset type id.

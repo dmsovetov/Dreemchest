@@ -110,9 +110,10 @@ void Material::updateMaterialFeatures( void )
 {
 	m_features = 0;
 
-	if( m_texture[Diffuse].isValid() ) {
-		m_features |= FeatureDiffuse;
-	}
+    DC_NOT_IMPLEMENTED
+//	if( m_texture[Diffuse].isValid() ) {
+//		m_features |= FeatureDiffuse;
+//	}
 }
 
 } // namespace Scene

@@ -33,6 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if ASSET_DEPRECATED
     //! This handles are issued by an Assets class and are the only way the outer world can access an asset.
     template<typename TAsset>
     class AssetHandle {
@@ -177,6 +178,7 @@ namespace Scene {
     {
         return &const_cast<TAsset&>( m_pool->assetAtSlot( m_slot ) );
     }
+#endif
 
 } // namespace Scene
 

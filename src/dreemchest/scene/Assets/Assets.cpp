@@ -30,6 +30,104 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ------------------------------------------- AssetHandle ------------------------------------------- //
+
+// ** AssetHandle::AssetHandle
+AssetHandle::AssetHandle( void ) : m_assets( NULL )
+{
+    
+}
+
+// ** AssetHandle::AssetHandle
+AssetHandle::AssetHandle( const Assets* assets, SlotIndex32 slot ) : m_assets( assets ), m_slot( slot )
+{
+    
+}
+
+// ** AssetHandle::AssetHandle
+AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets ), m_slot( other.m_slot )
+{
+    
+}
+
+// ** AssetHandle::operator ->
+const AssetHandle& AssetHandle::operator = ( const AssetHandle& other )
+{
+    m_assets = other.m_assets;
+    m_slot   = other.m_slot;
+    return *this;
+}
+
+// ** AssetHandle::operator ->
+const Asset* AssetHandle::operator -> ( void ) const
+{
+    return isValid() ? &m_assets->assetAtSlot( m_slot ) : NULL;
+}
+
+// ** AssetHandle::isValid
+bool AssetHandle::isValid( void ) const
+{
+    return m_assets && m_assets->isValidSlot( m_slot );
+}
+
+// --------------------------------------------- Assets --------------------------------------------- //
+
+// ** Assets::add
+AssetHandle Assets::addAsset( TypeId type, const AssetId& uniqueId, const String& fileName )
+{
+    DC_BREAK_IF( m_slotById.find( uniqueId ) != m_slotById.end() );
+
+    // First reserve the slot for an asset data.
+    SlotIndex32 slot = m_assets.add( Asset( type, uniqueId, fileName ) );
+
+    // Now register unique id associated with this asset slot.
+    m_slotById[uniqueId] = slot;
+
+    // Construct an asset handle.
+    return AssetHandle( this, slot );
+}
+
+// ** Assets::remove
+bool Assets::removeAsset( const AssetId& id )
+{
+    // Find handle by id.
+    AssetSlotsById::iterator i = m_slotById.find( id );
+    DC_BREAK_IF( i == m_slotById.end() );
+
+    // Store the slot before and remove the handle mapping.
+    SlotIndex32 slot = i->second;
+    m_slotById.erase( i );
+
+    // Now release an asset data
+    return m_assets.remove( slot );
+}
+
+// ** Assets::findAsset
+AssetHandle Assets::findAsset( const AssetId& id ) const
+{
+    AssetSlotsById::const_iterator i = m_slotById.find( id );
+
+    if( i == m_slotById.end() ) {
+        return AssetHandle();
+    }
+
+    return AssetHandle( this, i->second );
+}
+
+// ** Assets::assetAtSlot
+const Asset& Assets::assetAtSlot( SlotIndex32 slot ) const
+{
+    return m_assets.get( slot );
+}
+
+// ** Assets::isValidSlot
+bool Assets::isValidSlot( SlotIndex32 slot ) const
+{
+    return m_assets.has( slot );
+}
+
+#if ASSET_DEPRECATED
+
 // ** Assets::Assets
 Assets::~Assets( void )
 {
@@ -37,6 +135,8 @@ Assets::~Assets( void )
         delete i->second;
     }
 }
+
+#endif
 
 /*// ------------------------------------------- Asset ------------------------------------------- //
 
