@@ -39,10 +39,47 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Base class for all 2D physics systems.
+    class Physics2D : public Ecs::EntitySystem {
+    public:
+
+		//! Sets the physics fixed time step.
+		void					setTimeStep( f32 value );
+
+    protected:
+
+                                //! Constructs Physics2D instance.
+                                Physics2D( const String& name, f32 timeStep = 1.0f / 120.0f, f32 scale = 1.0f );
+
+        //! Updates the rigid body linear velocity.
+        void                    updateLinearVelocity( RigidBody2D& rigidBody, const Vec2& value );
+
+        //! Updates the rigid body mass.
+        void                    updateMass( RigidBody2D& rigidBody, f32 value );
+
+        //! Clears the previous state of a rigid body.
+        void                    clearState( RigidBody2D& rigidBody );
+
+        //! Queues the collision event for a rigid body.
+        void                    queueCollisionEvent( RigidBody2D::CollisionEvent::Type type, const SceneObjectWPtr& first, const SceneObjectWPtr& second, const Array<Vec2>& points );
+
+        //! Simulates the physics with a fixed time step.
+        void                    simulatePhysics( f32 dt );
+
+        //! Performs a single physics simulation step.
+        virtual void            simulate( f32 dt ) = 0;
+
+    private:
+
+		f32						m_timeStep;		        //!< Physics fixed time step.
+        s32                     m_maxSimulationSteps;   //!< Maximum number of simulation steps to stop the spiral of death on low frame rates.
+        f32                     m_accumulator;          //!< Accumulated time that is split into fixed steps.
+    };
+
 #ifdef DC_BOX2D_ENABLED
 
-	//! The 2D physics system
-	class Box2DPhysics : public Ecs::EntitySystem {
+	//! The Box2D physics system
+	class Box2DPhysics : public Physics2D {
 	public:
 
 								//! Constructs the Box2DPhysics instance.
@@ -57,8 +94,8 @@ namespace Scene {
 		//! Returns all scene objects that are intersected by a ray.
 		SceneObjectSet			querySegment( const Vec2& start, const Vec2& end ) const;
 
-		//! Sets the physics fixed time step.
-		void					setTimeStep( f32 value );
+        //! Performs a single physics simulation step of a Box2D world.
+        virtual void            simulate( f32 dt ) DC_DECL_OVERRIDE;
 
         //! Updates the physics state.
         virtual void	        update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
@@ -122,9 +159,6 @@ namespace Scene {
         //! Updates the scene transform by a Box2D body transform.
         void                    updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform );
 
-        //! Simulates the physics with a fixed time step.
-        void                    simulatePhysics( f32 dt );
-
         //! Returns the Box2D body attached to this rigid body.
         b2Body*                 extractPhysicalBody( const RigidBody2D& rigidBody ) const;
 
@@ -147,9 +181,6 @@ namespace Scene {
 		AutoPtr<b2World>		m_world;			    //!< The Box2D physics world.
         AutoPtr<Collisions>     m_collisions;           //!< Collision listener interface.
 		f32						m_scale;			    //!< Physics world scale.
-		f32						m_timeStep;		        //!< Physics fixed time step.
-        s32                     m_maxSimulationSteps;   //!< Maximum number of simulation steps to stop the spiral of death on low frame rates.
-        f32                     m_accumulator;          //!< Accumulated time that is split into fixed steps.
 	};
 
 #endif	/*	DC_BOX2D_ENABLED	*/
