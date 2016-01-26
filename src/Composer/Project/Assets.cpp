@@ -36,6 +36,9 @@ DC_BEGIN_COMPOSER
 // ** Assets::Assets
 Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
 {
+    // Set the randomization seed to generate asset identifiers
+    srand( time( NULL ) );
+
 	// Create an asset bundle
 	//m_bundle = Scene::AssetBundle::create( "Assets", path );
     qWarning() << "Assets::Assets : no assets path set.";
@@ -54,15 +57,20 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
-    connect( m_assetFileSystem, SIGNAL(fileRemoved(const QString&, const FileInfo&)), this, SLOT(removeFromCache(const QString&, const FileInfo&)) );
+    connect( m_assetFileSystem, SIGNAL(fileRemoved(const QString&, const FileInfo&)), this, SLOT(removeAssetFromCache(const QString&, const FileInfo&)) );
     connect( m_assetFileSystem, SIGNAL(fileChanged(const QString&, const FileInfo&)), this, SLOT(updateAssetCache(const QString&, const FileInfo&)) );
 }
 
 // ** Assets::bundle
-Scene::Assets& Assets::bundle( void ) const
+const Scene::Assets& Assets::bundle( void ) const
 {
-    DC_NOT_IMPLEMENTED; // remove cast
-	return const_cast<Scene::Assets&>( m_bundle );
+	return m_bundle;
+}
+
+// ** Assets::bundle
+Scene::Assets& Assets::bundle( void )
+{
+	return m_bundle;
 }
 
 // ** Assets::createAssetForFile
@@ -80,8 +88,27 @@ Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
     DC_BREAK_IF( !asset.isValid() );
 
 	// Set meta file
-	m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() );
+	m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
     return asset;
+}
+
+// ** Assets::parseAssetFromData
+Scene::AssetHandle Assets::parseAssetFromData( const Io::KeyValue& kv )
+{
+	DC_BREAK_IF( !kv.isObject() );
+
+	// Get asset type by name.
+	Scene::AssetType type = Scene::AssetType::fromString( kv.get( "type", "" ).asString() );
+    DC_BREAK_IF( !type.isValid() );
+
+    // Read the unique asset identifier.
+    Scene::AssetId uid = kv.get( "uuid" ).asString();
+
+	// Create asset instance by type name
+	Scene::AssetHandle asset = m_bundle.addAsset( type, uid, "" );
+    DC_BREAK_IF( !asset.isValid() );
+
+	return asset;
 }
 
 // ** Assets::registerExtension
@@ -100,12 +127,8 @@ Scene::AssetType Assets::assetTypeFromExtension( const String& extension ) const
 // ** Assets::removeAssetFromCache
 void Assets::removeAssetFromCache( const QString& uuid, const FileInfo& file )
 {
-#if 0
 	// Remove asset from bundle
-	m_bundle->removeAsset( uuid.toStdString() );
-#else
-    DC_NOT_IMPLEMENTED
-#endif
+	m_bundle.removeAsset( uuid.toStdString() );
 
 	// Remove asset from cache
     qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid.toStdString() ).c_str() );
@@ -159,8 +182,7 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 
 	// Create asset from data or create the new one
 	if( !meta.isNull() ) {
-	//	asset = m_bundle->createAssetFromData( meta );
-        DC_NOT_IMPLEMENTED;
+		asset = parseAssetFromData( meta );
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}

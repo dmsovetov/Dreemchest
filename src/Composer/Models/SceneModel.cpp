@@ -228,7 +228,6 @@ void SceneModel::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Sc
 // ** SceneModel::acceptableDropAction
 SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
 {
-#if 0
 	// No valid assets - can't drop
 	if( assets.empty() ) {
 		return AssetAction::Invalid;
@@ -238,34 +237,30 @@ SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet
 	AssetAction assetAction( AssetAction::Invalid, assets, target, point );
 
 	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
-		switch( (*i)->type() ) {
-		case Scene::Asset::Mesh:		assetAction.type = AssetAction::PlaceMesh;
-										break;
+        const Scene::AssetType& type = (*i)->type();
 
-		case Scene::Asset::Material:	if( !target.valid() || target->has<Scene::StaticMesh>() ) {
-											assetAction.type = AssetAction::AssignMaterial;
-										}
-										break;
-		}
+        if( type.is<Scene::Mesh>() ) {
+            assetAction.type = AssetAction::PlaceMesh;
+        }
+        else if( type.is<Scene::Material>() ) {
+            if( !target.valid() || target->has<Scene::StaticMesh>() ) {
+                assetAction.type = AssetAction::AssignMaterial;
+            }
+        }
 	}
 
 	return assetAction;
-#else
-    DC_NOT_IMPLEMENTED;
-    return AssetAction( AssetAction::Invalid );
-#endif
 }
 
 // ** SceneModel::performAssetAction
 bool SceneModel::performAssetAction( const AssetAction& action )
 {
-#if 0
 	// Get the target scene object.
 	Scene::SceneObjectWPtr target = action.sceneObject;
 
 	switch( action.type ) {
 	case AssetAction::PlaceMesh:		{
-											Scene::SceneObjectWPtr object = placeStaticMesh( castTo<Scene::Mesh>( action.assets.begin()->get() ), action.point );
+											Scene::SceneObjectWPtr object = placeStaticMesh( *action.assets.begin(), action.point );
 											DC_BREAK_IF( !object.valid() );
 
 											if( target.valid() ) {
@@ -278,35 +273,28 @@ bool SceneModel::performAssetAction( const AssetAction& action )
 												return false;
 											}
 
-											applyMaterial( target, 0, castTo<Scene::Material>( action.assets.begin()->get() ) );
+											applyMaterial( target, 0, *action.assets.begin() );
 										}
 
 										break;
 	}
 
 	return true;
-#else
-    DC_NOT_IMPLEMENTED
-    return false;
-#endif
 }
 
 // ** SceneModel::applyMaterial
 void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialHandle material )
 {
-#if 0
 	DC_BREAK_IF( !target.valid() );
 	DC_BREAK_IF( !target->has<Scene::StaticMesh>() );
 	DC_BREAK_IF( !material.isValid() );
 
 	// Queue material for loading.
-	material->bundle()->queueForLoading( material );
+	//material->bundle()->queueForLoading( material );
+    qWarning() << "SceneModel::applyMaterial : material is not queued for loading any more";
 
 	// Set mesh material
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
-#else
-    DC_NOT_IMPLEMENTED;
-#endif
 }
 
 // ** SceneModel::placeTerrain
@@ -346,9 +334,9 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainHandle terrain, c
 // ** SceneModel::placeStaticMesh
 Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, const Vec3& point )
 {
-#if 0
 	DC_BREAK_IF( !mesh.isValid() );
 
+#if 0
 	// Construct scene object
 	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
     sceneObject->setSerializable( true );
@@ -381,9 +369,9 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 		}
 	}
 
-	return sceneObject;
+    return sceneObject;
 #else
-    DC_NOT_IMPLEMENTED;
+    DC_NOT_IMPLEMENTED
     return Scene::SceneObjectWPtr();
 #endif
 }

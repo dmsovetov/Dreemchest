@@ -178,13 +178,9 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 		return NULL;
 	}
 
-#if 0
 	// Find asset by UUID
-	Scene::AssetPtr asset = m_assets->bundle()->findAsset( uuid );
-	DC_BREAK_IF( !asset.valid() );
-#else
-    DC_NOT_IMPLEMENTED
-#endif
+	Scene::AssetHandle asset = m_assets->bundle().findAsset( uuid );
+	DC_BREAK_IF( !asset.isValid() );
 
 	// Dock the editor to main window
 	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, fileInfo );

@@ -125,7 +125,8 @@ void SceneEditor::render( f32 dt )
 	m_scene->update( 0, dt );
 
 	// Render the scene
-	m_scene->render( m_renderingContext );
+	//m_scene->render( m_renderingContext );
+    qWarning() << "SceneEditor::render : rendering is disabled";
 
 	// Reset the cursor movement
 	m_cursorMovement->set( Vec3() );
@@ -173,8 +174,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
     // Create serialization context
     Ecs::SerializationContext ctx( scene->ecs() );
-    DC_NOT_IMPLEMENTED;
-    //ctx.set<Scene::AssetBundle>( m_project->assets().get() );
+    ctx.set<Scene::Assets>( &m_project->assets() );
 
     Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
 

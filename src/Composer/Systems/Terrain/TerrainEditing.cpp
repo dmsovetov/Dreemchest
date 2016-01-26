@@ -118,7 +118,6 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
         return;
     }
 
-#if 0
 	// Find the intersection point of ray & terrain
 	Vec3 point = chunk.terrain()->rayMarch( m_viewport->ray() );
 
@@ -140,8 +139,8 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 	}
 
 	// Get terrain heightmap.
-	Scene::TerrainWPtr terrain   = chunk.terrain();
-	Scene::Heightmap&  heightmap = terrain->heightmap();
+	Scene::TerrainHandle    terrain   = chunk.terrain();
+	const Scene::Heightmap& heightmap = terrain->heightmap();
 
 	point = transform.parent()->matrix().inversed() * point;
 
@@ -186,10 +185,12 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
             }
 
 			// Update the height
-			heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
+			//heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
+            DC_NOT_IMPLEMENTED;
 		}
 	}
 
+#if 0
 	// Get the chunk buffers
 	Scene::Terrain::VertexBuffer vertices = terrain->chunkVertexBuffer( chunk.x(), chunk.z() );
 
@@ -255,7 +256,6 @@ f32 TerrainHeightmapSystem::applyFlattening( const Vec3& vertex, s32 x, s32 z, S
 // ** TerrainHeightmapSystem::applyLeveling
 f32 TerrainHeightmapSystem::applyLeveling( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const
 {
-#if 0
     // Calculate target height.
     f32 height = terrain->maxHeight() * strength;
 
@@ -266,10 +266,6 @@ f32 TerrainHeightmapSystem::applyLeveling( const Vec3& vertex, s32 x, s32 z, Sce
     result = min2( height, result );
 
     return result;
-#else
-    DC_NOT_IMPLEMENTED
-    return 0.0f;
-#endif
 }
 
 // ** TerrainHeightmapSystem::applySmoothing
@@ -286,7 +282,6 @@ f32 TerrainHeightmapSystem::applySmoothing( const Vec3& vertex, s32 x, s32 z, Sc
 // ** TerrainHeightmapSystem::calculateAverageHeight
 f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain, s32 x, s32 z, s32 radius ) const
 {
-#if 0
     f32 average = 0.0f;
     s32 count   = 0;
 
@@ -304,10 +299,6 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
 	average /= count;
 
     return average;
-#else
-    DC_NOT_IMPLEMENTED
-    return 0.0f;
-#endif
 }
 
 // -------------------------------------------------------------- TerrainToolPass -------------------------------------------------------------- //
@@ -315,7 +306,6 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
 // ** TerrainToolPass::render
 void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform )
 {
-#if 0
 	Renderer::Renderer2DWPtr renderer = context->renderer();
 
 	s32 r = ceil( tool.radius() );
@@ -344,9 +334,6 @@ void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rv
 			renderer->box( Bounds( point - Vec3(5.0f,0.1f,5.0f) * influence, point + Vec3(5.0f,0.1f,5.0f) * influence ), Rgba( 1.0f, 1.0f, 0.0f ) );
 		}	
 	}
-#else
-    DC_NOT_IMPLEMENTED
-#endif
 }
 
 DC_END_COMPOSER

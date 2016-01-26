@@ -273,13 +273,12 @@ Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 
 		DC_BREAK_IF( !meta.isObject() );
 
-        DC_NOT_IMPLEMENTED;
 		// Find asset by UUID.
-		//Scene::AssetWPtr asset = m_project->assets()->findAsset( meta.get( "uuid", "" ).asString() );
-		//DC_BREAK_IF( !asset.valid() );
+		Scene::AssetHandle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
+		DC_BREAK_IF( !asset.isValid() );
 
 		// Add to set.
-		//result.insert( asset );
+		result.insert( asset );
 	}
 
 	return result;

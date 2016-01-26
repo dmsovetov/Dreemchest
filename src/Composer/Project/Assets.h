@@ -41,7 +41,8 @@ DC_BEGIN_COMPOSER
 	public:
 
 		//! Returns asset bundle.
-		Scene::Assets&		        bundle( void ) const;
+		const Scene::Assets&		bundle( void ) const;
+        Scene::Assets&              bundle( void );
 
 		//! Registers the mapping from extension to asset type.
 		void						registerExtension( const String& ext, Scene::AssetType type );
@@ -62,6 +63,9 @@ DC_BEGIN_COMPOSER
 
 		//! Creates new asset instance by a specified extension.
 		Scene::AssetHandle			createAssetForFile( const FileInfo& fileInfo );
+
+        //! Parses an asset from a meta data.
+        Scene::AssetHandle          parseAssetFromData( const Io::KeyValue& kv );
 
     private slots:
 
