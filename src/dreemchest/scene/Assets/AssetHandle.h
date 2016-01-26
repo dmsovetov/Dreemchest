@@ -33,6 +33,107 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! This handle are issued by an Assets class and are the only way the outer world can access an asset.
+    class AssetHandle {
+    friend class Assets;
+    public:
+
+                                    //! Constructs an empty AssetHandle instance.
+                                    AssetHandle( void );
+
+                                    //! Constructs AssetHandle instance from another one.
+                                    AssetHandle( const AssetHandle& other );
+
+        //! Copies an asset handle.
+        const AssetHandle&          operator = ( const AssetHandle& other );
+
+        //! Compares two asset handles.
+        bool                        operator < ( const AssetHandle& other ) const;
+
+        //! This operator is used for read-only access to actual asset data.
+        const Asset*                operator -> ( void ) const;
+        Asset*                      operator -> ( void );
+
+        //! Returns true if this asset handle is still valid.
+        bool                        isValid( void ) const;
+
+    private:
+
+                                    //! Constructs the AssetHandle instance.
+                                    AssetHandle( const Assets* assets, SlotIndex32 slot );
+
+    private:
+
+        const Assets*               m_assets;   //!< An assets manager that issued this handle.
+        SlotIndex32                 m_slot;     //!< Asset slot.
+    };
+
+    //! This generic asset handle exposes actual asset data. All data handles are weak references and become invalid once asset is unloaded.
+    template<typename TAsset>
+    class AssetDataHandle {
+    public:
+
+                                        //! Constructs an empty AssetDataHandle instance.
+                                        AssetDataHandle( void );
+
+                                        //! Constructs AssetDataHandle instance from another one.
+                                        AssetDataHandle( const AssetDataHandle<TAsset>& other );
+
+                                        //! Constructs AssetDataHandle instance from AssetHandle by casting it's type.
+                                        AssetDataHandle( const AssetHandle& asset );
+
+        //! Copies an asset handle.
+        const AssetDataHandle<TAsset>&  operator = ( const AssetDataHandle<TAsset>& other );
+
+        //! This operator is used for read-only access to actual asset data.
+        const TAsset*                   operator -> ( void ) const;
+
+        //! Returns true if this asset handle is still valid.
+        bool                            isValid( void ) const;
+    };
+
+    // ** AssetDataHandle::AssetDataHandle
+    template<typename TAsset>
+    AssetDataHandle<TAsset>::AssetDataHandle( void )
+    {
+    
+    }
+
+    // ** AssetDataHandle::AssetDataHandle
+    template<typename TAsset>
+    AssetDataHandle<TAsset>::AssetDataHandle( const AssetDataHandle<TAsset>& other )
+    {
+    
+    }
+
+    // ** AssetDataHandle::AssetDataHandle
+    template<typename TAsset>
+    AssetDataHandle<TAsset>::AssetDataHandle( const AssetHandle& asset )
+    {
+    
+    }
+
+    // ** AssetDataHandle::operator =
+    template<typename TAsset>
+    const AssetDataHandle<TAsset>& AssetDataHandle<TAsset>::operator = ( const AssetDataHandle<TAsset>& other )
+    {
+        return *this;
+    }
+
+    // ** AssetDataHandle::operator ->
+    template<typename TAsset>
+    const TAsset* AssetDataHandle<TAsset>::operator -> ( void ) const
+    {
+        return NULL;
+    }
+
+    // ** AssetDataHandle::isValid
+    template<typename TAsset>
+    bool AssetDataHandle<TAsset>::isValid( void ) const
+    {
+        return false;
+    }
+
 #if ASSET_DEPRECATED
     //! This handles are issued by an Assets class and are the only way the outer world can access an asset.
     template<typename TAsset>

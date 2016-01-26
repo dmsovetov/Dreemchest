@@ -30,69 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// -------------------------------------------- AssetType -------------------------------------------- //
-
-// ** AssetType::Invalid
-const AssetType AssetType::Invalid;
-
-// ** AssetType::AssetType
-AssetType::AssetType( void ) : m_type( ~0 )
-{
-}
-
-// ** AssetType::AssetType
-AssetType::AssetType( const AssetType& other ) : m_type( other.m_type )
-{
-}
-
-// ** AssetType::AssetType
-AssetType::AssetType( TypeIdx type ) : m_type( type )
-{
-
-}
-
-// ** AssetType::operator ==
-bool AssetType::operator == ( const AssetType& other ) const
-{
-    return m_type == other.m_type;
-}
-
-// ** AssetType::operator <
-bool AssetType::operator < ( const AssetType& other ) const
-{
-    return m_type < other.m_type;
-}
-
-// ** AssetType::isValid
-bool AssetType::isValid( void ) const
-{
-    return !(*this == Invalid);
-}
-
-// ** AssetType::fromString
-AssetType AssetType::fromString( const String& value )
-{
-    if( value == "Mesh" )       return fromClass<Mesh>();
-    if( value == "Image" )      return fromClass<Image>();
-    if( value == "Material" )   return fromClass<Material>();
-    if( value == "Prefab" )     return fromClass<Prefab>();
-
-    DC_BREAK;
-    return AssetType();
-}
-
-// ** AssetType::toString
-String AssetType::toString( const AssetType& value )
-{
-    if( value == fromClass<Mesh>() )        return "Mesh";
-    if( value == fromClass<Image>() )       return "Image";
-    if( value == fromClass<Material>() )    return "Material";
-    if( value == fromClass<Prefab>() )      return "Prefab";
-
-    DC_BREAK;
-    return "";
-}
-
 // ---------------------------------------------- Asset ---------------------------------------------- //
 
 // ** Asset::Asset
@@ -127,53 +64,6 @@ const String& Asset::name( void ) const
 void Asset::setName( const String& value )
 {
     m_name = value;
-}
-
-// ------------------------------------------- AssetHandle ------------------------------------------- //
-
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( void ) : m_assets( NULL )
-{
-    
-}
-
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( const Assets* assets, SlotIndex32 slot ) : m_assets( assets ), m_slot( slot )
-{
-    
-}
-
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets ), m_slot( other.m_slot )
-{
-    
-}
-
-// ** AssetHandle::operator ->
-const AssetHandle& AssetHandle::operator = ( const AssetHandle& other )
-{
-    m_assets = other.m_assets;
-    m_slot   = other.m_slot;
-    return *this;
-}
-
-// ** AssetHandle::operator ->
-const Asset* AssetHandle::operator -> ( void ) const
-{
-    return isValid() ? &m_assets->assetAtSlot( m_slot ) : NULL;
-}
-
-// ** AssetHandle::operator ->
-Asset* AssetHandle::operator -> ( void )
-{
-    return isValid() ? const_cast<Asset*>( &m_assets->assetAtSlot( m_slot ) ) : NULL;
-}
-
-
-// ** AssetHandle::isValid
-bool AssetHandle::isValid( void ) const
-{
-    return m_assets && m_assets->isValidSlot( m_slot );
 }
 
 // --------------------------------------------- Assets --------------------------------------------- //

@@ -29,60 +29,11 @@
 
 #include "AssetHandle.h"
 #include "AssetPool.h"
+#include "AssetType.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
-
-    //! Asset type id.
-    class AssetType {
-    public:
-
-        //! Invalid asset type constant.
-        static const AssetType      Invalid;
-
-
-                                    //! Constructs invalid Asset type.
-                                    AssetType( void );
-
-                                    //! Copies AssetType instance.
-                                    AssetType( const AssetType& other );
-
-        //! Compares two asset types.
-        bool                        operator == ( const AssetType& other ) const;
-
-        //! Compares two asset type.
-        bool                        operator < ( const AssetType& other ) const;
-
-        //! Returns true if this is a valid asset type.
-        bool                        isValid( void ) const;
-
-        //! Returns an asset type for specified class.
-        template<typename TAsset>
-        static AssetType            fromClass( void );
-
-        //! Returns an asset type from a string.
-        static AssetType            fromString( const String& value );
-
-        //! Returns an asset type formatted as string.
-        static String               toString( const AssetType& value );
-
-    private:
-
-                                    //! Constructs AssetType instance.
-                                    AssetType( TypeIdx type );
-
-    private:
-
-        TypeIdx                     m_type; //!< Actual asset type value.
-    };
-
-    // ** Assets::fromClass
-    template<typename TAsset>
-    AssetType AssetType::fromClass( void )
-    {
-        return GroupedTypeIndex<TAsset, AssetType>::idx();
-    }
 
     //! Asset class instance stores info about a single asset.
     class Asset {
@@ -114,44 +65,14 @@ namespace Scene {
         String                      m_name;     //!< Asset name.
     };
 
-    //! This handle are issued by an Assets class and are the only way the outer world can access an asset.
-    class AssetHandle {
-    friend class Assets;
-    public:
-
-                                    //! Constructs an empty AssetHandle instance.
-                                    AssetHandle( void );
-
-                                    //! Constructs AssetHandle instance from another one.
-                                    AssetHandle( const AssetHandle& other );
-
-        //! Copies an asset handle.
-        const AssetHandle&          operator = ( const AssetHandle& other );
-
-        //! This operator is used for read-only access to actual asset data.
-        const Asset*                operator -> ( void ) const;
-        Asset*                      operator -> ( void );
-
-        //! Returns true if this asset handle is still valid.
-        bool                        isValid( void ) const;
-
-    private:
-
-                                    //! Constructs the AssetHandle instance.
-                                    AssetHandle( const Assets* assets, SlotIndex32 slot );
-
-    private:
-
-        const Assets*               m_assets;   //!< An assets manager that issued this handle.
-        SlotIndex32                 m_slot;     //!< Asset slot.
-    };
-
-    typedef Set<AssetHandle> AssetSet;
-
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
     friend class AssetHandle;
     public:
+
+        //! Returns an asset of specified type.
+        template<typename TAsset>
+        AssetDataHandle<TAsset>     find( const AssetId& uniqueId ) const;
 
         //! Adds new asset with unique id.
         AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName );
@@ -178,6 +99,14 @@ namespace Scene {
         Slots<Asset, SlotIndex32>   m_assets;   //!< All available assets.
         AssetSlotsById              m_slotById; //!< AssetId to handle mapping.
     };
+
+    // ** Assets::find
+    template<typename TAsset>
+    AssetDataHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
+    {
+        AssetHandle handle = findAsset( uniqueId );
+        return handle;
+    }
 
 #if ASSET_DEPRECATED
     //! Root interface to access all available assets.
