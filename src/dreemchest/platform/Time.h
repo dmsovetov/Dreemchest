@@ -36,27 +36,69 @@ namespace Platform {
 	//! Returns current time in milliseconds.
 	extern u32 currentTime( void );
 
+    //! Time step data issued by fixed timer.
+    class TimeStep {
+    friend class FixedTimeStep;
+    public:
+
+                    //! Constructs empty TimeStep instance.
+                    TimeStep( void );
+
+        //! Returns the time step duration in millseconds.
+        u32         milliseconds( void ) const;
+
+        //! Returns the time step duration in seconds.
+        f32         seconds( void ) const;
+
+        //! Returns the total number of iterations for this time step.
+        s32         count( void ) const;
+
+    private:
+
+        u32         m_dt;     //!< Time step time in milliseconds.
+        s32         m_count;  //!< The total number of iteration to be repeated for this time step.
+    };
+
+    //! Calculates the time passed since last update.
+    class TimeDelta {
+    public:
+
+                    //! Constructs TimeDelta instance.
+                    TimeDelta( void );
+
+        //! Calculates time passed since last update.
+        /*!
+         \return Milliseconds passed since last update.
+        */
+        u32         update( void );
+
+    private:
+
+        u32         m_prev; //!< Last recorded time.
+    };
+
 	//! Fixed time step timer.
 	class FixedTimeStep {
 	public:
 
-				//! Constructs FixedTimeStep instance.
-				FixedTimeStep( u32 step );
+				    //! Constructs FixedTimeStep instance.
+				    FixedTimeStep( u32 step, s32 maxSteps );
 
-		//! Returns the total number of steps passed since last call.
-		s32		stepCount( void );
+        //! Advances the fixed time step timer by a specified amount of milliseconds.
+        /*!
+         \param dt Time in milliseconds passed since last advance.
+         \return The time step instance.
+        */
+        TimeStep    advance( u32 dt );
 
-		//! Returns the time step as integer value in milliseconds.
-		u32		milliseconds( void ) const;
-
-		//! Returns the time step as floating point value in seconds.
-		f32		seconds( void ) const;
+        //! Returns the maximum number of steps that can be performed.
+        s32         maxSteps( void ) const;
 
 	private:
 
-		u32		m_dt;			//!< The requested timer step.
-		u32		m_prev;			//!< The previous time value.
-		u32		m_accumulated;	//!< The accumulated value.
+		u32		    m_dt;			//!< The requested timer step.
+		u32		    m_accumulated;	//!< The accumulated value.
+        s32         m_maxSteps;     //!< The maxium number of steps to be performed.
 	};
 
 } // namespace Platform
