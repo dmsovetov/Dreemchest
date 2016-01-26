@@ -75,6 +75,7 @@ namespace Scene {
 	class Mesh;
 	class Material;
 	class Terrain;
+    class Prefab;
 
 	class Transform;
 	class StaticMesh;

@@ -75,6 +75,7 @@ AssetType AssetType::fromString( const String& value )
     if( value == "Mesh" )       return fromClass<Mesh>();
     if( value == "Image" )      return fromClass<Image>();
     if( value == "Material" )   return fromClass<Material>();
+    if( value == "Prefab" )     return fromClass<Prefab>();
 
     DC_BREAK;
     return AssetType();
@@ -86,6 +87,7 @@ String AssetType::toString( const AssetType& value )
     if( value == fromClass<Mesh>() )        return "Mesh";
     if( value == fromClass<Image>() )       return "Image";
     if( value == fromClass<Material>() )    return "Material";
+    if( value == fromClass<Prefab>() )      return "Prefab";
 
     DC_BREAK;
     return "";
