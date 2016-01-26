@@ -53,11 +53,11 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 	}
 
 	// Get the rendered mesh
-	MeshHandle mesh = staticMesh.mesh();
-	DC_BREAK_IF( !mesh.isValid() );
+    MeshHandle  handle = staticMesh.mesh();
+    const Mesh& mesh   = handle.readLock();
 
 	// Emit render operation for each mesh chunk
-	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
+	for( u32 i = 0, n = mesh.chunkCount(); i < n; i++ ) {
 		// Get the material for chunk
 		MaterialHandle material = staticMesh.material( i );
 
@@ -72,11 +72,11 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 		Rvm::Command* rop = rvm.emit();
 
 		// Initialize the rendering operation
-		rop->transform		= transform.matrix();
-		rop->mesh			= mesh.slot();
-		rop->mode			= RenderOpaque;
-		rop->shader			= NULL;
-		rop->distance		= 0;
+		rop->transform	= transform.matrix();
+		rop->mesh		= handle.slot();
+		rop->mode		= RenderOpaque;
+		rop->shader		= NULL;
+		rop->distance	= 0;
 
 		if( !material.isValid() ) {
 			continue;
