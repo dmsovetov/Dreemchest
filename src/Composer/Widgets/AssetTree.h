@@ -50,10 +50,10 @@ namespace Ui {
 							AssetSelector( u32 mask = ~0, QWidget* parent = NULL );
 
 		//! Returns the selected asset.
-		Scene::Asset	    value( void ) const;
+		Scene::AssetHandle  value( void ) const;
 
 		//! Sets the selected asset.
-		void				setValue( const Scene::Asset& value );
+		void				setValue( const Scene::AssetHandle& value );
 
 	private:
 
@@ -65,7 +65,7 @@ namespace Ui {
 		QLineEdit*			m_line;		//!< Asset selector line edit.
 		QToolButton*		m_button;	//!< Asset selector button.
 		u32					m_mask;		//!< Accepted asset types.
-		Scene::Asset	    m_asset;	//!< The selected asset.
+		Scene::AssetHandle  m_asset;	//!< The selected asset.
 	};
 
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.

@@ -41,8 +41,7 @@ DC_BEGIN_COMPOSER
 		//! Called each time object property was changed.
 		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE
         {
-            DC_NOT_IMPLEMENTED;
-        //    m_material.writeLock();
+            m_material.writeLock();
         }
 
 	private:

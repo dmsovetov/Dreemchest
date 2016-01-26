@@ -311,22 +311,21 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainHandle terrain, c
 	root->attach<Scene::Identifier>( "Terrain" );
 	scene->addSceneObject( root );
 
-    DC_NOT_IMPLEMENTED
-
 	// Add chunks
-	//for( u32 z = 0; z < terrain->chunkCount(); z++ ) {
-	//	for( u32 x = 0; x < terrain->chunkCount(); x++ ) {
-	//		Scene::SceneObjectPtr chunk = scene->createSceneObject();
-	//		Scene::Mesh		      mesh  = terrain->createChunkMesh( x, z );
+	for( u32 z = 0; z < terrain->chunkCount(); z++ ) {
+		for( u32 x = 0; x < terrain->chunkCount(); x++ ) {
+			Scene::SceneObjectPtr chunk = scene->createSceneObject();
+			Scene::Mesh		      mesh  = terrain->createChunkMesh( x, z );
 
-	//		chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
-	//		chunk->attach<Scene::StaticMesh>( mesh );
-	//		chunk->attach<Editors::TerrainChunk>( terrain, x, z );
-	//		chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
-	//		
-	//		scene->addSceneObject( chunk );
-	//	}
-	//}
+			chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
+            DC_NOT_IMPLEMENTED
+			//chunk->attach<Scene::StaticMesh>( mesh );
+			chunk->attach<Editors::TerrainChunk>( terrain, x, z );
+			chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
+			
+			scene->addSceneObject( chunk );
+		}
+	}
 
 	return root;
 }

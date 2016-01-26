@@ -139,8 +139,9 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 	}
 
 	// Get terrain heightmap.
-	Scene::TerrainHandle    terrain   = chunk.terrain();
-	const Scene::Heightmap& heightmap = terrain->heightmap();
+    Scene::TerrainHandle terrain = chunk.terrain();
+    Scene::AssetWriteLock<Scene::Terrain> locked = terrain.writeLock();
+    Scene::Heightmap& heightmap = locked->heightmap();
 
 	point = transform.parent()->matrix().inversed() * point;
 
@@ -185,8 +186,7 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
             }
 
 			// Update the height
-			//heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
-            DC_NOT_IMPLEMENTED;
+			heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
 		}
 	}
 

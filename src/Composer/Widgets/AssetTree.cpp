@@ -45,8 +45,7 @@ namespace Ui {
 // ** AssetSelector::AssetSelector
 AssetSelector::AssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
 {
-    DC_NOT_IMPLEMENTED
-//	qRegisterMetaType<Scene::AssetWPtr>( "Scene::AssetWPtr" );
+	qRegisterMetaType<Scene::AssetHandle>( "Scene::AssetHandle" );
 
 	m_line = new QLineEdit( this );
 	m_line->installEventFilter( this );
@@ -76,17 +75,13 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 									return true;
 								}
 
-                            #if 0
 								// Decode asset
-								Scene::AssetPtr asset = qComposer->assetFromMime( de->mimeData() );
+								Scene::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
 
 								// Check asset type
-								if( !asset.valid() || (asset->type() & m_mask) == 0 ) {
+								if( !asset.isValid() || (asset->type().bit() & m_mask) == 0 ) {
 									return true;
 								}
-                            #else
-                                DC_NOT_IMPLEMENTED
-                            #endif
 
 								// Accept this action
 								de->acceptProposedAction();
@@ -96,15 +91,11 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
     case QEvent::Drop:		{
 								QDropEvent* de = static_cast<QDropEvent*>( e );
 
-                            #if 0
 								// Decode asset
-								Scene::AssetWPtr asset = qComposer->assetFromMime( de->mimeData() );
+								Scene::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
 								
 								// Set the value
 								setValue( asset );
-                            #else
-                                DC_NOT_IMPLEMENTED
-                            #endif
 
 								// Emit the signal
 								emit valueChanged();
@@ -116,23 +107,19 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 }
 
 // ** AssetSelector::assetChanged
-Scene::Asset AssetSelector::value( void ) const
+Scene::AssetHandle AssetSelector::value( void ) const
 {
 	return m_asset;
 }
 
 // ** AssetSelector::setValue
-void AssetSelector::setValue( const Scene::Asset& value )
+void AssetSelector::setValue( const Scene::AssetHandle& value )
 {
-#if 0
 	// Save the asset pointer
 	m_asset = value;
 
 	// Update the text field
-	m_line->setText( m_asset.valid() ? QString::fromStdString( m_asset->name() ) : "" );
-#else
-    DC_NOT_IMPLEMENTED
-#endif
+	m_line->setText( m_asset.isValid() ? QString::fromStdString( m_asset->name() ) : "" );
 }
 
 // ------------------------------------------------ AssetTree ------------------------------------------------ //
