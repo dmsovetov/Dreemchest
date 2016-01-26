@@ -33,12 +33,12 @@ namespace Scene {
 // ---------------------------------------------- Asset ---------------------------------------------- //
 
 // ** Asset::Asset
-Asset::Asset( void )
+Asset::Asset( void ) : m_state( Unloaded )
 {
 }
 
 // ** Asset::Asset
-Asset::Asset( AssetType type, const AssetId& uniqueId, const String& fileName ) : m_type( type ), m_uniqueId( uniqueId ), m_fileName( fileName )
+Asset::Asset( AssetType type, const AssetId& uniqueId, const String& fileName ) : m_type( type ), m_uniqueId( uniqueId ), m_fileName( fileName ), m_state( Unloaded )
 {
 }
 
@@ -46,6 +46,12 @@ Asset::Asset( AssetType type, const AssetId& uniqueId, const String& fileName ) 
 const AssetType& Asset::type( void ) const
 {
     return m_type;
+}
+
+// ** Asset::state
+Asset::State Asset::state( void ) const
+{
+    return m_state;
 }
 
 // ** Asset::uniqueId
@@ -107,7 +113,7 @@ AssetHandle Assets::findAsset( const AssetId& id ) const
         return AssetHandle();
     }
 
-    return AssetHandle( this, i->second );
+    return AssetHandle( const_cast<Assets*>( this ), i->second );
 }
 
 // ** Assets::assetAtSlot
@@ -120,6 +126,12 @@ const Asset& Assets::assetAtSlot( SlotIndex32 slot ) const
 bool Assets::isValidSlot( SlotIndex32 slot ) const
 {
     return m_assets.has( slot );
+}
+
+// ** Assets::releaseWriteLock
+void Assets::releaseWriteLock( const AssetHandle& asset )
+{
+    asset->m_lastModified = Platform::currentTime();
 }
 
 #if ASSET_DEPRECATED

@@ -72,6 +72,8 @@ namespace Scene {
 
     class Assets;
     class Asset;
+    class AbstractAssetCache;
+    template<typename TAsset> class AssetCache;
 
 	class Image;
 	class Mesh;
@@ -92,6 +94,9 @@ namespace Scene {
     //! Forward declaration of an AssetDataHandle type.
     template<typename TAsset> class AssetDataHandle;
 
+    //! Forward declaration of an asset AssetWriteLock type.
+    template<typename TAsset> class AssetWriteLock;
+
     //! Image handle type.
     typedef AssetDataHandle<class Image> ImageHandle;
 
@@ -105,9 +110,6 @@ namespace Scene {
     typedef AssetDataHandle<class Terrain> TerrainHandle;
 
 #if ASSET_DEPRECATED
-    //! Forward declaration of an asset AssetWriteLock type.
-    template<typename TAsset> class AssetWriteLock;
-
     //! Forward declaration of an AssetFormat type.
     template<typename TAsset> class AssetFormat;
 
@@ -462,7 +464,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Terrain.h"
     #include "Assets/Prefab.h"
     #include "Assets/AssetHandle.h"
-    #include "Assets/AssetPool.h"
+    #include "Assets/AssetCache.h"
     #include "Assets/AssetFormat.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"

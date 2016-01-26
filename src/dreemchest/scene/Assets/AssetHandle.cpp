@@ -38,7 +38,7 @@ AssetHandle::AssetHandle( void ) : m_assets( NULL )
 }
 
 // ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( const Assets* assets, SlotIndex32 slot ) : m_assets( assets ), m_slot( slot )
+AssetHandle::AssetHandle( Assets* assets, SlotIndex32 slot ) : m_assets( assets ), m_slot( slot )
 {
     
 }
@@ -68,15 +68,28 @@ bool AssetHandle::operator < ( const AssetHandle& other ) const
 // ** AssetHandle::operator ->
 const Asset* AssetHandle::operator -> ( void ) const
 {
-    return isValid() ? &m_assets->assetAtSlot( m_slot ) : NULL;
+    return isValid() ? &asset() : NULL;
 }
 
 // ** AssetHandle::operator ->
 Asset* AssetHandle::operator -> ( void )
 {
-    return isValid() ? const_cast<Asset*>( &m_assets->assetAtSlot( m_slot ) ) : NULL;
+    return isValid() ? &asset() : NULL;
 }
 
+// ** AssetHandle::asset
+const Asset& AssetHandle::asset( void ) const
+{
+    DC_BREAK_IF( !isValid() );
+    return m_assets->assetAtSlot( m_slot );
+}
+
+// ** AssetHandle::asset
+Asset& AssetHandle::asset( void )
+{
+    DC_BREAK_IF( !isValid() );
+    return const_cast<Asset&>( m_assets->assetAtSlot( m_slot ) );
+}
 
 // ** AssetHandle::isValid
 bool AssetHandle::isValid( void ) const
@@ -84,10 +97,22 @@ bool AssetHandle::isValid( void ) const
     return m_assets && m_assets->isValidSlot( m_slot );
 }
 
+// ** AssetHandle::isLoaded
+bool AssetHandle::isLoaded( void ) const
+{
+    return isValid() && (operator->())->state() == Asset::Loaded;
+}
+
 // ** AssetHandle::slot
 SlotIndex32 AssetHandle::slot( void ) const
 {
     return m_slot;
+}
+
+// ** AssetHandle::assets
+Assets* AssetHandle::assets( void ) const
+{
+    return m_assets;
 }
 
 } // namespace Scene
