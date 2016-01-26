@@ -30,6 +30,68 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ------------------------------------------------ Physics2D ------------------------------------------------ //
+
+// ** Physics2D::Physics2D
+Physics2D::Physics2D( const String& name, f32 timeStep, f32 scale ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+{
+
+}
+
+// ** Physics2D::setTimeStep
+void Physics2D::setTimeStep( f32 value )
+{
+	m_timeStep = value;
+}
+
+// ** Physics2D::simulatePhysics
+void Physics2D::simulatePhysics( f32 dt )
+{
+    // Increase the time accumulator
+    m_accumulator += dt;
+
+    // Calculate the total number of simulation steps to perform
+    s32 steps = static_cast<s32>( floor( m_accumulator / m_timeStep ) );
+    
+    // Clamp step count
+    steps = min2( steps, m_maxSimulationSteps );
+
+    // Simulate physics
+    while( steps-- ) {
+        simulate( m_timeStep );
+        m_accumulator -= m_timeStep;
+    }
+}
+
+// ** Physics2D::updateLinearVelocity
+void Physics2D::updateLinearVelocity( RigidBody2D& rigidBody, const Vec2& value )
+{
+    rigidBody.setLinearVelocity( value );
+}
+
+// ** Physics2D::updateMass
+void Physics2D::updateMass( RigidBody2D& rigidBody, f32 value )
+{
+    rigidBody.updateMass( value );
+}
+
+// ** Physics2D::clearState
+void Physics2D::clearState( RigidBody2D& rigidBody )
+{
+	// Clear all forces now
+	rigidBody.clear();
+
+    // Clear all queued events from last simulation step
+    rigidBody.clearEvents();
+}
+
+// ** Physics2D::queueCollisionEvent
+void Physics2D::queueCollisionEvent( RigidBody2D::CollisionEvent::Type type, const SceneObjectWPtr& first, const SceneObjectWPtr& second, const Array<Vec2>& points )
+{
+    first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, second, points ) );
+    second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, first, points ) );
+}
+
 #ifdef DC_BOX2D_ENABLED
 
 // ------------------------------------------------ Box2DPhysics::Collisions ------------------------------------------------ //
@@ -146,7 +208,7 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : EntitySystem( "Box2DPhysics", Ecs::Aspect::all<RigidBody2D, Transform>() ), m_scale( scale ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep, scale ), m_scale( scale )
 {
     // Create Box2D world instance
 	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
@@ -162,12 +224,6 @@ Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : Ent
 
     // Set contact listener
     m_world->SetContactListener( m_collisions.get() );
-}
-
-// ** Box2DPhysics::setTimeStep
-void Box2DPhysics::setTimeStep( f32 value )
-{
-	m_timeStep = value;
 }
 
 // ** Box2DPhysics::queryRect
@@ -252,6 +308,12 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 	return callback.m_hasIntersection;
 }
 
+// ** Box2DPhysics::simulate
+void Box2DPhysics::simulate( f32 dt )
+{
+    m_world->Step( dt, 8, 4 );
+}
+
 // ** Box2DPhysics::update
 void Box2DPhysics::update( u32 currentTime, f32 dt )
 {
@@ -272,6 +334,9 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
     // Now simulate the physics with a fixed time step
     simulatePhysics( dt );
 
+    // Clear forces
+    m_world->ClearForces();
+
     // Now apply physics transform to a scene transform & dispatch collision events.
     for( Ecs::EntitySet::iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
         RigidBody2D& rigidBody = *(*i)->get<RigidBody2D>();
@@ -286,28 +351,6 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
 
     // Finally dispatch collision events
     dispatchCollisionEvents();
-}
-
-// ** Box2DPhysics::simulatePhysics
-void Box2DPhysics::simulatePhysics( f32 dt )
-{
-    // Increase the time accumulator
-    m_accumulator += dt;
-
-    // Calculate the total number of simulation steps to perform
-    s32 steps = static_cast<s32>( floor( m_accumulator / m_timeStep ) );
-    
-    // Clamp step count
-    steps = min2( steps, m_maxSimulationSteps );
-
-    // Simulate physics
-    while( steps-- ) {
-        m_world->Step( m_timeStep, 8, 4 );
-        m_accumulator -= m_timeStep;
-    }
-
-    // Clear applied forces
-    m_world->ClearForces();
 }
 
 // ** Box2DPhysics::extractPhysicalBody
@@ -349,6 +392,7 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
 
 	body->SetLinearDamping( rigidBody.linearDamping() );
 	body->SetAngularDamping( rigidBody.angularDamping() );
+    body->SetLinearVelocity( positionToBox2D( rigidBody.linearVelocity() ) );
 	body->ApplyTorque( -torque * mass, true );
 	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
@@ -367,11 +411,8 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
 		body->ApplyLinearImpulse( value, point, true );   
     }
 
-	// Clear all forces now
-	rigidBody.clear();
-
-    // Clear all queued events from last simulation step
-    rigidBody.clearEvents();
+    // Clear the rigid body state
+    clearState( rigidBody );
 }
 
 // ** Box2DPhysics::updateTransfor
@@ -383,6 +424,9 @@ void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transf
 	// Update the Transform2D instance
 	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+
+    // Update the body's linear velocity
+    rigidBody.setLinearVelocity( positionFromBox2D( body->GetLinearVelocity() ) );
 }
 
 // ** Box2DPhysics::dispatchCollisionEvents
@@ -407,17 +451,13 @@ void Box2DPhysics::dispatchCollisionEvents( void )
         // Emit an event and push it to component's event queue
         switch( e.type ) {
         case Collisions::Event::Begin:  {
-                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second, points ) );
-                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first, points ) );
-
+                                            queueCollisionEvent( RigidBody2D::CollisionEvent::Begin, first, second, points );
                                             notify<CollisionBegin>( first, second );
                                         }
                                         break;
 
         case Collisions::Event::End:    {
-                                            first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, second ) );
-                                            second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, first ) );
-
+                                            queueCollisionEvent( RigidBody2D::CollisionEvent::End, first, second, points );
                                             notify<CollisionEnd>( first, second );
                                         }
                                         break;
@@ -476,6 +516,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 		default:				DC_BREAK;
 		}
 	}
+
+    // Now set the mass
+    updateMass( rigidBody, body->GetMass() );
 
 	// Attach created body to a component
 	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );

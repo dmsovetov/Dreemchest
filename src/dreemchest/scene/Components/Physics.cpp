@@ -348,6 +348,24 @@ void RigidBody2D::clearEvents( void )
     m_collisionEvents.clear();
 }
 
+// ** RigidBody2D::linearVelocity
+const Vec2& RigidBody2D::linearVelocity( void ) const
+{
+    return m_linearVelocity;
+}
+
+// ** RigidBody2D::setLinearVelocity
+void RigidBody2D::setLinearVelocity( const Vec2& value )
+{
+    m_linearVelocity = value;
+}
+
+// ** RigidBody2D::updateMass
+void RigidBody2D::updateMass( f32 value )
+{
+    m_mass = value;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
