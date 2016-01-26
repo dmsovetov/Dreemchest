@@ -336,16 +336,16 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 {
 	DC_BREAK_IF( !mesh.isValid() );
 
-#if 0
 	// Construct scene object
 	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
     sceneObject->setSerializable( true );
-	sceneObject->attach<Scene::Identifier>( mesh->name() );
+	sceneObject->attach<Scene::Identifier>( mesh.name() );
 	sceneObject->attach<Scene::StaticMesh>( mesh );
 	sceneObject->attach<Scene::Transform>( point.x, point.y, point.z, Scene::TransformWPtr() );
 	sceneObject->attach<Editors::SceneEditorInternal>( sceneObject );
 	m_scene->addSceneObject( sceneObject );
 
+#if 0
 	// Get all materials
 	Set<Scene::MaterialPtr> materials = m_assets->findByType<Scene::Material>();
 
@@ -368,12 +368,11 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 			qDebug() << "Material" << texture.c_str() << "not found";
 		}
 	}
+#else
+    qWarning() << "SceneModel::placeStaticMesh : no default material set";
+#endif
 
     return sceneObject;
-#else
-    DC_NOT_IMPLEMENTED
-    return Scene::SceneObjectWPtr();
-#endif
 }
 
 DC_END_COMPOSER

@@ -125,8 +125,7 @@ void SceneEditor::render( f32 dt )
 	m_scene->update( 0, dt );
 
 	// Render the scene
-	//m_scene->render( m_renderingContext );
-    qWarning() << "SceneEditor::render : rendering is disabled";
+	m_scene->render( m_renderingContext );
 
 	// Reset the cursor movement
 	m_cursorMovement->set( Vec3() );
