@@ -43,8 +43,8 @@ namespace Scene {
 			f32							distance;									//!< Normalized distance to camera.
 			u8							mode;										//!< Rendering mode.
 			Renderer::Shader*			shader;										//!< Shader to be used for rendering.
-			u32							mesh;										//!< The rendered mesh id.
-			u32							textures[Material::TotalMaterialLayers];	//!< Textures to be used for rendering.
+			SlotIndex32				    mesh;										//!< The rendered mesh id.
+			SlotIndex32				    textures[Material::TotalMaterialLayers];	//!< Textures to be used for rendering.
 			const Rgba*					colors[Material::TotalMaterialLayers];		//!< Material colors.
 			Matrix4						transform;									//!< Transformation matrix.
 		};

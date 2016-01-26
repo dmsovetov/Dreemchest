@@ -42,8 +42,6 @@ StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features, Mate
 // ** StaticMeshRopEmitter::emit
 void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const StaticMesh& staticMesh, const Transform& transform )
 {
-    DC_NOT_IMPLEMENTED
-#if 0
 	// Skip if mesh is not visible
 	if( !staticMesh.isVisible( m_camera->id() ) ) {
 		return;
@@ -55,24 +53,16 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 	}
 
 	// Get the rendered mesh
-	const MeshPtr& mesh = staticMesh.mesh();
-	DC_BREAK_IF( !mesh.valid() );
+	MeshHandle mesh = staticMesh.mesh();
+	DC_BREAK_IF( !mesh.isValid() );
 
 	// Emit render operation for each mesh chunk
 	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {
-		// Get the renderable id
-		const RenderingAssetId* id = &mesh->chunkId( i );
-
-		// Ensure we have a renderable for this mesh chunk
-		if( !(*id) ) {
-			id = &ctx.uploadRenderable( mesh, i );
-		}
-
 		// Get the material for chunk
-		const MaterialPtr& material = staticMesh.material( i );
+		MaterialHandle material = staticMesh.material( i );
 
 		// Get the rendering mode from material or use opaque by default
-		::DC_DREEMCHEST_NS Scene::RenderingMode renderingMode = material.valid() ? material->renderingMode() : RenderOpaque;
+		::DC_DREEMCHEST_NS Scene::RenderingMode renderingMode = material.isValid() ? material->renderingMode() : RenderOpaque;
 
 		if( !rvm.willRender( renderingMode ) ) {
 			continue;
@@ -83,12 +73,12 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 		// Initialize the rendering operation
 		rop->transform		= transform.matrix();
-		rop->mesh			= *id;
+		rop->mesh			= mesh.slot();
 		rop->mode			= RenderOpaque;
 		rop->shader			= NULL;
 		rop->distance		= 0;
 
-		if( !material.valid() ) {
+		if( !material.isValid() ) {
 			continue;
 		}
 
@@ -114,23 +104,15 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 			rop->colors[j] = &material->color( layer );
 
-			const ImageWPtr& image = material->texture( layer );
+			ImageHandle image = material->texture( layer );
 
-			if( !image.valid() || image->state() != Asset::Loaded ) {
+			if( image.isLoaded() ) {
 				continue;
 			}
 
-			// Get the texture id
-			const RenderingAssetId* id = &image->id();
-		
-			if( !(*id) ) {
-				id = &ctx.uploadTexture( image );
-			}
-
-			rop->textures[j] = *id;
+			rop->textures[j] = image.slot();
 		}	
 	}
-#endif
 }
 
 } // namespace Scene
