@@ -69,7 +69,9 @@ namespace Scene {
 
 	class Scene;
 	class RenderTarget;
+
     class Assets;
+    class Asset;
 
 	class Image;
 	class Mesh;
@@ -87,44 +89,37 @@ namespace Scene {
     //! Opaque 32 bit handle.
     typedef OpaqueHandle<12, 20> SlotIndex32;
 
-#if ASSET_DEPRECATED
-    //! Forward declaration of an AssetHandle type.
-    template<typename TAsset> class AssetHandle;
+    //! Forward declaration of an AssetDataHandle type.
+    template<typename TAsset> class AssetDataHandle;
 
+    //! Image handle type.
+    typedef AssetDataHandle<class Image> ImageHandle;
+
+    //! Mesh handle type.
+    typedef AssetDataHandle<class Mesh> MeshHandle;
+
+    //! Material handle type.
+    typedef AssetDataHandle<class Material> MaterialHandle;
+
+    //! Terrain handle type.
+    typedef AssetDataHandle<class Terrain> TerrainHandle;
+
+#if ASSET_DEPRECATED
     //! Forward declaration of an asset AssetWriteLock type.
     template<typename TAsset> class AssetWriteLock;
-#endif
 
     //! Forward declaration of an AssetFormat type.
     template<typename TAsset> class AssetFormat;
 
     //! Forward declaration of an AssetPool type.
     template<typename TAsset> class AssetPool;
+#endif
 
     //! Asset identifier type.
     typedef String AssetId;
 
-#if ASSET_DEPRECATED
     //! Set of assets.
-    typedef Set<Asset> AssetSet;
-
-    //! Image handle type.
-    typedef AssetHandle<class Image> ImageHandle;
-
-    //! Mesh handle type.
-    typedef AssetHandle<class Mesh> MeshHandle;
-
-    //! Material handle type.
-    typedef AssetHandle<class Material> MaterialHandle;
-
-    //! Terrain handle type.
-    typedef AssetHandle<class Terrain> TerrainHandle;
-#else
-    typedef s32 ImageHandle;
-    typedef s32 MeshHandle;
-    typedef s32 MaterialHandle;
-    typedef s32 TerrainHandle;
-#endif
+    typedef Set<class AssetHandle> AssetSet;
 
 	//! Available rendering modes.
 	enum RenderingMode {

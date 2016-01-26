@@ -160,8 +160,7 @@ bool MaterialFormatKeyValue::parse( Io::StreamPtr stream, Assets& assets, Materi
 	
 	asset.setModel( Material::Phong );
 	asset.setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
-    DC_NOT_IMPLEMENTED
-	//m_asset->setTexture( Material::Diffuse, assets->find<Image>( diffuseTexture["asset"].asString() ) );
+	asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
 
 	return true;
 #else

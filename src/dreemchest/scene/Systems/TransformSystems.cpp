@@ -72,12 +72,11 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 // ** WorldSpaceBoundingBoxSystem::process
 void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
-    DC_NOT_IMPLEMENTED
-//	if( !staticMesh.mesh().isValid() ) {
-//		return;
-//	}
+	if( !staticMesh.mesh().isValid() ) {
+		return;
+	}
 
-//	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
+	staticMesh.setWorldSpaceBounds( staticMesh.mesh()->bounds() * transform.matrix() );
 }
 
 // ------------------------------------------------------- MoveAlongAxesSystem ------------------------------------------------------- //

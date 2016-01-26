@@ -107,8 +107,7 @@ MeshHandle StaticMesh::mesh( void ) const
 // ** StaticMesh::setMesh
 void StaticMesh::setMesh( MeshHandle value )
 {
-    DC_NOT_IMPLEMENTED
-//	DC_BREAK_IF( !value.isValid() );
+	DC_BREAK_IF( !value.isValid() );
 	m_mesh = value;
 }
 
@@ -190,21 +189,20 @@ void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) c
 // ** StaticMesh::deserialize
 void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
 {
-    DC_NOT_IMPLEMENTED
-    //AssetBundle* assets = ctx.get<AssetBundle>();
-    //
-    //if( !assets ) {
-    //    log::error( "StaticMesh::deserialize : no AssetBundle attached to serialization context.\n" );
-    //    return;
-    //}
+    Assets* assets = ctx.get<Assets>();
+    
+    if( !assets ) {
+        log::error( "StaticMesh::deserialize : no Assets attached to serialization context.\n" );
+        return;
+    }
 
-    //const Io::KeyValue& materials = ar["materials"];
+    const Io::KeyValue& materials = ar["materials"];
 
-    //for( s32 i = 0, n = materials.size(); i < n; i++ ) {
-    //    setMaterial( i, assets->find<Material>( materials[i].asString() ) );
-    //}
+    for( s32 i = 0, n = materials.size(); i < n; i++ ) {
+        setMaterial( i, assets->find<Material>( materials[i].asString() ) );
+    }
 
-    //m_mesh = assets->find<Mesh>( ar["asset"].asString() );
+    m_mesh = assets->find<Mesh>( ar["asset"].asString() );
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
