@@ -84,7 +84,7 @@ Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
     }
 
 	// Create asset by type
-	Scene::AssetHandle asset = m_bundle.addAsset( type, Guid::generate().toString(), "" );
+	Scene::AssetHandle asset = m_bundle.addAsset( type, Guid::generate().toString(), cacheFileFromUuid( asset->uniqueId() ).c_str() );
     DC_BREAK_IF( !asset.isValid() );
 
 	// Set meta file
@@ -105,7 +105,7 @@ Scene::AssetHandle Assets::parseAssetFromData( const Io::KeyValue& kv )
     Scene::AssetId uid = kv.get( "uuid" ).asString();
 
 	// Create asset instance by type name
-	Scene::AssetHandle asset = m_bundle.addAsset( type, uid, "" );
+	Scene::AssetHandle asset = m_bundle.addAsset( type, uid, cacheFileFromUuid( uid ).c_str() );
     DC_BREAK_IF( !asset.isValid() );
 
 	return asset;
