@@ -72,7 +72,7 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 // ** WorldSpaceBoundingBoxSystem::process
 void WorldSpaceBoundingBoxSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform )
 {
-	if( !staticMesh.mesh().isValid() ) {
+	if( !staticMesh.mesh().isLoaded() ) {
 		return;
 	}
 
