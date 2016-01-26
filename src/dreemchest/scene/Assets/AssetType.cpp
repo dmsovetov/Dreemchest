@@ -67,6 +67,13 @@ bool AssetType::isValid( void ) const
     return !(*this == Invalid);
 }
 
+// ** AssetType::bit
+u32 AssetType::bit( void ) const
+{
+    DC_BREAK_IF( m_type > 31 );
+    return 1 << BIT( m_type );
+}
+
 // ** AssetType::fromString
 AssetType AssetType::fromString( const String& value )
 {

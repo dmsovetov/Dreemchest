@@ -59,6 +59,9 @@ namespace Scene {
         //! Converts an asset type to a string.
         String                      toString( void ) const;
 
+        //! Returns asset type bit mask.
+        u32                         bit( void ) const;
+
         //! Returns true if an asset type matches the specified class.
         template<typename TAsset>
         bool                        is( void ) const;
