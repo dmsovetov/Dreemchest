@@ -69,6 +69,28 @@ bool AssetType::isValid( void ) const
     return !(*this == Invalid);
 }
 
+// ** AssetType::fromString
+AssetType AssetType::fromString( const String& value )
+{
+    if( value == "Mesh" )       return fromClass<Mesh>();
+    if( value == "Image" )      return fromClass<Image>();
+    if( value == "Material" )   return fromClass<Material>();
+
+    DC_BREAK;
+    return AssetType();
+}
+
+// ** AssetType::toString
+String AssetType::toString( const AssetType& value )
+{
+    if( value == fromClass<Mesh>() )        return "Mesh";
+    if( value == fromClass<Image>() )       return "Image";
+    if( value == fromClass<Material>() )    return "Material";
+
+    DC_BREAK;
+    return "";
+}
+
 // ---------------------------------------------- Asset ---------------------------------------------- //
 
 // ** Asset::Asset

@@ -61,6 +61,12 @@ namespace Scene {
         template<typename TAsset>
         static AssetType            fromClass( void );
 
+        //! Returns an asset type from a string.
+        static AssetType            fromString( const String& value );
+
+        //! Returns an asset type formatted as string.
+        static String               toString( const AssetType& value );
+
     private:
 
                                     //! Constructs AssetType instance.
