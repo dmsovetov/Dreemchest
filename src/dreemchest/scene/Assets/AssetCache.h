@@ -24,14 +24,61 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_AssetPool_H__
-#define __DC_Scene_AssetPool_H__
+#ifndef __DC_Scene_Assets_Cache_H__
+#define __DC_Scene_Assets_Cache_H__
 
 #include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+    //! Base class for all asset cache types
+    class AbstractAssetCache {
+    public:
+
+        virtual                     ~AbstractAssetCache( void ) {}
+    };
+
+    //! Generic class to store all loaded assets of type TAsset.
+    template<typename TAsset>
+    class AssetCache : public AbstractAssetCache {
+    public:
+
+        //! Creates an asset inside the pool.
+        SlotIndex32                 add( void );
+
+        //! Removes an asset from a cache.
+        bool                        remove( SlotIndex32 slot );
+
+        //! Returns an asset by it's id.
+        const TAsset&               get( SlotIndex32 slot );
+
+    protected:
+
+        Slots<TAsset, SlotIndex32>  m_cache;   //!< Cached asset data is stored here.
+    };
+
+    // ** AssetCache::add
+    template<typename TAsset>
+    SlotIndex32 AssetCache<TAsset>::add( void )
+    {
+        return m_cache.reserve();
+    }
+
+    // ** AssetCache::remove
+    template<typename TAsset>
+    bool AssetCache<TAsset>::remove( SlotIndex32 slot )
+    {
+        return m_cache.remove( slot );
+    }
+
+    // ** AssetCache::get
+    template<typename TAsset>
+    const TAsset& AssetCache<TAsset>::get( SlotIndex32 slot )
+    {
+        return m_cache.get( slot );
+    }
 
 #if ASSET_DEPRECATED
 
@@ -202,4 +249,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_AssetPool_H__    */
+#endif    /*    !__DC_Scene_Assets_Cache_H__    */
