@@ -175,15 +175,14 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
 {
-    DC_NOT_IMPLEMENTED
-    //Io::KeyValue materials = Io::KeyValue::array();
+    Io::KeyValue materials = Io::KeyValue::array();
 
-    //for( u32 i = 0, n = materialCount(); i < n; i++ ) {
-    //    MaterialPtr m = material( i );
-    //    materials << (m.valid() ? m->uuid() : "");
-    //}
+    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
+        MaterialHandle m = material( i );
+        materials << (m.isValid() ? m.uniqueId() : "");
+    }
 
-    //ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
+    ar = Io::KeyValue::object() << "asset" << (m_mesh.isValid() ? m_mesh.uniqueId() : "") << "materials" << materials;
 }
 
 // ** StaticMesh::deserialize
