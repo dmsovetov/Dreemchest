@@ -84,6 +84,12 @@ bool AssetHandle::isValid( void ) const
     return m_assets && m_assets->isValidSlot( m_slot );
 }
 
+// ** AssetHandle::slot
+SlotIndex32 AssetHandle::slot( void ) const
+{
+    return m_slot;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

@@ -57,6 +57,9 @@ namespace Scene {
         //! Returns true if this asset handle is still valid.
         bool                        isValid( void ) const;
 
+        //! Returns asset slot.
+        SlotIndex32                 slot( void ) const;
+
     private:
 
                                     //! Constructs the AssetHandle instance.
@@ -90,6 +93,22 @@ namespace Scene {
 
         //! Returns true if this asset handle is still valid.
         bool                            isValid( void ) const;
+
+        //! Returns true if this asset data is loaded to cache.
+        bool                            isLoaded( void ) const;
+
+        //! Returns asset slot.
+        SlotIndex32                     slot( void ) const;
+
+        //! Returns asset name.
+        const String&                   name( void ) const;
+
+        //! Returns unique asset identifier.
+        const AssetId&                  uniqueId( void ) const;
+
+    private:
+
+        AssetHandle                     m_asset;    //!< Asset handle.
     };
 
     // ** AssetDataHandle::AssetDataHandle
@@ -103,20 +122,22 @@ namespace Scene {
     template<typename TAsset>
     AssetDataHandle<TAsset>::AssetDataHandle( const AssetDataHandle<TAsset>& other )
     {
-    
+        m_asset = other.m_asset;
     }
 
     // ** AssetDataHandle::AssetDataHandle
     template<typename TAsset>
     AssetDataHandle<TAsset>::AssetDataHandle( const AssetHandle& asset )
     {
-    
+        DC_BREAK_IF( !asset->type().is<TAsset>() );
+        m_asset = asset;
     }
 
     // ** AssetDataHandle::operator =
     template<typename TAsset>
     const AssetDataHandle<TAsset>& AssetDataHandle<TAsset>::operator = ( const AssetDataHandle<TAsset>& other )
     {
+        m_asset = other.m_asset;
         return *this;
     }
 
@@ -131,7 +152,37 @@ namespace Scene {
     template<typename TAsset>
     bool AssetDataHandle<TAsset>::isValid( void ) const
     {
-        return false;
+        return m_asset.isValid();
+    }
+
+    // ** AssetDataHandle::isLoaded
+    template<typename TAsset>
+    bool AssetDataHandle<TAsset>::isLoaded( void ) const
+    {
+        return isValid() && false;
+    }
+
+    // ** AssetDataHandle::name
+    template<typename TAsset>
+    const String& AssetDataHandle<TAsset>::name( void ) const
+    {
+        DC_BREAK_IF( !isValid() );
+        return m_asset->name();
+    }
+
+    // ** AssetDataHandle::uniqueId
+    template<typename TAsset>
+    const AssetId& AssetDataHandle<TAsset>::uniqueId( void ) const
+    {
+        DC_BREAK_IF( !isValid() );
+        return m_asset->uniqueId();
+    }
+
+    // ** AssetDataHandle::slot
+    template<typename TAsset>
+    SlotIndex32 AssetDataHandle<TAsset>::slot( void ) const
+    {
+        return m_asset.slot();
     }
 
 #if ASSET_DEPRECATED
