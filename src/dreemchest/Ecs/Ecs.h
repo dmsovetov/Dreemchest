@@ -179,6 +179,9 @@ namespace Ecs {
 		//! Creates a new entity with a generated id.
 		EntityPtr		createEntity( void );
 
+        //! Clones entity.
+        EntityPtr       cloneEntity( EntityWPtr entity );
+
 		//! Returns the entity with specified id.
 		EntityPtr		findEntity( const EntityId& id ) const;
 

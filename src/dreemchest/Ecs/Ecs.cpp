@@ -162,6 +162,23 @@ EntityPtr Ecs::createEntity( void )
 	return createEntity( id );
 }
 
+// ** Ecs::cloneEntity
+EntityPtr Ecs::cloneEntity( EntityWPtr entity )
+{
+    // Serialize source to a key-value archive
+    Io::KeyValue ar;
+    SerializationContext ctx( this );
+    entity->serialize( ctx, ar );
+
+    // Create entity instance
+    EntityPtr instance = createEntity();
+
+    // Deserialize
+    instance->deserialize( ctx, ar );
+
+    return instance;
+}
+
 // ** Ecs::findEntity
 EntityPtr Ecs::findEntity( const EntityId& id ) const
 {
