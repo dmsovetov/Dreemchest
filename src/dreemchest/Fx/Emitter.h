@@ -164,6 +164,9 @@ namespace Fx {
 		//! Updates the current emitter time.
 		bool					updateTime( f32 dt );
 
+        //! Returns true if this emitter instance is looped.
+        bool                    isLooped( void ) const;
+
 		//! Calculates the number of particles to emit.
 		s32						calculateEmissionCount( f32 scalar, s32 maxCount );
 
