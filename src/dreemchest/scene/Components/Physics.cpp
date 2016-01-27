@@ -103,6 +103,8 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 // ** Shape2D::serialize
 void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
 {
+    Io::KeyValue material = Io::KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
+
     switch( m_parts[0].type ) {
     case Polygon:   {
                         Io::KeyValue vertices = Io::KeyValue::array();
@@ -111,7 +113,11 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) cons
                             vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
                         }
 
-                        ar = Io::KeyValue::object() << "type" << "polygon" << "vertices" << vertices;
+                        ar = Io::KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
+                    }
+                    break;
+    case Circle:    {
+                        ar = Io::KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
                     }
                     break;
     default:        DC_BREAK;
@@ -124,6 +130,18 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
     // Get shape type
     const String& type = ar.get( "type", "" ).asString();
 
+    // Get material
+    Io::KeyValue material = ar.get( "material" );
+
+    // Parse material
+    Material shapeMaterial;
+
+    if( material.isObject() ) {
+        shapeMaterial.density       = material.get( "density", 1.0f ).asFloat();
+        shapeMaterial.friction      = material.get( "friction", 0.2f ).asFloat();
+        shapeMaterial.restitution   = material.get( "restitution", 0.0f ).asFloat();
+    }
+
     if( type == "polygon" ) {
         const Io::KeyValue& vertices = ar.get( "vertices" );
         Array<Vec2>         points;
@@ -132,7 +150,10 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
             points.push_back( Vec2( vertices[i * 2 + 0].asFloat(), vertices[i * 2 + 1].asFloat() ) );
         }
 
-        addPolygon( &points[0], points.size() );
+        addPolygon( &points[0], points.size(), shapeMaterial );
+    }
+    else if( type == "circle" ) {
+        addCircle( ar.get( "radius", 0.0f ).asFloat(), 0.0f, 0.0f, shapeMaterial );
     }
     else {
         DC_BREAK;
