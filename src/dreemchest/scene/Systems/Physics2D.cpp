@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------------ Physics2D ------------------------------------------------ //
 
 // ** Physics2D::Physics2D
-Physics2D::Physics2D( const String& name, f32 timeStep, f32 scale ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+Physics2D::Physics2D( const String& name, f32 timeStep, f32 scale ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Shape2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
 {
 
 }
