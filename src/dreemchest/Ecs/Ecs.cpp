@@ -146,8 +146,6 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )
 {
-	DC_BREAK_IF( isUsedId( id ) );
-
 	EntityPtr entity( DC_NEW Entity );
 	entity->setId( id );
 	//addEntity( entity );
