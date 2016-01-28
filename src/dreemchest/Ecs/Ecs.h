@@ -32,7 +32,8 @@
 #include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
 
-#define DC_ECS_ITERATIVE_INDEX_REBUILD (1)  // Enable to rebuild indicies after each system update
+#define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
+#define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method
 
 DC_BEGIN_DREEMCHEST
 
@@ -179,8 +180,10 @@ namespace Ecs {
 		//! Creates a new entity with a generated id.
 		EntityPtr		createEntity( void );
 
+    #if !DC_ECS_ENTITY_CLONING
         //! Clones entity.
         EntityPtr       cloneEntity( EntityWPtr entity );
+    #endif  /*  !DC_ECS_ENTITY_CLONING  */
 
 		//! Returns the entity with specified id.
 		EntityPtr		findEntity( const EntityId& id ) const;

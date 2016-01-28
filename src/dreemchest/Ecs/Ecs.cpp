@@ -160,6 +160,8 @@ EntityPtr Ecs::createEntity( void )
 	return createEntity( id );
 }
 
+#if !DC_ECS_ENTITY_CLONING
+
 // ** Ecs::cloneEntity
 EntityPtr Ecs::cloneEntity( EntityWPtr entity )
 {
@@ -176,6 +178,8 @@ EntityPtr Ecs::cloneEntity( EntityWPtr entity )
 
     return instance;
 }
+
+#endif  /*  !DC_ECS_ENTITY_CLONING  */
 
 // ** Ecs::findEntity
 EntityPtr Ecs::findEntity( const EntityId& id ) const

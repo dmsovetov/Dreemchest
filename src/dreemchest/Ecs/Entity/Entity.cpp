@@ -128,6 +128,32 @@ void Entity::updateComponentBit( u32 bit, bool value )
 	}
 }
 
+#if DC_ECS_ENTITY_CLONING
+
+// ** Entity::deepCopy
+EntityPtr Entity::deepCopy( const EntityId& id ) const
+{
+    // Create entity instance
+    Ecs*      ecs    = const_cast<Ecs*>( m_ecs.get() );
+    EntityPtr entity = id.isNull() ? ecs->createEntity() : ecs->createEntity( id );
+
+    // Now clone components
+    for( Components::const_iterator i = m_components.begin(), end = m_components.end(); i != end; ++i ) {
+        // Deep copy component
+        ComponentPtr component = i->second->deepCopy();
+
+        // Set parent entity to NULL
+        component->setParentEntity( NULL );
+
+        // Attach this component to an entity clone
+        entity->attachComponent( component.get() );
+    }
+
+    return entity;
+}
+
+#endif  /*  DC_ECS_ENTITY_CLONING   */
+
 #ifndef DC_ECS_NO_SERIALIZATION
 
 // ** Entity::read

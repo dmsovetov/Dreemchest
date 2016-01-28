@@ -110,6 +110,10 @@ namespace Ecs {
 		template<typename TComponent>
 		TComponent*				attachComponent( TComponent* component );
 
+    #if DC_ECS_ENTITY_CLONING
+        virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
+    #endif  /*  DC_ECS_ENTITY_CLONING   */
+
     #ifndef DC_ECS_NO_SERIALIZATION
 		//! Reads archetype from a storage.
 		virtual void		    read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
