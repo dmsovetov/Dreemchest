@@ -111,6 +111,11 @@ namespace Ecs {
 		TComponent*				attachComponent( TComponent* component );
 
     #if DC_ECS_ENTITY_CLONING
+        //! Copies component from a specified entity and attaches it.
+        template<typename TComponent>
+        TComponent*             attachFrom( EntityWPtr entity );
+
+        //! Makes a full copy of this entity.
         virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
@@ -208,6 +213,17 @@ namespace Ecs {
 		
 		return component;	
 	}
+
+    // ** Entity::attachFrom
+    template<typename TComponent>
+    TComponent* Entity::attachFrom( EntityWPtr entity )
+    {
+        if( TComponent* component = entity->has<TComponent>() ) {
+            return attachComponent<TComponent>( static_cast<TComponent*>( component->deepCopy().get() ) );
+        }
+
+        return NULL;
+    }
 
 	// ** Entity::enable
 	template<typename TComponent>
