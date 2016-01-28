@@ -247,6 +247,7 @@ namespace Ecs {
     {
         T* instance = DC_NEW T;
         *instance = *static_cast<const T*>( this );
+        instance->setParentEntity( NULL );
         return instance;
     }
 #endif  /*  DC_ECS_ENTITY_CLONING   */

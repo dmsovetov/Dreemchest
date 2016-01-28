@@ -139,14 +139,7 @@ EntityPtr Entity::deepCopy( const EntityId& id ) const
 
     // Now clone components
     for( Components::const_iterator i = m_components.begin(), end = m_components.end(); i != end; ++i ) {
-        // Deep copy component
-        ComponentPtr component = i->second->deepCopy();
-
-        // Set parent entity to NULL
-        component->setParentEntity( NULL );
-
-        // Attach this component to an entity clone
-        entity->attachComponent( component.get() );
+        entity->attachComponent( i->second->deepCopy().get() );
     }
 
     return entity;
