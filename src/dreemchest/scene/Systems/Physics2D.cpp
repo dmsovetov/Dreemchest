@@ -86,10 +86,11 @@ void Physics2D::clearState( RigidBody2D& rigidBody )
 }
 
 // ** Physics2D::queueCollisionEvent
-void Physics2D::queueCollisionEvent( RigidBody2D::CollisionEvent::Type type, const SceneObjectWPtr& first, const SceneObjectWPtr& second, const Array<Vec2>& points )
+void Physics2D::queueCollisionEvent( RigidBody2D& rigidBody, const RigidBody2D::CollisionEvent& e )
 {
-    first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, second, points ) );
-    second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, first, points ) );
+    rigidBody.queueCollisionEvent( e );
+//    first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, second, isSensor, category, points ) );
+//    second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, first, isSensor, category, points ) );
 }
 
 #ifdef DC_BOX2D_ENABLED
@@ -112,13 +113,14 @@ public:
                         Event( void )
                             {}
                         //! Constructs Event instance.
-                        Event( Type type, b2Body* first, b2Body* second, const Array<b2Vec2>& points = Array<b2Vec2>() )
+                        Event( Type type, b2Fixture* first, b2Fixture* second, const Array<b2Vec2>& points = Array<b2Vec2>() )
                             : type( type ), first( first ), second( second ), points( points ) {}
 
-        b2Body*         first;  //!< First contact body.
-        b2Body*         second; //!< Second contact body.
-        Type            type;   //!< Collision type.
-        Array<b2Vec2>   points; //!< Contact points.
+        b2Fixture*      first;      //!< First contact body.
+        b2Fixture*      second;     //!< Second contact body.
+        Type            type;       //!< Collision type.
+        bool            isSensor;   //!< Do we touch the sensor?
+        Array<b2Vec2>   points;     //!< Contact points.
     };
 
     //! Clears recorded events.
@@ -166,11 +168,11 @@ const Box2DPhysics::Collisions::Event& Box2DPhysics::Collisions::event( s32 inde
 void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
 {
     // Get contact bodies
-    b2Body* first  = contact->GetFixtureA()->GetBody();
-    b2Body* second = contact->GetFixtureB()->GetBody();
+    b2Fixture* first  = contact->GetFixtureA();
+    b2Fixture* second = contact->GetFixtureB();
 
     // Bodies with no user data don't trigger collision events
-    if( !first->GetUserData() || !second->GetUserData() ) {
+    if( !first->GetBody()->GetUserData() || !second->GetBody()->GetUserData() ) {
         return;
     }
 
@@ -193,11 +195,11 @@ void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
 void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 {
     // Get contact bodies
-    b2Body* first  = contact->GetFixtureA()->GetBody();
-    b2Body* second = contact->GetFixtureB()->GetBody();
+    b2Fixture* first  = contact->GetFixtureA();
+    b2Fixture* second = contact->GetFixtureB();
 
     // Bodies with no user data don't trigger collision events
-    if( !first->GetUserData() || !second->GetUserData() ) {
+    if( !first->GetBody()->GetUserData() || !second->GetBody()->GetUserData() ) {
         return;
     }
 
@@ -437,9 +439,13 @@ void Box2DPhysics::dispatchCollisionEvents( void )
         // Get collision event by index
         const Collisions::Event& e = m_collisions->event( i );
 
+        // Get fixtures from an event
+        b2Fixture* firstFixture = e.first;
+        b2Fixture* secondFixture = e.second;
+
         // Get scene objects from collision event
-        SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( e.first->GetUserData() );
-        SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( e.second->GetUserData() );
+        SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( firstFixture->GetBody()->GetUserData() );
+        SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( secondFixture->GetBody()->GetUserData() );
 
         // Convert Box2D contact points to world space.
         Array<Vec2> points;
@@ -451,13 +457,17 @@ void Box2DPhysics::dispatchCollisionEvents( void )
         // Emit an event and push it to component's event queue
         switch( e.type ) {
         case Collisions::Event::Begin:  {
-                                            queueCollisionEvent( RigidBody2D::CollisionEvent::Begin, first, second, points );
+                                            queueCollisionEvent( *first->get<RigidBody2D>(),  RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second, secondFixture->IsSensor(), secondFixture->GetFilterData().categoryBits, points ) );
+                                            queueCollisionEvent( *second->get<RigidBody2D>(), RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first,  firstFixture->IsSensor(), firstFixture->GetFilterData().categoryBits, points ) );
+
                                             notify<CollisionBegin>( first, second );
                                         }
                                         break;
 
         case Collisions::Event::End:    {
-                                            queueCollisionEvent( RigidBody2D::CollisionEvent::End, first, second, points );
+                                            queueCollisionEvent( *first->get<RigidBody2D>(),  RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, second, secondFixture->IsSensor(), secondFixture->GetFilterData().categoryBits, points ) );
+                                            queueCollisionEvent( *second->get<RigidBody2D>(), RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, first,  firstFixture->IsSensor(), firstFixture->GetFilterData().categoryBits, points ) );
+
                                             notify<CollisionEnd>( first, second );
                                         }
                                         break;

@@ -61,7 +61,7 @@ namespace Scene {
         void                    clearState( RigidBody2D& rigidBody );
 
         //! Queues the collision event for a rigid body.
-        void                    queueCollisionEvent( RigidBody2D::CollisionEvent::Type type, const SceneObjectWPtr& first, const SceneObjectWPtr& second, const Array<Vec2>& points );
+        void                    queueCollisionEvent( RigidBody2D& rigidBody, const RigidBody2D::CollisionEvent& e );
 
         //! Simulates the physics with a fixed time step.
         void                    simulatePhysics( f32 dt );

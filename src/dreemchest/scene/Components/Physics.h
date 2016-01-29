@@ -157,12 +157,14 @@ namespace Scene {
                                 CollisionEvent( void )
                                     {}
                                 //! Constructs Event instance.
-                                CollisionEvent( Type type, SceneObjectWPtr other, const Array<Vec2>& points = Array<Vec2>() )
-                                    : type( type ), other( other ), points( points ) {}
+                                CollisionEvent( Type type, SceneObjectWPtr other, bool isSensor, u16 category, const Array<Vec2>& points = Array<Vec2>() )
+                                    : type( type ), isSensor( isSensor ), category( category ), other( other ), points( points ) {}
 
-            SceneObjectWPtr     other;  //!< First contact body.
-            Type                type;   //!< Collision type.
-            Array<Vec2>         points; //!< Collision points.
+            SceneObjectWPtr     other;      //!< First contact body.
+            Type                type;       //!< Collision type.
+            bool                isSensor;   //!< Do we touch the sensor?
+            u16                 category;   //!< The category of a touched body.
+            Array<Vec2>         points;     //!< Collision points.
         };
 
 							    //! Constructs the RigidBody2D instance.
