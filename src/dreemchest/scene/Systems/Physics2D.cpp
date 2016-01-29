@@ -510,9 +510,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 
 		// Initialize Box2D fixture
 		switch( part.type ) {
-		case Shape2D::Circle:	addCircleFixture( body, filter, part );		break;
-		case Shape2D::Rect:		addRectFixture( body, filter, part );		break;
-		case Shape2D::Polygon:	addPolygonFixture( body, filter, part );	break;
+		case Shape2D::Circle:	addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
+		case Shape2D::Rect:		addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
+		case Shape2D::Polygon:	addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
 		default:				DC_BREAK;
 		}
 	}
@@ -539,7 +539,7 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 }
 
 // ** Box2DPhysics::addCircleFixture
-b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2CircleShape circle;
@@ -548,6 +548,7 @@ b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const 
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
 	circle.m_radius = sizeToBox2D( shape.circle.radius );
@@ -558,7 +559,7 @@ b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const 
 }
 
 // ** Box2DPhysics::addRectFixture
-b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -567,6 +568,7 @@ b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Sh
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
 	polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
@@ -577,7 +579,7 @@ b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Sh
 }
 
 // ** Box2DPhysics::addPolygonFixture
-b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -586,6 +588,7 @@ b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	Array<b2Vec2> points;
 

@@ -166,7 +166,7 @@ namespace Scene {
         };
 
 							    //! Constructs the RigidBody2D instance.
-							    RigidBody2D( f32 mass = 0.0f, Type type = Static, u16 category = DefaultCategory, u16 collisionMask = ~0, bool isBullet = false );
+							    RigidBody2D( f32 mass = 0.0f, Type type = Static, u16 category = DefaultCategory, u16 collisionMask = ~0, bool isBullet = false, bool isSensor = false );
 
 		//! Returns the rigid body mass.
 		f32					    mass( void ) const;
@@ -209,6 +209,9 @@ namespace Scene {
 
         //! Returns true if this is a bullet.
         bool                    isBullet( void ) const;
+
+        //! Returns true if this is a sensor.
+        bool                    isSensor( void ) const;
 
 		//! Returns the torque applied to this rigid body.
 		f32					    torque( void ) const;
@@ -282,6 +285,7 @@ namespace Scene {
               WasMoved      = BIT( 0 )  //!< Rigid body was moved.
             , WasPutToRest  = BIT( 1 )  //!< Rigid body was put to rest.
             , IsBullet      = BIT( 2 )  //!< Indicates that continuous collision detection is used for this body.
+            , IsSensor      = BIT( 3 )  //!< Sensor bodies collect contact information but never generate a collision.
         };
 
 		f32					    m_mass;				//!< The rigid body mass.
