@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------------ Physics2D ------------------------------------------------ //
 
 // ** Physics2D::Physics2D
-Physics2D::Physics2D( const String& name, f32 timeStep, f32 scale ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Shape2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+Physics2D::Physics2D( const String& name, f32 timeStep ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Shape2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
 {
 
 }
@@ -89,8 +89,6 @@ void Physics2D::clearState( RigidBody2D& rigidBody )
 void Physics2D::queueCollisionEvent( RigidBody2D& rigidBody, const RigidBody2D::CollisionEvent& e )
 {
     rigidBody.queueCollisionEvent( e );
-//    first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, second, isSensor, category, points ) );
-//    second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, first, isSensor, category, points ) );
 }
 
 #ifdef DC_BOX2D_ENABLED
@@ -210,10 +208,10 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep, scale ), m_scale( scale )
+Box2DPhysics::Box2DPhysics( f32 timeStep, const ScaleFactors& scalingFactors, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep ), m_scalingFactors( scalingFactors )
 {
     // Create Box2D world instance
-	m_world = DC_NEW b2World( positionToBox2D( gravity ) );
+	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
 
     // Disable automatic force clearing
     m_world->SetAutoClearForces( false );
@@ -393,21 +391,21 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
 
 	body->SetLinearDamping( rigidBody.linearDamping() );
 	body->SetAngularDamping( rigidBody.angularDamping() );
-    body->SetLinearVelocity( positionToBox2D( rigidBody.linearVelocity() ) );
+    body->SetLinearVelocity( velocityToBox2D( rigidBody.linearVelocity() ) );
 	body->ApplyTorque( -torque, true );
-	body->ApplyForceToCenter( positionToBox2D( force ), true );
+	body->ApplyForceToCenter( forceToBox2D( force ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
 
 	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
 		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
-		body->ApplyForce( positionToBox2D( appliedForce.m_value ), point, true );
+		body->ApplyForce( forceToBox2D( appliedForce.m_value ), point, true );
 	}
 
     for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
  		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
-		body->ApplyLinearImpulse( positionToBox2D( appliedImpulse.m_value ), point, true );   
+		body->ApplyLinearImpulse( forceToBox2D( appliedImpulse.m_value ), point, true );   
     }
 
     // Clear the rigid body state
@@ -425,7 +423,7 @@ void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transf
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
 
     // Update the body's linear velocity
-    rigidBody.setLinearVelocity( positionFromBox2D( body->GetLinearVelocity() ) );
+    rigidBody.setLinearVelocity( velocityFromBox2D( body->GetLinearVelocity() ) );
 }
 
 // ** Box2DPhysics::dispatchCollisionEvents
@@ -615,7 +613,7 @@ b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const
 // ** Box2DPhysics::positionFromBox2D
 Vec3 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
 {
-	return Vec3( position.x, position.y, 0.0f ) * m_scale;
+	return Vec3( position.x, position.y, 0.0f ) * m_scalingFactors.distance;
 }
 
 // ** Box2DPhysics::rotationFromBox2D
@@ -627,13 +625,37 @@ f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec3& position ) const
 {
-	return b2Vec2( position.x / m_scale, position.y / m_scale );
+	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
 }
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
 {
-	return b2Vec2( position.x / m_scale, position.y / m_scale );
+	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
+}
+
+// ** Box2DPhysics::forceToBox2D
+b2Vec2 Box2DPhysics::forceToBox2D( const Vec2& value ) const
+{
+    return b2Vec2( value.x / m_scalingFactors.force, value.y / m_scalingFactors.force );
+}
+
+// ** Box2DPhysics::forceFromBox2D
+Vec2 Box2DPhysics::forceFromBox2D( const b2Vec2& value ) const
+{
+    return Vec2( value.x, value.y ) * m_scalingFactors.force;
+}
+
+// ** Box2DPhysics::velocityToBox2D
+b2Vec2 Box2DPhysics::velocityToBox2D( const Vec2& value ) const
+{
+    return b2Vec2( value.x / m_scalingFactors.velocity, value.y / m_scalingFactors.velocity );
+}
+
+// ** Box2DPhysics::velocityFromBox2D
+Vec2 Box2DPhysics::velocityFromBox2D( const b2Vec2& value ) const
+{
+    return Vec2( value.x, value.y ) * m_scalingFactors.velocity;
 }
 
 // ** Box2DPhysics::rotationToBox2D
@@ -645,7 +667,7 @@ f32 Box2DPhysics::rotationToBox2D( f32 angle ) const
 // ** Box2DPhysics::sizeToBox2D
 f32 Box2DPhysics::sizeToBox2D( f32 value ) const
 {
-	return value / m_scale;
+	return value / m_scalingFactors.distance;
 }
 
 #endif	/*	DC_BOX2D_ENABLED	*/
