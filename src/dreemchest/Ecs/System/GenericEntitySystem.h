@@ -109,7 +109,6 @@ namespace Ecs {
 	template<typename TSystem, typename ... TComponents>
 	void GenericEntitySystem<TSystem, TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
 	{
-		DC_BREAK
 	}
 
 #endif	/*	!DC_CPP11_DISABLED	*/
