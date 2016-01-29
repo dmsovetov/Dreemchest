@@ -213,7 +213,7 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep, scale ), m_scale( scale )
 {
     // Create Box2D world instance
-	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
+	m_world = DC_NEW b2World( positionToBox2D( gravity ) );
 
     // Disable automatic force clearing
     m_world->SetAutoClearForces( false );
@@ -388,29 +388,26 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
     }
 
 	// Now apply forces
-	f32			mass   = body->GetMass();
 	f32			torque = rigidBody.torque();
 	const Vec2& force  = rigidBody.force();
 
 	body->SetLinearDamping( rigidBody.linearDamping() );
 	body->SetAngularDamping( rigidBody.angularDamping() );
     body->SetLinearVelocity( positionToBox2D( rigidBody.linearVelocity() ) );
-	body->ApplyTorque( -torque * mass, true );
-	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
+	body->ApplyTorque( -torque, true );
+	body->ApplyForceToCenter( positionToBox2D( force ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
 
 	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
 		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
-		b2Vec2 value = b2Vec2( appliedForce.m_value.x * mass, appliedForce.m_value.y * mass );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
-		body->ApplyForce( value, point, true );
+		body->ApplyForce( positionToBox2D( appliedForce.m_value ), point, true );
 	}
 
     for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
  		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
-		b2Vec2 value = b2Vec2( appliedImpulse.m_value.x * mass, appliedImpulse.m_value.y * mass );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
-		body->ApplyLinearImpulse( value, point, true );   
+		body->ApplyLinearImpulse( positionToBox2D( appliedImpulse.m_value ), point, true );   
     }
 
     // Clear the rigid body state
