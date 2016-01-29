@@ -46,6 +46,15 @@ namespace Scene {
 		//! Sets the physics fixed time step.
 		void					setTimeStep( f32 value );
 
+		//! Performs the ray casting and returns the closes point to the starting one.
+		virtual bool		    rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const = 0;
+
+		//! Returns all scene objects inside the rect.
+		virtual SceneObjectSet	queryRect( const Rect& rect ) const = 0;
+
+		//! Returns all scene objects that are intersected by a ray.
+		virtual SceneObjectSet  querySegment( const Vec2& start, const Vec2& end ) const = 0;
+
     protected:
 
                                 //! Constructs Physics2D instance.
@@ -86,13 +95,13 @@ namespace Scene {
 								Box2DPhysics( f32 timeStep = 1.0f / 120.0f, f32 scale = 1.0f, const Vec2& gravity = Vec2( 0.0f, -9.8f ) );
 
 		//! Performs the ray casting and returns the closes point to the starting one.
-		bool					rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const;
+		virtual bool		    rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const DC_DECL_OVERRIDE;
 
 		//! Returns all scene objects inside the rect.
-		SceneObjectSet			queryRect( const Rect& rect ) const;
+		virtual SceneObjectSet  queryRect( const Rect& rect ) const DC_DECL_OVERRIDE;
 
 		//! Returns all scene objects that are intersected by a ray.
-		SceneObjectSet			querySegment( const Vec2& start, const Vec2& end ) const;
+		virtual SceneObjectSet  querySegment( const Vec2& start, const Vec2& end ) const DC_DECL_OVERRIDE;
 
         //! Performs a single physics simulation step of a Box2D world.
         virtual void            simulate( f32 dt ) DC_DECL_OVERRIDE;

@@ -178,7 +178,7 @@ namespace Scene {
 	dcDeclarePtrs( AssetTexture )
 	dcDeclarePtrs( AssetMesh )
 
-	dcDeclarePtrs( Box2DPhysics )
+	dcDeclarePtrs( Physics2D )
 	dcDeclarePtrs( RigidBody2D )
 
 	dcDeclarePtrs( RenderingContext )
