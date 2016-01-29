@@ -637,25 +637,25 @@ b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
 // ** Box2DPhysics::forceToBox2D
 b2Vec2 Box2DPhysics::forceToBox2D( const Vec2& value ) const
 {
-    return b2Vec2( value.x / m_scalingFactors.force, value.y / m_scalingFactors.force );
+    return b2Vec2( value.x * m_scalingFactors.force, value.y * m_scalingFactors.force );
 }
 
 // ** Box2DPhysics::forceFromBox2D
 Vec2 Box2DPhysics::forceFromBox2D( const b2Vec2& value ) const
 {
-    return Vec2( value.x, value.y ) * m_scalingFactors.force;
+    return Vec2( value.x, value.y ) / m_scalingFactors.force;
 }
 
 // ** Box2DPhysics::velocityToBox2D
 b2Vec2 Box2DPhysics::velocityToBox2D( const Vec2& value ) const
 {
-    return b2Vec2( value.x / m_scalingFactors.velocity, value.y / m_scalingFactors.velocity );
+    return b2Vec2( value.x * m_scalingFactors.velocity, value.y * m_scalingFactors.velocity );
 }
 
 // ** Box2DPhysics::velocityFromBox2D
 Vec2 Box2DPhysics::velocityFromBox2D( const b2Vec2& value ) const
 {
-    return Vec2( value.x, value.y ) * m_scalingFactors.velocity;
+    return Vec2( value.x, value.y ) / m_scalingFactors.velocity;
 }
 
 // ** Box2DPhysics::rotationToBox2D
