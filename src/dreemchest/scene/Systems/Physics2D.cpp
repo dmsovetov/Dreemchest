@@ -211,7 +211,7 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 Box2DPhysics::Box2DPhysics( f32 timeStep, const ScaleFactors& scalingFactors, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep ), m_scalingFactors( scalingFactors )
 {
     // Create Box2D world instance
-	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
+	m_world = DC_NEW b2World( forceToBox2D( gravity ) );
 
     // Disable automatic force clearing
     m_world->SetAutoClearForces( false );
@@ -619,7 +619,7 @@ Vec3 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
 // ** Box2DPhysics::rotationFromBox2D
 f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 {
-	return degrees( -angle );
+	return degrees( angle );
 }
 
 // ** Box2DPhysics::positionToBox2D
