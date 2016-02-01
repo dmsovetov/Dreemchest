@@ -379,6 +379,11 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
         body->SetTransform( positionToBox2D( rigidBody.movedTo() ), rigidBodyTransform.q.GetAngle() );
     }
 
+    // This rigid body was rotated - sync the Box2D body with it
+    if( rigidBody.wasRotated() ) {
+        body->SetTransform( body->GetPosition(), radians( rigidBody.rotatedTo() ) );
+    }
+
     // Rigid body was put to rest - clear velocities
     if( rigidBody.wasPutToRest() ) {
         body->SetLinearVelocity( b2Vec2( 0.0f, 0.0f ) );

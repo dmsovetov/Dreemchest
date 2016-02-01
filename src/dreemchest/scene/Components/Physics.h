@@ -203,6 +203,15 @@ namespace Scene {
         //! Returns true if the rigid body was moved outside the physics engine step.
         bool                    wasMoved( void ) const;
 
+        //! Rotates the rigid body to a specified angle.
+        void                    rotateTo( f32 angle );
+
+        //! Returns the angle this rigid body was rotated to.
+        f32                     rotatedTo( void ) const;
+
+        //! Returns true if the rigid body was rotated outside the physics engine step.
+        bool                    wasRotated( void ) const;
+
         //! Resets linear & angular velocities of a body and places the body to a rest.
         void                    putToRest( void );
 
@@ -285,9 +294,10 @@ namespace Scene {
         //! Internal physical body flags.
         enum {
               WasMoved      = BIT( 0 )  //!< Rigid body was moved.
-            , WasPutToRest  = BIT( 1 )  //!< Rigid body was put to rest.
-            , IsBullet      = BIT( 2 )  //!< Indicates that continuous collision detection is used for this body.
-            , IsSensor      = BIT( 3 )  //!< Sensor bodies collect contact information but never generate a collision.
+            , WasRotated    = BIT( 1 )  //!< Rigid body was rotated.
+            , WasPutToRest  = BIT( 2 )  //!< Rigid body was put to rest.
+            , IsBullet      = BIT( 3 )  //!< Indicates that continuous collision detection is used for this body.
+            , IsSensor      = BIT( 4 )  //!< Sensor bodies collect contact information but never generate a collision.
         };
 
 		f32					    m_mass;				//!< The rigid body mass.
@@ -303,6 +313,7 @@ namespace Scene {
         u16                     m_category;         //!< Rigid body category used in collision filtering.
         u16                     m_collisionMask;    //!< Collision mask used to filter collisions.
         Vec2                    m_movedTo;          //!< World-space position this rigid body was moved.
+        f32                     m_rotatedTo;        //!< An angle this rigid body was rotated.
         FlagSet8                m_flags;            //!< State flags.
         Vec2                    m_linearVelocity;   //!< Linear velocity of a body.
 	};

@@ -164,7 +164,7 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
 
 // ** RigidBody2D::RigidBody2D
 RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask, bool isBullet, bool isSensor )
-	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask ), m_gravityScale( 1.0f )
+	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask ), m_gravityScale( 1.0f ), m_rotatedTo( 0.0f )
 {
     m_flags.set( IsBullet, isBullet );
     m_flags.set( IsSensor, isSensor );
@@ -235,6 +235,25 @@ const Vec2& RigidBody2D::movedTo( void ) const
 bool RigidBody2D::wasMoved( void ) const
 {
     return m_flags.is( WasMoved );
+}
+
+// ** RigidBody2D::rotateTo
+void RigidBody2D::rotateTo( f32 angle )
+{
+    m_rotatedTo = angle;
+    m_flags.on( WasRotated );
+}
+
+// ** RigidBody2D::rotatedTo
+f32 RigidBody2D::rotatedTo( void ) const
+{
+    return m_rotatedTo;
+}
+
+// ** RigidBody2D::wasRotated
+bool RigidBody2D::wasRotated( void ) const
+{
+    return m_flags.is( WasRotated );
 }
 
 // ** RigidBody2D::putToRest
@@ -365,7 +384,7 @@ void RigidBody2D::clear( void )
 {
 	m_torque = 0.0f;
 	m_force  = Vec2( 0.0f, 0.0f );
-    m_flags.off( WasPutToRest | WasMoved );
+    m_flags.off( WasPutToRest | WasMoved | WasRotated );
 	m_forces.clear();
     m_impulses.clear();
 }
