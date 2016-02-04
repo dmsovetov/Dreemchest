@@ -60,6 +60,12 @@ const EntityId& Entity::id( void ) const
 	return m_id;
 }
 
+// ** Entity::clear
+void Entity::clear( void )
+{
+    m_components.clear();
+}
+
 // ** Entity::isSerializable
 bool Entity::isSerializable( void ) const
 {

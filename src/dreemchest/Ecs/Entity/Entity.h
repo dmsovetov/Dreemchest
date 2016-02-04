@@ -63,6 +63,9 @@ namespace Ecs {
 		//! Returns a component mask.
 		const Bitset&			mask( void ) const;
 
+        //! Removes all attached components.
+        void                    clear( void );
+
 		//! Returns entity flags.
 		u8						flags( void ) const;
 
