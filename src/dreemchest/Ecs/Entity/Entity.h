@@ -142,6 +142,9 @@ namespace Ecs {
 		TComponent*				attach( Args ... args );
 	#endif	/*	!DC_CPP11_DISABLED	*/
 
+        //! Removes a component by type id from this entity.
+        void                    detachById( TypeIdx id );
+
 		//! Removes a component from this entity.
 		template<typename TComponent>
 		void					detach( void );
@@ -272,13 +275,7 @@ namespace Ecs {
 	template<typename TComponent>
 	void Entity::detach( void )
 	{
-		DC_BREAK_IF( m_flags.is( Removed ) );
-
-		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
-		DC_BREAK_IF( i == m_components.end() );
-		updateComponentBit( i->second->typeIndex(), false );
-        i->second->setParentEntity( NULL );
-		m_components.erase( i );
+        detachById( TypeIndex<TComponent>::idx() );
 	}
 
 } // namespace Ecs

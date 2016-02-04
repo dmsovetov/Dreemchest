@@ -134,6 +134,18 @@ void Entity::updateComponentBit( u32 bit, bool value )
 	}
 }
 
+// ** Entity::detachById
+void Entity::detachById( TypeIdx id )
+{
+	DC_BREAK_IF( m_flags.is( Removed ) );
+
+	Components::iterator i = m_components.find( id );
+	DC_BREAK_IF( i == m_components.end() );
+	updateComponentBit( i->second->typeIndex(), false );
+    i->second->setParentEntity( NULL );
+	m_components.erase( i );
+}
+
 #if DC_ECS_ENTITY_CLONING
 
 // ** Entity::deepCopy
