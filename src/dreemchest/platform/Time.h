@@ -82,7 +82,7 @@ namespace Platform {
 	public:
 
 				    //! Constructs FixedTimeStep instance.
-				    FixedTimeStep( u32 step, s32 maxSteps );
+				    FixedTimeStep( u32 step = 16, s32 maxSteps = INT_MAX );
 
         //! Advances the fixed time step timer by a specified amount of milliseconds.
         /*!
@@ -91,8 +91,14 @@ namespace Platform {
         */
         TimeStep    advance( u32 dt );
 
-        //! Returns the maximum number of steps that can be performed.
+        //! Returns the maximum number of steps that can be performed in a single tick.
         s32         maxSteps( void ) const;
+
+        //! Sets the maximum number of steps that can be performed in a single tick.
+        void        setMaxSteps( s32 value );
+
+        //! Sets the time step value.
+        void        setTimeStep( u32 value );
 
 	private:
 

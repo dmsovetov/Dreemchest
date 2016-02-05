@@ -121,6 +121,18 @@ s32 FixedTimeStep::maxSteps( void ) const
     return m_maxSteps;
 }
 
+// ** FixedTimeStep::setMaxSteps
+void FixedTimeStep::setMaxSteps( s32 value )
+{
+    m_maxSteps = value;
+}
+
+// ** FixedTimeStep::setTimeStep
+void FixedTimeStep::setTimeStep( u32 value )
+{
+    m_dt = value;
+}
+
 } // namespace Platform
 
 DC_END_DREEMCHEST
