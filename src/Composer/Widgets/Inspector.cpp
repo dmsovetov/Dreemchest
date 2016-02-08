@@ -89,7 +89,7 @@ void Inspector::setModel( PropertyModelQPtr value )
 		// Construct the widget according to the type
 		QWidget* widget = NULL;
 
-		if( type == "Scene::ImageWPtr" ) {
+		if( type == "Scene::ImageHandle" ) {
 			widget = new AssetSelector( Scene::AssetType::fromClass<Scene::Image>().bit(), this );
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
 		}

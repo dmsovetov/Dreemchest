@@ -82,16 +82,12 @@ DC_BEGIN_COMPOSER
 
 		QVariant toVariant( TValue value ) const
 		{
-            DC_NOT_IMPLEMENTED;
-            return QVariant();
-		//	return QVariant::fromValue<Scene::AssetWPtr>( value );
+			return QVariant::fromValue<Scene::AssetHandle>( value );
 		}
 
 		TValue toValue( const QVariant& value ) const
 		{
-            DC_NOT_IMPLEMENTED
-            return TValue();
-		//	return static_cast<typename TValue::Type*>( value.value<Scene::AssetWPtr>().get() );
+			return value.value<Scene::AssetHandle>();
 		}	
 	};
 

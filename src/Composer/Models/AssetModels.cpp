@@ -32,7 +32,8 @@ DC_BEGIN_COMPOSER
 // ** MaterialModel::MaterialModel
 MaterialModel::MaterialModel( Scene::MaterialHandle material, QObject* parent ) : PropertyModel( parent ), m_material( material )
 {
-    const Scene::Material& instance = material.readLock();
+    material.forceLoad();
+    Scene::Material* instance = &(*material.writeLock());
 	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, instance ), BindSetter( Scene::Material::setRenderingMode, instance ) );
 	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, instance ), BindSetter( Scene::Material::setModel, instance ) );
 	addAsset<Scene::ImageHandle>( "Diffuse", BindGetter( Scene::Material::diffuse, instance ), BindSetter( Scene::Material::setDiffuse, instance ) );
