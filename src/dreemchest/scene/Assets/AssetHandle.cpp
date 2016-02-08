@@ -57,6 +57,12 @@ const AssetHandle& AssetHandle::operator = ( const AssetHandle& other )
     return *this;
 }
 
+// ** AssetHandle::operator ==
+bool AssetHandle::operator == ( const AssetHandle& other ) const
+{
+    return other.m_assets == m_assets && other.m_slot == m_slot;
+}
+
 // ** AssetHandle::operator <
 bool AssetHandle::operator < ( const AssetHandle& other ) const
 {

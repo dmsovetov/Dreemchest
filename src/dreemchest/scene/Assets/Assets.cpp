@@ -26,6 +26,8 @@
 
 #include "Assets.h"
 
+#include "Mesh.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -73,6 +75,19 @@ void Asset::setName( const String& value )
 }
 
 // --------------------------------------------- Assets --------------------------------------------- //
+
+// ** Assets::Assets
+Assets::Assets( void )
+{
+}
+
+// ** Assets::Assets
+Assets::~Assets( void )
+{
+    for( AssetCaches::iterator i = m_cache.begin(), end = m_cache.end(); i != end; ++i ) {
+        delete i->second;
+    }
+}
 
 // ** Assets::add
 AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName )
@@ -132,6 +147,40 @@ bool Assets::isValidSlot( SlotIndex32 slot ) const
 void Assets::releaseWriteLock( const AssetHandle& asset )
 {
     asset->m_lastModified = Platform::currentTime();
+}
+
+// ** Assets::update
+void Assets::update( f32 dt )
+{
+    // Process the loading queue
+    while( !m_loadingQueue.empty() ) {
+        // Get the first asset in loading queue
+        AssetHandle asset = *m_loadingQueue.begin();
+        m_loadingQueue.pop_front();
+
+        // Perform loading
+        log::verbose( "Loading '%s'...\n", asset->name().c_str() );
+    }
+}
+
+// ** Assets::queue
+void Assets::queueForLoading( const AssetHandle& asset ) const
+{
+    // Make sure this asset should be loaded
+    if( asset->state() != Asset::Unloaded ) {
+        return;
+    }
+
+    // First check if this asset is already in queue
+    AssetList::const_iterator i = std::find( m_loadingQueue.begin(), m_loadingQueue.end(), asset );
+
+    // Just skip if it was found
+    if( i != m_loadingQueue.end() ) {
+        return;
+    }
+
+    m_loadingQueue.push_back( asset );
+    log::verbose( "Asset '%s' is queued for loading\n", asset->name().c_str() );
 }
 
 #if ASSET_DEPRECATED

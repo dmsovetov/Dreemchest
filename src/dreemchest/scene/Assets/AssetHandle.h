@@ -47,6 +47,9 @@ namespace Scene {
         //! Copies an asset handle.
         const AssetHandle&              operator = ( const AssetHandle& other );
 
+        //! Compares two asset handles for equality.
+        bool                            operator == ( const AssetHandle& other ) const;
+
         //! Compares two asset handles.
         bool                            operator < ( const AssetHandle& other ) const;
 

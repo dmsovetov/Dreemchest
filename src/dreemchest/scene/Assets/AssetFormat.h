@@ -33,9 +33,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Base class for all asset format parsers.
+    class AbstractAssetFormat {
+    public:
+
+        virtual         ~AbstractAssetFormat( void ) {}
+    };
+
     //! Generic base class for all asset format parsers.
     template<typename TAsset>
-    class AssetFormat {
+    class AssetFormat : public AbstractAssetFormat {
     public:
 
         //! Performs an asset data parsing from a stream.

@@ -30,6 +30,7 @@
 #include "AssetHandle.h"
 #include "AssetCache.h"
 #include "AssetType.h"
+#include "AssetFormat.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -76,6 +77,7 @@ namespace Scene {
 
     private:
 
+        AssetFormatUPtr             m_format;       //!< Asset format parser used for loading.
         AssetType                   m_type;         //!< Asset type.
         AssetId                     m_uniqueId;     //!< Unique asset id.
         String                      m_fileName;     //!< Asset file name.
@@ -92,9 +94,17 @@ namespace Scene {
     template<typename TAsset> friend class AssetWriteLock;
     public:
 
+                                    //! Constructs Assets instance.
+                                    Assets( void );
+                                    ~Assets( void );
+
         //! Returns an asset of specified type.
         template<typename TAsset>
         AssetDataHandle<TAsset>     find( const AssetId& uniqueId ) const;
+
+        //! Sets the default placeholder for unloaded assets of specified type.
+        template<typename TAsset>
+        void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
         AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName );
@@ -105,13 +115,22 @@ namespace Scene {
         //! Returns an asset by it's id.
         AssetHandle                 findAsset( const AssetId& id ) const;
 
+        //! Updates an asset manager (performs loading, unloading, etc).
+        void                        update( f32 dt );
+
     private:
+
+        //! Forward declaration of generic asset cache type.
+        template<typename TAsset>   class AssetCache;
 
         //! Returns an asset by slot handle.
         const Asset&                assetAtSlot( SlotIndex32 slot ) const;
 
         //! Returns true if the specified asset slot handle is valid.
         bool                        isValidSlot( SlotIndex32 slot ) const;
+
+        //! Puts an asset to a loading queue.
+        void                        queueForLoading( const AssetHandle& asset ) const;
 
         //! Requests an asset cache for a specified asset type.
         template<typename TAsset>
@@ -134,15 +153,28 @@ namespace Scene {
 
     private:
 
+        //! Abstract asset cache.
+        struct AbstractAssetCache {
+            virtual                 ~AbstractAssetCache( void ) {}
+        };
+
+        //! Generic asset cache that stores asset data of specified type.
+        template<typename TAsset>
+        struct AssetCache : public AbstractAssetCache {
+            TAsset                      placeholder;    //!< Default placeholder that is returned for unloaded assets.
+            Slots<TAsset, SlotIndex32>  slots;          //!< Cached asset data is stored here.
+        };
+
         //! Container type to store unique id to an asset slot mapping.
         typedef Map<AssetId, SlotIndex32>   AssetSlotsById;
 
         //! Container type to store asset cache for an asset type.
         typedef Map<AssetType, AbstractAssetCache*> AssetCaches;
 
-        Slots<Asset, SlotIndex32>   m_assets;   //!< All available assets.
-        mutable AssetCaches         m_caches;   //!< Asset caches.
-        AssetSlotsById              m_slotById; //!< AssetId to handle mapping.
+        Slots<Asset, SlotIndex32>   m_assets;       //!< All available assets.
+        AssetSlotsById              m_slotById;     //!< AssetId to handle mapping.
+        mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
+        mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };
 
     // ** Assets::find
@@ -153,19 +185,27 @@ namespace Scene {
         return handle;
     }
 
+    // ** Assets::setPlaceholder
+    template<typename TAsset>
+    void Assets::setPlaceholder( const TAsset& value )
+    {
+        AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
+        cache.placeholder = value;
+    }
+
     // ** Assets::requestAssetCache
     template<typename TAsset>
-    AssetCache<TAsset>& Assets::requestAssetCache( void ) const
+    Assets::AssetCache<TAsset>& Assets::requestAssetCache( void ) const
     {
         AssetType type = AssetType::fromClass<TAsset>();
-        AssetCaches::iterator i = m_caches.find( type );
+        AssetCaches::iterator i = m_cache.find( type );
 
-        if( i != m_caches.end() ) {
+        if( i != m_cache.end() ) {
             return *static_cast<AssetCache<TAsset>*>( i->second );
         }
 
         AssetCache<TAsset>* cache = DC_NEW AssetCache<TAsset>();
-        m_caches[type] = cache;
+        m_cache[type] = cache;
 
         return *cache;
     }
@@ -174,14 +214,29 @@ namespace Scene {
     template<typename TAsset>
     const TAsset& Assets::assetData( const AssetHandle& asset ) const
     {
+        // Request an asset cache for this type of asset
         AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
-        return cache.get( asset->m_cache );
+
+        // Use the placeholder for unloaded assets
+        if( !asset->m_cache.isValid() ) {
+            return cache.placeholder;
+        }
+
+        // Now lookup an asset data
+        TAsset& data = cache.slots.get( asset->m_cache );
+        return data;
     }
 
     // ** Assets::acquireReadLock
     template<typename TAsset>
     const TAsset& Assets::acquireReadLock( const AssetHandle& asset ) const
     {
+        DC_BREAK_IF( !asset.isValid() );
+
+        if( !asset.isLoaded() ) {
+            queueForLoading( asset );
+        }
+
         const TAsset& data = assetData<TAsset>( asset );
         asset->m_lastUsed = Platform::currentTime();
         return data;

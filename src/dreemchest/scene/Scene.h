@@ -72,8 +72,7 @@ namespace Scene {
 
     class Assets;
     class Asset;
-    class AbstractAssetCache;
-    template<typename TAsset> class AssetCache;
+    class AbstractAssetFormat;
 
 	class Image;
 	class Mesh;
@@ -122,6 +121,12 @@ namespace Scene {
 
     //! Set of assets.
     typedef Set<class AssetHandle> AssetSet;
+
+    //! List of assets.
+    typedef List<class AssetHandle> AssetList;
+
+    // Unique ptr for asset format.
+    typedef AutoPtr<AbstractAssetFormat> AssetFormatUPtr;
 
 	//! Available rendering modes.
 	enum RenderingMode {

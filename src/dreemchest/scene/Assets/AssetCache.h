@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if ASSET_DEPRECATED
+
     //! Base class for all asset cache types
     class AbstractAssetCache {
     public:
@@ -79,8 +81,6 @@ namespace Scene {
     {
         return m_cache.get( slot );
     }
-
-#if ASSET_DEPRECATED
 
     //! Base class for all asset pools.
     class AbstractAssetPool {
