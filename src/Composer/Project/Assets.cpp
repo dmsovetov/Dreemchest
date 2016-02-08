@@ -79,17 +79,17 @@ Assets::Assets& AssetManager::assets( void )
 }
 
 // ** AssetManager::createAssetForFile
-Assets::AssetHandle AssetManager::createAssetForFile( const FileInfo& fileInfo )
+Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
 	Assets::Type type = assetTypeFromExtension( fileInfo.extension() );
 
     if( !type.isValid() ) {
-        return Assets::AssetHandle();
+        return Assets::Handle();
     }
 
     // Create an asset
-    Assets::AssetHandle asset = createAsset( type, Guid::generate().toString() );
+    Assets::Handle asset = createAsset( type, Guid::generate().toString() );
 
     // Set meta file
     m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
@@ -98,7 +98,7 @@ Assets::AssetHandle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 }
 
 // ** AssetManager::parseAssetFromData
-Assets::AssetHandle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
+Assets::Handle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 {
 	DC_BREAK_IF( !kv.isObject() );
 
@@ -114,7 +114,7 @@ Assets::AssetHandle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 }
 
 // ** AssetManager::createAsset
-Assets::AssetHandle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
+Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
 {
     // Create asset format by extension
     Assets::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
@@ -125,7 +125,7 @@ Assets::AssetHandle AssetManager::createAsset( Assets::Type type, const Assets::
     }
 
     // Create asset instance
-    Assets::AssetHandle asset = m_assets.addAsset( type, id, format );
+    Assets::Handle asset = m_assets.addAsset( type, id, format );
     DC_BREAK_IF( !asset.isValid() );
 
     return asset;
@@ -198,7 +198,7 @@ void AssetManager::addAssetFile( const FileInfo& fileInfo )
 	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
 
 	// Added asset
-	Assets::AssetHandle asset;
+	Assets::Handle asset;
 
 	// Create asset from data or create the new one
 	if( !meta.isNull() ) {

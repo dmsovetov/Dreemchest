@@ -62,13 +62,13 @@ DC_BEGIN_COMPOSER
 		Io::Path					cacheFolderFromUuid( const String& uuid ) const;
 
 		//! Creates new asset instance by a specified extension.
-		Assets::AssetHandle			createAssetForFile( const FileInfo& fileInfo );
+		Assets::Handle			    createAssetForFile( const FileInfo& fileInfo );
 
         //! Parses an asset from a meta data.
-        Assets::AssetHandle         parseAssetFromData( const Io::KeyValue& kv );
+        Assets::Handle              parseAssetFromData( const Io::KeyValue& kv );
 
         //! Creates an asset instance with specified asset type and id.
-        Assets::AssetHandle         createAsset( Assets::Type type, const Assets::AssetId& id );
+        Assets::Handle              createAsset( Assets::Type type, const Assets::AssetId& id );
 
     private slots:
 

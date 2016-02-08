@@ -65,7 +65,7 @@
 DC_BEGIN_COMPOSER
 
 	// Declare Qt metatypes
-	Q_DECLARE_METATYPE( Assets::AssetHandle )
+	Q_DECLARE_METATYPE( Assets::Handle )
 	Q_DECLARE_METATYPE( Scene::ImageHandle )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
 	Q_DECLARE_METATYPE( Scene::Material::Model )
@@ -280,7 +280,7 @@ DC_BEGIN_COMPOSER
 		Assets::AssetSet		assetsFromMime( MimeDataQPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Assets::AssetHandle	    assetFromMime( MimeDataQPtr mime ) const;
+		Assets::Handle	        assetFromMime( MimeDataQPtr mime ) const;
 
 	private:
 

@@ -31,98 +31,98 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( void ) : m_assets( NULL )
+// ** Handle::Handle
+Handle::Handle( void ) : m_assets( NULL )
 {
     
 }
 
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( Assets* assets, Index index ) : m_assets( assets ), m_index( index )
+// ** Handle::Handle
+Handle::Handle( Assets* assets, Index index ) : m_assets( assets ), m_index( index )
 {
     
 }
 
-// ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets ), m_index( other.index() )
+// ** Handle::Handle
+Handle::Handle( const Handle& other ) : m_assets( other.m_assets ), m_index( other.index() )
 {
     
 }
 
-// ** AssetHandle::operator =
-const AssetHandle& AssetHandle::operator = ( const AssetHandle& other )
+// ** Handle::operator =
+const Handle& Handle::operator = ( const Handle& other )
 {
     m_assets = other.m_assets;
     m_index  = other.index();
     return *this;
 }
 
-// ** AssetHandle::operator ==
-bool AssetHandle::operator == ( const AssetHandle& other ) const
+// ** Handle::operator ==
+bool Handle::operator == ( const Handle& other ) const
 {
     return other.m_assets == m_assets && other.index() == index();
 }
 
-// ** AssetHandle::operator <
-bool AssetHandle::operator < ( const AssetHandle& other ) const
+// ** Handle::operator <
+bool Handle::operator < ( const Handle& other ) const
 {
     if( other.m_assets != m_assets ) return other.m_assets < m_assets;
     if( other.index()  != index()  ) return other.index()  < index();
     return false;
 }
 
-// ** AssetHandle::operator ->
-const Asset* AssetHandle::operator -> ( void ) const
+// ** Handle::operator ->
+const Asset* Handle::operator -> ( void ) const
 {
     return isValid() ? &asset() : NULL;
 }
 
-// ** AssetHandle::operator ->
-Asset* AssetHandle::operator -> ( void )
+// ** Handle::operator ->
+Asset* Handle::operator -> ( void )
 {
     return isValid() ? &asset() : NULL;
 }
 
-// ** AssetHandle::asset
-const Asset& AssetHandle::asset( void ) const
+// ** Handle::asset
+const Asset& Handle::asset( void ) const
 {
     DC_BREAK_IF( !isValid() );
     return m_assets->assetAtIndex( index() );
 }
 
-// ** AssetHandle::asset
-Asset& AssetHandle::asset( void )
+// ** Handle::asset
+Asset& Handle::asset( void )
 {
     DC_BREAK_IF( !isValid() );
     return const_cast<Asset&>( m_assets->assetAtIndex( index() ) );
 }
 
-// ** AssetHandle::isValid
-bool AssetHandle::isValid( void ) const
+// ** Handle::isValid
+bool Handle::isValid( void ) const
 {
     return m_assets && m_assets->isIndexValid( index() );
 }
 
-// ** AssetHandle::isLoaded
-bool AssetHandle::isLoaded( void ) const
+// ** Handle::isLoaded
+bool Handle::isLoaded( void ) const
 {
     return isValid() && (operator->())->state() == Asset::Loaded;
 }
 
-// ** AssetHandle::index
-Index AssetHandle::index( void ) const
+// ** Handle::index
+Index Handle::index( void ) const
 {
     return m_index;
 }
 
-// ** AssetHandle::assets
-Assets* AssetHandle::assets( void ) const
+// ** Handle::assets
+Assets* Handle::assets( void ) const
 {
     return m_assets;
 }
 
-// ** AssetHandle::forceLoad
-bool AssetHandle::forceLoad( void )
+// ** Handle::forceLoad
+bool Handle::forceLoad( void )
 {
     return assets()->loadAssetToCache( *this );
 }

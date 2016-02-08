@@ -34,7 +34,7 @@ namespace Assets {
 // ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
 
 // ** AbstractAssetFileFormat::parse
-bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
+bool AbstractAssetFileFormat::parse( Assets& assets, Handle asset )
 {
     Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 

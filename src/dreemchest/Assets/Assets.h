@@ -45,7 +45,7 @@ namespace Assets {
     typedef OpaqueHandle<12, 20> Index;
 
     //! Forward declaration of an AssetDataHandle type.
-    template<typename TAsset> class AssetDataHandle;
+    template<typename TAsset> class GenericHandle;
 
     //! Forward declaration of an asset AssetWriteLock type.
     template<typename TAsset> class AssetWriteLock;
@@ -54,10 +54,10 @@ namespace Assets {
     typedef String AssetId;
 
     //! Set of assets.
-    typedef Set<class AssetHandle> AssetSet;
+    typedef Set<class Handle> AssetSet;
 
     //! List of assets.
-    typedef List<class AssetHandle> AssetList;
+    typedef List<class Handle> AssetList;
 
     // Unique ptr for asset format.
     typedef AutoPtr<class AbstractAssetFormat> AssetFormatUPtr;
@@ -127,7 +127,7 @@ namespace Assets {
 
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
-    friend class AssetHandle;
+    friend class Handle;
     template<typename TAsset> friend class AssetWriteLock;
     public:
 
@@ -137,20 +137,20 @@ namespace Assets {
 
         //! Returns an asset of specified type.
         template<typename TAsset>
-        AssetDataHandle<TAsset>     find( const AssetId& uniqueId ) const;
+        GenericHandle<TAsset>       find( const AssetId& uniqueId ) const;
 
         //! Sets the default placeholder for unloaded assets of specified type.
         template<typename TAsset>
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        AssetHandle                 addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format );
+        Handle                      addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );
 
         //! Returns an asset by it's id.
-        AssetHandle                 findAsset( const AssetId& id ) const;
+        Handle                      findAsset( const AssetId& id ) const;
 
         //! Updates an asset manager (performs loading, unloading, etc).
         void                        update( f32 dt );
@@ -167,7 +167,7 @@ namespace Assets {
         bool                        isIndexValid( Index index ) const;
 
         //! Puts an asset to a loading queue.
-        void                        queueForLoading( const AssetHandle& asset ) const;
+        void                        queueForLoading( const Handle& asset ) const;
 
         //! Requests an asset cache for a specified asset type.
         template<typename TAsset>
@@ -175,24 +175,24 @@ namespace Assets {
 
         //! Returns cached asset data.
         template<typename TAsset>
-        const TAsset&               assetData( const AssetHandle& asset ) const;
+        const TAsset&               assetData( const Handle& asset ) const;
 
         //! Reserves asset data handle inside the cache.
         Index                       reserveAssetData( const Type& type );
 
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
-        const TAsset&               acquireReadLock( const AssetHandle& asset ) const;
+        const TAsset&               acquireReadLock( const Handle& asset ) const;
 
         //! Locks an asset for writing.
         template<typename TAsset>
-        AssetWriteLock<TAsset>      acquireWriteLock( const AssetHandle& asset );
+        AssetWriteLock<TAsset>      acquireWriteLock( const Handle& asset );
 
         //! Unlocks an asset after writing and updates last modified timestamp.
-        void                        releaseWriteLock( const AssetHandle& asset );
+        void                        releaseWriteLock( const Handle& asset );
 
         //! Loads an asset data to a cache.
-        bool                        loadAssetToCache( AssetHandle asset );
+        bool                        loadAssetToCache( Handle asset );
 
     private:
 
@@ -228,9 +228,9 @@ namespace Assets {
 
     // ** Assets::find
     template<typename TAsset>
-    AssetDataHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
+    GenericHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
     {
-        AssetHandle handle = findAsset( uniqueId );
+        Handle handle = findAsset( uniqueId );
         return handle;
     }
 
@@ -261,7 +261,7 @@ namespace Assets {
 
     // ** Assets::assetData
     template<typename TAsset>
-    const TAsset& Assets::assetData( const AssetHandle& asset ) const
+    const TAsset& Assets::assetData( const Handle& asset ) const
     {
         // Request an asset cache for this type of asset
         AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
@@ -278,7 +278,7 @@ namespace Assets {
 
     // ** Assets::acquireReadLock
     template<typename TAsset>
-    const TAsset& Assets::acquireReadLock( const AssetHandle& asset ) const
+    const TAsset& Assets::acquireReadLock( const Handle& asset ) const
     {
         DC_BREAK_IF( !asset.isValid() );
 
@@ -293,7 +293,7 @@ namespace Assets {
 
     // ** Assets::acquireWriteLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> Assets::acquireWriteLock( const AssetHandle& asset )
+    AssetWriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
     {
         return AssetWriteLock<TAsset>( asset );
     }

@@ -186,7 +186,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 	}
 
 	// Find asset by UUID
-	Assets::AssetHandle asset = m_assets->assets().findAsset( uuid );
+	Assets::Handle asset = m_assets->assets().findAsset( uuid );
 	DC_BREAK_IF( !asset.isValid() );
 
 	// Dock the editor to main window

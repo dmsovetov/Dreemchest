@@ -82,12 +82,12 @@ DC_BEGIN_COMPOSER
 
 		QVariant toVariant( TValue value ) const
 		{
-			return QVariant::fromValue<Assets::AssetHandle>( value );
+			return QVariant::fromValue<Assets::Handle>( value );
 		}
 
 		TValue toValue( const QVariant& value ) const
 		{
-			return value.value<Assets::AssetHandle>();
+			return value.value<Assets::Handle>();
 		}	
 	};
 

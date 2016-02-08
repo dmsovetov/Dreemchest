@@ -113,7 +113,7 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-AssetHandle Assets::addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format )
+Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format )
 {
     DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
@@ -124,7 +124,7 @@ AssetHandle Assets::addAsset( const Type& type, const AssetId& uniqueId, Abstrac
     m_indexById[uniqueId] = index;
 
     // Construct an asset handle.
-    return AssetHandle( this, index );
+    return Handle( this, index );
 }
 
 // ** Assets::removeAsset
@@ -143,15 +143,15 @@ bool Assets::removeAsset( const AssetId& id )
 }
 
 // ** Assets::findAsset
-AssetHandle Assets::findAsset( const AssetId& id ) const
+Handle Assets::findAsset( const AssetId& id ) const
 {
     AssetIndexById::const_iterator i = m_indexById.find( id );
 
     if( i == m_indexById.end() ) {
-        return AssetHandle();
+        return Handle();
     }
 
-    return AssetHandle( const_cast<Assets*>( this ), i->second );
+    return Handle( const_cast<Assets*>( this ), i->second );
 }
 
 // ** Assets::assetAtIndex
@@ -167,13 +167,13 @@ bool Assets::isIndexValid( Index index ) const
 }
 
 // ** Assets::releaseWriteLock
-void Assets::releaseWriteLock( const AssetHandle& asset )
+void Assets::releaseWriteLock( const Handle& asset )
 {
     asset->m_lastModified = Platform::currentTime();
 }
 
 // ** Assets::loadAssetToCache
-bool Assets::loadAssetToCache( AssetHandle asset )
+bool Assets::loadAssetToCache( Handle asset )
 {
     if( asset->state() != Asset::Unloaded ) {
         return true;
@@ -207,7 +207,7 @@ void Assets::update( f32 dt )
     // Process the loading queue
     while( !m_loadingQueue.empty() ) {
         // Get the first asset in loading queue
-        AssetHandle asset = *m_loadingQueue.begin();
+        Handle asset = *m_loadingQueue.begin();
         m_loadingQueue.pop_front();
 
         // Load an asset to cache
@@ -216,7 +216,7 @@ void Assets::update( f32 dt )
 }
 
 // ** Assets::queue
-void Assets::queueForLoading( const AssetHandle& asset ) const
+void Assets::queueForLoading( const Handle& asset ) const
 {
     // Make sure this asset should be loaded
     if( asset->state() != Asset::Unloaded ) {

@@ -33,25 +33,25 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    //! This handle are issued by an Assets class and are the only way the outer world can access an asset.
-    class AssetHandle {
+    //! This handles are issued by an Assets class and are the only way the outer world can access an asset.
+    class Handle {
     friend class Assets;
     public:
 
-                                        //! Constructs an empty AssetHandle instance.
-                                        AssetHandle( void );
+                                        //! Constructs an empty Handle instance.
+                                        Handle( void );
 
-                                        //! Constructs AssetHandle instance from another one.
-                                        AssetHandle( const AssetHandle& other );
+                                        //! Constructs Handle instance from another one.
+                                        Handle( const Handle& other );
 
         //! Copies an asset handle.
-        const AssetHandle&              operator = ( const AssetHandle& other );
+        const Handle&                   operator = ( const Handle& other );
 
         //! Compares two asset handles for equality.
-        bool                            operator == ( const AssetHandle& other ) const;
+        bool                            operator == ( const Handle& other ) const;
 
         //! Compares two asset handles.
-        bool                            operator < ( const AssetHandle& other ) const;
+        bool                            operator < ( const Handle& other ) const;
 
         //! This operator is used for read-only access to actual asset data.
         const Asset*                    operator -> ( void ) const;
@@ -90,8 +90,8 @@ namespace Assets {
 
     private:
 
-                                        //! Constructs the AssetHandle instance.
-                                        AssetHandle( Assets* assets, Index index );
+                                        //! Constructs the Handle instance.
+                                        Handle( Assets* assets, Index index );
 
     protected:
 
@@ -99,40 +99,40 @@ namespace Assets {
         Index                           m_index;    //!< Asset index.
     };
 
-    // ** AssetHandle::data
+    // ** Handle::data
     template<typename TAsset>
-    const TAsset& AssetHandle::data( void ) const
+    const TAsset& Handle::data( void ) const
     {
         return assets()->assetData<TAsset>( *this );
     }
 
-    // ** AssetHandle::readLock
+    // ** Handle::readLock
     template<typename TAsset>
-    const TAsset& AssetHandle::readLock( void ) const
+    const TAsset& Handle::readLock( void ) const
     {
         return assets()->acquireReadLock<TAsset>( *this );
     }
 
-    // ** AssetHandle::writeLock
+    // ** Handle::writeLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> AssetHandle::writeLock( void )
+    AssetWriteLock<TAsset> Handle::writeLock( void )
     {
         return assets()->acquireWriteLock<TAsset>( *this );
     }
 
     //! This generic asset handle exposes actual asset data. All data handles are weak references and become invalid once asset is unloaded.
     template<typename TAsset>
-    class AssetDataHandle : public AssetHandle {
+    class GenericHandle : public Handle {
     public:
 
-                                        //! Constructs an empty AssetDataHandle instance.
-                                        AssetDataHandle( void );
+                                        //! Constructs an empty GenericHandle instance.
+                                        GenericHandle( void );
 
-                                        //! Constructs AssetDataHandle instance from AssetHandle by casting it's type.
-                                        AssetDataHandle( const AssetHandle& asset );
+                                        //! Constructs GenericHandle instance from Handle by casting it's type.
+                                        GenericHandle( const Handle& asset );
 
         //! Copies an asset handle.
-        const AssetDataHandle<TAsset>&  operator = ( const AssetDataHandle<TAsset>& other );
+        const GenericHandle<TAsset>&    operator = ( const GenericHandle<TAsset>& other );
 
         //! This operator is used for read-only access to actual asset data.
         const TAsset*                   operator -> ( void ) const;
@@ -153,72 +153,72 @@ namespace Assets {
         const AssetId&                  uniqueId( void ) const;
     };
 
-    // ** AssetDataHandle::AssetDataHandle
+    // ** GenericHandle::GenericHandle
     template<typename TAsset>
-    AssetDataHandle<TAsset>::AssetDataHandle( void )
+    GenericHandle<TAsset>::GenericHandle( void )
     {
     
     }
 
-    // ** AssetDataHandle::AssetDataHandle
+    // ** GenericHandle::GenericHandle
     template<typename TAsset>
-    AssetDataHandle<TAsset>::AssetDataHandle( const AssetHandle& asset )
+    GenericHandle<TAsset>::GenericHandle( const Handle& asset )
     {
         DC_BREAK_IF( isValid() && asset.isValid() && !asset->type().is<TAsset>() );
         this->m_assets = asset.assets();
         this->m_index  = asset.index();
     }
 
-    // ** AssetDataHandle::operator =
+    // ** GenericHandle::operator =
     template<typename TAsset>
-    const AssetDataHandle<TAsset>& AssetDataHandle<TAsset>::operator = ( const AssetDataHandle<TAsset>& other )
+    const GenericHandle<TAsset>& GenericHandle<TAsset>::operator = ( const GenericHandle<TAsset>& other )
     {
         m_assets = other.assets();
         m_index  = other.index();
         return *this;
     }
 
-    // ** AssetDataHandle::operator ->
+    // ** GenericHandle::operator ->
     template<typename TAsset>
-    const TAsset* AssetDataHandle<TAsset>::operator -> ( void ) const
+    const TAsset* GenericHandle<TAsset>::operator -> ( void ) const
     {
         return &data<TAsset>();
     }
 
-    // ** AssetDataHandle::name
+    // ** GenericHandle::name
     template<typename TAsset>
-    const String& AssetDataHandle<TAsset>::name( void ) const
+    const String& GenericHandle<TAsset>::name( void ) const
     {
         return asset().name();
     }
 
-    // ** AssetDataHandle::uniqueId
+    // ** GenericHandle::uniqueId
     template<typename TAsset>
-    const AssetId& AssetDataHandle<TAsset>::uniqueId( void ) const
+    const AssetId& GenericHandle<TAsset>::uniqueId( void ) const
     {
         return asset().uniqueId();
     }
 
-    // ** AssetDataHandle::readLock
+    // ** GenericHandle::readLock
     template<typename TAsset>
-    const TAsset& AssetDataHandle<TAsset>::readLock( void ) const
+    const TAsset& GenericHandle<TAsset>::readLock( void ) const
     {
-        return AssetHandle::readLock<TAsset>();
+        return Handle::readLock<TAsset>();
     }
 
-    // ** AssetDataHandle::readLock
+    // ** GenericHandle::readLock
     template<typename TAsset>
-    const TAsset& AssetDataHandle<TAsset>::forceLoad( void )
+    const TAsset& GenericHandle<TAsset>::forceLoad( void )
     {
-        AssetHandle::forceLoad();
+        Handle::forceLoad();
         return readLock();
     }
 
-    // ** AssetDataHandle::writeLock
+    // ** GenericHandle::writeLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> AssetDataHandle<TAsset>::writeLock( void )
+    AssetWriteLock<TAsset> GenericHandle<TAsset>::writeLock( void )
     {
-        return AssetHandle::writeLock<TAsset>();
+        return Handle::writeLock<TAsset>();
     }
 
     //! Asset write lock is used for updating asset data.
@@ -238,16 +238,16 @@ namespace Assets {
     private:
 
                                     //! Constructs AssetWriteLock instance.
-                                    AssetWriteLock( const AssetDataHandle<TAsset>& asset );
+                                    AssetWriteLock( const GenericHandle<TAsset>& asset );
 
     private:
 
-        AssetDataHandle<TAsset>     m_asset;    //!< Handle to an asset being modified.
+        GenericHandle<TAsset>       m_asset;    //!< Handle to an asset being modified.
     };
 
     // ** AssetWriteLock::AssetWriteLock
     template<typename TAsset>
-    AssetWriteLock<TAsset>::AssetWriteLock( const AssetDataHandle<TAsset>& asset ) : m_asset( asset )
+    AssetWriteLock<TAsset>::AssetWriteLock( const GenericHandle<TAsset>& asset ) : m_asset( asset )
     {
         DC_BREAK_IF( !asset.isValid() );
     }

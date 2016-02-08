@@ -242,12 +242,12 @@ void Composer::closeProject( void )
 }
 
 // ** Composer::assetFromMime
-Assets::AssetHandle Composer::assetFromMime( MimeDataQPtr mime ) const
+Assets::Handle Composer::assetFromMime( MimeDataQPtr mime ) const
 {
 	Assets::AssetSet assets = assetsFromMime( mime );
 
 	if( assets.empty() ) {
-		return Assets::AssetHandle();
+		return Assets::Handle();
 	}
 
 	return *assets.begin();
@@ -274,7 +274,7 @@ Assets::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 		DC_BREAK_IF( !meta.isObject() );
 
 		// Find asset by UUID.
-		Assets::AssetHandle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
+		Assets::Handle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
 		DC_BREAK_IF( !asset.isValid() );
 
 		// Add to set.

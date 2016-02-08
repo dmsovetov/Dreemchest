@@ -40,7 +40,7 @@ namespace Assets {
         virtual         ~AbstractAssetFormat( void ) {}
 
         //! Loads data to a specified asset data handle.
-        virtual bool    parse( Assets& assets, AssetHandle asset ) = 0;
+        virtual bool    parse( Assets& assets, Handle asset ) = 0;
     };
 
     //! Asset file format used for loading assets from files.
@@ -48,7 +48,7 @@ namespace Assets {
     public:
 
         //! Opens the file stream and loads data from it.
-        virtual bool    parse( Assets& assets, AssetHandle asset ) DC_DECL_OVERRIDE;
+        virtual bool    parse( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
 
         //! Returns the source asset file name.
         const String&   fileName( void ) const;
@@ -59,7 +59,7 @@ namespace Assets {
     protected:
 
         //! This virtual method is used to dispatch the loading process to actual asset loading implementation.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, AssetHandle asset ) = 0;
+        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) = 0;
 
     private:
 
@@ -72,7 +72,7 @@ namespace Assets {
     protected:
 
         //! Type casts an asset handle and dispatches the loading process to an implementation.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, AssetHandle asset ) DC_DECL_OVERRIDE;
+        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
 
         //! Performs an asset data parsing from a stream.
         virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
@@ -80,7 +80,7 @@ namespace Assets {
 
     // ** AssetFileFormat::parseFromStream
     template<typename TAsset>
-    bool AssetFileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, AssetHandle asset )
+    bool AssetFileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
     {
         AssetWriteLock<TAsset> lock = asset.writeLock<TAsset>();
         TAsset&                data = *lock;

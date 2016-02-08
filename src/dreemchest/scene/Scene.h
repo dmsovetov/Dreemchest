@@ -88,16 +88,16 @@ namespace Scene {
 	class Rvm;
 
     //! Image handle type.
-    typedef Assets::AssetDataHandle<class Image> ImageHandle;
+    typedef Assets::GenericHandle<class Image> ImageHandle;
 
     //! Mesh handle type.
-    typedef Assets::AssetDataHandle<class Mesh> MeshHandle;
+    typedef Assets::GenericHandle<class Mesh> MeshHandle;
 
     //! Material handle type.
-    typedef Assets::AssetDataHandle<class Material> MaterialHandle;
+    typedef Assets::GenericHandle<class Material> MaterialHandle;
 
     //! Terrain handle type.
-    typedef Assets::AssetDataHandle<class Terrain> TerrainHandle;
+    typedef Assets::GenericHandle<class Terrain> TerrainHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {

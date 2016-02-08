@@ -37,7 +37,7 @@ namespace Ui {
 	class AssetSelector : public QWidget {
 
 		Q_OBJECT
-		Q_PROPERTY( Assets::AssetHandle value READ value WRITE setValue NOTIFY valueChanged USER true )
+		Q_PROPERTY( Assets::Handle value READ value WRITE setValue NOTIFY valueChanged USER true )
 
 	Q_SIGNALS:
 
@@ -50,10 +50,10 @@ namespace Ui {
 							AssetSelector( u32 mask = ~0, QWidget* parent = NULL );
 
 		//! Returns the selected asset.
-		Assets::AssetHandle value( void ) const;
+		Assets::Handle      value( void ) const;
 
 		//! Sets the selected asset.
-		void				setValue( const Assets::AssetHandle& value );
+		void				setValue( const Assets::Handle& value );
 
 	private:
 
@@ -65,7 +65,7 @@ namespace Ui {
 		QLineEdit*			m_line;		//!< Asset selector line edit.
 		QToolButton*		m_button;	//!< Asset selector button.
 		u32					m_mask;		//!< Accepted asset types.
-		Assets::AssetHandle m_asset;	//!< The selected asset.
+		Assets::Handle      m_asset;	//!< The selected asset.
 	};
 
 	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
