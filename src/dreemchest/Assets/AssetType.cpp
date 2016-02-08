@@ -28,10 +28,16 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Assets {
 
 // ** AssetType::Invalid
 const AssetType AssetType::Invalid;
+
+// ** AssetType::s_nameToType
+Map<String, AssetType> AssetType::s_nameToType;
+
+// ** AssetType::s_typeToName
+Map<AssetType, String> AssetType::s_typeToName;
 
 // ** AssetType::AssetType
 AssetType::AssetType( void ) : m_type( ~0 )
@@ -77,27 +83,29 @@ u32 AssetType::bit( void ) const
 // ** AssetType::fromString
 AssetType AssetType::fromString( const String& value )
 {
-    if( value == "Mesh" )       return fromClass<Mesh>();
-    if( value == "Image" )      return fromClass<Image>();
-    if( value == "Material" )   return fromClass<Material>();
-    if( value == "Prefab" )     return fromClass<Prefab>();
+    Map<String, AssetType>::const_iterator i = s_nameToType.find( value );
+    
+    if( i == s_nameToType.end() ) {
+        DC_BREAK;
+        return AssetType();
+    }
 
-    DC_BREAK;
-    return AssetType();
+    return i->second;
 }
 
 // ** AssetType::toString
 String AssetType::toString( void ) const
 {
-    if( is<Mesh>() )        return "Mesh";
-    if( is<Image>() )       return "Image";
-    if( is<Material>() )    return "Material";
-    if( is<Prefab>() )      return "Prefab";
+    Map<AssetType, String>::const_iterator i = s_typeToName.find( m_type );
 
-    DC_BREAK;
-    return "";
+    if( i == s_typeToName.end() ) {
+        DC_BREAK;
+        return "";
+    }
+
+    return i->second;
 }
 
-} // namespace Scene
+} // namespace Assets
 
 DC_END_DREEMCHEST

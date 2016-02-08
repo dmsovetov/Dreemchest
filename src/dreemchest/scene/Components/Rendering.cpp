@@ -188,7 +188,7 @@ void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) c
 // ** StaticMesh::deserialize
 void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
 {
-    Assets* assets = ctx.get<Assets>();
+    Assets::Assets* assets = ctx.get<Assets::Assets>();
     
     if( !assets ) {
         log::error( "StaticMesh::deserialize : no Assets attached to serialization context.\n" );

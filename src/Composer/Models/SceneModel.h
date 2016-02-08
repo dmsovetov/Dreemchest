@@ -45,7 +45,7 @@ DC_BEGIN_COMPOSER
 			};
 
 										//! Constructs AssetAction instance.
-										AssetAction( Type type, Scene::AssetSet assets, Scene::SceneObjectWPtr sceneObject, const Vec3& point = Vec3( 0, 0, 0 ) )
+										AssetAction( Type type, Assets::AssetSet assets, Scene::SceneObjectWPtr sceneObject, const Vec3& point = Vec3( 0, 0, 0 ) )
 											: type( type ), sceneObject( sceneObject ), assets( assets ), point( point ) {}
 
 										//! Constructs AssetAction instance from type.
@@ -57,18 +57,18 @@ DC_BEGIN_COMPOSER
 
 			Type						type;			//!< Drop action type.
 			Scene::SceneObjectWPtr		sceneObject;	//!< Target scene object.
-			Scene::AssetSet				assets;			//!< Asset set that should be used.
+			Assets::AssetSet		    assets;			//!< Asset set that should be used.
 			Vec3						point;			//!< Target world space point.
 		};
 
 										//! Constructs SceneModel instance.
-										SceneModel( Scene::Assets& assets, Scene::SceneWPtr scene, QObject* parent );
+										SceneModel( Assets::Assets& assets, Scene::SceneWPtr scene, QObject* parent );
 
 		//! Returns scene instance.
 		Scene::SceneWPtr		        scene( void ) const;
 
 		//! Returns an acceptable drop action by a set of assets & target scene object
-		AssetAction				        acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const;
+		AssetAction				        acceptableAssetAction( const Assets::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const;
 
 		//! Handles an asset drop action to a target scene object & world space point.
 		bool					        performAssetAction( const AssetAction& action );
@@ -118,7 +118,7 @@ DC_BEGIN_COMPOSER
 
 	private:
 
-		Scene::Assets&			        m_assets;	//!< Assets use by this scene.
+		Assets::Assets&			        m_assets;	//!< Assets use by this scene.
         Scene::SceneWPtr		        m_scene;	//!< Actual scene.
 	};
 

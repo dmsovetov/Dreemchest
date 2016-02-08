@@ -242,22 +242,22 @@ void Composer::closeProject( void )
 }
 
 // ** Composer::assetFromMime
-Scene::AssetHandle Composer::assetFromMime( MimeDataQPtr mime ) const
+Assets::AssetHandle Composer::assetFromMime( MimeDataQPtr mime ) const
 {
-	Scene::AssetSet assets = assetsFromMime( mime );
+	Assets::AssetSet assets = assetsFromMime( mime );
 
 	if( assets.empty() ) {
-		return Scene::AssetHandle();
+		return Assets::AssetHandle();
 	}
 
 	return *assets.begin();
 }
 
 // ** Composer::assetsFromMime
-Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
+Assets::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 {
 	// Resulting asset set
-	Scene::AssetSet result;
+	Assets::AssetSet result;
 
 	// Get an array of attached assets
 	QList<QUrl> assets = mime->urls();
@@ -274,7 +274,7 @@ Scene::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 		DC_BREAK_IF( !meta.isObject() );
 
 		// Find asset by UUID.
-		Scene::AssetHandle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
+		Assets::AssetHandle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
 		DC_BREAK_IF( !asset.isValid() );
 
 		// Add to set.

@@ -52,7 +52,8 @@ IMPLEMENT_LOGGER( log )
 // ** Scene::Scene
 Scene::Scene( void )
 {
-	m_ecs		= Ecs::Ecs::create();
+    // Construct entity component system instance
+	m_ecs = Ecs::Ecs::create();
 
 	// Create entity indices
 	m_cameras	= m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() );
@@ -252,7 +253,7 @@ ScenePtr Scene::create( void )
 }
 
 // ** Scene::createFromFile
-ScenePtr Scene::createFromFile( const Assets& assets, const String& fileName )
+ScenePtr Scene::createFromFile( const Assets::Assets& assets, const String& fileName )
 {
 	// Read the JSON file
 	String json = Io::DiskFileSystem::readTextFile( fileName );
@@ -262,7 +263,7 @@ ScenePtr Scene::createFromFile( const Assets& assets, const String& fileName )
 }
 
 // ** Scene::createFromJson
-ScenePtr Scene::createFromJson( const Assets& assets, const String& json )
+ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json )
 {
 #ifdef HAVE_JSON
 	// Create scene instance
@@ -287,7 +288,7 @@ ScenePtr Scene::createFromJson( const Assets& assets, const String& json )
 #ifdef HAVE_JSON
 
 // ** JsonSceneLoader::JsonSceneLoader
-JsonSceneLoader::JsonSceneLoader( const Assets& assets ) : m_assets( assets )
+JsonSceneLoader::JsonSceneLoader( const Assets::Assets& assets ) : m_assets( assets )
 {
 	m_loaders["Transform"]				= dcThisMethod( JsonSceneLoader::readTransform );
 	m_loaders["Renderer"]				= dcThisMethod( JsonSceneLoader::readRenderer );
@@ -313,7 +314,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const String& json )
 	struct ParticleMaterialFactory : public Fx::IMaterialFactory {
 
 		//! Constructs ParticleMaterialFactory instance.
-		ParticleMaterialFactory( const Assets& assets )
+		ParticleMaterialFactory( const Assets::Assets& assets )
 			: m_assets( assets ) {}
 
 
@@ -333,7 +334,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const String& json )
 
 	private:
 
-		const Assets&	m_assets;	//!< Asset bundle to use.		
+		const Assets::Assets&	m_assets;	//!< Asset bundle to use.		
 	};
 
 	Json::Reader reader;

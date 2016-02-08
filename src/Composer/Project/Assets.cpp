@@ -33,8 +33,8 @@
 
 DC_BEGIN_COMPOSER
 
-// ** Assets::Assets
-Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
+// ** AssetManager::AssetManager
+AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
 {
     // Set the randomization seed to generate asset identifiers
     srand( time( NULL ) );
@@ -56,9 +56,9 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
     // Declare default asset formats
-    m_assetFormats.declare<Scene::ImageFormatRaw>( Scene::AssetType::fromClass<Scene::Image>() );
-    m_assetFormats.declare<Scene::MeshFormatRaw>( Scene::AssetType::fromClass<Scene::Mesh>() );
-    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Scene::AssetType::fromClass<Scene::Material>() );
+    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::AssetType::fromClass<Scene::Image>() );
+    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::AssetType::fromClass<Scene::Mesh>() );
+    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Assets::AssetType::fromClass<Scene::Material>() );
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
@@ -66,30 +66,30 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
     connect( m_assetFileSystem, SIGNAL(fileChanged(const QString&, const FileInfo&)), this, SLOT(updateAssetCache(const QString&, const FileInfo&)) );
 }
 
-// ** Assets::bundle
-const Scene::Assets& Assets::bundle( void ) const
+// ** AssetManager::assets
+const Assets::Assets& AssetManager::assets( void ) const
 {
-	return m_bundle;
+	return m_assets;
 }
 
-// ** Assets::bundle
-Scene::Assets& Assets::bundle( void )
+// ** AssetManager::assets
+Assets::Assets& AssetManager::assets( void )
 {
-	return m_bundle;
+	return m_assets;
 }
 
-// ** Assets::createAssetForFile
-Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
+// ** AssetManager::createAssetForFile
+Assets::AssetHandle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Scene::AssetType type = assetTypeFromExtension( fileInfo.extension() );
+	Assets::AssetType type = assetTypeFromExtension( fileInfo.extension() );
 
     if( !type.isValid() ) {
-        return Scene::AssetHandle();
+        return Assets::AssetHandle();
     }
 
     // Create an asset
-    Scene::AssetHandle asset = createAsset( type, Guid::generate().toString() );
+    Assets::AssetHandle asset = createAsset( type, Guid::generate().toString() );
 
     // Set meta file
     m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
@@ -97,27 +97,27 @@ Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
     return asset;
 }
 
-// ** Assets::parseAssetFromData
-Scene::AssetHandle Assets::parseAssetFromData( const Io::KeyValue& kv )
+// ** AssetManager::parseAssetFromData
+Assets::AssetHandle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 {
 	DC_BREAK_IF( !kv.isObject() );
 
 	// Get asset type by name.
-	Scene::AssetType type = Scene::AssetType::fromString( kv.get( "type", "" ).asString() );
+	Assets::AssetType type = Assets::AssetType::fromString( kv.get( "type", "" ).asString() );
     DC_BREAK_IF( !type.isValid() );
 
     // Read the unique asset identifier.
-    Scene::AssetId uid = kv.get( "uuid" ).asString();
+    Assets::AssetId uid = kv.get( "uuid" ).asString();
 
     // Create an asset
     return createAsset( type, uid );
 }
 
-// ** Assets::createAsset
-Scene::AssetHandle Assets::createAsset( Scene::AssetType type, const Scene::AssetId& id )
+// ** AssetManager::createAsset
+Assets::AssetHandle AssetManager::createAsset( Assets::AssetType type, const Assets::AssetId& id )
 {
     // Create asset format by extension
-    Scene::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
+    Assets::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
 
     // Set the source file name
     if( format ) {
@@ -125,37 +125,37 @@ Scene::AssetHandle Assets::createAsset( Scene::AssetType type, const Scene::Asse
     }
 
     // Create asset instance
-    Scene::AssetHandle asset = m_bundle.addAsset( type, id, format );
+    Assets::AssetHandle asset = m_assets.addAsset( type, id, format );
     DC_BREAK_IF( !asset.isValid() );
 
     return asset;
 }
 
-// ** Assets::registerExtension
-void Assets::registerExtension( const String& extension, Scene::AssetType type )
+// ** AssetManager::registerExtension
+void AssetManager::registerExtension( const String& extension, Assets::AssetType type )
 {
 	m_assetTypes[extension] = type;
 }
 
-// ** Assets::assetTypeFromExtension
-Scene::AssetType Assets::assetTypeFromExtension( const String& extension ) const
+// ** AssetManager::assetTypeFromExtension
+Assets::AssetType AssetManager::assetTypeFromExtension( const String& extension ) const
 {
 	AssetTypes::const_iterator i = m_assetTypes.find( extension );
-	return i != m_assetTypes.end() ? i->second : Scene::AssetType::Invalid;
+	return i != m_assetTypes.end() ? i->second : Assets::AssetType::Invalid;
 }
 
-// ** Assets::removeAssetFromCache
-void Assets::removeAssetFromCache( const QString& uuid, const FileInfo& file )
+// ** AssetManager::removeAssetFromCache
+void AssetManager::removeAssetFromCache( const QString& uuid, const FileInfo& file )
 {
 	// Remove asset from bundle
-	m_bundle.removeAsset( uuid.toStdString() );
+	m_assets.removeAsset( uuid.toStdString() );
 
 	// Remove asset from cache
     qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid.toStdString() ).c_str() );
 }
 
-// ** Assets::updateAssetCache
-bool Assets::updateAssetCache( const QString& uuid, const FileInfo& file )
+// ** AssetManager::updateAssetCache
+bool AssetManager::updateAssetCache( const QString& uuid, const FileInfo& file )
 {
 	// Create an asset importer for
 	Importers::AssetImporterPtr importer = m_assetImporters.construct( file.extension() );
@@ -191,14 +191,14 @@ bool Assets::updateAssetCache( const QString& uuid, const FileInfo& file )
 	return result;
 }
 
-// ** Assets::addAssetFile
-void Assets::addAssetFile( const FileInfo& fileInfo )
+// ** AssetManager::addAssetFile
+void AssetManager::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
 	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
 
 	// Added asset
-	Scene::AssetHandle asset;
+	Assets::AssetHandle asset;
 
 	// Create asset from data or create the new one
 	if( !meta.isNull() ) {
@@ -222,14 +222,14 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 	qDebug() << "Added" << asset->name().c_str();
 }
 
-// ** Assets::cacheFolderFromUuid
-Io::Path Assets::cacheFileFromUuid( const String& uuid ) const
+// ** AssetManager::cacheFolderFromUuid
+Io::Path AssetManager::cacheFileFromUuid( const String& uuid ) const
 {
 	return cacheFolderFromUuid( uuid ) + uuid;
 }
 
-// ** Assets::cacheFolderFromUuid
-Io::Path Assets::cacheFolderFromUuid( const String& uuid ) const
+// ** AssetManager::cacheFolderFromUuid
+Io::Path AssetManager::cacheFolderFromUuid( const String& uuid ) const
 {
 	String folder = String() + uuid[0] + uuid[1];
 	return m_path + folder;

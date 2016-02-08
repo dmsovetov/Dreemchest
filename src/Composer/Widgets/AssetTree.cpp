@@ -45,7 +45,7 @@ namespace Ui {
 // ** AssetSelector::AssetSelector
 AssetSelector::AssetSelector( u32 mask, QWidget* parent ) : QWidget( parent ), m_mask( mask )
 {
-	qRegisterMetaType<Scene::AssetHandle>( "Scene::AssetHandle" );
+	qRegisterMetaType<Assets::AssetHandle>( "Assets::AssetHandle" );
 
 	m_line = new QLineEdit( this );
 	m_line->installEventFilter( this );
@@ -76,7 +76,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								}
 
 								// Decode asset
-								Scene::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
+								Assets::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
 
 								// Check asset type
 								if( !asset.isValid() || (asset->type().bit() & m_mask) == 0 ) {
@@ -92,7 +92,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								QDropEvent* de = static_cast<QDropEvent*>( e );
 
 								// Decode asset
-								Scene::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
+								Assets::AssetHandle asset = qComposer->assetFromMime( de->mimeData() );
 								
 								// Set the value
 								setValue( asset );
@@ -107,13 +107,13 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 }
 
 // ** AssetSelector::assetChanged
-Scene::AssetHandle AssetSelector::value( void ) const
+Assets::AssetHandle AssetSelector::value( void ) const
 {
 	return m_asset;
 }
 
 // ** AssetSelector::setValue
-void AssetSelector::setValue( const Scene::AssetHandle& value )
+void AssetSelector::setValue( const Assets::AssetHandle& value )
 {
 	// Save the asset pointer
 	m_asset = value;
@@ -266,7 +266,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	String uuid = model()->uuid( file );
 
 	// Find asset by UUID
-	Scene::AssetHandle asset = m_project->assets().findAsset( uuid );
+	Assets::AssetHandle asset = m_project->assets().findAsset( uuid );
 	DC_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.

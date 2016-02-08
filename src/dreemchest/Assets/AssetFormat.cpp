@@ -24,49 +24,40 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#include "AssetFormat.h"
+#include "AssetHandle.h"
 
-#define dcInterface
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+namespace Assets {
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-	#define DC_DREEMCHEST_NS
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+// ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
 
-#include "Base/Base.h"
+// ** AbstractAssetFileFormat::parse
+bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
+{
+    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 
-#ifdef HAVE_JSON
-	#include <json/json.h>
-#endif	/*	HAVE_JSON	*/
+    if( !stream.valid() ) {
+        return false;
+    }
 
-#ifndef DC_BUILD_LIBRARY
-	#include <Network/Network.h>
-	#include <Io/Io.h>
-    #include <Assets/Assets.h>
-	#include <Event/Event.h>
-	#include <Threads/Threads.h>
-	#include <Ecs/Ecs.h>
-	#include <Platform/Platform.h>
-	#include <Threads/Threads.h>
-	#include <Scene/Scene.h>
-	#include <Renderer/Renderer.h>
-	#include <Sound/Sound.h>
-	#include <Mvvm/Mvvm.h>
-	#include <Fx/Fx.h>
-#endif
+    bool result = parseFromStream( stream, assets, asset );
+    return result;
+}
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+// ** AbstractAssetFileFormat::fileName
+const String& AbstractAssetFileFormat::fileName( void ) const
+{
+    return m_fileName;
+}
+
+// ** AbstractAssetFileFormat::fileName
+void AbstractAssetFileFormat::setFileName( const String& value )
+{
+    m_fileName = value;
+}
+
+} // namespace Assets
+
+DC_END_DREEMCHEST

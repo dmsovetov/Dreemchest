@@ -42,6 +42,10 @@
 #include <Renderer/Hal.h>
 #include <Renderer/Renderer2D.h>
 
+#include <Assets/AssetHandle.h>
+#include <Assets/Assets.h>
+#include <Assets/AssetFormat.h>
+
 #include <Ecs/Entity/Entity.h>
 #include <Ecs/Entity/Archetype.h>
 #include <Ecs/Component/Component.h>
@@ -70,10 +74,6 @@ namespace Scene {
 	class Scene;
 	class RenderTarget;
 
-    class Assets;
-    class Asset;
-    class AbstractAssetFormat;
-
 	class Image;
 	class Mesh;
 	class Material;
@@ -87,46 +87,17 @@ namespace Scene {
 
 	class Rvm;
 
-    //! Opaque 32 bit handle.
-    typedef OpaqueHandle<12, 20> SlotIndex32;
-
-    //! Forward declaration of an AssetDataHandle type.
-    template<typename TAsset> class AssetDataHandle;
-
-    //! Forward declaration of an asset AssetWriteLock type.
-    template<typename TAsset> class AssetWriteLock;
-
     //! Image handle type.
-    typedef AssetDataHandle<class Image> ImageHandle;
+    typedef Assets::AssetDataHandle<class Image> ImageHandle;
 
     //! Mesh handle type.
-    typedef AssetDataHandle<class Mesh> MeshHandle;
+    typedef Assets::AssetDataHandle<class Mesh> MeshHandle;
 
     //! Material handle type.
-    typedef AssetDataHandle<class Material> MaterialHandle;
+    typedef Assets::AssetDataHandle<class Material> MaterialHandle;
 
     //! Terrain handle type.
-    typedef AssetDataHandle<class Terrain> TerrainHandle;
-
-#if ASSET_DEPRECATED
-    //! Forward declaration of an AssetFormat type.
-    template<typename TAsset> class AssetFormat;
-
-    //! Forward declaration of an AssetPool type.
-    template<typename TAsset> class AssetPool;
-#endif
-
-    //! Asset identifier type.
-    typedef String AssetId;
-
-    //! Set of assets.
-    typedef Set<class AssetHandle> AssetSet;
-
-    //! List of assets.
-    typedef List<class AssetHandle> AssetList;
-
-    // Unique ptr for asset format.
-    typedef AutoPtr<AbstractAssetFormat> AssetFormatUPtr;
+    typedef Assets::AssetDataHandle<class Terrain> TerrainHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -289,10 +260,10 @@ namespace Scene {
 		static ScenePtr					create( void );
 
 		//! Creates scene and loads it from JSON file.
-		static ScenePtr					createFromFile( const Assets& assets, const String& fileName );
+		static ScenePtr					createFromFile( const Assets::Assets& assets, const String& fileName );
 
 		//! Creates scene and loads it from JSON string.
-		static ScenePtr					createFromJson( const Assets& assets, const String& json );
+		static ScenePtr					createFromJson( const Assets::Assets& assets, const String& json );
 
 		//! This event is emitted when a new scene object was added.
 		struct SceneObjectAdded {
@@ -361,7 +332,7 @@ namespace Scene {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.
-									JsonSceneLoader( const Assets& assets );
+									JsonSceneLoader( const Assets::Assets& assets );
 
 		//! Loads the scene from string.
 		bool						load( ScenePtr scene, const String& json );
@@ -442,7 +413,7 @@ namespace Scene {
 		//! Container type to store parsed components.
 		typedef Map<String, Ecs::ComponentPtr> Components;
 
-		const Assets&				m_assets;					//!< Available assets.
+		const Assets::Assets&	    m_assets;					//!< Available assets.
 		Json::Value					m_json;						//!< Parsed JSON.
 		ScenePtr					m_scene;					//!< The scene to be loaded.
 		SceneObjects				m_sceneObjects;				//!< Parsed scene objects.
@@ -468,9 +439,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
     #include "Assets/Prefab.h"
-    #include "Assets/AssetHandle.h"
-    #include "Assets/AssetCache.h"
-    #include "Assets/AssetFormat.h"
+    #include "Assets/AssetFormats.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"

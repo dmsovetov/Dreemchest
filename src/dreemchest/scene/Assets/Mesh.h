@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_Mesh_H__
 #define __DC_Scene_Mesh_H__
 
-#include "Assets.h"
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 

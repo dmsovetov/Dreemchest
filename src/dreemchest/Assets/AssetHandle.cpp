@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Assets {
 
 // ** AssetHandle::AssetHandle
 AssetHandle::AssetHandle( void ) : m_assets( NULL )
@@ -127,6 +127,6 @@ bool AssetHandle::forceLoad( void )
     return assets()->loadAssetToCache( *this );
 }
 
-} // namespace Scene
+} // namespace Assets
 
 DC_END_DREEMCHEST

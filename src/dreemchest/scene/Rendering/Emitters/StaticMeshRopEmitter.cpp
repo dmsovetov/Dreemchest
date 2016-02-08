@@ -27,6 +27,7 @@
 #include "StaticMeshRopEmitter.h"
 
 #include "../../Assets/Mesh.h"
+#include "../../Assets/Image.h"
 
 DC_BEGIN_DREEMCHEST
 

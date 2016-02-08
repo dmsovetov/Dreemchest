@@ -24,49 +24,41 @@
 
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#ifndef __DC_Scene_AssetFormats_H__
+#define __DC_Scene_AssetFormats_H__
 
-#define dcInterface
+#include "../Scene.h"
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-	#define DC_DREEMCHEST_NS
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+namespace Scene {
 
-#include "Base/Base.h"
+    //! Loads an image from a raw pixel buffer format.
+    class ImageFormatRaw : public Assets::AssetFileFormat<Image> {
+    protected:
 
-#ifdef HAVE_JSON
-	#include <json/json.h>
-#endif	/*	HAVE_JSON	*/
+        //! Loads image data from an input stream.
+        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+    };
 
-#ifndef DC_BUILD_LIBRARY
-	#include <Network/Network.h>
-	#include <Io/Io.h>
-    #include <Assets/Assets.h>
-	#include <Event/Event.h>
-	#include <Threads/Threads.h>
-	#include <Ecs/Ecs.h>
-	#include <Platform/Platform.h>
-	#include <Threads/Threads.h>
-	#include <Scene/Scene.h>
-	#include <Renderer/Renderer.h>
-	#include <Sound/Sound.h>
-	#include <Mvvm/Mvvm.h>
-	#include <Fx/Fx.h>
-#endif
+    //! Loads a mesh from a raw binary format.
+    class MeshFormatRaw : public Assets::AssetFileFormat<Mesh> {
+    protected:
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+        //! Loads mesh data from an input stream.
+        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
+    };
+
+    //! Loads a material from a key-value storage.
+    class MaterialFormatKeyValue : public Assets::AssetFileFormat<Material> {
+    protected:
+
+        //! Loads material data from an input stream.
+        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+    };
+
+} // namespace Scene
+
+DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_AssetFormats_H__    */

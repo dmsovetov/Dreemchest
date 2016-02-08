@@ -3,6 +3,7 @@ add_definitions(-DDC_BUILD_LIBRARY)
 
 # Glob all source files
 add_directories(Base BASE_SRCS)
+add_directories(Assets ASSETS_SRCS)
 add_directories(Ecs ECS_SRCS)
 add_directories(Scene SCENE_SRCS)
 add_directories(Network NETWORK_SRCS)
@@ -92,7 +93,7 @@ if (DC_SOUND_ENABLED)
 endif (DC_SOUND_ENABLED)
 
 # Add the Dreemchest static library
-add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS})
+add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS} ${ASSETS_SRCS})
 
 # Link 3rd-party libraries
 if (DC_BOX2D_ENABLED)

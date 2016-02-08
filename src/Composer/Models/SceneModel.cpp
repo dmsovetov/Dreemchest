@@ -29,7 +29,7 @@
 DC_BEGIN_COMPOSER
 
 // ** SceneModel::SceneModel
-SceneModel::SceneModel( Scene::Assets& assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
+SceneModel::SceneModel( Assets::Assets& assets, Scene::SceneWPtr scene, QObject* parent ) : GenericTreeModel( 1, parent ), m_assets( assets ), m_scene( scene )
 {
     qCheckParent( parent )
 	scene->subscribe<Scene::Scene::SceneObjectAdded>( dcThisMethod( SceneModel::handleSceneObjectAdded ) );
@@ -120,7 +120,7 @@ bool SceneModel::dropMimeData( const QMimeData* data, Qt::DropAction action, int
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = qComposer->assetsFromMime( data );
+	Assets::AssetSet assets = qComposer->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
@@ -149,7 +149,7 @@ bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, 
 	}
 
 	// Extract an assets from MIME data
-	Scene::AssetSet assets = qComposer->assetsFromMime( data );
+	Assets::AssetSet assets = qComposer->assetsFromMime( data );
 
 	// Extract target sccene object from model index
 	Scene::SceneObjectWPtr sceneObject = parent.isValid() ? dataAt( parent ) : Scene::SceneObjectWPtr();
@@ -226,7 +226,7 @@ void SceneModel::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Sc
 }
 
 // ** SceneModel::acceptableDropAction
-SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
+SceneModel::AssetAction SceneModel::acceptableAssetAction( const Assets::AssetSet& assets, Scene::SceneObjectWPtr target, const Vec3& point ) const
 {
 	// No valid assets - can't drop
 	if( assets.empty() ) {
@@ -236,8 +236,8 @@ SceneModel::AssetAction SceneModel::acceptableAssetAction( const Scene::AssetSet
 	// Check if we have droppable assets
 	AssetAction assetAction( AssetAction::Invalid, assets, target, point );
 
-	for( Scene::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
-        const Scene::AssetType& type = (*i)->type();
+	for( Assets::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
+        const Assets::AssetType& type = (*i)->type();
 
         if( type.is<Scene::Mesh>() ) {
             assetAction.type = AssetAction::PlaceMesh;

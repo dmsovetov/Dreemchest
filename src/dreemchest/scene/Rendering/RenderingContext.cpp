@@ -85,7 +85,7 @@ Renderer2DPtr RenderingContext::renderer( void ) const
 s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
 {
     // Construct the renderable handle
-    u32 handle = mesh.slot() | (chunk << SlotIndex32::Bits);
+    u32 handle = mesh.slot() | (chunk << Assets::SlotIndex32::Bits);
 
     // Lookup renderable index by a handle
     MeshToRenderable::const_iterator i = m_renderableByMesh.find( handle );

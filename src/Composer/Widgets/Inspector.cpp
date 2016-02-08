@@ -90,7 +90,7 @@ void Inspector::setModel( PropertyModelQPtr value )
 		QWidget* widget = NULL;
 
 		if( type == "Scene::ImageHandle" ) {
-			widget = new AssetSelector( Scene::AssetType::fromClass<Scene::Image>().bit(), this );
+			widget = new AssetSelector( Assets::AssetType::fromClass<Scene::Image>().bit(), this );
 			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
 		}
 		else if( type == "Scene::RenderingMode" ) {

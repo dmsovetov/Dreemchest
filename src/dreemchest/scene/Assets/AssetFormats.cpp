@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "AssetFormat.h"
+#include "AssetFormats.h"
 
 #include "Image.h"
 #include "Mesh.h"
@@ -34,37 +34,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
-
-// ** AbstractAssetFileFormat::parse
-bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
-{
-    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
-
-    if( !stream.valid() ) {
-        return false;
-    }
-
-    bool result = parseFromStream( stream, assets, asset );
-    return result;
-}
-
-// ** AbstractAssetFileFormat::fileName
-const String& AbstractAssetFileFormat::fileName( void ) const
-{
-    return m_fileName;
-}
-
-// ** AbstractAssetFileFormat::fileName
-void AbstractAssetFileFormat::setFileName( const String& value )
-{
-    m_fileName = value;
-}
-
 // ------------------------------------------ ImageLoaderRaw ------------------------------------------ //
 
 // ** ImageFormatRaw::parseFromStream
-bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Image& asset )
+bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& asset )
 {
 	u16 width, height;
 	u8  channels;
@@ -92,7 +65,7 @@ bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Imag
 // ------------------------------------------ MeshFormatRaw ------------------------------------------ //
 
 // ** MeshFormatRaw::parseFromStream
-bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Mesh& asset )
+bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& asset )
 {
 	// Read the total number of mesh chunks
 	u32 chunkCount;
@@ -148,7 +121,7 @@ bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Mesh&
 // --------------------------------------- MaterialFormatKeyValue --------------------------------------- //
 
 // ** MaterialFormatKeyValue::parseFromStream
-bool MaterialFormatKeyValue::parseFromStream( Io::StreamPtr stream, Assets& assets, Material& asset )
+bool MaterialFormatKeyValue::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
 #ifdef HAVE_JSON
 	String json;

@@ -24,64 +24,83 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_AssetType_H__
-#define __DC_Scene_AssetType_H__
+#ifndef __DC_Assets_AssetType_H__
+#define __DC_Assets_AssetType_H__
 
-#include "../Scene.h"
+#include "../Dreemchest.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Assets {
 
     //! Asset type id.
     class AssetType {
     public:
 
         //! Invalid asset type constant.
-        static const AssetType      Invalid;
+        static const AssetType          Invalid;
 
 
-                                    //! Constructs invalid Asset type.
-                                    AssetType( void );
+                                        //! Constructs invalid Asset type.
+                                        AssetType( void );
 
-                                    //! Copies AssetType instance.
-                                    AssetType( const AssetType& other );
+                                        //! Copies AssetType instance.
+                                        AssetType( const AssetType& other );
 
         //! Compares two asset types.
-        bool                        operator == ( const AssetType& other ) const;
+        bool                            operator == ( const AssetType& other ) const;
 
         //! Compares two asset type.
-        bool                        operator < ( const AssetType& other ) const;
+        bool                            operator < ( const AssetType& other ) const;
 
         //! Returns true if this is a valid asset type.
-        bool                        isValid( void ) const;
+        bool                            isValid( void ) const;
 
         //! Converts an asset type to a string.
-        String                      toString( void ) const;
+        String                          toString( void ) const;
 
         //! Returns asset type bit mask.
-        u32                         bit( void ) const;
+        u32                             bit( void ) const;
 
         //! Returns true if an asset type matches the specified class.
         template<typename TAsset>
-        bool                        is( void ) const;
+        bool                            is( void ) const;
 
         //! Returns an asset type for specified class.
         template<typename TAsset>
-        static AssetType            fromClass( void );
+        static AssetType                fromClass( void );
 
         //! Returns an asset type from a string.
-        static AssetType            fromString( const String& value );
+        static AssetType                fromString( const String& value );
+
+        //! Registers a new asset type.
+        template<typename TAsset>
+        static bool                     declare( void );
 
     private:
 
-                                    //! Constructs AssetType instance.
-                                    AssetType( TypeIdx type );
+                                        //! Constructs AssetType instance.
+                                        AssetType( TypeIdx type );
 
     private:
 
-        TypeIdx                     m_type; //!< Actual asset type value.
+        TypeIdx                         m_type;         //!< Actual asset type value.
+        static Map<String, AssetType>   s_nameToType;   //!< Maps asset name to type.
+        static Map<AssetType, String>   s_typeToName;   //!< Maps asset type to name.
     };
+
+    // ** AssetType::declare
+    template<typename TAsset>
+    bool AssetType::declare( void )
+    {
+        AssetType type = fromClass<TAsset>();
+        String    name = TypeInfo<TAsset>::name();
+
+        s_nameToType[name] = type;
+        s_typeToName[type] = name;
+
+        return true;
+    }
 
     // ** AssetType::fromClass
     template<typename TAsset>
@@ -97,8 +116,8 @@ namespace Scene {
         return *this == fromClass<TAsset>();
     }
 
-} // namespace Scene
+} // namespace Assets
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_AssetType_H__    */
+#endif    /*    !__DC_Assets_AssetType_H__    */

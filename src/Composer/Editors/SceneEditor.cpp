@@ -173,7 +173,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
     // Create serialization context
     Ecs::SerializationContext ctx( scene->ecs() );
-    ctx.set<Scene::Assets>( &m_project->assets() );
+    ctx.set<Assets::Assets>( &m_project->assets() );
 
     Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
 
@@ -386,7 +386,7 @@ void SceneEditor::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
 	// Extract assets from MIME data
-	Scene::AssetSet assets = qComposer->assetsFromMime( mime );
+	Assets::AssetSet assets = qComposer->assetsFromMime( mime );
 
 	// Get the asset action
 	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );
