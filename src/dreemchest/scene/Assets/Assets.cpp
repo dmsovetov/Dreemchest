@@ -169,6 +169,35 @@ void Assets::releaseWriteLock( const AssetHandle& asset )
     asset->m_lastModified = Platform::currentTime();
 }
 
+// ** Assets::loadAssetToCache
+bool Assets::loadAssetToCache( AssetHandle asset )
+{
+    if( asset->state() != Asset::Unloaded ) {
+        return true;
+    }
+
+    // Perform loading
+    log::verbose( "Loading '%s'...\n", asset->name().c_str() );
+
+    // Switch to Loading state
+    asset->switchToState( Asset::Loading );
+
+    // Reserve asset data before loading
+    asset->setCache( reserveAssetData( asset->type() ) );
+
+    // Get the asset format
+    AbstractAssetFormat* format = asset->format();
+    DC_BREAK_IF( !format );
+
+    // Parse asset
+    bool result = format->parse( *this, asset );
+
+    // Switch to a Loaded or Error state
+    asset->switchToState( result ? Asset::Loaded : Asset::Error );
+
+    return result;
+}
+
 // ** Assets::update
 void Assets::update( f32 dt )
 {
@@ -178,24 +207,8 @@ void Assets::update( f32 dt )
         AssetHandle asset = *m_loadingQueue.begin();
         m_loadingQueue.pop_front();
 
-        // Perform loading
-        log::verbose( "Loading '%s'...\n", asset->name().c_str() );
-
-        // Switch to Loading state
-        asset->switchToState( Asset::Loading );
-
-        // Reserve asset data before loading
-        asset->setCache( reserveAssetData( asset->type() ) );
-
-        // Get the asset format
-        AbstractAssetFormat* format = asset->format();
-        DC_BREAK_IF( !format );
-
-        // Parse asset
-        bool result = format->parse( *this, asset );
-
-        // Switch to a Loaded or Error state
-        asset->switchToState( result ? Asset::Loaded : Asset::Error );
+        // Load an asset to cache
+        loadAssetToCache( asset );
     }
 }
 

@@ -121,6 +121,12 @@ Assets* AssetHandle::assets( void ) const
     return m_assets;
 }
 
+// ** AssetHandle::forceLoad
+bool AssetHandle::forceLoad( void )
+{
+    return assets()->loadAssetToCache( *this );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

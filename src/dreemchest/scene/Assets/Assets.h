@@ -165,6 +165,9 @@ namespace Scene {
         //! Unlocks an asset after writing and updates last modified timestamp.
         void                        releaseWriteLock( const AssetHandle& asset );
 
+        //! Loads an asset data to a cache.
+        bool                        loadAssetToCache( AssetHandle asset );
+
     private:
 
         //! Abstract asset cache.
