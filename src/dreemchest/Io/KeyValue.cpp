@@ -1003,6 +1003,16 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
             result.a = a.asFloat();
             return true;
         }
+
+        static bool guid( const Json::Value& json, Guid& result )
+        {
+            if( json.get( "typeID", "" ).asString() == "guid" ) {
+                result = Guid( json.get( "value", "" ).asString() );
+                return true;
+            }
+
+            return false;
+        }
     };
 
     Vec2 vec2;
@@ -1011,6 +1021,7 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
     Quat quat;
     Rgb  rgb;
     Rgba rgba;
+    Guid guid;
 
 	switch( json.type() ) {
 	case Json::nullValue:		return kNull;
@@ -1032,10 +1043,11 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
 	case Json::objectValue:		{
                                     if( Parser::quat( json, quat ) ) return quat;
                                     if( Parser::rgba( json, rgba ) ) return rgba;
-                                    if( Parser::rgb( json, rgb ) ) return rgb;
+                                    if( Parser::rgb( json, rgb ) )   return rgb;
                                     if( Parser::vec4( json, vec4 ) ) return vec4;
                                     if( Parser::vec3( json, vec3 ) ) return vec3;
                                     if( Parser::vec2( json, vec2 ) ) return vec2;
+                                    if( Parser::guid( json, guid ) ) return guid;
 
                                     DC_BREAK_IF( !json["typeID"].isNull() );
 									KeyValue kv( kObject );
