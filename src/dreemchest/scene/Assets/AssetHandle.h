@@ -128,9 +128,6 @@ namespace Scene {
                                         //! Constructs an empty AssetDataHandle instance.
                                         AssetDataHandle( void );
 
-                                        //! Constructs AssetDataHandle instance from another one.
-                                        //AssetDataHandle( const AssetDataHandle<TAsset>& other );
-
                                         //! Constructs AssetDataHandle instance from AssetHandle by casting it's type.
                                         AssetDataHandle( const AssetHandle& asset );
 
@@ -162,13 +159,6 @@ namespace Scene {
     {
     
     }
-
-    //// ** AssetDataHandle::AssetDataHandle
-    //template<typename TAsset>
-    //AssetDataHandle<TAsset>::AssetDataHandle( const AssetDataHandle<TAsset>& other )
-    //{
-    //    m_asset = other.m_asset;
-    //}
 
     // ** AssetDataHandle::AssetDataHandle
     template<typename TAsset>
