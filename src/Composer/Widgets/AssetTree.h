@@ -37,7 +37,7 @@ namespace Ui {
 	class AssetSelector : public QWidget {
 
 		Q_OBJECT
-	//	Q_PROPERTY( Scene::AssetWPtr value READ value WRITE setValue NOTIFY valueChanged USER true )
+		Q_PROPERTY( Scene::AssetHandle value READ value WRITE setValue NOTIFY valueChanged USER true )
 
 	Q_SIGNALS:
 

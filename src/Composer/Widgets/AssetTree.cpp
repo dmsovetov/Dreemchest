@@ -270,12 +270,12 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	DC_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.
-    qWarning() << "AssetTree::bindToInspector : asset to inspector binding is disabled.";
-	//switch( asset->type() ) {
-	//case Scene::Asset::Material:	inspector->setModel( new MaterialModel( castTo<Scene::Material>( asset.get() ), this ) );
-	//								break;
-	//default:						inspector->setModel( NULL );
-	//}
+    if( asset->type().is<Scene::Material>() ) {
+        inspector->setModel( new MaterialModel( asset, this ) );
+    }
+    else {
+        inspector->setModel( NULL );
+    }
 }
 
 // ** AssetTree::selection
