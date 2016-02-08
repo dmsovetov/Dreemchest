@@ -98,9 +98,9 @@ public:
         // First clear a viewport with a color
         m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
 
-		for( s32 i = 0, n = m_timeStep.stepCount(); i < n; i++ ) {
-			m_scene->update( 0, m_timeStep.seconds() );
-		}
+	//	for( s32 i = 0, n = m_timeStep.stepCount(); i < n; i++ ) {
+	//		m_scene->update( 0, m_timeStep.seconds() );
+	//	}
 
 		m_scene->render( m_renderingContext );
 
