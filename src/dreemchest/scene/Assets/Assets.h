@@ -53,7 +53,7 @@ namespace Scene {
                                     Asset( void );
 
                                     //! Constructs Asset instance.
-                                    Asset( AssetType type, const AssetId& uniqueId, const String& fileName );
+                                    Asset( AssetType type, const AssetId& uniqueId, AbstractAssetFormat* format );
 
         //! Returns asset unique id.
         const AssetId&              uniqueId( void ) const;
@@ -89,7 +89,6 @@ namespace Scene {
         AssetFormatUPtr             m_format;       //!< Asset format parser used for loading.
         AssetType                   m_type;         //!< Asset type.
         AssetId                     m_uniqueId;     //!< Unique asset id.
-        String                      m_fileName;     //!< Asset file name.
         String                      m_name;         //!< Asset name.
         State                       m_state;        //!< Current asset state.
         SlotIndex32                 m_cache;        //!< Asset data cache slot.
@@ -116,7 +115,7 @@ namespace Scene {
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName );
+        AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, AbstractAssetFormat* format );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );

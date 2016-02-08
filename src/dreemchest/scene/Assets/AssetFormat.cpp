@@ -36,11 +36,6 @@ namespace Scene {
 
 // ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
 
-// ** AbstractAssetFileFormat::AbstractAssetFileFormat
-AbstractAssetFileFormat::AbstractAssetFileFormat( const String& fileName ) : m_fileName( fileName )
-{
-}
-
 // ** AbstractAssetFileFormat::parse
 bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
 {
@@ -52,6 +47,18 @@ bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
 
     bool result = parseFromStream( stream, assets, asset );
     return result;
+}
+
+// ** AbstractAssetFileFormat::fileName
+const String& AbstractAssetFileFormat::fileName( void ) const
+{
+    return m_fileName;
+}
+
+// ** AbstractAssetFileFormat::fileName
+void AbstractAssetFileFormat::setFileName( const String& value )
+{
+    m_fileName = value;
 }
 
 // ------------------------------------------ ImageLoaderRaw ------------------------------------------ //

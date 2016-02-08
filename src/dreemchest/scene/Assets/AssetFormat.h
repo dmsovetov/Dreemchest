@@ -51,14 +51,14 @@ namespace Scene {
     class AbstractAssetFileFormat : public AbstractAssetFormat {
     public:
 
-                        //! Constructs AbstractAssetFileFormat instance.
-                        AbstractAssetFileFormat( const String& fileName );
-
         //! Opens the file stream and loads data from it.
         virtual bool    parse( Assets& assets, AssetHandle asset ) DC_DECL_OVERRIDE;
 
         //! Returns the source asset file name.
         const String&   fileName( void ) const;
+
+        //! Sets the source asset file name.
+        void            setFileName( const String& value );
 
     protected:
 

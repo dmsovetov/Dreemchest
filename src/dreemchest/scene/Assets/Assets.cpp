@@ -40,7 +40,8 @@ Asset::Asset( void ) : m_state( Unloaded )
 }
 
 // ** Asset::Asset
-Asset::Asset( AssetType type, const AssetId& uniqueId, const String& fileName ) : m_type( type ), m_uniqueId( uniqueId ), m_fileName( fileName ), m_state( Unloaded )
+Asset::Asset( AssetType type, const AssetId& uniqueId, AbstractAssetFormat* format )
+    : m_format( format ), m_type( type ), m_uniqueId( uniqueId ), m_state( Unloaded )
 {
 }
 
@@ -102,13 +103,13 @@ Assets::~Assets( void )
     }
 }
 
-// ** Assets::add
-AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, const String& fileName )
+// ** Assets::addAsset
+AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, AbstractAssetFormat* format )
 {
     DC_BREAK_IF( m_slotById.find( uniqueId ) != m_slotById.end() );
 
     // First reserve the slot for an asset data.
-    SlotIndex32 slot = m_assets.add( Asset( type, uniqueId, fileName ) );
+    SlotIndex32 slot = m_assets.add( Asset( type, uniqueId, format ) );
 
     // Now register unique id associated with this asset slot.
     m_slotById[uniqueId] = slot;
@@ -117,7 +118,7 @@ AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, co
     return AssetHandle( this, slot );
 }
 
-// ** Assets::remove
+// ** Assets::removeAsset
 bool Assets::removeAsset( const AssetId& id )
 {
     // Find handle by id.
