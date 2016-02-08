@@ -55,6 +55,11 @@ Assets::Assets( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr 
 	m_assetImporters.declare<Importers::ImageImporterTGA>( "tga" );
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
+    // Declare default asset formats
+    m_assetFormats.declare<Scene::ImageFormatRaw>( Scene::AssetType::fromClass<Scene::Image>() );
+    m_assetFormats.declare<Scene::MeshFormatRaw>( Scene::AssetType::fromClass<Scene::Mesh>() );
+    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Scene::AssetType::fromClass<Scene::Material>() );
+
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
     connect( m_assetFileSystem, SIGNAL(fileRemoved(const QString&, const FileInfo&)), this, SLOT(removeAssetFromCache(const QString&, const FileInfo&)) );
@@ -83,12 +88,12 @@ Scene::AssetHandle Assets::createAssetForFile( const FileInfo& fileInfo )
         return Scene::AssetHandle();
     }
 
-	// Create asset by type
-	Scene::AssetHandle asset = m_bundle.addAsset( type, Guid::generate().toString(), cacheFileFromUuid( asset->uniqueId() ).c_str() );
-    DC_BREAK_IF( !asset.isValid() );
+    // Create an asset
+    Scene::AssetHandle asset = createAsset( type, Guid::generate().toString() );
 
-	// Set meta file
-	m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
+    // Set meta file
+    m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
+
     return asset;
 }
 
@@ -104,11 +109,26 @@ Scene::AssetHandle Assets::parseAssetFromData( const Io::KeyValue& kv )
     // Read the unique asset identifier.
     Scene::AssetId uid = kv.get( "uuid" ).asString();
 
-	// Create asset instance by type name
-	Scene::AssetHandle asset = m_bundle.addAsset( type, uid, cacheFileFromUuid( uid ).c_str() );
+    // Create an asset
+    return createAsset( type, uid );
+}
+
+// ** Assets::createAsset
+Scene::AssetHandle Assets::createAsset( Scene::AssetType type, const Scene::AssetId& id )
+{
+    // Create asset format by extension
+    Scene::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
+
+    // Set the source file name
+    if( format ) {
+        format->setFileName( cacheFileFromUuid( id ).c_str() );
+    }
+
+    // Create asset instance
+    Scene::AssetHandle asset = m_bundle.addAsset( type, id, format );
     DC_BREAK_IF( !asset.isValid() );
 
-	return asset;
+    return asset;
 }
 
 // ** Assets::registerExtension

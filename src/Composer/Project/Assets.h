@@ -67,6 +67,9 @@ DC_BEGIN_COMPOSER
         //! Parses an asset from a meta data.
         Scene::AssetHandle          parseAssetFromData( const Io::KeyValue& kv );
 
+        //! Creates an asset instance with specified asset type and id.
+        Scene::AssetHandle          createAsset( Scene::AssetType type, const Scene::AssetId& id );
+
     private slots:
 
         //! Adds an asset to cache.
@@ -83,12 +86,16 @@ DC_BEGIN_COMPOSER
 		//! Alias the asset importer factory type.
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
+        //! Alias the asset format factory type.
+        typedef AbstractFactory<Scene::AbstractAssetFileFormat, Scene::AssetType> AssetFormatFactory;
+
 		//! Alias the ext to asset type mapping.
 		typedef Map<String, Scene::AssetType> AssetTypes;
 
 		Io::Path					m_path;				//!< Root cache folder path.
 		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
+        AssetFormatFactory          m_assetFormats;     //!< Asset format factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
 		Scene::Assets		        m_bundle;			//!< Asset bundle.
 	};
