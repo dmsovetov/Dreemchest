@@ -82,8 +82,8 @@ namespace Assets {
     template<typename TAsset>
     bool AssetFileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
     {
-        AssetWriteLock<TAsset> lock = asset.writeLock<TAsset>();
-        TAsset&                data = *lock;
+        WriteLock<TAsset> lock = asset.writeLock<TAsset>();
+        TAsset&           data = *lock;
         bool result = parseFromStream( stream, assets, data );
         return result;
     }

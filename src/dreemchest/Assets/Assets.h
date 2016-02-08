@@ -47,8 +47,8 @@ namespace Assets {
     //! Forward declaration of an AssetDataHandle type.
     template<typename TAsset> class GenericHandle;
 
-    //! Forward declaration of an asset AssetWriteLock type.
-    template<typename TAsset> class AssetWriteLock;
+    //! Forward declaration of an asset WriteLock type.
+    template<typename TAsset> class WriteLock;
 
     //! Asset identifier type.
     typedef String AssetId;
@@ -128,7 +128,7 @@ namespace Assets {
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
     friend class Handle;
-    template<typename TAsset> friend class AssetWriteLock;
+    template<typename TAsset> friend class WriteLock;
     public:
 
                                     //! Constructs Assets instance.
@@ -186,7 +186,7 @@ namespace Assets {
 
         //! Locks an asset for writing.
         template<typename TAsset>
-        AssetWriteLock<TAsset>      acquireWriteLock( const Handle& asset );
+        WriteLock<TAsset>           acquireWriteLock( const Handle& asset );
 
         //! Unlocks an asset after writing and updates last modified timestamp.
         void                        releaseWriteLock( const Handle& asset );
@@ -293,9 +293,9 @@ namespace Assets {
 
     // ** Assets::acquireWriteLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
+    WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
     {
-        return AssetWriteLock<TAsset>( asset );
+        return WriteLock<TAsset>( asset );
     }
 
 } // namespace Assets

@@ -140,7 +140,7 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 
 	// Get terrain heightmap.
     Scene::TerrainHandle terrain = chunk.terrain();
-    Assets::AssetWriteLock<Scene::Terrain> locked = terrain.writeLock();
+    Assets::WriteLock<Scene::Terrain> locked = terrain.writeLock();
     Scene::Heightmap& heightmap = locked->heightmap();
 
 	point = transform.parent()->matrix().inversed() * point;

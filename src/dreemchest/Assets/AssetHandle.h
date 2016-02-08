@@ -86,7 +86,7 @@ namespace Assets {
 
         //! Returns the write lock used to update an asset data.
         template<typename TAsset>
-        AssetWriteLock<TAsset>          writeLock( void );
+        WriteLock<TAsset>               writeLock( void );
 
     private:
 
@@ -115,7 +115,7 @@ namespace Assets {
 
     // ** Handle::writeLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> Handle::writeLock( void )
+    WriteLock<TAsset> Handle::writeLock( void )
     {
         return assets()->acquireWriteLock<TAsset>( *this );
     }
@@ -144,7 +144,7 @@ namespace Assets {
         const TAsset&                   forceLoad( void );
 
         //! Returns the write lock used to update an asset data.
-        AssetWriteLock<TAsset>          writeLock( void );
+        WriteLock<TAsset>               writeLock( void );
 
         //! Returns asset name.
         const String&                   name( void ) const;
@@ -216,18 +216,18 @@ namespace Assets {
 
     // ** GenericHandle::writeLock
     template<typename TAsset>
-    AssetWriteLock<TAsset> GenericHandle<TAsset>::writeLock( void )
+    WriteLock<TAsset> GenericHandle<TAsset>::writeLock( void )
     {
         return Handle::writeLock<TAsset>();
     }
 
     //! Asset write lock is used for updating asset data.
     template<typename TAsset>
-    class AssetWriteLock {
+    class WriteLock {
     friend class Assets;
     public:
 
-                                    ~AssetWriteLock( void );
+                                    ~WriteLock( void );
 
         //! This operator is used for write access to actual asset data.
         TAsset*                     operator -> ( void );
@@ -237,38 +237,38 @@ namespace Assets {
 
     private:
 
-                                    //! Constructs AssetWriteLock instance.
-                                    AssetWriteLock( const GenericHandle<TAsset>& asset );
+                                    //! Constructs WriteLock instance.
+                                    WriteLock( const GenericHandle<TAsset>& asset );
 
     private:
 
         GenericHandle<TAsset>       m_asset;    //!< Handle to an asset being modified.
     };
 
-    // ** AssetWriteLock::AssetWriteLock
+    // ** WriteLock::WriteLock
     template<typename TAsset>
-    AssetWriteLock<TAsset>::AssetWriteLock( const GenericHandle<TAsset>& asset ) : m_asset( asset )
+    WriteLock<TAsset>::WriteLock( const GenericHandle<TAsset>& asset ) : m_asset( asset )
     {
         DC_BREAK_IF( !asset.isValid() );
     }
 
-    // ** AssetWriteLock::AssetWriteLock
+    // ** WriteLock::WriteLock
     template<typename TAsset>
-    AssetWriteLock<TAsset>::~AssetWriteLock( void )
+    WriteLock<TAsset>::~WriteLock( void )
     {
         m_asset.assets()->releaseWriteLock( m_asset );
     }
 
-    // ** AssetWriteLock::operator ->
+    // ** WriteLock::operator ->
     template<typename TAsset>
-    TAsset* AssetWriteLock<TAsset>::operator -> ( void )
+    TAsset* WriteLock<TAsset>::operator -> ( void )
     {
         return const_cast<TAsset*>( m_asset.operator->() );
     }
 
-    // ** AssetWriteLock::operator *
+    // ** WriteLock::operator *
     template<typename TAsset>
-    TAsset& AssetWriteLock<TAsset>::operator * ( void )
+    TAsset& WriteLock<TAsset>::operator * ( void )
     {
         return *const_cast<TAsset*>( m_asset.operator->() );
     }
