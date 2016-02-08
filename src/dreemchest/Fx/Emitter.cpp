@@ -316,7 +316,7 @@ ParticlesInstanceWPtr EmitterInstance::particles( s32 index ) const
 // ** EmitterInstance::hasEnded
 bool EmitterInstance::hasEnded( void ) const
 {
-	if( m_emitter->isLooped() ) {
+	if( isLooped() ) {
 		return false;
 	}
 
@@ -380,7 +380,7 @@ bool EmitterInstance::updateTime( f32 dt )
 		return false;
 	}
 
-	if( m_emitter->isLooped() ) {
+	if( isLooped() ) {
 		m_iteration++;
 		m_time -= floor( m_time / duration ) * duration;
 	} else {
@@ -388,6 +388,12 @@ bool EmitterInstance::updateTime( f32 dt )
 	}
 
 	return true;
+}
+
+// ** EmitterInstance::isLooped
+bool EmitterInstance::isLooped( void ) const
+{
+    return m_emitter->isLooped() && !m_isStopped;
 }
 
 // ** EmitterInstance::warmUp

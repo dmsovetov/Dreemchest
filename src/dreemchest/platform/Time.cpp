@@ -30,13 +30,16 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-// ** FixedTimeStep::FixedTimeStep
-FixedTimeStep::FixedTimeStep( u32 step ) : m_dt( step ), m_prev( 0 ), m_accumulated( 0 )
+// -------------------------------------------------------------- TimeDelta -------------------------------------------------------------- //
+
+// ** TimeDelta::TimeDelta
+TimeDelta::TimeDelta( void ) : m_prev( 0 )
 {
+
 }
 
-// ** FixedTimeStep::stepCount
-s32 FixedTimeStep::stepCount( void )
+// ** TimeDelta::update
+u32 TimeDelta::update( void )
 {
 	// Get current time
 	u32 time = Platform::currentTime();
@@ -46,31 +49,88 @@ s32 FixedTimeStep::stepCount( void )
 		return 0;
 	}
 
+    u32 dt = time - m_prev;
+    m_prev = time;
+
+    return dt;
+}
+
+// -------------------------------------------------------------- TimeStep --------------------------------------------------------------- //
+
+// ** TimeStep::TimeStep
+TimeStep::TimeStep( void ) : m_dt( 0 ), m_count( 0 )
+{
+}
+
+// ** TimeStep::milliseconds
+u32 TimeStep::milliseconds( void ) const
+{
+    return m_dt;
+}
+
+// ** TimeStep::seconds
+f32 TimeStep::seconds( void ) const
+{
+    return milliseconds() * 0.001f;
+}
+
+
+// ** TimeStep::count
+s32 TimeStep::count( void ) const
+{
+    return m_count;
+}
+
+// ------------------------------------------------------------ FixedTimeStep ------------------------------------------------------------ //
+
+// ** FixedTimeStep::FixedTimeStep
+FixedTimeStep::FixedTimeStep( u32 step, s32 maxSteps ) : m_dt( step ), m_accumulated( 0 ), m_maxSteps( maxSteps )
+{
+}
+
+// ** FixedTimeStep::advance
+TimeStep FixedTimeStep::advance( u32 dt )
+{
 	// Accumulate time
-	m_accumulated += (time - m_prev);
-	m_prev = time;
+	m_accumulated += dt;
 
 	if( m_accumulated < m_dt ) {
-		return 0;
+		return TimeStep();
 	}
 
 	// Calculate the iterations count.
-	s32 count = m_accumulated / m_dt;
-	m_accumulated = m_accumulated - count * m_dt;
+    TimeStep step;
+    step.m_count = m_accumulated / m_dt;
+    step.m_dt    = m_dt;
 
-	return count;
+    // Dont perform more than maximum allowed number of steps.
+    if( step.count() > m_maxSteps ) {
+        step.m_count = m_maxSteps;
+        step.m_dt    = m_accumulated / step.m_count;
+    }
+
+    // Decrease an accumulator.
+	m_accumulated = m_accumulated - step.count() * step.milliseconds();
+
+	return step;
 }
 
-// ** FixedTimeStep::milliseconds
-u32 FixedTimeStep::milliseconds( void ) const
+// ** FixedTimeStep::maxSteps
+s32 FixedTimeStep::maxSteps( void ) const
 {
-	return m_dt;
+    return m_maxSteps;
 }
 
-// ** FixedTimeStep::seconds
-f32 FixedTimeStep::seconds( void ) const
+// ** FixedTimeStep::setMaxSteps
+void FixedTimeStep::setMaxSteps( s32 value )
 {
-	return m_dt * 0.001f;
+    m_maxSteps = value;
+}
+
+// ** FixedTimeStep::setTimeStep
+void FixedTimeStep::setTimeStep( u32 value )
+{
+    m_dt = value;
 }
 
 } // namespace Platform

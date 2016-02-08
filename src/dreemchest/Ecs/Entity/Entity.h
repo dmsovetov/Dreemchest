@@ -63,6 +63,9 @@ namespace Ecs {
 		//! Returns a component mask.
 		const Bitset&			mask( void ) const;
 
+        //! Removes all attached components.
+        void                    clear( void );
+
 		//! Returns entity flags.
 		u8						flags( void ) const;
 
@@ -110,6 +113,15 @@ namespace Ecs {
 		template<typename TComponent>
 		TComponent*				attachComponent( TComponent* component );
 
+    #if DC_ECS_ENTITY_CLONING
+        //! Copies component from a specified entity and attaches it.
+        template<typename TComponent>
+        TComponent*             attachFrom( EntityWPtr entity );
+
+        //! Makes a full copy of this entity.
+        virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
+    #endif  /*  DC_ECS_ENTITY_CLONING   */
+
     #ifndef DC_ECS_NO_SERIALIZATION
 		//! Reads archetype from a storage.
 		virtual void		    read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
@@ -129,6 +141,9 @@ namespace Ecs {
 		template<typename TComponent, typename ... Args>
 		TComponent*				attach( Args ... args );
 	#endif	/*	!DC_CPP11_DISABLED	*/
+
+        //! Removes a component by type id from this entity.
+        void                    detachById( TypeIdx id );
 
 		//! Removes a component from this entity.
 		template<typename TComponent>
@@ -205,6 +220,17 @@ namespace Ecs {
 		return component;	
 	}
 
+    // ** Entity::attachFrom
+    template<typename TComponent>
+    TComponent* Entity::attachFrom( EntityWPtr entity )
+    {
+        if( TComponent* component = entity->has<TComponent>() ) {
+            return attachComponent<TComponent>( static_cast<TComponent*>( component->deepCopy().get() ) );
+        }
+
+        return NULL;
+    }
+
 	// ** Entity::enable
 	template<typename TComponent>
 	void Entity::enable( void )
@@ -249,13 +275,7 @@ namespace Ecs {
 	template<typename TComponent>
 	void Entity::detach( void )
 	{
-		DC_BREAK_IF( m_flags.is( Removed ) );
-
-		Components::iterator i = m_components.find( TypeIndex<TComponent>::idx() );
-		DC_BREAK_IF( i == m_components.end() );
-		updateComponentBit( i->second->typeIndex(), false );
-        i->second->setParentEntity( NULL );
-		m_components.erase( i );
+        detachById( TypeIndex<TComponent>::idx() );
 	}
 
 } // namespace Ecs

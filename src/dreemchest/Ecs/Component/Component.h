@@ -83,6 +83,10 @@ namespace Ecs {
         //! Returns parent entity instance.
         EntityWPtr                  entity( void ) const;
 
+    #if DC_ECS_ENTITY_CLONING
+        virtual ComponentPtr        deepCopy( void ) const;
+    #endif  /*  DC_ECS_ENTITY_CLONING   */
+
 	#ifndef DC_ECS_NO_SERIALIZATION
 		//! Reads component from a storage.
 		virtual void		        read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
@@ -135,7 +139,15 @@ namespace Ecs {
 		return typename Internal<T>::Ptr();
 	}
 
-#if !DC_BSON_DISABLED
+#if DC_ECS_ENTITY_CLONING
+    // ** ComponentBase::deepCopy
+    inline ComponentPtr ComponentBase::deepCopy( void ) const
+    {
+        return ComponentPtr();
+    }
+#endif  /*  DC_ECS_ENTITY_CLONING   */
+
+#ifndef DC_ECS_NO_SERIALIZATION
 	// ** ComponentBase::read
 	inline void ComponentBase::read( const Io::Storage* storage )
 	{
@@ -168,7 +180,7 @@ namespace Ecs {
 	{
 		log::warn( "Component::deserialize : is not implemented for '%s'\n", typeName() );
 	}
-#endif	/*	!DC_BSON_DISABLED	*/
+#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	// ** ComponentBase::flags
 	inline u32 ComponentBase::flags( void ) const
@@ -222,7 +234,23 @@ namespace Ecs {
 		typedef StrongPtr<T>	Ptr;
 
 		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<T>::idx() ); return result; }
+
+    #if DC_ECS_ENTITY_CLONING
+        virtual ComponentPtr    deepCopy( void ) const DC_DECL_OVERRIDE;
+    #endif  /*  DC_ECS_ENTITY_CLONING   */
 	};
+
+#if DC_ECS_ENTITY_CLONING
+    // ** Component::deepCopy
+    template<typename T>
+    ComponentPtr Component<T>::deepCopy( void ) const
+    {
+        T* instance = DC_NEW T;
+        *instance = *static_cast<const T*>( this );
+        instance->setParentEntity( NULL );
+        return instance;
+    }
+#endif  /*  DC_ECS_ENTITY_CLONING   */
 
 } // namespace Ecs
 

@@ -93,7 +93,11 @@ DC_BEGIN_DREEMCHEST
 	// ** Guid::Guid
 	inline Guid::Guid( const String& str )
 	{
-		DC_NOT_IMPLEMENTED
+        char* error;
+        for( s32 i = 0; i < Size; i++ ) {
+            String ch = String() + str[i * 2 + 0] + str[i * 2 + 1];
+            m_id[i] = static_cast<u8>( strtoul( ch.c_str(), &error, 16 ) );
+        }
 	}
 
 	// ** Guid::operator Strin

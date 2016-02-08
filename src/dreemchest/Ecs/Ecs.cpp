@@ -146,8 +146,6 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )
 {
-	DC_BREAK_IF( isUsedId( id ) );
-
 	EntityPtr entity( DC_NEW Entity );
 	entity->setId( id );
 	//addEntity( entity );
@@ -161,6 +159,27 @@ EntityPtr Ecs::createEntity( void )
 	EntityId id = generateId();
 	return createEntity( id );
 }
+
+#if !DC_ECS_ENTITY_CLONING
+
+// ** Ecs::cloneEntity
+EntityPtr Ecs::cloneEntity( EntityWPtr entity )
+{
+    // Serialize source to a key-value archive
+    Io::KeyValue ar;
+    SerializationContext ctx( this );
+    entity->serialize( ctx, ar );
+
+    // Create entity instance
+    EntityPtr instance = createEntity();
+
+    // Deserialize
+    instance->deserialize( ctx, ar );
+
+    return instance;
+}
+
+#endif  /*  !DC_ECS_ENTITY_CLONING  */
 
 // ** Ecs::findEntity
 EntityPtr Ecs::findEntity( const EntityId& id ) const

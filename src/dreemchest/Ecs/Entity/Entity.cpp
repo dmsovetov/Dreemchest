@@ -60,6 +60,12 @@ const EntityId& Entity::id( void ) const
 	return m_id;
 }
 
+// ** Entity::clear
+void Entity::clear( void )
+{
+    m_components.clear();
+}
+
 // ** Entity::isSerializable
 bool Entity::isSerializable( void ) const
 {
@@ -127,6 +133,37 @@ void Entity::updateComponentBit( u32 bit, bool value )
 		m_ecs->notifyEntityChanged( m_id );
 	}
 }
+
+// ** Entity::detachById
+void Entity::detachById( TypeIdx id )
+{
+	DC_BREAK_IF( m_flags.is( Removed ) );
+
+	Components::iterator i = m_components.find( id );
+	DC_BREAK_IF( i == m_components.end() );
+	updateComponentBit( i->second->typeIndex(), false );
+    i->second->setParentEntity( NULL );
+	m_components.erase( i );
+}
+
+#if DC_ECS_ENTITY_CLONING
+
+// ** Entity::deepCopy
+EntityPtr Entity::deepCopy( const EntityId& id ) const
+{
+    // Create entity instance
+    Ecs*      ecs    = const_cast<Ecs*>( m_ecs.get() );
+    EntityPtr entity = id.isNull() ? ecs->createEntity() : ecs->createEntity( id );
+
+    // Now clone components
+    for( Components::const_iterator i = m_components.begin(), end = m_components.end(); i != end; ++i ) {
+        entity->attachComponent( i->second->deepCopy().get() );
+    }
+
+    return entity;
+}
+
+#endif  /*  DC_ECS_ENTITY_CLONING   */
 
 #ifndef DC_ECS_NO_SERIALIZATION
 

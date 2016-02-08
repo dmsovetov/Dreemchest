@@ -174,7 +174,7 @@ namespace Scene {
 	dcDeclarePtrs( RenderPassBase )
 	dcDeclarePtrs( ShaderCache )
 
-	dcDeclarePtrs( Box2DPhysics )
+	dcDeclarePtrs( Physics2D )
 	dcDeclarePtrs( RigidBody2D )
 
 	dcDeclarePtrs( RenderingContext )

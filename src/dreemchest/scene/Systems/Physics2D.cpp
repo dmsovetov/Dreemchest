@@ -33,7 +33,7 @@ namespace Scene {
 // ------------------------------------------------ Physics2D ------------------------------------------------ //
 
 // ** Physics2D::Physics2D
-Physics2D::Physics2D( const String& name, f32 timeStep, f32 scale ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
+Physics2D::Physics2D( const String& name, f32 timeStep ) : EntitySystem( name, Ecs::Aspect::all<RigidBody2D, Shape2D, Transform>() ), m_timeStep( timeStep ), m_maxSimulationSteps( 5 ), m_accumulator( 0.0f )
 {
 
 }
@@ -86,10 +86,9 @@ void Physics2D::clearState( RigidBody2D& rigidBody )
 }
 
 // ** Physics2D::queueCollisionEvent
-void Physics2D::queueCollisionEvent( RigidBody2D::CollisionEvent::Type type, const SceneObjectWPtr& first, const SceneObjectWPtr& second, const Array<Vec2>& points )
+void Physics2D::queueCollisionEvent( RigidBody2D& rigidBody, const RigidBody2D::CollisionEvent& e )
 {
-    first->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, second, points ) );
-    second->get<RigidBody2D>()->queueCollisionEvent( RigidBody2D::CollisionEvent( type, first, points ) );
+    rigidBody.queueCollisionEvent( e );
 }
 
 #ifdef DC_BOX2D_ENABLED
@@ -112,13 +111,14 @@ public:
                         Event( void )
                             {}
                         //! Constructs Event instance.
-                        Event( Type type, b2Body* first, b2Body* second, const Array<b2Vec2>& points = Array<b2Vec2>() )
+                        Event( Type type, b2Fixture* first, b2Fixture* second, const Array<b2Vec2>& points = Array<b2Vec2>() )
                             : type( type ), first( first ), second( second ), points( points ) {}
 
-        b2Body*         first;  //!< First contact body.
-        b2Body*         second; //!< Second contact body.
-        Type            type;   //!< Collision type.
-        Array<b2Vec2>   points; //!< Contact points.
+        b2Fixture*      first;      //!< First contact body.
+        b2Fixture*      second;     //!< Second contact body.
+        Type            type;       //!< Collision type.
+        bool            isSensor;   //!< Do we touch the sensor?
+        Array<b2Vec2>   points;     //!< Contact points.
     };
 
     //! Clears recorded events.
@@ -166,11 +166,11 @@ const Box2DPhysics::Collisions::Event& Box2DPhysics::Collisions::event( s32 inde
 void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
 {
     // Get contact bodies
-    b2Body* first  = contact->GetFixtureA()->GetBody();
-    b2Body* second = contact->GetFixtureB()->GetBody();
+    b2Fixture* first  = contact->GetFixtureA();
+    b2Fixture* second = contact->GetFixtureB();
 
     // Bodies with no user data don't trigger collision events
-    if( !first->GetUserData() || !second->GetUserData() ) {
+    if( !first->GetBody()->GetUserData() || !second->GetBody()->GetUserData() ) {
         return;
     }
 
@@ -193,11 +193,11 @@ void Box2DPhysics::Collisions::BeginContact( b2Contact* contact )
 void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 {
     // Get contact bodies
-    b2Body* first  = contact->GetFixtureA()->GetBody();
-    b2Body* second = contact->GetFixtureB()->GetBody();
+    b2Fixture* first  = contact->GetFixtureA();
+    b2Fixture* second = contact->GetFixtureB();
 
     // Bodies with no user data don't trigger collision events
-    if( !first->GetUserData() || !second->GetUserData() ) {
+    if( !first->GetBody()->GetUserData() || !second->GetBody()->GetUserData() ) {
         return;
     }
 
@@ -208,10 +208,10 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 // ------------------------------------------------ Box2DPhysics ------------------------------------------------ //
 
 // ** Box2DPhysics::Box2DPhysics
-Box2DPhysics::Box2DPhysics( f32 timeStep, f32 scale, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep, scale ), m_scale( scale )
+Box2DPhysics::Box2DPhysics( f32 timeStep, const ScaleFactors& scalingFactors, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep ), m_scalingFactors( scalingFactors )
 {
     // Create Box2D world instance
-	m_world = DC_NEW b2World( b2Vec2( gravity.x, gravity.y ) );
+	m_world = DC_NEW b2World( forceToBox2D( gravity ) );
 
     // Disable automatic force clearing
     m_world->SetAutoClearForces( false );
@@ -379,6 +379,11 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
         body->SetTransform( positionToBox2D( rigidBody.movedTo() ), rigidBodyTransform.q.GetAngle() );
     }
 
+    // This rigid body was rotated - sync the Box2D body with it
+    if( rigidBody.wasRotated() ) {
+        body->SetTransform( body->GetPosition(), radians( rigidBody.rotatedTo() ) );
+    }
+
     // Rigid body was put to rest - clear velocities
     if( rigidBody.wasPutToRest() ) {
         body->SetLinearVelocity( b2Vec2( 0.0f, 0.0f ) );
@@ -386,29 +391,26 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
     }
 
 	// Now apply forces
-	f32			mass   = body->GetMass();
 	f32			torque = rigidBody.torque();
 	const Vec2& force  = rigidBody.force();
 
 	body->SetLinearDamping( rigidBody.linearDamping() );
 	body->SetAngularDamping( rigidBody.angularDamping() );
-    body->SetLinearVelocity( positionToBox2D( rigidBody.linearVelocity() ) );
-	body->ApplyTorque( -torque * mass, true );
-	body->ApplyForceToCenter( b2Vec2( force.x * mass, force.y * mass ), true );
+    body->SetLinearVelocity( velocityToBox2D( rigidBody.linearVelocity() ) );
+	body->ApplyTorque( -torque, true );
+	body->ApplyForceToCenter( forceToBox2D( force ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
 
 	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
 		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
-		b2Vec2 value = b2Vec2( appliedForce.m_value.x * mass, appliedForce.m_value.y * mass );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
-		body->ApplyForce( value, point, true );
+		body->ApplyForce( forceToBox2D( appliedForce.m_value ), point, true );
 	}
 
     for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
  		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
-		b2Vec2 value = b2Vec2( appliedImpulse.m_value.x * mass, appliedImpulse.m_value.y * mass );
 		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
-		body->ApplyLinearImpulse( value, point, true );   
+		body->ApplyLinearImpulse( forceToBox2D( appliedImpulse.m_value ), point, true );   
     }
 
     // Clear the rigid body state
@@ -426,7 +428,7 @@ void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transf
 	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
 
     // Update the body's linear velocity
-    rigidBody.setLinearVelocity( positionFromBox2D( body->GetLinearVelocity() ) );
+    rigidBody.setLinearVelocity( velocityFromBox2D( body->GetLinearVelocity() ) );
 }
 
 // ** Box2DPhysics::dispatchCollisionEvents
@@ -437,9 +439,13 @@ void Box2DPhysics::dispatchCollisionEvents( void )
         // Get collision event by index
         const Collisions::Event& e = m_collisions->event( i );
 
+        // Get fixtures from an event
+        b2Fixture* firstFixture = e.first;
+        b2Fixture* secondFixture = e.second;
+
         // Get scene objects from collision event
-        SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( e.first->GetUserData() );
-        SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( e.second->GetUserData() );
+        SceneObjectWPtr first  = reinterpret_cast<Ecs::Entity*>( firstFixture->GetBody()->GetUserData() );
+        SceneObjectWPtr second = reinterpret_cast<Ecs::Entity*>( secondFixture->GetBody()->GetUserData() );
 
         // Convert Box2D contact points to world space.
         Array<Vec2> points;
@@ -451,13 +457,17 @@ void Box2DPhysics::dispatchCollisionEvents( void )
         // Emit an event and push it to component's event queue
         switch( e.type ) {
         case Collisions::Event::Begin:  {
-                                            queueCollisionEvent( RigidBody2D::CollisionEvent::Begin, first, second, points );
+                                            queueCollisionEvent( *first->get<RigidBody2D>(),  RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, second, secondFixture->IsSensor(), secondFixture->GetFilterData().categoryBits, points ) );
+                                            queueCollisionEvent( *second->get<RigidBody2D>(), RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::Begin, first,  firstFixture->IsSensor(), firstFixture->GetFilterData().categoryBits, points ) );
+
                                             notify<CollisionBegin>( first, second );
                                         }
                                         break;
 
         case Collisions::Event::End:    {
-                                            queueCollisionEvent( RigidBody2D::CollisionEvent::End, first, second, points );
+                                            queueCollisionEvent( *first->get<RigidBody2D>(),  RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, second, secondFixture->IsSensor(), secondFixture->GetFilterData().categoryBits, points ) );
+                                            queueCollisionEvent( *second->get<RigidBody2D>(), RigidBody2D::CollisionEvent( RigidBody2D::CollisionEvent::End, first,  firstFixture->IsSensor(), firstFixture->GetFilterData().categoryBits, points ) );
+
                                             notify<CollisionEnd>( first, second );
                                         }
                                         break;
@@ -510,9 +520,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 
 		// Initialize Box2D fixture
 		switch( part.type ) {
-		case Shape2D::Circle:	addCircleFixture( body, filter, part );		break;
-		case Shape2D::Rect:		addRectFixture( body, filter, part );		break;
-		case Shape2D::Polygon:	addPolygonFixture( body, filter, part );	break;
+		case Shape2D::Circle:	addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
+		case Shape2D::Rect:		addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
+		case Shape2D::Polygon:	addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
 		default:				DC_BREAK;
 		}
 	}
@@ -539,7 +549,7 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 }
 
 // ** Box2DPhysics::addCircleFixture
-b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2CircleShape circle;
@@ -548,6 +558,7 @@ b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const 
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
 	circle.m_radius = sizeToBox2D( shape.circle.radius );
@@ -558,7 +569,7 @@ b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const 
 }
 
 // ** Box2DPhysics::addRectFixture
-b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -567,6 +578,7 @@ b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Sh
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
 	polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
@@ -577,7 +589,7 @@ b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Sh
 }
 
 // ** Box2DPhysics::addPolygonFixture
-b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape ) const
+b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -586,6 +598,7 @@ b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const
 	fixture.friction = shape.material.friction;
 	fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
+    fixture.isSensor = isSensor;
 
 	Array<b2Vec2> points;
 
@@ -605,25 +618,49 @@ b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const
 // ** Box2DPhysics::positionFromBox2D
 Vec3 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
 {
-	return Vec3( position.x, position.y, 0.0f ) * m_scale;
+	return Vec3( position.x, position.y, 0.0f ) * m_scalingFactors.distance;
 }
 
 // ** Box2DPhysics::rotationFromBox2D
 f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 {
-	return degrees( -angle );
+	return degrees( angle );
 }
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec3& position ) const
 {
-	return b2Vec2( position.x / m_scale, position.y / m_scale );
+	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
 }
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
 {
-	return b2Vec2( position.x / m_scale, position.y / m_scale );
+	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
+}
+
+// ** Box2DPhysics::forceToBox2D
+b2Vec2 Box2DPhysics::forceToBox2D( const Vec2& value ) const
+{
+    return b2Vec2( value.x * m_scalingFactors.force, value.y * m_scalingFactors.force );
+}
+
+// ** Box2DPhysics::forceFromBox2D
+Vec2 Box2DPhysics::forceFromBox2D( const b2Vec2& value ) const
+{
+    return Vec2( value.x, value.y ) / m_scalingFactors.force;
+}
+
+// ** Box2DPhysics::velocityToBox2D
+b2Vec2 Box2DPhysics::velocityToBox2D( const Vec2& value ) const
+{
+    return b2Vec2( value.x * m_scalingFactors.velocity, value.y * m_scalingFactors.velocity );
+}
+
+// ** Box2DPhysics::velocityFromBox2D
+Vec2 Box2DPhysics::velocityFromBox2D( const b2Vec2& value ) const
+{
+    return Vec2( value.x, value.y ) / m_scalingFactors.velocity;
 }
 
 // ** Box2DPhysics::rotationToBox2D
@@ -635,7 +672,7 @@ f32 Box2DPhysics::rotationToBox2D( f32 angle ) const
 // ** Box2DPhysics::sizeToBox2D
 f32 Box2DPhysics::sizeToBox2D( f32 value ) const
 {
-	return value / m_scale;
+	return value / m_scalingFactors.distance;
 }
 
 #endif	/*	DC_BOX2D_ENABLED	*/

@@ -74,6 +74,19 @@ namespace Fx {
 						//! Constructs Particle instance.
 						Particle( void )
 							: indices( NULL ), position( NULL ), rotation( NULL ), life( NULL ), size( NULL ), transparency( NULL ), color( NULL ), angularVelocity( NULL ), force( NULL ) {}
+                        ~Particle( void )
+                        {
+                            delete[]indices;
+                            delete[]position;
+                            delete[]velocity;
+                            delete[]rotation;
+                            delete[]life;
+                            delete[]size;
+                            delete[]transparency;
+                            delete[]color;
+                            delete[]angularVelocity;
+                            delete[]force;
+                        }
 	};
 
 	//! Particles contains an array of particles and a set of simulation parameters.
