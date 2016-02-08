@@ -79,13 +79,13 @@ namespace Assets {
                                     Asset( void );
 
                                     //! Constructs Asset instance.
-                                    Asset( AssetType type, const AssetId& uniqueId, AbstractAssetFormat* format );
+                                    Asset( Type type, const AssetId& uniqueId, AbstractAssetFormat* format );
 
         //! Returns asset unique id.
         const AssetId&              uniqueId( void ) const;
 
         //! Returns asset type.
-        const AssetType&            type( void ) const;
+        const Type&                 type( void ) const;
 
         //! Returns asset name.
         const String&               name( void ) const;
@@ -116,7 +116,7 @@ namespace Assets {
     private:
 
         AssetFormatUPtr             m_format;       //!< Asset format parser used for loading.
-        AssetType                   m_type;         //!< Asset type.
+        Type                        m_type;         //!< Asset type.
         AssetId                     m_uniqueId;     //!< Unique asset id.
         String                      m_name;         //!< Asset name.
         State                       m_state;        //!< Current asset state.
@@ -144,7 +144,7 @@ namespace Assets {
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        AssetHandle                 addAsset( const AssetType& type, const AssetId& uniqueId, AbstractAssetFormat* format );
+        AssetHandle                 addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );
@@ -178,7 +178,7 @@ namespace Assets {
         const TAsset&               assetData( const AssetHandle& asset ) const;
 
         //! Reserves asset data handle inside the cache.
-        SlotIndex32                 reserveAssetData( const AssetType& type );
+        SlotIndex32                 reserveAssetData( const Type& type );
 
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
@@ -218,7 +218,7 @@ namespace Assets {
         typedef Map<AssetId, SlotIndex32>   AssetSlotsById;
 
         //! Container type to store asset cache for an asset type.
-        typedef Map<AssetType, AbstractAssetCache*> AssetCaches;
+        typedef Map<Type, AbstractAssetCache*> AssetCaches;
 
         Slots<Asset, SlotIndex32>   m_assets;       //!< All available assets.
         AssetSlotsById              m_slotById;     //!< AssetId to handle mapping.
@@ -246,7 +246,7 @@ namespace Assets {
     template<typename TAsset>
     Assets::AssetCache<TAsset>& Assets::requestAssetCache( void ) const
     {
-        AssetType type = AssetType::fromClass<TAsset>();
+        Type type = Type::fromClass<TAsset>();
         AssetCaches::iterator i = m_cache.find( type );
 
         if( i != m_cache.end() ) {

@@ -30,73 +30,73 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ** AssetType::Invalid
-const AssetType AssetType::Invalid;
+// ** Type::Invalid
+const Type Type::Invalid;
 
-// ** AssetType::s_nameToType
-Map<String, AssetType> AssetType::s_nameToType;
+// ** Type::s_nameToType
+Map<String, Type> Type::s_nameToType;
 
-// ** AssetType::s_typeToName
-Map<AssetType, String> AssetType::s_typeToName;
+// ** Type::s_typeToName
+Map<Type, String> Type::s_typeToName;
 
-// ** AssetType::AssetType
-AssetType::AssetType( void ) : m_type( ~0 )
+// ** Type::Type
+Type::Type( void ) : m_type( ~0 )
 {
 }
 
-// ** AssetType::AssetType
-AssetType::AssetType( const AssetType& other ) : m_type( other.m_type )
+// ** Type::Type
+Type::Type( const Type& other ) : m_type( other.m_type )
 {
 }
 
-// ** AssetType::AssetType
-AssetType::AssetType( TypeIdx type ) : m_type( type )
+// ** Type::Type
+Type::Type( TypeIdx type ) : m_type( type )
 {
 
 }
 
-// ** AssetType::operator ==
-bool AssetType::operator == ( const AssetType& other ) const
+// ** Type::operator ==
+bool Type::operator == ( const Type& other ) const
 {
     return m_type == other.m_type;
 }
 
-// ** AssetType::operator <
-bool AssetType::operator < ( const AssetType& other ) const
+// ** Type::operator <
+bool Type::operator < ( const Type& other ) const
 {
     return m_type < other.m_type;
 }
 
-// ** AssetType::isValid
-bool AssetType::isValid( void ) const
+// ** Type::isValid
+bool Type::isValid( void ) const
 {
     return !(*this == Invalid);
 }
 
-// ** AssetType::bit
-u32 AssetType::bit( void ) const
+// ** Type::bit
+u32 Type::bit( void ) const
 {
     DC_BREAK_IF( m_type > 31 );
     return 1 << BIT( m_type );
 }
 
-// ** AssetType::fromString
-AssetType AssetType::fromString( const String& value )
+// ** Type::fromString
+Type Type::fromString( const String& value )
 {
-    Map<String, AssetType>::const_iterator i = s_nameToType.find( value );
+    Map<String, Type>::const_iterator i = s_nameToType.find( value );
     
     if( i == s_nameToType.end() ) {
         DC_BREAK;
-        return AssetType();
+        return Type();
     }
 
     return i->second;
 }
 
-// ** AssetType::toString
-String AssetType::toString( void ) const
+// ** Type::toString
+String Type::toString( void ) const
 {
-    Map<AssetType, String>::const_iterator i = s_typeToName.find( m_type );
+    Map<Type, String>::const_iterator i = s_typeToName.find( m_type );
 
     if( i == s_typeToName.end() ) {
         DC_BREAK;

@@ -45,10 +45,10 @@ DC_BEGIN_COMPOSER
         Assets::Assets&             assets( void );
 
 		//! Registers the mapping from extension to asset type.
-		void						registerExtension( const String& ext, Assets::AssetType type );
+		void						registerExtension( const String& ext, Assets::Type type );
 
 		//! Returns asset type by extension.
-		Assets::AssetType			assetTypeFromExtension( const String& ext ) const;
+		Assets::Type			    assetTypeFromExtension( const String& ext ) const;
 
 	private:
 
@@ -68,7 +68,7 @@ DC_BEGIN_COMPOSER
         Assets::AssetHandle         parseAssetFromData( const Io::KeyValue& kv );
 
         //! Creates an asset instance with specified asset type and id.
-        Assets::AssetHandle         createAsset( Assets::AssetType type, const Assets::AssetId& id );
+        Assets::AssetHandle         createAsset( Assets::Type type, const Assets::AssetId& id );
 
     private slots:
 
@@ -87,10 +87,10 @@ DC_BEGIN_COMPOSER
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
         //! Alias the asset format factory type.
-        typedef AbstractFactory<Assets::AbstractAssetFileFormat, Assets::AssetType> AssetFormatFactory;
+        typedef AbstractFactory<Assets::AbstractAssetFileFormat, Assets::Type> AssetFormatFactory;
 
 		//! Alias the ext to asset type mapping.
-		typedef Map<String, Assets::AssetType> AssetTypes;
+		typedef Map<String, Assets::Type> AssetTypes;
 
 		Io::Path					m_path;				//!< Root cache folder path.
 		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.

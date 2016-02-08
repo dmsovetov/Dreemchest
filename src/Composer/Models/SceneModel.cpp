@@ -237,7 +237,7 @@ SceneModel::AssetAction SceneModel::acceptableAssetAction( const Assets::AssetSe
 	AssetAction assetAction( AssetAction::Invalid, assets, target, point );
 
 	for( Assets::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
-        const Assets::AssetType& type = (*i)->type();
+        const Assets::Type& type = (*i)->type();
 
         if( type.is<Scene::Mesh>() ) {
             assetAction.type = AssetAction::PlaceMesh;

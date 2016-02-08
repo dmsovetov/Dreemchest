@@ -105,7 +105,7 @@ DC_BEGIN_COMPOSER
 	private:
 
 		//! Alias the asset editor factory type.
-		typedef AbstractFactory<Editors::AssetEditor, Assets::AssetType> AssetEditorFactory;
+		typedef AbstractFactory<Editors::AssetEditor, Assets::Type> AssetEditorFactory;
 
 		String						m_name;					//!< Project name.
 		AssetFileSystemModelQPtr    m_assetFileSystem;		//!< Asset file system model.

@@ -43,13 +43,13 @@ Asset::Asset( void ) : m_state( Unloaded )
 }
 
 // ** Asset::Asset
-Asset::Asset( AssetType type, const AssetId& uniqueId, AbstractAssetFormat* format )
+Asset::Asset( Type type, const AssetId& uniqueId, AbstractAssetFormat* format )
     : m_format( format ), m_type( type ), m_uniqueId( uniqueId ), m_state( Unloaded )
 {
 }
 
 // ** Asset::type
-const AssetType& Asset::type( void ) const
+const Type& Asset::type( void ) const
 {
     return m_type;
 }
@@ -113,7 +113,7 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-AssetHandle Assets::addAsset( const AssetType& type, const AssetId& uniqueId, AbstractAssetFormat* format )
+AssetHandle Assets::addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format )
 {
     DC_BREAK_IF( m_slotById.find( uniqueId ) != m_slotById.end() );
 
@@ -236,7 +236,7 @@ void Assets::queueForLoading( const AssetHandle& asset ) const
 }
 
 // ** Assets::reserveAssetData
-SlotIndex32 Assets::reserveAssetData( const AssetType& type )
+SlotIndex32 Assets::reserveAssetData( const Type& type )
 {
     AssetCaches::iterator i = m_cache.find( type );
 

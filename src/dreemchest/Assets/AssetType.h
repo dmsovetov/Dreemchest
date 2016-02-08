@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Assets_AssetType_H__
-#define __DC_Assets_AssetType_H__
+#ifndef __DC_Assets_Type_H__
+#define __DC_Assets_Type_H__
 
 #include "../Dreemchest.h"
 
@@ -34,67 +34,67 @@ DC_BEGIN_DREEMCHEST
 namespace Assets {
 
     //! Asset type id.
-    class AssetType {
+    class Type {
     public:
 
         //! Invalid asset type constant.
-        static const AssetType          Invalid;
+        static const Type           Invalid;
 
 
-                                        //! Constructs invalid Asset type.
-                                        AssetType( void );
+                                    //! Constructs invalid asset type.
+                                    Type( void );
 
-                                        //! Copies AssetType instance.
-                                        AssetType( const AssetType& other );
+                                    //! Copies Type instance.
+                                    Type( const Type& other );
 
         //! Compares two asset types.
-        bool                            operator == ( const AssetType& other ) const;
+        bool                        operator == ( const Type& other ) const;
 
         //! Compares two asset type.
-        bool                            operator < ( const AssetType& other ) const;
+        bool                        operator < ( const Type& other ) const;
 
         //! Returns true if this is a valid asset type.
-        bool                            isValid( void ) const;
+        bool                        isValid( void ) const;
 
         //! Converts an asset type to a string.
-        String                          toString( void ) const;
+        String                      toString( void ) const;
 
         //! Returns asset type bit mask.
-        u32                             bit( void ) const;
+        u32                         bit( void ) const;
 
         //! Returns true if an asset type matches the specified class.
         template<typename TAsset>
-        bool                            is( void ) const;
+        bool                        is( void ) const;
 
         //! Returns an asset type for specified class.
         template<typename TAsset>
-        static AssetType                fromClass( void );
+        static Type                 fromClass( void );
 
         //! Returns an asset type from a string.
-        static AssetType                fromString( const String& value );
+        static Type                 fromString( const String& value );
 
         //! Registers a new asset type.
         template<typename TAsset>
-        static bool                     declare( void );
+        static bool                 declare( void );
 
     private:
 
-                                        //! Constructs AssetType instance.
-                                        AssetType( TypeIdx type );
+                                    //! Constructs Type instance.
+                                    Type( TypeIdx type );
 
     private:
 
-        TypeIdx                         m_type;         //!< Actual asset type value.
-        static Map<String, AssetType>   s_nameToType;   //!< Maps asset name to type.
-        static Map<AssetType, String>   s_typeToName;   //!< Maps asset type to name.
+        TypeIdx                     m_type;         //!< Actual asset type value.
+        static Map<String, Type>    s_nameToType;   //!< Maps asset name to type.
+        static Map<Type, String>    s_typeToName;   //!< Maps asset type to name.
     };
 
-    // ** AssetType::declare
+    // ** Type::declare
     template<typename TAsset>
-    bool AssetType::declare( void )
+    bool Type::declare( void )
     {
-        AssetType type = fromClass<TAsset>();
-        String    name = TypeInfo<TAsset>::name();
+        Type   type = fromClass<TAsset>();
+        String name = TypeInfo<TAsset>::name();
 
         s_nameToType[name] = type;
         s_typeToName[type] = name;
@@ -102,16 +102,16 @@ namespace Assets {
         return true;
     }
 
-    // ** AssetType::fromClass
+    // ** Type::fromClass
     template<typename TAsset>
-    AssetType AssetType::fromClass( void )
+    Type Type::fromClass( void )
     {
-        return GroupedTypeIndex<TAsset, AssetType>::idx();
+        return GroupedTypeIndex<TAsset, Type>::idx();
     }
 
-    // ** Assets::is
+    // ** Type::is
     template<typename TAsset>
-    bool AssetType::is( void ) const
+    bool Type::is( void ) const
     {
         return *this == fromClass<TAsset>();
     }
@@ -120,4 +120,4 @@ namespace Assets {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Assets_AssetType_H__    */
+#endif    /*    !__DC_Assets_Type_H__    */

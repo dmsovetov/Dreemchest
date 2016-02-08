@@ -54,29 +54,29 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_paths[CachePath]	= path + "Cache";
 
 	// Declare asset editors.
-	m_assetEditors.declare<Editors::SceneEditor>( Assets::AssetType::fromClass<Scene::Prefab>() );
+	m_assetEditors.declare<Editors::SceneEditor>( Assets::Type::fromClass<Scene::Prefab>() );
 
 	// Create assets bundle & model
 	m_assetFileSystem = new AssetFileSystemModel( this );
 
     // Declare asset types
-    Assets::AssetType::declare<Scene::Image>();
-    Assets::AssetType::declare<Scene::Mesh>();
-    Assets::AssetType::declare<Scene::Material>();
-    Assets::AssetType::declare<Scene::Prefab>();
-    Assets::AssetType::declare<Scene::Terrain>();
+    Assets::Type::declare<Scene::Image>();
+    Assets::Type::declare<Scene::Mesh>();
+    Assets::Type::declare<Scene::Material>();
+    Assets::Type::declare<Scene::Prefab>();
+    Assets::Type::declare<Scene::Terrain>();
 
 	// Create project cache
 	m_assets = new AssetManager( this, absolutePath( CachePath ), m_assetFileSystem );
 
 	// Register asset types
 	//m_assets->registerExtension( "", Scene::Asset::Folder );
-	m_assets->registerExtension( "tga", Assets::AssetType::fromClass<Scene::Image>() );
-	m_assets->registerExtension( "tif", Assets::AssetType::fromClass<Scene::Image>() );
-	m_assets->registerExtension( "fbx", Assets::AssetType::fromClass<Scene::Mesh>() );
-	m_assets->registerExtension( "scene", Assets::AssetType::fromClass<Scene::Prefab>() );
-	m_assets->registerExtension( "prefab", Assets::AssetType::fromClass<Scene::Prefab>() );
-	m_assets->registerExtension( "material", Assets::AssetType::fromClass<Scene::Material>() );
+	m_assets->registerExtension( "tga", Assets::Type::fromClass<Scene::Image>() );
+	m_assets->registerExtension( "tif", Assets::Type::fromClass<Scene::Image>() );
+	m_assets->registerExtension( "fbx", Assets::Type::fromClass<Scene::Mesh>() );
+	m_assets->registerExtension( "scene", Assets::Type::fromClass<Scene::Prefab>() );
+	m_assets->registerExtension( "prefab", Assets::Type::fromClass<Scene::Prefab>() );
+	m_assets->registerExtension( "material", Assets::Type::fromClass<Scene::Material>() );
 
 	// Setup assets model after creating cache
 	m_assetFileSystem->setReadOnly( false );
@@ -174,7 +174,7 @@ void Project::createAsset( const String& name, const String& ext )
 Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 {
     // Get the asset type by extension
-    Assets::AssetType assetType = m_assets->assetTypeFromExtension( fileInfo.extension() );
+    Assets::Type assetType = m_assets->assetTypeFromExtension( fileInfo.extension() );
 
 	// Construct the asset editor by asset type
 	Editors::AssetEditorQPtr assetEditor = m_assetEditors.construct( assetType );

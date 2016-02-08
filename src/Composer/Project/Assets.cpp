@@ -56,9 +56,9 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
     // Declare default asset formats
-    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::AssetType::fromClass<Scene::Image>() );
-    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::AssetType::fromClass<Scene::Mesh>() );
-    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Assets::AssetType::fromClass<Scene::Material>() );
+    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Type::fromClass<Scene::Image>() );
+    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Type::fromClass<Scene::Mesh>() );
+    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Assets::Type::fromClass<Scene::Material>() );
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
@@ -82,7 +82,7 @@ Assets::Assets& AssetManager::assets( void )
 Assets::AssetHandle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Assets::AssetType type = assetTypeFromExtension( fileInfo.extension() );
+	Assets::Type type = assetTypeFromExtension( fileInfo.extension() );
 
     if( !type.isValid() ) {
         return Assets::AssetHandle();
@@ -103,7 +103,7 @@ Assets::AssetHandle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 	DC_BREAK_IF( !kv.isObject() );
 
 	// Get asset type by name.
-	Assets::AssetType type = Assets::AssetType::fromString( kv.get( "type", "" ).asString() );
+	Assets::Type type = Assets::Type::fromString( kv.get( "type", "" ).asString() );
     DC_BREAK_IF( !type.isValid() );
 
     // Read the unique asset identifier.
@@ -114,7 +114,7 @@ Assets::AssetHandle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 }
 
 // ** AssetManager::createAsset
-Assets::AssetHandle AssetManager::createAsset( Assets::AssetType type, const Assets::AssetId& id )
+Assets::AssetHandle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
 {
     // Create asset format by extension
     Assets::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
@@ -132,16 +132,16 @@ Assets::AssetHandle AssetManager::createAsset( Assets::AssetType type, const Ass
 }
 
 // ** AssetManager::registerExtension
-void AssetManager::registerExtension( const String& extension, Assets::AssetType type )
+void AssetManager::registerExtension( const String& extension, Assets::Type type )
 {
 	m_assetTypes[extension] = type;
 }
 
 // ** AssetManager::assetTypeFromExtension
-Assets::AssetType AssetManager::assetTypeFromExtension( const String& extension ) const
+Assets::Type AssetManager::assetTypeFromExtension( const String& extension ) const
 {
 	AssetTypes::const_iterator i = m_assetTypes.find( extension );
-	return i != m_assetTypes.end() ? i->second : Assets::AssetType::Invalid;
+	return i != m_assetTypes.end() ? i->second : Assets::Type::Invalid;
 }
 
 // ** AssetManager::removeAssetFromCache
