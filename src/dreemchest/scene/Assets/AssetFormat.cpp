@@ -34,10 +34,30 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
+
+// ** AbstractAssetFileFormat::AbstractAssetFileFormat
+AbstractAssetFileFormat::AbstractAssetFileFormat( const String& fileName ) : m_fileName( fileName )
+{
+}
+
+// ** AbstractAssetFileFormat::parse
+bool AbstractAssetFileFormat::parse( Assets& assets, AssetHandle asset )
+{
+    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
+
+    if( !stream.valid() ) {
+        return false;
+    }
+
+    bool result = parseFromStream( stream, assets, asset );
+    return result;
+}
+
 // ------------------------------------------ ImageLoaderRaw ------------------------------------------ //
 
-// ** ImageFormatRaw::parse
-bool ImageFormatRaw::parse( Io::StreamPtr stream, Assets& assets, Image& asset )
+// ** ImageFormatRaw::parseFromStream
+bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Image& asset )
 {
 	u16 width, height;
 	u8  channels;
@@ -64,8 +84,8 @@ bool ImageFormatRaw::parse( Io::StreamPtr stream, Assets& assets, Image& asset )
 
 // ------------------------------------------ MeshFormatRaw ------------------------------------------ //
 
-// ** MeshFormatRaw::parse
-bool MeshFormatRaw::parse( Io::StreamPtr stream, Assets& assets, Mesh& asset )
+// ** MeshFormatRaw::parseFromStream
+bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets& assets, Mesh& asset )
 {
 	// Read the total number of mesh chunks
 	u32 chunkCount;
@@ -120,8 +140,8 @@ bool MeshFormatRaw::parse( Io::StreamPtr stream, Assets& assets, Mesh& asset )
 
 // --------------------------------------- MaterialFormatKeyValue --------------------------------------- //
 
-// ** MaterialFormatKeyValue::parse
-bool MaterialFormatKeyValue::parse( Io::StreamPtr stream, Assets& assets, Material& asset )
+// ** MaterialFormatKeyValue::parseFromStream
+bool MaterialFormatKeyValue::parseFromStream( Io::StreamPtr stream, Assets& assets, Material& asset )
 {
 #ifdef HAVE_JSON
 	String json;

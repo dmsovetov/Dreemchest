@@ -46,6 +46,7 @@ namespace Scene {
               Unloaded  //!< Asset is now unloaded.
             , Loading   //!< Asset is now loading.
             , Loaded    //!< Asset is loaded and ready to use.
+            , Error     //!< Asset was failed to load.
         };
 
                                     //! Constructs empty Asset instance.
@@ -66,6 +67,9 @@ namespace Scene {
         //! Sets asset name.
         void                        setName( const String& value );
 
+        //! Returns an asset format.
+        AbstractAssetFormat*        format( void ) const;
+
         //! Returns asset state.
         State                       state( void ) const;
 
@@ -74,6 +78,11 @@ namespace Scene {
 
         //! Returns the last asset use timestamp.
         u32                         lastUsed( void ) const;
+
+    private:
+
+        //! Switches an asset to a specified state.
+        void                        switchToState( State value );
 
     private:
 

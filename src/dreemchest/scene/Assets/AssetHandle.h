@@ -228,6 +228,9 @@ namespace Scene {
         //! This operator is used for write access to actual asset data.
         TAsset*                     operator -> ( void );
 
+        //! Returns a non-constant reference to asset data.
+        TAsset&                     operator * ( void );
+
     private:
 
                                     //! Constructs AssetWriteLock instance.
@@ -257,6 +260,13 @@ namespace Scene {
     TAsset* AssetWriteLock<TAsset>::operator -> ( void )
     {
         return const_cast<TAsset*>( m_asset.operator->() );
+    }
+
+    // ** AssetWriteLock::operator *
+    template<typename TAsset>
+    TAsset& AssetWriteLock<TAsset>::operator * ( void )
+    {
+        return *const_cast<TAsset*>( m_asset.operator->() );
     }
 
 #if ASSET_DEPRECATED

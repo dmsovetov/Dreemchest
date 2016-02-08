@@ -74,6 +74,19 @@ void Asset::setName( const String& value )
     m_name = value;
 }
 
+// ** Asset::format
+AbstractAssetFormat* Asset::format( void ) const
+{
+    return m_format.get();
+}
+
+// ** Asset::switchToState
+void Asset::switchToState( State value )
+{
+    DC_BREAK_IF( m_state == value );
+    m_state = value;
+}
+
 // --------------------------------------------- Assets --------------------------------------------- //
 
 // ** Assets::Assets
@@ -160,6 +173,19 @@ void Assets::update( f32 dt )
 
         // Perform loading
         log::verbose( "Loading '%s'...\n", asset->name().c_str() );
+
+        // Switch to Loading state
+        asset->switchToState( Asset::Loading );
+
+        // Get the asset format
+        AbstractAssetFormat* format = asset->format();
+        DC_BREAK_IF( !format );
+
+        // Parse asset
+        bool result = format->parse( *this, asset );
+
+        // Switch to a Loaded or Error state
+        asset->switchToState( result ? Asset::Loaded : Asset::Error );
     }
 }
 
