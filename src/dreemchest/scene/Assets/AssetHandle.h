@@ -174,7 +174,7 @@ namespace Scene {
     template<typename TAsset>
     AssetDataHandle<TAsset>::AssetDataHandle( const AssetHandle& asset )
     {
-        DC_BREAK_IF( !asset->type().is<TAsset>() );
+        DC_BREAK_IF( isValid() && asset.isValid() && !asset->type().is<TAsset>() );
         this->m_assets = asset.assets();
         this->m_slot   = asset.slot();
     }
