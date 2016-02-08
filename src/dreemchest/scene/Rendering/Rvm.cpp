@@ -214,21 +214,18 @@ void Rvm::flush( void )
 
 		// Set the texture
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
-        #if 0
-			Renderer::Texture* texture = cmd->textures[j] ? m_renderingContext->texture( cmd->textures[j] ).get() : NULL;
+            Renderer::Texture* texture = cmd->textures[j];
 
-			if( texture != activeTextures[j] ) {
-				m_hal->setTexture( j, texture );
-				activeTextures[j] = texture;
-				increase( TextureSwitches );
-			}
-        #else
-            DC_NOT_IMPLEMENTED
-        #endif
+			if( texture == activeTextures[j] ) {
+                continue;
+            }
+
+			m_hal->setTexture( j, texture );
+			activeTextures[j] = texture;
+			increase( TextureSwitches );
 		}
 
 		// Set the vertex buffer
-    #if 0
 		const RenderingContext::Renderable& renderable = m_renderingContext->renderable( cmd->mesh );
 
 		if( renderable.vertexBuffer != activeVertexBuffer ) {
@@ -242,9 +239,6 @@ void Rvm::flush( void )
 		increase( DrawIndexed );
 		increase( Triangles, renderable.indexBuffer->size() / 3 );
 		increase( Vertices, renderable.indexBuffer->size() );
-    #else
-        DC_NOT_IMPLEMENTED
-    #endif
 	}
 
 	// Clear the command list

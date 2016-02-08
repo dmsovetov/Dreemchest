@@ -81,6 +81,98 @@ Renderer2DPtr RenderingContext::renderer( void ) const
 	return m_renderer;
 }
 
+//! Returns the renderable index for a specified mesh asset.
+s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
+{
+    // Construct the renderable handle
+    u32 handle = mesh.slot() | (chunk << SlotIndex32::Bits);
+
+    // Lookup renderable index by a handle
+    MeshToRenderable::const_iterator i = m_renderableByMesh.find( handle );
+
+    if( i != m_renderableByMesh.end() ) {
+        return i->second;
+    }
+
+    // Create new renderable
+	const Mesh::VertexBuffer& vertices = mesh->vertexBuffer( chunk );
+	const Mesh::IndexBuffer&  indices  = mesh->indexBuffer( chunk );
+
+	u32 vertexCount = ( u32 )vertices.size();
+	u32 indexCount = ( u32 )indices.size();
+
+	// Create GPU buffers.
+	VertexDeclarationPtr vertexFormat = m_hal->createVertexDeclaration( "P3:N:T0:T1" );
+	VertexBufferPtr	     vertexBuffer = m_hal->createVertexBuffer( vertexFormat, vertexCount );
+	IndexBufferPtr	     indexBuffer  = m_hal->createIndexBuffer( indexCount );
+
+	// Upload the vertex data
+	Mesh::Vertex* vertex = vertexBuffer->lock<Mesh::Vertex>();
+
+	for( u32 i = 0; i < vertexCount; i++ ) {
+		vertex->position = vertices[i].position;
+		vertex->normal = vertices[i].normal;
+
+		for( u32 j = 0; j < Mesh::Vertex::MaxTexCoords; j++ ) {
+			vertex->uv[j] = vertices[i].uv[j];
+		}
+		
+		vertex++;	
+	}
+
+	vertexBuffer->unlock();
+
+	// Upload the index data
+	u16* index = indexBuffer->lock();
+	memcpy( index, &indices[0], indices.size() * sizeof( u16 ) );
+	indexBuffer->unlock();
+
+	// Create the renderable.
+    Renderable renderable;
+    renderable.primitiveType = Renderer::PrimTriangles;
+    renderable.vertexBuffer  = vertexBuffer;
+    renderable.indexBuffer   = indexBuffer;
+	m_renderables.push_back( renderable );
+
+    // Register mapping
+    m_renderableByMesh[handle] = m_renderables.size() - 1;
+
+    // Output log message
+    log::verbose( "Renderable #%d with %d vertices and %d indices constructed from mesh '%s'.\n", m_renderableByMesh[handle], vertices.size(), indices.size(), mesh.name().c_str() );
+
+    return m_renderables.size() - 1;
+}
+
+// ** RenderingContext::requestTexture
+Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image )
+{
+    // Lookup texture by a handle
+    ImageToTexture::const_iterator i = m_textureByImage.find( image.slot() );
+
+    if( i != m_textureByImage.end() ) {
+        return i->second;
+    }
+
+    // Upload this image to a GPU texture
+	Renderer::Texture2DPtr texture = m_hal->createTexture2D( image->width(), image->height(), image->bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+	texture->setData( 0, &image->mipLevel( 0 )[0] );
+
+	// Register mapping from image to texture
+	m_textureByImage[image.slot()] = texture;
+
+    // Output log message
+    log::verbose( "%dx%d %s texture constructed from image '%s'.\n", image->width(), image->height(), image->bytesPerPixel() == 3 ? "RGB8" : "RGBA8", image.name().c_str() );
+
+	return texture;
+}
+
+//! Returns the renderable data by an array index.
+const RenderingContext::Renderable& RenderingContext::renderable( s32 index ) const
+{
+    DC_BREAK_IF( index < 0 || index >= ( s32 )m_renderables.size() );
+    return m_renderables[index];
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

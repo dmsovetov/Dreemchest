@@ -73,7 +73,7 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 		// Initialize the rendering operation
 		rop->transform	= transform.matrix();
-		rop->mesh		= handle.slot();
+		rop->mesh		= ctx.requestRenderable( handle, i );
 		rop->mode		= RenderOpaque;
 		rop->shader		= NULL;
 		rop->distance	= 0;
@@ -94,6 +94,8 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 		if( m_features.is( Distance ) ) {
 			rop->distance = rop->mode == RenderAdditive || rop->mode == RenderTranslucent ? (m_transform->position() - transform.position()).length() : 0;
 		}
+
+        const Material& m = material.readLock(); 
 		
 		for( u32 j = 0; j < Material::TotalMaterialLayers; j++ ) {
 			if( m_features.disabled( BIT( j ) ) ) {
@@ -102,15 +104,21 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 			Material::Layer layer = static_cast<Material::Layer>( j );
 
-			rop->colors[j] = &material->color( layer );
+			rop->colors[j] = &m.color( layer );
 
-			ImageHandle image = material->texture( layer );
+			ImageHandle image = m.texture( layer );
 
-			if( image.isLoaded() ) {
+            if( !image.isValid() ) {
+                continue;
+            }
+
+            const Image& im = image.readLock();
+
+			if( !image.isLoaded() ) {
 				continue;
 			}
 
-			rop->textures[j] = image.slot();
+			rop->textures[j] = ctx.requestTexture( image ).get();
 		}	
 	}
 }

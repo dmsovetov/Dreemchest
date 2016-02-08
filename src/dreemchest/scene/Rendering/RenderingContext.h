@@ -37,6 +37,13 @@ namespace Scene {
 	class RenderingContext : public RefCounted {
 	public:
 
+        //! Renderable data structure.
+        struct Renderable {
+            Renderer::PrimitiveType         primitiveType;  //!< Renderable primitive type.
+            Renderer::VertexBufferPtr       vertexBuffer;   //!< GPU-side vertex buffer constructed from a mesh asset.
+            Renderer::IndexBufferPtr        indexBuffer;    //!< Index buffer constructed from a mesh asset.
+        };
+
 		//! Returns RVM.
 		RvmPtr								rvm( void ) const;
 
@@ -49,6 +56,15 @@ namespace Scene {
 		//! Returns renderer.
 		Renderer::Renderer2DPtr				renderer( void ) const;
 
+        //! Returns the renderable index for a specified mesh asset.
+        s32                                 requestRenderable( const MeshHandle& mesh, s32 chunk );
+
+        //! Returns texture for a specified image asset.
+        Renderer::TexturePtr                requestTexture( const ImageHandle& image );
+
+        //! Returns the renderable data by an array index.
+        const Renderable&                   renderable( s32 index ) const;
+
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( const Renderer::HalPtr& hal );
 
@@ -59,10 +75,19 @@ namespace Scene {
 
 	private:
 
-		RvmPtr								m_rvm;			//!< Rendering virtual machine.
-		ShaderCachePtr						m_shaders;		//!< Shaders cache.
-		Renderer::HalPtr					m_hal;			//!< Rendering HAL.
-		Renderer::Renderer2DPtr				m_renderer;		//!< Rendering interface.
+        //! Container type to store mapping from chunk handle to renderable index.
+        typedef Map<u32, u32> MeshToRenderable;
+
+        //! Container type to store mapping from image handle to texture.
+        typedef Map<u32, Renderer::TexturePtr> ImageToTexture;
+
+		RvmPtr								m_rvm;			    //!< Rendering virtual machine.
+		ShaderCachePtr						m_shaders;		    //!< Shaders cache.
+		Renderer::HalPtr					m_hal;			    //!< Rendering HAL.
+		Renderer::Renderer2DPtr				m_renderer;		    //!< Rendering interface.
+        Array<Renderable>                   m_renderables;      //!< Array of renderable data.
+        ImageToTexture                      m_textureByImage;   //!< Maps from image handle to GPU texture.
+        MeshToRenderable                    m_renderableByMesh; //!< Maps from mesh handle to a renderable index.
 	};
 
 } // namespace Scene
