@@ -28,6 +28,7 @@
 #define __DC_Scene_RenderPass_H__
 
 #include "../Scene.h"
+
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
 

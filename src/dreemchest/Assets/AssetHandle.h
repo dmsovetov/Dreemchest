@@ -88,15 +88,21 @@ namespace Assets {
         template<typename TAsset>
         WriteLock<TAsset>               writeLock( void );
 
-    private:
+    protected:
 
                                         //! Constructs the Handle instance.
                                         Handle( Assets* assets, Index index );
+
+        //! Set an asset handle.
+        void                            setHandle( Assets* assets, Index index );
 
     protected:
 
         Assets*                         m_assets;   //!< An assets manager that issued this handle.
         Index                           m_index;    //!< Asset index.
+    #ifdef DC_DEBUG
+        Asset*                          m_asset;    //!< Pointer to an asset is here to simplify debugging.
+    #endif  /*  DC_DEBUG    */
     };
 
     // ** Handle::data
@@ -151,6 +157,13 @@ namespace Assets {
 
         //! Returns unique asset identifier.
         const AssetId&                  uniqueId( void ) const;
+
+    #ifdef DC_DEBUG
+    private:
+        //! Set an asset handle.
+        void                            setHandle( Assets* assets, Index index );
+        const TAsset*                   m_data; //!< Pointer to asset data to simplify debugging.
+    #endif  /*  DC_DEBUG    */
     };
 
     // ** GenericHandle::GenericHandle
@@ -165,16 +178,14 @@ namespace Assets {
     GenericHandle<TAsset>::GenericHandle( const Handle& asset )
     {
         DC_BREAK_IF( isValid() && asset.isValid() && !asset->type().is<TAsset>() );
-        this->m_assets = asset.assets();
-        this->m_index  = asset.index();
+        this->setHandle( asset.assets(), asset.index() );
     }
 
     // ** GenericHandle::operator =
     template<typename TAsset>
     const GenericHandle<TAsset>& GenericHandle<TAsset>::operator = ( const GenericHandle<TAsset>& other )
     {
-        m_assets = other.assets();
-        m_index  = other.index();
+        this->setHandle( other.assets(), other.index() );
         return *this;
     }
 
@@ -184,6 +195,16 @@ namespace Assets {
     {
         return &data<TAsset>();
     }
+
+#ifdef DC_DEBUG
+    // ** GenericHandle<TAsset>::setHandle
+    template<typename TAsset>
+    void GenericHandle<TAsset>::setHandle( Assets* assets, Index index )
+    {
+        Handle::setHandle( assets, index );
+        m_data = &data<TAsset>();
+    }
+#endif  /*  DC_DEBUG    */
 
     // ** GenericHandle::name
     template<typename TAsset>

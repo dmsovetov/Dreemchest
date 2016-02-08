@@ -28,6 +28,9 @@
 #define __DC_Scene_Component_Rendering_H__
 
 #include "../Scene.h"
+#include "../Assets/Mesh.h"
+#include "../Assets/Image.h"
+#include "../Assets/Material.h"
 #include "../Rendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST

@@ -34,26 +34,25 @@ namespace Assets {
 // ** Handle::Handle
 Handle::Handle( void ) : m_assets( NULL )
 {
-    
+    setHandle( NULL, 0 );
 }
 
 // ** Handle::Handle
-Handle::Handle( Assets* assets, Index index ) : m_assets( assets ), m_index( index )
+Handle::Handle( Assets* assets, Index index ) : m_assets( NULL ), m_index( 0 )
 {
-    
+    setHandle( assets, index );
 }
 
 // ** Handle::Handle
-Handle::Handle( const Handle& other ) : m_assets( other.m_assets ), m_index( other.index() )
+Handle::Handle( const Handle& other ) : m_assets( NULL ), m_index( 0 )
 {
-    
+    setHandle( other.assets(), other.index() );
 }
 
 // ** Handle::operator =
 const Handle& Handle::operator = ( const Handle& other )
 {
-    m_assets = other.m_assets;
-    m_index  = other.index();
+    setHandle( other.assets(), other.index() );
     return *this;
 }
 
@@ -81,6 +80,17 @@ const Asset* Handle::operator -> ( void ) const
 Asset* Handle::operator -> ( void )
 {
     return isValid() ? &asset() : NULL;
+}
+
+// ** Handle::setHandle
+void Handle::setHandle( Assets* assets, Index index )
+{
+    m_assets = assets;
+    m_index  = index;
+
+#ifdef DC_DEBUG
+    m_asset = isValid() ? &asset() : NULL;
+#endif  /*  DC_DEBUG    */
 }
 
 // ** Handle::asset
