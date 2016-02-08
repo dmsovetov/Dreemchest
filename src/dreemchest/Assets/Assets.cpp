@@ -43,7 +43,7 @@ Asset::Asset( void ) : m_state( Unloaded )
 }
 
 // ** Asset::Asset
-Asset::Asset( Type type, const AssetId& uniqueId, AbstractAssetFormat* format )
+Asset::Asset( Type type, const AssetId& uniqueId, FormatUPtr format )
     : m_format( format ), m_type( type ), m_uniqueId( uniqueId ), m_state( Unloaded )
 {
 }
@@ -79,7 +79,7 @@ void Asset::setName( const String& value )
 }
 
 // ** Asset::format
-AbstractAssetFormat* Asset::format( void ) const
+Format* Asset::format( void ) const
 {
     return m_format.get();
 }
@@ -113,7 +113,7 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format )
+Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, FormatUPtr format )
 {
     DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
@@ -189,7 +189,7 @@ bool Assets::loadAssetToCache( Handle asset )
     asset->setCache( reserveAssetData( asset->type() ) );
 
     // Get the asset format
-    AbstractAssetFormat* format = asset->format();
+    Format* format = asset->format();
     DC_BREAK_IF( !format );
 
     // Parse asset

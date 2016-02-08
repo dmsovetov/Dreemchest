@@ -117,7 +117,7 @@ Assets::Handle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
 Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
 {
     // Create asset format by extension
-    Assets::AbstractAssetFileFormat* format = m_assetFormats.construct( type );
+    Assets::AbstractFileFormat* format = m_assetFormats.construct( type );
 
     // Set the source file name
     if( format ) {

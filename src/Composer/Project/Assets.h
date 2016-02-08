@@ -87,7 +87,7 @@ DC_BEGIN_COMPOSER
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
         //! Alias the asset format factory type.
-        typedef AbstractFactory<Assets::AbstractAssetFileFormat, Assets::Type> AssetFormatFactory;
+        typedef AbstractFactory<Assets::AbstractFileFormat, Assets::Type> AssetFormatFactory;
 
 		//! Alias the ext to asset type mapping.
 		typedef Map<String, Assets::Type> AssetTypes;

@@ -31,10 +31,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ------------------------------------------ AbstractAssetFileFormat ------------------------------------------ //
+// ------------------------------------------ AbstractFileFormat ------------------------------------------ //
 
-// ** AbstractAssetFileFormat::parse
-bool AbstractAssetFileFormat::parse( Assets& assets, Handle asset )
+// ** AbstractFileFormat::parse
+bool AbstractFileFormat::parse( Assets& assets, Handle asset )
 {
     Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 
@@ -46,14 +46,14 @@ bool AbstractAssetFileFormat::parse( Assets& assets, Handle asset )
     return result;
 }
 
-// ** AbstractAssetFileFormat::fileName
-const String& AbstractAssetFileFormat::fileName( void ) const
+// ** AbstractFileFormat::fileName
+const String& AbstractFileFormat::fileName( void ) const
 {
     return m_fileName;
 }
 
-// ** AbstractAssetFileFormat::fileName
-void AbstractAssetFileFormat::setFileName( const String& value )
+// ** AbstractFileFormat::fileName
+void AbstractFileFormat::setFileName( const String& value )
 {
     m_fileName = value;
 }

@@ -60,7 +60,7 @@ namespace Assets {
     typedef List<class Handle> AssetList;
 
     // Unique ptr for asset format.
-    typedef AutoPtr<class AbstractAssetFormat> AssetFormatUPtr;
+    typedef AutoPtr<class Format> FormatUPtr;
 
     //! Asset class instance stores info about a single asset.
     class Asset {
@@ -79,7 +79,7 @@ namespace Assets {
                                     Asset( void );
 
                                     //! Constructs Asset instance.
-                                    Asset( Type type, const AssetId& uniqueId, AbstractAssetFormat* format );
+                                    Asset( Type type, const AssetId& uniqueId, FormatUPtr format );
 
         //! Returns asset unique id.
         const AssetId&              uniqueId( void ) const;
@@ -94,7 +94,7 @@ namespace Assets {
         void                        setName( const String& value );
 
         //! Returns an asset format.
-        AbstractAssetFormat*        format( void ) const;
+        Format*                     format( void ) const;
 
         //! Returns asset state.
         State                       state( void ) const;
@@ -115,7 +115,7 @@ namespace Assets {
 
     private:
 
-        AssetFormatUPtr             m_format;       //!< Asset format parser used for loading.
+        FormatUPtr                  m_format;       //!< Asset format parser used for loading.
         Type                        m_type;         //!< Asset type.
         AssetId                     m_uniqueId;     //!< Unique asset id.
         String                      m_name;         //!< Asset name.
@@ -144,7 +144,7 @@ namespace Assets {
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        Handle                      addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format );
+        Handle                      addAsset( const Type& type, const AssetId& uniqueId, FormatUPtr format );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );

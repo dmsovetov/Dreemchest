@@ -34,17 +34,17 @@ DC_BEGIN_DREEMCHEST
 namespace Assets {
 
     //! Base class for all asset format parsers.
-    class AbstractAssetFormat {
+    class Format {
     public:
 
-        virtual         ~AbstractAssetFormat( void ) {}
+        virtual         ~Format( void ) {}
 
         //! Loads data to a specified asset data handle.
         virtual bool    parse( Assets& assets, Handle asset ) = 0;
     };
 
     //! Asset file format used for loading assets from files.
-    class AbstractAssetFileFormat : public AbstractAssetFormat {
+    class AbstractFileFormat : public Format {
     public:
 
         //! Opens the file stream and loads data from it.
@@ -68,7 +68,7 @@ namespace Assets {
 
     //! Generic base class for all asset file format parsers.
     template<typename TAsset>
-    class AssetFileFormat : public AbstractAssetFileFormat {
+    class FileFormat : public AbstractFileFormat {
     protected:
 
         //! Type casts an asset handle and dispatches the loading process to an implementation.
@@ -78,9 +78,9 @@ namespace Assets {
         virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
     };
 
-    // ** AssetFileFormat::parseFromStream
+    // ** FileFormat::parseFromStream
     template<typename TAsset>
-    bool AssetFileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
+    bool FileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
     {
         WriteLock<TAsset> lock = asset.writeLock<TAsset>();
         TAsset&           data = *lock;
