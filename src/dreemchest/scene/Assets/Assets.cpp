@@ -88,6 +88,12 @@ void Asset::switchToState( State value )
     m_state = value;
 }
 
+// ** Asset::setCache
+void Asset::setCache( SlotIndex32 value )
+{
+    m_cache = value;
+}
+
 // --------------------------------------------- Assets --------------------------------------------- //
 
 // ** Assets::Assets
@@ -178,6 +184,9 @@ void Assets::update( f32 dt )
         // Switch to Loading state
         asset->switchToState( Asset::Loading );
 
+        // Reserve asset data before loading
+        asset->setCache( reserveAssetData( asset->type() ) );
+
         // Get the asset format
         AbstractAssetFormat* format = asset->format();
         DC_BREAK_IF( !format );
@@ -208,6 +217,18 @@ void Assets::queueForLoading( const AssetHandle& asset ) const
 
     m_loadingQueue.push_back( asset );
     log::verbose( "Asset '%s' is queued for loading\n", asset->name().c_str() );
+}
+
+// ** Assets::reserveAssetData
+SlotIndex32 Assets::reserveAssetData( const AssetType& type )
+{
+    AssetCaches::iterator i = m_cache.find( type );
+
+    if( i != m_cache.end() ) {
+        return i->second->reserve();
+    }
+
+    return SlotIndex32();
 }
 
 #if ASSET_DEPRECATED

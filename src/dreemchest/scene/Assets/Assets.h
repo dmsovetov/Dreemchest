@@ -84,6 +84,9 @@ namespace Scene {
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
 
+        //! Sets the cache handle.
+        void                        setCache( SlotIndex32 value );
+
     private:
 
         AssetFormatUPtr             m_format;       //!< Asset format parser used for loading.
@@ -148,6 +151,9 @@ namespace Scene {
         template<typename TAsset>
         const TAsset&               assetData( const AssetHandle& asset ) const;
 
+        //! Reserves asset data handle inside the cache.
+        SlotIndex32                 reserveAssetData( const AssetType& type );
+
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
         const TAsset&               acquireReadLock( const AssetHandle& asset ) const;
@@ -164,11 +170,17 @@ namespace Scene {
         //! Abstract asset cache.
         struct AbstractAssetCache {
             virtual                 ~AbstractAssetCache( void ) {}
+
+            //! Reserves the slot handle inside cache.
+            virtual SlotIndex32     reserve( void ) = 0;
         };
 
         //! Generic asset cache that stores asset data of specified type.
         template<typename TAsset>
         struct AssetCache : public AbstractAssetCache {
+            //! Reserves the slot handle inside cache.
+            virtual SlotIndex32         reserve( void ) { return slots.reserve(); }
+
             TAsset                      placeholder;    //!< Default placeholder that is returned for unloaded assets.
             Slots<TAsset, SlotIndex32>  slots;          //!< Cached asset data is stored here.
         };
