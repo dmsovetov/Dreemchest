@@ -34,6 +34,9 @@ DC_BEGIN_DREEMCHEST
     class OpaqueHandle {
     public:
 
+        //! Expose the number of bits used to represent an index.
+        enum { Bits = TBitsIndex };
+
                                 //! Constructs OpaqueHandle instance.
                                 OpaqueHandle( u32 index = ~0, u32 generation = 0 )
                                     : m_index( index ), m_generation( generation ) {}
