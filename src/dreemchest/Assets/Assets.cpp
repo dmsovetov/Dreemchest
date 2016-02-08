@@ -92,7 +92,7 @@ void Asset::switchToState( State value )
 }
 
 // ** Asset::setCache
-void Asset::setCache( SlotIndex32 value )
+void Asset::setCache( Index value )
 {
     m_cache = value;
 }
@@ -115,55 +115,55 @@ Assets::~Assets( void )
 // ** Assets::addAsset
 AssetHandle Assets::addAsset( const Type& type, const AssetId& uniqueId, AbstractAssetFormat* format )
 {
-    DC_BREAK_IF( m_slotById.find( uniqueId ) != m_slotById.end() );
+    DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
     // First reserve the slot for an asset data.
-    SlotIndex32 slot = m_assets.add( Asset( type, uniqueId, format ) );
+    Index index = m_assets.add( Asset( type, uniqueId, format ) );
 
     // Now register unique id associated with this asset slot.
-    m_slotById[uniqueId] = slot;
+    m_indexById[uniqueId] = index;
 
     // Construct an asset handle.
-    return AssetHandle( this, slot );
+    return AssetHandle( this, index );
 }
 
 // ** Assets::removeAsset
 bool Assets::removeAsset( const AssetId& id )
 {
-    // Find handle by id.
-    AssetSlotsById::iterator i = m_slotById.find( id );
-    DC_BREAK_IF( i == m_slotById.end() );
+    // Find index by id.
+    AssetIndexById::iterator i = m_indexById.find( id );
+    DC_BREAK_IF( i == m_indexById.end() );
 
     // Store the slot before and remove the handle mapping.
-    SlotIndex32 slot = i->second;
-    m_slotById.erase( i );
+    Index index = i->second;
+    m_indexById.erase( i );
 
     // Now release an asset data
-    return m_assets.remove( slot );
+    return m_assets.remove( index );
 }
 
 // ** Assets::findAsset
 AssetHandle Assets::findAsset( const AssetId& id ) const
 {
-    AssetSlotsById::const_iterator i = m_slotById.find( id );
+    AssetIndexById::const_iterator i = m_indexById.find( id );
 
-    if( i == m_slotById.end() ) {
+    if( i == m_indexById.end() ) {
         return AssetHandle();
     }
 
     return AssetHandle( const_cast<Assets*>( this ), i->second );
 }
 
-// ** Assets::assetAtSlot
-const Asset& Assets::assetAtSlot( SlotIndex32 slot ) const
+// ** Assets::assetAtIndex
+const Asset& Assets::assetAtIndex( Index index ) const
 {
-    return m_assets.get( slot );
+    return m_assets.get( index );
 }
 
-// ** Assets::isValidSlot
-bool Assets::isValidSlot( SlotIndex32 slot ) const
+// ** Assets::isIndexValid
+bool Assets::isIndexValid( Index index ) const
 {
-    return m_assets.has( slot );
+    return m_assets.has( index );
 }
 
 // ** Assets::releaseWriteLock
@@ -236,7 +236,7 @@ void Assets::queueForLoading( const AssetHandle& asset ) const
 }
 
 // ** Assets::reserveAssetData
-SlotIndex32 Assets::reserveAssetData( const Type& type )
+Index Assets::reserveAssetData( const Type& type )
 {
     AssetCaches::iterator i = m_cache.find( type );
 
@@ -244,7 +244,7 @@ SlotIndex32 Assets::reserveAssetData( const Type& type )
         return i->second->reserve();
     }
 
-    return SlotIndex32();
+    return Index();
 }
 
 } // namespace Assets

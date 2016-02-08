@@ -42,7 +42,7 @@ namespace Assets {
     DECLARE_LOG( log )
 
     //! Opaque 32 bit handle.
-    typedef OpaqueHandle<12, 20> SlotIndex32;
+    typedef OpaqueHandle<12, 20> Index;
 
     //! Forward declaration of an AssetDataHandle type.
     template<typename TAsset> class AssetDataHandle;
@@ -111,7 +111,7 @@ namespace Assets {
         void                        switchToState( State value );
 
         //! Sets the cache handle.
-        void                        setCache( SlotIndex32 value );
+        void                        setCache( Index value );
 
     private:
 
@@ -120,7 +120,7 @@ namespace Assets {
         AssetId                     m_uniqueId;     //!< Unique asset id.
         String                      m_name;         //!< Asset name.
         State                       m_state;        //!< Current asset state.
-        SlotIndex32                 m_cache;        //!< Asset data cache slot.
+        Index                       m_cache;        //!< Asset data cache slot.
         mutable u32                 m_lastModified; //!< Last time this asset was modified.
         mutable u32                 m_lastUsed;     //!< Last time this asset was used.
     };
@@ -160,11 +160,11 @@ namespace Assets {
         //! Forward declaration of generic asset cache type.
         template<typename TAsset>   class AssetCache;
 
-        //! Returns an asset by slot handle.
-        const Asset&                assetAtSlot( SlotIndex32 slot ) const;
+        //! Returns an asset by index.
+        const Asset&                assetAtIndex( Index index ) const;
 
-        //! Returns true if the specified asset slot handle is valid.
-        bool                        isValidSlot( SlotIndex32 slot ) const;
+        //! Returns true if the specified asset index is valid.
+        bool                        isIndexValid( Index index ) const;
 
         //! Puts an asset to a loading queue.
         void                        queueForLoading( const AssetHandle& asset ) const;
@@ -178,7 +178,7 @@ namespace Assets {
         const TAsset&               assetData( const AssetHandle& asset ) const;
 
         //! Reserves asset data handle inside the cache.
-        SlotIndex32                 reserveAssetData( const Type& type );
+        Index                       reserveAssetData( const Type& type );
 
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
@@ -201,27 +201,27 @@ namespace Assets {
             virtual                 ~AbstractAssetCache( void ) {}
 
             //! Reserves the slot handle inside cache.
-            virtual SlotIndex32     reserve( void ) = 0;
+            virtual Index           reserve( void ) = 0;
         };
 
         //! Generic asset cache that stores asset data of specified type.
         template<typename TAsset>
         struct AssetCache : public AbstractAssetCache {
             //! Reserves the slot handle inside cache.
-            virtual SlotIndex32         reserve( void ) { return slots.reserve(); }
+            virtual Index           reserve( void ) { return slots.reserve(); }
 
-            TAsset                      placeholder;    //!< Default placeholder that is returned for unloaded assets.
-            Slots<TAsset, SlotIndex32>  slots;          //!< Cached asset data is stored here.
+            TAsset                  placeholder;    //!< Default placeholder that is returned for unloaded assets.
+            Slots<TAsset, Index>    slots;          //!< Cached asset data is stored here.
         };
 
         //! Container type to store unique id to an asset slot mapping.
-        typedef Map<AssetId, SlotIndex32>   AssetSlotsById;
+        typedef Map<AssetId, Index>   AssetIndexById;
 
         //! Container type to store asset cache for an asset type.
         typedef Map<Type, AbstractAssetCache*> AssetCaches;
 
-        Slots<Asset, SlotIndex32>   m_assets;       //!< All available assets.
-        AssetSlotsById              m_slotById;     //!< AssetId to handle mapping.
+        Slots<Asset, Index>         m_assets;       //!< All available assets.
+        AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
         mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };

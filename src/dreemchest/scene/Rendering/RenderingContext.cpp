@@ -85,7 +85,7 @@ Renderer2DPtr RenderingContext::renderer( void ) const
 s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
 {
     // Construct the renderable handle
-    u32 handle = mesh.slot() | (chunk << Assets::SlotIndex32::Bits);
+    u32 handle = mesh.index() | (chunk << Assets::Index::Bits);
 
     // Lookup renderable index by a handle
     MeshToRenderable::const_iterator i = m_renderableByMesh.find( handle );
@@ -147,7 +147,7 @@ s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
 Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image )
 {
     // Lookup texture by a handle
-    ImageToTexture::const_iterator i = m_textureByImage.find( image.slot() );
+    ImageToTexture::const_iterator i = m_textureByImage.find( image.index() );
 
     if( i != m_textureByImage.end() ) {
         return i->second;
@@ -158,7 +158,7 @@ Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image 
 	texture->setData( 0, &image->mipLevel( 0 )[0] );
 
 	// Register mapping from image to texture
-	m_textureByImage[image.slot()] = texture;
+	m_textureByImage[image.index()] = texture;
 
     // Output log message
     log::verbose( "%dx%d %s texture constructed from image '%s'.\n", image->width(), image->height(), image->bytesPerPixel() == 3 ? "RGB8" : "RGBA8", image.name().c_str() );

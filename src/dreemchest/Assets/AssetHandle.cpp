@@ -38,13 +38,13 @@ AssetHandle::AssetHandle( void ) : m_assets( NULL )
 }
 
 // ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( Assets* assets, SlotIndex32 slot ) : m_assets( assets ), m_slot( slot )
+AssetHandle::AssetHandle( Assets* assets, Index index ) : m_assets( assets ), m_index( index )
 {
     
 }
 
 // ** AssetHandle::AssetHandle
-AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets ), m_slot( other.m_slot )
+AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets ), m_index( other.index() )
 {
     
 }
@@ -53,21 +53,21 @@ AssetHandle::AssetHandle( const AssetHandle& other ) : m_assets( other.m_assets 
 const AssetHandle& AssetHandle::operator = ( const AssetHandle& other )
 {
     m_assets = other.m_assets;
-    m_slot   = other.m_slot;
+    m_index  = other.index();
     return *this;
 }
 
 // ** AssetHandle::operator ==
 bool AssetHandle::operator == ( const AssetHandle& other ) const
 {
-    return other.m_assets == m_assets && other.m_slot == m_slot;
+    return other.m_assets == m_assets && other.index() == index();
 }
 
 // ** AssetHandle::operator <
 bool AssetHandle::operator < ( const AssetHandle& other ) const
 {
     if( other.m_assets != m_assets ) return other.m_assets < m_assets;
-    if( other.m_slot != m_slot ) return other.m_slot < m_slot;
+    if( other.index()  != index()  ) return other.index()  < index();
     return false;
 }
 
@@ -87,20 +87,20 @@ Asset* AssetHandle::operator -> ( void )
 const Asset& AssetHandle::asset( void ) const
 {
     DC_BREAK_IF( !isValid() );
-    return m_assets->assetAtSlot( m_slot );
+    return m_assets->assetAtIndex( index() );
 }
 
 // ** AssetHandle::asset
 Asset& AssetHandle::asset( void )
 {
     DC_BREAK_IF( !isValid() );
-    return const_cast<Asset&>( m_assets->assetAtSlot( m_slot ) );
+    return const_cast<Asset&>( m_assets->assetAtIndex( index() ) );
 }
 
 // ** AssetHandle::isValid
 bool AssetHandle::isValid( void ) const
 {
-    return m_assets && m_assets->isValidSlot( m_slot );
+    return m_assets && m_assets->isIndexValid( index() );
 }
 
 // ** AssetHandle::isLoaded
@@ -109,10 +109,10 @@ bool AssetHandle::isLoaded( void ) const
     return isValid() && (operator->())->state() == Asset::Loaded;
 }
 
-// ** AssetHandle::slot
-SlotIndex32 AssetHandle::slot( void ) const
+// ** AssetHandle::index
+Index AssetHandle::index( void ) const
 {
-    return m_slot;
+    return m_index;
 }
 
 // ** AssetHandle::assets

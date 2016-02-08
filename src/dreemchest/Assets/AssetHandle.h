@@ -70,8 +70,8 @@ namespace Assets {
         const Asset&                    asset( void ) const;
         Asset&                          asset( void );
 
-        //! Returns asset slot.
-        SlotIndex32                     slot( void ) const;
+        //! Returns asset index.
+        Index                           index( void ) const;
 
         //! Returns asset manager that issued this handle.
         Assets*                         assets( void ) const;
@@ -91,12 +91,12 @@ namespace Assets {
     private:
 
                                         //! Constructs the AssetHandle instance.
-                                        AssetHandle( Assets* assets, SlotIndex32 slot );
+                                        AssetHandle( Assets* assets, Index index );
 
     protected:
 
         Assets*                         m_assets;   //!< An assets manager that issued this handle.
-        SlotIndex32                     m_slot;     //!< Asset slot.
+        Index                           m_index;    //!< Asset index.
     };
 
     // ** AssetHandle::data
@@ -166,7 +166,7 @@ namespace Assets {
     {
         DC_BREAK_IF( isValid() && asset.isValid() && !asset->type().is<TAsset>() );
         this->m_assets = asset.assets();
-        this->m_slot   = asset.slot();
+        this->m_index  = asset.index();
     }
 
     // ** AssetDataHandle::operator =
@@ -174,7 +174,7 @@ namespace Assets {
     const AssetDataHandle<TAsset>& AssetDataHandle<TAsset>::operator = ( const AssetDataHandle<TAsset>& other )
     {
         m_assets = other.assets();
-        m_slot   = other.slot();
+        m_index  = other.index();
         return *this;
     }
 
