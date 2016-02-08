@@ -46,7 +46,7 @@ DC_BEGIN_DREEMCHEST
                                 operator u32( void ) const { return m_index; }
 
         //! Returns true if this handle is valid.
-        bool                    isValid( void ) const { return m_index != ~0; }
+        bool                    isValid( void ) const { return m_index != static_cast<u32>( ~0 ) >> (32 - TBitsIndex); }
 
         //! Returns opaque handle generation.
         u32                     generation( void ) const { return m_generation; }
