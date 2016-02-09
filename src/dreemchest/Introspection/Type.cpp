@@ -1,11 +1,7 @@
 /**************************************************************************
-
  The MIT License (MIT)
-
  Copyright (c) 2015 Dmitry Sovetov
-
  https://github.com/dmsovetov
-
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,52 +17,71 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
  **************************************************************************/
 
-#ifndef DREEMCHEST_H
-#define DREEMCHEST_H
+#include "Type.h"
+#include "TypeCast.h"
 
-#define dcInterface
+DC_BEGIN_DREEMCHEST
 
-#ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
-#endif
+namespace Introspection {
 
-#ifdef DC_NAMESPACE
-    #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
-    #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
-    #define DC_END_DREEMCHEST    }
-#else
-    #define DC_USE_DREEMCHEST
-	#define DC_DREEMCHEST_NS
-    #define DC_BEGIN_DREEMCHEST
-    #define DC_END_DREEMCHEST
-#endif
+// ** TypeCast::s_typeCasts
+TypeCast::RegisteredTypeCasts TypeCast::s_typeCasts;
 
-#include "Base/Base.h"
+// ** TypeCast::s_constructed
+bool TypeCast::s_constructed = false;
 
-#ifdef HAVE_JSON
-	#include <json/json.h>
-#endif	/*	HAVE_JSON	*/
+// ** Type::Invalid
+const Type Type::Void;
 
-#ifndef DC_BUILD_LIBRARY
-	#include <Network/Network.h>
-	#include <Io/Io.h>
-	#include <Event/Event.h>
-	#include <Threads/Threads.h>
-    #include <Introspection/Introspection.h>
-	#include <Ecs/Ecs.h>
-	#include <Platform/Platform.h>
-	#include <Threads/Threads.h>
-	#include <Scene/Scene.h>
-	#include <Renderer/Renderer.h>
-	#include <Sound/Sound.h>
-	#include <Mvvm/Mvvm.h>
-	#include <Fx/Fx.h>
-#endif
+// ** Type::Type
+Type::Type( void ) : m_type( ~0 )
+{
+}
 
-#endif  /*  !defined( DREEMCHEST_H )    */
+// ** Type::Type
+Type::Type( const Type& other ) : m_type( other.m_type ), m_size( other.m_size ), m_constructor( other.m_constructor )
+{
+}
+
+// ** Type::Type
+Type::Type( TypeIdx type, s32 size, Constructor constructor ) : m_type( type ), m_size( size ), m_constructor( constructor )
+{
+
+}
+
+// ** Type::operator ==
+bool Type::operator == ( const Type& other ) const
+{
+    return m_type == other.m_type;
+}
+
+// ** Type::operator <
+bool Type::operator < ( const Type& other ) const
+{
+    return m_type < other.m_type;
+}
+
+// ** Type::isValid
+bool Type::isValid( void ) const
+{
+    return !(*this == Void);
+}
+
+// ** Type::size
+s32 Type::size( void ) const
+{
+    return m_size;
+}
+
+// ** Type::construct
+void Type::construct( void* instance, const void* copy ) const
+{
+    DC_BREAK_IF( !m_constructor );
+    m_constructor( instance, copy );
+}
+
+} // namespace Introspection
+
+DC_END_DREEMCHEST
