@@ -344,6 +344,8 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 	sceneObject->attach<Editors::SceneEditorInternal>( sceneObject );
 	m_scene->addSceneObject( sceneObject );
 
+    // This will queue an asset for loading
+    mesh.readLock();
 #if 0
 	// Get all materials
 	Set<Scene::MaterialPtr> materials = m_assets->findByType<Scene::Material>();
