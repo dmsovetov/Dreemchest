@@ -215,7 +215,7 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 // ** Entity::deserialize
 void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
 {
-	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
+//	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
 
 	Components& items = components();
 
