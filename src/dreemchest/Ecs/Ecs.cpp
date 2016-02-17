@@ -38,8 +38,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-IMPLEMENT_LOGGER( log )
-
 // -------------------------------------------------------------- Ecs -------------------------------------------------------------- //
 
 // ** Ecs::Ecs
@@ -99,7 +97,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Ensure we found the archetype type
 	if( !instance.valid() ) {
-		log::error( "Ecs::createArchetypeByName : unknown archetype '%s'\n", name.c_str() );
+		LogError( "Ecs::createArchetypeByName : unknown archetype '%s'\n", name.c_str() );
 		return ArchetypePtr();
 	}
 
@@ -130,7 +128,7 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 
 	// Ensure we found the component type
 	if( !instance.valid() ) {
-		log::error( "Ecs::createComponentByName : unknown component '%s'\n", name.c_str() );
+		LogError( "Ecs::createComponentByName : unknown component '%s'\n", name.c_str() );
 		return ComponentPtr();
 	}
 
@@ -252,7 +250,7 @@ SystemGroupPtr Ecs::createGroup( const String& name, u32 mask )
 void Ecs::notifyEntityChanged( const EntityId& id )
 {
 	if( !isUsedId( id ) ) {
-		log::error( "Ecs::notifyEntityChanged : no such entity ID %s\n", id.toString().c_str() );
+		LogError( "Ecs::notifyEntityChanged : no such entity ID %s\n", id.toString().c_str() );
 		return;
 	}
 

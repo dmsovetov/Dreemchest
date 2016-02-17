@@ -34,10 +34,10 @@ DC_BEGIN_DREEMCHEST
 namespace mvvm {
 
 	//! Base property binding.
-	class IBinding : public RefCounted {
+	class AbstractBinding : public RefCounted {
 	public:
 
-		virtual					~IBinding( void ) {}
+		virtual					~AbstractBinding( void ) {}
 
 		//! Clones this binding.
 		virtual BindingPtr		clone( void ) const = 0;
@@ -63,7 +63,7 @@ namespace mvvm {
 
 	//! A template class to bind a property of a specified type TValue.
 	template<typename TBinding, typename TValue>
-	class Binding : public IBinding {
+	class Binding : public AbstractBinding {
 	public:
 
 		virtual					~Binding( void );

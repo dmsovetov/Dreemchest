@@ -67,7 +67,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 							#ifdef HAVE_FASTLZ
 								return DC_NEW FastLZBufferCompressor;
 							#else
-								log::warn( "Archive::createCompressor : built without FastLZ support\n" );
+								LogWarning( "Archive::createCompressor : built without FastLZ support\n" );
 							#endif
                             break;
 
@@ -75,7 +75,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 							#ifdef HAVE_FASTLZ
 								return DC_NEW ZLibBufferCompressor;
 							#else
-								log::warn( "Archive::createCompressor : built without Zlib support\n" );
+								LogWarning( "Archive::createCompressor : built without Zlib support\n" );
 							#endif
                             break;
 
@@ -223,13 +223,13 @@ bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
 {
     StreamPtr input = openFile( fileName );
     if( input == NULL ) {
-        log::error( "Archive::extractFile : no such file %s in package\n", fileName.c_str() );
+        LogError( "Archive::extractFile : no such file %s in package\n", fileName.c_str() );
         return false;
     }
 
     StreamPtr output = m_diskFileSystem->openFile( outputFileName, BinaryWriteStream );
     if( output == NULL ) {
-        log::error( "Archive::extractFile : failed to open file %s for writing\n", outputFileName.c_str()  );
+        LogError( "Archive::extractFile : failed to open file %s for writing\n", outputFileName.c_str()  );
         return false;
     }
 

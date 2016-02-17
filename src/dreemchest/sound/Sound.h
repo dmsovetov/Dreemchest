@@ -36,7 +36,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Sound {
 
-    DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Sound )
 
     //! Supported sound sample formats.
     enum SoundSampleFormat {

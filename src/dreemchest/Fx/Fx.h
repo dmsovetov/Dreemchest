@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	DECLARE_LOG(log)
+    NIMBLE_LOGGER_TAG( Fx )
 
 	typedef Array<f32> FloatArray;
 

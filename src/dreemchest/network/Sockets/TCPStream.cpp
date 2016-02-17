@@ -85,10 +85,10 @@ s32 TCPStream::write( const void* buffer, s32 size )
         if( result == -1 ) {
 		#ifdef DC_PLATFORM_WINDOWS
 			if( WSAGetLastError() == WSAEWOULDBLOCK ) continue;
-			log::error( "PosixTCPSocket::sendTo : %d\n", PosixNetwork::lastError() );
+			LogError( "PosixTCPSocket::sendTo : %d\n", PosixNetwork::lastError() );
 		#else
 			if( errno == EAGAIN ) continue;
-			log::error( "PosixTCPSocket::sendTo : %s\n", strerror( errno ) );
+			LogError( "PosixTCPSocket::sendTo : %s\n", strerror( errno ) );
 		#endif
 
             return -1;

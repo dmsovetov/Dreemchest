@@ -113,13 +113,13 @@ namespace Renderer {
                 }
 
                 switch( error ) {
-                case GL_INVALID_ENUM:       log::error( "GL_INVALID_ENUM\n" );      break;
-                case GL_INVALID_VALUE:      log::error( "GL_INVALID_VALUE\n" );     break;
-                case GL_INVALID_OPERATION:  log::error( "GL_INVALID_OPERATION\n" ); break;
-                case GL_OUT_OF_MEMORY:      log::error( "GL_OUT_OF_MEMORY\n" );     break;
-                case GL_STACK_OVERFLOW:     log::error( "GL_STACK_OVERFLOW\n" );    break;
-                case GL_STACK_UNDERFLOW:    log::error( "GL_STACK_UNDERFLOW\n" );   break;
-                default:                    log::error( "Unknown OpenGL error\n" );
+                case GL_INVALID_ENUM:       LogError( "GL_INVALID_ENUM\n" );      break;
+                case GL_INVALID_VALUE:      LogError( "GL_INVALID_VALUE\n" );     break;
+                case GL_INVALID_OPERATION:  LogError( "GL_INVALID_OPERATION\n" ); break;
+                case GL_OUT_OF_MEMORY:      LogError( "GL_OUT_OF_MEMORY\n" );     break;
+                case GL_STACK_OVERFLOW:     LogError( "GL_STACK_OVERFLOW\n" );    break;
+                case GL_STACK_UNDERFLOW:    LogError( "GL_STACK_UNDERFLOW\n" );   break;
+                default:                    LogError( "Unknown OpenGL error\n" );
                                             continue;
                 }
 

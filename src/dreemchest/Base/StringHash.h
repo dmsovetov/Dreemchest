@@ -29,6 +29,8 @@
 
 DC_BEGIN_DREEMCHEST
 
+#if 0
+
     // ** class StringHash
     class StringHash {
     public:
@@ -52,6 +54,7 @@ DC_BEGIN_DREEMCHEST
 
         type     m_hash;
     };
+#endif
 
 DC_END_DREEMCHEST
 

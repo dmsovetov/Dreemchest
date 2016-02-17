@@ -133,7 +133,7 @@ namespace Ecs {
 		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
 
 		if( i != m_internal.end() ) {
-			return i->second;
+			return static_cast<T*>( i->second.get() );
 		}
 
 		return typename Internal<T>::Ptr();
@@ -172,13 +172,13 @@ namespace Ecs {
 	inline void ComponentBase::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 	{
         ar = Io::KeyValue::kNull;
-		log::warn( "Component::serialize : is not implemented for '%s'\n", typeName() );
+		LogWarning( "Component::serialize : is not implemented for '%s'\n", typeName() );
 	}
 
 	// ** ComponentBase::deserialize
 	inline void ComponentBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
 	{
-		log::warn( "Component::deserialize : is not implemented for '%s'\n", typeName() );
+		LogWarning( "Component::deserialize : is not implemented for '%s'\n", typeName() );
 	}
 #endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 

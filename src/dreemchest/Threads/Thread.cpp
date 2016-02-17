@@ -66,12 +66,6 @@ ThreadPtr Thread::create( void )
 	return ThreadPtr();
 }
 
-// ** Thread::release
-void Thread::release( void )
-{
-    delete this;
-}
-
 // ** Thread::isAlive
 inline bool Thread::isAlive( void ) const
 {

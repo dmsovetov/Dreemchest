@@ -228,7 +228,7 @@ void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
         const Io::KeyValue& kv = ar.get( key );
 
         if( kv.isNull() ) {
-            log::verbose( "Entity::deserialize : no data for component '%s'\n", key );
+            LogDebug( "Entity::deserialize : no data for component '%s'\n", key );
             continue;
         }
 

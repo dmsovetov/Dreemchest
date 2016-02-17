@@ -31,8 +31,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-IMPLEMENT_LOGGER( log )
-
 // ** FileSystem::FileSystem
 FileSystem::FileSystem( void )
 {

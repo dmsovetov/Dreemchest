@@ -55,16 +55,14 @@ namespace Ecs {
 		//! New entity has been added to index.
 		struct Added {
 								//! Constructs Added instance.
-								Added( const EntityPtr& entity )
-									: entity( entity ) {}
+								Added( const EntityPtr& entity );
 			EntityPtr			entity;	//! Added entity.
 		};
 
 		//! Entity has been removed from index.
 		struct Removed {
 								//! Constructs Removed instance.
-								Removed( const EntityPtr& entity )
-									: entity( entity ) {}
+								Removed( const EntityPtr& entity );
 			EntityPtr			entity;	//! Removed entity.
 		};
 

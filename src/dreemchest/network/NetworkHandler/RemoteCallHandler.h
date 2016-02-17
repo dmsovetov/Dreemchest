@@ -73,7 +73,7 @@ namespace net {
 	template<>
 	inline bool Response<Void>::operator()( const Void& value, const Error& error )
 	{
-		log::warn( "Response<Void> : void responses are ignored\n" ); 
+		LogWarning( "Response<Void> : void responses are ignored\n" ); 
 		return true;
 	}
 

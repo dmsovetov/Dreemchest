@@ -31,8 +31,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-IMPLEMENT_LOGGER( log )
-
 // -------------------------------------------------- BindingFactory -------------------------------------------------- //
 
 // ** BindingFactory::BindingFactory
@@ -191,17 +189,17 @@ bool Bindings::createBinding( ValueWPtr value, Widget widget, const WidgetTypeCh
 			BindingPtr converter = m_factory->createConverter( value->type(), binding->type() );
 		
 			if( !converter.valid() ) {
-				log::warn( "Bindings::createBinding : no converter found to bind the value to a widget.\n" );
+				LogWarning( "Bindings::createBinding : no converter found to bind the value to a widget.\n" );
 				return false;
 			}
 
 			if( !converter->bind( value, NULL ) ) {
-				log::warn( "Bindings::createBinding : failed to create converter.\n" );
+				LogWarning( "Bindings::createBinding : failed to create converter.\n" );
 				return false;				
 			}
 
 			if( !binding->bind( converter->converted(), widget ) ) {
-				log::warn( "Bindings::createBinding : failed to bind to a converted value.\n" );
+				LogWarning( "Bindings::createBinding : failed to bind to a converted value.\n" );
 				return false;				
 			}
 

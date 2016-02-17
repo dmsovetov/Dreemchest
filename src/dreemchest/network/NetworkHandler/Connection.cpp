@@ -143,7 +143,7 @@ void Connection::send( NetworkPacket* packet )
 		return;	// ** The socket was closed.
 	}
 
-	log::verbose( "Packet %s(%d) sent to %s (%d bytes)\n", packet->typeName(), packet->typeId(), m_socket->address().toString(), bytesSent );
+	LogDebug( "Packet %s(%d) sent to %s (%d bytes)\n", packet->typeName(), packet->typeId(), m_socket->address().toString(), bytesSent );
 
 	// ** Increase the sent bytes counter.
 	m_totalBytesSent += bytesSent;
@@ -158,7 +158,7 @@ bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet.id );
 
 	if( i == m_pendingRemoteCalls.end() ) {
-		log::warn( "Connection::handleResponse : invalid request id %d\n", packet.id );
+		LogWarning( "Connection::handleResponse : invalid request id %d\n", packet.id );
 		return false;
 	}
 
@@ -190,7 +190,7 @@ void Connection::update( u32 dt )
 
 	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
 		if( i->second.m_timeLeft < 0 ) {
-			log::warn( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
+			LogWarning( "Connection::update : remote procedure call '%s' timed out\n", i->second.m_name.c_str() );
 			i = m_pendingRemoteCalls.erase( i );
 		} else {
 			++i;

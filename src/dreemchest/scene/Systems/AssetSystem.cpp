@@ -83,7 +83,7 @@ bool AssetSystem::load( AssetWPtr asset ) const
 	if( !loader.valid() ) {
 		DC_BREAK;
 		asset->setState( Asset::LoadingError );
-		log::error( "AssetSystem::load : asset '%s' has invalid asset format\n", asset->name().c_str() );
+		LogError( "AssetSystem::load : asset '%s' has invalid asset format\n", asset->name().c_str() );
 		return false;
 	}
 
@@ -93,7 +93,7 @@ bool AssetSystem::load( AssetWPtr asset ) const
 	if( !stream.valid() ) {
 		DC_BREAK;
 		asset->setState( Asset::LoadingError );
-		log::error( "AssetSystem::load : failed to open the file stream for '%s'\n", asset->name().c_str() );
+		LogError( "AssetSystem::load : failed to open the file stream for '%s'\n", asset->name().c_str() );
 		return false;
 	}
 

@@ -146,7 +146,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 
 	memset( &m_windowClass, 0, sizeof( m_windowClass ) );
 
-	m_className = "dreemchest" + format::number( s_windowCount++ );
+	m_className = "dreemchest" + toString( s_windowCount++ );
 
 	m_windowClass.hCursor		= LoadCursor( NULL, IDC_ARROW );
 	m_windowClass.hInstance		= m_applicationInstance;
@@ -156,7 +156,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 	m_windowClass.hbrBackground	= ( HBRUSH )COLOR_GRAYTEXT;
 
 	if( !RegisterClass( &m_windowClass ) ) {
-		log::error( "WindowsWindow::create : failed to register window class" );
+		LogError( "WindowsWindow::create : failed to register window class" );
 		return false;
 	}
 
@@ -178,7 +178,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 		NULL, NULL, m_applicationInstance, NULL );
 
 	if( !m_window ) {
-		log::error( "WindowsWindow::create : failed to create window" );
+		LogError( "WindowsWindow::create : failed to create window" );
 		return false;
 	}
 

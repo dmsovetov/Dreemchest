@@ -35,7 +35,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace mvvm {
 
-	DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Mvvm )
 
 	//! Generic class to convert between the value type & BSON.
 	template<typename TValue>
@@ -86,7 +86,7 @@ namespace mvvm {
 	//! Widget that is bound to a value.
 	typedef void* Widget;
 
-	dcDeclareNamedPtrs( IBinding, Binding )
+	dcDeclareNamedPtrs( AbstractBinding, Binding )
 	dcDeclareNamedPtrs( ObjectValue, Object )
 	dcDeclarePtrs( Value )
 	dcDeclarePtrs( BindingFactory )

@@ -80,12 +80,12 @@ bool WavSoundDecoder::open( ISoundStreamPtr stream )
     m_rate = waveFormat.nSamplesPerSec;
 
     if( waveFormat.nChannels > 2 ) {
-        log::warn( "WavSoundDecoder::Open : unsupported sound format, file contains %d channels\n", waveFormat.nChannels );
+        LogWarning( "WavSoundDecoder::Open : unsupported sound format, file contains %d channels\n", waveFormat.nChannels );
         return false;
     }
 
     if( waveFormat.wBitsPerSample > 16 ) {
-        log::warn( "WavSoundDecoder::Open : unsupported sound format, sound sample size is %d only 8 and 16 are supported\n", waveFormat.wBitsPerSample );
+        LogWarning( "WavSoundDecoder::Open : unsupported sound format, sound sample size is %d only 8 and 16 are supported\n", waveFormat.wBitsPerSample );
         return false;
     }
 

@@ -52,7 +52,7 @@ bool OggSoundDecoder::open( ISoundStreamPtr stream )
     SoundDecoder::open( stream );
 
     if( ov_open_callbacks( m_stream.get(), m_vorbisFile, NULL, -1, cb ) < 0 ) {
-        log::error( "OggSoundDecoder::Open : ov_open_callbacks failed\n" );
+        LogError( "OggSoundDecoder::Open : ov_open_callbacks failed\n" );
         return false;
     }
 

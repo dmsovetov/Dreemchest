@@ -131,7 +131,7 @@ bool PosixNetwork::requestHostName( String& name ) const
 bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const
 {
 #if defined( DC_PLATFORM_ANDROID )
-	log::error( "PosixNetwork::requestInterfaces : not available on Android devices\n" );
+	LogError( "PosixNetwork::requestInterfaces : not available on Android devices\n" );
 	return false;
 #elif !defined( DC_PLATFORM_WINDOWS )
     ifaddrs *interfaces     = NULL;
@@ -139,7 +139,7 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
 
     s32 success = getifaddrs( &interfaces );
     if( success != 0 ) {
-        log::error( "PosixNetwork::RequestInterfaces : getifaddrs failed, %s\n", strerror( errno ) );
+        LogError( "PosixNetwork::RequestInterfaces : getifaddrs failed, %s\n", strerror( errno ) );
         return false;
     }
 
@@ -189,7 +189,7 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
         pAdapterInfo = ( IP_ADAPTER_INFO* ) malloc( ulOutBufLen );
         if( pAdapterInfo == NULL ) 
 		{
-			log::error( "PosixNetwork::requestInterfaces : error allocating memory needed to call GetAdaptersinfo\n" );
+			LogError( "PosixNetwork::requestInterfaces : error allocating memory needed to call GetAdaptersinfo\n" );
             return false;
         }
     }
@@ -202,38 +202,40 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
 	pAdapter = pAdapterInfo;
 	while (pAdapter) 
 	{
-		log::verbose("\tComboIndex: \t5d\n", pAdapter->ComboIndex);
-		log::verbose("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
-		log::verbose("\tAdapter Desc: \t%s\n", pAdapter->Description);
-		log::verbose("\tAdapter Addr: \t");
+    #if 0
+		LogDebug("\tComboIndex: \t5d\n", pAdapter->ComboIndex);
+		LogDebug("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
+		LogDebug("\tAdapter Desc: \t%s\n", pAdapter->Description);
+		LogDebug("\tAdapter Addr: \t");
 		for (unsigned int i = 0; i < pAdapter->AddressLength; i++) 
 		{
 			if (i == (pAdapter->AddressLength - 1))
-				log::verbose("%.2X\n", (int) pAdapter->Address[i]);
+				LogDebug("%.2X\n", (int) pAdapter->Address[i]);
 			else
-				log::verbose("%.2X-", (int) pAdapter->Address[i]);
+				LogDebug("%.2X-", (int) pAdapter->Address[i]);
 		}
 
-		log::verbose("\tIndex: \t%d\n", pAdapter->Index);
-		log::verbose("\tType: \t");
+		LogDebug("\tIndex: \t%d\n", pAdapter->Index);
+		LogDebug("\tType: \t");
 		switch (pAdapter->Type) 
 		{
-		case MIB_IF_TYPE_OTHER:     log::verbose("Other\n");      break;
-		case MIB_IF_TYPE_ETHERNET:  log::verbose("Ethernet\n");   break;
-		case MIB_IF_TYPE_TOKENRING: log::verbose("Token Ring\n"); break;
-		case MIB_IF_TYPE_FDDI:      log::verbose("FDDI\n");       break;
-		case MIB_IF_TYPE_PPP:       log::verbose("PPP\n");        break;
-		case MIB_IF_TYPE_LOOPBACK:  log::verbose("Lookback\n");   break;
-		case MIB_IF_TYPE_SLIP:      log::verbose("Slip\n");       break;
-		case IF_TYPE_IEEE80211:     log::verbose("IEEE 802.11 wireless network interface\n"); break;
-		default:					log::verbose("Unknown type %ld\n", pAdapter->Type);
+		case MIB_IF_TYPE_OTHER:     LogDebug("Other\n");      break;
+		case MIB_IF_TYPE_ETHERNET:  LogDebug("Ethernet\n");   break;
+		case MIB_IF_TYPE_TOKENRING: LogDebug("Token Ring\n"); break;
+		case MIB_IF_TYPE_FDDI:      LogDebug("FDDI\n");       break;
+		case MIB_IF_TYPE_PPP:       LogDebug("PPP\n");        break;
+		case MIB_IF_TYPE_LOOPBACK:  LogDebug("Lookback\n");   break;
+		case MIB_IF_TYPE_SLIP:      LogDebug("Slip\n");       break;
+		case IF_TYPE_IEEE80211:     LogDebug("IEEE 802.11 wireless network interface\n"); break;
+		default:					LogDebug("Unknown type %ld\n", pAdapter->Type);
 									break;
 		}
 
-		log::verbose("\tIP Address: \t%s\n", pAdapter->IpAddressList.IpAddress.String);
-		log::verbose("\tIP Mask: \t%s\n", pAdapter->IpAddressList.IpMask.String);
-		log::verbose("\tGateway: \t%s\n", pAdapter->GatewayList.IpAddress.String);
-		log::verbose("\t***\n");
+		LogDebug("\tIP Address: \t%s\n", pAdapter->IpAddressList.IpAddress.String);
+		LogDebug("\tIP Mask: \t%s\n", pAdapter->IpAddressList.IpMask.String);
+		LogDebug("\tGateway: \t%s\n", pAdapter->GatewayList.IpAddress.String);
+		LogDebug("\t***\n");
+    #endif
 
 		u_long host_addr = inet_addr(pAdapter->IpAddressList.IpAddress.String);
 		u_long net_mask  = inet_addr(pAdapter->IpAddressList.IpMask.String);
@@ -248,7 +250,9 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
 	//	m_HostBroadcastIPStr = inet_ntoa(*((in_addr*)(&dir_bcast_addr)));
 
 		pAdapter = pAdapter->Next;
-		log::verbose("\n");
+    #if 0
+		LogDebug("\n");
+    #endif
 	}
 
 	if( pAdapterInfo ) {

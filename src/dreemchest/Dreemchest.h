@@ -47,7 +47,15 @@
     #define DC_END_DREEMCHEST
 #endif
 
-#include "Base/Base.h"
+#include <Nimble.h>
+
+#include "Deprecated.h"
+
+#define LogDebug( ... )     log::debug( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
+#define LogVerbose( ... )   log::verbose( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
+#define LogWarning( ... )   log::warn( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
+#define LogError( ... )     log::error( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
+#define LogFatal( ... )     log::fatal( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
 
 #ifdef HAVE_JSON
 	#include <json/json.h>

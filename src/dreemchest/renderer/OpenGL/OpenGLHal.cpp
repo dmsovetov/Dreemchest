@@ -42,10 +42,10 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 
 	DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL );
 
-    log::msg( "GL_VERSION:    %s\n", glGetString( GL_VERSION ) );
-    log::msg( "GL_RENDERER:   %s\n", glGetString( GL_RENDERER ) );
-    log::msg( "GL_VENDOR:     %s\n", glGetString( GL_VENDOR ) );
-    log::msg( "GL_EXTENSIONS: %s\n", glGetString( GL_EXTENSIONS ) );
+    LogVerbose( "GL_VERSION:    %s\n", glGetString( GL_VERSION ) );
+    LogVerbose( "GL_RENDERER:   %s\n", glGetString( GL_RENDERER ) );
+    LogVerbose( "GL_VENDOR:     %s\n", glGetString( GL_VENDOR ) );
+    LogVerbose( "GL_EXTENSIONS: %s\n", glGetString( GL_EXTENSIONS ) );
 
     m_stencilFunc   = Always;
     m_stencilMask   = ~0;
@@ -1151,7 +1151,7 @@ bool OpenGLShader::link( void ) const
     if( result == GL_FALSE ) {
 		s8 error[256];
         glGetShaderInfoLog( m_program, sizeof( error ), NULL, error );
-		log::error( "OpenGLShader::link : %s\n", error );
+		LogError( "OpenGLShader::link : %s\n", error );
         return false;
     }
 
@@ -1177,7 +1177,7 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
 
     if( result == GL_FALSE ) {
         glGetShaderInfoLog( id, errSize, NULL, error );
-		log::error( "OpenGLShader::compile : %s\n", error );
+		LogError( "OpenGLShader::compile : %s\n", error );
         return false;
     }
 

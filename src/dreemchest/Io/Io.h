@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-    DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Io )
 
     class Path;
     class Serializable;

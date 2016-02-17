@@ -70,7 +70,7 @@ bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packet
 // ** ServerHandler::processClientConnection
 void ServerHandler::processClientConnection( TCPSocket* socket )
 {
-	log::verbose( "Client %s connected to server\n", socket->address().toString() );
+	LogVerbose( "Client %s connected to server\n", socket->address().toString() );
 	ConnectionPtr connection = createConnection( socket );
 
 	m_eventEmitter.notify<ClientConnected>( connection );
@@ -81,7 +81,7 @@ void ServerHandler::processClientDisconnection( TCPSocket* socket )
 {
 	ConnectionPtr connection = findConnectionBySocket( socket );
 
-	log::verbose( "Client %s dicconnected from server\n", socket->address().toString() );
+	LogVerbose( "Client %s dicconnected from server\n", socket->address().toString() );
 	removeConnection( socket );
 
 	m_eventEmitter.notify<ClientDisconnected>( connection );
@@ -96,7 +96,7 @@ ConnectionList ServerHandler::eventListeners( void ) const
     for( TCPSocketList::const_iterator i = sockets.begin(), end = sockets.end(); i != end; ++i ) {
 		ConnectionPtr connection = findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) );
 		if( connection == ConnectionPtr() ) {
-			log::msg( "ServerHandler::eventListeners : null\n" );
+			LogDebug( "ServerHandler::eventListeners : null\n" );
 			continue;
 		}
 

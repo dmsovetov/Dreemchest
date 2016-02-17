@@ -41,7 +41,7 @@ u32 SocketDescriptor::ActiveCount = 0;
 SocketDescriptor::SocketDescriptor( s32 socket ) : m_socket( socket )
 {
 	ActiveCount++;
-	log::verbose( "Active socket descriptors: %d\n", ActiveCount );
+	LogDebug( "Active socket descriptors: %d\n", ActiveCount );
 }
 
 // ** SocketDescriptor::SocketDescriptor
@@ -57,7 +57,7 @@ SocketDescriptor::~SocketDescriptor( void )
 {
 	close();
 	ActiveCount--;
-	log::verbose( "Active socket descriptors: %d\n", ActiveCount );
+	LogDebug( "Active socket descriptors: %d\n", ActiveCount );
 }
 
 // ** SocketDescriptor::operator bool
@@ -195,7 +195,7 @@ bool SocketDescriptor::enableAddressReuse( void )
 
     s32 result = setsockopt( m_socket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof( one ) );
 	if( result == SOCKET_ERROR ) {
-		log::error( "SocketDescriptor::enableAddressReuse : setsockopt failed, %d\n", PosixNetwork::lastError() );
+		LogError( "SocketDescriptor::enableAddressReuse : setsockopt failed, %d\n", PosixNetwork::lastError() );
 		DC_BREAK_IF( result == SOCKET_ERROR );
 	}
 

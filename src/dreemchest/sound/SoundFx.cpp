@@ -45,8 +45,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Sound {
 
-IMPLEMENT_LOGGER( log )
-
 // ------------------------------------------------------ SoundFx ------------------------------------------------------ //
 
 // ** SoundFx::SoundFx
@@ -58,7 +56,7 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener ) : m_hal( NULL ),
                     #ifdef DC_HAVE_OPENAL
                         m_hal = DC_NEW OpenAL;
                     #else
-                        log::error( "SoundFx::SoundFx : the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
+                        LogError( "SoundFx::SoundFx : the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
                     #endif
                     break;
     }
@@ -81,7 +79,7 @@ SoundGroupWPtr SoundFx::createGroup( CString identifier )
     DC_BREAK_IF( identifier == NULL );
 
     if( findGroupByName( identifier ).valid() ) {
-        log::warn( "SoundFx::createGroup : failed to create group, group with a same name '%s' found\n", identifier );
+        LogWarning( "SoundFx::createGroup : failed to create group, group with a same name '%s' found\n", identifier );
         return NULL;
     }
 
@@ -101,7 +99,7 @@ SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupW
 
     // Ensure we don't have a sound with a same name.
     if( findSoundByName( identifier ).valid() ) {
-        log::warn( "SoundFx::createSound : failed to create sound, sound with a same name '%s' found\n", identifier );
+        LogWarning( "SoundFx::createSound : failed to create sound, sound with a same name '%s' found\n", identifier );
         return NULL;
     }
 
@@ -120,7 +118,7 @@ SoundEventWPtr SoundFx::createEvent( CString identifier )
     DC_BREAK_IF( identifier == NULL )
 
     if( findEventByName( identifier ).valid() ) {
-        log::warn( "SoundFx::createEvent : failed to create event, sound with a same name '%s' found\n", identifier );
+        LogWarning( "SoundFx::createEvent : failed to create event, sound with a same name '%s' found\n", identifier );
         return NULL;
     }
 
@@ -240,14 +238,14 @@ SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
     DC_BREAK_IF( data == NULL );
     
     if( m_hal == NULL ) {
-        log::error( "SoundFx::createSource : failed to create sound source for '%s', no HAL created.\n", data->identifier() );
+        LogError( "SoundFx::createSource : failed to create sound source for '%s', no HAL created.\n", data->identifier() );
         return NULL;
     }
 
     // ** Create sound source
     SoundSourcePtr source = m_hal->createSource();
     if( !source.valid() ) {
-        log::error( "SoundFx::createSource : failed to create sound source for '%s'\n", data->identifier() );
+        LogError( "SoundFx::createSource : failed to create sound source for '%s'\n", data->identifier() );
         return NULL;
     }
 
@@ -265,14 +263,14 @@ SoundBufferPtr SoundFx::createBuffer( SoundDataWPtr data )
     DC_BREAK_IF( data == NULL );
 
     if( !m_hal.valid() ) {
-        log::error( "SoundFx::createBuffer : failed to create sound buffer for '%s', no HAL created.\n", data->identifier() );
+        LogError( "SoundFx::createBuffer : failed to create sound buffer for '%s', no HAL created.\n", data->identifier() );
         return NULL;
     }
 
     // ** Create sound decoder
     SoundDecoderPtr decoder = createDecoder( data );
     if( !decoder.valid() && !data->pcm().valid() ) {
-        log::error( "SoundFx::createBuffer : failed to create sound decoder for '%s'\n", data->identifier() );
+        LogError( "SoundFx::createBuffer : failed to create sound decoder for '%s'\n", data->identifier() );
         return NULL;
     }
 
@@ -297,7 +295,7 @@ SoundDecoderPtr SoundFx::createDecoder( SoundDataWPtr data )
     ISoundStreamPtr stream = m_streamOpener->open( data->uri() );
 
     if( !stream.valid() ) {
-        log::error( "SoundFx::createDecoder : failed to open sound stream %s\n", data->uri() );
+        LogError( "SoundFx::createDecoder : failed to open sound stream %s\n", data->uri() );
         return SoundDecoderPtr();
     }
 
@@ -333,7 +331,7 @@ SoundChannelPtr SoundFx::event( CString identifier )
     SoundEventWPtr event = findEventByName( identifier );
 
     if( event == NULL ) {
-        log::error( "SoundFx::event : no such event '%s'\n", identifier );
+        LogError( "SoundFx::event : no such event '%s'\n", identifier );
         return NULL;
     }
 
@@ -341,7 +339,7 @@ SoundChannelPtr SoundFx::event( CString identifier )
     const char* label = event->requestIdentifier();
 
     if( label == NULL ) {
-        log::msg( "Event '%s' skipped due to probability\n", identifier );
+        LogVerbose( "Event '%s' skipped due to probability\n", identifier );
         return NULL;
     }
 
@@ -355,7 +353,7 @@ SoundChannelPtr SoundFx::play( CString identifier )
     SoundDataWPtr data = findSoundByName( identifier );
 
     if( data == NULL ) {
-        log::error( "SoundFx::play : no such sound '%s'\n", identifier );
+        LogError( "SoundFx::play : no such sound '%s'\n", identifier );
         return NULL;
     }
 
@@ -374,7 +372,7 @@ SoundChannelPtr SoundFx::play( CString identifier )
     SoundSourcePtr source = createSource( data );
 
     if( !source.valid() ) {
-        log::error( "SoundFx::play : failed to start playback for '%s', no sound source created\n", identifier );
+        LogError( "SoundFx::play : failed to start playback for '%s', no sound source created\n", identifier );
         return NULL;
     }
 
@@ -389,7 +387,7 @@ SoundChannelPtr SoundFx::play( CString identifier )
         group->addSound( channel );
     }
 
-    log::verbose( "Channel for %s created (%x)\n", identifier, channel );
+    LogVerbose( "Channel for %s created (%x)\n", identifier, channel );
 
     return channel;
 }
@@ -471,15 +469,15 @@ bool SoundFx::load( const char *identifier )
     setData( data );
 
     u32 size = 0;
-    log::verbose( "Loading sounds...\n" );
+    LogDebug( "Loading sounds...\n" );
     for( Sounds::iterator i = m_sounds.begin(), end = m_sounds.end(); i != end; ++i ) {
         if( i->second->loading() == SoundData::Decode ) {
-            log::verbose( "Decoding sound '%s'...\n", i->second->identifier() );
+            LogDebug( "Decoding sound '%s'...\n", i->second->identifier() );
             SoundBuffer* buffer = createBuffer( i->second.get() );
             size += buffer->size();
         }
     }
-    log::verbose( "%2.2fmb of PCM data loaded\n", f32( size ) / 1024 / 1024 );
+    LogDebug( "%2.2fmb of PCM data loaded\n", f32( size ) / 1024 / 1024 );
 */
     return true;
 }
@@ -496,27 +494,27 @@ void SoundFx::reset( void )
 // ** SoundFx::volume
 f32 SoundFx::volume( void ) const
 {
-    log::warn( "SoundFx::volume : not implemented\n" );
+    LogWarning( "SoundFx::volume : not implemented\n" );
     return 0.0f;
 }
 
 // ** SoundFx::setVolume
 void SoundFx::setVolume( f32 value )
 {
-    log::warn( "SoundFx::setVolume : not implemented\n" );
+    LogWarning( "SoundFx::setVolume : not implemented\n" );
 }
 
 // ** SoundFx::pitch
 f32 SoundFx::pitch( void ) const
 {
-    log::warn( "SoundFx::pitch : not implemented\n" );
+    LogWarning( "SoundFx::pitch : not implemented\n" );
     return 0.0f;
 }
 
 // ** SoundFx::setPitch
 void SoundFx::setPitch( f32 value )
 {
-    log::warn( "SoundFx::setPitch : not implemented\n" ); 
+    LogWarning( "SoundFx::setPitch : not implemented\n" ); 
 }
 
 // ** SoundGroups& SoundFx::groups

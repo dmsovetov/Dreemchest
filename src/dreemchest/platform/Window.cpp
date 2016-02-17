@@ -30,8 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-IMPLEMENT_LOGGER( log )
-
 //! Platform-specific window constructor.
 extern IWindow* createWindow( u32 width, u32 height );
 
@@ -39,7 +37,7 @@ extern IWindow* createWindow( u32 width, u32 height );
 Window::Window( IWindow* impl ) : m_impl( impl )
 {
     if( m_impl ) m_impl->setOwner( this );
-    else         log::warn( "Window::Window : windows are not available on current platform\n" );
+    else         LogWarning( "Window::Window : windows are not available on current platform\n" );
 }
 
 // ** Window::~Window
@@ -79,7 +77,7 @@ u32 Window::width( void ) const
         return m_impl->width();
     }
 
-    log::warn( "Window::width : window is not implemented\n" );
+    LogWarning( "Window::width : window is not implemented\n" );
     return 0;
 }
 
@@ -90,7 +88,7 @@ u32 Window::height( void ) const
         return m_impl->height();
     }
 
-    log::warn( "Window::height : window is not implemented\n" );
+    LogWarning( "Window::height : window is not implemented\n" );
     return 0;
 }
 
@@ -111,7 +109,7 @@ void Window::mapCursorToWindow( s32& x, s32& y ) const
 String Window::caption( void ) const
 {
     if( m_impl == NULL ) {
-        log::warn( "Window::caption : window is not implemented\n" );
+        LogWarning( "Window::caption : window is not implemented\n" );
         return "";
     }
 
@@ -122,7 +120,7 @@ String Window::caption( void ) const
 void Window::setCaption( const String& value )
 {
     if( m_impl == NULL ) {
-        log::warn( "Window::setCaption : window is not implemented\n" );
+        LogWarning( "Window::setCaption : window is not implemented\n" );
         return;
     }
 
@@ -133,7 +131,7 @@ void Window::setCaption( const String& value )
 void* Window::handle( void ) const
 {
     if( m_impl == NULL ) {
-        log::warn( "Window::handle : window is not implemented\n" );
+        LogWarning( "Window::handle : window is not implemented\n" );
         return NULL;
     }
 

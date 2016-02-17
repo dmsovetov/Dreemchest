@@ -826,7 +826,7 @@ String KeyValue::stringify( const KeyValue& kv, bool formatted )
 	Json::Value json = toJson( kv );
 	return formatted ? json.toStyledString() : Json::FastWriter().write( json );
 #else
-	log::error( "KeyValue::stringify : failed to convert to string, built with no JSON support.\n" );
+	LogError( "KeyValue::stringify : failed to convert to string, built with no JSON support.\n" );
 	return "";
 #endif	/*	HAVE_JSON	*/
 }
@@ -839,13 +839,13 @@ KeyValue KeyValue::parse( const String& text )
 	Json::Reader reader;
 	
 	if( !reader.parse( text, json ) ) {
-		log::warn( "KeyValue::parse : failed to parse JSON string.\n" );
+		LogWarning( "KeyValue::parse : failed to parse JSON string.\n" );
 		return kNull;
 	}
 
 	return fromJson( json );
 #else
-	log::error( "KeyValue::parse : failed to parse from string, built with no JSON support.\n" );
+	LogError( "KeyValue::parse : failed to parse from string, built with no JSON support.\n" );
 	return kNull;
 #endif	/*	HAVE_JSON	*/
 }

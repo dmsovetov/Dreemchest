@@ -223,7 +223,7 @@ AssetBundlePtr AssetBundle::createFromFile( const String& name, const Io::Path& 
 	String text = Io::DiskFileSystem::readTextFile( fileName );
 
 	if( text == "" ) {
-		log::warn( "AssetBundle::createFromFile : %s, file does not exist or empty\n", fileName.c_str() );
+		LogWarning( "AssetBundle::createFromFile : %s, file does not exist or empty\n", fileName.c_str() );
 		return AssetBundlePtr();
 	}
 
@@ -347,7 +347,7 @@ bool AssetBundle::loadFromString( const String& text )
 // ** AssetBundle::addAsset
 void AssetBundle::addAsset( AssetPtr asset )
 {
-	log::msg( "Adding asset '%s' to bundle '%s'...\n", asset->name().c_str(), m_name.c_str() );
+	LogVerbose( "Adding asset '%s' to bundle '%s'...\n", asset->name().c_str(), m_name.c_str() );
 
 	// Register an asset by it's UUID
 	const String& uuid = asset->uuid();
@@ -357,7 +357,7 @@ void AssetBundle::addAsset( AssetPtr asset )
 	StringHash hashUuid( uuid.c_str() );
 
 	if( m_assets.count( hashUuid ) ) {
-		log::error( "AssetBundle::addAsset : asset bundle '%s' already contains an asset '%s'\n", m_name.c_str(), uuid.c_str() );
+		LogError( "AssetBundle::addAsset : asset bundle '%s' already contains an asset '%s'\n", m_name.c_str(), uuid.c_str() );
 		return;
 	}
 
@@ -400,7 +400,7 @@ void AssetBundle::removeAsset( const String& uuid )
 	Assets::iterator i = m_assets.find( StringHash( uuid.c_str() ) );
 
 	if( i == m_assets.end() ) {
-		log::warn( "AssetBundle::removeAsset : '%s' is not a valid asset id\n", uuid.c_str() );
+		LogWarning( "AssetBundle::removeAsset : '%s' is not a valid asset id\n", uuid.c_str() );
 		return;
 	}
 

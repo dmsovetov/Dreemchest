@@ -144,7 +144,7 @@ ParticlesWPtr Emitter::addParticles( void )
 void Emitter::addModule( const ModulePtr& module )
 {
 	DC_BREAK_IF( !module.valid() );
-	log::verbose( "%s emitter module added\n", module->name().c_str() );
+	LogDebug( "%s emitter module added\n", module->name().c_str() );
 	m_modules.push_back( module );
 }
 

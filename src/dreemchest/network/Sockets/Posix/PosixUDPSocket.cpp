@@ -67,7 +67,7 @@ u32 PosixUDPSocket::send( const NetworkAddress& address, u16 port, const void* b
     // ** Send datagram
     s32 result = sendto( m_socket, ( s8* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
     if( result == -1 ) {
-        log::warn( "PosixUDPSocket::Send : failed to send data to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
+        LogWarning( "PosixUDPSocket::Send : failed to send data to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
         DC_BREAK;
 		return 0;
     }
@@ -104,7 +104,7 @@ void PosixUDPSocket::update( void )
     if( size <= 0 ) {
 	#if defined( DC_PLATFORM_WINDOWS )
 		if( WSAGetLastError() == WSAEWOULDBLOCK ) { return; }
-		log::error( "PosixUDPSocket::update : recvfrom failed, %d\n", PosixNetwork::lastError() );
+		LogError( "PosixUDPSocket::update : recvfrom failed, %d\n", PosixNetwork::lastError() );
 	#else
 		if( errno != EAGAIN ) { DC_BREAK; }
 	#endif

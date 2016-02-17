@@ -52,10 +52,10 @@ namespace Scene {
 		virtual u32					height( void ) const { return 0; }
 
 		//! Begins rendering to this target.
-		virtual void				begin( RenderingContextPtr context ) const {}
+		virtual void				begin( RenderingContextPtr context ) const;
 
 		//! Ends rendering to this target.
-		virtual void				end( RenderingContextPtr context ) const {}
+		virtual void				end( RenderingContextPtr context ) const;
 	};
 
 	//! WindowTarget is used for rendering the scene to window.

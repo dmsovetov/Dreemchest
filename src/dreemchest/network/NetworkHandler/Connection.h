@@ -36,7 +36,7 @@ namespace net {
 
 	//! Remote connection interface.
 	class Connection : public RefCounted {
-	EmbedUserData
+	//EmbedUserData
 	friend class NetworkHandler;
 	public:
 

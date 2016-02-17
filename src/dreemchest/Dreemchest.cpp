@@ -24,44 +24,10 @@
 
  **************************************************************************/
 
-#include "SystemGroup.h"
-#include "../Entity/Entity.h"
+#include "Dreemchest.h"
 
-DC_BEGIN_DREEMCHEST
+#ifdef DC_PLATFORM_WINDOWS
+    #include <Windows.h>
+#endif  /*  DC_PLATFORM_WINDOWS */
 
-namespace Ecs {
-
-// ** SystemGroup::SystemGroup
-SystemGroup::SystemGroup( EcsWPtr ecs, const String& name, u32 mask ) : m_ecs( ecs ), m_name( name ), m_mask( mask ), m_isLocked( false )
-{
-
-}
-
-// ** SystemGroup::mask
-u32 SystemGroup::mask( void ) const
-{
-	return m_mask;
-}
-
-// ** SystemGroup::update
-void SystemGroup::update( u32 currentTime, f32 dt )
-{
-	m_isLocked = true;
-
-	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
-        // Update the system
-		m_systems[i].m_system->update( currentTime, dt );
-
-    #if DC_ECS_ITERATIVE_INDEX_REBUILD
-        // Now rebuild & cleanup entities
-        m_ecs->rebuildChangedEntities();
-        m_ecs->cleanupRemovedEntities();
-    #endif  /*  DC_ECS_ITERATIVE_INDEX_REBUILD  */
-	}
-
-	m_isLocked = false;
-}
-
-} // namespace Ecs
-
-DC_END_DREEMCHEST
+NIMBLE_LOGGER_STATIC()
