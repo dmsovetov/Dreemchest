@@ -26,6 +26,11 @@ set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 # Add include directory
 include_directories(Dreemchest)
 
+# Add Nimble subproject
+include_directories(Nimble)
+add_definitions(-DNIMBLE_NAMESPACE=DC_NAMESPACE)
+add_subdirectory(Nimble)
+
 # Setup definitions
 if (DC_QT_SUPPORT MATCHES "Auto")
 	find_package(Qt4 QUIET)
