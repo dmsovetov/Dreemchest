@@ -131,7 +131,7 @@ bool PosixNetwork::requestHostName( String& name ) const
 bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const
 {
 #if defined( DC_PLATFORM_ANDROID )
-	LogError( "PosixNetwork::requestInterfaces : not available on Android devices\n" );
+	LogError( "requestInterfaces", "not available on Android devices\n" );
 	return false;
 #elif !defined( DC_PLATFORM_WINDOWS )
     ifaddrs *interfaces     = NULL;
@@ -139,7 +139,7 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
 
     s32 success = getifaddrs( &interfaces );
     if( success != 0 ) {
-        LogError( "PosixNetwork::RequestInterfaces : getifaddrs failed, %s\n", strerror( errno ) );
+        LogError( "requestInterfaces", "getifaddrs failed, %s\n", strerror( errno ) );
         return false;
     }
 
@@ -189,7 +189,7 @@ bool PosixNetwork::requestInterfaces( NetworkAddressArray& broadcast, NetworkAdd
         pAdapterInfo = ( IP_ADAPTER_INFO* ) malloc( ulOutBufLen );
         if( pAdapterInfo == NULL ) 
 		{
-			LogError( "PosixNetwork::requestInterfaces : error allocating memory needed to call GetAdaptersinfo\n" );
+			LogError( "requestInterfaces", "error allocating memory needed to call GetAdaptersinfo\n" );
             return false;
         }
     }

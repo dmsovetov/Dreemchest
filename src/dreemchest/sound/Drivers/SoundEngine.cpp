@@ -66,7 +66,7 @@ SoundBufferPtr SoundEngine::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) const
 {
     switch( format ) {
-    case SoundFormatUnknown:    LogWarning( "SoundEngine::createSoundDecoder : unknown sound format\n" );
+    case SoundFormatUnknown:    LogWarning( "soundEngine", "unknown sound format\n" );
                                 return SoundDecoderPtr();
 
     case SoundFormatWav:        return DC_NEW WavSoundDecoder;
@@ -74,14 +74,14 @@ SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) c
 								#ifdef DC_HAVE_MP3
 									return DC_NEW Mp3SoundDecoder;
 								#else
-									LogWarning( "SoundEngine::createSoundDecoder : MP3 sound decoder is not supported\n" );
+									LogWarning( "soundEngine", "MP3 sound decoder is not supported\n" );
 								#endif
 								break;
     case SoundFormatOgg:
 								#ifdef DC_HAVE_VORBIS
 									return DC_NEW OggSoundDecoder;
 								#else
-									LogWarning( "SoundEngine::createSoundDecoder : Vorbis sound decoder is not supported\n" );
+									LogWarning( "soundEngine", "Vorbis sound decoder is not supported\n" );
 								#endif
 								break;
     }
@@ -97,7 +97,7 @@ SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr strea
     SoundDecoderPtr soundDecoder = createSoundDecoder( format );
 
     if( !soundDecoder.valid() ) {
-        LogError( "OpenAL::createSoundDecoder : failed to open file\n" );
+        LogError( "soundEngine", "failed to open file\n" );
         return SoundDecoderPtr();
     }
 
@@ -105,7 +105,7 @@ SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr strea
         return soundDecoder;
     }
 
-    LogError( "OpenAL::createSoundDecoder : unknown file format\n" );
+    LogError( "soundEngine", "unknown file format\n" );
     return SoundDecoderPtr();
 }
 

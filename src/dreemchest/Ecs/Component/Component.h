@@ -172,13 +172,13 @@ namespace Ecs {
 	inline void ComponentBase::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 	{
         ar = Io::KeyValue::kNull;
-		LogWarning( "Component::serialize : is not implemented for '%s'\n", typeName() );
+		LogWarning( "serialize", "not implemented for component '%s'\n", typeName() );
 	}
 
 	// ** ComponentBase::deserialize
 	inline void ComponentBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
 	{
-		LogWarning( "Component::deserialize : is not implemented for '%s'\n", typeName() );
+		LogWarning( "deserialize", "not implemented for component '%s'\n", typeName() );
 	}
 #endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 

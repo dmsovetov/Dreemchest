@@ -110,7 +110,7 @@ void PosixTCPSocketListener::update( void )
 	// ** Do a select
 	if( select( nfds, &read, &write, &except, &waitTime ) <= 0 ) {
 		if( PosixNetwork::lastError() ) {
-			LogError( "PosixTCPSocketListener::update : select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
+			LogError( "socket", "select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
 		}
 		return;
 	}
@@ -123,7 +123,7 @@ void PosixTCPSocketListener::update( void )
 		m_delegate->handleConnectionAccepted( m_parent, accepted.get() );
 	}
 	else if( FD_ISSET( m_socket, &except ) ) {
-		LogError( "PosixTCPSocketListener::update : error on listening socket: %d\n", m_socket.error() );
+		LogError( "socket", "error on listening socket: %d\n", m_socket.error() );
 		return;
 	}
 
@@ -145,14 +145,14 @@ void PosixTCPSocketListener::update( void )
 			}
 			if( FD_ISSET( descriptor, &write ) ) {
 				FD_CLR( descriptor, &write );
-			//	LogDebug( "PosixTCPSocketListener::update : writable socket handle %d\n", ( s32 )descriptor );
+			//	LogDebug( "socket", "writable socket handle %d\n", ( s32 )descriptor );
 			}
 		}
 
 		if( hasError ) {
 			s32 error = descriptor.error();
 			if( error != 0 ) {
-				LogError( "PosixTCPSocketListener::update : socket error %\n", error );
+				LogError( "socket", "update socket error %\n", error );
 			}
 			socket->close();
 		}
@@ -213,7 +213,7 @@ bool PosixTCPSocketListener::bindTo( u16 port )
     m_socket = socket( PF_INET, SOCK_STREAM, 0 );
 
 	if( !m_socket.isValid() ) {
-		LogError( "PosixTCPSocketListener::bindTo : failed to create socket, %d\n%s\n", PosixNetwork::lastError(), PosixNetwork::lastErrorMessage().c_str() );
+		LogError( "socket", "failed to create socket, %d\n%s\n", PosixNetwork::lastError(), PosixNetwork::lastErrorMessage().c_str() );
 		return false;
 	}
 
@@ -221,7 +221,7 @@ bool PosixTCPSocketListener::bindTo( u16 port )
 	s32 result = bind( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result == SOCKET_ERROR ) {
-		LogError( "PosixTCPSocketListener::bindTo : bind failed, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "bind failed, %d\n", PosixNetwork::lastError() );
 		return false;
 	}
 
@@ -235,7 +235,7 @@ bool PosixTCPSocketListener::bindTo( u16 port )
     result = listen( m_socket, 16 );
    
 	if( result == SOCKET_ERROR ) {
-		LogError( "PosixTCPSocketListener::bindTo : listen failed, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "listen failed, %d\n", PosixNetwork::lastError() );
 		return false;
 	}
     

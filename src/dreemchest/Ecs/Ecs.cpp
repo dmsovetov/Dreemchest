@@ -97,7 +97,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Ensure we found the archetype type
 	if( !instance.valid() ) {
-		LogError( "Ecs::createArchetypeByName : unknown archetype '%s'\n", name.c_str() );
+		LogError( "entity", "unknown archetype '%s'\n", name.c_str() );
 		return ArchetypePtr();
 	}
 
@@ -128,7 +128,7 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 
 	// Ensure we found the component type
 	if( !instance.valid() ) {
-		LogError( "Ecs::createComponentByName : unknown component '%s'\n", name.c_str() );
+		LogError( "entity", "unknown component '%s'\n", name.c_str() );
 		return ComponentPtr();
 	}
 
@@ -250,7 +250,7 @@ SystemGroupPtr Ecs::createGroup( const String& name, u32 mask )
 void Ecs::notifyEntityChanged( const EntityId& id )
 {
 	if( !isUsedId( id ) ) {
-		LogError( "Ecs::notifyEntityChanged : no such entity ID %s\n", id.toString().c_str() );
+		LogDebug( "entity", "changed with invalid id %s\n", id.toString().c_str() );
 		return;
 	}
 

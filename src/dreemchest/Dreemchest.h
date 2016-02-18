@@ -51,11 +51,11 @@
 
 #include "Deprecated.h"
 
-#define LogDebug( ... )     log::debug( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
-#define LogVerbose( ... )   log::verbose( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
-#define LogWarning( ... )   log::warn( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
-#define LogError( ... )     log::error( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
-#define LogFatal( ... )     log::fatal( NIMBLE_LOGGER_CONTEXT, __VA_ARGS__ )
+#define LogDebug( prefix, message, ... )     log::debug( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
+#define LogVerbose( prefix, message, ... )   log::verbose( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
+#define LogWarning( prefix, message, ... )   log::warn( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
+#define LogError( prefix, message, ... )     log::error( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
+#define LogFatal( prefix, message, ... )     log::fatal( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
 
 #ifdef HAVE_JSON
 	#include <json/json.h>

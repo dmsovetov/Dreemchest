@@ -87,7 +87,7 @@ void Index::notifyEntityChanged( const EntityPtr& entity )
 // ** Index::processEntityAdded
 void Index::processEntityAdded( const EntityPtr& entity )
 {
-	LogDebug( "%s: entity %d added\n", m_name.c_str(), entity->id() );
+	LogDebug( "entityIndex", "%s added to %s\n", entity->id().toString().c_str(), m_name.c_str() );
 	m_entities.insert( entity );
 	m_eventEmitter.notify<Added>( entity );
 }
@@ -95,7 +95,7 @@ void Index::processEntityAdded( const EntityPtr& entity )
 // ** Index::processEntityRemoved
 void Index::processEntityRemoved( const EntityPtr& entity )
 {
-	LogDebug( "%s: entity %d removed\n", m_name.c_str(), entity->id() );
+	LogDebug( "entityIndex", "%s removed from %s\n", entity->id().toString().c_str(), m_name.c_str() );
 	m_eventEmitter.notify<Removed>( entity );
 	m_entities.erase( entity );
 }

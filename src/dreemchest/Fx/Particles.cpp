@@ -115,7 +115,7 @@ void Particles::addModule( const ModulePtr& module )
 {
     // Add new module
 	DC_BREAK_IF( !module.valid() );
-	LogDebug( "%s particle module added\n", module->name().c_str() );
+	LogDebug( "particles", "module %s added\n", module->name().c_str() );
 	m_modules.push_back( module );
 
     // Sort by execution priority

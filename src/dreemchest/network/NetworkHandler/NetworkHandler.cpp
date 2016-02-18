@@ -111,7 +111,7 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 {
 	using namespace Io;
 
-	LogDebug( "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
+	LogDebug( "socket", "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
 
 	// ** Find a connection by socket
 	ConnectionPtr connection = findConnectionBySocket( socket );
@@ -126,21 +126,20 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 	for( Serializables::iterator i = packets.begin(), end = packets.end(); i != end; ++i ) {
 		NetworkPacket* packet = i->get();
 
-		LogDebug( "Packet %s(%d) received from %s\n", packet->typeName(), packet->typeId(), socket->address().toString() );
+		LogDebug( "packet", "%s received from %s\n", packet->typeName(), socket->address().toString() );
 
 		PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
 		if( j == m_packetHandlers.end() ) {
-			LogWarning( "NetworkHandler::processReceivedData : unhandled packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
+			LogWarning( "packet", "unhandled packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 			continue;
 		}
 
-		LogDebug( "Packet [%s] received from %s\n", packet->typeName(), socket->address().toString() );
 		if( !j->second->handle( connection, packet ) ) {
-			LogWarning( "NetworkHandler::processReceivedData : invalid packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
+			LogWarning( "packet", "malformed packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
 		}
 	}
 
-	LogDebug( "%d bytes from %s processed, %d bytes left in buffer\n", stream->position(), socket->address().toString(), stream->length() - stream->position() );
+	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", stream->position(), socket->address().toString(), stream->length() - stream->position() );
 	
 	stream->trimFromLeft( stream->position() );
 }
@@ -161,7 +160,7 @@ bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping&
 		u32 time = packet.time + rtt / 2;
 
 		if( abs( ( s64 )time - connection->time() ) > 5 ) {
-			LogWarning( "Time error: %d ms\n", time - connection->time() );
+			LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
 			connection->setTime( time );
 		}
 
@@ -193,7 +192,7 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Even
 	DC_BREAK_IF( i == m_eventHandlers.end() )
 
 	if( i == m_eventHandlers.end() ) {
-		LogWarning( "NetworkHandler::handleEventPacket : unknown event %d received\n", packet.eventId );
+		LogWarning( "rpc", "unknown event %d received\n", packet.eventId );
 		return false;
 	}
 
@@ -208,7 +207,7 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, packets:
 	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
 
 	if( i == m_remoteCallHandlers.end() ) {
-		LogWarning( "NetworkHandler::handleRemoteCallPacket : trying to invoke unknown remote procedure %d\n", packet.method );
+		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
 		return false;
 	}
 

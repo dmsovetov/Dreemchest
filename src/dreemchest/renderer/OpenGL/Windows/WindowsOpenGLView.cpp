@@ -35,7 +35,7 @@ OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
     WindowsOpenGLView* view = DC_NEW WindowsOpenGLView;
     view->initialize( reinterpret_cast<HWND>( window ), depthStencil );
-    LogVerbose( "Windows OpenGL viewport created\n" );
+    LogVerbose( "opengl", "Windows OpenGL viewport created\n" );
     return view;
 }
 

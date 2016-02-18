@@ -103,7 +103,7 @@ s32 FileStream::read( void* buffer, s32 size ) const
     s32 bytesRead = fread( buffer, 1, size, m_file );
 
     if( bytesRead != size && ferror( m_file ) ) {
-        LogError( "FileStream::read : failed to read %d bytes from file, %d\n", size, errno );
+        LogError( "stream", "failed to read %d bytes from file, %d\n", size, errno );
     }
     
     return bytesRead;
@@ -119,7 +119,7 @@ s32 FileStream::write( const void* buffer, s32 size )
     s32 bytesWritten = fwrite( buffer, 1, size, m_file );
     
     if( bytesWritten != size && ferror( m_file ) ) {
-        LogError( "FileStream::write : failed to write %d bytes to file, %d\n", size, errno );
+        LogError( "stream", "failed to write %d bytes to file, %d\n", size, errno );
     }
     
     return bytesWritten;

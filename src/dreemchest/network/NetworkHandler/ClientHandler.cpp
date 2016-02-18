@@ -113,7 +113,7 @@ void ClientSocketDelegate::handleClosed( TCPSocket* sender )
 		return;
 	}
 
-	LogVerbose( "ClientSocketDelegate::handleClosed : connection closed\n" );
+	LogVerbose( "socket", "client connection closed\n" );
 	m_clientHandler->processConnectionClosed( sender );
 }
 

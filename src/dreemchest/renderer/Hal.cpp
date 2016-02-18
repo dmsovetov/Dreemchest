@@ -84,11 +84,11 @@ Hal* Hal::create( RenderingHal renderer, RenderView* view )
 					#ifdef DC_OPENGL_ENABLED
 						return DC_NEW OpenGLHal( view );
 					#else
-						LogError( "Hal::create : OpenGL renderer is not implemented\n" );
+						LogError( "hal", "OpenGL renderer is not implemented\n" );
 					#endif
 					break;
 
-    case Direct3D:  LogError( "Hal::create : Direct3D renderer is not implemented\n" );
+    case Direct3D:  LogError( "hal", "Direct3D renderer is not implemented\n" );
 					break;
     }
 
@@ -101,7 +101,7 @@ RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 #if defined( DC_OPENGL_ENABLED )
     return Renderer::createOpenGLView( window, depthStencil );
 #else
-    LogError( "Hal::createOpenGLView : the target platform doesn't support OpenGL.\n" );
+    LogError( "hal", "the target platform doesn't support OpenGL.\n" );
     return NULL;
 #endif
 }
@@ -175,7 +175,7 @@ VertexDeclarationPtr Hal::createVertexDeclaration( const char *format, u32 verte
 IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 {
 	if( GPU ) {
-        LogWarning( "Renderer::createIndexBuffer : GPU index buffers are not supported\n" );
+        LogWarning( "hal", "GPU index buffers are not supported\n" );
 	}
 
     return IndexBufferPtr( DC_NEW IndexBuffer( count, false ) );
@@ -185,7 +185,7 @@ IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 VertexBufferPtr Hal::createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU )
 {
 	if( GPU ) {
-		LogWarning( "Renderer::createVertexBuffer : GPU vertex buffers are not supported\n" );
+		LogWarning( "hal", "GPU vertex buffers are not supported\n" );
 	}
 
     return VertexBufferPtr( DC_NEW VertexBuffer( declaration, count, false ) );

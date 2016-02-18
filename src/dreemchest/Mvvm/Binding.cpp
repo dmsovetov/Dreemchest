@@ -189,17 +189,17 @@ bool Bindings::createBinding( ValueWPtr value, Widget widget, const WidgetTypeCh
 			BindingPtr converter = m_factory->createConverter( value->type(), binding->type() );
 		
 			if( !converter.valid() ) {
-				LogWarning( "Bindings::createBinding : no converter found to bind the value to a widget.\n" );
+				LogWarning( "binding", "no converter found to bind the value to a widget.\n" );
 				return false;
 			}
 
 			if( !converter->bind( value, NULL ) ) {
-				LogWarning( "Bindings::createBinding : failed to create converter.\n" );
+				LogWarning( "binding", "failed to create converter.\n" );
 				return false;				
 			}
 
 			if( !binding->bind( converter->converted(), widget ) ) {
-				LogWarning( "Bindings::createBinding : failed to bind to a converted value.\n" );
+				LogWarning( "binding", "failed to bind to a converted value.\n" );
 				return false;				
 			}
 

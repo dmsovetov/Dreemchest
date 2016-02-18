@@ -156,7 +156,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 	m_windowClass.hbrBackground	= ( HBRUSH )COLOR_GRAYTEXT;
 
 	if( !RegisterClass( &m_windowClass ) ) {
-		LogError( "WindowsWindow::create : failed to register window class" );
+		LogError( "window", "failed to register window class" );
 		return false;
 	}
 
@@ -178,7 +178,7 @@ bool WindowsWindow::create( u32 width, u32 height )
 		NULL, NULL, m_applicationInstance, NULL );
 
 	if( !m_window ) {
-		LogError( "WindowsWindow::create : failed to create window" );
+		LogError( "window", "failed to create window" );
 		return false;
 	}
 

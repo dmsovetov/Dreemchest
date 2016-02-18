@@ -191,7 +191,7 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue
     AssetBundle* assets = ctx.get<AssetBundle>();
     
     if( !assets ) {
-        LogError( "StaticMesh::deserialize : no AssetBundle attached to serialization context.\n" );
+        LogError( "staticMesh", "no AssetBundle attached to serialization context.\n" );
         return;
     }
 

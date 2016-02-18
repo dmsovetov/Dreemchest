@@ -40,7 +40,7 @@ Application* Application::s_application = NULL;
 Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
     DC_BREAK_IF( s_application != NULL );
-    if( !m_impl ) LogWarning( "Application::Application : application interface is not implemented on current platform\n" );
+    if( !m_impl ) LogWarning( "application", "not implemented on current platform\n" );
     s_application = this;
 }
 
@@ -75,7 +75,7 @@ Application* Application::create( const Arguments& args )
 void Application::quit( u32 exitCode )
 {
     if( !m_impl ) {
-        LogWarning( "Application::quit : application is not implemented\n" );
+    //    LogWarning( "application", "quit is not implemented\n" );
         return;
     }
 
@@ -86,7 +86,7 @@ void Application::quit( u32 exitCode )
 int Application::launch( ApplicationDelegate* delegate )
 {
     if( !m_impl ) {
-        LogWarning( "Application::launch : application is not implemented\n" );
+    //    LogWarning( "Application::launch : application is not implemented\n" );
         return -1;
     }
 
@@ -99,7 +99,7 @@ int Application::launch( ApplicationDelegate* delegate )
 void Application::notifyLaunched( void )
 {
     if( !m_delegate ) {
-        LogDebug( "Application::notifyLaunched : no application delegate set, event ignored\n" );
+        LogDebug( "application", "no application delegate set, event ignored\n" );
         return;
     }
 
