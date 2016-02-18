@@ -53,11 +53,13 @@ namespace Io {
 		//! Reads field from a binary storage.
 		virtual void			read( const BinaryStorage* storage ) = 0;
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes field to a binary storage.
 		virtual void			write( KeyValueStorage* storage ) = 0;
 
 		//! Reads field from a binary storage.
 		virtual void			read( const KeyValueStorage* storage ) = 0;
+    #endif
 
 		//! Creates a field serializer with a specified type.
 		template<typename T>
@@ -100,11 +102,13 @@ namespace Io {
 		//! Reads value from a binary storage.
 		virtual void			read( const BinaryStorage* storage );
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes value to a key-value storage.
 		virtual void			write( KeyValueStorage* storage );
 
 		//! Reads value from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage );
+    #endif
 	};
 
 	//! Numeric field serializer.
@@ -116,8 +120,10 @@ namespace Io {
 								NumericSerializer( const Storage::Key& key, T& value )
 									: PodSerializer<T>( key, value ) {}
 
+    #if DC_DEPRECATED_FEATURE
 		//! Reads numeric value from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage );
+    #endif
 	};
 
 	//! Object serializer type
@@ -135,11 +141,13 @@ namespace Io {
 		//! Reads object from a binary storage.
 		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes object to a key-value storage.
 		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads object from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
+    #endif
 	};
 
 	//! String serializer type.
@@ -156,11 +164,13 @@ namespace Io {
 		//! Reads string from binary storage.
 		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes string to a key-value storage.
 		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads string from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
+    #endif
 	};
 
 	//! Collection serializer type.
@@ -177,11 +187,13 @@ namespace Io {
 		//! Reads collection from a binary storage.
 		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes collection to a key-value storage.
 		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
+    #endif
 	};
 
 	//! Collection of serializable objects.
@@ -198,11 +210,13 @@ namespace Io {
 		//! Reads collection from a binary storage.
 		virtual void			read( const BinaryStorage* ar ) DC_DECL_OVERRIDE;
 
+    #if DC_DEPRECATED_FEATURE
 		//! Writes collection to a key-value storage.
 		virtual void			write( KeyValueStorage* storage ) DC_DECL_OVERRIDE;
 
 		//! Reads collection from a key-value storage.
 		virtual void			read( const KeyValueStorage* storage ) DC_DECL_OVERRIDE;
+    #endif
 	};
 
 	//! Value serialization type.
@@ -270,6 +284,7 @@ namespace Io {
 		storage->read( this->m_value );
 	}
 
+#if 0
 	// ** PodSerializer::write
 	template<typename T>
 	inline void PodSerializer<T>::write( KeyValueStorage* storage )
@@ -283,9 +298,11 @@ namespace Io {
 	{
 		this->m_value = storage->read( this->m_key ).template as<T>();
 	}
+#endif
 
 	// --------------------------------- NumericSerializer ----------------------------------//
 
+#if 0
 	// ** NumericSerializer::read
 	template<typename T>
 	inline void NumericSerializer<T>::read( const KeyValueStorage* storage )
@@ -296,6 +313,7 @@ namespace Io {
 			this->m_value = static_cast<T>( value.toDouble() );
 		}
 	}
+#endif
 
 	// -----------------------------------StringSerializer ----------------------------------//
 
@@ -321,6 +339,7 @@ namespace Io {
 		}
 	}
 
+#if 0
 	// ** StringSerializer::write
 	inline void StringSerializer::write( KeyValueStorage* storage )
 	{
@@ -332,6 +351,7 @@ namespace Io {
 	{
 		m_value = storage->read( m_key ).toString();
 	}
+#endif
 
 	// -----------------------------------ObjectSerializer ------------------------------------//
 
@@ -349,6 +369,7 @@ namespace Io {
 		this->m_value.read( storage );
 	}
 
+#if 0
 	// ** ObjectSerializer::write
 	template<typename T>
 	inline void ObjectSerializer<T>::write( KeyValueStorage* storage )
@@ -366,6 +387,7 @@ namespace Io {
 		DC_BREAK_IF( object == KeyValueStoragePtr() );
 		this->m_value.read( object.get() );
 	}
+#endif
 
 	// -----------------------------------CollectionSerializer ------------------------------------//
 
@@ -397,6 +419,7 @@ namespace Io {
 		}
 	}
 
+#if 0
 	// ** CollectionSerializer::write
 	template<typename TCollection, typename TElement>
 	inline void CollectionSerializer<TCollection, TElement>::write( KeyValueStorage* storage )
@@ -425,6 +448,7 @@ namespace Io {
 			this->m_value.push_back( element );
 		}
 	}
+#endif
 
 	// ----------------------------------- ObjectCollectionSerializer ------------------------------------//
 
@@ -455,6 +479,7 @@ namespace Io {
 		}
 	}
 
+#if 0
 	// ** ObjectCollectionSerializer::write
 	template<typename TCollection, typename TElement>
 	inline void ObjectCollectionSerializer<TCollection, TElement>::write( KeyValueStorage* storage )
@@ -488,6 +513,7 @@ namespace Io {
 		//	this->m_value.push_back( element );
 		//}
 	}
+#endif
 
 } // namespace Io
 

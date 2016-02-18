@@ -51,7 +51,9 @@ namespace Io {
 
 	class Storage;
 		class BinaryStorage;
+    #if DC_DEPRECATED_FEATURE
 		class KeyValueStorage;
+    #endif  /*  DC_DEPRECATED_FEATURE   */
 
     //! Available stream open modes.
     enum StreamMode {
@@ -91,8 +93,10 @@ namespace Io {
 	//! List of field serializer ptrs.
 	typedef List<SerializerPtr> SerializerList;
 
+#if DC_DEPRECATED_FEATURE
 	//! Key-value storage strong ptr.
 	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;
+#endif
 
 } // namespace Io
 
