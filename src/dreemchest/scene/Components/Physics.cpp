@@ -101,37 +101,42 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 }
 
 // ** Shape2D::serialize
-void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Shape2D::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 {
-    Io::KeyValue material = Io::KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    KeyValue material = KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
 
     switch( m_parts[0].type ) {
     case Polygon:   {
-                        Io::KeyValue vertices = Io::KeyValue::array();
+                        KeyValue vertices = KeyValue::array();
 
                         for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
                             vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
                         }
 
-                        ar = Io::KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
+                        ar = KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
                     }
                     break;
     case Circle:    {
-                        ar = Io::KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
+                        ar = KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
                     }
                     break;
     default:        DC_BREAK;
     }
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Shape2D::deserialize
-void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Shape2D::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     // Get shape type
     const String& type = ar.get( "type", "" ).asString();
 
     // Get material
-    Io::KeyValue material = ar.get( "material" );
+    KeyValue material = ar.get( "material" );
 
     // Parse material
     Material shapeMaterial;
@@ -143,7 +148,7 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
     }
 
     if( type == "polygon" ) {
-        const Io::KeyValue& vertices = ar.get( "vertices" );
+        const KeyValue& vertices = ar.get( "vertices" );
         Array<Vec2>         points;
 
         for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
@@ -158,6 +163,9 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
     else {
         DC_BREAK;
     }
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //

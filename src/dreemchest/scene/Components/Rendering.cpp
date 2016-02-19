@@ -85,13 +85,13 @@ void Light::setRange( f32 value )
 }
 
 // ** Light::serialize
-void Light::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Light::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 {
     DC_BREAK;
 }
 
 // ** Light::deserialize
-void Light::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Light::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
 {
     DC_BREAK;
 }
@@ -173,21 +173,26 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 }
 
 // ** StaticMesh::serialize
-void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void StaticMesh::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 {
-    Io::KeyValue materials = Io::KeyValue::array();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    KeyValue materials = KeyValue::array();
 
     for( u32 i = 0, n = materialCount(); i < n; i++ ) {
         MaterialPtr m = material( i );
         materials << (m.valid() ? m->uuid() : "");
     }
 
-    ar = Io::KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
+    ar = KeyValue::object() << "asset" << (m_mesh.valid() ? m_mesh->uuid() : "") << "materials" << materials;
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** StaticMesh::deserialize
-void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     AssetBundle* assets = ctx.get<AssetBundle>();
     
     if( !assets ) {
@@ -195,13 +200,16 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue
         return;
     }
 
-    const Io::KeyValue& materials = ar["materials"];
+    const KeyValue& materials = ar["materials"];
 
     for( s32 i = 0, n = materials.size(); i < n; i++ ) {
         setMaterial( i, assets->find<Material>( materials[i].asString() ) );
     }
 
     m_mesh = assets->find<Mesh>( ar["asset"].asString() );
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -448,20 +456,28 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 }
 
 // ** Camera::serialize
-void Camera::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Camera::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 {
-    ar = Io::KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    ar = KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Camera::deserialize
-void Camera::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Camera::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     m_clearMask     = ar["clearMask"].asUByte();
     m_projection    = static_cast<Projection>( ar["projection"].asInt() );
     m_clearColor    = ar["clearColor"].asRgba();
     m_fov           = ar["fov"].asFloat();
     m_near          = ar["near"].asFloat();
     m_far           = ar["far"].asFloat();
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 } // namespace Scene

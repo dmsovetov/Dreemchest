@@ -252,7 +252,7 @@ namespace Scene {
 
 		//! Creates an archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const Io::KeyValue& data = Io::KeyValue::kNull );
+		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const KeyValue* data = NULL );
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
@@ -351,7 +351,7 @@ namespace Scene {
 
 	// ** Scene::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const Io::KeyValue& data )
+	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const KeyValue* data )
 	{
 		return m_ecs->createArchetype<TArchetype>( id, data );
 	}

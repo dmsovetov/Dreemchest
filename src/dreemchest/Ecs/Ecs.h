@@ -141,14 +141,14 @@ namespace Ecs {
 	public:
 
 		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const KeyValue* data = NULL ) const;
 
 		//! Creates the component instance by name.
-		ComponentPtr	createComponentByName( const String& name, const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		ComponentPtr	createComponentByName( const String& name, const KeyValue* data = NULL ) const;
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const KeyValue* data = NULL ) const;
 
         //! Clones an archetype instance.
         template<typename TArchetype>
@@ -156,11 +156,11 @@ namespace Ecs {
 
 		//! Creates an array of archetype instances from data.
 		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const Io::KeyValue& data ) const;
+		Array<StrongPtr<TArchetype>>	createArchetypes( const KeyValue& data ) const;
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
-		StrongPtr<TComponent>	createComponent( const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		StrongPtr<TComponent>	createComponent( const KeyValue* data = NULL ) const;
 
 		//! Registers the archetype type.
 		template<typename TArchetype>
@@ -287,7 +287,7 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Io::KeyValue& data ) const
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const KeyValue* data ) const
 	{
 		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
 	}
@@ -297,25 +297,25 @@ namespace Ecs {
     StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const
     {
         // Serialize source to a key-value archive
-        Io::KeyValue ar;
+        KeyValue ar;
         SerializationContext ctx( const_cast<Ecs*>( this ) );
         source->serialize( ctx, ar );
 
         // Create archetype instance
-        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, ar );
+        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar );
 
         return instance;
     }
 
 	// ** Ecs::createArchetypes
 	template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Io::KeyValue& data ) const
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const KeyValue& data ) const
 	{
 		Array<StrongPtr<TArchetype>> result;
 
 		for( s32 i = 0, n = data.items().size(); i < n; i++ ) {
-			const Io::KeyValue& item = data[i];
-			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), item ) );
+			const KeyValue& item = data[i];
+			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), &item ) );
 		}
 
 		return result;
@@ -323,7 +323,7 @@ namespace Ecs {
 		
 	// ** Ecs::createComponent
 	template<typename TComponent>
-	StrongPtr<TComponent> Ecs::createComponent( const Io::KeyValue& data  ) const
+	StrongPtr<TComponent> Ecs::createComponent( const KeyValue* data  ) const
 	{
 		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
 	}

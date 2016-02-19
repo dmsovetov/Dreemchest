@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 // ** ArchetypeBase::deserialize
-void ArchetypeBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
+void ArchetypeBase::deserialize( SerializationContext& ctx, const KeyValue& value )
 {
     if( components().empty() ) {
         construct();

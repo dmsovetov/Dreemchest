@@ -27,6 +27,9 @@
 #ifndef DEPRECATED_H
 #define DEPRECATED_H
 
+//! Enables/disables the deprecated KeyValue data type
+#define DEV_DEPRECATED_KEYVALUE_TYPE    (1)
+
 DC_BEGIN_DREEMCHEST
 
     template<class T>
@@ -36,6 +39,16 @@ DC_BEGIN_DREEMCHEST
 
     template<typename T>
 	class Hash : public std::map<strhash, T> {};
+
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    namespace Io {
+        class KeyValue;
+    }
+
+    typedef Io::KeyValue KeyValue;
+#else
+    typedef Kv KeyValue;
+#endif  /*  !DEV_DEPRECATED_KEYVALUE_TYPE   */
 
 DC_END_DREEMCHEST
 

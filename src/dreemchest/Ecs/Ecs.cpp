@@ -89,7 +89,7 @@ void Ecs::addEntity( EntityPtr entity )
 }
 
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Io::KeyValue& data ) const
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const KeyValue* data ) const
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
@@ -112,16 +112,16 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 	instance->setEcs( const_cast<Ecs*>( this ) );
 
 	// Load from data
-	if( !data.isNull() ) {
+	if( data ) {
         SerializationContext ctx( const_cast<Ecs*>( this ) );
-		instance->deserialize( ctx, data );
+		instance->deserialize( ctx, *data );
 	}
 
 	return instance;
 }
 
 // ** Ecs::createComponentByName
-ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue& data ) const
+ComponentPtr Ecs::createComponentByName( const String& name, const KeyValue* data ) const
 {
 	ComponentPtr instance = m_componentFactory.construct( name );
 	DC_BREAK_IF( !instance.valid() );
@@ -133,9 +133,9 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Io::KeyValue&
 	}
 
 	// Load from data
-	if( !data.isNull() ) {
+	if( data ) {
         SerializationContext ctx( const_cast<Ecs*>( this ) );
-		instance->deserialize( ctx, data );
+		instance->deserialize( ctx, *data );
 	}
 
 	return instance;
@@ -164,7 +164,7 @@ EntityPtr Ecs::createEntity( void )
 EntityPtr Ecs::cloneEntity( EntityWPtr entity )
 {
     // Serialize source to a key-value archive
-    Io::KeyValue ar;
+    KeyValue ar;
     SerializationContext ctx( this );
     entity->serialize( ctx, ar );
 

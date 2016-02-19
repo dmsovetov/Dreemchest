@@ -183,9 +183,10 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 }
 
 // ** ObjectValue::bson
-Io::KeyValue ObjectValue::bson( void ) const
+KeyValue ObjectValue::bson( void ) const
 {
-	Io::KeyValue result = Io::KeyValue::object();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	KeyValue result = KeyValue::object();
 
 	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
 		const String& key = i->first;
@@ -194,7 +195,7 @@ Io::KeyValue ObjectValue::bson( void ) const
 			continue;
 		}
 
-		Io::KeyValue value = i->second->bson();
+		KeyValue value = i->second->bson();
 
 		if( value.isNull() ) {
 			continue;
@@ -204,20 +205,28 @@ Io::KeyValue ObjectValue::bson( void ) const
 	}
 
 	return result;
+#else
+    DC_NOT_IMPLEMENTED
+    return KeyValue();
+#endif
 }
 
 // ** ObjectValue::setBson
-void ObjectValue::setBson( const Io::KeyValue& value )
+void ObjectValue::setBson( const KeyValue& value )
 {
-	const Io::KeyValue::Properties& kv = value.properties();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	const KeyValue::Properties& kv = value.properties();
 
-	for( Io::KeyValue::Properties::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
+	for( KeyValue::Properties::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
 		ValueWPtr value = get( i->first );
 
 		if( value.valid() ) {
 			value->setBson( i->second );
 		}
 	}
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ----------------------------------------------------------- CommandValue ----------------------------------------------------------- //
@@ -241,13 +250,18 @@ ValueTypeIdx CommandValue::type( void ) const
 }
 
 //! Returns the BSON object that represents this value.
-Io::KeyValue CommandValue::bson( void ) const
+KeyValue CommandValue::bson( void ) const
 {
-	return Io::KeyValue::kNull;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	return KeyValue::kNull;
+#else
+    DC_NOT_IMPLEMENTED
+    return KeyValue();
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 //! Sets the BSON object that represents this value.
-void CommandValue::setBson( const Io::KeyValue& value )
+void CommandValue::setBson( const KeyValue& value )
 {
 
 }

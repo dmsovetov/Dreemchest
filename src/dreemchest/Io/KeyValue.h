@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+
 	//! Key-value storage type.
 	class KeyValue : public Serializable {
 	public:
@@ -391,6 +393,8 @@ namespace Io {
 
 		return *this << items;
 	}
+
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 } // namespace Io
 

@@ -51,10 +51,10 @@ namespace mvvm {
 		virtual ValueTypeIdx		type( void ) const = 0;
 
 		//! Returns the BSON object that represents this value.
-		virtual Io::KeyValue			bson( void ) const = 0;
+		virtual KeyValue			bson( void ) const = 0;
 
 		//! Sets the BSON object that represents this value.
-		virtual void				setBson( const Io::KeyValue& value ) = 0;
+		virtual void				setBson( const KeyValue& value ) = 0;
 
 		//! Generates the value type index.
 		template<typename TValue>
@@ -126,10 +126,10 @@ namespace mvvm {
 		virtual ValueTypeIdx			type( void ) const;
 
 		//! Returns the BSON object that represents this value.
-		virtual Io::KeyValue				bson( void ) const;
+		virtual KeyValue				bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
-		virtual void					setBson( const Io::KeyValue& value );
+		virtual void					setBson( const KeyValue& value );
 
 		//! Returns the property value.
 		const TValue&					get( void ) const;
@@ -189,14 +189,14 @@ namespace mvvm {
 
 	// ** PrimitiveValue::bson
 	template<typename TValue, typename TBsonConverter>
-	Io::KeyValue PrimitiveValue<TValue, TBsonConverter>::bson( void ) const
+	KeyValue PrimitiveValue<TValue, TBsonConverter>::bson( void ) const
 	{
 		return TBsonConverter::to( m_value );
 	}
 
 	// ** PrimitiveValue::setBson
 	template<typename TValue, typename TBsonConverter>
-	void PrimitiveValue<TValue, TBsonConverter>::setBson( const Io::KeyValue& value )
+	void PrimitiveValue<TValue, TBsonConverter>::setBson( const KeyValue& value )
 	{
 		set( TBsonConverter::from( value ) );
 	}
@@ -240,10 +240,10 @@ namespace mvvm {
 		virtual ValueTypeIdx				type( void ) const;
 
 		//! Returns the BSON object that represents this value.
-		virtual Io::KeyValue					bson( void ) const;
+		virtual KeyValue					bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
-		virtual void						setBson( const Io::KeyValue& value );
+		virtual void						setBson( const KeyValue& value );
 
 		//! Returns true if the object type matches the specified one.
 		virtual bool						is( ValueTypeIdx expected ) const;
@@ -376,10 +376,10 @@ namespace mvvm {
 		virtual ValueTypeIdx		type( void ) const;
 
 		//! Returns the BSON object that represents this value.
-		virtual Io::KeyValue			bson( void ) const;
+		virtual KeyValue			bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
-		virtual void				setBson( const Io::KeyValue& value );
+		virtual void				setBson( const KeyValue& value );
 
 		//! Returns true if the array matches the expected type.
 		virtual bool				is( ValueTypeIdx expected ) const;
@@ -467,20 +467,25 @@ namespace mvvm {
 
 	// ** ArrayValue::bson
 	template<typename TValue>
-	Io::KeyValue ArrayValue<TValue>::bson( void ) const
+	KeyValue ArrayValue<TValue>::bson( void ) const
 	{
-		Io::KeyValue result = Io::KeyValue::array();
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
+		KeyValue result = KeyValue::array();
 
 		for( s32 i = 0, n = size(); i < n; i++ ) {
 			result << m_values[i]->bson();
 		}
 
 		return result;
+    #else
+        DC_NOT_IMPLEMENTED
+        return KeyValue();
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	// ** ArrayValue::setBson
 	template<typename TValue>
-	void ArrayValue<TValue>::setBson( const Io::KeyValue& value )
+	void ArrayValue<TValue>::setBson( const KeyValue& value )
 	{
 		DC_NOT_IMPLEMENTED
 	}
@@ -496,10 +501,10 @@ namespace mvvm {
 		virtual ValueTypeIdx	type( void ) const;
 
 		//! Returns the BSON object that represents this value.
-		virtual Io::KeyValue		bson( void ) const;
+		virtual KeyValue		bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
-		virtual void			setBson( const Io::KeyValue& value );
+		virtual void			setBson( const KeyValue& value );
 
 		//! Returns true if the command matches the expected type.
 		virtual bool			is( ValueTypeIdx expected ) const;

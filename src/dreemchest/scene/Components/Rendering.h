@@ -123,10 +123,10 @@ namespace Scene {
     protected:
 
         //! Writes the light data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const;
 
 		//! Reads the light data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar );
 
 	private:
 
@@ -180,10 +180,10 @@ namespace Scene {
     protected:
 
         //! Writes the static mesh data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const;
 
 		//! Reads the static mesh data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar );
 
 	private:
 
@@ -332,10 +332,10 @@ namespace Scene {
     protected:
 
         //! Writes the camera data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const;
 
 		//! Reads the camera data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar );
 
 	private:
 

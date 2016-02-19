@@ -94,7 +94,11 @@ namespace Io {
 		}
 
 		BinaryStorage storage( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		data.read( &storage );
+    #else
+        DC_NOT_IMPLEMENTED
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		return data;
 	}
 

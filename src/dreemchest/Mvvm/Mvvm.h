@@ -41,28 +41,60 @@ namespace mvvm {
 	template<typename TValue>
 	struct BsonConverter {
 		//! Converts to BSON from a value.
-		static Io::KeyValue	to( const TValue& value ) { return Io::KeyValue( value ); }
+		static KeyValue	    to( const TValue& value )
+        {
+        #if DEV_DEPRECATED_KEYVALUE_TYPE
+            return KeyValue( value );
+        #else
+            DC_NOT_IMPLEMENTED
+            return KeyValue();
+        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        }
 
 		//! Converts from a value to a BSON.
-		static TValue		from( const Io::KeyValue& value ) { return static_cast<TValue>( value ); }
+		static TValue		from( const KeyValue& value )
+        {
+        #if DEV_DEPRECATED_KEYVALUE_TYPE
+            return static_cast<TValue>( value );
+        #else
+            DC_NOT_IMPLEMENTED
+            return TValue();
+        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        }
 	};
 
 	//! Converts between the GUID and BSON.
 	struct GuidBsonConverter {
 		//! Converts to BSON from a value.
-		static Io::KeyValue	to( const :: DC_DREEMCHEST_NS Guid& value ) { return Io::KeyValue( value.toString() ); }
+		static KeyValue	to( const :: DC_DREEMCHEST_NS Guid& value )
+        {
+        #if DEV_DEPRECATED_KEYVALUE_TYPE
+            return KeyValue( value.toString() );
+        #else
+            DC_NOT_IMPLEMENTED;
+            return KeyValue();
+        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        }
 
 		//! Converts from a value to a BSON.
-		static :: DC_DREEMCHEST_NS Guid		from( const Io::KeyValue& value ) { return value.asString(); }	
+		static :: DC_DREEMCHEST_NS Guid		from( const KeyValue& value )
+        {
+        #if DEV_DEPRECATED_KEYVALUE_TYPE
+            return value.asString();
+        #else
+            DC_NOT_IMPLEMENTED
+            return Guid();
+        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        }	
 	};
 
 	//! Converts between the Vec2 and BSON.
 	struct Vec2BsonConverter {
 		//! Converts to BSON from a value.
-		static Io::KeyValue	to( const Vec2& value );
+		static KeyValue	to( const Vec2& value );
 
 		//! Converts from a value to a BSON.
-		static Vec2			from( const Io::KeyValue& value );			
+		static Vec2			from( const KeyValue& value );			
 	};
 
 	//! Primitive value type forward declaration.

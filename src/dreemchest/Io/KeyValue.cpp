@@ -32,6 +32,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+
 // ** KeyValue::kEmptyArray
 const KeyValue KeyValue::kEmptyArray( KeyValue::kArray );
 
@@ -1055,6 +1057,8 @@ KeyValue KeyValue::fromJson( const Json::Value& json )
 }
 
 #endif	/*	HAVE_JSON*/
+
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 } // namespace Io
 

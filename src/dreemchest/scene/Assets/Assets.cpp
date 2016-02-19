@@ -130,20 +130,29 @@ void Asset::setFormat( AssetFormat value )
 }
 
 // ** Asset::keyValue
-Io::KeyValue Asset::keyValue( void ) const
+KeyValue Asset::keyValue( void ) const
 {
-	return Io::KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	return KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Asset::setKeyValue
-bool Asset::setKeyValue( const Io::KeyValue& value )
+bool Asset::setKeyValue( const KeyValue& value )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	DC_BREAK_IF( !value.isObject() );
 
 	m_uuid		= value.get( "uuid", "" ).asString();
 	m_timestamp = value.get( "timestamp", 0 ).asUInt();
 
 	return m_uuid != "";
+#else
+    DC_NOT_IMPLEMENTED
+    return false;
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Asset::dispose
@@ -320,8 +329,9 @@ AssetPtr AssetBundle::findAsset( const String& name, u32 expectedType ) const
 // ** AssetBundle::loadFromString
 bool AssetBundle::loadFromString( const String& text )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	// Parse key-value from string
-	Io::KeyValue kv = Io::KeyValue::parse( text );
+	KeyValue kv = KeyValue::parse( text );
 
 	// Failed to parse
 	if( kv.isNull() ) {
@@ -342,6 +352,10 @@ bool AssetBundle::loadFromString( const String& text )
 	}
 
 	return true;
+#else
+    DC_NOT_IMPLEMENTED
+    return false;
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetBundle::addAsset
@@ -371,8 +385,9 @@ void AssetBundle::addAsset( AssetPtr asset )
 }
 
 // ** AssetBundle::createAssetFromData
-AssetPtr AssetBundle::createAssetFromData( const Io::KeyValue& kv ) const
+AssetPtr AssetBundle::createAssetFromData( const KeyValue& kv ) const
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	DC_BREAK_IF( !kv.isObject() );
 
 	// Get asset type by name.
@@ -392,6 +407,10 @@ AssetPtr AssetBundle::createAssetFromData( const Io::KeyValue& kv ) const
 	}
 
 	return asset;
+#else
+    DC_NOT_IMPLEMENTED
+    return AssetPtr();
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetBundle::removeAsset
