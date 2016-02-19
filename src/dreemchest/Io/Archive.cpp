@@ -50,7 +50,7 @@ Archive::Archive( const DiskFileSystem *diskFileSystem ) : m_diskFileSystem( dis
 
 Archive::~Archive( void )
 {
-    DC_RELEASE( m_file );
+
 }
 
 // ** Archive::release
@@ -142,7 +142,7 @@ bool Archive::open( const StreamPtr& file )
         return true;
     }
 
-    DC_RELEASE( m_file );
+    m_file = StreamPtr();
     return true;
 }
 
@@ -167,7 +167,7 @@ void Archive::close( void )
 
     clearFiles();
 
-    DC_RELEASE( m_file );
+    m_file = StreamPtr();
 }
 
 // ** Archive::fileName

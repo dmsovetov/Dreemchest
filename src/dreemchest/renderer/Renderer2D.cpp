@@ -53,7 +53,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 {
 	// Create shaders
 	m_shaders[ShaderTextured] = m_hal->createShader(
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform mat4 u_mvp;
 
 			varying vec2 v_tex0;
@@ -65,7 +65,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 				v_color		= gl_Color;
 				gl_Position = u_mvp * gl_Vertex;
 			} ),
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform sampler2D u_texture;
 
 			varying vec2	  v_tex0;
@@ -79,7 +79,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 			} ) );
 
 	m_shaders[ShaderDefault] = m_hal->createShader(
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform mat4 u_mvp;
 
 			varying vec4 v_color;
@@ -89,7 +89,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 				v_color		= gl_Color;
 				gl_Position = u_mvp * gl_Vertex;
 			} ),
-		CODE(
+		NIMBLE_STRINGIFY(
 			varying vec4 v_color;
 
 			void main()
