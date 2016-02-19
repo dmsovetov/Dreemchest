@@ -42,8 +42,8 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 
 	DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL );
 
-    LogVerbose( "opengl", "version=%s, renderer=%s, vendor=%s", glGetString( GL_VERSION ), glGetString( GL_RENDERER ), glGetString( GL_VENDOR ) );
-    LogVerbose( "opengl", "%s", glGetString( GL_EXTENSIONS ) );
+    LogVerbose( "opengl", "version=%s, renderer=%s, vendor=%s\n", glGetString( GL_VERSION ), glGetString( GL_RENDERER ), glGetString( GL_VENDOR ) );
+    LogVerbose( "opengl", "%s\n", glGetString( GL_EXTENSIONS ) );
 
     m_stencilFunc   = Always;
     m_stencilMask   = ~0;
