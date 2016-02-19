@@ -20,15 +20,17 @@ option(DC_OPENGL_ENABLED "Build with OpenGL support" ON)
 option(DC_BOX2D_ENABLED "Build with Box2D support" OFF)
 option(DC_SOUND_ENABLED "Build with sound support" OFF)
 option(DC_COMPOSER_ENABLED "Build Dreemchest Composer" OFF)
+set(DC_NAMESPACE "Dreemchest" CACHE STRING "Root engine namespace")
 set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt5")
 set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 
+# Set the namespace
+add_definitions(-DDC_NAMESPACE=${DC_NAMESPACE} -DNIMBLE_NAMESPACE=DC_NAMESPACE -D_CRT_SECURE_NO_WARNINGS)
+
 # Add include directory
-include_directories(Dreemchest)
+include_directories(Dreemchest Nimble)
 
 # Add Nimble subproject
-include_directories(Nimble)
-add_definitions(-DNIMBLE_NAMESPACE=DC_NAMESPACE)
 add_subdirectory(Nimble)
 
 # Setup definitions
