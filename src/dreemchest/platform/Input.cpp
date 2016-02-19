@@ -48,7 +48,7 @@ Input::Input( IInput* impl ) : m_impl( impl )
 
 Input::~Input( void )
 {
-    DC_DELETE( m_impl )
+    delete m_impl;
 }
 
 // ** Input::sharedInstance

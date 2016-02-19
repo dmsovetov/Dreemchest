@@ -112,9 +112,7 @@ Path Path::operator + ( CString str ) const
 // ** Path::operator +=
 const Path& Path::operator += ( CString str )
 {
-    StringList items = split( str );
-
-    m_items.splice( m_items.end(), items );
+    m_items << split( str );
     build();
 
     return *this;
@@ -123,7 +121,7 @@ const Path& Path::operator += ( CString str )
 // ** Path::operator +=
 const Path& Path::operator += ( const Path& other )
 {
-    m_items.insert( m_items.end(), other.m_items.begin(), other.m_items.end() );
+    m_items << other.m_items;
     build();
 
     return *this;
@@ -132,7 +130,7 @@ const Path& Path::operator += ( const Path& other )
 // ** Path::isEmpty
 bool Path::isEmpty( void ) const
 {
-    return m_items.empty();
+    return m_items.isEmpty();
 }
 
 // ** Path::folder
@@ -140,7 +138,7 @@ Path Path::folder( void ) const
 {
     Path result;
     result.m_items = m_items;
-    result.m_items.pop_back();
+    result.m_items.pop();
     result.build();
 
     return result;
@@ -149,7 +147,7 @@ Path Path::folder( void ) const
 // ** Path::lastmi
 CString Path::last( void ) const
 {
-    return m_items.size() ? m_items.back().c_str() : "";
+    return m_items.count() ? m_items.last().c_str() : "";
 }
 
 // **  Path::c_str
@@ -163,7 +161,9 @@ void Path::build( void )
 {
     m_str = "";
 
-    for( StringList::const_iterator i = m_items.begin(), end = m_items.end(); i != end; ++i ) {
+    const StringList::Container& strings = m_items.container();
+
+    for( StringList::Container::const_iterator i = strings.begin(), end = strings.end(); i != end; ++i ) {
         if( m_str != "" ) {
             m_str += '/';
         }
@@ -190,7 +190,7 @@ StringList Path::split( CString str )
     CString item = strtok( path, "/" );
 
     while( item ) {
-        result.push_back( item );
+        result << item;
         item = strtok( NULL, "/" );
     }
 

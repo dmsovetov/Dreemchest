@@ -43,8 +43,8 @@ PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor
 
 PackedStream::~PackedStream( void )
 {
-    DC_DELETE( m_buffer );
-    DC_DELETE( m_compressor );
+    delete[]m_buffer;
+    delete  m_compressor;
 }
 
 // ** PackedStream::reopen

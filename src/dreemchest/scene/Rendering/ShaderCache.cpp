@@ -129,14 +129,14 @@ CString ShaderCache::s_modelName[Material::TotalModels] = {
 ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 	// ** Pink
 	{
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform mat4 u_vp, u_transform;
 
 			void main() {
 				gl_Position = u_vp * u_transform * gl_Vertex;
 			}
 		),
-		CODE(
+		NIMBLE_STRINGIFY(
 			void main() {
 				gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
 			}
@@ -145,14 +145,14 @@ ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 
 	// ** Constant color
 	{
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform mat4 u_vp, u_transform;
 
 			void main() {
 				gl_Position = u_vp * u_transform * gl_Vertex;
 			}
 		),
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform vec4 u_color;
 
 			void main() {
@@ -163,7 +163,7 @@ ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 
 	// ** Output normals as color.
 	{
-		CODE(
+		NIMBLE_STRINGIFY(
 			uniform mat4 u_vp, u_transform;
 			varying vec3 v_normal;
 
@@ -172,7 +172,7 @@ ShaderCache::Code ShaderCache::s_shaderCode[TotalShaders] = {
 				gl_Position = u_vp * u_transform * gl_Vertex;
 			}
 		),
-		CODE(
+		NIMBLE_STRINGIFY(
 			varying vec3 v_normal;
 
 			void main() {
