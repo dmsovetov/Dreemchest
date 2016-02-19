@@ -424,14 +424,6 @@ void Hal::setColorModulation( f32 r, f32 g, f32 b, f32 a )
 
 }
 
-// ----------------------------------------------- RenderResource ----------------------------------------------- //
-
-// ** RenderResource::release
-void RenderResource::release( void )
-{
-    delete this;
-}
-
 // --------------------------------------------------- Texture -------------------------------------------------- //
 
 // ** Texture::Texture
