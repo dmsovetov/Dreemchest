@@ -33,8 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-IMPLEMENT_LOGGER( log )
-
 // ---------------------------------------------- Asset ---------------------------------------------- //
 
 // ** Asset::Asset
@@ -180,7 +178,7 @@ bool Assets::loadAssetToCache( Handle asset )
     }
 
     // Perform loading
-    log::verbose( "Loading '%s'...\n", asset->name().c_str() );
+    LogVerbose( "cache", "loading '%s'...\n", asset->name().c_str() );
 
     // Switch to Loading state
     asset->switchToState( Asset::Loading );
@@ -232,7 +230,7 @@ void Assets::queueForLoading( const Handle& asset ) const
     }
 
     m_loadingQueue.push_back( asset );
-    log::verbose( "Asset '%s' is queued for loading\n", asset->name().c_str() );
+    LogVerbose( "cache", "asset '%s' is queued for loading\n", asset->name().c_str() );
 }
 
 // ** Assets::reserveAssetData

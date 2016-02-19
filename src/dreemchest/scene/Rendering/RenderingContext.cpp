@@ -138,7 +138,7 @@ s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
     m_renderableByMesh[handle] = m_renderables.size() - 1;
 
     // Output log message
-    log::verbose( "Renderable #%d with %d vertices and %d indices constructed from mesh '%s'.\n", m_renderableByMesh[handle], vertices.size(), indices.size(), mesh.name().c_str() );
+    LogVerbose( "renderingContext", "renderable #%d with %d vertices and %d indices constructed from mesh '%s'.\n", m_renderableByMesh[handle], vertices.size(), indices.size(), mesh.name().c_str() );
 
     return m_renderables.size() - 1;
 }
@@ -161,7 +161,7 @@ Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image 
 	m_textureByImage[image.index()] = texture;
 
     // Output log message
-    log::verbose( "%dx%d %s texture constructed from image '%s'.\n", image->width(), image->height(), image->bytesPerPixel() == 3 ? "RGB8" : "RGBA8", image.name().c_str() );
+    LogVerbose( "renderingContext", "%dx%d %s texture constructed from image '%s'.\n", image->width(), image->height(), image->bytesPerPixel() == 3 ? "RGB8" : "RGBA8", image.name().c_str() );
 
 	return texture;
 }
