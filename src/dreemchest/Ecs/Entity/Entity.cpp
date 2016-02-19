@@ -215,7 +215,7 @@ void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
 // ** Entity::deserialize
 void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
 {
-	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
+//	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
 
 	Components& items = components();
 
@@ -228,7 +228,7 @@ void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
         const Io::KeyValue& kv = ar.get( key );
 
         if( kv.isNull() ) {
-            log::verbose( "Entity::deserialize : no data for component '%s'\n", key );
+            LogDebug( "deserialize", "no data for component '%s'\n", key );
             continue;
         }
 

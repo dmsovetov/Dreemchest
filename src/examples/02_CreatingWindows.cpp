@@ -35,7 +35,8 @@ class CreatingWindows : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Platform::Application* application ) {
-		Platform::log::setStandardHandler();
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
         // This line of code creates a window with 800x600 dimensions.
         //

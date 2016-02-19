@@ -191,7 +191,7 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue
     Assets::Assets* assets = ctx.get<Assets::Assets>();
     
     if( !assets ) {
-        log::error( "StaticMesh::deserialize : no Assets attached to serialization context.\n" );
+        LogError( "staticMesh", "no Assets attached to serialization context.\n" );
         return;
     }
 
@@ -207,7 +207,7 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue
 // ------------------------------------------- Particles ----------------------------------------- //
 
 // ** Particles::Particles
-Particles::Particles( const Fx::ParticleSystemPtr& particleSystem, const Fx::ParticlesInstancePtr& instance ) : m_particleSystem( particleSystem ), m_instance( instance )
+Particles::Particles( const Fx::ParticleSystemPtr& particleSystem, const Fx::ParticleSystemInstancePtr& instance ) : m_particleSystem( particleSystem ), m_instance( instance )
 {
 
 }

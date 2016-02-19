@@ -75,9 +75,8 @@ class Files : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
-        // Setup defaul loggers
-        Platform::log::setStandardHandler();
-        Io::log::setStandardHandler();
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
 		Data d1, d2, d3;
 		d1.m_boolean = true;

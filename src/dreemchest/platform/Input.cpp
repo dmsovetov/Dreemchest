@@ -40,7 +40,7 @@ Input* Input::s_input = NULL;
 Input::Input( IInput* impl ) : m_impl( impl )
 {
     DC_BREAK_IF( s_input != NULL );
-    if( !m_impl ) log::warn( "Input::Input : input interface is not implemented on current platform\n" );
+    if( !m_impl ) LogWarning( "input", "not implemented on current platform\n" );
     s_input = this;
 
 	memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );

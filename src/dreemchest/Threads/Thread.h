@@ -49,9 +49,6 @@ namespace Threads {
         //! Returns true is this thread is alive.
         bool                isAlive( void ) const;
 
-        //! Releases this Thread object.
-        void                release( void );
-
         //! Returns a thread id.
         u32                 id( void ) const;
 

@@ -39,7 +39,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Ecs )
 
 	class Aspect;
 

@@ -44,7 +44,7 @@ PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& s
 
     m_socket = ::socket( PF_INET, SOCK_STREAM, 0 );
 	if( !m_socket.isValid() ) {
-		log::error( "PosixTCPSocket::PosixTCPSocket : failed to create socket, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to create TCP socket, %d\n", PosixNetwork::lastError() );
 		return;
 	}
 
@@ -134,7 +134,7 @@ u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 void PosixTCPSocket::update( void )
 {
     if( !m_socket.isValid() ) {
-        log::verbose( "PosixTCPSocket::update : updating socket with an invalid descriptor.\n" );
+        LogError( "socket", "updating socket with an invalid descriptor.\n" );
         return;
     }
     

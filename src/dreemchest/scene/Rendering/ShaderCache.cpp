@@ -58,7 +58,7 @@ const Renderer::ShaderPtr& ShaderCache::shaderById( ShaderId id )
 		return m_shaders[id];
 	}
 
-	log::msg( "Loading shader '%s'...\n", s_shaderName[id] );
+	LogVerbose( "shaderCache", "loading '%s'...\n", s_shaderName[id] );
 
 	const Code& code = s_shaderCode[id];
 	m_shaders[id] = m_hal->createShader( code.m_vertex, code.m_fragment );
@@ -75,7 +75,7 @@ const Renderer::ShaderPtr& ShaderCache::materialShader( Material::Model model, u
 	}
 
 	if( !m_material[model]->isLoaded( features ) ) {
-		log::msg( "Loading '%s' material shader permutation %d...\n", s_modelName[model], features );
+		LogVerbose( "shaderCache", "loading '%s' material permutation %d...\n", s_modelName[model], features );
 	}
 	
 	return m_material[model]->permutation( m_hal, features );

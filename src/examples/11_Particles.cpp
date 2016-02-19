@@ -30,35 +30,30 @@
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace to use shorter types.
-using namespace Platform;
-
-// Open a renderer namespace.
-using namespace Renderer;
-
-// Open an Fx namespace.
-using namespace Fx;
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( Particles )
 
 // Application delegate is used to handle an events raised by application instance.
-class ParticleSystems : public ApplicationDelegate {
+class ParticleSystems : public Platform::ApplicationDelegate {
 public:
 
 	ParticleSystems( void )
 		: m_timeStep( 16 ) {}
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
+    virtual void handleLaunched( Platform::Application* application ) {
+        // Set the default log handler.
+        Logger::setStandardLogger();
+
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
+        Platform::Window* window = Platform::Window::create( 800, 600 );
 
         // Create a rendering view.
-        RenderView* view   = Hal::createOpenGLView( window->handle() );
+        Renderer::RenderView* view   = Renderer::Hal::createOpenGLView( window->handle() );
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create( OpenGL, view );
-
-		Fx::log::setStandardHandler();
+        m_hal = Renderer::Hal::create( Renderer::OpenGL, view );
 
 		m_renderingContext = Scene::RenderingContext::create( m_hal );
 
@@ -88,10 +83,10 @@ public:
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
 		// Finally subscribe for window events
-		window->subscribe<Window::Update>( dcThisMethod( ParticleSystems::update ) );
+		window->subscribe<Platform::Window::Update>( dcThisMethod( ParticleSystems::update ) );
     }
 
-	void update( const Window::Update& e )
+	void update( const Platform::Window::Update& e )
 	{
 		Rgb clearColor = Rgb::fromHashString( "#314D79" );
 
@@ -101,6 +96,7 @@ public:
 	//	for( s32 i = 0, n = m_timeStep.stepCount(); i < n; i++ ) {
 	//		m_scene->update( 0, m_timeStep.seconds() );
 	//	}
+        DC_NOT_IMPLEMENTED;
 
 		m_scene->render( m_renderingContext );
 

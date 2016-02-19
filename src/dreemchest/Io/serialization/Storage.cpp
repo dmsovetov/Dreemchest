@@ -73,6 +73,7 @@ StreamPtr BinaryStorage::stream( void ) const
 	return m_stream;
 }
 
+#if 0
 // --------------------------------------- KeyValueStorage --------------------------------------- //
 
 // ** KeyValueStorage::KeyValueStorage
@@ -144,6 +145,8 @@ Variant& KeyValueStorage::get( const Key& key ) const
 
 	return array[key.index];
 }
+
+#endif
 
 // ---------------------------------------- JsonStorage ------------------------------------------ //
 

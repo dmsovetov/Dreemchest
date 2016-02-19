@@ -98,7 +98,7 @@
 
 #define DC_CHECK_IMPL( ... )											\
             if( m_impl == NULL ) {												\
-                log::warn( "%s : not implemented\n", __FUNCTION__ );	\
+                LogWarning( "%s : not implemented\n", __FUNCTION__ );	\
                 return __VA_ARGS__;										\
             }
 

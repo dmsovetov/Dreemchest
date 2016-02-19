@@ -30,36 +30,30 @@
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace to use shorter types.
-using namespace Platform;
-
-// Open a renderer namespace.
-using namespace Renderer;
-
-// Open the Scene namespace.
-using namespace Scene;
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( Simple )
 
 // Application delegate is used to handle an events raised by application instance.
-class ParticleSystems : public ApplicationDelegate {
+class ParticleSystems : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
-		::Scene::log::setStandardHandler();
-		::Renderer::log::setStandardHandler();
+    virtual void handleLaunched( Platform::Application* application ) {
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
+        Platform::Window* window = Platform::Window::create( 800, 600 );
 
         // Create a rendering view.
-        RenderView* view   = Hal::createOpenGLView( window->handle() );
+        Renderer::RenderView* view = Renderer::Hal::createOpenGLView( window->handle() );
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create( OpenGL, view );
-        m_renderingContext = RenderingContext::create( m_hal );
+        m_hal = Renderer::Hal::create( Renderer::OpenGL, view );
+        m_renderingContext = Scene::RenderingContext::create( m_hal );
 
 		// Create the particle system
-		m_scene = ::Scene::Scene::create();
+		m_scene = Scene::Scene::create();
 
 		// Create an empty asset bundle
 		//m_assets = AssetBundle::create( "assets" );
@@ -80,25 +74,25 @@ class ParticleSystems : public ApplicationDelegate {
 
 		//m_scene->addSystem<AssetSystem>( m_assets );
 
-		Vec3BindingPtr wasdDirection = DC_NEW Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
+		Scene::Vec3BindingPtr wasdDirection = DC_NEW Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 
-		SceneObjectPtr camera = m_scene->createSceneObject();
-		camera->attach<Camera>( Camera::Perspective, WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
-		camera->attach<RenderParticles>();
-	//	camera->attach<RenderForwardLit>();
-		camera->attach<RenderWireframe>();
-		camera->attach<::Scene::Transform>();
-		camera->attach<MoveAlongAxes>( 60.0f, true, wasdDirection );
-	//	camera->attach<RenderBoundingVolumes>();
+		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
+		camera->attach<Scene::Camera>( Scene::Camera::Perspective, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
+		camera->attach<Scene::RenderParticles>();
+	//	camera->attach<Scene::RenderForwardLit>();
+		camera->attach<Scene::RenderWireframe>();
+		camera->attach<Scene::Transform>();
+		camera->attach<Scene::MoveAlongAxes>( 60.0f, true, wasdDirection );
+	//	camera->attach<Scene::RenderBoundingVolumes>();
 
 		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
         // Finally subscribe to updates events.
-        window->subscribe<Window::Update>( dcThisMethod( ParticleSystems::handleUpdate ) );
+        window->subscribe<Platform::Window::Update>( dcThisMethod( ParticleSystems::handleUpdate ) );
     }
 
     // Called each frame and renders a single frame
-    virtual void handleUpdate( const Window::Update& e ) {
+    virtual void handleUpdate( const Platform::Window::Update& e ) {
 		Rgb clearColor = Rgb::fromHashString( "#314D79" );
 
         // First clear a viewport with a color
@@ -114,12 +108,13 @@ class ParticleSystems : public ApplicationDelegate {
     }
 
 	Renderer::HalPtr	m_hal;
-	ScenePtr			m_scene;
+
+	Scene::ScenePtr			m_scene;
 //	AssetBundlePtr		m_assets;
 //	AssetBundlePtr		m_meshes;
 
 	//! Scene rendering context.
-	RenderingContextPtr	m_renderingContext;
+	Scene::RenderingContextPtr	m_renderingContext;
 };
 
 // Now declare an application entry point with Particles application delegate.

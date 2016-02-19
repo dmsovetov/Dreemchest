@@ -28,6 +28,7 @@
 #define		__DC_Network_PosixNetworkAPI_H__
 
 #if defined( DC_PLATFORM_WINDOWS )
+    #define     _WINSOCK_DEPRECATED_NO_WARNINGS
     #include	<winsock2.h>
     #include	<Ws2tcpip.h>
 #else

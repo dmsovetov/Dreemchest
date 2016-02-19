@@ -41,7 +41,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	DECLARE_LOG(log)
+    NIMBLE_LOGGER_TAG( Network )
 
 	class TCPSocketDelegate;
 	class TCPSocket;

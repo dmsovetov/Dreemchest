@@ -114,7 +114,7 @@ void ByteBuffer::trimFromLeft( s32 size )
 {
     DC_BREAK_IF( size > length() );
     m_buffer.erase( m_buffer.begin(), m_buffer.begin() + size );
-    m_position = std::min( m_position, length() );
+    m_position = min2( m_position, length() );
 }
 
 // ** ByteBuffer::trimFromRight
@@ -122,7 +122,7 @@ void ByteBuffer::trimFromRight( s32 size )
 {
     DC_BREAK_IF( size > length() );
     m_buffer.erase( m_buffer.begin() + (length() - size), m_buffer.end() );
-    m_position = std::min( m_position, length() );
+    m_position = min2( m_position, length() );
 }
 
 // ** ByteBuffer::read
@@ -144,7 +144,7 @@ s32 ByteBuffer::write( const void* buffer, s32 size )
     DC_BREAK_IF( buffer == NULL );
     DC_BREAK_IF( size <= 0 );
 
-    s32 extra = std::max( 0, size - bytesAvailable() );
+    s32 extra = max2( 0, size - bytesAvailable() );
 
     if( extra ) {
         m_buffer.resize( length() + extra );
@@ -166,13 +166,13 @@ s32 ByteBuffer::position( void ) const
 void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-    case SeekSet:   m_position = std::min( length(), offset );
+    case SeekSet:   m_position = min2( length(), offset );
                     break;
             
-    case SeekCur:   m_position = std::min( m_position + offset, length() );
+    case SeekCur:   m_position = min2( m_position + offset, length() );
                     break;
             
-	case SeekEnd:   m_position = std::max( 0, length() - offset );
+	case SeekEnd:   m_position = max2( 0, length() - offset );
                     break;
 	}
 }

@@ -109,6 +109,19 @@ DC_BEGIN_DREEMCHEST
 #define TemplateFunctionArgs6 const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3, const Arg4& arg4, const Arg5& arg5
 #define TemplateFunctionArgs7 const Arg0& arg0, const Arg1& arg1, const Arg2& arg2, const Arg3& arg3, const Arg4& arg4, const Arg5& arg5, const Arg6& arg6
 
+//! Does a type cast.
+template<typename T, typename S>
+inline T* castTo( S* ptr ) {
+    return ptr->is( TypeInfo<T>::id() ) ? static_cast<T*>( ptr ) : 0;
+}
+
+//! Does a type cast.
+template<typename T, typename S>
+inline const T* castTo( const S* ptr ) {
+    return ptr->is( TypeInfo<T>::id() ) ? static_cast<const T*>( ptr ) : 0;
+}
+
+#if 0
 //! Type for class index.
 typedef unsigned short  TypeIdx;
 
@@ -221,18 +234,6 @@ private:
 	}
 };
 
-//! Does a type cast.
-template<typename T, typename S>
-inline T* castTo( S* ptr ) {
-    return ptr->is( TypeInfo<T>::id() ) ? static_cast<T*>( ptr ) : 0;
-}
-
-//! Does a type cast.
-template<typename T, typename S>
-inline const T* castTo( const S* ptr ) {
-    return ptr->is( TypeInfo<T>::id() ) ? static_cast<const T*>( ptr ) : 0;
-}
-
 //! Statically check if a class D is derived from B.
 /*!
 	http://stackoverflow.com/questions/2910979/how-does-is-base-of-work
@@ -315,6 +316,7 @@ struct IndexTupleBuilder<0, IndexesTuple<Idxs ...>>
 { 
 	typedef IndexesTuple<Idxs...> Indexes; 
 };
+#endif
 
 DC_END_DREEMCHEST
 

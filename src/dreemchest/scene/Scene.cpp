@@ -47,8 +47,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-IMPLEMENT_LOGGER( log )
-
 // ** Scene::Scene
 Scene::Scene( void )
 {
@@ -278,7 +276,7 @@ ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json
 
 	return scene;
 #else
-	log::error( "Scene::createFromJson : failed to load scene, built with no JSON support.\n" );
+	LogError( "deserialize", "failed to load scene, built with no JSON support.\n" );
 	return ScenePtr();
 #endif	/*	HAVE_JSON	*/
 }
@@ -397,7 +395,7 @@ Ecs::ComponentPtr JsonSceneLoader::requestComponent( const String& id )
 	ComponentLoaders::iterator j = m_loaders.find( type );
 
 	if( j == m_loaders.end() ) {
-		log::error( "JsonSceneLoader::requestComponent : unknown object type '%s'\n", type.c_str() );
+		LogError( "deserialize", "unknown component type '%s'\n", type.c_str() );
 		return Ecs::ComponentPtr();
 	}
 
@@ -525,7 +523,7 @@ Ecs::ComponentPtr JsonSceneLoader::readParticles( const Json::Value& value )
 		ModuleLoaders::const_iterator j = m_moduleLoaders.find( i.key().asString() );
 
 		if( j == m_moduleLoaders.end() ) {
-			log::warn( "JsonSceneLoader::readParticles : unhandled module %s\n", i.key().asString().c_str() );
+			LogWarning( "deserialize", "unhandled particle module %s\n", i.key().asString().c_str() );
 			continue;
 		}
 

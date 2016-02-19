@@ -43,7 +43,9 @@ namespace Io {
 	public:
 
 						DC_DECLARE_IS(BinaryStorage, BinaryStorage, NULL)
+                    #if DC_DEPRECATED_FEATURE
 						DC_DECLARE_IS(KeyValueStorage, KeyValueStorage, NULL)
+                    #endif
 
 		virtual			~Storage( void ) {}
 
@@ -117,6 +119,7 @@ namespace Io {
 		read( &value, sizeof( T ) );
 	}
 
+#if 0
 	//! Key value storage interface.
 	class KeyValueStorage : public Storage {
 	public:
@@ -157,6 +160,7 @@ namespace Io {
 		//! Root value.
 		Variant*					m_root;
 	};
+#endif
 
 #ifdef HAVE_JSONCPP
 

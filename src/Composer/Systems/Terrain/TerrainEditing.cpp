@@ -209,8 +209,6 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 
 	// Rebuild terrain mesh.
 	mesh.mesh()->invalidateRenderable();
-#else
-    DC_NOT_IMPLEMENTED
 #endif
 }
 

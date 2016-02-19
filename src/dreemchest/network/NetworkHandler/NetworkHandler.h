@@ -216,7 +216,7 @@ namespace net {
 	inline void NetworkHandler::emitTo( const T& e, const ConnectionList& listeners )
 	{
 		if( listeners.empty() ) {
-			log::warn( "NetworkHandler::emit : no listeners to listen for %s\n", TypeInfo<T>::name() );
+			LogWarning( "rpc", "no listeners to listen for %s\n", TypeInfo<T>::name() );
 			return;
 		}
 
@@ -274,7 +274,7 @@ namespace net {
 		//! Sends a received data to parent network handler.
 		virtual void	handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size )
 		{
-			log::error( "udp\n" );
+			LogError( "socket", "udp\n" );
 		}
 
 	private:

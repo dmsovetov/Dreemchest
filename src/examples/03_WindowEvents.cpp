@@ -30,56 +30,56 @@
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace to use shorter types.
-using namespace Platform;
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( Windows )
 
 // Application delegate is used to handle an events raised by application instance.
-class WindowEvents : public ApplicationDelegate {
+class WindowEvents : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
-        
-        Platform::log::setStandardHandler();
+    virtual void handleLaunched( Platform::Application* application ) {
+        // Set the default log handler.
+        Logger::setStandardLogger();
         
         // Create a 800x600 window like we did in previous example.
-        Window* window = Window::create( 800, 600 );
+        Platform::Window* window = Platform::Window::create( 800, 600 );
 
         // Now subscribe for window events.
-        window->subscribe<Window::TouchBegan>( dcThisMethod( WindowEvents::handleTouchBegan ) );
-        window->subscribe<Window::TouchEnded>( dcThisMethod( WindowEvents::handleTouchEnded ) );
-        window->subscribe<Window::TouchMoved>( dcThisMethod( WindowEvents::handleTouchMoved ) );
-        window->subscribe<Window::KeyPressed>( dcThisMethod( WindowEvents::handleKeyPressed ) );
-        window->subscribe<Window::KeyReleased>( dcThisMethod( WindowEvents::handleKeyReleased ) );
-        window->subscribe<Window::Update>( dcThisMethod( WindowEvents::handleUpdate ) );
+        window->subscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowEvents::handleTouchBegan ) );
+        window->subscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowEvents::handleTouchEnded ) );
+        window->subscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowEvents::handleTouchMoved ) );
+        window->subscribe<Platform::Window::KeyPressed>( dcThisMethod( WindowEvents::handleKeyPressed ) );
+        window->subscribe<Platform::Window::KeyReleased>( dcThisMethod( WindowEvents::handleKeyReleased ) );
+        window->subscribe<Platform::Window::Update>( dcThisMethod( WindowEvents::handleUpdate ) );
     }
 
     // This method is called when mouse/touch is pressed.
-    void handleTouchBegan( const Window::TouchBegan& e ) {
-        Platform::log::msg( "handleMouseDown : %d %d\n", e.x, e.y );
+    void handleTouchBegan( const Platform::Window::TouchBegan& e ) {
+        LogVerbose( "touchBegan", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when mouse/touch is released.
-    void handleTouchEnded( const Window::TouchEnded& e ) {
-        Platform::log::msg( "handleMouseUp : %d %d\n", e.x, e.y );
+    void handleTouchEnded( const Platform::Window::TouchEnded& e ) {
+        LogVerbose( "touchEnded", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when mouse/touch is moved.
-    void handleTouchMoved( const Window::TouchMoved& e ) {
-        Platform::log::msg( "handleMouseMove : %d %d\n", e.x, e.y );
+    void handleTouchMoved( const Platform::Window::TouchMoved& e ) {
+        LogVerbose( "touchMoved", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when key is pressed.
-    void handleKeyPressed( const Window::KeyPressed& e ) {
-        Platform::log::msg( "handleKeyDown : %d\n", e.key );
+    void handleKeyPressed( const Platform::Window::KeyPressed& e ) {
+        LogVerbose( "keyPressed", "%d\n", e.key );
     }
 
     // This method is called when key is released.
-    void handleKeyReleased( const Window::KeyReleased& e ) {
-        Platform::log::msg( "handleKeyUp : %d\n", e.key );
+    void handleKeyReleased( const Platform::Window::KeyReleased& e ) {
+        LogVerbose( "keyReleased", "%d\n", e.key );
     }
 
     // This method is called each frame
-   void handleUpdate( const Window::Update& e ) {
+   void handleUpdate( const Platform::Window::Update& e ) {
         
     }
 };

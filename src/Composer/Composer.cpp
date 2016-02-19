@@ -103,8 +103,7 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 	m_fileSystem = new FileSystem( this );
 
     // Setup default log handlers
-	Renderer::log::setStandardHandler();
-	Scene::log::setStandardHandler();
+	Logger::setStandardLogger();
 }
 
 // ** Composer::project

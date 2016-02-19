@@ -30,26 +30,22 @@
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace.
-using namespace Platform;
-
-// Open a net namespace.
-using namespace net;
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( BasicNetworking )
 
 // Application delegate is used to handle an events raised by application instance.
-class Server : public ApplicationDelegate {
+class Server : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
-        // Setup default loggers
-        Platform::log::setStandardHandler();
-        net::log::setStandardHandler();
+    virtual void handleLaunched( Platform::Application* application ) {
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
 		// Create a network interface and show host info
-		Network network;
-		net::log::msg( "IP: %s\n", network.hostIP().toString() );
-		net::log::msg( "Hostname: %s\n", network.hostName() );
-		net::log::msg( "Broadcast IP: %s\n", network.broadcastIP().toString() );
+		net::Network network;
+		LogVerbose( "basicNetworking", "IP: %s\n", network.hostIP().toString() );
+		LogVerbose( "basicNetworking", "Hostname: %s\n", network.hostName() );
+		LogVerbose( "basicNetworking", "Broadcast IP: %s\n", network.broadcastIP().toString() );
 
 		// Now quit
 		application->quit();

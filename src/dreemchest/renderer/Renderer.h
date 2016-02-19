@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-    DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Renderer )
 
     class RenderView;
     class Hal;

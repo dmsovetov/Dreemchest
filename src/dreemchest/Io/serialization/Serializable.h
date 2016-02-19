@@ -171,10 +171,17 @@ namespace Io {
 		SerializerList fields = serializers();
 
         const BinaryStorage*   binary   = storage->isBinaryStorage();
+
+    #if DC_DEPRECATED_FEATURE
 		const KeyValueStorage* keyValue = storage->isKeyValueStorage();
+    #endif  /*  DC_DEPRECATED_FEATURE   */
 
 		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+        #if DC_DEPRECATED_FEATURE
             binary ? (*i)->read( binary ) : (*i)->read( keyValue );
+        #else
+            (*i)->read( binary );
+        #endif  /*  DC_DEPRECATED_FEATURE   */
 		}
 	}
 
@@ -184,10 +191,17 @@ namespace Io {
 		SerializerList fields = serializers();
 
         BinaryStorage*   binary   = storage->isBinaryStorage();
+
+    #if DC_DEPRECATED_FEATURE
 		KeyValueStorage* keyValue = storage->isKeyValueStorage();
+    #endif  /*  DC_DEPRECATED_FEATURE   */
 
 		for( SerializerList::iterator i = fields.begin(), end = fields.end(); i != end; ++i ) {
+        #if DC_DEPRECATED_FEATURE
             binary ? (*i)->write( binary ) : (*i)->write( keyValue );
+        #else
+            (*i)->write( binary );
+        #endif  /*  DC_DEPRECATED_FEATURE   */
 		}
 	}
 
