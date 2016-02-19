@@ -38,8 +38,8 @@ class WindowEvents : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
-        
-        Platform::log::setStandardHandler();
+        // Set the default log handler.
+        Logger::setStandardLogger();
         
         // Create a 800x600 window like we did in previous example.
         Window* window = Window::create( 800, 600 );
@@ -55,27 +55,27 @@ class WindowEvents : public ApplicationDelegate {
 
     // This method is called when mouse/touch is pressed.
     void handleTouchBegan( const Window::TouchBegan& e ) {
-        Platform::log::msg( "handleMouseDown : %d %d\n", e.x, e.y );
+        LogVerbose( "touchBegan", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when mouse/touch is released.
     void handleTouchEnded( const Window::TouchEnded& e ) {
-        Platform::log::msg( "handleMouseUp : %d %d\n", e.x, e.y );
+        LogVerbose( "touchEnded", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when mouse/touch is moved.
     void handleTouchMoved( const Window::TouchMoved& e ) {
-        Platform::log::msg( "handleMouseMove : %d %d\n", e.x, e.y );
+        LogVerbose( "touchMoved", "%d %d\n", e.x, e.y );
     }
 
     // This method is called when key is pressed.
     void handleKeyPressed( const Window::KeyPressed& e ) {
-        Platform::log::msg( "handleKeyDown : %d\n", e.key );
+        LogVerbose( "keyPressed", "%d\n", e.key );
     }
 
     // This method is called when key is released.
     void handleKeyReleased( const Window::KeyReleased& e ) {
-        Platform::log::msg( "handleKeyUp : %d\n", e.key );
+        LogVerbose( "keyReleased", "%d\n", e.key );
     }
 
     // This method is called each frame

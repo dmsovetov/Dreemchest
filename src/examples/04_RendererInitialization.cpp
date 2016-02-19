@@ -41,8 +41,8 @@ class RendererInitialization : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
-        Platform::log::setStandardHandler();
-        Renderer::log::setStandardHandler();
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
