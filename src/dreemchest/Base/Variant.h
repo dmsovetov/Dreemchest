@@ -29,6 +29,8 @@
 
 DC_BEGIN_DREEMCHEST
 
+#if 0
+
 	namespace impl {
 		typedef StrongPtr<class Value> ValuePtr;
 	} // namespace impl
@@ -587,6 +589,7 @@ DC_BEGIN_DREEMCHEST
 	{
 		return m_properties;
 	}
+#endif
 
 DC_END_DREEMCHEST
 

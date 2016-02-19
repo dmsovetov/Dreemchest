@@ -64,7 +64,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Scene )
 
 	class Scene;
 	class RenderTarget;

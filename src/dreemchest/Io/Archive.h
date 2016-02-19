@@ -53,7 +53,7 @@ namespace Io {
 
                             sFileInfo( CString name, s32 offset, s32 decompressedSize )
                                 : m_offset( offset ), m_decompressedSize( decompressedSize ) {
-                                m_name = strdup( name );
+                                m_name = _strdup( name );
                             }
                             ~sFileInfo( void ) {
                                 free( ( void* )m_name );

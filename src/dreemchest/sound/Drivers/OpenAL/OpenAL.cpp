@@ -44,13 +44,11 @@ OpenAL::OpenAL( void )
     f32 lv[] = { 0.0f, 0.0f,  0.0f };
     f32 lo[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 
-    log::verbose( "Creating OpenAL device... " );
     m_device = alcOpenDevice( NULL );
-    log::verbose( "succeeded\n" );
+    LogVerbose( "openal", "device created %x", m_device );
 
-    log::verbose( "Creating OpenAL context... " );
     m_context = alcCreateContext( m_device, NULL );
-    log::verbose( "succeeded\n" );
+    LogVerbose( "openal", "context created %x", m_context );
 
     alcMakeContextCurrent( m_context );
 
@@ -58,10 +56,8 @@ OpenAL::OpenAL( void )
     alListenerfv( AL_VELOCITY,    lv );
     alListenerfv( AL_ORIENTATION, lo );
 
-    log::msg( "AL_VERSION:    %s\n", alGetString( AL_VERSION ) );
-    log::msg( "AL_RENDERER:   %s\n", alGetString( AL_RENDERER ) );
-    log::msg( "AL_VENDOR:     %s\n", alGetString( AL_VENDOR ) );
-    log::msg( "AL_EXTENSIONS: %s\n", alGetString( AL_EXTENSIONS ) );
+    LogVerbose( "openal", "version=%s, renderer=%s, vendor=%s", alGetString( AL_VERSION ), alGetString( AL_RENDERER ), alGetString( AL_VENDOR ) );
+//    LogVerbose( "AL_EXTENSIONS: %s\n", alGetString( AL_EXTENSIONS ) );
 }
 
 OpenAL::~OpenAL( void )
@@ -111,11 +107,11 @@ void OpenAL::dumpErrors( const char *label )
         error = alGetError();
 
         switch( error ) {
-        case AL_INVALID_NAME:       log::error( "%s : invalid name\n", label );         break;
-        case AL_INVALID_ENUM:       log::error( "%s : invalid enum\n", label );         break;
-        case AL_INVALID_VALUE:      log::error( "%s : invalid value\n", label );        break;
-        case AL_INVALID_OPERATION:  log::error( "%s : invalid operation\n", label );    break;
-        case AL_OUT_OF_MEMORY:      log::error( "%s : out of memory\n", label );        break;
+        case AL_INVALID_NAME:       LogError( "openal", "%s, invalid name\n", label );         break;
+        case AL_INVALID_ENUM:       LogError( "openal", "%s, invalid enum\n", label );         break;
+        case AL_INVALID_VALUE:      LogError( "openal", "%s, invalid value\n", label );        break;
+        case AL_INVALID_OPERATION:  LogError( "openal", "%s, invalid operation\n", label );    break;
+        case AL_OUT_OF_MEMORY:      LogError( "openal", "%s, out of memory\n", label );        break;
         }
     } while( error != AL_NO_ERROR );
 }

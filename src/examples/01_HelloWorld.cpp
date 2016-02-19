@@ -35,6 +35,8 @@
 //       if you don't want to wrap engine code into a namespace).
 DC_USE_DREEMCHEST
 
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( HelloWorld )
 
 // Now the application delegate class is declared. Application delegate class
 // should be inherited from platform::ApplicationDelegate class.
@@ -47,10 +49,10 @@ class HelloWorld : public Platform::ApplicationDelegate {
         
         // The log callback can be overridden by custom function (for example to write logs to file),
         // but now we just set a standard log handler, to print all messages to console.
-        Platform::log::setStandardHandler();
+        Logger::setStandardLogger();
 
         // Just write a message to a console.
-        Platform::log::verbose( "HelloWorld application launched!\n" );
+        LogVerbose( "helloWorld", "application launched!\n" );
 
         // Now the hello world application is ready to quit - just do it! :)
         application->quit();

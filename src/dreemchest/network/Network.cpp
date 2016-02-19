@@ -27,28 +27,14 @@
 #include "Network.h"
 #include "Sockets/Posix/PosixNetwork.h"
 
-#define CHECK_TYPE_SIZE( type, size ) if( sizeof( type ) != size ) log::error( "Invalid size of %s, expected %d got %d\n", #type, size, sizeof( type ) );
-
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-IMPLEMENT_LOGGER(log)
-
 // ** Network::Network
 Network::Network( void ) : m_impl( NULL )
 {
-	CHECK_TYPE_SIZE( u8,  1 )
-	CHECK_TYPE_SIZE( s8,  1 )
-	CHECK_TYPE_SIZE( u16, 2 )
-	CHECK_TYPE_SIZE( s16, 2 )
-	CHECK_TYPE_SIZE( u32, 4 )
-	CHECK_TYPE_SIZE( s32, 4 )
-	CHECK_TYPE_SIZE( u64, 8 )
-	CHECK_TYPE_SIZE( s64, 8 )
-	CHECK_TYPE_SIZE( f32, 4 )
-	CHECK_TYPE_SIZE( f64, 8 )
-	CHECK_TYPE_SIZE( Guid, Guid::Size )
+	NIMBLE_EXPECTED_TYPE_SIZE( Guid, Guid::Size );
 
     m_impl = DC_NEW PosixNetwork;
 

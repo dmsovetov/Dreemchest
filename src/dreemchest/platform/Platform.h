@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-    DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Platform )
 
     //! Available key mappings.
     struct Key {

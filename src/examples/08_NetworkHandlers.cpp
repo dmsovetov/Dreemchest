@@ -32,16 +32,13 @@
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
-// Open a platform namespace.
-using namespace Platform;
-
-// Open a net namespace.
-using namespace net;
+// Declare the log tag in global namespace
+DREEMCHEST_LOGGER_TAG( "NetworkHandlers" )
 
 Threads::ThreadPtr serverThread;
 
 // Application delegate is used to handle an events raised by application instance.
-class NetworkHandlers : public ApplicationDelegate {
+class NetworkHandlers : public Platform::ApplicationDelegate {
 
 	struct LolEvent : public Io::Serializable {
 		ClassEnableTypeId( LolEvent )
@@ -64,21 +61,20 @@ class NetworkHandlers : public ApplicationDelegate {
 	};
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application )
+    virtual void handleLaunched( Platform::Application* application )
 	{
-        // Setup default loggers
-        Platform::log::setStandardHandler();
-        net::log::setStandardHandler();
+        // Set the default log handler.
+        Logger::setStandardLogger();
 
 		//! Create a network interface
-		Network network;
+		net::Network network;
 
 	#if LOCAL_MODE
-		ServerHandlerPtr server = startServer( application, 20000 );
+		net::ServerHandlerPtr server = startServer( application, 20000 );
 		serverThread = Threads::Thread::create();
 		serverThread->start( dcThisMethod( NetworkHandlers::updateServer ), server.get() );
 
-		ClientHandlerPtr client = connectToServer( application, 20000 );
+		net::ClientHandlerPtr client = connectToServer( application, 20000 );
 		client->registerEvent<LolEvent>();
 		client->registerEvent<ExtraEvent>();
 		client->subscribe<LolEvent>( dcThisMethod( NetworkHandlers::handleLolEvent ) );
@@ -106,17 +102,17 @@ class NetworkHandlers : public ApplicationDelegate {
 
 	void handleLolEvent( const LolEvent& e )
 	{
-		net::log::verbose( "handleLolEvent : x=%d, bar=%s\n", e.x, e.bar.c_str() );
+		LogVerbose( "events", "handleLolEvent : x=%d, bar=%s\n", e.x, e.bar.c_str() );
 	}
 
 	void handleExtraEvent( const ExtraEvent& e )
 	{
-		net::log::verbose( "handleExtraEvent\n" );
+		LogVerbose( "events", "handleExtraEvent\n" );
 	}
 
 	void updateServer( void* userData )
 	{
-		ServerHandler* server = reinterpret_cast<ServerHandler*>( userData );
+		net::ServerHandler* server = reinterpret_cast<net::ServerHandler*>( userData );
 
 		int counter = 1;
 
@@ -125,7 +121,7 @@ class NetworkHandlers : public ApplicationDelegate {
 			Threads::Thread::sleep( 1 );
 
 			if( (++counter % 500) == 0 ) {
-				printf( "emit : %d\n", counter );
+				LogDebug( "server", "emit : %d\n", counter );
 				server->emit<LolEvent>( counter, "counter!" );
 				server->emit<ExtraEvent>();
 			}
@@ -133,30 +129,30 @@ class NetworkHandlers : public ApplicationDelegate {
 	}
 
 	// This method connects to a remote socket.
-	ClientHandlerPtr connectToServer( Application* application, u16 port )
+	net::ClientHandlerPtr connectToServer( Platform::Application* application, u16 port )
 	{
 		// Connect to remote server
-		ClientHandlerPtr client = ClientHandler::create( NetworkAddress::Localhost, port );
+		net::ClientHandlerPtr client = net::ClientHandler::create( net::NetworkAddress::Localhost, port );
 
 		if( client == NULL ) {
-			return ClientHandlerPtr();
+			return net::ClientHandlerPtr();
 		}
 
 		return client;
 	}
 
 	// This method starts a TCP server
-	ServerHandlerPtr startServer( Application* application, u16 port )
+	net::ServerHandlerPtr startServer( Platform::Application* application, u16 port )
 	{
 		// Create a server-side network handler
-		ServerHandlerPtr server = ServerHandler::create( port );
+		net::ServerHandlerPtr server = net::ServerHandler::create( port );
 
 		if( server == NULL ) {
-			return ServerHandlerPtr();
+			return net::ServerHandlerPtr();
 		}
 
 		// Check for incomming data.
-		net::log::msg( "Waiting for connections...\n" );
+		LogVerbose( "server", "waiting for connections...\n" );
 
 		return server;
 	}

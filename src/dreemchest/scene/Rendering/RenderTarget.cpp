@@ -46,6 +46,16 @@ Rect RenderTarget::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
 	return ndc;
 }
 
+// ** RenderTarget::begin
+void RenderTarget::begin( RenderingContextPtr context ) const
+{
+}
+
+// ** RenderTarget::end
+void RenderTarget::end( RenderingContextPtr context ) const
+{
+}
+
 // ------------------------------------------ WindowTarget ------------------------------------------ //
 
 // ** WindowTarget::WindowTarget

@@ -305,9 +305,6 @@ namespace Renderer {
     public:
 
         virtual                     ~RenderResource( void ) {}
-
-        //! Releases this render resource.
-        virtual void                release( void );
     };
 
     //! Texture is a base class for all hardware textures.

@@ -205,8 +205,12 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 	mesh.mesh()->setVertexBuffer( 0, vb );
 	mesh.mesh()->updateBounds();
 
+#if 0
 	// Rebuild terrain mesh.
 	mesh.mesh()->invalidateRenderable();
+#else
+    LogError( "terrainEditing", "no more method 'invalidateRenderable'\n" );
+#endif
 }
 
 // ** TerrainHeightmapSystem::isPointInside

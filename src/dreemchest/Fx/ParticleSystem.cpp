@@ -37,8 +37,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-IMPLEMENT_LOGGER(log)
-
 // ------------------------------------------ ParticleSystem ------------------------------------------ //
 
 // ** ParticleSystem::emitterCount

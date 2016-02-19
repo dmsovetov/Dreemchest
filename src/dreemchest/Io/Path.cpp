@@ -177,7 +177,7 @@ StringList Path::split( CString str )
 {
     StringList result;
     
-    char* path = strdup( str );
+    char* path = _strdup( str );
 
     // ** Replace \\ in path
     for( s32 i = 0; i < ( s32 )strlen( path ); i++ ) {

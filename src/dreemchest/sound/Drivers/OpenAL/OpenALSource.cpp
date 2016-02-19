@@ -108,7 +108,7 @@ void OpenALSource::setState( SourceState value )
 
     OpenAL::dumpErrors( "OpenALSource::setState" );
     if( state() != value ) {
-        log::warn( "OpenALSource::setState : failed to change source state\n" );
+        LogWarning( "openal", "failed to change source state\n" );
     }
 }
 
