@@ -46,7 +46,7 @@ Application::Application( const Arguments& arguments, IApplication* impl ) : m_i
 
 Application::~Application( void )
 {
-    DC_DELETE( m_impl )
+    delete m_impl;
 }
 
 // ** Application::args

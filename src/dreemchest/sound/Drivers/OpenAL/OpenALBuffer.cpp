@@ -59,7 +59,7 @@ OpenALBuffer::OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize ) : So
 
     // ** If the buffer is not streamed - cleanup data right now
     if( chunks == 1 ) {
-        DC_DELETE_ARRAY( m_pcm );
+        NIMBLE_DELETE_ARRAY( m_pcm );
         m_decoder = SoundDecoderPtr();
     }
 
@@ -68,7 +68,7 @@ OpenALBuffer::OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize ) : So
 
 OpenALBuffer::~OpenALBuffer( void )
 {
-    DC_DELETE_ARRAY( m_pcm );
+    NIMBLE_DELETE_ARRAY( m_pcm );
     alDeleteBuffers( m_buffers.size(), &m_buffers[0] );
 
     OpenAL::dumpErrors( "OpenALBuffer::~OpenALBuffer" );

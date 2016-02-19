@@ -41,11 +41,12 @@ DC_END_DREEMCHEST
 
 #include "Base/Preprocessor.h"
 #include "Base/Classes.h"
-#include "Base/Variant.h"
 
-#undef DC_NOT_IMPLEMENTED
-#define DC_NOT_IMPLEMENTED NIMBLE_NOT_IMPLEMENTED
-#define DC_DEPRECATED NIMBLE_DEPRECATED
-#define DC_NEW new
+#define DC_NOT_IMPLEMENTED  NIMBLE_NOT_IMPLEMENTED
+#define DC_DEPRECATED       NIMBLE_DEPRECATED
+#define DC_BREAK            NIMBLE_BREAK
+#define DC_BREAK_IF         NIMBLE_BREAK_IF
+#define DC_DECL_OVERRIDE    NIMBLE_OVERRIDE
+#define DC_NEW              new
 
 #endif  /*  !DEPRECATED_H   */

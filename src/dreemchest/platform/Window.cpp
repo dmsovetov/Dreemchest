@@ -43,7 +43,7 @@ Window::Window( IWindow* impl ) : m_impl( impl )
 // ** Window::~Window
 Window::~Window( void )
 {
-    DC_DELETE( m_impl )
+    delete m_impl;
 }
 
 // ** Window::create
