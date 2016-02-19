@@ -64,6 +64,11 @@
 
 DC_BEGIN_COMPOSER
 
+    DC_USE_DREEMCHEST
+
+    // Declare the log tag in global namespace
+    DREEMCHEST_LOGGER_TAG( Composer )
+
 	// Declare Qt metatypes
 	Q_DECLARE_METATYPE( Scene::AssetWPtr )
 	Q_DECLARE_METATYPE( Scene::ImageWPtr )
