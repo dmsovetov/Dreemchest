@@ -39,7 +39,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    DECLARE_LOG( log )
+    NIMBLE_LOGGER_TAG( Assets )
 
     //! Opaque 32 bit handle.
     typedef OpaqueHandle<12, 20> Index;
