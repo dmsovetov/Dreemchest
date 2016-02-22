@@ -66,8 +66,8 @@ DC_END_DREEMCHEST
             }
 
 #ifdef NIMBLE_DEBUG
-	#define DC_ABORT_IF( condition, ... )	\
-                if( condition ) {           \
+	#define DC_ABORT_IF( expression, ... )	\
+                if( expression ) {           \
 				    LogFatal( "assert", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
 				    NIMBLE_BREAK;           \
                 }
