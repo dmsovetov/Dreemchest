@@ -159,7 +159,7 @@ bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping&
 		u32 rtt  = connection->time() - packet.timestamp;
 		u32 time = packet.time + rtt / 2;
 
-		if( abs( ( s64 )time - connection->time() ) > 5 ) {
+		if( abs( ( s64 )time - connection->time() ) > 50 ) {
 			LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
 			connection->setTime( time );
 		}
