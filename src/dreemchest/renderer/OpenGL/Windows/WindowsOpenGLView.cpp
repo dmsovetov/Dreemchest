@@ -116,7 +116,12 @@ void WindowsOpenGLView::endFrame( void )
 bool WindowsOpenGLView::makeCurrent( void )
 {
 	bool result = wglMakeCurrent( m_deviceContext, m_renderingContext ) != FALSE;
-	DC_BREAK_IF( !result );
+
+    if( !result ) {
+        LogError( "opengl", "failed to make context current" );
+        DC_BREAK;
+    }
+
 	return result;
 }
 

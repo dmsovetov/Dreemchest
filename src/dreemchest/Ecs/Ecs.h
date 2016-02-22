@@ -131,7 +131,7 @@ namespace Ecs {
     {
         EntityPtr entity = findById( id );
         StrongPtr<TArchetype> instance = castTo<TArchetype>( entity.get() );
-        DC_BREAK_IF( !instance.valid() );
+        DC_ABORT_IF( !instance.valid(), "archetype mismatch" );
         return instance;
     }
 

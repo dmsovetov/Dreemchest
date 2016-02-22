@@ -39,7 +39,7 @@ Application* Application::s_application = NULL;
 // ** Application::Application
 Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
-    DC_BREAK_IF( s_application != NULL );
+    DC_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
     if( !m_impl ) LogWarning( "application", "not implemented on current platform\n" );
     s_application = this;
 }

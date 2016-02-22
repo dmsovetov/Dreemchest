@@ -112,7 +112,7 @@ namespace net {
 	{
 		ResponseType response( connection, packet.id );
 		bool result = m_callback( connection, response, Io::BinarySerializer::read<T>( packet.payload ) );
-		DC_BREAK_IF( !response.wasSent() );
+		DC_BREAK_IF( !response.wasSent(), "failed to send the response" );
 		return result;
 	}
 

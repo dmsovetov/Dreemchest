@@ -137,10 +137,11 @@ void Entity::updateComponentBit( u32 bit, bool value )
 // ** Entity::detachById
 void Entity::detachById( TypeIdx id )
 {
-	DC_BREAK_IF( m_flags.is( Removed ) );
+	DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
 
 	Components::iterator i = m_components.find( id );
-	DC_BREAK_IF( i == m_components.end() );
+	DC_ABORT_IF( i == m_components.end(), "component does not exist" );
+
 	updateComponentBit( i->second->typeIndex(), false );
     i->second->setParentEntity( NULL );
 	m_components.erase( i );

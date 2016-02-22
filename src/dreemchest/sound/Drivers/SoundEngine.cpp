@@ -92,7 +92,7 @@ SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) c
 // ** SoundEngine::createSoundDecoderWithFormat
 SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format )
 {
-    DC_BREAK_IF( !stream.valid() );
+    DC_ABORT_IF( !stream.valid(), "invalid stream" );
 
     SoundDecoderPtr soundDecoder = createSoundDecoder( format );
 

@@ -195,10 +195,10 @@ namespace Ecs {
 
 		TypeIdx idx = TypeIndex<TComponent>::idx();
 		Components::const_iterator i = m_components.find( idx );
-		DC_BREAK_IF( i == m_components.end() )
+		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
         TComponent* result = castTo<TComponent>( i->second.get() );
-		DC_BREAK_IF( result == NULL );
+		DC_ABORT_IF( result == NULL, "component type mismatch" );
 
 		return result;
 	}
@@ -207,8 +207,8 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::attachComponent( TComponent* component )
 	{
-		DC_BREAK_IF( m_flags.is( Removed ) );
-		DC_BREAK_IF( has<TComponent>() );
+		DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
+		DC_ABORT_IF( has<TComponent>(), "entity already has this component" );
 
 		TypeIdx idx = component->typeIndex();
 

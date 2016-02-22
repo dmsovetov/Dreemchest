@@ -48,7 +48,7 @@ Ecs::Ecs( const EntityIdGeneratorPtr& entityIdGenerator ) : m_entityId( entityId
 // ** Ecs::create
 EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 {
-	DC_BREAK_IF( entityIdGenerator == EntityIdGeneratorPtr() );
+	DC_BREAK_IF( !entityIdGenerator.valid(), "invalid entity id generator" );
 	return DC_NEW Ecs( entityIdGenerator );
 }
 
@@ -73,10 +73,10 @@ EntityId Ecs::generateId( void ) const
 // ** Ecs::addEntity
 void Ecs::addEntity( EntityPtr entity )
 {
-	DC_BREAK_IF( !entity.valid() );
+	DC_BREAK_IF( !entity.valid(), "invalid entity" );
 
 	const EntityId& id = entity->id();
-	DC_BREAK_IF( isUsedId( id ) );
+	DC_BREAK_IF( isUsedId( id ), "entity id is already used" );
 
 	// Setup entity
 	entity->setEcs( this );
@@ -93,7 +93,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
-	DC_BREAK_IF( !instance.valid() );
+	DC_BREAK_IF( !instance.valid(), "failed to create archetype by name" );
 
 	// Ensure we found the archetype type
 	if( !instance.valid() ) {
@@ -124,7 +124,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 ComponentPtr Ecs::createComponentByName( const String& name, const KeyValue* data ) const
 {
 	ComponentPtr instance = m_componentFactory.construct( name );
-	DC_BREAK_IF( !instance.valid() );
+	DC_BREAK_IF( !instance.valid(), "failed to create component by name" );
 
 	// Ensure we found the component type
 	if( !instance.valid() ) {
@@ -203,7 +203,7 @@ EntitySet Ecs::findByAspect( const Aspect& aspect ) const
 // ** Ecs::removeEntity
 void Ecs::removeEntity( const EntityId& id )
 {
-	DC_BREAK_IF( !isUsedId( id ) );
+	DC_BREAK_IF( !isUsedId( id ), "entity does not exist" );
 
 	Entities::iterator i = m_entities.find( id );
 

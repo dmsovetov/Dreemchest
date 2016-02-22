@@ -212,7 +212,7 @@ AssetBundlePtr AssetBundle::create( const String& name, const Io::Path& path )
 // ** AssetBundle::createFromString
 AssetBundlePtr AssetBundle::createFromString( const String& name, const Io::Path& path, const String& text )
 {
-	DC_BREAK_IF( text.empty() );
+	DC_BREAK_IF( text.empty(), "could not parse asset bundle from an empty string" );
 
 	// Create asset bundle instance
 	AssetBundlePtr assetBundle( DC_NEW AssetBundle( name, path ) );
@@ -365,7 +365,7 @@ void AssetBundle::addAsset( AssetPtr asset )
 
 	// Register an asset by it's UUID
 	const String& uuid = asset->uuid();
-	DC_BREAK_IF( uuid.empty() );
+	DC_BREAK_IF( uuid.empty(), "asset unique id should not be empty" );
 
 	// Check that this UUID is unique
 	StringHash hashUuid( uuid.c_str() );

@@ -201,7 +201,7 @@ namespace Fx {
 	template<typename TValue>
 	TValue Parameter<TValue>::sample( s32 particleIndex, f32 scalar, const TValue& defaultValue ) const
 	{
-		DC_BREAK_IF( scalar < 0.0f || scalar > 1.0f );
+		DC_BREAK_IF( scalar < 0.0f || scalar > 1.0f, "scalar value is out of range" );
 
 		// Set result to a default value
 		TValue result = defaultValue;

@@ -69,7 +69,7 @@ namespace net {
 	bool PacketHandler<T>::handle( ConnectionPtr& connection, NetworkPacket* packet )
 	{
 		T* packetWithType = castTo<T>( packet );
-		DC_BREAK_IF( packetWithType == NULL );
+		DC_ABORT_IF( packetWithType == NULL, "packet type mismatch" );
 		return m_callback( connection, *packetWithType );
 	}
 

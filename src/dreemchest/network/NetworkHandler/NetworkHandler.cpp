@@ -39,7 +39,7 @@ namespace net {
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
 {
-    DC_BREAK_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ) );
+    DC_ABORT_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ), "the type info return an invalid name" );
     
 	registerPacketHandler<packets::Ping>			  ( dcThisMethod( NetworkHandler::handlePingPacket ) );
 	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( NetworkHandler::handleKeepAlivePacket ) );
@@ -115,7 +115,7 @@ void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
 
 	// ** Find a connection by socket
 	ConnectionPtr connection = findConnectionBySocket( socket );
-	DC_BREAK_IF( connection == NULL );
+	DC_ABORT_IF( !connection.valid(), "the socked does not have an associated connection" );
 
 	connection->m_totalBytesReceived += stream->bytesAvailable();
 
@@ -189,7 +189,6 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Even
 {
 	// ** Find an event handler from this event id.
 	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
-	DC_BREAK_IF( i == m_eventHandlers.end() )
 
 	if( i == m_eventHandlers.end() ) {
 		LogWarning( "rpc", "unknown event %d received\n", packet.eventId );

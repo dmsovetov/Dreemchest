@@ -31,14 +31,14 @@
 
 #ifdef DC_DEBUG
     #ifdef DC_THREADS_ENABLED
-        #define CHECK_THREAD DC_BREAK_IF( m_renderThread != thread::Thread::currentThread() )
+        #define CHECK_THREAD DC_ASSERT( m_renderThread == thread::Thread::currentThread(), "Accessing OpenGL from another thread" )
     #else
         #define CHECK_THREAD
     #endif
 
-    #define		DC_CHECK_GL_CONTEXT	DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL )
+    #define		DC_CHECK_GL_CONTEXT	DC_ASSERT( glGetString( GL_EXTENSIONS ) != NULL, "OpenGL context should be initialized" )
     #define     DC_CHECK_GL         sOpenGLErrorCheck __gl_check; CHECK_THREAD
-    #define     DC_CHECK_GL_ERROR   DC_BREAK_IF( glGetError() != GL_NO_ERROR )
+    #define     DC_CHECK_GL_ERROR   DC_EXPECT( glGetError() == GL_NO_ERROR, "Unexpected OpenGL error occured" )
 #else
     #define		DC_CHECK_GL_CONTEXT
     #define     DC_CHECK_GL

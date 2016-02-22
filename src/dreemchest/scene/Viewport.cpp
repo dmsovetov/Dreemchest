@@ -65,7 +65,7 @@ const Ray& Viewport::ray( void ) const
 // ** Viewport::eye
 const Vec3& Viewport::eye( void ) const
 {
-	DC_BREAK_IF( !m_camera.valid() );
+	DC_ABORT_IF( !m_camera.valid(), "viewport has no camera set" );
 	return m_camera->get<Transform>()->position();
 }
 

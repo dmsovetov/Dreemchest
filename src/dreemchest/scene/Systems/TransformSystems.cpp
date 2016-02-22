@@ -59,7 +59,7 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 {
 	// Find the transform
 	Array<Transform*>::iterator i = std::find( m_transforms.begin(), m_transforms.end(), entity.has<Transform>() );
-	DC_BREAK_IF( i == m_transforms.end() );
+	DC_ABORT_IF( i == m_transforms.end(), "no such transform" );
 
 	// Remove it from an array
 	m_transforms.erase( i );

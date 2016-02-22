@@ -227,7 +227,7 @@ namespace Ecs {
     // ** ComponentBase::setParentEntity
     inline void ComponentBase::setParentEntity( const EntityWPtr& value )
     {
-        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value );
+        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value, "parent entity of a component is already set" );
         m_entity = value;
     }
 

@@ -62,11 +62,11 @@ namespace Scene {
 	template<typename TAsset>
 	bool GenericAssetLoader<TAsset>::loadFromStream( AssetBundleWPtr assets, AssetWPtr asset, const Io::StreamPtr& stream )
 	{
-		DC_BREAK_IF( !asset.valid() );
+		DC_ABORT_IF( !asset.valid(), "invalid asset" );
 
 		// Type cast an asset.
 		m_asset = castTo<TAsset>( asset.get() );
-		DC_BREAK_IF( !m_asset.valid() );
+		DC_ABORT_IF( !m_asset.valid(), "asset type mismatch" );
 
 		return m_asset.valid();		
 	}

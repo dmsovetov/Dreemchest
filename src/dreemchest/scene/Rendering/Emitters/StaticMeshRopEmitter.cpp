@@ -54,7 +54,7 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 
 	// Get the rendered mesh
 	const MeshPtr& mesh = staticMesh.mesh();
-	DC_BREAK_IF( !mesh.valid() );
+    DC_ABORT_IF( !mesh.valid(), "invalid mesh" )
 
 	// Emit render operation for each mesh chunk
 	for( u32 i = 0, n = mesh->chunkCount(); i < n; i++ ) {

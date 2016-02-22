@@ -39,7 +39,7 @@ Input* Input::s_input = NULL;
 // ** Input::Input
 Input::Input( IInput* impl ) : m_impl( impl )
 {
-    DC_BREAK_IF( s_input != NULL );
+    DC_ABORT_IF( s_input != NULL, "only a single Input instance is allowed" );
     if( !m_impl ) LogWarning( "input", "not implemented on current platform\n" );
     s_input = this;
 
