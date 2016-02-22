@@ -164,7 +164,34 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
         DC_NOT_IMPLEMENTED;
     }
 #else
-    DC_NOT_IMPLEMENTED
+    // Get shape type
+    const String& type = ar.get<String>( "type", "" );
+
+    // Get material
+    KeyValue material = ar.get<KeyValue>( "material" );
+
+    // Parse material
+    Material shapeMaterial;
+    shapeMaterial.density       = material.get( "density", 1.0f );
+    shapeMaterial.friction      = material.get( "friction", 0.2f );
+    shapeMaterial.restitution   = material.get( "restitution", 0.0f );
+
+    if( type == "polygon" ) {
+        VariantArray::Container vertices = ar.get<VariantArray>( "vertices" );
+        Array<Vec2>     points;
+
+        for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
+            points.push_back( Vec2( vertices[i * 2 + 0].as<f32>(), vertices[i * 2 + 1].as<f32>() ) );
+        }
+
+        addPolygon( &points[0], points.size(), shapeMaterial );
+    }
+    else if( type == "circle" ) {
+        addCircle( ar.get( "radius", 0.0f ), 0.0f, 0.0f, shapeMaterial );
+    }
+    else {
+        DC_NOT_IMPLEMENTED;
+    }
 #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 

@@ -47,7 +47,8 @@ DC_BEGIN_DREEMCHEST
 
     typedef Io::KeyValue KeyValue;
 #else
-    typedef Kv KeyValue;
+    typedef Kv<String>      KeyValue;
+    typedef Array<KeyValue> KeyValueArray;
 #endif  /*  !DEV_DEPRECATED_KEYVALUE_TYPE   */
 
 DC_END_DREEMCHEST

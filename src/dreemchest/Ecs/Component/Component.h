@@ -155,7 +155,9 @@ namespace Ecs {
     #if DEV_DEPRECATED_KEYVALUE_TYPE
         ar.read( storage );
     #else
-        DC_NOT_IMPLEMENTED
+        Variant value;
+        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).read( value );
+        ar = value.as<KeyValue>();
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
         SerializationContext ctx( NULL );
@@ -172,7 +174,7 @@ namespace Ecs {
     #if DEV_DEPRECATED_KEYVALUE_TYPE
 	    ar.write( storage );
     #else
-        DC_NOT_IMPLEMENTED
+        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( Variant::fromValue( ar ) );
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 

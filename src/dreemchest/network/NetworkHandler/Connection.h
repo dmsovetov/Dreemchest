@@ -189,13 +189,8 @@ namespace net {
 	template<typename TRemoteProcedure>
 	void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
-    #else
-        Io::ByteBufferPtr buffer;
-        DC_NOT_IMPLEMENTED
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		// ** Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;

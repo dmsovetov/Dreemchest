@@ -135,7 +135,8 @@ KeyValue Asset::keyValue( void ) const
 #if DEV_DEPRECATED_KEYVALUE_TYPE
 	return KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
 #else
-    DC_NOT_IMPLEMENTED
+    DC_NOT_IMPLEMENTED;
+    return KeyValue();
 #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 

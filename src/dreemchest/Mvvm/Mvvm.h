@@ -40,52 +40,60 @@ namespace mvvm {
 	//! Generic class to convert between the value type & BSON.
 	template<typename TValue>
 	struct BsonConverter {
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Converts to BSON from a value.
 		static KeyValue	    to( const TValue& value )
         {
-        #if DEV_DEPRECATED_KEYVALUE_TYPE
             return KeyValue( value );
-        #else
-            DC_NOT_IMPLEMENTED
-            return KeyValue();
-        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
         }
 
 		//! Converts from a value to a BSON.
 		static TValue		from( const KeyValue& value )
         {
-        #if DEV_DEPRECATED_KEYVALUE_TYPE
             return static_cast<TValue>( value );
-        #else
-            DC_NOT_IMPLEMENTED
-            return TValue();
-        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
         }
+    #else
+		//! Converts to BSON from a value.
+		static Variant	    to( const TValue& value )
+        {
+            return Variant::fromValue<TValue>( value );
+        }
+
+		//! Converts from a value to a BSON.
+		static TValue		from( const Variant& value )
+        {
+            return value.as<TValue>();
+        }
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	};
 
 	//! Converts between the GUID and BSON.
 	struct GuidBsonConverter {
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Converts to BSON from a value.
 		static KeyValue	to( const :: DC_DREEMCHEST_NS Guid& value )
         {
-        #if DEV_DEPRECATED_KEYVALUE_TYPE
             return KeyValue( value.toString() );
-        #else
-            DC_NOT_IMPLEMENTED;
-            return KeyValue();
-        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
         }
 
 		//! Converts from a value to a BSON.
 		static :: DC_DREEMCHEST_NS Guid		from( const KeyValue& value )
         {
-        #if DEV_DEPRECATED_KEYVALUE_TYPE
             return value.asString();
-        #else
-            DC_NOT_IMPLEMENTED
-            return Guid();
-        #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
-        }	
+        }
+    #else
+		//! Converts to BSON from a value.
+		static Variant	to( const :: DC_DREEMCHEST_NS Guid& value )
+        {
+            return Variant::fromValue( value.toString() );
+        }
+
+		//! Converts from a value to a BSON.
+		static :: DC_DREEMCHEST_NS Guid		from( const Variant& value )
+        {
+            return value.as<String>();
+        }
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	};
 
 	//! Converts between the Vec2 and BSON.

@@ -50,11 +50,19 @@ namespace mvvm {
 		//! Returns the value type.
 		virtual ValueTypeIdx		type( void ) const = 0;
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE 
 		//! Returns the BSON object that represents this value.
 		virtual KeyValue			bson( void ) const = 0;
 
 		//! Sets the BSON object that represents this value.
 		virtual void				setBson( const KeyValue& value ) = 0;
+    #else
+		//! Returns the BSON object that represents this value.
+		virtual Variant			    bson( void ) const = 0;
+
+		//! Sets the BSON object that represents this value.
+		virtual void				setBson( const Variant& value ) = 0;
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		//! Generates the value type index.
 		template<typename TValue>
@@ -125,11 +133,19 @@ namespace mvvm {
 		//! Returns the actual value type index.
 		virtual ValueTypeIdx			type( void ) const;
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Returns the BSON object that represents this value.
 		virtual KeyValue				bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
 		virtual void					setBson( const KeyValue& value );
+    #else
+		//! Returns the BSON object that represents this value.
+		virtual Variant				    bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void					setBson( const Variant& value );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		//! Returns the property value.
 		const TValue&					get( void ) const;
@@ -187,6 +203,7 @@ namespace mvvm {
 		return Value::valueType<Type>();
 	}
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	// ** PrimitiveValue::bson
 	template<typename TValue, typename TBsonConverter>
 	KeyValue PrimitiveValue<TValue, TBsonConverter>::bson( void ) const
@@ -200,6 +217,21 @@ namespace mvvm {
 	{
 		set( TBsonConverter::from( value ) );
 	}
+#else
+	// ** PrimitiveValue::bson
+	template<typename TValue, typename TBsonConverter>
+	Variant PrimitiveValue<TValue, TBsonConverter>::bson( void ) const
+	{
+		return TBsonConverter::to( m_value );
+	}
+
+	// ** PrimitiveValue::setBson
+	template<typename TValue, typename TBsonConverter>
+	void PrimitiveValue<TValue, TBsonConverter>::setBson( const Variant& value )
+	{
+		set( TBsonConverter::from( value ) );
+	}
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 	// ** PrimitiveValue::get
 	template<typename TValue, typename TBsonConverter>
@@ -239,11 +271,19 @@ namespace mvvm {
 		//! Returns the object value type index.
 		virtual ValueTypeIdx				type( void ) const;
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Returns the BSON object that represents this value.
 		virtual KeyValue					bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
 		virtual void						setBson( const KeyValue& value );
+    #else
+		//! Returns the BSON object that represents this value.
+		virtual Variant					    bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void						setBson( const Variant& value );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		//! Returns true if the object type matches the specified one.
 		virtual bool						is( ValueTypeIdx expected ) const;
@@ -375,11 +415,19 @@ namespace mvvm {
 		//! Returns array value type.
 		virtual ValueTypeIdx		type( void ) const;
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Returns the BSON object that represents this value.
 		virtual KeyValue			bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
 		virtual void				setBson( const KeyValue& value );
+#else
+		//! Returns the BSON object that represents this value.
+		virtual Variant			    bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void				setBson( const Variant& value );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		//! Returns true if the array matches the expected type.
 		virtual bool				is( ValueTypeIdx expected ) const;
@@ -465,11 +513,12 @@ namespace mvvm {
 		notifyValueChanged();
 	}
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	// ** ArrayValue::bson
 	template<typename TValue>
 	KeyValue ArrayValue<TValue>::bson( void ) const
 	{
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
+    
 		KeyValue result = KeyValue::array();
 
 		for( s32 i = 0, n = size(); i < n; i++ ) {
@@ -477,10 +526,6 @@ namespace mvvm {
 		}
 
 		return result;
-    #else
-        DC_NOT_IMPLEMENTED
-        return KeyValue();
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	// ** ArrayValue::setBson
@@ -489,7 +534,22 @@ namespace mvvm {
 	{
 		DC_NOT_IMPLEMENTED
 	}
+#else
+	// ** ArrayValue::bson
+	template<typename TValue>
+	Variant ArrayValue<TValue>::bson( void ) const
+	{
+		DC_NOT_IMPLEMENTED;
+        return Variant();
+	}
 
+	// ** ArrayValue::setBson
+	template<typename TValue>
+	void ArrayValue<TValue>::setBson( const Variant& value )
+	{
+		DC_NOT_IMPLEMENTED
+	}
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 	// ---------------------------------------------------------- CommandValue ---------------------------------------------------------- //
 
@@ -500,11 +560,19 @@ namespace mvvm {
 		//! Returns command value type.
 		virtual ValueTypeIdx	type( void ) const;
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		//! Returns the BSON object that represents this value.
 		virtual KeyValue		bson( void ) const;
 
 		//! Sets the BSON object that represents this value.
 		virtual void			setBson( const KeyValue& value );
+    #else
+		//! Returns the BSON object that represents this value.
+		virtual Variant		    bson( void ) const;
+
+		//! Sets the BSON object that represents this value.
+		virtual void			setBson( const Variant& value );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		//! Returns true if the command matches the expected type.
 		virtual bool			is( ValueTypeIdx expected ) const;

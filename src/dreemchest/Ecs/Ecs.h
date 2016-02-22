@@ -29,8 +29,8 @@
 
 #include "../Dreemchest.h"
 
-#include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
+#include "../io/serialization/Serializable.h"
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
 #define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method
@@ -155,8 +155,13 @@ namespace Ecs {
         StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const;
 
 		//! Creates an array of archetype instances from data.
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		template<typename TArchetype>
 		Array<StrongPtr<TArchetype>>	createArchetypes( const KeyValue& data ) const;
+    #else
+		template<typename TArchetype>
+		Array<StrongPtr<TArchetype>>	createArchetypes( const KeyValueArray& data ) const;
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
@@ -308,7 +313,8 @@ namespace Ecs {
     }
 
 	// ** Ecs::createArchetypes
-	template<typename TArchetype>
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    template<typename TArchetype>
 	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const KeyValue& data ) const
 	{
 		Array<StrongPtr<TArchetype>> result;
@@ -320,6 +326,20 @@ namespace Ecs {
 
 		return result;
 	}
+#else
+    template<typename TArchetype>
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const KeyValueArray& data ) const
+	{
+		Array<StrongPtr<TArchetype>> result;
+
+		for( s32 i = 0, n = data.size(); i < n; i++ ) {
+            const KeyValue& item = data[i];
+			result.push_back( createArchetype<TArchetype>( item["_id"].as<Guid>(), &item ) );
+		}
+
+		return result;
+	}
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		
 	// ** Ecs::createComponent
 	template<typename TComponent>

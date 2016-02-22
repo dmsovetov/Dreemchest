@@ -182,10 +182,11 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+
 // ** ObjectValue::bson
 KeyValue ObjectValue::bson( void ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
 	KeyValue result = KeyValue::object();
 
 	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
@@ -205,16 +206,11 @@ KeyValue ObjectValue::bson( void ) const
 	}
 
 	return result;
-#else
-    DC_NOT_IMPLEMENTED
-    return KeyValue();
-#endif
 }
 
 // ** ObjectValue::setBson
 void ObjectValue::setBson( const KeyValue& value )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
 	const KeyValue::Properties& kv = value.properties();
 
 	for( KeyValue::Properties::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
@@ -224,10 +220,41 @@ void ObjectValue::setBson( const KeyValue& value )
 			value->setBson( i->second );
 		}
 	}
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
+
+#else
+
+// ** ObjectValue::bson
+Variant ObjectValue::bson( void ) const
+{
+	KeyValue result;
+
+	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
+		const String& key = i->first;
+
+		if( key == "isValid" ) {
+			continue;
+		}
+
+		Variant value = i->second->bson();
+
+		if( !value.isValid() ) {
+			continue;
+		}
+
+		result.setValueAtKey( key, value );
+	}
+
+	return Variant::fromValue( result );
+}
+
+// ** ObjectValue::setBson
+void ObjectValue::setBson( const Variant& value )
+{
+    DC_NOT_IMPLEMENTED
+}
+
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 // ----------------------------------------------------------- CommandValue ----------------------------------------------------------- //
 
@@ -249,15 +276,11 @@ ValueTypeIdx CommandValue::type( void ) const
 	return Value::valueType<CommandValue>();
 }
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 //! Returns the BSON object that represents this value.
 KeyValue CommandValue::bson( void ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
 	return KeyValue::kNull;
-#else
-    DC_NOT_IMPLEMENTED
-    return KeyValue();
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 //! Sets the BSON object that represents this value.
@@ -265,6 +288,19 @@ void CommandValue::setBson( const KeyValue& value )
 {
 
 }
+#else
+//! Returns the BSON object that represents this value.
+Variant CommandValue::bson( void ) const
+{
+	return Variant();
+}
+
+//! Sets the BSON object that represents this value.
+void CommandValue::setBson( const Variant& value )
+{
+
+}
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 // -------------------------------------------------------------- Command -------------------------------------------------------------- //
 
