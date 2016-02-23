@@ -184,7 +184,7 @@ namespace Ecs {
     #if DEV_DEPRECATED_KEYVALUE_TYPE
         ar = KeyValue::kNull;
     #else
-        DC_NOT_IMPLEMENTED
+        ar = Archive();
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		LogWarning( "serialize", "not implemented for component '%s'\n", typeName() );
 	}
