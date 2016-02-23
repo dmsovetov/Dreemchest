@@ -150,6 +150,7 @@ ByteBufferPtr BinarySerializer::write( const Serializable& data )
 	return stream;
 }
 
+#if !DEV_DEPRECATED_KEYVALUE_TYPE
 // ** BinarySerializer::writeToByteBuffer
 ByteBufferPtr BinarySerializer::write( const KeyValue& data )
 {
@@ -158,6 +159,7 @@ ByteBufferPtr BinarySerializer::write( const KeyValue& data )
 
 	return stream;
 }
+#endif	/*	!DEV_DEPRECATED_KEYVALUE_TYPE	*/
 
 } // namespace Io
 
