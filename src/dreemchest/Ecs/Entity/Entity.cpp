@@ -309,6 +309,11 @@ void Entity::deserialize( SerializationContext& ctx, const Archive& ar )
 		}
 
 		ComponentPtr component = ctx.createComponent( i->first );
+
+        if( !component.valid() ) {
+            continue;
+        }
+
         component->deserialize( ctx, i->second );
 		attachComponent( component.get() );
 	}
