@@ -28,7 +28,7 @@
 #define DEPRECATED_H
 
 //! Enables/disables the deprecated KeyValue data type
-#define DEV_DEPRECATED_KEYVALUE_TYPE    (1)
+#define DEV_DEPRECATED_KEYVALUE_TYPE    (0)
 
 DC_BEGIN_DREEMCHEST
 
