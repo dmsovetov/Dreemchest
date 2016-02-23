@@ -251,7 +251,16 @@ Variant ObjectValue::bson( void ) const
 // ** ObjectValue::setBson
 void ObjectValue::setBson( const Variant& value )
 {
-    DC_NOT_IMPLEMENTED
+    KeyValue kv = value.as<KeyValue>();
+	const KeyValue::Properties& properties = kv.properties();
+
+	for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
+		ValueWPtr value = get( i->first );
+
+		if( value.valid() ) {
+			value->setBson( i->second );
+		}
+	}
 }
 
 #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
