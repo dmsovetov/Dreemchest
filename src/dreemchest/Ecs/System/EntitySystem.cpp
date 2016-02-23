@@ -80,6 +80,8 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 		return;
 	}
 
+    NIMBLE_BREADCRUMB( name() );
+
 	EntitySet& entities = m_index->entities();
 
 	for( EntitySet::iterator i = entities.begin(); i != entities.end(); ) {
@@ -93,12 +95,14 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 // ** EntitySystem::handleEntityAdded
 void EntitySystem::handleEntityAdded( const Index::Added& e )
 {
+    NIMBLE_BREADCRUMB( name() + ".handleEntityAdded" );
 	entityAdded( *e.entity.get() );
 }
 
 // ** EntitySystem::handleEntityRemoved
 void EntitySystem::handleEntityRemoved( const Index::Removed& e )
 {
+    NIMBLE_BREADCRUMB( name() + ".handleEntityRemoved" );
 	entityRemoved( *e.entity.get() );
 }
 
