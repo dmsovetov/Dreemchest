@@ -68,6 +68,11 @@ namespace Io {
 		//! Writes a serializable to a byte buffer.
 		static ByteBufferPtr		write( const Serializable& data );
 
+	#if !DEV_DEPRECATED_KEYVALUE_TYPE
+		//! Writes the KeyValue to a byte buffer.
+		static ByteBufferPtr		write( const KeyValue& data );
+	#endif	/*	!DEV_DEPRECATED_KEYVALUE_TYPE	*/
+
 	private:
 
 		//! Serializable data header.
@@ -97,7 +102,7 @@ namespace Io {
     #if DEV_DEPRECATED_KEYVALUE_TYPE
 		data.read( &storage );
     #else
-        DC_NOT_IMPLEMENTED
+        data.read( &storage );
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		return data;
 	}

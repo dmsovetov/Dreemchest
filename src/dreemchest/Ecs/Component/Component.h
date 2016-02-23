@@ -95,10 +95,10 @@ namespace Ecs {
 		virtual void		        write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
 
 		//! Writes this component to a key-value archive.
-		virtual void                serialize( SerializationContext& ctx, KeyValue& ar ) const;
+		virtual void                serialize( SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads this component from a key-value archive.
-		virtual void		        deserialize( SerializationContext& ctx, const KeyValue& value );
+		virtual void		        deserialize( SerializationContext& ctx, const Archive& ar );
 	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	protected:
@@ -151,13 +151,13 @@ namespace Ecs {
 	// ** ComponentBase::read
 	inline void ComponentBase::read( const Io::Storage* storage )
 	{
-	    KeyValue ar;
+	    Archive ar;
     #if DEV_DEPRECATED_KEYVALUE_TYPE
         ar.read( storage );
     #else
-        Variant value;
+		Variant value;
         Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).read( value );
-        ar = value.as<KeyValue>();
+		ar = value;
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
         SerializationContext ctx( NULL );
@@ -168,18 +168,18 @@ namespace Ecs {
 	inline void ComponentBase::write( Io::Storage* storage ) const
 	{
         SerializationContext ctx( NULL );
-        KeyValue ar;
+        Archive ar;
 
         serialize( ctx, ar );
     #if DEV_DEPRECATED_KEYVALUE_TYPE
 	    ar.write( storage );
     #else
-        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( Variant::fromValue( ar ) );
+        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( ar );
     #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	// ** ComponentBase::serialize
-	inline void ComponentBase::serialize( SerializationContext& ctx, KeyValue& ar ) const
+	inline void ComponentBase::serialize( SerializationContext& ctx, Archive& ar ) const
 	{
     #if DEV_DEPRECATED_KEYVALUE_TYPE
         ar = KeyValue::kNull;
@@ -190,7 +190,7 @@ namespace Ecs {
 	}
 
 	// ** ComponentBase::deserialize
-	inline void ComponentBase::deserialize( SerializationContext& ctx, const KeyValue& value )
+	inline void ComponentBase::deserialize( SerializationContext& ctx, const Archive& ar )
 	{
 		LogWarning( "deserialize", "not implemented for component '%s'\n", typeName() );
 	}

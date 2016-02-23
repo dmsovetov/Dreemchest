@@ -46,10 +46,14 @@ DC_BEGIN_DREEMCHEST
     }
 
     typedef Io::KeyValue KeyValue;
+	typedef Io::KeyValue Archive;
 #else
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;
+	typedef Variant			Archive;
 #endif  /*  !DEV_DEPRECATED_KEYVALUE_TYPE   */
+
+typedef Array<Archive> Archives;
 
 DC_END_DREEMCHEST
 

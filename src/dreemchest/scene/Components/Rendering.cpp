@@ -85,13 +85,13 @@ void Light::setRange( f32 value )
 }
 
 // ** Light::serialize
-void Light::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
+void Light::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
     DC_NOT_IMPLEMENTED;
 }
 
 // ** Light::deserialize
-void Light::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
+void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     DC_NOT_IMPLEMENTED;
 }
@@ -173,7 +173,7 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 }
 
 // ** StaticMesh::serialize
-void StaticMesh::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
+void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
     KeyValue materials = KeyValue::array();
@@ -190,7 +190,7 @@ void StaticMesh::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 }
 
 // ** StaticMesh::deserialize
-void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
+void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
     AssetBundle* assets = ctx.get<AssetBundle>();
@@ -456,7 +456,7 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 }
 
 // ** Camera::serialize
-void Camera::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
+void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
     ar = KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
@@ -466,7 +466,7 @@ void Camera::serialize( Ecs::SerializationContext& ctx, KeyValue& ar ) const
 }
 
 // ** Camera::deserialize
-void Camera::deserialize( Ecs::SerializationContext& ctx, const KeyValue& ar )
+void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
     m_clearMask     = ar["clearMask"].asUByte();

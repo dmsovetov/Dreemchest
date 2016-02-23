@@ -130,10 +130,10 @@ namespace Ecs {
 		virtual void		    write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
 
 		//! Writes this entity to a key-value archive.
-		virtual void            serialize( SerializationContext& ctx, KeyValue& ar ) const;
+		virtual void            serialize( SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads this entity from a key-value archive.
-		virtual void		    deserialize( SerializationContext& ctx, const KeyValue& value );
+		virtual void		    deserialize( SerializationContext& ctx, const Archive& ar );
     #endif  /*  !DC_ECS_NO_SERIALIZATION    */
 
 	#ifndef DC_CPP11_DISABLED

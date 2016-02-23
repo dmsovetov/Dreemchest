@@ -89,7 +89,7 @@ void Ecs::addEntity( EntityPtr entity )
 }
 
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const KeyValue* data ) const
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data ) const
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
@@ -121,7 +121,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 }
 
 // ** Ecs::createComponentByName
-ComponentPtr Ecs::createComponentByName( const String& name, const KeyValue* data ) const
+ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data ) const
 {
 	ComponentPtr instance = m_componentFactory.construct( name );
 	DC_BREAK_IF( !instance.valid(), "failed to create component by name" );

@@ -27,6 +27,7 @@
 #include "Storage.h"
 #include "BinarySerializer.h"
 #include "Serializable.h"
+#include "../KeyValue.h"
 #include "../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
@@ -145,6 +146,15 @@ ByteBufferPtr BinarySerializer::write( const Serializable& data )
 	ByteBufferPtr stream = ByteBuffer::create();
 	BinaryStorage storage( stream );
 	data.write( &storage );
+
+	return stream;
+}
+
+// ** BinarySerializer::writeToByteBuffer
+ByteBufferPtr BinarySerializer::write( const KeyValue& data )
+{
+	ByteBufferPtr stream = ByteBuffer::create();
+	BinaryVariantStream( stream ).write( Variant::fromValue( data ) );
 
 	return stream;
 }

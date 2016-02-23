@@ -1305,6 +1305,8 @@ BinaryVariantStream::Type BinaryVariantStream::valueType( const Variant& value )
     RETURN_TYPEID_IF( u16, s16, kInt16 );
     RETURN_TYPEID_IF( u32, s32, kInt32 );
     RETURN_TYPEID_IF( u64, s64, kInt64 );
+	RETURN_TYPEID_IF( f32, f32, kFloat32 );
+	RETURN_TYPEID_IF( f64, f64, kFloat32 );
     RETURN_TYPEID_IF( bool, bool, kBoolean );
     RETURN_TYPEID_IF( String, String, kString );
     RETURN_TYPEID_IF( VariantArray, VariantArray, kArray );
