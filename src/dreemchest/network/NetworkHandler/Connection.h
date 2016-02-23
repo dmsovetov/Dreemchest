@@ -227,13 +227,8 @@ namespace net {
 	template<typename T>
 	inline bool Response<T>::operator()( const T& value, const Error& error )
 	{
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
-    #else
-        Io::ByteBufferPtr buffer;
-        DC_NOT_IMPLEMENTED
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		// ** Send an RPC response packet.
 		m_connection->send<packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
