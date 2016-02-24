@@ -89,7 +89,7 @@ namespace Ecs {
 			return;
 		}
 
-        NIMBLE_BREADCRUMB( name() );
+        NIMBLE_BREADCRUMB_CALL_STACK;
 
 		EntitySet& entities = m_index->entities();
 
@@ -104,7 +104,7 @@ namespace Ecs {
 	template<typename TSystem, typename ... TComponents>
 	void GenericEntitySystem<TSystem, TComponents...>::entityAdded( const Entity& entity )
 	{
-        NIMBLE_BREADCRUMB( name() + ".handleEntityAdded" );
+        NIMBLE_BREADCRUMB_CALL_STACK;
 		dispatchEntityAdded( entity, typename Indices::Indexes() );
 	}
 

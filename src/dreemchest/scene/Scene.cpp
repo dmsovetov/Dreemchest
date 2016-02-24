@@ -88,7 +88,7 @@ Scene::Scene( void )
 // ** Scene::update
 void Scene::update( u32 currentTime, f32 dt )
 {
-    NIMBLE_BREADCRUMB_F;
+    NIMBLE_BREADCRUMB_CALL_STACK;
 	m_ecs->update( currentTime, dt, UpdateSystems );
 }
 
