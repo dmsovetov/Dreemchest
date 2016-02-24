@@ -28,7 +28,7 @@ set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 add_definitions(-DDC_NAMESPACE=${DC_NAMESPACE} -DNIMBLE_NAMESPACE=DC_NAMESPACE -D_CRT_SECURE_NO_WARNINGS)
 
 # Add include directory
-include_directories(Dreemchest Nimble)
+include_directories(Dreemchest)
 
 # Add Nimble subproject
 add_subdirectory(Nimble)
@@ -76,6 +76,11 @@ endif (WIN32)
 
 # Add child projects
 add_subdirectory(Dreemchest)
+
+target_include_directories(
+    Dreemchest PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/Nimble"
+    )
 
 if (DC_WITH_RELIGHT)
 	add_definitions(-DHAVE_RELIGHT)
