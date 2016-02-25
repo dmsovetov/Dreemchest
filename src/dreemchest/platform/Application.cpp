@@ -33,6 +33,11 @@ namespace Platform {
 //! Platform-specific application constructor.
 extern IApplication* createApplication( void );
 
+//! Platform-specific service application constructor.
+extern IApplication* createServiceApplication( void );
+
+// ------------------------------------------------------------------- Application ------------------------------------------------------------------- //
+
 // ** Application::s_application
 Application* Application::s_application = NULL;
 
@@ -121,6 +126,23 @@ void Application::notifyUpdate( void )
     if( m_delegate ) {
         m_delegate->handleUpdate( this );
     }
+}
+
+// -------------------------------------------------------------- ServiceApplication ---------------------------------------------------------------- //
+
+// ** ServiceApplication::ServiceApplication
+ServiceApplication::ServiceApplication( const Arguments& args, IApplication* impl ) : Application( args, impl )
+{
+}
+
+// ** ServiceApplication::create
+ServiceApplication* ServiceApplication::create( const Arguments& args )
+{
+    if( IApplication* impl = createServiceApplication() ) {
+        return DC_NEW ServiceApplication( args, impl );
+    }
+
+    return NULL;
 }
 
 } // namespace Platform

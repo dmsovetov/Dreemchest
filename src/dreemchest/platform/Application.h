@@ -116,7 +116,7 @@ namespace Platform {
         //! Returns a shared application instance.
         static Application*     sharedInstance( void );
 
-    private:
+    protected:
 
                                 //! Constructs a new Application instance.
                                 Application( const Arguments& args, IApplication* impl );
@@ -129,14 +129,35 @@ namespace Platform {
 		Arguments				m_arguments;	//!< Passed arguments.
     };
 
+    //! Service application
+    class ServiceApplication : public Application {
+    public:
+
+        //! Creates a new Service instance.
+        static ServiceApplication*  create( const Arguments& args );
+
+    private:
+
+                                    //! Constructs a new ServiceApplication instance.
+                                    ServiceApplication( const Arguments& args, IApplication* impl );
+    };
+
 } // namespace Platform
 
 DC_END_DREEMCHEST
 
-#define dcDeclareApplication( delegate )													\
-    int main( int argc, char** argv ) {														\
-		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							\
-        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );	\
+//! Declares an application entry point
+#define dcDeclareApplication( delegate )													        \
+    s32 main( s32 argc, s8** argv ) {														        \
+		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
+        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );	        \
+    }
+
+//! Declares a service entry point
+#define dcDeclareServiceApplication( delegate )                                                     \
+    s32 main( s32 argc, s8** argv ) {														        \
+		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
+        return DC_DREEMCHEST_NS Platform::ServiceApplication::create( args )->launch( delegate );	\
     }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

@@ -45,6 +45,60 @@ namespace Platform {
 
 		//! Windows application event loop.
 		void						loop( void );
+
+    private:
+
+        Application*                m_application;  //!< Parent application instance.
+    };
+
+    //! Windows service application implementation
+    class WindowsService : public IApplication {
+    public:
+
+                                    //! Constructs WindowsService instance.
+                                    WindowsService( void );
+
+        // ** IApplication
+        virtual void                quit( u32 exitCode ) DC_DECL_OVERRIDE;
+        virtual s32                 launch( Application* application ) DC_DECL_OVERRIDE;
+
+    public:
+
+        //! Entry point used by a service.
+        static VOID WINAPI          entryPoint( DWORD argc, LPTSTR* argv );
+
+        //! Service control handler.
+        static VOID WINAPI          controlHandler( DWORD code );
+
+        //! Service worker thread.
+        static DWORD WINAPI         thread( LPVOID param );
+
+        //! Returns true if the service is running now.
+        bool                        isRunning( void ) const;
+
+        //! Returns true if the service was stopped.
+        bool                        wasStopped( void ) const;
+
+        //! Configures the service instance.
+        bool                        configure( void );
+
+        //! Switch the service to a specified state.
+        void                        switchToState( DWORD controlsAccepted, DWORD state, DWORD checkpoint );
+
+        //! Launches the worker thread for a service
+        void                        launchServiceThread( void );
+
+    private:
+
+        //! Maximum service name constant
+        enum { MaxServiceNameLength = 64 };
+
+        static WindowsService*      s_instance;                     //!< Shared service instance.
+        Application*                m_application;                  //!< Parent application instance.
+        SERVICE_STATUS              m_status;                       //!< Used to report the status of the service to the Windows SCM.
+        SERVICE_STATUS_HANDLE       m_statusHandle;                 //!< Used to reference our service instance.
+        HANDLE                      m_stopEvent;                    //!< Service stop event handle.
+        s8                          m_name[MaxServiceNameLength];   //!< Service name.
     };
 
 } // namespace Platform
