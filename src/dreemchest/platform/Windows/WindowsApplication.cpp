@@ -52,12 +52,15 @@ void WindowsApplication::quit( u32 exitCode )
 }
 
 // ** WindowsApplication::launch
-int WindowsApplication::launch( Application* application )
+s32 WindowsApplication::launch( Application* application )
 {
-	// ** Notify application about a launch.
+    // Save the application instance
+    m_application = application;
+
+	// Notify application about a launch.
     application->notifyLaunched();
 
-	// ** Start an event loop
+	// Start an event loop
 	loop();
 
 	return 0;
@@ -78,6 +81,10 @@ void WindowsApplication::loop( void )
 			DispatchMessage( &msg );
 		}
 		else {
+            // Update an application
+            m_application->notifyUpdate();
+
+            // Update all windows
 			for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
 				i->second->owner()->notifyUpdate();
 			}

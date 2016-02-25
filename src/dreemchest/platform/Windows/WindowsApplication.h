@@ -33,13 +33,13 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-    // ** class WindowsApplication
+    //! Windows application implementation.
     class WindowsApplication : public IApplication {
     public:
 
         // ** IApplication
-        virtual void                quit( u32 exitCode );
-        virtual int                 launch( Application* application );
+        virtual void                quit( u32 exitCode ) DC_DECL_OVERRIDE;
+        virtual s32                 launch( Application* application ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -51,4 +51,4 @@ namespace Platform {
 
 DC_END_DREEMCHEST
 
-#endif /*   !defined( __DC_Platform_WindowsApplication_H__ )  */
+#endif /*   !__DC_Platform_WindowsApplication_H__  */

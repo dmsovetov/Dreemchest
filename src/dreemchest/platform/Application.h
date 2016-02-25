@@ -55,6 +55,9 @@ namespace Platform {
 
         //! Notifies about an application start.
         virtual void            handleLaunched( Application* application ) {}
+
+        //! Notifies about an application update.
+        virtual void            handleUpdate( Application* application ) {}
     };
 
 	//! Base class for windowed applications.
@@ -94,6 +97,9 @@ namespace Platform {
 
         //! Notifies an application about a launch.
         void                    notifyLaunched( void );
+
+        //! Notifies an application about an update.
+        void                    notifyUpdate( void );
 
 		//! Returns application arguments passed on launch.
 		const Arguments&		args( void ) const;

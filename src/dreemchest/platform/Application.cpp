@@ -106,6 +106,14 @@ void Application::notifyLaunched( void )
     m_delegate->handleLaunched( this );
 }
 
+// ** Application::notifyUpdate
+void Application::notifyUpdate( void )
+{
+    if( m_delegate ) {
+        m_delegate->handleUpdate( this );
+    }
+}
+
 } // namespace Platform
 
 DC_END_DREEMCHEST
