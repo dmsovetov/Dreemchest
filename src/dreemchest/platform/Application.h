@@ -53,6 +53,9 @@ namespace Platform {
 
         virtual                 ~ApplicationDelegate( void ) {}
 
+        //! Notifies that application is about to start.
+        virtual void            handlePrepareToLaunch( Application* application ) {}
+
         //! Notifies about an application start.
         virtual void            handleLaunched( Application* application ) {}
 
@@ -94,6 +97,9 @@ namespace Platform {
          \param delegate Application event delegate.
          */
         int                     launch( ApplicationDelegate* delegate );
+
+        //! Notifies that application is about to start.
+        void                    notifyPrepareToLaunch( void );
 
         //! Notifies an application about a launch.
         void                    notifyLaunched( void );

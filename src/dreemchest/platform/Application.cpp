@@ -75,7 +75,6 @@ Application* Application::create( const Arguments& args )
 void Application::quit( u32 exitCode )
 {
     if( !m_impl ) {
-    //    LogWarning( "application", "quit is not implemented\n" );
         return;
     }
 
@@ -83,23 +82,33 @@ void Application::quit( u32 exitCode )
 }
 
 // ** Application::launch
-int Application::launch( ApplicationDelegate* delegate )
+s32 Application::launch( ApplicationDelegate* delegate )
 {
     if( !m_impl ) {
-    //    LogWarning( "Application::launch : application is not implemented\n" );
         return -1;
     }
 
     m_delegate = delegate;
-
+    notifyPrepareToLaunch();
     return m_impl->launch( this );
+}
+
+// ** Application::notifyPrepareToLaunch
+void Application::notifyPrepareToLaunch( void )
+{
+    if( !m_delegate ) {
+        LogDebug( "application", "no application delegate set, prepareToLaunch event ignored\n" );
+        return;
+    }
+
+    m_delegate->handlePrepareToLaunch( this );
 }
 
 // ** Application::notifyLaunched
 void Application::notifyLaunched( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, event ignored\n" );
+        LogDebug( "application", "no application delegate set, launch event ignored\n" );
         return;
     }
 
