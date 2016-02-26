@@ -146,14 +146,18 @@ bool Assets::updateAssetCache( const QString& uuid, const FileInfo& file )
 void Assets::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
-	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
+	Archive meta = m_assetFileSystem->metaData( fileInfo );
 
 	// Added asset
 	Scene::AssetPtr asset;
 
 	// Create asset from data or create the new one
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	if( !meta.isNull() ) {
-		asset = m_bundle->createAssetFromData( meta );
+#else
+    if( meta.isValid() ) {
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        asset = m_bundle->createAssetFromData( meta );
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}

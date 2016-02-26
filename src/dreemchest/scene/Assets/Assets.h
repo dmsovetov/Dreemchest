@@ -99,10 +99,10 @@ namespace Scene {
 		AssetBundleWPtr			bundle( void ) const;
 
 		//! Returns asset data as key-value object.
-		virtual KeyValue	keyValue( void ) const;
+		virtual Archive	        keyValue( void ) const;
 
 		//! Reads asset data from key-value object.
-		virtual bool			setKeyValue( const KeyValue& value );
+		virtual bool			setKeyValue( const Archive& value );
 
 		//! Unloads asset data.
 		virtual void			dispose( void );
@@ -157,7 +157,7 @@ namespace Scene {
 		Io::Path				assetPathByIdentifier( const String& name ) const;
 
 		//! Creates the new Asset and loads it from key-value data.
-		AssetPtr				createAssetFromData( const KeyValue& data ) const;
+		AssetPtr				createAssetFromData( const Archive& data ) const;
 
 		//! Creates new Asset by type.
 		AssetPtr				createAssetByType( Asset::Type type ) const;
