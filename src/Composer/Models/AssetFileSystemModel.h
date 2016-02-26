@@ -68,10 +68,10 @@ DC_BEGIN_COMPOSER
 		bool					hasMetaData( const FileInfo& assetFile ) const;
 
 		//! Updates meta data for specified asset file.
-		void					setMetaData( const FileInfo& assetFile, const Io::KeyValue& data );
+		void					setMetaData( const FileInfo& assetFile, const Archive& data );
 
 		//! Returns meta data for a specified asset file.
-		Io::KeyValue			metaData( const FileInfo& assetFile ) const;
+		Archive			        metaData( const FileInfo& assetFile ) const;
 
 		//! Returns asset file info by model index.
 		FileInfo				assetFile( const QModelIndex& index ) const;
@@ -83,7 +83,7 @@ DC_BEGIN_COMPOSER
 		void					setRootPath( const String& value );
 
 		//! Returns meta data for a specified asset file name.
-		Io::KeyValue			metaData( const String& assetFileName ) const;
+		Archive			        metaData( const String& assetFileName ) const;
 
 	protected:
 

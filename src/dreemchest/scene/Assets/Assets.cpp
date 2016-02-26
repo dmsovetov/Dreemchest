@@ -130,18 +130,18 @@ void Asset::setFormat( AssetFormat value )
 }
 
 // ** Asset::keyValue
-KeyValue Asset::keyValue( void ) const
+Archive Asset::keyValue( void ) const
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
 	return KeyValue::object() << "uuid" << m_uuid << "timestamp" << m_timestamp << "type" << typeToString( m_type );
 #else
     DC_NOT_IMPLEMENTED;
-    return KeyValue();
+    return Archive();
 #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Asset::setKeyValue
-bool Asset::setKeyValue( const KeyValue& value )
+bool Asset::setKeyValue( const Archive& value )
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
 	DC_BREAK_IF( !value.isObject() );
@@ -386,7 +386,7 @@ void AssetBundle::addAsset( AssetPtr asset )
 }
 
 // ** AssetBundle::createAssetFromData
-AssetPtr AssetBundle::createAssetFromData( const KeyValue& kv ) const
+AssetPtr AssetBundle::createAssetFromData( const Archive& kv ) const
 {
 #if DEV_DEPRECATED_KEYVALUE_TYPE
 	DC_BREAK_IF( !kv.isObject() );

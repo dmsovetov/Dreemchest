@@ -228,7 +228,9 @@ bool AssetFileSystemModel::renameMetaFile( const QString& oldFileName, const QSt
 String AssetFileSystemModel::uuid( const FileInfo& assetFile ) const
 {
 	// Read the meta data
-	Io::KeyValue data = metaData( assetFile );
+	Archive data = metaData( assetFile );
+
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	DC_BREAK_IF( !data.isObject() );
 
 	if( !data.isObject() ) {
@@ -236,6 +238,9 @@ String AssetFileSystemModel::uuid( const FileInfo& assetFile ) const
 	}
 
 	return data.get( "uuid", "" ).asString();
+#else
+    return data.as<KeyValue>().get<String>( "uuid" );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetFileSystemModel::hasMetaData
@@ -252,27 +257,35 @@ FileInfo AssetFileSystemModel::assetFile( const QModelIndex& index ) const
 }
 
 // ** AssetFileSystemModel::setMetaData
-void AssetFileSystemModel::setMetaData( const FileInfo& assetFile, const Io::KeyValue& data )
+void AssetFileSystemModel::setMetaData( const FileInfo& assetFile, const Archive& data )
 {
 	// Write meta data to file
 	QFile metaFile( metaFileName( assetFile ) );
 	bool  result = metaFile.open( QFile::WriteOnly );
 	Q_ASSERT( result );
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	QTextStream stream( &metaFile );
 	String json = Io::KeyValue::stringify( data );
 	stream << json.c_str();
+#else
+    DC_NOT_IMPLEMENTED;
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 	metaFile.close();
 }
 
 // ** AssetFileSystemModel::metaData
-Io::KeyValue AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
+Archive AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
 {
 	QFile metaFile( metaFileName( assetFile ) );
 
 	if( !metaFile.open( QFile::ReadOnly ) ) {
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		return Io::KeyValue::kNull;
+    #else
+        return Archive();
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	QTextStream stream( &metaFile );
@@ -281,7 +294,12 @@ Io::KeyValue AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
 
 	metaFile.close();
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	return Io::KeyValue::parse( json.toStdString() );
+#else
+    DC_NOT_IMPLEMENTED;
+    return Archive();
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetFileSystemModel::metaFileName
@@ -311,7 +329,7 @@ void AssetFileSystemModel::setRootPath( const String& value )
 }
 
 // ** AssetFileSystemModel::metaData
-Io::KeyValue AssetFileSystemModel::metaData( const String& assetFileName ) const
+Archive AssetFileSystemModel::metaData( const String& assetFileName ) const
 {
 	return metaData( FileInfo( assetFileName ) );
 }
