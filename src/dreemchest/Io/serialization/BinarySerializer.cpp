@@ -27,6 +27,7 @@
 #include "Storage.h"
 #include "BinarySerializer.h"
 #include "Serializable.h"
+#include "../KeyValue.h"
 #include "../streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
@@ -148,6 +149,17 @@ ByteBufferPtr BinarySerializer::write( const Serializable& data )
 
 	return stream;
 }
+
+#if !DEV_DEPRECATED_KEYVALUE_TYPE
+// ** BinarySerializer::writeToByteBuffer
+ByteBufferPtr BinarySerializer::write( const KeyValue& data )
+{
+	ByteBufferPtr stream = ByteBuffer::create();
+	BinaryVariantStream( stream ).write( Variant::fromValue( data ) );
+
+	return stream;
+}
+#endif	/*	!DEV_DEPRECATED_KEYVALUE_TYPE	*/
 
 } // namespace Io
 

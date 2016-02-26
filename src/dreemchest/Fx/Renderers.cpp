@@ -55,7 +55,7 @@ ParticleRendererPtr ParticleRenderer::create( RenderingMode type, const IRenderi
     default:				break;
     }
 
-	DC_BREAK;
+	DC_BREAK_IF( true, "unhandled rendering mode" );
     return ParticleRendererPtr();
 }
 

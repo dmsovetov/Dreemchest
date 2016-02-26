@@ -89,7 +89,7 @@ namespace Scene {
 	template<typename TRenderable>
 	void RopEmitter<TRenderable>::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
 	{
-		DC_BREAK
+		DC_NOT_IMPLEMENTED
 	}
 
 } // namespace Scene

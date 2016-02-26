@@ -130,10 +130,10 @@ namespace Ecs {
 		virtual void		    write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
 
 		//! Writes this entity to a key-value archive.
-		virtual void            serialize( SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void            serialize( SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads this entity from a key-value archive.
-		virtual void		    deserialize( SerializationContext& ctx, const Io::KeyValue& value );
+		virtual void		    deserialize( SerializationContext& ctx, const Archive& ar );
     #endif  /*  !DC_ECS_NO_SERIALIZATION    */
 
 	#ifndef DC_CPP11_DISABLED
@@ -195,10 +195,10 @@ namespace Ecs {
 
 		TypeIdx idx = TypeIndex<TComponent>::idx();
 		Components::const_iterator i = m_components.find( idx );
-		DC_BREAK_IF( i == m_components.end() )
+		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
         TComponent* result = castTo<TComponent>( i->second.get() );
-		DC_BREAK_IF( result == NULL );
+		DC_ABORT_IF( result == NULL, "component type mismatch" );
 
 		return result;
 	}
@@ -207,8 +207,8 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::attachComponent( TComponent* component )
 	{
-		DC_BREAK_IF( m_flags.is( Removed ) );
-		DC_BREAK_IF( has<TComponent>() );
+		DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
+		DC_ABORT_IF( has<TComponent>(), "entity already has this component" );
 
 		TypeIdx idx = component->typeIndex();
 

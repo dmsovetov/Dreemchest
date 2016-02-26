@@ -95,10 +95,10 @@ namespace Ecs {
 		virtual void		        write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
 
 		//! Writes this component to a key-value archive.
-		virtual void                serialize( SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void                serialize( SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads this component from a key-value archive.
-		virtual void		        deserialize( SerializationContext& ctx, const Io::KeyValue& value );
+		virtual void		        deserialize( SerializationContext& ctx, const Archive& ar );
 	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	protected:
@@ -151,8 +151,14 @@ namespace Ecs {
 	// ** ComponentBase::read
 	inline void ComponentBase::read( const Io::Storage* storage )
 	{
-	    Io::KeyValue ar;
+	    Archive ar;
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
         ar.read( storage );
+    #else
+		Variant value;
+        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).read( value );
+		ar = value;
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
         SerializationContext ctx( NULL );
         deserialize( ctx, ar );
@@ -162,21 +168,29 @@ namespace Ecs {
 	inline void ComponentBase::write( Io::Storage* storage ) const
 	{
         SerializationContext ctx( NULL );
-        Io::KeyValue ar;
+        Archive ar;
 
         serialize( ctx, ar );
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 	    ar.write( storage );
+    #else
+        Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( ar );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	// ** ComponentBase::serialize
-	inline void ComponentBase::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
+	inline void ComponentBase::serialize( SerializationContext& ctx, Archive& ar ) const
 	{
-        ar = Io::KeyValue::kNull;
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
+        ar = KeyValue::kNull;
+    #else
+        ar = Archive();
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		LogWarning( "serialize", "not implemented for component '%s'\n", typeName() );
 	}
 
 	// ** ComponentBase::deserialize
-	inline void ComponentBase::deserialize( SerializationContext& ctx, const Io::KeyValue& value )
+	inline void ComponentBase::deserialize( SerializationContext& ctx, const Archive& ar )
 	{
 		LogWarning( "deserialize", "not implemented for component '%s'\n", typeName() );
 	}
@@ -215,7 +229,7 @@ namespace Ecs {
     // ** ComponentBase::setParentEntity
     inline void ComponentBase::setParentEntity( const EntityWPtr& value )
     {
-        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value );
+        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value, "parent entity of a component is already set" );
         m_entity = value;
     }
 

@@ -83,11 +83,8 @@ void PosixTCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
 // ** PosixTCPSocket::connectTo
 bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
 {
-	if( !m_socket.isValid() ) {
-        DC_BREAK
-        return false;
-    }
-    
+    DC_ABORT_IF( !m_socket.isValid(), "the socket should be valid" );
+
     m_address  = address;
 
 	sockaddr_in addr = PosixNetwork::toSockaddr( address, port );

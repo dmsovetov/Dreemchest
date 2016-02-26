@@ -41,11 +41,11 @@ u32 OpenALSource::s_aliveCount = 0;
 OpenALSource::OpenALSource( void )
 {
     s_aliveCount++;
-    DC_BREAK_IF( s_aliveCount > OpenAL::maxSources() );
+    DC_BREAK_IF( s_aliveCount > OpenAL::maxSources(), "too much sound sources created" );
 
     alGenSources( 1, &m_id );
     alSourcei( m_id, AL_LOOPING, AL_FALSE );
-    DC_BREAK_IF( !alIsSource( m_id ) );
+    DC_BREAK_IF( !alIsSource( m_id ), "the generated id expected to be a sound source" );
 
     OpenAL::dumpErrors( "OpenALSource::OpenALSource" );
 }
@@ -142,7 +142,7 @@ void OpenALSource::setPosition( const Vec3& value )
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {
-	DC_BREAK_IF( !m_buffer.valid() );
+	DC_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
 
     // ** Ensure we have a valid source state for a streamed sources
     if( m_state != state() && m_buffer->chunks() > 1 ) {

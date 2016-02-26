@@ -29,8 +29,8 @@
 
 #include "../Dreemchest.h"
 
-#include "../io/serialization/Serializable.h"
 #include "../io/KeyValue.h"
+#include "../io/serialization/Serializable.h"
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
 #define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method
@@ -131,7 +131,7 @@ namespace Ecs {
     {
         EntityPtr entity = findById( id );
         StrongPtr<TArchetype> instance = castTo<TArchetype>( entity.get() );
-        DC_BREAK_IF( !instance.valid() );
+        DC_ABORT_IF( !instance.valid(), "archetype mismatch" );
         return instance;
     }
 
@@ -141,26 +141,31 @@ namespace Ecs {
 	public:
 
 		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL ) const;
 
 		//! Creates the component instance by name.
-		ComponentPtr	createComponentByName( const String& name, const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		ComponentPtr	createComponentByName( const String& name, const Archive* data = NULL ) const;
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Archive* data = NULL ) const;
 
         //! Clones an archetype instance.
         template<typename TArchetype>
         StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const;
 
 		//! Creates an array of archetype instances from data.
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const Io::KeyValue& data ) const;
+		Array<StrongPtr<TArchetype>>	createArchetypes( const KeyValue& data ) const;
+    #else
+		template<typename TArchetype>
+		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data ) const;
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		
 		//! Creates a new component instance.
 		template<typename TComponent>
-		StrongPtr<TComponent>	createComponent( const Io::KeyValue& data = Io::KeyValue::kNull ) const;
+		StrongPtr<TComponent>	createComponent( const Archive* data = NULL ) const;
 
 		//! Registers the archetype type.
 		template<typename TArchetype>
@@ -287,7 +292,7 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Io::KeyValue& data ) const
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Archive* data ) const
 	{
 		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
 	}
@@ -297,33 +302,48 @@ namespace Ecs {
     StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const
     {
         // Serialize source to a key-value archive
-        Io::KeyValue ar;
+        Archive ar;
         SerializationContext ctx( const_cast<Ecs*>( this ) );
         source->serialize( ctx, ar );
 
         // Create archetype instance
-        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, ar );
+        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar );
 
         return instance;
     }
 
 	// ** Ecs::createArchetypes
-	template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Io::KeyValue& data ) const
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    template<typename TArchetype>
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const KeyValue& data ) const
 	{
 		Array<StrongPtr<TArchetype>> result;
 
 		for( s32 i = 0, n = data.items().size(); i < n; i++ ) {
-			const Io::KeyValue& item = data[i];
-			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), item ) );
+			const KeyValue& item = data[i];
+			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), &item ) );
 		}
 
 		return result;
 	}
+#else
+    template<typename TArchetype>
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Archives& data ) const
+	{
+		Array<StrongPtr<TArchetype>> result;
+
+		for( s32 i = 0, n = data.size(); i < n; i++ ) {
+            const Archive& item = data[i];
+			result.push_back( createArchetype<TArchetype>( item.as<KeyValue>()["_id"].as<Guid>(), &item ) );
+		}
+
+		return result;
+	}
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		
 	// ** Ecs::createComponent
 	template<typename TComponent>
-	StrongPtr<TComponent> Ecs::createComponent( const Io::KeyValue& data  ) const
+	StrongPtr<TComponent> Ecs::createComponent( const Archive* data ) const
 	{
 		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
 	}

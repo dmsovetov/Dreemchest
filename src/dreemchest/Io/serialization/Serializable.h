@@ -65,10 +65,10 @@ namespace Io {
         virtual         ~ISerializable( void ) {}
 
         //! Reads data from a storage.
-        virtual void	read( const Storage& storage ) { DC_BREAK; }
+        virtual void	read( const Storage& storage ) { DC_NOT_IMPLEMENTED; }
 
         //! Writes data to a storage.
-        virtual void	write( Storage& storage ) const	{ DC_BREAK; }
+        virtual void	write( Storage& storage ) const	{ DC_NOT_IMPLEMENTED; }
     };
 
     //! Base class for all types that has a serializers defined by macroses.

@@ -40,6 +40,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Threads {
 
+    NIMBLE_LOGGER_TAG( Threads )
+
 	dcDeclarePtrs( Thread )
 	dcDeclarePtrs( TaskProgress )
 	dcDeclarePtrs( Mutex )

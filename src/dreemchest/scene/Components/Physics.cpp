@@ -47,7 +47,7 @@ u32 Shape2D::partCount( void ) const
 // ** Shape2D::part
 const Shape2D::Part& Shape2D::part( u32 index ) const
 {
-	DC_BREAK_IF( index >= partCount() )
+	DC_ABORT_IF( index >= partCount(), "index is out of range" );
 	return m_parts[index];
 }
 
@@ -85,7 +85,7 @@ void Shape2D::addRect( f32 width, f32 height, f32 x, f32 y, const Material& mate
 // ** Shape2D::addPolygon
 void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& material )
 {
-	DC_BREAK_IF( count > Part::MaxVertices );
+	DC_BREAK_IF( count > Part::MaxVertices, "too much vertices" );
 
 	Part part;
 	part.type = Polygon;
@@ -101,37 +101,63 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 }
 
 // ** Shape2D::serialize
-void Shape2D::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    Io::KeyValue material = Io::KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    KeyValue material = KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
 
     switch( m_parts[0].type ) {
     case Polygon:   {
-                        Io::KeyValue vertices = Io::KeyValue::array();
+                        KeyValue vertices = KeyValue::array();
 
                         for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
                             vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
                         }
 
-                        ar = Io::KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
+                        ar = KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
                     }
                     break;
     case Circle:    {
-                        ar = Io::KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
+                        ar = KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
                     }
                     break;
     default:        DC_BREAK;
     }
+#else
+    KeyValue material = KvBuilder()
+							<< "density" << m_parts[0].material.density
+							<< "friction" << m_parts[0].material.friction
+							<< "restitution" << m_parts[0].material.restitution;
+
+    switch( m_parts[0].type ) {
+    case Polygon:   {
+                        VariantArray vertices;
+
+                        for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
+                            vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
+                        }
+
+                        ar = KvBuilder() << "type" << "polygon" << "vertices" << vertices << "material" << material;
+                    }
+                    break;
+    case Circle:    {
+                        ar = KvBuilder() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
+                    }
+                    break;
+    default:        DC_BREAK;
+    }
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Shape2D::deserialize
-void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     // Get shape type
     const String& type = ar.get( "type", "" ).asString();
 
     // Get material
-    Io::KeyValue material = ar.get( "material" );
+    KeyValue material = ar.get( "material" );
 
     // Parse material
     Material shapeMaterial;
@@ -143,7 +169,7 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
     }
 
     if( type == "polygon" ) {
-        const Io::KeyValue& vertices = ar.get( "vertices" );
+        const KeyValue& vertices = ar.get( "vertices" );
         Array<Vec2>         points;
 
         for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
@@ -156,8 +182,41 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& a
         addCircle( ar.get( "radius", 0.0f ).asFloat(), 0.0f, 0.0f, shapeMaterial );
     }
     else {
-        DC_BREAK;
+        DC_NOT_IMPLEMENTED;
     }
+#else
+	// Get the object from archive
+	KeyValue object = ar.as<KeyValue>();
+
+    // Get shape type
+    const String& type = object.get<String>( "type", "" );
+
+    // Get material
+    KeyValue material = object.get<KeyValue>( "material" );
+
+    // Parse material
+    Material shapeMaterial;
+    shapeMaterial.density       = material.get( "density", 1.0f );
+    shapeMaterial.friction      = material.get( "friction", 0.2f );
+    shapeMaterial.restitution   = material.get( "restitution", 0.0f );
+
+    if( type == "polygon" ) {
+        VariantArray::Container vertices = object.get<VariantArray>( "vertices" );
+        Array<Vec2>     points;
+
+        for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
+            points.push_back( Vec2( vertices[i * 2 + 0].as<f32>(), vertices[i * 2 + 1].as<f32>() ) );
+        }
+
+        addPolygon( &points[0], points.size(), shapeMaterial );
+    }
+    else if( type == "circle" ) {
+        addCircle( object.get( "radius", 0.0f ), 0.0f, 0.0f, shapeMaterial );
+    }
+    else {
+        DC_NOT_IMPLEMENTED;
+    }
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
@@ -343,7 +402,7 @@ u32 RigidBody2D::appliedForceCount( void ) const
 // ** RigidBody2D::appliedImpulse
 const RigidBody2D::AppliedForce& RigidBody2D::appliedImpulse( u32 index ) const
 {
-	DC_BREAK_IF( index >= appliedImpulseCount() );
+	DC_ABORT_IF( index >= appliedImpulseCount(), "index is out of range" );
 	return m_impulses[index];
 }
 
@@ -356,7 +415,7 @@ u32 RigidBody2D::appliedImpulseCount( void ) const
 // ** RigidBody2D::appliedForce
 const RigidBody2D::AppliedForce& RigidBody2D::appliedForce( u32 index ) const
 {
-	DC_BREAK_IF( index >= appliedForceCount() );
+	DC_ABORT_IF( index >= appliedForceCount(), "index is out of range" );
 	return m_forces[index];
 }
 
@@ -369,7 +428,7 @@ u32 RigidBody2D::collisionEventCount( void ) const
 // ** RigidBody2D::collisionEvent
 const RigidBody2D::CollisionEvent& RigidBody2D::collisionEvent( u32 index ) const
 {
-    DC_BREAK_IF( index < 0 || index >= collisionEventCount() );
+    DC_ABORT_IF( index < 0 || index >= collisionEventCount(), "index is out of range" );
     return m_collisionEvents[index];
 }
 

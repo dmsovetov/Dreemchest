@@ -48,7 +48,7 @@ s32 ParticleSystem::emitterCount( void ) const
 // ** ParticleSystem::emitter
 EmitterWPtr ParticleSystem::emitter( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= emitterCount() );
+	DC_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
 	return m_emitters[index];
 }
 
@@ -56,9 +56,9 @@ EmitterWPtr ParticleSystem::emitter( s32 index ) const
 void ParticleSystem::removeEmitter( const EmitterWPtr& emitter )
 {
 	EmittersArray::iterator i = std::find( m_emitters.begin(), m_emitters.end(), emitter );
+    DC_BREAK_IF( i == m_emitters.end(), "particle system does not contain this emitter" );
 
 	if( i == m_emitters.end() ) {
-		DC_BREAK;
 		return;
 	}
 
@@ -129,7 +129,7 @@ s32 ParticleSystemInstance::emitterCount( void ) const
 // ** ParticleSystemInstance::emitter
 EmitterInstanceWPtr ParticleSystemInstance::emitter( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= emitterCount() );
+	DC_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
 	return m_emitters[index];
 }
 

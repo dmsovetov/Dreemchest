@@ -33,7 +33,7 @@ namespace Sound {
 // ** Fader::Fader
 Fader::Fader( f32 start, f32 end, f32 duration, FaderCallback callback ) : m_start( start ), m_end( end ), m_duration( duration ), m_time( 0.0f ), m_callback( callback )
 {
-    DC_BREAK_IF( duration < 0 || duration > 60000 )
+    DC_BREAK_IF( duration <= 0 || duration > 60000, "fade duration is too long" )
 }
 
 // ** Fader::value

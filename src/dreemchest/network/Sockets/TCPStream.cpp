@@ -45,7 +45,7 @@ const SocketDescriptor* TCPStream::descriptor( void ) const
 // ** TCPStream::pull
 TCPStream::State TCPStream::pull( void )
 {
-	DC_BREAK_IF( !m_socket->isValid() );
+	DC_ABORT_IF( !m_socket->isValid(), "invalid socket" );
 
 	s8  chunk[1];
 	s32 received = 0;
@@ -74,7 +74,7 @@ void TCPStream::flush( void )
 // ** TCPStream::write
 s32 TCPStream::write( const void* buffer, s32 size )
 {
-    DC_BREAK_IF( !m_socket->isValid() );
+    DC_ABORT_IF( !m_socket->isValid(), "invalid socket" );
 
     s32       bytesSent = 0;
     const u8* data      = ( u8* )buffer;

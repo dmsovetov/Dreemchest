@@ -27,6 +27,9 @@
 #ifndef DEPRECATED_H
 #define DEPRECATED_H
 
+//! Enables/disables the deprecated KeyValue data type
+#define DEV_DEPRECATED_KEYVALUE_TYPE    (0)
+
 DC_BEGIN_DREEMCHEST
 
     template<class T>
@@ -37,16 +40,53 @@ DC_BEGIN_DREEMCHEST
     template<typename T>
 	class Hash : public std::map<strhash, T> {};
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    namespace Io {
+        class KeyValue;
+    }
+
+    typedef Io::KeyValue KeyValue;
+	typedef Io::KeyValue Archive;
+#else
+    typedef Kv<String>      KeyValue;
+    typedef Array<KeyValue> KeyValueArray;
+	typedef Variant			Archive;
+#endif  /*  !DEV_DEPRECATED_KEYVALUE_TYPE   */
+
+typedef Array<Archive> Archives;
+
 DC_END_DREEMCHEST
 
 #include "Base/Preprocessor.h"
 #include "Base/Classes.h"
 
-#define DC_NOT_IMPLEMENTED  NIMBLE_NOT_IMPLEMENTED
+#define DC_NOT_IMPLEMENTED                  \
+            LogInternal( "assert", "feature is not implemented" ); \
+            NIMBLE_BREAK;
+
+#define DC_BREAK_IF( expression, ... )      \
+            if( expression ) {              \
+    	        LogInternal( "unexpected", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
+			    NIMBLE_BREAK  ;             \
+            }
+
+#ifdef NIMBLE_DEBUG
+	#define DC_ABORT_IF( expression, ... )	\
+                if( expression ) {           \
+				    LogFatal( "assert", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
+				    NIMBLE_BREAK;           \
+                }
+#else
+	#define DC_ABORT_IF( expression, ... )	\
+                if( expression ) {           \
+				    LogFatal( "assert", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
+				    NIMBLE_ABORT( -1 );     \
+                }
+#endif  /*  NIMBLE_DEBUG    */
+
 #define DC_DEPRECATED       NIMBLE_DEPRECATED
-#define DC_BREAK            NIMBLE_BREAK
-#define DC_BREAK_IF         NIMBLE_BREAK_IF
 #define DC_DECL_OVERRIDE    NIMBLE_OVERRIDE
 #define DC_NEW              new
+#define DC_BREAK            NIMBLE_BREAK;
 
 #endif  /*  !DEPRECATED_H   */

@@ -60,14 +60,14 @@ RenderingContextPtr RenderingContext::create( const HalPtr& hal )
 // ** RenderingContext::renderable
 const RenderingContext::Renderable& RenderingContext::renderable( u32 index ) const
 {
-	DC_BREAK_IF( index == 0 );
+	DC_ABORT_IF( index == 0, "invalid renderable index" );
 	return m_renderables[index - 1];
 }
 
 // ** RenderingContext::texture
 const Renderer::TexturePtr& RenderingContext::texture( u32 index ) const
 {
-	DC_BREAK_IF( index == 0 );
+	DC_ABORT_IF( index == 0, "invalid texture index" );
 	return m_textures[index - 1];
 }
 
@@ -98,7 +98,7 @@ Renderer2DPtr RenderingContext::renderer( void ) const
 // ** RenderingContext::uploadRenderable
 const RenderingAssetId& RenderingContext::uploadRenderable( MeshWPtr mesh, s32 chunk )
 {
-	DC_BREAK_IF( !mesh.valid() );
+	DC_ABORT_IF( !mesh.valid(), "invalid mesh" );
 
 	// Get chunk mesh buffers
 	const Mesh::VertexBuffer& vertices = mesh->vertexBuffer( chunk );
@@ -145,7 +145,7 @@ const RenderingAssetId& RenderingContext::uploadRenderable( MeshWPtr mesh, s32 c
 // ** RenderingContext::uploadRenderable
 const RenderingAssetId& RenderingContext::uploadTexture( ImageWPtr image )
 {
-	DC_BREAK_IF( !image.valid() );
+	DC_ABORT_IF( !image.valid(), "invalid image" );
 
 	Renderer::Texture2DPtr texture = m_hal->createTexture2D( image->width(), image->height(), image->bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
 	texture->setData( 0, &image->mipLevel( 0 )[0] );

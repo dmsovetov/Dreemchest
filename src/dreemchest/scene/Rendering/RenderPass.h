@@ -119,7 +119,7 @@ namespace Scene {
 	template<typename TRenderable>
 	void RenderPass<TRenderable>::render( RenderingContextPtr context, Rvm& rvm, ShaderCache& shaders, const TRenderable& renderable, const Transform& transform )
 	{
-		DC_BREAK
+		DC_NOT_IMPLEMENTED;
 	}
 
 } // namespace Scene

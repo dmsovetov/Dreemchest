@@ -199,7 +199,7 @@ void Rvm::flush( void )
 			increase( ShaderSwitches );
 		}
 
-		DC_BREAK_IF( activeShader == NULL );
+		DC_ABORT_IF( activeShader == NULL, "no active shader" );
 
 		// Set rendering mode
 		if( activeRenderingMode != cmd->mode ) {
@@ -286,7 +286,7 @@ void Rvm::reset( void )
 Rvm::Command* Rvm::emit( void )
 {
 	Command* rop = m_allocator.allocate();
-	DC_BREAK_IF( rop == NULL )
+	DC_ABORT_IF( rop == NULL, "failed to allocate render operation" )
 
 	memset( rop, 0, sizeof( Command ) );
 	m_commands.push_back( rop );
@@ -297,10 +297,10 @@ Rvm::Command* Rvm::emit( void )
 // ** Rvm::setRenderingMode
 void Rvm::setRenderingMode( u8 value )
 {
-	DC_BREAK_IF( value >= TotalRenderModes )
+	DC_ABORT_IF( value >= TotalRenderModes, "invalid rendering mode" )
 
 	const RasterizationOptions& options = m_rasterization[value];
-	DC_BREAK_IF( !options )
+	DC_BREAK_IF( !options, "invalid rasterization options" )
 
 	m_hal->setBlendFactors( options.m_blend[0], options.m_blend[1] );
 	m_hal->setAlphaTest( options.m_alphaTest, options.m_alphaRef );

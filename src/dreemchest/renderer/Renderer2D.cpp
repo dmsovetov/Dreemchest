@@ -100,7 +100,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 	// Create vertex declarations
 	VertexDeclarationPtr vertexTextured = m_hal->createVertexDeclaration( "P3:C4:T0" );
 	VertexDeclarationPtr vertexColored  = m_hal->createVertexDeclaration( "P3:C4", sizeof( Vertex ) );
-	DC_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ) );
+	DC_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ), "vertex size mismatch" );
 
 	// Set vertex formats for primitive types
 	m_vertexFormat[PrimPoints]    = vertexColored;
@@ -477,7 +477,7 @@ void Renderer2D::pushTransform( const Matrix4& matrix )
 // ** Renderer2D::popTransform
 void Renderer2D::popTransform( void )
 {
-	DC_BREAK_IF( m_transformStack.empty() );
+	DC_ABORT_IF( m_transformStack.empty(), "no transformations pushed" );
 	flush();
 	m_transformStack.pop();
 }
@@ -494,8 +494,8 @@ void Renderer2D::flush( void )
 
 	PrimitiveType primitiveType = m_state.primitiveType;
 
-	DC_BREAK_IF( !m_vertexFormat[primitiveType].valid() )
-	DC_BREAK_IF( m_state.nIndices && !m_indexBuffers[primitiveType].valid() )
+	DC_ABORT_IF( !m_vertexFormat[primitiveType].valid(), "invalid vertex format" )
+	DC_ABORT_IF( m_state.nIndices && !m_indexBuffers[primitiveType].valid(), "invalid index buffer" )
 
 	// Set the shader
 	if( m_state.texture.valid() ) {

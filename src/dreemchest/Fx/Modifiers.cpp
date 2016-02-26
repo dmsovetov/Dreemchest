@@ -48,7 +48,7 @@ Modifier* Modifier::create( ModifierType type )
 	case ModifierForceField:	return DC_NEW ForceField;
 	}
 
-	DC_BREAK;
+	DC_BREAK_IF( true, "unhandled modifier type" );
 
 	return NULL;
 }

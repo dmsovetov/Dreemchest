@@ -148,7 +148,7 @@ void Connection::send( NetworkPacket* packet )
 	// ** Increase the sent bytes counter.
 	m_totalBytesSent += bytesSent;
 
-	DC_BREAK_IF( bytesWritten != bytesSent );
+	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
 }
 
 // ** Connection::handleResponse

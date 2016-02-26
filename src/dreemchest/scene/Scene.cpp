@@ -88,6 +88,7 @@ Scene::Scene( void )
 // ** Scene::update
 void Scene::update( u32 currentTime, f32 dt )
 {
+    NIMBLE_BREADCRUMB_CALL_STACK;
 	m_ecs->update( currentTime, dt, UpdateSystems );
 }
 
@@ -106,7 +107,7 @@ SceneObjectPtr Scene::createSceneObject( const SceneObjectId& id )
 // ** Scene::addSceneObject
 void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
 {
-	DC_BREAK_IF( !sceneObject.valid() );
+	DC_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
 	m_ecs->addEntity( sceneObject );
 
 	// Emit the event
@@ -116,7 +117,7 @@ void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
 // ** Scene::removeSceneObject
 void Scene::removeSceneObject( const SceneObjectPtr& sceneObject )
 {
-	DC_BREAK_IF( !sceneObject.valid() );
+	DC_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
 	m_ecs->removeEntity( sceneObject->id() );
 
 	// Emit the event
@@ -361,7 +362,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const AssetBundlePtr& assets, const 
 
 		// Read the component
 		Ecs::ComponentPtr component = requestComponent( i.key().asString() );
-		DC_BREAK_IF( !component.valid() );
+		DC_BREAK_IF( !component.valid(), "no such component" );
 
 		// Get the scene object to attach the component to.
 		Ecs::EntityPtr entity = requestSceneObject( i->get( "sceneObject", Json::Value() ).asString() );
@@ -596,7 +597,7 @@ bool JsonSceneLoader::readModuleAcceleration( Fx::ParticlesWPtr particles, const
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationYOverLife ), object["y"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationZOverLife ), object["z"] );
 #else
-	DC_BREAK
+	DC_NOT_IMPLEMENTED
 #endif
 	return true;
 }
@@ -725,7 +726,7 @@ void JsonSceneLoader::readColorParameter( Fx::RgbParameter& parameter, const Jso
 		parameter.setConstant( readRgb( object["value"] ) );
 	}
 	else {
-		DC_BREAK;
+		DC_NOT_IMPLEMENTED;
 	}
 }
 
@@ -756,7 +757,7 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 		parameter.constructLifetimeCurves();
 	}
 	else {
-		DC_BREAK;
+		DC_NOT_IMPLEMENTED;
 	}
 }
 
