@@ -93,10 +93,6 @@ void TCPSocketListener::recv( void )
 		return;
 	}
 
-    if( result == 0 ) {
-    //    return;
-    }
-
 	// Process listener socket
 	if( FD_ISSET( m_descriptor, &read ) ) {
 		TCPSocketPtr accepted = acceptConnection();
@@ -189,7 +185,6 @@ TCPSocketPtr TCPSocketListener::acceptConnection( void )
 
     // Create socket instance and subscribe for events
     TCPSocketPtr socket( DC_NEW TCPSocket( descriptor, address ) );
-    socket->subscribe<TCPSocket::Data>( dcThisMethod( TCPSocketListener::handleSocketData ) );
     socket->subscribe<TCPSocket::Closed>( dcThisMethod( TCPSocketListener::handleSocketClosed ) );
 
 	return socket;
@@ -249,14 +244,8 @@ bool TCPSocketListener::bind( u16 port )
 // ** TCPSocketListener::handleSocketClosed
 void TCPSocketListener::handleSocketClosed( const TCPSocket::Closed& e )
 {
-//    LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
-//    notify<Closed>( this, e.sender );
-}
-
-// ** TCPSocketListener::handleSocketData
-void TCPSocketListener::handleSocketData( const TCPSocket::Data& e )
-{
-//    notify<Data>( this, e.sender, e.data );
+    LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
+    notify<Closed>( this, e.sender );
 }
 
 } // namespace Network

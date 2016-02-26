@@ -36,7 +36,6 @@ namespace Network {
 // ** ServerHandler::ServerHandler
 ServerHandler::ServerHandler( TCPSocketListenerPtr socketListener ) : m_socketListener( socketListener )
 {
-    m_socketListener->subscribe<TCPSocketListener::Data>( dcThisMethod( ServerHandler::handleData ) );
     m_socketListener->subscribe<TCPSocketListener::Accepted>( dcThisMethod( ServerHandler::handleConnectionAccepted ) );
     m_socketListener->subscribe<TCPSocketListener::Closed>( dcThisMethod( ServerHandler::handleConnectionClosed ) );
 }
@@ -64,13 +63,6 @@ void ServerHandler::update( u32 dt )
 bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
 {
 	return true;
-}
-
-// ** ServerHandler::handleData
-void ServerHandler::handleData( const TCPSocketListener::Data& e )
-{
-//    DC_NOT_IMPLEMENTED;
-//    processReceivedData( e.socket, e.data );
 }
 
 // ** ServerHandler::handleConnectionAccepted

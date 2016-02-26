@@ -73,9 +73,6 @@ namespace Network {
 
     private:
 
-        //! Handles incoming data from a connected client.
-        void                        handleData( const TCPSocketListener::Data& e );
-
 		//! Handles accepted incomming connection.
 		void			            handleConnectionAccepted( const TCPSocketListener::Accepted& e );
 
