@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#include "PosixTCPSocketListener.h"
-#include "PosixTCPSocket.h"
+#include "TCPSocketListener.h"
+#include "TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 

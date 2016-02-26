@@ -28,7 +28,6 @@
 #define __DC_Network_TCPStream_H__
 
 #include "SocketDescriptor.h"
-#include "../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "PosixUDPSocket.h"
+#include "UDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
