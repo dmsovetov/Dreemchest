@@ -24,68 +24,44 @@
 
  **************************************************************************/
 
-#ifndef __DC_Ecs_System_H__
-#define __DC_Ecs_System_H__
+#ifndef __DC_Network_SocketResult_H__
+#define __DC_Network_SocketResult_H__
 
-#include "../Ecs.h"
+#include "../Network.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
+namespace Network {
 
-	//! System is a base class for all systems that process components.
-	/*!
-	System contains all the code for the one aspect of the entities, with
-	each System running continuously as if it has a private internal thread,
-	performing global actions on every Entity that possesses a Component of
-	the same aspect as that System.
-	*/
-	class System : public InjectEventEmitter<RefCounted> {
-	public:
+    //! Socket error class wraps the standard return codes and helps to format error to a string.
+    class SocketResult {
+    public:
 
-		virtual			~System( void ) {}
+                    //! Constructs SocketResult instance.
+                    SocketResult( s32 value );
 
-		//! Returns system name.
-		const String&	name( void ) const;
+                    //! Returns an actual value.
+                    operator s32( void ) const;
 
-		//! Attaches the system instance to ecs.
-		virtual bool	initialize( EcsWPtr ecs );
+        //! Returns true if the WOULDBLOCK/EAGAIN recorded.
+        bool        wouldBlock( void ) const;
 
-		//! System logic is done here.
-		virtual void	update( u32 currentTime, f32 dt ) = 0;
+        //! Returns true if error was recorded.
+        bool        isError( void ) const;
 
-	protected:
+        //! Returns the error code.
+        s32         errorCode( void ) const;
 
-						//! Constructs System instance.
-						System( const String& name );
+        //! Returns the formatted error message.
+        String      errorMessage( void ) const;
 
-	protected:
+    private:
 
-		EcsWPtr			m_ecs;	//!< Parent ECS instance.
-		String			m_name;	//!< System name.
-	};
+        s32         m_value; //!< Value returned by a socket call.
+    };
 
-	// ** System::System
-	inline System::System( const String& name ) : m_name( name )
-	{
-	
-	}
-
-	// ** System::name
-	inline const String& System::name( void ) const
-	{
-		return m_name;
-	}
-
-	// ** System::initialize
-	inline bool System::initialize( EcsWPtr ecs )
-	{
-		m_ecs = ecs;
-		return true;
-	}
-
-} // namespace Ecs
+} // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_System_H__	*/
+#endif	/*	!__DC_Network_SocketResult_H__	*/

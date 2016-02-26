@@ -68,7 +68,7 @@ namespace Platform {
     };
 
     //! A platform-specific work with windows.
-    class Window : public RefCountedEventEmitter {
+    class Window : public InjectEventEmitter<RefCounted> {
     public:
 
         virtual                 ~Window( void );

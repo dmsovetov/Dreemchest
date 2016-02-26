@@ -24,68 +24,53 @@
 
  **************************************************************************/
 
-#ifndef __DC_Ecs_System_H__
-#define __DC_Ecs_System_H__
+#ifndef __DC_Network_EventHandler_H__
+#define __DC_Network_EventHandler_H__
 
-#include "../Ecs.h"
+#include "Packets.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
+namespace Network {
 
-	//! System is a base class for all systems that process components.
-	/*!
-	System contains all the code for the one aspect of the entities, with
-	each System running continuously as if it has a private internal thread,
-	performing global actions on every Entity that possesses a Component of
-	the same aspect as that System.
-	*/
-	class System : public InjectEventEmitter<RefCounted> {
+	//! Event handler interface class.
+	class IEventHandler {
 	public:
 
-		virtual			~System( void ) {}
+		virtual			~IEventHandler( void ) {}
 
-		//! Returns system name.
-		const String&	name( void ) const;
-
-		//! Attaches the system instance to ecs.
-		virtual bool	initialize( EcsWPtr ecs );
-
-		//! System logic is done here.
-		virtual void	update( u32 currentTime, f32 dt ) = 0;
-
-	protected:
-
-						//! Constructs System instance.
-						System( const String& name );
-
-	protected:
-
-		EcsWPtr			m_ecs;	//!< Parent ECS instance.
-		String			m_name;	//!< System name.
+		//! Packet handler callback.
+		virtual bool	handle( ConnectionPtr& connection, const packets::Event& packet ) = 0;
 	};
 
-	// ** System::System
-	inline System::System( const String& name ) : m_name( name )
-	{
-	
-	}
+	//! Template class that handles an Event packet and emits the local event.
+	template<typename T>
+	class EventHandler : public IEventHandler {
+	public:
 
-	// ** System::name
-	inline const String& System::name( void ) const
-	{
-		return m_name;
-	}
+								//! Constructs EventHandler instance.
+								EventHandler( EventEmitter* eventEmitter )
+									: m_eventEmitter( eventEmitter ) {}
 
-	// ** System::initialize
-	inline bool System::initialize( EcsWPtr ecs )
+		//! Reads a payload from an Event packet and emits it as local event.
+		virtual bool handle( ConnectionPtr& connection, const packets::Event& packet );
+
+	private:
+
+		//! Parent event emitter.
+		EventEmitter*			m_eventEmitter;
+	};
+
+	// ** EventHandler::handle
+	template<typename T>
+	inline bool EventHandler<T>::handle( ConnectionPtr& connection, const packets::Event& packet )
 	{
-		m_ecs = ecs;
+        m_eventEmitter->notify( Io::BinarySerializer::read<T>( packet.payload ) );
 		return true;
 	}
 
-} // namespace Ecs
+} // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_System_H__	*/
+#endif	/*	!__DC_Network_EventHandler_H__	*/
