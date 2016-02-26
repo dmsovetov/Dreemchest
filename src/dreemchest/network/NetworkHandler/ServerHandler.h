@@ -36,7 +36,6 @@ namespace net {
 
 	//! Server-side network handler.
     class ServerHandler : public NetworkHandler {
-	friend class ServerSocketDelegate;
     public:
 
 		//! ClientConnected event is emitted when a new client is connected to a server.
@@ -67,42 +66,27 @@ namespace net {
 	protected:
 
 									//! Constructs ServerHandler instance.
-									ServerHandler( const TCPSocketListenerPtr& socketListener );
-
-		//! Processes a client connection.
-		virtual void				processClientConnection( TCPSocket* socket );
-
-		//! Processes a client disconnection.
-		virtual void				processClientDisconnection( TCPSocket* socket );
+									ServerHandler( TCPSocketListenerPtr socketListener );
 
 		//! Handles a server detection packet.
 		virtual bool				handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
+
+    private:
+
+        //! Handles incoming data from a connected client.
+        void                        handleData( const TCPSocketListener::Data& e );
+
+		//! Handles accepted incomming connection.
+		void			            handleConnectionAccepted( const TCPSocketListener::Accepted& e );
+
+		//! Handles a remote connection closed.
+		void			            handleConnectionClosed( const TCPSocketListener::Closed& e );
 
 	private:
 
 		//! TCP socket listener.
 		TCPSocketListenerPtr		m_socketListener;
     };
-
-	//! Server socket listener handler.
-	class ServerSocketDelegate : public TCPSocketListenerDelegate {
-	friend class ServerHandler;
-	public:
-
-		//! Handles incoming data from client.
-		virtual void			handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream );
-
-		//! Handles accepted incomming connection.
-		virtual void			handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket );
-
-		//! Handles a remote connection closed.
-		virtual void			handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket );
-
-	private:
-
-		//! Parent network server handler.
-		ServerHandler*			m_serverHandler;
-	};
     
 } // namespace net
 

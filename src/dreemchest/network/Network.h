@@ -63,11 +63,8 @@ namespace net {
 
     NIMBLE_LOGGER_TAG( Network )
 
-	class TCPSocketDelegate;
 	class TCPSocket;
-	class UDPSocketDelegate;
 	class UDPSocket;
-	class TCPSocketListenerDelegate;
 	class TCPSocketListener;
 	class SocketDescriptor;
 	class TCPStream;
@@ -85,38 +82,17 @@ namespace net {
 	//! Alias Io::Serializable as NetworkPacket
 	typedef Io::Serializable NetworkPacket;
 
-	//! TCP socket strong ptr.
-	typedef StrongPtr<TCPSocket> TCPSocketPtr;
+    //! Declare smart pointer types.
+    dcDeclarePtrs( TCPSocket )
+    dcDeclarePtrs( UDPSocket )
+    dcDeclarePtrs( TCPStream )
+    dcDeclarePtrs( TCPSocketListener )
+	dcDeclarePtrs( NetworkHandler )
+	dcDeclarePtrs( ServerHandler )
+    dcDeclarePtrs( Connection )
 
-	//! TCP socket event delegate ptr.
-	typedef StrongPtr<TCPSocketDelegate> TCPSocketDelegatePtr;
-
-	//! UDP socket strong ptr.
-	typedef StrongPtr<UDPSocket> UDPSocketPtr;
-
-	//! UDP socket event delegate ptr.
-	typedef StrongPtr<UDPSocketDelegate> UDPSocketDelegatePtr;
-
-	//! TCP stream strong ptr.
-	typedef StrongPtr<TCPStream> TCPStreamPtr;
-
-	//! TCP socket listener ptr.
-	typedef StrongPtr<TCPSocketListener> TCPSocketListenerPtr;
-
-	//! TCP socket listener delegate ptr.
-	typedef StrongPtr<TCPSocketListenerDelegate> TCPSocketListenerDelegatePtr;
-
-	//! Network handler strong ptr.
-	dcDeclarePtrs( NetworkHandler );
-
-	//! Server network handler strong ptr.
-	dcDeclarePtrs( ServerHandler );
-
-	//! Connection weak ptr.
-	typedef WeakPtr<Connection> ConnectionWPtr;
-
-	//! Connection strong ptr.
-	typedef StrongPtr<Connection> ConnectionPtr;
+    dcDeclarePtrs( TCPSocketDelegate )
+    dcDeclarePtrs( UDPSocketDelegate )
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;

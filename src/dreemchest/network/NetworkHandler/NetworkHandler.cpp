@@ -79,14 +79,14 @@ s32 NetworkHandler::keepAliveTime( void ) const
 }
 
 // ** NetworkHandler::findConnectionBySocket
-ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocket* socket ) const
+ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocketWPtr socket ) const
 {
 	ConnectionBySocket::const_iterator i = m_connections.find( socket );
 	return i != m_connections.end() ? i->second : ConnectionPtr();
 }
 
 // ** NetworkHandler::createConnection
-ConnectionPtr NetworkHandler::createConnection( TCPSocket* socket )
+ConnectionPtr NetworkHandler::createConnection( TCPSocketWPtr socket )
 {
 	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
 	connection->setTimeToLive( m_keepAliveTime );
@@ -95,7 +95,7 @@ ConnectionPtr NetworkHandler::createConnection( TCPSocket* socket )
 }
 
 // ** NetworkHandler::removeConnection
-void NetworkHandler::removeConnection( TCPSocket* socket )
+void NetworkHandler::removeConnection( TCPSocketWPtr socket )
 {
 	m_connections.erase( socket );
 }
@@ -107,7 +107,7 @@ void NetworkHandler::listenForBroadcasts( u16 port )
 }
 
 // ** NetworkHandler::processReceivedData
-void NetworkHandler::processReceivedData( TCPSocket* socket, TCPStream* stream )
+void NetworkHandler::processReceivedData( TCPSocketWPtr socket, TCPStreamWPtr stream )
 {
 	using namespace Io;
 

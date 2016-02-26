@@ -39,7 +39,7 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 	//! Basic network handler.
-	class NetworkHandler : public RefCounted {
+	class NetworkHandler : public InjectEventEmitter<RefCounted> {
 	friend class Connection;
 	public:
 
@@ -91,26 +91,22 @@ namespace net {
 		template<typename T, TemplateFunctionTypes3> void emit( TemplateFunctionArgs3 );
 		template<typename T, TemplateFunctionTypes4> void emit( TemplateFunctionArgs4 );
 
-		//! Subscribes for a network event of a specified type.
-		template<typename T>
-		void					subscribe( const typename EventEmitter::Callback<T>::Type& callback );
-
 	protected:
 
 		//! Returns a list of TCP sockets to send event to.
 		virtual ConnectionList	eventListeners( void ) const;
 
 		//! Processes a received data from client.
-		virtual void			processReceivedData( TCPSocket* socket, TCPStream* stream );
+		void			        processReceivedData( TCPSocketWPtr socket, TCPStreamWPtr stream );
 
 		//! Creates a connection from socket.
-		ConnectionPtr			createConnection( TCPSocket* socket );
+		ConnectionPtr			createConnection( TCPSocketWPtr socket );
 
 		//! Returns a connection by socket.
-        ConnectionPtr			findConnectionBySocket( TCPSocket* socket ) const;
+        ConnectionPtr			findConnectionBySocket( TCPSocketWPtr socket ) const;
 
 		//! Removes connection by socket.
-		void					removeConnection( TCPSocket* socket );
+		void					removeConnection( TCPSocketWPtr socket );
 
 		//! Handles a ping packet.
 		virtual bool			handlePingPacket( ConnectionPtr& connection, packets::Ping& packet );
@@ -142,7 +138,7 @@ namespace net {
 		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
 		//! Container type to store socket to connection mapping
-		typedef Map<TCPSocket*, ConnectionPtr>	ConnectionBySocket;
+		typedef Map<TCPSocketWPtr, ConnectionPtr>	ConnectionBySocket;
 
 		//! Packet handlers.
 		PacketHandlers			m_packetHandlers;
@@ -155,9 +151,6 @@ namespace net {
 
 		//! Active connections.
 		ConnectionBySocket		m_connections;
-
-		//! Network event emitter.
-		EventEmitter			m_eventEmitter;
 
 		//! Broadcast listener socket.
 		UDPSocketPtr			m_broadcastListener;
@@ -202,13 +195,6 @@ namespace net {
 	inline void NetworkHandler::registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback )
 	{
 		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>( callback );
-	}
-
-	// ** NetworkHandler::subscribe
-	template<typename T>
-	inline void NetworkHandler::subscribe( const typename EventEmitter::Callback<T>::Type& callback )
-	{
-		m_eventEmitter.subscribe<T>( callback );
 	}
 
 	// ** NetworkHandler::emitTo

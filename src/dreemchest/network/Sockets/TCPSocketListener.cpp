@@ -41,21 +41,21 @@ TCPSocketListener::TCPClientDelegate::TCPClientDelegate( TCPSocketListener* list
 // ** TCPSocketListener::TCPClientDelegate::handleReceivedData
 void TCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
-	if( m_listener != NULL ) m_listener->m_delegate->handleReceivedData( m_listener.get(), socket, stream );
+	if( m_listener != NULL ) m_listener->notify<TCPSocketListener::Data>( m_listener, socket, stream );
 }
     
 // ** TCPSocketListener::TCPClientDelegate::handleClosed
 void TCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
 {
-    if( m_listener != NULL ) m_listener->m_delegate->handleConnectionClosed( m_listener.get(), sender );
+    if( m_listener != NULL ) m_listener->notify<TCPSocketListener::Closed>( m_listener, sender );
 }
 
 // ------------------------------------------TCPSocketListener ---------------------------------------- //
 
 // ** TCPSocketListener::TCPSocketListener
-TCPSocketListener::TCPSocketListener( TCPSocketListenerDelegate* delegate ) : m_port( 0 )
+TCPSocketListener::TCPSocketListener( void ) : m_port( 0 )
 {
-	m_delegate = TCPSocketListenerDelegatePtr( delegate ? delegate : DC_NEW TCPSocketListenerDelegate );
+
 }
 
 // ** TCPSocketListener::setupFDSet
@@ -120,7 +120,8 @@ void TCPSocketListener::fetch( void )
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
 
-		m_delegate->handleConnectionAccepted( this, accepted.get() );
+        // Emit the event
+        notify<Accepted>( this, accepted );
 	}
 	else if( FD_ISSET( m_descriptor, &except ) ) {
 		LogError( "socket", "error on listening socket: %d\n", m_descriptor.error() );
@@ -209,9 +210,9 @@ TCPSocketPtr TCPSocketListener::acceptConnection( void )
 }
 
 // ** TCPSocketListener::bindTo
-TCPSocketListenerPtr TCPSocketListener::bindTo( u16 port, TCPSocketListenerDelegate* delegate )
+TCPSocketListenerPtr TCPSocketListener::bindTo( u16 port )
 {
-	TCPSocketListenerPtr listener( DC_NEW TCPSocketListener( delegate ) );
+	TCPSocketListenerPtr listener( DC_NEW TCPSocketListener );
 
 	if( !listener->bind( port ) ) {
 		return TCPSocketListenerPtr();

@@ -33,24 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! TCP socket listener event delegate.
-	class TCPSocketListenerDelegate : public RefCounted {
-	public:
-
-		virtual						~TCPSocketListenerDelegate( void ) {}
-
-		//! Handles incoming data from client.
-		virtual void				handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream ) {}
-
-		//! Handles accepted incomming connection.
-		virtual void				handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket ) {}
-
-		//! Handles a remote connection closed.
-		virtual void				handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket ) {}
-	};
-
 	//! Berkley TCP socket listener implementation.
-	class TCPSocketListener NIMBLE_FINAL : public RefCounted {
+	class TCPSocketListener NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
 	public:
 
 		//! Checks for incoming connections & updates existing.
@@ -66,15 +50,46 @@ namespace net {
 		const TCPSocketList&		    connections( void ) const;
 
 		//! Creates and binds a new socket listener to a specified port.
-		static TCPSocketListenerPtr	    bindTo( u16 port, TCPSocketListenerDelegate* delegate = NULL );
+		static TCPSocketListenerPtr	    bindTo( u16 port );
 
 		//! Binds a socket to a specified port.
 		bool							bind( u16 port );
 
+        //! Base class for all TCP socket listener events.
+        struct Event {
+                                        //! Constructs Event instance.
+                                        Event( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
+                                            : sender( sender ), socket( socket ) {}
+            TCPSocketListenerWPtr       sender; //!< Pointer to a socket listener that emitted this event.
+            TCPSocketWPtr               socket; //!< Pointer to a socket that received data.        
+        };
+
+        //! This event is emitted when new data is received from a remote connection.
+        struct Data : public Event {
+                                        //! Constructs Data event instance.
+                                        Data( TCPSocketListenerWPtr sender, TCPSocketWPtr socket, TCPStreamWPtr stream )
+                                            : Event( sender, socket ), stream( stream ) {}
+            TCPStreamWPtr               stream; //!< TCP stream that contains received data.
+        };
+
+        //! This event is emitted when a new connection was accepted.
+        struct Accepted : public Event {
+                                        //! Constructs Accepted event instance.
+                                        Accepted( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
+                                            : Event( sender, socket ) {}
+        };
+
+        //! This event is emitted when a remote connection was closed.
+        struct Closed : public Event {
+                                        //! Constructs Closed event instance.
+                                        Closed( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
+                                            : Event( sender, socket ) {}
+        };
+
     private:
 
                                         //! Constructs TCPSocketListener instance.
-										TCPSocketListener( TCPSocketListenerDelegate* delegate );
+										TCPSocketListener( void );
 
 	private:
 
@@ -88,9 +103,6 @@ namespace net {
 		void							removeClosedConnections( void );
 
 	private:
-
-		//! TCP socket listener delegate.
-		TCPSocketListenerDelegatePtr	m_delegate;
 
 		//! Socket descriptor.
 		SocketDescriptor				m_descriptor;

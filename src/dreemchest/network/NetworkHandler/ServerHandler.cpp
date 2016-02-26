@@ -34,24 +34,23 @@ namespace net {
 // --------------------------------------- ServerHandler -------------------------------------- //
 
 // ** ServerHandler::ServerHandler
-ServerHandler::ServerHandler( const TCPSocketListenerPtr& socketListener ) : m_socketListener( socketListener )
+ServerHandler::ServerHandler( TCPSocketListenerPtr socketListener ) : m_socketListener( socketListener )
 {
+    m_socketListener->subscribe<TCPSocketListener::Data>( dcThisMethod( ServerHandler::handleData ) );
+    m_socketListener->subscribe<TCPSocketListener::Accepted>( dcThisMethod( ServerHandler::handleConnectionAccepted ) );
+    m_socketListener->subscribe<TCPSocketListener::Closed>( dcThisMethod( ServerHandler::handleConnectionClosed ) );
 }
 
 // ** ServerHandler::create
 ServerHandlerPtr ServerHandler::create( u16 port )
 {
-	ServerSocketDelegate* serverDelegate = DC_NEW ServerSocketDelegate;
-	TCPSocketListenerPtr  socketListener = TCPSocketListener::bindTo( port, serverDelegate );
+	TCPSocketListenerPtr socketListener = TCPSocketListener::bindTo( port );
 
 	if( socketListener == NULL ) {
 		return ServerHandlerPtr();
 	}
 
-	ServerHandler* serverHandler    = DC_NEW ServerHandler( socketListener );
-	serverDelegate->m_serverHandler = serverHandler;
-
-	return ServerHandlerPtr( serverHandler );
+	return ServerHandlerPtr( DC_NEW ServerHandler( socketListener ) );
 }
 
 // ** ServerHandler::update
@@ -67,24 +66,30 @@ bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packet
 	return true;
 }
 
-// ** ServerHandler::processClientConnection
-void ServerHandler::processClientConnection( TCPSocket* socket )
+// ** ServerHandler::handleData
+void ServerHandler::handleData( const TCPSocketListener::Data& e )
 {
-	LogVerbose( "handler", "connection accepted from %s\n", socket->address().toString() );
-	ConnectionPtr connection = createConnection( socket );
-
-	m_eventEmitter.notify<ClientConnected>( connection );
+    processReceivedData( e.socket, e.stream );
 }
 
-// ** ServerHandler::processClientDisconnection
-void ServerHandler::processClientDisconnection( TCPSocket* socket )
+// ** ServerHandler::handleConnectionAccepted
+void ServerHandler::handleConnectionAccepted( const TCPSocketListener::Accepted& e )
 {
-	ConnectionPtr connection = findConnectionBySocket( socket );
+	LogVerbose( "handler", "connection accepted from %s\n", e.socket->address().toString() );
+	ConnectionPtr connection = createConnection( e.socket );
 
-	LogVerbose( "handler", "connection closed %s\n", socket->address().toString() );
-	removeConnection( socket );
+	notify<ClientConnected>( connection );
+}
 
-	m_eventEmitter.notify<ClientDisconnected>( connection );
+// ** ServerHandler::handleConnectionClosed
+void ServerHandler::handleConnectionClosed( const TCPSocketListener::Closed& e )
+{
+	ConnectionPtr connection = findConnectionBySocket( e.socket );
+
+	LogVerbose( "handler", "connection closed %s\n", e.socket->address().toString() );
+	removeConnection( e.socket );
+
+	notify<ClientDisconnected>( connection );
 }
 
 // ** ServerHandler::eventListeners
@@ -104,26 +109,6 @@ ConnectionList ServerHandler::eventListeners( void ) const
     }
     
 	return connections;
-}
-
-// ---------------------------------------- ServerSocketDelegate ------------------------------------//
-
-// ** ServerSocketDelegate::handleReceivedData
-void ServerSocketDelegate::handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
-{
-	m_serverHandler->processReceivedData( socket, stream );
-}
-
-// ** ServerSocketDelegate::handleConnectionAccepted
-void ServerSocketDelegate::handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket )
-{
-	m_serverHandler->processClientConnection( socket );
-}
-
-// ** ServerSocketDelegate::handleConnectionClosed
-void ServerSocketDelegate::handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket )
-{
-	m_serverHandler->processClientDisconnection( socket );
 }
 
 } // namespace net
