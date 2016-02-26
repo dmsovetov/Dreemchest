@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_H__
-#define		__DC_Network_H__
+#ifndef __DC_Network_H__
+#define __DC_Network_H__
 
-#include	"../Dreemchest.h"
+#include "../Dreemchest.h"
 
 #include "../io/Io.h"
 #include "../io/streams/ByteBuffer.h"
@@ -59,7 +59,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
     NIMBLE_LOGGER_TAG( Network )
 
@@ -97,19 +97,19 @@ namespace net {
 	typedef Array<ConnectionWPtr> ConnectionWeakArray;
 
     //! A helper class to represent a network address.
-    class NetworkAddress {
+    class Address {
     public:
 
-        static NetworkAddress           Null;		//!< Empty address.
-        static NetworkAddress           Localhost;	//!< Localhost address.
+        static Address           Null;		//!< Empty address.
+        static Address           Localhost;	//!< Localhost address.
 
     public:
 
-										//! Constructs NetworkAddress from a 32-bit integer.
-                                        NetworkAddress( u32 address = 0 );
+										//! Constructs Address from a 32-bit integer.
+                                        Address( u32 address = 0 );
 										
-										//! Constructs a NetworkAddress from string.
-        explicit                        NetworkAddress( CString address );
+										//! Constructs a Address from string.
+        explicit                        Address( CString address );
 
 		//! Converts a network address to unsigned 32-bit integer.
         operator                        u32( void ) const;
@@ -124,7 +124,7 @@ namespace net {
     };
 
 	//! Array of network addresses.
-    typedef Array<NetworkAddress> NetworkAddressArray;
+    typedef Array<Address> NetworkAddressArray;
 
 	//! Unix time structure.
 	struct UnixTime {
@@ -184,16 +184,16 @@ namespace net {
         virtual                         ~Network( void );
 
 		//! Returns a current host IP address.
-        const NetworkAddress&           hostIP( void ) const;
+        const Address&           hostIP( void ) const;
 
 		//! Returns a broadcast IP address.
-        const NetworkAddress&           broadcastIP( void ) const;
+        const Address&           broadcastIP( void ) const;
 
 		//! Returns current host name.
         CString							hostName( void ) const;
 
         //! Converts the network address and port to a sockaddr_in structure.
-		static sockaddr_in				toSockaddr( const NetworkAddress& address, u16 port );
+		static sockaddr_in				toSockaddr( const Address& address, u16 port );
 
     private:
 
@@ -209,9 +209,9 @@ namespace net {
     private:
 
         String							m_hostName;     //!< Local host name.
-        NetworkAddress                  m_host;         //!< Local host address.
-        NetworkAddress                  m_broadcast;    //!< Broadcast address.
-        NetworkAddress                  m_mask;         //!< Network mask.
+        Address                  m_host;         //!< Local host address.
+        Address                  m_broadcast;    //!< Broadcast address.
+        Address                  m_mask;         //!< Network mask.
         bool                            m_isAvailable;  //!< Indicates that network was successfully initialized.
 
 	#if defined( DC_PLATFORM_WINDOWS )
@@ -280,7 +280,7 @@ namespace net {
 		IoEndSerializer
 	};
     
-} // namespace net
+} // namespace Network
     
 DC_END_DREEMCHEST
 
