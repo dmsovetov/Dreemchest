@@ -27,14 +27,14 @@
 #ifndef __DC_Network_UDPSocket_H__
 #define __DC_Network_UDPSocket_H__
 
-#include "SocketDescriptor.h"
+#include "Socket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
     //! Datagram socket class.
-    class UDPSocket NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
+    class UDPSocket NIMBLE_FINAL : public Socket {
     public:
 
 		//! Sends a datagram to a specified address & port.
@@ -59,7 +59,7 @@ namespace Network {
                                     : sender( sender ), address( address ), data( data ) {}
 
             UDPSocketWPtr       sender;     //!< Socket instance that received packet.
-            Address      address;    //!< Sender remote address.
+            Address             address;    //!< Sender remote address.
             SocketDataWPtr      data;       //!< Received data.
         };
 
@@ -67,11 +67,6 @@ namespace Network {
 
                                 //! Constructs a UDPSocket instance.
                                 UDPSocket( bool broadcast );
-
-    private:
-		
-        SocketDescriptor		m_descriptor;   //!< Socket descriptor.
-		SocketDataPtr		    m_data;         //!< Socket receive buffer.
     };
     
 } // namespace Network

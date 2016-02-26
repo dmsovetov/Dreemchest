@@ -32,10 +32,8 @@ namespace Network {
 
 // ** TCPSocket::TCPSocket
 TCPSocket::TCPSocket( SocketDescriptor& descriptor, const Address& address )
-	: m_descriptor( descriptor ), m_address( address )
+	: Socket( descriptor ), m_address( address )
 {
-	m_data = Io::ByteBuffer::create();
-
     if( m_descriptor.isValid() ) {
         return;
     }
@@ -67,18 +65,6 @@ TCPSocketPtr TCPSocket::connectTo( const Address& address, u16 port )
 	}
 
 	return socket;
-}
-
-// ** TCPSocket::isValid
-bool TCPSocket::isValid( void ) const
-{
-	return m_descriptor.isValid();
-}
-
-// ** TCPSocket::descriptor
-const SocketDescriptor& TCPSocket::descriptor( void ) const
-{
-	return m_descriptor;
 }
 
 // ** TCPSocket::address

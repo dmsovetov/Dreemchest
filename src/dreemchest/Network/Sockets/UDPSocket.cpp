@@ -34,7 +34,6 @@ namespace Network {
 UDPSocket::UDPSocket( bool broadcast )
 {
     m_descriptor = socket( AF_INET, SOCK_DGRAM, 0 );
-    m_data       = Io::ByteBuffer::create();
 
 	m_descriptor.setNonBlocking();
 

@@ -27,27 +27,21 @@
 #ifndef	__DC_Network_TCPSocket_H__
 #define	__DC_Network_TCPSocket_H__
 
-#include "SocketDescriptor.h"
+#include "Socket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
     //! TCP socket.
-	class TCPSocket NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
+	class TCPSocket NIMBLE_FINAL : public Socket {
     friend class TCPSocketListener;
     public:
 
         virtual						~TCPSocket( void );
 
         //! Returns a remote address.
-		const Address&	    address( void ) const;
-
-        //! Returns a socket descriptor.
-		const SocketDescriptor&	    descriptor( void ) const;
-
-        //! Returns true if this socket is valid.
-		bool					    isValid( void ) const;
+		const Address&	            address( void ) const;
 
         //! Connects to a TCP socket at a given remote address and port.
         bool					    connect( const Address& address, u16 port );
@@ -98,9 +92,7 @@ namespace Network {
 
     private:
 
-        SocketDescriptor			m_descriptor;   //!< Socket descriptor.
-        SocketDataPtr               m_data;         //!< Socket receiving buffer.
-        Address				m_address;      //!< Remote socket address.
+        Address				        m_address;      //!< Remote socket address.
     };
 
 } // namespace Network
