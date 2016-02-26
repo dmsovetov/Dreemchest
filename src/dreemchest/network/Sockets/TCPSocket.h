@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
     //! TCP socket.
-	class TCPSocket NIMBLE_FINAL : public RefCounted {
+	class TCPSocket NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
     friend class TCPSocketListener;
     public:
 
@@ -65,45 +65,44 @@ namespace net {
 		*/
         u32						    send( const void* buffer, u32 size );
 
-        //! Sets the socket delegate.
-		void					    setDelegate( const TCPSocketDelegatePtr& value );
-
         //! Connects to a TCP socket at a given remote address and port.
-        static TCPSocketPtr		    connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate = NULL );
+        static TCPSocketPtr		    connectTo( const NetworkAddress& address, u16 port );
+
+        //! Base class for all TCP socket events.
+        struct Event {
+                                    //! Constructs Event instance.
+                                    Event( TCPSocketWPtr sender )
+                                        : sender( sender ) {}
+            TCPSocketWPtr           sender; //!< Pointer to a socket that emitted this event.      
+        };
+
+        //! This event is emitted when new data is received from a remote connection.
+        struct Data : public Event {
+                                    //! Constructs Data event instance.
+                                    Data( TCPSocketWPtr sender, TCPStreamWPtr stream )
+                                        : Event( sender ), stream( stream ) {}
+            TCPStreamWPtr           stream; //!< TCP stream that contains received data.
+        };
+
+        //! This event is emitted when socket is closed.
+        struct Closed : public Event {
+                                    //! Constructs Closed event instance.
+                                    Closed( TCPSocketWPtr sender )
+                                        : Event( sender ) {}
+        };
 
     private:
 
                                     //! Constructs a TCPSocket instance.
-                                    TCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& descriptor = SocketDescriptor::Invalid, const NetworkAddress& address = NetworkAddress::Null );
+                                    TCPSocket( SocketDescriptor& descriptor = SocketDescriptor::Invalid, const NetworkAddress& address = NetworkAddress::Null );
 
     private:
 
-		//! TCP socket event delegate.
-		TCPSocketDelegatePtr		m_delegate;
-
-		//! Socket descriptor.
-        SocketDescriptor			m_descriptor;
-
-		//! Socket receive buffer.
-		TCPStreamPtr				m_stream;
-
-		//! Socket address.
-        NetworkAddress				m_address;
+        SocketDescriptor			m_descriptor;   //!< Socket descriptor.
+		TCPStreamPtr				m_stream;       //!< Socket receiving buffer.
+        NetworkAddress				m_address;      //!< Remote socket address.
     };
 
-	//! TCP socket event delegate.
-	class TCPSocketDelegate : public RefCounted {
-	public:
-
-		virtual					~TCPSocketDelegate( void ) {}
-
-		//! Handles a socket disconnection.
-		virtual void			handleClosed( TCPSocket* sender ) {}
-
-		//! Handles a received data.
-		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream ) {}
-	};
-    
 } // namespace net
 
 DC_END_DREEMCHEST

@@ -62,35 +62,18 @@ namespace net {
 	protected:
 
 								//! Constructs ClientHandler instance.
-								ClientHandler( const TCPSocketPtr& socket );
+								ClientHandler( TCPSocketPtr socket );
 
-		//! Called when a connection was closed.
-		virtual void			processConnectionClosed( TCPSocket* socket );
+		//! Handles the socket closed event.
+		void			        handleSocketClosed( const TCPSocket::Closed& e );
+
+		//! Handles the socket data event.
+		void			        handleSocketData( const TCPSocket::Data& e );
 
 	private:
 
 		ConnectionPtr			m_connection;	//!< Client connection.
     };
-
-	//! Client socket handler.
-	class ClientSocketDelegate : public TCPSocketDelegate {
-	friend class ClientHandler;
-	public:
-
-		//! Handles a socket disconnection.
-		virtual void		handleClosed( TCPSocket* sender );
-
-		//! Handles a received data.
-		virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
-
-		//! Sets the parent client handler.
-		void				setClientHandler( ClientHandlerWPtr value );
-
-	private:
-
-		//! Parent client handler.
-		ClientHandlerWPtr	m_clientHandler;
-	};
     
 } // namespace net
     

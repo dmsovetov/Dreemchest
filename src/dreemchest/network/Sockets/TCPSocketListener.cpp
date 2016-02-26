@@ -31,27 +31,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// ----------------------------------TCPSocketListener::TCPClientDelegate ------------------------------ //
-
-// ** TCPSocketListener::TCPClientDelegate::TCPClientDelegate
-TCPSocketListener::TCPClientDelegate::TCPClientDelegate( TCPSocketListener* listener ) : m_listener( listener )
-{
-}
-
-// ** TCPSocketListener::TCPClientDelegate::handleReceivedData
-void TCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
-{
-	if( m_listener != NULL ) m_listener->notify<TCPSocketListener::Data>( m_listener, socket, stream );
-}
-    
-// ** TCPSocketListener::TCPClientDelegate::handleClosed
-void TCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
-{
-    if( m_listener != NULL ) m_listener->notify<TCPSocketListener::Closed>( m_listener, sender );
-}
-
-// ------------------------------------------TCPSocketListener ---------------------------------------- //
-
 // ** TCPSocketListener::TCPSocketListener
 TCPSocketListener::TCPSocketListener( void ) : m_port( 0 )
 {
@@ -204,9 +183,13 @@ TCPSocketPtr TCPSocketListener::acceptConnection( void )
 
 	descriptor.setNonBlocking();
     descriptor.setNoDelay();
-//	m_socket.setNoDelay();
 
-	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW TCPClientDelegate( this ), descriptor, address ) );
+    // Create socket instance and subscribe for events
+    TCPSocketPtr socket( DC_NEW TCPSocket( descriptor, address ) );
+    socket->subscribe<TCPSocket::Data>( dcThisMethod( TCPSocketListener::handleSocketData ) );
+    socket->subscribe<TCPSocket::Closed>( dcThisMethod( TCPSocketListener::handleSocketClosed ) );
+
+	return socket;
 }
 
 // ** TCPSocketListener::bindTo
@@ -256,6 +239,19 @@ bool TCPSocketListener::bind( u16 port )
     m_port = port;
 
     return true;
+}
+
+// ** TCPSocketListener::handleSocketClosed
+void TCPSocketListener::handleSocketClosed( const TCPSocket::Closed& e )
+{
+    LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
+    notify<Closed>( this, e.sender );
+}
+
+// ** TCPSocketListener::handleSocketData
+void TCPSocketListener::handleSocketData( const TCPSocket::Data& e )
+{
+    notify<Data>( this, e.sender, e.stream );
 }
 
 } // namespace net

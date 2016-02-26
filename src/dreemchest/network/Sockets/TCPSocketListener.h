@@ -91,8 +91,6 @@ namespace net {
                                         //! Constructs TCPSocketListener instance.
 										TCPSocketListener( void );
 
-	private:
-
 		//! Accepst incoming connection.
 		TCPSocketPtr					acceptConnection( void );
 
@@ -102,32 +100,17 @@ namespace net {
 		//! Removes closed connections.
 		void							removeClosedConnections( void );
 
+        //! Handles the socket closed event.
+        void                            handleSocketClosed( const TCPSocket::Closed& e );
+
+        //! Handles the data event from a socket.
+        void                            handleSocketData( const TCPSocket::Data& e );
+
 	private:
 
-		//! Socket descriptor.
-		SocketDescriptor				m_descriptor;
-        
-        //! Port used.
-        u16                             m_port;
-
-		//! List of client connections.
-        TCPSocketList					m_clientSockets;
-
-		//! A client connection delegate to dispatch client events to parent delegate.
-		class TCPClientDelegate : public TCPSocketDelegate {
-		public:
-                                //! Constructs TCPClientDelegate instance.
-                                TCPClientDelegate( TCPSocketListener* listener );
-
-            //! Throws a received data to TCP listener delegate.
-            virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
-            virtual void        handleClosed( TCPSocket* sender );
-
-		private:
-
-			//! Parent socket listener.
-			WeakPtr<TCPSocketListener>	m_listener;
-		};
+		SocketDescriptor				m_descriptor;       //!< Socket descriptor.
+        u16                             m_port;             //!< Port this listener is bound to.
+        TCPSocketList					m_clientSockets;    //!< List of client connections.
 	};
 
 } // namespace net

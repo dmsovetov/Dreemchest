@@ -31,14 +31,10 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** UDPSocket::UDPSocket
-UDPSocket::UDPSocket( UDPSocketDelegate* delegate, bool broadcast ) : m_delegate( delegate )
+UDPSocket::UDPSocket( bool broadcast )
 {
     m_descriptor = socket( AF_INET, SOCK_DGRAM, 0 );
     m_buffer     = Io::ByteBuffer::create( 4096 );
-
-	if( m_delegate == NULL ) {
-		m_delegate = UDPSocketDelegatePtr( DC_NEW UDPSocketDelegate );
-	}
 
 	m_descriptor.setNonBlocking();
 
@@ -87,8 +83,8 @@ bool UDPSocket::listen( u16 port )
     return true;
 }
 
-// ** UDPSocket::update
-void UDPSocket::update( void )
+// ** UDPSocket::fetch
+void UDPSocket::fetch( void )
 {
     sockaddr_in addr;
     socklen_t   addrlen = sizeof( addr );
@@ -105,19 +101,19 @@ void UDPSocket::update( void )
     }
 
 	NetworkAddress remoteAddress( addr.sin_addr.s_addr );
-	m_delegate->handleReceivedData( this, remoteAddress, m_buffer->buffer(), m_buffer->length() );
+    notify<Data>( this, NetworkAddress( addr.sin_addr.s_addr ), m_buffer );
 }
 
 // ** UDPSocket::create
-UDPSocketPtr UDPSocket::create( UDPSocketDelegate* delegate )
+UDPSocketPtr UDPSocket::create( void )
 {
-	return UDPSocketPtr( DC_NEW UDPSocket( delegate, false ) );
+	return UDPSocketPtr( DC_NEW UDPSocket( false ) );
 }
 
 // ** UDPSocket::createBroadcast
-UDPSocketPtr UDPSocket::createBroadcast( UDPSocketDelegate* delegate )
+UDPSocketPtr UDPSocket::createBroadcast( void )
 {
-	return UDPSocketPtr( DC_NEW UDPSocket( delegate, true ) );
+	return UDPSocketPtr( DC_NEW UDPSocket( true ) );
 }
 
 

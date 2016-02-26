@@ -249,25 +249,6 @@ namespace net {
 		emitTo( T( arg0, arg1, arg2, arg3 ), eventListeners() );
 	}
 
-	//! UDP socket delegate
-	class UDPSocketNetworkDelegate : public UDPSocketDelegate {
-	public:
-
-						//! Constructs UDPSocketNetworkDelegate instance.
-						UDPSocketNetworkDelegate( NetworkHandler* network )
-							: m_network( network ) {}
-
-		//! Sends a received data to parent network handler.
-		virtual void	handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size )
-		{
-			LogError( "socket", "udp\n" );
-		}
-
-	private:
-
-		NetworkHandler*	m_network;	//!< Parent network handler.
-	};
-
 } // namespace net
     
 DC_END_DREEMCHEST

@@ -48,7 +48,7 @@ NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
 
-	m_broadcastListener = UDPSocket::createBroadcast( DC_NEW UDPSocketNetworkDelegate( this ) );
+	m_broadcastListener = UDPSocket::createBroadcast();
 
 	setKeepAliveTime( 5 );
 }

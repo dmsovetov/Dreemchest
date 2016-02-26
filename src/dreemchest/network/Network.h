@@ -74,9 +74,6 @@ namespace net {
 		class ServerHandler;
 		class ClientHandler;
 
-	class NetworkEvents;
-    class INetwork;
-
 	dcDeclarePtrs( ClientHandler )
 
 	//! Alias Io::Serializable as NetworkPacket
@@ -90,9 +87,6 @@ namespace net {
 	dcDeclarePtrs( NetworkHandler )
 	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
-
-    dcDeclarePtrs( TCPSocketDelegate )
-    dcDeclarePtrs( UDPSocketDelegate )
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;

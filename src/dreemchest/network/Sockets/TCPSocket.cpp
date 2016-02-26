@@ -31,11 +31,10 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** TCPSocket::TCPSocket
-TCPSocket::TCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& descriptor, const NetworkAddress& address )
+TCPSocket::TCPSocket( SocketDescriptor& descriptor, const NetworkAddress& address )
 	: m_descriptor( descriptor ), m_address( address )
 {
-	m_stream   = DC_NEW TCPStream( &m_descriptor );
-	m_delegate = TCPSocketDelegatePtr( delegate ? delegate : DC_NEW TCPSocketDelegate );
+	m_stream = DC_NEW TCPStream( &m_descriptor );
 
     if( m_descriptor.isValid() ) {
         return;
@@ -56,9 +55,9 @@ TCPSocket::~TCPSocket( void )
 }
 
 // ** TCPSocket::connectTo
-TCPSocketPtr TCPSocket::connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate )
+TCPSocketPtr TCPSocket::connectTo( const NetworkAddress& address, u16 port )
 {
-	TCPSocketPtr socket( DC_NEW TCPSocket( delegate ) );
+	TCPSocketPtr socket( DC_NEW TCPSocket );
 
 	if( !socket->connect( address, port ) ) {
 		return TCPSocketPtr();
@@ -83,12 +82,6 @@ const SocketDescriptor& TCPSocket::descriptor( void ) const
 const NetworkAddress& TCPSocket::address( void ) const
 {
 	return m_address;
-}
-
-// ** TCPSocket::setDelegate
-void TCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
-{
-	m_delegate = value;
 }
 
 // ** TCPSocket::connect
@@ -119,8 +112,8 @@ bool TCPSocket::connect( const NetworkAddress& address, u16 port )
 // ** TCPSocket::close
 void TCPSocket::close( void )
 {
-	if( m_descriptor.isValid() && m_delegate.valid() ) {
-		m_delegate->handleClosed( this );
+	if( m_descriptor.isValid() ) {
+        notify<Closed>( this );
 	}
 	
 	m_descriptor.close();
@@ -156,7 +149,7 @@ void TCPSocket::fetch( void )
 			break;
 		}
 
-		m_delegate->handleReceivedData( this, this, stream );
+        notify<Data>( this, stream );
 
 		if( !isValid() ) {
 			break;

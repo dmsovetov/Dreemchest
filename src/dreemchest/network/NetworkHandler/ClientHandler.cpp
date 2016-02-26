@@ -31,18 +31,28 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// -----------------------------------------ClientHandler --------------------------------------- //
-
 // ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( const TCPSocketPtr& socket )
+ClientHandler::ClientHandler( TCPSocketPtr socket )
 {
+    // Create connection
 	m_connection = createConnection( socket.get() );
+
+    // Subscribe for socket events
+    socket->subscribe<TCPSocket::Closed>( dcThisMethod( ClientHandler::handleSocketClosed ) );
+    socket->subscribe<TCPSocket::Data>( dcThisMethod( ClientHandler::handleSocketData ) );
+
+    // Set the default ping rate
 	setPingRate( 500 );
 }
 
 ClientHandler::~ClientHandler( void )
 {
-	m_connection->socket()->setDelegate( TCPSocketDelegatePtr() );
+    // Get the socket from a connection
+    TCPSocketWPtr socket = m_connection->socket();
+
+    // Unsubscibe from socket events
+    socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ClientHandler::handleSocketClosed ) );
+    socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ClientHandler::handleSocketData ) );
 }
 
 // ** ClientHandler::connection
@@ -60,17 +70,13 @@ ConnectionPtr& ClientHandler::connection( void )
 // ** ClientHandler::create
 ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port )
 {
-	ClientSocketDelegate* clientDelegate = DC_NEW ClientSocketDelegate;
-	TCPSocketPtr	      clientSocket   = TCPSocket::connectTo( address, port, clientDelegate );
+	TCPSocketPtr clientSocket = TCPSocket::connectTo( address, port );
 
 	if( clientSocket == NULL ) {
 		return ClientHandlerPtr();
 	}
 
-	ClientHandler* clientHandler = DC_NEW ClientHandler( clientSocket );
-	clientDelegate->setClientHandler( clientHandler );
-
-	return ClientHandlerPtr( clientHandler );
+	return ClientHandlerPtr( DC_NEW ClientHandler( clientSocket ) );
 }
 
 // ** ClientHandler::update
@@ -92,39 +98,17 @@ bool ClientHandler::detectServers( u16 port )
 	return true;
 }
 
-// ** ClientHandler::processConnectionClosed
-void ClientHandler::processConnectionClosed( TCPSocket* socket )
+// ** ClientHandler::handleSocketClosed
+void ClientHandler::handleSocketClosed( const TCPSocket::Closed& e )
 {
-	m_eventEmitter.notify<ConnectionClosed>();
+    LogVerbose( "socket", "client connection closed\n" );
+	notify<ConnectionClosed>();
 }
 
-// ----------------------------------------- ClientSocketDelegate --------------------------------------- //
-
-// ** ClientSocketDelegate::setClientHandler
-void ClientSocketDelegate::setClientHandler( ClientHandlerWPtr clientHandler )
+// ** ClientHandler::handleData
+void ClientHandler::handleSocketData( const TCPSocket::Data& e )
 {
-	m_clientHandler = clientHandler;
-}
-
-// ** ClientSocketDelegate::handleClosed
-void ClientSocketDelegate::handleClosed( TCPSocket* sender )
-{
-	if( !m_clientHandler.valid() ) {
-		return;
-	}
-
-	LogVerbose( "socket", "client connection closed\n" );
-	m_clientHandler->processConnectionClosed( sender );
-}
-
-// ** ClientSocketDelegate::handleReceivedData
-void ClientSocketDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
-{
-	if( !m_clientHandler.valid() ) {
-		return;
-	}
-
-	m_clientHandler->processReceivedData( sender, stream );
+    processReceivedData( e.sender, e.stream );
 }
 
 } // namespace net
