@@ -58,31 +58,12 @@ const Address& ConnectionTCP::address( void ) const
 	return socket()->address();
 }
 
-// ** ConnectionTCP::sendPacket
-void ConnectionTCP::sendPacket( const NetworkPacket& packet )
+// ** ConnectionTCP::sendDataToSocket
+s32 ConnectionTCP::sendDataToSocket( SocketDataPtr data )
 {
-    DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
-
-	Io::ByteBufferPtr buffer = Io::ByteBuffer::create();
-
-	// Write packet to binary stream
-	u32 bytesWritten = Io::BinarySerializer::write( buffer, const_cast<NetworkPacket*>( &packet ) );
-
-	// Send binary data to socket
-	s32 bytesSent = m_socket->send( buffer->buffer(), buffer->length() );
-
-    // The socket was closed.
-	if( bytesSent == 0 ) {
-        close();
-		return;
-	}
-
-	LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet.typeName(), m_socket->address().toString(), bytesSent );
-
-	// Increase the sent bytes counter.
-    trackSentAmount( bytesSent );
-
-	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+	DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
+	s32 result = m_socket->send( data->buffer(), data->length() );
+    return result;
 }
 
 // ** ConnectionTCP::close

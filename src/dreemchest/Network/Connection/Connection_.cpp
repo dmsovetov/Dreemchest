@@ -66,6 +66,31 @@ s32 Connection_::totalBytesSent( void ) const
 	return m_totalBytesSent;
 }
 
+// ** Connection::send
+void Connection_::send( const NetworkPacket& packet )
+{
+	SocketDataPtr buffer = Io::ByteBuffer::create();
+
+	// Write packet to binary stream
+	u32 bytesWritten = Io::BinarySerializer::write( buffer, const_cast<NetworkPacket*>( &packet ) );
+
+	// Send binary data to socket
+	s32 bytesSent = sendDataToSocket( buffer );
+
+    // The socket was closed.
+	if( bytesSent == 0 ) {
+        close();
+		return;
+	}
+
+	//LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet.typeName(), m_socket->address().toString(), bytesSent );
+
+	// Increase the sent bytes counter.
+    trackSentAmount( bytesSent );
+
+	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+}
+
 } // namespace Network
 
 DC_END_DREEMCHEST

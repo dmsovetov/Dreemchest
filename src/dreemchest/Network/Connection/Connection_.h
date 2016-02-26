@@ -55,7 +55,13 @@ namespace Network {
         virtual void            close( void );
 
         //! Sends a packet over this connection.
-        virtual void            sendPacket( const NetworkPacket& packet ) = 0;
+        void                    send( const NetworkPacket& packet );
+
+	#ifndef DC_CPP11_DISABLED
+		//! Generic method to construct and sent the network packet over this connection.
+		template<typename TPacket, typename ... Args>
+		void					send( const Args& ... args );
+	#endif	/*	!DC_CPP11_DISABLED	*/
 
         //! Base class for all connection events.
         struct Event {
@@ -91,11 +97,24 @@ namespace Network {
         //! Tracks the specified amount of sent data.
         void                    trackSentAmount( s32 value );
 
+        //! Sends a byte buffer over this connection.
+        virtual s32             sendDataToSocket( SocketDataPtr data ) = 0;
+
     private:
 	
 		s32						m_totalBytesReceived;   //!< The total amount of bytes received.
 		s32						m_totalBytesSent;       //!< The total amount of bytes sent.
     };
+
+#ifndef DC_CPP11_DISABLED
+	// ** Connection::send
+	template<typename TPacket, typename ... Args>
+	void Connection_::send( const Args& ... args )
+	{
+		TPacket packet( args... );
+		send( packet );
+	}
+#endif	/*	!DC_CPP11_DISABLED	*/
 
 } // namespace Network
 

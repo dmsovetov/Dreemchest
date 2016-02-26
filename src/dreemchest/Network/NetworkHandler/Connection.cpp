@@ -99,12 +99,6 @@ NetworkHandler* Connection::networkHandler( void ) const
 	return m_networkHandler;
 }
 
-// ** Connection::send
-void Connection::send( NetworkPacket* packet )
-{
-    sendPacket( *packet );
-}
-
 // ** Connection::handleResponse
 bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
 {

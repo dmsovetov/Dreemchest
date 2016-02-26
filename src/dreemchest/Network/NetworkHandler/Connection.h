@@ -78,15 +78,6 @@ namespace Network {
 		template<typename TEvent>
 		void					emit( const TEvent& e );
 
-		//! Sends a packet over this connection.
-		void					send( NetworkPacket* packet );
-
-	#ifndef DC_CPP11_DISABLED
-		//! Generic method to construct and sent the network packet over this connection.
-		template<typename TPacket, typename ... Args>
-		void					send( const Args& ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
-
 	private:
 
 								//! Constructs Connection instance.
@@ -192,16 +183,6 @@ namespace Network {
 		// ** Send the packet
 		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
-
-#ifndef DC_CPP11_DISABLED
-	//! Generic method to construct and sent the network packet over this connection.
-	template<typename TPacket, typename ... Args>
-	void Connection::send( const Args& ... args )
-	{
-		TPacket packet( args... );
-		send( &packet );
-	}
-#endif	/*	!DC_CPP11_DISABLED	*/
 
 	//! Send a response to caller.
 	template<typename T>

@@ -47,9 +47,6 @@ namespace Network {
 		//! Returns a remote address of a connection.
 		const Address&	    address( void ) const;
 
-        //! Sends the packet over a TCP connection.
-        virtual void        sendPacket( const NetworkPacket& packet ) DC_DECL_OVERRIDE;
-
         //! Closes this TCP connection.
         virtual void        close( void ) DC_DECL_OVERRIDE;
 
@@ -57,6 +54,9 @@ namespace Network {
 
                             //! Constructs ConnectionTCP instance.
                             ConnectionTCP( TCPSocketPtr socket );
+
+        //! Sends a byte buffer over TCP connection.
+        virtual s32         sendDataToSocket( SocketDataPtr data ) DC_DECL_OVERRIDE;
 
         //! Splits the received data into packets and emits notifications.
         void                handleSocketData( const TCPSocket::Data& e );
