@@ -264,16 +264,30 @@ Assets::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 	// Add assets to scene
 	foreach( QUrl url, assets ) {
 		// Read an attached meta data
-		Io::KeyValue meta = m_project->assetFileSystem()->metaData( url.toLocalFile().toStdString() );
+		Archive meta = m_project->assetFileSystem()->metaData( url.toLocalFile().toStdString() );
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		if( meta.isNull() ) {
+    #else
+        if( !meta.isValid() ) {
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 			continue;	// Unsupported asset type or just a folder
 		}
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		DC_BREAK_IF( !meta.isObject() );
+    #else
+        DC_ABORT_IF( !meta.type()->is<KeyValue>(), "asset meta data expected to be a KeyValue type" );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 		// Find asset by UUID.
-		Assets::Handle asset = m_project->assets().findAsset( meta.get( "uuid", "" ).asString() );
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
+		String uuid = meta.get( "uuid", "" ).asString();
+    #else
+        String uuid = meta.as<KeyValue>().get<String>( "uuid" );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+
+		Assets::Handle asset = m_project->assets().findAsset( uuid );
 		DC_BREAK_IF( !asset.isValid() );
 
 		// Add to set.

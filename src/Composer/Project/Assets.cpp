@@ -195,14 +195,19 @@ bool AssetManager::updateAssetCache( const QString& uuid, const FileInfo& file )
 void AssetManager::addAssetFile( const FileInfo& fileInfo )
 {
 	// Read the meta data
-	Io::KeyValue meta = m_assetFileSystem->metaData( fileInfo );
+	Archive meta = m_assetFileSystem->metaData( fileInfo );
 
 	// Added asset
 	Assets::Handle asset;
 
 	// Create asset from data or create the new one
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	if( !meta.isNull() ) {
 		asset = parseAssetFromData( meta );
+#else
+    if( meta.isValid() ) {
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+        asset = m_bundle->createAssetFromData( meta );
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}

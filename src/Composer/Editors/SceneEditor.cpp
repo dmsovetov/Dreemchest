@@ -141,6 +141,8 @@ void SceneEditor::save( void )
 
     // Create serialization context
     Ecs::SerializationContext ctx( m_scene->ecs() );
+
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     Io::KeyValue ar = Io::KeyValue::object();
 
     // Write each object to a root key-value archive
@@ -156,6 +158,9 @@ void SceneEditor::save( void )
 
     // Write the serialized data to file
     qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::KeyValue::stringify( ar, true ) ) );
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** SceneEditor::loadFromFile
@@ -175,6 +180,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     Ecs::SerializationContext ctx( scene->ecs() );
     ctx.set<Assets::Assets>( &m_project->assets() );
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
 
     // Read each object from a root key-value archive
@@ -189,6 +195,9 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         // Add entity to scene
         scene->addSceneObject( entity );
     }
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
     return scene;
 }
