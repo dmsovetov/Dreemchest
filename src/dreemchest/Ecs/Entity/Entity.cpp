@@ -137,10 +137,11 @@ void Entity::updateComponentBit( u32 bit, bool value )
 // ** Entity::detachById
 void Entity::detachById( TypeIdx id )
 {
-	DC_BREAK_IF( m_flags.is( Removed ) );
+	DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
 
 	Components::iterator i = m_components.find( id );
-	DC_BREAK_IF( i == m_components.end() );
+	DC_ABORT_IF( i == m_components.end(), "component does not exist" );
+
 	updateComponentBit( i->second->typeIndex(), false );
     i->second->setParentEntity( NULL );
 	m_components.erase( i );
@@ -170,8 +171,14 @@ EntityPtr Entity::deepCopy( const EntityId& id ) const
 // ** Entity::read
 void Entity::read( const Io::Storage* storage )
 {
-	Io::KeyValue ar;
+	Archive ar;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     ar.read( storage );
+#else
+	Variant value;
+    Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).read( value );
+	ar = value;
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
     SerializationContext ctx( ecs() );
     deserialize( ctx, ar );
@@ -181,64 +188,101 @@ void Entity::read( const Io::Storage* storage )
 void Entity::write( Io::Storage* storage ) const
 {
     SerializationContext ctx( ecs() );
-    Io::KeyValue ar;
+    Archive ar;
 
     serialize( ctx, ar );
+
+#if DEV_DEPRECATED_KEYVALUE_TYPE
 	ar.write( storage );
+#else
+    Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( ar );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Entity::serialize
-void Entity::serialize( SerializationContext& ctx, Io::KeyValue& ar ) const
+void Entity::serialize( SerializationContext& ctx, Archive& ar ) const
 {
-	ar = Io::KeyValue::object();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	ar = KeyValue::object();
 
 	ar["Type"]  = typeName();
 	ar["_id"]   = id()/*.toString()*/;
     ar["flags"] = static_cast<u8>( m_flags );
+#else
+    KeyValue object = KvBuilder() << "Type" << typeName() << "_id" << id() << "flags" << static_cast<u8>( m_flags );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 	const Components& items = components();
 
 	for( Components::const_iterator i = items.begin(), end = items.end(); i != end; ++i ) {
-		CString      key = i->second->typeName();
-		Io::KeyValue component;
+		CString key = i->second->typeName();
+		Archive component;
 
         i->second->serialize( ctx, component );
 
+	#if DEV_DEPRECATED_KEYVALUE_TYPE
 		if( component.isNull() ) {
+	#else
+		if( !component.isValid() ) {
+	#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 			continue;
 		}
 
+	#if DEV_DEPRECATED_KEYVALUE_TYPE
 		ar[key] = component;
+	#else
+		object.setValueAtKey( key, component );
+	#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
+
+#if !DEV_DEPRECATED_KEYVALUE_TYPE
+	ar = Archive::fromValue( object );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Entity::deserialize
-void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
+void Entity::deserialize( SerializationContext& ctx, const Archive& ar )
 {
-//	DC_BREAK_IF( ar.get( "Type", "" ).asString() != typeName() );
-
 	Components& items = components();
 
     // Set flags
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     m_flags = ar["flags"].asUByte();
+#else
+	KeyValue object = ar.as<KeyValue>();
+    m_flags = object.get<u8>( "flags", 0 );
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 	// Load all attached components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString key = i->second->typeName();
-        const Io::KeyValue& kv = ar.get( key );
+
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
+        const KeyValue& kv = ar.get( key );
 
         if( kv.isNull() ) {
             LogDebug( "deserialize", "no data for component '%s'\n", key );
             continue;
         }
+    #else
+        const Archive& kv = object.valueAtKey( key );
+        if( !kv.isValid() ) {
+            LogDebug( "deserialize", "no data for component '%s'\n", key );
+            continue;
+        }
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
         i->second->deserialize( ctx, kv );
 	}
 	
 	// Create components from key-value archive
-	const Io::KeyValue::Properties& kv = ar.properties();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+	const KeyValue::Properties& kv = ar.properties();
+#else
+	const KeyValue::Properties& kv = object.properties();
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
-	for( Io::KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+	for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
 		if( i->first == "Type" || i->first == "_id" || i->first == "flags" ) {
 			continue;
 		}
@@ -256,11 +300,20 @@ void Entity::deserialize( SerializationContext& ctx, const Io::KeyValue& ar )
 			continue;
 		}
 
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		if( i->second.isNull() ) {
+    #else
+        if( !i->second.isValid() ) {
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 			continue;
 		}
 
 		ComponentPtr component = ctx.createComponent( i->first );
+
+        if( !component.valid() ) {
+            continue;
+        }
+
         component->deserialize( ctx, i->second );
 		attachComponent( component.get() );
 	}

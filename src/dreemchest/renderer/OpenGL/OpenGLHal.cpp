@@ -40,7 +40,7 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 {
     if( m_view ) m_view->makeCurrent();
 
-	DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL );
+    DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL, "the OpenGL was not properly initialized" )
 
     LogVerbose( "opengl", "version=%s, renderer=%s, vendor=%s\n", glGetString( GL_VERSION ), glGetString( GL_RENDERER ), glGetString( GL_VENDOR ) );
     LogVerbose( "opengl", "%s\n", glGetString( GL_EXTENSIONS ) );
@@ -118,7 +118,7 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
-	DC_BREAK_IF( !indexBuffer.valid() )
+	DC_ABORT_IF( indexBuffer.valid(), "invalid index buffer" )
     
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
@@ -240,7 +240,7 @@ void OpenGLHal::setRenderTarget( const RenderTargetPtr& renderTarget )
 void OpenGLHal::setTexture( u32 sampler, Texture *texture )
 {
     DC_CHECK_GL;
-    DC_BREAK_IF( sampler < 0 || sampler >= MAX_SAMPLERS );
+    DC_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
 
     if( m_samplers[sampler].m_texture == texture ) {
         return;
@@ -268,7 +268,7 @@ void OpenGLHal::setTexture( u32 sampler, Texture *texture )
 void OpenGLHal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 {
     DC_CHECK_GL;
-    DC_BREAK_IF( sampler < 0 || sampler >= MAX_SAMPLERS );
+    DC_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
 
     m_samplers[sampler].m_wrap      = textureWrap( wrap );
     m_samplers[sampler].m_filter    = textureFilter( filter );
@@ -475,7 +475,7 @@ void OpenGLHal::setCulling( TriangleFace value )
 void OpenGLHal::setBlendState( BlendState* state )
 {
     DC_CHECK_GL;
-    DC_BREAK_IF( state == NULL );
+    DC_ABORT_IF( state == NULL, "invalid blend state" );
 
     if( state->m_src != RSValueNotSet || state->m_dst != RSValueNotSet ) {
         glBlendFunc( blendFactor( state->m_src ), blendFactor( state->m_dst ) );
@@ -490,8 +490,7 @@ void OpenGLHal::setBlendState( BlendState* state )
 void OpenGLHal::setDepthStencilState( DepthStencilState* state )
 {
     DC_CHECK_GL;
-    
-    DC_BREAK_IF( state == NULL );
+    DC_ABORT_IF( state == NULL, "invalid depth stencil state" );
 
     // ** Tencil
     if( state->m_stencilEnable != RSValueNotSet ) {
@@ -753,7 +752,7 @@ GLenum OpenGLHal::textureFilter( u32 filter )
 // ** OpenGLHal::textureType
 GLenum OpenGLHal::textureType( const Texture *texture )
 {
-    DC_BREAK_IF( texture == NULL );
+    DC_ABORT_IF( texture == NULL, "invalid texture" );
 
 	switch( texture->type() ) {
 	case Texture::TextureType2D:	return GL_TEXTURE_2D;
@@ -906,7 +905,7 @@ void OpenGLTexture2D::setData( u32 level, const void *data )
 // ** OpenGLTexture2D::lock
 void* OpenGLTexture2D::lock( u32 level, u32& size )
 {
-    DC_BREAK_IF( isLocked() );
+    DC_ABORT_IF( isLocked(), "already locked" );
 
     size            = bytesPerMip( m_width >> level, m_height >> level );
     m_locked        = DC_NEW u8[size];
@@ -919,7 +918,7 @@ void* OpenGLTexture2D::lock( u32 level, u32& size )
 void OpenGLTexture2D::unlock( void )
 {
     DC_CHECK_GL;
-    DC_BREAK_IF( !isLocked() );
+    DC_ABORT_IF( !isLocked(), "already unlocked" );
     
     GLenum internalFormat = OpenGLHal::internalImageFormat( m_pixelFormat );
     GLenum format         = OpenGLHal::imageFormat( m_pixelFormat );
@@ -1009,7 +1008,7 @@ bool OpenGLRenderTarget::setColor( PixelFormat format, u32 index )
 	}
 
     m_color[index] = texture;
-	DC_BREAK_IF( !check() );
+	DC_ABORT_IF( !check(), "invalid render target configuration" );
 
 	return check();
 }
@@ -1034,7 +1033,7 @@ bool OpenGLRenderTarget::setDepth( PixelFormat format )
 OpenGLVertexBuffer::OpenGLVertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count )
 	: VertexBuffer( vertexDeclaration, count, true )
 {
-    DC_BREAK_IF( vertexDeclaration == NULL );
+    DC_ABORT_IF( vertexDeclaration == NULL, "invalid vertex declaration" );
     DC_CHECK_GL;
     
 	glGenBuffers( 1, &m_id );

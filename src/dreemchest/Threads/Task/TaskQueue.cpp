@@ -81,7 +81,7 @@ void TaskQueue::doTask( void )
         m_tasks.pop();
     }
 
-    DC_BREAK_IF( !function );
+    DC_ABORT_IF( function == NULL, "invalid task function" );
     function( progress.get(), userData );
     progress->complete();
 }

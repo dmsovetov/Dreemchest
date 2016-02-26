@@ -84,6 +84,8 @@ Renderer2DPtr RenderingContext::renderer( void ) const
 //! Returns the renderable index for a specified mesh asset.
 s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
 {
+	DC_ABORT_IF( !mesh.isValid(), "invalid mesh" );
+
     // Construct the renderable handle
     u32 handle = mesh.index() | (chunk << Assets::Index::Bits);
 
@@ -146,6 +148,8 @@ s32 RenderingContext::requestRenderable( const MeshHandle& mesh, s32 chunk )
 // ** RenderingContext::requestTexture
 Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image )
 {
+	DC_ABORT_IF( !image.isValid(), "invalid image" );
+
     // Lookup texture by a handle
     ImageToTexture::const_iterator i = m_textureByImage.find( image.index() );
 
@@ -164,13 +168,6 @@ Renderer::TexturePtr RenderingContext::requestTexture( const ImageHandle& image 
     LogVerbose( "renderingContext", "%dx%d %s texture constructed from image '%s'.\n", image->width(), image->height(), image->bytesPerPixel() == 3 ? "RGB8" : "RGBA8", image.name().c_str() );
 
 	return texture;
-}
-
-//! Returns the renderable data by an array index.
-const RenderingContext::Renderable& RenderingContext::renderable( s32 index ) const
-{
-    DC_BREAK_IF( index < 0 || index >= ( s32 )m_renderables.size() );
-    return m_renderables[index];
 }
 
 } // namespace Scene

@@ -62,7 +62,7 @@ const Renderer::ShaderPtr& ShaderCache::shaderById( ShaderId id )
 
 	const Code& code = s_shaderCode[id];
 	m_shaders[id] = m_hal->createShader( code.m_vertex, code.m_fragment );
-	DC_BREAK_IF( !m_shaders[id].valid() )
+	DC_ABORT_IF( !m_shaders[id].valid(), "failed to create shader" );
 
 	return m_shaders[id];
 }

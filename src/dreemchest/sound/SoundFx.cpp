@@ -76,7 +76,7 @@ SoundFxPtr SoundFx::create( SoundHal hal, IStreamOpenerPtr streamOpener )
 // ** SoundFx::createGroup
 SoundGroupWPtr SoundFx::createGroup( CString identifier )
 {
-    DC_BREAK_IF( identifier == NULL );
+    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
 
     if( findGroupByName( identifier ).valid() ) {
         LogWarning( "sfx", "failed to create group, group with a same name '%s' found\n", identifier );
@@ -94,8 +94,8 @@ SoundGroupWPtr SoundFx::createGroup( CString identifier )
 // ** SoundFx::createSound
 SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupWPtr group )
 {
-    DC_BREAK_IF( identifier == NULL );
-    DC_BREAK_IF( uri == NULL );
+    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
+    DC_ABORT_IF( uri == NULL, "invalid URI" );
 
     // Ensure we don't have a sound with a same name.
     if( findSoundByName( identifier ).valid() ) {
@@ -115,7 +115,7 @@ SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupW
 // ** SoundFx::createEvent
 SoundEventWPtr SoundFx::createEvent( CString identifier )
 {
-    DC_BREAK_IF( identifier == NULL )
+    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
 
     if( findEventByName( identifier ).valid() ) {
         LogWarning( "sfx", "failed to create event, sound with a same name '%s' found\n", identifier );
@@ -145,7 +145,7 @@ SoundDataWPtr SoundFx::findSoundByName( CString identifier )
 // ** SoundFx::removeSoundByName
 void SoundFx::removeSoundByName( CString identifier )
 {
-    DC_BREAK_IF( identifier == NULL );
+    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
     m_sounds.erase( StringHash( identifier ) );
 }
 
@@ -190,7 +190,7 @@ SoundGroupWPtr SoundFx::findGroupByName( CString identifier )
 // ** SoundFx::removeGroupByName
 void SoundFx::removeGroupByName( CString identifier )
 {
-    DC_BREAK_IF( identifier == NULL );
+    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
     m_groups.erase( StringHash( identifier ) );
 }
 
@@ -235,7 +235,7 @@ SoundEventWPtr SoundFx::findEventByName( CString identifier )
 // ** SoundFx::createSource
 SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
 {
-    DC_BREAK_IF( data == NULL );
+    DC_ABORT_IF( !data.valid(), "invalid sound data" );
     
     if( m_hal == NULL ) {
         LogError( "sfx", "failed to create sound source for '%s', no HAL created.\n", data->identifier() );
@@ -260,7 +260,7 @@ SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
 // ** SoundFx::createBuffer
 SoundBufferPtr SoundFx::createBuffer( SoundDataWPtr data )
 {
-    DC_BREAK_IF( data == NULL );
+    DC_ABORT_IF( !data.valid(), "invalid sound data" );
 
     if( !m_hal.valid() ) {
         LogError( "sfx", "failed to create sound buffer for '%s', no HAL created.\n", data->identifier() );

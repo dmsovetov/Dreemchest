@@ -53,9 +53,12 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 		return;
 	}
 
-	// Get the rendered mesh
-    MeshHandle  handle = staticMesh.mesh();
-    const Mesh& mesh   = handle.readLock();
+	// Get the rendered mesh handle
+    MeshHandle handle = staticMesh.mesh();
+	DC_ABORT_IF( !handle.isValid(), "invalid mesh" )
+		
+	// Read lock mesh handle
+    const Mesh& mesh = handle.readLock();
 
 	// Emit render operation for each mesh chunk
 	for( u32 i = 0, n = mesh.chunkCount(); i < n; i++ ) {

@@ -161,10 +161,10 @@ namespace Scene {
     protected:
 
         //! Writes the transform data to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads the transform data from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
 
 	private:
 
@@ -210,10 +210,10 @@ namespace Scene {
     protected:
 
         //! Writes the identifier to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
 
 		//! Reads the identifier from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
 
 	private:
 

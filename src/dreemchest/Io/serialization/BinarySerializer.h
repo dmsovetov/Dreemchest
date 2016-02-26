@@ -68,6 +68,11 @@ namespace Io {
 		//! Writes a serializable to a byte buffer.
 		static ByteBufferPtr		write( const Serializable& data );
 
+	#if !DEV_DEPRECATED_KEYVALUE_TYPE
+		//! Writes the KeyValue to a byte buffer.
+		static ByteBufferPtr		write( const KeyValue& data );
+	#endif	/*	!DEV_DEPRECATED_KEYVALUE_TYPE	*/
+
 	private:
 
 		//! Serializable data header.
@@ -94,7 +99,11 @@ namespace Io {
 		}
 
 		BinaryStorage storage( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
+    #if DEV_DEPRECATED_KEYVALUE_TYPE
 		data.read( &storage );
+    #else
+        data.read( &storage );
+    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		return data;
 	}
 

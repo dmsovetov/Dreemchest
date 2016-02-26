@@ -112,7 +112,7 @@ ByteBufferPtr ByteBuffer::copy( void ) const
 // ** ByteBuffer::trimFromLeft
 void ByteBuffer::trimFromLeft( s32 size )
 {
-    DC_BREAK_IF( size > length() );
+    DC_ABORT_IF( size > length(), "too long chunk to trim" );
     m_buffer.erase( m_buffer.begin(), m_buffer.begin() + size );
     m_position = min2( m_position, length() );
 }
@@ -120,7 +120,7 @@ void ByteBuffer::trimFromLeft( s32 size )
 // ** ByteBuffer::trimFromRight
 void ByteBuffer::trimFromRight( s32 size )
 {
-    DC_BREAK_IF( size > length() );
+    DC_ABORT_IF( size > length(), "too long chunk to trim" );
     m_buffer.erase( m_buffer.begin() + (length() - size), m_buffer.end() );
     m_position = min2( m_position, length() );
 }
@@ -128,9 +128,9 @@ void ByteBuffer::trimFromRight( s32 size )
 // ** ByteBuffer::read
 s32 ByteBuffer::read( void* buffer, s32 size ) const
 {
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
-    DC_BREAK_IF( size > bytesAvailable() );
+    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    DC_ABORT_IF( size <= 0, "the size should be positive" );
+    DC_ABORT_IF( size > bytesAvailable(), "not enough data to read" );
 
     memcpy( buffer, current(), size );
     m_position += size;
@@ -141,8 +141,8 @@ s32 ByteBuffer::read( void* buffer, s32 size ) const
 // ** ByteBuffer::write
 s32 ByteBuffer::write( const void* buffer, s32 size )
 {
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
+    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    DC_ABORT_IF( size <= 0, "the size should be positive" );
 
     s32 extra = max2( 0, size - bytesAvailable() );
 

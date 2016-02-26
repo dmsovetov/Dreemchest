@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+
 	//! Key-value storage type.
 	class KeyValue : public Serializable {
 	public:
@@ -391,6 +393,77 @@ namespace Io {
 
 		return *this << items;
 	}
+
+#else
+
+    //! Default KeyValue binary writer.
+    class BinaryVariantStream {
+    public:
+
+                    //! Constructs the BinaryVariantStream instance.
+                    BinaryVariantStream( StreamPtr stream );
+
+        //! Writes the KeyValue object to a binary stream.
+        s32         write( const Variant& value );
+
+        //! Reads the KeyValue object from a binary stream.
+        s32         read( Variant& value );
+
+    private:
+
+		//! Key-value value types.
+		enum Type {
+			  kNull
+			, kBoolean
+			, kInt8
+			, kInt16
+			, kInt32
+			, kInt64
+			, kFloat32
+			, kFloat64
+			, kString
+			, kGuid
+            , kVec2
+            , kVec3
+            , kVec4
+            , kQuat
+            , kRgb
+            , kRgba
+			, kArray
+			, kObject
+		};
+
+        //! Reads the single variant value from a stream.
+        Variant     readValue( void );
+
+        //! Writes the single variant value to a stream.
+        void        writeValue( const Variant& value );
+
+        //! Returns the variant value type.
+        Type        valueType( const Variant& value ) const;
+
+    private:
+
+        StreamPtr   m_stream;   //!< The source binary stream.
+    };
+
+	template<>
+	inline KeyValue BinarySerializer::read( const Array<u8>& bytes )
+	{
+		KeyValue data;
+
+		if( bytes.empty() ) {
+			return data;
+		}
+
+        Variant value;
+		BinaryStorage storage( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
+		BinaryVariantStream( storage.isBinaryStorage()->stream() ).read( value );
+
+		return value.as<KeyValue>();
+	}
+
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 } // namespace Io
 

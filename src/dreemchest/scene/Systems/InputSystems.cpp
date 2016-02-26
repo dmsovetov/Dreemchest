@@ -33,7 +33,7 @@ namespace Scene {
 // ** TouchSystem::TouchSystem
 TouchSystem::TouchSystem( const String& name, const Ecs::Aspect& aspect, ViewportWPtr viewport ) : EntitySystem( name, aspect ), m_viewport( viewport )
 {
-	DC_BREAK_IF( !viewport.valid() );
+	DC_ABORT_IF( !viewport.valid(), "invalid viewport" );
 
 	m_viewport->subscribe<Viewport::TouchBegan>( dcThisMethod( TouchSystem::handleTouchBegan ) );
 	m_viewport->subscribe<Viewport::TouchEnded>( dcThisMethod( TouchSystem::handleTouchEnded ) );

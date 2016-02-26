@@ -85,15 +85,15 @@ void Light::setRange( f32 value )
 }
 
 // ** Light::serialize
-void Light::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Light::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
 }
 
 // ** Light::deserialize
-void Light::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
 }
 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
@@ -107,7 +107,7 @@ MeshHandle StaticMesh::mesh( void ) const
 // ** StaticMesh::setMesh
 void StaticMesh::setMesh( MeshHandle value )
 {
-	DC_BREAK_IF( !value.isValid() );
+	DC_ABORT_IF( !value.isValid(), "invalid mesh" );
 	m_mesh = value;
 }
 
@@ -126,7 +126,7 @@ void StaticMesh::setWorldSpaceBounds( const Bounds& value )
 // ** StaticMesh::const 
 bool StaticMesh::isVisible( u8 camera ) const
 {
-	DC_BREAK_IF( camera >= 16 );
+	DC_ABORT_IF( camera >= 16, "index is out of range" );
 	return m_visibility.is( BIT( camera ) );
 }
 
@@ -151,7 +151,7 @@ MaterialHandle StaticMesh::material( u32 index ) const
 // ** StaticMesh::setMaterial
 void StaticMesh::setMaterial( u32 index, MaterialHandle value )
 {
-	DC_BREAK_IF( index > 8 );
+	DC_ABORT_IF( index > 8, "index is out of range" );
 
 	if( index >= materialCount() ) {
 		m_materials.resize( index + 1 );
@@ -173,35 +173,42 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 }
 
 // ** StaticMesh::serialize
-void StaticMesh::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    Io::KeyValue materials = Io::KeyValue::array();
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    KeyValue materials = KeyValue::array();
 
     for( u32 i = 0, n = materialCount(); i < n; i++ ) {
         MaterialHandle m = material( i );
         materials << (m.isValid() ? m.uniqueId() : "");
     }
 
-    ar = Io::KeyValue::object() << "asset" << (m_mesh.isValid() ? m_mesh.uniqueId() : "") << "materials" << materials;
+    ar = KeyValue::object() << "asset" << (m_mesh.isValid() ? m_mesh->uniqueId() : "") << "materials" << materials;
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** StaticMesh::deserialize
-void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     Assets::Assets* assets = ctx.get<Assets::Assets>();
-    
+	
     if( !assets ) {
         LogError( "staticMesh", "no Assets attached to serialization context.\n" );
         return;
     }
-
-    const Io::KeyValue& materials = ar["materials"];
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    const KeyValue& materials = ar["materials"];
 
     for( s32 i = 0, n = materials.size(); i < n; i++ ) {
         setMaterial( i, assets->find<Material>( materials[i].asString() ) );
     }
 
     m_mesh = assets->find<Mesh>( ar["asset"].asString() );
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -321,7 +328,7 @@ void Camera::setNdc( const Rect& value )
 // ** Camera::viewport
 Rect Camera::viewport( void ) const
 {
-	DC_BREAK_IF( m_target == NULL )
+	DC_ABORT_IF( !m_target.valid(), "invalid render target" )
 
 	u32 w = m_target->width();
 	u32 h = m_target->height();
@@ -344,7 +351,7 @@ const RenderTargetPtr& Camera::target( void ) const
 // ** Camera::calculateProjectionMatrix
 Matrix4 Camera::calculateProjectionMatrix( void ) const
 {
-	DC_BREAK_IF( m_target == NULL )
+	DC_ABORT_IF( !m_target.valid(), "invalid render target" )
 
 	Rect rect   = viewport();
 	f32  width  = rect.width();
@@ -448,20 +455,28 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 }
 
 // ** Camera::serialize
-void Camera::serialize( Ecs::SerializationContext& ctx, Io::KeyValue& ar ) const
+void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    ar = Io::KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
+#if DEV_DEPRECATED_KEYVALUE_TYPE
+    ar = KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Camera::deserialize
-void Camera::deserialize( Ecs::SerializationContext& ctx, const Io::KeyValue& ar )
+void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
+#if DEV_DEPRECATED_KEYVALUE_TYPE
     m_clearMask     = ar["clearMask"].asUByte();
     m_projection    = static_cast<Projection>( ar["projection"].asInt() );
     m_clearColor    = ar["clearColor"].asRgba();
     m_fov           = ar["fov"].asFloat();
     m_near          = ar["near"].asFloat();
     m_far           = ar["far"].asFloat();
+#else
+    DC_NOT_IMPLEMENTED
+#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 } // namespace Scene

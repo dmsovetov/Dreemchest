@@ -33,13 +33,18 @@ namespace Platform {
 //! Platform-specific application constructor.
 extern IApplication* createApplication( void );
 
+//! Platform-specific service application constructor.
+extern IApplication* createServiceApplication( void );
+
+// ------------------------------------------------------------------- Application ------------------------------------------------------------------- //
+
 // ** Application::s_application
 Application* Application::s_application = NULL;
 
 // ** Application::Application
 Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
-    DC_BREAK_IF( s_application != NULL );
+    DC_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
     if( !m_impl ) LogWarning( "application", "not implemented on current platform\n" );
     s_application = this;
 }
@@ -75,7 +80,6 @@ Application* Application::create( const Arguments& args )
 void Application::quit( u32 exitCode )
 {
     if( !m_impl ) {
-    //    LogWarning( "application", "quit is not implemented\n" );
         return;
     }
 
@@ -83,27 +87,62 @@ void Application::quit( u32 exitCode )
 }
 
 // ** Application::launch
-int Application::launch( ApplicationDelegate* delegate )
+s32 Application::launch( ApplicationDelegate* delegate )
 {
     if( !m_impl ) {
-    //    LogWarning( "Application::launch : application is not implemented\n" );
         return -1;
     }
 
     m_delegate = delegate;
-
+    notifyPrepareToLaunch();
     return m_impl->launch( this );
+}
+
+// ** Application::notifyPrepareToLaunch
+void Application::notifyPrepareToLaunch( void )
+{
+    if( !m_delegate ) {
+        LogDebug( "application", "no application delegate set, prepareToLaunch event ignored\n" );
+        return;
+    }
+
+    m_delegate->handlePrepareToLaunch( this );
 }
 
 // ** Application::notifyLaunched
 void Application::notifyLaunched( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, event ignored\n" );
+        LogDebug( "application", "no application delegate set, launch event ignored\n" );
         return;
     }
 
     m_delegate->handleLaunched( this );
+}
+
+// ** Application::notifyUpdate
+void Application::notifyUpdate( void )
+{
+    if( m_delegate ) {
+        m_delegate->handleUpdate( this );
+    }
+}
+
+// -------------------------------------------------------------- ServiceApplication ---------------------------------------------------------------- //
+
+// ** ServiceApplication::ServiceApplication
+ServiceApplication::ServiceApplication( const Arguments& args, IApplication* impl ) : Application( args, impl )
+{
+}
+
+// ** ServiceApplication::create
+ServiceApplication* ServiceApplication::create( const Arguments& args )
+{
+    if( IApplication* impl = createServiceApplication() ) {
+        return DC_NEW ServiceApplication( args, impl );
+    }
+
+    return NULL;
 }
 
 } // namespace Platform

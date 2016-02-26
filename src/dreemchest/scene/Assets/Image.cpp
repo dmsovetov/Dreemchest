@@ -88,10 +88,10 @@ void Image::setMipLevelCount( s32 value )
 // ** Image::mipLevel
 const ByteArray& Image::mipLevel( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= mipLevelCount() );
+	DC_ABORT_IF( index < 0 || index >= mipLevelCount(), "index is out of range" );
 
 	const ByteArray& pixels = m_mips[index];
-	DC_BREAK_IF( pixels.empty() );
+	DC_BREAK_IF( pixels.empty(), "the specified mip level was not initialized" );
 
 	return pixels;
 }
@@ -99,7 +99,7 @@ const ByteArray& Image::mipLevel( s32 index ) const
 // ** Image::setMipLevel
 void Image::setMipLevel( s32 index, const ByteArray& value )
 {
-	DC_BREAK_IF( index < 0 || index >= mipLevelCount() );
+	DC_ABORT_IF( index < 0 || index >= mipLevelCount(), "index is out of range" );
 	m_mips[index] = value;
 }
 

@@ -158,7 +158,7 @@ s32 Box2DPhysics::Collisions::eventCount( void ) const
 // ** Box2DPhysics::Collisions::event
 const Box2DPhysics::Collisions::Event& Box2DPhysics::Collisions::event( s32 index ) const
 {
-    DC_BREAK_IF( index < 0 || index >= eventCount() );
+    DC_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
     return m_events[index];
 }
 
@@ -255,7 +255,7 @@ SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 // ** Box2DPhysics::querySegment
 SceneObjectSet Box2DPhysics::querySegment( const Vec2& start, const Vec2& end ) const
 {
-	DC_BREAK_IF( (start - end).length() < 1.0f );
+	DC_BREAK_IF( (start - end).length() < 1.0f, "the queried segment is too short" );
 
 	// Ray casting callback
 	struct Callback : public b2RayCastCallback {
@@ -357,14 +357,14 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
 b2Body* Box2DPhysics::extractPhysicalBody( const RigidBody2D& rigidBody ) const
 {
 	Internal::Ptr physical = rigidBody.internal<Internal>();
-	DC_BREAK_IF( physical == NULL );
+	DC_ABORT_IF( physical == NULL, "invalid internal data" );
 	return physical->m_body;
 }
 
 // ** Box2DPhysics::prepareForSimulation
 void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
 {
-    DC_BREAK_IF( rigidBody.type() != RigidBody2D::Kinematic && rigidBody.type() != RigidBody2D::Dynamic );
+    DC_BREAK_IF( rigidBody.type() == RigidBody2D::Static, "static objects should not be simulated" );
 
     // Kinematic bodies inherit scene transform
     if( rigidBody.type() == RigidBody2D::Kinematic ) {
@@ -485,9 +485,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
     RigidBody2D& rigidBody  = *entity.get<RigidBody2D>();
     Transform&   transform  = *entity.get<Transform>();
 
-	DC_BREAK_IF( rigidBody.internal<Internal>() != Internal::Ptr() )
-	DC_BREAK_IF( shape == NULL )
-	DC_BREAK_IF( shape->partCount() == 0 )
+	DC_ABORT_IF( rigidBody.internal<Internal>().valid(), "internal data should not be valid" )
+	DC_ABORT_IF( shape == NULL, "rigid body should have an attached Shape2D" )
+	DC_ABORT_IF( shape->partCount() == 0, "rigid body shape should not be empty" )
 
     b2BodyDef def;
 
@@ -539,10 +539,10 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 {
     RigidBody2D* rigidBody = entity.get<RigidBody2D>();
 	Internal::Ptr physical = rigidBody->internal<Internal>();
-	DC_BREAK_IF( physical == NULL )
+	DC_ABORT_IF( physical == NULL, "internal data should be valid" )
 
 	b2Body* body = physical->m_body;
-	DC_BREAK_IF( body == NULL );
+	DC_ABORT_IF( body == NULL, "Box2D body should be valid" );
 
     body->SetUserData( NULL );
     m_world->DestroyBody( body );

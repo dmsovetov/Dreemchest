@@ -70,10 +70,18 @@ if (DC_SOUND_ENABLED)
 	add_files(Sound/Drivers SOUND_DRIVERS_SRCS)
 	
 	if (OPENAL_FOUND)
+		set(OPENAL_ENABLED ON)
+	endif ()
+	
+	if (OGGVORBIS_FOUND)
+		set(OGGVORBIS_ENABLED ON)
+	endif ()
+	
+	if (OPENAL_ENABLED)
 		add_definitions(-DDC_HAVE_OPENAL)
 		add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
 		include_directories(${OPENAL_INCLUDE_DIR})
-	endif (OPENAL_FOUND)
+	endif (OPENAL_ENABLED)
 
 	set(SOUND_DECODERS_SRCS
 		Sound/Decoders/SoundDecoder.cpp
@@ -81,11 +89,11 @@ if (DC_SOUND_ENABLED)
 		Sound/Decoders/WavSoundDecoder.cpp
 		Sound/Decoders/WavSoundDecoder.h)
 
-	if (OGGVORBIS_FOUND)
+	if (OGGVORBIS_ENABLED)
 		add_definitions(-DDC_HAVE_VORBIS)
 		set(SOUND_DECODERS_SRCS ${SOUND_DECODERS_SRCS} Sound/Decoders/OggSoundDecoder.cpp Sound/Decoders/OggSoundDecoder.h)
 		include_directories(${OGGVORBIS_INCLUDE_DIR})
-	endif (OGGVORBIS_FOUND)
+	endif ()
 
 	source_group("Code\\Sound\\Decoders" FILES ${SOUND_DECODERS_SRCS})
 

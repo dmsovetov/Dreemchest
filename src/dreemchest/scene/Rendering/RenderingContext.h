@@ -62,9 +62,6 @@ namespace Scene {
         //! Returns texture for a specified image asset.
         Renderer::TexturePtr                requestTexture( const ImageHandle& image );
 
-        //! Returns the renderable data by an array index.
-        const Renderable&                   renderable( s32 index ) const;
-
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( const Renderer::HalPtr& hal );
 

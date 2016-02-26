@@ -114,7 +114,7 @@ namespace Ecs {
 	template<typename ... TComponents>
 	void ImmutableEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, const Array<TComponents*>& ... )
 	{
-		DC_BREAK
+		DC_NOT_IMPLEMENTED
 	}
 
 	// ** ImmutableEntitySystem::process
@@ -128,7 +128,7 @@ namespace Ecs {
 	template<typename ... TComponents>
 	void ImmutableEntitySystem<TComponents...>::entityRemoved( const Entity& entity )
 	{
-		DC_BREAK
+		DC_NOT_IMPLEMENTED
 	}
 
 #endif	/*	!DC_CPP11_DISABLED	*/

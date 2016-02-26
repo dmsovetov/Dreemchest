@@ -62,7 +62,7 @@ WindowsWindow::~WindowsWindow( void )
 // ** WindowsWindow::close
 void WindowsWindow::close( void )
 {
-	DC_BREAK_IF( m_window == NULL );
+	DC_BREAK_IF( m_window == NULL, "invalid handle" );
 
 	// ** Destroy window
 	if( !DestroyWindow( m_window ) ) {
@@ -75,8 +75,8 @@ void WindowsWindow::close( void )
 	}
 
 	// ** Remove window from registry
-	int removed = s_windows.erase( m_window );
-	DC_BREAK_IF( removed != 1 );
+	s32 removed = s_windows.erase( m_window );
+	DC_BREAK_IF( removed != 1, "failed to remove window from a shared list" );
 
 	m_window				= NULL;
 	m_applicationInstance	= NULL;

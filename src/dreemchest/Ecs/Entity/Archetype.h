@@ -44,7 +44,7 @@ namespace Ecs {
 
 	#ifndef DC_ECS_NO_SERIALIZATION
 		//! Constructs archetype instance before deserialization.
-		virtual void		deserialize( SerializationContext& ctx, const Io::KeyValue& value ) DC_DECL_OVERRIDE;
+		virtual void		deserialize( SerializationContext& ctx, const Archive& value ) DC_DECL_OVERRIDE;
 	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 	};
 

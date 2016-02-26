@@ -370,7 +370,7 @@ struct sUnlockTextureTask {
 // ** Hal::createTexture2D
 void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture )
 {
-	DC_BREAK_IF( texture == NULL );
+	DC_ABORT_IF( texture == NULL, "invalid texture" );
 
     sCreateTextureTask task( this, texture, width, height, format );
     *texture = NULL;
@@ -385,7 +385,7 @@ void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DP
 // ** Hal::lockTexture
 void* Hal::lockTexture( Texture2D* texture, u32& size )
 {
-    DC_BREAK_IF( texture == NULL );
+    DC_ABORT_IF( texture == NULL, "invalid texture" );
 
     sLockTextureTask task( texture, &size );
 
@@ -401,7 +401,7 @@ void* Hal::lockTexture( Texture2D* texture, u32& size )
 // ** Hal::unlockTexture
 void Hal::unlockTexture( Texture2D* texture )
 {
-    DC_BREAK_IF( texture == NULL );
+    DC_ABORT_IF( texture == NULL, "invalid texture" );
 
     sUnlockTextureTask task( texture );
 
@@ -469,7 +469,7 @@ u32 Texture::bytesPerMip( u32 width, u32 height ) const
 // ** Texture::bytesPerBlock
 u32 Texture::bytesPerBlock( void ) const
 {
-    DC_BREAK_IF( !isCompressed() );
+    DC_BREAK_IF( !isCompressed(), "expected to be used only for compressed textures" );
 
     switch( m_pixelFormat ) {
     case PixelDxtc1:    return 8;
@@ -690,7 +690,7 @@ bool VertexDeclaration::parse( const char *format )
 
     free( ( void* )token );
 
-    DC_BREAK_IF( !position() );
+    DC_ABORT_IF( !position(), "vertex declaration should contain the vertex position" );
 
     return success;
 }

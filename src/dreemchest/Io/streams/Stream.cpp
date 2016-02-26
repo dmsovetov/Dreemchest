@@ -85,21 +85,21 @@ s32 Stream::writeString( CString str )
 // ** Stream::length
 s32 Stream::length( void ) const
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::position
 s32 Stream::position( void ) const
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::setPosition
 void Stream::setPosition( s32 offset, SeekOrigin origin )
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
 }
     
 // ** Stream::hasDataLeft
@@ -111,14 +111,14 @@ bool Stream::hasDataLeft( void ) const
 // ** Stream::read
 s32 Stream::read( void* buffer, s32 size ) const
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::write
 s32 Stream::write( const void* buffer, s32 size )
 {
-    DC_BREAK;
+    DC_NOT_IMPLEMENTED;
     return 0;
 }
 

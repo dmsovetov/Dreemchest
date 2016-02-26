@@ -114,7 +114,7 @@ s32 Emitter::particlesCount( void ) const
 // ** Emitter::particles
 ParticlesWPtr Emitter::particles( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= particlesCount() );
+	DC_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
 	return m_particles[index];
 }
 
@@ -122,9 +122,9 @@ ParticlesWPtr Emitter::particles( s32 index ) const
 void Emitter::removeParticles( const ParticlesWPtr& particles )
 {
 	ParticlesArray::iterator i = std::find( m_particles.begin(), m_particles.end(), particles );
+    DC_BREAK_IF( i == m_particles.end(), "emitter does not contain this particles" );
 
 	if( i == m_particles.end() ) {
-		DC_BREAK;
 		return;
 	}
 
@@ -143,7 +143,7 @@ ParticlesWPtr Emitter::addParticles( void )
 // ** Emitter::addModule
 void Emitter::addModule( const ModulePtr& module )
 {
-	DC_BREAK_IF( !module.valid() );
+	DC_ABORT_IF( !module.valid(), "invalid module" );
 	LogDebug( "emitter", "module %s added\n", module->name().c_str() );
 	m_modules.push_back( module );
 }
@@ -157,7 +157,7 @@ s32 Emitter::burstCount( void ) const
 // ** Emitter::burst
 const ParticleBurst& Emitter::burst( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= burstCount() );
+	DC_ABORT_IF( index < 0 || index >= burstCount(), "index is out of range" );
 	return m_bursts[index];
 }
 
@@ -309,7 +309,7 @@ s32 EmitterInstance::particlesCount( void ) const
 // ** EmitterInstance::particles
 ParticlesInstanceWPtr EmitterInstance::particles( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= particlesCount() );
+    DC_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
 	return m_particles[index];
 }
 
