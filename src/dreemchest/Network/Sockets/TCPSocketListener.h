@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Berkley TCP socket listener implementation.
 	class TCPSocketListener NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
@@ -113,7 +113,7 @@ namespace net {
         TCPSocketList					m_clientSockets;    //!< List of client connections.
 	};
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

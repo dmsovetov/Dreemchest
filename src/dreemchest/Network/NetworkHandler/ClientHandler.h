@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_ClientHandler_H__
-#define		__DC_Network_ClientHandler_H__
+#ifndef __DC_Network_ClientHandler_H__
+#define __DC_Network_ClientHandler_H__
 
 #include "NetworkHandler.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
     // ** class ClientHandler
     class ClientHandler : public NetworkHandler {
@@ -50,7 +50,7 @@ namespace net {
 		ConnectionPtr&			connection( void );
 
 		//! Creates a new NetworkClientHandler instance and connects to server.
-		static ClientHandlerPtr	create( const NetworkAddress& address, u16 port );
+		static ClientHandlerPtr	create( const Address& address, u16 port );
 
 		//! Does a broadcast request to detect a running servers.
 		static bool				detectServers( u16 port );
@@ -75,7 +75,7 @@ namespace net {
 		ConnectionPtr			m_connection;	//!< Client connection.
     };
     
-} // namespace net
+} // namespace Network
     
 DC_END_DREEMCHEST
 

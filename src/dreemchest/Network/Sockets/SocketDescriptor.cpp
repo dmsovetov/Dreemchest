@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** SocketDescriptor::Invalid
 SocketDescriptor SocketDescriptor::Invalid = INVALID_SOCKET;
@@ -108,7 +108,7 @@ s32 SocketDescriptor::error( void ) const
 }
 
 // ** SocketDescriptor::accept
-SocketDescriptor SocketDescriptor::accept( NetworkAddress& remoteAddress ) const
+SocketDescriptor SocketDescriptor::accept( Address& remoteAddress ) const
 {
     sockaddr_in addr;
 #if defined( DC_PLATFORM_WINDOWS )
@@ -216,6 +216,6 @@ bool SocketDescriptor::enableAddressReuse( void )
 	return result != SOCKET_ERROR;
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

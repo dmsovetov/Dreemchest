@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** ClientHandler::ClientHandler
 ClientHandler::ClientHandler( TCPSocketPtr socket )
@@ -68,7 +68,7 @@ ConnectionPtr& ClientHandler::connection( void )
 }
 
 // ** ClientHandler::create
-ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port )
+ClientHandlerPtr ClientHandler::create( const Address& address, u16 port )
 {
 	TCPSocketPtr clientSocket = TCPSocket::connectTo( address, port );
 
@@ -111,6 +111,6 @@ void ClientHandler::handleSocketData( const TCPSocket::Data& e )
     processReceivedData( e.sender, e.data );
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

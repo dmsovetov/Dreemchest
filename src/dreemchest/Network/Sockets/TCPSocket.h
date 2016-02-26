@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
     //! TCP socket.
 	class TCPSocket NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
@@ -41,7 +41,7 @@ namespace net {
         virtual						~TCPSocket( void );
 
         //! Returns a remote address.
-		const NetworkAddress&	    address( void ) const;
+		const Address&	    address( void ) const;
 
         //! Returns a socket descriptor.
 		const SocketDescriptor&	    descriptor( void ) const;
@@ -50,7 +50,7 @@ namespace net {
 		bool					    isValid( void ) const;
 
         //! Connects to a TCP socket at a given remote address and port.
-        bool					    connect( const NetworkAddress& address, u16 port );
+        bool					    connect( const Address& address, u16 port );
 
         //! Closes a socket.
         void					    close( void );
@@ -66,7 +66,7 @@ namespace net {
         u32						    send( const void* buffer, u32 size );
 
         //! Connects to a TCP socket at a given remote address and port.
-        static TCPSocketPtr		    connectTo( const NetworkAddress& address, u16 port );
+        static TCPSocketPtr		    connectTo( const Address& address, u16 port );
 
         //! Base class for all TCP socket events.
         struct Event {
@@ -94,16 +94,16 @@ namespace net {
     private:
 
                                     //! Constructs a TCPSocket instance.
-                                    TCPSocket( SocketDescriptor& descriptor = SocketDescriptor::Invalid, const NetworkAddress& address = NetworkAddress::Null );
+                                    TCPSocket( SocketDescriptor& descriptor = SocketDescriptor::Invalid, const Address& address = Address::Null );
 
     private:
 
         SocketDescriptor			m_descriptor;   //!< Socket descriptor.
         SocketDataPtr               m_data;         //!< Socket receiving buffer.
-        NetworkAddress				m_address;      //!< Remote socket address.
+        Address				m_address;      //!< Remote socket address.
     };
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** UDPSocket::UDPSocket
 UDPSocket::UDPSocket( bool broadcast )
@@ -44,7 +44,7 @@ UDPSocket::UDPSocket( bool broadcast )
 }
 
 // ** UDPSocket::send
-u32 UDPSocket::send( const NetworkAddress& address, u16 port, const void* buffer, u32 size )
+u32 UDPSocket::send( const Address& address, u16 port, const void* buffer, u32 size )
 {
     // ** Format address
     sockaddr_in dest;
@@ -100,8 +100,8 @@ void UDPSocket::recv( void )
         return;
     }
 
-	NetworkAddress remoteAddress( addr.sin_addr.s_addr );
-    notify<Data>( this, NetworkAddress( addr.sin_addr.s_addr ), m_data );
+	Address remoteAddress( addr.sin_addr.s_addr );
+    notify<Data>( this, Address( addr.sin_addr.s_addr ), m_data );
 }
 
 // ** UDPSocket::create
@@ -117,6 +117,6 @@ UDPSocketPtr UDPSocket::createBroadcast( void )
 }
 
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

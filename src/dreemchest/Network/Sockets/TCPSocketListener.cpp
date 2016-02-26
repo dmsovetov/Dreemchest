@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** TCPSocketListener::TCPSocketListener
 TCPSocketListener::TCPSocketListener( void ) : m_port( 0 )
@@ -177,7 +177,7 @@ const TCPSocketList& TCPSocketListener::connections( void ) const
 // ** TCPSocketListener::acceptConnection
 TCPSocketPtr TCPSocketListener::acceptConnection( void )
 {
-	NetworkAddress	 address;
+	Address	 address;
 	SocketDescriptor descriptor = m_descriptor.accept( address );
 
 	if( !descriptor.isValid() ) {
@@ -219,7 +219,7 @@ bool TCPSocketListener::bind( u16 port )
 
     m_descriptor = result;
 
-	sockaddr_in addr = Network::toSockaddr( NetworkAddress::Null, port );
+	sockaddr_in addr = Network::toSockaddr( Address::Null, port );
 	result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result.isError() ) {
@@ -259,6 +259,6 @@ void TCPSocketListener::handleSocketData( const TCPSocket::Data& e )
     notify<Data>( this, e.sender, e.data );
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

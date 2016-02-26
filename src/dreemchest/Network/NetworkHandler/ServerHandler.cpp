@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // --------------------------------------- ServerHandler -------------------------------------- //
 
@@ -111,6 +111,6 @@ ConnectionList ServerHandler::eventListeners( void ) const
 	return connections;
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

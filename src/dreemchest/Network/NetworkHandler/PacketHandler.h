@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Packet handler interface class.
 	class IPacketHandler {
@@ -73,7 +73,7 @@ namespace net {
 		return m_callback( connection, *packetWithType );
 	}
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

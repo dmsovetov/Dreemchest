@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** Network::Network
 Network::Network( void )
@@ -242,13 +242,13 @@ bool Network::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressA
 }
 
 // ** Network::hostIP
-const NetworkAddress& Network::hostIP( void ) const
+const Address& Network::hostIP( void ) const
 {
     return m_host;
 }
 
 // ** Network::broadcastIP
-const NetworkAddress& Network::broadcastIP( void ) const
+const Address& Network::broadcastIP( void ) const
 {
     return m_broadcast;
 }
@@ -260,7 +260,7 @@ const char* Network::hostName( void ) const
 }
 
 // ** Network::toSockaddr
-sockaddr_in Network::toSockaddr( const NetworkAddress& address, u16 port )
+sockaddr_in Network::toSockaddr( const Address& address, u16 port )
 {
     sockaddr_in addr;
 
@@ -271,38 +271,38 @@ sockaddr_in Network::toSockaddr( const NetworkAddress& address, u16 port )
     return addr;
 }
 
-// --------------------------------------------- NetworkAddress --------------------------------------------- //
+// --------------------------------------------- Address --------------------------------------------- //
 
-// ** NetworkAddress::Null
-NetworkAddress NetworkAddress::Null = 0;
+// ** Address::Null
+Address Address::Null = 0;
 
-// ** NetworkAddress::Localhost
-NetworkAddress NetworkAddress::Localhost = NetworkAddress( "127.0.0.1" );
+// ** Address::Localhost
+Address Address::Localhost = Address( "127.0.0.1" );
 
-// ** NetworkAddress::NetworkAddress
-NetworkAddress::NetworkAddress( u32 address ) : m_address( address )
+// ** Address::Address
+Address::Address( u32 address ) : m_address( address )
 {
 
 }
 
-NetworkAddress::NetworkAddress( CString address )
+Address::Address( CString address )
 {
     m_address = inet_addr( address );
 }
 
-// ** NetworkAddress::operator ulong
-NetworkAddress::operator u32( void ) const
+// ** Address::operator ulong
+Address::operator u32( void ) const
 {
     return m_address;
 }
 
-// ** NetworkAddress::toString
-CString NetworkAddress::toString( void ) const
+// ** Address::toString
+CString Address::toString( void ) const
 {
 	CString result = inet_ntoa( *( in_addr* )&m_address );
     return result;
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

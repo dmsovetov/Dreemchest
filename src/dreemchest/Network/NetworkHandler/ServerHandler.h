@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_ServerHandler_H__
-#define		__DC_Network_ServerHandler_H__
+#ifndef __DC_Network_ServerHandler_H__
+#define __DC_Network_ServerHandler_H__
 
 #include "NetworkHandler.h"
 #include "../Sockets/TCPSocketListener.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Server-side network handler.
     class ServerHandler : public NetworkHandler {
@@ -88,7 +88,7 @@ namespace net {
 		TCPSocketListenerPtr		m_socketListener;
     };
     
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

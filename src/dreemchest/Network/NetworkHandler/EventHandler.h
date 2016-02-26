@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Event handler interface class.
 	class IEventHandler {
@@ -69,7 +69,7 @@ namespace net {
 		return true;
 	}
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** SocketResult::SocketResult
 SocketResult::SocketResult( s32 value ) : m_value( value )
@@ -88,6 +88,6 @@ String SocketResult::errorMessage( void ) const
 #endif
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Remote connection interface.
 	class Connection : public RefCounted {
@@ -75,7 +75,7 @@ namespace net {
 		TCPSocketPtr&			socket( void );
 
 		//! Returns a remote address of a connection.
-		const NetworkAddress&	address( void ) const;
+		const Address&	address( void ) const;
 
 		//! Invokes a remote procedure.
 		template<typename TRemoteProcedure>

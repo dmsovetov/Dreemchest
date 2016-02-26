@@ -30,7 +30,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** Connection::Connection
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
@@ -112,7 +112,7 @@ NetworkHandler* Connection::networkHandler( void ) const
 }
 
 // ** Connection::address
-const NetworkAddress& Connection::address( void ) const
+const Address& Connection::address( void ) const
 {
 	return m_socket->address();
 }
@@ -198,6 +198,6 @@ void Connection::update( u32 dt )
 	}
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

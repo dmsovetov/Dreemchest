@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Socket descriptor.
 	class SocketDescriptor {
@@ -70,7 +70,7 @@ namespace net {
 		s32						error( void ) const;
 
 		//! Accepts incoming connection to this socket.
-		SocketDescriptor		accept( NetworkAddress& remoteAddress ) const;			
+		SocketDescriptor		accept( Address& remoteAddress ) const;			
 
 		//! Enables socket address reuse.
 		bool					enableAddressReuse( void );
@@ -90,7 +90,7 @@ namespace net {
 		mutable s32				m_socket;
 	};
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

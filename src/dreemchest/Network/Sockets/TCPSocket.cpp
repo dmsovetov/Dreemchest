@@ -28,10 +28,10 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** TCPSocket::TCPSocket
-TCPSocket::TCPSocket( SocketDescriptor& descriptor, const NetworkAddress& address )
+TCPSocket::TCPSocket( SocketDescriptor& descriptor, const Address& address )
 	: m_descriptor( descriptor ), m_address( address )
 {
 	m_data = Io::ByteBuffer::create();
@@ -58,7 +58,7 @@ TCPSocket::~TCPSocket( void )
 }
 
 // ** TCPSocket::connectTo
-TCPSocketPtr TCPSocket::connectTo( const NetworkAddress& address, u16 port )
+TCPSocketPtr TCPSocket::connectTo( const Address& address, u16 port )
 {
 	TCPSocketPtr socket( DC_NEW TCPSocket );
 
@@ -82,13 +82,13 @@ const SocketDescriptor& TCPSocket::descriptor( void ) const
 }
 
 // ** TCPSocket::address
-const NetworkAddress& TCPSocket::address( void ) const
+const Address& TCPSocket::address( void ) const
 {
 	return m_address;
 }
 
 // ** TCPSocket::connect
-bool TCPSocket::connect( const NetworkAddress& address, u16 port )
+bool TCPSocket::connect( const Address& address, u16 port )
 {
     DC_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
 
@@ -202,6 +202,6 @@ void TCPSocket::recv( void )
     }
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

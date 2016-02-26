@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 // ** NetworkHandler::NetworkHandler
 NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
@@ -262,6 +262,6 @@ void NetworkHandler::update( u32 dt )
 //	}
 }
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST

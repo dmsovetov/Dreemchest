@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
     //! Socket error class wraps the standard return codes and helps to format error to a string.
     class SocketResult {
@@ -60,7 +60,7 @@ namespace net {
         s32         m_value; //!< Value returned by a socket call.
     };
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_NetworkHandler_H__
-#define		__DC_Network_NetworkHandler_H__
+#ifndef __DC_Network_NetworkHandler_H__
+#define __DC_Network_NetworkHandler_H__
 
 #include "Packets.h"
 #include "PacketHandler.h"
@@ -36,7 +36,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Basic network handler.
 	class NetworkHandler : public InjectEventEmitter<RefCounted> {
@@ -249,7 +249,7 @@ namespace net {
 		emitTo( T( arg0, arg1, arg2, arg3 ), eventListeners() );
 	}
 
-} // namespace net
+} // namespace Network
     
 DC_END_DREEMCHEST
 

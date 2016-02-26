@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 	//! Remote procedure call handler interface class.
 	class IRemoteCallHandler {
@@ -153,7 +153,7 @@ namespace net {
 		return m_callback( connection, packet.error, Io::BinarySerializer::read<T>( packet.payload ) );
 	}
 
-} // namespace net
+} // namespace Network
     
 DC_END_DREEMCHEST
 

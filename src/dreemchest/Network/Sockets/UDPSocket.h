@@ -31,14 +31,14 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
     //! Datagram socket class.
     class UDPSocket NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
     public:
 
 		//! Sends a datagram to a specified address & port.
-        u32                     send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
+        u32                     send( const Address& address, u16 port, const void* buffer, u32 size );
 
 		//! Starts listening for datagrams at a given port.
         bool                    listen( u16 port );
@@ -55,11 +55,11 @@ namespace net {
         //! This event is emitted when packet was received.
         struct Data {
                                 //! Constructs Data instance.
-                                Data( UDPSocketWPtr sender, const NetworkAddress& address, SocketDataWPtr data )
+                                Data( UDPSocketWPtr sender, const Address& address, SocketDataWPtr data )
                                     : sender( sender ), address( address ), data( data ) {}
 
             UDPSocketWPtr       sender;     //!< Socket instance that received packet.
-            NetworkAddress      address;    //!< Sender remote address.
+            Address      address;    //!< Sender remote address.
             SocketDataWPtr      data;       //!< Received data.
         };
 
@@ -74,7 +74,7 @@ namespace net {
 		SocketDataPtr		    m_data;         //!< Socket receive buffer.
     };
     
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 

@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace net {
+namespace Network {
 
 namespace packets {
 
@@ -132,7 +132,7 @@ namespace packets {
 
 } // namespace packets
 
-} // namespace net
+} // namespace Network
 
 DC_END_DREEMCHEST
 
