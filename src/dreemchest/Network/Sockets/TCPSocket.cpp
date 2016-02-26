@@ -92,14 +92,15 @@ bool TCPSocket::connect( const NetworkAddress& address, u16 port )
 {
     DC_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
 
-    m_address  = address;
+    m_address = address;
 
 	sockaddr_in addr = Network::toSockaddr( address, port );
 
 	// Connect to a remote host
-	s32 result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
+	SocketResult result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
-	if( result == SOCKET_ERROR ) {
+	if( result.isError() ) {
+        LogError( "socket", "connect failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		return false;
 	}
 
