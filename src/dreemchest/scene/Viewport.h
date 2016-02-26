@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Scene viewport class is used by entity systems to handle user's input.
-	class Viewport : public RefCountedEventEmitter {
+	class Viewport : public InjectEventEmitter<RefCounted> {
 	public:
 
 		//! This event is emitted when touch began.
