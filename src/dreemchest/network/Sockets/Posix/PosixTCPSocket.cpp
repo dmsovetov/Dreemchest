@@ -30,93 +30,104 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// ** PosixTCPSocket::PosixTCPSocket
-PosixTCPSocket::PosixTCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& socket, const NetworkAddress& address )
-	: m_socket( socket ), m_address( address )
+// ** TCPSocket::TCPSocket
+TCPSocket::TCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& descriptor, const NetworkAddress& address )
+	: m_descriptor( descriptor ), m_address( address )
 {
-	m_parent   = NULL;
-	m_stream   = DC_NEW TCPStream( &m_socket );
+	m_stream   = DC_NEW TCPStream( &m_descriptor );
 	m_delegate = TCPSocketDelegatePtr( delegate ? delegate : DC_NEW TCPSocketDelegate );
 
-    if( m_socket.isValid() ) {
+    if( m_descriptor.isValid() ) {
         return;
     }
 
-    m_socket = ::socket( PF_INET, SOCK_STREAM, 0 );
-	if( !m_socket.isValid() ) {
+    m_descriptor = ::socket( PF_INET, SOCK_STREAM, 0 );
+	if( !m_descriptor.isValid() ) {
 		LogError( "socket", "failed to create TCP socket, %d\n", PosixNetwork::lastError() );
 		return;
 	}
 
-	m_socket.enableAddressReuse();
+	m_descriptor.enableAddressReuse();
 }
 
-PosixTCPSocket::~PosixTCPSocket( void )
+TCPSocket::~TCPSocket( void )
 {
 	close();
 }
 
-// ** PosixTCPSocket::isValid
-bool PosixTCPSocket::isValid( void ) const
+// ** TCPSocket::connectTo
+TCPSocketPtr TCPSocket::connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate )
 {
-	return m_socket.isValid();
+	TCPSocketPtr socket( DC_NEW TCPSocket( delegate ) );
+
+	if( !socket->connect( address, port ) ) {
+		return TCPSocketPtr();
+	}
+
+	return socket;
 }
 
-// ** PosixTCPSocket::descriptor
-const SocketDescriptor& PosixTCPSocket::descriptor( void ) const
+// ** TCPSocket::isValid
+bool TCPSocket::isValid( void ) const
 {
-	return m_socket;
+	return m_descriptor.isValid();
 }
 
-// ** PosixTCPSocket::address
-const NetworkAddress& PosixTCPSocket::address( void ) const
+// ** TCPSocket::descriptor
+const SocketDescriptor& TCPSocket::descriptor( void ) const
+{
+	return m_descriptor;
+}
+
+// ** TCPSocket::address
+const NetworkAddress& TCPSocket::address( void ) const
 {
 	return m_address;
 }
 
-// ** PosixTCPSocket::setDelegate
-void PosixTCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
+// ** TCPSocket::setDelegate
+void TCPSocket::setDelegate( const TCPSocketDelegatePtr& value )
 {
 	m_delegate = value;
 }
 
-// ** PosixTCPSocket::connectTo
-bool PosixTCPSocket::connectTo( const NetworkAddress& address, u16 port )
+// ** TCPSocket::connect
+bool TCPSocket::connect( const NetworkAddress& address, u16 port )
 {
-    DC_ABORT_IF( !m_socket.isValid(), "the socket should be valid" );
+    DC_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
 
     m_address  = address;
 
 	sockaddr_in addr = PosixNetwork::toSockaddr( address, port );
 
 	// ** Connect
-	s32 result = connect( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
+	s32 result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result == SOCKET_ERROR ) {
 		return false;
 	}
 
 	// ** Set non blocking mode
-	m_socket.setNonBlocking();
+	m_descriptor.setNonBlocking();
 
 	// ** Set no delay
-	m_socket.setNoDelay();
+	m_descriptor.setNoDelay();
 
 	return true;
 }
 
-// ** PosixTCPSocket::close
-void PosixTCPSocket::close( void )
+// ** TCPSocket::close
+void TCPSocket::close( void )
 {
-	if( m_socket.isValid() && m_delegate.valid() ) {
-		m_delegate->handleClosed( m_parent );
+	if( m_descriptor.isValid() && m_delegate.valid() ) {
+		m_delegate->handleClosed( this );
 	}
 	
-	m_socket.close();
+	m_descriptor.close();
 }
 
-// ** PosixTCPSocket::sendTo
-u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
+// ** TCPSocket::send
+u32 TCPSocket::send( const void* buffer, u32 size )
 {
 	s32 result = m_stream->write( buffer, size );
 	if( result == -1 ) {
@@ -127,10 +138,10 @@ u32 PosixTCPSocket::sendTo( const void* buffer, u32 size )
 	return ( u32 )result;
 }
 
-// ** PosixTCPSocket::update
-void PosixTCPSocket::update( void )
+// ** TCPSocket::fetch
+void TCPSocket::fetch( void )
 {
-    if( !m_socket.isValid() ) {
+    if( !m_descriptor.isValid() ) {
         LogError( "socket", "updating socket with an invalid descriptor.\n" );
         return;
     }
@@ -145,7 +156,7 @@ void PosixTCPSocket::update( void )
 			break;
 		}
 
-		m_delegate->handleReceivedData( m_parent, m_parent, stream );
+		m_delegate->handleReceivedData( this, this, stream );
 
 		if( !isValid() ) {
 			break;

@@ -138,7 +138,7 @@ void Connection::send( NetworkPacket* packet )
 	u32 bytesWritten = Io::BinarySerializer::write( buffer, packet );
 
 	// ** Send binary data to socket
-	s32 bytesSent = m_socket->sendTo( buffer->buffer(), buffer->length() );
+	s32 bytesSent = m_socket->send( buffer->buffer(), buffer->length() );
 	if( bytesSent == 0 ) {
 		return;	// ** The socket was closed.
 	}

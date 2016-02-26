@@ -32,27 +32,27 @@ DC_BEGIN_DREEMCHEST
 namespace net {
 
 // ** TCPStream::TCPStream
-TCPStream::TCPStream( SocketDescriptor* socket ) : ByteBuffer( NULL, 0 ), m_socket( socket )
+TCPStream::TCPStream( SocketDescriptor* descriptor ) : ByteBuffer( NULL, 0 ), m_descriptor( descriptor )
 {
 }
 
 // ** TCPStream::descriptor
 const SocketDescriptor* TCPStream::descriptor( void ) const
 {
-	return m_socket;
+	return m_descriptor;
 }
 
 // ** TCPStream::pull
 TCPStream::State TCPStream::pull( void )
 {
-	DC_ABORT_IF( !m_socket->isValid(), "invalid socket" );
+	DC_ABORT_IF( !m_descriptor->isValid(), "invalid socket descriptor" );
 
 	s8  chunk[1];
 	s32 received = 0;
 
 	setPosition( length() );
 
-	while( (received = recv( *m_socket, chunk, sizeof( chunk ), 0 )) != -1 ) {
+	while( (received = recv( *m_descriptor, chunk, sizeof( chunk ), 0 )) != -1 ) {
 		if( received == 0 ) {
 			return Closed;
 		}
@@ -74,13 +74,13 @@ void TCPStream::flush( void )
 // ** TCPStream::write
 s32 TCPStream::write( const void* buffer, s32 size )
 {
-    DC_ABORT_IF( !m_socket->isValid(), "invalid socket" );
+    DC_ABORT_IF( !m_descriptor->isValid(), "invalid socket" );
 
     s32       bytesSent = 0;
     const u8* data      = ( u8* )buffer;
 
     while( bytesSent < size ) {
-        s32 result = send( *m_socket, ( CString )(data + bytesSent), size - bytesSent, 0 );
+        s32 result = send( *m_descriptor, ( CString )(data + bytesSent), size - bytesSent, 0 );
 
         if( result == -1 ) {
 		#ifdef DC_PLATFORM_WINDOWS

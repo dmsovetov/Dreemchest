@@ -59,7 +59,7 @@ namespace net {
 	private:
 
 		//! TCP stream socket.
-		SocketDescriptor*	m_socket;
+		SocketDescriptor*	    m_descriptor;
 	};
 
 } // namespace net

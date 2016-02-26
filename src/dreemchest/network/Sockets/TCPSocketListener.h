@@ -27,60 +27,11 @@
 #ifndef __DC_Network_TCPSocketListener_H__
 #define __DC_Network_TCPSocketListener_H__
 
-#include "TCPSocket.h"
+#include "Posix/PosixTCPSocketListener.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
-	BeginPrivateInterface( TCPSocketListener )
-		InterfaceMethod( void					update( void ) )
-		InterfaceMethod( void					close( void ) )
-        InterfaceMethod( u16					port( void ) const )
-		InterfaceMethod( const TCPSocketList&	connections( void ) const )
-	EndPrivateInterface
-
-	//! Binds a TCP socket to port and listens for incoming connections.
-	class TCPSocketListener : public RefCounted {
-	public:
-
-									//! Constructs TCPSocketListener instance.
-									TCPSocketListener( impl::TCPSocketListenerPrivate* impl = NULL );
-		virtual						~TCPSocketListener( void ) {};
-
-		//! Checks for incoming connections & updates existing.
-		void						update( void );
-
-		//! Closes a socket listener.
-		void						close( void );
-        
-        //! Returns a port that listener is bound to.
-        u16                         port( void ) const;
-
-		//! Returns a list of active connections.
-		const TCPSocketList&		connections( void ) const;
-
-		//! Creates and binds a new socket listener to a specified port.
-		static TCPSocketListenerPtr	bindTo( u16 port, TCPSocketListenerDelegate* delegate = NULL );
-
-		UsePrivateInterface( TCPSocketListener )
-	};
-
-	//! TCP socket listener event delegate.
-	class TCPSocketListenerDelegate : public RefCounted {
-	public:
-
-		virtual						~TCPSocketListenerDelegate( void ) {}
-
-		//! Handles incoming data from client.
-		virtual void				handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream ) {}
-
-		//! Handles accepted incomming connection.
-		virtual void				handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket ) {}
-
-		//! Handles a remote connection closed.
-		virtual void				handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket ) {}
-	};
 
 } // namespace net
 

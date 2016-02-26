@@ -31,35 +31,35 @@ DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-// ----------------------------------PosixTCPSocketListener::TCPClientDelegate ------------------------------ //
+// ----------------------------------TCPSocketListener::TCPClientDelegate ------------------------------ //
 
-// ** PosixTCPSocketListener::TCPClientDelegate::TCPClientDelegate
-PosixTCPSocketListener::TCPClientDelegate::TCPClientDelegate( PosixTCPSocketListener* listener ) : m_listener( listener )
+// ** TCPSocketListener::TCPClientDelegate::TCPClientDelegate
+TCPSocketListener::TCPClientDelegate::TCPClientDelegate( TCPSocketListener* listener ) : m_listener( listener )
 {
 }
 
-// ** PosixTCPSocketListener::TCPClientDelegate::handleReceivedData
-void PosixTCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
+// ** TCPSocketListener::TCPClientDelegate::handleReceivedData
+void TCPSocketListener::TCPClientDelegate::handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream )
 {
-	if( m_listener != NULL ) m_listener->m_delegate->handleReceivedData( m_listener->m_parent, socket, stream );
+	if( m_listener != NULL ) m_listener->m_delegate->handleReceivedData( m_listener.get(), socket, stream );
 }
     
-// ** PosixTCPSocketListener::TCPClientDelegate::handleClosed
-void PosixTCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
+// ** TCPSocketListener::TCPClientDelegate::handleClosed
+void TCPSocketListener::TCPClientDelegate::handleClosed( TCPSocket* sender )
 {
-    if( m_listener != NULL ) m_listener->m_delegate->handleConnectionClosed( m_listener->m_parent, sender );
+    if( m_listener != NULL ) m_listener->m_delegate->handleConnectionClosed( m_listener.get(), sender );
 }
 
-// ------------------------------------------PosixTCPSocketListener ---------------------------------------- //
+// ------------------------------------------TCPSocketListener ---------------------------------------- //
 
-// ** PosixTCPSocketListener::PosixTCPSocketListener
-PosixTCPSocketListener::PosixTCPSocketListener( TCPSocketListenerDelegate* delegate ) : m_port( 0 )
+// ** TCPSocketListener::TCPSocketListener
+TCPSocketListener::TCPSocketListener( TCPSocketListenerDelegate* delegate ) : m_port( 0 )
 {
 	m_delegate = TCPSocketListenerDelegatePtr( delegate ? delegate : DC_NEW TCPSocketListenerDelegate );
 }
 
-// ** PosixTCPSocketListener::setupFDSet
-s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener )
+// ** TCPSocketListener::setupFDSet
+s32 TCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except, SocketDescriptor& listener )
 {
     // ** Maximum socket descriptor.
     s32 result = 0;
@@ -92,15 +92,15 @@ s32 PosixTCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& e
     return result + 1;
 }
 
-// ** PosixTCPSocketListener::update
-void PosixTCPSocketListener::update( void )
+// ** TCPSocketListener::fetch
+void TCPSocketListener::fetch( void )
 {
     // ** Remove closed connections
 	removeClosedConnections();
 
 	// ** Setup FD sets
 	fd_set read, write, except;
-	s32 nfds = setupFDSets( read, write, except, m_socket );
+	s32 nfds = setupFDSets( read, write, except, m_descriptor );
     
     // ** Setup the timeout structure.
     timeval waitTime;
@@ -116,14 +116,14 @@ void PosixTCPSocketListener::update( void )
 	}
 
 	// ** Process listener socket
-	if( FD_ISSET( m_socket, &read ) ) {
+	if( FD_ISSET( m_descriptor, &read ) ) {
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
 
-		m_delegate->handleConnectionAccepted( m_parent, accepted.get() );
+		m_delegate->handleConnectionAccepted( this, accepted.get() );
 	}
-	else if( FD_ISSET( m_socket, &except ) ) {
-		LogError( "socket", "error on listening socket: %d\n", m_socket.error() );
+	else if( FD_ISSET( m_descriptor, &except ) ) {
+		LogError( "socket", "error on listening socket: %d\n", m_descriptor.error() );
 		return;
 	}
 
@@ -141,7 +141,7 @@ void PosixTCPSocketListener::update( void )
 		else {
 			if( FD_ISSET( descriptor, &read ) ) {
 				FD_CLR( descriptor, &read );
-				socket->update();
+				socket->fetch();
 			}
 			if( FD_ISSET( descriptor, &write ) ) {
 				FD_CLR( descriptor, &write );
@@ -159,8 +159,8 @@ void PosixTCPSocketListener::update( void )
 	}
 }
 
-// ** PosixTCPSocketListener::removeClosedConnections
-void PosixTCPSocketListener::removeClosedConnections( void )
+// ** TCPSocketListener::removeClosedConnections
+void TCPSocketListener::removeClosedConnections( void )
 {
     for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ) {
 		if( !(*i)->isValid() ) {
@@ -171,54 +171,67 @@ void PosixTCPSocketListener::removeClosedConnections( void )
     }
 }
 
-// ** PosixTCPSocketListener::close
-void PosixTCPSocketListener::close( void )
+// ** TCPSocketListener::close
+void TCPSocketListener::close( void )
 {
-	m_socket.close();
+	m_descriptor.close();
 	m_clientSockets.clear();
     m_port = 0;
 }
     
-// ** PosixTCPSocketListener::port
-u16 PosixTCPSocketListener::port( void ) const
+// ** TCPSocketListener::port
+u16 TCPSocketListener::port( void ) const
 {
     return m_port;
 }
 
-// ** PosixTCPSocketListener::connections
-const TCPSocketList& PosixTCPSocketListener::connections( void ) const
+// ** TCPSocketListener::connections
+const TCPSocketList& TCPSocketListener::connections( void ) const
 {
 	return m_clientSockets;
 }
 
-// ** PosixTCPSocketListener::acceptConnection
-TCPSocketPtr PosixTCPSocketListener::acceptConnection( void )
+// ** TCPSocketListener::acceptConnection
+TCPSocketPtr TCPSocketListener::acceptConnection( void )
 {
 	NetworkAddress	 address;
-	SocketDescriptor socket = m_socket.accept( address );
+	SocketDescriptor descriptor = m_descriptor.accept( address );
 
-	if( !socket.isValid() ) {
+	if( !descriptor.isValid() ) {
 		return TCPSocketPtr();
 	}
 
-	socket.setNonBlocking();
-	m_socket.setNoDelay();
+	descriptor.setNonBlocking();
+    descriptor.setNoDelay();
+//	m_socket.setNoDelay();
 
-	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW PosixTCPSocket( DC_NEW TCPClientDelegate( this ), socket, address ) ) );
+	return TCPSocketPtr( DC_NEW TCPSocket( DC_NEW TCPClientDelegate( this ), descriptor, address ) );
 }
 
-// ** PosixTCPSocketListener::bindTo
-bool PosixTCPSocketListener::bindTo( u16 port )
+// ** TCPSocketListener::bindTo
+TCPSocketListenerPtr TCPSocketListener::bindTo( u16 port, TCPSocketListenerDelegate* delegate )
 {
-    m_socket = socket( PF_INET, SOCK_STREAM, 0 );
+	TCPSocketListenerPtr listener( DC_NEW TCPSocketListener( delegate ) );
 
-	if( !m_socket.isValid() ) {
+	if( !listener->bind( port ) ) {
+		return TCPSocketListenerPtr();
+	}
+
+	return listener;
+}
+
+// ** TCPSocketListener::bind
+bool TCPSocketListener::bind( u16 port )
+{
+    m_descriptor = socket( PF_INET, SOCK_STREAM, 0 );
+
+	if( !m_descriptor.isValid() ) {
 		LogError( "socket", "failed to create socket, %d\n%s\n", PosixNetwork::lastError(), PosixNetwork::lastErrorMessage().c_str() );
 		return false;
 	}
 
 	sockaddr_in addr = PosixNetwork::toSockaddr( NetworkAddress::Null, port );
-	s32 result = bind( m_socket, ( const sockaddr* )&addr, sizeof( addr ) );
+	s32 result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result == SOCKET_ERROR ) {
 		LogError( "socket", "bind failed, %d\n", PosixNetwork::lastError() );
@@ -226,13 +239,13 @@ bool PosixTCPSocketListener::bindTo( u16 port )
 	}
 
 	// ** Set non blocking mode
-	m_socket.setNonBlocking();
+	m_descriptor.setNonBlocking();
 
 	// ** Set no delay
-	m_socket.setNoDelay();
+	m_descriptor.setNoDelay();
 
 	// ** Listen for connections
-    result = listen( m_socket, 16 );
+    result = listen( m_descriptor, 16 );
    
 	if( result == SOCKET_ERROR ) {
 		LogError( "socket", "listen failed, %d\n", PosixNetwork::lastError() );

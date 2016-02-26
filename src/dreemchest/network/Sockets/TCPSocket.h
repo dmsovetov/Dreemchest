@@ -24,81 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_TCPSocket_H__
-#define		__DC_Network_TCPSocket_H__
+#ifndef __DC_Network_TCPSocket_H__
+#define __DC_Network_TCPSocket_H__
 
-#include	"SocketDescriptor.h"
+#include "SocketDescriptor.h"
+#include "Posix/PosixTCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
-	BeginPrivateInterface( TCPSocket )
-		InterfaceMethod( const NetworkAddress&		address( void ) const )
-		InterfaceMethod( const SocketDescriptor&	descriptor( void ) const )
-		InterfaceMethod( bool						isValid( void ) const )
-		InterfaceMethod( bool						connectTo( const NetworkAddress& address, u16 port ) )
-		InterfaceMethod( void						close( void ) )
-		InterfaceMethod( void						update( void ) )
-		InterfaceMethod( u32						sendTo( const void* buffer, u32 size ) )
-		InterfaceMethod( void						setDelegate( const TCPSocketDelegatePtr& value ) )
-	EndPrivateInterface
-
-    //! TCP socket class.
-    class TCPSocket : public RefCounted {
-	//EmbedUserData
-    public:
-
-									//! Constructs a TCPSocket instance.
-									TCPSocket( impl::TCPSocketPrivate* impl = NULL );
-		virtual						~TCPSocket( void ) {}
-
-									//! Returns true if this socket is valid.
-									operator bool() const;
-
-		//! Returns a socket descriptor.
-		const SocketDescriptor&		descriptor( void ) const;
-
-		//! Returns true if this socket is valid.
-		bool						isValid( void ) const;
-
-		//! Closes a socket.
-		void						close( void );
-
-		//! Reads all incoming data.
-        void						update( void );
-
-		//! Returns a remote address.
-		const NetworkAddress&		address( void ) const;
-
-		//! Sends data to socket.
-		/*
-		\param buffer Data to be sent.
-		\param size Data size to be sent.
-		*/
-        u32							sendTo( const void* buffer, u32 size );
-
-		//! Sets the socket delegate.
-		void						setDelegate( const TCPSocketDelegatePtr& value );
-
-		//! Connects to a TCP socket at a given remote address and port.
-		static TCPSocketPtr			connectTo( const NetworkAddress& address, u16 port, TCPSocketDelegate* delegate = NULL );
-        
-		UsePrivateInterface( TCPSocket )
-    };
-
-	//! TCP socket event delegate.
-	class TCPSocketDelegate : public RefCounted {
-	public:
-
-		virtual					~TCPSocketDelegate( void ) {}
-
-		//! Handles a socket disconnection.
-		virtual void			handleClosed( TCPSocket* sender ) {}
-
-		//! Handles a received data.
-		virtual void			handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream ) {}
-	};
 
 } // namespace net
     

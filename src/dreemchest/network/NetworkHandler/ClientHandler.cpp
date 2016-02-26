@@ -77,7 +77,7 @@ ClientHandlerPtr ClientHandler::create( const NetworkAddress& address, u16 port 
 void ClientHandler::update( u32 dt )
 {
 	NetworkHandler::update( dt );
-	m_connection->socket()->update();
+	m_connection->socket()->fetch();
 }
 
 // ** ClientHandler::eventListeners

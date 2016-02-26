@@ -27,27 +27,55 @@
 #ifndef __DC_Network_PosixTCPSocketListener_H__
 #define __DC_Network_PosixTCPSocketListener_H__
 
-#include "../TCPSocketListener.h"
+#include "PosixTCPSocket.h"
 #include "PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! Berkley TCP socket listener implementation.
-	class PosixTCPSocketListener : public impl::TCPSocketListenerPrivate {
+	//! TCP socket listener event delegate.
+	class TCPSocketListenerDelegate : public RefCounted {
 	public:
 
-										PosixTCPSocketListener( TCPSocketListenerDelegate* delegate );
+		virtual						~TCPSocketListenerDelegate( void ) {}
 
-		// ** TCPSocketListenerPrivate
-		virtual void					update( void );
-		virtual void					close( void );
-        virtual u16                     port( void ) const;
-		virtual const TCPSocketList&	connections( void ) const;
+		//! Handles incoming data from client.
+		virtual void				handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream ) {}
+
+		//! Handles accepted incomming connection.
+		virtual void				handleConnectionAccepted( TCPSocketListener* sender, TCPSocket* socket ) {}
+
+		//! Handles a remote connection closed.
+		virtual void				handleConnectionClosed( TCPSocketListener* sender, TCPSocket* socket ) {}
+	};
+
+	//! Berkley TCP socket listener implementation.
+	class TCPSocketListener NIMBLE_FINAL : public RefCounted {
+	public:
+
+		//! Checks for incoming connections & updates existing.
+		void						    fetch( void );
+
+		//! Closes a socket listener.
+		void						    close( void );
+        
+        //! Returns a port that listener is bound to.
+        u16                             port( void ) const;
+
+		//! Returns a list of active connections.
+		const TCPSocketList&		    connections( void ) const;
+
+		//! Creates and binds a new socket listener to a specified port.
+		static TCPSocketListenerPtr	    bindTo( u16 port, TCPSocketListenerDelegate* delegate = NULL );
 
 		//! Binds a socket to a specified port.
-		bool							bindTo( u16 port );
+		bool							bind( u16 port );
+
+    private:
+
+                                        //! Constructs TCPSocketListener instance.
+										TCPSocketListener( TCPSocketListenerDelegate* delegate );
 
 	private:
 
@@ -66,7 +94,7 @@ namespace net {
 		TCPSocketListenerDelegatePtr	m_delegate;
 
 		//! Socket descriptor.
-		SocketDescriptor				m_socket;
+		SocketDescriptor				m_descriptor;
         
         //! Port used.
         u16                             m_port;
@@ -78,7 +106,7 @@ namespace net {
 		class TCPClientDelegate : public TCPSocketDelegate {
 		public:
                                 //! Constructs TCPClientDelegate instance.
-                                TCPClientDelegate( PosixTCPSocketListener* listener );
+                                TCPClientDelegate( TCPSocketListener* listener );
 
             //! Throws a received data to TCP listener delegate.
             virtual void		handleReceivedData( TCPSocket* sender, TCPSocket* socket, TCPStream* stream );
@@ -87,7 +115,7 @@ namespace net {
 		private:
 
 			//! Parent socket listener.
-			WeakPtr<PosixTCPSocketListener>	m_listener;
+			WeakPtr<TCPSocketListener>	m_listener;
 		};
 	};
 

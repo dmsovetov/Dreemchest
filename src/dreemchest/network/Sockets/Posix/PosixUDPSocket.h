@@ -24,32 +24,43 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_PosixUDPSocket_H__
-#define		__DC_Network_PosixUDPSocket_H__
+#ifndef __DC_Network_PosixUDPSocket_H__
+#define __DC_Network_PosixUDPSocket_H__
 
-#include    "../UDPSocket.h"
-#include	"../SocketDescriptor.h"
+#include "../SocketDescriptor.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-    // ** class PosixUDPSocket
-    class PosixUDPSocket : public impl::UDPSocketPrivate {
+    //! Datagram socket class.
+    class UDPSocket NIMBLE_FINAL : public RefCounted {
     public:
 
-								PosixUDPSocket( UDPSocketDelegate* delegate, bool broadcast );
-        virtual					~PosixUDPSocket( void );
+		//! Sends a datagram to a specified address & port.
+        u32                     send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
 
-        // ** IUDPSocket
-        virtual u32				send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
-        virtual bool			listen( u16 port );
-        virtual void			update( void );
+		//! Starts listening for datagrams at a given port.
+        bool                    listen( u16 port );
+
+		//! Checks if any data has been received.
+        void                    update( void );
+
+		//! Creates a new UDP socket instance.
+		static UDPSocketPtr	    create( UDPSocketDelegate* delegate );
+
+		//! Creates a new broadcast UDP socket instance.
+		static UDPSocketPtr	    createBroadcast( UDPSocketDelegate* delegate );
+
+    private:
+
+                                //! Constructs a UDPSocket instance.
+                                UDPSocket( UDPSocketDelegate* delegate, bool broadcast );
 
     private:
 
 		//! Socket descriptor.
-        SocketDescriptor		m_socket;
+        SocketDescriptor		m_descriptor;
 
 		//! Socket event delegate.
 		UDPSocketDelegatePtr	m_delegate;
@@ -57,6 +68,16 @@ namespace net {
 		//! Socket receive buffer.
 		Io::ByteBufferPtr		m_buffer;
     };
+
+	//! UDP socket event delegate.
+	class UDPSocketDelegate : public RefCounted {
+	public:
+
+		virtual				~UDPSocketDelegate( void ) {}
+
+		//! Handles received data.
+		virtual void		handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size ) {}
+	};
     
 } // namespace net
 

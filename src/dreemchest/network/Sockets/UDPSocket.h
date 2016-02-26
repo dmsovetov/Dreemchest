@@ -24,56 +24,15 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Network_UDPSocket_H__
-#define		__DC_Network_UDPSocket_H__
+#ifndef __DC_Network_UDPSocket_H__
+#define __DC_Network_UDPSocket_H__
 
-#include    "../Network.h"
+#include "../Network.h"
+#include "Posix/PosixUDPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
-
-	BeginPrivateInterface( UDPSocket )
-		InterfaceMethod( u32  send( const NetworkAddress& address, u16 port, const void* buffer, u32 size ) )
-		InterfaceMethod( bool listen( u16 port ) )
-		InterfaceMethod( void update( void ) )
-	EndPrivateInterface
-
-    //! Datagram socket class.
-    class UDPSocket : public RefCounted {
-    public:
-
-							//! Constructs a UDPSocket instance.
-                            UDPSocket( impl::UDPSocketPrivate* impl = NULL );
-        virtual             ~UDPSocket( void );
-
-		//! Sends a datagram to a specified address & port.
-        u32                 send( const NetworkAddress& address, u16 port, const void* buffer, u32 size );
-
-		//! Starts listening for datagrams at a given port.
-        bool                listen( u16 port );
-
-		//! Checks if any data has been received.
-        void                update( void );
-
-		//! Creates a new UDP socket instance.
-		static UDPSocketPtr	create( UDPSocketDelegate* delegate );
-
-		//! Creates a new broadcast UDP socket instance.
-		static UDPSocketPtr	createBroadcast( UDPSocketDelegate* delegate );
-
-		UsePrivateInterface( UDPSocket )
-    };
-
-	//! UDP socket event delegate.
-	class UDPSocketDelegate : public RefCounted {
-	public:
-
-		virtual				~UDPSocketDelegate( void ) {}
-
-		//! Handles received data.
-		virtual void		handleReceivedData( UDPSocket* sender, const NetworkAddress& address, const void* data, u32 size ) {}
-	};
 
 } // namespace net
 
