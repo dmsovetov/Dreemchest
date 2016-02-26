@@ -24,56 +24,48 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_ClientHandler_H__
-#define __DC_Network_ClientHandler_H__
-
-#include "NetworkHandler.h"
-#include "../Sockets/TCPSocket.h"
+#include "Connection_.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-    // ** class ClientHandler
-    class ClientHandler : public NetworkHandler {
-	friend class ClientSocketDelegate;
-    public:
+// ** Connection::Connection
+Connection_::Connection_( void )
+    : m_totalBytesReceived( 0 )
+    , m_totalBytesSent( 0 )
+{
+}
 
-		//! ConnectionClosed event is emitted when a connection was closed.
-		struct ConnectionClosed {
-		};
+// ** Connection::close
+void Connection_::close( void )
+{
+}
 
-		virtual					~ClientHandler( void );
+// ** Connection::trackReceivedAmount
+void Connection_::trackReceivedAmount( s32 value )
+{
+    m_totalBytesReceived += value;
+}
 
-		//! Return current connection.
-		const ConnectionPtr&	connection( void ) const;
-		ConnectionPtr&			connection( void );
+// **  Connection::trackSentAmount
+void Connection_::trackSentAmount( s32 value )
+{
+    m_totalBytesSent += value;
+}
 
-		//! Creates a new NetworkClientHandler instance and connects to server.
-		static ClientHandlerPtr	create( const Address& address, u16 port );
+// ** Connection::totalBytesReceived
+s32 Connection_::totalBytesReceived( void ) const
+{
+	return m_totalBytesReceived;
+}
 
-		//! Does a broadcast request to detect a running servers.
-		static bool				detectServers( u16 port );
+// ** Connection::totalBytesSent
+s32 Connection_::totalBytesSent( void ) const
+{
+	return m_totalBytesSent;
+}
 
-        // ** NetworkHandler
-        virtual void			update( u32 dt );
-		virtual ConnectionList	eventListeners( void ) const;
-
-	protected:
-
-								//! Constructs ClientHandler instance.
-								ClientHandler( TCPSocketPtr socket );
-
-		//! Handles the connection closed event.
-		void			        handleConnectionClosed( const Connection::Closed& e );
-
-	private:
-
-		ConnectionPtr			m_connection;	//!< Client connection.
-    };
-    
 } // namespace Network
-    
-DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkClientHandler_H__	*/
+DC_END_DREEMCHEST

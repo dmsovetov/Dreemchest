@@ -37,9 +37,8 @@ ClientHandler::ClientHandler( TCPSocketPtr socket )
     // Create connection
 	m_connection = createConnection( socket.get() );
 
-    // Subscribe for socket events
-    socket->subscribe<TCPSocket::Closed>( dcThisMethod( ClientHandler::handleSocketClosed ) );
-    socket->subscribe<TCPSocket::Data>( dcThisMethod( ClientHandler::handleSocketData ) );
+    // Subscribe for connection events
+    m_connection->subscribe<Connection::Closed>( dcThisMethod( ClientHandler::handleConnectionClosed ) );
 
     // Set the default ping rate
 	setPingRate( 500 );
@@ -47,12 +46,8 @@ ClientHandler::ClientHandler( TCPSocketPtr socket )
 
 ClientHandler::~ClientHandler( void )
 {
-    // Get the socket from a connection
-    TCPSocketWPtr socket = m_connection->socket();
-
-    // Unsubscibe from socket events
-    socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ClientHandler::handleSocketClosed ) );
-    socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ClientHandler::handleSocketData ) );
+    // Subscribe from connection events
+    m_connection->unsubscribe<Connection::Closed>( dcThisMethod( ClientHandler::handleConnectionClosed ) );
 }
 
 // ** ClientHandler::connection
@@ -98,17 +93,11 @@ bool ClientHandler::detectServers( u16 port )
 	return true;
 }
 
-// ** ClientHandler::handleSocketClosed
-void ClientHandler::handleSocketClosed( const TCPSocket::Closed& e )
+// ** ClientHandler::handleConnectionClosed
+void ClientHandler::handleConnectionClosed( const Connection::Closed& e )
 {
-    LogVerbose( "socket", "client connection closed\n" );
+    LogVerbose( "handler", "client connection closed\n" );
 	notify<ConnectionClosed>();
-}
-
-// ** ClientHandler::handleData
-void ClientHandler::handleSocketData( const TCPSocket::Data& e )
-{
-    processReceivedData( e.sender, e.data );
 }
 
 } // namespace Network

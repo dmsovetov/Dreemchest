@@ -78,6 +78,9 @@ namespace Network {
 	//! Alias Io::Serializable as NetworkPacket
 	typedef Io::Serializable NetworkPacket;
 
+    //! A unique pointer type for a network packet instance.
+    typedef Ptr<NetworkPacket> NetworkPacketPtr;
+
     //! Declare smart pointer types.
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
@@ -85,6 +88,7 @@ namespace Network {
 	dcDeclarePtrs( NetworkHandler )
 	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
+    dcDeclarePtrs( Connection_ )
     dcDeclareNamedPtrs( Io::ByteBuffer, SocketData )
 
 	//! Socket list type.

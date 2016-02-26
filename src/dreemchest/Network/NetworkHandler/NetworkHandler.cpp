@@ -90,12 +90,24 @@ ConnectionPtr NetworkHandler::createConnection( TCPSocketWPtr socket )
 	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
 	connection->setTimeToLive( m_keepAliveTime );
 	m_connections[socket] = connection;
+
+    // Subscribe for connection events.
+    connection->subscribe<Connection::Received>( dcThisMethod( NetworkHandler::handlePacketReceived ) );
+
 	return connection;
 }
 
 // ** NetworkHandler::removeConnection
 void NetworkHandler::removeConnection( TCPSocketWPtr socket )
 {
+    // Find a connection by socket
+    ConnectionPtr connection = findConnectionBySocket( socket );
+    DC_ABORT_IF( !connection.valid(), "no connection associated with this socket instance" );
+
+    // Unsubscribe from a connection events
+    connection->unsubscribe<Connection::Received>( dcThisMethod( NetworkHandler::handlePacketReceived ) );
+
+    // Remove from a connections container
 	m_connections.erase( socket );
 }
 
@@ -103,44 +115,6 @@ void NetworkHandler::removeConnection( TCPSocketWPtr socket )
 void NetworkHandler::listenForBroadcasts( u16 port )
 {
 	m_broadcastListener->listen( port );
-}
-
-// ** NetworkHandler::processReceivedData
-void NetworkHandler::processReceivedData( TCPSocketWPtr socket, SocketDataWPtr data )
-{
-	using namespace Io;
-
-	LogDebug( "socket", "%d bytes of data received from %s\n", data->bytesAvailable(), socket->address().toString() );
-
-	// ** Find a connection by socket
-	ConnectionPtr connection = findConnectionBySocket( socket );
-	DC_ABORT_IF( !connection.valid(), "the socked does not have an associated connection" );
-
-	connection->m_totalBytesReceived += data->bytesAvailable();
-
-    ByteBufferPtr source( data );
-
-	Serializables packets = BinarySerializer::read( source );
-
-	for( Serializables::iterator i = packets.begin(), end = packets.end(); i != end; ++i ) {
-		NetworkPacket* packet = i->get();
-
-		LogDebug( "packet", "%s received from %s\n", packet->typeName(), socket->address().toString() );
-
-		PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
-		if( j == m_packetHandlers.end() ) {
-			LogWarning( "packet", "unhandled packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
-			continue;
-		}
-
-		if( !j->second->handle( connection, packet ) ) {
-			LogWarning( "packet", "malformed packet of type %s received from %s\n", packet->typeName(), socket->address().toString() );
-		}
-	}
-
-	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", data->position(), socket->address().toString(), data->length() - data->position() );
-	
-	data->trimFromLeft( data->position() );
 }
 
 // ** NetworkHandler::eventListeners
@@ -217,6 +191,28 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, packets:
 bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet )
 {
 	return connection->handleResponse( packet );
+}
+
+// ** NetworkHandler::handlePacketReceived
+void NetworkHandler::handlePacketReceived( const Connection::Received& e )
+{
+    // Get the packet and connection from an event
+    NetworkPacketPtr packet     = e.packet;
+    ConnectionPtr    connection = static_cast<Connection*>( e.sender.get() );
+
+    // Find corresponding packet handler
+	PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
+
+    // No handler for this type of packet
+	if( j == m_packetHandlers.end() ) {
+		LogWarning( "packet", "unhandled packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
+		return;
+	}
+
+    // Handle the packet
+	if( !j->second->handle( connection, packet.get() ) ) {
+		LogWarning( "packet", "malformed packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
+	}
 }
 
 // ** NetworkHandler::update

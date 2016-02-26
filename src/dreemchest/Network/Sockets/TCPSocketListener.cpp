@@ -249,14 +249,14 @@ bool TCPSocketListener::bind( u16 port )
 // ** TCPSocketListener::handleSocketClosed
 void TCPSocketListener::handleSocketClosed( const TCPSocket::Closed& e )
 {
-    LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
-    notify<Closed>( this, e.sender );
+//    LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
+//    notify<Closed>( this, e.sender );
 }
 
 // ** TCPSocketListener::handleSocketData
 void TCPSocketListener::handleSocketData( const TCPSocket::Data& e )
 {
-    notify<Data>( this, e.sender, e.data );
+//    notify<Data>( this, e.sender, e.data );
 }
 
 } // namespace Network

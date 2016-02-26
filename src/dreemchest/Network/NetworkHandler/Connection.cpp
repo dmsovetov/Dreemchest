@@ -34,7 +34,7 @@ namespace Network {
 
 // ** Connection::Connection
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-	: m_networkHandler( networkHandler ), m_socket( socket ), m_nextRemoteCallId( 1 ), m_totalBytesReceived( 0 ), m_totalBytesSent( 0 ), m_time( 0 ), m_roundTripTime( 0 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
+	: ConnectionTCP( socket ), m_networkHandler( networkHandler ), m_nextRemoteCallId( 1 ), m_time( 0 ), m_roundTripTime( 0 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
 {
 	memset( &m_traffic, 0, sizeof( m_traffic ) );
 }
@@ -93,62 +93,16 @@ void Connection::setRoundTripTime( u32 value )
 	m_roundTripTime = value;
 }
 
-// ** Connection::totalBytesReceived
-u32 Connection::totalBytesReceived( void ) const
-{
-	return m_totalBytesReceived;
-}
-
-// ** Connection::totalBytesSent
-u32 Connection::totalBytesSent( void ) const
-{
-	return m_totalBytesSent;
-}
-
 // ** Connection::networkHandler
 NetworkHandler* Connection::networkHandler( void ) const
 {
 	return m_networkHandler;
 }
 
-// ** Connection::address
-const Address& Connection::address( void ) const
-{
-	return m_socket->address();
-}
-
-// ** Connection::socket
-const TCPSocketPtr& Connection::socket( void ) const
-{
-	return m_socket;
-}
-
-// ** Connection::socket
-TCPSocketPtr& Connection::socket( void )
-{
-	return m_socket;
-}
-
 // ** Connection::send
 void Connection::send( NetworkPacket* packet )
 {
-	Io::ByteBufferPtr buffer = Io::ByteBuffer::create();
-
-	// ** Write packet to binary stream
-	u32 bytesWritten = Io::BinarySerializer::write( buffer, packet );
-
-	// ** Send binary data to socket
-	s32 bytesSent = m_socket->send( buffer->buffer(), buffer->length() );
-	if( bytesSent == 0 ) {
-		return;	// ** The socket was closed.
-	}
-
-	LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet->typeName(), m_socket->address().toString(), bytesSent );
-
-	// ** Increase the sent bytes counter.
-	m_totalBytesSent += bytesSent;
-
-	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+    sendPacket( *packet );
 }
 
 // ** Connection::handleResponse
@@ -177,11 +131,11 @@ void Connection::update( u32 dt )
 	m_timeToLive -= dt;
 
 	if( m_time - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
-		m_traffic.m_sentBps		= (m_totalBytesSent	 - m_traffic.m_lastSentBytes)	  * 8;
-		m_traffic.m_receivedBps = (m_totalBytesReceived - m_traffic.m_lastReceivedBytes) * 8;
+		m_traffic.m_sentBps		= (totalBytesSent()	 - m_traffic.m_lastSentBytes)	  * 8;
+		m_traffic.m_receivedBps = (totalBytesReceived() - m_traffic.m_lastReceivedBytes) * 8;
 		m_traffic.m_lastUpdateTimestamp = m_time;
-		m_traffic.m_lastSentBytes = m_totalBytesSent;
-		m_traffic.m_lastReceivedBytes = m_totalBytesReceived;
+		m_traffic.m_lastSentBytes = totalBytesSent();
+		m_traffic.m_lastReceivedBytes = totalBytesReceived();
 	}
 
 	if( m_pendingRemoteCalls.empty() ) {

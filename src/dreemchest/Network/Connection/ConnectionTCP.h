@@ -24,56 +24,53 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_ClientHandler_H__
-#define __DC_Network_ClientHandler_H__
+#ifndef __DC_Network_ConnectionTCP_H__
+#define __DC_Network_ConnectionTCP_H__
 
-#include "NetworkHandler.h"
+#include "Connection_.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-    // ** class ClientHandler
-    class ClientHandler : public NetworkHandler {
-	friend class ClientSocketDelegate;
+    //! Reliable network connection that uses a TCP socket as a data transmit protocol.
+    class ConnectionTCP : public Connection_ {
     public:
 
-		//! ConnectionClosed event is emitted when a connection was closed.
-		struct ConnectionClosed {
-		};
+                            //! Cleans up the socket event subscribtions.
+        virtual             ~ConnectionTCP( void );
 
-		virtual					~ClientHandler( void );
+        //! Returns the connection TCP socket.
+        TCPSocketWPtr       socket( void ) const;
 
-		//! Return current connection.
-		const ConnectionPtr&	connection( void ) const;
-		ConnectionPtr&			connection( void );
+		//! Returns a remote address of a connection.
+		const Address&	    address( void ) const;
 
-		//! Creates a new NetworkClientHandler instance and connects to server.
-		static ClientHandlerPtr	create( const Address& address, u16 port );
+        //! Sends the packet over a TCP connection.
+        virtual void        sendPacket( const NetworkPacket& packet ) DC_DECL_OVERRIDE;
 
-		//! Does a broadcast request to detect a running servers.
-		static bool				detectServers( u16 port );
+        //! Closes this TCP connection.
+        virtual void        close( void ) DC_DECL_OVERRIDE;
 
-        // ** NetworkHandler
-        virtual void			update( u32 dt );
-		virtual ConnectionList	eventListeners( void ) const;
+    protected:
 
-	protected:
+                            //! Constructs ConnectionTCP instance.
+                            ConnectionTCP( TCPSocketPtr socket );
 
-								//! Constructs ClientHandler instance.
-								ClientHandler( TCPSocketPtr socket );
+        //! Splits the received data into packets and emits notifications.
+        void                handleSocketData( const TCPSocket::Data& e );
 
-		//! Handles the connection closed event.
-		void			        handleConnectionClosed( const Connection::Closed& e );
+        //! Closes this connection after a socket closed event.
+        void                handleSocketClosed( const TCPSocket::Closed& e );
 
-	private:
+    private:
 
-		ConnectionPtr			m_connection;	//!< Client connection.
+        TCPSocketPtr        m_socket;   //!< TCP socket instance.
     };
-    
+
 } // namespace Network
-    
+
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkClientHandler_H__	*/
+#endif  /*  !__DC_Network_ConnectionTCP_H__ */

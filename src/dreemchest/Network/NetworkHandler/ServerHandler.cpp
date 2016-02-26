@@ -69,7 +69,8 @@ bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packet
 // ** ServerHandler::handleData
 void ServerHandler::handleData( const TCPSocketListener::Data& e )
 {
-    processReceivedData( e.socket, e.data );
+//    DC_NOT_IMPLEMENTED;
+//    processReceivedData( e.socket, e.data );
 }
 
 // ** ServerHandler::handleConnectionAccepted

@@ -96,9 +96,6 @@ namespace Network {
 		//! Returns a list of TCP sockets to send event to.
 		virtual ConnectionList	eventListeners( void ) const;
 
-		//! Processes a received data from client.
-		void			        processReceivedData( TCPSocketWPtr socket, SocketDataWPtr data );
-
 		//! Creates a connection from socket.
 		ConnectionPtr			createConnection( TCPSocketWPtr socket );
 
@@ -125,6 +122,9 @@ namespace Network {
 
 		//! Handles a response to remote call.
 		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet );
+
+        //! Handles a packet received over a connection.
+        void                    handlePacketReceived( const Connection::Received& e );
 
 	protected:
 

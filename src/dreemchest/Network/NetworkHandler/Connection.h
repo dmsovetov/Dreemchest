@@ -30,12 +30,14 @@
 #include "RemoteCallHandler.h"
 #include "Packets.h"
 
+#include "../Connection/ConnectionTCP.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
 	//! Remote connection interface.
-	class Connection : public RefCounted {
+	class Connection : public ConnectionTCP {
 	//EmbedUserData
 	friend class NetworkHandler;
 	public:
@@ -52,12 +54,6 @@ namespace Network {
 		//! Returns parent network handler.
 		NetworkHandler*			networkHandler( void ) const;
 
-		//! Returns the total amount of bytes received.
-		u32						totalBytesReceived( void ) const;
-
-		//! Returns the total amount of bytes sent.
-		u32						totalBytesSent( void ) const;
-
 		//! Returns current time.
 		u32						time( void ) const;
 
@@ -69,13 +65,6 @@ namespace Network {
 
 		//! Returns the traffic counter.
 		const Traffic&			traffic( void ) const;
-
-		//! Returns a connection TCP socket.
-		const  TCPSocketPtr&	socket( void ) const;
-		TCPSocketPtr&			socket( void );
-
-		//! Returns a remote address of a connection.
-		const Address&	address( void ) const;
 
 		//! Invokes a remote procedure.
 		template<typename TRemoteProcedure>
@@ -143,20 +132,11 @@ namespace Network {
 		//! Parent network connection.
 		NetworkHandler*			m_networkHandler;
 
-		//! Connection TCP socket.
-		TCPSocketPtr			m_socket;
-
 		//! A list of pending remote calls.
 		PendingRemoteCalls		m_pendingRemoteCalls;
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
-
-		//! The total amount of bytes received.
-		u32						m_totalBytesReceived;
-
-		//! The total amount of bytes sent.
-		u32						m_totalBytesSent;
 
 		//! Current connection time.
 		u32						m_time;
