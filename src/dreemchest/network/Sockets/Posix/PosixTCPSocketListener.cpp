@@ -109,8 +109,8 @@ void TCPSocketListener::fetch( void )
 
 	// ** Do a select
 	if( select( nfds, &read, &write, &except, &waitTime ) <= 0 ) {
-		if( PosixNetwork::lastError() ) {
-			LogError( "socket", "select failed, %s\n", PosixNetwork::lastErrorMessage().c_str() );
+		if( Network::lastError() ) {
+			LogError( "socket", "select failed, %s\n", Network::lastErrorMessage().c_str() );
 		}
 		return;
 	}
@@ -226,15 +226,15 @@ bool TCPSocketListener::bind( u16 port )
     m_descriptor = socket( PF_INET, SOCK_STREAM, 0 );
 
 	if( !m_descriptor.isValid() ) {
-		LogError( "socket", "failed to create socket, %d\n%s\n", PosixNetwork::lastError(), PosixNetwork::lastErrorMessage().c_str() );
+		LogError( "socket", "failed to create socket, %d\n%s\n", Network::lastError(), Network::lastErrorMessage().c_str() );
 		return false;
 	}
 
-	sockaddr_in addr = PosixNetwork::toSockaddr( NetworkAddress::Null, port );
+	sockaddr_in addr = Network::toSockaddr( NetworkAddress::Null, port );
 	s32 result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "bind failed, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "bind failed, %d\n", Network::lastError() );
 		return false;
 	}
 
@@ -248,7 +248,7 @@ bool TCPSocketListener::bind( u16 port )
     result = listen( m_descriptor, 16 );
    
 	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "listen failed, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "listen failed, %d\n", Network::lastError() );
 		return false;
 	}
     

@@ -43,7 +43,7 @@ TCPSocket::TCPSocket( TCPSocketDelegate* delegate, SocketDescriptor& descriptor,
 
     m_descriptor = ::socket( PF_INET, SOCK_STREAM, 0 );
 	if( !m_descriptor.isValid() ) {
-		LogError( "socket", "failed to create TCP socket, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to create TCP socket, %d\n", Network::lastError() );
 		return;
 	}
 
@@ -98,7 +98,7 @@ bool TCPSocket::connect( const NetworkAddress& address, u16 port )
 
     m_address  = address;
 
-	sockaddr_in addr = PosixNetwork::toSockaddr( address, port );
+	sockaddr_in addr = Network::toSockaddr( address, port );
 
 	// ** Connect
 	s32 result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );

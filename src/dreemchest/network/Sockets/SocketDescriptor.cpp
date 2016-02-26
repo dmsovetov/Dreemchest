@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "SocketDescriptor.h"
-#include "Posix/PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -155,7 +154,7 @@ bool SocketDescriptor::setNonBlocking( void )
 #endif
 
     if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to switch socket to a non-blocking mode, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to switch socket to a non-blocking mode, %d\n", Network::lastError() );
 		DC_BREAK
     }
 
@@ -169,7 +168,7 @@ bool SocketDescriptor::setNoDelay( void )
 	s32 result  = setsockopt( m_socket, IPPROTO_TCP, TCP_NODELAY, &noDelay, sizeof( noDelay ) );
 
     if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to enable the TCP no delay option, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to enable the TCP no delay option, %d\n", Network::lastError() );
 		DC_BREAK
     }
 
@@ -190,7 +189,7 @@ bool SocketDescriptor::enableBroadcast( void )
 	result = setsockopt( m_socket, SOL_SOCKET, SO_BROADCAST, &one, sizeof( one ) );
 
     if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to switch socket to a broadcast mode, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to switch socket to a broadcast mode, %d\n", Network::lastError() );
 		DC_BREAK
     }
 
@@ -208,7 +207,7 @@ bool SocketDescriptor::enableAddressReuse( void )
 
     s32 result = setsockopt( m_socket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof( one ) );
 	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to enable address reuse on socket, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "failed to enable address reuse on socket, %d\n", Network::lastError() );
 		DC_BREAK
 	}
 

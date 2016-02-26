@@ -28,7 +28,6 @@
 #define __DC_Network_PosixTCPSocketListener_H__
 
 #include "PosixTCPSocket.h"
-#include "PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 

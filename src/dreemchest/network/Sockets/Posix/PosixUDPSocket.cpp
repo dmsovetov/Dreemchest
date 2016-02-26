@@ -25,8 +25,6 @@
  **************************************************************************/
 
 #include "PosixUDPSocket.h"
-#include "PosixNetwork.h"
-#include "../../../io/streams/ByteBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -99,7 +97,7 @@ void UDPSocket::update( void )
     if( size <= 0 ) {
 	#if defined( DC_PLATFORM_WINDOWS )
 		if( WSAGetLastError() == WSAEWOULDBLOCK ) { return; }
-		LogError( "socket", "recvfrom failed, %d\n", PosixNetwork::lastError() );
+		LogError( "socket", "recvfrom failed, %d\n", Network::lastError() );
 	#else
 		if( errno != EAGAIN ) { DC_BREAK; }
 	#endif

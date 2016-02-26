@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "TCPStream.h"
-#include "Posix/PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -85,7 +84,7 @@ s32 TCPStream::write( const void* buffer, s32 size )
         if( result == -1 ) {
 		#ifdef DC_PLATFORM_WINDOWS
 			if( WSAGetLastError() == WSAEWOULDBLOCK ) continue;
-			LogError( "socket", "sendTo failed, %d\n", PosixNetwork::lastError() );
+			LogError( "socket", "sendTo failed, %d\n", Network::lastError() );
 		#else
 			if( errno == EAGAIN ) continue;
 			LogError( "socket", "sendTo failed, %s\n", strerror( errno ) );

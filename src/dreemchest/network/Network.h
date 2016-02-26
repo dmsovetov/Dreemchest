@@ -35,7 +35,27 @@
 #include "../io/serialization/BinarySerializer.h"
 #include "../io/serialization/Serializable.h"
 #include "../io/serialization/Serializer.h"
-#include <time.h>
+
+#if defined( DC_PLATFORM_WINDOWS )
+    #define     _WINSOCK_DEPRECATED_NO_WARNINGS
+    #include	<winsock2.h>
+    #include	<Ws2tcpip.h>
+#else
+    #include    <netinet/in.h>
+	#include	<netinet/tcp.h>
+    #include    <arpa/inet.h>
+    #include    <sys/socket.h>
+    #include    <sys/select.h>
+    #include    <sys/poll.h>
+    #include    <fcntl.h>
+    #include    <netdb.h>
+    #include    <errno.h>
+    #include    <unistd.h>
+
+    #if !defined( DC_PLATFORM_ANDROID )
+        #include    <ifaddrs.h>
+    #endif
+#endif
 
 DC_BEGIN_DREEMCHEST
 
@@ -203,27 +223,37 @@ namespace net {
 		//! Returns current host name.
         CString							hostName( void ) const;
 
+        //! Returns the last recorded error code.
+		static s32						lastError( void );
+
+        //! Returns the last recorded error messsage.
+        static String                   lastErrorMessage( void );
+
+        //! Converts the network address and port to a sockaddr_in structure.
+		static sockaddr_in				toSockaddr( const NetworkAddress& address, u16 port );
+
     private:
 
-		//! Network implementation.
-        INetwork*                       m_impl;
-    };
+        //! Performs network initialization.
+        void                            initialize( void );
 
-    // ** class INetwork
-    class INetwork {
-    friend class Network;
-    public:
+        //! Returns the local host name.
+        bool                            requestHostName( String& name ) const;
 
+        //! Returns list of available network interfaces.
+        bool                            requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const;
 
-        virtual                         ~INetwork( void ) {}
+    private:
 
-        virtual const NetworkAddress&   hostIP( void ) const = 0;
-        virtual const NetworkAddress&   broadcastIP( void ) const = 0;
-        virtual CString					hostName( void ) const = 0;
+        String							m_hostName;     //!< Local host name.
+        NetworkAddress                  m_host;         //!< Local host address.
+        NetworkAddress                  m_broadcast;    //!< Broadcast address.
+        NetworkAddress                  m_mask;         //!< Network mask.
+        bool                            m_isAvailable;  //!< Indicates that network was successfully initialized.
 
-    protected:
-
-        Network*                        m_parent;
+	#if defined( DC_PLATFORM_WINDOWS )
+		WSAData*						m_wsa;          //!< WSA struct.
+	#endif  /*  DC_PLATFORM_WINDOWS */
     };
 
 	//! Base class for all remote call types.

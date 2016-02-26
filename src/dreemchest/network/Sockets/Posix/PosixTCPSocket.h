@@ -28,7 +28,6 @@
 #define	__DC_Network_PosixTCPSocket_H__
 
 #include "../TCPStream.h"
-#include "PosixNetwork.h"
 
 DC_BEGIN_DREEMCHEST
 
