@@ -34,7 +34,7 @@ namespace net {
 UDPSocket::UDPSocket( bool broadcast )
 {
     m_descriptor = socket( AF_INET, SOCK_DGRAM, 0 );
-    m_buffer     = Io::ByteBuffer::create( 4096 );
+    m_data       = Io::ByteBuffer::create();
 
 	m_descriptor.setNonBlocking();
 
@@ -89,19 +89,19 @@ void UDPSocket::fetch( void )
     sockaddr_in addr;
     socklen_t   addrlen = sizeof( addr );
     
-    s32 size = recvfrom( m_descriptor, ( s8* )m_buffer->buffer(), m_buffer->length(), 0, ( sockaddr* )&addr, &addrlen );
-    if( size <= 0 ) {
-	#if defined( DC_PLATFORM_WINDOWS )
-		if( WSAGetLastError() == WSAEWOULDBLOCK ) { return; }
-		LogError( "socket", "recvfrom failed, %d\n", Network::lastError() );
-	#else
-		if( errno != EAGAIN ) { DC_BREAK; }
-	#endif
+    SocketResult result = recvfrom( m_descriptor, ( s8* )m_data->buffer(), m_data->length(), 0, ( sockaddr* )&addr, &addrlen );
+
+    if( result.wouldBlock() ) {
+        return;
+    }
+
+    if( result.isError() ) {
+        LogError( "socket", "recvfrom failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
         return;
     }
 
 	NetworkAddress remoteAddress( addr.sin_addr.s_addr );
-    notify<Data>( this, NetworkAddress( addr.sin_addr.s_addr ), m_buffer );
+    notify<Data>( this, NetworkAddress( addr.sin_addr.s_addr ), m_data );
 }
 
 // ** UDPSocket::create

@@ -97,7 +97,7 @@ namespace net {
 		virtual ConnectionList	eventListeners( void ) const;
 
 		//! Processes a received data from client.
-		void			        processReceivedData( TCPSocketWPtr socket, TCPStreamWPtr stream );
+		void			        processReceivedData( TCPSocketWPtr socket, SocketDataWPtr data );
 
 		//! Creates a connection from socket.
 		ConnectionPtr			createConnection( TCPSocketWPtr socket );

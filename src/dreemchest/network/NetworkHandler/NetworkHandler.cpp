@@ -28,7 +28,6 @@
 #include "Connection.h"
 #include "../Sockets/UDPSocket.h"
 #include "../Sockets/TCPSocket.h"
-#include "../Sockets/TCPStream.h"
 
 #define DEBUG_TTL_DISABLED	(1)
 
@@ -107,19 +106,19 @@ void NetworkHandler::listenForBroadcasts( u16 port )
 }
 
 // ** NetworkHandler::processReceivedData
-void NetworkHandler::processReceivedData( TCPSocketWPtr socket, TCPStreamWPtr stream )
+void NetworkHandler::processReceivedData( TCPSocketWPtr socket, SocketDataWPtr data )
 {
 	using namespace Io;
 
-	LogDebug( "socket", "%d bytes of data received from %s\n", stream->bytesAvailable(), socket->address().toString() );
+	LogDebug( "socket", "%d bytes of data received from %s\n", data->bytesAvailable(), socket->address().toString() );
 
 	// ** Find a connection by socket
 	ConnectionPtr connection = findConnectionBySocket( socket );
 	DC_ABORT_IF( !connection.valid(), "the socked does not have an associated connection" );
 
-	connection->m_totalBytesReceived += stream->bytesAvailable();
+	connection->m_totalBytesReceived += data->bytesAvailable();
 
-    ByteBufferPtr source( stream );
+    ByteBufferPtr source( data );
 
 	Serializables packets = BinarySerializer::read( source );
 
@@ -139,9 +138,9 @@ void NetworkHandler::processReceivedData( TCPSocketWPtr socket, TCPStreamWPtr st
 		}
 	}
 
-	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", stream->position(), socket->address().toString(), stream->length() - stream->position() );
+	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", data->position(), socket->address().toString(), data->length() - data->position() );
 	
-	stream->trimFromLeft( stream->position() );
+	data->trimFromLeft( data->position() );
 }
 
 // ** NetworkHandler::eventListeners

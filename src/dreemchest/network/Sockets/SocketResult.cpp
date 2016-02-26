@@ -24,45 +24,70 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_TCPStream_H__
-#define __DC_Network_TCPStream_H__
-
-#include "SocketDescriptor.h"
+#include "SocketResult.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace net {
 
-	//! A TCP stream class.
-	class TCPStream : public Io::ByteBuffer {
-	public:
+// ** SocketResult::SocketResult
+SocketResult::SocketResult( s32 value ) : m_value( value )
+{
+}
 
-		//! Socket pull result
-		enum State { Idle, Received, Closed };
+// ** SocketResult::operator s32
+SocketResult::operator s32( void ) const
+{
+    return m_value;
+}
 
-								//! Constructs a TCPStream instance.
-								TCPStream( SocketDescriptor* descriptor );
+// ** SocketResult::isError
+bool SocketResult::isError( void ) const
+{
+    return m_value == -1;
+}
 
-		//! Returns a TCP socket descriptor.
-		const SocketDescriptor*	descriptor( void ) const;
+// ** SocketResult::wouldBlock
+bool SocketResult::wouldBlock( void ) const
+{
+    // Get the error code
+    s32 code = errorCode();
 
-		//! Pulls incoming data from TCP stream.
-		State					pull( void );
+#ifdef DC_PLATFORM_WINDOWS
+	if( code == WSAEWOULDBLOCK ) {
+#else
+	if( code == EAGAIN ) {
+#endif  /*  DC_PLATFORM_WINDOWS */
+        return true;
+    }
 
-		//! Flushes all received data.
-		void					flush( void );
+    return false;
+}
 
-        //! Writes data from stream.
-        virtual s32				write( const void* buffer, s32 size );
+// ** SocketResult::errorCode
+s32 SocketResult::errorCode( void ) const
+{
+#ifdef DC_PLATFORM_WINDOWS
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
+}
 
-	private:
-
-		//! TCP stream socket.
-		SocketDescriptor*	    m_descriptor;
-	};
+// ** SocketResult::errorMessage
+String SocketResult::errorMessage( void ) const
+{
+#ifdef DC_PLATFORM_WINDOWS
+	LPSTR err = NULL;
+	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0, WSAGetLastError(), 0, ( LPSTR )&err, 0, 0 );
+	String msg = err;
+	LocalFree( err );
+	return msg;
+#else
+    return strerror( errno );
+#endif
+}
 
 } // namespace net
 
 DC_END_DREEMCHEST
-
-#endif	/*	!__DC_Network_TCPStream_H__	*/

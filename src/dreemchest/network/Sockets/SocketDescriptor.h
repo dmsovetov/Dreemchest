@@ -27,7 +27,7 @@
 #ifndef __DC_Network_SocketDescriptor_H__
 #define __DC_Network_SocketDescriptor_H__
 
-#include "../Network.h"
+#include "SocketResult.h"
 
 DC_BEGIN_DREEMCHEST
 

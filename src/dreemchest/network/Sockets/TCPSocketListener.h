@@ -67,9 +67,9 @@ namespace net {
         //! This event is emitted when new data is received from a remote connection.
         struct Data : public Event {
                                         //! Constructs Data event instance.
-                                        Data( TCPSocketListenerWPtr sender, TCPSocketWPtr socket, TCPStreamWPtr stream )
-                                            : Event( sender, socket ), stream( stream ) {}
-            TCPStreamWPtr               stream; //!< TCP stream that contains received data.
+                                        Data( TCPSocketListenerWPtr sender, TCPSocketWPtr socket, SocketDataWPtr data )
+                                            : Event( sender, socket ), data( data ) {}
+            SocketDataWPtr              data; //!< TCP stream that contains received data.
         };
 
         //! This event is emitted when a new connection was accepted.

@@ -108,7 +108,7 @@ void ClientHandler::handleSocketClosed( const TCPSocket::Closed& e )
 // ** ClientHandler::handleData
 void ClientHandler::handleSocketData( const TCPSocket::Data& e )
 {
-    processReceivedData( e.sender, e.stream );
+    processReceivedData( e.sender, e.data );
 }
 
 } // namespace net

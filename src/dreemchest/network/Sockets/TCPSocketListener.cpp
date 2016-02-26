@@ -74,27 +74,30 @@ s32 TCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except
 // ** TCPSocketListener::fetch
 void TCPSocketListener::fetch( void )
 {
-    // ** Remove closed connections
+    // Remove closed connections
 	removeClosedConnections();
 
-	// ** Setup FD sets
+	// Setup FD sets
 	fd_set read, write, except;
 	s32 nfds = setupFDSets( read, write, except, m_descriptor );
     
-    // ** Setup the timeout structure.
+    // Setup the timeout structure.
     timeval waitTime;
     waitTime.tv_sec  = 0;
     waitTime.tv_usec = 0;
 
-	// ** Do a select
-	if( select( nfds, &read, &write, &except, &waitTime ) <= 0 ) {
-		if( Network::lastError() ) {
-			LogError( "socket", "select failed, %s\n", Network::lastErrorMessage().c_str() );
-		}
+	// Do a select
+    SocketResult result = select( nfds, &read, &write, &except, &waitTime );
+	if( result.isError() ) {
+		LogError( "socket", "select failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		return;
 	}
 
-	// ** Process listener socket
+    if( result == 0 ) {
+    //    return;
+    }
+
+	// Process listener socket
 	if( FD_ISSET( m_descriptor, &read ) ) {
 		TCPSocketPtr accepted = acceptConnection();
         m_clientSockets.push_back( accepted );
@@ -107,13 +110,13 @@ void TCPSocketListener::fetch( void )
 		return;
 	}
 
-	// ** Process client sockets
+	// Process client sockets
 	for( TCPSocketList::iterator i = m_clientSockets.begin(), end = m_clientSockets.end(); i != end; ++i ) {
 		TCPSocketPtr&			socket	   = *i;
 		const SocketDescriptor& descriptor = socket->descriptor();
 		bool					hasError   = false;
 
-		// ** Check the erro on this socket.
+		// Check the erro on this socket.
 		if( FD_ISSET( descriptor, &except ) ) {
 			FD_CLR( descriptor, &except );
 			hasError = true;
@@ -207,32 +210,34 @@ TCPSocketListenerPtr TCPSocketListener::bindTo( u16 port )
 // ** TCPSocketListener::bind
 bool TCPSocketListener::bind( u16 port )
 {
-    m_descriptor = socket( PF_INET, SOCK_STREAM, 0 );
+    SocketResult result = socket( PF_INET, SOCK_STREAM, 0 );
 
-	if( !m_descriptor.isValid() ) {
-		LogError( "socket", "failed to create socket, %d\n%s\n", Network::lastError(), Network::lastErrorMessage().c_str() );
+	if( result.isError() ) {
+		LogError( "socket", "failed to create socket %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		return false;
 	}
+
+    m_descriptor = result;
 
 	sockaddr_in addr = Network::toSockaddr( NetworkAddress::Null, port );
-	s32 result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
+	result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
-	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "bind failed, %d\n", Network::lastError() );
+	if( result.isError() ) {
+		LogError( "socket", "bind failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		return false;
 	}
 
-	// ** Set non blocking mode
+	// Set non blocking mode
 	m_descriptor.setNonBlocking();
 
-	// ** Set no delay
+	// Set no delay
 	m_descriptor.setNoDelay();
 
-	// ** Listen for connections
+	// Listen for connections
     result = listen( m_descriptor, 16 );
    
-	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "listen failed, %d\n", Network::lastError() );
+	if( result.isError() ) {
+		LogError( "socket", "listen failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		return false;
 	}
     
@@ -251,7 +256,7 @@ void TCPSocketListener::handleSocketClosed( const TCPSocket::Closed& e )
 // ** TCPSocketListener::handleSocketData
 void TCPSocketListener::handleSocketData( const TCPSocket::Data& e )
 {
-    notify<Data>( this, e.sender, e.stream );
+    notify<Data>( this, e.sender, e.data );
 }
 
 } // namespace net

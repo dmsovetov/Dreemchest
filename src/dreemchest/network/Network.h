@@ -67,7 +67,6 @@ namespace net {
 	class UDPSocket;
 	class TCPSocketListener;
 	class SocketDescriptor;
-	class TCPStream;
 
 	class Connection;
 	class NetworkHandler;
@@ -82,11 +81,11 @@ namespace net {
     //! Declare smart pointer types.
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
-    dcDeclarePtrs( TCPStream )
     dcDeclarePtrs( TCPSocketListener )
 	dcDeclarePtrs( NetworkHandler )
 	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
+    dcDeclareNamedPtrs( Io::ByteBuffer, SocketData )
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
@@ -193,12 +192,6 @@ namespace net {
 		//! Returns current host name.
         CString							hostName( void ) const;
 
-        //! Returns the last recorded error code.
-		static s32						lastError( void );
-
-        //! Returns the last recorded error messsage.
-        static String                   lastErrorMessage( void );
-
         //! Converts the network address and port to a sockaddr_in structure.
 		static sockaddr_in				toSockaddr( const NetworkAddress& address, u16 port );
 
@@ -298,7 +291,6 @@ DC_END_DREEMCHEST
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"
-	#include "Sockets/TCPStream.h"
 #endif
 
 #endif	/*	!__DC_Network_H__	*/

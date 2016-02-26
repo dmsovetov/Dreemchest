@@ -144,17 +144,15 @@ void SocketDescriptor::close( void )
 // ** SocketDescriptor::setNonBlocking
 bool SocketDescriptor::setNonBlocking( void )
 {
-	s32 result = 0;
-
 #if defined( DC_PLATFORM_WINDOWS )
 	u_long noBlock = 1;
-	result = ioctlsocket( m_socket, FIONBIO, &noBlock );
+	SocketResult result = ioctlsocket( m_socket, FIONBIO, &noBlock );
 #else
-    result = fcntl( m_socket, F_SETFL, O_NONBLOCK );
+    SocketResult result = fcntl( m_socket, F_SETFL, O_NONBLOCK );
 #endif
 
-    if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to switch socket to a non-blocking mode, %d\n", Network::lastError() );
+    if( result.isError() ) {
+		LogError( "socket", "failed to switch socket to a non-blocking mode %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		DC_BREAK
     }
 
@@ -164,11 +162,16 @@ bool SocketDescriptor::setNonBlocking( void )
 // ** SocketDescriptor::setNoDelay
 bool SocketDescriptor::setNoDelay( void )
 {
-	s8  noDelay = 1;
-	s32 result  = setsockopt( m_socket, IPPROTO_TCP, TCP_NODELAY, &noDelay, sizeof( noDelay ) );
+#if defined( DC_PLATFORM_WINDOWS )
+	s8 one = 1;
+#else
+	s32 one = 1;
+#endif
 
-    if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to enable the TCP no delay option, %d\n", Network::lastError() );
+	SocketResult result = setsockopt( m_socket, IPPROTO_TCP, TCP_NODELAY, &one, sizeof( one ) );
+
+    if( result.isError() ) {
+		LogError( "socket", "failed to enable the TCP no delay option %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		DC_BREAK
     }
 
@@ -178,18 +181,16 @@ bool SocketDescriptor::setNoDelay( void )
 // ** SocketDescriptor::enableBroadcast
 bool SocketDescriptor::enableBroadcast( void )
 {
-	s32 result = 0;
-
 #if defined( DC_PLATFORM_WINDOWS )
 	s8 one = 1;
 #else
 	s32 one = 1;
 #endif
 
-	result = setsockopt( m_socket, SOL_SOCKET, SO_BROADCAST, &one, sizeof( one ) );
+	SocketResult result = setsockopt( m_socket, SOL_SOCKET, SO_BROADCAST, &one, sizeof( one ) );
 
-    if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to switch socket to a broadcast mode, %d\n", Network::lastError() );
+    if( result.isError() ) {
+		LogError( "socket", "failed to switch socket to a broadcast mode %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		DC_BREAK
     }
 
@@ -205,9 +206,10 @@ bool SocketDescriptor::enableAddressReuse( void )
 	s32 one = 1;
 #endif
 
-    s32 result = setsockopt( m_socket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof( one ) );
-	if( result == SOCKET_ERROR ) {
-		LogError( "socket", "failed to enable address reuse on socket, %d\n", Network::lastError() );
+    SocketResult result = setsockopt( m_socket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof( one ) );
+
+	if( result.isError() ) {
+		LogError( "socket", "failed to enable address reuse on socket %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
 		DC_BREAK
 	}
 

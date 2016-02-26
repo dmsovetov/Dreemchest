@@ -34,18 +34,21 @@ namespace net {
 TCPSocket::TCPSocket( SocketDescriptor& descriptor, const NetworkAddress& address )
 	: m_descriptor( descriptor ), m_address( address )
 {
-	m_stream = DC_NEW TCPStream( &m_descriptor );
+	m_data = Io::ByteBuffer::create();
 
     if( m_descriptor.isValid() ) {
         return;
     }
 
-    m_descriptor = ::socket( PF_INET, SOCK_STREAM, 0 );
-	if( !m_descriptor.isValid() ) {
-		LogError( "socket", "failed to create TCP socket, %d\n", Network::lastError() );
-		return;
-	}
+    // Request the socket descriptor
+    SocketResult result = socket( PF_INET, SOCK_STREAM, 0 );
 
+    if( result.isError() ) {
+        LogError( "socket", "failed to create TCP socket %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
+        return;
+    }
+
+    m_descriptor = result;
 	m_descriptor.enableAddressReuse();
 }
 
@@ -93,17 +96,17 @@ bool TCPSocket::connect( const NetworkAddress& address, u16 port )
 
 	sockaddr_in addr = Network::toSockaddr( address, port );
 
-	// ** Connect
+	// Connect to a remote host
 	s32 result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
 	if( result == SOCKET_ERROR ) {
 		return false;
 	}
 
-	// ** Set non blocking mode
+	// Set non blocking mode
 	m_descriptor.setNonBlocking();
 
-	// ** Set no delay
+	// Set no delay
 	m_descriptor.setNoDelay();
 
 	return true;
@@ -122,39 +125,80 @@ void TCPSocket::close( void )
 // ** TCPSocket::send
 u32 TCPSocket::send( const void* buffer, u32 size )
 {
-	s32 result = m_stream->write( buffer, size );
-	if( result == -1 ) {
-		close();
-		return 0;
-	}
+    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
 
-	return ( u32 )result;
+    s32       bytesSent = 0;
+    const s8* data      = reinterpret_cast<const s8*>( buffer );
+
+    // While we have data left - send it to a remote host
+    while( bytesSent < size ) {
+        // Send data
+        SocketResult result = ::send( m_descriptor, data + bytesSent, size - bytesSent, 0 );
+
+        // Everything is ok - proceed
+        if( !result.isError() ) {
+            bytesSent += result;
+            continue;
+        }
+
+        // Would block received - just wait
+        if( result.wouldBlock() ) {
+            continue;
+        }
+
+        // Something went wrong - write a log message and close socket
+		LogError( "socket", "send failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
+        close();
+
+        return 0;
+    }
+
+    return bytesSent;
 }
 
 // ** TCPSocket::fetch
 void TCPSocket::fetch( void )
 {
-    if( !m_descriptor.isValid() ) {
-        LogError( "socket", "updating socket with an invalid descriptor.\n" );
-        return;
-    }
-    
-	s32				 result = 0;
-	TCPStream*		 stream = m_stream.get();
-	TCPStream::State state  = TCPStream::Idle;
+    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
 
-	while( (state = stream->pull()) ) {
-		if( state == TCPStream::Closed ) {
+    // Rewind to the end of a buffer
+	m_data->setPosition( 0, Io::SeekEnd );
+
+    // Start receiving bytes from TCP stream
+	while( true ) {
+        // Read the data from a socket
+        s8           chunk[1];
+        SocketResult result = recv( m_descriptor, chunk, sizeof( chunk ), 0 );
+
+        // Peer has performed an orderly shutdown
+		if( result == 0 ) {
 			close();
-			break;
+            return;
 		}
 
-        notify<Data>( this, stream );
+        // Would block returned - just wait
+        if( result.wouldBlock() ) {
+            break;
+        }
 
-		if( !isValid() ) {
-			break;
-		}
+        // An error occured
+        if( result.isError() ) {
+            LogError( "socket", "recv returned an error %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
+            close();
+            break;
+        }
+
+        // Write received data to a buffer
+		m_data->write( chunk, result );
 	}
+
+    // Rewind back to a first byte
+	m_data->setPosition( 0, Io::SeekSet );
+
+    // If there is data inside buffer - notify subscribers
+    if( m_data->bytesAvailable() ) {
+        notify<Data>( this, m_data );
+    }
 }
 
 } // namespace net

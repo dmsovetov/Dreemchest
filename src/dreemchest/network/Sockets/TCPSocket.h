@@ -27,7 +27,7 @@
 #ifndef	__DC_Network_TCPSocket_H__
 #define	__DC_Network_TCPSocket_H__
 
-#include "TCPStream.h"
+#include "SocketDescriptor.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -79,9 +79,9 @@ namespace net {
         //! This event is emitted when new data is received from a remote connection.
         struct Data : public Event {
                                     //! Constructs Data event instance.
-                                    Data( TCPSocketWPtr sender, TCPStreamWPtr stream )
-                                        : Event( sender ), stream( stream ) {}
-            TCPStreamWPtr           stream; //!< TCP stream that contains received data.
+                                    Data( TCPSocketWPtr sender, SocketDataWPtr data )
+                                        : Event( sender ), data( data ) {}
+            SocketDataWPtr          data; //!< TCP stream that contains received data.
         };
 
         //! This event is emitted when socket is closed.
@@ -99,7 +99,7 @@ namespace net {
     private:
 
         SocketDescriptor			m_descriptor;   //!< Socket descriptor.
-		TCPStreamPtr				m_stream;       //!< Socket receiving buffer.
+        SocketDataPtr               m_data;         //!< Socket receiving buffer.
         NetworkAddress				m_address;      //!< Remote socket address.
     };
 
