@@ -44,7 +44,7 @@ namespace net {
         bool                    listen( u16 port );
 
 		//! Checks if any data has been received.
-        void                    fetch( void );
+        void                    recv( void );
 
 		//! Creates a new UDP socket instance.
 		static UDPSocketPtr	    create( void );

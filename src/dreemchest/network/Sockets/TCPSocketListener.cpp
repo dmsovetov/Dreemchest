@@ -71,8 +71,8 @@ s32 TCPSocketListener::setupFDSets( fd_set& read, fd_set& write,  fd_set& except
     return result + 1;
 }
 
-// ** TCPSocketListener::fetch
-void TCPSocketListener::fetch( void )
+// ** TCPSocketListener::recv
+void TCPSocketListener::recv( void )
 {
     // Remove closed connections
 	removeClosedConnections();
@@ -124,7 +124,7 @@ void TCPSocketListener::fetch( void )
 		else {
 			if( FD_ISSET( descriptor, &read ) ) {
 				FD_CLR( descriptor, &read );
-				socket->fetch();
+				socket->recv();
 			}
 			if( FD_ISSET( descriptor, &write ) ) {
 				FD_CLR( descriptor, &write );

@@ -57,7 +57,7 @@ ServerHandlerPtr ServerHandler::create( u16 port )
 void ServerHandler::update( u32 dt )
 {
 	NetworkHandler::update( dt );
-	m_socketListener->fetch();
+	m_socketListener->recv();
 }
 
 // ** ServerHandler::handleDetectServersPacket

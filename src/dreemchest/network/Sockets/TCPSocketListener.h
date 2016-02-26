@@ -38,7 +38,7 @@ namespace net {
 	public:
 
 		//! Checks for incoming connections & updates existing.
-		void						    fetch( void );
+		void						    recv( void );
 
 		//! Closes a socket listener.
 		void						    close( void );

@@ -156,8 +156,8 @@ u32 TCPSocket::send( const void* buffer, u32 size )
     return bytesSent;
 }
 
-// ** TCPSocket::fetch
-void TCPSocket::fetch( void )
+// ** TCPSocket::recv
+void TCPSocket::recv( void )
 {
     DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
 
@@ -168,7 +168,7 @@ void TCPSocket::fetch( void )
 	while( true ) {
         // Read the data from a socket
         s8           chunk[1];
-        SocketResult result = recv( m_descriptor, chunk, sizeof( chunk ), 0 );
+        SocketResult result = ::recv( m_descriptor, chunk, sizeof( chunk ), 0 );
 
         // Peer has performed an orderly shutdown
 		if( result == 0 ) {

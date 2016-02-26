@@ -83,8 +83,8 @@ bool UDPSocket::listen( u16 port )
     return true;
 }
 
-// ** UDPSocket::fetch
-void UDPSocket::fetch( void )
+// ** UDPSocket::recv
+void UDPSocket::recv( void )
 {
     sockaddr_in addr;
     socklen_t   addrlen = sizeof( addr );

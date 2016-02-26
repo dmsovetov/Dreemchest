@@ -56,7 +56,7 @@ namespace net {
         void					    close( void );
 
         //! Reads all incoming data.
-        void					    fetch( void );
+        void					    recv( void );
 
 		//! Sends data to socket.
 		/*
