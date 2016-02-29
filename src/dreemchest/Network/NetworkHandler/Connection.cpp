@@ -34,7 +34,7 @@ namespace Network {
 
 // ** Connection::Connection
 Connection::Connection( Application* application, const TCPSocketPtr& socket )
-	: ConnectionTCP( socket ), m_application( application ), m_nextRemoteCallId( 1 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
+	: ConnectionTCP( socket ), m_application( application ), m_nextRemoteCallId( 1 )
 {
 	memset( &m_traffic, 0, sizeof( m_traffic ) );
 }
@@ -43,30 +43,6 @@ Connection::Connection( Application* application, const TCPSocketPtr& socket )
 const Connection::Traffic& Connection::traffic( void ) const
 {
 	return m_traffic;
-}
-
-// ** Connection::timeToLive
-s32 Connection::timeToLive( void ) const
-{
-	return m_timeToLive;
-}
-
-// ** Connection::setTimeToLive
-void Connection::setTimeToLive( s32 value )
-{
-	m_timeToLive = value;
-}
-
-// ** Connection::keepAliveTimestamp
-u32 Connection::keepAliveTimestamp( void ) const
-{
-	return m_keepAliveTimestamp;
-}
-
-// ** Connection::setKeepAliveTimestamp
-void Connection::setKeepAliveTimestamp( u32 value )
-{
-	m_keepAliveTimestamp = value;
 }
 
 // ** Connection::application
@@ -95,8 +71,6 @@ void Connection::handleResponse( const Packets::RemoteCallResponse& packet )
 void Connection::update( u32 dt )
 {
 	ConnectionTCP::update( dt );
-
-	m_timeToLive -= dt;
 
 	if( time() - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
 		m_traffic.m_sentBps		= (totalBytesSent()	 - m_traffic.m_lastSentBytes)	  * 8;

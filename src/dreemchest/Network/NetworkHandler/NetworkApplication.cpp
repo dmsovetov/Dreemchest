@@ -26,20 +26,21 @@
 
 #include "NetworkApplication.h"
 #include "Connection.h"
+
+#include "../Connection/ConnectionMiddleware.h"
+
 #include "../Sockets/UDPSocket.h"
 #include "../Sockets/TCPSocket.h"
 
 #include "../Packets/Ping.h"
 #include "../Packets/RemoteCall.h"
 
-#define DEBUG_TTL_DISABLED	(1)
-
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
 // ** Application::Application
-Application::Application( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
+Application::Application( void )
 {
     DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
@@ -56,67 +57,36 @@ Application::Application( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_k
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( Application::handleRemoteCallPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
 #endif  /*  DEV_DEPRECATED_PACKETS  */
-
-	setKeepAliveTime( 5 );
-}
-
-// ** Application::setPingRate
-void Application::setPingRate( u32 value )
-{
-	m_pingSendRate = value;
-}
-
-// ** Application::pingRate
-u32 Application::pingRate( void ) const
-{
-	return m_pingSendRate;
-}
-
-// ** Application::setKeepAliveTime
-void Application::setKeepAliveTime( s32 value )
-{
-	m_keepAliveTime = value * 1000;
-	m_keepAliveSendRate = static_cast<u32>( m_keepAliveTime * 0.8f );
-}
-
-// ** Application::keepAliveTime
-s32 Application::keepAliveTime( void ) const
-{
-	return m_keepAliveTime / 1000;
-}
-
-// ** Application::findConnectionBySocket
-ConnectionPtr Application::findConnectionBySocket( TCPSocketWPtr socket ) const
-{
-	ConnectionBySocket::const_iterator i = m_connections.find( socket );
-	return i != m_connections.end() ? i->second : ConnectionPtr();
 }
 
 // ** Application::createConnection
 ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 {
+	// Create the connection instance and add it to an active connections set
 	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
-	connection->setTimeToLive( m_keepAliveTime );
-	m_connections[socket] = connection;
+	m_connections.insert( connection );
 
     // Subscribe for connection events.
     connection->subscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
+	connection->subscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
+
+	// Setup the connection middleware
+	connection->addMiddleware<PingInterval>( 500 );
+	connection->addMiddleware<KeepAliveInterval>( 5000 );
+	connection->addMiddleware<CloseOnTimeout>( 10000 );
 
 	return connection;
 }
 
 // ** Application::removeConnection
-void Application::removeConnection( TCPSocketWPtr socket )
+void Application::removeConnection( ConnectionWPtr connection )
 {
-    // Find a connection by socket
-    ConnectionPtr connection = findConnectionBySocket( socket );
-    DC_ABORT_IF( !connection.valid(), "no connection associated with this socket instance" );
-
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
+	connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
     // Remove from a connections container
-	m_connections.erase( socket );
+	m_connections.erase( connection );
 }
 
 // ** Application::eventListeners
@@ -311,47 +281,31 @@ void Application::handlePacketReceived( const Connection::Received& e )
 #endif  /*  DEV_DEPRECATED_PACKETS  */
 }
 
+// ** Application::handleConnectionClosed
+void Application::handleConnectionClosed( const Connection::Closed& e )
+{
+	// Remove this connection from list
+	removeConnection( static_cast<Connection*>( e.sender.get() ) );
+}
+
 // ** Application::update
 void Application::update( u32 dt )
 {
-	bool sendPing = false;
-
-	if( m_pingSendRate ) {
-		m_pingTimeLeft -= dt;
-
-		if( m_pingTimeLeft <= 0 ) {
-			m_pingTimeLeft += m_pingSendRate;
-			sendPing = true;
-		}
-	}
-
 	// Update all connections
-	ConnectionBySocket connections = m_connections;
+	ConnectionSet connections = m_connections;
 
-	for( ConnectionBySocket::iterator i = connections.begin(); i != connections.end(); ++i ) {
-	#if !DEBUG_TTL_DISABLED
-		if( m_keepAliveTime && i->second->timeToLive() <= 0 ) {
-			i->second->socket()->close();
-			continue;
+	for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
+		// Get the connection instance from an iterator
+		ConnectionPtr connection = *i;
+
+		// Update the connection instance
+		connection->update( dt );
+
+		// Close this connection if it was queued for closing
+		if( connection->willBeClosed() ) {
+			connection->close();
 		}
-	#endif
-
-		if( sendPing ) {
-			i->second->send<Packets::Ping>( 1, i->second->time() );
-		}
-
-	#if !DEBUG_TTL_DISABLED
-		if( (i->second->time() - i->second->keepAliveTimestamp()) > m_keepAliveSendRate ) {
-			i->second->send<packets::KeepAlive>();
-			i->second->setKeepAliveTimestamp( i->second->time() );
-		}
-	#endif
-
-		i->second->update( dt );
 	}
-//	if( m_broadcastListener != NULL ) {
-//		m_broadcastListener->update();
-//	}
 }
 
 } // namespace Network

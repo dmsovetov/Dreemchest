@@ -41,7 +41,7 @@ Client::Client( TCPSocketPtr socket )
     m_connection->subscribe<Connection::Closed>( dcThisMethod( Client::handleConnectionClosed ) );
 
     // Set the default ping rate
-	setPingRate( 500 );
+//	setPingRate( 500 );
 }
 
 Client::~Client( void )

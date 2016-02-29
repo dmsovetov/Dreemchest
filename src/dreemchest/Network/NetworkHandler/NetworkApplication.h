@@ -47,23 +47,6 @@ namespace Network {
 		//! Updates network handler.
 		virtual void			update( u32 dt );
 
-		//! Returns ping rate.
-		u32						pingRate( void ) const;
-
-		//! Sets the ping rate.
-		void					setPingRate( u32 value );
-
-		//! Returns the keep-alive time.
-		s32						keepAliveTime( void ) const;
-
-		//! Sets the keep-alive time.
-		void					setKeepAliveTime( s32 value );
-
-    #if DEV_DEPRECATED_PACKETS
-		//! Registers a new packet type.
-		template<typename T>
-		void					registerPacketHandler( const typename PacketHandler<T>::Callback& callback );
-    #else
         //! Registers a new event type.
 		template<typename T>
 		void					registerEvent( void );
@@ -86,8 +69,6 @@ namespace Network {
         void                    addPacketHandler( const TArgs& ... args );
     #endif  /*  DC_CPP11_DISABLED   */
 
-    #endif  /*  DEV_DEPRECATED_PACKETS  */
-
 		//! Emits a network event.
 		template<typename T>
 		void					emitTo( const T& e, const ConnectionList& listeners );
@@ -106,31 +87,9 @@ namespace Network {
 		//! Creates a connection from socket.
 		ConnectionPtr			createConnection( TCPSocketWPtr socket );
 
-		//! Returns a connection by socket.
-        ConnectionPtr			findConnectionBySocket( TCPSocketWPtr socket ) const;
+		//! Removes the connection instance from application.
+		void					removeConnection( ConnectionWPtr connection );
 
-		//! Removes connection by socket.
-		void					removeConnection( TCPSocketWPtr socket );
-
-    #if DEV_DEPRECATED_PACKETS
-		//! Handles a ping packet.
-		virtual bool			handlePingPacket( ConnectionPtr& connection, packets::Ping& packet );
-
-		//! Handles a keep-alive message and updates the connection TTL value.
-		virtual bool			handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet );
-
-		//! Handles a server detection packet.
-		virtual bool			handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
-
-		//! Handles an event packet.
-		bool					handleEventPacket( ConnectionPtr& connection, packets::Event& packet );
-
-		//! Handles a remote call packet.
-		bool					handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet );
-
-		//! Handles a response to remote call.
-		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet );
-    #else
 		//! Handles an event packet.
 		void					handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet );
 
@@ -145,22 +104,20 @@ namespace Network {
 
         //! Handles a packet received over a connection.
         void                    handlePacketReceived( const Connection::Received& e );
-    #endif
+
+		//! Handles the connection closed event.
+		void					handleConnectionClosed( const Connection::Closed& e );
 
 	protected:
 
-    #if DEV_DEPRECATED_PACKETS
-		//! A container type to store all registered packet handlers.
-		typedef Map< TypeId, AutoPtr<IPacketHandler> > PacketHandlers;
-    #endif
 		//! A container type to store all network event emitters.
 		typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
     
 		//! A container type to store all remote call handlers.
 		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
-		//! Container type to store socket to connection mapping.
-		typedef Map<TCPSocketWPtr, ConnectionPtr>	    ConnectionBySocket;
+		//! Container type to store active connections.
+		typedef Set<ConnectionPtr>						ConnectionSet;
 
         //! Container type to store a list of packet handlers.
         typedef List<AutoPtr<AbstractPacketHandler>>    PacketHandlerList;
@@ -171,41 +128,12 @@ namespace Network {
         //! Network packet factory type.
         typedef AbstractFactory<AbstractPacket, PacketTypeId> PacketFactory;
 
-    #if DEV_DEPRECATED_PACKETS
-		//! Packet handlers.
-		PacketHandlers			m_packetHandlers;
-    #else
 		EventHandlers			m_eventHandlers;        //!< Event handlers.
 		RemoteCallHandlers		m_remoteCallHandlers;   //!< Remote call handlers.
         PacketFactory           m_packetFactory;        //!< Packet factory.
         PacketHandlers          m_packetHandlers;       //!< Registered packet handlers.
-    #endif  /*  DEV_DEPRECATED_PACKETS  */
-
-		//! Active connections.
-		ConnectionBySocket		m_connections;
-
-		//! Ping send rate.
-		u32						m_pingSendRate;
-
-		//! Ping time accumulator.
-		s32						m_pingTimeLeft;
-
-		//! Keep alive time.
-		s32						m_keepAliveTime;
-
-		//! Keep alive send rate.
-		u32						m_keepAliveSendRate;
+		ConnectionSet			m_connections;			//!< Active connections.
 	};
-
-#if DEV_DEPRECATED_PACKETS
-	// ** Application::registerPacketHandler
-	template<typename T>
-	inline void Application::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
-	{
-		Io::SerializableTypes::registerType<T>();
-		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
-	}
-#endif  /*  DEV_DEPRECATED_PACKETS  */
 
 	// ** Application::registerEvent
 	template<typename T>

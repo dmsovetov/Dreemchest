@@ -79,12 +79,13 @@ void Server::handleConnectionAccepted( const TCPSocketListener::Accepted& e )
 // ** Server::handleConnectionClosed
 void Server::handleConnectionClosed( const TCPSocketListener::Closed& e )
 {
-	ConnectionPtr connection = findConnectionBySocket( e.socket );
+	DC_NOT_IMPLEMENTED
+//	ConnectionPtr connection = findConnectionBySocket( e.socket );
 
-	LogVerbose( "handler", "connection closed %s\n", e.socket->address().toString() );
-	removeConnection( e.socket );
+//	LogVerbose( "handler", "connection closed %s\n", e.socket->address().toString() );
+//	removeConnection( e.socket );
 
-	notify<ClientDisconnected>( connection );
+//	notify<ClientDisconnected>( connection );
 }
 
 // ** Server::eventListeners
@@ -93,16 +94,10 @@ ConnectionList Server::eventListeners( void ) const
     const TCPSocketList& sockets = m_socketListener->connections();
     
     ConnectionList connections;
-    for( TCPSocketList::const_iterator i = sockets.begin(), end = sockets.end(); i != end; ++i ) {
-		ConnectionPtr connection = findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) );
-		if( connection == ConnectionPtr() ) {
-			LogDebug( "handler", "Server::eventListeners : null\n" );
-			continue;
-		}
+	for( ConnectionSet::const_iterator i = m_connections.begin(), end = m_connections.end(); i != end; ++i ) {
+		connections.push_back( *i );
+	}
 
-        connections.push_back( connection );
-    }
-    
 	return connections;
 }
 

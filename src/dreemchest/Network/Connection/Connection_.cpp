@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Connection_.h"
+#include "ConnectionMiddleware.h"
 
 #include "../Packets/Packet.h"
 
@@ -37,13 +38,22 @@ Connection_::Connection_( void )
     : m_totalBytesReceived( 0 )
     , m_totalBytesSent( 0 )
 	, m_time( 0 )
+	, m_timeout( 0 )
 	, m_roundTripTime( 0 )
+	, m_shouldClose( false )
 {
 }
 
-// ** Connection::close
-void Connection_::close( void )
+// ** Connection::closeLater
+void Connection_::closeLater( void )
 {
+	m_shouldClose = true;
+}
+
+// ** Connection::willBeClosed
+bool Connection_::willBeClosed( void ) const
+{
+	return m_shouldClose;
 }
 
 // ** Connection::trackReceivedAmount
@@ -82,6 +92,12 @@ void Connection_::setTime( s32 value )
 	m_time = value;
 }
 
+// ** Connection::timeout
+s32 Connection_::timeout( void ) const
+{
+	return m_timeout;
+}
+
 // ** Connection::roundTripTime
 s32 Connection_::roundTripTime( void ) const
 {
@@ -92,6 +108,26 @@ s32 Connection_::roundTripTime( void ) const
 void Connection_::setRoundTripTime( s32 value )
 {
 	m_roundTripTime = value;
+}
+
+// ** Connection::notifyPacketReceived
+void Connection_::notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBufferWPtr packet )
+{
+	// Reset the timeout counter
+	m_timeout = 0;
+
+    // Notify all listeners about this packet
+    notify<Received>( this, type, size, packet );
+}
+
+// ** Connection::addMiddleware
+void Connection_::addMiddleware( ConnectionMiddlewareUPtr instance )
+{
+	// Set this connection as parent
+	instance->setConnection( static_cast<Connection*>( this ) );
+
+	// Add new middleware to a list
+	m_middlewares.push_back( instance );
 }
 
 // ** Connection::send
@@ -185,7 +221,16 @@ Connection_::Header Connection_::readPacket( Io::ByteBufferWPtr stream, Io::Byte
 // ** Connection_::update
 void Connection_::update( u32 dt )
 {
+	// Advance the connection time by a passed amount of milliseconds
 	m_time += dt;
+
+	// Advance the timeout counter
+	m_timeout += dt;
+
+	// Now update all connection middlewares
+	for( ConnectionMiddlewares::iterator i = m_middlewares.begin(), end = m_middlewares.end(); i != end; ++i ) {
+		(*i)->update( dt );
+	}
 }
 
 } // namespace Network

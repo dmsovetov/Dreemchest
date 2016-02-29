@@ -27,7 +27,7 @@
 #ifndef __DC_Network_Connection1_H__
 #define __DC_Network_Connection1_H__
 
-#include "../Network.h"
+#include "ConnectionMiddleware.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,6 +39,12 @@ namespace Network {
     public:
 
         virtual                 ~Connection_( void ) {}
+
+		//! Queues this connection for closing.
+		void					closeLater( void );
+
+		//! Returns true if the connection will be closed.
+		bool					willBeClosed( void ) const;
 
 		//! Returns the total amount of bytes received.
 		s32						totalBytesReceived( void ) const;
@@ -52,16 +58,23 @@ namespace Network {
 		//! Returns the round trip time.
 		s32						roundTripTime( void ) const;
 
-        //! Closes this connection.
-        virtual void            close( void );
+		//! Returns current timeout value.
+		s32						timeout( void ) const;
 
         //! Sends a packet over this connection.
         void                    send( const AbstractPacket& packet );
 
+		//! Adds new connection middleware.
+		void					addMiddleware( ConnectionMiddlewareUPtr instance );
+
 	#ifndef DC_CPP11_DISABLED
 		//! Generic method to construct and sent the network packet over this connection.
-		template<typename TPacket, typename ... Args>
-		void					send( const Args& ... args );
+		template<typename TPacket, typename ... TArgs>
+		void					send( const TArgs& ... args );
+
+		//! Generic method to construct and add the middleware to this connection.
+		template<typename TMiddleware, typename ... TArgs>
+		void					addMiddleware( const TArgs& ... args );
 	#endif	/*	!DC_CPP11_DISABLED	*/
 
         //! Base class for all connection events.
@@ -111,6 +124,9 @@ namespace Network {
         //! Tracks the specified amount of sent data.
         void                    trackSentAmount( s32 value );
 
+		//! Notifies about a received packet.
+		void					notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBufferWPtr packet );	
+
 		//! Sets the round trip time for this connection.
 		void					setRoundTripTime( s32 value );
 
@@ -129,21 +145,37 @@ namespace Network {
         //! Sends a byte buffer over this connection.
         virtual s32             sendData( Io::ByteBufferWPtr data ) = 0;
 
+        //! Closes this connection.
+        virtual void            close( void ) = 0;
+
     private:
+
+		//! Container type to store the list of connection middlewares.
+		typedef List<ConnectionMiddlewareUPtr> ConnectionMiddlewares;
 	
 		s32						m_totalBytesReceived;   //!< The total amount of bytes received.
 		s32						m_totalBytesSent;       //!< The total amount of bytes sent.
 		s32						m_time;					//!< Current connection time.
+		s32						m_timeout;				//!< The timeout counter reset each time a packet received.
 		s32						m_roundTripTime;		//!< Current round trip time.
+		bool					m_shouldClose;			//!< Indicates that a connection should be closed.
+		ConnectionMiddlewares	m_middlewares;			//!< Connection middlewares added to connection.
     };
 
 #ifndef DC_CPP11_DISABLED
 	// ** Connection::send
-	template<typename TPacket, typename ... Args>
-	void Connection_::send( const Args& ... args )
+	template<typename TPacket, typename ... TArgs>
+	void Connection_::send( const TArgs& ... args )
 	{
 		TPacket packet( args... );
 		send( packet );
+	}
+
+	// ** Connection::addMiddleware
+	template<typename TMiddleware, typename ... TArgs>
+	void Connection_::addMiddleware( const TArgs& ... args )
+	{
+		addMiddleware( DC_NEW TMiddleware( args... ) );
 	}
 #endif	/*	!DC_CPP11_DISABLED	*/
 

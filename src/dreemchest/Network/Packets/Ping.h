@@ -35,6 +35,10 @@ namespace Network {
 
 namespace Packets {
 
+	//! Keep alive packet.
+	struct KeepAlive : public Packet<KeepAlive> {
+	};
+
 	//! Latency test & time sync packet
 	struct Ping : public Packet<Ping> {
 						//! Constructs a Ping instance.

@@ -99,6 +99,9 @@ namespace Network {
     //! Command unique pointer.
     typedef AutoPtr<class AbstractCommand> CommandUPtr;
 
+	//! Connection middleware unique pointer.
+	typedef AutoPtr<class ConnectionMiddleware> ConnectionMiddlewareUPtr;
+
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
 

@@ -51,9 +51,6 @@ namespace Network {
 		//! Returns parent network application instance.
 		Application*			application( void ) const;
 
-		//! Returns the time to live for this connection.
-		s32						timeToLive( void ) const;
-
 		//! Returns the traffic counter.
 		const Traffic&			traffic( void ) const;
 
@@ -76,15 +73,6 @@ namespace Network {
 
 		//! Updates this connection
 		void					update( u32 dt );
-
-		//! Sets the time to live for this connection.
-		void					setTimeToLive( s32 value );
-
-		//! Sets the keep-alive timestamp.
-		void					setKeepAliveTimestamp( u32 value );
-
-		//! Returns the keep-alive timestamp.
-		u32						keepAliveTimestamp( void ) const;
 
 		//! Handles a recieved remote call response.
 		void					handleResponse( const Packets::RemoteCallResponse& packet );
@@ -113,12 +101,6 @@ namespace Network {
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
-
-		//! Time to live.
-		s32						m_timeToLive;
-
-		//! Last keep-alive timestamp.
-		u32						m_keepAliveTimestamp;
 
 		//! Traffic counter.
 		Traffic					m_traffic;

@@ -64,7 +64,7 @@ const Address& ConnectionTCP::address( void ) const
 // ** ConnectionTCP::sendData
 s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 {
-	DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
+	DC_BREAK_IF( !m_socket.valid(), "invalid socket" );
 	s32 result = m_socket->send( data->buffer(), data->length() );
     return result;
 }
@@ -72,12 +72,14 @@ s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 // ** ConnectionTCP::close
 void ConnectionTCP::close( void )
 {
+    // Unsubscribe from socket events
+	if( m_socket.valid() ) {
+		m_socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ConnectionTCP::handleSocketData ) );
+		m_socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ConnectionTCP::handleSocketClosed ) );
+	}
+
     // Notify all subscribers that connection is now closed
     notify<Closed>( this );
-
-    // Unsubscribe from socket events
-    m_socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ConnectionTCP::handleSocketData ) );
-    m_socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ConnectionTCP::handleSocketClosed ) );
 
     // Destroy this socket instance
     m_socket = TCPSocketPtr();
@@ -104,8 +106,8 @@ void ConnectionTCP::handleSocketData( const TCPSocket::Data& e )
             break;
         }
 
-        // Notify listeners if it's valid
-        notify<Received>( this, header.type, header.size, m_packet );
+        // Notify about this packet
+		notifyPacketReceived( header.type, header.size, m_packet );
     }
 
     // Trim processed data
