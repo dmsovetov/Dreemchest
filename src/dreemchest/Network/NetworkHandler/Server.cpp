@@ -24,51 +24,51 @@
 
  **************************************************************************/
 
-#include "ServerHandler.h"
+#include "Server.h"
 #include "Connection.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-// --------------------------------------- ServerHandler -------------------------------------- //
+// --------------------------------------- Server -------------------------------------- //
 
-// ** ServerHandler::ServerHandler
-ServerHandler::ServerHandler( TCPSocketListenerPtr socketListener ) : m_socketListener( socketListener )
+// ** Server::Server
+Server::Server( TCPSocketListenerPtr socketListener ) : m_socketListener( socketListener )
 {
-    m_socketListener->subscribe<TCPSocketListener::Accepted>( dcThisMethod( ServerHandler::handleConnectionAccepted ) );
-    m_socketListener->subscribe<TCPSocketListener::Closed>( dcThisMethod( ServerHandler::handleConnectionClosed ) );
+    m_socketListener->subscribe<TCPSocketListener::Accepted>( dcThisMethod( Server::handleConnectionAccepted ) );
+    m_socketListener->subscribe<TCPSocketListener::Closed>( dcThisMethod( Server::handleConnectionClosed ) );
 }
 
-// ** ServerHandler::create
-ServerHandlerPtr ServerHandler::create( u16 port )
+// ** Server::create
+ServerPtr Server::create( u16 port )
 {
 	TCPSocketListenerPtr socketListener = TCPSocketListener::bindTo( port );
 
 	if( socketListener == NULL ) {
-		return ServerHandlerPtr();
+		return ServerPtr();
 	}
 
-	return ServerHandlerPtr( DC_NEW ServerHandler( socketListener ) );
+	return ServerPtr( DC_NEW Server( socketListener ) );
 }
 
-// ** ServerHandler::update
-void ServerHandler::update( u32 dt )
+// ** Server::update
+void Server::update( u32 dt )
 {
-	NetworkHandler::update( dt );
+	Application::update( dt );
 	m_socketListener->recv();
 }
 
 #if DEV_DEPRECATED_PACKETS
-// ** ServerHandler::handleDetectServersPacket
-bool ServerHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
+// ** Server::handleDetectServersPacket
+bool Server::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
 {
 	return true;
 }
 #endif
 
-// ** ServerHandler::handleConnectionAccepted
-void ServerHandler::handleConnectionAccepted( const TCPSocketListener::Accepted& e )
+// ** Server::handleConnectionAccepted
+void Server::handleConnectionAccepted( const TCPSocketListener::Accepted& e )
 {
 	LogVerbose( "handler", "connection accepted from %s\n", e.socket->address().toString() );
 	ConnectionPtr connection = createConnection( e.socket );
@@ -76,8 +76,8 @@ void ServerHandler::handleConnectionAccepted( const TCPSocketListener::Accepted&
 	notify<ClientConnected>( connection );
 }
 
-// ** ServerHandler::handleConnectionClosed
-void ServerHandler::handleConnectionClosed( const TCPSocketListener::Closed& e )
+// ** Server::handleConnectionClosed
+void Server::handleConnectionClosed( const TCPSocketListener::Closed& e )
 {
 	ConnectionPtr connection = findConnectionBySocket( e.socket );
 
@@ -87,8 +87,8 @@ void ServerHandler::handleConnectionClosed( const TCPSocketListener::Closed& e )
 	notify<ClientDisconnected>( connection );
 }
 
-// ** ServerHandler::eventListeners
-ConnectionList ServerHandler::eventListeners( void ) const
+// ** Server::eventListeners
+ConnectionList Server::eventListeners( void ) const
 {
     const TCPSocketList& sockets = m_socketListener->connections();
     
@@ -96,7 +96,7 @@ ConnectionList ServerHandler::eventListeners( void ) const
     for( TCPSocketList::const_iterator i = sockets.begin(), end = sockets.end(); i != end; ++i ) {
 		ConnectionPtr connection = findConnectionBySocket( const_cast<TCPSocket*>( i->get() ) );
 		if( connection == ConnectionPtr() ) {
-			LogDebug( "handler", "ServerHandler::eventListeners : null\n" );
+			LogDebug( "handler", "Server::eventListeners : null\n" );
 			continue;
 		}
 

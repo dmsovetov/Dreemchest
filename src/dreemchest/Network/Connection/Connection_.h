@@ -35,6 +35,7 @@ namespace Network {
 
     //! Remote connection interface wraps a network sockets and used for sending/receiving packets.
     class Connection_ : public InjectEventEmitter<RefCounted> {
+	friend class Application;
     public:
 
         virtual                 ~Connection_( void ) {}

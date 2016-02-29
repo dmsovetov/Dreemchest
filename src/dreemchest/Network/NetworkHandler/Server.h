@@ -24,18 +24,18 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_ServerHandler_H__
-#define __DC_Network_ServerHandler_H__
+#ifndef __DC_Network_Server_H__
+#define __DC_Network_Server_H__
 
-#include "NetworkHandler.h"
+#include "NetworkApplication.h"
 #include "../Sockets/TCPSocketListener.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Server-side network handler.
-    class ServerHandler : public NetworkHandler {
+	//! Base class for all server-side applications
+    class Server : public Application {
     public:
 
 		//! ClientConnected event is emitted when a new client is connected to a server.
@@ -61,12 +61,12 @@ namespace Network {
 		virtual ConnectionList		eventListeners( void ) const;
 
 		//! Creates a new server network handler and binds it to specified port.
-		static ServerHandlerPtr		create( u16 port );
+		static ServerPtr			create( u16 port );
 
 	protected:
 
-									//! Constructs ServerHandler instance.
-									ServerHandler( TCPSocketListenerPtr socketListener );
+									//! Constructs Server instance.
+									Server( TCPSocketListenerPtr socketListener );
 
     #if DEV_DEPRECATED_PACKETS
 		//! Handles a server detection packet.
@@ -91,4 +91,4 @@ namespace Network {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_ServerHandler_H__	*/
+#endif	/*	!__DC_Network_Server_H__	*/

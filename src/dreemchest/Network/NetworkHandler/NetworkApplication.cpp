@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "NetworkHandler.h"
+#include "NetworkApplication.h"
 #include "Connection.h"
 #include "../Sockets/UDPSocket.h"
 #include "../Sockets/TCPSocket.h"
@@ -38,97 +38,97 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-// ** NetworkHandler::NetworkHandler
-NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
+// ** Application::Application
+Application::Application( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 ), m_keepAliveTime( 0 )
 {
-    DC_ABORT_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ), "the type info return an invalid name" );
+    DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
 #if DEV_DEPRECATED_PACKETS
-	registerPacketHandler<packets::Ping>			  ( dcThisMethod( NetworkHandler::handlePingPacket ) );
-	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( NetworkHandler::handleKeepAlivePacket ) );
-	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
-	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( NetworkHandler::handleDetectServersPacket ) );
-	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
-	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
+	registerPacketHandler<packets::Ping>			  ( dcThisMethod( Application::handlePingPacket ) );
+	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( Application::handleKeepAlivePacket ) );
+	registerPacketHandler<packets::Event>             ( dcThisMethod( Application::handleEventPacket ) );
+	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( Application::handleDetectServersPacket ) );
+	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( Application::handleRemoteCallPacket ) );
+	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
 #else
-    addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( NetworkHandler::handleEventPacket ) );
-    addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( NetworkHandler::handlePingPacket ) );
-    addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
-    addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( Application::handleEventPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( Application::handlePingPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( Application::handleRemoteCallPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
 #endif  /*  DEV_DEPRECATED_PACKETS  */
 
 	setKeepAliveTime( 5 );
 }
 
-// ** NetworkHandler::setPingRate
-void NetworkHandler::setPingRate( u32 value )
+// ** Application::setPingRate
+void Application::setPingRate( u32 value )
 {
 	m_pingSendRate = value;
 }
 
-// ** NetworkHandler::pingRate
-u32 NetworkHandler::pingRate( void ) const
+// ** Application::pingRate
+u32 Application::pingRate( void ) const
 {
 	return m_pingSendRate;
 }
 
-// ** NetworkHandler::setKeepAliveTime
-void NetworkHandler::setKeepAliveTime( s32 value )
+// ** Application::setKeepAliveTime
+void Application::setKeepAliveTime( s32 value )
 {
 	m_keepAliveTime = value * 1000;
 	m_keepAliveSendRate = static_cast<u32>( m_keepAliveTime * 0.8f );
 }
 
-// ** NetworkHandler::keepAliveTime
-s32 NetworkHandler::keepAliveTime( void ) const
+// ** Application::keepAliveTime
+s32 Application::keepAliveTime( void ) const
 {
 	return m_keepAliveTime / 1000;
 }
 
-// ** NetworkHandler::findConnectionBySocket
-ConnectionPtr NetworkHandler::findConnectionBySocket( TCPSocketWPtr socket ) const
+// ** Application::findConnectionBySocket
+ConnectionPtr Application::findConnectionBySocket( TCPSocketWPtr socket ) const
 {
 	ConnectionBySocket::const_iterator i = m_connections.find( socket );
 	return i != m_connections.end() ? i->second : ConnectionPtr();
 }
 
-// ** NetworkHandler::createConnection
-ConnectionPtr NetworkHandler::createConnection( TCPSocketWPtr socket )
+// ** Application::createConnection
+ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 {
 	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
 	connection->setTimeToLive( m_keepAliveTime );
 	m_connections[socket] = connection;
 
     // Subscribe for connection events.
-    connection->subscribe<Connection::Received>( dcThisMethod( NetworkHandler::handlePacketReceived ) );
+    connection->subscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 
 	return connection;
 }
 
-// ** NetworkHandler::removeConnection
-void NetworkHandler::removeConnection( TCPSocketWPtr socket )
+// ** Application::removeConnection
+void Application::removeConnection( TCPSocketWPtr socket )
 {
     // Find a connection by socket
     ConnectionPtr connection = findConnectionBySocket( socket );
     DC_ABORT_IF( !connection.valid(), "no connection associated with this socket instance" );
 
     // Unsubscribe from a connection events
-    connection->unsubscribe<Connection::Received>( dcThisMethod( NetworkHandler::handlePacketReceived ) );
+    connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 
     // Remove from a connections container
 	m_connections.erase( socket );
 }
 
-// ** NetworkHandler::eventListeners
-ConnectionList NetworkHandler::eventListeners( void ) const
+// ** Application::eventListeners
+ConnectionList Application::eventListeners( void ) const
 {
 	return ConnectionList();
 }
 
 #if DEV_DEPRECATED_PACKETS
 
-// ** NetworkHandler::handlePingPacket
-bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping& packet )
+// ** Application::handlePingPacket
+bool Application::handlePingPacket( ConnectionPtr& connection, packets::Ping& packet )
 {
 	if( packet.iterations ) {
 		connection->send<packets::Ping>( packet.iterations - 1, packet.timestamp, connection->time() );
@@ -148,21 +148,21 @@ bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping&
 	return true;
 }
 
-// ** NetworkHandler::handleKeepAlivePacket
-bool NetworkHandler::handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet )
+// ** Application::handleKeepAlivePacket
+bool Application::handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet )
 {
 	connection->setTimeToLive( m_keepAliveTime );
 	return true;
 }
 
-// ** NetworkHandler::handleDetectServersPacket
-bool NetworkHandler::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
+// ** Application::handleDetectServersPacket
+bool Application::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
 {
 	return true;
 }
 
-// ** NetworkHandler::handleEventPacket
-bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Event& packet )
+// ** Application::handleEventPacket
+bool Application::handleEventPacket( ConnectionPtr& connection, packets::Event& packet )
 {
 	// ** Find an event handler from this event id.
 	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
@@ -176,13 +176,13 @@ bool NetworkHandler::handleEventPacket( ConnectionPtr& connection, packets::Even
 	return i->second->handle( connection, packet );
 }
 
-// ** NetworkHandler::handleRemoteCallPacket
-bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet )
+// ** Application::handleRemoteCallPacket
+bool Application::handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet )
 {
+	if( i == m_remoteCallHandlers.end() ) {
 	// ** Find a remote call handler
 	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
 
-	if( i == m_remoteCallHandlers.end() ) {
 		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
 		return false;
 	}
@@ -191,16 +191,16 @@ bool NetworkHandler::handleRemoteCallPacket( ConnectionPtr& connection, packets:
 	return i->second->handle( connection, packet );
 }
 
-// ** NetworkHandler::handleRemoteCallResponsePacket
-bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet )
+// ** Application::handleRemoteCallResponsePacket
+bool Application::handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet )
 {
 	return connection->handleResponse( packet );
 }
 
 #else
 
-// ** NetworkHandler::handlePingPacket
-void NetworkHandler::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
+// ** Application::handlePingPacket
+void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
 {
 	if( ping.iterations ) {
 		connection->send<Packets::Ping>( ping.iterations - 1, ping.timestamp, connection->time() );
@@ -218,8 +218,8 @@ void NetworkHandler::handlePingPacket( ConnectionWPtr connection, const Packets:
 	}
 }
 
-// ** NetworkHandler::handleRemoteCallPacket
-void NetworkHandler::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
+// ** Application::handleRemoteCallPacket
+void Application::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 {
 	// Find a remote call handler
 	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
@@ -233,14 +233,14 @@ void NetworkHandler::handleRemoteCallPacket( ConnectionWPtr connection, const Pa
 	i->second->handle( connection, packet );
 }
 
-// ** NetworkHandler::handleRemoteCallResponsePacket
-void NetworkHandler::handleRemoteCallResponsePacket( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
+// ** Application::handleRemoteCallResponsePacket
+void Application::handleRemoteCallResponsePacket( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
 {
     connection->handleResponse( packet );
 }
 
-// ** NetworkHandler::handleEventPacket
-void NetworkHandler::handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet )
+// ** Application::handleEventPacket
+void Application::handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet )
 {
 	// Find an event handler from this event id.
 	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
@@ -256,8 +256,8 @@ void NetworkHandler::handleEventPacket( ConnectionWPtr connection, const Packets
 
 #endif  /*  DEV_DEPRECATED_PACKETS  */
 
-// ** NetworkHandler::handlePacketReceived
-void NetworkHandler::handlePacketReceived( const Connection::Received& e )
+// ** Application::handlePacketReceived
+void Application::handlePacketReceived( const Connection::Received& e )
 {
 #if DEV_DEPRECATED_PACKETS
     // Get the packet and connection from an event
@@ -311,8 +311,8 @@ void NetworkHandler::handlePacketReceived( const Connection::Received& e )
 #endif  /*  DEV_DEPRECATED_PACKETS  */
 }
 
-// ** NetworkHandler::update
-void NetworkHandler::update( u32 dt )
+// ** Application::update
+void Application::update( u32 dt )
 {
 	bool sendPing = false;
 

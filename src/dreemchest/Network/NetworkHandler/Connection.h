@@ -36,7 +36,7 @@ namespace Network {
 
 	//! Remote connection interface.
 	class Connection : public ConnectionTCP {
-    friend class NetworkHandler;
+	friend class Application;
 	public:
 
 		//! A helper struct to track the traffic in kbps.
@@ -48,8 +48,8 @@ namespace Network {
 			u32					m_lastReceivedBytes;	//!< Total received bytes when the tacking was update.
 		};
 
-		//! Returns parent network handler.
-		NetworkHandler*			networkHandler( void ) const;
+		//! Returns parent network application instance.
+		Application*			application( void ) const;
 
 		//! Returns the time to live for this connection.
 		s32						timeToLive( void ) const;
@@ -72,7 +72,7 @@ namespace Network {
 	private:
 
 								//! Constructs Connection instance.
-								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
+								Connection( Application* application, const TCPSocketPtr& socket );
 
 		//! Updates this connection
 		void					update( u32 dt );
@@ -106,7 +106,7 @@ namespace Network {
 		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
 
 		//! Parent network connection.
-		NetworkHandler*			m_networkHandler;
+		Application*			m_application;
 
 		//! A list of pending remote calls.
 		PendingRemoteCalls		m_pendingRemoteCalls;

@@ -24,77 +24,77 @@
 
  **************************************************************************/
 
-#include "ClientHandler.h"
+#include "Client.h"
 #include "Connection.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-// ** ClientHandler::ClientHandler
-ClientHandler::ClientHandler( TCPSocketPtr socket )
+// ** Client::Client
+Client::Client( TCPSocketPtr socket )
 {
     // Create connection
 	m_connection = createConnection( socket.get() );
 
     // Subscribe for connection events
-    m_connection->subscribe<Connection::Closed>( dcThisMethod( ClientHandler::handleConnectionClosed ) );
+    m_connection->subscribe<Connection::Closed>( dcThisMethod( Client::handleConnectionClosed ) );
 
     // Set the default ping rate
 	setPingRate( 500 );
 }
 
-ClientHandler::~ClientHandler( void )
+Client::~Client( void )
 {
     // Subscribe from connection events
-    m_connection->unsubscribe<Connection::Closed>( dcThisMethod( ClientHandler::handleConnectionClosed ) );
+    m_connection->unsubscribe<Connection::Closed>( dcThisMethod( Client::handleConnectionClosed ) );
 }
 
-// ** ClientHandler::connection
-const ConnectionPtr& ClientHandler::connection( void ) const
+// ** Client::connection
+const ConnectionPtr& Client::connection( void ) const
 {
 	return m_connection;
 }
 
-// ** ClientHandler::connection
-ConnectionPtr& ClientHandler::connection( void )
+// ** Client::connection
+ConnectionPtr& Client::connection( void )
 {
 	return m_connection;
 }
 
-// ** ClientHandler::create
-ClientHandlerPtr ClientHandler::create( const Address& address, u16 port )
+// ** Client::create
+ClientPtr Client::create( const Address& address, u16 port )
 {
 	TCPSocketPtr clientSocket = TCPSocket::connectTo( address, port );
 
 	if( clientSocket == NULL ) {
-		return ClientHandlerPtr();
+		return ClientPtr();
 	}
 
-	return ClientHandlerPtr( DC_NEW ClientHandler( clientSocket ) );
+	return ClientPtr( DC_NEW Client( clientSocket ) );
 }
 
-// ** ClientHandler::update
-void ClientHandler::update( u32 dt )
+// ** Client::update
+void Client::update( u32 dt )
 {
-	NetworkHandler::update( dt );
+	Application::update( dt );
 	m_connection->socket()->recv();
 }
 
-// ** ClientHandler::eventListeners
-ConnectionList ClientHandler::eventListeners( void ) const
+// ** Client::eventListeners
+ConnectionList Client::eventListeners( void ) const
 {
 	return ConnectionList();
 }
 
-// ** ClientHandler::detectServers
-bool ClientHandler::detectServers( u16 port )
+// ** Client::detectServers
+bool Client::detectServers( u16 port )
 {
 	return true;
 }
 
-// ** ClientHandler::handleConnectionClosed
-void ClientHandler::handleConnectionClosed( const Connection::Closed& e )
+// ** Client::handleConnectionClosed
+void Client::handleConnectionClosed( const Connection::Closed& e )
 {
     LogVerbose( "handler", "client connection closed\n" );
 	notify<ConnectionClosed>();

@@ -70,11 +70,7 @@ namespace Network {
 	class UDPSocket;
 	class TCPSocketListener;
 	class SocketDescriptor;
-
 	class Connection;
-	class NetworkHandler;
-		class ServerHandler;
-		class ClientHandler;
 
     namespace Packets {
 
@@ -85,12 +81,12 @@ namespace Network {
     } // namespace Packets
 
     //! Declare smart pointer types.
-	dcDeclarePtrs( ClientHandler )    
+	dcDeclarePtrs( Application )
+	dcDeclarePtrs( Client )
+	dcDeclarePtrs( Server )
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
     dcDeclarePtrs( TCPSocketListener )
-	dcDeclarePtrs( NetworkHandler )
-	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
     dcDeclarePtrs( Connection_ )
 
@@ -297,8 +293,8 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
 	#include "NetworkHandler/Connection.h"
-	#include "NetworkHandler/ServerHandler.h"
-	#include "NetworkHandler/ClientHandler.h"
+	#include "NetworkHandler/Server.h"
+	#include "NetworkHandler/Client.h"
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"

@@ -24,33 +24,32 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_ClientHandler_H__
-#define __DC_Network_ClientHandler_H__
+#ifndef __DC_Network_Client_H__
+#define __DC_Network_Client_H__
 
-#include "NetworkHandler.h"
+#include "NetworkApplication.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-    // ** class ClientHandler
-    class ClientHandler : public NetworkHandler {
-	friend class ClientSocketDelegate;
+    //! Base class for all client-side network applications.
+    class Client : public Application {
     public:
 
 		//! ConnectionClosed event is emitted when a connection was closed.
 		struct ConnectionClosed {
 		};
 
-		virtual					~ClientHandler( void );
+		virtual					~Client( void );
 
 		//! Return current connection.
 		const ConnectionPtr&	connection( void ) const;
 		ConnectionPtr&			connection( void );
 
 		//! Creates a new NetworkClientHandler instance and connects to server.
-		static ClientHandlerPtr	create( const Address& address, u16 port );
+		static ClientPtr		create( const Address& address, u16 port );
 
 		//! Does a broadcast request to detect a running servers.
 		static bool				detectServers( u16 port );
@@ -61,8 +60,8 @@ namespace Network {
 
 	protected:
 
-								//! Constructs ClientHandler instance.
-								ClientHandler( TCPSocketPtr socket );
+								//! Constructs Client instance.
+								Client( TCPSocketPtr socket );
 
 		//! Handles the connection closed event.
 		void			        handleConnectionClosed( const Connection::Closed& e );
@@ -76,4 +75,4 @@ namespace Network {
     
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkClientHandler_H__	*/
+#endif	/*	!__DC_Network_Client_H__	*/

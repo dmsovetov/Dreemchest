@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Connection.h"
-#include "NetworkHandler.h"
+#include "NetworkApplication.h"
 #include "../Sockets/TCPSocket.h"
 
 DC_BEGIN_DREEMCHEST
@@ -33,8 +33,8 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
 // ** Connection::Connection
-Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-	: ConnectionTCP( socket ), m_networkHandler( networkHandler ), m_nextRemoteCallId( 1 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
+Connection::Connection( Application* application, const TCPSocketPtr& socket )
+	: ConnectionTCP( socket ), m_application( application ), m_nextRemoteCallId( 1 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
 {
 	memset( &m_traffic, 0, sizeof( m_traffic ) );
 }
@@ -69,10 +69,10 @@ void Connection::setKeepAliveTimestamp( u32 value )
 	m_keepAliveTimestamp = value;
 }
 
-// ** Connection::networkHandler
-NetworkHandler* Connection::networkHandler( void ) const
+// ** Connection::application
+Application* Connection::application( void ) const
 {
-	return m_networkHandler;
+	return m_application;
 }
 
 // ** Connection::handleResponse

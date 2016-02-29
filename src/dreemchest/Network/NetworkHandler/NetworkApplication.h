@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_NetworkHandler_H__
-#define __DC_Network_NetworkHandler_H__
+#ifndef __DC_Network_Application_H__
+#define __DC_Network_Application_H__
 
 #include "Connection.h"
 #include "../Packets/PacketHandler.h"
@@ -36,13 +36,13 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Basic network handler.
-	class NetworkHandler : public InjectEventEmitter<RefCounted> {
+	//! Basic network application class.
+	class Application : public InjectEventEmitter<RefCounted> {
 	friend class Connection;
 	public:
 
-								//! Constructs NetworkHandler instance.
-								NetworkHandler( void );
+								//! Constructs Application instance.
+								Application( void );
 
 		//! Updates network handler.
 		virtual void			update( u32 dt );
@@ -198,38 +198,39 @@ namespace Network {
 	};
 
 #if DEV_DEPRECATED_PACKETS
-	// ** NetworkHandler::registerPacketHandler
+	// ** Application::registerPacketHandler
 	template<typename T>
-	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
+	inline void Application::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
 	{
 		Io::SerializableTypes::registerType<T>();
 		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
 #endif  /*  DEV_DEPRECATED_PACKETS  */
-	// ** NetworkHandler::registerEvent
+
+	// ** Application::registerEvent
 	template<typename T>
-	inline void NetworkHandler::registerEvent( void )
+	inline void Application::registerEvent( void )
 	{
 		m_eventHandlers[TypeInfo<T>::id()] = DC_NEW EventHandler<T>( &m_eventEmitter );
 	}
 
-	// ** NetworkHandler::registerRemoteProcedureVoid
+	// ** Application::registerRemoteProcedureVoid
 	template<typename TRemoteProcedure>
-	inline void NetworkHandler::registerRemoteProcedureVoid( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, Void>::Callback& callback )
+	inline void Application::registerRemoteProcedureVoid( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, Void>::Callback& callback )
 	{
 		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, Void>( callback );
 	}
 
 	// ** NetworkHandler::registerRemoteProcedure
 	template<typename TRemoteProcedure>
-	inline void NetworkHandler::registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback )
+	inline void Application::registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback )
 	{
 		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>( callback );
 	}
 
-	// ** NetworkHandler::emitTo
+	// ** Application::emitTo
 	template<typename T>
-	inline void NetworkHandler::emitTo( const T& e, const ConnectionList& listeners )
+	inline void Application::emitTo( const T& e, const ConnectionList& listeners )
 	{
 		if( listeners.empty() ) {
 			LogWarning( "rpc", "no listeners to listen for %s\n", TypeInfo<T>::name() );
@@ -244,9 +245,9 @@ namespace Network {
 		}
 	}
 
-    // ** NetworkHandler::addPacketHandler
+    // ** Application::addPacketHandler
     template<typename TPacketHandler>
-    void NetworkHandler::addPacketHandler( TPacketHandler* instance )
+    void Application::addPacketHandler( TPacketHandler* instance )
     {
         // Register the packet type inside a factory
         m_packetFactory.declare<typename TPacketHandler::Packet>( TypeInfo<typename TPacketHandler::Packet>::id() );
@@ -257,18 +258,16 @@ namespace Network {
     }
 
 #ifndef DC_CPP11_DISABLED
-    // ** NetworkHandler::addPacketHandler
+    // ** Application::addPacketHandler
     template<typename TPacketHandler, typename ... TArgs>
-    void NetworkHandler::addPacketHandler( const TArgs& ... args )
+    void Application::addPacketHandler( const TArgs& ... args )
     {
         addPacketHandler( DC_NEW TPacketHandler( args... ) );
     }
-#endif  /*  DC_CPP11_DISABLED   */
 
-#ifndef DC_CPP11_DISABLED
-	// ** NetworkHandler::emit
+	// ** Application::emit
 	template<typename TEvent, typename ... TArgs>
-	void NetworkHandler::emit( const TArgs& ... args )
+	void Application::emit( const TArgs& ... args )
 	{
         TEvent e( args... );
 		emitTo( e, eventListeners() );
@@ -279,4 +278,4 @@ namespace Network {
     
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkHandler_H__	*/
+#endif	/*	!__DC_Network_Application_H__	*/
