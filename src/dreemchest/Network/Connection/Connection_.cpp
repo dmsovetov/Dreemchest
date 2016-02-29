@@ -36,6 +36,8 @@ namespace Network {
 Connection_::Connection_( void )
     : m_totalBytesReceived( 0 )
     , m_totalBytesSent( 0 )
+	, m_time( 0 )
+	, m_roundTripTime( 0 )
 {
 }
 
@@ -66,6 +68,30 @@ s32 Connection_::totalBytesReceived( void ) const
 s32 Connection_::totalBytesSent( void ) const
 {
 	return m_totalBytesSent;
+}
+
+// ** Connection::time
+s32 Connection_::time( void ) const
+{
+	return m_time;
+}
+
+// ** Connection::setTime
+void Connection_::setTime( s32 value )
+{
+	m_time = value;
+}
+
+// ** Connection::roundTripTime
+s32 Connection_::roundTripTime( void ) const
+{
+	return m_roundTripTime;
+}
+
+// ** Connection::setRoundTripTime
+void Connection_::setRoundTripTime( s32 value )
+{
+	m_roundTripTime = value;
 }
 
 // ** Connection::send
@@ -154,6 +180,12 @@ Connection_::Header Connection_::readPacket( Io::ByteBufferWPtr stream, Io::Byte
     }
 
     return header;
+}
+
+// ** Connection_::update
+void Connection_::update( u32 dt )
+{
+	m_time += dt;
 }
 
 } // namespace Network

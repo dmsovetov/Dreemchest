@@ -34,7 +34,7 @@ namespace Network {
 
 // ** Connection::Connection
 Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket )
-	: ConnectionTCP( socket ), m_networkHandler( networkHandler ), m_nextRemoteCallId( 1 ), m_time( 0 ), m_roundTripTime( 0 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
+	: ConnectionTCP( socket ), m_networkHandler( networkHandler ), m_nextRemoteCallId( 1 ), m_timeToLive( 0 ), m_keepAliveTimestamp( 0 )
 {
 	memset( &m_traffic, 0, sizeof( m_traffic ) );
 }
@@ -43,18 +43,6 @@ Connection::Connection( NetworkHandler* networkHandler, const TCPSocketPtr& sock
 const Connection::Traffic& Connection::traffic( void ) const
 {
 	return m_traffic;
-}
-
-// ** Connection::time
-u32 Connection::time( void ) const
-{
-	return m_time;
-}
-
-// ** Connection::setTime
-void Connection::setTime( u32 value )
-{
-	m_time = value;
 }
 
 // ** Connection::timeToLive
@@ -79,18 +67,6 @@ u32 Connection::keepAliveTimestamp( void ) const
 void Connection::setKeepAliveTimestamp( u32 value )
 {
 	m_keepAliveTimestamp = value;
-}
-
-// ** Connection::roundTripTime
-u32 Connection::roundTripTime( void ) const
-{
-	return m_roundTripTime;
-}
-
-// ** Connection::setRoundTripTime
-void Connection::setRoundTripTime( u32 value )
-{
-	m_roundTripTime = value;
 }
 
 // ** Connection::networkHandler
@@ -118,13 +94,14 @@ void Connection::handleResponse( const Packets::RemoteCallResponse& packet )
 // ** Connection::update
 void Connection::update( u32 dt )
 {
-	m_time += dt;
+	ConnectionTCP::update( dt );
+
 	m_timeToLive -= dt;
 
-	if( m_time - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
+	if( time() - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
 		m_traffic.m_sentBps		= (totalBytesSent()	 - m_traffic.m_lastSentBytes)	  * 8;
 		m_traffic.m_receivedBps = (totalBytesReceived() - m_traffic.m_lastReceivedBytes) * 8;
-		m_traffic.m_lastUpdateTimestamp = m_time;
+		m_traffic.m_lastUpdateTimestamp = time();
 		m_traffic.m_lastSentBytes = totalBytesSent();
 		m_traffic.m_lastReceivedBytes = totalBytesReceived();
 	}

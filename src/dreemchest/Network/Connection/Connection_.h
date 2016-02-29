@@ -45,6 +45,12 @@ namespace Network {
 		//! Returns the total amount of bytes sent.
 		s32						totalBytesSent( void ) const;
 
+		//! Returns current time.
+		s32						time( void ) const;
+
+		//! Returns the round trip time.
+		s32						roundTripTime( void ) const;
+
         //! Closes this connection.
         virtual void            close( void );
 
@@ -104,11 +110,20 @@ namespace Network {
         //! Tracks the specified amount of sent data.
         void                    trackSentAmount( s32 value );
 
+		//! Sets the round trip time for this connection.
+		void					setRoundTripTime( s32 value );
+
+		//! Sets current time.
+		void					setTime( s32 value );
+
         //! Writes the packet to a binary stream.
         s32                     writePacket( const AbstractPacket& packet, Io::ByteBufferWPtr stream ) const;
 
         //! Reads the packet from a binary stream to a temporary buffer and returns it's header.
         Header                  readPacket( Io::ByteBufferWPtr stream, Io::ByteBufferWPtr packet ) const;
+
+		//! Updates this connection
+		void					update( u32 dt );
 
         //! Sends a byte buffer over this connection.
         virtual s32             sendData( Io::ByteBufferWPtr data ) = 0;
@@ -117,6 +132,8 @@ namespace Network {
 	
 		s32						m_totalBytesReceived;   //!< The total amount of bytes received.
 		s32						m_totalBytesSent;       //!< The total amount of bytes sent.
+		s32						m_time;					//!< Current connection time.
+		s32						m_roundTripTime;		//!< Current round trip time.
     };
 
 #ifndef DC_CPP11_DISABLED

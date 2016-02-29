@@ -51,12 +51,6 @@ namespace Network {
 		//! Returns parent network handler.
 		NetworkHandler*			networkHandler( void ) const;
 
-		//! Returns current time.
-		u32						time( void ) const;
-
-		//! Returns the round trip time.
-		u32						roundTripTime( void ) const;
-
 		//! Returns the time to live for this connection.
 		s32						timeToLive( void ) const;
 
@@ -82,12 +76,6 @@ namespace Network {
 
 		//! Updates this connection
 		void					update( u32 dt );
-
-		//! Sets the round trip time for this connection.
-		void					setRoundTripTime( u32 value );
-
-		//! Sets current time.
-		void					setTime( u32 value );
 
 		//! Sets the time to live for this connection.
 		void					setTimeToLive( s32 value );
@@ -125,12 +113,6 @@ namespace Network {
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
-
-		//! Current connection time.
-		u32						m_time;
-
-		//! Current round trip time.
-		u32						m_roundTripTime;
 
 		//! Time to live.
 		s32						m_timeToLive;
