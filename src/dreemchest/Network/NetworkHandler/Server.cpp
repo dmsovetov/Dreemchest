@@ -59,14 +59,6 @@ void Server::update( u32 dt )
 	m_socketListener->recv();
 }
 
-#if DEV_DEPRECATED_PACKETS
-// ** Server::handleDetectServersPacket
-bool Server::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
-{
-	return true;
-}
-#endif
-
 // ** Server::handleConnectionAccepted
 void Server::handleConnectionAccepted( const TCPSocketListener::Accepted& e )
 {

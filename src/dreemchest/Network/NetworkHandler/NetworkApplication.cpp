@@ -44,19 +44,10 @@ Application::Application( void )
 {
     DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
-#if DEV_DEPRECATED_PACKETS
-	registerPacketHandler<packets::Ping>			  ( dcThisMethod( Application::handlePingPacket ) );
-	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( Application::handleKeepAlivePacket ) );
-	registerPacketHandler<packets::Event>             ( dcThisMethod( Application::handleEventPacket ) );
-	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( Application::handleDetectServersPacket ) );
-	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( Application::handleRemoteCallPacket ) );
-	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
-#else
     addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( Application::handleEventPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( Application::handlePingPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( Application::handleRemoteCallPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
-#endif  /*  DEV_DEPRECATED_PACKETS  */
 }
 
 // ** Application::createConnection
@@ -94,80 +85,6 @@ ConnectionList Application::eventListeners( void ) const
 {
 	return ConnectionList();
 }
-
-#if DEV_DEPRECATED_PACKETS
-
-// ** Application::handlePingPacket
-bool Application::handlePingPacket( ConnectionPtr& connection, packets::Ping& packet )
-{
-	if( packet.iterations ) {
-		connection->send<packets::Ping>( packet.iterations - 1, packet.timestamp, connection->time() );
-	} else {
-		u32 rtt  = connection->time() - packet.timestamp;
-		u32 time = packet.time + rtt / 2;
-
-		if( abs( ( s64 )time - connection->time() ) > 50 ) {
-			LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
-			connection->setTime( time );
-		}
-
-		
-		connection->setRoundTripTime( rtt );
-	}
-	
-	return true;
-}
-
-// ** Application::handleKeepAlivePacket
-bool Application::handleKeepAlivePacket( ConnectionPtr& connection, packets::KeepAlive& packet )
-{
-	connection->setTimeToLive( m_keepAliveTime );
-	return true;
-}
-
-// ** Application::handleDetectServersPacket
-bool Application::handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet )
-{
-	return true;
-}
-
-// ** Application::handleEventPacket
-bool Application::handleEventPacket( ConnectionPtr& connection, packets::Event& packet )
-{
-	// ** Find an event handler from this event id.
-	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
-
-	if( i == m_eventHandlers.end() ) {
-		LogWarning( "rpc", "unknown event %d received\n", packet.eventId );
-		return false;
-	}
-
-	// ** Handle this event
-	return i->second->handle( connection, packet );
-}
-
-// ** Application::handleRemoteCallPacket
-bool Application::handleRemoteCallPacket( ConnectionPtr& connection, packets::RemoteCall& packet )
-{
-	if( i == m_remoteCallHandlers.end() ) {
-	// ** Find a remote call handler
-	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
-
-		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
-		return false;
-	}
-
-	// ** Invoke a method
-	return i->second->handle( connection, packet );
-}
-
-// ** Application::handleRemoteCallResponsePacket
-bool Application::handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet )
-{
-	return connection->handleResponse( packet );
-}
-
-#else
 
 // ** Application::handlePingPacket
 void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
@@ -224,30 +141,9 @@ void Application::handleEventPacket( ConnectionWPtr connection, const Packets::E
 	i->second->handle( connection, packet );
 }
 
-#endif  /*  DEV_DEPRECATED_PACKETS  */
-
 // ** Application::handlePacketReceived
 void Application::handlePacketReceived( const Connection::Received& e )
 {
-#if DEV_DEPRECATED_PACKETS
-    // Get the packet and connection from an event
-    PacketUPtr    packet     = e.packet;
-    ConnectionPtr connection = static_cast<Connection*>( e.sender.get() );
-
-    // Find corresponding packet handler
-	PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
-
-    // No handler for this type of packet
-	if( j == m_packetHandlers.end() ) {
-		LogWarning( "packet", "unhandled packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
-		return;
-	}
-
-    // Handle the packet
-	if( !j->second->handle( connection, packet.get() ) ) {
-		LogWarning( "packet", "malformed packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
-	}
-#else
     // Type cast the connection instance
     ConnectionWPtr connection = static_cast<Connection*>( e.sender.get() );
 
@@ -278,7 +174,6 @@ void Application::handlePacketReceived( const Connection::Received& e )
     for( PacketHandlerList::iterator j = i->second.begin(), end = i->second.end(); j != end; ++j ) {
         (*j)->process( connection, *packet );
     }
-#endif  /*  DEV_DEPRECATED_PACKETS  */
 }
 
 // ** Application::handleConnectionClosed

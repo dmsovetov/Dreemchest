@@ -37,8 +37,6 @@
 #include "../io/serialization/Serializer.h"
 #include "../Io/KeyValue.h"
 
-#define DEV_DEPRECATED_PACKETS  (0)
-
 #if defined( DC_PLATFORM_WINDOWS )
     #define     _WINSOCK_DEPRECATED_NO_WARNINGS
     #include	<winsock2.h>
