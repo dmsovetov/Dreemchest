@@ -73,9 +73,9 @@ namespace Network {
         //! This event is emitted when new data is received from a remote connection.
         struct Data : public Event {
                                     //! Constructs Data event instance.
-                                    Data( TCPSocketWPtr sender, SocketDataWPtr data )
+                                    Data( TCPSocketWPtr sender, Io::ByteBufferWPtr data )
                                         : Event( sender ), data( data ) {}
-            SocketDataWPtr          data; //!< TCP stream that contains received data.
+            Io::ByteBufferWPtr      data; //!< TCP stream that contains received data.
         };
 
         //! This event is emitted when socket is closed.

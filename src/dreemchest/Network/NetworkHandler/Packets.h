@@ -33,8 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-namespace packets {
+namespace Packets {
 
+#if DEV_DEPRECATED_PACKETS
 	//! Packet payload type.
 	typedef Array<u8> Payload;
 
@@ -129,8 +130,9 @@ namespace packets {
 			IoField( payload )
 		IoEndSerializer
 	};
+#endif
 
-} // namespace packets
+} // namespace Packets
 
 } // namespace Network
 

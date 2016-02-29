@@ -56,7 +56,7 @@ namespace Network {
                             ConnectionTCP( TCPSocketPtr socket );
 
         //! Sends a byte buffer over TCP connection.
-        virtual s32         sendDataToSocket( SocketDataPtr data ) DC_DECL_OVERRIDE;
+        virtual s32         sendData( Io::ByteBufferWPtr stream ) DC_DECL_OVERRIDE;
 
         //! Splits the received data into packets and emits notifications.
         void                handleSocketData( const TCPSocket::Data& e );
@@ -67,6 +67,7 @@ namespace Network {
     private:
 
         TCPSocketPtr        m_socket;   //!< TCP socket instance.
+        Io::ByteBufferPtr   m_packet;   //!< Packet temporary read buffer.
     };
 
 } // namespace Network

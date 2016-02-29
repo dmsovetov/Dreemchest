@@ -29,6 +29,9 @@
 #include "../Sockets/UDPSocket.h"
 #include "../Sockets/TCPSocket.h"
 
+#include "../Packets/Ping.h"
+#include "../Packets/RemoteCall.h"
+
 #define DEBUG_TTL_DISABLED	(1)
 
 DC_BEGIN_DREEMCHEST
@@ -40,14 +43,19 @@ NetworkHandler::NetworkHandler( void ) : m_pingSendRate( 0 ), m_pingTimeLeft( 0 
 {
     DC_ABORT_IF( TypeInfo<NetworkHandler>::name() != String( "NetworkHandler" ), "the type info return an invalid name" );
     
+#if DEV_DEPRECATED_PACKETS
 	registerPacketHandler<packets::Ping>			  ( dcThisMethod( NetworkHandler::handlePingPacket ) );
 	registerPacketHandler<packets::KeepAlive>		  ( dcThisMethod( NetworkHandler::handleKeepAlivePacket ) );
 	registerPacketHandler<packets::Event>             ( dcThisMethod( NetworkHandler::handleEventPacket ) );
 	registerPacketHandler<packets::DetectServers>	  ( dcThisMethod( NetworkHandler::handleDetectServersPacket ) );
 	registerPacketHandler<packets::RemoteCall>        ( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
 	registerPacketHandler<packets::RemoteCallResponse>( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
-
-	m_broadcastListener = UDPSocket::createBroadcast();
+#else
+    addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( NetworkHandler::handleEventPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( NetworkHandler::handlePingPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( NetworkHandler::handleRemoteCallPacket ) );
+    addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( NetworkHandler::handleRemoteCallResponsePacket ) );
+#endif  /*  DEV_DEPRECATED_PACKETS  */
 
 	setKeepAliveTime( 5 );
 }
@@ -111,17 +119,13 @@ void NetworkHandler::removeConnection( TCPSocketWPtr socket )
 	m_connections.erase( socket );
 }
 
-// ** NetworkHandler::listenForBroadcasts
-void NetworkHandler::listenForBroadcasts( u16 port )
-{
-	m_broadcastListener->listen( port );
-}
-
 // ** NetworkHandler::eventListeners
 ConnectionList NetworkHandler::eventListeners( void ) const
 {
 	return ConnectionList();
 }
+
+#if DEV_DEPRECATED_PACKETS
 
 // ** NetworkHandler::handlePingPacket
 bool NetworkHandler::handlePingPacket( ConnectionPtr& connection, packets::Ping& packet )
@@ -193,12 +197,72 @@ bool NetworkHandler::handleRemoteCallResponsePacket( ConnectionPtr& connection, 
 	return connection->handleResponse( packet );
 }
 
+#else
+
+// ** NetworkHandler::handlePingPacket
+void NetworkHandler::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
+{
+	if( ping.iterations ) {
+		connection->send<Packets::Ping>( ping.iterations - 1, ping.timestamp, connection->time() );
+	} else {
+		u32 rtt  = connection->time() - ping.timestamp;
+		u32 time = ping.time + rtt / 2;
+
+		if( abs( ( s64 )time - connection->time() ) > 50 ) {
+			LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
+			connection->setTime( time );
+		}
+
+		
+		connection->setRoundTripTime( rtt );
+	}
+}
+
+// ** NetworkHandler::handleRemoteCallPacket
+void NetworkHandler::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
+{
+	// Find a remote call handler
+	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
+
+	if( i == m_remoteCallHandlers.end() ) {
+		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
+		return;
+	}
+
+	// Invoke a method
+	i->second->handle( connection, packet );
+}
+
+// ** NetworkHandler::handleRemoteCallResponsePacket
+void NetworkHandler::handleRemoteCallResponsePacket( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
+{
+    connection->handleResponse( packet );
+}
+
+// ** NetworkHandler::handleEventPacket
+void NetworkHandler::handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet )
+{
+	// Find an event handler from this event id.
+	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
+
+	if( i == m_eventHandlers.end() ) {
+		LogWarning( "rpc", "unknown event %d received\n", packet.eventId );
+		return;
+	}
+
+	// Handle this event
+	i->second->handle( connection, packet );
+}
+
+#endif  /*  DEV_DEPRECATED_PACKETS  */
+
 // ** NetworkHandler::handlePacketReceived
 void NetworkHandler::handlePacketReceived( const Connection::Received& e )
 {
+#if DEV_DEPRECATED_PACKETS
     // Get the packet and connection from an event
-    NetworkPacketPtr packet     = e.packet;
-    ConnectionPtr    connection = static_cast<Connection*>( e.sender.get() );
+    PacketUPtr    packet     = e.packet;
+    ConnectionPtr connection = static_cast<Connection*>( e.sender.get() );
 
     // Find corresponding packet handler
 	PacketHandlers::iterator j = m_packetHandlers.find( packet->typeId() );
@@ -213,6 +277,38 @@ void NetworkHandler::handlePacketReceived( const Connection::Received& e )
 	if( !j->second->handle( connection, packet.get() ) ) {
 		LogWarning( "packet", "malformed packet of type %s received from %s\n", packet->typeName(), connection->address().toString() );
 	}
+#else
+    // Type cast the connection instance
+    ConnectionWPtr connection = static_cast<Connection*>( e.sender.get() );
+
+    // Create instance of a network packet
+	PacketUPtr packet = m_packetFactory.construct( e.type );
+
+    // The packet type is unknown - skip it
+	if( packet == NULL ) {
+        LogDebug( "packet", "packet of unknown type %d received, %d bytes skipped\n", e.type, e.packet->bytesAvailable() );
+		return;
+	}
+
+    // Get the packet stream
+    Io::ByteBufferWPtr stream = e.packet;
+
+	// Read the packet data from a stream
+    s32 position = stream->position();
+	packet->deserialize( stream );
+	s32 bytesRead = stream->position() - position;
+    DC_BREAK_IF( bytesRead != e.size, "packet size mismatch" );
+
+	// Find all handlers that are eligible to process this type of packet
+    PacketHandlers::iterator i = m_packetHandlers.find( e.type );
+    if( i == m_packetHandlers.end() ) {
+        return;
+    }
+
+    for( PacketHandlerList::iterator j = i->second.begin(), end = i->second.end(); j != end; ++j ) {
+        (*j)->process( connection, *packet );
+    }
+#endif  /*  DEV_DEPRECATED_PACKETS  */
 }
 
 // ** NetworkHandler::update
@@ -241,7 +337,7 @@ void NetworkHandler::update( u32 dt )
 	#endif
 
 		if( sendPing ) {
-			i->second->send<packets::Ping>( 1, i->second->time() );
+			i->second->send<Packets::Ping>( 1, i->second->time() );
 		}
 
 	#if !DEBUG_TTL_DISABLED

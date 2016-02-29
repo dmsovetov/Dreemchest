@@ -68,8 +68,10 @@ namespace Network {
 									//! Constructs ServerHandler instance.
 									ServerHandler( TCPSocketListenerPtr socketListener );
 
+    #if DEV_DEPRECATED_PACKETS
 		//! Handles a server detection packet.
 		virtual bool				handleDetectServersPacket( ConnectionPtr& connection, packets::DetectServers& packet );
+    #endif
 
     private:
 

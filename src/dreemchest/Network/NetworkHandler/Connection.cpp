@@ -100,22 +100,19 @@ NetworkHandler* Connection::networkHandler( void ) const
 }
 
 // ** Connection::handleResponse
-bool Connection::handleResponse( const packets::RemoteCallResponse& packet )
+void Connection::handleResponse( const Packets::RemoteCallResponse& packet )
 {
-	// ** Find pending remote call
+	// Find pending remote call
 	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet.id );
 
 	if( i == m_pendingRemoteCalls.end() ) {
 		LogWarning( "rpc", "received response with an invalid request id %d\n", packet.id );
-		return false;
+		return;
 	}
 
-	// ** Run a callback
-    ConnectionPtr connection( this );	//!! Potential bug :(
-	bool result = i->second.m_handler->handle( connection, packet );
+	// Run a callback
+	i->second.m_handler->handle( this, packet );
 	m_pendingRemoteCalls.erase( i );
-
-	return result;
 }
 
 // ** Connection::update

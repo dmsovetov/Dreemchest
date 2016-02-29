@@ -45,17 +45,11 @@ namespace Network {
 		//! Returns the total amount of bytes sent.
 		s32						totalBytesSent( void ) const;
 
-		//! Returns the round trip time.
-		s32						roundTripTime( void ) const;
-
-		//! Returns the time to live for this connection.
-		s32						timeToLive( void ) const;
-
         //! Closes this connection.
         virtual void            close( void );
 
         //! Sends a packet over this connection.
-        void                    send( const NetworkPacket& packet );
+        void                    send( const AbstractPacket& packet );
 
 	#ifndef DC_CPP11_DISABLED
 		//! Generic method to construct and sent the network packet over this connection.
@@ -74,9 +68,11 @@ namespace Network {
         //! This event is emitted when packet received over this connection.
         struct Received : public Event {
                                 //! Constructs Received instance.
-                                Received( Connection_WPtr sender, NetworkPacketPtr packet )
-                                    : Event( sender ), packet( packet ) {}
-            NetworkPacketPtr    packet; //!< Received packet instance.
+                                Received( Connection_WPtr sender, PacketTypeId type, s32 size, Io::ByteBufferWPtr packet )
+                                    : Event( sender ), type( type ), size( size ), packet( packet ) {}
+            PacketTypeId        type;   //!< Packet type identifier.
+            s32                 size;   //!< Packet size.
+            Io::ByteBufferWPtr  packet; //!< Received packet instance.
         };
 
         //! This event is emitted when a connection was closed.
@@ -88,6 +84,17 @@ namespace Network {
 
     protected:
 
+		//! Network packet data header.
+		struct Header {
+            				    //! Constructs Header instance.
+						        Header( PacketTypeId type = 0, u16 size = 0 )
+							        : type( type ), size( size ) {}
+			PacketTypeId	    type;	//!< Packet type.
+			u16			        size;	//!< Total serialized data size.
+
+            enum { Size = sizeof( PacketTypeId ) + sizeof( u16 ) };
+		};
+
                                 //! Constructs Connection instance.
                                 Connection_( void );
 
@@ -97,8 +104,14 @@ namespace Network {
         //! Tracks the specified amount of sent data.
         void                    trackSentAmount( s32 value );
 
+        //! Writes the packet to a binary stream.
+        s32                     writePacket( const AbstractPacket& packet, Io::ByteBufferWPtr stream ) const;
+
+        //! Reads the packet from a binary stream to a temporary buffer and returns it's header.
+        Header                  readPacket( Io::ByteBufferWPtr stream, Io::ByteBufferWPtr packet ) const;
+
         //! Sends a byte buffer over this connection.
-        virtual s32             sendDataToSocket( SocketDataPtr data ) = 0;
+        virtual s32             sendData( Io::ByteBufferWPtr data ) = 0;
 
     private:
 	

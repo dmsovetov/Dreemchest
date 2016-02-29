@@ -35,6 +35,9 @@
 #include "../io/serialization/BinarySerializer.h"
 #include "../io/serialization/Serializable.h"
 #include "../io/serialization/Serializer.h"
+#include "../Io/KeyValue.h"
+
+#define DEV_DEPRECATED_PACKETS  (0)
 
 #if defined( DC_PLATFORM_WINDOWS )
     #define     _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -73,15 +76,16 @@ namespace Network {
 		class ServerHandler;
 		class ClientHandler;
 
-	dcDeclarePtrs( ClientHandler )
+    namespace Packets {
 
-	//! Alias Io::Serializable as NetworkPacket
-	typedef Io::Serializable NetworkPacket;
+        struct Ping;
+        struct RemoteCall;
+        struct RemoteCallResponse;
 
-    //! A unique pointer type for a network packet instance.
-    typedef Ptr<NetworkPacket> NetworkPacketPtr;
+    } // namespace Packets
 
     //! Declare smart pointer types.
+	dcDeclarePtrs( ClientHandler )    
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
     dcDeclarePtrs( TCPSocketListener )
@@ -89,7 +93,15 @@ namespace Network {
 	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
     dcDeclarePtrs( Connection_ )
-    dcDeclareNamedPtrs( Io::ByteBuffer, SocketData )
+
+    //! Unique packet identifier type.
+    typedef TypeId PacketTypeId;
+
+    //! Network packet unique pointer.
+    typedef AutoPtr<class AbstractPacket> PacketUPtr;
+
+    //! Command unique pointer.
+    typedef AutoPtr<class AbstractCommand> CommandUPtr;
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
@@ -247,11 +259,6 @@ namespace Network {
 	struct ReplicatedEvent : public Io::SerializableT<T> {
 	};
 
-	//! Base class for all network packets.
-	template<typename T>
-	struct Packet : public Io::SerializableT<T> {
-	};
-
 	//! Remote call error response.
 	struct Error : public Io::SerializableT<Error> {
 		//! Error codes
@@ -295,6 +302,8 @@ DC_END_DREEMCHEST
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"
+    #include "Packets/PacketHandler.h"
+    #include "Packets/Ping.h"
 #endif
 
 #endif	/*	!__DC_Network_H__	*/

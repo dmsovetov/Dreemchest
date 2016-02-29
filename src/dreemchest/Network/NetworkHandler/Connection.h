@@ -27,10 +27,8 @@
 #ifndef __Network_Connection_H__
 #define __Network_Connection_H__
 
-#include "RemoteCallHandler.h"
-#include "Packets.h"
-
 #include "../Connection/ConnectionTCP.h"
+#include "RemoteCallHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,8 +36,7 @@ namespace Network {
 
 	//! Remote connection interface.
 	class Connection : public ConnectionTCP {
-	//EmbedUserData
-	friend class NetworkHandler;
+    friend class NetworkHandler;
 	public:
 
 		//! A helper struct to track the traffic in kbps.
@@ -102,7 +99,7 @@ namespace Network {
 		u32						keepAliveTimestamp( void ) const;
 
 		//! Handles a recieved remote call response.
-		bool					handleResponse( const packets::RemoteCallResponse& packet );
+		void					handleResponse( const Packets::RemoteCallResponse& packet );
 
 	private:
 
@@ -153,7 +150,7 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
-		send<packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
+		send<Packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
 	}
 
 	// ** Connection::invoke
@@ -167,7 +164,7 @@ namespace Network {
 		u16     remoteCallId = m_nextRemoteCallId++;
         TypeId  returnTypeId = TypeInfo<typename TRemoteProcedure::Response>::id();
         
-		send<packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
+		send<Packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( TRemoteProcedure::name(), DC_NEW RemoteResponseHandler<typename TRemoteProcedure::Response>( callback ) );
@@ -181,7 +178,7 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
 
 		// ** Send the packet
-		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
+		send<Packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
 
 	//! Send a response to caller.
@@ -192,14 +189,13 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
 
 		// ** Send an RPC response packet.
-		m_connection->send<packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
+		m_connection->send<Packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
 
 		// ** Mark this response as sent.
 		m_wasSent = true;
 
 		return true;
 	}
-
 }
 
 DC_END_DREEMCHEST

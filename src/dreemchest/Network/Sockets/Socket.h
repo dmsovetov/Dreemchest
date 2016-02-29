@@ -49,7 +49,7 @@ namespace Network {
     protected:
 
         SocketDescriptor        m_descriptor;   //!< Socket descriptor.
-        SocketDataPtr           m_data;         //!< Socket receiving buffer.
+        Io::ByteBufferPtr       m_data;         //!< Socket receiving buffer.
     };
 
 } // namespace Network

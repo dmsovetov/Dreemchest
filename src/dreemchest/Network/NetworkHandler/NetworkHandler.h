@@ -27,12 +27,10 @@
 #ifndef __DC_Network_NetworkHandler_H__
 #define __DC_Network_NetworkHandler_H__
 
-#include "Packets.h"
-#include "PacketHandler.h"
-#include "EventHandler.h"
-#include "RemoteCallHandler.h"
 #include "Connection.h"
-#include "../Sockets/UDPSocket.h"
+#include "../Packets/PacketHandler.h"
+#include "RemoteCallHandler.h"
+#include "EventHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -61,14 +59,12 @@ namespace Network {
 		//! Sets the keep-alive time.
 		void					setKeepAliveTime( s32 value );
 
-		//! Begins listening for broadcast messages.
-		void					listenForBroadcasts( u16 port );
-
+    #if DEV_DEPRECATED_PACKETS
 		//! Registers a new packet type.
 		template<typename T>
 		void					registerPacketHandler( const typename PacketHandler<T>::Callback& callback );
-
-		//! Registers a new event type.
+    #else
+        //! Registers a new event type.
 		template<typename T>
 		void					registerEvent( void );
 
@@ -79,17 +75,28 @@ namespace Network {
 		//! Registers a remote procedure.
 		template<typename TRemoteProcedure>
 		void					registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback );
+    
+        //! Registers a new packet handler.
+        template<typename TPacketHandler>
+        void                    addPacketHandler( TPacketHandler* instance );
+
+    #ifndef DC_CPP11_DISABLED
+        //! Creates a new instance of a packet handler and adds it to an application.
+        template<typename TPacketHandler, typename ... TArgs>
+        void                    addPacketHandler( const TArgs& ... args );
+    #endif  /*  DC_CPP11_DISABLED   */
+
+    #endif  /*  DEV_DEPRECATED_PACKETS  */
 
 		//! Emits a network event.
 		template<typename T>
 		void					emitTo( const T& e, const ConnectionList& listeners );
 
+    #ifndef DC_CPP11_DISABLED
 		//! Template functions to emit a new event.
-		template<typename T>						 void emit( void );
-		template<typename T, TemplateFunctionTypes1> void emit( TemplateFunctionArgs1 );
-		template<typename T, TemplateFunctionTypes2> void emit( TemplateFunctionArgs2 );
-		template<typename T, TemplateFunctionTypes3> void emit( TemplateFunctionArgs3 );
-		template<typename T, TemplateFunctionTypes4> void emit( TemplateFunctionArgs4 );
+		template<typename TEvent, typename ... TArgs>
+        void                    emit( const TArgs& ... args );
+    #endif  /*  DC_CPP11_DISABLED   */
 
 	protected:
 
@@ -105,6 +112,7 @@ namespace Network {
 		//! Removes connection by socket.
 		void					removeConnection( TCPSocketWPtr socket );
 
+    #if DEV_DEPRECATED_PACKETS
 		//! Handles a ping packet.
 		virtual bool			handlePingPacket( ConnectionPtr& connection, packets::Ping& packet );
 
@@ -122,38 +130,59 @@ namespace Network {
 
 		//! Handles a response to remote call.
 		bool					handleRemoteCallResponsePacket( ConnectionPtr& connection, packets::RemoteCallResponse& packet );
+    #else
+		//! Handles an event packet.
+		void					handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet );
+
+        //! Handles a ping packet.
+		void			        handlePingPacket( ConnectionWPtr connection, const Packets::Ping& packet );
+
+		//! Handles a remote call packet.
+		void					handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet );
+
+		//! Handles a response to remote call.
+		void					handleRemoteCallResponsePacket( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet );
 
         //! Handles a packet received over a connection.
         void                    handlePacketReceived( const Connection::Received& e );
+    #endif
 
 	protected:
 
+    #if DEV_DEPRECATED_PACKETS
 		//! A container type to store all registered packet handlers.
 		typedef Map< TypeId, AutoPtr<IPacketHandler> > PacketHandlers;
-
+    #endif
 		//! A container type to store all network event emitters.
 		typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
-
+    
 		//! A container type to store all remote call handlers.
 		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
-		//! Container type to store socket to connection mapping
-		typedef Map<TCPSocketWPtr, ConnectionPtr>	ConnectionBySocket;
+		//! Container type to store socket to connection mapping.
+		typedef Map<TCPSocketWPtr, ConnectionPtr>	    ConnectionBySocket;
 
+        //! Container type to store a list of packet handlers.
+        typedef List<AutoPtr<AbstractPacketHandler>>    PacketHandlerList;
+
+        //! Container type to store mapping from a packet type to a handlers list.
+        typedef Map<PacketTypeId, PacketHandlerList>    PacketHandlers;
+
+        //! Network packet factory type.
+        typedef AbstractFactory<AbstractPacket, PacketTypeId> PacketFactory;
+
+    #if DEV_DEPRECATED_PACKETS
 		//! Packet handlers.
 		PacketHandlers			m_packetHandlers;
-
-		//! Event handlers.
-		EventHandlers			m_eventHandlers;
-
-		//! Remote call handlers.
-		RemoteCallHandlers		m_remoteCallHandlers;
+    #else
+		EventHandlers			m_eventHandlers;        //!< Event handlers.
+		RemoteCallHandlers		m_remoteCallHandlers;   //!< Remote call handlers.
+        PacketFactory           m_packetFactory;        //!< Packet factory.
+        PacketHandlers          m_packetHandlers;       //!< Registered packet handlers.
+    #endif  /*  DEV_DEPRECATED_PACKETS  */
 
 		//! Active connections.
 		ConnectionBySocket		m_connections;
-
-		//! Broadcast listener socket.
-		UDPSocketPtr			m_broadcastListener;
 
 		//! Ping send rate.
 		u32						m_pingSendRate;
@@ -168,6 +197,7 @@ namespace Network {
 		u32						m_keepAliveSendRate;
 	};
 
+#if DEV_DEPRECATED_PACKETS
 	// ** NetworkHandler::registerPacketHandler
 	template<typename T>
 	inline void NetworkHandler::registerPacketHandler( const typename PacketHandler<T>::Callback& callback )
@@ -175,7 +205,7 @@ namespace Network {
 		Io::SerializableTypes::registerType<T>();
 		m_packetHandlers[TypeInfo<T>::id()] = DC_NEW PacketHandler<T>( callback );
 	}
-
+#endif  /*  DEV_DEPRECATED_PACKETS  */
 	// ** NetworkHandler::registerEvent
 	template<typename T>
 	inline void NetworkHandler::registerEvent( void )
@@ -214,40 +244,36 @@ namespace Network {
 		}
 	}
 
+    // ** NetworkHandler::addPacketHandler
+    template<typename TPacketHandler>
+    void NetworkHandler::addPacketHandler( TPacketHandler* instance )
+    {
+        // Register the packet type inside a factory
+        m_packetFactory.declare<typename TPacketHandler::Packet>( TypeInfo<typename TPacketHandler::Packet>::id() );
+
+        // Add this packet handler instance to a list
+        PacketTypeId type = instance->packetTypeId();
+        m_packetHandlers[type].push_back( instance );
+    }
+
+#ifndef DC_CPP11_DISABLED
+    // ** NetworkHandler::addPacketHandler
+    template<typename TPacketHandler, typename ... TArgs>
+    void NetworkHandler::addPacketHandler( const TArgs& ... args )
+    {
+        addPacketHandler( DC_NEW TPacketHandler( args... ) );
+    }
+#endif  /*  DC_CPP11_DISABLED   */
+
+#ifndef DC_CPP11_DISABLED
 	// ** NetworkHandler::emit
-	template<typename T>
-	inline void NetworkHandler::emit( void )
+	template<typename TEvent, typename ... TArgs>
+	void NetworkHandler::emit( const TArgs& ... args )
 	{
-		emitTo( T(), eventListeners() );
+        TEvent e( args... );
+		emitTo( e, eventListeners() );
 	}
-
-	// ** NetworkHandler::emit
-	template<typename T, TemplateFunctionTypes1>
-	inline void NetworkHandler::emit( TemplateFunctionArgs1 )
-	{
-		emitTo( T( arg0 ), eventListeners() );
-	}
-
-	// ** NetworkHandler::send
-	template<typename T, TemplateFunctionTypes2>
-	inline void NetworkHandler::emit( TemplateFunctionArgs2 )
-	{
-		emitTo( T( arg0, arg1 ), eventListeners() );
-	}
-
-	// ** NetworkHandler::send
-	template<typename T, TemplateFunctionTypes3>
-	inline void NetworkHandler::emit( TemplateFunctionArgs3 )
-	{
-		emitTo( T( arg0, arg1, arg2 ), eventListeners() );
-	}
-
-	// ** NetworkHandler::send
-	template<typename T, TemplateFunctionTypes4>
-	inline void NetworkHandler::emit( TemplateFunctionArgs4 )
-	{
-		emitTo( T( arg0, arg1, arg2, arg3 ), eventListeners() );
-	}
+#endif  /*  DC_CPP11_DISABLED   */
 
 } // namespace Network
     

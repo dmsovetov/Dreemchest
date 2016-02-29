@@ -35,6 +35,9 @@ ConnectionTCP::ConnectionTCP( TCPSocketPtr socket ) : m_socket( socket )
 {
     DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
 
+    // Create the temporary read buffer for received packet
+    m_packet = Io::ByteBuffer::create();
+
     // Subscribe for socket events
     m_socket->subscribe<TCPSocket::Data>( dcThisMethod( ConnectionTCP::handleSocketData ) );
     m_socket->subscribe<TCPSocket::Closed>( dcThisMethod( ConnectionTCP::handleSocketClosed ) );
@@ -58,8 +61,8 @@ const Address& ConnectionTCP::address( void ) const
 	return socket()->address();
 }
 
-// ** ConnectionTCP::sendDataToSocket
-s32 ConnectionTCP::sendDataToSocket( SocketDataPtr data )
+// ** ConnectionTCP::sendData
+s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 {
 	DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
 	s32 result = m_socket->send( data->buffer(), data->length() );
@@ -86,21 +89,24 @@ void ConnectionTCP::handleSocketData( const TCPSocket::Data& e )
     LogDebug( "socket", "%d bytes of data received from %s\n", e.data->bytesAvailable(), e.sender->address().toString() );
 
     // Save shortcut for a received data and socket
-    SocketDataWPtr data   = e.data;
-    TCPSocketWPtr  socket = e.sender;
+    Io::ByteBufferWPtr data   = e.data;
+    TCPSocketWPtr      socket = e.sender;
 
     // Track the received amount
     trackReceivedAmount( data->bytesAvailable() );
 
-    Io::ByteBufferPtr source( data );
-	Io::Serializables packets = Io::BinarySerializer::read( source );
+    // Parse packets while there is data left in a TCP stream 
+    while( data->hasDataLeft() ) {
+        // Read single packet from a stream
+        Header header = readPacket( data, m_packet );
 
-	for( Io::Serializables::iterator i = packets.begin(), end = packets.end(); i != end; ++i ) {
-		NetworkPacket* packet = i->get();
+        if( !header.type ) {
+            break;
+        }
 
-		LogDebug( "packet", "%s received from %s\n", packet->typeName(), socket->address().toString() );
-        notify<Received>( this, packet );
-	}
+        // Notify listeners if it's valid
+        notify<Received>( this, header.type, header.size, m_packet );
+    }
 
     // Trim processed data
 	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", data->position(), socket->address().toString(), data->length() - data->position() );

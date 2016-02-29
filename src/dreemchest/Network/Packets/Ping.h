@@ -24,57 +24,46 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_PacketHandler_H__
-#define __DC_Network_PacketHandler_H__
+#ifndef __DC_Network_Packet_Ping_H__
+#define __DC_Network_Packet_Ping_H__
 
-#include "../Network.h"
+#include "PacketHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Packet handler interface class.
-	class IPacketHandler {
-	public:
+namespace Packets {
 
-		virtual			~IPacketHandler( void ) {}
+	//! Latency test & time sync packet
+	struct Ping : public Packet<Ping> {
+						//! Constructs a Ping instance.
+						Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
+							: iterations( iterations ), timestamp( timestamp ), time( time ) {}
 
-		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, NetworkPacket* packet ) = 0;
+		u8				iterations;		//!< Current iteration number.
+		u32				timestamp;		//!< A timestamp value when the packet was sent.
+		u32				time;			//!< Current connection time in milliseconds
+
+        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        {
+            stream->write( &iterations, sizeof( iterations ) );
+            stream->write( &timestamp, sizeof( timestamp ) );
+            stream->write( &time, sizeof( time ) );
+        }
+
+        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        {
+            stream->read( &iterations, sizeof( iterations ) );
+            stream->read( &timestamp, sizeof( timestamp ) );
+            stream->read( &time, sizeof( time ) );        
+        }
 	};
 
-	//! Template class that handles a strict-typed packets.
-	template<typename T>
-	class PacketHandler : public IPacketHandler {
-	public:
-
-		//! Function type to handle packets.
-		typedef cClosure<bool(ConnectionPtr&,T&)> Callback;
-
-						//! Constructs GenericPacketHandler instance.
-						PacketHandler( const Callback& callback )
-							: m_callback( callback ) {}
-
-		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( ConnectionPtr& connection, NetworkPacket* packet );
-
-	private:
-
-		//! Packet handler callback.
-		Callback	 m_callback;
-	};
-
-	// ** PacketHandler::handle
-	template<typename T>
-	bool PacketHandler<T>::handle( ConnectionPtr& connection, NetworkPacket* packet )
-	{
-		T* packetWithType = castTo<T>( packet );
-		DC_ABORT_IF( packetWithType == NULL, "packet type mismatch" );
-		return m_callback( connection, *packetWithType );
-	}
+} // namespace Packets
 
 } // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_PacketHandler_H__	*/
+#endif  /*  __DC_Network_Packet_Ping_H__ */

@@ -26,6 +26,8 @@
 
 #include "Connection_.h"
 
+#include "../Packets/Packet.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
@@ -67,15 +69,16 @@ s32 Connection_::totalBytesSent( void ) const
 }
 
 // ** Connection::send
-void Connection_::send( const NetworkPacket& packet )
+void Connection_::send( const AbstractPacket& packet )
 {
-	SocketDataPtr buffer = Io::ByteBuffer::create();
+    // Create the network data to write packet to
+	Io::ByteBufferPtr stream = Io::ByteBuffer::create();
 
-	// Write packet to binary stream
-	u32 bytesWritten = Io::BinarySerializer::write( buffer, const_cast<NetworkPacket*>( &packet ) );
+    // Write packet to binary stream
+    u32 bytesWritten = writePacket( packet, stream );
 
 	// Send binary data to socket
-	s32 bytesSent = sendDataToSocket( buffer );
+	s32 bytesSent = sendData( stream );
 
     // The socket was closed.
 	if( bytesSent == 0 ) {
@@ -83,12 +86,74 @@ void Connection_::send( const NetworkPacket& packet )
 		return;
 	}
 
-	//LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet.typeName(), m_socket->address().toString(), bytesSent );
+	//LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet.name(), m_socket->address().toString(), bytesSent );
 
 	// Increase the sent bytes counter.
     trackSentAmount( bytesSent );
 
 	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+}
+
+// ** Connection::writePacket
+s32 Connection_::writePacket( const AbstractPacket& packet, Io::ByteBufferWPtr stream ) const
+{
+    // Save current position to track the total number of bytes written
+	s32 position = stream->position();
+
+    // Write the header to a binary stream
+	Header header( packet.id(), 0 );
+	stream->write( &header.type, sizeof( header.type ) );
+	stream->write( &header.size, sizeof( header.size ) );
+
+    // Write packet to a binary stream
+	s32 start = stream->position();
+	packet.serialize( stream );
+	header.size = stream->position() - start;
+
+	// Finalize the packet formatting by fixing a packet size inside the header
+	stream->setPosition( position + sizeof( header.type ) );
+	stream->write( &header.size, sizeof( header.size ) );
+
+    // Rewind back to the end of a packet
+	stream->setPosition( start + header.size );
+
+	return stream->position() - position;
+}
+
+// ** Connection::readPacket
+Connection_::Header Connection_::readPacket( Io::ByteBufferWPtr stream, Io::ByteBufferWPtr packet ) const
+{
+    // The received data is too small to be a readable packet
+	if( stream->bytesAvailable() < Header::Size ) {
+		return Header();
+	}
+
+	// Save current stream position
+	s32 initial = stream->position();
+
+	// Read the packet header
+	Header header;
+	stream->read( &header.type, sizeof( header.type ) );
+	stream->read( &header.size, sizeof( header.size ) );
+
+	// Do we have enough data to parse the whole packet?
+	if( stream->bytesAvailable() < header.size ) {
+		stream->setPosition( initial );
+		return Header();
+	}
+
+    // Copy data from a stream to a packet buffer
+    packet->setPosition( 0, Io::SeekSet );
+    if( header.size ) {
+        // Copy bytes from a stream to a packet buffer
+        packet->write( stream->current(), header.size );
+        packet->setPosition( 0, Io::SeekSet );
+
+        // Advance the stream cursor
+        stream->setPosition( header.size, Io::SeekCur );
+    }
+
+    return header;
 }
 
 } // namespace Network
