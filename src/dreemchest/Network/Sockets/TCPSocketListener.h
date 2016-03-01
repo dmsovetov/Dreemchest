@@ -34,14 +34,14 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
 	//! Berkley TCP socket listener implementation.
-	class TCPSocketListener NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
+	class TCPSocketListener NIMBLE_FINAL : public TCPSocket {
 	public:
 
 		//! Checks for incoming connections & updates existing.
-		void						    recv( void );
+		virtual void			        recv( void ) DC_DECL_OVERRIDE;
 
 		//! Closes a socket listener.
-		void						    close( void );
+		virtual void				    close( void ) DC_DECL_OVERRIDE;
         
         //! Returns a port that listener is bound to.
         u16                             port( void ) const;
@@ -97,7 +97,6 @@ namespace Network {
 
 	private:
 
-		SocketDescriptor				m_descriptor;       //!< Socket descriptor.
         u16                             m_port;             //!< Port this listener is bound to.
         TCPSocketList					m_clientSockets;    //!< List of client connections.
 	};

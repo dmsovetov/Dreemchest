@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
     //! TCP socket.
-	class TCPSocket NIMBLE_FINAL : public Socket {
+	class TCPSocket : public Socket {
     friend class TCPSocketListener;
     public:
 
@@ -47,10 +47,10 @@ namespace Network {
         bool					    connect( const Address& address, u16 port );
 
         //! Closes a socket.
-        void					    close( void );
+        virtual void			    close( void ) DC_DECL_OVERRIDE;
 
         //! Reads all incoming data.
-        void					    recv( void );
+        virtual void			    recv( void ) DC_DECL_OVERRIDE;
 
 		//! Sends data to socket.
 		/*

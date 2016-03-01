@@ -106,7 +106,7 @@ void TCPSocket::close( void )
         notify<Closed>( this );
 	}
 	
-	m_descriptor.close();
+	Socket::close();
 }
 
 // ** TCPSocket::send

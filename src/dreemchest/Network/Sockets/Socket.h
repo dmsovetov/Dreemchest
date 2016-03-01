@@ -39,12 +39,19 @@ namespace Network {
 
                                 //! Constructs the Socket instance.
                                 Socket( SocketDescriptor& descriptor = SocketDescriptor::Invalid );
+        virtual                 ~Socket( void ) {}
 
         //! Returns a socket descriptor.
 		const SocketDescriptor& descriptor( void ) const;
 
         //! Returns true if this socket is valid.
 		bool				    isValid( void ) const;
+
+        //! Closes a socket.
+        virtual void		    close( void );
+
+        //! Reads all incoming data.
+        virtual void		    recv( void ) = 0;
 
     protected:
 

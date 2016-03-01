@@ -49,6 +49,12 @@ const SocketDescriptor& Socket::descriptor( void ) const
 	return m_descriptor;
 }
 
+// ** Socket::close
+void Socket::close( void )
+{
+	m_descriptor.close();
+}
+
 } // namespace Network
 
 DC_END_DREEMCHEST
