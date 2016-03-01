@@ -61,10 +61,7 @@ ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
     connection->subscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 	connection->subscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
-	// Setup the connection middleware
-	connection->addMiddleware<PingInterval>( 500 );
-	connection->addMiddleware<KeepAliveInterval>( 5000 );
-	connection->addMiddleware<CloseOnTimeout>( 10000 );
+    LogVerbose( "connection", "connection accepted %s (%d active connections)\n", connection->address().toString(), m_connections.size() );
 
 	return connection;
 }
@@ -72,6 +69,8 @@ ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 // ** Application::removeConnection
 void Application::removeConnection( ConnectionWPtr connection )
 {
+    LogVerbose( "connection", "connection closed %s (%d active connections)\n", connection->address().toString(), m_connections.size() - 1 );
+
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 	connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );

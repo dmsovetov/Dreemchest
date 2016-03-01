@@ -80,8 +80,7 @@ namespace Network {
 
     //! Declare smart pointer types.
 	dcDeclarePtrs( Application )
-	dcDeclarePtrs( Client )
-	dcDeclarePtrs( Server )
+    dcDeclarePtrs( ApplicationTCP )
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
     dcDeclarePtrs( TCPSocketListener )
@@ -294,8 +293,7 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
 	#include "NetworkHandler/Connection.h"
-	#include "NetworkHandler/Server.h"
-	#include "NetworkHandler/Client.h"
+    #include "NetworkHandler/ApplicationTCP.h"
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"

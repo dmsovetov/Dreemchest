@@ -43,8 +43,9 @@ namespace Network {
 
 								//! Constructs Application instance.
 								Application( void );
+        virtual                 ~Application( void ) {}
 
-		//! Updates network handler.
+		//! Updates network application instance.
 		virtual void			update( u32 dt );
 
         //! Registers a new event type.
@@ -78,6 +79,26 @@ namespace Network {
 		template<typename TEvent, typename ... TArgs>
         void                    emit( const TArgs& ... args );
     #endif  /*  DC_CPP11_DISABLED   */
+
+		//! Connected event is emitted when a connection to server established or new client is connected to a server.
+		struct Connected {
+									//! Constructs Connected instance.
+									Connected( ApplicationWPtr sender, ConnectionWPtr connection )
+										: sender( sender ), connection( connection ) {}
+
+            ApplicationWPtr         sender;     //!< Network application instance that emitted this event.
+			ConnectionWPtr			connection;	//!< Opened connection instance.
+		};
+
+		//! Disconnected event is emitted when a connection to server was closed or client is disconnected from a server.
+		struct Disconnected {
+									//! Constructs Disconnected instance.
+									Disconnected( ApplicationWPtr sender, ConnectionWPtr connection )
+										: sender( sender ), connection( connection ) {}
+
+            ApplicationWPtr         sender;     //!< Network application instance that emitted this event.
+			ConnectionWPtr			connection;	//!< Closed connection instance.
+		};
 
 	protected:
 
