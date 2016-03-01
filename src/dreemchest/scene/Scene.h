@@ -201,7 +201,7 @@ namespace Scene {
 	typedef Array<RayTracingResult> RayTracingResultArray;
 
 	//! The root class for a scene subsystem.
-	class Scene : public RefCountedEventEmitter {
+	class Scene : public InjectEventEmitter<RefCounted> {
 	public:
 
 		//! Performs a scene update.

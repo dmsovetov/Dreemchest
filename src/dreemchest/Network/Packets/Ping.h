@@ -24,68 +24,50 @@
 
  **************************************************************************/
 
-#ifndef __DC_Ecs_System_H__
-#define __DC_Ecs_System_H__
+#ifndef __DC_Network_Packet_Ping_H__
+#define __DC_Network_Packet_Ping_H__
 
-#include "../Ecs.h"
+#include "PacketHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
+namespace Network {
 
-	//! System is a base class for all systems that process components.
-	/*!
-	System contains all the code for the one aspect of the entities, with
-	each System running continuously as if it has a private internal thread,
-	performing global actions on every Entity that possesses a Component of
-	the same aspect as that System.
-	*/
-	class System : public InjectEventEmitter<RefCounted> {
-	public:
+namespace Packets {
 
-		virtual			~System( void ) {}
-
-		//! Returns system name.
-		const String&	name( void ) const;
-
-		//! Attaches the system instance to ecs.
-		virtual bool	initialize( EcsWPtr ecs );
-
-		//! System logic is done here.
-		virtual void	update( u32 currentTime, f32 dt ) = 0;
-
-	protected:
-
-						//! Constructs System instance.
-						System( const String& name );
-
-	protected:
-
-		EcsWPtr			m_ecs;	//!< Parent ECS instance.
-		String			m_name;	//!< System name.
+	//! Keep alive packet.
+	struct KeepAlive : public Packet<KeepAlive> {
 	};
 
-	// ** System::System
-	inline System::System( const String& name ) : m_name( name )
-	{
-	
-	}
+	//! Latency test & time sync packet
+	struct Ping : public Packet<Ping> {
+						//! Constructs a Ping instance.
+						Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
+							: iterations( iterations ), timestamp( timestamp ), time( time ) {}
 
-	// ** System::name
-	inline const String& System::name( void ) const
-	{
-		return m_name;
-	}
+		u8				iterations;		//!< Current iteration number.
+		u32				timestamp;		//!< A timestamp value when the packet was sent.
+		u32				time;			//!< Current connection time in milliseconds
 
-	// ** System::initialize
-	inline bool System::initialize( EcsWPtr ecs )
-	{
-		m_ecs = ecs;
-		return true;
-	}
+        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        {
+            stream->write( &iterations, sizeof( iterations ) );
+            stream->write( &timestamp, sizeof( timestamp ) );
+            stream->write( &time, sizeof( time ) );
+        }
 
-} // namespace Ecs
+        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        {
+            stream->read( &iterations, sizeof( iterations ) );
+            stream->read( &timestamp, sizeof( timestamp ) );
+            stream->read( &time, sizeof( time ) );        
+        }
+	};
+
+} // namespace Packets
+
+} // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_System_H__	*/
+#endif  /*  __DC_Network_Packet_Ping_H__ */
