@@ -55,29 +55,6 @@ namespace Network {
 		//! Binds a socket to a specified port.
 		bool							bind( u16 port );
 
-        //! Base class for all TCP socket listener events.
-        struct Event {
-                                        //! Constructs Event instance.
-                                        Event( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : sender( sender ), socket( socket ) {}
-            TCPSocketListenerWPtr       sender; //!< Pointer to a socket listener that emitted this event.
-            TCPSocketWPtr               socket; //!< Pointer to a socket that received data.        
-        };
-
-        //! This event is emitted when a new connection was accepted.
-        struct Accepted : public Event {
-                                        //! Constructs Accepted event instance.
-                                        Accepted( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : Event( sender, socket ) {}
-        };
-
-        //! This event is emitted when a remote connection was closed.
-        struct Closed : public Event {
-                                        //! Constructs Closed event instance.
-                                        Closed( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : Event( sender, socket ) {}
-        };
-
     private:
 
                                         //! Constructs TCPSocketListener instance.

@@ -78,11 +78,18 @@ namespace Network {
             Io::ByteBufferWPtr      data; //!< TCP stream that contains received data.
         };
 
-        //! This event is emitted when socket is closed.
+        //! This event is emitted when socket is closed or remote host disconnected from a listening socket.
         struct Closed : public Event {
                                     //! Constructs Closed event instance.
                                     Closed( TCPSocketWPtr sender )
                                         : Event( sender ) {}
+        };
+
+        //! This event is connected to a remote host or incomming connection accepted.
+        struct Connected : public Event {
+                                        //! Constructs Connected event instance.
+                                        Connected( TCPSocketWPtr sender )
+                                            : Event( sender ) {}
         };
 
     private:

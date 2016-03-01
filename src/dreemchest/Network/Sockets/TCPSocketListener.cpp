@@ -99,7 +99,7 @@ void TCPSocketListener::recv( void )
         m_clientSockets.push_back( accepted );
 
         // Emit the event
-        notify<Accepted>( this, accepted );
+        notify<Connected>( accepted );
 	}
 	else if( FD_ISSET( m_descriptor, &except ) ) {
 		LogError( "socket", "error on listening socket: %d\n", m_descriptor.error() );
@@ -245,7 +245,7 @@ bool TCPSocketListener::bind( u16 port )
 void TCPSocketListener::handleSocketClosed( const TCPSocket::Closed& e )
 {
     LogVerbose( "socket", "remote socket connection closed (remote address %s)", e.sender->address().toString() );
-    notify<Closed>( this, e.sender );
+    notify<Closed>( e.sender );
 }
 
 } // namespace Network
