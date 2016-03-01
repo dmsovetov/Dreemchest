@@ -39,6 +39,7 @@ namespace Network {
 
                                 //! Constructs the Socket instance.
                                 Socket( SocketDescriptor& descriptor = SocketDescriptor::Invalid );
+        virtual                 ~Socket( void ) {}
 
         //! Returns a socket descriptor.
 		const SocketDescriptor& descriptor( void ) const;
@@ -46,10 +47,16 @@ namespace Network {
         //! Returns true if this socket is valid.
 		bool				    isValid( void ) const;
 
+        //! Closes a socket.
+        virtual void		    close( void );
+
+        //! Reads all incoming data.
+        virtual void		    recv( void ) = 0;
+
     protected:
 
         SocketDescriptor        m_descriptor;   //!< Socket descriptor.
-        SocketDataPtr           m_data;         //!< Socket receiving buffer.
+        Io::ByteBufferPtr       m_data;         //!< Socket receiving buffer.
     };
 
 } // namespace Network

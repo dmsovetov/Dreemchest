@@ -34,14 +34,14 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
 	//! Berkley TCP socket listener implementation.
-	class TCPSocketListener NIMBLE_FINAL : public InjectEventEmitter<RefCounted> {
+	class TCPSocketListener NIMBLE_FINAL : public TCPSocket {
 	public:
 
 		//! Checks for incoming connections & updates existing.
-		void						    recv( void );
+		virtual void			        recv( void ) DC_DECL_OVERRIDE;
 
 		//! Closes a socket listener.
-		void						    close( void );
+		virtual void				    close( void ) DC_DECL_OVERRIDE;
         
         //! Returns a port that listener is bound to.
         u16                             port( void ) const;
@@ -54,37 +54,6 @@ namespace Network {
 
 		//! Binds a socket to a specified port.
 		bool							bind( u16 port );
-
-        //! Base class for all TCP socket listener events.
-        struct Event {
-                                        //! Constructs Event instance.
-                                        Event( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : sender( sender ), socket( socket ) {}
-            TCPSocketListenerWPtr       sender; //!< Pointer to a socket listener that emitted this event.
-            TCPSocketWPtr               socket; //!< Pointer to a socket that received data.        
-        };
-
-        //! This event is emitted when new data is received from a remote connection.
-        struct Data : public Event {
-                                        //! Constructs Data event instance.
-                                        Data( TCPSocketListenerWPtr sender, TCPSocketWPtr socket, SocketDataWPtr data )
-                                            : Event( sender, socket ), data( data ) {}
-            SocketDataWPtr              data; //!< TCP stream that contains received data.
-        };
-
-        //! This event is emitted when a new connection was accepted.
-        struct Accepted : public Event {
-                                        //! Constructs Accepted event instance.
-                                        Accepted( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : Event( sender, socket ) {}
-        };
-
-        //! This event is emitted when a remote connection was closed.
-        struct Closed : public Event {
-                                        //! Constructs Closed event instance.
-                                        Closed( TCPSocketListenerWPtr sender, TCPSocketWPtr socket )
-                                            : Event( sender, socket ) {}
-        };
 
     private:
 
@@ -103,12 +72,8 @@ namespace Network {
         //! Handles the socket closed event.
         void                            handleSocketClosed( const TCPSocket::Closed& e );
 
-        //! Handles the data event from a socket.
-        void                            handleSocketData( const TCPSocket::Data& e );
-
 	private:
 
-		SocketDescriptor				m_descriptor;       //!< Socket descriptor.
         u16                             m_port;             //!< Port this listener is bound to.
         TCPSocketList					m_clientSockets;    //!< List of client connections.
 	};

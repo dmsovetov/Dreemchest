@@ -24,57 +24,21 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_PacketHandler_H__
-#define __DC_Network_PacketHandler_H__
+#ifndef __DC_Network_RemoteCall_H__
+#define __DC_Network_RemoteCall_H__
 
-#include "../Network.h"
+#include "PacketHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Packet handler interface class.
-	class IPacketHandler {
-	public:
+namespace Packets {
 
-		virtual			~IPacketHandler( void ) {}
-
-		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, NetworkPacket* packet ) = 0;
-	};
-
-	//! Template class that handles a strict-typed packets.
-	template<typename T>
-	class PacketHandler : public IPacketHandler {
-	public:
-
-		//! Function type to handle packets.
-		typedef cClosure<bool(ConnectionPtr&,T&)> Callback;
-
-						//! Constructs GenericPacketHandler instance.
-						PacketHandler( const Callback& callback )
-							: m_callback( callback ) {}
-
-		//! Casts an input network packet to a specified type and runs a callback.
-		virtual bool handle( ConnectionPtr& connection, NetworkPacket* packet );
-
-	private:
-
-		//! Packet handler callback.
-		Callback	 m_callback;
-	};
-
-	// ** PacketHandler::handle
-	template<typename T>
-	bool PacketHandler<T>::handle( ConnectionPtr& connection, NetworkPacket* packet )
-	{
-		T* packetWithType = castTo<T>( packet );
-		DC_ABORT_IF( packetWithType == NULL, "packet type mismatch" );
-		return m_callback( connection, *packetWithType );
-	}
+} // namespace Packets
 
 } // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_PacketHandler_H__	*/
+#endif  /*  !__DC_Network_RemoteCall_H__    */

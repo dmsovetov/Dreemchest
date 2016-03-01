@@ -27,7 +27,7 @@
 #ifndef	__DC_Network_RemoteCallHandler_H__
 #define	__DC_Network_RemoteCallHandler_H__
 
-#include "Packets.h"
+#include "../Packets/RemoteCall.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -40,7 +40,7 @@ namespace Network {
 		virtual			~IRemoteCallHandler( void ) {}
 
 		//! Packet handler callback.
-		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCall& packet ) = 0;
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) = 0;
 	};
 
 	//! Remote call response object.
@@ -91,14 +91,14 @@ namespace Network {
 		typedef Response<R> ResponseType;
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,ResponseType&,const T&)> Callback;
+		typedef cClosure<void(ConnectionWPtr,ResponseType&,const T&)> Callback;
 
 						//! Constructs RemoteCallHandler instance.
 						RemoteCallHandler( const Callback& callback )
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCall& packet );
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -108,12 +108,10 @@ namespace Network {
 
 	// ** RemoteCallHandler::handle
 	template<typename T, typename R>
-	inline bool RemoteCallHandler<T, R>::handle( ConnectionPtr& connection, const packets::RemoteCall& packet )
+	inline void RemoteCallHandler<T, R>::handle( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 	{
 		ResponseType response( connection, packet.id );
-		bool result = m_callback( connection, response, Io::BinarySerializer::read<T>( packet.payload ) );
-		DC_BREAK_IF( !response.wasSent(), "failed to send the response" );
-		return result;
+		m_callback( connection, response, Io::BinarySerializer::read<T>( packet.payload ) );
 	}
 
 	//! Remote response handler interface.
@@ -122,7 +120,7 @@ namespace Network {
 
 		virtual			~IRemoteResponseHandler( void ) {}
 
-		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCallResponse& packet ) = 0;
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) = 0;
 	};
 
 	//! Template class that handles a RemoteCallResponse packet and invokes a local procedure.
@@ -131,14 +129,14 @@ namespace Network {
 	public:
 
 		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionPtr&,const Error&,const T&)> Callback;
+		typedef cClosure<bool(ConnectionWPtr,const Error&,const T&)> Callback;
 
 						//! Constructs RemoteResponseHandler instance.
 						RemoteResponseHandler( const Callback& callback )
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool	handle( ConnectionPtr& connection, const packets::RemoteCallResponse& packet );
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) DC_DECL_OVERRIDE;
 
 	private:
 
@@ -148,9 +146,9 @@ namespace Network {
 
 	// ** RemoteResponseHandler::handle
 	template<typename T>
-	inline bool RemoteResponseHandler<T>::handle( ConnectionPtr& connection, const packets::RemoteCallResponse& packet )
+	inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
 	{
-		return m_callback( connection, packet.error, Io::BinarySerializer::read<T>( packet.payload ) );
+		m_callback( connection, packet.error, Io::BinarySerializer::read<T>( packet.payload ) );
 	}
 
 } // namespace Network

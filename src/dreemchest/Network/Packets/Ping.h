@@ -24,59 +24,50 @@
 
  **************************************************************************/
 
-#ifndef __DC_Network_ClientHandler_H__
-#define __DC_Network_ClientHandler_H__
+#ifndef __DC_Network_Packet_Ping_H__
+#define __DC_Network_Packet_Ping_H__
 
-#include "NetworkHandler.h"
-#include "../Sockets/TCPSocket.h"
+#include "PacketHandler.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-    // ** class ClientHandler
-    class ClientHandler : public NetworkHandler {
-	friend class ClientSocketDelegate;
-    public:
+namespace Packets {
 
-		//! ConnectionClosed event is emitted when a connection was closed.
-		struct ConnectionClosed {
-		};
+	//! Keep alive packet.
+	struct KeepAlive : public Packet<KeepAlive> {
+	};
 
-		virtual					~ClientHandler( void );
+	//! Latency test & time sync packet
+	struct Ping : public Packet<Ping> {
+						//! Constructs a Ping instance.
+						Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
+							: iterations( iterations ), timestamp( timestamp ), time( time ) {}
 
-		//! Return current connection.
-		const ConnectionPtr&	connection( void ) const;
-		ConnectionPtr&			connection( void );
+		u8				iterations;		//!< Current iteration number.
+		u32				timestamp;		//!< A timestamp value when the packet was sent.
+		u32				time;			//!< Current connection time in milliseconds
 
-		//! Creates a new NetworkClientHandler instance and connects to server.
-		static ClientHandlerPtr	create( const Address& address, u16 port );
+        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        {
+            stream->write( &iterations, sizeof( iterations ) );
+            stream->write( &timestamp, sizeof( timestamp ) );
+            stream->write( &time, sizeof( time ) );
+        }
 
-		//! Does a broadcast request to detect a running servers.
-		static bool				detectServers( u16 port );
+        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        {
+            stream->read( &iterations, sizeof( iterations ) );
+            stream->read( &timestamp, sizeof( timestamp ) );
+            stream->read( &time, sizeof( time ) );        
+        }
+	};
 
-        // ** NetworkHandler
-        virtual void			update( u32 dt );
-		virtual ConnectionList	eventListeners( void ) const;
+} // namespace Packets
 
-	protected:
-
-								//! Constructs ClientHandler instance.
-								ClientHandler( TCPSocketPtr socket );
-
-		//! Handles the socket closed event.
-		void			        handleSocketClosed( const TCPSocket::Closed& e );
-
-		//! Handles the socket data event.
-		void			        handleSocketData( const TCPSocket::Data& e );
-
-	private:
-
-		ConnectionPtr			m_connection;	//!< Client connection.
-    };
-    
 } // namespace Network
-    
+
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_NetworkClientHandler_H__	*/
+#endif  /*  __DC_Network_Packet_Ping_H__ */

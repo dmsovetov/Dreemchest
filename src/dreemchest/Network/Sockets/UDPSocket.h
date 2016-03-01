@@ -55,12 +55,12 @@ namespace Network {
         //! This event is emitted when packet was received.
         struct Data {
                                 //! Constructs Data instance.
-                                Data( UDPSocketWPtr sender, const Address& address, SocketDataWPtr data )
+                                Data( UDPSocketWPtr sender, const Address& address, Io::ByteBufferWPtr data )
                                     : sender( sender ), address( address ), data( data ) {}
 
             UDPSocketWPtr       sender;     //!< Socket instance that received packet.
             Address             address;    //!< Sender remote address.
-            SocketDataWPtr      data;       //!< Received data.
+            Io::ByteBufferWPtr  data;       //!< Received data.
         };
 
     private:

@@ -27,17 +27,16 @@
 #ifndef __Network_Connection_H__
 #define __Network_Connection_H__
 
+#include "../Connection/ConnectionTCP.h"
 #include "RemoteCallHandler.h"
-#include "Packets.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
 	//! Remote connection interface.
-	class Connection : public RefCounted {
-	//EmbedUserData
-	friend class NetworkHandler;
+	class Connection : public ConnectionTCP {
+	friend class Application;
 	public:
 
 		//! A helper struct to track the traffic in kbps.
@@ -49,33 +48,11 @@ namespace Network {
 			u32					m_lastReceivedBytes;	//!< Total received bytes when the tacking was update.
 		};
 
-		//! Returns parent network handler.
-		NetworkHandler*			networkHandler( void ) const;
-
-		//! Returns the total amount of bytes received.
-		u32						totalBytesReceived( void ) const;
-
-		//! Returns the total amount of bytes sent.
-		u32						totalBytesSent( void ) const;
-
-		//! Returns current time.
-		u32						time( void ) const;
-
-		//! Returns the round trip time.
-		u32						roundTripTime( void ) const;
-
-		//! Returns the time to live for this connection.
-		s32						timeToLive( void ) const;
+		//! Returns parent network application instance.
+		Application*			application( void ) const;
 
 		//! Returns the traffic counter.
 		const Traffic&			traffic( void ) const;
-
-		//! Returns a connection TCP socket.
-		const  TCPSocketPtr&	socket( void ) const;
-		TCPSocketPtr&			socket( void );
-
-		//! Returns a remote address of a connection.
-		const Address&	address( void ) const;
 
 		//! Invokes a remote procedure.
 		template<typename TRemoteProcedure>
@@ -89,40 +66,16 @@ namespace Network {
 		template<typename TEvent>
 		void					emit( const TEvent& e );
 
-		//! Sends a packet over this connection.
-		void					send( NetworkPacket* packet );
-
-	#ifndef DC_CPP11_DISABLED
-		//! Generic method to construct and sent the network packet over this connection.
-		template<typename TPacket, typename ... Args>
-		void					send( const Args& ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
-
 	private:
 
 								//! Constructs Connection instance.
-								Connection( NetworkHandler* networkHandler, const TCPSocketPtr& socket );
+								Connection( Application* application, const TCPSocketPtr& socket );
 
 		//! Updates this connection
 		void					update( u32 dt );
 
-		//! Sets the round trip time for this connection.
-		void					setRoundTripTime( u32 value );
-
-		//! Sets current time.
-		void					setTime( u32 value );
-
-		//! Sets the time to live for this connection.
-		void					setTimeToLive( s32 value );
-
-		//! Sets the keep-alive timestamp.
-		void					setKeepAliveTimestamp( u32 value );
-
-		//! Returns the keep-alive timestamp.
-		u32						keepAliveTimestamp( void ) const;
-
 		//! Handles a recieved remote call response.
-		bool					handleResponse( const packets::RemoteCallResponse& packet );
+		void					handleResponse( const Packets::RemoteCallResponse& packet );
 
 	private:
 
@@ -141,34 +94,13 @@ namespace Network {
 		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
 
 		//! Parent network connection.
-		NetworkHandler*			m_networkHandler;
-
-		//! Connection TCP socket.
-		TCPSocketPtr			m_socket;
+		Application*			m_application;
 
 		//! A list of pending remote calls.
 		PendingRemoteCalls		m_pendingRemoteCalls;
 
 		//! Next remote call response id.
 		u16						m_nextRemoteCallId;
-
-		//! The total amount of bytes received.
-		u32						m_totalBytesReceived;
-
-		//! The total amount of bytes sent.
-		u32						m_totalBytesSent;
-
-		//! Current connection time.
-		u32						m_time;
-
-		//! Current round trip time.
-		u32						m_roundTripTime;
-
-		//! Time to live.
-		s32						m_timeToLive;
-
-		//! Last keep-alive timestamp.
-		u32						m_keepAliveTimestamp;
 
 		//! Traffic counter.
 		Traffic					m_traffic;
@@ -182,7 +114,7 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
 
 		// ** Send an RPC request
-		send<packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
+		send<Packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
 	}
 
 	// ** Connection::invoke
@@ -196,7 +128,7 @@ namespace Network {
 		u16     remoteCallId = m_nextRemoteCallId++;
         TypeId  returnTypeId = TypeInfo<typename TRemoteProcedure::Response>::id();
         
-		send<packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
+		send<Packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
 		
 		// ** Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( TRemoteProcedure::name(), DC_NEW RemoteResponseHandler<typename TRemoteProcedure::Response>( callback ) );
@@ -210,18 +142,8 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
 
 		// ** Send the packet
-		send<packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
+		send<Packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
-
-#ifndef DC_CPP11_DISABLED
-	//! Generic method to construct and sent the network packet over this connection.
-	template<typename TPacket, typename ... Args>
-	void Connection::send( const Args& ... args )
-	{
-		TPacket packet( args... );
-		send( &packet );
-	}
-#endif	/*	!DC_CPP11_DISABLED	*/
 
 	//! Send a response to caller.
 	template<typename T>
@@ -231,14 +153,13 @@ namespace Network {
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
 
 		// ** Send an RPC response packet.
-		m_connection->send<packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
+		m_connection->send<Packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
 
 		// ** Mark this response as sent.
 		m_wasSent = true;
 
 		return true;
 	}
-
 }
 
 DC_END_DREEMCHEST

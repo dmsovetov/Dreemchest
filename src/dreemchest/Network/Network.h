@@ -35,6 +35,7 @@
 #include "../io/serialization/BinarySerializer.h"
 #include "../io/serialization/Serializable.h"
 #include "../io/serialization/Serializer.h"
+#include "../Io/KeyValue.h"
 
 #if defined( DC_PLATFORM_WINDOWS )
     #define     _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -67,25 +68,36 @@ namespace Network {
 	class UDPSocket;
 	class TCPSocketListener;
 	class SocketDescriptor;
-
 	class Connection;
-	class NetworkHandler;
-		class ServerHandler;
-		class ClientHandler;
 
-	dcDeclarePtrs( ClientHandler )
+    namespace Packets {
 
-	//! Alias Io::Serializable as NetworkPacket
-	typedef Io::Serializable NetworkPacket;
+        struct Ping;
+        struct RemoteCall;
+        struct RemoteCallResponse;
+
+    } // namespace Packets
 
     //! Declare smart pointer types.
+	dcDeclarePtrs( Application )
+    dcDeclarePtrs( ApplicationTCP )
     dcDeclarePtrs( TCPSocket )
     dcDeclarePtrs( UDPSocket )
     dcDeclarePtrs( TCPSocketListener )
-	dcDeclarePtrs( NetworkHandler )
-	dcDeclarePtrs( ServerHandler )
     dcDeclarePtrs( Connection )
-    dcDeclareNamedPtrs( Io::ByteBuffer, SocketData )
+    dcDeclarePtrs( Connection_ )
+
+    //! Unique packet identifier type.
+    typedef TypeId PacketTypeId;
+
+    //! Network packet unique pointer.
+    typedef AutoPtr<class AbstractPacket> PacketUPtr;
+
+    //! Command unique pointer.
+    typedef AutoPtr<class AbstractCommand> CommandUPtr;
+
+	//! Connection middleware unique pointer.
+	typedef AutoPtr<class ConnectionMiddleware> ConnectionMiddlewareUPtr;
 
 	//! Socket list type.
 	typedef List<TCPSocketPtr> TCPSocketList;
@@ -243,11 +255,6 @@ namespace Network {
 	struct ReplicatedEvent : public Io::SerializableT<T> {
 	};
 
-	//! Base class for all network packets.
-	template<typename T>
-	struct Packet : public Io::SerializableT<T> {
-	};
-
 	//! Remote call error response.
 	struct Error : public Io::SerializableT<Error> {
 		//! Error codes
@@ -286,11 +293,12 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
 	#include "NetworkHandler/Connection.h"
-	#include "NetworkHandler/ServerHandler.h"
-	#include "NetworkHandler/ClientHandler.h"
+    #include "NetworkHandler/ApplicationTCP.h"
 	#include "Sockets/TCPSocketListener.h"
 	#include "Sockets/TCPSocket.h"
 	#include "Sockets/UDPSocket.h"
+    #include "Packets/PacketHandler.h"
+    #include "Packets/Ping.h"
 #endif
 
 #endif	/*	!__DC_Network_H__	*/

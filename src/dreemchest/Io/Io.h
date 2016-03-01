@@ -68,14 +68,12 @@ namespace Io {
 		SeekEnd         //!< Seek from the end of a stream.
 	};
 
-    //! Stream ptr type.
-    typedef StrongPtr<Stream>       StreamPtr;
+
+    dcDeclarePtrs( Stream );
+    dcDeclarePtrs( ByteBuffer )
 
     //! File stream ptr type.
     typedef StrongPtr<FileStream>   FileStreamPtr;
-
-    //! Byte buffer ptr type.
-    typedef StrongPtr<ByteBuffer>   ByteBufferPtr;
 
     //! Archive ptr type.
     typedef StrongPtr<Archive>      ArchivePtr;
