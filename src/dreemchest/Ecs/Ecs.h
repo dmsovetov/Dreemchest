@@ -65,8 +65,14 @@ namespace Ecs {
 	//! Container type to store the list of entities.
 	typedef List<EntityPtr> EntityList;
 
+    //! Container type to store a list of weak pointers to entities.
+    typedef List<EntityWPtr> EntityWeakList;
+
     //! Container type to store an array of entities.
     typedef Array<EntityPtr> EntityArray;
+
+    //! Container type to store an array of weak pointers to entities.
+    typedef Array<EntityWPtr> EntityWeakArray;
 
     //! Converts container of archetypes to an array of entities.
     template<typename TContainer>
