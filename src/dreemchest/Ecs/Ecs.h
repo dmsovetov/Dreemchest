@@ -203,7 +203,7 @@ namespace Ecs {
 		EntitySet		findByAspect( const Aspect& aspect ) const;
 
 		//! Rebuild all system indices.
-		void			rebuildSystems( void );
+		void			rebuildIndices( void );
 
         //! Rebuild indices for changed entitites.
         void            rebuildChangedEntities( void );
@@ -253,6 +253,9 @@ namespace Ecs {
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );
 
+        //! Rebuilds the specified index.
+        void            rebuildIndex( IndexWPtr index );
+
 		//! Generates the unique entity id.
 		EntityId		generateId( void ) const;
 
@@ -267,6 +270,9 @@ namespace Ecs {
 		//! Container type to store entity indices.
 		typedef Map<Aspect, IndexPtr>		Indices;
 
+        //! Container type to store modified indices.
+        typedef Set<IndexWPtr>              IndexSet;
+
 		//! Data factory type.
 		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
 
@@ -278,8 +284,9 @@ namespace Ecs {
 		SystemGroups					m_systems;	//!< All systems reside in system groups.
 		Indices							m_indices;	//!< All entity indices are cached here.
 
-		EntitySet						m_changed;	//!< Entities that was changed.
-		EntitySet						m_removed;	//!< Entities that will be removed.
+		EntitySet						m_changed;	        //!< Entities that was changed.
+		EntitySet						m_removed;	        //!< Entities that will be removed.
+        IndexSet                        m_changedIndices;   //!< Indices that were changed.
 
 		ComponentFactory				m_componentFactory;		//!< Component object factory.
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.

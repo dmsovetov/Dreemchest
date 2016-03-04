@@ -330,7 +330,7 @@ namespace Scene {
 	WeakPtr<TSystem> Scene::addSystem( Args ... args )
 	{
 		WeakPtr<TSystem> system = m_updateSystems->add<TSystem>( args... );
-		m_ecs->rebuildSystems();
+		m_ecs->rebuildIndices();
 		return system;
 	}
 
@@ -346,7 +346,7 @@ namespace Scene {
 	void Scene::addRenderingSystem( void )
 	{
 		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
-		m_ecs->rebuildSystems();
+		m_ecs->rebuildIndices();
 	}
 
 	// ** Scene::createArchetype
