@@ -88,6 +88,26 @@ void Ecs::addEntity( EntityPtr entity )
 	m_changed.insert( entity );
 }
 
+// ** Ecs::addEntities
+s32 Ecs::addEntities( const EntityArray& entities )
+{
+    s32 addedCount = 0;
+
+    for( s32 i = 0, n = static_cast<s32>( entities.size() ); i < n; i++ ) {
+        DC_BREAK_IF( !entities[i].valid(), "invalid entity" );
+
+        // Don't add the same entity twice
+        if( isUsedId( entities[i]->id() ) ) {
+            continue;
+        }
+
+        addedCount++;
+        addEntity( entities[i] );
+    }
+
+    return addedCount;
+}
+
 // ** Ecs::createArchetypeByName
 ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data ) const
 {

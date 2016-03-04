@@ -223,6 +223,9 @@ namespace Ecs {
 		//! Adds a new entity.
 		void			addEntity( EntityPtr entity );
 
+        //! Adds an array of entities, returns the total number of entities that were added.
+        s32             addEntities( const EntityArray& entities );
+
 		//! Returns true if an entity with specified id exists.
 		bool			isUsedId( const EntityId& id ) const;
 
