@@ -41,6 +41,7 @@ namespace Network {
 
 // ** Application::Application
 Application::Application( void )
+    : m_nextConnectionId( 1 )
 {
     DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
@@ -61,7 +62,10 @@ ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
     connection->subscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 	connection->subscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
-    LogVerbose( "connection", "connection accepted %s (%d active connections)\n", connection->address().toString(), m_connections.size() );
+    // Assigned the connection id
+    connection->setId( m_nextConnectionId++ );
+
+    LogVerbose( "connection", "connection #%d accepted from %s (%d active connections)\n", connection->id(), connection->address().toString(), m_connections.size() );
 
 	return connection;
 }
@@ -69,7 +73,7 @@ ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 // ** Application::removeConnection
 void Application::removeConnection( ConnectionWPtr connection )
 {
-    LogVerbose( "connection", "connection closed %s (%d active connections)\n", connection->address().toString(), m_connections.size() - 1 );
+    LogVerbose( "connection", "connection #%d closed (%d active connections)\n", connection->id(), m_connections.size() - 1 );
 
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );

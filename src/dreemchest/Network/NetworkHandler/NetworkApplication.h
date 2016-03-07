@@ -154,6 +154,7 @@ namespace Network {
         PacketFactory           m_packetFactory;        //!< Packet factory.
         PacketHandlers          m_packetHandlers;       //!< Registered packet handlers.
 		ConnectionSet			m_connections;			//!< Active connections.
+        u32                     m_nextConnectionId;     //!< The next id that will be assigned to a connection.
 	};
 
 	// ** Application::registerEvent
