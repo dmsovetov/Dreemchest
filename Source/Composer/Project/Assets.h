@@ -70,6 +70,9 @@ DC_BEGIN_COMPOSER
         //! Creates an asset instance with specified asset type and id.
         Assets::Handle              createAsset( Assets::Type type, const Assets::AssetId& id );
 
+        //! Updates all assets when timer event is triggered.
+        virtual void                timerEvent( QTimerEvent* e ) Q_DECL_OVERRIDE;
+
     private slots:
 
         //! Adds an asset to cache.

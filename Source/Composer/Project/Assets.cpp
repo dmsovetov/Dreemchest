@@ -36,6 +36,9 @@ DC_BEGIN_COMPOSER
 // ** AssetManager::AssetManager
 AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem ) : QObject( parent ), m_path( path ), m_assetFileSystem( assetFileSystem )
 {
+    // Start asset update timer
+    startTimer( 16 );
+
     // Set the randomization seed to generate asset identifiers
     srand( time( NULL ) );
 
@@ -231,6 +234,12 @@ Io::Path AssetManager::cacheFolderFromUuid( const String& uuid ) const
 {
 	String folder = String() + uuid[0] + uuid[1];
 	return m_path + folder;
+}
+
+// ** AssetManager::timerEvent
+void AssetManager::timerEvent( QTimerEvent* e )
+{
+    m_assets.update( 1.0f / 60.0f );
 }
 
 DC_END_COMPOSER
