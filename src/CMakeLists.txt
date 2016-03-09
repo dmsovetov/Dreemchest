@@ -11,6 +11,7 @@ project(Dreemchest)
 # Add multicore build flag when generating for MSVC
 if (MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif (MSVC)
 
 # Available options
@@ -104,3 +105,9 @@ if (DC_COMPOSER_ENABLED)
 	
 	add_subdirectory(Composer)
 endif (DC_COMPOSER_ENABLED)
+
+# Add solution folders
+set_property(TARGET Composer PROPERTY FOLDER "Core")
+set_property(TARGET Dreemchest PROPERTY FOLDER "Core")
+set_property(TARGET Nimble PROPERTY FOLDER "Externals")
+set_property(TARGET Relight PROPERTY FOLDER "Externals")
