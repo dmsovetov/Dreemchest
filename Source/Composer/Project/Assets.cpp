@@ -44,7 +44,7 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
 
 	// Create an asset bundle
 	//m_bundle = Scene::AssetBundle::create( "Assets", path );
-    qWarning() << "Assets::Assets : no assets path set.";
+    LogWarning( "assets", "no assets path set\n" );
 
 	// Declare asset importers.
 #ifdef HAVE_TIFF
@@ -117,7 +117,7 @@ Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 // ** AssetManager::createAsset
 Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
 {
-    // Create asset format by extension
+    // Create asset source by extension
     Assets::AbstractFileSource* source = m_assetFormats.construct( type );
 
     // Set the source file name
@@ -128,6 +128,9 @@ Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::Asset
     // Create asset instance
     Assets::Handle asset = m_assets.addAsset( type, id, source );
     DC_BREAK_IF( !asset.isValid() );
+
+    // Register this asset file source
+    m_files[id] = source;
 
     return asset;
 }
@@ -148,8 +151,14 @@ Assets::Type AssetManager::assetTypeFromExtension( const String& extension ) con
 // ** AssetManager::removeAssetFromCache
 void AssetManager::removeAssetFromCache( const QString& uuid, const FileInfo& file )
 {
+    // Construct an asset id
+    Assets::AssetId assetId = uuid.toStdString();
+
+    // Remove asset file source
+    m_files.erase( assetId );
+
 	// Remove asset from bundle
-	m_assets.removeAsset( uuid.toStdString() );
+	m_assets.removeAsset( assetId );
 
 	// Remove asset from cache
     qComposer->fileSystem()->removeFile( cacheFileFromUuid( uuid.toStdString() ).c_str() );
@@ -169,25 +178,30 @@ bool AssetManager::updateAssetCache( const QString& uuid, const FileInfo& file )
     FileSystemQPtr fs = qComposer->fileSystem();
 
 	// Create the Assets folder
-	Io::Path AssetsFolderPath = cacheFolderFromUuid( uuid.toStdString() );
+	Io::Path assetsFolderPath = cacheFolderFromUuid( uuid.toStdString() );
 
-	if( !fs->fileExists( AssetsFolderPath.c_str() ) ) {
-		fs->createDirectory( AssetsFolderPath.c_str() );
+	if( !fs->fileExists( assetsFolderPath.c_str() ) ) {
+		fs->createDirectory( assetsFolderPath.c_str() );
 	}
 
-	// Get Assets file path
-	Io::Path AssetsFilePath = cacheFileFromUuid( uuid.toStdString() );
+	// Get assets file path
+	Io::Path assetsFilePath = cacheFileFromUuid( uuid.toStdString() );
 
-	// Don't Assets twice
-	if( fs->fileExists( AssetsFilePath.c_str() ) ) {
-		return true;
+	// Don't cache assets twice
+	if( fs->fileExists( assetsFilePath.c_str() ) ) {
+    //    LogDebug( "assets", "%s is already cached\n", file.fileName().c_str() );
+	//	return true;
 	}
 
 	// Perform asset caching.
-	bool result = importer->import( fs, file.absolutePath(), AssetsFilePath );
+	bool result = importer->import( fs, file.absolutePath(), assetsFilePath );
 	DC_BREAK_IF( !result );
 
-	qDebug() << "Cached" << file.fileName().c_str();
+    // Update the asset source timestamp
+    AssetFiles::iterator i = m_files.find( uuid.toStdString() );
+    i->second->setLastModified( Time::current() );
+
+    LogDebug( "assets", "%s cached\n", file.fileName().c_str() );
 
 	return result;
 }
@@ -220,7 +234,7 @@ void AssetManager::addAssetFile( const FileInfo& fileInfo )
 	updateAssetCache( QString::fromStdString( asset->uniqueId() ), fileInfo );
 
 	// Write message to a console
-	qDebug() << "Added" << asset->name().c_str();
+    LogDebug( "assets", "added %s\n", asset->name().c_str() );
 }
 
 // ** AssetManager::cacheFolderFromUuid
