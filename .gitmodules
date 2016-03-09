@@ -1,0 +1,6 @@
+[submodule "Source/Nimble"]
+	path = Source/Nimble
+	url = https://github.com/dmsovetov/Nimble.git
+[submodule "Source/Relight"]
+	path = Source/Relight
+	url = https://github.com/dmsovetov/Relight.git
