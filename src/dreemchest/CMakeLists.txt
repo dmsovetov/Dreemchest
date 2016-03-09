@@ -100,6 +100,20 @@ if (DC_SOUND_ENABLED)
 	set (SOUND_SRCS ${SOUND_SRCS} ${SOUND_DRIVERS_SRCS} ${SOUND_DECODERS_SRCS} ${SOUND_OPENAL_SRCS})
 endif (DC_SOUND_ENABLED)
 
+# Setup the PCH
+if (DC_USE_PCH)
+	if (MSVC)
+		set_source_files_properties(Dreemchest.cpp
+			PROPERTIES
+			COMPILE_FLAGS "/YcDreemchest.h"
+			)
+			
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIDreemchest.h")
+	else()
+		message(FATAL_ERROR "Precompiled headers are supported only for MSVC")
+	endif()
+endif()
+
 # Add the Dreemchest static library
 add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${MVVM_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS} ${ASSETS_SRCS})
 

@@ -9,6 +9,11 @@ macro(add_directories PATH SRC_FILES)
 		source_group("${SRC_GROUP}" FILES ${FILENAME})
 	endforeach(FILENAME)
 	
+	# Enable precompiled headers
+	if (DC_USE_PCH)
+		enabled_precompiled_headers(${PATH})
+	endif()
+	
 	set(${SRC_FILES} ${TMP_FILES})
 endmacro(add_directories)
 
@@ -23,5 +28,21 @@ macro(add_files PATH SRC_FILES)
 		source_group("${SRC_GROUP}" FILES ${FILENAME})
 	endforeach(FILENAME)
 	
+	# Enable precompiled headers
+	if (DC_USE_PCH)
+		enabled_precompiled_headers(${PATH})
+	endif()
+	
 	set(${SRC_FILES} ${TMP_FILES})
 endmacro(add_files)
+
+macro(enabled_precompiled_headers PATH)
+	file(GLOB_RECURSE SOURCE_FILES ${PATH}/*.cpp)
+	foreach( SRC_FILE ${SOURCE_FILES} )
+		set_source_files_properties(
+			${SRC_FILE}
+			PROPERTIES
+			COMPILE_FLAGS "/YuDreemchest.h"
+			)
+	endforeach()
+endmacro(enabled_precompiled_headers)
