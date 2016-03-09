@@ -92,22 +92,20 @@ Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
     Assets::Handle asset = createAsset( type, Guid::generate().toString() );
 
     // Set meta file
-    m_assetFileSystem->setMetaData( fileInfo, Io::KeyValue::object() << "uuid" << asset->uniqueId() << "type" << type.toString() );
+    m_assetFileSystem->setMetaData( fileInfo, KvBuilder() << "uuid" << asset->uniqueId() << "type" << type.toString() );
 
     return asset;
 }
 
 // ** AssetManager::parseAssetFromData
-Assets::Handle AssetManager::parseAssetFromData( const Io::KeyValue& kv )
+Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 {
-	DC_BREAK_IF( !kv.isObject() );
-
 	// Get asset type by name.
-	Assets::Type type = Assets::Type::fromString( kv.get( "type", "" ).asString() );
+	Assets::Type type = Assets::Type::fromString( kv.get<String>( "type" ) );
     DC_BREAK_IF( !type.isValid() );
 
     // Read the unique asset identifier.
-    Assets::AssetId uid = kv.get( "uuid" ).asString();
+    Assets::AssetId uid = kv.get<String>( "uuid" );
 
     // Create an asset
     return createAsset( type, uid );
@@ -202,7 +200,7 @@ void AssetManager::addAssetFile( const FileInfo& fileInfo )
 
 	// Create asset from data or create the new one
     if( meta.isValid() ) {
-        asset = parseAssetFromData( meta );
+        asset = parseAssetFromData( meta.as<KeyValue>() );
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}

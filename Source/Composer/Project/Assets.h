@@ -65,7 +65,7 @@ DC_BEGIN_COMPOSER
 		Assets::Handle			    createAssetForFile( const FileInfo& fileInfo );
 
         //! Parses an asset from a meta data.
-        Assets::Handle              parseAssetFromData( const Io::KeyValue& kv );
+        Assets::Handle              parseAssetFromData( const KeyValue& kv );
 
         //! Creates an asset instance with specified asset type and id.
         Assets::Handle              createAsset( Assets::Type type, const Assets::AssetId& id );
