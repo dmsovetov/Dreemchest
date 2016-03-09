@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+#if 0
+
 // ** Variant::Variant
 Variant::Variant( const Type& type, const void* copy ) : m_type( type )
 {
@@ -96,6 +98,8 @@ void* Variant::pointer( void )
     
     return m_value;
 }
+
+#endif
 
 } // namespace Introspection
 

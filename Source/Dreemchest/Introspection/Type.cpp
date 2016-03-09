@@ -26,6 +26,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+#if 0
+
 // ** TypeCast::s_typeCasts
 TypeCast::RegisteredTypeCasts TypeCast::s_typeCasts;
 
@@ -81,6 +83,8 @@ void Type::construct( void* instance, const void* copy ) const
     DC_BREAK_IF( !m_constructor );
     m_constructor( instance, copy );
 }
+
+#endif
 
 } // namespace Introspection
 

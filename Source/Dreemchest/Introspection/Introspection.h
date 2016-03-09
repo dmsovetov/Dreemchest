@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+    NIMBLE_LOGGER_TAG( Intr )
+
     class Property;
 
     typedef void* Instance; //!< Instance is just a void pointer.

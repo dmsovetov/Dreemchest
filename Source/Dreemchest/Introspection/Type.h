@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+#if 0
+
     //! Introspection data type.
     class Type {
     public:
@@ -113,6 +115,8 @@ namespace Introspection {
     {
         return *this == fromValue<TValue>();
     }
+
+#endif
 
 } // namespace Introspection
 

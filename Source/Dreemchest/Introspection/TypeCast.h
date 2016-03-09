@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+#if 0
+
     //! This class interface is used by Variant to cast values.
     class TypeCast {
     public:
@@ -168,6 +170,8 @@ namespace Introspection {
     {
         *reinterpret_cast<TOutput*>( output ) = static_cast<TOutput>( *reinterpret_cast<const TInput*>( input ) );
     }
+
+#endif
 
 } // namespace Introspection
 
