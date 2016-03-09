@@ -122,7 +122,7 @@ namespace Assets {
         //! Performs an asset data construction from an asset.
         virtual bool    constructFromAsset( const TSource& source, Assets& assets, TAsset& asset ) = 0;
 
-    private:
+    protected:
 
         AssetHandle     m_asset;
     };
@@ -147,7 +147,7 @@ namespace Assets {
     template<typename TAsset, typename TSource>
     u32 AssetSource<TAsset, TSource>::lastModified( void ) const
     {
-        return m_asset.lastModified();
+        return m_asset.asset().lastModified();
     }
 
 } // namespace Assets
