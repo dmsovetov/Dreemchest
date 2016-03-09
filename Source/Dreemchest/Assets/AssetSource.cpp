@@ -33,6 +33,12 @@ namespace Assets {
 
 // ------------------------------------------ AbstractFileSource ------------------------------------------ //
 
+// ** AbstractFileSource::AbstractFileSource
+AbstractFileSource::AbstractFileSource( void )
+    : m_lastModified( 0 )
+{
+}
+
 // ** AbstractFileSource::parse
 bool AbstractFileSource::parse( Assets& assets, Handle asset )
 {
@@ -44,6 +50,18 @@ bool AbstractFileSource::parse( Assets& assets, Handle asset )
 
     bool result = parseFromStream( stream, assets, asset );
     return result;
+}
+
+// ** AbstractFileSource::lastModified
+u32 AbstractFileSource::lastModified( void ) const
+{
+    return m_lastModified;
+}
+
+// ** AbstractFileSource::setLastModified
+void AbstractFileSource::setLastModified( u32 value )
+{
+    m_lastModified = value;
 }
 
 // ** AbstractFileSource::fileName

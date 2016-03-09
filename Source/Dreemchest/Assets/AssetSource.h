@@ -41,14 +41,26 @@ namespace Assets {
 
         //! Loads data to a specified asset data handle.
         virtual bool    parse( Assets& assets, Handle asset ) = 0;
+
+        //! Returns the last modification timestamp of an asset source.
+        virtual u32     lastModified( void ) const = 0;
     };
 
     //! Asset file source used for loading assets from files.
     class AbstractFileSource : public Source {
     public:
 
+                        //! Constructs AbstractFileSource instance.
+                        AbstractFileSource( void );
+
         //! Opens the file stream and loads data from it.
         virtual bool    parse( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+
+        //! Returns the last file modification time stamp.
+        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+
+        //! Sets the last file modification timestamp.
+        void            setLastModified( u32 value );
 
         //! Returns the source asset file name.
         const String&   fileName( void ) const;
@@ -63,7 +75,8 @@ namespace Assets {
 
     private:
 
-        String          m_fileName; //!< Source file name to load asset from.
+        String          m_fileName;     //!< Source file name to load asset from.
+        u32             m_lastModified; //!< Timestamp when the file was modified last time.
     };
 
     //! Generic base class for all asset file sources.
