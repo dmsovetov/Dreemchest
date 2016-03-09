@@ -100,7 +100,7 @@ void Inspector::setModel( PropertyModelQPtr value )
 			widget = new LightingComboBox;
 		}
 		else {
-			qWarning() << "Property" << name << "has unhnadled type" << type;
+            LogWarning( "inspector", "property '%s' has unhandled type '%s'\n", name.toStdString().c_str(), type.toStdString().c_str() );
 			continue;
 		}
 

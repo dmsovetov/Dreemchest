@@ -291,7 +291,7 @@ void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::
 
 	// Queue material for loading.
 	//material->bundle()->queueForLoading( material );
-    qWarning() << "SceneModel::applyMaterial : material is not queued for loading any more";
+    LogWarning( "scene", " material is not queued for loading any more\n" );
 
 	// Set mesh material
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
@@ -370,7 +370,7 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 		}
 	}
 #else
-    qWarning() << "SceneModel::placeStaticMesh : no default material set";
+    LogWarning( "scene", "no default material set for a static mesh\n" );
 #endif
 
     return sceneObject;
