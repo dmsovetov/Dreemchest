@@ -196,21 +196,12 @@ void AssetTree::itemDoubleClicked( const QModelIndex& index )
 	// Read the corresponding meta data
 	Archive data = model()->metaData( file );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	if( !data.isObject() ) {
-		return;
-	}
-
-	// Open the asset editor
-	m_project->edit( data["uuid"].asString(), file );
-#else
 	if( !data.type()->is<KeyValue>() ) {
 		return;
 	}
 
 	// Open the asset editor
 	m_project->edit( data.as<KeyValue>().get<String>( "uuid" ), file );
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetTree::mousePressEvent

@@ -103,27 +103,6 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 // ** Shape2D::serialize
 void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    KeyValue material = KeyValue::object() << "density" << m_parts[0].material.density << "friction" << m_parts[0].material.friction << "restitution" << m_parts[0].material.restitution;
-
-    switch( m_parts[0].type ) {
-    case Polygon:   {
-                        KeyValue vertices = KeyValue::array();
-
-                        for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
-                            vertices << m_parts[0].polygon.vertices[i * 2 + 0] << m_parts[0].polygon.vertices[i * 2 + 1];
-                        }
-
-                        ar = KeyValue::object() << "type" << "polygon" << "vertices" << vertices << "material" << material;
-                    }
-                    break;
-    case Circle:    {
-                        ar = KeyValue::object() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
-                    }
-                    break;
-    default:        DC_BREAK;
-    }
-#else
     KeyValue material = KvBuilder()
 							<< "density" << m_parts[0].material.density
 							<< "friction" << m_parts[0].material.friction
@@ -146,45 +125,11 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
                     break;
     default:        DC_BREAK;
     }
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Shape2D::deserialize
 void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    // Get shape type
-    const String& type = ar.get( "type", "" ).asString();
-
-    // Get material
-    KeyValue material = ar.get( "material" );
-
-    // Parse material
-    Material shapeMaterial;
-
-    if( material.isObject() ) {
-        shapeMaterial.density       = material.get( "density", 1.0f ).asFloat();
-        shapeMaterial.friction      = material.get( "friction", 0.2f ).asFloat();
-        shapeMaterial.restitution   = material.get( "restitution", 0.0f ).asFloat();
-    }
-
-    if( type == "polygon" ) {
-        const KeyValue& vertices = ar.get( "vertices" );
-        Array<Vec2>         points;
-
-        for( s32 i = 0, n = vertices.size() / 2; i < n; i++ ) {
-            points.push_back( Vec2( vertices[i * 2 + 0].asFloat(), vertices[i * 2 + 1].asFloat() ) );
-        }
-
-        addPolygon( &points[0], points.size(), shapeMaterial );
-    }
-    else if( type == "circle" ) {
-        addCircle( ar.get( "radius", 0.0f ).asFloat(), 0.0f, 0.0f, shapeMaterial );
-    }
-    else {
-        DC_NOT_IMPLEMENTED;
-    }
-#else
 	// Get the object from archive
 	KeyValue object = ar.as<KeyValue>();
 
@@ -216,7 +161,6 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
     else {
         DC_NOT_IMPLEMENTED;
     }
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //

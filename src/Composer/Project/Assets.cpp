@@ -152,11 +152,7 @@ void Assets::addAssetFile( const FileInfo& fileInfo )
 	Scene::AssetPtr asset;
 
 	// Create asset from data or create the new one
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	if( !meta.isNull() ) {
-#else
     if( meta.isValid() ) {
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
         asset = m_bundle->createAssetFromData( meta );
 	} else {
 		asset = createAssetForFile( fileInfo );

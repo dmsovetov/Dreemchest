@@ -161,14 +161,9 @@ namespace Ecs {
         StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const;
 
 		//! Creates an array of archetype instances from data.
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
-		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const KeyValue& data ) const;
-    #else
 		template<typename TArchetype>
 		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data ) const;
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
-		
+
 		//! Creates a new component instance.
 		template<typename TComponent>
 		StrongPtr<TComponent>	createComponent( const Archive* data = NULL ) const;
@@ -329,20 +324,6 @@ namespace Ecs {
     }
 
 	// ** Ecs::createArchetypes
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const KeyValue& data ) const
-	{
-		Array<StrongPtr<TArchetype>> result;
-
-		for( s32 i = 0, n = data.items().size(); i < n; i++ ) {
-			const KeyValue& item = data[i];
-			result.push_back( createArchetype<TArchetype>( item["_id"].asGuid(), &item ) );
-		}
-
-		return result;
-	}
-#else
     template<typename TArchetype>
 	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Archives& data ) const
 	{
@@ -355,8 +336,7 @@ namespace Ecs {
 
 		return result;
 	}
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
-		
+
 	// ** Ecs::createComponent
 	template<typename TComponent>
 	StrongPtr<TComponent> Ecs::createComponent( const Archive* data ) const
