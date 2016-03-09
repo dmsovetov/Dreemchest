@@ -226,19 +226,21 @@ void Rvm::flush( void )
 		}
 
 		// Set the vertex buffer
-		const RenderingContext::Renderable& renderable = m_renderingContext->renderable( cmd->mesh );
+		//const RenderingContext::Renderable& renderable = m_renderingContext->requestRenderable( cmd->mesh, 0 );
 
-		if( renderable.vertexBuffer != activeVertexBuffer ) {
-			m_hal->setVertexBuffer( renderable.vertexBuffer );
-			activeVertexBuffer = renderable.vertexBuffer.get();
-			increase( VertexBufferSwitches );
-		}
+		//if( renderable.vertexBuffer != activeVertexBuffer ) {
+		//	m_hal->setVertexBuffer( renderable.vertexBuffer );
+		//	activeVertexBuffer = renderable.vertexBuffer.get();
+		//	increase( VertexBufferSwitches );
+		//}
 
 		// Render the mesh
-		m_hal->renderIndexed( renderable.primitiveType, renderable.indexBuffer, 0, renderable.indexBuffer->size() );
-		increase( DrawIndexed );
-		increase( Triangles, renderable.indexBuffer->size() / 3 );
-		increase( Vertices, renderable.indexBuffer->size() );
+		//m_hal->renderIndexed( renderable.primitiveType, renderable.indexBuffer, 0, renderable.indexBuffer->size() );
+		//increase( DrawIndexed );
+		//increase( Triangles, renderable.indexBuffer->size() / 3 );
+		//increase( Vertices, renderable.indexBuffer->size() );
+
+        DC_NOT_IMPLEMENTED;
 	}
 
 	// Clear the command list
