@@ -108,7 +108,11 @@ if (DC_COMPOSER_ENABLED)
 endif (DC_COMPOSER_ENABLED)
 
 # Add solution folders
-set_property(TARGET Composer PROPERTY FOLDER "Core")
+if (DC_COMPOSER_ENABLED)
+	set_property(TARGET Composer PROPERTY FOLDER "Core")
+endif()
 set_property(TARGET Dreemchest PROPERTY FOLDER "Core")
 set_property(TARGET Nimble PROPERTY FOLDER "Externals")
-set_property(TARGET Relight PROPERTY FOLDER "Externals")
+if (DC_WITH_RELIGHT)
+	set_property(TARGET Relight PROPERTY FOLDER "Externals")
+endif()
