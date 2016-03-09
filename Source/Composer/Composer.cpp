@@ -93,6 +93,9 @@ const String Composer::kAssetMime = "text/uri-list";
 // ** Composer::Composer
 Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_project( NULL )
 {
+    // Setup default logger
+    Logger::setStandardLogger();
+
     // Set application name
     setApplicationName( "Dreemchest Composer" );
 
