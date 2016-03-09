@@ -201,13 +201,8 @@ void AssetManager::addAssetFile( const FileInfo& fileInfo )
 	Assets::Handle asset;
 
 	// Create asset from data or create the new one
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	if( !meta.isNull() ) {
-		asset = parseAssetFromData( meta );
-#else
     if( meta.isValid() ) {
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
-        asset = m_bundle->createAssetFromData( meta );
+        asset = parseAssetFromData( meta );
 	} else {
 		asset = createAssetForFile( fileInfo );
 	}

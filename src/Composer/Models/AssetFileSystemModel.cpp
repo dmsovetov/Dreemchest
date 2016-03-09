@@ -230,17 +230,8 @@ String AssetFileSystemModel::uuid( const FileInfo& assetFile ) const
 	// Read the meta data
 	Archive data = metaData( assetFile );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	DC_BREAK_IF( !data.isObject() );
-
-	if( !data.isObject() ) {
-		return "";
-	}
-
-	return data.get( "uuid", "" ).asString();
-#else
+    DC_BREAK_IF( !data.type()->is<KeyValue>() );
     return data.as<KeyValue>().get<String>( "uuid" );
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** AssetFileSystemModel::hasMetaData
@@ -281,11 +272,7 @@ Archive AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
 	QFile metaFile( metaFileName( assetFile ) );
 
 	if( !metaFile.open( QFile::ReadOnly ) ) {
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
-		return Io::KeyValue::kNull;
-    #else
         return Archive();
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	QTextStream stream( &metaFile );

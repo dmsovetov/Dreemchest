@@ -152,13 +152,9 @@ namespace Ecs {
 	inline void ComponentBase::read( const Io::Storage* storage )
 	{
 	    Archive ar;
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
-        ar.read( storage );
-    #else
 		Variant value;
         Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).read( value );
 		ar = value;
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
         SerializationContext ctx( NULL );
         deserialize( ctx, ar );
@@ -171,21 +167,13 @@ namespace Ecs {
         Archive ar;
 
         serialize( ctx, ar );
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
-	    ar.write( storage );
-    #else
         Io::BinaryVariantStream( storage->isBinaryStorage()->stream() ).write( ar );
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 	}
 
 	// ** ComponentBase::serialize
 	inline void ComponentBase::serialize( SerializationContext& ctx, Archive& ar ) const
 	{
-    #if DEV_DEPRECATED_KEYVALUE_TYPE
-        ar = KeyValue::kNull;
-    #else
         ar = Archive();
-    #endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 		LogWarning( "serialize", "not implemented for component '%s'\n", typeName() );
 	}
 

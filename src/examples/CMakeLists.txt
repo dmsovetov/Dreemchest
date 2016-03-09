@@ -40,3 +40,19 @@ endif (DC_SOUND_ENABLED)
 
 add_executable(13_Scene 13_Scene.cpp)
 target_link_libraries(13_Scene Dreemchest)
+
+# Add solution folders
+set_property(TARGET 01_HelloWorld PROPERTY FOLDER "Examples")
+set_property(TARGET 02_CreatingWindows PROPERTY FOLDER "Examples")
+set_property(TARGET 03_WindowEvents PROPERTY FOLDER "Examples")
+set_property(TARGET 04_RendererInitialization PROPERTY FOLDER "Examples")
+set_property(TARGET 05_Files PROPERTY FOLDER "Examples")
+set_property(TARGET 06_BasicNetworking PROPERTY FOLDER "Examples")
+set_property(TARGET 07_TCPSockets PROPERTY FOLDER "Examples")
+set_property(TARGET 08_NetworkHandlers PROPERTY FOLDER "Examples")
+set_property(TARGET 11_Particles PROPERTY FOLDER "Examples")
+
+if (DC_SOUND_ENABLED)
+	set_property(TARGET 12_Sound PROPERTY FOLDER "Examples")
+endif()
+set_property(TARGET 13_Scene PROPERTY FOLDER "Examples")
