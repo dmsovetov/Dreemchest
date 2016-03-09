@@ -34,27 +34,27 @@ DC_BEGIN_DREEMCHEST
 namespace Assets {
 
     //! Base class for all asset sources.
-    class Source {
+    class AbstractSource {
     public:
 
-        virtual         ~Source( void ) {}
+        virtual         ~AbstractSource( void ) {}
 
         //! Loads data to a specified asset data handle.
-        virtual bool    parse( Assets& assets, Handle asset ) = 0;
+        virtual bool    construct( Assets& assets, Handle asset ) = 0;
 
         //! Returns the last modification timestamp of an asset source.
         virtual u32     lastModified( void ) const = 0;
     };
 
     //! Asset file source used for loading assets from files.
-    class AbstractFileSource : public Source {
+    class AbstractFileSource : public AbstractSource {
     public:
 
                         //! Constructs AbstractFileSource instance.
                         AbstractFileSource( void );
 
         //! Opens the file stream and loads data from it.
-        virtual bool    parse( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
 
         //! Returns the last file modification time stamp.
         virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
@@ -71,7 +71,7 @@ namespace Assets {
     protected:
 
         //! This virtual method is used to dispatch the loading process to actual asset loading implementation.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) = 0;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) = 0;
 
     private:
 
@@ -85,20 +85,69 @@ namespace Assets {
     protected:
 
         //! Type casts an asset handle and dispatches the loading process to an implementation.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
 
         //! Performs an asset data parsing from a stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
     };
 
     // ** FileSource::parseFromStream
     template<typename TAsset>
-    bool FileSource<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
+    bool FileSource<TAsset>::constructFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
     {
-        WriteLock<TAsset> lock = asset.writeLock<TAsset>();
-        TAsset&           data = *lock;
-        bool result = parseFromStream( stream, assets, data );
+        bool result = constructFromStream( stream, assets, *asset.writeLock<TAsset>() );
         return result;
+    }
+
+    //! Generic base class for all asset sources.
+    template<typename TAsset, typename TSource>
+    class AssetSource : public AbstractSource {
+    public:
+
+        //! Alias an asset handle type.
+        typedef GenericHandle<TSource> AssetHandle;
+
+
+                        //! Constructs an AssetSource instance.
+                        AssetSource( AssetHandle asset );
+
+        //! Loads data from an asset.
+        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+
+        //! Returns the last asset modification time stamp.
+        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+
+    protected:
+
+        //! Performs an asset data construction from an asset.
+        virtual bool    constructFromAsset( const TSource& source, Assets& assets, TAsset& asset ) = 0;
+
+    private:
+
+        AssetHandle     m_asset;
+    };
+
+    // ** AssetSource::AssetSource
+    template<typename TAsset, typename TSource>
+    AssetSource<TAsset, TSource>::AssetSource( AssetHandle asset )
+        : m_asset( asset )
+    {
+    
+    }
+
+    // ** AssetSource::construct
+    template<typename TAsset, typename TSource>
+    bool AssetSource<TAsset, TSource>::construct( Assets& assets, Handle asset )
+    {
+        bool result = constructFromAsset( m_asset.readLock(), assets, *asset.writeLock<TAsset>() );
+        return result;
+    }
+
+    // ** AssetSource::lastModified
+    template<typename TAsset, typename TSource>
+    u32 AssetSource<TAsset, TSource>::lastModified( void ) const
+    {
+        return m_asset.lastModified();
     }
 
 } // namespace Assets

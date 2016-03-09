@@ -60,7 +60,7 @@ namespace Assets {
     typedef List<class Handle> AssetList;
 
     // Unique ptr for asset source.
-    typedef AutoPtr<class Source> SourceUPtr;
+    typedef AutoPtr<class AbstractSource> SourceUPtr;
 
     //! Asset class instance stores info about a single asset.
     class Asset {
@@ -94,7 +94,7 @@ namespace Assets {
         void                        setName( const String& value );
 
         //! Returns an asset source.
-        Source*                     source( void ) const;
+        AbstractSource*             source( void ) const;
 
         //! Returns asset state.
         State                       state( void ) const;

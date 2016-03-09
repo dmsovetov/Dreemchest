@@ -439,7 +439,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
     #include "Assets/Prefab.h"
-    #include "Assets/AssetFormats.h"
+    #include "Assets/AssetFileSources.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"

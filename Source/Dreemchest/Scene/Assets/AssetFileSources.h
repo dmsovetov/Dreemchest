@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_AssetFormats_H__
-#define __DC_Scene_AssetFormats_H__
+#ifndef __DC_Scene_AssetFileSources_H__
+#define __DC_Scene_AssetFileSources_H__
 
 #include "../Scene.h"
 
@@ -38,7 +38,7 @@ namespace Scene {
     protected:
 
         //! Loads image data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
     };
 
     //! Loads a mesh from a raw binary format.
@@ -46,7 +46,7 @@ namespace Scene {
     protected:
 
         //! Loads mesh data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
     };
 
     //! Loads a material from a key-value storage.
@@ -54,11 +54,11 @@ namespace Scene {
     protected:
 
         //! Loads material data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
     };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_AssetFormats_H__    */
+#endif    /*    !__DC_Scene_AssetFileSources_H__    */

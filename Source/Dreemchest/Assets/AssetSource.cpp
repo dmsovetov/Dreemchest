@@ -39,8 +39,8 @@ AbstractFileSource::AbstractFileSource( void )
 {
 }
 
-// ** AbstractFileSource::parse
-bool AbstractFileSource::parse( Assets& assets, Handle asset )
+// ** AbstractFileSource::construct
+bool AbstractFileSource::construct( Assets& assets, Handle asset )
 {
     Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 
@@ -48,7 +48,7 @@ bool AbstractFileSource::parse( Assets& assets, Handle asset )
         return false;
     }
 
-    bool result = parseFromStream( stream, assets, asset );
+    bool result = constructFromStream( stream, assets, asset );
     return result;
 }
 

@@ -83,7 +83,7 @@ void Asset::setName( const String& value )
 }
 
 // ** Asset::source
-Source* Asset::source( void ) const
+AbstractSource* Asset::source( void ) const
 {
     return m_source.get();
 }
@@ -225,11 +225,11 @@ bool Assets::loadAssetToCache( Handle asset )
     }
 
     // Get the asset format
-    Source* source = asset->source();
+    AbstractSource* source = asset->source();
     DC_ABORT_IF( source == NULL, "invalid asset source" );
 
     // Parse asset
-    bool result = source->parse( *this, asset );
+    bool result = source->construct( *this, asset );
 
     // Switch to a Loaded or Error state
     asset->switchToState( result ? Asset::Loaded : Asset::Error );
@@ -254,7 +254,7 @@ void Assets::update( f32 dt )
         }
 
         // Compare the asset source last modified timestamp with last constructed one
-        const Source* source = asset.source();
+        const AbstractSource* source = asset.source();
         DC_ABORT_IF( source == NULL, "asset has no valid asset source" );
 
         // Skip up-to-date assets
