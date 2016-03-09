@@ -42,7 +42,7 @@ macro(enabled_precompiled_headers PATH)
 		set_source_files_properties(
 			${SRC_FILE}
 			PROPERTIES
-			COMPILE_FLAGS "/YuDreemchest.h"
+			COMPILE_FLAGS "/Yu${DC_PCH_NAME}.h"
 			)
 	endforeach()
 endmacro(enabled_precompiled_headers)

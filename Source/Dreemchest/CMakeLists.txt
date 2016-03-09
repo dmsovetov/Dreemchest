@@ -1,6 +1,9 @@
 # Setup definitions
 add_definitions(-DDC_BUILD_LIBRARY)
 
+# Set the precompiled header name
+set(DC_PCH_NAME Dreemchest)
+
 # Glob all source files
 add_directories(Base BASE_SRCS)
 add_directories(Assets ASSETS_SRCS)
@@ -104,12 +107,12 @@ endif (DC_SOUND_ENABLED)
 # Setup the PCH
 if (DC_USE_PCH)
 	if (MSVC)
-		set_source_files_properties(Dreemchest.cpp
+		set_source_files_properties(${DC_PCH_NAME}.cpp
 			PROPERTIES
-			COMPILE_FLAGS "/YcDreemchest.h"
+			COMPILE_FLAGS "/Yc${DC_PCH_NAME}.h"
 			)
 			
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIDreemchest.h")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FI${DC_PCH_NAME}.h")
 	else()
 		message(FATAL_ERROR "Precompiled headers are supported only for MSVC")
 	endif()

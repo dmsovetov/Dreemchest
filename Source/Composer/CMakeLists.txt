@@ -10,6 +10,9 @@ set(CMAKE_AUTOUIC ON)
 # Automatically run rcc when needed.
 set(CMAKE_AUTORCC ON)
 
+# Set the precompiled header name
+set(DC_PCH_NAME Composer)
+
 add_directories(. SRCS)
 
 # Libraries to link with Composer
@@ -17,6 +20,7 @@ set(LIBRARIES Dreemchest)
 
 # Inject the environment options to VisualStudio user configuration
 if (MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm512")
 	set(USER_FILE ${TARGET_NAME}.vcxproj.user)
 	set(OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${USER_FILE})
 	configure_file(VisualStudio.user ${USER_FILE} @ONLY)
@@ -54,6 +58,22 @@ if (TIFF_FOUND)
 	set(LIBRARIES ${LIBRARIES} ${TIFF_LIBRARIES})
 	include_directories(${TIFF_INCLUDE_DIR})
 	add_definitions(-DHAVE_TIFF)
+endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+# Setup the PCH
+if (DC_USE_PCH)
+	if (MSVC)
+		set_source_files_properties(${DC_PCH_NAME}.cpp
+			PROPERTIES
+			COMPILE_FLAGS "/Yc${DC_PCH_NAME}.h"
+			)
+			
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FI${DC_PCH_NAME}.h")
+	else()
+		message(FATAL_ERROR "Precompiled headers are supported only for MSVC")
+	endif()
 endif()
 
 # Create the Composer executable
