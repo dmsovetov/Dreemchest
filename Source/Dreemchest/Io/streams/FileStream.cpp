@@ -138,7 +138,7 @@ void FileStream::setPosition( s32 offset, SeekOrigin origin )
     case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
     }
 
-    DC_BREAK_IF( result == 0, "fseek returned an unexpected value" );
+    DC_BREAK_IF( result != 0, "fseek returned an unexpected value" );
 }
 
 // ** FileStream::position
