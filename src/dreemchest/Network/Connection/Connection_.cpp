@@ -35,13 +35,26 @@ namespace Network {
 
 // ** Connection::Connection
 Connection_::Connection_( void )
-    : m_totalBytesReceived( 0 )
+    : m_id( 0 )
+    , m_totalBytesReceived( 0 )
     , m_totalBytesSent( 0 )
 	, m_time( 0 )
 	, m_timeout( 0 )
 	, m_roundTripTime( 0 )
 	, m_shouldClose( false )
 {
+}
+
+// ** Connection::setId
+void Connection_::setId( u32 value )
+{
+    m_id = value;
+}
+
+// ** Connection::id
+u32 Connection_::id( void ) const
+{
+    return m_id;
 }
 
 // ** Connection::closeLater
@@ -148,7 +161,7 @@ void Connection_::send( const AbstractPacket& packet )
 		return;
 	}
 
-	//LogDebug( "packet", "%s sent to %s (%d bytes)\n", packet.name(), m_socket->address().toString(), bytesSent );
+    LogDebug( "packet", "%s sent to #%d (%d bytes)\n", packet.name(), id(), bytesSent );
 
 	// Increase the sent bytes counter.
     trackSentAmount( bytesSent );

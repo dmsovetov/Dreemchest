@@ -40,6 +40,12 @@ namespace Network {
 
         virtual                 ~Connection_( void ) {}
 
+        //! Sets the connection id.
+        void                    setId( u32 value );
+
+        //! Returns the connection id.
+        u32                     id( void ) const;
+
 		//! Queues this connection for closing.
 		void					closeLater( void );
 
@@ -153,6 +159,7 @@ namespace Network {
 		//! Container type to store the list of connection middlewares.
 		typedef List<ConnectionMiddlewareUPtr> ConnectionMiddlewares;
 	
+        u32                     m_id;                   //!< Connection id.
 		s32						m_totalBytesReceived;   //!< The total amount of bytes received.
 		s32						m_totalBytesSent;       //!< The total amount of bytes sent.
 		s32						m_time;					//!< Current connection time.

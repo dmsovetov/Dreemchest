@@ -65,8 +65,14 @@ namespace Ecs {
 	//! Container type to store the list of entities.
 	typedef List<EntityPtr> EntityList;
 
+    //! Container type to store a list of weak pointers to entities.
+    typedef List<EntityWPtr> EntityWeakList;
+
     //! Container type to store an array of entities.
     typedef Array<EntityPtr> EntityArray;
+
+    //! Container type to store an array of weak pointers to entities.
+    typedef Array<EntityWPtr> EntityWeakArray;
 
     //! Converts container of archetypes to an array of entities.
     template<typename TContainer>
@@ -197,7 +203,7 @@ namespace Ecs {
 		EntitySet		findByAspect( const Aspect& aspect ) const;
 
 		//! Rebuild all system indices.
-		void			rebuildSystems( void );
+		void			rebuildIndices( void );
 
         //! Rebuild indices for changed entitites.
         void            rebuildChangedEntities( void );
@@ -216,6 +222,9 @@ namespace Ecs {
 
 		//! Adds a new entity.
 		void			addEntity( EntityPtr entity );
+
+        //! Adds an array of entities, returns the total number of entities that were added.
+        s32             addEntities( const EntityArray& entities );
 
 		//! Returns true if an entity with specified id exists.
 		bool			isUsedId( const EntityId& id ) const;
@@ -244,6 +253,9 @@ namespace Ecs {
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );
 
+        //! Rebuilds the specified index.
+        void            rebuildIndex( IndexWPtr index );
+
 		//! Generates the unique entity id.
 		EntityId		generateId( void ) const;
 
@@ -258,6 +270,9 @@ namespace Ecs {
 		//! Container type to store entity indices.
 		typedef Map<Aspect, IndexPtr>		Indices;
 
+        //! Container type to store modified indices.
+        typedef Set<IndexWPtr>              IndexSet;
+
 		//! Data factory type.
 		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
 
@@ -269,8 +284,9 @@ namespace Ecs {
 		SystemGroups					m_systems;	//!< All systems reside in system groups.
 		Indices							m_indices;	//!< All entity indices are cached here.
 
-		EntitySet						m_changed;	//!< Entities that was changed.
-		EntitySet						m_removed;	//!< Entities that will be removed.
+		EntitySet						m_changed;	        //!< Entities that was changed.
+		EntitySet						m_removed;	        //!< Entities that will be removed.
+        IndexSet                        m_changedIndices;   //!< Indices that were changed.
 
 		ComponentFactory				m_componentFactory;		//!< Component object factory.
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.

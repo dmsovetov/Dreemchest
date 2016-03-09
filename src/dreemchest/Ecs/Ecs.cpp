@@ -88,6 +88,26 @@ void Ecs::addEntity( EntityPtr entity )
 	m_changed.insert( entity );
 }
 
+// ** Ecs::addEntities
+s32 Ecs::addEntities( const EntityArray& entities )
+{
+    s32 addedCount = 0;
+
+    for( s32 i = 0, n = static_cast<s32>( entities.size() ); i < n; i++ ) {
+        DC_BREAK_IF( !entities[i].valid(), "invalid entity" );
+
+        // Don't add the same entity twice
+        if( isUsedId( entities[i]->id() ) ) {
+            continue;
+        }
+
+        addedCount++;
+        addEntity( entities[i] );
+    }
+
+    return addedCount;
+}
+
 // ** Ecs::createArchetypeByName
 ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data ) const
 {
@@ -226,14 +246,20 @@ bool Ecs::isUsedId( const EntityId& id ) const
 // ** Ecs::requestIndex
 IndexPtr Ecs::requestIndex( const String& name, const Aspect& aspect )
 {
+    // Find index by an aspect
 	Indices::iterator i = m_indices.find( aspect );
 
+    // Found - just return it
 	if( i != m_indices.end() ) {
 		return i->second;
 	}
 
+    // Create a new index instance
 	IndexPtr index( DC_NEW Index( this, name, aspect ) );
 	m_indices[aspect] = index;
+
+    // Add this index to a changed set
+    m_changedIndices.insert( index );
 
 	return index;
 }
@@ -261,15 +287,21 @@ void Ecs::notifyEntityChanged( const EntityId& id )
 	}
 }
 
-// ** Ecs::rebuildSystems
-void Ecs::rebuildSystems( void )
+// **  Ecs::rebuildIndex
+void Ecs::rebuildIndex( IndexWPtr index )
 {
-	// Process all entities
+    // Process all entities
 	for( Entities::iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
-		// Notify each index
-		for( Indices::iterator j = m_indices.begin(), jend = m_indices.end(); j != jend; j++ ) {
-			j->second->notifyEntityChanged( i->second );
-		}		
+	    index->notifyEntityChanged( i->second );
+	}
+}
+
+// ** Ecs::rebuildIndices
+void Ecs::rebuildIndices( void )
+{
+	// Rebuild each index
+	for( Indices::iterator i = m_indices.begin(), end = m_indices.end(); i != end; i++ ) {
+		rebuildIndex( i->second );
 	}
 }
 
@@ -307,8 +339,18 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 	// Process all changed entities.
     rebuildChangedEntities();
 
-	// Remove all queued entities
+	// Remove all queued entities.
     cleanupRemovedEntities();
+
+    // Rebuild all changed indices.
+    while( m_changedIndices.size() ) {
+        IndexSet changed = m_changedIndices;
+        m_changedIndices.clear();
+
+		for( IndexSet::iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
+			rebuildIndex( *i );
+		}
+    }
 
 	// Update all system groups.
 	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
