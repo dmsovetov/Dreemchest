@@ -255,13 +255,9 @@ void AssetFileSystemModel::setMetaData( const FileInfo& assetFile, const Archive
 	bool  result = metaFile.open( QFile::WriteOnly );
 	Q_ASSERT( result );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	QTextStream stream( &metaFile );
-	String json = Io::KeyValue::stringify( data );
-	stream << json.c_str();
-#else
-    DC_NOT_IMPLEMENTED;
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    QTextStream stream( &metaFile );
+    String json = Io::VariantTextStream::stringify( data );
+    stream << json.c_str();
 
 	metaFile.close();
 }
@@ -281,12 +277,7 @@ Archive AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
 
 	metaFile.close();
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	return Io::KeyValue::parse( json.toStdString() );
-#else
-    DC_NOT_IMPLEMENTED;
-    return Archive();
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    return Io::VariantTextStream::parse( json.toStdString() );
 }
 
 // ** AssetFileSystemModel::metaFileName
