@@ -58,7 +58,7 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
     // Declare default asset formats
     m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Type::fromClass<Scene::Image>() );
     m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Type::fromClass<Scene::Mesh>() );
-    m_assetFormats.declare<Scene::MaterialFormatKeyValue>( Assets::Type::fromClass<Scene::Material>() );
+    m_assetFormats.declare<Scene::MaterialSourceKeyValue>( Assets::Type::fromClass<Scene::Material>() );
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
@@ -115,15 +115,15 @@ Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
 {
     // Create asset format by extension
-    Assets::AbstractFileFormat* format = m_assetFormats.construct( type );
+    Assets::AbstractFileSource* source = m_assetFormats.construct( type );
 
     // Set the source file name
-    if( format ) {
-        format->setFileName( cacheFileFromUuid( id ).c_str() );
+    if( source ) {
+        source->setFileName( cacheFileFromUuid( id ).c_str() );
     }
 
     // Create asset instance
-    Assets::Handle asset = m_assets.addAsset( type, id, format );
+    Assets::Handle asset = m_assets.addAsset( type, id, source );
     DC_BREAK_IF( !asset.isValid() );
 
     return asset;

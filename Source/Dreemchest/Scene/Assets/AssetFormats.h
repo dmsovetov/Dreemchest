@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
     //! Loads an image from a raw pixel buffer format.
-    class ImageFormatRaw : public Assets::FileFormat<Image> {
+    class ImageFormatRaw : public Assets::FileSource<Image> {
     protected:
 
         //! Loads image data from an input stream.
@@ -42,7 +42,7 @@ namespace Scene {
     };
 
     //! Loads a mesh from a raw binary format.
-    class MeshFormatRaw : public Assets::FileFormat<Mesh> {
+    class MeshFormatRaw : public Assets::FileSource<Mesh> {
     protected:
 
         //! Loads mesh data from an input stream.
@@ -50,7 +50,7 @@ namespace Scene {
     };
 
     //! Loads a material from a key-value storage.
-    class MaterialFormatKeyValue : public Assets::FileFormat<Material> {
+    class MaterialSourceKeyValue : public Assets::FileSource<Material> {
     protected:
 
         //! Loads material data from an input stream.

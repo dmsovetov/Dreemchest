@@ -59,8 +59,8 @@ namespace Assets {
     //! List of assets.
     typedef List<class Handle> AssetList;
 
-    // Unique ptr for asset format.
-    typedef AutoPtr<class Format> FormatUPtr;
+    // Unique ptr for asset source.
+    typedef AutoPtr<class Source> SourceUPtr;
 
     //! Asset class instance stores info about a single asset.
     class Asset {
@@ -79,7 +79,7 @@ namespace Assets {
                                     Asset( void );
 
                                     //! Constructs Asset instance.
-                                    Asset( Type type, const AssetId& uniqueId, FormatUPtr format );
+                                    Asset( Type type, const AssetId& uniqueId, SourceUPtr source );
 
         //! Returns asset unique id.
         const AssetId&              uniqueId( void ) const;
@@ -93,8 +93,8 @@ namespace Assets {
         //! Sets asset name.
         void                        setName( const String& value );
 
-        //! Returns an asset format.
-        Format*                     format( void ) const;
+        //! Returns an asset source.
+        Source*                     source( void ) const;
 
         //! Returns asset state.
         State                       state( void ) const;
@@ -115,7 +115,7 @@ namespace Assets {
 
     private:
 
-        FormatUPtr                  m_format;       //!< Asset format parser used for loading.
+        SourceUPtr                  m_source;       //!< Asset source used for asset construction.
         Type                        m_type;         //!< Asset type.
         AssetId                     m_uniqueId;     //!< Unique asset id.
         String                      m_name;         //!< Asset name.
@@ -144,7 +144,7 @@ namespace Assets {
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        Handle                      addAsset( const Type& type, const AssetId& uniqueId, FormatUPtr format );
+        Handle                      addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );

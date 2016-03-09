@@ -118,10 +118,10 @@ bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& asset
 	return true;
 }
 
-// --------------------------------------- MaterialFormatKeyValue --------------------------------------- //
+// --------------------------------------- MaterialSourceKeyValue --------------------------------------- //
 
-// ** MaterialFormatKeyValue::parseFromStream
-bool MaterialFormatKeyValue::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
+// ** MaterialSourceKeyValue::parseFromStream
+bool MaterialSourceKeyValue::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
 #ifdef HAVE_JSON
 	String json;

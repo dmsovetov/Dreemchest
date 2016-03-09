@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Assets_AssetFormat_H__
-#define __DC_Assets_AssetFormat_H__
+#ifndef __DC_Assets_AssetSource_H__
+#define __DC_Assets_AssetSource_H__
 
 #include "Assets.h"
 
@@ -33,18 +33,18 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    //! Base class for all asset format parsers.
-    class Format {
+    //! Base class for all asset sources.
+    class Source {
     public:
 
-        virtual         ~Format( void ) {}
+        virtual         ~Source( void ) {}
 
         //! Loads data to a specified asset data handle.
         virtual bool    parse( Assets& assets, Handle asset ) = 0;
     };
 
-    //! Asset file format used for loading assets from files.
-    class AbstractFileFormat : public Format {
+    //! Asset file source used for loading assets from files.
+    class AbstractFileSource : public Source {
     public:
 
         //! Opens the file stream and loads data from it.
@@ -66,9 +66,9 @@ namespace Assets {
         String          m_fileName; //!< Source file name to load asset from.
     };
 
-    //! Generic base class for all asset file format parsers.
+    //! Generic base class for all asset file sources.
     template<typename TAsset>
-    class FileFormat : public AbstractFileFormat {
+    class FileSource : public AbstractFileSource {
     protected:
 
         //! Type casts an asset handle and dispatches the loading process to an implementation.
@@ -78,9 +78,9 @@ namespace Assets {
         virtual bool    parseFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
     };
 
-    // ** FileFormat::parseFromStream
+    // ** FileSource::parseFromStream
     template<typename TAsset>
-    bool FileFormat<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
+    bool FileSource<TAsset>::parseFromStream( Io::StreamPtr stream, Assets& assets, Handle asset )
     {
         WriteLock<TAsset> lock = asset.writeLock<TAsset>();
         TAsset&           data = *lock;
@@ -92,4 +92,4 @@ namespace Assets {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Assets_AssetFormat_H__    */
+#endif    /*    !__DC_Assets_AssetSource_H__    */

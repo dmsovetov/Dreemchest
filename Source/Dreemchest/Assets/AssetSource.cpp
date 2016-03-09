@@ -24,17 +24,17 @@
 
  **************************************************************************/
 
-#include "AssetFormat.h"
+#include "AssetSource.h"
 #include "AssetHandle.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ------------------------------------------ AbstractFileFormat ------------------------------------------ //
+// ------------------------------------------ AbstractFileSource ------------------------------------------ //
 
-// ** AbstractFileFormat::parse
-bool AbstractFileFormat::parse( Assets& assets, Handle asset )
+// ** AbstractFileSource::parse
+bool AbstractFileSource::parse( Assets& assets, Handle asset )
 {
     Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 
@@ -46,14 +46,14 @@ bool AbstractFileFormat::parse( Assets& assets, Handle asset )
     return result;
 }
 
-// ** AbstractFileFormat::fileName
-const String& AbstractFileFormat::fileName( void ) const
+// ** AbstractFileSource::fileName
+const String& AbstractFileSource::fileName( void ) const
 {
     return m_fileName;
 }
 
-// ** AbstractFileFormat::fileName
-void AbstractFileFormat::setFileName( const String& value )
+// ** AbstractFileSource::fileName
+void AbstractFileSource::setFileName( const String& value )
 {
     m_fileName = value;
 }

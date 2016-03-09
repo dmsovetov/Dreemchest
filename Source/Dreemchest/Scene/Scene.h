@@ -44,7 +44,7 @@
 
 #include <Assets/AssetHandle.h>
 #include <Assets/Assets.h>
-#include <Assets/AssetFormat.h>
+#include <Assets/AssetSource.h>
 
 #include <Ecs/Entity/Entity.h>
 #include <Ecs/Entity/Archetype.h>

@@ -27,7 +27,7 @@
 #include "Assets.h"
 
 #include "AssetHandle.h"
-#include "AssetFormat.h"
+#include "AssetSource.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,8 +41,8 @@ Asset::Asset( void ) : m_state( Unloaded )
 }
 
 // ** Asset::Asset
-Asset::Asset( Type type, const AssetId& uniqueId, FormatUPtr format )
-    : m_format( format ), m_type( type ), m_uniqueId( uniqueId ), m_state( Unloaded )
+Asset::Asset( Type type, const AssetId& uniqueId, SourceUPtr source )
+    : m_source( source ), m_type( type ), m_uniqueId( uniqueId ), m_state( Unloaded )
 {
 }
 
@@ -76,10 +76,10 @@ void Asset::setName( const String& value )
     m_name = value;
 }
 
-// ** Asset::format
-Format* Asset::format( void ) const
+// ** Asset::source
+Source* Asset::source( void ) const
 {
-    return m_format.get();
+    return m_source.get();
 }
 
 // ** Asset::switchToState
@@ -111,12 +111,12 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, FormatUPtr format )
+Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source )
 {
     DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
     // First reserve the slot for an asset data.
-    Index index = m_assets.add( Asset( type, uniqueId, format ) );
+    Index index = m_assets.add( Asset( type, uniqueId, source ) );
 
     // Now register unique id associated with this asset slot.
     m_indexById[uniqueId] = index;
@@ -187,11 +187,11 @@ bool Assets::loadAssetToCache( Handle asset )
     asset->setCache( reserveAssetData( asset->type() ) );
 
     // Get the asset format
-    Format* format = asset->format();
-    DC_BREAK_IF( !format );
+    Source* source = asset->source();
+    DC_ABORT_IF( source == NULL, "invalid asset source" );
 
     // Parse asset
-    bool result = format->parse( *this, asset );
+    bool result = source->parse( *this, asset );
 
     // Switch to a Loaded or Error state
     asset->switchToState( result ? Asset::Loaded : Asset::Error );
