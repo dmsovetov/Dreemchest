@@ -27,7 +27,7 @@
 #ifndef __DC_Assets_Type_H__
 #define __DC_Assets_Type_H__
 
-#include "../Dreemchest.h"
+#include "Assets.h"
 
 DC_BEGIN_DREEMCHEST
 
