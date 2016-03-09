@@ -204,6 +204,9 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
     }
 
     m_mesh = assets->find<Mesh>( kv.get<String>( "asset" ) );
+    if( !m_mesh.isValid() ) {
+        LogWarning( "staticMesh", "unresolved asset '%s'\n", kv.get<String>( "asset" ).c_str() );
+    }
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
