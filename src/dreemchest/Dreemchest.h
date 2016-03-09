@@ -72,6 +72,7 @@
     #include <Assets/Assets.h>
 	#include <Event/Event.h>
 	#include <Threads/Threads.h>
+    #include <Introspection/Introspection.h>
 	#include <Ecs/Ecs.h>
 	#include <Platform/Platform.h>
 	#include <Threads/Threads.h>
