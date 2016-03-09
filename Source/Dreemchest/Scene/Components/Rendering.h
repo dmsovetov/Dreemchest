@@ -31,7 +31,7 @@
 #include "../Assets/Mesh.h"
 #include "../Assets/Image.h"
 #include "../Assets/Material.h"
-#include "../Rendering/RenderTarget.h"
+#include "../DeprecatedRendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
 

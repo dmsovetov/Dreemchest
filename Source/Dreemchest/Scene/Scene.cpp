@@ -26,12 +26,12 @@
 
 #include "Scene.h"
 
-#include "Rendering/RenderingSystem.h"
-#include "Rendering/Rvm.h"
-#include "Rendering/RenderTarget.h"
-#include "Rendering/Passes/DebugPasses.h"
-#include "Rendering/Passes/BasicPasses.h"
-#include "Rendering/ForwardLighting/LightPass.h"
+#include "DeprecatedRendering/RenderingSystem.h"
+#include "DeprecatedRendering/Rvm.h"
+#include "DeprecatedRendering/RenderTarget.h"
+#include "DeprecatedRendering/Passes/DebugPasses.h"
+#include "DeprecatedRendering/Passes/BasicPasses.h"
+#include "DeprecatedRendering/ForwardLighting/LightPass.h"
 
 #include "Assets/Assets.h"
 #include "Assets/Material.h"

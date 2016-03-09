@@ -447,13 +447,13 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/CullingSystems.h"
 	#include "Archetypes/Camera.h"
-	#include "Rendering/RenderTarget.h"
-	#include "Rendering/RenderingContext.h"
-	#include "Rendering/RenderingSystem.h"
-	#include "Rendering/ShaderCache.h"
-	#include "Rendering/Passes/DebugPasses.h"
-	#include "Rendering/Passes/BasicPasses.h"
-	#include "Rendering/ForwardLighting/LightPass.h"
+	#include "DeprecatedRendering/RenderTarget.h"
+	#include "DeprecatedRendering/RenderingContext.h"
+	#include "DeprecatedRendering/RenderingSystem.h"
+	#include "DeprecatedRendering/ShaderCache.h"
+	#include "DeprecatedRendering/Passes/DebugPasses.h"
+	#include "DeprecatedRendering/Passes/BasicPasses.h"
+	#include "DeprecatedRendering/ForwardLighting/LightPass.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */
