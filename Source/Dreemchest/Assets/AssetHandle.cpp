@@ -119,12 +119,6 @@ bool Handle::isLoaded( void ) const
     return isValid() && (operator->())->state() == Asset::Loaded;
 }
 
-// ** Handle::index
-Index Handle::index( void ) const
-{
-    return m_index;
-}
-
 // ** Handle::assets
 Assets* Handle::assets( void ) const
 {

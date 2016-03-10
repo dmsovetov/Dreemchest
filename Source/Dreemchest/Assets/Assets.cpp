@@ -188,18 +188,6 @@ Handle Assets::findAsset( const AssetId& id ) const
     return Handle( const_cast<Assets*>( this ), i->second );
 }
 
-// ** Assets::assetAtIndex
-const Asset& Assets::assetAtIndex( Index index ) const
-{
-    return m_assets.get( index );
-}
-
-// ** Assets::isIndexValid
-bool Assets::isIndexValid( Index index ) const
-{
-    return m_assets.has( index );
-}
-
 // ** Assets::releaseWriteLock
 void Assets::releaseWriteLock( const Handle& asset )
 {

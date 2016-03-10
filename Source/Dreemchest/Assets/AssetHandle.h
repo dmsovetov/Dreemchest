@@ -112,6 +112,12 @@ namespace Assets {
         return assets()->assetData<TAsset>( *this );
     }
 
+    // ** Handle::index
+    NIMBLE_INLINE Index Handle::index( void ) const
+    {
+        return m_index;
+    }
+
     // ** Handle::readLock
     template<typename TAsset>
     const TAsset& Handle::readLock( void ) const

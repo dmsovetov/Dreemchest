@@ -315,9 +315,21 @@ namespace Assets {
 
     // ** Assets::acquireWriteLock
     template<typename TAsset>
-    WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
+    NIMBLE_INLINE WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
     {
         return WriteLock<TAsset>( asset );
+    }
+
+    // ** Assets::assetAtIndex
+    NIMBLE_INLINE const Asset& Assets::assetAtIndex( Index index ) const
+    {
+        return m_assets.get( index );
+    }
+
+    // ** Assets::isIndexValid
+    NIMBLE_INLINE bool Assets::isIndexValid( Index index ) const
+    {
+        return m_assets.has( index );
     }
 
 } // namespace Assets
