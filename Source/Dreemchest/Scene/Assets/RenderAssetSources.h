@@ -67,6 +67,23 @@ namespace Scene {
         Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.    
     };
 
+    //! Constructs technique asset from a material.
+    class TechniqueMaterialSource : public Assets::AssetSource<Technique, Material> {
+    public:
+
+                            //! Constructs TechniqueMaterialSource instance.
+                            TechniqueMaterialSource( MaterialHandle material, Renderer::HalWPtr hal );
+
+    protected:
+
+        //! Constructs a technique asset from a material source.
+        virtual bool        constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique ) DC_DECL_OVERRIDE;
+
+    private:
+
+        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.    
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** ShaderCache::ShaderCache
 ShaderCache::ShaderCache( const String& folder, const Renderer::HalPtr& hal ) : m_hal( hal )
 {
@@ -231,6 +233,8 @@ const Renderer::ShaderPtr& Shader::permutation( Renderer::HalPtr hal, u32 featur
 
 	return m_shaders[features];
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

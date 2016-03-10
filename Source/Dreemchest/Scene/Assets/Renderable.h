@@ -88,6 +88,31 @@ namespace Scene {
         Renderer::TexturePtr        m_texture;  //!< Texture 2D instance.
     };
 
+    //! Technique asset stores textures, shaders & constants used by a material.
+    class Technique {
+    public:
+
+        //! Returns the total number of textures.
+        s32                         textureCount( void ) const;
+
+        //! Returns material texture.
+        TextureHandle               texture( s32 index ) const;
+
+        //! Sets material texture.
+        void                        setTexture( s32 index, TextureHandle value );
+
+        //! Returns the material shader.
+        Renderer::ShaderWPtr        shader( void ) const;
+
+        //! Sets the material shader.
+        void                        setShader( Renderer::ShaderPtr value );
+
+    private:
+
+        Renderer::ShaderPtr         m_shader;   //!< Material shader instance.
+        Array<TextureHandle>        m_textures; //!< Textures used by material.
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

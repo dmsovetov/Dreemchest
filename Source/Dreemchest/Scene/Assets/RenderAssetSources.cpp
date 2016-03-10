@@ -27,6 +27,7 @@
 #include "RenderAssetSources.h"
 #include "Mesh.h"
 #include "Image.h"
+#include "Material.h"
 #include "Renderable.h"
 
 DC_BEGIN_DREEMCHEST
@@ -114,6 +115,37 @@ bool TextureImageSource::constructFromAsset( const Image& image, Assets::Assets&
 
     // Output log message
     LogVerbose( "renderingContext", "%dx%d %s texture constructed from image '%s'.\n", image.width(), image.height(), image.bytesPerPixel() == 3 ? "RGB8" : "RGBA8", m_asset.name().c_str() );
+
+    return true;
+}
+
+// ----------------------------------------------------------------------- TechniqueMaterialSource ----------------------------------------------------------------------- //
+
+// ** TechniqueMaterialSource::TechniqueMaterialSource
+TechniqueMaterialSource::TechniqueMaterialSource( MaterialHandle material, Renderer::HalWPtr hal )
+    : AssetSource( material ), m_hal( hal )
+{
+}
+
+// ** TechniqueMaterialSource::constructFromAsset
+bool TechniqueMaterialSource::constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique )
+{
+	CString vertex = NIMBLE_STRINGIFY(
+			uniform mat4 u_vp, u_transform;
+
+			void main() {
+				gl_Position = u_vp * u_transform * gl_Vertex;
+			}
+		);
+	CString fragment = NIMBLE_STRINGIFY(
+			uniform vec4 u_color;
+
+			void main() {
+				gl_FragColor = u_color;
+			}
+		);
+
+    technique.setShader( m_hal->createShader( vertex, fragment ) );
 
     return true;
 }

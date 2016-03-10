@@ -86,7 +86,7 @@ void RenderingContext::begin( void )
     for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
         renderFromCamera( commands, *(*i).get(), *(*i)->get<Camera>(), *(*i)->get<Transform>() );
     }
-    commands.flush( m_hal );
+    commands.flush( m_renderables.handles(), m_techniques.handles(), m_hal );
 }
 
 // ** RenderingContext::end
@@ -131,79 +131,52 @@ void RenderingContext::renderStaticMeshes( RenderCommandBuffer& commands )
         // Get the static mesh transforms
         const Transform* transform = (*i)->get<Transform>();
 
-        // Request the renderable asset for this mesh
-        s32 renderable = requestRenderable( staticMesh->mesh() );
-        m_renderableHandles[renderable].readLock();
+        // Request the renderable asset for this mesh.
+        s32 renderable = m_renderables.request( m_assets, m_hal, staticMesh->mesh(), "renderable" );
+
+        // Request the technique asset for a material.
+        s32 technique = m_techniques.request( m_assets, m_hal, staticMesh->material( 0 ), "technique" );
 
         // Emit the rendering command
-        commands.push( renderable );
-     /*   RenderableHandle handle = requestRenderable( staticMesh->mesh() );
-        DC_ABORT_IF( !handle.isValid(), "no valid renderable for a mesh" );
-
-        // Read-lock renderable asset
-        const Renderable& renderable = handle.readLock();
-
-        // Render all chunks
-        for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
-            m_hal->setVertexBuffer( renderable.vertexBuffer( j ) );
-            m_hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( 0 ), 0, renderable.indexBuffer( 0 )->size() );
-        }*/
+        commands.push( &transform->matrix(), renderable, technique );
     }
-}
-
-// ** RenderingContext::requestRenderable
-s32 RenderingContext::requestRenderable( MeshHandle mesh )
-{
-    // First lookup the renderable by a mesh handle
-    RenderableByMesh::iterator i = m_renderableByMesh.find( mesh );
-
-    // Next renderable index to be used
-    s32 index = 0;
-
-    // Found the renderable
-    if( i != m_renderableByMesh.end() ) {
-        // Ensure that mesh handle matches the stored one
-        if( i->first.index() == mesh.index() ) {
-            return i->second;
-        }
-
-        // Save this renderable asset index
-        index = i->second;
-
-        // Renderable is outdated - remove it
-        m_renderableByMesh.erase( i );
-    }
-
-    // Resize an array of renderable assets
-    if( index >= m_renderableHandles.size() ) {
-        m_renderableHandles.resize( index + 1 );
-    }
-
-    // Read lock the mesh asset to queue it for loading
-    mesh.readLock();
-
-    // Create a renderable instance
-    RenderableHandle handle = m_assets.add<Renderable>( mesh.uniqueId() + ".renderable", DC_NEW RenderableMeshSource( mesh, m_hal ) );
-    DC_ABORT_IF( !handle.isValid(), "failed to create renderable asset" );
-    handle.asset().setName( mesh.asset().name() + ".renderable" );
-
-    // Save this handle
-    m_renderableByMesh[mesh]   = index;
-    m_renderableHandles[index] = handle;
-
-    return index;
 }
 
 // ** RenderCommandBuffer::push
-void RenderCommandBuffer::push( s32 renderable )
+void RenderCommandBuffer::push( const Matrix4* transform, s32 renderable, s32 technique )
 {
+    Instance instance;
+    instance.transform = transform;
+    m_instances.push_back( instance );
 
+    Command cmd;
+    cmd.bits.renderable = renderable;
+    cmd.bits.technique  = technique;
+    cmd.bits.instance   = m_instances.size() - 1;
+    m_commands.push_back( cmd );
 }
 
 // ** RenderCommandBuffer::flush
-void RenderCommandBuffer::flush( const Array<RenderableHandle>& renderables, Renderer::HalWPtr hal )
+void RenderCommandBuffer::flush( const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal )
 {
     std::sort( m_commands.begin(), m_commands.end() );
+
+    for( s32 i = 0, n = m_commands.size(); i < n; i++ ) {
+        // Decode the command
+        const Command& cmd = m_commands[i];
+
+        // Read-lock renderable asset
+        const Renderable& renderable = renderables[cmd.bits.renderable].readLock();
+
+        // Read-lock material technique
+        const Technique& technique = techniques[cmd.bits.technique].readLock();
+
+        // Render all chunks
+        for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
+            hal->setVertexBuffer( renderable.vertexBuffer( j ) );
+            hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( 0 ), 0, renderable.indexBuffer( 0 )->size() );
+        }        
+    }
 }
 
 } // namespace Scene

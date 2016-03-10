@@ -34,6 +34,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! All shaders used for scene rendering reside here.
 	class ShaderCache : public RefCounted {
 	public:
@@ -104,6 +106,8 @@ namespace Scene {
 		Array<Feature>				m_features;	//!< Available shader features.
 		Array<Renderer::ShaderPtr>	m_shaders;	//!< Compiled shader permutations.
 	};
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

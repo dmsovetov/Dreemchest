@@ -34,6 +34,7 @@ namespace Scene {
 Renderable::Renderable( void )
     : m_primitiveType( Renderer::PrimTriangles )
 {
+
 }
 
 // ** Renderable::chunkCount
@@ -98,6 +99,41 @@ Renderer::TextureWPtr Texture::texture( void ) const
 void Texture::setTexture( Renderer::TexturePtr value )
 {
     m_texture = value;
+}
+
+// ** Technique::textureCount
+s32 Technique::textureCount( void ) const
+{
+    return static_cast<s32>( m_textures.size() );
+}
+
+// ** Technique::texture
+TextureHandle Technique::texture( s32 index ) const
+{
+    DC_ABORT_IF( index < 0 || index >= textureCount() );
+    return m_textures[index];
+}
+
+// ** Technique::setTexture
+void Technique::setTexture( s32 index, TextureHandle value )
+{
+    if( index >= textureCount() ) {
+        m_textures.resize( index + 1 );
+    }
+
+    m_textures[index] = value;
+}
+
+// ** Technique::shader
+Renderer::ShaderWPtr Technique::shader( void ) const
+{
+    return m_shader;
+}
+
+// ** Technique::setShader
+void Technique::setShader( Renderer::ShaderPtr value )
+{
+    m_shader = value;
 }
 
 } // namespace Scene

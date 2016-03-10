@@ -81,6 +81,7 @@ namespace Scene {
     class Prefab;
     class Renderable;
     class Texture;
+    class Technique;
 
 	class Transform;
 	class StaticMesh;
@@ -104,7 +105,11 @@ namespace Scene {
     //! Renderable handle type.
     typedef Assets::GenericHandle<class Renderable> RenderableHandle;
 
+    //! Texture handle type.
     typedef Assets::GenericHandle<class Texture> TextureHandle;
+
+    //! Technique handle type.
+    typedef Assets::GenericHandle<class Technique> TechniqueHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {
