@@ -139,9 +139,10 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
 		);
 	CString fragment = NIMBLE_STRINGIFY(
 			uniform vec4 u_color;
+            uniform vec4 u_clr0;
 
 			void main() {
-				gl_FragColor = u_color;
+				gl_FragColor = u_color * u_clr0;
 			}
 		);
 
@@ -149,15 +150,21 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
     Renderer::ShaderPtr shader = m_hal->createShader( vertex, fragment );
 
     // Known shader input names
-    CString inputs[Technique::TotalInputs] = {
+    CString inputs[] = {
           "u_vp"
         , "u_transform"
         , "u_color"
         , "u_tex0"
         , "u_tex1"
         , "u_tex2"
-        , "u_tex3" 
+        , "u_tex3"
+        , "u_clr0"
+        , "u_clr1"
+        , "u_clr2"
+        , "u_clr3"
     };
+
+    NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Technique::TotalInputs, "missing shader input names" );
 
     // Locate all shader inputs
     for( s32 i = 0; i < Technique::TotalInputs; i++ ) {
@@ -175,6 +182,11 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
 
     // Set technique shader
     technique.setShader( shader );
+
+    // Set technique colors
+    for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
+        technique.setColor( i, material.color( static_cast<Material::Layer>( i ) ) );
+    }
 
     return true;
 }

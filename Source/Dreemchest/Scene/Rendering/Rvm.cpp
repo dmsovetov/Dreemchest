@@ -63,8 +63,27 @@ void Rvm::setTechnique( s32 value )
     m_activeState.technique = value;
 
     // Set the technique shader
-    if( technique.shader() != m_activeState.shader ) {
-        setShader( technique.shader() );
+    Renderer::ShaderWPtr shader = technique.shader();
+
+    if( shader != m_activeState.shader ) {
+        setShader( shader );
+    }
+
+    u32 location;
+
+    // Bind texture samplers used by technique
+    for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
+        if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Texture0 + i ) ) ) {
+            shader->setInt( location, i );
+        }
+    }
+
+    // Set colors exposed by a material
+    for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
+        if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Color0 + i ) ) ) {
+            const Rgba& color = technique.color( i );
+            shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
+        }
     }
 }
 
@@ -99,25 +118,8 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
         shader->setVec4( location, m_constantColor );
     }
 
-    // Bind texture samples
-    for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Texture0 + i ) ) ) {
-            shader->setInt( location, i );
-        }
-    }
-
     // Save active shader
     m_activeState.shader = shader;
-
-	//// Set the light position
-	//if( location = shader->findUniformLocation( "u_lightPosition" ) ) {
-	//	shader->setVec4( location, m_registers[LightPosition] );
-	//}
-
-	//// Set the light color
-	//if( location = shader->findUniformLocation( "u_lightColor" ) ) {
-	//	shader->setVec4( location, m_registers[LightColor] );
-	//}
 }
 
 // ** Rvm::setInstance

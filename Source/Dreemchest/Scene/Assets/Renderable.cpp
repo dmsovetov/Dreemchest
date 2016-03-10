@@ -128,7 +128,7 @@ s32 Technique::textureCount( void ) const
 // ** Technique::texture
 TextureHandle Technique::texture( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= textureCount() );
+    DC_ABORT_IF( index < 0 || index >= textureCount(), "index is out of range" );
     return m_textures[index];
 }
 
@@ -140,6 +140,29 @@ void Technique::setTexture( s32 index, TextureHandle value )
     }
 
     m_textures[index] = value;
+}
+
+// ** Technique::colorCount
+s32 Technique::colorCount( void ) const
+{
+    return static_cast<s32>( m_colors.size() );
+}
+
+// ** Technique::color
+const Rgba& Technique::color( s32 index ) const
+{
+    DC_ABORT_IF( index < 0 || index >= colorCount(), "index is out of range" );
+    return m_colors[index];
+}
+
+// ** Technique::setColor
+void Technique::setColor( s32 index, const Rgba& value )
+{
+    if( index >= colorCount() ) {
+        m_colors.resize( index + 1 );
+    }
+
+    m_colors[index] = value;
 }
 
 // ** Technique::shader

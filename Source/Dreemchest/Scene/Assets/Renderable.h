@@ -101,6 +101,10 @@ namespace Scene {
             , Texture1              //!< Texture 1 sampler input.
             , Texture2              //!< Texture 2 sampler input.
             , Texture3              //!< Texture 3 sampler input.
+            , Color0                //!< Color 0 input.
+            , Color1                //!< Color 1 input.
+            , Color2                //!< Color 2 input.
+            , Color3                //!< Color 3 input.
             , TotalInputs           //!< The total number of shader inputs.
         };
 
@@ -122,6 +126,15 @@ namespace Scene {
         //! Sets the material shader.
         void                        setShader( Renderer::ShaderPtr value );
 
+        //! Returns the total number of constant colors.
+        s32                         colorCount( void ) const;
+
+        //! Returns the constant color by index.
+        const Rgba&                 color( s32 index ) const;
+
+        //! Sets the constant color at index.
+        void                        setColor( s32 index, const Rgba& value );
+
         //! Returns the shader input location.
         u32                         inputLocation( Input input ) const;
 
@@ -133,6 +146,7 @@ namespace Scene {
         Renderer::ShaderPtr         m_shader;                   //!< Material shader instance.
         Array<TextureHandle>        m_textures;                 //!< Textures used by material.
         u32                         m_locations[TotalInputs];   //!< Shader input locations.
+        Array<Rgba>                 m_colors;                   //!< Constant colors.
     };
 
 } // namespace Scene
