@@ -88,7 +88,8 @@ namespace Scene {
 	class Sprite;
 	class Camera;
 
-	class Rvm;
+	//! Rvm unique pointer type.
+    typedef AutoPtr<class Rvm> RvmUPtr;
 
     //! Image handle type.
     typedef Assets::GenericHandle<class Image> ImageHandle;

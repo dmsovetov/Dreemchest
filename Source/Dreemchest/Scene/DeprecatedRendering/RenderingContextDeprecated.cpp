@@ -26,7 +26,7 @@
 
 #include "RenderingContextDeprecated.h"
 
-#include "Rvm.h"
+#include "RvmDeprecated.h"
 #include "ShaderCache.h"
 
 #include "../Assets/Mesh.h"

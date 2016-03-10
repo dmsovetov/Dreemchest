@@ -32,7 +32,7 @@
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
 
-#include "Rvm.h"
+#include "RvmDeprecated.h"
 #include "ShaderCache.h"
 #include "RenderingContextDeprecated.h"
 

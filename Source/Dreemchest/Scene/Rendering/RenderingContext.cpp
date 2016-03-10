@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderingContext.h"
+#include "Rvm.h"
 
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
@@ -43,6 +44,7 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 {
     m_staticMeshes = scene->ecs()->requestIndex( "StaticMeshes", Ecs::Aspect::all<Transform, StaticMesh>() );
     m_lights       = scene->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Transform, Light>() );
+    m_rvm          = DC_NEW Rvm( m_renderables.handles(), m_techniques.handles(), m_hal );
 }
 
 // ** RenderingContext::create
@@ -82,11 +84,10 @@ void RenderingContext::begin( void )
 		target->end( this );
 	}
 
-    RenderCommandBuffer commands;
     for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-        renderFromCamera( commands, *(*i).get(), *(*i)->get<Camera>(), *(*i)->get<Transform>() );
+        renderFromCamera( *(*i).get(), *(*i)->get<Camera>(), *(*i)->get<Transform>() );
     }
-    commands.flush( m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_rvm->flush();
 }
 
 // ** RenderingContext::end
@@ -96,7 +97,7 @@ void RenderingContext::end( void )
 }
 
 // ** RenderingContext::renderFromCamera
-void RenderingContext::renderFromCamera( RenderCommandBuffer& commands, Ecs::Entity& entity, Camera& camera, Transform& transform )
+void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform )
 {
 	// Get the render target
 	RenderTargetWPtr target = camera.target();
@@ -113,14 +114,14 @@ void RenderingContext::renderFromCamera( RenderCommandBuffer& commands, Ecs::Ent
         m_hal->setTransform( Renderer::TransformProjection, camera.calculateProjectionMatrix().m );
         m_hal->setTransform( Renderer::TransformView, transform.matrix().inversed().m );
 
-		renderStaticMeshes( commands );
+		renderStaticMeshes();
 		m_hal->setViewport( target->rect() );
 	}
 	target->end( this );
 }
 
 // ** RenderingContext::renderStaticMeshes
-void RenderingContext::renderStaticMeshes( RenderCommandBuffer& commands )
+void RenderingContext::renderStaticMeshes( void )
 {
     const Ecs::EntitySet& staticMeshes = m_staticMeshes->entities();
 
@@ -138,44 +139,7 @@ void RenderingContext::renderStaticMeshes( RenderCommandBuffer& commands )
         s32 technique = m_techniques.request( m_assets, m_hal, staticMesh->material( 0 ), "technique" );
 
         // Emit the rendering command
-        commands.push( &transform->matrix(), renderable, technique );
-    }
-}
-
-// ** RenderCommandBuffer::push
-void RenderCommandBuffer::push( const Matrix4* transform, s32 renderable, s32 technique )
-{
-    Instance instance;
-    instance.transform = transform;
-    m_instances.push_back( instance );
-
-    Command cmd;
-    cmd.bits.renderable = renderable;
-    cmd.bits.technique  = technique;
-    cmd.bits.instance   = m_instances.size() - 1;
-    m_commands.push_back( cmd );
-}
-
-// ** RenderCommandBuffer::flush
-void RenderCommandBuffer::flush( const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal )
-{
-    std::sort( m_commands.begin(), m_commands.end() );
-
-    for( s32 i = 0, n = m_commands.size(); i < n; i++ ) {
-        // Decode the command
-        const Command& cmd = m_commands[i];
-
-        // Read-lock renderable asset
-        const Renderable& renderable = renderables[cmd.bits.renderable].readLock();
-
-        // Read-lock material technique
-        const Technique& technique = techniques[cmd.bits.technique].readLock();
-
-        // Render all chunks
-        for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
-            hal->setVertexBuffer( renderable.vertexBuffer( j ) );
-            hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( 0 ), 0, renderable.indexBuffer( 0 )->size() );
-        }        
+        m_rvm->push( &transform->matrix(), renderable, technique );
     }
 }
 

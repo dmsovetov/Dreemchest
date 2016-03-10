@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "Rvm.h"
+#include "RvmDeprecated.h"
 #include "RenderingContextDeprecated.h"
 
 DC_BEGIN_DREEMCHEST

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rvm_H__
-#define __DC_Scene_Rvm_H__
+#ifndef __DC_Scene_RvmDeprecated_H__
+#define __DC_Scene_RvmDeprecated_H__
 
 #include "../Scene.h"
 #include "../assets/Material.h"
@@ -215,4 +215,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rvm_H__    */
+#endif    /*    !__DC_Scene_RvmDeprecated_H__    */

@@ -26,7 +26,7 @@
 
 #include "RenderingSystemDeprecated.h"
 #include "RenderTargetDeprecated.h"
-#include "Rvm.h"
+#include "RvmDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 

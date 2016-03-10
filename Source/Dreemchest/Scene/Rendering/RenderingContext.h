@@ -38,46 +38,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Render command buffer
-    class RenderCommandBuffer {
-    public:
-
-        void            push( const Matrix4* transform, s32 renderable, s32 technique );
-
-        void            flush( const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal );
-
-    private:
-
-    private:
-
-        struct Command {
-            Command( void ) : value( 0 ) {}
-            bool operator < ( const Command& other ) const { return value < other.value; }
-
-            struct Bits {
-                u32     instance    : 14;   //!< Instance data index (instance transform, uniform, etc).
-                u32     technique   : 18;   //!< Rendering technique index.
-                u32     renderable  : 18;   //!< Mesh index.
-                u32     depth       : 12;   //!< Instance depth.
-                u32     mode        : 2;    //!< Rendering mode.
-            };
-
-            union {
-                Bits    bits;
-                u64     value;              //!< The composed command key.
-            };
-        };
-
-        struct Instance {
-            const Matrix4*  transform;      //!< Instance transform.
-        };
-
-        s32             m_commandSize;  //!< Maximum command size.
-        s32             m_meshBits;     //!< The total number of command bits available for the renderable index.
-        Array<Command>  m_commands;     //!< Actual command buffer.
-        Array<Instance> m_instances;    //!< Instance data.
-    };
-
     //! Render asset cache.
     template<typename TAsset, typename TRenderAsset, typename TSource>
     class RenderAssetCache {
@@ -177,10 +137,10 @@ namespace Scene {
 											RenderingContext( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
 
         //! Renders the scene from a camera point of view.
-        void                                renderFromCamera( RenderCommandBuffer& commands, Ecs::Entity& entity, Camera& camera, Transform& transform );
+        void                                renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform );
 
         //! Renders all static meshes.
-        void                                renderStaticMeshes( RenderCommandBuffer& commands );
+        void                                renderStaticMeshes( void );
 
 	private:
 
@@ -191,6 +151,7 @@ namespace Scene {
         typedef RenderAssetCache<Material, Technique, TechniqueMaterialSource> TechniqueCache;
 
         Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
+        RvmUPtr                             m_rvm;          //!< Internal Rvm instance.
         SceneWPtr                           m_scene;        //!< Parent scene instance.
         Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
 
