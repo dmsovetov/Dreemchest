@@ -103,6 +103,7 @@ namespace Scene {
             s32                         technique;          //!< Active technique.
             s32                         renderable;         //!< Active renderable.
             Renderer::ShaderWPtr        shader;             //!< Active shader.
+            Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
 
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
