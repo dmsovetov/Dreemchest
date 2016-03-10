@@ -145,7 +145,36 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
 			}
 		);
 
-    technique.setShader( m_hal->createShader( vertex, fragment ) );
+    // Create the technique shader instance
+    Renderer::ShaderPtr shader = m_hal->createShader( vertex, fragment );
+
+    // Known shader input names
+    CString inputs[Technique::TotalInputs] = {
+          "u_vp"
+        , "u_transform"
+        , "u_color"
+        , "u_tex0"
+        , "u_tex1"
+        , "u_tex2"
+        , "u_tex3" 
+    };
+
+    // Locate all shader inputs
+    for( s32 i = 0; i < Technique::TotalInputs; i++ ) {
+        // Find the input location
+        u32 location = shader->findUniformLocation( inputs[i] );
+
+        if( !location ) {
+            continue;
+        }
+
+        // Save the location index
+        technique.setInputLocation( static_cast<Technique::Input>( i ), location );
+        LogDebug( "technique", "%s is bound to %d for material %s\n", inputs[i], location, m_asset.asset().name().c_str() );
+    }
+
+    // Set technique shader
+    technique.setShader( shader );
 
     return true;
 }

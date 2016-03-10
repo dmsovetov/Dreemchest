@@ -110,9 +110,9 @@ void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Tr
         // Set the viewport rect
 		m_hal->setViewport( camera.viewport() );
 
-        // Push the view-projection transform
-        m_hal->setTransform( Renderer::TransformProjection, camera.calculateProjectionMatrix().m );
-        m_hal->setTransform( Renderer::TransformView, transform.matrix().inversed().m );
+        // Set the view-projection matrix
+        m_rvm->setViewProj( viewProjection );
+        m_rvm->setColor( Rgba( 0.0f, 1.0f, 0.0f ) );
 
 		renderStaticMeshes();
 		m_hal->setViewport( target->rect() );

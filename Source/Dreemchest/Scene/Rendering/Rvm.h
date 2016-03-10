@@ -68,6 +68,26 @@ namespace Scene {
         //! Flushes all accumulated commands.
         void                            flush( void );
 
+        //! Sets the view projection matrix.
+        void                            setViewProj( const Matrix4& value );
+
+        //! Sets the constant color.
+        void                            setColor( const Rgba& value );
+
+    private:
+
+        //! Setups rendering states for a technique.
+        void                            setTechnique( s32 value );
+
+        //! Setups rendering states needed by a renderable.
+        void                            setRenderable( s32 value );
+
+        //! Sets the active shader.
+        void                            setShader( Renderer::ShaderWPtr value );
+
+        //! Sets the instance data.
+        void                            setInstance( s32 value );
+
     private:
 
         //! Instance data used by rendering.
@@ -75,11 +95,24 @@ namespace Scene {
             const Matrix4*              transform;      //!< Instance transform.
         };
 
-        Renderer::HalWPtr               m_hal;          //!< Parent rendering HAL instance.
-        const Array<RenderableHandle>&  m_renderables;  //!< Renderable asset handles.
-        const Array<TechniqueHandle>&   m_techniques;   //!< Technique asset handles.
-        Array<Command>                  m_commands;     //!< Actual command buffer.
-        Array<Instance>                 m_instances;    //!< Instance data.
+        //! Active rendering state is stored by this helper struct.
+        struct ActiveState {
+                                        //! Constructs ActiveState instance.
+                                        ActiveState( void );
+
+            s32                         technique;          //!< Active technique.
+            s32                         renderable;         //!< Active renderable.
+            Renderer::ShaderWPtr        shader;             //!< Active shader.
+        };
+
+        Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
+        const Array<RenderableHandle>&  m_renderables;      //!< Renderable asset handles.
+        const Array<TechniqueHandle>&   m_techniques;       //!< Technique asset handles.
+        Array<Command>                  m_commands;         //!< Actual command buffer.
+        Array<Instance>                 m_instances;        //!< Instance data.
+        ActiveState                     m_activeState;      //!< Active rendering state.
+        Matrix4                         m_viewProjection;   //!< Active view projection matrix.
+        Vec4                            m_constantColor;    //!< Constant color.
     };
 
 } // namespace Scene

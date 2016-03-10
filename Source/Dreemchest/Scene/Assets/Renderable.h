@@ -92,6 +92,21 @@ namespace Scene {
     class Technique {
     public:
 
+        //! Available shader input indices
+        enum Input {
+              ViewProjection        //!< The view-projection matrix input.
+            , Transform             //!< The model matrix input.
+            , Color                 //!< The constant color input.
+            , Texture0              //!< Texture 0 sampler input.
+            , Texture1              //!< Texture 1 sampler input.
+            , Texture2              //!< Texture 2 sampler input.
+            , Texture3              //!< Texture 3 sampler input.
+            , TotalInputs           //!< The total number of shader inputs.
+        };
+
+                                    //! Constructs the Technique instance.
+                                    Technique( void );
+
         //! Returns the total number of textures.
         s32                         textureCount( void ) const;
 
@@ -107,10 +122,17 @@ namespace Scene {
         //! Sets the material shader.
         void                        setShader( Renderer::ShaderPtr value );
 
+        //! Returns the shader input location.
+        u32                         inputLocation( Input input ) const;
+
+        //! Set the shader input location.
+        void                        setInputLocation( Input input, u32 value );
+
     private:
 
-        Renderer::ShaderPtr         m_shader;   //!< Material shader instance.
-        Array<TextureHandle>        m_textures; //!< Textures used by material.
+        Renderer::ShaderPtr         m_shader;                   //!< Material shader instance.
+        Array<TextureHandle>        m_textures;                 //!< Textures used by material.
+        u32                         m_locations[TotalInputs];   //!< Shader input locations.
     };
 
 } // namespace Scene

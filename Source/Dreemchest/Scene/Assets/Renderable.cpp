@@ -101,6 +101,24 @@ void Texture::setTexture( Renderer::TexturePtr value )
     m_texture = value;
 }
 
+// ** Technique::Technique
+Technique::Technique( void )
+{
+    memset( m_locations, 0, sizeof( m_locations ) );
+}
+
+// ** Technique::inputLocation
+u32 Technique::inputLocation( Input input ) const
+{
+    return m_locations[input];
+}
+
+// ** Technique::setInputLocation
+void Technique::setInputLocation( Input input, u32 value )
+{
+    m_locations[input] = value;
+}
+
 // ** Technique::textureCount
 s32 Technique::textureCount( void ) const
 {
