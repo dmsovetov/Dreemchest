@@ -34,11 +34,13 @@
 
 #include "Rvm.h"
 #include "ShaderCache.h"
-#include "RenderingContext.h"
+#include "RenderingContextDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 	//! Performs a single rendering pass.
 	class RenderPassBase : public RefCounted {
@@ -122,6 +124,8 @@ namespace Scene {
 	{
 		DC_NOT_IMPLEMENTED;
 	}
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

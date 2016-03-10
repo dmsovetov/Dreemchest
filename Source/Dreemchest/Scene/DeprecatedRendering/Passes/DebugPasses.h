@@ -36,6 +36,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! Renders scene overdraw.
 	class OverdrawPass : public RenderPassBase {
 	public:
@@ -152,6 +154,8 @@ namespace Scene {
 		//! Renders origin cross.
 		void			renderCross( Renderer::Renderer2DWPtr renderer, f32 size, const Rgba& color ) const;
 	};
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

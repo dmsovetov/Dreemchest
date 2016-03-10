@@ -299,6 +299,8 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
     return average;
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // -------------------------------------------------------------- TerrainToolPass -------------------------------------------------------------- //
 
 // ** TerrainToolPass::render
@@ -333,5 +335,7 @@ void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rv
 		}	
 	}
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

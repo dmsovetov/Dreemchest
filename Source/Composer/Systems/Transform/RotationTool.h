@@ -95,6 +95,7 @@ DC_BEGIN_COMPOSER
 		u8							mapRayToAxis( RotationTool& tool, Scene::Transform& transform, f32 scale, const Ray& ray, Vec2& axis ) const;
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders active rotation tools.
 	class RotationToolPass : public Scene::RenderPass<RotationTool> {
 	public:
@@ -108,6 +109,8 @@ DC_BEGIN_COMPOSER
 		//! Renders the mesh of a single translation tool.
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const RotationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 

@@ -125,6 +125,7 @@ DC_BEGIN_COMPOSER
 		Scene::SceneObjectWPtr	m_tool;		//!< Terrain tool instance.
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders the terrain tool circle.
 	class TerrainToolPass : public Scene::RenderPass<TerrainTool> {
 	public:
@@ -138,6 +139,8 @@ DC_BEGIN_COMPOSER
 		//! Renders terrain tool circle
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 

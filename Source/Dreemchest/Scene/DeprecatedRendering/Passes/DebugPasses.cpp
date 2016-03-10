@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** OverdrawPass::setup
 void OverdrawPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
@@ -156,6 +158,8 @@ void GridPass::renderCross( Renderer::Renderer2DWPtr renderer, f32 size, const R
 	renderer->line( Vec3( -s, 0.0f, 0.0f ), Vec3( s, 0.0f, 0.0f ), color );
 	renderer->line( Vec3( 0.0f, 0.0f, -s ), Vec3( 0.0f, 0.0f, s ), color );
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

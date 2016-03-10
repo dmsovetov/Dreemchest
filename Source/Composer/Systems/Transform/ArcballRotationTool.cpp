@@ -158,6 +158,8 @@ void ArcballRotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e,
 	}
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // -------------------------------------------------------------- ArcballRotationToolPass -------------------------------------------------------------- //
 
 // ** ArcballRotationToolPass::render
@@ -176,5 +178,7 @@ void ArcballRotationToolPass::render( Scene::RenderingContextPtr context, Scene:
 	// Render the circle
 	renderer->wireCircle( transform.position(), side, up, tool.radius() * scale, 32, Rgba( 0.6f, 0.6f, 0.6f ) );
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

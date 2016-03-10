@@ -26,12 +26,16 @@
 
 #include "Scene.h"
 
-#include "DeprecatedRendering/RenderingSystem.h"
-#include "DeprecatedRendering/Rvm.h"
-#include "DeprecatedRendering/RenderTarget.h"
-#include "DeprecatedRendering/Passes/DebugPasses.h"
-#include "DeprecatedRendering/Passes/BasicPasses.h"
-#include "DeprecatedRendering/ForwardLighting/LightPass.h"
+#if DEV_DEPRECATED_SCENE_RENDERER
+    #include "DeprecatedRendering/RenderingSystem.h"
+    #include "DeprecatedRendering/Rvm.h"
+    #include "DeprecatedRendering/RenderTargetDeprecated.h"
+    #include "DeprecatedRendering/Passes/DebugPasses.h"
+    #include "DeprecatedRendering/Passes/BasicPasses.h"
+    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
+#else
+    #include "Rendering/RenderingContext.h"
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
@@ -70,6 +74,7 @@ Scene::Scene( void )
 	addSystem<WorldSpaceBoundingBoxSystem>();
 	addSystem<FrustumCullingSystem>( cameras() );
 		
+#if DEV_DEPRECATED_SCENE_RENDERER
 	// Add default render systems.
 	addRenderingSystem<BoundingVolumesRenderer>();
 	addRenderingSystem<ForwardLightingRenderer>();
@@ -78,6 +83,8 @@ Scene::Scene( void )
 	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
+#else
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
     // Register component types
     m_ecs->registerComponent<Identifier>();
@@ -144,7 +151,7 @@ SceneObjectSet Scene::findByAspect( const Ecs::Aspect& aspect ) const
 }
 
 // ** Scene::render
-void Scene::render( const RenderingContextPtr& context )
+void Scene::render( RenderingContextWPtr context )
 {
 	Renderer::HalPtr hal = context->hal();
 
@@ -170,6 +177,7 @@ void Scene::render( const RenderingContextPtr& context )
 		target->end( context );
 	}
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	// Update all rendering systems
 	for( u32 i = 0; i < ( u32 )m_renderingSystems.size(); i++ ) {
 		m_renderingSystems[i]->render( context );
@@ -177,6 +185,8 @@ void Scene::render( const RenderingContextPtr& context )
 
 	// Reset RVM
 	context->rvm()->reset();
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 }
 
 // ** Scene::cameras

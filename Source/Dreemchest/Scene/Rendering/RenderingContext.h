@@ -24,41 +24,38 @@
 
  **************************************************************************/
 
-#include "Rendering.h"
+#ifndef __DC_Scene_RenderingContext_H__
+#define __DC_Scene_RenderingContext_H__
 
-DC_BEGIN_COMPOSER
+#include "../Scene.h"
 
-#if DEV_DEPRECATED_SCENE_RENDERER
+DC_BEGIN_DREEMCHEST
 
-// -------------------------------------------------------- SceneObjectIndicatorsPass -------------------------------------------------------- //
+namespace Scene {
 
-// ** SceneObjectIndicatorsPass::render
-void SceneObjectIndicatorsPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform )
-{
-	if( internal.isPrivate() ) {
-		return;
-	}
+	//! Rendering context.
+	class RenderingContext : public RefCounted {
+	public:
 
-	if( !internal.parent().valid() ) {
-        LogError( "scene", "SceneEditorInternal has no valid scene object\n" );
-		return;
-	}
+        //! Returns the parent rendering HAL instance.
+        Renderer::HalWPtr                   hal( void ) const;
 
-	Renderer::Renderer2DPtr renderer = context->renderer();
+		//! Creates new rendering context.
+		static RenderingContextPtr			create( Renderer::HalWPtr hal, SceneWPtr scene );
 
-	if( internal.isSelected() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f ) );
-		}	
-	}
-	else if( internal.isHighlighted() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 0.0f, 1.0f, 0.0f ) );
-		}
-	}
-}
+	private:
 
-#else
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+											//! Constructs the RenderingContext instance.
+											RenderingContext( Renderer::HalWPtr hal, SceneWPtr scene );
 
-DC_END_COMPOSER
+	private:
+
+        Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
+        SceneWPtr                           m_scene;        //!< Parent scene instance.
+	};
+
+} // namespace Scene
+
+DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_RenderingContext_H__    */

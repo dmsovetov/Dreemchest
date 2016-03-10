@@ -24,41 +24,35 @@
 
  **************************************************************************/
 
-#include "Rendering.h"
+#include "RenderingContext.h"
 
-DC_BEGIN_COMPOSER
+#include "../Components/Rendering.h"
+#include "../Components/Transform.h"
 
-#if DEV_DEPRECATED_SCENE_RENDERER
+DC_BEGIN_DREEMCHEST
 
-// -------------------------------------------------------- SceneObjectIndicatorsPass -------------------------------------------------------- //
+namespace Scene {
 
-// ** SceneObjectIndicatorsPass::render
-void SceneObjectIndicatorsPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform )
+// ** RenderingContext::RenderingContext
+RenderingContext::RenderingContext( Renderer::HalWPtr hal, SceneWPtr scene )
+	: m_hal( hal )
+    , m_scene( scene )
 {
-	if( internal.isPrivate() ) {
-		return;
-	}
 
-	if( !internal.parent().valid() ) {
-        LogError( "scene", "SceneEditorInternal has no valid scene object\n" );
-		return;
-	}
-
-	Renderer::Renderer2DPtr renderer = context->renderer();
-
-	if( internal.isSelected() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f ) );
-		}	
-	}
-	else if( internal.isHighlighted() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 0.0f, 1.0f, 0.0f ) );
-		}
-	}
 }
 
-#else
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+// ** RenderingContext::create
+RenderingContextPtr RenderingContext::create( Renderer::HalWPtr hal, SceneWPtr scene )
+{
+	return RenderingContextPtr( DC_NEW RenderingContext( hal, scene ) );
+}
 
-DC_END_COMPOSER
+// ** RenderingContext::hal
+Renderer::HalWPtr RenderingContext::hal( void ) const
+{
+    return m_hal;
+}
+
+} // namespace Scene
+
+DC_END_DREEMCHEST

@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** ForwardLightPass::ForwardLightPass
 ForwardLightPass::ForwardLightPass( Ecs::EcsWPtr ecs ) : RenderPass( ecs, "ForwardLightPass" )
 {
@@ -104,6 +106,7 @@ void TranslucentLightPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4&
 	rvm.setRasterization( RenderTranslucent, litTranslucent );
 }
 
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

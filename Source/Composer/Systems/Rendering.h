@@ -39,6 +39,7 @@ DC_BEGIN_COMPOSER
 	public:
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders highlight & selection indicators for scene objects.
 	class SceneObjectIndicatorsPass : public Scene::RenderPass<Editors::SceneEditorInternal> {
 	public:
@@ -68,6 +69,8 @@ DC_BEGIN_COMPOSER
 									addPass<Scene::GridPass>();
 								}
 	};
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 

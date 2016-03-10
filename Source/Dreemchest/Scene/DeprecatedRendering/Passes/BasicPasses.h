@@ -34,6 +34,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! Renders unlit textured scene.
 	class UnlitPass : public RenderPassBase {
 	public:
@@ -75,6 +77,8 @@ namespace Scene {
 
 		Fx::ParticleRendererPtr	m_renderer;	//!< Particle renderer instance.
 	};
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

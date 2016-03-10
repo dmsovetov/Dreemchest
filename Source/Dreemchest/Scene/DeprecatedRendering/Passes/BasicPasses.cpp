@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** AmbientPass::setup
 void AmbientPass::setup( Rvm& rvm, ShaderCache& shaders, const Matrix4& viewProjection )
 {
@@ -61,6 +63,8 @@ void ParticleSystemsPass::render( RenderingContextPtr context, Rvm& rvm, ShaderC
 		}
 	}
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

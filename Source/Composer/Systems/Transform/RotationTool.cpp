@@ -216,6 +216,8 @@ void RotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::E
 	}
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // -------------------------------------------------------- RotationToolPass -------------------------------------------------------- //
 
 // ** RotationToolPass::render
@@ -271,5 +273,7 @@ void RotationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& r
 		renderer->wireCircle( transform.position(), side, up, tool.screenSpaceRadius() * scale, 32, sColor );
 	}
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** RenderPassBase::addEmitter
 void RenderPassBase::addEmitter( RopEmitterBase* emitter )
 {
@@ -103,6 +105,8 @@ void RenderPassBase::setClipper( const PlaneClipper& value )
 		m_emitters[i]->setClipper( value );
 	}
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

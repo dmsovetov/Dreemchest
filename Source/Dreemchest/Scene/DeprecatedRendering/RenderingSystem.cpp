@@ -25,12 +25,14 @@
  **************************************************************************/
 
 #include "RenderingSystem.h"
-#include "RenderTarget.h"
+#include "RenderTargetDeprecated.h"
 #include "Rvm.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 // ** RenderingSystemBase::RenderingSystemBase
 RenderingSystemBase::RenderingSystemBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect ) : m_ecs( ecs ), m_name( name )
@@ -76,6 +78,8 @@ void RenderingSystemBase::renderFromCamera( RenderingContextPtr context, Ecs::En
 	}
 	target->end( context );
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

@@ -263,6 +263,8 @@ u8 TranslationToolSystem::mapRayToAxis( TranslationTool& tool, f32 scale, const 
 	return TranslationTool::Null;
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // -------------------------------------------------------- TranslationToolPass -------------------------------------------------------- //
 
 // ** TranslationToolPass::render
@@ -328,5 +330,7 @@ void TranslationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm
 	// Pop gizmo transform matrix
 	renderer->popTransform();
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

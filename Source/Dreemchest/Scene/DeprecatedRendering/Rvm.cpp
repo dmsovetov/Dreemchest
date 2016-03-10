@@ -25,11 +25,13 @@
  **************************************************************************/
 
 #include "Rvm.h"
-#include "RenderingContext.h"
+#include "RenderingContextDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 // ** Rvm::s_samplersUniformNames
 CString Rvm::s_samplersUniformNames[] = { "u_tex0" , "u_tex1", "u_tex2", "u_tex3", "u_tex4", "u_tex5", "u_tex6", "u_tex7" };
@@ -390,6 +392,8 @@ bool Rvm::sortByShaderTextureMesh( const Command* a, const Command* b )
 
 	return false;
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

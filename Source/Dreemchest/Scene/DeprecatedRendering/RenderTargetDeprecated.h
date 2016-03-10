@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! Scene rendering target.
 	class RenderTarget : public RefCounted {
 	public:
@@ -113,6 +115,7 @@ namespace Scene {
 		Renderer::RenderTargetPtr	m_rt;	//!< Render target.
 	};
 
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

@@ -98,6 +98,7 @@ DC_BEGIN_COMPOSER
 		Vec3						mapRayToPoint( TranslationTool& tool, const Scene::Transform& transform, f32 scale, const Ray& ray );
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders active translation tools.
 	class TranslationToolPass : public Scene::RenderPass<TranslationTool> {
 	public:
@@ -111,6 +112,8 @@ DC_BEGIN_COMPOSER
 		//! Renders the mesh of a single translation tool.
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TranslationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 

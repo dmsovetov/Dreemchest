@@ -50,14 +50,18 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 		return false;
 	}
 
-	// Create rendering context.
-	m_renderingContext = Scene::RenderingContext::create( hal() );
-
 	// Create cursor binding
 	m_cursorMovement = new Scene::Vec3Binding;
 
 	// Create the scene.
     m_scene = loadFromFile( m_asset.absoluteFilePath() );
+
+    // Create rendering context.
+#if DEV_DEPRECATED_SCENE_RENDERER
+	m_renderingContext = Scene::RenderingContext::create( hal() );
+#else
+    m_renderingContext = Scene::RenderingContext::create( hal(), m_scene );
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Create the scene model
 	m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
@@ -110,7 +114,10 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_scene->addSystem<TranslationToolSystem>( viewport() );
 	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
 	m_scene->addSystem<RotationToolSystem>( viewport() );
+#if DEV_DEPRECATED_SCENE_RENDERER
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool
 	setTool( NoTool );

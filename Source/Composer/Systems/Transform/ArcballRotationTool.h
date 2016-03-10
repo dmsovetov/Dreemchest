@@ -86,6 +86,7 @@ DC_BEGIN_COMPOSER
 		bool						mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders the arcball rotation tool indicator.
 	class ArcballRotationToolPass : public Scene::RenderPass<ArcballRotationTool> {
 	public:
@@ -99,6 +100,8 @@ DC_BEGIN_COMPOSER
 		//! Renders arcball tool indicator.
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
+#else
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 

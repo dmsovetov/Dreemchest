@@ -35,6 +35,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! Emits render operations for static meshes affected by light sources.
 	class ForwardLightPass : public RenderPass<Light> {
 	public:
@@ -92,6 +94,8 @@ namespace Scene {
 									addPass<AdditiveLightPass>();
 								}
 	};
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

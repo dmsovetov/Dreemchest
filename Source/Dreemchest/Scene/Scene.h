@@ -101,6 +101,11 @@ namespace Scene {
     //! Terrain handle type.
     typedef Assets::GenericHandle<class Terrain> TerrainHandle;
 
+    //! Renderable handle type.
+    typedef Assets::GenericHandle<class Renderable> RenderableHandle;
+
+    typedef Assets::GenericHandle<class Texture> TextureHandle;
+
 	//! Available rendering modes.
 	enum RenderingMode {
 		  RenderOpaque		//!< Renders opaque.
@@ -210,7 +215,7 @@ namespace Scene {
 		void							update( u32 currentTime, f32 dt );
 
 		//! Renders a scene.
-		void							render( const RenderingContextPtr& context );
+		void							render( RenderingContextWPtr context );
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
@@ -436,6 +441,7 @@ DC_END_DREEMCHEST
 	#include "Components/Rendering.h"
 	#include "Components/Transform.h"
 	#include "Components/Physics.h"
+    #include "Components/Debug.h"
 	#include "Assets/Mesh.h"
 	#include "Assets/Material.h"
 	#include "Assets/Image.h"
@@ -447,13 +453,18 @@ DC_END_DREEMCHEST
 	#include "Systems/Physics2D.h"
 	#include "Systems/CullingSystems.h"
 	#include "Archetypes/Camera.h"
-	#include "DeprecatedRendering/RenderTarget.h"
-	#include "DeprecatedRendering/RenderingContext.h"
-	#include "DeprecatedRendering/RenderingSystem.h"
-	#include "DeprecatedRendering/ShaderCache.h"
-	#include "DeprecatedRendering/Passes/DebugPasses.h"
-	#include "DeprecatedRendering/Passes/BasicPasses.h"
-	#include "DeprecatedRendering/ForwardLighting/LightPass.h"
+
+    #if DEV_DEPRECATED_SCENE_RENDERER
+	    #include "DeprecatedRendering/RenderTarget.h"
+	    #include "DeprecatedRendering/RenderingContext.h"
+	    #include "DeprecatedRendering/RenderingSystem.h"
+	    #include "DeprecatedRendering/ShaderCache.h"
+	    #include "DeprecatedRendering/Passes/DebugPasses.h"
+	    #include "DeprecatedRendering/Passes/BasicPasses.h"
+	    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
+    #else
+        #include "Rendering/RenderingContext.h"
+    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif
 
 #endif    /*    !__DC_Scene_H__    */

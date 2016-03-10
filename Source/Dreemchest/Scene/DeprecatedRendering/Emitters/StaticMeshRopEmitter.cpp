@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** StaticMeshRopEmitter::StaticMeshRopEmitter
 StaticMeshRopEmitter::StaticMeshRopEmitter( Ecs::EcsWPtr ecs, u32 features, Material::Model model )
 	: RopEmitter( ecs, "StaticMeshRopEmitter" ), m_features( features ), m_model( model )
@@ -126,6 +128,8 @@ void StaticMeshRopEmitter::emit( RenderingContext& ctx, Rvm& rvm, ShaderCache& s
 		}	
 	}
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

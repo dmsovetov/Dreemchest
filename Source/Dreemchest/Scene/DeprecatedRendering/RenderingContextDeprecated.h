@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderingContext_H__
-#define __DC_Scene_RenderingContext_H__
+#ifndef __DC_Scene_RenderingContextDeprecated_H__
+#define __DC_Scene_RenderingContextDeprecated_H__
 
 #include "../Scene.h"
 
@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Rendering context.
-	class RenderingContext : public RefCounted {
+	class RenderingContextDeprecated : public RefCounted {
 	public:
 
         //! Renderable data structure.
@@ -67,8 +67,8 @@ namespace Scene {
 
 	private:
 
-											//! Constructs the RenderingContext instance.
-											RenderingContext( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal, Renderer::Renderer2DPtr renderer );
+											//! Constructs the RenderingContextDeprecated instance.
+											RenderingContextDeprecated( RvmPtr rvm, ShaderCachePtr shaders, Renderer::HalPtr hal, Renderer::Renderer2DPtr renderer );
 
 	private:
 
@@ -91,4 +91,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderingContext_H__    */
+#endif    /*    !__DC_Scene_RenderingContextDeprecated_H__    */
