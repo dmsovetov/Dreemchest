@@ -33,25 +33,64 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Render command buffer
+    class RenderCommandBuffer {
+    public:
+
+        void            push( s32 renderable );
+
+        void            flush( const Array<RenderableHandle>& renderables, Renderer::HalWPtr hal );
+
+    private:
+
+        s32             m_commandSize;  //!< Maximum command size.
+        s32             m_meshBits;     //!< The total number of command bits available for the renderable index.
+        Array<s32>      m_commands;     //!< Actual command buffer.
+    };
+
 	//! Rendering context.
 	class RenderingContext : public RefCounted {
 	public:
+
+        //! Begins rendering with this context.
+        void                                begin( void );
+
+        //! Ends rendering with this context.
+        void                                end( void );
 
         //! Returns the parent rendering HAL instance.
         Renderer::HalWPtr                   hal( void ) const;
 
 		//! Creates new rendering context.
-		static RenderingContextPtr			create( Renderer::HalWPtr hal, SceneWPtr scene );
+		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
 
 	private:
 
 											//! Constructs the RenderingContext instance.
-											RenderingContext( Renderer::HalWPtr hal, SceneWPtr scene );
+											RenderingContext( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
+
+        //! Returns the renderable asset for a specified mesh.
+        s32                                 requestRenderable( MeshHandle mesh );
+
+        //! Renders the scene from a camera point of view.
+        void                                renderFromCamera( RenderCommandBuffer& commands, Ecs::Entity& entity, Camera& camera, Transform& transform );
+
+        //! Renders all static meshes.
+        void                                renderStaticMeshes( RenderCommandBuffer& commands );
 
 	private:
 
+        //! Container type to map from a mesh asset to a renderable asset index.
+        typedef Map<MeshHandle, s32> RenderableByMesh;
+
         Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
         SceneWPtr                           m_scene;        //!< Parent scene instance.
+        Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
+
+        Ecs::IndexPtr                       m_staticMeshes;
+        Ecs::IndexPtr                       m_lights;
+        RenderableByMesh                    m_renderableByMesh;
+        Array<RenderableHandle>             m_renderableHandles;
 	};
 
 } // namespace Scene

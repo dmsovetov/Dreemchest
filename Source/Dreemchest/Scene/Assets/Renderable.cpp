@@ -32,7 +32,7 @@ namespace Scene {
 
 // ** Renderable::Renderable
 Renderable::Renderable( void )
-    : m_primitiveType( Renderer::TotalPrimitiveTypes )
+    : m_primitiveType( Renderer::PrimTriangles )
 {
 }
 

@@ -153,6 +153,7 @@ SceneObjectSet Scene::findByAspect( const Ecs::Aspect& aspect ) const
 // ** Scene::render
 void Scene::render( RenderingContextWPtr context )
 {
+#if DEV_DEPRECATED_SCENE_RENDERER
 	Renderer::HalPtr hal = context->hal();
 
 	// Clear all cameras & assign ids
@@ -177,7 +178,6 @@ void Scene::render( RenderingContextWPtr context )
 		target->end( context );
 	}
 
-#if DEV_DEPRECATED_SCENE_RENDERER
 	// Update all rendering systems
 	for( u32 i = 0; i < ( u32 )m_renderingSystems.size(); i++ ) {
 		m_renderingSystems[i]->render( context );
@@ -186,6 +186,11 @@ void Scene::render( RenderingContextWPtr context )
 	// Reset RVM
 	context->rvm()->reset();
 #else
+    // Begin rendering with this context.
+    context->begin();
+
+    // End rendering.
+    context->end();
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 }
 

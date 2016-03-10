@@ -151,6 +151,7 @@ namespace Editors {
 		Scene::ScenePtr					m_scene;					//!< Actual scene.
 		AutoPtr<SceneModel>				m_sceneModel;				//!< Scene model used by user interface.
 		Scene::RenderingContextPtr		m_renderingContext;			//!< Scene rendering context.
+        Scene::RenderTargetPtr          m_renderTarget;             //!< Viewport rendering target.
 		Scene::SpectatorCameraPtr		m_camera;					//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
 

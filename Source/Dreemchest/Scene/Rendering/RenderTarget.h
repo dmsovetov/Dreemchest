@@ -52,10 +52,10 @@ namespace Scene {
 		virtual u32					height( void ) const { return 0; }
 
 		//! Begins rendering to this target.
-		virtual void				begin( RenderingContextPtr context ) const;
+		virtual void				begin( RenderingContextWPtr context ) const;
 
 		//! Ends rendering to this target.
-		virtual void				end( RenderingContextPtr context ) const;
+		virtual void				end( RenderingContextWPtr context ) const;
 	};
 
 	//! WindowTarget is used for rendering the scene to window.
@@ -95,10 +95,10 @@ namespace Scene {
 		virtual u32					height( void ) const DC_DECL_OVERRIDE;
 
 		//! Begins rendering to this view.
-		virtual void				begin( RenderingContextPtr context ) const DC_DECL_OVERRIDE;
+		virtual void				begin( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
 
 		//! Ends rendering to this view.
-		virtual void				end( RenderingContextPtr context ) const DC_DECL_OVERRIDE;
+		virtual void				end( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
 
 		//! Creates the TextureTarget instance.
 		static RenderTargetPtr		create( const Renderer::RenderTargetPtr& rt );

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderingSystem_H__
-#define __DC_Scene_RenderingSystem_H__
+#ifndef __DC_Scene_RenderingSystemDeprecated_H__
+#define __DC_Scene_RenderingSystemDeprecated_H__
 
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
@@ -35,6 +35,8 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 	//! Base class for all rendering systems.
 	class RenderingSystemBase : public RefCounted {
@@ -107,8 +109,10 @@ namespace Scene {
 									: RenderingSystem<TRenderer>( ecs, "SinglePassRenderingSystem" ) { this->template addPass<TPass>(); }
 	};
 
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderingSystem_H__    */
+#endif    /*    !__DC_Scene_RenderingSystemDeprecated_H__    */

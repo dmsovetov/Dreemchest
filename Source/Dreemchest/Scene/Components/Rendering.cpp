@@ -335,13 +335,13 @@ Rect Camera::viewport( void ) const
 }
 
 // ** Camera::setView
-void Camera::setTarget( const RenderTargetPtr& value )
+void Camera::setTarget( RenderTargetWPtr value )
 {
 	m_target = value;
 }
 
 // ** Camera::view
-const RenderTargetPtr& Camera::target( void ) const
+RenderTargetWPtr Camera::target( void ) const
 {
 	return m_target;
 }

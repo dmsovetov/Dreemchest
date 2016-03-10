@@ -120,7 +120,8 @@ void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& ind
     DC_CHECK_GL;
 	DC_ABORT_IF( !indexBuffer.valid(), "invalid index buffer" )
     
-    static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
+    static GLenum glPrimType[TotalPrimitiveTypes + 1] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS, 0 };
+    DC_BREAK_IF( glPrimType[primType] == 0, "invalid primitive type" );
 
 	if( indexBuffer->isGpu() ) {
 		static_cast<OpenGLIndexBuffer*>( indexBuffer.get() )->bind();

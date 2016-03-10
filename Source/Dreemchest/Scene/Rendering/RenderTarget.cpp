@@ -47,12 +47,12 @@ Rect RenderTarget::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
 }
 
 // ** RenderTarget::begin
-void RenderTarget::begin( RenderingContextPtr context ) const
+void RenderTarget::begin( RenderingContextWPtr context ) const
 {
 }
 
 // ** RenderTarget::end
-void RenderTarget::end( RenderingContextPtr context ) const
+void RenderTarget::end( RenderingContextWPtr context ) const
 {
 }
 
@@ -95,13 +95,13 @@ Renderer::RenderTargetPtr TextureTarget::rt( void ) const
 }
 
 // ** TextureTarget::begin
-void TextureTarget::begin( RenderingContextPtr context ) const
+void TextureTarget::begin( RenderingContextWPtr context ) const
 {
 	context->hal()->setRenderTarget( m_rt );
 }
 
 // ** TextureTarget::end
-void TextureTarget::end( RenderingContextPtr context ) const
+void TextureTarget::end( RenderingContextWPtr context ) const
 {
 	context->hal()->setRenderTarget( Renderer::RenderTargetPtr() );
 }

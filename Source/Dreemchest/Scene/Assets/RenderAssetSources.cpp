@@ -44,6 +44,8 @@ RenderableMeshSource::RenderableMeshSource( MeshHandle mesh, Renderer::HalWPtr h
 // ** RenderableMeshSource::constructFromAsset
 bool RenderableMeshSource::constructFromAsset( const Mesh& mesh, Assets::Assets& assets, Renderable& renderable )
 {
+    DC_BREAK_IF( mesh.chunkCount() == 0, "constructing renderable from an empty mesh" );
+
     // Create vertex declaration
     Renderer::VertexDeclarationPtr vertexFormat = m_hal->createVertexDeclaration( "P3:N:T0:T1" );
 

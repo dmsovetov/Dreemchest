@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "RenderingSystem.h"
+#include "RenderingSystemDeprecated.h"
 #include "RenderTargetDeprecated.h"
 #include "Rvm.h"
 

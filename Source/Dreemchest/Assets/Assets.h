@@ -145,6 +145,10 @@ namespace Assets {
                                     Assets( void );
                                     ~Assets( void );
 
+        //! Adds a new asset of specified type.
+        template<typename TAsset>
+        GenericHandle<TAsset>       add( const AssetId& uniqueId, SourceUPtr source );
+
         //! Returns an asset of specified type.
         template<typename TAsset>
         GenericHandle<TAsset>       find( const AssetId& uniqueId ) const;
@@ -235,6 +239,14 @@ namespace Assets {
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
         mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };
+
+    //! Adds a new asset of specified type.
+    template<typename TAsset>
+    GenericHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
+    {
+        Handle handle = addAsset( Type::fromClass<TAsset>(), uniqueId, source );
+        return handle;
+    }
 
     // ** Assets::find
     template<typename TAsset>

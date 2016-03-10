@@ -28,7 +28,7 @@
 #define __DC_Scene_DebugPasses_H__
 
 #include "../RenderPass.h"
-#include "../RenderingSystem.h"
+#include "../RenderingSystemDeprecated.h"
 #include "../Emitters/StaticMeshRopEmitter.h"
 #include "../../Components/Debug.h"
 

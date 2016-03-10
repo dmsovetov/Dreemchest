@@ -295,7 +295,9 @@ namespace Scene {
 
 		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
+    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
 		Ecs::IndexPtr					m_meshes;			//!< All static meshes that reside in scene.

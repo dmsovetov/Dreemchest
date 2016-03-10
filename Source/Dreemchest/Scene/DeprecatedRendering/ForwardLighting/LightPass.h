@@ -28,7 +28,7 @@
 #define __DC_Scene_ForwardLighting_LightPass_H__
 
 #include "../RenderPass.h"
-#include "../RenderingSystem.h"
+#include "../RenderingSystemDeprecated.h"
 #include "../Passes/BasicPasses.h"
 
 DC_BEGIN_DREEMCHEST

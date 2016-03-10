@@ -60,7 +60,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 #if DEV_DEPRECATED_SCENE_RENDERER
 	m_renderingContext = Scene::RenderingContext::create( hal() );
 #else
-    m_renderingContext = Scene::RenderingContext::create( hal(), m_scene );
+    m_renderingContext = Scene::RenderingContext::create( project->assets(), hal(), m_scene );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Create the scene model
@@ -95,8 +95,11 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 		m_scene->addSceneObject( grid );
 	}
 
+    // Create the rendering target
+    m_renderTarget = FrameTarget::create( document->renderingFrame() );
+
 	// Create the camera.
-	m_camera = Scene::SpectatorCamera::create( FrameTarget::create( document->renderingFrame() ), m_cursorMovement );
+	m_camera = Scene::SpectatorCamera::create( m_renderTarget, m_cursorMovement );
 	m_camera->setMovementEnabled( false );
 	m_camera->setRotationEnabled( false );
 	m_camera->setClearColor( backgroundColor() );

@@ -265,7 +265,7 @@ namespace Scene {
 		};
 
 									//! Constructs Camera instance.
-									Camera( Projection projection = Perspective, const RenderTargetPtr& target = RenderTargetPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
+									Camera( Projection projection = Perspective, RenderTargetWPtr target = RenderTargetWPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
 										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_target( target ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
 
 		//! Returns camera clear mask.
@@ -314,10 +314,10 @@ namespace Scene {
 		Rect						viewport( void ) const;
 
 		//! Sets the camera render view.
-		void						setTarget( const RenderTargetPtr& value );
+		void						setTarget( RenderTargetWPtr value );
 
 		//! Returns the camera render view.
-		const RenderTargetPtr&		target( void ) const;
+		RenderTargetWPtr		    target( void ) const;
 
 		//! Calculates the projection matrix.
 		Matrix4						calculateProjectionMatrix( void ) const;
@@ -348,7 +348,7 @@ namespace Scene {
 		u8							m_id;			//!< Unique camera id.
 		Projection					m_projection;	//!< Camera projection.
 		Rect						m_ndc;			//!< Output normalized device coordinates.
-		RenderTargetPtr				m_target;		//!< Rendering target.
+		RenderTargetWPtr		    m_target;		//!< Rendering target.
 		Rgba						m_clearColor;	//!< The clear color.
 		f32							m_fov;			//!< Camera field of view.
 		f32							m_near;			//!< Z-near value.
