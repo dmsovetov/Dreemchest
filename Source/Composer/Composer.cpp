@@ -95,7 +95,8 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 {
     // Setup default logger
     Logger::setStandardLogger();
-
+    Logger::setFilter( new Logger::FilterByPrefix( StringList() << "packet" << "socket" << "entityIndex", Logger::Warning, true ) );
+    
     // Set application name
     setApplicationName( "Dreemchest Composer" );
 
@@ -104,9 +105,6 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 
     // Create the file system
 	m_fileSystem = new FileSystem( this );
-
-    // Setup default log handlers
-	Logger::setStandardLogger();
 }
 
 // ** Composer::project
