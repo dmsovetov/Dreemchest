@@ -1148,7 +1148,7 @@ bool OpenGLShader::link( void ) const
 
     if( result == GL_FALSE ) {
 		s8 error[256];
-        glGetShaderInfoLog( m_program, sizeof( error ), NULL, error );
+        glGetProgramInfoLog( m_program, sizeof( error ), NULL, error );
 		LogError( "opengl", "failed to link shader, %s\n", error );
         return false;
     }

@@ -55,6 +55,7 @@ PFNGLCOMPILESHADERPROC				glCompileShader = NULL;
 PFNGLSHADERSOURCEPROC				glShaderSource = NULL;
 PFNGLUSEPROGRAMPROC					glUseProgram = NULL;
 PFNGLGETSHADERINFOLOGPROC			glGetShaderInfoLog = NULL;
+PFNGLGETPROGRAMINFOLOGPROC          glGetProgramInfoLog = NULL;
 PFNGLGETPROGRAMIVPROC				glGetProgramiv = NULL;
 PFNGLGETSHADERIVPROC				glGetShaderiv = NULL;
 PFNGLGETUNIFORMLOCATIONARBPROC		glGetUniformLocation = NULL;
@@ -107,6 +108,7 @@ bool loadOpenGLExtensions( void )
 	glShaderSource			= ( PFNGLSHADERSOURCEPROC )				wglGetProcAddress( "glShaderSource" );
 	glUseProgram			= ( PFNGLUSEPROGRAMPROC )				wglGetProcAddress( "glUseProgram" );
 	glGetShaderInfoLog		= ( PFNGLGETSHADERINFOLOGPROC )			wglGetProcAddress( "glGetShaderInfoLog" );
+    glGetProgramInfoLog		= ( PFNGLGETPROGRAMINFOLOGPROC )	    wglGetProcAddress( "glGetProgramInfoLog" );
 	glGetProgramiv			= ( PFNGLGETPROGRAMIVPROC )				wglGetProcAddress( "glGetProgramiv" );
 	glGetShaderiv			= ( PFNGLGETSHADERIVPROC )				wglGetProcAddress( "glGetShaderiv" );
 	glGetUniformLocation	= ( PFNGLGETUNIFORMLOCATIONARBPROC )    wglGetProcAddress( "glGetUniformLocationARB" );
