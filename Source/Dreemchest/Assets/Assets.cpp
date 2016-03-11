@@ -257,6 +257,9 @@ bool Assets::loadAssetToCache( Handle asset )
 // ** Assets::update
 void Assets::update( f32 dt )
 {
+    // Save current time
+    m_currentTime = Platform::currentTime();
+
     // Check outdated assets
     for( s32 i = 0, n = m_assets.size(); i < n; i++ ) {
         // Get an asset by index

@@ -246,6 +246,7 @@ namespace Assets {
 
         Slots<Asset, Index>         m_assets;       //!< All available assets.
         AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
+        u32                         m_currentTime;  //!< Cached current time.
         Map<String, Type>           m_nameToType;   //!< Maps asset name to type.
         Map<Type, String>           m_typeToName;   //!< Maps asset type to name.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
@@ -338,7 +339,7 @@ namespace Assets {
         }
 
         const TAsset& data = assetData<TAsset>( asset );
-        asset->m_lastUsed = Platform::currentTime();
+        asset.m_lastUsed = m_currentTime;
         return data;
     }
 
