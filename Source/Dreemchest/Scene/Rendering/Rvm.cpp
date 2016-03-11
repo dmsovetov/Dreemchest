@@ -137,7 +137,9 @@ Rvm::UserData* Rvm::allocateUserData( Rop* rop )
 // ** Rvm::allocateRop
 Rvm::Rop* Rvm::allocateRop( void )
 {
-    return &m_operations[m_operationCount++];
+    Rop* rop = &m_operations[m_operationCount++];
+    rop->bits.sequence = m_sequence;
+    return rop;
 }
 
 // ** Rvm::setInstance
@@ -167,6 +169,23 @@ void Rvm::setInstance( s32 value )
 	}
 }
 
+// ** Rvm::setRenderingMode
+void Rvm::setRenderingMode( u8 value )
+{
+	DC_ABORT_IF( value >= TotalRenderModes, "invalid rendering mode" )
+
+    // Get the rendering mode by index
+	const RasterizationOptions& options = m_rasterization[value];
+
+    // Setup rasterization states
+	m_hal->setBlendFactors( options.blend.src, options.blend.dst );
+	m_hal->setAlphaTest( options.alpha.function, options.alpha.reference );
+	m_hal->setDepthTest( options.depth.write, options.depth.function );
+
+    // Save current rendering mode
+    m_activeState.renderingMode = value;
+}
+
 // ** Rvm::setColor
 void Rvm::setColor( const Rgba& value )
 {
@@ -193,6 +212,8 @@ void Rvm::executeCommand( const Rop& rop, const UserData& userData )
                                 break;
 
     case Rop::PopRenderTarget:  {
+                                    DC_ABORT_IF( m_renderTarget.empty(), "render target stack underflow" );
+
                                     // End rendering
                                     m_renderTarget.top().instance->end( m_context );
 
@@ -207,6 +228,18 @@ void Rvm::executeCommand( const Rop& rop, const UserData& userData )
                                 }
                                 break;
 
+    case Rop::RasterOptions:    {
+                                    // Get the rasterization options from command user data
+                                    const RasterizationOptions& ro = userData.rasterization;
+
+                                    for( s32 i = 0; i < TotalRenderModes; i++ ) {
+                                        if( BIT( i ) & ro.renderingMode ) {
+                                            m_rasterization[i] = ro;
+                                        }
+                                    }
+                                }
+                                break;
+
     default:                    DC_NOT_IMPLEMENTED;
     }
 }
@@ -216,6 +249,32 @@ void Rvm::flush( void )
 {
     // Sort accumulated commands
     std::sort( m_operations.begin(), m_operations.begin() + m_operationCount );
+
+#if 0
+    //
+    CString commands[] = {
+          "pushRenderTarget"
+        , "popRenderTarget"
+        , "rasterOptions"  
+    };
+    CString modes[] = {
+		  "opaque"
+		, "cutout"
+		, "translucent"
+		, "additive"
+    };
+
+    for( s32 i = 0; i < m_operationCount; i++ ) {
+        const Rop& rop = m_operations[i];
+
+        if( rop.bits.command ) {
+            LogVerbose( "rvm", "%d: %s\n", rop.bits.sequence, commands[rop.bits.mode] );
+        }
+        else {
+            LogVerbose( "rvm", "%d: drawCall : %s\n", rop.bits.sequence, modes[rop.bits.mode] );
+        }
+    }
+#endif
 
     // Process all commands
     for( s32 i = 0, n = m_operationCount; i < n; i++ ) {
@@ -231,6 +290,11 @@ void Rvm::flush( void )
         // Set the rendering technique
         if( m_activeState.technique != rop.bits.technique ) {
             setTechnique( rop.bits.technique );
+        }
+
+        // Set the rendering mode
+        if( m_activeState.renderingMode != rop.bits.mode ) {
+            setRenderingMode( rop.bits.mode );
         }
 
         // Set renderable
@@ -263,19 +327,54 @@ void Rvm::flush( void )
     m_operationCount = 0;
     m_instanceCount = 0;
 
+    memset( &m_operations[0], 0, sizeof( Rop ) * m_operations.size() );
+    memset( &m_userData[0], 0, sizeof( UserData ) * m_userData.size() );
+
     // Reset the sequence number
     m_sequence = 0;
 
     // Reset active state
     m_activeState = ActiveState();
+
+    // Reset rendering states
+    reset();
+}
+
+// ** Rvm::reset
+void Rvm::reset( void )
+{
+	// Reset rasterization options
+	m_rasterization[RenderOpaque]       = RasterizationOptions::opaque();
+	m_rasterization[RenderCutout]       = RasterizationOptions::cutout();
+	m_rasterization[RenderAdditive]     = RasterizationOptions::additive();
+	m_rasterization[RenderTranslucent]  = RasterizationOptions::translucent();
+
+	// Reset the face culling
+	m_hal->setCulling( Renderer::TriangleFaceBack );
+
+	// Set the default polygon mode
+	m_hal->setPolygonMode( Renderer::PolygonFill );
+
+	// Set the default shader
+	m_hal->setShader( NULL );
+
+	// Set the default vertex buffer
+	m_hal->setVertexBuffer( NULL );
+
+	// Set default textures
+	for( s32 i = 0; i < 8; i++ ) {
+		m_hal->setTexture( i, NULL );
+	}
+
+	// Enable the depth test back
+	m_hal->setDepthTest( true, Renderer::LessEqual );
 }
 
 // ** Rvm::emitPushRenderTarget
 void Rvm::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport )
 {
     Rop* rop = allocateRop();
-    rop->bits.command  = 1;
-    rop->bits.mode     = Rop::PushRenderTarget;
+    rop->setCommand( Rop::PushRenderTarget );
     rop->bits.sequence = m_sequence++;
 
     UserData* userData = allocateUserData( rop );
@@ -294,9 +393,20 @@ void Rvm::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& vi
 void Rvm::emitPopRenderTarget( void )
 {
     Rop* rop = allocateRop();
-    rop->bits.command = 1;
-    rop->bits.mode = Rop::PopRenderTarget;
+    rop->setCommand( Rop::PopRenderTarget );
     rop->bits.sequence = ++m_sequence;
+}
+
+// ** Rvm::emitRasterOptions
+void Rvm::emitRasterOptions( u8 renderingModes, const RasterizationOptions& options )
+{
+    Rop* rop = allocateRop();
+    rop->setCommand( Rop::RasterOptions );
+    rop->bits.sequence = m_sequence++;
+
+    UserData* userData = allocateUserData( rop );
+    userData->rasterization = options;
+    userData->rasterization.renderingMode = renderingModes;
 }
 
 // ** Rvm::Rop::Rop
@@ -315,9 +425,70 @@ bool Rvm::Rop::operator < ( const Rop& other ) const
 Rvm::ActiveState::ActiveState( void )
     : technique( -1 )
     , renderable( -1 )
+    , renderingMode( -1 )
     , shader( NULL )
     , vertexBuffer( NULL )
 {
+}
+
+// ** Rvm::RasterizationOptions::opaque
+Rvm::RasterizationOptions Rvm::RasterizationOptions::opaque( void )
+{
+    RasterizationOptions options;
+
+    options.blend.src       = Renderer::BlendDisabled;
+    options.blend.dst       = Renderer::BlendDisabled;
+    options.alpha.function  = Renderer::CompareDisabled;
+    options.alpha.reference = 0.0f;
+    options.depth.write     = true;
+    options.depth.function  = Renderer::LessEqual;
+
+    return options;
+}
+
+// ** Rvm::RasterizationOptions::cutout
+Rvm::RasterizationOptions Rvm::RasterizationOptions::cutout( void )
+{
+    RasterizationOptions options;
+
+    options.blend.src       = Renderer::BlendDisabled;
+    options.blend.dst       = Renderer::BlendDisabled;
+    options.alpha.function  = Renderer::Greater;
+    options.alpha.reference = 0.5f;
+    options.depth.write     = true;
+    options.depth.function  = Renderer::LessEqual;
+
+    return options;
+}
+
+// ** Rvm::RasterizationOptions::translucent
+Rvm::RasterizationOptions Rvm::RasterizationOptions::translucent( void )
+{
+    RasterizationOptions options;
+
+    options.blend.src       = Renderer::BlendSrcAlpha;
+    options.blend.dst       = Renderer::BlendInvSrcAlpha;
+    options.alpha.function  = Renderer::CompareDisabled;
+    options.alpha.reference = 0.0f;
+    options.depth.write     = false;
+    options.depth.function  = Renderer::LessEqual;
+
+    return options;
+}
+
+// ** Rvm::RasterizationOptions::additive
+Rvm::RasterizationOptions Rvm::RasterizationOptions::additive( void )
+{
+    RasterizationOptions options;
+
+    options.blend.src       = Renderer::BlendOne;
+    options.blend.dst       = Renderer::BlendOne;
+    options.alpha.function  = Renderer::CompareDisabled;
+    options.alpha.reference = 0.0f;
+    options.depth.write     = false;
+    options.depth.function  = Renderer::LessEqual;
+
+    return options;
 }
 
 } // namespace Scene

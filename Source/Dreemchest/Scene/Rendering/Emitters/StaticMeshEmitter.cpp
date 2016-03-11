@@ -31,17 +31,25 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( RenderingContext& ctx, Rvm& rvm, const StaticMesh& staticMesh, const Transform& transform )
+void StaticMeshEmitter::emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm, const StaticMesh& staticMesh, const Transform& transform )
 {
+    // Get the material
+    const MaterialHandle& material = staticMesh.material( 0 );
+    RenderingMode         mode     = material->renderingMode();
+
+    // Does this material passes the filter?
+    if( (BIT( mode ) & m_renderModes) == 0 ) {
+        return;
+    }
+
     // Request the renderable asset for this mesh.
-    const MeshHandle& mesh = staticMesh.mesh();
-    s32 renderable = ctx.requestRenderable( mesh );
+    s32 renderable = ctx.requestRenderable( staticMesh.mesh() );
 
     // Request the technique asset for a material.
-    s32 technique = ctx.requestTechnique( staticMesh.material( 0 ) );
+    s32 technique = ctx.requestTechnique( material );
 
     // Emit the rendering command
-    rvm.emitDrawCall( &transform.matrix(), renderable, technique );
+    rvm.emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
 }
 
 } // namespace Scene

@@ -44,8 +44,10 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
     , m_scene( scene )
     , m_assets( assets )
 {
-    m_rvm     = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
-    m_emitter = DC_NEW StaticMeshEmitter( scene );
+    m_rvm           = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_opaque        = DC_NEW StaticMeshEmitter( scene, RenderOpaqueBit | RenderCutoutBit );
+    m_translucent   = DC_NEW StaticMeshEmitter( scene, RenderTranslucentBit );
+    m_additive      = DC_NEW StaticMeshEmitter( scene, RenderAdditiveBit );
 }
 
 // ** RenderingContext::create
@@ -104,7 +106,15 @@ void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Tr
     m_rvm->emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
 
     // Now emit all render operations
-    m_emitter->emit( *this, *m_rvm );
+    m_rvm->emitRasterOptions( RenderOpaqueBit, Rvm::RasterizationOptions::opaque() );
+    m_rvm->emitRasterOptions( RenderCutoutBit, Rvm::RasterizationOptions::translucent() );
+    m_opaque->emit( transform.position(), *this, *m_rvm );
+
+    m_rvm->emitRasterOptions( RenderTranslucentBit, Rvm::RasterizationOptions::translucent() );
+    m_translucent->emit( transform.position(), *this, *m_rvm );
+
+    m_rvm->emitRasterOptions( RenderAdditiveBit, Rvm::RasterizationOptions::additive() );
+    m_additive->emit( transform.position(), *this, *m_rvm );
 
     // End rendering by popping a render target
     m_rvm->emitPopRenderTarget();

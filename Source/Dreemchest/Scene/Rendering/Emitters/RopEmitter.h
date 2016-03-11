@@ -46,7 +46,7 @@ namespace Scene {
                                     : m_entities( entities ) {}
 
 		//! Emits render operations for entities in scene.
-		virtual void			emit( RenderingContext& ctx, Rvm& rvm ) = 0;
+		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm ) = 0;
 
 	protected:
 
@@ -63,22 +63,22 @@ namespace Scene {
 									: AbstractRopEmitter( scene->ecs()->requestIndex( "", Ecs::Aspect::all<TRenderable, Transform>() ) ) {}
 
 		//! Emits render operations for renderable entities in scene.
-		virtual void			emit( RenderingContext& ctx, Rvm& rvm ) DC_DECL_OVERRIDE;
+		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Emits render operation for a single renderable entity.
-		virtual void			emit( RenderingContext& ctx, Rvm& rvm, const TRenderable& renderable, const Transform& transform ) = 0;
+		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm, const TRenderable& renderable, const Transform& transform ) = 0;
 	};
 
 	// ** RopEmitter::emit
 	template<typename TRenderable>
-	void RopEmitter<TRenderable>::emit( RenderingContext& ctx, Rvm& rvm )
+	void RopEmitter<TRenderable>::emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm )
 	{
 		const Ecs::EntitySet& entities = m_entities->entities();
 
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			emit( ctx, rvm, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+			emit( camera, ctx, rvm, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}
 	}
 

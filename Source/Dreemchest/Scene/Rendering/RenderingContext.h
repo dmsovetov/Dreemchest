@@ -170,7 +170,9 @@ namespace Scene {
         SceneWPtr                           m_scene;        //!< Parent scene instance.
         Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
 
-        RopEmitterUPtr                      m_emitter;
+        RopEmitterUPtr                      m_opaque;
+        RopEmitterUPtr                      m_translucent;
+        RopEmitterUPtr                      m_additive;
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
 	};

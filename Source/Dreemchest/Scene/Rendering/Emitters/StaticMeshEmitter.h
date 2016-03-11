@@ -38,13 +38,17 @@ namespace Scene {
 	public:
 
 								//! Constructs StaticMeshEmitter instance.
-								StaticMeshEmitter( SceneWPtr scene )
-                                    : RopEmitter( scene ) {}
+								StaticMeshEmitter( SceneWPtr scene, u32 renderModes = AllRenderModesBit )
+                                    : RopEmitter( scene ), m_renderModes( renderModes ) {}
 
 	private:
 
 		//! Emits render operations for all static meshes in scene.
-		virtual void			emit( RenderingContext& ctx, Rvm& rvm, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
+
+    private:
+
+        u32                     m_renderModes;  //!< Material render modes that will emit render operations.
 	};
 
 } // namespace Scene

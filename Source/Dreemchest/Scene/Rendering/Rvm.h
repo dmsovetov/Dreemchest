@@ -33,16 +33,55 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    inline u16 quantizeFloat( f32 value, f32 maximum, u16 bits )
+    {
+        f32 normalized = value / maximum;
+        f32 result     = f32( bits ) * normalized;
+        return static_cast<u16>( result );
+    }
+
     //! Renderer virtual machine.
     class Rvm {
     public:
 
+        //! Rasterization options used by a render mode.
+        struct RasterizationOptions {
+            u8                          renderingMode;  //!< Rendering modes that are eligible to use this rasterization options.
+            struct {
+                Renderer::BlendFactor   src;        //!< Source blend factor.
+                Renderer::BlendFactor   dst;        //!< Destination blend factor.
+            } blend;
+
+            struct {
+                Renderer::Compare		function;   //!< Alpha test function to be used.
+			    f32						reference;  //!< Reference value for an alpha test.
+            } alpha;
+
+            struct {
+                Renderer::Compare	    function;   //!< Depth test function to be used.          
+  			    bool					write;	    //!< Is writing to a depth buffer enabled or not.
+            } depth;
+
+            //! Returns default opaque rasterization options.
+            static RasterizationOptions opaque( void );
+
+            //! Returns default cutout rasterization options.
+            static RasterizationOptions cutout( void );
+
+            //! Returns default translucent rasterization options.
+            static RasterizationOptions translucent( void );
+
+            //! Returns default additive rasterization options.
+            static RasterizationOptions additive( void );
+        };
+
         //! Rendering operation emitted by scene object processing.
         struct Rop {
             //! Available command types
-            enum {
+            enum Command {
                   PushRenderTarget  //!< Begins rendering to target by pushing it to a stack and setting the viewport.
                 , PopRenderTarget   //!< Ends rendering to target by popping it from a stack.
+                , RasterOptions     //!< Setups the rasterization options.
             };
 
                         //! Constructs Rop instance.
@@ -65,6 +104,20 @@ namespace Scene {
                 Bits    bits;   //!< Command feature bits.
                 u64     key;    //!< The composed command key.
             };
+
+            //! Setups this render operation as a command.
+            NIMBLE_INLINE void setCommand( Command value )
+            {
+                bits.command = 1;
+                bits.mode    = value;
+            }
+
+            //! Returns the command type stored in this render operation.
+            NIMBLE_INLINE Command command( void ) const
+            {
+                DC_BREAK_IF( !bits.command, "render operation is no a command" );
+                return static_cast<Command>( bits.mode );
+            }
         };
 
         NIMBLE_STATIC_ASSERT( sizeof( Rop ) == 8, "Rop size is expected to be 8 bytes" );
@@ -73,7 +126,7 @@ namespace Scene {
                                         Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal );
 
         //! Pushes a single rendering command to a buffer.
-        NIMBLE_INLINE void              emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique );
+        NIMBLE_INLINE void              emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
 
         //! Emits the command to push a render target.
         void                            emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport );
@@ -81,8 +134,14 @@ namespace Scene {
         //! Emits the command to pop a render target.
         void                            emitPopRenderTarget( void );
 
+        //! Emits the rasterization options command.
+        void                            emitRasterOptions( u8 renderingModes, const RasterizationOptions& options );
+
         //! Flushes all accumulated commands.
         void                            flush( void );
+
+        //! Resets the rendering states.
+        void                            reset( void );
 
         //! Sets the constant color.
         void                            setColor( const Rgba& value );
@@ -107,6 +166,9 @@ namespace Scene {
         //! Sets the instance data.
         void                            setInstance( s32 value );
 
+        //! Sets the rendering mode.
+        void                            setRenderingMode( u8 value );
+
         //! Allocates new user data for a specified rop instance instance.
         UserData*                       allocateUserData( Rop* rop );
 
@@ -130,9 +192,10 @@ namespace Scene {
             union {
                 // Instance user data
                 struct {
-                    const Matrix4*      transform;  //!< Instance transform.
+                    const Matrix4*      transform;      //!< Instance transform.
                 } instance;
-                RenderTargetState       rt;         //!< Render target info.
+                RenderTargetState       rt;             //!< Render target info.
+                RasterizationOptions    rasterization;  //!< Rasterization options.
             };
         };
 
@@ -143,6 +206,7 @@ namespace Scene {
 
             s32                         technique;          //!< Active technique.
             s32                         renderable;         //!< Active renderable.
+            u8                          renderingMode;      //!< Active rendering mode.
             Renderer::ShaderWPtr        shader;             //!< Active shader.
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
@@ -152,6 +216,7 @@ namespace Scene {
         const Array<RenderableHandle>&  m_renderables;      //!< Renderable asset handles.
         const Array<TechniqueHandle>&   m_techniques;       //!< Technique asset handles.
         Stack<RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
+        RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         s32                             m_sequence;         //!< Current sequence number of render operation.
         Array<Rop>                      m_operations;       //!< Actual rop buffer.
         s32                             m_operationCount;   //!< The total number of allocated render operations.
@@ -162,13 +227,14 @@ namespace Scene {
     };
 
     // ** Rvm::emitDrawCall
-    NIMBLE_INLINE void Rvm::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique )
+    NIMBLE_INLINE void Rvm::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
     {
         // Allocate new command instance
         Rop* rop = allocateRop();
         rop->bits.renderable = renderable;
         rop->bits.technique  = technique;
-        rop->bits.sequence   = m_sequence;
+        rop->bits.mode       = mode;
+        rop->bits.depth      = static_cast<u8>( 255 * (1.0f - (depth / 100.0f)) );
 
         // Allocate instance user data
         UserData* data = allocateUserData( rop );
