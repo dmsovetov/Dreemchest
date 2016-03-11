@@ -109,7 +109,7 @@ namespace Assets {
     template<typename TAsset>
     const TAsset& Handle::data( void ) const
     {
-        return assets()->assetData<TAsset>( *this );
+        return assets()->assetData<TAsset>( asset() );
     }
 
     // ** Handle::index
@@ -134,7 +134,7 @@ namespace Assets {
     template<typename TAsset>
     const TAsset& Handle::readLock( void ) const
     {
-        return assets()->acquireReadLock<TAsset>( *this );
+        return assets()->acquireReadLock<TAsset>( asset() );
     }
 
     // ** Handle::writeLock

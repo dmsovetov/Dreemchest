@@ -116,7 +116,7 @@ Assets* Handle::assets( void ) const
 // ** Handle::forceLoad
 bool Handle::forceLoad( void )
 {
-    return assets()->loadAssetToCache( *this );
+    return assets()->loadAssetToCache( asset() );
 }
 
 } // namespace Assets
