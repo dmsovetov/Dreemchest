@@ -248,7 +248,7 @@ bool Assets::loadAssetToCache( Asset& asset )
     }
 
     // Perform loading
-    LogVerbose( "cache", "loading '%s'...\n", asset->name().c_str() );
+    LogVerbose( "cache", "loading '%s'...\n", asset.name().c_str() );
 
     // Switch to Loading state
     asset.switchToState( Asset::Loading );
@@ -342,8 +342,8 @@ void Assets::queueForLoading( const Asset& asset ) const
         return;
     }
 
-    m_loadingQueue.push_back( asset );
-    LogVerbose( "cache", "asset '%s' is queued for loading\n", asset->name().c_str() );
+    m_loadingQueue.push_back( handle );
+    LogVerbose( "cache", "asset '%s' is queued for loading\n", asset.name().c_str() );
 }
 
 // ** Assets::reserveAssetData
