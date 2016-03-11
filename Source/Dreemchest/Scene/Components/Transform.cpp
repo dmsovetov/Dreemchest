@@ -335,6 +335,12 @@ f32 MoveAlongAxes::speed( void ) const
 	return m_speed;
 }
 
+// ** MoveAlongAxes::setSpeed
+void MoveAlongAxes::setSpeed( f32 value )
+{
+    m_speed = value;
+}
+
 // ** MoveAlongAxes::coordinateSystem
 u8 MoveAlongAxes::coordinateSystem( void ) const
 {

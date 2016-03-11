@@ -231,6 +231,9 @@ namespace Scene {
 		//! Returns the movement speed.
 		f32						speed( void ) const;
 
+        //! Sets the movement speed.
+        void                    setSpeed( f32 value );
+
 		//! Returns the coordinate system used for transformations.
 		u8						coordinateSystem( void ) const;
 
