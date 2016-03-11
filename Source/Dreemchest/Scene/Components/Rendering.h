@@ -150,7 +150,7 @@ namespace Scene {
 										: m_mesh( mesh ), m_visibility( ~0 ) {}
 
 		//! Returns mesh to be rendered.
-		MeshHandle					mesh( void ) const;
+		const MeshHandle&		    mesh( void ) const;
 
 		//! Sets a mesh to be rendered.
 		void						setMesh( MeshHandle value );
@@ -171,7 +171,7 @@ namespace Scene {
 		u32							materialCount( void ) const;
 
 		//! Returns the material by index.
-		MaterialHandle				material( u32 index ) const;
+		const MaterialHandle&	    material( u32 index ) const;
 
 		//! Sets the material by index.
 		void						setMaterial( u32 index, MaterialHandle value );
@@ -198,6 +198,19 @@ namespace Scene {
 		Array<MaterialHandle>	    m_materials;		//!< Mesh materials array.
 		Renderer::TexturePtr		m_lightmap;			//!< Lightmap texture that is rendered for this mesh.
 	};
+
+    // ** StaticMesh::materialCount
+    NIMBLE_INLINE u32 StaticMesh::materialCount( void ) const
+    {
+	    return static_cast<u32>( m_materials.size() );
+    }
+
+    // ** StaticMesh::material
+    NIMBLE_INLINE const MaterialHandle& StaticMesh::material( u32 index ) const
+    {
+        static MaterialHandle Invalid;
+	    return index < materialCount() ? m_materials[index] : Invalid;
+    }
 
 	//! Holds the sprite rendering info.
 	class Sprite : public Ecs::Component<Sprite> {

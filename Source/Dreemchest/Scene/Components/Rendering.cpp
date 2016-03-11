@@ -99,7 +99,7 @@ void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
-MeshHandle StaticMesh::mesh( void ) const
+const MeshHandle& StaticMesh::mesh( void ) const
 {
 	return m_mesh;
 }
@@ -134,18 +134,6 @@ bool StaticMesh::isVisible( u8 camera ) const
 void StaticMesh::setVisibilityMask( u16 mask, bool value )
 {
 	m_visibility.set( mask, value );
-}
-
-// ** StaticMesh::materialCount
-u32 StaticMesh::materialCount( void ) const
-{
-	return ( u32 )m_materials.size();
-}
-
-// ** StaticMesh::material
-MaterialHandle StaticMesh::material( u32 index ) const
-{
-	return index < materialCount() ? m_materials[index] : MaterialHandle();
 }
 
 // ** StaticMesh::setMaterial
