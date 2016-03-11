@@ -105,6 +105,18 @@ void Material::setDiffuse( ImageHandle value )
 	setTexture( Diffuse, value );
 }
 
+// ** Material::shader
+ShaderHandle Material::shader( void ) const
+{
+    return m_shader;
+}
+
+// ** Material::setShader
+void Material::setShader( ShaderHandle value )
+{
+    m_shader = value;
+}
+
 // ** Material::updateMaterialFeatures
 void Material::updateMaterialFeatures( void )
 {

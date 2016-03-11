@@ -101,6 +101,12 @@ namespace Scene {
 		//! Sets the diffuse material texture.
 		void						setDiffuse( ImageHandle value );
 
+        //! Returns the material shader.
+        ShaderHandle                shader( void ) const;
+
+        //! Sets the material shader.
+        void                        setShader( ShaderHandle value );
+
 	private:
 
 		//! Updates material features.
@@ -109,6 +115,7 @@ namespace Scene {
 	private:
 
 		Model						m_model;						//!< Material light model.
+        ShaderHandle                m_shader;                       //!< Material shader handle.
 		RenderingMode				m_renderingMode;				//!< Material blending.
 		u32							m_features;						//!< Used material features.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
