@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "StaticMeshRopEmitter.h"
+#include "StaticMeshRopEmitterDeprecated.h"
 
 #include "../../Assets/Mesh.h"
 #include "../../Assets/Image.h"

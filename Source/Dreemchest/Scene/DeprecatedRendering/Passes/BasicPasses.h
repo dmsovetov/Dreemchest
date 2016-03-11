@@ -28,7 +28,7 @@
 #define __DC_Scene_BasicPasses_H__
 
 #include "../RenderPass.h"
-#include "../Emitters/StaticMeshRopEmitter.h"
+#include "../Emitters/StaticMeshRopEmitterDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -29,7 +29,7 @@
 
 #include "../RenderPass.h"
 #include "../RenderingSystemDeprecated.h"
-#include "../Emitters/StaticMeshRopEmitter.h"
+#include "../Emitters/StaticMeshRopEmitterDeprecated.h"
 #include "../../Components/Debug.h"
 
 DC_BEGIN_DREEMCHEST
