@@ -56,9 +56,6 @@ namespace Assets {
         //! Returns true if this is a valid asset type.
         bool                        isValid( void ) const;
 
-        //! Converts an asset type to a string.
-        String                      toString( void ) const;
-
         //! Returns asset type bit mask.
         u32                         bit( void ) const;
 
@@ -70,13 +67,6 @@ namespace Assets {
         template<typename TAsset>
         static Type                 fromClass( void );
 
-        //! Returns an asset type from a string.
-        static Type                 fromString( const String& value );
-
-        //! Registers a new asset type.
-        template<typename TAsset>
-        static bool                 declare( void );
-
     private:
 
                                     //! Constructs Type instance.
@@ -85,22 +75,7 @@ namespace Assets {
     private:
 
         TypeIdx                     m_type;         //!< Actual asset type value.
-        static Map<String, Type>    s_nameToType;   //!< Maps asset name to type.
-        static Map<Type, String>    s_typeToName;   //!< Maps asset type to name.
     };
-
-    // ** Type::declare
-    template<typename TAsset>
-    bool Type::declare( void )
-    {
-        Type   type = fromClass<TAsset>();
-        String name = TypeInfo<TAsset>::name();
-
-        s_nameToType[name] = type;
-        s_typeToName[type] = name;
-
-        return true;
-    }
 
     // ** Type::fromClass
     template<typename TAsset>

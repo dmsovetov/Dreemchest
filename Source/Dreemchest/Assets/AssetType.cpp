@@ -33,12 +33,6 @@ namespace Assets {
 // ** Type::Invalid
 const Type Type::Invalid;
 
-// ** Type::s_nameToType
-Map<String, Type> Type::s_nameToType;
-
-// ** Type::s_typeToName
-Map<Type, String> Type::s_typeToName;
-
 // ** Type::Type
 Type::Type( void ) : m_type( ~0 )
 {
@@ -78,32 +72,6 @@ u32 Type::bit( void ) const
 {
     DC_BREAK_IF( m_type > 31 );
     return 1 << BIT( m_type );
-}
-
-// ** Type::fromString
-Type Type::fromString( const String& value )
-{
-    Map<String, Type>::const_iterator i = s_nameToType.find( value );
-    
-    if( i == s_nameToType.end() ) {
-        DC_BREAK;
-        return Type();
-    }
-
-    return i->second;
-}
-
-// ** Type::toString
-String Type::toString( void ) const
-{
-    Map<Type, String>::const_iterator i = s_typeToName.find( m_type );
-
-    if( i == s_typeToName.end() ) {
-        DC_BREAK;
-        return "";
-    }
-
-    return i->second;
 }
 
 } // namespace Assets
