@@ -319,7 +319,7 @@ namespace Renderer {
 
         // ** Shader
         virtual u32                 findUniformLocation( CString name );
-        virtual void                setMatrix( u32 location, const Matrix4& value );
+        virtual void                setMatrix( u32 location, const f32 value[16] );
         virtual void                setInt( u32 location, u32 value );
         virtual void                setFloat( u32 location, f32 value );
         virtual void                setVec2( u32 location, const Vec2& value );

@@ -628,6 +628,9 @@ namespace Renderer {
 		//! Sets a 4x4 matrix value to a uniform location.
         virtual void                setMatrix( u32 location, const Matrix4& value );
 
+		//! Sets a 4x4 matrix value to a uniform location.
+        virtual void                setMatrix( u32 location, const f32 value[16] );
+
         //! Sets an integer value to a uniform location.
         virtual void                setInt( u32 location, u32 value );
 

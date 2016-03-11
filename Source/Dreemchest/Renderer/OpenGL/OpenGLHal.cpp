@@ -1198,10 +1198,10 @@ u32 OpenGLShader::findUniformLocation( const char *name )
 }
 
 // ** OpenGLShader::setMatrix
-void OpenGLShader::setMatrix( u32 location, const Matrix4& value )
+void OpenGLShader::setMatrix( u32 location, const f32 value[16] )
 {
     DC_CHECK_GL;
-    glUniformMatrix4fv( location - 1, 1, false, value.m );
+    glUniformMatrix4fv( location - 1, 1, false, value );
 }
 
 // ** OpenGLShader::setInt

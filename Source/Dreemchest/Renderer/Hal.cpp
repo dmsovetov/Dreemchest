@@ -834,6 +834,12 @@ u32 Shader::findUniformLocation( const char * name )
 // ** Shader::setMatrix
 void Shader::setMatrix( u32 location, const Matrix4& value )
 {
+    setMatrix( location, value.m );
+}
+
+// ** Shader::setMatrix
+void Shader::setMatrix( u32 location, const f32 value[16] )
+{
 
 }
 
