@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderAssetSources.h"
+#include "../Rendering/RenderingContext.h"
 #include "Mesh.h"
 #include "Image.h"
 #include "Material.h"
@@ -37,8 +38,8 @@ namespace Scene {
 // ----------------------------------------------------------------------- RenderableMeshSource ----------------------------------------------------------------------- //
 
 // ** RenderableMeshSource::RenderableMeshSource
-RenderableMeshSource::RenderableMeshSource( MeshHandle mesh, Renderer::HalWPtr hal )
-    : AssetSource( mesh ), m_hal( hal )
+RenderableMeshSource::RenderableMeshSource( MeshHandle mesh, RenderingContextWPtr context )
+    : AssetSource( mesh ), m_context( context )
 {
 }
 
@@ -47,8 +48,11 @@ bool RenderableMeshSource::constructFromAsset( const Mesh& mesh, Assets::Assets&
 {
     DC_BREAK_IF( mesh.chunkCount() == 0, "constructing renderable from an empty mesh" );
 
+    // Get the rendering HAL instance
+    Renderer::HalWPtr hal = m_context->hal();
+
     // Create vertex declaration
-    Renderer::VertexDeclarationPtr vertexFormat = m_hal->createVertexDeclaration( "P3:N:T0:T1" );
+    Renderer::VertexDeclarationPtr vertexFormat = hal->createVertexDeclaration( "P3:N:T0:T1" );
 
     // Add all mesh chunks to renderable
     for( s32 i = 0, n = mesh.chunkCount(); i < n; i++ ) {
@@ -60,8 +64,8 @@ bool RenderableMeshSource::constructFromAsset( const Mesh& mesh, Assets::Assets&
 	    u32 indexCount = ( u32 )indices.size();
 
 	    // Create GPU buffers.
-	    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( vertexFormat, vertexCount );
-	    Renderer::IndexBufferPtr  indexBuffer  = m_hal->createIndexBuffer( indexCount );
+	    Renderer::VertexBufferPtr vertexBuffer = hal->createVertexBuffer( vertexFormat, vertexCount );
+	    Renderer::IndexBufferPtr  indexBuffer  = hal->createIndexBuffer( indexCount );
 
 	    // Upload the vertex data
 	    Mesh::Vertex* vertex = vertexBuffer->lock<Mesh::Vertex>();
@@ -98,8 +102,8 @@ bool RenderableMeshSource::constructFromAsset( const Mesh& mesh, Assets::Assets&
 // ----------------------------------------------------------------------- TextureImageSource ----------------------------------------------------------------------- //
 
 // ** TextureImageSource::TextureImageSource
-TextureImageSource::TextureImageSource( ImageHandle image, Renderer::HalWPtr hal )
-    : AssetSource( image ), m_hal( hal )
+TextureImageSource::TextureImageSource( ImageHandle image, RenderingContextWPtr context )
+    : AssetSource( image ), m_context( context )
 {
 }
 
@@ -107,7 +111,7 @@ TextureImageSource::TextureImageSource( ImageHandle image, Renderer::HalWPtr hal
 bool TextureImageSource::constructFromAsset( const Image& image, Assets::Assets& assets, Texture& texture )
 {
     // Upload this image to a GPU texture
-	Renderer::Texture2DPtr instance = m_hal->createTexture2D( image.width(), image.height(), image.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+	Renderer::Texture2DPtr instance = m_context->hal()->createTexture2D( image.width(), image.height(), image.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
 	instance->setData( 0, &image.mipLevel( 0 )[0] );
 
     // Set texture asset
@@ -119,37 +123,40 @@ bool TextureImageSource::constructFromAsset( const Image& image, Assets::Assets&
     return true;
 }
 
-// ----------------------------------------------------------------------- TechniqueMaterialSource ----------------------------------------------------------------------- //
+// ----------------------------------------------------------------------- ProgramShaderSource ----------------------------------------------------------------------- //
 
-// ** TechniqueMaterialSource::TechniqueMaterialSource
-TechniqueMaterialSource::TechniqueMaterialSource( MaterialHandle material, Renderer::HalWPtr hal )
-    : AssetSource( material ), m_hal( hal )
+// ** ProgramShaderSource::ProgramShaderSource
+ProgramShaderSource::ProgramShaderSource( ShaderHandle shader, RenderingContextWPtr context )
+    : AssetSource( shader ), m_context( context )
 {
 }
 
-// ** TechniqueMaterialSource::constructFromAsset
-bool TechniqueMaterialSource::constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique )
+// ** ProgramShaderSource::constructFromAsset
+bool ProgramShaderSource::constructFromAsset( const Shader& shader, Assets::Assets& assets, Program& program )
 {
-	CString vertex = NIMBLE_STRINGIFY(
-			uniform mat4 u_vp, u_transform;
+	// Generate macro definitions from features
+	String macro = "";
 
-			void main() {
-				gl_Position = u_vp * u_transform * gl_Vertex;
-			}
-		);
-	CString fragment = NIMBLE_STRINGIFY(
-			uniform vec4 u_color;
-            uniform vec4 u_clr0;
+	for( u32 i = 0, n = shader.featureCount(); i < n; i++ ) {
+        const Shader::Feature& feature = shader.feature( i );
 
-			void main() {
-				gl_FragColor = u_color * u_clr0;
-			}
-		);
+		if( feature.mask & program.features() ) {
+			macro += "#define " + feature.name + "\n";
+		}
+	}
 
-    // Create the technique shader instance
-    Renderer::ShaderPtr shader = m_hal->createShader( vertex, fragment );
+	// Compile the shader
+	Renderer::ShaderPtr compiled = m_context->hal()->createShader( (macro + shader.vertex()).c_str(), (macro + shader.fragment()).c_str() );
 
-    // Known shader input names
+    // Failed to compile - return false
+    if( !compiled.valid() ) {
+        return false;
+    }
+
+    // Save the compiled shader
+    program.setShader( compiled );
+
+    // Known program input names
     CString inputs[] = {
           "u_vp"
         , "u_transform"
@@ -164,24 +171,42 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
         , "u_clr3"
     };
 
-    NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Technique::TotalInputs, "missing shader input names" );
+    NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Program::TotalInputs, "missing program input names" );
 
     // Locate all shader inputs
-    for( s32 i = 0; i < Technique::TotalInputs; i++ ) {
+    for( s32 i = 0; i < Program::TotalInputs; i++ ) {
         // Find the input location
-        u32 location = shader->findUniformLocation( inputs[i] );
+        u32 location = compiled->findUniformLocation( inputs[i] );
 
         if( !location ) {
             continue;
         }
 
         // Save the location index
-        technique.setInputLocation( static_cast<Technique::Input>( i ), location );
-        LogDebug( "technique", "%s is bound to %d for material %s\n", inputs[i], location, m_asset.asset().name().c_str() );
+        program.setInputLocation( static_cast<Program::Input>( i ), location );
+        LogDebug( "program", "%s is bound to %d for shader %s\n", inputs[i], location, m_asset.asset().name().c_str() );
     }
 
-    // Set technique shader
-    technique.setShader( shader );
+	return true;
+}
+
+// ----------------------------------------------------------------------- TechniqueMaterialSource ----------------------------------------------------------------------- //
+
+// ** TechniqueMaterialSource::TechniqueMaterialSource
+TechniqueMaterialSource::TechniqueMaterialSource( MaterialHandle material, RenderingContextWPtr context )
+    : AssetSource( material ), m_context( context )
+{
+}
+
+// ** TechniqueMaterialSource::constructFromAsset
+bool TechniqueMaterialSource::constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique )
+{
+    // Get the material shader
+    ShaderHandle shader = material.shader();
+    DC_BREAK_IF( !shader.isLoaded(), "material shader is not loaded" );
+
+    // Set the technique program
+    technique.setProgram( m_context->programByIndex( m_context->requestProgram( shader, material.features() ) ) );
 
     // Set technique colors
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
@@ -189,6 +214,42 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
     }
 
     return true;
+}
+
+// ----------------------------------------------------------------------- ShaderFormatText ----------------------------------------------------------------------- //
+
+// ** ShaderFormatText::constructFromStream
+bool ShaderFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Shader& shader )
+{
+	static CString vertexShaderMarker   = "[VertexShader]";
+	static CString fragmentShaderMarker = "[FragmentShader]";
+
+	// Read the code from an input stream
+	String code;
+	code.resize( stream->length() );
+	stream->read( &code[0], stream->length() );
+
+	// Extract vertex/fragment shader code blocks
+	u32 vertexBegin = code.find( vertexShaderMarker );
+	u32 fragmentBegin = code.find( fragmentShaderMarker );
+
+	if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
+		return false;
+	}
+
+	if( vertexBegin != String::npos ) {
+		u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
+		String vertex = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
+        shader.setVertex( vertex );
+	}
+
+	if( fragmentBegin != String::npos ) {
+		u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
+		String fragment = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
+        shader.setFragment( fragment );
+	}
+
+	return true;
 }
 
 } // namespace Scene

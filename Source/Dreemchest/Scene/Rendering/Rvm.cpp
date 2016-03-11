@@ -53,11 +53,20 @@ void Rvm::setTechnique( s32 value )
     // Read-lock material technique
     const Technique& technique = m_techniques[value].readLock();
 
+    if( !technique.program().isValid() ) {
+        return;
+    }
+
     // Save current technique
     m_activeState.technique = value;
 
     // Set the technique shader
-    Renderer::ShaderWPtr shader = technique.shader();
+    const Program& program = technique.program().readLock();
+    Renderer::ShaderWPtr shader = program.shader();
+
+    if( !shader.valid() ) {
+        return;
+    }
 
     if( shader != m_activeState.shader ) {
         setShader( shader );
@@ -67,7 +76,7 @@ void Rvm::setTechnique( s32 value )
 
     // Bind texture samplers used by technique
     for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Texture0 + i ) ) ) {
+        if( location = program.inputLocation( static_cast<Program::Input>( Program::Texture0 + i ) ) ) {
         #if !DEV_DISABLE_DRAW_CALLS
             shader->setInt( location, i );
         #endif
@@ -76,7 +85,7 @@ void Rvm::setTechnique( s32 value )
 
     // Set colors exposed by a material
     for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
-        if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Color0 + i ) ) ) {
+        if( location = program.inputLocation( static_cast<Program::Input>( Program::Color0 + i ) ) ) {
             const Rgba& color = technique.color( i );
         #if !DEV_DISABLE_DRAW_CALLS
             shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
@@ -98,10 +107,17 @@ void Rvm::setRenderable( s32 value )
 // ** Rvm::setShader
 void Rvm::setShader( Renderer::ShaderWPtr shader )
 {
+    if( !shader.valid() ) {
+        return;
+    }
+
     u32 location = 0;
 
     // Read-lock active material technique
     const Technique& technique = m_techniques[m_activeState.technique].readLock();
+
+    // Read-lock active program
+    const Program& program = technique.program().readLock();
 
     // Bind the shader instance
 #if !DEV_DISABLE_DRAW_CALLS
@@ -109,14 +125,14 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
 #endif
 
     // Set the view-projection matrix input
-    if( location = technique.inputLocation( Technique::ViewProjection ) ) {
+    if( location = program.inputLocation( Program::ViewProjection ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setMatrix( location, m_renderTarget.top().vp );
     #endif
     }
 
     // Set the constant color input
-    if( location = technique.inputLocation( Technique::Color ) ) {
+    if( location = program.inputLocation( Program::Color ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setVec4( location, m_constantColor );
     #endif
@@ -156,13 +172,16 @@ void Rvm::setInstance( s32 value )
     // Read-lock active material technique
     const Technique& technique = m_techniques[m_activeState.technique].readLock();
 
+    // Read-lock active program
+    const Program& program = technique.program().readLock();
+
     // Get the instance data
     const UserData& userData = m_userData[value];
 
 	// Set the transformation matrix
     u32 location = 0;
 
-	if( location = technique.inputLocation( Technique::Transform ) ) {
+	if( location = program.inputLocation( Program::Transform ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
 		shader->setMatrix( location, *userData.instance.transform );
     #endif

@@ -37,51 +37,76 @@ namespace Scene {
     class RenderableMeshSource : public Assets::AssetSource<Renderable, Mesh> {
     public:
 
-                            //! Constructs RenderableMeshSource instance.
-                            RenderableMeshSource( MeshHandle mesh, Renderer::HalWPtr hal );
+                                //! Constructs RenderableMeshSource instance.
+                                RenderableMeshSource( MeshHandle mesh, RenderingContextWPtr context );
 
     protected:
 
         //! Constructs a renderable asset from a mesh source.
-        virtual bool        constructFromAsset( const Mesh& mesh, Assets::Assets& assets, Renderable& renderable ) DC_DECL_OVERRIDE;
+        virtual bool            constructFromAsset( const Mesh& mesh, Assets::Assets& assets, Renderable& renderable ) DC_DECL_OVERRIDE;
 
     private:
 
-        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.
+        RenderingContextWPtr    m_context;  //!< Parent context instance.
     };
 
     //! Constructs texture asset from an image.
     class TextureImageSource : public Assets::AssetSource<Texture, Image> {
     public:
 
-                            //! Constructs TextureImageSource instance.
-                            TextureImageSource( ImageHandle image, Renderer::HalWPtr hal );
+                                //! Constructs TextureImageSource instance.
+                                TextureImageSource( ImageHandle image, RenderingContextWPtr context );
 
     protected:
 
         //! Constructs a texture asset from an image source.
-        virtual bool        constructFromAsset( const Image& image, Assets::Assets& assets, Texture& texture ) DC_DECL_OVERRIDE;
+        virtual bool            constructFromAsset( const Image& image, Assets::Assets& assets, Texture& texture ) DC_DECL_OVERRIDE;
 
     private:
 
-        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.    
+        RenderingContextWPtr    m_context;  //!< Parent context instance.   
     };
 
     //! Constructs technique asset from a material.
     class TechniqueMaterialSource : public Assets::AssetSource<Technique, Material> {
     public:
 
-                            //! Constructs TechniqueMaterialSource instance.
-                            TechniqueMaterialSource( MaterialHandle material, Renderer::HalWPtr hal );
+                                //! Constructs TechniqueMaterialSource instance.
+                                TechniqueMaterialSource( MaterialHandle material, RenderingContextWPtr context );
 
     protected:
 
         //! Constructs a technique asset from a material source.
-        virtual bool        constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique ) DC_DECL_OVERRIDE;
+        virtual bool            constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique ) DC_DECL_OVERRIDE;
 
     private:
 
-        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.    
+        RenderingContextWPtr    m_context;  //!< Parent context instance.   
+    };
+
+    //! Compiles the shader permutation instance.
+    class ProgramShaderSource : public Assets::AssetSource<Program, Shader> {
+    public:
+
+                                //! Constructs ProgramShaderSource instance.
+                                ProgramShaderSource( ShaderHandle shader, RenderingContextWPtr context );
+
+    protected:
+
+        //! Constructs a technique asset from a material source.
+        virtual bool            constructFromAsset( const Shader& shader, Assets::Assets& assets, Program& program ) DC_DECL_OVERRIDE;
+
+    private:
+
+        RenderingContextWPtr    m_context;  //!< Parent context instance.    
+    };
+
+    //! Loads a shader from a text file
+    class ShaderFormatText : public Assets::FileSource<Shader> {
+    protected:
+
+        //! Loads shader source from an input stream.
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Shader& shader ) DC_DECL_OVERRIDE;
     };
 
 } // namespace Scene

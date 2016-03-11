@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ----------------------------------------------------------------- Renderable ----------------------------------------------------------------- //
+
 // ** Renderable::Renderable
 Renderable::Renderable( void )
     : m_primitiveType( Renderer::PrimTriangles )
@@ -89,6 +91,100 @@ void Renderable::setIndexBuffer( s32 chunk, Renderer::IndexBufferPtr value )
     m_chunks[chunk].indexBuffer = value;
 }
 
+// ----------------------------------------------------------------- Shader ----------------------------------------------------------------- //
+
+// ** Shader::vertex
+const String& Shader::vertex( void ) const
+{
+    return m_vertex;
+}
+
+// ** Shader::setVertex
+void Shader::setVertex( const String& value )
+{
+    m_vertex = value;
+}
+
+// ** Shader::fragment
+const String& Shader::fragment( void ) const
+{
+    return m_fragment;
+}
+
+// ** Shader::setFragment
+void Shader::setFragment( const String& value )
+{
+    m_fragment = value;
+}
+
+// ** Shader::addFeature
+void Shader::addFeature( u32 mask, const String& name )
+{
+	Feature feature;
+	feature.mask = mask;
+	feature.name = name;
+	m_features.push_back( feature );
+}
+
+// ** Shader::featureCount
+s32 Shader::featureCount( void ) const
+{
+    return static_cast<s32>( m_features.size() );
+}
+
+// ** Shader::feature
+const Shader::Feature& Shader::feature( s32 index ) const
+{
+    DC_ABORT_IF( index < 0 || index >= featureCount(), "index is out of range" );
+    return m_features[index];
+}
+
+// ------------------------------------------------------------ Program ------------------------------------------------------------ //
+
+// ** Program::Program
+Program::Program( void )
+{
+    memset( m_locations, 0, sizeof( m_locations ) );
+}
+
+// ** Program::inputLocation
+u32 Program::inputLocation( Input input ) const
+{
+    return m_locations[input];
+}
+
+// ** Program::setInputLocation
+void Program::setInputLocation( Input input, u32 value )
+{
+    m_locations[input] = value;
+}
+
+// ** Program::features
+u32 Program::features( void ) const
+{
+    return m_features;
+}
+
+// ** Program::setFeatures
+void Program::setFeatures( u32 value )
+{
+    m_features = value;
+}
+
+// ** Program::shader
+Renderer::ShaderWPtr Program::shader( void ) const
+{
+    return m_shader;
+}
+
+// ** Program::setShader
+void Program::setShader( Renderer::ShaderPtr value )
+{
+    m_shader = value;
+}
+
+// ----------------------------------------------------------------- Texture ----------------------------------------------------------------- //
+
 // ** Texture::texture
 Renderer::TextureWPtr Texture::texture( void ) const
 {
@@ -101,23 +197,7 @@ void Texture::setTexture( Renderer::TexturePtr value )
     m_texture = value;
 }
 
-// ** Technique::Technique
-Technique::Technique( void )
-{
-    memset( m_locations, 0, sizeof( m_locations ) );
-}
-
-// ** Technique::inputLocation
-u32 Technique::inputLocation( Input input ) const
-{
-    return m_locations[input];
-}
-
-// ** Technique::setInputLocation
-void Technique::setInputLocation( Input input, u32 value )
-{
-    m_locations[input] = value;
-}
+// ----------------------------------------------------------------- Technique ----------------------------------------------------------------- //
 
 // ** Technique::textureCount
 s32 Technique::textureCount( void ) const
@@ -165,16 +245,16 @@ void Technique::setColor( s32 index, const Rgba& value )
     m_colors[index] = value;
 }
 
-// ** Technique::shader
-Renderer::ShaderWPtr Technique::shader( void ) const
+// ** Technique::program
+const ProgramHandle& Technique::program( void ) const
 {
-    return m_shader;
+    return m_program;
 }
 
-// ** Technique::setShader
-void Technique::setShader( Renderer::ShaderPtr value )
+// ** Technique::setProgram
+void Technique::setProgram( ProgramHandle value )
 {
-    m_shader = value;
+    m_program = value;
 }
 
 } // namespace Scene

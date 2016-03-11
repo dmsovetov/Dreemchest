@@ -88,8 +88,46 @@ namespace Scene {
         Renderer::TexturePtr        m_texture;  //!< Texture 2D instance.
     };
 
-    //! Technique asset stores textures, shaders & constants used by a material.
-    class Technique {
+    //! Shader asset stores a source code for shader.
+    class Shader {
+    public:
+
+		//! A single shader feature.
+		struct Feature {
+			u32						mask;		//!< Feature mask.
+			String					name;		//!< Feature name.
+		};
+
+        //! Returns vertex shader source code.
+        const String&               vertex( void ) const;
+
+        //! Sets vertex shader source code.
+        void                        setVertex( const String& value );
+
+        //! Returns fragment shader source code.
+        const String&               fragment( void ) const;
+
+        //! Sets fragment shader source code.
+        void                        setFragment( const String& value );
+
+		//! Adds a feature to shader.
+		void						addFeature( u32 mask, const String& name );
+
+        //! Returns the total number of features in this shader.
+        s32                         featureCount( void ) const;
+
+        //! Returns the shader feature by index.
+        const Feature&              feature( s32 index ) const;
+
+    private:
+
+        String                      m_vertex;   //!< Vertex shader source.
+        String                      m_fragment; //!< Fragment shader source.
+        Array<Feature>              m_features; //!< Shader features.
+    };
+
+    //! Shader program stores a compiled version of shader with it's feature set.
+    class Program {
     public:
 
         //! Available shader input indices
@@ -108,8 +146,37 @@ namespace Scene {
             , TotalInputs           //!< The total number of shader inputs.
         };
 
-                                    //! Constructs the Technique instance.
-                                    Technique( void );
+                                    //! Constructs the Program instance.
+                                    Program( void );
+
+        //! Returns the program features.
+        u32                         features( void ) const;
+
+        //! Sets the program features.
+        void                        setFeatures( u32 value );
+
+        //! Returns the compiled shader instance.
+        Renderer::ShaderWPtr        shader( void ) const;
+
+        //! Sets the compiled shader instance.
+        void                        setShader( Renderer::ShaderPtr value );
+
+        //! Returns the shader input location.
+        u32                         inputLocation( Input input ) const;
+
+        //! Set the shader input location.
+        void                        setInputLocation( Input input, u32 value );
+
+    private:
+
+        u32                         m_features;                 //!< Permutation features.
+        Renderer::ShaderPtr         m_shader;                   //!< The compiled shader instance.
+        u32                         m_locations[TotalInputs];   //!< Program input locations.
+    };
+
+    //! Technique asset stores textures, shaders & constants used by a material.
+    class Technique {
+    public:
 
         //! Returns the total number of textures.
         s32                         textureCount( void ) const;
@@ -121,10 +188,10 @@ namespace Scene {
         void                        setTexture( s32 index, TextureHandle value );
 
         //! Returns the material shader.
-        Renderer::ShaderWPtr        shader( void ) const;
+        const ProgramHandle&        program( void ) const;
 
         //! Sets the material shader.
-        void                        setShader( Renderer::ShaderPtr value );
+        void                        setProgram( ProgramHandle value );
 
         //! Returns the total number of constant colors.
         s32                         colorCount( void ) const;
@@ -135,17 +202,10 @@ namespace Scene {
         //! Sets the constant color at index.
         void                        setColor( s32 index, const Rgba& value );
 
-        //! Returns the shader input location.
-        u32                         inputLocation( Input input ) const;
-
-        //! Set the shader input location.
-        void                        setInputLocation( Input input, u32 value );
-
     private:
 
-        Renderer::ShaderPtr         m_shader;                   //!< Material shader instance.
+        ProgramHandle               m_program;                  //!< Technique shader program instance.
         Array<TextureHandle>        m_textures;                 //!< Textures used by material.
-        u32                         m_locations[TotalInputs];   //!< Shader input locations.
         Array<Rgba>                 m_colors;                   //!< Constant colors.
     };
 

@@ -50,7 +50,7 @@ namespace Scene {
         typedef Array<RenderAssetHandle>    Container;
 
         //! Requests the render asset index by an asset handle.
-        s32                                 request( Assets::Assets& assets, const Renderer::HalWPtr& hal, const Assets::GenericHandle<TAsset>& asset, CString postfix );
+        s32                                 request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::GenericHandle<TAsset>& asset, CString postfix );
 
         //! Returns the render asset handles.
         const Container&                    handles( void ) const;
@@ -85,7 +85,7 @@ namespace Scene {
 
     // ** RenderAssetCache::request
     template<typename TAsset, typename TRenderAsset, typename TSource>
-    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, const Renderer::HalWPtr& hal, const Assets::GenericHandle<TAsset>& asset, CString postfix )
+    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::GenericHandle<TAsset>& asset, CString postfix )
     {
         // First lookup the render asset by an asset handle
         IndexByAsset::iterator i = m_indexByAsset.find( asset );
@@ -116,7 +116,7 @@ namespace Scene {
         asset.readLock();
 
         // Create a render asset instance
-        RenderAssetHandle handle = assets.add<TRenderAsset>( asset.uniqueId() + "." + postfix, DC_NEW TSource( asset, hal ) );
+        RenderAssetHandle handle = assets.add<TRenderAsset>( asset.uniqueId() + "." + postfix, DC_NEW TSource( asset, context ) );
         DC_ABORT_IF( !handle.isValid(), "failed to create render asset" );
         handle.asset().setName( asset.asset().name() + "." + postfix );
 
@@ -146,6 +146,12 @@ namespace Scene {
         //! Returns technique index for a specified material asset.
         s32                                 requestTechnique( const MaterialHandle& handle );
 
+        //! Returns program index for a specified shader asset.
+        s32                                 requestProgram( const ShaderHandle& handle, u32 features );
+
+        //! Returns the program handle by index.
+        ProgramHandle                       programByIndex( s32 index ) const;
+
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
 
@@ -165,6 +171,9 @@ namespace Scene {
         //! Technique asset cache.
         typedef RenderAssetCache<Material, Technique, TechniqueMaterialSource> TechniqueCache;
 
+        //! Program asset cache.
+        typedef RenderAssetCache<Shader, Program, ProgramShaderSource> ProgramCache;
+
         Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
         RvmUPtr                             m_rvm;          //!< Internal Rvm instance.
         SceneWPtr                           m_scene;        //!< Parent scene instance.
@@ -175,18 +184,33 @@ namespace Scene {
         RopEmitterUPtr                      m_additive;
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
+        ProgramCache                        m_programs;
 	};
 
     // ** RenderingContext::requestRenderable
     NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
     {
-        return m_renderables.request( m_assets, m_hal, handle, "renderable" );
+        return m_renderables.request( m_assets, this, handle, "renderable" );
     }
 
     // ** RenderingContext::requestTechnique
     NIMBLE_INLINE s32 RenderingContext::requestTechnique( const MaterialHandle& handle )
     {
-        return m_techniques.request( m_assets, m_hal, handle, "technique" );
+        return m_techniques.request( m_assets, this, handle, "technique" );
+    }
+
+    // ** RenderingContext::requestProgram
+    NIMBLE_INLINE s32 RenderingContext::requestProgram( const ShaderHandle& handle, u32 features )
+    {
+        s32 index = m_programs.request( m_assets, this, handle, "program" );
+        programByIndex( index ).writeLock()->setFeatures( features );
+        return index;
+    }
+
+    // ** RenderingContext::programByIndex
+    NIMBLE_INLINE ProgramHandle RenderingContext::programByIndex( s32 index ) const
+    {
+        return m_programs.handles()[index];
     }
 
 } // namespace Scene

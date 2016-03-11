@@ -119,6 +119,12 @@ namespace Scene {
     //! Technique handle type.
     typedef Assets::GenericHandle<class Technique> TechniqueHandle;
 
+    //! Shader handle type.
+    typedef Assets::GenericHandle<class Shader> ShaderHandle;
+
+    //! Shader program handle type.
+    typedef Assets::GenericHandle<class Program> ProgramHandle;
+
 	//! Available rendering modes.
 	enum RenderingMode {
 		  RenderOpaque		//!< Renders opaque.
