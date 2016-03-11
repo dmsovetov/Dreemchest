@@ -58,7 +58,19 @@ namespace Scene {
     private:
 
         //! Container type to map from an asset to a render asset index.
+    #ifdef DC_CPP11_DISABLED
         typedef Map<RenderAssetHandle, s32> IndexByAsset;
+    #else
+        //! Asset handle hash predicate
+        struct Hash {
+            //! Just returns the handle index converted to a size_t
+            size_t operator()( RenderAssetHandle const & key ) const {
+                return key.index();
+            }
+        };
+
+        typedef std::unordered_map<RenderAssetHandle, s32, Hash> IndexByAsset;
+    #endif
 
         IndexByAsset                        m_indexByAsset;
         Container                           m_handles;
