@@ -91,7 +91,7 @@ namespace Scene {
         IndexByAsset::iterator i = m_indexByAsset.find( asset );
 
         // Next render index to be used
-        s32 index = 0;
+        s32 index = static_cast<s32>( m_handles.size() );
 
         // Found the renderable
         if( i != m_indexByAsset.end() ) {
