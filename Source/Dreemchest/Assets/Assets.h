@@ -169,6 +169,16 @@ namespace Assets {
         //! Updates an asset manager (performs loading, unloading, etc).
         void                        update( f32 dt );
 
+        //! Returns an asset type by it's name.
+        Type                        typeFromName( const String& name ) const;
+
+        //! Returns asset type name.
+        String                      assetTypeName( const Type& type ) const;
+
+        //! Registers an asset type.
+        template<typename TAsset>
+        void                        registerType( void );
+
     private:
 
         //! Forward declaration of generic asset cache type.
@@ -236,9 +246,28 @@ namespace Assets {
 
         Slots<Asset, Index>         m_assets;       //!< All available assets.
         AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
+        Map<String, Type>           m_nameToType;   //!< Maps asset name to type.
+        Map<Type, String>           m_typeToName;   //!< Maps asset type to name.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
         mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };
+
+    // ** Assets::registerType
+    template<typename TAsset>
+    void Assets::registerType( void )
+    {
+        // Get the type & name
+        Type   type = Type::fromClass<TAsset>();
+        String name = TypeInfo<TAsset>::name();
+
+        // Register type & name
+        m_nameToType[name] = type;
+        m_typeToName[type] = name;
+
+        // Create an asset cache for this type of asset
+        DC_BREAK_IF( m_cache.count( type ) );
+        m_cache[type] = DC_NEW AssetCache<TAsset>();
+    }
 
     //! Adds a new asset of specified type.
     template<typename TAsset>

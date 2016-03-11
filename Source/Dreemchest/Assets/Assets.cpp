@@ -188,6 +188,32 @@ Handle Assets::findAsset( const AssetId& id ) const
     return Handle( const_cast<Assets*>( this ), i->second );
 }
 
+// ** Assets::typeFromName
+Type Assets::typeFromName( const String& value ) const
+{
+    Map<String, Type>::const_iterator i = m_nameToType.find( value );
+    
+    if( i == m_nameToType.end() ) {
+        DC_BREAK;
+        return Type();
+    }
+
+    return i->second;
+}
+
+// ** Assets::assetTypeName
+String Assets::assetTypeName( const Type& type ) const
+{
+    Map<Type, String>::const_iterator i = m_typeToName.find( type );
+    
+    if( i == m_typeToName.end() ) {
+        DC_BREAK;
+        return "";
+    }
+
+    return i->second;
+}
+
 // ** Assets::releaseWriteLock
 void Assets::releaseWriteLock( const Handle& asset )
 {
