@@ -118,6 +118,18 @@ namespace Assets {
         return m_index;
     }
 
+    // ** Handle::isValid
+    NIMBLE_INLINE bool Handle::isValid( void ) const
+    {
+        return m_assets && m_assets->isIndexValid( index() );
+    }
+
+    // ** Handle::isLoaded
+    NIMBLE_INLINE bool Handle::isLoaded( void ) const
+    {
+        return isValid() && (operator->())->state() == Asset::Loaded;
+    }
+
     // ** Handle::readLock
     template<typename TAsset>
     const TAsset& Handle::readLock( void ) const

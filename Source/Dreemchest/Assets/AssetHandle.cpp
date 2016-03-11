@@ -107,18 +107,6 @@ Asset& Handle::asset( void )
     return const_cast<Asset&>( m_assets->assetAtIndex( index() ) );
 }
 
-// ** Handle::isValid
-bool Handle::isValid( void ) const
-{
-    return m_assets && m_assets->isIndexValid( index() );
-}
-
-// ** Handle::isLoaded
-bool Handle::isLoaded( void ) const
-{
-    return isValid() && (operator->())->state() == Asset::Loaded;
-}
-
 // ** Handle::assets
 Assets* Handle::assets( void ) const
 {
