@@ -184,7 +184,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
     // Create serialization context
     Ecs::SerializationContext ctx( scene->ecs() );
-    ctx.set<Assets::Assets>( &m_project->assets() );
+    ctx.set<Scene::Resources>( &m_project->assets() );
 
     // Parse KeyValue from a text stream
     Archive  ar = Io::VariantTextStream::parse( data.toStdString() );

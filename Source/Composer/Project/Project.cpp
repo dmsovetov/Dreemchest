@@ -59,13 +59,6 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	// Create assets bundle & model
 	m_assetFileSystem = new AssetFileSystemModel( this );
 
-    // Declare asset types
-    Assets::Type::declare<Scene::Image>();
-    Assets::Type::declare<Scene::Mesh>();
-    Assets::Type::declare<Scene::Material>();
-    Assets::Type::declare<Scene::Prefab>();
-    Assets::Type::declare<Scene::Terrain>();
-
 	// Create project cache
 	m_assets = new AssetManager( this, absolutePath( CachePath ), m_assetFileSystem );
 

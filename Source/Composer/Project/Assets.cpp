@@ -95,7 +95,7 @@ Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
     Assets::Handle asset = createAsset( type, Guid::generate().toString() );
 
     // Set meta file
-    m_assetFileSystem->setMetaData( fileInfo, KvBuilder() << "uuid" << asset->uniqueId() << "type" << type.toString() );
+    m_assetFileSystem->setMetaData( fileInfo, KvBuilder() << "uuid" << asset->uniqueId() << "type" << m_assets.assetTypeName( type ) );
 
     return asset;
 }
@@ -104,7 +104,7 @@ Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 {
 	// Get asset type by name.
-	Assets::Type type = Assets::Type::fromString( kv.get<String>( "type" ) );
+	Assets::Type type = m_assets.typeFromName( kv.get<String>( "type" ) );
     DC_BREAK_IF( !type.isValid() );
 
     // Read the unique asset identifier.

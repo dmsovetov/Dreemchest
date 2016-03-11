@@ -104,7 +104,7 @@ DC_BEGIN_COMPOSER
         AssetFormatFactory          m_assetFormats;     //!< Asset format factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
         AssetFiles                  m_files;            //!< Added asset files.
-		Assets::Assets		        m_assets;			//!< Asset bundle.
+		Scene::Resources		    m_assets;			//!< Asset bundle.
 	};
 
 DC_END_COMPOSER
