@@ -51,7 +51,7 @@ namespace Scene {
 									: m_parent( parent ), m_position( x, y, z ), m_scale( 1.0f, 1.0f, 1.0f ) {}
 
 		//! Returns an affine transformation matrix.
-		virtual const Matrix4&	matrix( void ) const;
+		const Matrix4&	        matrix( void ) const;
 
 		//! Sets the affine transform.
 		void					setMatrix( const Matrix4& value );
