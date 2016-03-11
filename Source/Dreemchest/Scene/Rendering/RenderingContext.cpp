@@ -44,7 +44,7 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 {
     m_staticMeshes = scene->ecs()->requestIndex( "StaticMeshes", Ecs::Aspect::all<Transform, StaticMesh>() );
     m_lights       = scene->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Transform, Light>() );
-    m_rvm          = DC_NEW Rvm( m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_rvm          = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
 }
 
 // ** RenderingContext::create
@@ -99,25 +99,14 @@ void RenderingContext::end( void )
 // ** RenderingContext::renderFromCamera
 void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform )
 {
-	// Get the render target
-	RenderTargetWPtr target = camera.target();
+    // Begin rendering by pushing a render target
+    m_rvm->emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
 
-	// Calculate the view-projection matrix
-	Matrix4 viewProjection = camera.calculateViewProjection( transform.matrix() );
+    // Now emit all render operations
+    renderStaticMeshes();
 
-	target->begin( this );
-	{
-        // Set the viewport rect
-		m_hal->setViewport( camera.viewport() );
-
-        // Set the view-projection matrix
-        m_rvm->setViewProj( viewProjection );
-        m_rvm->setColor( Rgba( 0.0f, 1.0f, 0.0f ) );
-
-		renderStaticMeshes();
-		m_hal->setViewport( target->rect() );
-	}
-	target->end( this );
+    // End rendering by popping a render target
+    m_rvm->emitPopRenderTarget();
 }
 
 // ** RenderingContext::renderStaticMeshes
@@ -133,13 +122,14 @@ void RenderingContext::renderStaticMeshes( void )
         const Transform* transform = (*i)->get<Transform>();
 
         // Request the renderable asset for this mesh.
-        s32 renderable = m_renderables.request( m_assets, m_hal, staticMesh->mesh(), "renderable" );
+        const MeshHandle& mesh = staticMesh->mesh();
+        s32 renderable = m_renderables.request( m_assets, m_hal, mesh, "renderable" );
 
         // Request the technique asset for a material.
         s32 technique = m_techniques.request( m_assets, m_hal, staticMesh->material( 0 ), "technique" );
 
         // Emit the rendering command
-        m_rvm->push( &transform->matrix(), renderable, technique );
+        m_rvm->emitDrawCall( &transform->matrix(), renderable, technique );
     }
 }
 

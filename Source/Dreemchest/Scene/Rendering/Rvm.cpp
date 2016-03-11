@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Rvm.h"
+#include "RenderTarget.h"
 #include "../Assets/Renderable.h"
 
 DC_BEGIN_DREEMCHEST
@@ -32,25 +33,18 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Rvm::Rvm
-Rvm::Rvm( const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal )
-    : m_hal( hal )
+Rvm::Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal )
+    : m_context( context )
+    , m_hal( hal )
     , m_renderables( renderables )
     , m_techniques( techniques )
+    , m_operationCount( 0 )
+    , m_instanceCount( 0 )
+    , m_constantColor( Vec4( 1.0f, 1.0f, 1.0f, 1.0f ) )
+    , m_sequence( 0 )
 {
-}
-
-// ** Rvm::push
-void Rvm::push( const Matrix4* transform, s32 renderable, s32 technique )
-{
-    Instance instance;
-    instance.transform = transform;
-    m_instances.push_back( instance );
-
-    Command cmd;
-    cmd.bits.renderable = renderable;
-    cmd.bits.technique  = technique;
-    cmd.bits.instance   = m_instances.size() - 1;
-    m_commands.push_back( cmd );
+    m_operations.resize( 16384 );
+    m_userData.resize( 16384 );
 }
 
 // ** Rvm::setTechnique
@@ -117,7 +111,7 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
     // Set the view-projection matrix input
     if( location = technique.inputLocation( Technique::ViewProjection ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
-        shader->setMatrix( location, m_viewProjection );
+        shader->setMatrix( location, m_renderTarget.top().vp );
     #endif
     }
 
@@ -130,6 +124,20 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
 
     // Save active shader
     m_activeState.shader = shader;
+}
+
+// ** Rvm::allocateUserData
+Rvm::UserData* Rvm::allocateUserData( Rop* rop )
+{
+    UserData* instance = &m_userData[m_instanceCount++];
+    rop->bits.userData = m_instanceCount - 1;
+    return instance;
+}
+
+// ** Rvm::allocateRop
+Rvm::Rop* Rvm::allocateRop( void )
+{
+    return &m_operations[m_operationCount++];
 }
 
 // ** Rvm::setInstance
@@ -147,22 +155,16 @@ void Rvm::setInstance( s32 value )
     const Technique& technique = m_techniques[m_activeState.technique].readLock();
 
     // Get the instance data
-    const Instance& instance = m_instances[value];
+    const UserData& userData = m_userData[value];
 
 	// Set the transformation matrix
     u32 location = 0;
 
 	if( location = technique.inputLocation( Technique::Transform ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
-		shader->setMatrix( location, *instance.transform );
+		shader->setMatrix( location, *userData.instance.transform );
     #endif
 	}
-}
-
-// ** Rvm::setViewProj
-void Rvm::setViewProj( const Matrix4& value )
-{
-    m_viewProjection = value;
 }
 
 // ** Rvm::setColor
@@ -171,32 +173,76 @@ void Rvm::setColor( const Rgba& value )
     m_constantColor = Vec4( value.r, value.g, value.b, value.a );
 }
 
+// ** Rvm::executeCommand
+void Rvm::executeCommand( const Rop& rop, const UserData& userData )
+{
+    switch( rop.bits.mode ) {
+    case Rop::PushRenderTarget: {
+                                    // Get the render target state from command user data
+                                    const RenderTargetState& rt = userData.rt;
+
+                                    // Push this render target to a stack
+                                    m_renderTarget.push( rt );
+
+                                    // Begin rendering
+                                    userData.rt.instance->begin( m_context );
+
+                                    // Setup the viewport for this target
+                                    m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                }
+                                break;
+
+    case Rop::PopRenderTarget:  {
+                                    // End rendering
+                                    m_renderTarget.top().instance->end( m_context );
+
+                                    // Pop render target from a stack
+                                    m_renderTarget.pop();
+
+                                    // Rollback to the previous render target
+                                    if( m_renderTarget.size() ) {
+                                        const RenderTargetState& rt = m_renderTarget.top();
+                                        m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                    }
+                                }
+                                break;
+
+    default:                    DC_NOT_IMPLEMENTED;
+    }
+}
+
 // ** Rvm::flush
 void Rvm::flush( void )
 {
     // Sort accumulated commands
-    std::sort( m_commands.begin(), m_commands.end() );
+    std::sort( m_operations.begin(), m_operations.begin() + m_operationCount );
 
     // Process all commands
-    for( s32 i = 0, n = m_commands.size(); i < n; i++ ) {
+    for( s32 i = 0, n = m_operationCount; i < n; i++ ) {
         // Decode the command
-        const Command& cmd = m_commands[i];
+        const Rop& rop = m_operations[i];
+
+        // Is this a command?
+        if( rop.bits.command ) {
+            executeCommand( rop, m_userData[rop.bits.userData] );
+            continue;
+        }
 
         // Set the rendering technique
-        if( m_activeState.technique != cmd.bits.technique ) {
-            setTechnique( cmd.bits.technique );
+        if( m_activeState.technique != rop.bits.technique ) {
+            setTechnique( rop.bits.technique );
         }
 
         // Set renderable
-        if( m_activeState.renderable != cmd.bits.renderable ) {
-            setRenderable( cmd.bits.renderable );
+        if( m_activeState.renderable != rop.bits.renderable ) {
+            setRenderable( rop.bits.renderable );
         }
 
         // Set instance data
-        setInstance( cmd.bits.instance );
+        setInstance( rop.bits.userData );
 
         // Render all chunks
-        const Renderable& renderable = m_renderables[cmd.bits.renderable].readLock();
+        const Renderable& renderable = m_renderables[rop.bits.renderable].readLock();
 
         for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
             Renderer::VertexBufferWPtr vertexBuffer = renderable.vertexBuffer( j );
@@ -214,21 +260,53 @@ void Rvm::flush( void )
     }
 
     // Clear processed commands
-    m_commands.clear();
-    m_instances.clear();
+    m_operationCount = 0;
+    m_instanceCount = 0;
+
+    // Reset the sequence number
+    m_sequence = 0;
 
     // Reset active state
     m_activeState = ActiveState();
 }
 
-// ** Rvm::Command::Command
-Rvm::Command::Command( void )
+// ** Rvm::emitPushRenderTarget
+void Rvm::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport )
+{
+    Rop* rop = allocateRop();
+    rop->bits.command  = 1;
+    rop->bits.mode     = Rop::PushRenderTarget;
+    rop->bits.sequence = m_sequence++;
+
+    UserData* userData = allocateUserData( rop );
+    userData->rt.instance = renderTarget.get();
+    userData->rt.viewport[0] = static_cast<u32>( viewport.min().x );
+    userData->rt.viewport[1] = static_cast<u32>( viewport.min().y );
+    userData->rt.viewport[2] = static_cast<u32>( viewport.width() );
+    userData->rt.viewport[3] = static_cast<u32>( viewport.height() );
+
+    for( s32 i = 0; i < 16; i++ ) {
+        userData->rt.vp[i] = viewProjection[i];
+    }
+}
+
+// ** Rvm::emitPopRenderTarget
+void Rvm::emitPopRenderTarget( void )
+{
+    Rop* rop = allocateRop();
+    rop->bits.command = 1;
+    rop->bits.mode = Rop::PopRenderTarget;
+    rop->bits.sequence = ++m_sequence;
+}
+
+// ** Rvm::Rop::Rop
+Rvm::Rop::Rop( void )
     : key( 0 )
 {
 }
 
-// ** Rvm::Command::operator <
-bool Rvm::Command::operator < ( const Command& other ) const
+// ** Rvm::Rop::operator <
+bool Rvm::Rop::operator < ( const Rop& other ) const
 {
     return key < other.key;
 }

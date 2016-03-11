@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_Rvm_H__
 #define __DC_Scene_Rvm_H__
 
-#include "../Scene.h"
+#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,19 +38,27 @@ namespace Scene {
     public:
 
         //! Rendering operation emitted by scene object processing.
-        struct Command {
-                        //! Constructs command instance.
-                        Command( void );
+        struct Rop {
+            //! Available command types
+            enum {
+                  PushRenderTarget  //!< Begins rendering to target by pushing it to a stack and setting the viewport.
+                , PopRenderTarget   //!< Ends rendering to target by popping it from a stack.
+            };
+
+                        //! Constructs Rop instance.
+                        Rop( void );
 
             //! Compares two commands by their key.
-            bool        operator < ( const Command& other ) const;
+            bool        operator < ( const Rop& other ) const;
 
             struct Bits {
-                u32     instance    : 14;   //!< Instance data index (instance transform, uniform, etc).
-                u32     technique   : 18;   //!< Rendering technique index.
-                u32     renderable  : 18;   //!< Mesh index.
-                u32     depth       : 12;   //!< Instance depth.
-                u32     mode        : 2;    //!< Rendering mode.
+                u16     userData    : 14;   //!< Command user data index.
+                u16     technique   : 16;   //!< Rendering technique index.
+                u16     renderable  : 16;   //!< Mesh index.
+                u8      depth       : 8;    //!< Instance depth.
+                u8      mode        : 2;    //!< Rendering mode.
+                u8      command     : 1;    //!< Indicates that that this is not a draw call.
+                u8      sequence    : 4;    //!< Command sequence number.
             };
 
             union {
@@ -59,22 +67,33 @@ namespace Scene {
             };
         };
 
+        NIMBLE_STATIC_ASSERT( sizeof( Rop ) == 8, "Rop size is expected to be 8 bytes" );
+
                                         //! Constructs Rvm instance.
-                                        Rvm( const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal );
+                                        Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal );
 
         //! Pushes a single rendering command to a buffer.
-        void                            push( const Matrix4* transform, s32 renderable, s32 technique );
+        NIMBLE_INLINE void              emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique );
+
+        //! Emits the command to push a render target.
+        void                            emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport );
+
+        //! Emits the command to pop a render target.
+        void                            emitPopRenderTarget( void );
 
         //! Flushes all accumulated commands.
         void                            flush( void );
-
-        //! Sets the view projection matrix.
-        void                            setViewProj( const Matrix4& value );
 
         //! Sets the constant color.
         void                            setColor( const Rgba& value );
 
     private:
+
+        //! Forward declaration of a command user data.
+        struct UserData;
+
+        //! Forward declaration of a render target state data.
+        struct RenderTargetState;
 
         //! Setups rendering states for a technique.
         void                            setTechnique( s32 value );
@@ -88,11 +107,33 @@ namespace Scene {
         //! Sets the instance data.
         void                            setInstance( s32 value );
 
+        //! Allocates new user data for a specified rop instance instance.
+        UserData*                       allocateUserData( Rop* rop );
+
+        //! Allocates new Rop instance.
+        Rop*                            allocateRop( void );
+
+        //! Executes the command.
+        void                            executeCommand( const Rop& rop, const UserData& userData );
+
     private:
 
-        //! Instance data used by rendering.
-        struct Instance {
-            const Matrix4*              transform;      //!< Instance transform.
+        //! Render target state data.
+        struct RenderTargetState {
+            const RenderTarget*         instance;       //!< Render target instance to be pushed.
+            f32                         vp[16];         //!< The view-projection matrix to be set for a render target.
+            u32                         viewport[4];    //!< The viewport inside this render target.
+        };
+
+        //! User data used by rendering commands.
+        struct UserData {
+            union {
+                // Instance user data
+                struct {
+                    const Matrix4*      transform;  //!< Instance transform.
+                } instance;
+                RenderTargetState       rt;         //!< Render target info.
+            };
         };
 
         //! Active rendering state is stored by this helper struct.
@@ -106,15 +147,33 @@ namespace Scene {
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
 
+        RenderingContextWPtr            m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
         const Array<RenderableHandle>&  m_renderables;      //!< Renderable asset handles.
         const Array<TechniqueHandle>&   m_techniques;       //!< Technique asset handles.
-        Array<Command>                  m_commands;         //!< Actual command buffer.
-        Array<Instance>                 m_instances;        //!< Instance data.
+        Stack<RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
+        s32                             m_sequence;         //!< Current sequence number of render operation.
+        Array<Rop>                      m_operations;       //!< Actual rop buffer.
+        s32                             m_operationCount;   //!< The total number of allocated render operations.
+        Array<UserData>                 m_userData;         //!< Instance data.
+        s32                             m_instanceCount;    //!< The total number of allocated instances.
         ActiveState                     m_activeState;      //!< Active rendering state.
-        Matrix4                         m_viewProjection;   //!< Active view projection matrix.
         Vec4                            m_constantColor;    //!< Constant color.
     };
+
+    // ** Rvm::emitDrawCall
+    NIMBLE_INLINE void Rvm::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique )
+    {
+        // Allocate new command instance
+        Rop* rop = allocateRop();
+        rop->bits.renderable = renderable;
+        rop->bits.technique  = technique;
+        rop->bits.sequence   = m_sequence;
+
+        // Allocate instance user data
+        UserData* data = allocateUserData( rop );
+        data->instance.transform = transform;
+    }
 
 } // namespace Scene
 
