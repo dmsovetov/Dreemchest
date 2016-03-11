@@ -51,6 +51,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** Resources::Resources
+Resources::Resources( void )
+{
+}
+
 // ** Scene::Scene
 Scene::Scene( void )
 {
@@ -267,7 +272,7 @@ ScenePtr Scene::create( void )
 }
 
 // ** Scene::createFromFile
-ScenePtr Scene::createFromFile( const Assets::Assets& assets, const String& fileName )
+ScenePtr Scene::createFromFile( const Resources& assets, const String& fileName )
 {
 	// Read the JSON file
 	String json = Io::DiskFileSystem::readTextFile( fileName );
@@ -277,7 +282,7 @@ ScenePtr Scene::createFromFile( const Assets::Assets& assets, const String& file
 }
 
 // ** Scene::createFromJson
-ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json )
+ScenePtr Scene::createFromJson( const Resources& assets, const String& json )
 {
 #ifdef HAVE_JSON
 	// Create scene instance
@@ -302,7 +307,7 @@ ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json
 #ifdef HAVE_JSON
 
 // ** JsonSceneLoader::JsonSceneLoader
-JsonSceneLoader::JsonSceneLoader( const Assets::Assets& assets ) : m_assets( assets )
+JsonSceneLoader::JsonSceneLoader( const Resources& assets ) : m_assets( assets )
 {
 	m_loaders["Transform"]				= dcThisMethod( JsonSceneLoader::readTransform );
 	m_loaders["Renderer"]				= dcThisMethod( JsonSceneLoader::readRenderer );

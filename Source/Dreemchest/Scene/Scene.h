@@ -213,6 +213,14 @@ namespace Scene {
 	//! Array of ray tracing results.
 	typedef Array<RayTracingResult> RayTracingResultArray;
 
+    //! Asset manager used by scene module.
+    class Resources : public Assets::Assets {
+    public:
+
+                        //! Constructs Resources instance.
+                        Resources( void );
+    };
+
 	//! The root class for a scene subsystem.
 	class Scene : public InjectEventEmitter<RefCounted> {
 	public:
@@ -273,10 +281,10 @@ namespace Scene {
 		static ScenePtr					create( void );
 
 		//! Creates scene and loads it from JSON file.
-		static ScenePtr					createFromFile( const Assets::Assets& assets, const String& fileName );
+		static ScenePtr					createFromFile( const Resources& assets, const String& fileName );
 
 		//! Creates scene and loads it from JSON string.
-		static ScenePtr					createFromJson( const Assets::Assets& assets, const String& json );
+		static ScenePtr					createFromJson( const Resources& assets, const String& json );
 
 		//! This event is emitted when a new scene object was added.
 		struct SceneObjectAdded {
@@ -347,7 +355,7 @@ namespace Scene {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.
-									JsonSceneLoader( const Assets::Assets& assets );
+									JsonSceneLoader( const Resources& assets );
 
 		//! Loads the scene from string.
 		bool						load( ScenePtr scene, const String& json );
@@ -428,7 +436,7 @@ namespace Scene {
 		//! Container type to store parsed components.
 		typedef Map<String, Ecs::ComponentPtr> Components;
 
-		const Assets::Assets&	    m_assets;					//!< Available assets.
+		const Resources&	        m_assets;					//!< Available assets.
 		Json::Value					m_json;						//!< Parsed JSON.
 		ScenePtr					m_scene;					//!< The scene to be loaded.
 		SceneObjects				m_sceneObjects;				//!< Parsed scene objects.
