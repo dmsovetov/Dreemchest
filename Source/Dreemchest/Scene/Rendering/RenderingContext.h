@@ -50,7 +50,7 @@ namespace Scene {
         typedef Array<RenderAssetHandle>    Container;
 
         //! Requests the render asset index by an asset handle.
-        s32                                 request( Assets::Assets& assets, Renderer::HalWPtr hal, Assets::GenericHandle<TAsset> asset, const String& postfix );
+        s32                                 request( Assets::Assets& assets, const Renderer::HalWPtr& hal, const Assets::GenericHandle<TAsset>& asset, CString postfix );
 
         //! Returns the render asset handles.
         const Container&                    handles( void ) const;
@@ -73,9 +73,9 @@ namespace Scene {
 
     // ** RenderAssetCache::request
     template<typename TAsset, typename TRenderAsset, typename TSource>
-    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, Renderer::HalWPtr hal, Assets::GenericHandle<TAsset> asset, const String& postfix )
+    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, const Renderer::HalWPtr& hal, const Assets::GenericHandle<TAsset>& asset, CString postfix )
     {
-         // First lookup the render asset by an asset handle
+        // First lookup the render asset by an asset handle
         IndexByAsset::iterator i = m_indexByAsset.find( asset );
 
         // Next render index to be used
@@ -112,7 +112,7 @@ namespace Scene {
         m_indexByAsset[asset] = index;
         m_handles[index]      = handle;
 
-        return index;   
+        return index;
     }
 
 	//! Rendering context.
