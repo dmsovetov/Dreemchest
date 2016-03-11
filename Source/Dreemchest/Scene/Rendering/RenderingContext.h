@@ -140,6 +140,12 @@ namespace Scene {
         //! Returns the parent rendering HAL instance.
         Renderer::HalWPtr                   hal( void ) const;
 
+        //! Returns renderable index for a specified mesh asset.
+        s32                                 requestRenderable( const MeshHandle& handle );
+
+        //! Returns technique index for a specified material asset.
+        s32                                 requestTechnique( const MaterialHandle& handle );
+
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
 
@@ -150,9 +156,6 @@ namespace Scene {
 
         //! Renders the scene from a camera point of view.
         void                                renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform );
-
-        //! Renders all static meshes.
-        void                                renderStaticMeshes( void );
 
 	private:
 
@@ -167,11 +170,22 @@ namespace Scene {
         SceneWPtr                           m_scene;        //!< Parent scene instance.
         Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
 
+        RopEmitterUPtr                      m_emitter;
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
-        Ecs::IndexPtr                       m_staticMeshes;
-        Ecs::IndexPtr                       m_lights;
 	};
+
+    // ** RenderingContext::requestRenderable
+    NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
+    {
+        return m_renderables.request( m_assets, m_hal, handle, "renderable" );
+    }
+
+    // ** RenderingContext::requestTechnique
+    NIMBLE_INLINE s32 RenderingContext::requestTechnique( const MaterialHandle& handle )
+    {
+        return m_techniques.request( m_assets, m_hal, handle, "technique" );
+    }
 
 } // namespace Scene
 

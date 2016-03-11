@@ -27,6 +27,8 @@
 #include "RenderingContext.h"
 #include "Rvm.h"
 
+#include "Emitters/StaticMeshEmitter.h"
+
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
 #include "../Assets/Renderable.h"
@@ -42,9 +44,8 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
     , m_scene( scene )
     , m_assets( assets )
 {
-    m_staticMeshes = scene->ecs()->requestIndex( "StaticMeshes", Ecs::Aspect::all<Transform, StaticMesh>() );
-    m_lights       = scene->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Transform, Light>() );
-    m_rvm          = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_rvm     = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_emitter = DC_NEW StaticMeshEmitter( scene );
 }
 
 // ** RenderingContext::create
@@ -103,34 +104,10 @@ void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Tr
     m_rvm->emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
 
     // Now emit all render operations
-    renderStaticMeshes();
+    m_emitter->emit( *this, *m_rvm );
 
     // End rendering by popping a render target
     m_rvm->emitPopRenderTarget();
-}
-
-// ** RenderingContext::renderStaticMeshes
-void RenderingContext::renderStaticMeshes( void )
-{
-    const Ecs::EntitySet& staticMeshes = m_staticMeshes->entities();
-
-    for( Ecs::EntitySet::const_iterator i = staticMeshes.begin(), end = staticMeshes.end(); i != end; i++ ) {
-        // Get the static mesh from an entity
-        const StaticMesh* staticMesh = (*i)->get<StaticMesh>();
-
-        // Get the static mesh transforms
-        const Transform* transform = (*i)->get<Transform>();
-
-        // Request the renderable asset for this mesh.
-        const MeshHandle& mesh = staticMesh->mesh();
-        s32 renderable = m_renderables.request( m_assets, m_hal, mesh, "renderable" );
-
-        // Request the technique asset for a material.
-        s32 technique = m_techniques.request( m_assets, m_hal, staticMesh->material( 0 ), "technique" );
-
-        // Emit the rendering command
-        m_rvm->emitDrawCall( &transform->matrix(), renderable, technique );
-    }
 }
 
 } // namespace Scene

@@ -95,6 +95,9 @@ namespace Scene {
 	//! Rvm unique pointer type.
     typedef AutoPtr<class Rvm> RvmUPtr;
 
+    //! Rop emitter unique pointer type.
+    typedef AutoPtr<class AbstractRopEmitter> RopEmitterUPtr;
+
     //! Image handle type.
     typedef Assets::GenericHandle<class Image> ImageHandle;
 
