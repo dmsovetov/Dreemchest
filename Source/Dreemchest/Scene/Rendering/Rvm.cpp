@@ -138,7 +138,7 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
 void Rvm::setInstance( s32 value )
 {
     // Get an active shader instance
-    Renderer::ShaderWPtr shader = m_activeState.shader;
+    Renderer::ShaderWPtr& shader = m_activeState.shader;
 
     // No active shader - skip
     if( !shader.valid() ) {
