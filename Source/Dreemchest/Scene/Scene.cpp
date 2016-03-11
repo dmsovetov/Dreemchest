@@ -84,8 +84,10 @@ Scene::Scene( void )
 	addSystem<MoveAlongAxesSystem>();
 	addSystem<MoveToSystem>();
 	addSystem<RotateAroundAxesSystem>();
-	addSystem<WorldSpaceBoundingBoxSystem>();
-	addSystem<FrustumCullingSystem>( cameras() );
+#if !DEV_DISABLE_CULLING
+    addSystem<WorldSpaceBoundingBoxSystem>();
+    addSystem<FrustumCullingSystem>( cameras() );
+#endif  /*  !DEV_DISABLE_CULLING    */
 		
 #if DEV_DEPRECATED_SCENE_RENDERER
 	// Add default render systems.

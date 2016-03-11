@@ -37,6 +37,14 @@ namespace Scene {
 // ** AffineTransformSystem::update
 void AffineTransformSystem::update( u32 currentTime, f32 dt )
 {
+#if DEV_DISABLE_TRANSFORMS
+    static bool once = false;
+    if( once ) {
+        return;
+    }
+    once = true;
+#endif  /*  DEV_DISABLE_TRANSFORMS  */
+
 	for( u32 i = 0; i < m_transforms.size(); i++ ) {
 		Transform* transform = m_transforms[i];
 

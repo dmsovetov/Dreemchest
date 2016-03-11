@@ -65,6 +65,10 @@
 
 #include "PlaneClipper.h"
 
+#define DEV_DISABLE_DRAW_CALLS  (0)
+#define DEV_DISABLE_CULLING     (0)
+#define DEV_DISABLE_TRANSFORMS  (0)
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {

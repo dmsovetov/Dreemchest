@@ -27,8 +27,6 @@
 #include "Rvm.h"
 #include "../Assets/Renderable.h"
 
-#define DEV_ENABLE_HAL_CALLS   (0)
-
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -76,7 +74,7 @@ void Rvm::setTechnique( s32 value )
     // Bind texture samplers used by technique
     for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
         if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Texture0 + i ) ) ) {
-        #if DEV_ENABLE_HAL_CALLS
+        #if !DEV_DISABLE_DRAW_CALLS
             shader->setInt( location, i );
         #endif
         }
@@ -86,7 +84,7 @@ void Rvm::setTechnique( s32 value )
     for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
         if( location = technique.inputLocation( static_cast<Technique::Input>( Technique::Color0 + i ) ) ) {
             const Rgba& color = technique.color( i );
-        #if DEV_ENABLE_HAL_CALLS
+        #if !DEV_DISABLE_DRAW_CALLS
             shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
         #endif
         }
@@ -112,20 +110,20 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
     const Technique& technique = m_techniques[m_activeState.technique].readLock();
 
     // Bind the shader instance
-#if DEV_ENABLE_HAL_CALLS
+#if !DEV_DISABLE_DRAW_CALLS
     m_hal->setShader( shader );
 #endif
 
     // Set the view-projection matrix input
     if( location = technique.inputLocation( Technique::ViewProjection ) ) {
-    #if DEV_ENABLE_HAL_CALLS
+    #if !DEV_DISABLE_DRAW_CALLS
         shader->setMatrix( location, m_viewProjection );
     #endif
     }
 
     // Set the constant color input
     if( location = technique.inputLocation( Technique::Color ) ) {
-    #if DEV_ENABLE_HAL_CALLS
+    #if !DEV_DISABLE_DRAW_CALLS
         shader->setVec4( location, m_constantColor );
     #endif
     }
@@ -155,7 +153,7 @@ void Rvm::setInstance( s32 value )
     u32 location = 0;
 
 	if( location = technique.inputLocation( Technique::Transform ) ) {
-    #if DEV_ENABLE_HAL_CALLS
+    #if !DEV_DISABLE_DRAW_CALLS
 		shader->setMatrix( location, *instance.transform );
     #endif
 	}
@@ -204,12 +202,12 @@ void Rvm::flush( void )
             Renderer::VertexBufferWPtr vertexBuffer = renderable.vertexBuffer( j );
 
             if( vertexBuffer != m_activeState.vertexBuffer ) {
-            #if DEV_ENABLE_HAL_CALLS
+            #if !DEV_DISABLE_DRAW_CALLS
                 m_hal->setVertexBuffer( vertexBuffer );
             #endif
                 m_activeState.vertexBuffer = vertexBuffer;
             }
-        #if DEV_ENABLE_HAL_CALLS
+        #if !DEV_DISABLE_DRAW_CALLS
             m_hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( j ), 0, renderable.indexBuffer( j )->size() );
         #endif
         }        
