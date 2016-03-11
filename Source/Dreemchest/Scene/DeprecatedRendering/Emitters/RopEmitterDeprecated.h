@@ -24,14 +24,16 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RopEmitter_H__
-#define __DC_Scene_RopEmitter_H__
+#ifndef __DC_Scene_RopEmitterDeprecated_H__
+#define __DC_Scene_RopEmitterDeprecated_H__
 
 #include "../RenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 	//! Render operation emitter takes renderable entities as an input and emits render operations as an output.
 	class RopEmitterBase : public RefCounted {
@@ -92,8 +94,10 @@ namespace Scene {
 		DC_NOT_IMPLEMENTED
 	}
 
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RopEmitter_H__    */
+#endif    /*    !__DC_Scene_RopEmitterDeprecated_H__    */

@@ -27,11 +27,13 @@
 #ifndef __DC_Scene_StaticMeshRopEmitter_H__
 #define __DC_Scene_StaticMeshRopEmitter_H__
 
-#include "RopEmitter.h"
+#include "RopEmitterDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 	//! Emits render operations for static meshes in scene.
 	class StaticMeshRopEmitter : public RopEmitter<StaticMesh> {
@@ -63,6 +65,8 @@ namespace Scene {
 		Material::Model			m_model;		//!< Default material model.
 
 	};
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

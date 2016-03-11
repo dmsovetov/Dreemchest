@@ -24,11 +24,13 @@
 
  **************************************************************************/
 
-#include "RopEmitter.h"
+#include "RopEmitterDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 // ** RopEmitterBase::RopEmitterBase
 RopEmitterBase::RopEmitterBase( Ecs::EcsWPtr ecs, const String& name, const Ecs::Aspect& aspect ) : m_camera( NULL ), m_transform( NULL )
@@ -48,6 +50,8 @@ void RopEmitterBase::setClipper( const PlaneClipper& value )
 {
 	m_clipper = value;
 }
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

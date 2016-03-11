@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "RenderPass.h"
-#include "Emitters/RopEmitter.h"
+#include "Emitters/RopEmitterDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
