@@ -79,4 +79,11 @@ DC_END_DREEMCHEST
 #define DC_NEW              new
 #define DC_BREAK            NIMBLE_BREAK;
 
+#if NIMBLE_NO_DEBUG
+    #undef DC_BREAK_IF
+    #define DC_BREAK_IF( ... )
+    #undef DC_ABORT_IF
+    #define DC_ABORT_IF( ... )
+#endif
+
 #endif  /*  !DEPRECATED_H   */
