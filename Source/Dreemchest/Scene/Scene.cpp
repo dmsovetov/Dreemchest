@@ -40,6 +40,8 @@
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
+#include "Assets/Prefab.h"
+#include "Assets/Renderable.h"
 
 #include "Components/Rendering.h"
 #include "Components/Transform.h"
@@ -54,6 +56,12 @@ namespace Scene {
 // ** Resources::Resources
 Resources::Resources( void )
 {
+    registerType<Mesh>();
+    registerType<Image>();
+    registerType<Prefab>();
+    registerType<Material>();
+    registerType<Renderable>();
+    registerType<Technique>();
 }
 
 // ** Scene::Scene
