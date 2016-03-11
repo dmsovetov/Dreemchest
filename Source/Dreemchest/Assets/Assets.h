@@ -245,7 +245,7 @@ namespace Assets {
         };
 
         //! Container type to store unique id to an asset slot mapping.
-        typedef Map<AssetId, Index>   AssetIndexById;
+        typedef Map<AssetId, Index> AssetIndexById;
 
         //! Container type to store asset cache for an asset type.
         typedef Map<Type, AbstractAssetCache*> AssetCaches;

@@ -308,8 +308,11 @@ void Assets::update( f32 dt )
         queueForLoading( asset );
     }
 
+    // The maximum number of assets that can be loaded in a single frame
+    s32 maximumAssetsToLoad = 1;
+
     // Process the loading queue
-    while( !m_loadingQueue.empty() ) {
+    while( !m_loadingQueue.empty() && maximumAssetsToLoad-- ) {
         // Get the first asset in loading queue
         Handle handle = *m_loadingQueue.begin();
         m_loadingQueue.pop_front();
