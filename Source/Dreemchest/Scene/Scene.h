@@ -104,6 +104,9 @@ namespace Scene {
     //! Rop emitter unique pointer type.
     typedef AutoPtr<class AbstractRopEmitter> RopEmitterUPtr;
 
+    //! Render system unique pointer type.
+    typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
+
     //! Image handle type.
     typedef Assets::GenericHandle<class Image> ImageHandle;
 
@@ -292,10 +295,6 @@ namespace Scene {
 		template<typename TSystem, typename ... Args>
 		WeakPtr<TSystem>				addSystem( Args ... args );
 
-		//! Adds a new rendering system to the scene.
-		template<typename TRenderingSystem>
-		void							addRenderingSystem( void );
-
 		//! Creates an empty scene.
 		static ScenePtr					create( void );
 
@@ -328,9 +327,6 @@ namespace Scene {
 
 		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		Array<RenderingSystemBasePtr>	m_renderingSystems;	//!< Entity rendering systems.
-    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
 		Ecs::IndexPtr					m_meshes;			//!< All static meshes that reside in scene.
@@ -350,14 +346,6 @@ namespace Scene {
 	WeakPtr<TSystem> Scene::system( void ) const
 	{
 		return m_updateSystems->get<TSystem>();
-	}
-
-	// ** Scene::addRenderingSystem
-	template<typename TRenderingSystem>
-	void Scene::addRenderingSystem( void )
-	{
-		m_renderingSystems.push_back( DC_NEW TRenderingSystem( m_ecs ) );
-		m_ecs->rebuildIndices();
 	}
 
 	// ** Scene::createArchetype
@@ -499,6 +487,7 @@ DC_END_DREEMCHEST
 	    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
     #else
         #include "Rendering/RenderingContext.h"
+        #include "Rendering/RenderSystems/DepthComplexity.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif
 
