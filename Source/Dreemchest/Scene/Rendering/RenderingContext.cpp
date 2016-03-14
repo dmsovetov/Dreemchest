@@ -44,7 +44,7 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
     , m_scene( scene )
     , m_assets( assets )
 {
-    m_rvm           = DC_NEW Rvm( this, m_renderables.handles(), m_techniques.handles(), m_hal );
+    m_rvm           = DC_NEW Rvm( *this, m_hal );
     m_commands      = DC_NEW Commands;
     m_opaque        = DC_NEW StaticMeshEmitter( scene, RenderOpaqueBit | RenderCutoutBit );
     m_translucent   = DC_NEW StaticMeshEmitter( scene, RenderTranslucentBit );

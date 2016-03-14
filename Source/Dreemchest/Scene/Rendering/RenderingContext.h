@@ -149,8 +149,14 @@ namespace Scene {
         //! Returns program index for a specified shader asset.
         s32                                 requestProgram( const ShaderHandle& handle, u32 features );
 
+        //! Returns renderable handle by index.
+        const RenderableHandle&             renderableByIndex( s32 index ) const;
+
+        //! Returns technique handle by index.
+        const TechniqueHandle&              techniqueByIndex( s32 index ) const;
+
         //! Returns the program handle by index.
-        ProgramHandle                       programByIndex( s32 index ) const;
+        const ProgramHandle&                programByIndex( s32 index ) const;
 
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
@@ -191,27 +197,39 @@ namespace Scene {
     // ** RenderingContext::requestRenderable
     NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
     {
-        return m_renderables.request( m_assets, this, handle, "renderable" );
+        return m_renderables.request( m_assets, this, handle, "renderable" ) + 1;
     }
 
     // ** RenderingContext::requestTechnique
     NIMBLE_INLINE s32 RenderingContext::requestTechnique( const MaterialHandle& handle )
     {
-        return m_techniques.request( m_assets, this, handle, "technique" );
+        return m_techniques.request( m_assets, this, handle, "technique" ) + 1;
     }
 
     // ** RenderingContext::requestProgram
     NIMBLE_INLINE s32 RenderingContext::requestProgram( const ShaderHandle& handle, u32 features )
     {
-        s32 index = m_programs.request( m_assets, this, handle, "program" );
-        programByIndex( index ).writeLock()->setFeatures( features );
+        s32 index = m_programs.request( m_assets, this, handle, "program" ) + 1;
+        const_cast<ProgramHandle&>( programByIndex( index ) ).writeLock()->setFeatures( features );
         return index;
     }
 
     // ** RenderingContext::programByIndex
-    NIMBLE_INLINE ProgramHandle RenderingContext::programByIndex( s32 index ) const
+    NIMBLE_INLINE const ProgramHandle& RenderingContext::programByIndex( s32 index ) const
     {
-        return m_programs.handles()[index];
+        return m_programs.handles()[index - 1];
+    }
+
+    // ** RenderingContext::renderableByIndex
+    NIMBLE_INLINE const RenderableHandle& RenderingContext::renderableByIndex( s32 index ) const
+    {
+        return m_renderables.handles()[index - 1];
+    }
+
+    // ** RenderingContext::techniqueByIndex
+    NIMBLE_INLINE const TechniqueHandle& RenderingContext::techniqueByIndex( s32 index ) const
+    {
+        return m_techniques.handles()[index - 1];
     }
 
 } // namespace Scene

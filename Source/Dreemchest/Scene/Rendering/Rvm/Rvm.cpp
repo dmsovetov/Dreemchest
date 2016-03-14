@@ -33,11 +33,9 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Rvm::Rvm
-Rvm::Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal )
+Rvm::Rvm( RenderingContext& context, Renderer::HalWPtr hal )
     : m_context( context )
     , m_hal( hal )
-    , m_renderables( renderables )
-    , m_techniques( techniques )
     , m_constantColor( Vec4( 1.0f, 1.0f, 1.0f, 1.0f ) )
 {
 }
@@ -46,7 +44,7 @@ Rvm::Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderabl
 void Rvm::setTechnique( s32 value )
 {
     // Read-lock material technique
-    const Technique& technique = m_techniques[value].readLock();
+    const Technique& technique = m_context.techniqueByIndex( value ).readLock();
 
     if( !technique.program().isValid() ) {
         return;
@@ -93,7 +91,7 @@ void Rvm::setTechnique( s32 value )
 void Rvm::setRenderable( s32 value )
 {
     // Read-lock renderable asset
-    const Renderable& renderable = m_renderables[value].readLock();
+    const Renderable& renderable = m_context.renderableByIndex( value ).readLock();
 
     // Save current renderable
     m_activeState.renderable = value;
@@ -109,7 +107,7 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
     u32 location = 0;
 
     // Read-lock active material technique
-    const Technique& technique = m_techniques[m_activeState.technique].readLock();
+    const Technique& technique = m_context.techniqueByIndex( m_activeState.technique ).readLock();
 
     // Read-lock active program
     const Program& program = technique.program().readLock();
@@ -149,7 +147,7 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
     }
 
     // Read-lock active material technique
-    const Technique& technique = m_techniques[m_activeState.technique].readLock();
+    const Technique& technique = m_context.techniqueByIndex( m_activeState.technique ).readLock();
 
     // Read-lock active program
     const Program& program = technique.program().readLock();
@@ -199,7 +197,7 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                 m_renderTarget.push( rt );
 
                                                 // Begin rendering
-                                                userData.rt.instance->begin( m_context );
+                                                userData.rt.instance->begin( &m_context );
 
                                                 // Setup the viewport for this target
                                                 m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
@@ -210,7 +208,7 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                 DC_ABORT_IF( m_renderTarget.empty(), "render target stack underflow" );
 
                                                 // End rendering
-                                                m_renderTarget.top().instance->end( m_context );
+                                                m_renderTarget.top().instance->end( &m_context );
 
                                                 // Pop render target from a stack
                                                 m_renderTarget.pop();
@@ -279,7 +277,7 @@ void Rvm::execute( const Commands& commands )
         setInstance( userData.instance );
 
         // Render all chunks
-        const Renderable& renderable = m_renderables[rop.bits.renderable].readLock();
+        const Renderable& renderable = m_context.renderableByIndex( rop.bits.renderable ).readLock();
 
         for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
             Renderer::VertexBufferWPtr vertexBuffer = renderable.vertexBuffer( j );

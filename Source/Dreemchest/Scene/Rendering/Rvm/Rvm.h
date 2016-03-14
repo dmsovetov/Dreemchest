@@ -40,7 +40,7 @@ namespace Scene {
     public:
 
                                         //! Constructs Rvm instance.
-                                        Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderables, const Array<TechniqueHandle>& techniques, Renderer::HalWPtr hal );
+                                        Rvm( RenderingContext& context, Renderer::HalWPtr hal );
 
         //! Flushes all accumulated commands.
         void                            execute( const Commands& commands );
@@ -85,10 +85,8 @@ namespace Scene {
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
 
-        RenderingContextWPtr            m_context;          //!< Parent rendering context.
+        RenderingContext&               m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
-        const Array<RenderableHandle>&  m_renderables;      //!< Renderable asset handles.
-        const Array<TechniqueHandle>&   m_techniques;       //!< Technique asset handles.
         Stack<Commands::RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.
