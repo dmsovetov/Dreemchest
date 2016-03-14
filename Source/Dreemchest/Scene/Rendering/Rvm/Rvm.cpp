@@ -25,8 +25,8 @@
  **************************************************************************/
 
 #include "Rvm.h"
-#include "RenderTarget.h"
-#include "../Assets/Renderable.h"
+#include "../RenderTarget.h"
+#include "../../Assets/Renderable.h"
 
 DC_BEGIN_DREEMCHEST
 

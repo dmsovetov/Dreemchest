@@ -27,18 +27,11 @@
 #ifndef __DC_Scene_Rvm_H__
 #define __DC_Scene_Rvm_H__
 
-#include "RenderingContext.h"
+#include "../RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
-
-    inline u16 quantizeFloat( f32 value, f32 maximum, u16 bits )
-    {
-        f32 normalized = value / maximum;
-        f32 result     = f32( bits ) * normalized;
-        return static_cast<u16>( result );
-    }
 
     //! Renderer virtual machine.
     class Rvm {

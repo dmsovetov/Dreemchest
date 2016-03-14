@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "RenderingContext.h"
-#include "Rvm.h"
+#include "Rvm/Rvm.h"
 
 #include "Emitters/StaticMeshEmitter.h"
 

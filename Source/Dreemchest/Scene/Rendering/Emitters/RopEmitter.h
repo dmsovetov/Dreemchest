@@ -28,7 +28,7 @@
 #define __DC_Scene_Rendering_RopEmitter_H__
 
 #include "../RenderingContext.h"
-#include "../Rvm.h"
+#include "../Rvm/Rvm.h"
 
 #include "../../Components/Rendering.h"
 #include "../../Components/Transform.h"
