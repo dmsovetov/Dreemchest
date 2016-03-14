@@ -103,6 +103,11 @@ namespace Scene {
 
     //! Loads a shader from a text file
     class ShaderFormatText : public Assets::FileSource<Shader> {
+    public:
+
+                        //! Constructs ShaderFormatText instance.
+                        ShaderFormatText( const String& fileName );
+
     protected:
 
         //! Loads shader source from an input stream.

@@ -218,6 +218,12 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
 
 // ----------------------------------------------------------------------- ShaderFormatText ----------------------------------------------------------------------- //
 
+// ** ShaderFormatText::ShaderFormatText
+ShaderFormatText::ShaderFormatText( const String& fileName )
+{
+    setFileName( fileName );
+}
+
 // ** ShaderFormatText::constructFromStream
 bool ShaderFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Shader& shader )
 {
