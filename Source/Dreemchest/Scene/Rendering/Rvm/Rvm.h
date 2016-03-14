@@ -28,6 +28,7 @@
 #define __DC_Scene_Rvm_H__
 
 #include "../RenderingContext.h"
+#include "RasterizationOptions.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -36,37 +37,6 @@ namespace Scene {
     //! Renderer virtual machine.
     class Rvm {
     public:
-
-        //! Rasterization options used by a render mode.
-        struct RasterizationOptions {
-            u8                          renderingMode;  //!< Rendering modes that are eligible to use this rasterization options.
-            struct {
-                Renderer::BlendFactor   src;        //!< Source blend factor.
-                Renderer::BlendFactor   dst;        //!< Destination blend factor.
-            } blend;
-
-            struct {
-                Renderer::Compare		function;   //!< Alpha test function to be used.
-			    f32						reference;  //!< Reference value for an alpha test.
-            } alpha;
-
-            struct {
-                Renderer::Compare	    function;   //!< Depth test function to be used.          
-  			    bool					write;	    //!< Is writing to a depth buffer enabled or not.
-            } depth;
-
-            //! Returns default opaque rasterization options.
-            static RasterizationOptions opaque( void );
-
-            //! Returns default cutout rasterization options.
-            static RasterizationOptions cutout( void );
-
-            //! Returns default translucent rasterization options.
-            static RasterizationOptions translucent( void );
-
-            //! Returns default additive rasterization options.
-            static RasterizationOptions additive( void );
-        };
 
         //! Rendering operation emitted by scene object processing.
         struct Rop {

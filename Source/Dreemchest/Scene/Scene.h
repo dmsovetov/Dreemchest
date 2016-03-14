@@ -92,6 +92,8 @@ namespace Scene {
 	class Sprite;
 	class Camera;
 
+    struct RasterizationOptions;
+
 	//! Rvm unique pointer type.
     typedef AutoPtr<class Rvm> RvmUPtr;
 

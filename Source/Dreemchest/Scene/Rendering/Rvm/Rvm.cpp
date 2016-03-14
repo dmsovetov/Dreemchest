@@ -252,7 +252,7 @@ void Rvm::executeCommand( const Rop& rop, const UserData& userData )
                                     const RasterizationOptions& ro = userData.rasterization;
 
                                     for( s32 i = 0; i < TotalRenderModes; i++ ) {
-                                        if( BIT( i ) & ro.renderingMode ) {
+                                        if( BIT( i ) & ro.modes ) {
                                             m_rasterization[i] = ro;
                                         }
                                     }
@@ -425,7 +425,7 @@ void Rvm::emitRasterOptions( u8 renderingModes, const RasterizationOptions& opti
 
     UserData* userData = allocateUserData( rop );
     userData->rasterization = options;
-    userData->rasterization.renderingMode = renderingModes;
+    userData->rasterization.modes = renderingModes;
 }
 
 // ** Rvm::Rop::Rop
@@ -448,66 +448,6 @@ Rvm::ActiveState::ActiveState( void )
     , shader( NULL )
     , vertexBuffer( NULL )
 {
-}
-
-// ** Rvm::RasterizationOptions::opaque
-Rvm::RasterizationOptions Rvm::RasterizationOptions::opaque( void )
-{
-    RasterizationOptions options;
-
-    options.blend.src       = Renderer::BlendDisabled;
-    options.blend.dst       = Renderer::BlendDisabled;
-    options.alpha.function  = Renderer::CompareDisabled;
-    options.alpha.reference = 0.0f;
-    options.depth.write     = true;
-    options.depth.function  = Renderer::LessEqual;
-
-    return options;
-}
-
-// ** Rvm::RasterizationOptions::cutout
-Rvm::RasterizationOptions Rvm::RasterizationOptions::cutout( void )
-{
-    RasterizationOptions options;
-
-    options.blend.src       = Renderer::BlendDisabled;
-    options.blend.dst       = Renderer::BlendDisabled;
-    options.alpha.function  = Renderer::Greater;
-    options.alpha.reference = 0.5f;
-    options.depth.write     = true;
-    options.depth.function  = Renderer::LessEqual;
-
-    return options;
-}
-
-// ** Rvm::RasterizationOptions::translucent
-Rvm::RasterizationOptions Rvm::RasterizationOptions::translucent( void )
-{
-    RasterizationOptions options;
-
-    options.blend.src       = Renderer::BlendSrcAlpha;
-    options.blend.dst       = Renderer::BlendInvSrcAlpha;
-    options.alpha.function  = Renderer::CompareDisabled;
-    options.alpha.reference = 0.0f;
-    options.depth.write     = false;
-    options.depth.function  = Renderer::LessEqual;
-
-    return options;
-}
-
-// ** Rvm::RasterizationOptions::additive
-Rvm::RasterizationOptions Rvm::RasterizationOptions::additive( void )
-{
-    RasterizationOptions options;
-
-    options.blend.src       = Renderer::BlendOne;
-    options.blend.dst       = Renderer::BlendOne;
-    options.alpha.function  = Renderer::CompareDisabled;
-    options.alpha.reference = 0.0f;
-    options.depth.write     = false;
-    options.depth.function  = Renderer::LessEqual;
-
-    return options;
 }
 
 } // namespace Scene

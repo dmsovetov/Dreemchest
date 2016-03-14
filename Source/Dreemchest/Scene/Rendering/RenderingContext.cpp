@@ -106,14 +106,14 @@ void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Tr
     m_rvm->emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
 
     // Now emit all render operations
-    m_rvm->emitRasterOptions( RenderOpaqueBit, Rvm::RasterizationOptions::opaque() );
-    m_rvm->emitRasterOptions( RenderCutoutBit, Rvm::RasterizationOptions::translucent() );
+    m_rvm->emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
+    m_rvm->emitRasterOptions( RenderCutoutBit, RasterizationOptions::translucent() );
     m_opaque->emit( transform.position(), *this, *m_rvm );
 
-    m_rvm->emitRasterOptions( RenderTranslucentBit, Rvm::RasterizationOptions::translucent() );
+    m_rvm->emitRasterOptions( RenderTranslucentBit, RasterizationOptions::translucent() );
     m_translucent->emit( transform.position(), *this, *m_rvm );
 
-    m_rvm->emitRasterOptions( RenderAdditiveBit, Rvm::RasterizationOptions::additive() );
+    m_rvm->emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
     m_additive->emit( transform.position(), *this, *m_rvm );
 
     // End rendering by popping a render target
