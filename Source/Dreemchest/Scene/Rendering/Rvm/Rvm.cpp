@@ -174,10 +174,12 @@ void Rvm::setRenderingMode( u8 value )
     // Get the rendering mode by index
 	const RasterizationOptions& options = m_rasterization[value];
 
+#if !DEV_DISABLE_DRAW_CALLS
     // Setup rasterization states
 	m_hal->setBlendFactors( options.blend.src, options.blend.dst );
 	m_hal->setAlphaTest( options.alpha.function, options.alpha.reference );
 	m_hal->setDepthTest( options.depth.write, options.depth.function );
+#endif
 
     // Save current rendering mode
     m_activeState.renderingMode = value;
@@ -193,7 +195,9 @@ void Rvm::setConstantColor( const Rgba& value )
     if( const Program* program = m_activeState.program ) {
         u32 location = program->inputLocation( Program::Color );
         if( location ) {
+        #if !DEV_DISABLE_DRAW_CALLS
             program->shader()->setVec4( location, m_constantColor );
+        #endif
         }
     }
 }
@@ -212,8 +216,10 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                 // Begin rendering
                                                 userData.rt.instance->begin( &m_context );
 
+                                            #if !DEV_DISABLE_DRAW_CALLS
                                                 // Setup the viewport for this target
                                                 m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                            #endif
                                             }
                                             break;
 
@@ -229,7 +235,9 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                 // Rollback to the previous render target
                                                 if( m_renderTarget.size() ) {
                                                     const Commands::RenderTargetState& rt = m_renderTarget.top();
+                                                #if !DEV_DISABLE_DRAW_CALLS
                                                     m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                                #endif
                                                 }
                                             }
                                             break;
