@@ -45,6 +45,9 @@ namespace Scene {
                   PushRenderTarget  //!< Begins rendering to target by pushing it to a stack and setting the viewport.
                 , PopRenderTarget   //!< Ends rendering to target by popping it from a stack.
                 , RasterOptions     //!< Setups the rasterization options.
+                , PushProgram       //!< Pushes a program onto the stack.
+                , PopProgram        //!< Pops program from a stack.
+                , ConstantColor     //!< Sets the constant color value.
             };
 
                         //! Constructs Rop instance.
@@ -54,11 +57,11 @@ namespace Scene {
             bool        operator < ( const Rop& other ) const;
 
             struct Bits {
-                u16     userData    : 14;   //!< Command user data index.
-                u16     technique   : 16;   //!< Rendering technique index.
-                u16     renderable  : 16;   //!< Mesh index.
+                u16     userData    : 15;   //!< Command user data index.
+                u16     technique   : 15;   //!< Rendering technique index.
+                u16     renderable  : 15;   //!< Mesh index.
                 u8      depth       : 8;    //!< Instance depth.
-                u8      mode        : 2;    //!< Rendering mode.
+                u8      mode        : 3;    //!< Rendering mode.
                 u8      command     : 1;    //!< Indicates that that this is not a draw call.
                 u8      sequence    : 4;    //!< Command sequence number.
             };
@@ -83,6 +86,8 @@ namespace Scene {
             }
         };
 
+        NIMBLE_STATIC_ASSERT( sizeof( Rop ) == 8, "Rop size is expected to be 8 bytes" );
+
         //! Render target state data.
         struct RenderTargetState {
             const RenderTarget*         instance;       //!< Render target instance to be pushed.
@@ -101,10 +106,10 @@ namespace Scene {
                 InstanceData            instance;       //!< Instance user data.
                 RenderTargetState       rt;             //!< Render target info.
                 RasterizationOptions    rasterization;  //!< Rasterization options.
+                const Program*          program;        //!< Program to be pushed on to the stack.
+                f32                     color[4];       //!< The constant color value.
             };
         };
-
-        NIMBLE_STATIC_ASSERT( sizeof( Rop ) == 8, "Rop size is expected to be 8 bytes" );
 
                                         //! Constructs the Commands instance.
                                         Commands( void );
@@ -138,6 +143,15 @@ namespace Scene {
 
         //! Emits the rasterization options command.
         void                            emitRasterOptions( u8 renderingModes, const RasterizationOptions& options );
+
+        //! Emits the command to push program.
+        void                            emitPushProgram( ProgramHandle value );
+
+        //! Emits the command to pop program.
+        void                            emitPopProgram( void );
+
+        //! Emits the constant color operation.
+        void                            emitConstantColor( const Rgba& value );
 
     private:
 

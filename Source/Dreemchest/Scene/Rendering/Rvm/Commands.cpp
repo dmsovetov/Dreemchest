@@ -62,7 +62,10 @@ void Commands::dump( void ) const
     CString commands[] = {
           "pushRenderTarget"
         , "popRenderTarget"
-        , "rasterOptions"  
+        , "rasterOptions" 
+        , "pushProgram"
+        , "popProgram"
+        , "constantColor"
     };
     CString modes[] = {
 		  "opaque"
@@ -156,6 +159,39 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
     UserData* userData = allocateUserData( rop );
     userData->rasterization = options;
     userData->rasterization.modes = renderingModes;
+}
+
+// ** Commands::emitPushProgram
+void Commands::emitPushProgram( ProgramHandle value )
+{
+    Rop* rop = allocateRop();
+    rop->setCommand( Rop::PushProgram );
+    rop->bits.sequence = m_sequence++;
+
+    UserData* userData = allocateUserData( rop );
+    userData->program = &value.readLock();
+}
+
+// ** Commands::emitPopProgram
+void Commands::emitPopProgram( void )
+{
+    Rop* rop = allocateRop();
+    rop->setCommand( Rop::PopProgram );
+    rop->bits.sequence = ++m_sequence;
+}
+
+// ** Commands::emitConstantColor
+void Commands::emitConstantColor( const Rgba& value )
+{
+    Rop* rop = allocateRop();
+    rop->setCommand( Rop::ConstantColor );
+    rop->bits.sequence = m_sequence++;
+
+    UserData* userData = allocateUserData( rop );
+    userData->color[0] = value.r;
+    userData->color[1] = value.g;
+    userData->color[2] = value.b;
+    userData->color[3] = value.a;
 }
 
 // ** Commands::Rop::Rop
