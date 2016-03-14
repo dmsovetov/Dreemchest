@@ -38,13 +38,11 @@ Rvm::Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderabl
     , m_hal( hal )
     , m_renderables( renderables )
     , m_techniques( techniques )
-    , m_operationCount( 0 )
-    , m_instanceCount( 0 )
+    , m_operations( 1024 )
+    , m_userData( 1024 )
     , m_constantColor( Vec4( 1.0f, 1.0f, 1.0f, 1.0f ) )
     , m_sequence( 0 )
 {
-    m_operations.resize( 16384 );
-    m_userData.resize( 16384 );
 }
 
 // ** Rvm::setTechnique
@@ -145,17 +143,18 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
 // ** Rvm::allocateUserData
 Rvm::UserData* Rvm::allocateUserData( Rop* rop )
 {
-    UserData* instance = &m_userData[m_instanceCount++];
-    rop->bits.userData = m_instanceCount - 1;
-    return instance;
+    s32 idx = m_userData.allocate();
+    rop->bits.userData = idx;
+    return &m_userData[idx];
 }
 
 // ** Rvm::allocateRop
 Rvm::Rop* Rvm::allocateRop( void )
 {
-    Rop* rop = &m_operations[m_operationCount++];
-    rop->bits.sequence = m_sequence;
-    return rop;
+    s32  idx = m_operations.allocate();
+    Rop& rop = m_operations[idx];
+    rop.bits.sequence = m_sequence;
+    return &rop;
 }
 
 // ** Rvm::setInstance
@@ -267,7 +266,7 @@ void Rvm::executeCommand( const Rop& rop, const UserData& userData )
 void Rvm::flush( void )
 {
     // Sort accumulated commands
-    std::sort( m_operations.begin(), m_operations.begin() + m_operationCount );
+    std::sort( m_operations.items().begin(), m_operations.items().begin() + m_operations.allocatedCount() );
 
 #if 0
     //
@@ -296,7 +295,7 @@ void Rvm::flush( void )
 #endif
 
     // Process all commands
-    for( s32 i = 0, n = m_operationCount; i < n; i++ ) {
+    for( s32 i = 0, n = m_operations.allocatedCount(); i < n; i++ ) {
         // Decode the command
         const Rop& rop = m_operations[i];
 
@@ -343,11 +342,13 @@ void Rvm::flush( void )
     }
 
     // Clear processed commands
-    m_operationCount = 0;
-    m_instanceCount = 0;
+    m_operations.reset();
+    m_userData.reset();
+//    m_operationCount = 0;
+//    m_instanceCount = 0;
 
-    memset( &m_operations[0], 0, sizeof( Rop ) * m_operations.size() );
-    memset( &m_userData[0], 0, sizeof( UserData ) * m_userData.size() );
+//    memset( &m_operations[0], 0, sizeof( Rop ) * m_operations.size() );
+//    memset( &m_userData[0], 0, sizeof( UserData ) * m_userData.size() );
 
     // Reset the sequence number
     m_sequence = 0;

@@ -181,10 +181,8 @@ namespace Scene {
         Stack<RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         s32                             m_sequence;         //!< Current sequence number of render operation.
-        Array<Rop>                      m_operations;       //!< Actual rop buffer.
-        s32                             m_operationCount;   //!< The total number of allocated render operations.
-        Array<UserData>                 m_userData;         //!< Instance data.
-        s32                             m_instanceCount;    //!< The total number of allocated instances.
+        IndexAllocator<Rop>             m_operations;
+        IndexAllocator<UserData>        m_userData;
         ActiveState                     m_activeState;      //!< Active rendering state.
         Vec4                            m_constantColor;    //!< Constant color.
     };
