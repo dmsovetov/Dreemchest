@@ -88,7 +88,7 @@ namespace Scene {
         RenderingContext&               m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
         Stack<Commands::RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
-        Stack<const Program*>           m_programs;         //!< If no program set by technique the program from a top of this stack will be used.
+        Stack<const Technique*>         m_techniques;       //!< If no technique is associated with draw call, the technique from a top of this stack will be used.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.
         Vec4                            m_constantColor;    //!< Constant color.

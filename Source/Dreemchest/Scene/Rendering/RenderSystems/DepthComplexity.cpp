@@ -35,7 +35,7 @@ DepthComplexity::DepthComplexity( RenderingContext& context )
     : RenderSystem( context )
 {
     // Create shader
-    m_shader = context.createShader(  "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
+    m_technique = context.createTechnique( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
 
     // Create render operation emitters
     for( s32 i = 0; i < TotalRenderModes; i++ ) {
@@ -52,8 +52,9 @@ void DepthComplexity::emitRenderOperations( const Ecs::Entity& entity, const Cam
     // Set additive blend rasterization for all rendering modes
     commands.emitRasterOptions( AllRenderModesBit, RasterizationOptions::additive().overrideZWrite( true ) );
 
-    // Set the default shader program
-    commands.emitPushProgram( m_context.programByIndex( m_context.requestProgram( m_shader, 0 ) ) );
+    // Set the default technique
+    const Technique& tech = m_technique.readLock();
+    commands.emitPushTechnique( m_technique );
 
     // Emit operations for all rendering mode
     for( s32 i = 0; i < TotalRenderModes; i++ ) {
@@ -64,8 +65,8 @@ void DepthComplexity::emitRenderOperations( const Ecs::Entity& entity, const Cam
         m_emitters[i]->emit( transform.position() );
     }
 
-    // Pop the default program
-    commands.emitPopProgram();
+    // Pop the default technique
+    commands.emitPopTechnique();
 }
 
 } // namespace Scene

@@ -174,6 +174,9 @@ namespace Scene {
         //! Creates a new shader instance.
         ShaderHandle                        createShader( const String& fileName );
 
+        //! Creates a new technique instance.
+        TechniqueHandle                     createTechnique( const String& identifier, const String& shader );
+
         //! Returns the command buffer instance.
         Commands&                           commands( void );
 
@@ -235,6 +238,7 @@ namespace Scene {
     NIMBLE_INLINE s32 RenderingContext::requestProgram( const ShaderHandle& handle, u32 features )
     {
         s32 index = m_programs.request( m_assets, this, handle, "program" ) + 1;
+        const_cast<ProgramHandle&>( programByIndex( index ) ).forceLoad();
         const_cast<ProgramHandle&>( programByIndex( index ) ).writeLock()->setFeatures( features );
         return index;
     }

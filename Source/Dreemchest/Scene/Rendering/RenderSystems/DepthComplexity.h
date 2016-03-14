@@ -48,7 +48,7 @@ namespace Scene {
     private:
 
         RopEmitterUPtr          m_emitters[TotalRenderModes];   //!< Rop emitter for each of rendering modes.
-        ShaderHandle            m_shader;                       //!< The constant color shader.
+        TechniqueHandle         m_technique;                    //!< This technique is used for all draw call operations.
     };
 
 } // namespace Scene

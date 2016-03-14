@@ -43,21 +43,8 @@ Rvm::Rvm( RenderingContext& context, Renderer::HalWPtr hal )
 // ** Rvm::setTechnique
 void Rvm::setTechnique( s32 value )
 {
-    // If the technique is invalid - set the default program
-    if( value == 0 ) {
-        // Read-lock the default program
-        const Program* program = m_programs.top();
-
-        // Set the program shader
-        if( m_activeState.program != program ) {
-            setProgram( program );
-        }
-
-        return;
-    }
-
     // Read-lock material technique
-    const Technique& technique = m_context.techniqueByIndex( value ).readLock();
+    const Technique& technique = value ? m_context.techniqueByIndex( value ).readLock() : *m_techniques.top();
 
     if( !technique.program().isValid() ) {
         return;
@@ -113,6 +100,11 @@ void Rvm::setRenderable( s32 value )
 // ** Rvm::setProgram
 void Rvm::setProgram( const Program* value )
 {
+    // This program is already set
+    if( value == m_activeState.program ) {
+        return;
+    }
+
     // Get the shader from a program
     Renderer::ShaderWPtr shader = value->shader();
 
@@ -254,10 +246,10 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                             }
                                             break;
 
-    case Commands::Rop::PushProgram:        m_programs.push( userData.program );
+    case Commands::Rop::PushTechnique:      m_techniques.push( userData.technique );
                                             break;
 
-    case Commands::Rop::PopProgram:         m_programs.pop();
+    case Commands::Rop::PopTechnique:       m_techniques.pop();
                                             break;
 
     case Commands::Rop::ConstantColor:      setConstantColor( userData.color );

@@ -76,8 +76,42 @@ ShaderHandle RenderingContext::createShader( const String& fileName )
     }
 
     // No such shader - create a new one
-    shader = m_assets.add<Shader>( fileName, new ShaderFormatText( fileName ) );
+    shader = m_assets.add<Shader>( fileName, DC_NEW ShaderFormatText( fileName ) );
+
+    // Set the shader name
+    shader.asset().setName( fileName );
+
     return shader;
+}
+
+// ** RenderingContext::createTechnique
+TechniqueHandle RenderingContext::createTechnique( const String& identifier, const String& shader )
+{
+    // First lookup a previously created technique by it's identifier.
+    TechniqueHandle technique = m_assets.find<Technique>( identifier );
+
+    if( technique.isValid() ) {
+        return technique;
+    }
+
+    // No such technique - create a new one
+    technique = m_assets.add<Technique>( identifier, DC_NEW Assets::NullSource );
+    technique.forceLoad();
+
+    // Set an asset name same as identifier
+    technique.asset().setName( identifier + ".technique" );
+
+    // Get the technique shader
+    ShaderHandle shaderHandle = createShader( shader );
+    shaderHandle.forceLoad();
+
+    // Set it's shader
+    Assets::WriteLock<Technique> locked = technique.writeLock();
+    locked->setProgram( programByIndex( requestProgram( shaderHandle, 0 ) ) );
+    technique.forceLoad();
+    const_cast<ProgramHandle&>( locked->program() ).forceLoad();
+
+    return technique;
 }
 
 // ** RenderingContext::begin

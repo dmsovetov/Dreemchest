@@ -45,8 +45,8 @@ namespace Scene {
                   PushRenderTarget  //!< Begins rendering to target by pushing it to a stack and setting the viewport.
                 , PopRenderTarget   //!< Ends rendering to target by popping it from a stack.
                 , RasterOptions     //!< Setups the rasterization options.
-                , PushProgram       //!< Pushes a program onto the stack.
-                , PopProgram        //!< Pops program from a stack.
+                , PushTechnique     //!< Pushes a technique onto the stack.
+                , PopTechnique      //!< Pops technique from a stack.
                 , ConstantColor     //!< Sets the constant color value.
             };
 
@@ -106,7 +106,7 @@ namespace Scene {
                 InstanceData            instance;       //!< Instance user data.
                 RenderTargetState       rt;             //!< Render target info.
                 RasterizationOptions    rasterization;  //!< Rasterization options.
-                const Program*          program;        //!< Program to be pushed on to the stack.
+                const Technique*        technique;      //!< Technique to be pushed on to the stack.
                 f32                     color[4];       //!< The constant color value.
             };
         };
@@ -145,10 +145,10 @@ namespace Scene {
         void                            emitRasterOptions( u8 renderingModes, const RasterizationOptions& options );
 
         //! Emits the command to push program.
-        void                            emitPushProgram( ProgramHandle value );
+        void                            emitPushTechnique( TechniqueHandle value );
 
         //! Emits the command to pop program.
-        void                            emitPopProgram( void );
+        void                            emitPopTechnique( void );
 
         //! Emits the constant color operation.
         void                            emitConstantColor( const Rgba& value );

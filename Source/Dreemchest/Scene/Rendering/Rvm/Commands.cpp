@@ -161,22 +161,22 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
     userData->rasterization.modes = renderingModes;
 }
 
-// ** Commands::emitPushProgram
-void Commands::emitPushProgram( ProgramHandle value )
+// ** Commands::emitPushTechnique
+void Commands::emitPushTechnique( TechniqueHandle value )
 {
     Rop* rop = allocateRop();
-    rop->setCommand( Rop::PushProgram );
+    rop->setCommand( Rop::PushTechnique );
     rop->bits.sequence = m_sequence++;
 
     UserData* userData = allocateUserData( rop );
-    userData->program = &value.readLock();
+    userData->technique = &value.readLock();
 }
 
-// ** Commands::emitPopProgram
-void Commands::emitPopProgram( void )
+// ** Commands::emitPopTechnique
+void Commands::emitPopTechnique( void )
 {
     Rop* rop = allocateRop();
-    rop->setCommand( Rop::PopProgram );
+    rop->setCommand( Rop::PopTechnique );
     rop->bits.sequence = ++m_sequence;
 }
 
