@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( const Vec3& camera, RenderingContext& ctx, Rvm& rvm, const StaticMesh& staticMesh, const Transform& transform )
+void StaticMeshEmitter::emit( const Vec3& camera, RenderingContext& ctx, Commands& commands, const StaticMesh& staticMesh, const Transform& transform )
 {
     // Get the material
     const MaterialHandle& material = staticMesh.material( 0 );
@@ -49,7 +49,7 @@ void StaticMeshEmitter::emit( const Vec3& camera, RenderingContext& ctx, Rvm& rv
     s32 technique = ctx.requestTechnique( material );
 
     // Emit the rendering command
-    rvm.emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
+    commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
 }
 
 } // namespace Scene

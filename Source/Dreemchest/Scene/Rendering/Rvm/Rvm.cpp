@@ -38,10 +38,7 @@ Rvm::Rvm( RenderingContextWPtr context, const Array<RenderableHandle>& renderabl
     , m_hal( hal )
     , m_renderables( renderables )
     , m_techniques( techniques )
-    , m_operations( 1024 )
-    , m_userData( 1024 )
     , m_constantColor( Vec4( 1.0f, 1.0f, 1.0f, 1.0f ) )
-    , m_sequence( 0 )
 {
 }
 
@@ -140,25 +137,8 @@ void Rvm::setShader( Renderer::ShaderWPtr shader )
     m_activeState.shader = shader;
 }
 
-// ** Rvm::allocateUserData
-Rvm::UserData* Rvm::allocateUserData( Rop* rop )
-{
-    s32 idx = m_userData.allocate();
-    rop->bits.userData = idx;
-    return &m_userData[idx];
-}
-
-// ** Rvm::allocateRop
-Rvm::Rop* Rvm::allocateRop( void )
-{
-    s32  idx = m_operations.allocate();
-    Rop& rop = m_operations[idx];
-    rop.bits.sequence = m_sequence;
-    return &rop;
-}
-
 // ** Rvm::setInstance
-void Rvm::setInstance( s32 value )
+void Rvm::setInstance( const Commands::InstanceData& instance )
 {
     // Get an active shader instance
     Renderer::ShaderWPtr& shader = m_activeState.shader;
@@ -174,15 +154,12 @@ void Rvm::setInstance( s32 value )
     // Read-lock active program
     const Program& program = technique.program().readLock();
 
-    // Get the instance data
-    const UserData& userData = m_userData[value];
-
 	// Set the transformation matrix
     u32 location = 0;
 
 	if( location = program.inputLocation( Program::Transform ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
-		shader->setMatrix( location, *userData.instance.transform );
+		shader->setMatrix( location, *instance.transform );
     #endif
 	}
 }
@@ -211,97 +188,75 @@ void Rvm::setColor( const Rgba& value )
 }
 
 // ** Rvm::executeCommand
-void Rvm::executeCommand( const Rop& rop, const UserData& userData )
+void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& userData )
 {
     switch( rop.bits.mode ) {
-    case Rop::PushRenderTarget: {
-                                    // Get the render target state from command user data
-                                    const RenderTargetState& rt = userData.rt;
+    case Commands::Rop::PushRenderTarget:   {
+                                                // Get the render target state from command user data
+                                                const Commands::RenderTargetState& rt = userData.rt;
 
-                                    // Push this render target to a stack
-                                    m_renderTarget.push( rt );
+                                                // Push this render target to a stack
+                                                m_renderTarget.push( rt );
 
-                                    // Begin rendering
-                                    userData.rt.instance->begin( m_context );
+                                                // Begin rendering
+                                                userData.rt.instance->begin( m_context );
 
-                                    // Setup the viewport for this target
-                                    m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
-                                }
-                                break;
+                                                // Setup the viewport for this target
+                                                m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                            }
+                                            break;
 
-    case Rop::PopRenderTarget:  {
-                                    DC_ABORT_IF( m_renderTarget.empty(), "render target stack underflow" );
+    case Commands::Rop::PopRenderTarget:    {
+                                                DC_ABORT_IF( m_renderTarget.empty(), "render target stack underflow" );
 
-                                    // End rendering
-                                    m_renderTarget.top().instance->end( m_context );
+                                                // End rendering
+                                                m_renderTarget.top().instance->end( m_context );
 
-                                    // Pop render target from a stack
-                                    m_renderTarget.pop();
+                                                // Pop render target from a stack
+                                                m_renderTarget.pop();
 
-                                    // Rollback to the previous render target
-                                    if( m_renderTarget.size() ) {
-                                        const RenderTargetState& rt = m_renderTarget.top();
-                                        m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
-                                    }
-                                }
-                                break;
+                                                // Rollback to the previous render target
+                                                if( m_renderTarget.size() ) {
+                                                    const Commands::RenderTargetState& rt = m_renderTarget.top();
+                                                    m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                                }
+                                            }
+                                            break;
 
-    case Rop::RasterOptions:    {
-                                    // Get the rasterization options from command user data
-                                    const RasterizationOptions& ro = userData.rasterization;
+    case Commands::Rop::RasterOptions:      {
+                                                // Get the rasterization options from command user data
+                                                const RasterizationOptions& ro = userData.rasterization;
 
-                                    for( s32 i = 0; i < TotalRenderModes; i++ ) {
-                                        if( BIT( i ) & ro.modes ) {
-                                            m_rasterization[i] = ro;
-                                        }
-                                    }
-                                }
-                                break;
+                                                for( s32 i = 0; i < TotalRenderModes; i++ ) {
+                                                    if( BIT( i ) & ro.modes ) {
+                                                        m_rasterization[i] = ro;
+                                                    }
+                                                }
+                                            }
+                                            break;
 
     default:                    DC_NOT_IMPLEMENTED;
     }
 }
 
-// ** Rvm::flush
-void Rvm::flush( void )
+// ** Rvm::execute
+void Rvm::execute( const Commands& commands )
 {
-    // Sort accumulated commands
-    std::sort( m_operations.items().begin(), m_operations.items().begin() + m_operations.allocatedCount() );
-
 #if 0
-    //
-    CString commands[] = {
-          "pushRenderTarget"
-        , "popRenderTarget"
-        , "rasterOptions"  
-    };
-    CString modes[] = {
-		  "opaque"
-		, "cutout"
-		, "translucent"
-		, "additive"
-    };
-
-    for( s32 i = 0; i < m_operationCount; i++ ) {
-        const Rop& rop = m_operations[i];
-
-        if( rop.bits.command ) {
-            LogVerbose( "rvm", "%d: %s\n", rop.bits.sequence, commands[rop.bits.mode] );
-        }
-        else {
-            LogVerbose( "rvm", "%d: drawCall : %s\n", rop.bits.sequence, modes[rop.bits.mode] );
-        }
-    }
+    commands.dump();
 #endif
 
     // Process all commands
-    for( s32 i = 0, n = m_operations.allocatedCount(); i < n; i++ ) {
-        // Decode the command
-        const Rop& rop = m_operations[i];
+    for( s32 i = 0, n = commands.size(); i < n; i++ ) {
+        // Get the command by index
+        const Commands::Rop& rop = commands.ropAt( i );
+
+        // Get the user data for current command
+        const Commands::UserData& userData = commands.ropUserData( rop );
 
         // Is this a command?
         if( rop.bits.command ) {
-            executeCommand( rop, m_userData[rop.bits.userData] );
+            executeCommand( rop, userData );
             continue;
         }
 
@@ -321,7 +276,7 @@ void Rvm::flush( void )
         }
 
         // Set instance data
-        setInstance( rop.bits.userData );
+        setInstance( userData.instance );
 
         // Render all chunks
         const Renderable& renderable = m_renderables[rop.bits.renderable].readLock();
@@ -340,18 +295,6 @@ void Rvm::flush( void )
         #endif
         }        
     }
-
-    // Clear processed commands
-    m_operations.reset();
-    m_userData.reset();
-//    m_operationCount = 0;
-//    m_instanceCount = 0;
-
-//    memset( &m_operations[0], 0, sizeof( Rop ) * m_operations.size() );
-//    memset( &m_userData[0], 0, sizeof( UserData ) * m_userData.size() );
-
-    // Reset the sequence number
-    m_sequence = 0;
 
     // Reset active state
     m_activeState = ActiveState();
@@ -388,57 +331,6 @@ void Rvm::reset( void )
 
 	// Enable the depth test back
 	m_hal->setDepthTest( true, Renderer::LessEqual );
-}
-
-// ** Rvm::emitPushRenderTarget
-void Rvm::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport )
-{
-    Rop* rop = allocateRop();
-    rop->setCommand( Rop::PushRenderTarget );
-    rop->bits.sequence = m_sequence++;
-
-    UserData* userData = allocateUserData( rop );
-    userData->rt.instance = renderTarget.get();
-    userData->rt.viewport[0] = static_cast<u32>( viewport.min().x );
-    userData->rt.viewport[1] = static_cast<u32>( viewport.min().y );
-    userData->rt.viewport[2] = static_cast<u32>( viewport.width() );
-    userData->rt.viewport[3] = static_cast<u32>( viewport.height() );
-
-    for( s32 i = 0; i < 16; i++ ) {
-        userData->rt.vp[i] = viewProjection[i];
-    }
-}
-
-// ** Rvm::emitPopRenderTarget
-void Rvm::emitPopRenderTarget( void )
-{
-    Rop* rop = allocateRop();
-    rop->setCommand( Rop::PopRenderTarget );
-    rop->bits.sequence = ++m_sequence;
-}
-
-// ** Rvm::emitRasterOptions
-void Rvm::emitRasterOptions( u8 renderingModes, const RasterizationOptions& options )
-{
-    Rop* rop = allocateRop();
-    rop->setCommand( Rop::RasterOptions );
-    rop->bits.sequence = m_sequence++;
-
-    UserData* userData = allocateUserData( rop );
-    userData->rasterization = options;
-    userData->rasterization.modes = renderingModes;
-}
-
-// ** Rvm::Rop::Rop
-Rvm::Rop::Rop( void )
-    : key( 0 )
-{
-}
-
-// ** Rvm::Rop::operator <
-bool Rvm::Rop::operator < ( const Rop& other ) const
-{
-    return key < other.key;
 }
 
 // ** Rvm::ActiveState::ActiveState

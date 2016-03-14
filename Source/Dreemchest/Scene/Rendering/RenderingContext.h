@@ -175,7 +175,8 @@ namespace Scene {
         typedef RenderAssetCache<Shader, Program, ProgramShaderSource> ProgramCache;
 
         Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
-        RvmUPtr                             m_rvm;          //!< Internal Rvm instance.
+        RvmUPtr                             m_rvm;          //!< Internal rvm instance.
+        CommandsUPtr                        m_commands;     //!< Internal rvm command buffer.
         SceneWPtr                           m_scene;        //!< Parent scene instance.
         Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
 

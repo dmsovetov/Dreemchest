@@ -93,9 +93,13 @@ namespace Scene {
 	class Camera;
 
     struct RasterizationOptions;
+    class  Commands;
 
 	//! Rvm unique pointer type.
     typedef AutoPtr<class Rvm> RvmUPtr;
+
+    //! Rvm command buffer unique pointer type.
+    typedef AutoPtr<class Commands> CommandsUPtr;
 
     //! Rop emitter unique pointer type.
     typedef AutoPtr<class AbstractRopEmitter> RopEmitterUPtr;
