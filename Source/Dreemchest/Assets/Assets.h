@@ -336,6 +336,7 @@ namespace Assets {
     template<typename TAsset>
     NIMBLE_INLINE WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
     {
+        DC_BREAK_IF( asset->state() == Asset::Unloaded, "could not acquire write lock for an unloaded asset" );
         return WriteLock<TAsset>( asset );
     }
 
