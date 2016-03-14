@@ -74,8 +74,29 @@ namespace Scene {
 	class RenderBoundingVolumes : public Ecs::Component<RenderBoundingVolumes> {
 	};
 
-	//! This component is attached to a camera to render an overdraw
-	class RenderOverdraw : public Ecs::Component<RenderOverdraw> {
+	//! This component is attached to a camera to render a depth complexity
+	class RenderDepthComplexity : public Ecs::Component<RenderDepthComplexity> {
+    public:
+
+                                //! Constructs the RenderDepthComplexity instance with a same color for all rendering modes.
+                                RenderDepthComplexity( const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f ), f32 intensity = 0.1f );
+
+        //! Returns the output color for specified rendering mode.
+        const Rgba&             colorForMode( RenderingMode mode ) const;
+
+        //! Sets the output color for specified rendering mode.
+        void                    setColorForMode( RenderingMode mode, const Rgba& value );
+
+        //! Returns the color intensity.
+        f32                     intensity( void ) const;
+
+        //! Sets the color intensity.
+        void                    setIntensity( f32 value );
+
+    private:
+
+        Rgba                    m_color[TotalRenderModes];  //!< Output colors used for each of rendering modes.
+        f32                     m_intensity;                //!< The color intensity.
 	};
 
 	//! This component is attached to a camera to render an ambient lighting.

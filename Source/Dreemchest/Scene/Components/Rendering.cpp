@@ -34,6 +34,41 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------- RenderDepthComplexity -------------------------------------------- //
+
+// ** RenderDepthComplexity::RenderDepthComplexity
+RenderDepthComplexity::RenderDepthComplexity( const Rgba& color, f32 intensity )
+    : m_intensity( intensity )
+{
+    for( s32 i = 0; i < TotalRenderModes; i++ ) {
+        m_color[i] = color;
+    }
+}
+
+// ** RenderDepthComplexity::colorForMode
+const Rgba& RenderDepthComplexity::colorForMode( RenderingMode mode ) const
+{
+    return m_color[mode];
+}
+
+// ** RenderDepthComplexity::setColorForMode
+void RenderDepthComplexity::setColorForMode( RenderingMode mode, const Rgba& value )
+{
+    m_color[mode] = value;
+}
+
+// ** RenderDepthComplexity::intensity
+f32 RenderDepthComplexity::intensity( void ) const
+{
+    return m_intensity;
+}
+
+// ** RenderDepthComplexity::setIntensity
+void RenderDepthComplexity::setIntensity( f32 value )
+{
+    m_intensity = value;
+}
+
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::type
