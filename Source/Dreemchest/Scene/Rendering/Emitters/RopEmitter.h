@@ -42,14 +42,15 @@ namespace Scene {
 	public:
 
 								//! Constructs AbstractRopEmitter instance.
-								AbstractRopEmitter( Ecs::IndexPtr entities )
-                                    : m_entities( entities ) {}
+								AbstractRopEmitter( RenderingContext& context, Ecs::IndexPtr entities )
+                                    : m_context( context ), m_entities( entities ) {}
 
 		//! Emits render operations for entities in scene.
-		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Commands& commands ) = 0;
+		virtual void			emit( const Vec3& camera ) = 0;
 
 	protected:
 
+        RenderingContext&       m_context;      //!< Parent rendering context.
 		Ecs::IndexPtr			m_entities;		//!< Entities used for render operation emission.
 	};
 
@@ -59,27 +60,27 @@ namespace Scene {
 	public:
 
 								//! Constructs RopEmitter instance.
-								RopEmitter( SceneWPtr scene )
-									: AbstractRopEmitter( scene->ecs()->requestIndex( "", Ecs::Aspect::all<TRenderable, Transform>() ) ) {}
+								RopEmitter( RenderingContext& context )
+									: AbstractRopEmitter( context, context.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<TRenderable, Transform>() ) ) {}
 
 		//! Emits render operations for renderable entities in scene.
-		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Commands& commands ) DC_DECL_OVERRIDE;
+		virtual void			emit( const Vec3& camera ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Emits render operation for a single renderable entity.
-		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Commands& commands, const TRenderable& renderable, const Transform& transform ) = 0;
+		virtual void			emit( const Vec3& camera, const TRenderable& renderable, const Transform& transform ) = 0;
 	};
 
 	// ** RopEmitter::emit
 	template<typename TRenderable>
-	void RopEmitter<TRenderable>::emit( const Vec3& camera, RenderingContext& ctx, Commands& commands )
+	void RopEmitter<TRenderable>::emit( const Vec3& camera )
 	{
 		const Ecs::EntitySet& entities = m_entities->entities();
 
         s32 idx = 0;
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			emit( camera, ctx, commands, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+			emit( camera, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}
 	}
 

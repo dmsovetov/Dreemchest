@@ -43,6 +43,19 @@ Rvm::Rvm( RenderingContext& context, Renderer::HalWPtr hal )
 // ** Rvm::setTechnique
 void Rvm::setTechnique( s32 value )
 {
+    // If the technique is invalid - set the default program
+    if( value == 0 ) {
+        // Read-lock the default program
+        const Program* program = m_programs.top();
+
+        // Set the program shader
+        if( m_activeState.program != program ) {
+            setProgram( program );
+        }
+
+        return;
+    }
+
     // Read-lock material technique
     const Technique& technique = m_context.techniqueByIndex( value ).readLock();
 
@@ -54,22 +67,22 @@ void Rvm::setTechnique( s32 value )
     m_activeState.technique = value;
 
     // Set the technique shader
-    const Program& program = technique.program().readLock();
-    Renderer::ShaderWPtr shader = program.shader();
+    const Program* program = &technique.program().readLock();
+    Renderer::ShaderWPtr shader = program->shader();
 
     if( !shader.valid() ) {
         return;
     }
 
-    if( shader != m_activeState.shader ) {
-        setShader( shader );
+    if( program != m_activeState.program ) {
+        setProgram( program );
     }
 
     u32 location;
 
     // Bind texture samplers used by technique
     for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = program.inputLocation( static_cast<Program::Input>( Program::Texture0 + i ) ) ) {
+        if( location = program->inputLocation( static_cast<Program::Input>( Program::Texture0 + i ) ) ) {
         #if !DEV_DISABLE_DRAW_CALLS
             shader->setInt( location, i );
         #endif
@@ -78,7 +91,7 @@ void Rvm::setTechnique( s32 value )
 
     // Set colors exposed by a material
     for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
-        if( location = program.inputLocation( static_cast<Program::Input>( Program::Color0 + i ) ) ) {
+        if( location = program->inputLocation( static_cast<Program::Input>( Program::Color0 + i ) ) ) {
             const Rgba& color = technique.color( i );
         #if !DEV_DISABLE_DRAW_CALLS
             shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
@@ -97,67 +110,58 @@ void Rvm::setRenderable( s32 value )
     m_activeState.renderable = value;
 }
 
-// ** Rvm::setShader
-void Rvm::setShader( Renderer::ShaderWPtr shader )
+// ** Rvm::setProgram
+void Rvm::setProgram( const Program* value )
 {
+    // Get the shader from a program
+    Renderer::ShaderWPtr shader = value->shader();
+
     if( !shader.valid() ) {
         return;
     }
-
-    u32 location = 0;
-
-    // Read-lock active material technique
-    const Technique& technique = m_context.techniqueByIndex( m_activeState.technique ).readLock();
-
-    // Read-lock active program
-    const Program& program = technique.program().readLock();
 
     // Bind the shader instance
 #if !DEV_DISABLE_DRAW_CALLS
     m_hal->setShader( shader );
 #endif
 
+    u32 location = 0;
+
     // Set the view-projection matrix input
-    if( location = program.inputLocation( Program::ViewProjection ) ) {
+    if( location = value->inputLocation( Program::ViewProjection ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setMatrix( location, m_renderTarget.top().vp );
     #endif
     }
 
     // Set the constant color input
-    if( location = program.inputLocation( Program::Color ) ) {
+    if( location = value->inputLocation( Program::Color ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setVec4( location, m_constantColor );
     #endif
     }
 
-    // Save active shader
-    m_activeState.shader = shader;
+    // Save active program
+    m_activeState.program = value;
 }
 
 // ** Rvm::setInstance
 void Rvm::setInstance( const Commands::InstanceData& instance )
 {
-    // Get an active shader instance
-    Renderer::ShaderWPtr& shader = m_activeState.shader;
+    // Get an active program
+    const Program* program = m_activeState.program;
 
-    // No active shader - skip
-    if( !shader.valid() ) {
+    // No active program - skip
+    if( !program ) {
         return;
     }
-
-    // Read-lock active material technique
-    const Technique& technique = m_context.techniqueByIndex( m_activeState.technique ).readLock();
-
-    // Read-lock active program
-    const Program& program = technique.program().readLock();
 
 	// Set the transformation matrix
     u32 location = 0;
 
-	if( location = program.inputLocation( Program::Transform ) ) {
+	if( location = program->inputLocation( Program::Transform ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
-		shader->setMatrix( location, *instance.transform );
+		program->shader()->setMatrix( location, *instance.transform );
     #endif
 	}
 }
@@ -179,10 +183,19 @@ void Rvm::setRenderingMode( u8 value )
     m_activeState.renderingMode = value;
 }
 
-// ** Rvm::setColor
-void Rvm::setColor( const Rgba& value )
+// ** Rvm::setConstantColor
+void Rvm::setConstantColor( const Rgba& value )
 {
+    // Save this color
     m_constantColor = Vec4( value.r, value.g, value.b, value.a );
+
+    // Update the shader uniform
+    if( const Program* program = m_activeState.program ) {
+        u32 location = program->inputLocation( Program::Color );
+        if( location ) {
+            program->shader()->setVec4( location, m_constantColor );
+        }
+    }
 }
 
 // ** Rvm::executeCommand
@@ -231,6 +244,15 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                     }
                                                 }
                                             }
+                                            break;
+
+    case Commands::Rop::PushProgram:        m_programs.push( userData.program );
+                                            break;
+
+    case Commands::Rop::PopProgram:         m_programs.pop();
+                                            break;
+
+    case Commands::Rop::ConstantColor:      setConstantColor( userData.color );
                                             break;
 
     default:                    DC_NOT_IMPLEMENTED;
@@ -336,7 +358,7 @@ Rvm::ActiveState::ActiveState( void )
     : technique( -1 )
     , renderable( -1 )
     , renderingMode( -1 )
-    , shader( NULL )
+    , program( NULL )
     , vertexBuffer( NULL )
 {
 }

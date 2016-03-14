@@ -28,6 +28,7 @@
 #include "Rvm/Rvm.h"
 
 #include "Emitters/StaticMeshEmitter.h"
+#include "RenderSystems/RenderSystem.h"
 
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
@@ -46,9 +47,6 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 {
     m_rvm           = DC_NEW Rvm( *this, m_hal );
     m_commands      = DC_NEW Commands;
-    m_opaque        = DC_NEW StaticMeshEmitter( scene, RenderOpaqueBit | RenderCutoutBit );
-    m_translucent   = DC_NEW StaticMeshEmitter( scene, RenderTranslucentBit );
-    m_additive      = DC_NEW StaticMeshEmitter( scene, RenderAdditiveBit );
 }
 
 // ** RenderingContext::create
@@ -61,6 +59,27 @@ RenderingContextPtr RenderingContext::create( Assets::Assets& assets, Renderer::
 Renderer::HalWPtr RenderingContext::hal( void ) const
 {
     return m_hal;
+}
+
+// ** RenderingContext::scene
+SceneWPtr RenderingContext::scene( void ) const
+{
+    return m_scene;
+}
+
+// ** RenderingContext::createShader
+ShaderHandle RenderingContext::createShader( const String& fileName )
+{
+    // First lookup a previously created shader by a file name
+    ShaderHandle shader = m_assets.find<Shader>( fileName );
+
+    if( shader.isValid() ) {
+        return shader;
+    }
+
+    // No such shader - create a new one
+    shader = m_assets.add<Shader>( fileName, new ShaderFormatText( fileName ) );
+    return shader;
 }
 
 // ** RenderingContext::begin
@@ -88,40 +107,33 @@ void RenderingContext::begin( void )
 		target->end( this );
 	}
 
-    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-        renderFromCamera( *(*i).get(), *(*i)->get<Camera>(), *(*i)->get<Transform>() );
+    // Process all render systems
+    for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
+        m_renderSystems[i]->render();
     }
-
-    m_commands->sort();
-    m_rvm->execute( *m_commands.get() );
-    m_commands->clear();
 }
 
 // ** RenderingContext::end
 void RenderingContext::end( void )
 {
+    // Sort all emitted commands
+    m_commands->sort();
 
+#if 0
+    m_commands->dump();
+#endif
+
+    // Execute rendering commands
+    m_rvm->execute( *m_commands.get() );
+
+    // Clear 
+    m_commands->clear();
 }
 
-// ** RenderingContext::renderFromCamera
-void RenderingContext::renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform )
+// ** RenderingContext::commands
+Commands& RenderingContext::commands( void )
 {
-    // Begin rendering by pushing a render target
-    m_commands->emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
-
-    // Now emit all render operations
-    m_commands->emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
-    m_commands->emitRasterOptions( RenderCutoutBit, RasterizationOptions::translucent() );
-    m_opaque->emit( transform.position(), *this, *m_commands.get() );
-
-    m_commands->emitRasterOptions( RenderTranslucentBit, RasterizationOptions::translucent() );
-    m_translucent->emit( transform.position(), *this, *m_commands.get() );
-
-    m_commands->emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
-    m_additive->emit( transform.position(), *this, *m_commands.get() );
-
-    // End rendering by popping a render target
-    m_commands->emitPopRenderTarget();
+    return *m_commands;
 }
 
 } // namespace Scene

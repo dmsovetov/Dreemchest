@@ -48,9 +48,6 @@ namespace Scene {
         //! Resets the rendering states.
         void                            reset( void );
 
-        //! Sets the constant color.
-        void                            setColor( const Rgba& value );
-
     private:
 
         //! Setups rendering states for a technique.
@@ -59,11 +56,14 @@ namespace Scene {
         //! Setups rendering states needed by a renderable.
         void                            setRenderable( s32 value );
 
-        //! Sets the active shader.
-        void                            setShader( Renderer::ShaderWPtr value );
+        //! Sets the active program.
+        void                            setProgram( const Program* value );
 
         //! Sets the instance data.
         void                            setInstance( const Commands::InstanceData& instance );
+
+        //! Sets the constant color.
+        void                            setConstantColor( const Rgba& value );
 
         //! Sets the rendering mode.
         void                            setRenderingMode( u8 value );
@@ -81,13 +81,14 @@ namespace Scene {
             s32                         technique;          //!< Active technique.
             s32                         renderable;         //!< Active renderable.
             u8                          renderingMode;      //!< Active rendering mode.
-            Renderer::ShaderWPtr        shader;             //!< Active shader.
+            const Program*              program;            //!< Active program.
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
 
         RenderingContext&               m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
         Stack<Commands::RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
+        Stack<const Program*>           m_programs;         //!< If no program set by technique the program from a top of this stack will be used.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.
         Vec4                            m_constantColor;    //!< Constant color.

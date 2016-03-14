@@ -24,40 +24,49 @@
 
  **************************************************************************/
 
-#include "StaticMeshEmitter.h"
+#include "RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** StaticMeshEmitter::StaticMeshEmitter
-StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes, u32 techniqueMask )
-    : RopEmitter( context )
-    , m_techniqueMask( techniqueMask )
-    , m_renderModes( renderModes )
+// ** RenderSystemBase::RenderSystemBase
+RenderSystemBase::RenderSystemBase( RenderingContext& context, Ecs::IndexPtr cameras )
+    : m_context( context )
+    , m_cameras( cameras )
 {
 }
 
-// ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform )
+// ** RenderSystemBase::render
+void RenderSystemBase::render( void )
 {
-    // Get the material
-    const MaterialHandle& material = staticMesh.material( 0 );
-    RenderingMode         mode     = material->renderingMode();
+    // Get the command buffer from a context
+    Commands& commands = m_context.commands();
 
-    // Does this material passes the filter?
-    if( (BIT( mode ) & m_renderModes) == 0 ) {
-        return;
+    // Get all cameras eligible for rendering by this system
+    const Ecs::EntitySet& cameras = m_cameras->entities();
+
+    // Process each camera
+    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
+        // Get the camera entity
+        const Ecs::Entity& entity = *i->get();
+
+        // Get Camera component from an entity
+        const Camera& camera = *entity.get<Camera>();
+
+        // Get Transform component from an entity
+        const Transform& transform = *entity.get<Transform>();
+
+        // Push render target before rendering
+        commands.emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
+
+        // Emit render operations for this camera
+        emitRenderOperations( entity, camera, transform );
+
+        // Pop render target when rendering is finished
+        commands.emitPopRenderTarget();
     }
-
-    // Request the renderable asset for this mesh.
-    s32 renderable = m_context.requestRenderable( staticMesh.mesh() );
-
-    // Request the technique asset for a material.
-    s32 technique = m_context.requestTechnique( material ) & m_techniqueMask;
-
-    // Emit the rendering command
-    m_context.commands().emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
+        
 }
 
 } // namespace Scene

@@ -55,6 +55,9 @@ namespace Scene {
         //! Returns the render asset handles.
         const Container&                    handles( void ) const;
 
+        //! Returns the total number of assets stored in cache.
+        s32                                 count( void ) const;
+
     private:
 
         //! Container type to map from an asset to a render asset index.
@@ -76,7 +79,14 @@ namespace Scene {
         Container                           m_handles;
     };
 
-    // ** RenderAssetCache::container
+    // ** RenderAssetCache::count
+    template<typename TAsset, typename TRenderAsset, typename TSource>
+    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::count( void ) const
+    {
+        return static_cast<s32>( handles().size() );
+    }
+
+    // ** RenderAssetCache::handles
     template<typename TAsset, typename TRenderAsset, typename TSource>
     const typename RenderAssetCache<TAsset, TRenderAsset, TSource>::Container& RenderAssetCache<TAsset, TRenderAsset, TSource>::handles( void ) const
     {
@@ -140,6 +150,9 @@ namespace Scene {
         //! Returns the parent rendering HAL instance.
         Renderer::HalWPtr                   hal( void ) const;
 
+        //! Returns parent scene instance.
+        SceneWPtr                           scene( void ) const;
+
         //! Returns renderable index for a specified mesh asset.
         s32                                 requestRenderable( const MeshHandle& handle );
 
@@ -158,6 +171,16 @@ namespace Scene {
         //! Returns the program handle by index.
         const ProgramHandle&                programByIndex( s32 index ) const;
 
+        //! Creates a new shader instance.
+        ShaderHandle                        createShader( const String& fileName );
+
+        //! Returns the command buffer instance.
+        Commands&                           commands( void );
+
+		//! Adds a new render system to the scene.
+		template<typename TRenderSystem>
+		void							    addRenderSystem( void );
+
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
 
@@ -165,9 +188,6 @@ namespace Scene {
 
 											//! Constructs the RenderingContext instance.
 											RenderingContext( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
-
-        //! Renders the scene from a camera point of view.
-        void                                renderFromCamera( Ecs::Entity& entity, Camera& camera, Transform& transform );
 
 	private:
 
@@ -180,19 +200,24 @@ namespace Scene {
         //! Program asset cache.
         typedef RenderAssetCache<Shader, Program, ProgramShaderSource> ProgramCache;
 
-        Renderer::HalWPtr                   m_hal;          //!< Parent HAL instance.
-        RvmUPtr                             m_rvm;          //!< Internal rvm instance.
-        CommandsUPtr                        m_commands;     //!< Internal rvm command buffer.
-        SceneWPtr                           m_scene;        //!< Parent scene instance.
-        Assets::Assets&                     m_assets;       //!< Asset manager used to create render assets.
+        Renderer::HalWPtr                   m_hal;              //!< Parent HAL instance.
+        RvmUPtr                             m_rvm;              //!< Internal rvm instance.
+        CommandsUPtr                        m_commands;         //!< Internal rvm command buffer.
+        SceneWPtr                           m_scene;            //!< Parent scene instance.
+        Assets::Assets&                     m_assets;           //!< Asset manager used to create render assets.
+        Array<RenderSystemUPtr>	            m_renderSystems;    //!< Entity render systems.
 
-        RopEmitterUPtr                      m_opaque;
-        RopEmitterUPtr                      m_translucent;
-        RopEmitterUPtr                      m_additive;
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
         ProgramCache                        m_programs;
 	};
+
+	// ** RenderingContext::addRenderSystem
+	template<typename TRenderSystem>
+	void RenderingContext::addRenderSystem( void )
+	{
+		m_renderSystems.push_back( DC_NEW TRenderSystem( *this ) );
+	}
 
     // ** RenderingContext::requestRenderable
     NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
@@ -217,18 +242,21 @@ namespace Scene {
     // ** RenderingContext::programByIndex
     NIMBLE_INLINE const ProgramHandle& RenderingContext::programByIndex( s32 index ) const
     {
+        DC_ABORT_IF( index <= 0 || index > m_programs.count(), "index is out of range" );
         return m_programs.handles()[index - 1];
     }
 
     // ** RenderingContext::renderableByIndex
     NIMBLE_INLINE const RenderableHandle& RenderingContext::renderableByIndex( s32 index ) const
     {
+        DC_ABORT_IF( index <= 0 || index > m_renderables.count(), "index is out of range" );
         return m_renderables.handles()[index - 1];
     }
 
     // ** RenderingContext::techniqueByIndex
     NIMBLE_INLINE const TechniqueHandle& RenderingContext::techniqueByIndex( s32 index ) const
     {
+        DC_ABORT_IF( index <= 0 || index > m_techniques.count(), "index is out of range" );
         return m_techniques.handles()[index - 1];
     }
 

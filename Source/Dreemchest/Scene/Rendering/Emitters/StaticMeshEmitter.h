@@ -38,17 +38,17 @@ namespace Scene {
 	public:
 
 								//! Constructs StaticMeshEmitter instance.
-								StaticMeshEmitter( SceneWPtr scene, u32 renderModes = AllRenderModesBit )
-                                    : RopEmitter( scene ), m_renderModes( renderModes ) {}
+								StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit, u32 techniqueMask = ~0 );
 
 	private:
 
 		//! Emits render operations for all static meshes in scene.
-		virtual void			emit( const Vec3& camera, RenderingContext& ctx, Commands& commands, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void			emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
 
     private:
 
-        u32                     m_renderModes;  //!< Material render modes that will emit render operations.
+        u32                     m_techniqueMask;    //!< Bit mask to modify the emitted technique.
+        u32                     m_renderModes;      //!< Material render modes that will emit render operations.
 	};
 
 } // namespace Scene
