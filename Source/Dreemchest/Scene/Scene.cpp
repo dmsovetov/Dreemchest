@@ -41,7 +41,7 @@
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
 #include "Assets/Prefab.h"
-#include "Assets/Renderable.h"
+#include "Rendering/Assets/Renderable.h"
 
 #include "Components/Rendering.h"
 #include "Components/Transform.h"

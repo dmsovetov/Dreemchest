@@ -25,11 +25,11 @@
  **************************************************************************/
 
 #include "RenderAssetSources.h"
-#include "../Rendering/RenderingContext.h"
-#include "Mesh.h"
-#include "Image.h"
-#include "Material.h"
 #include "Renderable.h"
+#include "../RenderingContext.h"
+#include "../../Assets/Mesh.h"
+#include "../../Assets/Image.h"
+#include "../../Assets/Material.h"
 
 DC_BEGIN_DREEMCHEST
 

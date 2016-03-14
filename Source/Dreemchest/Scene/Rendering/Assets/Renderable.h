@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Renderable_H__
-#define __DC_Scene_Renderable_H__
+#ifndef __DC_Scene_Rendering_Renderable_H__
+#define __DC_Scene_Rendering_Renderable_H__
 
-#include "../Scene.h"
+#include "../../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -213,4 +213,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Renderable_H__    */
+#endif    /*    !__DC_Scene_Rendering_Renderable_H__    */

@@ -32,8 +32,6 @@
 
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
-#include "../Assets/Renderable.h"
-#include "../Assets/RenderAssetSources.h"
 
 DC_BEGIN_DREEMCHEST
 
