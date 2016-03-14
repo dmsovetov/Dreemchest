@@ -46,6 +46,17 @@ namespace Assets {
         virtual u32     lastModified( void ) const = 0;
     };
 
+    //! This is a dummy asset source used for runtime created assets.
+    class NullSource : public AbstractSource {
+    protected:
+
+        //! Does nothing with an asset
+        virtual bool    construct( Assets& assets, Handle asset );
+
+        //! Returns a zero timestamp.
+        virtual u32     lastModified( void ) const;
+    };
+
     //! Asset file source used for loading assets from files.
     class AbstractFileSource : public AbstractSource {
     public:

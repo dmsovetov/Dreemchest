@@ -31,6 +31,20 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
+// ---------------------------------------------- NullSource ---------------------------------------------- //
+
+// ** NullSource::construct
+bool NullSource::construct( Assets& assets, Handle asset )
+{
+    return false;
+}
+
+// ** NullSource::lastModified
+u32 NullSource::lastModified( void ) const
+{
+    return 0;
+}
+
 // ------------------------------------------ AbstractFileSource ------------------------------------------ //
 
 // ** AbstractFileSource::AbstractFileSource
