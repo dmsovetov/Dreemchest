@@ -152,6 +152,22 @@ namespace Scene {
 		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
 	};
 
+	//! Available lighting models.
+	enum LightingModel {
+		  LightingModelUnlit       //!< Object is not lit by any light sources.
+		, LightingModelAmbient     //!< Object is only lit by an ambient light source.
+		, LightingModelPhong       //!< Object is lit by all light sources that affect it.
+		, TotalLightingModels      //!< The total number of lighting models.
+	};
+
+	//! Lighting models bit masks.
+	enum LightingModelBits {
+		  LightingModelUnlitBit     = BIT( LightingModelUnlit )		//!< Unlit model bit.
+		, LightingModelAmbientBit   = BIT( LightingModelAmbient )   //!< Ambient lighting model bit.
+		, LightingModelPhongBit	    = BIT( LightingModelPhong )	    //!< Phong lighting model bit.
+		, AllLightingModelsBit		= LightingModelUnlit | LightingModelAmbient | LightingModelPhong
+	};
+
 	//! 3 coordinate plane types.
 	enum CoordinatePlane {
 		  PlaneXY				//!< The XY coordinate plane.

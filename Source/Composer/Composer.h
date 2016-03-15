@@ -73,7 +73,7 @@ DC_BEGIN_COMPOSER
 	Q_DECLARE_METATYPE( Assets::Handle )
 	Q_DECLARE_METATYPE( Scene::ImageHandle )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
-	Q_DECLARE_METATYPE( Scene::Material::Model )
+	Q_DECLARE_METATYPE( Scene::LightingModel )
 
 	namespace Ui {
 

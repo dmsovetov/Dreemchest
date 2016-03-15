@@ -39,15 +39,7 @@ namespace Scene {
 
 		//! Material features.
 		enum Feature {
-			  FeatureDiffuse	= BIT( 1 )
-		};
-
-		//! Material lighting model.
-		enum Model {
-			  Unlit
-			, Ambient
-			, Phong
-			, TotalModels
+			  FeatureDiffuse	= BIT( 0 )
 		};
 
 		//! Material layers.
@@ -75,10 +67,10 @@ namespace Scene {
 		void						setRenderingMode( RenderingMode value );
 
 		//! Returns material light model.
-		Model						model( void ) const;
+		LightingModel		        lightingModel( void ) const;
 
 		//! Sets material light model.
-		void						setModel( Model value );
+		void						setLightingModel( LightingModel value );
 
 		//! Returns material feature set.
 		u32							features( void ) const;
@@ -114,7 +106,7 @@ namespace Scene {
 
 	private:
 
-		Model						m_model;						//!< Material light model.
+		LightingModel				m_lightingModel;			    //!< Material lighting model.
         ShaderHandle                m_shader;                       //!< Material shader handle.
 		RenderingMode				m_renderingMode;				//!< Material blending.
 		u32							m_features;						//!< Used material features.

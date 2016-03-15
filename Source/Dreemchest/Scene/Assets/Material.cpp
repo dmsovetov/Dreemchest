@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Material::Material
-Material::Material( void ) : m_model( Unlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
+Material::Material( void ) : m_lightingModel( LightingModelUnlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
 {
 	setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
 	setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
@@ -50,16 +50,16 @@ void Material::setRenderingMode( RenderingMode value )
 	m_renderingMode = value;
 }
 
-// ** Material::lightModel
-Material::Model Material::model( void ) const
+// ** Material::lightingModel
+LightingModel Material::lightingModel( void ) const
 {
-	return m_model;
+	return m_lightingModel;
 }
 
-// ** Material::setModel
-void Material::setModel( Model value )
+// ** Material::setLightingModel
+void Material::setLightingModel( LightingModel value )
 {
-	m_model = value;
+	m_lightingModel = value;
 }
 
 // ** Material::features

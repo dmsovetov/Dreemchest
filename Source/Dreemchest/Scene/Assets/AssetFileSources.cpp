@@ -158,7 +158,7 @@ bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::
 		asset.setRenderingMode( RenderOpaque );
 	}
 	
-	asset.setModel( Material::Phong );
+	asset.setLightingModel( LightingModelPhong );
 	asset.setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
 	asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
 
