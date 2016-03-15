@@ -34,7 +34,7 @@ namespace Scene {
 DepthComplexity::DepthComplexity( RenderingContext& context )
     : RenderSystem( context )
 {
-    // Create shader
+    // Create the technique
     m_technique = context.createTechnique( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
 
     // Create render operation emitters
