@@ -38,7 +38,7 @@ namespace Scene {
 	public:
 
 								//! Constructs StaticMeshEmitter instance.
-								StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit, u32 techniqueMask = ~0 );
+								StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit );
 
 	private:
 
@@ -47,7 +47,6 @@ namespace Scene {
 
     private:
 
-        u32                     m_techniqueMask;    //!< Bit mask to modify the emitted technique.
         u32                     m_renderModes;      //!< Material render modes that will emit render operations.
 	};
 

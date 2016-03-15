@@ -31,9 +31,8 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshEmitter::StaticMeshEmitter
-StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes, u32 techniqueMask )
+StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes )
     : RopEmitter( context )
-    , m_techniqueMask( techniqueMask )
     , m_renderModes( renderModes )
 {
 }
@@ -54,7 +53,7 @@ void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, 
     s32 renderable = m_context.requestRenderable( staticMesh.mesh() );
 
     // Request the technique asset for a material.
-    s32 technique = m_context.requestTechnique( material ) & m_techniqueMask;
+    s32 technique = m_context.requestTechnique( material );
 
     // Emit the rendering command
     m_context.commands().emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
