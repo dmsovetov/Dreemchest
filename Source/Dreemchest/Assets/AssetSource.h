@@ -57,6 +57,38 @@ namespace Assets {
         virtual u32     lastModified( void ) const;
     };
 
+    //! Asset generator source used for generating assets in a runtime.
+    template<typename TAsset>
+    class GeneratorSource : public AbstractSource {
+    public:
+
+        //! Performs the type-cast of an asset handle and dispatches it to a protected abstract method.
+        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+
+        //! Returns the zero timestamp.
+        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+
+    protected:
+
+        //! This method should be overridden in a subclass to generate an asset.
+        virtual bool    generate( Assets& assets, TAsset& asset ) = 0;
+    };
+
+    // ** GeneratorSource::construct
+    template<typename TAsset>
+    bool GeneratorSource<TAsset>::construct( Assets& assets, Handle asset )
+    {
+        bool result = generate( assets, *asset.writeLock<TAsset>() );
+        return result;
+    }
+
+    // ** GeneratorSource::lastModified
+    template<typename TAsset>
+    u32 GeneratorSource<TAsset>::lastModified( void ) const
+    {
+        return 0;
+    }
+
     //! Asset file source used for loading assets from files.
     class AbstractFileSource : public AbstractSource {
     public:
