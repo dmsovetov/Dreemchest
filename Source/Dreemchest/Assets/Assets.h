@@ -296,8 +296,8 @@ namespace Assets {
     template<typename TAsset>
     void Assets::setPlaceholder( const TAsset& value )
     {
-        AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
-        cache.placeholder = value;
+        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( Type::fromClass<TAsset>() ) );
+        cache->placeholder = value;
     }
 
     // ** Assets::assetData
