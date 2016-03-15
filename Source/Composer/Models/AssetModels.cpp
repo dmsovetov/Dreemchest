@@ -35,7 +35,7 @@ MaterialModel::MaterialModel( Scene::MaterialHandle material, QObject* parent ) 
     material.forceLoad();
     Scene::Material* instance = &(*material.writeLock());
 	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, instance ), BindSetter( Scene::Material::setRenderingMode, instance ) );
-	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, instance ), BindSetter( Scene::Material::setModel, instance ) );
+	addEnum<Scene::LightingModel, LightingModel>( "Lighting Model", BindGetter( Scene::Material::lightingModel, instance ), BindSetter( Scene::Material::setLightingModel, instance ) );
 	addAsset<Scene::ImageHandle>( "Diffuse", BindGetter( Scene::Material::diffuse, instance ), BindSetter( Scene::Material::setDiffuse, instance ) );
 }
 
