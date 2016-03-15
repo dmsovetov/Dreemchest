@@ -32,7 +32,11 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Material::Material
-Material::Material( void ) : m_lightingModel( LightingModelUnlit ), m_renderingMode( RenderOpaque ), m_features( 0 )
+Material::Material( void )
+    : m_lightingModel( LightingModelUnlit )
+    , m_renderingMode( RenderOpaque )
+    , m_isTwoSided( false )
+    , m_features( 0 )
 {
 	setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
 	setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
@@ -60,6 +64,18 @@ LightingModel Material::lightingModel( void ) const
 void Material::setLightingModel( LightingModel value )
 {
 	m_lightingModel = value;
+}
+
+// ** Material::isTwoSided
+bool Material::isTwoSided( void ) const
+{
+    return m_isTwoSided;
+}
+
+// ** Material::setTwoSided
+void Material::setTwoSided( bool value )
+{
+    m_isTwoSided = value;
 }
 
 // ** Material::features

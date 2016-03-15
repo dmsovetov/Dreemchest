@@ -72,6 +72,12 @@ namespace Scene {
 		//! Sets material light model.
 		void						setLightingModel( LightingModel value );
 
+        //! Returns true if the material is two-sided.
+        bool                        isTwoSided( void ) const;
+
+        //! Sets the two-sided material flag.
+        void                        setTwoSided( bool value );
+
 		//! Returns material feature set.
 		u32							features( void ) const;
 
@@ -109,6 +115,7 @@ namespace Scene {
 		LightingModel				m_lightingModel;			    //!< Material lighting model.
         ShaderHandle                m_shader;                       //!< Material shader handle.
 		RenderingMode				m_renderingMode;				//!< Material blending.
+        bool                        m_isTwoSided;                   //!< Indicates that material is two-sided.
 		u32							m_features;						//!< Used material features.
         Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
 		ImageHandle					m_texture[TotalMaterialLayers];	//!< Material textures.

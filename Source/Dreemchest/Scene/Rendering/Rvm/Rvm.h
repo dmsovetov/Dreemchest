@@ -81,6 +81,7 @@ namespace Scene {
             s32                         technique;          //!< Active technique.
             s32                         renderable;         //!< Active renderable.
             u8                          renderingMode;      //!< Active rendering mode.
+            Renderer::TriangleFace      culling;            //!< Active culling mode.
             const Program*              program;            //!< Active program.
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };

@@ -49,14 +49,26 @@ void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, 
         return;
     }
 
+    // Get the command buffer
+    Commands& commands = m_context.commands();
+
     // Request the renderable asset for this mesh.
     s32 renderable = m_context.requestRenderable( staticMesh.mesh() );
 
     // Request the technique asset for a material.
     s32 technique = m_context.requestTechnique( material );
 
+    // Calculate the distance to this renderable
+    f32 distance = (camera - transform.position()).length();
+
+    // Emit additional draw call for additive & translucent two-sided materials.
+    if( material->isTwoSided() ) {
+        Commands::InstanceData* instance = commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
+        instance->culling = Renderer::TriangleFaceFront;
+    }
+
     // Emit the rendering command
-    m_context.commands().emitDrawCall( &transform.matrix(), renderable, technique, mode, (camera - transform.position()).length() );
+    commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
 }
 
 } // namespace Scene

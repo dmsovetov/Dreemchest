@@ -142,6 +142,11 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
 {
     // Get an active program
     const Program* program = m_activeState.program;
+    // Switch the culling mode
+    if( m_activeState.culling != instance.culling ) {
+        m_hal->setCulling( instance.culling );
+        m_activeState.culling = instance.culling;
+    }
 
     // No active program - skip
     if( !program ) {
@@ -358,6 +363,7 @@ Rvm::ActiveState::ActiveState( void )
     : technique( -1 )
     , renderable( -1 )
     , renderingMode( -1 )
+    , culling( Renderer::TriangleFaceBack )
     , program( NULL )
     , vertexBuffer( NULL )
 {
