@@ -36,8 +36,8 @@ namespace Scene {
 Rvm::Rvm( RenderingContext& context, Renderer::HalWPtr hal )
     : m_context( context )
     , m_hal( hal )
-    , m_constantColor( 1.0f, 1.0f, 1.0f, 1.0f )
 {
+    m_inputs[Program::Color] = Vec4( 1.0f, 1.0f, 1.0f );
     reset();
 }
 
@@ -159,7 +159,21 @@ void Rvm::setProgram( const Program& value )
     // Set the constant color input
     if( location = value.inputLocation( Program::Color ) ) {
     #if !DEV_DISABLE_DRAW_CALLS
-        shader->setVec4( location, m_constantColor );
+        shader->setVec4( location, m_inputs[Program::Color] );
+    #endif
+    }
+
+    // Set the light color input
+    if( location = value.inputLocation( Program::LightColor ) ) {
+    #if !DEV_DISABLE_DRAW_CALLS
+        shader->setVec4( location, m_inputs[Program::LightColor] );
+    #endif
+    }
+
+    // Set the light position input
+    if( location = value.inputLocation( Program::LightPosition ) ) {
+    #if !DEV_DISABLE_DRAW_CALLS
+        shader->setVec4( location, m_inputs[Program::LightPosition] );
     #endif
     }
 
@@ -194,6 +208,12 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
 		program->shader()->setMatrix( location, *instance.transform );
     #endif
 	}
+
+    if( location = program->inputLocation( Program::InverseTransform ) ) {
+    #if !DEV_DISABLE_DRAW_CALLS
+		program->shader()->setMatrix( location, instance.transform->inversed() );
+    #endif
+	}
 }
 
 // ** Rvm::setRenderingMode
@@ -219,14 +239,14 @@ void Rvm::setRenderingMode( u8 value )
 void Rvm::setConstantColor( const Rgba& value )
 {
     // Save this color
-    m_constantColor = Vec4( value.r, value.g, value.b, value.a );
+    m_inputs[Program::Color] = Vec4( value.r, value.g, value.b, value.a );
 
     // Update the shader uniform
     if( const Program* program = m_activeState.program ) {
         u32 location = program->inputLocation( Program::Color );
         if( location ) {
         #if !DEV_DISABLE_DRAW_CALLS
-            program->shader()->setVec4( location, m_constantColor );
+            program->shader()->setVec4( location, m_inputs[Program::Color] );
         #endif
         }
     }
@@ -295,6 +315,21 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                                     if( BIT( i ) & lightingModelShader.models ) {
                                                         m_shaders[i] = lightingModelShader.shader;
                                                     }
+                                                }
+                                            }
+                                            break;
+
+    case Commands::Rop::ProgramInput:       {
+                                                // Get the program input user data
+                                                const Commands::ProgramInput& programInput = userData.input;
+                                                m_inputs[programInput.location] = programInput.value;
+
+                                                // Get active program
+                                                const Program* program = m_activeState.program;
+
+                                                // Set program input
+                                                if( program ) {
+                                                    program->shader()->setVec4( program->inputLocation( programInput.location ), programInput.value );
                                                 }
                                             }
                                             break;

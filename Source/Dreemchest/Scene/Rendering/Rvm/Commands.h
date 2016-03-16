@@ -47,6 +47,7 @@ namespace Scene {
                 , RasterOptions     //!< Setups the rasterization options.
                 , ConstantColor     //!< Sets the constant color value.
                 , Shader            //!< Sets the shader to be used for a lighting model.
+                , ProgramInput      //!< Sets the program input value.
             };
 
                         //! Constructs Rop instance.
@@ -106,6 +107,12 @@ namespace Scene {
             s32                         shader;         //!< Shader instance.
         };
 
+        //! Program input value data.
+        struct ProgramInput {
+            Program::Input              location;       //!< Program input index.
+            f32                         value[4];       //!< The program input value.
+        };
+
         //! User data used by rendering commands.
         struct UserData {
             union {
@@ -114,6 +121,7 @@ namespace Scene {
                 RasterizationOptions    rasterization;  //!< Rasterization options.
                 LightingModelShader     shader;         //!< Lighting shader.
                 f32                     color[4];       //!< The constant color value.
+                ProgramInput            input;          //!< The program input value.
             };
         };
 
@@ -155,6 +163,9 @@ namespace Scene {
 
         //! Emits the constant color operation.
         void                            emitConstantColor( const Rgba& value );
+
+        //! Emits the program input value operation.
+        void                            emitProgramInput( Program::Input location, const Vec4& value );
 
     private:
 

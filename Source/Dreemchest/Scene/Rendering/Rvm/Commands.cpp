@@ -65,6 +65,7 @@ void Commands::dump( void ) const
         , "rasterOptions" 
         , "constantColor"
         , "shader"
+        , "programInput"
     };
     CString modes[] = {
 		  "opaque"
@@ -72,12 +73,34 @@ void Commands::dump( void ) const
 		, "translucent"
 		, "additive"
     };
+    CString inputs[] = {
+          "ViewProjection"            //!< The view-projection matrix input.
+        , "Transform"                 //!< The model matrix input.
+        , "Color"                     //!< The constant color input.
+        , "DiffuseTexture"            //!< Diffuse texture sampler input.
+        , "SpecularTexture"           //!< Specular texture sampler input.
+        , "NormalTexture"             //!< Normal texture sampler input.
+        , "HeightmapTexture"          //!< Heightmap texture sampler input.
+        , "AmbientOcclusionTexture"   //!< AO texture sampler input.
+        , "EmissionTexture"           //!< Emission texture sampler input.
+        , "DiffuseDetailTexture"      //!< Diffuse detail texture sampler input.
+        , "NormalDetailTexture"       //!< Normal detail texture sampler input.
+        , "TintTexture"               //!< Tint texture sampler input.
+        , "DiffuseColor"              //!< Diffuse color input.
+        , "SpecularColor"             //!< Specular color input.
+        , "AmbientColor"              //!< Ambient color input.
+        , "EmissionColor"             //!< Emission color input.
+        , "TintColor"                 //!< Tint color input.
+        , "LightPosition"             //!< Light position input.
+        , "LightIntensity"            //!< Light intensity input.
+    };
 
     for( s32 i = 0; i < size(); i++ ) {
         const Rop& rop = m_operations[i];
+        const UserData& ud = m_userData[rop.bits.userData];
 
         if( rop.bits.command ) {
-            LogVerbose( "rvm", "%d: %s\n", rop.bits.sequence, commands[rop.bits.mode] );
+            LogVerbose( "rvm", "%d: %s %s\n", rop.bits.sequence, commands[rop.bits.mode], rop.bits.mode == Commands::Rop::ProgramInput ? inputs[ud.input.location] : "" );
         }
         else {
             LogVerbose( "rvm", "%d: drawCall : %s\n", rop.bits.sequence, modes[rop.bits.mode] );
@@ -198,6 +221,18 @@ void Commands::emitConstantColor( const Rgba& value )
     userData->color[1] = value.g;
     userData->color[2] = value.b;
     userData->color[3] = value.a;
+}
+
+// ** Commands::emitProgramInput
+void Commands::emitProgramInput( Program::Input location, const Vec4& value )
+{
+    Rop* rop = allocateRop();
+    rop->setCommand( Rop::ProgramInput );
+    rop->bits.sequence = beginSequence();
+
+    UserData* userData = allocateUserData( rop );
+    userData->input.location = location;
+    memcpy( userData->input.value, &value.x, sizeof( userData->input.value ) );
 }
 
 // ** Commands::Rop::Rop

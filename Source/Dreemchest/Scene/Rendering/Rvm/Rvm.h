@@ -92,7 +92,7 @@ namespace Scene {
         s32                             m_shaders[TotalLightingModels];     //!< Shader to used for each lighting model.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.
-        Vec4                            m_constantColor;    //!< Constant color.
+        Vec4                            m_inputs[Program::TotalInputs];     //!< Program input registers.
     };
 
 } // namespace Scene

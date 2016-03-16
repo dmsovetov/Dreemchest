@@ -162,6 +162,7 @@ bool ProgramShaderSource::constructFromAsset( const ShaderSource& shader, Assets
     CString inputs[] = {
           "u_vp"
         , "u_transform"
+        , "u_inverseTransform"
         , "u_color"
         , "u_diffuseTexture"
         , "u_specularTexture"
@@ -177,6 +178,8 @@ bool ProgramShaderSource::constructFromAsset( const ShaderSource& shader, Assets
         , "u_ambientColor"
         , "u_emissionColor"
         , "u_tintColor"
+        , "u_lightPosition"
+        , "u_lightColor"
     };
 
     NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Program::TotalInputs, "missing program input names" );

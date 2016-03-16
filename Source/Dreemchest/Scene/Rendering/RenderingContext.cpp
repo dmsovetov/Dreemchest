@@ -92,7 +92,7 @@ ShaderSourceHandle RenderingContext::createShaderSource( const String& identifie
     }
 
     // No such shader - create a new one
-    shader = m_assets.add<ShaderSource>( fileName, DC_NEW ShaderSourceFormatText( fileName ) );
+    shader = m_assets.add<ShaderSource>( identifier, DC_NEW ShaderSourceFormatText( fileName ) );
 
     // Set the shader name
     shader.asset().setName( identifier + ".shader" );

@@ -500,6 +500,7 @@ DC_END_DREEMCHEST
     #else
         #include "Rendering/RenderingContext.h"
         #include "Rendering/RenderSystems/Unlit.h"
+        #include "Rendering/RenderSystems/ForwardLighting.h"
         #include "Rendering/RenderSystems/DepthComplexity.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif

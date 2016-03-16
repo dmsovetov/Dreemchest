@@ -142,6 +142,7 @@ namespace Scene {
         enum Input {
               ViewProjection            //!< The view-projection matrix input.
             , Transform                 //!< The model matrix input.
+            , InverseTransform          //!< The inversed model matrix input.
             , Color                     //!< The constant color input.
             , DiffuseTexture            //!< Diffuse texture sampler input.
             , SpecularTexture           //!< Specular texture sampler input.
@@ -157,6 +158,8 @@ namespace Scene {
             , AmbientColor              //!< Ambient color input.
             , EmissionColor             //!< Emission color input.
             , TintColor                 //!< Tint color input.
+            , LightPosition             //!< Light position input.
+            , LightColor                //!< Light color input.
             , TotalInputs               //!< The total number of shader inputs.
         };
 
