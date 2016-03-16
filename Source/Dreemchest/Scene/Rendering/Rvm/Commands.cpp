@@ -121,12 +121,26 @@ Commands::Rop* Commands::allocateRop( void )
     return &rop;
 }
 
+// ** Commands::beginSequence
+u8 Commands::beginSequence( void )
+{
+    DC_BREAK_IF( m_sequence + 1 >= 16, "sequence number overflow" );
+    return m_sequence++;
+}
+
+// ** Commands::endSequence
+u8 Commands::endSequence( void )
+{
+    DC_BREAK_IF( m_sequence + 1 >= 16, "sequence number overflow" );
+    return ++m_sequence;
+}
+
 // ** Commands::emitPushRenderTarget
 void Commands::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::PushRenderTarget );
-    rop->bits.sequence = m_sequence++;
+    rop->bits.sequence = beginSequence();
 
     UserData* userData = allocateUserData( rop );
     userData->rt.instance = renderTarget.get();
@@ -145,7 +159,7 @@ void Commands::emitPopRenderTarget( void )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::PopRenderTarget );
-    rop->bits.sequence = ++m_sequence;
+    rop->bits.sequence = endSequence();
 }
 
 // ** Commands::emitRasterOptions
@@ -153,7 +167,7 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::RasterOptions );
-    rop->bits.sequence = m_sequence++;
+    rop->bits.sequence = beginSequence();
 
     UserData* userData = allocateUserData( rop );
     userData->rasterization = options;
@@ -165,7 +179,7 @@ void Commands::emitLightingShader( u8 models, s32 shader )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::Shader );
-    rop->bits.sequence = m_sequence++;
+    rop->bits.sequence = beginSequence();
 
     UserData* userData = allocateUserData( rop );
     userData->shader.shader = shader;
@@ -177,7 +191,7 @@ void Commands::emitConstantColor( const Rgba& value )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::ConstantColor );
-    rop->bits.sequence = m_sequence++;
+    rop->bits.sequence = beginSequence();
 
     UserData* userData = allocateUserData( rop );
     userData->color[0] = value.r;

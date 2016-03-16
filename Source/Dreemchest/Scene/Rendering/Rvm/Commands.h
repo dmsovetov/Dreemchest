@@ -170,9 +170,15 @@ namespace Scene {
         //! Allocates new Rop instance.
         Rop*                            allocateRop( void );
 
+        //! Begins new sequence by returning current sequence number (also post-increments the sequence number).
+        u8                              beginSequence( void );
+
+        //! Ends current sequence by incrementing the sequence number and returning result.
+        u8                              endSequence( void );
+
     private:
 
-        s32                             m_sequence;     //!< Current sequence number of render operation.
+        u8                              m_sequence;     //!< Current sequence number of render operation.
         IndexAllocator<Rop>             m_operations;   //!< Allocated instructions.
         IndexAllocator<UserData>        m_userData;     //!< Allocated instruction user data.
     };
