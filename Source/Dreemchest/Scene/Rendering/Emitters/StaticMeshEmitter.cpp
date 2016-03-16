@@ -37,9 +37,57 @@ StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes
 {
 }
 
+#if DEV_DISABLE_VIRTUAL_EMISSION
+
+void StaticMeshEmitter::emit( const Vec3& camera )
+{
+	const Ecs::EntitySet& entities = m_entities->entities();
+
+	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+        const StaticMesh& staticMesh = *(*i)->get<StaticMesh>();
+        const Transform&  transform  = *(*i)->get<Transform>();
+
+        // Get the material
+        const MaterialHandle& material = staticMesh.material( 0 );
+        RenderingMode         mode     = material->renderingMode();
+
+        // Does this material passes the filter?
+        if( (BIT( mode ) & m_renderModes) == 0 ) {
+            continue;
+        }
+
+        // Get the command buffer
+        Commands& commands = m_context.commands();
+
+        // Request the renderable asset for this mesh.
+        s32 renderable = m_context.requestRenderable( staticMesh.mesh() );
+
+        // Request the technique asset for a material.
+        s32 technique = m_context.requestTechnique( material );
+
+        // Calculate the distance to this renderable
+        f32 distance = (camera - transform.position()).length();
+
+        // Emit additional draw call for additive & translucent two-sided materials.
+        if( material->isTwoSided() ) {
+            Commands::InstanceData* instance = commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
+            instance->culling = Renderer::TriangleFaceFront;
+        }
+
+        // Emit the rendering command
+        commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
+	}
+}
+
+#endif
+
 // ** StaticMeshEmitter::emit
 void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform )
 {
+#if DEV_DISABLE_VIRTUAL_EMISSION
+    DC_ABORT_IF( true );
+#endif
+
     // Get the material
     const MaterialHandle& material = staticMesh.material( 0 );
     RenderingMode         mode     = material->renderingMode();

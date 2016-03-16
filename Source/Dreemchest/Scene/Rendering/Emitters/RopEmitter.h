@@ -78,7 +78,6 @@ namespace Scene {
 	{
 		const Ecs::EntitySet& entities = m_entities->entities();
 
-        s32 idx = 0;
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
 			emit( camera, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}

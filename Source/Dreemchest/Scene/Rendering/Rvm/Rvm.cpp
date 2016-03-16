@@ -143,7 +143,9 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
 
     // Switch the culling mode
     if( m_activeState.culling != instance.culling ) {
+    #if !DEV_DISABLE_DRAW_CALLS
         m_hal->setCulling( instance.culling );
+    #endif
         m_activeState.culling = instance.culling;
     }
 
@@ -345,6 +347,7 @@ void Rvm::reset( void )
 	m_rasterization[RenderAdditive]     = RasterizationOptions::additive();
 	m_rasterization[RenderTranslucent]  = RasterizationOptions::translucent();
 
+#if !DEV_DISABLE_DRAW_CALLS
 	// Reset the face culling
 	m_hal->setCulling( Renderer::TriangleFaceBack );
 
@@ -364,6 +367,7 @@ void Rvm::reset( void )
 
 	// Enable the depth test back
 	m_hal->setDepthTest( true, Renderer::LessEqual );
+#endif
 }
 
 // ** Rvm::ActiveState::ActiveState

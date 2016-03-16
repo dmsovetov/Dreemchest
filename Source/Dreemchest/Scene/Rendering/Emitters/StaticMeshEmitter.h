@@ -42,6 +42,10 @@ namespace Scene {
 
 	private:
 
+    #if DEV_DISABLE_VIRTUAL_EMISSION
+        virtual void			emit( const Vec3& camera ) DC_DECL_OVERRIDE;
+    #endif
+
 		//! Emits render operations for all static meshes in scene.
 		virtual void			emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
 
