@@ -36,7 +36,7 @@ namespace Assets {
 // ** NullSource::construct
 bool NullSource::construct( Assets& assets, Handle asset )
 {
-    return false;
+    return true;
 }
 
 // ** NullSource::lastModified
