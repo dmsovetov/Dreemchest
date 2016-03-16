@@ -59,9 +59,9 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
     // Declare default asset formats
-    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Type::fromClass<Scene::Image>() );
-    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Type::fromClass<Scene::Mesh>() );
-    m_assetFormats.declare<Scene::MaterialSourceKeyValue>( Assets::Type::fromClass<Scene::Material>() );
+    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Assets::assetTypeId<Scene::Image>() );
+    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Assets::assetTypeId<Scene::Mesh>() );
+    m_assetFormats.declare<Scene::MaterialSourceKeyValue>( Assets::Assets::assetTypeId<Scene::Material>() );
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
@@ -85,9 +85,9 @@ Assets::Assets& AssetManager::assets( void )
 Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 {
 	// Get the asset type by extension
-	Assets::Type type = assetTypeFromExtension( fileInfo.extension() );
+	Assets::TypeId type = assetTypeFromExtension( fileInfo.extension() );
 
-    if( !type.isValid() ) {
+    if( type == 0 ) {
         return Assets::Handle();
     }
 
@@ -104,8 +104,8 @@ Assets::Handle AssetManager::createAssetForFile( const FileInfo& fileInfo )
 Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 {
 	// Get asset type by name.
-	Assets::Type type = m_assets.typeFromName( kv.get<String>( "type" ) );
-    DC_BREAK_IF( !type.isValid() );
+	Assets::TypeId type = m_assets.typeFromName( kv.get<String>( "type" ) );
+    DC_BREAK_IF( type == 0 );
 
     // Read the unique asset identifier.
     Assets::AssetId uid = kv.get<String>( "uuid" );
@@ -115,7 +115,7 @@ Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 }
 
 // ** AssetManager::createAsset
-Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::AssetId& id )
+Assets::Handle AssetManager::createAsset( const Assets::TypeId& type, const Assets::AssetId& id )
 {
     // Create asset source by extension
     Assets::AbstractFileSource* source = m_assetFormats.construct( type );
@@ -136,16 +136,16 @@ Assets::Handle AssetManager::createAsset( Assets::Type type, const Assets::Asset
 }
 
 // ** AssetManager::registerExtension
-void AssetManager::registerExtension( const String& extension, Assets::Type type )
+void AssetManager::registerExtension( const String& extension, Assets::TypeId type )
 {
 	m_assetTypes[extension] = type;
 }
 
 // ** AssetManager::assetTypeFromExtension
-Assets::Type AssetManager::assetTypeFromExtension( const String& extension ) const
+Assets::TypeId AssetManager::assetTypeFromExtension( const String& extension ) const
 {
 	AssetTypes::const_iterator i = m_assetTypes.find( extension );
-	return i != m_assetTypes.end() ? i->second : Assets::Type::Invalid;
+	return i != m_assetTypes.end() ? i->second : 0;
 }
 
 // ** AssetManager::removeAssetFromCache

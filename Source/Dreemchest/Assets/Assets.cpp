@@ -43,7 +43,7 @@ Asset::Asset( void )
 }
 
 // ** Asset::Asset
-Asset::Asset( Type type, void* cache, const AssetId& uniqueId, SourceUPtr source )
+Asset::Asset( const TypeId& type, void* cache, const AssetId& uniqueId, SourceUPtr source )
     : m_source( source )
     , m_type( type )
     , m_uniqueId( uniqueId )
@@ -56,7 +56,7 @@ Asset::Asset( Type type, void* cache, const AssetId& uniqueId, SourceUPtr source
 }
 
 // ** Asset::type
-const Type& Asset::type( void ) const
+const TypeId& Asset::type( void ) const
 {
     return m_type;
 }
@@ -150,7 +150,7 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source )
+Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source )
 {
     DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
@@ -160,7 +160,6 @@ Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr s
 
     // First reserve the slot for an asset data.
     Index index = m_assets.add( Asset( type, cache, uniqueId, source ) );
-
 
     // Now register unique id associated with this asset slot.
     m_indexById[uniqueId] = index;
@@ -197,22 +196,22 @@ Handle Assets::findAsset( const AssetId& id ) const
 }
 
 // ** Assets::typeFromName
-Type Assets::typeFromName( const String& value ) const
+TypeId Assets::typeFromName( const String& value ) const
 {
-    Map<String, Type>::const_iterator i = m_nameToType.find( value );
+    Map<String, TypeId>::const_iterator i = m_nameToType.find( value );
     
     if( i == m_nameToType.end() ) {
         DC_BREAK;
-        return Type();
+        return 0;
     }
 
     return i->second;
 }
 
 // ** Assets::assetTypeName
-String Assets::assetTypeName( const Type& type ) const
+String Assets::assetTypeName( const TypeId& type ) const
 {
-    Map<Type, String>::const_iterator i = m_typeToName.find( type );
+    Map<TypeId, String>::const_iterator i = m_typeToName.find( type );
     
     if( i == m_typeToName.end() ) {
         DC_BREAK;
@@ -229,7 +228,7 @@ void Assets::releaseWriteLock( const Handle& asset )
 }
 
 // ** Assets::findAssetCache
-Assets::AbstractAssetCache* Assets::findAssetCache( const Type& type ) const
+Assets::AbstractAssetCache* Assets::findAssetCache( const TypeId& type ) const
 {
     AssetCaches::iterator i = m_cache.find( type );
 
@@ -350,7 +349,7 @@ void Assets::queueForLoading( const Asset& asset ) const
 }
 
 // ** Assets::reserveAssetData
-Index Assets::reserveAssetData( const Type& type )
+Index Assets::reserveAssetData( const TypeId& type )
 {
     AssetCaches::iterator i = m_cache.find( type );
 

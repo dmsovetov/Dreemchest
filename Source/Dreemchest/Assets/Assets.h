@@ -33,8 +33,6 @@
 #include <Io/streams/Stream.h>
 #include <Io/DiskFileSystem.h>
 
-#include "AssetType.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
@@ -52,6 +50,9 @@ namespace Assets {
 
     //! Asset identifier type.
     typedef String AssetId;
+
+    //! Asset type identifier type.
+    typedef u16 TypeId;
 
     //! Set of assets.
     typedef Set<class Handle> AssetSet;
@@ -82,7 +83,7 @@ namespace Assets {
         const AssetId&              uniqueId( void ) const;
 
         //! Returns asset type.
-        const Type&                 type( void ) const;
+        const TypeId&               type( void ) const;
 
         //! Returns asset name.
         const String&               name( void ) const;
@@ -105,10 +106,14 @@ namespace Assets {
         //! Returns the last asset construction timestamp.
         u32                         lastConstructed( void ) const;
 
+        //! Returns true if an asset is of specified type.
+        template<typename TAsset>
+        bool                        is( void ) const;
+
     private:
 
                                     //! Constructs Asset instance.
-                                    Asset( Type type, void* cache, const AssetId& uniqueId, SourceUPtr source );
+                                    Asset( const TypeId& type, void* cache, const AssetId& uniqueId, SourceUPtr source );
 
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
@@ -125,7 +130,7 @@ namespace Assets {
     private:
 
         SourceUPtr                  m_source;           //!< Asset source used for asset construction.
-        Type                        m_type;             //!< Asset type.
+        TypeId                      m_type;             //!< Asset type.
         AssetId                     m_uniqueId;         //!< Unique asset id.
         String                      m_name;             //!< Asset name.
         State                       m_state;            //!< Current asset state.
@@ -135,6 +140,13 @@ namespace Assets {
         mutable u32                 m_lastModified;     //!< Last time this asset was modified.
         mutable u32                 m_lastUsed;         //!< Last time this asset was used.
     };
+
+    // ** Asset::is
+    template<typename TAsset>
+    NIMBLE_INLINE bool Asset::is( void ) const
+    {
+        return m_type == Assets::assetTypeId<TAsset>();
+    }
 
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
@@ -159,7 +171,7 @@ namespace Assets {
         void                        setPlaceholder( const TAsset& value );
 
         //! Adds new asset with unique id.
-        Handle                      addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source );
+        Handle                      addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );
@@ -171,10 +183,14 @@ namespace Assets {
         void                        update( f32 dt );
 
         //! Returns an asset type by it's name.
-        Type                        typeFromName( const String& name ) const;
+        TypeId                      typeFromName( const String& name ) const;
 
         //! Returns asset type name.
-        String                      assetTypeName( const Type& type ) const;
+        String                      assetTypeName( const TypeId& type ) const;
+
+        //! Returns an asset type id.
+        template<typename TAsset>
+        static TypeId               assetTypeId( void );
 
         //! Registers an asset type.
         template<typename TAsset>
@@ -201,14 +217,14 @@ namespace Assets {
         Handle                      createHandle( const Asset& asset ) const;
 
         //! Requests an asset cache for a specified asset type.
-        AbstractAssetCache*         findAssetCache( const Type& type ) const;
+        AbstractAssetCache*         findAssetCache( const TypeId& type ) const;
 
         //! Returns cached asset data.
         template<typename TAsset>
         const TAsset&               assetData( const Asset& asset ) const;
 
         //! Reserves asset data handle inside the cache.
-        Index                       reserveAssetData( const Type& type );
+        Index                       reserveAssetData( const TypeId& type );
 
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
@@ -248,23 +264,30 @@ namespace Assets {
         typedef Map<AssetId, Index> AssetIndexById;
 
         //! Container type to store asset cache for an asset type.
-        typedef Map<Type, AbstractAssetCache*> AssetCaches;
+        typedef Map<TypeId, AbstractAssetCache*> AssetCaches;
 
         Slots<Asset, Index>         m_assets;       //!< All available assets.
         AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
         u32                         m_currentTime;  //!< Cached current time.
-        Map<String, Type>           m_nameToType;   //!< Maps asset name to type.
-        Map<Type, String>           m_typeToName;   //!< Maps asset type to name.
+        Map<String, TypeId>         m_nameToType;   //!< Maps asset name to type.
+        Map<TypeId, String>         m_typeToName;   //!< Maps asset type to name.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
         mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };
+
+    // ** Assets::assetTypeId
+    template<typename TAsset>
+    TypeId Assets::assetTypeId( void )
+    {
+        return GroupedTypeIndex<TAsset, Assets>::idx();
+    }
 
     // ** Assets::registerType
     template<typename TAsset>
     void Assets::registerType( void )
     {
         // Get the type & name
-        Type   type = Type::fromClass<TAsset>();
+        TypeId type = assetTypeId<TAsset>();
         String name = TypeInfo<TAsset>::name();
 
         // Register type & name
@@ -280,7 +303,7 @@ namespace Assets {
     template<typename TAsset>
     GenericHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
     {
-        Handle handle = addAsset( Type::fromClass<TAsset>(), uniqueId, source );
+        Handle handle = addAsset( assetTypeId<TAsset>(), uniqueId, source );
         return handle;
     }
 
@@ -296,7 +319,7 @@ namespace Assets {
     template<typename TAsset>
     void Assets::setPlaceholder( const TAsset& value )
     {
-        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( Type::fromClass<TAsset>() ) );
+        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( assetTypeId<TAsset>() ) );
         cache->placeholder = value;
     }
 

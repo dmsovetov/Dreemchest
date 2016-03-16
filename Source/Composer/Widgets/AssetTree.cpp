@@ -79,7 +79,7 @@ bool AssetSelector::eventFilter( QObject* target, QEvent* e )
 								Assets::Handle asset = qComposer->assetFromMime( de->mimeData() );
 
 								// Check asset type
-								if( !asset.isValid() || (asset->type().bit() & m_mask) == 0 ) {
+								if( !asset.isValid() || (BIT( asset->type() ) & m_mask) == 0 ) {
 									return true;
 								}
 
@@ -270,7 +270,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	DC_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.
-    if( asset->type().is<Scene::Material>() ) {
+    if( asset->is<Scene::Material>() ) {
         inspector->setModel( new MaterialModel( asset, this ) );
     }
     else {

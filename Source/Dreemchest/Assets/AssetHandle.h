@@ -195,7 +195,7 @@ namespace Assets {
     template<typename TAsset>
     GenericHandle<TAsset>::GenericHandle( const Handle& asset )
     {
-        DC_BREAK_IF( isValid() && asset.isValid() && !asset->type().is<TAsset>() );
+        DC_BREAK_IF( isValid() && asset.isValid() && !asset->type() == Assets::assetTypeId<TAsset>() );
         this->setHandle( asset.assets(), asset.index() );
     }
 

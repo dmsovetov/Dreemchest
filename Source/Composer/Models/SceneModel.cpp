@@ -237,12 +237,12 @@ SceneModel::AssetAction SceneModel::acceptableAssetAction( const Assets::AssetSe
 	AssetAction assetAction( AssetAction::Invalid, assets, target, point );
 
 	for( Assets::AssetSet::const_iterator i = assets.begin(), end = assets.end(); i != end; i++ ) {
-        const Assets::Type& type = (*i)->type();
+        const Assets::Handle& asset = *i;
 
-        if( type.is<Scene::Mesh>() ) {
+        if( asset->is<Scene::Mesh>() ) {
             assetAction.type = AssetAction::PlaceMesh;
         }
-        else if( type.is<Scene::Material>() ) {
+        else if( asset->is<Scene::Material>() ) {
             if( !target.valid() || target->has<Scene::StaticMesh>() ) {
                 assetAction.type = AssetAction::AssignMaterial;
             }

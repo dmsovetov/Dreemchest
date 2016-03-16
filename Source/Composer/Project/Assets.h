@@ -45,10 +45,10 @@ DC_BEGIN_COMPOSER
         Assets::Assets&             assets( void );
 
 		//! Registers the mapping from extension to asset type.
-		void						registerExtension( const String& ext, Assets::Type type );
+		void						registerExtension( const String& ext, Assets::TypeId type );
 
 		//! Returns asset type by extension.
-		Assets::Type			    assetTypeFromExtension( const String& ext ) const;
+		Assets::TypeId			    assetTypeFromExtension( const String& ext ) const;
 
 	private:
 
@@ -68,7 +68,7 @@ DC_BEGIN_COMPOSER
         Assets::Handle              parseAssetFromData( const KeyValue& kv );
 
         //! Creates an asset instance with specified asset type and id.
-        Assets::Handle              createAsset( Assets::Type type, const Assets::AssetId& id );
+        Assets::Handle              createAsset( const Assets::TypeId& type, const Assets::AssetId& id );
 
         //! Updates all assets when timer event is triggered.
         virtual void                timerEvent( QTimerEvent* e ) Q_DECL_OVERRIDE;
@@ -90,10 +90,10 @@ DC_BEGIN_COMPOSER
 		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
         //! Alias the asset format factory type.
-        typedef AbstractFactory<Assets::AbstractFileSource, Assets::Type> AssetFormatFactory;
+        typedef AbstractFactory<Assets::AbstractFileSource, Assets::TypeId> AssetFormatFactory;
 
 		//! Alias the ext to asset type mapping.
-		typedef Map<String, Assets::Type> AssetTypes;
+		typedef Map<String, Assets::TypeId> AssetTypes;
 
         //! Alias the uuid to asset file source mapping.
         typedef Map<Assets::AssetId, Assets::AbstractFileSource*> AssetFiles;
