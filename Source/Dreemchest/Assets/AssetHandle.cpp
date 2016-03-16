@@ -104,7 +104,7 @@ const Asset& Handle::asset( void ) const
 Asset& Handle::asset( void )
 {
     DC_BREAK_IF( !isValid() );
-    return const_cast<Asset&>( m_assets->assetAtIndex( index() ) );
+    return m_assets->assetAtIndex( index() );
 }
 
 // ** Handle::assets

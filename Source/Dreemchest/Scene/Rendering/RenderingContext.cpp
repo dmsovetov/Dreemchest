@@ -45,6 +45,22 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 {
     m_rvm           = DC_NEW Rvm( *this, m_hal );
     m_commands      = DC_NEW Commands;
+
+    // Create default assets
+    {
+        UberShaderHandle pink = createShader( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
+        pink.asset().setName( "Placeholder.shader" );
+        pink.forceLoad();
+        m_assets.setPlaceholder<UberShader>( pink );
+    }
+
+    {
+        MaterialHandle pink = m_assets.add<Material>( "Placeholder.material", DC_NEW Assets::NullSource );
+        pink.asset().setName( "Placeholder.material" );
+        pink.forceLoad();
+        pink.writeLock()->setColor( Material::Diffuse, Rgba( 1.0f, 0.0f, 1.0f ) );
+        m_assets.setPlaceholder<Material>( pink );
+    }
 }
 
 // ** RenderingContext::create

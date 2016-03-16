@@ -70,10 +70,11 @@ namespace Assets {
 
         //! Available asset states.
         enum State {
-              Unloaded  //!< Asset is now unloaded.
-            , Loading   //!< Asset is now loading.
-            , Loaded    //!< Asset is loaded and ready to use.
-            , Error     //!< Asset was failed to load.
+              Unloaded              //!< Asset is now unloaded.
+            , WaitingForLoading     //!< Asset is now waiting to start loading.
+            , Loading               //!< Asset is now loading.
+            , Loaded                //!< Asset is loaded and ready to use.
+            , Error                 //!< Asset was failed to load.
         };
 
                                     //! Constructs empty Asset instance.
@@ -97,6 +98,9 @@ namespace Assets {
         //! Returns asset state.
         State                       state( void ) const;
 
+        //! Returns true if an asset is loaded.
+        bool                        isLoaded( void ) const;
+
         //! Returns the last asset modification timestamp.
         u32                         lastModified( void ) const;
 
@@ -118,14 +122,8 @@ namespace Assets {
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
 
-        //! Sets the data handle.
-        void                        setData( Index value );
-
         //! Returns the data handle.
         Index                       data( void ) const;
-
-        //! Returns true if an asset has valid data.
-        bool                        hasData( void ) const;
 
     private:
 
@@ -148,6 +146,12 @@ namespace Assets {
         return m_type == Assets::assetTypeId<TAsset>();
     }
 
+    // ** Asset::isLoaded
+    NIMBLE_INLINE bool Asset::isLoaded( void ) const
+    {
+        return m_state == Loaded;
+    }
+
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
     friend class Handle;
@@ -168,7 +172,7 @@ namespace Assets {
 
         //! Sets the default placeholder for unloaded assets of specified type.
         template<typename TAsset>
-        void                        setPlaceholder( const TAsset& value );
+        void                        setPlaceholder( const GenericHandle<TAsset>& value );
 
         //! Adds new asset with unique id.
         Handle                      addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source );
@@ -206,12 +210,13 @@ namespace Assets {
 
         //! Returns an asset by index.
         const Asset&                assetAtIndex( Index index ) const;
+        Asset&                      assetAtIndex( Index index );
 
         //! Returns true if the specified asset index is valid.
         bool                        isIndexValid( Index index ) const;
 
         //! Puts an asset to a loading queue.
-        void                        queueForLoading( const Asset& asset ) const;
+        void                        queueForLoading( Asset& asset );
 
         //! Constructs an asset handle for a specified asset.
         Handle                      createHandle( const Asset& asset ) const;
@@ -219,9 +224,13 @@ namespace Assets {
         //! Requests an asset cache for a specified asset type.
         AbstractAssetCache*         findAssetCache( const TypeId& type ) const;
 
-        //! Returns cached asset data.
+        //! Returns cached read-only asset data.
         template<typename TAsset>
-        const TAsset&               assetData( const Asset& asset ) const;
+        const TAsset&               readOnlyAssetData( const Asset& asset ) const;
+
+        //! Returns writable asset data (used internally by write locks).
+        template<typename TAsset>
+        TAsset&                     writableAssetData( const Asset& asset ) const;
 
         //! Reserves asset data handle inside the cache.
         Index                       reserveAssetData( const TypeId& type );
@@ -256,8 +265,9 @@ namespace Assets {
             //! Reserves the slot handle inside cache.
             virtual Index           reserve( void ) { return slots.reserve(); }
 
-            TAsset                  placeholder;    //!< Default placeholder that is returned for unloaded assets.
-            Slots<TAsset, Index>    slots;          //!< Cached asset data is stored here.
+            TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
+            GenericHandle<TAsset>   placeholder;        //!< Default placeholder that is returned for unloaded assets.
+            Slots<TAsset, Index>    slots;              //!< Cached asset data is stored here.
         };
 
         //! Container type to store unique id to an asset slot mapping.
@@ -317,15 +327,18 @@ namespace Assets {
 
     // ** Assets::setPlaceholder
     template<typename TAsset>
-    void Assets::setPlaceholder( const TAsset& value )
+    void Assets::setPlaceholder( const GenericHandle<TAsset>& value )
     {
+        // Request an asset cache for this type of asset
         AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( assetTypeId<TAsset>() ) );
+
+        DC_BREAK_IF( !value.isLoaded(), "unloaded asset could not be set as a placeholder" );
         cache->placeholder = value;
     }
 
-    // ** Assets::assetData
+    // ** Assets::readOnlyAssetData
     template<typename TAsset>
-    const TAsset& Assets::assetData( const Asset& asset ) const
+    const TAsset& Assets::readOnlyAssetData( const Asset& asset ) const
     {
         DC_BREAK_IF( asset.m_cache == NULL );
 
@@ -333,9 +346,27 @@ namespace Assets {
         AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( reinterpret_cast<AbstractAssetCache*>( asset.m_cache ) );
 
         // Use the placeholder for unloaded assets
-        if( asset.state() == Asset::Unloaded ) {
-            return cache->placeholder;
+        if( !asset.isLoaded() ) {
+            if( !cache->placeholder.isLoaded() ) {
+                return cache->builtInPlaceholder;
+            }
+
+            return readOnlyAssetData<TAsset>( cache->placeholder.asset() );
         }
+
+        // This asset is already loaded, so we can just return a const reference to a writable data
+        return writableAssetData<TAsset>( asset );
+    }
+
+    // ** Assets::writableAssetData
+    template<typename TAsset>
+    TAsset& Assets::writableAssetData( const Asset& asset ) const
+    {
+        DC_BREAK_IF( !asset.data().isValid(), "asset data is invalid" );
+        DC_BREAK_IF( asset.m_cache == NULL, "no data cache associated with this asset" );
+
+        // Get asset cache
+        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( reinterpret_cast<AbstractAssetCache*>( asset.m_cache ) );
 
         // Now lookup an asset data
         TAsset& data = cache->slots.get( asset.data() );
@@ -346,11 +377,11 @@ namespace Assets {
     template<typename TAsset>
     const TAsset& Assets::acquireReadLock( const Asset& asset ) const
     {
-        if( asset.state() != Asset::Loaded ) {
-            queueForLoading( asset );
+        if( asset.state() == Asset::Unloaded ) {
+            const_cast<Assets*>( this )->queueForLoading( const_cast<Asset&>( asset ) );
         }
 
-        const TAsset& data = assetData<TAsset>( asset );
+        const TAsset& data = readOnlyAssetData<TAsset>( asset );
         asset.m_lastUsed = m_currentTime;
         return data;
     }
@@ -365,6 +396,12 @@ namespace Assets {
 
     // ** Assets::assetAtIndex
     NIMBLE_INLINE const Asset& Assets::assetAtIndex( Index index ) const
+    {
+        return m_assets.get( index );
+    }
+
+    // ** Assets::assetAtIndex
+    NIMBLE_INLINE Asset& Assets::assetAtIndex( Index index )
     {
         return m_assets.get( index );
     }

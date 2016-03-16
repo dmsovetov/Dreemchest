@@ -36,6 +36,7 @@ namespace Assets {
     //! This handles are issued by an Assets class and are the only way the outer world can access an asset.
     class Handle {
     friend class Assets;
+    template<class TAsset> friend class WriteLock;
     public:
 
                                         //! Constructs an empty Handle instance.
@@ -76,9 +77,9 @@ namespace Assets {
         //! Returns asset manager that issued this handle.
         Assets*                         assets( void ) const;
 
-        //! Returns cached asset data.
+        //! Returns cached read-only asset data.
         template<typename TAsset>
-        const TAsset&                   data( void ) const;
+        const TAsset&                   readOnlyData( void ) const;
 
         //! Returns the read-only asset data and updates the last usage timestamp.
         template<typename TAsset>
@@ -96,6 +97,10 @@ namespace Assets {
         //! Set an asset handle.
         void                            setHandle( Assets* assets, Index index );
 
+        //! Returns writable asset data.
+        template<typename TAsset>
+        TAsset&                         writableData( void );
+
     protected:
 
         Assets*                         m_assets;   //!< An assets manager that issued this handle.
@@ -105,11 +110,18 @@ namespace Assets {
     #endif  /*  DC_DEBUG    */
     };
 
-    // ** Handle::data
+    // ** Handle::readOnlyData
     template<typename TAsset>
-    const TAsset& Handle::data( void ) const
+    const TAsset& Handle::readOnlyData( void ) const
     {
-        return assets()->assetData<TAsset>( asset() );
+        return assets()->readOnlyAssetData<TAsset>( asset() );
+    }
+
+    // ** Handle::writableData
+    template<typename TAsset>
+    TAsset& Handle::writableData( void )
+    {
+        return assets()->writableAssetData<TAsset>( asset() );
     }
 
     // ** Handle::index
@@ -161,6 +173,9 @@ namespace Assets {
         //! This operator is used for read-only access to actual asset data.
         const TAsset*                   operator -> ( void ) const;
 
+        //! This operator is used to return a const reference to actual asset data.
+        const TAsset&                   operator * ( void ) const;
+
         //! Returns the read-only asset data and updates the last usage timestamp.
         const TAsset&                   readLock( void ) const;
 
@@ -211,7 +226,14 @@ namespace Assets {
     template<typename TAsset>
     const TAsset* GenericHandle<TAsset>::operator -> ( void ) const
     {
-        return &data<TAsset>();
+        return &readOnlyData<TAsset>();
+    }
+
+    // ** GenericHandle::operator *
+    template<typename TAsset>
+    const TAsset& GenericHandle<TAsset>::operator * ( void ) const
+    {
+        return readOnlyData<TAsset>();
     }
 
 #ifdef DC_DEBUG
@@ -302,14 +324,14 @@ namespace Assets {
     template<typename TAsset>
     TAsset* WriteLock<TAsset>::operator -> ( void )
     {
-        return const_cast<TAsset*>( m_asset.operator->() );
+        return &m_asset.writableData<TAsset>();
     }
 
     // ** WriteLock::operator *
     template<typename TAsset>
     TAsset& WriteLock<TAsset>::operator * ( void )
     {
-        return *const_cast<TAsset*>( m_asset.operator->() );
+        return m_asset.writableData<TAsset>();
     }
 
 } // namespace Assets

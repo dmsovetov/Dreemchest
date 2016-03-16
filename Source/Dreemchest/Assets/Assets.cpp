@@ -99,22 +99,10 @@ void Asset::switchToState( State value )
     m_state = value;
 }
 
-// ** Asset::setData
-void Asset::setData( Index value )
-{
-    m_data = value;
-}
-
 // ** Asset::data
 Index Asset::data( void ) const
 {
     return m_data;
-}
-
-// ** Asset::hasData
-bool Asset::hasData( void ) const
-{
-    return data().isValid();
 }
 
 // ** Asset::lastModified
@@ -250,6 +238,11 @@ Assets::AbstractAssetCache* Assets::findAssetCache( const TypeId& type ) const
 bool Assets::loadAssetToCache( Handle asset )
 {
     if( asset->state() == Asset::Unloaded ) {
+        LogDebug( "cache", "forcing asset '%s' to be loaded\n", asset->name().c_str() );
+        asset->switchToState( Asset::WaitingForLoading );
+    }
+
+    if( asset->state() != Asset::WaitingForLoading ) {
         return true;
     }
 
@@ -327,7 +320,7 @@ void Assets::update( f32 dt )
 }
 
 // ** Assets::queueForLoading
-void Assets::queueForLoading( const Asset& asset ) const
+void Assets::queueForLoading( Asset& asset )
 {
     // Make sure this asset should be loaded
     if( asset.state() != Asset::Unloaded ) {
@@ -339,7 +332,7 @@ void Assets::queueForLoading( const Asset& asset ) const
     DC_ABORT_IF( j == m_indexById.end(), "unknown asset id" );
 
     // Construct asset handle
-    Handle handle( const_cast<Assets*>( this ), j->second );
+    Handle handle( this, j->second );
 
     // First check if this asset is already in queue
     AssetList::const_iterator i = std::find( m_loadingQueue.begin(), m_loadingQueue.end(), handle );
@@ -349,8 +342,12 @@ void Assets::queueForLoading( const Asset& asset ) const
         return;
     }
 
+    // Push an asset to a loading queue
     m_loadingQueue.push_back( handle );
     LogVerbose( "cache", "asset '%s' is queued for loading\n", asset.name().c_str() );
+
+    // Swith asset state
+    asset.switchToState( Asset::WaitingForLoading );
 }
 
 // ** Assets::reserveAssetData
