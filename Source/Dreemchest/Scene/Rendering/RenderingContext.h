@@ -159,8 +159,8 @@ namespace Scene {
         //! Returns technique index for a specified material asset.
         s32                                 requestTechnique( const MaterialHandle& handle );
 
-        //! Returns program index for a specified shader asset.
-        s32                                 requestProgram( const ShaderHandle& handle, u32 features );
+        //! Returns texture index for a specified image asset.
+        s32                                 requestTexture( const ImageHandle& handle );
 
         //! Returns renderable handle by index.
         const RenderableHandle&             renderableByIndex( s32 index ) const;
@@ -168,14 +168,11 @@ namespace Scene {
         //! Returns technique handle by index.
         const TechniqueHandle&              techniqueByIndex( s32 index ) const;
 
-        //! Returns the program handle by index.
-        const ProgramHandle&                programByIndex( s32 index ) const;
+        //! Returns texture handle by index.
+        const TextureHandle&                textureByIndex( s32 index ) const;
 
         //! Creates a new shader instance.
-        ShaderHandle                        createShader( const String& fileName );
-
-        //! Creates a new technique instance.
-        TechniqueHandle                     createTechnique( const String& identifier, const String& shader );
+        ShaderHandle                        createShader( const String& identifier, const String& fileName );
 
         //! Returns the command buffer instance.
         Commands&                           commands( void );
@@ -200,8 +197,8 @@ namespace Scene {
         //! Technique asset cache.
         typedef RenderAssetCache<Material, Technique, TechniqueMaterialSource> TechniqueCache;
 
-        //! Program asset cache.
-        typedef RenderAssetCache<Shader, Program, ProgramShaderSource> ProgramCache;
+        //! Texture asset cache.
+        typedef RenderAssetCache<Image, Texture, TextureImageSource> TextureCache;
 
         Renderer::HalWPtr                   m_hal;              //!< Parent HAL instance.
         RvmUPtr                             m_rvm;              //!< Internal rvm instance.
@@ -212,7 +209,7 @@ namespace Scene {
 
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
-        ProgramCache                        m_programs;
+        TextureCache                        m_textures;
 	};
 
 	// ** RenderingContext::addRenderSystem
@@ -225,29 +222,25 @@ namespace Scene {
     // ** RenderingContext::requestRenderable
     NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
     {
-        return m_renderables.request( m_assets, this, handle, "renderable" ) + 1;
+        s32 idx = m_renderables.request( m_assets, this, handle, "renderable" ) + 1;
+        renderableByIndex( idx ).readLock();
+        return idx;
     }
 
     // ** RenderingContext::requestTechnique
     NIMBLE_INLINE s32 RenderingContext::requestTechnique( const MaterialHandle& handle )
     {
-        return m_techniques.request( m_assets, this, handle, "technique" ) + 1;
+        s32 idx = m_techniques.request( m_assets, this, handle, "technique" ) + 1;
+        techniqueByIndex( idx ).readLock();
+        return idx;
     }
 
-    // ** RenderingContext::requestProgram
-    NIMBLE_INLINE s32 RenderingContext::requestProgram( const ShaderHandle& handle, u32 features )
+    // ** RenderingContext::requestTexture
+    NIMBLE_INLINE s32 RenderingContext::requestTexture( const ImageHandle& handle )
     {
-        s32 index = m_programs.request( m_assets, this, handle, "program" ) + 1;
-        const_cast<ProgramHandle&>( programByIndex( index ) ).forceLoad();
-        const_cast<ProgramHandle&>( programByIndex( index ) ).writeLock()->setFeatures( features );
-        return index;
-    }
-
-    // ** RenderingContext::programByIndex
-    NIMBLE_INLINE const ProgramHandle& RenderingContext::programByIndex( s32 index ) const
-    {
-        DC_ABORT_IF( index <= 0 || index > m_programs.count(), "index is out of range" );
-        return m_programs.handles()[index - 1];
+        s32 idx = m_textures.request( m_assets, this, handle, "texture" ) + 1;
+        textureByIndex( idx ).readLock();
+        return idx;
     }
 
     // ** RenderingContext::renderableByIndex
@@ -262,6 +255,13 @@ namespace Scene {
     {
         DC_ABORT_IF( index <= 0 || index > m_techniques.count(), "index is out of range" );
         return m_techniques.handles()[index - 1];
+    }
+
+    // ** RenderingContext::textureByIndex
+    NIMBLE_INLINE const TextureHandle& RenderingContext::textureByIndex( s32 index ) const
+    {
+        DC_ABORT_IF( index <= 0 || index > m_textures.count(), "index is out of range" );
+        return m_textures.handles()[index - 1];
     }
 
 } // namespace Scene

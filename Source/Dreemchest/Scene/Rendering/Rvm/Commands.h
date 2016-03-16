@@ -45,9 +45,8 @@ namespace Scene {
                   PushRenderTarget  //!< Begins rendering to target by pushing it to a stack and setting the viewport.
                 , PopRenderTarget   //!< Ends rendering to target by popping it from a stack.
                 , RasterOptions     //!< Setups the rasterization options.
-                , PushTechnique     //!< Pushes a technique onto the stack.
-                , PopTechnique      //!< Pops technique from a stack.
                 , ConstantColor     //!< Sets the constant color value.
+                , Shader            //!< Sets the shader to be used for a lighting model.
             };
 
                         //! Constructs Rop instance.
@@ -98,6 +97,13 @@ namespace Scene {
         //! Instance data associated with a draw call.
         struct InstanceData {
             const Matrix4*              transform;      //!< Instance transform.
+            Renderer::TriangleFace      culling;        //!< Triangle face culling.
+        };
+
+        //! Lighting model shader to be used.
+        struct LightingModelShader {
+            u8                          models;         //!< The bitmask of models that are eligible to use this shader.
+            const Shader*               shader;         //!< Shader instance.
         };
 
         //! User data used by rendering commands.
@@ -106,7 +112,7 @@ namespace Scene {
                 InstanceData            instance;       //!< Instance user data.
                 RenderTargetState       rt;             //!< Render target info.
                 RasterizationOptions    rasterization;  //!< Rasterization options.
-                const Technique*        technique;      //!< Technique to be pushed on to the stack.
+                LightingModelShader     shader;         //!< Lighting shader.
                 f32                     color[4];       //!< The constant color value.
             };
         };
@@ -133,7 +139,7 @@ namespace Scene {
         const UserData&                 ropUserData( const Rop& rop ) const;
 
         //! Pushes a single draw call instruction.
-        NIMBLE_INLINE void              emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
+        NIMBLE_INLINE InstanceData*     emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
 
         //! Emits the command to push a render target.
         void                            emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport );
@@ -144,11 +150,8 @@ namespace Scene {
         //! Emits the rasterization options command.
         void                            emitRasterOptions( u8 renderingModes, const RasterizationOptions& options );
 
-        //! Emits the command to push program.
-        void                            emitPushTechnique( TechniqueHandle value );
-
-        //! Emits the command to pop program.
-        void                            emitPopTechnique( void );
+        //! Emits the lighting shader setup command.
+        void                            emitLightingShader( u8 models, const Shader& shader );
 
         //! Emits the constant color operation.
         void                            emitConstantColor( const Rgba& value );
@@ -175,7 +178,7 @@ namespace Scene {
     };
 
     // ** Commands::emitDrawCall
-    NIMBLE_INLINE void Commands::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
+    NIMBLE_INLINE Commands::InstanceData* Commands::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
     {
         // Allocate new command instance
         Rop* rop = allocateRop();
@@ -187,6 +190,9 @@ namespace Scene {
         // Allocate instance user data
         UserData* data = allocateUserData( rop );
         data->instance.transform = transform;
+        data->instance.culling   = Renderer::TriangleFaceBack;
+
+        return &data->instance;
     }
 
 } // namespace Scene

@@ -61,9 +61,9 @@ Resources::Resources( void )
     registerType<Prefab>();
     registerType<Material>();
     registerType<Renderable>();
+    registerType<Texture>();
     registerType<Technique>();
     registerType<Shader>();
-    registerType<Program>();
 }
 
 // ** Scene::Scene

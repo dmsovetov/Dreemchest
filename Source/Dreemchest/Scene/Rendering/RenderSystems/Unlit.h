@@ -47,10 +47,10 @@ namespace Scene {
 
     private:
 
-        TechniqueHandle         m_technique;    //!< This technique is used for all render operations.
         RopEmitterUPtr          m_opaque;       //!< Emits render operations for opaque & cutout objects.
         RopEmitterUPtr          m_translucent;  //!< Emits render operations for translucent objects.
         RopEmitterUPtr          m_additive;     //!< Emits render operations for additive objects.
+        ShaderHandle            m_shader;       //!< This shader is used for all lighting models.
     };
 
 } // namespace Scene

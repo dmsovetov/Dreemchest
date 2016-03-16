@@ -36,52 +36,47 @@ namespace Scene {
 Rvm::Rvm( RenderingContext& context, Renderer::HalWPtr hal )
     : m_context( context )
     , m_hal( hal )
-    , m_constantColor( Vec4( 1.0f, 1.0f, 1.0f, 1.0f ) )
+    , m_constantColor( 1.0f, 1.0f, 1.0f, 1.0f )
 {
+    reset();
 }
 
 // ** Rvm::setTechnique
 void Rvm::setTechnique( s32 value )
 {
-    // Read-lock material technique
-    const Technique& technique = value ? m_context.techniqueByIndex( value ).readLock() : *m_techniques.top();
-
-    if( !technique.program().isValid() ) {
-        return;
-    }
+    // Read-lock the technique
+    const Technique& technique = *m_context.techniqueByIndex( value );
+    DC_BREAK_IF( !m_shaders[technique.lightingModel()], "no shader set for this lighting model" );
 
     // Save current technique
     m_activeState.technique = value;
 
-    // Set the technique shader
-    const Program* program = &technique.program().readLock();
-    Renderer::ShaderWPtr shader = program->shader();
+    // Get the shader permutation
+    const Shader& shader = *m_shaders[technique.lightingModel()];
+    Shader::Permutation& permutation = const_cast<Shader::Permutation&>( shader.permutation( m_hal, technique.features() ) );
 
-    if( !shader.valid() ) {
-        return;
-    }
-
-    if( program != m_activeState.program ) {
-        setProgram( program );
-    }
+    // Set the permutation shader.
+    setProgram( permutation );
 
     u32 location;
 
     // Bind texture samplers used by technique
     for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = program->inputLocation( static_cast<Program::Input>( Program::Texture0 + i ) ) ) {
+        if( location = permutation.locations[Shader::Texture0 + i] ) {
+            const Texture& texture = *technique.texture( i );
         #if !DEV_DISABLE_DRAW_CALLS
-            shader->setInt( location, i );
+            permutation.shader->setInt( location, i );
+            m_hal->setTexture( i, texture.texture().get() );
         #endif
         }
     }
 
     // Set colors exposed by a material
     for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
-        if( location = program->inputLocation( static_cast<Program::Input>( Program::Color0 + i ) ) ) {
+        if( location = permutation.locations[Shader::Color0 + i] ) {
             const Rgba& color = technique.color( i );
         #if !DEV_DISABLE_DRAW_CALLS
-            shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
+            permutation.shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
         #endif
         }
     }
@@ -91,22 +86,22 @@ void Rvm::setTechnique( s32 value )
 void Rvm::setRenderable( s32 value )
 {
     // Read-lock renderable asset
-    const Renderable& renderable = m_context.renderableByIndex( value ).readLock();
+    const Renderable& renderable = *m_context.renderableByIndex( value );
 
     // Save current renderable
     m_activeState.renderable = value;
 }
 
 // ** Rvm::setProgram
-void Rvm::setProgram( const Program* value )
+void Rvm::setProgram( const Shader::Permutation& value )
 {
     // This program is already set
-    if( value == m_activeState.program ) {
+    if( &value == m_activeState.program ) {
         return;
     }
 
     // Get the shader from a program
-    Renderer::ShaderWPtr shader = value->shader();
+    Renderer::ShaderWPtr shader = value.shader;
 
     if( !shader.valid() ) {
         return;
@@ -120,28 +115,29 @@ void Rvm::setProgram( const Program* value )
     u32 location = 0;
 
     // Set the view-projection matrix input
-    if( location = value->inputLocation( Program::ViewProjection ) ) {
+    if( location = value.locations[Shader::ViewProjection] ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setMatrix( location, m_renderTarget.top().vp );
     #endif
     }
 
     // Set the constant color input
-    if( location = value->inputLocation( Program::Color ) ) {
+    if( location = value.locations[Shader::Color] ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setVec4( location, m_constantColor );
     #endif
     }
 
     // Save active program
-    m_activeState.program = value;
+    m_activeState.program = const_cast<Shader::Permutation*>( &value );
 }
 
 // ** Rvm::setInstance
 void Rvm::setInstance( const Commands::InstanceData& instance )
 {
     // Get an active program
-    const Program* program = m_activeState.program;
+    Shader::Permutation* program = m_activeState.program;
+
     // Switch the culling mode
     if( m_activeState.culling != instance.culling ) {
         m_hal->setCulling( instance.culling );
@@ -156,9 +152,9 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
 	// Set the transformation matrix
     u32 location = 0;
 
-	if( location = program->inputLocation( Program::Transform ) ) {
+	if( location = program->locations[Shader::Transform] ) {
     #if !DEV_DISABLE_DRAW_CALLS
-		program->shader()->setMatrix( location, *instance.transform );
+		program->shader->setMatrix( location, *instance.transform );
     #endif
 	}
 }
@@ -189,11 +185,11 @@ void Rvm::setConstantColor( const Rgba& value )
     m_constantColor = Vec4( value.r, value.g, value.b, value.a );
 
     // Update the shader uniform
-    if( const Program* program = m_activeState.program ) {
-        u32 location = program->inputLocation( Program::Color );
+    if( Shader::Permutation* program = m_activeState.program ) {
+        u32 location = program->locations[Shader::Color];
         if( location ) {
         #if !DEV_DISABLE_DRAW_CALLS
-            program->shader()->setVec4( location, m_constantColor );
+            program->shader->setVec4( location, m_constantColor );
         #endif
         }
     }
@@ -251,13 +247,19 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
                                             }
                                             break;
 
-    case Commands::Rop::PushTechnique:      m_techniques.push( userData.technique );
-                                            break;
-
-    case Commands::Rop::PopTechnique:       m_techniques.pop();
-                                            break;
-
     case Commands::Rop::ConstantColor:      setConstantColor( userData.color );
+                                            break;
+
+    case Commands::Rop::Shader:             {
+                                                // Get the shader from command user data
+                                                const Commands::LightingModelShader& lightingModelShader = userData.shader;
+
+                                                for( s32 i = 0; i < TotalLightingModels; i++ ) {
+                                                    if( BIT( i ) & lightingModelShader.models ) {
+                                                        m_shaders[i] = lightingModelShader.shader;
+                                                    }
+                                                }
+                                            }
                                             break;
 
     default:                    DC_NOT_IMPLEMENTED;
@@ -304,7 +306,7 @@ void Rvm::execute( const Commands& commands )
         setInstance( userData.instance );
 
         // Render all chunks
-        const Renderable& renderable = m_context.renderableByIndex( rop.bits.renderable ).readLock();
+        const Renderable& renderable = *m_context.renderableByIndex( rop.bits.renderable );
 
         for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
             Renderer::VertexBufferWPtr vertexBuffer = renderable.vertexBuffer( j );
@@ -318,7 +320,7 @@ void Rvm::execute( const Commands& commands )
         #if !DEV_DISABLE_DRAW_CALLS
             m_hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( j ), 0, renderable.indexBuffer( j )->size() );
         #endif
-        }        
+        }
     }
 
     // Reset active state
@@ -331,6 +333,9 @@ void Rvm::execute( const Commands& commands )
 // ** Rvm::reset
 void Rvm::reset( void )
 {
+    // Reset lighting shaders
+    memset( m_shaders, 0, sizeof( m_shaders ) );
+
 	// Reset rasterization options
 	m_rasterization[RenderOpaque]       = RasterizationOptions::opaque();
 	m_rasterization[RenderCutout]       = RasterizationOptions::cutout();

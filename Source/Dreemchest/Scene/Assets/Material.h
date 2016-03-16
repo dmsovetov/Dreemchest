@@ -99,12 +99,6 @@ namespace Scene {
 		//! Sets the diffuse material texture.
 		void						setDiffuse( ImageHandle value );
 
-        //! Returns the material shader.
-        ShaderHandle                shader( void ) const;
-
-        //! Sets the material shader.
-        void                        setShader( ShaderHandle value );
-
 	private:
 
 		//! Updates material features.
@@ -113,7 +107,6 @@ namespace Scene {
 	private:
 
 		LightingModel				m_lightingModel;			    //!< Material lighting model.
-        ShaderHandle                m_shader;                       //!< Material shader handle.
 		RenderingMode				m_renderingMode;				//!< Material blending.
         bool                        m_isTwoSided;                   //!< Indicates that material is two-sided.
 		u32							m_features;						//!< Used material features.

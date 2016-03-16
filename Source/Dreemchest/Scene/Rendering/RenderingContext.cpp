@@ -48,10 +48,10 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 
     // Create default assets
     {
-        UberShaderHandle pink = createShader( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
+        ShaderHandle pink = createShader( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
         pink.asset().setName( "Placeholder.shader" );
         pink.forceLoad();
-        m_assets.setPlaceholder<UberShader>( pink );
+        m_assets.setPlaceholder<Shader>( pink );
     }
 
     {
@@ -82,10 +82,10 @@ SceneWPtr RenderingContext::scene( void ) const
 }
 
 // ** RenderingContext::createShader
-ShaderHandle RenderingContext::createShader( const String& fileName )
+ShaderHandle RenderingContext::createShader( const String& identifier, const String& fileName )
 {
     // First lookup a previously created shader by a file name
-    ShaderHandle shader = m_assets.find<Shader>( fileName );
+    ShaderHandle shader = m_assets.find<Shader>( identifier );
 
     if( shader.isValid() ) {
         return shader;
@@ -95,39 +95,9 @@ ShaderHandle RenderingContext::createShader( const String& fileName )
     shader = m_assets.add<Shader>( fileName, DC_NEW ShaderFormatText( fileName ) );
 
     // Set the shader name
-    shader.asset().setName( fileName );
+    shader.asset().setName( identifier + ".shader" );
 
     return shader;
-}
-
-// ** RenderingContext::createTechnique
-TechniqueHandle RenderingContext::createTechnique( const String& identifier, const String& shader )
-{
-    // First lookup a previously created technique by it's identifier.
-    TechniqueHandle technique = m_assets.find<Technique>( identifier );
-
-    if( technique.isValid() ) {
-        return technique;
-    }
-
-    // No such technique - create a new one
-    technique = m_assets.add<Technique>( identifier, DC_NEW Assets::NullSource );
-    technique.forceLoad();
-
-    // Set an asset name same as identifier
-    technique.asset().setName( identifier + ".technique" );
-
-    // Get the technique shader
-    ShaderHandle shaderHandle = createShader( shader );
-    shaderHandle.forceLoad();
-
-    // Set it's shader
-    Assets::WriteLock<Technique> locked = technique.writeLock();
-    locked->setProgram( programByIndex( requestProgram( shaderHandle, 0 ) ) );
-    technique.forceLoad();
-    const_cast<ProgramHandle&>( locked->program() ).forceLoad();
-
-    return technique;
 }
 
 // ** RenderingContext::begin

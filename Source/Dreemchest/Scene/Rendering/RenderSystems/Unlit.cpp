@@ -34,14 +34,13 @@ namespace Scene {
 Unlit::Unlit( RenderingContext& context )
     : RenderSystem( context )
 {
-    // Create the default technique
-    m_technique = context.createTechnique( "unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
-    m_technique.writeLock()->setColor( 0, Rgba( 1.0f, 1.0f, 1.0f ) );
+    // Create the shader instance
+    m_shader = context.createShader( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
 
     // Create render operation emitters
-    m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit, 0 );
-    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit, 0 );
-    m_additive      = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit, 0 );
+    m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
+    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit );
+    m_additive      = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
 }
 
 // ** Unlit::emitRenderOperations
@@ -51,8 +50,7 @@ void Unlit::emitRenderOperations( const Ecs::Entity& entity, const Camera& camer
     Commands& commands = m_context.commands();
 
     // Set the default technique
-    const Technique& tech = m_technique.readLock();
-    commands.emitPushTechnique( m_technique );
+    commands.emitLightingShader( AllLightingModelsBit, m_shader.readLock() );
 
     // Emit operations for opaque objects
     commands.emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
@@ -66,9 +64,6 @@ void Unlit::emitRenderOperations( const Ecs::Entity& entity, const Camera& camer
     // Emit operations for additive objects
     commands.emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
     m_additive->emit( transform.position() );
-
-    // Pop the default technique
-    commands.emitPopTechnique();
 }
 
 } // namespace Scene

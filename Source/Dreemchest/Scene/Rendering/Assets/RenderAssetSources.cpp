@@ -123,6 +123,8 @@ bool TextureImageSource::constructFromAsset( const Image& image, Assets::Assets&
     return true;
 }
 
+#if DEV_DEPRECATED_PROGRAM
+
 // ----------------------------------------------------------------------- ProgramShaderSource ----------------------------------------------------------------------- //
 
 // ** ProgramShaderSource::ProgramShaderSource
@@ -190,6 +192,8 @@ bool ProgramShaderSource::constructFromAsset( const Shader& shader, Assets::Asse
 	return true;
 }
 
+#endif
+
 // ----------------------------------------------------------------------- TechniqueMaterialSource ----------------------------------------------------------------------- //
 
 // ** TechniqueMaterialSource::TechniqueMaterialSource
@@ -201,16 +205,21 @@ TechniqueMaterialSource::TechniqueMaterialSource( MaterialHandle material, Rende
 // ** TechniqueMaterialSource::constructFromAsset
 bool TechniqueMaterialSource::constructFromAsset( const Material& material, Assets::Assets& assets, Technique& technique )
 {
-    // Get the material shader
-    ShaderHandle shader = material.shader();
-    DC_BREAK_IF( !shader.isLoaded(), "material shader is not loaded" );
+    // Set the technique features
+    technique.setFeatures( material.features() );
 
-    // Set the technique program
-    technique.setProgram( m_context->programByIndex( m_context->requestProgram( shader, material.features() ) ) );
+    // Set the lighting model of a technique
+    technique.setLightingModel( material.lightingModel() );
 
-    // Set technique colors
+    // Set technique colors & textures
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
-        technique.setColor( i, material.color( static_cast<Material::Layer>( i ) ) );
+        Material::Layer layer = static_cast<Material::Layer>( i );
+        technique.setColor( i, material.color( layer ) );
+
+        ImageHandle image = material.texture( layer );
+        if( image.isValid() ) {
+            technique.setTexture( i, m_context->textureByIndex( m_context->requestTexture( image ) ) );
+        }
     }
 
     return true;

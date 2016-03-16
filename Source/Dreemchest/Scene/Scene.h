@@ -131,9 +131,6 @@ namespace Scene {
     //! Shader handle type.
     typedef Assets::GenericHandle<class Shader> ShaderHandle;
 
-    //! Shader program handle type.
-    typedef Assets::GenericHandle<class Program> ProgramHandle;
-
 	//! Available rendering modes.
 	enum RenderingMode {
 		  RenderOpaque		//!< Renders opaque.
@@ -503,6 +500,7 @@ DC_END_DREEMCHEST
 	    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
     #else
         #include "Rendering/RenderingContext.h"
+        #include "Rendering/RenderSystems/Unlit.h"
         #include "Rendering/RenderSystems/DepthComplexity.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif

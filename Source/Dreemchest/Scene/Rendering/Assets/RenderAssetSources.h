@@ -84,6 +84,7 @@ namespace Scene {
         RenderingContextWPtr    m_context;  //!< Parent context instance.   
     };
 
+#if DEV_DEPRECATED_PROGRAM
     //! Compiles the shader permutation instance.
     class ProgramShaderSource : public Assets::AssetSource<Program, Shader> {
     public:
@@ -100,6 +101,7 @@ namespace Scene {
 
         RenderingContextWPtr    m_context;  //!< Parent context instance.    
     };
+#endif
 
     //! Loads a shader from a text file
     class ShaderFormatText : public Assets::FileSource<Shader> {

@@ -92,11 +92,33 @@ namespace Scene {
     class Shader {
     public:
 
+        //! Available shader input indices
+        enum Input {
+              ViewProjection        //!< The view-projection matrix input.
+            , Transform             //!< The model matrix input.
+            , Color                 //!< The constant color input.
+            , Texture0              //!< Texture 0 sampler input.
+            , Texture1              //!< Texture 1 sampler input.
+            , Texture2              //!< Texture 2 sampler input.
+            , Texture3              //!< Texture 3 sampler input.
+            , Color0                //!< Color 0 input.
+            , Color1                //!< Color 1 input.
+            , Color2                //!< Color 2 input.
+            , Color3                //!< Color 3 input.
+            , TotalInputs           //!< The total number of shader inputs.
+        };
+
 		//! A single shader feature.
 		struct Feature {
-			u32						mask;		//!< Feature mask.
-			String					name;		//!< Feature name.
+			u32						mask;		    //!< Feature mask.
+			String					name;		    //!< Feature name.
 		};
+
+        //! A single shader permutation.
+        struct Permutation {
+            Renderer::ShaderPtr     shader;         //!< Compiled shader program.
+            u8                      locations[11];  //!< Cached program input locations.
+        };
 
         //! Returns vertex shader source code.
         const String&               vertex( void ) const;
@@ -119,13 +141,30 @@ namespace Scene {
         //! Returns the shader feature by index.
         const Feature&              feature( s32 index ) const;
 
+        //! Returns a shader permutation with specified feature set.
+        const Permutation&          permutation( Renderer::HalWPtr hal, u32 features ) const;
+
     private:
 
-        String                      m_vertex;   //!< Vertex shader source.
-        String                      m_fragment; //!< Fragment shader source.
-        Array<Feature>              m_features; //!< Shader features.
+        //! Compiles a shader permutation with specified features.
+        bool                        compile( Renderer::HalWPtr hal, Permutation& permutation, u32 features ) const;
+
+    private:
+
+        //! Container type to map from a feature set to a compiled shader program.
+    #ifdef DC_CPP11_DISABLED
+        typedef Map<u32, Permutation> Permutations;
+    #else
+        typedef std::unordered_map<u32, Permutation> Permutations;
+    #endif  /*  DC_CPP11_DISABLED   */
+
+        String                      m_vertex;       //!< Vertex shader source.
+        String                      m_fragment;     //!< Fragment shader source.
+        Array<Feature>              m_features;     //!< Shader features.
+        mutable Permutations        m_permutations; //!< Compiled permutations are stored here.
     };
 
+#if DEV_DEPRECATED_PROGRAM
     //! Shader program stores a compiled version of shader with it's feature set.
     class Program {
     public:
@@ -173,10 +212,14 @@ namespace Scene {
         Renderer::ShaderPtr         m_shader;                   //!< The compiled shader instance.
         u32                         m_locations[TotalInputs];   //!< Program input locations.
     };
+#endif
 
     //! Technique asset stores textures, shaders & constants used by a material.
     class Technique {
     public:
+
+                                    //! Constructs Technique instance.
+                                    Technique( void );
 
         //! Returns the total number of textures.
         s32                         textureCount( void ) const;
@@ -187,11 +230,17 @@ namespace Scene {
         //! Sets material texture.
         void                        setTexture( s32 index, TextureHandle value );
 
-        //! Returns the material shader.
-        const ProgramHandle&        program( void ) const;
+        //! Returns material features.
+        u32                         features( void ) const;
 
-        //! Sets the material shader.
-        void                        setProgram( ProgramHandle value );
+        //! Sets material features.
+        void                        setFeatures( u32 value );
+
+        //! Returns the lighting model.
+        LightingModel               lightingModel( void ) const;
+
+        //! Sets the lighting model.
+        void                        setLightingModel( LightingModel value );
 
         //! Returns the total number of constant colors.
         s32                         colorCount( void ) const;
@@ -204,7 +253,8 @@ namespace Scene {
 
     private:
 
-        ProgramHandle               m_program;                  //!< Technique shader program instance.
+        u32                         m_features;                 //!< Shader features inheritted from material.
+        LightingModel               m_lightingModel;            //!< Lighting model inheritted from a material.
         Array<TextureHandle>        m_textures;                 //!< Textures used by material.
         Array<Rgba>                 m_colors;                   //!< Constant colors.
     };

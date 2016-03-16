@@ -63,9 +63,8 @@ void Commands::dump( void ) const
           "pushRenderTarget"
         , "popRenderTarget"
         , "rasterOptions" 
-        , "pushProgram"
-        , "popProgram"
         , "constantColor"
+        , "shader"
     };
     CString modes[] = {
 		  "opaque"
@@ -161,23 +160,16 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
     userData->rasterization.modes = renderingModes;
 }
 
-// ** Commands::emitPushTechnique
-void Commands::emitPushTechnique( TechniqueHandle value )
+// ** Commands::emitLightingShader
+void Commands::emitLightingShader( u8 models, const Shader& shader )
 {
     Rop* rop = allocateRop();
-    rop->setCommand( Rop::PushTechnique );
+    rop->setCommand( Rop::Shader );
     rop->bits.sequence = m_sequence++;
 
     UserData* userData = allocateUserData( rop );
-    userData->technique = &value.readLock();
-}
-
-// ** Commands::emitPopTechnique
-void Commands::emitPopTechnique( void )
-{
-    Rop* rop = allocateRop();
-    rop->setCommand( Rop::PopTechnique );
-    rop->bits.sequence = ++m_sequence;
+    userData->shader.shader = &shader;
+    userData->shader.models = models;
 }
 
 // ** Commands::emitConstantColor

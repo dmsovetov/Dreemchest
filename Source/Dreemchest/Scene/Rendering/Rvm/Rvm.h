@@ -57,7 +57,7 @@ namespace Scene {
         void                            setRenderable( s32 value );
 
         //! Sets the active program.
-        void                            setProgram( const Program* value );
+        void                            setProgram( const Shader::Permutation& value );
 
         //! Sets the instance data.
         void                            setInstance( const Commands::InstanceData& instance );
@@ -82,14 +82,14 @@ namespace Scene {
             s32                         renderable;         //!< Active renderable.
             u8                          renderingMode;      //!< Active rendering mode.
             Renderer::TriangleFace      culling;            //!< Active culling mode.
-            const Program*              program;            //!< Active program.
+            Shader::Permutation*        program;            //!< Active shader program permutation.
             Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
         };
 
         RenderingContext&               m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
         Stack<Commands::RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
-        Stack<const Technique*>         m_techniques;       //!< If no technique is associated with draw call, the technique from a top of this stack will be used.
+        const Shader*                   m_shaders[TotalLightingModels];     //!< Shader to used for each lighting model.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.
         Vec4                            m_constantColor;    //!< Constant color.
