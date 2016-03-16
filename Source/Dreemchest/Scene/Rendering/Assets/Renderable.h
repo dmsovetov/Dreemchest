@@ -140,18 +140,24 @@ namespace Scene {
 
         //! Available shader input indices
         enum Input {
-              ViewProjection        //!< The view-projection matrix input.
-            , Transform             //!< The model matrix input.
-            , Color                 //!< The constant color input.
-            , Texture0              //!< Texture 0 sampler input.
-            , Texture1              //!< Texture 1 sampler input.
-            , Texture2              //!< Texture 2 sampler input.
-            , Texture3              //!< Texture 3 sampler input.
-            , Color0                //!< Color 0 input.
-            , Color1                //!< Color 1 input.
-            , Color2                //!< Color 2 input.
-            , Color3                //!< Color 3 input.
-            , TotalInputs           //!< The total number of shader inputs.
+              ViewProjection            //!< The view-projection matrix input.
+            , Transform                 //!< The model matrix input.
+            , Color                     //!< The constant color input.
+            , DiffuseTexture            //!< Diffuse texture sampler input.
+            , SpecularTexture           //!< Specular texture sampler input.
+            , NormalTexture             //!< Normal texture sampler input.
+            , HeightmapTexture          //!< Heightmap texture sampler input.
+            , AmbientOcclusionTexture   //!< AO texture sampler input.
+            , EmissionTexture           //!< Emission texture sampler input.
+            , DiffuseDetailTexture      //!< Diffuse detail texture sampler input.
+            , NormalDetailTexture       //!< Normal detail texture sampler input.
+            , TintTexture               //!< Tint texture sampler input.
+            , DiffuseColor              //!< Diffuse color input.
+            , SpecularColor             //!< Specular color input.
+            , AmbientColor              //!< Ambient color input.
+            , EmissionColor             //!< Emission color input.
+            , TintColor                 //!< Tint color input.
+            , TotalInputs               //!< The total number of shader inputs.
         };
 
                                     //! Constructs the Program instance.

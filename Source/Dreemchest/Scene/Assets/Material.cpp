@@ -126,9 +126,13 @@ void Material::updateMaterialFeatures( void )
 {
 	m_features = 0;
 
-	if( m_texture[Diffuse].isValid() ) {
-		m_features |= FeatureDiffuse;
-	}
+    for( s32 i = 0; i < TotalMaterialLayers; i++ ) {
+	    if( m_texture[i].isValid() ) {
+		    m_features |= BIT( i );
+	    }    
+    }
+
+    m_features |= PrimaryUvBit;
 }
 
 } // namespace Scene

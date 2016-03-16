@@ -37,11 +37,6 @@ namespace Scene {
 	class Material {
 	public:
 
-		//! Material features.
-		enum Feature {
-			  FeatureDiffuse	= BIT( 0 )
-		};
-
 		//! Material layers.
         enum Layer {
               Diffuse				//!< Diffuse color layer.
@@ -56,6 +51,20 @@ namespace Scene {
 
             , TotalMaterialLayers	//!< The total number of material layers.
         };
+
+		//! Material feature bitmasks.
+		enum Feature {
+              DiffuseBit	        = BIT( Diffuse )            //!< Diffuse color layer.
+            , SpecularBit	        = BIT( Specular )           //!< Specular color layer.
+			, NormalBit		        = BIT( Normal )             //!< Normal map layer.
+			, HeightmapBit	        = BIT( Heightmap )          //!< Heightmap layer.
+			, AmbientOcclusionBit   = BIT( AmbientOcclusion )   //!< Ambient occlusion layer.
+			, EmissionBit		    = BIT( Emission )			//!< Emission color layer.
+			, DiffuseDetailBit	    = BIT( DiffuseDetail )	    //!< Diffuse map detail layer.
+			, NormalDetailBit	    = BIT( NormalDetail )	    //!< Normal map detail layer.
+			, TintBit	            = BIT( Tint )			    //!< Tint color layer.
+            , PrimaryUvBit          = BIT( Tint + 1 )           //!< Material has primary UV layer.
+		};
 
 									//! Constructs Material instance.
 									Material( void );

@@ -163,14 +163,20 @@ bool ProgramShaderSource::constructFromAsset( const ShaderSource& shader, Assets
           "u_vp"
         , "u_transform"
         , "u_color"
-        , "u_tex0"
-        , "u_tex1"
-        , "u_tex2"
-        , "u_tex3"
-        , "u_clr0"
-        , "u_clr1"
-        , "u_clr2"
-        , "u_clr3"
+        , "u_diffuseTexture"
+        , "u_specularTexture"
+        , "u_normalTexture"
+        , "u_heightmapTexture"
+        , "u_ambientOcclusionTexture"
+        , "u_emissionTexture"
+        , "u_diffuseDetailTexture"
+        , "u_normalDetailTexture"
+        , "u_tintTexture"
+        , "u_diffuseColor"
+        , "u_specularColor"
+        , "u_ambientColor"
+        , "u_emissionColor"
+        , "u_tintColor"
     };
 
     NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Program::TotalInputs, "missing program input names" );
@@ -181,7 +187,12 @@ bool ProgramShaderSource::constructFromAsset( const ShaderSource& shader, Assets
     // Locate all shader inputs
     for( s32 i = 0; i < Program::TotalInputs; i++ ) {
         // Find the input location
-        program.setInputLocation( static_cast<Program::Input>( i ), compiled->findUniformLocation( inputs[i] ) );
+        u32 location = compiled->findUniformLocation( inputs[i] );
+
+        if( location ) {
+            program.setInputLocation( static_cast<Program::Input>( i ), location );
+            LogVerbose( "program", "%s '%s' is bound to %d\n", m_asset.asset().name().c_str(), inputs[i], location );
+        }
     }
 
 	return true;

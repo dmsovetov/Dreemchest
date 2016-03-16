@@ -64,25 +64,57 @@ void Rvm::setTechnique( s32 value )
     u32 location;
 
     // Bind texture samplers used by technique
-    for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = program.inputLocation( static_cast<Program::Input>( Program::Texture0 + i ) ) ) {
-            const Texture& texture = *technique.texture( i );
+    struct {
+        Program::Input  input;  //!< Program input index.
+        Material::Layer layer;  //!< Material layer index.
+    } samplerInputs[] = {
+          { Program::DiffuseTexture,            Material::Diffuse }
+        , { Program::SpecularTexture,           Material::Specular }
+        , { Program::NormalTexture,             Material::Normal }
+        , { Program::HeightmapTexture,          Material::Heightmap }
+        , { Program::AmbientOcclusionTexture,   Material::AmbientOcclusion }
+        , { Program::EmissionTexture,           Material::Emission }
+        , { Program::DiffuseDetailTexture,      Material::DiffuseDetail }
+        , { Program::NormalDetailTexture,       Material::NormalDetail }
+        , { Program::TintTexture,               Material::Tint }
+    };
+
+    s32 samplersUsed = 0;
+
+    for( s32 i = 0, n = technique.textureCount(); i < sizeof( samplerInputs ) / sizeof( samplerInputs[0] ); i++ ) {
+        if( location = program.inputLocation( samplerInputs[i].input ) ) {
+            const Texture& texture = *technique.texture( samplerInputs[i].layer );
         #if !DEV_DISABLE_DRAW_CALLS
-            program.shader()->setInt( location, i );
-            m_hal->setTexture( i, texture.texture().get() );
+            program.shader()->setInt( location, samplersUsed );
+            m_hal->setTexture( samplersUsed, texture.texture().get() );
+            samplersUsed++;
         #endif
         }
     }
 
     // Set colors exposed by a material
-    for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
-        if( location = program.inputLocation( static_cast<Program::Input>( Program::Color0 + i ) ) ) {
-            const Rgba& color = technique.color( i );
+    struct {
+        Program::Input  input;  //!< Program input index.
+        Material::Layer layer;  //!< Material layer index.
+    } colorInputs[] = {
+          { Program::DiffuseColor,  Material::Diffuse }
+        , { Program::SpecularColor, Material::Specular }
+        , { Program::EmissionColor, Material::Emission }
+        , { Program::TintColor,     Material::Tint }
+    };
+
+    for( s32 i = 0, n = technique.colorCount(); i < sizeof( colorInputs ) / sizeof( colorInputs[0] ); i++ ) {
+        if( location = program.inputLocation( colorInputs[i].input ) ) {
+            const Rgba& color = technique.color( colorInputs[i].layer );
         #if !DEV_DISABLE_DRAW_CALLS
             program.shader()->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
         #endif
         }
     }
+
+#if !DEV_DISABLE_DRAW_CALL
+    program.shader()->setVec4( program.inputLocation( Program::AmbientColor ), Vec4( 0.4f, 0.4f, 0.4f ) );
+#endif
 }
 
 // ** Rvm::setRenderable
@@ -367,6 +399,9 @@ void Rvm::reset( void )
 
 	// Enable the depth test back
 	m_hal->setDepthTest( true, Renderer::LessEqual );
+
+    // Disable the alpha test
+    m_hal->setAlphaTest( Renderer::CompareDisabled );
 #endif
 }
 

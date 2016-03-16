@@ -347,6 +347,7 @@ namespace Scene {
         // Create new program asset
         ProgramHandle program = m_assets.add<Program>( shader.asset().uniqueId() + ".program." + toString( features ), DC_NEW ProgramShaderSource( shader, this ) );
         program.asset().setName( shader.asset().uniqueId() + ".program." + toString( features ) );
+        program.writeLock()->setFeatures( features );
         m_permutations[hash] = program;
 
         return m_permutations[hash];
