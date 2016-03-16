@@ -43,12 +43,13 @@ Asset::Asset( void )
 }
 
 // ** Asset::Asset
-Asset::Asset( const TypeId& type, void* cache, const AssetId& uniqueId, SourceUPtr source )
+Asset::Asset( const TypeId& type, void* cache, const Index& data, const AssetId& uniqueId, SourceUPtr source )
     : m_source( source )
     , m_type( type )
     , m_uniqueId( uniqueId )
     , m_state( Unloaded )
     , m_cache( cache )
+    , m_data( data )
     , m_lastConstructed( 0 )
     , m_lastModified( 0 )
     , m_lastUsed( 0 )
@@ -158,8 +159,14 @@ Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr
     AbstractAssetCache* cache = findAssetCache( type );
     DC_BREAK_IF( !cache, "no cache for this type of asset" );
 
+    // Reserve asset data index.
+    Index data = reserveAssetData( type );
+
+    // Setup a new asset
+    Asset asset( type, cache, data, uniqueId, source );
+
     // First reserve the slot for an asset data.
-    Index index = m_assets.add( Asset( type, cache, uniqueId, source ) );
+    Index index = m_assets.add( asset );
 
     // Now register unique id associated with this asset slot.
     m_indexById[uniqueId] = index;
@@ -240,36 +247,34 @@ Assets::AbstractAssetCache* Assets::findAssetCache( const TypeId& type ) const
 }
 
 // ** Assets::loadAssetToCache
-bool Assets::loadAssetToCache( Asset& asset )
+bool Assets::loadAssetToCache( Handle asset )
 {
-    if( asset.state() != Asset::Unloaded ) {
+    if( asset->state() == Asset::Unloaded ) {
         return true;
     }
 
     // Perform loading
-    LogVerbose( "cache", "loading '%s'...\n", asset.name().c_str() );
+    LogVerbose( "cache", "loading '%s'...\n", asset->name().c_str() );
 
     // Switch to Loading state
-    asset.switchToState( Asset::Loading );
-
-    // Reserve asset data before loading
-    if( !asset.hasData() ) {
-        asset.setData( reserveAssetData( asset.type() ) );
-    }
+    asset->switchToState( Asset::Loading );
 
     // Get the asset format
-    AbstractSource* source = asset.source();
+    AbstractSource* source = asset->source();
     DC_ABORT_IF( source == NULL, "invalid asset source" );
 
     // Parse asset
-    Handle handle = createHandle( asset );
-    bool   result = source->construct( *this, handle );
+    bool result = source->construct( *this, asset );
+
+    if( !result ) {
+        LogWarning( "cache", "'%s' was failed to load\n", asset->name().c_str() );
+    }
 
     // Switch to a Loaded or Error state
-    asset.switchToState( result ? Asset::Loaded : Asset::Error );
+    asset->switchToState( result ? Asset::Loaded : Asset::Error );
 
     // Update the last constructed time stamp
-    asset.m_lastConstructed = Time::current();
+    asset->m_lastConstructed = Time::current();
 
     return result;
 }
@@ -317,7 +322,7 @@ void Assets::update( f32 dt )
         m_loadingQueue.pop_front();
 
         // Load an asset to cache
-        loadAssetToCache( handle.asset() );
+        loadAssetToCache( handle );
     }
 }
 

@@ -113,7 +113,7 @@ namespace Assets {
     private:
 
                                     //! Constructs Asset instance.
-                                    Asset( const TypeId& type, void* cache, const AssetId& uniqueId, SourceUPtr source );
+                                    Asset( const TypeId& type, void* cache, const Index& value, const AssetId& uniqueId, SourceUPtr source );
 
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
@@ -238,7 +238,7 @@ namespace Assets {
         void                        releaseWriteLock( const Handle& asset );
 
         //! Loads an asset data to a cache.
-        bool                        loadAssetToCache( Asset& asset );
+        bool                        loadAssetToCache( Handle asset );
 
     private:
 
