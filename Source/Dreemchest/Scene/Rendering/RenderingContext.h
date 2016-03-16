@@ -162,6 +162,9 @@ namespace Scene {
         //! Returns texture index for a specified image asset.
         s32                                 requestTexture( const ImageHandle& handle );
 
+        //! Returns shader source index for a specified handle.
+        s32                                 requestShaderSource( const ShaderSourceHandle& handle );
+
         //! Returns renderable handle by index.
         const RenderableHandle&             renderableByIndex( s32 index ) const;
 
@@ -171,8 +174,14 @@ namespace Scene {
         //! Returns texture handle by index.
         const TextureHandle&                textureByIndex( s32 index ) const;
 
+        //! Returns shader source handle by index.
+        const ShaderSourceHandle&           shaderByIndex( u32 index ) const;
+
         //! Creates a new shader instance.
-        ShaderSourceHandle                  createShader( const String& identifier, const String& fileName );
+        ShaderSourceHandle                  createShaderSource( const String& identifier, const String& fileName );
+
+        //! Creates a shader program with a specified feature set.
+        const ProgramHandle&                requestProgram( u32 source, u32 features );
 
         //! Returns the command buffer instance.
         Commands&                           commands( void );
@@ -200,6 +209,19 @@ namespace Scene {
         //! Texture asset cache.
         typedef RenderAssetCache<Image, Texture, TextureImageSource> TextureCache;
 
+        //! Container type to store all created shader permutations.
+    #ifdef DC_CPP11_DISABLED
+        typedef Map<u64, ProgramHandle> Permutations;
+        typedef Map<ShaderSourceHandle, u32> ShaderSourceIndices;
+    #else
+        struct Hash {
+            size_t operator()( ShaderSourceHandle const & key ) const { return key.index(); }
+        };
+
+        typedef std::unordered_map<u64, ProgramHandle> Permutations;
+        typedef std::unordered_map<ShaderSourceHandle, u32, Hash> ShaderSourceIndices;
+    #endif
+
         Renderer::HalWPtr                   m_hal;              //!< Parent HAL instance.
         RvmUPtr                             m_rvm;              //!< Internal rvm instance.
         CommandsUPtr                        m_commands;         //!< Internal rvm command buffer.
@@ -210,6 +232,10 @@ namespace Scene {
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
         TextureCache                        m_textures;
+
+        Permutations                        m_permutations;         //!< All created shader permutations.
+        ShaderSourceIndices                 m_shaderSourceIndices;  //!< Maps from a shader source to it's index.
+        Array<ShaderSourceHandle>           m_shaderSources;
 	};
 
 	// ** RenderingContext::addRenderSystem
@@ -262,6 +288,68 @@ namespace Scene {
     {
         DC_ABORT_IF( index <= 0 || index > m_textures.count(), "index is out of range" );
         return m_textures.handles()[index - 1];
+    }
+
+    // ** RenderingContext::shaderByIndex
+    NIMBLE_INLINE const ShaderSourceHandle& RenderingContext::shaderByIndex( u32 index ) const
+    {
+        DC_BREAK_IF( index <= 0 || index > static_cast<u32>( m_shaderSources.size() ), "index is out of range" );
+        return m_shaderSources[index - 1];
+    }
+
+    // ** RenderingContext::requestShaderSource
+    NIMBLE_INLINE s32 RenderingContext::requestShaderSource( const ShaderSourceHandle& handle )
+    {
+        handle.readLock();
+
+        ShaderSourceIndices::const_iterator i = m_shaderSourceIndices.find( handle );
+
+        if( i != m_shaderSourceIndices.end() ) {
+            DC_BREAK_IF( i->first.index() != handle.index(), "outdated shader source item" );
+            return i->second + 1;
+        }
+
+        u32 count = static_cast<u32>( m_shaderSources.size() );
+        u32 index = count;
+
+        // Resize an array of renderable assets
+        if( index >= count ) {
+            m_shaderSources.resize( index + 1 );
+        }
+
+        // Save this handle
+        m_shaderSourceIndices[handle] = index;
+        m_shaderSources[index]        = handle;
+
+        return index + 1;
+    }
+
+    // ** RenderingContext::requestProgram
+    NIMBLE_INLINE const ProgramHandle& RenderingContext::requestProgram( u32 source, u32 features )
+    {
+        DC_BREAK_IF( source == 0, "invalid shader source" );
+
+        // Create the permutation hash key
+        u64 hash = static_cast<u64>( source ) << 32 | features;
+
+        // First lookup the permutation cache
+        Permutations::const_iterator i = m_permutations.find( hash );
+
+        // Found - return a program
+        if( i != m_permutations.end() ) {
+            return i->second;
+        }
+
+        // Create new permutation
+        const ShaderSourceHandle& shader = shaderByIndex( source );
+        DC_BREAK_IF( !shader.isValid(), "invalid shader source" );
+
+        // Create new program asset
+        ProgramHandle program = m_assets.add<Program>( shader.asset().uniqueId() + ".program." + toString( features ), DC_NEW ProgramShaderSource( shader, this ) );
+        program.asset().setName( shader.asset().uniqueId() + ".program." + toString( features ) );
+        m_permutations[hash] = program;
+
+        return m_permutations[hash];
     }
 
 } // namespace Scene

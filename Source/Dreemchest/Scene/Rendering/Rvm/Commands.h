@@ -103,7 +103,7 @@ namespace Scene {
         //! Lighting model shader to be used.
         struct LightingModelShader {
             u8                          models;         //!< The bitmask of models that are eligible to use this shader.
-            const ShaderSource*         shader;         //!< Shader instance.
+            s32                         shader;         //!< Shader instance.
         };
 
         //! User data used by rendering commands.
@@ -151,7 +151,7 @@ namespace Scene {
         void                            emitRasterOptions( u8 renderingModes, const RasterizationOptions& options );
 
         //! Emits the lighting shader setup command.
-        void                            emitLightingShader( u8 models, const ShaderSource& shader );
+        void                            emitLightingShader( u8 models, s32 shader );
 
         //! Emits the constant color operation.
         void                            emitConstantColor( const Rgba& value );

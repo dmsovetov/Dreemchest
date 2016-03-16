@@ -161,14 +161,14 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
 }
 
 // ** Commands::emitLightingShader
-void Commands::emitLightingShader( u8 models, const ShaderSource& shader )
+void Commands::emitLightingShader( u8 models, s32 shader )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::Shader );
     rop->bits.sequence = m_sequence++;
 
     UserData* userData = allocateUserData( rop );
-    userData->shader.shader = &shader;
+    userData->shader.shader = shader;
     userData->shader.models = models;
 }
 

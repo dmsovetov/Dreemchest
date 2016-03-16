@@ -64,6 +64,7 @@ Resources::Resources( void )
     registerType<Texture>();
     registerType<Technique>();
     registerType<ShaderSource>();
+    registerType<Program>();
 }
 
 // ** Scene::Scene

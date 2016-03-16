@@ -139,80 +139,6 @@ const ShaderSource::Feature& ShaderSource::feature( s32 index ) const
     return m_features[index];
 }
 
-// ** ShaderSource::permutation
-const ShaderSource::Permutation& ShaderSource::permutation( Renderer::HalWPtr hal, u32 features ) const
-{
-    // First lookup already compiled permutations
-    Permutations::iterator i = m_permutations.find( features );
-
-    // If found just return a reference to it.
-    if( i != m_permutations.end() ) {
-        return i->second;
-    }
-
-    // Compile the permutation.
-    m_permutations[features] = Permutation();
-    compile( hal, m_permutations[features], features );
-
-    return m_permutations[features];
-}
-
-// ** ShaderSource::compile
-bool ShaderSource::compile( Renderer::HalWPtr hal, Permutation& permutation, u32 features ) const
-{
-    DC_BREAK_IF( m_vertex.empty() || m_fragment.empty(), "the shader source is empty" );
-
-    permutation.shader = hal->createShader( m_vertex.c_str(), m_fragment.c_str() );
-
-	// Generate macro definitions from features
-	String macro = "";
-
-	for( u32 i = 0, n = featureCount(); i < n; i++ ) {
-        const Feature& feature = this->feature( i );
-
-		if( feature.mask & features ) {
-			macro += "#define " + feature.name + "\n";
-		}
-	}
-
-    LogVerbose( "shader", "compiling permutation %s\n", macro.c_str() );
-
-	// Compile the shader
-	permutation.shader = hal->createShader( (macro + m_vertex).c_str(), (macro + m_fragment).c_str() );
-    DC_BREAK_IF( !permutation.shader.valid() );
-
-    // Failed to compile - return false
-    if( !permutation.shader.valid() ) {
-        return false;
-    }
-
-    // Known program input names
-    CString inputs[] = {
-          "u_vp"
-        , "u_transform"
-        , "u_color"
-        , "u_tex0"
-        , "u_tex1"
-        , "u_tex2"
-        , "u_tex3"
-        , "u_clr0"
-        , "u_clr1"
-        , "u_clr2"
-        , "u_clr3"
-    };
-
-    NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == TotalInputs, "missing program input names" );
-
-    // Locate all shader inputs
-    for( s32 i = 0; i < TotalInputs; i++ ) {
-        // Find the input location
-        permutation.locations[i] = permutation.shader->findUniformLocation( inputs[i] );
-    }
-
-	return true;
-}
-
-#if DEV_DEPRECATED_PROGRAM
 // ------------------------------------------------------------ Program ------------------------------------------------------------ //
 
 // ** Program::Program
@@ -256,7 +182,6 @@ void Program::setShader( Renderer::ShaderPtr value )
 {
     m_shader = value;
 }
-#endif
 
 // ----------------------------------------------------------------- Texture ----------------------------------------------------------------- //
 

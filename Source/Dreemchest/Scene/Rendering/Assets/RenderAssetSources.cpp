@@ -123,40 +123,40 @@ bool TextureImageSource::constructFromAsset( const Image& image, Assets::Assets&
     return true;
 }
 
-#if DEV_DEPRECATED_PROGRAM
-
 // ----------------------------------------------------------------------- ProgramShaderSource ----------------------------------------------------------------------- //
 
 // ** ProgramShaderSource::ProgramShaderSource
-ProgramShaderSource::ProgramShaderSource( ShaderHandle shader, RenderingContextWPtr context )
+ProgramShaderSource::ProgramShaderSource( ShaderSourceHandle shader, RenderingContextWPtr context )
     : AssetSource( shader ), m_context( context )
 {
 }
 
 // ** ProgramShaderSource::constructFromAsset
-bool ProgramShaderSource::constructFromAsset( const Shader& shader, Assets::Assets& assets, Program& program )
+bool ProgramShaderSource::constructFromAsset( const ShaderSource& shader, Assets::Assets& assets, Program& program )
 {
+    DC_BREAK_IF( shader.vertex().empty() || shader.fragment().empty(), "the shader source is empty" );
+
 	// Generate macro definitions from features
 	String macro = "";
 
 	for( u32 i = 0, n = shader.featureCount(); i < n; i++ ) {
-        const Shader::Feature& feature = shader.feature( i );
+        const ShaderSource::Feature& feature = shader.feature( i );
 
 		if( feature.mask & program.features() ) {
 			macro += "#define " + feature.name + "\n";
 		}
 	}
 
+    LogVerbose( "shader", "compiling permutation %s\n", macro.c_str() );
+
 	// Compile the shader
 	Renderer::ShaderPtr compiled = m_context->hal()->createShader( (macro + shader.vertex()).c_str(), (macro + shader.fragment()).c_str() );
+    DC_BREAK_IF( !compiled.valid() );
 
     // Failed to compile - return false
     if( !compiled.valid() ) {
         return false;
     }
-
-    // Save the compiled shader
-    program.setShader( compiled );
 
     // Known program input names
     CString inputs[] = {
@@ -175,24 +175,17 @@ bool ProgramShaderSource::constructFromAsset( const Shader& shader, Assets::Asse
 
     NIMBLE_STATIC_ASSERT( (sizeof( inputs ) / sizeof( inputs[0] )) == Program::TotalInputs, "missing program input names" );
 
+    // Set the program shader
+    program.setShader( compiled );
+
     // Locate all shader inputs
     for( s32 i = 0; i < Program::TotalInputs; i++ ) {
         // Find the input location
-        u32 location = compiled->findUniformLocation( inputs[i] );
-
-        if( !location ) {
-            continue;
-        }
-
-        // Save the location index
-        program.setInputLocation( static_cast<Program::Input>( i ), location );
-        LogDebug( "program", "%s is bound to %d for shader %s\n", inputs[i], location, m_asset.asset().name().c_str() );
+        program.setInputLocation( static_cast<Program::Input>( i ), compiled->findUniformLocation( inputs[i] ) );
     }
 
 	return true;
 }
-
-#endif
 
 // ----------------------------------------------------------------------- TechniqueMaterialSource ----------------------------------------------------------------------- //
 

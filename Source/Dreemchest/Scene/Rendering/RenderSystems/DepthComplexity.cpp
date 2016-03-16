@@ -35,7 +35,7 @@ DepthComplexity::DepthComplexity( RenderingContext& context )
     : RenderSystem( context )
 {
     // Create the shader
-    m_shader = context.createShader( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
+    m_shader = context.createShaderSource( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
 
     // Create render operation emitters
     for( s32 i = 0; i < TotalRenderModes; i++ ) {
@@ -53,7 +53,8 @@ void DepthComplexity::emitRenderOperations( const Ecs::Entity& entity, const Cam
     commands.emitRasterOptions( AllRenderModesBit, RasterizationOptions::additive().overrideZWrite( true ) );
 
     // Set the default shader for all lighting models
-    commands.emitLightingShader( AllLightingModelsBit, m_shader.readLock() );
+    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_shader ) );
+    m_shader.readLock();
 
     // Emit operations for all rendering mode
     for( s32 i = 0; i < TotalRenderModes; i++ ) {

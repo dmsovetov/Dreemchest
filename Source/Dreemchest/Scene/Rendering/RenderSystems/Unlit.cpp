@@ -35,7 +35,7 @@ Unlit::Unlit( RenderingContext& context )
     : RenderSystem( context )
 {
     // Create the shader instance
-    m_shader = context.createShader( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
+    m_shader = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
 
     // Create render operation emitters
     m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
@@ -50,7 +50,7 @@ void Unlit::emitRenderOperations( const Ecs::Entity& entity, const Camera& camer
     Commands& commands = m_context.commands();
 
     // Set the default technique
-    commands.emitLightingShader( AllLightingModelsBit, m_shader.readLock() );
+    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_shader ) );
 
     // Emit operations for opaque objects
     commands.emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );

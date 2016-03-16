@@ -84,24 +84,22 @@ namespace Scene {
         RenderingContextWPtr    m_context;  //!< Parent context instance.   
     };
 
-#if DEV_DEPRECATED_PROGRAM
     //! Compiles the shader permutation instance.
-    class ProgramShaderSource : public Assets::AssetSource<Program, Shader> {
+    class ProgramShaderSource : public Assets::AssetSource<Program, ShaderSource> {
     public:
 
                                 //! Constructs ProgramShaderSource instance.
-                                ProgramShaderSource( ShaderHandle shader, RenderingContextWPtr context );
+                                ProgramShaderSource( ShaderSourceHandle shader, RenderingContextWPtr context );
 
     protected:
 
         //! Constructs a technique asset from a material source.
-        virtual bool            constructFromAsset( const Shader& shader, Assets::Assets& assets, Program& program ) DC_DECL_OVERRIDE;
+        virtual bool            constructFromAsset( const ShaderSource& shader, Assets::Assets& assets, Program& program ) DC_DECL_OVERRIDE;
 
     private:
 
         RenderingContextWPtr    m_context;  //!< Parent context instance.    
     };
-#endif
 
     //! Loads a shader source from a text file
     class ShaderSourceFormatText : public Assets::FileSource<ShaderSource> {
