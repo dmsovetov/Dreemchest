@@ -128,8 +128,8 @@ namespace Scene {
     //! Technique handle type.
     typedef Assets::GenericHandle<class Technique> TechniqueHandle;
 
-    //! Shader handle type.
-    typedef Assets::GenericHandle<class Shader> ShaderHandle;
+    //! ShaderSource handle type.
+    typedef Assets::GenericHandle<class ShaderSource> ShaderSourceHandle;
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -202,11 +202,6 @@ namespace Scene {
 	dcDeclarePtrs( RigidBody2D )
 
 	dcDeclarePtrs( RenderingContext )
-	dcDeclarePtrs( Rvm )
-	dcDeclarePtrs( RenderPassBase )
-	dcDeclarePtrs( RenderingSystemBase )
-	dcDeclarePtrs( Shader )
-	dcDeclarePtrs( RopEmitterBase )
 
 	dcDeclarePtrs( Vec3Binding )
 

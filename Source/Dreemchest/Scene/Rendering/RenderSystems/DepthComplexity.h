@@ -48,7 +48,7 @@ namespace Scene {
     private:
 
         RopEmitterUPtr          m_emitters[TotalRenderModes];   //!< Rop emitter for each of rendering modes.
-        ShaderHandle            m_shader;                       //!< This shader is used for all lighting models.
+        ShaderSourceHandle      m_shader;                       //!< This shader is used for all lighting models.
     };
 
 } // namespace Scene

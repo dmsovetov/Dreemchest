@@ -225,16 +225,16 @@ bool TechniqueMaterialSource::constructFromAsset( const Material& material, Asse
     return true;
 }
 
-// ----------------------------------------------------------------------- ShaderFormatText ----------------------------------------------------------------------- //
+// ----------------------------------------------------------------------- ShaderSourceFormatText ----------------------------------------------------------------------- //
 
-// ** ShaderFormatText::ShaderFormatText
-ShaderFormatText::ShaderFormatText( const String& fileName )
+// ** ShaderSourceFormatText::ShaderSourceFormatText
+ShaderSourceFormatText::ShaderSourceFormatText( const String& fileName )
 {
     setFileName( fileName );
 }
 
-// ** ShaderFormatText::constructFromStream
-bool ShaderFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Shader& shader )
+// ** ShaderSourceFormatText::constructFromStream
+bool ShaderSourceFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, ShaderSource& shader )
 {
 	static CString vertexShaderMarker   = "[VertexShader]";
 	static CString fragmentShaderMarker = "[FragmentShader]";

@@ -161,7 +161,7 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
 }
 
 // ** Commands::emitLightingShader
-void Commands::emitLightingShader( u8 models, const Shader& shader )
+void Commands::emitLightingShader( u8 models, const ShaderSource& shader )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::Shader );

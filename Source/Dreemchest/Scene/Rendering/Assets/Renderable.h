@@ -88,8 +88,8 @@ namespace Scene {
         Renderer::TexturePtr        m_texture;  //!< Texture 2D instance.
     };
 
-    //! Shader asset stores a source code for shader.
-    class Shader {
+    //! ShaderSource asset stores a source code for shader and permutation cache.
+    class ShaderSource {
     public:
 
         //! Available shader input indices

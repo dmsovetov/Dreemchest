@@ -52,8 +52,8 @@ void Rvm::setTechnique( s32 value )
     m_activeState.technique = value;
 
     // Get the shader permutation
-    const Shader& shader = *m_shaders[technique.lightingModel()];
-    Shader::Permutation& permutation = const_cast<Shader::Permutation&>( shader.permutation( m_hal, technique.features() ) );
+    const ShaderSource& shader = *m_shaders[technique.lightingModel()];
+    ShaderSource::Permutation& permutation = const_cast<ShaderSource::Permutation&>( shader.permutation( m_hal, technique.features() ) );
 
     // Set the permutation shader.
     setProgram( permutation );
@@ -62,7 +62,7 @@ void Rvm::setTechnique( s32 value )
 
     // Bind texture samplers used by technique
     for( s32 i = 0, n = technique.textureCount(); i < n; i++ ) {
-        if( location = permutation.locations[Shader::Texture0 + i] ) {
+        if( location = permutation.locations[ShaderSource::Texture0 + i] ) {
             const Texture& texture = *technique.texture( i );
         #if !DEV_DISABLE_DRAW_CALLS
             permutation.shader->setInt( location, i );
@@ -73,7 +73,7 @@ void Rvm::setTechnique( s32 value )
 
     // Set colors exposed by a material
     for( s32 i = 0, n = technique.colorCount(); i < n; i++ ) {
-        if( location = permutation.locations[Shader::Color0 + i] ) {
+        if( location = permutation.locations[ShaderSource::Color0 + i] ) {
             const Rgba& color = technique.color( i );
         #if !DEV_DISABLE_DRAW_CALLS
             permutation.shader->setVec4( location, Vec4( color.r, color.g, color.b, color.a ) );
@@ -93,7 +93,7 @@ void Rvm::setRenderable( s32 value )
 }
 
 // ** Rvm::setProgram
-void Rvm::setProgram( const Shader::Permutation& value )
+void Rvm::setProgram( const ShaderSource::Permutation& value )
 {
     // This program is already set
     if( &value == m_activeState.program ) {
@@ -115,28 +115,28 @@ void Rvm::setProgram( const Shader::Permutation& value )
     u32 location = 0;
 
     // Set the view-projection matrix input
-    if( location = value.locations[Shader::ViewProjection] ) {
+    if( location = value.locations[ShaderSource::ViewProjection] ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setMatrix( location, m_renderTarget.top().vp );
     #endif
     }
 
     // Set the constant color input
-    if( location = value.locations[Shader::Color] ) {
+    if( location = value.locations[ShaderSource::Color] ) {
     #if !DEV_DISABLE_DRAW_CALLS
         shader->setVec4( location, m_constantColor );
     #endif
     }
 
     // Save active program
-    m_activeState.program = const_cast<Shader::Permutation*>( &value );
+    m_activeState.program = const_cast<ShaderSource::Permutation*>( &value );
 }
 
 // ** Rvm::setInstance
 void Rvm::setInstance( const Commands::InstanceData& instance )
 {
     // Get an active program
-    Shader::Permutation* program = m_activeState.program;
+    ShaderSource::Permutation* program = m_activeState.program;
 
     // Switch the culling mode
     if( m_activeState.culling != instance.culling ) {
@@ -152,7 +152,7 @@ void Rvm::setInstance( const Commands::InstanceData& instance )
 	// Set the transformation matrix
     u32 location = 0;
 
-	if( location = program->locations[Shader::Transform] ) {
+	if( location = program->locations[ShaderSource::Transform] ) {
     #if !DEV_DISABLE_DRAW_CALLS
 		program->shader->setMatrix( location, *instance.transform );
     #endif
@@ -185,8 +185,8 @@ void Rvm::setConstantColor( const Rgba& value )
     m_constantColor = Vec4( value.r, value.g, value.b, value.a );
 
     // Update the shader uniform
-    if( Shader::Permutation* program = m_activeState.program ) {
-        u32 location = program->locations[Shader::Color];
+    if( ShaderSource::Permutation* program = m_activeState.program ) {
+        u32 location = program->locations[ShaderSource::Color];
         if( location ) {
         #if !DEV_DISABLE_DRAW_CALLS
             program->shader->setVec4( location, m_constantColor );

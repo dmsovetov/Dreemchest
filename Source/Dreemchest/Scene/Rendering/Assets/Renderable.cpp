@@ -91,34 +91,34 @@ void Renderable::setIndexBuffer( s32 chunk, Renderer::IndexBufferPtr value )
     m_chunks[chunk].indexBuffer = value;
 }
 
-// ----------------------------------------------------------------- Shader ----------------------------------------------------------------- //
+// ----------------------------------------------------------------- ShaderSource ----------------------------------------------------------------- //
 
-// ** Shader::vertex
-const String& Shader::vertex( void ) const
+// ** ShaderSource::vertex
+const String& ShaderSource::vertex( void ) const
 {
     return m_vertex;
 }
 
-// ** Shader::setVertex
-void Shader::setVertex( const String& value )
+// ** ShaderSource::setVertex
+void ShaderSource::setVertex( const String& value )
 {
     m_vertex = value;
 }
 
-// ** Shader::fragment
-const String& Shader::fragment( void ) const
+// ** ShaderSource::fragment
+const String& ShaderSource::fragment( void ) const
 {
     return m_fragment;
 }
 
-// ** Shader::setFragment
-void Shader::setFragment( const String& value )
+// ** ShaderSource::setFragment
+void ShaderSource::setFragment( const String& value )
 {
     m_fragment = value;
 }
 
-// ** Shader::addFeature
-void Shader::addFeature( u32 mask, const String& name )
+// ** ShaderSource::addFeature
+void ShaderSource::addFeature( u32 mask, const String& name )
 {
 	Feature feature;
 	feature.mask = mask;
@@ -126,21 +126,21 @@ void Shader::addFeature( u32 mask, const String& name )
 	m_features.push_back( feature );
 }
 
-// ** Shader::featureCount
-s32 Shader::featureCount( void ) const
+// ** ShaderSource::featureCount
+s32 ShaderSource::featureCount( void ) const
 {
     return static_cast<s32>( m_features.size() );
 }
 
-// ** Shader::feature
-const Shader::Feature& Shader::feature( s32 index ) const
+// ** ShaderSource::feature
+const ShaderSource::Feature& ShaderSource::feature( s32 index ) const
 {
     DC_ABORT_IF( index < 0 || index >= featureCount(), "index is out of range" );
     return m_features[index];
 }
 
-// ** Shader::permutation
-const Shader::Permutation& Shader::permutation( Renderer::HalWPtr hal, u32 features ) const
+// ** ShaderSource::permutation
+const ShaderSource::Permutation& ShaderSource::permutation( Renderer::HalWPtr hal, u32 features ) const
 {
     // First lookup already compiled permutations
     Permutations::iterator i = m_permutations.find( features );
@@ -157,8 +157,8 @@ const Shader::Permutation& Shader::permutation( Renderer::HalWPtr hal, u32 featu
     return m_permutations[features];
 }
 
-// ** Shader::compile
-bool Shader::compile( Renderer::HalWPtr hal, Permutation& permutation, u32 features ) const
+// ** ShaderSource::compile
+bool ShaderSource::compile( Renderer::HalWPtr hal, Permutation& permutation, u32 features ) const
 {
     DC_BREAK_IF( m_vertex.empty() || m_fragment.empty(), "the shader source is empty" );
 

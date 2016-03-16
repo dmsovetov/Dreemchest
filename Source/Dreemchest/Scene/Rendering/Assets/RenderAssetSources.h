@@ -103,17 +103,17 @@ namespace Scene {
     };
 #endif
 
-    //! Loads a shader from a text file
-    class ShaderFormatText : public Assets::FileSource<Shader> {
+    //! Loads a shader source from a text file
+    class ShaderSourceFormatText : public Assets::FileSource<ShaderSource> {
     public:
 
-                        //! Constructs ShaderFormatText instance.
-                        ShaderFormatText( const String& fileName );
+                        //! Constructs ShaderSourceFormatText instance.
+                        ShaderSourceFormatText( const String& fileName );
 
     protected:
 
         //! Loads shader source from an input stream.
-        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Shader& shader ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, ShaderSource& shader ) DC_DECL_OVERRIDE;
     };
 
 } // namespace Scene

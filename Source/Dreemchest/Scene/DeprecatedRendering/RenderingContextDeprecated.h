@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 	//! Rendering context.
 	class RenderingContextDeprecated : public RefCounted {
 	public:
@@ -86,6 +88,8 @@ namespace Scene {
         ImageToTexture                      m_textureByImage;   //!< Maps from image handle to GPU texture.
         MeshToRenderable                    m_renderableByMesh; //!< Maps from mesh handle to a renderable index.
 	};
+
+#endif DEV_DEPRECATED_SCENE_RENDERER
 
 } // namespace Scene
 

@@ -48,10 +48,10 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
 
     // Create default assets
     {
-        ShaderHandle pink = createShader( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
+        ShaderSourceHandle pink = createShader( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
         pink.asset().setName( "Placeholder.shader" );
         pink.forceLoad();
-        m_assets.setPlaceholder<Shader>( pink );
+        m_assets.setPlaceholder<ShaderSource>( pink );
     }
 
     {
@@ -82,17 +82,17 @@ SceneWPtr RenderingContext::scene( void ) const
 }
 
 // ** RenderingContext::createShader
-ShaderHandle RenderingContext::createShader( const String& identifier, const String& fileName )
+ShaderSourceHandle RenderingContext::createShader( const String& identifier, const String& fileName )
 {
     // First lookup a previously created shader by a file name
-    ShaderHandle shader = m_assets.find<Shader>( identifier );
+    ShaderSourceHandle shader = m_assets.find<ShaderSource>( identifier );
 
     if( shader.isValid() ) {
         return shader;
     }
 
     // No such shader - create a new one
-    shader = m_assets.add<Shader>( fileName, DC_NEW ShaderFormatText( fileName ) );
+    shader = m_assets.add<ShaderSource>( fileName, DC_NEW ShaderSourceFormatText( fileName ) );
 
     // Set the shader name
     shader.asset().setName( identifier + ".shader" );

@@ -172,7 +172,7 @@ namespace Scene {
         const TextureHandle&                textureByIndex( s32 index ) const;
 
         //! Creates a new shader instance.
-        ShaderHandle                        createShader( const String& identifier, const String& fileName );
+        ShaderSourceHandle                  createShader( const String& identifier, const String& fileName );
 
         //! Returns the command buffer instance.
         Commands&                           commands( void );

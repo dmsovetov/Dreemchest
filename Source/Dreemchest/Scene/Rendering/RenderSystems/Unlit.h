@@ -50,7 +50,7 @@ namespace Scene {
         RopEmitterUPtr          m_opaque;       //!< Emits render operations for opaque & cutout objects.
         RopEmitterUPtr          m_translucent;  //!< Emits render operations for translucent objects.
         RopEmitterUPtr          m_additive;     //!< Emits render operations for additive objects.
-        ShaderHandle            m_shader;       //!< This shader is used for all lighting models.
+        ShaderSourceHandle      m_shader;       //!< This shader is used for all lighting models.
     };
 
 } // namespace Scene
