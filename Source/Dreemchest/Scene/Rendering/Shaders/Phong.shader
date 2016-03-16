@@ -1,3 +1,6 @@
+[Features]
+F_DIFFUSE_MAP   = 1
+
 [VertexShader]
 #version 120
 
@@ -5,7 +8,7 @@ uniform mat4 u_vp, u_transform, u_inverseTransform;
 uniform vec4 u_lightPosition;
 uniform vec4 u_lightColor;
 
-#ifdef USE_DIFFUSE_MAP
+#ifdef F_DIFFUSE_MAP
 	varying vec2 v_uv0;
 #endif
 
@@ -15,7 +18,7 @@ varying vec4 v_lightColor;
 
 void main()
 {
-#ifdef USE_DIFFUSE_MAP
+#ifdef F_DIFFUSE_MAP
 	v_uv0 = gl_MultiTexCoord0.xy;
 #endif
 
@@ -47,7 +50,7 @@ uniform vec4 u_lightIntensity;
 void main() {
 	vec4 diffuse  = u_clr0;
 
-#ifdef USE_DIFFUSE_MAP
+#ifdef F_DIFFUSE_MAP
 	diffuse *= texture2D( u_tex0, v_uv0 );
 #endif
 

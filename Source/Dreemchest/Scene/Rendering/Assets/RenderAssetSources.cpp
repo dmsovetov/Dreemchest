@@ -229,6 +229,7 @@ bool ShaderFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets
 {
 	static CString vertexShaderMarker   = "[VertexShader]";
 	static CString fragmentShaderMarker = "[FragmentShader]";
+    static CString featuresMarker       = "[Features]";
 
 	// Read the code from an input stream
 	String code;
@@ -238,10 +239,22 @@ bool ShaderFormatText::constructFromStream( Io::StreamPtr stream, Assets::Assets
 	// Extract vertex/fragment shader code blocks
 	u32 vertexBegin = code.find( vertexShaderMarker );
 	u32 fragmentBegin = code.find( fragmentShaderMarker );
+    u32 featuresBegin = code.find( featuresMarker );
 
 	if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
 		return false;
 	}
+
+    if( featuresBegin != String::npos ) {
+        u32 featuresCodeStart = featuresBegin + strlen( featuresMarker );
+        Array<String> features = split( code.substr( featuresCodeStart, vertexBegin - featuresCodeStart ), "\r\n" );
+
+        for( Array<String>::const_iterator i = features.begin(), end = features.end(); i != end; ++i ) {
+            Array<String> value = split( *i, " \t=" );
+            shader.addFeature( atoi( value[1].c_str() ), value[0] );
+            LogVerbose( "shader", "feature %s = %d added\n", value[0].c_str(), atoi( value[1].c_str() ) );
+        }
+    }
 
 	if( vertexBegin != String::npos ) {
 		u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
