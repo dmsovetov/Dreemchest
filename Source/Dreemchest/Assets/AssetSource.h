@@ -182,6 +182,7 @@ namespace Assets {
     template<typename TAsset, typename TSource>
     bool AssetSource<TAsset, TSource>::construct( Assets& assets, Handle asset )
     {
+        DC_ABORT_IF( !m_asset.isLoaded(), "asset could not be constructed because the source asset was not loaded" );
         bool result = constructFromAsset( m_asset.readLock(), assets, *asset.writeLock<TAsset>() );
         return result;
     }
