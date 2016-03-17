@@ -45,10 +45,10 @@ OpenAL::OpenAL( void )
     f32 lo[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 
     m_device = alcOpenDevice( NULL );
-    LogVerbose( "openal", "device created %x", m_device );
+    LogVerbose( "openal", "device created %x\n", m_device );
 
     m_context = alcCreateContext( m_device, NULL );
-    LogVerbose( "openal", "context created %x", m_context );
+    LogVerbose( "openal", "context created %x\n", m_context );
 
     alcMakeContextCurrent( m_context );
 
@@ -56,7 +56,7 @@ OpenAL::OpenAL( void )
     alListenerfv( AL_VELOCITY,    lv );
     alListenerfv( AL_ORIENTATION, lo );
 
-    LogVerbose( "openal", "version=%s, renderer=%s, vendor=%s", alGetString( AL_VERSION ), alGetString( AL_RENDERER ), alGetString( AL_VENDOR ) );
+    LogVerbose( "openal", "version=%s, renderer=%s, vendor=%s\n", alGetString( AL_VERSION ), alGetString( AL_RENDERER ), alGetString( AL_VENDOR ) );
 //    LogVerbose( "AL_EXTENSIONS: %s\n", alGetString( AL_EXTENSIONS ) );
 }
 
