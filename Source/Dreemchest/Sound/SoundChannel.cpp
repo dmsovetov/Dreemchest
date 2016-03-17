@@ -109,7 +109,9 @@ void SoundChannel::resume( f32 fade )
     m_source->setState( SoundSource::Playing );
     m_source->setVolume( 0.0f );
 
-    m_volumeFader = DC_NEW Fader( 0.0f, m_volume, fade, dcThisMethod( SoundChannel::onFadeIn ) );
+    if( fade > 0.0f ) {
+        m_volumeFader = DC_NEW Fader( 0.0f, m_volume, fade, dcThisMethod( SoundChannel::onFadeIn ) );
+    }
 }
 
 // ** SoundChannel::stop
@@ -124,7 +126,9 @@ void SoundChannel::stop( f32 fade )
         return;
     }
 
-    m_volumeFader = DC_NEW Fader( m_volume, 0.0f, fade, dcThisMethod( SoundChannel::onStopped ) );
+    if( fade > 0.0f ) {
+        m_volumeFader = DC_NEW Fader( m_volume, 0.0f, fade, dcThisMethod( SoundChannel::onStopped ) );
+    }
 }
 
 // ** SoundChannel::update
