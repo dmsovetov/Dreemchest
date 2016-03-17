@@ -357,18 +357,18 @@ SoundChannelPtr SoundFx::play( CString identifier )
         return NULL;
     }
 
-    // ** Get the sound group
+    // Get the sound group
     SoundGroupWPtr group = data->group();
 
-    // ** Ensure we have a free playback slot
+    // Ensure we have a free playback slot
     if( group.valid() && !group->requestSlot( data ) ) {
         return NULL;
     }
 
-    // ** Cleanup dead channels
+    // Cleanup dead channels
     cleanupChannels();
 
-    // ** Create a sound source
+    // Create a sound source
     SoundSourcePtr source = createSource( data );
 
     if( !source.valid() ) {
@@ -376,13 +376,20 @@ SoundChannelPtr SoundFx::play( CString identifier )
         return NULL;
     }
 
-    // ** Create channel
+    // Calculate the sound fade time
+    f32 fadeTime = data->fadeTime();
+
+    if( fadeTime < 0.0f ) {
+        fadeTime = group->fadeTime();
+    }
+
+    // Create channel
     SoundChannel* channel = DC_NEW SoundChannel( data, source );
     channel->setVolume( data->volumeForSound() );
-    channel->resume( data->fadeTime() );
+    channel->resume( fadeTime );
     m_channels.push_back( channel );
 
-    // ** Add sound to a group
+    // Add sound to a group
     if( group.valid() ) {
         group->addSound( channel );
     }

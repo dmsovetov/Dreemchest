@@ -95,7 +95,11 @@ void SoundChannel::pause( f32 fade )
         return;
     }
 
-    m_volumeFader = DC_NEW Fader( m_volume, 0.0f, fade, dcThisMethod( SoundChannel::onFadeOut ) );
+    if( fade > 0.0f ) {
+        m_volumeFader = DC_NEW Fader( m_volume, 0.0f, fade, dcThisMethod( SoundChannel::onFadeOut ) );
+    } else {
+        stopPlayback( true );
+    }
 }
 
 // ** SoundChannel::resume
@@ -111,6 +115,8 @@ void SoundChannel::resume( f32 fade )
 
     if( fade > 0.0f ) {
         m_volumeFader = DC_NEW Fader( 0.0f, m_volume, fade, dcThisMethod( SoundChannel::onFadeIn ) );
+    } else {
+        m_source->setVolume( m_volume );
     }
 }
 
@@ -128,6 +134,8 @@ void SoundChannel::stop( f32 fade )
 
     if( fade > 0.0f ) {
         m_volumeFader = DC_NEW Fader( m_volume, 0.0f, fade, dcThisMethod( SoundChannel::onStopped ) );
+    } else {
+        stopPlayback( false );
     }
 }
 
@@ -144,6 +152,13 @@ bool SoundChannel::update( f32 dt )
     return m_source->state() == SoundSource::Stopped;
 }
 
+// ** SoundChannel::stopPlayback
+void SoundChannel::stopPlayback( bool pause )
+{
+    m_source->setState( pause ? SoundSource::Paused : SoundSource::Stopped );
+    m_source->setVolume( 0.0f );
+}
+
 // ** SoundChannel::onFadeIn
 void SoundChannel::onFadeIn( FaderWPtr fader )
 {
@@ -154,15 +169,14 @@ void SoundChannel::onFadeIn( FaderWPtr fader )
 // ** SoundChannel::onFadeOut
 void SoundChannel::onFadeOut( FaderWPtr fader )
 {
-    m_source->setState( SoundSource::Paused );
-    m_source->setVolume( 0.0f );
+    stopPlayback( true );
     m_volumeFader = FaderPtr();
 }
 
 // ** SoundChannel::onStopped
 void SoundChannel::onStopped( FaderWPtr fader )
 {
-    m_source->setState( SoundSource::Stopped );
+    stopPlayback( false );
     m_volumeFader = FaderPtr();
 }
 

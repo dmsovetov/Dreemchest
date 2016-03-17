@@ -96,10 +96,15 @@ namespace Sound {
 
         //! Fade in callback.
         void                onFadeIn( FaderWPtr fader );
+
         //! Fade out callback.
         void                onFadeOut( FaderWPtr fader );
+
         //! Fade in callback that is called after stopping the sound playback.
         void                onStopped( FaderWPtr fader );
+
+        //! Stops the playback of a sound by switching it to a specified state (the sound volume will be set to 0).
+        void                stopPlayback( bool pause );
 
     private:
 
