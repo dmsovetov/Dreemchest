@@ -105,11 +105,16 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->setClearColor( backgroundColor() );
 	m_camera->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
-	m_camera->attach<Scene::RenderWireframe>();
-	m_camera->attach<Scene::RenderVertexNormals>();
+    //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
+	//m_camera->attach<Scene::RenderWireframe>();
+	//m_camera->attach<Scene::RenderVertexNormals>();
 	//m_camera->attach<Scene::RenderUnlit>();
-	m_camera->attach<Scene::RenderBoundingVolumes>();
-	m_camera->attach<RenderSceneHelpers>();
+    m_camera->attach<Scene::RenderForwardLit>();
+	//m_camera->attach<Scene::RenderBoundingVolumes>();
+	//m_camera->attach<RenderSceneHelpers>();
+
+    m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
+
 	m_scene->addSceneObject( m_camera );
 	viewport()->setCamera( m_camera );
 
@@ -120,6 +125,9 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 #if DEV_DEPRECATED_SCENE_RENDERER
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
 #else
+    m_renderingContext->addRenderSystem<Scene::DepthComplexity>();
+    m_renderingContext->addRenderSystem<Scene::Unlit>();
+    m_renderingContext->addRenderSystem<Scene::ForwardLighting>();
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool
@@ -135,7 +143,24 @@ void SceneEditor::render( f32 dt )
 	m_scene->update( 0, dt );
 
 	// Render the scene
+    clock_t time = clock();
 	m_scene->render( m_renderingContext );
+    time = clock() - time;
+
+    static u32 kLastPrintTime = 0;
+    static u32 kTime = 0;
+    static u32 kFrames = 0;
+
+    u32 time1 = Time::current();
+
+    if( time1 - kLastPrintTime > 3000 ) {
+        LogWarning( "sceneEditor", "Rendering the frame took %2.2f ms\n", f32( kTime ) / kFrames );
+        kLastPrintTime = time1;
+        kFrames = 0;
+        kTime = 0;
+    }
+    kTime += time;
+    kFrames++;
 
 	// Reset the cursor movement
 	m_cursorMovement->set( Vec3() );
@@ -175,6 +200,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     // Create scene instance
     Scene::ScenePtr scene = Scene::Scene::create();
 
+#if 0
     // Read the file contents
     QString data = qComposer->fileSystem()->readTextFile( fileName );
 
@@ -202,6 +228,83 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         // Add entity to scene
         scene->addSceneObject( entity );
     }
+#else
+    Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
+    DC_BREAK_IF( !diffuse.isValid() );
+
+    struct MaterialGenerator : public Assets::GeneratorSource<Scene::Material> {
+        MaterialGenerator( Scene::ImageHandle diffuse ) : m_diffuse( diffuse ) {}
+
+        virtual bool generate( Assets::Assets& assets, Scene::Material& material ) DC_DECL_OVERRIDE
+        {
+            material.setTexture( Scene::Material::Diffuse, m_diffuse );
+            material.setRenderingMode( static_cast<Scene::RenderingMode>( rand() % Scene::TotalRenderModes ) );
+            //material.setRenderingMode( static_cast<Scene::RenderingMode>( rand() % 3 ) );
+            //material.setColor( Scene::Material::Diffuse, material.color( Scene::Material::Diffuse ).darker( 3.0f ) );
+
+            //material.setTexture( Scene::Material::AmbientOcclusion, m_diffuse );
+
+            //material.setTexture( Scene::Material::Emission, m_diffuse );
+            //material.setColor( Scene::Material::Emission, Rgba( 1.0f, 0.0f, 0.0f ) );
+
+            switch( material.renderingMode() ) {
+            case Scene::RenderTranslucent:  material.setColor( Scene::Material::Diffuse, Rgba( 1.0f, 1.0f, 1.0f, 0.25f ) );
+                                            material.setTwoSided( true );
+                                            break;
+            case Scene::RenderAdditive:     material.setColor( Scene::Material::Diffuse, Rgba( 0.3f, 0.3f, 0.0f ) );
+                                            material.setTwoSided( true );
+                                            break;
+            case Scene::RenderCutout:       //material.setColor( Scene::Material::Diffuse, Rgba( 0.0f, 0.5f, 0.0f ) );
+                                            break;
+            case Scene::RenderOpaque:       //material.setColor( Scene::Material::Diffuse, Rgba( 0.5f, 0.0f, 0.0f ) );
+                                            break;
+            }
+
+            return true;
+        }
+
+        virtual u32 lastModified( void ) const DC_DECL_OVERRIDE
+        {
+            return 0;
+        }
+
+        Scene::ImageHandle      m_diffuse;
+    };
+
+    Array<Scene::MaterialHandle> materials;
+    for( s32 i = 0; i < 16; i++ ) {
+        materials.push_back( m_project->assets().add<Scene::Material>( Guid::generate().toString(), new MaterialGenerator( diffuse ) ) );
+        materials.back().asset().setName( "GeneratedMaterial" + toString( i ) );
+    }
+
+    s32 count = 16;
+    f32 offset = 5.25f;
+    for( s32 i = 0; i < count; i++ ) {
+        for( s32 j = 0; j < count; j++ ) {
+            Scene::SceneObjectPtr mesh = scene->createSceneObject();
+            mesh->attach<Scene::Transform>( i * offset, 0.0f, j * offset, Scene::TransformWPtr() )->setScale( Vec3( 1.0f, 1.0f, 1.0f ) * 0.5f );
+            mesh->get<Scene::Transform>()->setRotationY( rand0to1() * 360.0f );
+            Scene::StaticMesh* staticMesh = mesh->attach<Scene::StaticMesh>( m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" ) );
+            staticMesh->setMaterial( 0, randomItem( materials ) );
+
+            scene->addSceneObject( mesh );
+        }
+    }
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( 9.0f, 4.0f, 9.0f, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::Light::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 10.0f );
+        scene->addSceneObject( light );
+    }
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 0.0f, 2.0f, 0.0f, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::Light::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 10.0f );
+    //    scene->addSceneObject( light );
+    //}
+#endif
 
     return scene;
 }

@@ -82,7 +82,4 @@ void main() {
 	vec4 result = diffuse * att * v_lightColor.a * v_lightColor * max( dot( normal, light ), 0.0 );
 
 	gl_FragColor = vec4( result.rgb, diffuse.a );
-
-    //gl_FragColor = vec4( normal, 1.0f );
-    //gl_FragColor = vec4( v_lightColor.rgb, 1.0 );
 }
