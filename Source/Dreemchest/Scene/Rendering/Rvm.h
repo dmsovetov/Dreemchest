@@ -196,7 +196,7 @@ namespace Scene {
 		static CString					s_transformUniformName;				//!< Model transform uniform name.
 
 		Renderer::HalPtr				m_hal;								//!< HAL to be used for rendering.
-		ArrayAllocator<Command>			m_allocator;						//!< Array allocator used to allocated render operations.
+		LinearAllocator<Command>	    m_allocator;						//!< Array allocator used to allocated render operations.
 		EmittedCommands					m_commands;							//!< Emitted rendering commands.
 		Matrix4							m_viewProjection;					//!< The view projection matrix.
 		Array<Renderer::ShaderPtr>		m_shaders;							//!< Array of available shaders.
