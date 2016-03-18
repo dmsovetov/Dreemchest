@@ -40,6 +40,7 @@ SoundGroup::SoundGroup( CString identifier )
     m_behaviour  = ReplaceOldest;
     m_threshold  = 0;
     m_fadeTime   = 0;
+	m_volume	 = 1.0f;
 }
 
 SoundGroup::~SoundGroup( void )
@@ -113,6 +114,18 @@ void SoundGroup::setFadeTime( f32 value )
     m_fadeTime = value;
 }
 
+// ** SoundGroup::volume
+f32 SoundGroup::volume( void ) const
+{
+	return m_volume;
+}
+
+// ** SoundGroup::setVolume
+void SoundGroup::setVolume( f32 value )
+{
+	m_volume = value;
+}
+
 // ** SoundGroup::data
 SoundGroupInfo SoundGroup::data( void ) const
 {
@@ -123,6 +136,7 @@ SoundGroupInfo SoundGroup::data( void ) const
     result.slotCount  = m_slotCount;
     result.threshold  = m_threshold;
     result.fadeTime   = m_fadeTime;
+	result.volume	  = m_volume;
 
     return result;
 }
@@ -135,6 +149,7 @@ void SoundGroup::setData( const SoundGroupInfo& value )
     m_slotCount  = value.slotCount;
     m_threshold  = value.threshold;
     m_fadeTime   = value.fadeTime;
+	m_volume	 = value.volume;
 }
 
 // ** SoundGroup::addSound

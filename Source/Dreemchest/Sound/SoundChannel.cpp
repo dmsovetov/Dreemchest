@@ -29,6 +29,7 @@
 #include "Decoders/SoundDecoder.h"
 #include "Drivers/SoundSource.h"
 #include "SoundData.h"
+#include "SoundGroup.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -144,10 +145,18 @@ bool SoundChannel::update( f32 dt )
 {
     m_source->update();
 
-    // Update volume fader
+    // Update volume fader and calculate the volume fade factor
+	f32 fade = 1.0f;
+
     if( m_volumeFader.valid() ) {
-		m_source->setVolume( m_volumeFader->update( dt ) );
+		fade = m_volumeFader->update( dt );
 	}
+
+	// Calculate the final volume base on fade factor, group volume & channel volume
+	f32 volume = m_volume * m_sound->group()->volume() * fade;
+
+	// Set the sond source volume
+	m_source->setVolume( volume );
 
     return m_source->state() == SoundSource::Stopped;
 }
