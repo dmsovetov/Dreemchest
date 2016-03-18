@@ -58,12 +58,12 @@ namespace Scene {
 
             struct Bits {
                 u16     userData    : 15;   //!< Command user data index.
-                u16     technique   : 15;   //!< Rendering technique index.
-                u16     renderable  : 15;   //!< Mesh index.
+                u16     technique   : 8;    //!< Rendering technique index.
+                u16     renderable  : 8;    //!< Mesh index.
                 u8      depth       : 8;    //!< Instance depth.
                 u8      mode        : 3;    //!< Rendering mode.
                 u8      command     : 1;    //!< Indicates that that this is not a draw call.
-                u8      sequence    : 4;    //!< Command sequence number.
+                u8      sequence    : 8;    //!< Command sequence number.
             };
 
             union {

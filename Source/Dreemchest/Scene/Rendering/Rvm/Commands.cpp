@@ -147,14 +147,14 @@ Commands::Rop* Commands::allocateRop( void )
 // ** Commands::beginSequence
 u8 Commands::beginSequence( void )
 {
-    DC_BREAK_IF( m_sequence + 1 >= 16, "sequence number overflow" );
+    DC_BREAK_IF( static_cast<s32>( m_sequence ) + 1 >= 255, "sequence number overflow" );
     return m_sequence++;
 }
 
 // ** Commands::endSequence
 u8 Commands::endSequence( void )
 {
-    DC_BREAK_IF( m_sequence + 1 >= 16, "sequence number overflow" );
+    DC_BREAK_IF( static_cast<s32>( m_sequence ) + 1 >= 255, "sequence number overflow" );
     return ++m_sequence;
 }
 
