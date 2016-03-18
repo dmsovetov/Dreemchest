@@ -76,6 +76,7 @@ void Commands::dump( void ) const
     CString inputs[] = {
           "ViewProjection"            //!< The view-projection matrix input.
         , "Transform"                 //!< The model matrix input.
+        , "InverseTransform"          //!< The inverse model matrix input.
         , "Color"                     //!< The constant color input.
         , "DiffuseTexture"            //!< Diffuse texture sampler input.
         , "SpecularTexture"           //!< Specular texture sampler input.
@@ -92,7 +93,7 @@ void Commands::dump( void ) const
         , "EmissionColor"             //!< Emission color input.
         , "TintColor"                 //!< Tint color input.
         , "LightPosition"             //!< Light position input.
-        , "LightIntensity"            //!< Light intensity input.
+        , "LightColor"                //!< Light color input.
     };
 
     for( s32 i = 0; i < size(); i++ ) {
