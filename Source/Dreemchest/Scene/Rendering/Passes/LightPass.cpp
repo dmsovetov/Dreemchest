@@ -24,36 +24,18 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_Unlit_H__
-#define __DC_Scene_Rendering_Unlit_H__
-
-#include "RenderSystem.h"
+#include "LightPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! This render system outputs an unlit scene to a render target.
-    class Unlit : public RenderSystem<RenderUnlit> {
-    public:
-
-                                //! Constructs the Unlit instance.
-                                Unlit( RenderingContext& context );
-
-    protected:
-
-        //! Emits render operations to output the depth complexity of a scene to a render target.
-        virtual void            emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit ) DC_DECL_OVERRIDE;
-
-    private:
-
-        ShaderSourceHandle      m_shader;           //!< Shader that is used to render all objects.
-        RenderPassUPtr          m_solidTransparent; //!< Emits render operations for all solid & transparent objects in scene.
-        RenderPassUPtr          m_additive;         //!< Emits render operations for additive objects.
-    };
+// ** LightPass::render
+void LightPass::render( const Vec3& camera, ShaderSourceHandle shader, const Light& light, const Transform& transform )
+{
+    DC_NOT_IMPLEMENTED;
+}
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_Rendering_Unlit_H__    */

@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "LightPass.h"
+#include "LightPassDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 

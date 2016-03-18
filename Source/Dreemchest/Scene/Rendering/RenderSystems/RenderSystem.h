@@ -53,7 +53,7 @@ namespace Scene {
 
 	protected:
 
-        RenderingContext&       m_context;
+        RenderingContext&       m_context;  //!< Parent rendering context.
 		Ecs::IndexPtr			m_cameras;	//!< All active cameras that are processed by this render system.
 	};
 

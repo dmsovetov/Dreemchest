@@ -26,6 +26,9 @@
 
 #include "ForwardLighting.h"
 
+#include "../Passes/SolidAndTransparentPass.h"
+#include "../Passes/AdditivePass.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -35,9 +38,13 @@ ForwardLighting::ForwardLighting( RenderingContext& context )
     : RenderSystem( context )
 {
     // Create shaders
-    m_unlitShader   = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
-    m_ambientShader = context.createShaderSource( "Ambient", "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
-    m_phongShader   = context.createShaderSource( "Phong", "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_ambientShader     = context.createShaderSource( "Ambient", "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_additiveShader    = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
+    m_phongShader       = context.createShaderSource( "Phong", "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+
+    // Create render passes
+    m_solidTransparent  = DC_NEW SolidAndTransparentPass( context );
+    m_additive          = DC_NEW AdditivePass( context );
 
     // Create light index
     m_lights = context.scene()->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Light, Transform>() );
@@ -45,29 +52,19 @@ ForwardLighting::ForwardLighting( RenderingContext& context )
     // Create render operation emitters
     m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
     m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit );
-    m_additive      = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
 }
 
 // ** ForwardLighting::emitRenderOperations
 void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& forwardLit )
 {
+    // Get the camera position.
+    const Vec3& position = transform.worldSpacePosition();
+
     // Get active command buffer
     Commands& commands = m_context.commands();
 
     // Ambient pass
-    {
-        // Set the default shader
-        commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_ambientShader ) );
-
-        // Emit operations for opaque objects
-        commands.emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
-        commands.emitRasterOptions( RenderCutoutBit, RasterizationOptions::cutout() );
-        m_opaque->emit( transform.position() );
-
-        // Emit operations for translucent objects
-        commands.emitRasterOptions( RenderTranslucentBit, RasterizationOptions::translucent() );
-        m_translucent->emit( transform.position() );
-    }
+    m_solidTransparent->render( position, m_ambientShader );
 
     // Opaque objects lighting
     {
@@ -89,7 +86,7 @@ void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Cam
             // Set program inputs for lighting
             commands.emitProgramInput( Program::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
             commands.emitProgramInput( Program::LightPosition, Vec4( transform.x(), transform.y(), transform.z(), light.range() ) );
-            m_opaque->emit( transform.position() );
+            m_opaque->emit( position );
         }
     }
 
@@ -110,19 +107,12 @@ void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Cam
             // Set program inputs for lighting
             commands.emitProgramInput( Program::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
             commands.emitProgramInput( Program::LightPosition, Vec4( transform.x(), transform.y(), transform.z(), light.range() ) );
-            m_translucent->emit( transform.position() );
+            m_translucent->emit( position );
         }
     }
 
     // Additive pass
-    {
-        // Set the default shader
-        commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_unlitShader ) );
-
-        // Emit operations for additive objects
-        commands.emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
-        m_additive->emit( transform.position() );
-    }
+    m_additive->render( position, m_additiveShader );
 }
 
 } // namespace Scene

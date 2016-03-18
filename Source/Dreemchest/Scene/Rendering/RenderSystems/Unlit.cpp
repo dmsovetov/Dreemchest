@@ -26,6 +26,9 @@
 
 #include "Unlit.h"
 
+#include "../Passes/SolidAndTransparentPass.h"
+#include "../Passes/AdditivePass.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -34,36 +37,22 @@ namespace Scene {
 Unlit::Unlit( RenderingContext& context )
     : RenderSystem( context )
 {
-    // Create the shader instance
-    m_shader = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
+    // Create the unlit shader instance
+    m_shader           = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
 
-    // Create render operation emitters
-    m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
-    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit );
-    m_additive      = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
+    // Create render passes
+    m_solidTransparent = DC_NEW SolidAndTransparentPass( context );
+    m_additive         = DC_NEW AdditivePass( context );
 }
 
 // ** Unlit::emitRenderOperations
 void Unlit::emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit )
 {
-    // Get active command buffer
-    Commands& commands = m_context.commands();
+    // Get the camera position
+    const Vec3& position = transform.worldSpacePosition();
 
-    // Set the default technique
-    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_shader ) );
-
-    // Emit operations for opaque objects
-    commands.emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
-    commands.emitRasterOptions( RenderCutoutBit, RasterizationOptions::cutout() );
-    m_opaque->emit( transform.position() );
-
-    // Emit operations for translucent objects
-    commands.emitRasterOptions( RenderTranslucentBit, RasterizationOptions::translucent() );
-    m_translucent->emit( transform.position() );
-
-    // Emit operations for additive objects
-    commands.emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
-    m_additive->emit( transform.position() );
+    m_solidTransparent->render( position, m_shader );
+    m_additive->render( position, m_shader );
 }
 
 } // namespace Scene

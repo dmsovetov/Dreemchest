@@ -24,36 +24,35 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_Unlit_H__
-#define __DC_Scene_Rendering_Unlit_H__
+#include "AdditivePass.h"
 
-#include "RenderSystem.h"
+#include "../Emitters/StaticMeshEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! This render system outputs an unlit scene to a render target.
-    class Unlit : public RenderSystem<RenderUnlit> {
-    public:
+// ** AdditivePass::AdditivePass
+AdditivePass::AdditivePass( RenderingContext& context )
+    : RenderPassBase( context )
+{
+    m_additive = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
+}
 
-                                //! Constructs the Unlit instance.
-                                Unlit( RenderingContext& context );
+// ** AdditivePass::render
+void AdditivePass::render( const Vec3& camera, ShaderSourceHandle shader )
+{
+    // Get the commands from rendering context
+    Commands& commands = m_context.commands();
 
-    protected:
+    // Set the default shader
+    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( shader ) );
 
-        //! Emits render operations to output the depth complexity of a scene to a render target.
-        virtual void            emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit ) DC_DECL_OVERRIDE;
-
-    private:
-
-        ShaderSourceHandle      m_shader;           //!< Shader that is used to render all objects.
-        RenderPassUPtr          m_solidTransparent; //!< Emits render operations for all solid & transparent objects in scene.
-        RenderPassUPtr          m_additive;         //!< Emits render operations for additive objects.
-    };
+    // Emit operations for additive objects
+    commands.emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
+    m_additive->emit( camera );
+}
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_Rendering_Unlit_H__    */

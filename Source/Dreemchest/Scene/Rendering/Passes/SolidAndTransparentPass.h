@@ -24,36 +24,35 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_Unlit_H__
-#define __DC_Scene_Rendering_Unlit_H__
+#ifndef __DC_Scene_Rendering_SolidAndTransparentPass_H__
+#define __DC_Scene_Rendering_SolidAndTransparentPass_H__
 
-#include "RenderSystem.h"
+#include "RenderPass.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! This render system outputs an unlit scene to a render target.
-    class Unlit : public RenderSystem<RenderUnlit> {
+    //! Performs rendering of opaque & translucent geometry with a specified shader.
+    class SolidAndTransparentPass : public RenderPassBase {
     public:
 
-                                //! Constructs the Unlit instance.
-                                Unlit( RenderingContext& context );
+                                    //! Constructs SolidAndTransparentPass instance.
+                                    SolidAndTransparentPass( RenderingContext& context );
 
     protected:
 
-        //! Emits render operations to output the depth complexity of a scene to a render target.
-        virtual void            emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit ) DC_DECL_OVERRIDE;
+        //! Emits setup render operations before processing all added emitters.
+        virtual void			    render( const Vec3& camera, ShaderSourceHandle shader ) DC_DECL_OVERRIDE;
 
     private:
 
-        ShaderSourceHandle      m_shader;           //!< Shader that is used to render all objects.
-        RenderPassUPtr          m_solidTransparent; //!< Emits render operations for all solid & transparent objects in scene.
-        RenderPassUPtr          m_additive;         //!< Emits render operations for additive objects.
+        RopEmitterUPtr              m_opaque;       //!< Emits render operations for opaque and cutout objects.
+        RopEmitterUPtr              m_translucent;  //!< Emits render operations for translucent objects.
     };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rendering_Unlit_H__    */
+#endif    /*    !__DC_Scene_Rendering_SolidAndTransparentPass_H__    */

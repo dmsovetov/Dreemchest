@@ -47,12 +47,14 @@ namespace Scene {
 
     private:
 
+        ShaderSourceHandle      m_ambientShader;    //!< Ambient pass shader.
+        ShaderSourceHandle      m_additiveShader;   //!< Additive pass shader.
+        ShaderSourceHandle      m_phongShader;      //!< Phong lighting shader.
+        RenderPassUPtr          m_solidTransparent; //!< Solid and transparent pass instance.
+        RenderPassUPtr          m_additive;         //!< Additive pass instance.
+
         RopEmitterUPtr          m_opaque;           //!< Emits render operations for opaque & cutout objects.
         RopEmitterUPtr          m_translucent;      //!< Emits render operations for translucent objects.
-        RopEmitterUPtr          m_additive;         //!< Emits render operations for additive objects.
-        ShaderSourceHandle      m_unlitShader;      //!< Unlit shader is used for additive pass.
-        ShaderSourceHandle      m_ambientShader;    //!< Ambient shader.
-        ShaderSourceHandle      m_phongShader;      //!< Phong lighting shader.
         Ecs::IndexPtr           m_lights;           //!< Light entity index.
     };
 

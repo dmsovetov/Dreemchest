@@ -66,7 +66,6 @@ void RenderSystemBase::render( void )
         // Pop render target when rendering is finished
         commands.emitPopRenderTarget();
     }
-        
 }
 
 } // namespace Scene

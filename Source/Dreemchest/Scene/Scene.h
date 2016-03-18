@@ -108,6 +108,9 @@ namespace Scene {
     //! Render system unique pointer type.
     typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
 
+    //! Render pass unique pointer type.
+    typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
+
     //! Image handle type.
     typedef Assets::GenericHandle<class Image> ImageHandle;
 

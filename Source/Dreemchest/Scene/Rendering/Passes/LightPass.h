@@ -24,27 +24,29 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_AmbientPass_H__
-#define __DC_Scene_Rendering_AmbientPass_H__
+#ifndef __DC_Scene_Rendering_LightPass_H__
+#define __DC_Scene_Rendering_LightPass_H__
 
 #include "RenderPass.h"
+#include "../../Components/Rendering.h"
+#include "../../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Performs rendering of opaque & translucent geometry.
-    class AmbientPass : public RenderPassBase {
+    //! Processes all lights in scene and emits render operations for them.
+    class LightPass : public RenderPass<Light> {
     public:
 
     protected:
 
-        //! Emits setup render operations before processing all added emitters.
-
+        //! Processes a single light instance.
+        virtual void    render( const Vec3& camera, ShaderSourceHandle shader, const Light& light, const Transform& transform );
     };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rendering_RenderPass_H__    */
+#endif    /*    !__DC_Scene_Rendering_LightPass_H__    */
