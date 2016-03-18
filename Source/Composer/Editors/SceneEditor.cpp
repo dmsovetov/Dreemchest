@@ -33,6 +33,8 @@
 #include "../Systems/Rendering.h"
 #include "../Project/Project.h"
 
+#define DEV_CAMERA_SPLIT    (1)
+
 DC_BEGIN_COMPOSER
 
 namespace Editors {
@@ -105,6 +107,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->setClearColor( backgroundColor() );
 	m_camera->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
+    m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
@@ -114,6 +117,30 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	//m_camera->attach<RenderSceneHelpers>();
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
+
+#if DEV_CAMERA_SPLIT
+    // Depth complexity camera
+    {
+        Scene::SceneObjectPtr camera = m_scene->createSceneObject();
+        camera->attach<Scene::Transform>( 0, 0, 0, m_camera->get<Scene::Transform>() );
+        camera->attach<Scene::Camera>( Scene::Camera::Perspective, m_renderTarget, backgroundColor(), Rect( 0.5f, 0.0f, 1.0f, 0.5f ) );
+        camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
+        camera->attach<SceneEditorInternal>( camera, SceneEditorInternal::Private );
+        m_scene->addSceneObject( camera );
+    }
+
+    // Unlit camera
+    {
+        Scene::SceneObjectPtr camera = m_scene->createSceneObject();
+        camera->attach<Scene::Transform>( 0, 0, 0, m_camera->get<Scene::Transform>() );
+        camera->attach<Scene::Camera>( Scene::Camera::Perspective, m_renderTarget, backgroundColor(), Rect( 0.0f, 0.5f, 0.5f, 1.0f ) );
+        camera->attach<Scene::RenderUnlit>();
+        camera->attach<SceneEditorInternal>( camera, SceneEditorInternal::Private );
+        m_scene->addSceneObject( camera );
+    }
+#else
+    m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+#endif
 
 	m_scene->addSceneObject( m_camera );
 	viewport()->setCamera( m_camera );
@@ -277,7 +304,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         materials.back().asset().setName( "GeneratedMaterial" + toString( i ) );
     }
 
-    s32 count = 16;
+    s32 count = 4;
     f32 offset = 5.25f;
     for( s32 i = 0; i < count; i++ ) {
         for( s32 j = 0; j < count; j++ ) {
