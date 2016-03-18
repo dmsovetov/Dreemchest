@@ -182,7 +182,7 @@ void Commands::emitPopRenderTarget( void )
 {
     Rop* rop = allocateRop();
     rop->setCommand( Rop::PopRenderTarget );
-    rop->bits.sequence = endSequence();
+    rop->bits.sequence = beginSequence();
 }
 
 // ** Commands::emitRasterOptions
