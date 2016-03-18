@@ -39,7 +39,7 @@ SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGro
     m_identifier        = identifier;
     m_type              = 0;
     m_loading           = LoadToRam;
-    m_fadeTime          = 0;
+    m_fadeTime          = -1.0f;
     m_volume            = 1.0f;
     m_volumeModifier    = Range( 1.0f, 1.0f );
     m_pitch             = 1.0f;

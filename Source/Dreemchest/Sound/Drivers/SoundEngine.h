@@ -40,6 +40,12 @@ namespace Sound {
                                 SoundEngine( void );
         virtual                 ~SoundEngine( void );
 
+		//! Sets the master volume.
+		virtual void			setVolume( f32 value ) = 0;
+
+		//! Sets the master pitch.
+		virtual void			setPitch( f32 value ) = 0;
+
         //! Sets the listener position.
         virtual void            setPosition( const Vec3& value ) = 0;
 

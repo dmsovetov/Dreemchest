@@ -48,7 +48,11 @@ namespace Sound {
 // ------------------------------------------------------ SoundFx ------------------------------------------------------ //
 
 // ** SoundFx::SoundFx
-SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener ) : m_hal( NULL ), m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
+SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener )
+	: m_hal( NULL )
+	, m_volume( 1.0f )
+	, m_pitch( 1.0f )
+	, m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
 {
     switch( hal ) {
     case None:      m_hal = NULL;           break;
@@ -357,18 +361,18 @@ SoundChannelPtr SoundFx::play( CString identifier )
         return NULL;
     }
 
-    // ** Get the sound group
+    // Get the sound group
     SoundGroupWPtr group = data->group();
 
-    // ** Ensure we have a free playback slot
+    // Ensure we have a free playback slot
     if( group.valid() && !group->requestSlot( data ) ) {
         return NULL;
     }
 
-    // ** Cleanup dead channels
+    // Cleanup dead channels
     cleanupChannels();
 
-    // ** Create a sound source
+    // Create a sound source
     SoundSourcePtr source = createSource( data );
 
     if( !source.valid() ) {
@@ -376,13 +380,20 @@ SoundChannelPtr SoundFx::play( CString identifier )
         return NULL;
     }
 
-    // ** Create channel
+    // Calculate the sound fade time
+    f32 fadeTime = data->fadeTime();
+
+    if( fadeTime < 0.0f ) {
+        fadeTime = group->fadeTime();
+    }
+
+    // Create channel
     SoundChannel* channel = DC_NEW SoundChannel( data, source );
     channel->setVolume( data->volumeForSound() );
-    channel->resume( data->fadeTime() );
+    channel->resume( fadeTime );
     m_channels.push_back( channel );
 
-    // ** Add sound to a group
+    // Add sound to a group
     if( group.valid() ) {
         group->addSound( channel );
     }
@@ -494,27 +505,28 @@ void SoundFx::reset( void )
 // ** SoundFx::volume
 f32 SoundFx::volume( void ) const
 {
-    LogWarning( "sfx", "SoundFx::volume : not implemented\n" );
-    return 0.0f;
+    return m_volume;
 }
 
 // ** SoundFx::setVolume
 void SoundFx::setVolume( f32 value )
 {
-    LogWarning( "sfx", "SoundFx::setVolume : not implemented\n" );
+	DC_BREAK_IF( value < 0.0f, "volume could not have a negative value" );
+    m_volume = value;
+	m_hal->setVolume( volume() );
 }
 
 // ** SoundFx::pitch
 f32 SoundFx::pitch( void ) const
 {
-    LogWarning( "sfx", "SoundFx::pitch : not implemented\n" );
-    return 0.0f;
+    return m_pitch;
 }
 
 // ** SoundFx::setPitch
 void SoundFx::setPitch( f32 value )
 {
-    LogWarning( "sfx", "SoundFx::setPitch : not implemented\n" ); 
+    m_pitch = value;
+	m_hal->setPitch( pitch() );
 }
 
 // ** SoundGroups& SoundFx::groups

@@ -213,6 +213,12 @@ namespace Sound {
         //! Sound engine HAL.
         SoundEnginePtr          m_hal;
 
+		//! Stores the master volume.
+		f32						m_volume;
+
+		//! Stores the master pitch value.
+		f32						m_pitch;
+
         //! Stream opener interface.
         IStreamOpenerPtr		m_streamOpener;
 
