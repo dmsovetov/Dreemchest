@@ -341,10 +341,6 @@ void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& us
 // ** Rvm::execute
 void Rvm::execute( const Commands& commands )
 {
-#if 0
-    commands.dump();
-#endif
-
     // Process all commands
     for( s32 i = 0, n = commands.size(); i < n; i++ ) {
         // Get the command by index

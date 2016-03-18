@@ -33,6 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_VIRTUAL_EMITTERS
 	//! Emits render operations for static meshes in scene.
 	class StaticMeshEmitter : public RopEmitter<StaticMesh> {
 	public:
@@ -42,10 +43,6 @@ namespace Scene {
 
 	private:
 
-    #if DEV_DISABLE_VIRTUAL_EMISSION
-        virtual void			emit( const Vec3& camera ) DC_DECL_OVERRIDE;
-    #endif
-
 		//! Emits render operations for all static meshes in scene.
 		virtual void			emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
 
@@ -53,6 +50,37 @@ namespace Scene {
 
         u32                     m_renderModes;      //!< Material render modes that will emit render operations.
 	};
+#else
+    //! Stores info about a single renderable mesh.
+    struct StaticMeshRenderable {
+        const Transform*        transform;          //!< Mesh transform component.
+        const Matrix4*          matrix;             //!< Mesh transform affine matrix.
+        MaterialHandle          material;           //!< Material used for rendering.
+        MeshHandle              mesh;
+        s32                     renderable;         //!< Renderable index.
+        s32                     technique;          //!< Technique index.
+    };
+
+    //! Emits render operations for static meshes in scene.
+    class StaticMeshEmitter : public FixedRopEmitter<StaticMesh, StaticMeshRenderable> {
+ 	public:
+
+								        //! Constructs StaticMeshEmitter instance.
+								        StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit );
+
+    protected:
+
+        //! Emits render operations for all visible meshes.
+        virtual void			        emit( const Vec3& camera ) DC_DECL_OVERRIDE;
+
+        //! Constructs mesh render entity from a scene entity.
+        virtual StaticMeshRenderable    createRenderEntity( const Ecs::Entity& entity );
+
+    private:
+
+        u32                             m_renderModes;      //!< Material render modes that will emit render operations.
+    };
+#endif  /*  DEV_VIRTUAL_EMITTERS    */
 
 } // namespace Scene
 

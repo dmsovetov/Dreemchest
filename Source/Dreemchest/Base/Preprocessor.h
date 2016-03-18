@@ -28,9 +28,9 @@
 #define __Base_Preprocessor_H__
 
 // ** Function binding
-#define dcThisMethod( method )              CLOSURE( this, &method )
-#define dcObjectMethod( object, method )    CLOSURE( object, &method )
-#define dcStaticFunction( function )        SCLOSURE( &function )
+#define dcThisMethod( method )              CLOSURE( this, (&method) )
+#define dcObjectMethod( object, method )    CLOSURE( object, (&method) )
+#define dcStaticFunction( function )        SCLOSURE( (&function) )
 
 // ** Smart ptrs
 #define        DC_DECLARE_PTRS( type, name )								\

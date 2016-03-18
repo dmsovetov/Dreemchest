@@ -33,7 +33,7 @@
 #include "../Systems/Rendering.h"
 #include "../Project/Project.h"
 
-#define DEV_CAMERA_SPLIT    (1)
+#define DEV_CAMERA_SPLIT    (0)
 
 DC_BEGIN_COMPOSER
 
@@ -111,8 +111,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
-	//m_camera->attach<Scene::RenderUnlit>();
-    m_camera->attach<Scene::RenderForwardLit>();
+	m_camera->attach<Scene::RenderUnlit>();
+   // m_camera->attach<Scene::RenderForwardLit>();
 	//m_camera->attach<Scene::RenderBoundingVolumes>();
 	//m_camera->attach<RenderSceneHelpers>();
 
@@ -304,7 +304,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         materials.back().asset().setName( "GeneratedMaterial" + toString( i ) );
     }
 
-    s32 count = 4;
+    s32 count = 64;
     f32 offset = 5.25f;
     for( s32 i = 0; i < count; i++ ) {
         for( s32 j = 0; j < count; j++ ) {

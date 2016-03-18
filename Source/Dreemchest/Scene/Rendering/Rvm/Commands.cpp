@@ -104,7 +104,7 @@ void Commands::dump( void ) const
             LogVerbose( "rvm", "%d: %s %s\n", rop.bits.sequence, commands[rop.bits.mode], rop.bits.mode == Commands::Rop::ProgramInput ? inputs[ud.input.location] : "" );
         }
         else {
-            LogVerbose( "rvm", "%d: drawCall : %s\n", rop.bits.sequence, modes[rop.bits.mode] );
+            LogVerbose( "rvm", "%d: drawCall : %s technique=%d, renderable=%d\n", rop.bits.sequence, modes[rop.bits.mode], rop.bits.technique, rop.bits.renderable );
         }
     }
 }
