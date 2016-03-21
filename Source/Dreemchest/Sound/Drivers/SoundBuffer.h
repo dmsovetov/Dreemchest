@@ -63,7 +63,13 @@ namespace Sound {
         //! Returns the total PCM data size.
         u64					size( void ) const;
 
+        //! Returns the sound buffer format.
+        SoundSampleFormat   format( void ) const;
+
     protected:
+
+        //! Internal sound format.
+        SoundSampleFormat   m_format;
 
         //! Attached sound decoder.
         SoundDecoderPtr		m_decoder;

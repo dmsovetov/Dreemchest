@@ -34,11 +34,15 @@ DC_BEGIN_DREEMCHEST
 namespace Sound {
 
 // ** SoundBuffer::SoundBuffer
-SoundBuffer::SoundBuffer( SoundDecoderPtr decoder, u32 chunks ) : m_decoder( decoder ), m_size( 0 ), m_chunks( chunks )
+SoundBuffer::SoundBuffer( SoundDecoderPtr decoder, u32 chunks )
+    : m_format( SoundSampleMono8 )
+    , m_decoder( decoder )
+    , m_size( 0 )
+    , m_chunks( chunks )
 {
-    if( decoder.valid() ) {
-		m_size = decoder->size();
-	}
+    DC_ABORT_IF( !decoder.valid(), "invalid sound decoder" );
+    m_size = decoder->size();
+    m_format = decoder->format();
 }
 
 SoundBuffer::~SoundBuffer( void )
@@ -62,6 +66,12 @@ SoundDecoderWPtr SoundBuffer::decoder( void ) const
 u64 SoundBuffer::size( void ) const
 {
     return m_size;
+}
+
+// ** SoundBuffer::format
+SoundSampleFormat SoundBuffer::format( void ) const
+{
+    return m_format;
 }
 
 // ** SoundBuffer::attachToSource
