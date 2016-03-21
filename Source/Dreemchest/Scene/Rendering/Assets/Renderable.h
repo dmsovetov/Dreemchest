@@ -191,6 +191,12 @@ namespace Scene {
         u32                         m_locations[TotalInputs];   //!< Program input locations.
     };
 
+    // ** Program::inputLocation
+    NIMBLE_INLINE u32 Program::inputLocation( Input input ) const
+    {
+        return m_locations[input];
+    }
+
     //! Technique asset stores textures, shaders & constants used by a material.
     class Technique {
     public:
@@ -235,6 +241,18 @@ namespace Scene {
         Array<TextureHandle>        m_textures;                 //!< Textures used by material.
         Array<Rgba>                 m_colors;                   //!< Constant colors.
     };
+
+    // ** Technique::features
+    NIMBLE_INLINE u32 Technique::features( void ) const
+    {
+        return m_features;
+    }
+
+    // ** Technique::lightingModel
+    NIMBLE_INLINE LightingModel Technique::lightingModel( void ) const
+    {
+        return m_lightingModel;
+    }
 
 } // namespace Scene
 

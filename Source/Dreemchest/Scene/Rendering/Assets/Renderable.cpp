@@ -147,12 +147,6 @@ Program::Program( void )
     memset( m_locations, 0, sizeof( m_locations ) );
 }
 
-// ** Program::inputLocation
-u32 Program::inputLocation( Input input ) const
-{
-    return m_locations[input];
-}
-
 // ** Program::setInputLocation
 void Program::setInputLocation( Input input, u32 value )
 {
@@ -229,22 +223,10 @@ void Technique::setTexture( s32 index, TextureHandle value )
     m_textures[index] = value;
 }
 
-// ** Technique::features
-u32 Technique::features( void ) const
-{
-    return m_features;
-}
-
 // ** Technique::setFeatures
 void Technique::setFeatures( u32 value )
 {
     m_features = value;
-}
-
-// ** Technique::lightingModel
-LightingModel Technique::lightingModel( void ) const
-{
-    return m_lightingModel;
 }
 
 // ** Technique::setLightingModel

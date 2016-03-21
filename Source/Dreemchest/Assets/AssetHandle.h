@@ -142,6 +142,26 @@ namespace Assets {
         return isValid() && (operator->())->state() == Asset::Loaded;
     }
 
+    // ** Handle::asset
+    NIMBLE_INLINE const Asset& Handle::asset( void ) const
+    {
+        DC_BREAK_IF( !isValid() );
+        return m_assets->assetAtIndex( index() );
+    }
+
+    // ** Handle::asset
+    NIMBLE_INLINE Asset& Handle::asset( void )
+    {
+        DC_BREAK_IF( !isValid() );
+        return m_assets->assetAtIndex( index() );
+    }
+
+    // ** Handle::assets
+    NIMBLE_INLINE Assets* Handle::assets( void ) const
+    {
+        return m_assets;
+    }
+
     // ** Handle::readLock
     template<typename TAsset>
     const TAsset& Handle::readLock( void ) const
@@ -262,7 +282,7 @@ namespace Assets {
 
     // ** GenericHandle::readLock
     template<typename TAsset>
-    const TAsset& GenericHandle<TAsset>::readLock( void ) const
+    NIMBLE_INLINE const TAsset& GenericHandle<TAsset>::readLock( void ) const
     {
         return Handle::readLock<TAsset>();
     }

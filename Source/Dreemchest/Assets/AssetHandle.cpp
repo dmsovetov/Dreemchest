@@ -93,26 +93,6 @@ void Handle::setHandle( Assets* assets, Index index )
 #endif  /*  DC_DEBUG    */
 }
 
-// ** Handle::asset
-const Asset& Handle::asset( void ) const
-{
-    DC_BREAK_IF( !isValid() );
-    return m_assets->assetAtIndex( index() );
-}
-
-// ** Handle::asset
-Asset& Handle::asset( void )
-{
-    DC_BREAK_IF( !isValid() );
-    return m_assets->assetAtIndex( index() );
-}
-
-// ** Handle::assets
-Assets* Handle::assets( void ) const
-{
-    return m_assets;
-}
-
 // ** Handle::forceLoad
 bool Handle::forceLoad( void )
 {
