@@ -37,7 +37,7 @@ AdditivePass::AdditivePass( RenderingContext& context )
     : RenderPassBase( context )
 {
     m_additive = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
-#if !DEV_VIRTAL_EMITTERS
+#if !DEV_VIRTUAL_EMITTERS
     static_cast<StaticMeshEmitter*>( m_additive.get() )->construct();
 #endif
 }

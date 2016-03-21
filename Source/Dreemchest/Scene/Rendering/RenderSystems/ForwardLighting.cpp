@@ -53,7 +53,7 @@ ForwardLighting::ForwardLighting( RenderingContext& context )
     m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
     m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit );
 
-#if !DEV_VIRTAL_EMITTERS
+#if !DEV_VIRTUAL_EMITTERS
     static_cast<StaticMeshEmitter*>( m_opaque.get() )->construct();
     static_cast<StaticMeshEmitter*>( m_translucent.get() )->construct();
 #endif
