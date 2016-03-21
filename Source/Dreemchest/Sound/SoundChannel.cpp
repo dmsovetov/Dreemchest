@@ -28,6 +28,7 @@
 #include "Fader.h"
 #include "Decoders/SoundDecoder.h"
 #include "Drivers/SoundSource.h"
+#include "Drivers/SoundBuffer.h"
 #include "SoundData.h"
 #include "SoundGroup.h"
 
@@ -67,6 +68,13 @@ const Vec3& SoundChannel::position( void ) const
 // ** SoundChannel::setPosition
 void SoundChannel::setPosition( const Vec3& value )
 {
+    // Only mono sounds can be positioned
+    SoundSampleFormat format = m_source->buffer()->format();
+
+    if( format != SoundSampleMono8 && format != SoundSampleMono16 ) {
+        LogWarning( "channel", "stereo sound '%s' could not be positioned in 3D\n", m_sound->identifier() );
+    }
+
     m_source->setPosition( value );
 }
 
