@@ -74,9 +74,10 @@ void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, 
 #else
 
 // ** StaticMeshEmitter::StaticMeshEmitter
-StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes )
-    : FixedRopEmitter( context )
+StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes, bool depthSort )
+    : RopEmitter( context )
     , m_renderModes( renderModes )
+    , m_depthSort( depthSort )
 {
 }
 
@@ -108,11 +109,15 @@ void StaticMeshEmitter::emit( const Vec3& camera )
         mesh.mesh.readLock();
 
         // Calculate the distance to this renderable
-        f32 distance = (camera - mesh.transform->worldSpacePosition()).length();
+        f32 distance = m_depthSort ? (camera - mesh.transform->worldSpacePosition()).length() : 0.0f;
 
         // Emit additional draw call for additive & translucent two-sided materials.
         if( material.isTwoSided() ) {
+        #if DEV_OLD_RENDER_COMMANDS
             Commands::InstanceData* instance = commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
+        #else
+            Commands::DrawIndexed* instance = commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
+        #endif  /*  DEV_OLD_RENDER_COMMANDS */
             instance->culling = Renderer::TriangleFaceFront;
         }
 

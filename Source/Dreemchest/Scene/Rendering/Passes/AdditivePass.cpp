@@ -36,7 +36,11 @@ namespace Scene {
 AdditivePass::AdditivePass( RenderingContext& context )
     : RenderPassBase( context )
 {
-    m_additive = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit );
+    m_additive = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit
+    #if !DEV_OLD_RENDER_COMMANDS
+        , true
+    #endif
+        );
 #if !DEV_VIRTUAL_EMITTERS
     static_cast<StaticMeshEmitter*>( m_additive.get() )->construct();
 #endif

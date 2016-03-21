@@ -33,40 +33,22 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-#if DEV_VIRTUAL_EMITTERS
-	//! Emits render operations for static meshes in scene.
-	class StaticMeshEmitter : public RopEmitter<StaticMesh> {
-	public:
-
-								//! Constructs StaticMeshEmitter instance.
-								StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit );
-
-	private:
-
-		//! Emits render operations for all static meshes in scene.
-		virtual void			emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform ) DC_DECL_OVERRIDE;
-
-    private:
-
-        u32                     m_renderModes;      //!< Material render modes that will emit render operations.
-	};
-#else
     //! Stores info about a single renderable mesh.
     struct StaticMeshRenderable {
         const Transform*        transform;          //!< Mesh transform component.
         const Matrix4*          matrix;             //!< Mesh transform affine matrix.
         MaterialHandle          material;           //!< Material used for rendering.
-        MeshHandle              mesh;
+        MeshHandle              mesh;               //!< Rendered mesh resource handle.
         s32                     renderable;         //!< Renderable index.
         s32                     technique;          //!< Technique index.
     };
 
     //! Emits render operations for static meshes in scene.
-    class StaticMeshEmitter : public FixedRopEmitter<StaticMesh, StaticMeshRenderable> {
+    class StaticMeshEmitter : public RopEmitter<StaticMesh, StaticMeshRenderable> {
  	public:
 
 								        //! Constructs StaticMeshEmitter instance.
-								        StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit );
+								        StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit, bool depthSort = false );
 
     protected:
 
@@ -79,8 +61,8 @@ namespace Scene {
     private:
 
         u32                             m_renderModes;      //!< Material render modes that will emit render operations.
+        bool                            m_depthSort;        //!< Is depth sorting enabled or not?
     };
-#endif  /*  DEV_VIRTUAL_EMITTERS    */
 
 } // namespace Scene
 

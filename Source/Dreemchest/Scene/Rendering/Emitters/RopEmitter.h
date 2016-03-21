@@ -55,47 +55,17 @@ namespace Scene {
 		Ecs::IndexPtr			m_index;		//!< Entities used for render operation emission.
 	};
 
-#if DEV_VIRTUAL_EMITTERS
-	//! Generic render operation emitter.
-	template<typename TRenderable>
-	class RopEmitter : public AbstractRopEmitter {
-	public:
-
-								//! Constructs RopEmitter instance.
-								RopEmitter( RenderingContext& context )
-									: AbstractRopEmitter( context, context.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<TRenderable, Transform>() ) ) {}
-
-		//! Emits render operations for renderable entities in scene.
-		virtual void			emit( const Vec3& camera ) DC_DECL_OVERRIDE;
-
-	protected:
-
-		//! Emits render operation for a single renderable entity.
-		virtual void			emit( const Vec3& camera, const TRenderable& renderable, const Transform& transform ) = 0;
-	};
-
-	// ** RopEmitter::emit
-	template<typename TRenderable>
-	void RopEmitter<TRenderable>::emit( const Vec3& camera )
-	{
-		const Ecs::EntitySet& entities = m_index->entities();
-
-		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			emit( camera, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
-		}
-	}
-#else
     //! Generic render operation emitter.
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize = 0>
-    class FixedRopEmitter : public AbstractRopEmitter {
+    class RopEmitter : public AbstractRopEmitter {
     public:
 
         //! Alias an array type to store renderable entities.
         typedef FixedArray<TRenderEntity>   RenderEntities; 
 
 								    //! Constructs FixedRopEmitter instance.
-								    FixedRopEmitter( RenderingContext& context );
-        virtual                     ~FixedRopEmitter( void ) DC_DECL_OVERRIDE;
+								    RopEmitter( RenderingContext& context );
+        virtual                     ~RopEmitter( void ) DC_DECL_OVERRIDE;
 
         //! This method should be called once right after a construction of emitter instance.
         void                        construct( void );
@@ -137,18 +107,18 @@ namespace Scene {
 
     // ** FixedRopEmitter::FixedRopEmitter
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-	FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::FixedRopEmitter( RenderingContext& context )
+	RopEmitter<TRenderable, TRenderEntity, TInitialSize>::RopEmitter( RenderingContext& context )
 		: AbstractRopEmitter( context, context.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<TRenderable, Transform>() ) )
         , m_entities( TInitialSize )
     {
         // Subscribe for index events
-        m_index->events().subscribe<Ecs::Index::Added>( CLOSURE( this, (&FixedRopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
-        m_index->events().subscribe<Ecs::Index::Removed>( CLOSURE( this, (&FixedRopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
+        m_index->events().subscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
+        m_index->events().subscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
     }
 
-    // ** FixedRopEmitter::construct
+    // ** RopEmitter::construct
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-    void FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::construct( void )
+    void RopEmitter<TRenderable, TRenderEntity, TInitialSize>::construct( void )
     {
         const Ecs::EntitySet& entities = m_index->entities();
 
@@ -157,39 +127,39 @@ namespace Scene {
         }
     }
 
-    // ** FixedRopEmitter::~FixedRopEmitter
+    // ** RopEmitter::~RopEmitter
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-	FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::~FixedRopEmitter( void )
+	RopEmitter<TRenderable, TRenderEntity, TInitialSize>::~RopEmitter( void )
     {
         // Unsubscribe from index events
-        m_index->events().unsubscribe<Ecs::Index::Added>( CLOSURE( this, (&FixedRopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
-        m_index->events().unsubscribe<Ecs::Index::Removed>( CLOSURE( this, (&FixedRopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
+        m_index->events().unsubscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
+        m_index->events().unsubscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
     }
 
-    // ** FixedRopEmitter::~FixedRopEmitter
+    // ** RopEmitter::~RopEmitter
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-	const typename FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::RenderEntities& FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::renderEntities( void ) const
+	const typename RopEmitter<TRenderable, TRenderEntity, TInitialSize>::RenderEntities& RopEmitter<TRenderable, TRenderEntity, TInitialSize>::renderEntities( void ) const
     {
         return m_entities;
     }
 
-    // ** FixedRopEmitter::handleEntityAdded
+    // ** RopEmitter::handleEntityAdded
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-    void FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::handleEntityAdded( const Ecs::Index::Added& e )
+    void RopEmitter<TRenderable, TRenderEntity, TInitialSize>::handleEntityAdded( const Ecs::Index::Added& e )
     {
         addRenderableEntity( e.entity.get() );
     }
 
-    // ** FixedRopEmitter::handleEntityRemoved
+    // ** RopEmitter::handleEntityRemoved
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-    void FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::handleEntityRemoved( const Ecs::Index::Removed& e )
+    void RopEmitter<TRenderable, TRenderEntity, TInitialSize>::handleEntityRemoved( const Ecs::Index::Removed& e )
     {
         removeRenderableEntity( e.entity.get() );
     }
 
-    //! Adds new renderable entity.
+    // ** RopEmitter::addRenderableEntity
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-    void FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::addRenderableEntity( const Ecs::Entity* entity )
+    void RopEmitter<TRenderable, TRenderEntity, TInitialSize>::addRenderableEntity( const Ecs::Entity* entity )
     {
         // Push new render entity to an array and store it's index
         s32 index = m_entities.push( createRenderEntity( *entity ) );
@@ -198,9 +168,9 @@ namespace Scene {
         m_indices[entity] = index;
     }
 
-    //! Removes a renderable entity.
+    // ** RopEmitter::removeRenderableEntity
     template<typename TRenderable, typename TRenderEntity, s32 TInitialSize>
-    void FixedRopEmitter<TRenderable, TRenderEntity, TInitialSize>::removeRenderableEntity( const Ecs::Entity* entity )
+    void RopEmitter<TRenderable, TRenderEntity, TInitialSize>::removeRenderableEntity( const Ecs::Entity* entity )
     {
         // Find an index of this entity
         IndexByEntity::iterator i = m_indices.find( entity );
@@ -212,7 +182,6 @@ namespace Scene {
         //! Remove mapping
         m_indices.erase( i );
     }
-#endif  /*  DEV_VIRTUAL_EMITTERS  */
 
 } // namespace Scene
 
