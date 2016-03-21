@@ -220,7 +220,7 @@ namespace Scene {
         NIMBLE_INLINE InstanceData*     emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
     #else
         //! Pushes a single draw call instruction.
-        NIMBLE_INLINE DrawIndexed*      emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
+        NIMBLE_INLINE DrawIndexed*      emitDrawCall( u32 sortingKey, const Matrix4* transform, s32 renderable, s32 technique, u8 mode );
 
         //! Returns a rop at specified index.
         s32                             opCodeAt( s32 index ) const
@@ -324,11 +324,9 @@ namespace Scene {
     }
 
     // ** Commands::emitDrawCall
-    NIMBLE_INLINE Commands::DrawIndexed* Commands::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
+    NIMBLE_INLINE Commands::DrawIndexed* Commands::emitDrawCall( u32 sortingKey, const Matrix4* transform, s32 renderable, s32 technique, u8 mode )
     {
-        u8 quantizedDepth = static_cast<u8>( 127 * (1.0f - (depth / 100.0f)) );
-
-        DrawIndexed* cmd = allocateCommand<DrawIndexed>( (m_sequence << 24) | (mode << 22) | (quantizedDepth << 14) | (technique << 7 ) | renderable );
+        DrawIndexed* cmd = allocateCommand<DrawIndexed>( m_sequence << 24 | sortingKey );
         cmd->mode = mode;
         cmd->technique = technique;
         cmd->renderable = renderable;

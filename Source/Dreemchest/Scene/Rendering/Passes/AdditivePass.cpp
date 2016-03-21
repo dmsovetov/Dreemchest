@@ -41,9 +41,7 @@ AdditivePass::AdditivePass( RenderingContext& context )
         , true
     #endif
         );
-#if !DEV_VIRTUAL_EMITTERS
     static_cast<StaticMeshEmitter*>( m_additive.get() )->construct();
-#endif
 }
 
 // ** AdditivePass::render

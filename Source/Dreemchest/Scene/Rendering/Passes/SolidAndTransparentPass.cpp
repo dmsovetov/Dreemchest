@@ -43,10 +43,8 @@ SolidAndTransparentPass::SolidAndTransparentPass( RenderingContext& context )
     #endif
         );
 
-#if !DEV_VIRTUAL_EMITTERS
     static_cast<StaticMeshEmitter*>( m_opaque.get() )->construct();
     static_cast<StaticMeshEmitter*>( m_translucent.get() )->construct();
-#endif
 }
 
 // ** SolidAndTransparentPass::render

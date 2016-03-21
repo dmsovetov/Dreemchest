@@ -30,49 +30,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-#if DEV_VIRTUAL_EMITTERS
-// ** StaticMeshEmitter::StaticMeshEmitter
-StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes )
-    : RopEmitter( context )
-    , m_renderModes( renderModes )
-{
-}
-
-// ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( const Vec3& camera, const StaticMesh& staticMesh, const Transform& transform )
-{
-    // Get the material
-    const MaterialHandle& material = staticMesh.material( 0 );
-    RenderingMode         mode     = material->renderingMode();
-
-    // Does this material passes the filter?
-    if( (BIT( mode ) & m_renderModes) == 0 ) {
-        return;
-    }
-
-    // Get the command buffer
-    Commands& commands = m_context.commands();
-
-    // Request the renderable asset for this mesh.
-    s32 renderable = m_context.requestRenderable( staticMesh.mesh() );
-
-    // Request the technique asset for a material.
-    s32 technique = m_context.requestTechnique( material );
-
-    // Calculate the distance to this renderable
-    f32 distance = (camera - transform.position()).length();
-
-    // Emit additional draw call for additive & translucent two-sided materials.
-    if( material->isTwoSided() ) {
-        Commands::InstanceData* instance = commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
-        instance->culling = Renderer::TriangleFaceFront;
-    }
-
-    // Emit the rendering command
-    commands.emitDrawCall( &transform.matrix(), renderable, technique, mode, distance );
-}
-#else
-
 // ** StaticMeshEmitter::StaticMeshEmitter
 StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes, bool depthSort )
     : RopEmitter( context )
@@ -108,21 +65,40 @@ void StaticMeshEmitter::emit( const Vec3& camera )
 
         mesh.mesh.readLock();
 
-        // Calculate the distance to this renderable
-        f32 distance = m_depthSort ? (camera - mesh.transform->worldSpacePosition()).length() : 0.0f;
+    #if DEV_OLD_RENDER_COMMANDS
+        f32 distance = (camera - mesh.transform->worldSpacePosition()).length();
+    #else
+        // Compose the sorting key
+        u32 sortKey = 0;
+
+        if( m_depthSort ) {
+            // Calculate the distance to this renderable
+            f32 distance = m_depthSort ? (camera - mesh.transform->worldSpacePosition()).length() : 0.0f;
+
+            // Convert depth to an integer value
+            sortKey = (mode << 22) | static_cast<u32>( 4194303 * (1.0f - (distance / 100.0f)) );
+        } else {
+            // No depth sorting, so just compose the key from renderable and technique
+            sortKey = (mode << 22) | (mesh.technique << 11) | mesh.renderable;
+        }
+    #endif  /*  DEV_OLD_RENDER_COMMANDS */
 
         // Emit additional draw call for additive & translucent two-sided materials.
         if( material.isTwoSided() ) {
         #if DEV_OLD_RENDER_COMMANDS
             Commands::InstanceData* instance = commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
         #else
-            Commands::DrawIndexed* instance = commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
+            Commands::DrawIndexed* instance = commands.emitDrawCall( sortKey, mesh.matrix, mesh.renderable, mesh.technique, mode );
         #endif  /*  DEV_OLD_RENDER_COMMANDS */
             instance->culling = Renderer::TriangleFaceFront;
         }
 
         // Emit the rendering command
+    #if DEV_OLD_RENDER_COMMANDS
         commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
+    #else
+        commands.emitDrawCall( sortKey, mesh.matrix, mesh.renderable, mesh.technique, mode );
+    #endif  /*  DEV_OLD_RENDER_COMMANDS */
     }
 }
 
@@ -141,8 +117,6 @@ StaticMeshRenderable StaticMeshEmitter::createRenderEntity( const Ecs::Entity& e
     mesh.technique  = m_context.requestTechnique( mesh.material );
     return mesh;
 }
-
-#endif  /*  DEV_VIRTUAL_EMITTERS    */
 
 } // namespace Scene
 
