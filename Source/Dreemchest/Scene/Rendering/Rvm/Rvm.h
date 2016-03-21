@@ -59,24 +59,14 @@ namespace Scene {
         //! Sets the active program.
         void                            setProgram( const Program& value );
 
-#if DEV_OLD_RENDER_COMMANDS
-        //! Sets the instance data.
-        void                            setInstance( const Commands::InstanceData& instance );
-#else
         //! Sets an instance data.
         void                            setInstance( const Commands::DrawIndexed& instance );
-#endif  /*  DEV_OLD_RENDER_COMMANDS */
 
         //! Sets the constant color.
         void                            setConstantColor( const Rgba& value );
 
         //! Sets the rendering mode.
         void                            setRenderingMode( u8 value );
-
-#if DEV_OLD_RENDER_COMMANDS
-        //! Executes the command.
-        void                            executeCommand( const Commands::Rop& rop, const Commands::UserData& userData );
-#endif  /*  DEV_OLD_RENDER_COMMANDS */
 
     private:
 
@@ -95,11 +85,7 @@ namespace Scene {
 
         RenderingContext&               m_context;          //!< Parent rendering context.
         Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
-    #if DEV_OLD_RENDER_COMMANDS
-        Stack<Commands::RenderTargetState>        m_renderTarget;     //!< All render targets are pushed and popped off from here.
-    #else
         Stack<Commands::PushRenderTarget>   m_renderTarget; //!< All render targets are pushed and popped off from here.
-    #endif  /*  DEV_OLD_RENDER_COMMANDS */
         s32                             m_shaders[TotalLightingModels];     //!< Shader to used for each lighting model.
         RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
         ActiveState                     m_activeState;      //!< Active rendering state.

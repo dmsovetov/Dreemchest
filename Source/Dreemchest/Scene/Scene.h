@@ -66,7 +66,6 @@
 #include "PlaneClipper.h"
 
 #define DEV_PROFILE_RVM_CPU             (0)
-#define DEV_OLD_RENDER_COMMANDS         (0)
 
 #if DEV_PROFILE_RVM_CPU
     #define DEV_DISABLE_DRAW_CALLS          (1)

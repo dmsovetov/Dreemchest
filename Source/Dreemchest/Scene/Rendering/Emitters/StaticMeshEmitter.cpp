@@ -65,9 +65,6 @@ void StaticMeshEmitter::emit( const Vec3& camera )
 
         mesh.mesh.readLock();
 
-    #if DEV_OLD_RENDER_COMMANDS
-        f32 distance = (camera - mesh.transform->worldSpacePosition()).length();
-    #else
         // Compose the sorting key
         u32 sortKey = 0;
 
@@ -76,29 +73,20 @@ void StaticMeshEmitter::emit( const Vec3& camera )
             f32 distance = m_depthSort ? (camera - mesh.transform->worldSpacePosition()).length() : 0.0f;
 
             // Convert depth to an integer value
-            sortKey = (mode << 22) | static_cast<u32>( 4194303 * (1.0f - (distance / 100.0f)) );
+            sortKey = (mode << 22) | static_cast<u32>( 4194303 * (1.0f - (distance / 1000.0f)) );
         } else {
             // No depth sorting, so just compose the key from renderable and technique
             sortKey = (mode << 22) | (mesh.technique << 11) | mesh.renderable;
         }
-    #endif  /*  DEV_OLD_RENDER_COMMANDS */
 
         // Emit additional draw call for additive & translucent two-sided materials.
         if( material.isTwoSided() ) {
-        #if DEV_OLD_RENDER_COMMANDS
-            Commands::InstanceData* instance = commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
-        #else
             Commands::DrawIndexed* instance = commands.emitDrawCall( sortKey, mesh.matrix, mesh.renderable, mesh.technique, mode );
-        #endif  /*  DEV_OLD_RENDER_COMMANDS */
             instance->culling = Renderer::TriangleFaceFront;
         }
 
         // Emit the rendering command
-    #if DEV_OLD_RENDER_COMMANDS
-        commands.emitDrawCall( mesh.matrix, mesh.renderable, mesh.technique, mode, distance );
-    #else
         commands.emitDrawCall( sortKey, mesh.matrix, mesh.renderable, mesh.technique, mode );
-    #endif  /*  DEV_OLD_RENDER_COMMANDS */
     }
 }
 

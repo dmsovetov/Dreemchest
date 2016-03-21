@@ -37,11 +37,7 @@ SolidAndTransparentPass::SolidAndTransparentPass( RenderingContext& context )
     : RenderPassBase( context )
 {
     m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
-    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit
-    #if !DEV_OLD_RENDER_COMMANDS
-        , true
-    #endif
-        );
+    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit, true );
 
     static_cast<StaticMeshEmitter*>( m_opaque.get() )->construct();
     static_cast<StaticMeshEmitter*>( m_translucent.get() )->construct();
