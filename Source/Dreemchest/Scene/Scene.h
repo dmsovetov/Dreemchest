@@ -65,10 +65,18 @@
 
 #include "PlaneClipper.h"
 
-#define DEV_DISABLE_DRAW_CALLS          (0)
-#define DEV_DISABLE_CULLING             (0)
-#define DEV_DISABLE_TRANSFORMS          (0)
-#define DEV_VIRTUAL_EMITTERS            (0)
+#define DEV_PROFILE_RVM_CPU             (0)
+#define DEV_OLD_RENDER_COMMANDS         (0)
+
+#if DEV_PROFILE_RVM_CPU
+    #define DEV_DISABLE_DRAW_CALLS          (1)
+    #define DEV_DISABLE_CULLING             (1)
+    #define DEV_DISABLE_TRANSFORMS          (1)
+#else
+    #define DEV_DISABLE_DRAW_CALLS          (0)
+    #define DEV_DISABLE_CULLING             (0)
+    #define DEV_DISABLE_TRANSFORMS          (0)
+#endif  /*  DEV_PROFILE_RVM_CPU */
 
 DC_BEGIN_DREEMCHEST
 

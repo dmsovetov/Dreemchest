@@ -34,7 +34,11 @@ namespace Scene {
 // ** Commands::Commands
 Commands::Commands( void )
     : m_operations( 16 )
+#if DEV_OLD_RENDER_COMMANDS
     , m_userData( 16 )
+#else
+    , m_commands( 131072 * 10 )
+#endif  /*  DEV_OLD_RENDER_COMMANDS */
     , m_sequence( 0 )
 {
 }
@@ -50,7 +54,11 @@ void Commands::clear( void )
 {
     // Clear commands & user data
     m_operations.reset();
+#if DEV_OLD_RENDER_COMMANDS
     m_userData.reset();
+#else
+    m_commands.reset();
+#endif  /*  DEV_OLD_RENDER_COMMANDS */
 
     // Reset the sequence number
     m_sequence = 0;
@@ -66,6 +74,7 @@ void Commands::dump( void ) const
         , "constantColor"
         , "shader"
         , "programInput"
+        , "drawIndexed"
     };
     CString modes[] = {
 		  "opaque"
@@ -95,7 +104,7 @@ void Commands::dump( void ) const
         , "LightPosition"             //!< Light position input.
         , "LightColor"                //!< Light color input.
     };
-
+#if DEV_OLD_RENDER_COMMANDS
     for( s32 i = 0; i < size(); i++ ) {
         const Rop& rop = m_operations[i];
         const UserData& ud = m_userData[rop.bits.userData];
@@ -107,6 +116,39 @@ void Commands::dump( void ) const
             LogVerbose( "rvm", "%d: drawCall : %s technique=%d, renderable=%d\n", rop.bits.sequence, modes[rop.bits.mode], rop.bits.technique, rop.bits.renderable );
         }
     }
+#else
+    for( s32 i = 0; i < size(); i++ ) {
+        s32 opCode = opCodeAt( i );
+
+        switch( opCode ) {
+        case OpDrawIndexed:         {  
+                                        const DrawIndexed& draw = commandAt<DrawIndexed>( i );
+                                        LogVerbose( "rvm", "%s %s technique=%d, renderable=%d\n", commands[opCode], modes[draw.mode], draw.technique, draw.renderable );
+                                    }
+                                    break;
+        case OpPushRenderTarget:    {
+                                        const PushRenderTarget& cmd = commandAt<PushRenderTarget>( i );
+                                        LogVerbose( "rvm", "%s viewport=(%d %d %d %d)\n", commands[opCode], cmd.viewport[0], cmd.viewport[1], cmd.viewport[2], cmd.viewport[3] );
+                                    }
+                                    break;
+        //case OpSetRasterOptions:    {
+        //                                const SetRasterOptions& cmd = commandAt<SetRasterOptions>( i );
+        //                                LogVerbose( "rvm", "%s blend=(%s %s)\n", commands[opCode], cmd.viewport[0], cmd.viewport[1], cmd.viewport[2], cmd.viewport[3] );
+        //                            }
+        //                            break;
+        default:                    {
+                                        LogVerbose( "rvm", "%s\n", commands[opCode] );
+                                    }
+        }
+
+   /*     if( rop.bits.command ) {
+            LogVerbose( "rvm", "%d: %s %s\n", rop.bits.sequence, commands[rop.bits.mode], rop.bits.mode == Commands::Rop::ProgramInput ? inputs[ud.input.location] : "" );
+        }
+        else {
+            LogVerbose( "rvm", "%d: drawCall : %s technique=%d, renderable=%d\n", rop.bits.sequence, modes[rop.bits.mode], rop.bits.technique, rop.bits.renderable );
+        }*/
+    }
+#endif
 }
 
 // ** Commands::size
@@ -115,6 +157,7 @@ s32 Commands::size( void ) const
     return m_operations.allocatedCount();
 }
 
+#if DEV_OLD_RENDER_COMMANDS
 // ** Commands::ropAt
 const Commands::Rop& Commands::ropAt( s32 index ) const
 {
@@ -144,6 +187,7 @@ Commands::Rop* Commands::allocateRop( void )
     rop.bits.sequence = m_sequence;
     return &rop;
 }
+#endif
 
 // ** Commands::beginSequence
 u8 Commands::beginSequence( void )
@@ -162,6 +206,7 @@ u8 Commands::endSequence( void )
 // ** Commands::emitPushRenderTarget
 void Commands::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::PushRenderTarget );
     rop->bits.sequence = beginSequence();
@@ -176,19 +221,37 @@ void Commands::emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix
     for( s32 i = 0; i < 16; i++ ) {
         userData->rt.vp[i] = viewProjection[i];
     }
+#else
+    PushRenderTarget* cmd = allocateCommand<PushRenderTarget>( RVM_SORT( (beginSequence() << 24) ) );
+
+    cmd->instance = renderTarget.get();
+    cmd->viewport[0] = static_cast<u32>( viewport.min().x );
+    cmd->viewport[1] = static_cast<u32>( viewport.min().y );
+    cmd->viewport[2] = static_cast<u32>( viewport.width() );
+    cmd->viewport[3] = static_cast<u32>( viewport.height() );
+
+    for( s32 i = 0; i < 16; i++ ) {
+        cmd->vp[i] = viewProjection[i];
+    }
+#endif
 }
 
 // ** Commands::emitPopRenderTarget
 void Commands::emitPopRenderTarget( void )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::PopRenderTarget );
     rop->bits.sequence = beginSequence();
+#else
+    allocateCommand<PopRenderTarget>( beginSequence() << 24 );
+#endif
 }
 
 // ** Commands::emitRasterOptions
 void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions& options )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::RasterOptions );
     rop->bits.sequence = beginSequence();
@@ -196,11 +259,17 @@ void Commands::emitRasterOptions( u8 renderingModes, const RasterizationOptions&
     UserData* userData = allocateUserData( rop );
     userData->rasterization = options;
     userData->rasterization.modes = renderingModes;
+#else
+    SetRasterOptions* cmd = allocateCommand<SetRasterOptions>( beginSequence() << 24 );
+    cmd->options = options;
+    cmd->modes = renderingModes;
+#endif
 }
 
 // ** Commands::emitLightingShader
 void Commands::emitLightingShader( u8 models, s32 shader )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::Shader );
     rop->bits.sequence = beginSequence();
@@ -208,11 +277,17 @@ void Commands::emitLightingShader( u8 models, s32 shader )
     UserData* userData = allocateUserData( rop );
     userData->shader.shader = shader;
     userData->shader.models = models;
+#else
+    Shader* cmd = allocateCommand<Shader>( beginSequence() << 24 );
+    cmd->shader = shader;
+    cmd->models = models;
+#endif
 }
 
 // ** Commands::emitConstantColor
 void Commands::emitConstantColor( const Rgba& value )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::ConstantColor );
     rop->bits.sequence = beginSequence();
@@ -222,11 +297,19 @@ void Commands::emitConstantColor( const Rgba& value )
     userData->color[1] = value.g;
     userData->color[2] = value.b;
     userData->color[3] = value.a;
+#else
+    ConstantColor* cmd = allocateCommand<ConstantColor>( beginSequence() << 24 );
+    cmd->color[0] = value.r;
+    cmd->color[1] = value.g;
+    cmd->color[2] = value.b;
+    cmd->color[3] = value.a;
+#endif
 }
 
 // ** Commands::emitProgramInput
 void Commands::emitProgramInput( Program::Input location, const Vec4& value )
 {
+#if DEV_OLD_RENDER_COMMANDS
     Rop* rop = allocateRop();
     rop->setCommand( Rop::ProgramInput );
     rop->bits.sequence = beginSequence();
@@ -234,8 +317,14 @@ void Commands::emitProgramInput( Program::Input location, const Vec4& value )
     UserData* userData = allocateUserData( rop );
     userData->input.location = location;
     memcpy( userData->input.value, &value.x, sizeof( userData->input.value ) );
+#else
+    ProgramInput* cmd = allocateCommand<ProgramInput>( beginSequence() << 24 );
+    cmd->location = location;
+    memcpy( cmd->value, &value.x, sizeof( cmd->value ) );
+#endif
 }
 
+#if DEV_OLD_RENDER_COMMANDS
 // ** Commands::Rop::Rop
 Commands::Rop::Rop( void )
     : key( 0 )
@@ -247,6 +336,7 @@ bool Commands::Rop::operator < ( const Rop& other ) const
 {
     return key < other.key;
 }
+#endif
 
 } // namespace Scene
 

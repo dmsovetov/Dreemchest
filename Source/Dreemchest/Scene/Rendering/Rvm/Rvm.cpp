@@ -52,7 +52,10 @@ void Rvm::setTechnique( s32 value )
     m_activeState.technique = value;
 
     // Request the shader permutation
-    const Program& program = m_context.requestProgram( m_shaders[technique.lightingModel()], technique.features() ).readLock();
+    u32                  features = technique.features();
+    s32                  source   = m_shaders[technique.lightingModel()];
+    const ProgramHandle& handle   = m_context.requestProgram( source, features );
+    const Program&       program  = handle.readLock();
 
     // Set the permutation shader.
     setProgram( program );
@@ -182,7 +185,11 @@ void Rvm::setProgram( const Program& value )
 }
 
 // ** Rvm::setInstance
+#if DEV_OLD_RENDER_COMMANDS
 void Rvm::setInstance( const Commands::InstanceData& instance )
+#else
+void Rvm::setInstance( const Commands::DrawIndexed& instance )
+#endif  /*  DEV_OLD_RENDER_COMMANDS */
 {
     // Get an active program
     const Program* program = m_activeState.program;
@@ -252,6 +259,7 @@ void Rvm::setConstantColor( const Rgba& value )
     }
 }
 
+#if DEV_OLD_RENDER_COMMANDS
 // ** Rvm::executeCommand
 void Rvm::executeCommand( const Commands::Rop& rop, const Commands::UserData& userData )
 {
@@ -397,6 +405,141 @@ void Rvm::execute( const Commands& commands )
     // Reset rendering states
     reset();
 }
+#else
+// ** Rvm::execute
+void Rvm::execute( const Commands& commands )
+{
+    for( s32 i = 0, n = commands.size(); i < n; i++ ) {
+        s32 opCode = commands.opCodeAt( i );
+
+        switch( opCode ) {
+        case Commands::OpPushRenderTarget:   {
+                                                    // Get the render target state from command user data
+                                                    const Commands::PushRenderTarget& rt = commands.commandAt<Commands::PushRenderTarget>( i );
+
+                                                    // Push this render target to a stack
+                                                    m_renderTarget.push( rt );
+
+                                                    // Begin rendering
+                                                    rt.instance->begin( &m_context );
+
+                                                #if !DEV_DISABLE_DRAW_CALLS
+                                                    // Setup the viewport for this target
+                                                    m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                                #endif
+                                                }
+                                                break;
+
+        case Commands::OpPopRenderTarget:    {
+                                                    DC_ABORT_IF( m_renderTarget.empty(), "render target stack underflow" );
+
+                                                    // End rendering
+                                                    m_renderTarget.top().instance->end( &m_context );
+
+                                                    // Pop render target from a stack
+                                                    m_renderTarget.pop();
+
+                                                    // Rollback to the previous render target
+                                                    if( m_renderTarget.size() ) {
+                                                        const Commands::PushRenderTarget& rt = m_renderTarget.top();
+                                                    #if !DEV_DISABLE_DRAW_CALLS
+                                                        m_hal->setViewport( rt.viewport[0], rt.viewport[1], rt.viewport[2], rt.viewport[3] );
+                                                    #endif
+                                                    }
+                                                }
+                                                break;
+
+        case Commands::OpSetRasterOptions:      {
+                                                    // Get the rasterization options from command user data
+                                                    const Commands::SetRasterOptions& ro = commands.commandAt<Commands::SetRasterOptions>( i );
+
+                                                    for( s32 i = 0; i < TotalRenderModes; i++ ) {
+                                                        if( BIT( i ) & ro.modes ) {
+                                                            m_rasterization[i] = ro.options;
+                                                        }
+                                                    }
+                                                }
+                                                break;
+
+        case Commands::OpConstantColor:      setConstantColor( commands.commandAt<Commands::ConstantColor>( i ).color );
+                                                break;
+
+        case Commands::OpShader:         {
+                                                // Get the shader from command user data
+                                                const Commands::Shader& lightingModelShader = commands.commandAt<Commands::Shader>( i );
+
+                                                for( s32 i = 0; i < TotalLightingModels; i++ ) {
+                                                    if( BIT( i ) & lightingModelShader.models ) {
+                                                        m_shaders[i] = lightingModelShader.shader;
+                                                    }
+                                                }
+                                            }
+                                            break;
+
+        case Commands::OpProgramInput:   {
+                                                    // Get the program input user data
+                                                    const Commands::ProgramInput& programInput = commands.commandAt<Commands::ProgramInput>( i );
+                                                    m_inputs[programInput.location] = programInput.value;
+
+                                                    // Get active program
+                                                    const Program* program = m_activeState.program;
+
+                                                    // Set program input
+                                                    if( program ) {
+                                                        program->shader()->setVec4( program->inputLocation( programInput.location ), programInput.value );
+                                                    }
+                                                }
+                                                break;
+        case Commands::OpDrawIndexed:       {
+                                                const Commands::DrawIndexed& cmd = commands.commandAt<Commands::DrawIndexed>( i );
+
+                                                // Set the rendering technique
+                                                if( m_activeState.technique != cmd.technique ) {
+                                                    setTechnique( cmd.technique );
+                                                }
+
+                                                // Set the rendering mode
+                                                if( m_activeState.renderingMode != cmd.mode ) {
+                                                    setRenderingMode( cmd.mode );
+                                                }
+
+                                                // Set renderable
+                                                if( m_activeState.renderable !=cmd.renderable ) {
+                                                    setRenderable( cmd.renderable );
+                                                }
+
+                                                // Set instance data
+                                                setInstance( cmd );
+
+                                                // Render all chunks
+                                                const Renderable& renderable = *m_context.renderableByIndex( cmd.renderable );
+
+                                                for( s32 j = 0; j < renderable.chunkCount(); j++ ) {
+                                                    Renderer::VertexBufferWPtr vertexBuffer = renderable.vertexBuffer( j );
+
+                                                    if( vertexBuffer != m_activeState.vertexBuffer ) {
+                                                    #if !DEV_DISABLE_DRAW_CALLS
+                                                        m_hal->setVertexBuffer( vertexBuffer );
+                                                    #endif
+                                                        m_activeState.vertexBuffer = vertexBuffer;
+                                                    }
+                                                #if !DEV_DISABLE_DRAW_CALLS
+                                                    m_hal->renderIndexed( renderable.primitiveType(), renderable.indexBuffer( j ), 0, renderable.indexBuffer( j )->size() );
+                                                #endif
+                                                }                   
+                                            }
+                                            break;
+        default: NIMBLE_NOT_IMPLEMENTED;
+        }
+    }
+
+    // Reset active state
+    m_activeState = ActiveState();
+
+    // Reset rendering states
+    reset();
+}
+#endif  /*  DEV_OLD_RENDER_COMMANDS */
 
 // ** Rvm::reset
 void Rvm::reset( void )

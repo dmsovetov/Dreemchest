@@ -30,6 +30,9 @@
 #include "../RenderingContext.h"
 #include "RasterizationOptions.h"
 
+#define RVM_SORT( value )       (static_cast<u64>( value ) << 32)
+#define RVM_SEQUENCE( value )   (static_cast<u64>( value ) << (64 - 8))
+
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
@@ -38,6 +41,7 @@ namespace Scene {
     class Commands {
     public:
 
+    #if DEV_OLD_RENDER_COMMANDS
         //! Rendering operation emitted by scene object processing.
         struct Rop {
             //! Available command types
@@ -124,6 +128,71 @@ namespace Scene {
                 ProgramInput            input;          //!< The program input value.
             };
         };
+    #else
+        //! Render operation is a 64-bit unsigned integer that contains a 48-bit sorting key in higher bits and 16-bit command index in lower bits.
+        typedef u64 Rop;
+
+        //! Available command types
+        enum {
+              OpPushRenderTarget    //!< Begins rendering to target by pushing it to a stack and setting the viewport.
+            , OpPopRenderTarget     //!< Ends rendering to target by popping it from a stack.
+            , OpSetRasterOptions    //!< Setups the rasterization options.
+            , OpConstantColor       //!< Sets the constant color value.
+            , OpShader              //!< Sets the shader to be used for a lighting model.
+            , OpProgramInput        //!< Sets the program input value.
+            , OpDrawIndexed         //!< Performs rendering of an indexed renderable.
+        };
+
+        //! Template class to declare commands.
+        template<s32 TCommandId>
+        struct Command {
+            Command( void ) : id( TCommandId ) {};
+            s32 id;
+        };
+
+        //! Pushes a new render target to a stack
+        struct PushRenderTarget : public Command<OpPushRenderTarget> {
+            const RenderTarget*         instance;       //!< Render target instance to be pushed.
+            f32                         vp[16];         //!< The view-projection matrix to be set for a render target.
+            u32                         viewport[4];    //!< The viewport inside this render target.
+        };
+
+        //! Pops a render target from a stack
+        struct PopRenderTarget : public Command<OpPopRenderTarget> {
+        };
+
+        //! Sets the rasterization options for a set of blending modes.
+        struct SetRasterOptions : public Command<OpSetRasterOptions> {
+            u8                          modes;
+            RasterizationOptions        options;
+        };
+
+        //! Performs an indexed draw call
+        struct DrawIndexed : public Command<OpDrawIndexed> {
+            u16                         technique;      //!< Rendering technique index.
+            u16                         renderable;     //!< Mesh index.
+            u8                          mode;           //!< Rendering mode.
+            const Matrix4*              transform;      //!< Instance transform.
+            Renderer::TriangleFace      culling;        //!< Triangle face culling.
+        };
+
+        //! Sets the shader to be used for a set of material lighting models.
+        struct Shader : public Command<OpShader> {
+            u8                          models;         //!< The bitmask of models that are eligible to use this shader.
+            s32                         shader;         //!< Shader instance index.       
+        };
+
+        //! Sets the constant color program input.
+        struct ConstantColor : public Command<OpConstantColor> {
+            f32                         color[4];       //!< The constant color value.
+        };
+
+        //! Program input value data.
+        struct ProgramInput : public Command<OpProgramInput> {
+            Program::Input              location;       //!< Program input index.
+            f32                         value[4];       //!< The program input value.
+        };
+    #endif
 
                                         //! Constructs the Commands instance.
                                         Commands( void );
@@ -140,6 +209,7 @@ namespace Scene {
         //! Returns the total number of render operations.
         s32                             size( void ) const;
 
+    #if DEV_OLD_RENDER_COMMANDS
         //! Returns the render operation by index.
         const Rop&                      ropAt( s32 index ) const;
 
@@ -148,6 +218,24 @@ namespace Scene {
 
         //! Pushes a single draw call instruction.
         NIMBLE_INLINE InstanceData*     emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
+    #else
+        //! Pushes a single draw call instruction.
+        NIMBLE_INLINE DrawIndexed*      emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth );
+
+        //! Returns a rop at specified index.
+        s32                             opCodeAt( s32 index ) const
+        {
+            return *reinterpret_cast<const s32*>( m_commands.data() + static_cast<u32>( m_operations[index] & 0xFFFFFFFF ) );
+        }
+
+        //! Returns a command at specified index.
+        template<typename TCommand>
+        const TCommand&                 commandAt( s32 index ) const
+        {
+            const u8* pointer = m_commands.data() + static_cast<u32>( m_operations[index] & 0xFFFFFFFF );
+            return *reinterpret_cast<const TCommand*>( pointer );
+        }
+    #endif  /*  DEV_OLD_RENDER_COMMANDS */
 
         //! Emits the command to push a render target.
         void                            emitPushRenderTarget( RenderTargetWPtr renderTarget, const Matrix4& viewProjection, const Rect& viewport );
@@ -175,11 +263,17 @@ namespace Scene {
         //! Forward declaration of a render target state data.
         struct RenderTargetState;
 
+    #if DEV_OLD_RENDER_COMMANDS
         //! Allocates new user data for a specified rop instance instance.
         UserData*                       allocateUserData( Rop* rop );
 
         //! Allocates new Rop instance.
         Rop*                            allocateRop( void );
+    #else
+        //! Allocates a command instance.
+        template<typename T>
+        T*                              allocateCommand( u64 sortingKey );
+    #endif  /*  DEV_OLD_RENDER_COMMANDS */
 
         //! Begins new sequence by returning current sequence number (also post-increments the sequence number).
         u8                              beginSequence( void );
@@ -190,10 +284,16 @@ namespace Scene {
     private:
 
         u8                              m_sequence;     //!< Current sequence number of render operation.
+    #if DEV_OLD_RENDER_COMMANDS
         IndexAllocator<Rop>             m_operations;   //!< Allocated instructions.
         IndexAllocator<UserData>        m_userData;     //!< Allocated instruction user data.
+    #else
+        IndexAllocator<Rop>             m_operations;   //!< Allocated instructions.
+        LinearAllocator                 m_commands;     //!< This linear allocator is used for storing all commands.
+    #endif  /*  DEV_OLD_RENDER_COMMANDS */
     };
 
+#if DEV_OLD_RENDER_COMMANDS
     // ** Commands::emitDrawCall
     NIMBLE_INLINE Commands::InstanceData* Commands::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
     {
@@ -211,6 +311,32 @@ namespace Scene {
 
         return &data->instance;
     }
+#else
+    // ** Commands::allocateCommand
+    template<typename T>
+    T* Commands::allocateCommand( u64 sortingKey )
+    {
+        u8* pointer = m_commands.allocate( sizeof( T ) );
+        u32 offset  = pointer - m_commands.data();
+        s32 idx     = m_operations.allocate();
+        m_operations[idx] = RVM_SORT( sortingKey ) | offset;
+        return DC_NEW( pointer ) T;
+    }
+
+    // ** Commands::emitDrawCall
+    NIMBLE_INLINE Commands::DrawIndexed* Commands::emitDrawCall( const Matrix4* transform, s32 renderable, s32 technique, u8 mode, f32 depth )
+    {
+        u8 quantizedDepth = static_cast<u8>( 127 * (1.0f - (depth / 100.0f)) );
+
+        DrawIndexed* cmd = allocateCommand<DrawIndexed>( (m_sequence << 24) | (mode << 22) | (quantizedDepth << 14) | (technique << 7 ) | renderable );
+        cmd->mode = mode;
+        cmd->technique = technique;
+        cmd->renderable = renderable;
+        cmd->transform = transform;
+        cmd->culling = Renderer::TriangleFaceBack;
+        return cmd;
+    }
+#endif  /*  DEV_OLD_RENDER_COMMANDS */
 
 } // namespace Scene
 

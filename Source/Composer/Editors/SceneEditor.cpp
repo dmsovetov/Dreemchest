@@ -304,7 +304,11 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         materials.back().asset().setName( "GeneratedMaterial" + toString( i ) );
     }
 
-    s32 count = 64;
+#if DEV_PROFILE_RVM_CPU
+    s32 count = 125;
+#else
+    s32 count = 16;
+#endif
     f32 offset = 5.25f;
     for( s32 i = 0; i < count; i++ ) {
         for( s32 j = 0; j < count; j++ ) {
