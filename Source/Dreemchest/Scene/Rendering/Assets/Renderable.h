@@ -122,11 +122,7 @@ namespace Scene {
     private:
 
         //! Container type to map from a feature set to a compiled shader program.
-    #ifdef DC_CPP11_DISABLED
-        typedef Map<u32, ProgramHandle> Permutations;
-    #else
-        typedef std::unordered_map<u32, ProgramHandle> Permutations;
-    #endif  /*  DC_CPP11_DISABLED   */
+        typedef HashMap<u32, ProgramHandle> Permutations;
 
         String                      m_vertex;       //!< Vertex shader source.
         String                      m_fragment;     //!< Fragment shader source.
