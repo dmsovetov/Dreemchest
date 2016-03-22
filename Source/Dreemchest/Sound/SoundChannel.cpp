@@ -72,8 +72,16 @@ const Vec3& SoundChannel::position( void ) const
 // ** SoundChannel::setPosition
 void SoundChannel::setPosition( const Vec3& value )
 {
+    // Get the sound source buffer
+    SoundBufferWPtr buffer = m_source->buffer();
+
+    if( !buffer.valid() ) {
+        LogError( "channel", "channel sound source does not have a sound buffer\n" );
+        return;
+    }
+
     // Only mono sounds can be positioned
-    SoundSampleFormat format = m_source->buffer()->format();
+    SoundSampleFormat format = buffer->format();
 
     if( format != SoundSampleMono8 && format != SoundSampleMono16 ) {
         LogWarning( "channel", "stereo sound '%s' could not be positioned in 3D\n", m_sound->identifier() );
