@@ -40,10 +40,6 @@ namespace Sound {
 // ** OpenAL::OpenAL
 OpenAL::OpenAL( void )
 {
-    f32 lp[] = { 0.0f, 0.0f,  0.0f };
-    f32 lv[] = { 0.0f, 0.0f,  0.0f };
-    f32 lo[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
-
     m_device = alcOpenDevice( NULL );
     LogVerbose( "openal", "device created %x\n", m_device );
 
@@ -51,10 +47,6 @@ OpenAL::OpenAL( void )
     LogVerbose( "openal", "context created %x\n", m_context );
 
     alcMakeContextCurrent( m_context );
-
-    alListenerfv( AL_POSITION,    lp );
-    alListenerfv( AL_VELOCITY,    lv );
-    alListenerfv( AL_ORIENTATION, lo );
 
     LogVerbose( "openal", "version=%s, renderer=%s, vendor=%s\n", alGetString( AL_VERSION ), alGetString( AL_RENDERER ), alGetString( AL_VENDOR ) );
 //    LogVerbose( "AL_EXTENSIONS: %s\n", alGetString( AL_EXTENSIONS ) );
@@ -146,6 +138,18 @@ void OpenAL::setVolume( f32 value )
 void OpenAL::setPitch( f32 value )
 {
 	alListenerf( AL_PITCH, value );
+}
+
+// ** OpenAL::setDistanceModel
+void OpenAL::setDistanceModel( DistanceModel value )
+{
+    ALenum models[] = {
+          AL_NONE
+        , AL_INVERSE_DISTANCE_CLAMPED
+        , AL_LINEAR_DISTANCE_CLAMPED
+        , AL_EXPONENT_DISTANCE_CLAMPED
+    };
+    alDistanceModel( models[value] );
 }
 
 } // namespace Sound

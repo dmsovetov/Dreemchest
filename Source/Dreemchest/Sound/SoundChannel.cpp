@@ -37,7 +37,11 @@ DC_BEGIN_DREEMCHEST
 namespace Sound {
 
 // ** SoundChannel::SoundChannel
-SoundChannel::SoundChannel( SoundDataWPtr data, SoundSourcePtr source ) : m_source( source ), m_volumeFader( NULL ), m_sound( data ), m_volume( 1.0f )
+SoundChannel::SoundChannel( SoundDataWPtr data, SoundSourcePtr source )
+    : m_source( source )
+    , m_volumeFader( NULL )
+    , m_sound( data )
+    , m_volume( 1.0f )
 {
 
 }
@@ -165,6 +169,12 @@ bool SoundChannel::update( f32 dt )
 
 	// Set the sond source volume
 	m_source->setVolume( volume );
+
+    // Update source distance attenuation properties
+    m_source->setMaximumDistance( m_sound->maximumDistance() );
+    m_source->setRolloffFactor( m_sound->rolloffFactor() );
+    m_source->setReferenceDistance( m_sound->referenceDistance() );
+    m_source->setRelative( m_sound->isRelative() );
 
     return m_source->state() == SoundSource::Stopped;
 }

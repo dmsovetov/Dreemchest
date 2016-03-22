@@ -139,6 +139,30 @@ void OpenALSource::setPosition( const Vec3& value )
     alSourcefv( m_id, AL_POSITION, v );
 }
 
+// ** OpenALSource::setRelative
+void OpenALSource::setRelative( bool value )
+{
+    alSourcei( m_id, AL_SOURCE_RELATIVE, value ? AL_TRUE : AL_FALSE );
+}
+
+// ** OpenALSource::setReferenceDistance
+void OpenALSource::setReferenceDistance( f32 value )
+{
+    alSourcef( m_id, AL_REFERENCE_DISTANCE, value );
+}
+
+// ** OpenALSource::setMaximumDistance
+void OpenALSource::setMaximumDistance( f32 value )
+{
+    alSourcef( m_id, AL_MAX_DISTANCE, value );
+}
+
+// ** OpenALSource::setRolloffFactor
+void OpenALSource::setRolloffFactor( f32 value )
+{
+    alSourcef( m_id, AL_ROLLOFF_FACTOR, value );
+}
+
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {

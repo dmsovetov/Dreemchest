@@ -54,6 +54,14 @@ namespace Sound {
         SoundFormatMp3,         //!< MP3
     };
 
+    //! Supported distance attenuation models.
+    enum DistanceModel {
+          NoDistanceAttenutation        //!< The distance attenuation is disabled.
+        , InverseDistanceAttenuation    //!< Doubling the distance halves the source gain.
+        , LinearDistanceAttenutation    //!< Linear gain scaling between the reference and max distances.
+        , ExponentDistanceAttenuation   //!< Exponential gain dropoff.
+    };
+
 	dcDeclarePtrs( SoundFx )
 	dcDeclarePtrs( SoundChannel )
 	dcDeclarePtrs( SoundData )

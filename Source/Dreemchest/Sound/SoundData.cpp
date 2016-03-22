@@ -34,7 +34,16 @@ DC_BEGIN_DREEMCHEST
 namespace Sound {
 
 // ** SoundData::SoundData
-SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group ) : m_soundFx( sfx ), m_uri( uri ), m_group( group ), m_pcm( NULL ), m_format( SoundFormatUnknown )
+SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group )
+    : m_soundFx( sfx )
+    , m_uri( uri )
+    , m_group( group )
+    , m_pcm( NULL )
+    , m_format( SoundFormatUnknown )
+    , m_isRelative( false )
+    , m_maximumDistance( FLT_MAX )
+    , m_rolloffFactor( 1.0f )
+    , m_referenceDistance( 1.0f )
 {
     m_identifier        = identifier;
     m_type              = 0;
@@ -173,6 +182,54 @@ bool SoundData::isLooped( void ) const
 void SoundData::setLooped( bool value )
 {
     m_isLooped = value;
+}
+
+// ** SoundData::isRelative
+bool SoundData::isRelative( void ) const
+{
+    return m_isRelative;
+}
+
+// ** SoundData::setRelative
+void SoundData::setRelative( bool value )
+{
+    m_isRelative = value;
+}
+
+// ** SoundData::referenceDistance
+f32 SoundData::referenceDistance( void ) const
+{
+    return m_referenceDistance;
+}
+
+// ** SoundData::setReferenceDistance
+void SoundData::setReferenceDistance( f32 value )
+{
+    m_referenceDistance = value;
+}
+
+// ** SoundData::maximumDistance
+f32 SoundData::maximumDistance( void ) const
+{
+    return m_maximumDistance;
+}
+
+// ** SoundData::setMaximumDistance
+void SoundData::setMaximumDistance( f32 value )
+{
+    m_maximumDistance = value;
+}
+
+// ** SoundData::rolloffFactor
+f32 SoundData::rolloffFactor( void ) const
+{
+    return m_rolloffFactor;
+}
+
+// ** SoundData::setRolloffFactor
+void SoundData::setRolloffFactor( f32 value )
+{
+    m_rolloffFactor = value;
 }
 
 // ** SoundData::priority

@@ -49,6 +49,9 @@ namespace Sound {
         //! Sets the listener position.
         virtual void            setPosition( const Vec3& value ) = 0;
 
+        //! Sets the distance attenuation model.
+        virtual void            setDistanceModel( DistanceModel value ) = 0;
+
         //! Creates a new hardware sound source.
         virtual SoundSourcePtr	createSource( void );
 

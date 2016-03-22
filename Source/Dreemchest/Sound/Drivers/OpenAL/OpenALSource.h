@@ -40,16 +40,20 @@ namespace Sound {
     public:
 
                                 OpenALSource( void );
-        virtual                 ~OpenALSource( void );
+        virtual                 ~OpenALSource( void ) DC_DECL_OVERRIDE;
 
         // ** SoundSource
-        virtual void            update( void );
-        virtual void            setBuffer( SoundBufferPtr value );
-        virtual SourceState     state( void ) const;
-        virtual void            setState( SourceState value );
-        virtual void            setVolume( f32 value );
-        virtual void            setPitch( f32 value );
-        virtual void            setPosition( const Vec3& value );
+        virtual void            update( void ) DC_DECL_OVERRIDE;
+        virtual void            setBuffer( SoundBufferPtr value ) DC_DECL_OVERRIDE;
+        virtual SourceState     state( void ) const DC_DECL_OVERRIDE;
+        virtual void            setState( SourceState value ) DC_DECL_OVERRIDE;
+        virtual void            setVolume( f32 value ) DC_DECL_OVERRIDE;
+        virtual void            setPitch( f32 value ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( const Vec3& value ) DC_DECL_OVERRIDE;
+        virtual void            setRelative( bool value ) DC_DECL_OVERRIDE;
+        virtual void            setReferenceDistance( f32 value ) DC_DECL_OVERRIDE;
+        virtual void            setMaximumDistance( f32 value ) DC_DECL_OVERRIDE;
+        virtual void            setRolloffFactor( f32 value ) DC_DECL_OVERRIDE;
 
     private:
 

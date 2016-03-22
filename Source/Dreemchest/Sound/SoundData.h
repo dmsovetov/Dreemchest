@@ -35,28 +35,29 @@ namespace Sound {
 
     // ** struct SoundDataInfo
     struct SoundDataInfo {
-        String         identifier;
-        String         uri;
-        String         group;
-        u32            type;
-        u8             loading;
-        f32            fadeTime;
-        f32            volume;
-        Range          volumeModifier;
-        f32            pitch;
-        Range          pitchModifier;
-        bool           isLooped;
-        u32            priority;
+        String          identifier;
+        String          uri;
+        String          group;
+        u32             type;
+        u8              loading;
+        f32             fadeTime;
+        f32             volume;
+        Range           volumeModifier;
+        f32             pitch;
+        Range           pitchModifier;
+        bool            isLooped;
+        bool            isRelative;
+        f32             referenceDistance;
+        f32             maximumDistance;
+        u32             priority;
     };
 
-    // ** SoundData
     //! SoundData class represents a single sound that is shared
     //! across all hardware sources that are playing a sound.
     class SoundData : public RefCounted {
     friend class SoundFx;
     public:
 
-        // ** enum eLoadingFlags
         //! Supported sound loading flags
         enum LoadingFlags {
             Stream,            //!< The sound is streamed from an asset file.
@@ -111,10 +112,39 @@ namespace Sound {
         f32						pitch( void ) const;
         //! Sets a base sound playback pitch.
         void					setPitch( f32 value );
-        //! Returns true id this sound is looped, otherwise false.
+        //! Returns true if this sound is looped, otherwise false.
         bool					isLooped( void ) const;
         //! Sets a sound looping flag.
         void					setLooped( bool value );
+        //! Returns true if this sound is positioned relatively to a listener.
+        bool                    isRelative( void ) const;
+        //! Sets a sound relative flag.
+        void                    setRelative( bool value );
+        //! Returns the reference distance value.
+        /*!
+            The distance under which the volume for the source
+            would normally drop by half (before being influenced
+            by rolloff factor or maximumDistance).   
+        */
+        f32                     referenceDistance( void ) const;
+        //! Sets the reference distance value.
+        void                    setReferenceDistance( f32 value );
+        //! Returns maximum distance value.
+        /*!
+            Used with the Inverse Distance Model to set
+            the distance where there will no longer be any
+            attenuation of the source.
+        */
+        f32                     maximumDistance( void ) const;
+        //! Sets the maximum distance value.
+        void                    setMaximumDistance( f32 value );
+        //! Sets the rolloff factor value.
+        /*!
+            The rolloff rate for the source default is 1.0.
+        */
+        f32                     rolloffFactor( void ) const;
+        //! Sets the rollof factor value.
+        void                    setRolloffFactor( f32 value );
         //! Returns a sound priority.
         u32						priority( void ) const;
         //! Sets a sound priority.
@@ -160,6 +190,14 @@ namespace Sound {
         Range					m_pitchModifier;
         //! The flag indicating whether this sound is looped.
         bool					m_isLooped;
+        //! The flag indicating whether this sound is positioned relatively to a listener.
+        bool                    m_isRelative;
+        //! Reference distance value (used by a distance model).
+        f32                     m_referenceDistance;
+        //! Maximum distance (used by a distance model).
+        f32                     m_maximumDistance;
+        //! Rolloff factor (used by a distance model).
+        f32                     m_rolloffFactor;
         //! Sound playback priority.
         u32						m_priority;
         //! Decoded PCM data.

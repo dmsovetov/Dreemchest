@@ -44,7 +44,6 @@ namespace Sound {
     class SoundFx : public RefCounted {
     public:
 
-        // ** enum eSoundHal
         //! Supported sound fx HALs
         enum SoundHal {
             None,        //!< No HAL, the sound playback is disabled.
@@ -88,6 +87,11 @@ namespace Sound {
 
         //! Sets the listener position.
         void                    setListenerPosition( const Vec3& value );
+
+        //! Returns the selected distance model.
+        DistanceModel           distanceModel( void ) const;
+        //! Sets the distance model to be used.
+        void                    setDistanceModel( DistanceModel value );
 
         //! Returns a group by a given name (NULL if no such group found).
         SoundGroupWPtr          findGroupByName( CString identifier );
@@ -236,6 +240,9 @@ namespace Sound {
         //! Sound event registered inside this SoundFx.
         /*! Contains pairs of (strhash, sound event pointer). */
         SoundEvents             m_events;
+
+        //! Distance attenuation model.
+        DistanceModel           m_distanceModel;
     };
     
 } // namespace Sound
