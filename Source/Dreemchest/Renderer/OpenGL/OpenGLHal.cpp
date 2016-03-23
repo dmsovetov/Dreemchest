@@ -27,7 +27,7 @@
 #include	"OpenGLHal.h"
 #include	"OpenGLExtensions.h"
 
-#include    "../RenderState.h"
+#include    "../RenderStateDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Hal.h"
-#include "RenderState.h"
+#include "RenderStateDeprecated.h"
 #include "BatchRenderer.h"
 
 #ifdef DC_THREADS

@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include    "RenderState.h"
+#include    "RenderStateDeprecated.h"
 
 DC_BEGIN_DREEMCHEST
 
