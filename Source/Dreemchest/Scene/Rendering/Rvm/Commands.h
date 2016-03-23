@@ -195,7 +195,9 @@ namespace Scene {
     // ** Commands::emitDrawCall
     NIMBLE_INLINE Commands::DrawIndexed* Commands::emitDrawCall( u32 sortingKey, const Matrix4* transform, s32 renderable, s32 technique, u8 mode )
     {
-        DrawIndexed* cmd = allocateCommand<DrawIndexed>( m_sequence << 24 | sortingKey );
+        DC_BREAK_IF( (~4194303 & sortingKey) != 0, "sorting key bitmask overflow" );
+
+        DrawIndexed* cmd = allocateCommand<DrawIndexed>( m_sequence << 22 | sortingKey );
         cmd->mode = mode;
         cmd->technique = technique;
         cmd->renderable = renderable;

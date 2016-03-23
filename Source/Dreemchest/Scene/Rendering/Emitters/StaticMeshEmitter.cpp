@@ -73,10 +73,10 @@ void StaticMeshEmitter::emit( const Vec3& camera )
             f32 distance = m_depthSort ? (camera - mesh.transform->worldSpacePosition()).length() : 0.0f;
 
             // Convert depth to an integer value
-            sortKey = (mode << 22) | static_cast<u32>( 4194303 * (1.0f - (distance / 1000.0f)) );
+            sortKey = static_cast<u32>( 4194303 * (1.0f - (distance / 1000.0f)) );
         } else {
             // No depth sorting, so just compose the key from renderable and technique
-            sortKey = (mode << 22) | (mesh.technique << 11) | mesh.renderable;
+            sortKey = (mesh.technique << 11) | mesh.renderable;
         }
 
         // Emit additional draw call for additive & translucent two-sided materials.
