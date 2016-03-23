@@ -53,6 +53,7 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener )
 	, m_volume( 1.0f )
 	, m_pitch( 1.0f )
 	, m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
+    , m_distanceModel( InverseDistanceAttenuation )
 {
     switch( hal ) {
     case None:      m_hal = NULL;           break;
@@ -132,6 +133,19 @@ SoundEventWPtr SoundFx::createEvent( CString identifier )
     m_events[hash] = event;
 
     return event;
+}
+
+// ** SoundFx::distanceModel
+DistanceModel SoundFx::distanceModel( void ) const
+{
+    return m_distanceModel;
+}
+
+// ** SoundFx::setDistanceModel
+void SoundFx::setDistanceModel( DistanceModel value )
+{
+    m_distanceModel = value;
+    m_hal->setDistanceModel( value );
 }
 
 // ** SoundFx::findSoundByName

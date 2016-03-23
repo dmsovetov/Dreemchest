@@ -83,11 +83,23 @@ namespace Sound {
         //! Sets the looping of a sound source.
         virtual void            setLooped( bool value );
 
-        //! Returns the source source position.
+        //! Returns the a sound source position.
         virtual const Vec3&     position( void ) const;
 
-        //! Sets source source position.
+        //! Sets a sound source position.
         virtual void            setPosition( const Vec3& value );
+
+        //! Sets sound source relative flag.
+        virtual void            setRelative( bool value ) = 0;
+
+        //! Sets the reference distance value.
+        virtual void            setReferenceDistance( f32 value ) = 0;
+
+        //! Sets the maximum distance value.
+        virtual void            setMaximumDistance( f32 value ) = 0;
+
+        //! Sets the rollof factor value.
+        virtual void            setRolloffFactor( f32 value ) = 0;
 
     protected:
 

@@ -37,7 +37,11 @@ DC_BEGIN_DREEMCHEST
 namespace Sound {
 
 // ** SoundChannel::SoundChannel
-SoundChannel::SoundChannel( SoundDataWPtr data, SoundSourcePtr source ) : m_source( source ), m_volumeFader( NULL ), m_sound( data ), m_volume( 1.0f )
+SoundChannel::SoundChannel( SoundDataWPtr data, SoundSourcePtr source )
+    : m_source( source )
+    , m_volumeFader( NULL )
+    , m_sound( data )
+    , m_volume( 1.0f )
 {
 
 }
@@ -68,8 +72,16 @@ const Vec3& SoundChannel::position( void ) const
 // ** SoundChannel::setPosition
 void SoundChannel::setPosition( const Vec3& value )
 {
+    // Get the sound source buffer
+    SoundBufferWPtr buffer = m_source->buffer();
+
+    if( !buffer.valid() ) {
+        LogError( "channel", "channel sound source does not have a sound buffer\n" );
+        return;
+    }
+
     // Only mono sounds can be positioned
-    SoundSampleFormat format = m_source->buffer()->format();
+    SoundSampleFormat format = buffer->format();
 
     if( format != SoundSampleMono8 && format != SoundSampleMono16 ) {
         LogWarning( "channel", "stereo sound '%s' could not be positioned in 3D\n", m_sound->identifier() );
@@ -165,6 +177,12 @@ bool SoundChannel::update( f32 dt )
 
 	// Set the sond source volume
 	m_source->setVolume( volume );
+
+    // Update source distance attenuation properties
+    m_source->setMaximumDistance( m_sound->maximumDistance() );
+    m_source->setRolloffFactor( m_sound->rolloffFactor() );
+    m_source->setReferenceDistance( m_sound->referenceDistance() );
+    m_source->setRelative( m_sound->isRelative() );
 
     return m_source->state() == SoundSource::Stopped;
 }

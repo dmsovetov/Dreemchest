@@ -70,10 +70,13 @@ ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 	return connection;
 }
 
-// ** Application::removeConnection
-void Application::removeConnection( ConnectionWPtr connection )
+// ** Application::closeConnection
+void Application::closeConnection( ConnectionWPtr connection )
 {
     LogVerbose( "connection", "connection #%d closed (%d active connections)\n", connection->id(), m_connections.size() - 1 );
+
+    // Notify listeners about a disconnection
+    notify<Disconnected>( this, connection );
 
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
@@ -182,8 +185,11 @@ void Application::handlePacketReceived( const Connection::Received& e )
 // ** Application::handleConnectionClosed
 void Application::handleConnectionClosed( const Connection::Closed& e )
 {
+    // Output the log message
+    LogVerbose( "connection", "#%d was closed (%d active connections)\n", e.sender->id(), m_connections.size() );
+
 	// Remove this connection from list
-	removeConnection( static_cast<Connection*>( e.sender.get() ) );
+	closeConnection( static_cast<Connection*>( e.sender.get() ) );
 }
 
 // ** Application::update
