@@ -108,8 +108,8 @@ namespace Network {
 		//! Creates a connection from socket.
 		ConnectionPtr			createConnection( TCPSocketWPtr socket );
 
-		//! Removes the connection instance from application.
-		void					removeConnection( ConnectionWPtr connection );
+		//! Removes the connection instance from application and emits Disconnected event.
+		void					closeConnection( ConnectionWPtr connection );
 
 		//! Handles an event packet.
 		void					handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet );

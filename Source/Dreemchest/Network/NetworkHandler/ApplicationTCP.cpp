@@ -115,11 +115,8 @@ void ApplicationTCP::handleSocketClosed( const TCPSocket::Closed& e )
     ConnectionBySocket::iterator i = m_connectionBySocket.find( e.sender );
     DC_ABORT_IF( i == m_connectionBySocket.end(), "no connection associated with this socket instance" );
 
-    // Notify listeners about a disconnection
-    notify<Disconnected>( this, i->second );
-
     // Remove the connection
-    removeConnection( i->second );
+    closeConnection( i->second );
 
     // Unregister the connection
     m_connectionBySocket.erase( i );
