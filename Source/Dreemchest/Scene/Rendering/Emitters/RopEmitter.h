@@ -112,8 +112,8 @@ namespace Scene {
         , m_entities( TInitialSize )
     {
         // Subscribe for index events
-        m_index->events().subscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
-        m_index->events().subscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
+        m_index->subscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
+        m_index->subscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
     }
 
     // ** RopEmitter::construct
@@ -132,8 +132,8 @@ namespace Scene {
 	RopEmitter<TRenderable, TRenderEntity, TInitialSize>::~RopEmitter( void )
     {
         // Unsubscribe from index events
-        m_index->events().unsubscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
-        m_index->events().unsubscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
+        m_index->unsubscribe<Ecs::Index::Added>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityAdded) ) );
+        m_index->unsubscribe<Ecs::Index::Removed>( CLOSURE( this, (&RopEmitter<TRenderable, TRenderEntity>::handleEntityRemoved) ) );
     }
 
     // ** RopEmitter::~RopEmitter

@@ -45,8 +45,8 @@ bool EntitySystem::initialize( EcsWPtr ecs )
 	}
 
 	m_index = ecs->requestIndex( m_name, m_aspect );
-	m_index->events().subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
-	m_index->events().subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
+	m_index->subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
+	m_index->subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
 
 	return true;
 }

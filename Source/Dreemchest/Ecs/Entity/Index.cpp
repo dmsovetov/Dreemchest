@@ -60,12 +60,6 @@ s32 Index::size( void ) const
 	return static_cast<s32>( m_entities.size() );
 }
 
-// ** Index::events
-EventEmitter& Index::events( void )
-{
-	return m_eventEmitter;
-}
-
 // ** Index::notifyEntityChanged
 void Index::notifyEntityChanged( const EntityPtr& entity )
 {

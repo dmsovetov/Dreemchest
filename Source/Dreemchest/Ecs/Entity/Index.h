@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 	//! Entity index represents a set of entities grouped by a certain criteria.
-	class Index : public RefCounted {
+	class Index : public InjectEventEmitter<RefCounted> {
 	friend class Ecs;
 	public:
 
@@ -45,12 +45,7 @@ namespace Ecs {
 
 		//! Returns a set of entities 
 		const EntitySet&		entities( void ) const;
-
-		//! Returns a set of entities 
 		EntitySet&				entities( void );
-
-		//! Returns event emitter
-		EventEmitter&			events( void );
 
 		//! New entity has been added to index.
 		struct Added {
@@ -88,7 +83,6 @@ namespace Ecs {
 		String					m_name;				//!< Index name.
 		Aspect					m_aspect;			//!< Entity aspect.
 		EntitySet				m_entities;			//!< Entity set.
-		EventEmitter			m_eventEmitter;		//!< Index event emitter.
 	};
 
 } // namespace Ecs
