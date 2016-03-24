@@ -112,8 +112,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
-	//m_camera->attach<Scene::RenderUnlit>();
-    m_camera->attach<Scene::RenderForwardLit>();
+	m_camera->attach<Scene::RenderUnlit>();
+    //m_camera->attach<Scene::RenderForwardLit>();
 	//m_camera->attach<Scene::RenderBoundingVolumes>();
 	//m_camera->attach<RenderSceneHelpers>();
 
@@ -153,9 +153,9 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 #if DEV_DEPRECATED_SCENE_RENDERER
 	m_scene->addRenderingSystem<SceneHelpersRenderer>();
 #else
-    m_renderingContext->addRenderSystem<Scene::DepthComplexity>();
-    m_renderingContext->addRenderSystem<Scene::Unlit>();
-    m_renderingContext->addRenderSystem<Scene::ForwardLighting>();
+    m_renderScene->addRenderSystem<Scene::DepthComplexity>();
+    m_renderScene->addRenderSystem<Scene::Unlit>();
+    m_renderScene->addRenderSystem<Scene::ForwardLighting>();
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool
@@ -309,7 +309,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 #if DEV_PROFILE_RVM_CPU
     s32 count = 125;
 #else
-    s32 count = 64;
+    s32 count = 16;
 #endif
     f32 offset = 5.25f;
     for( s32 i = 0; i < count; i++ ) {
