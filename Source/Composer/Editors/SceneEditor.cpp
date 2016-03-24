@@ -602,7 +602,7 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 Scene::SceneObjectWPtr SceneEditor::findSceneObjectAtPoint( s32 x, s32 y ) const
 {
 	// Query scene object by ray
-	Scene::RayTracingResultArray sceneObjects = m_scene->queryRay( constructViewRay( x, y ) );
+	Scene::Spatial::Results sceneObjects = m_scene->spatial()->queryRay( constructViewRay( x, y ) );
 
 	// Get the hit scene object.
 	Scene::SceneObjectWPtr target = !sceneObjects.empty() ? sceneObjects[0].sceneObject : Scene::SceneObjectWPtr();
