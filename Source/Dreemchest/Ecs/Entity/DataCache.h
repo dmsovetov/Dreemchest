@@ -85,7 +85,7 @@ namespace Ecs {
         typedef FixedArray<TData>   Container;
 
         //! Factory function to create cache items.
-        typedef cClosure<TData(const Entity*)>  Factory;
+        typedef cClosure<TData(const Entity&)>  Factory;
 
         //! Returns cached data.
         const Container&            data( void ) const;
@@ -134,7 +134,8 @@ namespace Ecs {
     template<typename TData>
     s32 DataCache<TData>::addCacheEntry( const Entity* entity )
     {
-        return m_data.push( m_factory( entity ) );
+        DC_ABORT_IF( entity == NULL, "cache entry could not be created from an invalid entity" );
+        return m_data.push( m_factory( *entity ) );
     }
 
     // ** DataCache::removeCacheEntry
