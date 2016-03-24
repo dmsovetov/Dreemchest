@@ -227,6 +227,17 @@ namespace Assets {
         //! Requests an asset cache for a specified asset type.
         AbstractAssetCache*         findAssetCache( const TypeId& type ) const;
 
+        //! Returns the total number of bytes allocated for asset data.
+        s32                         totalBytesUsed( void ) const;
+
+        //! Returns the total number of bytes allocated for a specified asset type.
+        template<typename TAsset>
+        s32                         bytesUsedByType( void ) const;
+
+        //! Sets asset size evaluation function.
+        template<typename TAsset>
+        void                        setSizeEvaluator( const cClosure<s32(const TAsset&)>& value );
+
         //! Returns cached read-only asset data.
         template<typename TAsset>
         const TAsset&               readOnlyAssetData( const Asset& asset ) const;
@@ -263,20 +274,42 @@ namespace Assets {
 
             //! Returns the total cache size.
             virtual s32             size( void ) const = 0;
+
+            //! Returns the total number of bytes used by an asset cache.
+            virtual s32             allocatedBytes( void ) const = 0;
         };
 
         //! Generic asset cache that stores asset data of specified type.
         template<typename TAsset>
         struct AssetCache : public AbstractAssetCache {
+            //! Asset size evaluation function.
+            typedef cClosure<s32(const TAsset& asset)> SizeEvaluator;
+
             //! Reserves the slot handle inside cache.
             virtual Index           reserve( void ) { return slots.reserve(); }
 
             //! Returns the total cache size.
             virtual s32             size( void ) const { return slots.size(); }
 
+            //! Returns the total number of bytes used by an asset cache.
+            virtual s32             allocatedBytes( void ) const
+            {
+                if( !sizeEvaluator ) {
+                    return 0;
+                }
+
+                s32 result = 0;
+                for( s32 i = 0, n = slots.size(); i < n; i++ ) {
+                    result += sizeEvaluator( slots.dataAt( i ) );
+                }
+
+                return result;
+            }
+
             TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
             GenericHandle<TAsset>   placeholder;        //!< Default placeholder that is returned for unloaded assets.
             Slots<TAsset, Index>    slots;              //!< Cached asset data is stored here.
+            SizeEvaluator           sizeEvaluator;      //!< Function to evaluate single asset size.
         };
 
         //! Container type to store unique id to an asset slot mapping.
@@ -299,6 +332,26 @@ namespace Assets {
     TypeId Assets::assetTypeId( void )
     {
         return GroupedTypeIndex<TAsset, Assets>::idx();
+    }
+
+    // ** Assets::bytesUsedByType
+    template<typename TAsset>
+    s32 Assets::bytesUsedByType( void ) const
+    {
+        AbstractAssetCache* cache = findAssetCache( assetTypeId<TAsset>() );
+        DC_ABORT_IF( cache == NULL, "unknown asset type" );
+
+        return cache->allocatedBytes();
+    }
+
+    // ** Assets::setSizeEvaluator
+    template<typename TAsset>
+    void Assets::setSizeEvaluator( const cClosure<s32(const TAsset&)>& value )
+    {
+        AbstractAssetCache* cache = findAssetCache( assetTypeId<TAsset>() );
+        DC_ABORT_IF( cache == NULL, "unknown asset type" );
+
+        static_cast<AssetCache<TAsset>*>( cache )->sizeEvaluator = value;
     }
 
     // ** Assets::registerType
