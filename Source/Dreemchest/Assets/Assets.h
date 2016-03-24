@@ -257,6 +257,9 @@ namespace Assets {
 
             //! Reserves the slot handle inside cache.
             virtual Index           reserve( void ) = 0;
+
+            //! Returns the total cache size.
+            virtual s32             size( void ) const = 0;
         };
 
         //! Generic asset cache that stores asset data of specified type.
@@ -264,6 +267,9 @@ namespace Assets {
         struct AssetCache : public AbstractAssetCache {
             //! Reserves the slot handle inside cache.
             virtual Index           reserve( void ) { return slots.reserve(); }
+
+            //! Returns the total cache size.
+            virtual s32             size( void ) const { return slots.size(); }
 
             TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
             GenericHandle<TAsset>   placeholder;        //!< Default placeholder that is returned for unloaded assets.

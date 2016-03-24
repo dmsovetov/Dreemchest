@@ -159,6 +159,8 @@ Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr
     // Now register unique id associated with this asset slot.
     m_indexById[uniqueId] = index;
 
+    LogDebug( "asset", "%s %s added (%d assets of a same type, %d assets total)\n", assetTypeName( type ).c_str(), uniqueId.c_str(), cache->size(), m_assets.size() );
+
     // Construct an asset handle.
     return Handle( this, index );
 }
@@ -173,6 +175,11 @@ bool Assets::removeAsset( const AssetId& id )
     // Store the slot before and remove the handle mapping.
     Index index = i->second;
     m_indexById.erase( i );
+
+    // Output log message
+    const Asset& asset = m_assets.get( index );
+    AbstractAssetCache* cache = findAssetCache( asset.type() );
+    LogDebug( "asset", "%s %s removed (%d assets of a same type, %d assets total)\n", assetTypeName( asset.type() ).c_str(), id.c_str(), cache->size(), m_assets.size() );
 
     // Now release an asset data
     return m_assets.remove( index );
