@@ -213,8 +213,6 @@ namespace Scene {
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( StaticMesh )
 	dcDeclarePtrs( Light )
-	dcDeclarePtrs( RenderPassBase )
-	dcDeclarePtrs( ShaderCache )
 
 	dcDeclarePtrs( Physics2D )
 	dcDeclarePtrs( RigidBody2D )
@@ -226,11 +224,16 @@ namespace Scene {
 	dcDeclarePtrs( SpectatorCamera )
 	dcDeclarePtrs( Camera2D )
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+	dcDeclarePtrs( RenderPassBase )
+	dcDeclarePtrs( ShaderCache )
+
 	//! Scene systems mask.
 	enum Systems {
 		  UpdateSystems = BIT( 0 )
 		, RenderSystems = BIT( 1 )
 	};
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;

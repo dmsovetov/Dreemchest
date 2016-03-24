@@ -83,7 +83,11 @@ Scene::Scene( void )
     m_spatial   = DC_NEW Spatial( this );
 
 	// Create system groups.
-	m_updateSystems = m_ecs->createGroup( "Update", UpdateSystems );
+	m_updateSystems = m_ecs->createGroup( "Update",
+    #if DEV_DEPRECATED_SCENE_RENDERER
+        UpdateSystems
+    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+        ~0 );
 
 	// Add default update systems.
 	addSystem<AffineTransformSystem>();
@@ -119,7 +123,13 @@ Scene::Scene( void )
 void Scene::update( u32 currentTime, f32 dt )
 {
     NIMBLE_BREADCRUMB_CALL_STACK;
-	m_ecs->update( currentTime, dt, UpdateSystems );
+	m_ecs->update( currentTime, dt,
+    #if DEV_DEPRECATED_SCENE_RENDERER
+        UpdateSystems 
+    #else
+        ~0
+    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+    );
 }
 
 // ** Scene::createSceneObject
