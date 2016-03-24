@@ -34,7 +34,7 @@ namespace Scene {
 // ** Commands::Commands
 Commands::Commands( void )
     : m_operations( 16 )
-    , m_commands( 131072 * 10 )
+    , m_commands( 0 )
     , m_sequence( 0 )
 {
 }
@@ -122,6 +122,18 @@ void Commands::dump( void ) const
 s32 Commands::size( void ) const
 {
     return m_operations.allocatedCount();
+}
+
+// ** Commands::allocatedBytes
+s32 Commands::allocatedBytes( void ) const
+{
+    return m_commands.size();
+}
+
+// ** Commands::usedBytes
+s32 Commands::usedBytes( void ) const
+{
+    return m_commands.allocated();
 }
 
 // ** Commands::opCodeAt

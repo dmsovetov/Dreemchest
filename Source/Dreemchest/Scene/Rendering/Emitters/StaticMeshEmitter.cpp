@@ -31,26 +31,23 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** StaticMeshEmitter::StaticMeshEmitter
-StaticMeshEmitter::StaticMeshEmitter( RenderingContext& context, u32 renderModes, bool depthSort )
-    : RopEmitter( context )
+StaticMeshEmitter::StaticMeshEmitter( RenderScene& renderScene, u32 renderModes, bool depthSort )
+    : AbstractRopEmitter( renderScene )
     , m_renderModes( renderModes )
     , m_depthSort( depthSort )
 {
 }
 
 // ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( const Vec3& camera )
+void StaticMeshEmitter::emit( Commands& commands, const Vec3& camera )
 {
     // Get all renderable meshes
-    const RenderEntities& meshes = renderEntities();
-
-    // Get the command buffer
-    Commands& commands = m_context.commands();
+    const RenderScene::Meshes& meshes = m_renderScene.meshes();
 
     // Process each mesh entity
     for( s32 i = 0, n = meshes.count(); i < n; i++ ) {
         // Get mesh entity by index
-        const StaticMeshRenderable& mesh = meshes[i];
+        const RenderScene::RenderableMesh& mesh = meshes[i];
 
         // Get the material
         const Material& material = mesh.material.readLock();
@@ -88,22 +85,6 @@ void StaticMeshEmitter::emit( const Vec3& camera )
         // Emit the rendering command
         commands.emitDrawCall( sortKey, mesh.matrix, mesh.renderable, mesh.technique, mode );
     }
-}
-
-// ** StaticMeshEmitter::createRenderEntity
-StaticMeshRenderable StaticMeshEmitter::createRenderEntity( const Ecs::Entity& entity )
-{
-    const Transform*  transform  = entity.get<Transform>();
-    const StaticMesh* staticMesh = entity.get<StaticMesh>();
-
-    StaticMeshRenderable mesh;
-    mesh.transform  = transform;
-    mesh.matrix     = &transform->matrix();
-    mesh.material   = staticMesh->material( 0 );
-    mesh.mesh       = staticMesh->mesh();
-    mesh.renderable = m_context.requestRenderable( staticMesh->mesh() );
-    mesh.technique  = m_context.requestTechnique( mesh.material );
-    return mesh;
 }
 
 } // namespace Scene

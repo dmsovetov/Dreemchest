@@ -33,33 +33,27 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** SolidAndTransparentPass::SolidAndTransparentPass
-SolidAndTransparentPass::SolidAndTransparentPass( RenderingContext& context )
-    : RenderPassBase( context )
+SolidAndTransparentPass::SolidAndTransparentPass( RenderScene& renderScene )
+    : RenderPassBase( renderScene )
 {
-    m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
-    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit, true );
-
-    static_cast<StaticMeshEmitter*>( m_opaque.get() )->construct();
-    static_cast<StaticMeshEmitter*>( m_translucent.get() )->construct();
+    m_opaque        = DC_NEW StaticMeshEmitter( renderScene, RenderOpaqueBit | RenderCutoutBit );
+    m_translucent   = DC_NEW StaticMeshEmitter( renderScene, RenderTranslucentBit, true );
 }
 
 // ** SolidAndTransparentPass::render
-void SolidAndTransparentPass::render( const Vec3& camera, ShaderSourceHandle shader )
+void SolidAndTransparentPass::render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader )
 {
-    // Get the commands from rendering context
-    Commands& commands = m_context.commands();
-
     // Set the default shader
-    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( shader ) );
+    commands.emitLightingShader( AllLightingModelsBit, m_renderScene.context()->requestShaderSource( shader ) );
 
     // Emit operations for opaque objects
     commands.emitRasterOptions( RenderOpaqueBit, RasterizationOptions::opaque() );
     commands.emitRasterOptions( RenderCutoutBit, RasterizationOptions::cutout() );
-    m_opaque->emit( camera );
+    m_opaque->emit( commands, camera );
 
     // Emit operations for translucent objects
     commands.emitRasterOptions( RenderTranslucentBit, RasterizationOptions::translucent() );
-    m_translucent->emit( camera );
+    m_translucent->emit( commands, camera );
 }
 
 } // namespace Scene

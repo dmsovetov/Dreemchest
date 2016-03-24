@@ -31,29 +31,26 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** DepthComplexity::DepthComplexity
-DepthComplexity::DepthComplexity( RenderingContext& context )
-    : RenderSystem( context )
+DepthComplexity::DepthComplexity( RenderScene& renderScene )
+    : RenderSystem( renderScene )
 {
     // Create the shader
-    m_shader = context.createShaderSource( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
+    m_shader = renderScene.context()->createShaderSource( "constantColor", "../Source/Dreemchest/Scene/Rendering/Shaders/ConstantColor.shader" );
 
     // Create render operation emitters
     for( s32 i = 0; i < TotalRenderModes; i++ ) {
-        m_emitters[i] = DC_NEW StaticMeshEmitter( context, BIT( i ) );
+        m_emitters[i] = DC_NEW StaticMeshEmitter( renderScene, BIT( i ) );
     }
 }
 
 // ** DepthComplexity::emitRenderOperations
-void DepthComplexity::emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderDepthComplexity& depthComplexity )
+void DepthComplexity::emitRenderOperations( Commands& commands, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderDepthComplexity& depthComplexity )
 {
-    // Get active command buffer
-    Commands& commands = m_context.commands();
-
     // Set additive blend rasterization for all rendering modes
     commands.emitRasterOptions( AllRenderModesBit, RasterizationOptions::additive().overrideZWrite( true ) );
 
     // Set the default shader for all lighting models
-    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_shader ) );
+    commands.emitLightingShader( AllLightingModelsBit, m_renderScene.context()->requestShaderSource( m_shader ) );
     m_shader.readLock();
 
     // Emit operations for all rendering mode
@@ -62,7 +59,7 @@ void DepthComplexity::emitRenderOperations( const Ecs::Entity& entity, const Cam
         commands.emitConstantColor( depthComplexity.colorForMode( static_cast<RenderingMode>( i ) ) * depthComplexity.intensity() );
 
         // Emit draw calls
-        m_emitters[i]->emit( transform.position() );
+        m_emitters[i]->emit( commands, transform.position() );
     }
 }
 

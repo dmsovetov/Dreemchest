@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderingContext_H__
-#define __DC_Scene_RenderingContext_H__
+#ifndef __DC_Scene_RenderAssets_H__
+#define __DC_Scene_RenderAssets_H__
 
 #include "../Scene.h"
 #include "../Assets/Mesh.h"
@@ -61,7 +61,8 @@ namespace Scene {
     private:
 
         //! Container type to map from an asset to a render asset index.
-    #ifdef DC_CPP11_DISABLED
+        typedef HashMap<Assets::Index, RenderAssetIndex, Assets::IndexHasher> IndexByAsset;
+ /*   #ifdef DC_CPP11_DISABLED
         typedef Map<RenderAssetHandle, s32> IndexByAsset;
     #else
         //! Asset handle hash predicate
@@ -73,7 +74,8 @@ namespace Scene {
         };
 
         typedef std::unordered_map<RenderAssetHandle, s32, Hash> IndexByAsset;
-    #endif
+    #endif*/
+
 
         IndexByAsset                        m_indexByAsset;
         Container                           m_handles;
@@ -97,29 +99,32 @@ namespace Scene {
     template<typename TAsset, typename TRenderAsset, typename TSource>
     s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::GenericHandle<TAsset>& asset, CString postfix )
     {
+        // Get an asset index
+        const Assets::Index& assetIndex = asset.index();
+
         // First lookup the render asset by an asset handle
-        IndexByAsset::iterator i = m_indexByAsset.find( asset );
+        IndexByAsset::iterator i = m_indexByAsset.find( assetIndex );
 
         // Next render index to be used
-        s32 index = static_cast<s32>( m_handles.size() );
+        RenderAssetIndex renderAssetIndex = static_cast<s32>( m_handles.size() );
 
         // Found the renderable
         if( i != m_indexByAsset.end() ) {
             // Ensure that mesh handle matches the stored one
-            if( i->first.index() == asset.index() ) {
+            if( i->first == asset.index() ) {
                 return i->second;
             }
 
             // Save this renderable asset index
-            index = i->second;
+            renderAssetIndex = i->second;
 
             // Renderable is outdated - remove it
             m_indexByAsset.erase( i );
         }
 
         // Resize an array of renderable assets
-        if( index >= static_cast<s32>( m_handles.size() ) ) {
-            m_handles.resize( index + 1 );
+        if( renderAssetIndex >= static_cast<s32>( m_handles.size() ) ) {
+            m_handles.resize( renderAssetIndex + 1 );
         }
 
         // Read lock the asset to queue it for loading
@@ -131,24 +136,21 @@ namespace Scene {
         handle.asset().setName( asset.asset().name() + "." + postfix );
 
         // Save this handle
-        m_indexByAsset[asset] = index;
-        m_handles[index]      = handle;
+        m_indexByAsset[assetIndex]  = renderAssetIndex;
+        m_handles[renderAssetIndex] = handle;
 
-        return index;
+        return renderAssetIndex;
     }
 
 	//! Rendering context.
 	class RenderingContext : public RefCounted {
 	public:
 
-        //! Begins rendering with this context.
-        void                                begin( void );
-
-        //! Ends rendering with this context.
-        void                                end( void );
-
         //! Returns the parent rendering HAL instance.
         Renderer::HalWPtr                   hal( void ) const;
+
+        //! Returns the RVM instance.
+        Rvm*                                rvm( void ) const;
 
         //! Returns parent scene instance.
         SceneWPtr                           scene( void ) const;
@@ -182,13 +184,6 @@ namespace Scene {
 
         //! Creates a shader program with a specified feature set.
         const ProgramHandle&                requestProgram( u32 source, u32 features );
-
-        //! Returns the command buffer instance.
-        Commands&                           commands( void );
-
-		//! Adds a new render system to the scene.
-		template<typename TRenderSystem>
-		void							    addRenderSystem( void );
 
 		//! Creates new rendering context.
 		static RenderingContextPtr			create( Assets::Assets& assets, Renderer::HalWPtr hal, SceneWPtr scene );
@@ -224,10 +219,8 @@ namespace Scene {
 
         Renderer::HalWPtr                   m_hal;              //!< Parent HAL instance.
         RvmUPtr                             m_rvm;              //!< Internal rvm instance.
-        CommandsUPtr                        m_commands;         //!< Internal rvm command buffer.
         SceneWPtr                           m_scene;            //!< Parent scene instance.
         Assets::Assets&                     m_assets;           //!< Asset manager used to create render assets.
-        Array<RenderSystemUPtr>	            m_renderSystems;    //!< Entity render systems.
 
         RenderableCache                     m_renderables;
         TechniqueCache                      m_techniques;
@@ -237,13 +230,6 @@ namespace Scene {
         ShaderSourceIndices                 m_shaderSourceIndices;  //!< Maps from a shader source to it's index.
         Array<ShaderSourceHandle>           m_shaderSources;
 	};
-
-	// ** RenderingContext::addRenderSystem
-	template<typename TRenderSystem>
-	void RenderingContext::addRenderSystem( void )
-	{
-		m_renderSystems.push_back( DC_NEW TRenderSystem( *this ) );
-	}
 
     // ** RenderingContext::requestRenderable
     NIMBLE_INLINE s32 RenderingContext::requestRenderable( const MeshHandle& handle )
@@ -357,4 +343,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderingContext_H__    */
+#endif    /*    !__DC_Scene_RenderAssets_H__    */

@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_Rvm_H__
 #define __DC_Scene_Rvm_H__
 
-#include "../RenderingContext.h"
+#include "../RenderAssets.h"
 #include "Commands.h"
 #include "RasterizationOptions.h"
 

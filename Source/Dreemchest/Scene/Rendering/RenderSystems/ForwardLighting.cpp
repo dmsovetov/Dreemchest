@@ -34,45 +34,39 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** ForwardLighting::ForwardLighting
-ForwardLighting::ForwardLighting( RenderingContext& context )
-    : RenderSystem( context )
+ForwardLighting::ForwardLighting( RenderScene& renderScene )
+    : RenderSystem( renderScene )
 {
     // Create shaders
-    m_ambientShader     = context.createShaderSource( "Ambient", "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
-    m_additiveShader    = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
-    m_phongShader       = context.createShaderSource( "Phong", "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_ambientShader     = renderScene.context()->createShaderSource( "Ambient", "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_additiveShader    = renderScene.context()->createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
+    m_phongShader       = renderScene.context()->createShaderSource( "Phong", "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
 
     // Create render passes
-    m_solidTransparent  = DC_NEW SolidAndTransparentPass( context );
-    m_additive          = DC_NEW AdditivePass( context );
+    m_solidTransparent  = DC_NEW SolidAndTransparentPass( renderScene );
+    m_additive          = DC_NEW AdditivePass( renderScene );
 
     // Create light index
-    m_lights = context.scene()->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Light, Transform>() );
+    m_lights = renderScene.scene()->ecs()->requestIndex( "Lights", Ecs::Aspect::all<Light, Transform>() );
 
     // Create render operation emitters
-    m_opaque        = DC_NEW StaticMeshEmitter( context, RenderOpaqueBit | RenderCutoutBit );
-    m_translucent   = DC_NEW StaticMeshEmitter( context, RenderTranslucentBit );
-
-    static_cast<StaticMeshEmitter*>( m_opaque.get() )->construct();
-    static_cast<StaticMeshEmitter*>( m_translucent.get() )->construct();
+    m_opaque        = DC_NEW StaticMeshEmitter( renderScene, RenderOpaqueBit | RenderCutoutBit );
+    m_translucent   = DC_NEW StaticMeshEmitter( renderScene, RenderTranslucentBit );
 }
 
 // ** ForwardLighting::emitRenderOperations
-void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& forwardLit )
+void ForwardLighting::emitRenderOperations( Commands& commands, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& forwardLit )
 {
     // Get the camera position.
     const Vec3& position = transform.worldSpacePosition();
 
-    // Get active command buffer
-    Commands& commands = m_context.commands();
-
     // Ambient pass
-    m_solidTransparent->render( position, m_ambientShader );
+    m_solidTransparent->render( commands, position, m_ambientShader );
 
     // Opaque objects lighting
     {
         // Set the default shader
-        commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( m_phongShader ) );
+        commands.emitLightingShader( AllLightingModelsBit, m_renderScene.context()->requestShaderSource( m_phongShader ) );
 
         // Set additive blending for opaque & cutout objects
         commands.emitRasterOptions( RenderOpaqueBit | RenderCutoutBit, RasterizationOptions::additive() );
@@ -89,7 +83,7 @@ void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Cam
             // Set program inputs for lighting
             commands.emitProgramInput( Program::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
             commands.emitProgramInput( Program::LightPosition, Vec4( transform.x(), transform.y(), transform.z(), light.range() ) );
-            m_opaque->emit( position );
+            m_opaque->emit( commands, position );
         }
     }
 
@@ -110,12 +104,12 @@ void ForwardLighting::emitRenderOperations( const Ecs::Entity& entity, const Cam
             // Set program inputs for lighting
             commands.emitProgramInput( Program::LightColor, Vec4( color.r, color.g, color.b, light.intensity() ) );
             commands.emitProgramInput( Program::LightPosition, Vec4( transform.x(), transform.y(), transform.z(), light.range() ) );
-            m_translucent->emit( position );
+            m_translucent->emit( commands, position );
         }
     }
 
     // Additive pass
-    m_additive->render( position, m_additiveShader );
+    m_additive->render( commands, position, m_additiveShader );
 }
 
 } // namespace Scene

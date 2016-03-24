@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "RenderingContext.h"
+#include "RenderAssets.h"
 #include "Rvm/Rvm.h"
 
 #include "Emitters/StaticMeshEmitter.h"
@@ -44,7 +44,6 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
     , m_assets( assets )
 {
     m_rvm           = DC_NEW Rvm( *this, m_hal );
-    m_commands      = DC_NEW Commands;
 
     // Create default assets
     {
@@ -81,6 +80,11 @@ SceneWPtr RenderingContext::scene( void ) const
     return m_scene;
 }
 
+Rvm* RenderingContext::rvm( void ) const
+{
+    return m_rvm.get();
+}
+
 // ** RenderingContext::createShaderSource
 ShaderSourceHandle RenderingContext::createShaderSource( const String& identifier, const String& fileName )
 {
@@ -98,60 +102,6 @@ ShaderSourceHandle RenderingContext::createShaderSource( const String& identifie
     shader.asset().setName( identifier + ".shader" );
 
     return shader;
-}
-
-// ** RenderingContext::begin
-void RenderingContext::begin( void )
-{
-    // Get all active scene cameras
-    const Ecs::EntitySet& cameras = m_scene->cameras()->entities();
-
-    // Clear each render target
-    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-		Camera*			 camera = (*i)->get<Camera>();
-		RenderTargetWPtr target = camera->target();
-
-		if( !target.valid() ) {
-			continue;
-		}
-
-		target->begin( this );
-		{
-			m_hal->setViewport( camera->viewport() );
-			u32 mask = ( camera->clearMask() & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( camera->clearMask() & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
-			m_hal->clear( camera->clearColor(), 1.0f, 0, mask );
-			m_hal->setViewport( target->rect() );
-		}
-		target->end( this );
-	}
-
-    // Process all render systems
-    for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render();
-    }
-}
-
-// ** RenderingContext::end
-void RenderingContext::end( void )
-{
-    // Sort all emitted commands
-    m_commands->sort();
-
-#if 0
-    m_commands->dump();
-#endif
-
-    // Execute rendering commands
-    m_rvm->execute( *m_commands.get() );
-
-    // Clear 
-    m_commands->clear();
-}
-
-// ** RenderingContext::commands
-Commands& RenderingContext::commands( void )
-{
-    return *m_commands;
 }
 
 } // namespace Scene

@@ -34,7 +34,7 @@
     #include "DeprecatedRendering/Passes/BasicPasses.h"
     #include "DeprecatedRendering/ForwardLighting/LightPass.h"
 #else
-    #include "Rendering/RenderingContext.h"
+    #include "Rendering/RenderAssets.h"
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 #include "Assets/Assets.h"
@@ -76,7 +76,6 @@ Scene::Scene( void )
 	m_ecs = Ecs::Ecs::create();
 
 	// Create entity indices
-	m_cameras	= m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() );
 	m_named		= m_ecs->requestIndex( "Named Entities", Ecs::Aspect::all<Identifier>() );
 
     // Create spatial index
@@ -97,7 +96,7 @@ Scene::Scene( void )
 	addSystem<RotateAroundAxesSystem>();
 #if !DEV_DISABLE_CULLING
     addSystem<WorldSpaceBoundingBoxSystem>();
-    addSystem<FrustumCullingSystem>( cameras() );
+    addSystem<FrustumCullingSystem>( m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() ) );
 #endif  /*  !DEV_DISABLE_CULLING    */
 		
 #if DEV_DEPRECATED_SCENE_RENDERER
@@ -182,10 +181,10 @@ SceneObjectSet Scene::findByAspect( const Ecs::Aspect& aspect ) const
 	return m_ecs->findByAspect( aspect );
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** Scene::render
 void Scene::render( RenderingContextWPtr context )
 {
-#if DEV_DEPRECATED_SCENE_RENDERER
 	Renderer::HalPtr hal = context->hal();
 
 	// Clear all cameras & assign ids
@@ -217,20 +216,8 @@ void Scene::render( RenderingContextWPtr context )
 
 	// Reset RVM
 	context->rvm()->reset();
-#else
-    // Begin rendering with this context.
-    context->begin();
-
-    // End rendering.
-    context->end();
+}
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
-}
-
-// ** Scene::cameras
-const Ecs::IndexPtr& Scene::cameras( void ) const
-{
-	return m_cameras;
-}
 
 // ** Scene::ecs
 Ecs::EcsWPtr Scene::ecs( void ) const

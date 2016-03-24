@@ -63,6 +63,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_renderingContext = Scene::RenderingContext::create( hal() );
 #else
     m_renderingContext = Scene::RenderingContext::create( project->assets(), hal(), m_scene );
+    m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Create the scene model
@@ -171,7 +172,8 @@ void SceneEditor::render( f32 dt )
 
 	// Render the scene
     clock_t time = clock();
-	m_scene->render( m_renderingContext );
+	Scene::RenderScene::Frame frame = m_renderScene->captureFrame();
+    m_renderScene->display( frame );
     time = clock() - time;
 
     static u32 kLastPrintTime = 0;

@@ -38,12 +38,12 @@ namespace Scene {
     public:
 
                                 //! Constructs the DepthComplexity instance.
-                                DepthComplexity( RenderingContext& context );
+                                DepthComplexity( RenderScene& renderScene );
 
     protected:
 
         //! Emits render operations to output the depth complexity of a scene to a render target.
-        virtual void            emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderDepthComplexity& depthComplexity ) DC_DECL_OVERRIDE;
+        virtual void            emitRenderOperations( Commands& commands, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderDepthComplexity& depthComplexity ) DC_DECL_OVERRIDE;
 
     private:
 

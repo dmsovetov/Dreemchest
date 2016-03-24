@@ -72,7 +72,7 @@ namespace Assets {
         Asset&                          asset( void );
 
         //! Returns asset index.
-        Index                           index( void ) const;
+        const Index&                    index( void ) const;
 
         //! Returns asset manager that issued this handle.
         Assets*                         assets( void ) const;
@@ -125,7 +125,7 @@ namespace Assets {
     }
 
     // ** Handle::index
-    NIMBLE_INLINE Index Handle::index( void ) const
+    NIMBLE_INLINE const Index& Handle::index( void ) const
     {
         return m_index;
     }

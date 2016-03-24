@@ -33,25 +33,21 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** AdditivePass::AdditivePass
-AdditivePass::AdditivePass( RenderingContext& context )
-    : RenderPassBase( context )
+AdditivePass::AdditivePass( RenderScene& renderScene )
+    : RenderPassBase( renderScene )
 {
-    m_additive = DC_NEW StaticMeshEmitter( context, RenderAdditiveBit, true );
-    static_cast<StaticMeshEmitter*>( m_additive.get() )->construct();
+    m_additive = DC_NEW StaticMeshEmitter( renderScene, RenderAdditiveBit, true );
 }
 
 // ** AdditivePass::render
-void AdditivePass::render( const Vec3& camera, ShaderSourceHandle shader )
+void AdditivePass::render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader )
 {
-    // Get the commands from rendering context
-    Commands& commands = m_context.commands();
-
     // Set the default shader
-    commands.emitLightingShader( AllLightingModelsBit, m_context.requestShaderSource( shader ) );
+    commands.emitLightingShader( AllLightingModelsBit, m_renderScene.context()->requestShaderSource( shader ) );
 
     // Emit operations for additive objects
     commands.emitRasterOptions( RenderAdditiveBit, RasterizationOptions::additive() );
-    m_additive->emit( camera );
+    m_additive->emit( commands, camera );
 }
 
 } // namespace Scene

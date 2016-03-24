@@ -27,7 +27,8 @@
 #ifndef __DC_Scene_Rendering_RenderPass_H__
 #define __DC_Scene_Rendering_RenderPass_H__
 
-#include "../RenderingContext.h"
+#include "../RenderAssets.h"
+#include "../RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,15 +39,15 @@ namespace Scene {
 	public:
 
                                     //! Constructs RenderPassBase instance.
-                                    RenderPassBase( RenderingContext& context )
-                                        : m_context( context ) {}
+                                    RenderPassBase( RenderScene& renderScene )
+                                        : m_renderScene( renderScene ) {}
 
 		//! Renders a pass to active render target.
-		virtual void			    render( const Vec3& camera, ShaderSourceHandle shader ) = 0;
+		virtual void			    render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader ) = 0;
 
 	protected:
 
-        RenderingContext&           m_context;      //!< Parent rendering context.
+        RenderScene&                m_renderScene;  //!< Parent render scene.
 	};
 
 	//! Generic render pass class.
@@ -58,12 +59,12 @@ namespace Scene {
 							        RenderPass( RenderingContext& context );
 
 		//! Processes the entity family and emits render operations to be executed by RVM.
-		virtual void		        render( const Vec3& camera, ShaderSourceHandle shader ) DC_DECL_OVERRIDE;
+		virtual void		        render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader ) DC_DECL_OVERRIDE;
 
 	protected:
 
 		//! Emits render operation for a single renderable entity.
-		virtual void		        render( const Vec3& camera, ShaderSourceHandle shader, const TRenderable& renderable, const Transform& transform ) = 0;
+		virtual void		        render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader, const TRenderable& renderable, const Transform& transform ) = 0;
 
 	protected:
 
@@ -79,14 +80,14 @@ namespace Scene {
 
 	// ** RenderPass::render
 	template<typename TRenderable>
-	void RenderPass<TRenderable>::render( const Vec3& camera, ShaderSourceHandle shader )
+	void RenderPass<TRenderable>::render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader )
 	{
         // Get the entity set from index
 		const Ecs::EntitySet& entities = m_index->entities();
 
         // Process each entity
 		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			render( camera, shader, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+			render( commands, camera, shader, *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
 		}
 	}
 

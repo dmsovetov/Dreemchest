@@ -34,25 +34,25 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Unlit::Unlit
-Unlit::Unlit( RenderingContext& context )
-    : RenderSystem( context )
+Unlit::Unlit( RenderScene& renderScene )
+    : RenderSystem( renderScene )
 {
     // Create the unlit shader instance
-    m_shader           = context.createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
+    m_shader           = renderScene.context()->createShaderSource( "Unlit", "../Source/Dreemchest/Scene/Rendering/Shaders/Unlit.shader" );
 
     // Create render passes
-    m_solidTransparent = DC_NEW SolidAndTransparentPass( context );
-    m_additive         = DC_NEW AdditivePass( context );
+    m_solidTransparent = DC_NEW SolidAndTransparentPass( renderScene );
+    m_additive         = DC_NEW AdditivePass( renderScene );
 }
 
 // ** Unlit::emitRenderOperations
-void Unlit::emitRenderOperations( const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit )
+void Unlit::emitRenderOperations( Commands& commands, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderUnlit& unlit )
 {
     // Get the camera position
     const Vec3& position = transform.worldSpacePosition();
 
-    m_solidTransparent->render( position, m_shader );
-    m_additive->render( position, m_shader );
+    m_solidTransparent->render( commands, position, m_shader );
+    m_additive->render( commands, position, m_shader );
 }
 
 } // namespace Scene

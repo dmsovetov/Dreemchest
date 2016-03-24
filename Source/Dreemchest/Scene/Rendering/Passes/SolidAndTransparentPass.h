@@ -38,12 +38,12 @@ namespace Scene {
     public:
 
                                     //! Constructs SolidAndTransparentPass instance.
-                                    SolidAndTransparentPass( RenderingContext& context );
+                                    SolidAndTransparentPass( RenderScene& renderScene );
 
     protected:
 
         //! Emits setup render operations before processing all added emitters.
-        virtual void			    render( const Vec3& camera, ShaderSourceHandle shader ) DC_DECL_OVERRIDE;
+        virtual void			    render( Commands& commands, const Vec3& camera, ShaderSourceHandle shader ) DC_DECL_OVERRIDE;
 
     private:
 

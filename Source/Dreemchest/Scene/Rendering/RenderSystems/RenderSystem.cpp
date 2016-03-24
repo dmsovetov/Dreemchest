@@ -31,18 +31,15 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RenderSystemBase::RenderSystemBase
-RenderSystemBase::RenderSystemBase( RenderingContext& context, Ecs::IndexPtr cameras )
-    : m_context( context )
+RenderSystemBase::RenderSystemBase( RenderScene& renderScene, Ecs::IndexPtr cameras )
+    : m_renderScene( renderScene )
     , m_cameras( cameras )
 {
 }
 
 // ** RenderSystemBase::render
-void RenderSystemBase::render( void )
+void RenderSystemBase::render( RenderScene::Frame& frame )
 {
-    // Get the command buffer from a context
-    Commands& commands = m_context.commands();
-
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
 
@@ -57,11 +54,15 @@ void RenderSystemBase::render( void )
         // Get Transform component from an entity
         const Transform& transform = *entity.get<Transform>();
 
+        // Create command buffer
+        frame.push_back( DC_NEW Commands );
+        Commands& commands = *frame.back();
+
         // Push render target before rendering
         commands.emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
 
         // Emit render operations for this camera
-        emitRenderOperations( entity, camera, transform );
+        emitRenderOperations( commands, entity, camera, transform );
 
         // Pop render target when rendering is finished
         commands.emitPopRenderTarget();

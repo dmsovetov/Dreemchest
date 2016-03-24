@@ -42,6 +42,9 @@ namespace Assets {
     //! Opaque 32 bit handle.
     typedef OpaqueHandle<12, 20> Index;
 
+    //! Asset index hasher.
+    typedef OpaqueHandleHasher<Index> IndexHasher;
+
     //! Forward declaration of an AssetDataHandle type.
     template<typename TAsset> class GenericHandle;
 

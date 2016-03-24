@@ -26,7 +26,7 @@
 
 #include "RenderAssetSources.h"
 #include "Renderable.h"
-#include "../RenderingContext.h"
+#include "../RenderAssets.h"
 #include "../../Assets/Mesh.h"
 #include "../../Assets/Image.h"
 #include "../../Assets/Material.h"

@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_Rvm_Commands_H__
 #define __DC_Scene_Rvm_Commands_H__
 
-#include "../RenderingContext.h"
+#include "../RenderAssets.h"
 #include "RasterizationOptions.h"
 
 #define RVM_SORT( value )       (static_cast<u64>( value ) << 32)
@@ -120,6 +120,12 @@ namespace Scene {
         //! Returns the total number of render operations.
         s32                             size( void ) const;
 
+        //! Returns the total number of bytes allocated for this command buffer.
+        s32                             allocatedBytes( void ) const;
+
+        //! Returns the total number of bytes used by this command buffer.
+        s32                             usedBytes( void ) const;
+
         //! Pushes a single draw call instruction.
         NIMBLE_INLINE DrawIndexed*      emitDrawCall( u32 sortingKey, const Matrix4* transform, s32 renderable, s32 technique, u8 mode );
 
@@ -186,6 +192,13 @@ namespace Scene {
     T* Commands::allocateCommand( u64 sortingKey )
     {
         u8* pointer = m_commands.allocate( sizeof( T ) );
+        if( pointer == NULL ) {
+            s32 expandSize = static_cast<s32>( m_commands.size() * 0.25f );
+            m_commands.resize( m_commands.size() + max2( expandSize, 1024 ) );
+            pointer = m_commands.allocate( sizeof( T ) );
+            DC_BREAK_IF( pointer == NULL, "failed to allocate command" );
+        }
+
         u32 offset  = pointer - m_commands.data();
         s32 idx     = m_operations.allocate();
         m_operations[idx] = RVM_SORT( sortingKey ) | offset;

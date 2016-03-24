@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_RasterizationOptions_H__
 #define __DC_Scene_RasterizationOptions_H__
 
-#include "../RenderingContext.h"
+#include "../RenderAssets.h"
 
 DC_BEGIN_DREEMCHEST
 

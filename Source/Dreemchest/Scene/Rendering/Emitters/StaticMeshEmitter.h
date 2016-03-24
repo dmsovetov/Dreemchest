@@ -33,30 +33,17 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Stores info about a single renderable mesh.
-    struct StaticMeshRenderable {
-        const Transform*        transform;          //!< Mesh transform component.
-        const Matrix4*          matrix;             //!< Mesh transform affine matrix.
-        MaterialHandle          material;           //!< Material used for rendering.
-        MeshHandle              mesh;               //!< Rendered mesh resource handle.
-        s32                     renderable;         //!< Renderable index.
-        s32                     technique;          //!< Technique index.
-    };
-
     //! Emits render operations for static meshes in scene.
-    class StaticMeshEmitter : public RopEmitter<StaticMesh, StaticMeshRenderable> {
+    class StaticMeshEmitter : public AbstractRopEmitter {
  	public:
 
 								        //! Constructs StaticMeshEmitter instance.
-								        StaticMeshEmitter( RenderingContext& context, u32 renderModes = AllRenderModesBit, bool depthSort = false );
+								        StaticMeshEmitter( RenderScene& renderScene, u32 renderModes = AllRenderModesBit, bool depthSort = false );
 
     protected:
 
         //! Emits render operations for all visible meshes.
-        virtual void			        emit( const Vec3& camera ) DC_DECL_OVERRIDE;
-
-        //! Constructs mesh render entity from a scene entity.
-        virtual StaticMeshRenderable    createRenderEntity( const Ecs::Entity& entity );
+        virtual void			        emit( Commands& commands, const Vec3& camera ) DC_DECL_OVERRIDE;
 
     private:
 

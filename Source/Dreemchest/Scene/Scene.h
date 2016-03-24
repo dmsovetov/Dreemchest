@@ -149,6 +149,9 @@ namespace Scene {
     //! Program handle type.
     typedef Assets::GenericHandle<class Program> ProgramHandle;
 
+    //! Integer handle type to access render assets.
+    typedef s32 RenderAssetIndex;
+
 	//! Available rendering modes.
 	enum RenderingMode {
 		  RenderOpaque		//!< Renders opaque.
@@ -218,6 +221,7 @@ namespace Scene {
 	dcDeclarePtrs( RigidBody2D )
 
 	dcDeclarePtrs( RenderingContext )
+    dcDeclarePtrs( RenderScene )
 
 	dcDeclarePtrs( Vec3Binding )
 
@@ -253,8 +257,10 @@ namespace Scene {
 		//! Performs a scene update.
 		void							update( u32 currentTime, f32 dt );
 
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		//! Renders a scene.
 		void							render( RenderingContextWPtr context );
+    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
@@ -280,9 +286,6 @@ namespace Scene {
 
 		//! Returns a list of scene objects that match a specified aspect.
 		SceneObjectSet					findByAspect( const Ecs::Aspect& aspect ) const;
-
-		//! Returns cameras that reside in scene.
-		const Ecs::IndexPtr&			cameras( void ) const;
 
         //! Returns internal entity component system instance.
         Ecs::EcsWPtr                    ecs( void ) const;
@@ -330,7 +333,6 @@ namespace Scene {
 
 		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
-		Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
         SpatialUPtr                     m_spatial;          //!< Scene spatial index.
 	};
@@ -490,7 +492,8 @@ DC_END_DREEMCHEST
 	    #include "DeprecatedRendering/Passes/BasicPasses.h"
 	    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
     #else
-        #include "Rendering/RenderingContext.h"
+        #include "Rendering/RenderScene.h"
+        #include "Rendering/RenderAssets.h"
         #include "Rendering/RenderSystems/Unlit.h"
         #include "Rendering/RenderSystems/ForwardLighting.h"
         #include "Rendering/RenderSystems/DepthComplexity.h"
