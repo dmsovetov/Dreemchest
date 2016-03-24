@@ -55,6 +55,7 @@ namespace Ecs {
 	dcDeclarePtrs( Entity )
 	dcDeclareNamedPtrs( ComponentBase, Component )
 	dcDeclareNamedPtrs( ArchetypeBase, Archetype )
+    dcDeclareNamedPtrs( DataCacheBase, DataCache )
 	dcDeclarePtrs( Index )
 	dcDeclarePtrs( System )
 	dcDeclarePtrs( SystemGroup )
@@ -186,6 +187,10 @@ namespace Ecs {
 		//! Creates a new entity with a generated id.
 		EntityPtr		createEntity( void );
 
+        //! Creates new data cache instance that will be populated inside next update
+        template<typename TDataCache>
+        Ptr<TDataCache> createDataCache( const Aspect& aspect, const typename TDataCache::Factory& factory );
+
     #if !DC_ECS_ENTITY_CLONING
         //! Clones entity.
         EntityPtr       cloneEntity( EntityWPtr entity );
@@ -268,6 +273,9 @@ namespace Ecs {
         //! Container type to store modified indices.
         typedef Set<IndexWPtr>              IndexSet;
 
+        //! Container type to store created data caches.
+        typedef List<DataCachePtr>          DataCacheList;
+
 		//! Data factory type.
 		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
 
@@ -282,6 +290,7 @@ namespace Ecs {
 		EntitySet						m_changed;	        //!< Entities that was changed.
 		EntitySet						m_removed;	        //!< Entities that will be removed.
         IndexSet                        m_changedIndices;   //!< Indices that were changed.
+        DataCacheList                   m_dataCaches;       //!< List of data caches that should be populated.
 
 		ComponentFactory				m_componentFactory;		//!< Component object factory.
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
@@ -300,6 +309,15 @@ namespace Ecs {
 	{
 		return m_componentFactory.declare<TComponent>();
 	}
+
+    // ** Ecs::createDataCache
+    template<typename TDataCache>
+    Ptr<TDataCache> Ecs::createDataCache( const Aspect& aspect, const typename TDataCache::Factory& factory )
+    {
+        Ptr<TDataCache> dataCache = DC_NEW TDataCache( this, aspect, factory );
+        m_dataCaches.push_back( dataCache );
+        return dataCache;
+    }
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
@@ -354,6 +372,7 @@ DC_END_DREEMCHEST
 	#include "Entity/Aspect.h"
 	#include "Entity/Index.h"
 	#include "Entity/Archetype.h"
+    #include "Entity/DataCache.h"
 	#include "System/SystemGroup.h"
 	#include "System/GenericEntitySystem.h"
 	#include "System/ImmutableEntitySystem.h"

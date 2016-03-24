@@ -30,6 +30,7 @@
 #include "Entity/Entity.h"
 #include "Entity/Index.h"
 #include "Entity/Archetype.h"
+#include "Entity/DataCache.h"
 #include "System/SystemGroup.h"
 
 #include <time.h>
@@ -345,6 +346,16 @@ void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 
 	// Remove all queued entities.
     cleanupRemovedEntities();
+
+    // Populate all data caches
+    while( m_dataCaches.size() ) {
+        DataCacheList dataCaches = m_dataCaches;
+        m_dataCaches.clear();
+
+        for( DataCacheList::iterator i = dataCaches.begin(), end = dataCaches.end(); i != end; ++i ) {
+            (*i)->populate();
+        }
+    }
 
     // Rebuild all changed indices.
     while( m_changedIndices.size() ) {
