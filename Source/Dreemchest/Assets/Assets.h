@@ -117,9 +117,6 @@ namespace Assets {
         template<typename TAsset>
         TAsset&                     writableAssetData( const Asset& asset ) const;
 
-        //! Reserves asset data handle inside the cache.
-        Index                       reserveAssetData( const TypeId& type );
-
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
         const TAsset&               acquireReadLock( const Asset& asset ) const;

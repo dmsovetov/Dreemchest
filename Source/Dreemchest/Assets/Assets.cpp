@@ -36,7 +36,7 @@ namespace Assets {
 // ** Assets::Assets
 Assets::Assets( void )
 {
-    m_loadingQueue = DC_NEW LoadingQueue( *this, 1 );
+    m_loadingQueue = DC_NEW LoadingQueue( *this, INT_MAX );
 }
 
 // ** Assets::Assets
@@ -55,11 +55,8 @@ Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr
     // Find an asset cache for this type of asset
     AbstractAssetCache& cache = findAssetCache( type );
 
-    // Reserve asset data index.
-    Index data = reserveAssetData( type );
-
     // Setup a new asset
-    Asset asset( type, &cache, data, uniqueId, source );
+    Asset asset( type, &cache, cache.reserve(), uniqueId, source );
 
     // First reserve the slot for an asset data.
     Index index = m_assets.add( asset );
@@ -188,18 +185,6 @@ void Assets::update( f32 dt )
 
     // Update the loading queue
     m_loadingQueue->update();
-}
-
-// ** Assets::reserveAssetData
-Index Assets::reserveAssetData( const TypeId& type )
-{
-    AssetCaches::iterator i = m_cache.find( type );
-
-    if( i != m_cache.end() ) {
-        return i->second->reserve();
-    }
-
-    return Index();
 }
 
 // ** Assets::createHandle

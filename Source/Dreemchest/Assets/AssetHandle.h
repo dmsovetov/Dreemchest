@@ -89,10 +89,10 @@ namespace Assets {
     protected:
 
                                         //! Constructs the Handle instance.
-                                        Handle( Assets* assets, Index index );
+                                        Handle( AssetsWPtr assets, Index index );
 
         //! Set an asset handle.
-        void                            setHandle( Assets* assets, Index index );
+        void                            setHandle( AssetsWPtr assets, Index index );
 
         //! Returns writable asset data.
         template<typename TAsset>
@@ -100,7 +100,7 @@ namespace Assets {
 
     protected:
 
-        Assets*                         m_assets;   //!< An assets manager that issued this handle.
+        AssetsWPtr                      m_assets;   //!< An assets manager that issued this handle.
         Index                           m_index;    //!< Asset index.
     #ifdef DC_DEBUG
         Asset*                          m_asset;    //!< Pointer to an asset is here to simplify debugging.
@@ -130,7 +130,7 @@ namespace Assets {
     // ** Handle::isValid
     NIMBLE_INLINE bool Handle::isValid( void ) const
     {
-        return m_assets && m_assets->isIndexValid( index() );
+        return m_assets.valid() && m_assets->isIndexValid( index() );
     }
 
     // ** Handle::isLoaded
@@ -156,7 +156,7 @@ namespace Assets {
     // ** Handle::assets
     NIMBLE_INLINE Assets* Handle::assets( void ) const
     {
-        return m_assets;
+        return m_assets.get();
     }
 
     // ** Handle::readLock

@@ -39,13 +39,15 @@ Handle::Handle( void ) : m_assets( NULL )
 }
 
 // ** Handle::Handle
-Handle::Handle( Assets* assets, Index index ) : m_assets( NULL ), m_index( 0 )
+Handle::Handle( AssetsWPtr assets, Index index )
+    : m_index( 0 )
 {
     setHandle( assets, index );
 }
 
 // ** Handle::Handle
-Handle::Handle( const Handle& other ) : m_assets( NULL ), m_index( 0 )
+Handle::Handle( const Handle& other )
+    : m_index( 0 )
 {
     setHandle( other.assets(), other.index() );
 }
@@ -84,7 +86,7 @@ Asset* Handle::operator -> ( void )
 }
 
 // ** Handle::setHandle
-void Handle::setHandle( Assets* assets, Index index )
+void Handle::setHandle( AssetsWPtr assets, Index index )
 {
     m_assets = assets;
     m_index  = index;

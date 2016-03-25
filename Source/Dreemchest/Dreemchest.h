@@ -119,6 +119,8 @@ DC_BEGIN_DREEMCHEST
         //! Loading queue unique pointer type.
         typedef AutoPtr<class LoadingQueue> LoadingQueueUPtr;
 
+        dcDeclarePtrs( Assets )
+
     } // namespace Assets
 
 DC_END_DREEMCHEST
