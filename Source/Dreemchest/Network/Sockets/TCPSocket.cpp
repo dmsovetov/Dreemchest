@@ -110,9 +110,10 @@ void TCPSocket::close( void )
 }
 
 // ** TCPSocket::send
-u32 TCPSocket::send( const void* buffer, u32 size )
+u32 TCPSocket::send( const void* buffer, s32 size )
 {
     DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    DC_BREAK_IF( size <= 0, "size should be a positive number" );
 
     s32       bytesSent = 0;
     const s8* data      = reinterpret_cast<const s8*>( buffer );

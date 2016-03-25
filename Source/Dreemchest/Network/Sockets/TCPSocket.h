@@ -57,7 +57,7 @@ namespace Network {
 		\param buffer Data to be sent.
 		\param size Data size to be sent.
 		*/
-        u32						    send( const void* buffer, u32 size );
+        u32						    send( const void* buffer, s32 size );
 
         //! Connects to a TCP socket at a given remote address and port.
         static TCPSocketPtr		    connectTo( const Address& address, u16 port );

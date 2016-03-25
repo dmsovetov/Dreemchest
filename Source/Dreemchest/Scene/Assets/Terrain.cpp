@@ -67,7 +67,7 @@ u32 Terrain::chunkCount( void ) const
 // ** Terrain::hasVertex
 bool Terrain::hasVertex( s32 x, s32 z ) const
 {
-	bool invalid = x < 0 || z < 0 || x > size() || z > size();
+	bool invalid = x < 0 || z < 0 || x > static_cast<s32>( size() ) || z > static_cast<s32>( size() );
 	return !invalid;
 }
 
@@ -88,8 +88,8 @@ f32 Terrain::height( f32 x, f32 z ) const
 	s32 hz = static_cast<s32>( floor( z ) );
 
 	// Make sure that we are using right indices
-	if( hx + 1 >= size() ) hx--;
-	if( hz + 1 >= size() ) hz--;
+	if( hx + 1 >= static_cast<s32>( size() ) ) hx--;
+	if( hz + 1 >= static_cast<s32>( size() ) ) hz--;
 
 	// Calculate the fraction values
 	f32 fx = x - hx;
@@ -331,14 +331,14 @@ void Heightmap::setHeight( u32 x, u32 z, Type value )
 Vec3 Heightmap::normal( u32 x, u32 z ) const
 {
 	// Compute the X gradient
-    f32 dx = height( x < m_size - 1 ? x + 1 : x, z ) - height( x > 0 ? x - 1 : x, z );
+    f32 dx = static_cast<f32>( height( x < m_size - 1 ? x + 1 : x, z ) - height( x > 0 ? x - 1 : x, z ) );
 
     if( x == 0 || x == m_size - 1 ) {
         dx *= 2;
 	}
 
 	// Compute the Z gradient
-    f32 dz = height( x, z < m_size-1 ? z + 1 : z ) - height( x, z > 0 ?  z - 1 : z );
+    f32 dz = static_cast<f32>( height( x, z < m_size-1 ? z + 1 : z ) - height( x, z > 0 ?  z - 1 : z ) );
 
     if( z == 0 || z == m_size - 1 ) {
         dz *= 2;
