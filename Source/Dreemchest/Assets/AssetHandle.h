@@ -64,9 +64,6 @@ namespace Assets {
         //! Returns true if this asset data is loaded to cache.
         bool                            isLoaded( void ) const;
 
-        //! Forces an asset to be loaded and returns true if loading succeed.
-        bool                            forceLoad( void );
-
         //! Returns an asset that is referenced by this handle.
         const Asset&                    asset( void ) const;
         Asset&                          asset( void );
@@ -199,9 +196,6 @@ namespace Assets {
         //! Returns the read-only asset data and updates the last usage timestamp.
         const TAsset&                   readLock( void ) const;
 
-        //! Forces an asset to be loaded and returns resulting asset data.
-        const TAsset&                   forceLoad( void );
-
         //! Returns the write lock used to update an asset data.
         WriteLock<TAsset>               writeLock( void );
 
@@ -285,14 +279,6 @@ namespace Assets {
     NIMBLE_INLINE const TAsset& DataHandle<TAsset>::readLock( void ) const
     {
         return Handle::readLock<TAsset>();
-    }
-
-    // ** DataHandle::readLock
-    template<typename TAsset>
-    const TAsset& DataHandle<TAsset>::forceLoad( void )
-    {
-        Handle::forceLoad();
-        return readLock();
     }
 
     // ** DataHandle::writeLock

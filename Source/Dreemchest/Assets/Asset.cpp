@@ -39,7 +39,7 @@ Asset::Asset( void )
 }
 
 // ** Asset::Asset
-Asset::Asset( const TypeId& type, void* cache, const Index& data, const AssetId& uniqueId, SourceUPtr source )
+Asset::Asset( const TypeId& type, AbstractAssetCache* cache, const Index& data, const AssetId& uniqueId, SourceUPtr source )
     : m_source( source )
     , m_type( type )
     , m_uniqueId( uniqueId )
@@ -81,9 +81,9 @@ void Asset::setName( const String& value )
 }
 
 // ** Asset::source
-AbstractSource* Asset::source( void ) const
+AbstractSource& Asset::source( void ) const
 {
-    return m_source.get();
+    return *m_source.get();
 }
 
 // ** Asset::switchToState
@@ -93,8 +93,8 @@ void Asset::switchToState( State value )
     m_state = value;
 }
 
-// ** Asset::data
-Index Asset::data( void ) const
+// ** Asset::dataIndex
+const Index& Asset::dataIndex( void ) const
 {
     return m_data;
 }
@@ -103,6 +103,22 @@ Index Asset::data( void ) const
 const Asset::Timestamp& Asset::timestamp( void ) const
 {
     return m_timestamp;
+}
+
+// ** Asset::isUpToDate
+bool Asset::isUpToDate( void ) const
+{
+    // Unloaded assets are always up-to-date
+    if( !isLoaded() ) {
+        return true;
+    }
+
+    // If an asset source was modified later that this asset was constructed, then an asset is up-to-date
+    if( m_source->lastModified() <= m_timestamp.constructed ) {
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace Assets

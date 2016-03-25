@@ -58,15 +58,23 @@ namespace Scene {
 // ** Resources::Resources
 Resources::Resources( void )
 {
-    registerType<Mesh>( dcStaticFunction( bytesAllocatedForMesh ) );
-    registerType<Image>( dcStaticFunction( bytesAllocatedForImage ) );
+    registerType<Mesh>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForMesh ) );
+    registerType<Image>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForImage ) );
     registerType<Prefab>();
-    registerType<Material>( dcStaticFunction( bytesAllocatedForMaterial ) );
-    registerType<Renderable>( dcStaticFunction( bytesAllocatedForRenderable ) );
-    registerType<Texture>( dcStaticFunction( bytesAllocatedForTexture ) );
-    registerType<Technique>( dcStaticFunction( bytesAllocatedForTechnique ) );
-    registerType<ShaderSource>( dcStaticFunction( bytesAllocatedForShaderSource ) );
-    registerType<Program>( dcStaticFunction( bytesAllocatedForProgram ) );
+    registerType<Material>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForMaterial ) );
+    registerType<Renderable>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForRenderable ) );
+    registerType<Texture>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForTexture ) );
+    registerType<Technique>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForTechnique ) );
+    registerType<ShaderSource>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForShaderSource ) );
+    registerType<Program>()
+        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForProgram ) );
 }
 
 // ** Resources::bytesAllocatedForTexture

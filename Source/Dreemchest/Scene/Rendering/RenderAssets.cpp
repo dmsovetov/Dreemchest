@@ -49,16 +49,16 @@ RenderingContext::RenderingContext( Assets::Assets& assets, Renderer::HalWPtr ha
     {
         ShaderSourceHandle pink = createShaderSource( "Placeholder.shader", "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
         pink.asset().setName( "Placeholder.shader" );
-        pink.forceLoad();
-        m_assets.setPlaceholder<ShaderSource>( pink );
+        m_assets.forceLoad( pink );
+        m_assets.assetCache<ShaderSource>().setPlaceholder( pink );
     }
 
     {
         MaterialHandle pink = m_assets.add<Material>( "Placeholder.material", DC_NEW Assets::NullSource );
         pink.asset().setName( "Placeholder.material" );
-        pink.forceLoad();
+        m_assets.forceLoad( pink );
         pink.writeLock()->setColor( Material::Diffuse, Rgba( 1.0f, 0.0f, 1.0f ) );
-        m_assets.setPlaceholder<Material>( pink );
+        m_assets.assetCache<Material>().setPlaceholder( pink );
     }
 }
 

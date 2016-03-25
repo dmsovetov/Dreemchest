@@ -85,7 +85,9 @@ DC_BEGIN_DREEMCHEST
     
         NIMBLE_LOGGER_TAG( Assets )
 
+        class Assets;
         class Asset;
+        class AbstractAssetCache;
 
         //! Opaque 32 bit handle.
         typedef OpaqueHandle<12, 20> Index;
@@ -113,6 +115,9 @@ DC_BEGIN_DREEMCHEST
 
         // Unique ptr for asset source.
         typedef AutoPtr<class AbstractSource> SourceUPtr;
+
+        //! Loading queue unique pointer type.
+        typedef AutoPtr<class LoadingQueue> LoadingQueueUPtr;
 
     } // namespace Assets
 

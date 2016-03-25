@@ -29,6 +29,9 @@
 
 #include "../Dreemchest.h"
 
+#include "AssetCache.h"
+#include "AssetLoadingQueue.h"
+
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
@@ -51,9 +54,13 @@ namespace Assets {
         template<typename TAsset>
         DataHandle<TAsset>          find( const AssetId& uniqueId ) const;
 
-        //! Sets the default placeholder for unloaded assets of specified type.
+        //! Returns asset cache of specified type.
         template<typename TAsset>
-        void                        setPlaceholder( const DataHandle<TAsset>& value );
+        const AssetCache<TAsset>&   assetCache( void ) const;
+
+        //! Returns asset cache of specified type.
+        template<typename TAsset>
+        AssetCache<TAsset>&         assetCache( void );
 
         //! Adds new asset with unique id.
         Handle                      addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source );
@@ -76,13 +83,8 @@ namespace Assets {
         //! Returns the total number of bytes allocated for asset data.
         s32                         totalBytesUsed( void ) const;
 
-        //! Returns the total number of bytes allocated for a specified asset type.
-        template<typename TAsset>
-        s32                         allocatedForType( void ) const;
-
-        //! Sets asset size evaluation function.
-        template<typename TAsset>
-        void                        setSizeEvaluator( const cClosure<s32(const TAsset&)>& value );
+        //! Forces an asset to be loaded and returns true if loading succeed.
+        bool                        forceLoad( const Handle& asset );
 
         //! Returns an asset type id.
         template<typename TAsset>
@@ -90,15 +92,9 @@ namespace Assets {
 
         //! Registers an asset type.
         template<typename TAsset>
-        void                        registerType( const cClosure<s32(const TAsset&)>& sizeEvaluator = cClosure<s32(const TAsset&)>() );
+        AssetCache<TAsset>&         registerType( void );
 
     private:
-
-        //! Forward declaration of an abstract asset cache type.
-        struct AbstractAssetCache;
-
-        //! Forward declaration of generic asset cache type.
-        template<typename TAsset>   class AssetCache;
 
         //! Returns an asset by index.
         const Asset&                assetAtIndex( Index index ) const;
@@ -107,17 +103,11 @@ namespace Assets {
         //! Returns true if the specified asset index is valid.
         bool                        isIndexValid( Index index ) const;
 
-        //! Puts an asset to a loading queue.
-        void                        queueForLoading( Asset& asset );
-
         //! Constructs an asset handle for a specified asset.
         Handle                      createHandle( const Asset& asset ) const;
 
         //! Requests an asset cache for a specified asset type.
-        AbstractAssetCache*         findAssetCache( const TypeId& type ) const;
-
-        //! Returns the total number of bytes allocated by a specified asset type cache.
-        s32                         assetCacheSize( const TypeId& type ) const;
+        AbstractAssetCache&         findAssetCache( const TypeId& type ) const;
 
         //! Returns cached read-only asset data.
         template<typename TAsset>
@@ -141,58 +131,7 @@ namespace Assets {
         //! Unlocks an asset after writing and updates last modified timestamp.
         void                        releaseWriteLock( const Handle& asset );
 
-        //! Loads an asset data to a cache.
-        bool                        loadAssetToCache( Handle asset );
-
     private:
-
-        //! Abstract asset cache.
-        struct AbstractAssetCache {
-            virtual                 ~AbstractAssetCache( void ) {}
-
-            //! Reserves the slot handle inside cache.
-            virtual Index           reserve( void ) = 0;
-
-            //! Returns the total cache size.
-            virtual s32             size( void ) const = 0;
-
-            //! Returns the total number of bytes used by an asset cache.
-            virtual s32             allocatedBytes( void ) const = 0;
-        };
-
-        //! Generic asset cache that stores asset data of specified type.
-        template<typename TAsset>
-        struct AssetCache : public AbstractAssetCache {
-            //! Asset size evaluation function.
-            typedef cClosure<s32(const TAsset& asset)> SizeEvaluator;
-
-            //! Reserves the slot handle inside cache.
-            virtual Index           reserve( void ) { return pool.reserve(); }
-
-            //! Returns the total cache size.
-            virtual s32             size( void ) const { return pool.size(); }
-
-            //! Returns the total number of bytes used by an asset cache.
-            virtual s32             allocatedBytes( void ) const
-            {
-                if( !sizeEvaluator ) {
-                    LogWarning( "cache", "an amount of allocated bytes requested, but no size evaluator set\n" );
-                    return 0;
-                }
-
-                s32 result = 0;
-                for( s32 i = 0, n = pool.size(); i < n; i++ ) {
-                    result += sizeEvaluator( pool.dataAt( i ) );
-                }
-
-                return result;
-            }
-
-            TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
-            DataHandle<TAsset>      placeholder;        //!< Default placeholder that is returned for unloaded assets.
-            Pool<TAsset, Index>     pool;               //!< Cached asset data is stored here.
-            SizeEvaluator           sizeEvaluator;      //!< Function to evaluate single asset size.
-        };
 
         //! Container type to store unique id to an asset slot mapping.
         typedef Map<AssetId, Index> AssetIndexById;
@@ -205,8 +144,8 @@ namespace Assets {
         u32                         m_currentTime;  //!< Cached current time.
         Map<String, TypeId>         m_nameToType;   //!< Maps asset name to type.
         Map<TypeId, String>         m_typeToName;   //!< Maps asset type to name.
+        mutable LoadingQueueUPtr    m_loadingQueue; //!< Asset loading queue.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
-        mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
     };
 
     // ** Assets::assetTypeId
@@ -216,26 +155,23 @@ namespace Assets {
         return GroupedTypeIndex<TAsset, Assets>::idx();
     }
 
-    // ** Assets::allocatedForType
+    // ** Assets::assetCache
     template<typename TAsset>
-    s32 Assets::allocatedForType( void ) const
+    AssetCache<TAsset>& Assets::assetCache( void )
     {
-        return assetCacheSize( assetTypeId<TAsset>() );
+        return static_cast<AssetCache<TAsset>&>( findAssetCache( assetTypeId<TAsset>() ) );
     }
 
-    // ** Assets::setSizeEvaluator
+    // ** Assets::assetCache
     template<typename TAsset>
-    void Assets::setSizeEvaluator( const cClosure<s32(const TAsset&)>& value )
+    const AssetCache<TAsset>& Assets::assetCache( void ) const
     {
-        AbstractAssetCache* cache = findAssetCache( assetTypeId<TAsset>() );
-        DC_ABORT_IF( cache == NULL, "unknown asset type" );
-
-        static_cast<AssetCache<TAsset>*>( cache )->sizeEvaluator = value;
+        return const_cast<Assets*>( this )->assetCache<TAsset>();
     }
 
     // ** Assets::registerType
     template<typename TAsset>
-    void Assets::registerType( const cClosure<s32(const TAsset&)>& sizeEvaluator )
+    AssetCache<TAsset>& Assets::registerType( void )
     {
         // Get the type & name
         TypeId type = assetTypeId<TAsset>();
@@ -248,8 +184,9 @@ namespace Assets {
         // Create an asset cache for this type of asset
         DC_BREAK_IF( m_cache.count( type ) );
         AssetCache<TAsset>* cache = DC_NEW AssetCache<TAsset>();
-        cache->sizeEvaluator = sizeEvaluator;
         m_cache[type] = cache;
+
+        return *cache;
     }
 
     //! Adds a new asset of specified type.
@@ -268,33 +205,16 @@ namespace Assets {
         return handle;
     }
 
-    // ** Assets::setPlaceholder
-    template<typename TAsset>
-    void Assets::setPlaceholder( const DataHandle<TAsset>& value )
-    {
-        // Request an asset cache for this type of asset
-        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( assetTypeId<TAsset>() ) );
-
-        DC_BREAK_IF( !value.isLoaded(), "unloaded asset could not be set as a placeholder" );
-        cache->placeholder = value;
-    }
-
     // ** Assets::readOnlyAssetData
     template<typename TAsset>
     const TAsset& Assets::readOnlyAssetData( const Asset& asset ) const
     {
-        DC_BREAK_IF( asset.m_cache == NULL );
-
         // Request an asset cache for this type of asset
-        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( reinterpret_cast<AbstractAssetCache*>( asset.m_cache ) );
+        AssetCache<TAsset>& cache = static_cast<AssetCache<TAsset>&>( asset.cache() );
 
         // Use the placeholder for unloaded assets
         if( !asset.isLoaded() ) {
-            if( !cache->placeholder.isLoaded() ) {
-                return cache->builtInPlaceholder;
-            }
-
-            return readOnlyAssetData<TAsset>( cache->placeholder.asset() );
+            return cache.placeholder();
         }
 
         // This asset is already loaded, so we can just return a const reference to a writable data
@@ -305,14 +225,13 @@ namespace Assets {
     template<typename TAsset>
     TAsset& Assets::writableAssetData( const Asset& asset ) const
     {
-        DC_BREAK_IF( !asset.data().isValid(), "asset data is invalid" );
-        DC_BREAK_IF( asset.m_cache == NULL, "no data cache associated with this asset" );
+        DC_BREAK_IF( !asset.dataIndex().isValid(), "asset data is invalid" );
 
         // Get asset cache
-        AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( reinterpret_cast<AbstractAssetCache*>( asset.m_cache ) );
+        AssetCache<TAsset>& cache = static_cast<AssetCache<TAsset>&>( asset.cache() );
 
         // Now lookup an asset data
-        TAsset& data = cache->pool.get( asset.data() );
+        TAsset& data = cache.get( asset.dataIndex() );
         return data;
     }
 
@@ -321,7 +240,7 @@ namespace Assets {
     const TAsset& Assets::acquireReadLock( const Asset& asset ) const
     {
         if( asset.state() == Asset::Unloaded ) {
-            const_cast<Assets*>( this )->queueForLoading( const_cast<Asset&>( asset ) );
+            m_loadingQueue->queue( createHandle( asset ) );
         }
 
         const TAsset& data = readOnlyAssetData<TAsset>( asset );

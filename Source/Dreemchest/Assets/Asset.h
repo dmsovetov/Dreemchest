@@ -36,6 +36,7 @@ namespace Assets {
     //! Asset class instance stores info about a single asset.
     class Asset {
     friend class Assets;
+    friend class LoadingQueue;
     public:
 
         //! Available asset states.
@@ -69,14 +70,23 @@ namespace Assets {
         //! Sets asset name.
         void                        setName( const String& value );
 
+        //! Returns the data cache index.
+        const Index&                dataIndex( void ) const;
+
         //! Returns an asset source.
-        AbstractSource*             source( void ) const;
+        AbstractSource&             source( void ) const;
+
+        //! Returns an asset data cache.
+        AbstractAssetCache&         cache( void ) const;
 
         //! Returns asset state.
         State                       state( void ) const;
 
         //! Returns true if an asset is loaded.
         bool                        isLoaded( void ) const;
+
+        //! Returns true if an asset is up to date.
+        bool                        isUpToDate( void ) const;
 
         //! Returns asset timestamp.
         const Timestamp&            timestamp( void ) const;
@@ -88,13 +98,10 @@ namespace Assets {
     private:
 
                                     //! Constructs Asset instance.
-                                    Asset( const TypeId& type, void* cache, const Index& value, const AssetId& uniqueId, SourceUPtr source );
+                                    Asset( const TypeId& type, AbstractAssetCache* cache, const Index& value, const AssetId& uniqueId, SourceUPtr source );
 
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
-
-        //! Returns the data handle.
-        Index                       data( void ) const;
 
     private:
 
@@ -104,7 +111,7 @@ namespace Assets {
         String                      m_name;             //!< Asset name.
         State                       m_state;            //!< Current asset state.
         Index                       m_data;             //!< Asset data slot.
-        void*                       m_cache;            //!< Asset data cache pointer.
+        AbstractAssetCache*         m_cache;            //!< Asset data cache pointer.
         mutable Timestamp           m_timestamp;        //!< Asset data timestamp.
     };
 
@@ -119,6 +126,13 @@ namespace Assets {
     NIMBLE_INLINE bool Asset::isLoaded( void ) const
     {
         return m_state == Loaded;
+    }
+
+    // ** Asset::cache
+    NIMBLE_INLINE AbstractAssetCache& Asset::cache( void ) const
+    {
+        DC_ABORT_IF( m_cache == NULL, "invalid asset cache" );
+        return *m_cache;
     }
 
 } // namespace Assets

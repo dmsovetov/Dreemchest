@@ -94,12 +94,6 @@ void Handle::setHandle( Assets* assets, Index index )
 #endif  /*  DC_DEBUG    */
 }
 
-// ** Handle::forceLoad
-bool Handle::forceLoad( void )
-{
-    return assets()->loadAssetToCache( *this );
-}
-
 } // namespace Assets
 
 DC_END_DREEMCHEST
