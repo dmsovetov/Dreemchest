@@ -206,13 +206,6 @@ s32 Technique::textureCount( void ) const
     return static_cast<s32>( m_textures.size() );
 }
 
-// ** Technique::texture
-TextureHandle Technique::texture( s32 index ) const
-{
-    DC_ABORT_IF( index < 0 || index >= textureCount(), "index is out of range" );
-    return m_textures[index];
-}
-
 // ** Technique::setTexture
 void Technique::setTexture( s32 index, TextureHandle value )
 {

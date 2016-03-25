@@ -204,7 +204,7 @@ namespace Scene {
         s32                         textureCount( void ) const;
 
         //! Returns material texture.
-        TextureHandle               texture( s32 index ) const;
+        const TextureHandle&        texture( s32 index ) const;
 
         //! Sets material texture.
         void                        setTexture( s32 index, TextureHandle value );
@@ -248,6 +248,13 @@ namespace Scene {
     NIMBLE_INLINE LightingModel Technique::lightingModel( void ) const
     {
         return m_lightingModel;
+    }
+
+    // ** Technique::texture
+    NIMBLE_INLINE const TextureHandle& Technique::texture( s32 index ) const
+    {
+        DC_ABORT_IF( index < 0 || index >= textureCount(), "index is out of range" );
+        return m_textures[index];
     }
 
 } // namespace Scene
