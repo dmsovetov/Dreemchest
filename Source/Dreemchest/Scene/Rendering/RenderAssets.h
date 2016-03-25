@@ -44,13 +44,13 @@ namespace Scene {
     public:
 
         //! Alias the render asset handle type.
-        typedef Assets::GenericHandle<TRenderAsset> RenderAssetHandle;
+        typedef Assets::DataHandle<TRenderAsset> RenderAssetHandle;
 
         //! Container type to store render asset handles.
         typedef Array<RenderAssetHandle>    Container;
 
         //! Requests the render asset index by an asset handle.
-        s32                                 request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::GenericHandle<TAsset>& asset, CString postfix );
+        s32                                 request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::DataHandle<TAsset>& asset, CString postfix );
 
         //! Returns the render asset handles.
         const Container&                    handles( void ) const;
@@ -97,7 +97,7 @@ namespace Scene {
 
     // ** RenderAssetCache::request
     template<typename TAsset, typename TRenderAsset, typename TSource>
-    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::GenericHandle<TAsset>& asset, CString postfix )
+    s32 RenderAssetCache<TAsset, TRenderAsset, TSource>::request( Assets::Assets& assets, RenderingContextWPtr context, const Assets::DataHandle<TAsset>& asset, CString postfix )
     {
         // Get an asset index
         const Assets::Index& assetIndex = asset.index();

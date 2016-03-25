@@ -148,7 +148,7 @@ namespace Assets {
     public:
 
         //! Alias an asset handle type.
-        typedef GenericHandle<TSource> AssetHandle;
+        typedef DataHandle<TSource> AssetHandle;
 
 
                         //! Constructs an AssetSource instance.

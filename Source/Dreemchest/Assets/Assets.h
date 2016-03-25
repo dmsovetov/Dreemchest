@@ -37,35 +37,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    NIMBLE_LOGGER_TAG( Assets )
-
-    //! Opaque 32 bit handle.
-    typedef OpaqueHandle<12, 20> Index;
-
-    //! Asset index hasher.
-    typedef OpaqueHandleHasher<Index> IndexHasher;
-
-    //! Forward declaration of an AssetDataHandle type.
-    template<typename TAsset> class GenericHandle;
-
-    //! Forward declaration of an asset WriteLock type.
-    template<typename TAsset> class WriteLock;
-
-    //! Asset identifier type.
-    typedef String AssetId;
-
-    //! Asset type identifier type.
-    typedef u16 TypeId;
-
-    //! Set of assets.
-    typedef Set<class Handle> AssetSet;
-
-    //! List of assets.
-    typedef List<class Handle> AssetList;
-
-    // Unique ptr for asset source.
-    typedef AutoPtr<class AbstractSource> SourceUPtr;
-
     //! Asset class instance stores info about a single asset.
     class Asset {
     friend class Assets;
@@ -167,15 +138,15 @@ namespace Assets {
 
         //! Adds a new asset of specified type.
         template<typename TAsset>
-        GenericHandle<TAsset>       add( const AssetId& uniqueId, SourceUPtr source );
+        DataHandle<TAsset>          add( const AssetId& uniqueId, SourceUPtr source );
 
         //! Returns an asset of specified type.
         template<typename TAsset>
-        GenericHandle<TAsset>       find( const AssetId& uniqueId ) const;
+        DataHandle<TAsset>          find( const AssetId& uniqueId ) const;
 
         //! Sets the default placeholder for unloaded assets of specified type.
         template<typename TAsset>
-        void                        setPlaceholder( const GenericHandle<TAsset>& value );
+        void                        setPlaceholder( const DataHandle<TAsset>& value );
 
         //! Adds new asset with unique id.
         Handle                      addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source );
@@ -311,7 +282,7 @@ namespace Assets {
             }
 
             TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
-            GenericHandle<TAsset>   placeholder;        //!< Default placeholder that is returned for unloaded assets.
+            DataHandle<TAsset>      placeholder;        //!< Default placeholder that is returned for unloaded assets.
             Pool<TAsset, Index>     pool;               //!< Cached asset data is stored here.
             SizeEvaluator           sizeEvaluator;      //!< Function to evaluate single asset size.
         };
@@ -376,7 +347,7 @@ namespace Assets {
 
     //! Adds a new asset of specified type.
     template<typename TAsset>
-    GenericHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
+    DataHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
     {
         Handle handle = addAsset( assetTypeId<TAsset>(), uniqueId, source );
         return handle;
@@ -384,7 +355,7 @@ namespace Assets {
 
     // ** Assets::find
     template<typename TAsset>
-    GenericHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
+    DataHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
     {
         Handle handle = findAsset( uniqueId );
         return handle;
@@ -392,7 +363,7 @@ namespace Assets {
 
     // ** Assets::setPlaceholder
     template<typename TAsset>
-    void Assets::setPlaceholder( const GenericHandle<TAsset>& value )
+    void Assets::setPlaceholder( const DataHandle<TAsset>& value )
     {
         // Request an asset cache for this type of asset
         AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( findAssetCache( assetTypeId<TAsset>() ) );

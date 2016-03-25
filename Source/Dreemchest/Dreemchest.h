@@ -66,6 +66,43 @@
 	#include <json/json.h>
 #endif	/*	HAVE_JSON	*/
 
+DC_BEGIN_DREEMCHEST
+
+    namespace Assets {
+    
+        NIMBLE_LOGGER_TAG( Assets )
+
+        //! Opaque 32 bit handle.
+        typedef OpaqueHandle<12, 20> Index;
+
+        //! Asset index hasher.
+        typedef OpaqueHandleHasher<Index> IndexHasher;
+
+        //! Forward declaration of an AssetDataHandle type.
+        template<typename TAsset> class DataHandle;
+
+        //! Forward declaration of an asset WriteLock type.
+        template<typename TAsset> class WriteLock;
+
+        //! Asset identifier type.
+        typedef String AssetId;
+
+        //! Asset type identifier type.
+        typedef u16 TypeId;
+
+        //! Set of assets.
+        typedef Set<class Handle> AssetSet;
+
+        //! List of assets.
+        typedef List<class Handle> AssetList;
+
+        // Unique ptr for asset source.
+        typedef AutoPtr<class AbstractSource> SourceUPtr;
+
+    } // namespace Assets
+
+DC_END_DREEMCHEST
+
 #ifndef DC_BUILD_LIBRARY
 	#include <Network/Network.h>
 	#include <Io/Io.h>

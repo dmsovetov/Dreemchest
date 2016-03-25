@@ -123,31 +123,31 @@ namespace Scene {
     typedef AutoPtr<class Spatial> SpatialUPtr;
 
     //! Image handle type.
-    typedef Assets::GenericHandle<class Image> ImageHandle;
+    typedef Assets::DataHandle<class Image> ImageHandle;
 
     //! Mesh handle type.
-    typedef Assets::GenericHandle<class Mesh> MeshHandle;
+    typedef Assets::DataHandle<class Mesh> MeshHandle;
 
     //! Material handle type.
-    typedef Assets::GenericHandle<class Material> MaterialHandle;
+    typedef Assets::DataHandle<class Material> MaterialHandle;
 
     //! Terrain handle type.
-    typedef Assets::GenericHandle<class Terrain> TerrainHandle;
+    typedef Assets::DataHandle<class Terrain> TerrainHandle;
 
     //! Renderable handle type.
-    typedef Assets::GenericHandle<class Renderable> RenderableHandle;
+    typedef Assets::DataHandle<class Renderable> RenderableHandle;
 
     //! Texture handle type.
-    typedef Assets::GenericHandle<class Texture> TextureHandle;
+    typedef Assets::DataHandle<class Texture> TextureHandle;
 
     //! Technique handle type.
-    typedef Assets::GenericHandle<class Technique> TechniqueHandle;
+    typedef Assets::DataHandle<class Technique> TechniqueHandle;
 
     //! ShaderSource handle type.
-    typedef Assets::GenericHandle<class ShaderSource> ShaderSourceHandle;
+    typedef Assets::DataHandle<class ShaderSource> ShaderSourceHandle;
 
     //! Program handle type.
-    typedef Assets::GenericHandle<class Program> ProgramHandle;
+    typedef Assets::DataHandle<class Program> ProgramHandle;
 
     //! Integer handle type to access render assets.
     typedef s32 RenderAssetIndex;
