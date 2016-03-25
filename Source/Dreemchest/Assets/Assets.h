@@ -289,10 +289,10 @@ namespace Assets {
             typedef cClosure<s32(const TAsset& asset)> SizeEvaluator;
 
             //! Reserves the slot handle inside cache.
-            virtual Index           reserve( void ) { return slots.reserve(); }
+            virtual Index           reserve( void ) { return pool.reserve(); }
 
             //! Returns the total cache size.
-            virtual s32             size( void ) const { return slots.size(); }
+            virtual s32             size( void ) const { return pool.size(); }
 
             //! Returns the total number of bytes used by an asset cache.
             virtual s32             allocatedBytes( void ) const
@@ -303,8 +303,8 @@ namespace Assets {
                 }
 
                 s32 result = 0;
-                for( s32 i = 0, n = slots.size(); i < n; i++ ) {
-                    result += sizeEvaluator( slots.dataAt( i ) );
+                for( s32 i = 0, n = pool.size(); i < n; i++ ) {
+                    result += sizeEvaluator( pool.dataAt( i ) );
                 }
 
                 return result;
@@ -312,7 +312,7 @@ namespace Assets {
 
             TAsset                  builtInPlaceholder; //!< Built-in placeholder asset.
             GenericHandle<TAsset>   placeholder;        //!< Default placeholder that is returned for unloaded assets.
-            Slots<TAsset, Index>    slots;              //!< Cached asset data is stored here.
+            Pool<TAsset, Index>     pool;               //!< Cached asset data is stored here.
             SizeEvaluator           sizeEvaluator;      //!< Function to evaluate single asset size.
         };
 
@@ -322,7 +322,7 @@ namespace Assets {
         //! Container type to store asset cache for an asset type.
         typedef Map<TypeId, AbstractAssetCache*> AssetCaches;
 
-        Slots<Asset, Index>         m_assets;       //!< All available assets.
+        Pool<Asset, Index>          m_assets;       //!< All available assets.
         AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
         u32                         m_currentTime;  //!< Cached current time.
         Map<String, TypeId>         m_nameToType;   //!< Maps asset name to type.
@@ -434,7 +434,7 @@ namespace Assets {
         AssetCache<TAsset>* cache = static_cast<AssetCache<TAsset>*>( reinterpret_cast<AbstractAssetCache*>( asset.m_cache ) );
 
         // Now lookup an asset data
-        TAsset& data = cache->slots.get( asset.data() );
+        TAsset& data = cache->pool.get( asset.data() );
         return data;
     }
 
