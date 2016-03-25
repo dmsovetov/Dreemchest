@@ -92,11 +92,11 @@ void Application::closeConnection( ConnectionWPtr connection )
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 	connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
-    // Remove from a connections container
-	m_connections.erase( connection );
-
     // Notify listeners about a disconnection
     notify<Disconnected>( this, connection );
+
+    // Remove from a connections container
+	m_connections.erase( connection );
 }
 
 // ** Application::eventListeners
