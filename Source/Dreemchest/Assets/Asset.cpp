@@ -24,74 +24,85 @@
 
  **************************************************************************/
 
-#include "Asset.h"
 #include "AssetSource.h"
-#include "AssetHandle.h"
-
-#include <Io/DiskFileSystem.h>
-#include <Io/Streams/Stream.h>
+#include "Asset.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ---------------------------------------------- NullSource ---------------------------------------------- //
-
-// ** NullSource::construct
-bool NullSource::construct( Assets& assets, Handle asset )
-{
-    return true;
-}
-
-// ** NullSource::lastModified
-u32 NullSource::lastModified( void ) const
-{
-    return 0;
-}
-
-// ------------------------------------------ AbstractFileSource ------------------------------------------ //
-
-// ** AbstractFileSource::AbstractFileSource
-AbstractFileSource::AbstractFileSource( void )
-    : m_lastModified( 0 )
+// ** Asset::Asset
+Asset::Asset( void )
+    : m_state( Unloaded )
+    , m_cache( NULL )
 {
 }
 
-// ** AbstractFileSource::construct
-bool AbstractFileSource::construct( Assets& assets, Handle asset )
+// ** Asset::Asset
+Asset::Asset( const TypeId& type, void* cache, const Index& data, const AssetId& uniqueId, SourceUPtr source )
+    : m_source( source )
+    , m_type( type )
+    , m_uniqueId( uniqueId )
+    , m_state( Unloaded )
+    , m_cache( cache )
+    , m_data( data )
 {
-    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
-
-    if( !stream.valid() ) {
-        return false;
-    }
-
-    bool result = constructFromStream( stream, assets, asset );
-    return result;
+    memset( &m_timestamp, 0, sizeof Timestamp );
 }
 
-// ** AbstractFileSource::lastModified
-u32 AbstractFileSource::lastModified( void ) const
+// ** Asset::type
+const TypeId& Asset::type( void ) const
 {
-    return m_lastModified;
+    return m_type;
 }
 
-// ** AbstractFileSource::setLastModified
-void AbstractFileSource::setLastModified( u32 value )
+// ** Asset::state
+Asset::State Asset::state( void ) const
 {
-    m_lastModified = value;
+    return m_state;
 }
 
-// ** AbstractFileSource::fileName
-const String& AbstractFileSource::fileName( void ) const
+// ** Asset::uniqueId
+const AssetId& Asset::uniqueId( void ) const
 {
-    return m_fileName;
+    return m_uniqueId;
 }
 
-// ** AbstractFileSource::fileName
-void AbstractFileSource::setFileName( const String& value )
+// ** Asset::name
+const String& Asset::name( void ) const
 {
-    m_fileName = value;
+    return m_name;
+}
+
+// ** Asset::setName
+void Asset::setName( const String& value )
+{
+    m_name = value;
+}
+
+// ** Asset::source
+AbstractSource* Asset::source( void ) const
+{
+    return m_source.get();
+}
+
+// ** Asset::switchToState
+void Asset::switchToState( State value )
+{
+    DC_BREAK_IF( m_state == value );
+    m_state = value;
+}
+
+// ** Asset::data
+Index Asset::data( void ) const
+{
+    return m_data;
+}
+
+// ** Asset::timestamp
+const Asset::Timestamp& Asset::timestamp( void ) const
+{
+    return m_timestamp;
 }
 
 } // namespace Assets

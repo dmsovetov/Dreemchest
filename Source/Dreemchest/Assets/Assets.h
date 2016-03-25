@@ -33,95 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    //! Asset class instance stores info about a single asset.
-    class Asset {
-    friend class Assets;
-    public:
-
-        //! Available asset states.
-        enum State {
-              Unloaded              //!< Asset is now unloaded.
-            , WaitingForLoading     //!< Asset is now waiting to start loading.
-            , Loading               //!< Asset is now loading.
-            , Loaded                //!< Asset is loaded and ready to use.
-            , Error                 //!< Asset was failed to load.
-        };
-
-                                    //! Constructs empty Asset instance.
-                                    Asset( void );
-
-        //! Returns asset unique id.
-        const AssetId&              uniqueId( void ) const;
-
-        //! Returns asset type.
-        const TypeId&               type( void ) const;
-
-        //! Returns asset name.
-        const String&               name( void ) const;
-
-        //! Sets asset name.
-        void                        setName( const String& value );
-
-        //! Returns an asset source.
-        AbstractSource*             source( void ) const;
-
-        //! Returns asset state.
-        State                       state( void ) const;
-
-        //! Returns true if an asset is loaded.
-        bool                        isLoaded( void ) const;
-
-        //! Returns the last asset modification timestamp.
-        u32                         lastModified( void ) const;
-
-        //! Returns the last asset use timestamp.
-        u32                         lastUsed( void ) const;
-
-        //! Returns the last asset construction timestamp.
-        u32                         lastConstructed( void ) const;
-
-        //! Returns true if an asset is of specified type.
-        template<typename TAsset>
-        bool                        is( void ) const;
-
-    private:
-
-                                    //! Constructs Asset instance.
-                                    Asset( const TypeId& type, void* cache, const Index& value, const AssetId& uniqueId, SourceUPtr source );
-
-        //! Switches an asset to a specified state.
-        void                        switchToState( State value );
-
-        //! Returns the data handle.
-        Index                       data( void ) const;
-
-    private:
-
-        SourceUPtr                  m_source;           //!< Asset source used for asset construction.
-        TypeId                      m_type;             //!< Asset type.
-        AssetId                     m_uniqueId;         //!< Unique asset id.
-        String                      m_name;             //!< Asset name.
-        State                       m_state;            //!< Current asset state.
-        Index                       m_data;             //!< Asset data slot.
-        void*                       m_cache;            //!< Asset data cache pointer.
-        mutable u32                 m_lastConstructed;  //!< Last time this asset was constructed from source.
-        mutable u32                 m_lastModified;     //!< Last time this asset was modified.
-        mutable u32                 m_lastUsed;         //!< Last time this asset was used.
-    };
-
-    // ** Asset::is
-    template<typename TAsset>
-    NIMBLE_INLINE bool Asset::is( void ) const
-    {
-        return m_type == Assets::assetTypeId<TAsset>();
-    }
-
-    // ** Asset::isLoaded
-    NIMBLE_INLINE bool Asset::isLoaded( void ) const
-    {
-        return m_state == Loaded;
-    }
-
     //! Root interface to access all available assets.
     class Assets : public RefCounted {
     friend class Handle;
@@ -414,7 +325,7 @@ namespace Assets {
         }
 
         const TAsset& data = readOnlyAssetData<TAsset>( asset );
-        asset.m_lastUsed = m_currentTime;
+        asset.m_timestamp.used = m_currentTime;
         return data;
     }
 
@@ -446,5 +357,9 @@ namespace Assets {
 } // namespace Assets
 
 DC_END_DREEMCHEST
+
+#ifndef DC_BUILD_LIBRARY
+    #include "Asset.h"
+#endif  /*  #ifndef DC_BUILD_LIBRARY    */
 
 #endif    /*    !__DC_Assets_H__    */

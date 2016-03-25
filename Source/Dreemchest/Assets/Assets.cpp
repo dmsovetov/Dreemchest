@@ -26,104 +26,13 @@
 
 #include "Assets.h"
 
+#include "Asset.h"
 #include "AssetHandle.h"
 #include "AssetSource.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
-
-// ---------------------------------------------- Asset ---------------------------------------------- //
-
-// ** Asset::Asset
-Asset::Asset( void )
-    : m_state( Unloaded )
-    , m_cache( NULL )
-{
-}
-
-// ** Asset::Asset
-Asset::Asset( const TypeId& type, void* cache, const Index& data, const AssetId& uniqueId, SourceUPtr source )
-    : m_source( source )
-    , m_type( type )
-    , m_uniqueId( uniqueId )
-    , m_state( Unloaded )
-    , m_cache( cache )
-    , m_data( data )
-    , m_lastConstructed( 0 )
-    , m_lastModified( 0 )
-    , m_lastUsed( 0 )
-{
-}
-
-// ** Asset::type
-const TypeId& Asset::type( void ) const
-{
-    return m_type;
-}
-
-// ** Asset::state
-Asset::State Asset::state( void ) const
-{
-    return m_state;
-}
-
-// ** Asset::uniqueId
-const AssetId& Asset::uniqueId( void ) const
-{
-    return m_uniqueId;
-}
-
-// ** Asset::name
-const String& Asset::name( void ) const
-{
-    return m_name;
-}
-
-// ** Asset::setName
-void Asset::setName( const String& value )
-{
-    m_name = value;
-}
-
-// ** Asset::source
-AbstractSource* Asset::source( void ) const
-{
-    return m_source.get();
-}
-
-// ** Asset::switchToState
-void Asset::switchToState( State value )
-{
-    DC_BREAK_IF( m_state == value );
-    m_state = value;
-}
-
-// ** Asset::data
-Index Asset::data( void ) const
-{
-    return m_data;
-}
-
-// ** Asset::lastModified
-u32 Asset::lastModified( void ) const
-{
-    return m_lastModified;
-}
-
-// ** Asset::lastUsed
-u32 Asset::lastUsed( void ) const
-{
-    return m_lastUsed;
-}
-
-// ** Asset::lastConstructed
-u32 Asset::lastConstructed( void ) const
-{
-    return m_lastConstructed;
-}
-
-// --------------------------------------------- Assets --------------------------------------------- //
 
 // ** Assets::Assets
 Assets::Assets( void )
@@ -247,7 +156,7 @@ String Assets::assetTypeName( const TypeId& type ) const
 // ** Assets::releaseWriteLock
 void Assets::releaseWriteLock( const Handle& asset )
 {
-    asset->m_lastModified = Platform::currentTime();
+    asset->m_timestamp.modified = Platform::currentTime();
 }
 
 // ** Assets::findAssetCache
@@ -295,7 +204,7 @@ bool Assets::loadAssetToCache( Handle asset )
     asset->switchToState( result ? Asset::Loaded : Asset::Error );
 
     // Update the last constructed time stamp
-    asset->m_lastConstructed = Time::current();
+    asset->m_timestamp.constructed = Time::current();
 
     // Output the log message
     LogDebug( "cache", "%s loaded (%2.2fkb allocated for %s, %2.2fkb total allocated)\n", asset->name().c_str(), assetCacheSize( asset->type() ) / 1024.0f, assetTypeName( asset->type() ).c_str(), totalBytesUsed() / 1024.0f );
@@ -324,7 +233,7 @@ void Assets::update( f32 dt )
         DC_ABORT_IF( source == NULL, "asset has no valid asset source" );
 
         // Skip up-to-date assets
-        if( source->lastModified() <= asset.lastModified() ) {
+        if( source->lastModified() <= asset.timestamp().modified ) {
             continue;
         }
 

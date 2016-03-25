@@ -42,6 +42,7 @@
 #include <Renderer/Hal.h>
 #include <Renderer/Renderer2D.h>
 
+#include <Assets/Asset.h>
 #include <Assets/AssetHandle.h>
 #include <Assets/Assets.h>
 #include <Assets/AssetSource.h>

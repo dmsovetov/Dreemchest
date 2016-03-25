@@ -191,7 +191,7 @@ namespace Assets {
     template<typename TAsset, typename TSource>
     u32 AssetSource<TAsset, TSource>::lastModified( void ) const
     {
-        return m_asset.asset().lastModified();
+        return m_asset.asset().timestamp().modified;
     }
 
 } // namespace Assets

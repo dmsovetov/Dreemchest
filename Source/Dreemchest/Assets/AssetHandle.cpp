@@ -24,6 +24,7 @@
 
  **************************************************************************/
 
+#include "Asset.h"
 #include "AssetHandle.h"
 #include "Assets.h"
 
