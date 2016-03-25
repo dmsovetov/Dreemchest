@@ -211,7 +211,7 @@ namespace Assets {
             virtual Index           reserve( void ) { return slots.reserve(); }
 
             TAsset                  placeholder;    //!< Default placeholder that is returned for unloaded assets.
-            Slots<TAsset, Index>    slots;          //!< Cached asset data is stored here.
+            Pool<TAsset, Index>     slots;          //!< Cached asset data is stored here.
         };
 
         //! Container type to store unique id to an asset slot mapping.
@@ -220,7 +220,7 @@ namespace Assets {
         //! Container type to store asset cache for an asset type.
         typedef Map<Type, AbstractAssetCache*> AssetCaches;
 
-        Slots<Asset, Index>         m_assets;       //!< All available assets.
+        Pool<Asset, Index>          m_assets;       //!< All available assets.
         AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
         mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
         mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
