@@ -753,6 +753,12 @@ const VertexDeclarationPtr& VertexBuffer::vertexDeclaration( void ) const
     return m_vertexDeclaration;
 }
 
+// ** VertexBuffer::size
+u32 VertexBuffer::size( void ) const
+{
+    return m_size;
+}
+
 // ** VertexBuffer::pointer
 const void* VertexBuffer::pointer( void ) const
 {

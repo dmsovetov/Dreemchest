@@ -248,6 +248,32 @@ namespace Scene {
 
                         //! Constructs Resources instance.
                         Resources( void );
+
+    private:
+
+        //! Calculates the total size allocated for texture asset.
+        static s32      bytesAllocatedForTexture( const Texture& asset );
+
+        //! Calculates the total size allocated for mesh asset.
+        static s32      bytesAllocatedForMesh( const Mesh& asset );
+
+        //! Calculates the total size allocated for image asset.
+        static s32      bytesAllocatedForImage( const Image& asset );
+
+        //! Calculates the total size allocated for material asset.
+        static s32      bytesAllocatedForMaterial( const Material& asset );
+
+        //! Calculates the total size allocated for renderable asset.
+        static s32      bytesAllocatedForRenderable( const Renderable& asset );
+
+        //! Calculates the total size allocated for technique asset.
+        static s32      bytesAllocatedForTechnique( const Technique& asset );
+
+        //! Calculates the total size allocated for shader source asset.
+        static s32      bytesAllocatedForShaderSource( const ShaderSource& asset );
+
+        //! Calculates the total size allocated for shader source asset.
+        static s32      bytesAllocatedForProgram( const Program& asset );
     };
 
 	//! The root class for a scene subsystem.

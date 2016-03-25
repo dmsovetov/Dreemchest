@@ -195,13 +195,24 @@ namespace Assets {
         //! Returns asset type name.
         String                      assetTypeName( const TypeId& type ) const;
 
+        //! Returns the total number of bytes allocated for asset data.
+        s32                         totalBytesUsed( void ) const;
+
+        //! Returns the total number of bytes allocated for a specified asset type.
+        template<typename TAsset>
+        s32                         allocatedForType( void ) const;
+
+        //! Sets asset size evaluation function.
+        template<typename TAsset>
+        void                        setSizeEvaluator( const cClosure<s32(const TAsset&)>& value );
+
         //! Returns an asset type id.
         template<typename TAsset>
         static TypeId               assetTypeId( void );
 
         //! Registers an asset type.
         template<typename TAsset>
-        void                        registerType( void );
+        void                        registerType( const cClosure<s32(const TAsset&)>& sizeEvaluator = cClosure<s32(const TAsset&)>() );
 
     private:
 
@@ -227,16 +238,8 @@ namespace Assets {
         //! Requests an asset cache for a specified asset type.
         AbstractAssetCache*         findAssetCache( const TypeId& type ) const;
 
-        //! Returns the total number of bytes allocated for asset data.
-        s32                         totalBytesUsed( void ) const;
-
-        //! Returns the total number of bytes allocated for a specified asset type.
-        template<typename TAsset>
-        s32                         bytesUsedByType( void ) const;
-
-        //! Sets asset size evaluation function.
-        template<typename TAsset>
-        void                        setSizeEvaluator( const cClosure<s32(const TAsset&)>& value );
+        //! Returns the total number of bytes allocated by a specified asset type cache.
+        s32                         assetCacheSize( const TypeId& type ) const;
 
         //! Returns cached read-only asset data.
         template<typename TAsset>
@@ -295,6 +298,7 @@ namespace Assets {
             virtual s32             allocatedBytes( void ) const
             {
                 if( !sizeEvaluator ) {
+                    LogWarning( "cache", "an amount of allocated bytes requested, but no size evaluator set\n" );
                     return 0;
                 }
 
@@ -334,14 +338,11 @@ namespace Assets {
         return GroupedTypeIndex<TAsset, Assets>::idx();
     }
 
-    // ** Assets::bytesUsedByType
+    // ** Assets::allocatedForType
     template<typename TAsset>
-    s32 Assets::bytesUsedByType( void ) const
+    s32 Assets::allocatedForType( void ) const
     {
-        AbstractAssetCache* cache = findAssetCache( assetTypeId<TAsset>() );
-        DC_ABORT_IF( cache == NULL, "unknown asset type" );
-
-        return cache->allocatedBytes();
+        return assetCacheSize( assetTypeId<TAsset>() );
     }
 
     // ** Assets::setSizeEvaluator
@@ -356,7 +357,7 @@ namespace Assets {
 
     // ** Assets::registerType
     template<typename TAsset>
-    void Assets::registerType( void )
+    void Assets::registerType( const cClosure<s32(const TAsset&)>& sizeEvaluator )
     {
         // Get the type & name
         TypeId type = assetTypeId<TAsset>();
@@ -368,7 +369,9 @@ namespace Assets {
 
         // Create an asset cache for this type of asset
         DC_BREAK_IF( m_cache.count( type ) );
-        m_cache[type] = DC_NEW AssetCache<TAsset>();
+        AssetCache<TAsset>* cache = DC_NEW AssetCache<TAsset>();
+        cache->sizeEvaluator = sizeEvaluator;
+        m_cache[type] = cache;
     }
 
     //! Adds a new asset of specified type.

@@ -58,15 +58,100 @@ namespace Scene {
 // ** Resources::Resources
 Resources::Resources( void )
 {
-    registerType<Mesh>();
-    registerType<Image>();
+    registerType<Mesh>( dcStaticFunction( bytesAllocatedForMesh ) );
+    registerType<Image>( dcStaticFunction( bytesAllocatedForImage ) );
     registerType<Prefab>();
-    registerType<Material>();
-    registerType<Renderable>();
-    registerType<Texture>();
-    registerType<Technique>();
-    registerType<ShaderSource>();
-    registerType<Program>();
+    registerType<Material>( dcStaticFunction( bytesAllocatedForMaterial ) );
+    registerType<Renderable>( dcStaticFunction( bytesAllocatedForRenderable ) );
+    registerType<Texture>( dcStaticFunction( bytesAllocatedForTexture ) );
+    registerType<Technique>( dcStaticFunction( bytesAllocatedForTechnique ) );
+    registerType<ShaderSource>( dcStaticFunction( bytesAllocatedForShaderSource ) );
+    registerType<Program>( dcStaticFunction( bytesAllocatedForProgram ) );
+}
+
+// ** Resources::bytesAllocatedForTexture
+s32 Resources::bytesAllocatedForTexture( const Texture& asset )
+{
+    Renderer::TextureWPtr instance = asset.texture();
+
+    if( !instance.valid() ) {
+        return 0;
+    }
+
+    s32 result = 0;
+
+    switch( instance->type() ) {
+    case Renderer::Texture::TextureType2D:  {
+                                                Renderer::Texture2DWPtr texture = static_cast<Renderer::Texture2D*>( instance.get() );
+                                                result = texture->bytesPerMip( texture->width(), texture->height() );
+                                            }
+                                            break;
+    default:                                DC_NOT_IMPLEMENTED;
+    }
+
+    return result + sizeof( Texture );
+}
+
+// ** Resources::bytesAllocatedForMesh
+s32 Resources::bytesAllocatedForMesh( const Mesh& asset )
+{
+    s32 result = 0;
+
+    for( s32 i = 0; i < asset.chunkCount(); i++ ) {
+        result += asset.vertexBuffer( i ).size() * sizeof( Mesh::Vertex );
+        result += asset.indexBuffer( i ).size() * sizeof( u16 );
+    }
+
+    return result + sizeof( Mesh );
+}
+
+// ** Resources::bytesAllocatedForImage
+s32 Resources::bytesAllocatedForImage( const Image& asset )
+{
+    s32 result = 0;
+
+    for( s32 i = 0, n = asset.mipLevelCount(); i < n; i++ ) {
+        result += asset.mipLevelWidth( i ) * asset.mipLevelHeight( i ) * asset.bytesPerPixel();
+    }
+
+    return result + sizeof( Image );
+}
+
+// ** Resources::bytesAllocatedForMaterial
+s32 Resources::bytesAllocatedForMaterial( const Material& asset )
+{
+    return sizeof( Material );
+}
+
+// ** Resources::bytesAllocatedForRenderable
+s32 Resources::bytesAllocatedForRenderable( const Renderable& asset )
+{
+    s32 result = 0;
+
+    for( s32 i = 0; i < asset.chunkCount(); i++ ) {
+        result += asset.vertexBuffer( i )->size() * asset.vertexBuffer( i )->vertexDeclaration()->vertexSize();
+        result += asset.indexBuffer( i )->size() * sizeof( u16 );
+    }
+
+    return result + sizeof( Renderable );
+}
+
+// ** Resources::bytesAllocatedForTechnique
+s32 Resources::bytesAllocatedForTechnique( const Technique& asset )
+{
+    return sizeof( Technique ) + sizeof( Rgba ) * asset.colorCount() + sizeof( ImageHandle ) * asset.textureCount();
+}
+
+// ** Resources::bytesAllocatedForShaderSource
+s32 Resources::bytesAllocatedForShaderSource( const ShaderSource& asset )
+{
+    return sizeof( ShaderSource ) + sizeof( ShaderSource::Feature ) * asset.featureCount() + asset.vertex().length() + asset.fragment().length();
+}
+
+// ** Resources::bytesAllocatedForProgram
+s32 Resources::bytesAllocatedForProgram( const Program& asset )
+{
+    return sizeof( Program );
 }
 
 // ** Scene::Scene

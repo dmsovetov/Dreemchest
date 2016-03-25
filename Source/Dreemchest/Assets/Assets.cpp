@@ -185,6 +185,27 @@ bool Assets::removeAsset( const AssetId& id )
     return m_assets.remove( index );
 }
 
+// ** Assets::assetCacheSize
+s32 Assets::assetCacheSize( const TypeId& type ) const
+{
+    AbstractAssetCache* cache = findAssetCache( type );
+    DC_ABORT_IF( cache == NULL, "unknown asset type" );
+
+    return cache->allocatedBytes();
+}
+
+// ** Assets::totalBytesUsed
+s32 Assets::totalBytesUsed( void ) const
+{
+    s32 result = 0;
+
+    for( AssetCaches::const_iterator i = m_cache.begin(), end = m_cache.end(); i != end; ++i ) {
+        result += i->second->allocatedBytes();
+    }
+
+    return result;
+}
+
 // ** Assets::findAsset
 Handle Assets::findAsset( const AssetId& id ) const
 {
@@ -275,6 +296,9 @@ bool Assets::loadAssetToCache( Handle asset )
 
     // Update the last constructed time stamp
     asset->m_lastConstructed = Time::current();
+
+    // Output the log message
+    LogDebug( "cache", "%s loaded (%2.2fkb allocated for %s, %2.2fkb total allocated)\n", asset->name().c_str(), assetCacheSize( asset->type() ) / 1024.0f, assetTypeName( asset->type() ).c_str(), totalBytesUsed() / 1024.0f );
 
     return result;
 }
