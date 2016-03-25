@@ -68,6 +68,19 @@
 
 DC_BEGIN_DREEMCHEST
 
+    namespace Platform {
+    
+        //! Returns current time in milliseconds.
+	    extern u32 currentTime( void );
+
+    } // namespace Platform
+
+    namespace Io {
+    
+        dcDeclarePtrs( Stream )
+
+    } // namespace Io
+
     namespace Assets {
     
         NIMBLE_LOGGER_TAG( Assets )

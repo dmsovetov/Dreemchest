@@ -33,9 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-	//! Returns current time in milliseconds.
-	extern u32 currentTime( void );
-
     //! Time step data issued by fixed timer.
     class TimeStep {
     friend class FixedTimeStep;

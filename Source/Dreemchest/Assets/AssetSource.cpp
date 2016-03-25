@@ -27,6 +27,9 @@
 #include "AssetSource.h"
 #include "AssetHandle.h"
 
+#include <Io/DiskFileSystem.h>
+#include <Io/Streams/Stream.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
