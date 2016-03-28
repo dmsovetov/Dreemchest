@@ -28,8 +28,6 @@
 #define __DC_Introspection_Property_H__
 
 #include "Introspection.h"
-#include "Type.h"
-#include "Variant.h"
 
 DC_BEGIN_DREEMCHEST
 

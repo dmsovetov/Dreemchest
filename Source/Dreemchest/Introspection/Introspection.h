@@ -156,8 +156,6 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
     #include "Property.h"
-    #include "Type.h"
-    #include "Variant.h"
 #endif  /*  !DC_BUILD_LIBRARY   */
 
 #endif    /*    !__DC_Introspection_H__    */
