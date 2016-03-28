@@ -116,7 +116,9 @@ void ApplicationTCP::handleSocketClosed( const TCPSocket::Closed& e )
     DC_ABORT_IF( i == m_connectionBySocket.end(), "no connection associated with this socket instance" );
 
     // Remove the connection
-    closeConnection( i->second );
+    if( i->second.valid() ) {
+        closeConnection( i->second );
+    }
 
     // Unregister the connection
     m_connectionBySocket.erase( i );
