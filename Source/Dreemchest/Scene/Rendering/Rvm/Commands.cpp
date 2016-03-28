@@ -136,12 +136,6 @@ s32 Commands::usedBytes( void ) const
     return m_commands.allocated();
 }
 
-// ** Commands::opCodeAt
-s32 Commands::opCodeAt( s32 index ) const
-{
-    return *reinterpret_cast<const s32*>( m_commands.data() + static_cast<u32>( m_operations[index] & 0xFFFFFFFF ) );
-}
-
 // ** Commands::beginSequence
 u8 Commands::beginSequence( void )
 {
