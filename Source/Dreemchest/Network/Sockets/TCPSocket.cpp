@@ -115,6 +115,12 @@ u32 TCPSocket::send( const void* buffer, s32 size )
     DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
     DC_BREAK_IF( size <= 0, "size should be a positive number" );
 
+    // This socket was queued for removal - close now
+    if( m_shouldClose ) {
+        close();
+        return 0;
+    }
+
     s32       bytesSent = 0;
     const s8* data      = reinterpret_cast<const s8*>( buffer );
 
@@ -148,6 +154,12 @@ u32 TCPSocket::send( const void* buffer, s32 size )
 void TCPSocket::recv( void )
 {
     DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+
+    // This socket was queued for removal - close now
+    if( m_shouldClose ) {
+        close();
+        return;
+    }
 
     // Rewind to the end of a buffer
 	m_data->setPosition( 0, Io::SeekEnd );

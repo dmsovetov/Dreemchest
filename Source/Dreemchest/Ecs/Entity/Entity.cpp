@@ -223,6 +223,14 @@ void Entity::deserialize( SerializationContext& ctx, const Archive& ar )
 	KeyValue object = ar.as<KeyValue>();
     m_flags = object.get<u8>( "flags", 0 );
 
+    // This code is very important!
+    const Variant& id = object.valueAtKey( "_id" );
+    if( id.type()->is<Guid>() ) {
+        m_id = id.as<Guid>();
+    } else {
+        m_id = id.as<String>();
+    }
+
 	// Load all attached components
 	for( Components::iterator i = items.begin(), end = items.end(); i != end; ++i ) {
 		CString key = i->second->typeName();

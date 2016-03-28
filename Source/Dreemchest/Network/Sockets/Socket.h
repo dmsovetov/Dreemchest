@@ -47,6 +47,9 @@ namespace Network {
         //! Returns true if this socket is valid.
 		bool				    isValid( void ) const;
 
+        //! Queues this socket for removal.
+        void                    closeLater( void );
+
         //! Closes a socket.
         virtual void		    close( void );
 
@@ -57,6 +60,7 @@ namespace Network {
 
         SocketDescriptor        m_descriptor;   //!< Socket descriptor.
         Io::ByteBufferPtr       m_data;         //!< Socket receiving buffer.
+        bool                    m_shouldClose;  //!< Indicates that a socket should be closed.
     };
 
 } // namespace Network

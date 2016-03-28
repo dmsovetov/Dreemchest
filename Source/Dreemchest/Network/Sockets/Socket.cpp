@@ -31,7 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
 // ** Socket::Socket
-Socket::Socket( SocketDescriptor& descriptor ) : m_descriptor( descriptor )
+Socket::Socket( SocketDescriptor& descriptor )
+    : m_descriptor( descriptor )
+    , m_shouldClose( false )
 {
     // Create the socket receiving buffer
     m_data = Io::ByteBuffer::create();
@@ -53,6 +55,12 @@ const SocketDescriptor& Socket::descriptor( void ) const
 void Socket::close( void )
 {
 	m_descriptor.close();
+}
+
+// ** Socket::closeLater
+void Socket::closeLater( void )
+{
+    m_shouldClose = true;
 }
 
 } // namespace Network

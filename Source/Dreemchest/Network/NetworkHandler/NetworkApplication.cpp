@@ -51,6 +51,19 @@ Application::Application( void )
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
 }
 
+// ** Application::~Application
+Application::~Application( void )
+{
+    // Copy the connection set before closing connections
+    ConnectionSet connections = m_connections;
+
+    // Close all connections upon application destruction
+	for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
+		ConnectionPtr connection = *i;
+        connection->close();
+	}
+}
+
 // ** Application::createConnection
 ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 {
@@ -75,12 +88,12 @@ void Application::closeConnection( ConnectionWPtr connection )
 {
     LogVerbose( "connection", "connection #%d closed (%d active connections)\n", connection->id(), m_connections.size() - 1 );
 
-    // Notify listeners about a disconnection
-    notify<Disconnected>( this, connection );
-
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
 	connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
+
+    // Notify listeners about a disconnection
+    notify<Disconnected>( this, connection );
 
     // Remove from a connections container
 	m_connections.erase( connection );

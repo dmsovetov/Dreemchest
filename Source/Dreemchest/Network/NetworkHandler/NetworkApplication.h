@@ -43,7 +43,7 @@ namespace Network {
 
 								//! Constructs Application instance.
 								Application( void );
-        virtual                 ~Application( void ) {}
+        virtual                 ~Application( void );
 
 		//! Updates network application instance.
 		virtual void			update( u32 dt );

@@ -81,8 +81,16 @@ void ConnectionTCP::close( void )
     // Notify all subscribers that connection is now closed
     notify<Closed>( this );
 
+    // This connection does not have a valid socket instance - just exit
+    if( !m_socket.valid() ) {
+        return;
+    }
+
+    // Queue the socket for removal
+    m_socket->closeLater();
+
     // Destroy this socket instance
-    m_socket = TCPSocketPtr();
+    //m_socket = TCPSocketPtr();
 }
 
 // ** ConnectionTCP::handleSocketData
