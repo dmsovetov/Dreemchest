@@ -29,8 +29,9 @@
 
 #include "../Dreemchest.h"
 
-#include "../io/KeyValue.h"
-#include "../io/serialization/Serializable.h"
+#include <Io/KeyValue.h>
+#include <Io/serialization/Serializable.h>
+#include <Introspection/Introspection.h>
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
 #define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method
@@ -73,6 +74,9 @@ namespace Ecs {
 
     //! Container type to store an array of weak pointers to entities.
     typedef Array<EntityWPtr> EntityWeakArray;
+
+    //! Container type to store a list of weak pointers to components.
+    typedef List<ComponentWPtr> ComponentWeakList;
 
     //! Converts container of archetypes to an array of entities.
     template<typename TContainer>

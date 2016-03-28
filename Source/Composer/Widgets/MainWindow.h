@@ -76,8 +76,8 @@ namespace Ui {
 		//! Returns the scene tree instance.
 		SceneTreeQPtr			        sceneTree( void ) const;
 
-		//! Returns the object inspector instance.
-		InspectorQPtr		            inspector( void ) const;
+		//! Returns the entity inspector instance.
+		EntityInspectorQPtr		        inspector( void ) const;
 
         //! Returns an active document.
         DocumentQPtr                    activeDocument( void ) const;
@@ -111,7 +111,7 @@ namespace Ui {
 		RenderingFrameQPtr				m_sharedRenderingContext;	//!< The shared OpenGL context.
 		AssetTreeQPtr					m_assetTree;				//!< Asset tree instance.
 		SceneTreeQPtr					m_sceneTree;				//!< Scene tree instance.
-		InspectorQPtr				    m_inspector;			    //!< Object inspector instance.
+		EntityInspectorQPtr			    m_inspector;			    //!< Entity inspector instance.
 		ProjectQPtr			            m_project;					//!< Opened project.
 	};
 

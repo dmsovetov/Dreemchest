@@ -27,10 +27,9 @@
 #include "AssetTree.h"
 
 #include "Document.h"
-#include "Inspector.h"
+#include "EntityInspector.h"
 #include "Menu.h"
 
-#include "../Models/AssetModels.h"
 #include "../Models/PropertyModel.h"
 #include "../Models/AssetFileSystemModel.h"
 #include "../Project/Project.h"
@@ -246,11 +245,15 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	}
 
 	// Get the inspector widget
-	InspectorQPtr inspector = qMainWindow->inspector();
+	EntityInspectorQPtr inspector = qMainWindow->inspector();
 
 	// The asset was deselected - hide inspector
 	if( indexes.empty() ) {
+    #if 0
 		inspector->setModel( NULL );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif
 		return;
 	}
 
@@ -270,12 +273,16 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 	DC_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.
+#if 0
     if( asset->type().is<Scene::Material>() ) {
         inspector->setModel( new MaterialModel( asset, this ) );
     }
     else {
         inspector->setModel( NULL );
     }
+#else
+    DC_NOT_IMPLEMENTED;
+#endif
 }
 
 // ** AssetTree::selection

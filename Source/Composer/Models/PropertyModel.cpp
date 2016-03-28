@@ -29,27 +29,14 @@
 DC_BEGIN_COMPOSER
 
 // ** PropertyModel::PropertyModel
-PropertyModel::PropertyModel( QObject* parent ) : QAbstractItemModel( parent )
+PropertyModel::PropertyModel( Introspection::MetaObject* metaObject, QObject* parent ) : QAbstractItemModel( parent )
 {
-
+    DC_NOT_IMPLEMENTED;
 }
 
-// ** PropertyModel::propertyCount
-int PropertyModel::propertyCount( void ) const
+PropertyModel::~PropertyModel( void )
 {
-	return ( int )m_properties.size();
-}
 
-// ** PropertyModel::propertyName
-QString PropertyModel::propertyName( int index ) const
-{
-	return m_properties[index]->name();
-}
-
-// ** PropertyModel::propertyType
-QString PropertyModel::propertyType( int index ) const
-{
-	return m_properties[index]->type();
 }
 
 // ** PropertyModel::rowCount
@@ -67,23 +54,26 @@ QModelIndex PropertyModel::parent( const QModelIndex& child ) const
 // ** PropertyModel::columnCount
 int PropertyModel::columnCount( const QModelIndex& parent ) const
 {
-	return propertyCount();
+    return 0;
+//	return PropertyModel().size();
 }
 
 // ** PropertyModel::data
 QVariant PropertyModel::data( const QModelIndex& index, int role ) const
 {
 	int idx = index.column();
-	return m_properties[idx]->get( idx );
+    return QVariant();
+//	return m_PropertyModel[idx]->get( idx );
 }
 
 // ** PropertyModel::setData
 bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
 	int idx = index.column();
-	m_properties[idx]->set( idx, value );
 
-	objectChanged();
+	//if( m_PropertyModel[idx]->set( idx, value ) ) {
+    //    Q_EMIT propertyChanged();
+    //}
 
 	return true;
 }

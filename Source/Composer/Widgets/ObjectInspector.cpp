@@ -24,90 +24,89 @@
 
  **************************************************************************/
 
-#include "Inspector.h"
-
-#include "AssetTree.h"
-#include "ComboBox.h"
+#include "ObjectInspector.h"
 
 #include "../Models/PropertyModel.h"
-#include "../Models/EnumerationModel.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-void qDeleteLayout( QLayout* layout )
-{
-	if( !layout ) {
-		return;
-	}
+// ** ObjectInspector::s_factory
+ObjectInspector::WidgetFactory ObjectInspector::s_factory;
 
-	QLayoutItem* child = NULL;
-
-	while( (child = layout->takeAt(0)) != 0 ) {
-		delete child->widget();
-		delete child;
-	}
-
-	delete layout;
-}
-
-// ** Inspector::Inspector
-Inspector::Inspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_mapper( NULL )
+// ** ObjectInspector::ObjectInspector
+ObjectInspector::ObjectInspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_model( NULL ), m_mapper( NULL )
 {
 
 }
 
-// ** Inspector::setModel
-void Inspector::setModel( PropertyModelQPtr value )
+// ** ObjectInspector::setModel
+void ObjectInspector::setModel( PropertyModelQPtr value )
 {
-	// Set the model
-	m_model = value;
+    delete m_model;
+    m_model = value;
+    mapModelToWidgets();
+}
 
+// ** ObjectInspector::setMargins
+void ObjectInspector::setMargins( int left, int top, int right, int bottom )
+{
+    m_layout->setContentsMargins( QMargins( left, top, right, bottom ) );
+}
+
+// ** ObjectInspector::refresh
+void ObjectInspector::refresh( void )
+{
+    m_mapper->revert();
+}
+
+// ** ObjectInspector::mapModelToWidgets
+void ObjectInspector::mapModelToWidgets( void )
+{
 	// Destroy old layout & mapper
 	qDeleteLayout( m_layout ); m_layout = NULL;
 	delete m_mapper; m_mapper = NULL;
 
 	// Return if the model is not valid
-	if( !m_model.get() ) {
+	if( !m_model ) {
 		return;
 	}
 
 	// Create the mapper.
 	m_mapper = new QDataWidgetMapper( this );
-	m_mapper->setModel( m_model.get() );
+	m_mapper->setModel( m_model );
 
 	// Create root layout.
 	m_layout = new QFormLayout( this );
+    m_layout->setSpacing( 2 );
 
+    // Widget mapper index
+    int index = 0;
+
+#if 0
 	// Construct property widgets.
-	for( s32 i = 0, n = m_model->propertyCount(); i < n; i++ ) {
+	foreach( Introspection::Property* property, m_model->properties() ) {
+        // Increase the widget mapper index
+        index++;
+
 		// Get the property type & name
-		QString type = m_model->propertyType( i );
-		QString name = m_model->propertyName( i );
+		QString widget = property->widget();
+		QString name   = property->name();
 
-		// Construct the widget according to the type
-		QWidget* widget = NULL;
+        // Construct widget by a type name
+        QWidget* instance = s_factory.construct( widget );
 
-		if( type == "Scene::ImageHandle" ) {
-			widget = new AssetSelector( Assets::Type::fromClass<Scene::Image>().bit(), this );
-			connect( widget, SIGNAL(valueChanged()), m_mapper, SLOT(submit()) );
-		}
-		else if( type == "Scene::RenderingMode" ) {
-			widget = new RenderingModeComboBox;
-		}
-		else if( type == "Scene::Material::Model" ) {
-			widget = new LightingComboBox;
-		}
-		else {
-            LogWarning( "inspector", "property '%s' has unhandled type '%s'\n", name.toStdString().c_str(), type.toStdString().c_str() );
-			continue;
-		}
+        if( !instance ) {
+			qWarning() << "Property" << name << "has unhnadled widget" << widget;
+			continue;            
+        }
 
-		// Add widget
-		m_layout->addRow( name, widget );
-		m_mapper->addMapping( widget, i );
+        // Add widget to layout and mapper
+		m_layout->addRow( name, instance );
+		m_mapper->addMapping( instance, index - 1 );
 	}
+#endif
 
 	// Finish construction
 	m_mapper->toFirst();

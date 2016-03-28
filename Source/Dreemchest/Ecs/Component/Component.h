@@ -57,6 +57,8 @@ namespace Ecs {
 	friend class Entity;
 	public:
 
+        INTROSPECTION( ComponentBase )
+
                                     ClassEnableTypeInfoSuper( ComponentBase, Io::Serializable )
 
 									//! Constructs ComponentBase instance.

@@ -229,9 +229,9 @@ void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
 		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformBasisComboBox );
+        m_tools->addWidget( new QComboBox );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformPivotComboBox );
+        m_tools->addWidget( new QComboBox );
 	    m_tools->addSeparator();
 		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
 		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
