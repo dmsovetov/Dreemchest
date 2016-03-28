@@ -178,6 +178,20 @@ EntityPtr Ecs::createEntity( void )
 	return createEntity( id );
 }
 
+// ** Ecs::copyEntity
+EntityPtr Ecs::copyEntity( const EntityWPtr& entity, const EntityId& id )
+{
+    // Create entity instance
+    EntityPtr clone = id.isNull() ? createEntity() : createEntity( id );
+
+    // Now clone components
+    for( Entity::Components::const_iterator i = entity->components().begin(), end = entity->components().end(); i != end; ++i ) {
+        clone->attachComponent( i->second->deepCopy().get() );
+    }
+
+    return clone;
+}
+
 #if !DC_ECS_ENTITY_CLONING
 
 // ** Ecs::cloneEntity
