@@ -260,17 +260,21 @@ SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
         return NULL;
     }
 
-    // ** Create sound source
+    // Create sound source
     SoundSourcePtr source = m_hal->createSource();
     if( !source.valid() ) {
         LogError( "sfx", "failed to create sound source for '%s'\n", data->identifier() );
         return NULL;
     }
 
-    // ** Setup source
+    // Inherit sound source properties from sound data
     source->setBuffer( createBuffer( data ) );
-    source->setLooped( data->isLooped() );
     source->setPitch( data->pitchForSound() );
+
+    // Streamed sounds should not be looped by a hardware
+    if( data->loading() != SoundData::Stream ) {
+        source->setLooped( data->isLooped() );
+    }
 
     return source;
 }

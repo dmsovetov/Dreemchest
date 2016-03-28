@@ -139,6 +139,12 @@ void OpenALSource::setPosition( const Vec3& value )
     alSourcefv( m_id, AL_POSITION, v );
 }
 
+// ** OpenALSource::setLooped
+void OpenALSource::setLooped( bool value )
+{
+    alSourcei( m_id, AL_LOOPING, value ? AL_TRUE : AL_FALSE );
+}
+
 // ** OpenALSource::setRelative
 void OpenALSource::setRelative( bool value )
 {
