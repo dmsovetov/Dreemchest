@@ -24,58 +24,44 @@
 
  **************************************************************************/
 
-#include "AssetSource.h"
-#include "AssetHandle.h"
+#include "Output.h"
 
-DC_BEGIN_DREEMCHEST
+DC_BEGIN_COMPOSER
 
-namespace Assets {
+namespace Ui {
 
-// ------------------------------------------ AbstractFileSource ------------------------------------------ //
-
-// ** AbstractFileSource::AbstractFileSource
-AbstractFileSource::AbstractFileSource( void )
-    : m_lastModified( 0 )
+// ** Output::Output
+Output::Output( QWidget* parent )
+    : QTextEdit( parent )
 {
+    QFont font( "Monospace" );
+    font.setStyleHint( QFont::TypeWriter );
+
+    Logger::setWriter( new Writer( this ) );
+    setReadOnly( true );
+    setLineWrapMode( QTextEdit::NoWrap );
+    setFont( font );
 }
 
-// ** AbstractFileSource::construct
-bool AbstractFileSource::construct( Assets& assets, Handle asset )
+// ** Output::Writer::write
+void Output::Writer::write( Logger::Level level, const String& text ) const
 {
-    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
+    QString line = QString::fromStdString( text );
 
-    if( !stream.valid() ) {
-        return false;
+    if( line.endsWith( "\n" ) ) {
+        line.remove( line.size() - 1, 1 );
     }
 
-    bool result = constructFromStream( stream, assets, asset );
-    return result;
+    QString color = "Black";
+
+    switch( level ) {
+    case Logger::Debug:     color = "Silver";   break;
+    case Logger::Verbose:   color = "Black";    break;
+    case Logger::Warning:   color = "Orange";   break;
+    case Logger::Error:     color = "Red";      break;
+    }
+
+    output->insertHtml( "<font color='" + color + "'>" + line + "</font><br>" );
 }
 
-// ** AbstractFileSource::lastModified
-u32 AbstractFileSource::lastModified( void ) const
-{
-    return m_lastModified;
-}
-
-// ** AbstractFileSource::setLastModified
-void AbstractFileSource::setLastModified( u32 value )
-{
-    m_lastModified = value;
-}
-
-// ** AbstractFileSource::fileName
-const String& AbstractFileSource::fileName( void ) const
-{
-    return m_fileName;
-}
-
-// ** AbstractFileSource::fileName
-void AbstractFileSource::setFileName( const String& value )
-{
-    m_fileName = value;
-}
-
-} // namespace Assets
-
-DC_END_DREEMCHEST
+} // namespace Ui

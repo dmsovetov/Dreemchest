@@ -35,6 +35,10 @@ AssetFileSystemModel::AssetFileSystemModel( QObject* parent ) : QFileSystemModel
 {
 	setReadOnly( false );
 
+    // Create file system watcher
+    m_watcher = new QFileSystemWatcher( this );
+    connect( m_watcher, SIGNAL(fileChanged(const QString&)), this, SLOT(assetChanged(const QString&)) );
+
 	connect( this, SIGNAL(directoryLoaded(const QString&)), this, SLOT(scanLoadedDirectory(const QString&)) );
 	connect( this, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(assetsAdded(const QModelIndex&, int, int)) );
 	connect( this, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)), this, SLOT(assetsRemoved(const QModelIndex&, int, int)) );
@@ -61,6 +65,9 @@ bool AssetFileSystemModel::dropMimeData( const QMimeData* data, Qt::DropAction a
 
 		bool result = renameMetaFile( oldFileName, newFileName );
 		Q_ASSERT( result );
+
+        // Remove old path from watcher
+        m_watcher->removePath( oldFileName );
 
 		// Add this file to a moved set
 		m_wasMoved << newFileName;
@@ -135,9 +142,9 @@ void AssetFileSystemModel::scanLoadedDirectory( const QString& path )
 
 	// Emit the events
 	if( m_foldersToScan.size() ) {
-        emit folderScanned( m_foldersToScan.size() );
+        Q_EMIT folderScanned( m_foldersToScan.size() );
 	} else {
-        emit scanningCompleted();
+        Q_EMIT scanningCompleted();
 	}
 }
 
@@ -151,13 +158,16 @@ void AssetFileSystemModel::assetsAdded( const QModelIndex& parent, int start, in
 		// Get asset file info from index
 		FileInfo file = assetFile( idx );
 
+        // Remove this file from watcher
+        m_watcher->addPath( file.absoluteFilePath() );
+
 		// This file was moved - skip it
 		if( wasMoved( file ) ) {
 			continue;
 		}
 
 		// Emit the signal
-        emit fileAdded( file );
+        Q_EMIT fileAdded( file );
 	}
 }
 
@@ -170,13 +180,16 @@ void AssetFileSystemModel::assetsRemoved( const QModelIndex& parent, int start, 
 		// Construct file info
 		FileInfo file = assetFile( idx );
 
+        // Remove this file from watcher
+        m_watcher->removePath( file.absoluteFilePath() );
+
 		// Meta file does not exist - do nothing
 		if( !QFile::exists( metaFileName( file ) ) ) {
 			continue;
 		}
 
 		// Dispatch an event
-        emit fileRemoved( QString::fromStdString( uuid( file ) ), file );
+        Q_EMIT fileRemoved( QString::fromStdString( uuid( file ) ), file );
 
 		// Remove meta file
 		bool result = QDir().remove( metaFileName( file ) );
@@ -191,6 +204,13 @@ void AssetFileSystemModel::assetRenamed( const QString& path, const QString& old
 	QString newFileName = QDir::cleanPath( path + "/" + newName );
 
 	renameMetaFile( oldFileName, newFileName );
+}
+
+// ** AssetFileSystemModel::assetChanged
+void AssetFileSystemModel::assetChanged( const QString& path )
+{
+    FileInfo file( path );
+    Q_EMIT fileChanged( QString::fromStdString( uuid( file ) ), file ); 
 }
 
 // ** AssetFileSystemModel::wasMoved
@@ -255,13 +275,9 @@ void AssetFileSystemModel::setMetaData( const FileInfo& assetFile, const Archive
 	bool  result = metaFile.open( QFile::WriteOnly );
 	Q_ASSERT( result );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	QTextStream stream( &metaFile );
-	String json = Io::KeyValue::stringify( data );
-	stream << json.c_str();
-#else
-    DC_NOT_IMPLEMENTED;
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    QTextStream stream( &metaFile );
+    String json = Io::VariantTextStream::stringify( data );
+    stream << json.c_str();
 
 	metaFile.close();
 }
@@ -281,12 +297,7 @@ Archive AssetFileSystemModel::metaData( const FileInfo& assetFile ) const
 
 	metaFile.close();
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-	return Io::KeyValue::parse( json.toStdString() );
-#else
-    DC_NOT_IMPLEMENTED;
-    return Archive();
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    return Io::VariantTextStream::parse( json.toStdString() );
 }
 
 // ** AssetFileSystemModel::metaFileName

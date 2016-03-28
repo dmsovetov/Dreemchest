@@ -60,7 +60,7 @@ namespace Assets {
     typedef List<class Handle> AssetList;
 
     // Unique ptr for asset source.
-    typedef AutoPtr<class Source> SourceUPtr;
+    typedef AutoPtr<class AbstractSource> SourceUPtr;
 
     //! Asset class instance stores info about a single asset.
     class Asset {
@@ -94,7 +94,7 @@ namespace Assets {
         void                        setName( const String& value );
 
         //! Returns an asset source.
-        Source*                     source( void ) const;
+        AbstractSource*             source( void ) const;
 
         //! Returns asset state.
         State                       state( void ) const;
@@ -105,24 +105,34 @@ namespace Assets {
         //! Returns the last asset use timestamp.
         u32                         lastUsed( void ) const;
 
+        //! Returns the last asset construction timestamp.
+        u32                         lastConstructed( void ) const;
+
     private:
 
         //! Switches an asset to a specified state.
         void                        switchToState( State value );
 
-        //! Sets the cache handle.
-        void                        setCache( Index value );
+        //! Sets the data handle.
+        void                        setData( Index value );
+
+        //! Returns the data handle.
+        Index                       data( void ) const;
+
+        //! Returns true if an asset has valid data.
+        bool                        hasData( void ) const;
 
     private:
 
-        SourceUPtr                  m_source;       //!< Asset source used for asset construction.
-        Type                        m_type;         //!< Asset type.
-        AssetId                     m_uniqueId;     //!< Unique asset id.
-        String                      m_name;         //!< Asset name.
-        State                       m_state;        //!< Current asset state.
-        Index                       m_cache;        //!< Asset data cache slot.
-        mutable u32                 m_lastModified; //!< Last time this asset was modified.
-        mutable u32                 m_lastUsed;     //!< Last time this asset was used.
+        SourceUPtr                  m_source;           //!< Asset source used for asset construction.
+        Type                        m_type;             //!< Asset type.
+        AssetId                     m_uniqueId;         //!< Unique asset id.
+        String                      m_name;             //!< Asset name.
+        State                       m_state;            //!< Current asset state.
+        Index                       m_data;             //!< Asset data slot.
+        mutable u32                 m_lastConstructed;  //!< Last time this asset was constructed from source.
+        mutable u32                 m_lastModified;     //!< Last time this asset was modified.
+        mutable u32                 m_lastUsed;         //!< Last time this asset was used.
     };
 
     //! Root interface to access all available assets.
@@ -267,12 +277,12 @@ namespace Assets {
         AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
 
         // Use the placeholder for unloaded assets
-        if( !asset->m_cache.isValid() ) {
+        if( !asset->hasData() ) {
             return cache.placeholder;
         }
 
         // Now lookup an asset data
-        TAsset& data = cache.slots.get( asset->m_cache );
+        TAsset& data = cache.slots.get( asset->data() );
         return data;
     }
 

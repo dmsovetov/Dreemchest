@@ -24,58 +24,32 @@
 
  **************************************************************************/
 
-#include "AssetSource.h"
-#include "AssetHandle.h"
+#ifndef __DC_Composer_Output_H__
+#define __DC_Composer_Output_H__
 
-DC_BEGIN_DREEMCHEST
+#include "../Composer.h"
 
-namespace Assets {
+DC_BEGIN_COMPOSER
 
-// ------------------------------------------ AbstractFileSource ------------------------------------------ //
+namespace Ui {
 
-// ** AbstractFileSource::AbstractFileSource
-AbstractFileSource::AbstractFileSource( void )
-    : m_lastModified( 0 )
-{
-}
+    //! Output window widget.
+    class Output : public QTextEdit {
+    public:
 
-// ** AbstractFileSource::construct
-bool AbstractFileSource::construct( Assets& assets, Handle asset )
-{
-    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
+                            //! Constructs Output instance.
+                            Output( QWidget* parent = NULL );
 
-    if( !stream.valid() ) {
-        return false;
-    }
+    private:
 
-    bool result = constructFromStream( stream, assets, asset );
-    return result;
-}
+        //! This writer intercepts log messages and output them to a widget.
+        struct Writer : public Logger::Writer {
+                            Writer( Output* output ) : output( output ) {}
+            virtual void    write( Logger::Level level, const String& text ) const DC_DECL_OVERRIDE;
+            Output*         output;
+        };
+    };
 
-// ** AbstractFileSource::lastModified
-u32 AbstractFileSource::lastModified( void ) const
-{
-    return m_lastModified;
-}
+} // namespace Ui
 
-// ** AbstractFileSource::setLastModified
-void AbstractFileSource::setLastModified( u32 value )
-{
-    m_lastModified = value;
-}
-
-// ** AbstractFileSource::fileName
-const String& AbstractFileSource::fileName( void ) const
-{
-    return m_fileName;
-}
-
-// ** AbstractFileSource::fileName
-void AbstractFileSource::setFileName( const String& value )
-{
-    m_fileName = value;
-}
-
-} // namespace Assets
-
-DC_END_DREEMCHEST
+#endif  /*  !__DC_Composer_Output_H__   */

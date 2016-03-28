@@ -119,12 +119,16 @@ DC_BEGIN_COMPOSER
 		//! Handles renamed asset signal.
 		void					assetRenamed( const QString& path, const QString& oldName, const QString& newName );
 
+        //! Handles file changed signal from filesystem watcher.
+        void                    assetChanged( const QString& path );
+
 		//! Scans the directory when it's loaded.
 		void					scanLoadedDirectory( const QString& path );
 
 	private:
 
 		QString					m_metaFileExtension;	//!< Meta file extension.
+        QFileSystemWatcher*     m_watcher;              //!< File system watcher.
 		bool					m_isEditingModel;		//!< The model editing is in progress.
 		mutable QSet<QString>	m_wasMoved;				//!< Set of file names that were moved.
 		mutable QSet<QString>	m_foldersToScan;		//!< Set of paths waiting for scan.

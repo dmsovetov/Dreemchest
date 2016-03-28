@@ -118,7 +118,7 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
-	DC_ABORT_IF( indexBuffer.valid(), "invalid index buffer" )
+	DC_ABORT_IF( !indexBuffer.valid(), "invalid index buffer" )
     
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
@@ -905,7 +905,7 @@ void OpenGLTexture2D::setData( u32 level, const void *data )
 // ** OpenGLTexture2D::lock
 void* OpenGLTexture2D::lock( u32 level, u32& size )
 {
-    DC_ABORT_IF( isLocked(), "already locked" );
+    DC_BREAK_IF( isLocked(), "already locked" );
 
     size            = bytesPerMip( m_width >> level, m_height >> level );
     m_locked        = DC_NEW u8[size];
@@ -918,7 +918,7 @@ void* OpenGLTexture2D::lock( u32 level, u32& size )
 void OpenGLTexture2D::unlock( void )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( !isLocked(), "already unlocked" );
+    DC_BREAK_IF( !isLocked(), "already unlocked" );
     
     GLenum internalFormat = OpenGLHal::internalImageFormat( m_pixelFormat );
     GLenum format         = OpenGLHal::imageFormat( m_pixelFormat );

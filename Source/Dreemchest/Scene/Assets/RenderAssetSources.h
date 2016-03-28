@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_AssetFormats_H__
-#define __DC_Scene_AssetFormats_H__
+#ifndef __DC_Scene_RenderAssetSources_H__
+#define __DC_Scene_RenderAssetSources_H__
 
 #include "../Scene.h"
 
@@ -33,32 +33,42 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Loads an image from a raw pixel buffer format.
-    class ImageFormatRaw : public Assets::FileSource<Image> {
+    //! Constructs renderable asset from a mesh asset.
+    class RenderableMeshSource : public Assets::AssetSource<Renderable, Mesh> {
+    public:
+
+                            //! Constructs RenderableMeshSource instance.
+                            RenderableMeshSource( MeshHandle mesh, Renderer::HalWPtr hal );
+
     protected:
 
-        //! Loads image data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+        //! Constructs a renderable asset from a mesh source.
+        virtual bool        constructFromAsset( const Mesh& mesh, Assets::Assets& assets, Renderable& renderable ) DC_DECL_OVERRIDE;
+
+    private:
+
+        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.
     };
 
-    //! Loads a mesh from a raw binary format.
-    class MeshFormatRaw : public Assets::FileSource<Mesh> {
+    //! Constructs texture asset from an image.
+    class TextureImageSource : public Assets::AssetSource<Texture, Image> {
+    public:
+
+                            //! Constructs TextureImageSource instance.
+                            TextureImageSource( ImageHandle image, Renderer::HalWPtr hal );
+
     protected:
 
-        //! Loads mesh data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
-    };
+        //! Constructs a texture asset from an image source.
+        virtual bool        constructFromAsset( const Image& image, Assets::Assets& assets, Texture& texture ) DC_DECL_OVERRIDE;
 
-    //! Loads a material from a key-value storage.
-    class MaterialSourceKeyValue : public Assets::FileSource<Material> {
-    protected:
+    private:
 
-        //! Loads material data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+        Renderer::HalWPtr   m_hal;  //!< Parent HAL instance.    
     };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_AssetFormats_H__    */
+#endif    /*    !__DC_Scene_RenderAssetSources_H__    */

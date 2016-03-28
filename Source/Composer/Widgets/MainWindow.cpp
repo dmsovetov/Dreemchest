@@ -32,6 +32,7 @@
 #include "Inspector.h"
 #include "Menu.h"
 #include "RenderingFrame.h"
+#include "Output.h"
 
 #include "../FileSystem.h"
 #include "../Project/Project.h"
@@ -375,7 +376,7 @@ void MainWindow::createProjectInterface( Project* project )
 	addDock( "Inspector", m_inspector, Qt::RightDockWidgetArea );
 	addDock( "Assets", m_assetTree, Qt::RightDockWidgetArea );
 	addDock( "Hierarchy", m_sceneTree, Qt::LeftDockWidgetArea );
-	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
+	addDock( "Output", new Output( this ), Qt::LeftDockWidgetArea );
 
 	// Update window caption
 	setWindowTitle( m_project->name().c_str() + QString( " - " + windowTitle() ) );

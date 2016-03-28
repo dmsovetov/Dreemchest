@@ -70,6 +70,9 @@ DC_BEGIN_COMPOSER
         //! Creates an asset instance with specified asset type and id.
         Assets::Handle              createAsset( Assets::Type type, const Assets::AssetId& id );
 
+        //! Updates all assets when timer event is triggered.
+        virtual void                timerEvent( QTimerEvent* e ) Q_DECL_OVERRIDE;
+
     private slots:
 
         //! Adds an asset to cache.
@@ -92,11 +95,15 @@ DC_BEGIN_COMPOSER
 		//! Alias the ext to asset type mapping.
 		typedef Map<String, Assets::Type> AssetTypes;
 
+        //! Alias the uuid to asset file source mapping.
+        typedef Map<Assets::AssetId, Assets::AbstractFileSource*> AssetFiles;
+
 		Io::Path					m_path;				//!< Root cache folder path.
 		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.
 		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
         AssetFormatFactory          m_assetFormats;     //!< Asset format factory.
 		AssetTypes					m_assetTypes;		//!< Registered asset types.
+        AssetFiles                  m_files;            //!< Added asset files.
 		Assets::Assets		        m_assets;			//!< Asset bundle.
 	};
 

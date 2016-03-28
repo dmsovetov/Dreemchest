@@ -175,18 +175,14 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    KeyValue materials = KeyValue::array();
+    VariantArray materials;
 
     for( u32 i = 0, n = materialCount(); i < n; i++ ) {
         MaterialHandle m = material( i );
         materials << (m.isValid() ? m.uniqueId() : "");
     }
 
-    ar = KeyValue::object() << "asset" << (m_mesh.isValid() ? m_mesh->uniqueId() : "") << "materials" << materials;
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    ar = KvBuilder() << "asset" << (m_mesh.isValid() ? m_mesh.uniqueId() : "") << "materials" << materials;
 }
 
 // ** StaticMesh::deserialize
@@ -198,17 +194,19 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
         LogError( "staticMesh", "no Assets attached to serialization context.\n" );
         return;
     }
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    const KeyValue& materials = ar["materials"];
 
-    for( s32 i = 0, n = materials.size(); i < n; i++ ) {
-        setMaterial( i, assets->find<Material>( materials[i].asString() ) );
+    KeyValue     kv        = ar.as<KeyValue>();
+    VariantArray materials = kv.get<VariantArray>( "materials" );
+    const VariantArray::Container& items = materials;
+
+    for( s32 i = 0, n = items.size(); i < n; i++ ) {
+        setMaterial( i, assets->find<Material>( items[i].as<String>() ) );
     }
 
-    m_mesh = assets->find<Mesh>( ar["asset"].asString() );
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    m_mesh = assets->find<Mesh>( kv.get<String>( "asset" ) );
+    if( !m_mesh.isValid() ) {
+        LogWarning( "staticMesh", "unresolved asset '%s'\n", kv.get<String>( "asset" ).c_str() );
+    }
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -457,26 +455,26 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 // ** Camera::serialize
 void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    ar = KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    ar = KvBuilder()
+            << "clearMask" << m_clearMask
+            << "projection" << m_projection
+            << "clearColor" << m_clearColor
+            << "fov" << m_fov
+            << "near" << m_near
+            << "far" << m_far
+            ;
 }
 
 // ** Camera::deserialize
 void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    m_clearMask     = ar["clearMask"].asUByte();
-    m_projection    = static_cast<Projection>( ar["projection"].asInt() );
-    m_clearColor    = ar["clearColor"].asRgba();
-    m_fov           = ar["fov"].asFloat();
-    m_near          = ar["near"].asFloat();
-    m_far           = ar["far"].asFloat();
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    KeyValue kv     = ar.as<KeyValue>();
+    m_clearMask     = kv.get<u8>( "clearMask" );
+    m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    m_clearColor    = kv.get( "clearColor", Rgba() );
+    m_fov           = kv.get( "fov", 60.0f );
+    m_near          = kv.get( "near", 0.01f );
+    m_far           = kv.get( "far", 1000.0f );
 }
 
 } // namespace Scene

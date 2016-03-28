@@ -142,8 +142,7 @@ void SceneEditor::save( void )
     // Create serialization context
     Ecs::SerializationContext ctx( m_scene->ecs() );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    Io::KeyValue ar = Io::KeyValue::object();
+    KeyValue kv;
 
     // Write each object to a root key-value archive
     for( Scene::SceneObjectSet::const_iterator i = objects.begin(), end = objects.end(); i != end; ++i ) {
@@ -151,16 +150,13 @@ void SceneEditor::save( void )
             continue;
         }
 
-        Io::KeyValue object;
+        Archive object;
         (*i)->serialize( ctx, object );
-        ar[(*i)->id().toString()] = object;
+        kv.setValueAtKey( (*i)->id().toString(), object );
     }
 
     // Write the serialized data to file
-    qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::KeyValue::stringify( ar, true ) ) );
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::VariantTextStream::stringify( Variant::fromValue( kv ), true ) ) );
 }
 
 // ** SceneEditor::loadFromFile
@@ -180,13 +176,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     Ecs::SerializationContext ctx( scene->ecs() );
     ctx.set<Assets::Assets>( &m_project->assets() );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
+    // Parse KeyValue from a text stream
+    Archive  ar = Io::VariantTextStream::parse( data.toStdString() );
+    KeyValue kv = ar.as<KeyValue>();
 
     // Read each object from a root key-value archive
-    for( Io::KeyValue::Properties::const_iterator i = ar.properties().begin(), end = ar.properties().end(); i != end; ++i ) {
+    for( KeyValue::Properties::const_iterator i = kv.properties().begin(), end = kv.properties().end(); i != end; ++i ) {
         // Create entity instance by a type name
-        Ecs::EntityPtr entity = ctx.createEntity( i->second["Type"].asString() );
+        Ecs::EntityPtr entity = ctx.createEntity( i->second.as<KeyValue>().get<String>( "Type" ) );
         entity->attach<SceneEditorInternal>( entity );
 
         // Read entity from data
@@ -195,9 +192,6 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         // Add entity to scene
         scene->addSceneObject( entity );
     }
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
     return scene;
 }

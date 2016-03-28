@@ -76,6 +76,10 @@ void Ecs::addEntity( EntityPtr entity )
 	DC_BREAK_IF( !entity.valid(), "invalid entity" );
 
 	const EntityId& id = entity->id();
+    if( id.isNull() ) {
+        LogWarning( "entity", "adding entity with an invalid id\n" );
+    }
+
 	DC_BREAK_IF( isUsedId( id ), "entity id is already used" );
 
 	// Setup entity

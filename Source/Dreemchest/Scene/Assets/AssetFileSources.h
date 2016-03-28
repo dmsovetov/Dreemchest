@@ -24,58 +24,41 @@
 
  **************************************************************************/
 
-#include "AssetSource.h"
-#include "AssetHandle.h"
+#ifndef __DC_Scene_AssetFileSources_H__
+#define __DC_Scene_AssetFileSources_H__
+
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Assets {
+namespace Scene {
 
-// ------------------------------------------ AbstractFileSource ------------------------------------------ //
+    //! Loads an image from a raw pixel buffer format.
+    class ImageFormatRaw : public Assets::FileSource<Image> {
+    protected:
 
-// ** AbstractFileSource::AbstractFileSource
-AbstractFileSource::AbstractFileSource( void )
-    : m_lastModified( 0 )
-{
-}
+        //! Loads image data from an input stream.
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+    };
 
-// ** AbstractFileSource::construct
-bool AbstractFileSource::construct( Assets& assets, Handle asset )
-{
-    Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
+    //! Loads a mesh from a raw binary format.
+    class MeshFormatRaw : public Assets::FileSource<Mesh> {
+    protected:
 
-    if( !stream.valid() ) {
-        return false;
-    }
+        //! Loads mesh data from an input stream.
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
+    };
 
-    bool result = constructFromStream( stream, assets, asset );
-    return result;
-}
+    //! Loads a material from a key-value storage.
+    class MaterialSourceKeyValue : public Assets::FileSource<Material> {
+    protected:
 
-// ** AbstractFileSource::lastModified
-u32 AbstractFileSource::lastModified( void ) const
-{
-    return m_lastModified;
-}
+        //! Loads material data from an input stream.
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+    };
 
-// ** AbstractFileSource::setLastModified
-void AbstractFileSource::setLastModified( u32 value )
-{
-    m_lastModified = value;
-}
-
-// ** AbstractFileSource::fileName
-const String& AbstractFileSource::fileName( void ) const
-{
-    return m_fileName;
-}
-
-// ** AbstractFileSource::fileName
-void AbstractFileSource::setFileName( const String& value )
-{
-    m_fileName = value;
-}
-
-} // namespace Assets
+} // namespace Scene
 
 DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_AssetFileSources_H__    */

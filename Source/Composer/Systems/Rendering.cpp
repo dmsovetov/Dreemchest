@@ -38,7 +38,7 @@ void SceneObjectIndicatorsPass::render( Scene::RenderingContextPtr context, Scen
 	}
 
 	if( !internal.parent().valid() ) {
-		qDebug() << "SceneEditorInternal has no valid scene object.";
+        LogError( "scene", "SceneEditorInternal has no valid scene object\n" );
 		return;
 	}
 
