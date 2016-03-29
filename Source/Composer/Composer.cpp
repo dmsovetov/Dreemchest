@@ -31,6 +31,11 @@
 #include "Widgets/Menu.h"
 #include "Widgets/MainWindow.h"
 #include "Widgets/AssetTree.h"
+#include "Widgets/PropertyInspector.h"
+#include "Widgets/Properties/ColorEdit.h"
+#include "Widgets/Properties/QuatEdit.h"
+#include "Widgets/Properties/StringEdit.h"
+#include "Widgets/Properties/VectorEdit.h"
 
 #include "Project/Project.h"
 
@@ -107,6 +112,13 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 
     // Setup default log handlers
 	Logger::setStandardLogger();
+
+    // Register property inspector widgets
+    Ui::PropertyInspector::registerWidget<String, Ui::StringEdit>();
+    Ui::PropertyInspector::registerWidget<Vec2, Ui::Vec2Edit>();
+    Ui::PropertyInspector::registerWidget<Vec3, Ui::Vec3Edit>();
+    Ui::PropertyInspector::registerWidget<Vec4, Ui::Vec4Edit>();
+    Ui::PropertyInspector::registerWidget<Quat, Ui::QuatEdit>();
 }
 
 // ** Composer::project

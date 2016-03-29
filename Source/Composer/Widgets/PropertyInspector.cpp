@@ -29,6 +29,10 @@
 #include "../Models/PropertyModel.h"
 
 #include "Properties/VectorEdit.h"
+#include "Properties/StringEdit.h"
+#include "Properties/QuatEdit.h"
+
+#define DEV_MINIMUM_LABEL_SIZE  (50)
 
 DC_BEGIN_COMPOSER
 
@@ -151,22 +155,27 @@ void PropertyInspector::mapModelToWidgets( void )
         name[0] = name[0].toUpper();
 
         // Construct widget by a type name
-        QWidget* instance = NULL;
-        if( property->type()->is<Vec3>() ) {
-            instance = new Vec3Edit;
-        } else {
-            instance = new QWidget;
+        QWidget* widget = s_factory.construct( property->type() );
+
+        if( !widget ) {
+            LogWarning( "propertyInspector", "no widget registered for properties of type '%s'\n", property->type()->name() );
+            continue;
         }
 
-        connect( instance, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
+        // Connect to a widget's valueChanged signal
+        connect( widget, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
 
         // Add widget to layout and mapper
-		m_layout->addRow( name, instance );
-		m_mapper->addMapping( instance, index - 1 );
+		m_layout->addRow( name, widget );
+		m_mapper->addMapping( widget, index - 1 );
+
+        // Set the minimum size for a label widget
+        QWidget* label = m_layout->labelForField( widget );
+        label->setMinimumWidth( DEV_MINIMUM_LABEL_SIZE );
 
         // Set the property tooltip
         if( info.description ) {
-            m_layout->labelForField( instance )->setToolTip( info.description );
+            label->setToolTip( info.description );
         }
 	}
 

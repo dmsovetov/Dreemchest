@@ -50,7 +50,7 @@ namespace Ui {
         void                    refresh( void );
 
         //! Registers widget type for a specified type.
-        template<typename TWidget>
+        template<typename TType, typename TWidget>
         static void             registerWidget( void );
 
     private:
@@ -61,7 +61,7 @@ namespace Ui {
     private:
 
         //! Factory type to construct inspector widgets.
-        typedef AbstractFactory<QWidget, QString> WidgetFactory;
+        typedef AbstractFactory<QWidget, const Type*> WidgetFactory;
 
         //! Internal item delegate type.
         class ItemDelegate;
@@ -73,10 +73,10 @@ namespace Ui {
     };
 
     // ** PropertyInspector::registerWidget
-    template<typename TWidget>
+    template<typename TType, typename TWidget>
     void PropertyInspector::registerWidget( void )
     {
-        s_factory.declare<TWidget>( ::Model::TypeInfo<TWidget>::name() );
+        s_factory.declare<TWidget>( Type::fromClass<TType>() );
     }
 
 } // namespace Ui
