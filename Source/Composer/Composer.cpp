@@ -315,6 +315,7 @@ DC_END_COMPOSER
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setLibraryPaths( QCoreApplication::libraryPaths() << "." << "imageformats" << "platforms" );
+    QLocale::setDefault( QLocale::c() );
 
     Composer app( argc, argv );
 
