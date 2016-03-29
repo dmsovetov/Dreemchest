@@ -76,7 +76,6 @@ Variant AbstractVectorEdit::value( void ) const
 void AbstractVectorEdit::setValue( const Variant& value )
 {
     fromVariant( value, m_value );
-    Q_EMIT valueChanged( value );
     updateLineEdits();
 }
 
@@ -92,14 +91,20 @@ void AbstractVectorEdit::componentTextChanged( const QString& value )
     }
 
     m_value[idx] = v;
-    setValue( toVariant( m_value ) );
+
+    Variant newValue = toVariant( m_value );
+    setValue( newValue );
+
+    Q_EMIT valueChanged( newValue );
 }
 
 // ** AbstractVectorEdit::updateLineEdits
 void AbstractVectorEdit::updateLineEdits( void )
 {
     for( s32 i = 0, n = m_edits.size(); i < n; i++ ) {
+        m_edits[i]->blockSignals( true );
         m_edits[i]->setText( QString::number( m_value[i] ) );
+        m_edits[i]->blockSignals( false );
     }
 }
 
