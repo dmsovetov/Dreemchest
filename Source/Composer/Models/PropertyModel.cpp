@@ -29,14 +29,30 @@
 DC_BEGIN_COMPOSER
 
 // ** PropertyModel::PropertyModel
-PropertyModel::PropertyModel( Introspection::MetaObject* metaObject, QObject* parent ) : QAbstractItemModel( parent )
+PropertyModel::PropertyModel( Instance instance, MetaObject* metaObject, QObject* parent )
+    : QAbstractItemModel( parent )
+    , m_instance( instance )
 {
-    DC_NOT_IMPLEMENTED;
+    DC_ABORT_IF( instance == NULL, "invalid instance passed" );
+    DC_ABORT_IF( metaObject == NULL, "invalid metaobject passed" );
+
+    for( s32 i = 0, n = metaObject->memberCount(); i < n; i++ ) {
+        Introspection::Member* member = metaObject->member( i );
+        if( Property* property = member->asProperty() ) {
+            m_properties.push_back( property );
+        }
+    }
 }
 
 PropertyModel::~PropertyModel( void )
 {
 
+}
+
+// ** PropertyModel::properties
+const PropertyModel::Properties& PropertyModel::properties( void ) const
+{
+    return m_properties;
 }
 
 // ** PropertyModel::rowCount
@@ -54,8 +70,7 @@ QModelIndex PropertyModel::parent( const QModelIndex& child ) const
 // ** PropertyModel::columnCount
 int PropertyModel::columnCount( const QModelIndex& parent ) const
 {
-    return 0;
-//	return PropertyModel().size();
+	return properties().size();
 }
 
 // ** PropertyModel::data

@@ -85,7 +85,7 @@ DC_BEGIN_COMPOSER
 		qDeclarePtr( Menu )
 		qDeclarePtr( ToolBar )
 		qDeclarePtr( RenderingFrame )
-        qDeclarePtr( ObjectInspector )
+        qDeclarePtr( PropertyInspector )
         qDeclarePtr( EntityInspector )
 
 		//! Message status.

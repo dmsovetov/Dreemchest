@@ -97,14 +97,13 @@ namespace Ui {
         class Header;
 
         //! Container type to store all object inspectors that were created for entity components.
-        typedef QVector<ObjectInspectorQPtr> ObjectInspectors;
+        typedef QVector<PropertyInspectorQPtr> ComponentInspectors;
 
         QVBoxLayout*                m_layout;       //!< Vertical layout for component inspectors.
         QPushButton*                m_save;         //!< Save button instance.
         QPushButton*                m_reset;        //!< Reset button instance.
         QPushButton*                m_add;          //!< Add component button instance.
-        //ComponentMenu*            m_components;   //!< Component menu used to attach components.
-        ObjectInspectors            m_inspectors;   //!< Component object inspectors.
+        ComponentInspectors         m_inspectors;   //!< Component object inspectors.
         Ecs::EntityWPtr             m_entity;       //!< Bound entity instance.
         Archive                     m_previous;     //!< Previos state of en entity.
         bool                        m_hasChanges;   //!< Indicates that entity has unsaved changes.

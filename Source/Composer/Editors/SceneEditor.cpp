@@ -26,6 +26,7 @@
 
 #include "SceneEditor.h"
 #include "../Widgets/Menu.h"
+#include "../Widgets/EntityInspector.h"
 #include "../Systems/Transform/TranslationTool.h"
 #include "../Systems/Transform/RotationTool.h"
 #include "../Systems/Transform/ArcballRotationTool.h"
@@ -444,14 +445,20 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 	// Store this object
 	m_selectedSceneObject = sceneObject;
 
-	// Mark it as selected
-	if( m_selectedSceneObject.valid() ) {
-		// Add the selected flag
-		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+    // Nothing selected - just return
+    if( !m_selectedSceneObject.valid() ) {
+        return;
+    }
 
-		// Bind the gizmo for an active transformation tool
-		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
-	}
+	// Add the selected flag
+	m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+
+	// Bind the gizmo for an active transformation tool
+	bindTransformGizmo( m_selectedSceneObject, m_activeTool );
+
+    // Bind to an entity inspector
+    Ui::EntityInspectorQPtr inspector = qMainWindow->inspector();
+    inspector->bind( m_selectedSceneObject );
 }
 
 // ** SceneEditor::findSceneObjectAtPoint

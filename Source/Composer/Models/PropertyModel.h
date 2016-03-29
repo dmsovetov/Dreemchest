@@ -39,33 +39,53 @@ DC_BEGIN_COMPOSER
     Q_SIGNALS:
 
         //! Emitted when a property was changed.
-        void                        propertyChanged( void );
+        void                                propertyChanged( void );
 
     public:
 
-                                    //! Constructs PropertyModel instance.
-                                    PropertyModel( Introspection::MetaObject* metaObject, QObject* parent = NULL );
-                                    ~PropertyModel( void );
+        //! Alias the Introspection::Property type.
+        typedef Introspection::Property     Property;
+
+        //! Alias the Introspection::Instance type.
+        typedef Introspection::Instance     Instance;
+
+        //! Alias the Introspection::MetaObject type.
+        typedef Introspection::MetaObject   MetaObject;
+
+        //! Container type to store an array of exposed properties.
+        typedef QVector<Property*>          Properties;
+
+                                            //! Constructs PropertyModel instance.
+                                            PropertyModel( Instance instance, MetaObject* metaObject, QObject* parent = NULL );
+                                            ~PropertyModel( void );
+
+        //! Returns an array of properties exposed by a model.
+        const Properties&                   properties( void ) const;
 
     protected:
 
 	    //! Returns the constant row count equal to 1.
-	    virtual int			        rowCount( const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+	    virtual int			                rowCount( const QModelIndex& parent ) const Q_DECL_OVERRIDE;
 
 	    //! Always returns an invalid index.
-	    virtual QModelIndex	        parent( const QModelIndex& child ) const Q_DECL_OVERRIDE;
+	    virtual QModelIndex	                parent( const QModelIndex& child ) const Q_DECL_OVERRIDE;
 
 	    //! Returns the total number of properties exposed by an object.
-	    virtual int			        columnCount( const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+	    virtual int			                columnCount( const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
 
 	    //! Reads the data from object's property at index.column.
-	    virtual QVariant	        data( const QModelIndex& index, int role = Qt::DisplayRole ) const Q_DECL_OVERRIDE;
+	    virtual QVariant	                data( const QModelIndex& index, int role = Qt::DisplayRole ) const Q_DECL_OVERRIDE;
 
 	    //! Writes the data to object's property at index.column.
-	    virtual bool		        setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) Q_DECL_OVERRIDE;
+	    virtual bool		                setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) Q_DECL_OVERRIDE;
 
 	    //! Returns the model index.
-	    virtual QModelIndex         index( int row, int column, const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+	    virtual QModelIndex                 index( int row, int column, const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+
+    private:
+
+        Instance                            m_instance;     //!< Object instance.
+        Properties                          m_properties;   //!< Properties exposed by an object.
     };
 
 DC_END_COMPOSER

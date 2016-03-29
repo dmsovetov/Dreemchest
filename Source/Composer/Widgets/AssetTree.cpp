@@ -281,7 +281,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
         inspector->setModel( NULL );
     }
 #else
-    DC_NOT_IMPLEMENTED;
+    LogError( "assetTree", "asset could not be bound to an entity inspector\n" );
 #endif
 }
 

@@ -25,7 +25,8 @@
  **************************************************************************/
 
 #include "EntityInspector.h"
-#include "ObjectInspector.h"
+#include "PropertyInspector.h"
+#include "Actions.h"
 
 #include "../Models/PropertyModel.h"
 
@@ -50,7 +51,7 @@ class EntityInspector::Header : public QWidget {
 public:
 
                             //! Constructs Header instance.
-                            Header( QMenu* menu, const QString& text, ObjectInspector* inspector );
+                            Header( QMenu* menu, const QString& text, PropertyInspector* inspector );
 
 protected:
 
@@ -75,14 +76,15 @@ protected:
 private:
 
     QHBoxLayout*            m_layout;       //!< Horizontal layout.
-    ObjectInspector*        m_inspector;    //!< Child widget.
+    PropertyInspector*      m_inspector;    //!< Child widget.
     QToolButton*            m_collapse;     //!< Collapse button.
     bool                    m_isPressed;    //!< Is the header pressed by user.
 };
 
 // ** EntityInspector::Header::Header
-EntityInspector::Header::Header( QMenu* menu, const QString& text, ObjectInspector* inspector )
-    : m_isPressed( false ), m_inspector( inspector )
+EntityInspector::Header::Header( QMenu* menu, const QString& text, PropertyInspector* inspector )
+    : m_isPressed( false )
+    , m_inspector( inspector )
 {
     m_layout = new QHBoxLayout( this );
     m_layout->setMargin( 2 );
@@ -191,7 +193,12 @@ void EntityInspector::Header::paintVerticalTriangle( QPainter& painter, const QB
 // ---------------------------------------------------------------------- EntityInspector ----------------------------------------------------------------------- //
 
 // ** EntityInspector::EntityInspector
-EntityInspector::EntityInspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_hasChanges( false )
+EntityInspector::EntityInspector( QWidget* parent )
+    : QWidget( parent )
+    , m_layout( NULL )
+    , m_hasChanges( false )
+    , m_save( NULL )
+    , m_reset( NULL )
 {
     
 }
@@ -228,8 +235,13 @@ bool EntityInspector::hasChanges( void ) const
 void EntityInspector::setHasChanges( bool value )
 {
     m_hasChanges = value;
-    m_save->setEnabled( hasChanges() );
-    m_reset->setEnabled( hasChanges() );
+
+    if( m_save ) {
+        m_save->setEnabled( hasChanges() );
+    }
+    if( m_reset ) {
+        m_reset->setEnabled( hasChanges() );
+    }
 }
 
 // ** EntityInspector::saveState
@@ -257,7 +269,7 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
 {
     Ecs::ComponentWeakList list;
 
-#if 0
+
     // Declare the comparator
     struct LessThan {
         static bool compare( Ecs::ComponentWPtr a, Ecs::ComponentWPtr b ) { return strcmp( a->typeName(), b->typeName() ) < 0; }
@@ -269,10 +281,11 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
         list.push_back( i->second );
     }
 
+#if 0
     // Sort list by a component name
     std::sort( list.begin(), list.end(), LessThan::compare );
 #else
-    DC_NOT_IMPLEMENTED
+    LogWarning( "entityInspector", "component list was not sorted\n" );
 #endif
 
     return list;
@@ -282,11 +295,11 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
 QMenu* EntityInspector::createComponentMenu( TypeIdx component ) const
 {
     QMenu* menu = new QMenu;
-//    QAction* action = new DetachComponentAction( m_entity, component );
-//    action->setText( "Remove" );
-//    menu->addAction( action );
+    QAction* action = new DetachComponentAction( m_entity, component );
+    action->setText( "Remove" );
+    menu->addAction( action );
 
-//    connect( action, SIGNAL(triggered()), this, SLOT(detachComponent()) );
+    connect( action, SIGNAL(triggered()), this, SLOT(detachComponent()) );
 
     return menu;
 }
@@ -314,8 +327,8 @@ void EntityInspector::refresh( void )
     Ecs::ComponentWeakList components = buildComponentList();
 
     foreach( Ecs::ComponentWPtr component, components ) {
-        ObjectInspector* inspector  = new ObjectInspector;
-        PropertyModel*   properties = new PropertyModel( component->metaObject(), this );
+        PropertyInspector* inspector  = new PropertyInspector( this );
+        PropertyModel*     properties = new PropertyModel( component->metaInstance(), component->metaObject(), inspector );
 
         // Connect to a property modification signal
         connect( properties, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()) );

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_ObjectInspector_H__
-#define __DC_Composer_ObjectInspector_H__
+#ifndef __DC_Composer_PropertyInspector_H__
+#define __DC_Composer_PropertyInspector_H__
 
 #include "../Composer.h"
 
@@ -33,12 +33,12 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-    //! Displays properties from an object model.
-    class ObjectInspector : public QWidget {
+    //! Displays properties from a property model.
+    class PropertyInspector : public QWidget {
     public:
 
-                                //! Constructs ObjectInspector instance.
-                                ObjectInspector( QWidget* parent = NULL );
+                                //! Constructs PropertyInspector instance.
+                                PropertyInspector( QWidget* parent = NULL );
 
         //! Sets property model.
         void                    setModel( PropertyModelQPtr value );
@@ -69,9 +69,9 @@ namespace Ui {
         static WidgetFactory    s_factory;      //!< Shared widget factory instance.
     };
 
-    // ** ObjectInspector::registerWidget
+    // ** PropertyInspector::registerWidget
     template<typename TWidget>
-    void ObjectInspector::registerWidget( void )
+    void PropertyInspector::registerWidget( void )
     {
         s_factory.declare<TWidget>( ::Model::TypeInfo<TWidget>::name() );
     }
@@ -80,4 +80,4 @@ namespace Ui {
 
 DC_END_COMPOSER
 
-#endif  /*  !__DC_Composer_ObjectInspector_H__    */
+#endif  /*  !__DC_Composer_PropertyInspector_H__    */

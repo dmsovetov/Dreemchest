@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "ObjectInspector.h"
+#include "PropertyInspector.h"
 
 #include "../Models/PropertyModel.h"
 
@@ -32,37 +32,41 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-// ** ObjectInspector::s_factory
-ObjectInspector::WidgetFactory ObjectInspector::s_factory;
+// ** PropertyInspector::s_factory
+PropertyInspector::WidgetFactory PropertyInspector::s_factory;
 
-// ** ObjectInspector::ObjectInspector
-ObjectInspector::ObjectInspector( QWidget* parent ) : QWidget( parent ), m_layout( NULL ), m_model( NULL ), m_mapper( NULL )
+// ** PropertyInspector::PropertyInspector
+PropertyInspector::PropertyInspector( QWidget* parent )
+    : QWidget( parent )
+    , m_layout( NULL )
+    , m_model( NULL )
+    , m_mapper( NULL )
 {
 
 }
 
-// ** ObjectInspector::setModel
-void ObjectInspector::setModel( PropertyModelQPtr value )
+// ** PropertyInspector::setModel
+void PropertyInspector::setModel( PropertyModelQPtr value )
 {
     delete m_model;
     m_model = value;
     mapModelToWidgets();
 }
 
-// ** ObjectInspector::setMargins
-void ObjectInspector::setMargins( int left, int top, int right, int bottom )
+// ** PropertyInspector::setMargins
+void PropertyInspector::setMargins( int left, int top, int right, int bottom )
 {
     m_layout->setContentsMargins( QMargins( left, top, right, bottom ) );
 }
 
-// ** ObjectInspector::refresh
-void ObjectInspector::refresh( void )
+// ** PropertyInspector::refresh
+void PropertyInspector::refresh( void )
 {
     m_mapper->revert();
 }
 
-// ** ObjectInspector::mapModelToWidgets
-void ObjectInspector::mapModelToWidgets( void )
+// ** PropertyInspector::mapModelToWidgets
+void PropertyInspector::mapModelToWidgets( void )
 {
 	// Destroy old layout & mapper
 	qDeleteLayout( m_layout ); m_layout = NULL;
