@@ -83,6 +83,14 @@ namespace Scene {
 
 	//! Holds the light information.
 	class Light : public Ecs::Component<Light> {
+
+        INTROSPECTION( Light
+        //  , PROPERTY( type,      type,      setType,      "The light type."            )
+            , PROPERTY( color,     color,     setColor,     "The light color."           )
+            , PROPERTY( intensity, intensity, setIntensity, "The light intensity."       )
+            , PROPERTY( range,     range,     setRange,     "The light influence range." )
+            )
+
 	public:
 
 		//! Available light types.
@@ -138,6 +146,11 @@ namespace Scene {
 
 	//! Holds the static mesh data with per-instance materials.
 	class StaticMesh : public Ecs::Component<StaticMesh> {
+
+        INTROSPECTION( StaticMesh
+            , PROPERTY( mesh, mesh, setMesh, "The mesh asset ")
+            )
+
 	public:
 
 									//! Constructs StaticMesh instance.

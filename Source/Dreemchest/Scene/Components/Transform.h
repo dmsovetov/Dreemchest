@@ -202,6 +202,11 @@ namespace Scene {
 
 	//! Identifier component.
 	class Identifier : public Ecs::Component<Identifier> {
+
+        INTROSPECTION( Identifier
+            , PROPERTY( name, name, setName, "The entity identifier value." )
+            )
+
 	public:
 
 								//! Constructs the Identifier instance.
