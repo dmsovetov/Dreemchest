@@ -190,6 +190,9 @@ namespace Ecs {
 		//! Creates a new entity with a generated id.
 		EntityPtr		createEntity( void );
 
+        //! Makes a full copy of an entity.
+        EntityPtr       copyEntity( const EntityWPtr& entity, const EntityId& id = EntityId() );
+
     #if !DC_ECS_ENTITY_CLONING
         //! Clones entity.
         EntityPtr       cloneEntity( EntityWPtr entity );

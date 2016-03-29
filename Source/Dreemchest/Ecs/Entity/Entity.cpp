@@ -152,16 +152,8 @@ void Entity::detachById( TypeIdx id )
 // ** Entity::deepCopy
 EntityPtr Entity::deepCopy( const EntityId& id ) const
 {
-    // Create entity instance
-    Ecs*      ecs    = const_cast<Ecs*>( m_ecs.get() );
-    EntityPtr entity = id.isNull() ? ecs->createEntity() : ecs->createEntity( id );
-
-    // Now clone components
-    for( Components::const_iterator i = m_components.begin(), end = m_components.end(); i != end; ++i ) {
-        entity->attachComponent( i->second->deepCopy().get() );
-    }
-
-    return entity;
+    DC_ABORT_IF( !m_ecs.valid(), "entity that is not added to any Ecs could not be copied\n" );
+    return const_cast<Ecs*>( m_ecs.get() )->copyEntity( const_cast<Entity*>( this ), id );
 }
 
 #endif  /*  DC_ECS_ENTITY_CLONING   */

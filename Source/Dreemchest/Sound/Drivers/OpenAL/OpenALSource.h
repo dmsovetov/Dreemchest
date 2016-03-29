@@ -50,6 +50,7 @@ namespace Sound {
         virtual void            setVolume( f32 value ) DC_DECL_OVERRIDE;
         virtual void            setPitch( f32 value ) DC_DECL_OVERRIDE;
         virtual void            setPosition( const Vec3& value ) DC_DECL_OVERRIDE;
+        virtual void            setLooped( bool value ) DC_DECL_OVERRIDE;
         virtual void            setRelative( bool value ) DC_DECL_OVERRIDE;
         virtual void            setReferenceDistance( f32 value ) DC_DECL_OVERRIDE;
         virtual void            setMaximumDistance( f32 value ) DC_DECL_OVERRIDE;
