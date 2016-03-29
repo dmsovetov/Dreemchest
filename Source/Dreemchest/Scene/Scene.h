@@ -63,6 +63,9 @@
 #include <Fx/Zones.h>
 #include <Fx/Modules.h>
 
+#include <Introspection/Property.h>
+#include <Introspection/Introspection.h>
+
 #include "PlaneClipper.h"
 
 DC_BEGIN_DREEMCHEST

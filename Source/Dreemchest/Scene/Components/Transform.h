@@ -36,6 +36,13 @@ namespace Scene {
 
 	//! Scene object transformation component.
 	class Transform : public Ecs::Component<Transform> {
+
+        INTROSPECTION( Transform
+            , PROPERTY( position, position, setPosition, "The local position of this Transform relative to parent." )
+            , PROPERTY( rotation, rotation, setRotation, "The local rotation of this Transform relative to parent." )
+            , PROPERTY( scale,    scale,    setScale,    "The local scaling of this Transform relative to parent."  )
+            )
+
 	public:
 
 								//! Constructs Transform instance.
