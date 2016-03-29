@@ -28,9 +28,58 @@
 
 #include "../Models/PropertyModel.h"
 
+#include "Properties/VectorEdit.h"
+
 DC_BEGIN_COMPOSER
 
 namespace Ui {
+
+// ----------------------------------------------------------------------------- PropertyInspector::ItemDelegate ----------------------------------------------------------------------------- //
+
+//! Item delegate type used by QDataWidgetMapper to bind properties to widgets.
+class PropertyInspector::ItemDelegate : public QItemDelegate {
+protected:
+
+    //! Updates widget data with value stored inside an object property.
+    virtual void	setEditorData( QWidget* editor, const QModelIndex& index ) const Q_DECL_OVERRIDE;
+
+    //! Updates property value with data received from a widget.
+    virtual void	setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index ) const Q_DECL_OVERRIDE;
+};
+
+// ** PropertyInspector::ItemDelegate::setEditorData
+void PropertyInspector::ItemDelegate::setEditorData( QWidget* editor, const QModelIndex& index ) const
+{
+    QVariant   value        = index.data( Qt::EditRole );
+    QByteArray userProperty = editor->metaObject()->userProperty().name();
+
+    if( userProperty.isEmpty() ) {
+        LogError( "propertyInspector", "widget %s has no user proprty to write data\n", editor->metaObject()->className() );
+        return;
+    }
+
+    if( !value.isValid() ) {
+        LogError( "propertyInspector", "property model returned an invalid value\n" );
+        return;
+    }
+
+    editor->setProperty( userProperty, value );
+}
+
+// ** PropertyInspector::ItemDelegate::setModelData
+void PropertyInspector::ItemDelegate::setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index ) const
+{
+    QByteArray userProperty = editor->metaObject()->userProperty().name();
+
+    if( userProperty.isEmpty() ) {
+        LogError( "propertyInspector", "widget %s has no user proprty to read data\n", editor->metaObject()->className() );
+        return;
+    }
+
+    model->setData( index, editor->property( userProperty ), Qt::EditRole );
+}
+
+// ------------------------------------------------------------------------------------ PropertyInspector ------------------------------------------------------------------------------------ //
 
 // ** PropertyInspector::s_factory
 PropertyInspector::WidgetFactory PropertyInspector::s_factory;
@@ -80,6 +129,7 @@ void PropertyInspector::mapModelToWidgets( void )
 	// Create the mapper.
 	m_mapper = new QDataWidgetMapper( this );
 	m_mapper->setModel( m_model );
+    m_mapper->setItemDelegate( new ItemDelegate );
 
 	// Create root layout.
 	m_layout = new QFormLayout( this );
@@ -88,29 +138,37 @@ void PropertyInspector::mapModelToWidgets( void )
     // Widget mapper index
     int index = 0;
 
-#if 0
 	// Construct property widgets.
-	foreach( Introspection::Property* property, m_model->properties() ) {
+	foreach( PropertyModel::Property* property, m_model->properties() ) {
         // Increase the widget mapper index
         index++;
 
+        // Get the property info
+        const Introspection::PropertyInfo& info = property->info();
+
 		// Get the property type & name
-		QString widget = property->widget();
-		QString name   = property->name();
+		QString name = property->name();
+        name[0] = name[0].toUpper();
 
         // Construct widget by a type name
-        QWidget* instance = s_factory.construct( widget );
-
-        if( !instance ) {
-			qWarning() << "Property" << name << "has unhnadled widget" << widget;
-			continue;            
+        QWidget* instance = NULL;
+        if( property->type()->is<Vec3>() ) {
+            instance = new Vec3Edit;
+        } else {
+            instance = new QWidget;
         }
+
+        connect( instance, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
 
         // Add widget to layout and mapper
 		m_layout->addRow( name, instance );
 		m_mapper->addMapping( instance, index - 1 );
+
+        // Set the property tooltip
+        if( info.description ) {
+            m_layout->labelForField( instance )->setToolTip( info.description );
+        }
 	}
-#endif
 
 	// Finish construction
 	m_mapper->toFirst();

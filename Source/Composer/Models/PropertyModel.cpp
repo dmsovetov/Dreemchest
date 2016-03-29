@@ -77,18 +77,18 @@ int PropertyModel::columnCount( const QModelIndex& parent ) const
 QVariant PropertyModel::data( const QModelIndex& index, int role ) const
 {
 	int idx = index.column();
-    return QVariant();
-//	return m_PropertyModel[idx]->get( idx );
+	return QVariant::fromValue( m_properties[idx]->get( m_instance ) );
 }
 
 // ** PropertyModel::setData
 bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
-	int idx = index.column();
+	int     idx = index.column();
+    Variant v   = qvariant_cast<Variant>( value );
 
-	//if( m_PropertyModel[idx]->set( idx, value ) ) {
-    //    Q_EMIT propertyChanged();
-    //}
+	if( m_properties[idx]->update( m_instance, v ) ) {
+        Q_EMIT propertyChanged();
+    }
 
 	return true;
 }

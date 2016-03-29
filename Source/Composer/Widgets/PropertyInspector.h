@@ -63,6 +63,9 @@ namespace Ui {
         //! Factory type to construct inspector widgets.
         typedef AbstractFactory<QWidget, QString> WidgetFactory;
 
+        //! Internal item delegate type.
+        class ItemDelegate;
+
         PropertyModelQPtr       m_model;        //!< Bound property model.
         QFormLayout*            m_layout;       //!< Form layout to display property widget.
         QDataWidgetMapper*      m_mapper;	    //!< Maps property model to actual widgets.

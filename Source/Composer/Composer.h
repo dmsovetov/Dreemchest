@@ -70,6 +70,7 @@ DC_BEGIN_COMPOSER
     DREEMCHEST_LOGGER_TAG( Composer )
 
 	// Declare Qt metatypes
+    Q_DECLARE_METATYPE( Variant )
 	Q_DECLARE_METATYPE( Assets::Handle )
 	Q_DECLARE_METATYPE( Scene::ImageHandle )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
