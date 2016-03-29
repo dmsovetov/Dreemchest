@@ -64,6 +64,9 @@ namespace Introspection {
         //! Sets the property value.
         virtual void            set( Instance instance, const Variant& value ) = 0;
 
+        //! Sets the property value only if it will be changed.
+        virtual bool            update( Instance instance, const Variant& value ) = 0;
+
         //! Gets the property value.
         virtual Variant         get( Instance instance ) const = 0;
 
@@ -94,6 +97,9 @@ namespace Introspection {
             //! Sets the property value.
             virtual void            set( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
 
+            //! Sets the property value only if it will be changed.
+            virtual bool            update( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
+
             //! Gets the property value.
             virtual Variant         get( Instance instance ) const DC_DECL_OVERRIDE;
 
@@ -118,6 +124,23 @@ namespace Introspection {
         {
             TValue v = value.as<TValue>();
             (reinterpret_cast<TObject*>( instance )->*m_setter)( v );
+        }
+
+        // ** Property::update
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        bool Property<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value )
+        {
+            TObject* object = reinterpret_cast<TObject*>( instance );
+
+            TValue v = value.as<TValue>();
+            TValue o = (object->*m_getter)();
+
+            if( v == o ) {
+                return false;
+            }
+
+            (object->*m_setter)( v );
+            return true;
         }
 
         // ** Property::get
