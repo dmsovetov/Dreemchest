@@ -33,20 +33,33 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+    //! Contains property meta-information like description, serialization flags, min/max range etc.
+    struct PropertyInfo {
+        CString             description;    //!< Property description string.
+
+                            //! Constructs an empty PropertyInfo instance.
+                            PropertyInfo( void );
+
+                            //! Construct PropertyInfo instance.
+                            PropertyInfo( CString description );
+    };
+
     //! The Property class provides meta-data about a property.
     class Property : public Member {
     public:
 
                                 //! Constructs the Property instance.
-                                Property( CString name, const Type& type )
-                                    : Member( name ), m_type( type ) {}
+                                Property( CString name, const Type* type, const PropertyInfo& info );
 
         //! This type can be type casted to a property.
-        virtual const Property* asProperty( void ) const DC_DECL_OVERRIDE { return this; }
-        virtual Property*       asProperty( void ) DC_DECL_OVERRIDE { return this; }
+        virtual const Property* asProperty( void ) const DC_DECL_OVERRIDE;
+        virtual Property*       asProperty( void ) DC_DECL_OVERRIDE;
 
         //! Returns the property value type.
-        const Type&             type( void ) const { return m_type; }
+        const Type*             type( void ) const;
+
+        //! Returns property information.
+        const PropertyInfo&     info( void ) const;
     
         //! Sets the property value.
         virtual void            set( Instance instance, const Variant& value ) = 0;
@@ -56,59 +69,66 @@ namespace Introspection {
 
     private:
 
-        Type                    m_type; //!< The property value type.
+        const Type*             m_type; //!< The property value type.
+        PropertyInfo            m_info; //!< Property information.
     };
 
-    //! Generic property bound to a specified type.
-    template<typename TObject, typename TValue, typename TPropertyValue>
-    class GenericProperty : public Property {
-    public:
+    namespace Private {
 
-        //! The property getter.
-        typedef TPropertyValue  ( TObject::*Getter )( void ) const;
+        //! Generic property bound to a specified type.
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        class Property : public ::DC_DREEMCHEST_NS Introspection::Property {
+        public:
 
-        //! The property setter.
-        typedef void            ( TObject::*Setter )( TPropertyValue );
+            //! The property getter.
+            typedef TPropertyValue  ( TObject::*Getter )( void ) const;
 
-                                //! Constructs the GenericProperty instance.
-                                GenericProperty( CString name, Getter getter, Setter setter );
+            //! The property setter.
+            typedef void            ( TObject::*Setter )( TPropertyValue );
 
-    protected:
+                                    //! Constructs the Property instance.
+                                    Property( CString name, Getter getter, Setter setter, const PropertyInfo& info );
 
-        //! Sets the property value.
-        virtual void            set( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
+        protected:
 
-        //! Gets the property value.
-        virtual Variant         get( Instance instance ) const DC_DECL_OVERRIDE;
+            //! Sets the property value.
+            virtual void            set( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
 
-    private:
+            //! Gets the property value.
+            virtual Variant         get( Instance instance ) const DC_DECL_OVERRIDE;
 
-        Getter                  m_getter;   //!< The property getter.
-        Setter                  m_setter;   //!< The property setter.
-    };
+        private:
 
-    // ** GenericProperty::GenericProperty
-    template<typename TObject, typename TValue, typename TPropertyValue>
-    GenericProperty<TObject, TValue, TPropertyValue>::GenericProperty( CString name, Getter getter, Setter setter )
-        : Property( name, Type::fromValue<TValue>() ), m_getter( getter ), m_setter( setter )
-    {
-    }
+            Getter                  m_getter;   //!< The property getter.
+            Setter                  m_setter;   //!< The property setter.
+        };
 
-    // ** GenericProperty::set
-    template<typename TObject, typename TValue, typename TPropertyValue>
-    void GenericProperty<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value )
-    {
-        TValue v = value.as<TValue>();
-        (reinterpret_cast<TObject*>( instance )->*m_setter)( v );
-    }
+        // ** Property::Property
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
+            : :: DC_DREEMCHEST_NS Introspection::Property( name, Type::fromClass<TValue>(), info )
+            , m_getter( getter )
+            , m_setter( setter )
+        {
+        }
 
-    // ** GenericProperty::get
-    template<typename TObject, typename TValue, typename TPropertyValue>
-    Variant GenericProperty<TObject, TValue, TPropertyValue>::get( Instance instance ) const
-    {
-        TValue v = (reinterpret_cast<TObject*>( instance )->*m_getter)();
-        return Variant::fromValue<TValue>( v );
-    }
+        // ** Property::set
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        void Property<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value )
+        {
+            TValue v = value.as<TValue>();
+            (reinterpret_cast<TObject*>( instance )->*m_setter)( v );
+        }
+
+        // ** Property::get
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        Variant Property<TObject, TValue, TPropertyValue>::get( Instance instance ) const
+        {
+            TValue v = (reinterpret_cast<TObject*>( instance )->*m_getter)();
+            return Variant::fromValue<TValue>( v );
+        }
+
+    } // namespace Private
 
 } // namespace Introspection
 

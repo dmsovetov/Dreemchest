@@ -30,6 +30,54 @@ DC_BEGIN_DREEMCHEST
 
 namespace Introspection {
 
+// -------------------------------------------------------------- PropertyInfo -------------------------------------------------------------- //
+
+// ** PropertyInfo::PropertyInfo
+PropertyInfo::PropertyInfo( void )
+    : description( NULL )
+{
+}
+
+// ** PropertyInfo::PropertyInfo
+PropertyInfo::PropertyInfo( CString description )
+    : description( description )
+{
+}
+
+// ----------------------------------------------------------------- Property ----------------------------------------------------------------- //
+
+// ** Property::Property
+Property::Property( CString name, const Type* type, const PropertyInfo& info )
+    : Member( name )
+    , m_type( type )
+    , m_info( info )
+{
+}
+
+// ** Property::asProperty
+const Property* Property::asProperty( void ) const
+{
+    return this;
+}
+
+// ** Property::asProperty
+Property* Property::asProperty( void )
+{
+    return this;
+}
+
+// ** Property::type
+const Type* Property::type( void ) const
+{
+    return m_type;
+}
+
+// ** Property::info
+const PropertyInfo& Property::info( void ) const
+{
+    return m_info;
+}
+
 } // namespace Introspection
 
 DC_END_DREEMCHEST

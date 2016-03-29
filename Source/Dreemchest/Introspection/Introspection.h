@@ -36,6 +36,7 @@ namespace Introspection {
     NIMBLE_LOGGER_TAG( Intr )
 
     class Property;
+    struct PropertyInfo;
 
     typedef void* Instance; //!< Instance is just a void pointer.
 
@@ -94,22 +95,26 @@ namespace Introspection {
         s32                 m_memberCount;  //!< The total number of members.
     };
 
-    //! Forward declaration of a generic property type.
-    template<typename TObject, typename TValue, typename TPropertyValue> class GenericProperty;
+    namespace Private {
 
-    //! Creates property that accepts POD values and is bound to a specified data type.
-    template<typename TObject, typename TValue>
-    Property* createProperty( CString name, TValue ( TObject::*getter )( void ) const, void ( TObject::*setter )( TValue ) )
-    {
-        return DC_NEW GenericProperty<TObject, TValue, TValue>( name, getter, setter );
-    }
+        //! Forward declaration of a generic property type.
+        template<typename TObject, typename TValue, typename TPropertyValue> class Property;
 
-    //! Creates property that accepts refereces and is bound to a specified data type.
-    template<typename TObject, typename TValue>
-    Property* createProperty( CString name, const TValue& ( TObject::*getter )( void ) const, void ( TObject::*setter )( const TValue& ) )
-    {
-        return DC_NEW GenericProperty<TObject, TValue, const TValue&>( name, getter, setter );
-    }
+        //! Creates property that accepts POD values and is bound to a specified data type.
+        template<typename TObject, typename TValue>
+        ::DC_DREEMCHEST_NS Introspection::Property* createProperty( CString name, TValue ( TObject::*getter )( void ) const, void ( TObject::*setter )( TValue ), const PropertyInfo& info )
+        {
+            return DC_NEW Property<TObject, TValue, TValue>( name, getter, setter, info );
+        }
+
+        //! Creates property that accepts refereces and is bound to a specified data type.
+        template<typename TObject, typename TValue>
+        ::DC_DREEMCHEST_NS Introspection::Property* createProperty( CString name, const TValue& ( TObject::*getter )( void ) const, void ( TObject::*setter )( const TValue& ), const PropertyInfo& info )
+        {
+            return DC_NEW Property<TObject, TValue, const TValue&>( name, getter, setter, info );
+        }
+
+    } // namespace Private
 
 } // namespace Introspection
 
@@ -124,35 +129,45 @@ DC_END_DREEMCHEST
             virtual ::DC_DREEMCHEST_NS Introspection::MetaObject* metaObject( void )                                \
             {                                                                                                       \
                 return type::staticMetaObject();                                                                    \
+            }                                                                                                       \
+            virtual void* metaInstance( void )                                                                      \
+            {                                                                                                       \
+                return this;                                                                                        \
+            }                                                                                                       \
+            virtual const void* metaInstance( void ) const                                                          \
+            {                                                                                                       \
+                return this;                                                                                        \
             }
 
 //! Embeds the instrospection as a static member.
-#define INTROSPECTION( type, ... )                                                                                          \
-            public:                                                                                                         \
-            INSTROSPECTION_ACCESSOR( type )                                                                                 \
-            static ::DC_DREEMCHEST_NS Introspection::MetaObject* staticMetaObject( void )                                   \
-            {                                                                                                               \
-                typedef type Object;                                                                                        \
-                static ::DC_DREEMCHEST_NS Introspection::Member* m[] = { NULL, __VA_ARGS__ };                               \
-                static ::DC_DREEMCHEST_NS Introspection::MetaObject meta( #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 ); \
-                return &meta;                                                                                               \
+#define INTROSPECTION( type, ... )                                                                                  \
+            public:                                                                                                 \
+            INSTROSPECTION_ACCESSOR( type )                                                                         \
+            static ::DC_DREEMCHEST_NS Introspection::MetaObject* staticMetaObject( void )                           \
+            {                                                                                                       \
+                DC_USE_DREEMCHEST                                                                                   \
+                typedef type Object;                                                                                \
+                static Introspection::Member* m[] = { NULL, __VA_ARGS__ };                                          \
+                static Introspection::MetaObject meta( #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );            \
+                return &meta;                                                                                       \
             }
 
 //! Embeds the instrospection as a static member with a specified super class.
-#define INTROSPECTION_SUPER( type, super, ... )                                                                                                         \
-            public:                                                                                                                                     \
-            INSTROSPECTION_ACCESSOR( type )                                                                                                             \
-            static ::DC_DREEMCHEST_NS Introspection::MetaObject* staticMetaObject( void )                                                               \
-            {                                                                                                                                           \
-                typedef type Object;                                                                                                                    \
-                static ::DC_DREEMCHEST_NS Introspection::Member* m[] = { NULL, __VA_ARGS__ };                                                           \
-                static ::DC_DREEMCHEST_NS Introspection::MetaObject meta( super::staticMetaObject(), #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );  \
-                return &meta;                                                                                                                           \
+#define INTROSPECTION_SUPER( type, super, ... )                                                                                         \
+            public:                                                                                                                     \
+            INSTROSPECTION_ACCESSOR( type )                                                                                             \
+            static ::DC_DREEMCHEST_NS Introspection::MetaObject* staticMetaObject( void )                                               \
+            {                                                                                                                           \
+                DC_USE_DREEMCHEST                                                                                                       \
+                typedef type Object;                                                                                                    \
+                static Introspection::Member* m[] = { NULL, __VA_ARGS__ };                                                              \
+                static Introspection::MetaObject meta( super::staticMetaObject(), #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );     \
+                return &meta;                                                                                                           \
             }
 
 //! Adds the property member to an introspection.
-#define PROPERTY( name, getter, setter )    \
-            ::DC_DREEMCHEST_NS Introspection::createProperty( #name, &Object::getter, &Object::setter ),
+#define PROPERTY( name, getter, setter, ... )    \
+            Introspection::Private::createProperty( #name, &Object::getter, &Object::setter, Introspection::PropertyInfo( __VA_ARGS__ ) )
 
 #ifndef DC_BUILD_LIBRARY
     #include "Property.h"
