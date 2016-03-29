@@ -85,7 +85,7 @@ namespace Scene {
 	class Light : public Ecs::Component<Light> {
 
         INTROSPECTION( Light
-        //  , PROPERTY( type,      type,      setType,      "The light type."            )
+            , PROPERTY( type,      type,      setType,      "The light type."            )
             , PROPERTY( color,     color,     setColor,     "The light color."           )
             , PROPERTY( intensity, intensity, setIntensity, "The light intensity."       )
             , PROPERTY( range,     range,     setRange,     "The light influence range." )
