@@ -86,6 +86,11 @@ bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, in
 	int     idx = index.column();
     Variant v   = qvariant_cast<Variant>( value );
 
+    if( !v.isValid() ) {
+        LogError( "propertyModel", "value could not be set from a void variant\n" );
+        return false;
+    }
+
 	if( m_properties[idx]->update( m_instance, v ) ) {
         Q_EMIT propertyChanged();
     }
