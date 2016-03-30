@@ -30,7 +30,6 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-
 // ** StringEdit::StringEdit
 StringEdit::StringEdit( QWidget* parent )
     : QLineEdit( parent )

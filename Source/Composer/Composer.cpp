@@ -36,6 +36,7 @@
 #include "Widgets/Properties/QuatEdit.h"
 #include "Widgets/Properties/StringEdit.h"
 #include "Widgets/Properties/VectorEdit.h"
+#include "Widgets/Properties/SpinBoxes.h"
 
 #include "Project/Project.h"
 
@@ -119,6 +120,9 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
     Ui::PropertyInspector::registerWidget<Vec3, Ui::Vec3Edit>();
     Ui::PropertyInspector::registerWidget<Vec4, Ui::Vec4Edit>();
     Ui::PropertyInspector::registerWidget<Quat, Ui::QuatEdit>();
+    Ui::PropertyInspector::registerWidget<f32, Ui::DoubleEdit>();
+    Ui::PropertyInspector::registerWidget<f64, Ui::DoubleEdit>();
+    Ui::PropertyInspector::registerWidget<s32, Ui::IntegerEdit>();
 }
 
 // ** Composer::project
