@@ -73,12 +73,19 @@ namespace Reflection {
                 return U::staticMetaObject();    
             }
 
-            //! Returns a NULL pointer if the type T does not have a toString method.
+            //! Returns the pointer to static enumeration meta-object.
             template<typename U>
             static NIMBLE_STATIC_IF( IsEnumClass<U>, MetaObject* ) detectMetaObject( void )
             {
                 static Private::Enum<U> meta;
                 return &meta;
+            }
+
+            //! Returns a NULL pointer if this is not an enum class and no staticMetaObject method found.
+            template<typename U>
+            static typename EnableIf<!IsEnumClass<U>::value && !Has_staticMetaObject<U>::value, MetaObject* >::value detectMetaObject( void )
+            {
+                return NULL;
             }
         };
 
