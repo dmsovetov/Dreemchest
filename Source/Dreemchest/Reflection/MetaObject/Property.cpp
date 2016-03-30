@@ -54,14 +54,14 @@ Property::Property( CString name, const Type* type, const PropertyInfo& info )
 {
 }
 
-// ** Property::asProperty
-const Property* Property::asProperty( void ) const
+// ** Property::isProperty
+const Property* Property::isProperty( void ) const
 {
     return this;
 }
 
-// ** Property::asProperty
-Property* Property::asProperty( void )
+// ** Property::isProperty
+Property* Property::isProperty( void )
 {
     return this;
 }

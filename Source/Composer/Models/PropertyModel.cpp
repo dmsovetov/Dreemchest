@@ -38,7 +38,7 @@ PropertyModel::PropertyModel( Instance instance, Class* metaObject, QObject* par
 
     for( s32 i = 0, n = metaObject->memberCount(); i < n; i++ ) {
         Reflection::Member* member = metaObject->member( i );
-        if( Property* property = member->asProperty() ) {
+        if( Property* property = member->isProperty() ) {
             m_properties.push_back( property );
         }
     }

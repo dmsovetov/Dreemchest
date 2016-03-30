@@ -52,8 +52,8 @@ namespace Reflection {
                                 Property( CString name, const Type* type, const PropertyInfo& info );
 
         //! This type can be type casted to a property.
-        virtual const Property* asProperty( void ) const DC_DECL_OVERRIDE;
-        virtual Property*       asProperty( void ) DC_DECL_OVERRIDE;
+        virtual const Property* isProperty( void ) const DC_DECL_OVERRIDE;
+        virtual Property*       isProperty( void ) DC_DECL_OVERRIDE;
 
         //! Returns the property value type.
         const Type*             type( void ) const;

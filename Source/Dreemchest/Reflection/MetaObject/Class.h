@@ -45,8 +45,8 @@ namespace Reflection {
         CString                 name( void ) const;
 
         //! Perfors the type cast to a Property type.
-        virtual const Property* asProperty( void ) const { return NULL; }
-        virtual Property*       asProperty( void ) { return NULL; }
+        virtual const Property* isProperty( void ) const { return NULL; }
+        virtual Property*       isProperty( void ) { return NULL; }
 
     private:
 
