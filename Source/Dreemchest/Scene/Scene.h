@@ -64,7 +64,7 @@
 #include <Fx/Modules.h>
 
 #include <Reflection/MetaObject/Property.h>
-#include <Reflection/MetaObject/MetaObject.h>
+#include <Reflection/MetaObject/Class.h>
 
 #include "PlaneClipper.h"
 

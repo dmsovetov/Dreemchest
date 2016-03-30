@@ -24,24 +24,32 @@
 
  **************************************************************************/
 
-#include "MetaObject.h"
+#ifndef __DC_Reflection_H__
+#define __DC_Reflection_H__
+
+#include "../Dreemchest.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Reflection {
 
-// ** MetaObject::MetaObject
-MetaObject::MetaObject( CString name )
-    : m_name( name )
-{
-}
+    NIMBLE_LOGGER_TAG( Reflection )
 
-// ** MetaObject::name
-CString MetaObject::name( void ) const
-{
-    return m_name;
-}
+    class MetaObject;
+        class Class;
+
+    class Property;
+    struct PropertyInfo;
+
+    typedef void* Instance; //!< Instance is just a void pointer.
 
 } // namespace Reflection
 
 DC_END_DREEMCHEST
+
+#ifndef DC_BUILD_LIBRARY
+    #include "MetaObject/Property.h"
+    #include "MetaObject/Class.h"
+#endif  /*  !DC_BUILD_LIBRARY   */
+
+#endif    /*    !__DC_Reflection_H__    */

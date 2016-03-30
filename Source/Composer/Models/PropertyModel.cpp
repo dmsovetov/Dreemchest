@@ -29,7 +29,7 @@
 DC_BEGIN_COMPOSER
 
 // ** PropertyModel::PropertyModel
-PropertyModel::PropertyModel( Instance instance, MetaObject* metaObject, QObject* parent )
+PropertyModel::PropertyModel( Instance instance, Class* metaObject, QObject* parent )
     : QAbstractItemModel( parent )
     , m_instance( instance )
 {

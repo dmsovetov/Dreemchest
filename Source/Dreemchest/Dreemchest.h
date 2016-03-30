@@ -72,7 +72,7 @@
     #include <Assets/Assets.h>
 	#include <Event/Event.h>
 	#include <Threads/Threads.h>
-    #include <Reflection/MetaObject/MetaObject.h>
+    #include <Reflection/Reflection.h>
 	#include <Ecs/Ecs.h>
 	#include <Platform/Platform.h>
 	#include <Threads/Threads.h>

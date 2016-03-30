@@ -27,94 +27,30 @@
 #ifndef __DC_Reflection_MetaObject_H__
 #define __DC_Reflection_MetaObject_H__
 
-#include "../../Dreemchest.h"
+#include "../Reflection.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Reflection {
 
-    NIMBLE_LOGGER_TAG( Intr )
-
-    class Property;
-    struct PropertyInfo;
-
-    typedef void* Instance; //!< Instance is just a void pointer.
-
-    //! Base class for meta object member types.
-    class Member {
-    public:
-
-                                //! Constructs Member instance.
-                                Member( CString name );
-        virtual                 ~Member( void ) {}
-
-        //! Returns the property name.
-        CString                 name( void ) const;
-
-        //! Perfors the type cast to a Property type.
-        virtual const Property* asProperty( void ) const { return NULL; }
-        virtual Property*       asProperty( void ) { return NULL; }
-
-    private:
-
-        CString                 m_name; //!< The property name.
-    };
-
     //! The MetaObject class contains meta-information about objects.
     class MetaObject {
     public:
 
-                            //! Constructs MetaObject instance.
-                            MetaObject( CString name, Member** members, s32 memberCount );
-
-                            //! Constructs MetaObject instance with a super class.
-                            MetaObject( const MetaObject* super, CString name, Member** members, s32 memberCount );
-
-        //! Returns the super class.
-        const MetaObject*   super( void ) const;
+                                //! Constructs MetaObject instance.
+                                MetaObject( CString name );
 
         //! Returns the type name.
-        CString             name( void ) const;
+        CString                 name( void ) const;
 
-        //! Returns the total number of properties owned by introspected type.
-        s32                 memberCount( void ) const;
-
-        //! Returns the member at specified index.
-        const Member*       member( s32 index ) const;
-        Member*             member( s32 index );
-
-        //! Returns the member with a specified name.
-        const Member*       findMember( CString name ) const;
-        Member*             findMember( CString name );
+        //! Returns an instance pointer type casted to Class or NULL, if the metaobject is not a class.
+        virtual const Class*    isClass( void ) const { return NULL; }
+        virtual Class*          isClass( void ) { return NULL; }
 
     private:
 
-        const MetaObject*   m_super;        //!< Base class of an introspected type.
-        CString             m_name;         //!< The introspected type name.
-        Member**            m_members;      //!< All members exposed by data type.
-        s32                 m_memberCount;  //!< The total number of members.
+        CString                 m_name; //!< The type name.
     };
-
-    namespace Private {
-
-        //! Forward declaration of a generic property type.
-        template<typename TObject, typename TValue, typename TPropertyValue> class Property;
-
-        //! Creates property that accepts POD values and is bound to a specified data type.
-        template<typename TObject, typename TValue>
-        ::DC_DREEMCHEST_NS Reflection::Property* createProperty( CString name, TValue ( TObject::*getter )( void ) const, void ( TObject::*setter )( TValue ), const PropertyInfo& info )
-        {
-            return DC_NEW Property<TObject, TValue, TValue>( name, getter, setter, info );
-        }
-
-        //! Creates property that accepts refereces and is bound to a specified data type.
-        template<typename TObject, typename TValue>
-        ::DC_DREEMCHEST_NS Reflection::Property* createProperty( CString name, const TValue& ( TObject::*getter )( void ) const, void ( TObject::*setter )( const TValue& ), const PropertyInfo& info )
-        {
-            return DC_NEW Property<TObject, TValue, const TValue&>( name, getter, setter, info );
-        }
-
-    } // namespace Private
 
 } // namespace Reflection
 
@@ -122,11 +58,11 @@ DC_END_DREEMCHEST
 
 //! Embeds the virtual meta object accessor.
 #define INSTROSPECTION_ACCESSOR( type ) \
-            virtual const ::DC_DREEMCHEST_NS Reflection::MetaObject* metaObject( void ) const                    \
+            virtual const ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void ) const                            \
             {                                                                                                       \
                 return type::staticMetaObject();                                                                    \
             }                                                                                                       \
-            virtual ::DC_DREEMCHEST_NS Reflection::MetaObject* metaObject( void )                                \
+            virtual ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void )                                        \
             {                                                                                                       \
                 return type::staticMetaObject();                                                                    \
             }                                                                                                       \
@@ -143,34 +79,30 @@ DC_END_DREEMCHEST
 #define INTROSPECTION( type, ... )                                                                                  \
             public:                                                                                                 \
             INSTROSPECTION_ACCESSOR( type )                                                                         \
-            static ::DC_DREEMCHEST_NS Reflection::MetaObject* staticMetaObject( void )                           \
+            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                   \
             {                                                                                                       \
                 DC_USE_DREEMCHEST                                                                                   \
                 typedef type Object;                                                                                \
-                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                          \
-                static Reflection::MetaObject meta( #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );            \
+                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                             \
+                static Reflection::Class meta( #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );                    \
                 return &meta;                                                                                       \
             }
 
 //! Embeds the instrospection as a static member with a specified super class.
-#define INTROSPECTION_SUPER( type, super, ... )                                                                                         \
-            public:                                                                                                                     \
-            INSTROSPECTION_ACCESSOR( type )                                                                                             \
-            static ::DC_DREEMCHEST_NS Reflection::MetaObject* staticMetaObject( void )                                               \
-            {                                                                                                                           \
-                DC_USE_DREEMCHEST                                                                                                       \
-                typedef type Object;                                                                                                    \
-                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                              \
-                static Reflection::MetaObject meta( super::staticMetaObject(), #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );     \
-                return &meta;                                                                                                           \
+#define INTROSPECTION_SUPER( type, super, ... )                                                                             \
+            public:                                                                                                         \
+            INSTROSPECTION_ACCESSOR( type )                                                                                 \
+            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                           \
+            {                                                                                                               \
+                DC_USE_DREEMCHEST                                                                                           \
+                typedef type Object;                                                                                        \
+                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                     \
+                static Reflection::Class meta( super::staticMetaObject(), #type, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 ); \
+                return &meta;                                                                                               \
             }
 
 //! Adds the property member to an introspection.
 #define PROPERTY( name, getter, setter, ... )    \
             Reflection::Private::createProperty( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
-
-#ifndef DC_BUILD_LIBRARY
-    #include "Property.h"
-#endif  /*  !DC_BUILD_LIBRARY   */
 
 #endif    /*    !__DC_Reflection_MetaObject_H__    */

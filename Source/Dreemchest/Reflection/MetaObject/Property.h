@@ -27,7 +27,7 @@
 #ifndef __DC_Reflection_Property_H__
 #define __DC_Reflection_Property_H__
 
-#include "MetaObject.h"
+#include "Class.h"
 
 DC_BEGIN_DREEMCHEST
 
