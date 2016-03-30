@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "Reflection.h"
+#include "MetaObject.h"
 
 DC_BEGIN_DREEMCHEST
 

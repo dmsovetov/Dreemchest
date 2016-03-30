@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef __DC_Reflection_H__
-#define __DC_Reflection_H__
+#ifndef __DC_Reflection_MetaObject_H__
+#define __DC_Reflection_MetaObject_H__
 
-#include "../Dreemchest.h"
+#include "../../Dreemchest.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -173,4 +173,4 @@ DC_END_DREEMCHEST
     #include "Property.h"
 #endif  /*  !DC_BUILD_LIBRARY   */
 
-#endif    /*    !__DC_Reflection_H__    */
+#endif    /*    !__DC_Reflection_MetaObject_H__    */

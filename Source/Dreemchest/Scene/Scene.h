@@ -63,8 +63,8 @@
 #include <Fx/Zones.h>
 #include <Fx/Modules.h>
 
-#include <Reflection/Property.h>
-#include <Reflection/Reflection.h>
+#include <Reflection/MetaObject/Property.h>
+#include <Reflection/MetaObject/MetaObject.h>
 
 #include "PlaneClipper.h"
 
