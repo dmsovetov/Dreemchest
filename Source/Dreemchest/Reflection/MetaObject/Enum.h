@@ -50,6 +50,9 @@ namespace Reflection {
         //! Returns the enum value of an entry at specified index.
         virtual s32         valueAt( s32 index ) const NIMBLE_ABSTRACT;
 
+        //! Returns the enumeration Variant value by a string.
+        virtual Variant     valueFromString( const String& value ) const NIMBLE_ABSTRACT;
+
         //! Returns an instance pointer type casted to Class or NULL, if the metaobject is not a class.
         virtual const Enum* isEnum( void ) const NIMBLE_OVERRIDE { return this; }
         virtual Enum*       isEnum( void ) NIMBLE_OVERRIDE { return this; }
@@ -73,6 +76,9 @@ namespace Reflection {
 
             //! Returns the enum value of an entry at specified index.
             virtual s32         valueAt( s32 index ) const NIMBLE_OVERRIDE;
+
+            //! Returns the enumeration Variant value by a string.
+            virtual Variant     valueFromString( const String& value ) const NIMBLE_OVERRIDE;
         };
 
         // ** Enum::Enum
@@ -101,6 +107,13 @@ namespace Reflection {
         s32 Enum<TEnumClass>::valueAt( s32 index ) const
         {
             return TEnumClass::valueAt( index );
+        }
+
+        // ** Enum::valueFromString
+        template<typename TEnumClass>
+        Variant Enum<TEnumClass>::valueFromString( const String& value ) const
+        {
+            return Variant::fromValue<TEnumClass>( TEnumClass::fromString( value.c_str() ) );
         }
 
     } // namespace Private
