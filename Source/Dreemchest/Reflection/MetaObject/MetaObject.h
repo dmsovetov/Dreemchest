@@ -47,6 +47,10 @@ namespace Reflection {
         virtual const Class*    isClass( void ) const { return NULL; }
         virtual Class*          isClass( void ) { return NULL; }
 
+        //! Returns an instance pointer type casted to Enum or NULL, if the metaobject is not a class.
+        virtual const Enum*     isEnum( void ) const { return NULL; }
+        virtual Enum*           isEnum( void ) { return NULL; }
+
     private:
 
         CString                 m_name; //!< The type name.

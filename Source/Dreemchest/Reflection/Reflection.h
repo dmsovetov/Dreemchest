@@ -37,6 +37,7 @@ namespace Reflection {
 
     class MetaObject;
         class Class;
+        class Enum;
 
     class Property;
     struct PropertyInfo;
@@ -50,6 +51,7 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
     #include "MetaObject/Property.h"
     #include "MetaObject/Class.h"
+    #include "MetaObject/Enum.h"
 #endif  /*  !DC_BUILD_LIBRARY   */
 
 #endif    /*    !__DC_Reflection_H__    */
