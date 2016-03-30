@@ -24,73 +24,49 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_SpinBoxes_H__
-#define __DC_Composer_SpinBoxes_H__
+#ifndef __DC_Composer_EnumEdit_H__
+#define __DC_Composer_EnumEdit_H__
 
-#include "../../Composer.h"
+#include "../../../Composer.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-    //! Widget to edit integer properties.
-    class IntegerEdit : public QSpinBox {
-
+    //! Widget to edit enumeration properties.
+    class EnumEdit : public QComboBox {
+    
         Q_OBJECT
         Q_PROPERTY( Variant value READ value WRITE setValue NOTIFY valueChanged USER true )
 
     public:
 
-                            //! Constructs IntegerEdit instance.
-                            IntegerEdit( s32 min = INT_MIN, s32 max = INT_MAX, s32 step = 1, QWidget* parent = NULL );
+                                //! Constructs EnumEdit instance.
+                                EnumEdit( const Reflection::Enum* enumeration, QWidget* parent = NULL );
 
         //! Returns current property value as Variant.
-        Variant             value( void ) const;
+        Variant                 value( void ) const;
 
         //! Sets property value from a Variant.
-        void                setValue( const Variant& value );
+        void                    setValue( const Variant& value );
 
     Q_SIGNALS:
 
         //! Emitted when the widget value was changed.
-        void                valueChanged( const Variant& value );
+        void                    valueChanged( const Variant& value );
 
     private Q_SLOTS:
 
-        //! Handles the spin box change and emits the valueChanged signal.
-        void                valueChanged( int value );
-    };
+        //! Emits the value changed signal with an active enum value converted to Variant.
+        void                    currentIndexChanged( const QString& value );
 
-    //! Widget to edit float and double properties
-    class DoubleEdit : public QDoubleSpinBox {
+    private:
 
-        Q_OBJECT
-        Q_PROPERTY( Variant value READ value WRITE setValue NOTIFY valueChanged USER true )
-
-    public:
-
-                            //! Constructs DoubleEdit instance.
-                            DoubleEdit( f64 min = -DBL_MAX, f64 max = DBL_MAX, f64 step = 1.0, QWidget* parent = NULL );
-
-        //! Returns current property value as Variant.
-        Variant             value( void ) const;
-
-        //! Sets property value from a Variant.
-        void                setValue( const Variant& value );
-
-    Q_SIGNALS:
-
-        //! Emitted when the widget value was changed.
-        void                valueChanged( const Variant& value );
-
-    private Q_SLOTS:
-
-        //! Handles the spin box change and emits the valueChanged signal.
-        void                valueChanged( double value );
+        const Reflection::Enum* m_enumeration;  //!< Enumeration meta-object.
     };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_SpinBoxes_H__	*/
+#endif	/*	!__DC_Composer_StringEdit_H__	*/

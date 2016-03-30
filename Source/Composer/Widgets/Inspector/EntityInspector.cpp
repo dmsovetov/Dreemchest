@@ -26,9 +26,9 @@
 
 #include "EntityInspector.h"
 #include "PropertyInspector.h"
-#include "Actions.h"
+#include "../Actions.h"
 
-#include "../Models/PropertyModel.h"
+#include "../../Models/PropertyModel.h"
 
 DC_BEGIN_COMPOSER
 

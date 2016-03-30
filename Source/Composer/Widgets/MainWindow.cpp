@@ -29,7 +29,7 @@
 #include "AssetTree.h"
 #include "Document.h"
 #include "SceneTree.h"
-#include "EntityInspector.h"
+#include "Inspector/EntityInspector.h"
 #include "Menu.h"
 #include "RenderingFrame.h"
 #include "Output.h"

@@ -26,13 +26,8 @@
 
 #include "PropertyInspector.h"
 
-#include "../Models/PropertyModel.h"
-#include "../Models/EnumerationModel.h"
-
-#include "Properties/VectorEdit.h"
-#include "Properties/StringEdit.h"
-#include "Properties/QuatEdit.h"
-#include "Properties/EnumEdit.h"
+#include "../../Models/PropertyModel.h"
+#include "../../Models/EnumerationModel.h"
 
 #define DEV_MINIMUM_LABEL_SIZE  (50)
 

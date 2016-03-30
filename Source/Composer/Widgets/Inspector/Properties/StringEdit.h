@@ -27,7 +27,7 @@
 #ifndef __DC_Composer_StringEdit_H__
 #define __DC_Composer_StringEdit_H__
 
-#include "../../Composer.h"
+#include "../../../Composer.h"
 
 DC_BEGIN_COMPOSER
 

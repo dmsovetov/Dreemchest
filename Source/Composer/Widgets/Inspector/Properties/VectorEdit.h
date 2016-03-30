@@ -27,7 +27,7 @@
 #ifndef __DC_Composer_VectorEdit_H__
 #define __DC_Composer_VectorEdit_H__
 
-#include "../../Composer.h"
+#include "../../../Composer.h"
 
 DC_BEGIN_COMPOSER
 

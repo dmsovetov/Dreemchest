@@ -27,7 +27,14 @@
 #ifndef __DC_Composer_PropertyInspector_H__
 #define __DC_Composer_PropertyInspector_H__
 
-#include "../Composer.h"
+#include "../../Composer.h"
+
+#include "Properties/ColorEdit.h"
+#include "Properties/QuatEdit.h"
+#include "Properties/StringEdit.h"
+#include "Properties/VectorEdit.h"
+#include "Properties/SpinBoxes.h"
+#include "Properties/EnumEdit.h"
 
 DC_BEGIN_COMPOSER
 

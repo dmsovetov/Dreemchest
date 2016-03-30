@@ -26,7 +26,7 @@
 
 #include "SceneEditor.h"
 #include "../Widgets/Menu.h"
-#include "../Widgets/EntityInspector.h"
+#include "../Widgets/Inspector/EntityInspector.h"
 #include "../Systems/Transform/TranslationTool.h"
 #include "../Systems/Transform/RotationTool.h"
 #include "../Systems/Transform/ArcballRotationTool.h"

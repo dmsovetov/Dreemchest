@@ -27,7 +27,7 @@
 #include "AssetTree.h"
 
 #include "Document.h"
-#include "EntityInspector.h"
+#include "Inspector/EntityInspector.h"
 #include "Menu.h"
 
 #include "../Models/PropertyModel.h"

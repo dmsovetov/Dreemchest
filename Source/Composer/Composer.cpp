@@ -31,12 +31,7 @@
 #include "Widgets/Menu.h"
 #include "Widgets/MainWindow.h"
 #include "Widgets/AssetTree.h"
-#include "Widgets/PropertyInspector.h"
-#include "Widgets/Properties/ColorEdit.h"
-#include "Widgets/Properties/QuatEdit.h"
-#include "Widgets/Properties/StringEdit.h"
-#include "Widgets/Properties/VectorEdit.h"
-#include "Widgets/Properties/SpinBoxes.h"
+#include "Widgets/Inspector/PropertyInspector.h"
 
 #include "Project/Project.h"
 
