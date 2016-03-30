@@ -81,6 +81,9 @@ namespace Scene {
 	class RenderParticles : public Ecs::Component<RenderParticles> {
 	};
 
+	//! Available light types.
+    NIMBLE_DECLARE_ENUM( LightType, Point, Spot, Directional )
+
 	//! Holds the light information.
 	class Light : public Ecs::Component<Light> {
 
@@ -93,22 +96,15 @@ namespace Scene {
 
 	public:
 
-		//! Available light types.
-		enum Type {
-			  Point
-			, Spot
-			, Directional
-		};
-
 									//! Constructs Light instance.
-									Light( Type type = Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
+									Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
 										: m_type( type ), m_color( color ), m_intensity( intensity ), m_range( range ) {}
 
 		//! Returns the light type.
-		Type						type( void ) const;
+		LightType				    type( void ) const;
 
 		//! Sets the light type.
-		void						setType( Type value );
+		void						setType( LightType value );
 
 		//! Returns the light color.
 		const Rgb&					color( void ) const;
@@ -138,7 +134,7 @@ namespace Scene {
 
 	private:
 
-		Type						m_type;			//!< Light type.
+		LightType				    m_type;			//!< Light type.
 		Rgb							m_color;		//!< Light color.
 		f32							m_intensity;	//!< Light intensity.
 		f32							m_range;		//!< Light influence range.

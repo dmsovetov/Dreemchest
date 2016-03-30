@@ -484,7 +484,7 @@ Ecs::ComponentPtr JsonSceneLoader::readRenderer( const Json::Value& value )
 // ** JsonSceneLoader::readLight
 Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 {
-	Light::Type types[] = { Light::Spot, Light::Directional, Light::Point };
+	LightType types[] = { LightType::Spot, LightType::Directional, LightType::Point };
 
 	Light* result = DC_NEW Light;
 	result->setColor( readRgb( value["color"] ) );

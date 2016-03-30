@@ -65,6 +65,7 @@
 
 #include <Reflection/MetaObject/Property.h>
 #include <Reflection/MetaObject/Class.h>
+#include <Reflection/MetaObject/Enum.h>
 
 #include "PlaneClipper.h"
 

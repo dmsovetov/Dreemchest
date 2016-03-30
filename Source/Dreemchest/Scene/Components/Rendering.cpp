@@ -37,13 +37,13 @@ namespace Scene {
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::type
-Light::Type Light::type( void ) const
+LightType Light::type( void ) const
 {
 	return m_type;
 }
 
 // ** Light::setType
-void Light::setType( Type value )
+void Light::setType( LightType value )
 {
 	m_type = value;
 }
