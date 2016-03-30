@@ -63,8 +63,8 @@
 #include <Fx/Zones.h>
 #include <Fx/Modules.h>
 
-#include <Introspection/Property.h>
-#include <Introspection/Introspection.h>
+#include <Reflection/Property.h>
+#include <Reflection/Reflection.h>
 
 #include "PlaneClipper.h"
 

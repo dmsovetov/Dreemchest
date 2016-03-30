@@ -37,7 +37,7 @@ PropertyModel::PropertyModel( Instance instance, MetaObject* metaObject, QObject
     DC_ABORT_IF( metaObject == NULL, "invalid metaobject passed" );
 
     for( s32 i = 0, n = metaObject->memberCount(); i < n; i++ ) {
-        Introspection::Member* member = metaObject->member( i );
+        Reflection::Member* member = metaObject->member( i );
         if( Property* property = member->asProperty() ) {
             m_properties.push_back( property );
         }

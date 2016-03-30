@@ -44,13 +44,13 @@ DC_BEGIN_COMPOSER
     public:
 
         //! Alias the Introspection::Property type.
-        typedef Introspection::Property     Property;
+        typedef Reflection::Property        Property;
 
         //! Alias the Introspection::Instance type.
-        typedef Introspection::Instance     Instance;
+        typedef Reflection::Instance        Instance;
 
         //! Alias the Introspection::MetaObject type.
-        typedef Introspection::MetaObject   MetaObject;
+        typedef Reflection::MetaObject      MetaObject;
 
         //! Container type to store an array of exposed properties.
         typedef QVector<Property*>          Properties;

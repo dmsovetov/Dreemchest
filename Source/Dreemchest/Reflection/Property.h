@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef __DC_Introspection_Property_H__
-#define __DC_Introspection_Property_H__
+#ifndef __DC_Reflection_Property_H__
+#define __DC_Reflection_Property_H__
 
-#include "Introspection.h"
+#include "Reflection.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
     //! Contains property meta-information like description, serialization flags, min/max range etc.
     struct PropertyInfo {
@@ -80,7 +80,7 @@ namespace Introspection {
 
         //! Generic property bound to a specified type.
         template<typename TObject, typename TValue, typename TPropertyValue>
-        class Property : public ::DC_DREEMCHEST_NS Introspection::Property {
+        class Property : public ::DC_DREEMCHEST_NS Reflection::Property {
         public:
 
             //! The property getter.
@@ -112,7 +112,7 @@ namespace Introspection {
         // ** Property::Property
         template<typename TObject, typename TValue, typename TPropertyValue>
         Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
-            : :: DC_DREEMCHEST_NS Introspection::Property( name, Type::fromClass<TValue>(), info )
+            : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
         {
@@ -153,8 +153,8 @@ namespace Introspection {
 
     } // namespace Private
 
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Introspection_Property_H__    */
+#endif    /*    !__DC_Reflection_Property_H__    */

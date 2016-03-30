@@ -31,7 +31,7 @@
 
 #include <Io/KeyValue.h>
 #include <Io/serialization/Serializable.h>
-#include <Introspection/Introspection.h>
+#include <Reflection/Reflection.h>
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
 #define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method

@@ -148,7 +148,7 @@ void PropertyInspector::mapModelToWidgets( void )
         index++;
 
         // Get the property info
-        const Introspection::PropertyInfo& info = property->info();
+        const Reflection::PropertyInfo& info = property->info();
 
 		// Get the property type & name
 		QString name = property->name();

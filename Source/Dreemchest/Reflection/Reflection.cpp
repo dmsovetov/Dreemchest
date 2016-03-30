@@ -24,11 +24,11 @@
 
  **************************************************************************/
 
-#include "Introspection.h"
+#include "Reflection.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
 // ------------------------------------------------------------- Member ------------------------------------------------------------- //
 
@@ -105,6 +105,6 @@ Member* MetaObject::findMember( CString name )
     return NULL;
 }
 
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST

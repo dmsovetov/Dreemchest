@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
 // -------------------------------------------------------------- PropertyInfo -------------------------------------------------------------- //
 
@@ -78,6 +78,6 @@ const PropertyInfo& Property::info( void ) const
     return m_info;
 }
 
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST
