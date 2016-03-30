@@ -49,7 +49,7 @@ namespace Reflection {
     public:
 
                                 //! Constructs the Property instance.
-                                Property( CString name, const Type* type, const PropertyInfo& info );
+                                Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info );
 
         //! This type can be type casted to a property.
         virtual const Property* isProperty( void ) const DC_DECL_OVERRIDE;
@@ -57,6 +57,9 @@ namespace Reflection {
 
         //! Returns the property value type.
         const Type*             type( void ) const;
+
+        //! Returns the property value meta-object.
+        const MetaObject*       metaObject( void ) const;
 
         //! Returns property information.
         const PropertyInfo&     info( void ) const;
@@ -72,8 +75,9 @@ namespace Reflection {
 
     private:
 
-        const Type*             m_type; //!< The property value type.
-        PropertyInfo            m_info; //!< Property information.
+        const MetaObject*       m_metaObject;   //!< The property value meta-object.
+        const Type*             m_type;         //!< The property value type.
+        PropertyInfo            m_info;         //!< Property information.
     };
 
     namespace Private {
@@ -112,7 +116,7 @@ namespace Reflection {
         // ** Property::Property
         template<typename TObject, typename TValue, typename TPropertyValue>
         Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
-            : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), info )
+            : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
         {

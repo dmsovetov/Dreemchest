@@ -47,8 +47,9 @@ PropertyInfo::PropertyInfo( CString description )
 // ----------------------------------------------------------------- Property ----------------------------------------------------------------- //
 
 // ** Property::Property
-Property::Property( CString name, const Type* type, const PropertyInfo& info )
+Property::Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info )
     : Member( name )
+    , m_metaObject( metaObject )
     , m_type( type )
     , m_info( info )
 {
@@ -70,6 +71,12 @@ Property* Property::isProperty( void )
 const Type* Property::type( void ) const
 {
     return m_type;
+}
+
+// ** Property::metaObject
+const MetaObject* Property::metaObject( void ) const
+{
+    return m_metaObject;
 }
 
 // ** Property::info
