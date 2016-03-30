@@ -149,49 +149,91 @@ void PropertyInspector::mapModelToWidgets( void )
         // Increase the widget mapper index
         index++;
 
-        // Get the property info
-        const Reflection::PropertyInfo& info = property->info();
+		// Format the property name
+        QString name = formatPropertyName( property );
 
-		// Get the property type & name
-		QString name = property->name();
-        name[0] = name[0].toUpper();
+        // Create a property editor
+        QWidget* editor = createPropertyEditor( property );
 
-        QWidget* widget = NULL;
-        const Reflection::MetaObject* metaObject = property->metaObject();
-
-        if( metaObject && metaObject->isEnum() ) {
-            // Construct combo box with enumeration model
-            widget = new EnumEdit( metaObject->isEnum() );
-        } else {
-            // Construct widget by a type name
-            widget = s_factory.construct( property->type() );
-        }
-
-        if( !widget ) {
-            LogWarning( "propertyInspector", "no widget registered for properties of type '%s'\n", property->type()->name() );
+        if( !editor ) {
+            LogWarning( "propertyInspector", "no editor registered for properties of type '%s'\n", property->type()->name() );
             continue;
         }
 
         // Connect to a widget's valueChanged signal
-        connect( widget, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
+        connect( editor, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
 
         // Add widget to layout and mapper
-		m_layout->addRow( name, widget );
-		m_mapper->addMapping( widget, index - 1 );
+		m_layout->addRow( name, editor );
+		m_mapper->addMapping( editor, index - 1 );
 
-        // Set the minimum size for a label widget
-        QWidget* label = m_layout->labelForField( widget );
-        label->setMinimumWidth( DEV_MINIMUM_LABEL_SIZE );
-
-        // Set the property tooltip
-        if( info.description ) {
-            label->setToolTip( info.description );
-        }
+        // Finish by label setup
+        setupLabel( property, editor );
 	}
 
 	// Finish construction
 	m_mapper->toFirst();
 	m_mapper->setSubmitPolicy( QDataWidgetMapper::AutoSubmit );
+}
+
+// ** PropertyInspector::formatPropertyName
+QString PropertyInspector::formatPropertyName( const Reflection::Property* property ) const
+{
+    // Get the property name
+    QString name = property->name();
+
+    // Convert the first letter to an upper case
+    name[0] = name[0].toUpper();
+
+    // Insert spaces before each capital letter except the first one
+    for( s32 i = 1; i < name.length(); i++ ) {
+        if( name[i].isUpper() ) {
+            name.insert( i, ' ' );
+        }
+    }
+
+    return name;
+}
+
+// ** PropertyInspector::createPropertyEditor
+QWidget* PropertyInspector::createPropertyEditor( const Reflection::Property* property ) const
+{
+    // First try to create an editor by a property type
+    if( QWidget* widget = s_factory.construct( property->type() ) ) {
+        return widget;
+    }
+
+    // Now get the property value meta-object
+    const Reflection::MetaObject* metaObject = property->metaObject();
+
+    // No meta-object found - just return a NULL pointer
+    if( metaObject == NULL ) {
+        return NULL;
+    }
+
+    // Create an enumeration editor for Enum meta-objects
+    if( const Reflection::Enum* enumeration = metaObject->isEnum() ) {
+        return new EnumEdit( enumeration );
+    }
+
+    // The property editor could not be created - return NULL pointer
+    return NULL;
+}
+
+// ** PropertyInspector::setupLabel
+void PropertyInspector::setupLabel( const Reflection::Property* property, QWidget* editor )
+{
+    // Set the minimum size for a label widget
+    QWidget* label = m_layout->labelForField( editor );
+    label->setMinimumWidth( DEV_MINIMUM_LABEL_SIZE );
+
+    // Get the property info
+    const Reflection::PropertyInfo& info = property->info();
+
+    // Set the property tooltip
+    if( info.description ) {
+        label->setToolTip( info.description );
+    }
 }
 
 } // namespace Ui

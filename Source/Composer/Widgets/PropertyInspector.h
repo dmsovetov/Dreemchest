@@ -58,6 +58,15 @@ namespace Ui {
         //! Builds form layout from a bound model.
         void                    mapModelToWidgets( void );
 
+        //! Converts the property name to a label text.
+        QString                 formatPropertyName( const Reflection::Property* property ) const;
+
+        //! Creates an editor widget for a specified property.
+        QWidget*                createPropertyEditor( const Reflection::Property* property ) const;
+
+        //! Setups the property label.
+        void                    setupLabel( const Reflection::Property* property, QWidget* editor );
+
     private:
 
         //! Factory type to construct inspector widgets.
