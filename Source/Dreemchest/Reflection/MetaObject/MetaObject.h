@@ -56,6 +56,51 @@ namespace Reflection {
         CString                 m_name; //!< The type name.
     };
 
+    namespace Private {
+
+        //! Forward declaration of an Enum template class.
+        template<typename T> class Enum;
+    
+        //! staticMetaObject function detector
+        NIMBLE_DECLARE_MEMBER_DETECTOR( staticMetaObject )
+
+        //! A helper type to detect meta-object associated with a class.
+        struct ClassMetaObject {
+            //! Returns the pointer to MetaObject instance embedded into a class.
+            template<typename U>
+            static NIMBLE_STATIC_IF( Has_staticMetaObject<U>, MetaObject* ) detectMetaObject( void )
+            {
+                return U::staticMetaObject();    
+            }
+
+            //! Returns a NULL pointer if the type T does not have a toString method.
+            template<typename U>
+            static NIMBLE_STATIC_IF( IsEnumClass<U>, MetaObject* ) detectMetaObject( void )
+            {
+                static Private::Enum<U> meta;
+                return &meta;
+            }
+        };
+
+        //! Returns NULL pointer for a primitive types.
+        struct PrimitiveMetaObject {
+            //! Just returns a NULL pointer for any primitive type.
+            template<typename U>
+            static MetaObject* detectMetaObject( void )
+            {
+                return NULL;
+            }           
+        };
+
+    } // namespace Private
+
+    //! Returns a pointer to a static MetaObject instance associated with a specified type.
+    template<typename T>
+    NIMBLE_INLINE MetaObject* staticMetaObject( void )
+    {
+        return TypeSelector<IsClassOrUnion<T>::value, Private::ClassMetaObject, Private::PrimitiveMetaObject>::type::detectMetaObject<T>();
+    }
+
 } // namespace Reflection
 
 DC_END_DREEMCHEST
