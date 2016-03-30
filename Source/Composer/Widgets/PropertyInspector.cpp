@@ -27,10 +27,12 @@
 #include "PropertyInspector.h"
 
 #include "../Models/PropertyModel.h"
+#include "../Models/EnumerationModel.h"
 
 #include "Properties/VectorEdit.h"
 #include "Properties/StringEdit.h"
 #include "Properties/QuatEdit.h"
+#include "Properties/EnumEdit.h"
 
 #define DEV_MINIMUM_LABEL_SIZE  (50)
 
@@ -154,8 +156,16 @@ void PropertyInspector::mapModelToWidgets( void )
 		QString name = property->name();
         name[0] = name[0].toUpper();
 
-        // Construct widget by a type name
-        QWidget* widget = s_factory.construct( property->type() );
+        QWidget* widget = NULL;
+        const Reflection::MetaObject* metaObject = property->metaObject();
+
+        if( metaObject && metaObject->isEnum() ) {
+            // Construct combo box with enumeration model
+            widget = new EnumEdit( metaObject->isEnum() );
+        } else {
+            // Construct widget by a type name
+            widget = s_factory.construct( property->type() );
+        }
 
         if( !widget ) {
             LogWarning( "propertyInspector", "no widget registered for properties of type '%s'\n", property->type()->name() );
