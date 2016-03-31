@@ -41,6 +41,7 @@ namespace Scene {
             , PROPERTY( position, position, setPosition, "The local position of this Transform relative to parent." )
             , PROPERTY( rotation, rotation, setRotation, "The local rotation of this Transform relative to parent." )
             , PROPERTY( scale,    scale,    setScale,    "The local scaling of this Transform relative to parent."  )
+            , PROPERTY( parent,   parent,   setParent,   "The parent Transform instance."                           )
             )
 
 	public:
