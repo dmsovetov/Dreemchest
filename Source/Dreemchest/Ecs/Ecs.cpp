@@ -408,6 +408,8 @@ EntityId EntityIdGenerator::generate( void )
 #endif
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 // ---------------------------------------------------------- SerializationContext ---------------------------------------------------------- //
 
 // ** SerializationContext::SerializationContext
@@ -443,6 +445,8 @@ EntityPtr SerializationContext::createEntity( const String& name ) const
 
     return m_ecs->createArchetypeByName( name );
 }
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Ecs
 

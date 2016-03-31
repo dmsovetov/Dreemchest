@@ -107,6 +107,7 @@ namespace Ecs {
 		EntityId			m_nextId;
 	};
 
+#if DEV_DEPRECATED_SERIALIZATION
     //! Ecs serialization context.
     class SerializationContext : public Composition {
     public:
@@ -144,6 +145,7 @@ namespace Ecs {
         DC_ABORT_IF( !instance.valid(), "archetype mismatch" );
         return instance;
     }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	//! Ecs is a root class of an entity component system.
 	class Ecs : public RefCounted {
