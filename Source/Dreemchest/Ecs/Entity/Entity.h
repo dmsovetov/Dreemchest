@@ -49,6 +49,9 @@ namespace Ecs {
 	*/
 	class Entity : public EntitySuperClass {
 	friend class Ecs;
+
+        INTROSPECTION( Entity )
+
 	public:
 
 		//! Available entity flags
