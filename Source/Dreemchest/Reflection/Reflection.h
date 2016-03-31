@@ -88,6 +88,7 @@ DC_END_DREEMCHEST
     #include "MetaObject/Property.h"
     #include "MetaObject/Class.h"
     #include "MetaObject/Enum.h"
+    #include "Serialization/Serializer.h"
 #endif  /*  !DC_BUILD_LIBRARY   */
 
 #endif    /*    !__DC_Reflection_H__    */
