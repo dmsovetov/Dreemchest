@@ -31,7 +31,9 @@
 
 #include <Io/KeyValue.h>
 #include <Io/serialization/Serializable.h>
+#include <Reflection/MetaObject/Property.h>
 #include <Reflection/MetaObject/Class.h>
+#include <Reflection/Serialization/Serializer.h>
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update
 #define DC_ECS_ENTITY_CLONING           (1) // Enables cloning entities with deepCopy method
@@ -358,6 +360,7 @@ namespace Ecs {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
+    #include "EntitySerializer.h"
 	#include "Component/Component.h"
 	#include "Entity/Entity.h"
 	#include "Entity/Aspect.h"
