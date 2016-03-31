@@ -50,7 +50,9 @@ namespace Ecs {
 	class Entity : public EntitySuperClass {
 	friend class Ecs;
 
-        INTROSPECTION( Entity )
+        INTROSPECTION( Entity
+            , PROPERTY( flags, flags, setFlags, "The entity flags." )
+            )
 
 	public:
 
