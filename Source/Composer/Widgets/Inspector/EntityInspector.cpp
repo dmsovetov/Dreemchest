@@ -252,7 +252,11 @@ Archive EntityInspector::saveState( void ) const
     Ecs::SerializationContext ctx( m_entity->ecs() );
     m_entity->serialize( ctx, state );
 #else
-    LogError( "entityInspector", "entity serialization is not implemented\n" );
+    Ecs::Serializer serializer( m_entity->ecs(), Ecs::Aspect::expandComponentBits<Editors::SceneEditorInternal>() );
+    KeyValue ar;
+    serializer.serialize( m_entity, ar );
+    state = Archive::fromValue( ar );
+    LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     return state;
 }
