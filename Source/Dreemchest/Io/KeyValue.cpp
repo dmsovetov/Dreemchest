@@ -126,7 +126,7 @@ Json::Value VariantTextStream::toJson( const Variant& value )
 		return json;
     }
     else {
-        DC_NOT_IMPLEMENTED;
+        LogWarning( "variantTextStream", "unhandled variant type '%s'\n", type->name() );
     }
 
 	return Json::Value::null;
@@ -444,7 +444,7 @@ Variant BinaryVariantStream::readValue( void )
 					}
 					break;
 
-	default:		DC_NOT_IMPLEMENTED;
+	default:		LogWarning( "binaryVariantStream", "unknown variant type id '%d'\n", type );
 	}
 
     return Variant();
@@ -554,7 +554,9 @@ BinaryVariantStream::Type BinaryVariantStream::valueType( const Variant& value )
     RETURN_TYPEID_IF( KeyValue, KeyValue, kObject );
     RETURN_TYPEID_IF( Guid, Guid, kGuid );
 
-    DC_NOT_IMPLEMENTED;
+    LogWarning( "binaryVariantStream", "unhandled variant type '%s'\n", type->name() );
+
+    //DC_NOT_IMPLEMENTED;
     return kNull;
 }
 
