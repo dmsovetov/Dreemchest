@@ -264,6 +264,8 @@ ScenePtr Scene::createFromFile( const Assets::Assets& assets, const String& file
 // ** Scene::createFromJson
 ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json )
 {
+#if DEV_DEPRECATED_SERIALIZATION
+
 #ifdef HAVE_JSON
 	// Create scene instance
 	ScenePtr scene( DC_NEW Scene );
@@ -280,7 +282,13 @@ ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json
 	LogError( "deserialize", "failed to load scene, built with no JSON support.\n" );
 	return ScenePtr();
 #endif	/*	HAVE_JSON	*/
+#else
+    DC_NOT_IMPLEMENTED;
+    return ScenePtr();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
+
+#if DEV_DEPRECATED_SERIALIZATION
 
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
@@ -762,6 +770,8 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 }
 
 #endif	/*	HAVE_JSON	*/
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Scene
 

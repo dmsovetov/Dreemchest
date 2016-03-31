@@ -248,32 +248,34 @@ void EntityInspector::setHasChanges( bool value )
 Archive EntityInspector::saveState( void ) const
 {
     Archive state;
+#if DEV_DEPRECATED_SERIALIZATION
     Ecs::SerializationContext ctx( m_entity->ecs() );
     m_entity->serialize( ctx, state );
+#else
+    LogError( "entityInspector", "entity serialization is not implemented\n" );
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     return state;
 }
 
 // ** EntityInspector::restoreState
 void EntityInspector::restoreState( const Archive& state )
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Remove all components from entity
     m_entity->clear();
 
     // Deserialize entity
     Ecs::SerializationContext ctx( m_entity->ecs() );
     m_entity->deserialize( ctx, state );
+#else
+    LogError( "entityInspector", "entity deserialization is not implemented\n" );
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** EntityInspector::buildComponentList
 Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
 {
     Ecs::ComponentWeakList list;
-
-
-    // Declare the comparator
-    struct LessThan {
-        static bool compare( Ecs::ComponentWPtr a, Ecs::ComponentWPtr b ) { return strcmp( a->typeName(), b->typeName() ) < 0; }
-    };
 
     // Add all components to a list
     Ecs::Entity::Components components = m_entity->components();
@@ -282,6 +284,11 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
     }
 
 #if 0
+    // Declare the comparator
+    struct LessThan {
+        static bool compare( Ecs::ComponentWPtr a, Ecs::ComponentWPtr b ) { return strcmp( a->typeName(), b->typeName() ) < 0; }
+    };
+
     // Sort list by a component name
     std::sort( list.begin(), list.end(), LessThan::compare );
 #else
@@ -334,7 +341,7 @@ void EntityInspector::refresh( void )
         connect( properties, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()) );
 
         // Add header item
-        m_layout->addWidget( new Header( createComponentMenu( component->typeIndex() ), component->typeName(), inspector ) );
+        m_layout->addWidget( new Header( createComponentMenu( component->typeIndex() ), component->metaObject()->name(), inspector ) );
 
         // Add component object inspector
         inspector->setModel( properties );

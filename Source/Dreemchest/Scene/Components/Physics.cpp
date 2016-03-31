@@ -100,6 +100,8 @@ void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& mater
 	addPart( part );
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 // ** Shape2D::serialize
 void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -162,6 +164,8 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
         DC_NOT_IMPLEMENTED;
     }
 }
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ----------------------------------------- RigidBody2D ----------------------------------------- //
 

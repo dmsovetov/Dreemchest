@@ -48,18 +48,26 @@ namespace Ecs {
 		IsEnabled = BIT( 31 )	//!< Indicates that a component is enabled.
 	};
 
+#if DEV_DEPRECATED_SERIALIZATION
+    typedef Io::Serializable ComponentSuperClass;
+#else
+    typedef RefCounted ComponentSuperClass;
+#endif  /*  #if !DEV_DEPRECATED_SERIALIZATION    */
+
 	//! A base class for all components.
 	/*!
 	A component is all the data for one aspect of the entity. Component is just a plain
 	data and doesn't contain any processing logic.
 	*/
-	class ComponentBase : public Io::Serializable {
+	class ComponentBase : public ComponentSuperClass {
 	friend class Entity;
 	public:
 
         INTROSPECTION( ComponentBase )
 
+                                #if DEV_DEPRECATED_SERIALIZATION
                                     ClassEnableTypeInfoSuper( ComponentBase, Io::Serializable )
+                                #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 									//! Constructs ComponentBase instance.
 									ComponentBase( void )
@@ -85,11 +93,23 @@ namespace Ecs {
         //! Returns parent entity instance.
         EntityWPtr                  entity( void ) const;
 
+        //! Generates component type index for a specified type.
+        template<typename T>
+        static TypeIdx              typeId( void ) { return GroupedTypeIndex<T, ComponentBase>::idx(); }
+
+    #if !DEV_DEPRECATED_SERIALIZATION
+        //! Returns component type index.
+        virtual TypeIdx             typeIndex( void ) const NIMBLE_ABSTRACT;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
     #if DC_ECS_ENTITY_CLONING
-        virtual ComponentPtr        deepCopy( void ) const;
+        //! Copies a component by value and returns a new instance.
+        virtual ComponentPtr        deepCopy( void ) const NIMBLE_ABSTRACT;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
 	#ifndef DC_ECS_NO_SERIALIZATION
+
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Reads component from a storage.
 		virtual void		        read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
 
@@ -101,6 +121,8 @@ namespace Ecs {
 
 		//! Reads this component from a key-value archive.
 		virtual void		        deserialize( SerializationContext& ctx, const Archive& ar );
+    #endif  /*  #if !DEV_DEPRECATED_SERIALIZATION   */
+
 	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	protected:
@@ -141,15 +163,9 @@ namespace Ecs {
 		return typename Internal<T>::Ptr();
 	}
 
-#if DC_ECS_ENTITY_CLONING
-    // ** ComponentBase::deepCopy
-    inline ComponentPtr ComponentBase::deepCopy( void ) const
-    {
-        return ComponentPtr();
-    }
-#endif  /*  DC_ECS_ENTITY_CLONING   */
-
 #ifndef DC_ECS_NO_SERIALIZATION
+
+#if DEV_DEPRECATED_SERIALIZATION
 	// ** ComponentBase::read
 	inline void ComponentBase::read( const Io::Storage* storage )
 	{
@@ -184,6 +200,8 @@ namespace Ecs {
 	{
 		LogWarning( "deserialize", "not implemented for component '%s'\n", typeName() );
 	}
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
 #endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 
 	// ** ComponentBase::flags
@@ -228,7 +246,9 @@ namespace Ecs {
 	class Component : public ComponentBase {
 	public:
 
+                            #if DEV_DEPRECATED_SERIALIZATION
 		                        ClassEnableTypeInfoSuper( T, ComponentBase )
+                            #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 
 		//! Weak pointer type.
@@ -237,7 +257,12 @@ namespace Ecs {
 		//! Strong pointer type.
 		typedef StrongPtr<T>	Ptr;
 
-		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( TypeIndex<T>::idx() ); return result; }
+    #if !DEV_DEPRECATED_SERIALIZATION
+        //! Returns component type index.
+        virtual TypeIdx         typeIndex( void ) const { return typeId<T>(); }
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
+		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( typeId<T>() ); return result; }
 
     #if DC_ECS_ENTITY_CLONING
         virtual ComponentPtr    deepCopy( void ) const DC_DECL_OVERRIDE;

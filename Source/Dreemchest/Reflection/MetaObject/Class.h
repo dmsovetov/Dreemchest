@@ -66,9 +66,6 @@ namespace Reflection {
         //! Returns the super class.
         const Class*            super( void ) const;
 
-        //! Returns the type name.
-        CString                 name( void ) const;
-
         //! Returns the total number of properties owned by introspected type.
         s32                     memberCount( void ) const;
 

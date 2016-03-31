@@ -137,6 +137,7 @@ struct Null : public Ecs::Component<Null> {};
 // ** SceneEditor::save
 void SceneEditor::save( void )
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Get the set of objects to be serialized
     Scene::SceneObjectSet objects = m_scene->findByAspect( Ecs::Aspect::exclude<Null>() );
 
@@ -158,11 +159,15 @@ void SceneEditor::save( void )
 
     // Write the serialized data to file
     qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::VariantTextStream::stringify( Variant::fromValue( kv ), true ) ) );
+#else
+    LogError( "sceneEditor", "scene serialization is not implemented\n" );
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::loadFromFile
 Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Create scene instance
     Scene::ScenePtr scene = Scene::Scene::create();
 
@@ -195,6 +200,10 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     }
 
     return scene;
+#else
+    LogError( "sceneEditor", "scene deserialization is not implemented\n" );
+    return Scene::Scene::create();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::navigateToObject

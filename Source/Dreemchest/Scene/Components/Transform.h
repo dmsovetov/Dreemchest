@@ -167,11 +167,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the transform data to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the transform data from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
@@ -221,11 +223,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the identifier to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the identifier from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 

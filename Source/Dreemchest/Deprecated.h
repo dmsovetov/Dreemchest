@@ -27,6 +27,8 @@
 #ifndef DEPRECATED_H
 #define DEPRECATED_H
 
+#define DEV_DEPRECATED_SERIALIZATION    (0)
+
 DC_BEGIN_DREEMCHEST
 
     template<class T>

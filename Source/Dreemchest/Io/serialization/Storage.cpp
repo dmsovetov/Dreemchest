@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 // ----------------------------------------BinaryStorage ------------------------------------------//
 
 // ** BinaryStorage::position
@@ -249,6 +251,8 @@ String JsonStorage::toString( void ) const
 }
 
 #endif
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

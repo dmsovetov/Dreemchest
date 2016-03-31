@@ -39,7 +39,7 @@ namespace Scene {
 // ** SpectatorCamera::construct
 void SpectatorCamera::construct( void )
 {
-	attach<Camera>( Camera::Perspective );
+	attach<Camera>( Projection::Perspective );
 	attach<Transform>();
 	attach<RotateAroundAxes>( 10.0f, CSLocalX, DC_NEW Vec3FromMouse )->setRangeForAxis( AxisX, Range( -90.0f, 90.0f ) );
 	attach<MoveAlongAxes>( 60.0f, CSLocal, new Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
@@ -155,7 +155,7 @@ SpectatorCameraPtr SpectatorCamera::create( const RenderTargetPtr& renderTarget,
 // ** Camera2D::construct
 void Camera2D::construct( void )
 {
-	attach<Camera>( Camera::OrthoCenter );
+	attach<Camera>( Projection::OrthoCenter );
 	attach<Transform>();
 }
 

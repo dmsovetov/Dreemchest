@@ -331,6 +331,8 @@ namespace Scene {
 		return m_ecs->createArchetype<TArchetype>( id, data );
 	}
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 #ifdef HAVE_JSON
 
 	//! Loads the scene from JSON file.
@@ -430,6 +432,8 @@ namespace Scene {
 	};
 
 #endif	/*	HAVE_JSON	*/
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Scene
 

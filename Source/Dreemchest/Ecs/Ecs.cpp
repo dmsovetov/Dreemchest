@@ -137,8 +137,12 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Load from data
 	if( data ) {
+    #if DEV_DEPRECATED_SERIALIZATION
         SerializationContext ctx( const_cast<Ecs*>( this ) );
 		instance->deserialize( ctx, *data );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 	return instance;
@@ -158,8 +162,12 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data
 
 	// Load from data
 	if( data ) {
+    #if DEV_DEPRECATED_SERIALIZATION
         SerializationContext ctx( const_cast<Ecs*>( this ) );
 		instance->deserialize( ctx, *data );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 	return instance;
