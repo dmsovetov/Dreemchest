@@ -335,7 +335,7 @@ void EntityInspector::refresh( void )
 
     foreach( Ecs::ComponentWPtr component, components ) {
         PropertyInspector* inspector  = new PropertyInspector( this );
-        PropertyModel*     properties = new PropertyModel( component->metaInstance(), component->metaObject(), inspector );
+        PropertyModel*     properties = new PropertyModel( component->metaInstance(), inspector );
 
         // Connect to a property modification signal
         connect( properties, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()) );

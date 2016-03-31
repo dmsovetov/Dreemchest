@@ -43,20 +43,20 @@ DC_BEGIN_COMPOSER
 
     public:
 
-        //! Alias the Introspection::Property type.
+        //! Alias the Reflection::Property type.
         typedef Reflection::Property        Property;
 
-        //! Alias the Introspection::Instance type.
-        typedef Reflection::Instance        Instance;
+        //! Alias the Reflection::MetaInstance type.
+        typedef Reflection::MetaInstance    MetaInstance;
 
-        //! Alias the Introspection::MetaObject type.
+        //! Alias the Reflection::MetaObject type.
         typedef Reflection::Class           Class;
 
         //! Container type to store an array of exposed properties.
-        typedef QVector<Property*>          Properties;
+        typedef QVector<const Property*>    Properties;
 
                                             //! Constructs PropertyModel instance.
-                                            PropertyModel( Instance instance, Class* metaObject, QObject* parent = NULL );
+                                            PropertyModel( MetaInstance instance, QObject* parent = NULL );
                                             ~PropertyModel( void );
 
         //! Returns an array of properties exposed by a model.
@@ -84,7 +84,7 @@ DC_BEGIN_COMPOSER
 
     private:
 
-        Instance                            m_instance;     //!< Object instance.
+        MetaInstance                        m_instance;     //!< Object instance.
         Properties                          m_properties;   //!< Properties exposed by an object.
     };
 

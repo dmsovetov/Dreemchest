@@ -122,13 +122,13 @@ DC_END_DREEMCHEST
             {                                                                                                       \
                 return type::staticMetaObject();                                                                    \
             }                                                                                                       \
-            virtual void* metaInstance( void )                                                                      \
+            virtual::DC_DREEMCHEST_NS Reflection:: MetaInstance metaInstance( void )                                \
             {                                                                                                       \
-                return this;                                                                                        \
+                return ::DC_DREEMCHEST_NS Reflection::MetaInstance( metaObject(), this );                           \
             }                                                                                                       \
-            virtual const void* metaInstance( void ) const                                                          \
+            virtual ::DC_DREEMCHEST_NS Reflection::MetaInstanceConst metaInstance( void ) const                     \
             {                                                                                                       \
-                return this;                                                                                        \
+                return ::DC_DREEMCHEST_NS Reflection::MetaInstanceConst( metaObject(), this );                      \
             }
 
 //! Embeds the instrospection as a static member.

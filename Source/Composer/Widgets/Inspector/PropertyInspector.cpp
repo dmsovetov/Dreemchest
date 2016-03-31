@@ -140,7 +140,7 @@ void PropertyInspector::mapModelToWidgets( void )
     int index = 0;
 
 	// Construct property widgets.
-	foreach( PropertyModel::Property* property, m_model->properties() ) {
+	foreach( const PropertyModel::Property* property, m_model->properties() ) {
         // Increase the widget mapper index
         index++;
 

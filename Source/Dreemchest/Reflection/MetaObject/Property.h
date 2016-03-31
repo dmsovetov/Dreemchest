@@ -52,8 +52,8 @@ namespace Reflection {
                                 Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info );
 
         //! This type can be type casted to a property.
-        virtual const Property* isProperty( void ) const DC_DECL_OVERRIDE;
-        virtual Property*       isProperty( void ) DC_DECL_OVERRIDE;
+        virtual const Property* isProperty( void ) const NIMBLE_OVERRIDE;
+        virtual Property*       isProperty( void ) NIMBLE_OVERRIDE;
 
         //! Returns the property value type.
         const Type*             type( void ) const;
@@ -65,13 +65,13 @@ namespace Reflection {
         const PropertyInfo&     info( void ) const;
     
         //! Sets the property value.
-        virtual void            set( Instance instance, const Variant& value ) = 0;
+        virtual void            set( MetaInstance instance, const Variant& value ) const NIMBLE_ABSTRACT;
 
         //! Sets the property value only if it will be changed.
-        virtual bool            update( Instance instance, const Variant& value ) = 0;
+        virtual bool            update( MetaInstance instance, const Variant& value ) const NIMBLE_ABSTRACT;
 
         //! Gets the property value.
-        virtual Variant         get( Instance instance ) const = 0;
+        virtual Variant         get( MetaInstanceConst instance ) const NIMBLE_ABSTRACT;
 
     private:
 
@@ -99,13 +99,13 @@ namespace Reflection {
         protected:
 
             //! Sets the property value.
-            virtual void            set( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
+            virtual void            set( MetaInstance instance, const Variant& value ) const NIMBLE_OVERRIDE;
 
             //! Sets the property value only if it will be changed.
-            virtual bool            update( Instance instance, const Variant& value ) DC_DECL_OVERRIDE;
+            virtual bool            update( MetaInstance instance, const Variant& value ) const NIMBLE_OVERRIDE;
 
             //! Gets the property value.
-            virtual Variant         get( Instance instance ) const DC_DECL_OVERRIDE;
+            virtual Variant         get( MetaInstanceConst instance ) const NIMBLE_OVERRIDE;
 
         private:
 
@@ -124,17 +124,17 @@ namespace Reflection {
 
         // ** Property::set
         template<typename TObject, typename TValue, typename TPropertyValue>
-        void Property<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value )
+        void Property<TObject, TValue, TPropertyValue>::set( MetaInstance instance, const Variant& value ) const
         {
             TValue v = value.as<TValue>();
-            (reinterpret_cast<TObject*>( instance )->*m_setter)( v );
+            (reinterpret_cast<TObject*>( instance.pointer )->*m_setter)( v );
         }
 
         // ** Property::update
         template<typename TObject, typename TValue, typename TPropertyValue>
-        bool Property<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value )
+        bool Property<TObject, TValue, TPropertyValue>::update( MetaInstance instance, const Variant& value ) const
         {
-            TObject* object = reinterpret_cast<TObject*>( instance );
+            TObject* object = reinterpret_cast<TObject*>( instance.pointer );
 
             TValue v = value.as<TValue>();
             TValue o = (object->*m_getter)();
@@ -149,9 +149,9 @@ namespace Reflection {
 
         // ** Property::get
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Variant Property<TObject, TValue, TPropertyValue>::get( Instance instance ) const
+        Variant Property<TObject, TValue, TPropertyValue>::get( MetaInstanceConst instance ) const
         {
-            TValue v = (reinterpret_cast<TObject*>( instance )->*m_getter)();
+            TValue v = (reinterpret_cast<const TObject*>( instance.pointer )->*m_getter)();
             return Variant::fromValue<TValue>( v );
         }
 

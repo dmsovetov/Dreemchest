@@ -42,7 +42,43 @@ namespace Reflection {
     class Property;
     struct PropertyInfo;
 
-    typedef void* Instance; //!< Instance is just a void pointer.
+    //! The MetaInstance class contains a pointer to an instance along with an associated meta-object.
+    struct MetaInstance {
+                                //! Constructs MetaInstance instance.
+                                MetaInstance( void )
+                                    : cls( NULL ), pointer( NULL ) {}
+
+                                //! Constructs MetaInstance instance.
+                                MetaInstance( const Class* cls, void* pointer )
+                                    : cls( cls ), pointer( pointer ) {}
+
+                                //! Returns true if this meta-instance is valid.
+                                operator bool( void ) const { return pointer != NULL && cls != NULL; }
+
+        const Class*            cls;        //!< Meta-class instance.
+        void*                   pointer;    //!< Object instance pointer.
+    };
+
+    //! The MetaInstance class contains a pointer to an instance along with an associated meta-object.
+    struct MetaInstanceConst {
+                                //! Constructs MetaInstanceConst instance.
+                                MetaInstanceConst( void )
+                                    : cls( NULL ), pointer( NULL ) {}
+
+                                //! Constructs MetaInstanceConst instance.
+                                MetaInstanceConst( const Class* cls, const void* pointer )
+                                    : cls( cls ), pointer( pointer ) {}
+
+                                //! Constructs MetaInstanceConst instance from MetaInstance.
+                                MetaInstanceConst( const MetaInstance& instance )
+                                    : cls( instance.cls ), pointer( instance.pointer ) {}
+
+                                //! Returns true if this meta-instance is valid.
+                                operator bool( void ) const { return pointer != NULL && cls != NULL; }
+
+        const Class*            cls;        //!< Meta-class instance.
+        const void*             pointer;    //!< Object instance pointer.
+    };
 
 } // namespace Reflection
 
