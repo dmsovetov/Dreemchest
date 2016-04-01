@@ -29,13 +29,13 @@
 DC_BEGIN_COMPOSER
 
 // ** PropertyModel::PropertyModel
-PropertyModel::PropertyModel( MetaInstance instance, QObject* parent )
+PropertyModel::PropertyModel( Instance instance, QObject* parent )
     : QAbstractItemModel( parent )
     , m_instance( instance )
 {
     DC_ABORT_IF( !instance, "invalid meta-instance passed" );
 
-    const Reflection::Class* metaClass = instance.cls;
+    const Reflection::Class* metaClass = instance.type();
 
     for( s32 i = 0, n = metaClass->memberCount(); i < n; i++ ) {
         const Reflection::Member* member = metaClass->member( i );
