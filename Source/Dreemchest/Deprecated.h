@@ -37,8 +37,6 @@ DC_BEGIN_DREEMCHEST
     template<typename T>
 	class Hash : public std::map<String64, T> {};
 
-    typedef String64 StringHash;
-
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;
 	typedef Variant			Archive;

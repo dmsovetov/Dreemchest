@@ -135,7 +135,7 @@ namespace Network {
 		typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
     
 		//! A container type to store all remote call handlers.
-		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
+		typedef Map< String32, AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
 		//! Container type to store active connections.
 		typedef Set<ConnectionPtr>						ConnectionSet;

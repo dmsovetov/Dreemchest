@@ -349,7 +349,7 @@ namespace mvvm {
 	void QtBindingFactory::registerBinding( const String& widgetProperty )
 	{
 		CString		  widgetName = TWidget::staticMetaObject.className();
-		WidgetTypeIdx widgetType = StringHash( widgetName );
+		WidgetTypeIdx widgetType = String64( widgetName );
 
 		BindingFactory::registerBinding<TBinding>( widgetType, widgetProperty );
 	}
