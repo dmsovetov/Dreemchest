@@ -236,7 +236,7 @@ namespace Network {
 	struct RemoteCall {
 		typedef TArgument Argument;
 		typedef TResponse Response;
-		static StringHash id( void ) { return StringHash( name() ); }
+		static String32   id( void ) { return String32( name() ); }
 		static CString    name( void ) { return TypeInfo<TRemoteCall>::name(); }
 	};
 

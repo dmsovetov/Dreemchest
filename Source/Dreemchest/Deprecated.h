@@ -32,11 +32,8 @@ DC_BEGIN_DREEMCHEST
     template<class T>
     using StrongPtr = Ptr<T>;
     
-    typedef String64 StringHash;
-    typedef StringHash::Type strhash;
-
     template<typename T>
-	class Hash : public std::map<strhash, T> {};
+	class Hash : public std::map<String64, T> {};
 
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;

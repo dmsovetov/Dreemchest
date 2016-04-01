@@ -313,7 +313,7 @@ WidgetTypeChain QtBindings::resolveWidgetTypeChain( const String& name ) const
 
 	while( metaObject ) {
 		CString className = metaObject->className();
-		result.push_back( StringHash( className ) );
+		result.push_back( String64( className ) );
 		metaObject = metaObject->superClass();
 	}
 

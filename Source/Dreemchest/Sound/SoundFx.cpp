@@ -89,7 +89,7 @@ SoundGroupWPtr SoundFx::createGroup( CString identifier )
     }
 
     SoundGroup* group = DC_NEW SoundGroup( identifier );
-    strhash     hash  = StringHash( identifier );
+    String64    hash( identifier );
 
     m_groups[hash] = group;
 
@@ -110,7 +110,7 @@ SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupW
 
     // ** Create a sound data instance
     SoundData* sound = DC_NEW SoundData( this, identifier, uri, group );
-    strhash    hash  = StringHash( identifier );
+    String64   hash( identifier );
 
     m_sounds[hash] = sound;
 
@@ -128,7 +128,7 @@ SoundEventWPtr SoundFx::createEvent( CString identifier )
     }
 
     SoundEvent* event = DC_NEW SoundEvent( identifier );
-    strhash     hash  = StringHash( identifier );
+    String64    hash( identifier );
 
     m_events[hash] = event;
 
@@ -151,7 +151,7 @@ void SoundFx::setDistanceModel( DistanceModel value )
 // ** SoundFx::findSoundByName
 SoundDataWPtr SoundFx::findSoundByName( CString identifier )
 {
-    Sounds::iterator i = m_sounds.find( StringHash( identifier ) );
+    Sounds::iterator i = m_sounds.find( String64( identifier ) );
 
     if( i != m_sounds.end() ) {
         return i->second;
@@ -164,7 +164,7 @@ SoundDataWPtr SoundFx::findSoundByName( CString identifier )
 void SoundFx::removeSoundByName( CString identifier )
 {
     DC_ABORT_IF( identifier == NULL, "invalid identifier" );
-    m_sounds.erase( StringHash( identifier ) );
+    m_sounds.erase( String64( identifier ) );
 }
 
 // ** SoundFx::renameSound
@@ -185,7 +185,7 @@ bool SoundFx::renameSound( CString identifier, CString newName )
     // Rename sound
     removeSoundByName( identifier );
 
-    strhash hash = StringHash( newName );
+    String64 hash( newName );
     sound->setIdentifier( newName );
 
     m_sounds[hash] = sound;
@@ -196,7 +196,7 @@ bool SoundFx::renameSound( CString identifier, CString newName )
 // ** SoundFx::findGroupByName
 SoundGroupWPtr SoundFx::findGroupByName( CString identifier )
 {
-    SoundGroups::iterator i = m_groups.find( StringHash( identifier ) );
+    SoundGroups::iterator i = m_groups.find( String64( identifier ) );
 
     if( i != m_groups.end() ) {
         return i->second;
@@ -209,7 +209,7 @@ SoundGroupWPtr SoundFx::findGroupByName( CString identifier )
 void SoundFx::removeGroupByName( CString identifier )
 {
     DC_ABORT_IF( identifier == NULL, "invalid identifier" );
-    m_groups.erase( StringHash( identifier ) );
+    m_groups.erase( String64( identifier ) );
 }
 
 // ** SoundFx::renameGroup
@@ -230,7 +230,7 @@ bool SoundFx::renameGroup( CString identifier, CString newName )
     // Rename group
     removeGroupByName( identifier );
 
-    strhash hash = StringHash( newName );
+    String64 hash = String64( newName );
     group->setIdentifier( newName );
     
     m_groups[hash] = group;
@@ -241,7 +241,7 @@ bool SoundFx::renameGroup( CString identifier, CString newName )
 // ** SoundFx::findEventByName
 SoundEventWPtr SoundFx::findEventByName( CString identifier )
 {
-    SoundEvents::iterator i = m_events.find( StringHash( identifier ) );
+    SoundEvents::iterator i = m_events.find( String64( identifier ) );
 
     if( i != m_events.end() ) {
         return i->second;

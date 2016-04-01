@@ -128,7 +128,7 @@ void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Pi
 void Application::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 {
 	// Find a remote call handler
-	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
+	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( String32( packet.method ) );
 
 	if( i == m_remoteCallHandlers.end() ) {
 		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
