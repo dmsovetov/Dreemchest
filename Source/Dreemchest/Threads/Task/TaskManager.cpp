@@ -159,7 +159,7 @@ void TaskManager::startTaskThread( const String& name, TaskQueueWPtr queue )
 {
     DC_ABORT_IF( queue == NULL, "invalid task queue" );
     
-    strhash       hash        = StringHash( name.c_str() );
+    String64      hash        = String64( name.c_str() );
     TaskThreadPtr taskThread  = DC_NEW TaskThread( name, queue );
     m_taskThreads[hash]		  = taskThread;
 }
