@@ -21,7 +21,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
 #include "Class.h"
@@ -48,8 +48,8 @@ CString Member::name( void ) const
 // ----------------------------------------------------------- Class ----------------------------------------------------------- //
 
 // ** Class::Class
-Class::Class( CString name, Member** members, s32 memberCount )
-    : MetaObject( name )
+Class::Class( CString name, const Type* type, Member** members, s32 memberCount )
+    : MetaObject( name, type )
     , m_super( NULL )
     , m_members( members )
     , m_memberCount( memberCount )
@@ -57,8 +57,8 @@ Class::Class( CString name, Member** members, s32 memberCount )
 }
 
 // ** Class::Class
-Class::Class( const Class* super, CString name, Member** members, s32 memberCount )
-    : MetaObject( name )
+Class::Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount )
+    : MetaObject( name, type )
     , m_super( super )
     , m_members( members )
     , m_memberCount( memberCount )

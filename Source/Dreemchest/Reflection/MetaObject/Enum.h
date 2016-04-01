@@ -38,8 +38,8 @@ namespace Reflection {
     public:
 
                             //! Constructs Enum instance.
-                            Enum( CString name )
-                                : MetaObject( name ) {}
+                            Enum( CString name, const Type* type )
+                                : MetaObject( name, type ) {}
 
         //! Returns the total number of entries inside this enumeration.
         virtual s32         size( void ) const NIMBLE_ABSTRACT;
@@ -84,7 +84,7 @@ namespace Reflection {
         // ** Enum::Enum
         template<typename TEnumClass>
         Enum<TEnumClass>::Enum( void )
-            : ::DC_DREEMCHEST_NS Reflection::Enum( TEnumClass::name() )
+            : ::DC_DREEMCHEST_NS Reflection::Enum( TEnumClass::name(), Type::fromClass<TEnumClass>() )
         {
         }
 

@@ -58,10 +58,10 @@ namespace Reflection {
     public:
 
                                 //! Constructs Class instance.
-                                Class( CString name, Member** members, s32 memberCount );
+                                Class( CString name, const Type* type, Member** members, s32 memberCount );
 
                                 //! Constructs Class instance with a super class.
-                                Class( const Class* super, CString name, Member** members, s32 memberCount );
+                                Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount );
 
         //! Returns the super class.
         const Class*            super( void ) const;

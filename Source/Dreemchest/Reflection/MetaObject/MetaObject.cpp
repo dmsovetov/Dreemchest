@@ -31,8 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Reflection {
 
 // ** MetaObject::MetaObject
-MetaObject::MetaObject( CString name )
+MetaObject::MetaObject( CString name, const Type* type )
     : m_name( name )
+    , m_type( type )
 {
 }
 
@@ -40,6 +41,12 @@ MetaObject::MetaObject( CString name )
 CString MetaObject::name( void ) const
 {
     return m_name;
+}
+
+// ** MetaObject::type
+const Type* MetaObject::type( void ) const
+{
+    return m_type;
 }
 
 } // namespace Reflection

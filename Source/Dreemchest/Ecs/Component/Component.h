@@ -63,7 +63,7 @@ namespace Ecs {
 	friend class Entity;
 	public:
 
-        INTROSPECTION( ComponentBase )
+        INTROSPECTION_ABSTRACT( ComponentBase )
 
                                 #if DEV_DEPRECATED_SERIALIZATION
                                     ClassEnableTypeInfoSuper( ComponentBase, Io::Serializable )
