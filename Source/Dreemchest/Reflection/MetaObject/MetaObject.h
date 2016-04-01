@@ -38,10 +38,13 @@ namespace Reflection {
     public:
 
                                 //! Constructs MetaObject instance.
-                                MetaObject( CString name );
+                                MetaObject( CString name, const Type* type );
 
         //! Returns the type name.
         CString                 name( void ) const;
+
+        //! Returns the instrospected type instance.
+        const Type*             type( void ) const;
 
         //! Returns an instance pointer type casted to Class or NULL, if the metaobject is not a class.
         virtual const Class*    isClass( void ) const { return NULL; }
@@ -54,6 +57,7 @@ namespace Reflection {
     private:
 
         CString                 m_name; //!< The type name.
+        const Type*             m_type; //!< The introspected type instance.
     };
 
     namespace Private {
