@@ -40,15 +40,15 @@ namespace Reflection {
         virtual                 ~Serializer( void ) {}
 
         //! Writes an object instance to a key-value storage.
-        virtual bool            serialize( MetaInstanceConst instance, KeyValue& ar ) const;
+        virtual bool            serialize( InstanceConst instance, KeyValue& ar ) const;
 
         //! Reads an object instance from a key-value storage.
-        virtual MetaInstance    deserialize( AssemblyWPtr assembly, const KeyValue& ar );
+        virtual Instance        deserialize( AssemblyWPtr assembly, const KeyValue& ar );
 
     protected:
 
         //! Reads instance properties from a key-value storage.
-        MetaInstance            createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
+        Instance                createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
     };
 
 } // namespace Reflection

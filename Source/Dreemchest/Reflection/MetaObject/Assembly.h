@@ -38,7 +38,7 @@ namespace Reflection {
     public:
 
         //! Creates a new class instance.
-        MetaInstance        createInstance( const String& name ) const;
+        Instance            createInstance( const String& name ) const;
 
         //! Adds new class to this assembly.
         template<typename TClass>

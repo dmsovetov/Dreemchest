@@ -29,18 +29,19 @@
 #include "../MetaObject/Assembly.h"
 #include "../MetaObject/Class.h"
 #include "../MetaObject/Property.h"
+#include "../MetaObject/Instance.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Reflection {
 
 // ** Serializer::serialize
-bool Serializer::serialize( MetaInstanceConst instance, KeyValue& ar ) const
+bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
 {
     DC_ABORT_IF( !instance, "invalid asset instance" );
 
     // Get the meta-class
-    const Class* cls = instance.cls;
+    const Class* cls = instance.type();
 
     // Write instance type
     ar.setValueAtKey( "class", Variant::fromValue( cls->name() ) );
@@ -58,7 +59,7 @@ bool Serializer::serialize( MetaInstanceConst instance, KeyValue& ar ) const
 }
 
 // ** Serializer::deserialize
-MetaInstance Serializer::deserialize( AssemblyWPtr assembly, const KeyValue& ar )
+Instance Serializer::deserialize( AssemblyWPtr assembly, const KeyValue& ar )
 {
     DC_ABORT_IF( !assembly.valid(), "invalid assembly" );
 
@@ -66,16 +67,16 @@ MetaInstance Serializer::deserialize( AssemblyWPtr assembly, const KeyValue& ar 
     String name = ar.get<String>( "class" );
 
     // Create and read instance
-    MetaInstance instance = createAndDeserialize( assembly, name, ar );
+    Instance instance = createAndDeserialize( assembly, name, ar );
 
     return instance;
 }
 
 // ** Serializer::createAndDeserialize
-MetaInstance Serializer::createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const
+Instance Serializer::createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const
 {
     // Construct class instance by name
-    MetaInstance instance = assembly->createInstance( name );
+    Instance instance = assembly->createInstance( name );
 
     if( !instance ) {
         LogError( "serializer", "failed to create instance of '%s'\n", name.c_str() );
@@ -83,7 +84,7 @@ MetaInstance Serializer::createAndDeserialize( AssemblyWPtr assembly, const Stri
     }
 
     // Get the meta-class from instance
-    const Class* cls = instance.cls;
+    const Class* cls = instance.type();
 
     // Now read instance properties
     for( s32 i = 0, n = cls->memberCount(); i < n; i++ ) {

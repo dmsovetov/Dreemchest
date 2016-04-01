@@ -46,8 +46,8 @@ DC_BEGIN_COMPOSER
         //! Alias the Reflection::Property type.
         typedef Reflection::Property        Property;
 
-        //! Alias the Reflection::MetaInstance type.
-        typedef Reflection::MetaInstance    MetaInstance;
+        //! Alias the Reflection::Instance type.
+        typedef Reflection::Instance        Instance;
 
         //! Alias the Reflection::MetaObject type.
         typedef Reflection::Class           Class;
@@ -56,7 +56,7 @@ DC_BEGIN_COMPOSER
         typedef QVector<const Property*>    Properties;
 
                                             //! Constructs PropertyModel instance.
-                                            PropertyModel( MetaInstance instance, QObject* parent = NULL );
+                                            PropertyModel( Instance instance, QObject* parent = NULL );
                                             ~PropertyModel( void );
 
         //! Returns an array of properties exposed by a model.
@@ -84,7 +84,7 @@ DC_BEGIN_COMPOSER
 
     private:
 
-        MetaInstance                        m_instance;     //!< Object instance.
+        Instance                            m_instance;     //!< Object instance.
         Properties                          m_properties;   //!< Properties exposed by an object.
     };
 

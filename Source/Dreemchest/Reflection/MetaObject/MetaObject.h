@@ -126,52 +126,64 @@ DC_END_DREEMCHEST
             {                                                                                                       \
                 return type::staticMetaObject();                                                                    \
             }                                                                                                       \
-            virtual::DC_DREEMCHEST_NS Reflection:: MetaInstance metaInstance( void )                                \
+            virtual::DC_DREEMCHEST_NS Reflection::Instance metaInstance( void )                                     \
             {                                                                                                       \
-                return ::DC_DREEMCHEST_NS Reflection::MetaInstance( metaObject(), this );                           \
+                return ::DC_DREEMCHEST_NS Reflection::Instance( metaObject(), this );                               \
             }                                                                                                       \
-            virtual ::DC_DREEMCHEST_NS Reflection::MetaInstanceConst metaInstance( void ) const                     \
+            virtual ::DC_DREEMCHEST_NS Reflection::InstanceConst metaInstance( void ) const                         \
             {                                                                                                       \
-                return ::DC_DREEMCHEST_NS Reflection::MetaInstanceConst( metaObject(), this );                      \
+                return ::DC_DREEMCHEST_NS Reflection::InstanceConst( metaObject(), this );                          \
             }
 
 //! Embeds the instrospection as a static member.
-#define INTROSPECTION( type, ... )                                                                                          \
-            public:                                                                                                         \
-            _INSTROSPECTION_ACCESSOR( type )                                                                                \
-            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                           \
-            {                                                                                                               \
-                DC_USE_DREEMCHEST                                                                                           \
-                typedef type Object;                                                                                        \
-                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                     \
-                static Reflection::Class meta( #type, Type::fromClass<type>(), m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );   \
-                return &meta;                                                                                               \
+#define INTROSPECTION( type, ... )                                                                                              \
+            public:                                                                                                             \
+            _INSTROSPECTION_ACCESSOR( type )                                                                                    \
+            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                               \
+            {                                                                                                                   \
+                DC_USE_DREEMCHEST                                                                                               \
+                typedef type Object;                                                                                            \
+                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                         \
+                static Reflection::Class meta( #type, Type::fromClass<type>(), m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );       \
+                return &meta;                                                                                                   \
+            }                                                                                                                   \
+            virtual ::DC_DREEMCHEST_NS Reflection::Instance upcast( const ::DC_DREEMCHEST_NS Reflection::Class* target ) {      \
+                return ::DC_DREEMCHEST_NS Reflection::Instance();                                                               \
             }
 
 //! Embeds the interface instrospection as a static member.
-#define INTROSPECTION_ABSTRACT( type, ... )                                                                                 \
-            public:                                                                                                         \
-            _INSTROSPECTION_ACCESSOR( type )                                                                                \
-            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                           \
-            {                                                                                                               \
-                DC_USE_DREEMCHEST                                                                                           \
-                typedef type Object;                                                                                        \
-                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                     \
-                static Reflection::Class meta( #type, NULL, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );                      \
-                return &meta;                                                                                               \
+#define INTROSPECTION_ABSTRACT( type, ... )                                                                                     \
+            public:                                                                                                             \
+            _INSTROSPECTION_ACCESSOR( type )                                                                                    \
+            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                               \
+            {                                                                                                                   \
+                DC_USE_DREEMCHEST                                                                                               \
+                typedef type Object;                                                                                            \
+                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                         \
+                static Reflection::Class meta( #type, NULL, m + 1, sizeof( m ) / sizeof( m[0] ) - 1 );                          \
+                return &meta;                                                                                                   \
+            }                                                                                                                   \
+            virtual ::DC_DREEMCHEST_NS Reflection::Instance upCast( const ::DC_DREEMCHEST_NS Reflection::Class* target ) {      \
+                return ::DC_DREEMCHEST_NS Reflection::Instance();                                                               \
             }
 
 //! Embeds the instrospection as a static member with a specified super class.
-#define INTROSPECTION_SUPER( type, super, ... )                                                                             \
-            public:                                                                                                         \
-            _INSTROSPECTION_ACCESSOR( type )                                                                                \
-            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                           \
-            {                                                                                                               \
-                DC_USE_DREEMCHEST                                                                                           \
-                typedef type Object;                                                                                        \
-                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                     \
+#define INTROSPECTION_SUPER( type, super, ... )                                                                                 \
+            public:                                                                                                             \
+            _INSTROSPECTION_ACCESSOR( type )                                                                                    \
+            static ::DC_DREEMCHEST_NS Reflection::Class* staticMetaObject( void )                                               \
+            {                                                                                                                   \
+                DC_USE_DREEMCHEST                                                                                               \
+                typedef type Object;                                                                                            \
+                static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                         \
                 static Reflection::Class meta( super::staticMetaObject(), #type, Type::fromClass<type>(), m + 1, sizeof( m ) / sizeof( m[0] ) - 1 ); \
-                return &meta;                                                                                               \
+                return &meta;                                                                                                   \
+            }                                                                                                                   \
+            virtual ::DC_DREEMCHEST_NS Reflection::Instance upCast( const ::DC_DREEMCHEST_NS Reflection::Class* target ) {      \
+                if( staticMetaObject() == target ) {                                                                            \
+                    return ::DC_DREEMCHEST_NS Reflection::Instance( target, this );                                             \
+                }                                                                                                               \
+                return super::upCast( target );                                                                                 \
             }
 
 //! Adds the property member to an introspection.

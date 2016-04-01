@@ -94,7 +94,8 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
         }
 
         // Create and read component instance
-        Reflection::MetaInstance component = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
+        Reflection::Instance component = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
+
 	}
 
     return true;
