@@ -37,7 +37,7 @@ namespace Scene {
 	//! Scene object transformation component.
 	class Transform : public Ecs::Component<Transform> {
 
-        INTROSPECTION( Transform
+        INTROSPECTION_SUPER( Transform, Ecs::ComponentBase
             , PROPERTY( position, position, setPosition, "The local position of this Transform relative to parent." )
             , PROPERTY( rotation, rotation, setRotation, "The local rotation of this Transform relative to parent." )
             , PROPERTY( scale,    scale,    setScale,    "The local scaling of this Transform relative to parent."  )
@@ -206,7 +206,7 @@ namespace Scene {
 	//! Identifier component.
 	class Identifier : public Ecs::Component<Identifier> {
 
-        INTROSPECTION( Identifier
+        INTROSPECTION_SUPER( Identifier, Ecs::ComponentBase
             , PROPERTY( name, name, setName, "The entity identifier value." )
             )
 

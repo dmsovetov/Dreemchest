@@ -87,7 +87,7 @@ namespace Scene {
 	//! Holds the light information.
 	class Light : public Ecs::Component<Light> {
 
-        INTROSPECTION( Light
+        INTROSPECTION_SUPER( Light, Ecs::ComponentBase
             , PROPERTY( type,      type,      setType,      "The light type."            )
             , PROPERTY( color,     color,     setColor,     "The light color."           )
             , PROPERTY( intensity, intensity, setIntensity, "The light intensity."       )
@@ -145,7 +145,7 @@ namespace Scene {
 	//! Holds the static mesh data with per-instance materials.
 	class StaticMesh : public Ecs::Component<StaticMesh> {
 
-        INTROSPECTION( StaticMesh
+        INTROSPECTION_SUPER( StaticMesh, Ecs::ComponentBase
             , PROPERTY( mesh, mesh, setMesh, "The mesh asset ")
             )
 
@@ -260,7 +260,7 @@ namespace Scene {
 	//! Camera component.
 	class Camera : public Ecs::Component<Camera> {
 
-        INTROSPECTION( Camera
+        INTROSPECTION_SUPER( Camera, Ecs::ComponentBase
             , PROPERTY( projection,  projection, setProjection, "The camera projection."            )
             , PROPERTY( clearColor,  clearColor, setClearColor, "The viewport clear color."         )
             , PROPERTY( fieldOfView, fov,        setFov,        "The camera field of view."         )
