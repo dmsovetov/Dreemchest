@@ -253,10 +253,19 @@ Archive EntityInspector::saveState( void ) const
     m_entity->serialize( ctx, state );
 #else
     Ecs::Serializer serializer( m_entity->ecs(), Ecs::Aspect::expandComponentBits<Editors::SceneEditorInternal>() );
+    Reflection::AssemblyPtr assembly = Reflection::Assembly::create();
+
+    assembly->registerClass<Scene::Transform>();
+    //assembly->registerClass<Scene::Identifier>();
+    assembly->registerClass<Scene::StaticMesh>();
+
     KeyValue ar;
     serializer.serialize( m_entity, ar );
     state = Archive::fromValue( ar );
     LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
+
+    Ecs::EntityPtr e = m_entity->ecs()->createEntity();
+    serializer.deserialize( assembly, e, ar );
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     return state;
 }
