@@ -66,7 +66,7 @@ Instance::Instance( void )
 }
 
 // ** Instance::Instance
-Instance::Instance( const Class* cls, const void* pointer )
+Instance::Instance( const Class* cls, void* pointer )
     : InstanceConst( cls, pointer )
 {
 }

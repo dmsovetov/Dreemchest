@@ -49,16 +49,13 @@ namespace Reflection {
                                 //! Returns true if this meta-instance is valid.
                                 operator bool( void ) const;
 
-        //! Performs a down-cast of this instance.
-        template<typename TClass>
-        const TClass*           downCast( void ) const;
-
         //! Performs an up-cast of this instance.
         template<typename TClass>
         const TClass*           upCast( void ) const;
 
-        //! Returns an instance pointer.
-        const void*             pointer( void ) const;
+        //! Returns an instance pointer if it matches the specified class.
+        template<typename TClass>
+        const TClass*           pointer( void ) const;
 
         //! Returns meta-class instance pointer.
         const Class*            type( void ) const;
@@ -69,30 +66,47 @@ namespace Reflection {
         const void*             m_pointer;  //!< Object instance pointer.
     };
 
-    // ** InstanceConst::downCast
-    template<typename TClass>
-    const TClass* InstanceConst::downCast( void ) const
-    {
-        return NULL;
-    }
-
     // ** InstanceConst::upCast
     template<typename TClass>
     const TClass* InstanceConst::upCast( void ) const
     {
-        return NULL;
-    }
+        DC_ABORT_IF( m_pointer == NULL, "invalid instance" );
+        DC_ABORT_IF( m_class == NULL, "invalid instance" );
 
-    // ** InstanceConst::pointer
-    NIMBLE_INLINE const void* InstanceConst::pointer( void ) const
-    {
-        return m_pointer;
+        // Start from a current class and instance pointer.
+        const Class*  current  = m_class;
+        InstanceConst instance = *this;
+
+        // Keep going up until the target class encountered
+        const Class* target   = TClass::staticMetaObject();
+        
+        // Move up until the top of a hill reached
+        while( instance ) {
+            // Target class reached - return current instance
+            if( target == current ) {
+                return instance.pointer<TClass>();
+            }
+
+            // Cast to a base class
+            instance = current->upCast( instance );
+            current  = instance.type();
+        }
+
+        return NULL;
     }
 
     // ** InstanceConst::type
     NIMBLE_INLINE const Class* InstanceConst::type( void ) const
     {
         return m_class;
+    }
+
+    // ** InstanceConst::pointer
+    template<typename TClass>
+    NIMBLE_INLINE const TClass* InstanceConst::pointer( void ) const
+    {
+        DC_ABORT_IF( m_class != TClass::staticMetaObject(), "unexpected instance type" );
+        return reinterpret_cast<const TClass*>( m_pointer );
     }
 
     //! The Instance class contains a pointer to an instance along with an associated meta-object.
@@ -103,26 +117,16 @@ namespace Reflection {
                                 Instance( void );
 
                                 //! Constructs Instance instance.
-                                Instance( const Class* cls, const void* pointer );
-
-        //! Performs a down-cast of this instance.
-        template<typename TClass>
-        TClass*                 downCast( void ) const;
+                                Instance( const Class* cls, void* pointer );
 
         //! Performs an up-cast of this instance.
         template<typename TClass>
         TClass*                 upCast( void ) const;
 
-        //! Returns an instance pointer.
-        void*                   pointer( void ) const;
+        //! Returns an instance pointer if it matches the specified class.
+        template<typename TClass>
+        TClass*                 pointer( void ) const;
     };
-
-    // ** Instance::downCast
-    template<typename TClass>
-    NIMBLE_INLINE TClass* Instance::downCast( void ) const
-    {
-        return const_cast<TClass*>( InstanceConst::downCast<TClass>() );
-    }
 
     // ** Instance::upCast
     template<typename TClass>
@@ -132,10 +136,22 @@ namespace Reflection {
     }
 
     // ** Instance::pointer
-    NIMBLE_INLINE void* Instance::pointer( void ) const
+    template<typename TClass>
+    NIMBLE_INLINE TClass* Instance::pointer( void ) const
     {
-        return const_cast<void*>( m_pointer );
+        return const_cast<TClass*>( InstanceConst::pointer<TClass>() );
     }
+
+    namespace Private {
+    
+        //! Performs an type casting between types.
+        template<typename TFrom, typename TTo>
+        InstanceConst typeCast( const InstanceConst& instance )
+        {
+            return InstanceConst( TTo::staticMetaObject(), static_cast<const TTo*>( instance.pointer<TFrom>() ) );
+        }
+
+    } // namespace Private
 
 } // namespace Reflection
 

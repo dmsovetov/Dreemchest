@@ -57,11 +57,14 @@ namespace Reflection {
     class Class : public MetaObject {
     public:
 
+        //! An up-cast function prototype.
+        typedef InstanceConst ( *UpCast )( const InstanceConst& instance );
+
                                 //! Constructs Class instance.
                                 Class( CString name, const Type* type, Member** members, s32 memberCount );
 
                                 //! Constructs Class instance with a super class.
-                                Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount );
+                                Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount, UpCast upCast );
 
         //! Returns the super class.
         const Class*            super( void ) const;
@@ -77,6 +80,9 @@ namespace Reflection {
         const Member*           findMember( CString name ) const;
         Member*                 findMember( CString name );
 
+        //! Performs an upcast of an instance pointer.
+        InstanceConst           upCast( const InstanceConst& instance ) const;
+
         //! Returns an instance pointer type casted to Class or NULL, if the metaobject is not a class.
         virtual const Class*    isClass( void ) const NIMBLE_OVERRIDE;
         virtual Class*          isClass( void ) NIMBLE_OVERRIDE;
@@ -86,6 +92,7 @@ namespace Reflection {
         const Class*            m_super;        //!< Base class of an introspected type.
         Member**                m_members;      //!< All members exposed by data type.
         s32                     m_memberCount;  //!< The total number of members.
+        UpCast                  m_upCast;       //!< Performs an up-casting of an instance pointer.
     };
 
     namespace Private {

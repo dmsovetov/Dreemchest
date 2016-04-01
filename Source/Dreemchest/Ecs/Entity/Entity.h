@@ -49,6 +49,9 @@ namespace Ecs {
 	*/
 	class Entity : public EntitySuperClass {
 	friend class Ecs;
+    #if !DEV_DEPRECATED_SERIALIZATION
+        friend class Serializer;
+    #endif  /*  #if !DEV_DEPRECATED_SERIALIZATION    */
 
         INTROSPECTION_ABSTRACT( Entity
             , PROPERTY( flags, flags, setFlags, "The entity flags." )

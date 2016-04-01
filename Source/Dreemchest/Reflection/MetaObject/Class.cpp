@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Class.h"
+#include "Instance.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -53,15 +54,17 @@ Class::Class( CString name, const Type* type, Member** members, s32 memberCount 
     , m_super( NULL )
     , m_members( members )
     , m_memberCount( memberCount )
+    , m_upCast( NULL )
 {
 }
 
 // ** Class::Class
-Class::Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount )
+Class::Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount, UpCast upCast )
     : MetaObject( name, type )
     , m_super( super )
     , m_members( members )
     , m_memberCount( memberCount )
+    , m_upCast( upCast )
 {
 }
 
@@ -107,6 +110,12 @@ Member* Class::member( s32 index )
 const Member* Class::findMember( CString name ) const
 {
     return const_cast<Class*>( this )->findMember( name );
+}
+
+// ** Class::upCast
+InstanceConst Class::upCast( const InstanceConst& instance ) const
+{
+    return m_upCast ? m_upCast( instance ) : InstanceConst();
 }
 
 // ** Class::findMember

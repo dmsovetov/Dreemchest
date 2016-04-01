@@ -127,14 +127,14 @@ namespace Reflection {
         void Property<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value ) const
         {
             TValue v = value.as<TValue>();
-            (reinterpret_cast<TObject*>( instance.pointer() )->*m_setter)( v );
+            (instance.pointer<TObject>()->*m_setter)( v );
         }
 
         // ** Property::update
         template<typename TObject, typename TValue, typename TPropertyValue>
         bool Property<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value ) const
         {
-            TObject* object = reinterpret_cast<TObject*>( instance.pointer() );
+            TObject* object = instance.pointer<TObject>();
 
             TValue v = value.as<TValue>();
             TValue o = (object->*m_getter)();
@@ -151,7 +151,7 @@ namespace Reflection {
         template<typename TObject, typename TValue, typename TPropertyValue>
         Variant Property<TObject, TValue, TPropertyValue>::get( InstanceConst instance ) const
         {
-            TValue v = (reinterpret_cast<const TObject*>( instance.pointer() )->*m_getter)();
+            TValue v = (instance.pointer<TObject>()->*m_getter)();
             return Variant::fromValue<TValue>( v );
         }
 

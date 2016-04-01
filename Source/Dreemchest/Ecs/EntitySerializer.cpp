@@ -48,6 +48,17 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
         return false;
     }
 
+    // Read entity identfier
+    String id = ar.get<String>( "id" );
+    if( id.empty() ) {
+        LogWarning( "serializer", "invalid entity identifier\n" );
+    } else {
+        entity->setId( id );
+    }
+
+    // Read entity flags & identifier
+    entity->setFlags( ar.get<u8>( "flags", 0 ) );
+
     // Get entity components
     const Entity::Components& components = entity->components();
 
@@ -94,8 +105,21 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
         }
 
         // Create and read component instance
-        Reflection::Instance component = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
+        Reflection::Instance instance = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
 
+        if( !instance ) {
+            continue;
+        }
+
+        // Down-cast instance to an abstract component
+        ComponentBase* component = instance.upCast<ComponentBase>();
+
+        if( !component ) {
+            LogError( "serializer", "'%s' is not a subclass of component\n", i->first.c_str() );
+            continue;           
+        }
+
+        entity->attachComponent( component );
 	}
 
     return true;
