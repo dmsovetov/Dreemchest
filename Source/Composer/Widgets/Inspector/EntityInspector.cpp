@@ -256,7 +256,7 @@ Archive EntityInspector::saveState( void ) const
     Reflection::AssemblyPtr assembly = Reflection::Assembly::create();
 
     assembly->registerClass<Scene::Transform>();
-    //assembly->registerClass<Scene::Identifier>();
+    assembly->registerClass<Scene::Identifier>();
     assembly->registerClass<Scene::StaticMesh>();
 
     KeyValue ar;
@@ -266,6 +266,12 @@ Archive EntityInspector::saveState( void ) const
 
     Ecs::EntityPtr e = m_entity->ecs()->createEntity();
     serializer.deserialize( assembly, e, ar );
+
+    {
+        KeyValue ar;
+        serializer.serialize( e, ar );
+        LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
+    }
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     return state;
 }
