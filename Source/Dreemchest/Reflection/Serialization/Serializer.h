@@ -43,7 +43,12 @@ namespace Reflection {
         virtual bool            serialize( MetaInstanceConst instance, KeyValue& ar ) const;
 
         //! Reads an object instance from a key-value storage.
-        virtual MetaInstance    deserialize( const KeyValue& ar );
+        virtual MetaInstance    deserialize( AssemblyWPtr assembly, const KeyValue& ar );
+
+    protected:
+
+        //! Reads instance properties from a key-value storage.
+        MetaInstance            createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
     };
 
 } // namespace Reflection

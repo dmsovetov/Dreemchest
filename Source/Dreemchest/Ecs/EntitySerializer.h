@@ -44,7 +44,7 @@ namespace Ecs {
         virtual bool                        serialize( EntityWPtr entity, KeyValue& ar ) const;
 
         //! Creates entity and reads it from a key-value storage.
-        virtual bool                        deserialize( EntityWPtr entity, const KeyValue& ar );
+        virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
     private:
 

@@ -26,6 +26,7 @@
 
 #include "Serializer.h"
 
+#include "../MetaObject/Assembly.h"
 #include "../MetaObject/Class.h"
 #include "../MetaObject/Property.h"
 
@@ -57,9 +58,50 @@ bool Serializer::serialize( MetaInstanceConst instance, KeyValue& ar ) const
 }
 
 // ** Serializer::deserialize
-MetaInstance Serializer::deserialize( const KeyValue& ar )
+MetaInstance Serializer::deserialize( AssemblyWPtr assembly, const KeyValue& ar )
 {
-    return MetaInstance();
+    DC_ABORT_IF( !assembly.valid(), "invalid assembly" );
+
+    // Read an instance type
+    String name = ar.get<String>( "class" );
+
+    // Create and read instance
+    MetaInstance instance = createAndDeserialize( assembly, name, ar );
+
+    return instance;
+}
+
+// ** Serializer::createAndDeserialize
+MetaInstance Serializer::createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const
+{
+    // Construct class instance by name
+    MetaInstance instance = assembly->createInstance( name );
+
+    if( !instance ) {
+        LogError( "serializer", "failed to create instance of '%s'\n", name.c_str() );
+        return instance;
+    }
+
+    // Get the meta-class from instance
+    const Class* cls = instance.cls;
+
+    // Now read instance properties
+    for( s32 i = 0, n = cls->memberCount(); i < n; i++ ) {
+        const Member* member = cls->member( i );
+
+        if( const Property* property = member->isProperty() ) {
+            const Variant& value = ar.valueAtKey( member->name() );
+
+            if( !value.isValid() ) {
+                LogWarning( "serializer", "property '%s' of type '%s' does not exist inside a key-value storage\n", member->name(), cls->name() );
+                continue;
+            }
+
+            property->set( instance, value );
+        }
+    }
+
+    return instance;
 }
 
 } // namespace Reflection

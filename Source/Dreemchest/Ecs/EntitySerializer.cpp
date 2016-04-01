@@ -73,9 +73,31 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
 }
 
 // ** Serializer::serialize
-bool Serializer::deserialize( EntityWPtr entity, const KeyValue& ar )
+bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar )
 {
-    return false;
+    // Create components from key-value archive
+	const KeyValue::Properties& kv = ar.properties();
+
+    // Get the entity meta-class
+    const Reflection::Class* metaObject = entity->metaObject();
+
+	for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+        // Skip the class value & all entity properties
+		if( i->first == "class" || metaObject->findMember( i->first.c_str() ) ) {
+			continue;
+		}
+
+        // Key-value storage expected
+        if( !i->second.type()->is<KeyValue>() ) {
+            LogError( "serializer", "entity component '%s' data is expected to be a key-value storage\n", i->first.c_str() );
+            continue;
+        }
+
+        // Create and read component instance
+        Reflection::MetaInstance component = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
+	}
+
+    return true;
 }
 
 } // namespace Ecs
