@@ -33,6 +33,7 @@
 #include <Io/serialization/Serializable.h>
 #include <Reflection/MetaObject/Property.h>
 #include <Reflection/MetaObject/Class.h>
+#include <Reflection/MetaObject/Assembly.h>
 #include <Reflection/Serialization/Serializer.h>
 
 #define DC_ECS_ITERATIVE_INDEX_REBUILD  (1) // Enable to rebuild indicies after each system update

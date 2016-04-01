@@ -42,6 +42,8 @@ namespace Reflection {
     class Property;
     struct PropertyInfo;
 
+    dcDeclarePtrs( Assembly )
+
     //! The MetaInstance class contains a pointer to an instance along with an associated meta-object.
     struct MetaInstance {
                                 //! Constructs MetaInstance instance.
