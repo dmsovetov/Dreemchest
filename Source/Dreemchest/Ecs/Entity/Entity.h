@@ -55,6 +55,7 @@ namespace Ecs {
 
         INTROSPECTION_ABSTRACT( Entity
             , PROPERTY( flags, flags, setFlags, "The entity flags." )
+            , PROPERTY( id, id, setId, "The unique entity identifier." )
             )
 
 	public:
