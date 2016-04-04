@@ -79,11 +79,13 @@ Scene::Scene( void )
 	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
 
+#if DEV_DEPRECATED_SERIALIZATION
     // Register component types
     m_ecs->registerComponent<Identifier>();
     m_ecs->registerComponent<StaticMesh>();
     m_ecs->registerComponent<Camera>();
     m_ecs->registerComponent<Transform>();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** Scene::update

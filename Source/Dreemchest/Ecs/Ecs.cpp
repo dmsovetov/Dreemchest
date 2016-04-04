@@ -148,6 +148,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 	return instance;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Ecs::createComponentByName
 ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data ) const
 {
@@ -172,6 +173,7 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data
 
 	return instance;
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )

@@ -159,8 +159,10 @@ namespace Ecs {
 		//! Creates the archetype instance by name.
 		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL ) const;
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Creates the component instance by name.
 		ComponentPtr	createComponentByName( const String& name, const Archive* data = NULL ) const;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Creates a new archetype instance.
 		template<typename TArchetype>
@@ -174,17 +176,21 @@ namespace Ecs {
 		template<typename TArchetype>
 		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data ) const;
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Creates a new component instance.
 		template<typename TComponent>
 		StrongPtr<TComponent>	createComponent( const Archive* data = NULL ) const;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Registers the archetype type.
 		template<typename TArchetype>
 		bool			registerArchetype( void );
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Registers the component type.
 		template<typename TComponent>
 		bool			registerComponent( void );
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Creates a new entity.
 		/*!
@@ -281,8 +287,10 @@ namespace Ecs {
         //! Container type to store modified indices.
         typedef Set<IndexWPtr>              IndexSet;
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Data factory type.
 		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Archetype factory type.
 		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
@@ -296,7 +304,9 @@ namespace Ecs {
 		EntitySet						m_removed;	        //!< Entities that will be removed.
         IndexSet                        m_changedIndices;   //!< Indices that were changed.
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		ComponentFactory				m_componentFactory;		//!< Component object factory.
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
 	};
 
@@ -307,12 +317,14 @@ namespace Ecs {
 		return m_archetypeFactory.declare<TArchetype>();
 	}
 
+#if DEV_DEPRECATED_SERIALIZATION
 	// ** Ecs::registerComponent
 	template<typename TComponent>
 	bool Ecs::registerComponent( void )
 	{
 		return m_componentFactory.declare<TComponent>();
 	}
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
@@ -354,12 +366,14 @@ namespace Ecs {
 		return result;
 	}
 
+#if DEV_DEPRECATED_SERIALIZATION
 	// ** Ecs::createComponent
 	template<typename TComponent>
 	StrongPtr<TComponent> Ecs::createComponent( const Archive* data ) const
 	{
 		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
 	}
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Ecs
 
