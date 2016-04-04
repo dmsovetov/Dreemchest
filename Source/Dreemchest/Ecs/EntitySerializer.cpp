@@ -48,17 +48,6 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
         return false;
     }
 
-    // Read entity identfier
-    String id = ar.get<String>( "id" );
-    if( id.empty() ) {
-        LogWarning( "serializer", "invalid entity identifier\n" );
-    } else {
-        entity->setId( id );
-    }
-
-    // Read entity flags & identifier
-    entity->setFlags( ar.get<u8>( "flags", 0 ) );
-
     // Get entity components
     const Entity::Components& components = entity->components();
 
@@ -86,6 +75,9 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
 // ** Serializer::serialize
 bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar )
 {
+    // First deserialize an entity itself
+    Reflection::Serializer::deserialize( entity->metaInstance(), ar );
+
     // Create components from key-value archive
 	const KeyValue::Properties& kv = ar.properties();
 

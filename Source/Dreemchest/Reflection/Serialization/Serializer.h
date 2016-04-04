@@ -49,6 +49,9 @@ namespace Reflection {
 
         //! Reads instance properties from a key-value storage.
         Instance                createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
+
+        //! Reads instance properties from a key-value storage.
+        void                    deserialize( const Instance& instance, const KeyValue& ar ) const;
     };
 
 } // namespace Reflection
