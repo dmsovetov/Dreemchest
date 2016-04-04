@@ -51,7 +51,7 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
         const Member* member = cls->member( i );
 
         if( const Property* property = member->isProperty() ) {
-            ar.setValueAtKey( member->name(), property->get( instance ) );
+            ar.setValueAtKey( member->name(), property->serialize( instance ) );
         }
     }
 
@@ -86,25 +86,6 @@ Instance Serializer::createAndDeserialize( AssemblyWPtr assembly, const String& 
     // Read instance properties
     deserialize( instance, ar );
 
-    // Get the meta-class from instance
-    /*const Class* cls = instance.type();
-
-    // Now read instance properties
-    for( s32 i = 0, n = cls->memberCount(); i < n; i++ ) {
-        const Member* member = cls->member( i );
-
-        if( const Property* property = member->isProperty() ) {
-            const Variant& value = ar.valueAtKey( member->name() );
-
-            if( !value.isValid() ) {
-                LogWarning( "serializer", "property '%s' of type '%s' does not exist inside a key-value storage\n", member->name(), cls->name() );
-                continue;
-            }
-
-            property->set( instance, value );
-        }
-    }*/
-
     return instance;
 }
 
@@ -126,7 +107,7 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
                 continue;
             }
 
-            property->set( instance, value );
+            property->deserialize( instance, value );
         }
     }
 }

@@ -73,6 +73,12 @@ namespace Reflection {
         //! Gets the property value.
         virtual Variant         get( InstanceConst instance ) const NIMBLE_ABSTRACT;
 
+        //! Converts Variant to a property value.
+        virtual void            deserialize( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
+
+        //! Converts a property value to a Variant.
+        virtual Variant         serialize( InstanceConst instance ) const NIMBLE_ABSTRACT;
+
     private:
 
         const MetaObject*       m_metaObject;   //!< The property value meta-object.
@@ -93,8 +99,14 @@ namespace Reflection {
             //! The property setter.
             typedef void            ( TObject::*Setter )( TPropertyValue );
 
+            //! The property value encoder.
+            typedef void            ( *Serializer )( Variant&, const TValue& );
+
+            //! The property value decoder.
+            typedef void            ( *Deserializer )( const Variant&, TValue& );
+
                                     //! Constructs the Property instance.
-                                    Property( CString name, Getter getter, Setter setter, const PropertyInfo& info );
+                                    Property( CString name, Getter getter, Setter setter, Serializer serializer, Deserializer deserializer, const PropertyInfo& info );
 
         protected:
 
@@ -107,18 +119,28 @@ namespace Reflection {
             //! Gets the property value.
             virtual Variant         get( InstanceConst instance ) const NIMBLE_OVERRIDE;
 
+            //! Decodes property value from a Variant.
+            virtual void            deserialize( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
+
+            //! Encodes property value to Variant.
+            virtual Variant         serialize( InstanceConst instance ) const NIMBLE_OVERRIDE;
+
         private:
 
-            Getter                  m_getter;   //!< The property getter.
-            Setter                  m_setter;   //!< The property setter.
+            Getter                  m_getter;       //!< The property getter.
+            Setter                  m_setter;       //!< The property setter.
+            Serializer              m_serializer;   //!< Converts a property value to a Variant.
+            Deserializer            m_deserializer; //!< Converts a Variant to a property value.
         };
 
         // ** Property::Property
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
+        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, Serializer serializer, Deserializer deserializer, const PropertyInfo& info )
             : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
+            , m_serializer( serializer )
+            , m_deserializer( deserializer )
         {
         }
 
@@ -153,6 +175,25 @@ namespace Reflection {
         {
             TValue v = (instance.pointer<TObject>()->*m_getter)();
             return Variant::fromValue<TValue>( v );
+        }
+
+        // ** Property::deserialize
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        void Property<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
+        {
+            TValue v;
+            m_deserializer( value, v );
+            (instance.pointer<TObject>()->*m_setter)( v );
+        }
+
+        // ** Property::serialize
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        Variant Property<TObject, TValue, TPropertyValue>::serialize( InstanceConst instance ) const
+        {
+            Variant result;
+            TValue v = (instance.pointer<TObject>()->*m_getter)();
+            m_serializer( result, v );
+            return result;
         }
 
     } // namespace Private
