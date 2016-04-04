@@ -65,7 +65,11 @@ namespace Network {
 	template<typename T>
 	inline bool EventHandler<T>::handle( ConnectionWPtr connection, const Packets::Event& packet )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
         m_eventEmitter->notify( Io::BinarySerializer::read<T>( packet.payload ) );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 		return true;
 	}
 

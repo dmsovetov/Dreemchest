@@ -110,8 +110,12 @@ namespace Network {
 	template<typename TRemoteProcedure>
 	void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
+    #else
+        Io::ByteBufferPtr buffer;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC request
 		send<Packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
@@ -121,8 +125,13 @@ namespace Network {
 	template<typename TRemoteProcedure>
 	void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
+    #else
+        Io::ByteBufferPtr buffer;
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;
@@ -138,8 +147,13 @@ namespace Network {
 	template<typename TEvent>
 	void Connection::emit( const TEvent& e )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
 		// ** Serialize event to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
+    #else
+        Io::ByteBufferPtr buffer;
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send the packet
 		send<Packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
@@ -149,8 +163,13 @@ namespace Network {
 	template<typename T>
 	inline bool Response<T>::operator()( const T& value, const Error& error )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
+    #else
+        Io::ByteBufferPtr buffer;
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC response packet.
 		m_connection->send<Packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );

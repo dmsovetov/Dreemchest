@@ -61,6 +61,8 @@ namespace Ecs {
 
                                     #if DEV_DEPRECATED_SERIALIZATION
 										ClassEnableTypeInfoSuper( TArchetype, ArchetypeBase )
+                                    #else
+                                    CString typeName( void ) const { return TypeInfo<TArchetype>::name(); }
                                     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Weak pointer type.

@@ -327,8 +327,12 @@ namespace Ecs {
     {
         // Serialize source to a key-value archive
         Archive ar;
+    #if DEV_DEPRECATED_SERIALIZATION
         SerializationContext ctx( const_cast<Ecs*>( this ) );
         source->serialize( ctx, ar );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
         // Create archetype instance
         StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar );

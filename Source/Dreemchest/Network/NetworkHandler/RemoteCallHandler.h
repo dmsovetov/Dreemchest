@@ -111,7 +111,15 @@ namespace Network {
 	inline void RemoteCallHandler<T, R>::handle( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 	{
 		ResponseType response( connection, packet.id );
+    #if DEV_DEPRECATED_SERIALIZATION
 		m_callback( connection, response, Io::BinarySerializer::read<T>( packet.payload ) );
+    #else
+        DC_NOT_IMPLEMENTED;
+    //    T arg;
+    //    Io::ByteBufferPtr stream = Io::ByteBuffer::createFromArray( packet.payload );
+    //    arg.deserialize( stream );
+    //    m_callback( connection, response, arg );
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 	//! Remote response handler interface.
@@ -148,7 +156,11 @@ namespace Network {
 	template<typename T>
 	inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
 	{
+    #if DEV_DEPRECATED_SERIALIZATION
 		m_callback( connection, packet.error, Io::BinarySerializer::read<T>( packet.payload ) );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 } // namespace Network
