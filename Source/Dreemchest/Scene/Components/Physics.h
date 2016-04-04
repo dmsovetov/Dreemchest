@@ -35,6 +35,9 @@ namespace Scene {
 
 	//! Shape of an object used for hit tests and/or 2D physics.
 	class Shape2D : public Ecs::Component<Shape2D> {
+
+        INTROSPECTION_SUPER( Shape2D, Ecs::ComponentBase )
+
 	public:
 
 		//! The shape part types.
