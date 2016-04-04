@@ -505,7 +505,8 @@ void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     KeyValue kv     = ar.as<KeyValue>();
     m_clearMask     = kv.get<u8>( "clearMask" );
-    m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    //m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    m_projection    = Projection::Perspective;
     m_clearColor    = kv.get( "clearColor", Rgba() );
     m_fov           = kv.get( "fov", 60.0f );
     m_near          = kv.get( "near", 0.01f );

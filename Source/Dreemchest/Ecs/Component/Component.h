@@ -247,7 +247,7 @@ namespace Ecs {
 	public:
 
                             #if DEV_DEPRECATED_SERIALIZATION
-		                        ClassEnableTypeInfoSuper( T, ComponentBase )
+		                    //    ClassEnableTypeInfoSuper( T, ComponentBase )
                             #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 
@@ -259,10 +259,14 @@ namespace Ecs {
 
     #if !DEV_DEPRECATED_SERIALIZATION
         //! Returns component type index.
-        virtual TypeIdx         typeIndex( void ) const { return typeId<T>(); }
+        virtual TypeIdx         typeIndex( void ) const NIMBLE_OVERRIDE { return typeId<T>(); }
+    #else
+        virtual TypeId          typeId( void ) const  { return TypeInfo<T>::id(); }
+		virtual CString         typeName( void ) const { return TypeInfo<T>::name(); }		
+        virtual TypeIdx         typeIndex( void ) const NIMBLE_OVERRIDE { return ComponentBase::typeId<T>(); }
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
-		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( typeId<T>() ); return result; }
+		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( ComponentBase::typeId<T>() ); return result; }
 
     #if DC_ECS_ENTITY_CLONING
         virtual ComponentPtr    deepCopy( void ) const DC_DECL_OVERRIDE;

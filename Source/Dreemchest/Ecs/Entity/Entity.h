@@ -219,12 +219,12 @@ namespace Ecs {
 		Components::const_iterator i = m_components.find( idx );
 		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
-    #if DEV_DEPRECATED_SERIALIZATION
-        TComponent* result = castTo<TComponent>( i->second.get() );
-		DC_ABORT_IF( result == NULL, "component type mismatch" );
-    #else
+    //#if DEV_DEPRECATED_SERIALIZATION
+    //    TComponent* result = castTo<TComponent>( i->second.get() );
+	//	DC_ABORT_IF( result == NULL, "component type mismatch" );
+    //#else
         TComponent* result = static_cast<TComponent*>( i->second.get() );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    //#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		return result;
 	}
