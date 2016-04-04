@@ -120,11 +120,11 @@ DC_END_DREEMCHEST
 #define _INSTROSPECTION_ACCESSOR( type ) \
             virtual const ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void ) const                            \
             {                                                                                                       \
-                return type::staticMetaObject();                                                                    \
+                return /*type::*/staticMetaObject();                                                                    \
             }                                                                                                       \
             virtual ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void )                                        \
             {                                                                                                       \
-                return type::staticMetaObject();                                                                    \
+                return /*type::*/staticMetaObject();                                                                    \
             }                                                                                                       \
             virtual::DC_DREEMCHEST_NS Reflection::Instance metaInstance( void )                                     \
             {                                                                                                       \
@@ -170,12 +170,12 @@ DC_END_DREEMCHEST
                 DC_USE_DREEMCHEST                                                                                               \
                 typedef type Object;                                                                                            \
                 static Reflection::Member* m[] = { NULL, __VA_ARGS__ };                                                         \
-                static Reflection::Class meta( super::staticMetaObject(), #type, Type::fromClass<type>(), m + 1, sizeof( m ) / sizeof( m[0] ) - 1, &::DC_DREEMCHEST_NS Reflection::Private::typeCast<type, super> ); \
+                static Reflection::Class meta( super::staticMetaObject(), #type, ::DC_DREEMCHEST_NS Type::fromClass<type>(), m + 1, sizeof( m ) / sizeof( m[0] ) - 1, &::DC_DREEMCHEST_NS Reflection::Private::typeCast<type, super> ); \
                 return &meta;                                                                                                   \
             }
 
 //! Adds the property member to an introspection.
 #define PROPERTY( name, getter, setter, ... )    \
-            Reflection::Private::createProperty( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
+            Reflection::Private::PropertyFactory<Object>::createProperty( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
 
 #endif    /*    !__DC_Reflection_MetaObject_H__    */

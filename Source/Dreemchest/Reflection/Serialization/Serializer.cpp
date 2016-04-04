@@ -79,7 +79,7 @@ Instance Serializer::createAndDeserialize( AssemblyWPtr assembly, const String& 
     Instance instance = assembly->createInstance( name );
 
     if( !instance ) {
-        LogError( "serializer", "failed to create instance of '%s'\n", name.c_str() );
+        LogError( "serializer", "unresolved class '%s'\n", name.c_str() );
         return instance;
     }
 

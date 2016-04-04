@@ -65,7 +65,7 @@ Instance Assembly::createInstance( const String& name ) const
     Classes::const_iterator i = m_classes.find( hash );
 
     if( i == m_classes.end() ) {
-        LogError( "assembly", "unresolved class '%s'\n", name.c_str() );
+    //    LogError( "assembly", "unresolved class '%s'\n", name.c_str() );
         return Instance();
     }
 

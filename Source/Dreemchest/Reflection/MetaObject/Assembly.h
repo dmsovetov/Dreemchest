@@ -86,6 +86,7 @@ namespace Reflection {
         Classes::iterator i = m_classes.find( hash );
 
         if( i != m_classes.end() ) {
+            DC_BREAK;
             LogWarning( "assembly", "class '%s' was already added to the '%s' assembly\n", name, m_name == "" ? "toplevel" : m_name.c_str() );
             return false;
         }
