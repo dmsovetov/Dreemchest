@@ -142,7 +142,12 @@ void OpenALSource::setPosition( const Vec3& value )
 // ** OpenALSource::setLooped
 void OpenALSource::setLooped( bool value )
 {
-    alSourcei( m_id, AL_LOOPING, value ? AL_TRUE : AL_FALSE );
+    SoundSource::setLooped( value );
+
+    // Streamed sounds should not be looped by a hardware
+    if( !isStreamed() ) {
+        alSourcei( m_id, AL_LOOPING, value ? AL_TRUE : AL_FALSE );
+    }
 }
 
 // ** OpenALSource::setRelative
@@ -169,13 +174,19 @@ void OpenALSource::setRolloffFactor( f32 value )
     alSourcef( m_id, AL_ROLLOFF_FACTOR, value );
 }
 
+// ** OpenALSource::isStreamed
+bool OpenALSource::isStreamed( void ) const
+{
+    return m_buffer->chunks() > 1;
+}
+
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {
 	DC_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
 
     // ** Ensure we have a valid source state for a streamed sources
-    if( m_state != state() && m_buffer->chunks() > 1 ) {
+    if( m_state != state() && isStreamed() ) {
         setState( m_state );
     }
     
