@@ -112,7 +112,7 @@ u32 WavSoundDecoder::read( u8 *buffer, u32 size )
 // ** WavSoundDecoder::seek
 void WavSoundDecoder::seek( u32 pos )
 {
-    m_stream->setPosition( pos );
+    m_stream->setPosition( m_pcmDataOffset + pos );
 }
 
 } // namespace Sound
