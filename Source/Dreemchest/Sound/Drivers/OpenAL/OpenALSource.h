@@ -55,6 +55,7 @@ namespace Sound {
         virtual void            setReferenceDistance( f32 value ) DC_DECL_OVERRIDE;
         virtual void            setMaximumDistance( f32 value ) DC_DECL_OVERRIDE;
         virtual void            setRolloffFactor( f32 value ) DC_DECL_OVERRIDE;
+        bool                    isStreamed( void ) const;
 
     private:
 

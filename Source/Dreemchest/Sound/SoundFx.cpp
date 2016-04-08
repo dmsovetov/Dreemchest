@@ -270,11 +270,7 @@ SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
     // Inherit sound source properties from sound data
     source->setBuffer( createBuffer( data ) );
     source->setPitch( data->pitchForSound() );
-
-    // Streamed sounds should not be looped by a hardware
-    if( data->loading() != SoundData::Stream ) {
-        source->setLooped( data->isLooped() );
-    }
+    source->setLooped( data->isLooped() );
 
     return source;
 }

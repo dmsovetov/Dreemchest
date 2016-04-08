@@ -341,8 +341,8 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
     for( Ecs::EntitySet::iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
         RigidBody2D& rigidBody = *(*i)->get<RigidBody2D>();
 
-        // Skip static bodies
-        if( rigidBody.type() == RigidBody2D::Static ) {
+        // Skip static and kinematic bodies
+        if( rigidBody.type() != RigidBody2D::Dynamic ) {
             continue;
         }
 
@@ -417,7 +417,7 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
     clearState( rigidBody );
 }
 
-// ** Box2DPhysics::updateTransfor
+// ** Box2DPhysics::updateTransform
 void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
 {
 	// Get the body transform
