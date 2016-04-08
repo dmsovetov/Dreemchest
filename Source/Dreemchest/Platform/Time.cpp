@@ -84,7 +84,10 @@ s32 TimeStep::count( void ) const
 // ------------------------------------------------------------ FixedTimeStep ------------------------------------------------------------ //
 
 // ** FixedTimeStep::FixedTimeStep
-FixedTimeStep::FixedTimeStep( u32 step, s32 maxSteps ) : m_dt( step ), m_accumulated( 0 ), m_maxSteps( maxSteps )
+FixedTimeStep::FixedTimeStep( u32 step, s32 maxSteps )
+    : m_dt( step )
+    , m_accumulated( 0 )
+    , m_maxSteps( maxSteps )
 {
 }
 
@@ -131,6 +134,18 @@ void FixedTimeStep::setMaxSteps( s32 value )
 void FixedTimeStep::setTimeStep( u32 value )
 {
     m_dt = value;
+}
+
+// ** FixedTimeStep::dt
+u32 FixedTimeStep::dt( void ) const
+{
+    return m_dt;
+}
+
+// ** FixedTimeStep::accumulated
+u32 FixedTimeStep::accumulated( void ) const
+{
+    return m_accumulated;
 }
 
 } // namespace Platform
