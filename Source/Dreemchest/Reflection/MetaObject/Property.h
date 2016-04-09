@@ -99,14 +99,8 @@ namespace Reflection {
             //! The property setter.
             typedef void            ( TObject::*Setter )( TPropertyValue );
 
-            //! The property value encoder.
-            typedef void            ( *Serializer )( Variant&, const TValue& );
-
-            //! The property value decoder.
-            typedef void            ( *Deserializer )( const Variant&, TValue& );
-
                                     //! Constructs the Property instance.
-                                    Property( CString name, Getter getter, Setter setter, Serializer serializer, Deserializer deserializer, const PropertyInfo& info );
+                                    Property( CString name, Getter getter, Setter setter, const PropertyInfo& info );
 
         protected:
 
@@ -129,18 +123,14 @@ namespace Reflection {
 
             Getter                  m_getter;       //!< The property getter.
             Setter                  m_setter;       //!< The property setter.
-            Serializer              m_serializer;   //!< Converts a property value to a Variant.
-            Deserializer            m_deserializer; //!< Converts a Variant to a property value.
         };
 
         // ** Property::Property
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, Serializer serializer, Deserializer deserializer, const PropertyInfo& info )
+        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
             : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
-            , m_serializer( serializer )
-            , m_deserializer( deserializer )
         {
         }
 
@@ -182,7 +172,7 @@ namespace Reflection {
         void Property<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
         {
             TValue v;
-            m_deserializer( value, v );
+            v << value;
             (instance.pointer<TObject>()->*m_setter)( v );
         }
 
@@ -192,7 +182,7 @@ namespace Reflection {
         {
             Variant result;
             TValue v = (instance.pointer<TObject>()->*m_getter)();
-            m_serializer( result, v );
+            v >> result;
             return result;
         }
 

@@ -107,18 +107,14 @@ namespace Reflection {
             template<typename TValue>
             static ::DC_DREEMCHEST_NS Reflection::Property* createProperty( CString name, TValue ( TObject::*getter )( void ) const, void ( TObject::*setter )( TValue ), const PropertyInfo& info )
             {
-                typename Property<TObject, TValue, TValue>::Serializer serializer = &operator <<;
-                typename Property<TObject, TValue, TValue>::Deserializer deserializer = &operator >>;
-                return DC_NEW Property<TObject, TValue, TValue>( name, getter, setter, serializer, deserializer, info );
+                return DC_NEW Property<TObject, TValue, TValue>( name, getter, setter, info );
             }
 
             //! Creates property that accepts refereces and is bound to a specified data type.
             template<typename TValue>
             static ::DC_DREEMCHEST_NS Reflection::Property* createProperty( CString name, const TValue& ( TObject::*getter )( void ) const, void ( TObject::*setter )( const TValue& ), const PropertyInfo& info )
             {
-                typename Property<TObject, TValue, const TValue&>::Serializer serializer = &operator <<;
-                typename Property<TObject, TValue, const TValue&>::Deserializer deserializer = &operator >>;
-                return DC_NEW Property<TObject, TValue, const TValue&>( name, getter, setter, serializer, deserializer, info );
+                return DC_NEW Property<TObject, TValue, const TValue&>( name, getter, setter, info );
             }       
         };
 
