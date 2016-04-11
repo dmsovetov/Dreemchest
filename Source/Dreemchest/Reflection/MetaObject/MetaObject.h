@@ -60,13 +60,13 @@ namespace Reflection {
         const Type*             m_type; //!< The introspected type instance.
     };
 
+    //! staticMetaObject function detector
+    NIMBLE_DECLARE_MEMBER_DETECTOR( staticMetaObject )
+
     namespace Private {
 
         //! Forward declaration of an Enum template class.
         template<typename T> class Enum;
-    
-        //! staticMetaObject function detector
-        NIMBLE_DECLARE_MEMBER_DETECTOR( staticMetaObject )
 
         //! A helper type to detect meta-object associated with a class.
         struct ClassMetaObject {
