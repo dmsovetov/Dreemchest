@@ -103,7 +103,7 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
             const Variant& value = ar.valueAtKey( member->name() );
 
             if( !value.isValid() ) {
-                LogWarning( "serializer", "property '%s' of type '%s' does not exist inside a key-value storage\n", member->name(), cls->name() );
+                LogDebug( "serializer", "%s.%s does not exist inside a key-value storage\n", cls->name(), member->name() );
                 continue;
             }
 
