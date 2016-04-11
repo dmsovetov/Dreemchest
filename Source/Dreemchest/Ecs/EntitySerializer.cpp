@@ -40,6 +40,9 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
 {
 	// Register an entity flags default value
 	registerPropertyDefault<Entity>( "flags", dcThisMethod( Serializer::defaultEntityFlags ) );
+
+    // Register entity value converter
+    registerTypeConverter<Guid, EntityWPtr>( dcThisMethod( Serializer::convertGuidToEntity ) );
 }
 
 // ** Serializer::serialize
@@ -124,6 +127,29 @@ Variant Serializer::defaultEntityFlags( const KeyValue& ar ) const
 {
 	return Variant::fromValue( 0 );
 }
+
+// ** Serializer::convertGuidToEntity
+Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const
+{
+    // Get a Guid value
+    Guid id = value.as<Guid>();
+
+    // Return a NULL pointer if this is an empty Guid
+    if( id.isNull() ) {
+        return Variant::fromValue( EntityWPtr() );
+    }
+
+    // Lookup entity by identifier
+    EntityWPtr entity = m_ecs->findEntity( id );
+
+    // Show a warning message if no entity found
+    if( !entity.valid() ) {
+        LogWarning( "serializer", "%s.%s, unresolved entity %s\n", cls.name(), property.name(), id.toString().c_str() );
+    }
+
+    return Variant::fromValue( entity );
+}
+
 } // namespace Ecs
 
 DC_END_DREEMCHEST

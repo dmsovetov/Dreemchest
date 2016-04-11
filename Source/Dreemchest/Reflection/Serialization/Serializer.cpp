@@ -97,10 +97,16 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
 
     // Now read instance properties
     for( s32 i = 0, n = cls->memberCount(); i < n; i++ ) {
+        // Get the class member at current index
         const Member* member = cls->member( i );
 
-        if( const Property* property = member->isProperty() ) {
-            const Variant& value = ar.valueAtKey( member->name() );
+        // Is it a property?
+        const Property* property = member->isProperty();
+
+        // No it's not - just skip
+        if( !property ) {
+            continue;
+        }
 
         // Read a property value
         Variant value = readPropertyValue( cls, property, ar );
@@ -110,6 +116,15 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
             LogDebug( "serializer", "%s.%s does not exist inside a key-value storage\n", cls->name(), member->name() );
             continue;
         }
+
+        // Do we have to convert a value before sending it to a property?
+        TypeConverter converter = findTypeConverter( value.type(), property->type() );
+
+        // Perform a conversion
+        if( converter ) {
+            value = converter( *cls, *property, value );
+        }
+
         // Finally set a property value
         property->deserialize( instance, value );
     }
@@ -143,6 +158,25 @@ Variant Serializer::readPropertyValue( const Class* cls, const Property* propert
 String64 Serializer::calculatePropertyReaderHash( const Class* cls, CString name ) const
 {
 	return String64( (String( cls->name() ) + "." + name).c_str() );
+}
+
+// ** Serializer::calculateTypeConverterHash
+u64 Serializer::calculateTypeConverterHash( const Type* from, const Type* to ) const
+{
+    return static_cast<u64>( from->id() ) << 32 | to->id();
+}
+
+// ** Serializer::findTypeConverter
+Serializer::TypeConverter Serializer::findTypeConverter( const Type* from, const Type* to ) const
+{
+    // Calculate a hash value
+    u64 hash = calculateTypeConverterHash( from, to );
+
+    // Lookup a type converter
+    TypeConverters::const_iterator i = m_typeConverters.find( hash );
+
+    // Return a type converter
+    return i != m_typeConverters.end() ? i->second : TypeConverter();
 }
 
 } // namespace Reflection
