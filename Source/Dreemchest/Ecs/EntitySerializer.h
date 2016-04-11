@@ -46,6 +46,10 @@ namespace Ecs {
         //! Creates entity and reads it from a key-value storage.
         virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
+	private:
+
+		//! Callback to access the default value of Entity flags property.
+		Variant								defaultEntityFlags( const KeyValue& ar ) const;
     private:
 
         EcsWPtr                             m_ecs;      //!< Parent Ecs instance.

@@ -38,6 +38,8 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
     : m_ecs( ecs )
     , m_excluded( excluded )
 {
+	// Register an entity flags default value
+	registerPropertyDefault<Entity>( "flags", dcThisMethod( Serializer::defaultEntityFlags ) );
 }
 
 // ** Serializer::serialize
@@ -72,7 +74,7 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
     return true;
 }
 
-// ** Serializer::serialize
+// ** Serializer::deserialize
 bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar )
 {
     // First deserialize an entity itself
@@ -117,6 +119,11 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
     return true;
 }
 
+// ** Serializer::defaultEntityFlags
+Variant Serializer::defaultEntityFlags( const KeyValue& ar ) const
+{
+	return Variant::fromValue( 0 );
+}
 } // namespace Ecs
 
 DC_END_DREEMCHEST

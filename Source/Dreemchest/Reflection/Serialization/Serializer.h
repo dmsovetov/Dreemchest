@@ -37,6 +37,9 @@ namespace Reflection {
     class Serializer {
     public:
 
+		//! Function type used by property default value accessor.
+		typedef cClosure<Variant(const KeyValue&)> PropertyDefault;
+
         virtual                 ~Serializer( void ) {}
 
         //! Writes an object instance to a key-value storage.
@@ -45,6 +48,10 @@ namespace Reflection {
         //! Reads an object instance from a key-value storage.
         virtual Instance        deserialize( AssemblyWPtr assembly, const KeyValue& ar );
 
+
+		//! Registers a property default value accessor.
+		template<typename TType>
+		void					registerPropertyDefault( const String& name, const PropertyDefault& callback );
     protected:
 
         //! Reads instance properties from a key-value storage.
@@ -52,7 +59,27 @@ namespace Reflection {
 
         //! Reads instance properties from a key-value storage.
         void                    deserialize( const Instance& instance, const KeyValue& ar ) const;
+
+		//! Reads a property value from an archive.
+		Variant					readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const;
+
+		//! Calculates a property reader hash value.
+		String64				calculatePropertyReaderHash( const Class* cls, CString name ) const;
+
+		//! Container type to store property serializers/deserializers.
+		typedef HashMap<String64, PropertyDefault, String64Hasher> PropertyDefaults;
+
+		PropertyDefaults		m_defaults;				//!< Property default value callbacks.
     };
+
+
+	// ** Serializer::registerPropertyDefault
+	template<typename TType>
+	void Serializer::registerPropertyDefault( const String& name, const PropertyDefault& callback )
+	{
+		String64 hash = calculatePropertyReaderHash( TType::staticMetaObject(), name.c_str() );
+		m_defaults[hash] = callback;
+	}
 
 } // namespace Reflection
 

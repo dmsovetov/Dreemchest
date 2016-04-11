@@ -102,14 +102,47 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
         if( const Property* property = member->isProperty() ) {
             const Variant& value = ar.valueAtKey( member->name() );
 
-            if( !value.isValid() ) {
-                LogDebug( "serializer", "%s.%s does not exist inside a key-value storage\n", cls->name(), member->name() );
-                continue;
-            }
+        // Read a property value
+        Variant value = readPropertyValue( cls, property, ar );
 
-            property->deserialize( instance, value );
+        // Value is invalid - just skip
+        if( !value.isValid() ) {
+            LogDebug( "serializer", "%s.%s does not exist inside a key-value storage\n", cls->name(), member->name() );
+            continue;
         }
+        // Finally set a property value
+        property->deserialize( instance, value );
     }
+}
+
+// ** Serializer::readPropertyValue
+Variant Serializer::readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const
+{
+	DC_ABORT_IF( cls == NULL, "invalid class" );
+	DC_ABORT_IF( property == NULL, "invalid property" );
+
+	// First try to lookup value inside an archive
+	const Variant& v = ar.valueAtKey( property->name() );
+
+	if( v.isValid() ) {
+		return v;
+	}
+
+	// No value inside an archive - try a default one
+	PropertyDefaults::const_iterator i = m_defaults.find( calculatePropertyReaderHash( cls, property->name() ) );
+
+	if( i != m_defaults.end() ) {
+		return i->second( ar );
+	}
+
+	// Return a void value
+	return Variant();
+}
+
+// ** Serializer::calculatePropertyReaderHash
+String64 Serializer::calculatePropertyReaderHash( const Class* cls, CString name ) const
+{
+	return String64( (String( cls->name() ) + "." + name).c_str() );
 }
 
 } // namespace Reflection
