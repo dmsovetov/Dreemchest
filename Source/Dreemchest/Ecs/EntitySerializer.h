@@ -51,8 +51,11 @@ namespace Ecs {
 		//! Callback to access the default value of Entity flags property.
 		Variant								defaultEntityFlags( const KeyValue& ar ) const;
 
-        //! Converts a Guid value to a property reference.
+        //! Converts a Guid value to an entity reference.
         Variant                             convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
+
+        //! Converts an entity reference to a Guid variant value.
+        Variant                             convertEntityToGuid( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
 
     private:
 

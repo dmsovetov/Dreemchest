@@ -43,6 +43,7 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
 
     // Register entity value converter
     registerTypeConverter<Guid, EntityWPtr>( dcThisMethod( Serializer::convertGuidToEntity ) );
+    registerTypeConverter<EntityWPtr, Variant>( dcThisMethod( Serializer::convertEntityToGuid ) );
 }
 
 // ** Serializer::serialize
@@ -148,6 +149,16 @@ Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Ref
     }
 
     return Variant::fromValue( entity );
+}
+
+// ** Serializer::convertEntityToGuid
+Variant Serializer::convertEntityToGuid( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const
+{
+    // Get an entity reference
+    EntityWPtr entity = value.as<EntityWPtr>();
+
+    // Return entity id or a null guid as variant
+    return Variant::fromValue( entity.valid() ? entity->id() : Guid() );
 }
 
 } // namespace Ecs

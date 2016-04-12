@@ -48,11 +48,30 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
 
     // Write instance properties
     for( s32 i = 0, n = cls->memberCount(); i < n; i++ ) {
+        // Get the class member at current index
         const Member* member = cls->member( i );
 
-        if( const Property* property = member->isProperty() ) {
-            ar.setValueAtKey( member->name(), property->serialize( instance ) );
+        // Is it a property?
+        const Property* property = member->isProperty();
+
+        // No it's not - just skip
+        if( !property ) {
+            continue;
         }
+
+        // Serialize property to a Variant
+        Variant value = property->serialize( instance );
+
+        // Do we have to convert a value before writing it to a key-value archive?
+        TypeConverter converter = findTypeConverter( value.type(), Type::fromClass<Variant>() );
+
+        // Perform a conversion
+        if( converter ) {
+            value = converter( *cls, *property, value );
+        }
+
+        // Now set a key inside a key-value archive
+        ar.setValueAtKey( member->name(), value );
     }
 
     return true;
