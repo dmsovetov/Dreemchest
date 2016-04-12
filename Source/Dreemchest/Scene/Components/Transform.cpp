@@ -289,23 +289,13 @@ void Transform::setScaleZ( f32 value )
 // ** Transform::serialize
 void Transform::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    ar = KeyValue::object() << "position" << position() << "rotation" << rotation() << "scale" << scale() << "parent" << m_parent.get();
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Transform::deserialize
 void Transform::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    m_position = ar["position"].asVec3();
-    m_rotation = ar["rotation"].asQuat();
-    m_scale    = ar["scale"].asVec3();
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ----------------------------------------------- Identifier ------------------------------------------------ //
@@ -325,21 +315,13 @@ void Identifier::setName( const String& value )
 // ** Identifier::serialize
 void Identifier::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    ar = KeyValue::object() << "value" << name();
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Identifier::deserialize
 void Identifier::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    m_name = ar["value"].asString();
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // --------------------------------------------- MoveAlongAxes --------------------------------------------- //

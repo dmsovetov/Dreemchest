@@ -175,18 +175,7 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    KeyValue materials = KeyValue::array();
-
-    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
-        MaterialHandle m = material( i );
-        materials << (m.isValid() ? m.uniqueId() : "");
-    }
-
-    ar = KeyValue::object() << "asset" << (m_mesh.isValid() ? m_mesh->uniqueId() : "") << "materials" << materials;
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** StaticMesh::deserialize
@@ -198,17 +187,8 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
         LogError( "staticMesh", "no Assets attached to serialization context.\n" );
         return;
     }
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    const KeyValue& materials = ar["materials"];
 
-    for( s32 i = 0, n = materials.size(); i < n; i++ ) {
-        setMaterial( i, assets->find<Material>( materials[i].asString() ) );
-    }
-
-    m_mesh = assets->find<Mesh>( ar["asset"].asString() );
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //
@@ -457,26 +437,13 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 // ** Camera::serialize
 void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    ar = KeyValue::object() << "clearMask" << m_clearMask << "projection" << m_projection << "clearColor" << m_clearColor << "fov" << m_fov << "near" << m_near << "far" << m_far;
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 // ** Camera::deserialize
 void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    m_clearMask     = ar["clearMask"].asUByte();
-    m_projection    = static_cast<Projection>( ar["projection"].asInt() );
-    m_clearColor    = ar["clearColor"].asRgba();
-    m_fov           = ar["fov"].asFloat();
-    m_near          = ar["near"].asFloat();
-    m_far           = ar["far"].asFloat();
-#else
     DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 }
 
 } // namespace Scene
