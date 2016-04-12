@@ -182,48 +182,6 @@ ValueWPtr ObjectValue::resolve( const String& uri ) const
 	return object->resolve( key );
 }
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-
-// ** ObjectValue::bson
-KeyValue ObjectValue::bson( void ) const
-{
-	KeyValue result = KeyValue::object();
-
-	for( Properties::const_iterator i = m_properties.begin(), end = m_properties.end(); i != end; ++i ) {
-		const String& key = i->first;
-
-		if( key == "isValid" ) {
-			continue;
-		}
-
-		KeyValue value = i->second->bson();
-
-		if( value.isNull() ) {
-			continue;
-		}
-
-		result[key] = i->second->bson();
-	}
-
-	return result;
-}
-
-// ** ObjectValue::setBson
-void ObjectValue::setBson( const KeyValue& value )
-{
-	const KeyValue::Properties& kv = value.properties();
-
-	for( KeyValue::Properties::const_iterator i = kv.begin(), end = kv.end(); i != end; ++i ) {
-		ValueWPtr value = get( i->first );
-
-		if( value.valid() ) {
-			value->setBson( i->second );
-		}
-	}
-}
-
-#else
-
 // ** ObjectValue::bson
 Variant ObjectValue::bson( void ) const
 {
@@ -263,8 +221,6 @@ void ObjectValue::setBson( const Variant& value )
 	}
 }
 
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
-
 // ----------------------------------------------------------- CommandValue ----------------------------------------------------------- //
 
 // ** CommandValue::is
@@ -285,19 +241,6 @@ ValueTypeIdx CommandValue::type( void ) const
 	return Value::valueType<CommandValue>();
 }
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-//! Returns the BSON object that represents this value.
-KeyValue CommandValue::bson( void ) const
-{
-	return KeyValue::kNull;
-}
-
-//! Sets the BSON object that represents this value.
-void CommandValue::setBson( const KeyValue& value )
-{
-
-}
-#else
 //! Returns the BSON object that represents this value.
 Variant CommandValue::bson( void ) const
 {
@@ -309,7 +252,6 @@ void CommandValue::setBson( const Variant& value )
 {
 
 }
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
 // -------------------------------------------------------------- Command -------------------------------------------------------------- //
 
