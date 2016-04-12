@@ -34,6 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 // --------------------------------------------------------------------- SpectatorCamera --------------------------------------------------------------------- //
 
 // ** SpectatorCamera::construct
@@ -195,6 +196,7 @@ Camera2DPtr Camera2D::create( const RenderTargetPtr& renderTarget )
 
 	return instance;
 }
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 } // namespace Scene
 

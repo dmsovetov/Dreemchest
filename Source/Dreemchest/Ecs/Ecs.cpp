@@ -113,6 +113,7 @@ s32 Ecs::addEntities( const EntityArray& entities )
     return addedCount;
 }
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 // ** Ecs::createArchetypeByName
 ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
 {
@@ -149,6 +150,7 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	return instance;
 }
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 #if DEV_DEPRECATED_SERIALIZATION
 // ** Ecs::createComponentByName

@@ -59,7 +59,9 @@ namespace Ecs {
 	dcDeclarePtrs( EntityIdGenerator )
 	dcDeclarePtrs( Entity )
 	dcDeclareNamedPtrs( ComponentBase, Component )
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 	dcDeclareNamedPtrs( ArchetypeBase, Archetype )
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 	dcDeclarePtrs( Index )
 	dcDeclarePtrs( System )
 	dcDeclarePtrs( SystemGroup )
@@ -161,6 +163,7 @@ namespace Ecs {
 		ComponentPtr	createComponentByName( const String& name, const Archive* data = NULL ) const;
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
+    #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Creates the archetype instance by name.
 		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
 
@@ -175,6 +178,7 @@ namespace Ecs {
 		//! Creates an array of archetype instances from data.
 		template<typename TArchetype>
 		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const;
+    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
     #if DEV_DEPRECATED_SERIALIZATION
 		//! Creates a new component instance.
@@ -182,9 +186,11 @@ namespace Ecs {
 		StrongPtr<TComponent>	createComponent( const Archive* data = NULL ) const;
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
+    #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Registers the archetype type.
 		template<typename TArchetype>
 		bool			registerArchetype( void );
+    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
     #if DEV_DEPRECATED_SERIALIZATION
 		//! Registers the component type.
@@ -292,8 +298,10 @@ namespace Ecs {
 		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
+    #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Archetype factory type.
 		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
+    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 		mutable EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
 		Entities						m_entities;	//!< Active entities reside here.
@@ -307,15 +315,19 @@ namespace Ecs {
     #if DEV_DEPRECATED_SERIALIZATION
 		ComponentFactory				m_componentFactory;		//!< Component object factory.
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    #if DEV_DEPRECATED_ECS_ARCHETYPES
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
+    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 	};
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 	// ** Ecs::registerArchetype
 	template<typename TArchetype>
 	bool Ecs::registerArchetype( void )
 	{
 		return m_archetypeFactory.declare<TArchetype>();
 	}
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 #if DEV_DEPRECATED_SERIALIZATION
 	// ** Ecs::registerComponent
@@ -326,6 +338,7 @@ namespace Ecs {
 	}
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
 	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
@@ -369,6 +382,7 @@ namespace Ecs {
 
 		return result;
 	}
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 #if DEV_DEPRECATED_SERIALIZATION
 	// ** Ecs::createComponent

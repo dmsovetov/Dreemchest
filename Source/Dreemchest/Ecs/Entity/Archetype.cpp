@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
+
 #if DEV_DEPRECATED_SERIALIZATION
 
 // ** ArchetypeBase::deserialize
@@ -43,6 +45,8 @@ void ArchetypeBase::deserialize( SerializationContext& ctx, const Archive& value
 }
 
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 } // namespace Ecs
 

@@ -33,6 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 	//! Archetype is a predefined component composition.
 	class ArchetypeBase : public Entity {
 	public:
@@ -71,6 +72,7 @@ namespace Ecs {
 		//! Strong pointer type.
 		typedef StrongPtr<TArchetype>	Ptr;
 	};
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 } // namespace Ecs
 
