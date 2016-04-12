@@ -156,6 +156,9 @@ namespace Fx {
 		//! Sets the stopped state of an emitter.
 		void					setStopped( bool value );
 
+        //! Restarts a playback of an emitter.
+        void                    restart( void );
+
 	private:
 
 								//! Constructs EmitterInstance instance.
