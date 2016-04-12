@@ -106,6 +106,94 @@ namespace Network {
 		Traffic					m_traffic;
 	};
 
+    namespace Private {
+
+        //! Writes a network argument value to a binary stream
+        struct PrimitiveValueWriter {
+            template<typename TValue>
+            static Io::ByteBufferPtr write( const TValue& value )
+            {
+                NIMBLE_STATIC_ASSERT( false, "the specified type could not be sent over a network" );
+                return Io::ByteBufferPtr();
+            }
+
+            template<typename TValue>
+            static TValue read( Io::StreamPtr stream )
+            {
+                NIMBLE_STATIC_ASSERT( false, "the specified type could not be sent over a network" );
+                return TValue();
+            }
+
+            template<>
+            static Io::ByteBufferPtr write( const KeyValue& value )
+            {
+                Io::ByteBufferPtr buffer = Io::ByteBuffer::create();
+                Io::BinaryVariantStream stream( buffer );
+                stream.write( Variant::fromValue( value ) );
+                return buffer;
+            }
+
+            template<>
+            static KeyValue read( Io::StreamPtr stream )
+            {
+                Io::BinaryVariantStream reader( stream );
+                Variant kv = Variant::fromValue( KeyValue() );
+                reader.read( kv );
+                return kv.as<KeyValue>();
+            }
+        };
+
+        struct MetaObjectWriter {
+            template<typename T>
+            static Io::ByteBufferPtr write( const T& value )
+            {
+                Reflection::Serializer serializer;
+                KeyValue ar;
+                serializer.serialize( value.metaInstance(), ar );
+                return PrimitiveValueWriter::write( ar );
+            }
+
+            template<typename T>
+            static T read( Io::StreamPtr stream )
+            {
+                Reflection::Serializer serializer;
+                KeyValue kv = PrimitiveValueWriter::read<KeyValue>( stream );
+                T v;
+                serializer.deserialize( v.metaInstance(), kv );
+                return v;
+            }
+        };
+
+        struct StreamableWriter {
+            template<typename T>
+            static Io::ByteBufferPtr write( const T& value )
+            {
+                DC_NOT_IMPLEMENTED;
+                return Io::ByteBufferPtr();
+            }
+
+            template<typename T>
+            static T read( Io::StreamPtr stream )
+            {
+                DC_NOT_IMPLEMENTED;
+                return T();
+            }
+        };
+
+        template<typename TValue>
+        Io::ByteBufferPtr writeToStream( const TValue& value )
+        {
+            return TypeSelector<Reflection::Has_staticMetaObject<TValue>::value, MetaObjectWriter, TypeSelector<IsBaseOf<Io::Streamable, TValue>::value, StreamableWriter, PrimitiveValueWriter>::type>::type::write<TValue>( value );
+        }
+
+        template<typename TValue>
+        TValue readFromStream( Io::StreamPtr stream )
+        {
+            return TypeSelector<Reflection::Has_staticMetaObject<TValue>::value, MetaObjectWriter, TypeSelector<IsBaseOf<Io::Streamable, TValue>::value, StreamableWriter, PrimitiveValueWriter>::type>::type::read<TValue>( stream );
+        }
+
+    } // namespace Private
+
 	// ** Connection::invokeVoid
 	template<typename TRemoteProcedure>
 	void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
@@ -114,7 +202,7 @@ namespace Network {
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
     #else
-        Io::ByteBufferPtr buffer;
+        Io::ByteBufferPtr buffer = Private::PrimitiveValueWriter::write( argument );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC request
@@ -129,8 +217,7 @@ namespace Network {
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
     #else
-        Io::ByteBufferPtr buffer;
-        DC_NOT_IMPLEMENTED;
+        Io::ByteBufferPtr buffer = Private::writeToStream( argument );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC request
@@ -151,8 +238,7 @@ namespace Network {
 		// ** Serialize event to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
     #else
-        Io::ByteBufferPtr buffer;
-        DC_NOT_IMPLEMENTED;
+        Io::ByteBufferPtr buffer = Private::writeToStream( e );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send the packet
@@ -167,8 +253,7 @@ namespace Network {
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
     #else
-        Io::ByteBufferPtr buffer;
-        DC_NOT_IMPLEMENTED;
+        Io::ByteBufferPtr buffer = Private::writeToStream( value );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC response packet.

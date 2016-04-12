@@ -93,8 +93,7 @@ namespace Io {
 
 #if !DEV_DEPRECATED_SERIALIZATION
     //! Abstract class interface to be implemented by a streamable types.
-    template<typename TBase>
-    class Streamable : public TBase {
+    class Streamable : public RefCounted {
     public:
 
         virtual             ~Streamable( void ) {}

@@ -51,6 +51,9 @@ namespace Reflection {
         //! Reads an object instance from a key-value storage.
         virtual Instance        deserialize( AssemblyWPtr assembly, const KeyValue& ar );
 
+        //! Reads instance properties from a key-value storage.
+        void                    deserialize( const Instance& instance, const KeyValue& ar ) const;
+
 		//! Registers a type converter.
 		template<typename TFrom, typename TTo>
 		void					registerTypeConverter( const TypeConverter& callback );
@@ -63,9 +66,6 @@ namespace Reflection {
 
         //! Reads instance properties from a key-value storage.
         Instance                createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
-
-        //! Reads instance properties from a key-value storage.
-        void                    deserialize( const Instance& instance, const KeyValue& ar ) const;
 
 		//! Reads a property value from an archive.
 		Variant					readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const;

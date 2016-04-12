@@ -114,11 +114,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
 		m_callback( connection, response, Io::BinarySerializer::read<T>( packet.payload ) );
     #else
-        DC_NOT_IMPLEMENTED;
-    //    T arg;
-    //    Io::ByteBufferPtr stream = Io::ByteBuffer::createFromArray( packet.payload );
-    //    arg.deserialize( stream );
-    //    m_callback( connection, response, arg );
+        m_callback( connection, response, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
@@ -159,7 +155,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
 		m_callback( connection, packet.error, Io::BinarySerializer::read<T>( packet.payload ) );
     #else
-        DC_NOT_IMPLEMENTED;
+        m_callback( connection, packet.error, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 

@@ -156,25 +156,25 @@ namespace Ecs {
 	friend class Entity;
 	public:
 
-		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL ) const;
-
     #if DEV_DEPRECATED_SERIALIZATION
 		//! Creates the component instance by name.
 		ComponentPtr	createComponentByName( const String& name, const Archive* data = NULL ) const;
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
-		//! Creates a new archetype instance.
+		//! Creates the archetype instance by name.
+		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
+
+        //! Creates a new archetype instance.
 		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Archive* data = NULL ) const;
+		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Archive* data = NULL, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
 
         //! Clones an archetype instance.
         template<typename TArchetype>
-        StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const;
+        StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
 
 		//! Creates an array of archetype instances from data.
 		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data ) const;
+		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const;
 
     #if DEV_DEPRECATED_SERIALIZATION
 		//! Creates a new component instance.
@@ -328,14 +328,14 @@ namespace Ecs {
 
 	// ** Ecs::createArchetype
 	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Archive* data ) const
+	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
 	{
-		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data ).get() );
+		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data, assembly ).get() );
 	}
 
     // ** Ecs::cloneArchetype
     template<typename TArchetype>
-    StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source ) const
+    StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source, Reflection::AssemblyWPtr assembly ) const
     {
         // Serialize source to a key-value archive
         Archive ar;
@@ -343,24 +343,28 @@ namespace Ecs {
         SerializationContext ctx( const_cast<Ecs*>( this ) );
         source->serialize( ctx, ar );
     #else
-        DC_NOT_IMPLEMENTED;
+        EntityWPtr _source = const_cast<TArchetype*>( source.get() );
+        KeyValue kv;
+        Serializer serializer( const_cast<Ecs*>( this ) );
+        serializer.serialize( _source, kv );
+        ar = Variant::fromValue( kv );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
         // Create archetype instance
-        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar );
+        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar, assembly );
 
         return instance;
     }
 
 	// ** Ecs::createArchetypes
     template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Archives& data ) const
+	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const
 	{
 		Array<StrongPtr<TArchetype>> result;
 
 		for( s32 i = 0, n = data.size(); i < n; i++ ) {
             const Archive& item = data[i];
-			result.push_back( createArchetype<TArchetype>( item.as<KeyValue>()["_id"].as<Guid>(), &item ) );
+			result.push_back( createArchetype<TArchetype>( item.as<KeyValue>()["id"].as<Guid>(), &item, assembly ) );
 		}
 
 		return result;

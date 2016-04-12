@@ -26,6 +26,7 @@
 
 #include "Entity/Aspect.h"
 #include "Ecs.h"
+#include "EntitySerializer.h"
 
 #include "Entity/Entity.h"
 #include "Entity/Index.h"
@@ -113,7 +114,7 @@ s32 Ecs::addEntities( const EntityArray& entities )
 }
 
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data ) const
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
@@ -141,7 +142,8 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
         SerializationContext ctx( const_cast<Ecs*>( this ) );
 		instance->deserialize( ctx, *data );
     #else
-        DC_NOT_IMPLEMENTED;
+        Serializer serializer( const_cast<Ecs*>( this ) );
+        serializer.deserialize( assembly, instance, data->as<KeyValue>() );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 

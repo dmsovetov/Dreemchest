@@ -37,6 +37,8 @@
 #include "../io/serialization/Serializer.h"
 #include "../Io/KeyValue.h"
 
+#include <Reflection/Serialization/Serializer.h>
+
 #if defined( DC_PLATFORM_WINDOWS )
     #define     _WINSOCK_DEPRECATED_NO_WARNINGS
     #include	<winsock2.h>
@@ -246,7 +248,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
         : public Io::SerializableT<T>
     #else
-        : public Io::Streamable<RefCounted>
+        : public Io::Streamable
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     {
 	};
@@ -257,7 +259,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
         : public Io::SerializableT<T>
     #else
-        : public Io::Streamable<RefCounted>
+        : public Io::Streamable
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     {
 	};
@@ -268,7 +270,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
         : public Io::SerializableT<T>
     #else
-        : public Io::Streamable<RefCounted>
+        : public Io::Streamable
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     {
 	};
@@ -278,7 +280,7 @@ namespace Network {
     #if DEV_DEPRECATED_SERIALIZATION
         : public Io::SerializableT<Error>
     #else
-        : public Io::Streamable<RefCounted>
+        : public Io::Streamable
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     {
 		//! Error codes
