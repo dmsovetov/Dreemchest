@@ -120,11 +120,11 @@ DC_END_DREEMCHEST
 #define _INSTROSPECTION_ACCESSOR( type ) \
             virtual const ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void ) const                            \
             {                                                                                                       \
-                return /*type::*/staticMetaObject();                                                                    \
+                return staticMetaObject();                                                                          \
             }                                                                                                       \
             virtual ::DC_DREEMCHEST_NS Reflection::Class* metaObject( void )                                        \
             {                                                                                                       \
-                return /*type::*/staticMetaObject();                                                                    \
+                return staticMetaObject();                                                                          \
             }                                                                                                       \
             virtual::DC_DREEMCHEST_NS Reflection::Instance metaInstance( void )                                     \
             {                                                                                                       \
@@ -174,8 +174,8 @@ DC_END_DREEMCHEST
                 return &meta;                                                                                                   \
             }
 
-//! Adds the property member to an introspection.
+//! Adds a property member to an introspection.
 #define PROPERTY( name, getter, setter, ... )    \
-            Reflection::Private::PropertyFactory<Object>::createProperty( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
+            Reflection::Private::ValuePropertyFactory<Object>::create( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
 
 #endif    /*    !__DC_Reflection_MetaObject_H__    */

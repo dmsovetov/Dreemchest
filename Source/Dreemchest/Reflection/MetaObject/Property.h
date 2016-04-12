@@ -88,9 +88,9 @@ namespace Reflection {
 
     namespace Private {
 
-        //! Generic property bound to a specified type.
+        //! Generic value property bound to a specified type.
         template<typename TObject, typename TValue, typename TPropertyValue>
-        class Property : public ::DC_DREEMCHEST_NS Reflection::Property {
+        class ValueProperty : public Property {
         public:
 
             //! The property getter.
@@ -99,8 +99,8 @@ namespace Reflection {
             //! The property setter.
             typedef void            ( TObject::*Setter )( TPropertyValue );
 
-                                    //! Constructs the Property instance.
-                                    Property( CString name, Getter getter, Setter setter, const PropertyInfo& info );
+                                    //! Constructs the ValueProperty instance.
+                                    ValueProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info );
 
         protected:
 
@@ -125,26 +125,26 @@ namespace Reflection {
             Setter                  m_setter;       //!< The property setter.
         };
 
-        // ** Property::Property
+        // ** ValueProperty::ValueProperty
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Property<TObject, TValue, TPropertyValue>::Property( CString name, Getter getter, Setter setter, const PropertyInfo& info )
-            : :: DC_DREEMCHEST_NS Reflection::Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
+        ValueProperty<TObject, TValue, TPropertyValue>::ValueProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info )
+            : Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
         {
         }
 
-        // ** Property::set
+        // ** ValueProperty::set
         template<typename TObject, typename TValue, typename TPropertyValue>
-        void Property<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value ) const
+        void ValueProperty<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value ) const
         {
             TValue v = value.as<TValue>();
             (instance.pointer<TObject>()->*m_setter)( v );
         }
 
-        // ** Property::update
+        // ** ValueProperty::update
         template<typename TObject, typename TValue, typename TPropertyValue>
-        bool Property<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value ) const
+        bool ValueProperty<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value ) const
         {
             TObject* object = instance.pointer<TObject>();
 
@@ -159,26 +159,26 @@ namespace Reflection {
             return true;
         }
 
-        // ** Property::get
+        // ** ValueProperty::get
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Variant Property<TObject, TValue, TPropertyValue>::get( InstanceConst instance ) const
+        Variant ValueProperty<TObject, TValue, TPropertyValue>::get( InstanceConst instance ) const
         {
             TValue v = (instance.pointer<TObject>()->*m_getter)();
             return Variant::fromValue<TValue>( v );
         }
 
-        // ** Property::deserialize
+        // ** ValueProperty::deserialize
         template<typename TObject, typename TValue, typename TPropertyValue>
-        void Property<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
+        void ValueProperty<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
         {
             TValue v;
             v << value;
             (instance.pointer<TObject>()->*m_setter)( v );
         }
 
-        // ** Property::serialize
+        // ** ValueProperty::serialize
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Variant Property<TObject, TValue, TPropertyValue>::serialize( InstanceConst instance ) const
+        Variant ValueProperty<TObject, TValue, TPropertyValue>::serialize( InstanceConst instance ) const
         {
             Variant result;
             TValue v = (instance.pointer<TObject>()->*m_getter)();
