@@ -79,6 +79,18 @@ namespace Reflection {
         //! Calculates a type converter hash.
         u64                     calculateTypeConverterHash( const Type* from, const Type* to ) const;
 
+        //! Deserializes an iterable value.
+        void                    deserializeIterable( const Class& cls, const Property& property, const Instance& instance, const Variant& value, IteratorUPtr iterator ) const;
+
+        //! Deserializes a primitive value.
+        void                    deserializeValue( const Class& cls, const Property& property, const Instance& instance, const Variant& value ) const;
+
+        //! Serializes an iterable value.
+        void                    serializeIterable( const Class& cls, const Property& property, const InstanceConst& instance, ConstIteratorUPtr iterator, KeyValue& ar ) const;
+
+        //! Serializes a primitive value.
+        void                    serializeValue( const Class& cls, const Property& property, const InstanceConst& instance, KeyValue& ar ) const;
+
 	private:
 
 		//! Container type to store type conversions.

@@ -59,19 +59,14 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
             continue;
         }
 
-        // Serialize property to a Variant
-        Variant value = property->serialize( instance );
+        // Is this property iterable?
+        ConstIteratorUPtr iterator = property->iterator( instance );
 
-        // Do we have to convert a value before writing it to a key-value archive?
-        TypeConverter converter = findTypeConverter( value.type(), Type::fromClass<Variant>() );
-
-        // Perform a conversion
-        if( converter ) {
-            value = converter( *cls, *property, value );
+        if( iterator.get() ) {
+            serializeIterable( *cls, *property, instance, iterator, ar );
+        } else {
+            serializeValue( *cls, *property, instance, ar );
         }
-
-        // Now set a key inside a key-value archive
-        ar.setValueAtKey( member->name(), value );
     }
 
     return true;
@@ -136,17 +131,94 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
             continue;
         }
 
-        // Do we have to convert a value before sending it to a property?
-        TypeConverter converter = findTypeConverter( value.type(), property->type() );
+        // Is this property iterable?
+        IteratorUPtr iterator = property->iterator( instance );
 
-        // Perform a conversion
-        if( converter ) {
-            value = converter( *cls, *property, value );
+        if( iterator.get() ) {
+            deserializeIterable( *cls, *property, instance, value, iterator );
+        } else {
+            deserializeValue( *cls, *property, instance, value );
         }
-
-        // Finally set a property value
-        property->deserialize( instance, value );
     }
+}
+
+// ** Serializer::deserializeIterable
+void Serializer::deserializeIterable( const Class& cls, const Property& property, const Instance& instance, const Variant& value, IteratorUPtr iterator ) const
+{
+    // Get a list iterator
+    ListIterator* list = iterator->isList();
+
+    // Get an array value from a variant
+    VariantArray array = value.as<VariantArray>();
+
+    // Get an underlying container
+    const VariantArray::Container& items = array;
+
+    // Now insert elements to a container
+    for( s32 i = 0, n = static_cast<s32>( items.size() ); i < n; i++ ) {
+        // Get an element value
+        const Variant& item = items[i];
+
+        // Do we have to convert a value before sending it to a property?
+        TypeConverter converter = findTypeConverter( item.type(), iterator->valueType() );
+
+        // Perform a conversion and set a property
+        list->insertAfter( converter ? converter( cls, property, item ) : item );   
+    }
+}
+
+// ** Serializer::deserializeValue
+void Serializer::deserializeValue( const Class& cls, const Property& property, const Instance& instance, const Variant& value ) const
+{
+    // Do we have to convert a value before sending it to a property?
+    TypeConverter converter = findTypeConverter( value.type(), property.type() );
+
+    // Perform a conversion and set a property
+    if( converter ) {
+        property.deserialize( instance, converter( cls, property, value ) );
+    } else {
+        property.deserialize( instance, value );
+    }
+}
+
+// ** Serializer::serializeIterable
+void Serializer::serializeIterable( const Class& cls, const Property& property, const InstanceConst& instance, ConstIteratorUPtr iterator, KeyValue& ar ) const
+{
+    // Create an empty variant array
+    VariantArray array;
+
+    // Iterate all elements and append them to an array
+    while( iterator->next() ) {
+        // Get current element
+        Variant item = iterator->value();
+
+        // Do we have to convert a value before writing it to a key-value archive?
+        TypeConverter converter = findTypeConverter( item.type(), Type::fromClass<Variant>() );
+
+        // Append an item to an array
+        array << (converter ? converter( cls, property, item ) : item);
+    }
+
+    // Append a cunstructed array to a key-value storage
+    ar.setValueAtKey( property.name(), Variant::fromValue( array ) );
+}
+
+// ** Serializer::serializeValue
+void Serializer::serializeValue( const Class& cls, const Property& property, const InstanceConst& instance, KeyValue& ar ) const
+{
+    // Serialize property to a Variant
+    Variant value = property.serialize( instance );
+
+    // Do we have to convert a value before writing it to a key-value archive?
+    TypeConverter converter = findTypeConverter( value.type(), Type::fromClass<Variant>() );
+
+    // Perform a conversion
+    if( converter ) {
+        value = converter( cls, property, value );
+    }
+
+    // Now set a key inside a key-value archive
+    ar.setValueAtKey( property.name(), value );
 }
 
 // ** Serializer::readPropertyValue

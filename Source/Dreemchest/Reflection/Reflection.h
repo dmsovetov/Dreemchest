@@ -40,11 +40,18 @@ namespace Reflection {
     class MetaObject;
         class Class;
         class Enum;
+    class Iterator;
+        class ListIterator;
+        class MapIterator;
 
     class Property;
     struct PropertyInfo;
 
     dcDeclarePtrs( Assembly )
+
+    //! An iterator unique pointer type.
+    typedef AutoPtr<Iterator>       IteratorUPtr;
+    typedef AutoPtr<const Iterator> ConstIteratorUPtr;
 
 } // namespace Reflection
 

@@ -28,6 +28,7 @@
 #define __DC_Reflection_Property_H__
 
 #include "Class.h"
+#include "Iterator.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -48,49 +49,53 @@ namespace Reflection {
     class Property : public Member {
     public:
 
-                                //! Constructs the Property instance.
-                                Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info );
+                                    //! Constructs the Property instance.
+                                    Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info );
 
         //! This type can be type casted to a property.
-        virtual const Property* isProperty( void ) const NIMBLE_OVERRIDE;
-        virtual Property*       isProperty( void ) NIMBLE_OVERRIDE;
+        virtual const Property*     isProperty( void ) const NIMBLE_OVERRIDE;
+        virtual Property*           isProperty( void ) NIMBLE_OVERRIDE;
 
         //! Returns the property value type.
-        const Type*             type( void ) const;
+        const Type*                 type( void ) const;
 
         //! Returns the property value meta-object.
-        const MetaObject*       metaObject( void ) const;
+        const MetaObject*           metaObject( void ) const;
 
         //! Returns property information.
-        const PropertyInfo&     info( void ) const;
+        const PropertyInfo&         info( void ) const;
+
+        //! Returns an iterator instance if a property is a collection.
+        virtual ConstIteratorUPtr   iterator( InstanceConst instance ) const NIMBLE_ABSTRACT;
+        virtual IteratorUPtr        iterator( Instance instance ) const NIMBLE_ABSTRACT;
     
         //! Sets the property value.
-        virtual void            set( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
+        virtual void                set( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
 
         //! Sets the property value only if it will be changed.
-        virtual bool            update( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
+        virtual bool                update( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
 
         //! Gets the property value.
-        virtual Variant         get( InstanceConst instance ) const NIMBLE_ABSTRACT;
+        virtual Variant             get( InstanceConst instance ) const NIMBLE_ABSTRACT;
 
         //! Converts Variant to a property value.
-        virtual void            deserialize( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
+        virtual void                deserialize( Instance instance, const Variant& value ) const NIMBLE_ABSTRACT;
 
         //! Converts a property value to a Variant.
-        virtual Variant         serialize( InstanceConst instance ) const NIMBLE_ABSTRACT;
+        virtual Variant             serialize( InstanceConst instance ) const NIMBLE_ABSTRACT;
 
     private:
 
-        const MetaObject*       m_metaObject;   //!< The property value meta-object.
-        const Type*             m_type;         //!< The property value type.
-        PropertyInfo            m_info;         //!< Property information.
+        const MetaObject*           m_metaObject;   //!< The property value meta-object.
+        const Type*                 m_type;         //!< The property value type.
+        PropertyInfo                m_info;         //!< Property information.
     };
 
     namespace Private {
 
         //! Generic value property bound to a specified type.
         template<typename TObject, typename TValue, typename TPropertyValue>
-        class ValueProperty : public Property {
+        class GenericProperty : public Property {
         public:
 
             //! The property getter.
@@ -99,52 +104,72 @@ namespace Reflection {
             //! The property setter.
             typedef void            ( TObject::*Setter )( TPropertyValue );
 
-                                    //! Constructs the ValueProperty instance.
-                                    ValueProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info );
+                                        //! Constructs the GenericProperty instance.
+                                        GenericProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info );
 
         protected:
 
+            //! Returns an iterator instance if a property is a collection.
+            virtual ConstIteratorUPtr   iterator( InstanceConst instance ) const NIMBLE_OVERRIDE;
+            virtual IteratorUPtr        iterator( Instance instance ) const NIMBLE_OVERRIDE;
+
             //! Sets the property value.
-            virtual void            set( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
+            virtual void                set( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
 
             //! Sets the property value only if it will be changed.
-            virtual bool            update( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
+            virtual bool                update( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
 
             //! Gets the property value.
-            virtual Variant         get( InstanceConst instance ) const NIMBLE_OVERRIDE;
+            virtual Variant             get( InstanceConst instance ) const NIMBLE_OVERRIDE;
 
             //! Decodes property value from a Variant.
-            virtual void            deserialize( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
+            virtual void                deserialize( Instance instance, const Variant& value ) const NIMBLE_OVERRIDE;
 
             //! Encodes property value to Variant.
-            virtual Variant         serialize( InstanceConst instance ) const NIMBLE_OVERRIDE;
+            virtual Variant             serialize( InstanceConst instance ) const NIMBLE_OVERRIDE;
 
         private:
 
-            Getter                  m_getter;       //!< The property getter.
-            Setter                  m_setter;       //!< The property setter.
+            Getter                      m_getter;       //!< The property getter.
+            Setter                      m_setter;       //!< The property setter.
         };
 
-        // ** ValueProperty::ValueProperty
+        // ** GenericProperty::GenericProperty
         template<typename TObject, typename TValue, typename TPropertyValue>
-        ValueProperty<TObject, TValue, TPropertyValue>::ValueProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info )
+        GenericProperty<TObject, TValue, TPropertyValue>::GenericProperty( CString name, Getter getter, Setter setter, const PropertyInfo& info )
             : Property( name, Type::fromClass<TValue>(), staticMetaObject<TValue>(), info )
             , m_getter( getter )
             , m_setter( setter )
         {
         }
 
-        // ** ValueProperty::set
+        // ** GenericProperty::iterator
         template<typename TObject, typename TValue, typename TPropertyValue>
-        void ValueProperty<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value ) const
+        ConstIteratorUPtr GenericProperty<TObject, TValue, TPropertyValue>::iterator( InstanceConst instance ) const
+        {
+            TPropertyValue collection = (instance.pointer<TObject>()->*m_getter)();
+            return Private::createIterator<TValue>( collection );
+        }
+
+        // ** GenericProperty::iterator
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        IteratorUPtr GenericProperty<TObject, TValue, TPropertyValue>::iterator( Instance instance ) const
+        {
+            TPropertyValue collection = (instance.pointer<TObject>()->*m_getter)();
+            return Private::createIterator<TValue>( collection );
+        }
+
+        // ** GenericProperty::set
+        template<typename TObject, typename TValue, typename TPropertyValue>
+        void GenericProperty<TObject, TValue, TPropertyValue>::set( Instance instance, const Variant& value ) const
         {
             TValue v = value.as<TValue>();
             (instance.pointer<TObject>()->*m_setter)( v );
         }
 
-        // ** ValueProperty::update
+        // ** GenericProperty::update
         template<typename TObject, typename TValue, typename TPropertyValue>
-        bool ValueProperty<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value ) const
+        bool GenericProperty<TObject, TValue, TPropertyValue>::update( Instance instance, const Variant& value ) const
         {
             TObject* object = instance.pointer<TObject>();
 
@@ -159,26 +184,26 @@ namespace Reflection {
             return true;
         }
 
-        // ** ValueProperty::get
+        // ** GenericProperty::get
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Variant ValueProperty<TObject, TValue, TPropertyValue>::get( InstanceConst instance ) const
+        Variant GenericProperty<TObject, TValue, TPropertyValue>::get( InstanceConst instance ) const
         {
             TValue v = (instance.pointer<TObject>()->*m_getter)();
             return Variant::fromValue<TValue>( v );
         }
 
-        // ** ValueProperty::deserialize
+        // ** GenericProperty::deserialize
         template<typename TObject, typename TValue, typename TPropertyValue>
-        void ValueProperty<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
+        void GenericProperty<TObject, TValue, TPropertyValue>::deserialize( Instance instance, const Variant& value ) const
         {
             TValue v;
             v << value;
             (instance.pointer<TObject>()->*m_setter)( v );
         }
 
-        // ** ValueProperty::serialize
+        // ** GenericProperty::serialize
         template<typename TObject, typename TValue, typename TPropertyValue>
-        Variant ValueProperty<TObject, TValue, TPropertyValue>::serialize( InstanceConst instance ) const
+        Variant GenericProperty<TObject, TValue, TPropertyValue>::serialize( InstanceConst instance ) const
         {
             Variant result;
             TValue v = (instance.pointer<TObject>()->*m_getter)();

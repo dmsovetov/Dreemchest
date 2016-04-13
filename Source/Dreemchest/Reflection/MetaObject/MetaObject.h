@@ -176,6 +176,6 @@ DC_END_DREEMCHEST
 
 //! Adds a property member to an introspection.
 #define PROPERTY( name, getter, setter, ... )    \
-            Reflection::Private::ValuePropertyFactory<Object>::create( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
+            Reflection::Private::PropertyFactory<Object>::create( #name, &Object::getter, &Object::setter, Reflection::PropertyInfo( __VA_ARGS__ ) )
 
 #endif    /*    !__DC_Reflection_MetaObject_H__    */

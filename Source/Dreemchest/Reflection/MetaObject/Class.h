@@ -98,24 +98,24 @@ namespace Reflection {
     namespace Private {
 
         //! Forward declaration of a generic property type.
-        template<typename TObject, typename TValue, typename TPropertyValue> class ValueProperty;
+        template<typename TObject, typename TValue, typename TPropertyValue> class GenericProperty;
 
         //! Property factory type.
         template<typename TObject>
-        struct ValuePropertyFactory {
+        struct PropertyFactory {
             //! Creates property that accepts POD values and is bound to a specified data type.
             template<typename TValue>
             static Property* create( CString name, TValue ( TObject::*getter )( void ) const, void ( TObject::*setter )( TValue ), const PropertyInfo& info )
             {
-                return DC_NEW ValueProperty<TObject, TValue, TValue>( name, getter, setter, info );
+                return DC_NEW GenericProperty<TObject, TValue, TValue>( name, getter, setter, info );
             }
 
             //! Creates property that accepts refereces and is bound to a specified data type.
             template<typename TValue>
             static Property* create( CString name, const TValue& ( TObject::*getter )( void ) const, void ( TObject::*setter )( const TValue& ), const PropertyInfo& info )
             {
-                return DC_NEW ValueProperty<TObject, TValue, const TValue&>( name, getter, setter, info );
-            }       
+                return DC_NEW GenericProperty<TObject, TValue, const TValue&>( name, getter, setter, info );
+            }
         };
 
     } // namespace Private
