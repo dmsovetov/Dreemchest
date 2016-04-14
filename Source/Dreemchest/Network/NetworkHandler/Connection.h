@@ -168,15 +168,17 @@ namespace Network {
             template<typename T>
             static Io::ByteBufferPtr write( const T& value )
             {
-                DC_NOT_IMPLEMENTED;
-                return Io::ByteBufferPtr();
+               Io::ByteBufferPtr stream = Io::ByteBuffer::create();
+               value.serialize( stream );
+               return stream;
             }
 
             template<typename T>
             static T read( Io::StreamPtr stream )
             {
-                DC_NOT_IMPLEMENTED;
-                return T();
+                T v;
+                v.deserialize( stream );
+                return v;
             }
         };
 
