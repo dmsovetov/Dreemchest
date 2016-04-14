@@ -37,6 +37,9 @@ namespace Ecs {
     class Serializer : public Reflection::Serializer {
     public:
 
+		//! Function type used by a component converters.
+		typedef cClosure<KeyValue(const Variant&)> ComponentConverter;
+
                                             //! Constructs Serializer instance.
                                             Serializer( EcsWPtr ecs, const Bitset& excluded = Bitset() );
 
@@ -46,7 +49,14 @@ namespace Ecs {
         //! Creates entity and reads it from a key-value storage.
         virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
+		//! Registers a type converter.
+		template<typename TComponent>
+		void					            registerComponentConverter( const ComponentConverter& callback );
+
 	private:
+
+        //! Returns a component converter.
+        ComponentConverter                  findComponentConverter( const String& name ) const;
 
 		//! Callback to access the default value of Entity flags property.
 		Variant								defaultEntityFlags( const KeyValue& ar ) const;
@@ -59,9 +69,21 @@ namespace Ecs {
 
     private:
 
-        EcsWPtr                             m_ecs;      //!< Parent Ecs instance.
-        Bitset                              m_excluded; //!< List of excluded components.
+		//! Container type to store component conversions.
+		typedef HashMap<String32, ComponentConverter, String32Hasher> ComponentConverters;
+
+        EcsWPtr                             m_ecs;                  //!< Parent Ecs instance.
+        Bitset                              m_excluded;             //!< List of excluded components.
+        ComponentConverters                 m_componentConverters;  //!< Registered component converters.
     };
+
+    // ** Serializer::registerComponentConverter
+	template<typename TComponent>
+	void Serializer::registerComponentConverter( const ComponentConverter& callback )
+    {
+        String32 hash( TypeInfo<TComponent>::name() );
+        m_componentConverters[hash] = callback;
+    }
 
 } // namespace Ecs
 

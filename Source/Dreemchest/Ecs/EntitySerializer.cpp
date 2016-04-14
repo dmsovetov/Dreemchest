@@ -96,14 +96,24 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
 			continue;
 		}
 
-        // Key-value storage expected
-        if( !i->second.type()->is<KeyValue>() ) {
-            LogError( "serializer", "entity component '%s' data is expected to be a key-value storage\n", i->first.c_str() );
-            continue;
+        // First lookup a component converter
+        ComponentConverter converter = findComponentConverter( i->first );
+
+        // Perform a conversion if converter found
+        KeyValue kv;
+        if( converter ) {
+            kv = converter( i->second );
+        } else {
+            // Key-value storage expected
+            if( !i->second.type()->is<KeyValue>() ) {
+                LogError( "serializer", "entity component '%s' data is expected to be a key-value storage\n", i->first.c_str() );
+                continue;
+            }
+            kv = i->second.as<KeyValue>();
         }
 
         // Create and read component instance
-        Reflection::Instance instance = createAndDeserialize( assembly, i->first, i->second.as<KeyValue>() );
+        Reflection::Instance instance = createAndDeserialize( assembly, i->first, kv );
 
         if( !instance ) {
             continue;
@@ -121,6 +131,14 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
 	}
 
     return true;
+}
+
+// ** Serializer::findComponentConverter
+Serializer::ComponentConverter Serializer::findComponentConverter( const String& name ) const
+{
+    String32 hash( name.c_str() );
+    ComponentConverters::const_iterator i = m_componentConverters.find( hash );
+    return i != m_componentConverters.end() ? i->second : ComponentConverter();
 }
 
 // ** Serializer::defaultEntityFlags
