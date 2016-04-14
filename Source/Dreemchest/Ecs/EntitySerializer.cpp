@@ -64,6 +64,14 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
             continue;
         }
 
+        // Get a component meta-object
+        const Reflection::Class* metaClass = i->second->metaObject();
+
+        // Skip component with no type, this means it's an abstract data type
+        if( !metaClass->type() ) {
+            continue;
+        }
+
         // Serialize component to a temporary key-value storage
         KeyValue component;
         Reflection::Serializer::serialize( i->second->metaInstance(), component );
