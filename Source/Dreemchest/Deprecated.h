@@ -74,14 +74,14 @@ DC_END_DREEMCHEST
                 }
 #endif  /*  NIMBLE_DEBUG    */
 
-#ifdef NIMBLE_NO_DEBUG
+#if NIMBLE_NO_DEBUG
     #undef DC_BREAK_IF
     #define DC_BREAK_IF( ... )
     #undef DC_ABORT_IF
     #define DC_ABORT_IF( ... )
     #undef DC_NOT_IMPLEMENTED
     #define DC_NOT_IMPLEMENTED
-#endif  /*  #ifdef NIMBLE_NO_DEBUG  */
+#endif  /*  #if NIMBLE_NO_DEBUG  */
 
 #define DC_DEPRECATED       NIMBLE_DEPRECATED
 #define DC_DECL_OVERRIDE    NIMBLE_OVERRIDE
