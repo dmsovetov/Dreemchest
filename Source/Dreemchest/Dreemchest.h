@@ -59,8 +59,8 @@
 #define LogMilestone( prefix, message, ... ) Log::milestone( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
 #define LogWarning( prefix, message, ... )   Log::warn( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
 #define LogError( prefix, message, ... )     Log::error( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
-#define LogFatal( prefix, message, ... )     Log::fatal( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
-#define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT, prefix, message, __VA_ARGS__ )
+#define LogFatal( prefix, message, ... )     Log::fatal( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
+#define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 
 #ifdef HAVE_JSON
 	#include <json/json.h>
