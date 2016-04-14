@@ -79,14 +79,20 @@ namespace Reflection {
         //! Calculates a type converter hash.
         u64                     calculateTypeConverterHash( const Type* from, const Type* to ) const;
 
-        //! Deserializes an iterable value.
-        void                    deserializeIterable( const Class& cls, const Property& property, const Instance& instance, const Variant& value, IteratorUPtr iterator ) const;
+        //! Deserializes a list property value.
+        void                    deserializeList( const Class& cls, const Property& property, const Instance& instance, const Variant& value, Reflection::ListIterator& iterator ) const;
+
+        //! Deserializes a map property value.
+        void                    deserializeMap( const Class& cls, const Property& property, const Instance& instance, const Variant& value, Reflection::MapIterator& iterator ) const;
 
         //! Deserializes a primitive value.
         void                    deserializeValue( const Class& cls, const Property& property, const Instance& instance, const Variant& value ) const;
 
-        //! Serializes an iterable value.
-        void                    serializeIterable( const Class& cls, const Property& property, const InstanceConst& instance, ConstIteratorUPtr iterator, KeyValue& ar ) const;
+        //! Serializes a list property value.
+        void                    serializeList( const Class& cls, const Property& property, const InstanceConst& instance, const Reflection::ListIterator& iterator, KeyValue& ar ) const;
+
+        //! Serializes a map property value.
+        void                    serializeMap( const Class& cls, const Property& property, const InstanceConst& instance, const Reflection::MapIterator& iterator, KeyValue& ar ) const;
 
         //! Serializes a primitive value.
         void                    serializeValue( const Class& cls, const Property& property, const InstanceConst& instance, KeyValue& ar ) const;

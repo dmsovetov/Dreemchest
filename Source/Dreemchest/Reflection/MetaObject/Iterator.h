@@ -74,9 +74,6 @@ namespace Reflection {
         virtual const ListIterator* isList( void ) const NIMBLE_OVERRIDE { return this; }
         virtual ListIterator*       isList( void ) NIMBLE_OVERRIDE { return this; }
 
-        //! Returns true if this iterator is valid.
-        virtual bool                isValid( void ) const NIMBLE_ABSTRACT;
-
         //! Inserts a new element after a current value.
         virtual void                insertAfter( const Variant& value ) NIMBLE_ABSTRACT;
 
@@ -91,9 +88,6 @@ namespace Reflection {
         //! Returns a valid pointer if this iterator was issued by a map.
         virtual const MapIterator*  isMap( void ) const NIMBLE_OVERRIDE { return this; }
         virtual MapIterator*        isMap( void ) NIMBLE_OVERRIDE { return this; }
-
-        //! Returns true if this iterator is valid.
-        virtual bool                isValid( void ) const NIMBLE_ABSTRACT;
 
         //! Returns an current key.
         virtual Variant             key( void ) const NIMBLE_ABSTRACT;
@@ -228,6 +222,142 @@ namespace Reflection {
             m_iterator = m_collection.insert( m_iterator, v );
         }
 
+        //! Generic map iterator type.
+        template<typename TCollection> 
+        class GenericMapIterator : public MapIterator {
+        public:
+
+                                            //! Constructs GenericMapIterator instance.
+                                            GenericMapIterator( TCollection& collection );
+
+            //! Returns true if this iterator is valid.
+            virtual bool                    isValid( void ) const NIMBLE_OVERRIDE;
+
+            //! Returns a value type.
+            virtual const Type*             valueType( void ) const NIMBLE_OVERRIDE;
+
+            //! Returns a current value.
+            virtual Variant                 value( void ) const NIMBLE_OVERRIDE;
+
+            //! Iterates to a next element and returns true if an end of a collection was not reached.
+            virtual bool                    next( void ) const NIMBLE_OVERRIDE;
+
+            //! Returns the total number of elements inside a collection.
+            virtual s32                     count( void ) const NIMBLE_OVERRIDE;
+
+            //! Removes the current element from a collection.
+            virtual void                    remove( void ) NIMBLE_OVERRIDE;
+
+            //! Returns an current key.
+            virtual Variant                 key( void ) const NIMBLE_OVERRIDE;
+
+            //! Returns a key type.
+            virtual const Type*             keyType( void ) const NIMBLE_OVERRIDE;
+
+            //! Inserts a new value with a specified key, returns false if a collection contained an element with a specified key.
+            virtual bool                    insert( const Variant& key, const Variant& value ) NIMBLE_OVERRIDE;
+
+        private:
+
+            TCollection&                            m_collection;   //!< Collection reference.
+            mutable typename TCollection::iterator  m_iterator;     //!< Current iterator value.
+        };
+
+        // ** GenericMapIterator::GenericMapIterator
+        template<typename TCollection> 
+        GenericMapIterator<TCollection>::GenericMapIterator( TCollection& collection )
+            : m_collection( collection )
+            , m_iterator( collection.end() )
+        {
+        }
+
+        // ** GenericMapIterator::isValid
+        template<typename TCollection>
+        bool GenericMapIterator<TCollection>::isValid( void ) const
+        {
+            return m_iterator != m_collection.end();
+        }
+
+        // ** GenericMapIterator::valueType
+        template<typename TCollection> 
+        const Type* GenericMapIterator<TCollection>::valueType( void ) const
+        {
+            return Type::fromClass<typename TCollection::mapped_type>();
+        }
+
+        // ** GenericMapIterator::value
+        template<typename TCollection> 
+        Variant GenericMapIterator<TCollection>::value( void ) const
+        {
+            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            Variant v;
+            m_iterator->second >> v;
+            return v;
+        }
+
+        // ** GenericMapIterator::next
+        template<typename TCollection> 
+        bool GenericMapIterator<TCollection>::next( void ) const
+        {
+            if( isValid() ) {
+                m_iterator++;
+            } else {
+                m_iterator = m_collection.begin();
+            }
+
+            return isValid();
+        }
+
+        // ** GenericMapIterator::count
+        template<typename TCollection> 
+        s32 GenericMapIterator<TCollection>::count( void ) const
+        {
+            return static_cast<s32>( m_collection.size() );
+        }
+
+        // ** GenericMapIterator::remove
+        template<typename TCollection> 
+        void GenericMapIterator<TCollection>::remove( void )
+        {
+            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            m_iterator = m_collection.erase( m_iterator );
+        }
+
+        // ** GenericMapIterator::key
+        template<typename TCollection> 
+        Variant GenericMapIterator<TCollection>::key( void ) const
+        {
+            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            Variant v;
+            m_iterator->first >> v;
+            return v;
+        }
+
+        // ** GenericMapIterator::keyType
+        template<typename TCollection> 
+        const Type* GenericMapIterator<TCollection>::keyType( void ) const
+        {
+            return Type::fromClass<typename TCollection::key_type>();
+        }
+
+        // ** GenericMapIterator::insert
+        template<typename TCollection> 
+        bool GenericMapIterator<TCollection>::insert( const Variant& key, const Variant& value )
+        {
+            typename TCollection::key_type k;
+            k << key;
+
+            if( m_collection.count( k ) ) {
+                return false;
+            }
+
+            typename TCollection::mapped_type v;
+            v << value;
+            m_collection[k] = v;
+
+            return true;
+        }
+
         //! Returns a null pointer for a types that are not collections.
         template<typename TCollection>
         struct NullIteratorFactory {
@@ -254,8 +384,7 @@ namespace Reflection {
             //! Just returns a null pointer
             static Iterator* create( const TCollection& collection )
             {
-                DC_NOT_IMPLEMENTED;
-                return NULL;
+                return DC_NEW GenericMapIterator<TCollection>( const_cast<TCollection&>( collection ) );
             }
         };
 

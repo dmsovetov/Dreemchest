@@ -63,7 +63,15 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
         ConstIteratorUPtr iterator = property->iterator( instance );
 
         if( iterator.get() ) {
-            serializeIterable( *cls, *property, instance, iterator, ar );
+            if( const Reflection::ListIterator* list = iterator->isList() ) {
+                serializeList( *cls, *property, instance, *list, ar );
+            }
+            else if( const Reflection::MapIterator* map = iterator->isMap() ) {
+                serializeMap( *cls, *property, instance, *map, ar );
+            }
+            else {
+                DC_NOT_IMPLEMENTED;
+            }
         } else {
             serializeValue( *cls, *property, instance, ar );
         }
@@ -135,19 +143,24 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
         IteratorUPtr iterator = property->iterator( instance );
 
         if( iterator.get() ) {
-            deserializeIterable( *cls, *property, instance, value, iterator );
+            if( Reflection::ListIterator* list = iterator->isList() ) {
+                deserializeList( *cls, *property, instance, value, *list );
+            }
+            else if( Reflection::MapIterator* map = iterator->isMap() ) {
+                deserializeMap( *cls, *property, instance, value, *map );
+            }
+            else {
+                DC_NOT_IMPLEMENTED;
+            }
         } else {
             deserializeValue( *cls, *property, instance, value );
         }
     }
 }
 
-// ** Serializer::deserializeIterable
-void Serializer::deserializeIterable( const Class& cls, const Property& property, const Instance& instance, const Variant& value, IteratorUPtr iterator ) const
+// ** Serializer::deserializeList
+void Serializer::deserializeList( const Class& cls, const Property& property, const Instance& instance, const Variant& value, Reflection::ListIterator& iterator ) const
 {
-    // Get a list iterator
-    ListIterator* list = iterator->isList();
-
     // Get an array value from a variant
     VariantArray array = value.as<VariantArray>();
 
@@ -160,10 +173,32 @@ void Serializer::deserializeIterable( const Class& cls, const Property& property
         const Variant& item = items[i];
 
         // Do we have to convert a value before sending it to a property?
-        TypeConverter converter = findTypeConverter( item.type(), iterator->valueType() );
+        TypeConverter converter = findTypeConverter( item.type(), iterator.valueType() );
 
         // Perform a conversion and set a property
-        list->insertAfter( converter ? converter( cls, property, item ) : item );   
+        iterator.insertAfter( converter ? converter( cls, property, item ) : item );   
+    }
+}
+
+// ** Serializer::deserializeMap
+void Serializer::deserializeMap( const Class& cls, const Property& property, const Instance& instance, const Variant& value, Reflection::MapIterator& iterator ) const
+{
+    // Get a key-value from a variant
+    KeyValue kv = value.as<KeyValue>();
+
+    // Get key-value properties
+    const KeyValue::Properties& properties = kv.properties();
+
+    // Now insert elements to a container
+    for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
+        // Get an element value
+        const Variant& item = i->second;
+
+        // Do we have to convert a value before sending it to a property?
+        TypeConverter converter = findTypeConverter( item.type(), iterator.valueType() );
+
+        // Perform a conversion and set a property
+        iterator.insert( Variant::fromValue( i->first ), converter ? converter( cls, property, item ) : item );   
     }
 }
 
@@ -181,16 +216,16 @@ void Serializer::deserializeValue( const Class& cls, const Property& property, c
     }
 }
 
-// ** Serializer::serializeIterable
-void Serializer::serializeIterable( const Class& cls, const Property& property, const InstanceConst& instance, ConstIteratorUPtr iterator, KeyValue& ar ) const
+// ** Serializer::serializeList
+void Serializer::serializeList( const Class& cls, const Property& property, const InstanceConst& instance, const Reflection::ListIterator& iterator, KeyValue& ar ) const
 {
     // Create an empty variant array
     VariantArray array;
 
     // Iterate all elements and append them to an array
-    while( iterator->next() ) {
+    while( iterator.next() ) {
         // Get current element
-        Variant item = iterator->value();
+        Variant item = iterator.value();
 
         // Do we have to convert a value before writing it to a key-value archive?
         TypeConverter converter = findTypeConverter( item.type(), Type::fromClass<Variant>() );
@@ -201,6 +236,31 @@ void Serializer::serializeIterable( const Class& cls, const Property& property, 
 
     // Append a cunstructed array to a key-value storage
     ar.setValueAtKey( property.name(), Variant::fromValue( array ) );
+}
+
+// ** Serializer::serializeMap
+void Serializer::serializeMap( const Class& cls, const Property& property, const InstanceConst& instance, const Reflection::MapIterator& iterator, KeyValue& ar ) const
+{
+    // Create an empty key-value
+    KeyValue kv;
+
+    // Iterate all elements and append them to an array
+    while( iterator.next() ) {
+        // Get current value
+        Variant value = iterator.value();
+
+        // Get current key
+        Variant key = iterator.key();
+
+        // Do we have to convert a value before writing it to a key-value archive?
+        TypeConverter converter = findTypeConverter( value.type(), Type::fromClass<Variant>() );
+
+        // Append an item to an array
+        kv.setValueAtKey( key.as<String>(), (converter ? converter( cls, property, value ) : value) );
+    }
+
+    // Append a cunstructed array to a key-value storage
+    ar.setValueAtKey( property.name(), Variant::fromValue( kv ) );
 }
 
 // ** Serializer::serializeValue
