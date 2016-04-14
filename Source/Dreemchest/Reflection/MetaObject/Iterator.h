@@ -172,7 +172,9 @@ namespace Reflection {
         Variant GenericListIterator<TCollection>::value( void ) const
         {
             DC_ABORT_IF( !isValid(), "invalid iterator" );
-            return Variant::fromValue( *m_iterator );
+            Variant v;
+            *m_iterator >> v;
+            return v;
         }
 
         // ** GenericListIterator::next
@@ -207,8 +209,12 @@ namespace Reflection {
         template<typename TCollection> 
         void GenericListIterator<TCollection>::insertAfter( const Variant& value )
         {
-            typename TCollection::iterator i = m_iterator;
-            m_iterator = m_collection.insert( i == m_collection.end() ? i : ++i, value.as<typename TCollection::value_type>() );
+            typename TCollection::iterator   i = m_iterator;
+
+            typename TCollection::value_type v;
+            v << value;
+
+            m_iterator = m_collection.insert( i == m_collection.end() ? i : ++i, v );
         }
 
         // ** GenericListIterator::insertBefore
@@ -216,7 +222,10 @@ namespace Reflection {
         void GenericListIterator<TCollection>::insertBefore( const Variant& value )
         {
             DC_ABORT_IF( !isValid(), "invalid iterator" );
-            m_iterator = m_collection.insert( m_iterator, value.as<typename TCollection::value_type>() );
+            typename TCollection::value_type v;
+            v << value;
+
+            m_iterator = m_collection.insert( m_iterator, v );
         }
 
         //! Returns a null pointer for a types that are not collections.
