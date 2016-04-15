@@ -261,7 +261,7 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 							<< "restitution" << m_parts[0].material.restitution;
 
     switch( m_parts[0].type ) {
-    case Polygon:   {
+    case Shape2DType::Polygon:   {
                         VariantArray vertices;
 
                         for( u32 i = 0; i < m_parts[0].polygon.count; i++ ) {
@@ -271,7 +271,7 @@ void Shape2D::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
                         ar = KvBuilder() << "type" << "polygon" << "vertices" << vertices << "material" << material;
                     }
                     break;
-    case Circle:    {
+    case Shape2DType::Circle:    {
                         ar = KvBuilder() << "type" << "circle" << "radius" << m_parts[0].circle.radius << "material" << material;
                     }
                     break;
@@ -292,7 +292,7 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
     KeyValue material = object.get<KeyValue>( "material" );
 
     // Parse material
-    Material shapeMaterial;
+    MaterialShape2D shapeMaterial;
     shapeMaterial.density       = material.get( "density", 1.0f );
     shapeMaterial.friction      = material.get( "friction", 0.2f );
     shapeMaterial.restitution   = material.get( "restitution", 0.0f );
@@ -305,10 +305,10 @@ void Shape2D::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
             points.push_back( Vec2( vertices[i * 2 + 0].as<f32>(), vertices[i * 2 + 1].as<f32>() ) );
         }
 
-        addPolygon( &points[0], points.size(), shapeMaterial );
+        addPart( SimpleShape2D::createPolygon( &points[0], points.size(), shapeMaterial ) );
     }
     else if( type == "circle" ) {
-        addCircle( object.get( "radius", 0.0f ), 0.0f, 0.0f, shapeMaterial );
+        addPart( SimpleShape2D::createCircle( object.get( "radius", 0.0f ), 0.0f, 0.0f, shapeMaterial ) );
     }
     else {
         DC_NOT_IMPLEMENTED;
