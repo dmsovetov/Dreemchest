@@ -49,6 +49,12 @@ namespace Ecs {
         //! Creates entity and reads it from a key-value storage.
         virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
+        //! Writes component instance to a key-value storage.
+        void                                serializeComponent( ComponentWPtr component, KeyValue& ar ) const;
+
+        //! Reads component instance from a key-value storage.
+        void                                deserializeComponent( ComponentWPtr component, const KeyValue& ar ) const;
+
 		//! Registers a type converter.
 		template<typename TComponent>
 		void					            registerComponentConverter( const ComponentConverter& callback );

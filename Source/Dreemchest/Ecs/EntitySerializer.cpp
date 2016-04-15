@@ -145,6 +145,18 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
     return true;
 }
 
+// ** Serializer::serializeComponent
+void Serializer::serializeComponent( ComponentWPtr component, KeyValue& ar ) const
+{
+    Reflection::Serializer::serialize( component->metaInstance(), ar );
+}
+
+// ** Serializer::deserializeComponent
+void Serializer::deserializeComponent( ComponentWPtr component, const KeyValue& ar ) const
+{
+    Reflection::Serializer::deserialize( component->metaInstance(), ar );
+}
+
 // ** Serializer::findComponentConverter
 Serializer::ComponentConverter Serializer::findComponentConverter( const String& name ) const
 {
