@@ -60,7 +60,7 @@ SimpleShape2D SimpleShape2D::createRect( f32 width, f32 height, f32 x, f32 y, co
 // ** SimpleShape2D::addPolygon
 SimpleShape2D SimpleShape2D::createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material )
 {
-	DC_BREAK_IF( count > SimpleShape2D::MaxVertices, "too much vertices" );
+	DC_BREAK_IF( count > PolygonShape2D::MaxVertices, "too much vertices" );
 
 	SimpleShape2D part;
 	part.type = Shape2DType::Polygon;
@@ -73,6 +73,142 @@ SimpleShape2D SimpleShape2D::createPolygon( const Vec2* vertices, u32 count, con
 	}
 
 	return part;
+}
+
+// ** SimpleShape2D::operator <<
+void SimpleShape2D::operator << ( const Variant& value )
+{
+    KeyValue kv = value.as<KeyValue>();
+
+    type     << kv.valueAtKey( "type" );
+    material << kv.valueAtKey( "material" );
+
+    switch( type ) {
+    case Shape2DType::Circle:   circle << value;    break;
+    case Shape2DType::Polygon:  polygon << value;   break;
+    case Shape2DType::Rect:     rect << value;      break;
+    default:                    DC_NOT_IMPLEMENTED;
+    };
+}
+
+// ** SimpleShape2D::operator >>
+void SimpleShape2D::operator >> ( Variant& value )
+{
+    Variant vtype, vmaterial, vshape;
+
+    type     >> vtype;
+    material >> vmaterial;
+
+    switch( type ) {
+    case Shape2DType::Circle:   circle >> vshape;   break;
+    case Shape2DType::Polygon:  polygon >> vshape;  break;
+    case Shape2DType::Rect:     rect >> vshape;     break;
+    default:                    DC_NOT_IMPLEMENTED;
+    };
+
+    KeyValue& kv = vshape.expect<KeyValue>();
+    kv.setValueAtKey( "material", vmaterial );
+    kv.setValueAtKey( "type", vtype );
+
+    value = Variant::fromValue( kv );
+}
+
+// ** SimpleShape2D::operator ==
+bool SimpleShape2D::operator == ( const SimpleShape2D& other ) const
+{
+    if( type != other.type ) {
+        return false;
+    }
+
+    if( memcmp( &material, &other.material, sizeof material ) != 0 ) {
+        return false;
+    }
+
+    switch( type ) {
+    case Shape2DType::Circle:   return memcmp( &circle,  &other.circle,  sizeof circle  ) == 0;
+    case Shape2DType::Polygon:  return memcmp( &polygon, &other.polygon, sizeof polygon ) == 0;
+    case Shape2DType::Rect:     return memcmp( &rect,    &other.rect,    sizeof rect    ) == 0;
+    }
+
+    return true;
+}
+
+// ---------------------------------------- CircleShape2D ---------------------------------------- //
+
+// ** CircleShape2D::operator <<
+void CircleShape2D::operator << ( const Variant& value )
+{
+    KeyValue kv = value.as<KeyValue>();
+    radius = kv.get<f32>( "radius", 0.0f );
+    x      = kv.get<f32>( "x", 0.0f );
+    y      = kv.get<f32>( "y", 0.0f );
+}
+
+// ** CircleShape2D::operator >>
+void CircleShape2D::operator >> ( Variant& value )
+{
+    value = Variant::fromValue<KeyValue>( KvBuilder() << "radius" << radius << "x" << x << "y" << y );
+}
+
+// ----------------------------------------- RectShape2D ---------------------------------------- //
+
+// ** RectShape2D::operator <<
+void RectShape2D::operator << ( const Variant& value )
+{
+    const KeyValue& kv = value.expect<KeyValue>();
+    x      = kv.get<f32>( "x", 0.0f );
+    y      = kv.get<f32>( "y", 0.0f );
+    width  = kv.get<f32>( "width", 0.0f );
+    height = kv.get<f32>( "height", 0.0f );
+}
+
+// ** RectShape2D::operator >>
+void RectShape2D::operator >> ( Variant& value )
+{
+    value = Variant::fromValue<KeyValue>( KvBuilder() << "x" << x << "y" << y << "width" << width << "height" << height );
+}
+
+// --------------------------------------- PolygonShape2D --------------------------------------- //
+
+// ** PolygonShape2D::operator <<
+void PolygonShape2D::operator << ( const Variant& value )
+{
+    const KeyValue& kv = value.expect<KeyValue>();
+    VariantArray vtx = kv.get<VariantArray>( "vertices" );
+    const VariantArray::Container& items = vtx;
+
+    count = items.size() / 2;
+    for( u32 i = 0; i < count * 2; i++ ) {
+        vertices[i] = items[i].as<f32>();
+    }
+}
+
+// ** PolygonShape2D::operator >>
+void PolygonShape2D::operator >> ( Variant& value )
+{
+    VariantArray vtx;
+    for( u32 i = 0; i < count; i++ ) {
+        vtx << vertices[i];
+    }
+
+    value = Variant::fromValue<KeyValue>( KvBuilder() << "count" << count << "vertices" << vtx );
+}
+
+// -------------------------------------- MaterialShape2D --------------------------------------- //
+
+// ** MaterialShape2D::operator <<
+void MaterialShape2D::operator << ( const Variant& value )
+{
+    KeyValue kv = value.as<KeyValue>();
+    friction    = kv.get<f32>( "friction", 0.2f );
+    density     = kv.get<f32>( "density", 1.0f );
+    restitution = kv.get<f32>( "restitution", 0.0f );
+}
+
+// ** MaterialShape2D::operator >>
+void MaterialShape2D::operator >> ( Variant& value )
+{
+    value = Variant::fromValue<KeyValue>( KvBuilder() << "friction" << friction << "density" << density << "restitution" << restitution );
 }
 
 // ------------------------------------------- Shape2D ------------------------------------------- //
@@ -100,6 +236,18 @@ const SimpleShape2D& Shape2D::part( u32 index ) const
 void Shape2D::addPart( const SimpleShape2D& part )
 {
     m_parts.push_back( part );
+}
+
+// ** Shape2D::parts
+const Shape2D::Parts& Shape2D::parts( void ) const
+{
+    return m_parts;
+}
+
+// ** Shape2D::setParts
+void Shape2D::setParts( const Shape2D::Parts& value )
+{
+    m_parts = value;
 }
 
 #if DEV_DEPRECATED_SERIALIZATION

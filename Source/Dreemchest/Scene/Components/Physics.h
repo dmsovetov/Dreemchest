@@ -45,34 +45,74 @@ namespace Scene {
         		    //! Constructs a material instance.
 					MaterialShape2D( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
 						: density( density ), friction( friction ), restitution( restitution ) {}
+
+        //! Reads a material from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a material to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A 2D circle shape type.
+    struct CircleShape2D {
+		f32		    radius;			//!< Circle radius.
+		f32		    x;				//!< Circle centroid X.
+		f32		    y;				//!< Circle centroid Y.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A 2D rectangle shape type.
+    struct RectShape2D {
+		f32		    width;			//!< Rectangle width.
+		f32		    height;			//!< Rectangle height.
+		f32		    x;				//!< Rectangle centroid X.
+		f32		    y;				//!< Rectangle centroid Y.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A polygon 2D shape type.
+    struct PolygonShape2D {
+        enum { MaxVertices = 8 };	//!< Maximum number of polygon vertices.
+
+	    f32		    vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
+        u32		    count;								//!< Polygon vertex count.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
     };
 
     //! A simple shape type a Shape2D component is composed from.
     struct SimpleShape2D {
-        enum { MaxVertices = 8 };	//!< Maximum number of polygon vertices.
-
         Shape2DType         type;       //!< Simple shape type.
         MaterialShape2D     material;   //!< Simple shape material.
 
 		union {
-			struct {
-				f32		    radius;			//!< Circle radius.
-				f32		    x;				//!< Circle centroid X.
-				f32		    y;				//!< Circle centroid Y.
-			} circle;	    //!< Circle shape data.
-
-			struct {
-				f32		    width;			//!< Rectangle width.
-				f32		    height;			//!< Rectangle height.
-				f32		    x;				//!< Rectangle centroid X.
-				f32		    y;				//!< Rectangle centroid Y.
-			} rect;		    //!< Rectangle shape data.
-
-			struct {
-				f32		    vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
-				u32		    count;								//!< Polygon vertex count.
-			} polygon;	    //! Polygon shape data.
+			CircleShape2D   circle;	    //!< Circle shape data.
+            RectShape2D     rect;	    //!< Rectangle shape data.
+            PolygonShape2D  polygon;    //! Polygon shape data.
 		};
+
+        //! Tests two shape instance for an equality.
+        bool                    operator == ( const SimpleShape2D& other ) const;
+
+        //! Reads a shape instance from a Variant value.
+        void                    operator << ( const Variant& value );
+
+        //! Writes a shape instance to a Variant value.
+        void                    operator >> ( Variant& value );
 
 		//! Creates a 2D circle shape.
 		static SimpleShape2D    createCircle( f32 radius, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
@@ -87,9 +127,14 @@ namespace Scene {
 	//! Shape of an object used for hit tests and/or 2D physics.
 	class Shape2D : public Ecs::Component<Shape2D> {
 
-        INTROSPECTION_SUPER( Shape2D, Ecs::ComponentBase )
+        INTROSPECTION_SUPER( Shape2D, Ecs::ComponentBase
+            , PROPERTY( parts, parts, setParts, "An array of simple shapes this component is composed from." )
+            )
 
 	public:
+
+        //! Container type to store shape parts.
+        typedef Array<SimpleShape2D> Parts;
 
 							    //! Constructs Shape2D instance.
 							    Shape2D( void ) {}
@@ -105,6 +150,12 @@ namespace Scene {
 
         //! Adds a new shape part.
         void                    addPart( const SimpleShape2D& part );
+
+        //! Returns shape parts.
+        const Parts&            parts( void ) const;
+
+        //! Sets shap parts.
+        void                    setParts( const Parts& value );
 
     #if 0
 		//! Adds a new circle shape part.
