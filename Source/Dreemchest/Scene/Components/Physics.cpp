@@ -187,7 +187,7 @@ void PolygonShape2D::operator << ( const Variant& value )
 void PolygonShape2D::operator >> ( Variant& value )
 {
     VariantArray vtx;
-    for( u32 i = 0; i < count; i++ ) {
+    for( u32 i = 0; i < count * 2; i++ ) {
         vtx << vertices[i];
     }
 
