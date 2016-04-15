@@ -172,6 +172,11 @@ void Serializer::deserializeList( const Class& cls, const Property& property, co
         // Get an element value
         const Variant& item = items[i];
 
+        if( !item.isValid() ) {
+            LogWarning( "serializer", "array property '%s' has an invalid value at %d\n", property.name(), i );
+            continue;
+        }
+
         // Do we have to convert a value before sending it to a property?
         TypeConverter converter = findTypeConverter( item.type(), iterator.valueType() );
 
