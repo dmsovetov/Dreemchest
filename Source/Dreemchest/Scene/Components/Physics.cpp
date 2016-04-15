@@ -30,6 +30,51 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ------------------------------------------- SimpleShape2D ------------------------------------------- //
+
+// ** SimpleShape2D::createCircle
+SimpleShape2D SimpleShape2D::createCircle( f32 radius, f32 x, f32 y, const MaterialShape2D& material )
+{
+	SimpleShape2D part;
+	part.type = Shape2DType::Circle;
+	part.material = material;
+	part.circle.radius = radius;
+	part.circle.x = x;
+	part.circle.y = y;
+    return part;
+}
+
+// ** SimpleShape2D::createRect
+SimpleShape2D SimpleShape2D::createRect( f32 width, f32 height, f32 x, f32 y, const MaterialShape2D& material )
+{
+	SimpleShape2D part;
+	part.type = Shape2DType::Rect;
+	part.material = material;
+	part.rect.width = width;
+	part.rect.height = height;
+	part.rect.x = x;
+	part.rect.y = y;
+	return part;
+}
+
+// ** SimpleShape2D::addPolygon
+SimpleShape2D SimpleShape2D::createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material )
+{
+	DC_BREAK_IF( count > SimpleShape2D::MaxVertices, "too much vertices" );
+
+	SimpleShape2D part;
+	part.type = Shape2DType::Polygon;
+	part.material = material;
+	part.polygon.count = count;
+
+	for( u32 i = 0; i < count; i++ ) {
+		part.polygon.vertices[i * 2 + 0] = vertices[i].x;
+		part.polygon.vertices[i * 2 + 1] = vertices[i].y;
+	}
+
+	return part;
+}
+
 // ------------------------------------------- Shape2D ------------------------------------------- //
 
 // ** Shape2D::clear
@@ -45,59 +90,16 @@ u32 Shape2D::partCount( void ) const
 }
 
 // ** Shape2D::part
-const Shape2D::Part& Shape2D::part( u32 index ) const
+const SimpleShape2D& Shape2D::part( u32 index ) const
 {
 	DC_ABORT_IF( index >= partCount(), "index is out of range" );
 	return m_parts[index];
 }
 
 // ** Shape2D::addPart
-void Shape2D::addPart( const Part& part )
+void Shape2D::addPart( const SimpleShape2D& part )
 {
     m_parts.push_back( part );
-}
-
-// ** Shape2D::addCircle
-void Shape2D::addCircle( f32 radius, f32 x, f32 y, const Material& material )
-{
-	Part part;
-	part.type = Circle;
-	part.material = material;
-	part.circle.radius = radius;
-	part.circle.x = x;
-	part.circle.y = y;
-    addPart( part );
-}
-
-// ** Shape2D::addRect
-void Shape2D::addRect( f32 width, f32 height, f32 x, f32 y, const Material& material )
-{
-	Part part;
-	part.type = Rect;
-	part.material = material;
-	part.rect.width = width;
-	part.rect.height = height;
-	part.rect.x = x;
-	part.rect.y = y;
-	addPart( part );
-}
-
-// ** Shape2D::addPolygon
-void Shape2D::addPolygon( const Vec2* vertices, u32 count, const Material& material )
-{
-	DC_BREAK_IF( count > Part::MaxVertices, "too much vertices" );
-
-	Part part;
-	part.type = Polygon;
-	part.material = material;
-	part.polygon.count = count;
-
-	for( u32 i = 0; i < count; i++ ) {
-		part.polygon.vertices[i * 2 + 0] = vertices[i].x;
-		part.polygon.vertices[i * 2 + 1] = vertices[i].y;
-	}
-
-	addPart( part );
 }
 
 #if DEV_DEPRECATED_SERIALIZATION
