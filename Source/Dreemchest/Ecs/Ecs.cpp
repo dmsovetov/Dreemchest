@@ -445,11 +445,15 @@ ComponentPtr SerializationContext::createComponent( const String& name ) const
 // ** SerializationContext::createEntity
 EntityPtr SerializationContext::createEntity( const String& name ) const
 {
+#if DEV_DEPRECATED_ECS_ARCHETYPES
     if( name == "Entity" ) {
         return const_cast<SerializationContext*>( this )->m_ecs->createEntity();
     }
 
     return m_ecs->createArchetypeByName( name );
+#else
+    return const_cast<SerializationContext*>( this )->m_ecs->createEntity();
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 }
 
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
