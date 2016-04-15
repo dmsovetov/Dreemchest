@@ -44,6 +44,10 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
     // Register entity value converter
     registerTypeConverter<Guid, EntityWPtr>( dcThisMethod( Serializer::convertGuidToEntity ) );
     registerTypeConverter<EntityWPtr, Variant>( dcThisMethod( Serializer::convertEntityToGuid ) );
+
+    // ------------------------------------- workaround for strong pointers
+    registerTypeConverter<Guid, EntityPtr>( dcThisMethod( Serializer::convertGuidToEntityPtr ) );
+    registerTypeConverter<EntityPtr, Variant>( dcThisMethod( Serializer::convertEntityPtrToGuid ) );
 }
 
 // ** Serializer::serialize
@@ -182,6 +186,40 @@ Variant Serializer::convertEntityToGuid( const Reflection::Class& cls, const Ref
 {
     // Get an entity reference
     EntityWPtr entity = value.as<EntityWPtr>();
+
+    // Return entity id or a null guid as variant
+    return Variant::fromValue( entity.valid() ? entity->id() : Guid() );
+}
+
+// ------------------------------------- workaround for strong pointers
+
+// ** Serializer::convertGuidToEntityPtr
+Variant Serializer::convertGuidToEntityPtr( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const
+{
+    // Get a Guid value
+    Guid id = value.as<Guid>();
+
+    // Return a NULL pointer if this is an empty Guid
+    if( id.isNull() ) {
+        return Variant::fromValue( EntityPtr() );
+    }
+
+    // Lookup entity by identifier
+    EntityPtr entity = m_ecs->findEntity( id );
+
+    // Show a warning message if no entity found
+    if( !entity.valid() ) {
+        LogWarning( "serializer", "%s.%s, unresolved entity %s\n", cls.name(), property.name(), id.toString().c_str() );
+    }
+
+    return Variant::fromValue( entity );
+}
+
+// ** Serializer::convertEntityPtrToGuid
+Variant Serializer::convertEntityPtrToGuid( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const
+{
+    // Get an entity reference
+    EntityPtr entity = value.as<EntityPtr>();
 
     // Return entity id or a null guid as variant
     return Variant::fromValue( entity.valid() ? entity->id() : Guid() );

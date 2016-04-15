@@ -67,6 +67,14 @@ namespace Ecs {
         //! Converts an entity reference to a Guid variant value.
         Variant                             convertEntityToGuid( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
 
+        // ------------------------------------- workaround for strong pointers
+
+        //! Converts a Guid value to an entity reference.
+        Variant                             convertGuidToEntityPtr( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
+
+        //! Converts an entity reference to a Guid variant value.
+        Variant                             convertEntityPtrToGuid( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
+
     private:
 
 		//! Container type to store component conversions.
