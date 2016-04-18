@@ -31,6 +31,7 @@
 #include "Widgets/Menu.h"
 #include "Widgets/MainWindow.h"
 #include "Widgets/AssetTree.h"
+#include "Widgets/Inspector/PropertyInspector.h"
 
 #include "Project/Project.h"
 
@@ -93,6 +94,9 @@ const String Composer::kAssetMime = "text/uri-list";
 // ** Composer::Composer
 Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_project( NULL )
 {
+    // Setup default logger
+    Logger::setStandardLogger();
+
     // Set application name
     setApplicationName( "Dreemchest Composer" );
 
@@ -104,6 +108,16 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
 
     // Setup default log handlers
 	Logger::setStandardLogger();
+
+    // Register property inspector widgets
+    Ui::PropertyInspector::registerWidget<String, Ui::StringEdit>();
+    Ui::PropertyInspector::registerWidget<Vec2, Ui::Vec2Edit>();
+    Ui::PropertyInspector::registerWidget<Vec3, Ui::Vec3Edit>();
+    Ui::PropertyInspector::registerWidget<Vec4, Ui::Vec4Edit>();
+    Ui::PropertyInspector::registerWidget<Quat, Ui::QuatEdit>();
+    Ui::PropertyInspector::registerWidget<f32, Ui::DoubleEdit>();
+    Ui::PropertyInspector::registerWidget<f64, Ui::DoubleEdit>();
+    Ui::PropertyInspector::registerWidget<s32, Ui::IntegerEdit>();
 }
 
 // ** Composer::project
@@ -312,6 +326,7 @@ DC_END_COMPOSER
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setLibraryPaths( QCoreApplication::libraryPaths() << "." << "imageformats" << "platforms" );
+    QLocale::setDefault( QLocale::c() );
 
     Composer app( argc, argv );
 

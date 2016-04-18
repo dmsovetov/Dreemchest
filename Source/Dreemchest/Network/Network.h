@@ -37,6 +37,8 @@
 #include "../io/serialization/Serializer.h"
 #include "../Io/KeyValue.h"
 
+#include <Reflection/Serialization/Serializer.h>
+
 #if defined( DC_PLATFORM_WINDOWS )
     #define     _WINSOCK_DEPRECATED_NO_WARNINGS
     #include	<winsock2.h>
@@ -242,21 +244,45 @@ namespace Network {
 
 	//! Base class for all remote call argument types.
 	template<typename T>
-	struct RemoteCallArgument : public Io::SerializableT<T> {
+	struct RemoteCallArgument
+    #if DEV_DEPRECATED_SERIALIZATION
+        : public Io::SerializableT<T>
+    #else
+        : public Io::Streamable
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    {
 	};
 
 	//! Base call for all remote call response types.
 	template<typename T>
-	struct RemoteCallResponse : public Io::SerializableT<T> {
+	struct RemoteCallResponse
+    #if DEV_DEPRECATED_SERIALIZATION
+        : public Io::SerializableT<T>
+    #else
+        : public Io::Streamable
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    {
 	};
 
 	//! Base class for all replicated event types.
 	template<typename T>
-	struct ReplicatedEvent : public Io::SerializableT<T> {
+	struct ReplicatedEvent
+    #if DEV_DEPRECATED_SERIALIZATION
+        : public Io::SerializableT<T>
+    #else
+        : public Io::Streamable
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    {
 	};
 
 	//! Remote call error response.
-	struct Error : public Io::SerializableT<Error> {
+	struct Error
+    #if DEV_DEPRECATED_SERIALIZATION
+        : public Io::SerializableT<Error>
+    #else
+        : public Io::Streamable
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+    {
 		//! Error codes
 		enum {
 			NoError			 = 0		//!< No error recorded.
@@ -281,10 +307,24 @@ namespace Network {
 					//! Converts the error object to boolean value.
 					operator bool( void ) const { return code != 0; }
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		IoBeginSerializer
 			IoField( code )
 			IoField( message )
 		IoEndSerializer
+    #else
+        virtual void serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        {
+            stream->write( &code, sizeof u16 );
+            stream->writeString( message.c_str() );
+        }
+
+        virtual void deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        {
+            stream->read( &code, sizeof u16 );
+            stream->readString( message );
+        }
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	};
     
 } // namespace Network

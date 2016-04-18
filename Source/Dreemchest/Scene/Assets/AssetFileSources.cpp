@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include "AssetFormats.h"
+#include "AssetFileSources.h"
 
 #include "Image.h"
 #include "Mesh.h"
@@ -36,8 +36,8 @@ namespace Scene {
 
 // ------------------------------------------ ImageLoaderRaw ------------------------------------------ //
 
-// ** ImageFormatRaw::parseFromStream
-bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& asset )
+// ** ImageFormatRaw::constructFromStream
+bool ImageFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& asset )
 {
 	u16 width, height;
 	u8  channels;
@@ -64,8 +64,8 @@ bool ImageFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& asse
 
 // ------------------------------------------ MeshFormatRaw ------------------------------------------ //
 
-// ** MeshFormatRaw::parseFromStream
-bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& asset )
+// ** MeshFormatRaw::constructFromStream
+bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& asset )
 {
 	// Read the total number of mesh chunks
 	u32 chunkCount;
@@ -120,8 +120,8 @@ bool MeshFormatRaw::parseFromStream( Io::StreamPtr stream, Assets::Assets& asset
 
 // --------------------------------------- MaterialSourceKeyValue --------------------------------------- //
 
-// ** MaterialSourceKeyValue::parseFromStream
-bool MaterialSourceKeyValue::parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
+// ** MaterialSourceKeyValue::constructFromStream
+bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
 #ifdef HAVE_JSON
 	String json;

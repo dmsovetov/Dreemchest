@@ -24,19 +24,33 @@
 
  **************************************************************************/
 
-#include "AssetModels.h"
-#include "EnumerationModel.h"
+#ifndef __DC_Composer_QuatEdit_H__
+#define __DC_Composer_QuatEdit_H__
+
+#include "VectorEdit.h"
 
 DC_BEGIN_COMPOSER
 
-// ** MaterialModel::MaterialModel
-MaterialModel::MaterialModel( Scene::MaterialHandle material, QObject* parent ) : PropertyModel( parent ), m_material( material )
-{
-    material.forceLoad();
-    Scene::Material* instance = &(*material.writeLock());
-	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, instance ), BindSetter( Scene::Material::setRenderingMode, instance ) );
-	addEnum<Scene::Material::Model, LightingModel>( "Lighting Model", BindGetter( Scene::Material::model, instance ), BindSetter( Scene::Material::setModel, instance ) );
-	addAsset<Scene::ImageHandle>( "Diffuse", BindGetter( Scene::Material::diffuse, instance ), BindSetter( Scene::Material::setDiffuse, instance ) );
-}
+namespace Ui {
+
+    //! Widget to edit string properties.
+    class QuatEdit : public AbstractVectorEdit {
+    public:
+
+                            //! Constructs QuatEdit instance.
+                            QuatEdit( QWidget* parent = NULL );
+
+    private:
+
+        //! Converts the internal array of floats to a variant value.
+        virtual Variant     toVariant( const f32* value ) const DC_DECL_OVERRIDE;
+
+        //! Convets variant value to an array of floats.
+        virtual void        fromVariant( const Variant& input, f32* value ) DC_DECL_OVERRIDE;
+    };
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_QuatEdit_H__	*/

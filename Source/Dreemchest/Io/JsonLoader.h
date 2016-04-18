@@ -33,6 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 #ifdef HAVE_JSON
 
 	//! Base class for all JSON object loaders.
@@ -85,6 +87,8 @@ namespace Io {
 	};
 
 #endif	/*	HAVE_JSON	*/
+
+#endif  /*  DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

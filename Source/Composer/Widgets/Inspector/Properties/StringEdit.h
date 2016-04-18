@@ -24,41 +24,45 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_AssetFormats_H__
-#define __DC_Scene_AssetFormats_H__
+#ifndef __DC_Composer_StringEdit_H__
+#define __DC_Composer_StringEdit_H__
 
-#include "../Scene.h"
+#include "../../../Composer.h"
 
-DC_BEGIN_DREEMCHEST
+DC_BEGIN_COMPOSER
 
-namespace Scene {
+namespace Ui {
 
-    //! Loads an image from a raw pixel buffer format.
-    class ImageFormatRaw : public Assets::FileSource<Image> {
-    protected:
+    //! Widget to edit string properties.
+    class StringEdit : public QLineEdit {
+    
+        Q_OBJECT
+        Q_PROPERTY( Variant value READ value WRITE setValue NOTIFY valueChanged USER true )
 
-        //! Loads image data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+    public:
+
+                            //! Constructs StringEdit instance.
+                            StringEdit( QWidget* parent = NULL );
+
+        //! Returns current property value as Variant.
+        Variant             value( void ) const;
+
+        //! Sets property value from a Variant.
+        void                setValue( const Variant& value );
+
+    Q_SIGNALS:
+
+        //! Emitted when the widget value was changed.
+        void                valueChanged( const Variant& value );
+
+    private Q_SLOTS:
+
+        //! Emits the value changed signal with a QString converted to Variant value.
+        void                textChanged( const QString& value );
     };
 
-    //! Loads a mesh from a raw binary format.
-    class MeshFormatRaw : public Assets::FileSource<Mesh> {
-    protected:
+} // namespace Ui
 
-        //! Loads mesh data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
-    };
+DC_END_COMPOSER
 
-    //! Loads a material from a key-value storage.
-    class MaterialSourceKeyValue : public Assets::FileSource<Material> {
-    protected:
-
-        //! Loads material data from an input stream.
-        virtual bool    parseFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
-    };
-
-} // namespace Scene
-
-DC_END_DREEMCHEST
-
-#endif    /*    !__DC_Scene_AssetFormats_H__    */
+#endif	/*	!__DC_Composer_StringEdit_H__	*/

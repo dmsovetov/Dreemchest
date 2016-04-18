@@ -63,6 +63,11 @@
 #include <Fx/Zones.h>
 #include <Fx/Modules.h>
 
+#include <Reflection/MetaObject/Property.h>
+#include <Reflection/MetaObject/Class.h>
+#include <Reflection/MetaObject/Enum.h>
+#include <Reflection/MetaObject/Instance.h>
+
 #include "PlaneClipper.h"
 
 DC_BEGIN_DREEMCHEST
@@ -79,6 +84,8 @@ namespace Scene {
 	class Material;
 	class Terrain;
     class Prefab;
+    class Renderable;
+    class Texture;
 
 	class Transform;
 	class StaticMesh;
@@ -325,10 +332,65 @@ namespace Scene {
 		return m_ecs->createArchetype<TArchetype>( id, data );
 	}
 
+#if DEV_DEPRECATED_SCENE_SERIALIZATION
+
 #ifdef HAVE_JSON
 
+#if !DEV_DEPRECATED_SERIALIZATION
+    //! Base class for all JSON object loaders.
+	class JsonLoaderBase {
+	public:
+
+		//! Object loader type.
+		typedef cClosure<bool(const Json::Value&)>	Loader;
+
+		virtual						~JsonLoaderBase( void ) {}
+
+		//! Registers a new object loader.
+		void						registerLoader( const String& name, const Loader& loader );
+
+		//! Loads objects from JSON string.
+		bool						load( const String& json );
+
+	protected:
+
+		//! Reads the Vec3 from a JSON object.
+		static Vec3					readVec3( const Json::Value& value );
+
+		//! Reads the Rect from a JSON object.
+		static Rect					readRect( const Json::Value& value );
+
+		//! Reads the Rgba from JSON object.
+		static Rgba					readRgba( const Json::Value& value );
+
+		//! Reads the Rgba from JSON object.
+		static Rgb					readRgb( const Json::Value& value );
+
+		//! Reads the Quat from JSON object.
+		static Quat					readQuat( const Json::Value& value );
+
+		//! Reads the array of floats from JSON object.
+		static Array<f32>			readFloats( const Json::Value& value );
+
+	private:
+
+		//! Constructs an object from JSON object.
+		bool						constructObject( const String& name, const Json::Value& value );
+
+	private:
+
+		//! Container type to store loaders by type name.
+		typedef Map<String, Loader>	Loaders;
+
+		Loaders						m_loaders;	//!< Object loaders.
+		Json::Value					m_json;		//!< Parsed JSON object.
+	};
+#else
+    typedef Io::JsonLoaderBase JsonLoaderBase;
+#endif
+
 	//! Loads the scene from JSON file.
-	class JsonSceneLoader : public Io::JsonLoaderBase {
+	class JsonSceneLoader : public JsonLoaderBase {
 	public:
 
 									//! Constructs the JsonSceneLoader instance.
@@ -425,6 +487,8 @@ namespace Scene {
 
 #endif	/*	HAVE_JSON	*/
 
+#endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
@@ -439,7 +503,7 @@ DC_END_DREEMCHEST
 	#include "Assets/Image.h"
 	#include "Assets/Terrain.h"
     #include "Assets/Prefab.h"
-    #include "Assets/AssetFormats.h"
+    #include "Assets/AssetFileSources.h"
 	#include "Systems/InputSystems.h"
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"

@@ -21,14 +21,15 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#include "Introspection.h"
+#include "Class.h"
+#include "Instance.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
 // ------------------------------------------------------------- Member ------------------------------------------------------------- //
 
@@ -45,54 +46,80 @@ CString Member::name( void ) const
     return m_name;
 }
 
-// ----------------------------------------------------------- MetaObject ----------------------------------------------------------- //
+// ----------------------------------------------------------- Class ----------------------------------------------------------- //
 
-// ** MetaObject::MetaObject
-MetaObject::MetaObject( CString name, Member** members, s32 memberCount )
-    : m_super( NULL ), m_name( name ), m_members( members ), m_memberCount( memberCount )
+// ** Class::Class
+Class::Class( CString name, const Type* type, Member** members, s32 memberCount )
+    : MetaObject( name, type )
+    , m_super( NULL )
+    , m_members( members )
+    , m_memberCount( memberCount )
+    , m_upCast( NULL )
 {
 }
 
-// ** MetaObject::MetaObject
-MetaObject::MetaObject( const MetaObject* super, CString name, Member** members, s32 memberCount )
-    : m_super( super ), m_name( name ), m_members( members ), m_memberCount( memberCount )
+// ** Class::Class
+Class::Class( const Class* super, CString name, const Type* type, Member** members, s32 memberCount, UpCast upCast )
+    : MetaObject( name, type )
+    , m_super( super )
+    , m_members( members )
+    , m_memberCount( memberCount )
+    , m_upCast( upCast )
 {
 }
 
-// ** MetaObject::super
-const MetaObject* MetaObject::super( void ) const
+// ** Class::isClass
+const Class* Class::isClass( void ) const
+{
+    return this;
+}
+
+// ** Class::isClass
+Class* Class::isClass( void )
+{
+    return this;
+}
+
+// ** Class::super
+const Class* Class::super( void ) const
 {
     return m_super;
 }
 
-// ** MetaObject::memberCount
-s32 MetaObject::memberCount( void ) const
+// ** Class::memberCount
+s32 Class::memberCount( void ) const
 {
     return m_memberCount;
 }
 
-// ** MetaObject::member
-const Member* MetaObject::member( s32 index ) const
+// ** Class::member
+const Member* Class::member( s32 index ) const
 {
     DC_BREAK_IF( index < 0 || index >= memberCount() );
     return m_members[index];
 }
 
-// ** MetaObject::member
-Member* MetaObject::member( s32 index )
+// ** Class::member
+Member* Class::member( s32 index )
 {
     DC_BREAK_IF( index < 0 || index >= memberCount() );
     return m_members[index];
 }
 
-// ** MetaObject::findMember
-const Member* MetaObject::findMember( CString name ) const
+// ** Class::findMember
+const Member* Class::findMember( CString name ) const
 {
-    return const_cast<MetaObject*>( this )->findMember( name );
+    return const_cast<Class*>( this )->findMember( name );
 }
 
-// ** MetaObject::findMember
-Member* MetaObject::findMember( CString name )
+// ** Class::upCast
+InstanceConst Class::upCast( const InstanceConst& instance ) const
+{
+    return m_upCast ? m_upCast( instance ) : InstanceConst();
+}
+
+// ** Class::findMember
+Member* Class::findMember( CString name )
 {
     for( s32 i = 0; i < memberCount(); i++ ) {
         Member* m = member( i );
@@ -105,6 +132,6 @@ Member* MetaObject::findMember( CString name )
     return NULL;
 }
 
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST

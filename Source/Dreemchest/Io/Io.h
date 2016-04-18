@@ -91,6 +91,21 @@ namespace Io {
 	//! List of field serializer ptrs.
 	typedef List<SerializerPtr> SerializerList;
 
+#if !DEV_DEPRECATED_SERIALIZATION
+    //! Abstract class interface to be implemented by a streamable types.
+    class Streamable : public RefCounted {
+    public:
+
+        virtual             ~Streamable( void ) {}
+
+        //! Reads data from an input Stream and initialize fields of a Streamable object.
+        virtual void        serialize( Io::StreamWPtr stream ) const NIMBLE_ABSTRACT;
+
+        //! Writes fields of a Streamable object to an output Stream.
+        virtual void        deserialize( Io::StreamWPtr stream ) NIMBLE_ABSTRACT;
+    };
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
 #if DC_DEPRECATED_FEATURE
 	//! Key-value storage strong ptr.
 	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;

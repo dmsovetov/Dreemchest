@@ -160,6 +160,8 @@ EntityPtr Entity::deepCopy( const EntityId& id ) const
 
 #ifndef DC_ECS_NO_SERIALIZATION
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 // ** Entity::read
 void Entity::read( const Io::Storage* storage )
 {
@@ -271,6 +273,8 @@ void Entity::deserialize( SerializationContext& ctx, const Archive& ar )
 		attachComponent( component.get() );
 	}
 }
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 #endif  /*  !DC_ECS_NO_SERIALIZATION    */
 

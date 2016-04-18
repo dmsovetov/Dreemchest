@@ -24,31 +24,31 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_AssetModels_H__
-#define __DC_Composer_AssetModels_H__
+#include "MetaObject.h"
 
-#include "PropertyModel.h"
+DC_BEGIN_DREEMCHEST
 
-DC_BEGIN_COMPOSER
+namespace Reflection {
 
-	//! Material asset model.
-	class MaterialModel : public PropertyModel {
-	public:
+// ** MetaObject::MetaObject
+MetaObject::MetaObject( CString name, const Type* type )
+    : m_name( name )
+    , m_type( type )
+{
+}
 
-                                //! Constructs MaterialModel instance.
-		                        MaterialModel( Scene::MaterialHandle material, QObject* parent = NULL );
+// ** MetaObject::name
+CString MetaObject::name( void ) const
+{
+    return m_name;
+}
 
-		//! Called each time object property was changed.
-		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE
-        {
-            m_material.writeLock();
-        }
+// ** MetaObject::type
+const Type* MetaObject::type( void ) const
+{
+    return m_type;
+}
 
-	private:
+} // namespace Reflection
 
-		Scene::MaterialHandle   m_material;
-	};
-
-DC_END_COMPOSER
-
-#endif	/*	!__DC_Composer_AssetModels_H__	*/
+DC_END_DREEMCHEST

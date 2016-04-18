@@ -33,6 +33,8 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Io {
+
+#if DEV_DEPRECATED_SERIALIZATION
     
     template<typename T>
     class SerializableT;
@@ -514,6 +516,8 @@ namespace Io {
 		//}
 	}
 #endif
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

@@ -26,6 +26,7 @@
 
 #include "Entity/Aspect.h"
 #include "Ecs.h"
+#include "EntitySerializer.h"
 
 #include "Entity/Entity.h"
 #include "Entity/Index.h"
@@ -76,6 +77,10 @@ void Ecs::addEntity( EntityPtr entity )
 	DC_BREAK_IF( !entity.valid(), "invalid entity" );
 
 	const EntityId& id = entity->id();
+    if( id.isNull() ) {
+        LogWarning( "entity", "adding entity with an invalid id\n" );
+    }
+
 	DC_BREAK_IF( isUsedId( id ), "entity id is already used" );
 
 	// Setup entity
@@ -108,8 +113,9 @@ s32 Ecs::addEntities( const EntityArray& entities )
     return addedCount;
 }
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 // ** Ecs::createArchetypeByName
-ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data ) const
+ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
 {
 	// Create archetype instance by name
 	ArchetypePtr instance = m_archetypeFactory.construct( name );
@@ -133,13 +139,20 @@ ArchetypePtr Ecs::createArchetypeByName( const String& name, const EntityId& id,
 
 	// Load from data
 	if( data ) {
+    #if DEV_DEPRECATED_SERIALIZATION
         SerializationContext ctx( const_cast<Ecs*>( this ) );
 		instance->deserialize( ctx, *data );
+    #else
+        Serializer serializer( const_cast<Ecs*>( this ) );
+        serializer.deserialize( assembly, instance, data->as<KeyValue>() );
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 	return instance;
 }
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Ecs::createComponentByName
 ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data ) const
 {
@@ -154,12 +167,17 @@ ComponentPtr Ecs::createComponentByName( const String& name, const Archive* data
 
 	// Load from data
 	if( data ) {
+    #if DEV_DEPRECATED_SERIALIZATION
         SerializationContext ctx( const_cast<Ecs*>( this ) );
 		instance->deserialize( ctx, *data );
+    #else
+        DC_NOT_IMPLEMENTED;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 	}
 
 	return instance;
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )
@@ -396,6 +414,8 @@ EntityId EntityIdGenerator::generate( void )
 #endif
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 // ---------------------------------------------------------- SerializationContext ---------------------------------------------------------- //
 
 // ** SerializationContext::SerializationContext
@@ -425,12 +445,18 @@ ComponentPtr SerializationContext::createComponent( const String& name ) const
 // ** SerializationContext::createEntity
 EntityPtr SerializationContext::createEntity( const String& name ) const
 {
+#if DEV_DEPRECATED_ECS_ARCHETYPES
     if( name == "Entity" ) {
         return const_cast<SerializationContext*>( this )->m_ecs->createEntity();
     }
 
     return m_ecs->createArchetypeByName( name );
+#else
+    return const_cast<SerializationContext*>( this )->m_ecs->createEntity();
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 }
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Ecs
 

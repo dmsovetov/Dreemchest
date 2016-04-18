@@ -37,7 +37,6 @@
 #include "../Widgets/ComboBox.h"
 
 #include "../Models/SceneModel.h"
-#include "../Models/EnumerationModel.h"
 
 DC_BEGIN_COMPOSER
 

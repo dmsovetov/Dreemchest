@@ -26,6 +26,7 @@
 
 #include "SceneEditor.h"
 #include "../Widgets/Menu.h"
+#include "../Widgets/Inspector/EntityInspector.h"
 #include "../Systems/Transform/TranslationTool.h"
 #include "../Systems/Transform/RotationTool.h"
 #include "../Systems/Transform/ArcballRotationTool.h"
@@ -136,14 +137,14 @@ struct Null : public Ecs::Component<Null> {};
 // ** SceneEditor::save
 void SceneEditor::save( void )
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Get the set of objects to be serialized
     Scene::SceneObjectSet objects = m_scene->findByAspect( Ecs::Aspect::exclude<Null>() );
 
     // Create serialization context
     Ecs::SerializationContext ctx( m_scene->ecs() );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    Io::KeyValue ar = Io::KeyValue::object();
+    KeyValue kv;
 
     // Write each object to a root key-value archive
     for( Scene::SceneObjectSet::const_iterator i = objects.begin(), end = objects.end(); i != end; ++i ) {
@@ -151,21 +152,22 @@ void SceneEditor::save( void )
             continue;
         }
 
-        Io::KeyValue object;
+        Archive object;
         (*i)->serialize( ctx, object );
-        ar[(*i)->id().toString()] = object;
+        kv.setValueAtKey( (*i)->id().toString(), object );
     }
 
     // Write the serialized data to file
-    qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::KeyValue::stringify( ar, true ) ) );
+    qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::VariantTextStream::stringify( Variant::fromValue( kv ), true ) ) );
 #else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
+    LogError( "sceneEditor", "scene serialization is not implemented\n" );
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::loadFromFile
 Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Create scene instance
     Scene::ScenePtr scene = Scene::Scene::create();
 
@@ -180,13 +182,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     Ecs::SerializationContext ctx( scene->ecs() );
     ctx.set<Assets::Assets>( &m_project->assets() );
 
-#if DEV_DEPRECATED_KEYVALUE_TYPE
-    Io::KeyValue ar = Io::KeyValue::parse( data.toStdString() );
+    // Parse KeyValue from a text stream
+    Archive  ar = Io::VariantTextStream::parse( data.toStdString() );
+    KeyValue kv = ar.as<KeyValue>();
 
     // Read each object from a root key-value archive
-    for( Io::KeyValue::Properties::const_iterator i = ar.properties().begin(), end = ar.properties().end(); i != end; ++i ) {
+    for( KeyValue::Properties::const_iterator i = kv.properties().begin(), end = kv.properties().end(); i != end; ++i ) {
         // Create entity instance by a type name
-        Ecs::EntityPtr entity = ctx.createEntity( i->second["Type"].asString() );
+        Ecs::EntityPtr entity = ctx.createEntity( i->second.as<KeyValue>().get<String>( "Type" ) );
         entity->attach<SceneEditorInternal>( entity );
 
         // Read entity from data
@@ -195,11 +198,12 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         // Add entity to scene
         scene->addSceneObject( entity );
     }
-#else
-    DC_NOT_IMPLEMENTED
-#endif  /*  DEV_DEPRECATED_KEYVALUE_TYPE    */
 
     return scene;
+#else
+    LogError( "sceneEditor", "scene deserialization is not implemented\n" );
+    return Scene::Scene::create();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::navigateToObject
@@ -235,9 +239,9 @@ void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
 		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformBasisComboBox );
+        m_tools->addWidget( new QComboBox );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformPivotComboBox );
+        m_tools->addWidget( new QComboBox );
 	    m_tools->addSeparator();
 		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
 		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
@@ -450,14 +454,20 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 	// Store this object
 	m_selectedSceneObject = sceneObject;
 
-	// Mark it as selected
-	if( m_selectedSceneObject.valid() ) {
-		// Add the selected flag
-		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+    // Nothing selected - just return
+    if( !m_selectedSceneObject.valid() ) {
+        return;
+    }
 
-		// Bind the gizmo for an active transformation tool
-		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
-	}
+	// Add the selected flag
+	m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+
+	// Bind the gizmo for an active transformation tool
+	bindTransformGizmo( m_selectedSceneObject, m_activeTool );
+
+    // Bind to an entity inspector
+    Ui::EntityInspectorQPtr inspector = qMainWindow->inspector();
+    inspector->bind( m_selectedSceneObject );
 }
 
 // ** SceneEditor::findSceneObjectAtPoint

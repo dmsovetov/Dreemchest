@@ -37,13 +37,13 @@ namespace Scene {
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::type
-Light::Type Light::type( void ) const
+LightType Light::type( void ) const
 {
 	return m_type;
 }
 
 // ** Light::setType
-void Light::setType( Type value )
+void Light::setType( LightType value )
 {
 	m_type = value;
 }
@@ -84,6 +84,7 @@ void Light::setRange( f32 value )
 	m_range = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Light::serialize
 void Light::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -95,6 +96,7 @@ void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     DC_NOT_IMPLEMENTED;
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
@@ -172,10 +174,18 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 	m_lightmap = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    DC_NOT_IMPLEMENTED
+    VariantArray materials;
+
+    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
+        MaterialHandle m = material( i );
+        materials << (m.isValid() ? m.uniqueId() : "");
+    }
+
+    ar = KvBuilder() << "asset" << (m_mesh.isValid() ? m_mesh.uniqueId() : "") << "materials" << materials;
 }
 
 // ** StaticMesh::deserialize
@@ -188,8 +198,20 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
         return;
     }
 
-    DC_NOT_IMPLEMENTED
+    KeyValue     kv        = ar.as<KeyValue>();
+    VariantArray materials = kv.get<VariantArray>( "materials" );
+    const VariantArray::Container& items = materials;
+
+    for( s32 i = 0, n = items.size(); i < n; i++ ) {
+        setMaterial( i, assets->find<Material>( items[i].as<String>() ) );
+    }
+
+    m_mesh = assets->find<Mesh>( kv.get<String>( "asset" ) );
+    if( !m_mesh.isValid() ) {
+        LogWarning( "staticMesh", "unresolved asset '%s'\n", kv.get<String>( "asset" ).c_str() );
+    }
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ------------------------------------------- Particles ----------------------------------------- //
 
@@ -263,16 +285,34 @@ void Camera::setId( u8 value )
 	m_id = value;
 }
 
-// ** Camera:setFar
-void Camera::setFar( f32 value )
+// ** Camera::near
+f32 Camera::near( void ) const
 {
-	m_far = value;
+    return m_near;
 }
 
 // ** Camera:setNear
 void Camera::setNear( f32 value )
 {
 	m_near = value;
+}
+
+// ** Camera::far
+f32 Camera::far( void ) const
+{
+    return m_far;
+}
+
+// ** Camera:setFar
+void Camera::setFar( f32 value )
+{
+	m_far = value;
+}
+
+// ** Camera::fov
+f32 Camera::fov( void ) const
+{
+    return m_fov;
 }
 
 // ** Camera:setFov
@@ -291,6 +331,18 @@ const Rgba& Camera::clearColor( void ) const
 void Camera::setClearColor( const Rgba& value )
 {
 	m_clearColor = value;
+}
+
+// ** Camera::projection
+Projection Camera::projection( void ) const
+{
+    return m_projection;
+}
+
+// ** Camera::setProjection
+void Camera::setProjection( Projection value )
+{
+    m_projection = value;
 }
 
 // ** Camera::ndc
@@ -338,10 +390,10 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 	f32  height = rect.height();
 
 	switch( m_projection ) {
-	case Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
-	case Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
-	case OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
-	default:			DC_BREAK;
+    case Projection::Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
+	case Projection::Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
+	case Projection::OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
+	default:			            DC_NOT_IMPLEMENTED;
 	}
 
 	return Matrix4();
@@ -434,17 +486,33 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 	return Circle( center, radius );
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Camera::serialize
 void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    DC_NOT_IMPLEMENTED
+    ar = KvBuilder()
+            << "clearMask" << m_clearMask
+            << "projection" << m_projection
+            << "clearColor" << m_clearColor
+            << "fov" << m_fov
+            << "near" << m_near
+            << "far" << m_far
+            ;
 }
 
 // ** Camera::deserialize
 void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-    DC_NOT_IMPLEMENTED
+    KeyValue kv     = ar.as<KeyValue>();
+    m_clearMask     = kv.get<u8>( "clearMask" );
+    //m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    m_projection    = Projection::Perspective;
+    m_clearColor    = kv.get( "clearColor", Rgba() );
+    m_fov           = kv.get( "fov", 60.0f );
+    m_near          = kv.get( "near", 0.01f );
+    m_far           = kv.get( "far", 1000.0f );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Scene
 

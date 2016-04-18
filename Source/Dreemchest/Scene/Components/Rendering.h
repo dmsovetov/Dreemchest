@@ -81,26 +81,30 @@ namespace Scene {
 	class RenderParticles : public Ecs::Component<RenderParticles> {
 	};
 
+	//! Available light types.
+    NIMBLE_DECLARE_ENUM( LightType, Point, Spot, Directional )
+
 	//! Holds the light information.
 	class Light : public Ecs::Component<Light> {
+
+        INTROSPECTION_SUPER( Light, Ecs::ComponentBase
+            , PROPERTY( type,      type,      setType,      "The light type."            )
+            , PROPERTY( color,     color,     setColor,     "The light color."           )
+            , PROPERTY( intensity, intensity, setIntensity, "The light intensity."       )
+            , PROPERTY( range,     range,     setRange,     "The light influence range." )
+            )
+
 	public:
 
-		//! Available light types.
-		enum Type {
-			  Point
-			, Spot
-			, Directional
-		};
-
 									//! Constructs Light instance.
-									Light( Type type = Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
+									Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
 										: m_type( type ), m_color( color ), m_intensity( intensity ), m_range( range ) {}
 
 		//! Returns the light type.
-		Type						type( void ) const;
+		LightType				    type( void ) const;
 
 		//! Sets the light type.
-		void						setType( Type value );
+		void						setType( LightType value );
 
 		//! Returns the light color.
 		const Rgb&					color( void ) const;
@@ -122,15 +126,17 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the light data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the light data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
-		Type						m_type;			//!< Light type.
+		LightType				    m_type;			//!< Light type.
 		Rgb							m_color;		//!< Light color.
 		f32							m_intensity;	//!< Light intensity.
 		f32							m_range;		//!< Light influence range.
@@ -138,6 +144,11 @@ namespace Scene {
 
 	//! Holds the static mesh data with per-instance materials.
 	class StaticMesh : public Ecs::Component<StaticMesh> {
+
+        INTROSPECTION_SUPER( StaticMesh, Ecs::ComponentBase
+            , PROPERTY( mesh, mesh, setMesh, "The mesh asset ")
+            )
+
 	public:
 
 									//! Constructs StaticMesh instance.
@@ -179,11 +190,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the static mesh data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the static mesh data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
@@ -241,16 +254,21 @@ namespace Scene {
 		MaterialHandle				    m_material;			//!< Particle system material.
 	};
 
+    //! Available camera projections.
+    NIMBLE_DECLARE_ENUM( Projection, Perspective, Ortho, OrthoCenter )
+
 	//! Camera component.
 	class Camera : public Ecs::Component<Camera> {
-	public:
 
-		//! Available camera projections.
-		enum Projection {
-			  Perspective = 0
-			, Ortho
-			, OrthoCenter
-		};
+        INTROSPECTION_SUPER( Camera, Ecs::ComponentBase
+            , PROPERTY( projection,  projection, setProjection, "The camera projection."            )
+            , PROPERTY( clearColor,  clearColor, setClearColor, "The viewport clear color."         )
+            , PROPERTY( fieldOfView, fov,        setFov,        "The camera field of view."         )
+            , PROPERTY( near,        near,       setNear,       "The camera near clipping plane."   )
+            , PROPERTY( far,         far,        setFar,        "The camera far clipping plane."    )
+            )
+
+	public:
 
 		//! Camera clear flags.
 		enum ClearFlags {
@@ -260,7 +278,7 @@ namespace Scene {
 		};
 
 									//! Constructs Camera instance.
-									Camera( Projection projection = Perspective, const RenderTargetPtr& target = RenderTargetPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
+									Camera( Projection projection = Projection::Perspective, const RenderTargetPtr& target = RenderTargetPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
 										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_target( target ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
 
 		//! Returns camera clear mask.
@@ -274,6 +292,12 @@ namespace Scene {
 
 		//! Returns the clear color.
 		const Rgba&					clearColor( void ) const;
+
+        //! Returns camera projection.
+        Projection                  projection( void ) const;
+
+        //! Sets camera projection.
+        void                        setProjection( Projection value );
 
 		//! Returns the camera id.
 		u8							id( void ) const;
@@ -331,11 +355,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the camera data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the camera data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 

@@ -79,11 +79,13 @@ Scene::Scene( void )
 	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
 	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
 
+#if DEV_DEPRECATED_SERIALIZATION
     // Register component types
     m_ecs->registerComponent<Identifier>();
     m_ecs->registerComponent<StaticMesh>();
     m_ecs->registerComponent<Camera>();
     m_ecs->registerComponent<Transform>();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** Scene::update
@@ -264,6 +266,8 @@ ScenePtr Scene::createFromFile( const Assets::Assets& assets, const String& file
 // ** Scene::createFromJson
 ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json )
 {
+#if DEV_DEPRECATED_SCENE_SERIALIZATION
+
 #ifdef HAVE_JSON
 	// Create scene instance
 	ScenePtr scene( DC_NEW Scene );
@@ -280,7 +284,13 @@ ScenePtr Scene::createFromJson( const Assets::Assets& assets, const String& json
 	LogError( "deserialize", "failed to load scene, built with no JSON support.\n" );
 	return ScenePtr();
 #endif	/*	HAVE_JSON	*/
+#else
+    DC_NOT_IMPLEMENTED;
+    return ScenePtr();
+#endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 }
+
+#if DEV_DEPRECATED_SCENE_SERIALIZATION
 
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
@@ -445,7 +455,7 @@ Ecs::ComponentPtr JsonSceneLoader::readTransform( const Json::Value& value )
 
 	if( parent != Json::nullValue ) {
 		Ecs::ComponentPtr component = requestComponent( parent.asString() );
-		result->setParent( castTo<Transform>( component.get() ) );
+		result->setParent( static_cast<Transform*>( component.get() ) );
 	}
 
 	return result;
@@ -484,7 +494,7 @@ Ecs::ComponentPtr JsonSceneLoader::readRenderer( const Json::Value& value )
 // ** JsonSceneLoader::readLight
 Ecs::ComponentPtr JsonSceneLoader::readLight( const Json::Value& value )
 {
-	Light::Type types[] = { Light::Spot, Light::Directional, Light::Point };
+	LightType types[] = { LightType::Spot, LightType::Directional, LightType::Point };
 
 	Light* result = DC_NEW Light;
 	result->setColor( readRgb( value["color"] ) );
@@ -761,7 +771,93 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 	}
 }
 
+#if !DEV_DEPRECATED_SERIALIZATION
+// ** JsonLoaderBase::load
+bool JsonLoaderBase::load( const String& json )
+{
+	Json::Reader reader;
+
+	// Parse the JSON string
+	if( !reader.parse( json, m_json ) ) {
+		return false;
+	}
+
+	// Read objects from JSON
+	for( Json::ValueIterator i = m_json.begin(), end = m_json.end(); i != end; ++i ) {
+		// Get the instance type.
+		String type = i->get( "class", "" ).asString();
+
+		// Construct object
+		constructObject( type, *i );
+	}
+
+	return true;
+}
+
+// ** JsonLoaderBase::constructObject
+bool JsonLoaderBase::constructObject( const String& name, const Json::Value& value )
+{
+	Loaders::const_iterator i = m_loaders.find( name );
+
+	if( i == m_loaders.end() ) {
+		return false;
+	}
+
+	return i->second( value );
+}
+
+// ** JsonLoaderBase::registerLoader
+void JsonLoaderBase::registerLoader( const String& name, const Loader& loader )
+{
+	m_loaders[name] = loader;
+}
+
+// ** JsonLoaderBase::readVec3
+Vec3 JsonLoaderBase::readVec3( const Json::Value& value )
+{
+	return Vec3( value[0].asFloat(), value[1].asFloat(), value[2].asFloat() );
+}
+
+// ** JsonLoaderBase::readRect
+Rect JsonLoaderBase::readRect( const Json::Value& value )
+{
+	return Rect( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
+}
+
+// ** JsonLoaderBase::readRgba
+Rgba JsonLoaderBase::readRgba( const Json::Value& value )
+{
+	return Rgba( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
+}
+
+// ** JsonLoaderBase::readRgb
+Rgb JsonLoaderBase::readRgb( const Json::Value& value )
+{
+	return Rgb( value[0].asFloat(), value[1].asFloat(), value[2].asFloat() );
+}
+
+// ** JsonLoaderBase::readQuat
+Quat JsonLoaderBase::readQuat( const Json::Value& value )
+{
+	return Quat( value[0].asFloat(), value[1].asFloat(), value[2].asFloat(), value[3].asFloat() );
+}
+
+// ** JsonLoaderBase::readQuat
+Array<f32> JsonLoaderBase::readFloats( const Json::Value& value )
+{
+	Array<f32> result;
+
+	for( s32 i = 0, n = value.size(); i < n; i++ ) {
+		result.push_back( value[i].asFloat() );
+	}
+
+	return result;
+}
+#endif  /*  !DEV_DEPRECATED_SERIALIZATION   */
+
 #endif	/*	HAVE_JSON	*/
+
+#endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 
 } // namespace Scene
 

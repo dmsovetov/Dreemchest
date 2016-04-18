@@ -240,7 +240,7 @@ void Rvm::flush( void )
 		//increase( Triangles, renderable.indexBuffer->size() / 3 );
 		//increase( Vertices, renderable.indexBuffer->size() );
 
-        DC_NOT_IMPLEMENTED;
+       // DC_NOT_IMPLEMENTED;
 	}
 
 	// Clear the command list

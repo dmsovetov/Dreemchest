@@ -33,6 +33,25 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+    //! KeyValue text stream writer/reader.
+    class VariantTextStream {
+    public:
+
+		//! Converts Variant to a JSON string.
+		static String		stringify( const Variant& value, bool formatted = false );
+
+		//! Parses Variant from a JSON string.
+		static Variant		parse( const String& text );
+
+    #ifdef HAVE_JSON
+        //! Converts Variant to JSON object.
+		static Json::Value	toJson( const Variant& value );
+
+		//! Constructs Variant from JSON object.
+		static Variant		fromJson( const Json::Value& json );
+    #endif  /*  HAVE_JSON   */
+    };
+
     //! Default KeyValue binary writer.
     class BinaryVariantStream {
     public:
@@ -84,6 +103,7 @@ namespace Io {
         StreamPtr   m_stream;   //!< The source binary stream.
     };
 
+#if DEV_DEPRECATED_SERIALIZATION
 	template<>
 	inline KeyValue BinarySerializer::read( const Array<u8>& bytes )
 	{
@@ -99,6 +119,7 @@ namespace Io {
 
 		return value.as<KeyValue>();
 	}
+#endif
 
 } // namespace Io
 

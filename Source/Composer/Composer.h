@@ -70,6 +70,7 @@ DC_BEGIN_COMPOSER
     DREEMCHEST_LOGGER_TAG( Composer )
 
 	// Declare Qt metatypes
+    Q_DECLARE_METATYPE( Variant )
 	Q_DECLARE_METATYPE( Assets::Handle )
 	Q_DECLARE_METATYPE( Scene::ImageHandle )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
@@ -81,11 +82,12 @@ DC_BEGIN_COMPOSER
         qDeclarePtr( MainWindow )
         qDeclarePtr( Document )
         qDeclarePtr( SceneTree )
-        qDeclarePtr( Inspector )
 		qDeclarePtr( Action )
 		qDeclarePtr( Menu )
 		qDeclarePtr( ToolBar )
 		qDeclarePtr( RenderingFrame )
+        qDeclarePtr( PropertyInspector )
+        qDeclarePtr( EntityInspector )
 
 		//! Message status.
 		enum MessageStatus {
@@ -225,6 +227,23 @@ DC_BEGIN_COMPOSER
 
 	//! Container type to store file info.
 	typedef QVector<class FileInfo> FileInfoArray;
+
+    //! Completely deletes layout and it's items
+    inline void qDeleteLayout( QLayout* layout )
+    {
+	    if( !layout ) {
+		    return;
+	    }
+
+	    QLayoutItem* child = NULL;
+
+	    while( (child = layout->takeAt(0)) != 0 ) {
+		    delete child->widget();
+		    delete child;
+	    }
+
+	    delete layout;
+    }
 
 	//! Root composer class.
 	class Composer : public QApplication {

@@ -286,17 +286,22 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Transform::serialize
 void Transform::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    DC_NOT_IMPLEMENTED
+    ar = KvBuilder() << "position" << position() << "rotation" << rotation() << "scale" << scale() << "parent" << (m_parent.valid() ? m_parent->entity()->id() : Guid());
 }
 
 // ** Transform::deserialize
 void Transform::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-    DC_NOT_IMPLEMENTED
+    KeyValue kv = ar.as<KeyValue>();
+    m_position = kv.get<Vec3>( "position" );
+    m_rotation = kv.get<Quat>( "rotation" );
+    m_scale    = kv.get<Vec3>( "scale" );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ----------------------------------------------- Identifier ------------------------------------------------ //
 
@@ -312,17 +317,19 @@ void Identifier::setName( const String& value )
 	m_name = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Identifier::serialize
 void Identifier::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
-    DC_NOT_IMPLEMENTED
+    ar = KvBuilder() << "value" << name();
 }
 
 // ** Identifier::deserialize
 void Identifier::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
-    DC_NOT_IMPLEMENTED
+    m_name = ar.as<KeyValue>().get<String>( "value" );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // --------------------------------------------- MoveAlongAxes --------------------------------------------- //
 

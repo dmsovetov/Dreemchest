@@ -38,6 +38,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 	//! Basic data storage interface
 	class Storage : public RefCounted {
 	public:
@@ -211,6 +213,8 @@ namespace Io {
 	};
 
 #endif	// HAVE_JSONCPP
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

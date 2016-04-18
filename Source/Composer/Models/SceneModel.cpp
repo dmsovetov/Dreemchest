@@ -74,7 +74,7 @@ QVariant SceneModel::data( const QModelIndex& index, int role ) const
 	// Return the data according to requested role.
 	switch( role ) {
 	case Qt::DisplayRole:
-	case Qt::EditRole:			return sceneObject->has<Scene::Identifier>() ? sceneObject->get<Scene::Identifier>()->name().c_str() : sceneObject->typeName();
+	case Qt::EditRole:			return sceneObject->has<Scene::Identifier>() ? sceneObject->get<Scene::Identifier>()->name().c_str() : "Entity";
 	//case Qt::DecorationRole:	return m_iconProvider->icon( item->data() );
 	}
 
@@ -291,7 +291,7 @@ void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::
 
 	// Queue material for loading.
 	//material->bundle()->queueForLoading( material );
-    qWarning() << "SceneModel::applyMaterial : material is not queued for loading any more";
+    LogWarning( "scene", " material is not queued for loading any more\n" );
 
 	// Set mesh material
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
@@ -370,7 +370,7 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 		}
 	}
 #else
-    qWarning() << "SceneModel::placeStaticMesh : no default material set";
+    LogWarning( "scene", "no default material set for a static mesh\n" );
 #endif
 
     return sceneObject;

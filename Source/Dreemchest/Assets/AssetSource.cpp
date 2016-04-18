@@ -33,8 +33,14 @@ namespace Assets {
 
 // ------------------------------------------ AbstractFileSource ------------------------------------------ //
 
-// ** AbstractFileSource::parse
-bool AbstractFileSource::parse( Assets& assets, Handle asset )
+// ** AbstractFileSource::AbstractFileSource
+AbstractFileSource::AbstractFileSource( void )
+    : m_lastModified( 0 )
+{
+}
+
+// ** AbstractFileSource::construct
+bool AbstractFileSource::construct( Assets& assets, Handle asset )
 {
     Io::StreamPtr stream = Io::DiskFileSystem::open( m_fileName );
 
@@ -42,8 +48,20 @@ bool AbstractFileSource::parse( Assets& assets, Handle asset )
         return false;
     }
 
-    bool result = parseFromStream( stream, assets, asset );
+    bool result = constructFromStream( stream, assets, asset );
     return result;
+}
+
+// ** AbstractFileSource::lastModified
+u32 AbstractFileSource::lastModified( void ) const
+{
+    return m_lastModified;
+}
+
+// ** AbstractFileSource::setLastModified
+void AbstractFileSource::setLastModified( u32 value )
+{
+    m_lastModified = value;
 }
 
 // ** AbstractFileSource::fileName

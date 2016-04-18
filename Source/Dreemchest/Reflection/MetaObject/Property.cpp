@@ -1,7 +1,11 @@
 /**************************************************************************
+
  The MIT License (MIT)
+
  Copyright (c) 2015 Dmitry Sovetov
+
  https://github.com/dmsovetov
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -17,75 +21,70 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
+
  **************************************************************************/
 
-#include "Type.h"
-#include "TypeCast.h"
+#include "Property.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
-#if 0
+// -------------------------------------------------------------- PropertyInfo -------------------------------------------------------------- //
 
-// ** TypeCast::s_typeCasts
-TypeCast::RegisteredTypeCasts TypeCast::s_typeCasts;
-
-// ** TypeCast::s_constructed
-bool TypeCast::s_constructed = false;
-
-// ** Type::Invalid
-const Type Type::Void;
-
-// ** Type::Type
-Type::Type( void ) : m_type( ~0 )
+// ** PropertyInfo::PropertyInfo
+PropertyInfo::PropertyInfo( void )
+    : description( NULL )
 {
 }
 
-// ** Type::Type
-Type::Type( const Type& other ) : m_type( other.m_type ), m_size( other.m_size ), m_constructor( other.m_constructor )
+// ** PropertyInfo::PropertyInfo
+PropertyInfo::PropertyInfo( CString description )
+    : description( description )
 {
 }
 
-// ** Type::Type
-Type::Type( TypeIdx type, s32 size, Constructor constructor ) : m_type( type ), m_size( size ), m_constructor( constructor )
-{
+// ----------------------------------------------------------------- Property ----------------------------------------------------------------- //
 
+// ** Property::Property
+Property::Property( CString name, const Type* type, const MetaObject* metaObject, const PropertyInfo& info )
+    : Member( name )
+    , m_metaObject( metaObject )
+    , m_type( type )
+    , m_info( info )
+{
 }
 
-// ** Type::operator ==
-bool Type::operator == ( const Type& other ) const
+// ** Property::isProperty
+const Property* Property::isProperty( void ) const
 {
-    return m_type == other.m_type;
+    return this;
 }
 
-// ** Type::operator <
-bool Type::operator < ( const Type& other ) const
+// ** Property::isProperty
+Property* Property::isProperty( void )
 {
-    return m_type < other.m_type;
+    return this;
 }
 
-// ** Type::isValid
-bool Type::isValid( void ) const
+// ** Property::type
+const Type* Property::type( void ) const
 {
-    return !(*this == Void);
+    return m_type;
 }
 
-// ** Type::size
-s32 Type::size( void ) const
+// ** Property::metaObject
+const MetaObject* Property::metaObject( void ) const
 {
-    return m_size;
+    return m_metaObject;
 }
 
-// ** Type::construct
-void Type::construct( void* instance, const void* copy ) const
+// ** Property::info
+const PropertyInfo& Property::info( void ) const
 {
-    DC_BREAK_IF( !m_constructor );
-    m_constructor( instance, copy );
+    return m_info;
 }
 
-#endif
-
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST

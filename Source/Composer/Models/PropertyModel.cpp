@@ -29,27 +29,31 @@
 DC_BEGIN_COMPOSER
 
 // ** PropertyModel::PropertyModel
-PropertyModel::PropertyModel( QObject* parent ) : QAbstractItemModel( parent )
+PropertyModel::PropertyModel( Instance instance, QObject* parent )
+    : QAbstractItemModel( parent )
+    , m_instance( instance )
+{
+    DC_ABORT_IF( !instance, "invalid meta-instance passed" );
+
+    const Reflection::Class* metaClass = instance.type();
+
+    for( s32 i = 0, n = metaClass->memberCount(); i < n; i++ ) {
+        const Reflection::Member* member = metaClass->member( i );
+        if( const Property* property = member->isProperty() ) {
+            m_properties.push_back( property );
+        }
+    }
+}
+
+PropertyModel::~PropertyModel( void )
 {
 
 }
 
-// ** PropertyModel::propertyCount
-int PropertyModel::propertyCount( void ) const
+// ** PropertyModel::properties
+const PropertyModel::Properties& PropertyModel::properties( void ) const
 {
-	return ( int )m_properties.size();
-}
-
-// ** PropertyModel::propertyName
-QString PropertyModel::propertyName( int index ) const
-{
-	return m_properties[index]->name();
-}
-
-// ** PropertyModel::propertyType
-QString PropertyModel::propertyType( int index ) const
-{
-	return m_properties[index]->type();
+    return m_properties;
 }
 
 // ** PropertyModel::rowCount
@@ -67,23 +71,30 @@ QModelIndex PropertyModel::parent( const QModelIndex& child ) const
 // ** PropertyModel::columnCount
 int PropertyModel::columnCount( const QModelIndex& parent ) const
 {
-	return propertyCount();
+	return properties().size();
 }
 
 // ** PropertyModel::data
 QVariant PropertyModel::data( const QModelIndex& index, int role ) const
 {
 	int idx = index.column();
-	return m_properties[idx]->get( idx );
+	return QVariant::fromValue( m_properties[idx]->get( m_instance ) );
 }
 
 // ** PropertyModel::setData
 bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
-	int idx = index.column();
-	m_properties[idx]->set( idx, value );
+	int     idx = index.column();
+    Variant v   = qvariant_cast<Variant>( value );
 
-	objectChanged();
+    if( !v.isValid() ) {
+        LogError( "propertyModel", "value could not be set from a void variant\n" );
+        return false;
+    }
+
+	if( m_properties[idx]->update( m_instance, v ) ) {
+        Q_EMIT propertyChanged();
+    }
 
 	return true;
 }

@@ -29,9 +29,10 @@
 #include "AssetTree.h"
 #include "Document.h"
 #include "SceneTree.h"
-#include "Inspector.h"
+#include "Inspector/EntityInspector.h"
 #include "Menu.h"
 #include "RenderingFrame.h"
+#include "Output.h"
 
 #include "../FileSystem.h"
 #include "../Project/Project.h"
@@ -152,7 +153,7 @@ SceneTreeQPtr MainWindow::sceneTree( void ) const
 }
 
 // ** MainWindow::inspector
-InspectorQPtr MainWindow::inspector( void ) const
+EntityInspectorQPtr MainWindow::inspector( void ) const
 {
 	return m_inspector;
 }
@@ -366,7 +367,7 @@ void MainWindow::createProjectInterface( Project* project )
 	m_sceneTree = new SceneTree( this );
 
 	// Create the object inspector
-	m_inspector = new Inspector( this );
+	m_inspector = new EntityInspector( this );
 
 	// Setup status bar
 	statusBar()->show();
@@ -375,7 +376,7 @@ void MainWindow::createProjectInterface( Project* project )
 	addDock( "Inspector", m_inspector, Qt::RightDockWidgetArea );
 	addDock( "Assets", m_assetTree, Qt::RightDockWidgetArea );
 	addDock( "Hierarchy", m_sceneTree, Qt::LeftDockWidgetArea );
-	addDock( "Output", new QTreeView, Qt::LeftDockWidgetArea );
+	addDock( "Output", new Output( this ), Qt::LeftDockWidgetArea );
 
 	// Update window caption
 	setWindowTitle( m_project->name().c_str() + QString( " - " + windowTitle() ) );

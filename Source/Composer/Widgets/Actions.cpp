@@ -24,12 +24,47 @@
 
  **************************************************************************/
 
-#include "Property.h"
+#include "Actions.h"
 
-DC_BEGIN_DREEMCHEST
+DC_BEGIN_COMPOSER
 
-namespace Introspection {
+namespace Ui {
 
-} // namespace Introspection
+// --------------------------------------------------------- BaseAction --------------------------------------------------------- //
 
-DC_END_DREEMCHEST
+// ** BaseAction::BaseAction
+BaseAction::BaseAction( QWidget* parent )
+    : QAction( parent )
+{
+    connect( this, SIGNAL(triggered()), this, SLOT(triggered()) );
+}
+
+// -------------------------------------------------------- EntityAction -------------------------------------------------------- //
+
+// ** EntityAction::EntityAction
+EntityAction::EntityAction( Ecs::EntityWPtr entity, QWidget* parent )
+    : BaseAction( parent )
+    , m_entity( entity )
+{
+
+}
+
+// ----------------------------------------------------- DetachComponentAction -------------------------------------------------- //
+
+// ** DetachComponentAction::DetachComponentAction
+DetachComponentAction::DetachComponentAction( Ecs::EntityWPtr entity, TypeIdx component, QWidget* parent )
+    : EntityAction( entity, parent )
+    , m_component( component )
+{
+
+}
+
+// ** DetachComponentAction::triggered
+void DetachComponentAction::triggered( void )
+{
+    m_entity->detachById( m_component );
+}
+
+} // namespace Ui
+
+DC_END_COMPOSER

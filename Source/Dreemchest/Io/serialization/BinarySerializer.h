@@ -34,6 +34,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 	//! BinarySerializer class writes serializable types to binary storage.
 	class BinarySerializer {
 	public:
@@ -100,6 +102,8 @@ namespace Io {
         data.read( &storage );
 		return data;
 	}
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

@@ -24,83 +24,53 @@
 
  **************************************************************************/
 
-#include "Variant.h"
+#include "Instance.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Introspection {
+namespace Reflection {
 
-#if 0
+// -------------------------------------------------------- InstanceConst -------------------------------------------------------- //
 
-// ** Variant::Variant
-Variant::Variant( const Type& type, const void* copy ) : m_type( type )
+// ** InstanceConst::InstanceConst
+InstanceConst::InstanceConst( void )
+    : m_class( NULL )
+    , m_pointer( NULL )
 {
-    m_type.construct( allocate(), copy );
 }
 
-// ** Variant::Variant
-Variant::Variant( const Variant& other ) : m_type( other.type() )
+// ** InstanceConst::InstanceConst
+InstanceConst::InstanceConst( const Class* cls, const void* pointer )
+    : m_class( cls ), m_pointer( pointer )
 {
-    m_type.construct( allocate(), other.pointer() );
 }
 
-// ** Variant::Variant
-Variant::~Variant( void )
+// ** InstanceConst::InstanceConst
+InstanceConst::InstanceConst( const Instance& instance )
+    : m_class( instance.m_class )
+    , m_pointer( instance.m_pointer )
 {
-    if( m_type.size() > MaxValueSize ) {
-        free( m_pointer );
-    }
 }
 
-// ** Variant::operator =
-const Variant& Variant::operator = ( const Variant& other )
+// ** InstanceConst::operator bool
+InstanceConst::operator bool( void ) const
 {
-    m_type = other.type();
-    m_type.construct( allocate(), other.pointer() );
-    return *this;
+    return m_pointer != NULL && m_class != NULL;
 }
 
-// ** Variant::type
-const Type& Variant::type( void ) const
+// ------------------------------------------------------------ Instance ---------------------------------------------------------- //
+
+// ** Instance::Instance
+Instance::Instance( void )
 {
-    return m_type;
 }
 
-// ** Variant::allocate
-void* Variant::allocate( void )
+// ** Instance::Instance
+Instance::Instance( const Class* cls, void* pointer )
+    : InstanceConst( cls, pointer )
 {
-    DC_BREAK_IF( !type().isValid() );
-
-    // Get the value type size
-    s32 size = type().size();
-
-    // The value fits the static buffer.
-    if( size <= MaxValueSize ) {
-        return m_value;
-    }
-
-    m_pointer = malloc( size );
-    return m_pointer;
 }
 
-// ** Variant::pointer
-const void* Variant::pointer( void ) const
-{
-    return const_cast<Variant*>( this )->pointer();
-}
-
-// **  Variant::pointer
-void* Variant::pointer( void )
-{
-    if( m_type.size() > MaxValueSize ) {
-        return m_pointer;
-    }
-    
-    return m_value;
-}
-
-#endif
-
-} // namespace Introspection
+} // namespace Reflection
 
 DC_END_DREEMCHEST
