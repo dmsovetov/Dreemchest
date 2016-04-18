@@ -6,8 +6,6 @@ F_DIFFUSE_DETAIL    = 64
 F_PRIMARY_UV        = 512
 
 [VertexShader]
-#version 120
-
 uniform mat4 u_vp, u_transform;
 
 #ifdef F_PRIMARY_UV
@@ -24,8 +22,6 @@ void main()
 }
 
 [FragmentShader]
-#version 120
-
 #ifdef F_PRIMARY_UV
 	varying vec2 v_uv0;
 #endif  /*  F_PRIMARY_UV   */
