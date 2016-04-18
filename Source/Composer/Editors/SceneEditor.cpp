@@ -234,11 +234,10 @@ void SceneEditor::save( void )
 // ** SceneEditor::loadFromFile
 Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 {
-#if DEV_DEPRECATED_SERIALIZATION
     // Create scene instance
     Scene::ScenePtr scene = Scene::Scene::create();
 
-#if 0
+#if DEV_DEPRECATED_SERIALIZATION
     // Read the file contents
     QString data = qComposer->fileSystem()->readTextFile( fileName );
 
@@ -336,7 +335,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     {
         Scene::SceneObjectPtr light = scene->createSceneObject();
         light->attach<Scene::Transform>( 9.0f, 4.0f, 9.0f, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::Light::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 10.0f );
+        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 10.0f );
         scene->addSceneObject( light );
     }
 
@@ -346,13 +345,9 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     //    light->attach<Scene::Light>( Scene::Light::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 10.0f );
     //    scene->addSceneObject( light );
     //}
-#endif
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
     return scene;
-#else
-    LogError( "sceneEditor", "scene deserialization is not implemented\n" );
-    return Scene::Scene::create();
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::navigateToObject
