@@ -84,8 +84,11 @@ QVariant AssetFileSystemModel::data( const QModelIndex& index, int role ) const
 	}
 
 	switch( role ) {
-	case Qt::DisplayRole:	return m_isEditingModel ? fileInfo( index ).fileName() : fileInfo( index ).baseName();
-	case Qt::EditRole:		return fileInfo( index ).baseName();
+	case Qt::DisplayRole:	    return m_isEditingModel ? fileInfo( index ).fileName() : fileInfo( index ).baseName();
+	case Qt::EditRole:		    return fileInfo( index ).baseName();
+#if DEV_DISABLE_SYSTEM_ICON_PROVIDER
+    case Qt::DecorationRole:    return QPixmap();
+#endif  /*  DEV_DISABLE_SYSTEM_ICON_PROVIDER    */
 	}
 
 	return QFileSystemModel::data( index, role );

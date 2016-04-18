@@ -30,8 +30,9 @@
 #include <Dreemchest.h>
 #include <functional>
 
-#define DEV_BACKGROUND_ASSET_LOADING	(0)
-#define DEV_USE_DOCK_INDICATOR			(1)
+#define DEV_BACKGROUND_ASSET_LOADING	    (0)
+#define DEV_USE_DOCK_INDICATOR			    (1)
+#define DEV_DISABLE_SYSTEM_ICON_PROVIDER    (1)
 
 #ifdef DC_QT4_ENABLED
 	#include <QtGui>
