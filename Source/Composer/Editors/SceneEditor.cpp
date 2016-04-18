@@ -26,6 +26,7 @@
 
 #include "SceneEditor.h"
 #include "../Widgets/Menu.h"
+#include "../Widgets/Inspector/EntityInspector.h"
 #include "../Systems/Transform/TranslationTool.h"
 #include "../Systems/Transform/RotationTool.h"
 #include "../Systems/Transform/ArcballRotationTool.h"
@@ -102,11 +103,14 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderTarget = FrameTarget::create( document->renderingFrame() );
 
 	// Create the camera.
-	m_camera = Scene::SpectatorCamera::create( m_renderTarget, m_cursorMovement );
-	m_camera->setMovementEnabled( false );
-	m_camera->setRotationEnabled( false );
-	m_camera->setClearColor( backgroundColor() );
-	m_camera->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
+	m_camera = m_scene->createSceneObject();
+    m_camera->attach<Scene::Transform>()->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
+    m_camera->attach<Scene::Camera>( Scene::Projection::Perspective, m_renderTarget, backgroundColor() );
+    m_camera->attach<Scene::RotateAroundAxes>( 10.0f, Scene::CSLocalX, DC_NEW Scene::Vec3FromMouse )->setRangeForAxis( Scene::AxisX, Range( -90.0f, 90.0f ) );
+    m_camera->get<Scene::RotateAroundAxes>()->setBinding( m_cursorMovement );
+	m_camera->attach<Scene::MoveAlongAxes>( 60.0f, Scene::CSLocal, new Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
+	m_camera->disable<Scene::RotateAroundAxes>();
+	m_camera->disable<Scene::MoveAlongAxes>();
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
@@ -200,6 +204,7 @@ struct Null : public Ecs::Component<Null> {};
 // ** SceneEditor::save
 void SceneEditor::save( void )
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Get the set of objects to be serialized
     Scene::SceneObjectSet objects = m_scene->findByAspect( Ecs::Aspect::exclude<Null>() );
 
@@ -221,11 +226,15 @@ void SceneEditor::save( void )
 
     // Write the serialized data to file
     qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::VariantTextStream::stringify( Variant::fromValue( kv ), true ) ) );
+#else
+    LogError( "sceneEditor", "scene serialization is not implemented\n" );
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::loadFromFile
 Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 {
+#if DEV_DEPRECATED_SERIALIZATION
     // Create scene instance
     Scene::ScenePtr scene = Scene::Scene::create();
 
@@ -340,6 +349,10 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 #endif
 
     return scene;
+#else
+    LogError( "sceneEditor", "scene deserialization is not implemented\n" );
+    return Scene::Scene::create();
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** SceneEditor::navigateToObject
@@ -353,9 +366,12 @@ void SceneEditor::navigateToObject( Scene::SceneObjectWPtr sceneObject )
 	// Get the  mesh bounding box
 	Bounds bounds = sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
 
+    // Get camera transform
+    Scene::Transform* transform = m_camera->get<Scene::Transform>();
+
 	// Calculate new camera position by subtracting
 	// the view direction from scene object position
-	Vec3 position = bounds.center() + m_camera->view() * max3( bounds.width(), bounds.height(), bounds.depth() ) + 1.0f;
+	Vec3 position = bounds.center() + transform->axisZ() * max3( bounds.width(), bounds.height(), bounds.depth() ) + 1.0f;
 
 	// Attach the moving component
 	m_camera->attach<Scene::MoveTo>( new Scene::Vec3Binding( position ), false, Scene::MoveTo::Smooth, 16.0f );
@@ -375,9 +391,9 @@ void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
 		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformBasisComboBox );
+        m_tools->addWidget( new QComboBox );
         m_tools->addSeparator();
-        m_tools->addWidget( new TransformPivotComboBox );
+        m_tools->addWidget( new QComboBox );
 	    m_tools->addSeparator();
 		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
 		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
@@ -473,8 +489,8 @@ void SceneEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button
 	VisualEditor::handleMousePress( x, y, buttons );
 
 	if( buttons & Ui::MouseButtons::Right ) {
-		m_camera->setRotationEnabled( true );
-		m_camera->setMovementEnabled( true );
+		m_camera->enable<Scene::RotateAroundAxes>();
+		m_camera->enable<Scene::MoveAlongAxes>();
 	}
 }
 
@@ -484,8 +500,8 @@ void SceneEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& butt
 	VisualEditor::handleMouseRelease( x, y, buttons );
 
 	if( buttons & Ui::MouseButtons::Right ) {
-		m_camera->setRotationEnabled( false );
-		m_camera->setMovementEnabled( false );
+		m_camera->disable<Scene::RotateAroundAxes>();
+		m_camera->disable<Scene::MoveAlongAxes>();
 	}
 	else if( buttons & Ui::MouseButtons::Left ) {
 		// Get the scene object underneath the mouse cursor
@@ -509,7 +525,8 @@ void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::Mouse
 // ** SceneEditor::handleMouseWheel
 void SceneEditor::handleMouseWheel( s32 delta )
 {
-	m_camera->setPosition( m_camera->position() - m_camera->view() * delta * 0.01f );
+    Scene::Transform* transform = m_camera->get<Scene::Transform>();
+	transform->setPosition( transform->position() - transform->axisZ() * delta * 0.01f );
 }
 
 // ** SceneEditor::handleDragEnter
@@ -537,8 +554,11 @@ void SceneEditor::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 	// Extract assets from MIME data
 	Assets::AssetSet assets = qComposer->assetsFromMime( mime );
 
+    // Get camera transform
+    Scene::Transform* transform = m_camera->get<Scene::Transform>();
+
 	// Get the asset action
-	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, m_camera->position() + constructViewRay( x, y ).direction() * 5.0f );
+	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, transform->position() + constructViewRay( x, y ).direction() * 5.0f );
 
 	if( action ) {
 		m_sceneModel->performAssetAction( action );
@@ -590,14 +610,20 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 	// Store this object
 	m_selectedSceneObject = sceneObject;
 
-	// Mark it as selected
-	if( m_selectedSceneObject.valid() ) {
-		// Add the selected flag
-		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+    // Nothing selected - just return
+    if( !m_selectedSceneObject.valid() ) {
+        return;
+    }
 
-		// Bind the gizmo for an active transformation tool
-		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
-	}
+	// Add the selected flag
+	m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+
+	// Bind the gizmo for an active transformation tool
+	bindTransformGizmo( m_selectedSceneObject, m_activeTool );
+
+    // Bind to an entity inspector
+    Ui::EntityInspectorQPtr inspector = qMainWindow->inspector();
+    inspector->bind( m_selectedSceneObject );
 }
 
 // ** SceneEditor::findSceneObjectAtPoint

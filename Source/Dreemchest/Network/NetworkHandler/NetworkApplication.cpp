@@ -128,7 +128,7 @@ void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Pi
 void Application::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 {
 	// Find a remote call handler
-	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( packet.method );
+	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( String32( packet.method ) );
 
 	if( i == m_remoteCallHandlers.end() ) {
 		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
@@ -175,6 +175,9 @@ void Application::handlePacketReceived( const Connection::Received& e )
 		return;
 	}
 
+    // Track received packet size
+    m_bytesReceivedPerPacket[packet->name()] += e.size;
+
     // Get the packet stream
     Io::ByteBufferWPtr stream = e.packet;
 
@@ -203,6 +206,18 @@ void Application::handleConnectionClosed( const Connection::Closed& e )
 
 	// Remove this connection from list
 	closeConnection( static_cast<Connection*>( e.sender.get() ) );
+}
+
+// ** Application::bytesSentPerPacket
+const Application::TrafficPerPacket& Application::bytesSentPerPacket( void ) const
+{
+    return m_bytesSentPerPacket;
+}
+
+// ** Application::bytesReceivedPerPacket
+const Application::TrafficPerPacket& Application::bytesReceivedPerPacket( void ) const
+{
+    return m_bytesReceivedPerPacket;
 }
 
 // ** Application::update

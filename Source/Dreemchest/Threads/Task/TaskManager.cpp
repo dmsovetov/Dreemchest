@@ -126,7 +126,7 @@ TaskProgressPtr TaskManager::runTask( const TaskFunction& task, void *userData, 
 TaskQueueWPtr TaskManager::taskQueue( const String& name ) const
 {
     if( name != "" ) {
-        TaskThreads::const_iterator i = m_taskThreads.find( StringHash( name.c_str() ) );
+        TaskThreads::const_iterator i = m_taskThreads.find( String64( name.c_str() ) );
 
         if( i != m_taskThreads.end() ) {
             return i->second->taskQueue();
@@ -159,7 +159,7 @@ void TaskManager::startTaskThread( const String& name, TaskQueueWPtr queue )
 {
     DC_ABORT_IF( queue == NULL, "invalid task queue" );
     
-    strhash       hash        = StringHash( name.c_str() );
+    String64      hash        = String64( name.c_str() );
     TaskThreadPtr taskThread  = DC_NEW TaskThread( name, queue );
     m_taskThreads[hash]		  = taskThread;
 }

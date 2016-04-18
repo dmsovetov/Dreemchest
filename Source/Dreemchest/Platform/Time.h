@@ -97,6 +97,12 @@ namespace Platform {
         //! Sets the time step value.
         void        setTimeStep( u32 value );
 
+        //! Returns a delta time in milliseconds.
+        u32         dt( void ) const;
+
+        //! Returns a time value left in accumulator.
+        u32         accumulated( void ) const;
+
 	private:
 
 		u32		    m_dt;			//!< The requested timer step.

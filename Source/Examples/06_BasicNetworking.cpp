@@ -42,7 +42,7 @@ class Server : public Platform::ApplicationDelegate {
         Logger::setStandardLogger();
 
 		// Create a network interface and show host info
-		net::Network network;
+		Network::Network network;
 		LogVerbose( "basicNetworking", "IP: %s\n", network.hostIP().toString() );
 		LogVerbose( "basicNetworking", "Hostname: %s\n", network.hostName() );
 		LogVerbose( "basicNetworking", "Broadcast IP: %s\n", network.broadcastIP().toString() );

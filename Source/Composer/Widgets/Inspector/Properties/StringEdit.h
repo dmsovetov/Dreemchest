@@ -24,19 +24,45 @@
 
  **************************************************************************/
 
-#include "AssetModels.h"
-#include "EnumerationModel.h"
+#ifndef __DC_Composer_StringEdit_H__
+#define __DC_Composer_StringEdit_H__
+
+#include "../../../Composer.h"
 
 DC_BEGIN_COMPOSER
 
-// ** MaterialModel::MaterialModel
-MaterialModel::MaterialModel( Scene::MaterialHandle material, QObject* parent ) : PropertyModel( parent ), m_material( material )
-{
-    material.assets()->forceLoad( material );
-    Scene::Material* instance = &(*material.writeLock());
-	addEnum<Scene::RenderingMode, RenderingModeModel>( "Rendering Mode", BindGetter( Scene::Material::renderingMode, instance ), BindSetter( Scene::Material::setRenderingMode, instance ) );
-	addEnum<Scene::LightingModel, LightingModel>( "Lighting Model", BindGetter( Scene::Material::lightingModel, instance ), BindSetter( Scene::Material::setLightingModel, instance ) );
-	addAsset<Scene::ImageHandle>( "Diffuse", BindGetter( Scene::Material::diffuse, instance ), BindSetter( Scene::Material::setDiffuse, instance ) );
-}
+namespace Ui {
+
+    //! Widget to edit string properties.
+    class StringEdit : public QLineEdit {
+    
+        Q_OBJECT
+        Q_PROPERTY( Variant value READ value WRITE setValue NOTIFY valueChanged USER true )
+
+    public:
+
+                            //! Constructs StringEdit instance.
+                            StringEdit( QWidget* parent = NULL );
+
+        //! Returns current property value as Variant.
+        Variant             value( void ) const;
+
+        //! Sets property value from a Variant.
+        void                setValue( const Variant& value );
+
+    Q_SIGNALS:
+
+        //! Emitted when the widget value was changed.
+        void                valueChanged( const Variant& value );
+
+    private Q_SLOTS:
+
+        //! Emits the value changed signal with a QString converted to Variant value.
+        void                textChanged( const QString& value );
+    };
+
+} // namespace Ui
 
 DC_END_COMPOSER
+
+#endif	/*	!__DC_Composer_StringEdit_H__	*/

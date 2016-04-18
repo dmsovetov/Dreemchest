@@ -33,24 +33,25 @@ DC_USE_DREEMCHEST
 // Declare the log tag in global namespace
 DREEMCHEST_LOGGER_TAG( TCPSockets )
 
+#if 0
 // A delagate class to listen the server socket events.
-class TCPListenerEventHandler : public net::TCPSocketListenerDelegate {
+class TCPListenerEventHandler : public Network::TCPSocketListenerDelegate {
 public:
 
 	//! Handles accepted incomming connection.
-	virtual void handleConnectionAccepted( net::TCPSocketListener* sender, net::TCPSocket* socket )
+	virtual void handleConnectionAccepted( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
 	{
 		LogVerbose( "socketListener", "client connected, remote address %s\n", socket->address().toString() );
 	}
 
 	//! Handles a remote connection closed.
-	virtual void handleConnectionClosed( net::TCPSocketListener* sender, net::TCPSocket* socket )
+	virtual void handleConnectionClosed( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
 	{
 		LogVerbose( "socketListener", "client disconnected, remote address %s\n", socket->address().toString() );
 	}
 
 	//! Called when socket has received data.
-	virtual void handleReceivedData( net::TCPSocketListener* sender, net::TCPSocket* socket, net::TCPStream* stream )
+	virtual void handleReceivedData( Network::TCPSocketListener* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
 	{
 		LogVerbose( "socketListener", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
 		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
@@ -64,19 +65,19 @@ public:
 };
 
 // A delegate class to listen the socket events.
-class TCPEventHandler : public net::TCPSocketDelegate {
+class TCPEventHandler : public Network::TCPSocketDelegate {
 public:
 
 	TCPEventHandler( Platform::Application* app ) : m_application( app ) {}
 
 	//! Called when socket is closed.
-	virtual void handleClosed( net::TCPSocket* sender )
+	virtual void handleClosed( Network::TCPSocket* sender )
 	{
 		LogVerbose( "socket", "socket disconnected\n" );
 	}
 
 	//! Called when socket has received data.
-	virtual void handleReceivedData( net::TCPSocket* sender, net::TCPSocket* socket, net::TCPStream* stream )
+	virtual void handleReceivedData( Network::TCPSocket* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
 	{
 		LogVerbose( "socket", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
 		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
@@ -110,13 +111,13 @@ class Server : public Platform::ApplicationDelegate {
         Logger::setStandardLogger();
 
 		//! Create a network interface
-		net::Network network;
+		Network::Network network;
 
-		net::TCPSocketListenerPtr server = startServer( application, 20000 );
+		Network::TCPSocketListenerPtr server = startServer( application, 20000 );
 		serverThread = Threads::Thread::create();
 		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
 
-		net::TCPSocketPtr client = connectToServer( application, 20000 );
+		Network::TCPSocketPtr client = connectToServer( application, 20000 );
 
 		while( true ) {
 			if( client != NULL && client->isValid() ) {
@@ -150,13 +151,13 @@ class Server : public Platform::ApplicationDelegate {
 	}
 
 	// This method connects to a remote socket.
-	net::TCPSocketPtr connectToServer( Platform::Application* application, u16 port )
+	Network::TCPSocketPtr connectToServer( Platform::Application* application, u16 port )
 	{
 		// Connect to remote server
-		net::TCPSocketPtr socket = net::TCPSocket::connectTo( net::NetworkAddress::Localhost, port, new TCPEventHandler( application ) );
+		Network::TCPSocketPtr socket = Network::TCPSocket::connectTo( Network::Address::Localhost, port, new TCPEventHandler( application ) );
 
 		if( socket == NULL ) {
-			return net::TCPSocketPtr();
+			return Network::TCPSocketPtr();
 		}
 
 		// Send message to server
@@ -188,3 +189,9 @@ class Server : public Platform::ApplicationDelegate {
 
 // Now declare an application entry point with Files application delegate.
 dcDeclareApplication( new Server )
+#else
+int main()
+{
+    return -1;
+}
+#endif

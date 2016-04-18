@@ -55,7 +55,7 @@ public:
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Renderer::Hal::create( Renderer::OpenGL, view );
 
-		m_renderingContext = Scene::RenderingContext::create( m_hal );
+		//m_renderingContext = Scene::RenderingContext::create( m_hal );
 
 		// Create the particle system
 		//m_assets = Scene::AssetBundle::createFromFile( "particles", "assets", "assets/assets.json" );
@@ -67,6 +67,7 @@ public:
 		m_scene->findAllWithName( "smoke_missile" ).begin()->get()->get<Scene::Transform>()->setPosition( Vec3( -1000, 0, 0 ) );
 		m_scene->findAllWithName( "smoke_missile" ).begin()->get()->attach<Scene::MoveAlongAxes>( 1000.0f, Scene::CSWorld, new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
 
+    #if 0
 		Scene::Camera2DPtr camera = Scene::Camera2D::create( Scene::WindowTarget::create( window ) );
 		camera->attach<Scene::RenderParticles>();
 		camera->attach<Scene::RenderGrid>();
@@ -74,6 +75,9 @@ public:
 		camera->setZoom( 0.2f );
 		camera->get<Scene::Camera>()->setClearColor( Rgba( 0.5f, 0.5f, 0.5f ) );
 		m_scene->addSceneObject( camera );
+    #else
+        DC_NOT_IMPLEMENTED
+    #endif
 
 		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
 		grid->attach<Scene::Grid>( 1000.0f, 10.0f );
@@ -98,7 +102,7 @@ public:
 	//	}
         DC_NOT_IMPLEMENTED;
 
-		m_scene->render( m_renderingContext );
+	//	m_scene->render( m_renderingContext );
 
         // And now just present all rendered data to the screen
         m_hal->present();	

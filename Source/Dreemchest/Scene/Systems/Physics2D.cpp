@@ -341,8 +341,8 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
     for( Ecs::EntitySet::iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
         RigidBody2D& rigidBody = *(*i)->get<RigidBody2D>();
 
-        // Skip static bodies
-        if( rigidBody.type() == RigidBody2D::Static ) {
+        // Skip static and kinematic bodies
+        if( rigidBody.type() != RigidBody2D::Dynamic ) {
             continue;
         }
 
@@ -417,7 +417,7 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
     clearState( rigidBody );
 }
 
-// ** Box2DPhysics::updateTransfor
+// ** Box2DPhysics::updateTransform
 void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
 {
 	// Get the body transform
@@ -511,7 +511,7 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 	// Initialize the body shape
 	for( u32 i = 0, n = shape->partCount(); i < n; i++ ) {
 		// Get the shape part by index
-		const Shape2D::Part& part = shape->part( i );
+		const SimpleShape2D& part = shape->part( i );
 
         // Setup fixture collision filter
         b2Filter filter;
@@ -520,10 +520,10 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 
 		// Initialize Box2D fixture
 		switch( part.type ) {
-		case Shape2D::Circle:	addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
-		case Shape2D::Rect:		addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
-		case Shape2D::Polygon:	addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
-		default:				DC_BREAK;
+		case Shape2DType::Circle:	    addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
+		case Shape2DType::Rect:         addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
+		case Shape2DType::Polygon:      addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
+		default:				        DC_BREAK;
 		}
 	}
 
@@ -549,7 +549,7 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 }
 
 // ** Box2DPhysics::addCircleFixture
-b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
+b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2CircleShape circle;
@@ -569,7 +569,7 @@ b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const 
 }
 
 // ** Box2DPhysics::addRectFixture
-b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
+b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;
@@ -589,7 +589,7 @@ b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const Sh
 }
 
 // ** Box2DPhysics::addPolygonFixture
-b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const Shape2D::Part& shape, bool isSensor ) const
+b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
 	b2FixtureDef fixture;
 	b2PolygonShape polygon;

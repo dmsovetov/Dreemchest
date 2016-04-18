@@ -72,13 +72,13 @@ void RenderDepthComplexity::setIntensity( f32 value )
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::type
-Light::Type Light::type( void ) const
+LightType Light::type( void ) const
 {
 	return m_type;
 }
 
 // ** Light::setType
-void Light::setType( Type value )
+void Light::setType( LightType value )
 {
 	m_type = value;
 }
@@ -119,6 +119,7 @@ void Light::setRange( f32 value )
 	m_range = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Light::serialize
 void Light::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -130,6 +131,7 @@ void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     DC_NOT_IMPLEMENTED;
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
@@ -140,7 +142,7 @@ const MeshHandle& StaticMesh::mesh( void ) const
 }
 
 // ** StaticMesh::setMesh
-void StaticMesh::setMesh( MeshHandle value )
+void StaticMesh::setMesh( const MeshHandle& value )
 {
 	DC_ABORT_IF( !value.isValid(), "invalid mesh" );
 	m_mesh = value;
@@ -195,6 +197,7 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 	m_lightmap = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** StaticMesh::serialize
 void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -231,6 +234,7 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
         LogWarning( "staticMesh", "unresolved asset '%s'\n", kv.get<String>( "asset" ).c_str() );
     }
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ------------------------------------------- Particles ----------------------------------------- //
 
@@ -304,16 +308,34 @@ void Camera::setId( u8 value )
 	m_id = value;
 }
 
-// ** Camera:setFar
-void Camera::setFar( f32 value )
+// ** Camera::near
+f32 Camera::near( void ) const
 {
-	m_far = value;
+    return m_near;
 }
 
 // ** Camera:setNear
 void Camera::setNear( f32 value )
 {
 	m_near = value;
+}
+
+// ** Camera::far
+f32 Camera::far( void ) const
+{
+    return m_far;
+}
+
+// ** Camera:setFar
+void Camera::setFar( f32 value )
+{
+	m_far = value;
+}
+
+// ** Camera::fov
+f32 Camera::fov( void ) const
+{
+    return m_fov;
 }
 
 // ** Camera:setFov
@@ -332,6 +354,18 @@ const Rgba& Camera::clearColor( void ) const
 void Camera::setClearColor( const Rgba& value )
 {
 	m_clearColor = value;
+}
+
+// ** Camera::projection
+Projection Camera::projection( void ) const
+{
+    return m_projection;
+}
+
+// ** Camera::setProjection
+void Camera::setProjection( Projection value )
+{
+    m_projection = value;
 }
 
 // ** Camera::ndc
@@ -379,10 +413,10 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 	f32  height = rect.height();
 
 	switch( m_projection ) {
-	case Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
-	case Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
-	case OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
-	default:			DC_BREAK;
+    case Projection::Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
+	case Projection::Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
+	case Projection::OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
+	default:			            DC_NOT_IMPLEMENTED;
 	}
 
 	return Matrix4();
@@ -475,6 +509,7 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 	return Circle( center, radius );
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Camera::serialize
 void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -493,12 +528,14 @@ void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
 {
     KeyValue kv     = ar.as<KeyValue>();
     m_clearMask     = kv.get<u8>( "clearMask" );
-    m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    //m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
+    m_projection    = Projection::Perspective;
     m_clearColor    = kv.get( "clearColor", Rgba() );
     m_fov           = kv.get( "fov", 60.0f );
     m_near          = kv.get( "near", 0.01f );
     m_far           = kv.get( "far", 1000.0f );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Scene
 

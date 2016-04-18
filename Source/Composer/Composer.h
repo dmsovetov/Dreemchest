@@ -70,6 +70,7 @@ DC_BEGIN_COMPOSER
     DREEMCHEST_LOGGER_TAG( Composer )
 
 	// Declare Qt metatypes
+    Q_DECLARE_METATYPE( Variant )
 	Q_DECLARE_METATYPE( Assets::Handle )
 	Q_DECLARE_METATYPE( Scene::ImageHandle )
 	Q_DECLARE_METATYPE( Scene::RenderingMode )
@@ -81,11 +82,12 @@ DC_BEGIN_COMPOSER
         qDeclarePtr( MainWindow )
         qDeclarePtr( Document )
         qDeclarePtr( SceneTree )
-        qDeclarePtr( Inspector )
 		qDeclarePtr( Action )
 		qDeclarePtr( Menu )
 		qDeclarePtr( ToolBar )
 		qDeclarePtr( RenderingFrame )
+        qDeclarePtr( PropertyInspector )
+        qDeclarePtr( EntityInspector )
 
 		//! Message status.
 		enum MessageStatus {
@@ -226,6 +228,23 @@ DC_BEGIN_COMPOSER
 	//! Container type to store file info.
 	typedef QVector<class FileInfo> FileInfoArray;
 
+    //! Completely deletes layout and it's items
+    inline void qDeleteLayout( QLayout* layout )
+    {
+	    if( !layout ) {
+		    return;
+	    }
+
+	    QLayoutItem* child = NULL;
+
+	    while( (child = layout->takeAt(0)) != 0 ) {
+		    delete child->widget();
+		    delete child;
+	    }
+
+	    delete layout;
+    }
+
 	//! Root composer class.
 	class Composer : public QApplication {
 
@@ -257,59 +276,63 @@ DC_BEGIN_COMPOSER
 			, TotalMenues
 		};
 
-                                //! Constructs Composer instance.
-								Composer( int argc, char ** argv );
+                                    //! Constructs Composer instance.
+								    Composer( int argc, char ** argv );
 
 		//! Opens the existing project at path.
-		void					openProject( const String& path );
+		void					    openProject( const String& path );
 
 		//! Creates new project at path.
-		void					createProject( const String& path );
+		void					    createProject( const String& path );
 
         //! Closes an opened project.
-        void                    closeProject( void );
+        void                        closeProject( void );
 
 		//! Returns opened project.
-		ProjectQPtr	            project( void ) const;
+		ProjectQPtr	                project( void ) const;
+
+        //! Returns global assembly instance.
+        Reflection::AssemblyWPtr    assembly( void ) const;
 
 		//! Returns main window.
-		Ui::MainWindowQPtr		window( void ) const;
+		Ui::MainWindowQPtr		    window( void ) const;
 
 		//! Returns the file system instance.
-		FileSystemQPtr	        fileSystem( void ) const;
+		FileSystemQPtr	            fileSystem( void ) const;
 
 		//! Performs the composer initialization.
-		bool					initialize( void );
+		bool					    initialize( void );
 
 		//! Extracts an asset set from MIME data.
-		Assets::AssetSet		assetsFromMime( MimeDataQPtr mime ) const;
+		Assets::AssetSet		    assetsFromMime( MimeDataQPtr mime ) const;
 
 		//! Extracts a single asset from MIME data.
-		Assets::Handle	        assetFromMime( MimeDataQPtr mime ) const;
+		Assets::Handle	            assetFromMime( MimeDataQPtr mime ) const;
 
 	private:
 
 		//! Creates a new project.
-		void					menuCreateProject( Ui::ActionQPtr action );
+		void					    menuCreateProject( Ui::ActionQPtr action );
 
 		//! Opens an existing project.
-		void					menuOpenProject( Ui::ActionQPtr action );
+		void					    menuOpenProject( Ui::ActionQPtr action );
 
 		//! Saves current project.
-		void					menuSaveProject( Ui::ActionQPtr action );
+		void					    menuSaveProject( Ui::ActionQPtr action );
 
 		//! Undo the last action.
-		void					menuUndo( Ui::ActionQPtr action );
+		void					    menuUndo( Ui::ActionQPtr action );
 
 		//! Redo the last action.
-		void					menuRedo( Ui::ActionQPtr action );
+		void					    menuRedo( Ui::ActionQPtr action );
 
 	private:
 
-		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
-		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
-		ProjectQPtr             m_project;				//!< Active project.
-        FileSystemQPtr		    m_fileSystem;		    //!< File system interface.
+		Ui::MainWindowQPtr		    m_mainWindow;			//!< Main composer window.
+		Ui::MenuQPtr			    m_menues[TotalMenues];	//!< Default menues.
+		ProjectQPtr                 m_project;				//!< Active project.
+        FileSystemQPtr		        m_fileSystem;		    //!< File system interface.
+        Reflection::AssemblyPtr     m_assembly;             //!< Global assembly instance.
 	};
 
 DC_END_COMPOSER

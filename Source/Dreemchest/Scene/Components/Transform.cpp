@@ -286,6 +286,7 @@ void Transform::setScaleZ( f32 value )
 	m_scale.z = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Transform::serialize
 void Transform::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -300,6 +301,7 @@ void Transform::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
     m_rotation = kv.get<Quat>( "rotation" );
     m_scale    = kv.get<Vec3>( "scale" );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ----------------------------------------------- Identifier ------------------------------------------------ //
 
@@ -315,6 +317,7 @@ void Identifier::setName( const String& value )
 	m_name = value;
 }
 
+#if DEV_DEPRECATED_SERIALIZATION
 // ** Identifier::serialize
 void Identifier::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
 {
@@ -326,6 +329,7 @@ void Identifier::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
 {
     m_name = ar.as<KeyValue>().get<String>( "value" );
 }
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // --------------------------------------------- MoveAlongAxes --------------------------------------------- //
 

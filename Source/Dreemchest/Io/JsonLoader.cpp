@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 #ifdef HAVE_JSON
 
 // ** JsonLoaderBase::load
@@ -130,6 +132,8 @@ Array<f32> JsonLoaderBase::readFloats( const Json::Value& value )
 }
 
 #endif	/*	HAVE_JSON	*/
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

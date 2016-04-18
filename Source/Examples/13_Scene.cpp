@@ -50,7 +50,7 @@ class ParticleSystems : public Platform::ApplicationDelegate {
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Renderer::Hal::create( Renderer::OpenGL, view );
-        m_renderingContext = Scene::RenderingContext::create( m_hal );
+        //m_renderingContext = Scene::RenderingContext::create( m_hal );
 
 		// Create the particle system
 		m_scene = Scene::Scene::create();
@@ -77,7 +77,7 @@ class ParticleSystems : public Platform::ApplicationDelegate {
 		Scene::Vec3BindingPtr wasdDirection = DC_NEW Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 
 		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
-		camera->attach<Scene::Camera>( Scene::Camera::Perspective, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
+		camera->attach<Scene::Camera>( Scene::Projection::Perspective, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
 		camera->attach<Scene::RenderParticles>();
 	//	camera->attach<Scene::RenderForwardLit>();
 		camera->attach<Scene::RenderWireframe>();
@@ -101,7 +101,8 @@ class ParticleSystems : public Platform::ApplicationDelegate {
 		Threads::Thread::sleep( 30 );
 
 		m_scene->update( 0, 0.03f );
-		m_scene->render( m_renderingContext );
+	//	m_scene->render( m_renderingContext );
+        DC_NOT_IMPLEMENTED;
 
         // And now just present all rendered data to the screen
         m_hal->present();

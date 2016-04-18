@@ -74,7 +74,7 @@ QVariant SceneModel::data( const QModelIndex& index, int role ) const
 	// Return the data according to requested role.
 	switch( role ) {
 	case Qt::DisplayRole:
-	case Qt::EditRole:			return sceneObject->has<Scene::Identifier>() ? sceneObject->get<Scene::Identifier>()->name().c_str() : sceneObject->typeName();
+	case Qt::EditRole:			return sceneObject->has<Scene::Identifier>() ? sceneObject->get<Scene::Identifier>()->name().c_str() : "Entity";
 	//case Qt::DecorationRole:	return m_iconProvider->icon( item->data() );
 	}
 

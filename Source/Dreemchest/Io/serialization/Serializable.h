@@ -29,6 +29,8 @@
 
 #include "Serializer.h"
 
+#if DEV_DEPRECATED_SERIALIZATION
+
 #define IoRegisterType( Type ) Io::SerializableTypes::registerType<Type>();
 
 #define IoOverrideSerializable( Type )                              \
@@ -54,9 +56,13 @@
 		return result;	\
 	}
 
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+
 DC_BEGIN_DREEMCHEST
 
 namespace Io {
+
+#if DEV_DEPRECATED_SERIALIZATION
 
     //! Base interface class for all serializable data structs.
     class ISerializable : public RefCounted {
@@ -204,6 +210,8 @@ namespace Io {
         #endif  /*  DC_DEPRECATED_FEATURE   */
 		}
 	}
+
+#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Io
 

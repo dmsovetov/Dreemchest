@@ -27,17 +27,18 @@
 #ifndef DEPRECATED_H
 #define DEPRECATED_H
 
-#define DEV_DEPRECATED_SCENE_RENDERER   (0)
+#define DEV_DEPRECATED_SCENE_RENDERER       (0)
+#define DEV_DEPRECATED_ECS_ARCHETYPES       (0)
+#define DEV_DEPRECATED_SERIALIZATION        (0)
+#define DEV_DEPRECATED_SCENE_SERIALIZATION  (1)
 
 DC_BEGIN_DREEMCHEST
 
     template<class T>
     using StrongPtr = Ptr<T>;
-    
-    typedef StringHash::type strhash;
 
     template<typename T>
-	class Hash : public std::map<strhash, T> {};
+	class Hash : public std::map<String64, T> {};
 
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;
@@ -73,6 +74,15 @@ DC_END_DREEMCHEST
 				    NIMBLE_ABORT( -1 );     \
                 }
 #endif  /*  NIMBLE_DEBUG    */
+
+#if NIMBLE_NO_DEBUG
+    #undef DC_BREAK_IF
+    #define DC_BREAK_IF( ... )
+    #undef DC_ABORT_IF
+    #define DC_ABORT_IF( ... )
+    #undef DC_NOT_IMPLEMENTED
+    #define DC_NOT_IMPLEMENTED
+#endif  /*  #if NIMBLE_NO_DEBUG  */
 
 #define DC_DEPRECATED       NIMBLE_DEPRECATED
 #define DC_DECL_OVERRIDE    NIMBLE_OVERRIDE

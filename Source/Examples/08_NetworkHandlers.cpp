@@ -29,6 +29,8 @@
 
 #define LOCAL_MODE	(1)
 
+#if 0
+
 // Open a root engine namespace
 DC_USE_DREEMCHEST
 
@@ -160,3 +162,9 @@ class NetworkHandlers : public Platform::ApplicationDelegate {
 
 // Now declare an application entry point with NetworkHandlers application delegate.
 dcDeclareApplication( new NetworkHandlers )
+#else
+int main()
+{
+    return -1;
+}
+#endif

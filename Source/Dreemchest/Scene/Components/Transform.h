@@ -36,6 +36,14 @@ namespace Scene {
 
 	//! Scene object transformation component.
 	class Transform : public Ecs::Component<Transform> {
+
+        INTROSPECTION_SUPER( Transform, Ecs::ComponentBase
+            , PROPERTY( position, position, setPosition, "The local position of this Transform relative to parent." )
+            , PROPERTY( rotation, rotation, setRotation, "The local rotation of this Transform relative to parent." )
+            , PROPERTY( scale,    scale,    setScale,    "The local scaling of this Transform relative to parent."  )
+            , PROPERTY( parent,   parent,   setParent,   "The parent Transform instance."                           )
+            )
+
 	public:
 
 								//! Constructs Transform instance.
@@ -160,11 +168,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the transform data to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the transform data from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
@@ -195,6 +205,11 @@ namespace Scene {
 
 	//! Identifier component.
 	class Identifier : public Ecs::Component<Identifier> {
+
+        INTROSPECTION_SUPER( Identifier, Ecs::ComponentBase
+            , PROPERTY( name, name, setName, "The entity identifier value." )
+            )
+
 	public:
 
 								//! Constructs the Identifier instance.
@@ -209,11 +224,13 @@ namespace Scene {
 
     protected:
 
+    #if DEV_DEPRECATED_SERIALIZATION
         //! Writes the identifier to a key-value archive.
-		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
 
 		//! Reads the identifier from a key-value archive.
-		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar );
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 

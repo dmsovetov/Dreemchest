@@ -29,31 +29,16 @@
 
 #include "../Composer.h"
 
-#define qDeclareEnumeration( name, items )                                  \
-	struct name##Model : public EnumerationModel {                          \
-		name##Model( void ) { setStringList( QStringList() << items ); }    \
-	};                                                                      \
-    typedef Ui::EnumerationComboBox<name##Model> name##ComboBox;
-
 DC_BEGIN_COMPOSER
 
-	//! Base class for all enumeration models.
-	class EnumerationModel : public QStringListModel {
-	public:
+    //! Enumeration model is used by combo boxes to display acceptable enum values.
+    class EnumeraionModel : public QStringListModel {
+    public:
 
-		//! Returns the integer value from string.
-		int					fromString( const QString& value ) const { return stringList().indexOf( value ); }
-
-		//! Returns the string from enum value.
-		QString				toString( int value ) const { return stringList().at( value ); }
-	};
-
-    qDeclareEnumeration( RenderingMode, "Opaque" << "Cutout" << "Translucent" << "Additive" )
-    qDeclareEnumeration( Lighting, "Unlit" << "Ambient" << "Phong" )
-
-    qDeclareEnumeration( TransformBasis, "Local" << "World" << "Camera" )
-    qDeclareEnumeration( TransformPivot, "Individual" << "Median Point" )
+                            //! Constructs EnumeraionModel instance.
+                            EnumeraionModel( const Reflection::Enum* enumeration, QObject* parent = NULL );
+    };
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_EnumerationModel_H__	*/
+#endif	/*	!__DC_Composer_EnumerationModel_H__ */

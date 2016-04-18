@@ -40,6 +40,7 @@ struct A {
 	float b;
 };
 
+#if DEV_DEPRECATED_SERIALIZATION
 struct Nested : public SerializableT<Nested> {
 	String			m_a;
 	int				m_b;
@@ -69,6 +70,7 @@ struct Data : public SerializableT<Data> {
 		IoField( m_nestedItems )
 	IoEndSerializer
 };
+#endif
 
 // Application delegate is used to handle an events raised by application instance.
 class Files : public ApplicationDelegate {
@@ -77,7 +79,7 @@ class Files : public ApplicationDelegate {
     virtual void handleLaunched( Application* application ) {
         // Set the default log handler.
         Logger::setStandardLogger();
-
+    #if DEV_DEPRECATED_SERIALIZATION
 		Data d1, d2, d3;
 		d1.m_boolean = true;
 		d1.m_integer = -23;
@@ -104,8 +106,11 @@ class Files : public ApplicationDelegate {
 		printf( "%s\n", json.toString().c_str() );
 		d3.read( &json );
 	#endif
+
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     }
 };
+
 
 // Now declare an application entry point with Files application delegate.
 dcDeclareApplication( new Files )

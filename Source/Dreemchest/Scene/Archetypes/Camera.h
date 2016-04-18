@@ -33,6 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_ECS_ARCHETYPES
 	//! The spectator camera archetype.
 	class SpectatorCamera : public Ecs::Archetype<SpectatorCamera> {
 	public:
@@ -109,6 +110,7 @@ namespace Scene {
 		//! Constructs the Camera2D instance.
 		virtual void				construct( void ) DC_DECL_OVERRIDE;
 	};
+#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 } // namespace Scene
 

@@ -41,6 +41,9 @@ namespace Network {
 	friend class Connection;
 	public:
 
+        //! Traffic stats for each packet type.
+        typedef HashMap<String, u32> TrafficPerPacket;
+
 								//! Constructs Application instance.
 								Application( void );
         virtual                 ~Application( void );
@@ -79,6 +82,12 @@ namespace Network {
 		template<typename TEvent, typename ... TArgs>
         void                    emit( const TArgs& ... args );
     #endif  /*  DC_CPP11_DISABLED   */
+
+        //! Returns the traffic stats for each sent packet.
+        const TrafficPerPacket& bytesSentPerPacket( void ) const;
+
+        //! Returns the traffic stats for each received packet.
+        const TrafficPerPacket& bytesReceivedPerPacket( void ) const;
 
 		//! Connected event is emitted when a connection to server established or new client is connected to a server.
 		struct Connected {
@@ -135,7 +144,7 @@ namespace Network {
 		typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
     
 		//! A container type to store all remote call handlers.
-		typedef Hash< AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
+		typedef Map< String32, AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
 		//! Container type to store active connections.
 		typedef Set<ConnectionPtr>						ConnectionSet;
@@ -149,12 +158,14 @@ namespace Network {
         //! Network packet factory type.
         typedef AbstractFactory<AbstractPacket, PacketTypeId> PacketFactory;
 
-		EventHandlers			m_eventHandlers;        //!< Event handlers.
-		RemoteCallHandlers		m_remoteCallHandlers;   //!< Remote call handlers.
-        PacketFactory           m_packetFactory;        //!< Packet factory.
-        PacketHandlers          m_packetHandlers;       //!< Registered packet handlers.
-		ConnectionSet			m_connections;			//!< Active connections.
-        u32                     m_nextConnectionId;     //!< The next id that will be assigned to a connection.
+		EventHandlers			m_eventHandlers;            //!< Event handlers.
+		RemoteCallHandlers		m_remoteCallHandlers;       //!< Remote call handlers.
+        PacketFactory           m_packetFactory;            //!< Packet factory.
+        PacketHandlers          m_packetHandlers;           //!< Registered packet handlers.
+		ConnectionSet			m_connections;			    //!< Active connections.
+        u32                     m_nextConnectionId;         //!< The next id that will be assigned to a connection.
+        TrafficPerPacket        m_bytesSentPerPacket;       //!< The total number of bytes sent by each packet type.
+        TrafficPerPacket        m_bytesReceivedPerPacket;   //!< The total number of bytes received by each packet type.
 	};
 
 	// ** Application::registerEvent

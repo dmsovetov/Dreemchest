@@ -231,7 +231,12 @@ EmitterInstancePtr Emitter::createInstance( IMaterialFactoryWPtr materialFactory
 
 // ** EmitterInstance::EmitterInstance
 EmitterInstance::EmitterInstance( IMaterialFactoryWPtr materialFactory, EmitterWPtr emitter )
-	: m_emitter( emitter ), m_time( 0.0f ), m_timeEmission( 0.0f ), m_aliveCount( 0 ), m_iteration( 0 ), m_isStopped( false )
+	: m_emitter( emitter )
+    , m_time( 0.0f )
+    , m_timeEmission( 0.0f )
+    , m_aliveCount( 0 )
+    , m_iteration( 0 )
+    , m_isStopped( false )
 {
 	// Construct nested particles
 	for( int i = 0, n = m_emitter->particlesCount(); i < n; i++ ) {
@@ -254,6 +259,13 @@ bool EmitterInstance::isStopped( void ) const
 void EmitterInstance::setStopped( bool value )
 {
 	m_isStopped = value;
+}
+
+// ** EmitterInstance::restart
+void EmitterInstance::restart( void )
+{
+    m_time          = 0.0f;
+    m_timeEmission  = 0.0f;
 }
 
 // ** EmitterInstance::calculateEmissionCount

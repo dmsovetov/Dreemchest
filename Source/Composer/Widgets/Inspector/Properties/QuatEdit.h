@@ -24,31 +24,33 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_AssetModels_H__
-#define __DC_Composer_AssetModels_H__
+#ifndef __DC_Composer_QuatEdit_H__
+#define __DC_Composer_QuatEdit_H__
 
-#include "PropertyModel.h"
+#include "VectorEdit.h"
 
 DC_BEGIN_COMPOSER
 
-	//! Material asset model.
-	class MaterialModel : public PropertyModel {
-	public:
+namespace Ui {
 
-                                //! Constructs MaterialModel instance.
-		                        MaterialModel( Scene::MaterialHandle material, QObject* parent = NULL );
+    //! Widget to edit string properties.
+    class QuatEdit : public AbstractVectorEdit {
+    public:
 
-		//! Called each time object property was changed.
-		virtual void		    objectChanged( void ) DC_DECL_OVERRIDE
-        {
-            m_material.writeLock();
-        }
+                            //! Constructs QuatEdit instance.
+                            QuatEdit( QWidget* parent = NULL );
 
-	private:
+    private:
 
-		Scene::MaterialHandle   m_material;
-	};
+        //! Converts the internal array of floats to a variant value.
+        virtual Variant     toVariant( const f32* value ) const DC_DECL_OVERRIDE;
+
+        //! Convets variant value to an array of floats.
+        virtual void        fromVariant( const Variant& input, f32* value ) DC_DECL_OVERRIDE;
+    };
+
+} // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_AssetModels_H__	*/
+#endif	/*	!__DC_Composer_QuatEdit_H__	*/

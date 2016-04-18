@@ -89,6 +89,9 @@ namespace Fx {
 		//! Returns the emitter instance.
 		EmitterInstanceWPtr			emitter( s32 index ) const;
 
+        //! Restarts a playback of a particle system.
+        void                        restart( void );
+
 		//! Stops the playback of a particle system.
 		void						stop( void );
 

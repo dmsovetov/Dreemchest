@@ -33,90 +33,152 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! A 2D shape part type.
+    NIMBLE_DECLARE_ENUM( Shape2DType, Circle, Rect, Polygon )
+
+    //! A 2D shape part material.
+    struct MaterialShape2D {
+	    f32			density;        //!< Material density.
+	    f32			friction;       //!< Material friction.
+	    f32			restitution;    //!< Material restitution.
+
+        		    //! Constructs a material instance.
+					MaterialShape2D( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
+						: density( density ), friction( friction ), restitution( restitution ) {}
+
+        //! Reads a material from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a material to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A 2D circle shape type.
+    struct CircleShape2D {
+		f32		    radius;			//!< Circle radius.
+		f32		    x;				//!< Circle centroid X.
+		f32		    y;				//!< Circle centroid Y.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A 2D rectangle shape type.
+    struct RectShape2D {
+		f32		    width;			//!< Rectangle width.
+		f32		    height;			//!< Rectangle height.
+		f32		    x;				//!< Rectangle centroid X.
+		f32		    y;				//!< Rectangle centroid Y.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A polygon 2D shape type.
+    struct PolygonShape2D {
+        enum { MaxVertices = 8 };	//!< Maximum number of polygon vertices.
+
+	    f32		    vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
+        u32		    count;								//!< Polygon vertex count.
+
+        //! Reads a shape from a Variant value.
+        void        operator << ( const Variant& value );
+
+        //! Writes a shape to a Variant value.
+        void        operator >> ( Variant& value );
+    };
+
+    //! A simple shape type a Shape2D component is composed from.
+    struct SimpleShape2D {
+        Shape2DType         type;       //!< Simple shape type.
+        MaterialShape2D     material;   //!< Simple shape material.
+
+		union {
+			CircleShape2D   circle;	    //!< Circle shape data.
+            RectShape2D     rect;	    //!< Rectangle shape data.
+            PolygonShape2D  polygon;    //! Polygon shape data.
+		};
+
+        //! Tests two shape instance for an equality.
+        bool                    operator == ( const SimpleShape2D& other ) const;
+
+        //! Reads a shape instance from a Variant value.
+        void                    operator << ( const Variant& value );
+
+        //! Writes a shape instance to a Variant value.
+        void                    operator >> ( Variant& value );
+
+		//! Creates a 2D circle shape.
+		static SimpleShape2D    createCircle( f32 radius, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
+
+		//! Creates a 2D rectangle shape.
+		static SimpleShape2D    createRect( f32 width, f32 height, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
+
+		//! Creates a 2D polygon shape.
+		static SimpleShape2D    createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material = MaterialShape2D() );
+    };
+
 	//! Shape of an object used for hit tests and/or 2D physics.
 	class Shape2D : public Ecs::Component<Shape2D> {
+
+        INTROSPECTION_SUPER( Shape2D, Ecs::ComponentBase
+            , PROPERTY( parts, parts, setParts, "An array of simple shapes this component is composed from." )
+            )
+
 	public:
 
-		//! The shape part types.
-		enum Type {
-			  Circle = 0		//!< The circle shape.
-			, Rect				//!< The rectangular shape.
-			, Polygon			//!< The polygonal shape.
-			, TotalShapeTypes	//!< The total number of shape types.
-		};
+        //! Container type to store shape parts.
+        typedef Array<SimpleShape2D> Parts;
 
-		//! Shape part material.
-		struct Material {
-			f32			density;
-			f32			friction;
-			f32			restitution;
-
-						//! Constructs the material instance.
-						Material( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
-							: density( density ), friction( friction ), restitution( restitution ) {}
-		};
-
-		//! The shape is composed from parts.
-		struct Part {
-			enum { MaxVertices = 8 };		//!< Maximum number of polygon vertices.
-
-			Type		type;				//!< Shape type.
-			Material	material;			//! Shape material.
-
-			union {
-				struct {
-					f32		radius;			//!< Circle radius.
-					f32		x;				//!< Circle centroid X.
-					f32		y;				//!< Circle centroid Y.
-				} circle;	//!< Circle shape data.
-
-				struct {
-					f32		width;			//!< Rectangle width.
-					f32		height;			//!< Rectangle height.
-					f32		x;				//!< Rectangle centroid X.
-					f32		y;				//!< Rectangle centroid Y.
-				} rect;		//!< Rectangle shape data.
-
-				struct {
-					f32		vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
-					u32		count;								//!< Polygon vertex count.
-				} polygon;	//! Polygon shape data.
-			};
-		};
-
-							//! Constructs Shape2D instance.
-							Shape2D( void ) {}
+							    //! Constructs Shape2D instance.
+							    Shape2D( void ) {}
 
 		//! Removes all nested shape parts.
-		void				clear( void );
+		void				    clear( void );
 
 		//! Returns the total number of nested shapes.
-		u32					partCount( void ) const;
+		u32					    partCount( void ) const;
 
 		//! Returns the nested shape by index.
-		const Part&			part( u32 index ) const;
+		const SimpleShape2D&    part( u32 index ) const;
 
         //! Adds a new shape part.
-        void                addPart( const Part& part );
+        void                    addPart( const SimpleShape2D& part );
 
+        //! Returns shape parts.
+        const Parts&            parts( void ) const;
+
+        //! Sets shap parts.
+        void                    setParts( const Parts& value );
+
+    #if 0
 		//! Adds a new circle shape part.
-		void				addCircle( f32 radius, f32 x = 0, f32 y = 0, const Material& material = Material() );
+		void				    addCircle( f32 radius, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
 
 		//! Adds a new rectangle shape part.
-		void				addRect( f32 width, f32 height, f32 x = 0, f32 y = 0, const Material& material = Material() );
+		void				    addRect( f32 width, f32 height, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
 
 		//! Adds a new polygon shape part.
-		void				addPolygon( const Vec2* vertices, u32 count, const Material& material = Material() );
+		void				    addPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material = MaterialShape2D() );
+    #endif
 
+    #if DEV_DEPRECATED_SERIALIZATION
 		//! Writes 2D shape to a key-value archive.
-		virtual void        serialize( Ecs::SerializationContext& ctx, Archive& ar ) const DC_DECL_OVERRIDE;
+		virtual void            serialize( Ecs::SerializationContext& ctx, Archive& ar ) const DC_DECL_OVERRIDE;
 
 		//! Reads 2D shape from a key-value archive.
-		virtual void		deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) DC_DECL_OVERRIDE;
+		virtual void		    deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) DC_DECL_OVERRIDE;
+    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
-		Array<Part>			m_parts;	//!< Shape parts.
+		Array<SimpleShape2D>    m_parts;	//!< Shape parts.
 	};
 
 	//! 2D rigid body.

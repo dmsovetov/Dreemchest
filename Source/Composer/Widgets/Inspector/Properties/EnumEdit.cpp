@@ -24,37 +24,40 @@
 
  **************************************************************************/
 
-#ifndef __DC_Composer_Inspector_H__
-#define __DC_Composer_Inspector_H__
-
-#include "../Composer.h"
+#include "EnumEdit.h"
+#include "../../../Models/EnumerationModel.h"
 
 DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Object inspector widget.
-	class Inspector : public QWidget {
+// ** EnumEdit::EnumEdit
+EnumEdit::EnumEdit( const Reflection::Enum* enumeration, QWidget* parent )
+    : QComboBox( parent )
+    , m_enumeration( enumeration )
+{
+    setModel( new EnumeraionModel( enumeration ) );
+    connect( this, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentIndexChanged(const QString&)) );
+}
 
-		Q_OBJECT
+// ** EnumEdit::value
+Variant EnumEdit::value( void ) const
+{
+    return m_enumeration->valueFromString( currentText().toStdString() );
+}
 
-	public:
+// ** EnumEdit::setValue
+void EnumEdit::setValue( const Variant& value )
+{
+    setCurrentIndex( value.as<s32>() );
+}
 
-								//! Constructs Inspector instance.
-								Inspector( QWidget* parent = NULL );
-
-		//! Sets the property model.
-		void					setModel( PropertyModelQPtr value );
-
-	private:
-
-		AutoPtr<PropertyModel>  m_model;	//!< Object properties model used.
-		QFormLayout*			m_layout;	//!< Root layout.
-		QDataWidgetMapper*		m_mapper;	//!< Data widget mapper.
-	};
+// ** EnumEdit::currentIndexChanged
+void EnumEdit::currentIndexChanged( const QString& value )
+{
+    Q_EMIT valueChanged( this->value() );
+}
 
 } // namespace Ui
 
 DC_END_COMPOSER
-
-#endif	/*	!__DC_Composer_Inspector_H__	*/
