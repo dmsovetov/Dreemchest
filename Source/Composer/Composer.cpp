@@ -107,9 +107,6 @@ Composer::Composer( int argc, char ** argv ) : QApplication( argc, argv ), m_pro
     // Create the file system
 	m_fileSystem = new FileSystem( this );
 
-    // Setup default log handlers
-	Logger::setStandardLogger();
-
     // Register property inspector widgets
     Ui::PropertyInspector::registerWidget<String, Ui::StringEdit>();
     Ui::PropertyInspector::registerWidget<Vec2, Ui::Vec2Edit>();
