@@ -30,6 +30,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** RenderFrame::RenderFrame
+RenderFrame::RenderFrame( void )
+    : m_stateBlockAllocator( 1024 )
+{
+}
+
 // ** RenderFrame::createCommandBuffer
 RenderCommandBuffer& RenderFrame::createCommandBuffer( void )
 {
@@ -107,6 +113,12 @@ s32 RenderFrame::internShader( Renderer::ShaderPtr shader )
 const Renderer::ShaderPtr& RenderFrame::shader( s32 identifier ) const
 {
     return m_shaders.resolve( identifier );
+}
+
+// ** RenderFrame::allocateStateBlock
+RenderStateBlock* RenderFrame::allocateStateBlock( void )
+{
+    return m_stateBlockAllocator.allocate();
 }
 
 } // namespace Scene

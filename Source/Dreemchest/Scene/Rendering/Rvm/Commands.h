@@ -45,12 +45,12 @@ namespace Scene {
                 , DrawPrimitives
             };
 
-            Type                    type;                           //!< An op code type.
-            Renderer::PrimitiveType primitives;                     //!< A primitive type to be rendered.
-            s32                     first;                          //!< First index or primitive.
-            s32                     count;                          //!< A total number of indices or primitives to use.
-            u64                     sorting;                        //!< A sorting key.
-            const RenderStateBlock* states[RenderStateStack::Size]; //!< States from this stack are applied before a rendering command.
+            Type                    type;                       //!< An op code type.
+            Renderer::PrimitiveType primitives;                 //!< A primitive type to be rendered.
+            s32                     first;                      //!< First index or primitive.
+            s32                     count;                      //!< A total number of indices or primitives to use.
+            u64                     sorting;                    //!< A sorting key.
+            const RenderStateBlock* states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
         };
 
         //! Returns a total number of recorded commands.
@@ -60,10 +60,10 @@ namespace Scene {
         const OpCode&               opCodeAt( s32 index ) const;
 
         //! Emits a draw indexed command.
-        void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count );
+        void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );
 
         //! Emits a draw primitives command.
-        void                        drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count );
+        void                        drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );
 
     private:
 

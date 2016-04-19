@@ -179,7 +179,7 @@ void SceneEditor::render( f32 dt )
 
 	// Render the scene
     clock_t time = clock();
-	Scene::RenderFrame frame = m_renderScene->captureFrame( hal() );
+	Scene::RenderFrameUPtr frame = m_renderScene->captureFrame( hal() );
 #if DEV_DEPRECATED_SCENE_RENDERER
     m_renderScene->display( frame );
 #else

@@ -33,6 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! A maximum number of state blocks that can be pushed onto a state stack.
+    enum { MaxStateStackDepth = 4 };
+
     //! Render state defines a single state change.
     struct RenderState {
         //! Available constant buffers.
@@ -87,7 +90,7 @@ namespace Scene {
                                         RenderState( s32 id, TextureSampler sampler );
 
                                         //! Constructs a render target state.
-                                        RenderState( s32 id, const Matrix4& matrix, const Rect& viewport );
+                                        RenderState( s32 id, const Rect& viewport );
 
         Type                            type;           //!< Render state type.
         union {
@@ -120,7 +123,6 @@ namespace Scene {
 
             struct {
                 s32                     id;             //!< Render target identifier.
-                f32                     matrix[16];     //!< A view-projection matrix.
                 f32                     viewport[4];    //!< A target viewport.
             } renderTarget;                             //!< A render target state to be set.
         };
@@ -158,7 +160,7 @@ namespace Scene {
         void                            setAlphaTest( Renderer::Compare function, f32 reference );
 
         //! Sets a render target.
-        void                            setRenderTarget( s32 id, const Matrix4& matrix, const Rect& viewport );
+        void                            setRenderTarget( s32 id, const Rect& viewport );
 
         //! Disables an alpha testing.
         void                            disableAlphaTest( void );
@@ -215,27 +217,6 @@ namespace Scene {
         DC_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_stateBits[index];
     }
-
-    //! A state stack contains a list of state blocks.
-    class RenderStateStack {
-    public:
-
-        //! A maximum state stack depth.
-        enum { Size = 4 };
-
-        //! Pushes a new state block to a stack.
-        void                            push( const RenderStateBlock* state );
-
-        //! Pops a state block from a to of a stack.
-        void                            pop( void );
-
-    private:
-
-        //! Container type to store active states.
-        typedef List<const RenderStateBlock*> RenderStateBlocks;
-
-        RenderStateBlocks               m_blocks;   //!< A list of active render state blocks.
-    };
 
 } // namespace Scene
 

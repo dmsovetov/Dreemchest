@@ -58,10 +58,10 @@ RvmPtr Rvm::create( RenderingContextWPtr context )
 }
 
 // ** Rvm::display
-void Rvm::display( const RenderFrame& frame )
+void Rvm::display( const RenderFrameUPtr& frame )
 {
-    for( s32 i = 0, n = frame.commandBufferCount(); i < n; i++ ) {
-        execute( frame, frame.commandBufferAt( i ) );
+    for( s32 i = 0, n = frame->commandBufferCount(); i < n; i++ ) {
+        execute( *frame.get(), frame->commandBufferAt( i ) );
     }
 }
 
@@ -73,7 +73,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
         const RenderCommandBuffer::OpCode& opCode = commands.opCodeAt( i );
 
         // Apply rendering states from a stack
-        applyStates( frame, opCode.states, RenderStateStack::Size );
+        applyStates( frame, opCode.states, MaxStateStackDepth );
 
         // Perform a draw call
         switch( opCode.type ) {

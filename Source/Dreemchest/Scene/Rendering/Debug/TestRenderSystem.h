@@ -44,6 +44,16 @@ namespace Scene {
 
     private:
 
+        struct FrameConstants {
+            Rgba        color;
+        };
+        struct CameraConstants {
+            Matrix4     viewProjection;
+        };
+        struct InstanceConstants {
+            Matrix4     transform;
+        };
+
         Renderer::ShaderPtr             m_pinkShader;
         Renderer::ShaderPtr             m_whiteShader;
         Renderer::ConstantBufferPtr     m_frameConstants;

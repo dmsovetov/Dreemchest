@@ -121,6 +121,9 @@ namespace Scene {
     //! Render pass unique pointer type.
     typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
 #else
+    //! Render frame unique pointer type.
+    typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
+
     //! Render system unique pointer type.
     typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
 

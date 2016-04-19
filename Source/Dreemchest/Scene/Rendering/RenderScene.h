@@ -46,7 +46,7 @@ namespace Scene {
 		void						    addRenderSystem( const TArgs& ... args );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
-        RenderFrame                     captureFrame( Renderer::HalWPtr hal );
+        RenderFrameUPtr                 captureFrame( Renderer::HalWPtr hal );
 
         //! Creates a new render scene.
         static RenderScenePtr           create( SceneWPtr scene );

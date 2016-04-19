@@ -51,13 +51,13 @@ SceneWPtr RenderScene::scene( void ) const
 }
 
 // ** RenderScene::captureFrame
-RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
+RenderFrameUPtr RenderScene::captureFrame( Renderer::HalWPtr hal )
 {
-    RenderFrame frame;
+    RenderFrameUPtr frame( DC_NEW RenderFrame );
 
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( frame );
+        m_renderSystems[i]->render( *frame.get() );
     }
 
     return frame;

@@ -86,11 +86,10 @@ RenderState::RenderState( s32 id, TextureSampler sampler )
 }
 
 // ** RenderState::RenderState
-RenderState::RenderState( s32 id, const Matrix4& matrix, const Rect& viewport )
+RenderState::RenderState( s32 id, const Rect& viewport )
     : type( RenderTarget )
 {
     renderTarget.id = id;
-    memcpy( &renderTarget.matrix, &matrix, sizeof renderTarget.matrix );
     renderTarget.viewport[0] = viewport.min().x;
     renderTarget.viewport[1] = viewport.min().y;
     renderTarget.viewport[2] = viewport.width();
@@ -154,9 +153,9 @@ void RenderStateBlock::setAlphaTest( Renderer::Compare function, f32 reference )
 }
 
 // ** RenderStateBlock::setRenderTarget
-void RenderStateBlock::setRenderTarget( s32 id, const Matrix4& matrix, const Rect& viewport )
+void RenderStateBlock::setRenderTarget( s32 id, const Rect& viewport )
 {
-    pushState( RenderState( id, matrix, viewport ), RenderState::RenderTarget );
+    pushState( RenderState( id, viewport ), RenderState::RenderTarget );
 }
 
 // ** RenderStateBlock::disableBlending

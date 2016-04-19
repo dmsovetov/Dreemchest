@@ -54,17 +54,8 @@ void RenderSystemBase::render( RenderFrame& frame )
         // Get Transform component from an entity
         const Transform& transform = *entity.get<Transform>();
 
-        // Add a command buffer
-        //RenderCommandBuffer& commands = frame.createCommandBuffer();
-
-        // Push render target before rendering
-        //commands.emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
-
         // Emit render operations for this camera
         emitRenderOperations( frame, entity, camera, transform );
-
-        // Pop render target when rendering is finished
-        //commands.emitPopRenderTarget();
     }
 }
 

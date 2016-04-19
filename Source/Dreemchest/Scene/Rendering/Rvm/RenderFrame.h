@@ -28,6 +28,7 @@
 #define __DC_Scene_RenderFrame_H__
 
 #include "Commands.h"
+#include "RenderState.h"
 #include "../RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
@@ -37,6 +38,9 @@ namespace Scene {
     //! Render frame contains all required frame data captured by a render scene.
     class RenderFrame {
     public:
+                        
+                                                //! Constructs a RenderFrame instance.
+                                                RenderFrame( void );
 
         //! Returns a total number of captured command buffers.
         s32                                     commandBufferCount( void ) const;
@@ -84,18 +88,23 @@ namespace Scene {
         //! Returns a shader by an index.
         const Renderer::ShaderPtr&              shader( s32 identifier ) const;
 
+        //! Allocates new render state block.
+        RenderStateBlock*                       allocateStateBlock( void );
+
     private:
 
         //! Container type to store recorded command buffers.
         typedef Array<RenderCommandBufferUPtr> Commands;
 
-        Commands                                m_commandBuffers;   //!< An array of recorded commands buffers.
-        IndexCache<RenderTargetPtr>             m_renderTargets;    //!< Interned render targets.
-        IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;    //!< Interned vertex buffers.
-        IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;     //!< Interned index buffers.
-        IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;  //!< Interned constant buffers.
-        IndexCache<Renderer::TexturePtr>        m_textures;         //!< Interned textures.
-        IndexCache<Renderer::ShaderPtr>         m_shaders;          //!< Interned shaders.
+        Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
+        IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
+        IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
+        IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;         //!< Interned index buffers.
+        IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
+        IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
+        IndexCache<Renderer::ShaderPtr>         m_shaders;              //!< Interned shaders.
+
+        LinearObjectAllocator<RenderStateBlock> m_stateBlockAllocator;  //!< Allocates render state blocks.
     };
 
     //! Returns a total number of captured command buffers.

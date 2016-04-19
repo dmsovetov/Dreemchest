@@ -33,7 +33,7 @@ namespace Scene {
 // ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
 
 // ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
+void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
 {
     OpCode opCode;
     opCode.type         = OpCode::DrawIndexed;
@@ -47,7 +47,7 @@ void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType prim
 }
 
 // ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
+void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
 {
     OpCode opCode;
     opCode.type         = OpCode::DrawPrimitives;
