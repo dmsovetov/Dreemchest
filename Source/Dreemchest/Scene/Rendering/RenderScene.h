@@ -59,7 +59,6 @@ namespace Scene {
     private:
 
         SceneWPtr                       m_scene;            //!< Parent scene instance.
-        Ecs::IndexPtr                   m_cameras;          //!< All cameras that reside in scene.
         Array<RenderSystemUPtr>	        m_renderSystems;    //!< Entity render systems.
     };
 
