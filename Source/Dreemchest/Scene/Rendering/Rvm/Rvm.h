@@ -27,69 +27,62 @@
 #ifndef __DC_Scene_Rvm_H__
 #define __DC_Scene_Rvm_H__
 
-#include "../RenderAssets.h"
-#include "Commands.h"
-#include "RasterizationOptions.h"
+#include "../RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! Renderer virtual machine.
-    class Rvm {
+    //! Rendering virtual machine.
+    class Rvm : public RefCounted {
     public:
 
-                                        //! Constructs Rvm instance.
-                                        Rvm( RenderingContext& context, Renderer::HalWPtr hal );
+        //! Displays a frame captured by a render scene.
+        void                    display( const RenderFrame& frame );
 
-        //! Flushes all accumulated commands.
-        void                            execute( const Commands& commands );
-
-        //! Resets the rendering states.
-        void                            reset( void );
+        //! Creates an Rvm instance.
+        static RvmPtr           create( RenderingContextWPtr context );
 
     private:
 
-        //! Setups rendering states for a technique.
-        void                            setTechnique( s32 value );
+                                //! Constructs an Rvm instance.
+                                Rvm( RenderingContextWPtr context );
 
-        //! Setups rendering states needed by a renderable.
-        void                            setRenderable( s32 value );
+        //! Executes a single command buffer.
+        void                    execute( const RenderFrame& frame, const RenderCommandBuffer& commands );
 
-        //! Sets the active program.
-        void                            setProgram( const Program& value );
+        //! Unrolls a state stack an applies all state changes.
+        void                    applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count );
 
-        //! Sets an instance data.
-        void                            setInstance( const Commands::DrawIndexed& instance );
+        //! Sets an alpha testing state.
+        void                    switchAlphaTest( const RenderFrame& frame, const RenderState& state );
 
-        //! Sets the constant color.
-        void                            setConstantColor( const Rgba& value );
+        //! Sets a depth state.
+        void                    switchDepthState( const RenderFrame& frame, const RenderState& state );
 
-        //! Sets the rendering mode.
-        void                            setRenderingMode( u8 value );
+        //! Sets a blending state.
+        void                    switchBlending( const RenderFrame& frame, const RenderState& state );
+
+        //! Sets a render target.
+        void                    switchRenderTarget( const RenderFrame& frame, const RenderState& state );
+
+        //! Binds a shader program to a pipeline.
+        void                    switchShader( const RenderFrame& frame, const RenderState& state );
+
+        //! Binds a constant buffer to a pipeline.
+        void                    switchConstantBuffer( const RenderFrame& frame, const RenderState& state );
+
+        //! Binds a vertex buffer to a pipeline.
+        void                    switchVertexBuffer( const RenderFrame& frame, const RenderState& state );
 
     private:
 
-        //! Active rendering state is stored by this helper struct.
-        struct ActiveState {
-                                        //! Constructs ActiveState instance.
-                                        ActiveState( void );
+        //! State switcher function callback.
+        typedef void ( Rvm::*StateSwitch )( const RenderFrame&, const RenderState& );
 
-            s32                         technique;          //!< Active technique.
-            s32                         renderable;         //!< Active renderable.
-            u8                          renderingMode;      //!< Active rendering mode.
-            Renderer::TriangleFace      culling;            //!< Active culling mode.
-            const Program*              program;            //!< Active shader program permutation.
-            Renderer::VertexBufferWPtr  vertexBuffer;       //!< Active vertex buffer.
-        };
-
-        RenderingContext&               m_context;          //!< Parent rendering context.
-        Renderer::HalWPtr               m_hal;              //!< Parent rendering HAL instance.
-        Stack<Commands::PushRenderTarget>   m_renderTarget; //!< All render targets are pushed and popped off from here.
-        s32                             m_shaders[TotalLightingModels];     //!< Shader to used for each lighting model.
-        RasterizationOptions            m_rasterization[TotalRenderModes];  //!< Rasterization options for each rendering mode.
-        ActiveState                     m_activeState;      //!< Active rendering state.
-        Vec4                            m_inputs[Program::TotalInputs];     //!< Program input registers.
+        Renderer::HalWPtr       m_hal;                                      //!< Rendering HAL to be used.
+        RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
+        StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.            
     };
 
 } // namespace Scene

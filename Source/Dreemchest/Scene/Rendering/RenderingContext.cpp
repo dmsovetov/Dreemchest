@@ -24,41 +24,30 @@
 
  **************************************************************************/
 
-#include "Commands.h"
+#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
-
-// ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
+// ** RenderingContext::RenderingContext
+RenderingContext::RenderingContext( Renderer::HalWPtr hal )
+    : m_hal( hal )
 {
-    OpCode opCode;
-    opCode.type         = OpCode::DrawIndexed;
-    opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
-
-    m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
+// ** RenderingContext::hal
+Renderer::HalWPtr RenderingContext::hal( void ) const
 {
-    OpCode opCode;
-    opCode.type         = OpCode::DrawPrimitives;
-    opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
-
-    m_commands.push_back( opCode );
+    return m_hal;
 }
+
+// ** RenderingContext::create
+RenderingContextPtr RenderingContext::create( Renderer::HalWPtr hal )
+{
+    return DC_NEW RenderingContext( hal );
+}
+
 
 } // namespace Scene
 

@@ -24,42 +24,37 @@
 
  **************************************************************************/
 
-#include "Commands.h"
+#ifndef __DC_Scene_RenderingContext_H__
+#define __DC_Scene_RenderingContext_H__
+
+#include "../Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
+    //! Rendering context.
+    class RenderingContext : public RefCounted {
+    public:
 
-// ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
-{
-    OpCode opCode;
-    opCode.type         = OpCode::DrawIndexed;
-    opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
+        //! Returns a parent rendering HAL instance.
+        Renderer::HalWPtr           hal( void ) const;
 
-    m_commands.push_back( opCode );
-}
+        //! Creates a RenderingContext instance.
+        static RenderingContextPtr  create( Renderer::HalWPtr hal );
 
-// ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[RenderStateStack::Size], s32 first, s32 count )
-{
-    OpCode opCode;
-    opCode.type         = OpCode::DrawPrimitives;
-    opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
+    private:
 
-    m_commands.push_back( opCode );
-}
+                                    //! Constructs a RenderingContext instance.
+                                    RenderingContext( Renderer::HalWPtr hal );
+
+    private:
+
+        Renderer::HalWPtr           m_hal;  //!< A rendering HAL to be used.
+    };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_RenderingContext_H__    */

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "RenderTarget.h"
-#include "RenderAssets.h"
+#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -46,6 +46,7 @@ Rect RenderTarget::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
 	return ndc;
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** RenderTarget::begin
 void RenderTarget::begin( RenderingContextWPtr context ) const
 {
@@ -55,6 +56,17 @@ void RenderTarget::begin( RenderingContextWPtr context ) const
 void RenderTarget::end( RenderingContextWPtr context ) const
 {
 }
+#else
+// ** RenderTarget::begin
+void RenderTarget::begin( Renderer::HalWPtr hal ) const
+{
+}
+
+// ** RenderTarget::end
+void RenderTarget::end( Renderer::HalWPtr hal ) const
+{
+}
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ------------------------------------------ WindowTarget ------------------------------------------ //
 
@@ -94,6 +106,7 @@ Renderer::RenderTargetPtr TextureTarget::rt( void ) const
 	return m_rt;
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** TextureTarget::begin
 void TextureTarget::begin( RenderingContextWPtr context ) const
 {
@@ -105,6 +118,19 @@ void TextureTarget::end( RenderingContextWPtr context ) const
 {
 	context->hal()->setRenderTarget( Renderer::RenderTargetPtr() );
 }
+#else
+// ** TextureTarget::begin
+void TextureTarget::begin( Renderer::HalWPtr hal ) const
+{
+    hal->setRenderTarget( m_rt );
+}
+
+// ** TextureTarget::end
+void TextureTarget::end( Renderer::HalWPtr hal ) const
+{
+    hal->setRenderTarget( Renderer::RenderTargetPtr() );
+}
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ** TextureTarget::width
 u32 TextureTarget::width( void ) const

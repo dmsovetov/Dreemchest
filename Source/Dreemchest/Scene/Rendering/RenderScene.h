@@ -28,6 +28,7 @@
 #define __DC_Scene_RenderScene_H__
 
 #include "../Scene.h"
+#include "Rvm/RenderFrame.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,88 +38,26 @@ namespace Scene {
     class RenderScene : public RefCounted {
     public:
 
-        //! Base class for all renderable entities.
-        struct RenderableEntity {
-            const Transform*        transform;          //!< Mesh transform component.
-            const Matrix4*          matrix;             //!< Mesh transform affine matrix.
-        };
-
-        //! Stores info about a single renderable mesh.
-        struct RenderableMesh : public RenderableEntity {
-            MaterialHandle          material;           //!< Material used for rendering.
-            MeshHandle              mesh;               //!< Rendered mesh resource handle.
-            RenderAssetIndex        renderable;         //!< Renderable asset index.
-            RenderAssetIndex        technique;          //!< Technique asset index.
-        };
-
-        //! Stores info about a single light entity.
-        struct RenderableLight : public RenderableEntity {
-        };
-
-        //! A single frame is just an array of command buffers.
-        typedef Array<CommandsUPtr> Frame;
-
-        //! A fixed array with renderable meshes inside.
-        typedef FixedArray<RenderableMesh> Meshes;
-
-        //! A fixed array with lights inside.
-        typedef FixedArray<RenderableLight> Lights;
-
 		//! Adds a new render system to the scene.
 		template<typename TRenderSystem>
 		void						    addRenderSystem( void );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
-        Frame                           captureFrame( void );
-
-        //! Renders a frame by executing all commands.
-        void                            display( Frame& frame );
-
-        //! Returns parent rendering context.
-        RenderingContextWPtr            context( void ) const;
-
-        //! Returns parent scene.
-        SceneWPtr                       scene( void ) const;
-
-        //! Returns renderable meshes.
-        const Meshes&                   meshes( void ) const;
+        RenderFrame                     captureFrame( Renderer::HalWPtr hal );
 
         //! Creates a new render scene.
-        static RenderScenePtr           create( SceneWPtr scene, RenderingContextWPtr context );
+        static RenderScenePtr           create( SceneWPtr scene );
 
     private:
 
                                         //! Constructs RenderScene instance.
-                                        RenderScene( SceneWPtr scene, RenderingContextWPtr context );
-
-        //! Creates renderable mesh item from a scene object.
-        RenderableMesh                  createMeshFromEntity( const Ecs::Entity& entity );
-
-        //! Creates light item item from a scene object.
-        RenderableLight                 createLightFromEntity( const Ecs::Entity& entity );
+                                        RenderScene( SceneWPtr scene );
 
     private:
 
-        //! Entity data cache to store renderable meshes.
-        typedef Ecs::DataCache<RenderableMesh>    MeshCache;
-
-        //! Entity data cache to store scene lights.
-        typedef Ecs::DataCache<RenderableLight>   LightCache;
-
-        SceneWPtr                       m_scene;            //!< Parent scene instance.
-        RenderingContextWPtr            m_context;          //!< Parent rendering context instance.
-        Array<RenderSystemUPtr>	        m_renderSystems;    //!< Entity render systems.
-        Ptr<MeshCache>                  m_meshes;           //!< Renderable mesh cache.
-        Ptr<LightCache>                 m_lights;           //!< Renderable light cache.
-        Ecs::IndexPtr					m_cameras;			//!< All cameras that reside in scene.
+        SceneWPtr                       m_scene;    //!< Parent scene instance.
+        Ecs::IndexPtr                   m_cameras;  //!< All cameras that reside in scene.
     };
-
-	// ** RenderScene::addRenderSystem
-	template<typename TRenderSystem>
-	void RenderScene::addRenderSystem( void )
-	{
-		m_renderSystems.push_back( DC_NEW TRenderSystem( *this ) );
-	}
 
 } // namespace Scene
 

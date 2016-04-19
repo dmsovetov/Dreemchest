@@ -98,15 +98,11 @@ namespace Scene {
 	class Material;
 	class Terrain;
     class Prefab;
+
+#if DEV_DEPRECATED_SCENE_RENDERER
     class Renderable;
     class Texture;
     class Technique;
-
-	class Transform;
-	class StaticMesh;
-	class Sprite;
-	class Camera;
-
     struct RasterizationOptions;
     class  Commands;
 
@@ -124,6 +120,17 @@ namespace Scene {
 
     //! Render pass unique pointer type.
     typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
+#else
+    class RenderStateBlock;
+
+    //! Render command buffer unique pointer type.
+    typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
+
+	class Transform;
+	class StaticMesh;
+	class Sprite;
+	class Camera;
 
     //! Spatial index unique pointer type.
     typedef AutoPtr<class Spatial> SpatialUPtr;
@@ -140,6 +147,7 @@ namespace Scene {
     //! Terrain handle type.
     typedef Assets::DataHandle<class Terrain> TerrainHandle;
 
+#if DEV_DEPRECATED_SCENE_RENDERER
     //! Renderable handle type.
     typedef Assets::DataHandle<class Renderable> RenderableHandle;
 
@@ -157,6 +165,7 @@ namespace Scene {
 
     //! Integer handle type to access render assets.
     typedef s32 RenderAssetIndex;
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Available rendering modes.
 	enum RenderingMode {
@@ -228,6 +237,7 @@ namespace Scene {
 
 	dcDeclarePtrs( RenderingContext )
     dcDeclarePtrs( RenderScene )
+    dcDeclarePtrs( Rvm )
 
 	dcDeclarePtrs( Vec3Binding )
 
@@ -235,17 +245,6 @@ namespace Scene {
 	dcDeclarePtrs( SpectatorCamera )
 	dcDeclarePtrs( Camera2D )
 #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-	dcDeclarePtrs( RenderPassBase )
-	dcDeclarePtrs( ShaderCache )
-
-	//! Scene systems mask.
-	enum Systems {
-		  UpdateSystems = BIT( 0 )
-		, RenderSystems = BIT( 1 )
-	};
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;
@@ -259,8 +258,6 @@ namespace Scene {
 
     private:
 
-        //! Calculates the total size allocated for texture asset.
-        static s32      bytesAllocatedForTexture( const Texture& asset );
 
         //! Calculates the total size allocated for mesh asset.
         static s32      bytesAllocatedForMesh( const Mesh& asset );
@@ -270,6 +267,10 @@ namespace Scene {
 
         //! Calculates the total size allocated for material asset.
         static s32      bytesAllocatedForMaterial( const Material& asset );
+
+    #if DEV_DEPRECATED_SCENE_RENDERER
+        //! Calculates the total size allocated for texture asset.
+        static s32      bytesAllocatedForTexture( const Texture& asset );
 
         //! Calculates the total size allocated for renderable asset.
         static s32      bytesAllocatedForRenderable( const Renderable& asset );
@@ -282,6 +283,7 @@ namespace Scene {
 
         //! Calculates the total size allocated for shader source asset.
         static s32      bytesAllocatedForProgram( const Program& asset );
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
     };
 
 	//! The root class for a scene subsystem.
@@ -290,11 +292,6 @@ namespace Scene {
 
 		//! Performs a scene update.
 		void							update( u32 currentTime, f32 dt );
-
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		//! Renders a scene.
-		void							render( RenderingContextWPtr context );
-    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( void );
@@ -575,19 +572,15 @@ DC_END_DREEMCHEST
 	#include "Archetypes/Camera.h"
 
     #if DEV_DEPRECATED_SCENE_RENDERER
-	    #include "DeprecatedRendering/RenderTarget.h"
-	    #include "DeprecatedRendering/RenderingContext.h"
-	    #include "DeprecatedRendering/RenderingSystem.h"
-	    #include "DeprecatedRendering/ShaderCache.h"
-	    #include "DeprecatedRendering/Passes/DebugPasses.h"
-	    #include "DeprecatedRendering/Passes/BasicPasses.h"
-	    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
-    #else
         #include "Rendering/RenderScene.h"
         #include "Rendering/RenderAssets.h"
         #include "Rendering/RenderSystems/Unlit.h"
         #include "Rendering/RenderSystems/ForwardLighting.h"
         #include "Rendering/RenderSystems/DepthComplexity.h"
+    #else
+        #include "Rendering/RenderScene.h"
+        #include "Rendering/RenderingContext.h"
+        #include "Rendering/Rvm/Rvm.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif
 

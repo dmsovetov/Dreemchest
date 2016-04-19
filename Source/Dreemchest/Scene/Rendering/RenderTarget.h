@@ -51,11 +51,19 @@ namespace Scene {
 		//! Returns the render target height.
 		virtual u32					height( void ) const { return 0; }
 
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		//! Begins rendering to this target.
 		virtual void				begin( RenderingContextWPtr context ) const;
 
 		//! Ends rendering to this target.
 		virtual void				end( RenderingContextWPtr context ) const;
+    #else
+		//! Begins rendering to this target.
+		virtual void				begin( Renderer::HalWPtr hal ) const;
+
+		//! Ends rendering to this target.
+		virtual void				end( Renderer::HalWPtr hal ) const;
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 	};
 
 	//! WindowTarget is used for rendering the scene to window.
@@ -94,11 +102,19 @@ namespace Scene {
 		//! Returns the render target height.
 		virtual u32					height( void ) const DC_DECL_OVERRIDE;
 
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		//! Begins rendering to this view.
 		virtual void				begin( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
 
 		//! Ends rendering to this view.
 		virtual void				end( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
+    #else
+		//! Begins rendering to this target.
+		virtual void				begin( Renderer::HalWPtr hal ) const;
+
+		//! Ends rendering to this target.
+		virtual void				end( Renderer::HalWPtr hal ) const;
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 		//! Creates the TextureTarget instance.
 		static RenderTargetPtr		create( const Renderer::RenderTargetPtr& rt );

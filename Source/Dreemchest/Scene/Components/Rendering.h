@@ -31,12 +31,7 @@
 #include "../Assets/Mesh.h"
 #include "../Assets/Image.h"
 #include "../Assets/Material.h"
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-    #include "../DeprecatedRendering/RenderTargetDeprecated.h"
-#else
-    #include "../Rendering/RenderTarget.h"
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+#include "../Rendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
 

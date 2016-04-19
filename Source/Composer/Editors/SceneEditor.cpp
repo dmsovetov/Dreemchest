@@ -61,10 +61,12 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 
     // Create rendering context.
 #if DEV_DEPRECATED_SCENE_RENDERER
-	m_renderingContext = Scene::RenderingContext::create( hal() );
-#else
     m_renderingContext = Scene::RenderingContext::create( project->assets(), hal(), m_scene );
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext );
+#else
+    m_renderingContext = Scene::RenderingContext::create( hal() );
+    m_renderScene      = Scene::RenderScene::create( m_scene );
+    m_rvm              = Scene::Rvm::create( m_renderingContext );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Create the scene model
@@ -155,8 +157,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
 	m_scene->addSystem<RotationToolSystem>( viewport() );
 #if DEV_DEPRECATED_SCENE_RENDERER
-	m_scene->addRenderingSystem<SceneHelpersRenderer>();
-#else
+//	m_scene->addRenderingSystem<SceneHelpersRenderer>();
     m_renderScene->addRenderSystem<Scene::DepthComplexity>();
     m_renderScene->addRenderSystem<Scene::Unlit>();
     m_renderScene->addRenderSystem<Scene::ForwardLighting>();
@@ -176,8 +177,12 @@ void SceneEditor::render( f32 dt )
 
 	// Render the scene
     clock_t time = clock();
-	Scene::RenderScene::Frame frame = m_renderScene->captureFrame();
+	Scene::RenderFrame frame = m_renderScene->captureFrame( hal() );
+#if DEV_DEPRECATED_SCENE_RENDERER
     m_renderScene->display( frame );
+#else
+    m_rvm->display( frame );
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
     time = clock() - time;
 
     static u32 kLastPrintTime = 0;

@@ -25,8 +25,7 @@
  **************************************************************************/
 
 #include "RenderScene.h"
-#include "RenderAssets.h"
-#include "RenderSystems/RenderSystem.h"
+#include "Rvm/Commands.h"
 
 #include "../Components/Rendering.h"
 #include "../Components/Transform.h"
@@ -35,133 +34,160 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
-    : m_scene( scene )
-    , m_context( context )
-{
-    // Create entity caches
-    m_meshes = scene->ecs()->createDataCache<MeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createMeshFromEntity ) );
-    m_lights = scene->ecs()->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightFromEntity ) );
+Renderer::ShaderPtr pinkShader;
+Renderer::ShaderPtr whiteShader;
+Renderer::ConstantBufferPtr frameConstantBuffer;
+Renderer::ConstantBufferPtr passConstantBuffer;
+Renderer::ConstantBufferPtr instanceConstantBuffer;
+Renderer::VertexBufferPtr pointCloud;
+Renderer::VertexDeclarationPtr vertexDeclaration;
 
+struct RenderFrameConstants {
+    Vec4        color;
+};
+struct RenderPassConstants {
+    Matrix4     viewProjection;
+};
+struct RenderInstanceConstants {
+    Matrix4     transform;
+};
+
+// ** RenderScene::RenderScene
+RenderScene::RenderScene( SceneWPtr scene )
+    : m_scene( scene )
+{
     // Create camera index
     m_cameras = scene->ecs()->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() );
 }
 
 // ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene, RenderingContextWPtr context )
+RenderScenePtr RenderScene::create( SceneWPtr scene )
 {
-    return DC_NEW RenderScene( scene, context );
-}
-
-// ** RenderScene::context
-RenderingContextWPtr RenderScene::context( void ) const
-{
-    return m_context;
-}
-
-// ** RenderScene::scene
-SceneWPtr RenderScene::scene( void ) const
-{
-    return m_scene;
-}
-
-// ** RenderScene::meshes
-const RenderScene::Meshes& RenderScene::meshes( void ) const
-{
-    return m_meshes->data();
+    return DC_NEW RenderScene( scene );
 }
 
 // ** RenderScene::captureFrame
-RenderScene::Frame RenderScene::captureFrame( void )
+RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
 {
-    Frame frame;
+    RenderFrame frame;
+
+    if( !pinkShader.valid() ) {
+        pinkShader = hal->createShader(
+                NIMBLE_STRINGIFY(
+                    struct RenderPass {
+                        mat4    viewProjection;
+                    };
+                    struct RenderInstance {
+                        mat4    transform;
+                    };
+
+                    RenderPass uPass;
+                    RenderInstance uInstance;
+
+                    void main()
+                    {
+                        gl_Position = uPass.viewProjection * uInstance.transform * gl_Vertex;
+                    }   
+                )
+            ,   NIMBLE_STRINGIFY(
+                    void main()
+                    {
+                        gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
+                    }
+                )
+            );
+
+        whiteShader = hal->createShader(
+                NIMBLE_STRINGIFY(
+                    struct RenderPass {
+                        mat4    viewProjection;
+                    };
+                    struct RenderInstance {
+                        mat4    transform;
+                    };
+
+                    RenderPass uPass;
+                    RenderInstance uInstance;
+
+                    void main()
+                    {
+                        gl_Position = uPass.viewProjection * uInstance.transform * gl_Vertex;
+                    }   
+                )
+            ,   NIMBLE_STRINGIFY(
+                    struct RenderFrame {
+                        vec4    color;
+                    };
+
+                    RenderFrame uFrame;
+
+                    void main()
+                    {
+                        gl_FragColor = uFrame.color;
+                    }
+                )
+            );
+
+        vertexDeclaration = hal->createVertexDeclaration( "P3:C4" );
+        pointCloud = hal->createVertexBuffer( vertexDeclaration, 100 );
+
+        struct Point {
+            Vec3 pos;
+            u8   color[4];
+        };
+        Point* pts = reinterpret_cast<Point*>( pointCloud->lock() );
+        s32 x = sizeof Point;
+        for( s32 i = 0; i < 100; i++ ) {
+            Point& p = pts[i];
+            p.pos = Vec3::randomInSphere( Vec3::zero(), 1.0f );
+            p.color[0] = p.color[1] = p.color[2] = p.color[3] = 255;
+        }
+        pointCloud->unlock();
+
+
+        frameConstantBuffer = hal->createConstantBuffer( sizeof( RenderFrameConstants ), false );
+        passConstantBuffer = hal->createConstantBuffer( sizeof( RenderPassConstants ), false );
+        instanceConstantBuffer = hal->createConstantBuffer( sizeof( RenderInstanceConstants ), false );
+    }
+    
+    // Default state block
+    RenderStateBlock* defaults = new RenderStateBlock;
+    defaults->disableAlphaTest();
+    defaults->disableBlending();
+    defaults->setDepthState( Renderer::LessEqual, true );
+    defaults->bindProgram( frame.internShader( pinkShader ) );
+    defaults->bindConstantBuffer( frame.internConstantBuffer( frameConstantBuffer ), RenderState::GlobalConstants );
 
     // Get all active scene cameras
     const Ecs::EntitySet& cameras = m_cameras->entities();
 
     // Clear each render target
     for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-		Camera*			 camera = (*i)->get<Camera>();
-		RenderTargetWPtr target = camera->target();
+		Camera*			 camera     = (*i)->get<Camera>();
+        Transform*	     transform  = (*i)->get<Transform>();
+		RenderTargetWPtr target     = camera->target();
 
 		if( !target.valid() ) {
 			continue;
 		}
 
-		target->begin( m_context );
-		{
-			m_context->hal()->setViewport( camera->viewport() );
-			u32 mask = ( camera->clearMask() & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( camera->clearMask() & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
-			m_context->hal()->clear( camera->clearColor(), 1.0f, 0, mask );
-			m_context->hal()->setViewport( target->rect() );
-		}
-		target->end( m_context );
+        // Pass state block
+        RenderStateBlock* pass = new RenderStateBlock;
+        pass->setRenderTarget( frame.internRenderTarget( target ), camera->calculateViewProjection( transform->matrix() ), camera->viewport() );
+        pass->bindConstantBuffer( frame.internConstantBuffer( passConstantBuffer ), RenderState::PassConstants );
+
+        // Instance state block
+        RenderStateBlock* instance = new RenderStateBlock;
+        instance->bindVertexBuffer( frame.internVertexBuffer( pointCloud ) );
+        instance->bindConstantBuffer( frame.internConstantBuffer( instanceConstantBuffer ), RenderState::InstanceConstants );
+
+        const RenderStateBlock* stack[] = { instance, pass, defaults, NULL };
+
+        RenderCommandBuffer& commands = frame.createCommandBuffer();
+        commands.drawPrimitives( 0, Renderer::PrimPoints, stack, 0, 100 );
 	}
 
-    // Process all render systems
-    for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( frame );
-    }
-
-#if 0
-    s32 allocated = 0;
-    s32 used      = 0;
-
-    // Calculate allocated space
-    for( s32 i = 0, n = static_cast<s32>( frame.size() ); i < n; i++ ) {
-        allocated += frame[i]->allocatedBytes();
-        used += frame[i]->usedBytes();
-    }
-
-    LogDebug( "renderScene", "%2.2fkb allocated for a frame, %2.2fkb used (%2.2f percents wasted)\n", allocated / 1024.0f, used / 1024.0f, static_cast<f32>( allocated - used ) / allocated * 100.0f );
-#endif
-
     return frame;
-}
-
-// ** RenderScene::display
-void RenderScene::display( Frame& frame )
-{
-    for( s32 i = 0, n = static_cast<s32>( frame.size() ); i < n; i++ ) {
-        // Sort all emitted commands
-        frame[i]->sort();
-
-    #if 0
-        frame[i]->dump();
-    #endif
-
-        // Execute rendering commands
-        m_context->rvm()->execute( *frame[i] );
-    }
-}
-
-// ** RenderScene::createMeshFromEntity
-RenderScene::RenderableMesh RenderScene::createMeshFromEntity( const Ecs::Entity& entity )
-{
-    const Transform*  transform  = entity.get<Transform>();
-    const StaticMesh* staticMesh = entity.get<StaticMesh>();
-
-    RenderableMesh mesh;
-    mesh.transform  = transform;
-    mesh.matrix     = &transform->matrix();
-    mesh.material   = staticMesh->material( 0 );
-    mesh.mesh       = staticMesh->mesh();
-    mesh.renderable = m_context->requestRenderable( staticMesh->mesh() );
-    mesh.technique  = m_context->requestTechnique( mesh.material );
-    return mesh;
-}
-
-// ** RenderScene::createLightFromEntity
-RenderScene::RenderableLight RenderScene::createLightFromEntity( const Ecs::Entity& entity )
-{
-    const Transform* transform = entity.get<Transform>();
-
-    RenderableLight light;
-    light.transform = transform;
-    light.matrix    = &transform->matrix();
-
-    return light;
 }
 
 } // namespace Scene

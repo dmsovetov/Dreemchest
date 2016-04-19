@@ -27,21 +27,14 @@
 #include "Scene.h"
 
 #if DEV_DEPRECATED_SCENE_RENDERER
-    #include "DeprecatedRendering/RenderingSystem.h"
-    #include "DeprecatedRendering/Rvm.h"
-    #include "DeprecatedRendering/RenderTargetDeprecated.h"
-    #include "DeprecatedRendering/Passes/DebugPasses.h"
-    #include "DeprecatedRendering/Passes/BasicPasses.h"
-    #include "DeprecatedRendering/ForwardLighting/LightPass.h"
-#else
     #include "Rendering/RenderAssets.h"
+    #include "Rendering/Assets/Renderable.h"
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
 #include "Assets/Prefab.h"
-#include "Rendering/Assets/Renderable.h"
 
 #include "Components/Rendering.h"
 #include "Components/Transform.h"
@@ -65,6 +58,7 @@ Resources::Resources( void )
     registerType<Prefab>();
     registerType<Material>()
         .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForMaterial ) );
+#if DEV_DEPRECATED_SCENE_RENDERER
     registerType<Renderable>()
         .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForRenderable ) );
     registerType<Texture>()
@@ -75,29 +69,7 @@ Resources::Resources( void )
         .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForShaderSource ) );
     registerType<Program>()
         .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForProgram ) );
-}
-
-// ** Resources::bytesAllocatedForTexture
-s32 Resources::bytesAllocatedForTexture( const Texture& asset )
-{
-    Renderer::TextureWPtr instance = asset.texture();
-
-    if( !instance.valid() ) {
-        return 0;
-    }
-
-    s32 result = 0;
-
-    switch( instance->type() ) {
-    case Renderer::Texture::TextureType2D:  {
-                                                Renderer::Texture2DWPtr texture = static_cast<Renderer::Texture2D*>( instance.get() );
-                                                result = texture->bytesPerMip( texture->width(), texture->height() );
-                                            }
-                                            break;
-    default:                                DC_NOT_IMPLEMENTED;
-    }
-
-    return result + sizeof( Texture );
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 }
 
 // ** Resources::bytesAllocatedForMesh
@@ -131,6 +103,30 @@ s32 Resources::bytesAllocatedForMaterial( const Material& asset )
     return sizeof( Material );
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+// ** Resources::bytesAllocatedForTexture
+s32 Resources::bytesAllocatedForTexture( const Texture& asset )
+{
+    Renderer::TextureWPtr instance = asset.texture();
+
+    if( !instance.valid() ) {
+        return 0;
+    }
+
+    s32 result = 0;
+
+    switch( instance->type() ) {
+    case Renderer::Texture::TextureType2D:  {
+                                                Renderer::Texture2DWPtr texture = static_cast<Renderer::Texture2D*>( instance.get() );
+                                                result = texture->bytesPerMip( texture->width(), texture->height() );
+                                            }
+                                            break;
+    default:                                DC_NOT_IMPLEMENTED;
+    }
+
+    return result + sizeof( Texture );
+}
+
 // ** Resources::bytesAllocatedForRenderable
 s32 Resources::bytesAllocatedForRenderable( const Renderable& asset )
 {
@@ -161,6 +157,7 @@ s32 Resources::bytesAllocatedForProgram( const Program& asset )
 {
     return sizeof( Program );
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ** Scene::Scene
 Scene::Scene( void )
@@ -175,11 +172,7 @@ Scene::Scene( void )
     m_spatial   = DC_NEW Spatial( this );
 
 	// Create system groups.
-	m_updateSystems = m_ecs->createGroup( "Update",
-    #if DEV_DEPRECATED_SCENE_RENDERER
-        UpdateSystems
-    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
-        ~0 );
+	m_updateSystems = m_ecs->createGroup( "Update", ~0 );
 
 	// Add default update systems.
 	addSystem<AffineTransformSystem>();
@@ -192,18 +185,6 @@ Scene::Scene( void )
     addSystem<FrustumCullingSystem>( m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() ) );
 #endif  /*  !DEV_DISABLE_CULLING    */
 		
-#if DEV_DEPRECATED_SCENE_RENDERER
-	// Add default render systems.
-	addRenderingSystem<BoundingVolumesRenderer>();
-	addRenderingSystem<ForwardLightingRenderer>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderUnlit, UnlitPass>>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderParticles, ParticleSystemsPass>>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderWireframe, WireframePass>>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderGrid, GridPass>>();
-	addRenderingSystem<SinglePassRenderingSystem<RenderVertexNormals, VertexNormalsPass>>();
-#else
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
-
 #if DEV_DEPRECATED_SERIALIZATION
     // Register component types
     m_ecs->registerComponent<Identifier>();
@@ -217,13 +198,7 @@ Scene::Scene( void )
 void Scene::update( u32 currentTime, f32 dt )
 {
     NIMBLE_BREADCRUMB_CALL_STACK;
-	m_ecs->update( currentTime, dt,
-    #if DEV_DEPRECATED_SCENE_RENDERER
-        UpdateSystems 
-    #else
-        ~0
-    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
-    );
+	m_ecs->update( currentTime, dt, ~0 );
 }
 
 // ** Scene::createSceneObject
@@ -275,44 +250,6 @@ SceneObjectSet Scene::findByAspect( const Ecs::Aspect& aspect ) const
 {
 	return m_ecs->findByAspect( aspect );
 }
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-// ** Scene::render
-void Scene::render( RenderingContextWPtr context )
-{
-	Renderer::HalPtr hal = context->hal();
-
-	// Clear all cameras & assign ids
-	const Ecs::EntitySet& cameras  = m_cameras->entities();
-	u8					  cameraId = 0;
-
-	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; i++ ) {
-		Camera*					camera = (*i)->get<Camera>();
-		const RenderTargetPtr&	target = camera->target();
-
-		if( !target.valid() ) {
-			continue;
-		}
-
-		target->begin( context );
-		{
-			hal->setViewport( camera->viewport() );
-			u32 mask = ( camera->clearMask() & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( camera->clearMask() & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
-			hal->clear( camera->clearColor(), 1.0f, 0, mask );
-			hal->setViewport( target->rect() );
-		}
-		target->end( context );
-	}
-
-	// Update all rendering systems
-	for( u32 i = 0; i < ( u32 )m_renderingSystems.size(); i++ ) {
-		m_renderingSystems[i]->render( context );
-	}
-
-	// Reset RVM
-	context->rvm()->reset();
-}
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ** Scene::ecs
 Ecs::EcsWPtr Scene::ecs( void ) const
