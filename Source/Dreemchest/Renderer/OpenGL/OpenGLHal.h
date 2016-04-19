@@ -152,6 +152,7 @@ namespace Renderer {
         virtual RenderTargetPtr     createRenderTarget( u32 width, u32 height );
         virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
         virtual IndexBufferPtr      createIndexBuffer( u32 count, bool GPU = true );
+        virtual ConstantBufferPtr   createConstantBuffer( u32 size, bool GPU = true );
         virtual VertexBufferPtr		createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
 		virtual void				setPolygonMode( PolygonMode mode );
         virtual void				setShader( const ShaderPtr& shader );
@@ -160,6 +161,7 @@ namespace Renderer {
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
         virtual void                setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration );
+        virtual void                setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
         virtual void				setColorMask( u32 value );
         virtual void				setBlendFactors( BlendFactor source, BlendFactor destination );

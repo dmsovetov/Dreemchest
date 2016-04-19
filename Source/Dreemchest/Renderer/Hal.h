@@ -146,6 +146,14 @@ namespace Renderer {
          */
         virtual VertexBufferPtr   createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
 
+        //! Creates a new constant buffer.
+        /*!
+         \param size    The total size of a constant buffer in bytes.
+         \param GPU     Determines a location where to store a constant buffer data (RAM or GPU).
+         \return        ConstantBuffer instance.
+         */
+        virtual ConstantBufferPtr    createConstantBuffer( u32 size, bool GPU = true );
+
         //! Binds a shader.
         virtual void    setShader( const ShaderPtr& shader );
 
@@ -172,6 +180,13 @@ namespace Renderer {
          \param vertexDeclaration   Override the vertex declaration.
          */
         virtual void    setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration = VertexDeclarationWPtr() );
+
+        //! Binds a constant buffer.
+        /*!
+         \param constantBuffer      Constant buffer to be bound.
+         \param location            Constant buffer location.
+         */
+        virtual void    setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
 
         //! Sets a rendering viewport.
         /*!
@@ -612,6 +627,33 @@ namespace Renderer {
 
         //! Is it a GPU-side index buffer?
 		bool						m_isGpu;
+    };
+
+    //! Constant buffer contains data that is sent to a shader.
+    class ConstantBuffer : public RenderResource {
+    public:
+
+                                    //! Constructs a ConstantBuffer instance.
+                                    ConstantBuffer( u32 size, bool gpu );
+		virtual						~ConstantBuffer( void );
+
+        //! Returns a constant buffer size.
+        u32                         size( void ) const;
+
+        //! Returns true if this buffer reside in GPU memory.
+		bool						isGpu( void ) const;
+
+        //! Locks a constant buffer.
+        virtual void*               lock( void );
+
+        //! Unlocks a constant buffer.
+        virtual void                unlock( void );
+
+    protected:
+
+        u32                         m_size;     //!< Constant buffer size.
+        void*                       m_data;     //!< Constant buffer data.
+        bool                        m_isGpu;    //!< Is it a GPU-side constant buffer?
     };
 
     // ** class Shader

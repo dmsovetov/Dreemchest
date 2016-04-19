@@ -59,6 +59,7 @@ namespace Renderer {
 	dcDeclarePtrs( VertexDeclaration )
 	dcDeclarePtrs( VertexBuffer )
 	dcDeclarePtrs( IndexBuffer )
+    dcDeclarePtrs( ConstantBuffer )
 	dcDeclarePtrs( Texture )
 	dcDeclarePtrs( Texture2D )
 	dcDeclarePtrs( Shader )

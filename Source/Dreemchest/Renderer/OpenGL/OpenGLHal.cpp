@@ -210,6 +210,23 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& decla
     return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( declaration, count ) );
 }
 
+// ** OpenGLHal::createConstantBuffer
+ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 count, bool GPU )
+{
+	DC_CHECK_GL_CONTEXT
+    DC_CHECK_GL;
+
+	if( !GPU ) {
+		return Hal::createConstantBuffer( count, GPU );
+	}
+
+	if( GPU ) {
+		LogError( "hal", "GPU constant buffers are not supported\n" );
+	}
+
+    return ConstantBufferPtr();
+}
+
 // ** OpenGLHal::setPolygonMode
 void OpenGLHal::setPolygonMode( PolygonMode mode )
 {
@@ -292,6 +309,11 @@ void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const Vert
 	}
 
 	enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration.valid() ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
+}
+
+// ** OpenGLHal::setConstantBuffer
+void OpenGLHal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location )
+{
 }
 
 // ** OpenGLHal::enableVertexDeclaration

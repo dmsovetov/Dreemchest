@@ -191,6 +191,16 @@ VertexBufferPtr Hal::createVertexBuffer( const VertexDeclarationPtr& declaration
     return VertexBufferPtr( DC_NEW VertexBuffer( declaration, count, false ) );
 }
 
+// ** Hal::createConstantBuffer
+ConstantBufferPtr Hal::createConstantBuffer( u32 size, bool GPU )
+{
+	if( GPU ) {
+		LogWarning( "hal", "GPU constant buffers are not supported\n" );
+	}
+
+    return ConstantBufferPtr( DC_NEW ConstantBuffer( size, false ) );
+}
+
 // ** Hal::setPolygonMode
 void Hal::setPolygonMode( PolygonMode mode )
 {
@@ -224,6 +234,11 @@ void Hal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration )
 {
 
+}
+
+// ** Hal::setConstantBuffer
+void Hal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location )
+{
 }
 
 // ** Hal::setViewport
@@ -825,6 +840,48 @@ u16* IndexBuffer::lock( void )
 
 // ** IndexBuffer::unlock
 void IndexBuffer::unlock( void )
+{
+
+}
+
+// ----------------------------------------------- ConstantBuffer -------------------------------------------------- //
+
+// ** ConstantBuffer::ConstantBuffer
+ConstantBuffer::ConstantBuffer( u32 size, bool gpu )
+	: m_size( size )
+    , m_data( NULL )
+    , m_isGpu( gpu )
+{
+	if( !m_isGpu ) {
+		m_data = DC_NEW u8[size];
+	}
+}
+
+ConstantBuffer::~ConstantBuffer( void )
+{
+	delete[]m_data;
+}
+
+// ** ConstantBuffer::size
+u32 ConstantBuffer::size( void ) const
+{
+    return m_size;
+}
+
+// ** ConstantBuffer::isGpu
+bool ConstantBuffer::isGpu( void ) const
+{
+	return m_isGpu;
+}
+
+// ** ConstantBuffer::lock
+void* ConstantBuffer::lock( void )
+{
+    return m_data;
+}
+
+// ** ConstantBuffer::unlock
+void ConstantBuffer::unlock( void )
 {
 
 }
