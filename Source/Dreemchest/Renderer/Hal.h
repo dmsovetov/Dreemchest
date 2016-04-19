@@ -587,6 +587,7 @@ namespace Renderer {
 	template<typename TVertex>
 	TVertex* VertexBuffer::lock( void )
 	{
+        DC_BREAK_IF( sizeof( TVertex ) != m_vertexDeclaration->vertexSize(), "vertex size mismatch" );
 		return reinterpret_cast<TVertex*>( lock() );
 	}
 
@@ -649,12 +650,24 @@ namespace Renderer {
         //! Unlocks a constant buffer.
         virtual void                unlock( void );
 
+		//! Lockes a constant buffer and performs the type cast.
+		template<typename TData>
+		TData*					    lock( void );
+
     protected:
 
         u32                         m_size;     //!< Constant buffer size.
         void*                       m_data;     //!< Constant buffer data.
         bool                        m_isGpu;    //!< Is it a GPU-side constant buffer?
     };
+
+	// ** ConstantBuffer::lock
+	template<typename TData>
+	TData* ConstantBuffer::lock( void )
+	{
+        DC_BREAK_IF( sizeof( TData ) != m_size, "constant buffer size mismatch" );
+		return reinterpret_cast<TData*>( lock() );
+	}
 
     // ** class Shader
     class dcInterface Shader : public RenderResource {
