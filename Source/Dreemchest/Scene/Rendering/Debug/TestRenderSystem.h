@@ -40,13 +40,10 @@ namespace Scene {
 
     protected:
 
-        virtual void			        emitRenderOperations( RenderFrame& frame, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void			        emitRenderOperations( RenderFrame& frame, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
     private:
 
-        struct FrameConstants {
-            Rgba        color;
-        };
         struct CameraConstants {
             Matrix4     viewProjection;
         };
@@ -56,7 +53,6 @@ namespace Scene {
 
         Renderer::ShaderPtr             m_pinkShader;
         Renderer::ShaderPtr             m_whiteShader;
-        Renderer::ConstantBufferPtr     m_frameConstants;
         Renderer::ConstantBufferPtr     m_cameraConstants;
         Renderer::ConstantBufferPtr     m_instanceConstants;
         Renderer::VertexBufferPtr       m_pointCloud;

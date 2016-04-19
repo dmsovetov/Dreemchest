@@ -106,10 +106,6 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
     }
     m_pointCloud->unlock();
 
-
-    m_frameConstants = hal->createConstantBuffer( sizeof( FrameConstants ), false );
-    m_frameConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( FrameConstants, color ), "Frame.color" );
-
     m_cameraConstants = hal->createConstantBuffer( sizeof( CameraConstants ), false );
     m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CameraConstants, viewProjection ), "Camera.viewProjection" );
 
@@ -118,44 +114,31 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 }
 
 // ** TestRenderSystem::emitRenderOperations
-void TestRenderSystem::emitRenderOperations( RenderFrame& frame, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
-    // Default state block
-    RenderStateBlock* defaults = frame.allocateStateBlock();
-    defaults->disableAlphaTest();
-    defaults->disableBlending();
-    defaults->setDepthState( Renderer::LessEqual, true );
-    defaults->bindProgram( frame.internShader( m_pinkShader ) );
-    defaults->bindConstantBuffer( frame.internConstantBuffer( m_frameConstants ), RenderState::GlobalConstants );
-
-    // Update frame constant buffer
-    FrameConstants* renderFrameConstants = m_frameConstants->lock<FrameConstants>();
-    renderFrameConstants->color = Rgba( 1.0f, 1.0f, 0.0f );
-    m_frameConstants->unlock();
-
     // Update camera constant buffer
     CameraConstants* renderPassConstants = m_cameraConstants->lock<CameraConstants>();
     renderPassConstants->viewProjection = camera.calculateViewProjection( transform.matrix() );
     m_cameraConstants->unlock();
 
-    // Pass state block
-    RenderStateBlock* pass = frame.allocateStateBlock();
-    pass->setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
-    pass->bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
-
-    // Instance state block
-    RenderStateBlock* instance = frame.allocateStateBlock();
-    instance->bindVertexBuffer( frame.internVertexBuffer( m_pointCloud ) );
-    instance->bindConstantBuffer( frame.internConstantBuffer( m_instanceConstants ), RenderState::InstanceConstants );
-
+    // Update instance variables
     InstanceConstants* renderInstanceConstants = m_instanceConstants->lock<InstanceConstants>();
     renderInstanceConstants->transform = Matrix4();
     m_instanceConstants->unlock();
 
-    const RenderStateBlock* stack[] = { instance, pass, defaults, NULL };
+    // Pass state block
+    RenderStateBlock& pass = stateStack.push();
+    pass.bindProgram( frame.internShader( m_pinkShader ) );
+    pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
+    pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
+
+    // Instance state block
+    RenderStateBlock& instance = stateStack.push();
+    instance.bindVertexBuffer( frame.internVertexBuffer( m_pointCloud ) );
+    instance.bindConstantBuffer( frame.internConstantBuffer( m_instanceConstants ), RenderState::InstanceConstants );
 
     RenderCommandBuffer& commands = frame.createCommandBuffer();
-    commands.drawPrimitives( 0, Renderer::PrimPoints, stack, 0, 100 );
+    commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, 100 );
 }
 
 } // namespace Scene

@@ -185,6 +185,45 @@ void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
     m_mask = m_mask | BIT( stateBit );
 }
 
+// -------------------------------------------------------------------------- RenderStateStack -------------------------------------------------------------------------- //
+
+// ** RenderStateStack::RenderStateStack
+RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
+    : m_allocator( maxStateBlocks * sizeof( RenderStateBlock ) + sizeof( RenderStateBlock* ) * maxStackSize )
+    , m_size( 0 )
+    , m_stack( NULL )
+{
+    m_stack = reinterpret_cast<const RenderStateBlock**>( m_allocator.allocate( sizeof( RenderStateBlock* ) * maxStackSize ) );
+}
+
+// ** RenderStateStack::push
+RenderStateBlock& RenderStateStack::push( void )
+{
+    DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
+    RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
+    m_stack[m_size++] = block;
+    return *block;
+}
+
+// ** RenderStateStack::pop
+void RenderStateStack::pop( void )
+{
+    DC_ABORT_IF( size() == 0, "stack underflow" );
+    m_stack[m_size--] = NULL;
+}
+
+// ** RenderStateStack::size
+s32 RenderStateStack::size( void ) const
+{
+    return m_size;
+}
+
+// ** RenderStateStack::states
+const RenderStateBlock** RenderStateStack::states( void ) const
+{
+    return m_stack;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

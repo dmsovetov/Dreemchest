@@ -43,6 +43,9 @@ void RenderSystemBase::render( RenderFrame& frame )
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
 
+    // Get a state stack
+    RenderStateStack& stateStack = frame.stateStack();
+
     // Process each camera
     for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
         // Get the camera entity
@@ -55,7 +58,7 @@ void RenderSystemBase::render( RenderFrame& frame )
         const Transform& transform = *entity.get<Transform>();
 
         // Emit render operations for this camera
-        emitRenderOperations( frame, entity, camera, transform );
+        emitRenderOperations( frame, stateStack, entity, camera, transform );
     }
 }
 

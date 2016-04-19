@@ -88,8 +88,8 @@ namespace Scene {
         //! Returns a shader by an index.
         const Renderer::ShaderPtr&              shader( s32 identifier ) const;
 
-        //! Allocates new render state block.
-        RenderStateBlock*                       allocateStateBlock( void );
+        //! Returns a state stack.
+        RenderStateStack&                       stateStack( void );
 
     private:
 
@@ -103,8 +103,7 @@ namespace Scene {
         IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
         IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
         IndexCache<Renderer::ShaderPtr>         m_shaders;              //!< Interned shaders.
-
-        LinearObjectAllocator<RenderStateBlock> m_stateBlockAllocator;  //!< Allocates render state blocks.
+        RenderStateStack                        m_stateStack;           //!< Current state stack.
     };
 
     //! Returns a total number of captured command buffers.

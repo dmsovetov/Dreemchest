@@ -32,7 +32,7 @@ namespace Scene {
 
 // ** RenderFrame::RenderFrame
 RenderFrame::RenderFrame( void )
-    : m_stateBlockAllocator( 1024 )
+    : m_stateStack( 1024, MaxStateStackDepth )
 {
 }
 
@@ -115,10 +115,10 @@ const Renderer::ShaderPtr& RenderFrame::shader( s32 identifier ) const
     return m_shaders.resolve( identifier );
 }
 
-// ** RenderFrame::allocateStateBlock
-RenderStateBlock* RenderFrame::allocateStateBlock( void )
+// ** RenderFrame::stateStack
+RenderStateStack& RenderFrame::stateStack( void )
 {
-    return m_stateBlockAllocator.allocate();
+    return m_stateStack;
 }
 
 } // namespace Scene

@@ -55,10 +55,22 @@ RenderFrameUPtr RenderScene::captureFrame( Renderer::HalWPtr hal )
 {
     RenderFrameUPtr frame( DC_NEW RenderFrame );
 
+    // Get a state stack
+    RenderStateStack& stateStack = frame->stateStack();
+
+    // Push a default state block
+    RenderStateBlock& defaults = stateStack.push();
+    defaults.disableAlphaTest();
+    defaults.disableBlending();
+    defaults.setDepthState( Renderer::LessEqual, true );
+
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
         m_renderSystems[i]->render( *frame.get() );
     }
+
+    // Pop a default state block
+    stateStack.pop();
 
     return frame;
 }

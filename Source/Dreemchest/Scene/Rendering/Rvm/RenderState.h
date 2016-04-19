@@ -218,6 +218,32 @@ namespace Scene {
         return m_stateBits[index];
     }
 
+    //! Render state stack.
+    class RenderStateStack {
+    public:
+
+                                    //! Constructs a RenderStateStack instance.
+                                    RenderStateStack( s32 maxStateBlocks, s32 maxStackSize );
+
+        //! Pushes a new state block onto the stack.
+        RenderStateBlock&           push( void );
+
+        //! Pops a state block from a top of the stack.
+        void                        pop( void );
+
+        //! Returns the stack size.
+        s32                         size( void ) const;
+
+        //! Returns the stack pointer.
+        const RenderStateBlock**    states( void ) const;
+
+    private:
+
+        LinearAllocator             m_allocator;    //!< Allocates a state block instances.
+        const RenderStateBlock**    m_stack;        //!< State blocks pushed onto a stack.
+        s32                         m_size;         //!< Current stack size.
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
