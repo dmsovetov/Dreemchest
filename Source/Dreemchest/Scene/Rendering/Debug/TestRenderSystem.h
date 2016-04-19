@@ -24,49 +24,37 @@
 
  **************************************************************************/
 
-#include "RenderScene.h"
-#include "Rvm/Commands.h"
-#include "RenderSystem/RenderSystem.h"
+#ifndef __DC_Scene_Rendering_TestRenderSystem_H__
+#define __DC_Scene_Rendering_TestRenderSystem_H__
 
-#include "../Components/Rendering.h"
-#include "../Components/Transform.h"
+#include "../RenderSystem/RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene )
-    : m_scene( scene )
-{
+    class TestRenderSystem : public RenderSystemBase {
+    public:
 
-}
+                                        TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal );
 
-// ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene )
-{
-    return DC_NEW RenderScene( scene );
-}
+    protected:
 
-// ** RenderScene::scene
-SceneWPtr RenderScene::scene( void ) const
-{
-    return m_scene;
-}
+        virtual void			        emitRenderOperations( RenderFrame& frame, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
-// ** RenderScene::captureFrame
-RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
-{
-    RenderFrame frame;
+    private:
 
-    // Process all render systems
-    for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( frame );
-    }
-
-    return frame;
-}
+        Renderer::ShaderPtr             m_pinkShader;
+        Renderer::ShaderPtr             m_whiteShader;
+        Renderer::ConstantBufferPtr     m_frameConstants;
+        Renderer::ConstantBufferPtr     m_cameraConstants;
+        Renderer::ConstantBufferPtr     m_instanceConstants;
+        Renderer::VertexBufferPtr       m_pointCloud;
+        Renderer::VertexDeclarationPtr  m_vertexDeclaration;
+    };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
+
+#endif    /*    !__DC_Scene_Rendering_TestRenderSystem_H__    */

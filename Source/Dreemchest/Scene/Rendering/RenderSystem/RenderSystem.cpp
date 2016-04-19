@@ -24,47 +24,48 @@
 
  **************************************************************************/
 
-#include "RenderScene.h"
-#include "Rvm/Commands.h"
-#include "RenderSystem/RenderSystem.h"
-
-#include "../Components/Rendering.h"
-#include "../Components/Transform.h"
+#include "RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene )
-    : m_scene( scene )
+// ** RenderSystemBase::RenderSystemBase
+RenderSystemBase::RenderSystemBase( RenderScene& renderScene, Ecs::IndexPtr cameras )
+    : m_renderScene( renderScene )
+    , m_cameras( cameras )
 {
-
 }
 
-// ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene )
+// ** RenderSystemBase::render
+void RenderSystemBase::render( RenderFrame& frame )
 {
-    return DC_NEW RenderScene( scene );
-}
+    // Get all cameras eligible for rendering by this system
+    const Ecs::EntitySet& cameras = m_cameras->entities();
 
-// ** RenderScene::scene
-SceneWPtr RenderScene::scene( void ) const
-{
-    return m_scene;
-}
+    // Process each camera
+    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
+        // Get the camera entity
+        const Ecs::Entity& entity = *i->get();
 
-// ** RenderScene::captureFrame
-RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
-{
-    RenderFrame frame;
+        // Get Camera component from an entity
+        const Camera& camera = *entity.get<Camera>();
 
-    // Process all render systems
-    for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( frame );
+        // Get Transform component from an entity
+        const Transform& transform = *entity.get<Transform>();
+
+        // Add a command buffer
+        //RenderCommandBuffer& commands = frame.createCommandBuffer();
+
+        // Push render target before rendering
+        //commands.emitPushRenderTarget( camera.target(), camera.calculateViewProjection( transform.matrix() ), camera.viewport() );
+
+        // Emit render operations for this camera
+        emitRenderOperations( frame, entity, camera, transform );
+
+        // Pop render target when rendering is finished
+        //commands.emitPopRenderTarget();
     }
-
-    return frame;
 }
 
 } // namespace Scene

@@ -121,6 +121,9 @@ namespace Scene {
     //! Render pass unique pointer type.
     typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
 #else
+    //! Render system unique pointer type.
+    typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
+
     class RenderStateBlock;
 
     //! Render command buffer unique pointer type.
@@ -581,6 +584,7 @@ DC_END_DREEMCHEST
         #include "Rendering/RenderScene.h"
         #include "Rendering/RenderingContext.h"
         #include "Rendering/Rvm/Rvm.h"
+        #include "Rendering/Debug/TestRenderSystem.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif
 

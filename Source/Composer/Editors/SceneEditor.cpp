@@ -161,6 +161,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene->addRenderSystem<Scene::DepthComplexity>();
     m_renderScene->addRenderSystem<Scene::Unlit>();
     m_renderScene->addRenderSystem<Scene::ForwardLighting>();
+#else
+    m_renderScene->addRenderSystem<Scene::TestRenderSystem>( hal() );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool

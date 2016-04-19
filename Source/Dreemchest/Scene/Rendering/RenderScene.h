@@ -38,9 +38,12 @@ namespace Scene {
     class RenderScene : public RefCounted {
     public:
 
+        //! Returns parent scene.
+        SceneWPtr                       scene( void ) const;
+
 		//! Adds a new render system to the scene.
-		template<typename TRenderSystem>
-		void						    addRenderSystem( void );
+		template<typename TRenderSystem, typename ... TArgs>
+		void						    addRenderSystem( const TArgs& ... args );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
         RenderFrame                     captureFrame( Renderer::HalWPtr hal );
@@ -55,9 +58,17 @@ namespace Scene {
 
     private:
 
-        SceneWPtr                       m_scene;    //!< Parent scene instance.
-        Ecs::IndexPtr                   m_cameras;  //!< All cameras that reside in scene.
+        SceneWPtr                       m_scene;            //!< Parent scene instance.
+        Ecs::IndexPtr                   m_cameras;          //!< All cameras that reside in scene.
+        Array<RenderSystemUPtr>	        m_renderSystems;    //!< Entity render systems.
     };
+
+	// ** RenderScene::addRenderSystem
+	template<typename TRenderSystem, typename ... TArgs>
+	void RenderScene::addRenderSystem( const TArgs& ... args )
+	{
+		m_renderSystems.push_back( DC_NEW TRenderSystem( *this, args... ) );
+	}
 
 } // namespace Scene
 
