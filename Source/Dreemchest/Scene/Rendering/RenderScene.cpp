@@ -25,11 +25,7 @@
  **************************************************************************/
 
 #include "RenderScene.h"
-#include "Rvm/Commands.h"
 #include "RenderSystem/RenderSystem.h"
-
-#include "../Components/Rendering.h"
-#include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
