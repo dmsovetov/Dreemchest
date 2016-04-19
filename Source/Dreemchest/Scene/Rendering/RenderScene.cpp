@@ -42,15 +42,19 @@ Renderer::ConstantBufferPtr instanceConstantBuffer;
 Renderer::VertexBufferPtr pointCloud;
 Renderer::VertexDeclarationPtr vertexDeclaration;
 
-struct RenderFrameConstants {
-    Vec4        color;
-};
-struct RenderPassConstants {
-    Matrix4     viewProjection;
-};
-struct RenderInstanceConstants {
-    Matrix4     transform;
-};
+namespace CBuffer {
+
+    struct Frame {
+        Rgba        color;
+    };
+    struct Camera {
+        Matrix4     viewProjection;
+    };
+    struct Instance {
+        Matrix4     transform;
+    };
+
+}
 
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene )
@@ -74,19 +78,19 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
     if( !pinkShader.valid() ) {
         pinkShader = hal->createShader(
                 NIMBLE_STRINGIFY(
-                    struct RenderPass {
+                    struct CBufferCamera {
                         mat4    viewProjection;
                     };
-                    struct RenderInstance {
+                    struct CBufferInstance {
                         mat4    transform;
                     };
 
-                    RenderPass uPass;
-                    RenderInstance uInstance;
+                    uniform CBufferCamera Camera;
+                    uniform CBufferInstance Instance;
 
                     void main()
                     {
-                        gl_Position = uPass.viewProjection * uInstance.transform * gl_Vertex;
+                        gl_Position = Camera.viewProjection * Instance.transform * gl_Vertex;
                     }   
                 )
             ,   NIMBLE_STRINGIFY(
@@ -99,19 +103,19 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
 
         whiteShader = hal->createShader(
                 NIMBLE_STRINGIFY(
-                    struct RenderPass {
+                    struct CBufferCamera {
                         mat4    viewProjection;
                     };
-                    struct RenderInstance {
+                    struct CBufferInstance {
                         mat4    transform;
                     };
 
-                    RenderPass uPass;
-                    RenderInstance uInstance;
+                    uniform CBufferCamera Camera;
+                    uniform CBufferInstance Instance;
 
                     void main()
                     {
-                        gl_Position = uPass.viewProjection * uInstance.transform * gl_Vertex;
+                        gl_Position = Camera.viewProjection * Instance.transform * gl_Vertex;
                     }   
                 )
             ,   NIMBLE_STRINGIFY(
@@ -135,7 +139,7 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
             Vec3 pos;
             u8   color[4];
         };
-        Point* pts = reinterpret_cast<Point*>( pointCloud->lock() );
+        Point* pts = pointCloud->lock<Point>();
         s32 x = sizeof Point;
         for( s32 i = 0; i < 100; i++ ) {
             Point& p = pts[i];
@@ -145,9 +149,14 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
         pointCloud->unlock();
 
 
-        frameConstantBuffer = hal->createConstantBuffer( sizeof( RenderFrameConstants ), false );
-        passConstantBuffer = hal->createConstantBuffer( sizeof( RenderPassConstants ), false );
-        instanceConstantBuffer = hal->createConstantBuffer( sizeof( RenderInstanceConstants ), false );
+        frameConstantBuffer = hal->createConstantBuffer( sizeof( CBuffer::Frame ), false );
+        frameConstantBuffer->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Frame, color ), "Frame.color" );
+
+        passConstantBuffer = hal->createConstantBuffer( sizeof( CBuffer::Camera ), false );
+        passConstantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Camera, viewProjection ), "Camera.viewProjection" );
+
+        instanceConstantBuffer = hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
+        instanceConstantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
     }
     
     // Default state block
@@ -157,6 +166,10 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
     defaults->setDepthState( Renderer::LessEqual, true );
     defaults->bindProgram( frame.internShader( pinkShader ) );
     defaults->bindConstantBuffer( frame.internConstantBuffer( frameConstantBuffer ), RenderState::GlobalConstants );
+
+    CBuffer::Frame* renderFrameConstants = frameConstantBuffer->lock<CBuffer::Frame>();
+    renderFrameConstants->color = Rgba( 1.0f, 1.0f, 0.0f );
+    frameConstantBuffer->unlock();
 
     // Get all active scene cameras
     const Ecs::EntitySet& cameras = m_cameras->entities();
@@ -171,6 +184,10 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
 			continue;
 		}
 
+        CBuffer::Camera* renderPassConstants = passConstantBuffer->lock<CBuffer::Camera>();
+        renderPassConstants->viewProjection = camera->calculateViewProjection( transform->matrix() );
+        passConstantBuffer->unlock();
+
         // Pass state block
         RenderStateBlock* pass = new RenderStateBlock;
         pass->setRenderTarget( frame.internRenderTarget( target ), camera->calculateViewProjection( transform->matrix() ), camera->viewport() );
@@ -180,6 +197,10 @@ RenderFrame RenderScene::captureFrame( Renderer::HalWPtr hal )
         RenderStateBlock* instance = new RenderStateBlock;
         instance->bindVertexBuffer( frame.internVertexBuffer( pointCloud ) );
         instance->bindConstantBuffer( frame.internConstantBuffer( instanceConstantBuffer ), RenderState::InstanceConstants );
+
+        CBuffer::Instance* renderInstanceConstants = instanceConstantBuffer->lock<CBuffer::Instance>();
+        renderInstanceConstants->transform = Matrix4();
+        instanceConstantBuffer->unlock();
 
         const RenderStateBlock* stack[] = { instance, pass, defaults, NULL };
 
