@@ -304,6 +304,10 @@ namespace Renderer {
         u32                         m_renderThread;
     #endif
 
+    #if DEV_RENDERER_SOFTWARE_CBUFFERS
+        Array<ConstantBufferWPtr>   m_constantBuffers;  //!< An array of bound constant buffers.
+    #endif   /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
+
         //! Current rasterizer state.
         //RasterizerState				m_rasterState2D;
 
@@ -634,9 +638,42 @@ namespace Renderer {
     class ConstantBuffer : public RenderResource {
     public:
 
+    #if DEV_RENDERER_SOFTWARE_CBUFFERS
+        //! Constant type.
+        enum Type {
+              Integer   //!< Integer constant value.
+            , Float     //!< Float constant value.
+            , Vec2      //!< Vec2 constant value.
+            , Vec3      //!< Vec3 constant value.
+            , Vec4      //!< Vec4 constant value.
+            , Matrix4   //!< 4x4 matrix constant value.
+        };
+
+        //! A constant value item
+        struct Constant {
+            Type        type;       //!< Uniform type.
+            CString     name;       //!< Uniform name.
+            u32         offset;     //!< Uniform offset.
+        };
+    #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
+
                                     //! Constructs a ConstantBuffer instance.
                                     ConstantBuffer( u32 size, bool gpu );
 		virtual						~ConstantBuffer( void );
+
+    #if DEV_RENDERER_SOFTWARE_CBUFFERS
+        //! Adds a new constant value to a software buffer.
+        void                        addConstant( Type type, u32 offset, CString name );
+
+        //! Returns a total number of uniforms stored inside a buffer.
+        s32                         constantCount( void ) const;
+
+        //! Returns a value at specified index.
+        const Constant&             constantAt( s32 index ) const;
+
+        //! Returns a constant buffer data pointer.
+        const u8*                   data( void ) const;
+    #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
         //! Returns a constant buffer size.
         u32                         size( void ) const;
@@ -656,9 +693,12 @@ namespace Renderer {
 
     protected:
 
-        u32                         m_size;     //!< Constant buffer size.
-        void*                       m_data;     //!< Constant buffer data.
-        bool                        m_isGpu;    //!< Is it a GPU-side constant buffer?
+        u32                         m_size;         //!< Constant buffer size.
+        void*                       m_data;         //!< Constant buffer data.
+        bool                        m_isGpu;        //!< Is it a GPU-side constant buffer?
+    #if DEV_RENDERER_SOFTWARE_CBUFFERS
+        Array<Constant>             m_constants;    //!< An array of constants that are stored inside a buffer.
+    #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };
 
 	// ** ConstantBuffer::lock
@@ -678,7 +718,7 @@ namespace Renderer {
          \param name Uniform name.
          \return Uniform location index.
          */
-        virtual u32                 findUniformLocation( CString name );
+        virtual u32                 findUniformLocation( CString name ) const;
         
 		//! Sets a 4x4 matrix value to a uniform location.
         virtual void                setMatrix( u32 location, const Matrix4& value );

@@ -211,20 +211,16 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& decla
 }
 
 // ** OpenGLHal::createConstantBuffer
-ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 count, bool GPU )
+ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, bool GPU )
 {
 	DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
-	if( !GPU ) {
-		return Hal::createConstantBuffer( count, GPU );
-	}
-
 	if( GPU ) {
-		LogError( "hal", "GPU constant buffers are not supported\n" );
+		LogWarning( "hal", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
 	}
 
-    return ConstantBufferPtr();
+    return Hal::createConstantBuffer( size, GPU );
 }
 
 // ** OpenGLHal::setPolygonMode
@@ -243,6 +239,11 @@ void OpenGLHal::setShader( const ShaderPtr& shader )
 	DC_CHECK_GL;
 
 	glUseProgram( shader.valid() ? static_cast<OpenGLShader*>( shader.get() )->m_program : 0 );
+
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+    // Update shader uniforms from bound constant buffers
+    Hal::setShader( shader );
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
 // ** OpenGLHal::setRenderTarget
@@ -314,6 +315,9 @@ void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const Vert
 // ** OpenGLHal::setConstantBuffer
 void OpenGLHal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location )
 {
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+    Hal::setConstantBuffer( constantBuffer, location );
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
 // ** OpenGLHal::enableVertexDeclaration
@@ -1206,7 +1210,7 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
 }
 
 // ** OpenGLShader::findUniformLocation
-u32 OpenGLShader::findUniformLocation( const char *name )
+u32 OpenGLShader::findUniformLocation( const char *name ) const
 {
     DC_CHECK_GL;
     

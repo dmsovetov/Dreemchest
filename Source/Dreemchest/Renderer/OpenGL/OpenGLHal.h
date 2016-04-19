@@ -320,7 +320,7 @@ namespace Renderer {
         virtual                     ~OpenGLShader( void );
 
         // ** Shader
-        virtual u32                 findUniformLocation( CString name );
+        virtual u32                 findUniformLocation( CString name ) const;
         virtual void                setMatrix( u32 location, const f32 value[16] );
         virtual void                setInt( u32 location, u32 value );
         virtual void                setFloat( u32 location, f32 value );

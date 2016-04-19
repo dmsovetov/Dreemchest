@@ -209,7 +209,51 @@ void Hal::setPolygonMode( PolygonMode mode )
 // ** Hal::setShader
 void Hal::setShader( const ShaderPtr& shader )
 {
-    
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+    // Process each bound constant buffer
+    for( s32 i = 0, n = static_cast<s32>( m_constantBuffers.size() ); i < n; i++ ) {
+        // Get a constant buffer at index
+        ConstantBufferWPtr& constantBuffer = m_constantBuffers[i];
+
+        // Skip invalid or GPU side constant buffers
+        if( !constantBuffer.valid() || constantBuffer->isGpu() ) {
+            continue;
+        }
+
+        // Get a constant buffer data.
+        const u8* data = constantBuffer->data();
+
+        // Submit all constants to a shader
+        for( s32 j = 0, k = constantBuffer->constantCount(); j < k; j++ ) {
+            // Get a constant stored inside a buffer
+            const ConstantBuffer::Constant& constant = constantBuffer->constantAt( j );
+
+            // Lookup a uniform location by name
+            u32 location = shader->findUniformLocation( constant.name );
+
+            // Not found - skip
+            if( location == 0 ) {
+                continue;
+            }
+
+            // Submit constant to a shader
+            switch( constant.type ) {
+            case ConstantBuffer::Integer:   const_cast<ShaderPtr&>( shader )->setInt( location, *reinterpret_cast<const u32*>( data + constant.offset ) );
+                                            break;
+            case ConstantBuffer::Float:     const_cast<ShaderPtr&>( shader )->setFloat( location, *reinterpret_cast<const f32*>( data + constant.offset ) );
+                                            break;
+            case ConstantBuffer::Vec2:      const_cast<ShaderPtr&>( shader )->setVec2( location, *reinterpret_cast<const Vec2*>( data + constant.offset ) );
+                                            break;
+            case ConstantBuffer::Vec3:      const_cast<ShaderPtr&>( shader )->setVec3( location, *reinterpret_cast<const Vec3*>( data + constant.offset ) );
+                                            break;
+            case ConstantBuffer::Vec4:      const_cast<ShaderPtr&>( shader )->setVec4( location, *reinterpret_cast<const Vec4*>( data + constant.offset ) );
+                                            break;
+            case ConstantBuffer::Matrix4:   const_cast<ShaderPtr&>( shader )->setMatrix( location, *reinterpret_cast<const Matrix4*>( data + constant.offset ) );
+                                            break;
+            }
+        }
+    }
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
 // ** Hal::setRenderTarget
@@ -239,6 +283,13 @@ void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDecl
 // ** Hal::setConstantBuffer
 void Hal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location )
 {
+    DC_ABORT_IF( location < 0, "invalid constant buffer location" );
+
+    if( location >= m_constantBuffers.size() ) {
+        m_constantBuffers.resize( location + 1 );
+    }
+
+    m_constantBuffers[location] = constantBuffer;
 }
 
 // ** Hal::setViewport
@@ -886,10 +937,42 @@ void ConstantBuffer::unlock( void )
 
 }
 
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+// ** ConstantBuffer::data
+const u8* ConstantBuffer::data( void ) const
+{
+    return reinterpret_cast<const u8*>( m_data );
+}
+
+// ** ConstantBuffer::addConstant
+void ConstantBuffer::addConstant( Type type, u32 offset, CString name )
+{
+    Constant constant;
+    constant.type    = type;
+    constant.offset  = offset;
+    constant.name    = name;
+    m_constants.push_back( constant );
+}
+
+// ** ConstantBuffer::constantCount
+s32 ConstantBuffer::constantCount( void ) const
+{
+    return static_cast<s32>( m_constants.size() );
+}
+
+// ** ConstantBuffer::constantAt
+const ConstantBuffer::Constant& ConstantBuffer::constantAt( s32 index ) const
+{
+    DC_ABORT_IF( index < 0 || index >= constantCount(), "index is out of range" );
+    return m_constants[index];
+}
+
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
+
 // -------------------------------------------------- Shader ---------------------------------------------------- //
 
 // ** Shader::findUniformLocation
-u32 Shader::findUniformLocation( const char * name )
+u32 Shader::findUniformLocation( const char * name ) const
 {
     return -1;
 }
