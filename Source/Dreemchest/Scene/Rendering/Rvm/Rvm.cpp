@@ -49,6 +49,7 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::Shader]            = &Rvm::switchShader;
     m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
     m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
+    m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
 }
 
 // ** Rvm::create
@@ -174,6 +175,13 @@ void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state
 {
     const Renderer::VertexBufferPtr& vertexBuffer = frame.vertexBuffer( state.id );
     m_hal->setVertexBuffer( vertexBuffer );
+}
+
+// ** Rvm::switchInputLayout
+void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state )
+{
+    const Renderer::InputLayoutPtr& inputLayout = frame.inputLayout( state.id );
+    m_hal->setInputLayout( inputLayout );
 }
 
 } // namespace Scene

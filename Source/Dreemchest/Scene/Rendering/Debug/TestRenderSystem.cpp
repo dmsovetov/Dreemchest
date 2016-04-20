@@ -118,6 +118,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
         RenderStateBlock& instance = stateStack.push();
         instance.bindVertexBuffer( frame.internVertexBuffer( pointCloud.vertexBuffer ) );
         instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.constantBuffer ), RenderState::InstanceConstants );
+        instance.bindInputLayout( frame.internInputLayout( pointCloud.inputLayout ) );
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );
         stateStack.pop();
     }

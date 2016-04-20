@@ -74,8 +74,13 @@ namespace Scene {
 
         //! Returns a constant buffer by an index.
         const Renderer::ConstantBufferPtr&      constantBuffer( s32 identifier ) const;
-       
 
+        //! Interns an input layout returns it's integer identifier.
+        s32                                     internInputLayout( Renderer::InputLayoutPtr inputLayout );
+
+        //! Returns an input layout by an index.
+        const Renderer::InputLayoutPtr&         inputLayout( s32 identifier ) const;
+       
         //! Interns a texture and returns it's integer identifier.
         s32                                     internTexture( Renderer::TexturePtr texture );
         
@@ -101,6 +106,7 @@ namespace Scene {
         IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
         IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;         //!< Interned index buffers.
         IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
+        IndexCache<Renderer::InputLayoutPtr>    m_inputLayouts;         //!< Interned input layouts.
         IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
         IndexCache<Renderer::ShaderPtr>         m_shaders;              //!< Interned shaders.
         RenderStateStack                        m_stateStack;           //!< Current state stack.

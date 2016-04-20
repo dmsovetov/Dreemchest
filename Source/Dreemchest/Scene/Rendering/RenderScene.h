@@ -57,7 +57,7 @@ namespace Scene {
         //! Stores info about a renderable point cloud.
         struct PointCloudNode : public Node {
             Renderer::VertexBufferPtr           vertexBuffer;   //!< A point cloud vertex buffer.
-            Renderer::VertexDeclarationPtr      inputLayout;    //!< A point cloud vertex buffer layout.
+            Renderer::InputLayoutPtr            inputLayout;    //!< A point cloud input layout.
             Renderer::ConstantBufferPtr         constantBuffer; //!< A point cloud constant buffer instance.
             s32                                 vertexCount;    //!< A total number of vertices inside a point cloud.
         };

@@ -91,6 +91,18 @@ const Renderer::ConstantBufferPtr& RenderFrame::constantBuffer( s32 identifier )
     return m_constantBuffers.resolve( identifier );
 }
 
+// ** RenderFrame::internInputLayout
+s32 RenderFrame::internInputLayout( Renderer::InputLayoutPtr inputLayout )
+{
+    return m_inputLayouts.add( inputLayout );
+}
+
+// ** RenderFrame::inputLayout
+const Renderer::InputLayoutPtr& RenderFrame::inputLayout( s32 identifier ) const
+{
+    return m_inputLayouts.resolve( identifier );
+}
+
 // ** RenderFrame::internTexture
 s32 RenderFrame::internTexture( Renderer::TexturePtr texture )
 {

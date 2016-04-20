@@ -108,17 +108,20 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     PointCloudNode node;
 
-    node.transform      = transform;
-    node.matrix         = &transform->matrix();
-    node.vertexCount    = pointCloud->vertexCount();
-    node.inputLayout    = m_hal->createVertexDeclaration( "P3:C4:N" );
-    node.vertexBuffer   = m_hal->createVertexBuffer( node.inputLayout, pointCloud->vertexCount() );
-
     struct Vertex {
         Vec3    point;
         u8      color[4];
         Vec3    normal;
     };
+
+    node.transform      = transform;
+    node.matrix         = &transform->matrix();
+    node.vertexCount    = pointCloud->vertexCount();
+    node.inputLayout    = m_hal->createInputLayout( sizeof( Vertex ) );
+    node.inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, offsetof( Vertex, point ) );
+    node.inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, offsetof( Vertex, color ) );
+    node.inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, offsetof( Vertex, normal ) );
+    node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
 
     const PointCloud::Vertex* pointCloudVertices = pointCloud->vertices<PointCloud::Vertex>();
 

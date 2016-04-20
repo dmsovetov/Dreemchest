@@ -116,6 +116,12 @@ void RenderStateBlock::bindIndexBuffer( s32 id )
     pushState( RenderState( RenderState::IndexBuffer, id ), RenderState::IndexBuffer );
 }
 
+// ** RenderStateBlock::bindInputLayout
+void RenderStateBlock::bindInputLayout( s32 id )
+{
+    pushState( RenderState( RenderState::InputLayout, id ), RenderState::InputLayout );
+}
+
 // ** RenderStateBlock::bindConstantBuffer
 void RenderStateBlock::bindConstantBuffer( s32 id, RenderState::ConstantBufferType type )
 {

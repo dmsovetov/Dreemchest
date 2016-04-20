@@ -58,7 +58,8 @@ namespace Scene {
         enum Type {
               VertexBuffer      = 0                                     //!< Binds an input vertex buffer.
             , IndexBuffer       = VertexBuffer   + 1                    //!< Binds an input index buffer.
-            , ConstantBuffer    = IndexBuffer    + 1                    //!< Binds a constant buffer.
+            , InputLayout       = IndexBuffer    + 1                    //!< Binds an input layout.
+            , ConstantBuffer    = InputLayout    + 1                    //!< Binds a constant buffer.
             , Shader            = ConstantBuffer + MaxConstantBuffers   //!< Binds a program instance.
             , RenderTarget      = Shader         + 1                    //!< Binds a render target.
             , Blending          = RenderTarget   + 1                    //!< Sets a blend function
@@ -140,6 +141,9 @@ namespace Scene {
 
         //! Binds an index buffer to a pipeline.
         void                            bindIndexBuffer( s32 id );
+
+        //! Binds an input layout to a pipeline.
+        void                            bindInputLayout( s32 id );
 
         //! Binds a constant buffer to a pipeline.
         void                            bindConstantBuffer( s32 id, RenderState::ConstantBufferType type );
