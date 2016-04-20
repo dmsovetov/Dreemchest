@@ -334,8 +334,11 @@ namespace Renderer {
 
     private:
 
+        typedef HashMap<String32, u32> UniformLocations;
+
         GLuint                      m_program;
         GLuint                      m_vertex, m_fragment;
+        mutable UniformLocations    m_uniformLocations;
     };
     
 } // namespace Renderer
