@@ -703,14 +703,35 @@ Texture2DPtr RenderTarget::color( u32 index ) const
 // ** InputLayout::attributeLocation
 InputLayout::InputLayout( s32 vertexSize )
     : m_vertexSize( vertexSize )
+    , m_features( 0 )
 {
 }
 
 // ** InputLayout::attributeLocation
 void InputLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
 {
+    static u32 kAttributeMask[TotalAttributes] = {
+        0,
+        BIT( 0 ),
+        BIT( 1 ),
+        BIT( 2 ),
+        BIT( 3 ),
+        BIT( 4 ),
+        BIT( 5 ),
+        BIT( 6 ),
+        0, 
+    };
+
     m_attributes[attribute].count  = count;
     m_attributes[attribute].offset = offset;
+
+    m_features = m_features | kAttributeMask[attribute];
+}
+
+// ** InputLayout::features
+u32 InputLayout::features( void ) const
+{
+    return m_features;
 }
 
 // ** InputLayout::vertexSize

@@ -499,7 +499,7 @@ namespace Renderer {
     public:
 
         //! Returns a bitmask of available features.
-        s32                     features( void ) const;
+        u32                     features( void ) const;
 
         //! Returns a vertex size in bytes.
         s32                     vertexSize( void ) const;
@@ -532,6 +532,7 @@ namespace Renderer {
 
     protected:
 
+        u32                     m_features;                     //!< An input layout features.
         s32                     m_vertexSize;                   //!< Vertex size in bytes.
         Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
     };
