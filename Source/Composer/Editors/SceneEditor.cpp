@@ -65,7 +65,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext );
 #else
     m_renderingContext = Scene::RenderingContext::create( hal() );
-    m_renderScene      = Scene::RenderScene::create( m_scene );
+    m_renderScene      = Scene::RenderScene::create( m_scene, hal() );
     m_rvm              = Scene::Rvm::create( m_renderingContext );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
@@ -179,7 +179,7 @@ void SceneEditor::render( f32 dt )
 
 	// Render the scene
     clock_t time = clock();
-	Scene::RenderFrameUPtr frame = m_renderScene->captureFrame( hal() );
+	Scene::RenderFrameUPtr frame = m_renderScene->captureFrame();
 #if DEV_DEPRECATED_SCENE_RENDERER
     m_renderScene->display( frame );
 #else
@@ -273,6 +273,26 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( entity );
     }
 #else
+    s32 count = 10;
+
+    for( s32 i = 0; i < count; i++ )
+    {
+        for( s32 j = 0; j < count; j++ )
+        {
+            Scene::SceneObjectPtr p1 = scene->createSceneObject();
+            p1->attach<Scene::Transform>( i * 2, 0, j * 2, Scene::TransformWPtr() );
+            Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( 10 );
+            Scene::PointCloud::Vertex* vertices = pointCloud->vertices<Scene::PointCloud::Vertex>();
+            for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+                Scene::PointCloud::Vertex& p = vertices[i];
+                p.position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
+                p.color.r = p.color.g = p.color.b = p.color.a = rand0to1();            
+            }
+            scene->addSceneObject( p1 );
+        }
+    }
+
+#if 0
     Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
     DC_BREAK_IF( !diffuse.isValid() );
 
@@ -352,6 +372,8 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     //    light->attach<Scene::Light>( Scene::Light::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 10.0f );
     //    scene->addSceneObject( light );
     //}
+#endif
+
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
     return scene;

@@ -201,7 +201,13 @@ RenderStateBlock& RenderStateStack::push( void )
 {
     DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
     RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
-    m_stack[m_size++] = block;
+
+    for( s32 i = 0; i < m_size; i++ ) {
+        m_stack[i + 1] = m_stack[i];
+    }
+    m_stack[0] = block;
+    m_size++;
+
     return *block;
 }
 
@@ -209,6 +215,11 @@ RenderStateBlock& RenderStateStack::push( void )
 void RenderStateStack::pop( void )
 {
     DC_ABORT_IF( size() == 0, "stack underflow" );
+
+    for( s32 i = 0; i < m_size - 1; i++ ) {
+        m_stack[i] = m_stack[i + 1];
+    }
+
     m_stack[m_size--] = NULL;
 }
 

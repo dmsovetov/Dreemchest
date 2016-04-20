@@ -32,16 +32,18 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene )
+RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
     : m_scene( scene )
+    , m_hal( hal )
 {
-
+    // Create entity caches
+    m_pointClouds = scene->ecs()->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
 }
 
 // ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene )
+RenderScenePtr RenderScene::create( SceneWPtr scene, Renderer::HalWPtr hal )
 {
-    return DC_NEW RenderScene( scene );
+    return DC_NEW RenderScene( scene, hal );
 }
 
 // ** RenderScene::scene
@@ -50,10 +52,19 @@ SceneWPtr RenderScene::scene( void ) const
     return m_scene;
 }
 
+// ** RenderScene::pointClouds
+const RenderScene::PointClouds& RenderScene::pointClouds( void ) const
+{
+    return m_pointClouds->data();
+}
+
 // ** RenderScene::captureFrame
-RenderFrameUPtr RenderScene::captureFrame( Renderer::HalWPtr hal )
+RenderFrameUPtr RenderScene::captureFrame( void )
 {
     RenderFrameUPtr frame( DC_NEW RenderFrame );
+
+    // Update instance constant buffers
+    updateInstanceConstants();
 
     // Get a state stack
     RenderStateStack& stateStack = frame->stateStack();
@@ -73,6 +84,60 @@ RenderFrameUPtr RenderScene::captureFrame( Renderer::HalWPtr hal )
     stateStack.pop();
 
     return frame;
+}
+
+// ** RenderScene::updateInstanceConstants
+void RenderScene::updateInstanceConstants( void )
+{
+    PointClouds& pointClouds = m_pointClouds->data();
+
+    for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
+        PointCloudNode& node = pointClouds[i];
+
+        CBuffer::Instance* cbuffer = node.constantBuffer->lock<CBuffer::Instance>();
+        cbuffer->transform = node.transform->matrix();
+        node.constantBuffer->unlock();
+    }
+}
+
+// ** RenderScene::createPointCloudNode
+RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity& entity )
+{
+    const Transform*  transform  = entity.get<Transform>();
+    const PointCloud* pointCloud = entity.get<PointCloud>();
+
+    PointCloudNode node;
+
+    node.transform      = transform;
+    node.matrix         = &transform->matrix();
+    node.vertexCount    = pointCloud->vertexCount();
+    node.inputLayout    = m_hal->createVertexDeclaration( "P3:C4:N" );
+    node.vertexBuffer   = m_hal->createVertexBuffer( node.inputLayout, pointCloud->vertexCount() );
+
+    struct Vertex {
+        Vec3    point;
+        u8      color[4];
+        Vec3    normal;
+    };
+
+    const PointCloud::Vertex* pointCloudVertices = pointCloud->vertices<PointCloud::Vertex>();
+
+    Vertex* vertices = node.vertexBuffer->lock<Vertex>();
+    for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+        Vertex& v   = vertices[i];
+        v.point     = pointCloudVertices[i].position;
+        v.normal    = pointCloudVertices[i].normal;
+        v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
+        v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
+        v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
+        v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
+    }
+    node.vertexBuffer->unlock();
+
+    node.constantBuffer = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
+    node.constantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
+
+    return node;
 }
 
 } // namespace Scene

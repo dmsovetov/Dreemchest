@@ -225,7 +225,7 @@ namespace Scene {
                                     //! Constructs a RenderStateStack instance.
                                     RenderStateStack( s32 maxStateBlocks, s32 maxStackSize );
 
-        //! Pushes a new state block onto the stack.
+        //! Allocates and pushes a new state block onto the stack.
         RenderStateBlock&           push( void );
 
         //! Pops a state block from a top of the stack.

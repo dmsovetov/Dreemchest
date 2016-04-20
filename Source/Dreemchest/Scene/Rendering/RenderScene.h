@@ -38,28 +38,69 @@ namespace Scene {
     class RenderScene : public RefCounted {
     public:
 
+        //! A constant buffer types
+        struct CBuffer {
+            struct Camera {
+                Matrix4     viewProjection;
+            };
+            struct Instance {
+                Matrix4     transform;
+            };
+        };
+
+        //! Base class for all renderable entities.
+        struct Node {
+            const Transform*                    transform;      //!< Mesh transform component.
+            const Matrix4*                      matrix;         //!< Mesh transform affine matrix.
+        };
+
+        //! Stores info about a renderable point cloud.
+        struct PointCloudNode : public Node {
+            Renderer::VertexBufferPtr           vertexBuffer;   //!< A point cloud vertex buffer.
+            Renderer::VertexDeclarationPtr      inputLayout;    //!< A point cloud vertex buffer layout.
+            Renderer::ConstantBufferPtr         constantBuffer; //!< A point cloud constant buffer instance.
+            s32                                 vertexCount;    //!< A total number of vertices inside a point cloud.
+        };
+
+        //! A fixed array with renderable point clouds inside.
+        typedef FixedArray<PointCloudNode>      PointClouds;
+
         //! Returns parent scene.
-        SceneWPtr                       scene( void ) const;
+        SceneWPtr                               scene( void ) const;
+
+        //! Returns renderable point clouds.
+        const PointClouds&                      pointClouds( void ) const;
 
 		//! Adds a new render system to the scene.
 		template<typename TRenderSystem, typename ... TArgs>
-		void						    addRenderSystem( const TArgs& ... args );
+		void						            addRenderSystem( const TArgs& ... args );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
-        RenderFrameUPtr                 captureFrame( Renderer::HalWPtr hal );
+        RenderFrameUPtr                         captureFrame( void );
 
         //! Creates a new render scene.
-        static RenderScenePtr           create( SceneWPtr scene );
+        static RenderScenePtr                   create( SceneWPtr scene, Renderer::HalWPtr hal );
 
     private:
 
-                                        //! Constructs RenderScene instance.
-                                        RenderScene( SceneWPtr scene );
+                                                //! Constructs RenderScene instance.
+                                                RenderScene( SceneWPtr scene, Renderer::HalWPtr hal );
+
+        //! Creates a point cloud node from an entity.
+        PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
+
+        //! Updates instance constant buffers.
+        void                                    updateInstanceConstants( void );
 
     private:
 
-        SceneWPtr                       m_scene;            //!< Parent scene instance.
-        Array<RenderSystemUPtr>	        m_renderSystems;    //!< Entity render systems.
+        //! Entity data cache to store renderable point clouds.
+        typedef Ecs::DataCache<PointCloudNode>  PointCloudCache;
+
+        Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
+        SceneWPtr                               m_scene;            //!< Parent scene instance.
+        Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
+        Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
     };
 
 	// ** RenderScene::addRenderSystem

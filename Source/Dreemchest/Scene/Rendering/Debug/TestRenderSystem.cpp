@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "TestRenderSystem.h"
+#include "../RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -71,46 +72,27 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
                 uniform CBufferCamera Camera;
                 uniform CBufferInstance Instance;
 
+                varying vec4 v_Color;
+
                 void main()
                 {
                     gl_Position = Camera.viewProjection * Instance.transform * gl_Vertex;
+                    gl_PointSize = 5;
+                    v_Color = gl_Color;
                 }   
             )
         ,   NIMBLE_STRINGIFY(
-                struct RenderFrame {
-                    vec4    color;
-                };
-
-                RenderFrame uFrame;
+                varying vec4 v_Color;
 
                 void main()
                 {
-                    gl_FragColor = uFrame.color;
+                    gl_FragColor = v_Color;
                 }
             )
         );
 
-    m_vertexDeclaration = hal->createVertexDeclaration( "P3:C4" );
-    m_pointCloud = hal->createVertexBuffer( m_vertexDeclaration, 100 );
-
-    struct Point {
-        Vec3 pos;
-        u8   color[4];
-    };
-    Point* pts = m_pointCloud->lock<Point>();
-    s32 x = sizeof Point;
-    for( s32 i = 0; i < 100; i++ ) {
-        Point& p = pts[i];
-        p.pos = Vec3::randomInSphere( Vec3::zero(), 1.0f );
-        p.color[0] = p.color[1] = p.color[2] = p.color[3] = 255;
-    }
-    m_pointCloud->unlock();
-
     m_cameraConstants = hal->createConstantBuffer( sizeof( CameraConstants ), false );
     m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CameraConstants, viewProjection ), "Camera.viewProjection" );
-
-    m_instanceConstants = hal->createConstantBuffer( sizeof( InstanceConstants ), false );
-    m_instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( InstanceConstants, transform ), "Instance.transform" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
@@ -121,24 +103,24 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
     renderPassConstants->viewProjection = camera.calculateViewProjection( transform.matrix() );
     m_cameraConstants->unlock();
 
-    // Update instance variables
-    InstanceConstants* renderInstanceConstants = m_instanceConstants->lock<InstanceConstants>();
-    renderInstanceConstants->transform = Matrix4();
-    m_instanceConstants->unlock();
-
     // Pass state block
     RenderStateBlock& pass = stateStack.push();
-    pass.bindProgram( frame.internShader( m_pinkShader ) );
+    pass.bindProgram( frame.internShader( m_whiteShader ) );
     pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
 
-    // Instance state block
-    RenderStateBlock& instance = stateStack.push();
-    instance.bindVertexBuffer( frame.internVertexBuffer( m_pointCloud ) );
-    instance.bindConstantBuffer( frame.internConstantBuffer( m_instanceConstants ), RenderState::InstanceConstants );
-
     RenderCommandBuffer& commands = frame.createCommandBuffer();
-    commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, 100 );
+    const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();
+
+    for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
+        const RenderScene::PointCloudNode& pointCloud = pointClouds[i];
+
+        RenderStateBlock& instance = stateStack.push();
+        instance.bindVertexBuffer( frame.internVertexBuffer( pointCloud.vertexBuffer ) );
+        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.constantBuffer ), RenderState::InstanceConstants );
+        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );
+        stateStack.pop();
+    }
 }
 
 } // namespace Scene

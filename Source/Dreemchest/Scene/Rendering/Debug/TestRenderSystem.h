@@ -47,16 +47,10 @@ namespace Scene {
         struct CameraConstants {
             Matrix4     viewProjection;
         };
-        struct InstanceConstants {
-            Matrix4     transform;
-        };
 
         Renderer::ShaderPtr             m_pinkShader;
         Renderer::ShaderPtr             m_whiteShader;
         Renderer::ConstantBufferPtr     m_cameraConstants;
-        Renderer::ConstantBufferPtr     m_instanceConstants;
-        Renderer::VertexBufferPtr       m_pointCloud;
-        Renderer::VertexDeclarationPtr  m_vertexDeclaration;
     };
 
 } // namespace Scene
