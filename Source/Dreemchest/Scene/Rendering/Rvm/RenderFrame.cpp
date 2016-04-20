@@ -116,13 +116,13 @@ const Renderer::TexturePtr& RenderFrame::texture( s32 identifier ) const
 }
 
 // ** RenderFrame::internShader
-s32 RenderFrame::internShader( Renderer::ShaderPtr shader )
+s32 RenderFrame::internShader( UbershaderPtr shader )
 {
     return m_shaders.add( shader );
 }
         
 // ** RenderFrame::shader
-const Renderer::ShaderPtr& RenderFrame::shader( s32 identifier ) const
+const UbershaderPtr& RenderFrame::shader( s32 identifier ) const
 {
     return m_shaders.resolve( identifier );
 }

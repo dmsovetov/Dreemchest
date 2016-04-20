@@ -274,20 +274,50 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     }
 #else
     s32 count = 10;
+    s32 points = 500;
+    s32 c = 0;
 
     for( s32 i = 0; i < count; i++ )
     {
         for( s32 j = 0; j < count; j++ )
         {
             Scene::SceneObjectPtr p1 = scene->createSceneObject();
-            p1->attach<Scene::Transform>( i * 2, 0, j * 2, Scene::TransformWPtr() );
-            Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( 10 );
-            Scene::PointCloud::Vertex* vertices = pointCloud->vertices<Scene::PointCloud::Vertex>();
-            for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
-                Scene::PointCloud::Vertex& p = vertices[i];
-                p.position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
-                p.color.r = p.color.g = p.color.b = p.color.a = rand0to1();            
+            p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
+            Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( points );
+
+            c++; c = c % 3;
+
+            if( c == 0 ) {
+                pointCloud->setVertexFormat( Scene::PointCloud::Position | Scene::PointCloud::Color | Scene::PointCloud::Normal );
+                Scene::PointCloud::Vertex* vertices = pointCloud->vertices<Scene::PointCloud::Vertex>();
+                for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+                    Scene::PointCloud::Vertex& p = vertices[i];
+                    p.position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
+                    p.normal = Vec3::normalize( p.position );
+                    p.color.r = p.color.g = p.color.b = p.color.a = rand0to1();            
+                }
             }
+            else if( c == 1 ) {
+                pointCloud->setVertexFormat( Scene::PointCloud::Position | Scene::PointCloud::Normal );
+                Scene::PointCloud::VertexOrientation* vertices = pointCloud->vertices<Scene::PointCloud::VertexOrientation>();
+                for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+                    Scene::PointCloud::VertexOrientation& p = vertices[i];
+                    p.position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
+                    p.normal = Vec3::normalize( p.position );         
+                }
+            }
+            else if( c == 2 ) {
+                pointCloud->setVertexFormat( Scene::PointCloud::Position | Scene::PointCloud::Color );
+                Scene::PointCloud::VertexColored* vertices = pointCloud->vertices<Scene::PointCloud::VertexColored>();
+                for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+                    Scene::PointCloud::VertexColored& p = vertices[i];
+                    p.position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
+                    p.color.r = p.color.g = p.color.b = p.color.a = rand0to1();       
+                }
+            } else {
+                DC_NOT_IMPLEMENTED;
+            }
+
             scene->addSceneObject( p1 );
         }
     }

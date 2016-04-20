@@ -108,39 +108,110 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     PointCloudNode node;
 
-    struct Vertex {
-        Vec3    point;
-        u8      color[4];
-        Vec3    normal;
-    };
-
     node.transform      = transform;
     node.matrix         = &transform->matrix();
     node.vertexCount    = pointCloud->vertexCount();
-    node.inputLayout    = m_hal->createInputLayout( sizeof( Vertex ) );
-    node.inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, offsetof( Vertex, point ) );
-    node.inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, offsetof( Vertex, color ) );
-    node.inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, offsetof( Vertex, normal ) );
-    node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
+    node.inputLayout    = createInputLayout( pointCloud->vertexFormat() );
+    
+    if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Color | PointCloud::Normal) ) {
+        struct Vertex {
+            Vec3    point;
+            u8      color[4];
+            Vec3    normal;
+        };
 
-    const PointCloud::Vertex* pointCloudVertices = pointCloud->vertices<PointCloud::Vertex>();
+        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
 
-    Vertex* vertices = node.vertexBuffer->lock<Vertex>();
-    for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
-        Vertex& v   = vertices[i];
-        v.point     = pointCloudVertices[i].position;
-        v.normal    = pointCloudVertices[i].normal;
-        v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
-        v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
-        v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
-        v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
+        const PointCloud::Vertex* pointCloudVertices = pointCloud->vertices<PointCloud::Vertex>();
+
+        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
+        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+            Vertex& v   = vertices[i];
+            v.point     = pointCloudVertices[i].position;
+            v.normal    = pointCloudVertices[i].normal;
+            v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
+            v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
+            v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
+            v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
+        }
+        node.vertexBuffer->unlock();
     }
-    node.vertexBuffer->unlock();
+    else if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Normal) ) {
+        struct Vertex {
+            Vec3    point;
+            Vec3    normal;
+        };
+
+        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
+
+        const PointCloud::VertexOrientation* pointCloudVertices = pointCloud->vertices<PointCloud::VertexOrientation>();
+
+        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
+        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+            Vertex& v   = vertices[i];
+            v.point     = pointCloudVertices[i].position;
+            v.normal    = pointCloudVertices[i].normal;
+        }
+        node.vertexBuffer->unlock();
+    }
+    else if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Color) ) {
+        struct Vertex {
+            Vec3    point;
+            u8      color[4];
+        };
+
+        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
+
+        const PointCloud::VertexColored* pointCloudVertices = pointCloud->vertices<PointCloud::VertexColored>();
+
+        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
+        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
+            Vertex& v   = vertices[i];
+            v.point     = pointCloudVertices[i].position;
+            v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
+            v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
+            v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
+            v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
+        }
+        node.vertexBuffer->unlock();
+    }
 
     node.constantBuffer = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
     node.constantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
 
     return node;
+}
+
+// ** RenderScene::createInputLayout
+Renderer::InputLayoutPtr RenderScene::createInputLayout( u32 format )
+{
+    // Calculate a vertex size
+    s32 vertexSize = 0;
+
+    if( format & PointCloud::Position ) vertexSize += sizeof( f32 ) * 3;
+    if( format & PointCloud::Color )    vertexSize += sizeof( u8  ) * 4;
+    if( format & PointCloud::Normal )   vertexSize += sizeof( f32 ) * 3;
+
+    // Create an input layout
+    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( vertexSize );
+
+    // Add vertex attributes to an input layout
+    s32 offset = 0;
+
+    if( format & PointCloud::Position ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, offset );
+        offset += sizeof( f32 ) * 3;
+    }
+    if( format & PointCloud::Color ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, offset );
+        offset += sizeof( u8 ) * 4;
+    }
+    if( format & PointCloud::Normal ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, offset );
+        offset += sizeof( f32 ) * 3;
+    }
+
+    return inputLayout;
 }
 
 } // namespace Scene

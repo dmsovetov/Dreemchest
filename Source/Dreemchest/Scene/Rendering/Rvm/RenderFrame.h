@@ -29,6 +29,7 @@
 
 #include "Commands.h"
 #include "RenderState.h"
+#include "Ubershader.h"
 #include "../RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
@@ -88,10 +89,10 @@ namespace Scene {
         const Renderer::TexturePtr&             texture( s32 identifier ) const;
 
         //! Interns a shader and returns it's integer identifier.
-        s32                                     internShader( Renderer::ShaderPtr shader );
+        s32                                     internShader( UbershaderPtr shader );
         
         //! Returns a shader by an index.
-        const Renderer::ShaderPtr&              shader( s32 identifier ) const;
+        const UbershaderPtr&                    shader( s32 identifier ) const;
 
         //! Returns a state stack.
         RenderStateStack&                       stateStack( void );
@@ -108,7 +109,7 @@ namespace Scene {
         IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
         IndexCache<Renderer::InputLayoutPtr>    m_inputLayouts;         //!< Interned input layouts.
         IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
-        IndexCache<Renderer::ShaderPtr>         m_shaders;              //!< Interned shaders.
+        IndexCache<UbershaderPtr>               m_shaders;              //!< Interned shaders.
         RenderStateStack                        m_stateStack;           //!< Current state stack.
     };
 

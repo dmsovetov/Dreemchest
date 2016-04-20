@@ -35,60 +35,67 @@ namespace Scene {
 TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal )
     : RenderSystemBase( renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
-    m_pinkShader = hal->createShader(
-            NIMBLE_STRINGIFY(
-                struct CBufferCamera {
-                    mat4    viewProjection;
-                };
-                struct CBufferInstance {
-                    mat4    transform;
-                };
+    m_pointCloudShader = DC_NEW Ubershader;
+    m_pointCloudShader->addFeature( BIT( 0 ), "F_NormalAttribute" );
+    m_pointCloudShader->addFeature( BIT( 1 ), "F_ColorAttribute" );
 
-                uniform CBufferCamera Camera;
-                uniform CBufferInstance Instance;
-
-                void main()
-                {
-                    gl_Position = Camera.viewProjection * Instance.transform * gl_Vertex;
-                }   
-            )
-        ,   NIMBLE_STRINGIFY(
-                void main()
-                {
-                    gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
-                }
-            )
+    m_pointCloudShader->addInclude(
+            "                                                       \n\
+                struct CBufferCamera   { mat4 viewProjection; };    \n\
+                struct CBufferInstance { mat4 transform; };         \n\
+                uniform CBufferCamera   Camera;                     \n\
+                uniform CBufferInstance Instance;                   \n\
+            "
         );
 
-    m_whiteShader = hal->createShader(
-            NIMBLE_STRINGIFY(
-                struct CBufferCamera {
-                    mat4    viewProjection;
-                };
-                struct CBufferInstance {
-                    mat4    transform;
-                };
+    m_pointCloudShader->setVertex(
+            "                                                       \n\
+            #ifdef F_ColorAttribute                                 \n\
+                varying vec4 v_Color;                               \n\
+            #endif  /*  F_ColorAttribute    */                      \n\
+                                                                    \n\
+            #ifdef F_NormalAttribute                                \n\
+                varying vec3 v_Normal;                              \n\
+            #endif  /*  F_NormalAttribute    */                     \n\
+                                                                    \n\
+                void main() {                                       \n\
+                    gl_Position     = Camera.viewProjection * Instance.transform * gl_Vertex;   \n\
+                    gl_PointSize    = 5;                            \n\
+            #ifdef F_ColorAttribute                                 \n\
+                    v_Color         = gl_Color;                     \n\
+            #endif  /*  F_ColorAttribute    */                      \n\
+                                                                    \n\
+            #ifdef F_NormalAttribute                                \n\
+                    v_Normal        = gl_Normal;                    \n\
+            #endif  /*  F_NormalAttribute    */                     \n\
+                }                                                   \n\
+            "
+        );
 
-                uniform CBufferCamera Camera;
-                uniform CBufferInstance Instance;
-
-                varying vec4 v_Color;
-
-                void main()
-                {
-                    gl_Position = Camera.viewProjection * Instance.transform * gl_Vertex;
-                    gl_PointSize = 5;
-                    v_Color = gl_Color;
-                }   
-            )
-        ,   NIMBLE_STRINGIFY(
-                varying vec4 v_Color;
-
-                void main()
-                {
-                    gl_FragColor = v_Color;
-                }
-            )
+    m_pointCloudShader->setFragment(
+            "                                                       \n\
+            #ifdef F_ColorAttribute                                 \n\
+                varying vec4 v_Color;                               \n\
+            #endif  /*  F_ColorAttribute    */                      \n\
+                                                                    \n\
+            #ifdef F_NormalAttribute                                \n\
+                varying vec3 v_Normal;                              \n\
+            #endif  /*  F_NormalAttribute    */                     \n\
+                                                                    \n\
+                void main()                                         \n\
+                {                                                   \n\
+            #ifdef F_ColorAttribute                                 \n\
+                    vec4 color = v_Color;                           \n\
+            #else                                                   \n\
+                    vec4 color = vec4( 1.0, 1.0, 1.0, 1.0 );        \n\
+            #endif  /*  F_ColorAttribute    */                      \n\
+                                                                    \n\
+            #ifdef F_NormalAttribute                                \n\
+                    color = color * vec4( v_Normal * 0.5 + 0.5, 1.0 );  \n\
+            #endif  /*  F_NormalAttribute    */                     \n\
+                    gl_FragColor = color;  \n\
+                }                                                   \n\
+            "
         );
 
     m_cameraConstants = hal->createConstantBuffer( sizeof( CameraConstants ), false );
@@ -105,7 +112,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
 
     // Pass state block
     RenderStateBlock& pass = stateStack.push();
-    pass.bindProgram( frame.internShader( m_whiteShader ) );
+    pass.bindProgram( frame.internShader( m_pointCloudShader ) );
     pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
 

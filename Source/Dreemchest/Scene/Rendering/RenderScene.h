@@ -89,6 +89,9 @@ namespace Scene {
         //! Creates a point cloud node from an entity.
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
 
+        //! Creates a vertex declaration from a point cloud format.
+        Renderer::InputLayoutPtr                createInputLayout( u32 format );
+
         //! Updates instance constant buffers.
         void                                    updateInstanceConstants( void );
 

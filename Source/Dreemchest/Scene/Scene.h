@@ -121,6 +121,8 @@ namespace Scene {
     //! Render pass unique pointer type.
     typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
 #else
+    dcDeclarePtrs( Ubershader )
+
     //! Render frame unique pointer type.
     typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
 

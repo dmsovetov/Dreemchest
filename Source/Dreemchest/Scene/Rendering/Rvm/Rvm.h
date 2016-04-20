@@ -28,6 +28,7 @@
 #define __DC_Scene_Rvm_H__
 
 #include "../RenderScene.h"
+#include "Ubershader.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -83,9 +84,23 @@ namespace Scene {
         //! State switcher function callback.
         typedef void ( Rvm::*StateSwitch )( const RenderFrame&, const RenderState& );
 
+        //! A helper structure to store an active shader state.
+        struct ActiveShader {
+            UbershaderWPtr      shader;                 //!< A shader instance that should be used.
+            UbershaderWPtr      activeShader;           //!< A shader instance that is now bound.
+            Ubershader::Bitmask features;               //!< An active permutation.
+            Renderer::ShaderPtr permutation;            //!< A shader permutation instance.
+
+                                //! Constructs an ActiveShader instance.
+                                ActiveShader( void )
+                                    : features( 0 ) {}
+        };
+
         Renderer::HalWPtr       m_hal;                                      //!< Rendering HAL to be used.
         RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
-        StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.            
+        StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.
+        u64                     m_inputLayoutFeatures;                      //!< An input layout features.
+        ActiveShader            m_activeShader;                             //!< An active shader instance.
     };
 
 } // namespace Scene

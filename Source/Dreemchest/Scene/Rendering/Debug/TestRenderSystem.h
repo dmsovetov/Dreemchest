@@ -28,6 +28,7 @@
 #define __DC_Scene_Rendering_TestRenderSystem_H__
 
 #include "../RenderSystem/RenderSystem.h"
+#include "../Rvm/Ubershader.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -48,8 +49,7 @@ namespace Scene {
             Matrix4     viewProjection;
         };
 
-        Renderer::ShaderPtr             m_pinkShader;
-        Renderer::ShaderPtr             m_whiteShader;
+        UbershaderPtr                   m_pointCloudShader;
         Renderer::ConstantBufferPtr     m_cameraConstants;
     };
 

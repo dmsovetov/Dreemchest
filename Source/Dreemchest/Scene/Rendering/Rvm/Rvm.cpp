@@ -27,6 +27,7 @@
 #include "Rvm.h"
 #include "Commands.h"
 #include "RenderFrame.h"
+#include "Ubershader.h"
 #include "../RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
@@ -75,6 +76,19 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 
         // Apply rendering states from a stack
         applyStates( frame, opCode.states, MaxStateStackDepth );
+        DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
+
+        // Select a shader permutation that match an active pipeline state
+        Ubershader::Bitmask features = m_inputLayoutFeatures & m_activeShader.shader->supportedFeatures();
+
+        if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
+            m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
+            m_activeShader.features     = features;
+            m_activeShader.activeShader = m_activeShader.shader;
+        }
+
+        // Bind an active shader permutation
+        m_hal->setShader( m_activeShader.permutation );
 
         // Perform a draw call
         switch( opCode.type ) {
@@ -90,6 +104,9 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 // ** Rvm::applyStates
 void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count )
 {
+    // Reset input layout features
+    m_inputLayoutFeatures = 0;
+
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
 
@@ -159,8 +176,9 @@ void Rvm::switchRenderTarget( const RenderFrame& frame, const RenderState& state
 // ** Rvm::switchShader
 void Rvm::switchShader( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::ShaderPtr& shader = frame.shader( state.id );
-    m_hal->setShader( shader );
+    m_activeShader.shader = frame.shader( state.id );
+//    const UbershaderPtr& shader = frame.shader( state.id );
+//    m_hal->setShader( shader->permutation( m_hal, 0 ) );
 }
 
 // ** Rvm::switchConstantBuffer
@@ -180,8 +198,12 @@ void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state
 // ** Rvm::switchInputLayout
 void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state )
 {
+    // Bind an input layout
     const Renderer::InputLayoutPtr& inputLayout = frame.inputLayout( state.id );
     m_hal->setInputLayout( inputLayout );
+
+    // Update an input layout features
+    m_inputLayoutFeatures = inputLayout->features();
 }
 
 } // namespace Scene
