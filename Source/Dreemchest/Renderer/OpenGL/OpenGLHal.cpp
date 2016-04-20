@@ -62,6 +62,7 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LESS );
+    glEnable( GL_VERTEX_PROGRAM_POINT_SIZE );
 
     glActiveTexture( GL_TEXTURE0 );
     glCullFace( GL_BACK );
