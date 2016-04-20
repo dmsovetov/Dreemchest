@@ -241,6 +241,89 @@ namespace Scene {
 	    return index < materialCount() ? m_materials[index] : Invalid;
     }
 
+    //! Holds a point cloud.
+    class PointCloud : public Ecs::Component<PointCloud> {
+    public:
+
+        //! A point cloud vertex format bits.
+        enum FormatBits {
+              Position  = BIT( 0 )
+            , Color     = BIT( 1 )
+            , Normal    = BIT( 2 )
+        };
+
+        //! A full point cloud vertex.
+        struct Vertex {
+            Vec3            position;   //!< A point position.
+            Rgba            color;      //!< A point color.
+            Vec3            normal;     //!< A point normal.
+        };
+
+        //! A point cloud vertex with just a color.
+        struct VertexColored {
+            Vec3            position;   //!< A point position.
+            Rgba            color;      //!< A point color.
+        };
+
+        //! A point cloud vertex with just a normal.
+        struct VertexOrientation {
+            Vec3            position;   //!< A point position.
+            Vec3            normal;     //!< A point normal.
+        };
+
+                            //! Constructs PointCloud instance.
+                            PointCloud( s32 vertexCount = 0, u8 format = Position | Color | Normal );
+                            ~PointCloud( void );
+
+        //! Resizes a point cloud.
+        void                resize( s32 vertexCount );
+
+        //! Clears a point cloud.
+        void                clear( void );
+
+        //! Returns a vertex format.
+        u8                  vertexFormat( void ) const;
+
+        //! Sets a vertex format.
+        void                setVertexFormat( u8 value );
+
+        //! Returns a total number of points inside a cloud.
+        s32                 vertexCount( void ) const;
+
+        //! Returns a single vertex size.
+        s32                 vertexSize( void ) const;
+
+        //! Returns type-casted point cloud vertices.
+        template<typename TVertex>
+        const TVertex*      vertices( void ) const;
+
+        //! Returns type-casted point cloud vertices.
+        template<typename TVertex>
+        TVertex*            vertices( void );
+
+    private:
+
+        u8                  m_format;       //!< A point cloud vertex format.
+        u8*                 m_vertices;     //!< A point cloud vertices.
+        s32                 m_vertexCount;  //!< A total number of vertices inside a point cloud.
+    };
+
+    // ** PointCloud::vertices
+    template<typename TVertex>
+    const TVertex* PointCloud::vertices( void ) const
+    {
+        DC_BREAK_IF( sizeof( TVertex ) != vertexSize(), "vertex size mismatch" );
+        return reinterpret_cast<const TVertex*>( m_vertices );
+    }
+
+    // ** PointCloud::vertices
+    template<typename TVertex>
+    TVertex* PointCloud::vertices( void )
+    {
+        DC_BREAK_IF( sizeof( TVertex ) != vertexSize(), "vertex size mismatch" );
+        return reinterpret_cast<TVertex*>( m_vertices );
+    }
+
 	//! Holds the sprite rendering info.
 	class Sprite : public Ecs::Component<Sprite> {
 	public:

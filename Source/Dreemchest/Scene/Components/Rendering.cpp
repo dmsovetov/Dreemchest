@@ -236,6 +236,69 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
 }
 #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
+// ------------------------------------------- PointCloud ----------------------------------------- //
+
+// ** PointCloud::PointCloud
+PointCloud::PointCloud( s32 vertexCount, u8 format )
+    : m_format( format )
+    , m_vertices( NULL )
+    , m_vertexCount( vertexCount )
+{
+    resize( vertexCount );
+}
+
+// ** PointCloud::~PointCloud
+PointCloud::~PointCloud( void )
+{
+    delete[]m_vertices;
+}
+
+// ** PointCloud::resize
+void PointCloud::resize( s32 vertexCount )
+{
+    clear();
+    m_vertexCount = vertexCount;
+    m_vertices    = DC_NEW u8[vertexCount * vertexSize()];
+}
+
+// ** PointCloud::clear
+void PointCloud::clear( void )
+{
+    delete[]m_vertices;
+    m_vertices = NULL;
+    m_vertexCount = 0;
+}
+
+// ** PointCloud::vertexFormat
+u8 PointCloud::vertexFormat( void ) const
+{
+    return m_format;
+}
+
+// ** PointCloud::setVertexFormat
+void PointCloud::setVertexFormat( u8 value )
+{
+    m_format = value;
+}
+
+// ** PointCloud::vertexCount
+s32 PointCloud::vertexCount( void ) const
+{
+    return m_vertexCount;
+}
+
+// ** PointCloud::vertexSize
+s32 PointCloud::vertexSize( void ) const
+{
+    s32 size = 0;
+
+    if( m_format & Position ) size += sizeof( Vec3 );
+    if( m_format & Color )    size += sizeof( Rgba );
+    if( m_format & Normal )   size += sizeof( Vec3 );
+
+    return size;
+}
+
 // ------------------------------------------- Particles ----------------------------------------- //
 
 // ** Particles::Particles
