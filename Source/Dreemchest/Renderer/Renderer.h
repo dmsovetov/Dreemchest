@@ -45,7 +45,7 @@ namespace Renderer {
         class Shader;
         class VertexBuffer;
         class IndexBuffer;
-        class VertexDeclaration;
+        class InputLayout;
         class Texture;
             class Texture1D;
             class Texture2D;
@@ -55,8 +55,8 @@ namespace Renderer {
 
 	//! Pointer types for renderer resources.
 	dcDeclarePtrs( Hal )
-	dcDeclarePtrs( Renderer2D )
-	dcDeclarePtrs( VertexDeclaration )
+	//dcDeclarePtrs( Renderer2D )
+	dcDeclarePtrs( InputLayout )
 	dcDeclarePtrs( VertexBuffer )
 	dcDeclarePtrs( IndexBuffer )
     dcDeclarePtrs( ConstantBuffer )

@@ -159,16 +159,9 @@ ShaderPtr Hal::createShader( const char *vertex, const char *fragment )
 }
 
 // ** Hal::createVertexDeclaration
-VertexDeclarationPtr Hal::createVertexDeclaration( const char *format, u32 vertexSize )
+InputLayoutPtr Hal::createInputLayout( s32 vertexSize )
 {
-    VertexDeclarationPtr decl( DC_NEW VertexDeclaration );
-
-    if( decl->parse( format ) ) {
-        if( vertexSize ) decl->m_vertexSize = vertexSize;
-        return decl;
-    }
-
-    return VertexDeclarationPtr();
+    return InputLayoutPtr( DC_NEW InputLayout( vertexSize ) );
 }
 
 // ** Hal::createIndexBuffer
@@ -182,13 +175,13 @@ IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 }
 
 // ** Hal::createVertexBuffer
-VertexBufferPtr Hal::createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU )
+VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 {
 	if( GPU ) {
 		LogWarning( "hal", "GPU vertex buffers are not supported\n" );
 	}
 
-    return VertexBufferPtr( DC_NEW VertexBuffer( declaration, count, false ) );
+    return VertexBufferPtr( DC_NEW VertexBuffer( size, false ) );
 }
 
 // ** Hal::createConstantBuffer
@@ -275,7 +268,13 @@ void Hal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 }
 
 // ** Hal::setVertexBuffer
-void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration )
+void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer )
+{
+
+}
+
+// ** Hal::setInputLayout
+void Hal::setInputLayout( const InputLayoutPtr& inputLayout )
 {
 
 }
@@ -699,124 +698,73 @@ Texture2DPtr RenderTarget::color( u32 index ) const
 	return index < ( u32 )m_color.size() ? m_color[index] : Texture2DPtr();
 }
 
-// ---------------------------------------------- VertexDeclaration --------------------------------------------- //
+// ---------------------------------------------- InputLayout --------------------------------------------- //
 
-// ** VertexDeclaration::parse
-bool VertexDeclaration::parse( const char *format )
+// ** InputLayout::attributeLocation
+InputLayout::InputLayout( s32 vertexSize )
+    : m_vertexSize( vertexSize )
 {
-    char *fmt    = _strdup( format );
-    char *token  = strtok( fmt, ":" );
-    bool success = true;
-
-    m_vertexSize = 0;
-
-    do {
-        u32 size = 0;
-
-        switch( token[0] ) {
-        case 'p':
-        case 'P':   size = token[1] - 48;
-					m_vertexElements[VertexPosition].m_offset = m_vertexSize;
-                    m_vertexElements[VertexPosition].m_count  = size;
-                    m_vertexSize += sizeof( f32 ) * size;
-                    break;
-        case 'n':
-        case 'N':   m_vertexElements[VertexNormal].m_offset = m_vertexSize;
-                    m_vertexElements[VertexNormal].m_count  = 3;
-                    m_vertexSize += sizeof( f32 ) * 3;
-                    break;
-        case 'c':
-        case 'C':   size = token[1] - 48;
-                    m_vertexElements[VertexColor].m_offset = m_vertexSize;
-                    m_vertexElements[VertexColor].m_count  = size;
-                    m_vertexSize += sizeof( u8 ) * size;
-                    break;
-
-        case 's':
-        case 'S':   size = token[1] - 48;
-                    m_vertexElements[VertexPointSize].m_offset = m_vertexSize;
-                    m_vertexElements[VertexPointSize].m_count  = 1;
-                    m_vertexSize += sizeof( f32 ) * size;
-                    break;
-
-        case 't':
-        case 'T':   size = token[1] - 48;
-					m_vertexElements[VertexTex0 + size].m_offset = m_vertexSize;
-                    m_vertexElements[VertexTex0 + size].m_count  = 2;
-                    m_vertexSize += sizeof( f32 ) * 2;
-                    break;
-
-        case '*':   size = token[1] - 48;
-                    m_vertexSize += sizeof( f32 ) * size;
-                    break;
-        }
-
-		token = strtok( NULL, ":" );
-    } while( token );
-
-    free( ( void* )token );
-
-    DC_ABORT_IF( !position(), "vertex declaration should contain the vertex position" );
-
-    return success;
 }
 
-// ** VertexDeclaration::vertexSize
-u32 VertexDeclaration::vertexSize( void ) const
+// ** InputLayout::attributeLocation
+void InputLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
+{
+    m_attributes[attribute].count  = count;
+    m_attributes[attribute].offset = offset;
+}
+
+// ** InputLayout::vertexSize
+s32 InputLayout::vertexSize( void ) const
 {
     return m_vertexSize;
 }
 
-// ** VertexDeclaration::position
-const VertexDeclaration::VertexElement& VertexDeclaration::position( void ) const
+// ** InputLayout::position
+const InputLayout::Element& InputLayout::position( void ) const
 {
-    return m_vertexElements[VertexPosition];
+    return m_attributes[Position];
 }
 
-// ** VertexDeclaration::color
-const VertexDeclaration::VertexElement& VertexDeclaration::color( void ) const
+// ** InputLayout::color
+const InputLayout::Element& InputLayout::color( void ) const
 {
-    return m_vertexElements[VertexColor];
+    return m_attributes[Color];
 }
 
-// ** VertexDeclaration::normal
-const VertexDeclaration::VertexElement& VertexDeclaration::normal( void ) const
+// ** InputLayout::normal
+const InputLayout::Element& InputLayout::normal( void ) const
 {
-    return m_vertexElements[VertexNormal];
+    return m_attributes[Normal];
 }
 
-// ** VertexDeclaration::uv
-const VertexDeclaration::VertexElement& VertexDeclaration::uv( u32 sampler ) const
+// ** InputLayout::uv
+const InputLayout::Element& InputLayout::uv( u32 sampler ) const
 {
-    return m_vertexElements[VertexTex0 + sampler];
+    return m_attributes[Uv0 + sampler];
 }
 
-// ** VertexDeclaration::pointSize
-const VertexDeclaration::VertexElement& VertexDeclaration::pointSize( void ) const
+// ** InputLayout::pointSize
+const InputLayout::Element& InputLayout::pointSize( void ) const
 {
-    return m_vertexElements[VertexPointSize];
+    return m_attributes[PointSize];
 }
 
 // ----------------------------------------------- VertexBuffer ------------------------------------------------- //
 
 // ** VertexBuffer::VertexBuffer
-VertexBuffer::VertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count, bool gpu )
-	: m_vertexDeclaration( vertexDeclaration ), m_size( count ), m_data( NULL ), m_isGpu( gpu )
+VertexBuffer::VertexBuffer( s32 size, bool gpu )
+	: m_size( size )
+    , m_data( NULL )
+    , m_isGpu( gpu )
 {
     if( !m_isGpu ) {
-		m_data = DC_NEW u8[vertexDeclaration->vertexSize() * count];
+		m_data = DC_NEW u8[size];
 	}
 }
 
 VertexBuffer::~VertexBuffer( void )
 {
 	delete[]( u8* )m_data;
-}
-
-// ** VertexBuffer::vertexDeclaration
-const VertexDeclarationPtr& VertexBuffer::vertexDeclaration( void ) const
-{
-    return m_vertexDeclaration;
 }
 
 // ** VertexBuffer::size

@@ -109,6 +109,7 @@ void OpenGLHal::present( void )
 void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count )
 {
     DC_CHECK_GL;
+    DC_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
 
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
@@ -120,6 +121,7 @@ void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& ind
 {
     DC_CHECK_GL;
 	DC_ABORT_IF( !indexBuffer.valid(), "invalid index buffer" )
+    DC_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
     
     static GLenum glPrimType[TotalPrimitiveTypes + 1] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS, 0 };
     DC_BREAK_IF( glPrimType[primType] == 0, "invalid primitive type" );
@@ -199,16 +201,16 @@ IndexBufferPtr OpenGLHal::createIndexBuffer( u32 count, bool GPU )
 }
 
 // ** OpenGLHal::createVertexBuffer
-VertexBufferPtr OpenGLHal::createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU )
+VertexBufferPtr OpenGLHal::createVertexBuffer( s32 size, bool GPU )
 {
 	DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
 	if( !GPU ) {
-		return Hal::createVertexBuffer( declaration, count, GPU );
+		return Hal::createVertexBuffer( size, GPU );
 	}
     
-    return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( declaration, count ) );
+    return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( size ) );
 }
 
 // ** OpenGLHal::createConstantBuffer
@@ -295,12 +297,8 @@ void OpenGLHal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter fi
 }
 
 // ** OpenGLHal::setVertexBuffer
-void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration )
+void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer )
 {
-    if( m_vertexDeclaration.valid() ) {
-        disableVertexDeclaration( m_vertexDeclaration );
-    }
-
 	if( !vertexBuffer.valid() ) {
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return;
@@ -310,7 +308,25 @@ void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer, const Vert
 		static_cast<OpenGLVertexBuffer*>( vertexBuffer.get() )->bind();
 	}
 
-	enableVertexDeclaration( ( const u8* )vertexBuffer->pointer(), vertexDeclaration.valid() ? vertexDeclaration : vertexBuffer->vertexDeclaration() );
+    m_activeVertexBuffer = vertexBuffer;
+
+    if( m_lastInputLayout != m_activeInputLayout ) {
+	    enableInputLayout( ( const u8* )vertexBuffer->pointer(), m_lastInputLayout );
+    }
+}
+
+// ** OpenGLHal::setInputLayout
+void OpenGLHal::setInputLayout( const InputLayoutPtr& inputLayout )
+{
+    if( m_activeInputLayout.valid() ) {
+        disableInputLayout( m_activeInputLayout );
+    }
+
+    m_lastInputLayout = inputLayout;
+
+    if( m_lastInputLayout != m_activeInputLayout && m_activeVertexBuffer.valid() ) {
+	    enableInputLayout( ( const u8* )m_activeVertexBuffer->pointer(), m_lastInputLayout );
+    }
 }
 
 // ** OpenGLHal::setConstantBuffer
@@ -321,28 +337,28 @@ void OpenGLHal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 
 #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
-// ** OpenGLHal::enableVertexDeclaration
-void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclarationWPtr& vertexDeclaration )
+// ** OpenGLHal::enableInputLayout
+void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inputLayout )
 {
     DC_CHECK_GL;
 
-    m_vertexDeclaration = vertexDeclaration;
+    m_activeInputLayout = inputLayout;
 
-    u32 stride = vertexDeclaration->vertexSize();
+    s32 stride = inputLayout->vertexSize();
 
-    const VertexDeclaration::VertexElement& normal     = vertexDeclaration->normal();
-    const VertexDeclaration::VertexElement& position   = vertexDeclaration->position();
-    const VertexDeclaration::VertexElement& color      = vertexDeclaration->color();
-    const VertexDeclaration::VertexElement& pointSize  = vertexDeclaration->pointSize();
+    const InputLayout::Element& normal     = inputLayout->normal();
+    const InputLayout::Element& position   = inputLayout->position();
+    const InputLayout::Element& color      = inputLayout->color();
+    const InputLayout::Element& pointSize  = inputLayout->pointSize();
 
     if( normal ) {
         glEnableClientState( GL_NORMAL_ARRAY );
-        glNormalPointer( GL_FLOAT, stride, pointer + normal.m_offset );
+        glNormalPointer( GL_FLOAT, stride, pointer + normal.offset );
     }
 
     if( color ) {
         glEnableClientState( GL_COLOR_ARRAY );
-        glColorPointer( color.m_count, GL_UNSIGNED_BYTE, stride, pointer + color.m_offset );
+        glColorPointer( color.count, GL_UNSIGNED_BYTE, stride, pointer + color.offset );
     }
 
     if( pointSize ) {
@@ -352,8 +368,8 @@ void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclarat
 	#endif
     }
 
-    for( u32 i = 0; i < VertexDeclaration::VertexTex4 - VertexDeclaration::VertexTex0; i++ ) {
-        const VertexDeclaration::VertexElement& uv = vertexDeclaration->uv( i );
+    for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
+        const InputLayout::Element& uv = inputLayout->uv( i );
         
         if( !uv ) {
             continue;
@@ -361,34 +377,34 @@ void OpenGLHal::enableVertexDeclaration( const u8 *pointer, const VertexDeclarat
 
         glClientActiveTexture( GL_TEXTURE0 + i );
         glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-        glTexCoordPointer( uv.m_count, GL_FLOAT, stride, pointer + uv.m_offset );
+        glTexCoordPointer( uv.count, GL_FLOAT, stride, pointer + uv.offset );
     }
 
     glEnableClientState( GL_VERTEX_ARRAY );
-    glVertexPointer( position.m_count, GL_FLOAT, stride, pointer + position.m_offset );
+    glVertexPointer( position.count, GL_FLOAT, stride, pointer + position.offset );
 }
 
-// ** OpenGLHal::disableVertexDeclaration
-void OpenGLHal::disableVertexDeclaration( const VertexDeclarationWPtr& vertexDeclaration )
+// ** OpenGLHal::disableInputLayout
+void OpenGLHal::disableInputLayout( const InputLayoutWPtr& inputLayout )
 {
     DC_CHECK_GL;
 
-    if( vertexDeclaration->normal() ) {
+    if( inputLayout->normal() ) {
         glDisableClientState( GL_NORMAL_ARRAY );
     }
 
-    if( vertexDeclaration->color() ) {
+    if( inputLayout->color() ) {
         glDisableClientState( GL_COLOR_ARRAY );
     }
 
-    if( vertexDeclaration->pointSize() ) {
+    if( inputLayout->pointSize() ) {
 	#ifndef DC_PLATFORM_WINDOWS
         glDisableClientState( GL_POINT_SIZE_ARRAY );
 	#endif
     }
 
-    for( u32 i = 0; i < VertexDeclaration::VertexTex4 - VertexDeclaration::VertexTex0; i++ ) {
-        if( vertexDeclaration->uv( i ) ) {
+    for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
+        if( inputLayout->uv( i ) ) {
             glClientActiveTexture( GL_TEXTURE0 + i );
             glDisableClientState( GL_TEXTURE_COORD_ARRAY );
         }
@@ -396,7 +412,7 @@ void OpenGLHal::disableVertexDeclaration( const VertexDeclarationWPtr& vertexDec
 
     glDisableClientState( GL_VERTEX_ARRAY );
 
-    m_vertexDeclaration = NULL;
+    m_activeInputLayout = NULL;
 }
 
 // ** OpenGLHal::setColorMask
@@ -1058,15 +1074,14 @@ bool OpenGLRenderTarget::setDepth( PixelFormat format )
 // ----------------------------------------------- OpenGLVertexBuffer ------------------------------------------------- //
 
 // ** OpenGLVertexBuffer::OpenGLVertexBuffer
-OpenGLVertexBuffer::OpenGLVertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count )
-	: VertexBuffer( vertexDeclaration, count, true )
+OpenGLVertexBuffer::OpenGLVertexBuffer( s32 size )
+	: VertexBuffer( size, true )
 {
-    DC_ABORT_IF( vertexDeclaration == NULL, "invalid vertex declaration" );
     DC_CHECK_GL;
     
 	glGenBuffers( 1, &m_id );
 	glBindBuffer( GL_ARRAY_BUFFER, m_id );
-	glBufferData( GL_ARRAY_BUFFER, count * m_vertexDeclaration->vertexSize(), NULL, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW );
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 

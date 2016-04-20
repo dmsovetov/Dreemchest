@@ -100,6 +100,7 @@ namespace Fx {
 		virtual void				flush( void ) = 0;
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! The built-in rendering interface.
 	class BuiltInRenderingInterface : public IRenderingInterface {
 	public:
@@ -135,6 +136,7 @@ namespace Fx {
 
 		Renderer::Renderer2DPtr		m_renderer;	//!< 2d rendering interface.
 	};
+#endif
 
     //! Base class for all particle renderers.
     class ParticleRenderer : public RefCounted {

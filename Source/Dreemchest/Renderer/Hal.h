@@ -121,13 +121,12 @@ namespace Renderer {
          */
         virtual ShaderPtr     createShader( CString vertex, CString fragment );
 
-        //! Creates a new vertex declaration object.
+        //! Creates an input layout object.
         /*!
-         \param format      Vertex format (see VertexDeclaration for details).
-         \param vertexSize  A single vertex size in bytes.
-         \return            VertexDeclaration instance.
+         \param vertexSize  Vertex size in bytes.
+         \return            InputLayout instance.
          */
-        virtual VertexDeclarationPtr  createVertexDeclaration( CString format, u32 vertexSize = 0 );
+        virtual InputLayoutPtr  createInputLayout( s32 vertexSize );
 
         //! Creates a new index buffer.
         /*!
@@ -144,7 +143,7 @@ namespace Renderer {
          \param GPU         Determines a location where to store the vertex buffer data (RAM or GPU).
          \return            VertexBuffer instance.
          */
-        virtual VertexBufferPtr   createVertexBuffer( const VertexDeclarationPtr& declaration, u32 count, bool GPU = true );
+        virtual VertexBufferPtr   createVertexBuffer( s32 size, bool GPU = true );
 
         //! Creates a new constant buffer.
         /*!
@@ -177,9 +176,14 @@ namespace Renderer {
         //! Binds a vertex buffer.
         /*!
          \param vertexBuffer        Vertex buffer to be bound.
-         \param vertexDeclaration   Override the vertex declaration.
          */
-        virtual void    setVertexBuffer( const VertexBufferPtr& vertexBuffer, const VertexDeclarationWPtr& vertexDeclaration = VertexDeclarationWPtr() );
+        virtual void    setVertexBuffer( const VertexBufferPtr& vertexBuffer );
+
+        //! Binds an input layout.
+        /*!
+         \param inputLayout         Input layout to be bound.
+         */
+        virtual void    setInputLayout( const InputLayoutPtr& inputLayout );
 
         //! Binds a constant buffer.
         /*!
@@ -305,17 +309,11 @@ namespace Renderer {
     #endif
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
-        Array<ConstantBufferWPtr>   m_constantBuffers;  //!< An array of bound constant buffers.
+        Array<ConstantBufferWPtr>   m_constantBuffers;      //!< An array of bound constant buffers.
     #endif   /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
-
-        //! Current rasterizer state.
-        //RasterizerState				m_rasterState2D;
-
-        //! Current blend state.
-        //BlendState					m_blendState2D;
-
-        //! Current vertex declaration.
-        VertexDeclarationWPtr		m_vertexDeclaration;
+        InputLayoutWPtr             m_lastInputLayout;      //!< An input layout that was set last time.
+        InputLayoutWPtr		        m_activeInputLayout;    //!< An active input layout.
+        VertexBufferWPtr            m_activeVertexBuffer;   //!< An active vertex buffer.
     };
 
     // ** class RenderResource
@@ -463,78 +461,79 @@ namespace Renderer {
 		u32							m_height;	//!< Render target height.
     };
 
-    // ** class VertexDeclaration
-    //! VertexDeclaration class instance is used to define a vertex layout.
-    //! The input format for vertex layout is formed from blocks [T][S]
-    //! separated by [:]. Where T is attribute type and S is an attribute size.
-    //! For example:
-    //!     P2:S        - xy  position + point size
-    //!     P3:T0:T1:C  - xyz position + uv 0 + uv 1 + RGBA color.
-    class VertexDeclaration : public RenderResource {
+    //! InputLayout class instance is used to define a vertex buffer layout.
+    class InputLayout : public RenderResource {
     friend class Hal;
     public:
 
-        // ** enum VertexAttribute
         //! Supported vertex attributes.
-        enum VertexAttribute {
-            VertexPosition,         //!< Vertex position.
-            VertexNormal,           //!< Vertex normal.
-            VertexColor,            //!< Vertex color.
-            VertexPointSize,        //!< Point sprite size.
-            VertexTex0,             //!< Texture 0 UV.
-            VertexTex1,             //!< Texture 1 UV.
-            VertexTex2,             //!< Texture 2 UV.
-            VertexTex3,             //!< Texture 3 UV.
-            VertexTex4,             //!< Texture 4 UV.
-
-            VertexAttributesTotal,  //!< Total amount of supported vertex attributes.
+        enum Attribute {
+            Position,               //!< Vertex position.
+            Normal,                 //!< Vertex normal.
+            Color,                  //!< Vertex color.
+            Uv0,                    //!< Texture 0 UV.
+            Uv1,                    //!< Texture 1 UV.
+            Uv2,                    //!< Texture 2 UV.
+            Uv3,                    //!< Texture 3 UV.
+            Uv4,                    //!< Texture 4 UV.
+            PointSize,              //!< Point sprite size.
+            TotalAttributes,  //!< Total amount of supported vertex attributes.
         };
 
-        // ** struct VertexElement
-        //! Vertex element.
-        struct VertexElement {
-            s32     m_count;    //!< Attribute size.
-            s32     m_offset;   //!< Attribute offset.
+        //! Input layout element.
+        struct Element {
+            s32     count;      //!< Attribute size.
+            s32     offset;     //!< Attribute offset.
 
-                    //! Constructs a new VertexElement instance.
-                    VertexElement( void ) : m_count( -1 ), m_offset( -1 ) {}
+                    //! Constructs a new Element instance.
+                    Element( void )
+                        : count( -1 )
+                        , offset( -1 )
+                        {
+                        }
 
             //! Returns true if this vertex element is used.
-            operator bool() const { return m_count > 0 && m_offset >= 0; }
+            operator bool() const { return count > 0 && offset >= 0; }
         };
 
     public:
 
-        //! Returns a total vertex size in bytes.
-        u32                     vertexSize( void ) const;
+        //! Returns a bitmask of available features.
+        s32                     features( void ) const;
+
+        //! Returns a vertex size in bytes.
+        s32                     vertexSize( void ) const;
+
+        //! Defines a vertex attribute location.
+        void                    attributeLocation( Attribute attribute, s32 count, s32 offset );
 
         //! Returns the vertex position attribute.
-        const VertexElement&    position( void ) const;
+        const Element&          position( void ) const;
+
+        //! Enables a color input.
+        void                    setColor( s32 size, s32 offset = -1 );
 
         //! Returns the vertex color attribute.
-        const VertexElement&    color( void ) const;
+        const Element&          color( void ) const;
 
         //! Returns the vertex normal attribute.
-        const VertexElement&    normal( void ) const;
+        const Element&          normal( void ) const;
 
         //! Returns the vertex UV attribute for a given sampler index.
-        const VertexElement&    uv( u32 sampler ) const;
+        const Element&          uv( u32 sampler ) const;
 
         //! Returns the point size attribute.
-        const VertexElement&    pointSize( void ) const;
+        const Element&          pointSize( void ) const;
 
     private:
 
-        //! Parses a vertex format from string.
-        bool                    parse( CString format );
+                                //! Constructs an InputLayout instance.
+                                InputLayout( s32 vertexSize );
 
     protected:
 
-        //! Vertex size in bytes.
-        u32                     m_vertexSize;
-
-        //! Array of vertex attributes.
-        VertexElement           m_vertexElements[VertexAttributesTotal];
+        s32                     m_vertexSize;                   //!< Vertex size in bytes.
+        Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
     };
 
 	//! Vertex buffer class.
@@ -543,15 +542,11 @@ namespace Renderer {
 
                                     //! Constructs a new VertexBuffer instance.
                                     /*!
-                                     \param vertexDeclaration Vertex buffer layout.
-                                     \param count Total number of vertices that are reside inside this buffer.
+                                     \param size A total vertex buffer size.
                                      \param gpu Specifies whether this buffer resides in GPU memory or not.
                                      */
-                                    VertexBuffer( const VertexDeclarationPtr& vertexDeclaration, u32 count, bool gpu );
+                                    VertexBuffer( s32 size, bool gpu );
 		virtual						~VertexBuffer( void );
-
-        //! Returns a vertex declaration of this vertex buffer.
-        const VertexDeclarationPtr&	vertexDeclaration( void ) const;
 
         //! Returns a pointer to buffer vertex data.
         const void*                 pointer( void ) const;
@@ -574,9 +569,6 @@ namespace Renderer {
 
     protected:
 
-        //! Vertex declaration.
-        const VertexDeclarationPtr	m_vertexDeclaration;
-
         //! Vertex buffer size.
         u32                         m_size;
 
@@ -591,7 +583,6 @@ namespace Renderer {
 	template<typename TVertex>
 	TVertex* VertexBuffer::lock( void )
 	{
-        DC_BREAK_IF( sizeof( TVertex ) != m_vertexDeclaration->vertexSize(), "vertex size mismatch" );
 		return reinterpret_cast<TVertex*>( lock() );
 	}
 

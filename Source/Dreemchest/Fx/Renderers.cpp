@@ -222,6 +222,7 @@ void ThickPathRenderer::render( const IMaterialWPtr& material, const Particle *p
 
 // ---------------------------------------------------- BuiltInRenderingInterface ---------------------------------------------------- //
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** BuiltInRenderingInterface::BuiltInRenderingInterface
 BuiltInRenderingInterface::BuiltInRenderingInterface( Renderer::Renderer2DPtr renderer ) : m_renderer( renderer )
 {
@@ -237,19 +238,22 @@ void BuiltInRenderingInterface::renderPoints( const Vec3* position, const Rgba* 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride )
 {
-	m_renderer->points( position, color, size, count, stride );
+	DC_NOT_IMPLEMENTED;
+//	m_renderer->points( position, color, size, count, stride );
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
 {
-	m_renderer->orientedQuad( Renderer::Texture2DWPtr(), x, y, width, height, up, side, color );
+	DC_NOT_IMPLEMENTED;
+//	m_renderer->orientedQuad( Renderer::Texture2DWPtr(), x, y, width, height, up, side, color );
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 )
 {
-	m_renderer->line( x1, y1, x2, y2, color1, color2 );
+	DC_NOT_IMPLEMENTED;
+//	m_renderer->line( x1, y1, x2, y2, color1, color2 );
 }
 
 // ** uiltInRenderingInterface::renderPoints
@@ -273,8 +277,10 @@ void BuiltInRenderingInterface::renderThickLineStrip( const IMaterialWPtr& mater
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::flush( void )
 {
-	m_renderer->flush();
+	DC_NOT_IMPLEMENTED;
+//	m_renderer->flush();
 }
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Fx
 
