@@ -245,34 +245,41 @@ namespace Scene {
     class PointCloud : public Ecs::Component<PointCloud> {
     public:
 
-                            //! Constructs PointCloud instance.
-                            PointCloud( s32 vertexCount = 0, const VertexFormat& format = VertexFormat::Color | VertexFormat::Normal );
-                            ~PointCloud( void );
+                                //! Constructs PointCloud instance.
+                                PointCloud( s32 vertexCount = 0, const VertexFormat& format = VertexFormat::Color | VertexFormat::Normal );
+                                ~PointCloud( void );
 
         //! Resizes a point cloud.
-        void                resize( s32 vertexCount );
+        void                    resize( s32 vertexCount );
 
         //! Clears a point cloud.
-        void                clear( void );
+        void                    clear( void );
+
+        //! Returns a point cloud material.
+        const MaterialHandle&   material( void ) const;
+
+        //! Sets a point cloud material.
+        void                    setMaterial( const MaterialHandle& value );
 
         //! Returns a vertex format.
-        const VertexFormat& vertexFormat( void ) const;
+        const VertexFormat&     vertexFormat( void ) const;
 
         //! Sets a vertex format.
-        void                setVertexFormat( const VertexFormat& value );
+        void                    setVertexFormat( const VertexFormat& value );
 
         //! Returns a total number of points inside a cloud.
-        s32                 vertexCount( void ) const;
+        s32                     vertexCount( void ) const;
 
         //! Returns point cloud vertices.
-        const void*         vertices( void ) const;
-        void*               vertices( void );
+        const void*             vertices( void ) const;
+        void*                   vertices( void );
 
     private:
 
-        VertexFormat        m_format;       //!< A point cloud vertex format.
-        u8*                 m_vertices;     //!< A point cloud vertices.
-        s32                 m_vertexCount;  //!< A total number of vertices inside a point cloud.
+        VertexFormat            m_format;       //!< A point cloud vertex format.
+        u8*                     m_vertices;     //!< A point cloud vertices.
+        s32                     m_vertexCount;  //!< A total number of vertices inside a point cloud.
+        MaterialHandle          m_material;     //!< A point cloud material instance.
     };
 
 	//! Holds the sprite rendering info.
