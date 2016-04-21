@@ -40,7 +40,7 @@ namespace Scene {
 RenderDepthComplexity::RenderDepthComplexity( const Rgba& color, f32 intensity )
     : m_intensity( intensity )
 {
-    for( s32 i = 0; i < TotalRenderModes; i++ ) {
+    for( s32 i = 0; i < RenderingMode::Total; i++ ) {
         m_color[i] = color;
     }
 }

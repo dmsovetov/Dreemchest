@@ -33,8 +33,8 @@ namespace Scene {
 
 // ** Material::Material
 Material::Material( void )
-    : m_lightingModel( LightingModelUnlit )
-    , m_renderingMode( RenderOpaque )
+    : m_lightingModel( LightingModel::Unlit )
+    , m_renderingMode( RenderingMode::Opaque )
     , m_isTwoSided( false )
     , m_features( 0 )
 {

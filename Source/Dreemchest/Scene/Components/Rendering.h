@@ -90,8 +90,8 @@ namespace Scene {
 
     private:
 
-        Rgba                    m_color[TotalRenderModes];  //!< Output colors used for each of rendering modes.
-        f32                     m_intensity;                //!< The color intensity.
+        Rgba                    m_color[RenderingMode::Total];  //!< Output colors used for each of rendering modes.
+        f32                     m_intensity;                    //!< The color intensity.
 	};
 
 	//! This component is attached to a camera to render an ambient lighting.

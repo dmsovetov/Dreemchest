@@ -146,19 +146,19 @@ bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::
 	Json::Value parameters = root["parameters"];
 
 	if( shader.find( "cutout" ) != String::npos ) {
-		asset.setRenderingMode( RenderCutout );
+		asset.setRenderingMode( RenderingMode::Cutout );
 	}
 	else if( shader.find( "transparent" ) != String::npos ) {
-		asset.setRenderingMode( RenderTranslucent );
+		asset.setRenderingMode( RenderingMode::Translucent );
 	}
 	else if( shader.find( "additive" ) != String::npos ) {
-		asset.setRenderingMode( RenderAdditive );
+		asset.setRenderingMode( RenderingMode::Additive );
 	}
 	else {
-		asset.setRenderingMode( RenderOpaque );
+		asset.setRenderingMode( RenderingMode::Opaque );
 	}
 	
-	asset.setLightingModel( LightingModelPhong );
+	asset.setLightingModel( LightingModel::Phong );
 	asset.setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
 	asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
 

@@ -378,14 +378,9 @@ namespace Scene {
 #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Available rendering modes.
-	enum RenderingMode {
-		  RenderOpaque		//!< Renders opaque.
-		, RenderCutout		//!< Renders object with an alpha test.
-		, RenderTranslucent	//!< Renders object with alpha blending.
-		, RenderAdditive	//!< Renders objects with additive blending.
-		, TotalRenderModes	//!< Total number of render modes.
-	};
+    NIMBLE_DECLARE_ENUM( RenderingMode, Opaque, Cutout, Translucent, Additive )
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Rendering mode mask.
 	enum RenderingModeBits {
 		  RenderOpaqueBit		= BIT( RenderOpaque )		//!< Opaque rendering bit.
@@ -394,15 +389,12 @@ namespace Scene {
 		, RenderAdditiveBit		= BIT( RenderAdditive )		//!< Additive rendering bit.
 		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Available lighting models.
-	enum LightingModel {
-		  LightingModelUnlit       //!< Object is not lit by any light sources.
-		, LightingModelAmbient     //!< Object is only lit by an ambient light source.
-		, LightingModelPhong       //!< Object is lit by all light sources that affect it.
-		, TotalLightingModels      //!< The total number of lighting models.
-	};
+    NIMBLE_DECLARE_ENUM( LightingModel, Unlit, Ambient, Phong )
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Lighting models bit masks.
 	enum LightingModelBits {
 		  LightingModelUnlitBit     = BIT( LightingModelUnlit )		//!< Unlit model bit.
@@ -410,6 +402,7 @@ namespace Scene {
 		, LightingModelPhongBit	    = BIT( LightingModelPhong )	    //!< Phong lighting model bit.
 		, AllLightingModelsBit		= LightingModelUnlit | LightingModelAmbient | LightingModelPhong
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! 3 coordinate plane types.
 	enum CoordinatePlane {
