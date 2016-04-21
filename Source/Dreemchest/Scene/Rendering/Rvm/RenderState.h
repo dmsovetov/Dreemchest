@@ -57,6 +57,7 @@ namespace Scene {
 
     enum ShaderMaterialFeatures {
           ShaderAmbientColor
+        , ShaderPointLight
         , TotalMaterialFeatures
         , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
     };
@@ -88,6 +89,7 @@ namespace Scene {
             , PassConstants         //!< A constant buffer that stores a pass variables (view-projection matrix, light color, etc.).
             , InstanceConstants     //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
             , MaterialConstants     //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
+            , LightConstants        //!< A constant buffer that stores light variables (color, position, etc.).
             , MaxConstantBuffers    //!< A maximum number of supported constant buffers.
         };
 

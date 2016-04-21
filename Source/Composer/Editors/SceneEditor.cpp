@@ -330,7 +330,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
             for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
                 Vec3 position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
-                u32  color    = Rgba( 0.2f, 0.2f, 0.2f, 1.0f ).toInteger();
+                u32  color    = Rgba( 0.0f, 0.6f, 0.2f, 1.0f ).toInteger();
 
                 vertexFormat.setVertexAttribute( Scene::VertexFormat::Position, position, vertices, i );
                 vertexFormat.setVertexAttribute( Scene::VertexFormat::Normal, Vec3::normalize( position ), vertices, i );

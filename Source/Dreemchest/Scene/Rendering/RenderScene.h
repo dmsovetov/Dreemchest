@@ -54,6 +54,12 @@ namespace Scene {
                 Rgba        specular;
                 Rgba        emission;
             };
+            struct Light {
+                Vec3        position;
+                f32         radius;
+                Rgb         color;
+                f32         intensity;
+            };
         };
 
         //! Base class for all renderable entities.

@@ -42,6 +42,12 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 
     m_sceneConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Scene ), false );
     m_sceneConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( RenderScene::CBuffer::Scene, ambient ), "Scene.ambient" );
+
+    m_lightConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Light ), false );
+    m_lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( RenderScene::CBuffer::Light, position ), "Light.position" );
+    m_lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( RenderScene::CBuffer::Light, radius ), "Light.radius" );
+    m_lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( RenderScene::CBuffer::Light, color ), "Light.color" );
+    m_lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( RenderScene::CBuffer::Light, intensity ), "Light.intensity" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
@@ -49,7 +55,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
 {
     // Update scene constant buffer
     RenderScene::CBuffer::Scene* sceneConstants = m_sceneConstants->lock<RenderScene::CBuffer::Scene>();
-    sceneConstants->ambient = Rgba( 0.3f, 0.3f, 0.4f, 1.0f );
+    sceneConstants->ambient = Rgba( 1.3f, 0.3f, 0.4f, 1.0f );
     m_sceneConstants->unlock();
 
     // Update camera constant buffer
@@ -57,12 +63,22 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
     renderPassConstants->viewProjection = camera.calculateViewProjection( transform.matrix() );
     m_cameraConstants->unlock();
 
+    // Update light constant buffer
+    RenderScene::CBuffer::Light* lightConstants = m_lightConstants->lock<RenderScene::CBuffer::Light>();
+    lightConstants->position    = Vec3( 10, 5, 10 );
+    lightConstants->radius      = 10;
+    lightConstants->color       = Rgb( 1.0f, 0.6f, 1.0f );
+    lightConstants->intensity   = 5.0f;
+    m_lightConstants->unlock();
+
     // Pass state block
     RenderStateBlock& pass = stateStack.push();
     pass.bindProgram( frame.internShader( m_pointCloudShader ) );
     pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
+    pass.bindConstantBuffer( frame.internConstantBuffer( m_lightConstants ), RenderState::LightConstants );
+    pass.enableFeatures( BIT( ShaderPointLight ) );
     pass.enableFeatures( BIT( ShaderAmbientColor ) );
 
     RenderCommandBuffer& commands = frame.createCommandBuffer();

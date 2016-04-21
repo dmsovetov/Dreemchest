@@ -106,7 +106,8 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
     masks["texture1"]           = BIT( ShaderTexture1        + ResourceFeaturesOffset );
     masks["texture2"]           = BIT( ShaderTexture2        + ResourceFeaturesOffset );  
     masks["texture3"]           = BIT( ShaderTexture3        + ResourceFeaturesOffset ); 
-    masks["ambientColor"]    = BIT( ShaderAmbientColor + MaterialFeaturesOffset );
+    masks["ambientColor"]       = BIT( ShaderAmbientColor    + MaterialFeaturesOffset );
+    masks["pointLight"]         = BIT( ShaderPointLight      + MaterialFeaturesOffset );
 
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
@@ -153,7 +154,7 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
                 struct CBufferCamera   { mat4 viewProjection; };    \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
-                struct CBufferLight    { vec3 color; float intensity; vec3 position; float radius; };         \n\
+                struct CBufferLight    { vec3 position; float radius; vec3 color; float intensity; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferCamera   Camera;                     \n\
                 uniform CBufferInstance Instance;                   \n\
