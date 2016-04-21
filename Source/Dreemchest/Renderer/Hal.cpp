@@ -203,6 +203,10 @@ void Hal::setPolygonMode( PolygonMode mode )
 void Hal::setShader( const ShaderPtr& shader )
 {
 #if DEV_RENDERER_SOFTWARE_CBUFFERS
+    if( !shader.valid() ) {
+        return;
+    }
+
     // Process each bound constant buffer
     for( s32 i = 0, n = static_cast<s32>( m_constantBuffers.size() ); i < n; i++ ) {
         // Get a constant buffer at index
