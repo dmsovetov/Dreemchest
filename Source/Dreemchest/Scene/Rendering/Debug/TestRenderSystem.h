@@ -45,10 +45,6 @@ namespace Scene {
 
     private:
 
-        struct CameraConstants {
-            Matrix4     viewProjection;
-        };
-
         UbershaderPtr                   m_pointCloudShader;
         Renderer::ConstantBufferPtr     m_cameraConstants;
     };

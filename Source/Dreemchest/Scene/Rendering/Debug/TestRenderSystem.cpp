@@ -98,15 +98,15 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
             "
         );
 
-    m_cameraConstants = hal->createConstantBuffer( sizeof( CameraConstants ), false );
-    m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CameraConstants, viewProjection ), "Camera.viewProjection" );
+    m_cameraConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Camera ), false );
+    m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( RenderScene::CBuffer::Camera, viewProjection ), "Camera.viewProjection" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     // Update camera constant buffer
-    CameraConstants* renderPassConstants = m_cameraConstants->lock<CameraConstants>();
+    RenderScene::CBuffer::Camera* renderPassConstants = m_cameraConstants->lock<RenderScene::CBuffer::Camera>();
     renderPassConstants->viewProjection = camera.calculateViewProjection( transform.matrix() );
     m_cameraConstants->unlock();
 
