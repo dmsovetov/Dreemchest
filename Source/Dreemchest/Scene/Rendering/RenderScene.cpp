@@ -86,6 +86,85 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     return frame;
 }
 
+// ** RenderScene::createShader
+UbershaderPtr RenderScene::createShader( const String& fileName ) const
+{
+	static CString vertexShaderMarker   = "[VertexShader]";
+	static CString fragmentShaderMarker = "[FragmentShader]";
+    static CString featuresMarker       = "[Features]";
+
+    Map<String, u64> masks;
+
+    masks["inputNormal"]        = BIT( ShaderInputNormal     + InputFeaturesOffset );
+    masks["inputColor"]         = BIT( ShaderInputColor      + InputFeaturesOffset );
+    masks["inputUv0"]           = BIT( ShaderInputUv0        + InputFeaturesOffset );
+    masks["inputUv1"]           = BIT( ShaderInputUv1        + InputFeaturesOffset );
+    masks["inputUv2"]           = BIT( ShaderInputUv2        + InputFeaturesOffset );
+    masks["inputUv3"]           = BIT( ShaderInputUv3        + InputFeaturesOffset );
+    masks["inputUv4"]           = BIT( ShaderInputUv4        + InputFeaturesOffset );
+    masks["texture0"]           = BIT( ShaderTexture0        + ResourceFeaturesOffset );
+    masks["texture1"]           = BIT( ShaderTexture1        + ResourceFeaturesOffset );
+    masks["texture2"]           = BIT( ShaderTexture2        + ResourceFeaturesOffset );  
+    masks["texture3"]           = BIT( ShaderTexture3        + ResourceFeaturesOffset ); 
+    masks["ambientColor"]    = BIT( ShaderAmbientColor + MaterialFeaturesOffset );
+
+    // Create a shader instance
+    UbershaderPtr shader = DC_NEW Ubershader;
+
+	// Read the code from an input stream
+	String code = Io::DiskFileSystem::readTextFile( fileName );
+
+	// Extract vertex/fragment shader code blocks
+	u32 vertexBegin = code.find( vertexShaderMarker );
+	u32 fragmentBegin = code.find( fragmentShaderMarker );
+    u32 featuresBegin = code.find( featuresMarker );
+
+	if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
+		return false;
+	}
+
+    if( featuresBegin != String::npos ) {
+        u32 featuresCodeStart = featuresBegin + strlen( featuresMarker );
+        Array<String> features = split( code.substr( featuresCodeStart, vertexBegin - featuresCodeStart ), "\r\n" );
+
+        for( Array<String>::const_iterator i = features.begin(), end = features.end(); i != end; ++i ) {
+            Array<String> value = split( *i, " \t=" );
+            shader->addFeature( masks[value[1]], value[0] );
+            LogVerbose( "shader", "feature %s = %s (0x%x) added\n", value[0].c_str(), value[1].c_str(), masks[value[1]] );
+        }
+    }
+
+	if( vertexBegin != String::npos ) {
+		u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
+		String vertex = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
+        shader->setVertex( vertex );
+	}
+
+	if( fragmentBegin != String::npos ) {
+		u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
+		String fragment = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
+        shader->setFragment( fragment );
+	}
+
+    // ----------------------------------------------------
+    shader->addInclude(
+            "                                                       \n\
+                struct CBufferScene    { vec4 ambient; };           \n\
+                struct CBufferCamera   { mat4 viewProjection; };    \n\
+                struct CBufferInstance { mat4 transform; };         \n\
+                struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
+                struct CBufferLight    { vec3 color; float intensity; vec3 position; float radius; };         \n\
+                uniform CBufferScene    Scene;                      \n\
+                uniform CBufferCamera   Camera;                     \n\
+                uniform CBufferInstance Instance;                   \n\
+                uniform CBufferMaterial Material;                   \n\
+                uniform CBufferLight    Light;                      \n\
+            "
+        );
+
+	return shader;
+}
+
 // ** RenderScene::updateInstanceConstants
 void RenderScene::updateInstanceConstants( void )
 {

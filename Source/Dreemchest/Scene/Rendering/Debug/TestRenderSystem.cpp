@@ -35,78 +35,7 @@ namespace Scene {
 TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal )
     : RenderSystemBase( renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
-    m_pointCloudShader = DC_NEW Ubershader;
-    m_pointCloudShader->addFeature( FeatureInputNormal, "F_NormalAttribute" );
-    m_pointCloudShader->addFeature( FeatureInputColor, "F_ColorAttribute" );
-    m_pointCloudShader->addFeature( FeatureMaterialAmbient, "F_AmbientColor" );
-
-    m_pointCloudShader->addInclude(
-            "                                                       \n\
-                struct CBufferScene    { vec4 ambient; };           \n\
-                struct CBufferCamera   { mat4 viewProjection; };    \n\
-                struct CBufferInstance { mat4 transform; };         \n\
-                struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
-                uniform CBufferScene    Scene;                      \n\
-                uniform CBufferCamera   Camera;                     \n\
-                uniform CBufferInstance Instance;                   \n\
-                uniform CBufferMaterial Material;                   \n\
-            "
-        );
-
-    m_pointCloudShader->setVertex(
-            "                                                       \n\
-            #ifdef F_ColorAttribute                                 \n\
-                varying vec4 v_Color;                               \n\
-            #endif  /*  F_ColorAttribute    */                      \n\
-                                                                    \n\
-            #ifdef F_NormalAttribute                                \n\
-                varying vec3 v_Normal;                              \n\
-            #endif  /*  F_NormalAttribute    */                     \n\
-                                                                    \n\
-                void main() {                                       \n\
-                    gl_Position     = Camera.viewProjection * Instance.transform * gl_Vertex;   \n\
-                    gl_PointSize    = 5;                            \n\
-            #ifdef F_ColorAttribute                                 \n\
-                    v_Color         = gl_Color;                     \n\
-            #endif  /*  F_ColorAttribute    */                      \n\
-                                                                    \n\
-            #ifdef F_NormalAttribute                                \n\
-                    v_Normal        = gl_Normal;                    \n\
-            #endif  /*  F_NormalAttribute    */                     \n\
-                }                                                   \n\
-            "
-        );
-
-    m_pointCloudShader->setFragment(
-            "                                                           \n\
-            #ifdef F_ColorAttribute                                     \n\
-                varying vec4 v_Color;                                   \n\
-            #endif  /*  F_ColorAttribute    */                          \n\
-                                                                        \n\
-            #ifdef F_NormalAttribute                                    \n\
-                varying vec3 v_Normal;                                  \n\
-            #endif  /*  F_NormalAttribute    */                         \n\
-                                                                        \n\
-                void main()                                             \n\
-                {                                                       \n\
-            #ifdef F_ColorAttribute                                     \n\
-                    vec4 color = v_Color;                               \n\
-            #else                                                       \n\
-                    vec4 color = vec4( 1.0, 1.0, 1.0, 1.0 );            \n\
-            #endif  /*  F_ColorAttribute    */                          \n\
-                                                                        \n\
-            #ifdef F_NormalAttribute                                    \n\
-                    color = color * vec4( v_Normal * 0.5 + 0.5, 1.0 );  \n\
-            #endif  /*  F_NormalAttribute    */                         \n\
-                                                                        \n\
-            #ifdef F_AmbientColor                                       \n\
-                    color = color + Scene.ambient;                      \n\
-            #endif  /*  F_AmbientColor    */                            \n\
-                                                                        \n\
-                    gl_FragColor = Material.emission + color * Material.diffuse;            \n\
-                }                                                       \n\
-            "
-        );
+    m_pointCloudShader = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
 
     m_cameraConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Camera ), false );
     m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( RenderScene::CBuffer::Camera, viewProjection ), "Camera.viewProjection" );
@@ -134,7 +63,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
     pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
-    pass.enableFeatures( BIT( ShaderMaterialAmbient ) );
+    pass.enableFeatures( BIT( ShaderAmbientColor ) );
 
     RenderCommandBuffer& commands = frame.createCommandBuffer();
     const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();
@@ -150,7 +79,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
 
         const Material& material = pointCloud.material.readLock();
         if( material.lightingModel() == LightingModel::Unlit ) {
-            instance.disableFeatures( BIT( ShaderMaterialAmbient ) );
+            instance.disableFeatures( BIT( ShaderAmbientColor ) );
         }
 
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );

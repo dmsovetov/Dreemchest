@@ -56,7 +56,7 @@ namespace Scene {
     };
 
     enum ShaderMaterialFeatures {
-          ShaderMaterialAmbient
+          ShaderAmbientColor
         , TotalMaterialFeatures
         , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
     };
@@ -73,7 +73,7 @@ namespace Scene {
         , FeatureTexture1           = BIT( ShaderTexture1        + ResourceFeaturesOffset )  
         , FeatureTexture2           = BIT( ShaderTexture2        + ResourceFeaturesOffset )  
         , FeatureTexture3           = BIT( ShaderTexture3        + ResourceFeaturesOffset )  
-        , FeatureMaterialAmbient    = BIT( ShaderMaterialAmbient + MaterialFeaturesOffset )
+        , FeatureAmbientColor       = BIT( ShaderAmbientColor    + MaterialFeaturesOffset )
     };
     // ------------------------------------------------------------------------------------------------
 

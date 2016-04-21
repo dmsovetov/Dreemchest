@@ -88,6 +88,9 @@ namespace Scene {
         //! Captures scene rendering state and returns an array of resulting command buffers.
         RenderFrameUPtr                         captureFrame( void );
 
+        //! Creates a ubershader from a file.
+        UbershaderPtr                           createShader( const String& fileName ) const;
+
         //! Creates a new render scene.
         static RenderScenePtr                   create( SceneWPtr scene, Renderer::HalWPtr hal );
 
