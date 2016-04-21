@@ -47,7 +47,7 @@ namespace Scene {
 
         UbershaderPtr                   m_pointCloudShader;
         Renderer::ConstantBufferPtr     m_cameraConstants;
-        Renderer::ConstantBufferPtr     m_lightConstants;
+    //    Renderer::ConstantBufferPtr     m_lightConstants;
     };
 
 } // namespace Scene

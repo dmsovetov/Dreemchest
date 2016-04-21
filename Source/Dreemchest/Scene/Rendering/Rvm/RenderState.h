@@ -58,6 +58,7 @@ namespace Scene {
     enum ShaderMaterialFeatures {
           ShaderAmbientColor
         , ShaderPointLight
+        , ShaderEmissionColor
         , TotalMaterialFeatures
         , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
     };
@@ -79,7 +80,7 @@ namespace Scene {
     // ------------------------------------------------------------------------------------------------
 
     //! A maximum number of state blocks that can be pushed onto a state stack.
-    enum { MaxStateStackDepth = 4 };
+    enum { MaxStateStackDepth = 5 };
 
     //! Render state defines a single state change.
     struct RenderState {

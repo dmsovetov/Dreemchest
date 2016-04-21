@@ -56,7 +56,7 @@ namespace Scene {
             };
             struct Light {
                 Vec3        position;
-                f32         radius;
+                f32         range;
                 Rgb         color;
                 f32         intensity;
             };
@@ -64,8 +64,8 @@ namespace Scene {
 
         //! Base class for all renderable entities.
         struct Node {
-            const Transform*                    transform;      //!< Mesh transform component.
-            const Matrix4*                      matrix;         //!< Mesh transform affine matrix.
+            const Transform*                    transform;          //!< Node transform component.
+            const Matrix4*                      matrix;             //!< Node transform affine matrix.
         };
 
         //! Stores info about a renderable point cloud.
@@ -73,19 +73,31 @@ namespace Scene {
             MaterialHandle                      material;
             Renderer::VertexBufferPtr           vertexBuffer;       //!< A point cloud vertex buffer.
             Renderer::InputLayoutPtr            inputLayout;        //!< A point cloud input layout.
-            Renderer::ConstantBufferPtr         instanceConstants;  //!< A point cloud constant buffer instance.
+            Renderer::ConstantBufferPtr         instanceConstants;  //!< Node instance constant buffer.
             Renderer::ConstantBufferPtr         materialConstants;  //!< A point cloud material options.       
             s32                                 vertexCount;        //!< A total number of vertices inside a point cloud.
         };
 
+        //! Stores info about a renderable light.
+        struct LightNode : public Node {
+            const Light*                        light;              //!< Light component.
+            Renderer::ConstantBufferPtr         lightConstants;     //!< Light parameters constant buffer.
+        };
+
         //! A fixed array with renderable point clouds inside.
         typedef FixedArray<PointCloudNode>      PointClouds;
+
+        //! A fixed array with light nodes inside.
+        typedef FixedArray<LightNode>           Lights;
 
         //! Returns parent scene.
         SceneWPtr                               scene( void ) const;
 
         //! Returns renderable point clouds.
         const PointClouds&                      pointClouds( void ) const;
+
+        //! Returns light nodes.
+        const Lights&                           lights( void ) const;
 
 		//! Adds a new render system to the scene.
 		template<typename TRenderSystem, typename ... TArgs>
@@ -108,6 +120,9 @@ namespace Scene {
         //! Creates a point cloud node from an entity.
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
 
+        //! Creates a light  node from an entity.
+        LightNode                               createLightNode( const Ecs::Entity& entity );
+
         //! Creates a vertex declaration from a point cloud format.
         Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
 
@@ -122,11 +137,15 @@ namespace Scene {
         //! Entity data cache to store renderable point clouds.
         typedef Ecs::DataCache<PointCloudNode>  PointCloudCache;
 
+        //! Entity data cache to store light nodes.
+        typedef Ecs::DataCache<LightNode>       LightCache;
+
         Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
         Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
+        Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
     };
 
 	// ** RenderScene::addRenderSystem

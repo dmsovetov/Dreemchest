@@ -2,6 +2,7 @@
 F_NormalAttribute = inputNormal
 F_ColorAttribute  = inputColor
 F_AmbientColor	  = ambientColor
+F_EmissionColor	  = emissionColor
 F_PointLight	  = pointLight
 
 [VertexShader]
@@ -49,14 +50,24 @@ void main()
 #endif  /*  F_ColorAttribute    */
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
-	float d   = length( v_LightDir ) / Light.radius;
+	float d   = length( v_LightDir ) / Light.range;
 	float att = 1.0 / (1.0 + 25.0 * d * d);
 	color 	  = color * max( dot( v_Normal, v_LightDir ), 0.0 ) * vec4( Light.color, 1.0 ) * Light.intensity * att;
 #endif  /*  F_NormalAttribute    */
 
+#if !defined( F_NormalAttribute ) && defined( F_PointLight )
+	color = vec4( 0.0, 0.0, 0.0, 1.0 );
+#endif
+
 #if defined( F_AmbientColor )
-	color = color + Scene.ambient;
+	color = color * Scene.ambient;
 #endif  /*  F_AmbientColor    */
 
-	gl_FragColor = Material.emission + color * Material.diffuse;
+	vec4 finalColor = color * Material.diffuse;
+	
+#if defined( F_EmissionColor )
+	finalColor = finalColor + Material.emission;
+#endif	/*	F_EmissionColor	*/
+
+	gl_FragColor = finalColor;
 }

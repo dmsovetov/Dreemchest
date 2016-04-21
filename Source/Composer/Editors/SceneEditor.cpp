@@ -288,7 +288,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     {
         Assets::WriteLock<Scene::Material> writable = red.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 0.5f, 0.25f ) );
-        writable->setColor( Scene::Material::Emission, Rgba( 0.2f, 0.0f, 0.0f ) );
+        writable->setColor( Scene::Material::Emission, Rgba( 0.4f, 0.4f, 0.4f ) );
         writable->setLightingModel( Scene::LightingModel::Unlit );
     }
     Scene::MaterialHandle green = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
@@ -314,6 +314,20 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         , green
         , blue
     };
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 5.0f );
+        scene->addSceneObject( light );
+    }
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 5.0f );
+        scene->addSceneObject( light );
+    }
 
     for( s32 i = 0; i < count; i++ )
     {

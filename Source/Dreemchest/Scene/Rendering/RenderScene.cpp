@@ -38,6 +38,7 @@ RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
 {
     // Create entity caches
     m_pointClouds = scene->ecs()->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
+    m_lights      = scene->ecs()->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
 
     // Create scene constant buffer
     m_sceneConstants = hal->createConstantBuffer( sizeof( CBuffer::Scene ), false );
@@ -62,6 +63,12 @@ const RenderScene::PointClouds& RenderScene::pointClouds( void ) const
     return m_pointClouds->data();
 }
 
+// ** RenderScene::lights
+const RenderScene::Lights& RenderScene::lights( void ) const
+{
+    return m_lights->data();
+}
+
 // ** RenderScene::captureFrame
 RenderFrameUPtr RenderScene::captureFrame( void )
 {
@@ -78,6 +85,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.disableAlphaTest();
     defaults.disableBlending();
     defaults.setDepthState( Renderer::LessEqual, true );
+    defaults.enableFeatures( BIT( ShaderAmbientColor ) );
     defaults.bindConstantBuffer( frame->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
 
     // Process all render systems
@@ -99,7 +107,7 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
     static CString featuresMarker       = "[Features]";
 
     Map<String, u64> masks;
-
+    
     masks["inputNormal"]        = BIT( ShaderInputNormal     + InputFeaturesOffset );
     masks["inputColor"]         = BIT( ShaderInputColor      + InputFeaturesOffset );
     masks["inputUv0"]           = BIT( ShaderInputUv0        + InputFeaturesOffset );
@@ -113,6 +121,7 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
     masks["texture3"]           = BIT( ShaderTexture3        + ResourceFeaturesOffset ); 
     masks["ambientColor"]       = BIT( ShaderAmbientColor    + MaterialFeaturesOffset );
     masks["pointLight"]         = BIT( ShaderPointLight      + MaterialFeaturesOffset );
+    masks["emissionColor"]      = BIT( ShaderEmissionColor   + MaterialFeaturesOffset );
 
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
@@ -159,7 +168,7 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
                 struct CBufferView     { mat4 transform; };    \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
-                struct CBufferLight    { vec3 position; float radius; vec3 color; float intensity; };         \n\
+                struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\
@@ -176,8 +185,24 @@ void RenderScene::updateConstantBuffers( void )
 {
     // Update scene constant buffer
     CBuffer::Scene* sceneConstants = m_sceneConstants->lock<CBuffer::Scene>();
-    sceneConstants->ambient = Rgba( 1.3f, 0.3f, 0.4f, 1.0f );
+    sceneConstants->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );
     m_sceneConstants->unlock();
+
+    // Update light constant buffers
+    Lights& light = m_lights->data();
+
+    for( s32 i = 0, n = light.count(); i < n; i++ ) {
+        LightNode& node = light[i];
+
+        {
+            CBuffer::Light* cbuffer = node.lightConstants->lock<CBuffer::Light>();
+            cbuffer->position  = node.transform->worldSpacePosition();
+            cbuffer->intensity = node.light->intensity();
+            cbuffer->color     = node.light->color();
+            cbuffer->range     = node.light->range();
+            node.lightConstants->unlock();
+        }
+    }
 
     // Update instance constant buffers
     PointClouds& pointClouds = m_pointClouds->data();
@@ -224,6 +249,24 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
     node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
 
     return node;
+}
+
+// ** RenderScene::createLightNode
+RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
+{
+    LightNode light;
+
+    light.transform = entity.get<Transform>();
+    light.matrix    = &light.transform->matrix();
+    light.light     = entity.get<Light>();
+
+    light.lightConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Light ), false );
+    light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, position ), "Light.position" );
+    light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, range ), "Light.range" );
+    light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, color ), "Light.color" );
+    light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, intensity ), "Light.intensity" );
+
+    return light;
 }
 
 // ** RenderScene::createInputLayout
