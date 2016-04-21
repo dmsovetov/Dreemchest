@@ -291,20 +291,6 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
             p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
             Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( points, vertexFormats[c++ % 3] );
 
-       /*     c++; c = c % 3;
-
-            if( c == 0 ) {
-                pointCloud->setVertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal );
-            }
-            else if( c == 1 ) {
-                pointCloud->setVertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Normal );
-            }
-            else if( c == 2 ) {
-                pointCloud->setVertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color );
-            } else {
-                DC_NOT_IMPLEMENTED;
-            }*/
-
             void* vertices = pointCloud->vertices();
             const Scene::VertexFormat& vertexFormat = pointCloud->vertexFormat();
 

@@ -103,7 +103,7 @@ namespace Reflection {
 		typedef HashMap<u64, TypeConverter> TypeConverters;
 
 		//! Container type to store property serializers/deserializers.
-		typedef HashMap<String64, PropertyDefault, String64Hasher> PropertyDefaults;
+		typedef HashMap<String64, PropertyDefault> PropertyDefaults;
 
 		TypeConverters			m_typeConverters;	    //!< Custom type converters.
 		PropertyDefaults		m_defaults;				//!< Property default value callbacks.
