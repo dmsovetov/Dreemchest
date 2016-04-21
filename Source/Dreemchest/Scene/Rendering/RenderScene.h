@@ -40,6 +40,9 @@ namespace Scene {
 
         //! A constant buffer types
         struct CBuffer {
+            struct Scene {
+                Rgba        ambient;
+            };
             struct Camera {
                 Matrix4     viewProjection;
             };
@@ -56,6 +59,7 @@ namespace Scene {
 
         //! Stores info about a renderable point cloud.
         struct PointCloudNode : public Node {
+            const PointCloud*                   pointCloud;     //!< A point cloud component.
             Renderer::VertexBufferPtr           vertexBuffer;   //!< A point cloud vertex buffer.
             Renderer::InputLayoutPtr            inputLayout;    //!< A point cloud input layout.
             Renderer::ConstantBufferPtr         constantBuffer; //!< A point cloud constant buffer instance.

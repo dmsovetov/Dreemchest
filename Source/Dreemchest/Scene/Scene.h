@@ -139,6 +139,7 @@ namespace Scene {
 	class StaticMesh;
 	class Sprite;
 	class Camera;
+    class PointCloud;
 
     //! Spatial index unique pointer type.
     typedef AutoPtr<class Spatial> SpatialUPtr;
