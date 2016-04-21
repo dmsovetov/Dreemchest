@@ -239,7 +239,7 @@ void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar 
 // ------------------------------------------- PointCloud ----------------------------------------- //
 
 // ** PointCloud::PointCloud
-PointCloud::PointCloud( s32 vertexCount, u8 format )
+PointCloud::PointCloud( s32 vertexCount, const VertexFormat& format )
     : m_format( format )
     , m_vertices( NULL )
     , m_vertexCount( vertexCount )
@@ -258,7 +258,7 @@ void PointCloud::resize( s32 vertexCount )
 {
     clear();
     m_vertexCount = vertexCount;
-    m_vertices    = DC_NEW u8[vertexCount * vertexSize()];
+    m_vertices    = DC_NEW u8[vertexCount * m_format.vertexSize()];
 }
 
 // ** PointCloud::clear
@@ -270,13 +270,13 @@ void PointCloud::clear( void )
 }
 
 // ** PointCloud::vertexFormat
-u8 PointCloud::vertexFormat( void ) const
+const VertexFormat& PointCloud::vertexFormat( void ) const
 {
     return m_format;
 }
 
 // ** PointCloud::setVertexFormat
-void PointCloud::setVertexFormat( u8 value )
+void PointCloud::setVertexFormat( const VertexFormat& value )
 {
     m_format = value;
 }
@@ -287,16 +287,16 @@ s32 PointCloud::vertexCount( void ) const
     return m_vertexCount;
 }
 
-// ** PointCloud::vertexSize
-s32 PointCloud::vertexSize( void ) const
+// ** PointCloud::vertices
+const void* PointCloud::vertices( void ) const
 {
-    s32 size = 0;
+    return m_vertices;
+}
 
-    if( m_format & Position ) size += sizeof( Vec3 );
-    if( m_format & Color )    size += sizeof( Rgba );
-    if( m_format & Normal )   size += sizeof( Vec3 );
-
-    return size;
+// ** PointCloud::vertices
+void* PointCloud::vertices( void )
+{
+    return m_vertices;
 }
 
 // ------------------------------------------- Particles ----------------------------------------- //

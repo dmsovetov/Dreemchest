@@ -112,69 +112,7 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
     node.matrix         = &transform->matrix();
     node.vertexCount    = pointCloud->vertexCount();
     node.inputLayout    = createInputLayout( pointCloud->vertexFormat() );
-    
-    if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Color | PointCloud::Normal) ) {
-        struct Vertex {
-            Vec3    point;
-            u8      color[4];
-            Vec3    normal;
-        };
-
-        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
-
-        const PointCloud::Vertex* pointCloudVertices = pointCloud->vertices<PointCloud::Vertex>();
-
-        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
-        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
-            Vertex& v   = vertices[i];
-            v.point     = pointCloudVertices[i].position;
-            v.normal    = pointCloudVertices[i].normal;
-            v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
-            v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
-            v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
-            v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
-        }
-        node.vertexBuffer->unlock();
-    }
-    else if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Normal) ) {
-        struct Vertex {
-            Vec3    point;
-            Vec3    normal;
-        };
-
-        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
-
-        const PointCloud::VertexOrientation* pointCloudVertices = pointCloud->vertices<PointCloud::VertexOrientation>();
-
-        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
-        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
-            Vertex& v   = vertices[i];
-            v.point     = pointCloudVertices[i].position;
-            v.normal    = pointCloudVertices[i].normal;
-        }
-        node.vertexBuffer->unlock();
-    }
-    else if( pointCloud->vertexFormat() == (PointCloud::Position | PointCloud::Color) ) {
-        struct Vertex {
-            Vec3    point;
-            u8      color[4];
-        };
-
-        node.vertexBuffer   = m_hal->createVertexBuffer( pointCloud->vertexCount() * sizeof( Vertex ) );
-
-        const PointCloud::VertexColored* pointCloudVertices = pointCloud->vertices<PointCloud::VertexColored>();
-
-        Vertex* vertices = node.vertexBuffer->lock<Vertex>();
-        for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
-            Vertex& v   = vertices[i];
-            v.point     = pointCloudVertices[i].position;
-            v.color[0]  = static_cast<u8>( pointCloudVertices[i].color.r * 255 );
-            v.color[1]  = static_cast<u8>( pointCloudVertices[i].color.g * 255 );
-            v.color[2]  = static_cast<u8>( pointCloudVertices[i].color.b * 255 );
-            v.color[3]  = static_cast<u8>( pointCloudVertices[i].color.a * 255 );
-        }
-        node.vertexBuffer->unlock();
-    }
+    node.vertexBuffer   = createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat(), pointCloud->vertexFormat() );
 
     node.constantBuffer = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
     node.constantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
@@ -183,35 +121,58 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 }
 
 // ** RenderScene::createInputLayout
-Renderer::InputLayoutPtr RenderScene::createInputLayout( u32 format )
+Renderer::InputLayoutPtr RenderScene::createInputLayout( const VertexFormat& format )
 {
-    // Calculate a vertex size
-    s32 vertexSize = 0;
-
-    if( format & PointCloud::Position ) vertexSize += sizeof( f32 ) * 3;
-    if( format & PointCloud::Color )    vertexSize += sizeof( u8  ) * 4;
-    if( format & PointCloud::Normal )   vertexSize += sizeof( f32 ) * 3;
-
     // Create an input layout
-    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( vertexSize );
+    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
 
     // Add vertex attributes to an input layout
-    s32 offset = 0;
-
-    if( format & PointCloud::Position ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, offset );
-        offset += sizeof( f32 ) * 3;
+    if( format & VertexFormat::Position ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
     }
-    if( format & PointCloud::Color ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, offset );
-        offset += sizeof( u8 ) * 4;
+    if( format & VertexFormat::Color ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
     }
-    if( format & PointCloud::Normal ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, offset );
-        offset += sizeof( f32 ) * 3;
+    if( format & VertexFormat::Normal ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
+    }
+    if( format & VertexFormat::Uv0 ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
+    }
+    if( format & VertexFormat::Uv1 ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
     }
 
     return inputLayout;
+}
+
+// ** RenderScene::createVertexBuffer
+Renderer::VertexBufferPtr RenderScene::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
+{
+    // Create a vertex buffer instance
+    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( count * dstFormat.vertexSize() );
+
+    // Lock a vertex buffer
+    void* locked = vertexBuffer->lock();
+
+    // Just copy memory if vertex formats match
+    if( dstFormat == srcFormat ) {
+        memcpy( locked, vertices, count * dstFormat.vertexSize() );
+    } else {
+        // Copy all vertices to a vertex buffer
+        for( s32 i = 0; i < count; i++ ) {
+            dstFormat.setVertexAttribute( VertexFormat::Position, srcFormat.vertexAttribute<Vec3>( VertexFormat::Position, vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Color,    srcFormat.vertexAttribute<u32> ( VertexFormat::Color,    vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Normal,   srcFormat.vertexAttribute<Vec3>( VertexFormat::Normal,   vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Uv0,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv0,      vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Uv1,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv1,      vertices, i ), locked, i );
+        }
+    }
+
+    // Unlock a vertex buffer.
+    vertexBuffer->unlock();
+
+    return vertexBuffer;
 }
 
 } // namespace Scene

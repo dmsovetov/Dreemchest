@@ -90,7 +90,10 @@ namespace Scene {
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
 
         //! Creates a vertex declaration from a point cloud format.
-        Renderer::InputLayoutPtr                createInputLayout( u32 format );
+        Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
+
+        //! Creates a vertex buffer from a vertex array with a specified vertex format.
+        Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
 
         //! Updates instance constant buffers.
         void                                    updateInstanceConstants( void );
