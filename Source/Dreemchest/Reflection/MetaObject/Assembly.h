@@ -61,7 +61,7 @@ namespace Reflection {
     private:
 
         //! Maps from a class name to an associated meta-object.
-        typedef HashMap<String64, const Class*, String64Hasher> Classes;
+        typedef HashMap<String64, const Class*> Classes;
 
         String              m_name;     //!< Assembly name.
         AssemblyWPtr        m_parent;   //!< Parrent assembly instance.

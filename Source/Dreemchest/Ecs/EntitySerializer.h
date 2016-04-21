@@ -84,7 +84,7 @@ namespace Ecs {
     private:
 
 		//! Container type to store component conversions.
-		typedef HashMap<String32, ComponentConverter, String32Hasher> ComponentConverters;
+		typedef HashMap<String32, ComponentConverter> ComponentConverters;
 
         EcsWPtr                             m_ecs;                  //!< Parent Ecs instance.
         Bitset                              m_excluded;             //!< List of excluded components.
