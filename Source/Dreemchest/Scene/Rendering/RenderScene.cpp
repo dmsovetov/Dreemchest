@@ -94,9 +94,18 @@ void RenderScene::updateInstanceConstants( void )
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
         PointCloudNode& node = pointClouds[i];
 
-        CBuffer::Instance* cbuffer = node.constantBuffer->lock<CBuffer::Instance>();
-        cbuffer->transform = node.transform->matrix();
-        node.constantBuffer->unlock();
+        {
+            CBuffer::Instance* cbuffer = node.instanceConstants->lock<CBuffer::Instance>();
+            cbuffer->transform = node.transform->matrix();
+            node.instanceConstants->unlock();
+        }
+        {
+            CBuffer::Material* cbuffer = node.materialConstants->lock<CBuffer::Material>();
+            cbuffer->diffuse  = node.material->color( Material::Diffuse );
+            cbuffer->specular = node.material->color( Material::Specular );
+            cbuffer->emission = node.material->color( Material::Emission );
+            node.materialConstants->unlock();
+        }
     }
 }
 
@@ -111,11 +120,17 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
     node.transform      = transform;
     node.matrix         = &transform->matrix();
     node.vertexCount    = pointCloud->vertexCount();
+    node.material       = pointCloud->material();
     node.inputLayout    = createInputLayout( pointCloud->vertexFormat() );
     node.vertexBuffer   = createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat(), pointCloud->vertexFormat() );
 
-    node.constantBuffer = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
-    node.constantBuffer->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
+    node.instanceConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
+    node.instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
+
+    node.materialConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Material ), false );
+    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, diffuse ), "Material.diffuse" );
+    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, specular ), "Material.specular" );
+    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
 
     return node;
 }

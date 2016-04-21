@@ -43,6 +43,7 @@ namespace Scene {
               GlobalConstants       //!< A constant buffer that stores global scene settings (ambient color, fog type, etc.).
             , PassConstants         //!< A constant buffer that stores a pass variables (view-projection matrix, light color, etc.).
             , InstanceConstants     //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
+            , MaterialConstants     //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
             , MaxConstantBuffers    //!< A maximum number of supported constant buffers.
         };
 

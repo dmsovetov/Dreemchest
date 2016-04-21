@@ -277,10 +277,35 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     s32 points = 500;
     s32 c = 0;
 
+    Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        Assets::WriteLock<Scene::Material> writable = red.writeLock();
+        writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 0.5f, 0.25f ) );
+        writable->setColor( Scene::Material::Emission, Rgba( 0.2f, 0.0f, 0.0f ) );
+        writable->setLightingModel( Scene::LightingModel::Unlit );
+    }
+    Scene::MaterialHandle green = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        Assets::WriteLock<Scene::Material> writable = green.writeLock();
+        writable->setColor( Scene::Material::Diffuse, Rgba( 0.5f, 1.0f, 0.25f ) );
+        writable->setLightingModel( Scene::LightingModel::Ambient );    
+    }
+    Scene::MaterialHandle blue = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        Assets::WriteLock<Scene::Material> writable = blue.writeLock();
+        writable->setColor( Scene::Material::Diffuse, Rgba( 0.25f, 0.5f, 1.0f ) );
+        writable->setLightingModel( Scene::LightingModel::Phong );    
+    }
+
     Scene::VertexFormat vertexFormats[] = {
           Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal )
         , Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Normal )
         , Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color )
+    };
+    Scene::MaterialHandle materials[] = {
+          red
+        , green
+        , blue
     };
 
     for( s32 i = 0; i < count; i++ )
@@ -290,13 +315,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
             Scene::SceneObjectPtr p1 = scene->createSceneObject();
             p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
             Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( points, vertexFormats[c++ % 3] );
+            pointCloud->setMaterial( materials[c % 3] );
 
             void* vertices = pointCloud->vertices();
             const Scene::VertexFormat& vertexFormat = pointCloud->vertexFormat();
 
             for( s32 i = 0, n = pointCloud->vertexCount(); i < n; i++ ) {
                 Vec3 position = Vec3::randomInSphere( Vec3::zero(), 1.0f );
-                u32  color    = Rgba( 0.8f, 0.8f, 0.8f, 1.0f ).toInteger();
+                u32  color    = Rgba( 0.2f, 0.2f, 0.2f, 1.0f ).toInteger();
 
                 vertexFormat.setVertexAttribute( Scene::VertexFormat::Position, position, vertices, i );
                 vertexFormat.setVertexAttribute( Scene::VertexFormat::Normal, Vec3::normalize( position ), vertices, i );

@@ -45,9 +45,11 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
                 struct CBufferScene    { vec4 ambient; };           \n\
                 struct CBufferCamera   { mat4 viewProjection; };    \n\
                 struct CBufferInstance { mat4 transform; };         \n\
+                struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferCamera   Camera;                     \n\
                 uniform CBufferInstance Instance;                   \n\
+                uniform CBufferMaterial Material;                   \n\
             "
         );
 
@@ -101,7 +103,7 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
                     color = color + Scene.ambient;                      \n\
             #endif  /*  F_AmbientColor    */                            \n\
                                                                         \n\
-                    gl_FragColor = color;                               \n\
+                    gl_FragColor = Material.emission + color * Material.diffuse;            \n\
                 }                                                       \n\
             "
         );
@@ -118,7 +120,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
 {
     // Update scene constant buffer
     RenderScene::CBuffer::Scene* sceneConstants = m_sceneConstants->lock<RenderScene::CBuffer::Scene>();
-    sceneConstants->ambient = Rgba( 1.0f, 0.0f, 0.0f, 1.0f );
+    sceneConstants->ambient = Rgba( 0.3f, 0.3f, 0.4f, 1.0f );
     m_sceneConstants->unlock();
 
     // Update camera constant buffer
@@ -142,8 +144,15 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
 
         RenderStateBlock& instance = stateStack.push();
         instance.bindVertexBuffer( frame.internVertexBuffer( pointCloud.vertexBuffer ) );
-        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.constantBuffer ), RenderState::InstanceConstants );
+        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.instanceConstants ), RenderState::InstanceConstants );
+        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.materialConstants ), RenderState::MaterialConstants );
         instance.bindInputLayout( frame.internInputLayout( pointCloud.inputLayout ) );
+
+        const Material& material = pointCloud.material.readLock();
+        if( material.lightingModel() == LightingModel::Unlit ) {
+            instance.disableFeatures( BIT( ShaderMaterialAmbient ) );
+        }
+
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );
         stateStack.pop();
     }

@@ -181,8 +181,6 @@ void Rvm::switchRenderTarget( const RenderFrame& frame, const RenderState& state
 void Rvm::switchShader( const RenderFrame& frame, const RenderState& state )
 {
     m_activeShader.shader = frame.shader( state.id );
-//    const UbershaderPtr& shader = frame.shader( state.id );
-//    m_hal->setShader( shader->permutation( m_hal, 0 ) );
 }
 
 // ** Rvm::switchConstantBuffer

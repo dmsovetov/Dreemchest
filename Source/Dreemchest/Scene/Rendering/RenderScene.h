@@ -49,6 +49,11 @@ namespace Scene {
             struct Instance {
                 Matrix4     transform;
             };
+            struct Material {
+                Rgba        diffuse;
+                Rgba        specular;
+                Rgba        emission;
+            };
         };
 
         //! Base class for all renderable entities.
@@ -59,11 +64,12 @@ namespace Scene {
 
         //! Stores info about a renderable point cloud.
         struct PointCloudNode : public Node {
-            const PointCloud*                   pointCloud;     //!< A point cloud component.
-            Renderer::VertexBufferPtr           vertexBuffer;   //!< A point cloud vertex buffer.
-            Renderer::InputLayoutPtr            inputLayout;    //!< A point cloud input layout.
-            Renderer::ConstantBufferPtr         constantBuffer; //!< A point cloud constant buffer instance.
-            s32                                 vertexCount;    //!< A total number of vertices inside a point cloud.
+            MaterialHandle                      material;
+            Renderer::VertexBufferPtr           vertexBuffer;       //!< A point cloud vertex buffer.
+            Renderer::InputLayoutPtr            inputLayout;        //!< A point cloud input layout.
+            Renderer::ConstantBufferPtr         instanceConstants;  //!< A point cloud constant buffer instance.
+            Renderer::ConstantBufferPtr         materialConstants;  //!< A point cloud material options.       
+            s32                                 vertexCount;        //!< A total number of vertices inside a point cloud.
         };
 
         //! A fixed array with renderable point clouds inside.
