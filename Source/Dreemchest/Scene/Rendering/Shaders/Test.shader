@@ -43,27 +43,26 @@ varying vec3 v_LightDir;
 
 void main()
 {
+	vec4 diffuseColor = Material.diffuse;
+	vec4 lightColor   = vec4( 0.0, 0.0, 0.0, 1.0 );
+
 #if defined( F_ColorAttribute )
-	vec4 color = v_Color;
-#else
-	vec4 color = vec4( 1.0, 1.0, 1.0, 1.0 );
+	diffuseColor = diffuseColor * Material.diffuse;
 #endif  /*  F_ColorAttribute    */
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
-	float d   = length( v_LightDir ) / Light.range;
-	float att = 1.0 / (1.0 + 25.0 * d * d);
-	color 	  = color * max( dot( v_Normal, v_LightDir ), 0.0 ) * vec4( Light.color, 1.0 ) * Light.intensity * att;
+	float d    = length( v_LightDir ) / Light.range;
+	float att  = 1.0 / (1.0 + 25.0 * d * d);
+	lightColor = max( dot( v_Normal, v_LightDir ), 0.0 ) * vec4( Light.color, 1.0 ) * Light.intensity * att;
 #endif  /*  F_NormalAttribute    */
 
-#if !defined( F_NormalAttribute ) && defined( F_PointLight )
-	color = vec4( 0.0, 0.0, 0.0, 1.0 );
-#endif
-
 #if defined( F_AmbientColor )
-	color = color * Scene.ambient;
+	vec4 ambientColor = Scene.ambient;
+#else
+	vec4 ambientColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 #endif  /*  F_AmbientColor    */
 
-	vec4 finalColor = color * Material.diffuse;
+	vec4 finalColor = (ambientColor + lightColor) * diffuseColor;
 	
 #if defined( F_EmissionColor )
 	finalColor = finalColor + Material.emission;
