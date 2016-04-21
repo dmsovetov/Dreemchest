@@ -57,16 +57,18 @@ namespace Scene {
         //! Available render state types.
         enum Type {
               VertexBuffer      = 0                                     //!< Binds an input vertex buffer.
-            , IndexBuffer       = VertexBuffer   + 1                    //!< Binds an input index buffer.
-            , InputLayout       = IndexBuffer    + 1                    //!< Binds an input layout.
-            , ConstantBuffer    = InputLayout    + 1                    //!< Binds a constant buffer.
-            , Shader            = ConstantBuffer + MaxConstantBuffers   //!< Binds a program instance.
-            , RenderTarget      = Shader         + 1                    //!< Binds a render target.
-            , Blending          = RenderTarget   + 1                    //!< Sets a blend function
-            , DepthState        = Blending       + 1                    //!< Sets a depth test function and a reference value.
-            , AlphaTest         = DepthState     + 1                    //!< Sets an alpha test function and a reference value.
-            , Texture           = AlphaTest      + 1                    //!< Binds a texture to a sampler #(Type.Texture + index).
-            , TotalStates       = Texture        + MaxTextureSamplers   //!< A total number of available render states.
+            , IndexBuffer       = VertexBuffer      + 1                    //!< Binds an input index buffer.
+            , InputLayout       = IndexBuffer       + 1                    //!< Binds an input layout.
+            , ConstantBuffer    = InputLayout       + 1                    //!< Binds a constant buffer.
+            , Shader            = ConstantBuffer    + MaxConstantBuffers   //!< Binds a program instance.
+            , EnableFeatures    = Shader            + 1                    //!< Enables a ubershader feature set.
+            , DisableFeatures   = EnableFeatures    + 1                    //!< Disables a ubershader feature set.
+            , RenderTarget      = DisableFeatures   + 1                    //!< Binds a render target.
+            , Blending          = RenderTarget      + 1                    //!< Sets a blend function
+            , DepthState        = Blending          + 1                    //!< Sets a depth test function and a reference value.
+            , AlphaTest         = DepthState        + 1                    //!< Sets an alpha test function and a reference value.
+            , Texture           = AlphaTest         + 1                    //!< Binds a texture to a sampler #(Type.Texture + index).
+            , TotalStates       = Texture           + MaxTextureSamplers   //!< A total number of available render states.
         };
 
                                         //! Constructs an empty RenderState instance.
@@ -95,7 +97,8 @@ namespace Scene {
 
         Type                            type;           //!< Render state type.
         union {
-            s32                         id;             //!< A resource identifier to be bound to a pipeline.
+            s16                         id;             //!< A resource identifier to be bound to a pipeline.
+            u32                         features;       //!< A shader features to be pushed.
 
             struct {
                 s32                     id;             //!< Buffer ID to be bound.
@@ -125,7 +128,7 @@ namespace Scene {
             struct {
                 s32                     id;             //!< Render target identifier.
                 f32                     viewport[4];    //!< A target viewport.
-            } renderTarget;                             //!< A render target state to be set.
+            } renderTarget;                             //!< A render target state to be set.                              
         };
     };
 
@@ -159,6 +162,12 @@ namespace Scene {
 
         //! Sets a depth state.
         void                            setDepthState( Renderer::Compare function, bool write );
+
+        //! Enables a ubershader features.
+        void                            enableFeatures( u32 bits );
+
+        //! Disables a ubershader features.
+        void                            disableFeatures( u32 bits );
 
         //! Sets an alpha test function.
         void                            setAlphaTest( Renderer::Compare function, f32 reference );

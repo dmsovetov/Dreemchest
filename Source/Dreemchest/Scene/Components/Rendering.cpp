@@ -269,6 +269,18 @@ void PointCloud::clear( void )
     m_vertexCount = 0;
 }
 
+// ** PointCloud::material
+const MaterialHandle& PointCloud::material( void ) const
+{
+    return m_material;
+}
+
+// ** PointCloud::setMaterial
+void PointCloud::setMaterial( const MaterialHandle& value )
+{
+    m_material = value;
+}
+
 // ** PointCloud::vertexFormat
 const VertexFormat& PointCloud::vertexFormat( void ) const
 {

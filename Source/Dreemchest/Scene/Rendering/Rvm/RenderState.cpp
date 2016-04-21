@@ -152,6 +152,18 @@ void RenderStateBlock::setDepthState( Renderer::Compare function, bool write )
     pushState( RenderState( function, write ), RenderState::DepthState );
 }
 
+// ** RenderStateBlock::enableFeatures
+void RenderStateBlock::enableFeatures( u32 bits )
+{
+    pushState( RenderState( RenderState::EnableFeatures, bits ), RenderState::EnableFeatures );
+}
+
+// ** RenderStateBlock::disableFeatures
+void RenderStateBlock::disableFeatures( u32 bits )
+{
+    pushState( RenderState( RenderState::DisableFeatures, bits ), RenderState::DisableFeatures );
+}
+
 // ** RenderStateBlock::setAlphaTest
 void RenderStateBlock::setAlphaTest( Renderer::Compare function, f32 reference )
 {

@@ -33,6 +33,48 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    enum ShaderInputFeatures {
+          ShaderInputNormal
+        , ShaderInputColor
+        , ShaderInputUv0
+        , ShaderInputUv1
+        , ShaderInputUv2
+        , ShaderInputUv3
+        , ShaderInputUv4
+        , TotalInputFeatures
+        , InputFeaturesOffset = 0
+    };
+
+    enum ShaderResourceFeatures {
+          ShaderTexture0
+        , ShaderTexture1
+        , ShaderTexture2
+        , ShaderTexture3
+        , TotalResourceFeatures
+        , ResourceFeaturesOffset = TotalInputFeatures
+    };
+
+    enum ShaderMaterialFeatures {
+          ShaderMaterialAmbient
+        , TotalMaterialFeatures
+        , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
+    };
+
+    enum UbershaderFeatures {
+          FeatureInputNormal        = BIT( ShaderInputNormal     + InputFeaturesOffset )
+        , FeatureInputColor         = BIT( ShaderInputColor      + InputFeaturesOffset )
+        , FeatureInputUv0           = BIT( ShaderInputUv0        + InputFeaturesOffset )
+        , FeatureInputUv1           = BIT( ShaderInputUv1        + InputFeaturesOffset )
+        , FeatureInputUv2           = BIT( ShaderInputUv2        + InputFeaturesOffset )
+        , FeatureInputUv3           = BIT( ShaderInputUv3        + InputFeaturesOffset )
+        , FeatureInputUv4           = BIT( ShaderInputUv4        + InputFeaturesOffset )
+        , FeatureTexture0           = BIT( ShaderTexture0        + ResourceFeaturesOffset )  
+        , FeatureTexture1           = BIT( ShaderTexture1        + ResourceFeaturesOffset )  
+        , FeatureTexture2           = BIT( ShaderTexture2        + ResourceFeaturesOffset )  
+        , FeatureTexture3           = BIT( ShaderTexture3        + ResourceFeaturesOffset )  
+        , FeatureMaterialAmbient    = BIT( ShaderMaterialAmbient + MaterialFeaturesOffset )
+    };
+
     //! Ubershader stores a source code for shader and permutation cache.
     class Ubershader : public RefCounted {
     public:

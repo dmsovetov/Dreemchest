@@ -79,6 +79,12 @@ namespace Scene {
         //! Binds an input layout to a pipeline.
         void                    switchInputLayout( const RenderFrame& frame, const RenderState& state );
 
+        //! Enables a ubershader feature set.
+        void                    switchEnableFeatures( const RenderFrame& frame, const RenderState& state );
+
+        //! Disables a ubershader feature set.
+        void                    switchDisableFeatures( const RenderFrame& frame, const RenderState& state );
+
     private:
 
         //! State switcher function callback.
@@ -100,6 +106,8 @@ namespace Scene {
         RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
         StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.
         u64                     m_inputLayoutFeatures;                      //!< An input layout features.
+        u64                     m_userFeatures;                             //!< A user-defined features.
+        u64                     m_userFeaturesMask;                         //!< A used-defined features mask.
         ActiveShader            m_activeShader;                             //!< An active shader instance.
     };
 

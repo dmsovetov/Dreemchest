@@ -51,6 +51,8 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
     m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
     m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
+    m_stateSwitches[RenderState::EnableFeatures]    = &Rvm::switchEnableFeatures;
+    m_stateSwitches[RenderState::DisableFeatures]   = &Rvm::switchDisableFeatures;
 }
 
 // ** Rvm::create
@@ -79,7 +81,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
         DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
 
         // Select a shader permutation that match an active pipeline state
-        Ubershader::Bitmask features = m_inputLayoutFeatures & m_activeShader.shader->supportedFeatures();
+        Ubershader::Bitmask features = (m_inputLayoutFeatures | (m_userFeatures & m_userFeaturesMask)) & m_activeShader.shader->supportedFeatures();
 
         if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
             m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
@@ -104,8 +106,10 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 // ** Rvm::applyStates
 void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count )
 {
-    // Reset input layout features
+    // Reset all ubershader features
     m_inputLayoutFeatures = 0;
+    m_userFeatures = 0;
+    m_userFeaturesMask = ~0;
 
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
@@ -204,6 +208,18 @@ void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state 
 
     // Update an input layout features
     m_inputLayoutFeatures = inputLayout->features();
+}
+
+// ** Rvm::switchEnableFeatures
+void Rvm::switchEnableFeatures( const RenderFrame& frame, const RenderState& state )
+{
+    m_userFeatures = m_userFeatures | (state.features << MaterialFeaturesOffset);
+}
+
+// ** Rvm::switchDisableFeatures
+void Rvm::switchDisableFeatures( const RenderFrame& frame, const RenderState& state )
+{
+    m_userFeaturesMask = m_userFeaturesMask & ~(state.features << MaterialFeaturesOffset);
 }
 
 } // namespace Scene
