@@ -156,12 +156,12 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
     shader->addInclude(
             "                                                       \n\
                 struct CBufferScene    { vec4 ambient; };           \n\
-                struct CBufferCamera   { mat4 viewProjection; };    \n\
+                struct CBufferView     { mat4 transform; };    \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
                 struct CBufferLight    { vec3 position; float radius; vec3 color; float intensity; };         \n\
                 uniform CBufferScene    Scene;                      \n\
-                uniform CBufferCamera   Camera;                     \n\
+                uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\
                 uniform CBufferMaterial Material;                   \n\
                 uniform CBufferLight    Light;                      \n\

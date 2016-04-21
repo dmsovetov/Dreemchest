@@ -43,8 +43,8 @@ namespace Scene {
             struct Scene {
                 Rgba        ambient;
             };
-            struct Camera {
-                Matrix4     viewProjection;
+            struct View {
+                Matrix4     transform;
             };
             struct Instance {
                 Matrix4     transform;

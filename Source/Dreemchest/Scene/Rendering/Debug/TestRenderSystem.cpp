@@ -37,8 +37,8 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 {
     m_pointCloudShader = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
 
-    m_cameraConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Camera ), false );
-    m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( RenderScene::CBuffer::Camera, viewProjection ), "Camera.viewProjection" );
+    m_cameraConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::View ), false );
+    m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( RenderScene::CBuffer::View, transform ), "View.transform" );
 
     m_lightConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::Light ), false );
     m_lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( RenderScene::CBuffer::Light, position ), "Light.position" );
@@ -51,8 +51,8 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     // Update camera constant buffer
-    RenderScene::CBuffer::Camera* renderPassConstants = m_cameraConstants->lock<RenderScene::CBuffer::Camera>();
-    renderPassConstants->viewProjection = camera.calculateViewProjection( transform.matrix() );
+    RenderScene::CBuffer::View* renderPassConstants = m_cameraConstants->lock<RenderScene::CBuffer::View>();
+    renderPassConstants->transform = camera.calculateViewProjection( transform.matrix() );
     m_cameraConstants->unlock();
 
     // Update light constant buffer

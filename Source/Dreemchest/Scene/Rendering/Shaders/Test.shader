@@ -18,7 +18,7 @@ void main()
 {
 	vec4 vertex 	= Instance.transform * gl_Vertex;
 	
-	gl_Position     = Camera.viewProjection * vertex;
+	gl_Position     = View.transform * vertex;
 	gl_PointSize    = 5;
 #if defined( F_ColorAttribute )
 	v_Color         = gl_Color;
