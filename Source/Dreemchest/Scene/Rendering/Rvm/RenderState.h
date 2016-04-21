@@ -142,7 +142,7 @@ namespace Scene {
 
         Type                            type;           //!< Render state type.
         union {
-            s16                         id;             //!< A resource identifier to be bound to a pipeline.
+            s32                         id;             //!< A resource identifier to be bound to a pipeline.
 
             struct {
                 s32                     id;             //!< Buffer ID to be bound.

@@ -222,8 +222,8 @@ RenderStateBlock& RenderStateStack::push( void )
     DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
     RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
 
-    for( s32 i = 0; i < m_size; i++ ) {
-        m_stack[i + 1] = m_stack[i];
+    for( s32 i = m_size; i > 0; i-- ) {
+        m_stack[i] = m_stack[i - 1];
     }
     m_stack[0] = block;
     m_size++;
