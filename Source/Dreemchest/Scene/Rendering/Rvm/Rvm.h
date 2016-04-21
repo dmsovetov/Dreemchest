@@ -79,12 +79,6 @@ namespace Scene {
         //! Binds an input layout to a pipeline.
         void                    switchInputLayout( const RenderFrame& frame, const RenderState& state );
 
-        //! Enables a ubershader feature set.
-        void                    switchEnableFeatures( const RenderFrame& frame, const RenderState& state );
-
-        //! Disables a ubershader feature set.
-        void                    switchDisableFeatures( const RenderFrame& frame, const RenderState& state );
-
     private:
 
         //! State switcher function callback.

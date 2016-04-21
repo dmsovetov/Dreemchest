@@ -101,6 +101,8 @@ RenderState::RenderState( s32 id, const Rect& viewport )
 // ** RenderStateBlock::RenderStateBlock
 RenderStateBlock::RenderStateBlock( void )
     : m_mask( 0 )
+    , m_features( 0 )
+    , m_featureMask( ~0 )
 {
 }
 
@@ -153,15 +155,15 @@ void RenderStateBlock::setDepthState( Renderer::Compare function, bool write )
 }
 
 // ** RenderStateBlock::enableFeatures
-void RenderStateBlock::enableFeatures( u32 bits )
+void RenderStateBlock::enableFeatures( u64 bits )
 {
-    pushState( RenderState( RenderState::EnableFeatures, bits ), RenderState::EnableFeatures );
+    m_features = m_features | (bits << MaterialFeaturesOffset);
 }
 
 // ** RenderStateBlock::disableFeatures
-void RenderStateBlock::disableFeatures( u32 bits )
+void RenderStateBlock::disableFeatures( u64 bits )
 {
-    pushState( RenderState( RenderState::DisableFeatures, bits ), RenderState::DisableFeatures );
+    m_featureMask = m_featureMask & ~(bits << MaterialFeaturesOffset);
 }
 
 // ** RenderStateBlock::setAlphaTest

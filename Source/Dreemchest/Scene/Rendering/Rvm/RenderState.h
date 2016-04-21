@@ -33,6 +33,50 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    // ------------------------------------------------------------------------------------------------
+    enum ShaderInputFeatures {
+          ShaderInputNormal
+        , ShaderInputColor
+        , ShaderInputUv0
+        , ShaderInputUv1
+        , ShaderInputUv2
+        , ShaderInputUv3
+        , ShaderInputUv4
+        , TotalInputFeatures
+        , InputFeaturesOffset = 0
+    };
+
+    enum ShaderResourceFeatures {
+          ShaderTexture0
+        , ShaderTexture1
+        , ShaderTexture2
+        , ShaderTexture3
+        , TotalResourceFeatures
+        , ResourceFeaturesOffset = TotalInputFeatures
+    };
+
+    enum ShaderMaterialFeatures {
+          ShaderMaterialAmbient
+        , TotalMaterialFeatures
+        , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
+    };
+
+    enum UbershaderFeatures {
+          FeatureInputNormal        = BIT( ShaderInputNormal     + InputFeaturesOffset )
+        , FeatureInputColor         = BIT( ShaderInputColor      + InputFeaturesOffset )
+        , FeatureInputUv0           = BIT( ShaderInputUv0        + InputFeaturesOffset )
+        , FeatureInputUv1           = BIT( ShaderInputUv1        + InputFeaturesOffset )
+        , FeatureInputUv2           = BIT( ShaderInputUv2        + InputFeaturesOffset )
+        , FeatureInputUv3           = BIT( ShaderInputUv3        + InputFeaturesOffset )
+        , FeatureInputUv4           = BIT( ShaderInputUv4        + InputFeaturesOffset )
+        , FeatureTexture0           = BIT( ShaderTexture0        + ResourceFeaturesOffset )  
+        , FeatureTexture1           = BIT( ShaderTexture1        + ResourceFeaturesOffset )  
+        , FeatureTexture2           = BIT( ShaderTexture2        + ResourceFeaturesOffset )  
+        , FeatureTexture3           = BIT( ShaderTexture3        + ResourceFeaturesOffset )  
+        , FeatureMaterialAmbient    = BIT( ShaderMaterialAmbient + MaterialFeaturesOffset )
+    };
+    // ------------------------------------------------------------------------------------------------
+
     //! A maximum number of state blocks that can be pushed onto a state stack.
     enum { MaxStateStackDepth = 4 };
 
@@ -62,9 +106,7 @@ namespace Scene {
             , InputLayout       = IndexBuffer       + 1                    //!< Binds an input layout.
             , ConstantBuffer    = InputLayout       + 1                    //!< Binds a constant buffer.
             , Shader            = ConstantBuffer    + MaxConstantBuffers   //!< Binds a program instance.
-            , EnableFeatures    = Shader            + 1                    //!< Enables a ubershader feature set.
-            , DisableFeatures   = EnableFeatures    + 1                    //!< Disables a ubershader feature set.
-            , RenderTarget      = DisableFeatures   + 1                    //!< Binds a render target.
+            , RenderTarget      = Shader            + 1                    //!< Binds a render target.
             , Blending          = RenderTarget      + 1                    //!< Sets a blend function
             , DepthState        = Blending          + 1                    //!< Sets a depth test function and a reference value.
             , AlphaTest         = DepthState        + 1                    //!< Sets an alpha test function and a reference value.
@@ -99,7 +141,6 @@ namespace Scene {
         Type                            type;           //!< Render state type.
         union {
             s16                         id;             //!< A resource identifier to be bound to a pipeline.
-            u32                         features;       //!< A shader features to be pushed.
 
             struct {
                 s32                     id;             //!< Buffer ID to be bound.
@@ -165,10 +206,10 @@ namespace Scene {
         void                            setDepthState( Renderer::Compare function, bool write );
 
         //! Enables a ubershader features.
-        void                            enableFeatures( u32 bits );
+        void                            enableFeatures( u64 bits );
 
         //! Disables a ubershader features.
-        void                            disableFeatures( u32 bits );
+        void                            disableFeatures( u64 bits );
 
         //! Sets an alpha test function.
         void                            setAlphaTest( Renderer::Compare function, f32 reference );
@@ -194,6 +235,12 @@ namespace Scene {
         //! Returns a state bit at specified index.
         u32                             stateBit( s32 index ) const;
 
+        //! Returns a feature set enabled by a state block.
+        u64                             features( void ) const;
+
+        //! Returns a feature mask exposed by a state block.
+        u64                             featureMask( void ) const;
+
     private:
 
         //! Pushes a new state to a block.
@@ -202,6 +249,8 @@ namespace Scene {
     private:
 
         u32                             m_mask;         //!< A bit mask of state changes that are preset inside this state block.
+        u64                             m_features;     //!< A shader feature set.
+        u64                             m_featureMask;  //!< A shader feature mask.
         Array<u32>                      m_stateBits;    //!< An array of state bits.
         Array<RenderState>              m_states;       //!< An array of state changes.
     };
@@ -210,6 +259,18 @@ namespace Scene {
     NIMBLE_INLINE u32 RenderStateBlock::mask( void ) const
     {
         return m_mask;
+    }
+
+    //! Returns a feature set enabled by a state block.
+    NIMBLE_INLINE u64 RenderStateBlock::features( void ) const
+    {
+        return m_features;
+    }
+
+    //! Returns a feature mask exposed by a state block.
+    NIMBLE_INLINE u64 RenderStateBlock::featureMask( void ) const
+    {
+        return m_featureMask;
     }
 
     // ** RenderStateBlock::stateCount

@@ -277,6 +277,13 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     s32 points = 500;
     s32 c = 0;
 
+    Scene::MaterialHandle dflt = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        Assets::WriteLock<Scene::Material> writable = dflt.writeLock();
+        writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
+        writable->setColor( Scene::Material::Emission, Rgba( 1.0f, 0.0f, 0.0f ) );
+        writable->setLightingModel( Scene::LightingModel::Unlit );
+    }
     Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
         Assets::WriteLock<Scene::Material> writable = red.writeLock();
@@ -316,6 +323,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
             p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
             Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( points, vertexFormats[c++ % 3] );
             pointCloud->setMaterial( materials[c % 3] );
+        //    pointCloud->setMaterial( dflt );
 
             void* vertices = pointCloud->vertices();
             const Scene::VertexFormat& vertexFormat = pointCloud->vertexFormat();

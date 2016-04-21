@@ -51,8 +51,6 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
     m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
     m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
-    m_stateSwitches[RenderState::EnableFeatures]    = &Rvm::switchEnableFeatures;
-    m_stateSwitches[RenderState::DisableFeatures]   = &Rvm::switchDisableFeatures;
 }
 
 // ** Rvm::create
@@ -122,6 +120,10 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
         if( block == NULL ) {
             break;
         }
+
+        // Update feature set
+        m_userFeatures      = m_userFeatures     | block->features();
+        m_userFeaturesMask  = m_userFeaturesMask & block->featureMask();
 
         // Skip redundant state blocks by testing a block bitmask against an active state mask
         if( (activeStateMask ^ block->mask()) == 0 ) {
@@ -206,18 +208,6 @@ void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state 
 
     // Update an input layout features
     m_inputLayoutFeatures = inputLayout->features();
-}
-
-// ** Rvm::switchEnableFeatures
-void Rvm::switchEnableFeatures( const RenderFrame& frame, const RenderState& state )
-{
-    m_userFeatures = m_userFeatures | (state.features << MaterialFeaturesOffset);
-}
-
-// ** Rvm::switchDisableFeatures
-void Rvm::switchDisableFeatures( const RenderFrame& frame, const RenderState& state )
-{
-    m_userFeaturesMask = m_userFeaturesMask & ~(state.features << MaterialFeaturesOffset);
 }
 
 } // namespace Scene
