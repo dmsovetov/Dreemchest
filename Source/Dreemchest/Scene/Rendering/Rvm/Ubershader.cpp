@@ -110,16 +110,19 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
 
 	// Generate macro definitions from features
 	String macro = "";
+    String debug = "";
 
 	for( u32 i = 0, n = featureCount(); i < n; i++ ) {
         const Feature& feature = this->feature( i );
 
 		if( feature.mask & features ) {
 			macro += "#define " + feature.name + "\n";
+            if( debug.length() ) debug += ", ";
+            debug += feature.name;
 		}
 	}
 
-    LogVerbose( "shader", "compiling permutation %s\n", macro.c_str() );
+    LogVerbose( "shader", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
 
     // Includes
     for( s32 i = 0, n = static_cast<s32>( m_includes.size() ); i < n; i++ ) {
