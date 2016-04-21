@@ -49,6 +49,9 @@ namespace Scene {
                                 //! Constructs an Rvm instance.
                                 Rvm( RenderingContextWPtr context );
 
+        //! Resets rendering states to defaults.
+        void                    reset( void );
+
         //! Executes a single command buffer.
         void                    execute( const RenderFrame& frame, const RenderCommandBuffer& commands );
 

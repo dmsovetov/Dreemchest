@@ -65,6 +65,9 @@ void Rvm::display( const RenderFrameUPtr& frame )
     for( s32 i = 0, n = frame->commandBufferCount(); i < n; i++ ) {
         execute( *frame.get(), frame->commandBufferAt( i ) );
     }
+
+    // Reset rendering states
+    reset();
 }
 
 // ** Rvm::execute
@@ -99,6 +102,33 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
         default:                                            DC_NOT_IMPLEMENTED;
         }
     }
+}
+
+// ** Rvm::reset
+void Rvm::reset( void )
+{
+	// Reset the face culling
+	m_hal->setCulling( Renderer::TriangleFaceBack );
+
+	// Set the default polygon mode
+	m_hal->setPolygonMode( Renderer::PolygonFill );
+
+	// Set the default shader
+	m_hal->setShader( NULL );
+
+	// Set the default vertex buffer
+	m_hal->setVertexBuffer( NULL );
+
+	// Set default textures
+	for( s32 i = 0; i < 8; i++ ) {
+		m_hal->setTexture( i, NULL );
+	}
+
+	// Enable the depth test back
+	m_hal->setDepthTest( true, Renderer::LessEqual );
+
+    // Disable the alpha test
+    m_hal->setAlphaTest( Renderer::CompareDisabled );
 }
 
 // ** Rvm::applyStates
