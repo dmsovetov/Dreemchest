@@ -288,7 +288,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     {
         Assets::WriteLock<Scene::Material> writable = red.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 0.5f, 0.25f ) );
-        writable->setColor( Scene::Material::Emission, Rgba( 0.4f, 0.4f, 0.4f ) );
+        writable->setColor( Scene::Material::Emission, Rgba( 0.4f, 0.0f, 0.4f ) );
         writable->setLightingModel( Scene::LightingModel::Unlit );
     }
     Scene::MaterialHandle green = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
