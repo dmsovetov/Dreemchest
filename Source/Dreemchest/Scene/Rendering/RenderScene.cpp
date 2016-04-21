@@ -38,6 +38,10 @@ RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
 {
     // Create entity caches
     m_pointClouds = scene->ecs()->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
+
+    // Create scene constant buffer
+    m_sceneConstants = hal->createConstantBuffer( sizeof( CBuffer::Scene ), false );
+    m_sceneConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Scene, ambient ), "Scene.ambient" );
 }
 
 // ** RenderScene::create
@@ -63,8 +67,8 @@ RenderFrameUPtr RenderScene::captureFrame( void )
 {
     RenderFrameUPtr frame( DC_NEW RenderFrame );
 
-    // Update instance constant buffers
-    updateInstanceConstants();
+    // Update active constant buffers
+    updateConstantBuffers();
 
     // Get a state stack
     RenderStateStack& stateStack = frame->stateStack();
@@ -74,6 +78,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.disableAlphaTest();
     defaults.disableBlending();
     defaults.setDepthState( Renderer::LessEqual, true );
+    defaults.bindConstantBuffer( frame->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
 
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
@@ -166,9 +171,15 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
 	return shader;
 }
 
-// ** RenderScene::updateInstanceConstants
-void RenderScene::updateInstanceConstants( void )
+// ** RenderScene::updateConstantBuffers
+void RenderScene::updateConstantBuffers( void )
 {
+    // Update scene constant buffer
+    CBuffer::Scene* sceneConstants = m_sceneConstants->lock<CBuffer::Scene>();
+    sceneConstants->ambient = Rgba( 1.3f, 0.3f, 0.4f, 1.0f );
+    m_sceneConstants->unlock();
+
+    // Update instance constant buffers
     PointClouds& pointClouds = m_pointClouds->data();
 
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {

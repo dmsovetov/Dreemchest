@@ -114,8 +114,8 @@ namespace Scene {
         //! Creates a vertex buffer from a vertex array with a specified vertex format.
         Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
 
-        //! Updates instance constant buffers.
-        void                                    updateInstanceConstants( void );
+        //! Updates all active constant buffers.
+        void                                    updateConstantBuffers( void );
 
     private:
 
@@ -123,6 +123,7 @@ namespace Scene {
         typedef Ecs::DataCache<PointCloudNode>  PointCloudCache;
 
         Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
+        Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
