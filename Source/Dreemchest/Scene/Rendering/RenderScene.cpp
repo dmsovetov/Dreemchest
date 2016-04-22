@@ -39,6 +39,7 @@ RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
     // Create entity caches
     m_pointClouds = scene->ecs()->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
     m_lights      = scene->ecs()->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
+    m_cameras     = scene->ecs()->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
 
     // Create scene constant buffer
     m_sceneConstants = hal->createConstantBuffer( sizeof( CBuffer::Scene ), false );
@@ -80,6 +81,9 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     // Get a state stack
     RenderStateStack& stateStack = frame->stateStack();
 
+    // Gen a frame entry point command buffer
+    RenderCommandBuffer& entryPoint = frame->entryPoint();
+
     // Push a default state block
     RenderStateBlock& defaults = stateStack.push();
     defaults.disableAlphaTest();
@@ -88,9 +92,17 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.enableFeatures( BIT( ShaderAmbientColor ) );
     defaults.bindConstantBuffer( frame->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
 
+    // Clear all cameras
+    const Cameras& cameras = m_cameras->data();
+
+    for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
+        const CameraNode& camera = cameras[i];
+        entryPoint.clear( frame->internRenderTarget( camera.camera->target() ), camera.camera->clearColor(), camera.camera->viewport(), camera.camera->clearMask() );
+    }
+
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( *frame.get() );
+        m_renderSystems[i]->render( *frame.get(), entryPoint );
     }
 
     // Pop a default state block
@@ -267,6 +279,21 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, intensity ), "Light.intensity" );
 
     return light;
+}
+
+// ** RenderScene::createCameraNode
+RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity )
+{
+    CameraNode camera;
+
+    camera.transform = entity.get<Transform>();
+    camera.matrix    = &camera.transform->matrix();
+    camera.camera    = entity.get<Camera>();
+
+    camera.cameraConstants = m_hal->createConstantBuffer( sizeof( CBuffer::View ), false );
+    camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, position ), "View.transform" );
+
+    return camera;
 }
 
 // ** RenderScene::createInputLayout

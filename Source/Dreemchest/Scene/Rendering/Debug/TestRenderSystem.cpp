@@ -44,7 +44,7 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 }
 
 // ** TestRenderSystem::emitRenderOperations
-void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     // Update camera constant buffer
     RenderScene::CBuffer::View* renderPassConstants = m_cameraConstants->lock<RenderScene::CBuffer::View>();
@@ -57,8 +57,6 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderStateStac
     pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
     pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
     pass.enableFeatures( BIT( ShaderEmissionColor ) );
-
-    RenderCommandBuffer& commands = frame.createCommandBuffer();
 
     m_pointCloudEmitter->emit( frame, commands, stateStack );
 

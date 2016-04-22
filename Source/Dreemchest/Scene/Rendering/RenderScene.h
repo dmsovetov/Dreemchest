@@ -84,11 +84,20 @@ namespace Scene {
             Renderer::ConstantBufferPtr         lightConstants;     //!< Light parameters constant buffer.
         };
 
+        //! Stores info about a camera.
+        struct CameraNode : public Node {
+            const Camera*                       camera;             //!< Camera component.
+            Renderer::ConstantBufferPtr         cameraConstants;    //!< Camera parameters constant buffer.
+        };
+
         //! A fixed array with renderable point clouds inside.
         typedef FixedArray<PointCloudNode>      PointClouds;
 
         //! A fixed array with light nodes inside.
         typedef FixedArray<LightNode>           Lights;
+
+        //! A fixed array with camera nodes inside.
+        typedef FixedArray<CameraNode>          Cameras;
 
         //! Returns parent scene.
         SceneWPtr                               scene( void ) const;
@@ -98,6 +107,9 @@ namespace Scene {
 
         //! Returns light nodes.
         const Lights&                           lights( void ) const;
+
+        //! Returns camera nodes.
+        const Cameras&                          cameras( void ) const;
 
 		//! Adds a new render system to the scene.
 		template<typename TRenderSystem, typename ... TArgs>
@@ -120,8 +132,11 @@ namespace Scene {
         //! Creates a point cloud node from an entity.
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
 
-        //! Creates a light  node from an entity.
+        //! Creates a light node from an entity.
         LightNode                               createLightNode( const Ecs::Entity& entity );
+
+        //! Creates a camera node from an entity.
+        CameraNode                              createCameraNode( const Ecs::Entity& entity );
 
         //! Creates a vertex declaration from a point cloud format.
         Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
@@ -140,12 +155,16 @@ namespace Scene {
         //! Entity data cache to store light nodes.
         typedef Ecs::DataCache<LightNode>       LightCache;
 
+        //! Entity data cache to store camera nodes.
+        typedef Ecs::DataCache<CameraNode>      CameraCache;
+
         Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
         Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
+        Ptr<CameraCache>                        m_cameras;          //!< Camera nodes cache.
     };
 
 	// ** RenderScene::addRenderSystem

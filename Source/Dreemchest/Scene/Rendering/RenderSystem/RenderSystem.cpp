@@ -38,7 +38,7 @@ RenderSystemBase::RenderSystemBase( RenderScene& renderScene, Ecs::IndexPtr came
 }
 
 // ** RenderSystemBase::render
-void RenderSystemBase::render( RenderFrame& frame )
+void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands )
 {
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
@@ -57,8 +57,12 @@ void RenderSystemBase::render( RenderFrame& frame )
         // Get Transform component from an entity
         const Transform& transform = *entity.get<Transform>();
 
+        // Create a command buffer to render this camera
+        RenderCommandBuffer& cameraCommands = frame.createCommandBuffer();
+        commands.execute( cameraCommands );
+
         // Emit render operations for this camera
-        emitRenderOperations( frame, stateStack, entity, camera, transform );
+        emitRenderOperations( frame, cameraCommands, stateStack, entity, camera, transform );
     }
 }
 
