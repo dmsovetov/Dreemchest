@@ -41,16 +41,16 @@ namespace Scene {
         Renderer::HalWPtr                       hal( void ) const;
 
         //! Creates an input layout instance and returns it's index.
-        Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& vertexFormat );
+        RenderResource                          createInputLayout( const VertexFormat& vertexFormat );
 
         //! Creates a vertex buffer from a vertex array with a specified vertex format.
-        Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
+        RenderResource                          createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
 
         //! Creates an index buffer from an index array.
-        Renderer::IndexBufferPtr                createIndexBuffer( const u16* indices, s32 count );
+        RenderResource                          createIndexBuffer( const u16* indices, s32 count );
 
         //! Creates a constant buffer with specified size and layout.
-        Renderer::ConstantBufferPtr             createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout );
+        RenderResource                          createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout );
 
         //! Interns a render target and returns it's integer identifier.
         s32                                     internRenderTarget( RenderTargetPtr renderTarget );
@@ -58,29 +58,17 @@ namespace Scene {
         //! Returns a render target by an index.
         const RenderTargetPtr&                  renderTarget( s32 identifier ) const;
 
-        //! Interns a vertex buffer and returns it's integer identifier.
-        s32                                     internVertexBuffer( Renderer::VertexBufferPtr vertexBuffer );
-        
         //! Returns a vertex buffer by an index.
-        const Renderer::VertexBufferPtr&        vertexBuffer( s32 identifier ) const;
-
-        //! Interns an index buffer and returns it's integer identifier.
-        s32                                     internIndexBuffer( Renderer::IndexBufferPtr indexBuffer );
+        const Renderer::VertexBufferPtr&        vertexBuffer( RenderResource identifier ) const;
 
         //! Returns an index buffer by an index.
-        const Renderer::IndexBufferPtr&         indexBuffer( s32 identifier ) const;
-
-        //! Interns a constant returns it's integer identifier.
-        s32                                     internConstantBuffer( Renderer::ConstantBufferPtr constantBuffer );
+        const Renderer::IndexBufferPtr&         indexBuffer( RenderResource identifier ) const;
 
         //! Returns a constant buffer by an index.
-        const Renderer::ConstantBufferPtr&      constantBuffer( s32 identifier ) const;
-
-        //! Interns an input layout returns it's integer identifier.
-        s32                                     internInputLayout( Renderer::InputLayoutPtr inputLayout );
+        const Renderer::ConstantBufferPtr&      constantBuffer( RenderResource identifier ) const;
 
         //! Returns an input layout by an index.
-        const Renderer::InputLayoutPtr&         inputLayout( s32 identifier ) const;
+        const Renderer::InputLayoutPtr&         inputLayout( RenderResource identifier ) const;
        
         //! Interns a texture and returns it's integer identifier.
         s32                                     internTexture( Renderer::TexturePtr texture );
@@ -104,12 +92,13 @@ namespace Scene {
 
     private:
 
-        Renderer::HalWPtr                       m_hal;  //!< A rendering HAL to be used.
+        Renderer::HalWPtr                       m_hal;                  //!< A rendering HAL to be used.
+        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;     //!< Allocated vertex buffers.
+        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;      //!< Allocated index buffers.
+        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;   //!< Allocated constant buffers.
+        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;      //!< Allocated input layouts.
+
         IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
-        IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
-        IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;         //!< Interned index buffers.
-        IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
-        IndexCache<Renderer::InputLayoutPtr>    m_inputLayouts;         //!< Interned input layouts.
         IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
         IndexCache<UbershaderPtr>               m_shaders;              //!< Interned shaders.
     };

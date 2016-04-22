@@ -153,7 +153,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.disableBlending();
     defaults.setDepthState( Renderer::LessEqual, true );
     defaults.enableFeatures( BIT( ShaderAmbientColor ) );
-    defaults.bindConstantBuffer( m_context->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
+    defaults.bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();
@@ -259,9 +259,10 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
 void RenderScene::updateConstantBuffers( void )
 {
     // Update scene constant buffer
-    CBuffer::Scene* sceneConstants = m_sceneConstants->lock<CBuffer::Scene>();
+    Renderer::ConstantBufferPtr sceneCBuffer = m_context->constantBuffer( m_sceneConstants );
+    CBuffer::Scene* sceneConstants = sceneCBuffer->lock<CBuffer::Scene>();
     sceneConstants->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );
-    m_sceneConstants->unlock();
+    sceneCBuffer->unlock();
 
     // Update camera constant buffers
     Cameras& cameras = m_cameras->data();
@@ -269,9 +270,10 @@ void RenderScene::updateConstantBuffers( void )
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         CameraNode& node = cameras[i];
         {
-            CBuffer::View* cameraConstants = node.cameraConstants->lock<RenderScene::CBuffer::View>();
+            Renderer::ConstantBufferPtr cameraCBuffer = m_context->constantBuffer( node.cameraConstants );
+            CBuffer::View* cameraConstants = cameraCBuffer->lock<RenderScene::CBuffer::View>();
             cameraConstants->transform = node.camera->calculateViewProjection( node.transform->matrix() );
-            node.cameraConstants->unlock();
+            cameraCBuffer->unlock();
         }
     }
 
@@ -282,12 +284,13 @@ void RenderScene::updateConstantBuffers( void )
         LightNode& node = lights[i];
 
         {
-            CBuffer::Light* cbuffer = node.lightConstants->lock<CBuffer::Light>();
+            Renderer::ConstantBufferPtr lightCBuffer = m_context->constantBuffer( node.lightConstants );
+            CBuffer::Light* cbuffer = lightCBuffer->lock<CBuffer::Light>();
             cbuffer->position  = node.transform->worldSpacePosition();
             cbuffer->intensity = node.light->intensity();
             cbuffer->color     = node.light->color();
             cbuffer->range     = node.light->range();
-            node.lightConstants->unlock();
+            lightCBuffer->unlock();
         }
     }
 
@@ -298,16 +301,18 @@ void RenderScene::updateConstantBuffers( void )
         PointCloudNode& node = pointClouds[i];
 
         {
-            CBuffer::Instance* cbuffer = node.instanceConstants->lock<CBuffer::Instance>();
+            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.instanceConstants );
+            CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
             cbuffer->transform = node.transform->matrix();
-            node.instanceConstants->unlock();
+            instanceCBuffer->unlock();
         }
         {
-            CBuffer::Material* cbuffer = node.materialConstants->lock<CBuffer::Material>();
+            Renderer::ConstantBufferPtr materialCBuffer = m_context->constantBuffer( node.materialConstants );
+            CBuffer::Material* cbuffer = materialCBuffer->lock<CBuffer::Material>();
             cbuffer->diffuse  = node.material->color( Material::Diffuse );
             cbuffer->specular = node.material->color( Material::Specular );
             cbuffer->emission = node.material->color( Material::Emission );
-            node.materialConstants->unlock();
+            materialCBuffer->unlock();
         }
     }
 
@@ -318,17 +323,19 @@ void RenderScene::updateConstantBuffers( void )
         StaticMeshNode& node = staticMeshes[i];
 
         {
-            CBuffer::Instance* cbuffer = node.instanceConstants->lock<CBuffer::Instance>();
+            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.instanceConstants );
+            CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
             cbuffer->transform = node.transform->matrix();
-            node.instanceConstants->unlock();
+            instanceCBuffer->unlock();
         }
         if( node.material.isValid() )
         {
-            CBuffer::Material* cbuffer = node.materialConstants->lock<CBuffer::Material>();
+            Renderer::ConstantBufferPtr materialCBuffer = m_context->constantBuffer( node.materialConstants );
+            CBuffer::Material* cbuffer = materialCBuffer->lock<CBuffer::Material>();
             cbuffer->diffuse  = node.material->color( Material::Diffuse );
             cbuffer->specular = node.material->color( Material::Specular );
             cbuffer->emission = node.material->color( Material::Emission );
-            node.materialConstants->unlock();
+            materialCBuffer->unlock();
         }
     }
 }

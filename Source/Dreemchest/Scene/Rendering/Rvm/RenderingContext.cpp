@@ -43,7 +43,7 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
 }
 
 // ** RenderingContext::createInputLayout
-Renderer::InputLayoutPtr RenderingContext::createInputLayout( const VertexFormat& format )
+RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
 {
     // Create an input layout
     Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
@@ -65,11 +65,11 @@ Renderer::InputLayoutPtr RenderingContext::createInputLayout( const VertexFormat
         inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
     }
 
-    return inputLayout;
+    return m_inputLayoutPool.push( inputLayout ) + 1;
 }
 
 // ** RenderingContext::createVertexBuffer
-Renderer::VertexBufferPtr RenderingContext::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
+RenderResource RenderingContext::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
 {
     // Create a vertex buffer instance
     Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( count * dstFormat.vertexSize() );
@@ -94,11 +94,11 @@ Renderer::VertexBufferPtr RenderingContext::createVertexBuffer( const void* vert
     // Unlock a vertex buffer.
     vertexBuffer->unlock();
 
-    return vertexBuffer;
+    return m_vertexBufferPool.push( vertexBuffer ) + 1;
 }
 
 // ** RenderingContext::createIndexBuffer
-Renderer::IndexBufferPtr RenderingContext::createIndexBuffer( const u16* indices, s32 count )
+RenderResource RenderingContext::createIndexBuffer( const u16* indices, s32 count )
 {
     // Create an index buffer instance
     Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( count * sizeof( u16 ) );
@@ -109,13 +109,14 @@ Renderer::IndexBufferPtr RenderingContext::createIndexBuffer( const u16* indices
     // Unlock an index buffer.
     indexBuffer->unlock();
 
-    return indexBuffer;
+    return m_indexBufferPool.push( indexBuffer ) + 1;
 }
 
 // ** RenderingContext::createConstantBuffer
-Renderer::ConstantBufferPtr RenderingContext::createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout )
+RenderResource RenderingContext::createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout )
 {
-    return m_hal->createConstantBuffer( size, layout );
+    Renderer::ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( size, layout );
+    return m_constantBufferPool.push( constantBuffer ) + 1;
 }
 
 // ** RenderingContext::internRenderTarget
@@ -130,52 +131,32 @@ const RenderTargetPtr& RenderingContext::renderTarget( s32 identifier ) const
     return m_renderTargets.resolve( identifier );
 }
 
-// ** RenderingContext::internVertexBuffer
-s32 RenderingContext::internVertexBuffer( Renderer::VertexBufferPtr vertexBuffer )
-{
-    return m_vertexBuffers.add( vertexBuffer );
-}
-        
 // ** RenderingContext::vertexBuffer
-const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( s32 identifier ) const
+const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( RenderResource identifier ) const
 {
-    return m_vertexBuffers.resolve( identifier );
-}
-
-// ** RenderingContext::internIndexBuffer
-s32 RenderingContext::internIndexBuffer( Renderer::IndexBufferPtr indexBuffer )
-{
-    return m_indexBuffers.add( indexBuffer );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_vertexBufferPool[identifier - 1];
 }
         
 // ** RenderingContext::indexBuffer
-const Renderer::IndexBufferPtr& RenderingContext::indexBuffer( s32 identifier ) const
+const Renderer::IndexBufferPtr& RenderingContext::indexBuffer( RenderResource identifier ) const
 {
-    return m_indexBuffers.resolve( identifier );
-}
-
-// ** RenderingContext::internConstantBuffer
-s32 RenderingContext::internConstantBuffer( Renderer::ConstantBufferPtr constantBuffer )
-{
-    return m_constantBuffers.add( constantBuffer );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_indexBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::constantBuffer
-const Renderer::ConstantBufferPtr& RenderingContext::constantBuffer( s32 identifier ) const
+const Renderer::ConstantBufferPtr& RenderingContext::constantBuffer( RenderResource identifier ) const
 {
-    return m_constantBuffers.resolve( identifier );
-}
-
-// ** RenderingContext::internInputLayout
-s32 RenderingContext::internInputLayout( Renderer::InputLayoutPtr inputLayout )
-{
-    return m_inputLayouts.add( inputLayout );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_constantBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::inputLayout
-const Renderer::InputLayoutPtr& RenderingContext::inputLayout( s32 identifier ) const
+const Renderer::InputLayoutPtr& RenderingContext::inputLayout( RenderResource identifier ) const
 {
-    return m_inputLayouts.resolve( identifier );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_inputLayoutPool[identifier - 1];
 }
 
 // ** RenderingContext::internTexture

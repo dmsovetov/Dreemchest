@@ -34,6 +34,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    typedef u32 RenderResource;
+
     //! Render scene contains all renderable entities, performs culling and constructs command buffers.
     class RenderScene : public RefCounted {
     public:
@@ -77,27 +79,27 @@ namespace Scene {
         //! Stores info about a scene instance.
         struct InstanceNode : public Node {
             MaterialHandle                      material;
-            Renderer::ConstantBufferPtr         instanceConstants;  //!< Node instance constant buffer.
-            Renderer::ConstantBufferPtr         materialConstants;  //!< A point cloud material options.   
+            RenderResource                      instanceConstants;  //!< Node instance constant buffer.
+            RenderResource                      materialConstants;  //!< A point cloud material options.   
         };
 
         //! Stores info about a renderable point cloud.
         struct PointCloudNode : public InstanceNode {
-            Renderer::VertexBufferPtr           vertexBuffer;       //!< A point cloud vertex buffer.
-            Renderer::InputLayoutPtr            inputLayout;        //!< A point cloud input layout.    
+            RenderResource                      vertexBuffer;       //!< A point cloud vertex buffer.
+            RenderResource                      inputLayout;        //!< A point cloud input layout.    
             s32                                 vertexCount;        //!< A total number of vertices inside a point cloud.
         };
 
         //! Stores info about a renderable light.
         struct LightNode : public Node {
             const Light*                        light;              //!< Light component.
-            Renderer::ConstantBufferPtr         lightConstants;     //!< Light parameters constant buffer.
+            RenderResource                      lightConstants;     //!< Light parameters constant buffer.
         };
 
         //! Stores info about a camera.
         struct CameraNode : public Node {
             const Camera*                       camera;             //!< Camera component.
-            Renderer::ConstantBufferPtr         cameraConstants;    //!< Camera parameters constant buffer.
+            RenderResource                      cameraConstants;    //!< Camera parameters constant buffer.
         };
 
         //! Stores info about a static mesh.
@@ -105,9 +107,9 @@ namespace Scene {
             const StaticMesh*                   mesh;               //!< Mesh component.
             u32                                 timestamp;          //!< Asset modification timestamp.
             u32                                 indexCount;         //!< A total number of indices in a mesh.
-            Renderer::VertexBufferPtr           vertexBuffer;       //!< A mesh vertex buffer.
-            Renderer::IndexBufferPtr            indexBuffer;        //!< A mesh index buffer.
-            Renderer::InputLayoutPtr            inputLayout;        //!< A mesh input layout.  
+            RenderResource                      vertexBuffer;       //!< A mesh vertex buffer.
+            RenderResource                      indexBuffer;        //!< A mesh index buffer.
+            RenderResource                      inputLayout;        //!< A mesh input layout.  
         };
 
         //! A fixed array with renderable point clouds inside.
@@ -194,7 +196,7 @@ namespace Scene {
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
-        Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
+        s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
