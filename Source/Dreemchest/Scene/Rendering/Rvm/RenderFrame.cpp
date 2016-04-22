@@ -34,6 +34,19 @@ namespace Scene {
 RenderFrame::RenderFrame( void )
     : m_stateStack( 1024, MaxStateStackDepth )
 {
+    m_entryPoint = &createCommandBuffer();
+}
+
+// ** RenderFrame::entryPoint
+const RenderCommandBuffer& RenderFrame::entryPoint( void ) const
+{
+    return *m_entryPoint;
+}
+
+// ** RenderFrame::entryPoint
+RenderCommandBuffer& RenderFrame::entryPoint( void )
+{
+    return *m_entryPoint;
 }
 
 // ** RenderFrame::createCommandBuffer

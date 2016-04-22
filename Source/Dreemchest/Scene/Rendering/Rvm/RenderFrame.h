@@ -97,11 +97,16 @@ namespace Scene {
         //! Returns a state stack.
         RenderStateStack&                       stateStack( void );
 
+        //! Returns a root command buffer.
+        const RenderCommandBuffer&              entryPoint( void ) const;
+        RenderCommandBuffer&                    entryPoint( void );
+
     private:
 
         //! Container type to store recorded command buffers.
         typedef Array<RenderCommandBufferUPtr> Commands;
 
+        RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
         IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
         IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
