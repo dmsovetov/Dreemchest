@@ -30,6 +30,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** FrustumCullingSystem::begin
 bool FrustumCullingSystem::begin( u32 currentTime, f32 dt )
 {
@@ -70,6 +71,7 @@ void FrustumCullingSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity
 		staticMesh.setVisibilityMask( BIT( frustum.id() ), frustum.inside( bounds ) );
 	}
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

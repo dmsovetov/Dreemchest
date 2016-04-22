@@ -68,13 +68,17 @@ namespace Scene {
             const Matrix4*                      matrix;             //!< Node transform affine matrix.
         };
 
-        //! Stores info about a renderable point cloud.
-        struct PointCloudNode : public Node {
+        //! Stores info about a scene instance.
+        struct InstanceNode : public Node {
             MaterialHandle                      material;
-            Renderer::VertexBufferPtr           vertexBuffer;       //!< A point cloud vertex buffer.
-            Renderer::InputLayoutPtr            inputLayout;        //!< A point cloud input layout.
             Renderer::ConstantBufferPtr         instanceConstants;  //!< Node instance constant buffer.
-            Renderer::ConstantBufferPtr         materialConstants;  //!< A point cloud material options.       
+            Renderer::ConstantBufferPtr         materialConstants;  //!< A point cloud material options.   
+        };
+
+        //! Stores info about a renderable point cloud.
+        struct PointCloudNode : public InstanceNode {
+            Renderer::VertexBufferPtr           vertexBuffer;       //!< A point cloud vertex buffer.
+            Renderer::InputLayoutPtr            inputLayout;        //!< A point cloud input layout.    
             s32                                 vertexCount;        //!< A total number of vertices inside a point cloud.
         };
 
@@ -90,6 +94,14 @@ namespace Scene {
             Renderer::ConstantBufferPtr         cameraConstants;    //!< Camera parameters constant buffer.
         };
 
+        //! Stores info about a static mesh.
+        struct StaticMeshNode : public InstanceNode {
+            const StaticMesh*                   mesh;               //!< Mesh component.
+            Renderer::VertexBufferPtr           vertexBuffer;       //!< A mesh vertex buffer.
+            Renderer::IndexBufferPtr            indexBuffer;        //!< A mesh index buffer.
+            Renderer::InputLayoutPtr            inputLayout;        //!< A mesh input layout.  
+        };
+
         //! A fixed array with renderable point clouds inside.
         typedef FixedArray<PointCloudNode>      PointClouds;
 
@@ -98,6 +110,9 @@ namespace Scene {
 
         //! A fixed array with camera nodes inside.
         typedef FixedArray<CameraNode>          Cameras;
+
+        //! A fixed array with static mesh nodes inside.
+        typedef FixedArray<StaticMeshNode>      StaticMeshes;
 
         //! Returns parent scene.
         SceneWPtr                               scene( void ) const;
@@ -110,6 +125,9 @@ namespace Scene {
 
         //! Returns camera nodes.
         const Cameras&                          cameras( void ) const;
+
+        //! Returns static mesh nodes.
+        const StaticMeshes&                     staticMeshes( void ) const;
 
         //! Returns a camera node by a component.
         const CameraNode&                       findCameraNode( Ecs::EntityWPtr camera ) const;
@@ -141,6 +159,9 @@ namespace Scene {
         //! Creates a camera node from an entity.
         CameraNode                              createCameraNode( const Ecs::Entity& entity );
 
+        //! Creates a static mesh node from an entity.
+        StaticMeshNode                          createStaticMeshNode( const Ecs::Entity& entity );
+
         //! Creates a vertex declaration from a point cloud format.
         Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
 
@@ -161,6 +182,9 @@ namespace Scene {
         //! Entity data cache to store camera nodes.
         typedef Ecs::DataCache<CameraNode>      CameraCache;
 
+        //! Entity data cache to store static meshes.
+        typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
+
         Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
         Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
@@ -168,6 +192,7 @@ namespace Scene {
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
         Ptr<CameraCache>                        m_cameras;          //!< Camera nodes cache.
+        Ptr<StaticMeshCache>                    m_staticMeshes;     //!< Static mesh nodes cache.
     };
 
 	// ** RenderScene::addRenderSystem

@@ -182,7 +182,9 @@ Scene::Scene( void )
 	addSystem<RotateAroundAxesSystem>();
 #if !DEV_DISABLE_CULLING
     addSystem<WorldSpaceBoundingBoxSystem>();
+    #if DEV_DEPRECATED_SCENE_RENDERER
     addSystem<FrustumCullingSystem>( m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() ) );
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 #endif  /*  !DEV_DISABLE_CULLING    */
 		
 #if DEV_DEPRECATED_SERIALIZATION

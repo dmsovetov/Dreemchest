@@ -31,15 +31,28 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types {
+    enum {
+          _Light = sizeof( RenderScene::LightNode )
+        , _PointCloud = sizeof( RenderScene::PointCloudNode )
+        , _Camera = sizeof( RenderScene::CameraNode )
+        , _StaticMesh = sizeof( RenderScene::StaticMeshNode )
+    };
+};
+
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
     : m_scene( scene )
     , m_hal( hal )
 {
+    // Get a parent Ecs instance
+    Ecs::EcsWPtr ecs = scene->ecs();
+
     // Create entity caches
-    m_pointClouds = scene->ecs()->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
-    m_lights      = scene->ecs()->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
-    m_cameras     = scene->ecs()->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
+    m_pointClouds   = ecs->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
+    m_lights        = ecs->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
+    m_cameras       = ecs->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
+    m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 
     // Create scene constant buffer
     m_sceneConstants = hal->createConstantBuffer( sizeof( CBuffer::Scene ), false );
@@ -68,6 +81,12 @@ const RenderScene::PointClouds& RenderScene::pointClouds( void ) const
 const RenderScene::Lights& RenderScene::lights( void ) const
 {
     return m_lights->data();
+}
+
+// ** RenderScene::staticMeshes
+const RenderScene::StaticMeshes& RenderScene::staticMeshes( void ) const
+{
+    return m_staticMeshes->data();
 }
 
 // ** RenderScene::findCameraNode
@@ -312,6 +331,18 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::View, transform ), "View.transform" );
 
     return camera;
+}
+
+// ** RenderScene::createStaticMeshNode
+RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity& entity )
+{
+    StaticMeshNode mesh;
+
+    mesh.transform  = entity.get<Transform>();
+    mesh.matrix     = &mesh.transform->matrix();
+    mesh.mesh       = entity.get<StaticMesh>();
+
+    return mesh;
 }
 
 // ** RenderScene::createInputLayout

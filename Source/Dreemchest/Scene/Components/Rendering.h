@@ -174,7 +174,12 @@ namespace Scene {
 
 									//! Constructs StaticMesh instance.
 									StaticMesh( const MeshHandle mesh = MeshHandle() )
-										: m_mesh( mesh ), m_visibility( ~0 ) {}
+										: m_mesh( mesh )
+                                    #if DEV_DEPRECATED_SCENE_RENDERER
+                                        , m_visibility( ~0 )
+                                    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
+                                        {
+                                        }
 
 		//! Returns mesh to be rendered.
 		const MeshHandle&		    mesh( void ) const;
@@ -188,11 +193,13 @@ namespace Scene {
 		//! Sets the mesh world space bounding box.
 		void						setWorldSpaceBounds( const Bounds& value );
 
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		//! Returns true if the mesh is visible by camera.
 		bool						isVisible( u8 camera ) const;
 
 		//! Marks the mesh as visible from camera.
 		void						setVisibilityMask( u16 mask, bool value );
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 		//! Returns the total number of materials.
 		u32							materialCount( void ) const;
@@ -221,7 +228,9 @@ namespace Scene {
 
 	private:
 
+    #if DEV_DEPRECATED_SCENE_RENDERER
 		FlagSet16					m_visibility;		//!< Camera visibility mask.
+    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 		MeshHandle				    m_mesh;				//!< Mesh to be rendered.
 		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
 		Array<MaterialHandle>	    m_materials;		//!< Mesh materials array.

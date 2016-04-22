@@ -36,6 +36,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Performs frustum culling for all active cameras.
 	class FrustumCullingSystem : public Ecs::GenericEntitySystem<FrustumCullingSystem, StaticMesh, Transform> {
 	public:
@@ -57,6 +58,7 @@ namespace Scene {
 		Ecs::IndexPtr		m_cameras;	//!< All cameras used for culling.
 		Array<PlaneClipper>	m_frustums;	//!< Active frustums.
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

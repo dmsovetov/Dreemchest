@@ -160,6 +160,7 @@ void StaticMesh::setWorldSpaceBounds( const Bounds& value )
 	m_worldSpaceBounds = value;
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** StaticMesh::const 
 bool StaticMesh::isVisible( u8 camera ) const
 {
@@ -172,6 +173,7 @@ void StaticMesh::setVisibilityMask( u16 mask, bool value )
 {
 	m_visibility.set( mask, value );
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ** StaticMesh::setMaterial
 void StaticMesh::setMaterial( u32 index, MaterialHandle value )
