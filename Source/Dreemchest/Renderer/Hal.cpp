@@ -185,13 +185,13 @@ VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 }
 
 // ** Hal::createConstantBuffer
-ConstantBufferPtr Hal::createConstantBuffer( u32 size, bool GPU )
+ConstantBufferPtr Hal::createConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 {
-	if( GPU ) {
+	if( layout == NULL ) {
 		LogWarning( "hal", "GPU constant buffers are not supported\n" );
 	}
 
-    return ConstantBufferPtr( DC_NEW ConstantBuffer( size, false ) );
+    return ConstantBufferPtr( DC_NEW ConstantBuffer( size, layout ) );
 }
 
 // ** Hal::setPolygonMode
@@ -213,7 +213,7 @@ void Hal::setShader( const ShaderPtr& shader )
         ConstantBufferWPtr& constantBuffer = m_constantBuffers[i];
 
         // Skip invalid or GPU side constant buffers
-        if( !constantBuffer.valid() || constantBuffer->isGpu() ) {
+        if( !constantBuffer.valid() || constantBuffer->layout() == NULL ) {
             continue;
         }
 
@@ -221,12 +221,9 @@ void Hal::setShader( const ShaderPtr& shader )
         const u8* data = constantBuffer->data();
 
         // Submit all constants to a shader
-        for( s32 j = 0, k = constantBuffer->constantCount(); j < k; j++ ) {
-            // Get a constant stored inside a buffer
-            const ConstantBuffer::Constant& constant = constantBuffer->constantAt( j );
-
+        for( const ConstantBufferLayout* constant = constantBuffer->layout(); constant->name; constant++ ) {
             // Lookup a uniform location by name
-            u32 location = shader->findUniformLocation( constant.name );
+            u32 location = shader->findUniformLocation( constant->name );
 
             // Not found - skip
             if( location == 0 ) {
@@ -234,19 +231,19 @@ void Hal::setShader( const ShaderPtr& shader )
             }
 
             // Submit constant to a shader
-            switch( constant.type ) {
-            case ConstantBuffer::Integer:   const_cast<ShaderPtr&>( shader )->setInt( location, *reinterpret_cast<const u32*>( data + constant.offset ) );
-                                            break;
-            case ConstantBuffer::Float:     const_cast<ShaderPtr&>( shader )->setFloat( location, *reinterpret_cast<const f32*>( data + constant.offset ) );
-                                            break;
-            case ConstantBuffer::Vec2:      const_cast<ShaderPtr&>( shader )->setVec2( location, *reinterpret_cast<const Vec2*>( data + constant.offset ) );
-                                            break;
-            case ConstantBuffer::Vec3:      const_cast<ShaderPtr&>( shader )->setVec3( location, *reinterpret_cast<const Vec3*>( data + constant.offset ) );
-                                            break;
-            case ConstantBuffer::Vec4:      const_cast<ShaderPtr&>( shader )->setVec4( location, *reinterpret_cast<const Vec4*>( data + constant.offset ) );
-                                            break;
-            case ConstantBuffer::Matrix4:   const_cast<ShaderPtr&>( shader )->setMatrix( location, *reinterpret_cast<const Matrix4*>( data + constant.offset ) );
-                                            break;
+            switch( constant->type ) {
+            case ConstantBufferLayout::Integer: const_cast<ShaderPtr&>( shader )->setInt( location, *reinterpret_cast<const u32*>( data + constant->offset ) );
+                                                break;
+            case ConstantBufferLayout::Float:   const_cast<ShaderPtr&>( shader )->setFloat( location, *reinterpret_cast<const f32*>( data + constant->offset ) );
+                                                break;
+            case ConstantBufferLayout::Vec2:    const_cast<ShaderPtr&>( shader )->setVec2( location, *reinterpret_cast<const Vec2*>( data + constant->offset ) );
+                                                break;
+            case ConstantBufferLayout::Vec3:    const_cast<ShaderPtr&>( shader )->setVec3( location, *reinterpret_cast<const Vec3*>( data + constant->offset ) );
+                                                break;
+            case ConstantBufferLayout::Vec4:    const_cast<ShaderPtr&>( shader )->setVec4( location, *reinterpret_cast<const Vec4*>( data + constant->offset ) );
+                                                break;
+            case ConstantBufferLayout::Matrix4: const_cast<ShaderPtr&>( shader )->setMatrix( location, *reinterpret_cast<const Matrix4*>( data + constant->offset ) );
+                                                break;
             }
         }
     }
@@ -875,14 +872,16 @@ void IndexBuffer::unlock( void )
 // ----------------------------------------------- ConstantBuffer -------------------------------------------------- //
 
 // ** ConstantBuffer::ConstantBuffer
-ConstantBuffer::ConstantBuffer( u32 size, bool gpu )
+ConstantBuffer::ConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 	: m_size( size )
     , m_data( NULL )
-    , m_isGpu( gpu )
+    , m_layout( layout )
 {
-	if( !m_isGpu ) {
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+	if( layout ) {
 		m_data = DC_NEW u8[size];
 	}
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
 ConstantBuffer::~ConstantBuffer( void )
@@ -894,12 +893,6 @@ ConstantBuffer::~ConstantBuffer( void )
 u32 ConstantBuffer::size( void ) const
 {
     return m_size;
-}
-
-// ** ConstantBuffer::isGpu
-bool ConstantBuffer::isGpu( void ) const
-{
-	return m_isGpu;
 }
 
 // ** ConstantBuffer::lock
@@ -921,29 +914,11 @@ const u8* ConstantBuffer::data( void ) const
     return reinterpret_cast<const u8*>( m_data );
 }
 
-// ** ConstantBuffer::addConstant
-void ConstantBuffer::addConstant( Type type, u32 offset, CString name )
+// ** ConstantBuffer::size
+const ConstantBufferLayout* ConstantBuffer::layout( void ) const
 {
-    Constant constant;
-    constant.type    = type;
-    constant.offset  = offset;
-    constant.name    = name;
-    m_constants.push_back( constant );
+    return m_layout;
 }
-
-// ** ConstantBuffer::constantCount
-s32 ConstantBuffer::constantCount( void ) const
-{
-    return static_cast<s32>( m_constants.size() );
-}
-
-// ** ConstantBuffer::constantAt
-const ConstantBuffer::Constant& ConstantBuffer::constantAt( s32 index ) const
-{
-    DC_ABORT_IF( index < 0 || index >= constantCount(), "index is out of range" );
-    return m_constants[index];
-}
-
 #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
 // -------------------------------------------------- Shader ---------------------------------------------------- //

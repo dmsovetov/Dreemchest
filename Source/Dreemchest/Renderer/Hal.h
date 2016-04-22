@@ -33,6 +33,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
+#if DEV_RENDERER_SOFTWARE_CBUFFERS
+    struct ConstantBufferLayout;
+#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
+
     // ** class RenderView
     //! RenderView class is a container for rendering surface.
     class dcInterface RenderView {
@@ -150,7 +154,7 @@ namespace Renderer {
          \param GPU     Determines a location where to store a constant buffer data (RAM or GPU).
          \return        ConstantBuffer instance.
          */
-        virtual ConstantBufferPtr    createConstantBuffer( u32 size, bool GPU = true );
+        virtual ConstantBufferPtr    createConstantBuffer( u32 size, const ConstantBufferLayout* layout );
 
         //! Binds a shader.
         virtual void    setShader( const ShaderPtr& shader );
@@ -631,11 +635,9 @@ namespace Renderer {
 		bool						m_isGpu;
     };
 
-    //! Constant buffer contains data that is sent to a shader.
-    class ConstantBuffer : public RenderResource {
-    public:
-
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
+    //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
+    struct ConstantBufferLayout {
         //! Constant type.
         enum Type {
               Integer   //!< Integer constant value.
@@ -646,27 +648,23 @@ namespace Renderer {
             , Matrix4   //!< 4x4 matrix constant value.
         };
 
-        //! A constant value item
-        struct Constant {
-            Type        type;       //!< Uniform type.
-            CString     name;       //!< Uniform name.
-            u32         offset;     //!< Uniform offset.
-        };
+        CString     name;       //!< Uniform name.
+        Type        type;       //!< Uniform type.
+        u32         offset;     //!< Uniform offset.
+    };
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
+    //! Constant buffer contains data that is sent to a shader.
+    class ConstantBuffer : public RenderResource {
+    public:
+
                                     //! Constructs a ConstantBuffer instance.
-                                    ConstantBuffer( u32 size, bool gpu );
+                                    ConstantBuffer( u32 size, const ConstantBufferLayout* layout );
 		virtual						~ConstantBuffer( void );
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
-        //! Adds a new constant value to a software buffer.
-        void                        addConstant( Type type, u32 offset, CString name );
-
-        //! Returns a total number of uniforms stored inside a buffer.
-        s32                         constantCount( void ) const;
-
-        //! Returns a value at specified index.
-        const Constant&             constantAt( s32 index ) const;
+        //! Returns a constant buffer layout.
+        const ConstantBufferLayout* layout( void ) const;
 
         //! Returns a constant buffer data pointer.
         const u8*                   data( void ) const;
@@ -674,9 +672,6 @@ namespace Renderer {
 
         //! Returns a constant buffer size.
         u32                         size( void ) const;
-
-        //! Returns true if this buffer reside in GPU memory.
-		bool						isGpu( void ) const;
 
         //! Locks a constant buffer.
         virtual void*               lock( void );
@@ -690,11 +685,10 @@ namespace Renderer {
 
     protected:
 
-        u32                         m_size;         //!< Constant buffer size.
-        void*                       m_data;         //!< Constant buffer data.
-        bool                        m_isGpu;        //!< Is it a GPU-side constant buffer?
+        u32                         m_size;     //!< Constant buffer size.
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
-        Array<Constant>             m_constants;    //!< An array of constants that are stored inside a buffer.
+        void*                       m_data;     //!< Constant buffer data.
+        const ConstantBufferLayout* m_layout;   //!< An array of constants that are stored inside a buffer.
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };
 

@@ -206,16 +206,16 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( s32 size, bool GPU )
 }
 
 // ** OpenGLHal::createConstantBuffer
-ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, bool GPU )
+ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 {
 	DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
-	if( GPU ) {
+	if( layout == NULL ) {
 		LogWarning( "hal", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
 	}
 
-    return Hal::createConstantBuffer( size, GPU );
+    return Hal::createConstantBuffer( size, layout );
 }
 
 // ** OpenGLHal::setPolygonMode
