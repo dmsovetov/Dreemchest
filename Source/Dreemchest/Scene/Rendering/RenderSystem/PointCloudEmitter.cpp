@@ -37,7 +37,7 @@ PointCloudEmitter::PointCloudEmitter( RenderScene& renderScene )
 }
 
 // ** PointCloudEmitter::emit
-void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
+void PointCloudEmitter::emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
 {
     // Get all point clouds that reside in scene
     const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();
@@ -55,10 +55,10 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
         RenderStateBlock& instance = stateStack.push();
-        instance.bindVertexBuffer( frame.internVertexBuffer( pointCloud.vertexBuffer ) );
-        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.instanceConstants ), RenderState::InstanceConstants );
-        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.materialConstants ), RenderState::MaterialConstants );
-        instance.bindInputLayout( frame.internInputLayout( pointCloud.inputLayout ) );
+        instance.bindVertexBuffer( context.internVertexBuffer( pointCloud.vertexBuffer ) );
+        instance.bindConstantBuffer( context.internConstantBuffer( pointCloud.instanceConstants ), RenderState::InstanceConstants );
+        instance.bindConstantBuffer( context.internConstantBuffer( pointCloud.materialConstants ), RenderState::MaterialConstants );
+        instance.bindInputLayout( context.internInputLayout( pointCloud.inputLayout ) );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
             instance.disableFeatures( BIT( ShaderAmbientColor ) );

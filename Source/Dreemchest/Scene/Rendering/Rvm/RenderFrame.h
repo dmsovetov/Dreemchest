@@ -52,48 +52,6 @@ namespace Scene {
         //! Creates a new command buffer.
         RenderCommandBuffer&                    createCommandBuffer( void );
 
-        //! Interns a render target and returns it's integer identifier.
-        s32                                     internRenderTarget( RenderTargetPtr renderTarget );
-
-        //! Returns a render target by an index.
-        const RenderTargetPtr&                  renderTarget( s32 identifier ) const;
-
-        //! Interns a vertex buffer and returns it's integer identifier.
-        s32                                     internVertexBuffer( Renderer::VertexBufferPtr vertexBuffer );
-        
-        //! Returns a vertex buffer by an index.
-        const Renderer::VertexBufferPtr&        vertexBuffer( s32 identifier ) const;
-
-        //! Interns an index buffer and returns it's integer identifier.
-        s32                                     internIndexBuffer( Renderer::IndexBufferPtr indexBuffer );
-
-        //! Returns an index buffer by an index.
-        const Renderer::IndexBufferPtr&         indexBuffer( s32 identifier ) const;
-
-        //! Interns a constant returns it's integer identifier.
-        s32                                     internConstantBuffer( Renderer::ConstantBufferPtr constantBuffer );
-
-        //! Returns a constant buffer by an index.
-        const Renderer::ConstantBufferPtr&      constantBuffer( s32 identifier ) const;
-
-        //! Interns an input layout returns it's integer identifier.
-        s32                                     internInputLayout( Renderer::InputLayoutPtr inputLayout );
-
-        //! Returns an input layout by an index.
-        const Renderer::InputLayoutPtr&         inputLayout( s32 identifier ) const;
-       
-        //! Interns a texture and returns it's integer identifier.
-        s32                                     internTexture( Renderer::TexturePtr texture );
-        
-        //! Returns a texture by an index.
-        const Renderer::TexturePtr&             texture( s32 identifier ) const;
-
-        //! Interns a shader and returns it's integer identifier.
-        s32                                     internShader( UbershaderPtr shader );
-        
-        //! Returns a shader by an index.
-        const UbershaderPtr&                    shader( s32 identifier ) const;
-
         //! Returns a state stack.
         RenderStateStack&                       stateStack( void );
 
@@ -108,13 +66,6 @@ namespace Scene {
 
         RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
-        IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
-        IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
-        IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;         //!< Interned index buffers.
-        IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
-        IndexCache<Renderer::InputLayoutPtr>    m_inputLayouts;         //!< Interned input layouts.
-        IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
-        IndexCache<UbershaderPtr>               m_shaders;              //!< Interned shaders.
         RenderStateStack                        m_stateStack;           //!< Current state stack.
     };
 

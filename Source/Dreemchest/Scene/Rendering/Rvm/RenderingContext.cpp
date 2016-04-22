@@ -42,12 +42,95 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
     return m_hal;
 }
 
+// ** RenderingContext::internRenderTarget
+s32 RenderingContext::internRenderTarget( RenderTargetPtr renderTarget )
+{
+    return m_renderTargets.add( renderTarget );
+}
+
+// ** RenderingContext::renderTarget
+const RenderTargetPtr& RenderingContext::renderTarget( s32 identifier ) const
+{
+    return m_renderTargets.resolve( identifier );
+}
+
+// ** RenderingContext::internVertexBuffer
+s32 RenderingContext::internVertexBuffer( Renderer::VertexBufferPtr vertexBuffer )
+{
+    return m_vertexBuffers.add( vertexBuffer );
+}
+        
+// ** RenderingContext::vertexBuffer
+const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( s32 identifier ) const
+{
+    return m_vertexBuffers.resolve( identifier );
+}
+
+// ** RenderingContext::internIndexBuffer
+s32 RenderingContext::internIndexBuffer( Renderer::IndexBufferPtr indexBuffer )
+{
+    return m_indexBuffers.add( indexBuffer );
+}
+        
+// ** RenderingContext::indexBuffer
+const Renderer::IndexBufferPtr& RenderingContext::indexBuffer( s32 identifier ) const
+{
+    return m_indexBuffers.resolve( identifier );
+}
+
+// ** RenderingContext::internConstantBuffer
+s32 RenderingContext::internConstantBuffer( Renderer::ConstantBufferPtr constantBuffer )
+{
+    return m_constantBuffers.add( constantBuffer );
+}
+
+// ** RenderingContext::constantBuffer
+const Renderer::ConstantBufferPtr& RenderingContext::constantBuffer( s32 identifier ) const
+{
+    return m_constantBuffers.resolve( identifier );
+}
+
+// ** RenderingContext::internInputLayout
+s32 RenderingContext::internInputLayout( Renderer::InputLayoutPtr inputLayout )
+{
+    return m_inputLayouts.add( inputLayout );
+}
+
+// ** RenderingContext::inputLayout
+const Renderer::InputLayoutPtr& RenderingContext::inputLayout( s32 identifier ) const
+{
+    return m_inputLayouts.resolve( identifier );
+}
+
+// ** RenderingContext::internTexture
+s32 RenderingContext::internTexture( Renderer::TexturePtr texture )
+{
+    return m_textures.add( texture );
+}
+        
+// ** RenderingContext::texture
+const Renderer::TexturePtr& RenderingContext::texture( s32 identifier ) const
+{
+    return m_textures.resolve( identifier );
+}
+
+// ** RenderingContext::internShader
+s32 RenderingContext::internShader( UbershaderPtr shader )
+{
+    return m_shaders.add( shader );
+}
+        
+// ** RenderingContext::shader
+const UbershaderPtr& RenderingContext::shader( s32 identifier ) const
+{
+    return m_shaders.resolve( identifier );
+}
+
 // ** RenderingContext::create
 RenderingContextPtr RenderingContext::create( Renderer::HalWPtr hal )
 {
     return DC_NEW RenderingContext( hal );
 }
-
 
 } // namespace Scene
 

@@ -38,7 +38,7 @@ RenderSystemBase::RenderSystemBase( RenderScene& renderScene, Ecs::IndexPtr came
 }
 
 // ** RenderSystemBase::render
-void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands )
+void RenderSystemBase::render( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands )
 {
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
@@ -64,11 +64,11 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         RenderStateBlock& pass = stateStack.push();
-        pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
-        pass.bindConstantBuffer( frame.internConstantBuffer( cameraNode.cameraConstants ), RenderState::PassConstants );
+        pass.setRenderTarget( context.internRenderTarget( camera.target() ), camera.viewport() );
+        pass.bindConstantBuffer( context.internConstantBuffer( cameraNode.cameraConstants ), RenderState::PassConstants );
 
         // Emit render operations for this camera
-        emitRenderOperations( frame, cameraCommands, stateStack, entity, camera, transform );
+        emitRenderOperations( context, frame, cameraCommands, stateStack, entity, camera, transform );
     }
 }
 

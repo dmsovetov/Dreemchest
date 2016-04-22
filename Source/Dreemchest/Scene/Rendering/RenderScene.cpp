@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderScene.h"
+#include "Rvm/RenderingContext.h"
 #include "RenderSystem/RenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
@@ -41,9 +42,9 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types {
 };
 
 // ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
+RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     : m_scene( scene )
-    , m_hal( hal )
+    , m_context( context )
 {
     // Get a parent Ecs instance
     Ecs::EcsWPtr ecs = scene->ecs();
@@ -55,14 +56,14 @@ RenderScene::RenderScene( SceneWPtr scene, Renderer::HalWPtr hal )
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 
     // Create scene constant buffer
-    m_sceneConstants = hal->createConstantBuffer( sizeof( CBuffer::Scene ), false );
+    m_sceneConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Scene ), false );
     m_sceneConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Scene, ambient ), "Scene.ambient" );
 }
 
 // ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene, Renderer::HalWPtr hal )
+RenderScenePtr RenderScene::create( SceneWPtr scene, RenderingContextWPtr context )
 {
-    return DC_NEW RenderScene( scene, hal );
+    return DC_NEW RenderScene( scene, context );
 }
 
 // ** RenderScene::scene
@@ -118,19 +119,19 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.disableBlending();
     defaults.setDepthState( Renderer::LessEqual, true );
     defaults.enableFeatures( BIT( ShaderAmbientColor ) );
-    defaults.bindConstantBuffer( frame->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
+    defaults.bindConstantBuffer( m_context->internConstantBuffer( m_sceneConstants ), RenderState::GlobalConstants );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();
 
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         const CameraNode& camera = cameras[i];
-        entryPoint.clear( frame->internRenderTarget( camera.camera->target() ), camera.camera->clearColor(), camera.camera->viewport(), camera.camera->clearMask() );
+        entryPoint.clear( m_context->internRenderTarget( camera.camera->target() ), camera.camera->clearColor(), camera.camera->viewport(), camera.camera->clearMask() );
     }
 
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
-        m_renderSystems[i]->render( *frame.get(), entryPoint );
+        m_renderSystems[i]->render( *m_context.get(), *frame.get(), entryPoint );
     }
 
     // Pop a default state block
@@ -358,7 +359,7 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.matrix    = &light.transform->matrix();
     light.light     = entity.get<Light>();
 
-    light.lightConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Light ), false );
+    light.lightConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Light ), false );
     light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, position ), "Light.position" );
     light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, range ), "Light.range" );
     light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, color ), "Light.color" );
@@ -376,7 +377,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.matrix    = &camera.transform->matrix();
     camera.camera    = entity.get<Camera>();
 
-    camera.cameraConstants = m_hal->createConstantBuffer( sizeof( CBuffer::View ), false );
+    camera.cameraConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::View ), false );
     camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::View, transform ), "View.transform" );
 
     return camera;
@@ -403,10 +404,10 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
     instance.transform = entity.get<Transform>();
     instance.matrix    = &instance.transform->matrix();
 
-    instance.instanceConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
+    instance.instanceConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Instance ), false );
     instance.instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
 
-    instance.materialConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Material ), false );
+    instance.materialConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Material ), false );
     instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, diffuse ), "Material.diffuse" );
     instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, specular ), "Material.specular" );
     instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
@@ -416,7 +417,7 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
 Renderer::InputLayoutPtr RenderScene::createInputLayout( const VertexFormat& format )
 {
     // Create an input layout
-    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
+    Renderer::InputLayoutPtr inputLayout = m_context->hal()->createInputLayout( format.vertexSize() );
 
     // Add vertex attributes to an input layout
     if( format & VertexFormat::Position ) {
@@ -442,7 +443,7 @@ Renderer::InputLayoutPtr RenderScene::createInputLayout( const VertexFormat& for
 Renderer::VertexBufferPtr RenderScene::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
 {
     // Create a vertex buffer instance
-    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( count * dstFormat.vertexSize() );
+    Renderer::VertexBufferPtr vertexBuffer = m_context->hal()->createVertexBuffer( count * dstFormat.vertexSize() );
 
     // Lock a vertex buffer
     void* locked = vertexBuffer->lock();
@@ -471,7 +472,7 @@ Renderer::VertexBufferPtr RenderScene::createVertexBuffer( const void* vertices,
 Renderer::IndexBufferPtr RenderScene::createIndexBuffer( const u16* indices, s32 count )
 {
     // Create an index buffer instance
-    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( count * sizeof( u16 ) );
+    Renderer::IndexBufferPtr indexBuffer = m_context->hal()->createIndexBuffer( count * sizeof( u16 ) );
 
     // Copy memory to a GPU index buffer
     memcpy( indexBuffer->lock(), indices, count * sizeof( u16 ) );

@@ -37,7 +37,7 @@ StaticMeshEmitter::StaticMeshEmitter( RenderScene& renderScene )
 }
 
 // ** StaticMeshEmitter::emit
-void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
+void StaticMeshEmitter::emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
 {
     // Get all static meshes meshes
     const RenderScene::StaticMeshes& meshes = m_renderScene.staticMeshes();
@@ -58,11 +58,11 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
         RenderStateBlock& instance = stateStack.push();
-        instance.bindVertexBuffer( frame.internVertexBuffer( mesh.vertexBuffer ) );
-        instance.bindIndexBuffer( frame.internIndexBuffer( mesh.indexBuffer ) );
-        instance.bindConstantBuffer( frame.internConstantBuffer( mesh.instanceConstants ), RenderState::InstanceConstants );
-        instance.bindConstantBuffer( frame.internConstantBuffer( mesh.materialConstants ), RenderState::MaterialConstants );
-        instance.bindInputLayout( frame.internInputLayout( mesh.inputLayout ) );
+        instance.bindVertexBuffer( context.internVertexBuffer( mesh.vertexBuffer ) );
+        instance.bindIndexBuffer( context.internIndexBuffer( mesh.indexBuffer ) );
+        instance.bindConstantBuffer( context.internConstantBuffer( mesh.instanceConstants ), RenderState::InstanceConstants );
+        instance.bindConstantBuffer( context.internConstantBuffer( mesh.materialConstants ), RenderState::MaterialConstants );
+        instance.bindInputLayout( context.internInputLayout( mesh.inputLayout ) );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
             instance.disableFeatures( BIT( ShaderAmbientColor ) );

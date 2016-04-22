@@ -44,18 +44,18 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 }
 
 // ** TestRenderSystem::emitRenderOperations
-void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     UbershaderPtr shader = m_pointCloudShader;
 
     // Ambient pass
     {
         RenderStateBlock& pass = stateStack.push();
-        pass.bindProgram( frame.internShader( shader ) );
+        pass.bindProgram( context.internShader( shader ) );
         pass.enableFeatures( BIT( ShaderEmissionColor ) );
 
-        m_staticMeshEmitter->emit( frame, commands, stateStack );
-        m_pointCloudEmitter->emit( frame, commands, stateStack );
+        m_staticMeshEmitter->emit( context, frame, commands, stateStack );
+        m_pointCloudEmitter->emit( context, frame, commands, stateStack );
 
         stateStack.pop();
     }
@@ -70,17 +70,17 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
 
         // Light state block
         RenderStateBlock& state = stateStack.push();
-        state.bindConstantBuffer( frame.internConstantBuffer( light.lightConstants ), RenderState::LightConstants );
+        state.bindConstantBuffer( context.internConstantBuffer( light.lightConstants ), RenderState::LightConstants );
         state.enableFeatures( BIT( ShaderPointLight ) );
         state.disableFeatures( BIT( ShaderAmbientColor ) );
-        state.bindProgram( frame.internShader( shader ) );
+        state.bindProgram( context.internShader( shader ) );
         state.setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
         // Emit render operations
         RopEmitter::Filter filter;
         filter.lightingModels = BIT( LightingModel::Phong );
-        m_staticMeshEmitter->emit( frame, commands, stateStack, filter );
-        m_pointCloudEmitter->emit( frame, commands, stateStack, filter );
+        m_staticMeshEmitter->emit( context, frame, commands, stateStack, filter );
+        m_pointCloudEmitter->emit( context, frame, commands, stateStack, filter );
 
         stateStack.pop();
     }

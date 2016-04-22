@@ -38,19 +38,68 @@ namespace Scene {
     public:
 
         //! Returns a parent rendering HAL instance.
-        Renderer::HalWPtr           hal( void ) const;
+        Renderer::HalWPtr                       hal( void ) const;
+
+        //! Interns a render target and returns it's integer identifier.
+        s32                                     internRenderTarget( RenderTargetPtr renderTarget );
+
+        //! Returns a render target by an index.
+        const RenderTargetPtr&                  renderTarget( s32 identifier ) const;
+
+        //! Interns a vertex buffer and returns it's integer identifier.
+        s32                                     internVertexBuffer( Renderer::VertexBufferPtr vertexBuffer );
+        
+        //! Returns a vertex buffer by an index.
+        const Renderer::VertexBufferPtr&        vertexBuffer( s32 identifier ) const;
+
+        //! Interns an index buffer and returns it's integer identifier.
+        s32                                     internIndexBuffer( Renderer::IndexBufferPtr indexBuffer );
+
+        //! Returns an index buffer by an index.
+        const Renderer::IndexBufferPtr&         indexBuffer( s32 identifier ) const;
+
+        //! Interns a constant returns it's integer identifier.
+        s32                                     internConstantBuffer( Renderer::ConstantBufferPtr constantBuffer );
+
+        //! Returns a constant buffer by an index.
+        const Renderer::ConstantBufferPtr&      constantBuffer( s32 identifier ) const;
+
+        //! Interns an input layout returns it's integer identifier.
+        s32                                     internInputLayout( Renderer::InputLayoutPtr inputLayout );
+
+        //! Returns an input layout by an index.
+        const Renderer::InputLayoutPtr&         inputLayout( s32 identifier ) const;
+       
+        //! Interns a texture and returns it's integer identifier.
+        s32                                     internTexture( Renderer::TexturePtr texture );
+        
+        //! Returns a texture by an index.
+        const Renderer::TexturePtr&             texture( s32 identifier ) const;
+
+        //! Interns a shader and returns it's integer identifier.
+        s32                                     internShader( UbershaderPtr shader );
+        
+        //! Returns a shader by an index.
+        const UbershaderPtr&                    shader( s32 identifier ) const;
 
         //! Creates a RenderingContext instance.
-        static RenderingContextPtr  create( Renderer::HalWPtr hal );
+        static RenderingContextPtr              create( Renderer::HalWPtr hal );
 
     private:
 
-                                    //! Constructs a RenderingContext instance.
-                                    RenderingContext( Renderer::HalWPtr hal );
+                                                //! Constructs a RenderingContext instance.
+                                                RenderingContext( Renderer::HalWPtr hal );
 
     private:
 
-        Renderer::HalWPtr           m_hal;  //!< A rendering HAL to be used.
+        Renderer::HalWPtr                       m_hal;  //!< A rendering HAL to be used.
+        IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
+        IndexCache<Renderer::VertexBufferPtr>   m_vertexBuffers;        //!< Interned vertex buffers.
+        IndexCache<Renderer::IndexBufferPtr>    m_indexBuffers;         //!< Interned index buffers.
+        IndexCache<Renderer::ConstantBufferPtr> m_constantBuffers;      //!< Interned constant buffers.
+        IndexCache<Renderer::InputLayoutPtr>    m_inputLayouts;         //!< Interned input layouts.
+        IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
+        IndexCache<UbershaderPtr>               m_shaders;              //!< Interned shaders.
     };
 
 } // namespace Scene

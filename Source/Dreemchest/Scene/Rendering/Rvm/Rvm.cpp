@@ -80,7 +80,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 
         // Perform a draw call
         switch( opCode.type ) {
-        case RenderCommandBuffer::OpCode::Clear:            clearRenderTarget( frame.renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
+        case RenderCommandBuffer::OpCode::Clear:            clearRenderTarget( m_context->renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
                                                             break;
         case RenderCommandBuffer::OpCode::Execute:          execute( frame, *opCode.execute.commands );
                                                             break;
@@ -234,7 +234,7 @@ void Rvm::switchBlending( const RenderFrame& frame, const RenderState& state )
 // ** Rvm::switchRenderTarget
 void Rvm::switchRenderTarget( const RenderFrame& frame, const RenderState& state )
 {
-    const RenderTargetPtr& rt = frame.renderTarget( state.renderTarget.id );
+    const RenderTargetPtr& rt = m_context->renderTarget( state.renderTarget.id );
     m_hal->setViewport( state.renderTarget.viewport[0], state.renderTarget.viewport[1], state.renderTarget.viewport[2], state.renderTarget.viewport[3] );
     rt->begin( m_hal );
 }
@@ -242,27 +242,27 @@ void Rvm::switchRenderTarget( const RenderFrame& frame, const RenderState& state
 // ** Rvm::switchShader
 void Rvm::switchShader( const RenderFrame& frame, const RenderState& state )
 {
-    m_activeShader.shader = frame.shader( state.id );
+    m_activeShader.shader = m_context->shader( state.id );
 }
 
 // ** Rvm::switchConstantBuffer
 void Rvm::switchConstantBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::ConstantBufferPtr& constantBuffer = frame.constantBuffer( state.constantBuffer.id );
+    const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.constantBuffer.id );
     m_hal->setConstantBuffer( constantBuffer, state.constantBuffer.type );
 }
 
 // ** Rvm::switchVertexBuffer
 void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::VertexBufferPtr& vertexBuffer = frame.vertexBuffer( state.id );
+    const Renderer::VertexBufferPtr& vertexBuffer = m_context->vertexBuffer( state.id );
     m_hal->setVertexBuffer( vertexBuffer );
 }
 
 // ** Rvm::switchIndexBuffer
 void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::IndexBufferPtr& indexBuffer = frame.indexBuffer( state.id );
+    const Renderer::IndexBufferPtr& indexBuffer = m_context->indexBuffer( state.id );
     m_hal->setIndexBuffer( indexBuffer );
 }
 
@@ -270,7 +270,7 @@ void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state 
 void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state )
 {
     // Bind an input layout
-    const Renderer::InputLayoutPtr& inputLayout = frame.inputLayout( state.id );
+    const Renderer::InputLayoutPtr& inputLayout = m_context->inputLayout( state.id );
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features

@@ -145,12 +145,12 @@ namespace Scene {
         UbershaderPtr                           createShader( const String& fileName ) const;
 
         //! Creates a new render scene.
-        static RenderScenePtr                   create( SceneWPtr scene, Renderer::HalWPtr hal );
+        static RenderScenePtr                   create( SceneWPtr scene, RenderingContextWPtr context );
 
     private:
 
                                                 //! Constructs RenderScene instance.
-                                                RenderScene( SceneWPtr scene, Renderer::HalWPtr hal );
+                                                RenderScene( SceneWPtr scene, RenderingContextWPtr context );
 
         //! Creates a point cloud node from an entity.
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
@@ -196,7 +196,7 @@ namespace Scene {
         //! Entity data cache to store static meshes.
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
-        Renderer::HalWPtr                       m_hal;              //!< Rendering HAL to be used.
+        RenderingContextWPtr                    m_context;          //!< Parent rendering context.
         Renderer::ConstantBufferPtr             m_sceneConstants;   //!< Global constant buffer with scene variables.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.

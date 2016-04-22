@@ -28,6 +28,7 @@
 #define __DC_Scene_Rendering_RopEmitter_H__
 
 #include "../RenderScene.h"
+#include "../Rvm/RenderingContext.h"
 #include "../../Assets/Material.h"
 
 DC_BEGIN_DREEMCHEST
@@ -57,7 +58,7 @@ namespace Scene {
         virtual                 ~RopEmitter( void ) {}
 
 		//! Emits render operations for entities in scene.
-		virtual void			emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter = Filter() ) = 0;
+		virtual void			emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter = Filter() ) = 0;
 
 	protected:
 
