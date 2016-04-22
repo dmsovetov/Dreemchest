@@ -91,6 +91,9 @@ namespace Ecs {
         const Container&            data( void ) const;
         Container&                  data( void );
 
+        //! Returns a data by entity.
+        const TData&                dataFromEntity( const EntityWPtr& entity ) const;
+
     private:
 
                                     //! Constructs DataCache instance.
@@ -128,6 +131,15 @@ namespace Ecs {
 	typename DataCache<TData>::Container& DataCache<TData>::data( void )
     {
         return m_data;
+    }
+
+    // ** DataCache::dataFromEntity
+    template<typename TData>
+    const TData& DataCache<TData>::dataFromEntity( const EntityWPtr& entity ) const
+    {
+        s32 index = indexFromEntity( entity );
+        DC_ABORT_IF( index == -1, "the specified entity does not exist in cache" );
+        return m_data[index];
     }
 
     // ** DataCache::addCacheEntry
