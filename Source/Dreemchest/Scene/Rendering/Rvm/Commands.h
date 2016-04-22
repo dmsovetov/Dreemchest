@@ -41,10 +41,11 @@ namespace Scene {
         struct OpCode {
             //! An op-code type.
             enum Type {
-                  DrawIndexed       //!< Draws a list of primitives using an index buffer.
-                , DrawPrimitives    //!< Draws a list of primitives from an active vertex buffer.
-                , Clear             //!< Clears a render target.
-                , Execute           //!< Executes a command buffer.
+                  DrawIndexed           //!< Draws a list of primitives using an index buffer.
+                , DrawPrimitives        //!< Draws a list of primitives from an active vertex buffer.
+                , Clear                 //!< Clears a render target.
+                , Execute               //!< Executes a command buffer.
+                , UploadConstantBuffer  //!< Uploads data to a constant buffer.
             };
 
             Type                                type;                       //!< An op code type.
@@ -56,15 +57,23 @@ namespace Scene {
                     s32                         count;                      //!< A total number of indices or primitives to use.
                     const RenderStateBlock*     states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
                 } drawCall;
+
                 struct {
-                    s32                         id;                         //!< Render target id.
+                    u32                         id;                         //!< Render target id.
                     u8                          clearMask;                  //!< A clear mask.
                     f32                         clearColor[4];              //!< A render target clearing color.
                     u32                         viewport[4];                //!< A render target viewport.
                 } renderTarget;
+
                 struct {
                     const RenderCommandBuffer*  commands;                   //!< A command buffer to be executed.
                 } execute;
+
+                struct {
+                    u32                         id;                         //!< A target buffer handle.
+                    const void*                 data;                       //!< A source data point.
+                    s32                         size;                       //!< A total number of bytes to upload.
+                } upload;
             };
         };
 
@@ -79,6 +88,9 @@ namespace Scene {
 
         //! Emits a command buffer execution command.
         void                        execute( const RenderCommandBuffer& commands );
+
+        //! Emits a constant buffer upload command.
+        void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
 
         //! Emits a draw indexed command.
         void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );

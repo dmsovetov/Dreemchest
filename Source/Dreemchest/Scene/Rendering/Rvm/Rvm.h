@@ -61,6 +61,9 @@ namespace Scene {
         //! Clears a render target.
         void                    clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* color, const u32* viewport, u8 mask );
 
+        //! Uploads data to a GPU constant buffer.
+        void                    uploadConstantBuffer( u32 id, const void* data, s32 size );
+
         //! Sets an alpha testing state.
         void                    switchAlphaTest( const RenderFrame& frame, const RenderState& state );
 

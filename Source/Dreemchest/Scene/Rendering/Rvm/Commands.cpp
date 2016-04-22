@@ -58,6 +58,17 @@ void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
     m_commands.push_back( opCode );
 }
 
+// ** RenderCommandBuffer::uploadConstantBuffer
+void RenderCommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
+{
+    OpCode opCode;
+    opCode.type = OpCode::UploadConstantBuffer;
+    opCode.upload.id = id;
+    opCode.upload.data = data;
+    opCode.upload.size = size;
+    m_commands.push_back( opCode );
+}
+
 // ** RenderCommandBuffer::drawIndexed
 void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
 {

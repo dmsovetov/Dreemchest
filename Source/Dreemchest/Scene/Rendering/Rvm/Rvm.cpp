@@ -80,27 +80,29 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 
         // Perform a draw call
         switch( opCode.type ) {
-        case RenderCommandBuffer::OpCode::Clear:            clearRenderTarget( m_context->renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
-                                                            break;
-        case RenderCommandBuffer::OpCode::Execute:          execute( frame, *opCode.execute.commands );
-                                                            break;
-        case RenderCommandBuffer::OpCode::DrawIndexed:      {
-                                                                // Apply rendering states from a stack
-                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+        case RenderCommandBuffer::OpCode::Clear:                clearRenderTarget( m_context->renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
+                                                                break;
+        case RenderCommandBuffer::OpCode::Execute:              execute( frame, *opCode.execute.commands );
+                                                                break;
+        case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+                                                                break;
+        case RenderCommandBuffer::OpCode::DrawIndexed:          {
+                                                                    // Apply rendering states from a stack
+                                                                    applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
-                                                                // Perform an actual draw call
-                                                                m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
-                                                            }
-                                                            break;
-        case RenderCommandBuffer::OpCode::DrawPrimitives:   {
-                                                                // Apply rendering states from a stack
-                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+                                                                    // Perform an actual draw call
+                                                                    m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                                }
+                                                                break;
+        case RenderCommandBuffer::OpCode::DrawPrimitives:       {
+                                                                    // Apply rendering states from a stack
+                                                                    applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
-                                                                // Perform an actual draw call
-                                                                m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
-                                                            }
-                                                            break;
-        default:                                            DC_NOT_IMPLEMENTED;
+                                                                    // Perform an actual draw call
+                                                                    m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                                }
+                                                                break;
+        default:                                                DC_NOT_IMPLEMENTED;
         }
     }
 }
@@ -143,6 +145,14 @@ void Rvm::clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* col
 		m_hal->setViewport( renderTarget->rect() );
 	}
 	renderTarget->end( m_hal );
+}
+
+// ** Rvm::uploadConstantBuffer
+void Rvm::uploadConstantBuffer( u32 id, const void* data, s32 size )
+{
+    Renderer::ConstantBufferPtr constantBuffer = m_context->constantBuffer( id );
+    memcpy( constantBuffer->lock(), data, size );
+    constantBuffer->unlock();
 }
 
 // ** Rvm::applyStates

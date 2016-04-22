@@ -81,6 +81,8 @@ namespace Scene {
         struct InstanceNode : public Node {
             MaterialHandle                      material;
             RenderResource                      materialConstants;  //!< A point cloud material options.   
+            AutoPtr<CBuffer::Material>          materialParameters; //!< Material constant buffer.
+            AutoPtr<CBuffer::Instance>          instanceParameters; //!< Instance constant buffer.
         };
 
         //! Stores info about a renderable point cloud.
@@ -93,11 +95,13 @@ namespace Scene {
         //! Stores info about a renderable light.
         struct LightNode : public Node {
             const Light*                        light;              //!< Light component.
+            AutoPtr<CBuffer::Light>             parameters;         //!< Light constant buffer.
         };
 
         //! Stores info about a camera.
         struct CameraNode : public Node {
             const Camera*                       camera;             //!< Camera component.
+            AutoPtr<CBuffer::View>              parameters;         //!< View constant buffer.
         };
 
         //! Stores info about a static mesh.
@@ -174,7 +178,7 @@ namespace Scene {
         void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance );
 
         //! Updates all active constant buffers.
-        void                                    updateConstantBuffers( void );
+        void                                    updateConstantBuffers( RenderFrame& frame );
 
         //! Updates all active mesh buffers.
         void                                    updateStaticMeshes( void );
@@ -195,6 +199,7 @@ namespace Scene {
 
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
+        AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.

@@ -91,7 +91,8 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 
     // Create scene constant buffer
-    m_sceneConstants = m_context->createConstantBuffer( sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
+    m_sceneConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
+    m_sceneParameters = DC_NEW CBuffer::Scene;
 }
 
 // ** RenderScene::create
@@ -139,7 +140,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     updateStaticMeshes();
 
     // Update active constant buffers
-    updateConstantBuffers();
+    updateConstantBuffers( *frame.get() );
 
     // Get a state stack
     RenderStateStack& stateStack = frame->stateStack();
@@ -256,25 +257,22 @@ UbershaderPtr RenderScene::createShader( const String& fileName ) const
 }
 
 // ** RenderScene::updateConstantBuffers
-void RenderScene::updateConstantBuffers( void )
+void RenderScene::updateConstantBuffers( RenderFrame& frame )
 {
+    // Get a frame entry point command buffer
+    RenderCommandBuffer& commands = frame.entryPoint();
+
     // Update scene constant buffer
-    Renderer::ConstantBufferPtr sceneCBuffer = m_context->constantBuffer( m_sceneConstants );
-    CBuffer::Scene* sceneConstants = sceneCBuffer->lock<CBuffer::Scene>();
-    sceneConstants->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );
-    sceneCBuffer->unlock();
+    m_sceneParameters->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );
+    commands.uploadConstantBuffer( m_sceneConstants, m_sceneParameters.get(), sizeof( CBuffer::Scene ) );
 
     // Update camera constant buffers
     Cameras& cameras = m_cameras->data();
 
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         CameraNode& node = cameras[i];
-        {
-            Renderer::ConstantBufferPtr cameraCBuffer = m_context->constantBuffer( node.constantBuffer );
-            CBuffer::View* cameraConstants = cameraCBuffer->lock<RenderScene::CBuffer::View>();
-            cameraConstants->transform = node.camera->calculateViewProjection( node.transform->matrix() );
-            cameraCBuffer->unlock();
-        }
+        node.parameters->transform = node.camera->calculateViewProjection( node.transform->matrix() );
+        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::View );
     }
 
     // Update light constant buffers
@@ -282,16 +280,11 @@ void RenderScene::updateConstantBuffers( void )
 
     for( s32 i = 0, n = lights.count(); i < n; i++ ) {
         LightNode& node = lights[i];
-
-        {
-            Renderer::ConstantBufferPtr lightCBuffer = m_context->constantBuffer( node.constantBuffer );
-            CBuffer::Light* cbuffer = lightCBuffer->lock<CBuffer::Light>();
-            cbuffer->position  = node.transform->worldSpacePosition();
-            cbuffer->intensity = node.light->intensity();
-            cbuffer->color     = node.light->color();
-            cbuffer->range     = node.light->range();
-            lightCBuffer->unlock();
-        }
+        node.parameters->position  = node.transform->worldSpacePosition();
+        node.parameters->intensity = node.light->intensity();
+        node.parameters->color     = node.light->color();
+        node.parameters->range     = node.light->range();
+        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::Light );
     }
 
     // Update point cloud constant buffers
@@ -300,20 +293,13 @@ void RenderScene::updateConstantBuffers( void )
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
         PointCloudNode& node = pointClouds[i];
 
-        {
-            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.constantBuffer );
-            CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
-            cbuffer->transform = node.transform->matrix();
-            instanceCBuffer->unlock();
-        }
-        {
-            Renderer::ConstantBufferPtr materialCBuffer = m_context->constantBuffer( node.materialConstants );
-            CBuffer::Material* cbuffer = materialCBuffer->lock<CBuffer::Material>();
-            cbuffer->diffuse  = node.material->color( Material::Diffuse );
-            cbuffer->specular = node.material->color( Material::Specular );
-            cbuffer->emission = node.material->color( Material::Emission );
-            materialCBuffer->unlock();
-        }
+        node.materialParameters->diffuse  = node.material->color( Material::Diffuse );
+        node.materialParameters->specular = node.material->color( Material::Specular );
+        node.materialParameters->emission = node.material->color( Material::Emission );
+        commands.uploadConstantBuffer( node.materialConstants, node.materialParameters.get(), sizeof CBuffer::Material );
+
+        node.instanceParameters->transform = node.transform->matrix();
+        commands.uploadConstantBuffer( node.constantBuffer, node.instanceParameters.get(), sizeof CBuffer::Instance );
     }
 
     // Update static mesh constant buffers
@@ -322,21 +308,13 @@ void RenderScene::updateConstantBuffers( void )
     for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
         StaticMeshNode& node = staticMeshes[i];
 
-        {
-            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.constantBuffer );
-            CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
-            cbuffer->transform = node.transform->matrix();
-            instanceCBuffer->unlock();
-        }
-        if( node.material.isValid() )
-        {
-            Renderer::ConstantBufferPtr materialCBuffer = m_context->constantBuffer( node.materialConstants );
-            CBuffer::Material* cbuffer = materialCBuffer->lock<CBuffer::Material>();
-            cbuffer->diffuse  = node.material->color( Material::Diffuse );
-            cbuffer->specular = node.material->color( Material::Specular );
-            cbuffer->emission = node.material->color( Material::Emission );
-            materialCBuffer->unlock();
-        }
+        node.materialParameters->diffuse  = node.material->color( Material::Diffuse );
+        node.materialParameters->specular = node.material->color( Material::Specular );
+        node.materialParameters->emission = node.material->color( Material::Emission );
+        commands.uploadConstantBuffer( node.materialConstants, node.materialParameters.get(), sizeof CBuffer::Material );
+
+        node.instanceParameters->transform = node.transform->matrix();
+        commands.uploadConstantBuffer( node.constantBuffer, node.instanceParameters.get(), sizeof CBuffer::Instance );
     }
 }
 
@@ -400,6 +378,7 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.matrix            = &light.transform->matrix();
     light.light             = entity.get<Light>();
     light.constantBuffer    = m_context->createConstantBuffer( sizeof( CBuffer::Light ), CBuffer::Light::Layout );
+    light.parameters        = DC_NEW CBuffer::Light;
 
     return light;
 }
@@ -413,6 +392,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.matrix           = &camera.transform->matrix();
     camera.camera           = entity.get<Camera>();
     camera.constantBuffer   = m_context->createConstantBuffer( sizeof( CBuffer::View ), CBuffer::View::Layout );
+    camera.parameters       = DC_NEW CBuffer::View;
 
     return camera;
 }
@@ -439,6 +419,8 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
     instance.matrix             = &instance.transform->matrix();
     instance.constantBuffer     = m_context->createConstantBuffer( sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
     instance.materialConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Material ), CBuffer::Material::Layout );
+    instance.materialParameters = DC_NEW CBuffer::Material;
+    instance.instanceParameters = DC_NEW CBuffer::Instance;
 }
 
 } // namespace Scene
