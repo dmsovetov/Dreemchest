@@ -27,7 +27,7 @@
 #ifndef __DC_Scene_RenderingContext_H__
 #define __DC_Scene_RenderingContext_H__
 
-#include "../Scene.h"
+#include "../RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
 

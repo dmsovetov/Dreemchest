@@ -28,7 +28,7 @@
 #include "Commands.h"
 #include "RenderFrame.h"
 #include "Ubershader.h"
-#include "../RenderingContext.h"
+#include "RenderingContext.h"
 #include "../../Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST

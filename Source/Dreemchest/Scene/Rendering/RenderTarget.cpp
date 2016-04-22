@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "RenderTarget.h"
-#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 

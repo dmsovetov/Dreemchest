@@ -785,7 +785,7 @@ DC_END_DREEMCHEST
         #include "Rendering/RenderSystems/DepthComplexity.h"
     #else
         #include "Rendering/RenderScene.h"
-        #include "Rendering/RenderingContext.h"
+        #include "Rendering/Rvm/RenderingContext.h"
         #include "Rendering/Rvm/Rvm.h"
         #include "Rendering/Debug/TestRenderSystem.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
