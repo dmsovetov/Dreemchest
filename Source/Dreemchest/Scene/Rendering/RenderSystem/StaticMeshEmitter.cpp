@@ -60,7 +60,7 @@ void StaticMeshEmitter::emit( RenderingContext& context, RenderFrame& frame, Ren
         RenderStateBlock& instance = stateStack.push();
         instance.bindVertexBuffer( mesh.vertexBuffer );
         instance.bindIndexBuffer( mesh.indexBuffer );
-        instance.bindConstantBuffer( mesh.instanceConstants, RenderState::InstanceConstants );
+        instance.bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
         instance.bindConstantBuffer( mesh.materialConstants, RenderState::MaterialConstants );
         instance.bindInputLayout( mesh.inputLayout );
 

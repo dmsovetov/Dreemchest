@@ -56,7 +56,7 @@ void PointCloudEmitter::emit( RenderingContext& context, RenderFrame& frame, Ren
 
         RenderStateBlock& instance = stateStack.push();
         instance.bindVertexBuffer( pointCloud.vertexBuffer );
-        instance.bindConstantBuffer( pointCloud.instanceConstants, RenderState::InstanceConstants );
+        instance.bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
         instance.bindConstantBuffer( pointCloud.materialConstants, RenderState::MaterialConstants );
         instance.bindInputLayout( pointCloud.inputLayout );
 

@@ -65,7 +65,7 @@ void RenderSystemBase::render( RenderingContext& context, RenderFrame& frame, Re
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         RenderStateBlock& pass = stateStack.push();
         pass.setRenderTarget( context.internRenderTarget( camera.target() ), camera.viewport() );
-        pass.bindConstantBuffer( cameraNode.cameraConstants, RenderState::PassConstants );
+        pass.bindConstantBuffer( cameraNode.constantBuffer, RenderState::PassConstants );
 
         // Emit render operations for this camera
         emitRenderOperations( context, frame, cameraCommands, stateStack, entity, camera, transform );

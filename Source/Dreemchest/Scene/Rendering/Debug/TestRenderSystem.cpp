@@ -70,7 +70,7 @@ void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFr
 
         // Light state block
         RenderStateBlock& state = stateStack.push();
-        state.bindConstantBuffer( light.lightConstants, RenderState::LightConstants );
+        state.bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
         state.enableFeatures( BIT( ShaderPointLight ) );
         state.disableFeatures( BIT( ShaderAmbientColor ) );
         state.bindProgram( context.internShader( shader ) );

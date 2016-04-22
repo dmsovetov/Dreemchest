@@ -74,12 +74,12 @@ namespace Scene {
         struct Node {
             const Transform*                    transform;          //!< Node transform component.
             const Matrix4*                      matrix;             //!< Node transform affine matrix.
+            RenderResource                      constantBuffer;     //!< Node constant buffer.
         };
 
         //! Stores info about a scene instance.
         struct InstanceNode : public Node {
             MaterialHandle                      material;
-            RenderResource                      instanceConstants;  //!< Node instance constant buffer.
             RenderResource                      materialConstants;  //!< A point cloud material options.   
         };
 
@@ -93,13 +93,11 @@ namespace Scene {
         //! Stores info about a renderable light.
         struct LightNode : public Node {
             const Light*                        light;              //!< Light component.
-            RenderResource                      lightConstants;     //!< Light parameters constant buffer.
         };
 
         //! Stores info about a camera.
         struct CameraNode : public Node {
             const Camera*                       camera;             //!< Camera component.
-            RenderResource                      cameraConstants;    //!< Camera parameters constant buffer.
         };
 
         //! Stores info about a static mesh.

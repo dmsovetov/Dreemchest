@@ -270,7 +270,7 @@ void RenderScene::updateConstantBuffers( void )
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         CameraNode& node = cameras[i];
         {
-            Renderer::ConstantBufferPtr cameraCBuffer = m_context->constantBuffer( node.cameraConstants );
+            Renderer::ConstantBufferPtr cameraCBuffer = m_context->constantBuffer( node.constantBuffer );
             CBuffer::View* cameraConstants = cameraCBuffer->lock<RenderScene::CBuffer::View>();
             cameraConstants->transform = node.camera->calculateViewProjection( node.transform->matrix() );
             cameraCBuffer->unlock();
@@ -284,7 +284,7 @@ void RenderScene::updateConstantBuffers( void )
         LightNode& node = lights[i];
 
         {
-            Renderer::ConstantBufferPtr lightCBuffer = m_context->constantBuffer( node.lightConstants );
+            Renderer::ConstantBufferPtr lightCBuffer = m_context->constantBuffer( node.constantBuffer );
             CBuffer::Light* cbuffer = lightCBuffer->lock<CBuffer::Light>();
             cbuffer->position  = node.transform->worldSpacePosition();
             cbuffer->intensity = node.light->intensity();
@@ -301,7 +301,7 @@ void RenderScene::updateConstantBuffers( void )
         PointCloudNode& node = pointClouds[i];
 
         {
-            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.instanceConstants );
+            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.constantBuffer );
             CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
             cbuffer->transform = node.transform->matrix();
             instanceCBuffer->unlock();
@@ -323,7 +323,7 @@ void RenderScene::updateConstantBuffers( void )
         StaticMeshNode& node = staticMeshes[i];
 
         {
-            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.instanceConstants );
+            Renderer::ConstantBufferPtr instanceCBuffer = m_context->constantBuffer( node.constantBuffer );
             CBuffer::Instance* cbuffer = instanceCBuffer->lock<CBuffer::Instance>();
             cbuffer->transform = node.transform->matrix();
             instanceCBuffer->unlock();
@@ -399,7 +399,7 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.transform         = entity.get<Transform>();
     light.matrix            = &light.transform->matrix();
     light.light             = entity.get<Light>();
-    light.lightConstants    = m_context->createConstantBuffer( sizeof( CBuffer::Light ), CBuffer::Light::Layout );
+    light.constantBuffer    = m_context->createConstantBuffer( sizeof( CBuffer::Light ), CBuffer::Light::Layout );
 
     return light;
 }
@@ -412,7 +412,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.transform        = entity.get<Transform>();
     camera.matrix           = &camera.transform->matrix();
     camera.camera           = entity.get<Camera>();
-    camera.cameraConstants  = m_context->createConstantBuffer( sizeof( CBuffer::View ), CBuffer::View::Layout );
+    camera.constantBuffer   = m_context->createConstantBuffer( sizeof( CBuffer::View ), CBuffer::View::Layout );
 
     return camera;
 }
@@ -437,7 +437,7 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
 {
     instance.transform          = entity.get<Transform>();
     instance.matrix             = &instance.transform->matrix();
-    instance.instanceConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
+    instance.constantBuffer     = m_context->createConstantBuffer( sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
     instance.materialConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Material ), CBuffer::Material::Layout );
 }
 
