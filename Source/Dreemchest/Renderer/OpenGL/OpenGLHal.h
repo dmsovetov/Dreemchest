@@ -146,7 +146,7 @@ namespace Renderer {
         virtual bool				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
         virtual void				present( void );
         virtual void                renderPrimitives( PrimitiveType primType, u32 offset, u32 count );
-        virtual void				renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
+        virtual void				renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count );
         virtual Texture2DPtr		createTexture2D( u32 width, u32 height, PixelFormat format );
         virtual TextureCube*        createTextureCube( u32 size, PixelFormat format );
         virtual RenderTargetPtr     createRenderTarget( u32 width, u32 height );
@@ -161,6 +161,7 @@ namespace Renderer {
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
         virtual void                setVertexBuffer( const VertexBufferPtr& vertexBuffer );
+        virtual void                setIndexBuffer( const IndexBufferPtr& indexBuffer );
         virtual void                setInputLayout( const InputLayoutPtr& inputLayout );
         virtual void                setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
@@ -211,7 +212,7 @@ namespace Renderer {
         u32                         m_stencilValue, m_stencilMask;
         Compare                     m_stencilFunc;
         sSampler                    m_samplers[MAX_SAMPLERS];
-    //    cMatrix4                    m_modelTransform, m_viewTransform;
+        IndexBufferWPtr             m_activeIndexBuffer;
     };
 
     // ** class OpenGLTexture2D

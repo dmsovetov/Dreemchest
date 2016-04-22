@@ -81,11 +81,10 @@ namespace Renderer {
         //! Renders a list of primitives from a bound vertex buffer and given index buffers.
         /*!
          \param primType    Primitive type to be rendered.
-         \param indexBuffer Index buffer to use.
          \param firstIndex  First index to use in rendering.
          \param count       Number of indices to use in this draw call.
          */
-        virtual void        renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count );
+        virtual void        renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count );
 
         //! Creates a new 2D texture.
         /*!
@@ -178,6 +177,12 @@ namespace Renderer {
          \param vertexBuffer        Vertex buffer to be bound.
          */
         virtual void    setVertexBuffer( const VertexBufferPtr& vertexBuffer );
+
+        //! Binds an index buffer.
+        /*!
+         \param indexBuffer         IndexBuffer to be bound.
+        */
+        virtual void    setIndexBuffer( const IndexBufferPtr& indexBuffer );
 
         //! Binds an input layout.
         /*!

@@ -117,24 +117,16 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 }
 
 // ** OpenGLHal::renderIndexed
-void OpenGLHal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
+void OpenGLHal::renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
-	DC_ABORT_IF( !indexBuffer.valid(), "invalid index buffer" )
     DC_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
+    DC_ABORT_IF( !m_activeIndexBuffer.valid(), "invalid index buffer" );
     
     static GLenum glPrimType[TotalPrimitiveTypes + 1] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS, 0 };
     DC_BREAK_IF( glPrimType[primType] == 0, "invalid primitive type" );
 
-	if( indexBuffer->isGpu() ) {
-		static_cast<OpenGLIndexBuffer*>( indexBuffer.get() )->bind();
-	}
-
-    glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, indexBuffer->pointer() + firstIndex );
-
-	if( indexBuffer->isGpu() ) {
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-	}
+    glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, m_activeIndexBuffer->pointer() + firstIndex );
 }
 
 // ** OpenGLHal::createTexture2D
@@ -313,6 +305,26 @@ void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer )
     if( m_lastInputLayout != m_activeInputLayout ) {
 	    enableInputLayout( ( const u8* )vertexBuffer->pointer(), m_lastInputLayout );
     }
+}
+
+// ** OpenGLHal::setIndexBuffer
+void OpenGLHal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
+{
+    if( m_activeIndexBuffer == indexBuffer ) {
+        return;
+    }
+
+    // Disable previous index buffer
+    if( m_activeIndexBuffer.valid() && m_activeIndexBuffer->isGpu() ) {
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    }
+
+    m_activeIndexBuffer = indexBuffer;
+
+    // Bind an active index buffer
+	if( m_activeIndexBuffer.valid() && m_activeIndexBuffer->isGpu() ) {
+		static_cast<OpenGLIndexBuffer*>( m_activeIndexBuffer.get() )->bind();
+	}
 }
 
 // ** OpenGLHal::setInputLayout

@@ -123,7 +123,7 @@ void Hal::present( void )
 }
 
 // ** Hal::renderIndexed
-void Hal::renderIndexed( PrimitiveType primType, const IndexBufferPtr& indexBuffer, u32 firstIndex, u32 count )
+void Hal::renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count )
 {
     
 }
@@ -275,6 +275,10 @@ void Hal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 void Hal::setVertexBuffer( const VertexBufferPtr& vertexBuffer )
 {
 
+}
+
+void Hal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
+{
 }
 
 // ** Hal::setInputLayout
