@@ -44,6 +44,7 @@ namespace Sound {
         virtual                 ~OpenAL( void );
 
         // ** SoundEngine
+        virtual bool            initialize( void );
         virtual SoundSourcePtr  createSource( void );
         virtual SoundBufferPtr  createBuffer( SoundDecoderPtr decoder, u32 chunks );
         virtual void            setPosition( const Vec3& value );

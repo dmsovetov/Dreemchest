@@ -40,17 +40,20 @@ namespace Sound {
                                 SoundEngine( void );
         virtual                 ~SoundEngine( void );
 
+        //! Performs a sound engine initialization, returns true on success.
+        virtual bool            initialize( void );
+
 		//! Sets the master volume.
-		virtual void			setVolume( f32 value ) = 0;
+		virtual void			setVolume( f32 value );
 
 		//! Sets the master pitch.
-		virtual void			setPitch( f32 value ) = 0;
+		virtual void			setPitch( f32 value );
 
         //! Sets the listener position.
-        virtual void            setPosition( const Vec3& value ) = 0;
+        virtual void            setPosition( const Vec3& value );
 
         //! Sets the distance attenuation model.
-        virtual void            setDistanceModel( DistanceModel value ) = 0;
+        virtual void            setDistanceModel( DistanceModel value );
 
         //! Creates a new hardware sound source.
         virtual SoundSourcePtr	createSource( void );

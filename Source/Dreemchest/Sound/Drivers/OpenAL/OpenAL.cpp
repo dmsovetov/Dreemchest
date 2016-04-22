@@ -40,23 +40,43 @@ namespace Sound {
 // ** OpenAL::OpenAL
 OpenAL::OpenAL( void )
 {
+
+}
+
+OpenAL::~OpenAL( void )
+{
+    alcMakeContextCurrent( NULL );
+    if( m_context ) {
+        alcDestroyContext( m_context );
+    }
+    if( m_device ) {
+        alcCloseDevice( m_device );
+    }
+}
+
+// ** OpenAL::initialize
+bool OpenAL::initialize( void )
+{
     m_device = alcOpenDevice( NULL );
+    if( !m_device ) {
+        LogError( "openal", "failed to create device 0x%x\n", alGetError() );
+        return false;
+    }
     LogVerbose( "openal", "device created %x\n", m_device );
 
     m_context = alcCreateContext( m_device, NULL );
+    if( !m_context ) {
+        LogError( "openal", "failed to create context 0x%x\n", alGetError() );
+        return false;
+    }
     LogVerbose( "openal", "context created %x\n", m_context );
 
     alcMakeContextCurrent( m_context );
 
     LogVerbose( "openal", "version=%s, renderer=%s, vendor=%s\n", alGetString( AL_VERSION ), alGetString( AL_RENDERER ), alGetString( AL_VENDOR ) );
 //    LogVerbose( "AL_EXTENSIONS: %s\n", alGetString( AL_EXTENSIONS ) );
-}
 
-OpenAL::~OpenAL( void )
-{
-    alcMakeContextCurrent( NULL );
-    alcDestroyContext( m_context );
-    alcCloseDevice( m_device );
+    return true;
 }
 
 // ** OpenAL::maxSources
