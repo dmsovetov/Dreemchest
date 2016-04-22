@@ -91,7 +91,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 
     // Create scene constant buffer
-    m_sceneConstants  = m_context->createConstantBuffer( NULL, sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
+    m_sceneConstants  = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
     m_sceneParameters = DC_NEW CBuffer::Scene;
     
     // Create a default shader
@@ -345,9 +345,9 @@ void RenderScene::updateStaticMeshes( void )
             VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1  );
             const Mesh::VertexBuffer& vb = mesh->vertexBuffer( 0 );
             const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
-            node.vertexBuffer = m_context->createVertexBuffer( &vb[0], vb.size() * vf.vertexSize() );
-            node.indexBuffer  = m_context->createIndexBuffer( &ib[0], ib.size() * sizeof( u16 ) );
-            node.inputLayout  = m_context->createInputLayout( vf );
+            node.vertexBuffer = m_context->requestVertexBuffer( &vb[0], vb.size() * vf.vertexSize() );
+            node.indexBuffer  = m_context->requestIndexBuffer( &ib[0], ib.size() * sizeof( u16 ) );
+            node.inputLayout  = m_context->requestInputLayout( vf );
             node.indexCount   = ib.size();
             LogVerbose( "renderScene", "reloaded static mesh renderable with %d vertices and %d indices\n", vb.size(), ib.size() );
         }
@@ -366,8 +366,8 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     node.vertexCount    = pointCloud->vertexCount();
     node.material       = pointCloud->material();
-    node.inputLayout    = m_context->createInputLayout( pointCloud->vertexFormat() );
-    node.vertexBuffer   = m_context->createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
+    node.inputLayout    = m_context->requestInputLayout( pointCloud->vertexFormat() );
+    node.vertexBuffer   = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
 
     return node;
 }
@@ -380,7 +380,7 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.transform         = entity.get<Transform>();
     light.matrix            = &light.transform->matrix();
     light.light             = entity.get<Light>();
-    light.constantBuffer    = m_context->createConstantBuffer( NULL, sizeof( CBuffer::Light ), CBuffer::Light::Layout );
+    light.constantBuffer    = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Light ), CBuffer::Light::Layout );
     light.parameters        = DC_NEW CBuffer::Light;
 
     return light;
@@ -394,7 +394,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.transform        = entity.get<Transform>();
     camera.matrix           = &camera.transform->matrix();
     camera.camera           = entity.get<Camera>();
-    camera.constantBuffer   = m_context->createConstantBuffer( NULL, sizeof( CBuffer::View ), CBuffer::View::Layout );
+    camera.constantBuffer   = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::View ), CBuffer::View::Layout );
     camera.parameters       = DC_NEW CBuffer::View;
 
     return camera;
@@ -422,8 +422,8 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
 {
     instance.transform          = entity.get<Transform>();
     instance.matrix             = &instance.transform->matrix();
-    instance.constantBuffer     = m_context->createConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
-    instance.materialConstants  = m_context->createConstantBuffer( NULL, sizeof( CBuffer::Material ), CBuffer::Material::Layout );
+    instance.constantBuffer     = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
+    instance.materialConstants  = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Material ), CBuffer::Material::Layout );
     instance.materialParameters = DC_NEW CBuffer::Material;
     instance.instanceParameters = DC_NEW CBuffer::Instance;
 }

@@ -145,8 +145,8 @@ void RenderingContext::constructConstantBuffer( const ResourceConstructor& const
     m_constantBufferPool[constructor.id - 1] = constantBuffer;
 }
 
-// ** RenderingContext::createInputLayout
-RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
+// ** RenderingContext::requestInputLayout
+RenderResource RenderingContext::requestInputLayout( const VertexFormat& format )
 {
     ResourceConstructor constructor = ResourceConstructor::InputLayout;
     constructor.id      = m_inputLayoutPool.push( NULL ) + 1;
@@ -156,8 +156,8 @@ RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
     return constructor.id;
 }
 
-// ** RenderingContext::createVertexBuffer
-RenderResource RenderingContext::createVertexBuffer( const void* data, s32 size )
+// ** RenderingContext::requestVertexBuffer
+RenderResource RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
     ResourceConstructor constructor = ResourceConstructor::VertexBuffer;
     constructor.id          = m_vertexBufferPool.push( NULL ) + 1;
@@ -168,8 +168,8 @@ RenderResource RenderingContext::createVertexBuffer( const void* data, s32 size 
     return constructor.id;
 }
 
-// ** RenderingContext::createIndexBuffer
-RenderResource RenderingContext::createIndexBuffer( const void* data, s32 size )
+// ** RenderingContext::requestIndexBuffer
+RenderResource RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
     ResourceConstructor constructor = ResourceConstructor::IndexBuffer;
     constructor.id          = m_indexBufferPool.push( NULL ) + 1;
@@ -180,8 +180,8 @@ RenderResource RenderingContext::createIndexBuffer( const void* data, s32 size )
     return constructor.id;
 }
 
-// ** RenderingContext::createConstantBuffer
-RenderResource RenderingContext::createConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
+// ** RenderingContext::requestConstantBuffer
+RenderResource RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
 {
     ResourceConstructor constructor = ResourceConstructor::ConstantBuffer;
     constructor.id          = m_constantBufferPool.push( NULL ) + 1;
