@@ -296,24 +296,68 @@ namespace Scene {
         return m_stateBits[index];
     }
 
+    //! A render state stack scope.
+    class StateScope {
+    friend class RenderStateStack;
+    public:
+
+                                    //! Performs a destructive copy of a state scope.
+                                    StateScope( StateScope& other );
+
+                                    //! Pops a state block from a stack upon destruction.
+                                    ~StateScope( void );
+
+        //! Returns a pointer to a topmost state block.
+        const RenderStateBlock*     operator -> ( void ) const;
+        RenderStateBlock*           operator -> ( void );
+
+        //! Performs a destructive copy of a state scope.
+        const StateScope&           operator = ( StateScope& other );
+
+    private:
+
+                                    //! Constructs a StateScope instance.
+                                    StateScope( RenderStateStack& stack, RenderStateBlock* stateBlock );
+
+    private:
+
+        RenderStateStack&           m_stack;        //!< A state stack that issued this scope.
+        RenderStateBlock*           m_stateBlock;   //!< A topmost state block.
+    };
+
+    // ** StateScope::operator ->
+    NIMBLE_INLINE const RenderStateBlock* StateScope::operator -> ( void ) const
+    {
+        return m_stateBlock;
+    }
+
+    // ** StateScope::operator ->
+    NIMBLE_INLINE RenderStateBlock* StateScope::operator -> ( void )
+    {
+        return m_stateBlock;
+    }
+
     //! Render state stack.
     class RenderStateStack {
+    friend class StateScope;
     public:
 
                                     //! Constructs a RenderStateStack instance.
                                     RenderStateStack( s32 maxStateBlocks, s32 maxStackSize );
 
         //! Allocates and pushes a new state block onto the stack.
-        RenderStateBlock&           push( void );
-
-        //! Pops a state block from a top of the stack.
-        void                        pop( void );
+        StateScope                  newScope( void );
 
         //! Returns the stack size.
         s32                         size( void ) const;
 
         //! Returns the stack pointer.
         const RenderStateBlock**    states( void ) const;
+
+    private:
+
+        //! Pops a state block from a top of the stack.
+        void                        pop( void );
 
     private:
 

@@ -205,6 +205,40 @@ void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
     m_mask = m_mask | BIT( stateBit );
 }
 
+// ---------------------------------------------------------------------------- StateScope ------------------------------------------------------------------------------ //
+
+// ** StateScope::StateScope
+StateScope::StateScope( RenderStateStack& stack, RenderStateBlock* stateBlock )
+    : m_stack( stack )
+    , m_stateBlock( stateBlock )
+{
+}
+
+// ** StateScope::StateScope
+StateScope::StateScope( StateScope& other )
+    : m_stack( other.m_stack )
+    , m_stateBlock( other.m_stateBlock )
+{
+    other.m_stateBlock = NULL;
+}
+
+// ** StateScope::~StateScope
+StateScope::~StateScope( void )
+{
+    if( m_stateBlock ) {
+        m_stack.pop();
+    }
+}
+
+// ** StateScope::operator =
+const StateScope& StateScope::operator = ( StateScope& other )
+{
+    m_stack      = other.m_stack;
+    m_stateBlock = other.m_stateBlock;
+    other.m_stateBlock = NULL;
+    return *this;
+}
+
 // -------------------------------------------------------------------------- RenderStateStack -------------------------------------------------------------------------- //
 
 // ** RenderStateStack::RenderStateStack
@@ -216,8 +250,8 @@ RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
     m_stack = reinterpret_cast<const RenderStateBlock**>( m_allocator.allocate( sizeof( RenderStateBlock* ) * maxStackSize ) );
 }
 
-// ** RenderStateStack::push
-RenderStateBlock& RenderStateStack::push( void )
+// ** RenderStateStack::newScope
+StateScope RenderStateStack::newScope( void )
 {
     DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
     RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
@@ -228,7 +262,7 @@ RenderStateBlock& RenderStateStack::push( void )
     m_stack[0] = block;
     m_size++;
 
-    return *block;
+    return StateScope( *this, block );
 }
 
 // ** RenderStateStack::pop

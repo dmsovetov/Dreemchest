@@ -54,18 +54,17 @@ void PointCloudEmitter::emit( RenderingContext& context, RenderFrame& frame, Ren
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
-        RenderStateBlock& instance = stateStack.push();
-        instance.bindVertexBuffer( pointCloud.vertexBuffer );
-        instance.bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
-        instance.bindConstantBuffer( pointCloud.materialConstants, RenderState::MaterialConstants );
-        instance.bindInputLayout( pointCloud.inputLayout );
+        StateScope instance = stateStack.newScope();
+        instance->bindVertexBuffer( pointCloud.vertexBuffer );
+        instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
+        instance->bindConstantBuffer( pointCloud.materialConstants, RenderState::MaterialConstants );
+        instance->bindInputLayout( pointCloud.inputLayout );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
-            instance.disableFeatures( BIT( ShaderAmbientColor ) );
+            instance->disableFeatures( BIT( ShaderAmbientColor ) );
         }
 
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );
-        stateStack.pop();
     }
 }
 

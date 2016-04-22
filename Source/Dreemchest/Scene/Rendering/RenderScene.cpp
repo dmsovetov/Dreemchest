@@ -152,13 +152,13 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     RenderCommandBuffer& entryPoint = frame->entryPoint();
 
     // Push a default state block
-    RenderStateBlock& defaults = stateStack.push();
-    defaults.disableAlphaTest();
-    defaults.disableBlending();
-    defaults.setDepthState( Renderer::LessEqual, true );
-    defaults.bindProgram( m_context->internShader( m_defaultShader ) );
-    defaults.enableFeatures( BIT( ShaderAmbientColor ) );
-    defaults.bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
+    StateScope defaults = stateStack.newScope();
+    defaults->disableAlphaTest();
+    defaults->disableBlending();
+    defaults->setDepthState( Renderer::LessEqual, true );
+    defaults->bindProgram( m_context->internShader( m_defaultShader ) );
+    defaults->enableFeatures( BIT( ShaderAmbientColor ) );
+    defaults->bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();
@@ -172,9 +172,6 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ ) {
         m_renderSystems[i]->render( *m_context.get(), *frame.get(), entryPoint );
     }
-
-    // Pop a default state block
-    stateStack.pop();
 
     return frame;
 }

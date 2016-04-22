@@ -57,19 +57,18 @@ void StaticMeshEmitter::emit( RenderingContext& context, RenderFrame& frame, Ren
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
-        RenderStateBlock& instance = stateStack.push();
-        instance.bindVertexBuffer( mesh.vertexBuffer );
-        instance.bindIndexBuffer( mesh.indexBuffer );
-        instance.bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
-        instance.bindConstantBuffer( mesh.materialConstants, RenderState::MaterialConstants );
-        instance.bindInputLayout( mesh.inputLayout );
+        StateScope instance = stateStack.newScope();
+        instance->bindVertexBuffer( mesh.vertexBuffer );
+        instance->bindIndexBuffer( mesh.indexBuffer );
+        instance->bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
+        instance->bindConstantBuffer( mesh.materialConstants, RenderState::MaterialConstants );
+        instance->bindInputLayout( mesh.inputLayout );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
-            instance.disableFeatures( BIT( ShaderAmbientColor ) );
+            instance->disableFeatures( BIT( ShaderAmbientColor ) );
         }
 
         commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, mesh.indexCount );
-        stateStack.pop();
     }
 }
 

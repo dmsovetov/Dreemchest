@@ -49,14 +49,12 @@ void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFr
 
     // Ambient pass
     {
-        RenderStateBlock& pass = stateStack.push();
-        pass.bindProgram( context.internShader( shader ) );
-        pass.enableFeatures( BIT( ShaderEmissionColor ) );
+        StateScope pass = stateStack.newScope();
+        pass->bindProgram( context.internShader( shader ) );
+        pass->enableFeatures( BIT( ShaderEmissionColor ) );
 
         m_staticMeshEmitter->emit( context, frame, commands, stateStack );
         m_pointCloudEmitter->emit( context, frame, commands, stateStack );
-
-        stateStack.pop();
     }
 
     // Get all light sources
@@ -68,20 +66,18 @@ void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFr
         const RenderScene::LightNode& light = lights[i];
 
         // Light state block
-        RenderStateBlock& state = stateStack.push();
-        state.bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
-        state.enableFeatures( BIT( ShaderPointLight ) );
-        state.disableFeatures( BIT( ShaderAmbientColor ) );
-        state.bindProgram( context.internShader( shader ) );
-        state.setBlend( Renderer::BlendOne, Renderer::BlendOne );
+        StateScope state = stateStack.newScope();
+        state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
+        state->enableFeatures( BIT( ShaderPointLight ) );
+        state->disableFeatures( BIT( ShaderAmbientColor ) );
+        state->bindProgram( context.internShader( shader ) );
+        state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
         // Emit render operations
         RopEmitter::Filter filter;
         filter.lightingModels = BIT( LightingModel::Phong );
         m_staticMeshEmitter->emit( context, frame, commands, stateStack, filter );
         m_pointCloudEmitter->emit( context, frame, commands, stateStack, filter );
-
-        stateStack.pop();
     }
 }
 
