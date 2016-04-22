@@ -204,7 +204,7 @@ namespace Network {
 		// ** Serialize argument to a byte buffer.
 		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
     #else
-        Io::ByteBufferPtr buffer = Private::PrimitiveValueWriter::write( argument );
+        Io::ByteBufferPtr buffer = Private::writeToStream( argument );
     #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		// ** Send an RPC request
