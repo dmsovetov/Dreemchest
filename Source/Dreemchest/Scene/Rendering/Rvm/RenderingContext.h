@@ -40,6 +40,18 @@ namespace Scene {
         //! Returns a parent rendering HAL instance.
         Renderer::HalWPtr                       hal( void ) const;
 
+        //! Creates an input layout instance and returns it's index.
+        Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& vertexFormat );
+
+        //! Creates a vertex buffer from a vertex array with a specified vertex format.
+        Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
+
+        //! Creates an index buffer from an index array.
+        Renderer::IndexBufferPtr                createIndexBuffer( const u16* indices, s32 count );
+
+        //! Creates a constant buffer with specified size and layout.
+        Renderer::ConstantBufferPtr             createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout );
+
         //! Interns a render target and returns it's integer identifier.
         s32                                     internRenderTarget( RenderTargetPtr renderTarget );
 

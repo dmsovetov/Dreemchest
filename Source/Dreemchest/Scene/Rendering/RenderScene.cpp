@@ -41,6 +41,41 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types {
     };
 };
 
+// ** RenderScene::CBuffer::Scene::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Scene::Layout[] = {
+      { "Scene.ambient", Renderer::ConstantBufferLayout::Vec4, offsetof( RenderScene::CBuffer::Scene, ambient ) }
+    , { NULL }
+};
+
+// ** RenderScene::CBuffer::Light::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Light::Layout[] = {
+      { "Light.position",  Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, position  ), }
+    , { "Light.range",     Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, range     ), }
+    , { "Light.color",     Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, color     ), }
+    , { "Light.intensity", Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, intensity ), }
+    , { NULL }
+};
+
+// ** RenderScene::CBuffer::View::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::View::Layout[] = {
+      { "View.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::View, transform ), }
+    , { NULL }
+};
+
+// ** RenderScene::CBuffer::Instance::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Instance::Layout[] = {
+      { "Instance.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::Instance, transform ), }
+    , { NULL }
+};
+
+// ** RenderScene::CBuffer::Material::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Material::Layout[] = {
+      { "Material.diffuse",  Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, diffuse ),  }
+    , { "Material.specular", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, specular ), }
+    , { "Material.emission", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, emission ), }
+    , { NULL }
+};
+
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     : m_scene( scene )
@@ -56,8 +91,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 
     // Create scene constant buffer
-    m_sceneConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Scene ), false );
-    m_sceneConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Scene, ambient ), "Scene.ambient" );
+    m_sceneConstants = m_context->createConstantBuffer( sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
 }
 
 // ** RenderScene::create
@@ -323,10 +357,10 @@ void RenderScene::updateStaticMeshes( void )
             VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1  );
             const Mesh::VertexBuffer& vb = mesh->vertexBuffer( 0 );
             const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
-            node.vertexBuffer = createVertexBuffer( &vb[0], vb.size(), vf, vf );
-            node.indexBuffer  = createIndexBuffer( &ib[0], ib.size() );
-            node.inputLayout = createInputLayout( vf );
-            node.indexCount = ib.size();
+            node.vertexBuffer = m_context->createVertexBuffer( &vb[0], vb.size(), vf, vf );
+            node.indexBuffer  = m_context->createIndexBuffer( &ib[0], ib.size() );
+            node.inputLayout  = m_context->createInputLayout( vf );
+            node.indexCount   = ib.size();
             LogVerbose( "renderScene", "reloaded static mesh renderable with %d vertices and %d indices\n", vb.size(), ib.size() );
         }
     }
@@ -344,8 +378,8 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     node.vertexCount    = pointCloud->vertexCount();
     node.material       = pointCloud->material();
-    node.inputLayout    = createInputLayout( pointCloud->vertexFormat() );
-    node.vertexBuffer   = createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat(), pointCloud->vertexFormat() );
+    node.inputLayout    = m_context->createInputLayout( pointCloud->vertexFormat() );
+    node.vertexBuffer   = m_context->createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat(), pointCloud->vertexFormat() );
 
     return node;
 }
@@ -355,15 +389,10 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
 {
     LightNode light;
 
-    light.transform = entity.get<Transform>();
-    light.matrix    = &light.transform->matrix();
-    light.light     = entity.get<Light>();
-
-    light.lightConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Light ), false );
-    light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, position ), "Light.position" );
-    light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, range ), "Light.range" );
-    light.lightConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, color ), "Light.color" );
-    light.lightConstants->addConstant( Renderer::ConstantBuffer::Float, offsetof( CBuffer::Light, intensity ), "Light.intensity" );
+    light.transform         = entity.get<Transform>();
+    light.matrix            = &light.transform->matrix();
+    light.light             = entity.get<Light>();
+    light.lightConstants    = m_context->createConstantBuffer( sizeof( CBuffer::Light ), CBuffer::Light::Layout );
 
     return light;
 }
@@ -373,12 +402,10 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
 {
     CameraNode camera;
 
-    camera.transform = entity.get<Transform>();
-    camera.matrix    = &camera.transform->matrix();
-    camera.camera    = entity.get<Camera>();
-
-    camera.cameraConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::View ), false );
-    camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::View, transform ), "View.transform" );
+    camera.transform        = entity.get<Transform>();
+    camera.matrix           = &camera.transform->matrix();
+    camera.camera           = entity.get<Camera>();
+    camera.cameraConstants  = m_context->createConstantBuffer( sizeof( CBuffer::View ), CBuffer::View::Layout );
 
     return camera;
 }
@@ -401,86 +428,10 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 // ** RenderScene::initializeInstanceNode
 void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance )
 {
-    instance.transform = entity.get<Transform>();
-    instance.matrix    = &instance.transform->matrix();
-
-    instance.instanceConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Instance ), false );
-    instance.instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
-
-    instance.materialConstants = m_context->hal()->createConstantBuffer( sizeof( CBuffer::Material ), false );
-    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, diffuse ), "Material.diffuse" );
-    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, specular ), "Material.specular" );
-    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
-}
-
-// ** RenderScene::createInputLayout
-Renderer::InputLayoutPtr RenderScene::createInputLayout( const VertexFormat& format )
-{
-    // Create an input layout
-    Renderer::InputLayoutPtr inputLayout = m_context->hal()->createInputLayout( format.vertexSize() );
-
-    // Add vertex attributes to an input layout
-    if( format & VertexFormat::Position ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
-    }
-    if( format & VertexFormat::Color ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
-    }
-    if( format & VertexFormat::Normal ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
-    }
-    if( format & VertexFormat::Uv0 ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
-    }
-    if( format & VertexFormat::Uv1 ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
-    }
-
-    return inputLayout;
-}
-
-// ** RenderScene::createVertexBuffer
-Renderer::VertexBufferPtr RenderScene::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
-{
-    // Create a vertex buffer instance
-    Renderer::VertexBufferPtr vertexBuffer = m_context->hal()->createVertexBuffer( count * dstFormat.vertexSize() );
-
-    // Lock a vertex buffer
-    void* locked = vertexBuffer->lock();
-
-    // Just copy memory if vertex formats match
-    if( dstFormat == srcFormat ) {
-        memcpy( locked, vertices, count * dstFormat.vertexSize() );
-    } else {
-        // Copy all vertices to a vertex buffer
-        for( s32 i = 0; i < count; i++ ) {
-            dstFormat.setVertexAttribute( VertexFormat::Position, srcFormat.vertexAttribute<Vec3>( VertexFormat::Position, vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Color,    srcFormat.vertexAttribute<u32> ( VertexFormat::Color,    vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Normal,   srcFormat.vertexAttribute<Vec3>( VertexFormat::Normal,   vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Uv0,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv0,      vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Uv1,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv1,      vertices, i ), locked, i );
-        }
-    }
-
-    // Unlock a vertex buffer.
-    vertexBuffer->unlock();
-
-    return vertexBuffer;
-}
-
-// ** RenderScene::createIndexBuffer
-Renderer::IndexBufferPtr RenderScene::createIndexBuffer( const u16* indices, s32 count )
-{
-    // Create an index buffer instance
-    Renderer::IndexBufferPtr indexBuffer = m_context->hal()->createIndexBuffer( count * sizeof( u16 ) );
-
-    // Copy memory to a GPU index buffer
-    memcpy( indexBuffer->lock(), indices, count * sizeof( u16 ) );
-
-    // Unlock an index buffer.
-    indexBuffer->unlock();
-
-    return indexBuffer;
+    instance.transform          = entity.get<Transform>();
+    instance.matrix             = &instance.transform->matrix();
+    instance.instanceConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
+    instance.materialConstants  = m_context->createConstantBuffer( sizeof( CBuffer::Material ), CBuffer::Material::Layout );
 }
 
 } // namespace Scene

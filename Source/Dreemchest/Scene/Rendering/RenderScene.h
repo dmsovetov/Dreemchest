@@ -40,25 +40,31 @@ namespace Scene {
 
         //! A constant buffer types
         struct CBuffer {
+            typedef Renderer::ConstantBufferLayout BufferLayout;
             struct Scene {
-                Rgba        ambient;
+                static BufferLayout Layout[];
+                Rgba                ambient;
             };
             struct View {
-                Matrix4     transform;
+                static BufferLayout Layout[];
+                Matrix4             transform;
             };
             struct Instance {
-                Matrix4     transform;
+                static BufferLayout Layout[];
+                Matrix4             transform;
             };
             struct Material {
-                Rgba        diffuse;
-                Rgba        specular;
-                Rgba        emission;
+                static BufferLayout Layout[];
+                Rgba                diffuse;
+                Rgba                specular;
+                Rgba                emission;
             };
             struct Light {
-                Vec3        position;
-                f32         range;
-                Rgb         color;
-                f32         intensity;
+                static BufferLayout Layout[];
+                Vec3                position;
+                f32                 range;
+                Rgb                 color;
+                f32                 intensity;
             };
         };
 
@@ -166,15 +172,6 @@ namespace Scene {
 
         //! Setups an instance render scene node.
         void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance );
-
-        //! Creates a vertex declaration from a point cloud format.
-        Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
-
-        //! Creates a vertex buffer from a vertex array with a specified vertex format.
-        Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
-
-        //! Creates an index buffer from an index array.
-        Renderer::IndexBufferPtr                createIndexBuffer( const u16* indices, s32 count );
 
         //! Updates all active constant buffers.
         void                                    updateConstantBuffers( void );

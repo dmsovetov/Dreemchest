@@ -42,6 +42,82 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
     return m_hal;
 }
 
+// ** RenderingContext::createInputLayout
+Renderer::InputLayoutPtr RenderingContext::createInputLayout( const VertexFormat& format )
+{
+    // Create an input layout
+    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
+
+    // Add vertex attributes to an input layout
+    if( format & VertexFormat::Position ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
+    }
+    if( format & VertexFormat::Color ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
+    }
+    if( format & VertexFormat::Normal ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
+    }
+    if( format & VertexFormat::Uv0 ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
+    }
+    if( format & VertexFormat::Uv1 ) {
+        inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
+    }
+
+    return inputLayout;
+}
+
+// ** RenderingContext::createVertexBuffer
+Renderer::VertexBufferPtr RenderingContext::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
+{
+    // Create a vertex buffer instance
+    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( count * dstFormat.vertexSize() );
+
+    // Lock a vertex buffer
+    void* locked = vertexBuffer->lock();
+
+    // Just copy memory if vertex formats match
+    if( dstFormat == srcFormat ) {
+        memcpy( locked, vertices, count * dstFormat.vertexSize() );
+    } else {
+        // Copy all vertices to a vertex buffer
+        for( s32 i = 0; i < count; i++ ) {
+            dstFormat.setVertexAttribute( VertexFormat::Position, srcFormat.vertexAttribute<Vec3>( VertexFormat::Position, vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Color,    srcFormat.vertexAttribute<u32> ( VertexFormat::Color,    vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Normal,   srcFormat.vertexAttribute<Vec3>( VertexFormat::Normal,   vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Uv0,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv0,      vertices, i ), locked, i );
+            dstFormat.setVertexAttribute( VertexFormat::Uv1,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv1,      vertices, i ), locked, i );
+        }
+    }
+
+    // Unlock a vertex buffer.
+    vertexBuffer->unlock();
+
+    return vertexBuffer;
+}
+
+// ** RenderingContext::createIndexBuffer
+Renderer::IndexBufferPtr RenderingContext::createIndexBuffer( const u16* indices, s32 count )
+{
+    // Create an index buffer instance
+    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( count * sizeof( u16 ) );
+
+    // Copy memory to a GPU index buffer
+    memcpy( indexBuffer->lock(), indices, count * sizeof( u16 ) );
+
+    // Unlock an index buffer.
+    indexBuffer->unlock();
+
+    return indexBuffer;
+}
+
+// ** RenderingContext::createConstantBuffer
+Renderer::ConstantBufferPtr RenderingContext::createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout )
+{
+    return m_hal->createConstantBuffer( size, layout );
+}
+
 // ** RenderingContext::internRenderTarget
 s32 RenderingContext::internRenderTarget( RenderTargetPtr renderTarget )
 {
