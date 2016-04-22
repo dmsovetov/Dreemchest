@@ -39,7 +39,7 @@ TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& rend
 {
     m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
     m_staticMeshEmitter = DC_NEW StaticMeshEmitter( renderScene );
-    m_phongShader   = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
+    m_phongShader   = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_ambientShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
 }
 
