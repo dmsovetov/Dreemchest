@@ -82,6 +82,9 @@ namespace Scene {
         //! Binds a vertex buffer to a pipeline.
         void                    switchVertexBuffer( const RenderFrame& frame, const RenderState& state );
 
+        //! Binds an index buffer to a pipeline.
+        void                    switchIndexBuffer( const RenderFrame& frame, const RenderState& state );
+
         //! Binds an input layout to a pipeline.
         void                    switchInputLayout( const RenderFrame& frame, const RenderState& state );
 

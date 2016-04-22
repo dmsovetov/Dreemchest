@@ -51,6 +51,7 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::Shader]            = &Rvm::switchShader;
     m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
     m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
+    m_stateSwitches[RenderState::IndexBuffer]       = &Rvm::switchIndexBuffer;
     m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
 }
 
@@ -88,7 +89,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                 applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
                                                                 // Perform an actual draw call
-                                                                m_hal->renderIndexed( opCode.drawCall.primitives, Renderer::IndexBufferPtr(), opCode.drawCall.first, opCode.drawCall.count );
+                                                                m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
                                                             }
                                                             break;
         case RenderCommandBuffer::OpCode::DrawPrimitives:   {
@@ -256,6 +257,13 @@ void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state
 {
     const Renderer::VertexBufferPtr& vertexBuffer = frame.vertexBuffer( state.id );
     m_hal->setVertexBuffer( vertexBuffer );
+}
+
+// ** Rvm::switchIndexBuffer
+void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state )
+{
+    const Renderer::IndexBufferPtr& indexBuffer = frame.indexBuffer( state.id );
+    m_hal->setIndexBuffer( indexBuffer );
 }
 
 // ** Rvm::switchInputLayout

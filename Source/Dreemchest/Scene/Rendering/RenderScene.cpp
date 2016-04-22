@@ -323,8 +323,9 @@ void RenderScene::updateStaticMeshes( void )
             const Mesh::VertexBuffer& vb = mesh->vertexBuffer( 0 );
             const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
             node.vertexBuffer = createVertexBuffer( &vb[0], vb.size(), vf, vf );
+            node.indexBuffer  = createIndexBuffer( &ib[0], ib.size() );
             node.inputLayout = createInputLayout( vf );
-            node.vertexCount = vb.size();
+            node.indexCount = ib.size();
             LogVerbose( "renderScene", "reloaded static mesh renderable with %d vertices and %d indices\n", vb.size(), ib.size() );
         }
     }
@@ -464,6 +465,21 @@ Renderer::VertexBufferPtr RenderScene::createVertexBuffer( const void* vertices,
     vertexBuffer->unlock();
 
     return vertexBuffer;
+}
+
+// ** RenderScene::createIndexBuffer
+Renderer::IndexBufferPtr RenderScene::createIndexBuffer( const u16* indices, s32 count )
+{
+    // Create an index buffer instance
+    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( count * sizeof( u16 ) );
+
+    // Copy memory to a GPU index buffer
+    memcpy( indexBuffer->lock(), indices, count * sizeof( u16 ) );
+
+    // Unlock an index buffer.
+    indexBuffer->unlock();
+
+    return indexBuffer;
 }
 
 } // namespace Scene

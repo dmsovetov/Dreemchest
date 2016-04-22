@@ -98,7 +98,7 @@ namespace Scene {
         struct StaticMeshNode : public InstanceNode {
             const StaticMesh*                   mesh;               //!< Mesh component.
             u32                                 timestamp;          //!< Asset modification timestamp.
-            u32                                 vertexCount;        //!< A total number of vertices in a mesh.
+            u32                                 indexCount;         //!< A total number of indices in a mesh.
             Renderer::VertexBufferPtr           vertexBuffer;       //!< A mesh vertex buffer.
             Renderer::IndexBufferPtr            indexBuffer;        //!< A mesh index buffer.
             Renderer::InputLayoutPtr            inputLayout;        //!< A mesh input layout.  
@@ -172,6 +172,9 @@ namespace Scene {
 
         //! Creates a vertex buffer from a vertex array with a specified vertex format.
         Renderer::VertexBufferPtr               createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
+
+        //! Creates an index buffer from an index array.
+        Renderer::IndexBufferPtr                createIndexBuffer( const u16* indices, s32 count );
 
         //! Updates all active constant buffers.
         void                                    updateConstantBuffers( void );

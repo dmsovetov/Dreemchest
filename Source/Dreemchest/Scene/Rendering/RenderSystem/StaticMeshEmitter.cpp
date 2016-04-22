@@ -59,6 +59,7 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
 
         RenderStateBlock& instance = stateStack.push();
         instance.bindVertexBuffer( frame.internVertexBuffer( mesh.vertexBuffer ) );
+        instance.bindIndexBuffer( frame.internIndexBuffer( mesh.indexBuffer ) );
         instance.bindConstantBuffer( frame.internConstantBuffer( mesh.instanceConstants ), RenderState::InstanceConstants );
         instance.bindConstantBuffer( frame.internConstantBuffer( mesh.materialConstants ), RenderState::MaterialConstants );
         instance.bindInputLayout( frame.internInputLayout( mesh.inputLayout ) );
@@ -67,7 +68,7 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
             instance.disableFeatures( BIT( ShaderAmbientColor ) );
         }
 
-        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, mesh.vertexCount );
+        commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, mesh.indexCount );
         stateStack.pop();
     }
 }
