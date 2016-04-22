@@ -46,7 +46,6 @@ namespace Scene {
     private:
 
         UbershaderPtr                   m_pointCloudShader;
-        Renderer::ConstantBufferPtr     m_cameraConstants;
         RopEmitterUPtr                  m_pointCloudEmitter;
     };
 

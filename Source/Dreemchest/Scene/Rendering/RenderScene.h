@@ -111,6 +111,9 @@ namespace Scene {
         //! Returns camera nodes.
         const Cameras&                          cameras( void ) const;
 
+        //! Returns a camera node by a component.
+        const CameraNode&                       findCameraNode( Ecs::EntityWPtr camera ) const;
+
 		//! Adds a new render system to the scene.
 		template<typename TRenderSystem, typename ... TArgs>
 		void						            addRenderSystem( const TArgs& ... args );

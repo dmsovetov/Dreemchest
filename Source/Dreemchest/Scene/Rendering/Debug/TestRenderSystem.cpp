@@ -38,27 +38,21 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
 {
     m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
     m_pointCloudShader = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
-
-    m_cameraConstants = hal->createConstantBuffer( sizeof( RenderScene::CBuffer::View ), false );
-    m_cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( RenderScene::CBuffer::View, transform ), "View.transform" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
-    // Update camera constant buffer
-    RenderScene::CBuffer::View* renderPassConstants = m_cameraConstants->lock<RenderScene::CBuffer::View>();
-    renderPassConstants->transform = camera.calculateViewProjection( transform.matrix() );
-    m_cameraConstants->unlock();
+    // Ambient pass
+    {
+        RenderStateBlock& pass = stateStack.push();
+        pass.bindProgram( frame.internShader( m_pointCloudShader ) );
+        pass.enableFeatures( BIT( ShaderEmissionColor ) );
 
-    // Pass state block
-    RenderStateBlock& pass = stateStack.push();
-    pass.bindProgram( frame.internShader( m_pointCloudShader ) );
-    pass.setRenderTarget( frame.internRenderTarget( camera.target() ), camera.viewport() );
-    pass.bindConstantBuffer( frame.internConstantBuffer( m_cameraConstants ), RenderState::PassConstants );
-    pass.enableFeatures( BIT( ShaderEmissionColor ) );
+        m_pointCloudEmitter->emit( frame, commands, stateStack );
 
-    m_pointCloudEmitter->emit( frame, commands, stateStack );
+        stateStack.pop();
+    }
 
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();
@@ -72,7 +66,6 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         RenderStateBlock& state = stateStack.push();
         state.bindConstantBuffer( frame.internConstantBuffer( light.lightConstants ), RenderState::LightConstants );
         state.enableFeatures( BIT( ShaderPointLight ) );
-        state.disableFeatures( BIT( ShaderEmissionColor ) );
         state.disableFeatures( BIT( ShaderAmbientColor ) );
         state.setBlend( Renderer::BlendOne, Renderer::BlendOne );
 

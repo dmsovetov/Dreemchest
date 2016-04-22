@@ -70,6 +70,12 @@ const RenderScene::Lights& RenderScene::lights( void ) const
     return m_lights->data();
 }
 
+// ** RenderScene::findCameraNode
+const  RenderScene::CameraNode& RenderScene::findCameraNode( Ecs::EntityWPtr camera ) const
+{
+    return m_cameras->dataFromEntity( camera );
+}
+
 // ** RenderScene::captureFrame
 RenderFrameUPtr RenderScene::captureFrame( void )
 {
@@ -200,11 +206,23 @@ void RenderScene::updateConstantBuffers( void )
     sceneConstants->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );
     m_sceneConstants->unlock();
 
-    // Update light constant buffers
-    Lights& light = m_lights->data();
+    // Update camera constant buffers
+    Cameras& cameras = m_cameras->data();
 
-    for( s32 i = 0, n = light.count(); i < n; i++ ) {
-        LightNode& node = light[i];
+    for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
+        CameraNode& node = cameras[i];
+        {
+            CBuffer::View* cameraConstants = node.cameraConstants->lock<RenderScene::CBuffer::View>();
+            cameraConstants->transform = node.camera->calculateViewProjection( node.transform->matrix() );
+            node.cameraConstants->unlock();
+        }
+    }
+
+    // Update light constant buffers
+    Lights& lights = m_lights->data();
+
+    for( s32 i = 0, n = lights.count(); i < n; i++ ) {
+        LightNode& node = lights[i];
 
         {
             CBuffer::Light* cbuffer = node.lightConstants->lock<CBuffer::Light>();
@@ -291,7 +309,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     camera.camera    = entity.get<Camera>();
 
     camera.cameraConstants = m_hal->createConstantBuffer( sizeof( CBuffer::View ), false );
-    camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Vec3, offsetof( CBuffer::Light, position ), "View.transform" );
+    camera.cameraConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::View, transform ), "View.transform" );
 
     return camera;
 }
