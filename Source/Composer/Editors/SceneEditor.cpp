@@ -322,14 +322,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     {
         Scene::SceneObjectPtr light = scene->createSceneObject();
         light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 5.0f );
+        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 15.0f );
         scene->addSceneObject( light );
     }
 
     {
         Scene::SceneObjectPtr light = scene->createSceneObject();
         light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 5.0f );
+        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 1.0f, 0.0f, 0.0f ), 5.0f, 15.0f );
         scene->addSceneObject( light );
     }
 

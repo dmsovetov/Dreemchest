@@ -12,7 +12,8 @@ varying vec4 v_Color;
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
 varying vec3 v_Normal;
-varying vec3 v_LightDir;
+varying vec3 v_LightPos;
+varying vec3 v_VertexPos;
 #endif  /*  F_NormalAttribute    */
 
 void main()
@@ -27,7 +28,8 @@ void main()
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
 	v_Normal        = gl_Normal;
-	v_LightDir		= Light.position - vertex.xyz;
+	v_LightPos		= Light.position;
+	v_VertexPos		= vertex.xyz;
 #endif  /*  F_NormalAttribute    */
 }     
 
@@ -38,8 +40,17 @@ varying vec4 v_Color;
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
 varying vec3 v_Normal;
-varying vec3 v_LightDir;
+varying vec3 v_LightPos;
+varying vec3 v_VertexPos;
 #endif  /*  F_NormalAttribute    */
+
+vec4 phongLightIntensity( vec3 point, vec3 light, vec3 normal, float range, float intensity )
+{
+	vec3  dir  = light - point;
+	float d    = length( dir ) / range;
+	float att  = 1.0 / (1.0 + 25.0 * d * d);
+	return max( dot( normal, normalize( dir ) ), 0.0 ) * intensity * att;
+}
 
 void main()
 {
@@ -51,9 +62,8 @@ void main()
 #endif  /*  F_ColorAttribute    */
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
-	float d    = length( v_LightDir ) / Light.range;
-	float att  = 1.0 / (1.0 + 25.0 * d * d);
-	lightColor = max( dot( v_Normal, v_LightDir ), 0.0 ) * vec4( Light.color, 1.0 ) * Light.intensity * att;
+//	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), Light.range, Light.intensity ) * vec4( Light.color, 1.0 );
+	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), Light.range, Light.intensity ) * vec4( Light.color, 1.0 );
 #endif  /*  F_NormalAttribute    */
 
 #if defined( F_AmbientColor )
