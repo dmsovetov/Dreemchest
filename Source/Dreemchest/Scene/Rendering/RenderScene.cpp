@@ -266,7 +266,7 @@ void RenderScene::updateStaticMeshes( void )
             const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
             node.vertexBuffer = m_context->requestVertexBuffer( &vb[0], vb.size() * vf.vertexSize() );
             node.indexBuffer  = m_context->requestIndexBuffer( &ib[0], ib.size() * sizeof( u16 ) );
-            node.inputLayout  = m_context->requestInputLayout( vf );
+            node.inputLayout  = findInputLayout( vf );
             node.indexCount   = ib.size();
             LogVerbose( "renderScene", "reloaded static mesh renderable with %d vertices and %d indices\n", vb.size(), ib.size() );
         }
@@ -285,7 +285,7 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     node.vertexCount    = pointCloud->vertexCount();
     node.material       = pointCloud->material();
-    node.inputLayout    = m_context->requestInputLayout( pointCloud->vertexFormat() );
+    node.inputLayout    = findInputLayout( pointCloud->vertexFormat() );
     node.vertexBuffer   = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
 
     return node;
@@ -345,6 +345,20 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
     instance.materialConstants  = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Material ), CBuffer::Material::Layout );
     instance.materialParameters = DC_NEW CBuffer::Material;
     instance.instanceParameters = DC_NEW CBuffer::Instance;
+}
+
+// ** RenderScene::findInputLayout
+RenderResource RenderScene::findInputLayout( const VertexFormat& format )
+{
+    InputLayouts::iterator i = m_inputLayouts.find( format );
+
+    if( i != m_inputLayouts.end() ) {
+        return i->second;
+    }
+
+    RenderResource id = m_context->requestInputLayout( format );
+    m_inputLayouts[format] = id;
+    return id;
 }
 
 } // namespace Scene

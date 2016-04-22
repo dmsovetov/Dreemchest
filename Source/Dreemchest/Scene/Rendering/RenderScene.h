@@ -180,6 +180,9 @@ namespace Scene {
         //! Updates all active mesh buffers.
         void                                    updateStaticMeshes( void );
 
+        //! Requests a new input layout or returns a cached one.
+        RenderResource                          findInputLayout( const VertexFormat& format );
+
     private:
 
         //! Entity data cache to store renderable point clouds.
@@ -194,11 +197,15 @@ namespace Scene {
         //! Entity data cache to store static meshes.
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
+        //! Container type to store mapping from a vertex format to a previously created input layout.
+        typedef HashMap<u8, RenderResource>     InputLayouts;
+
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
         AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         UbershaderPtr                           m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
+        InputLayouts                            m_inputLayouts;     //!< Input layout cache.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
