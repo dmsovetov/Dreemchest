@@ -58,7 +58,7 @@ namespace Scene {
         virtual                 ~RopEmitter( void ) {}
 
 		//! Emits render operations for entities in scene.
-		virtual void			emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter = Filter() ) = 0;
+		virtual void			emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter = Filter() ) = 0;
 
 	protected:
 

@@ -43,7 +43,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations for all visible meshes.
-        virtual void			        emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter ) DC_DECL_OVERRIDE;
+        virtual void			        emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter ) DC_DECL_OVERRIDE;
     };
 
 } // namespace Scene

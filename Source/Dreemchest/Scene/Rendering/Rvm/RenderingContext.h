@@ -53,6 +53,9 @@ namespace Scene {
         //! Queues a constant buffer instance for creation and returns it's index.
         RenderResource                          requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout );
 
+        //! Creates a shader from a file.
+        UbershaderPtr                           createShader( const String& fileName ) const;
+
         //! Interns a render target and returns it's integer identifier.
         s32                                     internRenderTarget( RenderTargetPtr renderTarget );
 

@@ -151,9 +151,6 @@ namespace Scene {
         //! Captures scene rendering state and returns an array of resulting command buffers.
         RenderFrameUPtr                         captureFrame( void );
 
-        //! Creates a ubershader from a file.
-        UbershaderPtr                           createShader( const String& fileName ) const;
-
         //! Creates a new render scene.
         static RenderScenePtr                   create( SceneWPtr scene, RenderingContextWPtr context );
 
@@ -213,7 +210,7 @@ namespace Scene {
 	template<typename TRenderSystem, typename ... TArgs>
 	void RenderScene::addRenderSystem( const TArgs& ... args )
 	{
-		m_renderSystems.push_back( DC_NEW TRenderSystem( *this, args... ) );
+		m_renderSystems.push_back( DC_NEW TRenderSystem( *m_context.get(), *this, args... ) );
 	}
 
 } // namespace Scene

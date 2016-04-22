@@ -37,11 +37,11 @@ namespace Scene {
     class TestRenderSystem : public RenderSystemBase {
     public:
 
-                                        TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal );
+                                        TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal );
 
     protected:
 
-        virtual void			        emitRenderOperations( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
     private:
 

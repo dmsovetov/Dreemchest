@@ -34,27 +34,27 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** TestRenderSystem::TestRenderSystem
-TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal )
-    : RenderSystemBase( renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
+TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal )
+    : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
     m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
     m_staticMeshEmitter = DC_NEW StaticMeshEmitter( renderScene );
-    m_pointCloudShader  = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
+    m_pointCloudShader  = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
-void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     UbershaderPtr shader = m_pointCloudShader;
 
     // Ambient pass
     {
         StateScope pass = stateStack.newScope();
-        pass->bindProgram( context.internShader( shader ) );
+        pass->bindProgram( m_context.internShader( shader ) );
         pass->enableFeatures( BIT( ShaderEmissionColor ) );
 
-        m_staticMeshEmitter->emit( context, frame, commands, stateStack );
-        m_pointCloudEmitter->emit( context, frame, commands, stateStack );
+        m_staticMeshEmitter->emit( frame, commands, stateStack );
+        m_pointCloudEmitter->emit( frame, commands, stateStack );
     }
 
     // Get all light sources
@@ -70,14 +70,14 @@ void TestRenderSystem::emitRenderOperations( RenderingContext& context, RenderFr
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
         state->enableFeatures( BIT( ShaderPointLight ) );
         state->disableFeatures( BIT( ShaderAmbientColor ) );
-        state->bindProgram( context.internShader( shader ) );
+        state->bindProgram( m_context.internShader( shader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
         // Emit render operations
         RopEmitter::Filter filter;
         filter.lightingModels = BIT( LightingModel::Phong );
-        m_staticMeshEmitter->emit( context, frame, commands, stateStack, filter );
-        m_pointCloudEmitter->emit( context, frame, commands, stateStack, filter );
+        m_staticMeshEmitter->emit( frame, commands, stateStack, filter );
+        m_pointCloudEmitter->emit( frame, commands, stateStack, filter );
     }
 }
 

@@ -37,7 +37,7 @@ PointCloudEmitter::PointCloudEmitter( RenderScene& renderScene )
 }
 
 // ** PointCloudEmitter::emit
-void PointCloudEmitter::emit( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
+void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
 {
     // Get all point clouds that reside in scene
     const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();

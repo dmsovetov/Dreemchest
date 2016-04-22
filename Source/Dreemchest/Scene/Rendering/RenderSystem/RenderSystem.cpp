@@ -31,14 +31,15 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RenderSystemBase::RenderSystemBase
-RenderSystemBase::RenderSystemBase( RenderScene& renderScene, Ecs::IndexPtr cameras )
-    : m_renderScene( renderScene )
+RenderSystemBase::RenderSystemBase( RenderingContext& context, RenderScene& renderScene, Ecs::IndexPtr cameras )
+    : m_context( context )
+    , m_renderScene( renderScene )
     , m_cameras( cameras )
 {
 }
 
 // ** RenderSystemBase::render
-void RenderSystemBase::render( RenderingContext& context, RenderFrame& frame, RenderCommandBuffer& commands )
+void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands )
 {
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
@@ -64,11 +65,11 @@ void RenderSystemBase::render( RenderingContext& context, RenderFrame& frame, Re
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         StateScope pass = stateStack.newScope();
-        pass->setRenderTarget( context.internRenderTarget( camera.target() ), camera.viewport() );
+        pass->setRenderTarget( m_context.internRenderTarget( camera.target() ), camera.viewport() );
         pass->bindConstantBuffer( cameraNode.constantBuffer, RenderState::PassConstants );
 
         // Emit render operations for this camera
-        emitRenderOperations( context, frame, cameraCommands, stateStack, entity, camera, transform );
+        emitRenderOperations( frame, cameraCommands, stateStack, entity, camera, transform );
     }
 }
 
