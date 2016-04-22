@@ -24,47 +24,50 @@
 
  **************************************************************************/
 
-#include "PointCloudEmitter.h"
+#include "StaticMeshEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** PointCloudEmitter::PointCloudEmitter
-PointCloudEmitter::PointCloudEmitter( RenderScene& renderScene )
+// ** StaticMeshEmitter::StaticMeshEmitter
+StaticMeshEmitter::StaticMeshEmitter( RenderScene& renderScene )
     : RopEmitter( renderScene )
 {
 }
 
-// ** PointCloudEmitter::emit
-void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
+// ** StaticMeshEmitter::emit
+void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter )
 {
-    // Get all point clouds that reside in scene
-    const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();
+    // Get all static meshes meshes
+    const RenderScene::StaticMeshes& meshes = m_renderScene.staticMeshes();
 
-    // Process each active point cloud
-    for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
-        // Get a point cloud by index
-        const RenderScene::PointCloudNode& pointCloud = pointClouds[i];
+    // A default material instance
+    Material defaultMaterial;
 
-        // Read-lock a point cloud material
-        const Material& material = pointCloud.material.readLock();
+    // Process each mesh entity
+    for( s32 i = 0, n = meshes.count(); i < n; i++ ) {
+        // Get mesh entity by index
+        const RenderScene::StaticMeshNode& mesh = meshes[i];
+
+        // Get the material
+        const Material& material = mesh.material.isValid() ? mesh.material.readLock() : defaultMaterial;
 
         // Does a material pass a filter?
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
         RenderStateBlock& instance = stateStack.push();
-        instance.bindVertexBuffer( frame.internVertexBuffer( pointCloud.vertexBuffer ) );
-        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.instanceConstants ), RenderState::InstanceConstants );
-        instance.bindConstantBuffer( frame.internConstantBuffer( pointCloud.materialConstants ), RenderState::MaterialConstants );
-        instance.bindInputLayout( frame.internInputLayout( pointCloud.inputLayout ) );
+        instance.bindVertexBuffer( frame.internVertexBuffer( mesh.vertexBuffer ) );
+        instance.bindConstantBuffer( frame.internConstantBuffer( mesh.instanceConstants ), RenderState::InstanceConstants );
+        instance.bindConstantBuffer( frame.internConstantBuffer( mesh.materialConstants ), RenderState::MaterialConstants );
+        instance.bindInputLayout( frame.internInputLayout( mesh.inputLayout ) );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
             instance.disableFeatures( BIT( ShaderAmbientColor ) );
         }
 
-        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.vertexCount );
+        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, mesh.vertexCount );
         stateStack.pop();
     }
 }

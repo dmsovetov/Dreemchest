@@ -100,6 +100,9 @@ RenderFrameUPtr RenderScene::captureFrame( void )
 {
     RenderFrameUPtr frame( DC_NEW RenderFrame );
 
+    // Update active static meshes
+    updateStaticMeshes();
+
     // Update active constant buffers
     updateConstantBuffers();
 
@@ -253,7 +256,7 @@ void RenderScene::updateConstantBuffers( void )
         }
     }
 
-    // Update instance constant buffers
+    // Update point cloud constant buffers
     PointClouds& pointClouds = m_pointClouds->data();
 
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
@@ -272,6 +275,59 @@ void RenderScene::updateConstantBuffers( void )
             node.materialConstants->unlock();
         }
     }
+
+    // Update static mesh constant buffers
+    StaticMeshes& staticMeshes = m_staticMeshes->data();
+
+    for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
+        StaticMeshNode& node = staticMeshes[i];
+
+        {
+            CBuffer::Instance* cbuffer = node.instanceConstants->lock<CBuffer::Instance>();
+            cbuffer->transform = node.transform->matrix();
+            node.instanceConstants->unlock();
+        }
+        if( node.material.isValid() )
+        {
+            CBuffer::Material* cbuffer = node.materialConstants->lock<CBuffer::Material>();
+            cbuffer->diffuse  = node.material->color( Material::Diffuse );
+            cbuffer->specular = node.material->color( Material::Specular );
+            cbuffer->emission = node.material->color( Material::Emission );
+            node.materialConstants->unlock();
+        }
+    }
+}
+
+// ** RenderScene::updateStaticMeshes
+void RenderScene::updateStaticMeshes( void )
+{
+    StaticMeshes& meshes = m_staticMeshes->data();
+
+    for( s32 i = 0, n = meshes.count(); i < n; i++ ) {
+        StaticMeshNode& node = meshes[i];
+
+        // Get a static mesh asset
+        const MeshHandle& mesh = node.mesh->mesh();
+
+        // Get an asset timestamp
+        u32 timestamp = mesh.asset().timestamp().modified;
+
+        // Mesh is up-to-date - skip
+        if( node.timestamp == timestamp ) {
+            continue;
+        }
+        node.timestamp = timestamp;
+
+        if( mesh->chunkCount() ) {
+            VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1  );
+            const Mesh::VertexBuffer& vb = mesh->vertexBuffer( 0 );
+            const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
+            node.vertexBuffer = createVertexBuffer( &vb[0], vb.size(), vf, vf );
+            node.inputLayout = createInputLayout( vf );
+            node.vertexCount = vb.size();
+            LogVerbose( "renderScene", "reloaded static mesh renderable with %d vertices and %d indices\n", vb.size(), ib.size() );
+        }
+    }
 }
 
 // ** RenderScene::createPointCloudNode
@@ -282,20 +338,12 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     PointCloudNode node;
 
-    node.transform      = transform;
-    node.matrix         = &transform->matrix();
+    initializeInstanceNode( entity, node );
+
     node.vertexCount    = pointCloud->vertexCount();
     node.material       = pointCloud->material();
     node.inputLayout    = createInputLayout( pointCloud->vertexFormat() );
     node.vertexBuffer   = createVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat(), pointCloud->vertexFormat() );
-
-    node.instanceConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
-    node.instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
-
-    node.materialConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Material ), false );
-    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, diffuse ), "Material.diffuse" );
-    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, specular ), "Material.specular" );
-    node.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
 
     return node;
 }
@@ -338,11 +386,29 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 {
     StaticMeshNode mesh;
 
-    mesh.transform  = entity.get<Transform>();
-    mesh.matrix     = &mesh.transform->matrix();
-    mesh.mesh       = entity.get<StaticMesh>();
+    initializeInstanceNode( entity, mesh );
+    mesh.mesh = entity.get<StaticMesh>();
+    mesh.material = mesh.mesh->material( 0 );
+    mesh.timestamp = -1;
+
+    mesh.mesh->mesh().readLock();
 
     return mesh;
+}
+
+// ** RenderScene::initializeInstanceNode
+void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance )
+{
+    instance.transform = entity.get<Transform>();
+    instance.matrix    = &instance.transform->matrix();
+
+    instance.instanceConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Instance ), false );
+    instance.instanceConstants->addConstant( Renderer::ConstantBuffer::Matrix4, offsetof( CBuffer::Instance, transform ), "Instance.transform" );
+
+    instance.materialConstants = m_hal->createConstantBuffer( sizeof( CBuffer::Material ), false );
+    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, diffuse ), "Material.diffuse" );
+    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, specular ), "Material.specular" );
+    instance.materialConstants->addConstant( Renderer::ConstantBuffer::Vec4, offsetof( CBuffer::Material, emission ), "Material.emission" );
 }
 
 // ** RenderScene::createInputLayout

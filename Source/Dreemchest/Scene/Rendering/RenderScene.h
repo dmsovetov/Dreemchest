@@ -97,6 +97,8 @@ namespace Scene {
         //! Stores info about a static mesh.
         struct StaticMeshNode : public InstanceNode {
             const StaticMesh*                   mesh;               //!< Mesh component.
+            u32                                 timestamp;          //!< Asset modification timestamp.
+            u32                                 vertexCount;        //!< A total number of vertices in a mesh.
             Renderer::VertexBufferPtr           vertexBuffer;       //!< A mesh vertex buffer.
             Renderer::IndexBufferPtr            indexBuffer;        //!< A mesh index buffer.
             Renderer::InputLayoutPtr            inputLayout;        //!< A mesh input layout.  
@@ -162,6 +164,9 @@ namespace Scene {
         //! Creates a static mesh node from an entity.
         StaticMeshNode                          createStaticMeshNode( const Ecs::Entity& entity );
 
+        //! Setups an instance render scene node.
+        void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance );
+
         //! Creates a vertex declaration from a point cloud format.
         Renderer::InputLayoutPtr                createInputLayout( const VertexFormat& format );
 
@@ -170,6 +175,9 @@ namespace Scene {
 
         //! Updates all active constant buffers.
         void                                    updateConstantBuffers( void );
+
+        //! Updates all active mesh buffers.
+        void                                    updateStaticMeshes( void );
 
     private:
 

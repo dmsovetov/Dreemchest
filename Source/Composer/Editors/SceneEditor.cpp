@@ -273,16 +273,20 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( entity );
     }
 #else
-    s32 count = 10;
+    s32 pointCloudCount = 10;
+    s32 meshCount = 5;
     s32 points = 500;
     s32 c = 0;
+
+    Scene::MeshHandle mesh = m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" );
+    DC_ABORT_IF( !mesh.isValid() );
 
     Scene::MaterialHandle dflt = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
         Assets::WriteLock<Scene::Material> writable = dflt.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
-        writable->setColor( Scene::Material::Emission, Rgba( 1.0f, 0.0f, 0.0f ) );
-        writable->setLightingModel( Scene::LightingModel::Unlit );
+        writable->setColor( Scene::Material::Emission, Rgba( 0.2f, 0.0f, 0.0f ) );
+        writable->setLightingModel( Scene::LightingModel::Phong );
     }
     Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
@@ -329,9 +333,20 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( light );
     }
 
-    for( s32 i = 0; i < count; i++ )
+    for( s32 i = 0; i < meshCount; i++ )
     {
-        for( s32 j = 0; j < count; j++ )
+        for( s32 j = 0; j < meshCount; j++ )
+        {
+            Scene::SceneObjectPtr msh = scene->createSceneObject();
+            msh->attach<Scene::Transform>( i * 15, 0, j * 15, Scene::TransformWPtr() );
+            msh->attach<Scene::StaticMesh>( mesh )->setMaterial( 0, dflt );
+            scene->addSceneObject( msh );
+        }
+    }
+
+    for( s32 i = 0; i < pointCloudCount; i++ )
+    {
+        for( s32 j = 0; j < pointCloudCount; j++ )
         {
             Scene::SceneObjectPtr p1 = scene->createSceneObject();
             p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );

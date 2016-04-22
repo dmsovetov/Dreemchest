@@ -24,35 +24,30 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_TestRenderSystem_H__
-#define __DC_Scene_Rendering_TestRenderSystem_H__
+#ifndef __DC_Scene_StaticMeshEmitter_H__
+#define __DC_Scene_StaticMeshEmitter_H__
 
-#include "../RenderSystem/RenderSystem.h"
-#include "../Rvm/Ubershader.h"
+#include "RopEmitter.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    class TestRenderSystem : public RenderSystemBase {
-    public:
+    //! Emits render operations for static meshes in scene.
+    class StaticMeshEmitter : public RopEmitter {
+ 	public:
 
-                                        TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr hal );
+								        //! Constructs StaticMeshEmitter instance.
+								        StaticMeshEmitter( RenderScene& renderScene );
 
     protected:
 
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
-
-    private:
-
-        UbershaderPtr                   m_nullShader;
-        UbershaderPtr                   m_pointCloudShader;
-        RopEmitterUPtr                  m_pointCloudEmitter;
-        RopEmitterUPtr                  m_staticMeshEmitter;
+        //! Emits render operations for all visible meshes.
+        virtual void			        emit( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Filter& filter ) DC_DECL_OVERRIDE;
     };
 
 } // namespace Scene
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rendering_TestRenderSystem_H__    */
+#endif    /*    !__DC_Scene_StaticMeshEmitter_H__    */

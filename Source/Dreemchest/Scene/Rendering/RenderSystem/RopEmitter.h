@@ -28,6 +28,7 @@
 #define __DC_Scene_Rendering_RopEmitter_H__
 
 #include "../RenderScene.h"
+#include "../../Assets/Material.h"
 
 DC_BEGIN_DREEMCHEST
 
