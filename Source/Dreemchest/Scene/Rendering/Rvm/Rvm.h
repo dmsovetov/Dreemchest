@@ -58,6 +58,9 @@ namespace Scene {
         //! Unrolls a state stack an applies all state changes.
         void                    applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count );
 
+        //! Clears a render target.
+        void                    clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* color, const u32* viewport, u8 mask );
+
         //! Sets an alpha testing state.
         void                    switchAlphaTest( const RenderFrame& frame, const RenderState& state );
 
@@ -103,8 +106,8 @@ namespace Scene {
         RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
         StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.
         u64                     m_inputLayoutFeatures;                      //!< An input layout features.
-        u64                     m_userFeatures;                             //!< A user-defined features.
-        u64                     m_userFeaturesMask;                         //!< A used-defined features mask.
+    //    u64                     m_userFeatures;                             //!< A user-defined features.
+    //    u64                     m_userFeaturesMask;                         //!< A used-defined features mask.
         ActiveShader            m_activeShader;                             //!< An active shader instance.
     };
 

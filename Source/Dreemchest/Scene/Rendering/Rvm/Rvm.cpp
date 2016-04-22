@@ -29,6 +29,7 @@
 #include "RenderFrame.h"
 #include "Ubershader.h"
 #include "../RenderingContext.h"
+#include "../../Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -62,9 +63,8 @@ RvmPtr Rvm::create( RenderingContextWPtr context )
 // ** Rvm::display
 void Rvm::display( const RenderFrameUPtr& frame )
 {
-    for( s32 i = 0, n = frame->commandBufferCount(); i < n; i++ ) {
-        execute( *frame.get(), frame->commandBufferAt( i ) );
-    }
+    // Execute an entry point command buffer
+    execute( *frame.get(), frame->entryPoint() );
 
     // Reset rendering states
     reset();
@@ -77,27 +77,27 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
         // Get a render operation at specified index
         const RenderCommandBuffer::OpCode& opCode = commands.opCodeAt( i );
 
-        // Apply rendering states from a stack
-        applyStates( frame, opCode.states, MaxStateStackDepth );
-        DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
-
-        // Select a shader permutation that match an active pipeline state
-        Ubershader::Bitmask features = (m_inputLayoutFeatures | (m_userFeatures & m_userFeaturesMask)) & m_activeShader.shader->supportedFeatures();
-
-        if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
-            m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
-            m_activeShader.features     = features;
-            m_activeShader.activeShader = m_activeShader.shader;
-        }
-
-        // Bind an active shader permutation
-        m_hal->setShader( m_activeShader.permutation );
-
         // Perform a draw call
         switch( opCode.type ) {
-        case RenderCommandBuffer::OpCode::DrawIndexed:      m_hal->renderIndexed( opCode.primitives, Renderer::IndexBufferPtr(), opCode.first, opCode.count );
+        case RenderCommandBuffer::OpCode::Clear:            clearRenderTarget( frame.renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
                                                             break;
-        case RenderCommandBuffer::OpCode::DrawPrimitives:   m_hal->renderPrimitives( opCode.primitives, opCode.first, opCode.count );
+        case RenderCommandBuffer::OpCode::Execute:          execute( frame, *opCode.execute.commands );
+                                                            break;
+        case RenderCommandBuffer::OpCode::DrawIndexed:      {
+                                                                // Apply rendering states from a stack
+                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+
+                                                                // Perform an actual draw call
+                                                                m_hal->renderIndexed( opCode.drawCall.primitives, Renderer::IndexBufferPtr(), opCode.drawCall.first, opCode.drawCall.count );
+                                                            }
+                                                            break;
+        case RenderCommandBuffer::OpCode::DrawPrimitives:   {
+                                                                // Apply rendering states from a stack
+                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+
+                                                                // Perform an actual draw call
+                                                                m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                            }
                                                             break;
         default:                                            DC_NOT_IMPLEMENTED;
         }
@@ -131,13 +131,27 @@ void Rvm::reset( void )
     m_hal->setAlphaTest( Renderer::CompareDisabled );
 }
 
+// ** Rvm::clearRenderTarget
+void Rvm::clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* color, const u32* viewport, u8 clearMask )
+{
+	renderTarget->begin( m_hal );
+	{
+		m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+		u32 mask = ( clearMask & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
+		m_hal->clear( Rgba( color ), 1.0f, 0, mask );
+		m_hal->setViewport( renderTarget->rect() );
+	}
+	renderTarget->end( m_hal );
+}
+
 // ** Rvm::applyStates
 void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count )
 {
+    u64 userFeatures = 0;
+    u64 userFeaturesMask = ~0;
+
     // Reset all ubershader features
     m_inputLayoutFeatures = 0;
-    m_userFeatures = 0;
-    m_userFeaturesMask = ~0;
 
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
@@ -152,8 +166,8 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
         }
 
         // Update feature set
-        m_userFeatures      = m_userFeatures     | block->features();
-        m_userFeaturesMask  = m_userFeaturesMask & block->featureMask();
+        userFeatures      = userFeatures     | block->features();
+        userFeaturesMask  = userFeaturesMask & block->featureMask();
 
         // Skip redundant state blocks by testing a block bitmask against an active state mask
         if( (activeStateMask ^ block->mask()) == 0 ) {
@@ -181,6 +195,21 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
             (this->*m_stateSwitches[state.type])( frame, state );
         }
     }
+
+    // Finally apply a shader
+    DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
+
+    // Select a shader permutation that match an active pipeline state
+    Ubershader::Bitmask features = (m_inputLayoutFeatures | (userFeatures & userFeaturesMask)) & m_activeShader.shader->supportedFeatures();
+
+    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
+        m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
+        m_activeShader.features     = features;
+        m_activeShader.activeShader = m_activeShader.shader;
+    }
+
+    // Bind an active shader permutation
+    m_hal->setShader( m_activeShader.permutation );
 }
 
 // ** Rvm::switchAlphaTest

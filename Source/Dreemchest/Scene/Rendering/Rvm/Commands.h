@@ -41,16 +41,31 @@ namespace Scene {
         struct OpCode {
             //! An op-code type.
             enum Type {
-                  DrawIndexed
-                , DrawPrimitives
+                  DrawIndexed       //!< Draws a list of primitives using an index buffer.
+                , DrawPrimitives    //!< Draws a list of primitives from an active vertex buffer.
+                , Clear             //!< Clears a render target.
+                , Execute           //!< Executes a command buffer.
             };
 
-            Type                    type;                       //!< An op code type.
-            Renderer::PrimitiveType primitives;                 //!< A primitive type to be rendered.
-            s32                     first;                      //!< First index or primitive.
-            s32                     count;                      //!< A total number of indices or primitives to use.
-            u64                     sorting;                    //!< A sorting key.
-            const RenderStateBlock* states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
+            Type                                type;                       //!< An op code type.
+            u64                                 sorting;                    //!< A sorting key.
+            union {
+                struct {
+                    Renderer::PrimitiveType     primitives;                 //!< A primitive type to be rendered.
+                    s32                         first;                      //!< First index or primitive.
+                    s32                         count;                      //!< A total number of indices or primitives to use.
+                    const RenderStateBlock*     states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
+                } drawCall;
+                struct {
+                    s32                         id;                         //!< Render target id.
+                    u8                          clearMask;                  //!< A clear mask.
+                    f32                         clearColor[4];              //!< A render target clearing color.
+                    u32                         viewport[4];                //!< A render target viewport.
+                } renderTarget;
+                struct {
+                    const RenderCommandBuffer*  commands;                   //!< A command buffer to be executed.
+                } execute;
+            };
         };
 
         //! Returns a total number of recorded commands.
@@ -58,6 +73,12 @@ namespace Scene {
 
         //! Returns a command at specified index.
         const OpCode&               opCodeAt( s32 index ) const;
+
+        //! Emits a render target clear command.
+        void                        clear( s32 renderTarget, const Rgba& clearColor, const Rect& viewport, u8 clearMask );
+
+        //! Emits a command buffer execution command.
+        void                        execute( const RenderCommandBuffer& commands );
 
         //! Emits a draw indexed command.
         void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );

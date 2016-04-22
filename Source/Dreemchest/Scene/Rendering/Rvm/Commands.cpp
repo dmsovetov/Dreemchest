@@ -32,16 +32,42 @@ namespace Scene {
 
 // ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
 
+// ** RenderCommandBuffer::execute
+void RenderCommandBuffer::clear( s32 renderTarget, const Rgba& clearColor, const Rect& viewport, u8 clearMask )
+{
+    OpCode opCode;
+    opCode.type = OpCode::Clear;
+    opCode.sorting = 0;
+    opCode.renderTarget.id = renderTarget;
+    opCode.renderTarget.clearMask = clearMask;
+    opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
+    opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
+    opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );
+    opCode.renderTarget.viewport[3] = static_cast<u32>( viewport.height() );
+    memcpy( opCode.renderTarget.clearColor, &clearColor, sizeof opCode.renderTarget.clearColor );
+    m_commands.push_back( opCode );
+}
+
+// ** RenderCommandBuffer::execute
+void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
+{
+    OpCode opCode;
+    opCode.type = OpCode::Execute;
+    opCode.sorting = 0;
+    opCode.execute.commands = &commands;
+    m_commands.push_back( opCode );
+}
+
 // ** RenderCommandBuffer::drawIndexed
 void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
 {
     OpCode opCode;
     opCode.type         = OpCode::DrawIndexed;
     opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
+    opCode.drawCall.primitives   = primitives;
+    opCode.drawCall.first        = first;
+    opCode.drawCall.count        = count;
+    memcpy( opCode.drawCall.states, states, sizeof opCode.drawCall.states );
 
     m_commands.push_back( opCode );
 }
@@ -52,10 +78,10 @@ void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType p
     OpCode opCode;
     opCode.type         = OpCode::DrawPrimitives;
     opCode.sorting      = sorting;
-    opCode.primitives   = primitives;
-    opCode.first        = first;
-    opCode.count        = count;
-    memcpy( opCode.states, states, sizeof opCode.states );
+    opCode.drawCall.primitives   = primitives;
+    opCode.drawCall.first        = first;
+    opCode.drawCall.count        = count;
+    memcpy( opCode.drawCall.states, states, sizeof opCode.drawCall.states );
 
     m_commands.push_back( opCode );
 }
