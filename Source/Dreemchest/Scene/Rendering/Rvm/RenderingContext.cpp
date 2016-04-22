@@ -42,9 +42,36 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
     return m_hal;
 }
 
-// ** RenderingContext::createInputLayout
-RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
+// ** RenderingContext::constructResources
+void RenderingContext::constructResources( void )
 {
+    // A table of construction functions
+    static ResourceConstructor::Function kConstructors[ResourceConstructor::TotalConstructors + 1] = {
+          &RenderingContext::constructInputLayout
+        , &RenderingContext::constructVertexBuffer
+        , &RenderingContext::constructIndexBuffer
+        , &RenderingContext::constructConstantBuffer
+        , NULL
+    };
+
+    // Construct all resources
+    for( ResourceConstructors::const_iterator i = m_resourceConstructors.begin(), end = m_resourceConstructors.end(); i != end; ++i ) {
+        DC_ABORT_IF( kConstructors[i->type] == NULL, "unhandled resource constructor type" );
+        ( this->*kConstructors[i->type] )( *i );
+    }
+
+    // Clear a resource constructor list
+    m_resourceConstructors.clear();
+}
+
+// ** RenderingContext::constructInputLayout
+void RenderingContext::constructInputLayout( const ResourceConstructor& constructor )
+{
+    DC_BREAK_IF( m_inputLayoutPool[constructor.id - 1].valid(), "resource was already constructed" );
+
+    // Create an input layout vertex format
+    VertexFormat format( constructor.inputLayout.format );
+
     // Create an input layout
     Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
 
@@ -65,58 +92,105 @@ RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
         inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
     }
 
-    return m_inputLayoutPool.push( inputLayout ) + 1;
+    // Save an input layout to a pool
+    m_inputLayoutPool[constructor.id - 1] = inputLayout;
+}
+
+// ** RenderingContext::constructVertexBuffer
+void RenderingContext::constructVertexBuffer( const ResourceConstructor& constructor )
+{
+    DC_BREAK_IF( m_vertexBufferPool[constructor.id - 1].valid(), "resource was already constructed" );
+
+    // Create a vertex buffer instance
+    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( constructor.buffer.size );
+
+    // Upload data to a GPU buffer
+    if( constructor.buffer.data ) {
+        memcpy( vertexBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
+        vertexBuffer->unlock();
+    }
+
+    // Save a vertex buffer to a pool
+    m_vertexBufferPool[constructor.id - 1] = vertexBuffer;
+}
+
+// ** RenderingContext::constructIndexBuffer
+void RenderingContext::constructIndexBuffer( const ResourceConstructor& constructor )
+{
+    // Create an index buffer instance
+    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( constructor.buffer.size );
+
+    // Upload data to a GPU buffer
+    if( constructor.buffer.data ) {
+        memcpy( indexBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
+        indexBuffer->unlock();
+    }
+
+    // Save a index buffer to a pool
+    m_indexBufferPool[constructor.id - 1] = indexBuffer;
+}
+
+// ** RenderingContext::constructConstantBuffer
+void RenderingContext::constructConstantBuffer( const ResourceConstructor& constructor )
+{
+    Renderer::ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( constructor.buffer.size, reinterpret_cast<const Renderer::ConstantBufferLayout*>( constructor.buffer.userData ) );
+
+    // Upload data to a GPU buffer
+    if( constructor.buffer.data ) {
+        memcpy( constantBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
+        constantBuffer->unlock();
+    }
+
+    // Save a index buffer to a pool
+    m_constantBufferPool[constructor.id - 1] = constantBuffer;
+}
+
+// ** RenderingContext::createInputLayout
+RenderResource RenderingContext::createInputLayout( const VertexFormat& format )
+{
+    ResourceConstructor constructor = ResourceConstructor::InputLayout;
+    constructor.id      = m_inputLayoutPool.push( NULL ) + 1;
+    constructor.inputLayout.format = format;
+
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
 }
 
 // ** RenderingContext::createVertexBuffer
-RenderResource RenderingContext::createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat )
+RenderResource RenderingContext::createVertexBuffer( const void* data, s32 size )
 {
-    // Create a vertex buffer instance
-    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( count * dstFormat.vertexSize() );
+    ResourceConstructor constructor = ResourceConstructor::VertexBuffer;
+    constructor.id          = m_vertexBufferPool.push( NULL ) + 1;
+    constructor.buffer.size = size;
+    constructor.buffer.data = data;
 
-    // Lock a vertex buffer
-    void* locked = vertexBuffer->lock();
-
-    // Just copy memory if vertex formats match
-    if( dstFormat == srcFormat ) {
-        memcpy( locked, vertices, count * dstFormat.vertexSize() );
-    } else {
-        // Copy all vertices to a vertex buffer
-        for( s32 i = 0; i < count; i++ ) {
-            dstFormat.setVertexAttribute( VertexFormat::Position, srcFormat.vertexAttribute<Vec3>( VertexFormat::Position, vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Color,    srcFormat.vertexAttribute<u32> ( VertexFormat::Color,    vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Normal,   srcFormat.vertexAttribute<Vec3>( VertexFormat::Normal,   vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Uv0,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv0,      vertices, i ), locked, i );
-            dstFormat.setVertexAttribute( VertexFormat::Uv1,      srcFormat.vertexAttribute<Vec2>( VertexFormat::Uv1,      vertices, i ), locked, i );
-        }
-    }
-
-    // Unlock a vertex buffer.
-    vertexBuffer->unlock();
-
-    return m_vertexBufferPool.push( vertexBuffer ) + 1;
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
 }
 
 // ** RenderingContext::createIndexBuffer
-RenderResource RenderingContext::createIndexBuffer( const u16* indices, s32 count )
+RenderResource RenderingContext::createIndexBuffer( const void* data, s32 size )
 {
-    // Create an index buffer instance
-    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( count * sizeof( u16 ) );
+    ResourceConstructor constructor = ResourceConstructor::IndexBuffer;
+    constructor.id          = m_indexBufferPool.push( NULL ) + 1;
+    constructor.buffer.size = size;
+    constructor.buffer.data = data;
 
-    // Copy memory to a GPU index buffer
-    memcpy( indexBuffer->lock(), indices, count * sizeof( u16 ) );
-
-    // Unlock an index buffer.
-    indexBuffer->unlock();
-
-    return m_indexBufferPool.push( indexBuffer ) + 1;
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
 }
 
 // ** RenderingContext::createConstantBuffer
-RenderResource RenderingContext::createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout )
+RenderResource RenderingContext::createConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
 {
-    Renderer::ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( size, layout );
-    return m_constantBufferPool.push( constantBuffer ) + 1;
+    ResourceConstructor constructor = ResourceConstructor::ConstantBuffer;
+    constructor.id          = m_constantBufferPool.push( NULL ) + 1;
+    constructor.buffer.size = size;
+    constructor.buffer.data = data;
+    constructor.buffer.userData = layout;
+
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
 }
 
 // ** RenderingContext::internRenderTarget

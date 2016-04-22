@@ -194,6 +194,9 @@ namespace Scene {
                                 //! Constructs a VertexFormat instance.
                                 VertexFormat( u8 attributes );
 
+                                //! Converts a VertexFormat to u8 value.
+                                operator u8( void ) const;
+
         //! Returns true if a specified attribute exists.
         bool                    operator & ( Attribute attribute ) const;
 
@@ -244,6 +247,12 @@ namespace Scene {
     NIMBLE_INLINE VertexFormat::VertexFormat( u8 attributes )
         : m_attributes( attributes | Position )
     {
+    }
+
+    // ** VertexFormat::operator u8
+    NIMBLE_INLINE VertexFormat::operator u8( void ) const
+    {
+        return m_attributes;
     }
 
     // ** VertexFormat::operator &

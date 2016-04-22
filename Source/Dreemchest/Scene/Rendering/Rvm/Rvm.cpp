@@ -64,6 +64,9 @@ RvmPtr Rvm::create( RenderingContextWPtr context )
 // ** Rvm::display
 void Rvm::display( const RenderFrameUPtr& frame )
 {
+    // Construct all resources before rendering a frame
+    m_context->constructResources();
+
     // Execute an entry point command buffer
     execute( *frame.get(), frame->entryPoint() );
 

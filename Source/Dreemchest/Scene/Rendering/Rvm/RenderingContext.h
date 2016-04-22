@@ -35,6 +35,7 @@ namespace Scene {
 
     //! Rendering context.
     class RenderingContext : public RefCounted {
+    friend class Rvm;
     public:
 
         //! Returns a parent rendering HAL instance.
@@ -44,13 +45,13 @@ namespace Scene {
         RenderResource                          createInputLayout( const VertexFormat& vertexFormat );
 
         //! Creates a vertex buffer from a vertex array with a specified vertex format.
-        RenderResource                          createVertexBuffer( const void* vertices, s32 count, const VertexFormat& dstFormat, const VertexFormat& srcFormat );
+        RenderResource                          createVertexBuffer( const void* data, s32 size );
 
         //! Creates an index buffer from an index array.
-        RenderResource                          createIndexBuffer( const u16* indices, s32 count );
+        RenderResource                          createIndexBuffer( const void* data, s32 size );
 
         //! Creates a constant buffer with specified size and layout.
-        RenderResource                          createConstantBuffer( s32 size, const Renderer::ConstantBufferLayout* layout );
+        RenderResource                          createConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout );
 
         //! Interns a render target and returns it's integer identifier.
         s32                                     internRenderTarget( RenderTargetPtr renderTarget );
@@ -87,20 +88,74 @@ namespace Scene {
 
     private:
 
+        //! Forward declaration of a ResourceConstructor type.
+        struct ResourceConstructor;
+
                                                 //! Constructs a RenderingContext instance.
                                                 RenderingContext( Renderer::HalWPtr hal );
 
+        //! Constructs all resources before rendering a frame.
+        void                                    constructResources( void );
+
+        //! Constructs an input layout.
+        void                                    constructInputLayout( const ResourceConstructor& constructor );
+
+        //! Constructs a vertex buffer.
+        void                                    constructVertexBuffer( const ResourceConstructor& constructor );
+
+        //! Constructs an index buffer.
+        void                                    constructIndexBuffer( const ResourceConstructor& constructor );
+
+        //! Constructs a constant buffer.
+        void                                    constructConstantBuffer( const ResourceConstructor& constructor );
+
     private:
 
-        Renderer::HalWPtr                       m_hal;                  //!< A rendering HAL to be used.
-        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;     //!< Allocated vertex buffers.
-        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;      //!< Allocated index buffers.
-        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;   //!< Allocated constant buffers.
-        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;      //!< Allocated input layouts.
+        //! A resource item that should be created.
+        struct ResourceConstructor {
+            //! Resource type being constructed
+            enum Type {
+                  InputLayout       //!< An input layout will be constructed.
+                , VertexBuffer      //!< A vertex buffer will be constructed.
+                , IndexBuffer       //!< An index buffer will be constructed.
+                , ConstantBuffer    //!< A constant buffer will be constructed.
+                , TotalConstructors //!< A total number of resource constructor types.
+            };
 
-        IndexCache<RenderTargetPtr>             m_renderTargets;        //!< Interned render targets.
-        IndexCache<Renderer::TexturePtr>        m_textures;             //!< Interned textures.
-        IndexCache<UbershaderPtr>               m_shaders;              //!< Interned shaders.
+            //! A callback function used to construct a resource.
+            typedef void ( RenderingContext::*Function )( const ResourceConstructor& );
+
+                                //! Constructs a ResourceConstructor instance.
+                                ResourceConstructor( Type type = TotalConstructors )
+                                    : type( type ) {}
+
+            Type                type;       //!< Resource constructor type.
+            RenderResource      id;         //!< Handle to a resource being constructed.
+            union {
+                struct {
+                    u8          format;     //!< Vertex format used by an input layout constructor.
+                } inputLayout;
+
+                struct {
+                    const void* data;       //!< Data that should be uploaded to a buffer after construction.
+                    s32         size;       //!< A buffer size.
+                    const void* userData;   //!< Used by a constant buffer constructor.
+                } buffer;
+            };
+        };
+
+        //! Container type to store a list of resource constructors that should be run before rendering a frame.
+        typedef List<ResourceConstructor>       ResourceConstructors;
+
+        Renderer::HalWPtr                       m_hal;                      //!< A rendering HAL to be used.
+        ResourceConstructors                    m_resourceConstructors;     //!< A list of resources to be constructed.
+        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;         //!< Allocated vertex buffers.
+        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;          //!< Allocated index buffers.
+        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;       //!< Allocated constant buffers.
+        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;          //!< Allocated input layouts.
+        IndexCache<RenderTargetPtr>             m_renderTargets;            //!< Interned render targets.
+        IndexCache<Renderer::TexturePtr>        m_textures;                 //!< Interned textures.
+        IndexCache<UbershaderPtr>               m_shaders;                  //!< Interned shaders.
     };
 
 } // namespace Scene
