@@ -39,18 +39,17 @@ TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& rend
 {
     m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
     m_staticMeshEmitter = DC_NEW StaticMeshEmitter( renderScene );
-    m_pointCloudShader  = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
+    m_phongShader   = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
+    m_ambientShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
-    UbershaderPtr shader = m_pointCloudShader;
-
     // Ambient pass
     {
         StateScope pass = stateStack.newScope();
-        pass->bindProgram( m_context.internShader( shader ) );
+        pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( BIT( ShaderEmissionColor ) );
 
         m_staticMeshEmitter->emit( frame, commands, stateStack );
@@ -69,8 +68,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         StateScope state = stateStack.newScope();
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
         state->enableFeatures( BIT( ShaderPointLight ) );
-        state->disableFeatures( BIT( ShaderAmbientColor ) );
-        state->bindProgram( m_context.internShader( shader ) );
+        state->bindProgram( m_context.internShader( m_phongShader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
         // Emit render operations

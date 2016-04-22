@@ -1,8 +1,6 @@
 [Features]
 F_NormalAttribute = inputNormal
 F_ColorAttribute  = inputColor
-F_AmbientColor	  = ambientColor
-F_EmissionColor	  = emissionColor
 F_PointLight	  = pointLight
 
 [VertexShader]
@@ -58,25 +56,14 @@ void main()
 	vec4 lightColor   = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 #if defined( F_ColorAttribute )
-	diffuseColor = diffuseColor * Material.diffuse;
+	diffuseColor = diffuseColor * v_Color;
 #endif  /*  F_ColorAttribute    */
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
-//	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), Light.range, Light.intensity ) * vec4( Light.color, 1.0 );
 	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), Light.range, Light.intensity ) * vec4( Light.color, 1.0 );
 #endif  /*  F_NormalAttribute    */
 
-#if defined( F_AmbientColor )
-	vec4 ambientColor = Scene.ambient;
-#else
-	vec4 ambientColor = vec4( 0.0, 0.0, 0.0, 1.0 );
-#endif  /*  F_AmbientColor    */
-
-	vec4 finalColor = (ambientColor + lightColor) * diffuseColor;
-	
-#if defined( F_EmissionColor )
-	finalColor = finalColor + Material.emission;
-#endif	/*	F_EmissionColor	*/
+	vec4 finalColor = lightColor * diffuseColor;
 
 	gl_FragColor = finalColor;
 }
