@@ -48,7 +48,7 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         const RenderScene::PointCloudNode& pointCloud = pointClouds[i];
 
         // Read-lock a point cloud material
-        const Material& material = pointCloud.material.readLock();
+        const Material& material = *pointCloud.material;
 
         // Does a material pass a filter?
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;

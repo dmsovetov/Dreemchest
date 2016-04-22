@@ -112,8 +112,7 @@ namespace Scene {
         RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
         StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.
         u64                     m_inputLayoutFeatures;                      //!< An input layout features.
-    //    u64                     m_userFeatures;                             //!< A user-defined features.
-    //    u64                     m_userFeaturesMask;                         //!< A used-defined features mask.
+        u64                     m_samplerFeatures;                          //!< Active sampler features.
         ActiveShader            m_activeShader;                             //!< An active shader instance.
     };
 

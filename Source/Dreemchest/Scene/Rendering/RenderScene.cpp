@@ -338,6 +338,8 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 // ** RenderScene::initializeInstanceNode
 void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance, const MaterialHandle& material )
 {
+    material.readLock();
+
     instance.transform          = entity.get<Transform>();
     instance.matrix             = &instance.transform->matrix();
     instance.constantBuffer     = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );

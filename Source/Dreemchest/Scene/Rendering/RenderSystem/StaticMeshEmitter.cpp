@@ -51,7 +51,7 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         const RenderScene::StaticMeshNode& mesh = meshes[i];
 
         // Get the material
-        const Material& material = mesh.material.isValid() ? mesh.material.readLock() : defaultMaterial;
+        const Material& material = mesh.material.isValid() ? *mesh.material : defaultMaterial;
 
         // Does a material pass a filter?
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
