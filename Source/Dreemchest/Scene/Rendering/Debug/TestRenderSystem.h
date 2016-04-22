@@ -45,7 +45,6 @@ namespace Scene {
 
     private:
 
-        UbershaderPtr                   m_nullShader;
         UbershaderPtr                   m_pointCloudShader;
         RopEmitterUPtr                  m_pointCloudEmitter;
         RopEmitterUPtr                  m_staticMeshEmitter;

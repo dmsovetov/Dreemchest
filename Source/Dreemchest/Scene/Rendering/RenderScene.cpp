@@ -93,6 +93,9 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
     // Create scene constant buffer
     m_sceneConstants  = m_context->createConstantBuffer( NULL, sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
     m_sceneParameters = DC_NEW CBuffer::Scene;
+    
+    // Create a default shader
+    m_defaultShader = createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
 }
 
 // ** RenderScene::create
@@ -153,6 +156,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults.disableAlphaTest();
     defaults.disableBlending();
     defaults.setDepthState( Renderer::LessEqual, true );
+    defaults.bindProgram( m_context->internShader( m_defaultShader ) );
     defaults.enableFeatures( BIT( ShaderAmbientColor ) );
     defaults.bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
 
@@ -339,6 +343,8 @@ void RenderScene::updateStaticMeshes( void )
         node.timestamp = timestamp;
 
         if( mesh->chunkCount() ) {
+            DC_BREAK_IF( node.vertexBuffer != 0 && node.indexBuffer != 0, "a static mesh was already created" );
+
             VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1  );
             const Mesh::VertexBuffer& vb = mesh->vertexBuffer( 0 );
             const Mesh::IndexBuffer& ib = mesh->indexBuffer( 0 );
@@ -406,6 +412,8 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
     mesh.mesh = entity.get<StaticMesh>();
     mesh.material = mesh.mesh->material( 0 );
     mesh.timestamp = -1;
+    mesh.vertexBuffer = 0;
+    mesh.indexBuffer = 0;
 
     mesh.mesh->mesh().readLock();
 

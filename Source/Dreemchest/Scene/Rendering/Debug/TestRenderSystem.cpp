@@ -40,7 +40,6 @@ TestRenderSystem::TestRenderSystem( RenderScene& renderScene, Renderer::HalWPtr 
     m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
     m_staticMeshEmitter = DC_NEW StaticMeshEmitter( renderScene );
     m_pointCloudShader  = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Test.shader" );
-    m_nullShader        = renderScene.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
 }
 
 // ** TestRenderSystem::emitRenderOperations
