@@ -36,6 +36,43 @@ namespace Scene {
 
     typedef u32 RenderResource;
 
+    //! Manages a render scene resource cache.
+    class RenderCache {
+    friend class RenderScene;
+    public:
+
+        //! Requests a new input layout from a rendering context or returns a cached one.
+        RenderResource                          findInputLayout( const VertexFormat& format );
+
+        //! Requests a new vertex buffer for a mesh asset or returns a cached one.
+        RenderResource                          findVertexBuffer( const MeshHandle& mesh );
+
+        //! Requests a new index buffer for a mesh asset or returns a cached one.
+        RenderResource                          findIndexBuffer( const MeshHandle& mesh );
+
+        //! Requests a new material constant buffer or returns a cached one.
+        RenderResource                          findConstantBuffer( const MaterialHandle& material );
+
+    private:
+
+                                                //! Constructs a RenderCache instance.
+                                                RenderCache( RenderingContextWPtr context );
+
+    private:
+
+        //! Container type to store mapping from a vertex format to a previously created input layout.
+        typedef HashMap<u8, RenderResource>     InputLayouts;
+
+        //! Container type to store mapping from an asset id to a previously created render resource.
+        typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
+
+        RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
+        InputLayouts                            m_inputLayouts;             //!< Input layout cache.
+        RenderResources                         m_vertexBuffers;            //!< Vertex buffer cache.
+        RenderResources                         m_indexBuffers;             //!< Index buffer cache.
+        RenderResources                         m_materialConstantBuffers;  //!< Material constant buffers cache.
+    };
+
     //! Render scene contains all renderable entities, performs culling and constructs command buffers.
     class RenderScene : public RefCounted {
     public:
@@ -172,16 +209,13 @@ namespace Scene {
         StaticMeshNode                          createStaticMeshNode( const Ecs::Entity& entity );
 
         //! Setups an instance render scene node.
-        void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance );
+        void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance, const MaterialHandle& material );
 
         //! Updates all active constant buffers.
         void                                    updateConstantBuffers( RenderFrame& frame );
 
         //! Updates all active mesh buffers.
         void                                    updateStaticMeshes( void );
-
-        //! Requests a new input layout or returns a cached one.
-        RenderResource                          findInputLayout( const VertexFormat& format );
 
     private:
 
@@ -197,15 +231,12 @@ namespace Scene {
         //! Entity data cache to store static meshes.
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
-        //! Container type to store mapping from a vertex format to a previously created input layout.
-        typedef HashMap<u8, RenderResource>     InputLayouts;
-
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
+        RenderCache                             m_renderCache;      //!< A render cache used by scene.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
         AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         UbershaderPtr                           m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
-        InputLayouts                            m_inputLayouts;     //!< Input layout cache.
         Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.

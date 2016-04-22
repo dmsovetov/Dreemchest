@@ -291,7 +291,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     }
     Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
-        dflt.asset().setName( "Red.material" );
+        red.asset().setName( "Red.material" );
         Assets::WriteLock<Scene::Material> writable = red.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 0.5f, 0.25f ) );
         writable->setColor( Scene::Material::Emission, Rgba( 0.4f, 0.0f, 0.4f ) );
@@ -299,14 +299,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     }
     Scene::MaterialHandle green = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
-        dflt.asset().setName( "Green.material" );
+        green.asset().setName( "Green.material" );
         Assets::WriteLock<Scene::Material> writable = green.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.5f, 1.0f, 0.25f ) );
         writable->setLightingModel( Scene::LightingModel::Ambient );    
     }
     Scene::MaterialHandle blue = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
-        dflt.asset().setName( "Blue.material" );
+        blue.asset().setName( "Blue.material" );
         Assets::WriteLock<Scene::Material> writable = blue.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.25f, 0.5f, 1.0f ) );
         writable->setLightingModel( Scene::LightingModel::Phong );    
