@@ -29,49 +29,11 @@
 
 #include "../Scene.h"
 #include "Rvm/RenderFrame.h"
+#include "RenderCache.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
-
-    typedef u32 RenderResource;
-
-    //! Manages a render scene resource cache.
-    class RenderCache {
-    friend class RenderScene;
-    public:
-
-        //! Requests a new input layout from a rendering context or returns a cached one.
-        RenderResource                          findInputLayout( const VertexFormat& format );
-
-        //! Requests a new vertex buffer for a mesh asset or returns a cached one.
-        RenderResource                          findVertexBuffer( const MeshHandle& mesh );
-
-        //! Requests a new index buffer for a mesh asset or returns a cached one.
-        RenderResource                          findIndexBuffer( const MeshHandle& mesh );
-
-        //! Requests a new material constant buffer or returns a cached one.
-        RenderResource                          findConstantBuffer( const MaterialHandle& material );
-
-    private:
-
-                                                //! Constructs a RenderCache instance.
-                                                RenderCache( RenderingContextWPtr context );
-
-    private:
-
-        //! Container type to store mapping from a vertex format to a previously created input layout.
-        typedef HashMap<u8, RenderResource>     InputLayouts;
-
-        //! Container type to store mapping from an asset id to a previously created render resource.
-        typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
-
-        RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
-        InputLayouts                            m_inputLayouts;             //!< Input layout cache.
-        RenderResources                         m_vertexBuffers;            //!< Vertex buffer cache.
-        RenderResources                         m_indexBuffers;             //!< Index buffer cache.
-        RenderResources                         m_materialConstantBuffers;  //!< Material constant buffers cache.
-    };
 
     //! Render scene contains all renderable entities, performs culling and constructs command buffers.
     class RenderScene : public RefCounted {
@@ -189,12 +151,12 @@ namespace Scene {
         RenderFrameUPtr                         captureFrame( void );
 
         //! Creates a new render scene.
-        static RenderScenePtr                   create( SceneWPtr scene, RenderingContextWPtr context );
+        static RenderScenePtr                   create( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache );
 
     private:
 
                                                 //! Constructs RenderScene instance.
-                                                RenderScene( SceneWPtr scene, RenderingContextWPtr context );
+                                                RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache );
 
         //! Creates a point cloud node from an entity.
         PointCloudNode                          createPointCloudNode( const Ecs::Entity& entity );
@@ -231,8 +193,8 @@ namespace Scene {
         //! Entity data cache to store static meshes.
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
+        RenderCacheWPtr                         m_cache;            //!< Render cache to be used.
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
-        RenderCache                             m_renderCache;      //!< A render cache used by scene.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
         AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         UbershaderPtr                           m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.

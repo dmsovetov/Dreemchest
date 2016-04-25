@@ -77,10 +77,10 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Material::Layout[] = {
 };
 
 // ** RenderScene::RenderScene
-RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
+RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache )
     : m_scene( scene )
     , m_context( context )
-    , m_renderCache( context )
+    , m_cache( cache )
 {
     // Get a parent Ecs instance
     Ecs::EcsWPtr ecs = scene->ecs();
@@ -100,9 +100,9 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context )
 }
 
 // ** RenderScene::create
-RenderScenePtr RenderScene::create( SceneWPtr scene, RenderingContextWPtr context )
+RenderScenePtr RenderScene::create( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache )
 {
-    return DC_NEW RenderScene( scene, context );
+    return DC_NEW RenderScene( scene, context, cache );
 }
 
 // ** RenderScene::scene
@@ -263,9 +263,9 @@ void RenderScene::updateStaticMeshes( void )
             DC_BREAK_IF( node.vertexBuffer != 0 && node.indexBuffer != 0, "a static mesh was already created" );
 
             VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
-            node.vertexBuffer = m_renderCache.findVertexBuffer( mesh );
-            node.indexBuffer  = m_renderCache.findIndexBuffer( mesh );
-            node.inputLayout  = m_renderCache.findInputLayout( vf );
+            node.vertexBuffer = m_cache->findVertexBuffer( mesh );
+            node.indexBuffer  = m_cache->findIndexBuffer( mesh );
+            node.inputLayout  = m_cache->findInputLayout( vf );
             node.indexCount   = mesh->indexBuffer( 0 ).size();
         }
     }
@@ -281,7 +281,7 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     node.vertexCount    = pointCloud->vertexCount();
     node.material       = pointCloud->material();
-    node.inputLayout    = m_renderCache.findInputLayout( pointCloud->vertexFormat() );
+    node.inputLayout    = m_cache->findInputLayout( pointCloud->vertexFormat() );
     node.vertexBuffer   = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
 
     initializeInstanceNode( entity, node, pointCloud->material() );
@@ -346,92 +346,9 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
     instance.instanceParameters = DC_NEW CBuffer::Instance;
 
     if( material.isValid() ) {
-        instance.materialConstants  = m_renderCache.findConstantBuffer( material );
+        instance.materialConstants  = m_cache->findConstantBuffer( material );
         instance.materialParameters = DC_NEW CBuffer::Material;
     }
-}
-
-// -------------------------------------------------------------- RenderCache --------------------------------------------------------------
-
-// ** RenderCache::RenderCache
-RenderCache::RenderCache( RenderingContextWPtr context )
-    : m_context( context )
-{
-}
-
-// ** RenderCache::findInputLayout
-RenderResource RenderCache::findInputLayout( const VertexFormat& format )
-{
-    InputLayouts::iterator i = m_inputLayouts.find( format );
-
-    if( i != m_inputLayouts.end() ) {
-        return i->second;
-    }
-
-    RenderResource id = m_context->requestInputLayout( format );
-    m_inputLayouts[format] = id;
-    return id;
-}
-
-// ** RenderCache::findVertexBuffer
-RenderResource RenderCache::findVertexBuffer( const MeshHandle& mesh )
-{
-    RenderResources::iterator i = m_vertexBuffers.find( mesh.asset().uniqueId() );
-
-    if( i != m_vertexBuffers.end() ) {
-        return i->second;
-    }
-
-    DC_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
-
-    const Mesh::VertexBuffer& vertices = mesh->vertexBuffer( 0 );
-    VertexFormat vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
-
-    RenderResource id = m_context->requestVertexBuffer( &vertices[0], vertices.size() * vertexFormat.vertexSize() );
-    m_vertexBuffers[mesh.asset().uniqueId()] = id;
-
-    LogVerbose( "renderCache", "vertex buffer with %d vertices created\n", vertices.size() );
-
-    return id;
-}
-
-// ** RenderCache::findIndexBuffer
-RenderResource RenderCache::findIndexBuffer( const MeshHandle& mesh )
-{
-    RenderResources::iterator i = m_indexBuffers.find( mesh.asset().uniqueId() );
-
-    if( i != m_indexBuffers.end() ) {
-        return i->second;
-    }
-
-    DC_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
-
-    const Mesh::IndexBuffer& indices = mesh->indexBuffer( 0 );
-
-    RenderResource id = m_context->requestIndexBuffer( &indices[0], indices.size() * sizeof( u16 ) );
-    m_indexBuffers[mesh.asset().uniqueId()] = id;
-
-    LogVerbose( "renderCache", "index buffer with %d indices created\n", indices.size() );
-
-    return id;
-}
-
-// ** RenderCache::findConstantBuffer
-RenderResource RenderCache::findConstantBuffer( const MaterialHandle& material )
-{
-    RenderResources::iterator i = m_materialConstantBuffers.find( material.asset().uniqueId() );
-
-    if( i != m_materialConstantBuffers.end() ) {
-        return i->second;
-    }
-
-
-    RenderResource id = m_context->requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
-    m_materialConstantBuffers[material.asset().uniqueId()] = id;
-
-    LogVerbose( "renderCache", "material constant buffer created for '%s'\n", material.asset().name().c_str() );
-
-    return id;
 }
 
 } // namespace Scene

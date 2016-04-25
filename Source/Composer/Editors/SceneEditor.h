@@ -151,6 +151,7 @@ namespace Editors {
 		Scene::ScenePtr					m_scene;					//!< Actual scene.
 		AutoPtr<SceneModel>				m_sceneModel;				//!< Scene model used by user interface.
 		Scene::RenderingContextPtr		m_renderingContext;			//!< Scene rendering context.
+        Scene::RenderCachePtr           m_renderCache;              //!< Render asset cache.
         Scene::RenderScenePtr           m_renderScene;              //!< Rendering scene instance.
         Scene::RvmPtr                   m_rvm;                      //!< Rendering virtual machine that executes generated instructions.
         Scene::RenderTargetPtr          m_renderTarget;             //!< Viewport rendering target.
