@@ -77,10 +77,8 @@ s32 Resources::bytesAllocatedForMesh( const Mesh& asset )
 {
     s32 result = 0;
 
-    for( s32 i = 0; i < asset.chunkCount(); i++ ) {
-        result += asset.vertexBuffer( i ).size() * sizeof( Mesh::Vertex );
-        result += asset.indexBuffer( i ).size() * sizeof( u16 );
-    }
+    result += asset.vertexBuffer().size() * sizeof( Mesh::Vertex );
+    result += asset.indexBuffer().size() * sizeof( u16 );
 
     return result + sizeof( Mesh );
 }

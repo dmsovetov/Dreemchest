@@ -64,31 +64,27 @@ const String& Mesh::texture( s32 chunk ) const
 }
 
 // ** Mesh::vertexBuffer
-const Mesh::VertexBuffer& Mesh::vertexBuffer( s32 chunk ) const
+const Mesh::VertexBuffer& Mesh::vertexBuffer( void ) const
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
-	return m_chunks[chunk].vertices;
+	return m_vertexBuffer;
 }
 
 // ** Mesh::setVertexBuffer
-void Mesh::setVertexBuffer( s32 chunk, const VertexBuffer& value )
+void Mesh::setVertexBuffer( const VertexBuffer& value )
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
-	m_chunks[chunk].vertices = value;
+	m_vertexBuffer = value;
 }
 
 // ** Mesh::indexBuffer
-const Mesh::IndexBuffer& Mesh::indexBuffer( s32 chunk ) const
+const Mesh::IndexBuffer& Mesh::indexBuffer( void ) const
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
-	return m_chunks[chunk].indices;
+	return m_indexBuffer;
 }
 
 // ** Mesh::setIndexBuffer
-void Mesh::setIndexBuffer( s32 chunk, const IndexBuffer& value )
+void Mesh::setIndexBuffer( const IndexBuffer& value )
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
-	m_chunks[chunk].indices = value;
+	m_indexBuffer = value;
 }
 
 // ** Mesh::bounds
@@ -108,15 +104,12 @@ void Mesh::updateBounds( void )
 {
 	m_bounds = Bounds();
 
-	// For each chunk
-	for( s32 i = 0, n = chunkCount(); i < n; i++ ) {
-		// Get the chunk's vertex buffer
-		const VertexBuffer& vertices = vertexBuffer( i );
+	// Get the chunk's vertex buffer
+	const VertexBuffer& vertices = vertexBuffer();
 
-		// For each vertex
-		for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ ) {
-			m_bounds << vertices[j].position;
-		}
+	// For each vertex
+	for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ ) {
+		m_bounds << vertices[j].position;
 	}
 }
 

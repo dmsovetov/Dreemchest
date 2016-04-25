@@ -70,16 +70,16 @@ namespace Scene {
 		const String&			texture( s32 chunk ) const;
 
 		//! Returns vertex buffer for a specified mesh chunk.
-		const VertexBuffer&		vertexBuffer( s32 chunk ) const;
+		const VertexBuffer&		vertexBuffer( void ) const;
 
 		//! Sets chunk vertex buffer.
-		void					setVertexBuffer( s32 chunk, const VertexBuffer& value );
+		void					setVertexBuffer( const VertexBuffer& value );
 
 		//! Returns index buffer for a specified mesh chunk.
-		const IndexBuffer&		indexBuffer( s32 chunk ) const;
+		const IndexBuffer&		indexBuffer( void ) const;
 
 		//! Sets chunk index buffer.
-		void					setIndexBuffer( s32 chunk, const IndexBuffer& value );
+		void					setIndexBuffer( const IndexBuffer& value );
 
 		//! Updates mesh bounds.
 		void					updateBounds( void );
@@ -89,11 +89,13 @@ namespace Scene {
 		//! Internal mesh chunk.
 		struct Chunk {
 			String				texture;	//!< Mesh node texture name.
-			VertexBuffer		vertices;	//!< Mesh node vertices.
-			IndexBuffer			indices;	//!< Mesh node indices.
+            s32                 offset;     //!< The first index of a mesh chunk.
+            s32                 count;      //!< A total number of indices in a chunk.
 		};
 
         VertexFormat            m_vertexFormat; //!< A mesh vertex format.
+        VertexBuffer            m_vertexBuffer; //!< Mesh vertex buffer.
+        IndexBuffer             m_indexBuffer;  //!< Mesh index buffer
 		Bounds					m_bounds;	    //!< Bounding box of a mesh.
 		Array<Chunk>			m_chunks;	    //!< Mesh chunks.
 	};

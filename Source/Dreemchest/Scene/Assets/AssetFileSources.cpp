@@ -73,6 +73,10 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 
 	// Set the total number of mesh chunks
 	asset.setChunkCount( chunkCount );
+    DC_BREAK_IF( chunkCount != 1 );
+
+    Mesh::VertexBuffer vertices;
+    Mesh::IndexBuffer indices;
 
 	for( u32 i = 0; i < chunkCount; i++ ) {
 		// Read chunk texture name
@@ -85,10 +89,9 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 		stream->read( &indexCount, 4 );
 
 		// Read vertex buffer
-		Mesh::VertexBuffer vertices;
-		vertices.resize( vertexCount );
+		vertices.resize( vertices.size() + vertexCount );
 
-		for( u32 j = 0; j < vertexCount; j++ ) {
+		for( u32 j = vertices.size() - vertexCount; j < vertexCount; j++ ) {
 			Mesh::Vertex* v = &vertices[j];
 
 			stream->read( &v->position.x, sizeof( v->position ) );
@@ -97,20 +100,24 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 			stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );
 		}
 
-		// Set chunk vertex buffer.
-		asset.setVertexBuffer( i, vertices );
-
 		// Read index buffer
-		Mesh::IndexBuffer indices;
-		indices.resize( indexCount );
-		stream->read( &indices[0], indices.size() * sizeof( u16 ) );
+		indices.resize( indices.size() + indexCount );
 
-		// Set chunk index buffer
-		asset.setIndexBuffer( i, indices );
+        for( u32 j = indices.size() - indexCount; j < indexCount; j++ ) {
+            u16 idx;
+            stream->read( &idx, sizeof u16 );
+            indices[j] = idx;
+        }
 
 		// Set chunk texture
 		asset.setTexture( i, texture );
 	}
+
+	// Set mesh vertex buffer.
+	asset.setVertexBuffer( vertices );
+
+	// Set mesh index buffer
+	asset.setIndexBuffer( indices );
 
 	// Update node bounds
 	asset.updateBounds();

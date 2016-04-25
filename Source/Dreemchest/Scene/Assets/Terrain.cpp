@@ -275,6 +275,7 @@ Mesh Terrain::createChunkMesh( u32 x, u32 z ) const
 // ** Terrain::setMeshChunk
 void Terrain::setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x, u32 z ) const
 {
+#if 0
 	// Set the chunk data
 	Mesh::VertexBuffer vb;
 	vb.resize( vertices.size() );
@@ -285,8 +286,11 @@ void Terrain::setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices,
 		vb[i].uv[0] = vertices[i].uv;
 	}
 
-	mesh.setVertexBuffer( chunk, vb );
-	mesh.setIndexBuffer( chunk, indices );
+	mesh.setVertexBuffer( vb );
+	mesh.setIndexBuffer( indices );
+#else
+    DC_NOT_IMPLEMENTED
+#endif
 }
 
 // --------------------------------------------------------------------- Heightmap ---------------------------------------------------------------------- //
