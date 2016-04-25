@@ -278,6 +278,9 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     s32 points = 500;
     s32 c = 0;
 
+    Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
+    DC_ABORT_IF( !diffuse.isValid() );
+
     Scene::MeshHandle mesh = m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" );
     DC_ABORT_IF( !mesh.isValid() );
 
@@ -287,6 +290,15 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         Assets::WriteLock<Scene::Material> writable = dflt.writeLock();
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
         writable->setColor( Scene::Material::Emission, Rgba( 0.2f, 0.0f, 0.0f ) );
+        writable->setLightingModel( Scene::LightingModel::Phong );
+    }
+
+    Scene::MaterialHandle stone = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        stone.asset().setName( "Stone.material" );
+        Assets::WriteLock<Scene::Material> writable = stone.writeLock();
+        writable->setDiffuse( diffuse );
+        writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
         writable->setLightingModel( Scene::LightingModel::Phong );
     }
     Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
@@ -343,7 +355,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         {
             Scene::SceneObjectPtr msh = scene->createSceneObject();
             msh->attach<Scene::Transform>( i * 15, 0, j * 15, Scene::TransformWPtr() );
-            msh->attach<Scene::StaticMesh>( mesh )->setMaterial( 0, dflt );
+            msh->attach<Scene::StaticMesh>( mesh )->setMaterial( 0, stone );
             scene->addSceneObject( msh );
         }
     }
