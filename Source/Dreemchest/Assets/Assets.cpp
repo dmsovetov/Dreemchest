@@ -146,6 +146,18 @@ void Assets::releaseWriteLock( const Handle& asset )
     asset->m_timestamp.modified = Platform::currentTime();
 }
 
+// ** Assets::queueLoaded
+void Assets::queueLoaded( const Handle& asset )
+{
+    m_loadedAssets.push_back( asset );
+}
+
+// ** Assets::queueUnloaded
+void Assets::queueUnloaded( const Handle& asset )
+{
+    m_unloadedAssets.push_back( asset );
+}
+
 // ** Assets::findAssetCache
 AbstractAssetCache& Assets::findAssetCache( const TypeId& type ) const
 {
@@ -175,16 +187,31 @@ void Assets::update( f32 dt )
             continue;
         }
 
-        // Mark this asset as unloaded
-        asset.switchToState( Asset::Unloaded );
+        LogVerbose( "cache", "asset '%s' was changed\n", asset.name().c_str() );
+
+        // Create an asset handle
+        Handle assetHandle = createHandle( asset );
+
+        // Unload an asset
+        forceUnload( assetHandle );
 
         // Queue asset for reloading
-        LogVerbose( "cache", "reloading '%s'\n", asset.name().c_str() );
-        m_loadingQueue->queue( createHandle( asset ) );
+        m_loadingQueue->queue( assetHandle );
     }
 
     // Update the loading queue
     m_loadingQueue->update();
+
+    // Notify listeners about asset state changes
+    for( AssetList::iterator i = m_unloadedAssets.begin(), end = m_unloadedAssets.end(); i != end; ++i ) {
+        notify<Unloaded>( *this, i->asset() );
+    }
+    m_unloadedAssets.clear();
+
+    for( AssetList::iterator i = m_loadedAssets.begin(), end = m_loadedAssets.end(); i != end; ++i ) {
+        notify<Loaded>( *this, i->asset() );
+    }
+    m_loadedAssets.clear();
 }
 
 // ** Assets::createHandle
@@ -197,6 +224,20 @@ Handle Assets::createHandle( const Asset& asset ) const
 bool Assets::forceLoad( const Handle& asset )
 {
     return m_loadingQueue->loadToCache( asset );
+}
+
+// ** Assets::forceUnload
+void Assets::forceUnload( Handle asset )
+{
+    DC_BREAK_IF( !asset->isLoaded(), "an asset was not loaded" );
+
+    // Mark this asset as unloaded
+    asset->switchToState( Asset::Unloaded );
+
+    // Queue an asset for notification
+    m_unloadedAssets.push_front( asset );
+
+    LogVerbose( "cache", "asset '%s' unloaded\n", asset->name().c_str() );
 }
 
 } // namespace Assets

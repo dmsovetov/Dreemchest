@@ -37,8 +37,9 @@ DC_BEGIN_DREEMCHEST
 namespace Assets {
 
     //! Root interface to access all available assets.
-    class Assets : public RefCounted {
+    class Assets : public InjectEventEmitter<RefCounted> {
     friend class Handle;
+    friend class LoadingQueue;
     template<typename TAsset> friend class WriteLock;
     public:
 
@@ -86,6 +87,9 @@ namespace Assets {
         //! Forces an asset to be loaded and returns true if loading succeed.
         bool                        forceLoad( const Handle& asset );
 
+        //! Forces an asset to be unloaded.
+        void                        forceUnload( Handle asset );
+
         //! Returns an asset type id.
         template<typename TAsset>
         static TypeId               assetTypeId( void );
@@ -93,6 +97,26 @@ namespace Assets {
         //! Registers an asset type.
         template<typename TAsset>
         AssetCache<TAsset>&         registerType( void );
+
+        //! This event is emitted when an asset was loaded.
+        struct Loaded {
+                                    //! Constructs a Loaded event instance.
+                                    Loaded( const Assets& sender, const Asset& asset )
+                                        : sender( sender )
+                                        , asset( asset ) {}
+            const Assets&           sender; //!< An asset manager that sent this event.
+            const Asset&            asset;  //!< An asset instance that was loaded.
+        };
+
+        //! This event is emitted when an asset was unloaded.
+        struct Unloaded {
+                                    //! Constructs a Unloaded event instance.
+                                    Unloaded( const Assets& sender, const Asset& asset )
+                                        : sender( sender )
+                                        , asset( asset ) {}
+            const Assets&           sender; //!< An asset manager that sent this event.
+            const Asset&            asset;  //!< An asset instance that was unloaded.
+        };
 
     private:
 
@@ -128,6 +152,12 @@ namespace Assets {
         //! Unlocks an asset after writing and updates last modified timestamp.
         void                        releaseWriteLock( const Handle& asset );
 
+        //! Queues a loaded asset for notification.
+        void                        queueLoaded( const Handle& asset );
+
+        //! Queues an unloaded asset for notification.
+        void                        queueUnloaded( const Handle& asset );
+
     private:
 
         //! Container type to store unique id to an asset slot mapping.
@@ -136,13 +166,15 @@ namespace Assets {
         //! Container type to store asset cache for an asset type.
         typedef Map<TypeId, AbstractAssetCache*> AssetCaches;
 
-        Pool<Asset, Index>          m_assets;       //!< All available assets.
-        AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
-        u32                         m_currentTime;  //!< Cached current time.
-        Map<String, TypeId>         m_nameToType;   //!< Maps asset name to type.
-        Map<TypeId, String>         m_typeToName;   //!< Maps asset type to name.
-        mutable LoadingQueueUPtr    m_loadingQueue; //!< Asset loading queue.
-        mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
+        Pool<Asset, Index>          m_assets;           //!< All available assets.
+        AssetIndexById              m_indexById;        //!< AssetId to asset index mapping.
+        u32                         m_currentTime;      //!< Cached current time.
+        Map<String, TypeId>         m_nameToType;       //!< Maps asset name to type.
+        Map<TypeId, String>         m_typeToName;       //!< Maps asset type to name.
+        AssetList                   m_loadedAssets;     //!< A list of assets that were loaded and are waiting for notification.
+        AssetList                   m_unloadedAssets;   //!< A list of assets that were loaded and are waiting for notification.
+        mutable LoadingQueueUPtr    m_loadingQueue;     //!< Asset loading queue.
+        mutable AssetCaches         m_cache;            //!< Asset cache by an asset type.
     };
 
     // ** Assets::assetTypeId

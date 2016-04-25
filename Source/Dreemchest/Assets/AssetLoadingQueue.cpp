@@ -93,6 +93,11 @@ bool LoadingQueue::loadToCache( Handle asset )
     // Update the last constructed time stamp
     asset->m_timestamp.constructed = Time::current();
 
+    // Notify listeners about an asset loading completion
+    if( result ) {
+        m_assets.queueLoaded( asset );
+    }
+
     // Output the log message
     LogDebug( "loadingQueue", "%s loaded\n", asset->name().c_str() );
 
