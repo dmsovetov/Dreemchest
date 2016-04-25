@@ -54,6 +54,9 @@ namespace Scene {
 		//! Returns mesh bounds.
 		const Bounds&			bounds( void ) const;
 
+        //! Returns a vertex format.
+        const VertexFormat&     vertexFormat( void ) const;
+
 		//! Returns the total number of mesh chunks.
 		s32						chunkCount( void ) const;
 
@@ -90,8 +93,9 @@ namespace Scene {
 			IndexBuffer			indices;	//!< Mesh node indices.
 		};
 
-		Bounds					m_bounds;	//!< Bounding box of a mesh.
-		Array<Chunk>			m_chunks;	//!< Mesh chunks.
+        VertexFormat            m_vertexFormat; //!< A mesh vertex format.
+		Bounds					m_bounds;	    //!< Bounding box of a mesh.
+		Array<Chunk>			m_chunks;	    //!< Mesh chunks.
 	};
 
 } // namespace Scene

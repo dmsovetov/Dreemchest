@@ -32,6 +32,7 @@ namespace Scene {
 
 // ** Mesh::Mesh
 Mesh::Mesh( void )
+    : m_vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 )
 {
 
 }
@@ -94,6 +95,12 @@ void Mesh::setIndexBuffer( s32 chunk, const IndexBuffer& value )
 const Bounds& Mesh::bounds( void ) const
 {
 	return m_bounds;
+}
+
+// ** Mesh::vertexFormat
+const VertexFormat& Mesh::vertexFormat( void ) const
+{
+    return m_vertexFormat;
 }
 
 // ** Mesh::updateBounds
