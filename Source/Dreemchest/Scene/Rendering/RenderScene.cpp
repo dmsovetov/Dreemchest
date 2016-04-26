@@ -234,7 +234,6 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
     PointCloudNode node;
 
     node.vertexCount        = pointCloud->vertexCount();
-    node.material.handle    = pointCloud->material();
     node.inputLayout        = m_cache->requestInputLayout( pointCloud->vertexFormat() );
     node.vertexBuffer       = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
 
@@ -277,7 +276,6 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
     StaticMeshNode mesh;
 
     mesh.mesh = entity.get<StaticMesh>();
-    mesh.material.handle = mesh.mesh->material( 0 );
 
     initializeInstanceNode( entity, mesh, mesh.mesh->material(0) );
 
