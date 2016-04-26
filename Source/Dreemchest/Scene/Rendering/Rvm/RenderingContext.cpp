@@ -51,6 +51,7 @@ void RenderingContext::constructResources( void )
         , &RenderingContext::constructVertexBuffer
         , &RenderingContext::constructIndexBuffer
         , &RenderingContext::constructConstantBuffer
+        , &RenderingContext::constructTexture
         , NULL
     };
 
@@ -145,6 +146,22 @@ void RenderingContext::constructConstantBuffer( const ResourceConstructor& const
     m_constantBufferPool[constructor.id - 1] = constantBuffer;
 }
 
+void RenderingContext::constructTexture( const ResourceConstructor& constructor )
+{
+    Renderer::Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.channels == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+
+    // Upload data to a GPU buffer
+    if( constructor.texture.data ) {
+        u32 size;
+        void* ptr = texture->lock( 0, size );
+        memcpy( ptr, constructor.texture.data, size );
+        texture->unlock();
+    }
+
+    // Save a index buffer to a pool
+    m_texturePool[constructor.id - 1] = texture;
+}
+
 // ** RenderingContext::requestInputLayout
 RenderResource RenderingContext::requestInputLayout( const VertexFormat& format )
 {
@@ -188,6 +205,20 @@ RenderResource RenderingContext::requestConstantBuffer( const void* data, s32 si
     constructor.buffer.size = size;
     constructor.buffer.data = data;
     constructor.buffer.userData = layout;
+
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
+}
+
+// ** RenderingContext::requestConstantBuffer
+RenderResource RenderingContext::requestTexture( const void* data, s32 width, s32 height, s32 channels )
+{
+    ResourceConstructor constructor = ResourceConstructor::Texture;
+    constructor.id          = m_texturePool.push( NULL ) + 1;
+    constructor.texture.data = data;
+    constructor.texture.width = width;
+    constructor.texture.height = height;
+    constructor.texture.channels = channels;
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
@@ -259,7 +290,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     shader->addInclude(
             "                                                       \n\
                 struct CBufferScene    { vec4 ambient; };           \n\
-                struct CBufferView     { mat4 transform; };    \n\
+                struct CBufferView     { mat4 transform; };         \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; };         \n\
@@ -268,6 +299,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 uniform CBufferInstance Instance;                   \n\
                 uniform CBufferMaterial Material;                   \n\
                 uniform CBufferLight    Light;                      \n\
+                #define u_DiffuseTexture Texture0                   \n\
             "
         );
 
@@ -313,17 +345,12 @@ const Renderer::InputLayoutPtr& RenderingContext::inputLayout( RenderResource id
     DC_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_inputLayoutPool[identifier - 1];
 }
-
-// ** RenderingContext::internTexture
-s32 RenderingContext::internTexture( Renderer::TexturePtr texture )
-{
-    return m_textures.add( texture );
-}
         
 // ** RenderingContext::texture
 const Renderer::TexturePtr& RenderingContext::texture( s32 identifier ) const
 {
-    return m_textures.resolve( identifier );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_texturePool[identifier - 1];
 }
 
 // ** RenderingContext::internShader

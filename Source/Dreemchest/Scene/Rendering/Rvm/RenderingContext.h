@@ -53,6 +53,9 @@ namespace Scene {
         //! Queues a constant buffer instance for creation and returns it's index.
         RenderResource                          requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout );
 
+        //! Queues a texture instance for creation and returns it's index.
+        RenderResource                          requestTexture( const void* data, s32 width, s32 height, s32 channels );
+
         //! Creates a shader from a file.
         UbershaderPtr                           createShader( const String& fileName ) const;
 
@@ -73,13 +76,10 @@ namespace Scene {
 
         //! Returns an input layout by an index.
         const Renderer::InputLayoutPtr&         inputLayout( RenderResource identifier ) const;
-       
-        //! Interns a texture and returns it's integer identifier.
-        s32                                     internTexture( Renderer::TexturePtr texture );
-        
+
         //! Returns a texture by an index.
         const Renderer::TexturePtr&             texture( s32 identifier ) const;
-
+       
         //! Interns a shader and returns it's integer identifier.
         s32                                     internShader( UbershaderPtr shader );
         
@@ -112,6 +112,9 @@ namespace Scene {
         //! Constructs a constant buffer.
         void                                    constructConstantBuffer( const ResourceConstructor& constructor );
 
+        //! Constructs a texture.
+        void                                    constructTexture( const ResourceConstructor& constructor );
+
     private:
 
         //! A resource item that should be created.
@@ -122,6 +125,7 @@ namespace Scene {
                 , VertexBuffer      //!< A vertex buffer will be constructed.
                 , IndexBuffer       //!< An index buffer will be constructed.
                 , ConstantBuffer    //!< A constant buffer will be constructed.
+                , Texture           //!< A texture will be constructed.
                 , TotalConstructors //!< A total number of resource constructor types.
             };
 
@@ -144,6 +148,13 @@ namespace Scene {
                     s32         size;       //!< A buffer size.
                     const void* userData;   //!< Used by a constant buffer constructor.
                 } buffer;
+
+                struct {
+                    const void* data;       //!< A texture data that should be uploaded after construction.
+                    u16         width;      //!< A texture width.
+                    u16         height;     //!< A texture height.
+                    u8          channels;   //!< A texture format.
+                } texture;
             };
         };
 
@@ -156,8 +167,9 @@ namespace Scene {
         FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;          //!< Allocated index buffers.
         FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;       //!< Allocated constant buffers.
         FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;          //!< Allocated input layouts.
+        FixedArray<Renderer::TexturePtr>        m_texturePool;              //!< Allocated textures.
+
         IndexCache<RenderTargetPtr>             m_renderTargets;            //!< Interned render targets.
-        IndexCache<Renderer::TexturePtr>        m_textures;                 //!< Interned textures.
         IndexCache<UbershaderPtr>               m_shaders;                  //!< Interned shaders.
     };
 
