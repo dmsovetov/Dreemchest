@@ -140,6 +140,20 @@ const TestRenderCache::RenderableNode* TestRenderCache::requestMesh( const MeshH
     return node;
 }
 
+// ** TestRenderCache::createRenderable
+const TestRenderCache::RenderableNode* TestRenderCache::createRenderable( const void* vertices, s32 count, const VertexFormat& vertexFormat )
+{
+    RenderResource vertexBuffer = m_context->requestVertexBuffer( vertices, count * vertexFormat.vertexSize() );
+
+    RenderableNode* node = DC_NEW RenderableNode;
+    node->offset = 0;
+    node->count  = count;
+    node->states.bindVertexBuffer( vertexBuffer );
+    node->states.bindInputLayout( requestInputLayout( vertexFormat ) );
+
+    return node;
+}
+
 // ** TestRenderCache::requestMaterial
 const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const MaterialHandle& asset )
 {

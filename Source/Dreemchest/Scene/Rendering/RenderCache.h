@@ -62,6 +62,9 @@ namespace Scene {
         //! Creates a renderable node instance for a specified mesh or returns a cached one.
         virtual const RenderableNode*           requestMesh( const MeshHandle& asset ) NIMBLE_ABSTRACT;
 
+        //! Creates a renderable node from a vertex data.
+        virtual const RenderableNode*           createRenderable( const void* vertices, s32 count, const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
+
         //! Creates an input layout for a specified vertex format or returns a cached one.
         virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
 
@@ -89,6 +92,9 @@ namespace Scene {
 
         //! Creates a renderable node instance for a specified mesh or returns a cached one.
         virtual const RenderableNode*           requestMesh( const MeshHandle& asset ) NIMBLE_OVERRIDE;
+
+        //! Creates a renderable node from a vertex data.
+        virtual const RenderableNode*           createRenderable( const void* vertices, s32 count, const VertexFormat& vertexFormat ) NIMBLE_OVERRIDE;
 
         //! Creates a material node instance for a specified material or returns a cached one.
         virtual const MaterialNode*             requestMaterial( const MaterialHandle& asset ) NIMBLE_OVERRIDE;
