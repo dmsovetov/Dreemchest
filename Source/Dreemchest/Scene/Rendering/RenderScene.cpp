@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderScene.h"
+#include "RenderCache.h"
 #include "Rvm/RenderingContext.h"
 #include "RenderSystem/RenderSystem.h"
 
@@ -210,14 +211,8 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
 
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
         PointCloudNode& node = pointClouds[i];
-
-        node.materialParameters->diffuse  = node.material->color( Material::Diffuse );
-        node.materialParameters->specular = node.material->color( Material::Specular );
-        node.materialParameters->emission = node.material->color( Material::Emission );
-        commands.uploadConstantBuffer( node.materialConstants, node.materialParameters.get(), sizeof CBuffer::Material );
-
-        node.instanceParameters->transform = node.transform->matrix();
-        commands.uploadConstantBuffer( node.constantBuffer, node.instanceParameters.get(), sizeof CBuffer::Instance );
+        node.instance.parameters->transform = node.transform->matrix();
+        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof CBuffer::Instance );
     }
 
     // Update static mesh constant buffers
@@ -225,14 +220,8 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
 
     for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
         StaticMeshNode& node = staticMeshes[i];
-
-        node.materialParameters->diffuse  = node.material->color( Material::Diffuse );
-        node.materialParameters->specular = node.material->color( Material::Specular );
-        node.materialParameters->emission = node.material->color( Material::Emission );
-        commands.uploadConstantBuffer( node.materialConstants, node.materialParameters.get(), sizeof CBuffer::Material );
-
-        node.instanceParameters->transform = node.transform->matrix();
-        commands.uploadConstantBuffer( node.constantBuffer, node.instanceParameters.get(), sizeof CBuffer::Instance );
+        node.instance.parameters->transform = node.transform->matrix();
+        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof CBuffer::Instance );
     }
 }
 
@@ -244,10 +233,10 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     PointCloudNode node;
 
-    node.vertexCount    = pointCloud->vertexCount();
-    node.material       = pointCloud->material();
-    node.inputLayout    = m_cache->findInputLayout( pointCloud->vertexFormat() );
-    node.vertexBuffer   = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
+    node.vertexCount        = pointCloud->vertexCount();
+    node.material.handle    = pointCloud->material();
+    node.inputLayout        = m_cache->requestInputLayout( pointCloud->vertexFormat() );
+    node.vertexBuffer       = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
 
     initializeInstanceNode( entity, node, pointCloud->material() );
 
@@ -288,7 +277,7 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
     StaticMeshNode mesh;
 
     mesh.mesh = entity.get<StaticMesh>();
-    mesh.material = mesh.mesh->material( 0 );
+    mesh.material.handle = mesh.mesh->material( 0 );
     mesh.timestamp = -1;
     mesh.vertexBuffer = 0;
     mesh.indexBuffer = 0;
@@ -298,9 +287,9 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
     const MeshHandle& asset = mesh.mesh->mesh();
     const Mesh&       data  = asset.readLock();
 
-    mesh.vertexBuffer = m_cache->findVertexBuffer( asset );
-    mesh.indexBuffer  = m_cache->findIndexBuffer( asset );
-    mesh.inputLayout  = m_cache->findInputLayout( data.vertexFormat() );
+    mesh.vertexBuffer = m_cache->requestVertexBuffer( asset );
+    mesh.indexBuffer  = m_cache->requestIndexBuffer( asset );
+    mesh.inputLayout  = m_cache->requestInputLayout( data.vertexFormat() );
     mesh.indexCount   = data.indexBuffer().size();
 
     return mesh;
@@ -309,17 +298,15 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 // ** RenderScene::initializeInstanceNode
 void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance, const MaterialHandle& material )
 {
-    material.readLock();
+    instance.transform              = entity.get<Transform>();
+    instance.matrix                 = &instance.transform->matrix();
+    instance.constantBuffer         = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
+    instance.instance.parameters    = DC_NEW CBuffer::Instance;
+    instance.material.handle        = material;
+    instance.material.states        = NULL;
 
-    instance.transform          = entity.get<Transform>();
-    instance.matrix             = &instance.transform->matrix();
-    instance.constantBuffer     = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
-    instance.instanceParameters = DC_NEW CBuffer::Instance;
-
-    if( material.isValid() ) {
-        instance.materialConstants  = m_cache->findConstantBuffer( material );
-        instance.materialStates     = m_cache->requestMaterialStateBlock( material );
-        instance.materialParameters = DC_NEW CBuffer::Material;
+    if( const AbstractRenderCache::MaterialNode* cached = m_cache->requestMaterial( material ) ) {
+        instance.material.states = &cached->states;
     }
 }
 

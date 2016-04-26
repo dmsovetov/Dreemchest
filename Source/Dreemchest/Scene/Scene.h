@@ -122,7 +122,10 @@ namespace Scene {
     typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
 #else
     dcDeclarePtrs( Ubershader )
-    dcDeclarePtrs( RenderCache )
+    dcDeclareNamedPtrs( AbstractRenderCache, RenderCache )
+
+    //! A render resource handle type.
+    typedef u32 RenderResource;
 
     //! Render frame unique pointer type.
     typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
@@ -795,6 +798,7 @@ DC_END_DREEMCHEST
         #include "Rendering/RenderSystems/DepthComplexity.h"
     #else
         #include "Rendering/RenderScene.h"
+        #include "Rendering/RenderCache.h"
         #include "Rendering/Rvm/RenderingContext.h"
         #include "Rendering/Rvm/Rvm.h"
         #include "Rendering/Debug/TestRenderSystem.h"

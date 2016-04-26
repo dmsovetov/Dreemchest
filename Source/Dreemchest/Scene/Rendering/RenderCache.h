@@ -27,33 +27,58 @@
 #ifndef __DC_Scene_RenderCache_H__
 #define __DC_Scene_RenderCache_H__
 
-#include "../Scene.h"
+#include "RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    typedef u32 RenderResource;
+    //! Manages a render scene resource cache.
+    class AbstractRenderCache : public RefCounted {
+    public:
+
+        //! A material node contains a cached material data (like constant buffer, allocated material parameters, etc.)
+        struct MaterialNode {
+            //! A material node constant buffer type alias.
+            typedef RenderScene::CBuffer::Material  CBuffer;
+
+            RenderResource                      constantBuffer; //!< A material constant buffer handle.
+            CBuffer                             data;           //!< Material constant buffer.
+            RenderStateBlock                    states;         //!< Material states that is bound prior an instance state block.
+        };
+
+        virtual                                 ~AbstractRenderCache( void ) {}
+
+        //! Creates a material node instance for a specified material or returns a cached one.
+        virtual const MaterialNode*             requestMaterial( const MaterialHandle& material ) NIMBLE_ABSTRACT;
+
+        //! Creates an input layout for a specified vertex format or returns a cached one.
+        virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
+
+        //! Requests a new vertex buffer for a mesh asset or returns a cached one.
+        virtual RenderResource                  requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
+
+        //! Requests a new index buffer for a mesh asset or returns a cached one.
+        virtual RenderResource                  requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
+    };
+
 
     //! Manages a render scene resource cache.
-    class RenderCache : public RefCounted {
+    class TestRenderCache : public AbstractRenderCache {
     friend class RenderScene;
     public:
 
-        //! Requests a new input layout from a rendering context or returns a cached one.
-        RenderResource                          findInputLayout( const VertexFormat& format );
+        //! Creates an input layout for a specified vertex format or returns a cached one.
+        virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_OVERRIDE;
 
         //! Requests a new vertex buffer for a mesh asset or returns a cached one.
-        RenderResource                          findVertexBuffer( const MeshHandle& mesh );
+        virtual RenderResource                  requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
 
         //! Requests a new index buffer for a mesh asset or returns a cached one.
-        RenderResource                          findIndexBuffer( const MeshHandle& mesh );
+        virtual RenderResource                  requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
 
-        //! Requests a new material constant buffer or returns a cached one.
-        RenderResource                          findConstantBuffer( const MaterialHandle& material );
-
-        //! Creates a new material state block or returns a cached one.
-        const RenderStateBlock*                 requestMaterialStateBlock( const MaterialHandle& material );
+        //! Creates a material node instance for a specified material or returns a cached one.
+        virtual const MaterialNode*             requestMaterial( const MaterialHandle& material ) NIMBLE_OVERRIDE;
 
         //! Requests a new texture or returns a cached one.
         RenderResource                          requestTexture( const ImageHandle& image );
@@ -63,8 +88,8 @@ namespace Scene {
 
     private:
 
-                                                //! Constructs a RenderCache instance.
-                                                RenderCache( Assets::AssetsWPtr assets, RenderingContextWPtr context );
+                                                //! Constructs a TestRenderCache instance.
+                                                TestRenderCache( Assets::AssetsWPtr assets, RenderingContextWPtr context );
 
     private:
 
@@ -75,7 +100,7 @@ namespace Scene {
         typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
 
         //! Container type to store a material state block cache.
-        typedef HashMap<Assets::AssetId, RenderStateBlock*> MaterialRenderStates;
+        typedef HashMap<Assets::AssetId, AutoPtr<MaterialNode>> MaterialNodeCache;
 
         Assets::AssetsWPtr                      m_assets;                   //!< Parent assets instance.
         RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
@@ -83,8 +108,7 @@ namespace Scene {
         RenderResources                         m_vertexBuffers;            //!< Vertex buffer cache.
         RenderResources                         m_indexBuffers;             //!< Index buffer cache.
         RenderResources                         m_textures;                 //!< Texture cache.
-        RenderResources                         m_materialConstantBuffers;  //!< Material constant buffers cache.
-        MaterialRenderStates                    m_materialRenderStates;     //!< Material render state block cache.
+        MaterialNodeCache                       m_materials;                //!< Material render state block cache.
     };
 
 } // namespace Scene

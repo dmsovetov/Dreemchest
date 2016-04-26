@@ -65,7 +65,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext );
 #else
     m_renderingContext = Scene::RenderingContext::create( hal() );
-    m_renderCache      = Scene::RenderCache::create( &project->assets(), m_renderingContext );
+    m_renderCache      = Scene::TestRenderCache::create( &project->assets(), m_renderingContext );
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext, m_renderCache );
     m_rvm              = Scene::Rvm::create( m_renderingContext );
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */

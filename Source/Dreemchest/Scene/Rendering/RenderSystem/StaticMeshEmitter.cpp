@@ -51,13 +51,13 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         const RenderScene::StaticMeshNode& mesh = meshes[i];
 
         // Get the material
-        const Material& material = mesh.material.isValid() ? *mesh.material : defaultMaterial;
+        const Material& material = mesh.material.handle.isValid() ? *mesh.material.handle : defaultMaterial;
 
         // Does a material pass a filter?
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
-        StateScope materialStates = stateStack.push( mesh.materialStates );
+        StateScope materialStates = stateStack.push( mesh.material.states );
 
         StateScope instance = stateStack.newScope();
         instance->bindVertexBuffer( mesh.vertexBuffer );

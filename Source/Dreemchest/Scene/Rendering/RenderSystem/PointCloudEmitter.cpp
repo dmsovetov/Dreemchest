@@ -48,13 +48,13 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         const RenderScene::PointCloudNode& pointCloud = pointClouds[i];
 
         // Read-lock a point cloud material
-        const Material& material = *pointCloud.material;
+        const Material& material = *pointCloud.material.handle;
 
         // Does a material pass a filter?
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
-        StateScope materialStates = stateStack.push( pointCloud.materialStates );
+        StateScope materialStates = stateStack.push( pointCloud.material.states );
 
         StateScope instance = stateStack.newScope();
         instance->bindVertexBuffer( pointCloud.vertexBuffer );

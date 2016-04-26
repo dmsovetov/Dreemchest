@@ -29,7 +29,6 @@
 
 #include "../Scene.h"
 #include "Rvm/RenderFrame.h"
-#include "RenderCache.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -78,11 +77,16 @@ namespace Scene {
 
         //! Stores info about a scene instance.
         struct InstanceNode : public Node {
-            MaterialHandle                      material;
-            RenderResource                      materialConstants;  //!< A point cloud material options.   
-            AutoPtr<CBuffer::Material>          materialParameters; //!< Material constant buffer.
-            AutoPtr<CBuffer::Instance>          instanceParameters; //!< Instance constant buffer.
-            const RenderStateBlock*             materialStates;     //!< A material state.
+            //! Instance material parameters.
+            struct Material {
+                MaterialHandle                      handle;
+                const RenderStateBlock*             states;         //!< A material state.
+            } material;
+
+            //! Instance parameters.
+            struct Instance {
+                AutoPtr<CBuffer::Instance>          parameters;     //!< Instance constant buffer.
+            } instance;
         };
 
         //! Stores info about a renderable point cloud.
