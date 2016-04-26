@@ -233,9 +233,11 @@ RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity
 
     PointCloudNode node;
 
-    node.vertexCount        = pointCloud->vertexCount();
-    node.inputLayout        = m_cache->requestInputLayout( pointCloud->vertexFormat() );
-    node.vertexBuffer       = m_context->requestVertexBuffer( pointCloud->vertices(), pointCloud->vertexCount() * pointCloud->vertexFormat().vertexSize() );
+    if( const AbstractRenderCache::RenderableNode* renderable = m_cache->createRenderable( pointCloud->vertices(), pointCloud->vertexCount(), pointCloud->vertexFormat() ) ) {
+        node.count      = renderable->count;
+        node.states     = &renderable->states;
+        node.renderable = renderable;
+    }
 
     initializeInstanceNode( entity, node, pointCloud->material() );
 

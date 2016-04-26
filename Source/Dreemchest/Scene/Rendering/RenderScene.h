@@ -91,9 +91,9 @@ namespace Scene {
 
         //! Stores info about a renderable point cloud.
         struct PointCloudNode : public InstanceNode {
-            RenderResource                      vertexBuffer;       //!< A point cloud vertex buffer.
-            RenderResource                      inputLayout;        //!< A point cloud input layout.    
-            s32                                 vertexCount;        //!< A total number of vertices inside a point cloud.
+            const void*                         renderable;
+            s32                                 count;              //!< A total number of vertices in a point cloud.
+            const RenderStateBlock*             states;             //!< A renderable state.
         };
 
         //! Stores info about a renderable light.
