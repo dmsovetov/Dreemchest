@@ -325,6 +325,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         writable->setLightingModel( Scene::LightingModel::Phong );    
     }
 
+    m_project->assets().forceLoad( mesh );
+    m_project->assets().forceLoad( diffuse );
+    m_project->assets().forceLoad( dflt );
+    m_project->assets().forceLoad( stone );
+    m_project->assets().forceLoad( red );
+    m_project->assets().forceLoad( green );
+    m_project->assets().forceLoad( blue );
+
     Scene::VertexFormat vertexFormats[] = {
           Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal )
         , Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Normal )
