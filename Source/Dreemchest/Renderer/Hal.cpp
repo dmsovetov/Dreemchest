@@ -208,7 +208,7 @@ void Hal::setShader( const ShaderPtr& shader )
     }
 
     // Bind texture samplers
-    static CString kSamplerNames[] = {
+    static FixedString kSamplerNames[] = {
           "Texture0"
         , "Texture1"
         , "Texture2"
@@ -945,6 +945,12 @@ const ConstantBufferLayout* ConstantBuffer::layout( void ) const
 
 // ** Shader::findUniformLocation
 u32 Shader::findUniformLocation( const char * name ) const
+{
+    return -1;
+}
+
+// ** Shader::findUniformLocation
+u32 Shader::findUniformLocation( const FixedString& name ) const
 {
     return -1;
 }

@@ -1240,18 +1240,22 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
 // ** OpenGLShader::findUniformLocation
 u32 OpenGLShader::findUniformLocation( const char *name ) const
 {
+    return findUniformLocation( FixedString( name ) );
+}
+
+// ** OpenGLShader::findUniformLocation
+u32 OpenGLShader::findUniformLocation( const FixedString& name ) const
+{
     DC_CHECK_GL;
 
-    String32 hash( name );
-
-    UniformLocations::const_iterator i = m_uniformLocations.find( hash );
+    UniformLocations::const_iterator i = m_uniformLocations.find( name.hash() );
 
     if( i != m_uniformLocations.end() ) {
         return i->second;
     }
     
 	u32 location = glGetUniformLocation( m_program, name ) + 1;
-    m_uniformLocations[hash] = location;
+    m_uniformLocations[name.hash()] = location;
 
     return location;
 }

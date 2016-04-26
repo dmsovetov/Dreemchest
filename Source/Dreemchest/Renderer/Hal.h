@@ -648,7 +648,7 @@ namespace Renderer {
             , Matrix4   //!< 4x4 matrix constant value.
         };
 
-        CString     name;       //!< Uniform name.
+        FixedString name;       //!< Uniform name.
         Type        type;       //!< Uniform type.
         u32         offset;     //!< Uniform offset.
     };
@@ -710,6 +710,13 @@ namespace Renderer {
          \return Uniform location index.
          */
         virtual u32                 findUniformLocation( CString name ) const;
+
+        //! Searches for a shader uniform location.
+        /*!
+         \param name Uniform name.
+         \return Uniform location index.
+         */
+        virtual u32                 findUniformLocation( const FixedString& name ) const;
         
 		//! Sets a 4x4 matrix value to a uniform location.
         virtual void                setMatrix( u32 location, const Matrix4& value );
