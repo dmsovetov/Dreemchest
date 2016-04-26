@@ -207,6 +207,26 @@ void Hal::setShader( const ShaderPtr& shader )
         return;
     }
 
+    // Bind texture samplers
+    static CString kSamplerNames[] = {
+          "Texture0"
+        , "Texture1"
+        , "Texture2"
+        , "Texture3"
+        , "Texture4"
+        , "Texture5"
+        , "Texture6"
+        , "Texture7"
+        , "Texture8"
+    };
+
+    for( s32 i = 0, n = sizeof( kSamplerNames ) / sizeof( kSamplerNames[0] ); i < n; i++ ) {
+        u32 location = shader->findUniformLocation( kSamplerNames[i] );
+        if( location ) {
+            const_cast<ShaderPtr&>( shader )->setInt( location, i );
+        }
+    }
+
     // Process each bound constant buffer
     for( s32 i = 0, n = static_cast<s32>( m_constantBuffers.size() ); i < n; i++ ) {
         // Get a constant buffer at index
