@@ -145,6 +145,7 @@ const RenderStateBlock* RenderCache::requestMaterialStateBlock( const MaterialHa
             state->bindTexture( id, static_cast<RenderState::TextureSampler>( RenderState::Texture0 + i ) );
         }
     }
+    state->bindConstantBuffer( findConstantBuffer( material ), RenderState::MaterialConstants );
 
     m_materialRenderStates[material.asset().uniqueId()] = state;
 

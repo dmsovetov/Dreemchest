@@ -59,7 +59,6 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         StateScope instance = stateStack.newScope();
         instance->bindVertexBuffer( pointCloud.vertexBuffer );
         instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
-        instance->bindConstantBuffer( pointCloud.materialConstants, RenderState::MaterialConstants );
         instance->bindInputLayout( pointCloud.inputLayout );
 
         if( material.lightingModel() == LightingModel::Unlit ) {

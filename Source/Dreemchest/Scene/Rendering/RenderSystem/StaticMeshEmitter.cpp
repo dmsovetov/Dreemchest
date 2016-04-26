@@ -63,7 +63,6 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         instance->bindVertexBuffer( mesh.vertexBuffer );
         instance->bindIndexBuffer( mesh.indexBuffer );
         instance->bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
-        instance->bindConstantBuffer( mesh.materialConstants, RenderState::MaterialConstants );
         instance->bindInputLayout( mesh.inputLayout );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
