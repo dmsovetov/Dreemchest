@@ -111,11 +111,13 @@ namespace Scene {
         //! Stores info about a static mesh.
         struct StaticMeshNode : public InstanceNode {
             const StaticMesh*                   mesh;               //!< Mesh component.
-            u32                                 timestamp;          //!< Asset modification timestamp.
-            u32                                 indexCount;         //!< A total number of indices in a mesh.
-            RenderResource                      vertexBuffer;       //!< A mesh vertex buffer.
-            RenderResource                      indexBuffer;        //!< A mesh index buffer.
-            RenderResource                      inputLayout;        //!< A mesh input layout.  
+            s32                                 count;              //!< A total number of indices in a mesh.
+            const RenderStateBlock*             states;             //!< A renderable state.
+        //    u32                                 timestamp;          //!< Asset modification timestamp.
+        //    u32                                 indexCount;         //!< A total number of indices in a mesh.
+        //    RenderResource                      vertexBuffer;       //!< A mesh vertex buffer.
+        //    RenderResource                      indexBuffer;        //!< A mesh index buffer.
+        //    RenderResource                      inputLayout;        //!< A mesh input layout.  
         };
 
         //! A fixed array with renderable point clouds inside.

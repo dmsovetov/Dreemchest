@@ -104,68 +104,54 @@ RenderResource TestRenderCache::requestIndexBuffer( const MeshHandle& mesh )
     return id;
 }
 
-// ** TestRenderCache::findConstantBuffer
-//RenderResource TestRenderCache::findConstantBuffer( const MaterialHandle& material )
-//{
-//    RenderResources::iterator i = m_materialConstantBuffers.find( material.asset().uniqueId() );
-//
-//    if( i != m_materialConstantBuffers.end() ) {
-//        return i->second;
-//    }
-//
-//    RenderResource id = m_context->requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
-//    m_materialConstantBuffers[material.asset().uniqueId()] = id;
-//
-//    LogVerbose( "renderCache", "material constant buffer created for '%s'\n", material.asset().name().c_str() );
-//
-//    return id;
-//}
-
-// ** TestRenderCache::requestMaterialStateBlock
-//const RenderStateBlock* TestRenderCache::requestMaterialStateBlock( const MaterialHandle& material )
-//{
-//    if( !material.isValid() ) {
-//        return NULL;
-//    }
-//
-//    DC_ABORT_IF( !material.isLoaded(), "a material asset was not loaded" );
-//
-//    MaterialRenderStates::iterator i = m_materialRenderStates.find( material.asset().uniqueId() );
-//
-//    if( i != m_materialRenderStates.end() ) {
-//        return i->second;
-//    }
-//
-//    const Material&   data  = *material;
-//    RenderStateBlock* state = DC_NEW RenderStateBlock;
-//
-//    for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
-//        RenderResource id = requestTexture( data.texture( static_cast<Material::Layer>( i ) ) );
-//        if( id ) {
-//            state->bindTexture( id, static_cast<RenderState::TextureSampler>( RenderState::Texture0 + i ) );
-//        }
-//    }
-//    state->bindConstantBuffer( findConstantBuffer( material ), RenderState::MaterialConstants );
-//
-//    m_materialRenderStates[material.asset().uniqueId()] = state;
-//
-//    LogVerbose( "renderCache", "material state block buffer created for '%s'\n", material.asset().name().c_str() );
-//
-//    return state;
-//}
-
-// ** TestRenderCache::requestMaterial
-const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const MaterialHandle& material )
+// ** TestRenderCache::requestMesh
+const TestRenderCache::RenderableNode* TestRenderCache::requestMesh( const MeshHandle& asset )
 {
-    // Return a NULL pointer for invalid materials
-    if( !material.isValid() ) {
+    // Return a NULL pointer for invalid meshes
+    if( !asset.isValid() ) {
         return NULL;
     }
 
-    DC_ABORT_IF( !material.isLoaded(), "a material asset was not loaded" );
+    DC_ABORT_IF( !asset.isLoaded(), "a mesh asset was not loaded" );
 
     // Get an asset unique id
-    const Assets::AssetId& assetId = material.asset().uniqueId();
+    const Assets::AssetId& assetId = asset.asset().uniqueId();
+
+    // First lookup a cached material
+    RenderableNodeCache::iterator i = m_renderable.find( assetId );
+    
+    if( i != m_renderable.end() ) {
+        return i->second.get();
+    }
+
+    // Create a new render node
+    RenderableNode* node = DC_NEW RenderableNode;
+    node->offset = 0;
+    node->count  = asset->indexBuffer().size();
+    node->states.bindVertexBuffer( requestVertexBuffer( asset ) );
+    node->states.bindIndexBuffer( requestIndexBuffer( asset ) );
+    node->states.bindInputLayout( requestInputLayout( asset->vertexFormat() ) );
+
+    // Associate this material node with an asset identifier
+    m_renderable[assetId] = node;
+
+    LogVerbose( "renderCache", "renderable created from '%s'\n", asset.asset().name().c_str() );
+
+    return node;
+}
+
+// ** TestRenderCache::requestMaterial
+const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const MaterialHandle& asset )
+{
+    // Return a NULL pointer for invalid materials
+    if( !asset.isValid() ) {
+        return NULL;
+    }
+
+    DC_ABORT_IF( !asset.isLoaded(), "a material asset was not loaded" );
+
+    // Get an asset unique id
+    const Assets::AssetId& assetId = asset.asset().uniqueId();
 
     // First lookup a cached material
     MaterialNodeCache::iterator i = m_materials.find( assetId );
@@ -176,15 +162,15 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
 
     // Create a new material node
     MaterialNode* node = DC_NEW MaterialNode;
-    node->data.diffuse   = material->color( Material::Diffuse );
-    node->data.specular  = material->color( Material::Specular );
-    node->data.emission  = material->color( Material::Emission );
+    node->data.diffuse   = asset->color( Material::Diffuse );
+    node->data.specular  = asset->color( Material::Specular );
+    node->data.emission  = asset->color( Material::Emission );
     node->constantBuffer = m_context->requestConstantBuffer( &node->data, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
 
     // Now setup a material state block
     node->states.bindConstantBuffer( node->constantBuffer, RenderState::MaterialConstants );
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
-        RenderResource id = requestTexture( material->texture( static_cast<Material::Layer>( i ) ) );
+        RenderResource id = requestTexture( asset->texture( static_cast<Material::Layer>( i ) ) );
         if( id ) {
             node->states.bindTexture( id, static_cast<RenderState::TextureSampler>( RenderState::Texture0 + i ) );
         }
@@ -193,7 +179,7 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
     // Associate this material node with an asset identifier
     m_materials[assetId] = node;
 
-    LogVerbose( "renderCache", "material '%s' created\n", material.asset().name().c_str() );
+    LogVerbose( "renderCache", "material '%s' created\n", asset.asset().name().c_str() );
 
     return node;
 }

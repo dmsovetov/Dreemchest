@@ -47,10 +47,20 @@ namespace Scene {
             RenderStateBlock                    states;         //!< Material states that is bound prior an instance state block.
         };
 
+        //! A renderable node contains a cached state block that binds input layout, vertex/index buffers.
+        struct RenderableNode {
+            s32                                 offset;         //!< Render command offset argument.
+            s32                                 count;          //!< Render command count argument.
+            RenderStateBlock                    states;         //!< Renderable instance states that is bound right before rendering.
+        };
+
         virtual                                 ~AbstractRenderCache( void ) {}
 
         //! Creates a material node instance for a specified material or returns a cached one.
-        virtual const MaterialNode*             requestMaterial( const MaterialHandle& material ) NIMBLE_ABSTRACT;
+        virtual const MaterialNode*             requestMaterial( const MaterialHandle& asset ) NIMBLE_ABSTRACT;
+
+        //! Creates a renderable node instance for a specified mesh or returns a cached one.
+        virtual const RenderableNode*           requestMesh( const MeshHandle& asset ) NIMBLE_ABSTRACT;
 
         //! Creates an input layout for a specified vertex format or returns a cached one.
         virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
@@ -77,8 +87,11 @@ namespace Scene {
         //! Requests a new index buffer for a mesh asset or returns a cached one.
         virtual RenderResource                  requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
 
+        //! Creates a renderable node instance for a specified mesh or returns a cached one.
+        virtual const RenderableNode*           requestMesh( const MeshHandle& asset ) NIMBLE_OVERRIDE;
+
         //! Creates a material node instance for a specified material or returns a cached one.
-        virtual const MaterialNode*             requestMaterial( const MaterialHandle& material ) NIMBLE_OVERRIDE;
+        virtual const MaterialNode*             requestMaterial( const MaterialHandle& asset ) NIMBLE_OVERRIDE;
 
         //! Requests a new texture or returns a cached one.
         RenderResource                          requestTexture( const ImageHandle& image );
@@ -99,8 +112,11 @@ namespace Scene {
         //! Container type to store mapping from an asset id to a previously created render resource.
         typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
 
-        //! Container type to store a material state block cache.
+        //! Container type to store a material node cache.
         typedef HashMap<Assets::AssetId, AutoPtr<MaterialNode>> MaterialNodeCache;
+
+        //! Container type to store a renderable node cache.
+        typedef HashMap<Assets::AssetId, AutoPtr<RenderableNode>> RenderableNodeCache;
 
         Assets::AssetsWPtr                      m_assets;                   //!< Parent assets instance.
         RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
@@ -108,7 +124,8 @@ namespace Scene {
         RenderResources                         m_vertexBuffers;            //!< Vertex buffer cache.
         RenderResources                         m_indexBuffers;             //!< Index buffer cache.
         RenderResources                         m_textures;                 //!< Texture cache.
-        MaterialNodeCache                       m_materials;                //!< Material render state block cache.
+        MaterialNodeCache                       m_materials;                //!< Material render node cache.
+        RenderableNodeCache                     m_renderable;               //!< Renderable node cache.
     };
 
 } // namespace Scene
