@@ -278,9 +278,6 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 
     mesh.mesh = entity.get<StaticMesh>();
     mesh.material.handle = mesh.mesh->material( 0 );
-//    mesh.timestamp = -1;
-//    mesh.vertexBuffer = 0;
-//    mesh.indexBuffer = 0;
 
     initializeInstanceNode( entity, mesh, mesh.mesh->material(0) );
 
@@ -294,11 +291,6 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
         mesh.states = &cached->states;
         mesh.count  = cached->count;
     }
-
-//    mesh.vertexBuffer = m_cache->requestVertexBuffer( asset );
-//    mesh.indexBuffer  = m_cache->requestIndexBuffer( asset );
-//    mesh.inputLayout  = m_cache->requestInputLayout( data.vertexFormat() );
- //   mesh.indexCount   = data.indexBuffer().size();
 
     return mesh;
 }
