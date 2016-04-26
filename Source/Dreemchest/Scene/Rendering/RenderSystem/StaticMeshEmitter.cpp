@@ -57,6 +57,8 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
+        StateScope materialStates = stateStack.push( mesh.materialStates );
+
         StateScope instance = stateStack.newScope();
         instance->bindVertexBuffer( mesh.vertexBuffer );
         instance->bindIndexBuffer( mesh.indexBuffer );

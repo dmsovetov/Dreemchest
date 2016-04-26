@@ -82,6 +82,7 @@ namespace Scene {
             RenderResource                      materialConstants;  //!< A point cloud material options.   
             AutoPtr<CBuffer::Material>          materialParameters; //!< Material constant buffer.
             AutoPtr<CBuffer::Instance>          instanceParameters; //!< Instance constant buffer.
+            const RenderStateBlock*             materialStates;     //!< A material state.
         };
 
         //! Stores info about a renderable point cloud.
@@ -175,9 +176,6 @@ namespace Scene {
 
         //! Updates all active constant buffers.
         void                                    updateConstantBuffers( RenderFrame& frame );
-
-        //! Updates all active mesh buffers.
-        void                                    updateStaticMeshes( void );
 
     private:
 

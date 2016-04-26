@@ -1,12 +1,17 @@
 [Features]
-F_NormalAttribute = inputNormal
-F_ColorAttribute  = inputColor
-F_PointLight	  = pointLight
+F_NormalAttribute 	= inputNormal
+F_ColorAttribute  	= inputColor
+F_PointLight	  	= pointLight
+F_DiffuseTexture	= texture0
 
 [VertexShader]
 #if defined( F_ColorAttribute )
 varying vec4 v_Color;
 #endif  /*  F_ColorAttribute    */
+
+#if defined( F_DiffuseTexture )
+varying vec2 v_TexCoord0;
+#endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
 varying vec3 v_Normal;
@@ -29,6 +34,10 @@ void main()
 	v_LightPos		= Light.position;
 	v_VertexPos		= vertex.xyz;
 #endif  /*  F_NormalAttribute    */
+
+#if defined( F_DiffuseTexture )
+	v_TexCoord0		= gl_MultiTexCoord0.xy;
+#endif	/*	F_DiffuseTexture	*/
 }     
 
 [FragmentShader]
@@ -41,6 +50,11 @@ varying vec3 v_Normal;
 varying vec3 v_LightPos;
 varying vec3 v_VertexPos;
 #endif  /*  F_NormalAttribute    */
+
+#if defined( F_DiffuseTexture )
+uniform sampler2D u_DiffuseTexture;
+varying vec2 v_TexCoord0;
+#endif	/*	F_DiffuseTexture	*/
 
 vec4 phongLightIntensity( vec3 point, vec3 light, vec3 normal, float range, float intensity )
 {
@@ -58,6 +72,10 @@ void main()
 #if defined( F_ColorAttribute )
 	diffuseColor = diffuseColor * v_Color;
 #endif  /*  F_ColorAttribute    */
+
+#if defined( F_DiffuseTexture )
+	diffuseColor = diffuseColor * texture2D( u_DiffuseTexture, v_TexCoord0 );
+#endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_NormalAttribute ) && defined( F_PointLight )
 	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), Light.range, Light.intensity ) * vec4( Light.color, 1.0 );

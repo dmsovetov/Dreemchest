@@ -54,6 +54,8 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         if( (filter.lightingModels & BIT( material.lightingModel() )) == 0 ) continue;
         if( (filter.renderModes    & BIT( material.renderingMode() )) == 0 ) continue;
 
+        StateScope materialStates = stateStack.push( pointCloud.materialStates );
+
         StateScope instance = stateStack.newScope();
         instance->bindVertexBuffer( pointCloud.vertexBuffer );
         instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );

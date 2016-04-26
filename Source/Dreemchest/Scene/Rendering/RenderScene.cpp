@@ -140,9 +140,6 @@ RenderFrameUPtr RenderScene::captureFrame( void )
 {
     RenderFrameUPtr frame( DC_NEW RenderFrame );
 
-    // Update active static meshes
-    updateStaticMeshes();
-
     // Update active constant buffers
     updateConstantBuffers( *frame.get() );
 
@@ -239,38 +236,6 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
     }
 }
 
-// ** RenderScene::updateStaticMeshes
-void RenderScene::updateStaticMeshes( void )
-{
-    StaticMeshes& meshes = m_staticMeshes->data();
-
-    for( s32 i = 0, n = meshes.count(); i < n; i++ ) {
-        StaticMeshNode& node = meshes[i];
-
-        // Get a static mesh asset
-        const MeshHandle& mesh = node.mesh->mesh();
-
-        // Get an asset timestamp
-        u32 timestamp = mesh.asset().timestamp().modified;
-
-        // Mesh is up-to-date - skip
-        if( node.timestamp == timestamp ) {
-            continue;
-        }
-        node.timestamp = timestamp;
-
-        if( mesh->chunkCount() ) {
-            DC_BREAK_IF( node.vertexBuffer != 0 && node.indexBuffer != 0, "a static mesh was already created" );
-
-            VertexFormat vf( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
-            node.vertexBuffer = m_cache->findVertexBuffer( mesh );
-            node.indexBuffer  = m_cache->findIndexBuffer( mesh );
-            node.inputLayout  = m_cache->findInputLayout( vf );
-            node.indexCount   = mesh->indexBuffer( 0 ).size();
-        }
-    }
-}
-
 // ** RenderScene::createPointCloudNode
 RenderScene::PointCloudNode RenderScene::createPointCloudNode( const Ecs::Entity& entity )
 {
@@ -330,7 +295,13 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 
     initializeInstanceNode( entity, mesh, mesh.mesh->material(0) );
 
-    mesh.mesh->mesh().readLock();
+    const MeshHandle& asset = mesh.mesh->mesh();
+    const Mesh&       data  = asset.readLock();
+
+    mesh.vertexBuffer = m_cache->findVertexBuffer( asset );
+    mesh.indexBuffer  = m_cache->findIndexBuffer( asset );
+    mesh.inputLayout  = m_cache->findInputLayout( data.vertexFormat() );
+    mesh.indexCount   = data.indexBuffer().size();
 
     return mesh;
 }
@@ -347,6 +318,7 @@ void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNod
 
     if( material.isValid() ) {
         instance.materialConstants  = m_cache->findConstantBuffer( material );
+        instance.materialStates     = m_cache->requestMaterialStateBlock( material );
         instance.materialParameters = DC_NEW CBuffer::Material;
     }
 }

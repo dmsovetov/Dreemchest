@@ -1,13 +1,18 @@
 [Features]
-F_NormalAttribute = inputNormal
-F_ColorAttribute  = inputColor
-F_AmbientColor	  = ambientColor
-F_EmissionColor	  = emissionColor
+F_NormalAttribute 	= inputNormal
+F_ColorAttribute  	= inputColor
+F_AmbientColor	  	= ambientColor
+F_EmissionColor	  	= emissionColor
+F_DiffuseTexture	= texture0
 
 [VertexShader]
 #if defined( F_ColorAttribute )
 varying vec4 v_Color;
 #endif  /*  F_ColorAttribute    */
+
+#if defined( F_DiffuseTexture )
+varying vec2 v_TexCoord0;
+#endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_NormalAttribute )
 varying vec3 v_Normal;
@@ -26,6 +31,10 @@ void main()
 #if defined( F_NormalAttribute )
 	v_Normal        = gl_Normal;
 #endif  /*  F_NormalAttribute    */
+
+#if defined( F_DiffuseTexture )
+	v_TexCoord0		= gl_MultiTexCoord0.xy;
+#endif	/*	F_DiffuseTexture	*/
 }     
 
 [FragmentShader]
@@ -37,6 +46,11 @@ varying vec4 v_Color;
 varying vec3 v_Normal;
 #endif  /*  F_NormalAttribute    */
 
+#if defined( F_DiffuseTexture )
+uniform sampler2D u_DiffuseTexture;
+varying vec2 v_TexCoord0;
+#endif	/*	F_DiffuseTexture	*/
+
 void main()
 {
 	vec4 diffuseColor = Material.diffuse;
@@ -44,6 +58,10 @@ void main()
 #if defined( F_ColorAttribute )
 	diffuseColor = diffuseColor * v_Color;
 #endif  /*  F_ColorAttribute    */
+
+#if defined( F_DiffuseTexture )
+	diffuseColor = diffuseColor * texture2D( u_DiffuseTexture, v_TexCoord0 );
+#endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_AmbientColor )
 	vec4 ambientColor = Scene.ambient;

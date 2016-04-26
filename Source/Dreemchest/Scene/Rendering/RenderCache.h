@@ -52,6 +52,12 @@ namespace Scene {
         //! Requests a new material constant buffer or returns a cached one.
         RenderResource                          findConstantBuffer( const MaterialHandle& material );
 
+        //! Creates a new material state block or returns a cached one.
+        const RenderStateBlock*                 requestMaterialStateBlock( const MaterialHandle& material );
+
+        //! Requests a new texture or returns a cached one.
+        RenderResource                          requestTexture( const ImageHandle& image );
+
         //! Creates a RenderCache instance.
         static RenderCachePtr                   create( Assets::AssetsWPtr assets, RenderingContextWPtr context );
 
@@ -68,12 +74,17 @@ namespace Scene {
         //! Container type to store mapping from an asset id to a previously created render resource.
         typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
 
+        //! Container type to store a material state block cache.
+        typedef HashMap<Assets::AssetId, RenderStateBlock*> MaterialRenderStates;
+
         Assets::AssetsWPtr                      m_assets;                   //!< Parent assets instance.
         RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
         InputLayouts                            m_inputLayouts;             //!< Input layout cache.
         RenderResources                         m_vertexBuffers;            //!< Vertex buffer cache.
         RenderResources                         m_indexBuffers;             //!< Index buffer cache.
+        RenderResources                         m_textures;                 //!< Texture cache.
         RenderResources                         m_materialConstantBuffers;  //!< Material constant buffers cache.
+        MaterialRenderStates                    m_materialRenderStates;     //!< Material render state block cache.
     };
 
 } // namespace Scene
