@@ -255,6 +255,15 @@ StateScope RenderStateStack::newScope( void )
 {
     DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
     RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
+    return push( block );
+}
+
+// ** RenderStateStack::push
+StateScope RenderStateStack::push( const RenderStateBlock* block )
+{
+    if( block == NULL ) {
+        return StateScope( *this, NULL );
+    }
 
     for( s32 i = m_size; i > 0; i-- ) {
         m_stack[i] = m_stack[i - 1];
@@ -262,7 +271,7 @@ StateScope RenderStateStack::newScope( void )
     m_stack[0] = block;
     m_size++;
 
-    return StateScope( *this, block );
+    return StateScope( *this, const_cast<RenderStateBlock*>( block ) );
 }
 
 // ** RenderStateStack::pop
