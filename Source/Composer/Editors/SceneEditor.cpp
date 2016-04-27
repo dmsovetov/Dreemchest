@@ -194,7 +194,7 @@ void SceneEditor::render( f32 dt )
 
     u32 time1 = Time::current();
 
-    if( time1 - kLastPrintTime > 3000 ) {
+    if( time1 - kLastPrintTime > 1000 ) {
         LogWarning( "sceneEditor", "Rendering the frame took %2.2f ms\n", f32( kTime ) / kFrames );
         kLastPrintTime = time1;
         kFrames = 0;

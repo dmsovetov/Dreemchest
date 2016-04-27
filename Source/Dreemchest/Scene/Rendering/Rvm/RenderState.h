@@ -181,6 +181,9 @@ namespace Scene {
     class RenderStateBlock {
     public:
 
+        //! A maximum number of states that can be stored inside a single block.
+        enum { MaxStates = 5 };
+
                                         //! Constructs a RenderStateBlock block.
                                         RenderStateBlock( void );
 
@@ -251,11 +254,12 @@ namespace Scene {
 
     private:
 
-        u32                             m_mask;         //!< A bit mask of state changes that are preset inside this state block.
-        u64                             m_features;     //!< A shader feature set.
-        u64                             m_featureMask;  //!< A shader feature mask.
-        Array<u32>                      m_stateBits;    //!< An array of state bits.
-        Array<RenderState>              m_states;       //!< An array of state changes.
+        u32                             m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
+        u64                             m_features;             //!< A shader feature set.
+        u64                             m_featureMask;          //!< A shader feature mask.
+        u32                             m_stateBits[MaxStates]; //!< An array of state bits.
+        RenderState                     m_states[MaxStates];    //!< An array of state changes.
+        s16                             m_count;                //!< A total number of states stored inside a block.
     };
 
     // ** RenderStateBlock::mask
@@ -279,7 +283,7 @@ namespace Scene {
     // ** RenderStateBlock::stateCount
     NIMBLE_INLINE s32 RenderStateBlock::stateCount( void ) const
     {
-        return static_cast<s32>( m_states.size() );
+        return m_count;
     }
 
     // ** RenderStateBlock::state

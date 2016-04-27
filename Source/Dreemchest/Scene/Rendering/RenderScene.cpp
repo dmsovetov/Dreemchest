@@ -39,6 +39,8 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types {
         , _PointCloud = sizeof( RenderScene::PointCloudNode )
         , _Camera = sizeof( RenderScene::CameraNode )
         , _StaticMesh = sizeof( RenderScene::StaticMeshNode )
+        , _StateBlock = sizeof( RenderStateBlock )
+        , _State = sizeof( RenderState )
     };
 };
 
@@ -156,8 +158,10 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults->disableBlending();
     defaults->setDepthState( Renderer::LessEqual, true );
     defaults->bindProgram( m_context->internShader( m_defaultShader ) );
-    defaults->enableFeatures( BIT( ShaderAmbientColor ) );
-    defaults->bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
+
+    // Push a scene state block
+    StateScope scene = stateStack.newScope();
+    scene->bindConstantBuffer( m_sceneConstants, RenderState::GlobalConstants );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();

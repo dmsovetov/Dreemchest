@@ -103,6 +103,7 @@ RenderStateBlock::RenderStateBlock( void )
     : m_mask( 0 )
     , m_features( 0 )
     , m_featureMask( ~0 )
+    , m_count( 0 )
 {
 }
 
@@ -194,12 +195,12 @@ void RenderStateBlock::disableBlending( void )
 void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
 {
     DC_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
+    DC_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );
 
     // Push a state to a state block
-    m_states.push_back( state );
-
-    // Push a state bit
-    m_stateBits.push_back( BIT( stateBit ) );
+    m_states[m_count] = state;
+    m_stateBits[m_count] = BIT( stateBit );
+    m_count++;
 
     // Update a state block bitmask
     m_mask = m_mask | BIT( stateBit );
