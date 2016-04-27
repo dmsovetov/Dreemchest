@@ -114,8 +114,8 @@ namespace Scene {
         Renderer::HalWPtr       m_hal;                                      //!< Rendering HAL to be used.
         RenderingContextWPtr    m_context;                                  //!< Parent rendering context.
         StateSwitch             m_stateSwitches[RenderState::TotalStates];  //!< Function callbacks to switch states.
-        u64                     m_inputLayoutFeatures;                      //!< An input layout features.
-        u64                     m_samplerFeatures;                          //!< Active sampler features.
+        u64                     m_vertexAttributeFeatures;                  //!< A vertex attribute features.
+        u64                     m_resourceFeatures;                         //!< Active resource features.
         ActiveShader            m_activeShader;                             //!< An active shader instance.
     };
 

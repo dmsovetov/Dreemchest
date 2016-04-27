@@ -233,20 +233,41 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 
     Map<String, u64> masks;
     
-    masks["inputNormal"]        = BIT( ShaderInputNormal     + InputFeaturesOffset );
-    masks["inputColor"]         = BIT( ShaderInputColor      + InputFeaturesOffset );
-    masks["inputUv0"]           = BIT( ShaderInputUv0        + InputFeaturesOffset );
-    masks["inputUv1"]           = BIT( ShaderInputUv1        + InputFeaturesOffset );
-    masks["inputUv2"]           = BIT( ShaderInputUv2        + InputFeaturesOffset );
-    masks["inputUv3"]           = BIT( ShaderInputUv3        + InputFeaturesOffset );
-    masks["inputUv4"]           = BIT( ShaderInputUv4        + InputFeaturesOffset );
-    masks["texture0"]           = BIT( ShaderTexture0        + ResourceFeaturesOffset );
-    masks["texture1"]           = BIT( ShaderTexture1        + ResourceFeaturesOffset );
-    masks["texture2"]           = BIT( ShaderTexture2        + ResourceFeaturesOffset );  
-    masks["texture3"]           = BIT( ShaderTexture3        + ResourceFeaturesOffset ); 
-    masks["ambientColor"]       = BIT( ShaderAmbientColor    + MaterialFeaturesOffset );
-    masks["pointLight"]         = BIT( ShaderPointLight      + MaterialFeaturesOffset );
-    masks["emissionColor"]      = BIT( ShaderEmissionColor   + MaterialFeaturesOffset );
+    masks["vertexNormal"]        = BIT( VertexNormal );
+    masks["vertexColor"]         = BIT( VertexColor );
+    masks["vertexTangent"]       = BIT( VertexTangent );
+    masks["vertexBitangent"]     = BIT( VertexBitangent );
+    masks["vertexPointSize"]     = BIT( VertexPointSize );
+    masks["vertexTexCoord0"]     = BIT( VertexTexCoord0 );
+    masks["vertexTexCoord1"]     = BIT( VertexTexCoord1 );
+    masks["vertexTexCoord2"]     = BIT( VertexTexCoord2 );
+    masks["vertexTexCoord3"]     = BIT( VertexTexCoord3 );
+    masks["vertexTexCoord4"]     = BIT( VertexTexCoord4 );
+    masks["vertexTexCoord5"]     = BIT( VertexTexCoord5 );
+    masks["vertexTexCoord6"]     = BIT( VertexTexCoord6 );
+    masks["vertexTexCoord7"]     = BIT( VertexTexCoord7 );
+
+    masks["texture0"]       = BIT( TextureSampler0 + SamplerFeaturesOffset );
+    masks["texture1"]       = BIT( TextureSampler1 + SamplerFeaturesOffset );
+    masks["texture2"]       = BIT( TextureSampler2 + SamplerFeaturesOffset );
+    masks["texture3"]       = BIT( TextureSampler3 + SamplerFeaturesOffset );
+    masks["texture4"]       = BIT( TextureSampler4 + SamplerFeaturesOffset );
+    masks["texture5"]       = BIT( TextureSampler5 + SamplerFeaturesOffset );
+    masks["texture6"]       = BIT( TextureSampler6 + SamplerFeaturesOffset );
+    masks["texture7"]       = BIT( TextureSampler7 + SamplerFeaturesOffset );
+
+    masks["cbuffer0"]       = BIT( ConstantBuffer0 + CBufferFeaturesOffset );
+    masks["cbuffer1"]       = BIT( ConstantBuffer1 + CBufferFeaturesOffset );
+    masks["cbuffer2"]       = BIT( ConstantBuffer2 + CBufferFeaturesOffset );
+    masks["cbuffer3"]       = BIT( ConstantBuffer3 + CBufferFeaturesOffset );
+    masks["cbuffer4"]       = BIT( ConstantBuffer4 + CBufferFeaturesOffset );
+    masks["cbuffer5"]       = BIT( ConstantBuffer5 + CBufferFeaturesOffset );
+    masks["cbuffer6"]       = BIT( ConstantBuffer6 + CBufferFeaturesOffset );
+    masks["cbuffer7"]       = BIT( ConstantBuffer7 + CBufferFeaturesOffset );
+
+    masks["ambientColor"]   = static_cast<u64>( ShaderAmbientColor )  << UserDefinedFeaturesOffset;
+    masks["emissionColor"]  = static_cast<u64>( ShaderEmissionColor ) << UserDefinedFeaturesOffset;
+    masks["pointLight"]     = static_cast<u64>( ShaderPointLight )    << UserDefinedFeaturesOffset;
 
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;

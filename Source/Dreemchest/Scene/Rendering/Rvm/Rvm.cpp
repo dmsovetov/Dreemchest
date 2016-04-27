@@ -166,8 +166,8 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
     u64 userFeaturesMask = ~0;
 
     // Reset all ubershader features
-    m_inputLayoutFeatures = 0;
-    m_samplerFeatures = 0;
+    m_vertexAttributeFeatures = 0;
+    m_resourceFeatures        = 0;
 
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
@@ -216,7 +216,9 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
     DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
 
     // Select a shader permutation that match an active pipeline state
-    Ubershader::Bitmask features = (m_inputLayoutFeatures | (m_samplerFeatures << TotalInputFeatures) | (userFeatures & userFeaturesMask)) & m_activeShader.shader->supportedFeatures();
+    Ubershader::Bitmask supported   = m_activeShader.shader->supportedFeatures();
+    Ubershader::Bitmask userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
+    Ubershader::Bitmask features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
 
     if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
         m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
@@ -289,18 +291,21 @@ void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state 
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features
-    m_inputLayoutFeatures = inputLayout->features();
+    m_vertexAttributeFeatures = inputLayout->features();
 }
 
 // ** Rvm::switchTexture
 void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
 {
+    // A single u64 bit constant value
+    static const u64 bit = 1;
+
     // Bind a texture to sampler
     const Renderer::TexturePtr& texture = m_context->texture( state.texture.id );
     m_hal->setTexture( state.texture.sampler, texture.get() );
 
-    // Update sampler features
-    m_samplerFeatures = m_samplerFeatures | (static_cast<u64>( 1 ) << state.texture.sampler );
+    // Update resource features
+    m_resourceFeatures = m_resourceFeatures | (bit << (state.texture.sampler + SamplerFeaturesOffset));
 }
 
 } // namespace Scene

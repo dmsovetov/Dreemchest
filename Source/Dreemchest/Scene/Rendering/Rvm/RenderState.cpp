@@ -158,13 +158,13 @@ void RenderStateBlock::setDepthState( Renderer::Compare function, bool write )
 // ** RenderStateBlock::enableFeatures
 void RenderStateBlock::enableFeatures( u64 bits )
 {
-    m_features = m_features | (bits << MaterialFeaturesOffset);
+    m_features = m_features | bits;
 }
 
 // ** RenderStateBlock::disableFeatures
 void RenderStateBlock::disableFeatures( u64 bits )
 {
-    m_featureMask = m_featureMask & ~(bits << MaterialFeaturesOffset);
+    m_featureMask = m_featureMask & ~bits;
 }
 
 // ** RenderStateBlock::setAlphaTest

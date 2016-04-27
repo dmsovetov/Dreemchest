@@ -50,7 +50,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
     {
         StateScope pass = stateStack.newScope();
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
-        pass->enableFeatures( BIT( ShaderEmissionColor ) );
+        pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
 
         m_staticMeshEmitter->emit( frame, commands, stateStack );
         m_pointCloudEmitter->emit( frame, commands, stateStack );
@@ -67,7 +67,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         // Light state block
         StateScope state = stateStack.newScope();
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
-        state->enableFeatures( BIT( ShaderPointLight ) );
+        state->enableFeatures( ShaderPointLight );
         state->bindProgram( m_context.internShader( m_phongShader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 

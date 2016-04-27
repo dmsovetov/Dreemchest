@@ -64,7 +64,7 @@ void StaticMeshEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         instance->bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
-            instance->disableFeatures( BIT( ShaderAmbientColor ) );
+            instance->disableFeatures( ShaderAmbientColor );
         }
 
         commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, mesh.count );

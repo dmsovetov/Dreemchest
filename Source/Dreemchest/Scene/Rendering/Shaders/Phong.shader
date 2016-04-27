@@ -1,6 +1,6 @@
 [Features]
-F_NormalAttribute 	= inputNormal
-F_ColorAttribute  	= inputColor
+F_NormalAttribute 	= vertexNormal
+F_ColorAttribute  	= vertexColor
 F_PointLight	  	= pointLight
 F_DiffuseTexture	= texture0
 

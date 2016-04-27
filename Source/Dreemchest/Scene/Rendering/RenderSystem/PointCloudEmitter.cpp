@@ -61,7 +61,7 @@ void PointCloudEmitter::emit( RenderFrame& frame, RenderCommandBuffer& commands,
         instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
 
         if( material.lightingModel() == LightingModel::Unlit ) {
-            instance->disableFeatures( BIT( ShaderAmbientColor ) );
+            instance->disableFeatures( ShaderAmbientColor );
         }
 
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.count );

@@ -33,50 +33,72 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    // ------------------------------------------------------------------------------------------------
-    enum ShaderInputFeatures {
-          ShaderInputNormal
-        , ShaderInputColor
-        , ShaderInputUv0
-        , ShaderInputUv1
-        , ShaderInputUv2
-        , ShaderInputUv3
-        , ShaderInputUv4
-        , TotalInputFeatures
-        , InputFeaturesOffset = 0
+    //! Vertex attributes that are passed to a shader.
+    enum VertexAttributeFeatures {
+          VertexNormal
+        , VertexColor
+        , VertexTangent
+        , VertexBitangent
+        , VertexPointSize
+        , VertexTexCoord0
+        , VertexTexCoord1
+        , VertexTexCoord2
+        , VertexTexCoord3
+        , VertexTexCoord4
+        , VertexTexCoord5
+        , VertexTexCoord6
+        , VertexTexCoord7
+        , TotalVertexAttributeFeatures
     };
 
-    enum ShaderResourceFeatures {
-          ShaderTexture0
-        , ShaderTexture1
-        , ShaderTexture2
-        , ShaderTexture3
-        , TotalResourceFeatures
-        , ResourceFeaturesOffset = TotalInputFeatures
+    //! An offset of sampler features.
+    enum { SamplerFeaturesOffset = TotalVertexAttributeFeatures };
+
+    //! Texture samplers that can be enabled upon rendering.
+    enum SamplerFeatures {
+          TextureSampler0
+        , TextureSampler1
+        , TextureSampler2
+        , TextureSampler3
+        , TextureSampler4
+        , TextureSampler5
+        , TextureSampler6
+        , TextureSampler7
+        , TotalSamplerFeatures
     };
 
-    enum ShaderMaterialFeatures {
-          ShaderAmbientColor
-        , ShaderPointLight
-        , ShaderEmissionColor
-        , TotalMaterialFeatures
-        , MaterialFeaturesOffset = ResourceFeaturesOffset + TotalResourceFeatures
+    //! An offset of constant buffer features.
+    enum { CBufferFeaturesOffset = SamplerFeaturesOffset + TotalSamplerFeatures };
+
+    //! Constant buffers that can be bound upon rendering.
+    enum ConstantBufferFeatures {
+          ConstantBuffer0
+        , ConstantBuffer1
+        , ConstantBuffer2
+        , ConstantBuffer3
+        , ConstantBuffer4
+        , ConstantBuffer5
+        , ConstantBuffer6
+        , ConstantBuffer7
+        , TotalConstantBufferFeatures
     };
 
-    enum UbershaderFeatures {
-          FeatureInputNormal        = BIT( ShaderInputNormal     + InputFeaturesOffset )
-        , FeatureInputColor         = BIT( ShaderInputColor      + InputFeaturesOffset )
-        , FeatureInputUv0           = BIT( ShaderInputUv0        + InputFeaturesOffset )
-        , FeatureInputUv1           = BIT( ShaderInputUv1        + InputFeaturesOffset )
-        , FeatureInputUv2           = BIT( ShaderInputUv2        + InputFeaturesOffset )
-        , FeatureInputUv3           = BIT( ShaderInputUv3        + InputFeaturesOffset )
-        , FeatureInputUv4           = BIT( ShaderInputUv4        + InputFeaturesOffset )
-        , FeatureTexture0           = BIT( ShaderTexture0        + ResourceFeaturesOffset )  
-        , FeatureTexture1           = BIT( ShaderTexture1        + ResourceFeaturesOffset )  
-        , FeatureTexture2           = BIT( ShaderTexture2        + ResourceFeaturesOffset )  
-        , FeatureTexture3           = BIT( ShaderTexture3        + ResourceFeaturesOffset )  
-        , FeatureAmbientColor       = BIT( ShaderAmbientColor    + MaterialFeaturesOffset )
+    //! An offset of user-defined shader features.
+    enum { UserDefinedFeaturesOffset = CBufferFeaturesOffset + TotalConstantBufferFeatures };
+
+    //! A total number of available user-defined feature bits.
+    enum { MaxUserDefinedFeatureBits = 64 - UserDefinedFeaturesOffset };
+
+    //! Available user-defined shader features. 
+    enum ShaderFeatures {
+          ShaderAmbientColor        = 1 << 0
+        , ShaderEmissionColor       = 1 << 1
+        , ShaderPointLight          = 1 << 2
+        , ShaderSpotLight           = 2 << 2
+        , ShaderDirectionalLight    = 3 << 2
+        , ShaderFogColor            = 1 << 4
     };
+
     // ------------------------------------------------------------------------------------------------
 
     //! A maximum number of state blocks that can be pushed onto a state stack.
