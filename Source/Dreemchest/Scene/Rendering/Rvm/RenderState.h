@@ -126,6 +126,11 @@ namespace Scene {
               Texture0
             , Texture1
             , Texture2
+            , Texture3
+            , Texture4
+            , Texture5
+            , Texture6
+            , Texture7
             , MaxTextureSamplers    //!< A maximum number of supported texture samplers.
         };
 
