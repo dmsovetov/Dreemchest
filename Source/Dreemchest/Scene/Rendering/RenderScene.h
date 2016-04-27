@@ -34,6 +34,17 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //! Render scene node attributes.
+    enum RenderNodeAttributes {
+          RenderMaskOpaque      = BIT( 0 ) //!< Node is rendered as opaque object.
+        , RenderMaskCutout      = BIT( 1 ) //!< Node is rendered as cutout object.
+        , RenderMaskAdditive    = BIT( 2 ) //!< Node is rendered as additive object.
+        , RenderMaskTranslucent = BIT( 3 ) //!< Node is rendered as translucent object.
+        , RenderMaskUnlit       = BIT( 4 ) //!< Node is rendered without lighting.
+        , RenderMaskAmbient     = BIT( 5 ) //!< Node is rendered with ambient lighting only.
+        , RenderMaskPhong       = BIT( 6 ) //!< Node is rendered with a phong lighting model.
+    };
+
     //! Render scene contains all renderable entities, performs culling and constructs command buffers.
     class RenderScene : public RefCounted {
     public:
@@ -77,9 +88,12 @@ namespace Scene {
 
         //! Stores info about a scene instance.
         struct InstanceNode : public Node {
+            u8                                      mask;           //!< Instance attribute mask.
+
             //! Instance material parameters.
             struct Material {
-                MaterialHandle                      handle;
+                u8                                  rendering;      //!< Material rendering mode.
+                u8                                  lighting;       //!< Lighting model.
                 const RenderStateBlock*             states;         //!< A material state.
             } material;
 

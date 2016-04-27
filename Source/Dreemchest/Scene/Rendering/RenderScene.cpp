@@ -302,12 +302,23 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
 // ** RenderScene::initializeInstanceNode
 void RenderScene::initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance, const MaterialHandle& material )
 {
+    instance.mask                   = ~0;
     instance.transform              = entity.get<Transform>();
     instance.matrix                 = &instance.transform->matrix();
     instance.constantBuffer         = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Instance ), CBuffer::Instance::Layout );
     instance.instance.parameters    = DC_NEW CBuffer::Instance;
-    instance.material.handle        = material;
+    instance.material.lighting      = -1;
+    instance.material.rendering     = -1;
     instance.material.states        = NULL;
+
+    if( material.isValid() ) {
+        u8 renderingMasks[] = { RenderMaskOpaque, RenderMaskCutout, RenderMaskTranslucent, RenderMaskAdditive };
+        u8 lightingMasks[]  = { RenderMaskUnlit, RenderMaskAmbient, RenderMaskPhong };
+
+        instance.material.rendering = material->renderingMode();
+        instance.material.lighting  = material->lightingModel();
+        instance.mask               = renderingMasks[instance.material.rendering] | lightingMasks[instance.material.lighting];
+    }
 
     if( const AbstractRenderCache::MaterialNode* cached = m_cache->requestMaterial( material ) ) {
         instance.material.states = &cached->states;

@@ -47,8 +47,6 @@ namespace Scene {
 
         UbershaderPtr                   m_phongShader;
         UbershaderPtr                   m_ambientShader;
-        RopEmitterUPtr                  m_pointCloudEmitter;
-        RopEmitterUPtr                  m_staticMeshEmitter;
     };
 
 } // namespace Scene

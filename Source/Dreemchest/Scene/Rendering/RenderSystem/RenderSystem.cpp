@@ -73,6 +73,66 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
     }
 }
 
+// ** RenderSystemBase::emitStaticMeshes
+void RenderSystemBase::emitStaticMeshes( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask )
+{
+    // Get all static meshes meshes
+    const RenderScene::StaticMeshes& meshes = m_renderScene.staticMeshes();
+
+    // Process each mesh entity
+    for( s32 i = 0, n = meshes.count(); i < n; i++ ) {
+        // Get mesh entity by index
+        const RenderScene::StaticMeshNode& mesh = meshes[i];
+
+        // Skip all meshes that do not pass a specified mask
+        if( (mesh.mask & mask) == 0 ) {
+            continue;
+        }
+
+        StateScope materialStates = stateStack.push( mesh.material.states );
+        StateScope renderableStates = stateStack.push( mesh.states );
+
+        StateScope instance = stateStack.newScope();
+        instance->bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
+
+        if( mesh.material.lighting == LightingModel::Unlit ) {
+            instance->disableFeatures( ShaderAmbientColor );
+        }
+
+        commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, mesh.count );
+    }
+}
+
+// ** RenderSystemBase::emitPointClouds
+void RenderSystemBase::emitPointClouds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask )
+{
+    // Get all point clouds that reside in scene
+    const RenderScene::PointClouds& pointClouds = m_renderScene.pointClouds();
+
+    // Process each active point cloud
+    for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
+        // Get a point cloud by index
+        const RenderScene::PointCloudNode& pointCloud = pointClouds[i];
+
+        // Skip all meshes that do not pass a specified mask
+        if( (pointCloud.mask & mask) == 0 ) {
+            continue;
+        }
+
+        StateScope materialStates = stateStack.push( pointCloud.material.states );
+        StateScope renderableStates = stateStack.push( pointCloud.states );
+
+        StateScope instance = stateStack.newScope();
+        instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
+
+        if( pointCloud.material.lighting == LightingModel::Unlit ) {
+            instance->disableFeatures( ShaderAmbientColor );
+        }
+
+        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.count );
+    }
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

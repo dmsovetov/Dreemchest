@@ -133,9 +133,6 @@ namespace Scene {
     //! Render system unique pointer type.
     typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
 
-    //! Rop emitter unique pointer type.
-    typedef AutoPtr<class RopEmitter> RopEmitterUPtr;
-
     class RenderStateBlock;
 
     //! Render command buffer unique pointer type.

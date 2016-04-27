@@ -25,8 +25,6 @@
  **************************************************************************/
 
 #include "TestRenderSystem.h"
-#include "../RenderSystem/PointCloudEmitter.h"
-#include "../RenderSystem/StaticMeshEmitter.h"
 #include "../RenderScene.h"
 
 DC_BEGIN_DREEMCHEST
@@ -37,8 +35,6 @@ namespace Scene {
 TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal )
     : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
-    m_pointCloudEmitter = DC_NEW PointCloudEmitter( renderScene );
-    m_staticMeshEmitter = DC_NEW StaticMeshEmitter( renderScene );
     m_phongShader   = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_ambientShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
 }
@@ -52,8 +48,8 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
 
-        m_staticMeshEmitter->emit( frame, commands, stateStack );
-        m_pointCloudEmitter->emit( frame, commands, stateStack );
+        emitStaticMeshes( frame, commands, stateStack );
+        emitPointClouds( frame, commands, stateStack );
     }
 
     // Get all light sources
@@ -72,10 +68,8 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
         // Emit render operations
-        RopEmitter::Filter filter;
-        filter.lightingModels = BIT( LightingModel::Phong );
-        m_staticMeshEmitter->emit( frame, commands, stateStack, filter );
-        m_pointCloudEmitter->emit( frame, commands, stateStack, filter );
+        emitStaticMeshes( frame, commands, stateStack, RenderMaskPhong );
+        emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
     }
 }
 
