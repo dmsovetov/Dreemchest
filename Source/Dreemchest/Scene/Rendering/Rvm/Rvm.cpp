@@ -256,45 +256,45 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
 // ** Rvm::switchAlphaTest
 void Rvm::switchAlphaTest( const RenderFrame& frame, const RenderState& state )
 {
-    m_hal->setAlphaTest( state.alpha.function, state.alpha.reference );
+    m_hal->setAlphaTest( static_cast<Renderer::Compare>( state.compareFunction ), state.data.alphaReference / 255.0f );
 }
 
 // ** Rvm::switchDepthState
 void Rvm::switchDepthState( const RenderFrame& frame, const RenderState& state )
 {
-    m_hal->setDepthTest( state.depth.write, state.depth.function );
+    m_hal->setDepthTest( state.data.depthWrite, static_cast<Renderer::Compare>( state.compareFunction ) );
 }
 
 // ** Rvm::switchBlending
 void Rvm::switchBlending( const RenderFrame& frame, const RenderState& state )
 {
-    m_hal->setBlendFactors( state.blend.src, state.blend.dst );
+    m_hal->setBlendFactors( static_cast<Renderer::BlendFactor>( state.data.blend >> 4 ), static_cast<Renderer::BlendFactor>( state.data.blend & 0xF ) );
 }
 
 // ** Rvm::switchShader
 void Rvm::switchShader( const RenderFrame& frame, const RenderState& state )
 {
-    m_activeShader.shader = m_context->shader( state.id );
+    m_activeShader.shader = m_context->shader( state.resourceId );
 }
 
 // ** Rvm::switchConstantBuffer
 void Rvm::switchConstantBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.constantBuffer.id );
-    m_hal->setConstantBuffer( constantBuffer, state.constantBuffer.type );
+    const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.resourceId );
+    m_hal->setConstantBuffer( constantBuffer, state.data.index );
 }
 
 // ** Rvm::switchVertexBuffer
 void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::VertexBufferPtr& vertexBuffer = m_context->vertexBuffer( state.id );
+    const Renderer::VertexBufferPtr& vertexBuffer = m_context->vertexBuffer( state.resourceId );
     m_hal->setVertexBuffer( vertexBuffer );
 }
 
 // ** Rvm::switchIndexBuffer
 void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state )
 {
-    const Renderer::IndexBufferPtr& indexBuffer = m_context->indexBuffer( state.id );
+    const Renderer::IndexBufferPtr& indexBuffer = m_context->indexBuffer( state.resourceId );
     m_hal->setIndexBuffer( indexBuffer );
 }
 
@@ -302,7 +302,7 @@ void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state 
 void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state )
 {
     // Bind an input layout
-    const Renderer::InputLayoutPtr& inputLayout = m_context->inputLayout( state.id );
+    const Renderer::InputLayoutPtr& inputLayout = m_context->inputLayout( state.resourceId );
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features
@@ -316,11 +316,11 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
     static const u64 bit = 1;
 
     // Bind a texture to sampler
-    const Renderer::TexturePtr& texture = m_context->texture( state.texture.id );
-    m_hal->setTexture( state.texture.sampler, texture.get() );
+    const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
+    m_hal->setTexture( state.data.index, texture.get() );
 
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | (bit << (state.texture.sampler + SamplerFeaturesOffset));
+    m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + SamplerFeaturesOffset));
 }
 
 } // namespace Scene

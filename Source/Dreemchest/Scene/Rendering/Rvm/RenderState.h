@@ -126,16 +126,16 @@ namespace Scene {
 
         //! Available render state types.
         enum Type {
-              VertexBuffer      = 0                                     //!< Binds an input vertex buffer.
-            , IndexBuffer       = VertexBuffer      + 1                    //!< Binds an input index buffer.
-            , InputLayout       = IndexBuffer       + 1                    //!< Binds an input layout.
-            , ConstantBuffer    = InputLayout       + 1                    //!< Binds a constant buffer.
-            , Shader            = ConstantBuffer    + MaxConstantBuffers   //!< Binds a program instance.
-            , Blending          = Shader            + 1                    //!< Sets a blend function
-            , DepthState        = Blending          + 1                    //!< Sets a depth test function and a reference value.
-            , AlphaTest         = DepthState        + 1                    //!< Sets an alpha test function and a reference value.
-            , Texture           = AlphaTest         + 1                    //!< Binds a texture to a sampler #(Type.Texture + index).
-            , TotalStates       = Texture           + MaxTextureSamplers   //!< A total number of available render states.
+              VertexBuffer      = 0                                         //!< Binds an input vertex buffer.
+            , IndexBuffer       = VertexBuffer      + 1                     //!< Binds an input index buffer.
+            , InputLayout       = IndexBuffer       + 1                     //!< Binds an input layout.
+            , ConstantBuffer    = InputLayout       + 1                     //!< Binds a constant buffer.
+            , Shader            = ConstantBuffer    + MaxConstantBuffers    //!< Binds a program instance.
+            , Blending          = Shader            + 1                     //!< Sets a blend function
+            , DepthState        = Blending          + 1                     //!< Sets a depth test function and a reference value.
+            , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
+            , Texture           = AlphaTest         + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
+            , TotalStates       = Texture           + MaxTextureSamplers    //!< A total number of available render states.
         };
 
                                         //! Constructs an empty RenderState instance.
@@ -159,35 +159,19 @@ namespace Scene {
                                         //! Constructs a blend function render state.
                                         RenderState( s32 id, TextureSampler sampler );
 
-        Type                            type;           //!< Render state type.
         union {
-            s32                         id;             //!< A resource identifier to be bound to a pipeline.
-
-            struct {
-                s32                     id;             //!< Buffer ID to be bound.
-                ConstantBufferType      type;           //!< Constant buffer index.
-            } constantBuffer;                           //!< Bind constant buffer data.
-
-            struct {
-                Renderer::BlendFactor   src;            //!< A source blend factor.
-                Renderer::BlendFactor   dst;            //!< A destination blend factor.
-            } blend;                                    //!< Blend mode to be set.
-
-            struct {
-                Renderer::Compare       function;       //!< A depth tesing function.
-                bool                    write;          //!< Enables or disables writing to a depth buffer.
-            } depth;                                    //!< A depth testing state to be set.
-
-            struct {
-                Renderer::Compare       function;       //!< An alpha test function.
-                f32                     reference;      //!< An alpha test function reference value.
-            } alpha;                                    //!< An alpha testing state to be set.
-
-            struct {
-                s32                     id;             //!< Texture ID to be bound.
-                TextureSampler          sampler;        //!< A sampler index to bind texture to.
-            } texture;                                  //!< A texture sampler data.                          
+            u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
+            u16                         compareFunction;    //!< A compare function value.
         };
+
+        union {
+            u8                          blend;              //!< Source blend factor in high bits and destination blend factor in low bits.
+            u8                          index;              //!< A constant buffer binding slot or sampler index.
+            bool                        depthWrite;         //!< Enables or disables writing to a depth buffer.
+            u8                          alphaReference;     //!< An alpha test function reference value.
+        } data;
+
+        u8                              type;               //!< Render state type.
     };
 
     //! Render state block agregates a set of state changes.

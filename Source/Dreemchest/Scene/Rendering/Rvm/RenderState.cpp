@@ -41,7 +41,7 @@ RenderState::RenderState( void )
 // ** RenderState::RenderState
 RenderState::RenderState( Type type, s32 id )
     : type( type )
-    , id( id )
+    , resourceId( id )
 {
 }
 
@@ -49,40 +49,39 @@ RenderState::RenderState( Type type, s32 id )
 RenderState::RenderState( Renderer::Compare function, bool write )
     : type( DepthState )
 {
-    depth.function = function;
-    depth.write    = write;
+    compareFunction = function;
+    data.depthWrite = write;
 }
 
 // ** RenderState::RenderState
 RenderState::RenderState( Renderer::Compare function, f32 reference )
     : type( AlphaTest )
 {
-    alpha.function  = function;
-    alpha.reference = reference;
+    compareFunction     = function;
+    data.alphaReference = static_cast<u8>( reference * 255 );
 }
 
 // ** RenderState::RenderState
 RenderState::RenderState( s32 id, ConstantBufferType type )
     : type( ConstantBuffer )
 {
-    constantBuffer.id   = id;
-    constantBuffer.type = type;
+    resourceId = id;
+    data.index = type;
 }
 
 // ** RenderState::RenderState
 RenderState::RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst )
     : type( Blending )
 {
-    blend.src = src;
-    blend.dst = dst;
+    data.blend = (src << 4) | dst;
 }
 
 // ** RenderState::RenderState
 RenderState::RenderState( s32 id, TextureSampler sampler )
     : type( Texture )
 {
-    texture.id      = id;
-    texture.sampler = sampler;
+    resourceId = id;
+    data.index = sampler;
 }
 
 // -------------------------------------------------------------------------- RenderStateBlock -------------------------------------------------------------------------- //
