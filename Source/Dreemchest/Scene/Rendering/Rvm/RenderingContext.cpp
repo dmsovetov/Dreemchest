@@ -311,7 +311,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     shader->addInclude(
             "                                                       \n\
                 struct CBufferScene    { vec4 ambient; };           \n\
-                struct CBufferView     { mat4 transform; };         \n\
+                struct CBufferView     { mat4 transform; float near; float far; };         \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; };         \n\

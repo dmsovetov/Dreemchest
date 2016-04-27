@@ -62,6 +62,8 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Light::Layout[] = {
 // ** RenderScene::CBuffer::View::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::View::Layout[] = {
       { "View.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::View, transform ), }
+    , { "View.near",      Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, near      ), }
+    , { "View.far",       Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, far       ), }
     , { NULL }
 };
 
@@ -197,6 +199,8 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         CameraNode& node = cameras[i];
         node.parameters->transform = node.camera->calculateViewProjection( node.transform->matrix() );
+        node.parameters->near      = node.camera->near();
+        node.parameters->far       = node.camera->far();
         commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::View );
     }
 

@@ -59,6 +59,8 @@ namespace Scene {
             struct View {
                 static BufferLayout Layout[];
                 Matrix4             transform;
+                f32                 near;
+                f32                 far;
             };
             struct Instance {
                 static BufferLayout Layout[];
