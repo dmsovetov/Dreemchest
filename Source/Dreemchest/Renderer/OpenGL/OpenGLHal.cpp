@@ -852,6 +852,8 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
     case PixelPvrtc4:   return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
 #if !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
+    case PixelR16F:     return GL_R16F;
+    case PixelR32F:     return GL_R32F;
     case PixelRgba16F:  return GL_RGBA16F;
     case PixelRgba32F:  return GL_RGBA32F;
     case PixelRgb32F:   return GL_RGB32F;
@@ -878,6 +880,8 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
     case PixelRgb32F:   return GL_RGB;
     case PixelRgba16F:  return GL_RGBA;
     case PixelRgba32F:  return GL_RGBA;
+    case PixelR32F:
+    case PixelR16F:     return GL_RED;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
     
@@ -896,7 +900,9 @@ GLenum OpenGLHal::imageDataType( u32 pixelFormat )
     case PixelDxtc5:    return 0;
     case PixelPvrtc2:   return 0;
     case PixelPvrtc4:   return 0;
+    case PixelR16F:
     case PixelRgba16F:  return GL_HALF_FLOAT;
+    case PixelR32F:
     case PixelRgb32F:
     case PixelRgba32F:  return GL_FLOAT;
     default:            DC_BREAK_IF( "Image format not implemented" );
