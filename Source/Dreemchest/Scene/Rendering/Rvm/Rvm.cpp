@@ -79,7 +79,7 @@ void Rvm::renderToTarget( const RenderFrame& frame, RenderResource renderTarget,
 {
     // Push a render target state
     if( renderTarget ) {
-        m_context->renderTarget( renderTarget )->begin( m_hal );
+        m_hal->setRenderTarget( m_context->renderTarget( renderTarget ) );
     }
 
     // Set a viewport before executing an attached command buffer
@@ -91,7 +91,7 @@ void Rvm::renderToTarget( const RenderFrame& frame, RenderResource renderTarget,
 
     // Pop a render target state
     if( renderTarget ) {
-        m_context->renderTarget( renderTarget )->end( m_hal );
+        m_hal->setRenderTarget( NULL );
     }
 
     // Pop a viewport
@@ -315,9 +315,17 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
     // A single u64 bit constant value
     static const u64 bit = 1;
 
+    // Convert a resource id to a signed integer
+    s32 id = static_cast<s16>( state.resourceId );
+
     // Bind a texture to sampler
-    const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
-    m_hal->setTexture( state.data.index, texture.get() );
+    if( id >= 0 ) {
+        const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
+        m_hal->setTexture( state.data.index, texture.get() );
+    } else {
+        Renderer::Texture2DPtr texture = m_context->renderTarget( -id )->color();
+        m_hal->setTexture( state.data.index, texture.get() );
+    }
 
     // Update resource features
     m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + SamplerFeaturesOffset));

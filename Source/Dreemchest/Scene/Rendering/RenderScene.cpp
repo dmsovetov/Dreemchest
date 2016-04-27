@@ -171,7 +171,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         const CameraNode& camera = cameras[i];
         entryPoint
-            .renderToTarget( camera.camera->viewport() )
+            .renderToTarget( 0, camera.camera->viewport() )
             .clear( camera.camera->clearColor(), camera.camera->clearMask() );
     }
 

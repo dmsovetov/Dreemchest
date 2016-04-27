@@ -54,16 +54,16 @@ namespace Scene {
         RenderResource                          requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout );
 
         //! Queues a texture instance for creation and returns it's index.
-        RenderResource                          requestTexture( const void* data, s32 width, s32 height, s32 channels );
+        RenderResource                          requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format );
+
+        //! Queues a render target instance for creation and returns it's index.
+        RenderResource                          requestRenderTarget( s32 width, s32 height, Renderer::PixelFormat format );
 
         //! Creates a shader from a file.
         UbershaderPtr                           createShader( const String& fileName ) const;
 
-        //! Interns a render target and returns it's integer identifier.
-        s32                                     internRenderTarget( RenderTargetPtr renderTarget );
-
         //! Returns a render target by an index.
-        const RenderTargetPtr&                  renderTarget( s32 identifier ) const;
+        const Renderer::RenderTargetPtr&        renderTarget( s32 identifier ) const;
 
         //! Returns a vertex buffer by an index.
         const Renderer::VertexBufferPtr&        vertexBuffer( RenderResource identifier ) const;
@@ -115,6 +115,9 @@ namespace Scene {
         //! Constructs a texture.
         void                                    constructTexture( const ResourceConstructor& constructor );
 
+        //! Constructs a render target.
+        void                                    constructRenderTarget( const ResourceConstructor& constructor );
+
     private:
 
         //! A resource item that should be created.
@@ -126,34 +129,35 @@ namespace Scene {
                 , IndexBuffer       //!< An index buffer will be constructed.
                 , ConstantBuffer    //!< A constant buffer will be constructed.
                 , Texture           //!< A texture will be constructed.
+                , RenderTarget      //!< A render target will be constructed.
                 , TotalConstructors //!< A total number of resource constructor types.
             };
 
             //! A callback function used to construct a resource.
             typedef void ( RenderingContext::*Function )( const ResourceConstructor& );
 
-                                //! Constructs a ResourceConstructor instance.
-                                ResourceConstructor( Type type = TotalConstructors )
-                                    : type( type ) {}
+                                            //! Constructs a ResourceConstructor instance.
+                                            ResourceConstructor( Type type = TotalConstructors )
+                                                : type( type ) {}
 
-            Type                type;       //!< Resource constructor type.
-            RenderResource      id;         //!< Handle to a resource being constructed.
+            Type                            type;       //!< Resource constructor type.
+            RenderResource                  id;         //!< Handle to a resource being constructed.
             union {
                 struct {
-                    u8          format;     //!< Vertex format used by an input layout constructor.
+                    u8                      format;     //!< Vertex format used by an input layout constructor.
                 } inputLayout;
 
                 struct {
-                    const void* data;       //!< Data that should be uploaded to a buffer after construction.
-                    s32         size;       //!< A buffer size.
-                    const void* userData;   //!< Used by a constant buffer constructor.
+                    const void*             data;       //!< Data that should be uploaded to a buffer after construction.
+                    s32                     size;       //!< A buffer size.
+                    const void*             userData;   //!< Used by a constant buffer constructor.
                 } buffer;
 
                 struct {
-                    const void* data;       //!< A texture data that should be uploaded after construction.
-                    u16         width;      //!< A texture width.
-                    u16         height;     //!< A texture height.
-                    u8          channels;   //!< A texture format.
+                    const void*             data;       //!< A texture data that should be uploaded after construction.
+                    u16                     width;      //!< A texture width.
+                    u16                     height;     //!< A texture height.
+                    Renderer::PixelFormat   format;     //!< A texture format.
                 } texture;
             };
         };
@@ -168,8 +172,7 @@ namespace Scene {
         FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;       //!< Allocated constant buffers.
         FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;          //!< Allocated input layouts.
         FixedArray<Renderer::TexturePtr>        m_texturePool;              //!< Allocated textures.
-
-        IndexCache<RenderTargetPtr>             m_renderTargets;            //!< Interned render targets.
+        FixedArray<Renderer::RenderTargetPtr>   m_renderTargetPool;         //!< Allocated render targets.
         IndexCache<UbershaderPtr>               m_shaders;                  //!< Interned shaders.
     };
 

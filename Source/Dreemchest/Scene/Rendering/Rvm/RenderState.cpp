@@ -131,6 +131,12 @@ void RenderStateBlock::bindTexture( s32 id, RenderState::TextureSampler sampler 
     pushState( RenderState( id, sampler ), RenderState::Texture + sampler );
 }
 
+// ** RenderStateBlock::bindRenderedTexture
+void RenderStateBlock::bindRenderedTexture( s32 id, RenderState::TextureSampler sampler )
+{
+    pushState( RenderState( -id, sampler ), RenderState::Texture + sampler );
+}
+
 // ** RenderStateBlock::setBlend
 void RenderStateBlock::setBlend( Renderer::BlendFactor src, Renderer::BlendFactor dst )
 {

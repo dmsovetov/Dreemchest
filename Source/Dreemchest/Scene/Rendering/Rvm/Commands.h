@@ -98,7 +98,7 @@ namespace Scene {
         void                        execute( const RenderCommandBuffer& commands );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        RenderCommandBuffer&        renderToTarget( const Rect& viewport );
+        RenderCommandBuffer&        renderToTarget( RenderResource id, const Rect& viewport );
 
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );

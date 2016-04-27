@@ -64,7 +64,7 @@ void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
 }
 
 // ** RenderCommandBuffer::renderToTarget
-RenderCommandBuffer& RenderCommandBuffer::renderToTarget( const Rect& viewport )
+RenderCommandBuffer& RenderCommandBuffer::renderToTarget( RenderResource id, const Rect& viewport )
 {
     RenderCommandBuffer& commands = m_frame.createCommandBuffer();
 
@@ -72,7 +72,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( const Rect& viewport )
     opCode.type = OpCode::RenderTarget;
     opCode.sorting = 0;
     opCode.renderTarget.commands = &commands;
-    opCode.renderTarget.id = 0;
+    opCode.renderTarget.id = id;
     opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
     opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
     opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );

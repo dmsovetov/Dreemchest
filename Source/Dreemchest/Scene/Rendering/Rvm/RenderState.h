@@ -212,6 +212,9 @@ namespace Scene {
         //! Binds a texture to a specified sampler.
         void                            bindTexture( s32 id, RenderState::TextureSampler sampler );
 
+        //! Binds a rendered texture to a specified sampler.
+        void                            bindRenderedTexture( s32 id, RenderState::TextureSampler sampler );
+
         //! Sets a blend function.
         void                            setBlend( Renderer::BlendFactor src, Renderer::BlendFactor dst );
 

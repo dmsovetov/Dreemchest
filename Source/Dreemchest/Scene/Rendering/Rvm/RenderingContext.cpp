@@ -52,6 +52,7 @@ void RenderingContext::constructResources( void )
         , &RenderingContext::constructIndexBuffer
         , &RenderingContext::constructConstantBuffer
         , &RenderingContext::constructTexture
+        , &RenderingContext::constructRenderTarget
         , NULL
     };
 
@@ -146,9 +147,10 @@ void RenderingContext::constructConstantBuffer( const ResourceConstructor& const
     m_constantBufferPool[constructor.id - 1] = constantBuffer;
 }
 
+// ** RenderingContext::constructTexture
 void RenderingContext::constructTexture( const ResourceConstructor& constructor )
 {
-    Renderer::Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.channels == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+    Renderer::Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.format );
 
     // Upload data to a GPU buffer
     if( constructor.texture.data ) {
@@ -160,6 +162,17 @@ void RenderingContext::constructTexture( const ResourceConstructor& constructor 
 
     // Save a index buffer to a pool
     m_texturePool[constructor.id - 1] = texture;
+}
+
+// ** RenderingContext::constructRenderTarget
+void RenderingContext::constructRenderTarget( const ResourceConstructor& constructor )
+{
+    Renderer::RenderTargetPtr renderTarget = m_hal->createRenderTarget( constructor.texture.width, constructor.texture.height );
+    bool result = renderTarget->setColor( constructor.texture.format );
+    DC_ABORT_IF( !result, "failed to create color render target" );
+
+    // Save a index buffer to a pool
+    m_renderTargetPool[constructor.id - 1] = renderTarget;
 }
 
 // ** RenderingContext::requestInputLayout
@@ -211,14 +224,28 @@ RenderResource RenderingContext::requestConstantBuffer( const void* data, s32 si
 }
 
 // ** RenderingContext::requestConstantBuffer
-RenderResource RenderingContext::requestTexture( const void* data, s32 width, s32 height, s32 channels )
+RenderResource RenderingContext::requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format )
 {
     ResourceConstructor constructor = ResourceConstructor::Texture;
     constructor.id          = m_texturePool.push( NULL ) + 1;
     constructor.texture.data = data;
     constructor.texture.width = width;
     constructor.texture.height = height;
-    constructor.texture.channels = channels;
+    constructor.texture.format = format;
+
+    m_resourceConstructors.push_back( constructor );
+    return constructor.id;
+}
+
+// ** RenderingContext::requestRenderTarget
+RenderResource RenderingContext::requestRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
+{
+    ResourceConstructor constructor = ResourceConstructor::RenderTarget;
+    constructor.id          = m_renderTargetPool.push( NULL ) + 1;
+    constructor.texture.data = NULL;
+    constructor.texture.width = width;
+    constructor.texture.height = height;
+    constructor.texture.format = format;
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
@@ -322,22 +349,18 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 uniform CBufferMaterial Material;                   \n\
                 uniform CBufferLight    Light;                      \n\
                 #define u_DiffuseTexture Texture0                   \n\
+                #define u_DepthTexture   Texture7                   \n\
             "
         );
 
 	return shader;
 }
 
-// ** RenderingContext::internRenderTarget
-s32 RenderingContext::internRenderTarget( RenderTargetPtr renderTarget )
-{
-    return m_renderTargets.add( renderTarget );
-}
-
 // ** RenderingContext::renderTarget
-const RenderTargetPtr& RenderingContext::renderTarget( s32 identifier ) const
+const Renderer::RenderTargetPtr& RenderingContext::renderTarget( s32 identifier ) const
 {
-    return m_renderTargets.resolve( identifier );
+    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    return m_renderTargetPool[identifier - 1];
 }
 
 // ** RenderingContext::vertexBuffer
