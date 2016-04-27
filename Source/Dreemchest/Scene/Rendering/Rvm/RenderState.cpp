@@ -85,17 +85,6 @@ RenderState::RenderState( s32 id, TextureSampler sampler )
     texture.sampler = sampler;
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( s32 id, const Rect& viewport )
-    : type( RenderTarget )
-{
-    renderTarget.id = id;
-    renderTarget.viewport[0] = viewport.min().x;
-    renderTarget.viewport[1] = viewport.min().y;
-    renderTarget.viewport[2] = viewport.width();
-    renderTarget.viewport[3] = viewport.height();
-}
-
 // -------------------------------------------------------------------------- RenderStateBlock -------------------------------------------------------------------------- //
 
 // ** RenderStateBlock::RenderStateBlock
@@ -171,12 +160,6 @@ void RenderStateBlock::disableFeatures( u64 bits )
 void RenderStateBlock::setAlphaTest( Renderer::Compare function, f32 reference )
 {
     pushState( RenderState( function, reference ), RenderState::AlphaTest );
-}
-
-// ** RenderStateBlock::setRenderTarget
-void RenderStateBlock::setRenderTarget( s32 id, const Rect& viewport )
-{
-    pushState( RenderState( id, viewport ), RenderState::RenderTarget );
 }
 
 // ** RenderStateBlock::disableBlending

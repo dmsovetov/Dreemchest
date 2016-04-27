@@ -55,11 +55,14 @@ namespace Scene {
         //! Executes a single command buffer.
         void                    execute( const RenderFrame& frame, const RenderCommandBuffer& commands );
 
+        //! Binds a render target with specified viewport and executes a command buffer.
+        void                    renderToTarget( const RenderFrame& frame, RenderResource renderTarget, const u32* viewport, const RenderCommandBuffer& commands );
+
         //! Unrolls a state stack an applies all state changes.
         void                    applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count );
 
-        //! Clears a render target.
-        void                    clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* color, const u32* viewport, u8 mask );
+        //! Clears an active render target
+        void                    clear( const f32* color, f32 depth, s32 stencil, u8 mask );
 
         //! Uploads data to a GPU constant buffer.
         void                    uploadConstantBuffer( u32 id, const void* data, s32 size );
@@ -117,6 +120,7 @@ namespace Scene {
         u64                     m_vertexAttributeFeatures;                  //!< A vertex attribute features.
         u64                     m_resourceFeatures;                         //!< Active resource features.
         ActiveShader            m_activeShader;                             //!< An active shader instance.
+        Stack<const u32*>       m_viewportStack;                            //!< A viewport stack.
     };
 
 } // namespace Scene

@@ -59,13 +59,11 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
         const Transform& transform = *entity.get<Transform>();
 
         // Create a command buffer to render this camera
-        RenderCommandBuffer& cameraCommands = frame.createCommandBuffer();
-        commands.execute( cameraCommands );
+        RenderCommandBuffer& cameraCommands = commands.renderToTarget( camera.viewport() );
 
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         StateScope pass = stateStack.newScope();
-        pass->setRenderTarget( m_context.internRenderTarget( camera.target() ), camera.viewport() );
         pass->bindConstantBuffer( cameraNode.constantBuffer, RenderState::PassConstants );
 
         // Emit render operations for this camera

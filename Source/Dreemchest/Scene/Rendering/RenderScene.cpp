@@ -168,7 +168,9 @@ RenderFrameUPtr RenderScene::captureFrame( void )
 
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         const CameraNode& camera = cameras[i];
-        entryPoint.clear( m_context->internRenderTarget( camera.camera->target() ), camera.camera->clearColor(), camera.camera->viewport(), camera.camera->clearMask() );
+        entryPoint
+            .renderToTarget( camera.camera->viewport() )
+            .clear( camera.camera->clearColor(), camera.camera->clearMask() );
     }
 
     // Process all render systems

@@ -47,7 +47,6 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::AlphaTest]         = &Rvm::switchAlphaTest;
     m_stateSwitches[RenderState::DepthState]        = &Rvm::switchDepthState;
     m_stateSwitches[RenderState::Blending]          = &Rvm::switchBlending;
-    m_stateSwitches[RenderState::RenderTarget]      = &Rvm::switchRenderTarget;
     m_stateSwitches[RenderState::Shader]            = &Rvm::switchShader;
     m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
     m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
@@ -75,6 +74,35 @@ void Rvm::display( const RenderFrameUPtr& frame )
     reset();
 }
 
+// ** Rvm::renderToTarget
+void Rvm::renderToTarget( const RenderFrame& frame, RenderResource renderTarget, const u32* viewport, const RenderCommandBuffer& commands )
+{
+    // Push a render target state
+    if( renderTarget ) {
+        m_context->renderTarget( renderTarget )->begin( m_hal );
+    }
+
+    // Set a viewport before executing an attached command buffer
+    m_viewportStack.push( viewport );
+    m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+
+    // Execute an attached command buffer
+    execute( frame, commands );
+
+    // Pop a render target state
+    if( renderTarget ) {
+        m_context->renderTarget( renderTarget )->end( m_hal );
+    }
+
+    // Pop a viewport
+    m_viewportStack.pop();
+
+    if( m_viewportStack.size() ) {
+        const u32* prev = m_viewportStack.top();
+        m_hal->setViewport( prev[0], prev[1], prev[2], prev[3] );
+    }
+}
+
 // ** Rvm::execute
 void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands )
 {
@@ -84,11 +112,13 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 
         // Perform a draw call
         switch( opCode.type ) {
-        case RenderCommandBuffer::OpCode::Clear:                clearRenderTarget( m_context->renderTarget( opCode.renderTarget.id ), opCode.renderTarget.clearColor, opCode.renderTarget.viewport, opCode.renderTarget.clearMask );
+        case RenderCommandBuffer::OpCode::Clear:                clear( opCode.clear.color, opCode.clear.depth, opCode.clear.stencil, opCode.clear.mask );
                                                                 break;
         case RenderCommandBuffer::OpCode::Execute:              execute( frame, *opCode.execute.commands );
                                                                 break;
         case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+                                                                break;
+        case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.id, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                                 break;
         case RenderCommandBuffer::OpCode::DrawIndexed:          {
                                                                     // Apply rendering states from a stack
@@ -138,17 +168,10 @@ void Rvm::reset( void )
     m_hal->setAlphaTest( Renderer::CompareDisabled );
 }
 
-// ** Rvm::clearRenderTarget
-void Rvm::clearRenderTarget( const RenderTargetPtr& renderTarget, const f32* color, const u32* viewport, u8 clearMask )
+// ** Rvm::clear
+void Rvm::clear( const f32* color, f32 depth, s32 stencil, u8 mask )
 {
-	renderTarget->begin( m_hal );
-	{
-		m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
-		u32 mask = ( clearMask & Camera::ClearColor ? Renderer::ClearColor : 0 ) | ( clearMask & Camera::ClearDepth ? Renderer::ClearDepth : 0 );
-		m_hal->clear( Rgba( color ), 1.0f, 0, mask );
-		m_hal->setViewport( renderTarget->rect() );
-	}
-	renderTarget->end( m_hal );
+    m_hal->clear( Rgba( color ), depth,stencil, mask );
 }
 
 // ** Rvm::uploadConstantBuffer
@@ -246,14 +269,6 @@ void Rvm::switchDepthState( const RenderFrame& frame, const RenderState& state )
 void Rvm::switchBlending( const RenderFrame& frame, const RenderState& state )
 {
     m_hal->setBlendFactors( state.blend.src, state.blend.dst );
-}
-
-// ** Rvm::switchRenderTarget
-void Rvm::switchRenderTarget( const RenderFrame& frame, const RenderState& state )
-{
-    const RenderTargetPtr& rt = m_context->renderTarget( state.renderTarget.id );
-    m_hal->setViewport( state.renderTarget.viewport[0], state.renderTarget.viewport[1], state.renderTarget.viewport[2], state.renderTarget.viewport[3] );
-    rt->begin( m_hal );
 }
 
 // ** Rvm::switchShader

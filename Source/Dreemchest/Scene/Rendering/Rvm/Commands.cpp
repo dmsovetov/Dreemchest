@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Commands.h"
+#include "RenderFrame.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -32,19 +33,23 @@ namespace Scene {
 
 // ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
 
-// ** RenderCommandBuffer::execute
-void RenderCommandBuffer::clear( s32 renderTarget, const Rgba& clearColor, const Rect& viewport, u8 clearMask )
+// ** RenderCommandBuffer::RenderCommandBuffer
+RenderCommandBuffer::RenderCommandBuffer( RenderFrame& frame )
+    : m_frame( frame )
+{
+}
+
+// ** RenderCommandBuffer::clear
+void RenderCommandBuffer::clear( const Rgba& clearColor, u8 clearMask )
 {
     OpCode opCode;
     opCode.type = OpCode::Clear;
     opCode.sorting = 0;
-    opCode.renderTarget.id = renderTarget;
-    opCode.renderTarget.clearMask = clearMask;
-    opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
-    opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
-    opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );
-    opCode.renderTarget.viewport[3] = static_cast<u32>( viewport.height() );
-    memcpy( opCode.renderTarget.clearColor, &clearColor, sizeof opCode.renderTarget.clearColor );
+    opCode.clear.mask = clearMask;
+    opCode.clear.depth = 1.0f;
+    opCode.clear.stencil = 0;
+
+    memcpy( opCode.clear.color, &clearColor, sizeof opCode.clear.color );
     m_commands.push_back( opCode );
 }
 
@@ -56,6 +61,25 @@ void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
     opCode.sorting = 0;
     opCode.execute.commands = &commands;
     m_commands.push_back( opCode );
+}
+
+// ** RenderCommandBuffer::renderToTarget
+RenderCommandBuffer& RenderCommandBuffer::renderToTarget( const Rect& viewport )
+{
+    RenderCommandBuffer& commands = m_frame.createCommandBuffer();
+
+    OpCode opCode;
+    opCode.type = OpCode::RenderTarget;
+    opCode.sorting = 0;
+    opCode.renderTarget.commands = &commands;
+    opCode.renderTarget.id = 0;
+    opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
+    opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
+    opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );
+    opCode.renderTarget.viewport[3] = static_cast<u32>( viewport.height() );
+    m_commands.push_back( opCode );
+
+    return commands;
 }
 
 // ** RenderCommandBuffer::uploadConstantBuffer

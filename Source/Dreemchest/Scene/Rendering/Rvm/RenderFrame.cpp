@@ -52,7 +52,7 @@ RenderCommandBuffer& RenderFrame::entryPoint( void )
 // ** RenderFrame::createCommandBuffer
 RenderCommandBuffer& RenderFrame::createCommandBuffer( void )
 {
-    m_commandBuffers.push_back( DC_NEW RenderCommandBuffer );
+    m_commandBuffers.push_back( DC_NEW RenderCommandBuffer( *this ) );
     return *m_commandBuffers.back().get();
 }
 

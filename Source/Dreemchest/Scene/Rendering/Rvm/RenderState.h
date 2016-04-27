@@ -131,8 +131,7 @@ namespace Scene {
             , InputLayout       = IndexBuffer       + 1                    //!< Binds an input layout.
             , ConstantBuffer    = InputLayout       + 1                    //!< Binds a constant buffer.
             , Shader            = ConstantBuffer    + MaxConstantBuffers   //!< Binds a program instance.
-            , RenderTarget      = Shader            + 1                    //!< Binds a render target.
-            , Blending          = RenderTarget      + 1                    //!< Sets a blend function
+            , Blending          = Shader            + 1                    //!< Sets a blend function
             , DepthState        = Blending          + 1                    //!< Sets a depth test function and a reference value.
             , AlphaTest         = DepthState        + 1                    //!< Sets an alpha test function and a reference value.
             , Texture           = AlphaTest         + 1                    //!< Binds a texture to a sampler #(Type.Texture + index).
@@ -159,9 +158,6 @@ namespace Scene {
 
                                         //! Constructs a blend function render state.
                                         RenderState( s32 id, TextureSampler sampler );
-
-                                        //! Constructs a render target state.
-                                        RenderState( s32 id, const Rect& viewport );
 
         Type                            type;           //!< Render state type.
         union {
@@ -190,12 +186,7 @@ namespace Scene {
             struct {
                 s32                     id;             //!< Texture ID to be bound.
                 TextureSampler          sampler;        //!< A sampler index to bind texture to.
-            } texture;                                  //!< A texture sampler data.
-
-            struct {
-                s32                     id;             //!< Render target identifier.
-                f32                     viewport[4];    //!< A target viewport.
-            } renderTarget;                             //!< A render target state to be set.                              
+            } texture;                                  //!< A texture sampler data.                          
         };
     };
 
@@ -241,9 +232,6 @@ namespace Scene {
 
         //! Sets an alpha test function.
         void                            setAlphaTest( Renderer::Compare function, f32 reference );
-
-        //! Sets a render target.
-        void                            setRenderTarget( s32 id, const Rect& viewport );
 
         //! Disables an alpha testing.
         void                            disableAlphaTest( void );
