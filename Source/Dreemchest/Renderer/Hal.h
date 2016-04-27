@@ -480,14 +480,20 @@ namespace Renderer {
             Position,               //!< Vertex position.
             Normal,                 //!< Vertex normal.
             Color,                  //!< Vertex color.
+            Tangent,                //!< Vertex tangent.
+            Bitangent,              //!< Vertex bitangent.
+            PointSize,              //!< Point sprite size.
             Uv0,                    //!< Texture 0 UV.
             Uv1,                    //!< Texture 1 UV.
             Uv2,                    //!< Texture 2 UV.
             Uv3,                    //!< Texture 3 UV.
             Uv4,                    //!< Texture 4 UV.
-            PointSize,              //!< Point sprite size.
+            Uv5,                    //!< Texture 2 UV.
+            Uv6,                    //!< Texture 3 UV.
+            Uv7,                    //!< Texture 4 UV.
             TotalAttributes,  //!< Total amount of supported vertex attributes.
         };
+
 
         //! Input layout element.
         struct Element {

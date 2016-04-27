@@ -744,7 +744,12 @@ void InputLayout::attributeLocation( Attribute attribute, s32 count, s32 offset 
         BIT( 4 ),
         BIT( 5 ),
         BIT( 6 ),
-        0, 
+        BIT( 7 ),
+        BIT( 8 ),
+        BIT( 9 ),
+        BIT( 10 ),
+        BIT( 11 ),
+        BIT( 12 ),
     };
 
     m_attributes[attribute].count  = count;
