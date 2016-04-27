@@ -1,22 +1,22 @@
 [Features]
-F_NormalAttribute 	= vertexNormal
-F_ColorAttribute  	= vertexColor
+F_VertexNormal 		= vertexNormal
+F_VertexColor  		= vertexColor
 F_AmbientColor	  	= ambientColor
 F_EmissionColor	  	= emissionColor
 F_DiffuseTexture	= texture0
 
 [VertexShader]
-#if defined( F_ColorAttribute )
+#if defined( F_VertexColor )
 varying vec4 v_Color;
-#endif  /*  F_ColorAttribute    */
+#endif  /*  F_VertexColor    */
 
 #if defined( F_DiffuseTexture )
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
 
-#if defined( F_NormalAttribute )
+#if defined( F_VertexNormal )
 varying vec3 v_Normal;
-#endif  /*  F_NormalAttribute    */
+#endif  /*  F_VertexNormal    */
 
 void main()
 {
@@ -24,13 +24,13 @@ void main()
 	
 	gl_Position     = View.transform * vertex;
 	gl_PointSize    = 5;
-#if defined( F_ColorAttribute )
+#if defined( F_VertexColor )
 	v_Color         = gl_Color;
-#endif  /*  F_ColorAttribute    */
+#endif  /*  F_VertexColor    */
 
-#if defined( F_NormalAttribute )
+#if defined( F_VertexNormal )
 	v_Normal        = gl_Normal;
-#endif  /*  F_NormalAttribute    */
+#endif  /*  F_VertexNormal    */
 
 #if defined( F_DiffuseTexture )
 	v_TexCoord0		= gl_MultiTexCoord0.xy;
@@ -38,13 +38,13 @@ void main()
 }     
 
 [FragmentShader]
-#if defined( F_ColorAttribute )
+#if defined( F_VertexColor )
 varying vec4 v_Color;
-#endif  /*  F_ColorAttribute    */
+#endif  /*  F_VertexColor    */
 
-#if defined( F_NormalAttribute )
+#if defined( F_VertexNormal )
 varying vec3 v_Normal;
-#endif  /*  F_NormalAttribute    */
+#endif  /*  F_VertexNormal    */
 
 #if defined( F_DiffuseTexture )
 uniform sampler2D u_DiffuseTexture;
@@ -55,9 +55,9 @@ void main()
 {
 	vec4 diffuseColor = Material.diffuse;
 
-#if defined( F_ColorAttribute )
+#if defined( F_VertexColor )
 	diffuseColor = diffuseColor * v_Color;
-#endif  /*  F_ColorAttribute    */
+#endif  /*  F_VertexColor    */
 
 #if defined( F_DiffuseTexture )
 	diffuseColor = diffuseColor * texture2D( u_DiffuseTexture, v_TexCoord0 );
