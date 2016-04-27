@@ -116,6 +116,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->disable<Scene::MoveAlongAxes>();
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
+    m_camera->get<Scene::Camera>()->setFar( 200.0f );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();

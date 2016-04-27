@@ -89,14 +89,19 @@ namespace Scene {
     //! A total number of available user-defined feature bits.
     enum { MaxUserDefinedFeatureBits = 64 - UserDefinedFeaturesOffset };
 
-    //! Available user-defined shader features. 
-    enum ShaderFeatures {
+    //! Available user-defined shader features used by a scene renderer. 
+    enum SceneShaderFeatures {
           ShaderAmbientColor        = 1 << 0
         , ShaderEmissionColor       = 1 << 1
         , ShaderPointLight          = 1 << 2
         , ShaderSpotLight           = 2 << 2
         , ShaderDirectionalLight    = 3 << 2
         , ShaderFogColor            = 1 << 4
+    };
+
+    //! Available user-defined shader features used by a depth renderer.
+    enum DepthShaderFeatures {
+          ShaderLinearDepth         = BIT( 0 )
     };
 
     // ------------------------------------------------------------------------------------------------

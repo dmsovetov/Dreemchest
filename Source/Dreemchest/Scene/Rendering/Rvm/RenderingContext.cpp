@@ -268,6 +268,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     masks["ambientColor"]   = static_cast<u64>( ShaderAmbientColor )  << UserDefinedFeaturesOffset;
     masks["emissionColor"]  = static_cast<u64>( ShaderEmissionColor ) << UserDefinedFeaturesOffset;
     masks["pointLight"]     = static_cast<u64>( ShaderPointLight )    << UserDefinedFeaturesOffset;
+    masks["linearDepth"]    = static_cast<u64>( ShaderLinearDepth )   << UserDefinedFeaturesOffset;
 
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
