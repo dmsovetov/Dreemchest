@@ -30,7 +30,6 @@
 #include "../Dreemchest.h"
 
 #include <Io/KeyValue.h>
-#include <Io/serialization/Serializable.h>
 #include <Reflection/MetaObject/Property.h>
 #include <Reflection/MetaObject/Class.h>
 #include <Reflection/MetaObject/Assembly.h>
@@ -113,55 +112,10 @@ namespace Ecs {
 		EntityId			m_nextId;
 	};
 
-#if DEV_DEPRECATED_SERIALIZATION
-    //! Ecs serialization context.
-    class SerializationContext : public Composition {
-    public:
-
-                                //! Constructs SerializationContext instance.
-                                SerializationContext( EcsWPtr ecs );
-
-        //! Returns parent entity component system.
-        EcsWPtr                 ecs( void ) const;
-
-        //! Returns an entity by unique id.
-        virtual EntityPtr       findById( const EntityId& id ) const;
-
-        //! Returns an archetype instance by unique id.
-        template<typename TArchetype>
-        StrongPtr<TArchetype>   find( const EntityId& id ) const;
-
-        //! Creates component by name.
-        ComponentPtr            createComponent( const String& name ) const;
-
-        //! Creates entity by class name.
-        EntityPtr               createEntity( const String& name ) const;
-
-    private:
-
-        EcsWPtr                 m_ecs;  //!< Parent entity component system.
-    };
-
-    // ** SerializationContext::find
-    template<typename TArchetype>
-    StrongPtr<TArchetype> SerializationContext::find( const EntityId& id ) const
-    {
-        EntityPtr entity = findById( id );
-        StrongPtr<TArchetype> instance = castTo<TArchetype>( entity.get() );
-        DC_ABORT_IF( !instance.valid(), "archetype mismatch" );
-        return instance;
-    }
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
 	//! Ecs is a root class of an entity component system.
 	class Ecs : public RefCounted {
 	friend class Entity;
 	public:
-
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Creates the component instance by name.
-		ComponentPtr	createComponentByName( const String& name, const Archive* data = NULL ) const;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
     #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Creates the archetype instance by name.
@@ -180,23 +134,11 @@ namespace Ecs {
 		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const;
     #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Creates a new component instance.
-		template<typename TComponent>
-		StrongPtr<TComponent>	createComponent( const Archive* data = NULL ) const;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
     #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Registers the archetype type.
 		template<typename TArchetype>
 		bool			registerArchetype( void );
     #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Registers the component type.
-		template<typename TComponent>
-		bool			registerComponent( void );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Creates a new entity.
 		/*!
@@ -293,11 +235,6 @@ namespace Ecs {
         //! Container type to store modified indices.
         typedef Set<IndexWPtr>              IndexSet;
 
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Data factory type.
-		typedef NamedAbstractFactory<ComponentBase>	ComponentFactory;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
     #if DEV_DEPRECATED_ECS_ARCHETYPES
 		//! Archetype factory type.
 		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
@@ -312,9 +249,6 @@ namespace Ecs {
 		EntitySet						m_removed;	        //!< Entities that will be removed.
         IndexSet                        m_changedIndices;   //!< Indices that were changed.
 
-    #if DEV_DEPRECATED_SERIALIZATION
-		ComponentFactory				m_componentFactory;		//!< Component object factory.
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
     #if DEV_DEPRECATED_ECS_ARCHETYPES
 		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
     #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
@@ -328,15 +262,6 @@ namespace Ecs {
 		return m_archetypeFactory.declare<TArchetype>();
 	}
 #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-#if DEV_DEPRECATED_SERIALIZATION
-	// ** Ecs::registerComponent
-	template<typename TComponent>
-	bool Ecs::registerComponent( void )
-	{
-		return m_componentFactory.declare<TComponent>();
-	}
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 #if DEV_DEPRECATED_ECS_ARCHETYPES
 	// ** Ecs::createArchetype
@@ -352,16 +277,11 @@ namespace Ecs {
     {
         // Serialize source to a key-value archive
         Archive ar;
-    #if DEV_DEPRECATED_SERIALIZATION
-        SerializationContext ctx( const_cast<Ecs*>( this ) );
-        source->serialize( ctx, ar );
-    #else
         EntityWPtr _source = const_cast<TArchetype*>( source.get() );
         KeyValue kv;
         Serializer serializer( const_cast<Ecs*>( this ) );
         serializer.serialize( _source, kv );
         ar = Variant::fromValue( kv );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
         // Create archetype instance
         StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar, assembly );
@@ -383,15 +303,6 @@ namespace Ecs {
 		return result;
 	}
 #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-#if DEV_DEPRECATED_SERIALIZATION
-	// ** Ecs::createComponent
-	template<typename TComponent>
-	StrongPtr<TComponent> Ecs::createComponent( const Archive* data ) const
-	{
-		return static_cast<TComponent*>( createComponentByName( TypeInfo<TComponent>::name(), data ).get() );
-	}
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Ecs
 

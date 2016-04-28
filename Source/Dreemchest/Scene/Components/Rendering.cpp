@@ -84,20 +84,6 @@ void Light::setRange( f32 value )
 	m_range = value;
 }
 
-#if DEV_DEPRECATED_SERIALIZATION
-// ** Light::serialize
-void Light::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
-{
-    DC_NOT_IMPLEMENTED;
-}
-
-// ** Light::deserialize
-void Light::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
-{
-    DC_NOT_IMPLEMENTED;
-}
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
@@ -173,45 +159,6 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 {
 	m_lightmap = value;
 }
-
-#if DEV_DEPRECATED_SERIALIZATION
-// ** StaticMesh::serialize
-void StaticMesh::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
-{
-    VariantArray materials;
-
-    for( u32 i = 0, n = materialCount(); i < n; i++ ) {
-        MaterialHandle m = material( i );
-        materials << (m.isValid() ? m.uniqueId() : "");
-    }
-
-    ar = KvBuilder() << "asset" << (m_mesh.isValid() ? m_mesh.uniqueId() : "") << "materials" << materials;
-}
-
-// ** StaticMesh::deserialize
-void StaticMesh::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
-{
-    Assets::Assets* assets = ctx.get<Assets::Assets>();
-	
-    if( !assets ) {
-        LogError( "staticMesh", "no Assets attached to serialization context.\n" );
-        return;
-    }
-
-    KeyValue     kv        = ar.as<KeyValue>();
-    VariantArray materials = kv.get<VariantArray>( "materials" );
-    const VariantArray::Container& items = materials;
-
-    for( s32 i = 0, n = items.size(); i < n; i++ ) {
-        setMaterial( i, assets->find<Material>( items[i].as<String>() ) );
-    }
-
-    m_mesh = assets->find<Mesh>( kv.get<String>( "asset" ) );
-    if( !m_mesh.isValid() ) {
-        LogWarning( "staticMesh", "unresolved asset '%s'\n", kv.get<String>( "asset" ).c_str() );
-    }
-}
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 // ------------------------------------------- Particles ----------------------------------------- //
 
@@ -485,34 +432,6 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 
 	return Circle( center, radius );
 }
-
-#if DEV_DEPRECATED_SERIALIZATION
-// ** Camera::serialize
-void Camera::serialize( Ecs::SerializationContext& ctx, Archive& ar ) const
-{
-    ar = KvBuilder()
-            << "clearMask" << m_clearMask
-            << "projection" << m_projection
-            << "clearColor" << m_clearColor
-            << "fov" << m_fov
-            << "near" << m_near
-            << "far" << m_far
-            ;
-}
-
-// ** Camera::deserialize
-void Camera::deserialize( Ecs::SerializationContext& ctx, const Archive& ar )
-{
-    KeyValue kv     = ar.as<KeyValue>();
-    m_clearMask     = kv.get<u8>( "clearMask" );
-    //m_projection    = static_cast<Projection>( kv.get<s32>( "projection", Perspective ) );
-    m_projection    = Projection::Perspective;
-    m_clearColor    = kv.get( "clearColor", Rgba() );
-    m_fov           = kv.get( "fov", 60.0f );
-    m_near          = kv.get( "near", 0.01f );
-    m_far           = kv.get( "far", 1000.0f );
-}
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 } // namespace Scene
 

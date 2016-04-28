@@ -54,7 +54,6 @@
 #include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
-#include <Io/JsonLoader.h>
 
 #include <Fx/ParticleSystem.h>
 #include <Fx/Particles.h>
@@ -336,7 +335,6 @@ namespace Scene {
 
 #ifdef HAVE_JSON
 
-#if !DEV_DEPRECATED_SERIALIZATION
     //! Base class for all JSON object loaders.
 	class JsonLoaderBase {
 	public:
@@ -385,9 +383,6 @@ namespace Scene {
 		Loaders						m_loaders;	//!< Object loaders.
 		Json::Value					m_json;		//!< Parsed JSON object.
 	};
-#else
-    typedef Io::JsonLoaderBase JsonLoaderBase;
-#endif
 
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader : public JsonLoaderBase {

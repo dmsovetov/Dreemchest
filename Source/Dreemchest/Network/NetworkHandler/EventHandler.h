@@ -65,11 +65,7 @@ namespace Network {
 	template<typename T>
 	inline bool EventHandler<T>::handle( ConnectionWPtr connection, const Packets::Event& packet )
 	{
-    #if DEV_DEPRECATED_SERIALIZATION
-        T event = Io::BinarySerializer::read<T>( packet.payload );
-    #else
         T event = Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
         m_eventEmitter->notify( event );
 		return true;
 	}

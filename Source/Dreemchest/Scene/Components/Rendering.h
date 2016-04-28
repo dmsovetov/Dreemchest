@@ -124,16 +124,6 @@ namespace Scene {
 		//! Sets the light influence range.
 		void						setRange( f32 value );
 
-    protected:
-
-    #if DEV_DEPRECATED_SERIALIZATION
-        //! Writes the light data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
-
-		//! Reads the light data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
 	private:
 
 		LightType				    m_type;			//!< Light type.
@@ -187,16 +177,6 @@ namespace Scene {
 
 		//! Sets a lightmap texture.
 		void						setLightmap( const Renderer::TexturePtr& value );
-
-    protected:
-
-    #if DEV_DEPRECATED_SERIALIZATION
-        //! Writes the static mesh data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
-
-		//! Reads the static mesh data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 
@@ -352,16 +332,6 @@ namespace Scene {
 
 		//! Projects the bounding sphere to a screen space.
 		Circle						sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
-
-    protected:
-
-    #if DEV_DEPRECATED_SERIALIZATION
-        //! Writes the camera data to a key-value archive.
-		virtual void                serialize( Ecs::SerializationContext& ctx, Archive& ar ) const NIMBLE_OVERRIDE;
-
-		//! Reads the camera data from a key-value archive.
-		virtual void		        deserialize( Ecs::SerializationContext& ctx, const Archive& ar ) NIMBLE_OVERRIDE;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 	private:
 

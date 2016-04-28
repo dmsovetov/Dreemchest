@@ -33,13 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-
-#if DEV_DEPRECATED_SERIALIZATION
-    typedef Io::Serializable EntitySuperClass;
-#else
-    typedef RefCounted EntitySuperClass;
-#endif  /*  #if !DEV_DEPRECATED_SERIALIZATION    */
-
 	//! Entity handle contains an entity id & parent world.
 	/*!
 	Entity is just a unique ID that tags each game-object as a separate
@@ -47,11 +40,9 @@ namespace Ecs {
 	game data. Entity's behaviour in a game world is defined by a set of
 	data components.
 	*/
-	class Entity : public EntitySuperClass {
+	class Entity : public RefCounted {
 	friend class Ecs;
-    #if !DEV_DEPRECATED_SERIALIZATION
-        friend class Serializer;
-    #endif  /*  #if !DEV_DEPRECATED_SERIALIZATION    */
+    friend class Serializer;
 
         INTROSPECTION_ABSTRACT( Entity
             , PROPERTY( flags, flags, setFlags, "The entity flags." )
@@ -67,10 +58,6 @@ namespace Ecs {
             , Serializable  = BIT( 2 )  //!< Marks this entity as serializable.
 			, TotalFlags    = 3		    //!< Total number of entity flags.
 		};
-
-                            #if DEV_DEPRECATED_SERIALIZATION
-								ClassEnableTypeInfoSuper( Entity, Io::Serializable )
-                            #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Container type to store components.
 		typedef Map<TypeIdx, ComponentPtr> Components;
@@ -140,24 +127,6 @@ namespace Ecs {
         virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
-    #ifndef DC_ECS_NO_SERIALIZATION
-
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Reads archetype from a storage.
-		virtual void		    read( const Io::Storage* storage ) DC_DECL_OVERRIDE;
-
-		//! Writes archetype to a storage.
-		virtual void		    write( Io::Storage* storage ) const DC_DECL_OVERRIDE;
-
-		//! Writes this entity to a key-value archive.
-		virtual void            serialize( SerializationContext& ctx, Archive& ar ) const;
-
-		//! Reads this entity from a key-value archive.
-		virtual void		    deserialize( SerializationContext& ctx, const Archive& ar );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
-    #endif  /*  !DC_ECS_NO_SERIALIZATION    */
-
 	#ifndef DC_CPP11_DISABLED
 		//! Constructs a new component and attaches it to this entity.
 		template<typename TComponent, typename ... Args>
@@ -204,7 +173,6 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::has( void ) const
 	{
-	//	DC_BREAK_IF( m_flags.is( Removed ) );
 		Components::const_iterator i = m_components.find( ComponentBase::typeId<TComponent>() );
 		return i == m_components.end() ? NULL : static_cast<TComponent*>( i->second.get() );
 	}
@@ -213,19 +181,11 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::get( void ) const
 	{
-	//	DC_BREAK_IF( m_flags.is( Removed ) );
-
 		TypeIdx idx = ComponentBase::typeId<TComponent>();
 		Components::const_iterator i = m_components.find( idx );
 		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
-    //#if DEV_DEPRECATED_SERIALIZATION
-    //    TComponent* result = castTo<TComponent>( i->second.get() );
-	//	DC_ABORT_IF( result == NULL, "component type mismatch" );
-    //#else
         TComponent* result = static_cast<TComponent*>( i->second.get() );
-    //#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
 		return result;
 	}
 

@@ -38,21 +38,8 @@ namespace Ecs {
 	class ArchetypeBase : public Entity {
 	public:
 
-                        #if DEV_DEPRECATED_SERIALIZATION
-							ClassEnableTypeInfoSuper( ArchetypeBase, Entity )
-                        #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
 		//! Constructs archetype instance by adding all components.
 		virtual void		construct( void ) = 0;
-
-	#ifndef DC_ECS_NO_SERIALIZATION
-
-    #if DEV_DEPRECATED_SERIALIZATION
-		//! Constructs archetype instance before deserialization.
-		virtual void		deserialize( SerializationContext& ctx, const Archive& value ) DC_DECL_OVERRIDE;
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
-	#endif	/*	!DC_ECS_NO_SERIALIZATION	*/
 	};
 
 	//! Generic archetype class to declare archetypes.
@@ -60,11 +47,7 @@ namespace Ecs {
 	class Archetype : public ArchetypeBase {
 	public:
 
-                                    #if DEV_DEPRECATED_SERIALIZATION
-										ClassEnableTypeInfoSuper( TArchetype, ArchetypeBase )
-                                    #else
                                     CString typeName( void ) const { return TypeInfo<TArchetype>::name(); }
-                                    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
 		//! Weak pointer type.
 		typedef WeakPtr<TArchetype>		WPtr;

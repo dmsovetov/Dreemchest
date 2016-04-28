@@ -248,10 +248,7 @@ void EntityInspector::setHasChanges( bool value )
 Archive EntityInspector::saveState( void ) const
 {
     Archive state;
-#if DEV_DEPRECATED_SERIALIZATION
-    Ecs::SerializationContext ctx( m_entity->ecs() );
-    m_entity->serialize( ctx, state );
-#else
+#if 0
     Ecs::Serializer serializer( m_entity->ecs(), Ecs::Aspect::expandComponentBits<Editors::SceneEditorInternal>() );
     Reflection::AssemblyPtr assembly = Reflection::Assembly::create();
 
@@ -272,14 +269,16 @@ Archive EntityInspector::saveState( void ) const
         serializer.serialize( e, ar );
         LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
     }
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+#else
+    LogError( "entityInspector", "saveState is not implemented\n" );
+#endif
     return state;
 }
 
 // ** EntityInspector::restoreState
 void EntityInspector::restoreState( const Archive& state )
 {
-#if DEV_DEPRECATED_SERIALIZATION
+#if 0
     // Remove all components from entity
     m_entity->clear();
 
@@ -288,7 +287,7 @@ void EntityInspector::restoreState( const Archive& state )
     m_entity->deserialize( ctx, state );
 #else
     LogError( "entityInspector", "entity deserialization is not implemented\n" );
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
+#endif
 }
 
 // ** EntityInspector::buildComponentList
