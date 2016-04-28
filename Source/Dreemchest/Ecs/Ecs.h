@@ -237,6 +237,9 @@ namespace Ecs {
 		//! Returns the entity index instance by it's aspect or creates a new one.
 		IndexPtr		requestIndex( const String& name, const Aspect& aspect );
 
+        //! Rebuilds the specified index.
+        void            rebuildIndex( IndexWPtr index );
+
 		//! Removes an entity by it's id.
 		void			removeEntity( const EntityId& id );
 
@@ -272,9 +275,6 @@ namespace Ecs {
 
 		//! Notifies the ECS about an entity changes.
 		void			notifyEntityChanged( const EntityId& id );
-
-        //! Rebuilds the specified index.
-        void            rebuildIndex( IndexWPtr index );
 
 		//! Generates the unique entity id.
 		EntityId		generateId( void ) const;
