@@ -47,7 +47,6 @@
 #include <Assets/AssetSource.h>
 
 #include <Ecs/Entity/Entity.h>
-#include <Ecs/Entity/Archetype.h>
 #include <Ecs/Component/Component.h>
 #include <Ecs/System/GenericEntitySystem.h>
 #include <Ecs/System/ImmutableEntitySystem.h>
@@ -503,7 +502,6 @@ DC_END_DREEMCHEST
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/CullingSystems.h"
-	#include "Archetypes/Camera.h"
 	#include "Rendering/RenderTarget.h"
 	#include "Rendering/RenderingContext.h"
 	#include "Rendering/RenderingSystem.h"

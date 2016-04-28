@@ -58,9 +58,6 @@ namespace Ecs {
 	dcDeclarePtrs( EntityIdGenerator )
 	dcDeclarePtrs( Entity )
 	dcDeclareNamedPtrs( ComponentBase, Component )
-#if DEV_DEPRECATED_ECS_ARCHETYPES
-	dcDeclareNamedPtrs( ArchetypeBase, Archetype )
-#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 	dcDeclarePtrs( Index )
 	dcDeclarePtrs( System )
 	dcDeclarePtrs( SystemGroup )
@@ -116,29 +113,6 @@ namespace Ecs {
 	class Ecs : public RefCounted {
 	friend class Entity;
 	public:
-
-    #if DEV_DEPRECATED_ECS_ARCHETYPES
-		//! Creates the archetype instance by name.
-		ArchetypePtr	createArchetypeByName( const String& name, const EntityId& id = EntityId(), const Archive* data = NULL, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
-
-        //! Creates a new archetype instance.
-		template<typename TArchetype>
-		StrongPtr<TArchetype>	createArchetype( const EntityId& id = EntityId(), const Archive* data = NULL, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
-
-        //! Clones an archetype instance.
-        template<typename TArchetype>
-        StrongPtr<TArchetype>   cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source, Reflection::AssemblyWPtr assembly = Reflection::AssemblyWPtr() ) const;
-
-		//! Creates an array of archetype instances from data.
-		template<typename TArchetype>
-		Array<StrongPtr<TArchetype>>	createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const;
-    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-    #if DEV_DEPRECATED_ECS_ARCHETYPES
-		//! Registers the archetype type.
-		template<typename TArchetype>
-		bool			registerArchetype( void );
-    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 		//! Creates a new entity.
 		/*!
@@ -235,11 +209,6 @@ namespace Ecs {
         //! Container type to store modified indices.
         typedef Set<IndexWPtr>              IndexSet;
 
-    #if DEV_DEPRECATED_ECS_ARCHETYPES
-		//! Archetype factory type.
-		typedef NamedAbstractFactory<ArchetypeBase>	ArchetypeFactory;
-    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
 		mutable EntityIdGeneratorPtr	m_entityId;	//!< Used for unique entity id generation.
 		Entities						m_entities;	//!< Active entities reside here.
 		SystemGroups					m_systems;	//!< All systems reside in system groups.
@@ -248,61 +217,7 @@ namespace Ecs {
 		EntitySet						m_changed;	        //!< Entities that was changed.
 		EntitySet						m_removed;	        //!< Entities that will be removed.
         IndexSet                        m_changedIndices;   //!< Indices that were changed.
-
-    #if DEV_DEPRECATED_ECS_ARCHETYPES
-		ArchetypeFactory				m_archetypeFactory;		//!< Archetype object factory.
-    #endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 	};
-
-#if DEV_DEPRECATED_ECS_ARCHETYPES
-	// ** Ecs::registerArchetype
-	template<typename TArchetype>
-	bool Ecs::registerArchetype( void )
-	{
-		return m_archetypeFactory.declare<TArchetype>();
-	}
-#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
-#if DEV_DEPRECATED_ECS_ARCHETYPES
-	// ** Ecs::createArchetype
-	template<typename TArchetype>
-	StrongPtr<TArchetype> Ecs::createArchetype( const EntityId& id, const Archive* data, Reflection::AssemblyWPtr assembly ) const
-	{
-		return static_cast<TArchetype*>( createArchetypeByName( TypeInfo<TArchetype>::name(), id, data, assembly ).get() );
-	}
-
-    // ** Ecs::cloneArchetype
-    template<typename TArchetype>
-    StrongPtr<TArchetype> Ecs::cloneArchetype( const EntityId& id, WeakPtr<const TArchetype> source, Reflection::AssemblyWPtr assembly ) const
-    {
-        // Serialize source to a key-value archive
-        Archive ar;
-        EntityWPtr _source = const_cast<TArchetype*>( source.get() );
-        KeyValue kv;
-        Serializer serializer( const_cast<Ecs*>( this ) );
-        serializer.serialize( _source, kv );
-        ar = Variant::fromValue( kv );
-
-        // Create archetype instance
-        StrongPtr<TArchetype> instance = createArchetype<TArchetype>( id, &ar, assembly );
-
-        return instance;
-    }
-
-	// ** Ecs::createArchetypes
-    template<typename TArchetype>
-	Array<StrongPtr<TArchetype>> Ecs::createArchetypes( const Archives& data, Reflection::AssemblyWPtr assembly ) const
-	{
-		Array<StrongPtr<TArchetype>> result;
-
-		for( s32 i = 0, n = data.size(); i < n; i++ ) {
-            const Archive& item = data[i];
-			result.push_back( createArchetype<TArchetype>( item.as<KeyValue>()["id"].as<Guid>(), &item, assembly ) );
-		}
-
-		return result;
-	}
-#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
 
 } // namespace Ecs
 
@@ -314,7 +229,6 @@ DC_END_DREEMCHEST
 	#include "Entity/Entity.h"
 	#include "Entity/Aspect.h"
 	#include "Entity/Index.h"
-	#include "Entity/Archetype.h"
 	#include "System/SystemGroup.h"
 	#include "System/GenericEntitySystem.h"
 	#include "System/ImmutableEntitySystem.h"
