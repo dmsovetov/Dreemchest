@@ -35,10 +35,109 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------------------------------- Rvm::IntermediateTargetStack ------------------------------------------------------------------- //
+
+/*!
+    Intermediate target stack is used to convert local indices that are
+    stored in commands to a global index of an intermediate render target.
+*/
+class Rvm::IntermediateTargetStack {
+public:
+
+    //! A maximum number of intermediate render targets that can be hold by a single stack frame.
+    enum { StackFrameSize = 8 };
+
+    //! A maximum number of stack frames that can be pushed during rendering.
+    enum { MaxStackFrames = 8 };
+
+    //! A total size of an intermediate stack size.
+    enum { MaxStackSize = MaxStackFrames * StackFrameSize };
+
+                                //! Constructs an IntermediateTargetStack instance.
+                                IntermediateTargetStack( RenderingContextWPtr context );
+
+    //! Pushes a new stack frame.
+    void                        pushFrame( void );
+
+    //! Pops an active stack frame.
+    void                        popFrame( void );
+
+    //! Returns a render target by a local index.
+    Renderer::RenderTargetWPtr  get( u8 index ) const;
+
+    //! Acquires an intermediate target with a specified parameters and loads it to a local slot.
+    void                        acquire( u8 index, u16 width, u16 height, Renderer::PixelFormat format );
+
+    //! Releases an intermediate target.
+    void                        release( u8 index );
+
+private:
+
+    RenderingContextWPtr        m_context;                      //!< A parent rendering context.
+    RenderResource*             m_stackFrame;                   //!< An active render target stack frame.
+    RenderResource              m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+};
+
+// ** Rvm::IntermediateTargetStack::IntermediateTargetStack
+Rvm::IntermediateTargetStack::IntermediateTargetStack( RenderingContextWPtr context )
+    : m_context( context )
+    , m_stackFrame( m_identifiers )
+{
+    memset( m_identifiers, 0, sizeof m_identifiers );
+}
+
+// ** Rvm::IntermediateTargetStack::pushFrame
+void Rvm::IntermediateTargetStack::pushFrame( void )
+{
+    DC_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
+    m_stackFrame += StackFrameSize;
+}
+
+// ** Rvm::IntermediateTargetStack::popFrame
+void Rvm::IntermediateTargetStack::popFrame( void )
+{
+    DC_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
+
+    // Ensure that all render targets were released
+    for( s32 i = 0; i < StackFrameSize; i++ ) {
+        if( m_stackFrame[i] ) {
+            LogWarning( "rvm", "an intermediate render target was not released before popping a stack frame\n" );
+        }
+    }
+
+    // Pop a stack frame
+    m_stackFrame -= StackFrameSize;
+}
+
+// ** Rvm::IntermediateTargetStack::get
+Renderer::RenderTargetWPtr Rvm::IntermediateTargetStack::get( u8 index ) const
+{
+    DC_ABORT_IF( index == 0, "invalid render target index" );
+    return m_context->intermediateRenderTarget( m_stackFrame[index - 1] );
+}
+
+// ** Rvm::IntermediateTargetStack::acquire
+void Rvm::IntermediateTargetStack::acquire( u8 index, u16 width, u16 height, Renderer::PixelFormat format )
+{
+    DC_ABORT_IF( index == 0, "invalid render target index" );
+    m_stackFrame[index - 1] = m_context->acquireRenderTarget( width, height, format );
+}
+
+// ** Rvm::IntermediateTargetStack::release
+void Rvm::IntermediateTargetStack::release( u8 index )
+{
+    DC_ABORT_IF( index == 0, "invalid render target index" );
+    m_context->releaseRenderTarget( m_stackFrame[index - 1] );
+    m_stackFrame[index - 1] = 0;
+}
+
+// -------------------------------------------------------------------------------- Rvm -------------------------------------------------------------------------------- //
+
 // ** Rvm::Rvm
 Rvm::Rvm( RenderingContextWPtr context )
     : m_context( context )
     , m_hal( context->hal() )
+    , m_intermediateTargets( DC_NEW IntermediateTargetStack( context ) )
 {
     // Reset all state switchers
     memset( m_stateSwitches, 0, sizeof m_stateSwitches );
@@ -75,11 +174,11 @@ void Rvm::display( const RenderFrameUPtr& frame )
 }
 
 // ** Rvm::renderToTarget
-void Rvm::renderToTarget( const RenderFrame& frame, RenderResource renderTarget, const u32* viewport, const RenderCommandBuffer& commands )
+void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const u32* viewport, const RenderCommandBuffer& commands )
 {
     // Push a render target state
     if( renderTarget ) {
-        m_hal->setRenderTarget( m_context->renderTarget( renderTarget ) );
+        m_hal->setRenderTarget( m_intermediateTargets->get( renderTarget ) );
     }
 
     // Set a viewport before executing an attached command buffer
@@ -106,6 +205,10 @@ void Rvm::renderToTarget( const RenderFrame& frame, RenderResource renderTarget,
 // ** Rvm::execute
 void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands )
 {
+    // Push a new frame to an intermediate target stack
+    m_intermediateTargets->pushFrame();
+
+    // Execute all commands inside a buffer
     for( s32 i = 0, n = commands.size(); i < n; i++ ) {
         // Get a render operation at specified index
         const RenderCommandBuffer::OpCode& opCode = commands.opCodeAt( i );
@@ -118,7 +221,11 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                 break;
         case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
-        case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.id, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
+        case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
+                                                                break;
+        case RenderCommandBuffer::OpCode::AcquireRenderTarget:  m_intermediateTargets->acquire( opCode.intermediateRenderTarget.index, opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format );
+                                                                break;
+        case RenderCommandBuffer::OpCode::ReleaseRenderTarget:  m_intermediateTargets->release( opCode.intermediateRenderTarget.index );
                                                                 break;
         case RenderCommandBuffer::OpCode::DrawIndexed:          {
                                                                     // Apply rendering states from a stack
@@ -139,6 +246,9 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
         default:                                                DC_NOT_IMPLEMENTED;
         }
     }
+
+    // Pop a stack frame
+    m_intermediateTargets->popFrame();
 }
 
 // ** Rvm::reset
@@ -323,7 +433,8 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
         const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
         m_hal->setTexture( state.data.index, texture.get() );
     } else {
-        Renderer::Texture2DPtr texture = m_context->renderTarget( -id )->color();
+        DC_BREAK_IF( abs( id ) > 255, "invalid identifier" );
+        Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->color();
         m_hal->setTexture( state.data.index, texture.get() );
     }
 

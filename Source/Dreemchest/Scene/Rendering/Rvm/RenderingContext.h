@@ -56,14 +56,8 @@ namespace Scene {
         //! Queues a texture instance for creation and returns it's index.
         RenderResource                          requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format );
 
-        //! Queues a render target instance for creation and returns it's index.
-        RenderResource                          requestRenderTarget( s32 width, s32 height, Renderer::PixelFormat format );
-
         //! Creates a shader from a file.
         UbershaderPtr                           createShader( const String& fileName ) const;
-
-        //! Returns a render target by an index.
-        const Renderer::RenderTargetPtr&        renderTarget( s32 identifier ) const;
 
         //! Returns a vertex buffer by an index.
         const Renderer::VertexBufferPtr&        vertexBuffer( RenderResource identifier ) const;
@@ -115,8 +109,14 @@ namespace Scene {
         //! Constructs a texture.
         void                                    constructTexture( const ResourceConstructor& constructor );
 
-        //! Constructs a render target.
-        void                                    constructRenderTarget( const ResourceConstructor& constructor );
+        //! Acquires an intermediate render target.
+        RenderResource                          acquireRenderTarget( u16 width, u16 height, Renderer::PixelFormat format );
+
+        //! Releases an intermediate render target.
+        void                                    releaseRenderTarget( RenderResource id );
+
+        //! Returns an intermediate render target.
+        Renderer::RenderTargetWPtr              intermediateRenderTarget( RenderResource id ) const;
 
     private:
 
@@ -129,7 +129,6 @@ namespace Scene {
                 , IndexBuffer       //!< An index buffer will be constructed.
                 , ConstantBuffer    //!< A constant buffer will be constructed.
                 , Texture           //!< A texture will be constructed.
-                , RenderTarget      //!< A render target will be constructed.
                 , TotalConstructors //!< A total number of resource constructor types.
             };
 
@@ -172,8 +171,18 @@ namespace Scene {
         FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;       //!< Allocated constant buffers.
         FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;          //!< Allocated input layouts.
         FixedArray<Renderer::TexturePtr>        m_texturePool;              //!< Allocated textures.
-        FixedArray<Renderer::RenderTargetPtr>   m_renderTargetPool;         //!< Allocated render targets.
         IndexCache<UbershaderPtr>               m_shaders;                  //!< Interned shaders.
+
+        //! A helper struct that hold info about an intermediate render target.
+        struct IntermediateRenderTarget {
+            Renderer::RenderTargetPtr           renderTarget;               //!< A GPU render target instance.
+            u16                                 width;                      //!< Render target width.
+            u16                                 height;                     //!< Render target height.
+            Renderer::PixelFormat               format;                     //!< Render target internal format.
+            bool                                isFree;                     //!< Indicates that this render target is free.
+        };
+
+        Array<IntermediateRenderTarget>         m_renderTargets;            //!< An array of intermediate render targets.
     };
 
 } // namespace Scene

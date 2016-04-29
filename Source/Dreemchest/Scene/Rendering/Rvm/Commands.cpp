@@ -36,6 +36,7 @@ namespace Scene {
 // ** RenderCommandBuffer::RenderCommandBuffer
 RenderCommandBuffer::RenderCommandBuffer( RenderFrame& frame )
     : m_frame( frame )
+    , m_renderTargetIndex( 0 )
 {
 }
 
@@ -64,7 +65,7 @@ void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
 }
 
 // ** RenderCommandBuffer::renderToTarget
-RenderCommandBuffer& RenderCommandBuffer::renderToTarget( RenderResource id, const Rect& viewport )
+RenderCommandBuffer& RenderCommandBuffer::renderToTarget( u8 index, const Rect& viewport )
 {
     RenderCommandBuffer& commands = m_frame.createCommandBuffer();
 
@@ -72,7 +73,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( RenderResource id, con
     opCode.type = OpCode::RenderTarget;
     opCode.sorting = 0;
     opCode.renderTarget.commands = &commands;
-    opCode.renderTarget.id = id;
+    opCode.renderTarget.index = index;
     opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
     opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
     opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );
@@ -80,6 +81,33 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( RenderResource id, con
     m_commands.push_back( opCode );
 
     return commands;
+}
+
+// ** RenderCommandBuffer::acquireRenderTarget
+u8 RenderCommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
+{
+    DC_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
+
+    OpCode opCode;
+    opCode.type = OpCode::AcquireRenderTarget;
+    opCode.sorting = 0;
+    opCode.intermediateRenderTarget.index  = ++m_renderTargetIndex;
+    opCode.intermediateRenderTarget.width  = width;
+    opCode.intermediateRenderTarget.height = height;
+    opCode.intermediateRenderTarget.format = format;
+    m_commands.push_back( opCode );
+
+    return opCode.intermediateRenderTarget.index;
+}
+
+// ** RenderCommandBuffer::releaseRenderTarget
+void RenderCommandBuffer::releaseRenderTarget( u8 index )
+{
+    OpCode opCode;
+    opCode.type = OpCode::ReleaseRenderTarget;
+    opCode.intermediateRenderTarget.index = index;
+    opCode.sorting = 0;
+    m_commands.push_back( opCode );
 }
 
 // ** RenderCommandBuffer::uploadConstantBuffer

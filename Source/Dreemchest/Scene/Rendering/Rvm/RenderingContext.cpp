@@ -52,7 +52,6 @@ void RenderingContext::constructResources( void )
         , &RenderingContext::constructIndexBuffer
         , &RenderingContext::constructConstantBuffer
         , &RenderingContext::constructTexture
-        , &RenderingContext::constructRenderTarget
         , NULL
     };
 
@@ -164,17 +163,6 @@ void RenderingContext::constructTexture( const ResourceConstructor& constructor 
     m_texturePool[constructor.id - 1] = texture;
 }
 
-// ** RenderingContext::constructRenderTarget
-void RenderingContext::constructRenderTarget( const ResourceConstructor& constructor )
-{
-    Renderer::RenderTargetPtr renderTarget = m_hal->createRenderTarget( constructor.texture.width, constructor.texture.height );
-    bool result = renderTarget->setColor( constructor.texture.format );
-    DC_ABORT_IF( !result, "failed to create color render target" );
-
-    // Save a index buffer to a pool
-    m_renderTargetPool[constructor.id - 1] = renderTarget;
-}
-
 // ** RenderingContext::requestInputLayout
 RenderResource RenderingContext::requestInputLayout( const VertexFormat& format )
 {
@@ -229,20 +217,6 @@ RenderResource RenderingContext::requestTexture( const void* data, s32 width, s3
     ResourceConstructor constructor = ResourceConstructor::Texture;
     constructor.id          = m_texturePool.push( NULL ) + 1;
     constructor.texture.data = data;
-    constructor.texture.width = width;
-    constructor.texture.height = height;
-    constructor.texture.format = format;
-
-    m_resourceConstructors.push_back( constructor );
-    return constructor.id;
-}
-
-// ** RenderingContext::requestRenderTarget
-RenderResource RenderingContext::requestRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
-{
-    ResourceConstructor constructor = ResourceConstructor::RenderTarget;
-    constructor.id          = m_renderTargetPool.push( NULL ) + 1;
-    constructor.texture.data = NULL;
     constructor.texture.width = width;
     constructor.texture.height = height;
     constructor.texture.format = format;
@@ -356,11 +330,43 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 	return shader;
 }
 
-// ** RenderingContext::renderTarget
-const Renderer::RenderTargetPtr& RenderingContext::renderTarget( s32 identifier ) const
+// ** RenderingContext::acquireRenderTarget
+RenderResource RenderingContext::acquireRenderTarget( u16 width, u16 height, Renderer::PixelFormat format )
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
-    return m_renderTargetPool[identifier - 1];
+    // Perform a linear search of a render target
+    for( s32 i = 0, n = static_cast<s32>( m_renderTargets.size() ); i < n; i++ ) {
+        IntermediateRenderTarget& intermediate = m_renderTargets[i];
+        if( intermediate.isFree && intermediate.width == width && intermediate.height == height && intermediate.format == format ) {
+            intermediate.isFree = false;
+            return i + 1;
+        }
+    }
+
+    // Not found - create a new one
+    IntermediateRenderTarget intermediate;
+    intermediate.isFree         = false;
+    intermediate.width          = width;
+    intermediate.height         = height;
+    intermediate.format         = format;
+    intermediate.renderTarget   = m_hal->createRenderTarget( width, height );
+    intermediate.renderTarget->setColor( format );
+    m_renderTargets.push_back( intermediate );
+
+    LogVerbose( "renderingContext", "%dx%d render target created\n", width, height );
+
+    return m_renderTargets.size();
+}
+
+// ** RenderingContext::releaseRenderTarget
+void RenderingContext::releaseRenderTarget( RenderResource id )
+{
+    m_renderTargets[id - 1].isFree = true;
+}
+
+// ** RenderingContext::intermediateRenderTarget
+Renderer::RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderResource id ) const
+{
+    return m_renderTargets[id - 1].renderTarget;
 }
 
 // ** RenderingContext::vertexBuffer

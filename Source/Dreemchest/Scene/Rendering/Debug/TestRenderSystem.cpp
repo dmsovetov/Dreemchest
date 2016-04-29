@@ -42,15 +42,29 @@ TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& rend
 // ** TestRenderSystem::emitRenderOperations
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
+    // Render scene to a texture
+    s32 color = commands.acquireRenderTarget( 1024, 1024, Renderer::PixelRgba8 );
+
+    // Render to texture pass
+    {
+        RenderCommandBuffer& cmd = commands.renderToTarget( color, Rect( 0, 0, 1024, 1024 ) );
+        cmd.clear( Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), ~0 );
+        emitStaticMeshes( frame, cmd, stateStack );
+        emitPointClouds( frame, cmd, stateStack );
+    }
+
     // Ambient pass
     {
         StateScope pass = stateStack.newScope();
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
+        pass->bindRenderedTexture( color, RenderState::Texture1 );
 
         emitStaticMeshes( frame, commands, stateStack );
         emitPointClouds( frame, commands, stateStack );
     }
+
+    commands.releaseRenderTarget( color );
 
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();

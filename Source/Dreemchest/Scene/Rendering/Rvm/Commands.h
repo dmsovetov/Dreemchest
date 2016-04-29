@@ -48,6 +48,8 @@ namespace Scene {
                 , Execute               //!< Executes a command buffer.
                 , RenderTarget          //!< Begins rendering to a viewport.
                 , UploadConstantBuffer  //!< Uploads data to a constant buffer.
+                , AcquireRenderTarget   //!< Acquires an intermediate render target.
+                , ReleaseRenderTarget   //!< Releases an intermediate render target.
             };
 
             Type                                type;                       //!< An op code type.
@@ -68,10 +70,17 @@ namespace Scene {
                 } clear;
 
                 struct {
-                    RenderResource              id;                         //!< A render target resource to be activated.
+                    u8                          index;                      //!< A render target resource to be activated.
                     u32                         viewport[4];                //!< A viewport value to be set.
                     const RenderCommandBuffer*  commands;                   //!< A command buffer to be executed after setting a viewport.
                 } renderTarget;
+
+                struct {
+                    u8                          index;                      //!< An intermediate render target handle.
+                    s32                         width;                      //!< A requested render target width.
+                    s32                         height;                     //!< A requested render target height.
+                    Renderer::PixelFormat       format;                     //!< A requested render target format.
+                } intermediateRenderTarget;
 
                 struct {
                     const RenderCommandBuffer*  commands;                   //!< A command buffer to be executed.
@@ -97,8 +106,14 @@ namespace Scene {
         //! Emits a command buffer execution command.
         void                        execute( const RenderCommandBuffer& commands );
 
+        //! Emits an acquire intermediate render target command.
+        u8                          acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format );
+
+        //! Emits a release an intermediate render target command.
+        void                        releaseRenderTarget( u8 index );
+
         //! Emits a rendering to a viewport of a specified render target command.
-        RenderCommandBuffer&        renderToTarget( RenderResource id, const Rect& viewport );
+        RenderCommandBuffer&        renderToTarget( u8 index, const Rect& viewport );
 
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
@@ -116,8 +131,9 @@ namespace Scene {
 
     private:
 
-        RenderFrame&                m_frame;    //!< A parent frame instance.
-        Array<OpCode>               m_commands; //!< An array of recorded commands.
+        RenderFrame&                m_frame;                //!< A parent frame instance.
+        Array<OpCode>               m_commands;             //!< An array of recorded commands.
+        u8                          m_renderTargetIndex;    //!< An intermediate render target index relative to a current stack offset.
     };
 
     // ** RenderCommandBuffer::size
