@@ -55,6 +55,7 @@
 #include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
+#include <Io/streams/Stream.h>
 
 #include <Fx/ParticleSystem.h>
 #include <Fx/Particles.h>
