@@ -260,7 +260,7 @@ void OpenGLHal::setTexture( u32 sampler, Texture *texture )
         return;
     }
 
-    GLenum glType = textureType( texture ? texture : m_samplers[sampler].m_texture );
+    GLenum glType = textureType( texture ? texture : m_samplers[sampler].m_texture.get() );
 
     glActiveTexture( GL_TEXTURE0 + sampler );
     glBindTexture( glType, textureID( texture ) );

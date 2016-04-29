@@ -202,7 +202,7 @@ namespace Renderer {
 
         // ** struct sSampler
         struct sSampler {
-            Texture*    m_texture;
+            TextureWPtr m_texture;
             GLenum      m_wrap;
             GLenum      m_filter;
         };
