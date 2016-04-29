@@ -48,7 +48,6 @@
 #include <Assets/AssetSource.h>
 
 #include <Ecs/Entity/Entity.h>
-#include <Ecs/Entity/Archetype.h>
 #include <Ecs/Entity/DataCache.h>
 #include <Ecs/Component/Component.h>
 #include <Ecs/System/GenericEntitySystem.h>
@@ -56,7 +55,6 @@
 #include <Ecs/System/SystemGroup.h>
 
 #include <Io/DiskFileSystem.h>
-#include <Io/JsonLoader.h>
 
 #include <Fx/ParticleSystem.h>
 #include <Fx/Particles.h>
@@ -611,7 +609,6 @@ namespace Scene {
 
 #ifdef HAVE_JSON
 
-#if !DEV_DEPRECATED_SERIALIZATION
     //! Base class for all JSON object loaders.
 	class JsonLoaderBase {
 	public:
@@ -660,9 +657,6 @@ namespace Scene {
 		Loaders						m_loaders;	//!< Object loaders.
 		Json::Value					m_json;		//!< Parsed JSON object.
 	};
-#else
-    typedef Io::JsonLoaderBase JsonLoaderBase;
-#endif
 
 	//! Loads the scene from JSON file.
 	class JsonSceneLoader : public JsonLoaderBase {
@@ -785,8 +779,6 @@ DC_END_DREEMCHEST
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/CullingSystems.h"
-	#include "Archetypes/Camera.h"
-
     #if DEV_DEPRECATED_SCENE_RENDERER
         #include "Rendering/RenderScene.h"
         #include "Rendering/RenderAssets.h"

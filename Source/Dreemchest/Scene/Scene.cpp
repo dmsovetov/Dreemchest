@@ -184,14 +184,6 @@ Scene::Scene( void )
     addSystem<FrustumCullingSystem>( m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() ) );
     #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 #endif  /*  !DEV_DISABLE_CULLING    */
-		
-#if DEV_DEPRECATED_SERIALIZATION
-    // Register component types
-    m_ecs->registerComponent<Identifier>();
-    m_ecs->registerComponent<StaticMesh>();
-    m_ecs->registerComponent<Camera>();
-    m_ecs->registerComponent<Transform>();
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 }
 
 // ** Scene::update
@@ -804,7 +796,6 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 	}
 }
 
-#if !DEV_DEPRECATED_SERIALIZATION
 // ** JsonLoaderBase::load
 bool JsonLoaderBase::load( const String& json )
 {
@@ -886,7 +877,6 @@ Array<f32> JsonLoaderBase::readFloats( const Json::Value& value )
 
 	return result;
 }
-#endif  /*  !DEV_DEPRECATED_SERIALIZATION   */
 
 #endif	/*	HAVE_JSON	*/
 

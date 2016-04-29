@@ -27,7 +27,7 @@
 #ifndef __DC_Io_KeyValue_H__
 #define __DC_Io_KeyValue_H__
 
-#include "serialization/Serializable.h"
+#include "Io.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -102,24 +102,6 @@ namespace Io {
 
         StreamPtr   m_stream;   //!< The source binary stream.
     };
-
-#if DEV_DEPRECATED_SERIALIZATION
-	template<>
-	inline KeyValue BinarySerializer::read( const Array<u8>& bytes )
-	{
-		KeyValue data;
-
-		if( bytes.empty() ) {
-			return data;
-		}
-
-        Variant value;
-		BinaryStorage storage( ByteBuffer::createFromData( &bytes[0], bytes.size() ) );
-		BinaryVariantStream( storage.isBinaryStorage()->stream() ).read( value );
-
-		return value.as<KeyValue>();
-	}
-#endif
 
 } // namespace Io
 

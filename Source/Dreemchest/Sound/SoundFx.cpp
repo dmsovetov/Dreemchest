@@ -60,6 +60,10 @@ SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener )
     case Default:   
                     #ifdef DC_HAVE_OPENAL
                         m_hal = DC_NEW OpenAL;
+                        if( !m_hal->initialize() ) {
+                            LogError( "sfx", "failed to create OpenAL backend, fallback to default\n" );
+                            m_hal = DC_NEW SoundEngine;
+                        }
                     #else
                         LogError( "sfx", "the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
                     #endif

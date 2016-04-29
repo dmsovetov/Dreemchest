@@ -49,12 +49,6 @@ namespace Io {
 		class ByteBuffer;
 		class PackedStream;
 
-	class Storage;
-		class BinaryStorage;
-    #if DC_DEPRECATED_FEATURE
-		class KeyValueStorage;
-    #endif  /*  DC_DEPRECATED_FEATURE   */
-
     //! Available stream open modes.
     enum StreamMode {
         BinaryReadStream,     //!< Open binary stream for reading.
@@ -91,7 +85,6 @@ namespace Io {
 	//! List of field serializer ptrs.
 	typedef List<SerializerPtr> SerializerList;
 
-#if !DEV_DEPRECATED_SERIALIZATION
     //! Abstract class interface to be implemented by a streamable types.
     class Streamable : public RefCounted {
     public:
@@ -104,12 +97,6 @@ namespace Io {
         //! Writes fields of a Streamable object to an output Stream.
         virtual void        deserialize( Io::StreamWPtr stream ) NIMBLE_ABSTRACT;
     };
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
-#if DC_DEPRECATED_FEATURE
-	//! Key-value storage strong ptr.
-	typedef StrongPtr<KeyValueStorage> KeyValueStoragePtr;
-#endif
 
 } // namespace Io
 
@@ -118,10 +105,6 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
 	#include "streams/FileStream.h"
     #include "streams/ByteBuffer.h"
-	#include "serialization/BinarySerializer.h"
-    #include "serialization/Storage.h"
-	#include "serialization/Serializer.h"
-    #include "serialization/Serializable.h"
 	#include "FileSystem.h"
 	#include "Archive.h"
     #include "DiskFileSystem.h"

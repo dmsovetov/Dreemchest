@@ -200,14 +200,7 @@ namespace Network {
 	template<typename TRemoteProcedure>
 	void Connection::invokeVoid( const typename TRemoteProcedure::Argument& argument )
 	{
-    #if DEV_DEPRECATED_SERIALIZATION
-		// ** Serialize argument to a byte buffer.
-		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
-    #else
         Io::ByteBufferPtr buffer = Private::writeToStream( argument );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-
-		// ** Send an RPC request
 		send<Packets::RemoteCall>( 0, TRemoteProcedure::id(), 0, buffer->array() );
 	}
 
@@ -215,20 +208,15 @@ namespace Network {
 	template<typename TRemoteProcedure>
 	void Connection::invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback )
 	{
-    #if DEV_DEPRECATED_SERIALIZATION
-		// ** Serialize argument to a byte buffer.
-		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( argument );
-    #else
         Io::ByteBufferPtr buffer = Private::writeToStream( argument );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
-		// ** Send an RPC request
+		// Send an RPC request
 		u16     remoteCallId = m_nextRemoteCallId++;
         TypeId  returnTypeId = TypeInfo<typename TRemoteProcedure::Response>::id();
         
 		send<Packets::RemoteCall>( remoteCallId, TRemoteProcedure::id(), returnTypeId, buffer->array() );
 		
-		// ** Create a response handler.
+		// Create a response handler.
 		m_pendingRemoteCalls[remoteCallId] = PendingRemoteCall( TRemoteProcedure::name(), DC_NEW RemoteResponseHandler<typename TRemoteProcedure::Response>( callback ) );
 	}
 
@@ -236,14 +224,10 @@ namespace Network {
 	template<typename TEvent>
 	void Connection::emit( const TEvent& e )
 	{
-    #if DEV_DEPRECATED_SERIALIZATION
-		// ** Serialize event to a byte buffer.
-		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
-    #else
+		// Serialize event to a byte buffer.
         Io::ByteBufferPtr buffer = Private::writeToStream( e );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
-		// ** Send the packet
+		// Send the packet
 		send<Packets::Event>( TypeInfo<TEvent>::id(), buffer->array() );
 	}
 
@@ -251,17 +235,13 @@ namespace Network {
 	template<typename T>
 	inline bool Response<T>::operator()( const T& value, const Error& error )
 	{
-    #if DEV_DEPRECATED_SERIALIZATION
-		// ** Serialize argument to a byte buffer.
-		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( value );
-    #else
+		// Serialize argument to a byte buffer.
         Io::ByteBufferPtr buffer = Private::writeToStream( value );
-    #endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
 
-		// ** Send an RPC response packet.
+		// Send an RPC response packet.
 		m_connection->send<Packets::RemoteCallResponse>( m_id, error, TypeInfo<T>::id(), buffer->array() );
 
-		// ** Mark this response as sent.
+		// Mark this response as sent.
 		m_wasSent = true;
 
 		return true;

@@ -50,6 +50,12 @@ SoundEngine::~SoundEngine( void )
 
 }
 
+// ** SoundEngine::initialize
+bool SoundEngine::initialize( void )
+{
+    return true;
+}
+
 // ** SoundEngine::createSource
 SoundSourcePtr SoundEngine::createSource( void )
 {
@@ -60,6 +66,26 @@ SoundSourcePtr SoundEngine::createSource( void )
 SoundBufferPtr SoundEngine::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 {
     return SoundBufferPtr();
+}
+
+// ** SoundEngine::setVolume
+void SoundEngine::setVolume( f32 value )
+{
+}
+
+// ** SoundEngine::setPitch
+void SoundEngine::setPitch( f32 value )
+{
+}
+
+// ** SoundEngine::setPosition
+void SoundEngine::setPosition( const Vec3& value )
+{
+}
+
+// ** SoundEngine::setDistanceModel
+void SoundEngine::setDistanceModel( DistanceModel value )
+{
 }
 
 // ** SoundEngine::createSoundDecoder
