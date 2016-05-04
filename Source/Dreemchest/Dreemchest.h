@@ -79,7 +79,6 @@
 	#include <Scene/Scene.h>
 	#include <Renderer/Renderer.h>
 	#include <Sound/Sound.h>
-	#include <Mvvm/Mvvm.h>
 	#include <Fx/Fx.h>
 #endif
 
