@@ -1053,6 +1053,8 @@ bool OpenGLRenderTarget::check( void ) const
 	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
+    DC_BREAK_IF( status != GL_FRAMEBUFFER_COMPLETE );
+
 	return status == GL_FRAMEBUFFER_COMPLETE;
 }
 
@@ -1075,6 +1077,8 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachmen
 	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
     if( attachment == Depth ) {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id(), 0 );
+        glDrawBuffer( GL_NONE );
+        glReadBuffer( GL_NONE );
     } else {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (attachment - 1), GL_TEXTURE_2D, texture->id(), 0 );
     }
