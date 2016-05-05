@@ -69,9 +69,17 @@ void Ubershader::setFragment( const String& value )
 // ** Ubershader::addFeature
 void Ubershader::addFeature( Bitmask mask, const String& name )
 {
+    u32 offset = 0;
+    for( offset = 0; offset < sizeof Bitset * 8; offset++ ) {
+        if( (static_cast<u64>( 1 ) << offset & mask) != 0 ) {
+            break;
+        }
+    }
+
 	Feature feature;
-	feature.mask = mask;
-	feature.name = name;
+	feature.mask   = mask;
+	feature.name   = name;
+    feature.offset = offset;
 	m_features.push_back( feature );
     m_supportedFeatures = m_supportedFeatures | mask;
 }
@@ -116,7 +124,7 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
         const Feature& feature = this->feature( i );
 
 		if( feature.mask & features ) {
-			macro += "#define " + feature.name + "\n";
+			macro += "#define " + feature.name + " " + toString( (feature.mask & features) >> feature.offset ) + "\n";
             if( debug.length() ) debug += ", ";
             debug += feature.name;
 		}

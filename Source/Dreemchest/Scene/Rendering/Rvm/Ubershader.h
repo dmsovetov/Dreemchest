@@ -44,6 +44,7 @@ namespace Scene {
 		struct Feature {
 			Bitmask			        mask;   //!< Feature mask.
 			String					name;   //!< Feature name.
+            s32                     offset; //!< A feature mask offset.
 		};
 
                                     //! Constructs an Ubershader instance.
