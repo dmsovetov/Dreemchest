@@ -217,7 +217,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
         node.parameters->intensity = node.light->intensity();
         node.parameters->color     = node.light->color();
         node.parameters->range     = node.light->range();
-        node.parameters->direction = -node.transform->axisZ();
+        node.parameters->direction = node.transform->axisZ();
         node.parameters->cutoff    = cosf( radians( node.light->cutoff() ) );
         commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::Light );
     }
