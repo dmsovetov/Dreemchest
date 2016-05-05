@@ -1,3 +1,5 @@
+// shadertype=glsl
+
 [VertexShader]
 void main()
 {

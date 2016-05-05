@@ -1,3 +1,5 @@
+// shadertype=glsl
+
 [Features]
 F_LinearDepth = linearDepth
 
