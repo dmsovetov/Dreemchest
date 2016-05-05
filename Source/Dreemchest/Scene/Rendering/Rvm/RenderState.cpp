@@ -84,11 +84,11 @@ RenderState::RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst )
 }
 
 // ** RenderState::RenderState
-RenderState::RenderState( s32 id, TextureSampler sampler )
+RenderState::RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment )
     : type( Texture )
 {
     resourceId = id;
-    data.index = sampler;
+    data.index = sampler | (attachment << 4);
 }
 
 // -------------------------------------------------------------------------- RenderStateBlock -------------------------------------------------------------------------- //
@@ -139,9 +139,9 @@ void RenderStateBlock::bindTexture( s32 id, RenderState::TextureSampler sampler 
 }
 
 // ** RenderStateBlock::bindRenderedTexture
-void RenderStateBlock::bindRenderedTexture( s32 id, RenderState::TextureSampler sampler )
+void RenderStateBlock::bindRenderedTexture( u8 renderTarget, RenderState::TextureSampler sampler, Renderer::RenderTarget::Attachment attachment )
 {
-    pushState( RenderState( -id, sampler ), RenderState::Texture + sampler );
+    pushState( RenderState( -renderTarget, sampler, attachment ), RenderState::Texture + sampler );
 }
 
 // ** RenderStateBlock::setBlend

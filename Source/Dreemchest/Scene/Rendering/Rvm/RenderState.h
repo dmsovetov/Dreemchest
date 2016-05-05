@@ -171,7 +171,7 @@ namespace Scene {
                                         RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst );
 
                                         //! Constructs a blend function render state.
-                                        RenderState( s32 id, TextureSampler sampler );
+                                        RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Depth );
 
         union {
             u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
@@ -194,7 +194,7 @@ namespace Scene {
     public:
 
         //! A maximum number of states that can be stored inside a single block.
-        enum { MaxStates = 5 };
+        enum { MaxStates = 6 };
 
                                         //! Constructs a RenderStateBlock block.
                                         RenderStateBlock( void );
@@ -218,7 +218,7 @@ namespace Scene {
         void                            bindTexture( s32 id, RenderState::TextureSampler sampler );
 
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture( s32 id, RenderState::TextureSampler sampler );
+        void                            bindRenderedTexture( u8 renderTarget, RenderState::TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Color0 );
 
         //! Sets a blend function.
         void                            setBlend( Renderer::BlendFactor src, Renderer::BlendFactor dst );

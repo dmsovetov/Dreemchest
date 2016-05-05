@@ -435,8 +435,9 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
         m_hal->setTexture( state.data.index, texture.get() );
     } else {
         DC_BREAK_IF( abs( id ) > 255, "invalid identifier" );
-        Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->color();
-        m_hal->setTexture( state.data.index, texture.get() );
+        Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTarget::Attachment>( state.data.index >> 4 ) );
+        DC_BREAK_IF( !texture.valid(), "invalid render target attachment" );
+        m_hal->setTexture( state.data.index & 0xF, texture.get() );
     }
 
     // Update resource features
