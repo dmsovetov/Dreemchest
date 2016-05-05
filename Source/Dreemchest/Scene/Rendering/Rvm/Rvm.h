@@ -97,6 +97,9 @@ namespace Scene {
         //! Binds a texture to a sampler.
         void                        switchTexture( const RenderFrame& frame, const RenderState& state );
 
+        //! Sets a cull face mode.
+        void                        switchCullFace( const RenderFrame& frame, const RenderState& state );
+
     private:
 
         //! State switcher function callback.

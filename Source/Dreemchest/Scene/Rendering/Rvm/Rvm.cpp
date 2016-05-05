@@ -152,6 +152,7 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::IndexBuffer]       = &Rvm::switchIndexBuffer;
     m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
     m_stateSwitches[RenderState::Texture]           = &Rvm::switchTexture;
+    m_stateSwitches[RenderState::CullFace]          = &Rvm::switchCullFace;
 }
 
 // ** Rvm::create
@@ -440,6 +441,12 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
 
     // Update resource features
     m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + SamplerFeaturesOffset));
+}
+
+// ** Rvm::switchCullFace
+void Rvm::switchCullFace( const RenderFrame& frame, const RenderState& state )
+{
+    m_hal->setCulling( static_cast<Renderer::TriangleFace>( state.cullFace ) );
 }
 
 } // namespace Scene

@@ -144,7 +144,8 @@ namespace Scene {
             , Blending          = Shader            + 1                     //!< Sets a blend function
             , DepthState        = Blending          + 1                     //!< Sets a depth test function and a reference value.
             , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
-            , Texture           = AlphaTest         + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
+            , CullFace          = AlphaTest         + 1                     //!< Sets a cull face mode.
+            , Texture           = CullFace          + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
             , TotalStates       = Texture           + MaxTextureSamplers    //!< A total number of available render states.
         };
 
@@ -153,6 +154,9 @@ namespace Scene {
 
                                         //! Constructs a RenderState instance of specified type.
                                         RenderState( Type type, s32 id );
+
+                                        //! Constructs a cull face render state instance.
+                                        RenderState( Renderer::TriangleFace face );
 
                                         //! Constructs a depth render state instance.
                                         RenderState( Renderer::Compare function, bool write );
@@ -172,6 +176,7 @@ namespace Scene {
         union {
             u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
+            u16                         cullFace;           //!< A face value.
         };
 
         union {
@@ -229,6 +234,9 @@ namespace Scene {
 
         //! Sets an alpha test function.
         void                            setAlphaTest( Renderer::Compare function, f32 reference );
+
+        //! Sets a cull face side.
+        void                            setCullFace( Renderer::TriangleFace face );
 
         //! Disables an alpha testing.
         void                            disableAlphaTest( void );

@@ -46,6 +46,13 @@ RenderState::RenderState( Type type, s32 id )
 }
 
 // ** RenderState::RenderState
+RenderState::RenderState( Renderer::TriangleFace face )
+    : type( CullFace )
+{
+    cullFace = face;
+}
+
+// ** RenderState::RenderState
 RenderState::RenderState( Renderer::Compare function, bool write )
     : type( DepthState )
 {
@@ -165,6 +172,12 @@ void RenderStateBlock::disableFeatures( u64 bits )
 void RenderStateBlock::setAlphaTest( Renderer::Compare function, f32 reference )
 {
     pushState( RenderState( function, reference ), RenderState::AlphaTest );
+}
+
+// ** RenderStateBlock::setCullFace
+void RenderStateBlock::setCullFace( Renderer::TriangleFace face )
+{
+    pushState( RenderState( face ), RenderState::CullFace );
 }
 
 // ** RenderStateBlock::disableBlending
