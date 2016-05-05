@@ -61,23 +61,35 @@ uniform sampler2D u_DiffuseTexture;
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
 
-vec4 phongLightIntensity( vec3 point, vec3 light, vec3 direction, vec3 normal, float range, float intensity, float cutoff )
+//! Computes a distance attenuation of a light source between point 'a' and 'b'
+float distanceAttenuation( vec3 a, vec3 b, float range, float constant, float linear, float quadratic )
 {
-#if F_LightType == 1
-	vec3  dir  = light - point;
-	float d    = length( dir ) / range;
-	float att  = 1.0 / (1.0 + 25.0 * d * d);
-#elif F_LightType == 2
-	vec3  dir  = normalize( light - point );
-	float d    = length( dir ) / range;
-	float spot = max( dot( dir, direction ), 0.0 );
-	float att  = 1.0 / (1.0 + 25.0 * d * d) * (1.0 - (1.0 - spot) * 1.0 / (1.0 - cutoff));
-#elif F_LightType == 3
-	vec3  dir  = direction;
-	float att  = 1.0;
-#endif	/*	F_LightType == 1	*/
+	float d = length( a - b ) / range;
+	return 1.0 / (constant + linear * d + quadratic * d * d);
+}
 
-	return max( dot( normal, normalize( dir ) ), 0.0 ) * intensity * att;
+//! Computes a point light intensity at specified point
+float pointLightIntensity( vec3 point, vec3 light, vec3 normal )
+{
+	vec3 dir = normalize( light - point );
+	return max( dot( normal, dir ), 0.0 );
+}
+
+//! Computes a spot light intensity at specified point
+float spotLightIntensity( vec3 point, vec3 light, vec3 normal, vec3 direction, float cutoff )
+{
+	vec3  dir	  = normalize( light - point );
+	float lambert = max( dot( normal, dir ), 0.0 );
+	float spot	  = max( dot( direction, dir ), 0.0 );
+	float falloff = 1.0 - (1.0 - spot) * 1.0 / (1.0 - cutoff);
+
+	return lambert * falloff;
+}
+
+//! Computes a directional light intensity at specified point
+float directionalLightIntensity( vec3 light, vec3 normal )
+{
+	return max( dot( normal, light ), 0.0 );
 }
 
 void main()
@@ -94,7 +106,19 @@ void main()
 #endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_VertexNormal )
-	lightColor = phongLightIntensity( v_VertexPos, v_LightPos, v_LightDir, normalize( v_Normal ), Light.range, Light.intensity, Light.cutoff ) * vec4( Light.color, 1.0 );
+	#if F_LightType == 1
+	float attenuation = distanceAttenuation( v_VertexPos, v_LightPos, Light.range, 1.0, 0.0, 25.0 );
+	float intensity   = pointLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ) ) * attenuation;
+
+	#elif F_LightType == 2
+	float attenuation = distanceAttenuation( v_VertexPos, v_LightPos, Light.range, 1.0, 0.0, 25.0 );
+	float intensity   = spotLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), v_LightDir, Light.cutoff ) * attenuation;
+
+	#elif F_LightType == 3
+	float intensity   = directionalLightIntensity( v_LightDir, normalize( v_Normal ) );
+	#endif	/*	F_LightType == 1	*/
+
+	lightColor = vec4( Light.color, 1.0 ) * Light.intensity * intensity;
 #endif  /*  F_VertexNormal    */
 
 	vec4 finalColor = lightColor * diffuseColor;
