@@ -118,8 +118,7 @@ namespace Scene {
 	public:
 
 									//! Constructs Light instance.
-									Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f )
-										: m_type( type ), m_color( color ), m_intensity( intensity ), m_range( range ), m_cutoff( 45.0f ) {}
+									Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f );
 
 		//! Returns the light type.
 		LightType				    type( void ) const;
@@ -151,6 +150,12 @@ namespace Scene {
         //! Sets a light cutoff value.
         void                        setCutoff( f32 value );
 
+        //! Returns true if a light casts shadows.
+        bool                        castsShadows( void ) const;
+
+        //! Sets a shadow casting flag.
+        void                        setCastsShadows( bool value );
+
 	private:
 
 		LightType				    m_type;			//!< Light type.
@@ -158,6 +163,7 @@ namespace Scene {
 		f32							m_intensity;	//!< Light intensity.
 		f32							m_range;		//!< Light influence range.
         f32                         m_cutoff;       //!< Light spot cutoff value.
+        bool                        m_castsShadow;  //!< Indicates that a light casts shadows.
 	};
 
 	//! Holds the static mesh data with per-instance materials.

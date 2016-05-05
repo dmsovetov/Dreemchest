@@ -71,6 +71,17 @@ void RenderDepthComplexity::setIntensity( f32 value )
 
 // ------------------------------------------------ Light ------------------------------------------------- //
 
+// ** Light::Light
+Light::Light( LightType type, const Rgb& color, f32 intensity, f32 range )
+	: m_type( type )
+    , m_color( color )
+    , m_intensity( intensity )
+    , m_range( range )
+    , m_cutoff( 45.0f )
+    , m_castsShadow( false )
+{
+}
+
 // ** Light::type
 LightType Light::type( void ) const
 {
@@ -129,6 +140,18 @@ f32 Light::cutoff( void ) const
 void Light::setCutoff( f32 value )
 {
 	m_cutoff = value;
+}
+
+// ** Light::castsShadows
+bool Light::castsShadows( void ) const
+{
+    return m_castsShadow;
+}
+
+// ** Light::setCastsShadows
+void Light::setCastsShadows( bool value )
+{
+    m_castsShadow = value;
 }
 
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
