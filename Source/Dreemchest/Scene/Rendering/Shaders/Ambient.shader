@@ -17,10 +17,6 @@ varying vec4 v_Color;
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
 
-//#if defined( F_TestTexture )
-//varying vec2 v_TexCoordTest;
-//#endif	/*	F_TestTexture	*/
-
 #if defined( F_VertexNormal )
 varying vec3 v_Normal;
 #endif  /*  F_VertexNormal    */
@@ -42,10 +38,6 @@ void main()
 #if defined( F_DiffuseTexture )
 	v_TexCoord0		= gl_MultiTexCoord0.xy;
 #endif	/*	F_DiffuseTexture	*/
-
-//#if defined( F_TestTexture )
-//	v_TexCoordTest	= gl_MultiTexCoord0.xy;
-//#endif	/*	F_TestTexture	*/
 }     
 
 [FragmentShader]
@@ -62,11 +54,6 @@ uniform sampler2D u_DiffuseTexture;
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
 
-//#if defined( F_TestTexture )
-//uniform sampler2D Texture1;
-//varying vec2 v_TexCoordTest;
-//#endif	/*	F_TestTexture	*/
-
 void main()
 {
 	vec4 diffuseColor = Material.diffuse;
@@ -78,10 +65,6 @@ void main()
 #if defined( F_DiffuseTexture )
 	diffuseColor = diffuseColor * texture2D( u_DiffuseTexture, v_TexCoord0 );
 #endif	/*	F_DiffuseTexture	*/
-
-//#if defined( F_TestTexture )
-//	diffuseColor = diffuseColor + texture2D( Texture1, v_TexCoordTest );
-//#endif	/*	F_TestTexture	*/
 
 #if defined( F_AmbientColor )
 	vec4 ambientColor = Scene.ambient;
