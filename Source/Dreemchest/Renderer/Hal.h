@@ -445,17 +445,27 @@ namespace Renderer {
     class RenderTarget : public RenderResource {
     public:
 
+        //! Available texture attachments
+        enum Attachment {
+              Depth             //!< A depth texture attachment.
+            , Color0            //!< A #1 color texture attachment.
+            , Color1            //!< A #2 color texture attachment.
+            , Color2            //!< A #3 color texture attachment.
+            , Color3            //!< A #4 color texture attachment.
+            , TotalAttachments  //!< A total number of available texture attachments.
+        };
+
                                     //! Constructs a new RenderTarget instance.
                                     RenderTarget( u32 width, u32 height );
 
 		//! Setups the color renderbuffer.
-		virtual bool				setColor( PixelFormat format, u32 index = 0 );
+		virtual bool				setAttachment( PixelFormat format, Attachment attachment );
 
 		//! Setups the depth renderbuffer.
 		virtual bool				setDepth( PixelFormat format );
 
 		//! Returns the color attachment by index.
-		Texture2DPtr				color( u32 index = 0 ) const;
+		Texture2DPtr				attachment( Attachment attachment ) const;
 
 		//! Returns render target width.
 		u32							width( void ) const;
@@ -465,9 +475,9 @@ namespace Renderer {
 
 	protected:
 
-		Array<Texture2DPtr>			m_color;	//!< Color attachments.
-		u32							m_width;	//!< Render target width.
-		u32							m_height;	//!< Render target height.
+		Texture2DPtr			    m_attachments[TotalAttachments];	//!< Texture attachments.
+		u32							m_width;	                        //!< Render target width.
+		u32							m_height;	                        //!< Render target height.
     };
 
     //! InputLayout class instance is used to define a vertex buffer layout.

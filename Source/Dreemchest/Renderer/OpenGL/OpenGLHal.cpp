@@ -882,6 +882,8 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
     case PixelRgba32F:  return GL_RGBA;
     case PixelR32F:
     case PixelR16F:     return GL_RED;
+    case PixelD24S8:
+    case PixelD24X8:    return GL_DEPTH_COMPONENT;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
     
@@ -905,6 +907,8 @@ GLenum OpenGLHal::imageDataType( u32 pixelFormat )
     case PixelR32F:
     case PixelRgb32F:
     case PixelRgba32F:  return GL_FLOAT;
+    case PixelD24S8:
+    case PixelD24X8:    return GL_FLOAT;
     default:            DC_BREAK_IF( "Image format not implemented" );
     }
     
@@ -958,7 +962,7 @@ void OpenGLTexture2D::setData( u32 level, const void *data )
     if( isCompressed() ) {
         glCompressedTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, bytesPerMip( width, height ), data );
     } else {
-        glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+    //    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
         glTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, format, type, data );
     }
     glBindTexture( GL_TEXTURE_2D, 0 );
@@ -1052,30 +1056,37 @@ bool OpenGLRenderTarget::check( void ) const
 	return status == GL_FRAMEBUFFER_COMPLETE;
 }
 
-// ** OpenGLRenderTarget::setColor
-bool OpenGLRenderTarget::setColor( PixelFormat format, u32 index )
+// ** OpenGLRenderTarget::setAttachment
+bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachment )
 {
     DC_CHECK_GL;
 	DC_CHECK_GL_CONTEXT;
 
 	OpenGLTexture2D* texture = DC_NEW OpenGLTexture2D( m_width, m_height, format );
 	texture->setData( 0, NULL );
+
+    glBindTexture( GL_TEXTURE_2D, texture->id() );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glBindTexture( GL_TEXTURE_2D, 0 );
     
 	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->id(), 0 );
+    if( attachment == Depth ) {
+        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id(), 0 );
+    } else {
+        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (attachment - 1), GL_TEXTURE_2D, texture->id(), 0 );
+    }
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-	if( index >= m_color.size() ) {
-		m_color.resize( index + 1 );
-	}
-
-    m_color[index] = texture;
+    m_attachments[attachment] = texture;
 	DC_ABORT_IF( !check(), "invalid render target configuration" );
 
 	return check();
 }
 
-// ** OpenGLRenderTarget::setDepth
+// ** OpenGLRenderTarget::setAttachment
 bool OpenGLRenderTarget::setDepth( PixelFormat format )
 {
 	glGenRenderbuffers( 1, &m_depth );

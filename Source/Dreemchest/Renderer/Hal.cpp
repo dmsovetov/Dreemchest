@@ -705,8 +705,8 @@ u32 RenderTarget::height( void ) const
 	return m_height;
 }
 
-// ** RenderTarget::attach
-bool RenderTarget::setColor( PixelFormat format, u32 index )
+// ** RenderTarget::setAttachment
+bool RenderTarget::setAttachment( PixelFormat format, Attachment attachment )
 {
 	return false;
 }
@@ -718,9 +718,9 @@ bool RenderTarget::setDepth( PixelFormat format )
 }
 
 // ** RenderTarget:attachment
-Texture2DPtr RenderTarget::color( u32 index ) const
+Texture2DPtr RenderTarget::attachment( Attachment attachment ) const
 {
-	return index < ( u32 )m_color.size() ? m_color[index] : Texture2DPtr();
+	return m_attachments[attachment];
 }
 
 // ---------------------------------------------- InputLayout --------------------------------------------- //
