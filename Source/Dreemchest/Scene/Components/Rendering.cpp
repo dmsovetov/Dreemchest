@@ -119,6 +119,18 @@ void Light::setRange( f32 value )
 	m_range = value;
 }
 
+// ** Light::cutoff
+f32 Light::cutoff( void ) const
+{
+	return m_cutoff;
+}
+
+// ** Light::setCutoff
+void Light::setCutoff( f32 value )
+{
+	m_cutoff = value;
+}
+
 // ---------------------------------------------- StaticMesh ---------------------------------------------- //
 
 // ** StaticMesh::mesh
