@@ -57,6 +57,8 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Light::Layout[] = {
     , { "Light.range",     Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, range     ), }
     , { "Light.color",     Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, color     ), }
     , { "Light.intensity", Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, intensity ), }
+    , { "Light.direction", Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, direction ), }
+    , { "Light.cutoff",    Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, cutoff    ), }
     , { NULL }
 };
 
@@ -214,6 +216,8 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
         node.parameters->intensity = node.light->intensity();
         node.parameters->color     = node.light->color();
         node.parameters->range     = node.light->range();
+        node.parameters->direction = -node.transform->axisZ();
+        node.parameters->cutoff    = cosf( radians( node.light->cutoff() ) );
         commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::Light );
     }
 

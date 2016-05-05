@@ -78,6 +78,8 @@ namespace Scene {
                 f32                 range;
                 Rgb                 color;
                 f32                 intensity;
+                Vec3                direction;
+                f32                 cutoff;
             };
         };
 
