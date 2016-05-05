@@ -118,6 +118,7 @@ namespace Scene {
             , InstanceConstants     //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
             , MaterialConstants     //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
             , LightConstants        //!< A constant buffer that stores light variables (color, position, etc.).
+            , ShadowConstants       //!< A constant buffer that stores shadow variables (transform, near, far, etc.).
             , MaxConstantBuffers    //!< A maximum number of supported constant buffers.
         };
 

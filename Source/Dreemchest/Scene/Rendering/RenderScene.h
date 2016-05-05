@@ -81,6 +81,10 @@ namespace Scene {
                 Vec3                direction;
                 f32                 cutoff;
             };
+            struct Shadow {
+                static BufferLayout Layout[];
+                Matrix4             transform;
+            };
         };
 
         //! Base class for all renderable entities.

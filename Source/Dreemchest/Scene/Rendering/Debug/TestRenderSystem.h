@@ -43,10 +43,15 @@ namespace Scene {
 
         virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
+        u8                              renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions );
+
     private:
 
         UbershaderPtr                   m_phongShader;
         UbershaderPtr                   m_ambientShader;
+        UbershaderPtr                   m_shadowShader;
+        RenderScene::CBuffer::Shadow    m_shadowParameters;
+        RenderResource                  m_shadowCBuffer;
     };
 
 } // namespace Scene

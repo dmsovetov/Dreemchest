@@ -356,6 +356,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         Scene::SceneObjectPtr light = scene->createSceneObject();
         light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
         light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+        light->get<Scene::Light>()->setCastsShadows( true );
         light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
         scene->addSceneObject( light );
     }

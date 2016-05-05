@@ -35,36 +35,24 @@ namespace Scene {
 TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal )
     : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
-    m_phongShader   = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_ambientShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_shadowShader      = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
+    m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
 }
 
 // ** TestRenderSystem::emitRenderOperations
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
-    // Render scene to a texture
-    //s32 color = commands.acquireRenderTarget( 1024, 1024, Renderer::PixelRgba8 );
-
-    // Render to texture pass
-    //{
-    //    RenderCommandBuffer& cmd = commands.renderToTarget( color, Rect( 0, 0, 1024, 1024 ) );
-    //    cmd.clear( Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), ~0 );
-    //    emitStaticMeshes( frame, cmd, stateStack );
-    //    emitPointClouds( frame, cmd, stateStack );
-    //}
-
     // Ambient pass
     {
         StateScope pass = stateStack.newScope();
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
-    //  pass->bindRenderedTexture( color, RenderState::Texture1 );
 
         emitStaticMeshes( frame, commands, stateStack );
         emitPointClouds( frame, commands, stateStack );
     }
-
-    //commands.releaseRenderTarget( color );
 
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();
@@ -77,6 +65,13 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         // Get a light by index
         const RenderScene::LightNode& light = lights[i];
 
+        // A shadow map render target handle
+        u8 shadows = 0;
+
+        if( light.light->castsShadows() ) {
+            shadows = renderShadows( frame, commands, stateStack, light, 1024 );
+        }
+
         // Light state block
         StateScope state = stateStack.newScope();
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
@@ -84,10 +79,49 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         state->bindProgram( m_context.internShader( m_phongShader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
+        // Bind a rendered shadowmap
+        if( shadows ) {
+            state->bindRenderedTexture( shadows, RenderState::Texture1, Renderer::RenderTarget::Depth );
+            state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
+        }
+
         // Emit render operations
         emitStaticMeshes( frame, commands, stateStack, RenderMaskPhong );
         emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
+
+        // Release an intermediate shadow render target
+        if( shadows ) {
+            commands.releaseRenderTarget( shadows );
+        }
     }
+}
+
+// ** TestRenderSystem::renderShadows
+u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions )
+{
+    DC_BREAK_IF( !light.light->castsShadows(), "a light instance does not cast shadows" );
+
+    // Acquire a shadow render target
+    u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
+
+    // Render scene from a light's point of view
+    RenderCommandBuffer& cmd = commands.renderToTarget( renderTarget, Rect( 0, 0, dimensions, dimensions ) );
+    cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
+
+    // Update a shadow constant buffer
+    m_shadowParameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.001f, light.light->range() ) * light.matrix->inversed();
+    cmd.uploadConstantBuffer( m_shadowCBuffer, &m_shadowParameters, sizeof m_shadowParameters );
+
+    // Push a shadow pass scope
+    StateScope state = stateStack.newScope();
+    state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
+    state->bindProgram( m_context.internShader( m_shadowShader ) );
+    state->setCullFace( Renderer::TriangleFaceFront );
+
+    // Render all static meshes to a target
+    emitStaticMeshes( frame, cmd, stateStack );
+
+    return renderTarget;
 }
 
 } // namespace Scene

@@ -317,13 +317,15 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
+                struct CBufferShadow   { mat4 transform; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\
                 uniform CBufferMaterial Material;                   \n\
                 uniform CBufferLight    Light;                      \n\
+                uniform CBufferShadow   Shadow;                     \n\
                 #define u_DiffuseTexture Texture0                   \n\
-                #define u_DepthTexture   Texture7                   \n\
+                #define u_ShadowTexture  Texture1                   \n\
             "
         );
 
@@ -349,7 +351,12 @@ RenderResource RenderingContext::acquireRenderTarget( u16 width, u16 height, Ren
     intermediate.height         = height;
     intermediate.format         = format;
     intermediate.renderTarget   = m_hal->createRenderTarget( width, height );
-    intermediate.renderTarget->setColor( format );
+    intermediate.renderTarget->setDepth( Renderer::PixelD24X8 );
+    if( format == Renderer::PixelD24S8 || format == Renderer::PixelD24X8 ) {
+        intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Depth );
+    } else {
+        intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Color0 );
+    }
     m_renderTargets.push_back( intermediate );
 
     LogVerbose( "renderingContext", "%dx%d render target created\n", width, height );

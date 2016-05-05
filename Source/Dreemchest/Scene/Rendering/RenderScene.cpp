@@ -62,6 +62,12 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Light::Layout[] = {
     , { NULL }
 };
 
+// ** RenderScene::CBuffer::Shadow::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Shadow::Layout[] = {
+      { "Shadow.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::Shadow, transform ), }
+    , { NULL }
+};
+
 // ** RenderScene::CBuffer::View::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::View::Layout[] = {
       { "View.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::View, transform ), }

@@ -5,6 +5,7 @@ F_VertexNormal 		= vertexNormal
 F_VertexColor  		= vertexColor
 F_LightType	  		= lightType
 F_DiffuseTexture	= texture0
+F_ShadowTexture		= texture1
 
 [VertexShader]
 #if defined( F_VertexColor )
@@ -14,6 +15,10 @@ varying vec4 v_Color;
 #if defined( F_DiffuseTexture )
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
+
+#if defined( F_ShadowTexture )
+varying vec4 v_TexCoordShadow;
+#endif	/*	F_ShadowTexture	*/
 
 #if defined( F_VertexNormal )
 varying vec3 v_Normal;
@@ -42,6 +47,10 @@ void main()
 #if defined( F_DiffuseTexture )
 	v_TexCoord0		= gl_MultiTexCoord0.xy;
 #endif	/*	F_DiffuseTexture	*/
+
+#if defined( F_ShadowTexture )
+	v_TexCoordShadow = Shadow.transform * vertex;
+#endif	/*	F_ShadowTexture	*/
 }     
 
 [FragmentShader]
@@ -60,6 +69,11 @@ varying vec3 v_VertexPos;
 uniform sampler2D u_DiffuseTexture;
 varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
+
+#if defined( F_ShadowTexture )
+uniform sampler2D u_ShadowTexture;
+varying vec4 v_TexCoordShadow;
+#endif	/*	F_ShadowTexture	*/
 
 //! Computes a distance attenuation of a light source between point 'a' and 'b'
 float distanceAttenuation( vec3 a, vec3 b, float range, float constant, float linear, float quadratic )
@@ -92,6 +106,17 @@ float directionalLightIntensity( vec3 light, vec3 normal )
 	return max( dot( normal, light ), 0.0 );
 }
 
+#if F_ShadowTexture
+//! Converts a clip space coordinates to a texture space.
+float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
+{
+	float currentDepth = lightSpaceCoord.z / lightSpaceCoord.w;
+	float storedDepth  = texture2D( u_ShadowTexture, lightSpaceCoord.xy / lightSpaceCoord.w * 0.5 + 0.5 ).x;
+
+	return (currentDepth <= (storedDepth + bias)) ? 1.0 : 0.0;
+}
+#endif	/*	F_ShadowTexture	*/
+
 void main()
 {
 	vec4 diffuseColor = Material.diffuse;
@@ -120,6 +145,10 @@ void main()
 
 	lightColor = vec4( Light.color, 1.0 ) * Light.intensity * intensity;
 #endif  /*  F_VertexNormal    */
+
+#if F_ShadowTexture
+	lightColor *= shadowFactor( u_ShadowTexture, v_TexCoordShadow, 0.0 );
+#endif	/*	F_ShadowTexture	*/
 
 	vec4 finalColor = lightColor * diffuseColor;
 
