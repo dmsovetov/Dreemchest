@@ -43,31 +43,34 @@ TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& rend
 void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     // Render scene to a texture
-    s32 color = commands.acquireRenderTarget( 1024, 1024, Renderer::PixelRgba8 );
+    //s32 color = commands.acquireRenderTarget( 1024, 1024, Renderer::PixelRgba8 );
 
     // Render to texture pass
-    {
-        RenderCommandBuffer& cmd = commands.renderToTarget( color, Rect( 0, 0, 1024, 1024 ) );
-        cmd.clear( Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), ~0 );
-        emitStaticMeshes( frame, cmd, stateStack );
-        emitPointClouds( frame, cmd, stateStack );
-    }
+    //{
+    //    RenderCommandBuffer& cmd = commands.renderToTarget( color, Rect( 0, 0, 1024, 1024 ) );
+    //    cmd.clear( Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), ~0 );
+    //    emitStaticMeshes( frame, cmd, stateStack );
+    //    emitPointClouds( frame, cmd, stateStack );
+    //}
 
     // Ambient pass
     {
         StateScope pass = stateStack.newScope();
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
-        pass->bindRenderedTexture( color, RenderState::Texture1 );
+    //  pass->bindRenderedTexture( color, RenderState::Texture1 );
 
         emitStaticMeshes( frame, commands, stateStack );
         emitPointClouds( frame, commands, stateStack );
     }
 
-    commands.releaseRenderTarget( color );
+    //commands.releaseRenderTarget( color );
 
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();
+
+    // A light type feature bits
+    Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
 
     // Render a scene for each light in scene
     for( s32 i = 0, n = lights.count(); i < n; i++ ) {
@@ -77,7 +80,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         // Light state block
         StateScope state = stateStack.newScope();
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
-        state->enableFeatures( ShaderPointLight );
+        state->enableFeatures( lightType[light.light->type()] );
         state->bindProgram( m_context.internShader( m_phongShader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 

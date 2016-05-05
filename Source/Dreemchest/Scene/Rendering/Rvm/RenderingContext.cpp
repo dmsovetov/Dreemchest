@@ -268,7 +268,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 
     masks["ambientColor"]   = static_cast<u64>( ShaderAmbientColor )  << UserDefinedFeaturesOffset;
     masks["emissionColor"]  = static_cast<u64>( ShaderEmissionColor ) << UserDefinedFeaturesOffset;
-    masks["pointLight"]     = static_cast<u64>( ShaderPointLight )    << UserDefinedFeaturesOffset;
+    masks["lightType"]      = static_cast<u64>( ShaderPointLight | ShaderDirectionalLight | ShaderSpotLight ) << UserDefinedFeaturesOffset;
     masks["linearDepth"]    = static_cast<u64>( ShaderLinearDepth )   << UserDefinedFeaturesOffset;
 
     // Create a shader instance
@@ -316,7 +316,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 struct CBufferView     { mat4 transform; float near; float far; };         \n\
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
-                struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; };         \n\
+                struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\
