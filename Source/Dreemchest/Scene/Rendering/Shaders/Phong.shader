@@ -111,10 +111,15 @@ float directionalLightIntensity( vec3 light, vec3 normal )
 //! Converts a clip space coordinates to a texture space.
 float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
 {
-	float currentDepth = lightSpaceCoord.z / lightSpaceCoord.w;
-	float storedDepth  = texture2D( texture, lightSpaceCoord.xy / lightSpaceCoord.w * 0.5 + 0.5 ).x;
+	// Perform a perspective divide and map to [0, 1] range
+	lightSpaceCoord = lightSpaceCoord / lightSpaceCoord.w * 0.5 + 0.5;
 
-	return (currentDepth <= (storedDepth + bias)) ? 1.0 : 0.0;
+	// Extract current and stored depths
+	float currentDepth = lightSpaceCoord.z;
+	float storedDepth  = texture2D( texture, lightSpaceCoord.xy ).x;
+
+	// Compare and return result
+	return (currentDepth * bias <= (storedDepth)) ? 1.0 : 0.0;
 }
 
 void main()
@@ -147,7 +152,7 @@ void main()
 #endif  /*  F_VertexNormal    */
 
 #if F_ShadowTexture
-	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.0 );
+	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.9999 );
 #endif	/*	F_ShadowTexture	*/
 
 	vec4 finalColor = lightColor * diffuseColor;
