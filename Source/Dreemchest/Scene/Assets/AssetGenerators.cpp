@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------------------------------------- MeshPlaneGenerator -------------------------------------------------------------------------- //
+
 // ** MeshPlaneGenerator::MeshPlaneGenerator
 MeshPlaneGenerator::MeshPlaneGenerator( const Vec3& u, const Vec3& v, f32 size )
     : m_size( size )
@@ -91,6 +93,90 @@ bool MeshPlaneGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setIndexBuffer( ib );
 
     return true;
+}
+
+// -------------------------------------------------------------------------- MeshBoxGenerator -------------------------------------------------------------------------- //
+
+// ** MeshBoxGenerator::MeshBoxGenerator
+MeshBoxGenerator::MeshBoxGenerator( f32 width, f32 height, f32 depth )
+    : m_width( width )
+    , m_height( height )
+    , m_depth( depth )
+{
+}
+
+// ** MeshBoxGenerator::generate
+bool MeshBoxGenerator::generate( Assets::Assets& assets, Mesh& mesh )
+{
+    // A total number of vertices and indices
+    const s32 kVertexCount = 24;
+    const s32 kIndexCount = 36;
+
+    // Half side dimensions
+    f32 w = m_width * 0.5f;
+    f32 h = m_height * 0.5f;
+    f32 d = m_depth * 0.5f;
+
+    // Mesh vertices
+    const Mesh::Vertex vertices[kVertexCount] = {
+	    // front
+	    {  { -w, h, d }, {  0.0f, 0.0f,  1.0f }, { 0.0f,1.0f } },
+	    {  {  w, h, d }, {  0.0f, 0.0f,  1.0f }, { 1.0f,1.0f } },
+	    {  {  w,-h, d }, {  0.0f, 0.0f,  1.0f }, { 1.0f,0.0f } },
+	    {  { -w,-h, d }, {  0.0f, 0.0f,  1.0f }, { 0.0f,0.0f } },
+	    // back
+	    {  {  w, h,-d }, {  0.0f, 0.0f, -1.0f }, { 0.0f,1.0f } },
+	    {  { -w, h,-d }, {  0.0f, 0.0f, -1.0f }, { 1.0f,1.0f } },
+	    {  { -w,-h,-d }, {  0.0f, 0.0f, -1.0f }, { 1.0f,0.0f } },
+	    {  {  w,-h,-d }, {  0.0f, 0.0f, -1.0f }, { 0.0f,0.0f } },
+	    // top
+	    {  { -w, h,-d }, {  0.0f, 1.0f,  0.0f }, { 0.0f,1.0f } },
+	    {  {  w, h,-d }, {  0.0f, 1.0f,  0.0f }, { 1.0f,1.0f } },
+	    {  {  w, h, d }, {  0.0f, 1.0f,  0.0f }, { 1.0f,0.0f } },
+	    {  { -w, h, d }, {  0.0f, 1.0f,  0.0f }, { 0.0f,0.0f } },
+	    // bottom
+	    {  {  w,-h,-d }, {  0.0f,-1.0f,  0.0f }, { 0.0f,1.0f } },
+	    {  { -w,-h,-d }, {  0.0f,-1.0f,  0.0f }, { 1.0f,1.0f } },
+	    {  { -w,-h, d }, {  0.0f,-1.0f,  0.0f }, { 1.0f,0.0f } },
+	    {  {  w,-h, d }, {  0.0f,-1.0f,  0.0f }, { 0.0f,0.0f } },
+	    // left
+	    {  { -w, h,-d }, { -1.0f, 0.0f,  0.0f }, { 0.0f,1.0f } },
+	    {  { -w, h, d }, { -1.0f, 0.0f,  0.0f }, { 1.0f,1.0f } },
+	    {  { -w,-h, d }, { -1.0f, 0.0f,  0.0f }, { 1.0f,0.0f } },
+	    {  { -w,-h,-d }, { -1.0f, 0.0f,  0.0f }, { 0.0f,0.0f } },
+	    // right
+	    {  {  w, h, d }, {  1.0f, 0.0f,  0.0f }, { 0.0f,1.0f } },
+	    {  {  w, h,-d }, {  1.0f, 0.0f,  0.0f }, { 1.0f,1.0f } },
+	    {  {  w,-h,-d }, {  1.0f, 0.0f,  0.0f }, { 1.0f,0.0f } },
+	    {  {  w,-h, d }, {  1.0f, 0.0f,  0.0f }, { 0.0f,0.0f } }
+    };
+
+    // Mesh indices
+    const u16 indices[kIndexCount] = {
+	     0, 3, 1,  1, 3, 2, // front
+	     4, 7, 5,  5, 7, 6, // back
+	     8,11, 9,  9,11,10, // top
+	    12,15,13, 13,15,14, // bottom
+	    16,19,17, 17,19,18, // left
+	    20,23,21, 21,23,22  // right
+    };
+
+    // Setup mesh asset
+    Mesh::VertexBuffer vb;
+    Mesh::IndexBuffer ib;
+
+    vb.resize( kVertexCount );
+    memcpy( &vb[0], vertices, sizeof vertices );
+
+    ib.resize( kIndexCount );
+    memcpy( &ib[0], indices, sizeof indices );
+
+    mesh.setChunkCount( 1 );
+    mesh.setVertexBuffer( vb );
+    mesh.setIndexBuffer( ib );
+
+    return true;
+
 }
 
 } // namespace Scene

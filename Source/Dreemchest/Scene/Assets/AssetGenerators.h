@@ -52,6 +52,25 @@ namespace Scene {
         Vec3            m_v;    //!< A second basis vector.
     };
 
+    //! Generates a box mesh with specified dimensions
+    class MeshBoxGenerator : public Assets::GeneratorSource<Mesh> {
+    public:
+
+                        //! Constructs a MeshBoxGenerator instance.
+                        MeshBoxGenerator( f32 width, f32 height, f32 depth );
+
+    protected:
+
+        //! Generates a box mesh.
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+
+    private:
+
+        f32             m_width;    //!< A box width.
+        f32             m_height;   //!< A box height.
+        f32             m_depth;    //!< A box depth.
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
