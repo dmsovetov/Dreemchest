@@ -59,6 +59,9 @@ namespace Scene {
         const RenderCommandBuffer&              entryPoint( void ) const;
         RenderCommandBuffer&                    entryPoint( void );
 
+        //! Interns a memory buffer that will by used during a frame rendering.
+        const void*                             internBuffer( const void* data, s32 size );
+
     private:
 
         //! Container type to store recorded command buffers.
@@ -67,6 +70,7 @@ namespace Scene {
         RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
         RenderStateStack                        m_stateStack;           //!< Current state stack.
+        LinearAllocator                         m_allocator;            //!< A linear allocator used by a frame renderers.
     };
 
     //! Returns a total number of captured command buffers.

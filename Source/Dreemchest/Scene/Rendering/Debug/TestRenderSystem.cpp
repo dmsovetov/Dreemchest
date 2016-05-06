@@ -109,8 +109,8 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 
     // Update a shadow constant buffer
-    m_shadowParameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.001f, light.light->range() ) * light.matrix->inversed();
-    cmd.uploadConstantBuffer( m_shadowCBuffer, &m_shadowParameters, sizeof m_shadowParameters );
+    m_shadowParameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
+    cmd.uploadConstantBuffer( m_shadowCBuffer, frame.internBuffer( &m_shadowParameters, sizeof m_shadowParameters ), sizeof m_shadowParameters );
 
     // Push a shadow pass scope
     StateScope state = stateStack.newScope();

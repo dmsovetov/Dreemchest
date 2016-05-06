@@ -33,8 +33,17 @@ namespace Scene {
 // ** RenderFrame::RenderFrame
 RenderFrame::RenderFrame( void )
     : m_stateStack( 1024, MaxStateStackDepth )
+    , m_allocator( 1024 )
 {
     m_entryPoint = &createCommandBuffer();
+}
+
+// ** RenderFrame::internBuffer
+const void* RenderFrame::internBuffer( const void* data, s32 size )
+{
+    u8* interned = m_allocator.allocate( size );
+    memcpy( interned, data, size );
+    return interned;
 }
 
 // ** RenderFrame::entryPoint
