@@ -256,7 +256,11 @@ RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
 StateScope RenderStateStack::newScope( void )
 {
     DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
-    RenderStateBlock* block = new( m_allocator.allocate( sizeof( RenderStateBlock ) ) ) RenderStateBlock;
+
+    void* allocated = m_allocator.allocate( sizeof( RenderStateBlock ) );
+    DC_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
+
+    RenderStateBlock* block = new( allocated ) RenderStateBlock;
     return push( block );
 }
 

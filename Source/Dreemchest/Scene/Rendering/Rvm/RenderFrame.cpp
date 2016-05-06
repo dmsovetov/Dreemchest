@@ -32,7 +32,7 @@ namespace Scene {
 
 // ** RenderFrame::RenderFrame
 RenderFrame::RenderFrame( void )
-    : m_stateStack( 1024, MaxStateStackDepth )
+    : m_stateStack( 4096, MaxStateStackDepth )
     , m_allocator( 1024 )
 {
     m_entryPoint = &createCommandBuffer();
