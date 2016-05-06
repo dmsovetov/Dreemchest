@@ -432,6 +432,9 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
     // Convert a resource id to a signed integer
     s32 id = static_cast<s16>( state.resourceId );
 
+    // Get a sampler index
+    u8 samplerIndex = state.data.index & 0xF;
+
     // Bind a texture to sampler
     if( id >= 0 ) {
         const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
@@ -440,11 +443,11 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
         DC_BREAK_IF( abs( id ) > 255, "invalid identifier" );
         Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTarget::Attachment>( state.data.index >> 4 ) );
         DC_BREAK_IF( !texture.valid(), "invalid render target attachment" );
-        m_hal->setTexture( state.data.index & 0xF, texture.get() );
+        m_hal->setTexture( samplerIndex, texture.get() );
     }
 
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + SamplerFeaturesOffset));
+    m_resourceFeatures = m_resourceFeatures | (bit << (samplerIndex + SamplerFeaturesOffset));
 }
 
 // ** Rvm::switchCullFace
