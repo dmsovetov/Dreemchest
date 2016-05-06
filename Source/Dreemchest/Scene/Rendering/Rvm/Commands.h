@@ -113,7 +113,7 @@ namespace Scene {
         void                        releaseRenderTarget( u8 index );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        RenderCommandBuffer&        renderToTarget( u8 index, const Rect& viewport );
+        RenderCommandBuffer&        renderToTarget( u8 index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );

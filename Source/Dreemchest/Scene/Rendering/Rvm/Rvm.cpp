@@ -179,12 +179,15 @@ void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const u32* 
 {
     // Push a render target state
     if( renderTarget ) {
-        m_hal->setRenderTarget( m_intermediateTargets->get( renderTarget ) );
+        const Renderer::RenderTargetWPtr rt = m_intermediateTargets->get( renderTarget );
+        m_hal->setRenderTarget( rt );
+        m_hal->setViewport( viewport[0] * rt->width(), viewport[1] * rt->height(), viewport[2] * rt->width(), viewport[3] * rt->height() );
+    } else {
+        m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
     }
 
     // Set a viewport before executing an attached command buffer
     m_viewportStack.push( viewport );
-    m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
 
     // Execute an attached command buffer
     execute( frame, commands );

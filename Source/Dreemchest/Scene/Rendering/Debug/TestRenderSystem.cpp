@@ -105,7 +105,7 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
     u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
 
     // Render scene from a light's point of view
-    RenderCommandBuffer& cmd = commands.renderToTarget( renderTarget, Rect( 0, 0, dimensions, dimensions ) );
+    RenderCommandBuffer& cmd = commands.renderToTarget( renderTarget );
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 
     // Update a shadow constant buffer
