@@ -97,11 +97,8 @@ namespace Scene {
         , ShaderSpotLight           = 2 << 2
         , ShaderDirectionalLight    = 3 << 2
         , ShaderFogColor            = 1 << 4
-    };
-
-    //! Available user-defined shader features used by a depth renderer.
-    enum DepthShaderFeatures {
-          ShaderLinearDepth         = BIT( 0 )
+        , ShaderSpecularColor       = 1 << 5
+        , ShaderRimLight            = 1 << 6
     };
 
     // ------------------------------------------------------------------------------------------------

@@ -73,6 +73,7 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::View::Layout[] = {
       { "View.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::View, transform ), }
     , { "View.near",      Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, near      ), }
     , { "View.far",       Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, far       ), }
+    , { "View.position",  Renderer::ConstantBufferLayout::Vec3,    offsetof( CBuffer::View, position  ), }
     , { NULL }
 };
 
@@ -84,9 +85,13 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Instance::Layout[] = {
 
 // ** RenderScene::CBuffer::Material::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Material::Layout[] = {
-      { "Material.diffuse",  Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, diffuse ),  }
-    , { "Material.specular", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, specular ), }
-    , { "Material.emission", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::Material, emission ), }
+      { "Material.diffuse",    Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, diffuse    ), }
+    , { "Material.specular",   Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, specular   ), }
+    , { "Material.emission",   Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, emission   ), }
+    , { "Material.rim.color",  Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Material, rim.color  ), }
+    , { "Material.rim.factor", Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.factor ), }
+    , { "Material.rim.start",  Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.start  ), }
+    , { "Material.rim.end",    Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.end    ), }
     , { NULL }
 };
 
@@ -211,6 +216,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
         node.parameters->transform = node.camera->calculateViewProjection( node.transform->matrix() );
         node.parameters->near      = node.camera->near();
         node.parameters->far       = node.camera->far();
+        node.parameters->position  = node.transform->worldSpacePosition();
         commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::View );
     }
 

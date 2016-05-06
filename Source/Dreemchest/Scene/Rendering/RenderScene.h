@@ -61,6 +61,7 @@ namespace Scene {
                 Matrix4             transform;
                 f32                 near;
                 f32                 far;
+                Vec3                position;
             };
             struct Instance {
                 static BufferLayout Layout[];
@@ -71,6 +72,13 @@ namespace Scene {
                 Rgba                diffuse;
                 Rgba                specular;
                 Rgba                emission;
+
+                struct {
+                    Rgb             color;
+                    f32             factor;
+                    f32             start;
+                    f32             end;
+                } rim;
             };
             struct Light {
                 static BufferLayout Layout[];

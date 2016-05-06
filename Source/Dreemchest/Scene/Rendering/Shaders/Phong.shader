@@ -38,7 +38,7 @@ void main()
 #endif  /*  F_VertexColor    */
 
 #if defined( F_VertexNormal )
-	v_Normal        = gl_Normal;
+	v_Normal        = (Instance.transform * vec4( gl_Normal, 0.0)).xyz;
 	v_LightPos		= Light.position;
 	v_LightDir		= Light.direction;
 	v_VertexPos		= vertex.xyz;
@@ -106,16 +106,14 @@ float directionalLightIntensity( vec3 light, vec3 normal )
 	return max( dot( normal, light ), 0.0 );
 }
 
-#if F_ShadowTexture
 //! Converts a clip space coordinates to a texture space.
 float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
 {
 	float currentDepth = lightSpaceCoord.z / lightSpaceCoord.w;
-	float storedDepth  = texture2D( u_ShadowTexture, lightSpaceCoord.xy / lightSpaceCoord.w * 0.5 + 0.5 ).x;
+	float storedDepth  = texture2D( texture, lightSpaceCoord.xy / lightSpaceCoord.w * 0.5 + 0.5 ).x;
 
 	return (currentDepth <= (storedDepth + bias)) ? 1.0 : 0.0;
 }
-#endif	/*	F_ShadowTexture	*/
 
 void main()
 {

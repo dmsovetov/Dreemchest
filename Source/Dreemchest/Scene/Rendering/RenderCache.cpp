@@ -176,10 +176,14 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
 
     // Create a new material node
     MaterialNode* node = DC_NEW MaterialNode;
-    node->data.diffuse   = asset->color( Material::Diffuse );
-    node->data.specular  = asset->color( Material::Specular );
-    node->data.emission  = asset->color( Material::Emission );
-    node->constantBuffer = m_context->requestConstantBuffer( &node->data, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
+    node->data.diffuse      = asset->color( Material::Diffuse );
+    node->data.specular     = asset->color( Material::Specular );
+    node->data.emission     = asset->color( Material::Emission );
+    node->data.rim.color    = Rgb( 1.0f, 0.0f, 0.0f );
+    node->data.rim.start    = 0.25f;
+    node->data.rim.end      = 1.0f;
+    node->data.rim.factor   = 0.5f;
+    node->constantBuffer    = m_context->requestConstantBuffer( &node->data, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
 
     // Now setup a material state block
     node->states.bindConstantBuffer( node->constantBuffer, RenderState::MaterialConstants );

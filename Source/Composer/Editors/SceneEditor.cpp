@@ -295,12 +295,22 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         writable->setLightingModel( Scene::LightingModel::Phong );
     }
 
+    Scene::MeshHandle ground = m_project->assets().add<Scene::Mesh>( Guid::generate(), DC_NEW Scene::MeshPlaneGenerator( Vec3::axisX(), Vec3::axisZ(), 100.0f ) );
+    ground.asset().setName( "Ground.mesh" );
+
     Scene::MaterialHandle stone = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
         stone.asset().setName( "Stone.material" );
         Assets::WriteLock<Scene::Material> writable = stone.writeLock();
         writable->setDiffuse( diffuse );
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
+        writable->setLightingModel( Scene::LightingModel::Phong );
+    }
+    Scene::MaterialHandle white = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        white.asset().setName( "White.material" );
+        Assets::WriteLock<Scene::Material> writable = white.writeLock();
+        writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 1.0f, 1.0f ) );
         writable->setLightingModel( Scene::LightingModel::Phong );
     }
     Scene::MaterialHandle red = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
@@ -333,6 +343,8 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     m_project->assets().forceLoad( red );
     m_project->assets().forceLoad( green );
     m_project->assets().forceLoad( blue );
+    m_project->assets().forceLoad( white );
+    m_project->assets().forceLoad( ground );
 
     Scene::VertexFormat vertexFormats[] = {
           Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal )
@@ -352,22 +364,29 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( light );
     }
 
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    Scene::Transform* transform = light->attach<Scene::Transform>( 10, 2, 20, Scene::TransformWPtr() );
+    //    transform->setRotation( Quat::rotateAroundAxis( 180.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( 45.0f, Vec3::axisX() ) );
+    //    light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
+    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
 
     {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        Scene::Transform* transform = light->attach<Scene::Transform>( 10, 2, 20, Scene::TransformWPtr() );
-        transform->setRotation( Quat::rotateAroundAxis( 180.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( 45.0f, Vec3::axisX() ) );
-        light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
-        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
+        Scene::SceneObjectPtr msh = scene->createSceneObject();
+        msh->attach<Scene::Transform>( 50, 0, 50, Scene::TransformWPtr() );
+        msh->attach<Scene::StaticMesh>( ground )->setMaterial( 0, white );
+        scene->addSceneObject( msh );   
     }
 
     for( s32 i = 0; i < meshCount; i++ )

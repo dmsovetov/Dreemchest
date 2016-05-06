@@ -268,8 +268,9 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 
     masks["ambientColor"]   = static_cast<u64>( ShaderAmbientColor )  << UserDefinedFeaturesOffset;
     masks["emissionColor"]  = static_cast<u64>( ShaderEmissionColor ) << UserDefinedFeaturesOffset;
+    masks["specularColor"]  = static_cast<u64>( ShaderSpecularColor ) << UserDefinedFeaturesOffset;
     masks["lightType"]      = static_cast<u64>( ShaderPointLight | ShaderDirectionalLight | ShaderSpotLight ) << UserDefinedFeaturesOffset;
-    masks["linearDepth"]    = static_cast<u64>( ShaderLinearDepth )   << UserDefinedFeaturesOffset;
+    masks["rimLight"]       = static_cast<u64>( ShaderRimLight ) << UserDefinedFeaturesOffset;
 
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
@@ -313,9 +314,9 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     shader->addInclude(
             "                                                       \n\
                 struct CBufferScene    { vec4 ambient; };           \n\
-                struct CBufferView     { mat4 transform; float near; float far; };         \n\
+                struct CBufferView     { mat4 transform; float near; float far; vec3 position; };         \n\
                 struct CBufferInstance { mat4 transform; };         \n\
-                struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; };         \n\
+                struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
                 struct CBufferShadow   { mat4 transform; };         \n\
                 uniform CBufferScene    Scene;                      \n\
