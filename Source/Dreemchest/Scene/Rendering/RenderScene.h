@@ -92,6 +92,7 @@ namespace Scene {
             struct Shadow {
                 static BufferLayout Layout[];
                 Matrix4             transform;
+                f32                 invSize;
             };
         };
 

@@ -275,7 +275,8 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( entity );
     }
 #else
-    s32 pointCloudCount = 10;
+    s32 pointCloudCount = 5;
+    s32 boxCount = 10;
     s32 meshCount = 5;
     s32 points = 500;
     s32 c = 0;
@@ -297,6 +298,9 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
     Scene::MeshHandle ground = m_project->assets().add<Scene::Mesh>( Guid::generate(), DC_NEW Scene::MeshPlaneGenerator( Vec3::axisX(), Vec3::axisZ(), 100.0f ) );
     ground.asset().setName( "Ground.mesh" );
+
+    Scene::MeshHandle box = m_project->assets().add<Scene::Mesh>( Guid::generate(), DC_NEW Scene::MeshBoxGenerator( 1.0f, 1.0f, 1.0f ) );
+    box.asset().setName( "Box.mesh" );
 
     Scene::MaterialHandle stone = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
@@ -345,6 +349,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     m_project->assets().forceLoad( blue );
     m_project->assets().forceLoad( white );
     m_project->assets().forceLoad( ground );
+    m_project->assets().forceLoad( box );
 
     Scene::VertexFormat vertexFormats[] = {
           Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal )
@@ -364,34 +369,59 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         scene->addSceneObject( light );
     }
 
-    //{
-    //    Scene::SceneObjectPtr light = scene->createSceneObject();
-    //    light->attach<Scene::Transform>( 20, 2, 20, Scene::TransformWPtr() );
-    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
-    //    light->get<Scene::Light>()->setCastsShadows( true );
-    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-    //    scene->addSceneObject( light );
-    //}
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( -5, 2, -5, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+        light->get<Scene::Light>()->setCastsShadows( true );
+        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+        scene->addSceneObject( light );
+    }
 
-    //{
-    //    Scene::SceneObjectPtr light = scene->createSceneObject();
-    //    Scene::Transform* transform = light->attach<Scene::Transform>( 10, 2, 20, Scene::TransformWPtr() );
-    //    transform->setRotation( Quat::rotateAroundAxis( 180.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( 45.0f, Vec3::axisX() ) );
-    //    light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
-    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
-    //    scene->addSceneObject( light );
-    //}
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( 10, 3, 10, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 1.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+        light->get<Scene::Light>()->setCastsShadows( true );
+        light->attach<Scene::RotateAroundAxes>( 10.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+        scene->addSceneObject( light );
+    }
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        light->attach<Scene::Transform>( 5, 4, 5, Scene::TransformWPtr() );
+        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 0.0f, 1.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+        light->get<Scene::Light>()->setCastsShadows( true );
+        light->attach<Scene::RotateAroundAxes>( 15.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+        scene->addSceneObject( light );
+    }
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        Scene::Transform* transform = light->attach<Scene::Transform>( 10, 2, 20, Scene::TransformWPtr() );
+        transform->setRotation( Quat::rotateAroundAxis( 180.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( 45.0f, Vec3::axisX() ) );
+        light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
+        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+        scene->addSceneObject( light );
+    }
 
     {
         Scene::SceneObjectPtr msh = scene->createSceneObject();
-        msh->attach<Scene::Transform>( 50, 0, 50, Scene::TransformWPtr() );
+        msh->attach<Scene::Transform>( 0, 0, 0, Scene::TransformWPtr() );
         msh->attach<Scene::StaticMesh>( ground )->setMaterial( 0, white );
         scene->addSceneObject( msh );   
     }
 
-    for( s32 i = 0; i < meshCount; i++ )
+    //{
+    //    Scene::SceneObjectPtr msh = scene->createSceneObject();
+    //    msh->attach<Scene::Transform>( 20, 0, 20, Scene::TransformWPtr() );
+    //    msh->attach<Scene::StaticMesh>( box )->setMaterial( 0, additive );
+    //    scene->addSceneObject( msh );
+    //}
+
+    for( s32 i = -meshCount / 2; i < meshCount / 2; i++ )
     {
-        for( s32 j = 0; j < meshCount; j++ )
+        for( s32 j = -meshCount / 2; j < meshCount / 2; j++ )
         {
             Scene::SceneObjectPtr msh = scene->createSceneObject();
             msh->attach<Scene::Transform>( i * 15, 0, j * 15, Scene::TransformWPtr() );
@@ -400,15 +430,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         }
     }
 
-    for( s32 i = 0; i < pointCloudCount; i++ )
+    for( s32 i = -pointCloudCount / 2; i < pointCloudCount / 2; i++ )
     {
-        for( s32 j = 0; j < pointCloudCount; j++ )
+        for( s32 j = -pointCloudCount / 2; j < pointCloudCount / 2; j++ )
         {
             Scene::SceneObjectPtr p1 = scene->createSceneObject();
             p1->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
             Scene::PointCloud* pointCloud = p1->attach<Scene::PointCloud>( points, vertexFormats[c++ % 3] );
             pointCloud->setMaterial( materials[c % 3] );
-        //    pointCloud->setMaterial( dflt );
 
             void* vertices = pointCloud->vertices();
             const Scene::VertexFormat& vertexFormat = pointCloud->vertexFormat();
@@ -423,6 +452,17 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
             }
 
             scene->addSceneObject( p1 );
+        }
+    }
+
+    for( s32 i = -boxCount / 2; i < boxCount / 2; i++ )
+    {
+        for( s32 j = -boxCount / 2; j < boxCount / 2; j++ )
+        {
+            Scene::SceneObjectPtr msh = scene->createSceneObject();
+            msh->attach<Scene::Transform>( i * 3, 0, j * 3, Scene::TransformWPtr() );
+            msh->attach<Scene::StaticMesh>( box )->setMaterial( 0, /*materials[c++ % 3]*/blue );
+            scene->addSceneObject( msh );   
         }
     }
 

@@ -270,6 +270,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     masks["emissionColor"]  = static_cast<u64>( ShaderEmissionColor ) << UserDefinedFeaturesOffset;
     masks["specularColor"]  = static_cast<u64>( ShaderSpecularColor ) << UserDefinedFeaturesOffset;
     masks["lightType"]      = static_cast<u64>( ShaderPointLight | ShaderDirectionalLight | ShaderSpotLight ) << UserDefinedFeaturesOffset;
+    masks["shadowFiltering"]= static_cast<u64>( ShaderShadowFiltering1 | ShaderShadowFiltering2 | ShaderShadowFiltering3 ) << UserDefinedFeaturesOffset;
     masks["rimLight"]       = static_cast<u64>( ShaderRimLight ) << UserDefinedFeaturesOffset;
 
     // Create a shader instance
@@ -318,7 +319,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 struct CBufferInstance { mat4 transform; };         \n\
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
-                struct CBufferShadow   { mat4 transform; };         \n\
+                struct CBufferShadow   { mat4 transform; float invSize; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\

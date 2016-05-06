@@ -75,7 +75,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
         // Light state block
         StateScope state = stateStack.newScope();
         state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
-        state->enableFeatures( lightType[light.light->type()] );
+        state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
         state->bindProgram( m_context.internShader( m_phongShader ) );
         state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
 
@@ -110,6 +110,7 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
 
     // Update a shadow constant buffer
     m_shadowParameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
+    m_shadowParameters.invSize   = 1.0f / dimensions;
     cmd.uploadConstantBuffer( m_shadowCBuffer, frame.internBuffer( &m_shadowParameters, sizeof m_shadowParameters ), sizeof m_shadowParameters );
 
     // Push a shadow pass scope

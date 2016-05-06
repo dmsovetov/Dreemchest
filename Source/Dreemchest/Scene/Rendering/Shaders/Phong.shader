@@ -6,6 +6,7 @@ F_VertexColor  		= vertexColor
 F_LightType	  		= lightType
 F_DiffuseTexture	= texture0
 F_ShadowTexture		= texture1
+F_ShadowFiltering	= shadowFiltering
 
 [VertexShader]
 varying vec4 wsVertex;
@@ -108,18 +109,32 @@ float directionalLightIntensity( vec3 light, vec3 normal )
 	return max( dot( normal, light ), 0.0 );
 }
 
-//! Converts a clip space coordinates to a texture space.
+//! Performs a projected texture lookup and returns a depth testing result
 float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
 {
 	// Perform a perspective divide and map to [0, 1] range
 	lightSpaceCoord = lightSpaceCoord / lightSpaceCoord.w * 0.5 + 0.5;
 
 	// Extract current and stored depths
-	float currentDepth = lightSpaceCoord.z;
-	float storedDepth  = texture2D( texture, lightSpaceCoord.xy ).x;
+	float currentDepth = lightSpaceCoord.z * bias;
 
+#if F_ShadowFiltering
+	// Compute a result
+	float shadow = 0.0;
+
+	for( int i = -F_ShadowFiltering; i < F_ShadowFiltering; i++ ) {
+		for( int j = -F_ShadowFiltering; j < F_ShadowFiltering; j++ ) {
+			float storedDepth = texture2D( texture, lightSpaceCoord.xy + vec2( i, j ) * Shadow.invSize ).x;
+			shadow += (currentDepth <= storedDepth) ? 1.0 : 0.0;
+		}
+	}
+	
 	// Compare and return result
-	return (currentDepth * bias <= (storedDepth)) ? 1.0 : 0.0;
+	return shadow / ((F_ShadowFiltering * 2 + 1) * (F_ShadowFiltering * 2 + 1));
+#else
+	float storedDepth = texture2D( texture, lightSpaceCoord.xy ).x;
+	return (currentDepth <= storedDepth) ? 1.0 : 0.0;
+#endif	/*	F_ShadowFiltering	*/
 }
 
 void main()
@@ -152,7 +167,7 @@ void main()
 #endif  /*  F_VertexNormal    */
 
 #if F_ShadowTexture
-	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.9999 );
+	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.999999 );
 #endif	/*	F_ShadowTexture	*/
 
 	vec4 finalColor = lightColor * diffuseColor;

@@ -91,14 +91,17 @@ namespace Scene {
 
     //! Available user-defined shader features used by a scene renderer. 
     enum SceneShaderFeatures {
-          ShaderAmbientColor        = 1 << 0
-        , ShaderEmissionColor       = 1 << 1
-        , ShaderPointLight          = 1 << 2
-        , ShaderSpotLight           = 2 << 2
-        , ShaderDirectionalLight    = 3 << 2
-        , ShaderFogColor            = 1 << 4
-        , ShaderSpecularColor       = 1 << 5
-        , ShaderRimLight            = 1 << 6
+          ShaderAmbientColor        = 0x1
+        , ShaderEmissionColor       = 0x2
+        , ShaderPointLight          = 0x4
+        , ShaderSpotLight           = 0x8
+        , ShaderDirectionalLight    = 0xC
+        , ShaderFogColor            = 0x10
+        , ShaderSpecularColor       = 0x20
+        , ShaderRimLight            = 0x40
+        , ShaderShadowFiltering1    = 0x80
+        , ShaderShadowFiltering2    = 0x100
+        , ShaderShadowFiltering3    = 0x180
     };
 
     // ------------------------------------------------------------------------------------------------
