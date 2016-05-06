@@ -8,6 +8,8 @@ F_DiffuseTexture	= texture0
 F_ShadowTexture		= texture1
 
 [VertexShader]
+varying vec4 wsVertex;
+
 #if defined( F_VertexColor )
 varying vec4 v_Color;
 #endif  /*  F_VertexColor    */
@@ -17,31 +19,30 @@ varying vec2 v_TexCoord0;
 #endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_ShadowTexture )
-varying vec4 v_TexCoordShadow;
+varying vec4 lsVertex;
 #endif	/*	F_ShadowTexture	*/
 
 #if defined( F_VertexNormal )
-varying vec3 v_Normal;
-varying vec3 v_LightPos;
-varying vec3 v_LightDir;
-varying vec3 v_VertexPos;
+varying vec3 wsNormal;
+varying vec3 wsLight;
+varying vec3 wsLightDir;
 #endif  /*  F_VertexNormal    */
 
 void main()
 {
-	vec4 vertex 	= Instance.transform * gl_Vertex;
+	wsVertex = Instance.transform * gl_Vertex;
 	
-	gl_Position     = View.transform * vertex;
+	gl_Position     = View.transform * wsVertex;
 	gl_PointSize    = 5;
+
 #if defined( F_VertexColor )
-	v_Color         = gl_Color;
+	v_Color = gl_Color;
 #endif  /*  F_VertexColor    */
 
 #if defined( F_VertexNormal )
-	v_Normal        = (Instance.transform * vec4( gl_Normal, 0.0)).xyz;
-	v_LightPos		= Light.position;
-	v_LightDir		= Light.direction;
-	v_VertexPos		= vertex.xyz;
+	wsNormal   = (Instance.transform * vec4( gl_Normal, 0.0)).xyz;
+	wsLight	   = Light.position;
+	wsLightDir = Light.direction;
 #endif  /*  F_VertexNormal    */
 
 #if defined( F_DiffuseTexture )
@@ -49,20 +50,21 @@ void main()
 #endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_ShadowTexture )
-	v_TexCoordShadow = Shadow.transform * vertex;
+	lsVertex = Shadow.transform * wsVertex;
 #endif	/*	F_ShadowTexture	*/
 }     
 
 [FragmentShader]
+varying vec4 wsVertex;
+
 #if defined( F_VertexColor )
 varying vec4 v_Color;
 #endif  /*  F_VertexColor    */
 
 #if defined( F_VertexNormal )
-varying vec3 v_Normal;
-varying vec3 v_LightPos;
-varying vec3 v_LightDir;
-varying vec3 v_VertexPos;
+varying vec3 wsNormal;
+varying vec3 wsLight;
+varying vec3 wsLightDir;
 #endif  /*  F_VertexNormal    */
 
 #if defined( F_DiffuseTexture )
@@ -72,7 +74,7 @@ varying vec2 v_TexCoord0;
 
 #if defined( F_ShadowTexture )
 uniform sampler2D u_ShadowTexture;
-varying vec4 v_TexCoordShadow;
+varying vec4 lsVertex;
 #endif	/*	F_ShadowTexture	*/
 
 //! Computes a distance attenuation of a light source between point 'a' and 'b'
@@ -130,22 +132,22 @@ void main()
 
 #if defined( F_VertexNormal )
 	#if F_LightType == 1
-	float attenuation = distanceAttenuation( v_VertexPos, v_LightPos, Light.range, 1.0, 0.0, 25.0 );
-	float intensity   = pointLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ) ) * attenuation;
+	float attenuation = distanceAttenuation( wsVertex, wsLight, Light.range, 1.0, 0.0, 25.0 );
+	float intensity   = pointLightIntensity( wsVertex, wsLight, normalize( wsNormal ) ) * attenuation;
 
 	#elif F_LightType == 2
-	float attenuation = distanceAttenuation( v_VertexPos, v_LightPos, Light.range, 1.0, 0.0, 25.0 );
-	float intensity   = spotLightIntensity( v_VertexPos, v_LightPos, normalize( v_Normal ), v_LightDir, Light.cutoff ) * attenuation;
+	float attenuation = distanceAttenuation( wsVertex, wsLight, Light.range, 1.0, 0.0, 25.0 );
+	float intensity   = spotLightIntensity( wsVertex, wsLight, normalize( wsNormal ), wsLightDir, Light.cutoff ) * attenuation;
 
 	#elif F_LightType == 3
-	float intensity   = directionalLightIntensity( v_LightDir, normalize( v_Normal ) );
+	float intensity   = directionalLightIntensity( wsLightDir, normalize( wsNormal ) );
 	#endif	/*	F_LightType == 1	*/
 
 	lightColor = vec4( Light.color, 1.0 ) * Light.intensity * intensity;
 #endif  /*  F_VertexNormal    */
 
 #if F_ShadowTexture
-	lightColor *= shadowFactor( u_ShadowTexture, v_TexCoordShadow, 0.0 );
+	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.0 );
 #endif	/*	F_ShadowTexture	*/
 
 	vec4 finalColor = lightColor * diffuseColor;
