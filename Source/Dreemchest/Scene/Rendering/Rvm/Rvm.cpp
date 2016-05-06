@@ -175,7 +175,7 @@ void Rvm::display( const RenderFrameUPtr& frame )
 }
 
 // ** Rvm::renderToTarget
-void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const u32* viewport, const RenderCommandBuffer& commands )
+void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const RenderCommandBuffer& commands )
 {
     // Push a render target state
     if( renderTarget ) {
@@ -201,7 +201,7 @@ void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const u32* 
     m_viewportStack.pop();
 
     if( m_viewportStack.size() ) {
-        const u32* prev = m_viewportStack.top();
+        const f32* prev = m_viewportStack.top();
         m_hal->setViewport( prev[0], prev[1], prev[2], prev[3] );
     }
 }

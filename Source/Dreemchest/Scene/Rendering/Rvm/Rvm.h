@@ -56,7 +56,7 @@ namespace Scene {
         void                        execute( const RenderFrame& frame, const RenderCommandBuffer& commands );
 
         //! Binds a render target with specified viewport and executes a command buffer.
-        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const u32* viewport, const RenderCommandBuffer& commands );
+        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const RenderCommandBuffer& commands );
 
         //! Unrolls a state stack an applies all state changes.
         void                        applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count );
@@ -126,7 +126,7 @@ namespace Scene {
         u64                                 m_vertexAttributeFeatures;                      //!< A vertex attribute features.
         u64                                 m_resourceFeatures;                             //!< Active resource features.
         ActiveShader                        m_activeShader;                                 //!< An active shader instance.
-        Stack<const u32*>                   m_viewportStack;                                //!< A viewport stack.
+        Stack<const f32*>                   m_viewportStack;                                //!< A viewport stack.
         AutoPtr<IntermediateTargetStack>    m_intermediateTargets;                          //!< An intermediate render target stack.
     };
 

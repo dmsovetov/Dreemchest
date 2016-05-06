@@ -74,10 +74,10 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( u8 index, const Rect& 
     opCode.sorting = 0;
     opCode.renderTarget.commands = &commands;
     opCode.renderTarget.index = index;
-    opCode.renderTarget.viewport[0] = static_cast<u32>( viewport.min().x );
-    opCode.renderTarget.viewport[1] = static_cast<u32>( viewport.min().y );
-    opCode.renderTarget.viewport[2] = static_cast<u32>( viewport.width() );
-    opCode.renderTarget.viewport[3] = static_cast<u32>( viewport.height() );
+    opCode.renderTarget.viewport[0] = viewport.min().x;
+    opCode.renderTarget.viewport[1] = viewport.min().y;
+    opCode.renderTarget.viewport[2] = viewport.width();
+    opCode.renderTarget.viewport[3] = viewport.height();
     m_commands.push_back( opCode );
 
     return commands;

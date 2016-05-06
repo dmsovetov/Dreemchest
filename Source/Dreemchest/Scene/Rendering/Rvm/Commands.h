@@ -71,7 +71,7 @@ namespace Scene {
 
                 struct {
                     u8                          index;                      //!< A render target resource to be activated.
-                    u32                         viewport[4];                //!< A viewport value to be set.
+                    f32                         viewport[4];                //!< A viewport value to be set.
                     const RenderCommandBuffer*  commands;                   //!< A command buffer to be executed after setting a viewport.
                 } renderTarget;
 
