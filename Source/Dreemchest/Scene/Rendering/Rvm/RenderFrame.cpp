@@ -33,7 +33,7 @@ namespace Scene {
 // ** RenderFrame::RenderFrame
 RenderFrame::RenderFrame( void )
     : m_stateStack( 4096, MaxStateStackDepth )
-    , m_allocator( 1024 )
+    , m_allocator( 1024 * 100 )
 {
     m_entryPoint = &createCommandBuffer();
 }
@@ -41,9 +41,17 @@ RenderFrame::RenderFrame( void )
 // ** RenderFrame::internBuffer
 const void* RenderFrame::internBuffer( const void* data, s32 size )
 {
-    u8* interned = m_allocator.allocate( size );
+    void* interned = allocate( size );
     memcpy( interned, data, size );
     return interned;
+}
+
+// ** RenderFrame::allocate
+void* RenderFrame::allocate( s32 size )
+{
+	void* allocated = m_allocator.allocate( size );
+	DC_ABORT_IF( allocated == NULL, "render frame is out of memory" );
+	return allocated;
 }
 
 // ** RenderFrame::entryPoint

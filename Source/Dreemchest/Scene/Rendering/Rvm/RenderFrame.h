@@ -62,6 +62,9 @@ namespace Scene {
         //! Interns a memory buffer that will by used during a frame rendering.
         const void*                             internBuffer( const void* data, s32 size );
 
+		//! Allocates a block of memory that is used during a frame rendering.
+		void*									allocate( s32 size );
+
     private:
 
         //! Container type to store recorded command buffers.
