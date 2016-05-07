@@ -329,10 +329,22 @@ void Particles::setMaterial( MaterialHandle value )
 
 // ---------------------------------------------- Sprite ---------------------------------------------- //
 
-// ** Sprite::image
-ImageHandle Sprite::image( void ) const
+// **  Sprite::width
+s32 Sprite::width( void ) const
 {
-	return m_image;
+	return m_width;
+}
+
+// **  Sprite::height
+s32 Sprite::height( void ) const
+{
+	return m_height;
+}
+
+// ** Sprite::material
+MaterialHandle Sprite::material( void ) const
+{
+	return m_material;
 }
 
 // ** Sprite::color

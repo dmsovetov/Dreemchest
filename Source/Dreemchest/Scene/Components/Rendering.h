@@ -289,18 +289,29 @@ namespace Scene {
 	public:
 
 									//! Constructs the Sprite instance.
-									Sprite( ImageHandle image = ImageHandle(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
-										: m_image( image ), m_color( color ) {}
+									Sprite( s32 width = 0, s32 height = 0, MaterialHandle material = MaterialHandle(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+										: m_width( width )
+										, m_height( height )
+										, m_material( material )
+										, m_color( color ) {}
 
-		//! Returns the sprite image.
-		ImageHandle				    image( void ) const;
+		//! Returns a sprite width.
+		s32							width( void ) const;
+
+		//! Returns a sprite height.
+		s32							height( void ) const;
+
+		//! Returns the sprite material.
+		MaterialHandle				material( void ) const;
 
 		//! Returns the sprite color.
 		const Rgba&					color( void ) const;
 
 	private:
 
-		ImageHandle					m_image;	//!< Sprite image.
+		s32							m_width;	//!< A sprite width.
+		s32							m_height;	//!< A sprite height.
+		MaterialHandle				m_material;	//!< Sprite material.
 		Rgba						m_color;	//!< Sprite color.
 	};
 
