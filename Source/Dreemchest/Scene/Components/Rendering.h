@@ -409,6 +409,9 @@ namespace Scene {
 		//! Calculates the output viewport coordinates.
 		Rect						viewport( void ) const;
 
+        //! Returns an aspect ratio of a camera render target.
+        f32                         aspect( void ) const;
+
 		//! Sets the camera render view.
 		void						setTarget( RenderTargetWPtr value );
 

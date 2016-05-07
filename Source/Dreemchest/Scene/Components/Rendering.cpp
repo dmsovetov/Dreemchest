@@ -462,6 +462,13 @@ RenderTargetWPtr Camera::target( void ) const
 	return m_target;
 }
 
+// ** Camera::aspect
+f32 Camera::aspect( void ) const
+{
+    Rect rect = viewport();
+    return rect.width() / rect.height();
+}
+
 // ** Camera::calculateProjectionMatrix
 Matrix4 Camera::calculateProjectionMatrix( void ) const
 {
