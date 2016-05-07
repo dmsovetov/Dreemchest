@@ -41,16 +41,32 @@ namespace Scene {
 
     protected:
 
+        //! Alias the shadow constant buffer type.
+        typedef RenderScene::CBuffer::Shadow ShadowParameters;
+
         virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
-        u8                              renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions );
+        //! Generate commands to render a light pass for a single light source.
+        void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows );
+
+        //! Generate commands to render a shadow map.
+        u8                              renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters );
+
+        //! Creates a shadow parameters for a spot light.
+        ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
+
+        //! Creates a shadow parameters for a directional light
+        ShadowParameters                directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const;
+
+        //! Calculates a world-space bounding box of a frustum split.
+        Bounds                          calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const;
 
     private:
 
         UbershaderPtr                   m_phongShader;
         UbershaderPtr                   m_ambientShader;
         UbershaderPtr                   m_shadowShader;
-        RenderScene::CBuffer::Shadow    m_shadowParameters;
+        ShadowParameters                m_shadowParameters;
         RenderResource                  m_shadowCBuffer;
     };
 

@@ -57,37 +57,31 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();
 
-    // A light type feature bits
-    Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
-
     // Render a scene for each light in scene
     for( s32 i = 0, n = lights.count(); i < n; i++ ) {
         // Get a light by index
         const RenderScene::LightNode& light = lights[i];
 
+        if( light.light->type() == LightType::Directional ) {
+            for( s32 j = 0; j < 1; j++ ) {
+                ShadowParameters parameters = directionalLightShadows( camera, transform.matrix(), transform.worldSpacePosition(), light, 1024, j, 1 );
+                u8 shadows = renderShadows( frame, commands, stateStack, light, 1024, parameters );
+                renderLight( frame, commands, stateStack, light, shadows );
+                commands.releaseRenderTarget( shadows );
+            }
+            continue;
+        }
+
         // A shadow map render target handle
         u8 shadows = 0;
 
         if( light.light->castsShadows() ) {
-            shadows = renderShadows( frame, commands, stateStack, light, 1024 );
+            ShadowParameters parameters = spotLightShadows( light, 1024 );
+            shadows = renderShadows( frame, commands, stateStack, light, 1024, parameters );
         }
 
-        // Light state block
-        StateScope state = stateStack.newScope();
-        state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
-        state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
-        state->bindProgram( m_context.internShader( m_phongShader ) );
-        state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
-
-        // Bind a rendered shadowmap
-        if( shadows ) {
-            state->bindRenderedTexture( shadows, RenderState::Texture1, Renderer::RenderTarget::Depth );
-            state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
-        }
-
-        // Emit render operations
-        emitStaticMeshes( frame, commands, stateStack, RenderMaskPhong );
-        emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
+        // Render a light pass
+        renderLight( frame, commands, stateStack, light, shadows );
 
         // Release an intermediate shadow render target
         if( shadows ) {
@@ -97,7 +91,7 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
 }
 
 // ** TestRenderSystem::renderShadows
-u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions )
+u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters )
 {
     DC_BREAK_IF( !light.light->castsShadows(), "a light instance does not cast shadows" );
 
@@ -109,9 +103,7 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 
     // Update a shadow constant buffer
-    m_shadowParameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
-    m_shadowParameters.invSize   = 1.0f / dimensions;
-    cmd.uploadConstantBuffer( m_shadowCBuffer, frame.internBuffer( &m_shadowParameters, sizeof m_shadowParameters ), sizeof m_shadowParameters );
+    cmd.uploadConstantBuffer( m_shadowCBuffer, frame.internBuffer( &parameters, sizeof parameters ), sizeof parameters );
 
     // Push a shadow pass scope
     StateScope state = stateStack.newScope();
@@ -123,6 +115,107 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
     emitStaticMeshes( frame, cmd, stateStack );
 
     return renderTarget;
+}
+
+// ** TestRenderSystem::renderLight
+void TestRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows )
+{
+    // A light type feature bits
+    Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
+
+    // Light state block
+    StateScope state = stateStack.newScope();
+    state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
+    state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
+    state->bindProgram( m_context.internShader( m_phongShader ) );
+    state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
+
+    // Bind a rendered shadowmap
+    if( shadows ) {
+        state->bindRenderedTexture( shadows, RenderState::Texture1, Renderer::RenderTarget::Depth );
+        state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
+    }
+
+    // Emit render operations
+    emitStaticMeshes( frame, commands, stateStack, RenderMaskPhong );
+    emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
+}
+
+// ** TestRenderSystem::spotLightShadows
+TestRenderSystem::ShadowParameters TestRenderSystem::spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const
+{
+    ShadowParameters parameters;
+    parameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
+    parameters.invSize   = 1.0f / dimensions;
+    return parameters;
+}
+
+// ** TestRenderSystem::directionalLightShadows
+TestRenderSystem::ShadowParameters TestRenderSystem::directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const
+{
+    f32 range     = camera.far() - camera.near();
+    f32 splitSize = range / maxSplits;
+
+    Bounds bounds = calculateSplitBounds( camera, cameraInverseTransform, *light.matrix, camera.near() + splitSize * split, camera.near() + splitSize * (split + 1) );
+
+    ShadowParameters parameters;
+    parameters.transform = Matrix4::ortho( bounds.min().x, bounds.max().x, bounds.min().y, bounds.max().y, bounds.min().z, bounds.max().z ) * light.matrix->inversed();
+    parameters.invSize   = 1.0f / dimensions;
+    return parameters;
+}
+
+// ** TestRenderSystem::calculateSplitBounds
+Bounds TestRenderSystem::calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const
+{
+    // Get the camera aspect ratio and field of view
+    f32 ar  = camera.aspect();
+    f32 fov = camera.fov();
+
+    f32 tanHalfHFOV = tanf( radians( fov / 2.0f ) );
+    f32 tanHalfVFOV = tanf( radians( (fov * ar) / 2.0f ) );
+
+    // Calculate dimensions of a split far and near faces
+    f32 xn = near * tanHalfHFOV;
+    f32 xf = far  * tanHalfHFOV;
+    f32 yn = near * tanHalfVFOV;
+    f32 yf = far  * tanHalfVFOV;
+
+    // Construct frustum vertices in a view space
+    Vec4 frustumCorners[8] = {
+          {  xn,  yn, near, 1.0 }   // Near split face
+        , { -xn,  yn, near, 1.0 }
+        , {  xn, -yn, near, 1.0 }
+        , { -xn, -yn, near, 1.0 }
+        , {  xf,  yf, far,  1.0 }   // Far split face
+        , { -xf,  yf, far,  1.0 }
+        , {  xf, -yf, far,  1.0 }
+        , { -xf, -yf, far,  1.0 }
+    };
+
+    // Calculate a light space split center
+    Bounds v;
+    for( s32 i = 0; i < 8; i++ ) v << frustumCorners[i];
+    Vec4 wsCenter = cameraInverseTransform.inversed() * Vec4( v.center().x, v.center().y, v.center().z, 1.0f );
+    Vec4 lsCenter = lightTransform.inversed() * wsCenter;
+
+    // Now transform vertices to a lightspace and calculate bounding box
+    Bounds result;
+
+    for( s32 i = 0; i < 8; i++ ) {
+        // Transform the frustum coordinate from view to world space
+        Vec4 wsVertex = cameraInverseTransform.inversed() * frustumCorners[i];
+
+        // Transform the frustum coordinate from world to light space
+        Vec4 lsVertex = lightTransform.inversed() * wsVertex;
+
+        // Append a vertex in a light space to split bounding box
+        result << lsVertex;
+    }
+
+    // Calculate a centered orhto projection matrix
+    Vec3 offset = Vec3( result.width(), result.height(), result.depth() ) * 0.5f;
+
+    return Bounds( Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) - offset, Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) + offset );
 }
 
 } // namespace Scene

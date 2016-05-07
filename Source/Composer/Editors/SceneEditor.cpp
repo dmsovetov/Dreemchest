@@ -116,7 +116,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->disable<Scene::MoveAlongAxes>();
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
-    m_camera->get<Scene::Camera>()->setFar( 200.0f );
+    m_camera->get<Scene::Camera>()->setFar( 100.0f );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
@@ -362,46 +362,47 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         , blue
     };
 
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 15.0f );
-        scene->addSceneObject( light );
-    }
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 15.0f );
+    //    scene->addSceneObject( light );
+    //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( -5, 2, -5, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 10, 3, 10, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 1.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 10.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 5, 4, 5, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 0.0f, 1.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 15.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
 
     {
         Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( -5, 2, -5, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 10, 3, 10, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 1.0f, 0.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 10.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 5, 4, 5, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 0.0f, 1.0f ), 25.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 15.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        Scene::Transform* transform = light->attach<Scene::Transform>( 10, 2, 20, Scene::TransformWPtr() );
-        transform->setRotation( Quat::rotateAroundAxis( 180.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( 45.0f, Vec3::axisX() ) );
+        Scene::Transform* transform = light->attach<Scene::Transform>();
+        transform->setRotation( Quat::rotateAroundAxis( 100.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( -25.0f, Vec3::axisX() ) );
         light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
-        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+        light->get<Scene::Light>()->setCastsShadows( true );
+   //     light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
         scene->addSceneObject( light );
     }
 
