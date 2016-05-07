@@ -9,7 +9,7 @@ F_ShadowTexture		= texture1
 F_ShadowFiltering	= shadowFiltering
 
 [VertexShader]
-varying vec4 wsVertex;
+varying vec3 wsVertex;
 
 #if defined( F_VertexColor )
 varying vec4 v_Color;
@@ -31,10 +31,12 @@ varying vec3 wsLightDir;
 
 void main()
 {
-	wsVertex = Instance.transform * gl_Vertex;
+	vec4 vertex = Instance.transform * gl_Vertex;
 	
-	gl_Position     = View.transform * wsVertex;
+	gl_Position     = View.transform * vertex;
 	gl_PointSize    = 5;
+
+	wsVertex = vertex.xyz;
 
 #if defined( F_VertexColor )
 	v_Color = gl_Color;
@@ -51,12 +53,12 @@ void main()
 #endif	/*	F_DiffuseTexture	*/
 
 #if defined( F_ShadowTexture )
-	lsVertex = Shadow.transform * wsVertex;
+	lsVertex = Shadow.transform * vertex;
 #endif	/*	F_ShadowTexture	*/
 }     
 
 [FragmentShader]
-varying vec4 wsVertex;
+varying vec3 wsVertex;
 
 #if defined( F_VertexColor )
 varying vec4 v_Color;

@@ -1251,11 +1251,17 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
     case GL_FRAGMENT_SHADER:    m_fragment = id; break;
     }
 
-    if( result == GL_FALSE ) {
-        glGetShaderInfoLog( id, errSize, NULL, error );
-		LogError( "opengl", "failed to compile shader, %s\n", error );
-        return false;
-    }
+	// Get a status of a compiled shader
+	GLsizei errLogSize;
+	glGetShaderInfoLog( id, errSize, &errLogSize, error );
+
+	if( errLogSize ) {
+		if( result == GL_FALSE ) {
+			LogError( "opengl", "%s\n", error );
+		} else {
+			LogWarning( "opengl", "%s\n", error );
+		}
+	}
 
     glAttachShader( m_program, id );
     return true;
