@@ -37,12 +37,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! This component is attached to a camera to render unlit scene.
 	class RenderUnlit : public Ecs::Component<RenderUnlit> {
-	};
-
-	//! This component is attached to a camera to render forward lit meshes.
-	class RenderForwardLit : public Ecs::Component<RenderForwardLit> {
 	};
 
 	//! This component is attached to a camera to render scene wireframe.
@@ -55,24 +52,6 @@ namespace Scene {
 
 	//! This component is attached to a camera to render vertex normals.
 	class RenderVertexNormals : public Ecs::Component<RenderVertexNormals> {
-	};
-
-	//! This component is attached to a camera to render sprites.
-	class RenderSprites : public Ecs::Component<RenderSprites> {
-	public:
-
-										//! Constructs a RenderSprites instance.
-										RenderSprites( f32 scaleFactor = 1.0f );
-
-		//! Returns a sprite rendering scale factor.
-		f32								scaleFactor( void ) const;
-
-		//! Sets a sprite rendering scale factor.
-		void							setScaleFactor( f32 value );
-
-	private:
-
-		f32								m_scaleFactor;		//!< A global scale factor that is applied to rendered sprites.
 	};
 
 	//! This component is attached to a camera to debug render sprite transforms.
@@ -114,6 +93,29 @@ namespace Scene {
 
 	//! This component is attached to a camera to render particles.
 	class RenderParticles : public Ecs::Component<RenderParticles> {
+	};
+#endif	/*	#if DEV_DEPRECATED_SCENE_RENDERER	*/
+
+	//! This component is attached to a camera to render sprites.
+	class SpriteRenderer : public Ecs::Component<SpriteRenderer> {
+	public:
+
+										//! Constructs a SpriteRenderer instance.
+										SpriteRenderer( f32 scaleFactor = 1.0f );
+
+		//! Returns a sprite rendering scale factor.
+		f32								scaleFactor( void ) const;
+
+		//! Sets a sprite rendering scale factor.
+		void							setScaleFactor( f32 value );
+
+	private:
+
+		f32								m_scaleFactor;		//!< A global scale factor that is applied to rendered sprites.
+	};
+
+	//! This component is attached to a camera to render forward lit meshes.
+	class ForwardRenderer : public Ecs::Component<ForwardRenderer> {
 	};
 
 	//! Available light types.

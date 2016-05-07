@@ -125,8 +125,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	//m_camera->attach<Scene::RenderBoundingVolumes>();
 	//m_camera->attach<RenderSceneHelpers>();
 
-	m_camera->attach<Scene::RenderSprites>( 0.01f );
-	m_camera->attach<Scene::RenderForwardLit>();
+	m_camera->attach<Scene::SpriteRenderer>( 0.01f );
+	m_camera->attach<Scene::ForwardRenderer>();
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
 

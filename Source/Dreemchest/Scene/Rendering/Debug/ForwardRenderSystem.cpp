@@ -41,7 +41,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
-void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& renderForwardLit )
+void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
 {
     // Ambient pass
     {

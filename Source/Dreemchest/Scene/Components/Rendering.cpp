@@ -34,6 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // -------------------------------------------- RenderDepthComplexity -------------------------------------------- //
 
 // ** RenderDepthComplexity::RenderDepthComplexity
@@ -68,23 +69,24 @@ void RenderDepthComplexity::setIntensity( f32 value )
 {
     m_intensity = value;
 }
+#endif	/*	#if DEV_DEPRECATED_SCENE_RENDERER	*/
 
-// -------------------------------------------------------------- RenderSprites -------------------------------------------------------------- //
+// -------------------------------------------------------------- SpriteRenderer -------------------------------------------------------------- //
 
-// ** RenderSprites::RenderSprites
-RenderSprites::RenderSprites( f32 scaleFactor )
+// ** SpriteRenderer::SpriteRenderer
+SpriteRenderer::SpriteRenderer( f32 scaleFactor )
 	: m_scaleFactor( scaleFactor )
 {
 }
 
-// ** RenderSprites::setScaleFactor
-f32 RenderSprites::scaleFactor( void ) const
+// ** SpriteRenderer::setScaleFactor
+f32 SpriteRenderer::scaleFactor( void ) const
 {
 	return m_scaleFactor;
 }
 
-// ** RenderSprites::setScaleFactor
-void RenderSprites::setScaleFactor( f32 value )
+// ** SpriteRenderer::setScaleFactor
+void SpriteRenderer::setScaleFactor( f32 value )
 {
 	m_scaleFactor = value;
 }

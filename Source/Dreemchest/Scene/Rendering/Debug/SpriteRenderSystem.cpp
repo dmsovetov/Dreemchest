@@ -51,7 +51,7 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 }
 
 // ** SpriteRenderSystem::emitRenderOperations
-void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderSprites& renderSprites )
+void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
 {
 	// Get all sprites that reside in scene
 	const RenderScene::Sprites& sprites = m_renderScene.sprites();
@@ -68,7 +68,7 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommand
 		const RenderScene::SpriteNode& sprite = sprites[i];
 		
 		// Write the sprite inside into a vertex buffer
-		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color(), renderSprites.scaleFactor() );
+		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color(), spriteRenderer.scaleFactor() );
 
 		// All sprites contain 4 vertices, so increase a vertex count by this amount
 		vertexCount += 4;

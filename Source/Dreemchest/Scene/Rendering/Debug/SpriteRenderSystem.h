@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 	//! Renders all sprites that reside in scene.
-    class SpriteRenderSystem : public RenderSystem<RenderSprites> {
+    class SpriteRenderSystem : public RenderSystem<SpriteRenderer> {
     public:
 
                                         SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene );
@@ -42,7 +42,7 @@ namespace Scene {
     protected:
 
 		//! Emits render operations for rendered sprites.
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderSprites& renderSprites ) NIMBLE_OVERRIDE;
+        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer ) NIMBLE_OVERRIDE;
     
 		//! Allocates and initializes an index buffer of a specified size.
 		u16*							allocateTrianleIndexBuffer( s32 triangleCount ) const;
