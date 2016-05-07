@@ -225,6 +225,8 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                 break;
         case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
+        case RenderCommandBuffer::OpCode::UploadVertexBuffer:	uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+                                                                break;
         case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                                 break;
         case RenderCommandBuffer::OpCode::AcquireRenderTarget:  m_intermediateTargets->acquire( opCode.intermediateRenderTarget.index, opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format );
@@ -294,6 +296,14 @@ void Rvm::uploadConstantBuffer( u32 id, const void* data, s32 size )
     Renderer::ConstantBufferPtr constantBuffer = m_context->constantBuffer( id );
     memcpy( constantBuffer->lock(), data, size );
     constantBuffer->unlock();
+}
+
+// ** Rvm::uploadVertexBuffer
+void Rvm::uploadVertexBuffer( u32 id, const void* data, s32 size )
+{
+    Renderer::VertexBufferPtr vertexBuffer = m_context->vertexBuffer( id );
+    memcpy( vertexBuffer->lock(), data, size );
+    vertexBuffer->unlock();
 }
 
 // ** Rvm::applyStates

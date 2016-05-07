@@ -113,6 +113,8 @@ void RenderingContext::constructVertexBuffer( const ResourceConstructor& constru
 
     // Save a vertex buffer to a pool
     m_vertexBufferPool[constructor.id - 1] = vertexBuffer;
+
+	LogDebug( "renderingContext", "vertex buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
 }
 
 // ** RenderingContext::constructIndexBuffer
@@ -129,6 +131,8 @@ void RenderingContext::constructIndexBuffer( const ResourceConstructor& construc
 
     // Save a index buffer to a pool
     m_indexBufferPool[constructor.id - 1] = indexBuffer;
+
+	LogDebug( "renderingContext", "index buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
 }
 
 // ** RenderingContext::constructConstantBuffer

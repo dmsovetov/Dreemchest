@@ -67,6 +67,9 @@ namespace Scene {
         //! Uploads data to a GPU constant buffer.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
 
+        //! Uploads data to a GPU vertex buffer.
+        void                        uploadVertexBuffer( u32 id, const void* data, s32 size );
+
         //! Sets an alpha testing state.
         void                        switchAlphaTest( const RenderFrame& frame, const RenderState& state );
 
