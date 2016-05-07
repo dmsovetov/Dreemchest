@@ -792,7 +792,7 @@ DC_END_DREEMCHEST
         #include "Rendering/RenderCache.h"
         #include "Rendering/Rvm/RenderingContext.h"
         #include "Rendering/Rvm/Rvm.h"
-        #include "Rendering/Debug/TestRenderSystem.h"
+        #include "Rendering/Debug/ForwardRenderSystem.h"
 		#include "Rendering/Debug/SpriteRenderSystem.h"
     #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 #endif

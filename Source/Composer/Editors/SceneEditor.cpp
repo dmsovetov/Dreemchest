@@ -126,6 +126,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	//m_camera->attach<RenderSceneHelpers>();
 
 	m_camera->attach<Scene::RenderSprites>( 0.01f );
+	m_camera->attach<Scene::RenderForwardLit>();
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
 
@@ -166,7 +167,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene->addRenderSystem<Scene::Unlit>();
     m_renderScene->addRenderSystem<Scene::ForwardLighting>();
 #else
-    m_renderScene->addRenderSystem<Scene::TestRenderSystem>();
+    m_renderScene->addRenderSystem<Scene::ForwardRenderSystem>();
 	m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>();
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
@@ -438,7 +439,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 		Scene::SceneObjectPtr sprite = scene->createSceneObject();
 		sprite->attach<Scene::Transform>( 2, 0, 0, Scene::TransformWPtr() );
 		sprite->attach<Scene::Sprite>( 200, 200, blue );
-		sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+	//	sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
 		scene->addSceneObject( sprite );
 	}
 
@@ -446,7 +447,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 		Scene::SceneObjectPtr sprite = scene->createSceneObject();
 		sprite->attach<Scene::Transform>( -2, 0, 0, Scene::TransformWPtr() );
 		sprite->attach<Scene::Sprite>( 200, 200, blue );
-		sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+	//	sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
 		scene->addSceneObject( sprite );
 	}
 

@@ -24,27 +24,26 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_TestRenderSystem_H__
-#define __DC_Scene_Rendering_TestRenderSystem_H__
+#ifndef __DC_Scene_Rendering_ForwardRenderSystem_H__
+#define __DC_Scene_Rendering_ForwardRenderSystem_H__
 
 #include "../RenderSystem/RenderSystem.h"
-#include "../Rvm/Ubershader.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    class TestRenderSystem : public RenderSystemBase {
+    class ForwardRenderSystem : public RenderSystem<RenderForwardLit> {
     public:
 
-                                        TestRenderSystem( RenderingContext& context, RenderScene& renderScene );
+                                        ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene );
 
     protected:
 
         //! Alias the shadow constant buffer type.
         typedef RenderScene::CBuffer::Shadow ShadowParameters;
 
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& renderForwardLit ) NIMBLE_OVERRIDE;
 
         //! Generate commands to render a light pass for a single light source.
         void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows );
@@ -74,4 +73,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rendering_TestRenderSystem_H__    */
+#endif    /*    !__DC_Scene_Rendering_ForwardRenderSystem_H__    */

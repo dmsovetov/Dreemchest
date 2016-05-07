@@ -24,16 +24,15 @@
 
  **************************************************************************/
 
-#include "TestRenderSystem.h"
-#include "../RenderScene.h"
+#include "ForwardRenderSystem.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** TestRenderSystem::TestRenderSystem
-TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene )
-    : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
+// ** ForwardRenderSystem::ForwardRenderSystem
+ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
+    : RenderSystem( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
@@ -41,8 +40,8 @@ TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& rend
     m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
 }
 
-// ** TestRenderSystem::emitRenderOperations
-void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+// ** ForwardRenderSystem::emitRenderOperations
+void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderForwardLit& renderForwardLit )
 {
     // Ambient pass
     {
@@ -90,8 +89,8 @@ void TestRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBu
     }
 }
 
-// ** TestRenderSystem::renderShadows
-u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters )
+// ** ForwardRenderSystem::renderShadows
+u8 ForwardRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters )
 {
     DC_BREAK_IF( !light.light->castsShadows(), "a light instance does not cast shadows" );
 
@@ -117,8 +116,8 @@ u8 TestRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& com
     return renderTarget;
 }
 
-// ** TestRenderSystem::renderLight
-void TestRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows )
+// ** ForwardRenderSystem::renderLight
+void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows )
 {
     // A light type feature bits
     Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
@@ -141,8 +140,8 @@ void TestRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& com
     emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
 }
 
-// ** TestRenderSystem::spotLightShadows
-TestRenderSystem::ShadowParameters TestRenderSystem::spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const
+// ** ForwardRenderSystem::spotLightShadows
+ForwardRenderSystem::ShadowParameters ForwardRenderSystem::spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const
 {
     ShadowParameters parameters;
     parameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
@@ -150,8 +149,8 @@ TestRenderSystem::ShadowParameters TestRenderSystem::spotLightShadows( const Ren
     return parameters;
 }
 
-// ** TestRenderSystem::directionalLightShadows
-TestRenderSystem::ShadowParameters TestRenderSystem::directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const
+// ** ForwardRenderSystem::directionalLightShadows
+ForwardRenderSystem::ShadowParameters ForwardRenderSystem::directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const
 {
     f32 range     = camera.far() - camera.near();
     f32 splitSize = range / maxSplits;
@@ -164,8 +163,8 @@ TestRenderSystem::ShadowParameters TestRenderSystem::directionalLightShadows( co
     return parameters;
 }
 
-// ** TestRenderSystem::calculateSplitBounds
-Bounds TestRenderSystem::calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const
+// ** ForwardRenderSystem::calculateSplitBounds
+Bounds ForwardRenderSystem::calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const
 {
     // Get the camera aspect ratio and field of view
     f32 ar  = camera.aspect();
