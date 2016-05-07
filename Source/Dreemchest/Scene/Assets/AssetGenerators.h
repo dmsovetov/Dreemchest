@@ -71,6 +71,40 @@ namespace Scene {
         f32             m_depth;    //!< A box depth.
     };
 
+	//! Generates a sphere mesh with a specified radius.
+	class MeshSphereGenerator : public Assets::GeneratorSource<Mesh> {
+    public:
+
+                        //! Constructs a MeshSphereGenerator instance.
+                        MeshSphereGenerator( f32 radius );
+
+    protected:
+
+        //! Generates a sphere mesh.
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+
+    private:
+
+        f32             m_radius;   //!< A sphere radius.	
+	};
+
+	//! Generates a torus mesh with a specified radius.
+	class MeshTorusGenerator : public Assets::GeneratorSource<Mesh> {
+    public:
+
+                        //! Constructs a MeshTorusGenerator instance.
+                        MeshTorusGenerator( f32 radius );
+
+    protected:
+
+        //! Generates a torus mesh.
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+
+    private:
+
+        f32             m_radius;   //!< A torus radius.	
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
