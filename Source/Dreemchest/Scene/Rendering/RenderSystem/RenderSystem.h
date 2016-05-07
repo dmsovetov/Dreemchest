@@ -29,6 +29,7 @@
 
 #include "../RenderScene.h"
 #include "../Rvm/RenderingContext.h"
+#include "../Rvm/Ubershader.h"
 
 #include "../../Components/Rendering.h"
 #include "../../Components/Transform.h"

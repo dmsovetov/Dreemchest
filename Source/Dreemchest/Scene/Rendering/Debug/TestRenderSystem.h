@@ -37,7 +37,7 @@ namespace Scene {
     class TestRenderSystem : public RenderSystemBase {
     public:
 
-                                        TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal );
+                                        TestRenderSystem( RenderingContext& context, RenderScene& renderScene );
 
     protected:
 

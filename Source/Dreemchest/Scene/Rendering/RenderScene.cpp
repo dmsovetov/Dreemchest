@@ -110,6 +110,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderC
     m_lights        = ecs->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
     m_cameras       = ecs->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
+	m_sprites		= ecs->createDataCache<SpriteCache>( Ecs::Aspect::all<Sprite, Transform>(), dcThisMethod( RenderScene::createSpriteNode ) );
 
     // Create scene constant buffer
     m_sceneConstants  = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
@@ -147,6 +148,12 @@ const RenderScene::Lights& RenderScene::lights( void ) const
 const RenderScene::StaticMeshes& RenderScene::staticMeshes( void ) const
 {
     return m_staticMeshes->data();
+}
+
+// ** RenderScene::sprites
+const RenderScene::Sprites& RenderScene::sprites( void ) const
+{
+    return m_sprites->data();
 }
 
 // ** RenderScene::findCameraNode
@@ -285,6 +292,20 @@ RenderScene::LightNode RenderScene::createLightNode( const Ecs::Entity& entity )
     light.parameters        = DC_NEW CBuffer::Light;
 
     return light;
+}
+
+// ** RenderScene::createSpriteNode
+RenderScene::SpriteNode RenderScene::createSpriteNode( const Ecs::Entity& entity )
+{
+    SpriteNode sprite;
+
+    sprite.transform         = entity.get<Transform>();
+    sprite.matrix            = &sprite.transform->matrix();
+    sprite.sprite            = entity.get<Sprite>();
+
+	initializeInstanceNode( entity, sprite, sprite.sprite->material() );
+
+    return sprite;
 }
 
 // ** RenderScene::createCameraNode

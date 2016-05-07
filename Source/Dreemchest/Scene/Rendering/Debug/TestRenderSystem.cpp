@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** TestRenderSystem::TestRenderSystem
-TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene, Renderer::HalWPtr hal )
+TestRenderSystem::TestRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
