@@ -30,11 +30,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// -------------------------------------------------------------- SpriteRenderSystem -------------------------------------------------------------- //
+
 // ** SpriteRenderSystem::SpriteRenderSystem
-SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene, f32 scaleFactor )
-    : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "", Ecs::Aspect::all<Camera, Transform>() ) )
+SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene )
+    : RenderSystem( context, renderScene )
 	, m_vertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 )
-	, m_scaleFactor( scaleFactor )
 {
 	// Allocate and initialize an index buffer
 	m_indices = allocateTrianleIndexBuffer( MaxSpritesInBatch * 2 );
@@ -50,7 +51,7 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 }
 
 // ** SpriteRenderSystem::emitRenderOperations
-void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderSprites& renderSprites )
 {
 	// Get all sprites that reside in scene
 	const RenderScene::Sprites& sprites = m_renderScene.sprites();
@@ -67,7 +68,7 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommand
 		const RenderScene::SpriteNode& sprite = sprites[i];
 		
 		// Write the sprite inside into a vertex buffer
-		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color() );
+		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color(), renderSprites.scaleFactor() );
 
 		// All sprites contain 4 vertices, so increase a vertex count by this amount
 		vertexCount += 4;
@@ -87,17 +88,14 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommand
 }
 
 // ** SpriteRenderSystem::emitSpriteVertices
-void SpriteRenderSystem::emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color ) const
+void SpriteRenderSystem::emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const
 {
-	// A sprite size multiplier
-	f32 scaleFactor = m_scaleFactor * 0.5f;
-
 	// A set of sprite vertices in a local space
 	Vec4 localSpaceVertex[] = {
-		  { -width * scaleFactor, -height * scaleFactor, 0.0f, 1.0f }
-		, {  width * scaleFactor, -height * scaleFactor, 0.0f, 1.0f }
-		, {  width * scaleFactor,  height * scaleFactor, 0.0f, 1.0f }
-		, { -width * scaleFactor,  height * scaleFactor, 0.0f, 1.0f }
+		  { -width * scaleFactor * 0.5f, -height * scaleFactor * 0.5f, 0.0f, 1.0f }
+		, {  width * scaleFactor * 0.5f, -height * scaleFactor * 0.5f, 0.0f, 1.0f }
+		, {  width * scaleFactor * 0.5f,  height * scaleFactor * 0.5f, 0.0f, 1.0f }
+		, { -width * scaleFactor * 0.5f,  height * scaleFactor * 0.5f, 0.0f, 1.0f }
 	};
 
 	// A set of sprite texture coordinates

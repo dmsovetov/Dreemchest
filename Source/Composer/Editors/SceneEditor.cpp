@@ -120,10 +120,12 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
-	m_camera->attach<Scene::RenderUnlit>();
+	//m_camera->attach<Scene::RenderUnlit>();
     //m_camera->attach<Scene::RenderForwardLit>();
 	//m_camera->attach<Scene::RenderBoundingVolumes>();
 	//m_camera->attach<RenderSceneHelpers>();
+
+	m_camera->attach<Scene::RenderSprites>( 0.01f );
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
 
@@ -165,7 +167,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene->addRenderSystem<Scene::ForwardLighting>();
 #else
     m_renderScene->addRenderSystem<Scene::TestRenderSystem>();
-	m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>( 0.01f );
+	m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>();
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool

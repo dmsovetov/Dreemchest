@@ -69,6 +69,26 @@ void RenderDepthComplexity::setIntensity( f32 value )
     m_intensity = value;
 }
 
+// -------------------------------------------------------------- RenderSprites -------------------------------------------------------------- //
+
+// ** RenderSprites::RenderSprites
+RenderSprites::RenderSprites( f32 scaleFactor )
+	: m_scaleFactor( scaleFactor )
+{
+}
+
+// ** RenderSprites::setScaleFactor
+f32 RenderSprites::scaleFactor( void ) const
+{
+	return m_scaleFactor;
+}
+
+// ** RenderSprites::setScaleFactor
+void RenderSprites::setScaleFactor( f32 value )
+{
+	m_scaleFactor = value;
+}
+
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::Light

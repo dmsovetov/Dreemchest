@@ -33,33 +33,33 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    class SpriteRenderSystem : public RenderSystemBase {
+	//! Renders all sprites that reside in scene.
+    class SpriteRenderSystem : public RenderSystem<RenderSprites> {
     public:
 
-                                        SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene, f32 scaleFactor = 1.0f );
+                                        SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene );
 
     protected:
 
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+		//! Emits render operations for rendered sprites.
+        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const RenderSprites& renderSprites ) NIMBLE_OVERRIDE;
     
 		//! Allocates and initializes an index buffer of a specified size.
 		u16*							allocateTrianleIndexBuffer( s32 triangleCount ) const;
 
 		//! Writes transformed vertices of a single sprite instance.
-		void							emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color ) const;
+		void							emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const;
 
 	private:
 
 		//! A maximum number of sprites that can be rendered in a single batch
 		enum { MaxSpritesInBatch = 1000 };
 
-		f32								m_scaleFactor;
-		VertexFormat					m_vertexFormat;
-		RenderResource					m_vertexBuffer;
-		RenderResource					m_indexBuffer;
-		RenderResource					m_inputLayout;
-		u16*							m_indices;
-		void*							m_vertices;
+		VertexFormat					m_vertexFormat;		//!< A 2D vertex format.
+		RenderResource					m_vertexBuffer;		//!< An intermediate vertex buffer used for batching.
+		RenderResource					m_indexBuffer;		//!< A static index buffer with pre-allocated set of indices.
+		RenderResource					m_inputLayout;		//!< An input layout constructed from a vertex format.
+		u16*							m_indices;			//!< An allocated static index buffer.
 	};
 
 } // namespace Scene

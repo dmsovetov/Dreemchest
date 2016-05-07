@@ -59,6 +59,20 @@ namespace Scene {
 
 	//! This component is attached to a camera to render sprites.
 	class RenderSprites : public Ecs::Component<RenderSprites> {
+	public:
+
+										//! Constructs a RenderSprites instance.
+										RenderSprites( f32 scaleFactor = 1.0f );
+
+		//! Returns a sprite rendering scale factor.
+		f32								scaleFactor( void ) const;
+
+		//! Sets a sprite rendering scale factor.
+		void							setScaleFactor( f32 value );
+
+	private:
+
+		f32								m_scaleFactor;		//!< A global scale factor that is applied to rendered sprites.
 	};
 
 	//! This component is attached to a camera to debug render sprite transforms.
