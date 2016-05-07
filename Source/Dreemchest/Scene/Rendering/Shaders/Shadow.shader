@@ -8,4 +8,6 @@ void main()
 
 [FragmentShader]
 
-// Nothing here
+void main()
+{
+}
