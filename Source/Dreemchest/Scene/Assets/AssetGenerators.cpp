@@ -26,6 +26,7 @@
 
 #include "AssetGenerators.h"
 #include "Mesh.h"
+#include "Image.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -2560,6 +2561,50 @@ bool MeshTorusGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setChunkCount( 1 );
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
+
+	return true;
+}
+
+// ------------------------------------------------------------------- ImageCheckerGenerator ------------------------------------------------------------------- //
+
+// ** ImageCheckerGenerator::ImageCheckerGenerator
+ImageCheckerGenerator::ImageCheckerGenerator( s32 width, s32 height, s32 cellSize, const Rgb& firstColor, const Rgb& secondColor )
+	: m_width( width )
+	, m_height( height )
+	, m_cellSize( cellSize )
+	, m_firstColor( firstColor )
+	, m_secondColor( secondColor )
+{
+}
+
+// ** ImageCheckerGenerator::generate
+bool ImageCheckerGenerator::generate( Assets::Assets& assets, Image& image )
+{
+	// Allocate an array of bytes for a checker pattern image
+	ByteArray pixels;
+	pixels.resize( m_width * m_height * 3 );
+	memset( &pixels[0], 255, pixels.size() );
+
+	// Fill the pixel buffer with a checker pattern
+	Rgb colors[]    = { m_firstColor, m_secondColor };
+	s32 activeColor = 0;
+
+	for( s32 row = 0; row < m_width; ++row ) {
+		for( s32 col = 0; col < m_height; ++col ) {
+			// Write pixel color
+			pixels[row * m_width * 3 + col * 3 + 0] = static_cast<u8>( colors[activeColor % 2].r * 255 );
+			pixels[row * m_width * 3 + col * 3 + 1] = static_cast<u8>( colors[activeColor % 2].g * 255 );
+			pixels[row * m_width * 3 + col * 3 + 2] = static_cast<u8>( colors[activeColor % 2].b * 255 );
+
+			// Switch color each cellSize pixels
+			if( col % 20 == 0 ) activeColor++;
+		}
+	}
+
+	// Initialize an image with the generated pixel buffer
+	image.setWidth( m_width );
+	image.setHeight( m_height );
+	image.setMipLevel( 0, pixels );
 
 	return true;
 }

@@ -105,6 +105,27 @@ namespace Scene {
         f32             m_radius;   //!< A torus radius.	
 	};
 
+	//! Generates a checker image.
+	class ImageCheckerGenerator : public Assets::GeneratorSource<Image> {
+    public:
+
+                        //! Constructs a ImageCheckerGenerator instance.
+                        ImageCheckerGenerator( s32 width, s32 height, s32 cellSize, const Rgb& firstColor = Rgb( 1.0f, 1.0f, 1.0f ), const Rgb& secondColor = Rgb( 0.0f, 0.0f, 0.0f ) );
+
+    protected:
+
+        //! Generates a checker image.
+        virtual bool    generate( Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+
+    private:
+
+		s32				m_width;
+		s32				m_height;
+		s32				m_cellSize;
+		Rgb				m_firstColor;
+		Rgb				m_secondColor;
+	};
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
