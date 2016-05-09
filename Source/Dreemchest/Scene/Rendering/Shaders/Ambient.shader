@@ -6,7 +6,6 @@ F_VertexColor  		= vertexColor
 F_AmbientColor	  	= ambientColor
 F_EmissionColor	  	= emissionColor
 F_DiffuseTexture	= texture0
-F_TestTexture		= texture1
 F_RimLight			= rimLight
 
 [VertexShader]
