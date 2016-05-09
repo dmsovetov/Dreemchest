@@ -48,42 +48,80 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 
 	// Request an index buffer and upload data
 	m_indexBuffer = context.requestIndexBuffer( m_indices, MaxSpritesInBatch * 6 * sizeof( u16 ) );
+
+	// Create a sprite shader
+	m_spriteShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Sprite.shader" );
 }
 
 // ** SpriteRenderSystem::emitRenderOperations
 void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
 {
+	// Push a shader sprite rendering state
+	StateScope state = stateStack.newScope();
+	state->bindVertexBuffer( m_vertexBuffer );
+	state->bindIndexBuffer( m_indexBuffer );
+	state->bindInputLayout( m_inputLayout );
+	state->bindProgram( m_context.internShader( m_spriteShader ) );
+
 	// Get all sprites that reside in scene
 	const RenderScene::Sprites& sprites = m_renderScene.sprites();
 
+	// Process each sprite and submit them in batches for rendering
+	const RenderStateBlock* activeStates = NULL;
+	s32						spriteCount  = 0;
+
+	for( s32 i = 0, n = sprites.count(); i < n; i++, spriteCount++ ) {
+		// Get a sprite by index
+		const RenderScene::SpriteNode& sprite = sprites[i];
+
+		// Go to a next sprite if this one has a same material state block as a previous one
+		if( sprite.material.states == activeStates && spriteCount < MaxSpritesInBatch ) {
+			continue;
+		}
+
+		// Render states for this sprite differ from a previous one - submit a batch
+		emitSpriteBatch( frame, commands, stateStack, sprites, i - spriteCount, spriteCount, spriteRenderer.scaleFactor() );
+			
+		// Save this state block and reset a sprite count
+		activeStates = sprite.material.states;
+		spriteCount  = 0;
+	}
+	
+	// Flush a last batch
+	emitSpriteBatch( frame, commands, stateStack, sprites, sprites.count() - spriteCount, spriteCount, spriteRenderer.scaleFactor() );
+}
+
+// ** SpriteRenderSystem::emitSpriteBatch
+void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor )
+{
+	// Nothing to render - just skip
+	if( count == 0 ) {
+		return;
+	}
+
 	// Begin batch by allocating a chunk of vertex data
-	void* vertices = frame.allocate( m_vertexFormat.vertexSize() * MaxSpritesInBatch * 2 );
+	void* vertices = frame.allocate( m_vertexFormat.vertexSize() * count * 2 );
 
 	// A total number of emitted vertices
 	s32 vertexCount = 0;
 
-	// Process each sprite an write it to a dynamic mesh vertex buffer
-	for( s32 i = 0, n = sprites.count(); i < n; i++ ) {
+	// Process each sprite and write them to a dynamic mesh vertex buffer
+	for( s32 i = first; i < first + count; i++ ) {
 		// Get a sprite by index
 		const RenderScene::SpriteNode& sprite = sprites[i];
-		
+
 		// Write the sprite inside into a vertex buffer
-		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color(), spriteRenderer.scaleFactor() );
+		emitSpriteVertices( vertices, vertexCount, *sprite.matrix, sprite.sprite->width(), sprite.sprite->height(), sprite.sprite->color(), scaleFactor );
 
 		// All sprites contain 4 vertices, so increase a vertex count by this amount
 		vertexCount += 4;
 	}
 
-	// Upload vertex data to a GPU buffer
+	// Push a material state for this batch
+	StateScope state = stateStack.push( sprites[first].material.states );
+
+	// Upload vertex data to a GPU buffer and emit a draw indexed command
 	commands.uploadVertexBuffer( m_vertexBuffer, vertices, vertexCount * m_vertexFormat.vertexSize() );
-
-	// Setup a sprite render state
-	StateScope state = stateStack.newScope();
-	state->bindVertexBuffer( m_vertexBuffer );
-	state->bindIndexBuffer( m_indexBuffer );
-	state->bindInputLayout( m_inputLayout );
-
-	// Emit a draw indexed command to render sprites
 	commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, vertexCount * 3 );
 }
 

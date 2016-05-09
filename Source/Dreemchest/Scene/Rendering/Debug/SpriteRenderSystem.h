@@ -50,11 +50,15 @@ namespace Scene {
 		//! Writes transformed vertices of a single sprite instance.
 		void							emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const;
 
+		//! Writes a batch of sprites with same render states to an output stream.
+		void							emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor );
+
 	private:
 
 		//! A maximum number of sprites that can be rendered in a single batch
 		enum { MaxSpritesInBatch = 1000 };
 
+		UbershaderPtr                   m_spriteShader;		//!< A default shader that is used for sprite rendering.
 		VertexFormat					m_vertexFormat;		//!< A 2D vertex format.
 		RenderResource					m_vertexBuffer;		//!< An intermediate vertex buffer used for batching.
 		RenderResource					m_indexBuffer;		//!< A static index buffer with pre-allocated set of indices.
