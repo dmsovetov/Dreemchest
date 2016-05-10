@@ -302,8 +302,7 @@ void Rvm::uploadConstantBuffer( u32 id, const void* data, s32 size )
 void Rvm::uploadVertexBuffer( u32 id, const void* data, s32 size )
 {
     Renderer::VertexBufferPtr vertexBuffer = m_context->vertexBuffer( id );
-    memcpy( vertexBuffer->lock(), data, size );
-    vertexBuffer->unlock();
+    vertexBuffer->setBufferData( data, 0, size );
 }
 
 // ** Rvm::applyStates
