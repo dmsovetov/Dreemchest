@@ -73,6 +73,7 @@ DC_BEGIN_COMPOSER
 		Gizmo				m_gizmo;			//!< Actual gizmo data.
 	};
 
+#if DEV_DEPRECATED_SCENE_INPUT
 	//! Translates the transforms by a translation tool.
 	class TranslationToolSystem : public Scene::GenericTouchSystem<TranslationToolSystem, TranslationTool, Scene::Transform> {
 	public:
@@ -97,6 +98,7 @@ DC_BEGIN_COMPOSER
 		//! Maps the view ray to an intersection point.
 		Vec3						mapRayToPoint( TranslationTool& tool, const Scene::Transform& transform, f32 scale, const Ray& ray );
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders active translation tools.

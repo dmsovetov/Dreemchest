@@ -73,6 +73,7 @@ DC_BEGIN_COMPOSER
 		Gizmo					m_gizmo;					//!< Actual gizmo state.
 	};
 
+#if DEV_DEPRECATED_SCENE_INPUT
 	//! Rotates transform by a rotation tool.
 	class RotationToolSystem : public Scene::GenericTouchSystem<RotationToolSystem, RotationTool, Scene::Transform> {
 	public:
@@ -94,6 +95,7 @@ DC_BEGIN_COMPOSER
 		//! Maps the view ray to a transformation axis.
 		u8							mapRayToAxis( RotationTool& tool, Scene::Transform& transform, f32 scale, const Ray& ray, Vec2& axis ) const;
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders active rotation tools.
@@ -109,7 +111,6 @@ DC_BEGIN_COMPOSER
 		//! Renders the mesh of a single translation tool.
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const RotationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
-#else
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

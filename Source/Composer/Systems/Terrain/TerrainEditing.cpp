@@ -103,6 +103,7 @@ void TerrainTool::setType( Type value )
 	m_type = value;
 }
 
+#if DEV_DEPRECATED_SCENE_INPUT
 // ----------------------------------------------------------------- TerrainHeightmapSystem ----------------------------------------------------------------- //
 
 // ** TerrainHeightmapSystem::TerrainHeightmapSystem
@@ -298,6 +299,7 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
 
     return average;
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 

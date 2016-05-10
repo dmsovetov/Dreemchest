@@ -87,6 +87,7 @@ DC_BEGIN_COMPOSER
 		Scene::TerrainHandle	m_terrain;	//!< Affected terrain instance.
 	};
 
+#if DEV_DEPRECATED_SCENE_INPUT
 	//! Used for terrain heightmap editing.
 	class TerrainHeightmapSystem : public Scene::GenericTouchSystem<TerrainHeightmapSystem, Editors::TerrainChunk, Scene::StaticMesh, Scene::Transform> {
 	public:
@@ -124,6 +125,7 @@ DC_BEGIN_COMPOSER
 
 		Scene::SceneObjectWPtr	m_tool;		//!< Terrain tool instance.
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders the terrain tool circle.
@@ -139,7 +141,6 @@ DC_BEGIN_COMPOSER
 		//! Renders terrain tool circle
 		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
 	};
-#else
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

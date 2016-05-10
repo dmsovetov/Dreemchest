@@ -92,6 +92,7 @@ Bounds TranslationTool::selectorBoundingBox( u8 idx ) const
 	return Bounds();
 }
 
+#if DEV_DEPRECATED_SCENE_INPUT
 // ------------------------------------------------------- TranslationToolSystem ------------------------------------------------------- //
 
 // ** TranslationToolSystem::TranslationToolSystem
@@ -262,6 +263,7 @@ u8 TranslationToolSystem::mapRayToAxis( TranslationTool& tool, f32 scale, const 
 
 	return TranslationTool::Null;
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 

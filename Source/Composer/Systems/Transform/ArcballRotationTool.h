@@ -64,6 +64,7 @@ DC_BEGIN_COMPOSER
 		bool						m_isLocked;			//!< Marks this arcball as locked.
 	};
 
+#if DEV_DEPRECATED_SCENE_INPUT
 	//! Rotates the transforms by an arcball rotation tool.
 	class ArcballRotationToolSystem : public Scene::GenericTouchSystem<ArcballRotationToolSystem, ArcballRotationTool, Scene::Transform> {
 	public:
@@ -85,6 +86,7 @@ DC_BEGIN_COMPOSER
 		//! Maps the screen space coordinates to a unit vector on arcball.
 		bool						mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 	//! Renders the arcball rotation tool indicator.

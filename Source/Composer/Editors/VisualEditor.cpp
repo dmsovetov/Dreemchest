@@ -38,7 +38,6 @@ namespace Editors {
 VisualEditor::VisualEditor( void ) : m_hasLostFocus( true )
 {
 	m_backgroundColor = Rgba( 0.5f, 0.5f, 0.5f );
-	m_viewport		  = new Scene::Viewport( Scene::SceneObjectWPtr() );
 }
 
 // ** VisualEditor::initialize
@@ -75,10 +74,10 @@ Renderer::HalWPtr VisualEditor::hal( void ) const
 	return m_hal;
 }
 
-// ** VisualEditor::viewport
-Scene::ViewportWPtr VisualEditor::viewport( void ) const
+// ** VisualEditor::setActiveCamera
+void VisualEditor::setActiveCamera( Scene::SceneObjectWPtr value )
 {
-	return m_viewport;
+    m_activeCamera = value;
 }
 
 // ** VisualEditor::backgroundColor
@@ -110,8 +109,13 @@ void VisualEditor::endFrameRendering( void )
 // ** VisualEditor::constructViewRay
 Ray VisualEditor::constructViewRay( s32 x, s32 y ) const
 {
+#if DEV_DEPRECATED_SCENE_INPUT
     y = m_document->renderingFrame()->height() - y;
     return m_viewport->constructViewRay( x, y );
+#else
+    DC_NOT_IMPLEMENTED;
+    return Ray();
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 }
 
 // ** VisualEditor::handleUpdate
@@ -124,21 +128,21 @@ void VisualEditor::handleResize( s32 width, s32 height )
 void VisualEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
-	m_viewport->touchBegan( x, y, m_viewport->flags() | button );
+    m_activeCamera->get<Scene::Viewport>()->touchBegan( 0, x, y, button );
 }
 
 // ** VisualEditor::handleMouseRelease
 void VisualEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
-	m_viewport->touchEnded( x, y, button );
+    m_activeCamera->get<Scene::Viewport>()->touchEnded( 0, x, y, button );
 }
 
 // ** VisualEditor::handleMouseMove
 void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
 	y = m_document->renderingFrame()->height() - y;
-	m_viewport->touchMoved( x, y, buttons );
+    m_activeCamera->get<Scene::Viewport>()->touchMoved( 0, x, y, dx, dy, buttons );
 }
 
 // ** VisualEditor::handleContextMenu

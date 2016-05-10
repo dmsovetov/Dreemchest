@@ -49,8 +49,8 @@ namespace Editors {
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;
 
-		//! Returns scene viewport of an editor.
-		Scene::ViewportWPtr				viewport( void ) const;
+        //! Sets an active camera for this visual editor.
+        void                            setActiveCamera( Scene::SceneObjectWPtr value );
 
 		//! Returns the background color.
 		const Rgba&						backgroundColor( void ) const;
@@ -125,7 +125,7 @@ namespace Editors {
 
 		Renderer::HalPtr				m_hal;						//!< Rendering HAL instance.
 		Rgba							m_backgroundColor;			//!< The background color.
-		Scene::ViewportPtr				m_viewport;					//!< Scene viewport.
+        Scene::SceneObjectWPtr          m_activeCamera;             //!< A workaround used for dispatching input events from a rendering frame to an active camera.
         QPoint                          m_lastCursorPos;            //!< Last tracked cursor position.
         Ui::MouseButtons                m_mouseButtons;             //!< Bitmask to store pressed mouse buttons.
         bool                            m_hasLostFocus;             //!< Indicates that the focus was lost.

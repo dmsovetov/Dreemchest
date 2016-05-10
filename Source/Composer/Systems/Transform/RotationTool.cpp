@@ -71,6 +71,7 @@ bool RotationTool::isLocked( void ) const
 	return m_gizmo.state() == Gizmo::Locked;
 }
 
+#if DEV_DEPRECATED_SCENE_INPUT
 // ------------------------------------------------------- RotationToolSystem ------------------------------------------------------- //
 
 // ** RotationToolSystem::RotationToolSystem
@@ -215,6 +216,7 @@ void RotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::E
 		tool.gizmo().unlock();
 	}
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 

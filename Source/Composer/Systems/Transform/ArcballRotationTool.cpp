@@ -77,6 +77,7 @@ void ArcballRotationTool::unlock( void )
 	m_isLocked = false;
 }
 
+#if DEV_DEPRECATED_SCENE_INPUT
 // ------------------------------------------------------- ArcballRotationToolSystem ------------------------------------------------------- //
 
 // ** ArcballRotationToolSystem::ArcballRotationToolSystem
@@ -157,6 +158,7 @@ void ArcballRotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e,
 		arcball.unlock();
 	}
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
 

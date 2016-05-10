@@ -40,6 +40,36 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
+class TestMoverInput : public Ecs::Component<TestMoverInput> {
+};
+
+class TestMover : public Ecs::Component<TestMover> {
+};
+
+class TestInputSystem : public Scene::InputSystem<TestInputSystem, TestMoverInput, Scene::Sprite, Scene::Transform, TestMover> {
+public:
+
+    TestInputSystem( Scene::Scene& scene )
+        : InputSystem( scene ) {}
+
+    virtual void touchBegan( Ecs::Entity& entity, u8 flags, const Scene::TouchEvent& touch ) NIMBLE_OVERRIDE
+    {
+        entity.attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 0.0f, 1.0f ) ) );
+    }
+
+    virtual void touchMoved( Ecs::Entity& entity, u8 flags, const Scene::TouchEvent& touch ) NIMBLE_OVERRIDE
+    {
+        Scene::Transform* transform = entity.get<Scene::Transform>();
+        transform->setX( touch.x );
+        transform->setY( touch.y );
+    }
+
+    virtual void touchEnded( Ecs::Entity& entity, u8 flags, const Scene::TouchEvent& touch ) NIMBLE_OVERRIDE
+    {
+        entity.detach<Scene::RotateAroundAxes>();
+    }
+};
+
 // ** SceneEditor::SceneEditor
 SceneEditor::SceneEditor( void ) : m_tools( NULL )
 {
@@ -90,7 +120,9 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 		m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
 		m_scene->addSceneObject( m_terrainTool );
 
+    #if DEV_DEPRECATED_SCENE_INPUT
 		m_scene->addSystem<TerrainHeightmapSystem>( m_terrainTool, viewport() );
+    #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 	}
 
 	// Create grid.
@@ -108,7 +140,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	// Create the camera.
 	m_camera = m_scene->createSceneObject();
     m_camera->attach<Scene::Transform>()->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
-    m_camera->attach<Scene::Camera>( Scene::Projection::Perspective, m_renderTarget, backgroundColor() );
+    m_camera->attach<Scene::Camera>( Scene::Projection::Perspective, backgroundColor() );
     m_camera->attach<Scene::RotateAroundAxes>( 10.0f, Scene::CSLocalX, DC_NEW Scene::Vec3FromMouse )->setRangeForAxis( Scene::AxisX, Range( -90.0f, 90.0f ) );
     m_camera->get<Scene::RotateAroundAxes>()->setBinding( m_cursorMovement );
 	m_camera->attach<Scene::MoveAlongAxes>( 60.0f, Scene::CSLocal, new Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
@@ -117,6 +149,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
     m_camera->get<Scene::Camera>()->setFar( 100.0f );
+    m_camera->attach<Scene::Viewport>( m_renderTarget );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
@@ -127,6 +160,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 
 	//m_camera->attach<Scene::SpriteRenderer>( 0.01f );
 	m_camera->attach<Scene::ForwardRenderer>();
+    m_camera->attach<TestMoverInput>();
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
 
@@ -155,22 +189,28 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 #endif
 
 	m_scene->addSceneObject( m_camera );
-	viewport()->setCamera( m_camera );
+    setActiveCamera( m_camera );
 
 	// Add a 2D camera
 	{
 		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
 		camera->attach<Scene::Transform>();
-		camera->attach<Scene::Camera>( Scene::Projection::Ortho, m_renderTarget );
+		camera->attach<Scene::Camera>( Scene::Projection::Ortho );
+        camera->attach<Scene::Viewport>( m_renderTarget );
 		camera->attach<Scene::SpriteRenderer>();
 		camera->attach<Editors::SceneEditorInternal>();
 		m_scene->addSceneObject( camera );
 	}
 
+#if DEV_DEPRECATED_SCENE_INPUT
 	// Add gizmo systems
 	m_scene->addSystem<TranslationToolSystem>( viewport() );
 	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
 	m_scene->addSystem<RotationToolSystem>( viewport() );
+#else
+    m_scene->addInputSystem<TestInputSystem>();
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
+
 #if DEV_DEPRECATED_SCENE_RENDERER
 //	m_scene->addRenderingSystem<SceneHelpersRenderer>();
     m_renderScene->addRenderSystem<Scene::DepthComplexity>();
@@ -462,7 +502,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 		Scene::SceneObjectPtr sprite = scene->createSceneObject();
 		sprite->attach<Scene::Transform>( 500, 100, 0, Scene::TransformWPtr() );
 		sprite->attach<Scene::Sprite>( 200, 200, dflt );
-		sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 0.0f, 1.0f ) ) );
+        sprite->attach<TestMover>();
 		scene->addSceneObject( sprite );
 	}
 
