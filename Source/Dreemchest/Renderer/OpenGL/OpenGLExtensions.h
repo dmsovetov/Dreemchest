@@ -44,6 +44,7 @@ namespace Renderer {
 	extern PFNGLDELETEBUFFERSARBPROC			glDeleteBuffers;
 	extern PFNGLGENBUFFERSARBPROC				glGenBuffers;
 	extern PFNGLBUFFERDATAARBPROC				glBufferData;
+    extern PFNGLBUFFERSUBDATAARBPROC		    glBufferSubData;
 	extern PFNGLMAPBUFFERARBPROC				glMapBuffer;
 	extern PFNGLUNMAPBUFFERARBPROC				glUnmapBuffer;
 

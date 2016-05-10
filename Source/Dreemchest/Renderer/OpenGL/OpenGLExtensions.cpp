@@ -43,6 +43,7 @@ PFNGLGENBUFFERSARBPROC				glGenBuffers = NULL;
 PFNGLBUFFERDATAARBPROC				glBufferData = NULL;
 PFNGLMAPBUFFERARBPROC				glMapBuffer = NULL;
 PFNGLUNMAPBUFFERARBPROC				glUnmapBuffer = NULL;
+PFNGLBUFFERSUBDATAARBPROC		    glBufferSubData = NULL;
 
 // ** GL_ARB_shading_language_100 & GL_ARB_shader_objects
 PFNGLCREATEPROGRAMPROC				glCreateProgram = NULL;
@@ -95,6 +96,7 @@ bool loadOpenGLExtensions( void )
 	glDeleteBuffers			= ( PFNGLDELETEBUFFERSARBPROC )         wglGetProcAddress( "glDeleteBuffersARB" );
 	glGenBuffers			= ( PFNGLGENBUFFERSARBPROC )            wglGetProcAddress( "glGenBuffersARB" );
 	glBufferData			= ( PFNGLBUFFERDATAARBPROC )            wglGetProcAddress( "glBufferDataARB" );
+    glBufferSubData		    = ( PFNGLBUFFERSUBDATAARBPROC )         wglGetProcAddress( "glBufferSubDataARB" );
 	glMapBuffer				= ( PFNGLMAPBUFFERARBPROC )             wglGetProcAddress( "glMapBufferARB" );
 	glUnmapBuffer			= ( PFNGLUNMAPBUFFERARBPROC )           wglGetProcAddress( "glUnmapBufferARB" );
 

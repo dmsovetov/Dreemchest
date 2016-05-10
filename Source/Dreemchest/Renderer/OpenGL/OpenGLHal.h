@@ -284,6 +284,7 @@ namespace Renderer {
         // ** VertexBuffer
         virtual void*               lock( void );
         virtual void                unlock( void );
+        virtual void                setBufferData( const void* source, s32 offset, s32 size );
 
 		// ** OpenGLVertexBuffer
 		void						bind( void );

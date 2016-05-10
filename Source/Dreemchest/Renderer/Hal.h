@@ -593,6 +593,9 @@ namespace Renderer {
 		template<typename TVertex>
 		TVertex*					lock( void );
 
+        //! Updates a part of a vertex buffer.
+        virtual void                setBufferData( const void* source, s32 offset, s32 size );
+
     protected:
 
         //! Vertex buffer size.

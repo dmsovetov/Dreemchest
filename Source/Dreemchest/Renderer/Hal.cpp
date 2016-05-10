@@ -848,6 +848,12 @@ void VertexBuffer::unlock( void )
     
 }
 
+// ** VertexBuffer::setBufferData
+void VertexBuffer::setBufferData( const void* source, s32 offset, s32 size )
+{
+    memcpy( reinterpret_cast<u8*>( m_data ) + offset, source, size );
+}
+
 // ----------------------------------------------- IndexBuffer -------------------------------------------------- //
 
 // ** IndexBuffer::IndexBuffer

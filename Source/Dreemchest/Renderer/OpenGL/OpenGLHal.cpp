@@ -1117,7 +1117,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer( s32 size )
     
 	glGenBuffers( 1, &m_id );
 	glBindBuffer( GL_ARRAY_BUFFER, m_id );
-	glBufferData( GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
@@ -1150,6 +1150,16 @@ void OpenGLVertexBuffer::unlock( void )
     DC_CHECK_GL;
     
     glUnmapBuffer( GL_ARRAY_BUFFER );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
+
+// ** OpenGLVertexBuffer::setBufferData
+void OpenGLVertexBuffer::setBufferData( const void* source, s32 offset, s32 size )
+{
+    DC_CHECK_GL;
+
+    glBindBuffer( GL_ARRAY_BUFFER, m_id );
+    glBufferSubData( GL_ARRAY_BUFFER, offset, size, source );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
