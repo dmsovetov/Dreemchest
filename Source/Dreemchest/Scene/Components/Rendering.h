@@ -28,10 +28,10 @@
 #define __DC_Scene_Component_Rendering_H__
 
 #include "../Scene.h"
+#include "../Viewport.h"
 #include "../Assets/Mesh.h"
 #include "../Assets/Image.h"
 #include "../Assets/Material.h"
-#include "../Rendering/RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -386,7 +386,7 @@ namespace Scene {
     public:
 
                                     //! Constructs a Viewport instance.
-                                    Viewport( RenderTargetWPtr renderTarget = RenderTargetWPtr() );
+                                    Viewport( ViewportWPtr viewport = ViewportWPtr() );
 
         //! Returns a viewport width.
         s32                         width( void ) const;
@@ -415,10 +415,13 @@ namespace Scene {
         //! Clears all queued events.
         void                        clearEvents( void );
 
+        //! Returns the viewport split by it's coordinates.
+        static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
+
     private:
 
-        RenderTargetWPtr            m_renderTarget; //!< A target that is used to render a frame.
-        Array<InputEvent>           m_events;       //!< All events recorded by this viewport instance.
+        ViewportWPtr                m_viewport; //!< A scene viewport that is used to render a frame.
+        Array<InputEvent>           m_events;   //!< All events recorded by this viewport instance.
     };
 
 } // namespace Scene

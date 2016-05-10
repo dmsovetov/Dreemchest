@@ -29,6 +29,7 @@
 
 #include "../Assets/Mesh.h"
 #include "../Assets/Material.h"
+#include "../Viewport.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -530,21 +531,21 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 // -------------------------------------------- Viewport -------------------------------------------- //
 
 // ** Viewport::Viewport
-Viewport::Viewport( RenderTargetWPtr renderTarget )
-    : m_renderTarget( renderTarget )
+Viewport::Viewport( ViewportWPtr viewport )
+    : m_viewport( viewport )
 {
 }
 
 // ** Viewport::width
 s32 Viewport::width( void ) const
 {
-    return m_renderTarget->width();
+    return m_viewport->width();
 }
 
 // ** Viewport::height
 s32 Viewport::height( void ) const
 {
-    return m_renderTarget->height();
+    return m_viewport->height();
 }
 
 // ** Viewport::denormalize
@@ -593,6 +594,19 @@ const InputEvent& Viewport::eventAt( s32 index ) const
 void Viewport::clearEvents( void )
 {
     m_events.clear();
+}
+
+// ** Viewport::calculateSplitRect
+Rect Viewport::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
+{
+	// Calculate the viewport dimensions in NDC
+	f32 width  = 1.0f / nx;
+	f32 height = 1.0f / ny;
+
+	// Calculate the NDC of a viewport
+	Rect ndc = Rect( x * width, y * height, (x + 1) * width, (y + 1) * height );
+
+	return ndc;
 }
 
 } // namespace Scene

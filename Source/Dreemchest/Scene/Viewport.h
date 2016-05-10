@@ -24,57 +24,48 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderTarget_H__
-#define __DC_Scene_RenderTarget_H__
+#ifndef __DC_Scene_Viewport_H__
+#define __DC_Scene_Viewport_H__
 
-#include "../Scene.h"
+#include "Scene.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Scene rendering target.
-	class RenderTarget : public RefCounted {
+	//! Scene viewport interface.
+	class AbstractViewport : public RefCounted {
 	public:
 
-		virtual						~RenderTarget( void ) {}
-
-		//! Returns the viewport split by it's coordinates.
-		static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
+		virtual						~AbstractViewport( void ) {}
 
 		//! Returns the render target rect.
-		Rect						rect( void ) const { return Rect( 0.0f, 0.0f, ( f32 )width(), ( f32 )height() ); }
+		Rect						rect( void ) const;
 
 		//! Returns the render target width.
-		virtual u32					width( void ) const { return 0; }
+		virtual s32					width( void ) const NIMBLE_ABSTRACT;
 
 		//! Returns the render target height.
-		virtual u32					height( void ) const { return 0; }
-
-		//! Begins rendering to this target.
-		virtual void				begin( Renderer::HalWPtr hal ) const;
-
-		//! Ends rendering to this target.
-		virtual void				end( Renderer::HalWPtr hal ) const;
+		virtual s32					height( void ) const NIMBLE_ABSTRACT;
 	};
 
-	//! WindowTarget is used for rendering the scene to window.
-	class WindowTarget : public RenderTarget {
+	//! WindowViewport is used for attaching a scene viewport to a window instance.
+	class WindowViewport : public AbstractViewport {
 	public:
 
 		//! Returns the window width.
-		virtual u32					width( void ) const DC_DECL_OVERRIDE;
+		virtual s32					width( void ) const NIMBLE_OVERRIDE;
 
 		//! Returns the window height.
-		virtual u32					height( void ) const DC_DECL_OVERRIDE;
+		virtual s32					height( void ) const NIMBLE_OVERRIDE;
 
 		//! Creates the WindowView instance.
-		static WindowTargetPtr		create( const Platform::WindowWPtr& window );
+		static WindowViewportPtr    create( const Platform::WindowWPtr& window );
 
 	private:
 
-									//! Constructs the WindowTarget instance.
-									WindowTarget( const Platform::WindowWPtr& window );
+									//! Constructs the WindowViewport instance.
+									WindowViewport( const Platform::WindowWPtr& window );
 
 	private:
 
@@ -85,4 +76,4 @@ namespace Scene {
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderTarget_H__    */
+#endif    /*    !__DC_Scene_Viewport_H__    */

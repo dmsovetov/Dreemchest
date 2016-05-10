@@ -375,9 +375,8 @@ namespace Scene {
 	typedef Ecs::EntityId			SceneObjectId;
 
 	dcDeclarePtrs( Scene )
-	dcDeclarePtrs( RenderTarget )
-	dcDeclarePtrs( TextureTarget )
-	dcDeclarePtrs( WindowTarget )
+	dcDeclareNamedPtrs( AbstractViewport, Viewport )
+	dcDeclarePtrs( WindowViewport )
 	dcDeclarePtrs( Transform )
 	dcDeclarePtrs( Camera )
 	dcDeclarePtrs( StaticMesh )

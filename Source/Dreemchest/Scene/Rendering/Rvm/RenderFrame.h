@@ -30,7 +30,6 @@
 #include "Commands.h"
 #include "RenderState.h"
 #include "Ubershader.h"
-#include "../RenderTarget.h"
 
 DC_BEGIN_DREEMCHEST
 

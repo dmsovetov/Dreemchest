@@ -24,60 +24,43 @@
 
  **************************************************************************/
 
-#include "RenderTarget.h"
+#include "Viewport.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ------------------------------------------ RenderTarget ------------------------------------------- //
+// ---------------------------------------- AbstractViewport ---------------------------------------- //
 
-// ** RenderTarget::calculateSplitRect
-Rect RenderTarget::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
+// ** AbstractViewport::rect
+Rect AbstractViewport::rect( void ) const
 {
-	// Calculate the viewport dimensions in NDC
-	f32 width  = 1.0f / nx;
-	f32 height = 1.0f / ny;
-
-	// Calculate the NDC of a viewport
-	Rect ndc = Rect( x * width, y * height, (x + 1) * width, (y + 1) * height );
-
-	return ndc;
+    return Rect( 0.0f, 0.0f, width(), height() );
 }
 
-// ** RenderTarget::begin
-void RenderTarget::begin( Renderer::HalWPtr hal ) const
+// ------------------------------------------ WindowViewport ------------------------------------------ //
+
+// ** WindowViewport::WindowViewport
+WindowViewport::WindowViewport( const Platform::WindowWPtr& window ) : m_window( window )
 {
 }
 
-// ** RenderTarget::end
-void RenderTarget::end( Renderer::HalWPtr hal ) const
-{
-}
-
-// ------------------------------------------ WindowTarget ------------------------------------------ //
-
-// ** WindowTarget::WindowTarget
-WindowTarget::WindowTarget( const Platform::WindowWPtr& window ) : m_window( window )
-{
-}
-
-// ** WindowTarget::width
-u32 WindowTarget::width( void ) const
+// ** WindowViewport::width
+s32 WindowViewport::width( void ) const
 {
 	return m_window->width();
 }
 
-// ** WindowTarget::height
-u32 WindowTarget::height( void ) const
+// ** WindowViewport::height
+s32 WindowViewport::height( void ) const
 {
 	return m_window->height();
 }
 
-// ** WindowTarget::create
-WindowTargetPtr WindowTarget::create( const Platform::WindowWPtr& window )
+// ** WindowViewport::create
+WindowViewportPtr WindowViewport::create( const Platform::WindowWPtr& window )
 {
-	return WindowTargetPtr( DC_NEW WindowTarget( window ) );
+	return WindowViewportPtr( DC_NEW WindowViewport( window ) );
 }
 
 } // namespace Scene
