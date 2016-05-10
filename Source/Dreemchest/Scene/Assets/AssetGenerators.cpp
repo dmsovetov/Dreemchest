@@ -2586,18 +2586,14 @@ bool ImageCheckerGenerator::generate( Assets::Assets& assets, Image& image )
 	memset( &pixels[0], 255, pixels.size() );
 
 	// Fill the pixel buffer with a checker pattern
-	Rgb colors[]    = { m_firstColor, m_secondColor };
-	s32 activeColor = 0;
-
 	for( s32 row = 0; row < m_width; ++row ) {
 		for( s32 col = 0; col < m_height; ++col ) {
-			// Write pixel color
-			pixels[row * m_width * 3 + col * 3 + 0] = static_cast<u8>( colors[activeColor % 2].r * 255 );
-			pixels[row * m_width * 3 + col * 3 + 1] = static_cast<u8>( colors[activeColor % 2].g * 255 );
-			pixels[row * m_width * 3 + col * 3 + 2] = static_cast<u8>( colors[activeColor % 2].b * 255 );
+            const Rgb& color = ((row + 1) / (m_cellSize + 1) + (col + 1) / (m_cellSize + 1)) % 2 == 0 ? m_firstColor : m_secondColor;
 
-			// Switch color each cellSize pixels
-			if( col % 20 == 0 ) activeColor++;
+			// Write pixel color
+			pixels[row * m_width * 3 + col * 3 + 0] = static_cast<u8>( color.r * 255 );
+			pixels[row * m_width * 3 + col * 3 + 1] = static_cast<u8>( color.g * 255 );
+			pixels[row * m_width * 3 + col * 3 + 2] = static_cast<u8>( color.b * 255 );
 		}
 	}
 
@@ -2605,6 +2601,7 @@ bool ImageCheckerGenerator::generate( Assets::Assets& assets, Image& image )
 	image.setWidth( m_width );
 	image.setHeight( m_height );
 	image.setMipLevel( 0, pixels );
+    image.setBytesPerPixel( 3 );
 
 	return true;
 }
