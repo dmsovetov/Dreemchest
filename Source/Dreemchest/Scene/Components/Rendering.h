@@ -473,6 +473,43 @@ namespace Scene {
 		f32							m_far;			//!< Z-far value.
 	};
 
+    //! A viewport component is attached to camera entities and used to handle a user input.
+    class Viewport : public Ecs::Component<Viewport> {
+    public:
+
+                                    //! Constructs a Viewport instance.
+                                    Viewport( RenderTargetWPtr renderTarget = RenderTargetWPtr() );
+
+        //! Returns a viewport width.
+        s32                         width( void ) const;
+
+        //! Returns a viewport height.
+        s32                         height( void ) const;
+
+        //! Queues a new touch began event.
+        void                        touchBegan( s32 id, s32 x, s32 y, u8 flags = 0 );
+
+        //! Queues a touch ended event.
+        void                        touchEnded( s32 id, s32 x, s32 y, u8 flags = 0 );
+
+        //! Queues a touch moved event.
+        void                        touchMoved( s32 id, s32 x, s32 y, s32 dx, s32 dy, u8 flags = 0 );
+
+        //! Returns a total number of queued events.
+        s32                         eventCount( void ) const;
+
+        //! Returns an event instance at specified index.
+        const InputEvent&           eventAt( s32 index ) const;
+
+        //! Clears all queued events.
+        void                        clearEvents( void );
+
+    private:
+
+        RenderTargetWPtr            m_renderTarget; //!< A target that is used to render a frame.
+        Array<InputEvent>           m_events;       //!< All events recorded by this viewport instance.
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

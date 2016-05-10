@@ -41,6 +41,7 @@
 
 #include "Systems/TransformSystems.h"
 #include "Systems/CullingSystems.h"
+#include "Systems/InputSystems.h"
 
 #include "Spatial/Spatial.h"
 
@@ -165,6 +166,7 @@ Scene::Scene( void )
 
 	// Create entity indices
 	m_named		= m_ecs->requestIndex( "Named Entities", Ecs::Aspect::all<Identifier>() );
+    m_cameras   = m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera, Transform, Viewport>() );
 
     // Create spatial index
     m_spatial   = DC_NEW Spatial( this );
@@ -190,6 +192,13 @@ Scene::Scene( void )
 void Scene::update( u32 currentTime, f32 dt )
 {
     NIMBLE_BREADCRUMB_CALL_STACK;
+
+    // Update all input systems
+    for( s32 i = 0, n = static_cast<s32>( m_inputSystems.size() ); i < n; i++ ) {
+        m_inputSystems[i]->update();
+    };
+
+    // Update all entity systems
 	m_ecs->update( currentTime, dt, ~0 );
 }
 

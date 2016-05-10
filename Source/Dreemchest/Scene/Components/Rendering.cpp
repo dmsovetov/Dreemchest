@@ -609,6 +609,66 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 	return Circle( center, radius );
 }
 
+// -------------------------------------------- Viewport -------------------------------------------- //
+
+// ** Viewport::Viewport
+Viewport::Viewport( RenderTargetWPtr renderTarget )
+    : m_renderTarget( renderTarget )
+{
+}
+
+// ** Viewport::width
+s32 Viewport::width( void ) const
+{
+    return m_renderTarget->width();
+}
+
+// ** Viewport::height
+s32 Viewport::height( void ) const
+{
+    return m_renderTarget->height();
+}
+
+// ** Viewport::touchBegan
+void Viewport::touchBegan( s32 id, s32 x, s32 y, u8 flags )
+{
+    TouchEvent touchEvent = { id, x, y, 0, 0 };
+    m_events.push_back( InputEvent( InputEvent::TouchBeganEvent, touchEvent, flags ) );
+}
+
+// ** Viewport::touchEnded
+void Viewport::touchEnded( s32 id, s32 x, s32 y, u8 flags )
+{
+    TouchEvent touchEvent = { id, x, y, 0, 0 };
+    m_events.push_back( InputEvent( InputEvent::TouchEndedEvent, touchEvent, flags ) );
+}
+
+// ** Viewport::touchMoved
+void Viewport::touchMoved( s32 id, s32 x, s32 y, s32 dx, s32 dy, u8 flags )
+{
+    TouchEvent touchEvent = { id, x, y, dx, dy };
+    m_events.push_back( InputEvent( InputEvent::TouchMovedEvent, touchEvent, flags ) );
+}
+
+// ** Viewport::eventCount
+s32 Viewport::eventCount( void ) const
+{
+    return static_cast<s32>( m_events.size() );
+}
+
+// ** Viewport::eventAt
+const InputEvent& Viewport::eventAt( s32 index ) const
+{
+    DC_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
+    return m_events[index];
+}
+
+// ** Viewport::clearEvents
+void Viewport::clearEvents( void )
+{
+    m_events.clear();
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

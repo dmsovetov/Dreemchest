@@ -30,56 +30,68 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** TouchSystem::TouchSystem
-TouchSystem::TouchSystem( const String& name, const Ecs::Aspect& aspect, ViewportWPtr viewport ) : EntitySystem( name, aspect ), m_viewport( viewport )
+// ** InputSystemBase::InputSystemBase
+InputSystemBase::InputSystemBase( Scene& scene, const Ecs::Aspect& cameraAspect, const Ecs::Aspect& entityAspect )
+    : m_scene( scene )
 {
-	DC_ABORT_IF( !viewport.valid(), "invalid viewport" );
-
-	m_viewport->subscribe<Viewport::TouchBegan>( dcThisMethod( TouchSystem::handleTouchBegan ) );
-	m_viewport->subscribe<Viewport::TouchEnded>( dcThisMethod( TouchSystem::handleTouchEnded ) );
-	m_viewport->subscribe<Viewport::TouchMoved>( dcThisMethod( TouchSystem::handleTouchMoved ) );
+    m_cameras  = m_scene.ecs()->requestIndex( "InputSystemBase.cameras", cameraAspect );
+    m_entities = m_scene.ecs()->requestIndex( "InputSystemBase.entities", entityAspect );
 }
 
-TouchSystem::~TouchSystem( void )
+// ** InputSystemBase::~InputSystemBase
+InputSystemBase::~InputSystemBase( void )
 {
-	if( m_viewport.valid() ) {
-		m_viewport->unsubscribe<Viewport::TouchBegan>( dcThisMethod( TouchSystem::handleTouchBegan ) );
-		m_viewport->unsubscribe<Viewport::TouchEnded>( dcThisMethod( TouchSystem::handleTouchEnded ) );
-		m_viewport->unsubscribe<Viewport::TouchMoved>( dcThisMethod( TouchSystem::handleTouchMoved ) );
-	}
 }
 
-// ** TouchSystem::handleTouchBegan
-void TouchSystem::handleTouchBegan( const Viewport::TouchBegan& e )
+// ** InputSystemBase::update
+void InputSystemBase::update( void )
 {
-	Ecs::EntitySet& entities = m_index->entities();
+    // Dispatch input events recorded by all camera viewports
+    Ecs::EntitySet& cameras = m_cameras->entities();
 
-	for( Ecs::EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ) {
-		Ecs::Entity& entity = *(i++)->get();
-		touchBeganEvent( const_cast<Viewport::TouchBegan&>( e ), entity );
-	}
+    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
+        // Get a camera component and associated viewport
+        Camera&   camera   = *(*i)->get<Camera>();
+        Viewport& viewport = *(*i)->get<Viewport>();
+
+        // Get a camera effective viewport rect
+        Rect cameraViewport = camera.viewport();
+
+        // Process each recorded event
+        for( s32 j = 0, n = viewport.eventCount(); j < n; j++ ) {
+            // Get an event by index
+            const InputEvent& e = viewport.eventAt( j );
+
+            // Skip an event if it's outside of an effective viewport rect
+            if( !cameraViewport.contains( e.touchEvent.x, e.touchEvent.y ) ) {
+                continue;
+            }
+
+            // Now dispatch this event to all entities
+            dispatchEvent( e );
+        }
+
+        // Clear all queued events
+        viewport.clearEvents();
+    }
 }
 
-// ** TouchSystem::handleTouchEnded
-void TouchSystem::handleTouchEnded( const Viewport::TouchEnded& e )
+// ** InputSystemBase::dispatchEvent
+void InputSystemBase::dispatchEvent( const InputEvent& e )
 {
-	Ecs::EntitySet& entities = m_index->entities();
+    // Dispatch this event to all active entities
+    Ecs::EntitySet& entities = m_entities->entities();
 
-	for( Ecs::EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ) {
-		Ecs::Entity& entity = *(i++)->get();
-		touchEndedEvent( const_cast<Viewport::TouchEnded&>( e ), entity );
-	}
-}
-
-// ** TouchSystem::handleTouchMoved
-void TouchSystem::handleTouchMoved( const Viewport::TouchMoved& e )
-{
-	Ecs::EntitySet& entities = m_index->entities();
-
-	for( Ecs::EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ) {
-		Ecs::Entity& entity = *(i++)->get();
-		touchMovedEvent( const_cast<Viewport::TouchMoved&>( e ), entity );
-	}
+    for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+        switch( e.type ) {
+        case InputEvent::TouchBeganEvent:   touchBegan( *i->get(), e.flags, e.touchEvent );
+                                            break;
+        case InputEvent::TouchMovedEvent:   touchMoved( *i->get(), e.flags, e.touchEvent );
+                                            break;
+        case InputEvent::TouchEndedEvent:   touchEnded( *i->get(), e.flags, e.touchEvent );
+                                            break;
+        }
+    }
 }
 
 } // namespace Scene

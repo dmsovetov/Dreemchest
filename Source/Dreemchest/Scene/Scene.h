@@ -438,7 +438,6 @@ namespace Scene {
 	typedef Ecs::EntityId			SceneObjectId;
 
 	dcDeclarePtrs( Scene )
-	dcDeclarePtrs( Viewport )
 	dcDeclarePtrs( RenderTarget )
 	dcDeclarePtrs( TextureTarget )
 	dcDeclarePtrs( WindowTarget )
@@ -455,6 +454,9 @@ namespace Scene {
     dcDeclarePtrs( Rvm )
 
 	dcDeclarePtrs( Vec3Binding )
+
+    //! An input system unique pointer type
+    typedef AutoPtr<class InputSystemBase> InputSystemPtr;
 
 #if DEV_DEPRECATED_ECS_ARCHETYPES
 	dcDeclarePtrs( SpectatorCamera )
@@ -517,10 +519,6 @@ namespace Scene {
 		//! Removes scene object to scene.
 		void							removeSceneObject( const SceneObjectPtr& sceneObject );
 
-		//! Creates an archetype instance.
-		template<typename TArchetype>
-		StrongPtr<TArchetype>			createArchetype( const SceneObjectId& id, const KeyValue* data = NULL );
-
 		//! Creates a new scene object instance.
 		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
 
@@ -545,7 +543,11 @@ namespace Scene {
 
 		//! Adds a new system to the scene.
 		template<typename TSystem, typename ... Args>
-		WeakPtr<TSystem>				addSystem( Args ... args );
+		WeakPtr<TSystem>				addSystem( const Args& ... args );
+
+        //! Adds a new input system to a scene.
+		template<typename TSystem, typename ... Args>
+		void				            addInputSystem( const Args& ... args );
 
 		//! Creates an empty scene.
 		static ScenePtr					create( void );
@@ -579,13 +581,15 @@ namespace Scene {
 
 		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
+        Array<InputSystemPtr>           m_inputSystems;     //!< User input processing systems.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
+        Ecs::IndexPtr                   m_cameras;          //!< All active cameras with associated viewports.
         SpatialUPtr                     m_spatial;          //!< Scene spatial index.
 	};
 
 	// ** Scene::addSystem
 	template<typename TSystem, typename ... Args>
-	WeakPtr<TSystem> Scene::addSystem( Args ... args )
+	WeakPtr<TSystem> Scene::addSystem( const Args& ... args )
 	{
 		WeakPtr<TSystem> system = m_updateSystems->add<TSystem>( args... );
 		m_ecs->rebuildIndices();
@@ -599,12 +603,46 @@ namespace Scene {
 		return m_updateSystems->get<TSystem>();
 	}
 
-	// ** Scene::createArchetype
-	template<typename TArchetype>
-	StrongPtr<TArchetype> Scene::createArchetype( const SceneObjectId& id, const KeyValue* data )
-	{
-		return m_ecs->createArchetype<TArchetype>( id, data );
-	}
+    // ** Scene::addInputSystem
+	template<typename TSystem, typename ... Args>
+	void Scene::addInputSystem( const Args& ... args )
+    {
+        m_inputSystems.push_back( DC_NEW TSystem( *this, args... ) );
+    }
+
+    //! A base class for all touch events.
+    struct TouchEvent {
+        s32     id; //!< A touch id.
+        s32     x;  //!< A touch X coordinate in viewport coordinate system.
+        s32     y;  //!< A touch Y coordinate in viewport coordinate system.
+        s32     dx; //!< A touch X coordinate change.
+        s32     dy; //!< A touch Y coordinate change.
+    };
+
+    //! A helper struct that wraps input event recorded by a viewport.
+    struct InputEvent {
+        //! Available input events
+        enum Type {
+              TouchBeganEvent
+            , TouchMovedEvent
+            , TouchEndedEvent
+        };
+
+                        //! Constructs an empty InputEvent instance.
+                        InputEvent( void ) {}
+
+                        //! Constructs an TouchBegan event instance.
+                        InputEvent( Type type, const TouchEvent& touchEvent, u8 flags )
+                            : type( type )
+                            , flags( flags )
+                            , touchEvent( touchEvent )
+                            {
+                            }
+
+        Type            type;       //!< An event type.
+        u8              flags;      //!< An event feature mask.
+        TouchEvent      touchEvent; //!< An attached touch event data.
+    };
 
 #if DEV_DEPRECATED_SCENE_SERIALIZATION
 
@@ -764,7 +802,6 @@ namespace Scene {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "Viewport.h"
     #include "Spatial/Spatial.h"
 	#include "Components/Rendering.h"
 	#include "Components/Transform.h"

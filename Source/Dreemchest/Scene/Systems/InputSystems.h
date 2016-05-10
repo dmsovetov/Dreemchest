@@ -27,54 +27,55 @@
 #ifndef __DC_Scene_InputSystems_H__
 #define __DC_Scene_InputSystems_H__
 
-#include "../Viewport.h"
+#include "../Components/Rendering.h"
+#include "../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Touch system are used for processing user's touches for entities that contain all components from a specified set.
-	class TouchSystem : public Ecs::EntitySystem {
+	//! Input systems are used for processing user's input for entities that contain all components from a specified set.
+	class InputSystemBase {
+    friend class Scene;
 	public:
 
-							//! Constructs TouchSystem instance.
-							TouchSystem( const String& name, const Ecs::Aspect& aspect, ViewportWPtr viewport );
-		virtual				~TouchSystem( void );
+							//! Constructs InputSystemBase instance.
+							InputSystemBase( Scene& scene, const Ecs::Aspect& cameraAspect, const Ecs::Aspect& entityAspect );
+		virtual				~InputSystemBase( void );
 
-	protected:
+        //! Dispatches all queued viewport events to all eligible entities.
+        void                update( void );
 
-		//! Handles touch began event and runs the press processing function.
-		void				handleTouchBegan( const Viewport::TouchBegan& e );
+    private:
 
-		//! Handles touch ended event and runs the press processing function.
-		void				handleTouchEnded( const Viewport::TouchEnded& e );
+        //! Dispatches a single touch event to all active entities.
+        virtual void        dispatchEvent( const InputEvent& e );
 
-		//! Handles touch moved event and runs the press processing function.
-		void				handleTouchMoved( const Viewport::TouchMoved& e );
+        //! A virtual function that should be overriden in a subclass to handle TouchBegan event.
+        virtual void        touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) {}
 
-		//! Processes a touch began event for a single entity.
-		virtual void		touchBeganEvent( Viewport::TouchBegan&, Ecs::Entity& entity ) {}
+        //! A virtual function that should be overriden in a subclass to handle TouchMoved event.
+        virtual void        touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) {}
 
-		//! Processes a touch ended event for a single entity.
-		virtual void		touchEndedEvent( Viewport::TouchEnded&, Ecs::Entity& entity ) {}
+        //! A virtual function that should be overriden in a subclass to handle TouchEnded event.
+        virtual void        touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) {}
 
-		//! Processes a touch moved event for a single entity.
-		virtual void		touchMovedEvent( Viewport::TouchMoved&, Ecs::Entity& entity ) {}
+    private:
 
-	protected:
-
-		ViewportWPtr		m_viewport;	//!< Viewport instance this system is bound to.
+        Scene&              m_scene;    //!< A parent scene instance.
+        Ecs::IndexPtr	    m_cameras;  //!< All active cameras that are processed by this input system.
+        Ecs::IndexPtr       m_entities; //!< All entities that are processed by this input system.
 	};
 
 #ifndef DC_CPP11_DISABLED
 
-	//! Generic touch processing entity system for entities that contain all components from a specified set.
-	template<typename TSystem, typename ... TComponents>
-	class GenericTouchSystem : public TouchSystem {
+	//! Generic input processing entity system for entities that contain all components from a specified set.
+	template<typename TSystem, typename TCamera, typename ... TComponents>
+	class InputSystem : public InputSystemBase {
 	public:
 
-							//! Constructs GenericTouchSystem instance.
-							GenericTouchSystem( ViewportWPtr viewport );
+							//! Constructs InputSystem instance.
+							InputSystem( Scene& scene );
 
 	protected:
 
@@ -85,72 +86,73 @@ namespace Scene {
 		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
 		//! Generic processing function that should be overriden in a subclass.
-		virtual void		touchBeganEvent( Viewport::TouchBegan& e, Ecs::Entity& entity, TComponents& ... components ) {}
+		virtual void		touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e, TComponents& ... components ) {}
 
 		//! Generic processing function that should be overriden in a subclass.
-		virtual void		touchEndedEvent( Viewport::TouchEnded& e, Ecs::Entity& entity, TComponents& ... components ) {}
+		virtual void		touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e, TComponents& ... components ) {}
 
 		//! Generic processing function that should be overriden in a subclass.
-		virtual void		touchMovedEvent( Viewport::TouchMoved& e, Ecs::Entity& entity, TComponents& ... components ) {}
+		virtual void		touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e, TComponents& ... components ) {}
 
-		//! Dispatches the entity components to processing pressed event
+		//! Dispatches the entity components to processing touch began event
 		template<s32 ... Idxs> 
-		void dispatchPressed( Viewport::TouchBegan& e, Ecs::Entity& entity, IndexesTuple<Idxs...> const& )  
+		void dispatchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e, IndexesTuple<Idxs...> const& )  
 		{ 
-			touchBeganEvent( e, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+			touchBegan( entity, flags, e, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
 		}
 
-		//! Dispatches the entity components to processing released event
+		//! Dispatches the entity components to processing touch ended event
 		template<s32 ... Idxs> 
-		void dispatchReleased( Viewport::TouchEnded& e, Ecs::Entity& entity, IndexesTuple<Idxs...> const& )  
+		void dispatchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e, IndexesTuple<Idxs...> const& )  
 		{ 
-			touchEndedEvent( e, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+			touchEnded( entity, flags, e, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
 		}
 
-		//! Dispatches the entity components to processing moved event
+		//! Dispatches the entity components to processing touch moved event
 		template<s32 ... Idxs> 
-		void dispatchMoved( Viewport::TouchMoved& e, Ecs::Entity& entity, IndexesTuple<Idxs...> const& )  
+		void dispatchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e, IndexesTuple<Idxs...> const& )  
 		{ 
-			touchMovedEvent( e, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+			touchMoved( entity, flags, e, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
 		}
 
 	private:
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchBeganEvent( Viewport::TouchBegan& e, Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchEndedEvent( Viewport::TouchEnded& e, Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchMovedEvent( Viewport::TouchMoved& e, Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
 	};
 
-	// ** GenericTouchSystem::GenericTouchSystem
-	template<typename TSystem, typename ... TComponents>
-	GenericTouchSystem<TSystem, TComponents...>::GenericTouchSystem( ViewportWPtr viewport ) : TouchSystem( TypeInfo<TSystem>::name(), Ecs::Aspect::all<TComponents...>(), viewport )
+	// ** InputSystem::InputSystem
+	template<typename TSystem, typename TCamera, typename ... TComponents>
+	InputSystem<TSystem, TCamera, TComponents...>::InputSystem( Scene& scene )
+        : InputSystemBase( scene, Ecs::Aspect::all<Camera, Transform, Viewport, TCamera>(), Ecs::Aspect::all<TComponents...>() )
 	{
 	}
 
-	// ** GenericTouchSystem::touchBeganEvent
-	template<typename TSystem, typename ... TComponents>
-	void GenericTouchSystem<TSystem, TComponents...>::touchBeganEvent( Viewport::TouchBegan& e, Ecs::Entity& entity )
+	// ** InputSystem::touchBeganEvent
+	template<typename TSystem, typename TCamera, typename ... TComponents>
+	void InputSystem<TSystem, TCamera, TComponents...>::touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e )
 	{
-		dispatchPressed( e, entity, typename Indices::Indexes() );
+		dispatchBegan( entity, flags, e, typename Indices::Indexes() );
 	}
 
-	// ** GenericTouchSystem::touchEndedEvent
-	template<typename TSystem, typename ... TComponents>
-	void GenericTouchSystem<TSystem, TComponents...>::touchEndedEvent( Viewport::TouchEnded& e, Ecs::Entity& entity )
+	// ** InputSystem::touchEndedEvent
+	template<typename TSystem, typename TCamera, typename ... TComponents>
+	void InputSystem<TSystem, TCamera, TComponents...>::touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e )
 	{
-		dispatchReleased( e, entity, typename Indices::Indexes() );
+		dispatchEnded( entity, flags, e, typename Indices::Indexes() );
 	}
 
-	// ** GenericTouchSystem::touchMovedEvent
-	template<typename TSystem, typename ... TComponents>
-	void GenericTouchSystem<TSystem, TComponents...>::touchMovedEvent( Viewport::TouchMoved& e, Ecs::Entity& entity )
+	// ** InputSystem::touchMovedEvent
+	template<typename TSystem, typename TCamera, typename ... TComponents>
+	void InputSystem<TSystem, TCamera, TComponents...>::touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e )
 	{
-		dispatchMoved( e, entity, typename Indices::Indexes() );
+		dispatchMoved( entity, flags, e, typename Indices::Indexes() );
 	}
 
 #endif	/*	!DC_CPP11_DISABLED	*/
