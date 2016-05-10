@@ -26,11 +26,6 @@
 
 #include "Scene.h"
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-    #include "Rendering/RenderAssets.h"
-    #include "Rendering/Assets/Renderable.h"
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
-
 #include "Assets/Assets.h"
 #include "Assets/Material.h"
 #include "Assets/Mesh.h"
@@ -59,18 +54,6 @@ Resources::Resources( void )
     registerType<Prefab>();
     registerType<Material>()
         .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForMaterial ) );
-#if DEV_DEPRECATED_SCENE_RENDERER
-    registerType<Renderable>()
-        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForRenderable ) );
-    registerType<Texture>()
-        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForTexture ) );
-    registerType<Technique>()
-        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForTechnique ) );
-    registerType<ShaderSource>()
-        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForShaderSource ) );
-    registerType<Program>()
-        .setAllocatedAssetMemoryCallback( dcStaticFunction( bytesAllocatedForProgram ) );
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 }
 
 // ** Resources::bytesAllocatedForMesh
@@ -102,62 +85,6 @@ s32 Resources::bytesAllocatedForMaterial( const Material& asset )
     return sizeof( Material );
 }
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-// ** Resources::bytesAllocatedForTexture
-s32 Resources::bytesAllocatedForTexture( const Texture& asset )
-{
-    Renderer::TextureWPtr instance = asset.texture();
-
-    if( !instance.valid() ) {
-        return 0;
-    }
-
-    s32 result = 0;
-
-    switch( instance->type() ) {
-    case Renderer::Texture::TextureType2D:  {
-                                                Renderer::Texture2DWPtr texture = static_cast<Renderer::Texture2D*>( instance.get() );
-                                                result = texture->bytesPerMip( texture->width(), texture->height() );
-                                            }
-                                            break;
-    default:                                DC_NOT_IMPLEMENTED;
-    }
-
-    return result + sizeof( Texture );
-}
-
-// ** Resources::bytesAllocatedForRenderable
-s32 Resources::bytesAllocatedForRenderable( const Renderable& asset )
-{
-    s32 result = 0;
-
-    for( s32 i = 0; i < asset.chunkCount(); i++ ) {
-        result += asset.vertexBuffer( i )->size() * asset.vertexBuffer( i )->vertexDeclaration()->vertexSize();
-        result += asset.indexBuffer( i )->size() * sizeof( u16 );
-    }
-
-    return result + sizeof( Renderable );
-}
-
-// ** Resources::bytesAllocatedForTechnique
-s32 Resources::bytesAllocatedForTechnique( const Technique& asset )
-{
-    return sizeof( Technique ) + sizeof( Rgba ) * asset.colorCount() + sizeof( ImageHandle ) * asset.textureCount();
-}
-
-// ** Resources::bytesAllocatedForShaderSource
-s32 Resources::bytesAllocatedForShaderSource( const ShaderSource& asset )
-{
-    return sizeof( ShaderSource ) + sizeof( ShaderSource::Feature ) * asset.featureCount() + asset.vertex().length() + asset.fragment().length();
-}
-
-// ** Resources::bytesAllocatedForProgram
-s32 Resources::bytesAllocatedForProgram( const Program& asset )
-{
-    return sizeof( Program );
-}
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
-
 // ** Scene::Scene
 Scene::Scene( void )
 {
@@ -182,9 +109,6 @@ Scene::Scene( void )
 	addSystem<RotateAroundAxesSystem>();
 #if !DEV_DISABLE_CULLING
     addSystem<WorldSpaceBoundingBoxSystem>();
-    #if DEV_DEPRECATED_SCENE_RENDERER
-    addSystem<FrustumCullingSystem>( m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera>() ) );
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 #endif  /*  !DEV_DISABLE_CULLING    */
 }
 

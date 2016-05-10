@@ -51,19 +51,11 @@ namespace Scene {
 		//! Returns the render target height.
 		virtual u32					height( void ) const { return 0; }
 
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		//! Begins rendering to this target.
-		virtual void				begin( RenderingContextWPtr context ) const;
-
-		//! Ends rendering to this target.
-		virtual void				end( RenderingContextWPtr context ) const;
-    #else
 		//! Begins rendering to this target.
 		virtual void				begin( Renderer::HalWPtr hal ) const;
 
 		//! Ends rendering to this target.
 		virtual void				end( Renderer::HalWPtr hal ) const;
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 	};
 
 	//! WindowTarget is used for rendering the scene to window.
@@ -88,48 +80,6 @@ namespace Scene {
 
 		Platform::WindowWPtr		m_window;	//!< The output window.
 	};
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-	//! TextureTarget is used for rendering the scene to a texture.
-	class TextureTarget : public RenderTarget {
-	public:
-
-		//! Returns render target.
-		Renderer::RenderTargetPtr	rt( void ) const;
-
-		//! Returns the render target width.
-		virtual u32					width( void ) const DC_DECL_OVERRIDE;
-
-		//! Returns the render target height.
-		virtual u32					height( void ) const DC_DECL_OVERRIDE;
-
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		//! Begins rendering to this view.
-		virtual void				begin( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
-
-		//! Ends rendering to this view.
-		virtual void				end( RenderingContextWPtr context ) const DC_DECL_OVERRIDE;
-    #else
-		//! Begins rendering to this target.
-		virtual void				begin( Renderer::HalWPtr hal ) const;
-
-		//! Ends rendering to this target.
-		virtual void				end( Renderer::HalWPtr hal ) const;
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
-
-		//! Creates the TextureTarget instance.
-		static RenderTargetPtr		create( const Renderer::RenderTargetPtr& rt );
-
-	private:
-
-									//! Constructs the TextureTarget instance.
-									TextureTarget( const Renderer::RenderTargetPtr& rt );
-
-	private:
-
-		Renderer::RenderTargetPtr	m_rt;	//!< Render target.
-	};
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

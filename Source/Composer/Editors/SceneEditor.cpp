@@ -90,15 +90,10 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_scene = loadFromFile( m_asset.absoluteFilePath() );
 
     // Create rendering context.
-#if DEV_DEPRECATED_SCENE_RENDERER
-    m_renderingContext = Scene::RenderingContext::create( project->assets(), hal(), m_scene );
-    m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext );
-#else
     m_renderingContext = Scene::RenderingContext::create( hal() );
     m_renderCache      = Scene::TestRenderCache::create( &project->assets(), m_renderingContext );
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext, m_renderCache );
     m_rvm              = Scene::Rvm::create( m_renderingContext );
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Create the scene model
 	m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
@@ -211,15 +206,8 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_scene->addInputSystem<TestInputSystem>();
 #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-//	m_scene->addRenderingSystem<SceneHelpersRenderer>();
-    m_renderScene->addRenderSystem<Scene::DepthComplexity>();
-    m_renderScene->addRenderSystem<Scene::Unlit>();
-    m_renderScene->addRenderSystem<Scene::ForwardLighting>();
-#else
     m_renderScene->addRenderSystem<Scene::ForwardRenderSystem>();
 	m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>();
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 	// Set the default tool
 	setTool( NoTool );
@@ -236,11 +224,7 @@ void SceneEditor::render( f32 dt )
 	// Render the scene
     clock_t time = clock();
 	Scene::RenderFrameUPtr frame = m_renderScene->captureFrame();
-#if DEV_DEPRECATED_SCENE_RENDERER
-    m_renderScene->display( frame );
-#else
     m_rvm->display( frame );
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
     time = clock() - time;
 
     static u32 kLastPrintTime = 0;

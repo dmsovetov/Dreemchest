@@ -34,43 +34,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-// -------------------------------------------- RenderDepthComplexity -------------------------------------------- //
-
-// ** RenderDepthComplexity::RenderDepthComplexity
-RenderDepthComplexity::RenderDepthComplexity( const Rgba& color, f32 intensity )
-    : m_intensity( intensity )
-{
-    for( s32 i = 0; i < RenderingMode::Total; i++ ) {
-        m_color[i] = color;
-    }
-}
-
-// ** RenderDepthComplexity::colorForMode
-const Rgba& RenderDepthComplexity::colorForMode( RenderingMode mode ) const
-{
-    return m_color[mode];
-}
-
-// ** RenderDepthComplexity::setColorForMode
-void RenderDepthComplexity::setColorForMode( RenderingMode mode, const Rgba& value )
-{
-    m_color[mode] = value;
-}
-
-// ** RenderDepthComplexity::intensity
-f32 RenderDepthComplexity::intensity( void ) const
-{
-    return m_intensity;
-}
-
-// ** RenderDepthComplexity::setIntensity
-void RenderDepthComplexity::setIntensity( f32 value )
-{
-    m_intensity = value;
-}
-#endif	/*	#if DEV_DEPRECATED_SCENE_RENDERER	*/
-
 // -------------------------------------------------------------- SpriteRenderer -------------------------------------------------------------- //
 
 // ** SpriteRenderer::SpriteRenderer
@@ -202,21 +165,6 @@ void StaticMesh::setWorldSpaceBounds( const Bounds& value )
 {
 	m_worldSpaceBounds = value;
 }
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-// ** StaticMesh::const 
-bool StaticMesh::isVisible( u8 camera ) const
-{
-	DC_ABORT_IF( camera >= 16, "index is out of range" );
-	return m_visibility.is( BIT( camera ) );
-}
-
-// ** StaticMesh::setVisibilityMask
-void StaticMesh::setVisibilityMask( u16 mask, bool value )
-{
-	m_visibility.set( mask, value );
-}
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ** StaticMesh::setMaterial
 void StaticMesh::setMaterial( u32 index, MaterialHandle value )

@@ -45,17 +45,6 @@ Rect RenderTarget::calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny )
 	return ndc;
 }
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-// ** RenderTarget::begin
-void RenderTarget::begin( RenderingContextWPtr context ) const
-{
-}
-
-// ** RenderTarget::end
-void RenderTarget::end( RenderingContextWPtr context ) const
-{
-}
-#else
 // ** RenderTarget::begin
 void RenderTarget::begin( Renderer::HalWPtr hal ) const
 {
@@ -65,7 +54,6 @@ void RenderTarget::begin( Renderer::HalWPtr hal ) const
 void RenderTarget::end( Renderer::HalWPtr hal ) const
 {
 }
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 // ------------------------------------------ WindowTarget ------------------------------------------ //
 
@@ -91,65 +79,6 @@ WindowTargetPtr WindowTarget::create( const Platform::WindowWPtr& window )
 {
 	return WindowTargetPtr( DC_NEW WindowTarget( window ) );
 }
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-// --------------------------------------- TextureTarget --------------------------------------- //
-
-// ** TextureTarget::TextureTarget
-TextureTarget::TextureTarget( const Renderer::RenderTargetPtr& rt ) : m_rt( rt )
-{
-}
-
-// ** TextureTarget::rt
-Renderer::RenderTargetPtr TextureTarget::rt( void ) const
-{
-	return m_rt;
-}
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-// ** TextureTarget::begin
-void TextureTarget::begin( RenderingContextWPtr context ) const
-{
-	context->hal()->setRenderTarget( m_rt );
-}
-
-// ** TextureTarget::end
-void TextureTarget::end( RenderingContextWPtr context ) const
-{
-	context->hal()->setRenderTarget( Renderer::RenderTargetPtr() );
-}
-#else
-// ** TextureTarget::begin
-void TextureTarget::begin( Renderer::HalWPtr hal ) const
-{
-    hal->setRenderTarget( m_rt );
-}
-
-// ** TextureTarget::end
-void TextureTarget::end( Renderer::HalWPtr hal ) const
-{
-    hal->setRenderTarget( Renderer::RenderTargetPtr() );
-}
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
-
-// ** TextureTarget::width
-u32 TextureTarget::width( void ) const
-{
-	return m_rt->width();
-}
-
-// ** TextureTarget::height
-u32 TextureTarget::height( void ) const
-{
-	return m_rt->height();
-}
-
-// ** TextureTarget::create
-RenderTargetPtr TextureTarget::create( const Renderer::RenderTargetPtr& rt )
-{
-	return TextureTargetPtr( DC_NEW TextureTarget( rt ) );
-}
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

@@ -37,65 +37,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-	//! This component is attached to a camera to render unlit scene.
-	class RenderUnlit : public Ecs::Component<RenderUnlit> {
-	};
-
-	//! This component is attached to a camera to render scene wireframe.
-	class RenderWireframe : public Ecs::Component<RenderWireframe> {
-	};
-
-	//! This component is attached to a camera to render debug grid.
-	class RenderGrid : public Ecs::Component<RenderGrid> {
-	};
-
-	//! This component is attached to a camera to render vertex normals.
-	class RenderVertexNormals : public Ecs::Component<RenderVertexNormals> {
-	};
-
-	//! This component is attached to a camera to debug render sprite transforms.
-	class RenderSpriteTransform : public Ecs::Component<RenderSpriteTransform> {
-	};
-
-	//! This component is attached to a camera to debug scene object bounding volumes
-	class RenderBoundingVolumes : public Ecs::Component<RenderBoundingVolumes> {
-	};
-
-	//! This component is attached to a camera to render a depth complexity
-	class RenderDepthComplexity : public Ecs::Component<RenderDepthComplexity> {
-    public:
-
-                                //! Constructs the RenderDepthComplexity instance with a same color for all rendering modes.
-                                RenderDepthComplexity( const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f ), f32 intensity = 0.1f );
-
-        //! Returns the output color for specified rendering mode.
-        const Rgba&             colorForMode( RenderingMode mode ) const;
-
-        //! Sets the output color for specified rendering mode.
-        void                    setColorForMode( RenderingMode mode, const Rgba& value );
-
-        //! Returns the color intensity.
-        f32                     intensity( void ) const;
-
-        //! Sets the color intensity.
-        void                    setIntensity( f32 value );
-
-    private:
-
-        Rgba                    m_color[RenderingMode::Total];  //!< Output colors used for each of rendering modes.
-        f32                     m_intensity;                    //!< The color intensity.
-	};
-
-	//! This component is attached to a camera to render an ambient lighting.
-	class RenderAmbient : public Ecs::Component<RenderAmbient> {
-	};
-
-	//! This component is attached to a camera to render particles.
-	class RenderParticles : public Ecs::Component<RenderParticles> {
-	};
-#endif	/*	#if DEV_DEPRECATED_SCENE_RENDERER	*/
-
 	//! This component is attached to a camera to render sprites.
 	class SpriteRenderer : public Ecs::Component<SpriteRenderer> {
 	public:
@@ -194,9 +135,6 @@ namespace Scene {
 									//! Constructs StaticMesh instance.
 									StaticMesh( const MeshHandle mesh = MeshHandle() )
 										: m_mesh( mesh )
-                                    #if DEV_DEPRECATED_SCENE_RENDERER
-                                        , m_visibility( ~0 )
-                                    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
                                         {
                                         }
 
@@ -211,14 +149,6 @@ namespace Scene {
 
 		//! Sets the mesh world space bounding box.
 		void						setWorldSpaceBounds( const Bounds& value );
-
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		//! Returns true if the mesh is visible by camera.
-		bool						isVisible( u8 camera ) const;
-
-		//! Marks the mesh as visible from camera.
-		void						setVisibilityMask( u16 mask, bool value );
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 		//! Returns the total number of materials.
 		u32							materialCount( void ) const;
@@ -237,9 +167,6 @@ namespace Scene {
 
 	private:
 
-    #if DEV_DEPRECATED_SCENE_RENDERER
-		FlagSet16					m_visibility;		//!< Camera visibility mask.
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 		MeshHandle				    m_mesh;				//!< Mesh to be rendered.
 		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
 		Array<MaterialHandle>	    m_materials;		//!< Mesh materials array.

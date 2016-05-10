@@ -98,28 +98,6 @@ namespace Scene {
 	class Terrain;
     class Prefab;
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-    class Renderable;
-    class Texture;
-    class Technique;
-    struct RasterizationOptions;
-    class  Commands;
-
-	//! Rvm unique pointer type.
-    typedef AutoPtr<class Rvm> RvmUPtr;
-
-    //! Rvm command buffer unique pointer type.
-    typedef AutoPtr<class Commands> CommandsUPtr;
-
-    //! Rop emitter unique pointer type.
-    typedef AutoPtr<class AbstractRopEmitter> RopEmitterUPtr;
-
-    //! Render system unique pointer type.
-    typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
-
-    //! Render pass unique pointer type.
-    typedef AutoPtr<class RenderPassBase> RenderPassUPtr;
-#else
     dcDeclarePtrs( Ubershader )
     dcDeclareNamedPtrs( AbstractRenderCache, RenderCache )
 
@@ -136,7 +114,6 @@ namespace Scene {
 
     //! Render command buffer unique pointer type.
     typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	class Transform;
 	class StaticMesh;
@@ -160,25 +137,6 @@ namespace Scene {
     //! Terrain handle type.
     typedef Assets::DataHandle<class Terrain> TerrainHandle;
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-    //! Renderable handle type.
-    typedef Assets::DataHandle<class Renderable> RenderableHandle;
-
-    //! Texture handle type.
-    typedef Assets::DataHandle<class Texture> TextureHandle;
-
-    //! Technique handle type.
-    typedef Assets::DataHandle<class Technique> TechniqueHandle;
-
-    //! ShaderSource handle type.
-    typedef Assets::DataHandle<class ShaderSource> ShaderSourceHandle;
-
-    //! Program handle type.
-    typedef Assets::DataHandle<class Program> ProgramHandle;
-
-    //! Integer handle type to access render assets.
-    typedef s32 RenderAssetIndex;
-#else
     //! Renderable vertex format.
     class VertexFormat {
     public:
@@ -388,34 +346,12 @@ namespace Scene {
 
         return 0;
     }
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! Available rendering modes.
     NIMBLE_DECLARE_ENUM( RenderingMode, Opaque, Cutout, Translucent, Additive )
 
-#if DEV_DEPRECATED_SCENE_RENDERER
-	//! Rendering mode mask.
-	enum RenderingModeBits {
-		  RenderOpaqueBit		= BIT( RenderOpaque )		//!< Opaque rendering bit.
-		, RenderCutoutBit		= BIT( RenderCutout )		//!< Cutout rendering bit.
-		, RenderTranslucentBit	= BIT( RenderTranslucent )	//!< Translucent rendering bit.
-		, RenderAdditiveBit		= BIT( RenderAdditive )		//!< Additive rendering bit.
-		, AllRenderModesBit		= RenderOpaqueBit | RenderCutoutBit | RenderTranslucentBit | RenderAdditiveBit
-	};
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
-
 	//! Available lighting models.
     NIMBLE_DECLARE_ENUM( LightingModel, Unlit, Ambient, Phong )
-
-#if DEV_DEPRECATED_SCENE_RENDERER
-	//! Lighting models bit masks.
-	enum LightingModelBits {
-		  LightingModelUnlitBit     = BIT( LightingModelUnlit )		//!< Unlit model bit.
-		, LightingModelAmbientBit   = BIT( LightingModelAmbient )   //!< Ambient lighting model bit.
-		, LightingModelPhongBit	    = BIT( LightingModelPhong )	    //!< Phong lighting model bit.
-		, AllLightingModelsBit		= LightingModelUnlit | LightingModelAmbient | LightingModelPhong
-	};
-#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 	//! 3 coordinate plane types.
 	enum CoordinatePlane {
@@ -485,23 +421,6 @@ namespace Scene {
 
         //! Calculates the total size allocated for material asset.
         static s32      bytesAllocatedForMaterial( const Material& asset );
-
-    #if DEV_DEPRECATED_SCENE_RENDERER
-        //! Calculates the total size allocated for texture asset.
-        static s32      bytesAllocatedForTexture( const Texture& asset );
-
-        //! Calculates the total size allocated for renderable asset.
-        static s32      bytesAllocatedForRenderable( const Renderable& asset );
-
-        //! Calculates the total size allocated for technique asset.
-        static s32      bytesAllocatedForTechnique( const Technique& asset );
-
-        //! Calculates the total size allocated for shader source asset.
-        static s32      bytesAllocatedForShaderSource( const ShaderSource& asset );
-
-        //! Calculates the total size allocated for shader source asset.
-        static s32      bytesAllocatedForProgram( const Program& asset );
-    #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
     };
 
 	//! The root class for a scene subsystem.
@@ -819,20 +738,12 @@ DC_END_DREEMCHEST
 	#include "Systems/TransformSystems.h"
 	#include "Systems/Physics2D.h"
 	#include "Systems/CullingSystems.h"
-    #if DEV_DEPRECATED_SCENE_RENDERER
-        #include "Rendering/RenderScene.h"
-        #include "Rendering/RenderAssets.h"
-        #include "Rendering/RenderSystems/Unlit.h"
-        #include "Rendering/RenderSystems/ForwardLighting.h"
-        #include "Rendering/RenderSystems/DepthComplexity.h"
-    #else
-        #include "Rendering/RenderScene.h"
-        #include "Rendering/RenderCache.h"
-        #include "Rendering/Rvm/RenderingContext.h"
-        #include "Rendering/Rvm/Rvm.h"
-        #include "Rendering/Debug/ForwardRenderSystem.h"
-		#include "Rendering/Debug/SpriteRenderSystem.h"
-    #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
+    #include "Rendering/RenderScene.h"
+    #include "Rendering/RenderCache.h"
+    #include "Rendering/Rvm/RenderingContext.h"
+    #include "Rendering/Rvm/Rvm.h"
+    #include "Rendering/Debug/ForwardRenderSystem.h"
+	#include "Rendering/Debug/SpriteRenderSystem.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */
