@@ -129,9 +129,6 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 		m_scene->addSceneObject( grid );
 	}
 
-    // Create the rendering target
-    m_renderTarget = FrameTarget::create( document->renderingFrame() );
-
 	// Create the camera.
 	m_camera = m_scene->createSceneObject();
     m_camera->attach<Scene::Transform>()->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
@@ -144,7 +141,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
     m_camera->get<Scene::Camera>()->setFar( 100.0f );
-    m_camera->attach<Scene::Viewport>( m_renderTarget );
+    m_camera->attach<Scene::Viewport>( viewport() );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
 	//m_camera->attach<Scene::RenderWireframe>();
 	//m_camera->attach<Scene::RenderVertexNormals>();
@@ -184,14 +181,13 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 #endif
 
 	m_scene->addSceneObject( m_camera );
-    setActiveCamera( m_camera );
 
 	// Add a 2D camera
 	{
 		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
 		camera->attach<Scene::Transform>();
 		camera->attach<Scene::Camera>( Scene::Projection::Ortho );
-        camera->attach<Scene::Viewport>( m_renderTarget );
+        camera->attach<Scene::Viewport>( viewport() );
 		camera->attach<Scene::SpriteRenderer>();
 		camera->attach<Editors::SceneEditorInternal>();
 		m_scene->addSceneObject( camera );

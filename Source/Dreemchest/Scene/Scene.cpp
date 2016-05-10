@@ -85,6 +85,8 @@ s32 Resources::bytesAllocatedForMaterial( const Material& asset )
     return sizeof( Material );
 }
 
+// --------------------------------------------------------------------------- Scene --------------------------------------------------------------------------- //
+
 // ** Scene::Scene
 Scene::Scene( void )
 {
@@ -93,7 +95,6 @@ Scene::Scene( void )
 
 	// Create entity indices
 	m_named		= m_ecs->requestIndex( "Named Entities", Ecs::Aspect::all<Identifier>() );
-    m_cameras   = m_ecs->requestIndex( "Cameras", Ecs::Aspect::all<Camera, Transform, Viewport>() );
 
     // Create spatial index
     m_spatial   = DC_NEW Spatial( this );

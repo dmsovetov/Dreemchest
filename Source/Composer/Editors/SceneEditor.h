@@ -154,7 +154,6 @@ namespace Editors {
         Scene::RenderCachePtr           m_renderCache;              //!< Render asset cache.
         Scene::RenderScenePtr           m_renderScene;              //!< Rendering scene instance.
         Scene::RvmPtr                   m_rvm;                      //!< Rendering virtual machine that executes generated instructions.
-        Scene::ViewportPtr              m_renderTarget;             //!< Viewport rendering target.
 		Scene::SceneObjectPtr		    m_camera;					//!< Main editor camera.
 		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
 
@@ -164,30 +163,6 @@ namespace Editors {
 
 		Scene::SceneObjectWPtr			m_activeSceneObject;		//!< The scene object underneath the mouse cursor is stored here.
 		Scene::SceneObjectWPtr			m_selectedSceneObject;		//!< The selected scene object.
-	};
-
-	//! FrameTarget is used for rendering the scene to rendering frame.
-	class FrameTarget : public Scene::AbstractViewport {
-	public:
-
-		//! Returns the frame width.
-		virtual s32						width( void ) const NIMBLE_OVERRIDE { return m_frame->width(); }
-
-		//! Returns the frame height.
-		virtual s32						height( void ) const NIMBLE_OVERRIDE { return m_frame->height(); }
-
-		//! Creates the WindowView instance.
-		static Scene::ViewportPtr	    create( const Ui::RenderingFrameQPtr& frame ) { return new FrameTarget( frame ); }
-
-	private:
-
-										//! Constructs the WindowTarget instance.
-										FrameTarget( const Ui::RenderingFrameQPtr& frame )
-											: m_frame( frame ) {}
-
-	private:
-
-		Ui::RenderingFrameQPtr			m_frame;	//!< The output frame.
 	};
 
 } // namespace Editors

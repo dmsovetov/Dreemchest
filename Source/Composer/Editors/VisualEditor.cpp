@@ -65,6 +65,9 @@ bool VisualEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::D
 	// Create the rendering HAL.
 	m_hal = Renderer::Hal::create( Renderer::OpenGL );
 
+    // Create the scene viewport instance
+    m_viewport = RenderingFrameViewport::create( document->renderingFrame() );
+
 	return true;
 }
 
@@ -74,10 +77,10 @@ Renderer::HalWPtr VisualEditor::hal( void ) const
 	return m_hal;
 }
 
-// ** VisualEditor::setActiveCamera
-void VisualEditor::setActiveCamera( Scene::SceneObjectWPtr value )
+// ** VisualEditor::viewport
+Scene::ViewportWPtr VisualEditor::viewport( void ) const
 {
-    m_activeCamera = value;
+    return m_viewport;
 }
 
 // ** VisualEditor::backgroundColor
@@ -128,21 +131,21 @@ void VisualEditor::handleResize( s32 width, s32 height )
 void VisualEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
-    m_activeCamera->get<Scene::Viewport>()->touchBegan( 0, x, y, button );
+   m_viewport->notify<RenderingFrameViewport::TouchBegan>( m_viewport, 0, x, y );
 }
 
 // ** VisualEditor::handleMouseRelease
 void VisualEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button )
 {
 	y = m_document->renderingFrame()->height() - y;
-    m_activeCamera->get<Scene::Viewport>()->touchEnded( 0, x, y, button );
+    m_viewport->notify<RenderingFrameViewport::TouchEnded>( m_viewport, 0, x, y );
 }
 
 // ** VisualEditor::handleMouseMove
 void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
 	y = m_document->renderingFrame()->height() - y;
-    m_activeCamera->get<Scene::Viewport>()->touchMoved( 0, x, y, dx, dy, buttons );
+    m_viewport->notify<RenderingFrameViewport::TouchMoved>( m_viewport, 0, x, y, dx, dy );
 }
 
 // ** VisualEditor::handleContextMenu

@@ -394,11 +394,6 @@ namespace Scene {
     //! An input system unique pointer type
     typedef AutoPtr<class InputSystemBase> InputSystemPtr;
 
-#if DEV_DEPRECATED_ECS_ARCHETYPES
-	dcDeclarePtrs( SpectatorCamera )
-	dcDeclarePtrs( Camera2D )
-#endif  /*  #if DEV_DEPRECATED_ECS_ARCHETYPES   */
-
 	//! Container type to store a set of scene objects.
 	typedef Set<SceneObjectPtr> SceneObjectSet;
 
@@ -502,7 +497,6 @@ namespace Scene {
 		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
         Array<InputSystemPtr>           m_inputSystems;     //!< User input processing systems.
 		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
-        Ecs::IndexPtr                   m_cameras;          //!< All active cameras with associated viewports.
         SpatialUPtr                     m_spatial;          //!< Scene spatial index.
 	};
 

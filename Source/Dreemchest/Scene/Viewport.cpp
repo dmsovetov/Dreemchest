@@ -41,8 +41,33 @@ Rect AbstractViewport::rect( void ) const
 // ------------------------------------------ WindowViewport ------------------------------------------ //
 
 // ** WindowViewport::WindowViewport
-WindowViewport::WindowViewport( const Platform::WindowWPtr& window ) : m_window( window )
+WindowViewport::WindowViewport( const Platform::WindowWPtr& window )
+    : m_window( window )
+    , m_lastX( -1 )
+    , m_lastY( -1 )
 {
+    DC_ABORT_IF( !window.valid(), "invalid window" );
+    m_window->subscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowViewport::handleTouchBegan ) );
+    m_window->subscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowViewport::handleTouchMoved ) );
+    m_window->subscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowViewport::handleTouchEnded ) );
+}
+
+// ** WindowViewport::~WindowViewport
+WindowViewport::~WindowViewport( void )
+{
+    if( !m_window.valid() ) {
+        return;
+    }
+
+    m_window->unsubscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowViewport::handleTouchBegan ) );
+    m_window->unsubscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowViewport::handleTouchMoved ) );
+    m_window->unsubscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowViewport::handleTouchEnded ) );
+}
+
+// ** WindowViewport::create
+WindowViewportPtr WindowViewport::create( const Platform::WindowWPtr& window )
+{
+	return WindowViewportPtr( DC_NEW WindowViewport( window ) );
 }
 
 // ** WindowViewport::width
@@ -57,10 +82,26 @@ s32 WindowViewport::height( void ) const
 	return m_window->height();
 }
 
-// ** WindowViewport::create
-WindowViewportPtr WindowViewport::create( const Platform::WindowWPtr& window )
+// ** WindowViewport::handleTouchBegan
+void WindowViewport::handleTouchBegan( const Platform::Window::TouchBegan& e )
 {
-	return WindowViewportPtr( DC_NEW WindowViewport( window ) );
+    m_lastX = e.x;
+    m_lastY = e.y;
+    notify<TouchBegan>( this, e.id, e.x, e.y );
+}
+
+// ** WindowViewport::handleTouchMoved
+void WindowViewport::handleTouchMoved( const Platform::Window::TouchMoved& e )
+{
+    notify<TouchMoved>( this, e.id, e.x, e.y, e.x - m_lastX, e.y - m_lastY );
+    m_lastX = e.x;
+    m_lastY = e.y;
+}
+
+// ** WindowViewport::handleTouchEnded
+void WindowViewport::handleTouchEnded( const Platform::Window::TouchEnded& e )
+{
+    notify<TouchEnded>( this, e.id, e.x, e.y );
 }
 
 } // namespace Scene

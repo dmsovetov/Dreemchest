@@ -49,8 +49,8 @@ namespace Editors {
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;
 
-        //! Sets an active camera for this visual editor.
-        void                            setActiveCamera( Scene::SceneObjectWPtr value );
+        //! Returns an editor viewport instance.
+        Scene::ViewportWPtr             viewport( void ) const;
 
 		//! Returns the background color.
 		const Rgba&						backgroundColor( void ) const;
@@ -125,10 +125,34 @@ namespace Editors {
 
 		Renderer::HalPtr				m_hal;						//!< Rendering HAL instance.
 		Rgba							m_backgroundColor;			//!< The background color.
-        Scene::SceneObjectWPtr          m_activeCamera;             //!< A workaround used for dispatching input events from a rendering frame to an active camera.
         QPoint                          m_lastCursorPos;            //!< Last tracked cursor position.
         Ui::MouseButtons                m_mouseButtons;             //!< Bitmask to store pressed mouse buttons.
         bool                            m_hasLostFocus;             //!< Indicates that the focus was lost.
+        Scene::ViewportPtr              m_viewport;                 //!< A scene viewport instance.
+	};
+
+	//! RenderingFrameViewport is used for rendering the scene to rendering frame.
+	class RenderingFrameViewport : public Scene::AbstractViewport {
+	public:
+
+		//! Returns the frame width.
+		virtual s32						width( void ) const NIMBLE_OVERRIDE { return m_frame->width(); }
+
+		//! Returns the frame height.
+		virtual s32						height( void ) const NIMBLE_OVERRIDE { return m_frame->height(); }
+
+		//! Creates the FrameViewport instance.
+		static Scene::ViewportPtr	    create( const Ui::RenderingFrameQPtr& frame ) { return new RenderingFrameViewport( frame ); }
+
+	private:
+
+										//! Constructs the RenderingFrameViewport instance.
+										RenderingFrameViewport( const Ui::RenderingFrameQPtr& frame )
+											: m_frame( frame ) {}
+
+	private:
+
+		Ui::RenderingFrameQPtr			m_frame;	//!< The output frame.
 	};
 
 } // namespace Editors

@@ -534,6 +534,24 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 Viewport::Viewport( ViewportWPtr viewport )
     : m_viewport( viewport )
 {
+    DC_ABORT_IF( !viewport.valid(), "invalid viewport" );
+
+    // Subscribe for a viewport events
+    viewport->subscribe<AbstractViewport::TouchBegan>( dcThisMethod( Viewport::handleTouchBegan ) );
+    viewport->subscribe<AbstractViewport::TouchMoved>( dcThisMethod( Viewport::handleTouchMoved ) );
+    viewport->subscribe<AbstractViewport::TouchEnded>( dcThisMethod( Viewport::handleTouchEnded ) );
+}
+
+Viewport::~Viewport( void )
+{
+    if( !m_viewport.valid() ) {
+        return;
+    }
+
+    // Unsubscribe from a viewport events
+    m_viewport->unsubscribe<AbstractViewport::TouchBegan>( dcThisMethod( Viewport::handleTouchBegan ) );
+    m_viewport->unsubscribe<AbstractViewport::TouchMoved>( dcThisMethod( Viewport::handleTouchMoved ) );
+    m_viewport->unsubscribe<AbstractViewport::TouchEnded>( dcThisMethod( Viewport::handleTouchEnded ) );
 }
 
 // ** Viewport::width
@@ -594,6 +612,24 @@ const InputEvent& Viewport::eventAt( s32 index ) const
 void Viewport::clearEvents( void )
 {
     m_events.clear();
+}
+
+// ** Viewport::handleTouchBegan
+void Viewport::handleTouchBegan( const AbstractViewport::TouchBegan& e )
+{
+    touchBegan( e.id, e.x, e.y );
+}
+
+// ** Viewport::handleTouchMoved
+void Viewport::handleTouchMoved( const AbstractViewport::TouchMoved& e )
+{
+    touchMoved( e.id, e.x, e.y, e.dx, e.dy );
+}
+
+// ** Viewport::handleTouchEnded
+void Viewport::handleTouchEnded( const AbstractViewport::TouchEnded& e )
+{
+    touchEnded( e.id, e.x, e.y );
 }
 
 // ** Viewport::calculateSplitRect

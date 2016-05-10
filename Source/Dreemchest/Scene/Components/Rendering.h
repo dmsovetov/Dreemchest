@@ -388,11 +388,16 @@ namespace Scene {
                                     //! Constructs a Viewport instance.
                                     Viewport( ViewportWPtr viewport = ViewportWPtr() );
 
+                                    ~Viewport( void );
+
         //! Returns a viewport width.
         s32                         width( void ) const;
 
         //! Returns a viewport height.
         s32                         height( void ) const;
+
+        //! Returns a viewport instance.
+        ViewportWPtr                get( void ) const;
 
         //! Calculates a viewport rectangle from a normalized viewport.
         Rect                        denormalize( const Rect& normalized ) const;
@@ -417,6 +422,17 @@ namespace Scene {
 
         //! Returns the viewport split by it's coordinates.
         static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
+
+    private:
+
+        //! Handles a viewport touch began event and queues it.
+        void                            handleTouchBegan( const AbstractViewport::TouchBegan& e );
+
+        //! Handles a viewport touch began event and queues it.
+        void                            handleTouchMoved( const AbstractViewport::TouchMoved& e );
+
+        //! Handles a viewport touch began event and queues it.
+        void                            handleTouchEnded( const AbstractViewport::TouchEnded& e );
 
     private:
 
