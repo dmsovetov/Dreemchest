@@ -86,7 +86,7 @@ namespace Scene {
     // ** RenderSystem::RenderSystem
     template<typename TRenderer>
     RenderSystem<TRenderer>::RenderSystem( RenderingContext& context, RenderScene& renderScene )
-        : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "RenderSystemCameras", Ecs::Aspect::all<Camera, Transform, TRenderer>() ) )
+        : RenderSystemBase( context, renderScene, renderScene.scene()->ecs()->requestIndex( "RenderSystemCameras", Ecs::Aspect::all<Camera, Transform, Viewport, TRenderer>() ) )
     {
     }
 

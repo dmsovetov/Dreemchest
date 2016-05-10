@@ -55,7 +55,7 @@ void InputSystemBase::update( void )
         Viewport& viewport = *(*i)->get<Viewport>();
 
         // Get a camera effective viewport rect
-        Rect cameraViewport = camera.viewport();
+        Rect cameraViewportRect = viewport.denormalize( camera.ndc() );
 
         // Process each recorded event
         for( s32 j = 0, n = viewport.eventCount(); j < n; j++ ) {
@@ -63,7 +63,7 @@ void InputSystemBase::update( void )
             const InputEvent& e = viewport.eventAt( j );
 
             // Skip an event if it's outside of an effective viewport rect
-            if( !cameraViewport.contains( e.touchEvent.x, e.touchEvent.y ) ) {
+            if( !cameraViewportRect.contains( e.touchEvent.x, e.touchEvent.y ) ) {
                 continue;
             }
 

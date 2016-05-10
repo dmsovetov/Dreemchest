@@ -108,7 +108,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderC
     // Create entity caches
     m_pointClouds   = ecs->createDataCache<PointCloudCache>( Ecs::Aspect::all<PointCloud, Transform>(), dcThisMethod( RenderScene::createPointCloudNode ) );
     m_lights        = ecs->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
-    m_cameras       = ecs->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
+    m_cameras       = ecs->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Viewport, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
 	m_sprites		= ecs->createDataCache<SpriteCache>( Ecs::Aspect::all<Sprite, Transform>(), dcThisMethod( RenderScene::createSpriteNode ) );
 
@@ -194,7 +194,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         const CameraNode& camera = cameras[i];
         entryPoint
-            .renderToTarget( 0, camera.camera->viewport() )
+            .renderToTarget( 0, camera.viewport->denormalize( camera.camera->ndc() ) )
             .clear( camera.camera->clearColor(), camera.camera->clearMask() );
     }
 
@@ -221,7 +221,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
 
     for( s32 i = 0, n = cameras.count(); i < n; i++ ) {
         CameraNode& node = cameras[i];
-        node.parameters->transform = node.camera->calculateViewProjection( node.transform->matrix() );
+        node.parameters->transform = Camera::calculateViewProjection( *node.camera, *node.viewport, node.transform->matrix() );
         node.parameters->near      = node.camera->near();
         node.parameters->far       = node.camera->far();
         node.parameters->position  = node.transform->worldSpacePosition();
@@ -314,6 +314,7 @@ RenderScene::CameraNode RenderScene::createCameraNode( const Ecs::Entity& entity
     CameraNode camera;
 
     camera.transform        = entity.get<Transform>();
+    camera.viewport         = entity.get<Viewport>();
     camera.matrix           = &camera.transform->matrix();
     camera.camera           = entity.get<Camera>();
     camera.constantBuffer   = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::View ), CBuffer::View::Layout );

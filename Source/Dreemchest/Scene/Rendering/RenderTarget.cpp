@@ -92,6 +92,7 @@ WindowTargetPtr WindowTarget::create( const Platform::WindowWPtr& window )
 	return WindowTargetPtr( DC_NEW WindowTarget( window ) );
 }
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // --------------------------------------- TextureTarget --------------------------------------- //
 
 // ** TextureTarget::TextureTarget
@@ -148,6 +149,7 @@ RenderTargetPtr TextureTarget::create( const Renderer::RenderTargetPtr& rt )
 {
 	return TextureTargetPtr( DC_NEW TextureTarget( rt ) );
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

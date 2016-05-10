@@ -89,6 +89,7 @@ namespace Scene {
 		Platform::WindowWPtr		m_window;	//!< The output window.
 	};
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! TextureTarget is used for rendering the scene to a texture.
 	class TextureTarget : public RenderTarget {
 	public:
@@ -128,6 +129,7 @@ namespace Scene {
 
 		Renderer::RenderTargetPtr	m_rt;	//!< Render target.
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

@@ -166,6 +166,7 @@ ForwardRenderSystem::ShadowParameters ForwardRenderSystem::directionalLightShado
 // ** ForwardRenderSystem::calculateSplitBounds
 Bounds ForwardRenderSystem::calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const
 {
+#if 0
     // Get the camera aspect ratio and field of view
     f32 ar  = camera.aspect();
     f32 fov = camera.fov();
@@ -215,6 +216,10 @@ Bounds ForwardRenderSystem::calculateSplitBounds( const Camera& camera, const Ma
     Vec3 offset = Vec3( result.width(), result.height(), result.depth() ) * 0.5f;
 
     return Bounds( Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) - offset, Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) + offset );
+#else
+    DC_NOT_IMPLEMENTED;
+    return Bounds();
+#endif
 }
 
 } // namespace Scene

@@ -142,6 +142,7 @@ namespace Scene {
 	class StaticMesh;
 	class Sprite;
 	class Camera;
+    class Viewport;
     class PointCloud;
 
     //! Spatial index unique pointer type.

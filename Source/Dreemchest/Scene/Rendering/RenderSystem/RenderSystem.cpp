@@ -55,11 +55,14 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
         // Get Camera component from an entity
         const Camera& camera = *entity.get<Camera>();
 
+        // Get Viewport component from an entity
+        const Viewport& viewport = *entity.get<Viewport>();
+
         // Get Transform component from an entity
         const Transform& transform = *entity.get<Transform>();
 
         // Create a command buffer to render this camera
-        RenderCommandBuffer& cameraCommands = commands.renderToTarget( 0, camera.viewport() );
+        RenderCommandBuffer& cameraCommands = commands.renderToTarget( 0, viewport.denormalize( camera.ndc() ) );
 
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );

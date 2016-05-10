@@ -141,6 +141,7 @@ namespace Scene {
         //! Stores info about a camera.
         struct CameraNode : public Node {
             const Camera*                       camera;             //!< Camera component.
+            const Viewport*                     viewport;           //!< Output viewport component.
             AutoPtr<CBuffer::View>              parameters;         //!< View constant buffer.
         };
 

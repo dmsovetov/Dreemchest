@@ -377,6 +377,18 @@ const Rgba& Sprite::color( void ) const
 
 // -------------------------------------------- Camera -------------------------------------------- //
 
+// ** Camera::Camera
+Camera::Camera( Projection projection, const Rgba& clearColor, const Rect& ndc )
+	: m_clearMask( ClearAll )
+    , m_projection( projection )
+    , m_ndc( ndc )
+    , m_clearColor( clearColor )
+    , m_fov( 60.0f )
+    , m_near( 0.01f )
+    , m_far( 1000.0f )
+{
+}
+
 // ** Camera::clearMask
 u8 Camera::clearMask( void ) const
 {
@@ -387,18 +399,6 @@ u8 Camera::clearMask( void ) const
 void Camera::setClearMask( u8 value )
 {
 	m_clearMask = value;
-}
-
-// ** Camera::id
-u8 Camera::id( void ) const
-{
-	return m_id;
-}
-
-// ** Camera::setId
-void Camera::setId( u8 value )
-{
-	m_id = value;
 }
 
 // ** Camera::near
@@ -473,47 +473,15 @@ void Camera::setNdc( const Rect& value )
 	m_ndc = value;
 }
 
-// ** Camera::viewport
-Rect Camera::viewport( void ) const
-{
-	DC_ABORT_IF( !m_target.valid(), "invalid render target" )
-
-	u32 w = m_target->width();
-	u32 h = m_target->height();
-
-	return Rect( w * m_ndc.min().x, h * m_ndc.min().y, w * m_ndc.max().x, h * m_ndc.max().y );
-}
-
-// ** Camera::setView
-void Camera::setTarget( RenderTargetWPtr value )
-{
-	m_target = value;
-}
-
-// ** Camera::view
-RenderTargetWPtr Camera::target( void ) const
-{
-	return m_target;
-}
-
-// ** Camera::aspect
-f32 Camera::aspect( void ) const
-{
-    Rect rect = viewport();
-    return rect.width() / rect.height();
-}
-
 // ** Camera::calculateProjectionMatrix
-Matrix4 Camera::calculateProjectionMatrix( void ) const
+Matrix4 Camera::calculateProjectionMatrix( const Camera& camera, const Viewport& viewport )
 {
-	DC_ABORT_IF( !m_target.valid(), "invalid render target" )
-
-	Rect rect   = viewport();
+	Rect rect   = viewport.denormalize( camera.ndc() );
 	f32  width  = rect.width();
 	f32  height = rect.height();
 
-	switch( m_projection ) {
-    case Projection::Perspective:	return Matrix4::perspective( m_fov, width / height, m_near, m_far );
+	switch( camera.projection() ) {
+    case Projection::Perspective:	return Matrix4::perspective( camera.fov(), width / height, camera.near(), camera.far() );
 	case Projection::Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
 	case Projection::OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
 	default:			            DC_NOT_IMPLEMENTED;
@@ -523,11 +491,12 @@ Matrix4 Camera::calculateProjectionMatrix( void ) const
 }
 
 // ** Camera::calculateViewProjection
-Matrix4 Camera::calculateViewProjection( const Matrix4& transform ) const
+Matrix4 Camera::calculateViewProjection( const Camera& camera, const Viewport& viewport, const Matrix4& transform )
 {
-	return calculateProjectionMatrix() * transform.inversed() /*Matrix4::lookAt( Vec3( 5, 5, 5 ), Vec3( 0, 0, 0 ), Vec3( 0, 1, 0 ) )*/;
+	return calculateProjectionMatrix( camera, viewport ) * transform.inversed();
 }
 
+#if 0
 // ** Camera::toWorldSpace
 bool Camera::toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const
 {
@@ -608,6 +577,7 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 
 	return Circle( center, radius );
 }
+#endif
 
 // -------------------------------------------- Viewport -------------------------------------------- //
 
@@ -627,6 +597,14 @@ s32 Viewport::width( void ) const
 s32 Viewport::height( void ) const
 {
     return m_renderTarget->height();
+}
+
+// ** Viewport::denormalize
+Rect Viewport::denormalize( const Rect& normalized ) const
+{
+    s32 w = width();
+    s32 h = height();
+    return Rect( w * normalized.min().x, h * normalized.min().y, w * normalized.max().x, h * normalized.max().y );
 }
 
 // ** Viewport::touchBegan

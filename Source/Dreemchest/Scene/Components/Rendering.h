@@ -382,8 +382,7 @@ namespace Scene {
 		};
 
 									//! Constructs Camera instance.
-									Camera( Projection projection = Projection::Perspective, RenderTargetWPtr target = RenderTargetWPtr(), const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) )
-										: m_clearMask( ClearAll ), m_id( -1 ), m_projection( projection ), m_ndc( ndc ), m_target( target ), m_clearColor( clearColor ), m_fov( 60.0f ), m_near( 0.01f ), m_far( 1000.0f ) {}
+									Camera( Projection projection = Projection::Perspective, const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 
 		//! Returns camera clear mask.
 		u8							clearMask( void ) const;
@@ -402,12 +401,6 @@ namespace Scene {
 
         //! Sets camera projection.
         void                        setProjection( Projection value );
-
-		//! Returns the camera id.
-		u8							id( void ) const;
-
-		//! Sets camera id.
-		void						setId( u8 value );
 
 		//! Returns camera field of view.
 		f32							fov( void ) const;
@@ -433,24 +426,13 @@ namespace Scene {
 		//! Returns the normalized device coordinates to render frame to.
 		const Rect&					ndc( void ) const;
 
-		//! Calculates the output viewport coordinates.
-		Rect						viewport( void ) const;
-
-        //! Returns an aspect ratio of a camera render target.
-        f32                         aspect( void ) const;
-
-		//! Sets the camera render view.
-		void						setTarget( RenderTargetWPtr value );
-
-		//! Returns the camera render view.
-		RenderTargetWPtr		    target( void ) const;
-
 		//! Calculates the projection matrix.
-		Matrix4						calculateProjectionMatrix( void ) const;
+		static Matrix4			    calculateProjectionMatrix( const Camera& camera, const Viewport& viewport );
 
 		//! Calculates the view projection matrix.
-		Matrix4						calculateViewProjection( const Matrix4& transform ) const;
+		static Matrix4			    calculateViewProjection( const Camera& camera, const Viewport& viewport, const Matrix4& transform );
 
+    #if 0
 		//! Converts from screen space to world space.
 		bool						toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const;
 
@@ -458,15 +440,14 @@ namespace Scene {
 		bool						pointToScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
 
 		//! Projects the bounding sphere to a screen space.
-		Circle						sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
+		Circle					sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
+    #endif
 
 	private:
 
 		u8							m_clearMask;	//!< Camera clear flags.
-		u8							m_id;			//!< Unique camera id.
 		Projection					m_projection;	//!< Camera projection.
 		Rect						m_ndc;			//!< Output normalized device coordinates.
-		RenderTargetWPtr		    m_target;		//!< Rendering target.
 		Rgba						m_clearColor;	//!< The clear color.
 		f32							m_fov;			//!< Camera field of view.
 		f32							m_near;			//!< Z-near value.
@@ -485,6 +466,9 @@ namespace Scene {
 
         //! Returns a viewport height.
         s32                         height( void ) const;
+
+        //! Calculates a viewport rectangle from a normalized viewport.
+        Rect                        denormalize( const Rect& normalized ) const;
 
         //! Queues a new touch began event.
         void                        touchBegan( s32 id, s32 x, s32 y, u8 flags = 0 );
