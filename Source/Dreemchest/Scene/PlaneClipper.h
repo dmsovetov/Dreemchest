@@ -31,6 +31,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 	//! Checks if an object is inside the set of planes.
 	class PlaneClipper {
 	public:
@@ -67,6 +68,7 @@ namespace Scene {
 		u8					m_id;		//!< Clipper identifier.
 		Array<Plane>		m_planes;	//!< Clipping planes.
 	};
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

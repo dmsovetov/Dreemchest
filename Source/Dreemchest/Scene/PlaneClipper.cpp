@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** PlaneClipper::PlaneClipper
 PlaneClipper::PlaneClipper( u8 id ) : m_id( id )
 {
@@ -130,7 +132,7 @@ PlaneClipper PlaneClipper::createFromBox( const Vec3& center, f32 radius, u8 id 
 	clipper.setAsBox( center, radius );
 	return clipper;
 }
-
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 
