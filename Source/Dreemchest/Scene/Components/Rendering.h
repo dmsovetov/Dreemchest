@@ -421,6 +421,9 @@ namespace Scene {
         //! Returns a viewport height.
         s32                         height( void ) const;
 
+        //! Returns a viewport apsect ratio.
+        f32                         aspect( void ) const;
+
         //! Returns a viewport instance.
         ViewportWPtr                get( void ) const;
 

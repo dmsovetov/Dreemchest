@@ -463,7 +463,7 @@ Matrix4 Camera::calculateProjectionMatrix( const Camera& camera, const Viewport&
 	f32  height = rect.height();
 
 	switch( camera.projection() ) {
-    case Projection::Perspective:	return Matrix4::perspective( camera.fov(), width / height, camera.near(), camera.far() );
+    case Projection::Perspective:	return Matrix4::perspective( camera.fov(), viewport.aspect(), camera.near(), camera.far() );
 	case Projection::Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
 	case Projection::OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
 	default:			            DC_NOT_IMPLEMENTED;
@@ -597,6 +597,12 @@ s32 Viewport::width( void ) const
 s32 Viewport::height( void ) const
 {
     return m_viewport->height();
+}
+
+// ** Viewport::aspect
+f32 Viewport::aspect( void ) const
+{
+    return static_cast<f32>( width() ) / height();
 }
 
 // ** Viewport::denormalize
