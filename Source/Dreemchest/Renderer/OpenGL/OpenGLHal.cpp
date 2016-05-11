@@ -1156,6 +1156,7 @@ void OpenGLVertexBuffer::unlock( void )
 // ** OpenGLVertexBuffer::setBufferData
 void OpenGLVertexBuffer::setBufferData( const void* source, s32 offset, s32 size )
 {
+    DC_BREAK_IF( offset + size > m_size, "vertex buffer overflow" );
     DC_CHECK_GL;
 
     glBindBuffer( GL_ARRAY_BUFFER, m_id );
