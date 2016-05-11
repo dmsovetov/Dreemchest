@@ -28,6 +28,10 @@
 #define __DC_Scene_Rendering_RenderPass_H__
 
 #include "../RenderScene.h"
+#include "../Rvm/RenderingContext.h"
+
+#include "../../Components/Rendering.h"
+#include "../../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,10 +42,16 @@ namespace Scene {
 	public:
 
                                     //! Constructs RenderPassBase instance.
-                                    RenderPassBase( RenderScene& renderScene );
+                                    RenderPassBase( RenderingContext& context, RenderScene& renderScene );
 
 		//! Renders a pass to active render target.
-        virtual void			    render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+        virtual void			    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+
+        //! Begins a pass rendering.
+        virtual void                begin( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+
+        //! Ends a pass rendering.
+        virtual void                end( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
 
         //! Emits rendering operations for static meshes that reside in scene.
         static void                 emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask = ~0 );
@@ -51,6 +61,7 @@ namespace Scene {
 
 	protected:
 
+        RenderingContext&           m_context;      //!< A parent rendering context.
         RenderScene&                m_renderScene;  //!< Parent render scene.
 	};
 

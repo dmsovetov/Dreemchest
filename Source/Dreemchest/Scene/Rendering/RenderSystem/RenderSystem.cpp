@@ -74,6 +74,21 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
     }
 }
 
+// ** RenderSystemBase::emitRenderOperations
+void RenderSystemBase::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+{
+    // Process each nested rendering pass
+    for( s32 i = 0, n = static_cast<s32>( m_passes.size() ); i < n; i++ ) {
+        // Get an active rendering pass
+        RenderPassBase& pass = *m_passes[i];
+
+        // Emit render operations for this pass
+        pass.begin( frame, commands, stateStack );
+        pass.emitRenderOperations( frame, commands, stateStack );
+        pass.end( frame, commands, stateStack );
+    }
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
