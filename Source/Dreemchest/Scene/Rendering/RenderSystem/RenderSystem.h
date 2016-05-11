@@ -27,6 +27,8 @@
 #ifndef __DC_Scene_Rendering_RenderSystem_H__
 #define __DC_Scene_Rendering_RenderSystem_H__
 
+#include "RenderPass.h"
+
 #include "../RenderScene.h"
 #include "../Rvm/RenderingContext.h"
 #include "../Rvm/Ubershader.h"
@@ -52,12 +54,6 @@ namespace Scene {
 
 		//! Emits rendering operations to a command buffer for a specified camera.
 		virtual void			emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) = 0;
-
-        //! Emits rendering operations for static meshes that reside in scene.
-        void                    emitStaticMeshes( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask = ~0 );
-
-        //! Emits rendering operations for point clouds that reside in scene.
-        void                    emitPointClouds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask = ~0 );
 
 	protected:
 

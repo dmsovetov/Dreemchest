@@ -49,8 +49,8 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
         pass->bindProgram( m_context.internShader( m_ambientShader ) );
         pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
 
-        emitStaticMeshes( frame, commands, stateStack );
-        emitPointClouds( frame, commands, stateStack );
+        RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, commands, stateStack );
+        RenderPassBase::emitPointClouds( m_renderScene.pointClouds(), frame, commands, stateStack );
     }
 
     // Get all light sources
@@ -111,7 +111,7 @@ u8 ForwardRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& 
     state->setCullFace( Renderer::TriangleFaceFront );
 
     // Render all static meshes to a target
-    emitStaticMeshes( frame, cmd, stateStack );
+    RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, cmd, stateStack );
 
     return renderTarget;
 }
@@ -136,8 +136,8 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
     }
 
     // Emit render operations
-    emitStaticMeshes( frame, commands, stateStack, RenderMaskPhong );
-    emitPointClouds( frame, commands, stateStack, RenderMaskPhong );
+    RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, commands, stateStack, RenderMaskPhong );
+    RenderPassBase::emitPointClouds( m_renderScene.pointClouds(), frame, commands, stateStack, RenderMaskPhong );
 }
 
 // ** ForwardRenderSystem::spotLightShadows
