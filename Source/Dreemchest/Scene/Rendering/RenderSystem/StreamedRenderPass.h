@@ -43,13 +43,16 @@ namespace Scene {
         //! Flushes a generated vertex stream.
         virtual void                    end( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) NIMBLE_OVERRIDE;
 
-    public:
+    protected:
 
         //! Writes transformed vertices of a single line instance.
         void                            emitLine( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba& color );
 
         //! Writes a wire box to an output stream.
         void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba& color );
+
+        //! Writes a wire box base on it's vertices to an output stream.
+        void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba& color );
 
         //! Writes a frustum to an output stream.
         void                            emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba& color );

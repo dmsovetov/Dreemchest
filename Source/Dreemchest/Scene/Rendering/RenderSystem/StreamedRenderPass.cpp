@@ -220,6 +220,20 @@ void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBu
     emitLine( frame, commands, stateStack, min + z    , min + z + y,     color );
 }
 
+// ** StreamedRenderPassBase::emitWireBounds
+void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba& color )
+{
+    for( s32 i = 0; i < 4; i++ ) {
+        emitLine( frame, commands, stateStack, vertices[i], vertices[(i + 1) % 4], color );
+    }
+    for( s32 i = 0; i < 4; i++ ) {
+        emitLine( frame, commands, stateStack, vertices[i + 4], vertices[(i + 1) % 4 + 4], color );
+    }
+    for( s32 i = 0; i < 4; i++ ) {
+        emitLine( frame, commands, stateStack, vertices[i], vertices[i + 4], color );
+    }
+}
+
 // ** StreamedRenderPassBase::emitBasis
 void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& transform )
 {
