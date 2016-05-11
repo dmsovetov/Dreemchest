@@ -67,6 +67,10 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
     glActiveTexture( GL_TEXTURE0 );
     glCullFace( GL_BACK );
 
+    for( s32 i = 0; i < 6; i++ ) {
+        glEnable( GL_CLIP_PLANE0 + i );
+    }
+
     while( glGetError() != GL_NO_ERROR ) {}
 }
 
