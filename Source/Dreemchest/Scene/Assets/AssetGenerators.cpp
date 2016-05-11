@@ -92,6 +92,7 @@ bool MeshPlaneGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setChunkCount( 1 );
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
+    mesh.updateBounds();
 
     return true;
 }
@@ -175,6 +176,7 @@ bool MeshBoxGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setChunkCount( 1 );
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
+    mesh.updateBounds();
 
     return true;
 }
@@ -961,6 +963,7 @@ bool MeshSphereGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setChunkCount( 1 );
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
+    mesh.updateBounds();
 
 	return true;
 }
@@ -2561,6 +2564,7 @@ bool MeshTorusGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setChunkCount( 1 );
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
+    mesh.updateBounds();
 
 	return true;
 }
