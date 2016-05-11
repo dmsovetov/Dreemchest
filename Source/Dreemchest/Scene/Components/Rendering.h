@@ -59,6 +59,31 @@ namespace Scene {
 	class ForwardRenderer : public Ecs::Component<ForwardRenderer> {
 	};
 
+    //! This component is attached to a camera to render a debug info.
+    class DebugRenderer : public Ecs::Component<DebugRenderer> {
+    public:
+
+                                        //! Constructs a DebugRenderer instance.
+                                        DebugRenderer( void );
+
+        //! Returns a static mesh color.
+        const Rgba&                     staticMeshColor( void ) const;
+
+        //! Sets a static mesh color.
+        void                            setStaticMeshColor( const Rgba& value );
+
+        //! Returns a light color.
+        const Rgba&                     lightColor( void ) const;
+
+        //! Sets a light color.
+        void                            setLightColor( const Rgba& value );
+
+    private:
+
+        Rgba                            m_staticMeshColor;  //!< A color of all static mesh bounding boxes.
+        Rgba                            m_lightColor;       //!< A color of all light fixtures.
+    };
+
 	//! Available light types.
     NIMBLE_DECLARE_ENUM( LightType, Point, Spot, Directional )
 

@@ -55,6 +55,39 @@ void SpriteRenderer::setScaleFactor( f32 value )
 	m_scaleFactor = value;
 }
 
+// -------------------------------------------------------------- DebugRenderer -------------------------------------------------------------- //
+
+// ** DebugRenderer::DebugRenderer
+DebugRenderer::DebugRenderer( void )
+    : m_staticMeshColor( 0.5f, 0.5f, 0.5f, 0.6f )
+    , m_lightColor( 1.0f, 1.0f, 0.0f, 0.5f )
+{
+}
+
+// ** DebugRenderer::staticMeshColor
+const Rgba& DebugRenderer::staticMeshColor( void ) const
+{
+    return m_staticMeshColor;
+}
+
+// ** DebugRenderer::setStaticMeshColor
+void DebugRenderer::setStaticMeshColor( const Rgba& value )
+{
+    m_staticMeshColor = value;
+}
+
+// ** DebugRenderer::lightColor
+const Rgba& DebugRenderer::lightColor( void ) const
+{
+    return m_lightColor;
+}
+
+// ** DebugRenderer::setLightColor
+void DebugRenderer::setLightColor( const Rgba& value )
+{
+    m_lightColor = value;
+}
+
 // ------------------------------------------------ Light ------------------------------------------------- //
 
 // ** Light::Light

@@ -737,6 +737,7 @@ DC_END_DREEMCHEST
     #include "Rendering/Rvm/Rvm.h"
     #include "Rendering/Debug/ForwardRenderSystem.h"
 	#include "Rendering/Debug/SpriteRenderSystem.h"
+    #include "Rendering/Debug/DebugRenderSystem.h"
 #endif
 
 #endif    /*    !__DC_Scene_H__    */
