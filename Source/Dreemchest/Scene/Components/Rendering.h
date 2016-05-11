@@ -78,10 +78,17 @@ namespace Scene {
         //! Sets a light color.
         void                            setLightColor( const Rgba& value );
 
+        //! Returns a camera color.
+        const Rgba&                     cameraColor( void ) const;
+
+        //! Sets a camera color.
+        void                            setCameraColor( const Rgba& value );
+
     private:
 
         Rgba                            m_staticMeshColor;  //!< A color of all static mesh bounding boxes.
         Rgba                            m_lightColor;       //!< A color of all light fixtures.
+        Rgba                            m_cameraColor;      //!< A color of all camera frustums.
     };
 
 	//! Available light types.

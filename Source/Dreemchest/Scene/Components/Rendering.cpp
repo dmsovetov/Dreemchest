@@ -61,6 +61,7 @@ void SpriteRenderer::setScaleFactor( f32 value )
 DebugRenderer::DebugRenderer( void )
     : m_staticMeshColor( 0.5f, 0.5f, 0.5f, 0.6f )
     , m_lightColor( 1.0f, 1.0f, 0.0f, 0.5f )
+    , m_cameraColor( 1.0f, 0.0f, 1.0f, 0.5f )
 {
 }
 
@@ -86,6 +87,18 @@ const Rgba& DebugRenderer::lightColor( void ) const
 void DebugRenderer::setLightColor( const Rgba& value )
 {
     m_lightColor = value;
+}
+
+// ** ebugRenderer::cameraColor
+const Rgba& DebugRenderer::cameraColor( void ) const
+{
+    return m_cameraColor;
+}
+
+// ** ebugRenderer::setCameraColor
+void DebugRenderer::setCameraColor( const Rgba& value )
+{
+    m_cameraColor = value;
 }
 
 // ------------------------------------------------ Light ------------------------------------------------- //

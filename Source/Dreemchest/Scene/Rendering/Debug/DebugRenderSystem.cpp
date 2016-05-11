@@ -55,9 +55,10 @@ void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandB
 	state->bindProgram( m_context.internShader( m_debugShader ) );
     state->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
-    // Get all static meshes and lights
+    // Get all static meshes, cameras and lights
     const RenderScene::StaticMeshes& staticMeshes = m_renderScene.staticMeshes();
     const RenderScene::Lights&       lights       = m_renderScene.lights();
+    const RenderScene::Cameras&      cameras      = m_renderScene.cameras();
 
 	// Begin batch by allocating a chunk of vertex data
     beginBatch( frame, commands, stateStack, Renderer::PrimLines, min2<s32>( 24 * staticMeshes.count(), MaxVerticesInBatch ) );
@@ -70,6 +71,17 @@ void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandB
     // Emit each light bounding box to an output stream
     for( s32 i = 0, n = lights.count(); i < lights.count(); i++ ) {
         emitLight( frame, commands, stateStack, lights[i], debugRenderer.lightColor() );
+    }
+
+    // Emit a frustum for each camera.
+    for( s32 i = 0, n = cameras.count(); i < cameras.count(); i++ ) {
+        const Camera*   camera   = cameras[i].camera;
+        const Viewport* viewport = cameras[i].viewport;
+
+        switch( camera->projection() ) {
+        case Projection::Perspective:   emitFrustum( frame, commands, stateStack, camera->fov(), viewport->aspect(), camera->near(), camera->far(), *cameras[i].matrix, debugRenderer.cameraColor() );
+                                        break;
+        }
     }
 
     // Flush an active batch
@@ -137,34 +149,36 @@ void DebugRenderSystem::emitLight( RenderFrame& frame, RenderCommandBuffer& comm
     switch( light.light->type() ) {
     case LightType::Point:  emitWireBounds( frame, commands, stateStack, bounds * *light.matrix, color );
                             break;
-    case LightType::Spot:   emitFrustum( frame, commands, stateStack, light.light->cutoff() * 2.0f, 0.1f, light.light->range() * 2.0f, *light.matrix, color );
+    case LightType::Spot:   emitFrustum( frame, commands, stateStack, light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f, *light.matrix, color );
                             break;
     }
 }
 
 // ** DebugRenderSystem::emitFrustum
-void DebugRenderSystem::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 near, f32 far, const Matrix4& transform, const Rgba& color )
+void DebugRenderSystem::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba& color )
 {
     // Calculate a tangent of a fov angle
     f32 fovTan2 = tanf( radians( fov * 0.5f ) );
 
     // Calculate near and far planes size
     f32 nh = fovTan2 * near;
+    f32 nw = nh * aspect;
     f32 fh = fovTan2 * far;
+    f32 fw = fh * aspect;
 
     // Construct a world space frustum vertices
     Vec3 worldSpaceVertices[] = {
           // Near plane
-          transform * Vec4( -nh, -nh, -near )
-        , transform * Vec4(  nh, -nh, -near )
-        , transform * Vec4(  nh,  nh, -near )
-        , transform * Vec4( -nh,  nh, -near )
+          transform * Vec4( -nw, -nh, -near )
+        , transform * Vec4(  nw, -nh, -near )
+        , transform * Vec4(  nw,  nh, -near )
+        , transform * Vec4( -nw,  nh, -near )
 
           // Far plane
-        , transform * Vec4( -fh, -fh, -far )
-        , transform * Vec4(  fh, -fh, -far )
-        , transform * Vec4(  fh,  fh, -far )
-        , transform * Vec4( -fh,  fh, -far )
+        , transform * Vec4( -fw, -fh, -far )
+        , transform * Vec4(  fw, -fh, -far )
+        , transform * Vec4(  fw,  fh, -far )
+        , transform * Vec4( -fw,  fh, -far )
 
           // An origin point
         , transform * Vec4( 0.0f, 0.0f, 0.0f )

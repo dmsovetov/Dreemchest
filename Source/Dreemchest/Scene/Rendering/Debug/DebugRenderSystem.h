@@ -54,7 +54,7 @@ namespace Scene {
         void                            emitLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, const Rgba& color );
 
         //! Writes a frustum to an output stream.
-        void                            emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 near, f32 far, const Matrix4& transform, const Rgba& color );
+        void                            emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba& color );
 
         //! Writes a basis to an output stream.
         void                            emitBasis( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& transform );
