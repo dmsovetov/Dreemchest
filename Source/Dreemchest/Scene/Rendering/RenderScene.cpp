@@ -156,6 +156,12 @@ const RenderScene::Sprites& RenderScene::sprites( void ) const
     return m_sprites->data();
 }
 
+// ** RenderScene::cameras
+const RenderScene::Cameras& RenderScene::cameras( void ) const
+{
+    return m_cameras->data();
+}
+
 // ** RenderScene::findCameraNode
 const  RenderScene::CameraNode& RenderScene::findCameraNode( Ecs::EntityWPtr camera ) const
 {
