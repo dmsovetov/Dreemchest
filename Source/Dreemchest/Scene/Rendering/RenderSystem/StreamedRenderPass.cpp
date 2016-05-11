@@ -110,14 +110,15 @@ bool StreamedRenderPassBase::hasEnoughSpace( s32 additionalVertices ) const
 // ** StreamedRenderPassBase::emitFrustum
 void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba& color )
 {
-    // Calculate a tangent of a fov angle
-    f32 fovTan2 = tanf( radians( fov * 0.5f ) );
+    // Calculate a tangents from a FOV and aspect ratio
+    f32 tanHalfVFOV = tanf( radians( fov * 0.5f ) );
+    f32 tanHalfHFOV = tanf( radians( fov * aspect * 0.5f ) );
 
     // Calculate near and far planes size
-    f32 nh = fovTan2 * near;
-    f32 nw = nh * aspect;
-    f32 fh = fovTan2 * far;
-    f32 fw = fh * aspect;
+    f32 nh = tanHalfVFOV * near;
+    f32 nw = tanHalfHFOV * near;
+    f32 fh = tanHalfVFOV * far;
+    f32 fw = tanHalfHFOV * far;
 
     // Construct a world space frustum vertices
     Vec3 worldSpaceVertices[] = {
