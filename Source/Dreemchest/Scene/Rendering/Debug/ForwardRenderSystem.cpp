@@ -73,7 +73,8 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
 
         if( light.light->type() == LightType::Directional ) {
             ShadowParameters parameters; parameters.invSize = 1.0f / shadowSize;
-            CascadedShadowMaps csm; csm.calculate( camera.fov(), camera.near(), camera.far(), entity.get<Viewport>()->aspect(), lambda, transform.matrix(), *light.matrix, cascadeCount );
+            CascadedShadowMaps csm( transform.matrix(), *light.matrix, shadowSize );
+            csm.calculate( camera.fov(), camera.near(), camera.far(), entity.get<Viewport>()->aspect(), lambda, cascadeCount );
 
             m_debugRenderTargets.begin( frame, commands, stateStack );
 
@@ -293,7 +294,7 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
     }
 
     // Caclulate CSM splits
-    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.5f, transform.matrix(), m_lightTransform, m_splitCount );
+    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.5f, m_splitCount );
 
     // Visualize camera frustum splits
     for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {

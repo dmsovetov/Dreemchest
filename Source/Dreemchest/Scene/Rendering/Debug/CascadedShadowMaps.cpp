@@ -30,8 +30,22 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+// ** CascadedShadowMaps::CascadedShadowMaps
+CascadedShadowMaps::CascadedShadowMaps( void )
+    : m_textureSize( 0 )
+{
+}
+
+// ** CascadedShadowMaps::CascadedShadowMaps
+CascadedShadowMaps::CascadedShadowMaps( const Matrix4& camera, const Matrix4& light, s32 textureSize )
+    : m_textureSize( textureSize )
+    , m_camera( camera )
+    , m_light( light )
+{
+}
+
 // ** CascadedShadowMaps::calculate
-void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, const Matrix4& camera, const Matrix4& light, s32 count )
+void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, s32 count )
 {
     // Resize cascaded shadow maps
     resize( count );
@@ -50,10 +64,10 @@ void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 
         cascade.far  = lerp( CUi, CLi, lambda );
 
         // Calculate a cascade world space vertices
-        calculateWorldSpaceVertices( camera, cascade.worldSpaceVertices, fov, cascade.near, cascade.far, aspect );
+        calculateWorldSpaceVertices( cascade.worldSpaceVertices, fov, cascade.near, cascade.far, aspect );
 
         // Calculate a cascade projection matrix
-        cascade.transform = calculateViewProjection( light, cascade.worldSpaceVertices );
+        cascade.transform = calculateViewProjection( cascade.worldSpaceVertices );
 
         // Calculate a cascade bounding box in a world and light spaces
         cascade.worldSpaceBounds = calculateWorldSpaceBounds( cascade );
@@ -84,7 +98,7 @@ void CascadedShadowMaps::resize( s32 count )
 }
 
 // ** CascadedShadowMaps::calculateWorldSpaceVertices
-void CascadedShadowMaps::calculateWorldSpaceVertices( const Matrix4& camera, Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const
+void CascadedShadowMaps::calculateWorldSpaceVertices( Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const
 {
     // Calculate a tangents from a FOV and aspect ratio
     f32 tanHalfVFOV = tanf( radians( fov * 0.5f ) );
@@ -97,16 +111,16 @@ void CascadedShadowMaps::calculateWorldSpaceVertices( const Matrix4& camera, Vec
     f32 yf = far  * tanHalfVFOV;
 
     // Construct a near frustum plane in a world space
-    worldSpaceVertices[0] = camera * Vec3( -xn, -yn, -near );
-    worldSpaceVertices[1] = camera * Vec3(  xn, -yn, -near );
-    worldSpaceVertices[2] = camera * Vec3(  xn,  yn, -near );
-    worldSpaceVertices[3] = camera * Vec3( -xn,  yn, -near );
+    worldSpaceVertices[0] = m_camera * Vec3( -xn, -yn, -near );
+    worldSpaceVertices[1] = m_camera * Vec3(  xn, -yn, -near );
+    worldSpaceVertices[2] = m_camera * Vec3(  xn,  yn, -near );
+    worldSpaceVertices[3] = m_camera * Vec3( -xn,  yn, -near );
 
     // Construct a far frustum plane in a world space
-    worldSpaceVertices[4] = camera * Vec3( -xf, -yf, -far );
-    worldSpaceVertices[5] = camera * Vec3(  xf, -yf, -far );
-    worldSpaceVertices[6] = camera * Vec3(  xf,  yf, -far );
-    worldSpaceVertices[7] = camera * Vec3( -xf,  yf, -far );
+    worldSpaceVertices[4] = m_camera * Vec3( -xf, -yf, -far );
+    worldSpaceVertices[5] = m_camera * Vec3(  xf, -yf, -far );
+    worldSpaceVertices[6] = m_camera * Vec3(  xf,  yf, -far );
+    worldSpaceVertices[7] = m_camera * Vec3( -xf,  yf, -far );
 }
 
 // ** CascadedShadowMaps::calculateLightSpaceVertices
@@ -132,13 +146,17 @@ void CascadedShadowMaps::calculateLightSpaceVertices( const Matrix4& viewProject
 }
 
 // ** CascadedShadowMaps::calculateViewProjection
-Matrix4 CascadedShadowMaps::calculateViewProjection( const Matrix4& light, const Vec3 worldSpaceVertices[8] ) const
+Matrix4 CascadedShadowMaps::calculateViewProjection( const Vec3 worldSpaceVertices[8] ) const
 {
     Bounds lightSpaceBounds;
 
+    // Compute an inverse of a light matrix
+    Matrix4 inverseLight = m_light.inversed();
+
+    // Transform all world space vertices to a light space and compute a final bounding box
     for( s32 i = 0; i < 8; i++ ) {
         // Transform the frustum vertex from world to light space.
-        lightSpaceBounds << light.inversed() * worldSpaceVertices[i];
+        lightSpaceBounds << inverseLight * worldSpaceVertices[i];
     }
 
     const Vec3& min = lightSpaceBounds.min();

@@ -50,8 +50,14 @@ namespace Scene {
         //! A container type to store shadow map cascades.
         typedef Array<Cascade>  Cascades;
 
+                                //! Constructs an empty CascadedShadowMaps instance.
+                                CascadedShadowMaps( void );
+
+                                //! Constructs a CascadedShadowMaps instance.
+                                CascadedShadowMaps( const Matrix4& camera, const Matrix4& light, s32 textureSize );
+
         //! Calculates a specified number of splits.
-        void                    calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, const Matrix4& camera, const Matrix4& light, s32 count );
+        void                    calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, s32 count );
 
         //! Returns a total number of splits.
         s32                     cascadeCount( void ) const;
@@ -65,13 +71,13 @@ namespace Scene {
         void                    resize( s32 count );
 
         //! Calculates world space vertices for a cascade.
-        void                    calculateWorldSpaceVertices( const Matrix4& camera, Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const;
+        void                    calculateWorldSpaceVertices( Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const;
 
         //! Calculates light space vertices for a cascade.
         void                    calculateLightSpaceVertices( const Matrix4& viewProjection, Vec3 lightSpaceVertices[8] ) const;
 
         //! Calculates a view-projection matrix from a set of cascade world space vertices.
-        Matrix4                 calculateViewProjection( const Matrix4& light, const Vec3 worldSpaceVertices[8] ) const;
+        Matrix4                 calculateViewProjection( const Vec3 worldSpaceVertices[8] ) const;
 
         //! Calculates a split world space bounding box.
         Bounds                  calculateWorldSpaceBounds( const Cascade& cascade ) const;
@@ -79,6 +85,9 @@ namespace Scene {
     private:
 
         Cascades                m_cascades;     //!< An array of shadow cascades.
+        s32                     m_textureSize;  //!< A texture size of a single cascade shadowmap.
+        Matrix4                 m_camera;       //!< A camera transform.
+        Matrix4                 m_light;        //!< A light transform.
     };
 
 } // namespace Scene
