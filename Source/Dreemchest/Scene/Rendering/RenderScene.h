@@ -94,6 +94,10 @@ namespace Scene {
                 Matrix4             transform;
                 f32                 invSize;
             };
+            struct ClipPlanes {
+                static BufferLayout Layout[];
+                Plane               equation[6];
+            };
         };
 
         //! Base class for all renderable entities.

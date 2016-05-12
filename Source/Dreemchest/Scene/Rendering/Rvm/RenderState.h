@@ -107,7 +107,7 @@ namespace Scene {
     // ------------------------------------------------------------------------------------------------
 
     //! A maximum number of state blocks that can be pushed onto a state stack.
-    enum { MaxStateStackDepth = 8 };
+    enum { MaxStateStackDepth = 9 };
 
     //! Render state defines a single state change.
     struct RenderState {
@@ -119,6 +119,7 @@ namespace Scene {
             , MaterialConstants     //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
             , LightConstants        //!< A constant buffer that stores light variables (color, position, etc.).
             , ShadowConstants       //!< A constant buffer that stores shadow variables (transform, near, far, etc.).
+            , ClippingPlanes        //!< A constant buffer that stores clipping planes.
             , MaxConstantBuffers    //!< A maximum number of supported constant buffers.
         };
 
@@ -171,7 +172,7 @@ namespace Scene {
                                         //! Constructs a blend function render state.
                                         RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst );
 
-                                        //! Constructs a blend function render state.
+                                        //! Constructs a texture binding state.
                                         RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Depth );
 
         union {

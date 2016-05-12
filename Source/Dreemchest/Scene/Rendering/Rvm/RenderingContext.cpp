@@ -324,12 +324,14 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                 struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
                 struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
                 struct CBufferShadow   { mat4 transform; float invSize; };         \n\
+                struct CBufferClipPlanes { vec4 equation[6]; };         \n\
                 uniform CBufferScene    Scene;                      \n\
                 uniform CBufferView     View;                       \n\
                 uniform CBufferInstance Instance;                   \n\
                 uniform CBufferMaterial Material;                   \n\
                 uniform CBufferLight    Light;                      \n\
                 uniform CBufferShadow   Shadow;                     \n\
+                uniform CBufferClipPlanes ClipPlanes;               \n\
                 #define u_DiffuseTexture Texture0                   \n\
                 #define u_ShadowTexture  Texture1                   \n\
             "

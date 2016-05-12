@@ -96,6 +96,17 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Material::Layout[] = {
     , { NULL }
 };
 
+// ** RenderScene::CBuffer::ClipPlanes::Layout
+RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::ClipPlanes::Layout[] = {
+      { "ClipPlanes.equation[0]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[0] ), }
+    , { "ClipPlanes.equation[1]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[1] ), }
+    , { "ClipPlanes.equation[2]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[2] ), }
+    , { "ClipPlanes.equation[3]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[3] ), }
+    , { "ClipPlanes.equation[4]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[4] ), }
+    , { "ClipPlanes.equation[5]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[5] ), }
+    , { NULL }
+};
+
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache )
     : m_scene( scene )

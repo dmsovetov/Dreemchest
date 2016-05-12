@@ -405,6 +405,12 @@ void Rvm::switchConstantBuffer( const RenderFrame& frame, const RenderState& sta
 {
     const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.resourceId );
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
+
+    // A single u64 bit constant value
+    static const u64 bit = 1;
+
+    // Update resource features
+    m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + CBufferFeaturesOffset));
 }
 
 // ** Rvm::switchVertexBuffer
