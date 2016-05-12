@@ -153,6 +153,7 @@ Rvm::Rvm( RenderingContextWPtr context )
     m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
     m_stateSwitches[RenderState::Texture]           = &Rvm::switchTexture;
     m_stateSwitches[RenderState::CullFace]          = &Rvm::switchCullFace;
+    m_stateSwitches[RenderState::PolygonOffset]     = &Rvm::switchPolygonOffset;
 }
 
 // ** Rvm::create
@@ -469,6 +470,12 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
 void Rvm::switchCullFace( const RenderFrame& frame, const RenderState& state )
 {
     m_hal->setCulling( static_cast<Renderer::TriangleFace>( state.cullFace ) );
+}
+
+// ** Rvm::switchPolygonOffset
+void Rvm::switchPolygonOffset( const RenderFrame& frame, const RenderState& state )
+{
+    m_hal->setPolygonOffset( state.polygonOffset.factor / 128.0f, state.polygonOffset.units / 128.0f );
 }
 
 } // namespace Scene

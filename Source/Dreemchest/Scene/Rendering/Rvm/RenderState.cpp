@@ -91,6 +91,14 @@ RenderState::RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget
     data.index = sampler | (attachment << 4);
 }
 
+// ** RenderState::RenderState
+RenderState::RenderState( f32 factor, f32 units )
+    : type( PolygonOffset )
+{
+    polygonOffset.factor = factor * 128.0f;
+    polygonOffset.units  = units * 128.0f;
+}
+
 // -------------------------------------------------------------------------- RenderStateBlock -------------------------------------------------------------------------- //
 
 // ** RenderStateBlock::RenderStateBlock
@@ -166,6 +174,18 @@ void RenderStateBlock::enableFeatures( u64 bits )
 void RenderStateBlock::disableFeatures( u64 bits )
 {
     m_featureMask = m_featureMask & ~bits;
+}
+
+// ** RenderStateBlock::setPolygonOffset
+void RenderStateBlock::setPolygonOffset( f32 factor, f32 units )
+{
+    pushState( RenderState( factor, units ), RenderState::PolygonOffset );
+}
+
+// ** RenderStateBlock::disablePolygonOffset
+void RenderStateBlock::disablePolygonOffset( void )
+{
+    setPolygonOffset( 0.0f, 0.0f );
 }
 
 // ** RenderStateBlock::setAlphaTest

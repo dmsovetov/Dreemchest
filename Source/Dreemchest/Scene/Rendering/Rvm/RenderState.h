@@ -143,8 +143,9 @@ namespace Scene {
             , InputLayout       = IndexBuffer       + 1                     //!< Binds an input layout.
             , ConstantBuffer    = InputLayout       + 1                     //!< Binds a constant buffer.
             , Shader            = ConstantBuffer    + MaxConstantBuffers    //!< Binds a program instance.
-            , Blending          = Shader            + 1                     //!< Sets a blend function
-            , DepthState        = Blending          + 1                     //!< Sets a depth test function and a reference value.
+            , Blending          = Shader            + 1                     //!< Sets a blend function.
+            , PolygonOffset     = Blending          + 1                     //!< Sets a polygon offset fill.
+            , DepthState        = PolygonOffset     + 1                     //!< Sets a depth test function and a reference value.
             , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
             , CullFace          = AlphaTest         + 1                     //!< Sets a cull face mode.
             , Texture           = CullFace          + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
@@ -175,10 +176,17 @@ namespace Scene {
                                         //! Constructs a texture binding state.
                                         RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Depth );
 
+                                        //! Constructs a polygon offset state.
+                                        RenderState( f32 factor, f32 units );
+
         union {
             u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
+            struct {
+                s8                      factor;             //!< A polygon offset factor.
+                s8                      units;              //!< A polygon offset units.
+            } polygonOffset;
         };
 
         union {
@@ -233,6 +241,12 @@ namespace Scene {
 
         //! Disables a ubershader features.
         void                            disableFeatures( u64 bits );
+
+        //! Sets a polygon offset values.
+        void                            setPolygonOffset( f32 factor, f32 units );
+
+        //! Disables a polygon offset.
+        void                            disablePolygonOffset( void );
 
         //! Sets an alpha test function.
         void                            setAlphaTest( Renderer::Compare function, f32 reference );

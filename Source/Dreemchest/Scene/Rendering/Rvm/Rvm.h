@@ -103,6 +103,9 @@ namespace Scene {
         //! Sets a cull face mode.
         void                        switchCullFace( const RenderFrame& frame, const RenderState& state );
 
+        //! Sets a polygon offset value
+        void                        switchPolygonOffset( const RenderFrame& frame, const RenderState& state );
+
     private:
 
         //! State switcher function callback.
