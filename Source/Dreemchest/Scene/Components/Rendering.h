@@ -57,6 +57,34 @@ namespace Scene {
 
 	//! This component is attached to a camera to render forward lit meshes.
 	class ForwardRenderer : public Ecs::Component<ForwardRenderer> {
+    public:
+
+                                        //! Constructs a ForwardRenderer instance.
+                                        ForwardRenderer( s32 shadowSize = 1024.0f, s32 shadowCascadeCount = 3 );
+
+        //! Returns a shadow texture size.
+        s32                             shadowSize( void ) const;
+
+        //! Sets a shadow texture size.
+        void                            setShadowSize( s32 value );
+
+        //! Returns a total number of cascades used for directional light sources.
+        s32                             shadowCascadeCount( void ) const;
+
+        //! Sets a total number of cascades used for directinal light sources.
+        void                            setShadowCascadeCount( s32 value );
+
+        //! Returns true if the debug rendering of cascade shadows is enabled.
+        bool                            isDebugCascadeShadows( void ) const;
+
+        //! Enables or disables the debug rendering of a cascade shadows.
+        void                            setDebugCascadeShadows( bool value );
+
+    private:
+
+        s32                             m_shadowSize;           //!< A shadow texture size.
+        s32                             m_shadowCascadeCount;   //!< A total number of cascades a camera frustum is split to.
+        bool                            m_debugCascadeShadows;  //!< Enables a debug rendering of cascaded shadowmaps.
 	};
 
     //! This component is attached to a camera to render a debug info.

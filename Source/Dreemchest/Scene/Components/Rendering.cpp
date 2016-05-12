@@ -55,6 +55,52 @@ void SpriteRenderer::setScaleFactor( f32 value )
 	m_scaleFactor = value;
 }
 
+// ------------------------------------------------------------- ForwardRenderer ------------------------------------------------------------- //
+
+// ** ForwardRenderer::ForwardRenderer
+ForwardRenderer::ForwardRenderer( s32 shadowSize, s32 shadowCascadeCount )
+    : m_shadowSize( shadowSize )
+    , m_shadowCascadeCount( shadowCascadeCount )
+    , m_debugCascadeShadows( false )
+{
+}
+
+// ** ForwardRenderer::shadowSize
+s32 ForwardRenderer::shadowSize( void ) const
+{
+    return m_shadowSize;
+}
+
+// ** ForwardRenderer::setShadowSize
+void ForwardRenderer::setShadowSize( s32 value )
+{
+    m_shadowSize = value;
+}
+
+// ** ForwardRenderer::shadowCascadeCount
+s32 ForwardRenderer::shadowCascadeCount( void ) const
+{
+    return m_shadowCascadeCount;
+}
+
+// ** ForwardRenderer::setShadowCascadeCount
+void ForwardRenderer::setShadowCascadeCount( s32 value )
+{
+    m_shadowCascadeCount = value;
+}
+
+// ** ForwardRenderer::isDebugCascadeShadows
+bool ForwardRenderer::isDebugCascadeShadows( void ) const
+{
+    return m_debugCascadeShadows;
+}
+
+// ** ForwardRenderer::setDebugCascadeShadows
+void ForwardRenderer::setDebugCascadeShadows( bool value )
+{
+    m_debugCascadeShadows = value;
+}
+
 // -------------------------------------------------------------- DebugRenderer -------------------------------------------------------------- //
 
 // ** DebugRenderer::DebugRenderer
