@@ -33,11 +33,16 @@ namespace Scene {
 // ** ForwardRenderSystem::ForwardRenderSystem
 ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
+    , m_debugCsmSplits( context, renderScene )
+    , m_debugRenderTargets( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_debugShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Debug.shader" );
     m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
     m_shadowShader      = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
     m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
+    m_viewCBuffer       = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::View, RenderScene::CBuffer::View::Layout );
+    m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::ClipPlanes, RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
@@ -53,6 +58,11 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
         RenderPassBase::emitPointClouds( m_renderScene.pointClouds(), frame, commands, stateStack );
     }
 
+    // Get the shadowmapping settings
+    s32 shadowSize   = forwardRenderer.shadowSize();
+    s32 cascadeCount = forwardRenderer.shadowCascadeCount();
+    f32 lambda       = forwardRenderer.shadowCascadeLambda();
+
     // Get all light sources
     const RenderScene::Lights& lights = m_renderScene.lights();
 
@@ -62,11 +72,36 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
         const RenderScene::LightNode& light = lights[i];
 
         if( light.light->type() == LightType::Directional ) {
-            for( s32 j = 0; j < 1; j++ ) {
-                ShadowParameters parameters = directionalLightShadows( camera, transform.matrix(), transform.worldSpacePosition(), light, 1024, j, 1 );
-                u8 shadows = renderShadows( frame, commands, stateStack, light, 1024, parameters );
+            ShadowParameters parameters; parameters.invSize = 1.0f / shadowSize;
+            CascadedShadowMaps csm; csm.calculate( camera.fov(), camera.near(), camera.far(), entity.get<Viewport>()->aspect(), lambda, transform.matrix(), *light.matrix, cascadeCount );
+
+            m_debugRenderTargets.begin( frame, commands, stateStack );
+
+            for( s32 j = 0; j < cascadeCount; j++ ) {
+                const CascadedShadowMaps::Cascade& cascade = csm.cascadeAt( j );
+
+                parameters.transform = cascade.transform;
+                u8 shadows = renderShadows( frame, commands, stateStack, light, shadowSize, parameters );
+
+                StateScope clip = stateStack.newScope();
+                m_clipPlanesParameters.equation[0] = Plane::calculate( -transform.axisZ(), transform.worldSpacePosition() - transform.axisZ() * cascade.near );
+                m_clipPlanesParameters.equation[1] = Plane::calculate(  transform.axisZ(), transform.worldSpacePosition() - transform.axisZ() * cascade.far );
+                clip->bindConstantBuffer( m_clipPlanesCBuffer, RenderState::ClippingPlanes );
+                commands.uploadConstantBuffer( m_clipPlanesCBuffer, frame.internBuffer( &m_clipPlanesParameters, sizeof m_clipPlanesParameters ), sizeof m_clipPlanesParameters );
+
                 renderLight( frame, commands, stateStack, light, shadows );
+
+                if( forwardRenderer.isDebugCascadeShadows() ) {
+                    debugRenderShadowmap( frame, commands, stateStack, *entity.get<Viewport>(), shadows, 128, j * 130, 0 );
+                }
+
                 commands.releaseRenderTarget( shadows );
+            }
+
+            m_debugRenderTargets.end( frame, commands, stateStack );
+
+            if( forwardRenderer.isDebugCascadeShadows() ) {
+                debugRenderCsm( frame, commands, stateStack, *light.matrix, csm );
             }
             continue;
         }
@@ -75,8 +110,8 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
         u8 shadows = 0;
 
         if( light.light->castsShadows() ) {
-            ShadowParameters parameters = spotLightShadows( light, 1024 );
-            shadows = renderShadows( frame, commands, stateStack, light, 1024, parameters );
+            ShadowParameters parameters = spotLightShadows( light, shadowSize );
+            shadows = renderShadows( frame, commands, stateStack, light, shadowSize, parameters );
         }
 
         // Render a light pass
@@ -128,6 +163,8 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
     state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
     state->bindProgram( m_context.internShader( m_phongShader ) );
     state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
+    state->setDepthState( Renderer::LessEqual, false );
+    state->setPolygonOffset( -1, -1 );
 
     // Bind a rendered shadowmap
     if( shadows ) {
@@ -149,77 +186,133 @@ ForwardRenderSystem::ShadowParameters ForwardRenderSystem::spotLightShadows( con
     return parameters;
 }
 
-// ** ForwardRenderSystem::directionalLightShadows
-ForwardRenderSystem::ShadowParameters ForwardRenderSystem::directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const
+// ** ForwardRenderSystem::debugRenderShadowmap
+void ForwardRenderSystem::debugRenderShadowmap( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, s32 size, s32 x, s32 y )
 {
-    f32 range     = camera.far() - camera.near();
-    f32 splitSize = range / maxSplits;
+    RenderScene::CBuffer::View camera;
+    camera.near      = -9999;
+    camera.far       =  9999;
+    camera.transform = Matrix4::ortho( 0, viewport.width(), 0, viewport.height(), -9999, 9999 );
 
-    Bounds bounds = calculateSplitBounds( camera, cameraInverseTransform, *light.matrix, camera.near() + splitSize * split, camera.near() + splitSize * (split + 1) );
+    commands.uploadConstantBuffer( m_viewCBuffer, frame.internBuffer( &camera, sizeof camera ), sizeof camera );
 
-    ShadowParameters parameters;
-    parameters.transform = Matrix4::ortho( bounds.min().x, bounds.max().x, bounds.min().y, bounds.max().y, bounds.min().z, bounds.max().z ) * light.matrix->inversed();
-    parameters.invSize   = 1.0f / dimensions;
-    return parameters;
+    StateScope pass = stateStack.newScope();
+    pass->bindProgram( m_context.internShader( m_debugShader ) );
+    pass->bindRenderedTexture( slot, RenderState::Texture0, Renderer::RenderTarget::Depth );
+    pass->bindConstantBuffer( m_viewCBuffer, RenderState::ConstantBufferType::PassConstants );
+    pass->setCullFace( Renderer::TriangleFaceBack );
+    m_debugRenderTargets.emitRenderTarget( frame, commands, stateStack, slot, size, x, y );
 }
 
-// ** ForwardRenderSystem::calculateSplitBounds
-Bounds ForwardRenderSystem::calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const
+// ** ForwardRenderSystem::debugRenderCsm
+void ForwardRenderSystem::debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm )
 {
-#if 0
-    // Get the camera aspect ratio and field of view
-    f32 ar  = camera.aspect();
-    f32 fov = camera.fov();
-
-    f32 tanHalfHFOV = tanf( radians( fov / 2.0f ) );
-    f32 tanHalfVFOV = tanf( radians( (fov * ar) / 2.0f ) );
-
-    // Calculate dimensions of a split far and near faces
-    f32 xn = near * tanHalfHFOV;
-    f32 xf = far  * tanHalfHFOV;
-    f32 yn = near * tanHalfVFOV;
-    f32 yf = far  * tanHalfVFOV;
-
-    // Construct frustum vertices in a view space
-    Vec4 frustumCorners[8] = {
-          {  xn,  yn, near, 1.0 }   // Near split face
-        , { -xn,  yn, near, 1.0 }
-        , {  xn, -yn, near, 1.0 }
-        , { -xn, -yn, near, 1.0 }
-        , {  xf,  yf, far,  1.0 }   // Far split face
-        , { -xf,  yf, far,  1.0 }
-        , {  xf, -yf, far,  1.0 }
-        , { -xf, -yf, far,  1.0 }
+    Rgba splitColors[] = {
+          { 1.0f, 0.0f, 0.0f }
+        , { 0.0f, 1.0f, 0.0f }
+        , { 0.0f, 0.0f, 2.0f }
     };
 
-    // Calculate a light space split center
-    Bounds v;
-    for( s32 i = 0; i < 8; i++ ) v << frustumCorners[i];
-    Vec4 wsCenter = cameraInverseTransform.inversed() * Vec4( v.center().x, v.center().y, v.center().z, 1.0f );
-    Vec4 lsCenter = lightTransform.inversed() * wsCenter;
+    StateScope pass = stateStack.newScope();
+    pass->bindProgram( m_context.internShader( m_debugShader ) );
+    pass->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
-    // Now transform vertices to a lightspace and calculate bounding box
-    Bounds result;
+    // Render a debug CSM pass
+    m_debugCsmSplits.setup( light, splitColors, 3 );
+    m_debugCsmSplits.begin( frame, commands, stateStack );
+    m_debugCsmSplits.emitRenderOperations( frame, commands, stateStack );
+    m_debugCsmSplits.end( frame, commands, stateStack );
+}
 
-    for( s32 i = 0; i < 8; i++ ) {
-        // Transform the frustum coordinate from view to world space
-        Vec4 wsVertex = cameraInverseTransform.inversed() * frustumCorners[i];
+// ---------------------------------------------------------------- DebugRenderTargets ---------------------------------------------------------------- //
 
-        // Transform the frustum coordinate from world to light space
-        Vec4 lsVertex = lightTransform.inversed() * wsVertex;
+// ** DebugRenderTargets::DebugRenderTargets
+DebugRenderTargets::DebugRenderTargets( RenderingContext& context, RenderScene& renderScene )
+    : StreamedRenderPassBase( context, renderScene, 96 )
+{
+}
 
-        // Append a vertex in a light space to split bounding box
-        result << lsVertex;
+// ** DebugRenderTargets::emitRenderTarget
+void DebugRenderTargets::emitRenderTarget( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 slot, s32 size, s32 x, s32 y )
+{
+    Vec3 vertices[] = {
+          { x,        y,        0 }
+        , { x + size, y,        0 }
+        , { x + size, y + size, 0 }
+        , { x,        y + size, 0 }
+    };
+    Rgba colors[] = {
+          { 0.0f, 1.0f, 1.0f }
+        , { 0.0f, 1.0f, 1.0f }
+        , { 0.0f, 1.0f, 1.0f }
+        , { 0.0f, 1.0f, 1.0f }
+    };
+    Vec2 uv[] = {
+          { 0.0f, 0.0f }
+        , { 1.0f, 0.0f }
+        , { 1.0f, 1.0f }
+        , { 0.0f, 1.0f }
+    };
+
+    emitRect( frame, commands, stateStack, vertices, uv, colors );
+    flush( commands, stateStack );
+}
+
+// ------------------------------------------------------------------ DebugCsmSplits ------------------------------------------------------------------ //
+
+// ** DebugCsmSplits::DebugCsmSplits
+DebugCsmSplits::DebugCsmSplits( RenderingContext& context, RenderScene& renderScene )
+    : StreamedRenderPass( context, renderScene, 96 )
+{
+}
+
+// ** DebugCsmSplits::setup
+void DebugCsmSplits::setup( const Matrix4& lightTransform, const Rgba* colors, s32 splitCount )
+{
+    m_colors = colors;
+    m_splitCount = splitCount;
+    m_lightTransform = lightTransform;
+}
+
+// ** DebugCsmSplits::emitRenderOperations
+void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+{
+    if( camera.projection() != Projection::Perspective ) {
+        return;
+    }
+    //if( !entity.has<DebugCsmCamera>() ) {
+    //    return;
+    //}
+
+    // By default a frustum aspect is 1.0f
+    f32 aspect = 1.0f;
+
+    // Inherit a camera frustum from a viewport
+    if( const Viewport* viewport = entity.has<Viewport>() ) {
+        aspect = viewport->aspect();
     }
 
-    // Calculate a centered orhto projection matrix
-    Vec3 offset = Vec3( result.width(), result.height(), result.depth() ) * 0.5f;
+    // Caclulate CSM splits
+    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.5f, transform.matrix(), m_lightTransform, m_splitCount );
 
-    return Bounds( Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) - offset, Vec3( lsCenter.x, lsCenter.y, lsCenter.z ) + offset );
-#else
-    DC_NOT_IMPLEMENTED;
-    return Bounds();
-#endif
+    // Visualize camera frustum splits
+    for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {
+        // Get a cascade at specified index
+        const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
+
+        // Render a cascade frustum
+        emitWireBounds( frame, commands, stateStack, cascade.worldSpaceVertices, m_colors[i].transparent( 0.5f ) );
+
+        // Render a split bounding box
+        emitWireBounds( frame, commands, stateStack, cascade.worldSpaceBounds, m_colors[i].transparent( 0.5f ) );
+
+        // Render light space vertices
+        for( s32 j = 0; j < 8; j++ ) {
+            emitWireBounds( frame, commands, stateStack, cascade.lightSpaceVertices, m_colors[i] );
+        }
+    }
+
+    emitBasis( frame, commands, stateStack, Matrix4() );
 }
 
 } // namespace Scene

@@ -62,6 +62,7 @@ ForwardRenderer::ForwardRenderer( s32 shadowSize, s32 shadowCascadeCount )
     : m_shadowSize( shadowSize )
     , m_shadowCascadeCount( shadowCascadeCount )
     , m_debugCascadeShadows( false )
+    , m_shadowCascadeLambda( 0.5f )
 {
 }
 
@@ -99,6 +100,18 @@ bool ForwardRenderer::isDebugCascadeShadows( void ) const
 void ForwardRenderer::setDebugCascadeShadows( bool value )
 {
     m_debugCascadeShadows = value;
+}
+
+// ** ForwardRenderer::shadowCascadeLambda
+f32 ForwardRenderer::shadowCascadeLambda( void ) const
+{
+    return m_shadowCascadeLambda;
+}
+
+// ** ForwardRenderer::setShadowCascadeLambda
+void ForwardRenderer::setShadowCascadeLambda( f32 value )
+{
+    m_shadowCascadeLambda = value;
 }
 
 // -------------------------------------------------------------- DebugRenderer -------------------------------------------------------------- //

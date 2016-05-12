@@ -151,8 +151,14 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
 	//m_camera->attach<RenderSceneHelpers>();
 
 	//m_camera->attach<Scene::SpriteRenderer>( 0.01f );
-	m_camera->attach<Scene::ForwardRenderer>();
-    m_camera->attach<Scene::DebugRenderer>();
+    {
+        Scene::ForwardRenderer* forwardRenderer = m_camera->attach<Scene::ForwardRenderer>();
+        forwardRenderer->setShadowSize( 2048 );
+        forwardRenderer->setShadowCascadeCount( 4 );
+        forwardRenderer->setShadowCascadeLambda( 0.3f );
+        forwardRenderer->setDebugCascadeShadows( true );
+    }
+    //m_camera->attach<Scene::DebugRenderer>();
     //m_camera->attach<TestMoverInput>();
 
     m_camera->get<Scene::MoveAlongAxes>()->setSpeed( 10 );
@@ -313,15 +319,19 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 #else
     s32 pointCloudCount = 0;
     s32 boxCount = 0;
-    s32 meshCount = 0;
+    s32 meshCount = 10;
     s32 points = 500;
     s32 c = 0;
 
-    //Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
-    //DC_ABORT_IF( !diffuse.isValid() );
+#define ENABLE_MESHES (1)
 
-    //Scene::MeshHandle mesh = m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" );
-    //DC_ABORT_IF( !mesh.isValid() );
+#if ENABLE_MESHES
+    Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
+    DC_ABORT_IF( !diffuse.isValid() );
+
+    Scene::MeshHandle mesh = m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" );
+    DC_ABORT_IF( !mesh.isValid() );
+#endif
 
 	Scene::ImageHandle checker = m_project->assets().add<Scene::Image>( Guid::generate(), DC_NEW Scene::ImageCheckerGenerator( 128, 128, 8, Rgb(1.0f,1.0f,1.0f), Rgb(0.5f, 0.5f, 0.5f) ) );
 	checker.asset().setName( "Checker.image" );
@@ -347,14 +357,16 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     Scene::MeshHandle torus = m_project->assets().add<Scene::Mesh>( Guid::generate(), DC_NEW Scene::MeshTorusGenerator( 1.0f ) );
     box.asset().setName( "Torus.mesh" );
 
-    //Scene::MaterialHandle stone = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
-    //{
-    //    stone.asset().setName( "Stone.material" );
-    //    Assets::WriteLock<Scene::Material> writable = stone.writeLock();
-    //    writable->setDiffuse( diffuse );
-    //    writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
-    //    writable->setLightingModel( Scene::LightingModel::Phong );
-    //}
+#if ENABLE_MESHES
+    Scene::MaterialHandle stone = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
+    {
+        stone.asset().setName( "Stone.material" );
+        Assets::WriteLock<Scene::Material> writable = stone.writeLock();
+        writable->setDiffuse( diffuse );
+        writable->setColor( Scene::Material::Diffuse, Rgba( 0.45f, 0.45f, 0.45f ) );
+        writable->setLightingModel( Scene::LightingModel::Phong );
+    }
+#endif
     Scene::MaterialHandle white = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
         white.asset().setName( "White.material" );
@@ -386,10 +398,12 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         writable->setLightingModel( Scene::LightingModel::Phong );    
     }
 
-    //m_project->assets().forceLoad( mesh );
-    //m_project->assets().forceLoad( diffuse );
+#if ENABLE_MESHES
+    m_project->assets().forceLoad( mesh );
+    m_project->assets().forceLoad( diffuse );
+    m_project->assets().forceLoad( stone );
+#endif
     m_project->assets().forceLoad( dflt );
-    //m_project->assets().forceLoad( stone );
     m_project->assets().forceLoad( red );
     m_project->assets().forceLoad( green );
     m_project->assets().forceLoad( blue );
@@ -416,55 +430,67 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
         , torus
     };
 
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 15.0f );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( -5, 1, -5, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 10, 1, 10, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 1.0f, 0.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 10.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
-
-    {
-        Scene::SceneObjectPtr light = scene->createSceneObject();
-        light->attach<Scene::Transform>( 5, 1, 5, Scene::TransformWPtr() );
-        light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 0.0f, 1.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
-        light->get<Scene::Light>()->setCastsShadows( true );
-        light->attach<Scene::RotateAroundAxes>( 15.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-        scene->addSceneObject( light );
-    }
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 10, 5, 10, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Point, Rgb( 0.0f, 1.0f, 0.0f ), 5.0f, 15.0f );
+    //    scene->addSceneObject( light );
+    //}
 
     //{
     //    Scene::SceneObjectPtr light = scene->createSceneObject();
-    //    Scene::Transform* transform = light->attach<Scene::Transform>();
-    //    transform->setRotation( Quat::rotateAroundAxis( 100.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( -25.0f, Vec3::axisX() ) );
-    //    light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.0f, 0.0f, 0.5f ), 5.0f, 15.0f );
+    //    light->attach<Scene::Transform>( -5, 1, -5, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 1.0f, 0.0f, 0.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
     //    light->get<Scene::Light>()->setCastsShadows( true );
-    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
     //    scene->addSceneObject( light );
     //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 10, 1, 10, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 1.0f, 0.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 10.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
+
+    //{
+    //    Scene::SceneObjectPtr light = scene->createSceneObject();
+    //    light->attach<Scene::Transform>( 5, 1, 5, Scene::TransformWPtr() );
+    //    light->attach<Scene::Light>( Scene::LightType::Spot, Rgb( 0.0f, 0.0f, 1.0f ), 50.0f, 25.0f )->setCutoff( 20.0f );
+    //    light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 15.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+    //    scene->addSceneObject( light );
+    //}
+
+    {
+        Scene::SceneObjectPtr light = scene->createSceneObject();
+        Scene::Transform* transform = light->attach<Scene::Transform>();
+        transform->setRotation( Quat::rotateAroundAxis( 70.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( -25.0f, Vec3::axisX() ) );
+        light->attach<Scene::Light>( Scene::LightType::Directional, Rgb( 0.5f, 0.5f, 0.5f ), 5.0f, 15.0f );
+        light->get<Scene::Light>()->setCastsShadows( true );
+    //    light->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+        scene->addSceneObject( light );
+    }
 
     {
         Scene::SceneObjectPtr msh = scene->createSceneObject();
         msh->attach<Scene::Transform>( 0, 0, 0, Scene::TransformWPtr() );
         msh->attach<Scene::StaticMesh>( ground )->setMaterial( 0, dflt );
         scene->addSceneObject( msh );   
+    }
+
+    {
+        Scene::SceneObjectPtr cam = scene->createSceneObject();
+        cam->attach<Scene::Transform>( 10, 10, 10, Scene::TransformWPtr() )->setRotation( Quat::rotateAroundAxis( 0.0f, Vec3::axisY() ) * Quat::rotateAroundAxis( -25.0f, Vec3::axisX() ) );
+        cam->attach<Scene::Viewport>( viewport() );
+        Scene::Camera* camera = cam->attach<Scene::Camera>( Scene::Projection::Perspective );
+        camera->setFov( 20.0f );
+        camera->setNear( 0.1f );
+        camera->setFar( 10.0f );
+        cam->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+        scene->addSceneObject( cam );
     }
 
     //{
@@ -474,16 +500,18 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     //    scene->addSceneObject( msh );
     //}
 
-    //for( s32 i = -meshCount / 2; i < meshCount / 2; i++ )
-    //{
-    //    for( s32 j = -meshCount / 2; j < meshCount / 2; j++ )
-    //    {
-    //        Scene::SceneObjectPtr msh = scene->createSceneObject();
-    //        msh->attach<Scene::Transform>( i * 15, 0, j * 15, Scene::TransformWPtr() );
-    //        msh->attach<Scene::StaticMesh>( mesh )->setMaterial( 0, stone );
-    //        scene->addSceneObject( msh );
-    //    }
-    //}
+#if ENABLE_MESHES
+    for( s32 i = -meshCount / 2; i < meshCount / 2; i++ )
+    {
+        for( s32 j = -meshCount / 2; j < meshCount / 2; j++ )
+        {
+            Scene::SceneObjectPtr msh = scene->createSceneObject();
+            msh->attach<Scene::Transform>( i * 15, 0, j * 15, Scene::TransformWPtr() );
+            msh->attach<Scene::StaticMesh>( mesh )->setMaterial( 0, stone );
+            scene->addSceneObject( msh );
+        }
+    }
+#endif
 
 	{
 		Scene::SceneObjectPtr sprite = scene->createSceneObject();

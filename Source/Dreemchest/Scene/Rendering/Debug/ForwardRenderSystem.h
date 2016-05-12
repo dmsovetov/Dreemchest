@@ -28,12 +28,56 @@
 #define __DC_Scene_Rendering_ForwardRenderSystem_H__
 
 #include "../RenderSystem/RenderSystem.h"
+#include "../RenderSystem/StreamedRenderPass.h"
+#include "CascadedShadowMaps.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+    //class DebugCsmCamera : public Ecs::Component<DebugCsmCamera> {
+    //};
+
+    class CascadedShadowMaps;
+
+    //! A debug render pass that renders a camera frustum splits.
+    class DebugCsmSplits : public StreamedRenderPass<Camera> {
+    public:
+
+                            //! Constructs a DebugCsmSplits instance.
+                            DebugCsmSplits( RenderingContext& context, RenderScene& renderScene );
+
+        //! Sets a bounding box color.
+        void                setup( const Matrix4& lightTransform, const Rgba* colors, s32 splitCount );
+
+        virtual void		emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) { StreamedRenderPass::emitRenderOperations( frame, commands, stateStack ); }
+
+    protected:
+
+        //! Emits render operations to render a single bounding box.
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+
+    private:
+
+        Ecs::EntityWPtr     m_light;            //!< A directional light entity.
+        const Rgba*         m_colors;           //!< Split colors.
+        Matrix4             m_lightTransform;   //!< A light transform.
+        s32                 m_splitCount;       //!< A total number of splits.
+        CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
+    };
+
+    //! A debug render pass that renders intermediate render targets.
+    class DebugRenderTargets : public StreamedRenderPassBase {
+    public:
+
+                            //! Constructs a DebugRenderTargets instance.
+                            DebugRenderTargets( RenderingContext& context, RenderScene& renderScene );
+
+        void                emitRenderTarget( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 slot, s32 size, s32 x, s32 y );
+    };
+
     class ForwardRenderSystem : public RenderSystem<ForwardRenderer> {
+    friend class DebugCsmSplits;
     public:
 
                                         ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene );
@@ -42,6 +86,9 @@ namespace Scene {
 
         //! Alias the shadow constant buffer type.
         typedef RenderScene::CBuffer::Shadow ShadowParameters;
+
+        //! Alias the clip planes constant buffer type.
+        typedef RenderScene::CBuffer::ClipPlanes ClipPlanesParameters;
 
         virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer ) NIMBLE_OVERRIDE;
 
@@ -54,19 +101,25 @@ namespace Scene {
         //! Creates a shadow parameters for a spot light.
         ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
 
-        //! Creates a shadow parameters for a directional light
-        ShadowParameters                directionalLightShadows( const Camera& camera, const Matrix4& cameraInverseTransform, const Vec3& cameraPosition, const RenderScene::LightNode& light, s32 dimensions, s32 split, s32 maxSplits ) const;
+        //! Renders a debug render target
+        void                            debugRenderShadowmap( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, s32 size, s32 x, s32 y );
 
-        //! Calculates a world-space bounding box of a frustum split.
-        Bounds                          calculateSplitBounds( const Camera& camera, const Matrix4& cameraInverseTransform, const Matrix4& lightTransform, f32 near, f32 far ) const;
+        //! Renders a debug info for shadow map cascades.
+        void                            debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm );
 
     private:
 
         UbershaderPtr                   m_phongShader;
+        UbershaderPtr                   m_debugShader;
         UbershaderPtr                   m_ambientShader;
         UbershaderPtr                   m_shadowShader;
         ShadowParameters                m_shadowParameters;
         RenderResource                  m_shadowCBuffer;
+        ClipPlanesParameters            m_clipPlanesParameters;
+        RenderResource                  m_clipPlanesCBuffer;
+        RenderResource                  m_viewCBuffer;
+        DebugCsmSplits                  m_debugCsmSplits;
+        DebugRenderTargets              m_debugRenderTargets;
     };
 
 } // namespace Scene

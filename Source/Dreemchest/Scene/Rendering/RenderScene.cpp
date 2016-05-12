@@ -199,6 +199,7 @@ RenderFrameUPtr RenderScene::captureFrame( void )
     defaults->disableBlending();
     defaults->setDepthState( Renderer::LessEqual, true );
     defaults->setCullFace( Renderer::TriangleFaceBack );
+    defaults->disablePolygonOffset();
     defaults->bindProgram( m_context->internShader( m_defaultShader ) );
 
     // Push a scene state block

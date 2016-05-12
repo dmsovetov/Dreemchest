@@ -80,10 +80,17 @@ namespace Scene {
         //! Enables or disables the debug rendering of a cascade shadows.
         void                            setDebugCascadeShadows( bool value );
 
+        //! A parameter value used by a splitting planes calculation function.
+        f32                             shadowCascadeLambda( void ) const;
+
+        //! Sets a parameter value used by a splitting planes calculation function, should be in [0, 1] range.
+        void                            setShadowCascadeLambda( f32 value );
+
     private:
 
         s32                             m_shadowSize;           //!< A shadow texture size.
         s32                             m_shadowCascadeCount;   //!< A total number of cascades a camera frustum is split to.
+        f32                             m_shadowCascadeLambda;  //!< An interpolation factor between linear and logarithmic splitting schemes.
         bool                            m_debugCascadeShadows;  //!< Enables a debug rendering of cascaded shadowmaps.
 	};
 
