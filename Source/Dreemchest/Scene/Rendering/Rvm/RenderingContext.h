@@ -161,25 +161,29 @@ namespace Scene {
             };
         };
 
+        //! A maximum number of input layout types
+        enum { MaxInputLayouts = 255 };
+
         //! Container type to store a list of resource constructors that should be run before rendering a frame.
         typedef List<ResourceConstructor>       ResourceConstructors;
 
-        Renderer::HalWPtr                       m_hal;                      //!< A rendering HAL to be used.
-        ResourceConstructors                    m_resourceConstructors;     //!< A list of resources to be constructed.
-        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;         //!< Allocated vertex buffers.
-        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;          //!< Allocated index buffers.
-        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;       //!< Allocated constant buffers.
-        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;          //!< Allocated input layouts.
-        FixedArray<Renderer::TexturePtr>        m_texturePool;              //!< Allocated textures.
-        IndexCache<UbershaderPtr>               m_shaders;                  //!< Interned shaders.
+        Renderer::HalWPtr                       m_hal;                              //!< A rendering HAL to be used.
+        ResourceConstructors                    m_resourceConstructors;             //!< A list of resources to be constructed.
+        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;                 //!< Allocated vertex buffers.
+        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;                  //!< Allocated index buffers.
+        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;               //!< Allocated constant buffers.
+        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;                  //!< Allocated input layouts.
+        RenderResource                          m_inputLayouts[MaxInputLayouts];    //!< A lookup table for input layout types.
+        FixedArray<Renderer::TexturePtr>        m_texturePool;                      //!< Allocated textures.
+        IndexCache<UbershaderPtr>               m_shaders;                          //!< Interned shaders.
 
         //! A helper struct that hold info about an intermediate render target.
         struct IntermediateRenderTarget {
-            Renderer::RenderTargetPtr           renderTarget;               //!< A GPU render target instance.
-            u16                                 width;                      //!< Render target width.
-            u16                                 height;                     //!< Render target height.
-            Renderer::PixelFormat               format;                     //!< Render target internal format.
-            bool                                isFree;                     //!< Indicates that this render target is free.
+            Renderer::RenderTargetPtr           renderTarget;                       //!< A GPU render target instance.
+            u16                                 width;                              //!< Render target width.
+            u16                                 height;                             //!< Render target height.
+            Renderer::PixelFormat               format;                             //!< Render target internal format.
+            bool                                isFree;                             //!< Indicates that this render target is free.
         };
 
         Array<IntermediateRenderTarget>         m_renderTargets;            //!< An array of intermediate render targets.

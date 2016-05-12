@@ -34,6 +34,7 @@ namespace Scene {
 RenderingContext::RenderingContext( Renderer::HalWPtr hal )
     : m_hal( hal )
 {
+    memset( m_inputLayouts, 0, sizeof m_inputLayouts );
 }
 
 // ** RenderingContext::hal
@@ -170,11 +171,21 @@ void RenderingContext::constructTexture( const ResourceConstructor& constructor 
 // ** RenderingContext::requestInputLayout
 RenderResource RenderingContext::requestInputLayout( const VertexFormat& format )
 {
+    // First lookup a previously constucted input layout
+    RenderResource id = m_inputLayouts[format];
+    if( id ) {
+        return id;
+    }
+
+    // Nothing found - construct a new one
     ResourceConstructor constructor = ResourceConstructor::InputLayout;
     constructor.id      = m_inputLayoutPool.push( NULL ) + 1;
     constructor.inputLayout.format = format;
-
     m_resourceConstructors.push_back( constructor );
+
+    // Save this input layout id in a lookup table
+    m_inputLayouts[format] = constructor.id;
+
     return constructor.id;
 }
 
