@@ -178,6 +178,7 @@ namespace Renderer {
         virtual void                setRasterizerState( RasterizerState* state );
         virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
+        virtual void                setPolygonOffset( f32 factor, f32 units );
 
         // ** OpenGLRenderer
         static GLenum               blendFactor( u32 factor );

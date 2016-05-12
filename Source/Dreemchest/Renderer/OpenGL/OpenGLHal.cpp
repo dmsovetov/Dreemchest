@@ -712,6 +712,19 @@ void OpenGLHal::setColorModulation( f32 r, f32 g, f32 b, f32 a )
     glColor4f( r, g, b, a );
 }
 
+// ** OpenGLHal::setPolygonOffset
+void OpenGLHal::setPolygonOffset( f32 factor, f32 units )
+{
+    DC_CHECK_GL;
+
+    if( equal3( factor, units, 0.0f ) ) {
+        glDisable( GL_POLYGON_OFFSET_FILL );
+    } else {
+        glEnable( GL_POLYGON_OFFSET_FILL );
+        glPolygonOffset( factor, units );
+    }
+}
+
 // ** OpenGLHal::blendFactor
 GLenum OpenGLHal::blendFactor( u32 factor )
 {

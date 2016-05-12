@@ -168,6 +168,9 @@ namespace Renderer {
 		//! Sets the polygon rendering mode.
 		virtual void	setPolygonMode( PolygonMode mode );
 
+        //! Sets a polygon offset values.
+        virtual void    setPolygonOffset( f32 factor, f32 units );
+
         //! Sets a texture sampler state.
         /*!
          \param sampler Sampler index.

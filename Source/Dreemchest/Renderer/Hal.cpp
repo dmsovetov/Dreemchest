@@ -199,6 +199,11 @@ void Hal::setPolygonMode( PolygonMode mode )
 {
 }
 
+// ** Hal::setPolygonOffset
+void Hal::setPolygonOffset( f32 factor, f32 units )
+{
+}
+
 // ** Hal::setShader
 void Hal::setShader( const ShaderPtr& shader )
 {
