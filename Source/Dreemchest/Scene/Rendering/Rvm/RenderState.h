@@ -107,7 +107,7 @@ namespace Scene {
     // ------------------------------------------------------------------------------------------------
 
     //! A maximum number of state blocks that can be pushed onto a state stack.
-    enum { MaxStateStackDepth = 9 };
+    enum { MaxStateStackDepth = 10 };
 
     //! Render state defines a single state change.
     struct RenderState {
@@ -204,7 +204,7 @@ namespace Scene {
     public:
 
         //! A maximum number of states that can be stored inside a single block.
-        enum { MaxStates = 6 };
+        enum { MaxStates = 8 };
 
                                         //! Constructs a RenderStateBlock block.
                                         RenderStateBlock( void );
