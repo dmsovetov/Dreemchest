@@ -7,6 +7,7 @@ F_LightType	  		= lightType
 F_DiffuseTexture	= texture0
 F_ShadowTexture		= texture1
 F_ShadowFiltering	= shadowFiltering
+F_ClipPlanes		= cbuffer6
 
 [VertexShader]
 varying vec3 wsVertex;
@@ -55,6 +56,12 @@ void main()
 #if defined( F_ShadowTexture )
 	lsVertex = Shadow.transform * vertex;
 #endif	/*	F_ShadowTexture	*/
+
+#if defined( F_ClipPlanes )
+	for( int i = 0; i < 6; i++ ) {
+		gl_ClipDistance[i] = dot( ClipPlanes.equation[i], vertex );
+	}
+#endif	/*	F_ClipPlanes	*/
 }     
 
 [FragmentShader]
