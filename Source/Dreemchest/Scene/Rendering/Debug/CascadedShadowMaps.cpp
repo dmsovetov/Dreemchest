@@ -163,7 +163,13 @@ Matrix4 CascadedShadowMaps::calculateViewProjection( const Vec3 worldSpaceVertic
     const Vec3& max = lightSpaceBounds.max();
 
     // IMPORTANT: minZ and maxZ are swapped!
-    return Matrix4::ortho( min.x, max.x, min.y, max.y, max.z /*+ 50.0f*/, min.z ) * light.inversed();
+    Matrix4 projection = Matrix4::ortho( min.x, max.x, min.y, max.y, max.z /*+ 50.0f*/, min.z );
+
+    // Fix the sub-texel jittering
+    projection = fixSubTexel( projection * inverseLight, projection );
+
+    // Return a final view-projection matrix for a cascade
+    return projection * inverseLight;
 }
 
 // ** CascadedShadowMaps::calculateWorldSpaceBounds
@@ -178,6 +184,23 @@ Bounds CascadedShadowMaps::calculateWorldSpaceBounds( const Cascade& cascade ) c
     }
 
     return result;
+}
+
+// ** CascadedShadowMaps::fixSubTexel
+Matrix4 CascadedShadowMaps::fixSubTexel( const Matrix4& viewProjection, const Matrix4& projection ) const
+{
+    // Transform an origin to a light projection space
+	Vec3 zero = viewProjection * Vec3::zero();
+
+	f32 sh = m_textureSize * 0.5f;
+	f32 tx = zero.x * sh;
+	f32 ty = zero.y * sh;
+
+	f32 dx = ( floor( tx ) - tx ) / sh;
+	f32 dy = ( floor( ty ) - ty ) / sh;
+
+    // Compute the final projection matrix
+	return Matrix4::translation( dx, dy, 0.0f ) * projection;
 }
 
 } // namespace Scene

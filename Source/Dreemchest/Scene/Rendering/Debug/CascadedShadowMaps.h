@@ -67,6 +67,9 @@ namespace Scene {
 
     private:
 
+        //! Fixes a sub-texel jitter in a cascade final matrix.
+        Matrix4                 fixSubTexel( const Matrix4& viewProjection, const Matrix4& projection ) const;
+
         //! Resizes a cascaded shadow maps.
         void                    resize( s32 count );
 
