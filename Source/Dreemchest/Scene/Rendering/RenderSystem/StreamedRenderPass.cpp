@@ -34,13 +34,9 @@ namespace Scene {
 StreamedRenderPassBase::StreamedRenderPassBase( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch )
     : RenderPassBase( context, renderScene )
     , m_maxVerticesInBatch( maxVerticesInBatch )
-    , m_vertexFormat( VertexFormat::Position | VertexFormat::Color )
 {
-	// Request an input layout for a 2D vertex format
-	m_inputLayout  = m_context.requestInputLayout( m_vertexFormat );
-
 	// Request a vertex buffer used for rendering
-	m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * m_vertexFormat.vertexSize() );
+	m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * VertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 ).vertexSize() );
 }
 
 // ** StreamedRenderPassBase::end
@@ -50,10 +46,10 @@ void StreamedRenderPassBase::end( RenderFrame& frame, RenderCommandBuffer& comma
 }
 
 // ** StreamedRenderPassBase::beginBatch
-void StreamedRenderPassBase::beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, s32 capacity )
+void StreamedRenderPassBase::beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity )
 {
     // Flush an active batch
-    if( m_activeBatch.primitive != primitive ) {
+    if( m_activeBatch.primitive != primitive || m_activeBatch.vertexFormat != vertexFormat ) {
         flush( commands, stateStack );
     }
 
@@ -61,14 +57,15 @@ void StreamedRenderPassBase::beginBatch( RenderFrame& frame, RenderCommandBuffer
     s32 actualCapacity = capacity ? capacity : m_maxVerticesInBatch;
 
     // And start a new one
-    m_activeBatch.size      = 0;
-    m_activeBatch.capacity  = actualCapacity;
-    m_activeBatch.primitive = primitive;
-    m_activeBatch.stream    = frame.allocate( m_vertexFormat.vertexSize() * actualCapacity );
+    m_activeBatch.size          = 0;
+    m_activeBatch.capacity      = actualCapacity;
+    m_activeBatch.primitive     = primitive;
+    m_activeBatch.vertexFormat  = vertexFormat;
+    m_activeBatch.stream        = frame.allocate( vertexFormat.vertexSize() * actualCapacity );
 }
 
 // ** StreamedRenderPassBase::restartBatch
-void StreamedRenderPassBase::restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive )
+void StreamedRenderPassBase::restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive )
 {
     // Save an active batch state
     ActiveBatch activeBatch = m_activeBatch;
@@ -77,7 +74,7 @@ void StreamedRenderPassBase::restartBatch( RenderFrame& frame, RenderCommandBuff
     flush( commands, stateStack );
 
     // And start a new one with same parameters
-    beginBatch( frame, commands, stateStack, primitive, activeBatch.capacity );
+    beginBatch( frame, commands, stateStack, vertexFormat, primitive, activeBatch.capacity );
 }
 
 // ** StreamedRenderPassBase::flush
@@ -91,11 +88,11 @@ void StreamedRenderPassBase::flush( RenderCommandBuffer& commands, RenderStateSt
     // Push a render state
     StateScope state = stateStack.newScope();
 	state->bindVertexBuffer( m_vertexBuffer );
-	state->bindInputLayout( m_inputLayout );
+	state->bindInputLayout( m_context.requestInputLayout( m_activeBatch.vertexFormat ) );
 
 	// Upload vertex data to a GPU buffer and emit a draw primitives command
-	commands.uploadVertexBuffer( m_vertexBuffer, m_activeBatch.stream, m_activeBatch.size * m_vertexFormat.vertexSize() );
-	commands.drawPrimitives( 0, Renderer::PrimLines, stateStack.states(), 0, m_activeBatch.size );
+	commands.uploadVertexBuffer( m_vertexBuffer, m_activeBatch.stream, m_activeBatch.size * m_activeBatch.vertexFormat.vertexSize() );
+	commands.drawPrimitives( 0, m_activeBatch.primitive, stateStack.states(), 0, m_activeBatch.size );
 
     // Reset an active batch state
     m_activeBatch = ActiveBatch();
@@ -148,17 +145,27 @@ void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffe
 }
 
 // ** StreamedRenderPassBase::emitVertices
-void StreamedRenderPassBase::emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Rgba* colors, s32 count )
+void StreamedRenderPassBase::emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count )
 {
+    // Get an input layout for these vertices
+    u8 vertexFormat = VertexFormat::Position;
+    if( uv ) vertexFormat     = vertexFormat | VertexFormat::Uv0;
+    if( colors ) vertexFormat = vertexFormat | VertexFormat::Color;
+
     // Ensure that we have a space for these vertices
-    if( !hasEnoughSpace( count ) ) {
-        restartBatch( frame, commands, stateStack, primitive );
+    if( !hasEnoughSpace( count ) || m_activeBatch.vertexFormat != vertexFormat ) {
+        restartBatch( frame, commands, stateStack, vertexFormat, primitive );
     }
 
     // Write each vertex to an output stream
     for( s32 i = 0; i < count; i++ ) {
-        m_vertexFormat.setVertexAttribute( VertexFormat::Position, positions[i], m_activeBatch.stream, m_activeBatch.size + i );
-        m_vertexFormat.setVertexAttribute( VertexFormat::Color, colors[i].toInteger(), m_activeBatch.stream, m_activeBatch.size + i );
+        m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::Position, positions[i], m_activeBatch.stream, m_activeBatch.size + i );
+        if( colors ) {
+            m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::Color, colors[i].toInteger(), m_activeBatch.stream, m_activeBatch.size + i );
+        }
+        if( uv ) {
+            m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::Uv0, uv[i], m_activeBatch.stream, m_activeBatch.size + i );
+        }
     }
 
     // Increase a batch size
@@ -170,7 +177,7 @@ void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& 
 {
     Vec3 positions[] = { start, end   };
     Rgba colors[]    = { color, color };
-    emitVertices( frame, commands, stateStack, Renderer::PrimLines, positions, colors, 2 );
+    emitVertices( frame, commands, stateStack, Renderer::PrimLines, positions, NULL, colors, 2 );
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
@@ -228,6 +235,24 @@ void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer&
     emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisX() ), Rgba( 1.0f, 0.0f, 0.0f ) );
     emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisY() ), Rgba( 0.0f, 1.0f, 0.0f ) );
     emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisZ() ), Rgba( 0.0f, 0.0f, 1.0f ) );
+}
+
+// ** StreamedRenderPassBase::emitRect
+void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors )
+{
+    u16  indices[] = { 0, 1, 2, 0, 2, 3 };
+    Vec3 trianglePositions[3];
+    Rgba triangleColors[3];
+    Vec2 triangleUv[3];
+
+    for( s32 j = 0; j < 2; j++ ) {
+        for( s32 i = 0; i < 3; i++ ) {
+            trianglePositions[i] = positions[indices[i + j * 3]];
+            triangleColors[i]    = colors[indices[i + j * 3]];
+            triangleUv[i]        = uv[indices[i + j * 3]];
+        }
+        emitVertices( frame, commands, stateStack, Renderer::PrimTriangles, trianglePositions, triangleUv, triangleColors, 3 );
+    }
 }
 
 } // namespace Scene

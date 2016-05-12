@@ -48,6 +48,9 @@ namespace Scene {
         //! Writes transformed vertices of a single line instance.
         void                            emitLine( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba& color );
 
+        //! Writes transformed vertices to a single triangle.
+        void                            emitTriangle( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3* positions, const Rgba* colors );
+
         //! Writes a wire box to an output stream.
         void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba& color );
 
@@ -60,14 +63,17 @@ namespace Scene {
         //! Writes a basis to an output stream.
         void                            emitBasis( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& transform );
 
+        //! Writes a rectangle to an output stream.
+        void                            emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors );
+
         //! Writes a set of vertices to an output stream.
-        void                            emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Rgba* colors, s32 count );
+        void                            emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count );
 
         //! Begins a new batch.
-        void                            beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, s32 capacity );
+        void                            beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity );
 
         //! Restarts a batch with a same parameters by flushing an active buffer.
-        void                            restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive );
+        void                            restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive );
 
         //! Flushes an active batch.
         void                            flush( RenderCommandBuffer& commands, RenderStateStack& stateStack );
@@ -84,6 +90,7 @@ namespace Scene {
                                             : primitive( Renderer::TotalPrimitiveTypes )
                                             , size( 0 )
                                             , capacity( 0 )
+                                            , vertexFormat( 0 )
                                             , stream( NULL )
                                             {
                                             }
@@ -91,12 +98,11 @@ namespace Scene {
             Renderer::PrimitiveType     primitive;              //!< An active primitive type.
             s32                         size;                   //!< A total number of vertices written to a stream.
             s32                         capacity;               //!< A maximum number of vertices that can be written to a stream.
+            VertexFormat                vertexFormat;           //!< An active vertex format.
             void*                       stream;                 //!< A batch vertex stream.
         };
 
-		VertexFormat					m_vertexFormat;		    //!< A debug vertex format.
 		RenderResource					m_vertexBuffer;		    //!< An intermediate vertex buffer used for batching.
-		RenderResource					m_inputLayout;		    //!< An input layout constructed from a vertex format.
         s32                             m_maxVerticesInBatch;   //! A maximum number of vertices that can be rendered in a single batch
         mutable ActiveBatch             m_activeBatch;          //!< An active batch state.
 	};
