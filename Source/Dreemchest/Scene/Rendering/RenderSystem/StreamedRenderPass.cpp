@@ -138,29 +138,13 @@ void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffe
         , transform * Vec4( 0.0f, 0.0f, 0.0f )
     };
 
-    // Emit a near plane
-    emitLine( frame, commands, stateStack, worldSpaceVertices[0], worldSpaceVertices[1], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[1], worldSpaceVertices[2], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[2], worldSpaceVertices[3], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[3], worldSpaceVertices[0], color );
-
-    // Emit a far plane
-    emitLine( frame, commands, stateStack, worldSpaceVertices[4], worldSpaceVertices[5], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[5], worldSpaceVertices[6], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[6], worldSpaceVertices[7], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[7], worldSpaceVertices[4], color );
+    emitWireBounds( frame, commands, stateStack, worldSpaceVertices, color );
 
     // Emit edges that are behind the near plane
     emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[0], color.transparent( 0.25f ) );
     emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[1], color.transparent( 0.25f ) );
     emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[2], color.transparent( 0.25f ) );
     emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[3], color.transparent( 0.25f ) );
-
-    // Emit edges that are infront of the near plane
-    emitLine( frame, commands, stateStack, worldSpaceVertices[0], worldSpaceVertices[4], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[1], worldSpaceVertices[5], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[2], worldSpaceVertices[6], color );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[3], worldSpaceVertices[7], color );
 }
 
 // ** StreamedRenderPassBase::emitVertices
@@ -192,32 +176,32 @@ void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& 
 // ** StreamedRenderPassBase::emitWireBounds
 void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba& color )
 {
-    // Get a bounding box min and max values
-    const Vec3& min = bounds.min();
-    const Vec3& max = bounds.max();
+    // Get a bounding box position
+    f32 x = bounds.min().x;
+    f32 y = bounds.min().y;
+    f32 z = bounds.min().z;
 
-    // Construct an extents vectors
-    Vec3 x = Vec3( bounds.width(), 0.0f, 0.0f );
-    Vec3 y = Vec3( 0.0f, bounds.height(), 0.0f );
-    Vec3 z = Vec3( 0.0f, 0.0f, bounds.depth() );
+    // Get a bounding box extents
+    f32 w = bounds.width();
+    f32 h = bounds.height();
+    f32 d = bounds.depth();
 
-    // Emit a bottom side of a bounding box
-    emitLine( frame, commands, stateStack, min        , min + x,     color );
-    emitLine( frame, commands, stateStack, min + x    , min + x + z, color );
-    emitLine( frame, commands, stateStack, min + x + z, min + z,     color );
-    emitLine( frame, commands, stateStack, min + z    , min,         color );
+    // Construct a vertex buffer for a bounding box
+    Vec3 worldSpaceVertices[] = {
+          // Bottom side
+          { x,      y, z     }
+        , { x + w,  y, z     }
+        , { x + w,  y, z + d }
+        , { x,      y, z + d }
 
-    // Emit a top side of a bounding box
-    emitLine( frame, commands, stateStack, min + y        , min + x + y,     color );
-    emitLine( frame, commands, stateStack, min + x + y    , min + x + z + y, color );
-    emitLine( frame, commands, stateStack, min + x + z + y, min + z + y,     color );
-    emitLine( frame, commands, stateStack, min + z + y    , min + y,         color );
+          // Top side
+        , { x,      y + h, z     }
+        , { x + w,  y + h, z     }
+        , { x + w,  y + h, z + d }
+        , { x,      y + h, z + d }
+    };
 
-    // Emit vertical lines
-    emitLine( frame, commands, stateStack, min        , min + y,         color );
-    emitLine( frame, commands, stateStack, min + x    , min + x + y,     color );
-    emitLine( frame, commands, stateStack, min + x + z, min + x + z + y, color );
-    emitLine( frame, commands, stateStack, min + z    , min + z + y,     color );
+    emitWireBounds( frame, commands, stateStack, worldSpaceVertices, color );
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
