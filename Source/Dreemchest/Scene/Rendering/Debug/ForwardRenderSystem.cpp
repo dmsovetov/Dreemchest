@@ -280,9 +280,6 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
     if( camera.projection() != Projection::Perspective ) {
         return;
     }
-    //if( !entity.has<DebugCsmCamera>() ) {
-    //    return;
-    //}
 
     // By default a frustum aspect is 1.0f
     f32 aspect = 1.0f;
@@ -302,13 +299,8 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
         // Get a cascade at specified index
         const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
 
-        // Render a cascade frustum
-        emitWireBounds( frame, commands, stateStack, cascade.worldSpaceVertices, m_colors[i].transparent( 0.5f ) );
-
-        // Render light space vertices
-        for( s32 j = 0; j < 8; j++ ) {
-            emitWireBounds( frame, commands, stateStack, cascade.lightSpaceVertices, m_colors[i] );
-        }
+        // Render a world space cascade bounding box
+        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), m_colors[i].transparent( 0.5f ) );
     }
 
     emitBasis( frame, commands, stateStack, Matrix4() );

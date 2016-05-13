@@ -69,14 +69,11 @@ void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 
         cascade.near = (i == 0) ? near : m_cascades[i - 1].far;
         cascade.far  = lerp( CUi, CLi, lambda );
 
-        // Calculate a cascade world space vertices
-        calculateWorldSpaceVertices( cascade.worldSpaceVertices, fov, cascade.near, cascade.far, aspect );
+        // Calculate a cascade bounding box in a world and light spaces
+        cascade.worldSpaceBounds = calculateWorldSpaceBounds( fov, cascade.near, cascade.far, aspect );
 
         // Calculate a cascade projection matrix
-        cascade.transform = calculateViewProjection( cascade.worldSpaceVertices );
-
-        // Calculate a cascade bounding box in a world and light spaces
-        cascade.worldSpaceBounds = calculateWorldSpaceBounds( cascade );
+        cascade.transform = calculateViewProjection( cascade.worldSpaceBounds );
 
         // Calculate light space vertices
         calculateLightSpaceVertices( cascade.transform, cascade.lightSpaceVertices );
@@ -103,8 +100,8 @@ void CascadedShadowMaps::resize( s32 count )
     memset( &m_cascades[0], 0, sizeof( Cascade ) * cascadeCount() );
 }
 
-// ** CascadedShadowMaps::calculateWorldSpaceVertices
-void CascadedShadowMaps::calculateWorldSpaceVertices( Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const
+// ** CascadedShadowMaps::calculateWorldSpaceBounds
+CascadedShadowMaps::BoundingVolume CascadedShadowMaps::calculateWorldSpaceBounds( f32 fov, f32 near, f32 far, f32 aspectRatio ) const
 {
     // Calculate a tangents from a FOV and aspect ratio
     f32 tanHalfVFOV = tanf( radians( fov * 0.5f ) );
@@ -116,17 +113,21 @@ void CascadedShadowMaps::calculateWorldSpaceVertices( Vec3 worldSpaceVertices[8]
     f32 yn = near * tanHalfVFOV;
     f32 yf = far  * tanHalfVFOV;
 
-    // Construct a near frustum plane in a world space
-    worldSpaceVertices[0] = m_camera * Vec3( -xn, -yn, -near );
-    worldSpaceVertices[1] = m_camera * Vec3(  xn, -yn, -near );
-    worldSpaceVertices[2] = m_camera * Vec3(  xn,  yn, -near );
-    worldSpaceVertices[3] = m_camera * Vec3( -xn,  yn, -near );
+    Vec3 localSpaceVertices[8];
 
-    // Construct a far frustum plane in a world space
-    worldSpaceVertices[4] = m_camera * Vec3( -xf, -yf, -far );
-    worldSpaceVertices[5] = m_camera * Vec3(  xf, -yf, -far );
-    worldSpaceVertices[6] = m_camera * Vec3(  xf,  yf, -far );
-    worldSpaceVertices[7] = m_camera * Vec3( -xf,  yf, -far );
+    // Construct a near frustum plane in a local space
+    localSpaceVertices[0] = Vec3( -xn, -yn, -near );
+    localSpaceVertices[1] = Vec3(  xn, -yn, -near );
+    localSpaceVertices[2] = Vec3(  xn,  yn, -near );
+    localSpaceVertices[3] = Vec3( -xn,  yn, -near );
+
+    // Construct a far frustum plane in a local space
+    localSpaceVertices[4] = Vec3( -xf, -yf, -far );
+    localSpaceVertices[5] = Vec3(  xf, -yf, -far );
+    localSpaceVertices[6] = Vec3(  xf,  yf, -far );
+    localSpaceVertices[7] = Vec3( -xf,  yf, -far );
+
+    return BoundingVolume::fromPoints( localSpaceVertices, 8 ) * m_camera;
 }
 
 // ** CascadedShadowMaps::calculateLightSpaceVertices
@@ -152,44 +153,30 @@ void CascadedShadowMaps::calculateLightSpaceVertices( const Matrix4& viewProject
 }
 
 // ** CascadedShadowMaps::calculateViewProjection
-Matrix4 CascadedShadowMaps::calculateViewProjection( const Vec3 worldSpaceVertices[8] ) const
+Matrix4 CascadedShadowMaps::calculateViewProjection( const BoundingVolume& worldSpaceBounds ) const
 {
-    Bounds lightSpaceBounds;
-
     // Compute an inverse of a light matrix
     Matrix4 inverseLight = m_light.inversed();
 
-    // Transform all world space vertices to a light space and compute a final bounding box
-    for( s32 i = 0; i < 8; i++ ) {
-        // Transform the frustum vertex from world to light space.
-        lightSpaceBounds << inverseLight * worldSpaceVertices[i];
-    }
+    // Transform a world space bounds to a light space
+#if DEV_CSM_BOUNDING_SPHERES
+    Bounds lightSpaceBounds = Bounds::fromSphere( inverseLight * worldSpaceBounds.center(), worldSpaceBounds.radius() );
+#else
+    Bounds lightSpaceBounds = worldSpaceBounds * inverseLight;
+#endif  /*  #if DEV_CSM_BOUNDING_SPHERES    */
 
+    // Calculate a projection matrix based on a light-space cascade bounding box
     const Vec3& min = lightSpaceBounds.min();
     const Vec3& max = lightSpaceBounds.max();
 
     // IMPORTANT: minZ and maxZ are swapped!
-    Matrix4 projection = Matrix4::ortho( min.x, max.x, min.y, max.y, max.z /*+ 50.0f*/, min.z );
+    Matrix4 projection = Matrix4::ortho( min.x, max.x, min.y, max.y, max.z + 50.0f, min.z );
 
     // Fix the sub-texel jittering
     projection = fixSubTexel( projection * inverseLight, projection );
 
     // Return a final view-projection matrix for a cascade
     return projection * inverseLight;
-}
-
-// ** CascadedShadowMaps::calculateWorldSpaceBounds
-Bounds CascadedShadowMaps::calculateWorldSpaceBounds( const Cascade& cascade ) const
-{
-    // Transform vertices to a world space and calculate bounding box
-    Bounds result;
-
-    for( s32 i = 0; i < 8; i++ ) {
-        // Append a vertex in a light space to split bounding box
-        result << cascade.worldSpaceVertices[i];
-    }
-
-    return result;
 }
 
 // ** CascadedShadowMaps::fixSubTexel

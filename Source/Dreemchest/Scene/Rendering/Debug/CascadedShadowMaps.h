@@ -37,13 +37,18 @@ namespace Scene {
     class CascadedShadowMaps {
     public:
 
+    #if DEV_CSM_BOUNDING_SPHERES
+        typedef Sphere BoundingVolume;
+    #else
+        typedef Bounds BoundingVolume;
+    #endif  /*  #if DEV_CSM_BOUNDING_SPHERES    */
+
         //! A helper struct to store a single split info.
         struct Cascade {
             f32                 near;                   //!< The near cascade plane.
             f32                 far;                    //!< The far cascade plane.
-            Vec3                worldSpaceVertices[8];  //!< World space vertices of a cascade frustum.
             Vec3                lightSpaceVertices[8];  //!< Light space vertices reprojected back to the world space.
-            Bounds              worldSpaceBounds;       //!< A world space bounding box of the cascade.
+            BoundingVolume      worldSpaceBounds;       //!< A world space bounding box of the cascade.
             Matrix4             transform;              //!< A view-projection matrix that is used to render a shadowmap for a cascade.
         };
 
@@ -77,16 +82,13 @@ namespace Scene {
         void                    resize( s32 count );
 
         //! Calculates world space vertices for a cascade.
-        void                    calculateWorldSpaceVertices( Vec3 worldSpaceVertices[8], f32 fov, f32 near, f32 far, f32 aspectRatio ) const;
+        BoundingVolume          calculateWorldSpaceBounds( f32 fov, f32 near, f32 far, f32 aspectRatio ) const;
 
         //! Calculates light space vertices for a cascade.
         void                    calculateLightSpaceVertices( const Matrix4& viewProjection, Vec3 lightSpaceVertices[8] ) const;
 
         //! Calculates a view-projection matrix from a set of cascade world space vertices.
-        Matrix4                 calculateViewProjection( const Vec3 worldSpaceVertices[8] ) const;
-
-        //! Calculates a split world space bounding box.
-        Bounds                  calculateWorldSpaceBounds( const Cascade& cascade ) const;
+        Matrix4                 calculateViewProjection( const BoundingVolume& worldSpaceBounds ) const;
 
     private:
 
