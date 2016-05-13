@@ -44,6 +44,12 @@ CascadedShadowMaps::CascadedShadowMaps( const Matrix4& camera, const Matrix4& li
 {
 }
 
+// ** CascadedShadowMaps::light
+const Matrix4& CascadedShadowMaps::light( void ) const
+{
+    return m_light;
+}
+
 // ** CascadedShadowMaps::calculate
 void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, s32 count )
 {

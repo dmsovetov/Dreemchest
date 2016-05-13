@@ -48,7 +48,7 @@ namespace Scene {
                             DebugCsmSplits( RenderingContext& context, RenderScene& renderScene );
 
         //! Sets a bounding box color.
-        void                setup( const Matrix4& lightTransform, const Rgba* colors, s32 splitCount );
+        void                setup( const CascadedShadowMaps& csm, const Rgba* colors );
 
         virtual void		emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) { StreamedRenderPass::emitRenderOperations( frame, commands, stateStack ); }
 
@@ -61,8 +61,6 @@ namespace Scene {
 
         Ecs::EntityWPtr     m_light;            //!< A directional light entity.
         const Rgba*         m_colors;           //!< Split colors.
-        Matrix4             m_lightTransform;   //!< A light transform.
-        s32                 m_splitCount;       //!< A total number of splits.
         CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
     };
 

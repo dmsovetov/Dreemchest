@@ -56,6 +56,9 @@ namespace Scene {
                                 //! Constructs a CascadedShadowMaps instance.
                                 CascadedShadowMaps( const Matrix4& camera, const Matrix4& light, s32 textureSize );
 
+        //! Returns an active light world transform.
+        const Matrix4&          light( void ) const;
+
         //! Calculates a specified number of splits.
         void                    calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, s32 count );
 

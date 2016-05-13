@@ -219,7 +219,7 @@ void ForwardRenderSystem::debugRenderCsm( RenderFrame& frame, RenderCommandBuffe
     pass->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
     // Render a debug CSM pass
-    m_debugCsmSplits.setup( light, splitColors, 3 );
+    m_debugCsmSplits.setup( csm, splitColors );
     m_debugCsmSplits.begin( frame, commands, stateStack );
     m_debugCsmSplits.emitRenderOperations( frame, commands, stateStack );
     m_debugCsmSplits.end( frame, commands, stateStack );
@@ -268,11 +268,10 @@ DebugCsmSplits::DebugCsmSplits( RenderingContext& context, RenderScene& renderSc
 }
 
 // ** DebugCsmSplits::setup
-void DebugCsmSplits::setup( const Matrix4& lightTransform, const Rgba* colors, s32 splitCount )
+void DebugCsmSplits::setup( const CascadedShadowMaps& csm, const Rgba* colors )
 {
     m_colors = colors;
-    m_splitCount = splitCount;
-    m_lightTransform = lightTransform;
+    m_csm = csm;
 }
 
 // ** DebugCsmSplits::emitRenderOperations
@@ -294,7 +293,9 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
     }
 
     // Caclulate CSM splits
-    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.5f, m_splitCount );
+    s32 cascades = m_csm.cascadeCount();
+    m_csm = CascadedShadowMaps( transform.matrix(), m_csm.light(), 1024.0f );
+    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.3f, cascades );
 
     // Visualize camera frustum splits
     for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {
@@ -303,9 +304,6 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
 
         // Render a cascade frustum
         emitWireBounds( frame, commands, stateStack, cascade.worldSpaceVertices, m_colors[i].transparent( 0.5f ) );
-
-        // Render a split bounding box
-        emitWireBounds( frame, commands, stateStack, cascade.worldSpaceBounds, m_colors[i].transparent( 0.5f ) );
 
         // Render light space vertices
         for( s32 j = 0; j < 8; j++ ) {
