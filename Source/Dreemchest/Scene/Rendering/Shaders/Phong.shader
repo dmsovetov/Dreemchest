@@ -118,8 +118,80 @@ float directionalLightIntensity( vec3 light, vec3 normal )
 	return max( dot( normal, light ), 0.0 );
 }
 
+//! Returns a binary depth tesing result
+float shadowSampleBinary( sampler2D texture, float currentDepth, vec2 sm )
+{
+	float storedDepth = texture2D( texture, sm ).x;
+	return (currentDepth <= storedDepth) ? 1.0 : 0.0;	
+}
+
+//! Returns a PCF depth testing result
+float shadowSamplePCF( sampler2D texture, float currentDepth, vec2 sm )
+{
+	// A shadow factor accumulator
+	float shadow = 0.0;
+
+	for( int i = -F_ShadowFiltering * 2; i < F_ShadowFiltering * 2; i++ ) {
+		for( int j = -F_ShadowFiltering * 2; j < F_ShadowFiltering * 2; j++ ) {
+			shadow += shadowSampleBinary( texture, currentDepth, sm + vec2( i, j ) * Shadow.invSize );
+		}
+	}
+	
+	// Compare and return result
+	return shadow / ((F_ShadowFiltering * 4 + 1) * (F_ShadowFiltering * 4 + 1));
+}
+
+float nrand( vec2 n ) {
+	return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
+
+vec2 rot2d( vec2 p, float a ) {
+	vec2 sc = vec2(sin(a),cos(a));
+	return vec2( dot( p, vec2(sc.y, -sc.x) ), dot( p, sc.xy ) );
+}
+
+//! Returns a poisson-filtered depth testing result
+float shadowSamplePoisson( sampler2D texture, float currentDepth, vec2 sm, vec3 fragCoord )
+{
+	const int NUM_TAPS = 12;
+	float radius = 4.0 * Shadow.invSize;
+
+	vec2 poisson[NUM_TAPS];
+	poisson[0]  = vec2( -0.326, -0.406 );
+	poisson[1]  = vec2( -0.840, -0.074 );
+	poisson[2]  = vec2( -0.696,  0.457 );
+	poisson[3]  = vec2( -0.203,  0.621 );
+	poisson[4]  = vec2(  0.962, -0.195 );
+	poisson[5]  = vec2(  0.473, -0.480 );
+	poisson[6]  = vec2(  0.519,  0.767 );
+	poisson[7]  = vec2(  0.185, -0.893 );
+	poisson[8]  = vec2(  0.507,  0.064 );
+	poisson[9]  = vec2(  0.896,  0.412 );
+	poisson[10] = vec2( -0.322, -0.933 );
+	poisson[11] = vec2( -0.792, -0.598 );
+
+	vec4 sum = vec4( 0.0 );
+	float rnd  = nrand( fragCoord.xy );
+	vec4 basis = vec4( rot2d( vec2( 1.0, 0.0 ), rnd ), rot2d( vec2( 0.0, 1.0 ), rnd ) );
+
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 0], basis.xz ), dot( poisson[ 0], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 1], basis.xz ), dot( poisson[ 1], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 2], basis.xz ), dot( poisson[ 2], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 3], basis.xz ), dot( poisson[ 3], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 4], basis.xz ), dot( poisson[ 4], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 5], basis.xz ), dot( poisson[ 5], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 6], basis.xz ), dot( poisson[ 6], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 7], basis.xz ), dot( poisson[ 7], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 8], basis.xz ), dot( poisson[ 8], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[ 9], basis.xz ), dot( poisson[ 9], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[10], basis.xz ), dot( poisson[10], basis.yw ) ) );
+	sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[11], basis.xz ), dot( poisson[11], basis.yw ) ) );
+
+	return sum / NUM_TAPS;
+}
+
 //! Performs a projected texture lookup and returns a depth testing result
-float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
+float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias, vec3 fragCoord )
 {
 	// Perform a perspective divide and map to [0, 1] range
 	lightSpaceCoord = lightSpaceCoord / lightSpaceCoord.w * 0.5 + 0.5;
@@ -128,21 +200,10 @@ float shadowFactor( sampler2D texture, vec4 lightSpaceCoord, float bias )
 	float currentDepth = lightSpaceCoord.z * bias;
 
 #if F_ShadowFiltering
-	// Compute a result
-	float shadow = 0.0;
-
-	for( int i = -F_ShadowFiltering; i < F_ShadowFiltering; i++ ) {
-		for( int j = -F_ShadowFiltering; j < F_ShadowFiltering; j++ ) {
-			float storedDepth = texture2D( texture, lightSpaceCoord.xy + vec2( i, j ) * Shadow.invSize ).x;
-			shadow += (currentDepth <= storedDepth) ? 1.0 : 0.0;
-		}
-	}
-	
-	// Compare and return result
-	return shadow / ((F_ShadowFiltering * 2 + 1) * (F_ShadowFiltering * 2 + 1));
+//	return shadowSamplePoisson( texture, currentDepth, lightSpaceCoord.xy, fragCoord );
+	return shadowSamplePCF( texture, currentDepth, lightSpaceCoord.xy );
 #else
-	float storedDepth = texture2D( texture, lightSpaceCoord.xy ).x;
-	return (currentDepth <= storedDepth) ? 1.0 : 0.0;
+	return shadowSampleBinary( texture, currentDepth, lightSpaceCoord.xy );
 #endif	/*	F_ShadowFiltering	*/
 }
 
@@ -176,7 +237,7 @@ void main()
 #endif  /*  F_VertexNormal    */
 
 #if F_ShadowTexture
-	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.999999 );
+	lightColor *= shadowFactor( u_ShadowTexture, lsVertex, 0.999999, wsVertex/*gl_FragCoord*/ );
 #endif	/*	F_ShadowTexture	*/
 
 	vec4 finalColor = lightColor * diffuseColor;
