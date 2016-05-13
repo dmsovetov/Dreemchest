@@ -166,7 +166,7 @@ ShaderPtr OpenGLHal::createShader( const char *vertex, const char *fragment )
     
     OpenGLShader* shader = DC_NEW OpenGLShader;
 	ShaderPtr	  result( shader );
-    char          error[256];
+    s8            error[2048];
 
     if( !shader->compile( GL_VERTEX_SHADER, vertex, error, sizeof( error ) ) ) {
         return ShaderPtr();
@@ -176,7 +176,7 @@ ShaderPtr OpenGLHal::createShader( const char *vertex, const char *fragment )
         return ShaderPtr();
     }
 
-    if( !shader->link() ) {
+    if( !shader->link( error, sizeof( error ) ) ) {
         return ShaderPtr();
     }
 
@@ -1243,7 +1243,7 @@ OpenGLShader::~OpenGLShader( void )
 }
 
 // ** OpenGLShader::link
-bool OpenGLShader::link( void ) const
+bool OpenGLShader::link( char *error, u32 errSize ) const
 {
     DC_CHECK_GL;
     
@@ -1252,12 +1252,28 @@ bool OpenGLShader::link( void ) const
     glLinkProgram( m_program );
     glGetProgramiv( m_program, GL_LINK_STATUS, &result );
 
-    if( result == GL_FALSE ) {
-		s8 error[256];
-        glGetProgramInfoLog( m_program, sizeof( error ), NULL, error );
-		LogError( "opengl", "failed to link shader, %s\n", error );
-        return false;
-    }
+  //  if( result == GL_FALSE ) {
+		//s8 error[256];
+  //      glGetProgramInfoLog( m_program, sizeof( error ), NULL, error );
+		//LogError( "opengl", "failed to link shader, %s\n", error );
+  //      return false;
+  //  }
+
+	// Get a status of a compiled shader
+	GLsizei errLogSize;
+	glGetProgramInfoLog( m_program, errSize, &errLogSize, error );
+
+	if( errLogSize ) {
+        StringArray messages = split( error, "\n" );
+
+        for( s32 i = 0; i < messages.size(); i++ ) {
+		    if( result == GL_FALSE ) {
+			    LogError( "opengl", "%s\n", messages[i].c_str() );
+		    } else {
+			    LogWarning( "opengl", "%s\n", messages[i].c_str() );
+		    }
+        }
+	}
 
     return result != GL_FALSE;
 }
@@ -1284,11 +1300,15 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
 	glGetShaderInfoLog( id, errSize, &errLogSize, error );
 
 	if( errLogSize ) {
-		if( result == GL_FALSE ) {
-			LogError( "opengl", "%s\n", error );
-		} else {
-			LogWarning( "opengl", "%s\n", error );
-		}
+        StringArray messages = split( error, "\n" );
+
+        for( s32 i = 0; i < messages.size(); i++ ) {
+		    if( result == GL_FALSE ) {
+			    LogError( "opengl", "%s\n", messages[i].c_str() );
+		    } else {
+			    LogWarning( "opengl", "%s\n", messages[i].c_str() );
+		    }
+        }
 	}
 
     glAttachShader( m_program, id );

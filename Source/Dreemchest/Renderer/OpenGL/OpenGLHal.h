@@ -335,7 +335,7 @@ namespace Renderer {
 
         // ** OpenGLShader
         bool                        compile( GLenum shaderType, CString data, char *error, u32 errSize );
-        bool                        link( void ) const;
+        bool                        link( char *error, u32 errSize ) const;
 
     private:
 
