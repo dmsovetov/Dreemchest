@@ -73,6 +73,22 @@ namespace Scene {
         virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
     };
 
+    //! A debug render pass that renders intermediate render targets.
+    class DebugRenderTarget : public StreamedRenderPassBase {
+    public:
+
+                            //! Constructs a DebugRenderTarget instance.
+                            DebugRenderTarget( RenderingContext& context, RenderScene& renderScene );
+
+        //! Emits render operations to render a target as a 2D rectangle.
+        void                render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTarget::Attachment attachment, s32 size, s32 x, s32 y );
+
+    private:
+
+        RenderResource      m_cbuffer;      //!< A view constant buffer instance.
+        UbershaderPtr       m_shader;       //!< A shader to be used for rendering.
+    };
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

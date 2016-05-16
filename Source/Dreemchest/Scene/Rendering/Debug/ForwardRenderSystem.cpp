@@ -34,14 +34,13 @@ namespace Scene {
 ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
     , m_debugCsmSplits( context, renderScene )
-    , m_debugRenderTargets( context, renderScene )
+    , m_debugRenderTarget( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_debugShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Debug.shader" );
+    m_debugShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
     m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
     m_shadowShader      = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
     m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
-    m_viewCBuffer       = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::View, RenderScene::CBuffer::View::Layout );
     m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::ClipPlanes, RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
@@ -76,8 +75,6 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
             CascadedShadowMaps csm( transform.matrix(), *light.matrix, shadowSize );
             csm.calculate( camera.fov(), camera.near(), camera.far(), entity.get<Viewport>()->aspect(), lambda, cascadeCount );
 
-            m_debugRenderTargets.begin( frame, commands, stateStack );
-
             for( s32 j = 0; j < cascadeCount; j++ ) {
                 const CascadedShadowMaps::Cascade& cascade = csm.cascadeAt( j );
 
@@ -93,13 +90,11 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
                 renderLight( frame, commands, stateStack, light, shadows );
 
                 if( forwardRenderer.isDebugCascadeShadows() ) {
-                    debugRenderShadowmap( frame, commands, stateStack, *entity.get<Viewport>(), shadows, 128, j * 130, 0 );
+                    m_debugRenderTarget.render( frame, commands, stateStack, *entity.get<Viewport>(), shadows, Renderer::RenderTarget::Depth, 128, j * 130, 0 );
                 }
 
                 commands.releaseRenderTarget( shadows );
             }
-
-            m_debugRenderTargets.end( frame, commands, stateStack );
 
             if( forwardRenderer.isDebugCascadeShadows() ) {
                 debugRenderCsm( frame, commands, stateStack, *light.matrix, csm );
@@ -187,24 +182,6 @@ ForwardRenderSystem::ShadowParameters ForwardRenderSystem::spotLightShadows( con
     return parameters;
 }
 
-// ** ForwardRenderSystem::debugRenderShadowmap
-void ForwardRenderSystem::debugRenderShadowmap( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, s32 size, s32 x, s32 y )
-{
-    RenderScene::CBuffer::View camera;
-    camera.near      = -9999;
-    camera.far       =  9999;
-    camera.transform = Matrix4::ortho( 0, viewport.width(), 0, viewport.height(), -9999, 9999 );
-
-    commands.uploadConstantBuffer( m_viewCBuffer, frame.internBuffer( &camera, sizeof camera ), sizeof camera );
-
-    StateScope pass = stateStack.newScope();
-    pass->bindProgram( m_context.internShader( m_debugShader ) );
-    pass->bindRenderedTexture( slot, RenderState::Texture0, Renderer::RenderTarget::Depth );
-    pass->bindConstantBuffer( m_viewCBuffer, RenderState::ConstantBufferType::PassConstants );
-    pass->setCullFace( Renderer::TriangleFaceBack );
-    m_debugRenderTargets.emitRenderTarget( frame, commands, stateStack, slot, size, x, y );
-}
-
 // ** ForwardRenderSystem::debugRenderCsm
 void ForwardRenderSystem::debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm )
 {
@@ -223,40 +200,6 @@ void ForwardRenderSystem::debugRenderCsm( RenderFrame& frame, RenderCommandBuffe
     m_debugCsmSplits.begin( frame, commands, stateStack );
     m_debugCsmSplits.emitRenderOperations( frame, commands, stateStack );
     m_debugCsmSplits.end( frame, commands, stateStack );
-}
-
-// ---------------------------------------------------------------- DebugRenderTargets ---------------------------------------------------------------- //
-
-// ** DebugRenderTargets::DebugRenderTargets
-DebugRenderTargets::DebugRenderTargets( RenderingContext& context, RenderScene& renderScene )
-    : StreamedRenderPassBase( context, renderScene, 96 )
-{
-}
-
-// ** DebugRenderTargets::emitRenderTarget
-void DebugRenderTargets::emitRenderTarget( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 slot, s32 size, s32 x, s32 y )
-{
-    Vec3 vertices[] = {
-          { x,        y,        0 }
-        , { x + size, y,        0 }
-        , { x + size, y + size, 0 }
-        , { x,        y + size, 0 }
-    };
-    Rgba colors[] = {
-          { 0.0f, 1.0f, 1.0f }
-        , { 0.0f, 1.0f, 1.0f }
-        , { 0.0f, 1.0f, 1.0f }
-        , { 0.0f, 1.0f, 1.0f }
-    };
-    Vec2 uv[] = {
-          { 0.0f, 0.0f }
-        , { 1.0f, 0.0f }
-        , { 1.0f, 1.0f }
-        , { 0.0f, 1.0f }
-    };
-
-    emitRect( frame, commands, stateStack, vertices, uv, colors );
-    flush( commands, stateStack );
 }
 
 // ------------------------------------------------------------------ DebugCsmSplits ------------------------------------------------------------------ //

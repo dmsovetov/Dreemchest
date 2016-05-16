@@ -29,16 +29,12 @@
 
 #include "../RenderSystem/RenderSystem.h"
 #include "../RenderSystem/StreamedRenderPass.h"
+#include "../Passes/DebugRenderPasses.h"
 #include "CascadedShadowMaps.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
-
-    //class DebugCsmCamera : public Ecs::Component<DebugCsmCamera> {
-    //};
-
-    class CascadedShadowMaps;
 
     //! A debug render pass that renders a camera frustum splits.
     class DebugCsmSplits : public StreamedRenderPass<Camera> {
@@ -62,16 +58,6 @@ namespace Scene {
         Ecs::EntityWPtr     m_light;            //!< A directional light entity.
         const Rgba*         m_colors;           //!< Split colors.
         CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
-    };
-
-    //! A debug render pass that renders intermediate render targets.
-    class DebugRenderTargets : public StreamedRenderPassBase {
-    public:
-
-                            //! Constructs a DebugRenderTargets instance.
-                            DebugRenderTargets( RenderingContext& context, RenderScene& renderScene );
-
-        void                emitRenderTarget( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 slot, s32 size, s32 x, s32 y );
     };
 
     class ForwardRenderSystem : public RenderSystem<ForwardRenderer> {
@@ -99,9 +85,6 @@ namespace Scene {
         //! Creates a shadow parameters for a spot light.
         ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
 
-        //! Renders a debug render target
-        void                            debugRenderShadowmap( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, s32 size, s32 x, s32 y );
-
         //! Renders a debug info for shadow map cascades.
         void                            debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm );
 
@@ -115,9 +98,8 @@ namespace Scene {
         RenderResource                  m_shadowCBuffer;
         ClipPlanesParameters            m_clipPlanesParameters;
         RenderResource                  m_clipPlanesCBuffer;
-        RenderResource                  m_viewCBuffer;
         DebugCsmSplits                  m_debugCsmSplits;
-        DebugRenderTargets              m_debugRenderTargets;
+        DebugRenderTarget               m_debugRenderTarget;
     };
 
 } // namespace Scene

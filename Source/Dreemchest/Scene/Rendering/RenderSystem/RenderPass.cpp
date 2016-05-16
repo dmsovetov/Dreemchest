@@ -121,6 +121,16 @@ RenderScene::CBuffer::Material RenderPassBase::diffuseMaterial( const Rgba& colo
     return material;
 }
 
+// ** RenderPassBase::orthoView
+RenderScene::CBuffer::View RenderPassBase::orthoView( const Viewport& viewport )
+{
+    RenderScene::CBuffer::View view;
+    view.near      = -9999;
+    view.far       =  9999;
+    view.transform = Matrix4::ortho( 0, viewport.width(), 0, viewport.height(), -9999, 9999 );
+    return view;
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

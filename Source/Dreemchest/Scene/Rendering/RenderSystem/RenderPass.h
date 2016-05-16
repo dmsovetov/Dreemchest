@@ -65,6 +65,9 @@ namespace Scene {
         //! Constructs a material constant buffer with a specified color.
         static RenderScene::CBuffer::Material   diffuseMaterial( const Rgba& color );
 
+        //! Constructs a view constant buffer with an ortho projection.
+        static RenderScene::CBuffer::View       orthoView( const Viewport& viewport );
+
 	protected:
 
         RenderingContext&                       m_context;          //!< A parent rendering context.

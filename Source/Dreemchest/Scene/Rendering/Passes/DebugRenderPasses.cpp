@@ -93,6 +93,44 @@ void DebugCameraPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuf
     }
 }
 
+// ------------------------------------------------------------------ DebugRenderTarget ------------------------------------------------------------------ //
+
+// ** DebugRenderTarget::DebugRenderTarget
+DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& renderScene )
+    : StreamedRenderPassBase( context, renderScene, 6 )
+{
+    // Create a view constant buffer
+    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::View, RenderScene::CBuffer::View::Layout );
+
+    // Create a shader
+    m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+}
+
+// ** DebugRenderTarget::render
+void DebugRenderTarget::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTarget::Attachment attachment, s32 size, s32 x, s32 y )
+{
+    // Begin a render pass
+    begin( frame, commands, stateStack );
+
+    // Upload a view constant buffer
+    RenderScene::CBuffer::View view = orthoView( viewport );
+    commands.uploadConstantBuffer( m_cbuffer, frame.internBuffer( &view, sizeof view ), sizeof view );
+
+    // Push a rendering state
+    StateScope pass = stateStack.newScope();
+    pass->bindProgram( m_context.internShader( m_shader ) );
+    pass->bindRenderedTexture( slot, RenderState::Texture0, attachment );
+    pass->bindConstantBuffer( m_cbuffer, RenderState::ConstantBufferType::PassConstants );
+    pass->setCullFace( Renderer::TriangleFaceBack );
+
+    // Emit a single rectangle
+    Rgba color( 0.0f, 1.0f, 1.0f );
+    emitRect( frame, commands, stateStack, Vec3( x + size * 0.5f, y + size * 0.5f, 0.0f ), Vec3( size * 0.5f , 0.0f, 0.0f ), Vec3( 0.0f, size * 0.5f , 0.0f ), &color );
+
+    // End render pass
+    end( frame, commands, stateStack );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST
