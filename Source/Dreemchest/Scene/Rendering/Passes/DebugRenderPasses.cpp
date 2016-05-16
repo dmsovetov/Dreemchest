@@ -131,6 +131,81 @@ void DebugRenderTarget::render( RenderFrame& frame, RenderCommandBuffer& command
     end( frame, commands, stateStack );
 }
 
+// ------------------------------------------------------------------ DebugCascadedShadows ------------------------------------------------------------------ //
+
+// ** DebugCascadedShadows::DebugCascadedShadows
+DebugCascadedShadows::DebugCascadedShadows( RenderingContext& context, RenderScene& renderScene )
+    : StreamedRenderPass( context, renderScene, 96 )
+{
+    // Create a shader
+    m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+}
+
+// ** DebugCascadedShadows::render
+void DebugCascadedShadows::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] )
+{
+    // Default split colors
+    static Rgba kSplitColors[] = {
+          { 1.0f, 0.0f, 0.0f }
+        , { 0.0f, 1.0f, 0.0f }
+        , { 0.0f, 0.0f, 1.0f }
+        , { 0.0f, 1.0f, 1.0f }
+    };
+
+    // Save cms instance and split colors before rendering
+    m_csm    = csm;
+    m_colors = colors ? colors : kSplitColors;
+
+    // Begin a render pass
+    begin( frame, commands, stateStack );
+
+    // Push a pass state
+    StateScope pass = stateStack.newScope();
+    pass->bindProgram( m_context.internShader( m_shader ) );
+    pass->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
+
+    // Emit all required render operations
+    StreamedRenderPass::emitRenderOperations( frame, commands, stateStack );
+
+    // End a render pass
+    end( frame, commands, stateStack );
+}
+
+// ** DebugCascadedShadows::emitRenderOperations
+void DebugCascadedShadows::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+{
+    if( camera.projection() != Projection::Perspective ) {
+        return;
+    }
+
+    // By default a frustum aspect is 1.0f
+    f32 aspect = 1.0f;
+
+    // Inherit a camera frustum from a viewport
+    if( const Viewport* viewport = entity.has<Viewport>() ) {
+        aspect = viewport->aspect();
+    }
+
+    // Caclulate CSM splits
+    s32 cascades = m_csm.cascadeCount();
+    m_csm = CascadedShadowMaps( transform.matrix(), m_csm.light(), m_csm.textureSize() );
+    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.3f, cascades );
+
+    // Visualize camera frustum splits
+    for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {
+        // Get a cascade at specified index
+        const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
+
+        // Render a world space cascade bounding box
+        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), &m_colors[i].transparent( 0.5f ) );
+
+        // Render a split projection box
+        emitWireBounds( frame, commands, stateStack, cascade.lightSpaceVertices, &m_colors[i].transparent( 0.25f ) );
+    }
+
+    emitBasis( frame, commands, stateStack, Matrix4() );
+}
+
 } // namespace Scene
 
 DC_END_DREEMCHEST

@@ -36,30 +36,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-    //! A debug render pass that renders a camera frustum splits.
-    class DebugCsmSplits : public StreamedRenderPass<Camera> {
-    public:
-
-                            //! Constructs a DebugCsmSplits instance.
-                            DebugCsmSplits( RenderingContext& context, RenderScene& renderScene );
-
-        //! Sets a bounding box color.
-        void                setup( const CascadedShadowMaps& csm, const Rgba* colors );
-
-        virtual void		emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) { StreamedRenderPass::emitRenderOperations( frame, commands, stateStack ); }
-
-    protected:
-
-        //! Emits render operations to render a single bounding box.
-        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
-
-    private:
-
-        Ecs::EntityWPtr     m_light;            //!< A directional light entity.
-        const Rgba*         m_colors;           //!< Split colors.
-        CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
-    };
-
     class ForwardRenderSystem : public RenderSystem<ForwardRenderer> {
     friend class DebugCsmSplits;
     public:
@@ -85,20 +61,16 @@ namespace Scene {
         //! Creates a shadow parameters for a spot light.
         ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
 
-        //! Renders a debug info for shadow map cascades.
-        void                            debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm );
-
     private:
 
         UbershaderPtr                   m_phongShader;
-        UbershaderPtr                   m_debugShader;
         UbershaderPtr                   m_ambientShader;
         UbershaderPtr                   m_shadowShader;
         ShadowParameters                m_shadowParameters;
         RenderResource                  m_shadowCBuffer;
         ClipPlanesParameters            m_clipPlanesParameters;
         RenderResource                  m_clipPlanesCBuffer;
-        DebugCsmSplits                  m_debugCsmSplits;
+        DebugCascadedShadows            m_debugCascadedShadows;
         DebugRenderTarget               m_debugRenderTarget;
     };
 

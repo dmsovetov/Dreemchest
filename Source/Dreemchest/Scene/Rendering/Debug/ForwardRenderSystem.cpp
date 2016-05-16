@@ -33,11 +33,10 @@ namespace Scene {
 // ** ForwardRenderSystem::ForwardRenderSystem
 ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
-    , m_debugCsmSplits( context, renderScene )
+    , m_debugCascadedShadows( context, renderScene )
     , m_debugRenderTarget( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_debugShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
     m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
     m_shadowShader      = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
     m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
@@ -97,7 +96,7 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
             }
 
             if( forwardRenderer.isDebugCascadeShadows() ) {
-                debugRenderCsm( frame, commands, stateStack, *light.matrix, csm );
+                m_debugCascadedShadows.render( frame, commands, stateStack, csm );
             }
             continue;
         }
@@ -180,73 +179,6 @@ ForwardRenderSystem::ShadowParameters ForwardRenderSystem::spotLightShadows( con
     parameters.transform = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
     parameters.invSize   = 1.0f / dimensions;
     return parameters;
-}
-
-// ** ForwardRenderSystem::debugRenderCsm
-void ForwardRenderSystem::debugRenderCsm( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& light, const CascadedShadowMaps& csm )
-{
-    Rgba splitColors[] = {
-          { 1.0f, 0.0f, 0.0f }
-        , { 0.0f, 1.0f, 0.0f }
-        , { 0.0f, 0.0f, 2.0f }
-    };
-
-    StateScope pass = stateStack.newScope();
-    pass->bindProgram( m_context.internShader( m_debugShader ) );
-    pass->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
-
-    // Render a debug CSM pass
-    m_debugCsmSplits.setup( csm, splitColors );
-    m_debugCsmSplits.begin( frame, commands, stateStack );
-    m_debugCsmSplits.emitRenderOperations( frame, commands, stateStack );
-    m_debugCsmSplits.end( frame, commands, stateStack );
-}
-
-// ------------------------------------------------------------------ DebugCsmSplits ------------------------------------------------------------------ //
-
-// ** DebugCsmSplits::DebugCsmSplits
-DebugCsmSplits::DebugCsmSplits( RenderingContext& context, RenderScene& renderScene )
-    : StreamedRenderPass( context, renderScene, 96 )
-{
-}
-
-// ** DebugCsmSplits::setup
-void DebugCsmSplits::setup( const CascadedShadowMaps& csm, const Rgba* colors )
-{
-    m_colors = colors;
-    m_csm = csm;
-}
-
-// ** DebugCsmSplits::emitRenderOperations
-void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
-{
-    if( camera.projection() != Projection::Perspective ) {
-        return;
-    }
-
-    // By default a frustum aspect is 1.0f
-    f32 aspect = 1.0f;
-
-    // Inherit a camera frustum from a viewport
-    if( const Viewport* viewport = entity.has<Viewport>() ) {
-        aspect = viewport->aspect();
-    }
-
-    // Caclulate CSM splits
-    s32 cascades = m_csm.cascadeCount();
-    m_csm = CascadedShadowMaps( transform.matrix(), m_csm.light(), 1024.0f );
-    m_csm.calculate( camera.fov(), camera.near(), camera.far(), aspect, 0.3f, cascades );
-
-    // Visualize camera frustum splits
-    for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {
-        // Get a cascade at specified index
-        const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
-
-        // Render a world space cascade bounding box
-        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), &m_colors[i].transparent( 0.5f ) );
-    }
-
-    emitBasis( frame, commands, stateStack, Matrix4() );
 }
 
 } // namespace Scene

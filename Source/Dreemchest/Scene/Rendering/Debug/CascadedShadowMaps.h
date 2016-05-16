@@ -64,6 +64,9 @@ namespace Scene {
         //! Returns an active light world transform.
         const Matrix4&          light( void ) const;
 
+        //! Returns a texture size.
+        s32                     textureSize( void ) const;
+
         //! Calculates a specified number of splits.
         void                    calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 lambda, s32 count );
 

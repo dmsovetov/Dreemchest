@@ -28,7 +28,7 @@
 #define __DC_Scene_Rendering_DebugRenderPasses_H__
 
 #include "../RenderSystem/StreamedRenderPass.h"
-
+#include "../Debug/CascadedShadowMaps.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -87,6 +87,28 @@ namespace Scene {
 
         RenderResource      m_cbuffer;      //!< A view constant buffer instance.
         UbershaderPtr       m_shader;       //!< A shader to be used for rendering.
+    };
+
+    //! A debug render pass that renders a debug info for cascaded shadow mapping
+    class DebugCascadedShadows : public StreamedRenderPass<Camera> {
+    public:
+
+                            //! Constructs a DebugCascadedShadows instance.
+                            DebugCascadedShadows( RenderingContext& context, RenderScene& renderScene );
+
+        //! Emits render operations to show a cascaded shadows debug info.
+        void                render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] = NULL );
+
+    protected:
+
+        //! Emits render operations to render a single bounding box.
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+
+    private:
+
+        const Rgba*         m_colors;           //!< Split colors.
+        CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
+        UbershaderPtr       m_shader;           //!< A shader to be used for rendering.
     };
 
 } // namespace Scene
