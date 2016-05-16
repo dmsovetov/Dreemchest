@@ -50,7 +50,7 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 	m_indexBuffer = context.requestIndexBuffer( m_indices, MaxSpritesInBatch * 6 * sizeof( u16 ) );
 
 	// Create a sprite shader
-	m_spriteShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Sprite.shader" );
+	m_spriteShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** SpriteRenderSystem::emitRenderOperations

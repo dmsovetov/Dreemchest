@@ -40,7 +40,7 @@ DebugRenderSystem::DebugRenderSystem( RenderingContext& context, RenderScene& re
     m_passes.push_back( DC_NEW DebugLightPass( context, renderScene ) );
 
 	// Create a sprite shader
-	m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Debug.shader" );
+	m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugRenderSystem::emitRenderOperations
