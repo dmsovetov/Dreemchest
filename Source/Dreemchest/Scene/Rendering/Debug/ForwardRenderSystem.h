@@ -48,21 +48,23 @@ namespace Scene {
         //! Alias the shadow constant buffer type.
         typedef RenderScene::CBuffer::Shadow ShadowParameters;
 
-        //! Alias the clip planes constant buffer type.
-        typedef RenderScene::CBuffer::ClipPlanes ClipPlanesParameters;
-
         virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer ) NIMBLE_OVERRIDE;
 
         //! Generate commands to render a light pass for a single light source.
-        void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows );
+        void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows );
 
-        //! Creates a shadow parameters for a spot light.
-        ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
+        //! Emits operations to render a spot light pass.
+        void                            renderSpotLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light );
+
+        //! Emits operations to render a point light pass.
+        void                            renderPointLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light );
+
+        //! Emits operations to render a directional light pass.
+        void                            renderDirectionalLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const Camera& camera, const Transform& cameraTransform, const Viewport& viewport, const RenderScene::LightNode& light );
 
     private:
 
         UbershaderPtr                   m_phongShader;
-        ClipPlanesParameters            m_clipPlanesParameters;
         RenderResource                  m_clipPlanesCBuffer;
         AmbientPass                     m_ambient;
         ShadowPass                      m_shadows;
