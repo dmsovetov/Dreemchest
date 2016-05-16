@@ -54,7 +54,7 @@ namespace Scene {
         //! Writes a wire box to an output stream.
         void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba* color = NULL );
 
-        //! Writes a wire box base on it's vertices to an output stream.
+        //! Writes a wire box based on it's vertices to an output stream.
         void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba* color = NULL );
 
         //! Writes a frustum to an output stream.
@@ -65,6 +65,9 @@ namespace Scene {
 
         //! Writes a rectangle to an output stream.
         void                            emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors );
+
+        //! Writes a rectangle based on a point and two basis vectors to an output stream.
+        void                            emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color = NULL );
 
         //! Writes a set of vertices to an output stream.
         void                            emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count );

@@ -252,11 +252,38 @@ void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& 
     for( s32 j = 0; j < 2; j++ ) {
         for( s32 i = 0; i < 3; i++ ) {
             trianglePositions[i] = positions[indices[i + j * 3]];
-            triangleColors[i]    = colors[indices[i + j * 3]];
-            triangleUv[i]        = uv[indices[i + j * 3]];
+            triangleColors[i]    = colors ? colors[indices[i + j * 3]] : Rgba();
+            triangleUv[i]        = uv ? uv[indices[i + j * 3]] : Vec2();
         }
-        emitVertices( frame, commands, stateStack, Renderer::PrimTriangles, trianglePositions, triangleUv, triangleColors, 3 );
+        emitVertices( frame, commands, stateStack, Renderer::PrimTriangles, trianglePositions, uv ? triangleUv : NULL, colors ? triangleColors : NULL, 3 );
     }
+}
+
+// ** StreamedRenderPassBase::emitRect
+void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color )
+{
+    Rgba vertexColor = color ? *color : Rgba();
+
+    Vec3 vertices[] = {
+          point - u - v
+        , point + u - v
+        , point + u + v
+        , point - u + v
+    };
+    Rgba colors[] = {
+          vertexColor
+        , vertexColor
+        , vertexColor
+        , vertexColor
+    };
+    Vec2 uv[] = {
+          { 0.0f, 0.0f }
+        , { 1.0f, 0.0f }
+        , { 1.0f, 1.0f }
+        , { 0.0f, 1.0f }
+    };
+
+    emitRect( frame, commands, stateStack, vertices, uv, color ? colors : NULL );
 }
 
 } // namespace Scene
