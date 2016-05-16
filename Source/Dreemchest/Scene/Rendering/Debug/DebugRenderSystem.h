@@ -28,7 +28,7 @@
 #define __DC_Scene_Rendering_DebugRenderSystem_H__
 
 #include "../RenderSystem/RenderSystem.h"
-#include "../RenderSystem/StreamedRenderPass.h"
+#include "../Passes/DebugRenderPasses.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -48,6 +48,9 @@ namespace Scene {
 	private:
 
 		UbershaderPtr                   m_debugShader;		//!< A default shader that is used for debug rendering.
+        DebugStaticMeshPass             m_staticMeshes;     //!< Renders bounding boxes for all static meshes.
+        DebugLightPass                  m_lights;           //!< Renders bounding boxes for all lights.
+        DebugCameraPass                 m_cameras;          //!< Renders bounding boxes for all cameras.
 	};
 
 } // namespace Scene

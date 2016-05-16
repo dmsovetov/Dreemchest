@@ -38,22 +38,10 @@ DebugStaticMeshPass::DebugStaticMeshPass( RenderingContext& context, RenderScene
 {
 }
 
-// ** DebugStaticMeshPass::color
-const Rgba& DebugStaticMeshPass::color( void ) const
-{
-    return m_color;
-}
-
-// ** DebugStaticMeshPass::setColor
-void DebugStaticMeshPass::setColor( const Rgba& value )
-{
-    m_color = value;
-}
-
 // ** DebugStaticMeshPass::emitRenderOperations
 void DebugStaticMeshPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform )
 {
-    emitWireBounds( frame, commands, stateStack, staticMesh.worldSpaceBounds(), m_color );
+    emitWireBounds( frame, commands, stateStack, staticMesh.worldSpaceBounds() );
 }
 
 // ------------------------------------------------------------------ DebugLightPass ------------------------------------------------------------------ //
@@ -62,18 +50,6 @@ void DebugStaticMeshPass::emitRenderOperations( RenderFrame& frame, RenderComman
 DebugLightPass::DebugLightPass( RenderingContext& context, RenderScene& renderScene )
     : StreamedRenderPass( context, renderScene, 96 )
 {
-}
-
-// ** DebugLightPass::color
-const Rgba& DebugLightPass::color( void ) const
-{
-    return m_color;
-}
-
-// ** DebugLightPass::setColor
-void DebugLightPass::setColor( const Rgba& value )
-{
-    m_color = value;
 }
 
 // ** DebugLightPass::emitRenderOperations
@@ -85,9 +61,9 @@ void DebugLightPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
 
     // Emit a bounding box to an output stream
     switch( light.type() ) {
-    case LightType::Point:  emitWireBounds( frame, commands, stateStack, bounds * transform.matrix(), m_color );
+    case LightType::Point:  emitWireBounds( frame, commands, stateStack, bounds * transform.matrix() );
                             break;
-    case LightType::Spot:   emitFrustum( frame, commands, stateStack, light.cutoff() * 2.0f, 1.0f, 0.1f, light.range() * 2.0f, transform.matrix(), m_color );
+    case LightType::Spot:   emitFrustum( frame, commands, stateStack, light.cutoff() * 2.0f, 1.0f, 0.1f, light.range() * 2.0f, transform.matrix() );
                             break;
     }
 }
@@ -98,18 +74,6 @@ void DebugLightPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
 DebugCameraPass::DebugCameraPass( RenderingContext& context, RenderScene& renderScene )
     : StreamedRenderPass( context, renderScene, 96 )
 {
-}
-
-// ** DebugCameraPass::color
-const Rgba& DebugCameraPass::color( void ) const
-{
-    return m_color;
-}
-
-// ** DebugCameraPass::setColor
-void DebugCameraPass::setColor( const Rgba& value )
-{
-    m_color = value;
 }
 
 // ** DebugCameraPass::emitRenderOperations
@@ -124,7 +88,7 @@ void DebugCameraPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuf
     }
 
     switch( camera.projection() ) {
-    case Projection::Perspective:   emitFrustum( frame, commands, stateStack, camera.fov(), aspect, camera.near(), camera.far(), transform.matrix(), m_color );
+    case Projection::Perspective:   emitFrustum( frame, commands, stateStack, camera.fov(), aspect, camera.near(), camera.far(), transform.matrix() );
                                     break;
     }
 }

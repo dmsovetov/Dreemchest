@@ -105,7 +105,7 @@ bool StreamedRenderPassBase::hasEnoughSpace( s32 additionalVertices ) const
 }
 
 // ** StreamedRenderPassBase::emitFrustum
-void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba& color )
+void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba* color )
 {
     // Calculate a tangents from a FOV and aspect ratio
     f32 tanHalfVFOV = tanf( radians( fov * 0.5f ) );
@@ -137,11 +137,14 @@ void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffe
 
     emitWireBounds( frame, commands, stateStack, worldSpaceVertices, color );
 
+    // Create a transparent color
+    Rgba transparent = color ? color->transparent( 0.25f ) : Rgba( 1.0f, 1.0f, 1.0f ).transparent( 0.25f );
+
     // Emit edges that are behind the near plane
-    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[0], color.transparent( 0.25f ) );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[1], color.transparent( 0.25f ) );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[2], color.transparent( 0.25f ) );
-    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[3], color.transparent( 0.25f ) );
+    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[0], &transparent );
+    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[1], &transparent );
+    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[2], &transparent );
+    emitLine( frame, commands, stateStack, worldSpaceVertices[8], worldSpaceVertices[3], &transparent );
 }
 
 // ** StreamedRenderPassBase::emitVertices
@@ -173,15 +176,16 @@ void StreamedRenderPassBase::emitVertices( RenderFrame& frame, RenderCommandBuff
 }
 
 // ** StreamedRenderPassBase::emitLine
-void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba& color )
+void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba* color )
 {
+    Rgba vertexColor = color ? *color : Rgba( 1.0f, 1.0f, 1.0f, 1.0 );
     Vec3 positions[] = { start, end   };
-    Rgba colors[]    = { color, color };
-    emitVertices( frame, commands, stateStack, Renderer::PrimLines, positions, NULL, colors, 2 );
+    Rgba colors[]    = { vertexColor, vertexColor };
+    emitVertices( frame, commands, stateStack, Renderer::PrimLines, positions, NULL, color ? colors : NULL, 2 );
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
-void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba& color )
+void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba* color )
 {
     // Get a bounding box position
     f32 x = bounds.min().x;
@@ -212,7 +216,7 @@ void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBu
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
-void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba& color )
+void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba* color )
 {
     for( s32 i = 0; i < 4; i++ ) {
         emitLine( frame, commands, stateStack, vertices[i], vertices[(i + 1) % 4], color );
@@ -232,9 +236,9 @@ void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer&
     Vec3 origin = transform * Vec3::zero();
 
     // Emit a line for each basis vector
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisX() ), Rgba( 1.0f, 0.0f, 0.0f ) );
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisY() ), Rgba( 0.0f, 1.0f, 0.0f ) );
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisZ() ), Rgba( 0.0f, 0.0f, 1.0f ) );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisX() ), &Rgba( 1.0f, 0.0f, 0.0f ) );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisY() ), &Rgba( 0.0f, 1.0f, 0.0f ) );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisZ() ), &Rgba( 0.0f, 0.0f, 1.0f ) );
 }
 
 // ** StreamedRenderPassBase::emitRect

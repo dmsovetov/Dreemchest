@@ -35,6 +35,27 @@ RenderPassBase::RenderPassBase( RenderingContext& context, RenderScene& renderSc
     : m_context( context )
     , m_renderScene( renderScene )
 {
+    // Create a material constant buffer
+    m_materialCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
+}
+
+// ** RenderPassBase::renderWithColor
+void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Rgba& color )
+{
+    // Create a diffuse material constant buffer
+    RenderScene::CBuffer::Material material = diffuseMaterial( color );
+
+    // Upload a constant buffer to GPU
+    commands.uploadConstantBuffer( m_materialCBuffer, frame.internBuffer( &material, sizeof material ), sizeof RenderScene::CBuffer::Material );
+
+    // Push a material state
+    StateScope state = stateStack.newScope();
+    state->bindConstantBuffer( m_materialCBuffer, RenderState::MaterialConstants );
+
+    // Emit required render operations
+    begin( frame, commands, stateStack );
+    emitRenderOperations( frame, commands, stateStack );
+    end( frame, commands, stateStack );
 }
 
 // ** RenderPassBase::emitStaticMeshes
@@ -89,6 +110,15 @@ void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointCloud
 
         commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.count );
     }
+}
+
+// ** RenderPassBase::diffuseMaterial
+RenderScene::CBuffer::Material RenderPassBase::diffuseMaterial( const Rgba& color )
+{
+    RenderScene::CBuffer::Material material;
+    memset( &material, 0, sizeof material );
+    material.diffuse = color;
+    return material;
 }
 
 } // namespace Scene

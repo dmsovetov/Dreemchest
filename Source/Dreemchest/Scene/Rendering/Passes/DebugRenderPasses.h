@@ -41,21 +41,10 @@ namespace Scene {
                             //! Constructs a DebugStaticMeshPass instance.
                             DebugStaticMeshPass( RenderingContext& context, RenderScene& renderScene );
 
-        //! Returns a bounding box color.
-        const Rgba&         color( void ) const;
-
-        //! Sets a bounding box color.
-        void                setColor( const Rgba& value );
-
-
     protected:
 
         //! Emits render operations to render a single bounding box.
         virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform ) NIMBLE_OVERRIDE;
-
-    private:
-
-        Rgba                m_color;    //!< A bounding box color.
     };
 
     //! Renders fixtures for all lights that reside in scene.
@@ -65,21 +54,10 @@ namespace Scene {
                             //! Constructs a DebugLightPass instance.
                             DebugLightPass( RenderingContext& context, RenderScene& renderScene );
 
-        //! Returns a bounding box color.
-        const Rgba&         color( void ) const;
-
-        //! Sets a bounding box color.
-        void                setColor( const Rgba& value );
-
-
     protected:
 
         //! Emits render operations to render a single bounding box.
         virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Light& light, const Transform& transform ) NIMBLE_OVERRIDE;
-
-    private:
-
-        Rgba                m_color;    //!< A light fixture color.
     };
 
     //! Renders frustums for all cameras that reside in scene.
@@ -89,21 +67,10 @@ namespace Scene {
                             //! Constructs a DebugCameraPass instance.
                             DebugCameraPass( RenderingContext& context, RenderScene& renderScene );
 
-        //! Returns a frustum color.
-        const Rgba&         color( void ) const;
-
-        //! Sets a frustum color.
-        void                setColor( const Rgba& value );
-
-
     protected:
 
         //! Emits render operations to render a single frustum.
         virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
-
-    private:
-
-        Rgba                m_color;    //!< A camera frustum color.
     };
 
 } // namespace Scene

@@ -300,7 +300,7 @@ void DebugCsmSplits::emitRenderOperations( RenderFrame& frame, RenderCommandBuff
         const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
 
         // Render a world space cascade bounding box
-        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), m_colors[i].transparent( 0.5f ) );
+        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), &m_colors[i].transparent( 0.5f ) );
     }
 
     emitBasis( frame, commands, stateStack, Matrix4() );

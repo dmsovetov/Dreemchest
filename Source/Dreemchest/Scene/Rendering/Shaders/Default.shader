@@ -4,6 +4,7 @@
 F_VertexColor	= vertexColor
 F_TexCoord		= vertexTexCoord0
 F_Texture		= texture0
+F_Material		= cbuffer3
 
 [VertexShader]
 #if defined( F_VertexColor )
@@ -43,6 +44,10 @@ void main()
 void main()
 {
 	vec4 diffuseColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+#if defined( F_Material )
+	diffuseColor *= Material.diffuse;
+#endif	//	F_Material
 
 #if defined( F_VertexColor )
 	diffuseColor *= v_Color;

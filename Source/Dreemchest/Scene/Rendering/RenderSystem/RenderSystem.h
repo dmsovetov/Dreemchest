@@ -48,14 +48,13 @@ namespace Scene {
 	protected:
 
 		//! Emits rendering operations to a command buffer for a specified camera.
-		virtual void			emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform );
+        virtual void			emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) {}
 
 	protected:
 
         RenderingContext&       m_context;      //!< Parent rendering context.
         RenderScene&            m_renderScene;  //!< Parent render scene.
 		Ecs::IndexPtr			m_cameras;	    //!< All active cameras that are processed by this render system.
-        Array<RenderPassUPtr>   m_passes;       //!< An array of nested render passes.
 	};
 
 	//! Generic render system class.

@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "DebugRenderSystem.h"
-#include "../Passes/DebugRenderPasses.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -34,11 +33,10 @@ namespace Scene {
 // ** DebugRenderSystem::DebugRenderSystem
 DebugRenderSystem::DebugRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
+    , m_staticMeshes( context, renderScene )
+    , m_lights( context, renderScene )
+    , m_cameras( context, renderScene )
 {
-    m_passes.push_back( DC_NEW DebugCameraPass( context, renderScene ) );
-    m_passes.push_back( DC_NEW DebugStaticMeshPass( context, renderScene ) );
-    m_passes.push_back( DC_NEW DebugLightPass( context, renderScene ) );
-
 	// Create a sprite shader
 	m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
@@ -51,13 +49,14 @@ void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandB
 	state->bindProgram( m_context.internShader( m_debugShader ) );
     state->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
-    // Setup passes before rendering
-    static_cast<DebugCameraPass*>( m_passes[0].get() )->setColor( debugRenderer.cameraColor() );
-    static_cast<DebugStaticMeshPass*>( m_passes[1].get() )->setColor( debugRenderer.staticMeshColor() );
-    static_cast<DebugLightPass*>( m_passes[2].get() )->setColor( debugRenderer.lightColor() );
+    // Static mesh bounding boxes
+    m_staticMeshes.renderWithColor( frame, commands, stateStack, debugRenderer.staticMeshColor() );
 
-    // Render all nested passes
-    RenderSystemBase::emitRenderOperations( frame, commands, stateStack, entity, camera, transform );
+    // Lights bounding boxes
+    m_lights.renderWithColor( frame, commands, stateStack, debugRenderer.lightColor() );
+
+    // Cameras bounding boxes
+    m_cameras.renderWithColor( frame, commands, stateStack, debugRenderer.cameraColor() );
 }
 
 } // namespace Scene
