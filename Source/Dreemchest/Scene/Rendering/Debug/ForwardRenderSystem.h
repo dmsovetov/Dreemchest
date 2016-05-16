@@ -30,6 +30,7 @@
 #include "../RenderSystem/RenderSystem.h"
 #include "../RenderSystem/StreamedRenderPass.h"
 #include "../Passes/DebugRenderPasses.h"
+#include "../Passes/GenericRenderPasses.h"
 #include "CascadedShadowMaps.h"
 
 DC_BEGIN_DREEMCHEST
@@ -55,21 +56,16 @@ namespace Scene {
         //! Generate commands to render a light pass for a single light source.
         void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, u8 shadows );
 
-        //! Generate commands to render a shadow map.
-        u8                              renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters );
-
         //! Creates a shadow parameters for a spot light.
         ShadowParameters                spotLightShadows( const RenderScene::LightNode& light, s32 dimensions ) const;
 
     private:
 
         UbershaderPtr                   m_phongShader;
-        UbershaderPtr                   m_ambientShader;
-        UbershaderPtr                   m_shadowShader;
-        ShadowParameters                m_shadowParameters;
-        RenderResource                  m_shadowCBuffer;
         ClipPlanesParameters            m_clipPlanesParameters;
         RenderResource                  m_clipPlanesCBuffer;
+        AmbientPass                     m_ambient;
+        ShadowPass                      m_shadows;
         DebugCascadedShadows            m_debugCascadedShadows;
         DebugRenderTarget               m_debugRenderTarget;
     };

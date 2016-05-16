@@ -35,26 +35,18 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
     : RenderSystem( context, renderScene )
     , m_debugCascadedShadows( context, renderScene )
     , m_debugRenderTarget( context, renderScene )
+    , m_shadows( context, renderScene )
+    , m_ambient( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_ambientShader     = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
-    m_shadowShader      = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
-    m_shadowCBuffer     = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
     m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::ClipPlanes, RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
 void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
 {
-    // Ambient pass
-    {
-        StateScope pass = stateStack.newScope();
-        pass->bindProgram( m_context.internShader( m_ambientShader ) );
-        pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
-
-        RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, commands, stateStack );
-        RenderPassBase::emitPointClouds( m_renderScene.pointClouds(), frame, commands, stateStack );
-    }
+    // First perform an ambient render pass
+    m_ambient.render( frame, commands, stateStack );
 
     // Get the shadowmapping settings
     s32 shadowSize   = forwardRenderer.shadowSize();
@@ -78,7 +70,8 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
                 const CascadedShadowMaps::Cascade& cascade = csm.cascadeAt( j );
 
                 parameters.transform = cascade.transform;
-                u8 shadows = renderShadows( frame, commands, stateStack, light, shadowSize, parameters );
+                parameters.invSize   = 1.0f / shadowSize;
+                u8 shadows = m_shadows.render( frame, commands, stateStack, parameters );
 
                 StateScope clip = stateStack.newScope();
                 m_clipPlanesParameters.equation[0] = Plane::calculate( -transform.axisZ(), transform.worldSpacePosition() - transform.axisZ() * cascade.near );
@@ -106,7 +99,7 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
 
         if( light.light->castsShadows() ) {
             ShadowParameters parameters = spotLightShadows( light, shadowSize );
-            shadows = renderShadows( frame, commands, stateStack, light, shadowSize, parameters );
+            shadows = m_shadows.render( frame, commands, stateStack, parameters );
         }
 
         // Render a light pass
@@ -117,33 +110,6 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
             commands.releaseRenderTarget( shadows );
         }
     }
-}
-
-// ** ForwardRenderSystem::renderShadows
-u8 ForwardRenderSystem::renderShadows( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, s32 dimensions, const ShadowParameters& parameters )
-{
-    DC_BREAK_IF( !light.light->castsShadows(), "a light instance does not cast shadows" );
-
-    // Acquire a shadow render target
-    u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
-
-    // Render scene from a light's point of view
-    RenderCommandBuffer& cmd = commands.renderToTarget( renderTarget );
-    cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
-
-    // Update a shadow constant buffer
-    cmd.uploadConstantBuffer( m_shadowCBuffer, frame.internBuffer( &parameters, sizeof parameters ), sizeof parameters );
-
-    // Push a shadow pass scope
-    StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
-    state->bindProgram( m_context.internShader( m_shadowShader ) );
-    state->setCullFace( Renderer::TriangleFaceFront );
-
-    // Render all static meshes to a target
-    RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, cmd, stateStack );
-
-    return renderTarget;
 }
 
 // ** ForwardRenderSystem::renderLight
@@ -164,7 +130,7 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
     // Bind a rendered shadowmap
     if( shadows ) {
         state->bindRenderedTexture( shadows, RenderState::Texture1, Renderer::RenderTarget::Depth );
-        state->bindConstantBuffer( m_shadowCBuffer, RenderState::ShadowConstants );
+        state->bindConstantBuffer( m_shadows.cbuffer(), RenderState::ShadowConstants );
     }
 
     // Emit render operations
