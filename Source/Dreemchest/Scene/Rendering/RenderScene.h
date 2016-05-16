@@ -97,6 +97,15 @@ namespace Scene {
             struct ClipPlanes {
                 static BufferLayout Layout[];
                 Plane               equation[6];
+
+                //! Constructs a clip planes constant buffer from near and far clip planes.
+                static ClipPlanes   fromNearAndFar( const Vec3& direction, const Vec3& position, f32 near, f32 far );
+
+                //! Constructs a clip planes from a view-projection matrix.
+                static ClipPlanes   fromViewProjection( const Matrix4& viewProjection );
+
+                //! Constructs a clip planes from a bounding sphere.
+                static ClipPlanes   fromSphere( const Vec3& center, f32 radius );
             };
         };
 

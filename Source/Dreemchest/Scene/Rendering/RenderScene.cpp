@@ -107,6 +107,53 @@ RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::ClipPlanes::Layout[] = 
     , { NULL }
 };
 
+// ** RenderScene::CBuffer::ClipPlanes::fromNearAndFar
+RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromNearAndFar( const Vec3& direction, const Vec3& position, f32 near, f32 far )
+{
+    ClipPlanes planes;
+    planes.equation[0] = Plane::calculate( -direction, position - direction * near );
+    planes.equation[1] = Plane::calculate(  direction, position - direction * far );
+    return planes;
+}
+
+// ** RenderScene::CBuffer::ClipPlanes::fromViewProjectio
+RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromViewProjection( const Matrix4& viewProjection )
+{
+	const f32 *m = viewProjection.m;
+	ClipPlanes planes;
+
+	planes.equation[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
+	planes.equation[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
+
+	planes.equation[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
+	planes.equation[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
+
+	planes.equation[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
+	planes.equation[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
+
+    return planes;
+}
+
+// ** RenderScene::CBuffer::ClipPlanes::fromSphere
+RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromSphere( const Vec3& center, f32 radius )
+{
+	Vec3 x( 1.0f, 0.0f, 0.0f );
+	Vec3 y( 0.0f, 1.0f, 0.0f );
+	Vec3 z( 0.0f, 0.0f, 1.0f );
+    ClipPlanes planes;
+
+	planes.equation[0] = Plane::calculate(  x, center - x * radius );
+	planes.equation[1] = Plane::calculate( -x, center + x * radius );
+
+	planes.equation[2] = Plane::calculate(  y, center - y * radius );
+	planes.equation[3] = Plane::calculate( -y, center + y * radius );
+
+	planes.equation[4] = Plane::calculate(  z, center - z * radius );
+	planes.equation[5] = Plane::calculate( -z, center + z * radius );
+
+    return planes;
+}
+
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderCacheWPtr cache )
     : m_scene( scene )
