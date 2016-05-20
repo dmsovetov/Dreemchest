@@ -59,6 +59,11 @@ namespace Ecs {
 		template<typename TComponent>
 		void					            registerComponentConverter( const ComponentConverter& callback );
 
+    protected:
+
+        //! Searches for an entity by it's identifier.
+        virtual EntityWPtr                  resolveEntity( const Guid& id ) const;
+
 	private:
 
         //! Returns a component converter.

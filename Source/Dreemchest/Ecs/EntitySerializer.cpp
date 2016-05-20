@@ -171,6 +171,12 @@ Variant Serializer::defaultEntityFlags( const KeyValue& ar ) const
 	return Variant::fromValue( 0 );
 }
 
+// ** Serializer::resolveEntity
+EntityWPtr Serializer::resolveEntity( const Guid& id ) const
+{
+    return m_ecs->findEntity( id );
+}
+
 // ** Serializer::convertGuidToEntity
 Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const
 {
@@ -183,7 +189,7 @@ Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Ref
     }
 
     // Lookup entity by identifier
-    EntityWPtr entity = m_ecs->findEntity( id );
+    EntityWPtr entity = resolveEntity( id );
 
     // Show a warning message if no entity found
     if( !entity.valid() ) {
@@ -217,7 +223,7 @@ Variant Serializer::convertGuidToEntityPtr( const Reflection::Class& cls, const 
     }
 
     // Lookup entity by identifier
-    EntityPtr entity = m_ecs->findEntity( id );
+    EntityPtr entity = resolveEntity( id );
 
     // Show a warning message if no entity found
     if( !entity.valid() ) {
