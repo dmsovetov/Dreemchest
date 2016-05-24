@@ -44,9 +44,15 @@ bool EntitySystem::initialize( EcsWPtr ecs )
 		return false;
 	}
 
+    // Request index and subdcribe for entity events
 	m_index = ecs->requestIndex( m_name, m_aspect );
 	m_index->subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
 	m_index->subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
+
+    // Run event handler for all entities that reside in an index
+    for( EntitySet::const_iterator i = m_index->entities().begin(), end = m_index->entities().end(); i != end; ++i ) {
+        entityAdded( *i->get() );
+    }
 
 	return true;
 }

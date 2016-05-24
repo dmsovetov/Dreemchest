@@ -194,6 +194,7 @@ namespace Ecs {
 	TComponent* Entity::attachComponent( TComponent* component )
 	{
 		DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
+        DC_BREAK_IF( ComponentBase::typeId<ComponentBase>() != ComponentBase::typeId<TComponent>() && component->typeIndex() != ComponentBase::typeId<TComponent>(), "component type mismatch" );
 		DC_ABORT_IF( has<TComponent>(), "entity already has this component" );
 
 		TypeIdx idx = component->typeIndex();
