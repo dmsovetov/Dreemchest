@@ -118,10 +118,7 @@ ISoundStreamPtr MemorySoundStream::loadToRam( void ) const
 // ** MemorySoundStream::read
 u32 MemorySoundStream::read( void* buffer, u32 size )
 {
-	if( m_data->bytesAvailable() < size ) {
-		return 0;
-	}
-
+    size = min2<u32>( m_data->bytesAvailable(), size );
     return m_data->read( buffer, size );
 }
 
