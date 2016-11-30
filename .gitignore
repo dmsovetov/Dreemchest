@@ -42,3 +42,4 @@ externals/src
 ~TestProject
 Build/*.dll
 Build/LogFile.txt
+*.DS_Store
