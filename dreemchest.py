@@ -28,30 +28,87 @@
 
 import argparse
 import sys
+import os
 
-# The Dreemchest engine command line tool.
-class Dreemchest:
-    # Constructs a command line tool.
+class CommandLineTool:
+    """A base class for all command line tools"""
+
+    def __init__(self, description):
+        """Constructs a command line tool"""
+
+        # Create a parser instance
+        self._parser = argparse.ArgumentParser(description=description)
+
+    def _ensure_command_exists(self, name, message):
+        """Ensures that a command is supported by this command line tool"""
+
+        if not hasattr(self, name):
+            print message
+            self._parser.print_help()
+            exit(1)
+
+    def _dispatch(self, command, args, message):
+        """Dispatches an execution to a selected command"""
+
+        self._ensure_command_exists(command, message)
+
+        # Use dispatch pattern to invoke method with same name
+        getattr(self, command)(args)
+
+
+class Configure(CommandLineTool):
+    """A command line tool to configure a working copy"""
+
     def __init__(self):
-        # Parse arguments
-        parser = argparse.ArgumentParser(description='Dreemchest configuration tool', usage='''dreemchest <command> [<args>]
-        The most commonly used commands are:
-           pull         Download source code from a remote repository.
-           configure    Configures a local working copy.
-        ''', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        """Constructs a configuration command line tool"""
 
-        parser.add_argument('command', help='Subcommand to run')
+        CommandLineTool.__init__(self, 'Generates a build system for a specified target platform')
 
-        # parse_args defaults to [1:] for args, but you need to
+        self._parser.add_argument('platform', help='A target platform', choices=['windows'])
+        self._parser.add_argument('--source', help='A source directory to generate build system.', default='.')
+        self._parser.add_argument('--output', help='An output directory to place generated build system.', default='.')
+
+        args = self._parser.parse_args(sys.argv[2:])
+
+        self._dispatch(args.platform, args, 'unrecognized platform')
+
+    @staticmethod
+    def windows(args):
+        """Generates a build system for Windows platform"""
+
+        # Create an output directory
+        if not os.path.exists(args.output):
+            os.makedirs(args.output)
+
+        # Invoke a CMake command to generate a build system
+        os.system('cmake -E chdir %s cmake %s -G "Visual Studio 12" -DDC_BUILD_TESTS=OFF -DDC_WITH_RELIGHT=OFF -DDC_QT_SUPPORT=OFF -DDC_COMPOSER_ENABLED=OFF -DDC_USE_PCH=ON' % (args.output, os.path.abspath(args.source)))
+
+        print args.source, args.output
+
+
+class Main(CommandLineTool):
+    """An entry point to a command line tool"""
+
+    def __init__(self):
+        """Constructs a command line tool."""
+
+        CommandLineTool.__init__(self, 'Dreemchest engine command line tool')
+
+        self._parser.add_argument('command', help='A command to run.', choices=['configure', 'pull'])
+
         # exclude the rest of the args too, or validation will fail
-        args = parser.parse_args(sys.argv[1:2])
+        args = self._parser.parse_args(sys.argv[1:2])
 
-        # Ensure that command exists
-        self._assert_command_exists(parser, args.command)
+        # Invoke a selected command
+        self._dispatch(args.command, args, 'unrecognized command')
 
-        # 0e dispatch pattern to invoke method with same name
-        getattr(self, args.command)()
+    @staticmethod
+    def configure(args):
+        """Runs a working copy configuration"""
 
+        Configure()
+
+    '''
     # Pulls a source code from a remote repository
     def pull(self):
         parser = argparse.ArgumentParser(
@@ -77,28 +134,14 @@ class Dreemchest:
             print 'Unrecognized command'
             parser.print_help()
             exit(1)
+    '''
+
+    USAGE = '''
+    Usage: dreemchest [command] [arguments...]
+    Available commands:
+        configure   -   runs a working copy configuration.
+    '''
 
 # Entry point
 if __name__ == "__main__":
-    Dreemchest()
-
-   # subparsers = parser.add_subparsers(help='sub-command help')
-
-   # pull = subparsers.add_parser('pull', help='pulls a specified version from a remote repository.')
-    #pull.add_argument('action', help='lists all available versions.')
-    '''
-    parser.add_argument( "-a",  "--action",      type = str,  default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install", "import"] )
-    parser.add_argument( "-s",  "--source",      type = str,  required = True,                               help = "Input resource path." )
-    parser.add_argument( "-o",  "--output",      type = str,  required = True,                               help = "Output path." )
- #   parser.add_argument( "-tc", "--compression", type = str,  default  = TextureCompression.Disabled,        help = "Hardware texture compression." )
- #   parser.add_argument( "-tf", "--texFormat",   type = str,  default  = TextureFormat.Raw,                  help = "Exported image format." )
- #   parser.add_argument( "-p",  "--platform",    type = str,  default  = TargetPlatform.Win,                 help = "Target platform.", choices = TargetPlatform.Available )
-    parser.add_argument( "-v",  "--version",     type = str,  default  = '1.0',                              help = "Resource version" )
-    parser.add_argument( "-w",  "--workers",     type = int,  default  = 8,                                  help = "The number of concurrent workers." )
-#    parser.add_argument( "-q",  "--quality",     type = str,  default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
-    parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
-    parser.add_argument( "--strip-unused",       type = bool, default  = False,                              help = "The unused assets won't be imported." )
-    parser.add_argument( "--use-uuids",          type = int,  default  = 1,                                  help = "The UUIDs will be used instead of file names." )
-    parser.add_argument( "--skip-scenes",        type = int,  default  = 0,                                  help = "Scenes wont be imported." )
-    '''
-    args = parser.parse_args()
+    Main()
