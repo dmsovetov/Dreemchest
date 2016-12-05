@@ -52,7 +52,6 @@ class CommandLineTool:
 
         cls(self._commands.add_parser(name))
 
-
 class PlatformConfigurationCommand:
     """A base class for all platform configuration commands"""
 
@@ -113,7 +112,28 @@ class PlatformConfigurationCommand:
                             type=str,
                             choices=['opengl'],
                             default='opengl')
+
+        # Add third party libraries options
+        self._add_library(parser, 'libtiff')
+        self._add_library(parser, 'jsoncpp')
+        self._add_library(parser, 'FBX')
+        self._add_library(parser, 'zlib')
+
         parser.set_defaults(function=self.configure)
+
+    @staticmethod
+    def _add_library(parser, name):
+        """Adds a third party library option to parser object"""
+
+        lib = parser.add_mutually_exclusive_group()
+        lib.add_argument('--no-%s' % name.lower(),
+                         help='disables the %s library support.' % name,
+                         action='store_true',
+                         default=False)
+        lib.add_argument('--system-%s' % name.lower(),
+                         help='use %s from the operating system if possible.' % name,
+                         action='store_true',
+                         default=True)
 
     def configure(self, options):
         """Performs basic build system configuration"""
