@@ -74,6 +74,10 @@ elseif (ANDROID)
 	set(DC_THREADS "Posix")
 	set(DC_OPENGL_ENABLED OFF)
 	add_definitions(-DDC_PLATFORM_ANDROID -DDC_THREADS_POSIX)
+elseif (APPLE)
+	set(DC_PLATFORM "MacOS")
+	set(DC_THREADS "Posix")
+	add_definitions(-DDC_PLATFORM_MACOS -DDC_THREADS_POSIX -std=c++11)
 endif (WIN32)
 
 # Add child projects

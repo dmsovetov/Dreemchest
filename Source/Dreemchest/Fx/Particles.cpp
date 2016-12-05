@@ -114,7 +114,7 @@ void Particles::setRenderingMode( RenderingMode value )
 void Particles::addModule( const ModulePtr& module )
 {
     // Add new module
-	DC_ABORT_IF( !module.valid(), "invalid module" );
+	NIMBLE_ABORT_IF( !module.valid(), "invalid module" );
 	LogDebug( "particles", "module %s added\n", module->name().c_str() );
 	m_modules.push_back( module );
 

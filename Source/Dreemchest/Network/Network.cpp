@@ -59,13 +59,13 @@ void Network::initialize( void )
 
 	if( WSAStartup( wVersionRequested, m_wsa ) ) {
         LogError( "initialize", "WSAStartup failed" );
-		DC_BREAK
+		NIMBLE_BREAK
 		return;
 	}
 
 	if( LOBYTE( m_wsa->wVersion ) != 2 || HIBYTE( m_wsa->wVersion ) != 2 ) {
         LogError( "initialize", "Invalid WSA version" );
-		DC_BREAK
+		NIMBLE_BREAK
 		WSACleanup();
 		return;
 	}
@@ -74,7 +74,7 @@ void Network::initialize( void )
     NetworkAddressArray broadcast, host, mask;
     
     bool result = requestHostName( m_hostName );
-    DC_BREAK_IF( result == false, "failed to request host by name" );
+    NIMBLE_BREAK_IF( result == false, "failed to request host by name" );
 
     m_isAvailable = requestInterfaces( broadcast, host, mask );
     if( !m_isAvailable ) {

@@ -103,8 +103,8 @@ namespace Ecs {
 	template<typename TSystem>
 	WeakPtr<TSystem> SystemGroup::add( TSystem* system )
 	{
-		DC_ABORT_IF( m_isLocked, "locked system group could not be modified" );
-		DC_ABORT_IF( get<TSystem>().valid(), "the same system should not be added twice" );
+		NIMBLE_ABORT_IF( m_isLocked, "locked system group could not be modified" );
+		NIMBLE_ABORT_IF( get<TSystem>().valid(), "the same system should not be added twice" );
 
 		if( !system->initialize( m_ecs ) ) {
 			return WeakPtr<TSystem>();
@@ -118,8 +118,8 @@ namespace Ecs {
 	template<typename TSystem>
 	void SystemGroup::remove( void )
 	{
-		DC_ABORT_IF( m_isLocked, "locked system group could not be modified" );
-		DC_ABORT_IF( !get<TSystem>().valid(), "the specified system does not exist" );
+		NIMBLE_ABORT_IF( m_isLocked, "locked system group could not be modified" );
+		NIMBLE_ABORT_IF( !get<TSystem>().valid(), "the specified system does not exist" );
 		m_systems.erase( TypeIndex<TSystem>::idx() );
 	}
 

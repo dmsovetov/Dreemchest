@@ -102,7 +102,7 @@ void KeepAliveInterval::update( u32 dt )
 	if( accumulateTime( dt ) ) {
 		// Send the KeepAlive packet
 		m_connection->send<Packets::KeepAlive>();
-		LogDebug( "connection", "keep alive packet sent\n" );
+		LogDebug( "connection", "%s", "keep alive packet sent\n" );
 	}
 }
 
@@ -120,7 +120,7 @@ void CloseOnTimeout::update( u32 dt )
 	if( m_connection->timeout() >= m_interval ) {
 		// Queue this connection for closing
 		m_connection->closeLater();
-		LogVerbose( "connection", "closed on timeout\n" );
+		LogVerbose( "connection", "%s", "closed on timeout\n" );
 	}
 }
 

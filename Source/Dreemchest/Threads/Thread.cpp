@@ -75,7 +75,7 @@ inline bool Thread::isAlive( void ) const
 // ** Thread::id
 u32 Thread::id( void ) const
 {
-    DC_BREAK_IF( m_id == 0, "thread id is expected to be a non-zero value" )
+    NIMBLE_BREAK_IF( m_id == 0, "thread id is expected to be a non-zero value" )
     return m_id;
 }
 

@@ -33,7 +33,7 @@ namespace Network {
 // ** ConnectionTCP::ConnectionTCP
 ConnectionTCP::ConnectionTCP( TCPSocketPtr socket ) : m_socket( socket )
 {
-    DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
+    NIMBLE_ABORT_IF( !m_socket.valid(), "invalid socket" );
 
     // Create the temporary read buffer for received packet
     m_packet = Io::ByteBuffer::create();
@@ -64,7 +64,7 @@ const Address& ConnectionTCP::address( void ) const
 // ** ConnectionTCP::sendData
 s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 {
-	DC_BREAK_IF( !m_socket.valid(), "invalid socket" );
+	NIMBLE_BREAK_IF( !m_socket.valid(), "invalid socket" );
 	s32 result = m_socket->send( data->buffer(), data->length() );
     return result;
 }

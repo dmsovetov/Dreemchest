@@ -166,7 +166,7 @@ void Connection_::send( const AbstractPacket& packet )
 	// Increase the sent bytes counter.
     trackSentAmount( bytesSent );
 
-	DC_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+	NIMBLE_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
 }
 
 // ** Connection::writePacket

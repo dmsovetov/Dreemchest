@@ -41,7 +41,7 @@ ZonePtr Zone::create( ZoneType type )
 	case ZoneBox:  return ZonePtr( DC_NEW BoxZone );
     }
 
-	DC_BREAK_IF( true, "unhandled zone type" );
+	NIMBLE_BREAK_IF( true, "unhandled zone type" );
     return ZonePtr();
 }
 

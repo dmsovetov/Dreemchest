@@ -51,10 +51,10 @@
 											RANDOM_SCALAR( (min).g, (max).g ),  \
 											RANDOM_SCALAR( (min).b, (max).b ) ))
 
-#define DC_CHECK_IMPL( ... )											\
-            if( m_impl == NULL ) {												\
-                LogWarning( "%s : not implemented\n", __FUNCTION__ );	\
-                return __VA_ARGS__;										\
+#define DC_CHECK_IMPL( ... )                                                \
+            if( m_impl == NULL ) {                                          \
+                LogWarning("", "%s : not implemented\n", __FUNCTION__ );    \
+                return __VA_ARGS__;                                         \
             }
 
 #define DC_DECLARE_IS( type, name, value )                                  \

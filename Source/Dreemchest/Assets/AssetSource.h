@@ -63,10 +63,10 @@ namespace Assets {
     public:
 
         //! Performs the type-cast of an asset handle and dispatches it to a protected abstract method.
-        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    construct( Assets& assets, Handle asset ) NIMBLE_OVERRIDE;
 
         //! Returns the zero timestamp.
-        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+        virtual u32     lastModified( void ) const NIMBLE_OVERRIDE;
 
     protected:
 
@@ -97,10 +97,10 @@ namespace Assets {
                         AbstractFileSource( void );
 
         //! Opens the file stream and loads data from it.
-        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    construct( Assets& assets, Handle asset ) NIMBLE_OVERRIDE;
 
         //! Returns the last file modification time stamp.
-        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+        virtual u32     lastModified( void ) const NIMBLE_OVERRIDE;
 
         //! Sets the last file modification timestamp.
         void            setLastModified( u32 value );
@@ -128,7 +128,7 @@ namespace Assets {
     protected:
 
         //! Type casts an asset handle and dispatches the loading process to an implementation.
-        virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, Handle asset ) NIMBLE_OVERRIDE;
 
         //! Performs an asset data parsing from a stream.
         virtual bool    constructFromStream( Io::StreamPtr stream, Assets& assets, TAsset& asset ) = 0;
@@ -155,10 +155,10 @@ namespace Assets {
                         AssetSource( AssetHandle asset );
 
         //! Loads data from an asset.
-        virtual bool    construct( Assets& assets, Handle asset ) DC_DECL_OVERRIDE;
+        virtual bool    construct( Assets& assets, Handle asset ) NIMBLE_OVERRIDE;
 
         //! Returns the last asset modification time stamp.
-        virtual u32     lastModified( void ) const DC_DECL_OVERRIDE;
+        virtual u32     lastModified( void ) const NIMBLE_OVERRIDE;
 
     protected:
 
@@ -182,7 +182,7 @@ namespace Assets {
     template<typename TAsset, typename TSource>
     bool AssetSource<TAsset, TSource>::construct( Assets& assets, Handle asset )
     {
-        DC_ABORT_IF( !m_asset.isLoaded(), "asset could not be constructed because the source asset was not loaded" );
+        NIMBLE_ABORT_IF( !m_asset.isLoaded(), "asset could not be constructed because the source asset was not loaded" );
         bool result = constructFromAsset( m_asset.readLock(), assets, *asset.writeLock<TAsset>() );
         return result;
     }

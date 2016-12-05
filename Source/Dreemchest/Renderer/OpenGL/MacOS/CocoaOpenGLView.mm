@@ -61,10 +61,10 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     int stencil = 8;
 
     switch( depthStencil ) {
-    case renderer::PixelD24S8:  depth   = 24;
+    case Renderer::PixelD24S8:  depth   = 24;
                                 stencil = 8;
                                 break;
-    case renderer::PixelD24X8:  depth   = 24;
+    case Renderer::PixelD24X8:  depth   = 24;
                                 stencil = 0;
                                 break;
     }

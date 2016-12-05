@@ -48,7 +48,7 @@ namespace Network {
 		const Address&	    address( void ) const;
 
         //! Closes this TCP connection.
-        virtual void        close( void ) DC_DECL_OVERRIDE;
+        virtual void        close( void ) NIMBLE_OVERRIDE;
 
     protected:
 
@@ -56,7 +56,7 @@ namespace Network {
                             ConnectionTCP( TCPSocketPtr socket );
 
         //! Sends a byte buffer over TCP connection.
-        virtual s32         sendData( Io::ByteBufferWPtr stream ) DC_DECL_OVERRIDE;
+        virtual s32         sendData( Io::ByteBufferWPtr stream ) NIMBLE_OVERRIDE;
 
         //! Splits the received data into packets and emits notifications.
         void                handleSocketData( const TCPSocket::Data& e );

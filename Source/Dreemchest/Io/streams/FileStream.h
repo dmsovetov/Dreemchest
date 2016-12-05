@@ -45,25 +45,25 @@ namespace Io {
 		virtual					~FileStream( void );
 
         //! Disposes this file stream.
-        virtual void            dispose( void ) DC_DECL_OVERRIDE;
+        virtual void            dispose( void ) NIMBLE_OVERRIDE;
 
         //! Returns a total lenght of this file.
-        virtual s32             length( void ) const DC_DECL_OVERRIDE;
+        virtual s32             length( void ) const NIMBLE_OVERRIDE;
 
         //! Returns current file position.
-        virtual s32             position( void ) const DC_DECL_OVERRIDE;
+        virtual s32             position( void ) const NIMBLE_OVERRIDE;
 
         //! Sets the position inside the file.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) NIMBLE_OVERRIDE;
 
         //! Returns true if there are any data left.
-        virtual bool            hasDataLeft( void ) const DC_DECL_OVERRIDE;
+        virtual bool            hasDataLeft( void ) const NIMBLE_OVERRIDE;
 
         //! Reads data from file.
-        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
+        virtual s32             read( void* buffer, s32 size ) const NIMBLE_OVERRIDE;
 
         //! Writes data to file.
-        virtual s32             write( const void* buffer, s32 size ) DC_DECL_OVERRIDE;
+        virtual s32             write( const void* buffer, s32 size ) NIMBLE_OVERRIDE;
 
         //! Returns a file name of this file.
         const Path&             fileName( void ) const;

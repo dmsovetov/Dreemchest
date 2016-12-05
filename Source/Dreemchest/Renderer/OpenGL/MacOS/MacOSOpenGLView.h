@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** class MacOSOpenGLView
     class MacOSOpenGLView : public OpenGLView {
@@ -53,7 +53,7 @@ namespace renderer {
         CocoaOpenGLView*    m_view;
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

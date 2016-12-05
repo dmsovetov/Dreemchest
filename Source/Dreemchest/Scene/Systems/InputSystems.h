@@ -118,13 +118,13 @@ namespace Scene {
 	private:
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
+		virtual void		touchBegan( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) NIMBLE_OVERRIDE;
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
+		virtual void		touchEnded( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) NIMBLE_OVERRIDE;
 
 		//! Extracts components from entity and dispatches them to a abstract function that should be overridden in a subclass.
-		virtual void		touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) DC_DECL_OVERRIDE;
+		virtual void		touchMoved( Ecs::Entity& entity, u8 flags, const TouchEvent& e ) NIMBLE_OVERRIDE;
 	};
 
 	// ** InputSystem::InputSystem

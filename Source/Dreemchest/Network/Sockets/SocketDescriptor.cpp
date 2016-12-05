@@ -26,6 +26,14 @@
 
 #include "SocketDescriptor.h"
 
+#ifndef INVALID_SOCKET
+    #define INVALID_SOCKET (-1)
+#endif  /*  #ifndef INVALID_SOCKET  */
+
+#ifndef SOCKET_ERROR
+    #define SOCKET_ERROR (-1)
+#endif  /*  #ifndef SOCKET_ERROR  */
+
 DC_BEGIN_DREEMCHEST
 
 namespace Network {
@@ -153,7 +161,7 @@ bool SocketDescriptor::setNonBlocking( void )
 
     if( result.isError() ) {
 		LogError( "socket", "failed to switch socket to a non-blocking mode %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
-		DC_BREAK
+		NIMBLE_BREAK
     }
 
 	return result != SOCKET_ERROR;
@@ -172,7 +180,7 @@ bool SocketDescriptor::setNoDelay( void )
 
     if( result.isError() ) {
 		LogError( "socket", "failed to enable the TCP no delay option %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
-		DC_BREAK
+		NIMBLE_BREAK
     }
 
 	return result != SOCKET_ERROR;
@@ -191,7 +199,7 @@ bool SocketDescriptor::enableBroadcast( void )
 
     if( result.isError() ) {
 		LogError( "socket", "failed to switch socket to a broadcast mode %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
-		DC_BREAK
+		NIMBLE_BREAK
     }
 
 	return result != SOCKET_ERROR;
@@ -210,7 +218,7 @@ bool SocketDescriptor::enableAddressReuse( void )
 
 	if( result.isError() ) {
 		LogError( "socket", "failed to enable address reuse on socket %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
-		DC_BREAK
+		NIMBLE_BREAK
 	}
 
 	return result != SOCKET_ERROR;

@@ -59,9 +59,9 @@ void PackedStream::reopen( void )
 // ** PackedStream::read
 s32 PackedStream::read( void* buffer, s32 size ) const
 {
-    DC_BREAK_IF( !m_file.valid() );
-    DC_BREAK_IF( buffer == NULL );
-    DC_BREAK_IF( size <= 0 );
+    NIMBLE_BREAK_IF( !m_file.valid() );
+    NIMBLE_BREAK_IF( buffer == NULL );
+    NIMBLE_BREAK_IF( size <= 0 );
 
     return const_cast<PackedStream*>( this )->readFile( ( u8* )buffer, size );
 }
@@ -69,7 +69,7 @@ s32 PackedStream::read( void* buffer, s32 size ) const
 // ** PackedStream::setPosition
 void PackedStream::setPosition( s32 offset, SeekOrigin origin )
 {
-	DC_BREAK_IF( !m_file.valid() );
+	NIMBLE_BREAK_IF( !m_file.valid() );
 
 	u64 currentPos = position();
 	u64 targetPos	= 0;
@@ -102,7 +102,7 @@ void PackedStream::setPosition( s32 offset, SeekOrigin origin )
 // ** PackedStream::position
 s32 PackedStream::position( void ) const
 {
-    DC_BREAK_IF( m_file == NULL );
+    NIMBLE_BREAK_IF( m_file == NULL );
     return m_position;
 }
 
@@ -116,7 +116,7 @@ s32 PackedStream::length( void ) const
 s32 PackedStream::readFile( u8 *buffer, s32 size )
 {
     s32 bytesRead = readFromBuffer( buffer, size );
-    DC_BREAK_IF( bytesRead > size );
+    NIMBLE_BREAK_IF( bytesRead > size );
 
     // ** Output buffer is full
     if( bytesRead >= size ) {
@@ -165,7 +165,7 @@ void PackedStream::decompressChunk( void )
     m_bytesAvailable = m_compressor->decompressToBuffer( compressed.get(), compressedSize, m_buffer, CHUNK_SIZE * 2 );
     m_bufferOffset   = 0;
     
-    DC_BREAK_IF( m_bytesAvailable > CHUNK_SIZE * 2 );
+    NIMBLE_BREAK_IF( m_bytesAvailable > CHUNK_SIZE * 2 );
 }
 
 } // namespace Io

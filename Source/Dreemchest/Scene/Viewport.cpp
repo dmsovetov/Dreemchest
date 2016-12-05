@@ -46,7 +46,7 @@ WindowViewport::WindowViewport( const Platform::WindowWPtr& window )
     , m_lastX( -1 )
     , m_lastY( -1 )
 {
-    DC_ABORT_IF( !window.valid(), "invalid window" );
+    NIMBLE_ABORT_IF( !window.valid(), "invalid window" );
     m_window->subscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowViewport::handleTouchBegan ) );
     m_window->subscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowViewport::handleTouchMoved ) );
     m_window->subscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowViewport::handleTouchEnded ) );

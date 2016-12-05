@@ -40,7 +40,7 @@ TaskProgress::TaskProgress( void ) : m_isCompleted( false )
 
 TaskProgress::~TaskProgress( void )
 {
-    DC_BREAK_IF( !m_isCompleted, "destroying progress of an incompleted task" )
+    NIMBLE_BREAK_IF( !m_isCompleted, "destroying progress of an incompleted task" )
 
     {
         DC_SCOPED_LOCK( m_mutex );

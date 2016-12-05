@@ -43,7 +43,7 @@ namespace Network {
 Application::Application( void )
     : m_nextConnectionId( 1 )
 {
-    DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
+    NIMBLE_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
     addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( Application::handleEventPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( Application::handlePingPacket ) );
@@ -185,7 +185,7 @@ void Application::handlePacketReceived( const Connection::Received& e )
     s32 position = stream->position();
 	packet->deserialize( stream );
 	s32 bytesRead = stream->position() - position;
-    DC_BREAK_IF( bytesRead != e.size, "packet size mismatch" );
+    NIMBLE_BREAK_IF( bytesRead != e.size, "packet size mismatch" );
 
 	// Find all handlers that are eligible to process this type of packet
     PacketHandlers::iterator i = m_packetHandlers.find( e.type );

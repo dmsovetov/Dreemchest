@@ -101,7 +101,7 @@ Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( ha
 	// Create vertex declarations
 	VertexDeclarationPtr vertexTextured = m_hal->createVertexDeclaration( "P3:C4:T0" );
 	VertexDeclarationPtr vertexColored  = m_hal->createVertexDeclaration( "P3:C4", sizeof( Vertex ) );
-	DC_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ), "vertex size mismatch" );
+	NIMBLE_BREAK_IF( vertexColored->vertexSize() != sizeof( Vertex ), "vertex size mismatch" );
 
 	// Set vertex formats for primitive types
 	m_vertexFormat[PrimPoints]    = vertexColored;
@@ -201,7 +201,7 @@ void Renderer2D::setBlendMode( BlendingMode blending )
 							break;
 	case BlendingAdditive:	m_hal->setBlendFactors( Renderer::BlendOne, Renderer::BlendOne );
 							break;
-	default:				DC_BREAK;
+	default:				NIMBLE_BREAK;
 	}
 
 	// Save active blending mode
@@ -220,7 +220,7 @@ void Renderer2D::point( f32 x, f32 y, const Rgba& color )
 // ** Renderer2D::points
 void Renderer2D::points( const Vec2* points, const Rgba* colors, const f32* sizes, s32 count, s32 stride )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 }
 
 // ** Renderer2D::line
@@ -478,7 +478,7 @@ void Renderer2D::pushTransform( const Matrix4& matrix )
 // ** Renderer2D::popTransform
 void Renderer2D::popTransform( void )
 {
-	DC_ABORT_IF( m_transformStack.empty(), "no transformations pushed" );
+	NIMBLE_ABORT_IF( m_transformStack.empty(), "no transformations pushed" );
 	flush();
 	m_transformStack.pop();
 }
@@ -495,8 +495,8 @@ void Renderer2D::flush( void )
 
 	PrimitiveType primitiveType = m_state.primitiveType;
 
-	DC_ABORT_IF( !m_vertexFormat[primitiveType].valid(), "invalid vertex format" )
-	DC_ABORT_IF( m_state.nIndices && !m_indexBuffers[primitiveType].valid(), "invalid index buffer" )
+	NIMBLE_ABORT_IF( !m_vertexFormat[primitiveType].valid(), "invalid vertex format" )
+	NIMBLE_ABORT_IF( m_state.nIndices && !m_indexBuffers[primitiveType].valid(), "invalid index buffer" )
 
 	// Set the shader
 	if( m_state.texture.valid() ) {

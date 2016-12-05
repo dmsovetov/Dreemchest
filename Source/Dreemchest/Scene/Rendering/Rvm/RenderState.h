@@ -320,16 +320,19 @@ namespace Scene {
     // ** RenderStateBlock::state
     NIMBLE_INLINE const RenderState& RenderStateBlock::state( s32 index ) const
     {
-        DC_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
+        NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_states[index];
     }
 
     // ** RenderStateBlock::stateBit
     NIMBLE_INLINE u32 RenderStateBlock::stateBit( s32 index ) const
     {
-        DC_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
+        NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_stateBits[index];
     }
+    
+    //! Forward declare a RenderStateStack class.
+    class RenderStateStack;
 
     //! A render state stack scope.
     class StateScope {
@@ -337,7 +340,7 @@ namespace Scene {
     public:
 
                                     //! Performs a destructive copy of a state scope.
-                                    StateScope( StateScope& other );
+                                    StateScope( const StateScope& other );
 
                                     //! Pops a state block from a stack upon destruction.
                                     ~StateScope( void );

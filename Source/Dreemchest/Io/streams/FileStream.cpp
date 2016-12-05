@@ -96,9 +96,9 @@ const Path& FileStream::fileName( void ) const
 // ** FileStream::read
 s32 FileStream::read( void* buffer, s32 size ) const
 {
-    DC_ABORT_IF( m_file == NULL, "invalid file handle" );
-    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
-    DC_ABORT_IF( size <= 0, "the size should be positive" );
+    NIMBLE_ABORT_IF( m_file == NULL, "invalid file handle" );
+    NIMBLE_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    NIMBLE_ABORT_IF( size <= 0, "the size should be positive" );
 
     s32 bytesRead = fread( buffer, 1, size, m_file );
 
@@ -112,9 +112,9 @@ s32 FileStream::read( void* buffer, s32 size ) const
 // ** FileStream::write
 s32 FileStream::write( const void* buffer, s32 size )
 {
-    DC_ABORT_IF( m_file == NULL, "invalid file handle" );
-    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
-    DC_ABORT_IF( size <= 0, "the size should be positive" );
+    NIMBLE_ABORT_IF( m_file == NULL, "invalid file handle" );
+    NIMBLE_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    NIMBLE_ABORT_IF( size <= 0, "the size should be positive" );
 
     s32 bytesWritten = fwrite( buffer, 1, size, m_file );
     
@@ -128,7 +128,7 @@ s32 FileStream::write( const void* buffer, s32 size )
 // ** FileStream::setPosition
 void FileStream::setPosition( s32 offset, SeekOrigin origin )
 {
-    DC_ABORT_IF( m_file == NULL, "invalid file handle" );
+    NIMBLE_ABORT_IF( m_file == NULL, "invalid file handle" );
 
     s32 result = 0;
 
@@ -138,13 +138,13 @@ void FileStream::setPosition( s32 offset, SeekOrigin origin )
     case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
     }
 
-    DC_BREAK_IF( result != 0, "fseek returned an unexpected value" );
+    NIMBLE_BREAK_IF( result != 0, "fseek returned an unexpected value" );
 }
 
 // ** FileStream::position
 s32 FileStream::position( void ) const
 {
-    DC_ABORT_IF( m_file == NULL, "invalid file handle" );
+    NIMBLE_ABORT_IF( m_file == NULL, "invalid file handle" );
     return ftell( m_file );
 }
 

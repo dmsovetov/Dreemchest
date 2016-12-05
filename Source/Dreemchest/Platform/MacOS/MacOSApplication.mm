@@ -31,12 +31,19 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createApplication
 IApplication* createApplication( void )
 {
     return DC_NEW MacOSApplication;
+}
+    
+// ** createServiceApplication
+IApplication* createServiceApplication( void )
+{
+    NIMBLE_NOT_IMPLEMENTED
+    return NULL;
 }
 
 // ** MacOSApplication::quit
@@ -56,6 +63,6 @@ int MacOSApplication::launch( Application* application )
     return 0;
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

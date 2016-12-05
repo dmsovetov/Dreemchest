@@ -78,7 +78,7 @@ void TaskManager::doMainThreadTasks( void )
 // ** TaskManager::runMainThreadTask
 TaskProgressPtr TaskManager::runMainThreadTask( const TaskFunction& task, void *userData, bool wait )
 {
-    DC_ABORT_IF( task == NULL, "invalid task function" );
+    NIMBLE_ABORT_IF( task == NULL, "invalid task function" );
 
     TaskProgressPtr progress = DC_NEW TaskProgress;
     if( m_mainThread != Thread::currentThread() ) {
@@ -99,11 +99,11 @@ TaskProgressPtr TaskManager::runMainThreadTask( const TaskFunction& task, void *
 // ** TaskManager::runBackgroundTask
 TaskProgressPtr TaskManager::runBackgroundTask( const TaskFunction& task, void* userData, u32 priority, const String& thread )
 {
-    DC_ABORT_IF( task == NULL, "invalid task function" );
+    NIMBLE_ABORT_IF( task == NULL, "invalid task function" );
 
     TaskProgressPtr progress  = DC_NEW TaskProgress;
     TaskQueueWPtr   queue     = taskQueue( thread );
-    DC_ABORT_IF( queue == NULL, "invalid task queue" );
+    NIMBLE_ABORT_IF( queue == NULL, "invalid task queue" );
     queue->pushTask( task, userData, progress, priority );
 
     return progress;
@@ -112,11 +112,11 @@ TaskProgressPtr TaskManager::runBackgroundTask( const TaskFunction& task, void* 
 // ** TaskManager::runTask
 TaskProgressPtr TaskManager::runTask( const TaskFunction& task, void *userData, u32 threadId, bool wait )
 {
-    DC_ABORT_IF( task == NULL, "invalid task function" );
+    NIMBLE_ABORT_IF( task == NULL, "invalid task function" );
 
     TaskProgressPtr progress = DC_NEW TaskProgress;
     TaskQueueWPtr   queue    = taskQueue( threadId );
-    DC_ABORT_IF( queue == NULL, "invalid task queue" );
+    NIMBLE_ABORT_IF( queue == NULL, "invalid task queue" );
     queue->pushTask( task, userData, progress, 0 );
 
     return progress;
@@ -132,7 +132,7 @@ TaskQueueWPtr TaskManager::taskQueue( const String& name ) const
             return i->second->taskQueue();
         }
 
-        DC_BREAK;
+        NIMBLE_BREAK;
     }
 
     return m_taskQueues[BackgroundQueue];
@@ -157,7 +157,7 @@ TaskQueueWPtr TaskManager::taskQueue( u32 threadId ) const
 // ** TaskManager::startTaskThread
 void TaskManager::startTaskThread( const String& name, TaskQueueWPtr queue )
 {
-    DC_ABORT_IF( queue == NULL, "invalid task queue" );
+    NIMBLE_ABORT_IF( queue == NULL, "invalid task queue" );
     
     String64      hash        = String64( name.c_str() );
     TaskThreadPtr taskThread  = DC_NEW TaskThread( name, queue );

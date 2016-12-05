@@ -73,7 +73,7 @@ namespace Platform {
 	private:
 
         //! Handles the application start and creates the window.
-        virtual void            handleLaunched( Application* application ) DC_DECL_OVERRIDE;
+        virtual void            handleLaunched( Application* application ) NIMBLE_OVERRIDE;
 
 	protected:
 

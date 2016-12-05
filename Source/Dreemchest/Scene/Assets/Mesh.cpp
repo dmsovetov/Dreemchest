@@ -52,14 +52,14 @@ void Mesh::setChunkCount( s32 value )
 // ** Mesh::setTexture
 void Mesh::setTexture( s32 chunk, const String& value )
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
 	m_chunks[chunk].texture = value;
 }
 
 // ** Mesh::texture
 const String& Mesh::texture( s32 chunk ) const
 {
-	DC_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( chunk < 0 || chunk >= chunkCount(), "index is out of range" );
 	return m_chunks[chunk].texture;
 }
 

@@ -87,7 +87,7 @@ void BatchRenderer::initialize( void )
     // ** Create vertex format
     m_vertexFormat = m_hal->createVertexDeclaration( "P2:T02:C" );
     m_pointFormat  = m_hal->createVertexDeclaration( "P2:S2:C", sizeof( sVertex ) );
-    DC_BREAK_IF( m_vertexFormat->vertexSize() != sizeof( sVertex ) );
+    NIMBLE_BREAK_IF( m_vertexFormat->vertexSize() != sizeof( sVertex ) );
 
     // ** Create buffers
     m_vertexBuffer	 = m_hal->createVertexBuffer( m_vertexFormat, m_maxVertices, false );
@@ -205,7 +205,7 @@ void BatchRenderer::pushTransform( eTransform transform )
 // ** BatchRenderer::popTransform
 void BatchRenderer::popTransform( eTransform transform )
 {
-    DC_BREAK_IF( m_transformStack[transform].empty() );
+    NIMBLE_BREAK_IF( m_transformStack[transform].empty() );
 
     setTransform( transform, m_transformStack[transform].top() );
     m_transformStack[transform].pop();
@@ -298,7 +298,7 @@ void BatchRenderer::flush( void )
 // ** BatchRenderer::renderVertices
 void BatchRenderer::renderVertices( ePrimitiveType primitiveType, dcTexture2D texture, const sVertex *vertices, int count )
 {
-    DC_BREAK_IF( m_vertices == NULL || m_indices == NULL );
+    NIMBLE_BREAK_IF( m_vertices == NULL || m_indices == NULL );
 
     int indexCount = calculateIndexCount( primitiveType, count );
     setRenderState( primitiveType, texture );
@@ -546,7 +546,7 @@ void BatchRenderer::renderLine( float x1, float y1, float x2, float y2, const rg
         }
             return;
         case LineSolid: break;
-        default:        DC_NOT_IMPLEMENTED;
+        default:        NIMBLE_NOT_IMPLEMENTED;
     }
 */
     // ** Render solid line
@@ -620,7 +620,7 @@ void BatchRenderer::renderPolygon( float x, float y, const vec2 *v, int vertexCo
 {
     const int kVertexCount = 32;
 
-    DC_BREAK_IF( vertexCount >= kVertexCount - 1 );
+    NIMBLE_BREAK_IF( vertexCount >= kVertexCount - 1 );
     sVertex vertices[kVertexCount];
 
     // ** Filled

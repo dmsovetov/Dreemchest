@@ -48,10 +48,10 @@ namespace Scene {
 	protected:
 
 		//! Calculates frustums for all cameras.
-		virtual bool		begin( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+		virtual bool		begin( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
 		//! Perform culling of a single mesh.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
 
 	private:
 

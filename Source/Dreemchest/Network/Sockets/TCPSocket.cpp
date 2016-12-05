@@ -76,7 +76,7 @@ const Address& TCPSocket::address( void ) const
 // ** TCPSocket::connect
 bool TCPSocket::connect( const Address& address, u16 port )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
 
     m_address = address;
 
@@ -112,8 +112,8 @@ void TCPSocket::close( void )
 // ** TCPSocket::send
 u32 TCPSocket::send( const void* buffer, s32 size )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
-    DC_BREAK_IF( size <= 0, "size should be a positive number" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    NIMBLE_BREAK_IF( size <= 0, "size should be a positive number" );
 
     // This socket was queued for removal - close now
     if( m_shouldClose ) {
@@ -153,7 +153,7 @@ u32 TCPSocket::send( const void* buffer, s32 size )
 // ** TCPSocket::recv
 void TCPSocket::recv( void )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
 
     // This socket was queued for removal - close now
     if( m_shouldClose ) {

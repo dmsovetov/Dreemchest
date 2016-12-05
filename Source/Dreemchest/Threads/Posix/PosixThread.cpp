@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#include    "PosixThread.h"
+#include "PosixThread.h"
 
 #ifdef DC_PLATFORM_WINDOWS
     #pragma comment( lib, "../../../../lib/pthreadVC1.lib" )
@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** PosixThread::PosixThread
 PosixThread::PosixThread( void )
@@ -55,7 +55,7 @@ void PosixThread::start( const ThreadCallback& callback, void *userData )
     Thread::start( callback, userData );
     
     u32 error = pthread_create( &m_thread, NULL, threadProc, this );
-    DC_BREAK_IF( error );
+    NIMBLE_BREAK_IF( error );
 }
 
 // ** PosixThread::threadProc
@@ -94,6 +94,6 @@ void PosixThread::threadYield( void )
 #endif
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

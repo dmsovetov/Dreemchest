@@ -94,6 +94,10 @@ namespace Assets {
         //! Returns true if an asset is of specified type.
         template<typename TAsset>
         bool                        is( void ) const;
+        
+        //! Returns an asset type id.
+        template<typename TAsset>
+        static TypeId               typeId( void );
 
     private:
 
@@ -119,7 +123,14 @@ namespace Assets {
     template<typename TAsset>
     NIMBLE_INLINE bool Asset::is( void ) const
     {
-        return m_type == Assets::assetTypeId<TAsset>();
+        return m_type == typeId<TAsset>();
+    }
+    
+    // ** Assets::typeId
+    template<typename TAsset>
+    NIMBLE_INLINE TypeId Asset::typeId( void )
+    {
+        return GroupedTypeIndex<TAsset, Asset>::idx();
     }
 
     // ** Asset::isLoaded
@@ -131,7 +142,7 @@ namespace Assets {
     // ** Asset::cache
     NIMBLE_INLINE AbstractAssetCache& Asset::cache( void ) const
     {
-        DC_ABORT_IF( m_cache == NULL, "invalid asset cache" );
+        NIMBLE_ABORT_IF( m_cache == NULL, "invalid asset cache" );
         return *m_cache;
     }
 

@@ -76,7 +76,7 @@ public:
 		camera->get<Scene::Camera>()->setClearColor( Rgba( 0.5f, 0.5f, 0.5f ) );
 		m_scene->addSceneObject( camera );
     #else
-        DC_NOT_IMPLEMENTED
+        NIMBLE_NOT_IMPLEMENTED
     #endif
 
 		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
@@ -100,7 +100,7 @@ public:
 	//	for( s32 i = 0, n = m_timeStep.stepCount(); i < n; i++ ) {
 	//		m_scene->update( 0, m_timeStep.seconds() );
 	//	}
-        DC_NOT_IMPLEMENTED;
+        NIMBLE_NOT_IMPLEMENTED;
 
 	//	m_scene->render( m_renderingContext );
 

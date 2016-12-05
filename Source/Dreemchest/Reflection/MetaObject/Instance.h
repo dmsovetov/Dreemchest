@@ -70,8 +70,8 @@ namespace Reflection {
     template<typename TClass>
     const TClass* InstanceConst::upCast( void ) const
     {
-        DC_ABORT_IF( m_pointer == NULL, "invalid instance" );
-        DC_ABORT_IF( m_class == NULL, "invalid instance" );
+        NIMBLE_ABORT_IF( m_pointer == NULL, "invalid instance" );
+        NIMBLE_ABORT_IF( m_class == NULL, "invalid instance" );
 
         // Start from a current class and instance pointer.
         const Class*  current  = m_class;
@@ -105,7 +105,7 @@ namespace Reflection {
     template<typename TClass>
     NIMBLE_INLINE const TClass* InstanceConst::pointer( void ) const
     {
-        DC_ABORT_IF( m_class != TClass::staticMetaObject(), "unexpected instance type" );
+        NIMBLE_ABORT_IF( m_class != TClass::staticMetaObject(), "unexpected instance type" );
         return reinterpret_cast<const TClass*>( m_pointer );
     }
 

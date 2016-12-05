@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
     class MacOSWindow;
 }
 
@@ -42,10 +42,10 @@ DC_USE_DREEMCHEST
 
 @interface CocoaWindow : NSWindow<NSAnimationDelegate> {
     NSPoint                 m_prevMousePos;
-    platform::MacOSWindow*  m_window;
+    Platform::MacOSWindow*  m_window;
 }
 
-- ( void )setWindow: ( platform::MacOSWindow* )window;
+- ( void )setWindow: ( Platform::MacOSWindow* )window;
 
 @end
 

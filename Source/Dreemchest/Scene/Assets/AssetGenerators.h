@@ -43,7 +43,7 @@ namespace Scene {
     protected:
 
         //! Generates a plane mesh.
-        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) NIMBLE_OVERRIDE;
 
     private:
 
@@ -62,7 +62,7 @@ namespace Scene {
     protected:
 
         //! Generates a box mesh.
-        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) NIMBLE_OVERRIDE;
 
     private:
 
@@ -81,7 +81,7 @@ namespace Scene {
     protected:
 
         //! Generates a sphere mesh.
-        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) NIMBLE_OVERRIDE;
 
     private:
 
@@ -98,7 +98,7 @@ namespace Scene {
     protected:
 
         //! Generates a torus mesh.
-        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) DC_DECL_OVERRIDE;
+        virtual bool    generate( Assets::Assets& assets, Mesh& mesh ) NIMBLE_OVERRIDE;
 
     private:
 
@@ -115,7 +115,7 @@ namespace Scene {
     protected:
 
         //! Generates a checker image.
-        virtual bool    generate( Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+        virtual bool    generate( Assets::Assets& assets, Image& image ) NIMBLE_OVERRIDE;
 
     private:
 

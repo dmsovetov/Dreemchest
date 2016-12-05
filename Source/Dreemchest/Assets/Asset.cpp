@@ -44,10 +44,10 @@ Asset::Asset( const TypeId& type, AbstractAssetCache* cache, const Index& data, 
     , m_type( type )
     , m_uniqueId( uniqueId )
     , m_state( Unloaded )
-    , m_cache( cache )
     , m_data( data )
+    , m_cache( cache )
 {
-    memset( &m_timestamp, 0, sizeof Timestamp );
+    memset( &m_timestamp, 0, sizeof( Timestamp ) );
 }
 
 // ** Asset::type
@@ -89,7 +89,7 @@ AbstractSource& Asset::source( void ) const
 // ** Asset::switchToState
 void Asset::switchToState( State value )
 {
-    DC_BREAK_IF( m_state == value );
+    NIMBLE_BREAK_IF( m_state == value );
     m_state = value;
 }
 

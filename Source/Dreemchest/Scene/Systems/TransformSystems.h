@@ -40,15 +40,15 @@ namespace Scene {
     protected:
 
 		//! Calculates the affine transform matrix for each transform component.
-		virtual void		update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+		virtual void		update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
 	private:
 
 		//! Called when entity was added.
-		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
 
 		//! Called when entity was removed.
-		virtual void		entityRemoved( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		entityRemoved( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
 
 	private:
 
@@ -60,7 +60,7 @@ namespace Scene {
 	protected:
 
 		//! Calculates the world space bounds for static mesh.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
 	};
 
 	//! Moves scene object transform along coordinate axes.
@@ -68,7 +68,7 @@ namespace Scene {
     protected:
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) NIMBLE_OVERRIDE;
 	};
 
 	//! Rotates scene object transform around axes.
@@ -76,7 +76,7 @@ namespace Scene {
     protected:
 
 		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) NIMBLE_OVERRIDE;
 	};
 
 	//! The moving to target system
@@ -84,15 +84,15 @@ namespace Scene {
     protected:
 
 		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) NIMBLE_OVERRIDE;
 
 		//! Attaches the internal following data to an added scene object.
-		virtual void		entityAdded( const Ecs::Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void		entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
 
 	private:
 
 		//! Holds the accumulated acceleration.
-		struct Internal : Ecs::Internal<Internal> {
+		struct Internal : Ecs::MixIn<Internal> {
 			Vec3			m_force;		//!< The accumulated force.
 		};
 	};
@@ -102,7 +102,7 @@ namespace Scene {
     protected:
 
 		//! Updates the particle system.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) DC_DECL_OVERRIDE;
+		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) NIMBLE_OVERRIDE;
 	};
 
 } // namespace Scene

@@ -32,7 +32,7 @@
 // ** applicationDidFinishLaunching
 - ( void )applicationDidFinishLaunching: ( NSNotification* )notification
 {
-    platform::Application::sharedInstance()->notifyLaunched();
+    Platform::Application::sharedInstance()->notifyLaunched();
 }
 
 // ** applicationShouldTerminateAfterLastWindowClosed

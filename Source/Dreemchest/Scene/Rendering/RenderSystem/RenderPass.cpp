@@ -36,7 +36,7 @@ RenderPassBase::RenderPassBase( RenderingContext& context, RenderScene& renderSc
     , m_renderScene( renderScene )
 {
     // Create a material constant buffer
-    m_materialCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
+    m_materialCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
 }
 
 // ** RenderPassBase::renderWithColor
@@ -46,7 +46,7 @@ void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& c
     RenderScene::CBuffer::Material material = diffuseMaterial( color );
 
     // Upload a constant buffer to GPU
-    commands.uploadConstantBuffer( m_materialCBuffer, frame.internBuffer( &material, sizeof material ), sizeof RenderScene::CBuffer::Material );
+    commands.uploadConstantBuffer( m_materialCBuffer, frame.internBuffer( &material, sizeof( material ) ), sizeof( RenderScene::CBuffer::Material ) );
 
     // Push a material state
     StateScope state = stateStack.newScope();

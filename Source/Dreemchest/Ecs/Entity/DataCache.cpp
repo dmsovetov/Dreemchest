@@ -102,7 +102,7 @@ void DataCacheBase::handleEntityRemoved( const Index::Removed& e )
 
     // Find an index of this entity
     IndexByEntity::iterator i = m_indices.find( entity );
-    DC_ABORT_IF( i == m_indices.end(), "entity pointer could not be mapped to an index" );
+    NIMBLE_ABORT_IF( i == m_indices.end(), "entity pointer could not be mapped to an index" );
 
     // Remove cache item
     removeCacheEntry( i->second );

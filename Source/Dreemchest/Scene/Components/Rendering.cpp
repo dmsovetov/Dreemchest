@@ -256,7 +256,7 @@ const MeshHandle& StaticMesh::mesh( void ) const
 // ** StaticMesh::setMesh
 void StaticMesh::setMesh( const MeshHandle& value )
 {
-	DC_ABORT_IF( !value.isValid(), "invalid mesh" );
+	NIMBLE_ABORT_IF( !value.isValid(), "invalid mesh" );
 	m_mesh = value;
 }
 
@@ -275,7 +275,7 @@ void StaticMesh::setWorldSpaceBounds( const Bounds& value )
 // ** StaticMesh::setMaterial
 void StaticMesh::setMaterial( u32 index, MaterialHandle value )
 {
-	DC_ABORT_IF( index > 8, "index is out of range" );
+	NIMBLE_ABORT_IF( index > 8, "index is out of range" );
 
 	if( index >= materialCount() ) {
 		m_materials.resize( index + 1 );
@@ -538,7 +538,7 @@ Matrix4 Camera::calculateProjectionMatrix( const Camera& camera, const Viewport&
     case Projection::Perspective:	return Matrix4::perspective( camera.fov(), viewport.aspect(), camera.near(), camera.far() );
 	case Projection::Ortho:			return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
 	case Projection::OrthoCenter:	return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
-	default:			            DC_NOT_IMPLEMENTED;
+	default:			            NIMBLE_NOT_IMPLEMENTED;
 	}
 
 	return Matrix4();
@@ -639,7 +639,7 @@ Circle Camera::sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& t
 Viewport::Viewport( ViewportWPtr viewport )
     : m_viewport( viewport )
 {
-    DC_ABORT_IF( !viewport.valid(), "invalid viewport" );
+    NIMBLE_ABORT_IF( !viewport.valid(), "invalid viewport" );
 
     // Subscribe for a viewport events
     viewport->subscribe<AbstractViewport::TouchBegan>( dcThisMethod( Viewport::handleTouchBegan ) );
@@ -715,7 +715,7 @@ s32 Viewport::eventCount( void ) const
 // ** Viewport::eventAt
 const InputEvent& Viewport::eventAt( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
     return m_events[index];
 }
 

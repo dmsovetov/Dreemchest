@@ -133,10 +133,10 @@ public:
 protected:
 
     //! Called by Box2D when two fixtures begin to touch.
-    virtual void    BeginContact( b2Contact* contact ) DC_DECL_OVERRIDE;
+    virtual void    BeginContact( b2Contact* contact ) NIMBLE_OVERRIDE;
 
     //! Called by Box2D when two fixtures cease to touch.
-    virtual void    EndContact( b2Contact* contact ) DC_DECL_OVERRIDE;
+    virtual void    EndContact( b2Contact* contact ) NIMBLE_OVERRIDE;
 
 private:
 
@@ -158,7 +158,7 @@ s32 Box2DPhysics::Collisions::eventCount( void ) const
 // ** Box2DPhysics::Collisions::event
 const Box2DPhysics::Collisions::Event& Box2DPhysics::Collisions::event( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= eventCount(), "index is out of range" );
     return m_events[index];
 }
 
@@ -231,7 +231,7 @@ SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 {
 	// Query callback
 	struct Callback : public b2QueryCallback {
-		virtual bool ReportFixture( b2Fixture* fixture ) DC_DECL_OVERRIDE {
+		virtual bool ReportFixture( b2Fixture* fixture ) NIMBLE_OVERRIDE {
 			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
 			m_result.insert( entity );
 			return true;
@@ -255,13 +255,13 @@ SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 // ** Box2DPhysics::querySegment
 SceneObjectSet Box2DPhysics::querySegment( const Vec2& start, const Vec2& end ) const
 {
-	DC_BREAK_IF( (start - end).length() < 1.0f, "the queried segment is too short" );
+	NIMBLE_BREAK_IF( (start - end).length() < 1.0f, "the queried segment is too short" );
 
 	// Ray casting callback
 	struct Callback : public b2RayCastCallback {
 		Callback( void ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) DC_DECL_OVERRIDE {
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
 			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
 			m_result.insert( entity );
 			return 1.0f;
@@ -283,7 +283,7 @@ bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersecti
 	struct Callback : public b2RayCastCallback {
 		Callback( void ) : m_hasIntersection( false ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) DC_DECL_OVERRIDE {
+		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
 			m_result = point;
 			m_hasIntersection = true;
 			return 0.0f;
@@ -357,14 +357,14 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
 b2Body* Box2DPhysics::extractPhysicalBody( const RigidBody2D& rigidBody ) const
 {
 	Internal::Ptr physical = rigidBody.internal<Internal>();
-	DC_ABORT_IF( physical == NULL, "invalid internal data" );
+	NIMBLE_ABORT_IF( physical == NULL, "invalid internal data" );
 	return physical->m_body;
 }
 
 // ** Box2DPhysics::prepareForSimulation
 void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
 {
-    DC_BREAK_IF( rigidBody.type() == RigidBody2D::Static, "static objects should not be simulated" );
+    NIMBLE_BREAK_IF( rigidBody.type() == RigidBody2D::Static, "static objects should not be simulated" );
 
     // Kinematic bodies inherit scene transform
     if( rigidBody.type() == RigidBody2D::Kinematic ) {
@@ -485,9 +485,9 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
     RigidBody2D& rigidBody  = *entity.get<RigidBody2D>();
     Transform&   transform  = *entity.get<Transform>();
 
-	DC_ABORT_IF( rigidBody.internal<Internal>().valid(), "internal data should not be valid" )
-	DC_ABORT_IF( shape == NULL, "rigid body should have an attached Shape2D" )
-	DC_ABORT_IF( shape->partCount() == 0, "rigid body shape should not be empty" )
+	NIMBLE_ABORT_IF( rigidBody.internal<Internal>().valid(), "internal data should not be valid" )
+	NIMBLE_ABORT_IF( shape == NULL, "rigid body should have an attached Shape2D" )
+	NIMBLE_ABORT_IF( shape->partCount() == 0, "rigid body shape should not be empty" )
 
     b2BodyDef def;
 
@@ -496,7 +496,7 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 	case RigidBody2D::Static:		def.type = b2_staticBody;	    break;
 	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;      break;
 	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;    break;
-	default:						DC_BREAK;
+	default:						NIMBLE_BREAK;
 	}
 
 	// Set the initial body transform
@@ -523,7 +523,7 @@ void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 		case Shape2DType::Circle:	    addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
 		case Shape2DType::Rect:         addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
 		case Shape2DType::Polygon:      addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
-		default:				        DC_BREAK;
+		default:				        NIMBLE_BREAK;
 		}
 	}
 
@@ -539,10 +539,10 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 {
     RigidBody2D* rigidBody = entity.get<RigidBody2D>();
 	Internal::Ptr physical = rigidBody->internal<Internal>();
-	DC_ABORT_IF( physical == NULL, "internal data should be valid" )
+	NIMBLE_ABORT_IF( physical == NULL, "internal data should be valid" )
 
 	b2Body* body = physical->m_body;
-	DC_ABORT_IF( body == NULL, "Box2D body should be valid" );
+	NIMBLE_ABORT_IF( body == NULL, "Box2D body should be valid" );
 
     body->SetUserData( NULL );
     m_world->DestroyBody( body );

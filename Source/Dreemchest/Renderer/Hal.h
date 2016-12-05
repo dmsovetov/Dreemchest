@@ -718,7 +718,7 @@ namespace Renderer {
 	template<typename TData>
 	TData* ConstantBuffer::lock( void )
 	{
-        DC_BREAK_IF( sizeof( TData ) != m_size, "constant buffer size mismatch" );
+        NIMBLE_BREAK_IF( sizeof( TData ) != m_size, "constant buffer size mismatch" );
 		return reinterpret_cast<TData*>( lock() );
 	}
 

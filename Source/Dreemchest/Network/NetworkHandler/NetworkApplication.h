@@ -150,7 +150,7 @@ namespace Network {
 		typedef Set<ConnectionPtr>						ConnectionSet;
 
         //! Container type to store a list of packet handlers.
-        typedef List<AutoPtr<AbstractPacketHandler>>    PacketHandlerList;
+        typedef List<AutoPtr<AbstractPacketHandler> >   PacketHandlerList;
 
         //! Container type to store mapping from a packet type to a handlers list.
         typedef Map<PacketTypeId, PacketHandlerList>    PacketHandlers;
@@ -167,73 +167,6 @@ namespace Network {
         TrafficPerPacket        m_bytesSentPerPacket;       //!< The total number of bytes sent by each packet type.
         TrafficPerPacket        m_bytesReceivedPerPacket;   //!< The total number of bytes received by each packet type.
 	};
-
-	// ** Application::registerEvent
-	template<typename T>
-	inline void Application::registerEvent( void )
-	{
-		m_eventHandlers[TypeInfo<T>::id()] = DC_NEW EventHandler<T>( &m_eventEmitter );
-	}
-
-	// ** Application::registerRemoteProcedureVoid
-	template<typename TRemoteProcedure>
-	inline void Application::registerRemoteProcedureVoid( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, Void>::Callback& callback )
-	{
-		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, Void>( callback );
-	}
-
-	// ** NetworkHandler::registerRemoteProcedure
-	template<typename TRemoteProcedure>
-	inline void Application::registerRemoteProcedure( const typename RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>::Callback& callback )
-	{
-		m_remoteCallHandlers[TRemoteProcedure::id()] = DC_NEW RemoteCallHandler<typename TRemoteProcedure::Argument, typename TRemoteProcedure::Response>( callback );
-	}
-
-	// ** Application::emitTo
-	template<typename T>
-	inline void Application::emitTo( const T& e, const ConnectionList& listeners )
-	{
-		if( listeners.empty() ) {
-			LogWarning( "rpc", "no listeners to listen for %s\n", TypeInfo<T>::name() );
-			return;
-		}
-
-		// ** Serialize event to a byte buffer.
-		Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
-
-		for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
-            const_cast<ConnectionPtr&>( *i )->send<packets::Event>( TypeInfo<T>::id(), buffer->array() );
-		}
-	}
-
-    // ** Application::addPacketHandler
-    template<typename TPacketHandler>
-    void Application::addPacketHandler( TPacketHandler* instance )
-    {
-        // Register the packet type inside a factory
-        m_packetFactory.declare<typename TPacketHandler::Packet>( TypeInfo<typename TPacketHandler::Packet>::id() );
-
-        // Add this packet handler instance to a list
-        PacketTypeId type = instance->packetTypeId();
-        m_packetHandlers[type].push_back( instance );
-    }
-
-#ifndef DC_CPP11_DISABLED
-    // ** Application::addPacketHandler
-    template<typename TPacketHandler, typename ... TArgs>
-    void Application::addPacketHandler( const TArgs& ... args )
-    {
-        addPacketHandler( DC_NEW TPacketHandler( args... ) );
-    }
-
-	// ** Application::emit
-	template<typename TEvent, typename ... TArgs>
-	void Application::emit( const TArgs& ... args )
-	{
-        TEvent e( args... );
-		emitTo( e, eventListeners() );
-	}
-#endif  /*  DC_CPP11_DISABLED   */
 
 } // namespace Network
     

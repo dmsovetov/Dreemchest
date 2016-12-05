@@ -44,8 +44,8 @@ Application* Application::s_application = NULL;
 // ** Application::Application
 Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
-    DC_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
-    if( !m_impl ) LogWarning( "application", "not implemented on current platform\n" );
+    NIMBLE_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
+    if( !m_impl ) LogWarning( "application", "%s", "not implemented on current platform\n" );
     s_application = this;
 }
 
@@ -102,7 +102,7 @@ s32 Application::launch( ApplicationDelegate* delegate )
 void Application::notifyPrepareToLaunch( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, prepareToLaunch event ignored\n" );
+        LogDebug( "application", "%s", "no application delegate set, prepareToLaunch event ignored\n" );
         return;
     }
 
@@ -113,7 +113,7 @@ void Application::notifyPrepareToLaunch( void )
 void Application::notifyLaunched( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, launch event ignored\n" );
+        LogDebug( "application", "%s", "no application delegate set, launch event ignored\n" );
         return;
     }
 

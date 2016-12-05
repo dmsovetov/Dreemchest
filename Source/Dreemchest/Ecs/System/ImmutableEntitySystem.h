@@ -83,7 +83,7 @@ namespace Ecs {
 			extract<Index + 1>( entity );
 		}
 
-	#ifndef ANDROID // Does not compile with NDK :(
+	#if defined(DC_PLATFORM_WINDOWS) // VS only NDK :(
 		//! Terminates the recursion
 		template<>
 		void extract<sizeof...(TComponents)>( const Entity& entity )
@@ -114,7 +114,7 @@ namespace Ecs {
 	template<typename ... TComponents>
 	void ImmutableEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, const Array<TComponents*>& ... )
 	{
-		DC_NOT_IMPLEMENTED
+		NIMBLE_NOT_IMPLEMENTED
 	}
 
 	// ** ImmutableEntitySystem::process
@@ -128,7 +128,7 @@ namespace Ecs {
 	template<typename ... TComponents>
 	void ImmutableEntitySystem<TComponents...>::entityRemoved( const Entity& entity )
 	{
-		DC_NOT_IMPLEMENTED
+		NIMBLE_NOT_IMPLEMENTED
 	}
 
 #endif	/*	!DC_CPP11_DISABLED	*/

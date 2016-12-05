@@ -86,7 +86,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( u8 index, const Rect& 
 // ** RenderCommandBuffer::acquireRenderTarget
 u8 RenderCommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
 {
-    DC_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
+    NIMBLE_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
 
     OpCode opCode;
     opCode.type = OpCode::AcquireRenderTarget;

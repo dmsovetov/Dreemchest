@@ -114,7 +114,7 @@ s32 Emitter::particlesCount( void ) const
 // ** Emitter::particles
 ParticlesWPtr Emitter::particles( s32 index ) const
 {
-	DC_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
 	return m_particles[index];
 }
 
@@ -122,7 +122,7 @@ ParticlesWPtr Emitter::particles( s32 index ) const
 void Emitter::removeParticles( const ParticlesWPtr& particles )
 {
 	ParticlesArray::iterator i = std::find( m_particles.begin(), m_particles.end(), particles );
-    DC_BREAK_IF( i == m_particles.end(), "emitter does not contain this particles" );
+    NIMBLE_BREAK_IF( i == m_particles.end(), "emitter does not contain this particles" );
 
 	if( i == m_particles.end() ) {
 		return;
@@ -143,7 +143,7 @@ ParticlesWPtr Emitter::addParticles( void )
 // ** Emitter::addModule
 void Emitter::addModule( const ModulePtr& module )
 {
-	DC_ABORT_IF( !module.valid(), "invalid module" );
+	NIMBLE_ABORT_IF( !module.valid(), "invalid module" );
 	LogDebug( "emitter", "module %s added\n", module->name().c_str() );
 	m_modules.push_back( module );
 }
@@ -157,7 +157,7 @@ s32 Emitter::burstCount( void ) const
 // ** Emitter::burst
 const ParticleBurst& Emitter::burst( s32 index ) const
 {
-	DC_ABORT_IF( index < 0 || index >= burstCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( index < 0 || index >= burstCount(), "index is out of range" );
 	return m_bursts[index];
 }
 
@@ -321,7 +321,7 @@ s32 EmitterInstance::particlesCount( void ) const
 // ** EmitterInstance::particles
 ParticlesInstanceWPtr EmitterInstance::particles( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= particlesCount(), "index is out of range" );
 	return m_particles[index];
 }
 
@@ -411,7 +411,7 @@ bool EmitterInstance::isLooped( void ) const
 // ** EmitterInstance::warmUp
 void EmitterInstance::warmUp( f32 dt, const Vec3& position )
 {
-	DC_BREAK_IF( m_emitter->isLooped() );
+	NIMBLE_BREAK_IF( m_emitter->isLooped() );
 
     s32 iterations = static_cast<s32>( m_emitter->duration() / dt );
 

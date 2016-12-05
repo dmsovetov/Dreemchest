@@ -49,7 +49,7 @@ Ecs::Ecs( const EntityIdGeneratorPtr& entityIdGenerator ) : m_entityId( entityId
 // ** Ecs::create
 EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 {
-	DC_BREAK_IF( !entityIdGenerator.valid(), "invalid entity id generator" );
+	NIMBLE_BREAK_IF( !entityIdGenerator.valid(), "invalid entity id generator" );
 	return DC_NEW Ecs( entityIdGenerator );
 }
 
@@ -74,14 +74,14 @@ EntityId Ecs::generateId( void ) const
 // ** Ecs::addEntity
 void Ecs::addEntity( EntityPtr entity )
 {
-	DC_BREAK_IF( !entity.valid(), "invalid entity" );
+	NIMBLE_BREAK_IF( !entity.valid(), "invalid entity" );
 
 	const EntityId& id = entity->id();
     if( id.isNull() ) {
-        LogWarning( "entity", "adding entity with an invalid id\n" );
+        LogWarning( "entity", "%s", "adding entity with an invalid id\n" );
     }
 
-	DC_BREAK_IF( isUsedId( id ), "entity id is already used" );
+	NIMBLE_BREAK_IF( isUsedId( id ), "entity id is already used" );
 
 	// Setup entity
 	entity->setEcs( this );
@@ -99,7 +99,7 @@ s32 Ecs::addEntities( const EntityArray& entities )
     s32 addedCount = 0;
 
     for( s32 i = 0, n = static_cast<s32>( entities.size() ); i < n; i++ ) {
-        DC_BREAK_IF( !entities[i].valid(), "invalid entity" );
+        NIMBLE_BREAK_IF( !entities[i].valid(), "invalid entity" );
 
         // Don't add the same entity twice
         if( isUsedId( entities[i]->id() ) ) {
@@ -189,7 +189,7 @@ EntitySet Ecs::findByAspect( const Aspect& aspect ) const
 // ** Ecs::removeEntity
 void Ecs::removeEntity( const EntityId& id )
 {
-	DC_BREAK_IF( !isUsedId( id ), "entity does not exist" );
+	NIMBLE_BREAK_IF( !isUsedId( id ), "entity does not exist" );
 
 	Entities::iterator i = m_entities.find( id );
 

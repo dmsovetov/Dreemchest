@@ -240,7 +240,7 @@ namespace Scene {
     // ** VertexFormat::attributeOffset
     NIMBLE_INLINE s32 VertexFormat::attributeOffset( Attribute attribute ) const
     {
-        DC_ABORT_IF( (m_attributes & attribute) == 0, "a vertex format does not contain a specified attribute" );
+        NIMBLE_ABORT_IF( (m_attributes & attribute) == 0, "a vertex format does not contain a specified attribute" );
 
         s32 offset = 0;
 
@@ -280,7 +280,7 @@ namespace Scene {
     TValue VertexFormat::vertexAttribute( Attribute attribute, const void* vertices, s32 index ) const
     {
         if( m_attributes & attribute ) {
-            DC_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
+            NIMBLE_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
             return *reinterpret_cast<const TValue*>( reinterpret_cast<const u8*>( vertices ) + vertexOffset( index ) + attributeOffset( attribute ) );
         }
 
@@ -292,7 +292,7 @@ namespace Scene {
     void VertexFormat::setVertexAttribute( Attribute attribute, const TValue& value, void* vertices, s32 index ) const
     {
         if( m_attributes & attribute ) {
-            DC_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
+            NIMBLE_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
             *reinterpret_cast<TValue*>( reinterpret_cast<u8*>( vertices ) + vertexOffset( index ) + attributeOffset( attribute ) ) = value;
         }
     }

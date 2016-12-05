@@ -34,12 +34,12 @@ DC_BEGIN_DREEMCHEST
 namespace Ecs {
 
 	//! A base class for internal system data attached to a components.
-	struct InternalBase : public RefCounted {
+	struct MixInBase : public RefCounted {
 	};
 
 	//! A template class used for declaring system-specific internal data.
 	template<typename T>
-	struct Internal : public InternalBase {
+	struct MixIn : public MixInBase {
 		typedef StrongPtr<T> Ptr;	//!< The internal data pointer.
 	};
 
@@ -65,11 +65,11 @@ namespace Ecs {
 
 		//! Sets the internal data.
 		template<typename T>
-		void						setInternal( InternalBase* value );
+		void						setInternal( MixInBase* value );
 
 		//! Returns the internal data.
 		template<typename T>
-		typename Internal<T>::Ptr	internal( void ) const;
+		typename MixIn<T>::Ptr      mixIn( void ) const;
 
 		//! Returns component flags.
 		u32							flags( void ) const;
@@ -106,7 +106,7 @@ namespace Ecs {
 	protected:
 
 		//! Container type to store internal system state inside a component.
-		typedef Map< TypeIdx, StrongPtr<InternalBase> > InternalDataHolder;
+		typedef Map< TypeIdx, StrongPtr<MixInBase> > InternalDataHolder;
 
         EntityWPtr                  m_entity;   //!< Entity instance this component is attached to.
 		InternalDataHolder			m_internal;	//!< The internal data.
@@ -115,14 +115,14 @@ namespace Ecs {
 
 	// ** ComponentBase::setInternal
 	template<typename T>
-	inline void ComponentBase::setInternal( InternalBase* value )
+	inline void ComponentBase::setInternal( MixInBase* value )
 	{
 		m_internal[TypeIndex<T>::idx()] = value;
 	}
 
 	// ** ComponentBase::internal
 	template<typename T>
-	inline typename Internal<T>::Ptr ComponentBase::internal( void ) const
+	inline typename MixIn<T>::Ptr ComponentBase::mixIn( void ) const
 	{
 		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
 
@@ -130,7 +130,7 @@ namespace Ecs {
 			return static_cast<T*>( i->second.get() );
 		}
 
-		return typename Internal<T>::Ptr();
+		return typename MixIn<T>::Ptr();
 	}
 
 	// ** ComponentBase::flags
@@ -166,7 +166,7 @@ namespace Ecs {
     // ** ComponentBase::setParentEntity
     inline void ComponentBase::setParentEntity( const EntityWPtr& value )
     {
-        DC_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value, "parent entity of a component is already set" );
+        NIMBLE_BREAK_IF( value.valid() && m_entity.valid() && m_entity != value, "parent entity of a component is already set" );
         m_entity = value;
     }
 
@@ -188,7 +188,7 @@ namespace Ecs {
 		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( ComponentBase::typeId<T>() ); return result; }
 
     #if DC_ECS_ENTITY_CLONING
-        virtual ComponentPtr    deepCopy( void ) const DC_DECL_OVERRIDE;
+        virtual ComponentPtr    deepCopy( void ) const NIMBLE_OVERRIDE;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 	};
 

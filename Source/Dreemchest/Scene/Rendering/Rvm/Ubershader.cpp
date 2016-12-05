@@ -70,7 +70,7 @@ void Ubershader::setFragment( const String& value )
 void Ubershader::addFeature( Bitmask mask, const String& name )
 {
     u32 offset = 0;
-    for( offset = 0; offset < sizeof Bitset * 8; offset++ ) {
+    for( offset = 0; offset < sizeof( Bitset ) * 8; offset++ ) {
         if( (static_cast<u64>( 1 ) << offset & mask) != 0 ) {
             break;
         }
@@ -93,7 +93,7 @@ s32 Ubershader::featureCount( void ) const
 // ** Ubershader::feature
 const Ubershader::Feature& Ubershader::feature( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= featureCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= featureCount(), "index is out of range" );
     return m_features[index];
 }
 
@@ -139,7 +139,7 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
 
 	// Compile the shader
 	Renderer::ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
-    DC_BREAK_IF( !compiled.valid() );
+    NIMBLE_BREAK_IF( !compiled.valid() );
 
     m_permutations[features] = compiled;
 

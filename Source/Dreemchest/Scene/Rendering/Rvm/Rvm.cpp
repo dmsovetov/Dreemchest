@@ -89,19 +89,19 @@ Rvm::IntermediateTargetStack::IntermediateTargetStack( RenderingContextWPtr cont
 // ** Rvm::IntermediateTargetStack::pushFrame
 void Rvm::IntermediateTargetStack::pushFrame( void )
 {
-    DC_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
+    NIMBLE_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
     m_stackFrame += StackFrameSize;
 }
 
 // ** Rvm::IntermediateTargetStack::popFrame
 void Rvm::IntermediateTargetStack::popFrame( void )
 {
-    DC_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
+    NIMBLE_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
 
     // Ensure that all render targets were released
     for( s32 i = 0; i < StackFrameSize; i++ ) {
         if( m_stackFrame[i] ) {
-            LogWarning( "rvm", "an intermediate render target was not released before popping a stack frame\n" );
+            LogWarning( "rvm", "%s", "an intermediate render target was not released before popping a stack frame\n" );
         }
     }
 
@@ -112,21 +112,21 @@ void Rvm::IntermediateTargetStack::popFrame( void )
 // ** Rvm::IntermediateTargetStack::get
 Renderer::RenderTargetWPtr Rvm::IntermediateTargetStack::get( u8 index ) const
 {
-    DC_ABORT_IF( index == 0, "invalid render target index" );
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     return m_context->intermediateRenderTarget( m_stackFrame[index - 1] );
 }
 
 // ** Rvm::IntermediateTargetStack::acquire
 void Rvm::IntermediateTargetStack::acquire( u8 index, u16 width, u16 height, Renderer::PixelFormat format )
 {
-    DC_ABORT_IF( index == 0, "invalid render target index" );
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = m_context->acquireRenderTarget( width, height, format );
 }
 
 // ** Rvm::IntermediateTargetStack::release
 void Rvm::IntermediateTargetStack::release( u8 index )
 {
-    DC_ABORT_IF( index == 0, "invalid render target index" );
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_context->releaseRenderTarget( m_stackFrame[index - 1] );
     m_stackFrame[index - 1] = 0;
 }
@@ -250,7 +250,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                     m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
                                                                 }
                                                                 break;
-        default:                                                DC_NOT_IMPLEMENTED;
+        default:                                                NIMBLE_NOT_IMPLEMENTED;
         }
     }
 
@@ -354,13 +354,13 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
             activeStateMask = activeStateMask | stateBit;
 
             // Finally apply a state
-            DC_ABORT_IF( m_stateSwitches[state.type] == NULL, "unhandled render state type" );
+            NIMBLE_ABORT_IF( m_stateSwitches[state.type] == NULL, "unhandled render state type" );
             (this->*m_stateSwitches[state.type])( frame, state );
         }
     }
 
     // Finally apply a shader
-    DC_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
+    NIMBLE_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
 
     // Select a shader permutation that match an active pipeline state
     Ubershader::Bitmask supported   = m_activeShader.shader->supportedFeatures();
@@ -456,9 +456,9 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
         const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
         m_hal->setTexture( state.data.index, texture.get() );
     } else {
-        DC_BREAK_IF( abs( id ) > 255, "invalid identifier" );
+        NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
         Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTarget::Attachment>( state.data.index >> 4 ) );
-        DC_BREAK_IF( !texture.valid(), "invalid render target attachment" );
+        NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
         m_hal->setTexture( samplerIndex, texture.get() );
     }
 

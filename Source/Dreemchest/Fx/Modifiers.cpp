@@ -48,7 +48,7 @@ Modifier* Modifier::create( ModifierType type )
 	case ModifierForceField:	return DC_NEW ForceField;
 	}
 
-	DC_BREAK_IF( true, "unhandled modifier type" );
+	NIMBLE_BREAK_IF( true, "unhandled modifier type" );
 
 	return NULL;
 }
@@ -106,7 +106,7 @@ void ForceField::setQuadratic( bool value )
 // ** ForceField::apply
 void ForceField::apply( float dt, float scalar, Particles *particles )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 /*
 	// ** Sample parameters
 	float x = SampleParameter( &m_x, 0.0f );
@@ -153,7 +153,7 @@ Friction::Friction( void )
 // ** Friction::apply
 void Friction::apply( float dt, float scalar, Particles *particles )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 /*
 	float value = SampleParameter( &m_value, 0.0f );
     float ratio = 1.0f - std::min( 1.0f, value * dt );
@@ -185,7 +185,7 @@ Force::Force( void )
 // ** Force::apply
 void Force::apply( float dt, float scalar, Particles *particles )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 /*
 	float x = SampleParameter( &m_x, 0.0f );
 	float y = SampleParameter( &m_y, 0.0f );

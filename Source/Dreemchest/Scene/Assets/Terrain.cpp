@@ -43,7 +43,7 @@ s32 Terrain::kMaxSize = 2048;
 Terrain::Terrain( u32 size )
 	: m_heightmap( size ), m_maxHeight( static_cast<f32>( size ) )
 {
-	DC_BREAK_IF( (size % kChunkSize) != 0, "terrain size should be a multiple of chunk size" );
+	NIMBLE_BREAK_IF( (size % kChunkSize) != 0, "terrain size should be a multiple of chunk size" );
 }
 
 // ** Terrain::size
@@ -159,8 +159,8 @@ Heightmap& Terrain::heightmap( void )
 // ** Terrain::chunkVertexBuffer
 Array<Terrain::Vertex> Terrain::chunkVertexBuffer( u32 x, u32 z ) const
 {
-	DC_ABORT_IF( x >= chunkCount(), "invalid chunk coordinate" )
-	DC_ABORT_IF( z >= chunkCount(), "invalid chunk coordinate" )
+	NIMBLE_ABORT_IF( x >= chunkCount(), "invalid chunk coordinate" )
+	NIMBLE_ABORT_IF( z >= chunkCount(), "invalid chunk coordinate" )
 
 	// UV tiling
 	f32 uvSize = 1.0f / m_heightmap.size();
@@ -289,7 +289,7 @@ void Terrain::setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices,
 	mesh.setVertexBuffer( vb );
 	mesh.setIndexBuffer( indices );
 #else
-    DC_NOT_IMPLEMENTED
+    NIMBLE_NOT_IMPLEMENTED
 #endif
 }
 
@@ -313,21 +313,21 @@ u32 Heightmap::size( void ) const
 Heightmap::Type Heightmap::maxValue( void ) const
 {
 	Type value = ~static_cast<Type>( 0 );
-	DC_BREAK_IF( value <= 0, "invalid maximum value" );
+	NIMBLE_BREAK_IF( value <= 0, "invalid maximum value" );
 	return value;
 }
 
 // ** Heightmap::height
 Heightmap::Type Heightmap::height( u32 x, u32 z ) const
 {
-	DC_ABORT_IF( x > m_size || z > m_size, "index is out of range" );
+	NIMBLE_ABORT_IF( x > m_size || z > m_size, "index is out of range" );
 	return m_buffer[z * (m_size + 1) + x];
 }
 
 // ** Heightmap::setHeight
 void Heightmap::setHeight( u32 x, u32 z, Type value )
 {
-	DC_ABORT_IF( x > m_size || z > m_size, "index is out of range" );
+	NIMBLE_ABORT_IF( x > m_size || z > m_size, "index is out of range" );
 	m_buffer[z * (m_size + 1) + x] = value;
 }
 

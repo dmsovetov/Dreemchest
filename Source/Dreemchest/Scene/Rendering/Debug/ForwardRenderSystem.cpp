@@ -39,7 +39,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
     , m_ambient( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::ClipPlanes, RenderScene::CBuffer::ClipPlanes::Layout );
+    m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
@@ -86,7 +86,8 @@ void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, RenderCommandBuff
     }
 
     // Render a light pass
-    renderLight( frame, commands, stateStack, light, &RenderScene::CBuffer::ClipPlanes::fromViewProjection( viewProjection ), shadowTexture );
+    RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromViewProjection( viewProjection );
+    renderLight( frame, commands, stateStack, light, &clip, shadowTexture );
 
     // Release an intermediate shadow render target
     if( shadowTexture ) {
@@ -98,7 +99,8 @@ void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, RenderCommandBuff
 void ForwardRenderSystem::renderPointLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
     // Render a light pass
-    renderLight( frame, commands, stateStack, light, &RenderScene::CBuffer::ClipPlanes::fromSphere( *light.matrix * Vec3::zero(), light.light->range() ), 0 );
+    RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromSphere( *light.matrix * Vec3::zero(), light.light->range() );
+    renderLight( frame, commands, stateStack, light, &clip, 0 );
 }
 
 // ** ForwardRenderSystem::renderDirectionalLight
@@ -158,7 +160,7 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
     StateScope clipper = stateStack.newScope();
 
     if( clip ) {
-        commands.uploadConstantBuffer( m_clipPlanesCBuffer, frame.internBuffer( clip, sizeof RenderScene::CBuffer::ClipPlanes ), sizeof RenderScene::CBuffer::ClipPlanes );
+        commands.uploadConstantBuffer( m_clipPlanesCBuffer, frame.internBuffer( clip, sizeof( RenderScene::CBuffer::ClipPlanes ) ), sizeof( RenderScene::CBuffer::ClipPlanes ) );
         clipper->bindConstantBuffer( m_clipPlanesCBuffer, RenderState::ClippingPlanes );
     }
 

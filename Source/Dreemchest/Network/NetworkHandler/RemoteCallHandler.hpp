@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,46 +21,47 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#ifndef __DC_PosixThread_H__
-#define __DC_PosixThread_H__
+#ifndef	__DC_Network_RemoteCallHandler_Hpp__
+#define	__DC_Network_RemoteCallHandler_Hpp__
 
-#include "Posix.h"
-#include "../Thread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Threads {
-        
-    // ** class PosixThread
-    //! POSIX thread implementation.
-    class PosixThread : public Thread {
-    public:
+namespace Network {
 
-                            PosixThread( void );
-        virtual             ~PosixThread( void );
+// ** Response::operator()
+template<>
+inline bool Response<Void>::operator()( const Void& value, const Error& error )
+{
+    LogWarning( "rpc", "%s", "void responses are ignored\n" );
+    return true;
+}
 
-        // ** Thread
-        virtual void        start( const ThreadCallback& callback, void *userData );
-        virtual void        yield( void );
-		virtual void		wait( void ) const;
-		
-		// ** PosixThread
-		static void			threadYield( void );
+template<>
+inline Response<Void>::Response( const ConnectionWPtr& connection, u16 id ) : m_connection( connection ), m_id( id ), m_wasSent( true )
+{
+}
 
-    private:
+// ** RemoteCallHandler::handle
+template<typename T, typename R>
+inline void RemoteCallHandler<T, R>::handle( ConnectionWPtr connection, const Packets::RemoteCall& packet )
+{
+    ResponseType response( connection, packet.id );
+    m_callback( connection, response, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
+}
 
-        static void*        threadProc( void *data );
-
-    private:
-
-        pthread_t           m_thread;
-    };
-
-} // namespace Threads
+// ** RemoteResponseHandler::handle
+template<typename T>
+inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
+{
+    m_callback( connection, packet.error, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
+}
+    
+} // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_PosixThread_H__    */
+#endif	/*	!__DC_Network_RemoteCallHandler_Hpp__	*/

@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#include    "PosixMutex.h"
-#include	"PosixThread.h"
+#include "PosixMutex.h"
+#include "PosixThread.h"
 
-#include    "../Thread.h"
+#include "../Thread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** PosixMutex::PosixMutex
 PosixMutex::PosixMutex( bool recursive )
@@ -39,36 +39,36 @@ PosixMutex::PosixMutex( bool recursive )
     u32 result = 0;
     
     result = pthread_mutexattr_init( &m_attr );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
     
     result = pthread_mutexattr_settype( &m_attr, recursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_DEFAULT );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 
     result = pthread_mutex_init( &m_mutex, &m_attr );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 PosixMutex::~PosixMutex( void )
 {
     u32 result = pthread_mutex_destroy( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 
     result = pthread_mutexattr_destroy( &m_attr );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 // ** PosixMutex::lock
 void PosixMutex::lock( void )
 {
     u32 result = pthread_mutex_lock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 // ** PosixMutex::unlock
 void PosixMutex::unlock( void )
 {
     u32 result = pthread_mutex_unlock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 // ** PosixMutex::tryLock
@@ -86,11 +86,11 @@ PosixCondition::PosixCondition( void )
     
     // ** Create condition var
     result = pthread_cond_init( &m_condition, NULL );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 
     // ** Create condition mutex
     result = pthread_mutex_init( &m_mutex, NULL );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 PosixCondition::~PosixCondition( void )
@@ -98,14 +98,14 @@ PosixCondition::~PosixCondition( void )
     u32 result = 0;
 
     result = pthread_cond_destroy( &m_condition );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 
     while( pthread_mutex_trylock( &m_mutex ) == 0 ) {
 		PosixThread::threadYield();
     }
     pthread_mutex_unlock( &m_mutex );
     result = pthread_mutex_destroy( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 // ** PosixCondition::wait
@@ -114,13 +114,13 @@ void PosixCondition::wait( void )
     u32 result = 0;
 
     result = pthread_mutex_lock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
     
     result = pthread_cond_wait( &m_condition, &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 
     result = pthread_mutex_unlock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
 // ** PosixCondition::trigger
@@ -129,15 +129,15 @@ void PosixCondition::trigger( void )
     u32 result = 0;
 
     result = pthread_mutex_lock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
     
     result = pthread_cond_signal( &m_condition );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
     
     result = pthread_mutex_unlock( &m_mutex );
-    DC_BREAK_IF( result );
+    NIMBLE_BREAK_IF( result );
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

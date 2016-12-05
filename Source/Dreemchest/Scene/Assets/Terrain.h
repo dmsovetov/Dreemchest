@@ -78,7 +78,7 @@ namespace Scene {
 									: m_value( value ) {}
 
 			//! Returns the constant terrain height.
-			virtual Type		calculate( u32 x, u32 z ) DC_DECL_OVERRIDE { return m_value; }
+			virtual Type		calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return m_value; }
 
 		private:
 
@@ -94,7 +94,7 @@ namespace Scene {
 									: m_min( min ), m_max( max ) {}
 
 			//! Returns the random terrain height.
-			virtual Type		calculate( u32 x, u32 z ) DC_DECL_OVERRIDE { return randomValue( m_min, m_max ); }
+			virtual Type		calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return randomValue( m_min, m_max ); }
 
 		private:
 

@@ -84,7 +84,7 @@ namespace Scene {
     //! Returns a command buffer at specified index.
     NIMBLE_INLINE const RenderCommandBuffer& RenderFrame::commandBufferAt( s32 index ) const
     {
-        DC_ABORT_IF( index < 0 || index >= commandBufferCount(), "index is out of range" );
+        NIMBLE_ABORT_IF( index < 0 || index >= commandBufferCount(), "index is out of range" );
         return *m_commandBuffers[index].get();
     }
 

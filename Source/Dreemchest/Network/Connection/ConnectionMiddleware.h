@@ -81,7 +81,7 @@ namespace Network {
 	protected:
 
 		//! Sends the Ping packet over a connection when the specified amount of time passed.
-		virtual void		update( u32 dt ) DC_DECL_OVERRIDE;
+		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
 
 	private:
 
@@ -98,7 +98,7 @@ namespace Network {
 	protected:
 
 		//! Sends the KeepAlive packet over a connection when the specified amount of time passed.
-		virtual void		update( u32 dt ) DC_DECL_OVERRIDE;
+		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
 	};
 
 	//! Middleware to close the connection on time out.
@@ -111,7 +111,7 @@ namespace Network {
 	protected:
 
 		//! Closes the connection instance if there are no packets received in a specified interval of time.
-		virtual void		update( u32 dt ) DC_DECL_OVERRIDE;
+		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
 
 	protected:
 

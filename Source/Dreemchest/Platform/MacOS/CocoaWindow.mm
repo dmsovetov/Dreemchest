@@ -29,7 +29,7 @@
 
 @implementation CocoaWindow
 
-- ( void )setWindow : ( platform::MacOSWindow* )window
+- ( void )setWindow : ( Platform::MacOSWindow* )window
 {
     m_window = window;
 }
@@ -108,14 +108,14 @@
 // ** keyDown
 - ( void )keyDown : ( NSEvent* )event
 {
-    platform::log::warn( "CocoaWindow::keyDown : not implemented\n" );
+    NIMBLE_NOT_IMPLEMENTED
     [super keyDown:event];
 }
 
 // ** keyUp
 - ( void )keyUp : ( NSEvent* )event
 {
-    platform::log::warn( "CocoaWindow::keyUp : not implemented\n" );
+    NIMBLE_NOT_IMPLEMENTED
     [super keyUp:event];
 }
 

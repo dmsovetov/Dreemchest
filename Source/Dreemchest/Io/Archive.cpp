@@ -67,7 +67,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 							#ifdef HAVE_FASTLZ
 								return DC_NEW FastLZBufferCompressor;
 							#else
-								LogWarning( "archive", "unsupported FastLZ compressor requested\n" );
+								LogWarning( "archive", "%s", "unsupported FastLZ compressor requested\n" );
 							#endif
                             break;
 
@@ -75,7 +75,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 							#ifdef HAVE_FASTLZ
 								return DC_NEW ZLibBufferCompressor;
 							#else
-								LogWarning( "archive", "unsupported ZLib compressor requested\n" );
+								LogWarning( "archive", "%s", "unsupported ZLib compressor requested\n" );
 							#endif
                             break;
 
@@ -191,7 +191,7 @@ StreamPtr Archive::openFile( const Path& fileName ) const
         file = m_diskFileSystem->openFile( m_fileName );
     }
 
-    DC_BREAK_IF( file == NULL );
+    NIMBLE_BREAK_IF( file == NULL );
     if( file == NULL ) {
         return StreamPtr();
     }
@@ -208,7 +208,7 @@ StreamPtr Archive::openFile( const Path& fileName, StreamMode mode ) const
 		return openFile( fileName );
 	}
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
 	return StreamPtr();
 }
 

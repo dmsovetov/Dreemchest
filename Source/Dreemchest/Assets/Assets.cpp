@@ -50,7 +50,7 @@ Assets::~Assets( void )
 // ** Assets::addAsset
 Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source )
 {
-    DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
+    NIMBLE_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
 
     // Find an asset cache for this type of asset
     AbstractAssetCache& cache = findAssetCache( type );
@@ -75,7 +75,7 @@ bool Assets::removeAsset( const AssetId& id )
 {
     // Find index by id.
     AssetIndexById::iterator i = m_indexById.find( id );
-    DC_BREAK_IF( i == m_indexById.end() );
+    NIMBLE_BREAK_IF( i == m_indexById.end() );
 
     // Store the slot before and remove the handle mapping.
     Index index = i->second;
@@ -120,7 +120,7 @@ TypeId Assets::typeFromName( const String& value ) const
     Map<String, TypeId>::const_iterator i = m_nameToType.find( value );
     
     if( i == m_nameToType.end() ) {
-        DC_BREAK;
+        NIMBLE_BREAK;
         return 0;
     }
 
@@ -133,7 +133,7 @@ String Assets::assetTypeName( const TypeId& type ) const
     Map<TypeId, String>::const_iterator i = m_typeToName.find( type );
     
     if( i == m_typeToName.end() ) {
-        DC_BREAK;
+        NIMBLE_BREAK;
         return "";
     }
 
@@ -167,7 +167,7 @@ AbstractAssetCache& Assets::findAssetCache( const TypeId& type ) const
         return *i->second;
     }
 
-    DC_ABORT_IF( true, "unknown asset type" );
+    NIMBLE_ABORT_IF( true, "unknown asset type" );
     return *reinterpret_cast<AbstractAssetCache*>( NULL );
 }
 
@@ -229,7 +229,7 @@ bool Assets::forceLoad( const Handle& asset )
 // ** Assets::forceUnload
 void Assets::forceUnload( Handle asset )
 {
-    DC_BREAK_IF( !asset->isLoaded(), "an asset was not loaded" );
+    NIMBLE_BREAK_IF( !asset->isLoaded(), "an asset was not loaded" );
 
     // Mark this asset as unloaded
     asset->switchToState( Asset::Unloaded );

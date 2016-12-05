@@ -149,7 +149,7 @@ namespace Scene {
     // ** RenderCommandBuffer::opCodeAt
     NIMBLE_INLINE const RenderCommandBuffer::OpCode& RenderCommandBuffer::opCodeAt( s32 index ) const
     {
-        DC_ABORT_IF( index < 0 || index >= size(), "index is out of range" );
+        NIMBLE_ABORT_IF( index < 0 || index >= size(), "index is out of range" );
         return m_commands[index];
     }
 

@@ -39,7 +39,7 @@ String VariantTextStream::stringify( const Variant& kv, bool formatted )
 	Json::Value json = toJson( kv );
 	return formatted ? json.toStyledString() : Json::FastWriter().write( json );
 #else
-	LogError( "variant", "failed to convert to string, built with no JSON support.\n" );
+	LogError( "variant", "%s", "failed to convert to string, built with no JSON support.\n" );
 	return "";
 #endif	/*	HAVE_JSON	*/
 }
@@ -52,13 +52,13 @@ Variant VariantTextStream::parse( const String& text )
 	Json::Reader reader;
 	
 	if( !reader.parse( text, json ) ) {
-		LogError( "keyValue", "failed to parse JSON string.\n" );
+		LogError( "keyValue", "%s", "failed to parse JSON string.\n" );
 		return Variant();
 	}
 
 	return fromJson( json );
 #else
-	LogError( "variant", "failed to parse from string, built with no JSON support.\n" );
+	LogError( "variant", "%s", "failed to parse from string, built with no JSON support.\n" );
 	return Variant();
 #endif	/*	HAVE_JSON	*/
 }
@@ -282,7 +282,7 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
                                     if( Parser::vec2( json, vec2 ) ) return Variant::fromValue<Vec2>( vec2 );
                                     if( Parser::guid( json, guid ) ) return Variant::fromValue<Guid>( guid );
 
-                                    DC_BREAK_IF( !json["typeID"].isNull() );
+                                    NIMBLE_BREAK_IF( !json["typeID"].isNull() );
 									KeyValue kv;
 
 									for( Json::Value::const_iterator i = json.begin(), end = json.end(); i != end; i++ ) {
@@ -293,7 +293,7 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
 									return Variant::fromValue<KeyValue>( kv );
 								}
 								break;
-	default:					DC_BREAK;
+	default:					NIMBLE_BREAK;
 	}
 
 	return Variant();
@@ -304,13 +304,13 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
 // ** BinaryVariantStream::BinaryVariantStream
 BinaryVariantStream::BinaryVariantStream( StreamPtr stream ) : m_stream( stream )
 {
-    DC_BREAK_IF( !m_stream.valid(), "invalid stream" );
+    NIMBLE_BREAK_IF( !m_stream.valid(), "invalid stream" );
 }
 
 // ** BinaryVariantStream::write
 s32 BinaryVariantStream::write( const Variant& value )
 {
-	DC_BREAK_IF( !m_stream.valid() );
+	NIMBLE_BREAK_IF( !m_stream.valid() );
 
 	// KeyValue layout type placeholder.
 	u32 type = 0;
@@ -517,7 +517,7 @@ void BinaryVariantStream::writeValue( const Variant& value )
 
 	case kArray:	{
                         VariantArray::Container array = value.as<VariantArray>();
-						DC_BREAK_IF( array.size() >= USHRT_MAX );
+						NIMBLE_BREAK_IF( array.size() >= USHRT_MAX );
 
 						u16 count = array.size();
 						m_stream->write( &count, 2 );
@@ -528,7 +528,7 @@ void BinaryVariantStream::writeValue( const Variant& value )
 					}
 					break;
 
-	default:		DC_BREAK;
+	default:		NIMBLE_BREAK;
 	}
 }
 
@@ -556,7 +556,7 @@ BinaryVariantStream::Type BinaryVariantStream::valueType( const Variant& value )
 
     LogError( "binaryVariantStream", "unhandled variant type '%s'\n", type->name() );
 
-    //DC_NOT_IMPLEMENTED;
+    //NIMBLE_NOT_IMPLEMENTED;
     return kNull;
 }
 

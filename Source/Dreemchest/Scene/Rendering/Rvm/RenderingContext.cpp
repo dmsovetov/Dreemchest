@@ -58,7 +58,7 @@ void RenderingContext::constructResources( void )
 
     // Construct all resources
     for( ResourceConstructors::const_iterator i = m_resourceConstructors.begin(), end = m_resourceConstructors.end(); i != end; ++i ) {
-        DC_ABORT_IF( kConstructors[i->type] == NULL, "unhandled resource constructor type" );
+        NIMBLE_ABORT_IF( kConstructors[i->type] == NULL, "unhandled resource constructor type" );
         ( this->*kConstructors[i->type] )( *i );
     }
 
@@ -69,7 +69,7 @@ void RenderingContext::constructResources( void )
 // ** RenderingContext::constructInputLayout
 void RenderingContext::constructInputLayout( const ResourceConstructor& constructor )
 {
-    DC_BREAK_IF( m_inputLayoutPool[constructor.id - 1].valid(), "resource was already constructed" );
+    NIMBLE_BREAK_IF( m_inputLayoutPool[constructor.id - 1].valid(), "resource was already constructed" );
 
     // Create an input layout vertex format
     VertexFormat format( constructor.inputLayout.format );
@@ -101,7 +101,7 @@ void RenderingContext::constructInputLayout( const ResourceConstructor& construc
 // ** RenderingContext::constructVertexBuffer
 void RenderingContext::constructVertexBuffer( const ResourceConstructor& constructor )
 {
-    DC_BREAK_IF( m_vertexBufferPool[constructor.id - 1].valid(), "resource was already constructed" );
+    NIMBLE_BREAK_IF( m_vertexBufferPool[constructor.id - 1].valid(), "resource was already constructed" );
 
     // Create a vertex buffer instance
     Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( constructor.buffer.size );
@@ -295,12 +295,12 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 	String code = Io::DiskFileSystem::readTextFile( fileName );
 
 	// Extract vertex/fragment shader code blocks
-	u32 vertexBegin = code.find( vertexShaderMarker );
-	u32 fragmentBegin = code.find( fragmentShaderMarker );
-    u32 featuresBegin = code.find( featuresMarker );
+	size_t vertexBegin   = code.find( vertexShaderMarker );
+	size_t fragmentBegin = code.find( fragmentShaderMarker );
+    size_t featuresBegin = code.find( featuresMarker );
 
 	if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
-		return false;
+		return UbershaderPtr();
 	}
 
     if( featuresBegin != String::npos ) {
@@ -398,35 +398,35 @@ Renderer::RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderRes
 // ** RenderingContext::vertexBuffer
 const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( RenderResource identifier ) const
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_vertexBufferPool[identifier - 1];
 }
         
 // ** RenderingContext::indexBuffer
 const Renderer::IndexBufferPtr& RenderingContext::indexBuffer( RenderResource identifier ) const
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_indexBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::constantBuffer
 const Renderer::ConstantBufferPtr& RenderingContext::constantBuffer( RenderResource identifier ) const
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_constantBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::inputLayout
 const Renderer::InputLayoutPtr& RenderingContext::inputLayout( RenderResource identifier ) const
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_inputLayoutPool[identifier - 1];
 }
         
 // ** RenderingContext::texture
 const Renderer::TexturePtr& RenderingContext::texture( s32 identifier ) const
 {
-    DC_ABORT_IF( identifier <= 0, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_texturePool[identifier - 1];
 }
 

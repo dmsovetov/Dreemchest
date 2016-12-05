@@ -87,6 +87,7 @@ DC_BEGIN_DREEMCHEST
 
         class Assets;
         class Asset;
+        class Handle;
         class AbstractAssetCache;
 
         //! Opaque 32 bit handle.
@@ -108,10 +109,10 @@ DC_BEGIN_DREEMCHEST
         typedef u16 TypeId;
 
         //! Set of assets.
-        typedef Set<class Handle> AssetSet;
+        typedef Set<DC_DREEMCHEST_NS Assets::Handle> AssetSet;
 
         //! List of assets.
-        typedef List<class Handle> AssetList;
+        typedef List<DC_DREEMCHEST_NS Assets::Handle> AssetList;
 
         // Unique ptr for asset source.
         typedef AutoPtr<class AbstractSource> SourceUPtr;

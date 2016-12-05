@@ -40,7 +40,7 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
 {
     if( m_view ) m_view->makeCurrent();
 
-    DC_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL, "the OpenGL was not properly initialized" )
+    NIMBLE_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL, "the OpenGL was not properly initialized" )
 
     LogVerbose( "opengl", "version=%s, renderer=%s, vendor=%s\n", glGetString( GL_VERSION ), glGetString( GL_RENDERER ), glGetString( GL_VENDOR ) );
     LogVerbose( "opengl", "%s\n", glGetString( GL_EXTENSIONS ) );
@@ -113,7 +113,7 @@ void OpenGLHal::present( void )
 void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
+    NIMBLE_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
 
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
@@ -124,11 +124,11 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 void OpenGLHal::renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
-    DC_ABORT_IF( !m_activeIndexBuffer.valid(), "invalid index buffer" );
+    NIMBLE_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
+    NIMBLE_ABORT_IF( !m_activeIndexBuffer.valid(), "invalid index buffer" );
     
     static GLenum glPrimType[TotalPrimitiveTypes + 1] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS, 0 };
-    DC_BREAK_IF( glPrimType[primType] == 0, "invalid primitive type" );
+    NIMBLE_BREAK_IF( glPrimType[primType] == 0, "invalid primitive type" );
 
     glDrawElements( glPrimType[primType], count, GL_UNSIGNED_SHORT, m_activeIndexBuffer->pointer() + firstIndex );
 }
@@ -216,7 +216,7 @@ ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, const ConstantBuffe
     DC_CHECK_GL;
 
 	if( layout == NULL ) {
-		LogWarning( "hal", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
+		LogWarning( "hal", "%s", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
 	}
 
     return Hal::createConstantBuffer( size, layout );
@@ -258,7 +258,7 @@ void OpenGLHal::setRenderTarget( const RenderTargetPtr& renderTarget )
 void OpenGLHal::setTexture( u32 sampler, Texture *texture )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
+    NIMBLE_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
 
     if( m_samplers[sampler].m_texture == texture ) {
         return;
@@ -286,7 +286,7 @@ void OpenGLHal::setTexture( u32 sampler, Texture *texture )
 void OpenGLHal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
+    NIMBLE_ABORT_IF( sampler < 0 || sampler >= MAX_SAMPLERS, "sampler index is out of range" );
 
     m_samplers[sampler].m_wrap      = textureWrap( wrap );
     m_samplers[sampler].m_filter    = textureFilter( filter );
@@ -380,7 +380,7 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inp
     if( pointSize ) {
 	#ifndef DC_PLATFORM_WINDOWS
         glEnableClientState( GL_POINT_SIZE_ARRAY );
-        glPointSizePointer( GL_FLOAT, stride, pointer + pointSize.m_offset );
+        glPointSizePointer( GL_FLOAT, stride, pointer + pointSize.offset );
 	#endif
     }
 
@@ -535,7 +535,7 @@ void OpenGLHal::setCulling( TriangleFace value )
 void OpenGLHal::setBlendState( BlendState* state )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( state == NULL, "invalid blend state" );
+    NIMBLE_ABORT_IF( state == NULL, "invalid blend state" );
 
     if( state->m_src != RSValueNotSet || state->m_dst != RSValueNotSet ) {
         glBlendFunc( blendFactor( state->m_src ), blendFactor( state->m_dst ) );
@@ -550,7 +550,7 @@ void OpenGLHal::setBlendState( BlendState* state )
 void OpenGLHal::setDepthStencilState( DepthStencilState* state )
 {
     DC_CHECK_GL;
-    DC_ABORT_IF( state == NULL, "invalid depth stencil state" );
+    NIMBLE_ABORT_IF( state == NULL, "invalid depth stencil state" );
 
     // ** Tencil
     if( state->m_stencilEnable != RSValueNotSet ) {
@@ -696,7 +696,7 @@ void OpenGLHal::setTransform( Transform transform, const float* matrix )
     case TransformProjection:   glMatrixMode( GL_PROJECTION );
                                 break;
 
-    default:                    DC_NOT_IMPLEMENTED;
+    default:                    NIMBLE_NOT_IMPLEMENTED;
     }
 
     glLoadMatrixf( matrix );
@@ -742,7 +742,7 @@ GLenum OpenGLHal::blendFactor( u32 factor )
     case BlendInvDstAlpha:  return GL_ONE_MINUS_DST_ALPHA;
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -753,10 +753,10 @@ GLenum OpenGLHal::triangleFace( u32 face )
     case TriangleFaceBack:          return GL_BACK;
     case TriangleFaceFront:         return GL_FRONT;
     case TriangleFaceFrontAndBack:  return GL_FRONT_AND_BACK;
-    default:                        DC_BREAK_IF( true );
+    default:                        NIMBLE_BREAK_IF( true );
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -774,7 +774,7 @@ GLenum OpenGLHal::compareFunc( u32 compare )
     case NotEqual:      return GL_NOTEQUAL;
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -792,7 +792,7 @@ GLenum OpenGLHal::stencilOp( u32 action )
     case StencilZero:           return GL_ZERO;
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -804,7 +804,7 @@ GLenum OpenGLHal::textureWrap( u32 wrap )
     case Repeat:    return GL_REPEAT;
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -818,21 +818,21 @@ GLenum OpenGLHal::textureFilter( u32 filter )
     case FilterMipLinear:   return GL_LINEAR_MIPMAP_LINEAR;     break;
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
 // ** OpenGLHal::textureType
 GLenum OpenGLHal::textureType( const Texture *texture )
 {
-    DC_ABORT_IF( texture == NULL, "invalid texture" );
+    NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
 	switch( texture->type() ) {
 	case Texture::TextureType2D:	return GL_TEXTURE_2D;
 	case Texture::TextureTypeCube:	return GL_TEXTURE_CUBE_MAP;
 	}
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -848,7 +848,7 @@ GLuint OpenGLHal::textureID( const Texture *texture )
     case Texture::TextureTypeCube:	return static_cast<const OpenGLTextureCube*>( texture )->m_id;
 	}
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return 0;
 }
 
@@ -876,7 +876,7 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
     case PixelRgb32F:   return GL_RGB32F;
 #endif
 	case PixelD24X8:	return GL_DEPTH_COMPONENT24;
-    default:            DC_BREAK_IF( "Image format not implemented" );
+    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
     }
 
     return 0;
@@ -901,7 +901,7 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
     case PixelR16F:     return GL_RED;
     case PixelD24S8:
     case PixelD24X8:    return GL_DEPTH_COMPONENT;
-    default:            DC_BREAK_IF( "Image format not implemented" );
+    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
     return 0;
@@ -926,7 +926,7 @@ GLenum OpenGLHal::imageDataType( u32 pixelFormat )
     case PixelRgba32F:  return GL_FLOAT;
     case PixelD24S8:
     case PixelD24X8:    return GL_FLOAT;
-    default:            DC_BREAK_IF( "Image format not implemented" );
+    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
     return 0;
@@ -988,7 +988,7 @@ void OpenGLTexture2D::setData( u32 level, const void *data )
 // ** OpenGLTexture2D::lock
 void* OpenGLTexture2D::lock( u32 level, u32& size )
 {
-    DC_BREAK_IF( isLocked(), "already locked" );
+    NIMBLE_BREAK_IF( isLocked(), "already locked" );
 
     size            = bytesPerMip( m_width >> level, m_height >> level );
     m_locked        = DC_NEW u8[size];
@@ -1001,7 +1001,7 @@ void* OpenGLTexture2D::lock( u32 level, u32& size )
 void OpenGLTexture2D::unlock( void )
 {
     DC_CHECK_GL;
-    DC_BREAK_IF( !isLocked(), "already unlocked" );
+    NIMBLE_BREAK_IF( !isLocked(), "already unlocked" );
     
     GLenum internalFormat = OpenGLHal::internalImageFormat( m_pixelFormat );
     GLenum format         = OpenGLHal::imageFormat( m_pixelFormat );
@@ -1070,7 +1070,7 @@ bool OpenGLRenderTarget::check( void ) const
 	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-    DC_BREAK_IF( status != GL_FRAMEBUFFER_COMPLETE );
+    NIMBLE_BREAK_IF( status != GL_FRAMEBUFFER_COMPLETE );
 
 	return status == GL_FRAMEBUFFER_COMPLETE;
 }
@@ -1105,7 +1105,7 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachmen
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     m_attachments[attachment] = texture;
-	DC_ABORT_IF( !check(), "invalid render target configuration" );
+	NIMBLE_ABORT_IF( !check(), "invalid render target configuration" );
 
 	return check();
 }
@@ -1173,7 +1173,7 @@ void OpenGLVertexBuffer::unlock( void )
 // ** OpenGLVertexBuffer::setBufferData
 void OpenGLVertexBuffer::setBufferData( const void* source, s32 offset, s32 size )
 {
-    DC_BREAK_IF( offset + size > m_size, "vertex buffer overflow" );
+    NIMBLE_BREAK_IF( offset + size > m_size, "vertex buffer overflow" );
     DC_CHECK_GL;
 
     glBindBuffer( GL_ARRAY_BUFFER, m_id );

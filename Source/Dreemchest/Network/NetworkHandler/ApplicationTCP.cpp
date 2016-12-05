@@ -36,7 +36,7 @@ namespace Network {
 // ** ApplicationTCP:ApplicationTCP
 ApplicationTCP::ApplicationTCP( TCPSocketPtr socket ) : m_socket( socket ), m_workaroundClientConn( false )
 {
-    DC_ABORT_IF( !socket.valid(), "invalid TCP socket" );
+    NIMBLE_ABORT_IF( !socket.valid(), "invalid TCP socket" );
     m_socket->subscribe<TCPSocket::Connected>( dcThisMethod( ApplicationTCP::handleSocketConnected ) );
     m_socket->subscribe<TCPSocket::Closed>( dcThisMethod( ApplicationTCP::handleSocketClosed ) );
 }
@@ -113,7 +113,7 @@ void ApplicationTCP::handleSocketClosed( const TCPSocket::Closed& e )
 {
     // Find the connection by a socket instance
     ConnectionBySocket::iterator i = m_connectionBySocket.find( e.sender );
-    DC_ABORT_IF( i == m_connectionBySocket.end(), "no connection associated with this socket instance" );
+    NIMBLE_ABORT_IF( i == m_connectionBySocket.end(), "no connection associated with this socket instance" );
 
     // Remove the connection
     if( i->second.valid() ) {

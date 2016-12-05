@@ -28,14 +28,14 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ** createOpenGLView
 OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
     MacOSOpenGLView* view = DC_NEW MacOSOpenGLView;
     view->initialize( reinterpret_cast<NSWindow*>( window ), depthStencil, nil );
-    log::verbose( "MacOS OpenGL viewport created\n" );
+    LogVerbose("opengl", "%s", "MacOS OpenGL viewport created\n" );
     return view;
 }
 
@@ -71,6 +71,6 @@ bool MacOSOpenGLView::makeCurrent( void )
     return [m_view makeCurrent];
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

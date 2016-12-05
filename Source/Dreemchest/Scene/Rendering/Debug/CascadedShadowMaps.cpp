@@ -95,7 +95,7 @@ s32 CascadedShadowMaps::cascadeCount( void ) const
 // ** CascadedShadowMaps::cascadeAt
 const CascadedShadowMaps::Cascade& CascadedShadowMaps::cascadeAt( s32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= cascadeCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= cascadeCount(), "index is out of range" );
     return m_cascades[index];
 }
 

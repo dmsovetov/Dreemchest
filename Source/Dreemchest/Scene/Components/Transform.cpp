@@ -203,7 +203,7 @@ void Transform::setRotation( const Quat& value )
 // ** Transform::rotationX
 f32 Transform::rotationX( void ) const
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return 0.0f;
 }
 
@@ -216,7 +216,7 @@ void Transform::setRotationX( f32 value )
 // ** Transform::rotationY
 f32 Transform::rotationY( void ) const
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
 	return 0.0f;
 }
 

@@ -283,15 +283,15 @@ namespace Network {
 					//! Converts the error object to boolean value.
 					operator bool( void ) const { return code != 0; }
 
-        virtual void serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
-            stream->write( &code, sizeof u16 );
+            stream->write( &code, sizeof( u16 ) );
             stream->writeString( message.c_str() );
         }
 
-        virtual void deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
-            stream->read( &code, sizeof u16 );
+            stream->read( &code, sizeof( u16 ) );
             stream->readString( message );
         }
 	};

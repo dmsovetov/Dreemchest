@@ -70,7 +70,7 @@ RenderResource TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
         return i->second;
     }
 
-    DC_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
+    NIMBLE_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
 
     const Mesh::VertexBuffer& vertices = mesh->vertexBuffer();
     VertexFormat vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
@@ -92,7 +92,7 @@ RenderResource TestRenderCache::requestIndexBuffer( const MeshHandle& mesh )
         return i->second;
     }
 
-    DC_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
+    NIMBLE_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
 
     const Mesh::IndexBuffer& indices = mesh->indexBuffer();
 
@@ -112,7 +112,7 @@ const TestRenderCache::RenderableNode* TestRenderCache::requestMesh( const MeshH
         return NULL;
     }
 
-    DC_ABORT_IF( !asset.isLoaded(), "a mesh asset was not loaded" );
+    NIMBLE_ABORT_IF( !asset.isLoaded(), "a mesh asset was not loaded" );
 
     // Get an asset unique id
     const Assets::AssetId& assetId = asset.asset().uniqueId();
@@ -162,7 +162,7 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
         return NULL;
     }
 
-    DC_ABORT_IF( !asset.isLoaded(), "a material asset was not loaded" );
+    NIMBLE_ABORT_IF( !asset.isLoaded(), "a material asset was not loaded" );
 
     // Get an asset unique id
     const Assets::AssetId& assetId = asset.asset().uniqueId();
@@ -183,7 +183,7 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
     node->data.rim.start    = 0.25f;
     node->data.rim.end      = 1.0f;
     node->data.rim.factor   = 0.5f;
-    node->constantBuffer    = m_context->requestConstantBuffer( &node->data, sizeof RenderScene::CBuffer::Material, RenderScene::CBuffer::Material::Layout );
+    node->constantBuffer    = m_context->requestConstantBuffer( &node->data, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
 
     // Now setup a material state block
     node->states.bindConstantBuffer( node->constantBuffer, RenderState::MaterialConstants );
@@ -209,7 +209,7 @@ RenderResource TestRenderCache::requestTexture( const ImageHandle& image )
         return 0;
     }
 
-    DC_ABORT_IF( !image.isLoaded(), "an image asset was not loaded" );
+    NIMBLE_ABORT_IF( !image.isLoaded(), "an image asset was not loaded" );
 
     RenderResources::iterator i = m_textures.find( image.asset().uniqueId() );
 

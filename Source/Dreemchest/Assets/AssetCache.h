@@ -106,7 +106,7 @@ namespace Assets {
     s32 AssetCache<TAsset>::allocatedBytes( void ) const
     {
         if( !m_allocatedAssetMemory ) {
-            LogWarning( "cache", "an amount of allocated bytes requested, but no size evaluator set\n" );
+            LogWarning( "cache", "%s", "an amount of allocated bytes requested, but no size evaluator set\n" );
             return 0;
         }
 
@@ -129,7 +129,7 @@ namespace Assets {
     template<typename TAsset>
     void AssetCache<TAsset>::setPlaceholder( const DataHandle<TAsset>& value )
     {
-        DC_BREAK_IF( !value.isLoaded(), "unloaded asset could not be set as a placeholder" );
+        NIMBLE_BREAK_IF( !value.isLoaded(), "unloaded asset could not be set as a placeholder" );
         m_placeholder = value;
     }
 

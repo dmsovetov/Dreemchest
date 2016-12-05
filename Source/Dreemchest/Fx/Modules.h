@@ -64,10 +64,10 @@ namespace Fx {
 		TParameter&				get( void );
 
 		//! Returns module name.
-		virtual String			name( void ) const DC_DECL_OVERRIDE;
+		virtual String			name( void ) const NIMBLE_OVERRIDE;
 
        //! Returns module execution priority.
-        virtual s32             priority( void ) const DC_DECL_OVERRIDE;
+        virtual s32             priority( void ) const NIMBLE_OVERRIDE;
 
 	protected:
 
@@ -107,7 +107,7 @@ namespace Fx {
 	protected:
 
 		//! Initializes the particle life properties.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Life module controls the particle life and calculates scalar value used to sample parameters.
@@ -115,7 +115,7 @@ namespace Fx {
 	protected:
 
 		//! Computes current life for each particle.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Velocity module computes the linear motion of particles.
@@ -132,15 +132,15 @@ namespace Fx {
 		FloatParameter&		z( void );
 
 		//! Returns module name.
-		virtual String		name( void ) const DC_DECL_OVERRIDE { return "LinearVelocity"; }
+		virtual String		name( void ) const NIMBLE_OVERRIDE { return "LinearVelocity"; }
 
 		//! Returns module execution priority.
-		virtual s32		    priority( void ) const DC_DECL_OVERRIDE { return 2; }
+		virtual s32		    priority( void ) const NIMBLE_OVERRIDE { return 2; }
 
 	protected:
 
 		//! Updates particle position according to a linear velocity.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 
 	private:
 
@@ -152,7 +152,7 @@ namespace Fx {
     protected:
 
 		//! Clamps the particle's velocity.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
     };
 
 	//! Sets the initial particle size.
@@ -160,7 +160,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial particle size.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Calculates the particle size based on parameter and current particle scalar.
@@ -168,7 +168,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the life time particle size.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Sets the initial particle transparency.
@@ -176,7 +176,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial particle transparency.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Calculates the particle transparency based on parameter and current particle scalar.
@@ -184,7 +184,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the life time particle transparency.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Sets the initial angular velocity of a particle.
@@ -192,7 +192,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial angular velocity of a particle.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Sets the initial particle rotation.
@@ -200,7 +200,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial rotation of a particle.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;	
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;	
 	};
 
 	//! Calculates the particle rotation based on particle's angular velocity.
@@ -208,7 +208,7 @@ namespace Fx {
 	protected:
 
 		//! Updates particle rotation.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Sets the initial particle force based on direction & speed.
@@ -216,7 +216,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial speed of a particle.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
 	};
 
 	//! Adds the gravity to a particle force.
@@ -224,7 +224,7 @@ namespace Fx {
 	protected:
 
 		//! Adds the gravity to a particle force.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;	
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;	
 	};
 
 	//! Modifies particle position by a velocity due to applied forces.
@@ -232,7 +232,7 @@ namespace Fx {
 	protected:
 
 		//! Calculates additional particle velocity based on acceleration. 
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;	
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;	
 	};
 
     //! Modifies particle position by an aggregated linear velocity.
@@ -240,15 +240,15 @@ namespace Fx {
     protected:
 
 		//! Returns module name.
-		virtual String		name( void ) const DC_DECL_OVERRIDE { return "Position"; }
+		virtual String		name( void ) const NIMBLE_OVERRIDE { return "Position"; }
 
 		//! Returns module execution priority.
-		virtual s32		    priority( void ) const DC_DECL_OVERRIDE { return INT_MAX; }
+		virtual s32		    priority( void ) const NIMBLE_OVERRIDE { return INT_MAX; }
 
 	protected:
 
 		//! Updates particle position according to a linear velocity.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;
     };
 
 	//! Sets the initial particle color.
@@ -256,7 +256,7 @@ namespace Fx {
 	protected:
 
 		//! Sets the initial color for each constructed particle.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;		
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;		
 	};
 
 	//! Updates the particle color.
@@ -264,7 +264,7 @@ namespace Fx {
 	protected:
 
 		//! Calculates particle color tint.
-		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const DC_DECL_OVERRIDE;		
+		virtual void		update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const NIMBLE_OVERRIDE;		
 	};
 
 } // namespace Fx

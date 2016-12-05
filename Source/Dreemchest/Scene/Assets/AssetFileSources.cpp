@@ -73,7 +73,7 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 
 	// Set the total number of mesh chunks
 	asset.setChunkCount( chunkCount );
-    DC_BREAK_IF( chunkCount != 1 );
+    NIMBLE_BREAK_IF( chunkCount != 1 );
 
     Mesh::VertexBuffer vertices;
     Mesh::IndexBuffer indices;
@@ -105,7 +105,7 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 
         for( u32 j = indices.size() - indexCount; j < indexCount; j++ ) {
             u16 idx;
-            stream->read( &idx, sizeof u16 );
+            stream->read( &idx, sizeof(u16) );
             indices[j] = idx;
         }
 

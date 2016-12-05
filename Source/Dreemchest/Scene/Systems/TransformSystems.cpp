@@ -69,7 +69,7 @@ void AffineTransformSystem::entityRemoved( const Ecs::Entity& entity )
 {
 	// Find the transform
 	Array<Transform*>::iterator i = std::find( m_transforms.begin(), m_transforms.end(), entity.has<Transform>() );
-	DC_ABORT_IF( i == m_transforms.end(), "no such transform" );
+	NIMBLE_ABORT_IF( i == m_transforms.end(), "no such transform" );
 
 	// Remove it from an array
 	m_transforms.erase( i );
@@ -190,7 +190,7 @@ void MoveToSystem::process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, M
 							break;
 
 	case MoveTo::Elastic:	{
-								Internal::Ptr internal = moveTo.internal<Internal>();
+								Internal::Ptr internal = moveTo.mixIn<Internal>();
 
 								Vec3 direction = target - transform.position();
 

@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createWindow
 IWindow* createWindow( u32 width, u32 height )
@@ -108,6 +108,12 @@ void* MacOSWindow::handle( void ) const
     return reinterpret_cast<void*>( m_window );
 }
 
+// ** MacOSWindow::mapCursorToWindow
+void MacOSWindow::mapCursorToWindow( s32& x, s32& y ) const
+{
+    NIMBLE_NOT_IMPLEMENTED
+}
+
 // ** MacOSWindow::create
 bool MacOSWindow::create( u32 width, u32 height )
 {
@@ -125,11 +131,11 @@ bool MacOSWindow::create( u32 width, u32 height )
     [m_window setAcceptsMouseMovedEvents: YES];
     [m_window setWindow: this];
 
-    log::verbose( "MacOS window created %dx%d...\n", m_width, m_height );
+    LogVerbose( "window", "MacOS window created %dx%d...\n", m_width, m_height );
 
     return true;
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

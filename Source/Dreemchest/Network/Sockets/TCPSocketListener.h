@@ -38,10 +38,10 @@ namespace Network {
 	public:
 
 		//! Checks for incoming connections & updates existing.
-		virtual void			        recv( void ) DC_DECL_OVERRIDE;
+		virtual void			        recv( void ) NIMBLE_OVERRIDE;
 
 		//! Closes a socket listener.
-		virtual void				    close( void ) DC_DECL_OVERRIDE;
+		virtual void				    close( void ) NIMBLE_OVERRIDE;
         
         //! Returns a port that listener is bound to.
         u16                             port( void ) const;

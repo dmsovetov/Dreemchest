@@ -44,19 +44,19 @@ namespace Io {
 		virtual					~ByteBuffer( void );
 
         //! Returns a length of this stream.
-        virtual s32             length( void ) const DC_DECL_OVERRIDE;
+        virtual s32             length( void ) const NIMBLE_OVERRIDE;
 
         //! Returns current memory offset in bytes.
-        virtual s32             position( void ) const DC_DECL_OVERRIDE;
+        virtual s32             position( void ) const NIMBLE_OVERRIDE;
 
         //! Sets an offset inside this byte buffer.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) NIMBLE_OVERRIDE;
 
         //! Reads data from stream.
-        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
+        virtual s32             read( void* buffer, s32 size ) const NIMBLE_OVERRIDE;
 
         //! Writes data from stream.
-        virtual s32             write( const void* buffer, s32 size ) DC_DECL_OVERRIDE;
+        virtual s32             write( const void* buffer, s32 size ) NIMBLE_OVERRIDE;
 
         //! Fills this memory with a given value
         void                    fill( u8 value );

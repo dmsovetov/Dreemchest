@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class MacOSWindow
     class MacOSWindow : public IWindow {
@@ -48,6 +48,7 @@ namespace platform {
         virtual String      caption( void ) const;
         virtual void        setCaption( const String& value );
         virtual void*       handle( void ) const;
+        virtual void        mapCursorToWindow( s32& x, s32& y ) const;
         void                setOwner( Window* value );
         Window*             owner( void ) const;
 
@@ -69,7 +70,7 @@ namespace platform {
         CocoaWindow*        m_window;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

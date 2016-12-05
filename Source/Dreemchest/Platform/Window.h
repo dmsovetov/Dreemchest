@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef     __DC_Platform_Window_H__
-#define     __DC_Platform_Window_H__
+#ifndef __DC_Platform_Window_H__
+#define __DC_Platform_Window_H__
 
-#include    "Platform.h"
+#include "Platform.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -170,7 +170,7 @@ namespace Platform {
 							: TouchEvent( window, x, y, id ) {}
 		};
 
-	#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_OSX )
+	#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
 		//! This event is emitted when user presses the key.
 		struct KeyPressed : public Event {
 						//! Constructs KeyPressed instance.
@@ -188,7 +188,7 @@ namespace Platform {
 
 			Key			key;	//!< Released key.	
 		};
-	#endif	/*	DC_PLATFORM_WINDOWS || DC_PLATFORM_OSX	*/
+	#endif	/*	DC_PLATFORM_WINDOWS || DC_PLATFORM_MACOS	*/
 
     private:
 

@@ -59,7 +59,7 @@ ShadowPass::ShadowPass( RenderingContext& context, RenderScene& renderScene )
     m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
 
     // Create a shadow parameters constant buffer
-    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::Shadow, RenderScene::CBuffer::Shadow::Layout );
+    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Shadow ), RenderScene::CBuffer::Shadow::Layout );
 }
 
 // ** ShadowPass::cbuffer

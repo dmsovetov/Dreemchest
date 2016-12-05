@@ -50,7 +50,7 @@ const void* RenderFrame::internBuffer( const void* data, s32 size )
 void* RenderFrame::allocate( s32 size )
 {
 	void* allocated = m_allocator.allocate( size );
-	DC_ABORT_IF( allocated == NULL, "render frame is out of memory" );
+	NIMBLE_ABORT_IF( allocated == NULL, "render frame is out of memory" );
 	return allocated;
 }
 

@@ -102,7 +102,7 @@ class ParticleSystems : public Platform::ApplicationDelegate {
 
 		m_scene->update( 0, 0.03f );
 	//	m_scene->render( m_renderingContext );
-        DC_NOT_IMPLEMENTED;
+        NIMBLE_NOT_IMPLEMENTED;
 
         // And now just present all rendered data to the screen
         m_hal->present();

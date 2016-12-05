@@ -37,7 +37,7 @@ extern IWindow* createWindow( u32 width, u32 height );
 Window::Window( IWindow* impl ) : m_impl( impl )
 {
     if( m_impl ) m_impl->setOwner( this );
-    else         LogWarning( "window", "not available on current platform\n" );
+    else         LogWarning( "window", "%s", "not available on current platform\n" );
 }
 
 // ** Window::~Window
@@ -50,7 +50,7 @@ Window::~Window( void )
 Window* Window::create( u32 width, u32 height )
 {
 #ifdef DC_PLATFORM_ANDROID
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 #else
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
@@ -165,7 +165,9 @@ void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 // ** Window::notifyKeyDown
 void Window::notifyKeyDown( Key key )
 {
+#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
 	notify<KeyPressed>( KeyPressed( this, key ) );
+#endif  /*  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )    */
 }
 
 // ** Window::notifyKeyUp

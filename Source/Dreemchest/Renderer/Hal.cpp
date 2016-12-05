@@ -84,11 +84,11 @@ Hal* Hal::create( RenderingHal renderer, RenderView* view )
 					#ifdef DC_OPENGL_ENABLED
 						return DC_NEW OpenGLHal( view );
 					#else
-						LogError( "hal", "OpenGL renderer is not implemented\n" );
+						LogError( "hal", "%s", "OpenGL renderer is not implemented\n" );
 					#endif
 					break;
 
-    case Direct3D:  LogError( "hal", "Direct3D renderer is not implemented\n" );
+    case Direct3D:  LogError( "hal", "%s", "Direct3D renderer is not implemented\n" );
 					break;
     }
 
@@ -101,7 +101,7 @@ RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
 #if defined( DC_OPENGL_ENABLED )
     return Renderer::createOpenGLView( window, depthStencil );
 #else
-    LogError( "hal", "the target platform doesn't support OpenGL.\n" );
+    LogError( "hal", "%s", "the target platform doesn't support OpenGL.\n" );
     return NULL;
 #endif
 }
@@ -168,7 +168,7 @@ InputLayoutPtr Hal::createInputLayout( s32 vertexSize )
 IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 {
 	if( GPU ) {
-        LogWarning( "hal", "GPU index buffers are not supported\n" );
+        LogWarning( "hal", "%s", "GPU index buffers are not supported\n" );
 	}
 
     return IndexBufferPtr( DC_NEW IndexBuffer( count, false ) );
@@ -178,7 +178,7 @@ IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 {
 	if( GPU ) {
-		LogWarning( "hal", "GPU vertex buffers are not supported\n" );
+		LogWarning( "hal", "%s", "GPU vertex buffers are not supported\n" );
 	}
 
     return VertexBufferPtr( DC_NEW VertexBuffer( size, false ) );
@@ -188,7 +188,7 @@ VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 ConstantBufferPtr Hal::createConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 {
 	if( layout == NULL ) {
-		LogWarning( "hal", "GPU constant buffers are not supported\n" );
+		LogWarning( "hal", "%s", "GPU constant buffers are not supported\n" );
 	}
 
     return ConstantBufferPtr( DC_NEW ConstantBuffer( size, layout ) );
@@ -312,7 +312,7 @@ void Hal::setInputLayout( const InputLayoutPtr& inputLayout )
 // ** Hal::setConstantBuffer
 void Hal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location )
 {
-    DC_ABORT_IF( location < 0, "invalid constant buffer location" );
+    NIMBLE_ABORT_IF( location < 0, "invalid constant buffer location" );
 
     if( location >= m_constantBuffers.size() ) {
         m_constantBuffers.resize( location + 1 );
@@ -465,7 +465,7 @@ struct sUnlockTextureTask {
 // ** Hal::createTexture2D
 void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture )
 {
-	DC_ABORT_IF( texture == NULL, "invalid texture" );
+	NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
     sCreateTextureTask task( this, texture, width, height, format );
     *texture = NULL;
@@ -480,7 +480,7 @@ void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DP
 // ** Hal::lockTexture
 void* Hal::lockTexture( Texture2D* texture, u32& size )
 {
-    DC_ABORT_IF( texture == NULL, "invalid texture" );
+    NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
     sLockTextureTask task( texture, &size );
 
@@ -496,7 +496,7 @@ void* Hal::lockTexture( Texture2D* texture, u32& size )
 // ** Hal::unlockTexture
 void Hal::unlockTexture( Texture2D* texture )
 {
-    DC_ABORT_IF( texture == NULL, "invalid texture" );
+    NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
     sUnlockTextureTask task( texture );
 
@@ -564,7 +564,7 @@ u32 Texture::bytesPerMip( u32 width, u32 height ) const
 // ** Texture::bytesPerBlock
 u32 Texture::bytesPerBlock( void ) const
 {
-    DC_BREAK_IF( !isCompressed(), "expected to be used only for compressed textures" );
+    NIMBLE_BREAK_IF( !isCompressed(), "expected to be used only for compressed textures" );
 
     switch( m_pixelFormat ) {
     case PixelDxtc1:    return 8;
@@ -572,7 +572,7 @@ u32 Texture::bytesPerBlock( void ) const
     case PixelDxtc5:    return 16;
     case PixelPvrtc2:   return 32;
     case PixelPvrtc4:   return 16;
-    default:            DC_BREAK_IF( "Image format is not implemented" );
+    default:            NIMBLE_BREAK_IF( "Image format is not implemented" );
     }
 
     return 0;
@@ -591,7 +591,7 @@ u32 Texture::bytesPerPixel( void ) const
     case PixelR32F:     return 4;
     case PixelRg32F:    return 8;
     case PixelRgba32F:  return 16;
-    default:            DC_BREAK_IF( "Image format is not implemented" );
+    default:            NIMBLE_BREAK_IF( "Image format is not implemented" );
     }
     
     return 0;

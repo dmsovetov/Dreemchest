@@ -38,7 +38,7 @@ LoadingQueue::LoadingQueue( Assets& assets, s32 maxAssetsToLoad )
     : m_assets( assets )
     , m_maxAssetsToLoad( maxAssetsToLoad )
 {
-    DC_BREAK_IF( maxAssetsToLoad <= 0, "maximum number of assets to load is expected to be a positive number" );
+    NIMBLE_BREAK_IF( maxAssetsToLoad <= 0, "maximum number of assets to load is expected to be a positive number" );
 }
 
 // ** LoadingQueue::update
@@ -137,7 +137,7 @@ s32 LoadingQueue::maxAssetsToLoad( void ) const
 // ** LoadingQueue::setMaxAssetsToLoad
 void LoadingQueue::setMaxAssetsToLoad( s32 value )
 {
-    DC_BREAK_IF( value <= 0, "maximum number of assets to load is expected to be a positive number" );
+    NIMBLE_BREAK_IF( value <= 0, "maximum number of assets to load is expected to be a positive number" );
     m_maxAssetsToLoad = value;
 }
 

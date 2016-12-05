@@ -106,25 +106,25 @@ namespace Scene {
 								Box2DPhysics( f32 timeStep = 1.0f / 120.0f, const ScaleFactors& scaleFactors = ScaleFactors(), const Vec2& gravity = Vec2( 0.0f, -9.8f ) );
 
 		//! Performs the ray casting and returns the closes point to the starting one.
-		virtual bool		    rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const DC_DECL_OVERRIDE;
+		virtual bool		    rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const NIMBLE_OVERRIDE;
 
 		//! Returns all scene objects inside the rect.
-		virtual SceneObjectSet  queryRect( const Rect& rect ) const DC_DECL_OVERRIDE;
+		virtual SceneObjectSet  queryRect( const Rect& rect ) const NIMBLE_OVERRIDE;
 
 		//! Returns all scene objects that are intersected by a ray.
-		virtual SceneObjectSet  querySegment( const Vec2& start, const Vec2& end ) const DC_DECL_OVERRIDE;
+		virtual SceneObjectSet  querySegment( const Vec2& start, const Vec2& end ) const NIMBLE_OVERRIDE;
 
         //! Performs a single physics simulation step of a Box2D world.
-        virtual void            simulate( f32 dt ) DC_DECL_OVERRIDE;
+        virtual void            simulate( f32 dt ) NIMBLE_OVERRIDE;
 
         //! Updates the physics state.
-        virtual void	        update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+        virtual void	        update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
 		//! Creates the Box2D rigid body for an added scene object.
-		virtual void			entityAdded( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
+		virtual void			entityAdded( const Ecs::Entity& sceneObject ) NIMBLE_OVERRIDE;
 
 		//! Destroys the Box2D rigid body of a removed scene object.
-		virtual void			entityRemoved( const Ecs::Entity& sceneObject ) DC_DECL_OVERRIDE;
+		virtual void			entityRemoved( const Ecs::Entity& sceneObject ) NIMBLE_OVERRIDE;
 
         //! Emitted when two bodies begin to touch.
         struct CollisionBegin {

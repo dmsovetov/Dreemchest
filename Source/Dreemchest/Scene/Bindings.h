@@ -59,7 +59,7 @@ namespace Scene {
 								Vec3FromKeyboard( Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total );
 
 		//! Calculates the direction.
-		virtual Vec3			get( void ) const DC_DECL_OVERRIDE;
+		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
 
 	private:
 
@@ -78,7 +78,7 @@ namespace Scene {
 								Vec3FromMouse( f32 scaleFactor = 1.0f );
 
 		//! Calculates the rotation values.
-		virtual Vec3			get( void ) const DC_DECL_OVERRIDE;
+		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
 
 	private:
 
@@ -95,7 +95,7 @@ namespace Scene {
 								Vec3FromTransform( const TransformWPtr& transform = TransformWPtr() );
 
 		//! Extracts the position from a Transform
-		virtual Vec3			get( void ) const DC_DECL_OVERRIDE;
+		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
 
 	private:
 

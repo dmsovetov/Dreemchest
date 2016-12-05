@@ -290,7 +290,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
         node.parameters->near      = node.camera->near();
         node.parameters->far       = node.camera->far();
         node.parameters->position  = node.transform->worldSpacePosition();
-        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::View );
+        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof( CBuffer::View ) );
     }
 
     // Update light constant buffers
@@ -304,7 +304,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
         node.parameters->range     = node.light->range();
         node.parameters->direction = node.transform->axisZ();
         node.parameters->cutoff    = cosf( radians( node.light->cutoff() ) );
-        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof CBuffer::Light );
+        commands.uploadConstantBuffer( node.constantBuffer, node.parameters.get(), sizeof( CBuffer::Light ) );
     }
 
     // Update point cloud constant buffers
@@ -313,7 +313,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
         PointCloudNode& node = pointClouds[i];
         node.instance.parameters->transform = node.transform->matrix();
-        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof CBuffer::Instance );
+        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof( CBuffer::Instance ) );
     }
 
     // Update static mesh constant buffers
@@ -322,7 +322,7 @@ void RenderScene::updateConstantBuffers( RenderFrame& frame )
     for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
         StaticMeshNode& node = staticMeshes[i];
         node.instance.parameters->transform = node.transform->matrix();
-        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof CBuffer::Instance );
+        commands.uploadConstantBuffer( node.constantBuffer, node.instance.parameters.get(), sizeof( CBuffer::Instance ) );
     }
 }
 

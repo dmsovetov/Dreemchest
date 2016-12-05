@@ -100,7 +100,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
     : StreamedRenderPassBase( context, renderScene, 6 )
 {
     // Create a view constant buffer
-    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof RenderScene::CBuffer::View, RenderScene::CBuffer::View::Layout );
+    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::View ), RenderScene::CBuffer::View::Layout );
 
     // Create a shader
     m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
@@ -195,12 +195,15 @@ void DebugCascadedShadows::emitRenderOperations( RenderFrame& frame, RenderComma
     for( s32 i = 0, n = m_csm.cascadeCount(); i < n; i++ ) {
         // Get a cascade at specified index
         const CascadedShadowMaps::Cascade& cascade = m_csm.cascadeAt( i );
+        
+        // Construct a transparent color
+        Rgba color = m_colors[i].transparent( 0.5f );
 
         // Render a world space cascade bounding box
-        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), &m_colors[i].transparent( 0.5f ) );
+        emitWireBounds( frame, commands, stateStack, Bounds::fromSphere( cascade.worldSpaceBounds.center(), cascade.worldSpaceBounds.radius() ), &color );
 
         // Render a split projection box
-        emitWireBounds( frame, commands, stateStack, cascade.lightSpaceVertices, &m_colors[i].transparent( 0.25f ) );
+        emitWireBounds( frame, commands, stateStack, cascade.lightSpaceVertices, &color );
     }
 
     emitBasis( frame, commands, stateStack, Matrix4() );

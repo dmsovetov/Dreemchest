@@ -59,10 +59,10 @@ namespace Network {
     public:
 
         //! Returns the packet name.
-        virtual CString         name( void ) const DC_DECL_OVERRIDE { return TypeInfo<TPacket>::name(); }
+        virtual CString         name( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::name(); }
 
         //! Returns the unique packet identifier.
-        virtual PacketTypeId    id( void ) const DC_DECL_OVERRIDE { return TypeInfo<TPacket>::id(); }
+        virtual PacketTypeId    id( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::id(); }
 
         //! Writes packet to a binary stream.
         virtual void            serialize( Io::StreamWPtr stream ) const {}
@@ -87,7 +87,7 @@ namespace Packets {
 					    RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
 						    : id( id ), method( method ), returnType( returnType ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -98,7 +98,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 
@@ -122,7 +122,7 @@ namespace Packets {
 					RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
 						: id( id ), error( error ), returnType( returnType ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -134,7 +134,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 
@@ -157,7 +157,7 @@ namespace Packets {
 						Event( TypeId eventId = 0, const BinaryBlob& payload = BinaryBlob() )
 							: eventId( eventId ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -166,7 +166,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 

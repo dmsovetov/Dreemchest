@@ -55,7 +55,7 @@ ParticleRendererPtr ParticleRenderer::create( RenderingMode type, const IRenderi
     default:				break;
     }
 
-	DC_BREAK_IF( true, "unhandled rendering mode" );
+	NIMBLE_BREAK_IF( true, "unhandled rendering mode" );
     return ParticleRendererPtr();
 }
 
@@ -70,7 +70,7 @@ PointRenderer::PointRenderer( const IRenderingInterfacePtr& renderingInterface )
 // ** PointRenderer::render
 void PointRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 //	m_renderingInterface->renderPoints( &particles->m_position, &particles->m_color.current, &particles->m_size.current, count, sizeof( Particle ) );
 //	m_renderingInterface->flush();
 }
@@ -153,7 +153,7 @@ void LineRenderer::render( const IMaterialWPtr& material, const Particle *partic
 
     m_renderingInterface->flush();
 #else
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 #endif
 }
 
@@ -181,7 +181,7 @@ void ThickLineRenderer::render( const IMaterialWPtr& material, const Particle *p
     
     m_renderingInterface->flush();
 #else
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 #endif
 }
 
@@ -196,7 +196,7 @@ PathRenderer::PathRenderer( const IRenderingInterfacePtr& renderingInterface ) :
 // ** PathRenderer::render
 void PathRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {
 //        m_renderingInterface->renderLineStrip( &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ), particles[i].m_color.current.alpha );
 //    }
@@ -213,7 +213,7 @@ ThickPathRenderer::ThickPathRenderer( const IRenderingInterfacePtr& renderingInt
 // ** ThickPathRenderer::render
 void ThickPathRenderer::render( const IMaterialWPtr& material, const Particle *particles, s32 count )
 {
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 //    for( s32 i = 0; i < count; i++ ) {
 //        m_renderingInterface->renderThickLineStrip( texture, &particles[i].m_snapshots->pos, &particles[i].m_snapshots->color, &particles[i].m_snapshots->size,  Particle::MaxSnapshots, sizeof( particles[i].m_snapshots[0] ),particles[i].m_color.current.alpha );
 //    }
@@ -232,52 +232,52 @@ BuiltInRenderingInterface::BuiltInRenderingInterface( Renderer::Renderer2DPtr re
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 //	m_renderer->points( position, color, size, count, stride );
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 //	m_renderer->orientedQuad( Renderer::Texture2DWPtr(), x, y, width, height, up, side, color );
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 //	m_renderer->line( x1, y1, x2, y2, color1, color2 );
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 }
 
 // ** uiltInRenderingInterface::renderPoints
 void BuiltInRenderingInterface::flush( void )
 {
-	DC_NOT_IMPLEMENTED;
+	NIMBLE_NOT_IMPLEMENTED;
 //	m_renderer->flush();
 }
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */

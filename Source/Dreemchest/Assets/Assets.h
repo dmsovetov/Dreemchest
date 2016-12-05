@@ -29,8 +29,10 @@
 
 #include "../Dreemchest.h"
 
+#include "Asset.h"
 #include "AssetCache.h"
 #include "AssetLoadingQueue.h"
+#include "AssetHandle.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -89,10 +91,6 @@ namespace Assets {
 
         //! Forces an asset to be unloaded.
         void                        forceUnload( Handle asset );
-
-        //! Returns an asset type id.
-        template<typename TAsset>
-        static TypeId               assetTypeId( void );
 
         //! Registers an asset type.
         template<typename TAsset>
@@ -177,18 +175,11 @@ namespace Assets {
         mutable AssetCaches         m_cache;            //!< Asset cache by an asset type.
     };
 
-    // ** Assets::assetTypeId
-    template<typename TAsset>
-    TypeId Assets::assetTypeId( void )
-    {
-        return GroupedTypeIndex<TAsset, Assets>::idx();
-    }
-
     // ** Assets::assetCache
     template<typename TAsset>
     AssetCache<TAsset>& Assets::assetCache( void )
     {
-        return static_cast<AssetCache<TAsset>&>( findAssetCache( assetTypeId<TAsset>() ) );
+        return static_cast<AssetCache<TAsset>&>( findAssetCache( Asset::typeId<TAsset>() ) );
     }
 
     // ** Assets::assetCache
@@ -203,7 +194,7 @@ namespace Assets {
     AssetCache<TAsset>& Assets::registerType( void )
     {
         // Get the type & name
-        TypeId type = assetTypeId<TAsset>();
+        TypeId type = Asset::typeId<TAsset>();
         String name = TypeInfo<TAsset>::name();
 
         // Register type & name
@@ -222,7 +213,7 @@ namespace Assets {
     template<typename TAsset>
     DataHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
     {
-        Handle handle = addAsset( assetTypeId<TAsset>(), uniqueId, source );
+        Handle handle = addAsset( Asset::typeId<TAsset>(), uniqueId, source );
         return handle;
     }
 
@@ -306,8 +297,6 @@ namespace Assets {
 
 DC_END_DREEMCHEST
 
-#ifndef DC_BUILD_LIBRARY
-    #include "Asset.h"
-#endif  /*  #ifndef DC_BUILD_LIBRARY    */
+#include "AssetHandle.hpp"
 
 #endif    /*    !__DC_Assets_H__    */

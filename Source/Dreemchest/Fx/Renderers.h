@@ -171,7 +171,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderPoints; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class QuadRenderer
@@ -182,7 +182,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderQuads; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class LineRenderer
@@ -193,7 +193,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderLines; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class ThickLineRenderer
@@ -204,7 +204,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickLines; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class PathRenderer
@@ -215,7 +215,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode	    type( void ) const { return RenderPaths; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class ThickPathRenderer
@@ -226,7 +226,7 @@ namespace Fx {
 
         // ** Renderer
         virtual RenderingMode		type( void ) const { return RenderThickPaths; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
 } // namespace Fx

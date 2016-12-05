@@ -56,7 +56,7 @@ u32 UDPSocket::send( const Address& address, u16 port, const void* buffer, u32 s
     s32 result = sendto( m_descriptor, ( s8* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
     if( result == -1 ) {
         LogWarning( "socket", "sendto failed to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
-        DC_BREAK;
+        NIMBLE_BREAK;
 		return 0;
     }
 

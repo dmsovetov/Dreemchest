@@ -53,10 +53,10 @@ namespace Ecs {
 		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
 		//! Performs an update of a system
-		virtual void	update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+		virtual void	update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
 		//! Called when entity was added.
-		virtual void	entityAdded( const Entity& entity ) DC_DECL_OVERRIDE;
+		virtual void	entityAdded( const Entity& entity ) NIMBLE_OVERRIDE;
 
 		//! Generic processing function that should be overriden in a subclass.
 		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );

@@ -69,19 +69,6 @@ namespace Network {
 		bool			m_wasSent;
 	};
 
-	// ** Response::operator()
-	template<>
-	inline bool Response<Void>::operator()( const Void& value, const Error& error )
-	{
-		LogWarning( "rpc", "void responses are ignored\n" ); 
-		return true;
-	}
-
-	template<>
-	inline Response<Void>::Response( const ConnectionWPtr& connection, u16 id ) : m_connection( connection ), m_id( id ), m_wasSent( true )
-	{
-	}
-
 	//! Template class that handles a RemoteCall packet and invokes a local procedure.
 	template<typename T, typename R>
 	class RemoteCallHandler : public IRemoteCallHandler {
@@ -98,7 +85,7 @@ namespace Network {
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) DC_DECL_OVERRIDE;
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) NIMBLE_OVERRIDE;
 
 	private:
 
@@ -106,13 +93,6 @@ namespace Network {
 		Callback		m_callback;
 	};
 
-	// ** RemoteCallHandler::handle
-	template<typename T, typename R>
-	inline void RemoteCallHandler<T, R>::handle( ConnectionWPtr connection, const Packets::RemoteCall& packet )
-	{
-		ResponseType response( connection, packet.id );
-        m_callback( connection, response, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
-	}
 
 	//! Remote response handler interface.
 	class IRemoteResponseHandler {
@@ -136,20 +116,13 @@ namespace Network {
 							: m_callback( callback ) {}
 
 		//! Reads a payload from an Event packet and emits it as local event.
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) DC_DECL_OVERRIDE;
+		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) NIMBLE_OVERRIDE;
 
 	private:
 
 		//! Local procedure
 		Callback		m_callback;
 	};
-
-	// ** RemoteResponseHandler::handle
-	template<typename T>
-	inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
-	{
-        m_callback( connection, packet.error, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
-	}
 
 } // namespace Network
     

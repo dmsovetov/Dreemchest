@@ -61,15 +61,6 @@ namespace Network {
 		EventEmitter*			m_eventEmitter;
 	};
 
-	// ** EventHandler::handle
-	template<typename T>
-	inline bool EventHandler<T>::handle( ConnectionWPtr connection, const Packets::Event& packet )
-	{
-        T event = Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) );
-        m_eventEmitter->notify( event );
-		return true;
-	}
-
 } // namespace Network
 
 DC_END_DREEMCHEST

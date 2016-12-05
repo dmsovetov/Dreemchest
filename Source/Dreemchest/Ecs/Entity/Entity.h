@@ -183,7 +183,7 @@ namespace Ecs {
 	{
 		TypeIdx idx = ComponentBase::typeId<TComponent>();
 		Components::const_iterator i = m_components.find( idx );
-		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
+		NIMBLE_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
         TComponent* result = static_cast<TComponent*>( i->second.get() );
 		return result;
@@ -193,9 +193,9 @@ namespace Ecs {
 	template<typename TComponent>
 	TComponent* Entity::attachComponent( TComponent* component )
 	{
-		DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
-        DC_BREAK_IF( ComponentBase::typeId<ComponentBase>() != ComponentBase::typeId<TComponent>() && component->typeIndex() != ComponentBase::typeId<TComponent>(), "component type mismatch" );
-		DC_ABORT_IF( has<TComponent>(), "entity already has this component" );
+		NIMBLE_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
+        NIMBLE_BREAK_IF( ComponentBase::typeId<ComponentBase>() != ComponentBase::typeId<TComponent>() && component->typeIndex() != ComponentBase::typeId<TComponent>(), "component type mismatch" );
+		NIMBLE_ABORT_IF( has<TComponent>(), "entity already has this component" );
 
 		TypeIdx idx = component->typeIndex();
 

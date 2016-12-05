@@ -142,7 +142,7 @@ SceneObjectPtr Scene::createSceneObject( const SceneObjectId& id )
 // ** Scene::addSceneObject
 void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
 {
-	DC_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
+	NIMBLE_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
 	m_ecs->addEntity( sceneObject );
 
 	// Emit the event
@@ -152,7 +152,7 @@ void Scene::addSceneObject( const SceneObjectPtr& sceneObject )
 // ** Scene::removeSceneObject
 void Scene::removeSceneObject( const SceneObjectPtr& sceneObject )
 {
-	DC_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
+	NIMBLE_ABORT_IF( !sceneObject.valid(), "invalid scene object" );
 	m_ecs->removeEntity( sceneObject->id() );
 
 	// Emit the event
@@ -240,11 +240,11 @@ ScenePtr Scene::createFromJson( const Resources& assets, const String& json )
 
 	return scene;
 #else
-	LogError( "deserialize", "failed to load scene, built with no JSON support.\n" );
+	LogError( "deserialize", "%s", "failed to load scene, built with no JSON support.\n" );
 	return ScenePtr();
 #endif	/*	HAVE_JSON	*/
 #else
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return ScenePtr();
 #endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 }
@@ -295,7 +295,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const String& json )
 				return Fx::IMaterialPtr();
 			}
 
-            DC_NOT_IMPLEMENTED;
+            NIMBLE_NOT_IMPLEMENTED;
             return NULL;
 		//	return DC_NEW Fx::IMaterial( material );
 		}
@@ -331,7 +331,7 @@ bool JsonSceneLoader::load( ScenePtr scene, const String& json )
 
 		// Read the component
 		Ecs::ComponentPtr component = requestComponent( i.key().asString() );
-		DC_BREAK_IF( !component.valid(), "no such component" );
+		NIMBLE_BREAK_IF( !component.valid(), "no such component" );
 
 		// Get the scene object to attach the component to.
 		Ecs::EntityPtr entity = requestSceneObject( i->get( "sceneObject", Json::Value() ).asString() );
@@ -524,7 +524,7 @@ bool JsonSceneLoader::readModuleShape( Fx::ParticlesWPtr particles, const Json::
 	case 2: emitter->setZone( DC_NEW Fx::HemiSphereZone( object["radius"].asFloat() ) ); break;
 	case 5: emitter->setZone( DC_NEW Fx::BoxZone( object["width"].asFloat(), object["height"].asFloat(), object["depth"].asFloat() ) ); break;
     case 12: emitter->setZone( DC_NEW Fx::LineZone( object["radius"].asFloat() ) ); break;
-	default: DC_NOT_IMPLEMENTED;
+	default: NIMBLE_NOT_IMPLEMENTED;
 	}
 
 	return true;
@@ -566,7 +566,7 @@ bool JsonSceneLoader::readModuleAcceleration( Fx::ParticlesWPtr particles, const
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationYOverLife ), object["y"] );
 	readScalarParameter( particles->scalarParameter( Fx::Particles::AccelerationZOverLife ), object["z"] );
 #else
-	DC_NOT_IMPLEMENTED
+	NIMBLE_NOT_IMPLEMENTED
 #endif
 	return true;
 }
@@ -695,7 +695,7 @@ void JsonSceneLoader::readColorParameter( Fx::RgbParameter& parameter, const Jso
 		parameter.setConstant( readRgb( object["value"] ) );
 	}
 	else {
-		DC_NOT_IMPLEMENTED;
+		NIMBLE_NOT_IMPLEMENTED;
 	}
 }
 
@@ -726,7 +726,7 @@ void JsonSceneLoader::readScalarParameter( Fx::FloatParameter& parameter, const 
 		parameter.constructLifetimeCurves();
 	}
 	else {
-		DC_NOT_IMPLEMENTED;
+		NIMBLE_NOT_IMPLEMENTED;
 	}
 }
 

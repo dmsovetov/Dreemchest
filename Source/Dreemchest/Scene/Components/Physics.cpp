@@ -60,7 +60,7 @@ SimpleShape2D SimpleShape2D::createRect( f32 width, f32 height, f32 x, f32 y, co
 // ** SimpleShape2D::addPolygon
 SimpleShape2D SimpleShape2D::createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material )
 {
-	DC_BREAK_IF( count > PolygonShape2D::MaxVertices, "too much vertices" );
+	NIMBLE_BREAK_IF( count > PolygonShape2D::MaxVertices, "too much vertices" );
 
 	SimpleShape2D part;
 	part.type = Shape2DType::Polygon;
@@ -87,7 +87,7 @@ void SimpleShape2D::operator << ( const Variant& value )
     case Shape2DType::Circle:   circle << value;    break;
     case Shape2DType::Polygon:  polygon << value;   break;
     case Shape2DType::Rect:     rect << value;      break;
-    default:                    DC_NOT_IMPLEMENTED;
+    default:                    NIMBLE_NOT_IMPLEMENTED;
     };
 }
 
@@ -103,7 +103,7 @@ void SimpleShape2D::operator >> ( Variant& value )
     case Shape2DType::Circle:   circle >> vshape;   break;
     case Shape2DType::Polygon:  polygon >> vshape;  break;
     case Shape2DType::Rect:     rect >> vshape;     break;
-    default:                    DC_NOT_IMPLEMENTED;
+    default:                    NIMBLE_NOT_IMPLEMENTED;
     };
 
     KeyValue& kv = vshape.expect<KeyValue>();
@@ -228,7 +228,7 @@ u32 Shape2D::partCount( void ) const
 // ** Shape2D::part
 const SimpleShape2D& Shape2D::part( u32 index ) const
 {
-	DC_ABORT_IF( index >= partCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( index >= partCount(), "index is out of range" );
 	return m_parts[index];
 }
 
@@ -433,7 +433,7 @@ u32 RigidBody2D::appliedForceCount( void ) const
 // ** RigidBody2D::appliedImpulse
 const RigidBody2D::AppliedForce& RigidBody2D::appliedImpulse( u32 index ) const
 {
-	DC_ABORT_IF( index >= appliedImpulseCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( index >= appliedImpulseCount(), "index is out of range" );
 	return m_impulses[index];
 }
 
@@ -446,7 +446,7 @@ u32 RigidBody2D::appliedImpulseCount( void ) const
 // ** RigidBody2D::appliedForce
 const RigidBody2D::AppliedForce& RigidBody2D::appliedForce( u32 index ) const
 {
-	DC_ABORT_IF( index >= appliedForceCount(), "index is out of range" );
+	NIMBLE_ABORT_IF( index >= appliedForceCount(), "index is out of range" );
 	return m_forces[index];
 }
 
@@ -459,7 +459,7 @@ u32 RigidBody2D::collisionEventCount( void ) const
 // ** RigidBody2D::collisionEvent
 const RigidBody2D::CollisionEvent& RigidBody2D::collisionEvent( u32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= collisionEventCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= collisionEventCount(), "index is out of range" );
     return m_collisionEvents[index];
 }
 

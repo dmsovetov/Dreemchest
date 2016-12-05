@@ -215,8 +215,8 @@ void RenderStateBlock::disableBlending( void )
 // ** RenderStateBlock::pushState
 void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
 {
-    DC_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
-    DC_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );
+    NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
+    NIMBLE_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );
 
     // Push a state to a state block
     m_states[m_count] = state;
@@ -237,11 +237,12 @@ StateScope::StateScope( RenderStateStack& stack, RenderStateBlock* stateBlock )
 }
 
 // ** StateScope::StateScope
-StateScope::StateScope( StateScope& other )
+StateScope::StateScope( const StateScope& other )
     : m_stack( other.m_stack )
     , m_stateBlock( other.m_stateBlock )
 {
-    other.m_stateBlock = NULL;
+    NIMBLE_NOT_IMPLEMENTED
+//    other.m_stateBlock = NULL;
 }
 
 // ** StateScope::~StateScope
@@ -266,8 +267,8 @@ const StateScope& StateScope::operator = ( StateScope& other )
 // ** RenderStateStack::RenderStateStack
 RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
     : m_allocator( maxStateBlocks * sizeof( RenderStateBlock ) + sizeof( RenderStateBlock* ) * maxStackSize )
-    , m_size( 0 )
     , m_stack( NULL )
+    , m_size( 0 )
 {
     m_stack = reinterpret_cast<const RenderStateBlock**>( m_allocator.allocate( sizeof( RenderStateBlock* ) * maxStackSize ) );
 }
@@ -275,10 +276,10 @@ RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
 // ** RenderStateStack::newScope
 StateScope RenderStateStack::newScope( void )
 {
-    DC_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
+    NIMBLE_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
 
     void* allocated = m_allocator.allocate( sizeof( RenderStateBlock ) );
-    DC_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
+    NIMBLE_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
 
     RenderStateBlock* block = new( allocated ) RenderStateBlock;
     return push( block );
@@ -303,7 +304,7 @@ StateScope RenderStateStack::push( const RenderStateBlock* block )
 // ** RenderStateStack::pop
 void RenderStateStack::pop( void )
 {
-    DC_ABORT_IF( size() == 0, "stack underflow" );
+    NIMBLE_ABORT_IF( size() == 0, "stack underflow" );
 
     for( s32 i = 0; i < m_size - 1; i++ ) {
         m_stack[i] = m_stack[i + 1];

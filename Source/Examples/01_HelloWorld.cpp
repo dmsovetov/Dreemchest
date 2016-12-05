@@ -52,7 +52,7 @@ class HelloWorld : public Platform::ApplicationDelegate {
         Logger::setStandardLogger();
 
         // Just write a message to a console.
-        LogVerbose( "helloWorld", "application launched!\n" );
+        LogVerbose( "helloWorld", "%s", "application launched!\n" );
 
         // Now the hello world application is ready to quit - just do it! :)
         application->quit();

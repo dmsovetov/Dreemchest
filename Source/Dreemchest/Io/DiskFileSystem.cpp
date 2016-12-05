@@ -78,7 +78,7 @@ StreamPtr DiskFileSystem::openFile( const Path& fileName ) const
 	char path[MaxPathLength + 1];
 
 	for( int i = 0; i < ( int )m_paths.size(); i++ ) {
-    #if defined( DC_PLATFORM_OSX ) || defined( DC_PLATFORM_IOS )
+    #if defined( DC_PLATFORM_MACOS ) || defined( DC_PLATFORM_IOS )
         if( fileName[0] == '/' ) {
             _snprintf( path, MaxPathLength, "%s", fileName );
         } else {

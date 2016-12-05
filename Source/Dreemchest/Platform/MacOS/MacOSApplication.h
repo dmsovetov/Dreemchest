@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class MacOSApplication
     class MacOSApplication : public IApplication {
@@ -42,7 +42,7 @@ namespace platform {
         virtual int         launch( Application* application );
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

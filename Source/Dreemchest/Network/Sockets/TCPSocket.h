@@ -47,10 +47,10 @@ namespace Network {
         bool					    connect( const Address& address, u16 port );
 
         //! Closes a socket.
-        virtual void			    close( void ) DC_DECL_OVERRIDE;
+        virtual void			    close( void ) NIMBLE_OVERRIDE;
 
         //! Reads all incoming data.
-        virtual void			    recv( void ) DC_DECL_OVERRIDE;
+        virtual void			    recv( void ) NIMBLE_OVERRIDE;
 
 		//! Sends data to socket.
 		/*

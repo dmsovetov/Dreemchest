@@ -234,11 +234,16 @@ void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer&
 {
     // Calculate a transformed basis origin
     Vec3 origin = transform * Vec3::zero();
+    
+    // Construct basis colors
+    Rgba red( 1.0f, 0.0f, 0.0f );
+    Rgba green( 0.0f, 1.0f, 0.0f );
+    Rgba blue( 0.0f, 0.0f, 1.0f );
 
     // Emit a line for each basis vector
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisX() ), &Rgba( 1.0f, 0.0f, 0.0f ) );
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisY() ), &Rgba( 0.0f, 1.0f, 0.0f ) );
-    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisZ() ), &Rgba( 0.0f, 0.0f, 1.0f ) );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisX() ), &red );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisY() ), &green );
+    emitLine( frame, commands, stateStack, origin, Vec3( transform * Vec3::axisZ() ), &blue );
 }
 
 // ** StreamedRenderPassBase::emitRect

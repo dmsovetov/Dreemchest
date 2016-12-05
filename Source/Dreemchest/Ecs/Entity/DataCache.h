@@ -100,10 +100,10 @@ namespace Ecs {
                                     DataCache( EcsWPtr ecs, const Aspect& aspect, const Factory& factory );
 
         //! Constructs new data instance associated with an entity.
-        virtual s32                 addCacheEntry( const Entity* entity ) DC_DECL_OVERRIDE;
+        virtual s32                 addCacheEntry( const Entity* entity ) NIMBLE_OVERRIDE;
 
         //! Removes a data cache entry by index.
-        virtual void                removeCacheEntry( s32 index ) DC_DECL_OVERRIDE;
+        virtual void                removeCacheEntry( s32 index ) NIMBLE_OVERRIDE;
 
     private:
 
@@ -138,7 +138,7 @@ namespace Ecs {
     const TData& DataCache<TData>::dataFromEntity( const EntityWPtr& entity ) const
     {
         s32 index = indexFromEntity( entity );
-        DC_ABORT_IF( index == -1, "the specified entity does not exist in cache" );
+        NIMBLE_ABORT_IF( index == -1, "the specified entity does not exist in cache" );
         return m_data[index];
     }
 
@@ -146,7 +146,7 @@ namespace Ecs {
     template<typename TData>
     s32 DataCache<TData>::addCacheEntry( const Entity* entity )
     {
-        DC_ABORT_IF( entity == NULL, "cache entry could not be created from an invalid entity" );
+        NIMBLE_ABORT_IF( entity == NULL, "cache entry could not be created from an invalid entity" );
         return m_data.push( m_factory( *entity ) );
     }
 
