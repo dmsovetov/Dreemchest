@@ -211,7 +211,7 @@ namespace Assets {
         m_typeToName[type] = name;
 
         // Create an asset cache for this type of asset
-        DC_BREAK_IF( m_cache.count( type ) );
+        NIMBLE_BREAK_IF( m_cache.count( type ) );
         AssetCache<TAsset>* cache = DC_NEW AssetCache<TAsset>();
         m_cache[type] = cache;
 
@@ -254,7 +254,7 @@ namespace Assets {
     template<typename TAsset>
     TAsset& Assets::writableAssetData( const Asset& asset ) const
     {
-        DC_BREAK_IF( !asset.dataIndex().isValid(), "asset data is invalid" );
+        NIMBLE_BREAK_IF( !asset.dataIndex().isValid(), "asset data is invalid" );
 
         // Get asset cache
         AssetCache<TAsset>& cache = static_cast<AssetCache<TAsset>&>( asset.cache() );
