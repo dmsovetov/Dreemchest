@@ -26,7 +26,7 @@ if (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
 	include_directories(${JSONCPP_INCLUDE_DIR})
 endif (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
 
-# Ыуегз Qt support
+# Setup Qt support
 if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
 	set(CMAKE_AUTOMOC ON)
 
@@ -150,3 +150,12 @@ endif (DC_QT_SUPPORT MATCHES "Qt4")
 if (DC_QT_SUPPORT MATCHES "Qt5")
 	target_link_libraries(Dreemchest Qt5::Widgets)
 endif (DC_QT_SUPPORT MATCHES "Qt5")
+
+# MacOS frameworks
+if (DC_PLATFORM MATCHES "MacOS")
+    target_link_libraries(Dreemchest "-framework AppKit")
+
+    if (DC_OPENGL_ENABLED)
+        target_link_libraries(Dreemchest "-framework CoreVideo")
+    endif ()
+endif ()

@@ -27,6 +27,8 @@
 // Include the engine header file.
 #include <Dreemchest.h>
 
+#include <iostream>
+
 // This macro hides a 'using namespace [identifier]' expression and just
 // opens a root engine namespace.
 //
