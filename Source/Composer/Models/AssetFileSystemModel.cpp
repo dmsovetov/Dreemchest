@@ -253,7 +253,7 @@ String AssetFileSystemModel::uuid( const FileInfo& assetFile ) const
 	// Read the meta data
 	Archive data = metaData( assetFile );
 
-    DC_BREAK_IF( !data.type()->is<KeyValue>() );
+    NIMBLE_BREAK_IF( !data.type()->is<KeyValue>() );
     return data.as<KeyValue>().get<String>( "uuid" );
 }
 
@@ -266,7 +266,7 @@ bool AssetFileSystemModel::hasMetaData( const FileInfo& assetFile ) const
 // ** AssetFileSystemModel::assetFile
 FileInfo AssetFileSystemModel::assetFile( const QModelIndex& index ) const
 {
-	DC_BREAK_IF( !index.isValid() );
+	NIMBLE_BREAK_IF( !index.isValid() );
 	return FileInfo( fileInfo( index ) );
 }
 

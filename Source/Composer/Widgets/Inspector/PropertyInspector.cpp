@@ -60,7 +60,7 @@ void PropertyInspector::ItemDelegate::setEditorData( QWidget* editor, const QMod
     }
 
     if( !value.isValid() ) {
-        LogError( "propertyInspector", "property model returned an invalid value\n" );
+        LogError( "propertyInspector", "%s", "property model returned an invalid value\n" );
         return;
     }
 

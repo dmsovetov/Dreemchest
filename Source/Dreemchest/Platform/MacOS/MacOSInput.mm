@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,56 +21,48 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
-
-#include <Cocoa/Cocoa.h>
+#include "MacOSInput.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
-
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
     
-// ** createServiceApplication
-IApplication* createServiceApplication( void )
+// ** createInput
+IInput* createInput( void )
+{
+    return DC_NEW MacOSInput;
+}
+
+// ** MacOSInput::keyDown
+bool MacOSInput::keyDown( const Key& key )
+{
+    NIMBLE_NOT_IMPLEMENTED;
+    return false;
+}
+
+// ** MacOSInput::mouseY
+void MacOSInput::setMouse( s32 x, s32 y )
 {
     NIMBLE_NOT_IMPLEMENTED
-    return NULL;
-}
-    
-// ** currentTime
-u32 currentTime( void )
-{
-    timeval time;
-    gettimeofday(&time, NULL);
-    return static_cast<u32>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
 }
 
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
+// ** MacOSInput::mouseX
+s32 MacOSInput::mouseX( void ) const
 {
-    exit( exitCode );
-}
-
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
+    NIMBLE_NOT_IMPLEMENTED
     return 0;
 }
 
+// ** MacOSInput::mouseY
+s32 MacOSInput::mouseY( void ) const
+{
+    NIMBLE_NOT_IMPLEMENTED
+    return 0;
+}
+    
 } // namespace Platform
 
 DC_END_DREEMCHEST

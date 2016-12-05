@@ -140,7 +140,7 @@ bool FileSystem::removeFile( const String& path )
 	}
 
 	bool result = QFile::remove( path.c_str() );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 
 	return result;
 }
@@ -175,7 +175,7 @@ bool FileSystem::copyFile( const String& source, const String& dest, bool force 
 	removeFile( dest );
 
 	bool result = QFile::copy( source.c_str(), dest.c_str() );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 
 	return result;
 }
@@ -188,7 +188,7 @@ bool FileSystem::createDirectory( const String& path )
 	}
 
 	bool result = QDir().mkpath( path.c_str() );
-	DC_BREAK_IF( result == false );
+	NIMBLE_BREAK_IF( result == false );
 
 	return result;
 }
@@ -201,7 +201,7 @@ bool FileSystem::createFile( const String& path )
 	}
 
 	bool result = QFile( path.c_str() ).open( QIODevice::WriteOnly );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 
 	return result;
 }
@@ -231,7 +231,7 @@ String FileSystem::generateFileName( const String& path, const String& name, con
 bool FileSystem::browse( const String& path )
 {
 	bool result = QDesktopServices::openUrl( QString( path.c_str() ) );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 	return result;
 }
 

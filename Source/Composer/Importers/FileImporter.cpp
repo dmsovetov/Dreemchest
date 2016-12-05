@@ -34,7 +34,7 @@ namespace Importers {
 bool FileImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
 	bool result = fs->copyFile( sourceFileName.c_str(), destinationFileName.c_str() );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 
 	return result;
 }

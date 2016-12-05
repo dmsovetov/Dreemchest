@@ -86,7 +86,7 @@ Bounds TranslationTool::selectorBoundingBox( u8 idx ) const
 	case XY:	return Bounds() << x * s << (x + y) * s << y * s;
 	case YZ:	return Bounds() << y * s << (y + z) * s << z * s;
 	case XZ:	return Bounds() << x * s << (x + z) * s << z * s;
-	default:	DC_BREAK;
+	default:	NIMBLE_BREAK;
 	}
 
 	return Bounds();
@@ -239,7 +239,7 @@ Vec3 TranslationToolSystem::mapRayToPoint( TranslationTool& tool, const Scene::T
 	// Find the view ray and gizmo transform plane intersection
 	Vec3 point;
 	bool hasIntersection = ray.intersects( best, &point );
-	DC_BREAK_IF( !hasIntersection );
+	NIMBLE_BREAK_IF( !hasIntersection );
 
 	return point;
 }

@@ -72,7 +72,7 @@ RenderingFrameQPtr Document::renderingFrame( void ) const
 // ** Document::attachRenderingFrame
 RenderingFrameQPtr Document::attachRenderingFrame( void )
 {
-	DC_BREAK_IF( m_renderingFrame );
+	NIMBLE_BREAK_IF( m_renderingFrame );
 
 	// Get the shared rendering context
 	RenderingFrameQPtr sharedContext = m_mainWindow->sharedRenderingContext();

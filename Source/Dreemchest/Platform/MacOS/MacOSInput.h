@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,56 +21,32 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#include "MacOSApplication.h"
-#include "MacOSApplicationDelegate.h"
+#ifndef __DC_Platform_MacOSInput_H__
+#define __DC_Platform_MacOSInput_H__
 
-#include <Cocoa/Cocoa.h>
+#include "../Input.h"
+
 
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
-
-// ** createApplication
-IApplication* createApplication( void )
-{
-    return DC_NEW MacOSApplication;
-}
     
-// ** createServiceApplication
-IApplication* createServiceApplication( void )
-{
-    NIMBLE_NOT_IMPLEMENTED
-    return NULL;
-}
+    // ** class MacOSInput
+    class MacOSInput : public IInput {
+    public:
+        
+        // ** IInput
+        virtual bool		keyDown( const Key& key ) NIMBLE_OVERRIDE;
+        virtual void		setMouse( s32 x, s32 y ) NIMBLE_OVERRIDE;
+        virtual s32			mouseX( void ) const NIMBLE_OVERRIDE;
+        virtual s32			mouseY( void ) const NIMBLE_OVERRIDE;
+    };
     
-// ** currentTime
-u32 currentTime( void )
-{
-    timeval time;
-    gettimeofday(&time, NULL);
-    return static_cast<u32>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
-}
-
-// ** MacOSApplication::quit
-void MacOSApplication::quit( u32 exitCode )
-{
-    exit( exitCode );
-}
-
-// ** MacOSApplication::launch
-int MacOSApplication::launch( Application* application )
-{
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app setDelegate: [[MacOSApplicationDelegate alloc] init]];
-    [app run];
-
-    return 0;
-}
-
 } // namespace Platform
 
 DC_END_DREEMCHEST
+
+#endif  /*  !__DC_Platform_MacOSInput_H__   */

@@ -100,7 +100,7 @@ DC_BEGIN_COMPOSER
 		virtual bool			        setData( const QModelIndex& index, const QVariant& value, int role ) Q_DECL_OVERRIDE;
 
 		//! Changes the scene object parent transform.
-		virtual bool			        moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const DC_DECL_OVERRIDE;
+		virtual bool			        moveItem( Item* sourceParent, Item* destinationParent, Item* item, int destinationRow ) const Q_DECL_OVERRIDE;
 
 		//! Handles the drop operation.
 		virtual bool			        dropMimeData( const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent ) Q_DECL_OVERRIDE;

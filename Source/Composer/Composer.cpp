@@ -295,13 +295,13 @@ Assets::AssetSet Composer::assetsFromMime( MimeDataQPtr mime ) const
 			continue;	// Unsupported asset type or just a folder
 		}
 
-        DC_ABORT_IF( !meta.type()->is<KeyValue>(), "asset meta data expected to be a KeyValue type" );
+        NIMBLE_ABORT_IF( !meta.type()->is<KeyValue>(), "asset meta data expected to be a KeyValue type" );
 
 		// Find asset by UUID.
         String uuid = meta.as<KeyValue>().get<String>( "uuid" );
 
 		Assets::Handle asset = m_project->assets().findAsset( uuid );
-		DC_BREAK_IF( !asset.isValid() );
+		NIMBLE_BREAK_IF( !asset.isValid() );
 
 		// Add to set.
 		result.insert( asset );

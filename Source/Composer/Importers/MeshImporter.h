@@ -42,7 +42,7 @@ namespace Importers {
 	public:
 
 		//! Writes imported mesh nodes to a file.
-		virtual bool		import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
+		virtual bool		import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) NIMBLE_OVERRIDE;
 
 	protected:
 

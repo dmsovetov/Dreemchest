@@ -42,7 +42,7 @@ bool MeshImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, co
 
 	// Write nodes to file
 	Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
-	DC_BREAK_IF( !stream.valid() );
+	NIMBLE_BREAK_IF( !stream.valid() );
 
 	s32 chunkCount = ( s32 )m_nodes.size();
 	stream->write( &chunkCount, 4 );
@@ -115,13 +115,13 @@ MeshImporterFBX::MeshImporterFBX( void ) : m_scene( NULL )
 	// Create the FBX manager instance
 	if( !s_manager ) {
 		s_manager = FbxManager::Create();
-		DC_BREAK_IF( !s_manager );
+		NIMBLE_BREAK_IF( !s_manager );
 	}
 
 	// Create an importer
 	if( !s_importer ) {
 		s_importer = FbxImporter::Create( s_manager, "" );
-		DC_BREAK_IF( !s_importer );
+		NIMBLE_BREAK_IF( !s_importer );
 	}
 }
 
@@ -135,17 +135,17 @@ bool MeshImporterFBX::importNodes( FileSystemQPtr fs, const Io::Path& sourceFile
 {
 	// Create the scene instance
 	m_scene = FbxScene::Create( s_manager, "" );
-	DC_BREAK_IF( !m_scene );
+	NIMBLE_BREAK_IF( !m_scene );
 
 	// Initialize the importer by providing a filename.
 	if( !s_importer->Initialize( sourceFileName.c_str() ) ) {
-		DC_BREAK;
+		NIMBLE_BREAK;
 		return false;
 	}
 
 	// Import the scene
 	if( !s_importer->Import( m_scene ) ) {
-		DC_BREAK;
+		NIMBLE_BREAK;
 		return false;
 	}
 
@@ -227,7 +227,7 @@ void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
 
         for( s32 j = 0; j < faceSize; j++ ) {
             s32 vertexIndex = mesh->GetPolygonVertex( i, j );
-			DC_BREAK_IF( vertexIndex >= vertexCount )
+			NIMBLE_BREAK_IF( vertexIndex >= vertexCount )
 
 			// Get vertex position
             position = vertices[vertexIndex];
@@ -266,7 +266,7 @@ String MeshImporterFBX::extractDiffuseTexture( FbxNode* node ) const
 {
 	// Get total number of materials inside node
 	s32 materialCount = node->GetMaterialCount();
-	DC_BREAK_IF( materialCount != 1 );
+	NIMBLE_BREAK_IF( materialCount != 1 );
 
 	// Resulting texture array
 	StringArray textures;
@@ -274,16 +274,16 @@ String MeshImporterFBX::extractDiffuseTexture( FbxNode* node ) const
 	for( s32 i = 0; i < materialCount; i++ ) {
 		// Get the surface material by index
 		FbxSurfaceMaterial* material = node->GetMaterial( i );
-		DC_BREAK_IF( material == NULL );
+		NIMBLE_BREAK_IF( material == NULL );
 
 		// Get the diffuse material
 		FbxProperty diffuse = material->FindProperty( FbxSurfaceMaterial::sDiffuse );
 	
 		s32 layersCount = diffuse.GetSrcObjectCount<FbxLayeredTexture>();
-		DC_BREAK_IF( layersCount > 0 );
+		NIMBLE_BREAK_IF( layersCount > 0 );
 
         s32 textureCount = diffuse.GetSrcObjectCount<FbxTexture>();
-		DC_BREAK_IF( textureCount != 1 );
+		NIMBLE_BREAK_IF( textureCount != 1 );
 
         for( s32 j = 0; j < textureCount; j++ )
         {

@@ -86,7 +86,7 @@ f32 TerrainTool::influence( f32 distance ) const
 		return 0.0f;
 	}
 
-    DC_BREAK_IF( m_strength < 0.0f || m_strength > 1.0f );
+    NIMBLE_BREAK_IF( m_strength < 0.0f || m_strength > 1.0f );
     f32 factor = distance / m_radius;
 	return sinf( 1.0f - powf( factor, m_exp ) ) * m_strength;
 }
@@ -173,7 +173,7 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
 				continue;
 			}
 
-            DC_BREAK_IF( influence < 0.0f || influence > 1.0f );
+            NIMBLE_BREAK_IF( influence < 0.0f || influence > 1.0f );
 
 			// Caclulate new height value
             f32 height = 0.0f;

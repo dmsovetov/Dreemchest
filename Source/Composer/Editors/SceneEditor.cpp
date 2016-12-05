@@ -278,7 +278,7 @@ void SceneEditor::save( void )
     // Write the serialized data to file
     qComposer->fileSystem()->writeTextFile( m_asset.absoluteFilePath(), QString::fromStdString( Io::VariantTextStream::stringify( Variant::fromValue( kv ), true ) ) );
 #else
-    LogError( "sceneEditor", "scene serialization is not implemented\n" );
+    LogError( "sceneEditor", "%s", "scene serialization is not implemented\n" );
 #endif
 }
 
@@ -327,10 +327,10 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
 #if ENABLE_MESHES
     Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
-    DC_ABORT_IF( !diffuse.isValid() );
+    NIMBLE_ABORT_IF( !diffuse.isValid() );
 
     Scene::MeshHandle mesh = m_project->assets().find<Scene::Mesh>( "eb7a422262cd5fda10121b47" );
-    DC_ABORT_IF( !mesh.isValid() );
+    NIMBLE_ABORT_IF( !mesh.isValid() );
 #endif
 
 	Scene::ImageHandle checker = m_project->assets().add<Scene::Image>( Guid::generate(), DC_NEW Scene::ImageCheckerGenerator( 128, 128, 8, Rgb(1.0f,1.0f,1.0f), Rgb(0.5f, 0.5f, 0.5f) ) );
@@ -575,7 +575,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 
 #if 0
     Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );
-    DC_BREAK_IF( !diffuse.isValid() );
+    NIMBLE_BREAK_IF( !diffuse.isValid() );
 
     struct MaterialGenerator : public Assets::GeneratorSource<Scene::Material> {
         MaterialGenerator( Scene::ImageHandle diffuse ) : m_diffuse( diffuse ) {}
@@ -689,7 +689,7 @@ void SceneEditor::navigateToObject( Scene::SceneObjectWPtr sceneObject )
 void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 {
 	// Create the tool bar
-	DC_BREAK_IF( m_tools );
+	NIMBLE_BREAK_IF( m_tools );
 	m_tools = window->addToolBar();
 
 	m_tools->beginActionGroup();
@@ -973,7 +973,7 @@ void SceneEditor::setTool( ActiveTool tool )
 // ** SceneEditor::bindTransformGizmo
 void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const
 {
-	DC_BREAK_IF( !sceneObject.valid() );
+	NIMBLE_BREAK_IF( !sceneObject.valid() );
 
 	// First remove all transform tool gizmos
 	if( sceneObject->has<TranslationTool>() )		sceneObject->detach<TranslationTool>();

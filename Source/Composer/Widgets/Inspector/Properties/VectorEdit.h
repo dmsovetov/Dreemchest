@@ -92,10 +92,10 @@ namespace Ui {
     private:
 
         //! Converts the internal array of floats to a variant value.
-        virtual Variant     toVariant( const f32* value ) const DC_DECL_OVERRIDE;
+        virtual Variant     toVariant( const f32* value ) const Q_DECL_OVERRIDE;
 
         //! Convets variant value to an array of floats.
-        virtual void        fromVariant( const Variant& input, f32* value ) DC_DECL_OVERRIDE;
+        virtual void        fromVariant( const Variant& input, f32* value ) Q_DECL_OVERRIDE;
     };
 
     // ** GenericVectorEdit::GenericVectorEdit

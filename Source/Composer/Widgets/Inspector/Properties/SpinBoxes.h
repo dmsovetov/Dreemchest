@@ -70,7 +70,7 @@ namespace Ui {
     public:
 
                             //! Constructs DoubleEdit instance.
-                            DoubleEdit( f64 min = -DBL_MAX, f64 max = DBL_MAX, f64 step = 1.0, QWidget* parent = NULL );
+                            DoubleEdit( f64 min = -std::numeric_limits<f64>::max(), f64 max = std::numeric_limits<f64>::max(), f64 step = 1.0, QWidget* parent = NULL );
 
         //! Returns current property value as Variant.
         Variant             value( void ) const;

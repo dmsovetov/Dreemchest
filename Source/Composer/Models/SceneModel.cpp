@@ -52,7 +52,7 @@ void SceneModel::remove( const QModelIndex& index )
 
 	// Get the scene object by index
 	Scene::SceneObjectWPtr sceneObject = dataAt( index );
-	DC_BREAK_IF( !sceneObject.valid() );
+	NIMBLE_BREAK_IF( !sceneObject.valid() );
 
 	// Remove scene object
 	scene()->removeSceneObject( sceneObject );
@@ -69,7 +69,7 @@ QVariant SceneModel::data( const QModelIndex& index, int role ) const
 {
 	// Get the scene object by index
 	Scene::SceneObjectWPtr sceneObject = dataAt( index );
-	DC_BREAK_IF( !sceneObject.valid() );
+	NIMBLE_BREAK_IF( !sceneObject.valid() );
 
 	// Return the data according to requested role.
 	switch( role ) {
@@ -99,7 +99,7 @@ bool SceneModel::setData( const QModelIndex& index, const QVariant& value, int r
 
 	// Get the scene object by index
 	Scene::SceneObjectWPtr sceneObject = dataAt( index );
-	DC_BREAK_IF( !sceneObject.valid() );
+	NIMBLE_BREAK_IF( !sceneObject.valid() );
 
 	// Set the object identifier
 	if( Scene::Identifier* identifier = sceneObject->has<Scene::Identifier>() ) {
@@ -169,7 +169,7 @@ bool SceneModel::canDropMimeData( const QMimeData* data, Qt::DropAction action, 
 // ** SceneModel::handleSceneObjectAdded
 void SceneModel::handleSceneObjectAdded( const Scene::Scene::SceneObjectAdded& e )
 {
-	DC_BREAK_IF( !e.sceneObject->has<Editors::SceneEditorInternal>() );
+	NIMBLE_BREAK_IF( !e.sceneObject->has<Editors::SceneEditorInternal>() );
 
 	// Ignore private scene objects.
 	if( e.sceneObject->has<Editors::SceneEditorInternal>()->isPrivate() ) {
@@ -188,7 +188,7 @@ void SceneModel::handleSceneObjectRemoved( const Scene::Scene::SceneObjectRemove
 {
 	// Get the model index by scene object.
 	QModelIndex idx = indexFromData( e.sceneObject );
-	DC_BREAK_IF( !idx.isValid() );
+	NIMBLE_BREAK_IF( !idx.isValid() );
 
 	// Get item from index
 	TreeItem* item = itemAtIndex( idx );
@@ -207,7 +207,7 @@ bool SceneModel::moveItem( Item* sourceParent, Item* destinationParent, Item* it
 // ** SceneModel::changeSceneObjectParent
 void SceneModel::changeSceneObjectParent( Scene::SceneObjectWPtr sceneObject, Scene::SceneObjectWPtr parent ) const
 {
-	DC_BREAK_IF( !sceneObject.valid() );
+	NIMBLE_BREAK_IF( !sceneObject.valid() );
 
 	// Get item transform
 	Scene::TransformWPtr childTransform = sceneObject->get<Scene::Transform>();
@@ -261,7 +261,7 @@ bool SceneModel::performAssetAction( const AssetAction& action )
 	switch( action.type ) {
 	case AssetAction::PlaceMesh:		{
 											Scene::SceneObjectWPtr object = placeStaticMesh( *action.assets.begin(), action.point );
-											DC_BREAK_IF( !object.valid() );
+											NIMBLE_BREAK_IF( !object.valid() );
 
 											if( target.valid() ) {
 												object->get<Scene::Transform>()->setParent( target->get<Scene::Transform>() );
@@ -285,13 +285,13 @@ bool SceneModel::performAssetAction( const AssetAction& action )
 // ** SceneModel::applyMaterial
 void SceneModel::applyMaterial( Scene::SceneObjectWPtr target, s32 slot, Scene::MaterialHandle material )
 {
-	DC_BREAK_IF( !target.valid() );
-	DC_BREAK_IF( !target->has<Scene::StaticMesh>() );
-	DC_BREAK_IF( !material.isValid() );
+	NIMBLE_BREAK_IF( !target.valid() );
+	NIMBLE_BREAK_IF( !target->has<Scene::StaticMesh>() );
+	NIMBLE_BREAK_IF( !material.isValid() );
 
 	// Queue material for loading.
 	//material->bundle()->queueForLoading( material );
-    LogWarning( "scene", " material is not queued for loading any more\n" );
+    LogWarning( "scene", "%s", " material is not queued for loading any more\n" );
 
 	// Set mesh material
 	target->get<Scene::StaticMesh>()->setMaterial( slot, material );
@@ -318,7 +318,7 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainHandle terrain, c
 			Scene::Mesh		      mesh  = terrain->createChunkMesh( x, z );
 
 			chunk->attach<Editors::SceneEditorInternal>( chunk, Editors::SceneEditorInternal::Private );
-            DC_NOT_IMPLEMENTED
+            NIMBLE_NOT_IMPLEMENTED
 			//chunk->attach<Scene::StaticMesh>( mesh );
 			chunk->attach<Editors::TerrainChunk>( terrain, x, z );
 			chunk->attach<Scene::Transform>( x * Scene::Terrain::kChunkSize, 0, z * Scene::Terrain::kChunkSize, root->get<Scene::Transform>() );
@@ -333,7 +333,7 @@ Scene::SceneObjectWPtr SceneModel::placeTerrain( Scene::TerrainHandle terrain, c
 // ** SceneModel::placeStaticMesh
 Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, const Vec3& point )
 {
-	DC_BREAK_IF( !mesh.isValid() );
+	NIMBLE_BREAK_IF( !mesh.isValid() );
 
 	// Construct scene object
 	Scene::SceneObjectPtr sceneObject = m_scene->createSceneObject();
@@ -370,7 +370,7 @@ Scene::SceneObjectWPtr SceneModel::placeStaticMesh( Scene::MeshHandle mesh, cons
 		}
 	}
 #else
-    LogWarning( "scene", "no default material set for a static mesh\n" );
+    LogWarning( "scene", "%s", "no default material set for a static mesh\n" );
 #endif
 
     return sceneObject;

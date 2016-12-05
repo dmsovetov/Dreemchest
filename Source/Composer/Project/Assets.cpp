@@ -44,7 +44,7 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
 
 	// Create an asset bundle
 	//m_bundle = Scene::AssetBundle::create( "Assets", path );
-    LogWarning( "assets", "no assets path set\n" );
+    LogWarning( "assets", "%s", "no assets path set\n" );
 
 	// Declare asset importers.
 #ifdef HAVE_TIFF
@@ -59,9 +59,9 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
 	m_assetImporters.declare<Importers::FileImporter>( "material" );
 
     // Declare default asset formats
-    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Assets::assetTypeId<Scene::Image>() );
-    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Assets::assetTypeId<Scene::Mesh>() );
-    m_assetFormats.declare<Scene::MaterialSourceKeyValue>( Assets::Assets::assetTypeId<Scene::Material>() );
+    m_assetFormats.declare<Scene::ImageFormatRaw>( Assets::Asset::typeId<Scene::Image>() );
+    m_assetFormats.declare<Scene::MeshFormatRaw>( Assets::Asset::typeId<Scene::Mesh>() );
+    m_assetFormats.declare<Scene::MaterialSourceKeyValue>( Assets::Asset::typeId<Scene::Material>() );
 
 	// Connect to asset model signals
     connect( m_assetFileSystem, SIGNAL(fileAdded(const FileInfo&)), this, SLOT(addAssetFile(const FileInfo&)) );
@@ -105,7 +105,7 @@ Assets::Handle AssetManager::parseAssetFromData( const KeyValue& kv )
 {
 	// Get asset type by name.
 	Assets::TypeId type = m_assets.typeFromName( kv.get<String>( "type" ) );
-    DC_BREAK_IF( type == 0 );
+    NIMBLE_BREAK_IF( type == 0 );
 
     // Read the unique asset identifier.
     Assets::AssetId uid = kv.get<String>( "uuid" );
@@ -127,7 +127,7 @@ Assets::Handle AssetManager::createAsset( const Assets::TypeId& type, const Asse
 
     // Create asset instance
     Assets::Handle asset = m_assets.addAsset( type, id, source );
-    DC_BREAK_IF( !asset.isValid() );
+    NIMBLE_BREAK_IF( !asset.isValid() );
 
     // Register this asset file source
     m_files[id] = source;
@@ -195,7 +195,7 @@ bool AssetManager::updateAssetCache( const QString& uuid, const FileInfo& file )
 
 	// Perform asset caching.
 	bool result = importer->import( fs, file.absolutePath(), assetsFilePath );
-	DC_BREAK_IF( !result );
+	NIMBLE_BREAK_IF( !result );
 
     // Update the asset source timestamp
     AssetFiles::iterator i = m_files.find( uuid.toStdString() );

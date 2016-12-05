@@ -46,7 +46,7 @@ bool ImageImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, c
 
 	// Write imported image to a binary stream
 	Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
-	DC_BREAK_IF( !stream.valid() );
+	NIMBLE_BREAK_IF( !stream.valid() );
 
 	stream->write( &m_image.width, 2 );
 	stream->write( &m_image.height, 2 );
@@ -63,7 +63,7 @@ bool ImageImporterTGA::importImage( FileSystemQPtr fs, const Io::Path& sourceFil
 {
 	// Open the file
 	Io::StreamPtr stream = Io::DiskFileSystem::open( sourceFileName );
-	DC_BREAK_IF( !stream.valid() );
+	NIMBLE_BREAK_IF( !stream.valid() );
 
 	if( !stream.valid() ) {
 		return false;
@@ -84,7 +84,7 @@ bool ImageImporterTGA::importImage( FileSystemQPtr fs, const Io::Path& sourceFil
 	stream->setPosition( len + 1, Io::SeekCur );
 
 	// Read an image
-	DC_BREAK_IF( imageType == 10 );	// RLE-encoded images are not supported yet.
+	NIMBLE_BREAK_IF( imageType == 10 );	// RLE-encoded images are not supported yet.
 
 	if( bitsPerPixel == 16 ) {
 		readPixels16( stream, m_image, width, height );
@@ -145,7 +145,7 @@ bool ImageImporterTIF::importImage( FileSystemQPtr fs, const Io::Path& sourceFil
 {
 	// Open the TIFF file
 	TIFF* tif = TIFFOpen( sourceFileName.c_str(), "r" );
-	DC_BREAK_IF( !tif );
+	NIMBLE_BREAK_IF( !tif );
 
 	// Extract image dimensions
 	u32 width, height;
@@ -155,11 +155,11 @@ bool ImageImporterTIF::importImage( FileSystemQPtr fs, const Io::Path& sourceFil
 	// Allocate the pixelbuffer
 	u32 npixels = width * height;
 	u32* raster = ( u32* )_TIFFmalloc( npixels * sizeof( u32 ) );
-	DC_BREAK_IF( !raster );
+	NIMBLE_BREAK_IF( !raster );
 
 	// Read image
 	s32 result = TIFFReadRGBAImage( tif, width, height, raster, 0 );
-	DC_BREAK_IF( result != 1 );
+	NIMBLE_BREAK_IF( result != 1 );
 
 	// Initialize the imported image
 	m_image.width    = width;

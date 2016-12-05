@@ -44,7 +44,7 @@ namespace Editors {
 										VisualEditor( void );
 
 		//! Performs the visual editor initialization.
-		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) Q_DECL_OVERRIDE;
 
 		//! Returns rendering HAL.
 		Renderer::HalWPtr				hal( void ) const;

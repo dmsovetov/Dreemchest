@@ -270,7 +270,7 @@ Archive EntityInspector::saveState( void ) const
         LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
     }
 #else
-    LogError( "entityInspector", "saveState is not implemented\n" );
+    LogError( "entityInspector", "%s", "saveState is not implemented\n" );
 #endif
     return state;
 }
@@ -286,7 +286,7 @@ void EntityInspector::restoreState( const Archive& state )
     Ecs::SerializationContext ctx( m_entity->ecs() );
     m_entity->deserialize( ctx, state );
 #else
-    LogError( "entityInspector", "entity deserialization is not implemented\n" );
+    LogError( "entityInspector", "%s", "entity deserialization is not implemented\n" );
 #endif
 }
 
@@ -310,7 +310,7 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
     // Sort list by a component name
     std::sort( list.begin(), list.end(), LessThan::compare );
 #else
-    LogWarning( "entityInspector", "component list was not sorted\n" );
+    LogWarning( "entityInspector", "%s", "component list was not sorted\n" );
 #endif
 
     return list;
@@ -414,12 +414,8 @@ void EntityInspector::reset( void )
 void EntityInspector::attachComponent( const QString& type )
 {
     // Create component by name
-#if DEV_DEPRECATED_SERIALIZATION
-    Ecs::ComponentPtr component = m_entity->ecs()->createComponentByName( type.toStdString() );
-#else
     Ecs::ComponentPtr component = qComposer->assembly()->createInstance( type.toStdString() ).upCast<Ecs::ComponentBase>();
-#endif  /*  #if DEV_DEPRECATED_SERIALIZATION    */
-    DC_BREAK_IF( !component.valid() );
+    NIMBLE_BREAK_IF( !component.valid() );
 
     // Attach it to an entity
     m_entity->attachComponent<Ecs::ComponentBase>( component.get() );

@@ -116,7 +116,7 @@ Ray VisualEditor::constructViewRay( s32 x, s32 y ) const
     y = m_document->renderingFrame()->height() - y;
     return m_viewport->constructViewRay( x, y );
 #else
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return Ray();
 #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 }
@@ -177,7 +177,7 @@ bool VisualEditor::eventFilter( QObject* sender, QEvent* e )
 {
     // Ensure the sender is a rendering frame
     Ui::RenderingFrame* frame = qobject_cast<Ui::RenderingFrame*>( sender );
-    DC_BREAK_IF( !frame );
+    NIMBLE_BREAK_IF( !frame );
 
     // Process an event
     switch( e->type() ) {

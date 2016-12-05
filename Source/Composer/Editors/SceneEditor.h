@@ -60,40 +60,40 @@ namespace Editors {
 
 
 		//! Performs the scene editor initialization.
-		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
+		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) Q_DECL_OVERRIDE;
 
 		//! Renders the scene.
-		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
+		virtual void					render( f32 dt ) Q_DECL_OVERRIDE;
 
         //! Saves the scene to file.
-        virtual void                    save( void ) DC_DECL_OVERRIDE;
+        virtual void                    save( void ) Q_DECL_OVERRIDE;
 
 		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
+		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) Q_DECL_OVERRIDE;
 
 		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button ) Q_DECL_OVERRIDE;
 
 		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons ) Q_DECL_OVERRIDE;
 
 		//! Handles the mouse wheel event.
-		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
+		virtual void					handleMouseWheel( s32 delta ) Q_DECL_OVERRIDE;
 
 		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( MimeDataQPtr mime ) DC_DECL_OVERRIDE;
+		virtual bool					handleDragEnter( MimeDataQPtr mime ) Q_DECL_OVERRIDE;
 
 		//! Handles the drag move event.
-		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) Q_DECL_OVERRIDE;
 
 		//! Handles the drop event.
-		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) Q_DECL_OVERRIDE;
 
 		//! Scene editor has entered the foreground.
-		virtual void					notifyEnterForeground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
+		virtual void					notifyEnterForeground( Ui::MainWindowQPtr window ) Q_DECL_OVERRIDE;
 
 		//! Scene editor has entered the background.
-		virtual void					notifyEnterBackground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
+		virtual void					notifyEnterBackground( Ui::MainWindowQPtr window ) Q_DECL_OVERRIDE;
 
 		//! Disables all transform tools.
 		void							menuTransformSelect( Ui::ActionQPtr action );

@@ -106,7 +106,7 @@ void Gizmo::lock( const Scene::Transform& transform, const Vec2& cursor, const R
 // ** Gizmo::unlock
 void Gizmo::unlock( void )
 {
-	DC_BREAK_IF( state() != Gizmo::Locked );
+	NIMBLE_BREAK_IF( state() != Gizmo::Locked );
 	m_state = Gizmo::Idle;
 }
 

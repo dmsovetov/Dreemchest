@@ -24,8 +24,8 @@
  
  **************************************************************************/
 
-#ifndef __DC_Assets_AssetHandle_H__
-#define __DC_Assets_AssetHandle_H__
+#ifndef __DC_Assets_AssetHandle_Hpp__
+#define __DC_Assets_AssetHandle_Hpp__
 
 #include "Assets.h"
 
@@ -212,4 +212,4 @@ TAsset& WriteLock<TAsset>::operator * ( void )
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Assets_AssetHandle_H__    */
+#endif    /*    !__DC_Assets_AssetHandle_Hpp__    */

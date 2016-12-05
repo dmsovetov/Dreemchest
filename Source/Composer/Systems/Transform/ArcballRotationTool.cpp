@@ -51,7 +51,7 @@ bool ArcballRotationTool::isLocked( void ) const
 // ** ArcballRotationTool::lock
 void ArcballRotationTool::lock( const Quat& rotation, const Vec3& direction )
 {
-	DC_BREAK_IF( m_isLocked );
+	NIMBLE_BREAK_IF( m_isLocked );
 
 	m_initialRotation	= rotation;
 	m_initialDirection	= direction;
@@ -73,7 +73,7 @@ const Quat& ArcballRotationTool::initialRotation( void ) const
 // ** ArcballRotationTool::unlock
 void ArcballRotationTool::unlock( void )
 {
-	DC_BREAK_IF( !m_isLocked );
+	NIMBLE_BREAK_IF( !m_isLocked );
 	m_isLocked = false;
 }
 

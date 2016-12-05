@@ -45,7 +45,7 @@ namespace Ui {
         //! This writer intercepts log messages and output them to a widget.
         struct Writer : public Logger::DebugWriter {
                             Writer( Output* output ) : output( output ) {}
-            virtual void    write( Logger::Level level, const String& text ) const DC_DECL_OVERRIDE;
+            virtual void    write( Logger::Level level, const String& text ) const Q_DECL_OVERRIDE;
             Output*         output;
         };
     };

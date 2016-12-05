@@ -54,7 +54,7 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 	m_paths[CachePath]	= path + "Cache";
 
 	// Declare asset editors.
-	m_assetEditors.declare<Editors::SceneEditor>( Assets::Assets::assetTypeId<Scene::Prefab>() );
+	m_assetEditors.declare<Editors::SceneEditor>( Assets::Asset::typeId<Scene::Prefab>() );
 
 	// Create assets bundle & model
 	m_assetFileSystem = new AssetFileSystemModel( this );
@@ -64,12 +64,12 @@ Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 
 	// Register asset types
 	//m_assets->registerExtension( "", Scene::Asset::Folder );
-	m_assets->registerExtension( "tga", Assets::Assets::assetTypeId<Scene::Image>() );
-	m_assets->registerExtension( "tif", Assets::Assets::assetTypeId<Scene::Image>() );
-	m_assets->registerExtension( "fbx", Assets::Assets::assetTypeId<Scene::Mesh>() );
-	m_assets->registerExtension( "scene", Assets::Assets::assetTypeId<Scene::Prefab>() );
-	m_assets->registerExtension( "prefab", Assets::Assets::assetTypeId<Scene::Prefab>() );
-	m_assets->registerExtension( "material", Assets::Assets::assetTypeId<Scene::Material>() );
+	m_assets->registerExtension( "tga", Assets::Asset::typeId<Scene::Image>() );
+	m_assets->registerExtension( "tif", Assets::Asset::typeId<Scene::Image>() );
+	m_assets->registerExtension( "fbx", Assets::Asset::typeId<Scene::Mesh>() );
+	m_assets->registerExtension( "scene", Assets::Asset::typeId<Scene::Prefab>() );
+	m_assets->registerExtension( "prefab", Assets::Asset::typeId<Scene::Prefab>() );
+	m_assets->registerExtension( "material", Assets::Asset::typeId<Scene::Material>() );
 
 	// Setup assets model after creating cache
 	m_assetFileSystem->setReadOnly( false );
@@ -102,7 +102,7 @@ Assets::Assets& Project::assets( void ) const
 // ** Project::absolutePath
 String Project::absolutePath( s32 index ) const
 {
-	DC_BREAK_IF( index < 0 || index >= TotalPaths );
+	NIMBLE_BREAK_IF( index < 0 || index >= TotalPaths );
 	return m_paths[index].c_str();
 }
 
@@ -180,7 +180,7 @@ Ui::DocumentQPtr Project::edit( const String& uuid, const FileInfo& fileInfo )
 
 	// Find asset by UUID
 	Assets::Handle asset = m_assets->assets().findAsset( uuid );
-	DC_BREAK_IF( !asset.isValid() );
+	NIMBLE_BREAK_IF( !asset.isValid() );
 
 	// Dock the editor to main window
 	Ui::DocumentQPtr result = qMainWindow->editDocument( assetEditor, fileInfo );

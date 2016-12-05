@@ -252,7 +252,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
     #if 0
 		inspector->setModel( NULL );
     #else
-        DC_NOT_IMPLEMENTED;
+        NIMBLE_NOT_IMPLEMENTED;
     #endif
 		return;
 	}
@@ -270,7 +270,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
 
 	// Find asset by UUID
 	Assets::Handle asset = m_project->assets().findAsset( uuid );
-	DC_BREAK_IF( !asset.isValid() );
+	NIMBLE_BREAK_IF( !asset.isValid() );
 	
 	// Bind the selected asset to an object inspector.
 #if 0
@@ -281,7 +281,7 @@ void AssetTree::bindToInspector( const QModelIndexList& indexes )
         inspector->setModel( NULL );
     }
 #else
-    LogError( "assetTree", "asset could not be bound to an entity inspector\n" );
+    LogError( "assetTree", "%s", "asset could not be bound to an entity inspector\n" );
 #endif
 }
 

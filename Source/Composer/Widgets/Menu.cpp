@@ -68,7 +68,7 @@ void ToolBar::beginActionGroup( void )
 // ** ToolBar::endActionGroup
 void ToolBar::endActionGroup( void )
 {
-	DC_BREAK_IF( m_group.empty() );
+	NIMBLE_BREAK_IF( m_group.empty() );
 
 	QActionGroup* group = new QActionGroup( this );
 

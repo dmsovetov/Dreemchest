@@ -33,7 +33,7 @@ PropertyModel::PropertyModel( Instance instance, QObject* parent )
     : QAbstractItemModel( parent )
     , m_instance( instance )
 {
-    DC_ABORT_IF( !instance, "invalid meta-instance passed" );
+    NIMBLE_ABORT_IF( !instance, "invalid meta-instance passed" );
 
     const Reflection::Class* metaClass = instance.type();
 
@@ -88,7 +88,7 @@ bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, in
     Variant v   = qvariant_cast<Variant>( value );
 
     if( !v.isValid() ) {
-        LogError( "propertyModel", "value could not be set from a void variant\n" );
+        LogError( "propertyModel", "%s", "value could not be set from a void variant\n" );
         return false;
     }
 

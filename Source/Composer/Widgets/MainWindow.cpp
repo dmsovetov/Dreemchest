@@ -106,7 +106,7 @@ void MainWindow::message( const String& text, MessageStatus status ) const
 	case MessageInfo:		QMessageBox::information( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );	break;
 	case MessageWarning:	QMessageBox::warning( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
 	case MessageError:		QMessageBox::critical( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
-	default:				DC_BREAK;
+	default:				NIMBLE_BREAK;
 	}
 }
 
@@ -123,7 +123,7 @@ MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const Strin
 	case MessageInfo:		msgBox.setIcon( QMessageBox::Information );		break;
 	case MessageWarning:	msgBox.setIcon( QMessageBox::Warning );			break;
 	case MessageError:		msgBox.setIcon( QMessageBox::Critical );		break;
-	default:				DC_BREAK;
+	default:				NIMBLE_BREAK;
 	}
 	
 	switch( msgBox.exec() ) {
@@ -197,7 +197,7 @@ QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::Dock
 // ** MainWindow::editDocument
 DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, const FileInfo& asset )
 {
-	DC_BREAK_IF( !assetEditor );
+	NIMBLE_BREAK_IF( !assetEditor );
 
 	// First lookup the exising document
 	DocumentQPtr existing = findDocument( asset );
@@ -242,7 +242,7 @@ bool MainWindow::closeDocument( DocumentQPtr document )
 	int index = m_documents.indexOf( document );
 
 	if( index == -1 ) {
-		DC_BREAK;
+		NIMBLE_BREAK;
 		return false;
 	}
 
@@ -352,9 +352,9 @@ bool MainWindow::ensureSaved( DocumentQPtr document ) const
 // ** MainWindow::createProjectInterface
 void MainWindow::createProjectInterface( Project* project )
 {
-    DC_BREAK_IF( m_assetTree );
-    DC_BREAK_IF( m_sceneTree );
-    DC_BREAK_IF( m_inspector );
+    NIMBLE_BREAK_IF( m_assetTree );
+    NIMBLE_BREAK_IF( m_sceneTree );
+    NIMBLE_BREAK_IF( m_inspector );
 
 	// Get the project from event
 	m_project = project;
@@ -386,7 +386,7 @@ void MainWindow::createProjectInterface( Project* project )
 void MainWindow::destroyProjectInterface( Project* project )
 {
 	m_project = NULL;
-	DC_BREAK;
+	NIMBLE_BREAK;
 }
 
 } // namespace Ui
