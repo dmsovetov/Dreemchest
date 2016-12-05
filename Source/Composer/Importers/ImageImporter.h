@@ -84,7 +84,7 @@ namespace Importers {
 	public:
 
 		//! Performs importing of a TIF image.
-		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
+		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) NIMBLE_OVERRIDE;
 	};
 
 #endif	/*	HAVE_TIFF	*/
