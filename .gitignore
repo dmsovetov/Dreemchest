@@ -43,3 +43,5 @@ externals/src
 Build/*.dll
 Build/LogFile.txt
 *.DS_Store
+
+Externals/Prebuilt
