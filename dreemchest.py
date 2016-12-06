@@ -29,6 +29,7 @@
 import argparse
 import os
 import subprocess
+import shutil
 
 
 def enable_option(value):
@@ -41,7 +42,25 @@ def disable_option(value):
     return 'OFF' if value else 'ON'
 
 
-def cmake_generate(generator, source, output, parameters, rest):
+def library_option(parameters, name, options):
+    """Adds a library parameter base on passed options"""
+
+    # Convert arguments to dictionary
+    values = vars(options)
+
+    # Convert a library name to lowercase
+    name = name.lower()
+
+    if values['no_%s' % name]:
+        return
+
+    if values['system_%s' % name]:
+        parameters['SYSTEM_%s' % name.upper()] = True
+    else:
+        parameters['BUNDLED_%s' % name.upper()] = True
+
+
+def cmake_generate(generator, source, output, parameters, rest='', quiet=False):
     """Invokes a CMake command to generate a build system"""
 
     # Create an output directory
@@ -59,17 +78,17 @@ def cmake_generate(generator, source, output, parameters, rest):
                                                                  )
 
     with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call(command_line, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+        subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
 
 
-def cmake_build(source, target, configuration):
+def cmake_build(source, target, configuration, quiet=False):
     """Build a CMake-generated project binary tree."""
 
     # Generate a command line string
     command_line = 'cmake --build %s --target %s --config %s' % (source, target, configuration)
 
     with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call(command_line, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+        subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
 
 
 class CommandLineTool:
@@ -118,6 +137,9 @@ class PlatformConfigurationCommand(CMakeCommand):
 
         CMakeCommand.__init__(self, parser)
 
+        # List of all available libraries
+        self._libraries = []
+
         parser.add_argument('--pch',
                             help='generate a build system that uses precompiled headers.',
                             action='store_true',
@@ -157,11 +179,17 @@ class PlatformConfigurationCommand(CMakeCommand):
         self._add_library(parser, 'libtiff')
         self._add_library(parser, 'jsoncpp')
         self._add_library(parser, 'zlib')
+        self._add_library(parser, 'Box2D')
+        self._add_library(parser, 'gtest')
+        self._add_library(parser, 'libpng')
+        self._add_library(parser, 'lua')
+        self._add_library(parser, 'ogg')
+        self._add_library(parser, 'vorbis')
+        self._add_library(parser, 'OpenAL')
 
         parser.set_defaults(function=self.configure)
 
-    @staticmethod
-    def _add_library(parser, name):
+    def _add_library(self, parser, name, is_bundled=True):
         """Adds a third party library option to parser object"""
 
         lib = parser.add_mutually_exclusive_group()
@@ -172,18 +200,25 @@ class PlatformConfigurationCommand(CMakeCommand):
         lib.add_argument('--system-%s' % name.lower(),
                          help='use %s from the operating system if possible.' % name,
                          action='store_true',
-                         default=True)
+                         default=False if is_bundled else True)
+
+        if is_bundled:
+            lib.add_argument('--%s' % name.lower(),
+                             help='use %s bundled with a source code distribution.' % name,
+                             action='store_true',
+                             default=True)
+
+        self._libraries.append(name)
 
     def configure(self, options):
         """Performs basic build system configuration"""
         pass
 
-    @staticmethod
-    def _prepare(options):
+    def _prepare(self, options):
         """Generates a command line arguments from an input options"""
 
         # Generate platform independent CMake arguments from passed options
-        return dict(
+        parameters = dict(
             DC_USE_PCH=enable_option(options.pch),
             DC_COMPOSER_ENABLED=disable_option(options.no_composer or options.no_qt),
             DC_OPENGL_ENABLED=disable_option(options.no_renderer),
@@ -194,14 +229,20 @@ class PlatformConfigurationCommand(CMakeCommand):
             DC_QT_SUPPORT=('disabled' if options.no_qt else options.qt).capitalize()
         )
 
+        # Generate CMake arguments from added libraries
+        for lib in self._libraries:
+            library_option(parameters, lib, options)
+
+        return parameters
+
 
 class DesktopConfigureCommand(PlatformConfigurationCommand):
     """Performs desktop OS build system configuration"""
 
-    def __init__(self, parser, renderers):
+    def __init__(self, parser, rendering_backend):
         """Constructs desktop configuration command"""
 
-        PlatformConfigurationCommand.__init__(self, parser, renderers)
+        PlatformConfigurationCommand.__init__(self, parser, rendering_backend)
 
         # Add Qt library options
         qt = parser.add_mutually_exclusive_group()
@@ -216,7 +257,7 @@ class DesktopConfigureCommand(PlatformConfigurationCommand):
                         default='auto')
 
         # Add third party libraries
-        self._add_library(parser, 'FBX')
+        self._add_library(parser, 'FBX', is_bundled=False)
 
 
 class WindowsConfigureCommand(DesktopConfigureCommand):
@@ -367,6 +408,8 @@ class InstallCommand(CMakeCommand):
                                     install_path,
                                     dict(ALSOFT_EXAMPLES=False, ALSOFT_TESTS=False, LIBTYPE='STATIC'))
 
+        shutil.rmtree('Projects/Externals')
+
     @staticmethod
     def _build_and_install(library, generator, source, output, options):
         """Generates a binary tree, then builds it and installs to a specified destination folder"""
@@ -388,6 +431,8 @@ class InstallCommand(CMakeCommand):
 
         except subprocess.CalledProcessError:
             print 'Failed to build %s' % library
+
+        shutil.rmtree(binary_dir)
 
     @staticmethod
     def _add_library(parser, name):
