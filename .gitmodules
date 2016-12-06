@@ -13,3 +13,6 @@
 [submodule "Externals/libpng"]
 	path = Externals/libpng
 	url = https://github.com/glennrp/libpng
+[submodule "Externals/libtiff"]
+	path = Externals/libtiff
+	url = https://github.com/LuaDist/libtiff
