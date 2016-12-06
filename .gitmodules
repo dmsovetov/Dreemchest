@@ -10,3 +10,6 @@
 [submodule "Externals/GoogleTest"]
 	path = Externals/GoogleTest
 	url = https://github.com/google/googletest
+[submodule "Externals/libpng"]
+	path = Externals/libpng
+	url = https://github.com/glennrp/libpng
