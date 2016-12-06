@@ -174,6 +174,11 @@ class PlatformConfigurationCommand(CMakeCommand):
                                   type=str,
                                   choices=rendering_backend,
                                   default=rendering_backend[0])
+            
+        parser.add_argument('--no-sound',
+                            help='build with no sound support',
+                            action='store_true',
+                            default=False)
 
         # Add third party libraries options
         self._add_library(parser, 'libtiff')
@@ -183,8 +188,7 @@ class PlatformConfigurationCommand(CMakeCommand):
         self._add_library(parser, 'gtest')
         self._add_library(parser, 'libpng')
         self._add_library(parser, 'lua')
-        self._add_library(parser, 'ogg')
-        self._add_library(parser, 'vorbis')
+        self._add_library(parser, 'oggvorbis')
         self._add_library(parser, 'OpenAL')
 
         parser.set_defaults(function=self.configure)
@@ -222,11 +226,13 @@ class PlatformConfigurationCommand(CMakeCommand):
             DC_USE_PCH=enable_option(options.pch),
             DC_COMPOSER_ENABLED=disable_option(options.no_composer or options.no_qt),
             DC_OPENGL_ENABLED=disable_option(options.no_renderer),
+            DC_SOUND_ENABLED=disable_option(options.no_sound),
             DC_WITH_RELIGHT=disable_option(options.no_relight),
             DC_BUILD_TESTS=disable_option(options.no_tests),
             DC_BUILD_EXAMPLES=disable_option(options.no_examples),
             CMAKE_CXX_STANDARD=options.cpp,
-            DC_QT_SUPPORT=('disabled' if options.no_qt else options.qt).capitalize()
+            DC_QT_SUPPORT=('disabled' if options.no_qt else options.qt).capitalize(),
+            CMAKE_PREFIX_PATH=os.path.abspath('Externals/Prebuilt/MacOS'),
         )
 
         # Generate CMake arguments from added libraries

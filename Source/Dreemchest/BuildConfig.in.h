@@ -36,19 +36,40 @@
 //! A target platform identifier string.
 #cmakedefine DC_PLATFORM "${DC_PLATFORM}"
 
-//! Indicates that a library was build with libtiff support.
-#cmakedefine HAVE_TIFF
-
 //! Indicates that a library was build with OpenGL support.
 #cmakedefine DC_OPENGL_ENABLED
-
-//! Indicates that a library was built with Box2D support.
-#cmakedefine DC_BOX2D_ENABLED
 
 //! Indicates that a library was built with sound support.
 #cmakedefine DC_SOUND_ENABLED
 
-//! A preprocessor constant that indicates a Qt library major version
+//! A preprocessor constant that indicates a Qt library major version.
 #cmakedefine DC_QT_VERSION (${DC_QT_VERSION})
+
+//! Indicates that a jsoncpp library was found upon configuration process.
+#cmakedefine JSONCPP_FOUND
+
+//! Indicates that a zlib library was found upon configuration process.
+#cmakedefine ZLIB_FOUND
+
+//! Indicates that a Box2D library was found upon configuration process.
+#cmakedefine BOX2D_FOUND
+
+//! Indicates that a OpenAL library was found upon configuration process.
+#cmakedefine OPENAL_FOUND
+
+//! Indicates that a Ogg and Vorbis libraries were found upon configuration process.
+#cmakedefine OGGVORBIS_FOUND
+
+//! Indicates that a Google Test library was found upon configuration process.
+#cmakedefine GTEST_FOUND
+
+//! Indicates that a libpng library was found upon configuration process.
+#cmakedefine PNG_FOUND
+
+//! Indicates that a libtiff library was found upon configuration process.
+#cmakedefine TIFF_FOUND
+
+//! Indicates that a Lua library was found upon configuration process.
+#cmakedefine LUA_FOUND
 
 #endif  /*  #ifndef __DC_BuildConfig_H__  */
