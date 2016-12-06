@@ -25,3 +25,6 @@
 [submodule "Externals/jsoncpp"]
 	path = Externals/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp
+[submodule "Externals/zlib"]
+	path = Externals/zlib
+	url = https://github.com/madler/zlib
