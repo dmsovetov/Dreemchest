@@ -7,3 +7,6 @@
 [submodule "Externals/Box2D"]
 	path = Externals/Box2D
 	url = https://github.com/erincatto/Box2D
+[submodule "Externals/GoogleTest"]
+	path = Externals/GoogleTest
+	url = https://github.com/google/googletest
