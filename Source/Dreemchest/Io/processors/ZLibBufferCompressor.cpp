@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 namespace Io {
 
 // ** ZLibBufferCompressor::compressToBuffer
-s64 ZLibBufferCompressor::compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
+s32 ZLibBufferCompressor::compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
 {
     s64 result = 0;
 
@@ -57,7 +57,7 @@ s64 ZLibBufferCompressor::compressToBuffer( const u8 *in, s32 size, u8 *out, s32
 }
 
 // ** ZLibBufferCompressor::decompressToBuffer
-s64 ZLibBufferCompressor::decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
+s32 ZLibBufferCompressor::decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
 {
     s64 result = -1;
 

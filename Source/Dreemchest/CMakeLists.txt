@@ -4,6 +4,19 @@ add_definitions(-DDC_BUILD_LIBRARY)
 # Set the precompiled header name
 set(DC_PCH_NAME Dreemchest)
 
+# Locate all dependencies
+locate_dependency(OpenAL)
+locate_dependency(Zlib)
+locate_dependency(Curl)
+locate_dependency(Lua)
+locate_dependency(TIFF)
+locate_dependency(PNG)
+locate_dependency(JsonCpp)
+locate_dependency(GTest)
+locate_dependency(Box2D)
+locate_dependency(Ogg)
+locate_dependency(Vorbis)
+
 # Glob all source files
 add_directories(Base BASE_SRCS)
 add_directories(Assets ASSETS_SRCS)
@@ -18,95 +31,12 @@ add_files(Io IO_SRCS)
 add_files(Io/Serialization IO_SERIALIZATION_SRCS)
 add_files(Io/Streams IO_STREAMS_SRCS)
 
-# Locate the Box2D library
-if (BUNDLED_BOX2D)
-    find_package(Box2D)
-
-    if (BOX2D_INCLUDE_DIR AND BOX2D_LIBRARY)
-	    include_directories(${BOX2D_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the Google Test library
-if (BUNDLED_GTEST)
-    find_package(GTest)
-
-    if (GTEST_INCLUDE_DIRS AND GTEST_BOTH_LIBRARIES)
-	    include_directories(${GTEST_INCLUDE_DIRS})
-    endif ()
-endif()
-
-# Locate the JSON library
-if (BUNDLED_JSONCPP)
-    find_package(Jsoncpp)
-
-    if (JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
-	    include_directories(${JSONCPP_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the libpng library
-if (BUNDLED_LIBPNG)
-    find_package(PNG)
-
-    if (PNG_INCLUDE_DIR AND PNG_LIBRARY)
-	    include_directories(${PNG_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the libtiff library
-if (BUNDLED_LIBTIFF)
-    find_package(TIFF)
-
-    if (TIFF_INCLUDE_DIR AND TIFF_LIBRARY)
-	    include_directories(${TIFF_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the Lua library
-if (BUNDLED_LUA)
-    find_package(Lua)
-
-    if (LUA_INCLUDE_DIR AND LUA_LIBRARY)
-	    include_directories(${LUA_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the Ogg and Vorbis libraries
-if (BUNDLED_OGGVORBIS)
-    find_package(OggVorbis)
-
-    if (OGGVORBIS_INCLUDE_DIR AND OGGVORBIS_LIBRARY)
-	    include_directories(${OGGVORBIS_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the OpenAL library
-if (BUNDLED_OPENAL)
-    find_package(OpenAL)
-
-    if (OPENAL_INCLUDE_DIR AND OPENAL_LIBRARY)
-	    include_directories(${OPENAL_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the zlib library
-if (BUNDLED_ZLIB)
-    find_package(Zlib)
-
-    if (ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
-	    include_directories(${ZLIB_INCLUDE_DIR})
-    endif ()
-endif()
-
-# Locate the cURL library
-if (BUNDLED_CURL)
-    find_package(Curl)
-
-    if (CURL_INCLUDE_DIR AND CURL_LIBRARY)
-	    include_directories(${CURL_INCLUDE_DIR})
-    endif ()
-endif()
+if (ZLIB_FOUND)
+    set(IO_STREAMS_SRCS ${IO_STREAMS_SRCS}
+        Io/processors/ZLibBufferCompressor.cpp
+        Io/processors/ZLibBufferCompressor
+        Io/processors/IBufferCompressor.h)
+endif ()
 
 # Setup Qt support
 if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
@@ -158,7 +88,7 @@ if (DC_SOUND_ENABLED)
 		Sound/Decoders/WavSoundDecoder.cpp
 		Sound/Decoders/WavSoundDecoder.h)
 
-	if (OGGVORBIS_ENABLED)
+	if (OGGVORBIS_FOUND)
 		set(SOUND_DECODERS_SRCS ${SOUND_DECODERS_SRCS} Sound/Decoders/OggSoundDecoder.cpp Sound/Decoders/OggSoundDecoder.h)
 	endif ()
 
@@ -184,22 +114,8 @@ endif()
 # Add the Dreemchest static library
 add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS} ${ASSETS_SRCS} ${REFLECTION_SRCS} )
 
-# Link 3rd-party libraries
-if (BOX2D_FOUND)
-	target_link_libraries(Dreemchest Box2D)
-endif ()
-
-if (JSONCPP_FOUND)
-	target_link_libraries(Dreemchest ${JSONCPP_LIBRARY})
-endif ()
-
-if (OPENAL_FOUND)
-	target_link_libraries(Dreemchest ${OPENAL_LIBRARY})
-endif ()
-
-if (OGGVORBIS_FOUND)
-	target_link_libraries(Dreemchest ${OGGVORBIS_LIBRARIES})
-endif ()
+# Link all requested libraries
+target_link_libraries(Dreemchest ${LIBRARIES})
 
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)

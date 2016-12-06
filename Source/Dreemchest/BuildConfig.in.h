@@ -57,8 +57,11 @@
 //! Indicates that a OpenAL library was found upon configuration process.
 #cmakedefine OPENAL_FOUND
 
-//! Indicates that a Ogg and Vorbis libraries were found upon configuration process.
-#cmakedefine OGGVORBIS_FOUND
+//! Indicates that a Ogg library was found upon configuration process.
+#cmakedefine OGG_FOUND
+
+//! Indicates that a Vorbis library was found upon configuration process.
+#cmakedefine VORBIS_FOUND
 
 //! Indicates that a Google Test library was found upon configuration process.
 #cmakedefine GTEST_FOUND
@@ -74,5 +77,10 @@
 
 //! Indicates that a cURL library was found upon configuration process.
 #cmakedefine CURL_FOUND
+
+//! Define a combined macro definition that indicates that both Ogg and Vorbis libraries were found
+#if defined(OGG_FOUND) && defined(VORBIS_FOUND)
+    #define OGGVORBIS_FOUND
+#endif  /*  defined(OGG_FOUND) && defined(VORBIS_FOUND) */
 
 #endif  /*  #ifndef __DC_BuildConfig_H__  */

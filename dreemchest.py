@@ -116,6 +116,9 @@ class CMakeCommand:
         parser.add_argument('--output',
                             help='an output directory to place generated build system.',
                             default=output_dir)
+        parser.add_argument('--prefix-path',
+                            help='a path used for searching packages.',
+                            default='.')
         parser.add_argument('--cpp',
                             help='specifies the C++ standard whose features that are required by a build system.',
                             type=int,
@@ -181,14 +184,15 @@ class PlatformConfigurationCommand(CMakeCommand):
                             default=False)
 
         # Add third party libraries options
-        self._add_library(parser, 'libtiff')
+        self._add_library(parser, 'tiff')
         self._add_library(parser, 'jsoncpp')
         self._add_library(parser, 'zlib')
         self._add_library(parser, 'Box2D')
         self._add_library(parser, 'gtest')
-        self._add_library(parser, 'libpng')
+        self._add_library(parser, 'png')
         self._add_library(parser, 'lua')
-        self._add_library(parser, 'oggvorbis')
+        self._add_library(parser, 'ogg')
+        self._add_library(parser, 'vorbis')
         self._add_library(parser, 'OpenAL')
         self._add_library(parser, 'curl')
 
@@ -233,7 +237,7 @@ class PlatformConfigurationCommand(CMakeCommand):
             DC_BUILD_EXAMPLES=disable_option(options.no_examples),
             CMAKE_CXX_STANDARD=options.cpp,
             DC_QT_SUPPORT=('disabled' if options.no_qt else options.qt).capitalize(),
-            CMAKE_PREFIX_PATH=os.path.abspath('Externals/Prebuilt/MacOS'),
+            PREFIX_PATH=os.path.abspath(options.prefix_path),
         )
 
         # Generate CMake arguments from added libraries
