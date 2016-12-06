@@ -72,4 +72,7 @@
 //! Indicates that a Lua library was found upon configuration process.
 #cmakedefine LUA_FOUND
 
+//! Indicates that a cURL library was found upon configuration process.
+#cmakedefine CURL_FOUND
+
 #endif  /*  #ifndef __DC_BuildConfig_H__  */

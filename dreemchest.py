@@ -174,7 +174,7 @@ class PlatformConfigurationCommand(CMakeCommand):
                                   type=str,
                                   choices=rendering_backend,
                                   default=rendering_backend[0])
-            
+
         parser.add_argument('--no-sound',
                             help='build with no sound support',
                             action='store_true',
@@ -190,6 +190,7 @@ class PlatformConfigurationCommand(CMakeCommand):
         self._add_library(parser, 'lua')
         self._add_library(parser, 'oggvorbis')
         self._add_library(parser, 'OpenAL')
+        self._add_library(parser, 'curl')
 
         parser.set_defaults(function=self.configure)
 
@@ -335,6 +336,7 @@ class InstallCommand(CMakeCommand):
         self._add_library(parser, 'lua')
         self._add_library(parser, 'ogg')
         self._add_library(parser, 'vorbis')
+        self._add_library(parser, 'curl')
 
         parser.set_defaults(function=self.install)
 
@@ -348,6 +350,13 @@ class InstallCommand(CMakeCommand):
                                     install_path,
                                     dict()
                                     )
+
+        if not options.no_curl:
+            self._build_and_install('curl',
+                                    'Xcode',
+                                    'Externals/curl',
+                                    install_path,
+                                    dict(BUILD_CURL_EXE=False, CURL_STATICLIB=True))
 
         if not options.no_box2d:
             self._build_and_install('Box2D',

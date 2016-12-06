@@ -99,6 +99,15 @@ if (BUNDLED_ZLIB)
     endif ()
 endif()
 
+# Locate the cURL library
+if (BUNDLED_CURL)
+    find_package(Curl)
+
+    if (CURL_INCLUDE_DIR AND CURL_LIBRARY)
+	    include_directories(${CURL_INCLUDE_DIR})
+    endif ()
+endif()
+
 # Setup Qt support
 if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
 	set(CMAKE_AUTOMOC ON)
