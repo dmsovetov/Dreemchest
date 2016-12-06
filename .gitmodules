@@ -16,3 +16,6 @@
 [submodule "Externals/libtiff"]
 	path = Externals/libtiff
 	url = https://github.com/LuaDist/libtiff
+[submodule "Externals/lua"]
+	path = Externals/lua
+	url = https://github.com/LuaDist/lua
