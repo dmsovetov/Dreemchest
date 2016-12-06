@@ -282,7 +282,11 @@ class WindowsConfigureCommand(DesktopConfigureCommand):
     def configure(self, options):
         """Performs basic build system configuration"""
 
-        raise NotImplementedError()
+        # Perform basic build configuration
+        cmake_parameters = self._prepare(options)
+
+        # Invoke a CMake command to generate a build system
+        cmake_generate('Visual Studio 12', options.source, options.output, cmake_parameters)
 
 
 class MacOSConfigureCommand(DesktopConfigureCommand):
@@ -328,7 +332,7 @@ class InstallCommand(CMakeCommand):
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        CMakeCommand.__init__(self, parser, output_dir='Externals/Prebuilt/MacOS')
+        CMakeCommand.__init__(self, parser, output_dir='Externals/Prebuilt/')
 
         self._add_library(parser, 'zlib')
         self._add_library(parser, 'Box2D')
@@ -342,6 +346,10 @@ class InstallCommand(CMakeCommand):
         self._add_library(parser, 'vorbis')
         self._add_library(parser, 'curl')
 
+        parser.add_argument('generator',
+                            help='build system generator to be used.',
+                            choices=['Xcode', 'Visual Studio 12'])
+
         parser.set_defaults(function=self.install)
 
     def install(self, options):
@@ -349,7 +357,7 @@ class InstallCommand(CMakeCommand):
 
         if not options.no_zlib:
             self._build_and_install('zlib',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/zlib',
                                     install_path,
                                     dict()
@@ -357,22 +365,22 @@ class InstallCommand(CMakeCommand):
 
         if not options.no_curl:
             self._build_and_install('curl',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/curl',
                                     install_path,
                                     dict(BUILD_CURL_EXE=False, CURL_STATICLIB=True))
 
         if not options.no_box2d:
             self._build_and_install('Box2D',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/Box2D/Box2D',
                                     install_path,
-                                    dict(BOX2D_BUILD_EXAMPLES=False)
+                                    dict(BOX2D_BUILD_EXAMPLES=False, BOX2D_INSTALL=True)
                                     )
 
         if not options.no_jsoncpp:
             self._build_and_install('jsoncpp',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/jsoncpp',
                                     install_path,
                                     dict(JSONCPP_WITH_TESTS=False, JSONCPP_WITH_POST_BUILD_UNITTEST=False)
@@ -380,54 +388,54 @@ class InstallCommand(CMakeCommand):
 
         if not options.no_ogg:
             self._build_and_install('ogg',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/ogg',
                                     install_path,
                                     dict())
 
         if not options.no_vorbis:
             self._build_and_install('vorbis',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/vorbis',
                                     install_path,
                                     dict())
 
         if not options.no_gtest:
             self._build_and_install('GoogleTest',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/GoogleTest',
                                     install_path,
                                     dict())
 
         if not options.no_libpng:
             self._build_and_install('libpng',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/libpng',
                                     install_path,
                                     dict(PNG_TESTS=False))
 
         if not options.no_libtiff:
             self._build_and_install('libtiff',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/libtiff',
                                     install_path,
-                                    dict())
+                                    dict(CMAKE_CXX_FLAGS='-D_XKEYCHECK_H'))
 
         if not options.no_lua:
             self._build_and_install('lua',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/lua',
                                     install_path,
                                     dict(BUILD_SHARED_LIBS=False))
 
         if not options.no_openal:
             self._build_and_install('OpenAL',
-                                    'Xcode',
+                                    options.generator,
                                     'Externals/OpenAL',
                                     install_path,
                                     dict(ALSOFT_EXAMPLES=False, ALSOFT_TESTS=False, LIBTYPE='STATIC'))
 
-        shutil.rmtree('Projects/Externals')
+    #    shutil.rmtree('Projects/Externals')
 
     @staticmethod
     def _build_and_install(library, generator, source, output, options):
@@ -451,7 +459,7 @@ class InstallCommand(CMakeCommand):
         except subprocess.CalledProcessError:
             print 'Failed to build %s' % library
 
-        shutil.rmtree(binary_dir)
+    #    shutil.rmtree(binary_dir)
 
     @staticmethod
     def _add_library(parser, name):
