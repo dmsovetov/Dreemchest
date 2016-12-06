@@ -4,3 +4,6 @@
 [submodule "Source/Relight"]
 	path = Source/Relight
 	url = https://github.com/dmsovetov/Relight.git
+[submodule "Externals/Box2D"]
+	path = Externals/Box2D
+	url = https://github.com/erincatto/Box2D
