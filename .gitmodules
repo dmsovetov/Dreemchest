@@ -22,3 +22,6 @@
 [submodule "Externals/OpenAL"]
 	path = Externals/OpenAL
 	url = https://github.com/kcat/openal-soft
+[submodule "Externals/jsoncpp"]
+	path = Externals/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp
