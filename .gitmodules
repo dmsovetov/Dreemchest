@@ -34,3 +34,6 @@
 [submodule "Externals/vorbis"]
 	path = Externals/vorbis
 	url = https://github.com/xiph/vorbis
+[submodule "Externals/curl"]
+	path = Externals/curl
+	url = https://github.com/curl/curl
