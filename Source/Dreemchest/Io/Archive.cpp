@@ -30,11 +30,11 @@
 #include "streams/PackedStream.h"
 #include "DiskFileSystem.h"
 
-#ifdef HAVE_ZLIB
+#ifdef ZLIB_FOUND
 	#include "processors/ZLibBufferCompressor.h"
 #endif
 
-#ifdef HAVE_FASTLZ
+#ifdef FASTLZ_FOUND
 	#include "processors/FastLZBufferCompressor.h"
 #endif
 
@@ -64,7 +64,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 {
     switch( compressor ) {
 	case CompressorFastLZ:  
-							#ifdef HAVE_FASTLZ
+							#ifdef FASTLZ_FOUND
 								return DC_NEW FastLZBufferCompressor;
 							#else
 								LogWarning( "archive", "%s", "unsupported FastLZ compressor requested\n" );
@@ -72,7 +72,7 @@ IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
                             break;
 
     case CompressorZ:      
-							#ifdef HAVE_FASTLZ
+							#ifdef ZLIB_FOUND
 								return DC_NEW ZLibBufferCompressor;
 							#else
 								LogWarning( "archive", "%s", "unsupported ZLib compressor requested\n" );

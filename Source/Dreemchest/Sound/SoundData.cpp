@@ -70,8 +70,8 @@ CString SoundData::identifier( void ) const
 // ** SoundData::setIdentifier
 void SoundData::setIdentifier( CString value )
 {
-    DC_ABORT_IF( value != NULL, "invalid identifier" );
-    DC_ABORT_IF( strlen( value ) == 0, "empty identifier" );
+    NIMBLE_ABORT_IF( value != NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( strlen( value ) == 0, "empty identifier" );
     
     m_identifier = value;
 }

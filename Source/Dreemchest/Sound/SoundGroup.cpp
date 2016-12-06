@@ -155,7 +155,7 @@ void SoundGroup::setData( const SoundGroupInfo& value )
 // ** SoundGroup::addSound
 void SoundGroup::addSound( const SoundChannelWPtr& channel )
 {
-    DC_BREAK_IF( activeSlotCount() + 1 > m_slotCount, "too much sounds in group" );
+    NIMBLE_BREAK_IF( activeSlotCount() + 1 > m_slotCount, "too much sounds in group" );
     m_slots.push_back( channel );
 }
 

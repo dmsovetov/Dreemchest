@@ -29,9 +29,9 @@
 
 #include "AssetImporter.h"
 
-#ifdef HAVE_FBX
+#ifdef FBX_FOUND
 	#include <fbxsdk.h>
-#endif	/*	HAVE_FBX	*/
+#endif	/*	#ifdef FBX_FOUND	*/
 
 DC_BEGIN_COMPOSER
 
@@ -78,7 +78,7 @@ namespace Importers {
 		Array<Node>			m_nodes;	//!< Imported mesh nodes.
 	};
 
-#ifdef HAVE_FBX
+#ifdef FBX_FOUND
 
 	//! Imports the FBX mesh.
 	class MeshImporterFBX : public MeshImporter {
@@ -111,7 +111,7 @@ namespace Importers {
 		FbxScene*			m_scene;	//!< Imported FBX scene.
 	};
 
-#endif	/*	HAVE_FBX	*/
+#endif	/*	#ifdef FBX_FOUND	*/
 
 } // namespace Importers
 

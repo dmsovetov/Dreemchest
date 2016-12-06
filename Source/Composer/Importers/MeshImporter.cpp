@@ -99,7 +99,7 @@ bool MeshImporter::VertexCompare::operator()( const Vertex& a, const Vertex& b )
 	return false;
 }
 
-#ifdef HAVE_FBX
+#ifdef FBX_FOUND
 
 // ---------------------------------------------------- MeshImporterFBX ---------------------------------------------------- //
 
@@ -295,7 +295,7 @@ String MeshImporterFBX::extractDiffuseTexture( FbxNode* node ) const
 	return textures[0];
 }
 
-#endif	/*	HAVE_FBX	*/
+#endif	/*	#ifdef FBX_FOUND	*/
 
 } // namespace Importers
 

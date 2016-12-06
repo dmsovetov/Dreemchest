@@ -48,7 +48,7 @@ OpenALBuffer::OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize ) : So
     // ** Generate buffers
     alGenBuffers( m_chunks, &m_buffers[0] );
     for( u32 i = 0; i < m_chunks; i++ ) {
-        DC_BREAK_IF( !alIsBuffer( m_buffers[i] ), "the generated id expected to be an OpenAL buffer" );
+        NIMBLE_BREAK_IF( !alIsBuffer( m_buffers[i] ), "the generated id expected to be an OpenAL buffer" );
     }
 
     // ** Fill buffers with data
@@ -77,7 +77,7 @@ OpenALBuffer::~OpenALBuffer( void )
 // ** OpenALBuffer::attachToSource
 void OpenALBuffer::attachToSource( SoundSourceWPtr target )
 {
-    DC_ABORT_IF( !target.valid(), "invalid target" );
+    NIMBLE_ABORT_IF( !target.valid(), "invalid target" );
 
     ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
@@ -88,7 +88,7 @@ void OpenALBuffer::attachToSource( SoundSourceWPtr target )
 // ** OpenALBuffer::detachFromSource
 void OpenALBuffer::detachFromSource( SoundSourceWPtr target )
 {
-    DC_ABORT_IF( !target.valid(), "invalid target" );
+    NIMBLE_ABORT_IF( !target.valid(), "invalid target" );
 
     OpenAL::flushErrors();
 
@@ -97,7 +97,7 @@ void OpenALBuffer::detachFromSource( SoundSourceWPtr target )
     ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
     alGetSourcei( source, AL_SOURCE_STATE, &state );
-    DC_BREAK_IF( state != AL_STOPPED, "source is expected to be stopped before detaching the buffer" );
+    NIMBLE_BREAK_IF( state != AL_STOPPED, "source is expected to be stopped before detaching the buffer" );
 
     alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
     while( queued-- ) {
@@ -109,7 +109,7 @@ void OpenALBuffer::detachFromSource( SoundSourceWPtr target )
 // ** OpenALBuffer::readSoundDecoder
 bool OpenALBuffer::readSoundDecoder( ALuint target, u32 size )
 {
-    DC_ABORT_IF( size <= 0, "the size should be positive" );
+    NIMBLE_ABORT_IF( size <= 0, "the size should be positive" );
 
     size = m_decoder->read( m_pcm, size );
     if( size <= 0 ) {
@@ -124,7 +124,7 @@ bool OpenALBuffer::readSoundDecoder( ALuint target, u32 size )
 // ** OpenALBuffer::updateStream
 bool OpenALBuffer::updateStream( SoundSourceWPtr target, bool isLooped )
 {
-    DC_ABORT_IF( !target.valid(), "invalid target" );
+    NIMBLE_ABORT_IF( !target.valid(), "invalid target" );
 
     if( chunks() <= 1 ) {
         return false;
@@ -137,7 +137,7 @@ bool OpenALBuffer::updateStream( SoundSourceWPtr target, bool isLooped )
     // ** Ensure the streamed sound is not looped
     ALint looping;
     alGetSourcei( source, AL_LOOPING, &looping );
-    DC_BREAK_IF( looping != 0, "sound source should not be looped" );
+    NIMBLE_BREAK_IF( looping != 0, "sound source should not be looped" );
 
     // ** Get total processed buffers
     ALint processed = 0;

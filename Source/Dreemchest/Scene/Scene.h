@@ -559,7 +559,7 @@ namespace Scene {
 
 #if DEV_DEPRECATED_SCENE_SERIALIZATION
 
-#ifdef HAVE_JSON
+#ifdef JSON_FOUND
 
     //! Base class for all JSON object loaders.
 	class JsonLoaderBase {
@@ -706,7 +706,7 @@ namespace Scene {
 		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
 	};
 
-#endif	/*	HAVE_JSON	*/
+#endif	/*	#ifdef JSON_FOUND	*/
 
 #endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 

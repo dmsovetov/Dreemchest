@@ -137,7 +137,7 @@ SoundSourcePtr OpenAL::createSource( void )
 // ** OpenAL::createBuffer
 SoundBufferPtr OpenAL::createBuffer( SoundDecoderPtr decoder, u32 chunks )
 {
-    DC_ABORT_IF( !decoder.valid(), "invalid decoder" );
+    NIMBLE_ABORT_IF( !decoder.valid(), "invalid decoder" );
     return DC_NEW OpenALBuffer( decoder, chunks, chunks == 1 ? decoder->size() : 16536 );
 }
 

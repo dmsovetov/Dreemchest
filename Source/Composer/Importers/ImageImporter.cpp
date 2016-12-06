@@ -26,9 +26,9 @@
 
 #include "ImageImporter.h"
 
-#ifdef HAVE_TIFF
+#ifdef TIFF_FOUND
 	#include <tiffio.h>
-#endif	/*	HAVE_TIFF	*/
+#endif	/*	#ifdef TIFF_FOUND	*/
 
 DC_BEGIN_COMPOSER
 
@@ -136,7 +136,7 @@ void ImageImporterTGA::swapChannels( Image& image ) const
 	}
 }
 
-#ifdef HAVE_TIFF
+#ifdef TIFF_FOUND
 
 // ------------------------------------------------ ImageImporterTIF ------------------------------------------------ //
 
@@ -183,7 +183,7 @@ bool ImageImporterTIF::importImage( FileSystemQPtr fs, const Io::Path& sourceFil
 	return true;
 }
 
-#endif	/*	HAVE_TIFF	*/
+#endif	/*	#ifdef TIFF_FOUND	*/
 
 } // namespace Importers
 

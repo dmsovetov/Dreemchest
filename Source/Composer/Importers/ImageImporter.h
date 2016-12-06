@@ -77,7 +77,7 @@ namespace Importers {
 		void				swapChannels( Image& image ) const;
 	};
 
-#ifdef HAVE_TIFF
+#ifdef TIFF_FOUND
 
 	//! Imports the TIF image.
 	class ImageImporterTIF : public ImageImporter {
@@ -87,7 +87,7 @@ namespace Importers {
 		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) NIMBLE_OVERRIDE;
 	};
 
-#endif	/*	HAVE_TIFF	*/
+#endif	/*	#ifdef TIFF_FOUND	*/
 
 } // namespace Importers
 

@@ -35,19 +35,19 @@ namespace Io {
 // ** VariantTextStream::stringify
 String VariantTextStream::stringify( const Variant& kv, bool formatted )
 {
-#ifdef HAVE_JSON
+#ifdef JSON_FOUND
 	Json::Value json = toJson( kv );
 	return formatted ? json.toStyledString() : Json::FastWriter().write( json );
 #else
 	LogError( "variant", "%s", "failed to convert to string, built with no JSON support.\n" );
 	return "";
-#endif	/*	HAVE_JSON	*/
+#endif	/*	#ifdef JSON_FOUND	*/
 }
 
 // ** VariantTextStream::parse
 Variant VariantTextStream::parse( const String& text )
 {
-#ifdef HAVE_JSON
+#ifdef JSON_FOUND
 	Json::Value json;
 	Json::Reader reader;
 	
@@ -60,10 +60,10 @@ Variant VariantTextStream::parse( const String& text )
 #else
 	LogError( "variant", "%s", "failed to parse from string, built with no JSON support.\n" );
 	return Variant();
-#endif	/*	HAVE_JSON	*/
+#endif	/*	#ifdef JSON_FOUND	*/
 }
 
-#ifdef HAVE_JSON
+#ifdef JSON_FOUND
 
 // ** VariantTextStream::toJson
 Json::Value VariantTextStream::toJson( const Variant& value )
@@ -299,7 +299,7 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
 	return Variant();
 }
 
-#endif	/*	HAVE_JSON*/
+#endif	/*	#ifdef JSON_FOUND   */
 
 // ** BinaryVariantStream::BinaryVariantStream
 BinaryVariantStream::BinaryVariantStream( StreamPtr stream ) : m_stream( stream )

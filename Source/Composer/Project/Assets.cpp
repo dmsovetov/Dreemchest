@@ -47,13 +47,13 @@ AssetManager::AssetManager( QObject* parent, const Io::Path& path, AssetFileSyst
     LogWarning( "assets", "%s", "no assets path set\n" );
 
 	// Declare asset importers.
-#ifdef HAVE_TIFF
+#ifdef TIFF_FOUND
 	m_assetImporters.declare<Importers::ImageImporterTIF>( "tif" );
-#endif	/*	HAVE_TIFF	*/
+#endif	/*	#ifdef TIFF_FOUND	*/
 
-#ifdef HAVE_FBX
+#ifdef FBX_FOUND
 	m_assetImporters.declare<Importers::MeshImporterFBX>( "fbx" );
-#endif	/*	HAVE_FBX	*/
+#endif	/*	#ifdef FBX_FOUND	*/
 
 	m_assetImporters.declare<Importers::ImageImporterTGA>( "tga" );
 	m_assetImporters.declare<Importers::FileImporter>( "material" );

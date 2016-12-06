@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     // ** class FastLZBufferCompressor
     class FastLZBufferCompressor : public IBufferCompressor {
@@ -41,7 +41,7 @@ namespace io {
         virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
     };
     
-} // namespace io
+} // namespace Io
     
 DC_END_DREEMCHEST
 
