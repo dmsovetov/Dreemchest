@@ -52,11 +52,13 @@ class CommandLineTool:
 
         cls(self._commands.add_parser(name))
 
+
 class PlatformConfigurationCommand:
     """A base class for all platform configuration commands"""
 
-    def __init__(self, parser):
+    def __init__(self, parser, rendering_backend):
         """Constructs a platform configuration command"""
+
         parser.add_argument('--source',
                             help='a source directory to generate build system.',
                             default='.')
@@ -89,34 +91,23 @@ class PlatformConfigurationCommand:
                             action='store_true',
                             default=False)
 
-        # Add Qt library options
-        qt = parser.add_mutually_exclusive_group()
-        qt.add_argument('--no-qt',
-                        help='disables a Qt library support.',
-                        action='store_true',
-                        default=False)
-        qt.add_argument('--qt',
-                        help='specifies the Qt library version that is required by a build system.',
-                        type=str,
-                        choices=['auto', 'qt4', 'qt5'],
-                        default='auto')
-
         # Add renderer options
         renderer = parser.add_mutually_exclusive_group()
         renderer.add_argument('--no-renderer',
-                            help='build with no rendering support.',
-                            action='store_true',
-                            default=False)
-        renderer.add_argument('--renderer',
-                            help='specifies a rendering backend to be used.',
-                            type=str,
-                            choices=['opengl'],
-                            default='opengl')
+                              help='build with no rendering support.',
+                              action='store_true',
+                              default=False)
+
+        if len(rendering_backend) > 1:
+            renderer.add_argument('--renderer',
+                                  help='specifies a rendering backend to be used.',
+                                  type=str,
+                                  choices=rendering_backend,
+                                  default=rendering_backend[0])
 
         # Add third party libraries options
         self._add_library(parser, 'libtiff')
         self._add_library(parser, 'jsoncpp')
-        self._add_library(parser, 'FBX')
         self._add_library(parser, 'zlib')
 
         parser.set_defaults(function=self.configure)
@@ -137,8 +128,7 @@ class PlatformConfigurationCommand:
 
     def configure(self, options):
         """Performs basic build system configuration"""
-
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def _prepare(options):
@@ -152,6 +142,7 @@ class PlatformConfigurationCommand:
         return dict(
             DC_USE_PCH=enable_option(options.pch),
             DC_COMPOSER_ENABLED=disable_option(options.no_composer or options.no_qt),
+            DC_OPENGL_ENABLED=disable_option(options.no_renderer),
             DC_WITH_RELIGHT=disable_option(options.no_relight),
             DC_BUILD_TESTS=disable_option(options.no_tests),
             DC_BUILD_EXAMPLES=disable_option(options.no_examples),
@@ -169,13 +160,37 @@ class PlatformConfigurationCommand:
         os.system('cmake -E chdir %s cmake %s -G "%s" %s' % (args.output, os.path.abspath(args.source), generator, ' '.join(cmake_parameters)))
 
 
-class WindowsConfigureCommand(PlatformConfigurationCommand):
+class DesktopConfigureCommand(PlatformConfigurationCommand):
+    """Performs desktop OS build system configuration"""
+
+    def __init__(self, parser, renderers):
+        """Constructs desktop configuration command"""
+
+        PlatformConfigurationCommand.__init__(self, parser, renderers)
+
+        # Add Qt library options
+        qt = parser.add_mutually_exclusive_group()
+        qt.add_argument('--no-qt',
+                        help='disables a Qt library support.',
+                        action='store_true',
+                        default=False)
+        qt.add_argument('--qt',
+                        help='specifies the Qt library version that is required by a build system.',
+                        type=str,
+                        choices=['auto', 'qt4', 'qt5'],
+                        default='auto')
+
+        # Add third party libraries
+        self._add_library(parser, 'FBX')
+
+
+class WindowsConfigureCommand(DesktopConfigureCommand):
     """Performs Windows build system configuration"""
 
     def __init__(self, parser):
         """Constructs Windows configuration command"""
 
-        PlatformConfigurationCommand.__init__(self, parser)
+        DesktopConfigureCommand.__init__(self, parser, ['opengl', 'direct3d9', 'direct3d12'])
 
     def configure(self, options):
         """Performs basic build system configuration"""
@@ -183,13 +198,13 @@ class WindowsConfigureCommand(PlatformConfigurationCommand):
         raise NotImplementedError()
 
 
-class MacOSConfigureCommand(PlatformConfigurationCommand):
+class MacOSConfigureCommand(DesktopConfigureCommand):
     """Performs MacOS build system configuration"""
 
     def __init__(self, parser):
         """Constructs MacOS configuration command"""
 
-        PlatformConfigurationCommand.__init__(self, parser)
+        DesktopConfigureCommand.__init__(self, parser, ['opengl'])
 
     def configure(self, options):
         """Performs MacOS build system configuration"""

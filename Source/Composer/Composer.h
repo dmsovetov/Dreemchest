@@ -34,13 +34,13 @@
 #define DEV_USE_DOCK_INDICATOR			    (1)
 #define DEV_DISABLE_SYSTEM_ICON_PROVIDER    (1)
 
-#ifdef DC_QT4_ENABLED
+#if DC_QT_VERSION == 4
 	#include <QtGui>
 	#include <QtCore>
 	#include <QtOpenGL>
 
 	#define Q_DECL_OVERRIDE override
-#elif DC_QT5_ENABLED
+#elif DC_QT_VERSION == 5
 	#include <QtWidgets>
 	#include <QtOpenGL>
 #endif

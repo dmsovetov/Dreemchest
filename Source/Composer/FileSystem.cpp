@@ -90,11 +90,11 @@ FileSystem::FileSystem( QObject* parent ) : QObject( parent )
 // ** FileSystem::documentsLocation
 String FileSystem::documentsLocation( void ) const
 {
-#ifdef DC_QT4_ENABLED
+#if DC_QT_VERSION == 4
 	return QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ).toStdString();
-#elif DC_QT5_ENABLED
+#else
 	return QStandardPaths::standardLocations( QStandardPaths::DocumentsLocation ).at( 0 ).toStdString();
-#endif	/*	DC_QT4_ENABLED	*/
+#endif	/*	#if DC_QT_VERSION == 4	*/
 }
 
 // ** FileSystem::selectExistingDirectory

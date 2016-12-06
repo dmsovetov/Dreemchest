@@ -27,7 +27,11 @@ set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt
 set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 
 # Set the namespace
-add_definitions(-DDC_NAMESPACE=${DC_NAMESPACE} -DNIMBLE_NAMESPACE=DC_NAMESPACE -D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-DNIMBLE_NAMESPACE=DC_NAMESPACE)
+
+if (MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif ()
 
 # Add include directory
 include_directories(Dreemchest)
@@ -57,11 +61,11 @@ if (DC_QT_SUPPORT MATCHES "Auto")
 endif (DC_QT_SUPPORT MATCHES "Auto")
 
 if (DC_QT_SUPPORT MATCHES "Qt4")
-	add_definitions(-DDC_QT4_ENABLED)
 	set(DC_QT_ENABLED ON)
+	set(DC_QT_VERSION 4)
 elseif (DC_QT_SUPPORT MATCHES "Qt5")
-	add_definitions(-DDC_QT5_ENABLED)
 	set(DC_QT_ENABLED ON)
+	set(DC_QT_VERSION 5)
 endif (DC_QT_SUPPORT MATCHES "Qt4")
 
 # Setup variables

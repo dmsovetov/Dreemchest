@@ -174,7 +174,7 @@ bool AbstractTreeModel::moveRows( const QModelIndex& sourceParent, int sourceRow
 	return true;
 }
 
-#ifdef DC_QT4_ENABLED
+#if DC_QT_VERSION == 4
 
 // ** AbstractTreeModel::moveRow
 bool AbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow, const QModelIndex& destinationParent, int destinationChild )
@@ -183,7 +183,7 @@ bool AbstractTreeModel::moveRow( const QModelIndex& sourceParent, int sourceRow,
 	return true;
 }
 
-#endif	/*	DC_QT4_ENABLED	*/
+#endif	/*	#if DC_QT_VERSION == 4	*/
 
 // ** AbstractTreeModel::parent
 QModelIndex AbstractTreeModel::parent( const QModelIndex& child ) const

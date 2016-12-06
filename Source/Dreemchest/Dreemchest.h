@@ -27,11 +27,13 @@
 #ifndef DREEMCHEST_H
 #define DREEMCHEST_H
 
+#include "BuildConfig.h"
+
 #define dcInterface
 
 #ifdef DC_BUILD_ENGINE
 	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
+		#define DC_NAMESPACE    Dreemchest
 	#endif
 #endif
 

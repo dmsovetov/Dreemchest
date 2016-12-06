@@ -159,3 +159,11 @@ if (DC_PLATFORM MATCHES "MacOS")
         target_link_libraries(Dreemchest "-framework CoreVideo")
     endif ()
 endif ()
+
+# Generate configuration file
+configure_file(BuildConfig.in.h BuildConfig.h)
+target_include_directories(Dreemchest PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+# Generate a configuration hash constant
+file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h DREEMCHEST_VERSION)
+configure_file(BuildConfig.in.h BuildConfig.h)
