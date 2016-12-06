@@ -38,20 +38,6 @@ if (ZLIB_FOUND)
         Io/processors/IBufferCompressor.h)
 endif ()
 
-# Setup Qt support
-if (NOT (DC_QT_SUPPORT MATCHES "Disabled"))
-	set(CMAKE_AUTOMOC ON)
-
-	if (DC_QT_SUPPORT MATCHES "Qt4")
-		find_package(Qt4 REQUIRED QtGui)
-		
-	elseif (DC_QT_SUPPORT MATCHES "Qt5")
-		find_package(Qt5Widgets)
-		
-	endif ()
-	
-endif ()
-
 # Threads module sources
 if (DC_THREADS)
 	add_files(Threads THREADS_SRCS)
@@ -115,7 +101,7 @@ endif()
 add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${ECS_SRCS} ${IO_SRCS} ${IO_SERIALIZATION_SRCS} ${IO_STREAMS_SRCS} ${NETWORK_SRCS} ${SCENE_SRCS} ${THREADS_SRCS} ${THREADS_TASK_SRCS}  ${THREADS_PLATFORM_SRCS} ${PLATFORM_IMPL_SRCS} ${PLATFORM_SRCS} ${RENDERER_SRCS} ${FX_SRCS} ${SOUND_SRCS} ${ASSETS_SRCS} ${REFLECTION_SRCS} )
 
 # Link all requested libraries
-target_link_libraries(Dreemchest ${LIBRARIES})
+target_link_libraries(Dreemchest ${DEPENDENCIES})
 
 if (WIN32)
 	target_link_libraries(Dreemchest ws2_32)
@@ -123,14 +109,6 @@ endif ()
 
 if (DC_OPENGL_ENABLED)
 	target_link_libraries(Dreemchest ${OPENGL_gl_LIBRARY})
-endif ()
-
-if (DC_QT_SUPPORT MATCHES "Qt4")
-	target_link_libraries(Dreemchest Qt4::QtGui)
-endif ()
-
-if (DC_QT_SUPPORT MATCHES "Qt5")
-	target_link_libraries(Dreemchest Qt5::Widgets)
 endif ()
 
 # MacOS frameworks
