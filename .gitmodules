@@ -28,3 +28,6 @@
 [submodule "Externals/zlib"]
 	path = Externals/zlib
 	url = https://github.com/madler/zlib
+[submodule "Externals/ogg"]
+	path = Externals/ogg
+	url = https://github.com/xiph/ogg
