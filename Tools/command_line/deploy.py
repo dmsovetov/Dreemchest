@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #################################################################################
 #
 # The MIT License (MIT)
@@ -26,30 +24,13 @@
 #
 #################################################################################
 
-import argparse
-import install
-import checkout
-import configure
-import command_line
+import shutil
+import os
 
+os.system('python setup.py sdist upload')
 
-class Main(command_line.Tool):
-    """An entry point to a command line tool"""
+if os.path.exists('dreemchest.egg-info'):
+    shutil.rmtree('dreemchest.egg-info')
 
-    def __init__(self, parser):
-        """Constructs a command line tool."""
-
-        command_line.Tool.__init__(self, parser, 'available commands')
-
-        self._add_command('configure', configure.Command)
-        self._add_command('checkout', checkout.Command)
-        self._add_command('install', install.Command)
-
-# Entry point
-if __name__ == "__main__":
-    root = argparse.ArgumentParser(description='Dreemchest engine command line tool')
-
-    Main(root)
-
-    args = root.parse_args()
-    args.function(args)
+if os.path.exists('dist'):
+    shutil.rmtree('dist')

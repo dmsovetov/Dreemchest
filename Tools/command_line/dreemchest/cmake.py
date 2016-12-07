@@ -26,6 +26,7 @@
 
 import os
 import subprocess
+import shutil
 
 
 def enable_option(value):
@@ -85,6 +86,33 @@ def build(source, target, configuration, quiet=False):
 
     with open(os.devnull, 'wb') as devnull:
         subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
+
+
+def configure_and_build(generator, source_dir, binary_dir,
+                        target='ALL_BUILD',
+                        configuration='Release',
+                        prefix=None,
+                        options=None):
+    """Generates a binary tree and then builds a specified target for requested configuration"""
+
+    if not options:
+        options = dict()
+
+    # Set the CMAKE_INSTALL_PREFIX variable
+    if prefix:
+        options['CMAKE_INSTALL_PREFIX:PATH'] = prefix
+
+    try:
+        # Generate a binary tree
+        generate(generator, source_dir, binary_dir, options, '-Wno-dev')
+
+        # Build a generated tree
+        build(binary_dir, target, configuration)
+
+    except subprocess.CalledProcessError:
+        print 'Failed to build %s' % source_dir
+
+    shutil.rmtree(binary_dir)
 
 
 class Command:

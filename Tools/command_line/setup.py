@@ -24,15 +24,14 @@
 #
 #################################################################################
 
+from setuptools import setup, find_packages
 
-class Tool:
-    """A base class for all command line tools that have nested commands"""
-
-    def __init__(self, parser, description):
-        """Constructs a command line tool instance"""
-        self._commands = parser.add_subparsers(help=description)
-
-    def _add_command(self, name, cls):
-        """Adds a nested command"""
-
-        cls(self._commands.add_parser(name))
+setup(name='dreemchest',
+      version='0.11',
+      description='Dreemchest engine command line tool.',
+      url='https://github.com/dmsovetov/Dreemchest',
+      author='Dmitry Sovetov',
+      author_email='dmsovetov@gmail.com',
+      license='MIT',
+      packages=find_packages(),
+      zip_safe=False)

@@ -24,9 +24,31 @@
 #
 #################################################################################
 
+import subprocess
+
+REMOTE_URL = 'https://github.com/dmsovetov/Dreemchest'
+BRANCH = 'renderer-refactoring'
+
 
 class Command:
     """A command line tool to checkout a source code from a remote repository"""
 
     def __init__(self, parser):
         """Constructs a pull command line tool"""
+
+        parser.add_argument('path',
+                            help='a destination folder to checkout a source code'
+                            )
+
+        parser.set_defaults(function=self.checkout)
+
+    @staticmethod
+    def checkout(options):
+        """Clones a remote repository"""
+
+        command_line = 'git clone %s --branch %s --single-branch %s' % (REMOTE_URL, BRANCH, options.path);
+
+        try:
+            subprocess.check_call(command_line, shell=True, stdout=None, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError:
+            pass
