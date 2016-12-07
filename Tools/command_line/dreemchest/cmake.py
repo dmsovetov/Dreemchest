@@ -37,11 +37,11 @@ def get_cmake_executable():
     if sys.platform == 'darwin':
         return 'Tools/cmake/CMake.app/Contents/bin/cmake'
     else:
-        return 'Tools/cmake/cmake'
+        return 'Tools/cmake/bin/cmake.exe'
 
 try:
     with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call('cmake', shell=True, stdout=devnull)
+        subprocess.check_call('cmake1', shell=True, stdout=devnull, stderr=devnull)
         cmake = 'cmake'
 except subprocess.CalledProcessError:
     cmake = get_cmake_executable()
@@ -134,11 +134,15 @@ def generate(generator, source, output, parameters, rest=''):
     cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
 
     # Generate a command line string
-    command_line = '%s -E chdir %s cmake %s -G "%s" %s %s' % (cmake, output, os.path.abspath(source),
-                                                              generator,
-                                                              ' '.join(cmd_args),
-                                                              rest
-                                                              )
+    command_line = '"{cmake}" -E chdir {output} "{cmake}" {source} -G "{generator}" {args} {rest}'.format(
+                     output= output,
+                     source= os.path.abspath(source),
+                     generator= generator,
+                     args= ' '.join(cmd_args),
+                     rest= rest,
+                     cmake= cmake)
+
+    print command_line
 
     subprocess.check_call(command_line, shell=True)
 
