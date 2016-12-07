@@ -25,42 +25,34 @@
 #################################################################################
 
 import subprocess
-import os
-
-import git
 
 
-class Command:
-    """A command line tool to checkout a source code from a remote repository"""
+def invoke(command):
+    """Invokes a command as a subprocess"""
 
-    def __init__(self, parser):
-        """Constructs a pull command line tool"""
+    try:
+        subprocess.check_call(command, shell=True, stdout=None, stderr=subprocess.STDOUT)
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
-        parser.add_argument('path',
-                            help='a destination folder to checkout a source code'
-                            )
 
-        parser.set_defaults(function=self.checkout)
+def clone(url, directory, branch=None):
+    """Clones a remote repository to a specified directory and that switches to a desired branch"""
 
-    @staticmethod
-    def checkout(options):
-        """Clones a remote repository"""
+    if branch:
+        return invoke('git clone %s --branch %s --single-branch %s' % (url, branch, directory))
+    else:
+        return invoke('git clone %s --single-branch %s' % (url, directory))
 
-        # Save current directory
-        current_dir = os.getcwd()
 
-        try:
-            # Checkout repository
-            git.clone('https://github.com/dmsovetov/Dreemchest', options.path, branch='renderer-refactoring')
+def checkout_submodule(directory):
+    """Initializes and pulls a submodule in a specified directory"""
 
-            # Change current directory
-            os.chdir(options.path)
+    return invoke('git submodule update --init -- %s' % directory)
 
-            # Initialize submodules
-            git.checkout_submodule('Source/Nimble')
-            git.checkout_submodule('Source/Relight')
-        except subprocess.CalledProcessError:
-            pass
 
-        # Reset current directory
-        os.chdir(current_dir)
+def checkout_submodules():
+    """Initializes and pulls all submodules"""
+
+    return invoke('git submodule update --init --recursive')

@@ -24,10 +24,10 @@
 #
 #################################################################################
 
-import cmake
 import shutil
 import os
 import cmake
+import git
 import command_line
 
 
@@ -63,6 +63,9 @@ class InstallCommand(cmake.Command):
         install_path = os.path.abspath(options.output)
         binary_dir = os.path.abspath(os.path.join(options.source, 'Projects'))
         source_dir = os.path.abspath(options.source)
+
+        # Make sure to pull all submodules before building them
+        git.checkout_submodules()
 
         if not options.no_zlib:
             cmake.configure_and_build(options.generator,
