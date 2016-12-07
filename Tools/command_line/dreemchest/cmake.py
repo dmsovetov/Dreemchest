@@ -185,7 +185,7 @@ def configure_and_build(generator, source_dir, binary_dir,
 class Command:
     """A base class for all CMake commands"""
 
-    def __init__(self, parser, source_dir='.', output_dir='.'):
+    def __init__(self, parser, source_dir='.', output_dir='.', prefix_path='.'):
         """Constructs a platform configuration command"""
 
         parser.add_argument('--source',
@@ -196,7 +196,7 @@ class Command:
                             default=output_dir)
         parser.add_argument('--prefix-path',
                             help='a path used for searching packages.',
-                            default='.')
+                            default=prefix_path)
         parser.add_argument('--cpp',
                             help='specifies the C++ standard whose features that are required by a build system.',
                             type=int,

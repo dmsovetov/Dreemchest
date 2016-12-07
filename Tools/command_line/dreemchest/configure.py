@@ -36,7 +36,7 @@ class PlatformConfigurationCommand(cmake.Command):
     def __init__(self, parser, rendering_backend):
         """Constructs a platform configuration command"""
 
-        cmake.Command.__init__(self, parser)
+        cmake.Command.__init__(self, parser, prefix_path='Build/Dependencies')
 
         command_line.add_component(parser, 'pch', description='generate a build system that uses precompiled headers.')
         command_line.add_component(parser, 'composer', description='do not build the Composer tool.')
@@ -63,7 +63,7 @@ class PlatformConfigurationCommand(cmake.Command):
 
         # Generate platform independent CMake arguments from passed options
         parameters = dict(
-            DC_USE_PCH=cmake.enable_option(options.pch),
+            DC_USE_PCH=cmake.disable_option(options.no_pch),
             DC_COMPOSER_ENABLED=cmake.disable_option(options.no_composer or options.no_qt),
             DC_OPENGL_ENABLED=cmake.disable_option(options.no_renderer),
             DC_SOUND_ENABLED=cmake.disable_option(options.no_sound),

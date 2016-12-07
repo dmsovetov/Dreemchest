@@ -83,4 +83,7 @@
     #define OGGVORBIS_FOUND
 #endif  /*  defined(OGG_FOUND) && defined(VORBIS_FOUND) */
 
+//! A C++ standard version used for compilation
+#define CPLUSPLUS_STD   (${CMAKE_CXX_STANDARD})
+
 #endif  /*  #ifndef __DC_BuildConfig_H__  */
