@@ -29,19 +29,11 @@
 
 #
 *.ogg
-dependency
-projects
-src/modules
-src/dreemchest/externals/src
-src/examples/assets
-externals/src
 *.suo
 *.pyc
 .idea
 
-~TestProject
-Build/*.dll
-Build/LogFile.txt
 *.DS_Store
 
-Externals/Prebuilt
+Build/Dependencies
+Projects
