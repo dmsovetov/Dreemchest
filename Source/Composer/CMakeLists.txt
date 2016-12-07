@@ -77,7 +77,7 @@ if (DC_USE_PCH)
 endif()
 
 # Create the Composer executable
-add_executable(${TARGET_NAME} WIN32 ${SRCS} Resources/Resources.qrc)
+add_executable(${TARGET_NAME} WIN32 MACOSX_BUNDLE ${SRCS} Resources/Resources.qrc)
  
 # Link dependencies
 target_link_libraries(${TARGET_NAME} ${LIBRARIES})
