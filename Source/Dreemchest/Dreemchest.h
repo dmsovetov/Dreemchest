@@ -31,12 +31,13 @@
 
 #define dcInterface
 
-#if CPLUSPLUS_STD > 98
-    #define DREEMCHEST_CPP11
-#endif  /*  CPLUSPLUS_STD > 98  */
+#if CPLUSPLUS_STD == 11
+    #define DREEMCHEST_CPP11    (1)
+#endif  /*  #if CPLUSPLUS_STD == 11  */
 
-#if CPLUSPLUS_STD > 11
-    #define DREEMCHEST_CPP14
+#if CPLUSPLUS_STD == 14
+    #define DREEMCHEST_CPP11    (1)
+    #define DREEMCHEST_CPP14    (1)
 #endif  /*  CPLUSPLUS_STD > 11  */
 
 #ifdef DC_BUILD_ENGINE
