@@ -35,5 +35,7 @@
 
 *.DS_Store
 
+Build/~TestProject
 Build/Dependencies
 Projects
+tools/cmake
