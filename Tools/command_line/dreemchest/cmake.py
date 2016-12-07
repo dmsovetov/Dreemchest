@@ -65,7 +65,6 @@ def download():
     file_size = int(meta.getheaders("Content-Length")[0])
     print "Downloading: %s Bytes: %s" % (file_name, file_size)
 
-
     file_size_dl = 0
     block_sz = 8192
     while True:
@@ -124,7 +123,7 @@ def library_option(parameters, name, options):
         parameters['BUNDLED_%s' % name.upper()] = True
 
 
-def generate(generator, source, output, parameters, rest='', quiet=False):
+def generate(generator, source, output, parameters, rest=''):
     """Invokes a CMake command to generate a build system"""
 
     # Create an output directory
@@ -141,18 +140,16 @@ def generate(generator, source, output, parameters, rest='', quiet=False):
                                                               rest
                                                               )
 
-    with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
+    subprocess.check_call(command_line, shell=True)
 
 
-def build(source, target, configuration, quiet=False):
+def build(source, target, configuration):
     """Build a CMake-generated project binary tree."""
 
     # Generate a command line string
     command_line = '%s --build %s --target %s --config %s' % (cmake, source, target, configuration)
 
-    with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
+    subprocess.check_call(command_line, shell=True)
 
 
 def configure_and_build(generator, source_dir, binary_dir,
