@@ -26,7 +26,30 @@
 #
 #################################################################################
 
-import os
-import sys
+import argparse
+import install
+import checkout
+import configure
+import command_line
 
-os.system('python Tools/dreemchest/dreemchest.py %s' % ' '.join(sys.argv[1:]))
+
+class Main(command_line.Tool):
+    """An entry point to a command line tool"""
+
+    def __init__(self, parser):
+        """Constructs a command line tool."""
+
+        command_line.Tool.__init__(self, parser, 'available commands')
+
+        self._add_command('configure', configure.Command)
+        self._add_command('checkout', checkout.Command)
+        self._add_command('install', install.Command)
+
+# Entry point
+if __name__ == "__main__":
+    root = argparse.ArgumentParser(description='Dreemchest engine command line tool')
+
+    Main(root)
+
+    args = root.parse_args()
+    args.function(args)

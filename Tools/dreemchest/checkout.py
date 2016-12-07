@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #################################################################################
 #
 # The MIT License (MIT)
@@ -26,7 +24,9 @@
 #
 #################################################################################
 
-import os
-import sys
 
-os.system('python Tools/dreemchest/dreemchest.py %s' % ' '.join(sys.argv[1:]))
+class Command:
+    """A command line tool to checkout a source code from a remote repository"""
+
+    def __init__(self, parser):
+        """Constructs a pull command line tool"""

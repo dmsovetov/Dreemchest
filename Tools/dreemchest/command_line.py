@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #################################################################################
 #
 # The MIT License (MIT)
@@ -26,7 +24,15 @@
 #
 #################################################################################
 
-import os
-import sys
 
-os.system('python Tools/dreemchest/dreemchest.py %s' % ' '.join(sys.argv[1:]))
+class Tool:
+    """A base class for all command line tools that have nested commands"""
+
+    def __init__(self, parser, description):
+        """Constructs a command line tool instance"""
+        self._commands = parser.add_subparsers(help=description)
+
+    def _add_command(self, name, cls):
+        """Adds a nested command"""
+
+        cls(self._commands.add_parser(name))
