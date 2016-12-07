@@ -24,10 +24,9 @@
 #
 #################################################################################
 
-import subprocess
 import os
-
 import git
+import cmake
 
 
 class Command:
@@ -39,6 +38,11 @@ class Command:
         parser.add_argument('path',
                             help='a destination folder to checkout a source code'
                             )
+        parser.add_argument('--no-cmake',
+                            help='do not download CMake distribution',
+                            action='store_true',
+                            default=False
+                            )
 
         parser.set_defaults(function=self.checkout)
 
@@ -49,18 +53,19 @@ class Command:
         # Save current directory
         current_dir = os.getcwd()
 
-        try:
-            # Checkout repository
-            git.clone('https://github.com/dmsovetov/Dreemchest', options.path, branch='renderer-refactoring')
+        # Checkout repository
+        git.clone('https://github.com/dmsovetov/Dreemchest', options.path, branch='renderer-refactoring')
 
-            # Change current directory
-            os.chdir(options.path)
+        # Change current directory
+        os.chdir(options.path)
 
-            # Initialize submodules
-            git.checkout_submodule('Source/Nimble')
-            git.checkout_submodule('Source/Relight')
-        except subprocess.CalledProcessError:
-            pass
+        # Download CMake
+        if not options.no_cmake:
+            cmake.download()
+
+        # Initialize submodules
+        git.checkout_submodule('Source/Nimble')
+        git.checkout_submodule('Source/Relight')
 
         # Reset current directory
         os.chdir(current_dir)

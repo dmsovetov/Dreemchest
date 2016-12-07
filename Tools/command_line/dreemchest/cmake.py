@@ -25,8 +25,75 @@
 #################################################################################
 
 import os
+import sys
 import subprocess
 import shutil
+import urllib2
+import zipfile
+import tarfile
+
+
+def get_cmake_executable():
+    if sys.platform == 'darwin':
+        return 'Tools/cmake/CMake.app/Contents/bin/cmake'
+    else:
+        return 'Tools/cmake/cmake'
+
+try:
+    with open(os.devnull, 'wb') as devnull:
+        subprocess.check_call('cmake', shell=True, stdout=devnull)
+        cmake = 'cmake'
+except subprocess.CalledProcessError:
+    cmake = get_cmake_executable()
+
+
+def get_download_url():
+    if sys.platform == 'darwin':
+        return 'https://cmake.org/files/v3.6/cmake-3.6.3-Darwin-x86_64.tar.gz'
+    else:
+        return 'https://cmake.org/files/v3.6/cmake-3.6.3-win32-x86.zip'
+
+
+def download():
+    url = get_download_url()
+
+    file_name = url.split('/')[-1]
+    u = urllib2.urlopen(url)
+
+    f = open(file_name, 'wb')
+    meta = u.info()
+    file_size = int(meta.getheaders("Content-Length")[0])
+    print "Downloading: %s Bytes: %s" % (file_name, file_size)
+
+
+    file_size_dl = 0
+    block_sz = 8192
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+
+        file_size_dl += len(buffer)
+        f.write(buffer)
+        status = "\r%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+        print status,
+        sys.stdout.flush()
+
+    f.close()
+
+    name, ext = os.path.splitext(file_name)
+
+    if ext == '.gz':
+        tar = tarfile.open(file_name, "r")
+        tar.extractall("Tools")
+        name, ext = os.path.splitext(name)
+    elif ext == '.zip':
+        with zipfile.ZipFile(file_name, "r") as z:
+            z.extractall("Tools")
+
+    os.rename(os.path.join('Tools', name), 'Tools/cmake')
+
+    os.remove(file_name)
 
 
 def enable_option(value):
@@ -68,11 +135,11 @@ def generate(generator, source, output, parameters, rest='', quiet=False):
     cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
 
     # Generate a command line string
-    command_line = 'cmake -E chdir %s cmake %s -G "%s" %s %s' % (output, os.path.abspath(source),
-                                                                 generator,
-                                                                 ' '.join(cmd_args),
-                                                                 rest
-                                                                 )
+    command_line = '%s -E chdir %s cmake %s -G "%s" %s %s' % (cmake, output, os.path.abspath(source),
+                                                              generator,
+                                                              ' '.join(cmd_args),
+                                                              rest
+                                                              )
 
     with open(os.devnull, 'wb') as devnull:
         subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
@@ -82,7 +149,7 @@ def build(source, target, configuration, quiet=False):
     """Build a CMake-generated project binary tree."""
 
     # Generate a command line string
-    command_line = 'cmake --build %s --target %s --config %s' % (source, target, configuration)
+    command_line = '%s --build %s --target %s --config %s' % (cmake, source, target, configuration)
 
     with open(os.devnull, 'wb') as devnull:
         subprocess.check_call(command_line, shell=True, stdout=devnull if quiet else None, stderr=subprocess.STDOUT)
