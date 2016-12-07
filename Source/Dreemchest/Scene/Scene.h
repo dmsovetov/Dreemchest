@@ -29,7 +29,7 @@
 
 #include "../Dreemchest.h"
 
-#ifdef DC_CPP11_DISABLED
+#if !DREEMCHEST_CPP11
 	#error C++11 should be enabled to use scene module.
 #endif
 

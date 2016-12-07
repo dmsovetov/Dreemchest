@@ -52,7 +52,7 @@ namespace Ecs {
 		//! Compares two aspects.
 		bool			operator < ( const Aspect& other ) const;
 
-    #ifndef DC_CPP11_DISABLED
+    #if DREEMCHEST_CPP11
 		//! Returns an aspect with all mask.
 		template<typename... TComponents>
 		static Aspect	all( void );
@@ -68,7 +68,7 @@ namespace Ecs {
         //! Expands the variadic template arguments to a components bitset.
         template<typename... TComponents>
         static Bitset   expandComponentBits( void );
-    #endif  /*  !DC_CPP11_DISABLED  */
+    #endif  /*  #if DREEMCHEST_CPP11 */
 
 	private:
 
@@ -77,7 +77,7 @@ namespace Ecs {
 		Bitset			m_exc;	//!< Entity should not contain a components from this set.
 	};
 
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 	// ** Aspect::all
 	template<typename... TComponents>
 	Aspect Aspect::all( void )
@@ -112,7 +112,7 @@ namespace Ecs {
 
         return result;
     }
-#endif  /*  !DC_CPP11_DISABLED  */
+#endif  /*  #if DREEMCHEST_CPP11  */
 
 } // namespace Ecs
 

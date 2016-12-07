@@ -110,6 +110,7 @@ MeshBoxGenerator::MeshBoxGenerator( f32 width, f32 height, f32 depth )
 // ** MeshBoxGenerator::generate
 bool MeshBoxGenerator::generate( Assets::Assets& assets, Mesh& mesh )
 {
+#if DREEMCHEST_CPP11
     // A total number of vertices and indices
     const s32 kVertexCount = 24;
     const s32 kIndexCount = 36;
@@ -177,7 +178,9 @@ bool MeshBoxGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
     mesh.updateBounds();
-
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DREEMCHEST_CPP11    */
     return true;
 }
 
@@ -192,6 +195,7 @@ MeshSphereGenerator::MeshSphereGenerator( f32 radius )
 // ** MeshSphereGenerator::generate
 bool MeshSphereGenerator::generate( Assets::Assets& assets, Mesh& mesh )
 {
+#if DREEMCHEST_CPP11
 	const s32 kVertexCount = 258;
 	const s32 kIndexCount = 1440;
 
@@ -964,7 +968,9 @@ bool MeshSphereGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
     mesh.updateBounds();
-
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DREEMCHEST_CPP11    */
 	return true;
 }
 
@@ -979,6 +985,7 @@ MeshTorusGenerator::MeshTorusGenerator( f32 radius )
 // ** MeshTorusGenerator::generate
 bool MeshTorusGenerator::generate( Assets::Assets& assets, Mesh& mesh )
 {
+#if DREEMCHEST_CPP11
 	const s32 kVertexCount = 528;
 	const s32 kIndexCount = 3072;
 
@@ -2565,6 +2572,9 @@ bool MeshTorusGenerator::generate( Assets::Assets& assets, Mesh& mesh )
     mesh.setVertexBuffer( vb );
     mesh.setIndexBuffer( ib );
     mesh.updateBounds();
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DREEMCHEST_CPP11    */
 
 	return true;
 }

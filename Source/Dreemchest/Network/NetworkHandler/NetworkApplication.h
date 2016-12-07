@@ -67,21 +67,21 @@ namespace Network {
         template<typename TPacketHandler>
         void                    addPacketHandler( TPacketHandler* instance );
 
-    #ifndef DC_CPP11_DISABLED
+    #if DREEMCHEST_CPP11
         //! Creates a new instance of a packet handler and adds it to an application.
         template<typename TPacketHandler, typename ... TArgs>
         void                    addPacketHandler( const TArgs& ... args );
-    #endif  /*  DC_CPP11_DISABLED   */
+    #endif  /*  #if DREEMCHEST_CPP11   */
 
 		//! Emits a network event.
 		template<typename T>
 		void					emitTo( const T& e, const ConnectionList& listeners );
 
-    #ifndef DC_CPP11_DISABLED
+    #if DREEMCHEST_CPP11
 		//! Template functions to emit a new event.
 		template<typename TEvent, typename ... TArgs>
         void                    emit( const TArgs& ... args );
-    #endif  /*  DC_CPP11_DISABLED   */
+    #endif  /*  #if DREEMCHEST_CPP11  */
 
         //! Returns the traffic stats for each sent packet.
         const TrafficPerPacket& bytesSentPerPacket( void ) const;

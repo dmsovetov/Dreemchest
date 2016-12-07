@@ -82,8 +82,12 @@ void PingInterval::update( u32 dt )
 {
 	// Update the time accumulator
 	if( accumulateTime( dt ) ) {
+    #if DREEMCHEST_CPP11
 		// Send the Ping packet
 		m_connection->send<Packets::Ping>( m_iterations, m_connection->time() );
+    #else
+        NIMBLE_NOT_IMPLEMENTED
+    #endif  /*  #if DREEMCHEST_CPP11    */
 	}
 }
 
@@ -100,9 +104,13 @@ void KeepAliveInterval::update( u32 dt )
 {
 	// Update the time accumulator
 	if( accumulateTime( dt ) ) {
+    #if DREEMCHEST_CPP11
 		// Send the KeepAlive packet
 		m_connection->send<Packets::KeepAlive>();
 		LogDebug( "connection", "%s", "keep alive packet sent\n" );
+    #else
+        NIMBLE_NOT_IMPLEMENTED
+    #endif  /*  #if DREEMCHEST_CPP11    */
 	}
 }
 

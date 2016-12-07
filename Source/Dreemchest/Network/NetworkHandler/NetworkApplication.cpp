@@ -45,10 +45,14 @@ Application::Application( void )
 {
     NIMBLE_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
+#if DREEMCHEST_CPP11
     addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( Application::handleEventPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( Application::handlePingPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( Application::handleRemoteCallPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DREEMCHEST_CPP11    */
 }
 
 // ** Application::~Application
@@ -109,7 +113,11 @@ ConnectionList Application::eventListeners( void ) const
 void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
 {
 	if( ping.iterations ) {
+    #if DREEMCHEST_CPP11
 		connection->send<Packets::Ping>( ping.iterations - 1, ping.timestamp, connection->time() );
+    #else
+        NIMBLE_NOT_IMPLEMENTED
+    #endif  /*  #if DREEMCHEST_CPP11    */
 	} else {
 		u32 rtt  = connection->time() - ping.timestamp;
 		u32 time = ping.time + rtt / 2;

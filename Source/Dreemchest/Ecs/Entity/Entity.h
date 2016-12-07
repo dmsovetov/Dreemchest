@@ -127,11 +127,11 @@ namespace Ecs {
         virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
-	#ifndef DC_CPP11_DISABLED
+	#if DREEMCHEST_CPP11
 		//! Constructs a new component and attaches it to this entity.
 		template<typename TComponent, typename ... Args>
 		TComponent*				attach( Args ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
+	#endif	/*	#if DREEMCHEST_CPP11	*/
 
         //! Removes a component by type id from this entity.
         void                    detachById( TypeIdx id );
@@ -249,14 +249,14 @@ namespace Ecs {
 	}
 
 	// ** Entity::attach
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 	template<typename TComponent, typename ... Args>
 	TComponent* Entity::attach( Args ... args )
 	{
 		TComponent* component = m_ecs->createComponent<TComponent>( args... );
 		return attachComponent<TComponent>( component );
 	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif	/*	#if DREEMCHEST_CPP11	*/
 
 	// ** Entity::detach
 	template<typename TComponent>

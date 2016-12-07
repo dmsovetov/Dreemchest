@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 
 	//! Immutable entity system stores cached entity components and can't change the component layout of an entity in update loop.
 	template<typename ... TComponents>
@@ -131,7 +131,7 @@ namespace Ecs {
 		NIMBLE_NOT_IMPLEMENTED
 	}
 
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif	/*	#if DREEMCHEST_CPP11	*/
 
 } // namespace Ecs
 

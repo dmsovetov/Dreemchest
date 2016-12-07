@@ -47,10 +47,10 @@ namespace Ecs {
 		void				update( u32 currentTime, f32 dt );
 
 		//! Constructs and adds a new system to a group.
-	#ifndef DC_CPP11_DISABLED
+	#if DREEMCHEST_CPP11
 		template<typename TSystem, typename ... Args>
 		WeakPtr<TSystem>	add( const Args& ... args );
-	#endif
+	#endif  /*  #if DREEMCHEST_CPP11    */
 
 		//! Adds a new system to a group.
 		template<typename TSystem>
@@ -92,13 +92,13 @@ namespace Ecs {
 	};
 
 	// ** SystemGroup::add
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 	template<typename TSystem, typename ... Args>
 	WeakPtr<TSystem> SystemGroup::add( const Args& ... args )
 	{
 		return add( DC_NEW TSystem( args... ) );
 	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif	/*	#if DREEMCHEST_CPP11	*/
 
 	template<typename TSystem>
 	WeakPtr<TSystem> SystemGroup::add( TSystem* system )

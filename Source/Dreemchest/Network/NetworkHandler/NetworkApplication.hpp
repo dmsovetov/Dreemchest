@@ -81,7 +81,7 @@ namespace Network {
         m_packetHandlers[type].push_back( instance );
     }
     
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
     // ** Application::addPacketHandler
     template<typename TPacketHandler, typename ... TArgs>
     void Application::addPacketHandler( const TArgs& ... args )
@@ -96,7 +96,7 @@ namespace Network {
         TEvent e( args... );
         emitTo( e, eventListeners() );
     }
-#endif  /*  DC_CPP11_DISABLED   */
+#endif  /*  #if DREEMCHEST_CPP11   */
     
 } // namespace Network
 

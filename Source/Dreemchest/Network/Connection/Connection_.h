@@ -73,7 +73,7 @@ namespace Network {
 		//! Adds new connection middleware.
 		void					addMiddleware( ConnectionMiddlewareUPtr instance );
 
-	#ifndef DC_CPP11_DISABLED
+	#if DREEMCHEST_CPP11
 		//! Generic method to construct and sent the network packet over this connection.
 		template<typename TPacket, typename ... TArgs>
 		void					send( const TArgs& ... args );
@@ -81,7 +81,7 @@ namespace Network {
 		//! Generic method to construct and add the middleware to this connection.
 		template<typename TMiddleware, typename ... TArgs>
 		void					addMiddleware( const TArgs& ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
+	#endif	/*	#if DREEMCHEST_CPP11	*/
 
         //! Base class for all connection events.
         struct Event {
@@ -169,7 +169,7 @@ namespace Network {
 		ConnectionMiddlewares	m_middlewares;			//!< Connection middlewares added to connection.
     };
 
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 	// ** Connection::send
 	template<typename TPacket, typename ... TArgs>
 	void Connection_::send( const TArgs& ... args )
@@ -184,7 +184,7 @@ namespace Network {
 	{
 		addMiddleware( DC_NEW TMiddleware( args... ) );
 	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif	/*	#if DREEMCHEST_CPP11	*/
 
 } // namespace Network
 

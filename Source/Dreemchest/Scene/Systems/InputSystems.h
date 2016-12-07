@@ -67,7 +67,7 @@ namespace Scene {
         Ecs::IndexPtr       m_entities; //!< All entities that are processed by this input system.
 	};
 
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 
 	//! Generic input processing entity system for entities that contain all components from a specified set.
 	template<typename TSystem, typename TCamera, typename ... TComponents>
@@ -155,7 +155,7 @@ namespace Scene {
 		dispatchMoved( entity, flags, e, typename Indices::Indexes() );
 	}
 
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif	/*	#if DREEMCHEST_CPP11	*/
 
 } // namespace Scene
 
