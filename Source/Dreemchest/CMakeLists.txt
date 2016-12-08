@@ -102,6 +102,7 @@ add_library(Dreemchest STATIC ${ROOT_SRCS} ${BASE_SRCS} ${ECS_SRCS} ${IO_SRCS} $
 
 # Link all requested libraries
 target_link_libraries(Dreemchest ${DEPENDENCIES})
+target_include_directories(Dreemchest PUBLIC ${DEPENDENCIES_INCLUDE_DIRS})
 
 if (WIN32)
     target_link_libraries(Dreemchest ws2_32)

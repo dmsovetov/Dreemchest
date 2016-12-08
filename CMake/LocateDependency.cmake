@@ -6,6 +6,7 @@ macro(locate_dependency NAME)
     set(BUNDLED_LIBRARY "BUNDLED_${NAME_UPPER}")
     set(SYSTEM_LIBRARY "SYSTEM_${NAME_UPPER}")
     set(LIBRARY_NAME "${NAME_UPPER}_LIBRARY")
+    set(LIBRARY_INCLUDE_DIR "${NAME_UPPER}_INCLUDE_DIR")
     set(FOUND_NAME "${NAME_UPPER}_FOUND")
 
     # Locate dependency according to a requested location
@@ -18,5 +19,6 @@ macro(locate_dependency NAME)
     # Push a dependency name to a list
     if (${${FOUND_NAME}})
 	    list(APPEND DEPENDENCIES ${${LIBRARY_NAME}})
+        list(APPEND DEPENDENCIES_INCLUDE_DIRS ${${LIBRARY_INCLUDE_DIR}})
     endif ()
 endmacro()
