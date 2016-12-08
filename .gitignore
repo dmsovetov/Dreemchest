@@ -37,5 +37,6 @@
 
 Build/~TestProject
 Build/Dependencies
+Build/Composer
 Projects
 tools/cmake
