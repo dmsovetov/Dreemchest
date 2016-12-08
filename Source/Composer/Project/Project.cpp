@@ -45,6 +45,8 @@ DC_BEGIN_COMPOSER
 // ** Project::Project
 Project::Project( QObject* parent, const Io::Path& path ) : QObject( parent )
 {
+    NIMBLE_ABORT_IF(!QFile::exists(path.c_str()), "a specified path does not exist");
+    
     // Save project name
     m_name = path.last();
 

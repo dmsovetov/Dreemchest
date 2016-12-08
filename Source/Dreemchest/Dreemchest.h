@@ -73,9 +73,9 @@
 #define LogFatal( prefix, message, ... )     Log::fatal( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 #define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 
-#ifdef JSON_FOUND
+#ifdef JSONCPP_FOUND
     #include <json/json.h>
-#endif    /*    #ifdef JSON_FOUND    */
+#endif    /*    #ifdef JSONCPP_FOUND    */
 
 DC_BEGIN_DREEMCHEST
 

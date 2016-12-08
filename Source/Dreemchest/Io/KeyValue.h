@@ -43,13 +43,13 @@ namespace Io {
         //! Parses Variant from a JSON string.
         static Variant        parse( const String& text );
 
-    #ifdef JSON_FOUND
+    #ifdef JSONCPP_FOUND
         //! Converts Variant to JSON object.
         static Json::Value    toJson( const Variant& value );
 
         //! Constructs Variant from JSON object.
         static Variant        fromJson( const Json::Value& json );
-    #endif  /*  #ifdef JSON_FOUND   */
+    #endif  /*  #ifdef JSONCPP_FOUND   */
     };
 
     //! Default KeyValue binary writer.

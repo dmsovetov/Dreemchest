@@ -130,7 +130,7 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 // ** MaterialSourceKeyValue::constructFromStream
 bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
-#ifdef JSON_FOUND
+#ifdef JSONCPP_FOUND
     String json;
     json.resize( stream->length() );
 
@@ -172,7 +172,7 @@ bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::
     return true;
 #else
     return false;
-#endif    /*    #ifdef JSON_FOUND    */
+#endif    /*    #ifdef JSONCPP_FOUND    */
 }
 
 } // namespace Scene

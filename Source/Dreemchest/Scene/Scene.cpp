@@ -227,7 +227,7 @@ ScenePtr Scene::createFromJson( const Resources& assets, const String& json )
 {
 #if DEV_DEPRECATED_SCENE_SERIALIZATION
 
-#ifdef JSON_FOUND
+#ifdef JSONCPP_FOUND
     // Create scene instance
     ScenePtr scene( DC_NEW Scene );
 
@@ -242,7 +242,7 @@ ScenePtr Scene::createFromJson( const Resources& assets, const String& json )
 #else
     LogError( "deserialize", "%s", "failed to load scene, built with no JSON support.\n" );
     return ScenePtr();
-#endif    /*    #ifdef JSON_FOUND    */
+#endif    /*    #ifdef JSONCPP_FOUND    */
 #else
     NIMBLE_NOT_IMPLEMENTED;
     return ScenePtr();
@@ -253,7 +253,7 @@ ScenePtr Scene::createFromJson( const Resources& assets, const String& json )
 
 // ------------------------------------------------- JsonSceneLoader ------------------------------------------------- //
 
-#ifdef JSON_FOUND
+#ifdef JSONCPP_FOUND
 
 // ** JsonSceneLoader::JsonSceneLoader
 JsonSceneLoader::JsonSceneLoader( const Resources& assets ) : m_assets( assets )
@@ -812,7 +812,7 @@ Array<f32> JsonLoaderBase::readFloats( const Json::Value& value )
     return result;
 }
 
-#endif    /*    #ifdef JSON_FOUND    */
+#endif    /*    #ifdef JSONCPP_FOUND    */
 
 #endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 
