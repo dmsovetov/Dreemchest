@@ -24,7 +24,7 @@ if (MSVC)
     set(USER_FILE ${TARGET_NAME}.vcxproj.user)
     set(OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${USER_FILE})
     configure_file(VisualStudio.user ${USER_FILE} @ONLY)
-endif (MSVC)
+endif ()
 
 # Setup the Qt library
 if (DC_QT_SUPPORT MATCHES "Qt4")
@@ -36,7 +36,7 @@ elseif (DC_QT_SUPPORT MATCHES "Qt5")
     find_package(Qt5OpenGL)
     set(LIBRARIES ${LIBRARIES} Qt5::Widgets Qt5::OpenGL)
     
-endif (DC_QT_SUPPORT MATCHES "Qt4")
+endif ()
 
 # Link with Relight
 if (DC_WITH_RELIGHT)

@@ -14,7 +14,7 @@ project(Dreemchest)
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-endif (MSVC)
+endif ()
 
 # Available options
 option(DC_BUILD_EXAMPLES "Build Dreemchest examples" ON)
@@ -48,7 +48,7 @@ if (DC_QT_SUPPORT MATCHES "Auto")
     
     if (Qt4_FOUND AND Qt5Widgets_FOUND)
         message(FATAL_ERROR "Both Qt4 and Qt5 found, you should use manually which version to use.")
-    endif (Qt4_FOUND AND Qt5Widgets_FOUND)
+    endif ()
     
     if (Qt4_FOUND)
         set(DC_QT_SUPPORT "Qt4")
@@ -59,8 +59,8 @@ if (DC_QT_SUPPORT MATCHES "Auto")
     else (Qt4_FOUND)
         message(WARNING "Qt library not found, disabling Qt support.")
         set(DC_QT_SUPPORT "Disabled")
-    endif (Qt4_FOUND)
-endif (DC_QT_SUPPORT MATCHES "Auto")
+    endif ()
+endif ()
 
 if (DC_QT_SUPPORT MATCHES "Qt4")
     set(DC_QT_ENABLED ON)
@@ -68,7 +68,7 @@ if (DC_QT_SUPPORT MATCHES "Qt4")
 elseif (DC_QT_SUPPORT MATCHES "Qt5")
     set(DC_QT_ENABLED ON)
     set(DC_QT_VERSION 5)
-endif (DC_QT_SUPPORT MATCHES "Qt4")
+endif ()
 
 # Setup variables
 if (WIN32)
@@ -84,7 +84,7 @@ elseif (APPLE)
     set(DC_PLATFORM "MacOS")
     set(DC_THREADS "Posix")
     add_definitions(-DDC_PLATFORM_MACOS -DDC_THREADS_POSIX)
-endif (WIN32)
+endif ()
 
 # Add child projects
 add_subdirectory(Dreemchest)
@@ -102,20 +102,20 @@ endif ()
 
 if (DC_BUILD_EXAMPLES)
     add_subdirectory(Examples)
-endif (DC_BUILD_EXAMPLES)
+endif ()
 
 if (DC_BUILD_TESTS)
     find_package(GTest REQUIRED)
     add_subdirectory(Tests)
-endif (DC_BUILD_TESTS)
+endif ()
 
 if (DC_COMPOSER_ENABLED)
     if (NOT DC_QT_ENABLED)
         message(FATAL_ERROR "Dreemchest Composer build requested but no Qt found.")
-    endif (NOT DC_QT_ENABLED)
+    endif ()
     
     add_subdirectory(Composer)
-endif (DC_COMPOSER_ENABLED)
+endif ()
 
 # Add solution folders
 if (DC_COMPOSER_ENABLED)

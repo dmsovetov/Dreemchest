@@ -10,8 +10,6 @@ F_ShadowFiltering    = shadowFiltering
 F_ClipPlanes        = cbuffer6
 
 [VertexShader]
-#extension GL_APPLE_clip_distance : require
-
 varying vec3 wsVertex;
 
 #if defined( F_VertexColor )
