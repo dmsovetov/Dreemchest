@@ -32,16 +32,18 @@ import urllib2
 import zipfile
 import tarfile
 
+GENERATE_COMMAND = '{cmake} -E chdir {output} {cmake} {source} -G "{generator}" {args} {rest}'
+
 
 def get_cmake_executable():
     if sys.platform == 'darwin':
-        return 'Tools/cmake/CMake.app/Contents/bin/cmake'
+        return os.path.abspath('Tools/cmake/CMake.app/Contents/bin/cmake')
     else:
-        return 'Tools/cmake/bin/cmake.exe'
+        return os.path.abspath('Tools/cmake/bin/cmake.exe')
 
 try:
     with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call('cmake1', shell=True, stdout=devnull, stderr=devnull)
+        subprocess.check_call('cmake', shell=True, stdout=devnull, stderr=devnull)
         cmake = 'cmake'
 except subprocess.CalledProcessError:
     cmake = get_cmake_executable()
@@ -134,15 +136,14 @@ def generate(generator, source, output, parameters, rest=''):
     cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
 
     # Generate a command line string
-    command_line = '"{cmake}" -E chdir {output} "{cmake}" {source} -G "{generator}" {args} {rest}'.format(
-                     output= output,
-                     source= os.path.abspath(source),
-                     generator= generator,
-                     args= ' '.join(cmd_args),
-                     rest= rest,
-                     cmake= cmake)
-
-    print command_line
+    command_line = GENERATE_COMMAND.format(
+        output=output,
+        source=os.path.abspath(source),
+        generator=generator,
+        args=' '.join(cmd_args),
+        rest=rest,
+        cmake=cmake
+        )
 
     subprocess.check_call(command_line, shell=True)
 
