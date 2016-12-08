@@ -52,40 +52,40 @@ class ParticleSystems : public Platform::ApplicationDelegate {
         m_hal = Renderer::Hal::create( Renderer::OpenGL, view );
         //m_renderingContext = Scene::RenderingContext::create( m_hal );
 
-		// Create the particle system
-		m_scene = Scene::Scene::create();
+        // Create the particle system
+        m_scene = Scene::Scene::create();
 
-		// Create an empty asset bundle
-		//m_assets = AssetBundle::create( "assets" );
+        // Create an empty asset bundle
+        //m_assets = AssetBundle::create( "assets" );
 
-		//m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
+        //m_assets->addMesh( "assets/tomb05_c", "tomb05_c" );
 
-		//TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
+        //TerrainPtr terrain = m_assets->addTerrain( "terrain", "terrain", 128 );
 
-		//for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
-		//	for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
-		//		SceneObjectPtr chunk = m_scene->createSceneObject();
-		//		MeshPtr		   mesh  = terrain->createChunkMesh( m_hal, j, i );
+        //for( u32 i = 0; i < terrain->chunkCount(); i++ ) {
+        //    for( u32 j = 0; j < terrain->chunkCount(); j++ ) {
+        //        SceneObjectPtr chunk = m_scene->createSceneObject();
+        //        MeshPtr           mesh  = terrain->createChunkMesh( m_hal, j, i );
 
-		//		chunk->attach<StaticMesh>( mesh );
-		//		chunk->attach<::Scene::Transform>( j * Terrain::kChunkSize, -4, i * Terrain::kChunkSize, ::Scene::Transform::WPtr() );
-		//	}
-		//}
+        //        chunk->attach<StaticMesh>( mesh );
+        //        chunk->attach<::Scene::Transform>( j * Terrain::kChunkSize, -4, i * Terrain::kChunkSize, ::Scene::Transform::WPtr() );
+        //    }
+        //}
 
-		//m_scene->addSystem<AssetSystem>( m_assets );
+        //m_scene->addSystem<AssetSystem>( m_assets );
 
-		Scene::Vec3BindingPtr wasdDirection = DC_NEW Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
+        Scene::Vec3BindingPtr wasdDirection = DC_NEW Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S );
 
-		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
-		camera->attach<Scene::Camera>( Scene::Projection::Perspective, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
-		camera->attach<Scene::RenderParticles>();
-	//	camera->attach<Scene::RenderForwardLit>();
-		camera->attach<Scene::RenderWireframe>();
-		camera->attach<Scene::Transform>();
-		camera->attach<Scene::MoveAlongAxes>( 60.0f, true, wasdDirection );
-	//	camera->attach<Scene::RenderBoundingVolumes>();
+        Scene::SceneObjectPtr camera = m_scene->createSceneObject();
+        camera->attach<Scene::Camera>( Scene::Projection::Perspective, Scene::WindowTarget::create( window ), Rgb::fromHashString( "#484848" ) );
+        camera->attach<Scene::RenderParticles>();
+    //    camera->attach<Scene::RenderForwardLit>();
+        camera->attach<Scene::RenderWireframe>();
+        camera->attach<Scene::Transform>();
+        camera->attach<Scene::MoveAlongAxes>( 60.0f, true, wasdDirection );
+    //    camera->attach<Scene::RenderBoundingVolumes>();
 
-		Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
+        Renderer::Renderer2DPtr renderer = Renderer::Renderer2D::create( m_hal, 4096 );
 
         // Finally subscribe to updates events.
         window->subscribe<Platform::Window::Update>( dcThisMethod( ParticleSystems::handleUpdate ) );
@@ -93,29 +93,29 @@ class ParticleSystems : public Platform::ApplicationDelegate {
 
     // Called each frame and renders a single frame
     virtual void handleUpdate( const Platform::Window::Update& e ) {
-		Rgb clearColor = Rgb::fromHashString( "#314D79" );
+        Rgb clearColor = Rgb::fromHashString( "#314D79" );
 
         // First clear a viewport with a color
         m_hal->clear( Rgba( clearColor.r, clearColor.g, clearColor.b ) );
 
-		Threads::Thread::sleep( 30 );
+        Threads::Thread::sleep( 30 );
 
-		m_scene->update( 0, 0.03f );
-	//	m_scene->render( m_renderingContext );
+        m_scene->update( 0, 0.03f );
+    //    m_scene->render( m_renderingContext );
         NIMBLE_NOT_IMPLEMENTED;
 
         // And now just present all rendered data to the screen
         m_hal->present();
     }
 
-	Renderer::HalPtr	m_hal;
+    Renderer::HalPtr    m_hal;
 
-	Scene::ScenePtr			m_scene;
-//	AssetBundlePtr		m_assets;
-//	AssetBundlePtr		m_meshes;
+    Scene::ScenePtr            m_scene;
+//    AssetBundlePtr        m_assets;
+//    AssetBundlePtr        m_meshes;
 
-	//! Scene rendering context.
-	Scene::RenderingContextPtr	m_renderingContext;
+    //! Scene rendering context.
+    Scene::RenderingContextPtr    m_renderingContext;
 };
 
 // Now declare an application entry point with Particles application delegate.

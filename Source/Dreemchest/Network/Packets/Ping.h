@@ -35,19 +35,19 @@ namespace Network {
 
 namespace Packets {
 
-	//! Keep alive packet.
-	struct KeepAlive : public Packet<KeepAlive> {
-	};
+    //! Keep alive packet.
+    struct KeepAlive : public Packet<KeepAlive> {
+    };
 
-	//! Latency test & time sync packet
-	struct Ping : public Packet<Ping> {
-						//! Constructs a Ping instance.
-						Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
-							: iterations( iterations ), timestamp( timestamp ), time( time ) {}
+    //! Latency test & time sync packet
+    struct Ping : public Packet<Ping> {
+                        //! Constructs a Ping instance.
+                        Ping( u8 iterations = 0, u32 timestamp = 0, s32 time = 0 )
+                            : iterations( iterations ), timestamp( timestamp ), time( time ) {}
 
-		u8				iterations;		//!< Current iteration number.
-		u32				timestamp;		//!< A timestamp value when the packet was sent.
-		u32				time;			//!< Current connection time in milliseconds
+        u8                iterations;        //!< Current iteration number.
+        u32                timestamp;        //!< A timestamp value when the packet was sent.
+        u32                time;            //!< Current connection time in milliseconds
 
         virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
@@ -62,7 +62,7 @@ namespace Packets {
             stream->read( &timestamp, sizeof( timestamp ) );
             stream->read( &time, sizeof( time ) );        
         }
-	};
+    };
 
 } // namespace Packets
 

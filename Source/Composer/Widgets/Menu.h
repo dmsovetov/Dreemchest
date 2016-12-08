@@ -37,85 +37,85 @@ DC_BEGIN_COMPOSER
 namespace Ui {
 
     //! Menu action flags
-	enum ActionFlags {
-		  ItemDisabled	= BIT( 0 )	//!< Menu action is disabled.
-		, ItemCheckable	= BIT( 1 )	//!< Menu action is checkable.
-		, ItemChecked	= BIT( 2 )	//!< Menu action is checked.
-		, ItemHidden	= BIT( 3 )	//!< Menu action is hidden.
-	};
+    enum ActionFlags {
+          ItemDisabled    = BIT( 0 )    //!< Menu action is disabled.
+        , ItemCheckable    = BIT( 1 )   //!< Menu action is checkable.
+        , ItemChecked    = BIT( 2 )     //!< Menu action is checked.
+        , ItemHidden    = BIT( 3 )      //!< Menu action is hidden.
+    };
 
-	//! Qt action extension.
-	class Action : public QAction {
+    //! Qt action extension.
+    class Action : public QAction {
 
         Q_OBJECT
 
-	public:
+    public:
 
-								    //! Constructs Action instance.
-								    Action( QWidget* parent, const String& text, ActionCallback callback );
+                                    //! Constructs Action instance.
+                                    Action( QWidget* parent, const String& text, ActionCallback callback );
 
-		//! Sets the menu action shortcut.
-		void					    setShortcut( const String& value );
-	
-		//! Sets the menu action icon.
-		void					    setIcon( const String& value );
+        //! Sets the menu action shortcut.
+        void                        setShortcut( const String& value );
+    
+        //! Sets the menu action icon.
+        void                        setIcon( const String& value );
 
-		//! Creates new Action instance.
-		static ActionQPtr			create( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
-	
-	private Q_SLOTS:
+        //! Creates new Action instance.
+        static ActionQPtr            create( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
+    
+    private Q_SLOTS:
 
-		//! Action triggered slot to run an action callback.
-		void						triggered( void );
-	
-	private:
+        //! Action triggered slot to run an action callback.
+        void                        triggered( void );
+    
+    private:
 
-		ActionCallback				m_callback;	//!< Menu action callback.
-	};
+        ActionCallback                m_callback;    //!< Menu action callback.
+    };
 
-	//! Qt tool bar extension.
-	class ToolBar : public QToolBar {
-	public:
+    //! Qt tool bar extension.
+    class ToolBar : public QToolBar {
+    public:
 
-									//! Constructs ToolBar instance.
-									ToolBar( QWidget* parent );
+                                    //! Constructs ToolBar instance.
+                                    ToolBar( QWidget* parent );
 
-		//! Adds an action to a tool bar.
-		void				        addAction( ActionQPtr action );
+        //! Adds an action to a tool bar.
+        void                        addAction( ActionQPtr action );
 
-		//! Creates new action owned by this tool bar.
-		ActionQPtr			        addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
+        //! Creates new action owned by this tool bar.
+        ActionQPtr                    addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
 
-		//! Begins the action group construction.
-		void				        beginActionGroup( void );
+        //! Begins the action group construction.
+        void                        beginActionGroup( void );
 
-		//! Ends the action group construction.
-		void				        endActionGroup( void );
+        //! Ends the action group construction.
+        void                        endActionGroup( void );
 
-	private:
+    private:
 
-		QVector<ActionQPtr>		    m_group;	//!< The action group being constructed.
-	};
+        QVector<ActionQPtr>            m_group;    //!< The action group being constructed.
+    };
 
-	//! Qt menu extension.
-	class Menu : public QMenu {
-	public:
+    //! Qt menu extension.
+    class Menu : public QMenu {
+    public:
 
-									//! Constructs Menu instance.
-									Menu( QWidget* parent );
+                                    //! Constructs Menu instance.
+                                    Menu( QWidget* parent );
 
-		//! Returns the total number of items inside the menu.
-		s32					        size( void ) const;
+        //! Returns the total number of items inside the menu.
+        s32                            size( void ) const;
 
-		//! Adds new submenu.
-		MenuQPtr			        addMenu( const String& text );
+        //! Adds new submenu.
+        MenuQPtr                    addMenu( const String& text );
 
-		//! Adds new action to a menu.
-		ActionQPtr			        addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
-	};
+        //! Adds new action to a menu.
+        ActionQPtr                    addAction( const String& text, ActionCallback callback, const String& shortcut = String(), const String& icon = String(), s32 flags = 0 );
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Menu_H__	*/
+#endif    /*    !__DC_Composer_Menu_H__    */

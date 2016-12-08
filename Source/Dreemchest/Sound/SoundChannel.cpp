@@ -166,17 +166,17 @@ bool SoundChannel::update( f32 dt )
     m_source->update();
 
     // Update volume fader and calculate the volume fade factor
-	f32 fade = 1.0f;
+    f32 fade = 1.0f;
 
     if( m_volumeFader.valid() ) {
-		fade = m_volumeFader->update( dt );
-	}
+        fade = m_volumeFader->update( dt );
+    }
 
-	// Calculate the final volume base on fade factor, group volume & channel volume
-	f32 volume = m_volume * m_sound->group()->volume() * fade;
+    // Calculate the final volume base on fade factor, group volume & channel volume
+    f32 volume = m_volume * m_sound->group()->volume() * fade;
 
-	// Set the sond source volume
-	m_source->setVolume( volume );
+    // Set the sond source volume
+    m_source->setVolume( volume );
 
     // Update source distance attenuation properties
     m_source->setMaximumDistance( m_sound->maximumDistance() );

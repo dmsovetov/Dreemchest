@@ -140,10 +140,10 @@ namespace Scene {
             const RenderStateBlock*             states;             //!< A renderable state.
         };
 
-		//! Stores info about a sprite instance.
-		struct SpriteNode : public InstanceNode {
-			const Sprite*						sprite;				//!< Sprite component.
-		};
+        //! Stores info about a sprite instance.
+        struct SpriteNode : public InstanceNode {
+            const Sprite*                        sprite;                //!< Sprite component.
+        };
 
         //! Stores info about a renderable light.
         struct LightNode : public Node {
@@ -177,8 +177,8 @@ namespace Scene {
         //! A fixed array with static mesh nodes inside.
         typedef FixedArray<StaticMeshNode>      StaticMeshes;
 
-		//! A fixed array with sprite nodes inside.
-		typedef FixedArray<SpriteNode>			Sprites;
+        //! A fixed array with sprite nodes inside.
+        typedef FixedArray<SpriteNode>            Sprites;
 
         //! Returns parent scene.
         SceneWPtr                               scene( void ) const;
@@ -195,15 +195,15 @@ namespace Scene {
         //! Returns static mesh nodes.
         const StaticMeshes&                     staticMeshes( void ) const;
 
-		//! Returns sprite nodes.
-		const Sprites&							sprites( void ) const;
+        //! Returns sprite nodes.
+        const Sprites&                            sprites( void ) const;
 
         //! Returns a camera node by a component.
         const CameraNode&                       findCameraNode( Ecs::EntityWPtr camera ) const;
 
-		//! Adds a new render system to the scene.
-		template<typename TRenderSystem, typename ... TArgs>
-		void						            addRenderSystem( const TArgs& ... args );
+        //! Adds a new render system to the scene.
+        template<typename TRenderSystem, typename ... TArgs>
+        void                                    addRenderSystem( const TArgs& ... args );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
         RenderFrameUPtr                         captureFrame( void );
@@ -228,8 +228,8 @@ namespace Scene {
         //! Creates a static mesh node from an entity.
         StaticMeshNode                          createStaticMeshNode( const Ecs::Entity& entity );
 
-		//! Creates a sprite node from an entity.
-		SpriteNode								createSpriteNode( const Ecs::Entity& entity );
+        //! Creates a sprite node from an entity.
+        SpriteNode                                createSpriteNode( const Ecs::Entity& entity );
 
         //! Setups an instance render scene node.
         void                                    initializeInstanceNode( const Ecs::Entity& entity, InstanceNode& instance, const MaterialHandle& material );
@@ -251,8 +251,8 @@ namespace Scene {
         //! Entity data cache to store static meshes.
         typedef Ecs::DataCache<StaticMeshNode>  StaticMeshCache;
 
-		//! Entity data cache to store sprites.
-		typedef Ecs::DataCache<SpriteNode>		SpriteCache;
+        //! Entity data cache to store sprites.
+        typedef Ecs::DataCache<SpriteNode>        SpriteCache;
 
         RenderCacheWPtr                         m_cache;            //!< Render cache to be used.
         RenderingContextWPtr                    m_context;          //!< Parent rendering context.
@@ -260,20 +260,20 @@ namespace Scene {
         AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         UbershaderPtr                           m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
-        Array<RenderSystemUPtr>	                m_renderSystems;    //!< Entity render systems.
+        Array<RenderSystemUPtr>                    m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
         Ptr<CameraCache>                        m_cameras;          //!< Camera nodes cache.
         Ptr<StaticMeshCache>                    m_staticMeshes;     //!< Static mesh nodes cache.
-		Ptr<SpriteCache>						m_sprites;			//!< Sprite nodes cache.
+        Ptr<SpriteCache>                        m_sprites;            //!< Sprite nodes cache.
     };
 
-	// ** RenderScene::addRenderSystem
-	template<typename TRenderSystem, typename ... TArgs>
-	void RenderScene::addRenderSystem( const TArgs& ... args )
-	{
-		m_renderSystems.push_back( DC_NEW TRenderSystem( *m_context.get(), *this, args... ) );
-	}
+    // ** RenderScene::addRenderSystem
+    template<typename TRenderSystem, typename ... TArgs>
+    void RenderScene::addRenderSystem( const TArgs& ... args )
+    {
+        m_renderSystems.push_back( DC_NEW TRenderSystem( *m_context.get(), *this, args... ) );
+    }
 
 } // namespace Scene
 

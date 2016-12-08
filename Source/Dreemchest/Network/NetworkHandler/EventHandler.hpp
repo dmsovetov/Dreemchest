@@ -44,4 +44,4 @@ inline bool EventHandler<T>::handle( ConnectionWPtr connection, const Packets::E
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_EventHandler_Hpp__	*/
+#endif    /*    !__DC_Network_EventHandler_Hpp__    */

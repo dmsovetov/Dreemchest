@@ -41,33 +41,33 @@ class SoundPlayback : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Application* application ) {
-		Sound::log::setStandardHandler();
+        Sound::log::setStandardHandler();
 
         // Create the SoundFx instance
-		SoundFxPtr sfx = SoundFx::create();
+        SoundFxPtr sfx = SoundFx::create();
 
-		SoundDataPtr s1 = sfx->createSound( "air_raid", "sounds/air_raid.wav" );
-		s1->setLoading( SoundData::LoadToRam );
-		s1->setFormat( SoundFormatWav );
-		s1->setLooped( false );
+        SoundDataPtr s1 = sfx->createSound( "air_raid", "sounds/air_raid.wav" );
+        s1->setLoading( SoundData::LoadToRam );
+        s1->setFormat( SoundFormatWav );
+        s1->setLooped( false );
 
-		SoundDataPtr s2 = sfx->createSound( "air_raid_m", "sounds/air_raid.ogg" );
-		s2->setLoading( SoundData::Stream );
-		s2->setFormat( SoundFormatOgg );
-		s2->setLooped( true );
+        SoundDataPtr s2 = sfx->createSound( "air_raid_m", "sounds/air_raid.ogg" );
+        s2->setLoading( SoundData::Stream );
+        s2->setFormat( SoundFormatOgg );
+        s2->setLooped( true );
 
-		SoundChannelPtr ch = sfx->play( "air_raid" );
+        SoundChannelPtr ch = sfx->play( "air_raid" );
 
-		while( true ) {
-			sfx->update( 0.1f );
+        while( true ) {
+            sfx->update( 0.1f );
 
-			if( ch.valid() && !ch->isPlaying() ) {
-				ch = SoundChannelPtr();
-				sfx->play( "air_raid_m" );
-			}
+            if( ch.valid() && !ch->isPlaying() ) {
+                ch = SoundChannelPtr();
+                sfx->play( "air_raid_m" );
+            }
 
-			Threads::Thread::sleep( 10 );
-		}
+            Threads::Thread::sleep( 10 );
+        }
     }
 
 };

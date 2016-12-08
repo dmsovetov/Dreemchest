@@ -226,7 +226,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                 break;
         case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
-        case RenderCommandBuffer::OpCode::UploadVertexBuffer:	uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+        case RenderCommandBuffer::OpCode::UploadVertexBuffer:    uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
         case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                                 break;
@@ -261,25 +261,25 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
 // ** Rvm::reset
 void Rvm::reset( void )
 {
-	// Reset the face culling
-	m_hal->setCulling( Renderer::TriangleFaceBack );
+    // Reset the face culling
+    m_hal->setCulling( Renderer::TriangleFaceBack );
 
-	// Set the default polygon mode
-	m_hal->setPolygonMode( Renderer::PolygonFill );
+    // Set the default polygon mode
+    m_hal->setPolygonMode( Renderer::PolygonFill );
 
-	// Set the default shader
-	m_hal->setShader( NULL );
+    // Set the default shader
+    m_hal->setShader( NULL );
 
-	// Set the default vertex buffer
-	m_hal->setVertexBuffer( NULL );
+    // Set the default vertex buffer
+    m_hal->setVertexBuffer( NULL );
 
-	// Set default textures
-	for( s32 i = 0; i < 8; i++ ) {
-		m_hal->setTexture( i, NULL );
-	}
+    // Set default textures
+    for( s32 i = 0; i < 8; i++ ) {
+        m_hal->setTexture( i, NULL );
+    }
 
-	// Enable the depth test back
-	m_hal->setDepthTest( true, Renderer::LessEqual );
+    // Enable the depth test back
+    m_hal->setDepthTest( true, Renderer::LessEqual );
 
     // Disable the alpha test
     m_hal->setAlphaTest( Renderer::CompareDisabled );

@@ -52,7 +52,7 @@ namespace Sound {
 
     private:
 
-        Array<ALuint>			m_buffers;
+        Array<ALuint>            m_buffers;
         u32                     m_pcmSize;
         u8*                     m_pcm;
         ALuint                  m_format;

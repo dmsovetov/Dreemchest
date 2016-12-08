@@ -37,99 +37,99 @@ namespace Network {
 // ** ConnectionMiddleware::setConnection
 void ConnectionMiddleware::setConnection( Connection* value )
 {
-	m_connection = value;
+    m_connection = value;
 }
 
 // --------------------------------------------- PacketSendingMiddleware -------------------------------------------- //
 
 // ** PacketSendingMiddleware::PacketSendingMiddleware
 PacketSendingMiddleware::PacketSendingMiddleware( u32 interval )
-	: m_interval( interval )
-	, m_accumulator( 0 )
+    : m_interval( interval )
+    , m_accumulator( 0 )
 {
 }
 
 // ** PacketSendingMiddleware::accumulateTime
 bool PacketSendingMiddleware::accumulateTime( u32 dt )
 {
-	// Increase the accumulated time
-	m_accumulator += dt;
+    // Increase the accumulated time
+    m_accumulator += dt;
 
-	// Do we have enough time accumulated?
-	s32 count = m_accumulator / m_interval;
+    // Do we have enough time accumulated?
+    s32 count = m_accumulator / m_interval;
 
-	if( count == 0 ) {
-		return false;
-	}
+    if( count == 0 ) {
+        return false;
+    }
 
-	// Reset the accumulator
-	m_accumulator -= count * m_interval;
+    // Reset the accumulator
+    m_accumulator -= count * m_interval;
 
-	return true;
+    return true;
 }
 
 // -------------------------------------------------- PingInterval -------------------------------------------------- //
 
 // ** PingInterval::PingInterval
 PingInterval::PingInterval( u32 interval, s32 iterations )
-	: PacketSendingMiddleware( interval )
-	, m_iterations( iterations )
+    : PacketSendingMiddleware( interval )
+    , m_iterations( iterations )
 {
 }
 
 // ** PingInterval::update
 void PingInterval::update( u32 dt )
 {
-	// Update the time accumulator
-	if( accumulateTime( dt ) ) {
+    // Update the time accumulator
+    if( accumulateTime( dt ) ) {
     #if DREEMCHEST_CPP11
-		// Send the Ping packet
-		m_connection->send<Packets::Ping>( m_iterations, m_connection->time() );
+        // Send the Ping packet
+        m_connection->send<Packets::Ping>( m_iterations, m_connection->time() );
     #else
         NIMBLE_NOT_IMPLEMENTED
     #endif  /*  #if DREEMCHEST_CPP11    */
-	}
+    }
 }
 
 // ------------------------------------------------ KeepAliveInterval ----------------------------------------------- //
 
 // ** KeepAliveInterval::KeepAliveInterval
 KeepAliveInterval::KeepAliveInterval( u32 interval )
-	: PacketSendingMiddleware( interval )
+    : PacketSendingMiddleware( interval )
 {
 }
 
 // ** KeepAliveInterval::update
 void KeepAliveInterval::update( u32 dt )
 {
-	// Update the time accumulator
-	if( accumulateTime( dt ) ) {
+    // Update the time accumulator
+    if( accumulateTime( dt ) ) {
     #if DREEMCHEST_CPP11
-		// Send the KeepAlive packet
-		m_connection->send<Packets::KeepAlive>();
-		LogDebug( "connection", "%s", "keep alive packet sent\n" );
+        // Send the KeepAlive packet
+        m_connection->send<Packets::KeepAlive>();
+        LogDebug( "connection", "%s", "keep alive packet sent\n" );
     #else
         NIMBLE_NOT_IMPLEMENTED
     #endif  /*  #if DREEMCHEST_CPP11    */
-	}
+    }
 }
 
 // ------------------------------------------------- CloseOnTimeout ------------------------------------------------ //
 
 CloseOnTimeout::CloseOnTimeout( s32 interval )
-	: m_interval( interval )
+    : m_interval( interval )
 {
 }
 
 // ** CloseOnTimeout::update
 void CloseOnTimeout::update( u32 dt )
 {
-	// Close the connection if the specified amount of time passed and no packets received
-	if( m_connection->timeout() >= m_interval ) {
-		// Queue this connection for closing
-		m_connection->closeLater();
-		LogVerbose( "connection", "%s", "closed on timeout\n" );
-	}
+    // Close the connection if the specified amount of time passed and no packets received
+    if( m_connection->timeout() >= m_interval ) {
+        // Queue this connection for closing
+        m_connection->closeLater();
+        LogVerbose( "connection", "%s", "closed on timeout\n" );
+    }
 }
 
 } // namespace Network

@@ -26,22 +26,22 @@
 
 #if 0
 
-#include	"BatchRenderer.h"
+#include    "BatchRenderer.h"
 #include    "Hal.h"
 #include    "RenderState.h"
 
 #include    "../platform/Engine.h"
 #include    "../stage/Shape.h"
 
-#define		SET_VERTEX( vtx, _x, _y, color )	\
-                vtx.x = ceilf( _x ) + 0.35f;	\
-				vtx.y = ceilf( _y ) + 0.35f;	\
+#define        SET_VERTEX( vtx, _x, _y, color )    \
+                vtx.x = ceilf( _x ) + 0.35f;    \
+                vtx.y = ceilf( _y ) + 0.35f;    \
                 vtx.r = color.r, vtx.g = color.g, vtx.b = color.b, vtx.a = color.a;
 
-#define		SET_VERTEX_UV( vtx, _x, _y, _color, _u, _v )	\
-				SET_VERTEX( vtx, _x, _y, _color )			\
-				vtx.u = _u;									\
-				vtx.v = _v;
+#define        SET_VERTEX_UV( vtx, _x, _y, _color, _u, _v )    \
+                SET_VERTEX( vtx, _x, _y, _color )            \
+                vtx.u = _u;                                    \
+                vtx.v = _v;
 
 DC_BEGIN_DREEMCHEST
 
@@ -54,14 +54,14 @@ BatchRenderer::BatchRenderer( dcEngine engine, dcHal hal, int maxRenderBufferSiz
         m_transform[i].Identity();
     }
 
-	m_maxVertices		= maxRenderBufferSize;
-	m_maxIndices		= m_maxVertices * 6;
-	m_immediateTexture	= NULL;
-	m_totalIndices		= 0;
-	m_totalVertices		= 0;
-	m_vertices			= NULL;
-	m_indices			= NULL;
-	m_mask				= 0;
+    m_maxVertices        = maxRenderBufferSize;
+    m_maxIndices        = m_maxVertices * 6;
+    m_immediateTexture    = NULL;
+    m_totalIndices        = 0;
+    m_totalVertices        = 0;
+    m_vertices            = NULL;
+    m_indices            = NULL;
+    m_mask                = 0;
 
     initialize();
 }
@@ -74,11 +74,11 @@ BatchRenderer::~BatchRenderer( void )
     DC_RELEASE_N( m_fanIndexBuffer );
 
     delete m_rasterState2D;
-	delete m_blendState2D;
-	delete m_disableColorWrite;
-	delete m_beginMask;
-	delete m_endMask;
-	delete m_disableMask;
+    delete m_blendState2D;
+    delete m_disableColorWrite;
+    delete m_beginMask;
+    delete m_endMask;
+    delete m_disableMask;
 }
 
 // ** BatchRenderer::initialize
@@ -90,14 +90,14 @@ void BatchRenderer::initialize( void )
     NIMBLE_BREAK_IF( m_vertexFormat->vertexSize() != sizeof( sVertex ) );
 
     // ** Create buffers
-    m_vertexBuffer	 = m_hal->createVertexBuffer( m_vertexFormat, m_maxVertices, false );
-    m_indexBuffer	 = m_hal->createIndexBuffer( m_maxIndices, false );
+    m_vertexBuffer     = m_hal->createVertexBuffer( m_vertexFormat, m_maxVertices, false );
+    m_indexBuffer     = m_hal->createIndexBuffer( m_maxIndices, false );
     m_fanIndexBuffer = m_hal->createIndexBuffer( m_maxIndices, false );
 
     // ** Lock buffers
-    m_indices	 = m_indexBuffer->lock();
+    m_indices     = m_indexBuffer->lock();
     m_fanIndices = m_fanIndexBuffer->lock();
-    m_vertices	 = ( sVertex* )m_vertexBuffer->lock();
+    m_vertices     = ( sVertex* )m_vertexBuffer->lock();
 
     // ** Fill index buffers with data
     for( int i = 0; i < m_maxVertices / 4; i++ ) {
@@ -115,85 +115,85 @@ void BatchRenderer::initialize( void )
     }
 
     // ** 2D render state
-	m_rasterState2D = DC_NEW RasterizerState;
-	m_rasterState2D->setCullMode( TriangleFaceNone );
-	m_rasterState2D->setZWrite( false );
+    m_rasterState2D = DC_NEW RasterizerState;
+    m_rasterState2D->setCullMode( TriangleFaceNone );
+    m_rasterState2D->setZWrite( false );
 
-	m_blendState2D = DC_NEW BlendState;
-	m_blendState2D->setBlendEnabled( true );
-	m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
+    m_blendState2D = DC_NEW BlendState;
+    m_blendState2D->setBlendEnabled( true );
+    m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
 
-	// ** Mask states
-	m_beginMask = DC_NEW DepthStencilState;
-	m_beginMask->setStencilEnabled( true );
-	m_beginMask->setStencilFunc( Equal, 0, 0xFF );
-	m_beginMask->setStencilOp( StencilKeep, StencilKeep, StencilIncSaturate );
+    // ** Mask states
+    m_beginMask = DC_NEW DepthStencilState;
+    m_beginMask->setStencilEnabled( true );
+    m_beginMask->setStencilFunc( Equal, 0, 0xFF );
+    m_beginMask->setStencilOp( StencilKeep, StencilKeep, StencilIncSaturate );
 
-	m_endMask = DC_NEW DepthStencilState;
-	m_endMask->setStencilFunc( Equal, 0, 0xFF );
-	m_endMask->setStencilOp( StencilKeep, StencilKeep, StencilKeep );
+    m_endMask = DC_NEW DepthStencilState;
+    m_endMask->setStencilFunc( Equal, 0, 0xFF );
+    m_endMask->setStencilOp( StencilKeep, StencilKeep, StencilKeep );
 
-	m_disableMask = DC_NEW DepthStencilState;
-	m_disableMask->setStencilFunc( Equal, 0, 0xFF );
-	m_disableMask->setStencilOp( StencilKeep, StencilKeep, StencilDecSaturate );
+    m_disableMask = DC_NEW DepthStencilState;
+    m_disableMask->setStencilFunc( Equal, 0, 0xFF );
+    m_disableMask->setStencilOp( StencilKeep, StencilKeep, StencilDecSaturate );
 
-	// ** Color write state
-	m_disableColorWrite = DC_NEW RasterizerState;
-	m_disableColorWrite->setColorWrite( false, false, false, false );
+    // ** Color write state
+    m_disableColorWrite = DC_NEW RasterizerState;
+    m_disableColorWrite->setColorWrite( false, false, false, false );
 
-	m_enableColorWrite = DC_NEW RasterizerState;
-	m_enableColorWrite->setColorWrite( true, true, true, true );
+    m_enableColorWrite = DC_NEW RasterizerState;
+    m_enableColorWrite->setColorWrite( true, true, true, true );
 }
 
 // ** BatchRenderer::beginMask
 void BatchRenderer::beginMask( void )
 {
-	flush();
+    flush();
 
-	if( m_mask == 0 ) {
+    if( m_mask == 0 ) {
         m_hal->clear( Black, 1.0f, 0, renderer::ClearStencil );
-	}
+    }
 
-	m_beginMask->m_stencilValue = m_mask++;
-	m_blendState2D->setBlendEnabled( false );
-	m_hal->setBlendState( m_blendState2D );
-	m_hal->setRasterizerState( m_disableColorWrite );
-	m_hal->setDepthStencilState( m_beginMask );
+    m_beginMask->m_stencilValue = m_mask++;
+    m_blendState2D->setBlendEnabled( false );
+    m_hal->setBlendState( m_blendState2D );
+    m_hal->setRasterizerState( m_disableColorWrite );
+    m_hal->setDepthStencilState( m_beginMask );
 }
 
 // ** BatchRenderer::endMask
 void BatchRenderer::endMask( void )
 {
-	flush();
+    flush();
 
-	m_endMask->setStencilEnabled( true );
-	m_endMask->m_stencilValue = m_mask;
-	m_blendState2D->setBlendEnabled( true );
-	m_hal->setRasterizerState( m_enableColorWrite );
-	m_hal->setDepthStencilState( m_endMask );
-	m_hal->setBlendState( m_blendState2D );
+    m_endMask->setStencilEnabled( true );
+    m_endMask->m_stencilValue = m_mask;
+    m_blendState2D->setBlendEnabled( true );
+    m_hal->setRasterizerState( m_enableColorWrite );
+    m_hal->setDepthStencilState( m_endMask );
+    m_hal->setBlendState( m_blendState2D );
 }
 
 // ** BatchRenderer::disableMask
 void BatchRenderer::disableMask( int width, int height )
 {
-	flush();
+    flush();
 
-	if( --m_mask == 0 ) {
-		m_endMask->setStencilEnabled( false );
-		m_hal->setDepthStencilState( m_endMask );
-		return;
-	}
+    if( --m_mask == 0 ) {
+        m_endMask->setStencilEnabled( false );
+        m_hal->setDepthStencilState( m_endMask );
+        return;
+    }
 
-	m_endMask->setStencilEnabled( true );
+    m_endMask->setStencilEnabled( true );
 
-	m_disableMask->m_stencilMask = m_mask + 1;
-	m_hal->setRasterizerState( m_disableColorWrite );
-	m_hal->setDepthStencilState( m_disableMask );
+    m_disableMask->m_stencilMask = m_mask + 1;
+    m_hal->setRasterizerState( m_disableColorWrite );
+    m_hal->setDepthStencilState( m_disableMask );
 
-	renderRect( 0, 0, width, height );
+    renderRect( 0, 0, width, height );
 
-	endMask();
+    endMask();
 }
 
 // ** BatchRenderer::pushTransform
@@ -225,14 +225,14 @@ void BatchRenderer::setTransform( eTransform transform, const cMatrix4& T, bool 
 // ** BatchRenderer::setBlendMode
 void BatchRenderer::setBlendMode( eBlendFactor src, eBlendFactor dst )
 {
-	if( m_blendState2D->m_src == src && m_blendState2D->m_dst == dst ) {
-		return;
-	}
+    if( m_blendState2D->m_src == src && m_blendState2D->m_dst == dst ) {
+        return;
+    }
 
-	flush();
+    flush();
 
-	m_blendState2D->setBlendFunc( src, dst );
-	m_hal->setBlendState( m_blendState2D );
+    m_blendState2D->setBlendFunc( src, dst );
+    m_hal->setBlendState( m_blendState2D );
 }
 
 // ** BatchRenderer::setColorModulation
@@ -266,13 +266,13 @@ void BatchRenderer::begin2D( int width, int height )
 // ** BatchRenderer::end2D
 void BatchRenderer::end2D( void )
 {
-	flush();
+    flush();
 
     popTransform( TransformProjection );
     popTransform( TransformView );
     popTransform( TransformModel );
 
-	m_hal->setViewport( 0, 0, m_engine->GetScreenWidth(), m_engine->GetScreenHeight() );
+    m_hal->setViewport( 0, 0, m_engine->GetScreenWidth(), m_engine->GetScreenHeight() );
 }
 
 // ** BatchRenderer::flush
@@ -291,8 +291,8 @@ void BatchRenderer::flush( void )
         m_hal->renderPrimitives( m_immediatePrimitive, 0, m_totalVertices );
     }
 
-    m_totalVertices		= 0;
-    m_totalIndices		= 0;
+    m_totalVertices        = 0;
+    m_totalIndices        = 0;
 }
 
 // ** BatchRenderer::renderVertices
@@ -328,8 +328,8 @@ void BatchRenderer::setRenderState( ePrimitiveType primType, dcTexture2D texture
 int BatchRenderer::calculateIndexCount( ePrimitiveType primType, int vertexCount ) const
 {
     switch( primType ) {
-    case renderer::PrimTriangles:		return vertexCount + vertexCount / 4 * 2;
-    case renderer::PrimTriangleStrip:	return vertexCount;
+    case renderer::PrimTriangles:        return vertexCount + vertexCount / 4 * 2;
+    case renderer::PrimTriangleStrip:    return vertexCount;
     default:                            return 0;
     }
     
@@ -523,18 +523,18 @@ void BatchRenderer::renderPoint( dcTexture2D texture, float x, float y, float si
 void BatchRenderer::renderLine( float x1, float y1, float x2, float y2, const rgba& colorA, const rgba& colorB )
 {
 /*
-    static const float kDashSize		= 3.0f;
-    static const float kSeparatorSize	= 3.0f;
+    static const float kDashSize        = 3.0f;
+    static const float kSeparatorSize    = 3.0f;
 
     // ** Render styled line
     switch( m_lineStyle ) {
-        case LineDash:	{
-            m_lineStyle		= LineSolid;
-            cVector2 start	= cVector2( x1, y1 );
-            cVector2 dir	= cVector2( x2, y2 ) - start;
-            float	 length = dir.Normalize();
-            float	 count	= length / (kDashSize + kSeparatorSize);
-            float	 extra  = count - floor( count );
+        case LineDash:    {
+            m_lineStyle        = LineSolid;
+            cVector2 start    = cVector2( x1, y1 );
+            cVector2 dir    = cVector2( x2, y2 ) - start;
+            float     length = dir.Normalize();
+            float     count    = length / (kDashSize + kSeparatorSize);
+            float     extra  = count - floor( count );
 
             for( int i = 0, n = int( count ); i < n + 1; i++ ) {
                 cVector2 end = start + dir * (kDashSize * ((i == n) ? extra : 1.0f));
@@ -542,7 +542,7 @@ void BatchRenderer::renderLine( float x1, float y1, float x2, float y2, const rg
                 start = end + dir * kSeparatorSize;
             }
 
-            m_lineStyle		= LineDash;
+            m_lineStyle        = LineDash;
         }
             return;
         case LineSolid: break;
@@ -570,10 +570,10 @@ void BatchRenderer::renderBounds( const bounds& bounds, const rgba& color )
 // ** BatchRenderer::renderWireRect
 void BatchRenderer::renderWireRect( float x, float y, float w, float h, const rgba& color )
 {
-    renderLine( x,		y,		x + w,	y,		color, color );
-    renderLine( x + w,	y,		x + w,	y + h,	color, color );
-    renderLine( x + w,	y + h,	x,	y + h,		color, color );
-    renderLine( x,	y + h,		x,	y,			color, color );
+    renderLine( x,        y,        x + w,    y,        color, color );
+    renderLine( x + w,    y,        x + w,    y + h,    color, color );
+    renderLine( x + w,    y + h,    x,    y + h,        color, color );
+    renderLine( x,    y + h,        x,    y,            color, color );
 }
 
 // ** BatchRenderer::renderShape
@@ -589,14 +589,14 @@ void BatchRenderer::renderShapePart( const cMatrix3& T, const stage::sShapePart 
 {
     using namespace stage;
 
-	pushTransform( renderer::TransformModel );
-	setTransform( renderer::TransformModel, T, true );
+    pushTransform( renderer::TransformModel );
+    setTransform( renderer::TransformModel, T, true );
 
     switch( shape->m_type ) {
     case sShapePart::Circle:    renderCircle( shape->m_x, shape->m_y, shape->m_radius1, fill, stroke );
                                 break;
 
-    case sShapePart::Polygon:	renderPolygon( shape->m_x, shape->m_y, shape->m_vertices, shape->m_totalVertices, fill, stroke );
+    case sShapePart::Polygon:    renderPolygon( shape->m_x, shape->m_y, shape->m_vertices, shape->m_totalVertices, fill, stroke );
                                 if( renderVertices ) {
                                     for( int i = 0; i < shape->m_totalVertices; i++ ) {
                                         const cVector2& v = shape->m_vertices[i];
@@ -605,14 +605,14 @@ void BatchRenderer::renderShapePart( const cMatrix3& T, const stage::sShapePart 
                                 }
                                 break;
 
-    case sShapePart::Capsule:	renderCapsule( shape->m_x, shape->m_y, shape->m_center1, shape->m_center2, shape->m_radius1, shape->m_radius2 );
+    case sShapePart::Capsule:    renderCapsule( shape->m_x, shape->m_y, shape->m_center1, shape->m_center2, shape->m_radius1, shape->m_radius2 );
                                 break;
 
-    case sShapePart::Rect:		renderRect( shape->m_x - shape->m_radius1 * 0.5f, shape->m_y - shape->m_radius2 * 0.5f, shape->m_radius1, shape->m_radius2, fill, stroke );
+    case sShapePart::Rect:        renderRect( shape->m_x - shape->m_radius1 * 0.5f, shape->m_y - shape->m_radius2 * 0.5f, shape->m_radius1, shape->m_radius2, fill, stroke );
                                 break;
     }
 
-	popTransform( renderer::TransformModel );
+    popTransform( renderer::TransformModel );
 }
 
 // ** BatchRenderer::renderPolygon
@@ -653,10 +653,10 @@ void BatchRenderer::renderRect( float x, float y, float w, float h, const rgba& 
     w = ceil( w );
     h = ceil( h );
 
-    SET_VERTEX( vertices[0], x,		y,		fill );
-    SET_VERTEX( vertices[1], x + w, y,		fill );
-    SET_VERTEX( vertices[2], x + w, y + h,	fill );
-    SET_VERTEX( vertices[3], x,		y + h,	fill );
+    SET_VERTEX( vertices[0], x,        y,        fill );
+    SET_VERTEX( vertices[1], x + w, y,        fill );
+    SET_VERTEX( vertices[2], x + w, y + h,    fill );
+    SET_VERTEX( vertices[3], x,        y + h,    fill );
 
     renderVertices( renderer::PrimTriangles, NULL, vertices, 4 );
     renderWireRect( x, y, w, h, stroke );
@@ -674,8 +674,8 @@ void BatchRenderer::renderCircle( float x, float y, float r, const rgba& fill, c
     const int kVertexCount = 32;
     sVertex vertices[kVertexCount];
 
-    float	step   = 360.0f / (kVertexCount - 1);
-    float	angle  = 0.0f;
+    float    step   = 360.0f / (kVertexCount - 1);
+    float    angle  = 0.0f;
     
     // ** Filled
     for( int i = 0; i < kVertexCount; i++ ) {

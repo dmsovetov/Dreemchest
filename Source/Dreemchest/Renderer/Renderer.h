@@ -53,17 +53,17 @@ namespace Renderer {
             class Texture3D;
             class TextureCube;
 
-	//! Pointer types for renderer resources.
-	dcDeclarePtrs( Hal )
-	//dcDeclarePtrs( Renderer2D )
-	dcDeclarePtrs( InputLayout )
-	dcDeclarePtrs( VertexBuffer )
-	dcDeclarePtrs( IndexBuffer )
+    //! Pointer types for renderer resources.
+    dcDeclarePtrs( Hal )
+    //dcDeclarePtrs( Renderer2D )
+    dcDeclarePtrs( InputLayout )
+    dcDeclarePtrs( VertexBuffer )
+    dcDeclarePtrs( IndexBuffer )
     dcDeclarePtrs( ConstantBuffer )
-	dcDeclarePtrs( Texture )
-	dcDeclarePtrs( Texture2D )
-	dcDeclarePtrs( Shader )
-	dcDeclarePtrs( RenderTarget )
+    dcDeclarePtrs( Texture )
+    dcDeclarePtrs( Texture2D )
+    dcDeclarePtrs( Shader )
+    dcDeclarePtrs( RenderTarget )
 
     //! Hardware rendering API.
     enum RenderingHal {
@@ -73,10 +73,10 @@ namespace Renderer {
 
     //! Clear mask bits that are passed to Hal::clear method.
     enum ClearMask {
-        ClearColor		= BIT( 0 ),                                 //!< Clear color buffer.
-        ClearDepth		= BIT( 1 ),                                 //!< Clear depth buffer.
-        ClearStencil	= BIT( 2 ),                                 //!< Clear stencil buffer.
-        ClearAll		= ClearColor | ClearDepth | ClearStencil    //!< Clear all buffers.
+        ClearColor        = BIT( 0 ),                                 //!< Clear color buffer.
+        ClearDepth        = BIT( 1 ),                                 //!< Clear depth buffer.
+        ClearStencil    = BIT( 2 ),                                 //!< Clear stencil buffer.
+        ClearAll        = ClearColor | ClearDepth | ClearStencil    //!< Clear all buffers.
     };
 
     // ** enum StencilAction
@@ -108,12 +108,12 @@ namespace Renderer {
 
     //! Color mask bits used as an argument for Hal::setColorMask method.
     enum ColorMask {
-        ColorMaskRed	= BIT( 0 ),                                                         //!< Render only RED channel.
-        ColorMaskGreen	= BIT( 1 ),                                                         //!< Render only GREEN channel.
-        ColorMaskBlue	= BIT( 2 ),                                                         //!< Render only BLUE channel.
-        ColorMaskAlpha	= BIT( 3 ),                                                         //!< Render only ALPHA channel.
-        ColorMaskAll	= ColorMaskRed | ColorMaskGreen | ColorMaskBlue | ColorMaskAlpha,   //!< Render all color channels.
-        ColorMaskRgb	= ColorMaskRed | ColorMaskGreen | ColorMaskBlue,                    //!< Render RED, GREEN and BLUE color channels.
+        ColorMaskRed    = BIT( 0 ),                                                         //!< Render only RED channel.
+        ColorMaskGreen    = BIT( 1 ),                                                         //!< Render only GREEN channel.
+        ColorMaskBlue    = BIT( 2 ),                                                         //!< Render only BLUE channel.
+        ColorMaskAlpha    = BIT( 3 ),                                                         //!< Render only ALPHA channel.
+        ColorMaskAll    = ColorMaskRed | ColorMaskGreen | ColorMaskBlue | ColorMaskAlpha,   //!< Render all color channels.
+        ColorMaskRgb    = ColorMaskRed | ColorMaskGreen | ColorMaskBlue,                    //!< Render RED, GREEN and BLUE color channels.
     };
 
     //! Texture wrapping control.
@@ -208,7 +208,7 @@ namespace Renderer {
         PixelD24X8,     //!< 32-bit depth stencil surface with 24-bit depth value and no stencil.
         PixelD24S8,     //!< 32-bit depth stencil surface with 24-bit depth value and 8-bit stencil.
 
-		TotalPixelFormats
+        TotalPixelFormats
     };
 
     //! A list of available primitive types.
@@ -220,7 +220,7 @@ namespace Renderer {
         PrimTriangleFan,    //!< Render triangle fan.
         PrimPoints,         //!< Render points.
 
-        TotalPrimitiveTypes	//!< Total primitive types available.
+        TotalPrimitiveTypes    //!< Total primitive types available.
     };
 
 } // namespace Renderer
@@ -232,7 +232,7 @@ DC_END_DREEMCHEST
     #include "Hal.h"
     #include "RenderStateDeprecated.h"
     #include "BatchRenderer.h"
-	#include "Renderer2D.h"
+    #include "Renderer2D.h"
 #endif
 
 #endif

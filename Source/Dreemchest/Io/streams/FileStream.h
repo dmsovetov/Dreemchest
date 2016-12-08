@@ -34,15 +34,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
         
-	//! A FileStream class is used for work with physical files.
-	class FileStream : public Stream {
+    //! A FileStream class is used for work with physical files.
+    class FileStream : public Stream {
     friend class DiskFileSystem;
 
         DC_DECLARE_IS( FileStream, FileStream, this );
 
-	public:
+    public:
 
-		virtual					~FileStream( void );
+        virtual                    ~FileStream( void );
 
         //! Disposes this file stream.
         virtual void            dispose( void ) NIMBLE_OVERRIDE;
@@ -79,20 +79,20 @@ namespace Io {
     private:
 
         //! File handle.
-		FILE*                   m_file;
+        FILE*                   m_file;
 
         //! Total file length in bytes.
-		s32                     m_length;
+        s32                     m_length;
 
         //! File name.
         Path                    m_fileName;
 
         //! Total opened files counter, used for debugging.
         static u32              s_openFileCount;
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__File_H__	*/
+#endif        /*    !__File_H__    */

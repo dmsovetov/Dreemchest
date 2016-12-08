@@ -33,53 +33,53 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Material class.
-	class Material {
-	public:
+    //! Material class.
+    class Material {
+    public:
 
-		//! Material layers.
+        //! Material layers.
         enum Layer {
-              Diffuse				//!< Diffuse color layer.
-            , Specular				//!< Specular color layer.
-			, Normal				//!< Normal map layer.
-			, Heightmap				//!< Heightmap layer.
-			, AmbientOcclusion		//!< Ambient occlusion layer.
-			, Emission				//!< Emission color layer.
-			, DiffuseDetail			//!< Diffuse map detail layer.
-			, NormalDetail			//!< Normal map detail layer.
-			, Tint					//!< Tint color layer.
+              Diffuse                //!< Diffuse color layer.
+            , Specular                //!< Specular color layer.
+            , Normal                //!< Normal map layer.
+            , Heightmap                //!< Heightmap layer.
+            , AmbientOcclusion        //!< Ambient occlusion layer.
+            , Emission                //!< Emission color layer.
+            , DiffuseDetail            //!< Diffuse map detail layer.
+            , NormalDetail            //!< Normal map detail layer.
+            , Tint                    //!< Tint color layer.
 
-            , TotalMaterialLayers	//!< The total number of material layers.
+            , TotalMaterialLayers    //!< The total number of material layers.
         };
 
-		//! Material feature bitmasks.
-		enum Feature {
-              DiffuseBit	        = BIT( Diffuse )            //!< Diffuse color layer.
-            , SpecularBit	        = BIT( Specular )           //!< Specular color layer.
-			, NormalBit		        = BIT( Normal )             //!< Normal map layer.
-			, HeightmapBit	        = BIT( Heightmap )          //!< Heightmap layer.
-			, AmbientOcclusionBit   = BIT( AmbientOcclusion )   //!< Ambient occlusion layer.
-			, EmissionBit		    = BIT( Emission )			//!< Emission color layer.
-			, DiffuseDetailBit	    = BIT( DiffuseDetail )	    //!< Diffuse map detail layer.
-			, NormalDetailBit	    = BIT( NormalDetail )	    //!< Normal map detail layer.
-			, TintBit	            = BIT( Tint )			    //!< Tint color layer.
+        //! Material feature bitmasks.
+        enum Feature {
+              DiffuseBit            = BIT( Diffuse )            //!< Diffuse color layer.
+            , SpecularBit            = BIT( Specular )           //!< Specular color layer.
+            , NormalBit                = BIT( Normal )             //!< Normal map layer.
+            , HeightmapBit            = BIT( Heightmap )          //!< Heightmap layer.
+            , AmbientOcclusionBit   = BIT( AmbientOcclusion )   //!< Ambient occlusion layer.
+            , EmissionBit            = BIT( Emission )            //!< Emission color layer.
+            , DiffuseDetailBit        = BIT( DiffuseDetail )        //!< Diffuse map detail layer.
+            , NormalDetailBit        = BIT( NormalDetail )        //!< Normal map detail layer.
+            , TintBit                = BIT( Tint )                //!< Tint color layer.
             , PrimaryUvBit          = BIT( Tint + 1 )           //!< Material has primary UV layer.
-		};
+        };
 
-									//! Constructs Material instance.
-									Material( void );
+                                    //! Constructs Material instance.
+                                    Material( void );
 
-		//! Returns material rendering mode.
-		RenderingMode				renderingMode( void ) const;
+        //! Returns material rendering mode.
+        RenderingMode                renderingMode( void ) const;
 
-		//! Sets material rendering mode.
-		void						setRenderingMode( RenderingMode value );
+        //! Sets material rendering mode.
+        void                        setRenderingMode( RenderingMode value );
 
-		//! Returns material light model.
-		LightingModel		        lightingModel( void ) const;
+        //! Returns material light model.
+        LightingModel                lightingModel( void ) const;
 
-		//! Sets material light model.
-		void						setLightingModel( LightingModel value );
+        //! Sets material light model.
+        void                        setLightingModel( LightingModel value );
 
         //! Returns true if the material is two-sided.
         bool                        isTwoSided( void ) const;
@@ -87,41 +87,41 @@ namespace Scene {
         //! Sets the two-sided material flag.
         void                        setTwoSided( bool value );
 
-		//! Returns material feature set.
-		u32							features( void ) const;
+        //! Returns material feature set.
+        u32                            features( void ) const;
 
         //! Returns a material color.
-        const Rgba&					color( Layer layer ) const;
+        const Rgba&                    color( Layer layer ) const;
 
-		//! Sets material color.
-		void						setColor( Layer layer, const Rgba& value );
+        //! Sets material color.
+        void                        setColor( Layer layer, const Rgba& value );
 
         //! Returns a material texture.
-        ImageHandle			        texture( Layer layer ) const;
+        ImageHandle                    texture( Layer layer ) const;
 
-		//! Sets material texture.
-		void						setTexture( Layer layer, ImageHandle value );
+        //! Sets material texture.
+        void                        setTexture( Layer layer, ImageHandle value );
 
-		//! Returns the diffuse material texture.
-		ImageHandle					diffuse( void ) const;
+        //! Returns the diffuse material texture.
+        ImageHandle                    diffuse( void ) const;
 
-		//! Sets the diffuse material texture.
-		void						setDiffuse( ImageHandle value );
+        //! Sets the diffuse material texture.
+        void                        setDiffuse( ImageHandle value );
 
-	private:
+    private:
 
-		//! Updates material features.
-		void						updateMaterialFeatures( void );
+        //! Updates material features.
+        void                        updateMaterialFeatures( void );
 
-	private:
+    private:
 
-		LightingModel				m_lightingModel;			    //!< Material lighting model.
-		RenderingMode				m_renderingMode;				//!< Material blending.
+        LightingModel                m_lightingModel;                //!< Material lighting model.
+        RenderingMode                m_renderingMode;                //!< Material blending.
         bool                        m_isTwoSided;                   //!< Indicates that material is two-sided.
-		u32							m_features;						//!< Used material features.
-        Rgba						m_color[TotalMaterialLayers];	//!< Material colors.
-		ImageHandle					m_texture[TotalMaterialLayers];	//!< Material textures.
-	};
+        u32                            m_features;                        //!< Used material features.
+        Rgba                        m_color[TotalMaterialLayers];    //!< Material colors.
+        ImageHandle                    m_texture[TotalMaterialLayers];    //!< Material textures.
+    };
 
 } // namespace Scene
 

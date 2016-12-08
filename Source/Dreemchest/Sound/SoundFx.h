@@ -64,7 +64,7 @@ namespace Sound {
             \param fade Volume fade in time (milliseconds).
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        SoundChannelPtr			playWithParameters( CString identifier, bool loop, f32 fade );
+        SoundChannelPtr            playWithParameters( CString identifier, bool loop, f32 fade );
 
         //! Starts a playback of a single sound.
         /*!
@@ -74,7 +74,7 @@ namespace Sound {
             \param identifier Sound identifier to play.
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        SoundChannelPtr			play( CString identifier );
+        SoundChannelPtr            play( CString identifier );
 
         //! Triggers an event.
         /*!
@@ -83,7 +83,7 @@ namespace Sound {
             \param identifier Event identifier to play.
             \return SoundChannel of a started playback. If no playback started, NULL is returned.
         */
-        SoundChannelPtr			event( CString identifier );
+        SoundChannelPtr            event( CString identifier );
 
         //! Sets the listener position.
         void                    setListenerPosition( const Vec3& value );
@@ -108,7 +108,7 @@ namespace Sound {
         bool                    renameSound( CString identifier, CString newName );
 
         //! Returns an event by a given name (NULL if no such sound found).
-        SoundEventWPtr			findEventByName( CString identifier );
+        SoundEventWPtr            findEventByName( CString identifier );
 
         //! Creates a new sound group.
         /*!
@@ -119,7 +119,7 @@ namespace Sound {
             \param info Sound group initial parameters.
             \return created SoundGroup instance, otherwise NULL.
         */
-        SoundGroupWPtr			createGroup( CString identifier );
+        SoundGroupWPtr            createGroup( CString identifier );
 
         //! Creates a new sound.
         /*!
@@ -174,8 +174,8 @@ namespace Sound {
         //! Returns a reference to a sound container.
         const Sounds&           sounds( void ) const;
 
-		//! Creates the SoundFx instance.
-		static SoundFxPtr		create( SoundHal hal = Default, IStreamOpenerPtr streamOpener = IStreamOpenerPtr() );
+        //! Creates the SoundFx instance.
+        static SoundFxPtr        create( SoundHal hal = Default, IStreamOpenerPtr streamOpener = IStreamOpenerPtr() );
 
     private:
 
@@ -217,17 +217,17 @@ namespace Sound {
         //! Sound engine HAL.
         SoundEnginePtr          m_hal;
 
-		//! Stores the master volume.
-		f32						m_volume;
+        //! Stores the master volume.
+        f32                        m_volume;
 
-		//! Stores the master pitch value.
-		f32						m_pitch;
+        //! Stores the master pitch value.
+        f32                        m_pitch;
 
         //! Stream opener interface.
-        IStreamOpenerPtr		m_streamOpener;
+        IStreamOpenerPtr        m_streamOpener;
 
         //! Array of sound channels the are now playing.
-        SoundChannels			m_channels;
+        SoundChannels            m_channels;
 
         //! Sounds registered inside this SoundFx.
         /*! Contains pairs of (strhash, sound data pointer). */

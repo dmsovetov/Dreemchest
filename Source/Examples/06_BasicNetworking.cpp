@@ -41,14 +41,14 @@ class Server : public Platform::ApplicationDelegate {
         // Set the default log handler.
         Logger::setStandardLogger();
 
-		// Create a network interface and show host info
-		Network::Network network;
-		LogVerbose( "basicNetworking", "IP: %s\n", network.hostIP().toString() );
-		LogVerbose( "basicNetworking", "Hostname: %s\n", network.hostName() );
-		LogVerbose( "basicNetworking", "Broadcast IP: %s\n", network.broadcastIP().toString() );
+        // Create a network interface and show host info
+        Network::Network network;
+        LogVerbose( "basicNetworking", "IP: %s\n", network.hostIP().toString() );
+        LogVerbose( "basicNetworking", "Hostname: %s\n", network.hostName() );
+        LogVerbose( "basicNetworking", "Broadcast IP: %s\n", network.broadcastIP().toString() );
 
-		// Now quit
-		application->quit();
+        // Now quit
+        application->quit();
     }
 };
 

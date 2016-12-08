@@ -41,13 +41,13 @@ TimeDelta::TimeDelta( void ) : m_prev( 0 )
 // ** TimeDelta::update
 u32 TimeDelta::update( void )
 {
-	// Get current time
-	u32 time = Platform::currentTime();
+    // Get current time
+    u32 time = Platform::currentTime();
 
-	if( m_prev == 0 ) {
-		m_prev = time;
-		return 0;
-	}
+    if( m_prev == 0 ) {
+        m_prev = time;
+        return 0;
+    }
 
     u32 dt = time - m_prev;
     m_prev = time;
@@ -94,14 +94,14 @@ FixedTimeStep::FixedTimeStep( u32 step, s32 maxSteps )
 // ** FixedTimeStep::advance
 TimeStep FixedTimeStep::advance( u32 dt )
 {
-	// Accumulate time
-	m_accumulated += dt;
+    // Accumulate time
+    m_accumulated += dt;
 
-	if( m_accumulated < m_dt ) {
-		return TimeStep();
-	}
+    if( m_accumulated < m_dt ) {
+        return TimeStep();
+    }
 
-	// Calculate the iterations count.
+    // Calculate the iterations count.
     TimeStep step;
     step.m_count = m_accumulated / m_dt;
     step.m_dt    = m_dt;
@@ -113,9 +113,9 @@ TimeStep FixedTimeStep::advance( u32 dt )
     }
 
     // Decrease an accumulator.
-	m_accumulated = m_accumulated - step.count() * step.milliseconds();
+    m_accumulated = m_accumulated - step.count() * step.milliseconds();
 
-	return step;
+    return step;
 }
 
 // ** FixedTimeStep::maxSteps

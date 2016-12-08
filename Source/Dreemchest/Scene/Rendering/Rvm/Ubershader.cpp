@@ -76,11 +76,11 @@ void Ubershader::addFeature( Bitmask mask, const String& name )
         }
     }
 
-	Feature feature;
-	feature.mask   = mask;
-	feature.name   = name;
+    Feature feature;
+    feature.mask   = mask;
+    feature.name   = name;
     feature.offset = offset;
-	m_features.push_back( feature );
+    m_features.push_back( feature );
     m_supportedFeatures = m_supportedFeatures | mask;
 }
 
@@ -116,19 +116,19 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
         return i->second;
     }
 
-	// Generate macro definitions from features
-	String macro = "";
+    // Generate macro definitions from features
+    String macro = "";
     String debug = "";
 
-	for( u32 i = 0, n = featureCount(); i < n; i++ ) {
+    for( u32 i = 0, n = featureCount(); i < n; i++ ) {
         const Feature& feature = this->feature( i );
 
-		if( feature.mask & features ) {
-			macro += "#define " + feature.name + " " + toString( (feature.mask & features) >> feature.offset ) + "\n";
+        if( feature.mask & features ) {
+            macro += "#define " + feature.name + " " + toString( (feature.mask & features) >> feature.offset ) + "\n";
             if( debug.length() ) debug += ", ";
             debug += feature.name;
-		}
-	}
+        }
+    }
 
     LogVerbose( "shader", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
 
@@ -137,8 +137,8 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
         macro += m_includes[i];
     }
 
-	// Compile the shader
-	Renderer::ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
+    // Compile the shader
+    Renderer::ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
     NIMBLE_BREAK_IF( !compiled.valid() );
 
     m_permutations[features] = compiled;

@@ -39,38 +39,38 @@ namespace Scene {
     public:
 
         //! Spatial query feature mask.
-	    enum SceneQueryFlags {
-		      QuerySingle		= BIT( 0 )	//!< Scene query will result a sinle best matching result.
-		    , QueryBackToFront	= BIT( 1 )	//!< Scene query will return results in back to front order. 
-	    };
+        enum SceneQueryFlags {
+              QuerySingle        = BIT( 0 )    //!< Scene query will result a sinle best matching result.
+            , QueryBackToFront    = BIT( 1 )    //!< Scene query will return results in back to front order. 
+        };
 
         //! Spatial query result contains weak pointer to a scene object and intersection info.
         struct Result {
- 		    SceneObjectWPtr		sceneObject;	//!< The scene object hit.
+             SceneObjectWPtr        sceneObject;    //!< The scene object hit.
 
             union {
                 struct {
-		            f32		    point[3];	    //!< The intersection world space point.
-		            f32			time;			//!< The distance value in range [0, 1] from ray origin to a hit point.
+                    f32            point[3];        //!< The intersection world space point.
+                    f32            time;            //!< The distance value in range [0, 1] from ray origin to a hit point.
                 } ray;
             };
 
                                 //! Constructs invalid query result.
                                 Result( void );
 
-							    //! Constructs ray query Result instance.
-							    Result( SceneObjectWPtr sceneObject, const Vec3& point, f32 time );
+                                //! Constructs ray query Result instance.
+                                Result( SceneObjectWPtr sceneObject, const Vec3& point, f32 time );
 
-							    //! Returns true if this is a valid result (contains a hit scene object).
-							    operator bool( void ) const { return sceneObject.valid(); }          
+                                //! Returns true if this is a valid result (contains a hit scene object).
+                                operator bool( void ) const { return sceneObject.valid(); }          
         };
 
 
-	    //! Array of spatial query results.
-	    typedef Array<Result>   Results;
+        //! Array of spatial query results.
+        typedef Array<Result>   Results;
 
-		//! Performs the ray tracing.
-		Results                 queryRay( const Ray& ray, const FlagSet8& flags = QuerySingle ) const;
+        //! Performs the ray tracing.
+        Results                 queryRay( const Ray& ray, const FlagSet8& flags = QuerySingle ) const;
 
     private:
 
@@ -86,7 +86,7 @@ namespace Scene {
     private:
 
         SceneWPtr               m_scene;    //!< Parent scene instance.
-        Ecs::IndexPtr		    m_meshes;   //!< All queries will be made to this mesh index.
+        Ecs::IndexPtr            m_meshes;   //!< All queries will be made to this mesh index.
     };
 
 } // namespace Scene

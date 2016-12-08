@@ -38,65 +38,65 @@ DREEMCHEST_LOGGER_TAG( TCPSockets )
 class TCPListenerEventHandler : public Network::TCPSocketListenerDelegate {
 public:
 
-	//! Handles accepted incomming connection.
-	virtual void handleConnectionAccepted( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
-	{
-		LogVerbose( "socketListener", "client connected, remote address %s\n", socket->address().toString() );
-	}
+    //! Handles accepted incomming connection.
+    virtual void handleConnectionAccepted( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
+    {
+        LogVerbose( "socketListener", "client connected, remote address %s\n", socket->address().toString() );
+    }
 
-	//! Handles a remote connection closed.
-	virtual void handleConnectionClosed( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
-	{
-		LogVerbose( "socketListener", "client disconnected, remote address %s\n", socket->address().toString() );
-	}
+    //! Handles a remote connection closed.
+    virtual void handleConnectionClosed( Network::TCPSocketListener* sender, Network::TCPSocket* socket )
+    {
+        LogVerbose( "socketListener", "client disconnected, remote address %s\n", socket->address().toString() );
+    }
 
-	//! Called when socket has received data.
-	virtual void handleReceivedData( Network::TCPSocketListener* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
-	{
-		LogVerbose( "socketListener", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
-		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
-			LogVerbose( "socketListener", "%c\n", ( s8 )stream->buffer()[i] );
-		}
+    //! Called when socket has received data.
+    virtual void handleReceivedData( Network::TCPSocketListener* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
+    {
+        LogVerbose( "socketListener", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
+        for( int i = 0; i < stream->bytesAvailable(); i++ ) {
+            LogVerbose( "socketListener", "%c\n", ( s8 )stream->buffer()[i] );
+        }
 
-		// Send a response
-		const char* response = "pong";
-		socket->sendTo( response, strlen( response ) );
-	}
+        // Send a response
+        const char* response = "pong";
+        socket->sendTo( response, strlen( response ) );
+    }
 };
 
 // A delegate class to listen the socket events.
 class TCPEventHandler : public Network::TCPSocketDelegate {
 public:
 
-	TCPEventHandler( Platform::Application* app ) : m_application( app ) {}
+    TCPEventHandler( Platform::Application* app ) : m_application( app ) {}
 
-	//! Called when socket is closed.
-	virtual void handleClosed( Network::TCPSocket* sender )
-	{
-		LogVerbose( "socket", "socket disconnected\n" );
-	}
+    //! Called when socket is closed.
+    virtual void handleClosed( Network::TCPSocket* sender )
+    {
+        LogVerbose( "socket", "socket disconnected\n" );
+    }
 
-	//! Called when socket has received data.
-	virtual void handleReceivedData( Network::TCPSocket* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
-	{
-		LogVerbose( "socket", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
-		for( int i = 0; i < stream->bytesAvailable(); i++ ) {
-			LogVerbose( "client", " %c\n", ( s8 )stream->buffer()[i] );
-		}
+    //! Called when socket has received data.
+    virtual void handleReceivedData( Network::TCPSocket* sender, Network::TCPSocket* socket, Network::TCPStream* stream )
+    {
+        LogVerbose( "socket", "%d bytes of data recived from %s:\n", ( int )stream->bytesAvailable(), socket->address().toString() );
+        for( int i = 0; i < stream->bytesAvailable(); i++ ) {
+            LogVerbose( "client", " %c\n", ( s8 )stream->buffer()[i] );
+        }
 
-		static int counter = 0;
+        static int counter = 0;
 
-		const char* response = "ping";
-		socket->sendTo( response, strlen( response ) );
-		Threads::Thread::sleep( 1000 );
+        const char* response = "ping";
+        socket->sendTo( response, strlen( response ) );
+        Threads::Thread::sleep( 1000 );
 
-		counter++;
-		if( counter >= 5 ) {
-			socket->close();
-		}
-	}
+        counter++;
+        if( counter >= 5 ) {
+            socket->close();
+        }
+    }
 
-	Platform::Application* m_application;
+    Platform::Application* m_application;
 };
 
 Threads::ThreadPtr serverThread;
@@ -106,85 +106,85 @@ class Server : public Platform::ApplicationDelegate {
 
     // This method will be called once an application is launched.
     virtual void handleLaunched( Platform::Application* application )
-	{
+    {
         // Set the default log handler.
         Logger::setStandardLogger();
 
-		//! Create a network interface
-		Network::Network network;
+        //! Create a network interface
+        Network::Network network;
 
-		Network::TCPSocketListenerPtr server = startServer( application, 20000 );
-		serverThread = Threads::Thread::create();
-		serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
+        Network::TCPSocketListenerPtr server = startServer( application, 20000 );
+        serverThread = Threads::Thread::create();
+        serverThread->start( dcThisMethod( Server::updateServer ), server.get() );
 
-		Network::TCPSocketPtr client = connectToServer( application, 20000 );
+        Network::TCPSocketPtr client = connectToServer( application, 20000 );
 
-		while( true ) {
-			if( client != NULL && client->isValid() ) {
-				client->update();
-			}
-		}
+        while( true ) {
+            if( client != NULL && client->isValid() ) {
+                client->update();
+            }
+        }
 /*
-		// Connect to a remote server
-		TCPSocketPtr socket = connectToServer( application, 20000 );
-		
-		// If failed to connect - start server
-		if( socket == NULL ) {
-			net::log::msg( "Failed to connect to server - launching a new one...\n" );
-			socket = startServer( application, 20000 );
-		}
+        // Connect to a remote server
+        TCPSocketPtr socket = connectToServer( application, 20000 );
+        
+        // If failed to connect - start server
+        if( socket == NULL ) {
+            net::log::msg( "Failed to connect to server - launching a new one...\n" );
+            socket = startServer( application, 20000 );
+        }
 
-		while( true ) {
-			socket->update();
-		}
+        while( true ) {
+            socket->update();
+        }
 */
-		// Now quit
-		application->quit();
+        // Now quit
+        application->quit();
     }
 
-	void updateServer( void* userData )
-	{
-		while( true ) {
-			reinterpret_cast<net::TCPSocketListener*>( userData )->update();
-			Threads::Thread::sleep( 1 );
-		}
-	}
+    void updateServer( void* userData )
+    {
+        while( true ) {
+            reinterpret_cast<net::TCPSocketListener*>( userData )->update();
+            Threads::Thread::sleep( 1 );
+        }
+    }
 
-	// This method connects to a remote socket.
-	Network::TCPSocketPtr connectToServer( Platform::Application* application, u16 port )
-	{
-		// Connect to remote server
-		Network::TCPSocketPtr socket = Network::TCPSocket::connectTo( Network::Address::Localhost, port, new TCPEventHandler( application ) );
+    // This method connects to a remote socket.
+    Network::TCPSocketPtr connectToServer( Platform::Application* application, u16 port )
+    {
+        // Connect to remote server
+        Network::TCPSocketPtr socket = Network::TCPSocket::connectTo( Network::Address::Localhost, port, new TCPEventHandler( application ) );
 
-		if( socket == NULL ) {
-			return Network::TCPSocketPtr();
-		}
+        if( socket == NULL ) {
+            return Network::TCPSocketPtr();
+        }
 
-		// Send message to server
-		const char* msg = "ping";
-		socket->sendTo( msg, strlen( msg ) );
+        // Send message to server
+        const char* msg = "ping";
+        socket->sendTo( msg, strlen( msg ) );
 
-		// Check for incomming data.
-		LogVerbose( "client", "waiting for server response...\n" );
+        // Check for incomming data.
+        LogVerbose( "client", "waiting for server response...\n" );
 
-		return socket;
-	}
+        return socket;
+    }
 
-	// This method starts a TCP server
-	net::TCPSocketListenerPtr startServer( Platform::Application* application, u16 port )
-	{
-		// Create a TCP socket.
-		net::TCPSocketListenerPtr socket = net::TCPSocketListener::bindTo( port, new TCPListenerEventHandler );
+    // This method starts a TCP server
+    net::TCPSocketListenerPtr startServer( Platform::Application* application, u16 port )
+    {
+        // Create a TCP socket.
+        net::TCPSocketListenerPtr socket = net::TCPSocketListener::bindTo( port, new TCPListenerEventHandler );
 
-		if( socket == NULL ) {
-			return net::TCPSocketListenerPtr();
-		}
+        if( socket == NULL ) {
+            return net::TCPSocketListenerPtr();
+        }
 
-		// Check for incomming data.
-		LogVerbose( "server", "waiting for connections...\n" );
+        // Check for incomming data.
+        LogVerbose( "server", "waiting for connections...\n" );
 
-		return socket;
-	}
+        return socket;
+    }
 };
 
 // Now declare an application entry point with Files application delegate.

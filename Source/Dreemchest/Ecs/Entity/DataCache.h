@@ -71,11 +71,11 @@ namespace Ecs {
         //! Container type to map from an entity pointer to a cache index.
         typedef HashMap<const Entity*, s32> IndexByEntity;
 
-        IndexPtr			        m_index;    //!< Index that is used to access entities.
+        IndexPtr                    m_index;    //!< Index that is used to access entities.
         IndexByEntity               m_indices;  //!< Maps from entity pointer to cache index.
     };
 
-	//! Data cache associates some user data with a set of entities specified by an aspect.
+    //! Data cache associates some user data with a set of entities specified by an aspect.
     template<typename TData>
     class DataCache : public DataCacheBase {
     friend class Ecs;
@@ -113,7 +113,7 @@ namespace Ecs {
 
     // ** DataCache::DataCache
     template<typename TData>
-	DataCache<TData>::DataCache( EcsWPtr ecs, const Aspect& aspect, const Factory& factory )
+    DataCache<TData>::DataCache( EcsWPtr ecs, const Aspect& aspect, const Factory& factory )
         : DataCacheBase( ecs, aspect )
         , m_factory( factory )
     {
@@ -121,14 +121,14 @@ namespace Ecs {
 
     // ** DataCache::data
     template<typename TData>
-	const typename DataCache<TData>::Container& DataCache<TData>::data( void ) const
+    const typename DataCache<TData>::Container& DataCache<TData>::data( void ) const
     {
         return m_data;
     }
 
     // ** DataCache::data
     template<typename TData>
-	typename DataCache<TData>::Container& DataCache<TData>::data( void )
+    typename DataCache<TData>::Container& DataCache<TData>::data( void )
     {
         return m_data;
     }
@@ -161,4 +161,4 @@ namespace Ecs {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_DataCache_H__	*/
+#endif    /*    !__DC_Ecs_DataCache_H__    */

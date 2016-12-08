@@ -33,45 +33,45 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
-	class SceneTree : public QTreeView {
+    //! Subclass of a QTreeView to extend the context menu & key press behaviour.
+    class SceneTree : public QTreeView {
 
-		Q_OBJECT
+        Q_OBJECT
 
     Q_SIGNALS:
 
         //! This event is emitted when user double clicks the scene object.
         void                        sceneObjectDoubleClicked( Scene::SceneObjectWPtr sceneObject );
 
-	public:
+    public:
 
-									//! Constructs SceneTree instance.
-									SceneTree( QWidget* parent );
+                                    //! Constructs SceneTree instance.
+                                    SceneTree( QWidget* parent );
 
-		//! Sets asset tree model.
-		void						setModel( SceneModelQPtr value );
+        //! Sets asset tree model.
+        void                        setModel( SceneModelQPtr value );
 
-	protected:
+    protected:
 
-		//! Handles the deletion and renaming items.
-		virtual void				keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the deletion and renaming items.
+        virtual void                keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Handles the context menu requests.
-		virtual void				contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the context menu requests.
+        virtual void                contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
 
-	private slots:
+    private slots:
 
-		//! Handles the doubleClicked signal.
-		void						itemDoubleClicked( const QModelIndex& index );
+        //! Handles the doubleClicked signal.
+        void                        itemDoubleClicked( const QModelIndex& index );
 
-	private:
+    private:
 
-		SceneModelQPtr				m_model;	//!< File system model used.
-		SceneTree*					m_parent;	//!< Parent scene tree instance.
-	};
+        SceneModelQPtr                m_model;    //!< File system model used.
+        SceneTree*                    m_parent;    //!< Parent scene tree instance.
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Qt_SceneTree_H__	*/
+#endif    /*    !__DC_Composer_Qt_SceneTree_H__    */

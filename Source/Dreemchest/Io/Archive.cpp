@@ -31,11 +31,11 @@
 #include "DiskFileSystem.h"
 
 #ifdef ZLIB_FOUND
-	#include "processors/ZLibBufferCompressor.h"
+    #include "processors/ZLibBufferCompressor.h"
 #endif
 
 #ifdef FASTLZ_FOUND
-	#include "processors/FastLZBufferCompressor.h"
+    #include "processors/FastLZBufferCompressor.h"
 #endif
 
 DC_BEGIN_DREEMCHEST
@@ -63,20 +63,20 @@ void Archive::release( void )
 IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 {
     switch( compressor ) {
-	case CompressorFastLZ:  
-							#ifdef FASTLZ_FOUND
-								return DC_NEW FastLZBufferCompressor;
-							#else
-								LogWarning( "archive", "%s", "unsupported FastLZ compressor requested\n" );
-							#endif
+    case CompressorFastLZ:  
+                            #ifdef FASTLZ_FOUND
+                                return DC_NEW FastLZBufferCompressor;
+                            #else
+                                LogWarning( "archive", "%s", "unsupported FastLZ compressor requested\n" );
+                            #endif
                             break;
 
     case CompressorZ:      
-							#ifdef ZLIB_FOUND
-								return DC_NEW ZLibBufferCompressor;
-							#else
-								LogWarning( "archive", "%s", "unsupported ZLib compressor requested\n" );
-							#endif
+                            #ifdef ZLIB_FOUND
+                                return DC_NEW ZLibBufferCompressor;
+                            #else
+                                LogWarning( "archive", "%s", "unsupported ZLib compressor requested\n" );
+                            #endif
                             break;
 
     default:                return NULL;
@@ -204,12 +204,12 @@ StreamPtr Archive::openFile( const Path& fileName ) const
 // ** Archive::openFile
 StreamPtr Archive::openFile( const Path& fileName, StreamMode mode ) const
 {
-	if( mode == BinaryReadStream ) {
-		return openFile( fileName );
-	}
+    if( mode == BinaryReadStream ) {
+        return openFile( fileName );
+    }
 
     NIMBLE_BREAK_IF( true );
-	return StreamPtr();
+    return StreamPtr();
 }
 
 // ** Archive::fileExists

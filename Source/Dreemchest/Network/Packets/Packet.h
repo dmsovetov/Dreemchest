@@ -76,16 +76,16 @@ namespace Network {
 
 namespace Packets {
 
-	//! RPC call packet.
-	struct RemoteCall : public Packet<RemoteCall> {
-		u16			    id;         //!< Remote call identifier.
-		u32			    method;     //!< Remote call method identifier.
+    //! RPC call packet.
+    struct RemoteCall : public Packet<RemoteCall> {
+        u16                id;         //!< Remote call identifier.
+        u32                method;     //!< Remote call method identifier.
         TypeId          returnType;
-	    BinaryBlob      payload;    //!< Remote call argument.
+        BinaryBlob      payload;    //!< Remote call argument.
 
-					    //! Constructs RemoteCall instance.
-					    RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
-						    : id( id ), method( method ), returnType( returnType ), payload( payload ) {}
+                        //! Constructs RemoteCall instance.
+                        RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
+                            : id( id ), method( method ), returnType( returnType ), payload( payload ) {}
 
         virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
@@ -109,18 +109,18 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
-	//! RPC call response
-	struct RemoteCallResponse : public Packet<RemoteCallResponse> {
-		u16			id;
-		Error		error;
-		TypeId		returnType;
-		BinaryBlob	payload;
+    //! RPC call response
+    struct RemoteCallResponse : public Packet<RemoteCallResponse> {
+        u16            id;
+        Error        error;
+        TypeId        returnType;
+        BinaryBlob    payload;
 
-					//! Constructs RemoteCallResponse instance.
-					RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
-						: id( id ), error( error ), returnType( returnType ), payload( payload ) {}
+                    //! Constructs RemoteCallResponse instance.
+                    RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
+                        : id( id ), error( error ), returnType( returnType ), payload( payload ) {}
 
         virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
@@ -146,16 +146,16 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
-	//! Network event packet
-	struct Event : public Packet<Event> {
-		TypeId			eventId;
-		BinaryBlob	    payload;
+    //! Network event packet
+    struct Event : public Packet<Event> {
+        TypeId            eventId;
+        BinaryBlob        payload;
 
-						//! Constructs Event instance.
-						Event( TypeId eventId = 0, const BinaryBlob& payload = BinaryBlob() )
-							: eventId( eventId ), payload( payload ) {}
+                        //! Constructs Event instance.
+                        Event( TypeId eventId = 0, const BinaryBlob& payload = BinaryBlob() )
+                            : eventId( eventId ), payload( payload ) {}
 
         virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
@@ -175,7 +175,7 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
 } // namespace Packets
 

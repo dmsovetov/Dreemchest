@@ -41,7 +41,7 @@ Physics2D::Physics2D( const String& name, f32 timeStep ) : EntitySystem( name, E
 // ** Physics2D::setTimeStep
 void Physics2D::setTimeStep( f32 value )
 {
-	m_timeStep = value;
+    m_timeStep = value;
 }
 
 // ** Physics2D::simulatePhysics
@@ -78,8 +78,8 @@ void Physics2D::updateMass( RigidBody2D& rigidBody, f32 value )
 // ** Physics2D::clearState
 void Physics2D::clearState( RigidBody2D& rigidBody )
 {
-	// Clear all forces now
-	rigidBody.clear();
+    // Clear all forces now
+    rigidBody.clear();
 
     // Clear all queued events from last simulation step
     rigidBody.clearEvents();
@@ -211,7 +211,7 @@ void Box2DPhysics::Collisions::EndContact( b2Contact* contact )
 Box2DPhysics::Box2DPhysics( f32 timeStep, const ScaleFactors& scalingFactors, const Vec2& gravity ) : Physics2D( "Box2DPhysics", timeStep ), m_scalingFactors( scalingFactors )
 {
     // Create Box2D world instance
-	m_world = DC_NEW b2World( forceToBox2D( gravity ) );
+    m_world = DC_NEW b2World( forceToBox2D( gravity ) );
 
     // Disable automatic force clearing
     m_world->SetAutoClearForces( false );
@@ -229,83 +229,83 @@ Box2DPhysics::Box2DPhysics( f32 timeStep, const ScaleFactors& scalingFactors, co
 // ** Box2DPhysics::queryRect
 SceneObjectSet Box2DPhysics::queryRect( const Rect& rect ) const
 {
-	// Query callback
-	struct Callback : public b2QueryCallback {
-		virtual bool ReportFixture( b2Fixture* fixture ) NIMBLE_OVERRIDE {
-			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
-			m_result.insert( entity );
-			return true;
-		}
+    // Query callback
+    struct Callback : public b2QueryCallback {
+        virtual bool ReportFixture( b2Fixture* fixture ) NIMBLE_OVERRIDE {
+            Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
+            m_result.insert( entity );
+            return true;
+        }
 
-		SceneObjectSet m_result;
-	};
+        SceneObjectSet m_result;
+    };
 
-	// Construct the AABB of a query
-	b2AABB aabb;
-	aabb.lowerBound = positionToBox2D( rect.min() );
-	aabb.upperBound = positionToBox2D( rect.max() );
+    // Construct the AABB of a query
+    b2AABB aabb;
+    aabb.lowerBound = positionToBox2D( rect.min() );
+    aabb.upperBound = positionToBox2D( rect.max() );
 
-	// Run the query
-	Callback callback;
-	m_world->QueryAABB( &callback, aabb );
+    // Run the query
+    Callback callback;
+    m_world->QueryAABB( &callback, aabb );
 
-	return callback.m_result;
+    return callback.m_result;
 }
 
 // ** Box2DPhysics::querySegment
 SceneObjectSet Box2DPhysics::querySegment( const Vec2& start, const Vec2& end ) const
 {
-	NIMBLE_BREAK_IF( (start - end).length() < 1.0f, "the queried segment is too short" );
+    NIMBLE_BREAK_IF( (start - end).length() < 1.0f, "the queried segment is too short" );
 
-	// Ray casting callback
-	struct Callback : public b2RayCastCallback {
-		Callback( void ) {}
+    // Ray casting callback
+    struct Callback : public b2RayCastCallback {
+        Callback( void ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
-			Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
-			m_result.insert( entity );
-			return 1.0f;
-		}
+        virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
+            Ecs::Entity* entity = reinterpret_cast<Ecs::Entity*>( fixture->GetBody()->GetUserData() );
+            m_result.insert( entity );
+            return 1.0f;
+        }
 
-		SceneObjectSet	m_result;
-	};
+        SceneObjectSet    m_result;
+    };
 
-	Callback callback;
-	m_world->RayCast( &callback, positionToBox2D( start ), positionToBox2D( end ) );
+    Callback callback;
+    m_world->RayCast( &callback, positionToBox2D( start ), positionToBox2D( end ) );
 
-	return callback.m_result;
+    return callback.m_result;
 }
 
 // ** Box2DPhysics::rayCast
 bool Box2DPhysics::rayCast( const Vec2& start, const Vec2& end, Vec2& intersectionPoint ) const
 {
-	// Ray casting callback
-	struct Callback : public b2RayCastCallback {
-		Callback( void ) : m_hasIntersection( false ) {}
+    // Ray casting callback
+    struct Callback : public b2RayCastCallback {
+        Callback( void ) : m_hasIntersection( false ) {}
 
-		virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
-			m_result = point;
-			m_hasIntersection = true;
-			return 0.0f;
-		}
+        virtual float32 ReportFixture( b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction ) NIMBLE_OVERRIDE {
+            m_result = point;
+            m_hasIntersection = true;
+            return 0.0f;
+        }
 
-		bool	m_hasIntersection;
-		b2Vec2	m_result;
-	};
+        bool    m_hasIntersection;
+        b2Vec2    m_result;
+    };
 
-	// Convert start & end points to Box2D coordinates
-	b2Vec2 p1 = positionToBox2D( start );
-	b2Vec2 p2 = positionToBox2D( end );
+    // Convert start & end points to Box2D coordinates
+    b2Vec2 p1 = positionToBox2D( start );
+    b2Vec2 p2 = positionToBox2D( end );
 
-	// Ray cast the physics world.
-	Callback callback;
-	m_world->RayCast( &callback, p1, p2 );
+    // Ray cast the physics world.
+    Callback callback;
+    m_world->RayCast( &callback, p1, p2 );
 
-	// Convert the result to Vec2 and return
-	Vec3 result = positionFromBox2D( callback.m_result );
-	intersectionPoint = Vec2( result.x, result.y );
+    // Convert the result to Vec2 and return
+    Vec3 result = positionFromBox2D( callback.m_result );
+    intersectionPoint = Vec2( result.x, result.y );
 
-	return callback.m_hasIntersection;
+    return callback.m_hasIntersection;
 }
 
 // ** Box2DPhysics::simulate
@@ -356,9 +356,9 @@ void Box2DPhysics::update( u32 currentTime, f32 dt )
 // ** Box2DPhysics::extractPhysicalBody
 b2Body* Box2DPhysics::extractPhysicalBody( const RigidBody2D& rigidBody ) const
 {
-	Internal::Ptr physical = rigidBody.internal<Internal>();
-	NIMBLE_ABORT_IF( physical == NULL, "invalid internal data" );
-	return physical->m_body;
+    Internal::Ptr physical = rigidBody.internal<Internal>();
+    NIMBLE_ABORT_IF( physical == NULL, "invalid internal data" );
+    return physical->m_body;
 }
 
 // ** Box2DPhysics::prepareForSimulation
@@ -371,8 +371,8 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
         body->SetTransform( positionToBox2D( Vec2( transform.x(), transform.y() ) ), rotationToBox2D( transform.rotationZ() ) );
     }
 
-	// Get the body transform
-	const b2Transform& rigidBodyTransform = body->GetTransform();
+    // Get the body transform
+    const b2Transform& rigidBodyTransform = body->GetTransform();
 
     // This rigid body was moved - sync the Box2D body with it
     if( rigidBody.wasMoved() ) {
@@ -390,27 +390,27 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
         body->SetAngularVelocity( 0.0f );
     }
 
-	// Now apply forces
-	f32			torque = rigidBody.torque();
-	const Vec2& force  = rigidBody.force();
+    // Now apply forces
+    f32            torque = rigidBody.torque();
+    const Vec2& force  = rigidBody.force();
 
-	body->SetLinearDamping( rigidBody.linearDamping() );
-	body->SetAngularDamping( rigidBody.angularDamping() );
+    body->SetLinearDamping( rigidBody.linearDamping() );
+    body->SetAngularDamping( rigidBody.angularDamping() );
     body->SetLinearVelocity( velocityToBox2D( rigidBody.linearVelocity() ) );
-	body->ApplyTorque( -torque, true );
-	body->ApplyForceToCenter( forceToBox2D( force ), true );
+    body->ApplyTorque( -torque, true );
+    body->ApplyForceToCenter( forceToBox2D( force ), true );
     body->SetGravityScale( rigidBody.gravityScale() );
 
-	for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
-		const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
-		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
-		body->ApplyForce( forceToBox2D( appliedForce.m_value ), point, true );
-	}
+    for( u32 i = 0, n = rigidBody.appliedForceCount(); i < n; i++ ) {
+        const RigidBody2D::AppliedForce& appliedForce = rigidBody.appliedForce( i );
+        b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedForce.m_point ) );
+        body->ApplyForce( forceToBox2D( appliedForce.m_value ), point, true );
+    }
 
     for( u32 i = 0, n = rigidBody.appliedImpulseCount(); i < n; i++ ) {
- 		const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
-		b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
-		body->ApplyLinearImpulse( forceToBox2D( appliedImpulse.m_value ), point, true );   
+         const RigidBody2D::AppliedForce& appliedImpulse = rigidBody.appliedImpulse( i );
+        b2Vec2 point = body->GetWorldPoint( positionToBox2D( appliedImpulse.m_point ) );
+        body->ApplyLinearImpulse( forceToBox2D( appliedImpulse.m_value ), point, true );   
     }
 
     // Clear the rigid body state
@@ -420,12 +420,12 @@ void Box2DPhysics::prepareForSimulation( b2Body* body, RigidBody2D& rigidBody, T
 // ** Box2DPhysics::updateTransform
 void Box2DPhysics::updateTransform( b2Body* body, RigidBody2D& rigidBody, Transform& transform )
 {
-	// Get the body transform
-	const b2Transform& rigidBodyTransform = body->GetTransform();
+    // Get the body transform
+    const b2Transform& rigidBodyTransform = body->GetTransform();
 
-	// Update the Transform2D instance
-	transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
-	transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
+    // Update the Transform2D instance
+    transform.setPosition( positionFromBox2D( rigidBodyTransform.p ) );
+    transform.setRotationZ( rotationFromBox2D( rigidBodyTransform.q.GetAngle() ) );
 
     // Update the body's linear velocity
     rigidBody.setLinearVelocity( velocityFromBox2D( body->GetLinearVelocity() ) );
@@ -481,68 +481,68 @@ void Box2DPhysics::dispatchCollisionEvents( void )
 // ** Box2DPhysics::entityAdded
 void Box2DPhysics::entityAdded( const Ecs::Entity& entity )
 {
-	Shape2D*     shape      =  entity.get<Shape2D>();
+    Shape2D*     shape      =  entity.get<Shape2D>();
     RigidBody2D& rigidBody  = *entity.get<RigidBody2D>();
     Transform&   transform  = *entity.get<Transform>();
 
-	NIMBLE_ABORT_IF( rigidBody.internal<Internal>().valid(), "internal data should not be valid" )
-	NIMBLE_ABORT_IF( shape == NULL, "rigid body should have an attached Shape2D" )
-	NIMBLE_ABORT_IF( shape->partCount() == 0, "rigid body shape should not be empty" )
+    NIMBLE_ABORT_IF( rigidBody.internal<Internal>().valid(), "internal data should not be valid" )
+    NIMBLE_ABORT_IF( shape == NULL, "rigid body should have an attached Shape2D" )
+    NIMBLE_ABORT_IF( shape->partCount() == 0, "rigid body shape should not be empty" )
 
     b2BodyDef def;
 
-	// Initialize body type
-	switch( rigidBody.type() ) {
-	case RigidBody2D::Static:		def.type = b2_staticBody;	    break;
-	case RigidBody2D::Dynamic:		def.type = b2_dynamicBody;      break;
-	case RigidBody2D::Kinematic:	def.type = b2_kinematicBody;    break;
-	default:						NIMBLE_BREAK;
-	}
+    // Initialize body type
+    switch( rigidBody.type() ) {
+    case RigidBody2D::Static:        def.type = b2_staticBody;        break;
+    case RigidBody2D::Dynamic:        def.type = b2_dynamicBody;      break;
+    case RigidBody2D::Kinematic:    def.type = b2_kinematicBody;    break;
+    default:                        NIMBLE_BREAK;
+    }
 
-	// Set the initial body transform
-	def.position = positionToBox2D( transform.position() );
-	def.angle = rotationToBox2D( transform.rotationZ() );
+    // Set the initial body transform
+    def.position = positionToBox2D( transform.position() );
+    def.angle = rotationToBox2D( transform.rotationZ() );
     def.bullet = rigidBody.isBullet();
 
-	// Construct the Box2D body and attach scene object to it
+    // Construct the Box2D body and attach scene object to it
     b2Body* body = m_world->CreateBody( &def );
-	body->SetUserData( const_cast<Ecs::Entity*>( &entity ) );
+    body->SetUserData( const_cast<Ecs::Entity*>( &entity ) );
 
-	// Initialize the body shape
-	for( u32 i = 0, n = shape->partCount(); i < n; i++ ) {
-		// Get the shape part by index
-		const SimpleShape2D& part = shape->part( i );
+    // Initialize the body shape
+    for( u32 i = 0, n = shape->partCount(); i < n; i++ ) {
+        // Get the shape part by index
+        const SimpleShape2D& part = shape->part( i );
 
         // Setup fixture collision filter
         b2Filter filter;
         filter.categoryBits = rigidBody.category();
         filter.maskBits     = rigidBody.collisionMask();
 
-		// Initialize Box2D fixture
-		switch( part.type ) {
-		case Shape2DType::Circle:	    addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
-		case Shape2DType::Rect:         addRectFixture( body, filter, part, rigidBody.isSensor() );		break;
-		case Shape2DType::Polygon:      addPolygonFixture( body, filter, part, rigidBody.isSensor() );	break;
-		default:				        NIMBLE_BREAK;
-		}
-	}
+        // Initialize Box2D fixture
+        switch( part.type ) {
+        case Shape2DType::Circle:        addCircleFixture( body, filter, part, rigidBody.isSensor() );   break;
+        case Shape2DType::Rect:         addRectFixture( body, filter, part, rigidBody.isSensor() );        break;
+        case Shape2DType::Polygon:      addPolygonFixture( body, filter, part, rigidBody.isSensor() );    break;
+        default:                        NIMBLE_BREAK;
+        }
+    }
 
     // Now set the mass
     updateMass( rigidBody, body->GetMass() );
 
-	// Attach created body to a component
-	rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );
+    // Attach created body to a component
+    rigidBody.setInternal<Internal>( DC_NEW Internal( body ) );
 }
 
 // ** Box2DPhysics::entityRemoved
 void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 {
     RigidBody2D* rigidBody = entity.get<RigidBody2D>();
-	Internal::Ptr physical = rigidBody->internal<Internal>();
-	NIMBLE_ABORT_IF( physical == NULL, "internal data should be valid" )
+    Internal::Ptr physical = rigidBody->internal<Internal>();
+    NIMBLE_ABORT_IF( physical == NULL, "internal data should be valid" )
 
-	b2Body* body = physical->m_body;
-	NIMBLE_ABORT_IF( body == NULL, "Box2D body should be valid" );
+    b2Body* body = physical->m_body;
+    NIMBLE_ABORT_IF( body == NULL, "Box2D body should be valid" );
 
     body->SetUserData( NULL );
     m_world->DestroyBody( body );
@@ -551,92 +551,92 @@ void Box2DPhysics::entityRemoved( const Ecs::Entity& entity )
 // ** Box2DPhysics::addCircleFixture
 b2Fixture* Box2DPhysics::addCircleFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
-	b2FixtureDef fixture;
-	b2CircleShape circle;
+    b2FixtureDef fixture;
+    b2CircleShape circle;
 
-	fixture.density = shape.material.density;
-	fixture.friction = shape.material.friction;
-	fixture.restitution = shape.material.restitution;
+    fixture.density = shape.material.density;
+    fixture.friction = shape.material.friction;
+    fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
     fixture.isSensor = isSensor;
 
-	circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
-	circle.m_radius = sizeToBox2D( shape.circle.radius );
-	fixture.shape = &circle;
+    circle.m_p = positionToBox2D( Vec3( shape.circle.x, shape.circle.y, 0.0f ) );
+    circle.m_radius = sizeToBox2D( shape.circle.radius );
+    fixture.shape = &circle;
 
-	b2Fixture* result = body->CreateFixture( &fixture );
+    b2Fixture* result = body->CreateFixture( &fixture );
     return result;
 }
 
 // ** Box2DPhysics::addRectFixture
 b2Fixture* Box2DPhysics::addRectFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
-	b2FixtureDef fixture;
-	b2PolygonShape polygon;
+    b2FixtureDef fixture;
+    b2PolygonShape polygon;
 
-	fixture.density = shape.material.density;
-	fixture.friction = shape.material.friction;
-	fixture.restitution = shape.material.restitution;
+    fixture.density = shape.material.density;
+    fixture.friction = shape.material.friction;
+    fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
     fixture.isSensor = isSensor;
 
-	polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
-	polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
-	fixture.shape = &polygon;
+    polygon.m_centroid = positionToBox2D( Vec3( shape.rect.x, shape.rect.y, 0.0f ) );
+    polygon.SetAsBox( sizeToBox2D( shape.rect.width * 0.5f ), sizeToBox2D( shape.rect.height * 0.5f ) );
+    fixture.shape = &polygon;
 
-	b2Fixture* result = body->CreateFixture( &fixture );
+    b2Fixture* result = body->CreateFixture( &fixture );
     return result;
 }
 
 // ** Box2DPhysics::addPolygonFixture
 b2Fixture* Box2DPhysics::addPolygonFixture( b2Body* body, b2Filter filter, const SimpleShape2D& shape, bool isSensor ) const
 {
-	b2FixtureDef fixture;
-	b2PolygonShape polygon;
+    b2FixtureDef fixture;
+    b2PolygonShape polygon;
 
-	fixture.density = shape.material.density;
-	fixture.friction = shape.material.friction;
-	fixture.restitution = shape.material.restitution;
+    fixture.density = shape.material.density;
+    fixture.friction = shape.material.friction;
+    fixture.restitution = shape.material.restitution;
     fixture.filter = filter;
     fixture.isSensor = isSensor;
 
-	Array<b2Vec2> points;
+    Array<b2Vec2> points;
 
-	for( u32 i = 0; i < shape.polygon.count; i++ ) {
-		b2Vec2 position = positionToBox2D( Vec3( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1], 0.0f ) );
-		points.push_back( position );
-	}
+    for( u32 i = 0; i < shape.polygon.count; i++ ) {
+        b2Vec2 position = positionToBox2D( Vec3( shape.polygon.vertices[i * 2 + 0], shape.polygon.vertices[i * 2 + 1], 0.0f ) );
+        points.push_back( position );
+    }
 
-	polygon.Set( &points[0], points.size() );
+    polygon.Set( &points[0], points.size() );
 
-	fixture.shape = &polygon;
+    fixture.shape = &polygon;
 
-	b2Fixture* result = body->CreateFixture( &fixture );
+    b2Fixture* result = body->CreateFixture( &fixture );
     return result;
 }
 
 // ** Box2DPhysics::positionFromBox2D
 Vec3 Box2DPhysics::positionFromBox2D( const b2Vec2& position ) const
 {
-	return Vec3( position.x, position.y, 0.0f ) * m_scalingFactors.distance;
+    return Vec3( position.x, position.y, 0.0f ) * m_scalingFactors.distance;
 }
 
 // ** Box2DPhysics::rotationFromBox2D
 f32 Box2DPhysics::rotationFromBox2D( f32 angle ) const
 {
-	return degrees( angle );
+    return degrees( angle );
 }
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec3& position ) const
 {
-	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
+    return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
 }
 
 // ** Box2DPhysics::positionToBox2D
 b2Vec2 Box2DPhysics::positionToBox2D( const Vec2& position ) const
 {
-	return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
+    return b2Vec2( position.x / m_scalingFactors.distance, position.y / m_scalingFactors.distance );
 }
 
 // ** Box2DPhysics::forceToBox2D
@@ -666,16 +666,16 @@ Vec2 Box2DPhysics::velocityFromBox2D( const b2Vec2& value ) const
 // ** Box2DPhysics::rotationToBox2D
 f32 Box2DPhysics::rotationToBox2D( f32 angle ) const
 {
-	return radians( -angle );
+    return radians( -angle );
 }
 
 // ** Box2DPhysics::sizeToBox2D
 f32 Box2DPhysics::sizeToBox2D( f32 value ) const
 {
-	return value / m_scalingFactors.distance;
+    return value / m_scalingFactors.distance;
 }
 
-#endif	/*	DC_BOX2D_ENABLED	*/
+#endif    /*    DC_BOX2D_ENABLED    */
 
 } // namespace Scene
 

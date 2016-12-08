@@ -58,7 +58,7 @@ namespace Sound {
         void                setPosition( const Vec3& value );
 
         //! Returns a pointer to an attached sound data.
-        SoundDataWPtr		sound( void ) const;
+        SoundDataWPtr        sound( void ) const;
 
         //! Pauses a sound playback with a given fade in time.
         /*!
@@ -109,13 +109,13 @@ namespace Sound {
     private:
 
         //! Hardware sound source used for sound playback.
-        SoundSourcePtr		m_source;
+        SoundSourcePtr        m_source;
 
         //! Fade instance to fade in/out sound volume.
         FaderPtr            m_volumeFader;
 
         //! Attached sound data, PCM sound samples are come from here.
-        SoundDataWPtr		m_sound;
+        SoundDataWPtr        m_sound;
 
         //! Sound channel volume.
         f32                 m_volume;

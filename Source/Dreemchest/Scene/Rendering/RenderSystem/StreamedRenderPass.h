@@ -33,9 +33,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Streamed render pass generates a mesh vertex and index buffers on a CPU side and submits it to GPU upon a state change.
-	class StreamedRenderPassBase : public RenderPassBase {
-	public:
+    //! Streamed render pass generates a mesh vertex and index buffers on a CPU side and submits it to GPU upon a state change.
+    class StreamedRenderPassBase : public RenderPassBase {
+    public:
 
                                         //! Constructs StreamedRenderPassBase instance.
                                         StreamedRenderPassBase( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch );
@@ -84,7 +84,7 @@ namespace Scene {
         //! Returns true if a batch can hold an additional amount of vertices.
         bool                            hasEnoughSpace( s32 additionalVertices ) const;
     
-	private:
+    private:
 
         //! A helper struct to hold an active batch state
         struct ActiveBatch {
@@ -105,52 +105,52 @@ namespace Scene {
             void*                       stream;                 //!< A batch vertex stream.
         };
 
-		RenderResource					m_vertexBuffer;		    //!< An intermediate vertex buffer used for batching.
+        RenderResource                    m_vertexBuffer;            //!< An intermediate vertex buffer used for batching.
         s32                             m_maxVerticesInBatch;   //! A maximum number of vertices that can be rendered in a single batch
         mutable ActiveBatch             m_activeBatch;          //!< An active batch state.
-	};
+    };
 
-	//! Generic render pass class.
-	template<typename TRenderable>
-	class StreamedRenderPass : public StreamedRenderPassBase {
-	public:
+    //! Generic render pass class.
+    template<typename TRenderable>
+    class StreamedRenderPass : public StreamedRenderPassBase {
+    public:
 
-							        //! Constructs StreamedRenderPass instance.
-							        StreamedRenderPass( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch );
+                                    //! Constructs StreamedRenderPass instance.
+                                    StreamedRenderPass( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch );
 
-		//! Processes an entity family and generates a vertex stream from it.
-		virtual void		        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) NIMBLE_OVERRIDE;
+        //! Processes an entity family and generates a vertex stream from it.
+        virtual void                emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) NIMBLE_OVERRIDE;
 
-	protected:
+    protected:
 
-		//! Emits render operation for a single renderable entity.
-		virtual void		        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const TRenderable& renderable, const Transform& transform ) NIMBLE_ABSTRACT;
+        //! Emits render operation for a single renderable entity.
+        virtual void                emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const TRenderable& renderable, const Transform& transform ) NIMBLE_ABSTRACT;
 
-	protected:
+    protected:
 
-		Ecs::IndexPtr		        m_index;        //!< Entity index to be processed.
-	};
+        Ecs::IndexPtr                m_index;        //!< Entity index to be processed.
+    };
 
-	// ** StreamedRenderPass::StreamedRenderPass
-	template<typename TRenderable>
-	StreamedRenderPass<TRenderable>::StreamedRenderPass( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch )
+    // ** StreamedRenderPass::StreamedRenderPass
+    template<typename TRenderable>
+    StreamedRenderPass<TRenderable>::StreamedRenderPass( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch )
         : StreamedRenderPassBase( context, renderScene, maxVerticesInBatch )
-	{
-		m_index = renderScene.scene()->ecs()->requestIndex( "StreamedRenderPass<>", Ecs::Aspect::all<TRenderable, Transform>() );
-	}
+    {
+        m_index = renderScene.scene()->ecs()->requestIndex( "StreamedRenderPass<>", Ecs::Aspect::all<TRenderable, Transform>() );
+    }
 
-	// ** StreamedRenderPass::emitRenderOperations
-	template<typename TRenderable>
-	void StreamedRenderPass<TRenderable>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack )
-	{
+    // ** StreamedRenderPass::emitRenderOperations
+    template<typename TRenderable>
+    void StreamedRenderPass<TRenderable>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack )
+    {
         // Get the entity set from index
-		const Ecs::EntitySet& entities = m_index->entities();
+        const Ecs::EntitySet& entities = m_index->entities();
 
         // Process each entity
-		for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-			emitRenderOperations( frame, commands, stateStack, *i->get(), *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
-		}
-	}
+        for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+            emitRenderOperations( frame, commands, stateStack, *i->get(), *(*i)->get<TRenderable>(), *(*i)->get<Transform>() );
+        }
+    }
 
 } // namespace Scene
 

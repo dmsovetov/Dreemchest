@@ -59,32 +59,32 @@ const PropertyModel::Properties& PropertyModel::properties( void ) const
 // ** PropertyModel::rowCount
 int PropertyModel::rowCount( const QModelIndex& parent ) const
 {
-	return 1;
+    return 1;
 }
 
 // ** PropertyModel::parent
 QModelIndex PropertyModel::parent( const QModelIndex& child ) const
 {
-	return QModelIndex();
+    return QModelIndex();
 }
 
 // ** PropertyModel::columnCount
 int PropertyModel::columnCount( const QModelIndex& parent ) const
 {
-	return properties().size();
+    return properties().size();
 }
 
 // ** PropertyModel::data
 QVariant PropertyModel::data( const QModelIndex& index, int role ) const
 {
-	int idx = index.column();
-	return QVariant::fromValue( m_properties[idx]->get( m_instance ) );
+    int idx = index.column();
+    return QVariant::fromValue( m_properties[idx]->get( m_instance ) );
 }
 
 // ** PropertyModel::setData
 bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
-	int     idx = index.column();
+    int     idx = index.column();
     Variant v   = qvariant_cast<Variant>( value );
 
     if( !v.isValid() ) {
@@ -92,17 +92,17 @@ bool PropertyModel::setData( const QModelIndex& index, const QVariant& value, in
         return false;
     }
 
-	if( m_properties[idx]->update( m_instance, v ) ) {
+    if( m_properties[idx]->update( m_instance, v ) ) {
         Q_EMIT propertyChanged();
     }
 
-	return true;
+    return true;
 }
 
 // ** PropertyModel::index
 QModelIndex PropertyModel::index( int row, int column, const QModelIndex& parent ) const
 {
-	return createIndex( row, column, ( void* )NULL );
+    return createIndex( row, column, ( void* )NULL );
 }
 
 DC_END_COMPOSER

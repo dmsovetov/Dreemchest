@@ -37,8 +37,8 @@ namespace Ecs {
     class Serializer : public Reflection::Serializer {
     public:
 
-		//! Function type used by a component converters.
-		typedef cClosure<KeyValue(const Variant&)> ComponentConverter;
+        //! Function type used by a component converters.
+        typedef cClosure<KeyValue(const Variant&)> ComponentConverter;
 
                                             //! Constructs Serializer instance.
                                             Serializer( EcsWPtr ecs, const Bitset& excluded = Bitset() );
@@ -55,22 +55,22 @@ namespace Ecs {
         //! Reads component instance from a key-value storage.
         void                                deserializeComponent( ComponentWPtr component, const KeyValue& ar ) const;
 
-		//! Registers a type converter.
-		template<typename TComponent>
-		void					            registerComponentConverter( const ComponentConverter& callback );
+        //! Registers a type converter.
+        template<typename TComponent>
+        void                                registerComponentConverter( const ComponentConverter& callback );
 
     protected:
 
         //! Searches for an entity by it's identifier.
         virtual EntityWPtr                  resolveEntity( const Guid& id ) const;
 
-	private:
+    private:
 
         //! Returns a component converter.
         ComponentConverter                  findComponentConverter( const String& name ) const;
 
-		//! Callback to access the default value of Entity flags property.
-		Variant								defaultEntityFlags( const KeyValue& ar ) const;
+        //! Callback to access the default value of Entity flags property.
+        Variant                                defaultEntityFlags( const KeyValue& ar ) const;
 
         //! Converts a Guid value to an entity reference.
         Variant                             convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
@@ -88,8 +88,8 @@ namespace Ecs {
 
     private:
 
-		//! Container type to store component conversions.
-		typedef HashMap<String32, ComponentConverter> ComponentConverters;
+        //! Container type to store component conversions.
+        typedef HashMap<String32, ComponentConverter> ComponentConverters;
 
         EcsWPtr                             m_ecs;                  //!< Parent Ecs instance.
         Bitset                              m_excluded;             //!< List of excluded components.
@@ -97,8 +97,8 @@ namespace Ecs {
     };
 
     // ** Serializer::registerComponentConverter
-	template<typename TComponent>
-	void Serializer::registerComponentConverter( const ComponentConverter& callback )
+    template<typename TComponent>
+    void Serializer::registerComponentConverter( const ComponentConverter& callback )
     {
         String32 hash( TypeInfo<TComponent>::name() );
         m_componentConverters[hash] = callback;

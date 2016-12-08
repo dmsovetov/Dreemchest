@@ -49,8 +49,8 @@ StandardSoundStream::StandardSoundStream( Io::StreamPtr stream ) : m_stream( str
 // ** StandardSoundStream::open
 ISoundStreamPtr StandardSoundStream::open( CString uri )
 {
-	Io::DiskFileSystem diskFileSystem;
-    Io::StreamPtr	   stream = diskFileSystem.openFile( uri );
+    Io::DiskFileSystem diskFileSystem;
+    Io::StreamPtr       stream = diskFileSystem.openFile( uri );
     return stream.valid() ? DC_NEW StandardSoundStream( stream ) : NULL;
 }
 
@@ -64,8 +64,8 @@ u32 StandardSoundStream::length( void ) const
 ISoundStreamPtr StandardSoundStream::loadToRam( void ) const
 {
     AutoPtr<u8> data = DC_NEW u8[m_stream->length()];
-	m_stream->read( data.get(), m_stream->length() );
-	return DC_NEW MemorySoundStream( Io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
+    m_stream->read( data.get(), m_stream->length() );
+    return DC_NEW MemorySoundStream( Io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
 }
 
 // ** StandardSoundStream::read
@@ -78,7 +78,7 @@ u32 StandardSoundStream::read( void* buffer, u32 size )
 void StandardSoundStream::setPosition( u32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-	case SeekSet: m_stream->setPosition( offset, Io::SeekSet ); break;
+    case SeekSet: m_stream->setPosition( offset, Io::SeekSet ); break;
     case SeekCur: m_stream->setPosition( offset, Io::SeekCur ); break;
     case SeekEnd: m_stream->setPosition( offset, Io::SeekEnd ); break;
     }
@@ -118,9 +118,9 @@ ISoundStreamPtr MemorySoundStream::loadToRam( void ) const
 // ** MemorySoundStream::read
 u32 MemorySoundStream::read( void* buffer, u32 size )
 {
-	if( m_data->bytesAvailable() < size ) {
-		return 0;
-	}
+    if( m_data->bytesAvailable() < size ) {
+        return 0;
+    }
 
     return m_data->read( buffer, size );
 }
@@ -129,7 +129,7 @@ u32 MemorySoundStream::read( void* buffer, u32 size )
 void MemorySoundStream::setPosition( u32 offset, SeekOrigin origin )
 {
     switch( origin ) {
-	case SeekSet: m_data->setPosition( offset, Io::SeekSet ); break;
+    case SeekSet: m_data->setPosition( offset, Io::SeekSet ); break;
     case SeekCur: m_data->setPosition( offset, Io::SeekCur ); break;
     case SeekEnd: m_data->setPosition( offset, Io::SeekEnd ); break;
     }

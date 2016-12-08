@@ -97,19 +97,19 @@ SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) c
 
     case SoundFormatWav:        return DC_NEW WavSoundDecoder;
     case SoundFormatMp3:
-								#ifdef MP3_FOUND
-									return DC_NEW Mp3SoundDecoder;
-								#else
-									LogWarning( "soundEngine", "%s", "MP3 sound decoder is not supported\n" );
-								#endif  /*  #ifdef MP3_FOUND  */
-								break;
+                                #ifdef MP3_FOUND
+                                    return DC_NEW Mp3SoundDecoder;
+                                #else
+                                    LogWarning( "soundEngine", "%s", "MP3 sound decoder is not supported\n" );
+                                #endif  /*  #ifdef MP3_FOUND  */
+                                break;
     case SoundFormatOgg:
-								#ifdef OGGVORBIS_FOUND
-									return DC_NEW OggSoundDecoder;
-								#else
-									LogWarning( "soundEngine", "%s", "Vorbis sound decoder is not supported\n" );
-								#endif  /*  #ifdef OGGVORBIS_FOUND  */
-								break;
+                                #ifdef OGGVORBIS_FOUND
+                                    return DC_NEW OggSoundDecoder;
+                                #else
+                                    LogWarning( "soundEngine", "%s", "Vorbis sound decoder is not supported\n" );
+                                #endif  /*  #ifdef OGGVORBIS_FOUND  */
+                                break;
     }
 
     return NULL;

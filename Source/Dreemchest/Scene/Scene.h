@@ -30,7 +30,7 @@
 #include "../Dreemchest.h"
 
 #if !DREEMCHEST_CPP11
-	#error C++11 should be enabled to use scene module.
+    #error C++11 should be enabled to use scene module.
 #endif
 
 #include <Platform/Platform.h>
@@ -89,13 +89,13 @@ namespace Scene {
 
     NIMBLE_LOGGER_TAG( Scene )
 
-	class Scene;
-	class RenderTarget;
+    class Scene;
+    class RenderTarget;
 
-	class Image;
-	class Mesh;
-	class Material;
-	class Terrain;
+    class Image;
+    class Mesh;
+    class Material;
+    class Terrain;
     class Prefab;
 
     dcDeclarePtrs( Ubershader )
@@ -115,10 +115,10 @@ namespace Scene {
     //! Render command buffer unique pointer type.
     typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
 
-	class Transform;
-	class StaticMesh;
-	class Sprite;
-	class Camera;
+    class Transform;
+    class StaticMesh;
+    class Sprite;
+    class Camera;
     class Viewport;
     class PointCloud;
 
@@ -347,55 +347,55 @@ namespace Scene {
         return 0;
     }
 
-	//! Available rendering modes.
+    //! Available rendering modes.
     NIMBLE_DECLARE_ENUM( RenderingMode, Opaque, Cutout, Translucent, Additive )
 
-	//! Available lighting models.
+    //! Available lighting models.
     NIMBLE_DECLARE_ENUM( LightingModel, Unlit, Ambient, Phong )
 
-	//! 3 coordinate plane types.
-	enum CoordinatePlane {
-		  PlaneXY				//!< The XY coordinate plane.
-		, PlaneYZ				//!< The YZ coordinate plane.
-		, PlaneXZ				//!< The XZ coordinate plane.
+    //! 3 coordinate plane types.
+    enum CoordinatePlane {
+          PlaneXY                //!< The XY coordinate plane.
+        , PlaneYZ                //!< The YZ coordinate plane.
+        , PlaneXZ                //!< The XZ coordinate plane.
 
-		, TotalCoordinatePlanes	//!< The total number of coordinate planes.
-	};
+        , TotalCoordinatePlanes    //!< The total number of coordinate planes.
+    };
 
-	//! Coordinate plane bit masks.
-	enum CoordinatePlaneBit {
-		  PlaneXYBit	= BIT( PlaneXY )	//!< The XY coordinate plane bit mask.
-		, PlaneYZBit	= BIT( PlaneYZ )	//!< The YZ coordinate plane bit mask.
-		, PlaneXZBit	= BIT( PlaneXZ )	//!< The XZ coordinate plane bit mask.
-	};
+    //! Coordinate plane bit masks.
+    enum CoordinatePlaneBit {
+          PlaneXYBit    = BIT( PlaneXY )    //!< The XY coordinate plane bit mask.
+        , PlaneYZBit    = BIT( PlaneYZ )    //!< The YZ coordinate plane bit mask.
+        , PlaneXZBit    = BIT( PlaneXZ )    //!< The XZ coordinate plane bit mask.
+    };
 
-	// Alias the Ecs::Entity type
-	typedef StrongPtr<Ecs::Entity>	SceneObjectPtr;
-	typedef WeakPtr<Ecs::Entity>	SceneObjectWPtr;
-	typedef Ecs::EntityId			SceneObjectId;
+    // Alias the Ecs::Entity type
+    typedef StrongPtr<Ecs::Entity>    SceneObjectPtr;
+    typedef WeakPtr<Ecs::Entity>    SceneObjectWPtr;
+    typedef Ecs::EntityId            SceneObjectId;
 
-	dcDeclarePtrs( Scene )
-	dcDeclareNamedPtrs( AbstractViewport, Viewport )
-	dcDeclarePtrs( WindowViewport )
-	dcDeclarePtrs( Transform )
-	dcDeclarePtrs( Camera )
-	dcDeclarePtrs( StaticMesh )
-	dcDeclarePtrs( Light )
+    dcDeclarePtrs( Scene )
+    dcDeclareNamedPtrs( AbstractViewport, Viewport )
+    dcDeclarePtrs( WindowViewport )
+    dcDeclarePtrs( Transform )
+    dcDeclarePtrs( Camera )
+    dcDeclarePtrs( StaticMesh )
+    dcDeclarePtrs( Light )
 
-	dcDeclarePtrs( Physics2D )
-	dcDeclarePtrs( RigidBody2D )
+    dcDeclarePtrs( Physics2D )
+    dcDeclarePtrs( RigidBody2D )
 
-	dcDeclarePtrs( RenderingContext )
+    dcDeclarePtrs( RenderingContext )
     dcDeclarePtrs( RenderScene )
     dcDeclarePtrs( Rvm )
 
-	dcDeclarePtrs( Vec3Binding )
+    dcDeclarePtrs( Vec3Binding )
 
     //! An input system unique pointer type
     typedef AutoPtr<class InputSystemBase> InputSystemPtr;
 
-	//! Container type to store a set of scene objects.
-	typedef Set<SceneObjectPtr> SceneObjectSet;
+    //! Container type to store a set of scene objects.
+    typedef Set<SceneObjectPtr> SceneObjectSet;
 
     //! Asset manager used by scene module.
     class Resources : public Assets::Assets {
@@ -417,33 +417,33 @@ namespace Scene {
         static s32      bytesAllocatedForMaterial( const Material& asset );
     };
 
-	//! The root class for a scene subsystem.
-	class Scene : public InjectEventEmitter<RefCounted> {
-	public:
+    //! The root class for a scene subsystem.
+    class Scene : public InjectEventEmitter<RefCounted> {
+    public:
 
-		//! Performs a scene update.
-		void							update( u32 currentTime, f32 dt );
+        //! Performs a scene update.
+        void                            update( u32 currentTime, f32 dt );
 
-		//! Creates a new scene object instance.
-		SceneObjectPtr					createSceneObject( void );
+        //! Creates a new scene object instance.
+        SceneObjectPtr                    createSceneObject( void );
 
-		//! Adds new scene object to scene.
-		void							addSceneObject( const SceneObjectPtr& sceneObject );
+        //! Adds new scene object to scene.
+        void                            addSceneObject( const SceneObjectPtr& sceneObject );
 
-		//! Removes scene object to scene.
-		void							removeSceneObject( const SceneObjectPtr& sceneObject );
+        //! Removes scene object to scene.
+        void                            removeSceneObject( const SceneObjectPtr& sceneObject );
 
-		//! Creates a new scene object instance.
-		SceneObjectPtr					createSceneObject( const SceneObjectId& id );
+        //! Creates a new scene object instance.
+        SceneObjectPtr                    createSceneObject( const SceneObjectId& id );
 
-		//! Returns the scene object with specified id.
-		SceneObjectPtr					findSceneObject( const SceneObjectId& id ) const;
+        //! Returns the scene object with specified id.
+        SceneObjectPtr                    findSceneObject( const SceneObjectId& id ) const;
 
-		//! Returns the list of scene object with specified name.
-		SceneObjectSet					findAllWithName( const String& name ) const;
+        //! Returns the list of scene object with specified name.
+        SceneObjectSet                    findAllWithName( const String& name ) const;
 
-		//! Returns a list of scene objects that match a specified aspect.
-		SceneObjectSet					findByAspect( const Ecs::Aspect& aspect ) const;
+        //! Returns a list of scene objects that match a specified aspect.
+        SceneObjectSet                    findByAspect( const Ecs::Aspect& aspect ) const;
 
         //! Returns internal entity component system instance.
         Ecs::EcsWPtr                    ecs( void ) const;
@@ -451,74 +451,74 @@ namespace Scene {
         //! Returns spatial index built for this scene.
         const Spatial*                  spatial( void ) const;
 
-		//! Returns a scene system of specified type.
-		template<typename TSystem>
-		WeakPtr<TSystem>				system( void ) const;
+        //! Returns a scene system of specified type.
+        template<typename TSystem>
+        WeakPtr<TSystem>                system( void ) const;
 
-		//! Adds a new system to the scene.
-		template<typename TSystem, typename ... Args>
-		WeakPtr<TSystem>				addSystem( const Args& ... args );
+        //! Adds a new system to the scene.
+        template<typename TSystem, typename ... Args>
+        WeakPtr<TSystem>                addSystem( const Args& ... args );
 
         //! Adds a new input system to a scene.
-		template<typename TSystem, typename ... Args>
-		void				            addInputSystem( const Args& ... args );
+        template<typename TSystem, typename ... Args>
+        void                            addInputSystem( const Args& ... args );
 
-		//! Creates an empty scene.
-		static ScenePtr					create( void );
+        //! Creates an empty scene.
+        static ScenePtr                    create( void );
 
-		//! Creates scene and loads it from JSON file.
-		static ScenePtr					createFromFile( const Resources& assets, const String& fileName );
+        //! Creates scene and loads it from JSON file.
+        static ScenePtr                    createFromFile( const Resources& assets, const String& fileName );
 
-		//! Creates scene and loads it from JSON string.
-		static ScenePtr					createFromJson( const Resources& assets, const String& json );
+        //! Creates scene and loads it from JSON string.
+        static ScenePtr                    createFromJson( const Resources& assets, const String& json );
 
-		//! This event is emitted when a new scene object was added.
-		struct SceneObjectAdded {
-										SceneObjectAdded( SceneObjectPtr sceneObject )
-											: sceneObject( sceneObject ) {}
-			SceneObjectPtr				sceneObject;	//!< The scene object that was added.
-		};
+        //! This event is emitted when a new scene object was added.
+        struct SceneObjectAdded {
+                                        SceneObjectAdded( SceneObjectPtr sceneObject )
+                                            : sceneObject( sceneObject ) {}
+            SceneObjectPtr                sceneObject;    //!< The scene object that was added.
+        };
 
-		//! This event is emitted when the scene object was removed.
-		struct SceneObjectRemoved {
-										SceneObjectRemoved( SceneObjectPtr sceneObject )
-											: sceneObject( sceneObject ) {}
-			SceneObjectPtr				sceneObject;	//!< The scene object that was removed.		
-		};
+        //! This event is emitted when the scene object was removed.
+        struct SceneObjectRemoved {
+                                        SceneObjectRemoved( SceneObjectPtr sceneObject )
+                                            : sceneObject( sceneObject ) {}
+            SceneObjectPtr                sceneObject;    //!< The scene object that was removed.        
+        };
 
-	private:
+    private:
 
-										//! Constructs a Scene instance.
-										Scene( void );
+                                        //! Constructs a Scene instance.
+                                        Scene( void );
 
-	private:
+    private:
 
-		Ecs::EcsPtr						m_ecs;				//!< Internal entity component system.
-		Ecs::SystemGroupPtr				m_updateSystems;	//!< Update systems group.
+        Ecs::EcsPtr                        m_ecs;                //!< Internal entity component system.
+        Ecs::SystemGroupPtr                m_updateSystems;    //!< Update systems group.
         Array<InputSystemPtr>           m_inputSystems;     //!< User input processing systems.
-		Ecs::IndexPtr					m_named;			//!< All named entities that reside in scene stored inside this family.
+        Ecs::IndexPtr                    m_named;            //!< All named entities that reside in scene stored inside this family.
         SpatialUPtr                     m_spatial;          //!< Scene spatial index.
-	};
+    };
 
-	// ** Scene::addSystem
-	template<typename TSystem, typename ... Args>
-	WeakPtr<TSystem> Scene::addSystem( const Args& ... args )
-	{
-		WeakPtr<TSystem> system = m_updateSystems->add<TSystem>( args... );
-		m_ecs->rebuildIndices();
-		return system;
-	}
+    // ** Scene::addSystem
+    template<typename TSystem, typename ... Args>
+    WeakPtr<TSystem> Scene::addSystem( const Args& ... args )
+    {
+        WeakPtr<TSystem> system = m_updateSystems->add<TSystem>( args... );
+        m_ecs->rebuildIndices();
+        return system;
+    }
 
-	// ** Scene::system
-	template<typename TSystem>
-	WeakPtr<TSystem> Scene::system( void ) const
-	{
-		return m_updateSystems->get<TSystem>();
-	}
+    // ** Scene::system
+    template<typename TSystem>
+    WeakPtr<TSystem> Scene::system( void ) const
+    {
+        return m_updateSystems->get<TSystem>();
+    }
 
     // ** Scene::addInputSystem
-	template<typename TSystem, typename ... Args>
-	void Scene::addInputSystem( const Args& ... args )
+    template<typename TSystem, typename ... Args>
+    void Scene::addInputSystem( const Args& ... args )
     {
         m_inputSystems.push_back( DC_NEW TSystem( *this, args... ) );
     }
@@ -562,151 +562,151 @@ namespace Scene {
 #ifdef JSON_FOUND
 
     //! Base class for all JSON object loaders.
-	class JsonLoaderBase {
-	public:
+    class JsonLoaderBase {
+    public:
 
-		//! Object loader type.
-		typedef cClosure<bool(const Json::Value&)>	Loader;
+        //! Object loader type.
+        typedef cClosure<bool(const Json::Value&)>    Loader;
 
-		virtual						~JsonLoaderBase( void ) {}
+        virtual                        ~JsonLoaderBase( void ) {}
 
-		//! Registers a new object loader.
-		void						registerLoader( const String& name, const Loader& loader );
+        //! Registers a new object loader.
+        void                        registerLoader( const String& name, const Loader& loader );
 
-		//! Loads objects from JSON string.
-		bool						load( const String& json );
+        //! Loads objects from JSON string.
+        bool                        load( const String& json );
 
-	protected:
+    protected:
 
-		//! Reads the Vec3 from a JSON object.
-		static Vec3					readVec3( const Json::Value& value );
+        //! Reads the Vec3 from a JSON object.
+        static Vec3                    readVec3( const Json::Value& value );
 
-		//! Reads the Rect from a JSON object.
-		static Rect					readRect( const Json::Value& value );
+        //! Reads the Rect from a JSON object.
+        static Rect                    readRect( const Json::Value& value );
 
-		//! Reads the Rgba from JSON object.
-		static Rgba					readRgba( const Json::Value& value );
+        //! Reads the Rgba from JSON object.
+        static Rgba                    readRgba( const Json::Value& value );
 
-		//! Reads the Rgba from JSON object.
-		static Rgb					readRgb( const Json::Value& value );
+        //! Reads the Rgba from JSON object.
+        static Rgb                    readRgb( const Json::Value& value );
 
-		//! Reads the Quat from JSON object.
-		static Quat					readQuat( const Json::Value& value );
+        //! Reads the Quat from JSON object.
+        static Quat                    readQuat( const Json::Value& value );
 
-		//! Reads the array of floats from JSON object.
-		static Array<f32>			readFloats( const Json::Value& value );
+        //! Reads the array of floats from JSON object.
+        static Array<f32>            readFloats( const Json::Value& value );
 
-	private:
+    private:
 
-		//! Constructs an object from JSON object.
-		bool						constructObject( const String& name, const Json::Value& value );
+        //! Constructs an object from JSON object.
+        bool                        constructObject( const String& name, const Json::Value& value );
 
-	private:
+    private:
 
-		//! Container type to store loaders by type name.
-		typedef Map<String, Loader>	Loaders;
+        //! Container type to store loaders by type name.
+        typedef Map<String, Loader>    Loaders;
 
-		Loaders						m_loaders;	//!< Object loaders.
-		Json::Value					m_json;		//!< Parsed JSON object.
-	};
+        Loaders                        m_loaders;    //!< Object loaders.
+        Json::Value                    m_json;        //!< Parsed JSON object.
+    };
 
-	//! Loads the scene from JSON file.
-	class JsonSceneLoader : public JsonLoaderBase {
-	public:
+    //! Loads the scene from JSON file.
+    class JsonSceneLoader : public JsonLoaderBase {
+    public:
 
-									//! Constructs the JsonSceneLoader instance.
-									JsonSceneLoader( const Resources& assets );
+                                    //! Constructs the JsonSceneLoader instance.
+                                    JsonSceneLoader( const Resources& assets );
 
-		//! Loads the scene from string.
-		bool						load( ScenePtr scene, const String& json );
+        //! Loads the scene from string.
+        bool                        load( ScenePtr scene, const String& json );
 
-	private:
+    private:
 
-		//! Returns the scene object by it's id.
-		Ecs::EntityPtr				requestSceneObject( const String& id );
+        //! Returns the scene object by it's id.
+        Ecs::EntityPtr                requestSceneObject( const String& id );
 
-		//! Returns the component by it's id.
-		Ecs::ComponentPtr			requestComponent( const String& id );
+        //! Returns the component by it's id.
+        Ecs::ComponentPtr            requestComponent( const String& id );
 
-		//! Reads the Transform component from JSON object.
-		Ecs::ComponentPtr			readTransform( const Json::Value& value );
+        //! Reads the Transform component from JSON object.
+        Ecs::ComponentPtr            readTransform( const Json::Value& value );
 
-		//! Reads the Renderer component from JSON object.
-		Ecs::ComponentPtr			readRenderer( const Json::Value& value );
+        //! Reads the Renderer component from JSON object.
+        Ecs::ComponentPtr            readRenderer( const Json::Value& value );
 
-		//! Reads the Camera component from JSON object.
-		Ecs::ComponentPtr			readCamera( const Json::Value& value );
+        //! Reads the Camera component from JSON object.
+        Ecs::ComponentPtr            readCamera( const Json::Value& value );
 
-		//! Reads the Light component from JSON object.
-		Ecs::ComponentPtr			readLight( const Json::Value& value );
+        //! Reads the Light component from JSON object.
+        Ecs::ComponentPtr            readLight( const Json::Value& value );
 
-		//! Reads the Particles component from JSON object.
-		Ecs::ComponentPtr			readParticles( const Json::Value& value );
+        //! Reads the Particles component from JSON object.
+        Ecs::ComponentPtr            readParticles( const Json::Value& value );
 
-		//! Reads the shape module from JSON object.
-		bool						readModuleShape( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the shape module from JSON object.
+        bool                        readModuleShape( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the color module from JSON object.
-		bool						readModuleColor( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the color module from JSON object.
+        bool                        readModuleColor( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the emission module from JSON object.
-		bool						readModuleEmission( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the emission module from JSON object.
+        bool                        readModuleEmission( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the size module from JSON object.
-		bool						readModuleSize( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the size module from JSON object.
+        bool                        readModuleSize( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the rotation module from JSON object.
-		bool						readModuleAngularVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the rotation module from JSON object.
+        bool                        readModuleAngularVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the acceleration module from JSON object.
-		bool						readModuleAcceleration( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the acceleration module from JSON object.
+        bool                        readModuleAcceleration( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the velocity module from JSON object.
-		bool						readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the velocity module from JSON object.
+        bool                        readModuleVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the limit velocity module from JSON object.
-		bool						readModuleLimitVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the limit velocity module from JSON object.
+        bool                        readModuleLimitVelocity( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the initial module from JSON object.
-		bool						readModuleInitial( Fx::ParticlesWPtr particles, const Json::Value& object );
+        //! Reads the initial module from JSON object.
+        bool                        readModuleInitial( Fx::ParticlesWPtr particles, const Json::Value& object );
 
-		//! Reads the color parameter from JSON object.
-		void						readColorParameter( Fx::RgbParameter& parameter, const Json::Value& object );
+        //! Reads the color parameter from JSON object.
+        void                        readColorParameter( Fx::RgbParameter& parameter, const Json::Value& object );
 
-		//! Reads the scalar parameter from JSON object.
-		void						readScalarParameter( Fx::FloatParameter& parameter, const Json::Value& object );
+        //! Reads the scalar parameter from JSON object.
+        void                        readScalarParameter( Fx::FloatParameter& parameter, const Json::Value& object );
 
-	private:
+    private:
 
-		//! Component loader type.
-		typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
+        //! Component loader type.
+        typedef cClosure<Ecs::ComponentPtr(const Json::Value&)> ComponentLoader;
 
-		//! Particle system module loader
-		typedef cClosure<bool(Fx::ParticlesWPtr, const Json::Value&)> ModuleLoader;
+        //! Particle system module loader
+        typedef cClosure<bool(Fx::ParticlesWPtr, const Json::Value&)> ModuleLoader;
 
-		//! Container type to store particle module loaders.
-		typedef Map<String, ModuleLoader>	ModuleLoaders;
+        //! Container type to store particle module loaders.
+        typedef Map<String, ModuleLoader>    ModuleLoaders;
 
-		//! Container to store all available component loaders.
-		typedef Map<String, ComponentLoader> ComponentLoaders;
+        //! Container to store all available component loaders.
+        typedef Map<String, ComponentLoader> ComponentLoaders;
 
-		//! Container type to store parsed scene objects.
-		typedef Map<String, Ecs::EntityPtr> SceneObjects;
+        //! Container type to store parsed scene objects.
+        typedef Map<String, Ecs::EntityPtr> SceneObjects;
 
-		//! Container type to store parsed components.
-		typedef Map<String, Ecs::ComponentPtr> Components;
+        //! Container type to store parsed components.
+        typedef Map<String, Ecs::ComponentPtr> Components;
 
-		const Resources&	        m_assets;					//!< Available assets.
-		Json::Value					m_json;						//!< Parsed JSON.
-		ScenePtr					m_scene;					//!< The scene to be loaded.
-		SceneObjects				m_sceneObjects;				//!< Parsed scene objects.
-		Components					m_components;				//!< Parsed components.
-		ComponentLoaders			m_loaders;					//!< Available component loaders.
-		ModuleLoaders				m_moduleLoaders;			//!< Available module loaders.
-		Fx::IMaterialFactoryPtr		m_particleMaterialFactory;	//!< Constructs particle system materials.
-	};
+        const Resources&            m_assets;                    //!< Available assets.
+        Json::Value                    m_json;                        //!< Parsed JSON.
+        ScenePtr                    m_scene;                    //!< The scene to be loaded.
+        SceneObjects                m_sceneObjects;                //!< Parsed scene objects.
+        Components                    m_components;                //!< Parsed components.
+        ComponentLoaders            m_loaders;                    //!< Available component loaders.
+        ModuleLoaders                m_moduleLoaders;            //!< Available module loaders.
+        Fx::IMaterialFactoryPtr        m_particleMaterialFactory;    //!< Constructs particle system materials.
+    };
 
-#endif	/*	#ifdef JSON_FOUND	*/
+#endif    /*    #ifdef JSON_FOUND    */
 
 #endif  /*  #if DEV_DEPRECATED_SCENE_SERIALIZATION    */
 
@@ -716,27 +716,27 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
     #include "Spatial/Spatial.h"
-	#include "Components/Rendering.h"
-	#include "Components/Transform.h"
-	#include "Components/Physics.h"
+    #include "Components/Rendering.h"
+    #include "Components/Transform.h"
+    #include "Components/Physics.h"
     #include "Components/Debug.h"
-	#include "Assets/Mesh.h"
-	#include "Assets/Material.h"
-	#include "Assets/Image.h"
-	#include "Assets/Terrain.h"
+    #include "Assets/Mesh.h"
+    #include "Assets/Material.h"
+    #include "Assets/Image.h"
+    #include "Assets/Terrain.h"
     #include "Assets/Prefab.h"
     #include "Assets/AssetFileSources.h"
     #include "Assets/AssetGenerators.h"
-	#include "Systems/InputSystems.h"
-	#include "Systems/TransformSystems.h"
-	#include "Systems/Physics2D.h"
-	#include "Systems/CullingSystems.h"
+    #include "Systems/InputSystems.h"
+    #include "Systems/TransformSystems.h"
+    #include "Systems/Physics2D.h"
+    #include "Systems/CullingSystems.h"
     #include "Rendering/RenderScene.h"
     #include "Rendering/RenderCache.h"
     #include "Rendering/Rvm/RenderingContext.h"
     #include "Rendering/Rvm/Rvm.h"
     #include "Rendering/Debug/ForwardRenderSystem.h"
-	#include "Rendering/Debug/SpriteRenderSystem.h"
+    #include "Rendering/Debug/SpriteRenderSystem.h"
     #include "Rendering/Debug/DebugRenderSystem.h"
 #endif
 

@@ -33,57 +33,57 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! 2D image data
-	class Image {
-	public:
+    //! 2D image data
+    class Image {
+    public:
 
-								//! Constructs an empty Image instance.
-								Image( void );
+                                //! Constructs an empty Image instance.
+                                Image( void );
 
-		//! Returns image width.
-		s32						width( void ) const;
+        //! Returns image width.
+        s32                        width( void ) const;
 
-		//! Sets image width.
-		void					setWidth( s32 value );
+        //! Sets image width.
+        void                    setWidth( s32 value );
 
-		//! Returns image height.
-		s32						height( void ) const;
+        //! Returns image height.
+        s32                        height( void ) const;
 
-		//! Sets image height.
-		void					setHeight( s32 value );
+        //! Sets image height.
+        void                    setHeight( s32 value );
 
-		//! Returns the bytes per pixel value.
-		s32						bytesPerPixel( void ) const;
+        //! Returns the bytes per pixel value.
+        s32                        bytesPerPixel( void ) const;
 
-		//! Sets the bytes per pixel value.
-		void					setBytesPerPixel( s32 value );
+        //! Sets the bytes per pixel value.
+        void                    setBytesPerPixel( s32 value );
 
-		//! Returns the total number of mip levels.
-		s32						mipLevelCount( void ) const;
+        //! Returns the total number of mip levels.
+        s32                        mipLevelCount( void ) const;
 
-		//! Sets the total number of mip levels.
-		void					setMipLevelCount( s32 value );
+        //! Sets the total number of mip levels.
+        void                    setMipLevelCount( s32 value );
 
-		//! Returns image pixels at specified mip level.
-		const ByteArray&		mipLevel( s32 index ) const;
+        //! Returns image pixels at specified mip level.
+        const ByteArray&        mipLevel( s32 index ) const;
 
-		//! Set image pixels at specified mip level.
-		void					setMipLevel( s32 index, const ByteArray& value );
+        //! Set image pixels at specified mip level.
+        void                    setMipLevel( s32 index, const ByteArray& value );
 
-		//! Returns the mip level width.
-		s32						mipLevelWidth( s32 index ) const;
+        //! Returns the mip level width.
+        s32                        mipLevelWidth( s32 index ) const;
 
-		//! Returns the mip level height.
-		s32						mipLevelHeight( s32 index ) const;
+        //! Returns the mip level height.
+        s32                        mipLevelHeight( s32 index ) const;
 
-	private:
+    private:
 
-		s32						m_width;			//!< Image base mip level width.
-		s32						m_height;			//!< Image base mip level height.
-		s32						m_bytesPerPixel;	//!< Number of bytes used to encode a single image pixel.
-		u8						m_channels;			//!< Image channels.
-		Array<ByteArray>		m_mips;				//!< Actual image pixels.
-	};
+        s32                        m_width;            //!< Image base mip level width.
+        s32                        m_height;            //!< Image base mip level height.
+        s32                        m_bytesPerPixel;    //!< Number of bytes used to encode a single image pixel.
+        u8                        m_channels;            //!< Image channels.
+        Array<ByteArray>        m_mips;                //!< Actual image pixels.
+    };
 
 } // namespace Scene
 

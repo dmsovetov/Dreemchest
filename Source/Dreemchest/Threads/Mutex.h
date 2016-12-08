@@ -78,7 +78,7 @@ namespace Threads {
 
     private:
 
-        MutexWPtr	m_mutex;
+        MutexWPtr    m_mutex;
     };
 
 } // namespace Threads

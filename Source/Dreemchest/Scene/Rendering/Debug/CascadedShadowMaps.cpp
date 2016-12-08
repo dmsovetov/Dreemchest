@@ -68,9 +68,9 @@ void CascadedShadowMaps::calculate( f32 fov, f32 near, f32 far, f32 aspect, f32 
         Cascade& cascade = m_cascades[i];
 
         // Calculate near and far planes for this cascade
-        f32 k	= (i + 1) / static_cast<f32>( count );
-		f32 CLi	= near * powf( far / near, k );
-		f32 CUi	= near + (far - near) * k;
+        f32 k    = (i + 1) / static_cast<f32>( count );
+        f32 CLi    = near * powf( far / near, k );
+        f32 CUi    = near + (far - near) * k;
 
         cascade.near = (i == 0) ? near : m_cascades[i - 1].far;
         cascade.far  = lerp( CUi, CLi, lambda );
@@ -189,17 +189,17 @@ Matrix4 CascadedShadowMaps::calculateViewProjection( const BoundingVolume& world
 Matrix4 CascadedShadowMaps::fixSubTexel( const Matrix4& viewProjection, const Matrix4& projection ) const
 {
     // Transform an origin to a light projection space
-	Vec3 zero = viewProjection * Vec3::zero();
+    Vec3 zero = viewProjection * Vec3::zero();
 
-	f32 sh = m_textureSize * 0.5f;
-	f32 tx = zero.x * sh;
-	f32 ty = zero.y * sh;
+    f32 sh = m_textureSize * 0.5f;
+    f32 tx = zero.x * sh;
+    f32 ty = zero.y * sh;
 
-	f32 dx = ( floor( tx ) - tx ) / sh;
-	f32 dy = ( floor( ty ) - ty ) / sh;
+    f32 dx = ( floor( tx ) - tx ) / sh;
+    f32 dy = ( floor( ty ) - ty ) / sh;
 
     // Compute the final projection matrix
-	return Matrix4::translation( dx, dy, 0.0f ) * projection;
+    return Matrix4::translation( dx, dy, 0.0f ) * projection;
 }
 
 } // namespace Scene

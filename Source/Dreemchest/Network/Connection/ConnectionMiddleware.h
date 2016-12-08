@@ -33,90 +33,90 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! A connection middleware is a piece of connection processing logic.
-	class ConnectionMiddleware {
-	friend class Connection_;
-	public:
+    //! A connection middleware is a piece of connection processing logic.
+    class ConnectionMiddleware {
+    friend class Connection_;
+    public:
 
-		virtual				~ConnectionMiddleware( void ) {}
+        virtual                ~ConnectionMiddleware( void ) {}
 
-		//! Abstract method to run a custom logic while updating a connection instance.
-		virtual void		update( u32 dt ) = 0;
+        //! Abstract method to run a custom logic while updating a connection instance.
+        virtual void        update( u32 dt ) = 0;
 
-	private:
+    private:
 
-		//! Sets the parent connection instance.
-		void				setConnection( Connection* value );
+        //! Sets the parent connection instance.
+        void                setConnection( Connection* value );
 
-	protected:
+    protected:
 
-		Connection*			m_connection;	//!< Parent connection instance.
-	};
+        Connection*            m_connection;    //!< Parent connection instance.
+    };
 
-	//! Base class for all middlewares that send packets with a specified interval of time.
-	class PacketSendingMiddleware : public ConnectionMiddleware {
-	public:
+    //! Base class for all middlewares that send packets with a specified interval of time.
+    class PacketSendingMiddleware : public ConnectionMiddleware {
+    public:
 
-							//! Constructs the PacketSendingMiddleware instance.
-							PacketSendingMiddleware( u32 interval );
+                            //! Constructs the PacketSendingMiddleware instance.
+                            PacketSendingMiddleware( u32 interval );
 
-	protected:
+    protected:
 
-		//! Updates the time accumulator and returns true if the packet should be sent.
-		bool				accumulateTime( u32 dt );
+        //! Updates the time accumulator and returns true if the packet should be sent.
+        bool                accumulateTime( u32 dt );
 
-	protected:
+    protected:
 
-		u32					m_interval;		//!< The packet interval.
-		u32					m_accumulator;	//!< The accumulated time.
-	};
+        u32                    m_interval;        //!< The packet interval.
+        u32                    m_accumulator;    //!< The accumulated time.
+    };
 
-	//! Middleware to ping the connection with a specified interval of time.
-	class PingInterval : public PacketSendingMiddleware {
-	public:
+    //! Middleware to ping the connection with a specified interval of time.
+    class PingInterval : public PacketSendingMiddleware {
+    public:
 
-							//! Constructs the PingInterval instance.
-							PingInterval( u32 interval = 1000, s32 iterations = 1 );
+                            //! Constructs the PingInterval instance.
+                            PingInterval( u32 interval = 1000, s32 iterations = 1 );
 
-	protected:
+    protected:
 
-		//! Sends the Ping packet over a connection when the specified amount of time passed.
-		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
+        //! Sends the Ping packet over a connection when the specified amount of time passed.
+        virtual void        update( u32 dt ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		s32					m_iterations;	//!< The total number of ping iterations to perform.
-	};
+        s32                    m_iterations;    //!< The total number of ping iterations to perform.
+    };
 
-	//! Middleware to send the KeepAlive packet with a specified interval of time.
-	class KeepAliveInterval : public PacketSendingMiddleware {
-	public:
+    //! Middleware to send the KeepAlive packet with a specified interval of time.
+    class KeepAliveInterval : public PacketSendingMiddleware {
+    public:
 
-							//! Constructs the KeepAliveInterval instance.
-							KeepAliveInterval( u32 interval = 1000 );
+                            //! Constructs the KeepAliveInterval instance.
+                            KeepAliveInterval( u32 interval = 1000 );
 
-	protected:
+    protected:
 
-		//! Sends the KeepAlive packet over a connection when the specified amount of time passed.
-		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
-	};
+        //! Sends the KeepAlive packet over a connection when the specified amount of time passed.
+        virtual void        update( u32 dt ) NIMBLE_OVERRIDE;
+    };
 
-	//! Middleware to close the connection on time out.
-	class CloseOnTimeout : public ConnectionMiddleware {
-	public:
+    //! Middleware to close the connection on time out.
+    class CloseOnTimeout : public ConnectionMiddleware {
+    public:
 
-							//! Constructs the CloseOnTimeout instance.
-							CloseOnTimeout( s32 interval );
+                            //! Constructs the CloseOnTimeout instance.
+                            CloseOnTimeout( s32 interval );
 
-	protected:
+    protected:
 
-		//! Closes the connection instance if there are no packets received in a specified interval of time.
-		virtual void		update( u32 dt ) NIMBLE_OVERRIDE;
+        //! Closes the connection instance if there are no packets received in a specified interval of time.
+        virtual void        update( u32 dt ) NIMBLE_OVERRIDE;
 
-	protected:
+    protected:
 
-		s32					m_interval;	//!< The connection time out value.
-	};
+        s32                    m_interval;    //!< The connection time out value.
+    };
 
 } // namespace Network
 

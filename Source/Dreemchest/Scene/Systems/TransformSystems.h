@@ -35,75 +35,75 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Affine transform system calculates the transformation matricies for all transform components.
-	class AffineTransformSystem : public Ecs::GenericEntitySystem<AffineTransformSystem, Transform> {
+    //! Affine transform system calculates the transformation matricies for all transform components.
+    class AffineTransformSystem : public Ecs::GenericEntitySystem<AffineTransformSystem, Transform> {
     protected:
 
-		//! Calculates the affine transform matrix for each transform component.
-		virtual void		update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
+        //! Calculates the affine transform matrix for each transform component.
+        virtual void        update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		//! Called when entity was added.
-		virtual void		entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
+        //! Called when entity was added.
+        virtual void        entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
 
-		//! Called when entity was removed.
-		virtual void		entityRemoved( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
+        //! Called when entity was removed.
+        virtual void        entityRemoved( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		Array<Transform*>	m_transforms;	//!< Active scene transform components.
-	};
+        Array<Transform*>    m_transforms;    //!< Active scene transform components.
+    };
 
-	//! World space bounding box system calculates bounding volumes for static meshes in scene.
-	class WorldSpaceBoundingBoxSystem : public Ecs::GenericEntitySystem<WorldSpaceBoundingBoxSystem, StaticMesh, Transform> {
-	protected:
-
-		//! Calculates the world space bounds for static mesh.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
-	};
-
-	//! Moves scene object transform along coordinate axes.
-	class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxesSystem, MoveAlongAxes, Transform> {
+    //! World space bounding box system calculates bounding volumes for static meshes in scene.
+    class WorldSpaceBoundingBoxSystem : public Ecs::GenericEntitySystem<WorldSpaceBoundingBoxSystem, StaticMesh, Transform> {
     protected:
 
-		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) NIMBLE_OVERRIDE;
-	};
+        //! Calculates the world space bounds for static mesh.
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
+    };
 
-	//! Rotates scene object transform around axes.
-	class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxesSystem, RotateAroundAxes, Transform> {
+    //! Moves scene object transform along coordinate axes.
+    class MoveAlongAxesSystem : public Ecs::GenericEntitySystem<MoveAlongAxesSystem, MoveAlongAxes, Transform> {
     protected:
 
-		//! Moves the scene object
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) NIMBLE_OVERRIDE;
-	};
+        //! Moves the scene object
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveAlongAxes& moveAlongAxes, Transform& transform ) NIMBLE_OVERRIDE;
+    };
 
-	//! The moving to target system
-	class MoveToSystem : public Ecs::GenericEntitySystem<MoveToSystem, MoveTo, Transform> {
+    //! Rotates scene object transform around axes.
+    class RotateAroundAxesSystem : public Ecs::GenericEntitySystem<RotateAroundAxesSystem, RotateAroundAxes, Transform> {
     protected:
 
-		//! Follows the target transform
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) NIMBLE_OVERRIDE;
+        //! Moves the scene object
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, RotateAroundAxes& rotateAroundAxes, Transform& transform ) NIMBLE_OVERRIDE;
+    };
 
-		//! Attaches the internal following data to an added scene object.
-		virtual void		entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
-
-	private:
-
-		//! Holds the accumulated acceleration.
-		struct Internal : Ecs::MixIn<Internal> {
-			Vec3			m_force;		//!< The accumulated force.
-		};
-	};
-
-	//! Particles update system
-	class ParticlesSystem : public Ecs::GenericEntitySystem<ParticlesSystem, Particles, Transform> {
+    //! The moving to target system
+    class MoveToSystem : public Ecs::GenericEntitySystem<MoveToSystem, MoveTo, Transform> {
     protected:
 
-		//! Updates the particle system.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) NIMBLE_OVERRIDE;
-	};
+        //! Follows the target transform
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, MoveTo& follow, Transform& transform ) NIMBLE_OVERRIDE;
+
+        //! Attaches the internal following data to an added scene object.
+        virtual void        entityAdded( const Ecs::Entity& entity ) NIMBLE_OVERRIDE;
+
+    private:
+
+        //! Holds the accumulated acceleration.
+        struct Internal : Ecs::MixIn<Internal> {
+            Vec3            m_force;        //!< The accumulated force.
+        };
+    };
+
+    //! Particles update system
+    class ParticlesSystem : public Ecs::GenericEntitySystem<ParticlesSystem, Particles, Transform> {
+    protected:
+
+        //! Updates the particle system.
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& sceneObject, Particles& particles, Transform& transform ) NIMBLE_OVERRIDE;
+    };
 
 } // namespace Scene
 

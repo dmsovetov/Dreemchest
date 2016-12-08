@@ -71,8 +71,8 @@ namespace Scene {
         f32             m_depth;    //!< A box depth.
     };
 
-	//! Generates a sphere mesh with a specified radius.
-	class MeshSphereGenerator : public Assets::GeneratorSource<Mesh> {
+    //! Generates a sphere mesh with a specified radius.
+    class MeshSphereGenerator : public Assets::GeneratorSource<Mesh> {
     public:
 
                         //! Constructs a MeshSphereGenerator instance.
@@ -85,11 +85,11 @@ namespace Scene {
 
     private:
 
-        f32             m_radius;   //!< A sphere radius.	
-	};
+        f32             m_radius;   //!< A sphere radius.    
+    };
 
-	//! Generates a torus mesh with a specified radius.
-	class MeshTorusGenerator : public Assets::GeneratorSource<Mesh> {
+    //! Generates a torus mesh with a specified radius.
+    class MeshTorusGenerator : public Assets::GeneratorSource<Mesh> {
     public:
 
                         //! Constructs a MeshTorusGenerator instance.
@@ -102,11 +102,11 @@ namespace Scene {
 
     private:
 
-        f32             m_radius;   //!< A torus radius.	
-	};
+        f32             m_radius;   //!< A torus radius.    
+    };
 
-	//! Generates a checker image.
-	class ImageCheckerGenerator : public Assets::GeneratorSource<Image> {
+    //! Generates a checker image.
+    class ImageCheckerGenerator : public Assets::GeneratorSource<Image> {
     public:
 
                         //! Constructs a ImageCheckerGenerator instance.
@@ -119,12 +119,12 @@ namespace Scene {
 
     private:
 
-		s32				m_width;
-		s32				m_height;
-		s32				m_cellSize;
-		Rgb				m_firstColor;
-		Rgb				m_secondColor;
-	};
+        s32                m_width;
+        s32                m_height;
+        s32                m_cellSize;
+        Rgb                m_firstColor;
+        Rgb                m_secondColor;
+    };
 
 } // namespace Scene
 

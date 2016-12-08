@@ -42,15 +42,15 @@ namespace Threads {
 
     NIMBLE_LOGGER_TAG( Threads )
 
-	dcDeclarePtrs( Thread )
-	dcDeclarePtrs( TaskProgress )
-	dcDeclarePtrs( Mutex )
-	dcDeclarePtrs( Condition )
-	dcDeclarePtrs( Task )
-	dcDeclarePtrs( TaskManager )
-	dcDeclarePtrs( TaskProgress )
-	dcDeclarePtrs( TaskQueue )
-	dcDeclarePtrs( TaskThread )
+    dcDeclarePtrs( Thread )
+    dcDeclarePtrs( TaskProgress )
+    dcDeclarePtrs( Mutex )
+    dcDeclarePtrs( Condition )
+    dcDeclarePtrs( Task )
+    dcDeclarePtrs( TaskManager )
+    dcDeclarePtrs( TaskProgress )
+    dcDeclarePtrs( TaskQueue )
+    dcDeclarePtrs( TaskThread )
 
     typedef cClosure<void(TaskProgressWPtr, void*)> TaskFunction;
 }

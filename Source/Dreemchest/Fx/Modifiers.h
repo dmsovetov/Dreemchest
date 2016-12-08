@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef	__DC_Fx_ParticleModifiers_H__
-#define	__DC_Fx_ParticleModifiers_H__
+#ifndef    __DC_Fx_ParticleModifiers_H__
+#define    __DC_Fx_ParticleModifiers_H__
 
 #include "Parameter.h"
 
@@ -36,26 +36,26 @@ namespace Fx {
     // ** class Modifier
     class Modifier : public RefCounted {
 
-		DC_DECLARE_IS( Modifier, Modifier, this );
+        DC_DECLARE_IS( Modifier, Modifier, this );
 
     public:
 
-							Modifier( void );
-        virtual				~Modifier( void ) {}
+                            Modifier( void );
+        virtual                ~Modifier( void ) {}
 
-		static Modifier*	create( ModifierType type );
+        static Modifier*    create( ModifierType type );
 
-		float				duration( void ) const;
-		void				setDuration( float value );
-		bool				isEnabled( void ) const;
-		void				setEnabled( bool value );
+        float                duration( void ) const;
+        void                setDuration( float value );
+        bool                isEnabled( void ) const;
+        void                setEnabled( bool value );
 
-        virtual void		apply( float dt, float scalar, Particles *particles ) = 0;
+        virtual void        apply( float dt, float scalar, Particles *particles ) = 0;
 
-	protected:
+    protected:
 
-		float				m_duration;
-		bool				m_isEnabled;
+        float                m_duration;
+        bool                m_isEnabled;
     };
 
     // ** class Friction
@@ -69,7 +69,7 @@ namespace Fx {
 
     private:
 
-		FloatParameter		m_value;
+        FloatParameter        m_value;
     };
 
     // ** class Force
@@ -83,7 +83,7 @@ namespace Fx {
 
     private:
 
-        FloatParameter		m_x, m_y, m_z;
+        FloatParameter        m_x, m_y, m_z;
     };
 
     // ** class ForceField
@@ -101,9 +101,9 @@ namespace Fx {
 
     private:
 
-		FloatParameter		m_x, m_y, m_z;
-		FloatParameter		m_force;
-		FloatParameter		m_radius;
+        FloatParameter        m_x, m_y, m_z;
+        FloatParameter        m_force;
+        FloatParameter        m_radius;
         bool                m_isQuadratic;
     };
 
@@ -111,4 +111,4 @@ namespace Fx {
     
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Fx_ParticleModifiers_H__	*/
+#endif        /*    !__DC_Fx_ParticleModifiers_H__    */

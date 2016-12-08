@@ -33,148 +33,148 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Heightmap wrapping class.
-	class Heightmap {
-	public:
+    //! Heightmap wrapping class.
+    class Heightmap {
+    public:
 
-		typedef u16				Type;	//!< Single heightmap pixel type.
-		typedef Array<Type>		Buffer;	//!< Heightmap buffer.
+        typedef u16                Type;    //!< Single heightmap pixel type.
+        typedef Array<Type>        Buffer;    //!< Heightmap buffer.
 
-		//! Base class to declare custom heightmap generators.
-		class Generator : public RefCounted {
-		public:
+        //! Base class to declare custom heightmap generators.
+        class Generator : public RefCounted {
+        public:
 
-			//! Calculates the height at specified point.
-			virtual Type		calculate( u32 x, u32 z ) = 0;
-		};
+            //! Calculates the height at specified point.
+            virtual Type        calculate( u32 x, u32 z ) = 0;
+        };
 
-								//! Constructs the Heightmap instance.
-								Heightmap( u32 size );
+                                //! Constructs the Heightmap instance.
+                                Heightmap( u32 size );
 
-		//! Returns heightmap size.
-		u32						size( void ) const;
+        //! Returns heightmap size.
+        u32                        size( void ) const;
 
-		//! Returns height at specified coordinate.
-		Type					height( u32 x, u32 z ) const;
+        //! Returns height at specified coordinate.
+        Type                    height( u32 x, u32 z ) const;
 
-		//! Sets height at specified coordinate.
-		void					setHeight( u32 x, u32 z, Type value );
+        //! Sets height at specified coordinate.
+        void                    setHeight( u32 x, u32 z, Type value );
 
-		//! Returns normal at specified coordinate.
-		Vec3					normal( u32 x, u32 z ) const;
+        //! Returns normal at specified coordinate.
+        Vec3                    normal( u32 x, u32 z ) const;
 
-		//! Constructs the heightmap from a callback.
-		void					set( StrongPtr<Generator> generator );
+        //! Constructs the heightmap from a callback.
+        void                    set( StrongPtr<Generator> generator );
 
-		//! Returns the maximum value that can be stored inside this heightmap.
-		Type					maxValue( void ) const;
+        //! Returns the maximum value that can be stored inside this heightmap.
+        Type                    maxValue( void ) const;
 
-		//! Fills the heightmap with a constant height value.
-		class ConstantHeight : public Generator {
-		public:
+        //! Fills the heightmap with a constant height value.
+        class ConstantHeight : public Generator {
+        public:
 
-								//! Constructs ConstantHeight instance.
-								ConstantHeight( Type value = 0 )
-									: m_value( value ) {}
+                                //! Constructs ConstantHeight instance.
+                                ConstantHeight( Type value = 0 )
+                                    : m_value( value ) {}
 
-			//! Returns the constant terrain height.
-			virtual Type		calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return m_value; }
+            //! Returns the constant terrain height.
+            virtual Type        calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return m_value; }
 
-		private:
+        private:
 
-			Type				m_value;	//!< Constant height value.
-		};
+            Type                m_value;    //!< Constant height value.
+        };
 
-		//! Fills the heightmap with a noise.
-		class Noise : public Generator {
-		public:
+        //! Fills the heightmap with a noise.
+        class Noise : public Generator {
+        public:
 
-								//! Constructs Noise instance.
-								Noise( Type min = 0, Type max = ~0 )
-									: m_min( min ), m_max( max ) {}
+                                //! Constructs Noise instance.
+                                Noise( Type min = 0, Type max = ~0 )
+                                    : m_min( min ), m_max( max ) {}
 
-			//! Returns the random terrain height.
-			virtual Type		calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return randomValue( m_min, m_max ); }
+            //! Returns the random terrain height.
+            virtual Type        calculate( u32 x, u32 z ) NIMBLE_OVERRIDE { return randomValue( m_min, m_max ); }
 
-		private:
+        private:
 
-			Type				m_min;		//!< Minimum height value.
-			Type				m_max;		//!< Maximum height value.
-		};
+            Type                m_min;        //!< Minimum height value.
+            Type                m_max;        //!< Maximum height value.
+        };
 
-	private:
+    private:
 
-		u32						m_size;		//!< Heightmap size.
-		Buffer					m_buffer;	//!< Actual heightmap buffer.
-	};
+        u32                        m_size;        //!< Heightmap size.
+        Buffer                    m_buffer;    //!< Actual heightmap buffer.
+    };
 
-	//! Heightmap base terrain.
-	class Terrain {
-	public:
+    //! Heightmap base terrain.
+    class Terrain {
+    public:
 
-		static s32				kChunkSize;	//!< Single terrain chunk size.
-		static s32				kMaxSize;	//!< The maximum terrain size.
+        static s32                kChunkSize;    //!< Single terrain chunk size.
+        static s32                kMaxSize;    //!< The maximum terrain size.
 
-		//! Terrain vertex struct.
-		struct Vertex {
-			Vec3				position;	//!< Vertex position.
-			Vec3				normal;		//!< Vertex normal.
-			Vec2				uv;			//!< Vertex UV coordinate.
-		};
+        //! Terrain vertex struct.
+        struct Vertex {
+            Vec3                position;    //!< Vertex position.
+            Vec3                normal;        //!< Vertex normal.
+            Vec2                uv;            //!< Vertex UV coordinate.
+        };
 
-		typedef Array<Vertex>	VertexBuffer;	//!< Terrain vertex buffer type.
-		typedef Array<u16>		IndexBuffer;	//!< Terrain index buffer type.
+        typedef Array<Vertex>    VertexBuffer;    //!< Terrain vertex buffer type.
+        typedef Array<u16>        IndexBuffer;    //!< Terrain index buffer type.
 
-								//! Constructs Terrain instance.
-								Terrain( u32 size = 0 );
+                                //! Constructs Terrain instance.
+                                Terrain( u32 size = 0 );
 
-		//! Returns terrain size.
-		u32						size( void ) const;
+        //! Returns terrain size.
+        u32                        size( void ) const;
 
-		//! Returns the interpolated height of a terrain at specified point.
-		f32						height( f32 x, f32 z ) const;
+        //! Returns the interpolated height of a terrain at specified point.
+        f32                        height( f32 x, f32 z ) const;
 
-		//! Returns the height value of a vertex.
-		f32						heightAtVertex( s32 x, s32 z ) const;
+        //! Returns the height value of a vertex.
+        f32                        heightAtVertex( s32 x, s32 z ) const;
 
         //! Returns true if the specified coordinates map to a valid vertex.
         bool                    hasVertex( s32 x, s32 z ) const;
 
-		//! Returns maximum terrain height.
-		f32						maxHeight( void ) const;
+        //! Returns maximum terrain height.
+        f32                        maxHeight( void ) const;
 
-		//! Finds the terrain & ray intersection point.
-		Vec3				    rayMarch( const Ray& ray, f32 epsilon = 0.001f ) const;
+        //! Finds the terrain & ray intersection point.
+        Vec3                    rayMarch( const Ray& ray, f32 epsilon = 0.001f ) const;
 
-		//! Returns terrain heightmap.
-		const Heightmap&		heightmap( void ) const;
-		Heightmap&				heightmap( void );
+        //! Returns terrain heightmap.
+        const Heightmap&        heightmap( void ) const;
+        Heightmap&                heightmap( void );
 
-		//! Returns terrain chunk count.
-		u32						chunkCount( void ) const;
+        //! Returns terrain chunk count.
+        u32                        chunkCount( void ) const;
 
-		//! Returns terrain chunk vertex buffer.
-		VertexBuffer			chunkVertexBuffer( u32 x, u32 z ) const;
+        //! Returns terrain chunk vertex buffer.
+        VertexBuffer            chunkVertexBuffer( u32 x, u32 z ) const;
 
-		//! Returns terrain chunk index buffer.
-		IndexBuffer				chunkIndexBuffer( void ) const;
+        //! Returns terrain chunk index buffer.
+        IndexBuffer                chunkIndexBuffer( void ) const;
 
-		//! Creates the chunk mesh.
-		Mesh				    createChunkMesh( u32 x, u32 z ) const;
+        //! Creates the chunk mesh.
+        Mesh                    createChunkMesh( u32 x, u32 z ) const;
 
-		//! Creates the mesh for whole terrain.
-		Mesh				    createMesh( void ) const;
+        //! Creates the mesh for whole terrain.
+        Mesh                    createMesh( void ) const;
 
-	private:
+    private:
 
-		//! Adds the mesh node constructed from chunk buffers.
-		void					setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x = 0, u32 z = 0 ) const;
+        //! Adds the mesh node constructed from chunk buffers.
+        void                    setMeshChunk( Mesh& mesh, u32 chunk, const VertexBuffer& vertices, const IndexBuffer& indices, u32 x = 0, u32 z = 0 ) const;
 
-	private:
+    private:
 
-		Heightmap				m_heightmap;	//!< Terrain heightmap.
-		f32						m_maxHeight;	//!< Maximum terrain height.
-	};
+        Heightmap                m_heightmap;    //!< Terrain heightmap.
+        f32                        m_maxHeight;    //!< Maximum terrain height.
+    };
 
 } // namespace Scene
 

@@ -41,4 +41,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_EnumerationModel_H__ */
+#endif    /*    !__DC_Composer_EnumerationModel_H__ */

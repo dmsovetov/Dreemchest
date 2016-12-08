@@ -53,4 +53,4 @@ namespace Ui {
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_QuatEdit_H__	*/
+#endif    /*    !__DC_Composer_QuatEdit_H__    */

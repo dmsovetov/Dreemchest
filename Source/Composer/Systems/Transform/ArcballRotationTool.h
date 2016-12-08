@@ -31,80 +31,80 @@
 
 DC_BEGIN_COMPOSER
 
-	//! Arcball rotation tool component.
-	class ArcballRotationTool : public Ecs::Component<ArcballRotationTool> {
-	public:
+    //! Arcball rotation tool component.
+    class ArcballRotationTool : public Ecs::Component<ArcballRotationTool> {
+    public:
 
-									//! Constructs ArcballRotationTool instance.
-									ArcballRotationTool( f32 radius = 0.175f );
+                                    //! Constructs ArcballRotationTool instance.
+                                    ArcballRotationTool( f32 radius = 0.175f );
 
-		//! Returns tool radius.
-		f32							radius( void ) const;
+        //! Returns tool radius.
+        f32                            radius( void ) const;
 
-		//! Returns true if this arcball is locked.
-		bool						isLocked( void ) const;
+        //! Returns true if this arcball is locked.
+        bool                        isLocked( void ) const;
 
-		//! Unlocks the arcball tool.
-		void						unlock( void );
+        //! Unlocks the arcball tool.
+        void                        unlock( void );
 
-		//! Locks the arcball tool.
-		void						lock( const Quat& rotation, const Vec3& direction );
+        //! Locks the arcball tool.
+        void                        lock( const Quat& rotation, const Vec3& direction );
 
-		//! Returns the initial direction.
-		const Vec3&					initialDirection( void ) const;
+        //! Returns the initial direction.
+        const Vec3&                    initialDirection( void ) const;
 
-		//! Returns the initial rotation.
-		const Quat&					initialRotation( void ) const;
+        //! Returns the initial rotation.
+        const Quat&                    initialRotation( void ) const;
 
-	private:
+    private:
 
-		f32							m_radius;			//!< Tool radius.
-		Quat						m_initialRotation;	//!< Initial transform rotation.
-		Vec3						m_initialDirection;	//!< Initial vector.
-		bool						m_isLocked;			//!< Marks this arcball as locked.
-	};
+        f32                            m_radius;            //!< Tool radius.
+        Quat                        m_initialRotation;    //!< Initial transform rotation.
+        Vec3                        m_initialDirection;    //!< Initial vector.
+        bool                        m_isLocked;            //!< Marks this arcball as locked.
+    };
 
 #if DEV_DEPRECATED_SCENE_INPUT
-	//! Rotates the transforms by an arcball rotation tool.
-	class ArcballRotationToolSystem : public Scene::GenericTouchSystem<ArcballRotationToolSystem, ArcballRotationTool, Scene::Transform> {
-	public:
+    //! Rotates the transforms by an arcball rotation tool.
+    class ArcballRotationToolSystem : public Scene::GenericTouchSystem<ArcballRotationToolSystem, ArcballRotationTool, Scene::Transform> {
+    public:
 
-									//! Constructs ArcballRotationToolSystem instance
-									ArcballRotationToolSystem( Scene::ViewportWPtr viewport );
+                                    //! Constructs ArcballRotationToolSystem instance
+                                    ArcballRotationToolSystem( Scene::ViewportWPtr viewport );
 
-	protected:
+    protected:
 
-		//! Handles mouse moved event and rotates active arcball.
-		virtual void				touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+        //! Handles mouse moved event and rotates active arcball.
+        virtual void                touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Handles mouse pressed event and locks the selected arcball.
-		virtual void				touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+        //! Handles mouse pressed event and locks the selected arcball.
+        virtual void                touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Handles mouse pressed event and unlocks all locked arcballs.
-		virtual void				touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+        //! Handles mouse pressed event and unlocks all locked arcballs.
+        virtual void                touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Maps the screen space coordinates to a unit vector on arcball.
-		bool						mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
-	};
+        //! Maps the screen space coordinates to a unit vector on arcball.
+        bool                        mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const;
+    };
 #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
-	//! Renders the arcball rotation tool indicator.
-	class ArcballRotationToolPass : public Scene::RenderPass<ArcballRotationTool> {
-	public:
+    //! Renders the arcball rotation tool indicator.
+    class ArcballRotationToolPass : public Scene::RenderPass<ArcballRotationTool> {
+    public:
 
-						//! Constructs ArcballRotationToolPass instance.
-						ArcballRotationToolPass( Ecs::EcsWPtr ecs )
-							: RenderPass( ecs, "ArcballRotationToolPass" ) {}
+                        //! Constructs ArcballRotationToolPass instance.
+                        ArcballRotationToolPass( Ecs::EcsWPtr ecs )
+                            : RenderPass( ecs, "ArcballRotationToolPass" ) {}
 
-	protected:
+    protected:
 
-		//! Renders arcball tool indicator.
-		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
-	};
+        //! Renders arcball tool indicator.
+        virtual void    render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
+    };
 #else
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Systems_ArcballRotationTool_H__	*/
+#endif    /*    !__DC_Composer_Systems_ArcballRotationTool_H__    */

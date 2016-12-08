@@ -34,55 +34,55 @@ namespace Ecs {
 // ** Aspect::Aspect
 Aspect::Aspect( AspectType type, const Bitset& mask )
 {
-	switch( type ) {
-	case All:		m_all = mask; break;
-	case Any:		m_any = mask; break;
-	case Exclude:	m_exc = mask; break;
-	}
+    switch( type ) {
+    case All:        m_all = mask; break;
+    case Any:        m_any = mask; break;
+    case Exclude:    m_exc = mask; break;
+    }
 }
 
 // ** Aspect::operator <
 bool Aspect::operator < ( const Aspect& other ) const
 {
-	if( m_all != other.m_all ) {
-		return m_all < other.m_all;
-	}
-	if( m_any != other.m_any ) {
-		return m_any < other.m_any;
-	}
-	if( m_exc != other.m_exc ) {
-		return m_exc < other.m_exc;
-	}
+    if( m_all != other.m_all ) {
+        return m_all < other.m_all;
+    }
+    if( m_any != other.m_any ) {
+        return m_any < other.m_any;
+    }
+    if( m_exc != other.m_exc ) {
+        return m_exc < other.m_exc;
+    }
 
-	return false;
+    return false;
 }
 
 // ** Aspect::hasIntersection
 bool Aspect::hasIntersection( const EntityPtr& entity ) const
 {
-	const Bitset& mask = entity->mask();
+    const Bitset& mask = entity->mask();
 
-	if( m_all ) {
-		for( int i = 0, n = m_all.size(); i < n; i++ ) {
-			if( m_all.is( i ) && !mask.is( i ) ) {
-				return false;
-			}
-		}
-	}
+    if( m_all ) {
+        for( int i = 0, n = m_all.size(); i < n; i++ ) {
+            if( m_all.is( i ) && !mask.is( i ) ) {
+                return false;
+            }
+        }
+    }
 
-	if( m_any ) {
-		if( m_any * mask == false ) {
-			return false;
-		}
-	}
+    if( m_any ) {
+        if( m_any * mask == false ) {
+            return false;
+        }
+    }
 
-	if( m_exc ) {
-		if( m_exc * mask == true ) {
-			return false;
-		}
-	}
+    if( m_exc ) {
+        if( m_exc * mask == true ) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 } // namespace Ecs

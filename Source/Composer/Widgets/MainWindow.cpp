@@ -39,8 +39,8 @@
 #include "../Editors/AssetEditor.h"
 
 #if DEV_USE_DOCK_INDICATOR
-	#include "DockIndicator.h"
-#endif	/*	DEV_USE_DOCK_INDICATOR	*/
+    #include "DockIndicator.h"
+#endif    /*    DEV_USE_DOCK_INDICATOR    */
 
 DC_BEGIN_COMPOSER
 
@@ -49,247 +49,247 @@ namespace Ui {
 // ** convertKey
 Platform::Key convertKey( s32 key )
 {
-	switch( key ) {
-	case Qt::Key_Back:		return Platform::Key::Back;
-	case Qt::Key_Delete:	return Platform::Key::Delete;
-	case Qt::Key_Left:		return Platform::Key::Left;
-	case Qt::Key_Right:		return Platform::Key::Right;
-	case Qt::Key_Up:		return Platform::Key::Up;
-	case Qt::Key_Down:		return Platform::Key::Down;
-	}
+    switch( key ) {
+    case Qt::Key_Back:        return Platform::Key::Back;
+    case Qt::Key_Delete:    return Platform::Key::Delete;
+    case Qt::Key_Left:        return Platform::Key::Left;
+    case Qt::Key_Right:        return Platform::Key::Right;
+    case Qt::Key_Up:        return Platform::Key::Up;
+    case Qt::Key_Down:        return Platform::Key::Down;
+    }
 
-	return Platform::Key::Total;
+    return Platform::Key::Total;
 }
 
 // ** MainWindow::MainWindow
 MainWindow::MainWindow( const QString& title ) : m_assetTree( NULL ), m_activeDocument( NULL ), m_sceneTree( NULL ), m_inspector( NULL )
 {
 #if DEV_USE_DOCK_INDICATOR
-	// Add the dock indicator widget
-	new DockIndicator( this );
-#endif	/*	DEV_USE_DOCK_INDICATOR	*/
+    // Add the dock indicator widget
+    new DockIndicator( this );
+#endif    /*    DEV_USE_DOCK_INDICATOR    */
 
-	// Setup the share OpenGL format
-	RenderingFrame::setupOpenGLFormat();
+    // Setup the share OpenGL format
+    RenderingFrame::setupOpenGLFormat();
 
-	// Create the shared OpenGL context
-	m_sharedRenderingContext = new RenderingFrame( NULL, this );
-	m_sharedRenderingContext->hide();
-	//setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
+    // Create the shared OpenGL context
+    m_sharedRenderingContext = new RenderingFrame( NULL, this );
+    m_sharedRenderingContext->hide();
+    //setCentralWidget( m_sharedRenderingContext->privateInterface<QRenderingFrame>() );
 
 #ifdef NDEBUG
-	//setWindowState( Qt::WindowMaximized );
-	resize( 1024, 768 );
+    //setWindowState( Qt::WindowMaximized );
+    resize( 1024, 768 );
 #else
-	resize( 1024, 768 );
+    resize( 1024, 768 );
 #endif
 
     setUnifiedTitleAndToolBarOnMac( true );
-	show();
-	setWindowTitle( title );
+    show();
+    setWindowTitle( title );
 }
 
 // ** MainWindow::initialize
 bool MainWindow::initialize( ComposerQPtr composer )
 {
-	// Listen for signals
+    // Listen for signals
     connect( composer, SIGNAL(projectOpened(Project*)), this, SLOT(createProjectInterface(Project*)) );
     connect( composer, SIGNAL(projectClosed(Project*)), this, SLOT(destroyProjectInterface(Project*)) );
 
-	return true;
+    return true;
 }
 
 // ** MainWindow::message
 void MainWindow::message( const String& text, MessageStatus status ) const
 {
-	switch( status ) {
-	case MessageInfo:		QMessageBox::information( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );	break;
-	case MessageWarning:	QMessageBox::warning( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
-	case MessageError:		QMessageBox::critical( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );		break;
-	default:				NIMBLE_BREAK;
-	}
+    switch( status ) {
+    case MessageInfo:        QMessageBox::information( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );    break;
+    case MessageWarning:    QMessageBox::warning( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );        break;
+    case MessageError:        QMessageBox::critical( const_cast<MainWindow*>( this ), windowTitle(), text.c_str() );        break;
+    default:                NIMBLE_BREAK;
+    }
 }
 
 // ** MainWindow::message
 MessageBoxResult MainWindow::messageYesNoCancel( const String& text, const String& info, MessageStatus status ) const
 {
-	QMessageBox msgBox;
-	msgBox.setText( text.c_str() );
-	msgBox.setInformativeText( info.c_str() );
-	msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
-	msgBox.setDefaultButton( QMessageBox::Cancel );
+    QMessageBox msgBox;
+    msgBox.setText( text.c_str() );
+    msgBox.setInformativeText( info.c_str() );
+    msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
+    msgBox.setDefaultButton( QMessageBox::Cancel );
 
-	switch( status ) {
-	case MessageInfo:		msgBox.setIcon( QMessageBox::Information );		break;
-	case MessageWarning:	msgBox.setIcon( QMessageBox::Warning );			break;
-	case MessageError:		msgBox.setIcon( QMessageBox::Critical );		break;
-	default:				NIMBLE_BREAK;
-	}
-	
-	switch( msgBox.exec() ) {
-	case QMessageBox::Yes:		return MessageBoxYes;
-	case QMessageBox::No:		return MessageBoxNo;
-	}
+    switch( status ) {
+    case MessageInfo:        msgBox.setIcon( QMessageBox::Information );        break;
+    case MessageWarning:    msgBox.setIcon( QMessageBox::Warning );            break;
+    case MessageError:        msgBox.setIcon( QMessageBox::Critical );        break;
+    default:                NIMBLE_BREAK;
+    }
+    
+    switch( msgBox.exec() ) {
+    case QMessageBox::Yes:        return MessageBoxYes;
+    case QMessageBox::No:        return MessageBoxNo;
+    }
 
-	return MessageBoxCancel;
+    return MessageBoxCancel;
 }
 
 // ** MainWindow::sharedRenderingContext
 RenderingFrameQPtr MainWindow::sharedRenderingContext( void ) const
 {
-	return m_sharedRenderingContext;
+    return m_sharedRenderingContext;
 }
 
 // ** MainWindow::assetTree
 AssetTreeQPtr MainWindow::assetTree( void ) const
 {
-	return m_assetTree;
+    return m_assetTree;
 }
 
 // ** MainWindow::sceneTree
 SceneTreeQPtr MainWindow::sceneTree( void ) const
 {
-	return m_sceneTree;
+    return m_sceneTree;
 }
 
 // ** MainWindow::inspector
 EntityInspectorQPtr MainWindow::inspector( void ) const
 {
-	return m_inspector;
+    return m_inspector;
 }
 
 // ** MainWindow::addMenu
 MenuQPtr MainWindow::addMenu( const String& title )
 {
-	QMenuBar* bar  = menuBar();
-	Menu*	  menu = new Menu( bar );
+    QMenuBar* bar  = menuBar();
+    Menu*      menu = new Menu( bar );
 
-	menu->setTitle( QString::fromStdString( title ) );
-	bar->addMenu( menu );
+    menu->setTitle( QString::fromStdString( title ) );
+    bar->addMenu( menu );
 
-	return menu;
+    return menu;
 }
 
 // ** MainWindow::addToolBar
 ToolBarQPtr MainWindow::addToolBar( void )
 {
-	ToolBar* toolBar = new ToolBar( this );
-	QMainWindow::addToolBar( toolBar );
+    ToolBar* toolBar = new ToolBar( this );
+    QMainWindow::addToolBar( toolBar );
 
-	return toolBar;
+    return toolBar;
 }
 
 // ** MainWindow::addDock
 QDockWidget* MainWindow::addDock( const QString& name, QWidget* widget, Qt::DockWidgetArea initialDockArea, Qt::DockWidgetAreas allowedDockAreas, QDockWidget* destination )
 {
-	QDockWidget* dock = new QDockWidget( name );
-	dock->setAllowedAreas( allowedDockAreas );
-	dock->setWidget( widget );
-	addDockWidget( initialDockArea, dock );
+    QDockWidget* dock = new QDockWidget( name );
+    dock->setAllowedAreas( allowedDockAreas );
+    dock->setWidget( widget );
+    addDockWidget( initialDockArea, dock );
 
-	if( destination ) {
-		tabifyDockWidget( dock, destination );
-	}
+    if( destination ) {
+        tabifyDockWidget( dock, destination );
+    }
 
-	return dock;
+    return dock;
 }
 
 // ** MainWindow::editDocument
 DocumentQPtr MainWindow::editDocument( Editors::AssetEditorQPtr assetEditor, const FileInfo& asset )
 {
-	NIMBLE_BREAK_IF( !assetEditor );
+    NIMBLE_BREAK_IF( !assetEditor );
 
-	// First lookup the exising document
-	DocumentQPtr existing = findDocument( asset );
+    // First lookup the exising document
+    DocumentQPtr existing = findDocument( asset );
 
-	if( existing ) {
-		existing->raise();
-		return existing;
-	}
+    if( existing ) {
+        existing->raise();
+        return existing;
+    }
 
-	// Create the document instance
-	DocumentQPtr document = new Document( this, assetEditor, QString::fromStdString( asset.fileName() ) );
+    // Create the document instance
+    DocumentQPtr document = new Document( this, assetEditor, QString::fromStdString( asset.fileName() ) );
 
-	// Initialize the asset editor with a document
-	if( !assetEditor->initialize( m_project, asset, document ) ) {
+    // Initialize the asset editor with a document
+    if( !assetEditor->initialize( m_project, asset, document ) ) {
         delete document;
-		return NULL;
-	}
+        return NULL;
+    }
 
-	addDockWidget( Qt::LeftDockWidgetArea, document );
+    addDockWidget( Qt::LeftDockWidgetArea, document );
 
-	// Find opened documents of a same type
-	QVector<DocumentQPtr> documents = findDocuments( asset );
+    // Find opened documents of a same type
+    QVector<DocumentQPtr> documents = findDocuments( asset );
 
-	if( documents.size() ) {
-		QDockWidget* tabifyTo = documents[0];
-		tabifyDockWidget( tabifyTo, document );
-	}
+    if( documents.size() ) {
+        QDockWidget* tabifyTo = documents[0];
+        tabifyDockWidget( tabifyTo, document );
+    }
 
-	// Set the document as active
-	setActiveDocument( document );
+    // Set the document as active
+    setActiveDocument( document );
 
-	// Save created document
-	m_documents.append( document );
+    // Save created document
+    m_documents.append( document );
 
-	return document;
+    return document;
 }
 
 // ** MainWindow::closeDocument
 bool MainWindow::closeDocument( DocumentQPtr document )
 {
-	// Find the document
-	int index = m_documents.indexOf( document );
+    // Find the document
+    int index = m_documents.indexOf( document );
 
-	if( index == -1 ) {
-		NIMBLE_BREAK;
-		return false;
-	}
+    if( index == -1 ) {
+        NIMBLE_BREAK;
+        return false;
+    }
 
-	// Ensure that document is saved
-	if( !ensureSaved( document ) ) {
-		return false;
-	}
+    // Ensure that document is saved
+    if( !ensureSaved( document ) ) {
+        return false;
+    }
 
-	// Change active document
-	setActiveDocument( (m_documents.size() - 1) ? m_documents[index - 1] : NULL );
+    // Change active document
+    setActiveDocument( (m_documents.size() - 1) ? m_documents[index - 1] : NULL );
 
-	// Remove the document dock widget
-	removeDockWidget( document );
+    // Remove the document dock widget
+    removeDockWidget( document );
 
-	// Remove from documents
-	m_documents.remove( index );
+    // Remove from documents
+    m_documents.remove( index );
 
     // Delete document
     delete document;
 
-	return true;
+    return true;
 }
 
 // ** MainWindow::findDocument
 DocumentQPtr MainWindow::findDocument( const FileInfo& asset ) const
 {
-	foreach( DocumentQPtr document, m_documents ) {
-		if( document->assetEditor()->asset() == asset ) {
-			return document;
-		}
-	}
+    foreach( DocumentQPtr document, m_documents ) {
+        if( document->assetEditor()->asset() == asset ) {
+            return document;
+        }
+    }
 
-	return NULL;
+    return NULL;
 }
 
 // ** MainWindow::findDocuments
 QVector<DocumentQPtr> MainWindow::findDocuments( const FileInfo& asset ) const
 {
-	QVector<DocumentQPtr> documents;
+    QVector<DocumentQPtr> documents;
 
-	foreach( DocumentQPtr document, m_documents ) {
-		if( document->assetEditor()->asset().extension() == asset.extension() ) {
-			documents.append( document );
-		}
-	}
+    foreach( DocumentQPtr document, m_documents ) {
+        if( document->assetEditor()->asset().extension() == asset.extension() ) {
+            documents.append( document );
+        }
+    }
 
-	return documents;
+    return documents;
 }
 
 // ** MainWindow::activeDocument
@@ -301,52 +301,52 @@ DocumentQPtr MainWindow::activeDocument( void ) const
 // ** MainWindow::setActiveDocument
 void MainWindow::setActiveDocument( DocumentQPtr document )
 {
-	// This document is already set as active
-	if( m_activeDocument == document ) {
-		return;
-	}
+    // This document is already set as active
+    if( m_activeDocument == document ) {
+        return;
+    }
 
-	// Notify the active document about moving to background.
-	if( m_activeDocument ) {
-		m_activeDocument->assetEditor()->notifyEnterBackground( this );
-	}
+    // Notify the active document about moving to background.
+    if( m_activeDocument ) {
+        m_activeDocument->assetEditor()->notifyEnterBackground( this );
+    }
 
-	// Set new active document
-	m_activeDocument = document;
+    // Set new active document
+    m_activeDocument = document;
 
-	// Notify active document about moving to foreground.
-	if( m_activeDocument ) {
-		// Raise the document dock widget
-		m_activeDocument->raise();
+    // Notify active document about moving to foreground.
+    if( m_activeDocument ) {
+        // Raise the document dock widget
+        m_activeDocument->raise();
 
-		// Notify the asset editor
-		m_activeDocument->assetEditor()->notifyEnterForeground( this );
-	}
+        // Notify the asset editor
+        m_activeDocument->assetEditor()->notifyEnterForeground( this );
+    }
 }
 
 // ** MainWindow::ensureSaved
 bool MainWindow::ensureSaved( DocumentQPtr document ) const
 {
-	// Get the attached asset editor.
-	Editors::AssetEditorQPtr assetEditor = document->assetEditor();
+    // Get the attached asset editor.
+    Editors::AssetEditorQPtr assetEditor = document->assetEditor();
 
-	// The document has no unsaved changes.
-	if( !assetEditor->hasChanges() ) {
-		return true;
-	}
+    // The document has no unsaved changes.
+    if( !assetEditor->hasChanges() ) {
+        return true;
+    }
 
-	// Show the message box
-	String			 message = "Do you want to save changes to " + assetEditor->asset().fileName() + "?";
-	String			 info	 = "Your changes will be lost if you don't save them";
-	MessageBoxResult result  = messageYesNoCancel( message, info, MessageWarning );
+    // Show the message box
+    String             message = "Do you want to save changes to " + assetEditor->asset().fileName() + "?";
+    String             info     = "Your changes will be lost if you don't save them";
+    MessageBoxResult result  = messageYesNoCancel( message, info, MessageWarning );
 
-	switch( result ) {
-	case MessageBoxCancel:	return false;
-	case MessageBoxYes:		assetEditor->save();
-	case MessageBoxNo:		break;
-	}
+    switch( result ) {
+    case MessageBoxCancel:    return false;
+    case MessageBoxYes:        assetEditor->save();
+    case MessageBoxNo:        break;
+    }
 
-	return true;
+    return true;
 }
 
 // ** MainWindow::createProjectInterface
@@ -356,37 +356,37 @@ void MainWindow::createProjectInterface( Project* project )
     NIMBLE_BREAK_IF( m_sceneTree );
     NIMBLE_BREAK_IF( m_inspector );
 
-	// Get the project from event
-	m_project = project;
+    // Get the project from event
+    m_project = project;
 
-	// Create the asset tree
-	m_assetTree = new AssetTree( m_project, this );
-	m_assetTree->setModel( m_project->assetFileSystem() );
+    // Create the asset tree
+    m_assetTree = new AssetTree( m_project, this );
+    m_assetTree->setModel( m_project->assetFileSystem() );
 
-	// Create the scene tree
-	m_sceneTree = new SceneTree( this );
+    // Create the scene tree
+    m_sceneTree = new SceneTree( this );
 
-	// Create the object inspector
-	m_inspector = new EntityInspector( this );
+    // Create the object inspector
+    m_inspector = new EntityInspector( this );
 
-	// Setup status bar
-	statusBar()->show();
+    // Setup status bar
+    statusBar()->show();
 
-	// Add dock windows
-	addDock( "Inspector", m_inspector, Qt::RightDockWidgetArea );
-	addDock( "Assets", m_assetTree, Qt::RightDockWidgetArea );
-	addDock( "Hierarchy", m_sceneTree, Qt::LeftDockWidgetArea );
-	addDock( "Output", new Output( this ), Qt::LeftDockWidgetArea );
+    // Add dock windows
+    addDock( "Inspector", m_inspector, Qt::RightDockWidgetArea );
+    addDock( "Assets", m_assetTree, Qt::RightDockWidgetArea );
+    addDock( "Hierarchy", m_sceneTree, Qt::LeftDockWidgetArea );
+    addDock( "Output", new Output( this ), Qt::LeftDockWidgetArea );
 
-	// Update window caption
-	setWindowTitle( m_project->name().c_str() + QString( " - " + windowTitle() ) );
+    // Update window caption
+    setWindowTitle( m_project->name().c_str() + QString( " - " + windowTitle() ) );
 }
 
 // ** MainWindow::destroyProjectInterface
 void MainWindow::destroyProjectInterface( Project* project )
 {
-	m_project = NULL;
-	NIMBLE_BREAK;
+    m_project = NULL;
+    NIMBLE_BREAK;
 }
 
 } // namespace Ui

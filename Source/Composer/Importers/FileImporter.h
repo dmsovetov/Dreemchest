@@ -33,16 +33,16 @@ DC_BEGIN_COMPOSER
 
 namespace Importers {
 
-	//! Imports the file by copying it to a cache.
-	class FileImporter : public AssetImporter {
-	public:
+    //! Imports the file by copying it to a cache.
+    class FileImporter : public AssetImporter {
+    public:
 
-		//! Performs importing of a file.
-		virtual bool		import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) NIMBLE_OVERRIDE;
-	};
+        //! Performs importing of a file.
+        virtual bool        import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) NIMBLE_OVERRIDE;
+    };
 
 } // namespace Importers
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_FileImporter_H__	*/
+#endif    /*    !__DC_Composer_FileImporter_H__    */

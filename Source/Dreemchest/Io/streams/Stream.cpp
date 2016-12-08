@@ -51,9 +51,9 @@ void Stream::dispose( void )
 // ** Stream::readString
 s32 Stream::readString( String& str ) const
 {
-    s32 result		= 0;
-    s32 strResult	= 0;
-    u32 length		= 0;
+    s32 result        = 0;
+    s32 strResult    = 0;
+    u32 length        = 0;
 
     str     = "";
     result += read( &length, sizeof( length ) );
@@ -75,9 +75,9 @@ s32 Stream::writeString( CString str )
     u32 length = ( u32 )strlen( str );
 
     result += write( &length, sizeof( length ) );
-	if( length ) {
-		result += write( str, length );
-	}
+    if( length ) {
+        result += write( str, length );
+    }
     
     return result;
 }

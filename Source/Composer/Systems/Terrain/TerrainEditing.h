@@ -31,45 +31,45 @@
 
 DC_BEGIN_COMPOSER
 
-	//! Terrain editing tool.
-	class TerrainTool : public Ecs::Component<TerrainTool> {
-	public:
+    //! Terrain editing tool.
+    class TerrainTool : public Ecs::Component<TerrainTool> {
+    public:
 
-		//! Available tool types.
-		enum Type {
-			  Raise
-			, Lower
-			, Flatten
-			, Level
-			, Smooth
-		};
+        //! Available tool types.
+        enum Type {
+              Raise
+            , Lower
+            , Flatten
+            , Level
+            , Smooth
+        };
 
-							    //! Constructs TerrainTool instance.
-							    TerrainTool( Scene::TerrainHandle terrain = Scene::TerrainHandle(), f32 radius = 1.0f, f32 strength = 0.1f, f32 exp = 1.0f );
+                                //! Constructs TerrainTool instance.
+                                TerrainTool( Scene::TerrainHandle terrain = Scene::TerrainHandle(), f32 radius = 1.0f, f32 strength = 0.1f, f32 exp = 1.0f );
 
-		//! Returns tool radius.
-		f32					    radius( void ) const;
+        //! Returns tool radius.
+        f32                        radius( void ) const;
 
-		//! Sets tool radius.
-		void				    setRadius( f32 value );
+        //! Sets tool radius.
+        void                    setRadius( f32 value );
 
-		//! Returns tool strength.
-		f32					    strength( void ) const;
+        //! Returns tool strength.
+        f32                        strength( void ) const;
 
-		//! Sets tool strength.
-		void				    setStrength( f32 value );
+        //! Sets tool strength.
+        void                    setStrength( f32 value );
 
-		//! Returns the affected terrain.
-		Scene::TerrainHandle    terrain( void ) const;
+        //! Returns the affected terrain.
+        Scene::TerrainHandle    terrain( void ) const;
 
-		//! Returns the influence at specified distance.
-		f32					    influence( f32 distance ) const;
+        //! Returns the influence at specified distance.
+        f32                        influence( f32 distance ) const;
 
-		//! Returns tool type.
-		Type				    type( void ) const;
+        //! Returns tool type.
+        Type                    type( void ) const;
 
-		//! Sets tool type.
-		void				    setType( Type value );
+        //! Sets tool type.
+        void                    setType( Type value );
 
         //! Returns tool exponentiation factor.
         f32                     exp( void ) const;
@@ -77,31 +77,31 @@ DC_BEGIN_COMPOSER
         //! Sets tool exponentiation factor.
         void                    setExp( f32 value );
 
-	private:
+    private:
 
-		f32					    m_radius;	//!< Terrain tool radius.
-		f32					    m_strength;	//!< Terrain tool strength.
-		Type				    m_type;		//!< Tool type.
+        f32                        m_radius;    //!< Terrain tool radius.
+        f32                        m_strength;    //!< Terrain tool strength.
+        Type                    m_type;        //!< Tool type.
         f32                     m_exp;      //!< Tool exponentiation factor.
 
-		Scene::TerrainHandle	m_terrain;	//!< Affected terrain instance.
-	};
+        Scene::TerrainHandle    m_terrain;    //!< Affected terrain instance.
+    };
 
 #if DEV_DEPRECATED_SCENE_INPUT
-	//! Used for terrain heightmap editing.
-	class TerrainHeightmapSystem : public Scene::GenericTouchSystem<TerrainHeightmapSystem, Editors::TerrainChunk, Scene::StaticMesh, Scene::Transform> {
-	public:
+    //! Used for terrain heightmap editing.
+    class TerrainHeightmapSystem : public Scene::GenericTouchSystem<TerrainHeightmapSystem, Editors::TerrainChunk, Scene::StaticMesh, Scene::Transform> {
+    public:
 
-							//! Constructs TerrainHeightmapSystem instance.
-							TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Scene::ViewportWPtr viewport );
+                            //! Constructs TerrainHeightmapSystem instance.
+                            TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Scene::ViewportWPtr viewport );
 
-	protected:
+    protected:
 
-		//! Edits the terrain chunk.
-		virtual void		touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, Editors::TerrainChunk& chunk, Scene::StaticMesh& mesh, Scene::Transform& transform ) DC_DECL_OVERRIDE;
+        //! Edits the terrain chunk.
+        virtual void        touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, Editors::TerrainChunk& chunk, Scene::StaticMesh& mesh, Scene::Transform& transform ) DC_DECL_OVERRIDE;
 
-		//! Returns true if the point is inside the chunk.
-		bool				isPointInside( const Vec3& point, f32 radius, const Editors::TerrainChunk& chunk ) const;
+        //! Returns true if the point is inside the chunk.
+        bool                isPointInside( const Vec3& point, f32 radius, const Editors::TerrainChunk& chunk ) const;
 
         //! Applies the lowering tool.
         f32                 applyLowering( const Vec3& vertex, s32 x, s32 z, Scene::TerrainHandle terrain, f32 influence, f32 strength ) const;
@@ -121,28 +121,28 @@ DC_BEGIN_COMPOSER
         //! Returns an average terrain height around the specified point with given radius.
         f32                 calculateAverageHeight( Scene::TerrainHandle terrain, s32 x, s32 z, s32 radius ) const;
 
-	private:
+    private:
 
-		Scene::SceneObjectWPtr	m_tool;		//!< Terrain tool instance.
-	};
+        Scene::SceneObjectWPtr    m_tool;        //!< Terrain tool instance.
+    };
 #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
 #if DEV_DEPRECATED_SCENE_RENDERER
-	//! Renders the terrain tool circle.
-	class TerrainToolPass : public Scene::RenderPass<TerrainTool> {
-	public:
+    //! Renders the terrain tool circle.
+    class TerrainToolPass : public Scene::RenderPass<TerrainTool> {
+    public:
 
-						//! Constructs TerrainToolPass instance.
-						TerrainToolPass( Ecs::EcsWPtr ecs )
-							: RenderPass( ecs, "TerrainToolPass" ) {}
+                        //! Constructs TerrainToolPass instance.
+                        TerrainToolPass( Ecs::EcsWPtr ecs )
+                            : RenderPass( ecs, "TerrainToolPass" ) {}
 
-	protected:
+    protected:
 
-		//! Renders terrain tool circle
-		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
-	};
+        //! Renders terrain tool circle
+        virtual void    render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
+    };
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_TerrainEditing_H__	*/
+#endif    /*    !__DC_Composer_TerrainEditing_H__    */

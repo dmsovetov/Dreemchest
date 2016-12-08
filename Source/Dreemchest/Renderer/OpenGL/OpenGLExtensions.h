@@ -24,70 +24,70 @@
 
  **************************************************************************/
 
-#ifndef		__DC_OpenGLExtensions_H__
-#define		__DC_OpenGLExtensions_H__
+#ifndef        __DC_OpenGLExtensions_H__
+#define        __DC_OpenGLExtensions_H__
 
-#include	"../Renderer.h"
-#include	"OpenGLHal.h"
+#include    "../Renderer.h"
+#include    "OpenGLHal.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
 #if defined( DC_PLATFORM_WINDOWS )
-	// ** GL_ARB_multitexture
-	extern PFNGLACTIVETEXTUREARBPROC			glActiveTexture;
-	extern PFNGLCLIENTACTIVETEXTUREARBPROC		glClientActiveTexture;
+    // ** GL_ARB_multitexture
+    extern PFNGLACTIVETEXTUREARBPROC            glActiveTexture;
+    extern PFNGLCLIENTACTIVETEXTUREARBPROC        glClientActiveTexture;
 
-	// ** GL_ARB_vertex_buffer_object
-	extern PFNGLBINDBUFFERARBPROC				glBindBuffer;
-	extern PFNGLDELETEBUFFERSARBPROC			glDeleteBuffers;
-	extern PFNGLGENBUFFERSARBPROC				glGenBuffers;
-	extern PFNGLBUFFERDATAARBPROC				glBufferData;
-    extern PFNGLBUFFERSUBDATAARBPROC		    glBufferSubData;
-	extern PFNGLMAPBUFFERARBPROC				glMapBuffer;
-	extern PFNGLUNMAPBUFFERARBPROC				glUnmapBuffer;
+    // ** GL_ARB_vertex_buffer_object
+    extern PFNGLBINDBUFFERARBPROC                glBindBuffer;
+    extern PFNGLDELETEBUFFERSARBPROC            glDeleteBuffers;
+    extern PFNGLGENBUFFERSARBPROC                glGenBuffers;
+    extern PFNGLBUFFERDATAARBPROC                glBufferData;
+    extern PFNGLBUFFERSUBDATAARBPROC            glBufferSubData;
+    extern PFNGLMAPBUFFERARBPROC                glMapBuffer;
+    extern PFNGLUNMAPBUFFERARBPROC                glUnmapBuffer;
 
-	// ** GL_ARB_shading_language_100 & GL_ARB_shader_objects
-	extern PFNGLCREATEPROGRAMPROC				glCreateProgram;
-	extern PFNGLCREATESHADERPROC				glCreateShader;
-	extern PFNGLLINKPROGRAMPROC					glLinkProgram;
-	extern PFNGLDELETEPROGRAMPROC				glDeleteProgram;
-	extern PFNGLDELETESHADERPROC				glDeleteShader;
-	extern PFNGLATTACHSHADERPROC				glAttachShader;
-	extern PFNGLCOMPILESHADERPROC				glCompileShader;
-	extern PFNGLSHADERSOURCEPROC				glShaderSource;
-	extern PFNGLUSEPROGRAMPROC					glUseProgram;
-	extern PFNGLGETSHADERINFOLOGPROC			glGetShaderInfoLog;
+    // ** GL_ARB_shading_language_100 & GL_ARB_shader_objects
+    extern PFNGLCREATEPROGRAMPROC                glCreateProgram;
+    extern PFNGLCREATESHADERPROC                glCreateShader;
+    extern PFNGLLINKPROGRAMPROC                    glLinkProgram;
+    extern PFNGLDELETEPROGRAMPROC                glDeleteProgram;
+    extern PFNGLDELETESHADERPROC                glDeleteShader;
+    extern PFNGLATTACHSHADERPROC                glAttachShader;
+    extern PFNGLCOMPILESHADERPROC                glCompileShader;
+    extern PFNGLSHADERSOURCEPROC                glShaderSource;
+    extern PFNGLUSEPROGRAMPROC                    glUseProgram;
+    extern PFNGLGETSHADERINFOLOGPROC            glGetShaderInfoLog;
     extern PFNGLGETPROGRAMINFOLOGPROC           glGetProgramInfoLog;
-	extern PFNGLGETSHADERIVPROC					glGetShaderiv;
-	extern PFNGLGETPROGRAMIVPROC				glGetProgramiv;
-	extern PFNGLGETUNIFORMLOCATIONARBPROC		glGetUniformLocation;
-	extern PFNGLUNIFORM4FARBPROC				glUniform4f;
-	extern PFNGLUNIFORM3FARBPROC				glUniform3f;
-	extern PFNGLUNIFORM2FARBPROC				glUniform2f;
-	extern PFNGLUNIFORM1IARBPROC				glUniform1i;
-	extern PFNGLUNIFORM1FARBPROC				glUniform1f;
-	extern PFNGLUNIFORM1FVARBPROC				glUniform1fv;
-	extern PFNGLUNIFORM2FVARBPROC				glUniform2fv;
-	extern PFNGLUNIFORM3FVARBPROC				glUniform3fv;
-	extern PFNGLUNIFORM4FVARBPROC				glUniform4fv;
-	extern PFNGLUNIFORMMATRIX4FVARBPROC			glUniformMatrix4fv;
+    extern PFNGLGETSHADERIVPROC                    glGetShaderiv;
+    extern PFNGLGETPROGRAMIVPROC                glGetProgramiv;
+    extern PFNGLGETUNIFORMLOCATIONARBPROC        glGetUniformLocation;
+    extern PFNGLUNIFORM4FARBPROC                glUniform4f;
+    extern PFNGLUNIFORM3FARBPROC                glUniform3f;
+    extern PFNGLUNIFORM2FARBPROC                glUniform2f;
+    extern PFNGLUNIFORM1IARBPROC                glUniform1i;
+    extern PFNGLUNIFORM1FARBPROC                glUniform1f;
+    extern PFNGLUNIFORM1FVARBPROC                glUniform1fv;
+    extern PFNGLUNIFORM2FVARBPROC                glUniform2fv;
+    extern PFNGLUNIFORM3FVARBPROC                glUniform3fv;
+    extern PFNGLUNIFORM4FVARBPROC                glUniform4fv;
+    extern PFNGLUNIFORMMATRIX4FVARBPROC            glUniformMatrix4fv;
 
-	// ** GL_framebuffer_object
-	extern PFNGLDELETEFRAMEBUFFERSPROC			glDeleteFramebuffers;
-	extern PFNGLFRAMEBUFFERTEXTURE2DPROC		glFramebufferTexture2D;
-	extern PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
-	extern PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
-	extern PFNGLDELETERENDERBUFFERSPROC			glDeleteRenderbuffers;
-	extern PFNGLGENRENDERBUFFERSPROC			glGenRenderbuffers;
-	extern PFNGLBINDRENDERBUFFERPROC			glBindRenderbuffer;
-	extern PFNGLRENDERBUFFERSTORAGEPROC			glRenderbufferStorage;
-	extern PFNGLCHECKFRAMEBUFFERSTATUSPROC		glCheckFramebufferStatus;
-	extern PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
+    // ** GL_framebuffer_object
+    extern PFNGLDELETEFRAMEBUFFERSPROC            glDeleteFramebuffers;
+    extern PFNGLFRAMEBUFFERTEXTURE2DPROC        glFramebufferTexture2D;
+    extern PFNGLGENFRAMEBUFFERSPROC                glGenFramebuffers;
+    extern PFNGLBINDFRAMEBUFFERPROC                glBindFramebuffer;
+    extern PFNGLDELETERENDERBUFFERSPROC            glDeleteRenderbuffers;
+    extern PFNGLGENRENDERBUFFERSPROC            glGenRenderbuffers;
+    extern PFNGLBINDRENDERBUFFERPROC            glBindRenderbuffer;
+    extern PFNGLRENDERBUFFERSTORAGEPROC            glRenderbufferStorage;
+    extern PFNGLCHECKFRAMEBUFFERSTATUSPROC        glCheckFramebufferStatus;
+    extern PFNGLFRAMEBUFFERRENDERBUFFERPROC        glFramebufferRenderbuffer;
 
-	// ** GL_ARB_texture_compression
-	extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2D;
+    // ** GL_ARB_texture_compression
+    extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC        glCompressedTexImage2D;
 #elif defined( DC_PLATFORM_MACOS )
     #define GL_RGBA16F              GL_RGBA16F_ARB
     #define GL_RGBA32F              GL_RGBA32F_ARB
@@ -98,9 +98,9 @@ namespace Renderer {
     #define GL_CLAMP                GL_CLAMP_TO_EDGE
     #define GL_RGB8                 GL_RGB8_OES
     #define GL_RGBA8                GL_RGBA8_OES
-	#if !defined( DC_PLATFORM_ANDROID )
-		#define GL_RGBA16F          GL_RGBA16F_EXT
-	#endif
+    #if !defined( DC_PLATFORM_ANDROID )
+        #define GL_RGBA16F          GL_RGBA16F_EXT
+    #endif
     #define GL_HALF_FLOAT           GL_HALF_FLOAT_OES
     #define GL_WRITE_ONLY           GL_WRITE_ONLY_OES
     #define GL_POINT_SIZE_ARRAY     GL_POINT_SIZE_ARRAY_OES
@@ -111,10 +111,10 @@ namespace Renderer {
     #define glPointSizePointer      glPointSizePointerOES
 #endif
 
-	bool loadOpenGLExtensions( void );
+    bool loadOpenGLExtensions( void );
 
 } // namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_OpenGLExtensions_H__	*/
+#endif    /*    !__DC_OpenGLExtensions_H__    */

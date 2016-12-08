@@ -41,19 +41,19 @@
 #endif  /*  CPLUSPLUS_STD > 11  */
 
 #ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    Dreemchest
-	#endif
+    #ifndef DC_NAMESPACE
+        #define DC_NAMESPACE    Dreemchest
+    #endif
 #endif
 
 #ifdef DC_NAMESPACE
     #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
+    #define DC_DREEMCHEST_NS     DC_NAMESPACE::
     #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
     #define DC_END_DREEMCHEST    }
 #else
     #define DC_USE_DREEMCHEST
-	#define DC_DREEMCHEST_NS
+    #define DC_DREEMCHEST_NS
     #define DC_BEGIN_DREEMCHEST
     #define DC_END_DREEMCHEST
 #endif
@@ -74,15 +74,15 @@
 #define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 
 #ifdef JSON_FOUND
-	#include <json/json.h>
-#endif	/*	#ifdef JSON_FOUND	*/
+    #include <json/json.h>
+#endif    /*    #ifdef JSON_FOUND    */
 
 DC_BEGIN_DREEMCHEST
 
     namespace Platform {
     
         //! Returns current time in milliseconds.
-	    extern u32 currentTime( void );
+        extern u32 currentTime( void );
 
     } // namespace Platform
 
@@ -138,19 +138,19 @@ DC_BEGIN_DREEMCHEST
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include <Network/Network.h>
-	#include <Io/Io.h>
+    #include <Network/Network.h>
+    #include <Io/Io.h>
     #include <Assets/Assets.h>
-	#include <Event/Event.h>
-	#include <Threads/Threads.h>
+    #include <Event/Event.h>
+    #include <Threads/Threads.h>
     #include <Reflection/Reflection.h>
-	#include <Ecs/Ecs.h>
-	#include <Platform/Platform.h>
-	#include <Threads/Threads.h>
-	#include <Scene/Scene.h>
-	#include <Renderer/Renderer.h>
-	#include <Sound/Sound.h>
-	#include <Fx/Fx.h>
+    #include <Ecs/Ecs.h>
+    #include <Platform/Platform.h>
+    #include <Threads/Threads.h>
+    #include <Scene/Scene.h>
+    #include <Renderer/Renderer.h>
+    #include <Sound/Sound.h>
+    #include <Fx/Fx.h>
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */

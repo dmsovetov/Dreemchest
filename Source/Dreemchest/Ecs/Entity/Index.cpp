@@ -45,53 +45,53 @@ Index::~Index( void )
 // ** Index::entities
 const EntitySet& Index::entities( void ) const
 {
-	return m_entities;
+    return m_entities;
 }
 
 // ** Index::entities
 EntitySet& Index::entities( void )
 {
-	return m_entities;
+    return m_entities;
 }
 
 // ** Index::size
 s32 Index::size( void ) const
 {
-	return static_cast<s32>( m_entities.size() );
+    return static_cast<s32>( m_entities.size() );
 }
 
 // ** Index::notifyEntityChanged
 void Index::notifyEntityChanged( const EntityPtr& entity )
 {
-	bool contains   = m_entities.count( entity ) != 0;
-	bool intersects = m_aspect.hasIntersection( entity );
+    bool contains   = m_entities.count( entity ) != 0;
+    bool intersects = m_aspect.hasIntersection( entity );
 
-	if( entity->flags() & Entity::Removed ) {
-		intersects = false;
-	}
+    if( entity->flags() & Entity::Removed ) {
+        intersects = false;
+    }
 
-	if( !contains && intersects ) {
-		processEntityAdded( entity );
-	}
-	else if( contains && !intersects ) {
-		processEntityRemoved( entity );
-	}
+    if( !contains && intersects ) {
+        processEntityAdded( entity );
+    }
+    else if( contains && !intersects ) {
+        processEntityRemoved( entity );
+    }
 }
 
 // ** Index::processEntityAdded
 void Index::processEntityAdded( const EntityPtr& entity )
 {
-	LogDebug( "entityIndex", "%s added to %s\n", entity->id().toString().c_str(), m_name.c_str() );
-	m_entities.insert( entity );
-	m_eventEmitter.notify<Added>( entity );
+    LogDebug( "entityIndex", "%s added to %s\n", entity->id().toString().c_str(), m_name.c_str() );
+    m_entities.insert( entity );
+    m_eventEmitter.notify<Added>( entity );
 }
 
 // ** Index::processEntityRemoved
 void Index::processEntityRemoved( const EntityPtr& entity )
 {
-	LogDebug( "entityIndex", "%s removed from %s\n", entity->id().toString().c_str(), m_name.c_str() );
-	m_eventEmitter.notify<Removed>( entity );
-	m_entities.erase( entity );
+    LogDebug( "entityIndex", "%s removed from %s\n", entity->id().toString().c_str(), m_name.c_str() );
+    m_eventEmitter.notify<Removed>( entity );
+    m_entities.erase( entity );
 }
 
 // ** Index::Added::Added

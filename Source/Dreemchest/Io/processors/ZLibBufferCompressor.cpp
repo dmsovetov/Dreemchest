@@ -103,11 +103,11 @@ void ZLibBufferCompressor::endStreamCompression( void )
 // ** ZLibBufferCompressor::beginStreamDecompression
 bool ZLibBufferCompressor::beginStreamDecompression( void )
 {
-    m_stream.zalloc		= Z_NULL;
-    m_stream.zfree		= Z_NULL;
-    m_stream.opaque		= Z_NULL;
-    m_stream.next_in	= Z_NULL;
-    m_stream.avail_in	= 0;
+    m_stream.zalloc        = Z_NULL;
+    m_stream.zfree        = Z_NULL;
+    m_stream.opaque        = Z_NULL;
+    m_stream.next_in    = Z_NULL;
+    m_stream.avail_in    = 0;
     
     if( inflateInit( &m_stream ) != Z_OK ) {
         return false;

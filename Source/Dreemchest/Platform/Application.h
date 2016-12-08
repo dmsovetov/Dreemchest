@@ -63,22 +63,22 @@ namespace Platform {
         virtual void            handleUpdate( Application* application ) {}
     };
 
-	//! Base class for windowed applications.
-	class WindowedApplicationDelegate : public ApplicationDelegate {
-	public:
+    //! Base class for windowed applications.
+    class WindowedApplicationDelegate : public ApplicationDelegate {
+    public:
 
-		//! Abstract method to be overridden in a subclass to setup application after window creation.
-		virtual bool			initialize( void ) = 0;
+        //! Abstract method to be overridden in a subclass to setup application after window creation.
+        virtual bool            initialize( void ) = 0;
 
-	private:
+    private:
 
         //! Handles the application start and creates the window.
         virtual void            handleLaunched( Application* application ) NIMBLE_OVERRIDE;
 
-	protected:
+    protected:
 
-		WindowPtr				m_window;	//!< Main application window.
-	};
+        WindowPtr                m_window;    //!< Main application window.
+    };
 
     //! Application class is an entry point for applications.
     class Application {
@@ -107,8 +107,8 @@ namespace Platform {
         //! Notifies an application about an update.
         void                    notifyUpdate( void );
 
-		//! Returns application arguments passed on launch.
-		const Arguments&		args( void ) const;
+        //! Returns application arguments passed on launch.
+        const Arguments&        args( void ) const;
 
         //! Creates a new Application instance.
         static Application*     create( const Arguments& args );
@@ -123,10 +123,10 @@ namespace Platform {
 
     private:
 
-        static Application*     s_application;	//!< Shared application instance.
-        IApplication*           m_impl;			//!< Platform specific application implementation.
-        ApplicationDelegate*    m_delegate;		//!< Application delegate instance.
-		Arguments				m_arguments;	//!< Passed arguments.
+        static Application*     s_application;    //!< Shared application instance.
+        IApplication*           m_impl;            //!< Platform specific application implementation.
+        ApplicationDelegate*    m_delegate;        //!< Application delegate instance.
+        Arguments                m_arguments;    //!< Passed arguments.
     };
 
     //! Service application
@@ -147,17 +147,17 @@ namespace Platform {
 DC_END_DREEMCHEST
 
 //! Declares an application entry point
-#define dcDeclareApplication( delegate )													        \
-    s32 main( s32 argc, s8** argv ) {														        \
-		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
-        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );	        \
+#define dcDeclareApplication( delegate )                                                            \
+    s32 main( s32 argc, s8** argv ) {                                                                \
+        DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );            \
     }
 
 //! Declares a service entry point
 #define dcDeclareServiceApplication( delegate )                                                     \
-    s32 main( s32 argc, s8** argv ) {														        \
-		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
-        return DC_DREEMCHEST_NS Platform::ServiceApplication::create( args )->launch( delegate );	\
+    s32 main( s32 argc, s8** argv ) {                                                                \
+        DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+        return DC_DREEMCHEST_NS Platform::ServiceApplication::create( args )->launch( delegate );    \
     }
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

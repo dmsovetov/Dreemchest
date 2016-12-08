@@ -119,17 +119,17 @@ RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromNearAndFa
 // ** RenderScene::CBuffer::ClipPlanes::fromViewProjectio
 RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromViewProjection( const Matrix4& viewProjection )
 {
-	const f32 *m = viewProjection.m;
-	ClipPlanes planes;
+    const f32 *m = viewProjection.m;
+    ClipPlanes planes;
 
-	planes.equation[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
-	planes.equation[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
+    planes.equation[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
+    planes.equation[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
 
-	planes.equation[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
-	planes.equation[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
+    planes.equation[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
+    planes.equation[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
 
-	planes.equation[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
-	planes.equation[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
+    planes.equation[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
+    planes.equation[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
 
     return planes;
 }
@@ -137,19 +137,19 @@ RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromViewProje
 // ** RenderScene::CBuffer::ClipPlanes::fromSphere
 RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromSphere( const Vec3& center, f32 radius )
 {
-	Vec3 x( 1.0f, 0.0f, 0.0f );
-	Vec3 y( 0.0f, 1.0f, 0.0f );
-	Vec3 z( 0.0f, 0.0f, 1.0f );
+    Vec3 x( 1.0f, 0.0f, 0.0f );
+    Vec3 y( 0.0f, 1.0f, 0.0f );
+    Vec3 z( 0.0f, 0.0f, 1.0f );
     ClipPlanes planes;
 
-	planes.equation[0] = Plane::calculate(  x, center - x * radius );
-	planes.equation[1] = Plane::calculate( -x, center + x * radius );
+    planes.equation[0] = Plane::calculate(  x, center - x * radius );
+    planes.equation[1] = Plane::calculate( -x, center + x * radius );
 
-	planes.equation[2] = Plane::calculate(  y, center - y * radius );
-	planes.equation[3] = Plane::calculate( -y, center + y * radius );
+    planes.equation[2] = Plane::calculate(  y, center - y * radius );
+    planes.equation[3] = Plane::calculate( -y, center + y * radius );
 
-	planes.equation[4] = Plane::calculate(  z, center - z * radius );
-	planes.equation[5] = Plane::calculate( -z, center + z * radius );
+    planes.equation[4] = Plane::calculate(  z, center - z * radius );
+    planes.equation[5] = Plane::calculate( -z, center + z * radius );
 
     return planes;
 }
@@ -168,7 +168,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderC
     m_lights        = ecs->createDataCache<LightCache>( Ecs::Aspect::all<Light, Transform>(), dcThisMethod( RenderScene::createLightNode ) );
     m_cameras       = ecs->createDataCache<CameraCache>( Ecs::Aspect::all<Camera, Viewport, Transform>(), dcThisMethod( RenderScene::createCameraNode ) );
     m_staticMeshes  = ecs->createDataCache<StaticMeshCache>( Ecs::Aspect::all<StaticMesh, Transform>(), dcThisMethod( RenderScene::createStaticMeshNode ) );
-	m_sprites		= ecs->createDataCache<SpriteCache>( Ecs::Aspect::all<Sprite, Transform>(), dcThisMethod( RenderScene::createSpriteNode ) );
+    m_sprites        = ecs->createDataCache<SpriteCache>( Ecs::Aspect::all<Sprite, Transform>(), dcThisMethod( RenderScene::createSpriteNode ) );
 
     // Create scene constant buffer
     m_sceneConstants  = m_context->requestConstantBuffer( NULL, sizeof( CBuffer::Scene ), CBuffer::Scene::Layout );
@@ -368,7 +368,7 @@ RenderScene::SpriteNode RenderScene::createSpriteNode( const Ecs::Entity& entity
     sprite.matrix            = &sprite.transform->matrix();
     sprite.sprite            = entity.get<Sprite>();
 
-	initializeInstanceNode( entity, sprite, sprite.sprite->material() );
+    initializeInstanceNode( entity, sprite, sprite.sprite->material() );
 
     return sprite;
 }

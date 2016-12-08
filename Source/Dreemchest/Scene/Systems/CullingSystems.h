@@ -37,27 +37,27 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 #if DEV_DEPRECATED_SCENE_RENDERER
-	//! Performs frustum culling for all active cameras.
-	class FrustumCullingSystem : public Ecs::GenericEntitySystem<FrustumCullingSystem, StaticMesh, Transform> {
-	public:
+    //! Performs frustum culling for all active cameras.
+    class FrustumCullingSystem : public Ecs::GenericEntitySystem<FrustumCullingSystem, StaticMesh, Transform> {
+    public:
 
-							//! Constructs FrustumCullingSystem instance.
-							FrustumCullingSystem( const Ecs::IndexPtr& cameras )
-								: m_cameras( cameras ) {}
+                            //! Constructs FrustumCullingSystem instance.
+                            FrustumCullingSystem( const Ecs::IndexPtr& cameras )
+                                : m_cameras( cameras ) {}
 
-	protected:
+    protected:
 
-		//! Calculates frustums for all cameras.
-		virtual bool		begin( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
+        //! Calculates frustums for all cameras.
+        virtual bool        begin( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
-		//! Perform culling of a single mesh.
-		virtual void		process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
+        //! Perform culling of a single mesh.
+        virtual void        process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		Ecs::IndexPtr		m_cameras;	//!< All cameras used for culling.
-		Array<PlaneClipper>	m_frustums;	//!< Active frustums.
-	};
+        Ecs::IndexPtr        m_cameras;    //!< All cameras used for culling.
+        Array<PlaneClipper>    m_frustums;    //!< Active frustums.
+    };
 #endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene

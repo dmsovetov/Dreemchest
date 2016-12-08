@@ -38,8 +38,8 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
     : m_ecs( ecs )
     , m_excluded( excluded )
 {
-	// Register an entity flags default value
-	registerPropertyDefault<Entity>( "flags", dcThisMethod( Serializer::defaultEntityFlags ) );
+    // Register an entity flags default value
+    registerPropertyDefault<Entity>( "flags", dcThisMethod( Serializer::defaultEntityFlags ) );
 
     // Register entity value converter
     registerTypeConverter<Guid, EntityWPtr>( dcThisMethod( Serializer::convertGuidToEntity ) );
@@ -97,16 +97,16 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
     Reflection::Serializer::deserialize( entity->metaInstance(), ar );
 
     // Create components from key-value archive
-	const KeyValue::Properties& kv = ar.properties();
+    const KeyValue::Properties& kv = ar.properties();
 
     // Get the entity meta-class
     const Reflection::Class* metaObject = entity->metaObject();
 
-	for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+    for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
         // Skip the class value & all entity properties
-		if( i->first == "class" || metaObject->findMember( i->first.c_str() ) ) {
-			continue;
-		}
+        if( i->first == "class" || metaObject->findMember( i->first.c_str() ) ) {
+            continue;
+        }
 
         // First lookup a component converter
         ComponentConverter converter = findComponentConverter( i->first );
@@ -140,7 +140,7 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
         }
 
         entity->attachComponent( component );
-	}
+    }
 
     return true;
 }
@@ -168,7 +168,7 @@ Serializer::ComponentConverter Serializer::findComponentConverter( const String&
 // ** Serializer::defaultEntityFlags
 Variant Serializer::defaultEntityFlags( const KeyValue& ar ) const
 {
-	return Variant::fromValue( 0 );
+    return Variant::fromValue( 0 );
 }
 
 // ** Serializer::resolveEntity

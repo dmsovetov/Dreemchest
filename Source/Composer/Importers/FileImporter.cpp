@@ -33,10 +33,10 @@ namespace Importers {
 // ** FileImporter::import
 bool FileImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
-	bool result = fs->copyFile( sourceFileName.c_str(), destinationFileName.c_str() );
-	NIMBLE_BREAK_IF( !result );
+    bool result = fs->copyFile( sourceFileName.c_str(), destinationFileName.c_str() );
+    NIMBLE_BREAK_IF( !result );
 
-	return result;
+    return result;
 }
 
 } // namespace Importers

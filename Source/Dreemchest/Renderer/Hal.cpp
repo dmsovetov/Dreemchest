@@ -34,8 +34,8 @@
 #endif
 
 #ifdef DC_OPENGL_ENABLED
-	#include "OpenGL/OpenGLHal.h"
-#endif	/*	DC_OPENGL_ENABLED	*/
+    #include "OpenGL/OpenGLHal.h"
+#endif    /*    DC_OPENGL_ENABLED    */
 
 #undef min
 #undef max
@@ -45,9 +45,9 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer {
 
 #ifdef DC_OPENGL_ENABLED
-	//! Platform-specific OpenGL view constructor.
-	extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
-#endif	/*	DC_OPENGL_ENABLED	*/
+    //! Platform-specific OpenGL view constructor.
+    extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
+#endif    /*    DC_OPENGL_ENABLED    */
 
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
@@ -60,36 +60,36 @@ Hal::Hal( RenderView* view ) : m_view( view )
     m_renderThread  = thread::Thread::currentThread();
 #endif
 
-	// ** 2D render state
-	//m_rasterState2D = DC_NEW RasterizerState;
-	//m_rasterState2D->setCullMode( TriangleFaceNone );
-	//m_rasterState2D->setZWrite( false );
+    // ** 2D render state
+    //m_rasterState2D = DC_NEW RasterizerState;
+    //m_rasterState2D->setCullMode( TriangleFaceNone );
+    //m_rasterState2D->setZWrite( false );
 
-	//m_blendState2D = DC_NEW BlendState;
-	//m_blendState2D->setBlendEnabled( true );
-	//m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
+    //m_blendState2D = DC_NEW BlendState;
+    //m_blendState2D->setBlendEnabled( true );
+    //m_blendState2D->setBlendFunc( BlendSrcAlpha, BlendInvSrcAlpha );
 }
 
 Hal::~Hal( void )
 {
-	//delete m_rasterState2D;
-	//delete m_blendState2D;
+    //delete m_rasterState2D;
+    //delete m_blendState2D;
 }
 
 // ** Hal::create
 Hal* Hal::create( RenderingHal renderer, RenderView* view )
 {
     switch( renderer ) {
-	case OpenGL:	
-					#ifdef DC_OPENGL_ENABLED
-						return DC_NEW OpenGLHal( view );
-					#else
-						LogError( "hal", "%s", "OpenGL renderer is not implemented\n" );
-					#endif
-					break;
+    case OpenGL:    
+                    #ifdef DC_OPENGL_ENABLED
+                        return DC_NEW OpenGLHal( view );
+                    #else
+                        LogError( "hal", "%s", "OpenGL renderer is not implemented\n" );
+                    #endif
+                    break;
 
     case Direct3D:  LogError( "hal", "%s", "Direct3D renderer is not implemented\n" );
-					break;
+                    break;
     }
 
     return NULL;
@@ -167,9 +167,9 @@ InputLayoutPtr Hal::createInputLayout( s32 vertexSize )
 // ** Hal::createIndexBuffer
 IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 {
-	if( GPU ) {
+    if( GPU ) {
         LogWarning( "hal", "%s", "GPU index buffers are not supported\n" );
-	}
+    }
 
     return IndexBufferPtr( DC_NEW IndexBuffer( count, false ) );
 }
@@ -177,9 +177,9 @@ IndexBufferPtr Hal::createIndexBuffer( u32 count, bool GPU )
 // ** Hal::createVertexBuffer
 VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 {
-	if( GPU ) {
-		LogWarning( "hal", "%s", "GPU vertex buffers are not supported\n" );
-	}
+    if( GPU ) {
+        LogWarning( "hal", "%s", "GPU vertex buffers are not supported\n" );
+    }
 
     return VertexBufferPtr( DC_NEW VertexBuffer( size, false ) );
 }
@@ -187,9 +187,9 @@ VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 // ** Hal::createConstantBuffer
 ConstantBufferPtr Hal::createConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 {
-	if( layout == NULL ) {
-		LogWarning( "hal", "%s", "GPU constant buffers are not supported\n" );
-	}
+    if( layout == NULL ) {
+        LogWarning( "hal", "%s", "GPU constant buffers are not supported\n" );
+    }
 
     return ConstantBufferPtr( DC_NEW ConstantBuffer( size, layout ) );
 }
@@ -330,13 +330,13 @@ void Hal::setViewport( u32 x, u32 y, u32 width, u32 height )
 // ** Hal::setViewport
 void Hal::setViewport( const Rect& rect )
 {
-	u32 x	   = static_cast<u32>( rect.min().x );
-	u32 y	   = static_cast<u32>( rect.min().y );
-	u32 width  = static_cast<u32>( rect.width() );
-	u32 height = static_cast<u32>( rect.height() );
+    u32 x       = static_cast<u32>( rect.min().x );
+    u32 y       = static_cast<u32>( rect.min().y );
+    u32 width  = static_cast<u32>( rect.width() );
+    u32 height = static_cast<u32>( rect.height() );
 
-	setViewport( x, y, width, height );
-	setScissorTest( true, x, y, width, height );
+    setViewport( x, y, width, height );
+    setScissorTest( true, x, y, width, height );
 }
 
 // ** Hal::setColorMask
@@ -465,7 +465,7 @@ struct sUnlockTextureTask {
 // ** Hal::createTexture2D
 void Hal::createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture )
 {
-	NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
+    NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
     sCreateTextureTask task( this, texture, width, height, format );
     *texture = NULL;
@@ -530,7 +530,7 @@ Texture::Texture( PixelFormat format, Type type ) : m_type( type ), m_pixelForma
 // ** Texture::type
 Texture::Type Texture::type( void ) const
 {
-	return m_type;
+    return m_type;
 }
 
 // ** Texture::pixelFormat
@@ -701,31 +701,31 @@ RenderTarget::RenderTarget( u32 width, u32 height ) : m_width( width ), m_height
 // ** RenderTarget::width
 u32 RenderTarget::width( void ) const
 {
-	return m_width;
+    return m_width;
 }
 
 // ** RenderTarget::height
 u32 RenderTarget::height( void ) const
 {
-	return m_height;
+    return m_height;
 }
 
 // ** RenderTarget::setAttachment
 bool RenderTarget::setAttachment( PixelFormat format, Attachment attachment )
 {
-	return false;
+    return false;
 }
 
 // ** RenderTarget::setDepth
 bool RenderTarget::setDepth( PixelFormat format )
 {
-	return false;
+    return false;
 }
 
 // ** RenderTarget:attachment
 Texture2DPtr RenderTarget::attachment( Attachment attachment ) const
 {
-	return m_attachments[attachment];
+    return m_attachments[attachment];
 }
 
 // ---------------------------------------------- InputLayout --------------------------------------------- //
@@ -809,18 +809,18 @@ const InputLayout::Element& InputLayout::pointSize( void ) const
 
 // ** VertexBuffer::VertexBuffer
 VertexBuffer::VertexBuffer( s32 size, bool gpu )
-	: m_size( size )
+    : m_size( size )
     , m_data( NULL )
     , m_isGpu( gpu )
 {
     if( !m_isGpu ) {
-		m_data = DC_NEW u8[size];
-	}
+        m_data = DC_NEW u8[size];
+    }
 }
 
 VertexBuffer::~VertexBuffer( void )
 {
-	delete[]( u8* )m_data;
+    delete[]( u8* )m_data;
 }
 
 // ** VertexBuffer::size
@@ -838,7 +838,7 @@ const void* VertexBuffer::pointer( void ) const
 // ** VertexBuffer::isGpu
 bool VertexBuffer::isGpu( void ) const
 {
-	return m_isGpu;
+    return m_isGpu;
 }
 
 // ** VertexBuffer::lock
@@ -863,16 +863,16 @@ void VertexBuffer::setBufferData( const void* source, s32 offset, s32 size )
 
 // ** IndexBuffer::IndexBuffer
 IndexBuffer::IndexBuffer( u32 count, bool gpu )
-	: m_size( count ), m_data( NULL ), m_isGpu( gpu )
+    : m_size( count ), m_data( NULL ), m_isGpu( gpu )
 {
-	if( !m_isGpu ) {
-		m_data = DC_NEW u16[count];
-	}
+    if( !m_isGpu ) {
+        m_data = DC_NEW u16[count];
+    }
 }
 
 IndexBuffer::~IndexBuffer( void )
 {
-	delete[]m_data;
+    delete[]m_data;
 }
 
 // ** IndexBuffer::size
@@ -890,7 +890,7 @@ const u16* IndexBuffer::pointer( void ) const
 // ** IndexBuffer::isGpu
 bool IndexBuffer::isGpu( void ) const
 {
-	return m_isGpu;
+    return m_isGpu;
 }
 
 // ** IndexBuffer::lock
@@ -909,20 +909,20 @@ void IndexBuffer::unlock( void )
 
 // ** ConstantBuffer::ConstantBuffer
 ConstantBuffer::ConstantBuffer( u32 size, const ConstantBufferLayout* layout )
-	: m_size( size )
+    : m_size( size )
     , m_data( NULL )
     , m_layout( layout )
 {
 #if DEV_RENDERER_SOFTWARE_CBUFFERS
-	if( layout ) {
-		m_data = DC_NEW u8[size];
-	}
+    if( layout ) {
+        m_data = DC_NEW u8[size];
+    }
 #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 }
 
 ConstantBuffer::~ConstantBuffer( void )
 {
-	delete[]m_data;
+    delete[]m_data;
 }
 
 // ** ConstantBuffer::size

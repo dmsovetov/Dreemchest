@@ -48,7 +48,7 @@ namespace Scene {
                 , Execute               //!< Executes a command buffer.
                 , RenderTarget          //!< Begins rendering to a viewport.
                 , UploadConstantBuffer  //!< Uploads data to a constant buffer.
-				, UploadVertexBuffer	//!< Uploads data to a vertex buffer.
+                , UploadVertexBuffer    //!< Uploads data to a vertex buffer.
                 , AcquireRenderTarget   //!< Acquires an intermediate render target.
                 , ReleaseRenderTarget   //!< Releases an intermediate render target.
             };
@@ -119,8 +119,8 @@ namespace Scene {
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
 
-		//! Emits a vertex buffer upload command.
-		void						uploadVertexBuffer( u32 id, const void* data, s32 size );
+        //! Emits a vertex buffer upload command.
+        void                        uploadVertexBuffer( u32 id, const void* data, s32 size );
 
         //! Emits a draw indexed command.
         void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );

@@ -26,16 +26,16 @@ target_link_libraries(08_NetworkHandlers Dreemchest)
 #target_link_libraries(09_ModelViewViewModel Dreemchest)
 
 if (DC_QT_ENABLED)
-#	add_executable(10_MvvmQt 10_MvvmQt.cpp)
-#	target_link_libraries(10_MvvmQt Dreemchest)
+#    add_executable(10_MvvmQt 10_MvvmQt.cpp)
+#    target_link_libraries(10_MvvmQt Dreemchest)
 endif (DC_QT_ENABLED)
 
 add_executable(11_Particles WIN32 MACOSX_BUNDLE 11_Particles.cpp)
 target_link_libraries(11_Particles Dreemchest)
 
 if (DC_SOUND_ENABLED)
-	add_executable(12_Sound WIN32 MACOSX_BUNDLE 12_Sound.cpp)
-	target_link_libraries(12_Sound Dreemchest)
+    add_executable(12_Sound WIN32 MACOSX_BUNDLE 12_Sound.cpp)
+    target_link_libraries(12_Sound Dreemchest)
 endif (DC_SOUND_ENABLED)
 
 add_executable(13_Scene WIN32 MACOSX_BUNDLE 13_Scene.cpp)
@@ -53,6 +53,6 @@ set_property(TARGET 08_NetworkHandlers PROPERTY FOLDER "Examples")
 set_property(TARGET 11_Particles PROPERTY FOLDER "Examples")
 
 if (DC_SOUND_ENABLED)
-	set_property(TARGET 12_Sound PROPERTY FOLDER "Examples")
+    set_property(TARGET 12_Sound PROPERTY FOLDER "Examples")
 endif()
 set_property(TARGET 13_Scene PROPERTY FOLDER "Examples")

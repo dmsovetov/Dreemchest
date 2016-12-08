@@ -33,10 +33,10 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Prefab scene asset.
-	class Prefab {
-	public:
-	};
+    //! Prefab scene asset.
+    class Prefab {
+    public:
+    };
 
 } // namespace Scene
 

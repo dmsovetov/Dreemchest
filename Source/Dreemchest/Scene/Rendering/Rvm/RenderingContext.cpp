@@ -115,7 +115,7 @@ void RenderingContext::constructVertexBuffer( const ResourceConstructor& constru
     // Save a vertex buffer to a pool
     m_vertexBufferPool[constructor.id - 1] = vertexBuffer;
 
-	LogDebug( "renderingContext", "vertex buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
+    LogDebug( "renderingContext", "vertex buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
 }
 
 // ** RenderingContext::constructIndexBuffer
@@ -133,7 +133,7 @@ void RenderingContext::constructIndexBuffer( const ResourceConstructor& construc
     // Save a index buffer to a pool
     m_indexBufferPool[constructor.id - 1] = indexBuffer;
 
-	LogDebug( "renderingContext", "index buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
+    LogDebug( "renderingContext", "index buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
 }
 
 // ** RenderingContext::constructConstantBuffer
@@ -243,8 +243,8 @@ RenderResource RenderingContext::requestTexture( const void* data, s32 width, s3
 // ** RenderingContext::createShader
 UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 {
-	static CString vertexShaderMarker   = "[VertexShader]";
-	static CString fragmentShaderMarker = "[FragmentShader]";
+    static CString vertexShaderMarker   = "[VertexShader]";
+    static CString fragmentShaderMarker = "[FragmentShader]";
     static CString featuresMarker       = "[Features]";
 
     Map<String, u64> masks;
@@ -291,17 +291,17 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
 
-	// Read the code from an input stream
-	String code = Io::DiskFileSystem::readTextFile( fileName );
+    // Read the code from an input stream
+    String code = Io::DiskFileSystem::readTextFile( fileName );
 
-	// Extract vertex/fragment shader code blocks
-	size_t vertexBegin   = code.find( vertexShaderMarker );
-	size_t fragmentBegin = code.find( fragmentShaderMarker );
+    // Extract vertex/fragment shader code blocks
+    size_t vertexBegin   = code.find( vertexShaderMarker );
+    size_t fragmentBegin = code.find( fragmentShaderMarker );
     size_t featuresBegin = code.find( featuresMarker );
 
-	if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
-		return UbershaderPtr();
-	}
+    if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
+        return UbershaderPtr();
+    }
 
     if( featuresBegin != String::npos ) {
         u32 featuresCodeStart = featuresBegin + strlen( featuresMarker );
@@ -314,17 +314,17 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
         }
     }
 
-	if( vertexBegin != String::npos ) {
-		u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
-		String vertex = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
+    if( vertexBegin != String::npos ) {
+        u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
+        String vertex = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
         shader->setVertex( vertex );
-	}
+    }
 
-	if( fragmentBegin != String::npos ) {
-		u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
-		String fragment = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
+    if( fragmentBegin != String::npos ) {
+        u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
+        String fragment = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
         shader->setFragment( fragment );
-	}
+    }
 
     // ----------------------------------------------------
     shader->addInclude(
@@ -348,7 +348,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
             "
         );
 
-	return shader;
+    return shader;
 }
 
 // ** RenderingContext::acquireRenderTarget

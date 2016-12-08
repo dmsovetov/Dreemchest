@@ -102,4 +102,4 @@ namespace Network {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_Application_Hpp__	*/
+#endif    /*    !__DC_Network_Application_Hpp__    */

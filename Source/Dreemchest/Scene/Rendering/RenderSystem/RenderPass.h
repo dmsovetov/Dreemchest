@@ -37,9 +37,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Performs a single rendering pass.
-	class RenderPassBase {
-	public:
+    //! Performs a single rendering pass.
+    class RenderPassBase {
+    public:
 
                                                 //! Constructs RenderPassBase instance.
                                                 RenderPassBase( RenderingContext& context, RenderScene& renderScene );
@@ -47,8 +47,8 @@ namespace Scene {
         //! Performs a render pass with a diffuse material.
         void                                    renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Rgba& color );
 
-		//! Renders a pass to active render target.
-        virtual void			                emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+        //! Renders a pass to active render target.
+        virtual void                            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
 
         //! Begins a pass rendering.
         virtual void                            begin( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
@@ -68,12 +68,12 @@ namespace Scene {
         //! Constructs a view constant buffer with an ortho projection.
         static RenderScene::CBuffer::View       orthoView( const Viewport& viewport );
 
-	protected:
+    protected:
 
         RenderingContext&                       m_context;          //!< A parent rendering context.
         RenderScene&                            m_renderScene;      //!< Parent render scene.
         RenderResource                          m_materialCBuffer;  //!< A material constant buffer.
-	};
+    };
 
 } // namespace Scene
 

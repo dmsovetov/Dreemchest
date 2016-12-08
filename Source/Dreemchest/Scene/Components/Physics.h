@@ -38,13 +38,13 @@ namespace Scene {
 
     //! A 2D shape part material.
     struct MaterialShape2D {
-	    f32			density;        //!< Material density.
-	    f32			friction;       //!< Material friction.
-	    f32			restitution;    //!< Material restitution.
+        f32            density;        //!< Material density.
+        f32            friction;       //!< Material friction.
+        f32            restitution;    //!< Material restitution.
 
-        		    //! Constructs a material instance.
-					MaterialShape2D( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
-						: density( density ), friction( friction ), restitution( restitution ) {}
+                    //! Constructs a material instance.
+                    MaterialShape2D( f32 density = 1.0f, f32 friction = 0.2f, f32 restitution = 0.0f )
+                        : density( density ), friction( friction ), restitution( restitution ) {}
 
         //! Reads a material from a Variant value.
         void        operator << ( const Variant& value );
@@ -55,9 +55,9 @@ namespace Scene {
 
     //! A 2D circle shape type.
     struct CircleShape2D {
-		f32		    radius;			//!< Circle radius.
-		f32		    x;				//!< Circle centroid X.
-		f32		    y;				//!< Circle centroid Y.
+        f32            radius;            //!< Circle radius.
+        f32            x;                //!< Circle centroid X.
+        f32            y;                //!< Circle centroid Y.
 
         //! Reads a shape from a Variant value.
         void        operator << ( const Variant& value );
@@ -68,10 +68,10 @@ namespace Scene {
 
     //! A 2D rectangle shape type.
     struct RectShape2D {
-		f32		    width;			//!< Rectangle width.
-		f32		    height;			//!< Rectangle height.
-		f32		    x;				//!< Rectangle centroid X.
-		f32		    y;				//!< Rectangle centroid Y.
+        f32            width;            //!< Rectangle width.
+        f32            height;            //!< Rectangle height.
+        f32            x;                //!< Rectangle centroid X.
+        f32            y;                //!< Rectangle centroid Y.
 
         //! Reads a shape from a Variant value.
         void        operator << ( const Variant& value );
@@ -82,10 +82,10 @@ namespace Scene {
 
     //! A polygon 2D shape type.
     struct PolygonShape2D {
-        enum { MaxVertices = 8 };	//!< Maximum number of polygon vertices.
+        enum { MaxVertices = 8 };    //!< Maximum number of polygon vertices.
 
-	    f32		    vertices[(MaxVertices + 1) * 2];	//!< Polygon vertices.
-        u32		    count;								//!< Polygon vertex count.
+        f32            vertices[(MaxVertices + 1) * 2];    //!< Polygon vertices.
+        u32            count;                                //!< Polygon vertex count.
 
         //! Reads a shape from a Variant value.
         void        operator << ( const Variant& value );
@@ -99,11 +99,11 @@ namespace Scene {
         Shape2DType         type;       //!< Simple shape type.
         MaterialShape2D     material;   //!< Simple shape material.
 
-		union {
-			CircleShape2D   circle;	    //!< Circle shape data.
-            RectShape2D     rect;	    //!< Rectangle shape data.
+        union {
+            CircleShape2D   circle;        //!< Circle shape data.
+            RectShape2D     rect;        //!< Rectangle shape data.
             PolygonShape2D  polygon;    //! Polygon shape data.
-		};
+        };
 
         //! Tests two shape instance for an equality.
         bool                    operator == ( const SimpleShape2D& other ) const;
@@ -114,39 +114,39 @@ namespace Scene {
         //! Writes a shape instance to a Variant value.
         void                    operator >> ( Variant& value );
 
-		//! Creates a 2D circle shape.
-		static SimpleShape2D    createCircle( f32 radius, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
+        //! Creates a 2D circle shape.
+        static SimpleShape2D    createCircle( f32 radius, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
 
-		//! Creates a 2D rectangle shape.
-		static SimpleShape2D    createRect( f32 width, f32 height, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
+        //! Creates a 2D rectangle shape.
+        static SimpleShape2D    createRect( f32 width, f32 height, f32 x = 0, f32 y = 0, const MaterialShape2D& material = MaterialShape2D() );
 
-		//! Creates a 2D polygon shape.
-		static SimpleShape2D    createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material = MaterialShape2D() );
+        //! Creates a 2D polygon shape.
+        static SimpleShape2D    createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material = MaterialShape2D() );
     };
 
-	//! Shape of an object used for hit tests and/or 2D physics.
-	class Shape2D : public Ecs::Component<Shape2D> {
+    //! Shape of an object used for hit tests and/or 2D physics.
+    class Shape2D : public Ecs::Component<Shape2D> {
 
         INTROSPECTION_SUPER( Shape2D, Ecs::ComponentBase
             , PROPERTY( parts, parts, setParts, "An array of simple shapes this component is composed from." )
             )
 
-	public:
+    public:
 
         //! Container type to store shape parts.
         typedef Array<SimpleShape2D> Parts;
 
-							    //! Constructs Shape2D instance.
-							    Shape2D( void ) {}
+                                //! Constructs Shape2D instance.
+                                Shape2D( void ) {}
 
-		//! Removes all nested shape parts.
-		void				    clear( void );
+        //! Removes all nested shape parts.
+        void                    clear( void );
 
-		//! Returns the total number of nested shapes.
-		u32					    partCount( void ) const;
+        //! Returns the total number of nested shapes.
+        u32                        partCount( void ) const;
 
-		//! Returns the nested shape by index.
-		const SimpleShape2D&    part( u32 index ) const;
+        //! Returns the nested shape by index.
+        const SimpleShape2D&    part( u32 index ) const;
 
         //! Adds a new shape part.
         void                    addPart( const SimpleShape2D& part );
@@ -157,36 +157,36 @@ namespace Scene {
         //! Sets shap parts.
         void                    setParts( const Parts& value );
 
-	private:
+    private:
 
-		Array<SimpleShape2D>    m_parts;	//!< Shape parts.
-	};
+        Array<SimpleShape2D>    m_parts;    //!< Shape parts.
+    };
 
-	//! 2D rigid body.
-	class RigidBody2D : public Ecs::Component<RigidBody2D> {
+    //! 2D rigid body.
+    class RigidBody2D : public Ecs::Component<RigidBody2D> {
     friend class Physics2D;
-	public:
+    public:
 
         //! The default rigid body category
         enum { DefaultCategory = BIT( 0 ) };
 
-		//! Supported rigid body types.
-		enum Type {
-			  Static = 0	//!< Static rigid body.
-			, Dynamic		//!< Dynamic rigid body.
-			, Kinematic		//!< Kinematic rigid body.
-			, TotalTypes	//!< The total number of rigid body types.
-		};
+        //! Supported rigid body types.
+        enum Type {
+              Static = 0    //!< Static rigid body.
+            , Dynamic        //!< Dynamic rigid body.
+            , Kinematic        //!< Kinematic rigid body.
+            , TotalTypes    //!< The total number of rigid body types.
+        };
 
-		//! A single force or impulse applied is stored in this structure.
-		struct AppliedForce {
-							    //! Constructs the AppliedForce instance.
-							    AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
-								    : m_value( value ), m_point( point ) {}
+        //! A single force or impulse applied is stored in this structure.
+        struct AppliedForce {
+                                //! Constructs the AppliedForce instance.
+                                AppliedForce( const Vec2& value = Vec2(), const Vec2& point = Vec2() )
+                                    : m_value( value ), m_point( point ) {}
 
-			Vec2			    m_value;    //!< The force applied.
-			Vec2			    m_point;    //!< The application point.
-		};
+            Vec2                m_value;    //!< The force applied.
+            Vec2                m_point;    //!< The application point.
+        };
 
         //! Collision event data.
         struct CollisionEvent {
@@ -210,26 +210,26 @@ namespace Scene {
             Array<Vec2>         points;     //!< Collision points.
         };
 
-							    //! Constructs the RigidBody2D instance.
-							    RigidBody2D( f32 mass = 0.0f, Type type = Static, u16 category = DefaultCategory, u16 collisionMask = ~0, bool isBullet = false, bool isSensor = false );
+                                //! Constructs the RigidBody2D instance.
+                                RigidBody2D( f32 mass = 0.0f, Type type = Static, u16 category = DefaultCategory, u16 collisionMask = ~0, bool isBullet = false, bool isSensor = false );
 
-		//! Returns the rigid body mass.
-		f32					    mass( void ) const;
+        //! Returns the rigid body mass.
+        f32                        mass( void ) const;
 
-		//! Returns the rigid body type.
-		Type				    type( void ) const;
+        //! Returns the rigid body type.
+        Type                    type( void ) const;
 
-		//! Returns the linear damping applied to a body.
-		f32					    linearDamping( void ) const;
+        //! Returns the linear damping applied to a body.
+        f32                        linearDamping( void ) const;
 
-		//! Sets the linear damping applied to a body.
-		void				    setLinearDamping( f32 value );
+        //! Sets the linear damping applied to a body.
+        void                    setLinearDamping( f32 value );
 
-		//! Returns the angular damping applied to a body.
-		f32					    angularDamping( void ) const;
+        //! Returns the angular damping applied to a body.
+        f32                        angularDamping( void ) const;
 
-		//! Sets the angular damping applied to a body.
-		void				    setAngularDamping( f32 value );
+        //! Sets the angular damping applied to a body.
+        void                    setAngularDamping( f32 value );
 
         //! Returns gravity scale for this body.
         f32                     gravityScale( void ) const;
@@ -267,20 +267,20 @@ namespace Scene {
         //! Returns true if this is a sensor.
         bool                    isSensor( void ) const;
 
-		//! Returns the torque applied to this rigid body.
-		f32					    torque( void ) const;
+        //! Returns the torque applied to this rigid body.
+        f32                        torque( void ) const;
 
-		//! Applies the torque to the rigid body.
-		void				    applyTorque( f32 value );
+        //! Applies the torque to the rigid body.
+        void                    applyTorque( f32 value );
 
-		//! Returns the force applied to this rigid body.
-		const Vec2&			    force( void ) const;
+        //! Returns the force applied to this rigid body.
+        const Vec2&                force( void ) const;
 
-		//! Applies force to the center of mass.
-		void				    applyForce( const Vec2& value );
+        //! Applies force to the center of mass.
+        void                    applyForce( const Vec2& value );
 
-		//! Applies force to a specified point.
-		void				    applyForceToPoint( const Vec2& value, const Vec2& point );
+        //! Applies force to a specified point.
+        void                    applyForceToPoint( const Vec2& value, const Vec2& point );
 
         //! Applies linear impulse to the center of mass.
         void                    applyImpulse( const Vec2& value );
@@ -288,11 +288,11 @@ namespace Scene {
         //! Applies linear impulse to a specified point.
         void                    applyImpulseToPoint( const Vec2& value, const Vec2& point );
 
-		//! Returns the total number of applied forces.
-		u32					    appliedForceCount( void ) const;
+        //! Returns the total number of applied forces.
+        u32                        appliedForceCount( void ) const;
 
-		//! Returns the applied force by index.
-		const AppliedForce&	    appliedForce( u32 index ) const;
+        //! Returns the applied force by index.
+        const AppliedForce&        appliedForce( u32 index ) const;
 
         //! Returns the total number of applied impulses.
         u32                     appliedImpulseCount( void ) const;
@@ -326,13 +326,13 @@ namespace Scene {
         //! Clears all queued events.
         void                    clearEvents( void );
 
-		//! Clears all applied forces and impulses.
-		void				    clear( void );
+        //! Clears all applied forces and impulses.
+        void                    clear( void );
 
         //! Updates mass of a body.
         void                    updateMass( f32 value );
 
-	private:
+    private:
 
         //! Internal physical body flags.
         enum {
@@ -343,14 +343,14 @@ namespace Scene {
             , IsSensor      = BIT( 4 )  //!< Sensor bodies collect contact information but never generate a collision.
         };
 
-		f32					    m_mass;				//!< The rigid body mass.
-		Type				    m_type;				//!< The rigid body type.
-		f32					    m_linearDamping;	//!< The linear damping applied to a body.
-		f32					    m_angularDamping;	//!< The angular damping applied to a body.
-		f32					    m_torque;			//!< The total torque applied.
-		Vec2				    m_force;			//!< The total force applied.
+        f32                        m_mass;                //!< The rigid body mass.
+        Type                    m_type;                //!< The rigid body type.
+        f32                        m_linearDamping;    //!< The linear damping applied to a body.
+        f32                        m_angularDamping;    //!< The angular damping applied to a body.
+        f32                        m_torque;            //!< The total torque applied.
+        Vec2                    m_force;            //!< The total force applied.
         f32                     m_gravityScale;     //!< Body's gravity scale.
-		Array<AppliedForce>	    m_forces;			//!< All applied forces.
+        Array<AppliedForce>        m_forces;            //!< All applied forces.
         Array<AppliedForce>     m_impulses;         //!< All applied impulses.
         Array<CollisionEvent>   m_collisionEvents;  //!< All collision events recorded since on simulation step.
         u16                     m_category;         //!< Rigid body category used in collision filtering.
@@ -359,7 +359,7 @@ namespace Scene {
         f32                     m_rotatedTo;        //!< An angle this rigid body was rotated.
         FlagSet8                m_flags;            //!< State flags.
         Vec2                    m_linearVelocity;   //!< Linear velocity of a body.
-	};
+    };
 
 } // namespace Scene
 

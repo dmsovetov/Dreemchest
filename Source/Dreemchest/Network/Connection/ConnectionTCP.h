@@ -44,8 +44,8 @@ namespace Network {
         //! Returns the connection TCP socket.
         TCPSocketWPtr       socket( void ) const;
 
-		//! Returns a remote address of a connection.
-		const Address&	    address( void ) const;
+        //! Returns a remote address of a connection.
+        const Address&        address( void ) const;
 
         //! Closes this TCP connection.
         virtual void        close( void ) NIMBLE_OVERRIDE;

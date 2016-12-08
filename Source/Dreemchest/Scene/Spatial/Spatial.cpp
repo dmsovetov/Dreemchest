@@ -64,38 +64,38 @@ Spatial::Spatial( SceneWPtr scene )
 // ** Spatial::queryRay
 Spatial::Results Spatial::queryRay( const Ray& ray, const FlagSet8& flags ) const
 {
-	// Get entity set from index
-	const Ecs::EntitySet& entities = m_meshes->entities();
+    // Get entity set from index
+    const Ecs::EntitySet& entities = m_meshes->entities();
 
-	// Resulting array
-	Results results;
+    // Resulting array
+    Results results;
 
-	// Iterate over all meshes in scene an store all that are intersected by a ray.
-	for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
-		// Get the world space bounding box of a mesh.
-		const Bounds& bounds = (*i)->get<StaticMesh>()->worldSpaceBounds();
+    // Iterate over all meshes in scene an store all that are intersected by a ray.
+    for( Ecs::EntitySet::const_iterator i = entities.begin(), end = entities.end(); i != end; ++i ) {
+        // Get the world space bounding box of a mesh.
+        const Bounds& bounds = (*i)->get<StaticMesh>()->worldSpaceBounds();
 
-		// Check for intersection.
-		Result result( *i, Vec3::zero(), -1.0f );
+        // Check for intersection.
+        Result result( *i, Vec3::zero(), -1.0f );
 
-		if( ray.intersects( bounds, result.ray.point, &result.ray.time ) ) {
-			results.push_back( result );
-		}
-	}
+        if( ray.intersects( bounds, result.ray.point, &result.ray.time ) ) {
+            results.push_back( result );
+        }
+    }
 
-	// Sort results
-	if( flags.is( QueryBackToFront ) ) {
-		std::sort( results.begin(), results.end(), Spatial::rayTracingResultGreater );
-	} else {
-		std::sort( results.begin(), results.end(), Spatial::rayTracingResultLess );
-	}
+    // Sort results
+    if( flags.is( QueryBackToFront ) ) {
+        std::sort( results.begin(), results.end(), Spatial::rayTracingResultGreater );
+    } else {
+        std::sort( results.begin(), results.end(), Spatial::rayTracingResultLess );
+    }
 
-	// Remove all elements except the first one if single result requested
-	if( !results.empty() && flags.is( QuerySingle ) ) {
-		results.erase( results.begin() + 1, results.end() );
-	}
+    // Remove all elements except the first one if single result requested
+    if( !results.empty() && flags.is( QuerySingle ) ) {
+        results.erase( results.begin() + 1, results.end() );
+    }
 
-	return results;
+    return results;
 }
 
 // ** Spatial::rayTracingResultGreater

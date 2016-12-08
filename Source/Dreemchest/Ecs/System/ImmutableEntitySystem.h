@@ -35,106 +35,106 @@ namespace Ecs {
 
 #if DREEMCHEST_CPP11
 
-	//! Immutable entity system stores cached entity components and can't change the component layout of an entity in update loop.
-	template<typename ... TComponents>
-	class ImmutableEntitySystem : public EntitySystem {
-	public:
+    //! Immutable entity system stores cached entity components and can't change the component layout of an entity in update loop.
+    template<typename ... TComponents>
+    class ImmutableEntitySystem : public EntitySystem {
+    public:
 
-						//! Constructs ImmutableEntitySystem instance.
-						ImmutableEntitySystem( const String& name )
-							: EntitySystem( name, Aspect::all<TComponents...>() ) {}
+                        //! Constructs ImmutableEntitySystem instance.
+                        ImmutableEntitySystem( const String& name )
+                            : EntitySystem( name, Aspect::all<TComponents...>() ) {}
 
-	protected:
+    protected:
 
-		//! Component types.
-		typedef std::tuple<TComponents...> Types;
+        //! Component types.
+        typedef std::tuple<TComponents...> Types;
 
-		//! Tuple indices
-		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
+        //! Tuple indices
+        typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
-		//! Performs an update of a system
-		virtual void	update( u32 currentTime, f32 dt );
+        //! Performs an update of a system
+        virtual void    update( u32 currentTime, f32 dt );
 
-		//! Generic processing function that should be overriden in a subclass.
-		virtual void	process( u32 currentTime, f32 dt, const Array<TComponents*>& ... );
+        //! Generic processing function that should be overriden in a subclass.
+        virtual void    process( u32 currentTime, f32 dt, const Array<TComponents*>& ... );
 
-		//! Called when entity was added.
-		virtual void	entityAdded( const Entity& entity );
+        //! Called when entity was added.
+        virtual void    entityAdded( const Entity& entity );
 
-		//! Called when entity was removed.
-		virtual void	entityRemoved( const Entity& entity );
+        //! Called when entity was removed.
+        virtual void    entityRemoved( const Entity& entity );
 
-	private:
+    private:
 
-		//! Dispatches the entity components to processing
-		template<s32 ... Idxs> 
-		void dispatch( u32 currentTime, f32 dt, IndexesTuple<Idxs...> const& )  
-		{ 
-			process( currentTime, dt, std::get<Idxs>( m_cache )... );
-		}
+        //! Dispatches the entity components to processing
+        template<s32 ... Idxs> 
+        void dispatch( u32 currentTime, f32 dt, IndexesTuple<Idxs...> const& )  
+        { 
+            process( currentTime, dt, std::get<Idxs>( m_cache )... );
+        }
 
-		//! Extracts entity components to cache.
-		template<s32 Index = 0>
-		void extract( const Entity& entity )
-		{
-			typedef typename std::tuple_element<Index, Types>::type T;
-			std::get<Index>( m_cache ).push_back( entity.get<T>() );
+        //! Extracts entity components to cache.
+        template<s32 Index = 0>
+        void extract( const Entity& entity )
+        {
+            typedef typename std::tuple_element<Index, Types>::type T;
+            std::get<Index>( m_cache ).push_back( entity.get<T>() );
 
-			extract<Index + 1>( entity );
-		}
+            extract<Index + 1>( entity );
+        }
 
-	#if defined(DC_PLATFORM_WINDOWS) // VS only NDK :(
-		//! Terminates the recursion
-		template<>
-		void extract<sizeof...(TComponents)>( const Entity& entity )
-		{
-	
-		}
-	#endif	/*	!ANDROID	*/
+    #if defined(DC_PLATFORM_WINDOWS) // VS only NDK :(
+        //! Terminates the recursion
+        template<>
+        void extract<sizeof...(TComponents)>( const Entity& entity )
+        {
+    
+        }
+    #endif    /*    !ANDROID    */
 
-	protected:
+    protected:
 
-		std::tuple< Array<TComponents*>... >	m_cache;	//!< Component cache.
-	};
+        std::tuple< Array<TComponents*>... >    m_cache;    //!< Component cache.
+    };
 
-	// ** ImmutableEntitySystem::update
-	template<typename ... TComponents>
-	void ImmutableEntitySystem<TComponents...>::update( u32 currentTime, f32 dt )
-	{
-		if( !begin( currentTime ) ) {
-			return;
-		}
+    // ** ImmutableEntitySystem::update
+    template<typename ... TComponents>
+    void ImmutableEntitySystem<TComponents...>::update( u32 currentTime, f32 dt )
+    {
+        if( !begin( currentTime ) ) {
+            return;
+        }
 
-		dispatch( currentTime, dt, Indices::Indexes() );
+        dispatch( currentTime, dt, Indices::Indexes() );
 
-		end();	
-	}
+        end();    
+    }
 
-	// ** ImmutableEntitySystem::process
-	template<typename ... TComponents>
-	void ImmutableEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, const Array<TComponents*>& ... )
-	{
-		NIMBLE_NOT_IMPLEMENTED
-	}
+    // ** ImmutableEntitySystem::process
+    template<typename ... TComponents>
+    void ImmutableEntitySystem<TComponents...>::process( u32 currentTime, f32 dt, const Array<TComponents*>& ... )
+    {
+        NIMBLE_NOT_IMPLEMENTED
+    }
 
-	// ** ImmutableEntitySystem::process
-	template<typename ... TComponents>
-	void ImmutableEntitySystem<TComponents...>::entityAdded( const Entity& entity )
-	{
-		extract( entity );
-	}
+    // ** ImmutableEntitySystem::process
+    template<typename ... TComponents>
+    void ImmutableEntitySystem<TComponents...>::entityAdded( const Entity& entity )
+    {
+        extract( entity );
+    }
 
-	// ** ImmutableEntitySystem::process
-	template<typename ... TComponents>
-	void ImmutableEntitySystem<TComponents...>::entityRemoved( const Entity& entity )
-	{
-		NIMBLE_NOT_IMPLEMENTED
-	}
+    // ** ImmutableEntitySystem::process
+    template<typename ... TComponents>
+    void ImmutableEntitySystem<TComponents...>::entityRemoved( const Entity& entity )
+    {
+        NIMBLE_NOT_IMPLEMENTED
+    }
 
-#endif	/*	#if DREEMCHEST_CPP11	*/
+#endif    /*    #if DREEMCHEST_CPP11    */
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_ImmutableEntitySystem_H__	*/
+#endif    /*    !__DC_Ecs_ImmutableEntitySystem_H__    */

@@ -41,40 +41,40 @@ ToolBar::ToolBar( QWidget* parent ) : QToolBar( parent )
 // ** ToolBar::addAction
 void ToolBar::addAction( ActionQPtr action )
 {
-	QToolButton* button = new QToolButton( this );
-	button->setDefaultAction( action );
-	button->setMaximumSize( QSize( 24, 24 ) );
+    QToolButton* button = new QToolButton( this );
+    button->setDefaultAction( action );
+    button->setMaximumSize( QSize( 24, 24 ) );
 
-	addWidget( button );
+    addWidget( button );
 }
 
 // ** ToolBar::addAction
 ActionQPtr ToolBar::addAction( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
 {
-	ActionQPtr action = Action::create( text, callback, shortcut, icon, flags );
-	m_group.append( action );
+    ActionQPtr action = Action::create( text, callback, shortcut, icon, flags );
+    m_group.append( action );
 
-	addAction( action );
+    addAction( action );
 
-	return action;
+    return action;
 }
 
 // ** ToolBar::beginActionGroup
 void ToolBar::beginActionGroup( void )
 {
-	m_group.clear();
+    m_group.clear();
 }
 
 // ** ToolBar::endActionGroup
 void ToolBar::endActionGroup( void )
 {
-	NIMBLE_BREAK_IF( m_group.empty() );
+    NIMBLE_BREAK_IF( m_group.empty() );
 
-	QActionGroup* group = new QActionGroup( this );
+    QActionGroup* group = new QActionGroup( this );
 
-	foreach( ActionQPtr action, m_group ) {
-		group->addAction( action );
-	}
+    foreach( ActionQPtr action, m_group ) {
+        group->addAction( action );
+    }
 
     m_group.clear();
 }
@@ -90,34 +90,34 @@ Action::Action( QWidget* parent, const String& text, ActionCallback callback ) :
 // ** Action::triggered
 void Action::triggered( void )
 {
-	m_callback( this );
+    m_callback( this );
 }
 
 // ** Action::setShortcut
 void Action::setShortcut( const String& value )
 {
-	QAction::setShortcut( QKeySequence( value.c_str() ) );
+    QAction::setShortcut( QKeySequence( value.c_str() ) );
 }
 
 // ** Action::setIcon
 void Action::setIcon( const String& value )
 {
-	QAction::setIcon( QIcon( value.c_str() ) );
+    QAction::setIcon( QIcon( value.c_str() ) );
 }
 
 // ** Action::create
 ActionQPtr Action::create( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
 {
-	Action* action = new Action( NULL, text, callback );
+    Action* action = new Action( NULL, text, callback );
 
-	action->setDisabled( flags & ItemDisabled );
-	action->setCheckable( flags & (ItemCheckable | ItemChecked) );
-	action->setChecked( flags & ItemChecked );
-	action->setVisible( (flags & ItemHidden) == 0 );
-	action->setIcon( icon );
-	action->setShortcut( shortcut );
+    action->setDisabled( flags & ItemDisabled );
+    action->setCheckable( flags & (ItemCheckable | ItemChecked) );
+    action->setChecked( flags & ItemChecked );
+    action->setVisible( (flags & ItemHidden) == 0 );
+    action->setIcon( icon );
+    action->setShortcut( shortcut );
 
-	return action;
+    return action;
 }
 
 // ------------------------------------------------ Menu ------------------------------------------------ //
@@ -130,25 +130,25 @@ Menu::Menu( QWidget *parent ) : QMenu( parent )
 // ** Menu::size
 s32 Menu::size( void ) const
 {
-	return actions().size();
+    return actions().size();
 }
 
 // ** Menu::addMenu
 MenuQPtr Menu::addMenu( const String& text )
 {
-	Menu* menu = new Menu( this );
-	menu->setTitle( text.c_str() );
-	QMenu::addMenu( menu );
+    Menu* menu = new Menu( this );
+    menu->setTitle( text.c_str() );
+    QMenu::addMenu( menu );
 
-	return menu;
+    return menu;
 }
 
 // ** Menu::addAction
 ActionQPtr Menu::addAction( const String& text, ActionCallback callback, const String& shortcut, const String& icon, s32 flags )
 {
-	ActionQPtr action = Action::create( text, callback, shortcut, icon, flags );
-	QMenu::addAction( action );
-	return action;
+    ActionQPtr action = Action::create( text, callback, shortcut, icon, flags );
+    QMenu::addAction( action );
+    return action;
 }
 
 } // namespace Ui

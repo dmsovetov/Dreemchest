@@ -53,7 +53,7 @@ namespace Threads {
         u32                 id( void ) const;
 
         //! Creates a new Thread object.
-        static ThreadPtr	create( void );
+        static ThreadPtr    create( void );
 
         //! Puts this thread to sleep for a given amount of time.
         /*!
@@ -77,13 +77,13 @@ namespace Threads {
         //! Yields a processor time to other threads.
         virtual void        yield( void );
 
-		//! Suspends execution of the calling thread until this one terminates.
-		virtual void		wait( void ) const;
+        //! Suspends execution of the calling thread until this one terminates.
+        virtual void        wait( void ) const;
 
-	protected:
+    protected:
 
-							//! Constructs Thread instance.
-							Thread( void );
+                            //! Constructs Thread instance.
+                            Thread( void );
 
     protected:
 

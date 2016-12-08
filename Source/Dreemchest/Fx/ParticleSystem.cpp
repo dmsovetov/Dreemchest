@@ -42,42 +42,42 @@ namespace Fx {
 // ** ParticleSystem::emitterCount
 s32 ParticleSystem::emitterCount( void ) const
 {
-	return static_cast<s32>( m_emitters.size() );
+    return static_cast<s32>( m_emitters.size() );
 }
 
 // ** ParticleSystem::emitter
 EmitterWPtr ParticleSystem::emitter( s32 index ) const
 {
-	NIMBLE_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
-	return m_emitters[index];
+    NIMBLE_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
+    return m_emitters[index];
 }
 
 // ** ParticleSystem::removeEmitter
 void ParticleSystem::removeEmitter( const EmitterWPtr& emitter )
 {
-	EmittersArray::iterator i = std::find( m_emitters.begin(), m_emitters.end(), emitter );
+    EmittersArray::iterator i = std::find( m_emitters.begin(), m_emitters.end(), emitter );
     NIMBLE_BREAK_IF( i == m_emitters.end(), "particle system does not contain this emitter" );
 
-	if( i == m_emitters.end() ) {
-		return;
-	}
+    if( i == m_emitters.end() ) {
+        return;
+    }
 
-	m_emitters.erase( i );
+    m_emitters.erase( i );
 }
 
 // ** ParticleSystem::addEmitter
 EmitterWPtr ParticleSystem::addEmitter( void )
 {
-	Emitter* emitter = DC_NEW Emitter;
-	m_emitters.push_back( emitter );
+    Emitter* emitter = DC_NEW Emitter;
+    m_emitters.push_back( emitter );
 
-	return emitter;
+    return emitter;
 }
 
 // ** ParticleSystem::createInstance
 ParticleSystemInstancePtr ParticleSystem::createInstance( IMaterialFactoryWPtr materialFactory ) const
 {
-	return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( materialFactory, const_cast<ParticleSystem*>( this ) ) );
+    return ParticleSystemInstancePtr( DC_NEW ParticleSystemInstance( materialFactory, const_cast<ParticleSystem*>( this ) ) );
 }
 
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
@@ -85,130 +85,130 @@ ParticleSystemInstancePtr ParticleSystem::createInstance( IMaterialFactoryWPtr m
 // ** ParticleSystemInstance::ParticleSystemInstance
 ParticleSystemInstance::ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 ), m_timeScale( 1.0f )
 {
-	for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
-		m_emitters.push_back( m_particleSystem->emitter( i )->createInstance( materialFactory ) );
-	}
+    for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
+        m_emitters.push_back( m_particleSystem->emitter( i )->createInstance( materialFactory ) );
+    }
 }
 
 // ** ParticleSystemInstance::position
 const Vec3& ParticleSystemInstance::position( void ) const
 {
-	return m_position;
+    return m_position;
 }
 
 // ** ParticleSystemInstance::setPosition
 void ParticleSystemInstance::setPosition( const Vec3& value )
 {
-	m_position = value;
+    m_position = value;
 }
 
 // ** ParticleSystemInstance::timeScale
 f32 ParticleSystemInstance::timeScale( void ) const
 {
-	return m_timeScale;
+    return m_timeScale;
 }
 
 // ** ParticleSystemInstance::setTimeScale
 void ParticleSystemInstance::setTimeScale( f32 value )
 {
-	m_timeScale = value;
+    m_timeScale = value;
 }
 
 // ** ParticleSystemInstance::aliveCount
 s32 ParticleSystemInstance::aliveCount( void ) const
 {
-	return m_aliveCount;
+    return m_aliveCount;
 }
 
 // ** ParticleSystemInstance::emitterCount
 s32 ParticleSystemInstance::emitterCount( void ) const
 {
-	return static_cast<s32>( m_emitters.size() );
+    return static_cast<s32>( m_emitters.size() );
 }
 
 // ** ParticleSystemInstance::emitter
 EmitterInstanceWPtr ParticleSystemInstance::emitter( s32 index ) const
 {
-	NIMBLE_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
-	return m_emitters[index];
+    NIMBLE_ABORT_IF( index < 0 || index >= emitterCount(), "index is out of range" );
+    return m_emitters[index];
 }
 
 // ** ParticleSystemInstance::restart
 void ParticleSystemInstance::restart( void )
 {
-	for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
-		emitter( i )->restart();
-	}
+    for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
+        emitter( i )->restart();
+    }
 }
 
 // ** ParticleSystemInstance::stop
 void ParticleSystemInstance::stop( void )
 {
-	for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
-		emitter( i )->setStopped( true );
-	}
+    for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
+        emitter( i )->setStopped( true );
+    }
 }
 
 // ** ParticleSystemInstance::play
 void ParticleSystemInstance::play( void )
 {
-	for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
-		emitter( i )->setStopped( false );
-	}
+    for( s32 i = 0, n = emitterCount(); i < n; i++ ) {
+        emitter( i )->setStopped( false );
+    }
 }
 
 // ** ParticleSystemInstance::hasEnded
 bool ParticleSystemInstance::hasEnded( void ) const
 {
-	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
-		if( !m_emitters[i]->hasEnded() ) {
-			return false;
-		}
-	}
+    for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
+        if( !m_emitters[i]->hasEnded() ) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 // ** ParticleSystemInstance::bounds
 Bounds ParticleSystemInstance::bounds( void ) const
 {
-	Bounds result;
+    Bounds result;
 
-	for( s32 i = 0, ne = emitterCount(); i < ne; i++ ) {
-		EmitterInstanceWPtr emitter = this->emitter( i );
+    for( s32 i = 0, ne = emitterCount(); i < ne; i++ ) {
+        EmitterInstanceWPtr emitter = this->emitter( i );
 
-		for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
-			ParticlesInstanceWPtr particles = emitter->particles( j );
+        for( s32 j = 0, np = emitter->particlesCount(); j < np; j++ ) {
+            ParticlesInstanceWPtr particles = emitter->particles( j );
 
-			if( !particles->aliveCount() ) {
-				continue;
-			}
+            if( !particles->aliveCount() ) {
+                continue;
+            }
 
-			result += particles->bounds();
-		}
-	}
+            result += particles->bounds();
+        }
+    }
 
-	return result;
+    return result;
 }
 
 // ** ParticleSystemInstance::update
 s32 ParticleSystemInstance::update( f32 dt )
 {
-	m_aliveCount = 0;
+    m_aliveCount = 0;
 
-	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
-		m_aliveCount += m_emitters[i]->update( dt * m_timeScale, m_position );
-	}
+    for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
+        m_aliveCount += m_emitters[i]->update( dt * m_timeScale, m_position );
+    }
 
-	return m_aliveCount;
+    return m_aliveCount;
 }
 
 // ** ParticleSystemInstance::warmUp
 void ParticleSystemInstance::warmUp( f32 dt )
 {
-	for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
-		m_emitters[i]->warmUp( dt, m_position );
-	}
+    for( u32 i = 0, n = ( u32 )m_emitters.size(); i < n; i++ ) {
+        m_emitters[i]->warmUp( dt, m_position );
+    }
 }
 
 } // namespace Fx

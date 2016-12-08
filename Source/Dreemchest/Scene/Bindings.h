@@ -33,74 +33,74 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Constant Vec3 binding, can be subclassed to implement a different behaviour.
-	class Vec3Binding : public RefCounted {
-	public:
+    //! Constant Vec3 binding, can be subclassed to implement a different behaviour.
+    class Vec3Binding : public RefCounted {
+    public:
 
-								//! Constructs the Vec3Binding instance
-								Vec3Binding( const Vec3& value = Vec3( 0.0f, 0.0f, 0.0f ) );
+                                //! Constructs the Vec3Binding instance
+                                Vec3Binding( const Vec3& value = Vec3( 0.0f, 0.0f, 0.0f ) );
 
-		//! Returns the value.
-		virtual Vec3			get( void ) const;
+        //! Returns the value.
+        virtual Vec3            get( void ) const;
 
-		//! Sets the value
-		void					set( const Vec3& value );
+        //! Sets the value
+        void                    set( const Vec3& value );
 
-	protected:
+    protected:
 
-		Vec3					m_value;	//!< The direction value.
-	};
+        Vec3                    m_value;    //!< The direction value.
+    };
 
-	//! Calculates the movement direction vector from the keyboard input.
-	class Vec3FromKeyboard : public Vec3Binding {
-	public:
+    //! Calculates the movement direction vector from the keyboard input.
+    class Vec3FromKeyboard : public Vec3Binding {
+    public:
 
-								//! Constructs the Vec3FromKeyboard instance.
-								Vec3FromKeyboard( Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total );
+                                //! Constructs the Vec3FromKeyboard instance.
+                                Vec3FromKeyboard( Platform::Key::Mapping left = Platform::Key::Total, Platform::Key::Mapping right = Platform::Key::Total, Platform::Key::Mapping up = Platform::Key::Total, Platform::Key::Mapping down = Platform::Key::Total );
 
-		//! Calculates the direction.
-		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
+        //! Calculates the direction.
+        virtual Vec3            get( void ) const NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		Platform::Input*		m_input;		//!< The input used.
-		Platform::Key::Mapping	m_left;			//!< Left key mapping
-		Platform::Key::Mapping	m_right;		//!< Right key mapping
-		Platform::Key::Mapping	m_up;			//!< Up key mapping
-		Platform::Key::Mapping	m_down;			//!< Down key mapping
-	};
+        Platform::Input*        m_input;        //!< The input used.
+        Platform::Key::Mapping    m_left;            //!< Left key mapping
+        Platform::Key::Mapping    m_right;        //!< Right key mapping
+        Platform::Key::Mapping    m_up;            //!< Up key mapping
+        Platform::Key::Mapping    m_down;            //!< Down key mapping
+    };
 
-	//! Calculates the rotation values from mouse movement.
-	class Vec3FromMouse : public Vec3Binding {
-	public:
+    //! Calculates the rotation values from mouse movement.
+    class Vec3FromMouse : public Vec3Binding {
+    public:
 
-								//! Constructs Vec3FromMouse instance.
-								Vec3FromMouse( f32 scaleFactor = 1.0f );
+                                //! Constructs Vec3FromMouse instance.
+                                Vec3FromMouse( f32 scaleFactor = 1.0f );
 
-		//! Calculates the rotation values.
-		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
+        //! Calculates the rotation values.
+        virtual Vec3            get( void ) const NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		Platform::Input*		m_input;		//!< The input used.
-		f32						m_scaleFactor;	//!< The output scaling factor.
-		mutable Vec2			m_lastPosition;	//!< Last cursor position.
-	};
+        Platform::Input*        m_input;        //!< The input used.
+        f32                        m_scaleFactor;    //!< The output scaling factor.
+        mutable Vec2            m_lastPosition;    //!< Last cursor position.
+    };
 
-	//! Extracts the position from a transform component.
-	class Vec3FromTransform : public Vec3Binding {
-	public:
+    //! Extracts the position from a transform component.
+    class Vec3FromTransform : public Vec3Binding {
+    public:
 
-								//! Constructs Vec3FromTransform instance.
-								Vec3FromTransform( const TransformWPtr& transform = TransformWPtr() );
+                                //! Constructs Vec3FromTransform instance.
+                                Vec3FromTransform( const TransformWPtr& transform = TransformWPtr() );
 
-		//! Extracts the position from a Transform
-		virtual Vec3			get( void ) const NIMBLE_OVERRIDE;
+        //! Extracts the position from a Transform
+        virtual Vec3            get( void ) const NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		TransformWPtr			m_transform;	//!< Source transform.
-	};
+        TransformWPtr            m_transform;    //!< Source transform.
+    };
 
 } // namespace Scene
 

@@ -35,11 +35,11 @@ UDPSocket::UDPSocket( bool broadcast )
 {
     m_descriptor = socket( AF_INET, SOCK_DGRAM, 0 );
 
-	m_descriptor.setNonBlocking();
+    m_descriptor.setNonBlocking();
 
-	if( broadcast ) {
-		m_descriptor.enableBroadcast();
-	}
+    if( broadcast ) {
+        m_descriptor.enableBroadcast();
+    }
 }
 
 // ** UDPSocket::send
@@ -49,15 +49,15 @@ u32 UDPSocket::send( const Address& address, u16 port, const void* buffer, u32 s
     sockaddr_in dest;
 
     dest.sin_addr.s_addr = address;
-	dest.sin_port        = htons( port );
-	dest.sin_family      = AF_INET;
+    dest.sin_port        = htons( port );
+    dest.sin_family      = AF_INET;
 
     // ** Send datagram
     s32 result = sendto( m_descriptor, ( s8* )buffer, size, 0, ( sockaddr* )&dest, sizeof( dest ) );
     if( result == -1 ) {
         LogWarning( "socket", "sendto failed to %s:%d, %s\n", address.toString(), port, strerror( errno ) );
         NIMBLE_BREAK;
-		return 0;
+        return 0;
     }
 
     return result;
@@ -99,20 +99,20 @@ void UDPSocket::recv( void )
         return;
     }
 
-	Address remoteAddress( addr.sin_addr.s_addr );
+    Address remoteAddress( addr.sin_addr.s_addr );
     notify<Data>( this, Address( addr.sin_addr.s_addr ), m_data );
 }
 
 // ** UDPSocket::create
 UDPSocketPtr UDPSocket::create( void )
 {
-	return UDPSocketPtr( DC_NEW UDPSocket( false ) );
+    return UDPSocketPtr( DC_NEW UDPSocket( false ) );
 }
 
 // ** UDPSocket::createBroadcast
 UDPSocketPtr UDPSocket::createBroadcast( void )
 {
-	return UDPSocketPtr( DC_NEW UDPSocket( true ) );
+    return UDPSocketPtr( DC_NEW UDPSocket( true ) );
 }
 
 

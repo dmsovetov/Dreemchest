@@ -48,7 +48,7 @@ namespace Scene {
         //! Alias the shadow constant buffer type.
         typedef RenderScene::CBuffer::Shadow ShadowParameters;
 
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer ) NIMBLE_OVERRIDE;
+        virtual void                    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer ) NIMBLE_OVERRIDE;
 
         //! Generate commands to render a light pass for a single light source.
         void                            renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows );

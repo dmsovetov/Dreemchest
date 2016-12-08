@@ -40,12 +40,12 @@ namespace Scene {
         //! A shader feature mask type.
         typedef u64                 Bitmask;
 
-		//! A single shader feature.
-		struct Feature {
-			Bitmask			        mask;   //!< Feature mask.
-			String					name;   //!< Feature name.
+        //! A single shader feature.
+        struct Feature {
+            Bitmask                    mask;   //!< Feature mask.
+            String                    name;   //!< Feature name.
             s32                     offset; //!< A feature mask offset.
-		};
+        };
 
                                     //! Constructs an Ubershader instance.
                                     Ubershader( void );
@@ -65,8 +65,8 @@ namespace Scene {
         //! Sets fragment shader source code.
         void                        setFragment( const String& value );
 
-		//! Adds a feature to shader.
-		void						addFeature( Bitmask mask, const String& name );
+        //! Adds a feature to shader.
+        void                        addFeature( Bitmask mask, const String& name );
 
         //! Returns the total number of features in this shader.
         s32                         featureCount( void ) const;

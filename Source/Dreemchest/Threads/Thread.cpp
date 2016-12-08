@@ -35,7 +35,7 @@
 #endif
 
 #ifdef DC_PLATFORM_ANDROID
-	#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 DC_BEGIN_DREEMCHEST
@@ -63,7 +63,7 @@ ThreadPtr Thread::create( void )
     #error Unknown threading option defined.
 #endif
 
-	return ThreadPtr();
+    return ThreadPtr();
 }
 
 // ** Thread::isAlive

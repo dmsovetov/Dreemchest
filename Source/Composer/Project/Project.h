@@ -33,87 +33,87 @@
 
 DC_BEGIN_COMPOSER
 
-	//! Represents active project.
-	class Project : public QObject {
+    //! Represents active project.
+    class Project : public QObject {
     friend class Composer;
-	public:
+    public:
 
-		//! Built-in project paths.
-		enum Path {
-			  RootPath		//!< Project root location.
-			, AssetsPath	//!< Project assets path.
-			, CachePath		//!< Project cache path.
+        //! Built-in project paths.
+        enum Path {
+              RootPath        //!< Project root location.
+            , AssetsPath    //!< Project assets path.
+            , CachePath        //!< Project cache path.
 
-			, TotalPaths	//!< The total number of project paths.
-		};
+            , TotalPaths    //!< The total number of project paths.
+        };
 
-									~Project( void );
+                                    ~Project( void );
 
-		//! Fills an asset menu.
-		void						fillAssetMenu( Ui::MenuQPtr menu, Ui::AssetTree* assetTree = NULL );
+        //! Fills an asset menu.
+        void                        fillAssetMenu( Ui::MenuQPtr menu, Ui::AssetTree* assetTree = NULL );
 
-		//! Returns project name.
-		const String&				name( void ) const;
+        //! Returns project name.
+        const String&                name( void ) const;
 
-		//! Returns project assets model.
-		AssetFileSystemModelQPtr    assetFileSystem( void ) const;
+        //! Returns project assets model.
+        AssetFileSystemModelQPtr    assetFileSystem( void ) const;
 
-		//! Returns an asset bundle.
-		Assets::Assets&		        assets( void ) const;
+        //! Returns an asset bundle.
+        Assets::Assets&                assets( void ) const;
 
-		//! Returns project absoulte path.
-		String						absolutePath( s32 index ) const;
+        //! Returns project absoulte path.
+        String                        absolutePath( s32 index ) const;
 
-		//! Returns project assets absolute path.
-		String						assetsAbsolutePath( void ) const;
+        //! Returns project assets absolute path.
+        String                        assetsAbsolutePath( void ) const;
 
-		//! Opens the asset editor.
-		Ui::DocumentQPtr			edit( const String& uuid, const FileInfo& fileInfo );
+        //! Opens the asset editor.
+        Ui::DocumentQPtr            edit( const String& uuid, const FileInfo& fileInfo );
 
-	private:
+    private:
 
-									//! Constructs Project instance.
-									Project( QObject* parent, const Io::Path& path );
+                                    //! Constructs Project instance.
+                                    Project( QObject* parent, const Io::Path& path );
 
-		//! Creates new asset with specified name at selected folder.
-		void						createAsset( const String& name, const String& ext );
+        //! Creates new asset with specified name at selected folder.
+        void                        createAsset( const String& name, const String& ext );
 
-		//! Imports assets to project.
-		void						menuImportAssets( Ui::ActionQPtr action );
+        //! Imports assets to project.
+        void                        menuImportAssets( Ui::ActionQPtr action );
 
-		//! Creates new folder.
-		void						menuCreateFolder( Ui::ActionQPtr action );
+        //! Creates new folder.
+        void                        menuCreateFolder( Ui::ActionQPtr action );
 
-		//! Creates new scene.
-		void						menuCreateScene( Ui::ActionQPtr action );
+        //! Creates new scene.
+        void                        menuCreateScene( Ui::ActionQPtr action );
 
-		//! Creates new material.
-		void						menuCreateMaterial( Ui::ActionQPtr action );
+        //! Creates new material.
+        void                        menuCreateMaterial( Ui::ActionQPtr action );
 
-		//! Opens an asset for editing.
-		void						menuOpenAsset( Ui::ActionQPtr action );
+        //! Opens an asset for editing.
+        void                        menuOpenAsset( Ui::ActionQPtr action );
 
-		//! Deletes the selected asset(s).
-		void						menuDeleteAsset( Ui::ActionQPtr action );
+        //! Deletes the selected asset(s).
+        void                        menuDeleteAsset( Ui::ActionQPtr action );
 
-		//! Browses the selected asset.
-		void						menuBrowseAssets( Ui::ActionQPtr action );
+        //! Browses the selected asset.
+        void                        menuBrowseAssets( Ui::ActionQPtr action );
 
-		//! Shows the selected asset in explorer.
-		void						menuShowInExplorer( Ui::ActionQPtr action );
+        //! Shows the selected asset in explorer.
+        void                        menuShowInExplorer( Ui::ActionQPtr action );
 
-	private:
+    private:
 
-		//! Alias the asset editor factory type.
-		typedef AbstractFactory<Editors::AssetEditor, Assets::TypeId> AssetEditorFactory;
+        //! Alias the asset editor factory type.
+        typedef AbstractFactory<Editors::AssetEditor, Assets::TypeId> AssetEditorFactory;
 
-		String						m_name;					//!< Project name.
-		AssetFileSystemModelQPtr    m_assetFileSystem;		//!< Asset file system model.
-		Io::Path					m_paths[TotalPaths];	//!< Project path.
-		AssetEditorFactory			m_assetEditors;			//!< Asset editor factory.
-		AssetManagerQPtr		    m_assets;				//!< The project assets.
-	};
+        String                        m_name;                    //!< Project name.
+        AssetFileSystemModelQPtr    m_assetFileSystem;        //!< Asset file system model.
+        Io::Path                    m_paths[TotalPaths];    //!< Project path.
+        AssetEditorFactory            m_assetEditors;            //!< Asset editor factory.
+        AssetManagerQPtr            m_assets;                //!< The project assets.
+    };
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Project_H__	*/
+#endif    /*    !__DC_Composer_Project_H__    */

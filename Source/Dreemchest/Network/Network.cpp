@@ -27,8 +27,8 @@
 #include "Network.h"
 
 #ifdef DC_PLATFORM_WINDOWS
-	#include <iphlpapi.h>
-	#pragma comment( lib, "iphlpapi.lib" )
+    #include <iphlpapi.h>
+    #pragma comment( lib, "iphlpapi.lib" )
 #endif  /*  DC_PLATFORM_WINDOWS */
 
 DC_BEGIN_DREEMCHEST
@@ -44,8 +44,8 @@ Network::Network( void )
 Network::~Network( void )
 {
 #ifdef DC_PLATFORM_WINDOWS
-	delete m_wsa;
-	WSACleanup();
+    delete m_wsa;
+    WSACleanup();
 #endif
 }
 
@@ -53,22 +53,22 @@ Network::~Network( void )
 void Network::initialize( void )
 {
 #ifdef DC_PLATFORM_WINDOWS
-	WORD wVersionRequested = MAKEWORD( 2, 2 );
+    WORD wVersionRequested = MAKEWORD( 2, 2 );
 
-	m_wsa = DC_NEW WSAData;
+    m_wsa = DC_NEW WSAData;
 
-	if( WSAStartup( wVersionRequested, m_wsa ) ) {
+    if( WSAStartup( wVersionRequested, m_wsa ) ) {
         LogError( "initialize", "WSAStartup failed" );
-		NIMBLE_BREAK
-		return;
-	}
+        NIMBLE_BREAK
+        return;
+    }
 
-	if( LOBYTE( m_wsa->wVersion ) != 2 || HIBYTE( m_wsa->wVersion ) != 2 ) {
+    if( LOBYTE( m_wsa->wVersion ) != 2 || HIBYTE( m_wsa->wVersion ) != 2 ) {
         LogError( "initialize", "Invalid WSA version" );
-		NIMBLE_BREAK
-		WSACleanup();
-		return;
-	}
+        NIMBLE_BREAK
+        WSACleanup();
+        return;
+    }
 #endif
 
     NetworkAddressArray broadcast, host, mask;
@@ -92,10 +92,10 @@ void Network::initialize( void )
 // ** Network::requestHostName
 bool Network::requestHostName( String& name ) const
 {
-	s8 hostName[256] = "";
+    s8 hostName[256] = "";
 
     // ** Get host name
-	int result = gethostname( hostName, 256 );
+    int result = gethostname( hostName, 256 );
     if( result != 0 ) {
         return false;
     }
@@ -109,8 +109,8 @@ bool Network::requestHostName( String& name ) const
 bool Network::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const
 {
 #if defined( DC_PLATFORM_ANDROID )
-	LogError( "requestInterfaces", "not available on Android devices\n" );
-	return false;
+    LogError( "requestInterfaces", "not available on Android devices\n" );
+    return false;
 #elif !defined( DC_PLATFORM_WINDOWS )
     ifaddrs *interfaces     = NULL;
     s32     totalInterfaces = 0;
@@ -156,88 +156,88 @@ bool Network::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressA
     freeifaddrs( interfaces );
     return totalInterfaces != 0;
 #else
-	PIP_ADAPTER_INFO	pAdapterInfo = ( IP_ADAPTER_INFO* )malloc( sizeof( IP_ADAPTER_INFO ) );
-	PIP_ADAPTER_INFO	pAdapter	 = NULL;
-	DWORD				dwRetVal	 = 0;
-    ULONG				ulOutBufLen  = sizeof( IP_ADAPTER_INFO );
+    PIP_ADAPTER_INFO    pAdapterInfo = ( IP_ADAPTER_INFO* )malloc( sizeof( IP_ADAPTER_INFO ) );
+    PIP_ADAPTER_INFO    pAdapter     = NULL;
+    DWORD                dwRetVal     = 0;
+    ULONG                ulOutBufLen  = sizeof( IP_ADAPTER_INFO );
 
     if( GetAdaptersInfo( pAdapterInfo, &ulOutBufLen ) == ERROR_BUFFER_OVERFLOW ) 
-	{
+    {
         free( pAdapterInfo );
         pAdapterInfo = ( IP_ADAPTER_INFO* ) malloc( ulOutBufLen );
         if( pAdapterInfo == NULL ) 
-		{
-			LogError( "requestInterfaces", "error allocating memory needed to call GetAdaptersinfo\n" );
+        {
+            LogError( "requestInterfaces", "error allocating memory needed to call GetAdaptersinfo\n" );
             return false;
         }
     }
 
-	dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen );
-	if( dwRetVal != NO_ERROR ) {
-		return false;
-	}
+    dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen );
+    if( dwRetVal != NO_ERROR ) {
+        return false;
+    }
 
-	pAdapter = pAdapterInfo;
-	while (pAdapter) 
-	{
+    pAdapter = pAdapterInfo;
+    while (pAdapter) 
+    {
     #if 0
-		LogDebug("\tComboIndex: \t5d\n", pAdapter->ComboIndex);
-		LogDebug("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
-		LogDebug("\tAdapter Desc: \t%s\n", pAdapter->Description);
-		LogDebug("\tAdapter Addr: \t");
-		for (unsigned int i = 0; i < pAdapter->AddressLength; i++) 
-		{
-			if (i == (pAdapter->AddressLength - 1))
-				LogDebug("%.2X\n", (int) pAdapter->Address[i]);
-			else
-				LogDebug("%.2X-", (int) pAdapter->Address[i]);
-		}
+        LogDebug("\tComboIndex: \t5d\n", pAdapter->ComboIndex);
+        LogDebug("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
+        LogDebug("\tAdapter Desc: \t%s\n", pAdapter->Description);
+        LogDebug("\tAdapter Addr: \t");
+        for (unsigned int i = 0; i < pAdapter->AddressLength; i++) 
+        {
+            if (i == (pAdapter->AddressLength - 1))
+                LogDebug("%.2X\n", (int) pAdapter->Address[i]);
+            else
+                LogDebug("%.2X-", (int) pAdapter->Address[i]);
+        }
 
-		LogDebug("\tIndex: \t%d\n", pAdapter->Index);
-		LogDebug("\tType: \t");
-		switch (pAdapter->Type) 
-		{
-		case MIB_IF_TYPE_OTHER:     LogDebug("Other\n");      break;
-		case MIB_IF_TYPE_ETHERNET:  LogDebug("Ethernet\n");   break;
-		case MIB_IF_TYPE_TOKENRING: LogDebug("Token Ring\n"); break;
-		case MIB_IF_TYPE_FDDI:      LogDebug("FDDI\n");       break;
-		case MIB_IF_TYPE_PPP:       LogDebug("PPP\n");        break;
-		case MIB_IF_TYPE_LOOPBACK:  LogDebug("Lookback\n");   break;
-		case MIB_IF_TYPE_SLIP:      LogDebug("Slip\n");       break;
-		case IF_TYPE_IEEE80211:     LogDebug("IEEE 802.11 wireless network interface\n"); break;
-		default:					LogDebug("Unknown type %ld\n", pAdapter->Type);
-									break;
-		}
+        LogDebug("\tIndex: \t%d\n", pAdapter->Index);
+        LogDebug("\tType: \t");
+        switch (pAdapter->Type) 
+        {
+        case MIB_IF_TYPE_OTHER:     LogDebug("Other\n");      break;
+        case MIB_IF_TYPE_ETHERNET:  LogDebug("Ethernet\n");   break;
+        case MIB_IF_TYPE_TOKENRING: LogDebug("Token Ring\n"); break;
+        case MIB_IF_TYPE_FDDI:      LogDebug("FDDI\n");       break;
+        case MIB_IF_TYPE_PPP:       LogDebug("PPP\n");        break;
+        case MIB_IF_TYPE_LOOPBACK:  LogDebug("Lookback\n");   break;
+        case MIB_IF_TYPE_SLIP:      LogDebug("Slip\n");       break;
+        case IF_TYPE_IEEE80211:     LogDebug("IEEE 802.11 wireless network interface\n"); break;
+        default:                    LogDebug("Unknown type %ld\n", pAdapter->Type);
+                                    break;
+        }
 
-		LogDebug("\tIP Address: \t%s\n", pAdapter->IpAddressList.IpAddress.String);
-		LogDebug("\tIP Mask: \t%s\n", pAdapter->IpAddressList.IpMask.String);
-		LogDebug("\tGateway: \t%s\n", pAdapter->GatewayList.IpAddress.String);
-		LogDebug("\t***\n");
+        LogDebug("\tIP Address: \t%s\n", pAdapter->IpAddressList.IpAddress.String);
+        LogDebug("\tIP Mask: \t%s\n", pAdapter->IpAddressList.IpMask.String);
+        LogDebug("\tGateway: \t%s\n", pAdapter->GatewayList.IpAddress.String);
+        LogDebug("\t***\n");
     #endif
 
-		u_long host_addr = inet_addr(pAdapter->IpAddressList.IpAddress.String);
-		u_long net_mask  = inet_addr(pAdapter->IpAddressList.IpMask.String);
-		u_long net_addr  = host_addr & net_mask;         // 172.16.64.0
-		u_long dir_bcast_addr = net_addr | (~net_mask); // 172.16.95.255
+        u_long host_addr = inet_addr(pAdapter->IpAddressList.IpAddress.String);
+        u_long net_mask  = inet_addr(pAdapter->IpAddressList.IpMask.String);
+        u_long net_addr  = host_addr & net_mask;         // 172.16.64.0
+        u_long dir_bcast_addr = net_addr | (~net_mask); // 172.16.95.255
 
-		broadcast.push_back( /*ba.s_addr*/dir_bcast_addr );
+        broadcast.push_back( /*ba.s_addr*/dir_bcast_addr );
         host.push_back( inet_addr( pAdapter->IpAddressList.IpAddress.String ) );
         mask.push_back( inet_addr( pAdapter->IpAddressList.IpMask.String ) );
 
-	//	m_HostIPMaskStr = pAdapter->IpAddressList.IpMask.String;
-	//	m_HostBroadcastIPStr = inet_ntoa(*((in_addr*)(&dir_bcast_addr)));
+    //    m_HostIPMaskStr = pAdapter->IpAddressList.IpMask.String;
+    //    m_HostBroadcastIPStr = inet_ntoa(*((in_addr*)(&dir_bcast_addr)));
 
-		pAdapter = pAdapter->Next;
+        pAdapter = pAdapter->Next;
     #if 0
-		LogDebug("\n");
+        LogDebug("\n");
     #endif
-	}
+    }
 
-	if( pAdapterInfo ) {
+    if( pAdapterInfo ) {
         free( pAdapterInfo );
-	}
+    }
 
-	return true;
+    return true;
 #endif
 }
 
@@ -265,8 +265,8 @@ sockaddr_in Network::toSockaddr( const Address& address, u16 port )
     sockaddr_in addr;
 
     addr.sin_addr.s_addr = address ? ( u32 )address : INADDR_ANY;
-	addr.sin_port        = htons( ( u16 )port );
-	addr.sin_family      = AF_INET;
+    addr.sin_port        = htons( ( u16 )port );
+    addr.sin_family      = AF_INET;
     
     return addr;
 }
@@ -299,7 +299,7 @@ Address::operator u32( void ) const
 // ** Address::toString
 CString Address::toString( void ) const
 {
-	CString result = inet_ntoa( *( in_addr* )&m_address );
+    CString result = inet_ntoa( *( in_addr* )&m_address );
     return result;
 }
 

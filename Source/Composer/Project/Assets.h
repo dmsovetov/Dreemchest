@@ -32,37 +32,37 @@
 
 DC_BEGIN_COMPOSER
 
-	//! Manages the project cache & available assets.
-	class AssetManager : public QObject {
-	friend class Project;
+    //! Manages the project cache & available assets.
+    class AssetManager : public QObject {
+    friend class Project;
 
         Q_OBJECT
 
-	public:
+    public:
 
-		//! Returns asset bundle.
-		const Assets::Assets&		assets( void ) const;
+        //! Returns asset bundle.
+        const Assets::Assets&        assets( void ) const;
         Assets::Assets&             assets( void );
 
-		//! Registers the mapping from extension to asset type.
-		void						registerExtension( const String& ext, Assets::TypeId type );
+        //! Registers the mapping from extension to asset type.
+        void                        registerExtension( const String& ext, Assets::TypeId type );
 
-		//! Returns asset type by extension.
-		Assets::TypeId			    assetTypeFromExtension( const String& ext ) const;
+        //! Returns asset type by extension.
+        Assets::TypeId                assetTypeFromExtension( const String& ext ) const;
 
-	private:
+    private:
 
-									//! Constructs AssetManager instance.
-									AssetManager( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem );
+                                    //! Constructs AssetManager instance.
+                                    AssetManager( QObject* parent, const Io::Path& path, AssetFileSystemModelQPtr assetFileSystem );
 
-		//! Returns asset cache path.
-		Io::Path					cacheFileFromUuid( const String& uuid ) const;
+        //! Returns asset cache path.
+        Io::Path                    cacheFileFromUuid( const String& uuid ) const;
 
-		//! Returns asset cache folder.
-		Io::Path					cacheFolderFromUuid( const String& uuid ) const;
+        //! Returns asset cache folder.
+        Io::Path                    cacheFolderFromUuid( const String& uuid ) const;
 
-		//! Creates new asset instance by a specified extension.
-		Assets::Handle			    createAssetForFile( const FileInfo& fileInfo );
+        //! Creates new asset instance by a specified extension.
+        Assets::Handle                createAssetForFile( const FileInfo& fileInfo );
 
         //! Parses an asset from a meta data.
         Assets::Handle              parseAssetFromData( const KeyValue& kv );
@@ -76,37 +76,37 @@ DC_BEGIN_COMPOSER
     private slots:
 
         //! Adds an asset to cache.
-		void						addAssetFile( const FileInfo& file );
+        void                        addAssetFile( const FileInfo& file );
 
-		//! Removes an asset from cache.
-		void						removeAssetFromCache( const QString& uuid, const FileInfo& file );
+        //! Removes an asset from cache.
+        void                        removeAssetFromCache( const QString& uuid, const FileInfo& file );
 
-		//! Performs caching of a changed asset.
-		bool						updateAssetCache( const QString& uuid, const FileInfo& file );
+        //! Performs caching of a changed asset.
+        bool                        updateAssetCache( const QString& uuid, const FileInfo& file );
 
-	private:
+    private:
 
-		//! Alias the asset importer factory type.
-		typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
+        //! Alias the asset importer factory type.
+        typedef AbstractFactory<Importers::AssetImporter, String> AssetImporterFactory;
 
         //! Alias the asset format factory type.
         typedef AbstractFactory<Assets::AbstractFileSource, Assets::TypeId> AssetFormatFactory;
 
-		//! Alias the ext to asset type mapping.
-		typedef Map<String, Assets::TypeId> AssetTypes;
+        //! Alias the ext to asset type mapping.
+        typedef Map<String, Assets::TypeId> AssetTypes;
 
         //! Alias the uuid to asset file source mapping.
         typedef Map<Assets::AssetId, Assets::AbstractFileSource*> AssetFiles;
 
-		Io::Path					m_path;				//!< Root cache folder path.
-		AssetFileSystemModelQPtr    m_assetFileSystem;	//!< Asset file system model to use.
-		AssetImporterFactory		m_assetImporters;	//!< Asset importer factory.
+        Io::Path                    m_path;                //!< Root cache folder path.
+        AssetFileSystemModelQPtr    m_assetFileSystem;    //!< Asset file system model to use.
+        AssetImporterFactory        m_assetImporters;    //!< Asset importer factory.
         AssetFormatFactory          m_assetFormats;     //!< Asset format factory.
-		AssetTypes					m_assetTypes;		//!< Registered asset types.
+        AssetTypes                    m_assetTypes;        //!< Registered asset types.
         AssetFiles                  m_files;            //!< Added asset files.
-		Scene::Resources		    m_assets;			//!< Asset bundle.
-	};
+        Scene::Resources            m_assets;            //!< Asset bundle.
+    };
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_AssetManager_H__	*/
+#endif    /*    !__DC_Composer_AssetManager_H__    */

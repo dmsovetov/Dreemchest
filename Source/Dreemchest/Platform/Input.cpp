@@ -43,7 +43,7 @@ Input::Input( IInput* impl ) : m_impl( impl )
     if( !m_impl ) LogWarning( "input", "%s", "not implemented on current platform\n" );
     s_input = this;
 
-	memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );
+    memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );
 }
 
 Input::~Input( void )
@@ -54,9 +54,9 @@ Input::~Input( void )
 // ** Input::sharedInstance
 Input* Input::sharedInstance( void )
 {
-	if( s_input == NULL ) {
-		s_input = Input::create();
-	}
+    if( s_input == NULL ) {
+        s_input = Input::create();
+    }
 
     return s_input;
 }
@@ -85,18 +85,18 @@ bool Input::keyPressed( const Key& key )
 {
     DC_CHECK_IMPL( false );
     
-	if( keyDown( key ) ) {
-		if( !m_isKeyDown[key] ) {
-			m_isKeyDown[key] = true;
-			return true;
-		}
+    if( keyDown( key ) ) {
+        if( !m_isKeyDown[key] ) {
+            m_isKeyDown[key] = true;
+            return true;
+        }
 
-		return false;
-	} else {
-		m_isKeyDown[key] = false;
-	}
+        return false;
+    } else {
+        m_isKeyDown[key] = false;
+    }
 
-	return false;
+    return false;
 }
 
 // ** Input::mouseX

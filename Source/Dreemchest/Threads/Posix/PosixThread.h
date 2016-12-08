@@ -45,10 +45,10 @@ namespace Threads {
         // ** Thread
         virtual void        start( const ThreadCallback& callback, void *userData );
         virtual void        yield( void );
-		virtual void		wait( void ) const;
-		
-		// ** PosixThread
-		static void			threadYield( void );
+        virtual void        wait( void ) const;
+        
+        // ** PosixThread
+        static void            threadYield( void );
 
     private:
 

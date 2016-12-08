@@ -93,4 +93,4 @@ namespace Ui {
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_SpinBoxes_H__	*/
+#endif    /*    !__DC_Composer_SpinBoxes_H__    */

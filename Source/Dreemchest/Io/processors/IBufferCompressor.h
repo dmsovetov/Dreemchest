@@ -33,18 +33,18 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-	// ** class IBufferCompressor
-	class IBufferCompressor {
-	public:
+    // ** class IBufferCompressor
+    class IBufferCompressor {
+    public:
 
         virtual         ~IBufferCompressor( void ) {}
 
         virtual s32     compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )    = 0;
         virtual s32     decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )  = 0;
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_IBufferCompressor_H__	*/
+#endif        /*    !__DC_Io_IBufferCompressor_H__    */

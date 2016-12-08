@@ -34,79 +34,79 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Remote connection interface.
-	class Connection : public ConnectionTCP {
-	friend class Application;
-	public:
+    //! Remote connection interface.
+    class Connection : public ConnectionTCP {
+    friend class Application;
+    public:
 
-		//! A helper struct to track the traffic in kbps.
-		struct Traffic {
-			u32					m_lastUpdateTimestamp;	//!< The last time the tracking was updated.
-			u32					m_sentBps;				//!< Last sent bits/s value.
-			u32					m_receivedBps;			//!< Last received bits/s value.
-			u32					m_lastSentBytes;		//!< Total sent bytes when the tacking was update.
-			u32					m_lastReceivedBytes;	//!< Total received bytes when the tacking was update.
-		};
+        //! A helper struct to track the traffic in kbps.
+        struct Traffic {
+            u32                    m_lastUpdateTimestamp;    //!< The last time the tracking was updated.
+            u32                    m_sentBps;                //!< Last sent bits/s value.
+            u32                    m_receivedBps;            //!< Last received bits/s value.
+            u32                    m_lastSentBytes;        //!< Total sent bytes when the tacking was update.
+            u32                    m_lastReceivedBytes;    //!< Total received bytes when the tacking was update.
+        };
 
-		//! Returns parent network application instance.
-		Application*			application( void ) const;
+        //! Returns parent network application instance.
+        Application*            application( void ) const;
 
-		//! Returns the traffic counter.
-		const Traffic&			traffic( void ) const;
+        //! Returns the traffic counter.
+        const Traffic&            traffic( void ) const;
 
-		//! Invokes a remote procedure.
-		template<typename TRemoteProcedure>
-		void					invokeVoid( const typename TRemoteProcedure::Argument& argument );
+        //! Invokes a remote procedure.
+        template<typename TRemoteProcedure>
+        void                    invokeVoid( const typename TRemoteProcedure::Argument& argument );
 
-		//! Invokes a remote procedure.
-		template<typename TRemoteProcedure>
-		void					invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback );
+        //! Invokes a remote procedure.
+        template<typename TRemoteProcedure>
+        void                    invoke( const typename TRemoteProcedure::Argument& argument, const typename RemoteResponseHandler<typename TRemoteProcedure::Response>::Callback& callback );
 
-		//! Emits the event to this connection.
-		template<typename TEvent>
-		void					emit( const TEvent& e );
+        //! Emits the event to this connection.
+        template<typename TEvent>
+        void                    emit( const TEvent& e );
 
-	private:
+    private:
 
-								//! Constructs Connection instance.
-								Connection( Application* application, const TCPSocketPtr& socket );
+                                //! Constructs Connection instance.
+                                Connection( Application* application, const TCPSocketPtr& socket );
 
-		//! Updates this connection
-		void					update( u32 dt );
+        //! Updates this connection
+        void                    update( u32 dt );
 
-		//! Handles a recieved remote call response.
-		void					handleResponse( const Packets::RemoteCallResponse& packet );
+        //! Handles a recieved remote call response.
+        void                    handleResponse( const Packets::RemoteCallResponse& packet );
 
-	private:
+    private:
 
-		//! A helper struct to store a timestamp of an RPC call.
-		struct PendingRemoteCall {
-			String							m_name;			//!< Remote procedure name.
-			s32								m_timeLeft;		//!< The time left to wait for a response to this call.
-			AutoPtr<IRemoteResponseHandler>	m_handler;		//!< Response handler.
+        //! A helper struct to store a timestamp of an RPC call.
+        struct PendingRemoteCall {
+            String                            m_name;            //!< Remote procedure name.
+            s32                                m_timeLeft;        //!< The time left to wait for a response to this call.
+            AutoPtr<IRemoteResponseHandler>    m_handler;        //!< Response handler.
 
-											//! Constructs a PendingRemoteCall instance.
-											PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL, s32 timeLeft = 60000 )
-												: m_name( name ), m_timeLeft( timeLeft ), m_handler( handler ) {}
-		};
+                                            //! Constructs a PendingRemoteCall instance.
+                                            PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL, s32 timeLeft = 60000 )
+                                                : m_name( name ), m_timeLeft( timeLeft ), m_handler( handler ) {}
+        };
 
-		//! A container type to store all pending remote calls.
-		typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
+        //! A container type to store all pending remote calls.
+        typedef Map< u16, PendingRemoteCall > PendingRemoteCalls;
 
-		//! Parent network connection.
-		Application*			m_application;
+        //! Parent network connection.
+        Application*            m_application;
 
-		//! A list of pending remote calls.
-		PendingRemoteCalls		m_pendingRemoteCalls;
+        //! A list of pending remote calls.
+        PendingRemoteCalls        m_pendingRemoteCalls;
 
-		//! Next remote call response id.
-		u16						m_nextRemoteCallId;
+        //! Next remote call response id.
+        u16                        m_nextRemoteCallId;
 
-		//! Traffic counter.
-		Traffic					m_traffic;
-	};
+        //! Traffic counter.
+        Traffic                    m_traffic;
+    };
 }
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__Network_Connection_H__	*/
+#endif    /*    !__Network_Connection_H__    */

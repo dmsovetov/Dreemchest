@@ -79,14 +79,14 @@ SceneEditor::SceneEditor( void ) : m_tools( NULL )
 // ** SceneEditor::initialize
 bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document )
 {
-	if( !VisualEditor::initialize( project, asset, document ) ) {
-		return false;
-	}
+    if( !VisualEditor::initialize( project, asset, document ) ) {
+        return false;
+    }
 
-	// Create cursor binding
-	m_cursorMovement = new Scene::Vec3Binding;
+    // Create cursor binding
+    m_cursorMovement = new Scene::Vec3Binding;
 
-	// Create the scene.
+    // Create the scene.
     m_scene = loadFromFile( m_asset.absoluteFilePath() );
 
     // Create rendering context.
@@ -95,62 +95,62 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext, m_renderCache );
     m_rvm              = Scene::Rvm::create( m_renderingContext );
 
-	// Create the scene model
-	m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
+    // Create the scene model
+    m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );
 
-	// Create terrain.
-	{
-		//Scene::TerrainPtr terrain1 = new Scene::Terrain( m_project->assets().get(), "terrain1", "terrain1", 128 );
-		//m_sceneModel->placeTerrain( terrain1, Vec3( 0, 0, 0 ) );
-		//Scene::TerrainPtr terrain2 = new Scene::Terrain( m_project->assets().get(), "terrain2", "terrain2", 128 );
-		//m_sceneModel->placeTerrain( terrain2, Vec3( 128, 0, 0 ) );
-		//Scene::TerrainPtr terrain3 = new Scene::Terrain( m_project->assets().get(), "terrain3", "terrain3", 128 );
-		//m_sceneModel->placeTerrain( terrain3, Vec3( 0, 0, 128 ) );
-		//Scene::TerrainPtr terrain4 = new Scene::Terrain( m_project->assets().get(), "terrain4", "terrain4", 128 );
-		//m_sceneModel->placeTerrain( terrain4, Vec3( 128, 0, 128 ) );
+    // Create terrain.
+    {
+        //Scene::TerrainPtr terrain1 = new Scene::Terrain( m_project->assets().get(), "terrain1", "terrain1", 128 );
+        //m_sceneModel->placeTerrain( terrain1, Vec3( 0, 0, 0 ) );
+        //Scene::TerrainPtr terrain2 = new Scene::Terrain( m_project->assets().get(), "terrain2", "terrain2", 128 );
+        //m_sceneModel->placeTerrain( terrain2, Vec3( 128, 0, 0 ) );
+        //Scene::TerrainPtr terrain3 = new Scene::Terrain( m_project->assets().get(), "terrain3", "terrain3", 128 );
+        //m_sceneModel->placeTerrain( terrain3, Vec3( 0, 0, 128 ) );
+        //Scene::TerrainPtr terrain4 = new Scene::Terrain( m_project->assets().get(), "terrain4", "terrain4", 128 );
+        //m_sceneModel->placeTerrain( terrain4, Vec3( 128, 0, 128 ) );
 
-		m_terrainTool = m_scene->createSceneObject();
-		m_terrainTool->attach<Scene::Transform>();
-		m_terrainTool->attach<TerrainTool>( /*terrain1*/Scene::TerrainHandle(), 10.0f );
-		m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
-		m_scene->addSceneObject( m_terrainTool );
+        m_terrainTool = m_scene->createSceneObject();
+        m_terrainTool->attach<Scene::Transform>();
+        m_terrainTool->attach<TerrainTool>( /*terrain1*/Scene::TerrainHandle(), 10.0f );
+        m_terrainTool->attach<SceneEditorInternal>( m_terrainTool, SceneEditorInternal::Private );
+        m_scene->addSceneObject( m_terrainTool );
 
     #if DEV_DEPRECATED_SCENE_INPUT
-		m_scene->addSystem<TerrainHeightmapSystem>( m_terrainTool, viewport() );
+        m_scene->addSystem<TerrainHeightmapSystem>( m_terrainTool, viewport() );
     #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
-	}
+    }
 
-	// Create grid.
-	{
-		Scene::SceneObjectPtr grid = m_scene->createSceneObject();
-		grid->attach<Scene::Grid>();
-		grid->attach<Scene::Transform>();
-		grid->attach<SceneEditorInternal>( grid, SceneEditorInternal::Private );
-		m_scene->addSceneObject( grid );
-	}
+    // Create grid.
+    {
+        Scene::SceneObjectPtr grid = m_scene->createSceneObject();
+        grid->attach<Scene::Grid>();
+        grid->attach<Scene::Transform>();
+        grid->attach<SceneEditorInternal>( grid, SceneEditorInternal::Private );
+        m_scene->addSceneObject( grid );
+    }
 
-	// Create the camera.
-	m_camera = m_scene->createSceneObject();
+    // Create the camera.
+    m_camera = m_scene->createSceneObject();
     m_camera->attach<Scene::Transform>()->setPosition( Vec3( 0.0f, 5.0f, 5.0f ) );
     m_camera->attach<Scene::Camera>( Scene::Projection::Perspective, backgroundColor() );
     m_camera->attach<Scene::RotateAroundAxes>( 10.0f, Scene::CSLocalX, DC_NEW Scene::Vec3FromMouse )->setRangeForAxis( Scene::AxisX, Range( -90.0f, 90.0f ) );
     m_camera->get<Scene::RotateAroundAxes>()->setBinding( m_cursorMovement );
-	m_camera->attach<Scene::MoveAlongAxes>( 60.0f, Scene::CSLocal, new Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
-	m_camera->disable<Scene::RotateAroundAxes>();
-	m_camera->disable<Scene::MoveAlongAxes>();
-	m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
+    m_camera->attach<Scene::MoveAlongAxes>( 60.0f, Scene::CSLocal, new Scene::Vec3FromKeyboard( Platform::Key::A, Platform::Key::D, Platform::Key::W, Platform::Key::S ) );
+    m_camera->disable<Scene::RotateAroundAxes>();
+    m_camera->disable<Scene::MoveAlongAxes>();
+    m_camera->attach<SceneEditorInternal>( m_camera, SceneEditorInternal::Private );
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 0.5f, 0.5f ) );
     m_camera->get<Scene::Camera>()->setFar( 100.0f );
     m_camera->attach<Scene::Viewport>( viewport() );
     //m_camera->attach<Scene::RenderDepthComplexity>( Rgba( 1.0f, 1.0f, 0.0f ), 0.1f );
-	//m_camera->attach<Scene::RenderWireframe>();
-	//m_camera->attach<Scene::RenderVertexNormals>();
-	//m_camera->attach<Scene::RenderUnlit>();
+    //m_camera->attach<Scene::RenderWireframe>();
+    //m_camera->attach<Scene::RenderVertexNormals>();
+    //m_camera->attach<Scene::RenderUnlit>();
     //m_camera->attach<Scene::RenderForwardLit>();
-	//m_camera->attach<Scene::RenderBoundingVolumes>();
-	//m_camera->attach<RenderSceneHelpers>();
+    //m_camera->attach<Scene::RenderBoundingVolumes>();
+    //m_camera->attach<RenderSceneHelpers>();
 
-	//m_camera->attach<Scene::SpriteRenderer>( 0.01f );
+    //m_camera->attach<Scene::SpriteRenderer>( 0.01f );
     {
         Scene::ForwardRenderer* forwardRenderer = m_camera->attach<Scene::ForwardRenderer>();
         forwardRenderer->setShadowSize( 2048 );
@@ -187,47 +187,47 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_camera->get<Scene::Camera>()->setNdc( Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 #endif
 
-	m_scene->addSceneObject( m_camera );
+    m_scene->addSceneObject( m_camera );
 
-	// Add a 2D camera
-	{
-		Scene::SceneObjectPtr camera = m_scene->createSceneObject();
-		camera->attach<Scene::Transform>();
-		camera->attach<Scene::Camera>( Scene::Projection::Ortho );
+    // Add a 2D camera
+    {
+        Scene::SceneObjectPtr camera = m_scene->createSceneObject();
+        camera->attach<Scene::Transform>();
+        camera->attach<Scene::Camera>( Scene::Projection::Ortho );
         camera->attach<Scene::Viewport>( viewport() );
-		camera->attach<Scene::SpriteRenderer>();
-		camera->attach<Editors::SceneEditorInternal>();
-		m_scene->addSceneObject( camera );
-	}
+        camera->attach<Scene::SpriteRenderer>();
+        camera->attach<Editors::SceneEditorInternal>();
+        m_scene->addSceneObject( camera );
+    }
 
 #if DEV_DEPRECATED_SCENE_INPUT
-	// Add gizmo systems
-	m_scene->addSystem<TranslationToolSystem>( viewport() );
-	m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
-	m_scene->addSystem<RotationToolSystem>( viewport() );
+    // Add gizmo systems
+    m_scene->addSystem<TranslationToolSystem>( viewport() );
+    m_scene->addSystem<ArcballRotationToolSystem>( viewport() );
+    m_scene->addSystem<RotationToolSystem>( viewport() );
 #else
     //m_scene->addInputSystem<TestInputSystem>();
 #endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
 
     m_renderScene->addRenderSystem<Scene::ForwardRenderSystem>();
     m_renderScene->addRenderSystem<Scene::DebugRenderSystem>();
-	//m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>();
+    //m_renderScene->addRenderSystem<Scene::SpriteRenderSystem>();
 
-	// Set the default tool
-	setTool( NoTool );
+    // Set the default tool
+    setTool( NoTool );
 
-	return true;
+    return true;
 }
 
 // ** SceneEditor::render
 void SceneEditor::render( f32 dt )
 {
-	// Update the scene
-	m_scene->update( 0, dt );
+    // Update the scene
+    m_scene->update( 0, dt );
 
-	// Render the scene
+    // Render the scene
     clock_t time = clock();
-	Scene::RenderFrameUPtr frame = m_renderScene->captureFrame();
+    Scene::RenderFrameUPtr frame = m_renderScene->captureFrame();
     m_rvm->display( frame );
     time = clock() - time;
 
@@ -246,8 +246,8 @@ void SceneEditor::render( f32 dt )
     kTime += time;
     kFrames++;
 
-	// Reset the cursor movement
-	m_cursorMovement->set( Vec3() );
+    // Reset the cursor movement
+    m_cursorMovement->set( Vec3() );
 }
 
 struct Null : public Ecs::Component<Null> {};
@@ -333,14 +333,14 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     NIMBLE_ABORT_IF( !mesh.isValid() );
 #endif
 
-	Scene::ImageHandle checker = m_project->assets().add<Scene::Image>( Guid::generate(), DC_NEW Scene::ImageCheckerGenerator( 128, 128, 8, Rgb(1.0f,1.0f,1.0f), Rgb(0.5f, 0.5f, 0.5f) ) );
-	checker.asset().setName( "Checker.image" );
+    Scene::ImageHandle checker = m_project->assets().add<Scene::Image>( Guid::generate(), DC_NEW Scene::ImageCheckerGenerator( 128, 128, 8, Rgb(1.0f,1.0f,1.0f), Rgb(0.5f, 0.5f, 0.5f) ) );
+    checker.asset().setName( "Checker.image" );
 
     Scene::MaterialHandle dflt = m_project->assets().add<Scene::Material>( Guid::generate(), DC_NEW Assets::NullSource );
     {
         dflt.asset().setName( "Default.material" );
         Assets::WriteLock<Scene::Material> writable = dflt.writeLock();
-		writable->setTexture( Scene::Material::Diffuse, checker );
+        writable->setTexture( Scene::Material::Diffuse, checker );
         writable->setColor( Scene::Material::Diffuse, Rgba( 1.0f, 1.0f, 1.0f ) );
         writable->setLightingModel( Scene::LightingModel::Phong );
     }
@@ -393,7 +393,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     {
         blue.asset().setName( "Blue.material" );
         Assets::WriteLock<Scene::Material> writable = blue.writeLock();
-		writable->setTexture( Scene::Material::Diffuse, checker );
+        writable->setTexture( Scene::Material::Diffuse, checker );
         writable->setColor( Scene::Material::Diffuse, Rgba( 0.25f, 0.5f, 1.0f ) );
         writable->setLightingModel( Scene::LightingModel::Phong );    
     }
@@ -412,7 +412,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     m_project->assets().forceLoad( box );
     m_project->assets().forceLoad( sphere );
     m_project->assets().forceLoad( torus );
-	m_project->assets().forceLoad( checker );
+    m_project->assets().forceLoad( checker );
 
     Scene::VertexFormat vertexFormats[] = {
           Scene::VertexFormat( Scene::VertexFormat::Position | Scene::VertexFormat::Color | Scene::VertexFormat::Normal )
@@ -513,29 +513,29 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     }
 #endif
 
-	{
-		Scene::SceneObjectPtr sprite = scene->createSceneObject();
-		sprite->attach<Scene::Transform>( 250, 200, 0, Scene::TransformWPtr() );
-		sprite->attach<Scene::Sprite>( 200, 200, dflt );
-		sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
-		scene->addSceneObject( sprite );
-	}
+    {
+        Scene::SceneObjectPtr sprite = scene->createSceneObject();
+        sprite->attach<Scene::Transform>( 250, 200, 0, Scene::TransformWPtr() );
+        sprite->attach<Scene::Sprite>( 200, 200, dflt );
+        sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 1.0f, 0.0f, 0.0f ) ) );
+        scene->addSceneObject( sprite );
+    }
 
-	{
-		Scene::SceneObjectPtr sprite = scene->createSceneObject();
-		sprite->attach<Scene::Transform>( 500, 100, 0, Scene::TransformWPtr() );
-		sprite->attach<Scene::Sprite>( 200, 200, dflt );
+    {
+        Scene::SceneObjectPtr sprite = scene->createSceneObject();
+        sprite->attach<Scene::Transform>( 500, 100, 0, Scene::TransformWPtr() );
+        sprite->attach<Scene::Sprite>( 200, 200, dflt );
     //    sprite->attach<TestMover>();
-		scene->addSceneObject( sprite );
-	}
+        scene->addSceneObject( sprite );
+    }
 
-	{
-		Scene::SceneObjectPtr sprite = scene->createSceneObject();
-		sprite->attach<Scene::Transform>( 250, 200, 0, Scene::TransformWPtr() );
-		sprite->attach<Scene::Sprite>( 200, 250, dflt );
-		sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
-		scene->addSceneObject( sprite );
-	}
+    {
+        Scene::SceneObjectPtr sprite = scene->createSceneObject();
+        sprite->attach<Scene::Transform>( 250, 200, 0, Scene::TransformWPtr() );
+        sprite->attach<Scene::Sprite>( 200, 250, dflt );
+        sprite->attach<Scene::RotateAroundAxes>( 5.0f )->setBinding( new Scene::Vec3Binding( Vec3( 0.0f, 1.0f, 0.0f ) ) );
+        scene->addSceneObject( sprite );
+    }
 
     for( s32 i = -pointCloudCount / 2; i < pointCloudCount / 2; i++ )
     {
@@ -666,94 +666,94 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
 // ** SceneEditor::navigateToObject
 void SceneEditor::navigateToObject( Scene::SceneObjectWPtr sceneObject )
 {
-	// Remove the previous component
-	if( m_camera->has<Scene::MoveTo>() ) {
-		m_camera->detach<Scene::MoveTo>();
-	}
+    // Remove the previous component
+    if( m_camera->has<Scene::MoveTo>() ) {
+        m_camera->detach<Scene::MoveTo>();
+    }
 
-	// Get the  mesh bounding box
-	Bounds bounds = sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
+    // Get the  mesh bounding box
+    Bounds bounds = sceneObject->get<Scene::StaticMesh>()->worldSpaceBounds();
 
     // Get camera transform
     Scene::Transform* transform = m_camera->get<Scene::Transform>();
 
-	// Calculate new camera position by subtracting
-	// the view direction from scene object position
-	Vec3 position = bounds.center() + transform->axisZ() * max3( bounds.width(), bounds.height(), bounds.depth() ) + 1.0f;
+    // Calculate new camera position by subtracting
+    // the view direction from scene object position
+    Vec3 position = bounds.center() + transform->axisZ() * max3( bounds.width(), bounds.height(), bounds.depth() ) + 1.0f;
 
-	// Attach the moving component
-	m_camera->attach<Scene::MoveTo>( new Scene::Vec3Binding( position ), false, Scene::MoveTo::Smooth, 16.0f );
+    // Attach the moving component
+    m_camera->attach<Scene::MoveTo>( new Scene::Vec3Binding( position ), false, Scene::MoveTo::Smooth, 16.0f );
 }
 
 // ** SceneEditor::notifyEnterForeground
 void SceneEditor::notifyEnterForeground( Ui::MainWindowQPtr window )
 {
-	// Create the tool bar
-	NIMBLE_BREAK_IF( m_tools );
-	m_tools = window->addToolBar();
+    // Create the tool bar
+    NIMBLE_BREAK_IF( m_tools );
+    m_tools = window->addToolBar();
 
-	m_tools->beginActionGroup();
-	{
-		m_tools->addAction( "Select", BindAction( SceneEditor::menuTransformSelect ), "", ":Scene/Scene/cursor.png", Ui::ItemCheckable | Ui::ItemChecked );
-		m_tools->addAction( "Translate", BindAction( SceneEditor::menuTransformTranslate ), "", ":Scene/Scene/move.png", Ui::ItemCheckable );
-		m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
-		m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
+    m_tools->beginActionGroup();
+    {
+        m_tools->addAction( "Select", BindAction( SceneEditor::menuTransformSelect ), "", ":Scene/Scene/cursor.png", Ui::ItemCheckable | Ui::ItemChecked );
+        m_tools->addAction( "Translate", BindAction( SceneEditor::menuTransformTranslate ), "", ":Scene/Scene/move.png", Ui::ItemCheckable );
+        m_tools->addAction( "Rotate", BindAction( SceneEditor::menuTransformRotate ), "", ":Scene/Scene/rotate.png", Ui::ItemCheckable );
+        m_tools->addAction( "Scale", BindAction( SceneEditor::menuTransformScale ), "", ":Scene/Scene/scale.png", Ui::ItemCheckable );
         m_tools->addSeparator();
         m_tools->addWidget( new QComboBox );
         m_tools->addSeparator();
         m_tools->addWidget( new QComboBox );
-	    m_tools->addSeparator();
-		m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
-		m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
-		m_tools->addAction( "Level Terrain", BindAction( SceneEditor::menuTerrainLevel ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
-		m_tools->addAction( "Flatten Terrain", BindAction( SceneEditor::menuTerrainFlatten ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
-		m_tools->addAction( "Smooth Terrain", BindAction( SceneEditor::menuTerrainSmooth ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
-	}
-	m_tools->endActionGroup();
+        m_tools->addSeparator();
+        m_tools->addAction( "Raise Terrain", BindAction( SceneEditor::menuTerrainRaise ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable | Ui::ItemChecked )->setChecked( false );
+        m_tools->addAction( "Lower Terrain", BindAction( SceneEditor::menuTerrainLower ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+        m_tools->addAction( "Level Terrain", BindAction( SceneEditor::menuTerrainLevel ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+        m_tools->addAction( "Flatten Terrain", BindAction( SceneEditor::menuTerrainFlatten ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+        m_tools->addAction( "Smooth Terrain", BindAction( SceneEditor::menuTerrainSmooth ), "", ":Scene/Scene/magnet.png", Ui::ItemCheckable );
+    }
+    m_tools->endActionGroup();
 
-	// Set this model
-	window->sceneTree()->setModel( m_sceneModel.get() );
+    // Set this model
+    window->sceneTree()->setModel( m_sceneModel.get() );
 
-	// Subscribe for event
+    // Subscribe for event
     connect( window->sceneTree(), SIGNAL(sceneObjectDoubleClicked(Scene::SceneObjectWPtr)), this, SLOT(navigateToObject(Scene::SceneObjectWPtr)) );
 }
 
 // ** SceneEditor::notifyEnterBackground
 void SceneEditor::notifyEnterBackground( Ui::MainWindowQPtr window )
 {
-	// Remove tool bar
-	window->removeToolBar( m_tools );
-	m_tools = Ui::ToolBarQPtr();
+    // Remove tool bar
+    window->removeToolBar( m_tools );
+    m_tools = Ui::ToolBarQPtr();
 
-	// Set empty model
-	window->sceneTree()->setModel( NULL );
+    // Set empty model
+    window->sceneTree()->setModel( NULL );
 
-	// Unsubscribe for event
+    // Unsubscribe for event
     disconnect( window->sceneTree(), SIGNAL(sceneObjectDoubleClicked(Scene::SceneObjectWPtr)), this, SLOT(navigateToObject(Scene::SceneObjectWPtr)) );
 }
 
 // ** SceneEditor::menuTransformSelect
 void SceneEditor::menuTransformSelect( Ui::ActionQPtr action )
 {
-	setTool( NoTool );
+    setTool( NoTool );
 }
 
 // ** SceneEditor::menuTransformTranslate
 void SceneEditor::menuTransformTranslate( Ui::ActionQPtr action )
 {
-	setTool( ToolTranslate );
+    setTool( ToolTranslate );
 }
 
 // ** SceneEditor::menuTransformRotate
 void SceneEditor::menuTransformRotate( Ui::ActionQPtr action )
 {
-	setTool( ToolRotate );
+    setTool( ToolRotate );
 }
 
 // ** SceneEditor::menuTransformScale
 void SceneEditor::menuTransformScale( Ui::ActionQPtr action )
 {
-	setTool( ToolScale );
+    setTool( ToolScale );
 }
 
 // ** SceneEditor::menuTerrainRaise
@@ -794,140 +794,140 @@ void SceneEditor::menuTerrainSmooth( Ui::ActionQPtr action )
 // ** SceneEditor::handleMousePress
 void SceneEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& buttons )
 {
-	VisualEditor::handleMousePress( x, y, buttons );
+    VisualEditor::handleMousePress( x, y, buttons );
 
-	if( buttons & Ui::MouseButtons::Right ) {
-		m_camera->enable<Scene::RotateAroundAxes>();
-		m_camera->enable<Scene::MoveAlongAxes>();
-	}
+    if( buttons & Ui::MouseButtons::Right ) {
+        m_camera->enable<Scene::RotateAroundAxes>();
+        m_camera->enable<Scene::MoveAlongAxes>();
+    }
 }
 
 // ** SceneEditor::handleMouseRelease
 void SceneEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& buttons )
 {
-	VisualEditor::handleMouseRelease( x, y, buttons );
+    VisualEditor::handleMouseRelease( x, y, buttons );
 
-	if( buttons & Ui::MouseButtons::Right ) {
-		m_camera->disable<Scene::RotateAroundAxes>();
-		m_camera->disable<Scene::MoveAlongAxes>();
-	}
-	else if( buttons & Ui::MouseButtons::Left ) {
-		// Get the scene object underneath the mouse cursor
-		Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
+    if( buttons & Ui::MouseButtons::Right ) {
+        m_camera->disable<Scene::RotateAroundAxes>();
+        m_camera->disable<Scene::MoveAlongAxes>();
+    }
+    else if( buttons & Ui::MouseButtons::Left ) {
+        // Get the scene object underneath the mouse cursor
+        Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
-		// Select it
-		selectSceneObject( target );
-	}
+        // Select it
+        selectSceneObject( target );
+    }
 }
 
 // ** SceneEditor::handleMouseMove
 void SceneEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
-	// Run the base class method to update the cursor
-	VisualEditor::handleMouseMove( x, y, dx, dy, buttons );
+    // Run the base class method to update the cursor
+    VisualEditor::handleMouseMove( x, y, dx, dy, buttons );
 
-	// Update cursor movement
-	m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
+    // Update cursor movement
+    m_cursorMovement->set( Vec3( -dy, -dx, 0 ) );
 }
 
 // ** SceneEditor::handleMouseWheel
 void SceneEditor::handleMouseWheel( s32 delta )
 {
     Scene::Transform* transform = m_camera->get<Scene::Transform>();
-	transform->setPosition( transform->position() - transform->axisZ() * delta * 0.01f );
+    transform->setPosition( transform->position() - transform->axisZ() * delta * 0.01f );
 }
 
 // ** SceneEditor::handleDragEnter
 bool SceneEditor::handleDragEnter( MimeDataQPtr mime )
 {
-	return mime->hasFormat( QString::fromStdString( Composer::kAssetMime ) );
+    return mime->hasFormat( QString::fromStdString( Composer::kAssetMime ) );
 }
 
 // ** SceneEditor::handleDragMove
 void SceneEditor::handleDragMove( MimeDataQPtr mime, s32 x, s32 y )
 {
-	// Get the scene object underneath the mouse cursor
-	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
+    // Get the scene object underneath the mouse cursor
+    Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
-	// Highlight it
-	highlightSceneObject( target );
+    // Highlight it
+    highlightSceneObject( target );
 }
 
 // ** SceneEditor::handleDrop
 void SceneEditor::handleDrop( MimeDataQPtr mime, s32 x, s32 y )
 {
-	// Get the scene object underneath the mouse cursor
-	Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
+    // Get the scene object underneath the mouse cursor
+    Scene::SceneObjectWPtr target = findSceneObjectAtPoint( x, y );
 
-	// Extract assets from MIME data
-	Assets::AssetSet assets = qComposer->assetsFromMime( mime );
+    // Extract assets from MIME data
+    Assets::AssetSet assets = qComposer->assetsFromMime( mime );
 
     // Get camera transform
     Scene::Transform* transform = m_camera->get<Scene::Transform>();
 
-	// Get the asset action
-	SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, transform->position() + constructViewRay( x, y ).direction() * 5.0f );
+    // Get the asset action
+    SceneModel::AssetAction action = m_sceneModel->acceptableAssetAction( assets, target, transform->position() + constructViewRay( x, y ).direction() * 5.0f );
 
-	if( action ) {
-		m_sceneModel->performAssetAction( action );
-	}
+    if( action ) {
+        m_sceneModel->performAssetAction( action );
+    }
 
-	// Reset the highlight indicator
-	highlightSceneObject( Scene::SceneObjectWPtr() );
+    // Reset the highlight indicator
+    highlightSceneObject( Scene::SceneObjectWPtr() );
 }
 
 // ** SceneEditor::highlightSceneObject
 void SceneEditor::highlightSceneObject( Scene::SceneObjectWPtr sceneObject )
 {
-	// This object is already highlighted - skip
-	if( sceneObject == m_activeSceneObject ) {
-		return;
-	}
+    // This object is already highlighted - skip
+    if( sceneObject == m_activeSceneObject ) {
+        return;
+    }
 
-	// Only one scene object can be highlighted at a time
-	if( m_activeSceneObject.valid() ) {
-		m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( false );
-	}
+    // Only one scene object can be highlighted at a time
+    if( m_activeSceneObject.valid() ) {
+        m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( false );
+    }
 
-	// Store this object
-	m_activeSceneObject = sceneObject;
+    // Store this object
+    m_activeSceneObject = sceneObject;
 
-	// Mark it as highlighted
-	if( m_activeSceneObject.valid() ) {
-		m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( true );
-	}
+    // Mark it as highlighted
+    if( m_activeSceneObject.valid() ) {
+        m_activeSceneObject->get<SceneEditorInternal>()->setHighlighted( true );
+    }
 }
 
 // ** SceneEditor::selectSceneObject
 void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 {
-	// This object is already selected - skip
-	if( sceneObject == m_selectedSceneObject ) {
-		return;
-	}
+    // This object is already selected - skip
+    if( sceneObject == m_selectedSceneObject ) {
+        return;
+    }
 
-	// Only one scene object can be selected at a time
-	if( m_selectedSceneObject.valid() ) {
-		// Remove the selected flag
-		m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( false );
-		
-		// Ensure the deselected object has no gizmos
-		bindTransformGizmo( m_selectedSceneObject, NoTool );
-	}
+    // Only one scene object can be selected at a time
+    if( m_selectedSceneObject.valid() ) {
+        // Remove the selected flag
+        m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( false );
+        
+        // Ensure the deselected object has no gizmos
+        bindTransformGizmo( m_selectedSceneObject, NoTool );
+    }
 
-	// Store this object
-	m_selectedSceneObject = sceneObject;
+    // Store this object
+    m_selectedSceneObject = sceneObject;
 
     // Nothing selected - just return
     if( !m_selectedSceneObject.valid() ) {
         return;
     }
 
-	// Add the selected flag
-	m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
+    // Add the selected flag
+    m_selectedSceneObject->get<SceneEditorInternal>()->setSelected( true );
 
-	// Bind the gizmo for an active transformation tool
-	bindTransformGizmo( m_selectedSceneObject, m_activeTool );
+    // Bind the gizmo for an active transformation tool
+    bindTransformGizmo( m_selectedSceneObject, m_activeTool );
 
     // Bind to an entity inspector
     Ui::EntityInspectorQPtr inspector = qMainWindow->inspector();
@@ -937,30 +937,30 @@ void SceneEditor::selectSceneObject( Scene::SceneObjectWPtr sceneObject )
 // ** SceneEditor::findSceneObjectAtPoint
 Scene::SceneObjectWPtr SceneEditor::findSceneObjectAtPoint( s32 x, s32 y ) const
 {
-	// Query scene object by ray
-	Scene::Spatial::Results sceneObjects = m_scene->spatial()->queryRay( constructViewRay( x, y ) );
+    // Query scene object by ray
+    Scene::Spatial::Results sceneObjects = m_scene->spatial()->queryRay( constructViewRay( x, y ) );
 
-	// Get the hit scene object.
-	Scene::SceneObjectWPtr target = !sceneObjects.empty() ? sceneObjects[0].sceneObject : Scene::SceneObjectWPtr();
+    // Get the hit scene object.
+    Scene::SceneObjectWPtr target = !sceneObjects.empty() ? sceneObjects[0].sceneObject : Scene::SceneObjectWPtr();
 
-	return target;
+    return target;
 }
 
 // ** SceneEditor::setTool
 void SceneEditor::setTool( ActiveTool tool )
 {
-	// This tool is already activated
-	if( tool == m_activeTool ) {
-		return;
-	}
+    // This tool is already activated
+    if( tool == m_activeTool ) {
+        return;
+    }
 
-	// Set active tool
-	m_activeTool = tool;
+    // Set active tool
+    m_activeTool = tool;
 
-	// Bind the gizmo to selected object
-	if( m_selectedSceneObject.valid() ) {
-		bindTransformGizmo( m_selectedSceneObject, m_activeTool );
-	}
+    // Bind the gizmo to selected object
+    if( m_selectedSceneObject.valid() ) {
+        bindTransformGizmo( m_selectedSceneObject, m_activeTool );
+    }
 
     // Now the terrain tool
     if( tool < ToolRaiseTerrain ) {
@@ -973,22 +973,22 @@ void SceneEditor::setTool( ActiveTool tool )
 // ** SceneEditor::bindTransformGizmo
 void SceneEditor::bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const
 {
-	NIMBLE_BREAK_IF( !sceneObject.valid() );
+    NIMBLE_BREAK_IF( !sceneObject.valid() );
 
-	// First remove all transform tool gizmos
-	if( sceneObject->has<TranslationTool>() )		sceneObject->detach<TranslationTool>();
-	if( sceneObject->has<RotationTool>() )			sceneObject->detach<RotationTool>();
-	if( sceneObject->has<ArcballRotationTool>() )	sceneObject->detach<ArcballRotationTool>();
+    // First remove all transform tool gizmos
+    if( sceneObject->has<TranslationTool>() )        sceneObject->detach<TranslationTool>();
+    if( sceneObject->has<RotationTool>() )            sceneObject->detach<RotationTool>();
+    if( sceneObject->has<ArcballRotationTool>() )    sceneObject->detach<ArcballRotationTool>();
 
-	// Now add the gizmo
-	switch( tool ) {
-	case ToolTranslate:	sceneObject->attach<TranslationTool>();
-						break;
+    // Now add the gizmo
+    switch( tool ) {
+    case ToolTranslate:    sceneObject->attach<TranslationTool>();
+                        break;
 
-	case ToolRotate:	sceneObject->attach<ArcballRotationTool>();
-						sceneObject->attach<RotationTool>();
-						break;
-	}
+    case ToolRotate:    sceneObject->attach<ArcballRotationTool>();
+                        sceneObject->attach<RotationTool>();
+                        break;
+    }
 }
 
 } // namespace Editors

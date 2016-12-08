@@ -33,36 +33,36 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Event handler interface class.
-	class IEventHandler {
-	public:
+    //! Event handler interface class.
+    class IEventHandler {
+    public:
 
-		virtual			~IEventHandler( void ) {}
+        virtual            ~IEventHandler( void ) {}
 
-		//! Packet handler callback.
-		virtual bool	handle( ConnectionWPtr connection, const Packets::Event& packet ) = 0;
-	};
+        //! Packet handler callback.
+        virtual bool    handle( ConnectionWPtr connection, const Packets::Event& packet ) = 0;
+    };
 
-	//! Template class that handles an Event packet and emits the local event.
-	template<typename T>
-	class EventHandler : public IEventHandler {
-	public:
+    //! Template class that handles an Event packet and emits the local event.
+    template<typename T>
+    class EventHandler : public IEventHandler {
+    public:
 
-								//! Constructs EventHandler instance.
-								EventHandler( EventEmitter* eventEmitter )
-									: m_eventEmitter( eventEmitter ) {}
+                                //! Constructs EventHandler instance.
+                                EventHandler( EventEmitter* eventEmitter )
+                                    : m_eventEmitter( eventEmitter ) {}
 
-		//! Reads a payload from an Event packet and emits it as local event.
-		virtual bool handle( ConnectionWPtr connection, const Packets::Event& packet );
+        //! Reads a payload from an Event packet and emits it as local event.
+        virtual bool handle( ConnectionWPtr connection, const Packets::Event& packet );
 
-	private:
+    private:
 
-		//! Parent event emitter.
-		EventEmitter*			m_eventEmitter;
-	};
+        //! Parent event emitter.
+        EventEmitter*            m_eventEmitter;
+    };
 
 } // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_EventHandler_H__	*/
+#endif    /*    !__DC_Network_EventHandler_H__    */

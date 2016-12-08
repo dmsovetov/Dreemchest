@@ -90,7 +90,7 @@ bool FileStream::open( const Path& fileName, StreamMode mode )
 // ** FileStream::fileName
 const Path& FileStream::fileName( void ) const
 {
-	return m_fileName;
+    return m_fileName;
 }
 
 // ** FileStream::read
@@ -151,13 +151,13 @@ s32 FileStream::position( void ) const
 // ** FileStream::hasDataLeft
 bool FileStream::hasDataLeft( void ) const
 {
-	return feof( m_file ) == 0;
+    return feof( m_file ) == 0;
 }
 
 // ** FileStream::length
 s32 FileStream::length( void ) const
 {
-	return m_length;
+    return m_length;
 }
 
 } // namespace Io

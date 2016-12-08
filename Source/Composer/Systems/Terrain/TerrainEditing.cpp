@@ -40,25 +40,25 @@ TerrainTool::TerrainTool( Scene::TerrainHandle terrain, f32 radius, f32 strength
 // ** TerrainTool::radius
 f32 TerrainTool::radius( void ) const
 {
-	return m_radius;
+    return m_radius;
 }
 
 // ** TerrainTool::setRadius
 void TerrainTool::setRadius( f32 value )
 {
-	m_radius = value;
+    m_radius = value;
 }
 
 // ** TerrainTool::strength
 f32 TerrainTool::strength( void ) const
 {
-	return m_strength;
+    return m_strength;
 }
 
 // ** TerrainTool::setStrength
 void TerrainTool::setStrength( f32 value )
 {
-	m_strength = value;
+    m_strength = value;
 }
 
 // ** TerrainTool::exp
@@ -76,31 +76,31 @@ void TerrainTool::setExp( f32 value )
 // ** TerrainTool::terrain
 Scene::TerrainHandle TerrainTool::terrain( void ) const
 {
-	return m_terrain;
+    return m_terrain;
 }
 
 // ** TerrainTool::influence
 f32 TerrainTool::influence( f32 distance ) const
 {
-	if( distance >= m_radius ) {
-		return 0.0f;
-	}
+    if( distance >= m_radius ) {
+        return 0.0f;
+    }
 
     NIMBLE_BREAK_IF( m_strength < 0.0f || m_strength > 1.0f );
     f32 factor = distance / m_radius;
-	return sinf( 1.0f - powf( factor, m_exp ) ) * m_strength;
+    return sinf( 1.0f - powf( factor, m_exp ) ) * m_strength;
 }
 
 // ** TerrainTool::type
 TerrainTool::Type TerrainTool::type( void ) const
 {
-	return m_type;
+    return m_type;
 }
 
 // ** TerrainTool::setType
 void TerrainTool::setType( Type value )
 {
-	m_type = value;
+    m_type = value;
 }
 
 #if DEV_DEPRECATED_SCENE_INPUT
@@ -108,7 +108,7 @@ void TerrainTool::setType( Type value )
 
 // ** TerrainHeightmapSystem::TerrainHeightmapSystem
 TerrainHeightmapSystem::TerrainHeightmapSystem( Scene::SceneObjectWPtr tool, Scene::ViewportWPtr viewport )
-	: GenericTouchSystem( viewport ), m_tool( tool )
+    : GenericTouchSystem( viewport ), m_tool( tool )
 {
 }
 
@@ -119,63 +119,63 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
         return;
     }
 
-	// Find the intersection point of ray & terrain
-	Vec3 point = chunk.terrain()->rayMarch( m_viewport->ray() );
+    // Find the intersection point of ray & terrain
+    Vec3 point = chunk.terrain()->rayMarch( m_viewport->ray() );
 
-	// Place tool to intersection point
-	m_tool->get<Scene::Transform>()->setPosition( point );
+    // Place tool to intersection point
+    m_tool->get<Scene::Transform>()->setPosition( point );
 
-	// Get tool settings.
-	f32  radius   = m_tool->get<TerrainTool>()->radius();
-	Vec3 position = transform.matrix().inversed() * m_tool->get<Scene::Transform>()->position();
+    // Get tool settings.
+    f32  radius   = m_tool->get<TerrainTool>()->radius();
+    Vec3 position = transform.matrix().inversed() * m_tool->get<Scene::Transform>()->position();
 
-	// No mouse buttons pressed - tool is not working
-	if( !m_viewport->flags().is( Ui::MouseButtons::Left ) ) {
-		return;
-	}
+    // No mouse buttons pressed - tool is not working
+    if( !m_viewport->flags().is( Ui::MouseButtons::Left ) ) {
+        return;
+    }
 
-	// Check that intersection point is inside the chunk
-	if( !isPointInside( position, radius, chunk ) ) {
-		return;
-	}
+    // Check that intersection point is inside the chunk
+    if( !isPointInside( position, radius, chunk ) ) {
+        return;
+    }
 
-	// Get terrain heightmap.
+    // Get terrain heightmap.
     Scene::TerrainHandle terrain = chunk.terrain();
     Assets::WriteLock<Scene::Terrain> locked = terrain.writeLock();
     Scene::Heightmap& heightmap = locked->heightmap();
 
-	point = transform.parent()->matrix().inversed() * point;
+    point = transform.parent()->matrix().inversed() * point;
 
-	// Calculate the affected heightmap rect.
-	s32 cr       = ceil( radius );
-	s32 cx       = point.x;
-	s32 cz       = point.z;
+    // Calculate the affected heightmap rect.
+    s32 cr       = ceil( radius );
+    s32 cx       = point.x;
+    s32 cz       = point.z;
     f32 strength = m_tool->get<TerrainTool>()->strength();
 
-	// Affect the heightmap by tool.
-	for( s32 z = cz - cr; z <= cz + cr; z++ ) {
-		for( s32 x = cx - cr; x <= cx + cr; x++ ) {
-			// Ensure this is a valid vertex coodinates.
+    // Affect the heightmap by tool.
+    for( s32 z = cz - cr; z <= cz + cr; z++ ) {
+        for( s32 x = cx - cr; x <= cx + cr; x++ ) {
+            // Ensure this is a valid vertex coodinates.
             if( !terrain->hasVertex( x, z ) ) {
                 continue;
             }
 
-			// Get the heightmap vertex position.
-			Vec3 vertex = Vec3( ( f32 )x, terrain->heightAtVertex( x, z ), ( f32 )z );
+            // Get the heightmap vertex position.
+            Vec3 vertex = Vec3( ( f32 )x, terrain->heightAtVertex( x, z ), ( f32 )z );
 
-			// Calculate distance to a center of a tool
-			f32 distance = (point - vertex).length();
+            // Calculate distance to a center of a tool
+            f32 distance = (point - vertex).length();
 
-			// Get the influence
-			f32 influence = m_tool->get<TerrainTool>()->influence( distance );
+            // Get the influence
+            f32 influence = m_tool->get<TerrainTool>()->influence( distance );
 
-			if( influence <= 0.0f ) {
-				continue;
-			}
+            if( influence <= 0.0f ) {
+                continue;
+            }
 
             NIMBLE_BREAK_IF( influence < 0.0f || influence > 1.0f );
 
-			// Caclulate new height value
+            // Caclulate new height value
             f32 height = 0.0f;
 
             switch( m_tool->get<TerrainTool>()->type() ) {
@@ -186,40 +186,40 @@ void TerrainHeightmapSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ec
             case TerrainTool::Smooth:   height = applySmoothing( vertex, x, z, terrain, influence, strength );  break;
             }
 
-			// Update the height
-			heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
-		}
-	}
+            // Update the height
+            heightmap.setHeight( x, z, max2( height, 0.0f ) / terrain->maxHeight() * heightmap.maxValue() );
+        }
+    }
 
 #if 0
-	// Get the chunk buffers
-	Scene::Terrain::VertexBuffer vertices = terrain->chunkVertexBuffer( chunk.x(), chunk.z() );
+    // Get the chunk buffers
+    Scene::Terrain::VertexBuffer vertices = terrain->chunkVertexBuffer( chunk.x(), chunk.z() );
 
-	// Set chunk mesh
-	Scene::Mesh::VertexBuffer vb;
-	vb.resize( vertices.size() );
+    // Set chunk mesh
+    Scene::Mesh::VertexBuffer vb;
+    vb.resize( vertices.size() );
 
-	for( u32 v = 0, n = ( u32 )vertices.size(); v < n; v++ ) {
-		vb[v].position = vertices[v].position;
-		vb[v].normal = vertices[v].normal;
-		vb[v].uv[0] = vertices[v].uv;
-	}
+    for( u32 v = 0, n = ( u32 )vertices.size(); v < n; v++ ) {
+        vb[v].position = vertices[v].position;
+        vb[v].normal = vertices[v].normal;
+        vb[v].uv[0] = vertices[v].uv;
+    }
 
-	mesh.mesh()->setVertexBuffer( 0, vb );
-	mesh.mesh()->updateBounds();
+    mesh.mesh()->setVertexBuffer( 0, vb );
+    mesh.mesh()->updateBounds();
 
-	// Rebuild terrain mesh.
-	mesh.mesh()->invalidateRenderable();
+    // Rebuild terrain mesh.
+    mesh.mesh()->invalidateRenderable();
 #endif
 }
 
 // ** TerrainHeightmapSystem::isPointInside
 bool TerrainHeightmapSystem::isPointInside( const Vec3& point, f32 radius, const Editors::TerrainChunk& chunk ) const
 {
-	if( point.x < -radius || point.x > Scene::Terrain::kChunkSize + radius ) return false;
-	if( point.y < -radius || point.y > Scene::Terrain::kChunkSize + radius ) return false;
+    if( point.x < -radius || point.x > Scene::Terrain::kChunkSize + radius ) return false;
+    if( point.y < -radius || point.y > Scene::Terrain::kChunkSize + radius ) return false;
 
-	return true;
+    return true;
 }
 
 // ** TerrainHeightmapSystem::applyLowering
@@ -284,18 +284,18 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
     f32 average = 0.0f;
     s32 count   = 0;
 
-	for( s32 j = z - radius; j <= z + radius; j++ ) {
-		for( s32 i = x - radius; i <= x + radius; i++ ) {
-			if( !terrain->hasVertex( i, j ) ) {
+    for( s32 j = z - radius; j <= z + radius; j++ ) {
+        for( s32 i = x - radius; i <= x + radius; i++ ) {
+            if( !terrain->hasVertex( i, j ) ) {
                 continue;
             }
 
             average += terrain->heightAtVertex( i, j );
-			count   += 1;
-		}
-	}
+            count   += 1;
+        }
+    }
 
-	average /= count;
+    average /= count;
 
     return average;
 }
@@ -308,34 +308,34 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
 // ** TerrainToolPass::render
 void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform )
 {
-	Renderer::Renderer2DWPtr renderer = context->renderer();
+    Renderer::Renderer2DWPtr renderer = context->renderer();
 
-	s32 r = ceil( tool.radius() );
-	s32 x = transform.position().x;
-	s32 z = transform.position().z;
+    s32 r = ceil( tool.radius() );
+    s32 x = transform.position().x;
+    s32 z = transform.position().z;
 
-	Scene::TerrainHandle terrain = tool.terrain();
+    Scene::TerrainHandle terrain = tool.terrain();
 
-	for( s32 j = z - r; j < z + r; j++ ) {
-		for( s32 i = x - r; i < x + r; i++ ) {
-			// Ensure this is a valid vertex coodinates.
+    for( s32 j = z - r; j < z + r; j++ ) {
+        for( s32 i = x - r; i < x + r; i++ ) {
+            // Ensure this is a valid vertex coodinates.
             if( !terrain->hasVertex( i, j ) ) {
                 continue;
             }
 
-			f32 height = tool.terrain()->height( i, j );
-			Vec3 point = Vec3( ( f32 )i, height, ( f32 )j );
+            f32 height = tool.terrain()->height( i, j );
+            Vec3 point = Vec3( ( f32 )i, height, ( f32 )j );
 
-			// Get the influence
-			f32 influence = tool.influence( (point - transform.position()).length() );
+            // Get the influence
+            f32 influence = tool.influence( (point - transform.position()).length() );
 
-			if( influence <= 0.0f ) {
-				continue;
-			}
+            if( influence <= 0.0f ) {
+                continue;
+            }
 
-			renderer->box( Bounds( point - Vec3(5.0f,0.1f,5.0f) * influence, point + Vec3(5.0f,0.1f,5.0f) * influence ), Rgba( 1.0f, 1.0f, 0.0f ) );
-		}	
-	}
+            renderer->box( Bounds( point - Vec3(5.0f,0.1f,5.0f) * influence, point + Vec3(5.0f,0.1f,5.0f) * influence ), Rgba( 1.0f, 1.0f, 0.0f ) );
+        }    
+    }
 }
 
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */

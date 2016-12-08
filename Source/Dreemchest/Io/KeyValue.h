@@ -37,18 +37,18 @@ namespace Io {
     class VariantTextStream {
     public:
 
-		//! Converts Variant to a JSON string.
-		static String		stringify( const Variant& value, bool formatted = false );
+        //! Converts Variant to a JSON string.
+        static String        stringify( const Variant& value, bool formatted = false );
 
-		//! Parses Variant from a JSON string.
-		static Variant		parse( const String& text );
+        //! Parses Variant from a JSON string.
+        static Variant        parse( const String& text );
 
     #ifdef JSON_FOUND
         //! Converts Variant to JSON object.
-		static Json::Value	toJson( const Variant& value );
+        static Json::Value    toJson( const Variant& value );
 
-		//! Constructs Variant from JSON object.
-		static Variant		fromJson( const Json::Value& json );
+        //! Constructs Variant from JSON object.
+        static Variant        fromJson( const Json::Value& json );
     #endif  /*  #ifdef JSON_FOUND   */
     };
 
@@ -67,27 +67,27 @@ namespace Io {
 
     private:
 
-		//! Key-value value types.
-		enum Type {
-			  kNull
-			, kBoolean
-			, kInt8
-			, kInt16
-			, kInt32
-			, kInt64
-			, kFloat32
-			, kFloat64
-			, kString
-			, kGuid
+        //! Key-value value types.
+        enum Type {
+              kNull
+            , kBoolean
+            , kInt8
+            , kInt16
+            , kInt32
+            , kInt64
+            , kFloat32
+            , kFloat64
+            , kString
+            , kGuid
             , kVec2
             , kVec3
             , kVec4
             , kQuat
             , kRgb
             , kRgba
-			, kArray
-			, kObject
-		};
+            , kArray
+            , kObject
+        };
 
         //! Reads the single variant value from a stream.
         Variant     readValue( void );
@@ -107,4 +107,4 @@ namespace Io {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_KeyValue_H__	*/
+#endif        /*    !__DC_Io_KeyValue_H__    */

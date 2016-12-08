@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Renders all sprites that reside in scene.
+    //! Renders all sprites that reside in scene.
     class SpriteRenderSystem : public RenderSystem<SpriteRenderer> {
     public:
 
@@ -41,30 +41,30 @@ namespace Scene {
 
     protected:
 
-		//! Emits render operations for rendered sprites.
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer ) NIMBLE_OVERRIDE;
+        //! Emits render operations for rendered sprites.
+        virtual void                    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer ) NIMBLE_OVERRIDE;
     
-		//! Allocates and initializes an index buffer of a specified size.
-		u16*							allocateTrianleIndexBuffer( s32 triangleCount ) const;
+        //! Allocates and initializes an index buffer of a specified size.
+        u16*                            allocateTrianleIndexBuffer( s32 triangleCount ) const;
 
-		//! Writes transformed vertices of a single sprite instance.
-		void							emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const;
+        //! Writes transformed vertices of a single sprite instance.
+        void                            emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const;
 
-		//! Writes a batch of sprites with same render states to an output stream.
-		void							emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor );
+        //! Writes a batch of sprites with same render states to an output stream.
+        void                            emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor );
 
-	private:
+    private:
 
-		//! A maximum number of sprites that can be rendered in a single batch
-		enum { MaxSpritesInBatch = 1000 };
+        //! A maximum number of sprites that can be rendered in a single batch
+        enum { MaxSpritesInBatch = 1000 };
 
-		UbershaderPtr                   m_spriteShader;		//!< A default shader that is used for sprite rendering.
-		VertexFormat					m_vertexFormat;		//!< A 2D vertex format.
-		RenderResource					m_vertexBuffer;		//!< An intermediate vertex buffer used for batching.
-		RenderResource					m_indexBuffer;		//!< A static index buffer with pre-allocated set of indices.
-		RenderResource					m_inputLayout;		//!< An input layout constructed from a vertex format.
-		u16*							m_indices;			//!< An allocated static index buffer.
-	};
+        UbershaderPtr                   m_spriteShader;        //!< A default shader that is used for sprite rendering.
+        VertexFormat                    m_vertexFormat;        //!< A 2D vertex format.
+        RenderResource                    m_vertexBuffer;        //!< An intermediate vertex buffer used for batching.
+        RenderResource                    m_indexBuffer;        //!< A static index buffer with pre-allocated set of indices.
+        RenderResource                    m_inputLayout;        //!< An input layout constructed from a vertex format.
+        u16*                            m_indices;            //!< An allocated static index buffer.
+    };
 
 } // namespace Scene
 

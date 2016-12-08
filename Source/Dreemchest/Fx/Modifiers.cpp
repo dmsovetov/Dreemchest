@@ -35,46 +35,46 @@ namespace Fx {
 // ** Modifier::Modifier
 Modifier::Modifier( void )
 {
-	m_duration  = 1.0f;
-	m_isEnabled = false;
+    m_duration  = 1.0f;
+    m_isEnabled = false;
 }
 
 // ** Modifier::create
 Modifier* Modifier::create( ModifierType type )
 {
-	switch( type ) {
-	case ModifierFriction:		return DC_NEW Friction;
-	case ModifierForce:			return DC_NEW Force;
-	case ModifierForceField:	return DC_NEW ForceField;
-	}
+    switch( type ) {
+    case ModifierFriction:        return DC_NEW Friction;
+    case ModifierForce:            return DC_NEW Force;
+    case ModifierForceField:    return DC_NEW ForceField;
+    }
 
-	NIMBLE_BREAK_IF( true, "unhandled modifier type" );
+    NIMBLE_BREAK_IF( true, "unhandled modifier type" );
 
-	return NULL;
+    return NULL;
 }
 
 // ** Modifier::duration
 float Modifier::duration( void ) const
 {
-	return m_duration;
+    return m_duration;
 }
 
 // ** Modifier::setDuration
 void Modifier::setDuration( float value )
 {
-	m_duration = value;
+    m_duration = value;
 }
 
 // ** Modifier::isEnabled
 bool Modifier::isEnabled( void ) const
 {
-	return m_isEnabled;
+    return m_isEnabled;
 }
 
 // ** Modifier::setEnabled
 void Modifier::setEnabled( bool value )
 {
-	m_isEnabled = value;
+    m_isEnabled = value;
 }
 
 // --------------------------------------- ForceField --------------------------------------- //
@@ -82,11 +82,11 @@ void Modifier::setEnabled( bool value )
 // ** ForceField::ForceField
 ForceField::ForceField( void )
 {
-//	registerParameter( "PositionX", &m_x, sParameterInfo::Lifetime );
-//	registerParameter( "PositionY", &m_y, sParameterInfo::Lifetime );
-//	registerParameter( "PositionZ", &m_z, sParameterInfo::Lifetime );
-//	registerParameter( "Force", &m_force, sParameterInfo::Lifetime );
-//	registerParameter( "Radius", &m_radius, sParameterInfo::Lifetime );
+//    registerParameter( "PositionX", &m_x, sParameterInfo::Lifetime );
+//    registerParameter( "PositionY", &m_y, sParameterInfo::Lifetime );
+//    registerParameter( "PositionZ", &m_z, sParameterInfo::Lifetime );
+//    registerParameter( "Force", &m_force, sParameterInfo::Lifetime );
+//    registerParameter( "Radius", &m_radius, sParameterInfo::Lifetime );
 
     m_isQuadratic = true;
 }
@@ -106,13 +106,13 @@ void ForceField::setQuadratic( bool value )
 // ** ForceField::apply
 void ForceField::apply( float dt, float scalar, Particles *particles )
 {
-	NIMBLE_NOT_IMPLEMENTED
+    NIMBLE_NOT_IMPLEMENTED
 /*
-	// ** Sample parameters
-	float x = SampleParameter( &m_x, 0.0f );
-	float y = SampleParameter( &m_y, 0.0f );
-	float r = SampleParameter( &m_radius, 0.0f );
-	float f = SampleParameter( &m_force, 0.0f );
+    // ** Sample parameters
+    float x = SampleParameter( &m_x, 0.0f );
+    float y = SampleParameter( &m_y, 0.0f );
+    float r = SampleParameter( &m_radius, 0.0f );
+    float f = SampleParameter( &m_force, 0.0f );
 
     Vec2  position = Vec2( x, y );
     float radius   = r * r;
@@ -153,9 +153,9 @@ Friction::Friction( void )
 // ** Friction::apply
 void Friction::apply( float dt, float scalar, Particles *particles )
 {
-	NIMBLE_NOT_IMPLEMENTED
+    NIMBLE_NOT_IMPLEMENTED
 /*
-	float value = SampleParameter( &m_value, 0.0f );
+    float value = SampleParameter( &m_value, 0.0f );
     float ratio = 1.0f - std::min( 1.0f, value * dt );
     
     for( int i = 0, n = bundle->GetTotalChunks(); i < n; i++ ) {
@@ -178,17 +178,17 @@ void Friction::apply( float dt, float scalar, Particles *particles )
 Force::Force( void )
 {
 //    registerParameter( "ForceX", &m_x, sParameterInfo::Lifetime );
-//	registerParameter( "ForceY", &m_y, sParameterInfo::Lifetime );
-//	registerParameter( "ForceZ", &m_z, sParameterInfo::Lifetime );
+//    registerParameter( "ForceY", &m_y, sParameterInfo::Lifetime );
+//    registerParameter( "ForceZ", &m_z, sParameterInfo::Lifetime );
 }
 
 // ** Force::apply
 void Force::apply( float dt, float scalar, Particles *particles )
 {
-	NIMBLE_NOT_IMPLEMENTED
+    NIMBLE_NOT_IMPLEMENTED
 /*
-	float x = SampleParameter( &m_x, 0.0f );
-	float y = SampleParameter( &m_y, 0.0f );
+    float x = SampleParameter( &m_x, 0.0f );
+    float y = SampleParameter( &m_y, 0.0f );
 
     cVector2 force( x * dt, y * dt );
 

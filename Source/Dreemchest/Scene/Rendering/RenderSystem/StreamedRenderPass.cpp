@@ -35,8 +35,8 @@ StreamedRenderPassBase::StreamedRenderPassBase( RenderingContext& context, Rende
     : RenderPassBase( context, renderScene )
     , m_maxVerticesInBatch( maxVerticesInBatch )
 {
-	// Request a vertex buffer used for rendering
-	m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * VertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 ).vertexSize() );
+    // Request a vertex buffer used for rendering
+    m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * VertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 ).vertexSize() );
 }
 
 // ** StreamedRenderPassBase::end
@@ -87,12 +87,12 @@ void StreamedRenderPassBase::flush( RenderCommandBuffer& commands, RenderStateSt
 
     // Push a render state
     StateScope state = stateStack.newScope();
-	state->bindVertexBuffer( m_vertexBuffer );
-	state->bindInputLayout( m_context.requestInputLayout( m_activeBatch.vertexFormat ) );
+    state->bindVertexBuffer( m_vertexBuffer );
+    state->bindInputLayout( m_context.requestInputLayout( m_activeBatch.vertexFormat ) );
 
-	// Upload vertex data to a GPU buffer and emit a draw primitives command
-	commands.uploadVertexBuffer( m_vertexBuffer, m_activeBatch.stream, m_activeBatch.size * m_activeBatch.vertexFormat.vertexSize() );
-	commands.drawPrimitives( 0, m_activeBatch.primitive, stateStack.states(), 0, m_activeBatch.size );
+    // Upload vertex data to a GPU buffer and emit a draw primitives command
+    commands.uploadVertexBuffer( m_vertexBuffer, m_activeBatch.stream, m_activeBatch.size * m_activeBatch.vertexFormat.vertexSize() );
+    commands.drawPrimitives( 0, m_activeBatch.primitive, stateStack.states(), 0, m_activeBatch.size );
 
     // Reset an active batch state
     m_activeBatch = ActiveBatch();

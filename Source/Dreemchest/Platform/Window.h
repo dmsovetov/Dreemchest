@@ -39,8 +39,8 @@ namespace Platform {
 
         virtual                 ~IWindow( void ) {}
 
-		//! Closes a window.
-		virtual void			close( void )				= 0;
+        //! Closes a window.
+        virtual void            close( void )                = 0;
 
         //! Returns window width.
         virtual u32             width( void ) const         = 0;
@@ -48,8 +48,8 @@ namespace Platform {
         //! Returns window height.
         virtual u32             height( void ) const        = 0;
 
-		//! Converts the global mouse coordinates to a local ones.
-		virtual void			mapCursorToWindow( s32& x, s32& y ) const = 0;
+        //! Converts the global mouse coordinates to a local ones.
+        virtual void            mapCursorToWindow( s32& x, s32& y ) const = 0;
 
         //! Returns a window caption.
         virtual String          caption( void ) const       = 0;
@@ -76,8 +76,8 @@ namespace Platform {
         //! Creates and shows a new Window instance.
         static Window*          create( u32 width, u32 height );
 
-		//! Closes a window and releases a memory.
-		void					release( void );
+        //! Closes a window and releases a memory.
+        void                    release( void );
 
         //! Returns a window caption.
         String                  caption( void ) const;
@@ -91,11 +91,11 @@ namespace Platform {
         //! Returns window height.
         u32                     height( void ) const;
 
-		//! Returns an aspect ratio of a window.
-		f32						aspectRatio( void ) const;
+        //! Returns an aspect ratio of a window.
+        f32                        aspectRatio( void ) const;
 
-		//! Converts the global mouse coordinates to a local ones.
-		void					mapCursorToWindow( s32& x, s32& y ) const;
+        //! Converts the global mouse coordinates to a local ones.
+        void                    mapCursorToWindow( s32& x, s32& y ) const;
 
 
         //! Returns a platform-specific window handle.
@@ -123,72 +123,72 @@ namespace Platform {
         //! Notifies window that key was released.
         void                    notifyKeyUp( Key key );
 
-		//! Base class for all window events.
-		struct Event {
-						//! Constructs Event instance.
-						Event( WindowWPtr window )
-							: window( window ) {}
-			WindowWPtr	window;	//!< Weak pointer to a window that emitted this event.
-		};
+        //! Base class for all window events.
+        struct Event {
+                        //! Constructs Event instance.
+                        Event( WindowWPtr window )
+                            : window( window ) {}
+            WindowWPtr    window;    //!< Weak pointer to a window that emitted this event.
+        };
 
-		//! This event is emitted each frame.
-		struct Update : public Event {
-						//! Constructs Update instance.
-						Update( WindowWPtr window )
-							: Event( window ) {}
-		};
+        //! This event is emitted each frame.
+        struct Update : public Event {
+                        //! Constructs Update instance.
+                        Update( WindowWPtr window )
+                            : Event( window ) {}
+        };
 
-		//! Base class for all touch events.
-		struct TouchEvent : public Event {
-						//! Constructs TouchEvent instance.
-						TouchEvent( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-							: Event( window ), x( x ), y( y ), id( id ) {}
+        //! Base class for all touch events.
+        struct TouchEvent : public Event {
+                        //! Constructs TouchEvent instance.
+                        TouchEvent( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+                            : Event( window ), x( x ), y( y ), id( id ) {}
 
-			s32			x;	//!< Touch X window coordinate.
-			s32			y;	//!< Touch Y window coordinate.
-			s32			id;	//!< Touch identifier.
-		};
+            s32            x;    //!< Touch X window coordinate.
+            s32            y;    //!< Touch Y window coordinate.
+            s32            id;    //!< Touch identifier.
+        };
 
-		//! This event is emitted when user touches the window.
-		struct TouchBegan : public TouchEvent {
-						//! Constructs TouchBegan instance.
-						TouchBegan( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-							: TouchEvent( window, x, y, id ) {}
-		};
+        //! This event is emitted when user touches the window.
+        struct TouchBegan : public TouchEvent {
+                        //! Constructs TouchBegan instance.
+                        TouchBegan( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, x, y, id ) {}
+        };
 
-		//! This event is emitted when user's touch was ended.
-		struct TouchEnded : public TouchEvent {
-						//! Constructs TouchEnded instance.
-						TouchEnded( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-							: TouchEvent( window, x, y, id ) {}
-		};
+        //! This event is emitted when user's touch was ended.
+        struct TouchEnded : public TouchEvent {
+                        //! Constructs TouchEnded instance.
+                        TouchEnded( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, x, y, id ) {}
+        };
 
-		//! This event is emitted when user's touch was moved.
-		struct TouchMoved : public TouchEvent {
-						//! Constructs TouchMoved instance.
-						TouchMoved( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-							: TouchEvent( window, x, y, id ) {}
-		};
+        //! This event is emitted when user's touch was moved.
+        struct TouchMoved : public TouchEvent {
+                        //! Constructs TouchMoved instance.
+                        TouchMoved( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, x, y, id ) {}
+        };
 
-	#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
-		//! This event is emitted when user presses the key.
-		struct KeyPressed : public Event {
-						//! Constructs KeyPressed instance.
-						KeyPressed( WindowWPtr window, Key key )
-							: Event( window ), key( key ) {}
+    #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+        //! This event is emitted when user presses the key.
+        struct KeyPressed : public Event {
+                        //! Constructs KeyPressed instance.
+                        KeyPressed( WindowWPtr window, Key key )
+                            : Event( window ), key( key ) {}
 
-			Key			key;	//!< Pressed key.	
-		};
+            Key            key;    //!< Pressed key.    
+        };
 
-		//! This event is emitted when user releases the key.
-		struct KeyReleased : public Event {
-						//! Constructs KeyReleased instance.
-						KeyReleased( WindowWPtr window, Key key )
-							: Event( window ), key( key ) {}
+        //! This event is emitted when user releases the key.
+        struct KeyReleased : public Event {
+                        //! Constructs KeyReleased instance.
+                        KeyReleased( WindowWPtr window, Key key )
+                            : Event( window ), key( key ) {}
 
-			Key			key;	//!< Released key.	
-		};
-	#endif	/*	DC_PLATFORM_WINDOWS || DC_PLATFORM_MACOS	*/
+            Key            key;    //!< Released key.    
+        };
+    #endif    /*    DC_PLATFORM_WINDOWS || DC_PLATFORM_MACOS    */
 
     private:
 

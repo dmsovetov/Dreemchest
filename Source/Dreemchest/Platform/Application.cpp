@@ -57,7 +57,7 @@ Application::~Application( void )
 // ** Application::args
 const Arguments& Application::args( void ) const
 {
-	return m_arguments;
+    return m_arguments;
 }
 
 // ** Application::sharedInstance

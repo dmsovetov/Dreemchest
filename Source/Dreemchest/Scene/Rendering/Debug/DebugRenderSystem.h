@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Renders a debug information for scene objects that reside in scene.
+    //! Renders a debug information for scene objects that reside in scene.
     class DebugRenderSystem : public RenderSystem<DebugRenderer> {
     public:
 
@@ -42,16 +42,16 @@ namespace Scene {
 
     protected:
 
-		//! Emits render operations for all objects that reside in scene.
-        virtual void			        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer ) NIMBLE_OVERRIDE;
+        //! Emits render operations for all objects that reside in scene.
+        virtual void                    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		UbershaderPtr                   m_debugShader;		//!< A default shader that is used for debug rendering.
+        UbershaderPtr                   m_debugShader;        //!< A default shader that is used for debug rendering.
         DebugStaticMeshPass             m_staticMeshes;     //!< Renders bounding boxes for all static meshes.
         DebugLightPass                  m_lights;           //!< Renders bounding boxes for all lights.
         DebugCameraPass                 m_cameras;          //!< Renders bounding boxes for all cameras.
-	};
+    };
 
 } // namespace Scene
 

@@ -32,26 +32,26 @@ namespace Scene {
 
 // ** Grid::Grid
 Grid::Grid( f32 size, f32 cellSize, u8 features )
-	: m_size( size ), m_cellSize( cellSize ), m_features( features )
+    : m_size( size ), m_cellSize( cellSize ), m_features( features )
 {
 }
 
 // ** Grid::size
 f32 Grid::size( void ) const
 {
-	return m_size;
+    return m_size;
 }
 
 // ** Grid::cellSize
 f32 Grid::cellSize( void ) const
 {
-	return m_cellSize;
+    return m_cellSize;
 }
 
 // ** Grid::features
 const FlagSet8& Grid::features( void ) const
 {
-	return m_features;
+    return m_features;
 }
 
 } // namespace Scene

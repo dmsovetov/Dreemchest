@@ -33,72 +33,72 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Mesh data container.
-	class Mesh {
-	public:
+    //! Mesh data container.
+    class Mesh {
+    public:
 
-		//! Mesh vertex.
-		struct Vertex {
-			enum { MaxTexCoords = 2 };
-			Vec3				position;			//!< Vertex position.
-			Vec3				normal;				//!< Vertex normal.
-			Vec2				uv[MaxTexCoords];	//!< Texture coordinates.
-		};
+        //! Mesh vertex.
+        struct Vertex {
+            enum { MaxTexCoords = 2 };
+            Vec3                position;            //!< Vertex position.
+            Vec3                normal;                //!< Vertex normal.
+            Vec2                uv[MaxTexCoords];    //!< Texture coordinates.
+        };
 
-		typedef Array<Vertex>	VertexBuffer;		//!< Mesh vertex buffer type.
-		typedef Array<u16>		IndexBuffer;		//!< Mesh index buffer type.
+        typedef Array<Vertex>    VertexBuffer;        //!< Mesh vertex buffer type.
+        typedef Array<u16>        IndexBuffer;        //!< Mesh index buffer type.
 
-								//! Constructs Mesh instance.
-								Mesh( void );
+                                //! Constructs Mesh instance.
+                                Mesh( void );
 
-		//! Returns mesh bounds.
-		const Bounds&			bounds( void ) const;
+        //! Returns mesh bounds.
+        const Bounds&            bounds( void ) const;
 
         //! Returns a vertex format.
         const VertexFormat&     vertexFormat( void ) const;
 
-		//! Returns the total number of mesh chunks.
-		s32						chunkCount( void ) const;
+        //! Returns the total number of mesh chunks.
+        s32                        chunkCount( void ) const;
 
-		//! Sets the total number of mesh chunks.
-		void					setChunkCount( s32 value );
+        //! Sets the total number of mesh chunks.
+        void                    setChunkCount( s32 value );
 
-		//! Sets chunk texture name.
-		void					setTexture( s32 chunk, const String& value );
+        //! Sets chunk texture name.
+        void                    setTexture( s32 chunk, const String& value );
 
-		//! Returns chunk texture name.
-		const String&			texture( s32 chunk ) const;
+        //! Returns chunk texture name.
+        const String&            texture( s32 chunk ) const;
 
-		//! Returns vertex buffer for a specified mesh chunk.
-		const VertexBuffer&		vertexBuffer( void ) const;
+        //! Returns vertex buffer for a specified mesh chunk.
+        const VertexBuffer&        vertexBuffer( void ) const;
 
-		//! Sets chunk vertex buffer.
-		void					setVertexBuffer( const VertexBuffer& value );
+        //! Sets chunk vertex buffer.
+        void                    setVertexBuffer( const VertexBuffer& value );
 
-		//! Returns index buffer for a specified mesh chunk.
-		const IndexBuffer&		indexBuffer( void ) const;
+        //! Returns index buffer for a specified mesh chunk.
+        const IndexBuffer&        indexBuffer( void ) const;
 
-		//! Sets chunk index buffer.
-		void					setIndexBuffer( const IndexBuffer& value );
+        //! Sets chunk index buffer.
+        void                    setIndexBuffer( const IndexBuffer& value );
 
-		//! Updates mesh bounds.
-		void					updateBounds( void );
+        //! Updates mesh bounds.
+        void                    updateBounds( void );
 
-	private:
+    private:
 
-		//! Internal mesh chunk.
-		struct Chunk {
-			String				texture;	//!< Mesh node texture name.
+        //! Internal mesh chunk.
+        struct Chunk {
+            String                texture;    //!< Mesh node texture name.
             s32                 offset;     //!< The first index of a mesh chunk.
             s32                 count;      //!< A total number of indices in a chunk.
-		};
+        };
 
         VertexFormat            m_vertexFormat; //!< A mesh vertex format.
         VertexBuffer            m_vertexBuffer; //!< Mesh vertex buffer.
         IndexBuffer             m_indexBuffer;  //!< Mesh index buffer
-		Bounds					m_bounds;	    //!< Bounding box of a mesh.
-		Array<Chunk>			m_chunks;	    //!< Mesh chunks.
-	};
+        Bounds                    m_bounds;        //!< Bounding box of a mesh.
+        Array<Chunk>            m_chunks;        //!< Mesh chunks.
+    };
 
 } // namespace Scene
 

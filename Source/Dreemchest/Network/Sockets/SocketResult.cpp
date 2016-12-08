@@ -54,9 +54,9 @@ bool SocketResult::wouldBlock( void ) const
     s32 code = errorCode();
 
 #ifdef DC_PLATFORM_WINDOWS
-	if( code == WSAEWOULDBLOCK ) {
+    if( code == WSAEWOULDBLOCK ) {
 #else
-	if( code == EAGAIN ) {
+    if( code == EAGAIN ) {
 #endif  /*  DC_PLATFORM_WINDOWS */
         return true;
     }
@@ -68,9 +68,9 @@ bool SocketResult::wouldBlock( void ) const
 s32 SocketResult::errorCode( void ) const
 {
 #ifdef DC_PLATFORM_WINDOWS
-	return WSAGetLastError();
+    return WSAGetLastError();
 #else
-	return errno;
+    return errno;
 #endif
 }
 
@@ -78,11 +78,11 @@ s32 SocketResult::errorCode( void ) const
 String SocketResult::errorMessage( void ) const
 {
 #ifdef DC_PLATFORM_WINDOWS
-	LPSTR err = NULL;
-	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0, WSAGetLastError(), 0, ( LPSTR )&err, 0, 0 );
-	String msg = err;
-	LocalFree( err );
-	return msg;
+    LPSTR err = NULL;
+    FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0, WSAGetLastError(), 0, ( LPSTR )&err, 0, 0 );
+    String msg = err;
+    LocalFree( err );
+    return msg;
 #else
     return strerror( errno );
 #endif

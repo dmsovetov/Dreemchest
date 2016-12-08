@@ -34,16 +34,16 @@ DC_BEGIN_COMPOSER
 
 namespace Importers {
 
-	//! Base class for all asset importers.
-	class AssetImporter : public RefCounted {
-	public:
+    //! Base class for all asset importers.
+    class AssetImporter : public RefCounted {
+    public:
 
-		//! Imports an asset to project cache.
-		virtual bool			import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) = 0;
-	};
+        //! Imports an asset to project cache.
+        virtual bool            import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName ) = 0;
+    };
 
 } // namespace Importers
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_AssetImporter_H__	*/
+#endif    /*    !__DC_Composer_AssetImporter_H__    */

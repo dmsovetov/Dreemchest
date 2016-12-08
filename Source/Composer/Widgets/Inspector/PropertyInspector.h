@@ -84,7 +84,7 @@ namespace Ui {
 
         PropertyModelQPtr       m_model;        //!< Bound property model.
         QFormLayout*            m_layout;       //!< Form layout to display property widget.
-        QDataWidgetMapper*      m_mapper;	    //!< Maps property model to actual widgets.
+        QDataWidgetMapper*      m_mapper;        //!< Maps property model to actual widgets.
         static WidgetFactory    s_factory;      //!< Shared widget factory instance.
     };
 

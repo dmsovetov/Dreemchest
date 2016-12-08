@@ -34,44 +34,44 @@
 
 DC_BEGIN_COMPOSER
 
-	//! Scene helpers rendering component.
-	class RenderSceneHelpers : public Ecs::Component<RenderSceneHelpers> {
-	public:
-	};
+    //! Scene helpers rendering component.
+    class RenderSceneHelpers : public Ecs::Component<RenderSceneHelpers> {
+    public:
+    };
 
 #if DEV_DEPRECATED_SCENE_RENDERER
-	//! Renders highlight & selection indicators for scene objects.
-	class SceneObjectIndicatorsPass : public Scene::RenderPass<Editors::SceneEditorInternal> {
-	public:
+    //! Renders highlight & selection indicators for scene objects.
+    class SceneObjectIndicatorsPass : public Scene::RenderPass<Editors::SceneEditorInternal> {
+    public:
 
-						//! Constructs SceneObjectIndicatorsPass instance.
-						SceneObjectIndicatorsPass( Ecs::EcsWPtr ecs )
-							: RenderPass( ecs, "SceneObjectIndicatorsPass" ) {}
+                        //! Constructs SceneObjectIndicatorsPass instance.
+                        SceneObjectIndicatorsPass( Ecs::EcsWPtr ecs )
+                            : RenderPass( ecs, "SceneObjectIndicatorsPass" ) {}
 
-	protected:
+    protected:
 
-		//! Renders scene object indicators.
-		virtual void	render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform ) DC_DECL_OVERRIDE;	
-	};
+        //! Renders scene object indicators.
+        virtual void    render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform ) DC_DECL_OVERRIDE;    
+    };
 
-	//! Scene editor helpers renderer type.
-	class SceneHelpersRenderer : public Scene::RenderingSystem<RenderSceneHelpers> {
-	public:
+    //! Scene editor helpers renderer type.
+    class SceneHelpersRenderer : public Scene::RenderingSystem<RenderSceneHelpers> {
+    public:
 
-								SceneHelpersRenderer( Ecs::EcsWPtr ecs )
-									: RenderingSystem( ecs, "SceneHelpersRenderer" )
-								{
-									addPass<TranslationToolPass>();
-									addPass<RotationToolPass>();
-									addPass<SceneObjectIndicatorsPass>();
-									addPass<TerrainToolPass>();
-									addPass<ArcballRotationToolPass>();
-									addPass<Scene::GridPass>();
-								}
-	};
+                                SceneHelpersRenderer( Ecs::EcsWPtr ecs )
+                                    : RenderingSystem( ecs, "SceneHelpersRenderer" )
+                                {
+                                    addPass<TranslationToolPass>();
+                                    addPass<RotationToolPass>();
+                                    addPass<SceneObjectIndicatorsPass>();
+                                    addPass<TerrainToolPass>();
+                                    addPass<ArcballRotationToolPass>();
+                                    addPass<Scene::GridPass>();
+                                }
+    };
 #else
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Rendering_H__	*/
+#endif    /*    !__DC_Composer_Rendering_H__    */

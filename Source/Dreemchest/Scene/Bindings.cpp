@@ -43,41 +43,41 @@ Vec3Binding::Vec3Binding( const Vec3& value ) : m_value( value )
 // ** Vec3Binding::get
 Vec3 Vec3Binding::get( void ) const
 {
-	return m_value;
+    return m_value;
 }
 
 // ** Vec3Binding::set
 void Vec3Binding::set( const Vec3& value )
 {
-	m_value = value;
+    m_value = value;
 }
 
 // ---------------------------------------------- Vec3FromKeyboard --------------------------------------------- //
 
 // ** Vec3FromKeyboard::Vec3FromKeyboard
 Vec3FromKeyboard::Vec3FromKeyboard( Platform::Key::Mapping left, Platform::Key::Mapping right, Platform::Key::Mapping up, Platform::Key::Mapping down )
-	: m_left( left ), m_right( right ), m_up( up ), m_down( down )
+    : m_left( left ), m_right( right ), m_up( up ), m_down( down )
 {
-	m_input = Platform::Input::sharedInstance();
+    m_input = Platform::Input::sharedInstance();
 }
 
 // ** Vec3FromKeyboard::get
 Vec3 Vec3FromKeyboard::get( void ) const
 {
-	// Resulting direction
-	Vec3 direction( 0.0f, 0.0f, 0.0f );
+    // Resulting direction
+    Vec3 direction( 0.0f, 0.0f, 0.0f );
 
-	// Get the movement direction
-		 if( m_input->keyDown( m_left ) )  direction.x = -1.0f;
-	else if( m_input->keyDown( m_right ) ) direction.x =  1.0f;
+    // Get the movement direction
+         if( m_input->keyDown( m_left ) )  direction.x = -1.0f;
+    else if( m_input->keyDown( m_right ) ) direction.x =  1.0f;
 
-		 if( m_input->keyDown( m_up ) )    direction.z = -1.0f;
-	else if( m_input->keyDown( m_down ) )  direction.z =  1.0f;
+         if( m_input->keyDown( m_up ) )    direction.z = -1.0f;
+    else if( m_input->keyDown( m_down ) )  direction.z =  1.0f;
 
-	// Normalize the direction
-	direction.normalize();
+    // Normalize the direction
+    direction.normalize();
 
-	return direction;
+    return direction;
 }
 
 // ---------------------------------------------- Vec3FromMouse --------------------------------------------- //
@@ -85,29 +85,29 @@ Vec3 Vec3FromKeyboard::get( void ) const
 // ** Vec3FromMouse::Vec3FromMouse
 Vec3FromMouse::Vec3FromMouse( f32 scaleFactor ) : m_scaleFactor( scaleFactor ), m_lastPosition( -1.0f, -1.0f )
 {
-	m_input = Platform::Input::sharedInstance();
+    m_input = Platform::Input::sharedInstance();
 }
 
 // ** Vec3FromMouse::get
 Vec3 Vec3FromMouse::get( void ) const
 {
-	// Get the mouse cursor
-	Vec2 pos = Vec2( m_input->mouseX(), m_input->mouseY() );
+    // Get the mouse cursor
+    Vec2 pos = Vec2( m_input->mouseX(), m_input->mouseY() );
 
-	// This is a first time the direction is requested
-	if( m_lastPosition.x == -1 || m_lastPosition.y == -1 ) {
-		m_lastPosition = pos;
-		return Vec3( 0.0f, 0.0f, 0.0f );
-	}
+    // This is a first time the direction is requested
+    if( m_lastPosition.x == -1 || m_lastPosition.y == -1 ) {
+        m_lastPosition = pos;
+        return Vec3( 0.0f, 0.0f, 0.0f );
+    }
 
-	// Calculate deltas
-	f32 dx = pos.x - m_lastPosition.x;
-	f32 dy = pos.y - m_lastPosition.y;
+    // Calculate deltas
+    f32 dx = pos.x - m_lastPosition.x;
+    f32 dy = pos.y - m_lastPosition.y;
 
-	// Set last used position
-	m_lastPosition = pos;
+    // Set last used position
+    m_lastPosition = pos;
 
-	return Vec3( -dy, -dx, 0.0f ) * m_scaleFactor;
+    return Vec3( -dy, -dx, 0.0f ) * m_scaleFactor;
 }
 
 // ---------------------------------------------- Vec3FromTransform --------------------------------------------- //
@@ -121,7 +121,7 @@ Vec3FromTransform::Vec3FromTransform( const TransformWPtr& transform ) : m_trans
 // ** Vec3FromTransform::get
 Vec3 Vec3FromTransform::get( void ) const
 {
-	return m_transform->position();
+    return m_transform->position();
 }
 
 } // namespace Scene

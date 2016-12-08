@@ -39,9 +39,9 @@ ByteBuffer::ByteBuffer( const u8* pointer, s32 size ) : m_position( 0 )
     
     m_buffer.resize( size );
 
-	if( pointer ) {
-		memcpy( &m_buffer[0], pointer, size );
-	}
+    if( pointer ) {
+        memcpy( &m_buffer[0], pointer, size );
+    }
 }
 
 ByteBuffer::~ByteBuffer( void )
@@ -82,7 +82,7 @@ s32 ByteBuffer::bytesAvailable( void ) const
 // ** ByteBuffer::array
 const Array<u8>& ByteBuffer::array( void ) const
 {
-	return m_buffer;
+    return m_buffer;
 }
 
 // ** ByteBuffer::buffer
@@ -106,7 +106,7 @@ s32 ByteBuffer::length( void ) const
 // ** ByteBuffer::copy
 ByteBufferPtr ByteBuffer::copy( void ) const
 {
-	return ByteBuffer::createFromArray( m_buffer );
+    return ByteBuffer::createFromArray( m_buffer );
 }
 
 // ** ByteBuffer::trimFromLeft
@@ -172,9 +172,9 @@ void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
     case SeekCur:   m_position = min2( m_position + offset, length() );
                     break;
             
-	case SeekEnd:   m_position = max2( 0, length() - offset );
+    case SeekEnd:   m_position = max2( 0, length() - offset );
                     break;
-	}
+    }
 }
 
 } // namespace Io

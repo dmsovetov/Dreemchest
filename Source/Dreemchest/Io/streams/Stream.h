@@ -33,15 +33,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-	//! Basic stream class.
+    //! Basic stream class.
     class dcInterface Stream : public RefCounted {
 
         DC_DECLARE_IS( FileStream, FileStream, NULL );
         DC_DECLARE_IS( ByteBuffer, ByteBuffer, NULL );
 
-	public:
+    public:
 
-		virtual					~Stream( void );
+        virtual                    ~Stream( void );
 
         //! Disposes this stream.
         virtual void            dispose( void );
@@ -84,10 +84,10 @@ namespace Io {
 
                                 //! Constructs a stream instance
                                 Stream( void );
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_Stream_H__	*/
+#endif        /*    !__DC_Io_Stream_H__    */

@@ -24,8 +24,8 @@
  
  **************************************************************************/
 
-#ifndef	__DC_Network_RemoteCallHandler_Hpp__
-#define	__DC_Network_RemoteCallHandler_Hpp__
+#ifndef    __DC_Network_RemoteCallHandler_Hpp__
+#define    __DC_Network_RemoteCallHandler_Hpp__
 
 
 DC_BEGIN_DREEMCHEST
@@ -64,4 +64,4 @@ inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const P
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_RemoteCallHandler_Hpp__	*/
+#endif    /*    !__DC_Network_RemoteCallHandler_Hpp__    */

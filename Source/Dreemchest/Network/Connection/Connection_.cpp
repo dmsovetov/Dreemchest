@@ -38,10 +38,10 @@ Connection_::Connection_( void )
     : m_id( 0 )
     , m_totalBytesReceived( 0 )
     , m_totalBytesSent( 0 )
-	, m_time( 0 )
-	, m_timeout( 0 )
-	, m_roundTripTime( 0 )
-	, m_shouldClose( false )
+    , m_time( 0 )
+    , m_timeout( 0 )
+    , m_roundTripTime( 0 )
+    , m_shouldClose( false )
 {
 }
 
@@ -60,13 +60,13 @@ u32 Connection_::id( void ) const
 // ** Connection::closeLater
 void Connection_::closeLater( void )
 {
-	m_shouldClose = true;
+    m_shouldClose = true;
 }
 
 // ** Connection::willBeClosed
 bool Connection_::willBeClosed( void ) const
 {
-	return m_shouldClose;
+    return m_shouldClose;
 }
 
 // ** Connection::trackReceivedAmount
@@ -84,50 +84,50 @@ void Connection_::trackSentAmount( s32 value )
 // ** Connection::totalBytesReceived
 s32 Connection_::totalBytesReceived( void ) const
 {
-	return m_totalBytesReceived;
+    return m_totalBytesReceived;
 }
 
 // ** Connection::totalBytesSent
 s32 Connection_::totalBytesSent( void ) const
 {
-	return m_totalBytesSent;
+    return m_totalBytesSent;
 }
 
 // ** Connection::time
 s32 Connection_::time( void ) const
 {
-	return m_time;
+    return m_time;
 }
 
 // ** Connection::setTime
 void Connection_::setTime( s32 value )
 {
-	m_time = value;
+    m_time = value;
 }
 
 // ** Connection::timeout
 s32 Connection_::timeout( void ) const
 {
-	return m_timeout;
+    return m_timeout;
 }
 
 // ** Connection::roundTripTime
 s32 Connection_::roundTripTime( void ) const
 {
-	return m_roundTripTime;
+    return m_roundTripTime;
 }
 
 // ** Connection::setRoundTripTime
 void Connection_::setRoundTripTime( s32 value )
 {
-	m_roundTripTime = value;
+    m_roundTripTime = value;
 }
 
 // ** Connection::notifyPacketReceived
 void Connection_::notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBufferWPtr packet )
 {
-	// Reset the timeout counter
-	m_timeout = 0;
+    // Reset the timeout counter
+    m_timeout = 0;
 
     // Notify all listeners about this packet
     notify<Received>( this, type, size, packet );
@@ -136,86 +136,86 @@ void Connection_::notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBuf
 // ** Connection::addMiddleware
 void Connection_::addMiddleware( ConnectionMiddlewareUPtr instance )
 {
-	// Set this connection as parent
-	instance->setConnection( static_cast<Connection*>( this ) );
+    // Set this connection as parent
+    instance->setConnection( static_cast<Connection*>( this ) );
 
-	// Add new middleware to a list
-	m_middlewares.push_back( instance );
+    // Add new middleware to a list
+    m_middlewares.push_back( instance );
 }
 
 // ** Connection::send
 void Connection_::send( const AbstractPacket& packet )
 {
     // Create the network data to write packet to
-	Io::ByteBufferPtr stream = Io::ByteBuffer::create();
+    Io::ByteBufferPtr stream = Io::ByteBuffer::create();
 
     // Write packet to binary stream
     u32 bytesWritten = writePacket( packet, stream );
 
-	// Send binary data to socket
-	s32 bytesSent = sendData( stream );
+    // Send binary data to socket
+    s32 bytesSent = sendData( stream );
 
     // The socket was closed.
-	if( bytesSent == 0 ) {
+    if( bytesSent == 0 ) {
         close();
-		return;
-	}
+        return;
+    }
 
     LogDebug( "packet", "%s sent to #%d (%d bytes)\n", packet.name(), id(), bytesSent );
 
-	// Increase the sent bytes counter.
+    // Increase the sent bytes counter.
     trackSentAmount( bytesSent );
 
-	NIMBLE_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
+    NIMBLE_BREAK_IF( bytesWritten != bytesSent, "failed to send all data" );
 }
 
 // ** Connection::writePacket
 s32 Connection_::writePacket( const AbstractPacket& packet, Io::ByteBufferWPtr stream ) const
 {
     // Save current position to track the total number of bytes written
-	s32 position = stream->position();
+    s32 position = stream->position();
 
     // Write the header to a binary stream
-	Header header( packet.id(), 0 );
-	stream->write( &header.type, sizeof( header.type ) );
-	stream->write( &header.size, sizeof( header.size ) );
+    Header header( packet.id(), 0 );
+    stream->write( &header.type, sizeof( header.type ) );
+    stream->write( &header.size, sizeof( header.size ) );
 
     // Write packet to a binary stream
-	s32 start = stream->position();
-	packet.serialize( stream );
-	header.size = stream->position() - start;
+    s32 start = stream->position();
+    packet.serialize( stream );
+    header.size = stream->position() - start;
 
-	// Finalize the packet formatting by fixing a packet size inside the header
-	stream->setPosition( position + sizeof( header.type ) );
-	stream->write( &header.size, sizeof( header.size ) );
+    // Finalize the packet formatting by fixing a packet size inside the header
+    stream->setPosition( position + sizeof( header.type ) );
+    stream->write( &header.size, sizeof( header.size ) );
 
     // Rewind back to the end of a packet
-	stream->setPosition( start + header.size );
+    stream->setPosition( start + header.size );
 
-	return stream->position() - position;
+    return stream->position() - position;
 }
 
 // ** Connection::readPacket
 Connection_::Header Connection_::readPacket( Io::ByteBufferWPtr stream, Io::ByteBufferWPtr packet ) const
 {
     // The received data is too small to be a readable packet
-	if( stream->bytesAvailable() < Header::Size ) {
-		return Header();
-	}
+    if( stream->bytesAvailable() < Header::Size ) {
+        return Header();
+    }
 
-	// Save current stream position
-	s32 initial = stream->position();
+    // Save current stream position
+    s32 initial = stream->position();
 
-	// Read the packet header
-	Header header;
-	stream->read( &header.type, sizeof( header.type ) );
-	stream->read( &header.size, sizeof( header.size ) );
+    // Read the packet header
+    Header header;
+    stream->read( &header.type, sizeof( header.type ) );
+    stream->read( &header.size, sizeof( header.size ) );
 
-	// Do we have enough data to parse the whole packet?
-	if( stream->bytesAvailable() < header.size ) {
-		stream->setPosition( initial );
-		return Header();
-	}
+    // Do we have enough data to parse the whole packet?
+    if( stream->bytesAvailable() < header.size ) {
+        stream->setPosition( initial );
+        return Header();
+    }
 
     // Copy data from a stream to a packet buffer
     packet->setPosition( 0, Io::SeekSet );
@@ -234,16 +234,16 @@ Connection_::Header Connection_::readPacket( Io::ByteBufferWPtr stream, Io::Byte
 // ** Connection_::update
 void Connection_::update( u32 dt )
 {
-	// Advance the connection time by a passed amount of milliseconds
-	m_time += dt;
+    // Advance the connection time by a passed amount of milliseconds
+    m_time += dt;
 
-	// Advance the timeout counter
-	m_timeout += dt;
+    // Advance the timeout counter
+    m_timeout += dt;
 
-	// Now update all connection middlewares
-	for( ConnectionMiddlewares::iterator i = m_middlewares.begin(), end = m_middlewares.end(); i != end; ++i ) {
-		(*i)->update( dt );
-	}
+    // Now update all connection middlewares
+    for( ConnectionMiddlewares::iterator i = m_middlewares.begin(), end = m_middlewares.end(); i != end; ++i ) {
+        (*i)->update( dt );
+    }
 }
 
 } // namespace Network

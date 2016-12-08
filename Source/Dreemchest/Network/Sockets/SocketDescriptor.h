@@ -33,65 +33,65 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Socket descriptor.
-	class SocketDescriptor {
-	public:
+    //! Socket descriptor.
+    class SocketDescriptor {
+    public:
 
-								//! Constructs a new socket descritptor
-								SocketDescriptor( s32 socket = -1 );
-								SocketDescriptor( const SocketDescriptor& other );
-								~SocketDescriptor( void );
+                                //! Constructs a new socket descritptor
+                                SocketDescriptor( s32 socket = -1 );
+                                SocketDescriptor( const SocketDescriptor& other );
+                                ~SocketDescriptor( void );
 
-								//! Converts to raw socket handle.
-								operator s32( void ) const;
+                                //! Converts to raw socket handle.
+                                operator s32( void ) const;
 
-		//! Invalid socket descriptor;
-		static SocketDescriptor Invalid;
+        //! Invalid socket descriptor;
+        static SocketDescriptor Invalid;
 
-		//! Open sockets counter.
-		static u32				ActiveCount;
+        //! Open sockets counter.
+        static u32                ActiveCount;
 
-		//! Compares two socket descriptors.
-		bool					operator == ( const SocketDescriptor& other ) const;
+        //! Compares two socket descriptors.
+        bool                    operator == ( const SocketDescriptor& other ) const;
 
-		//! Copies a socket descriptor.
-		const SocketDescriptor&	operator = ( const SocketDescriptor& other );
+        //! Copies a socket descriptor.
+        const SocketDescriptor&    operator = ( const SocketDescriptor& other );
 
-		//! Sets a socket descriptor from 32-bit integer
-		const SocketDescriptor&	operator = ( s32 socket );
+        //! Sets a socket descriptor from 32-bit integer
+        const SocketDescriptor&    operator = ( s32 socket );
 
-		//! Returns true if this socket descriptor is valid.
-		bool					isValid( void ) const;
+        //! Returns true if this socket descriptor is valid.
+        bool                    isValid( void ) const;
 
-		//! Closes a socket.
-		void					close( void );
+        //! Closes a socket.
+        void                    close( void );
 
-		//! Returns an error code on this socket.
-		s32						error( void ) const;
+        //! Returns an error code on this socket.
+        s32                        error( void ) const;
 
-		//! Accepts incoming connection to this socket.
-		SocketDescriptor		accept( Address& remoteAddress ) const;			
+        //! Accepts incoming connection to this socket.
+        SocketDescriptor        accept( Address& remoteAddress ) const;            
 
-		//! Enables socket address reuse.
-		bool					enableAddressReuse( void );
+        //! Enables socket address reuse.
+        bool                    enableAddressReuse( void );
 
-		//! Sets this socket to non-blocking mode.
-		bool					setNonBlocking( void );
+        //! Sets this socket to non-blocking mode.
+        bool                    setNonBlocking( void );
 
-		//! Disables Nagle algorithm for this socket,
-		bool					setNoDelay( void );
+        //! Disables Nagle algorithm for this socket,
+        bool                    setNoDelay( void );
 
-		//! Enables broadcasts for this socket.
-		bool					enableBroadcast( void );
+        //! Enables broadcasts for this socket.
+        bool                    enableBroadcast( void );
 
-	private:
+    private:
 
-		//! Actual socket descriptor.
-		mutable s32				m_socket;
-	};
+        //! Actual socket descriptor.
+        mutable s32                m_socket;
+    };
 
 } // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_SocketDescriptor_H__	*/
+#endif    /*    !__DC_Network_SocketDescriptor_H__    */

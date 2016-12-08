@@ -147,8 +147,8 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     }
 
     // ** Set the display link for the current renderer
-    CGLContextObj		cglContext		= ( CGLContextObj )[[self openGLContext] CGLContextObj];
-    CGLPixelFormatObj	cglPixelFormat	= ( CGLPixelFormatObj )[[self pixelFormat] CGLPixelFormatObj];
+    CGLContextObj        cglContext        = ( CGLContextObj )[[self openGLContext] CGLContextObj];
+    CGLPixelFormatObj    cglPixelFormat    = ( CGLPixelFormatObj )[[self pixelFormat] CGLPixelFormatObj];
 
     result = CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext( m_displayLink, cglContext, cglPixelFormat );
     if( result != kCVReturnSuccess ) {

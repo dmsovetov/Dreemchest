@@ -50,7 +50,7 @@ Window::~Window( void )
 Window* Window::create( u32 width, u32 height )
 {
 #ifdef DC_PLATFORM_ANDROID
-	NIMBLE_NOT_IMPLEMENTED
+    NIMBLE_NOT_IMPLEMENTED
 #else
     if( IWindow* impl = createWindow( width, height ) ) {
         return DC_NEW Window( impl );
@@ -63,11 +63,11 @@ Window* Window::create( u32 width, u32 height )
 // ** Window::release
 void Window::release( void )
 {
-	if( m_impl ) {
-		m_impl->close();
-	}
+    if( m_impl ) {
+        m_impl->close();
+    }
 
-	delete this;
+    delete this;
 }
 
 // ** Window::width
@@ -95,14 +95,14 @@ u32 Window::height( void ) const
 // ** Window::aspectRatio
 f32 Window::aspectRatio( void ) const
 {
-	return f32( width() ) / height();
+    return f32( width() ) / height();
 }
 
 // ** Window::mapCursorToWindow
 void Window::mapCursorToWindow( s32& x, s32& y ) const
 {
-	DC_CHECK_IMPL();
-	m_impl->mapCursorToWindow( x, y );
+    DC_CHECK_IMPL();
+    m_impl->mapCursorToWindow( x, y );
 }
 
 // ** Window::caption
@@ -141,39 +141,39 @@ void* Window::handle( void ) const
 // ** Window::notifyUpdate
 void Window::notifyUpdate( void )
 {
-	notify<Update>( Update( this ) );
+    notify<Update>( Update( this ) );
 }
 
 // ** Window::notifyMouseUp
 void Window::notifyMouseUp( u32 x, u32 y, int touchId )
 {
-	notify<TouchEnded>( TouchEnded( this, x, y, touchId ) );
+    notify<TouchEnded>( TouchEnded( this, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseDown
 void Window::notifyMouseDown( u32 x, u32 y, int touchId )
 {
-	notify<TouchBegan>( TouchBegan( this, x, y, touchId ) );
+    notify<TouchBegan>( TouchBegan( this, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseMove
 void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 {
-	notify<TouchMoved>( TouchMoved( this, sx, sx, touchId ) );
+    notify<TouchMoved>( TouchMoved( this, sx, sx, touchId ) );
 }
 
 // ** Window::notifyKeyDown
 void Window::notifyKeyDown( Key key )
 {
 #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
-	notify<KeyPressed>( KeyPressed( this, key ) );
+    notify<KeyPressed>( KeyPressed( this, key ) );
 #endif  /*  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )    */
 }
 
 // ** Window::notifyKeyUp
 void Window::notifyKeyUp( Key key )
 {
-	notify<KeyReleased>( KeyReleased( this, key ) );
+    notify<KeyReleased>( KeyReleased( this, key ) );
 }
 
 } // namespace Platform

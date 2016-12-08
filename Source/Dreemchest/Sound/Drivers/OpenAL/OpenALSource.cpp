@@ -183,7 +183,7 @@ bool OpenALSource::isStreamed( void ) const
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {
-	NIMBLE_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
+    NIMBLE_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
 
     // ** Ensure we have a valid source state for a streamed sources
     if( m_state != state() && isStreamed() ) {

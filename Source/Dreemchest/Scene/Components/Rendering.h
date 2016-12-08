@@ -37,26 +37,26 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! This component is attached to a camera to render sprites.
-	class SpriteRenderer : public Ecs::Component<SpriteRenderer> {
-	public:
+    //! This component is attached to a camera to render sprites.
+    class SpriteRenderer : public Ecs::Component<SpriteRenderer> {
+    public:
 
-										//! Constructs a SpriteRenderer instance.
-										SpriteRenderer( f32 scaleFactor = 1.0f );
+                                        //! Constructs a SpriteRenderer instance.
+                                        SpriteRenderer( f32 scaleFactor = 1.0f );
 
-		//! Returns a sprite rendering scale factor.
-		f32								scaleFactor( void ) const;
+        //! Returns a sprite rendering scale factor.
+        f32                                scaleFactor( void ) const;
 
-		//! Sets a sprite rendering scale factor.
-		void							setScaleFactor( f32 value );
+        //! Sets a sprite rendering scale factor.
+        void                            setScaleFactor( f32 value );
 
-	private:
+    private:
 
-		f32								m_scaleFactor;		//!< A global scale factor that is applied to rendered sprites.
-	};
+        f32                                m_scaleFactor;        //!< A global scale factor that is applied to rendered sprites.
+    };
 
-	//! This component is attached to a camera to render forward lit meshes.
-	class ForwardRenderer : public Ecs::Component<ForwardRenderer> {
+    //! This component is attached to a camera to render forward lit meshes.
+    class ForwardRenderer : public Ecs::Component<ForwardRenderer> {
     public:
 
                                         //! Constructs a ForwardRenderer instance.
@@ -92,7 +92,7 @@ namespace Scene {
         s32                             m_shadowCascadeCount;   //!< A total number of cascades a camera frustum is split to.
         f32                             m_shadowCascadeLambda;  //!< An interpolation factor between linear and logarithmic splitting schemes.
         bool                            m_debugCascadeShadows;  //!< Enables a debug rendering of cascaded shadowmaps.
-	};
+    };
 
     //! This component is attached to a camera to render a debug info.
     class DebugRenderer : public Ecs::Component<DebugRenderer> {
@@ -126,11 +126,11 @@ namespace Scene {
         Rgba                            m_cameraColor;      //!< A color of all camera frustums.
     };
 
-	//! Available light types.
+    //! Available light types.
     NIMBLE_DECLARE_ENUM( LightType, Point, Spot, Directional )
 
-	//! Holds the light information.
-	class Light : public Ecs::Component<Light> {
+    //! Holds the light information.
+    class Light : public Ecs::Component<Light> {
 
         INTROSPECTION_SUPER( Light, Ecs::ComponentBase
             , PROPERTY( type,      type,      setType,      "The light type."            )
@@ -139,34 +139,34 @@ namespace Scene {
             , PROPERTY( range,     range,     setRange,     "The light influence range." )
             )
 
-	public:
+    public:
 
-									//! Constructs Light instance.
-									Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f );
+                                    //! Constructs Light instance.
+                                    Light( LightType type = LightType::Point, const Rgb& color = Rgb( 1.0f, 1.0f, 1.0f ), f32 intensity = 1.0f, f32 range = 1.0f );
 
-		//! Returns the light type.
-		LightType				    type( void ) const;
+        //! Returns the light type.
+        LightType                    type( void ) const;
 
-		//! Sets the light type.
-		void						setType( LightType value );
+        //! Sets the light type.
+        void                        setType( LightType value );
 
-		//! Returns the light color.
-		const Rgb&					color( void ) const;
+        //! Returns the light color.
+        const Rgb&                    color( void ) const;
 
-		//! Sets the light color.
-		void						setColor( const Rgb& value );
+        //! Sets the light color.
+        void                        setColor( const Rgb& value );
 
-		//! Returns the light intensity.
-		f32							intensity( void ) const;
+        //! Returns the light intensity.
+        f32                            intensity( void ) const;
 
-		//! Sets the light intensity.
-		void						setIntensity( f32 value );
+        //! Sets the light intensity.
+        void                        setIntensity( f32 value );
 
-		//! Returns the light influence range.
-		f32							range( void ) const;
+        //! Returns the light influence range.
+        f32                            range( void ) const;
 
-		//! Sets the light influence range.
-		void						setRange( f32 value );
+        //! Sets the light influence range.
+        void                        setRange( f32 value );
 
         //! Returns a light cutoff value.
         f32                         cutoff( void ) const;
@@ -180,77 +180,77 @@ namespace Scene {
         //! Sets a shadow casting flag.
         void                        setCastsShadows( bool value );
 
-	private:
+    private:
 
-		LightType				    m_type;			//!< Light type.
-		Rgb							m_color;		//!< Light color.
-		f32							m_intensity;	//!< Light intensity.
-		f32							m_range;		//!< Light influence range.
+        LightType                    m_type;            //!< Light type.
+        Rgb                            m_color;        //!< Light color.
+        f32                            m_intensity;    //!< Light intensity.
+        f32                            m_range;        //!< Light influence range.
         f32                         m_cutoff;       //!< Light spot cutoff value.
         bool                        m_castsShadow;  //!< Indicates that a light casts shadows.
-	};
+    };
 
-	//! Holds the static mesh data with per-instance materials.
-	class StaticMesh : public Ecs::Component<StaticMesh> {
+    //! Holds the static mesh data with per-instance materials.
+    class StaticMesh : public Ecs::Component<StaticMesh> {
 
         INTROSPECTION_SUPER( StaticMesh, Ecs::ComponentBase
             , PROPERTY( mesh, mesh, setMesh, "The mesh asset ")
             )
 
-	public:
+    public:
 
-									//! Constructs StaticMesh instance.
-									StaticMesh( const MeshHandle mesh = MeshHandle() )
-										: m_mesh( mesh )
+                                    //! Constructs StaticMesh instance.
+                                    StaticMesh( const MeshHandle mesh = MeshHandle() )
+                                        : m_mesh( mesh )
                                         {
                                         }
 
-		//! Returns mesh to be rendered.
-		const MeshHandle&		    mesh( void ) const;
+        //! Returns mesh to be rendered.
+        const MeshHandle&            mesh( void ) const;
 
-		//! Sets a mesh to be rendered.
-		void						setMesh( const MeshHandle& value );
+        //! Sets a mesh to be rendered.
+        void                        setMesh( const MeshHandle& value );
 
-		//! Returns the mesh world space bounding box.
-		const Bounds&				worldSpaceBounds( void ) const;
+        //! Returns the mesh world space bounding box.
+        const Bounds&                worldSpaceBounds( void ) const;
 
-		//! Sets the mesh world space bounding box.
-		void						setWorldSpaceBounds( const Bounds& value );
+        //! Sets the mesh world space bounding box.
+        void                        setWorldSpaceBounds( const Bounds& value );
 
-		//! Returns the total number of materials.
-		u32							materialCount( void ) const;
+        //! Returns the total number of materials.
+        u32                            materialCount( void ) const;
 
-		//! Returns the material by index.
-		const MaterialHandle&	    material( u32 index ) const;
+        //! Returns the material by index.
+        const MaterialHandle&        material( u32 index ) const;
 
-		//! Sets the material by index.
-		void						setMaterial( u32 index, MaterialHandle value );
+        //! Sets the material by index.
+        void                        setMaterial( u32 index, MaterialHandle value );
 
-		//! Returns a lightmap texture.
-		const Renderer::TexturePtr&	lightmap( void ) const;
+        //! Returns a lightmap texture.
+        const Renderer::TexturePtr&    lightmap( void ) const;
 
-		//! Sets a lightmap texture.
-		void						setLightmap( const Renderer::TexturePtr& value );
+        //! Sets a lightmap texture.
+        void                        setLightmap( const Renderer::TexturePtr& value );
 
-	private:
+    private:
 
-		MeshHandle				    m_mesh;				//!< Mesh to be rendered.
-		Bounds						m_worldSpaceBounds;	//!< Mesh world space bounding box.
-		Array<MaterialHandle>	    m_materials;		//!< Mesh materials array.
-		Renderer::TexturePtr		m_lightmap;			//!< Lightmap texture that is rendered for this mesh.
-	};
+        MeshHandle                    m_mesh;                //!< Mesh to be rendered.
+        Bounds                        m_worldSpaceBounds;    //!< Mesh world space bounding box.
+        Array<MaterialHandle>        m_materials;        //!< Mesh materials array.
+        Renderer::TexturePtr        m_lightmap;            //!< Lightmap texture that is rendered for this mesh.
+    };
 
     // ** StaticMesh::materialCount
     NIMBLE_INLINE u32 StaticMesh::materialCount( void ) const
     {
-	    return static_cast<u32>( m_materials.size() );
+        return static_cast<u32>( m_materials.size() );
     }
 
     // ** StaticMesh::material
     NIMBLE_INLINE const MaterialHandle& StaticMesh::material( u32 index ) const
     {
         static MaterialHandle Invalid;
-	    return index < materialCount() ? m_materials[index] : Invalid;
+        return index < materialCount() ? m_materials[index] : Invalid;
     }
 
     //! Holds a point cloud.
@@ -294,69 +294,69 @@ namespace Scene {
         MaterialHandle          m_material;     //!< A point cloud material instance.
     };
 
-	//! Holds the sprite rendering info.
-	class Sprite : public Ecs::Component<Sprite> {
-	public:
+    //! Holds the sprite rendering info.
+    class Sprite : public Ecs::Component<Sprite> {
+    public:
 
-									//! Constructs the Sprite instance.
-									Sprite( s32 width = 0, s32 height = 0, MaterialHandle material = MaterialHandle(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
-										: m_width( width )
-										, m_height( height )
-										, m_material( material )
-										, m_color( color ) {}
+                                    //! Constructs the Sprite instance.
+                                    Sprite( s32 width = 0, s32 height = 0, MaterialHandle material = MaterialHandle(), const Rgba& color = Rgba( 1.0f, 1.0f, 1.0f, 1.0f ) )
+                                        : m_width( width )
+                                        , m_height( height )
+                                        , m_material( material )
+                                        , m_color( color ) {}
 
-		//! Returns a sprite width.
-		s32							width( void ) const;
+        //! Returns a sprite width.
+        s32                            width( void ) const;
 
-		//! Returns a sprite height.
-		s32							height( void ) const;
+        //! Returns a sprite height.
+        s32                            height( void ) const;
 
-		//! Returns the sprite material.
-		MaterialHandle				material( void ) const;
+        //! Returns the sprite material.
+        MaterialHandle                material( void ) const;
 
-		//! Returns the sprite color.
-		const Rgba&					color( void ) const;
+        //! Returns the sprite color.
+        const Rgba&                    color( void ) const;
 
-	private:
+    private:
 
-		s32							m_width;	//!< A sprite width.
-		s32							m_height;	//!< A sprite height.
-		MaterialHandle				m_material;	//!< Sprite material.
-		Rgba						m_color;	//!< Sprite color.
-	};
+        s32                            m_width;    //!< A sprite width.
+        s32                            m_height;    //!< A sprite height.
+        MaterialHandle                m_material;    //!< Sprite material.
+        Rgba                        m_color;    //!< Sprite color.
+    };
 
-	//! Holds the particle system instance to be rendered.
-	class Particles : public Ecs::Component<Particles> {
-	public:
+    //! Holds the particle system instance to be rendered.
+    class Particles : public Ecs::Component<Particles> {
+    public:
 
-										//! Constructs Particles instance.
-										Particles( const Fx::ParticleSystemPtr& particleSystem = Fx::ParticleSystemPtr(), const Fx::ParticleSystemInstancePtr& instance = Fx::ParticleSystemInstancePtr() );
+                                        //! Constructs Particles instance.
+                                        Particles( const Fx::ParticleSystemPtr& particleSystem = Fx::ParticleSystemPtr(), const Fx::ParticleSystemInstancePtr& instance = Fx::ParticleSystemInstancePtr() );
 
-		//! Returns particle system instance.
-		Fx::ParticleSystemInstanceWPtr	instance( void ) const;
+        //! Returns particle system instance.
+        Fx::ParticleSystemInstanceWPtr    instance( void ) const;
 
-		//! Returns particle system.
-		Fx::ParticleSystemWPtr			particles( void ) const;
+        //! Returns particle system.
+        Fx::ParticleSystemWPtr            particles( void ) const;
 
-		//! Returns the material particles material.
-		MaterialHandle					material( void ) const;
+        //! Returns the material particles material.
+        MaterialHandle                    material( void ) const;
 
-		//! Sets the particles material.
-		void							setMaterial( MaterialHandle value );
+        //! Sets the particles material.
+        void                            setMaterial( MaterialHandle value );
 
-	private:
+    private:
 
-		
-		Fx::ParticleSystemPtr			m_particleSystem;	//!< Particle system.
-		Fx::ParticleSystemInstancePtr	m_instance;			//!< Particle system instance.
-		MaterialHandle				    m_material;			//!< Particle system material.
-	};
+        
+        Fx::ParticleSystemPtr            m_particleSystem;    //!< Particle system.
+        Fx::ParticleSystemInstancePtr    m_instance;            //!< Particle system instance.
+        MaterialHandle                    m_material;            //!< Particle system material.
+    };
 
     //! Available camera projections.
     NIMBLE_DECLARE_ENUM( Projection, Perspective, Ortho, OrthoCenter )
 
-	//! Camera component.
-	class Camera : public Ecs::Component<Camera> {
+    //! Camera component.
+    class Camera : public Ecs::Component<Camera> {
 
         INTROSPECTION_SUPER( Camera, Ecs::ComponentBase
             , PROPERTY( projection,  projection, setProjection, "The camera projection."            )
@@ -366,29 +366,29 @@ namespace Scene {
             , PROPERTY( far,         far,        setFar,        "The camera far clipping plane."    )
             )
 
-	public:
+    public:
 
-		//! Camera clear flags.
-		enum ClearFlags {
-			  ClearColor	= BIT( 0 )					//!< Camera will clear the color buffer.
-			, ClearDepth	= BIT( 1 )					//!< Camera will clear the depth buffer.
-			, ClearAll		= ClearColor | ClearDepth	//!< Camera will clear all buffers.
-		};
+        //! Camera clear flags.
+        enum ClearFlags {
+              ClearColor    = BIT( 0 )                    //!< Camera will clear the color buffer.
+            , ClearDepth    = BIT( 1 )                    //!< Camera will clear the depth buffer.
+            , ClearAll        = ClearColor | ClearDepth    //!< Camera will clear all buffers.
+        };
 
-									//! Constructs Camera instance.
-									Camera( Projection projection = Projection::Perspective, const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+                                    //! Constructs Camera instance.
+                                    Camera( Projection projection = Projection::Perspective, const Rgba& clearColor = Rgba(), const Rect& ndc = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 
-		//! Returns camera clear mask.
-		u8							clearMask( void ) const;
+        //! Returns camera clear mask.
+        u8                            clearMask( void ) const;
 
-		//! Sets camera clear mask.
-		void						setClearMask( u8 value );
+        //! Sets camera clear mask.
+        void                        setClearMask( u8 value );
 
-		//! Sets the clear color.
-		void						setClearColor( const Rgba& value );
+        //! Sets the clear color.
+        void                        setClearColor( const Rgba& value );
 
-		//! Returns the clear color.
-		const Rgba&					clearColor( void ) const;
+        //! Returns the clear color.
+        const Rgba&                    clearColor( void ) const;
 
         //! Returns camera projection.
         Projection                  projection( void ) const;
@@ -396,57 +396,57 @@ namespace Scene {
         //! Sets camera projection.
         void                        setProjection( Projection value );
 
-		//! Returns camera field of view.
-		f32							fov( void ) const;
+        //! Returns camera field of view.
+        f32                            fov( void ) const;
 
-		//! Sets camera field of view.
-		void						setFov( f32 value );
+        //! Sets camera field of view.
+        void                        setFov( f32 value );
 
-		//! Returns the Z-near value.
-		f32							near( void ) const;
+        //! Returns the Z-near value.
+        f32                            near( void ) const;
 
-		//! Sets the Z-near value.
-		void						setNear( f32 value );
+        //! Sets the Z-near value.
+        void                        setNear( f32 value );
 
-		//! Returns the Z-far value.
-		f32							far( void ) const;
+        //! Returns the Z-far value.
+        f32                            far( void ) const;
 
-		//! Sets the Z-far value.
-		void						setFar( f32 value );
+        //! Sets the Z-far value.
+        void                        setFar( f32 value );
 
-		//! Sets the normalized device coordinates to render frame to.
-		void						setNdc( const Rect& value );
+        //! Sets the normalized device coordinates to render frame to.
+        void                        setNdc( const Rect& value );
 
-		//! Returns the normalized device coordinates to render frame to.
-		const Rect&					ndc( void ) const;
+        //! Returns the normalized device coordinates to render frame to.
+        const Rect&                    ndc( void ) const;
 
-		//! Calculates the projection matrix.
-		static Matrix4			    calculateProjectionMatrix( const Camera& camera, const Viewport& viewport );
+        //! Calculates the projection matrix.
+        static Matrix4                calculateProjectionMatrix( const Camera& camera, const Viewport& viewport );
 
-		//! Calculates the view projection matrix.
-		static Matrix4			    calculateViewProjection( const Camera& camera, const Viewport& viewport, const Matrix4& transform );
+        //! Calculates the view projection matrix.
+        static Matrix4                calculateViewProjection( const Camera& camera, const Viewport& viewport, const Matrix4& transform );
 
     #if 0
-		//! Converts from screen space to world space.
-		bool						toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const;
+        //! Converts from screen space to world space.
+        bool                        toWorldSpace( const Vec3& screen, Vec3& world, const Matrix4& transform ) const;
 
-		//! Converts from world space to screen space.
-		bool						pointToScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
+        //! Converts from world space to screen space.
+        bool                        pointToScreenSpace( const Vec3& world, Vec3& screen, const Matrix4& transform ) const;
 
-		//! Projects the bounding sphere to a screen space.
-		Circle					sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
+        //! Projects the bounding sphere to a screen space.
+        Circle                    sphereToScreenSpace( const Sphere& sphere, const TransformWPtr& transform ) const;
     #endif
 
-	private:
+    private:
 
-		u8							m_clearMask;	//!< Camera clear flags.
-		Projection					m_projection;	//!< Camera projection.
-		Rect						m_ndc;			//!< Output normalized device coordinates.
-		Rgba						m_clearColor;	//!< The clear color.
-		f32							m_fov;			//!< Camera field of view.
-		f32							m_near;			//!< Z-near value.
-		f32							m_far;			//!< Z-far value.
-	};
+        u8                            m_clearMask;    //!< Camera clear flags.
+        Projection                    m_projection;    //!< Camera projection.
+        Rect                        m_ndc;            //!< Output normalized device coordinates.
+        Rgba                        m_clearColor;    //!< The clear color.
+        f32                            m_fov;            //!< Camera field of view.
+        f32                            m_near;            //!< Z-near value.
+        f32                            m_far;            //!< Z-far value.
+    };
 
     //! A viewport component is attached to camera entities and used to handle a user input.
     class Viewport : public Ecs::Component<Viewport> {
@@ -491,7 +491,7 @@ namespace Scene {
         void                        clearEvents( void );
 
         //! Returns the viewport split by it's coordinates.
-        static Rect					calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
+        static Rect                    calculateSplitRect( u32 x, u32 y, u32 nx, u32 ny );
 
     private:
 

@@ -33,11 +33,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-	//! FileSystem class is a base for all other file systems, like disk file system or archive.
+    //! FileSystem class is a base for all other file systems, like disk file system or archive.
     class dcInterface FileSystem : public RefCounted {
-	public:
+    public:
 
-		virtual					~FileSystem( void );
+        virtual                    ~FileSystem( void );
 
         //! Creates a byte buffer stream from an in-memory data.
         /*!
@@ -45,14 +45,14 @@ namespace Io {
          \param size Byte buffer size.
          \return ByteBuffer instance.
          */
-		ByteBufferPtr           createByteBuffer( u8* pointer, u32 size ) const;
+        ByteBufferPtr           createByteBuffer( u8* pointer, u32 size ) const;
 
         //! Opens a file with a given file name for reading.
         /*!
          \param path File path.
          \return Instance of stream if file exists, otherwise false.
          */
-		virtual StreamPtr       openFile( const Path& path ) const;
+        virtual StreamPtr       openFile( const Path& path ) const;
 
         //! Opens a file with a given file name an mode.
         /*!
@@ -60,23 +60,23 @@ namespace Io {
          \param mode File open mode.
          \return Instance of stream if file exists, otherwise false.
          */
-		virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const;
+        virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const;
 
         //! Returns true if file at a given path exists.
         /*!
          \param path File path to check.
          \return True if file exists at path.
          */
-		virtual bool			fileExists( const Path& path ) const;
+        virtual bool            fileExists( const Path& path ) const;
 
     protected:
 
                                 //! Constructs file system instance.
                                 FileSystem( void );
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_FileSystem_H__	*/
+#endif        /*    !__DC_Io_FileSystem_H__    */

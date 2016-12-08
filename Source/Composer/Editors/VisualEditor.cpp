@@ -37,44 +37,44 @@ namespace Editors {
 // ** VisualEditor::VisualEditor
 VisualEditor::VisualEditor( void ) : m_hasLostFocus( true )
 {
-	m_backgroundColor = Rgba( 0.5f, 0.5f, 0.5f );
+    m_backgroundColor = Rgba( 0.5f, 0.5f, 0.5f );
 }
 
 // ** VisualEditor::initialize
 bool VisualEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document )
 {
-	// Perform basic initialization first.
-	if( !AssetEditor::initialize( project, asset, document ) ) {
-		return false;
-	}
+    // Perform basic initialization first.
+    if( !AssetEditor::initialize( project, asset, document ) ) {
+        return false;
+    }
 
-	// Attach the rendering frame to this document.
-	Ui::RenderingFrameQPtr frame = document->attachRenderingFrame();
+    // Attach the rendering frame to this document.
+    Ui::RenderingFrameQPtr frame = document->attachRenderingFrame();
 
-	if( !frame ) {
-		return false;
-	}
+    if( !frame ) {
+        return false;
+    }
 
     // Connect to an update signal
     connect( frame, SIGNAL(update(f32)), this, SLOT(renderingFrameUpdate(f32)) );
 
-	// Attach the rendering frame delegate.
+    // Attach the rendering frame delegate.
     frame->installEventFilter( this );
-	frame->makeCurrent();
+    frame->makeCurrent();
 
-	// Create the rendering HAL.
-	m_hal = Renderer::Hal::create( Renderer::OpenGL );
+    // Create the rendering HAL.
+    m_hal = Renderer::Hal::create( Renderer::OpenGL );
 
     // Create the scene viewport instance
     m_viewport = RenderingFrameViewport::create( document->renderingFrame() );
 
-	return true;
+    return true;
 }
 
 // ** VisualEditor::hal
 Renderer::HalWPtr VisualEditor::hal( void ) const
 {
-	return m_hal;
+    return m_hal;
 }
 
 // ** VisualEditor::viewport
@@ -86,27 +86,27 @@ Scene::ViewportWPtr VisualEditor::viewport( void ) const
 // ** VisualEditor::backgroundColor
 const Rgba& VisualEditor::backgroundColor( void ) const
 {
-	return m_backgroundColor;
+    return m_backgroundColor;
 }
 
 // ** VisualEditor::update
 void VisualEditor::update( f32 dt )
 {
-	beginFrameRendering();
-	render( dt );
-	endFrameRendering();
+    beginFrameRendering();
+    render( dt );
+    endFrameRendering();
 }
 
 // ** VisualEditor::beginFrameRendering
 void VisualEditor::beginFrameRendering( void )
 {
-	m_hal->clear( m_backgroundColor );
+    m_hal->clear( m_backgroundColor );
 }
 
 // ** VisualEditor::endFrameRendering
 void VisualEditor::endFrameRendering( void )
 {
-	m_hal->present();
+    m_hal->present();
 }
 
 // ** VisualEditor::constructViewRay
@@ -130,21 +130,21 @@ void VisualEditor::handleResize( s32 width, s32 height )
 // ** VisualEditor::handleMousePress
 void VisualEditor::handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button )
 {
-	y = m_document->renderingFrame()->height() - y;
+    y = m_document->renderingFrame()->height() - y;
    m_viewport->notify<RenderingFrameViewport::TouchBegan>( m_viewport, 0, x, y );
 }
 
 // ** VisualEditor::handleMouseRelease
 void VisualEditor::handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button )
 {
-	y = m_document->renderingFrame()->height() - y;
+    y = m_document->renderingFrame()->height() - y;
     m_viewport->notify<RenderingFrameViewport::TouchEnded>( m_viewport, 0, x, y );
 }
 
 // ** VisualEditor::handleMouseMove
 void VisualEditor::handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons )
 {
-	y = m_document->renderingFrame()->height() - y;
+    y = m_document->renderingFrame()->height() - y;
     m_viewport->notify<RenderingFrameViewport::TouchMoved>( m_viewport, 0, x, y, dx, dy );
 }
 
@@ -181,7 +181,7 @@ bool VisualEditor::eventFilter( QObject* sender, QEvent* e )
 
     // Process an event
     switch( e->type() ) {
-    case QEvent::MouseButtonPress:		{
+    case QEvent::MouseButtonPress:        {
                                             QMouseEvent*     me     = static_cast<QMouseEvent*>( e );
                                             Ui::MouseButtons button = me->button();
                                             handleMousePress( me->pos().x(), me->pos().y(), button );
@@ -189,7 +189,7 @@ bool VisualEditor::eventFilter( QObject* sender, QEvent* e )
                                             m_mouseButtons.on( button );
                                             return true;
                                         }
-	case QEvent::MouseButtonRelease:	{
+    case QEvent::MouseButtonRelease:    {
                                             QMouseEvent*     me     = static_cast<QMouseEvent*>( e );
                                             Ui::MouseButtons button = me->button();
                                             handleMouseRelease( me->pos().x(), me->pos().y(), me->button() );

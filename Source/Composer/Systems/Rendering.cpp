@@ -35,27 +35,27 @@ DC_BEGIN_COMPOSER
 // ** SceneObjectIndicatorsPass::render
 void SceneObjectIndicatorsPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform )
 {
-	if( internal.isPrivate() ) {
-		return;
-	}
+    if( internal.isPrivate() ) {
+        return;
+    }
 
-	if( !internal.parent().valid() ) {
+    if( !internal.parent().valid() ) {
         LogError( "scene", "SceneEditorInternal has no valid scene object\n" );
-		return;
-	}
+        return;
+    }
 
-	Renderer::Renderer2DPtr renderer = context->renderer();
+    Renderer::Renderer2DPtr renderer = context->renderer();
 
-	if( internal.isSelected() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f ) );
-		}	
-	}
-	else if( internal.isHighlighted() ) {
-		if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-			renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 0.0f, 1.0f, 0.0f ) );
-		}
-	}
+    if( internal.isSelected() ) {
+        if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
+            renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f ) );
+        }    
+    }
+    else if( internal.isHighlighted() ) {
+        if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
+            renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 0.0f, 1.0f, 0.0f ) );
+        }
+    }
 }
 
 #else

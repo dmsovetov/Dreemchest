@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#include	"OpenGLHal.h"
-#include	"OpenGLExtensions.h"
+#include    "OpenGLHal.h"
+#include    "OpenGLExtensions.h"
 
 #include    "../RenderStateDeprecated.h"
 
@@ -49,16 +49,16 @@ OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
     m_stencilMask   = ~0;
     m_stencilValue  =  0;
 
-	loadOpenGLExtensions();
+    loadOpenGLExtensions();
 
-	for( u32 i = 0; i < MAX_SAMPLERS; i++ ) {
-		m_samplers[i].m_texture = NULL;
-		m_samplers[i].m_filter  = GL_LINEAR;
-		m_samplers[i].m_wrap	= GL_CLAMP;
+    for( u32 i = 0; i < MAX_SAMPLERS; i++ ) {
+        m_samplers[i].m_texture = NULL;
+        m_samplers[i].m_filter  = GL_LINEAR;
+        m_samplers[i].m_wrap    = GL_CLAMP;
 
         glActiveTexture( GL_TEXTURE0 + i );
         glEnable( GL_TEXTURE_2D );
-	}
+    }
 
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LESS );
@@ -153,7 +153,7 @@ TextureCube* OpenGLHal::createTextureCube( u32 size, PixelFormat format )
 RenderTargetPtr OpenGLHal::createRenderTarget( u32 width, u32 height )
 {
     DC_CHECK_GL;
-	DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL_CONTEXT;
 
     OpenGLRenderTarget* rt = DC_NEW OpenGLRenderTarget( width, height );
     return RenderTargetPtr( rt );
@@ -165,7 +165,7 @@ ShaderPtr OpenGLHal::createShader( const char *vertex, const char *fragment )
     DC_CHECK_GL;
     
     OpenGLShader* shader = DC_NEW OpenGLShader;
-	ShaderPtr	  result( shader );
+    ShaderPtr      result( shader );
     s8            error[2048];
 
     if( !shader->compile( GL_VERTEX_SHADER, vertex, error, sizeof( error ) ) ) {
@@ -186,12 +186,12 @@ ShaderPtr OpenGLHal::createShader( const char *vertex, const char *fragment )
 // ** OpenGLHal::createIndexBuffer
 IndexBufferPtr OpenGLHal::createIndexBuffer( u32 count, bool GPU )
 {
-	DC_CHECK_GL_CONTEXT
+    DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
-	if( !GPU ) {
-		return Hal::createIndexBuffer( count, GPU );
-	}
+    if( !GPU ) {
+        return Hal::createIndexBuffer( count, GPU );
+    }
 
     return IndexBufferPtr( DC_NEW OpenGLIndexBuffer( count ) );
 }
@@ -199,12 +199,12 @@ IndexBufferPtr OpenGLHal::createIndexBuffer( u32 count, bool GPU )
 // ** OpenGLHal::createVertexBuffer
 VertexBufferPtr OpenGLHal::createVertexBuffer( s32 size, bool GPU )
 {
-	DC_CHECK_GL_CONTEXT
+    DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
-	if( !GPU ) {
-		return Hal::createVertexBuffer( size, GPU );
-	}
+    if( !GPU ) {
+        return Hal::createVertexBuffer( size, GPU );
+    }
     
     return VertexBufferPtr( DC_NEW OpenGLVertexBuffer( size ) );
 }
@@ -212,12 +212,12 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( s32 size, bool GPU )
 // ** OpenGLHal::createConstantBuffer
 ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, const ConstantBufferLayout* layout )
 {
-	DC_CHECK_GL_CONTEXT
+    DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;
 
-	if( layout == NULL ) {
-		LogWarning( "hal", "%s", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
-	}
+    if( layout == NULL ) {
+        LogWarning( "hal", "%s", "GPU constant buffers are not supported, creating a CPU-side emulation\n" );
+    }
 
     return Hal::createConstantBuffer( size, layout );
 }
@@ -234,10 +234,10 @@ void OpenGLHal::setPolygonMode( PolygonMode mode )
 // ** OpenGLHal::setShader
 void OpenGLHal::setShader( const ShaderPtr& shader )
 {
-	DC_CHECK_GL_CONTEXT;
-	DC_CHECK_GL;
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
 
-	glUseProgram( shader.valid() ? static_cast<OpenGLShader*>( shader.get() )->m_program : 0 );
+    glUseProgram( shader.valid() ? static_cast<OpenGLShader*>( shader.get() )->m_program : 0 );
 
 #if DEV_RENDERER_SOFTWARE_CBUFFERS
     // Update shader uniforms from bound constant buffers
@@ -248,8 +248,8 @@ void OpenGLHal::setShader( const ShaderPtr& shader )
 // ** OpenGLHal::setRenderTarget
 void OpenGLHal::setRenderTarget( const RenderTargetPtr& renderTarget )
 {
-	DC_CHECK_GL_CONTEXT;
-	DC_CHECK_GL;
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
 
     glBindFramebuffer( GL_FRAMEBUFFER, renderTarget.valid() ? static_cast<OpenGLRenderTarget*>( renderTarget.get() )->m_id : 0 );
 }
@@ -295,19 +295,19 @@ void OpenGLHal::setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter fi
 // ** OpenGLHal::setVertexBuffer
 void OpenGLHal::setVertexBuffer( const VertexBufferPtr& vertexBuffer )
 {
-	if( !vertexBuffer.valid() ) {
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-		return;
-	}
+    if( !vertexBuffer.valid() ) {
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        return;
+    }
 
-	if( vertexBuffer->isGpu() ) {
-		static_cast<OpenGLVertexBuffer*>( vertexBuffer.get() )->bind();
-	}
+    if( vertexBuffer->isGpu() ) {
+        static_cast<OpenGLVertexBuffer*>( vertexBuffer.get() )->bind();
+    }
 
     m_activeVertexBuffer = vertexBuffer;
 
     if( m_lastInputLayout != m_activeInputLayout ) {
-	    enableInputLayout( ( const u8* )vertexBuffer->pointer(), m_lastInputLayout );
+        enableInputLayout( ( const u8* )vertexBuffer->pointer(), m_lastInputLayout );
     }
 }
 
@@ -326,9 +326,9 @@ void OpenGLHal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
     m_activeIndexBuffer = indexBuffer;
 
     // Bind an active index buffer
-	if( m_activeIndexBuffer.valid() && m_activeIndexBuffer->isGpu() ) {
-		static_cast<OpenGLIndexBuffer*>( m_activeIndexBuffer.get() )->bind();
-	}
+    if( m_activeIndexBuffer.valid() && m_activeIndexBuffer->isGpu() ) {
+        static_cast<OpenGLIndexBuffer*>( m_activeIndexBuffer.get() )->bind();
+    }
 }
 
 // ** OpenGLHal::setInputLayout
@@ -341,7 +341,7 @@ void OpenGLHal::setInputLayout( const InputLayoutPtr& inputLayout )
     m_lastInputLayout = inputLayout;
 
     if( m_lastInputLayout != m_activeInputLayout && m_activeVertexBuffer.valid() ) {
-	    enableInputLayout( ( const u8* )m_activeVertexBuffer->pointer(), m_lastInputLayout );
+        enableInputLayout( ( const u8* )m_activeVertexBuffer->pointer(), m_lastInputLayout );
     }
 }
 
@@ -378,10 +378,10 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inp
     }
 
     if( pointSize ) {
-	#ifndef DC_PLATFORM_WINDOWS
+    #ifndef DC_PLATFORM_WINDOWS
         glEnableClientState( GL_POINT_SIZE_ARRAY );
         glPointSizePointer( GL_FLOAT, stride, pointer + pointSize.offset );
-	#endif
+    #endif
     }
 
     for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
@@ -414,9 +414,9 @@ void OpenGLHal::disableInputLayout( const InputLayoutWPtr& inputLayout )
     }
 
     if( inputLayout->pointSize() ) {
-	#ifndef DC_PLATFORM_WINDOWS
+    #ifndef DC_PLATFORM_WINDOWS
         glDisableClientState( GL_POINT_SIZE_ARRAY );
-	#endif
+    #endif
     }
 
     for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
@@ -827,10 +827,10 @@ GLenum OpenGLHal::textureType( const Texture *texture )
 {
     NIMBLE_ABORT_IF( texture == NULL, "invalid texture" );
 
-	switch( texture->type() ) {
-	case Texture::TextureType2D:	return GL_TEXTURE_2D;
-	case Texture::TextureTypeCube:	return GL_TEXTURE_CUBE_MAP;
-	}
+    switch( texture->type() ) {
+    case Texture::TextureType2D:    return GL_TEXTURE_2D;
+    case Texture::TextureTypeCube:    return GL_TEXTURE_CUBE_MAP;
+    }
 
     NIMBLE_BREAK_IF( true );
     return 0;
@@ -843,10 +843,10 @@ GLuint OpenGLHal::textureID( const Texture *texture )
         return 0;
     }
 
-	switch( texture->type() ) {
-	case Texture::TextureType2D:	return static_cast<const OpenGLTexture2D*>( texture )->m_id;
-    case Texture::TextureTypeCube:	return static_cast<const OpenGLTextureCube*>( texture )->m_id;
-	}
+    switch( texture->type() ) {
+    case Texture::TextureType2D:    return static_cast<const OpenGLTexture2D*>( texture )->m_id;
+    case Texture::TextureTypeCube:    return static_cast<const OpenGLTextureCube*>( texture )->m_id;
+    }
 
     NIMBLE_BREAK_IF( true );
     return 0;
@@ -875,7 +875,7 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
     case PixelRgba32F:  return GL_RGBA32F;
     case PixelRgb32F:   return GL_RGB32F;
 #endif
-	case PixelD24X8:	return GL_DEPTH_COMPONENT24;
+    case PixelD24X8:    return GL_DEPTH_COMPONENT24;
     default:            NIMBLE_BREAK_IF( "Image format not implemented" );
     }
 
@@ -1049,16 +1049,16 @@ void OpenGLTextureCube::unlock( u32 face )
 OpenGLRenderTarget::OpenGLRenderTarget( u32 width, u32 height ) : RenderTarget( width, height ), m_depth( 0 )
 {
     DC_CHECK_GL;
-	DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL_CONTEXT;
 
     glGenFramebuffers( 1, &m_id );
 }
 
 OpenGLRenderTarget::~OpenGLRenderTarget( void )
 {
-	if( m_depth ) {
-		glDeleteRenderbuffers( 1, &m_depth );
-	}
+    if( m_depth ) {
+        glDeleteRenderbuffers( 1, &m_depth );
+    }
 
     glDeleteFramebuffers( 1, &m_id );
 }
@@ -1066,23 +1066,23 @@ OpenGLRenderTarget::~OpenGLRenderTarget( void )
 // ** OpenGLRenderTarget::check
 bool OpenGLRenderTarget::check( void ) const
 {
-	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
-	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+    GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     NIMBLE_BREAK_IF( status != GL_FRAMEBUFFER_COMPLETE );
 
-	return status == GL_FRAMEBUFFER_COMPLETE;
+    return status == GL_FRAMEBUFFER_COMPLETE;
 }
 
 // ** OpenGLRenderTarget::setAttachment
 bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachment )
 {
     DC_CHECK_GL;
-	DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL_CONTEXT;
 
-	OpenGLTexture2D* texture = DC_NEW OpenGLTexture2D( m_width, m_height, format );
-	texture->setData( 0, NULL );
+    OpenGLTexture2D* texture = DC_NEW OpenGLTexture2D( m_width, m_height, format );
+    texture->setData( 0, NULL );
 
     f32 color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -1094,7 +1094,7 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachmen
     glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color );
     glBindTexture( GL_TEXTURE_2D, 0 );
     
-	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+    glBindFramebuffer( GL_FRAMEBUFFER, m_id );
     if( attachment == Depth ) {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id(), 0 );
         glDrawBuffer( GL_NONE );
@@ -1102,40 +1102,40 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, Attachment attachmen
     } else {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (attachment - 1), GL_TEXTURE_2D, texture->id(), 0 );
     }
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     m_attachments[attachment] = texture;
-	NIMBLE_ABORT_IF( !check(), "invalid render target configuration" );
+    NIMBLE_ABORT_IF( !check(), "invalid render target configuration" );
 
-	return check();
+    return check();
 }
 
 // ** OpenGLRenderTarget::setAttachment
 bool OpenGLRenderTarget::setDepth( PixelFormat format )
 {
-	glGenRenderbuffers( 1, &m_depth );
-	glBindRenderbuffer( GL_RENDERBUFFER, m_depth );
-	glRenderbufferStorage( GL_RENDERBUFFER, OpenGLHal::internalImageFormat( format ), m_width, m_height );
+    glGenRenderbuffers( 1, &m_depth );
+    glBindRenderbuffer( GL_RENDERBUFFER, m_depth );
+    glRenderbufferStorage( GL_RENDERBUFFER, OpenGLHal::internalImageFormat( format ), m_width, m_height );
 
-	glBindFramebuffer( GL_FRAMEBUFFER, m_id );
-	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth );
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    glBindFramebuffer( GL_FRAMEBUFFER, m_id );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-	return check();
+    return check();
 }
 
 // ----------------------------------------------- OpenGLVertexBuffer ------------------------------------------------- //
 
 // ** OpenGLVertexBuffer::OpenGLVertexBuffer
 OpenGLVertexBuffer::OpenGLVertexBuffer( s32 size )
-	: VertexBuffer( size, true )
+    : VertexBuffer( size, true )
 {
     DC_CHECK_GL;
     
-	glGenBuffers( 1, &m_id );
-	glBindBuffer( GL_ARRAY_BUFFER, m_id );
-	glBufferData( GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glGenBuffers( 1, &m_id );
+    glBindBuffer( GL_ARRAY_BUFFER, m_id );
+    glBufferData( GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer( void )
@@ -1148,8 +1148,8 @@ OpenGLVertexBuffer::~OpenGLVertexBuffer( void )
 // ** OpenGLVertexBuffer::bind
 void OpenGLVertexBuffer::bind( void )
 {
-	DC_CHECK_GL;
-	glBindBuffer( GL_ARRAY_BUFFER, m_id );
+    DC_CHECK_GL;
+    glBindBuffer( GL_ARRAY_BUFFER, m_id );
 }
 
 // ** OpenGLVertexBuffer::lock
@@ -1157,8 +1157,8 @@ void* OpenGLVertexBuffer::lock( void )
 {
     DC_CHECK_GL;
     
-	glBindBuffer( GL_ARRAY_BUFFER, m_id );
-	return glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+    glBindBuffer( GL_ARRAY_BUFFER, m_id );
+    return glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
 }
 
 // ** OpenGLVertexBuffer::unlock
@@ -1185,14 +1185,14 @@ void OpenGLVertexBuffer::setBufferData( const void* source, s32 offset, s32 size
 
 // ** OpenGLIndexBuffer::OpenGLIndexBuffer
 OpenGLIndexBuffer::OpenGLIndexBuffer( u32 count )
-	: IndexBuffer( count, true )
+    : IndexBuffer( count, true )
 {
     DC_CHECK_GL;
     
     glGenBuffers( 1, &m_id );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, count * sizeof( u16 ), NULL, GL_STATIC_DRAW );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, count * sizeof( u16 ), NULL, GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer( void )
@@ -1203,8 +1203,8 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer( void )
 // ** OpenGLIndexBuffer::bind
 void OpenGLIndexBuffer::bind( void )
 {
-	DC_CHECK_GL;
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
+    DC_CHECK_GL;
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
 }
 
 // ** OpenGLIndexBuffer::lock
@@ -1212,8 +1212,8 @@ u16* OpenGLIndexBuffer::lock( void )
 {
     DC_CHECK_GL;
 
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
-	return ( u16* )glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_id );
+    return ( u16* )glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY );
 }
 
 // ** OpenGLIndexBuffer::unlock
@@ -1253,27 +1253,27 @@ bool OpenGLShader::link( char *error, u32 errSize ) const
     glGetProgramiv( m_program, GL_LINK_STATUS, &result );
 
   //  if( result == GL_FALSE ) {
-		//s8 error[256];
+        //s8 error[256];
   //      glGetProgramInfoLog( m_program, sizeof( error ), NULL, error );
-		//LogError( "opengl", "failed to link shader, %s\n", error );
+        //LogError( "opengl", "failed to link shader, %s\n", error );
   //      return false;
   //  }
 
-	// Get a status of a compiled shader
-	GLsizei errLogSize;
-	glGetProgramInfoLog( m_program, errSize, &errLogSize, error );
+    // Get a status of a compiled shader
+    GLsizei errLogSize;
+    glGetProgramInfoLog( m_program, errSize, &errLogSize, error );
 
-	if( errLogSize ) {
+    if( errLogSize ) {
         StringArray messages = split( error, "\n" );
 
         for( s32 i = 0; i < messages.size(); i++ ) {
-		    if( result == GL_FALSE ) {
-			    LogError( "opengl", "%s\n", messages[i].c_str() );
-		    } else {
-			    LogWarning( "opengl", "%s\n", messages[i].c_str() );
-		    }
+            if( result == GL_FALSE ) {
+                LogError( "opengl", "%s\n", messages[i].c_str() );
+            } else {
+                LogWarning( "opengl", "%s\n", messages[i].c_str() );
+            }
         }
-	}
+    }
 
     return result != GL_FALSE;
 }
@@ -1295,21 +1295,21 @@ bool OpenGLShader::compile( GLenum shaderType, CString data, char *error, u32 er
     case GL_FRAGMENT_SHADER:    m_fragment = id; break;
     }
 
-	// Get a status of a compiled shader
-	GLsizei errLogSize;
-	glGetShaderInfoLog( id, errSize, &errLogSize, error );
+    // Get a status of a compiled shader
+    GLsizei errLogSize;
+    glGetShaderInfoLog( id, errSize, &errLogSize, error );
 
-	if( errLogSize ) {
+    if( errLogSize ) {
         StringArray messages = split( error, "\n" );
 
         for( s32 i = 0; i < messages.size(); i++ ) {
-		    if( result == GL_FALSE ) {
-			    LogError( "opengl", "%s\n", messages[i].c_str() );
-		    } else {
-			    LogWarning( "opengl", "%s\n", messages[i].c_str() );
-		    }
+            if( result == GL_FALSE ) {
+                LogError( "opengl", "%s\n", messages[i].c_str() );
+            } else {
+                LogWarning( "opengl", "%s\n", messages[i].c_str() );
+            }
         }
-	}
+    }
 
     glAttachShader( m_program, id );
     return true;
@@ -1332,7 +1332,7 @@ u32 OpenGLShader::findUniformLocation( const FixedString& name ) const
         return i->second;
     }
     
-	u32 location = glGetUniformLocation( m_program, name ) + 1;
+    u32 location = glGetUniformLocation( m_program, name ) + 1;
     m_uniformLocations[name.hash()] = location;
 
     return location;

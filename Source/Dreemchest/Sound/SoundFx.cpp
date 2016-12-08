@@ -38,8 +38,8 @@
 #include "Drivers/SoundEngine.h"
 
 #ifdef OPENAL_FOUND
-	#include "Drivers/OpenAL/OpenAL.h"
-#endif	/*	#ifdef OPENAL_FOUND	*/
+    #include "Drivers/OpenAL/OpenAL.h"
+#endif    /*    #ifdef OPENAL_FOUND    */
 
 DC_BEGIN_DREEMCHEST
 
@@ -49,10 +49,10 @@ namespace Sound {
 
 // ** SoundFx::SoundFx
 SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener )
-	: m_hal( NULL )
-	, m_volume( 1.0f )
-	, m_pitch( 1.0f )
-	, m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
+    : m_hal( NULL )
+    , m_volume( 1.0f )
+    , m_pitch( 1.0f )
+    , m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
     , m_distanceModel( InverseDistanceAttenuation )
 {
     switch( hal ) {
@@ -79,7 +79,7 @@ SoundFx::~SoundFx( void )
 // ** SoundFx::create
 SoundFxPtr SoundFx::create( SoundHal hal, IStreamOpenerPtr streamOpener )
 {
-	return SoundFxPtr( DC_NEW SoundFx( hal, streamOpener ) );
+    return SoundFxPtr( DC_NEW SoundFx( hal, streamOpener ) );
 }
 
 // ** SoundFx::createGroup
@@ -529,9 +529,9 @@ f32 SoundFx::volume( void ) const
 // ** SoundFx::setVolume
 void SoundFx::setVolume( f32 value )
 {
-	NIMBLE_BREAK_IF( value < 0.0f, "volume could not have a negative value" );
+    NIMBLE_BREAK_IF( value < 0.0f, "volume could not have a negative value" );
     m_volume = value;
-	m_hal->setVolume( volume() );
+    m_hal->setVolume( volume() );
 }
 
 // ** SoundFx::pitch
@@ -544,7 +544,7 @@ f32 SoundFx::pitch( void ) const
 void SoundFx::setPitch( f32 value )
 {
     m_pitch = value;
-	m_hal->setPitch( pitch() );
+    m_hal->setPitch( pitch() );
 }
 
 // ** SoundGroups& SoundFx::groups

@@ -69,34 +69,34 @@ s32 PackedStream::read( void* buffer, s32 size ) const
 // ** PackedStream::setPosition
 void PackedStream::setPosition( s32 offset, SeekOrigin origin )
 {
-	NIMBLE_BREAK_IF( !m_file.valid() );
+    NIMBLE_BREAK_IF( !m_file.valid() );
 
-	u64 currentPos = position();
-	u64 targetPos	= 0;
+    u64 currentPos = position();
+    u64 targetPos    = 0;
 
-	switch( origin ) {
+    switch( origin ) {
     case SeekCur: targetPos = currentPos  + offset;     break;
     case SeekSet: targetPos = offset;                   break;
-    case SeekEnd: targetPos = length() - offset;		break;
-	}
+    case SeekEnd: targetPos = length() - offset;        break;
+    }
 
-	if( targetPos == currentPos ) {
-		return;
-	}
+    if( targetPos == currentPos ) {
+        return;
+    }
 
-	if( targetPos < currentPos ) {
-		reopen();
+    if( targetPos < currentPos ) {
+        reopen();
 
-		for( int i = 0; i < targetPos; i++ ) {
-			u8 temp;
-			read( &temp, 1 );
+        for( int i = 0; i < targetPos; i++ ) {
+            u8 temp;
+            read( &temp, 1 );
         }
-	} else {
-		for( int i = 0; i < (targetPos - currentPos); i++ ) {
-			u8 temp;
-			read( &temp, 1 );
+    } else {
+        for( int i = 0; i < (targetPos - currentPos); i++ ) {
+            u8 temp;
+            read( &temp, 1 );
         }
-	}
+    }
 }
 
 // ** PackedStream::position

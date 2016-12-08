@@ -42,19 +42,19 @@ Socket::Socket( SocketDescriptor& descriptor )
 // ** Socket::isValid
 bool Socket::isValid( void ) const
 {
-	return m_descriptor.isValid();
+    return m_descriptor.isValid();
 }
 
 // ** Socket::descriptor
 const SocketDescriptor& Socket::descriptor( void ) const
 {
-	return m_descriptor;
+    return m_descriptor;
 }
 
 // ** Socket::close
 void Socket::close( void )
 {
-	m_descriptor.close();
+    m_descriptor.close();
 }
 
 // ** Socket::closeLater

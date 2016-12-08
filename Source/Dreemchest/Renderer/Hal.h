@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_Hal_H__
-#define		__DC_Hal_H__
+#ifndef        __DC_Hal_H__
+#define        __DC_Hal_H__
 
-#include	"Renderer.h"
+#include    "Renderer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -97,7 +97,7 @@ namespace Renderer {
          \param format  Texture pixel format.
          \return        Texture2D instance.
          */
-        virtual Texture2DPtr	createTexture2D( u32 width, u32 height, PixelFormat format );
+        virtual Texture2DPtr    createTexture2D( u32 width, u32 height, PixelFormat format );
 
         //! Creates a new CUBE texture.
         /*!
@@ -165,8 +165,8 @@ namespace Renderer {
         //! Binds a texture to a specified texture sampler.
         virtual void    setTexture( u32 sampler, Texture *texture );
 
-		//! Sets the polygon rendering mode.
-		virtual void	setPolygonMode( PolygonMode mode );
+        //! Sets the polygon rendering mode.
+        virtual void    setPolygonMode( PolygonMode mode );
 
         //! Sets a polygon offset values.
         virtual void    setPolygonOffset( f32 factor, f32 units );
@@ -213,8 +213,8 @@ namespace Renderer {
          */
         virtual void    setViewport( u32 x, u32 y, u32 width, u32 height );
 
-		//! Sets a rendering viewport.
-		virtual void	setViewport( const Rect& rect );
+        //! Sets a rendering viewport.
+        virtual void    setViewport( const Rect& rect );
 
         //! Sets a rendering color mask.
         /*!
@@ -274,7 +274,7 @@ namespace Renderer {
         virtual void    setStencilValue( u32 value, u32 mask = ~0 );
 
         // ?? Thread-safe operations
-		virtual void				createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture );
+        virtual void                createTexture2D( u32 width, u32 height, PixelFormat format, Texture2DPtr *texture );
         virtual void*               lockTexture( Texture2D* texture, u32& size );
         virtual void                unlockTexture( Texture2D* texture );
 
@@ -302,9 +302,9 @@ namespace Renderer {
          */
         static RenderView*          createOpenGLView( void* window, PixelFormat depthStencil = PixelD24S8 );
 
-	protected:
+    protected:
 
-									//! Constructs a new Hal instance.
+                                    //! Constructs a new Hal instance.
                                     /*!
                                      \param view Viewport container.
                                      */
@@ -324,7 +324,7 @@ namespace Renderer {
         Array<ConstantBufferWPtr>   m_constantBuffers;      //!< An array of bound constant buffers.
     #endif   /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
         InputLayoutWPtr             m_lastInputLayout;      //!< An input layout that was set last time.
-        InputLayoutWPtr		        m_activeInputLayout;    //!< An active input layout.
+        InputLayoutWPtr                m_activeInputLayout;    //!< An active input layout.
         VertexBufferWPtr            m_activeVertexBuffer;   //!< An active vertex buffer.
     };
 
@@ -340,17 +340,17 @@ namespace Renderer {
     class Texture : public RenderResource {
     public:
 
-		//! Available texture types.
-		enum Type {
-			  TextureType2D				//!< 2D texture.
-			, TextureTypeCube			//!< Cube texture.
-		};
+        //! Available texture types.
+        enum Type {
+              TextureType2D                //!< 2D texture.
+            , TextureTypeCube            //!< Cube texture.
+        };
 
                                     //! Constructs a new instance of Texture with a given pixel format.
                                     Texture( PixelFormat format, Type type );
 
-		//! Returns texture type.
-		Type						type( void ) const;
+        //! Returns texture type.
+        Type                        type( void ) const;
 
         //! Returns a texture pixel format.
         PixelFormat                 pixelFormat( void ) const;
@@ -359,10 +359,10 @@ namespace Renderer {
         u32                         bytesPerBlock( void ) const;
 
         //! Returns an amount of bytes per pixel for non compressed textures.
-		u32                         bytesPerPixel( void ) const;
+        u32                         bytesPerPixel( void ) const;
 
         //! Returns a total amount of bytes for a mip level with a given dimensions.
-		u32                         bytesPerMip( u32 width, u32 height ) const;
+        u32                         bytesPerMip( u32 width, u32 height ) const;
 
         //! Returns true if this texture is compressed.
         bool                        isCompressed( void ) const;
@@ -375,10 +375,10 @@ namespace Renderer {
 
     protected:
 
-        Type						m_type;			//!< Texture type.
-        PixelFormat                 m_pixelFormat;	//!< Texture pixel format.
-        void*                       m_locked;		//!< Pointer to a locked texture data.
-        u32                         m_lockedLevel;	//!< Index of a locked texture mip level.
+        Type                        m_type;            //!< Texture type.
+        PixelFormat                 m_pixelFormat;    //!< Texture pixel format.
+        void*                       m_locked;        //!< Pointer to a locked texture data.
+        u32                         m_lockedLevel;    //!< Index of a locked texture mip level.
     };
 
     //! Texture2D class represents a 2D texture.
@@ -415,8 +415,8 @@ namespace Renderer {
 
     protected:
 
-        u32                         m_width;	//!< Texture width.
-        u32                         m_height;	//!< Texture height.
+        u32                         m_width;    //!< Texture width.
+        u32                         m_height;    //!< Texture height.
     };
 
     //! A TextureCube class.
@@ -441,7 +441,7 @@ namespace Renderer {
 
     private:
 
-        u32                         m_size;	//!< Cube texture dimensions.
+        u32                         m_size;    //!< Cube texture dimensions.
     };
 
     //! A render target.
@@ -461,26 +461,26 @@ namespace Renderer {
                                     //! Constructs a new RenderTarget instance.
                                     RenderTarget( u32 width, u32 height );
 
-		//! Setups the color renderbuffer.
-		virtual bool				setAttachment( PixelFormat format, Attachment attachment );
+        //! Setups the color renderbuffer.
+        virtual bool                setAttachment( PixelFormat format, Attachment attachment );
 
-		//! Setups the depth renderbuffer.
-		virtual bool				setDepth( PixelFormat format );
+        //! Setups the depth renderbuffer.
+        virtual bool                setDepth( PixelFormat format );
 
-		//! Returns the color attachment by index.
-		Texture2DPtr				attachment( Attachment attachment ) const;
+        //! Returns the color attachment by index.
+        Texture2DPtr                attachment( Attachment attachment ) const;
 
-		//! Returns render target width.
-		u32							width( void ) const;
+        //! Returns render target width.
+        u32                            width( void ) const;
 
-		//! Returns render target height.
-		u32							height( void ) const;
+        //! Returns render target height.
+        u32                            height( void ) const;
 
-	protected:
+    protected:
 
-		Texture2DPtr			    m_attachments[TotalAttachments];	//!< Texture attachments.
-		u32							m_width;	                        //!< Render target width.
-		u32							m_height;	                        //!< Render target height.
+        Texture2DPtr                m_attachments[TotalAttachments];    //!< Texture attachments.
+        u32                            m_width;                            //!< Render target width.
+        u32                            m_height;                            //!< Render target height.
     };
 
     //! InputLayout class instance is used to define a vertex buffer layout.
@@ -565,7 +565,7 @@ namespace Renderer {
         Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
     };
 
-	//! Vertex buffer class.
+    //! Vertex buffer class.
     class dcInterface VertexBuffer : public RenderResource {
     public:
 
@@ -575,7 +575,7 @@ namespace Renderer {
                                      \param gpu Specifies whether this buffer resides in GPU memory or not.
                                      */
                                     VertexBuffer( s32 size, bool gpu );
-		virtual						~VertexBuffer( void );
+        virtual                        ~VertexBuffer( void );
 
         //! Returns a pointer to buffer vertex data.
         const void*                 pointer( void ) const;
@@ -584,7 +584,7 @@ namespace Renderer {
         u32                         size( void ) const;
 
         //! Returns true if this buffer reside in GPU memory.
-		bool						isGpu( void ) const;
+        bool                        isGpu( void ) const;
 
         //! Locks a vertex buffer.
         virtual void*               lock( void );
@@ -592,9 +592,9 @@ namespace Renderer {
         //! Unlocks a vertex buffer.
         virtual void                unlock( void );
 
-		//! Lockes a vertex buffer and performs the type cast.
-		template<typename TVertex>
-		TVertex*					lock( void );
+        //! Lockes a vertex buffer and performs the type cast.
+        template<typename TVertex>
+        TVertex*                    lock( void );
 
         //! Updates a part of a vertex buffer.
         virtual void                setBufferData( const void* source, s32 offset, s32 size );
@@ -605,18 +605,18 @@ namespace Renderer {
         u32                         m_size;
 
         //! Vertex buffer data.
-		void*						m_data;
+        void*                        m_data;
 
         //! Is it a GPU-side vertex buffer?
-		bool						m_isGpu;
+        bool                        m_isGpu;
     };
 
-	// ** VertexBuffer::lock
-	template<typename TVertex>
-	TVertex* VertexBuffer::lock( void )
-	{
-		return reinterpret_cast<TVertex*>( lock() );
-	}
+    // ** VertexBuffer::lock
+    template<typename TVertex>
+    TVertex* VertexBuffer::lock( void )
+    {
+        return reinterpret_cast<TVertex*>( lock() );
+    }
 
     // ** class IndexBuffer
     class dcInterface IndexBuffer : public RenderResource {
@@ -628,7 +628,7 @@ namespace Renderer {
                                      \param gpu Specifies whether this buffer resides in GPU memory or not.
                                      */
                                     IndexBuffer( u32 count, bool gpu );
-		virtual						~IndexBuffer( void );
+        virtual                        ~IndexBuffer( void );
 
         //! Returns an index buffer size.
         u32                         size( void ) const;
@@ -637,7 +637,7 @@ namespace Renderer {
         const u16*                  pointer( void ) const;
 
         //! Returns true if this buffer reside in GPU memory.
-		bool						isGpu( void ) const;
+        bool                        isGpu( void ) const;
 
         //! Locks an index buffer.
         virtual u16*                lock( void );
@@ -651,10 +651,10 @@ namespace Renderer {
         u32                         m_size;
 
         //! Index buffer data.
-		u16*						m_data;
+        u16*                        m_data;
 
         //! Is it a GPU-side index buffer?
-		bool						m_isGpu;
+        bool                        m_isGpu;
     };
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
@@ -682,7 +682,7 @@ namespace Renderer {
 
                                     //! Constructs a ConstantBuffer instance.
                                     ConstantBuffer( u32 size, const ConstantBufferLayout* layout );
-		virtual						~ConstantBuffer( void );
+        virtual                        ~ConstantBuffer( void );
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         //! Returns a constant buffer layout.
@@ -701,9 +701,9 @@ namespace Renderer {
         //! Unlocks a constant buffer.
         virtual void                unlock( void );
 
-		//! Lockes a constant buffer and performs the type cast.
-		template<typename TData>
-		TData*					    lock( void );
+        //! Lockes a constant buffer and performs the type cast.
+        template<typename TData>
+        TData*                        lock( void );
 
     protected:
 
@@ -714,13 +714,13 @@ namespace Renderer {
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };
 
-	// ** ConstantBuffer::lock
-	template<typename TData>
-	TData* ConstantBuffer::lock( void )
-	{
+    // ** ConstantBuffer::lock
+    template<typename TData>
+    TData* ConstantBuffer::lock( void )
+    {
         NIMBLE_BREAK_IF( sizeof( TData ) != m_size, "constant buffer size mismatch" );
-		return reinterpret_cast<TData*>( lock() );
-	}
+        return reinterpret_cast<TData*>( lock() );
+    }
 
     // ** class Shader
     class dcInterface Shader : public RenderResource {
@@ -740,10 +740,10 @@ namespace Renderer {
          */
         virtual u32                 findUniformLocation( const FixedString& name ) const;
         
-		//! Sets a 4x4 matrix value to a uniform location.
+        //! Sets a 4x4 matrix value to a uniform location.
         virtual void                setMatrix( u32 location, const Matrix4& value );
 
-		//! Sets a 4x4 matrix value to a uniform location.
+        //! Sets a 4x4 matrix value to a uniform location.
         virtual void                setMatrix( u32 location, const f32 value[16] );
 
         //! Sets an integer value to a uniform location.
@@ -755,10 +755,10 @@ namespace Renderer {
         //! Sets a Vec2 value to a uniform location.
         virtual void                setVec2( u32 location, const Vec2& value );
 
-		//! Sets a Vec3 value to a uniform location.
+        //! Sets a Vec3 value to a uniform location.
         virtual void                setVec3( u32 location, const Vec3& value );
 
-		//! Sets a Vec4 value to a uniform location.
+        //! Sets a Vec4 value to a uniform location.
         virtual void                setVec4( u32 location, const Vec4& value );
     };
 
@@ -766,4 +766,4 @@ namespace Renderer {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Hal_H__	*/
+#endif        /*    !__DC_Hal_H__    */

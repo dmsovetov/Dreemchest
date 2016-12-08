@@ -56,7 +56,7 @@ TaskManager::TaskManager( void )
 // ** TaskManager::create
 TaskManagerPtr TaskManager::create( void )
 {
-	return TaskManagerPtr( DC_NEW TaskManager );
+    return TaskManagerPtr( DC_NEW TaskManager );
 }
 
 // ** TaskManager::totalBackgroundTasks
@@ -161,7 +161,7 @@ void TaskManager::startTaskThread( const String& name, TaskQueueWPtr queue )
     
     String64      hash        = String64( name.c_str() );
     TaskThreadPtr taskThread  = DC_NEW TaskThread( name, queue );
-    m_taskThreads[hash]		  = taskThread;
+    m_taskThreads[hash]          = taskThread;
 }
 
 } // namespace Threads

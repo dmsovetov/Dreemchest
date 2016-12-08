@@ -43,11 +43,11 @@ namespace Sound {
         //! Performs a sound engine initialization, returns true on success.
         virtual bool            initialize( void );
 
-		//! Sets the master volume.
-		virtual void			setVolume( f32 value );
+        //! Sets the master volume.
+        virtual void            setVolume( f32 value );
 
-		//! Sets the master pitch.
-		virtual void			setPitch( f32 value );
+        //! Sets the master pitch.
+        virtual void            setPitch( f32 value );
 
         //! Sets the listener position.
         virtual void            setPosition( const Vec3& value );
@@ -56,14 +56,14 @@ namespace Sound {
         virtual void            setDistanceModel( DistanceModel value );
 
         //! Creates a new hardware sound source.
-        virtual SoundSourcePtr	createSource( void );
+        virtual SoundSourcePtr    createSource( void );
 
         //! Creates a new hardware sound buffer.
         /*!
          \param decoder Sound decoder used to read PCM sound samples from input stream.
          \param chunks
          */
-        virtual SoundBufferPtr	createBuffer( SoundDecoderPtr decoder, u32 chunks );
+        virtual SoundBufferPtr    createBuffer( SoundDecoderPtr decoder, u32 chunks );
 
         //! Creates a sound decoder with a given input stream and file format.
         SoundDecoderPtr         createSoundDecoder( ISoundStreamPtr stream, SoundContainerFormat format = SoundFormatUnknown );
@@ -71,10 +71,10 @@ namespace Sound {
     private:
 
         //! Creates a sound decoder instance for a given format.
-        SoundDecoderPtr			createSoundDecoder( SoundContainerFormat format ) const;
+        SoundDecoderPtr            createSoundDecoder( SoundContainerFormat format ) const;
 
         //! Creates a sound decoder with a given input stream and file format.
-        SoundDecoderPtr			createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format );
+        SoundDecoderPtr            createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format );
     };
     
 } // namespace Sound

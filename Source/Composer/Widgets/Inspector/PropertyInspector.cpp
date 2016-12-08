@@ -42,10 +42,10 @@ class PropertyInspector::ItemDelegate : public QItemDelegate {
 protected:
 
     //! Updates widget data with value stored inside an object property.
-    virtual void	setEditorData( QWidget* editor, const QModelIndex& index ) const Q_DECL_OVERRIDE;
+    virtual void    setEditorData( QWidget* editor, const QModelIndex& index ) const Q_DECL_OVERRIDE;
 
     //! Updates property value with data received from a widget.
-    virtual void	setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index ) const Q_DECL_OVERRIDE;
+    virtual void    setModelData( QWidget* editor, QAbstractItemModel* model, const QModelIndex& index ) const Q_DECL_OVERRIDE;
 };
 
 // ** PropertyInspector::ItemDelegate::setEditorData
@@ -118,33 +118,33 @@ void PropertyInspector::refresh( void )
 // ** PropertyInspector::mapModelToWidgets
 void PropertyInspector::mapModelToWidgets( void )
 {
-	// Destroy old layout & mapper
-	qDeleteLayout( m_layout ); m_layout = NULL;
-	delete m_mapper; m_mapper = NULL;
+    // Destroy old layout & mapper
+    qDeleteLayout( m_layout ); m_layout = NULL;
+    delete m_mapper; m_mapper = NULL;
 
-	// Return if the model is not valid
-	if( !m_model ) {
-		return;
-	}
+    // Return if the model is not valid
+    if( !m_model ) {
+        return;
+    }
 
-	// Create the mapper.
-	m_mapper = new QDataWidgetMapper( this );
-	m_mapper->setModel( m_model );
+    // Create the mapper.
+    m_mapper = new QDataWidgetMapper( this );
+    m_mapper->setModel( m_model );
     m_mapper->setItemDelegate( new ItemDelegate );
 
-	// Create root layout.
-	m_layout = new QFormLayout( this );
+    // Create root layout.
+    m_layout = new QFormLayout( this );
     m_layout->setSpacing( 2 );
 
     // Widget mapper index
     int index = 0;
 
-	// Construct property widgets.
-	foreach( const PropertyModel::Property* property, m_model->properties() ) {
+    // Construct property widgets.
+    foreach( const PropertyModel::Property* property, m_model->properties() ) {
         // Increase the widget mapper index
         index++;
 
-		// Format the property name
+        // Format the property name
         QString name = formatPropertyName( property );
 
         // Create a property editor
@@ -159,16 +159,16 @@ void PropertyInspector::mapModelToWidgets( void )
         connect( editor, SIGNAL(valueChanged(const Variant&)), m_mapper, SLOT(submit()) );
 
         // Add widget to layout and mapper
-		m_layout->addRow( name, editor );
-		m_mapper->addMapping( editor, index - 1 );
+        m_layout->addRow( name, editor );
+        m_mapper->addMapping( editor, index - 1 );
 
         // Finish by label setup
         setupLabel( property, editor );
-	}
+    }
 
-	// Finish construction
-	m_mapper->toFirst();
-	m_mapper->setSubmitPolicy( QDataWidgetMapper::AutoSubmit );
+    // Finish construction
+    m_mapper->toFirst();
+    m_mapper->setSubmitPolicy( QDataWidgetMapper::AutoSubmit );
 }
 
 // ** PropertyInspector::formatPropertyName

@@ -33,45 +33,45 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Subclass of a QDockWidget that contains single opened document.
-	class Document : public QDockWidget {
+    //! Subclass of a QDockWidget that contains single opened document.
+    class Document : public QDockWidget {
 
-		Q_OBJECT
+        Q_OBJECT
 
-	public:
+    public:
 
-									//! Constructs the Document instance.
-									Document( MainWindowQPtr parent, Editors::AssetEditorQPtr assetEditor, const QString& title );
+                                    //! Constructs the Document instance.
+                                    Document( MainWindowQPtr parent, Editors::AssetEditorQPtr assetEditor, const QString& title );
 
 
-		//! Returns the rendering frame used for this document dock.
-		RenderingFrameQPtr			renderingFrame( void ) const;
+        //! Returns the rendering frame used for this document dock.
+        RenderingFrameQPtr            renderingFrame( void ) const;
 
-		//! Attaches the rendering frame to this document.
-		RenderingFrameQPtr			attachRenderingFrame( void );
+        //! Attaches the rendering frame to this document.
+        RenderingFrameQPtr            attachRenderingFrame( void );
 
-		//! Returns an attached asset editor.
-		Editors::AssetEditorQPtr	assetEditor( void ) const;
-
-	private:
-
-		//! Handles the closed event.
-		virtual void				closeEvent( QCloseEvent *e ) Q_DECL_OVERRIDE;
-
-	private slots:
-
-		//! Handles the visibility changed signal
-		void						visibilityChanged( bool visible );
+        //! Returns an attached asset editor.
+        Editors::AssetEditorQPtr    assetEditor( void ) const;
 
     private:
 
-		MainWindowQPtr				m_mainWindow;		//!< Parent main window.
-		RenderingFrameQPtr			m_renderingFrame;	//!< The attached rendering frame.
-		Editors::AssetEditorQPtr    m_assetEditor;		//!< Asset editor attached to this document dock
-	};
+        //! Handles the closed event.
+        virtual void                closeEvent( QCloseEvent *e ) Q_DECL_OVERRIDE;
+
+    private slots:
+
+        //! Handles the visibility changed signal
+        void                        visibilityChanged( bool visible );
+
+    private:
+
+        MainWindowQPtr                m_mainWindow;        //!< Parent main window.
+        RenderingFrameQPtr            m_renderingFrame;    //!< The attached rendering frame.
+        Editors::AssetEditorQPtr    m_assetEditor;        //!< Asset editor attached to this document dock
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_Document_H__	*/
+#endif    /*    !__DC_Composer_Document_H__    */

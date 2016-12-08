@@ -34,52 +34,52 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! Entity system is used for processing entities.
-	class EntitySystem : public System {
-	public:
+    //! Entity system is used for processing entities.
+    class EntitySystem : public System {
+    public:
 
-		//! System logic is done here.
-		virtual void	update( u32 currentTime, f32 dt );
+        //! System logic is done here.
+        virtual void    update( u32 currentTime, f32 dt );
 
-		//! Initializes the entity system.
-		virtual bool	initialize( EcsWPtr ecs );
+        //! Initializes the entity system.
+        virtual bool    initialize( EcsWPtr ecs );
 
-		//! Returns the total number of entities that are processed by this system.
-		s32				entityCount( void ) const;
+        //! Returns the total number of entities that are processed by this system.
+        s32                entityCount( void ) const;
 
-	protected:
+    protected:
 
-						//! Constructs a EntitySystem instance.
-						EntitySystem( const String& name, const Aspect& aspect );
+                        //! Constructs a EntitySystem instance.
+                        EntitySystem( const String& name, const Aspect& aspect );
 
-		//! Called every update tick before processing entities.
-		virtual bool	begin( u32 currentTime, f32 dt );
+        //! Called every update tick before processing entities.
+        virtual bool    begin( u32 currentTime, f32 dt );
 
-		//! Called every update tick after all entities are processed.
-		virtual void	end( void );
+        //! Called every update tick after all entities are processed.
+        virtual void    end( void );
 
-		//! Processes a single entity.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity );
+        //! Processes a single entity.
+        virtual void    process( u32 currentTime, f32 dt, Entity& entity );
 
-		//! Called when entity was added.
-		virtual void	entityAdded( const Entity& entity );
+        //! Called when entity was added.
+        virtual void    entityAdded( const Entity& entity );
 
-		//! Called when entity was removed.
-		virtual void	entityRemoved( const Entity& entity );
+        //! Called when entity was removed.
+        virtual void    entityRemoved( const Entity& entity );
 
-		//! Handles an entity added event.
-		void			handleEntityAdded( const Index::Added& e );
+        //! Handles an entity added event.
+        void            handleEntityAdded( const Index::Added& e );
 
-		//! Handles an entity removed event.
-		void			handleEntityRemoved( const Index::Removed& e );
+        //! Handles an entity removed event.
+        void            handleEntityRemoved( const Index::Removed& e );
 
-	protected:
+    protected:
 
-		Aspect			m_aspect;	//!< Entity aspect.
-		IndexPtr		m_index;	//!< Entity index used by this system.
-	};
+        Aspect            m_aspect;    //!< Entity aspect.
+        IndexPtr        m_index;    //!< Entity index used by this system.
+    };
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_EntitySystem_H__	*/
+#endif    /*    !__DC_Ecs_EntitySystem_H__    */

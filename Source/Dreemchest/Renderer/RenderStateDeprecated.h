@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_R_RenderState_H__
-#define		__DC_R_RenderState_H__
+#ifndef        __DC_R_RenderState_H__
+#define        __DC_R_RenderState_H__
 
-#include	"Renderer.h"
+#include    "Renderer.h"
 
 DC_BEGIN_DREEMCHEST
 

@@ -34,48 +34,48 @@ DC_BEGIN_DREEMCHEST
 
 namespace Io {
 
-	//! DiskFileSystem class is an interface to work with physical file system.
-	class dcInterface DiskFileSystem : public FileSystem {
-	public:
+    //! DiskFileSystem class is an interface to work with physical file system.
+    class dcInterface DiskFileSystem : public FileSystem {
+    public:
 
                                 //! Constructs DiskFileSystem instance.
                                 DiskFileSystem( void );
 
-		virtual					~DiskFileSystem( void );
+        virtual                    ~DiskFileSystem( void );
 
-		//! Opens a file at path for reading.
-		virtual StreamPtr       openFile( const Path& path ) const NIMBLE_OVERRIDE;
+        //! Opens a file at path for reading.
+        virtual StreamPtr       openFile( const Path& path ) const NIMBLE_OVERRIDE;
 
         //! Opens a file at path.
-		virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const NIMBLE_OVERRIDE;
+        virtual StreamPtr       openFile( const Path& path, StreamMode mode ) const NIMBLE_OVERRIDE;
 
         //! Checks if file exists at path.
-		virtual bool			fileExists( const Path& path ) const NIMBLE_OVERRIDE;
+        virtual bool            fileExists( const Path& path ) const NIMBLE_OVERRIDE;
 
-		//! Sets a base directory.
+        //! Sets a base directory.
         /*!
          Path to a base directory is prepended to each file path that is tried to be opened by file system.
          */
-		//void					setBaseDir( const Path& path );
+        //void                    setBaseDir( const Path& path );
 
         //! Returns a base directory path.
-		//const Path&             baseDir( void ) const;
+        //const Path&             baseDir( void ) const;
 
         //! Registers a file search path.
         /*!
          \param path Directory path.
          */
-		//void					addPath( const Path& path );
+        //void                    addPath( const Path& path );
 
         //! Removes a file search path.
-		//void					removePath( const Path& path );
+        //void                    removePath( const Path& path );
 
         //! Opens an archive file.
         /*!
          \param fileName Archive file name to be opened.
          \return Archive instance if source file found and can be opened for reading.
          */
-		ArchivePtr				openPackage( const Path& fileName ) const;
+        ArchivePtr                openPackage( const Path& fileName ) const;
 
         //! Adds a new archive file.
         /*!
@@ -86,37 +86,37 @@ namespace Io {
          \param fileName Archive file name.
          \return Archive instance if source file found and can be opened for reading.
          */
-		ArchivePtr				loadPackage( const Path& fileName );
+        ArchivePtr                loadPackage( const Path& fileName );
 
         //! Removes a previously loaded file archive.
-		bool					unloadPackage( const Path& fileName );
+        bool                    unloadPackage( const Path& fileName );
 
         //! Searches for a loaded file archive by it's file name.
-		ArchivePtr				findPackage( const Path& fileName );
+        ArchivePtr                findPackage( const Path& fileName );
 
         //! Returns true if file exists at path.
-        static bool				fileExistsAtPath( const Path& fileName );
+        static bool                fileExistsAtPath( const Path& fileName );
 
-		//! Reads the text file content.
-		static String			readTextFile( const Path& fileName );
+        //! Reads the text file content.
+        static String            readTextFile( const Path& fileName );
 
-		//! Opens the file for reading.
-		static StreamPtr		open( const Path& fileName, StreamMode mode = BinaryReadStream );
+        //! Opens the file for reading.
+        static StreamPtr        open( const Path& fileName, StreamMode mode = BinaryReadStream );
 
-	protected:
+    protected:
 
         //! List of loaded file archives.
-		Archives                m_archives;
+        Archives                m_archives;
 
         //! Set of file search paths.
-		PathSet                 m_paths;
+        PathSet                 m_paths;
 
         //! Base file dir.
         Path                    m_baseDir;
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Io_DiskFileSystem_H__	*/
+#endif    /*    !__DC_Io_DiskFileSystem_H__    */

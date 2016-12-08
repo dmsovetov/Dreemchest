@@ -33,20 +33,20 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Scene viewport interface.
-	class AbstractViewport : public InjectEventEmitter<RefCounted> {
-	public:
+    //! Scene viewport interface.
+    class AbstractViewport : public InjectEventEmitter<RefCounted> {
+    public:
 
-		virtual						~AbstractViewport( void ) {}
+        virtual                        ~AbstractViewport( void ) {}
 
-		//! Returns the render target rect.
-		Rect						rect( void ) const;
+        //! Returns the render target rect.
+        Rect                        rect( void ) const;
 
-		//! Returns the render target width.
-		virtual s32					width( void ) const NIMBLE_ABSTRACT;
+        //! Returns the render target width.
+        virtual s32                    width( void ) const NIMBLE_ABSTRACT;
 
-		//! Returns the render target height.
-		virtual s32					height( void ) const NIMBLE_ABSTRACT;
+        //! Returns the render target height.
+        virtual s32                    height( void ) const NIMBLE_ABSTRACT;
 
         //! A base class for all viewport event types.
         struct Event {
@@ -88,27 +88,27 @@ namespace Scene {
             s32                     dx;     //!< A change of a touch X coordinate.
             s32                     dy;     //!< A change of a touch Y coordinate.
         };
-	};
+    };
 
-	//! WindowViewport is used for attaching a scene viewport to a window instance.
-	class WindowViewport : public AbstractViewport {
-	public:
+    //! WindowViewport is used for attaching a scene viewport to a window instance.
+    class WindowViewport : public AbstractViewport {
+    public:
 
         virtual                     ~WindowViewport( void );
 
-		//! Returns the window width.
-		virtual s32					width( void ) const NIMBLE_OVERRIDE;
+        //! Returns the window width.
+        virtual s32                    width( void ) const NIMBLE_OVERRIDE;
 
-		//! Returns the window height.
-		virtual s32					height( void ) const NIMBLE_OVERRIDE;
+        //! Returns the window height.
+        virtual s32                    height( void ) const NIMBLE_OVERRIDE;
 
-		//! Creates the WindowView instance.
-		static WindowViewportPtr    create( const Platform::WindowWPtr& window );
+        //! Creates the WindowView instance.
+        static WindowViewportPtr    create( const Platform::WindowWPtr& window );
 
-	private:
+    private:
 
-									//! Constructs the WindowViewport instance.
-									WindowViewport( const Platform::WindowWPtr& window );
+                                    //! Constructs the WindowViewport instance.
+                                    WindowViewport( const Platform::WindowWPtr& window );
 
         //! Handles a TouchBegan event from a window instance.
         void                        handleTouchBegan( const Platform::Window::TouchBegan& e );
@@ -119,12 +119,12 @@ namespace Scene {
         //! Handles a TouchEnded event from a window instance.
         void                        handleTouchEnded( const Platform::Window::TouchEnded& e );
 
-	private:
+    private:
 
-		Platform::WindowWPtr		m_window;	//!< The output window.
+        Platform::WindowWPtr        m_window;    //!< The output window.
         s32                         m_lastX;    //!< A last known cursor X coordinate.
         s32                         m_lastY;    //!< A last known cursor Y coordinate.
-	};
+    };
 
 } // namespace Scene
 

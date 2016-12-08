@@ -37,11 +37,11 @@ namespace Reflection {
     class Serializer {
     public:
 
-		//! Function type used by custom type serializers.
-		typedef cClosure<Variant(const Class&, const Property&, const Variant&)> TypeConverter;
+        //! Function type used by custom type serializers.
+        typedef cClosure<Variant(const Class&, const Property&, const Variant&)> TypeConverter;
 
-		//! Function type used by property default value accessor.
-		typedef cClosure<Variant(const KeyValue&)> PropertyDefault;
+        //! Function type used by property default value accessor.
+        typedef cClosure<Variant(const KeyValue&)> PropertyDefault;
 
         virtual                 ~Serializer( void ) {}
 
@@ -54,27 +54,27 @@ namespace Reflection {
         //! Reads instance properties from a key-value storage.
         void                    deserialize( const Instance& instance, const KeyValue& ar ) const;
 
-		//! Registers a type converter.
-		template<typename TFrom, typename TTo>
-		void					registerTypeConverter( const TypeConverter& callback );
+        //! Registers a type converter.
+        template<typename TFrom, typename TTo>
+        void                    registerTypeConverter( const TypeConverter& callback );
 
-		//! Registers a property default value accessor.
-		template<typename TType>
-		void					registerPropertyDefault( const String& name, const PropertyDefault& callback );
+        //! Registers a property default value accessor.
+        template<typename TType>
+        void                    registerPropertyDefault( const String& name, const PropertyDefault& callback );
 
     protected:
 
         //! Reads instance properties from a key-value storage.
         Instance                createAndDeserialize( AssemblyWPtr assembly, const String& name, const KeyValue& ar ) const;
 
-		//! Reads a property value from an archive.
-		Variant					readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const;
+        //! Reads a property value from an archive.
+        Variant                    readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const;
 
         //! Returns a value converter.
         TypeConverter           findTypeConverter( const Type* from, const Type* to ) const;
 
-		//! Calculates a property reader hash value.
-		String64				calculatePropertyReaderHash( const Class* cls, CString name ) const;
+        //! Calculates a property reader hash value.
+        String64                calculatePropertyReaderHash( const Class* cls, CString name ) const;
 
         //! Calculates a type converter hash.
         u64                     calculateTypeConverterHash( const Type* from, const Type* to ) const;
@@ -97,33 +97,33 @@ namespace Reflection {
         //! Serializes a primitive value.
         void                    serializeValue( const Class& cls, const Property& property, const InstanceConst& instance, KeyValue& ar ) const;
 
-	private:
+    private:
 
-		//! Container type to store type conversions.
-		typedef HashMap<u64, TypeConverter> TypeConverters;
+        //! Container type to store type conversions.
+        typedef HashMap<u64, TypeConverter> TypeConverters;
 
-		//! Container type to store property serializers/deserializers.
-		typedef HashMap<String64, PropertyDefault> PropertyDefaults;
+        //! Container type to store property serializers/deserializers.
+        typedef HashMap<String64, PropertyDefault> PropertyDefaults;
 
-		TypeConverters			m_typeConverters;	    //!< Custom type converters.
-		PropertyDefaults		m_defaults;				//!< Property default value callbacks.
+        TypeConverters            m_typeConverters;        //!< Custom type converters.
+        PropertyDefaults        m_defaults;                //!< Property default value callbacks.
     };
 
-	// ** Serializer::registerTypeConverter
-	template<typename TFrom, typename TTo>
-	void Serializer::registerTypeConverter( const TypeConverter& callback )
-	{
-		u64 hash = calculateTypeConverterHash( Type::fromClass<TFrom>(), Type::fromClass<TTo>() );
-		m_typeConverters[hash] = callback;
-	}
+    // ** Serializer::registerTypeConverter
+    template<typename TFrom, typename TTo>
+    void Serializer::registerTypeConverter( const TypeConverter& callback )
+    {
+        u64 hash = calculateTypeConverterHash( Type::fromClass<TFrom>(), Type::fromClass<TTo>() );
+        m_typeConverters[hash] = callback;
+    }
 
-	// ** Serializer::registerPropertyDefault
-	template<typename TType>
-	void Serializer::registerPropertyDefault( const String& name, const PropertyDefault& callback )
-	{
-		String64 hash = calculatePropertyReaderHash( TType::staticMetaObject(), name.c_str() );
-		m_defaults[hash] = callback;
-	}
+    // ** Serializer::registerPropertyDefault
+    template<typename TType>
+    void Serializer::registerPropertyDefault( const String& name, const PropertyDefault& callback )
+    {
+        String64 hash = calculatePropertyReaderHash( TType::staticMetaObject(), name.c_str() );
+        m_defaults[hash] = callback;
+    }
 
 } // namespace Reflection
 

@@ -176,4 +176,4 @@ inline bool Response<T>::operator()( const T& value, const Error& error )
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__Network_Connection_Hpp__	*/
+#endif    /*    !__Network_Connection_Hpp__    */

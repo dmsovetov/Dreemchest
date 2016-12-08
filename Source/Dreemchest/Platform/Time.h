@@ -74,12 +74,12 @@ namespace Platform {
         u32         m_prev; //!< Last recorded time.
     };
 
-	//! Fixed time step timer.
-	class FixedTimeStep {
-	public:
+    //! Fixed time step timer.
+    class FixedTimeStep {
+    public:
 
-				    //! Constructs FixedTimeStep instance.
-				    FixedTimeStep( u32 step = 16, s32 maxSteps = INT_MAX );
+                    //! Constructs FixedTimeStep instance.
+                    FixedTimeStep( u32 step = 16, s32 maxSteps = INT_MAX );
 
         //! Advances the fixed time step timer by a specified amount of milliseconds.
         /*!
@@ -103,12 +103,12 @@ namespace Platform {
         //! Returns a time value left in accumulator.
         u32         accumulated( void ) const;
 
-	private:
+    private:
 
-		u32		    m_dt;			//!< The requested timer step.
-		u32		    m_accumulated;	//!< The accumulated value.
+        u32            m_dt;            //!< The requested timer step.
+        u32            m_accumulated;    //!< The accumulated value.
         s32         m_maxSteps;     //!< The maxium number of steps to be performed.
-	};
+    };
 
 } // namespace Platform
 

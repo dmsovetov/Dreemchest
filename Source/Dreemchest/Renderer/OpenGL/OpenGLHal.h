@@ -24,10 +24,10 @@
 
  **************************************************************************/
 
-#ifndef		__DC_R_OpenGLHal_H__
-#define		__DC_R_OpenGLHal_H__
+#ifndef        __DC_R_OpenGLHal_H__
+#define        __DC_R_OpenGLHal_H__
 
-#include	"../Hal.h"
+#include    "../Hal.h"
 
 #ifdef DC_DEBUG
     #ifdef DC_THREADS_ENABLED
@@ -36,23 +36,23 @@
         #define CHECK_THREAD
     #endif
 
-    #define		DC_CHECK_GL_CONTEXT	DC_ASSERT( glGetString( GL_EXTENSIONS ) != NULL, "OpenGL context should be initialized" )
+    #define        DC_CHECK_GL_CONTEXT    DC_ASSERT( glGetString( GL_EXTENSIONS ) != NULL, "OpenGL context should be initialized" )
     #define     DC_CHECK_GL         sOpenGLErrorCheck __gl_check; CHECK_THREAD
     #define     DC_CHECK_GL_ERROR   DC_EXPECT( glGetError() == GL_NO_ERROR, "Unexpected OpenGL error occured" )
 #else
-    #define		DC_CHECK_GL_CONTEXT
+    #define        DC_CHECK_GL_CONTEXT
     #define     DC_CHECK_GL
     #define     DC_CHECK_GL_ERROR
 #endif
 
 // ** OpenGL headers and libraries
 #if defined( DC_PLATFORM_WINDOWS )
-	#include	<windows.h>
+    #include    <windows.h>
 
-    #include	<gl/gl.h>
-    #include	<gl/glu.h>
-	#include	"Windows/glext.h"
-	#include	"Windows/wglext.h"
+    #include    <gl/gl.h>
+    #include    <gl/glu.h>
+    #include    "Windows/glext.h"
+    #include    "Windows/wglext.h"
 #endif
 
 #if defined( DC_PLATFORM_ANDROID )
@@ -143,21 +143,21 @@ namespace Renderer {
                                     OpenGLHal( RenderView* view );
 
         // ** Renderer
-        virtual bool				clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
-        virtual void				present( void );
+        virtual bool                clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );
+        virtual void                present( void );
         virtual void                renderPrimitives( PrimitiveType primType, u32 offset, u32 count );
-        virtual void				renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count );
-        virtual Texture2DPtr		createTexture2D( u32 width, u32 height, PixelFormat format );
+        virtual void                renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count );
+        virtual Texture2DPtr        createTexture2D( u32 width, u32 height, PixelFormat format );
         virtual TextureCube*        createTextureCube( u32 size, PixelFormat format );
         virtual RenderTargetPtr     createRenderTarget( u32 width, u32 height );
-        virtual ShaderPtr			createShader( const char *vertex, const char *fragment );
+        virtual ShaderPtr            createShader( const char *vertex, const char *fragment );
         virtual IndexBufferPtr      createIndexBuffer( u32 count, bool GPU = true );
         virtual ConstantBufferPtr   createConstantBuffer( u32 size, const ConstantBufferLayout* layout = NULL );
-        virtual VertexBufferPtr		createVertexBuffer( s32 size, bool GPU = true );
-		virtual void				setPolygonMode( PolygonMode mode );
-        virtual void				setShader( const ShaderPtr& shader );
-        virtual void				setRenderTarget( const RenderTargetPtr& renderTarget );
-        virtual void				setTexture( u32 sampler, Texture *texture );
+        virtual VertexBufferPtr        createVertexBuffer( s32 size, bool GPU = true );
+        virtual void                setPolygonMode( PolygonMode mode );
+        virtual void                setShader( const ShaderPtr& shader );
+        virtual void                setRenderTarget( const RenderTargetPtr& renderTarget );
+        virtual void                setTexture( u32 sampler, Texture *texture );
         virtual void                setSamplerState( u32 sampler, TextureWrap wrap, TextureFilter filter );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
         virtual void                setVertexBuffer( const VertexBufferPtr& vertexBuffer );
@@ -165,14 +165,14 @@ namespace Renderer {
         virtual void                setInputLayout( const InputLayoutPtr& inputLayout );
         virtual void                setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
-        virtual void				setColorMask( u32 value );
-        virtual void				setBlendFactors( BlendFactor source, BlendFactor destination );
+        virtual void                setColorMask( u32 value );
+        virtual void                setBlendFactors( BlendFactor source, BlendFactor destination );
         virtual void                setAlphaTest( Compare compare, f32 value );
-        virtual void				setCulling( TriangleFace value );
-        virtual void				setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 height );
-        virtual void				setDepthTest( bool mask, Compare compare );
-        virtual void				setStencilAction( TriangleFace face, Compare compare, StencilAction pass, StencilAction depthFail, StencilAction stencilFail );
-        virtual void				setStencilValue( u32 value, u32 mask );
+        virtual void                setCulling( TriangleFace value );
+        virtual void                setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 height );
+        virtual void                setDepthTest( bool mask, Compare compare );
+        virtual void                setStencilAction( TriangleFace face, Compare compare, StencilAction pass, StencilAction depthFail, StencilAction stencilFail );
+        virtual void                setStencilValue( u32 value, u32 mask );
         virtual void                setBlendState( BlendState* state );
         virtual void                setDepthStencilState( DepthStencilState* state );
         virtual void                setRasterizerState( RasterizerState* state );
@@ -261,17 +261,17 @@ namespace Renderer {
                                     OpenGLRenderTarget( u32 width, u32 height );
         virtual                     ~OpenGLRenderTarget( void );
 
-		// ** RenderTarget
-		virtual bool				setAttachment( PixelFormat format, Attachment attachment );
-		virtual bool				setDepth( PixelFormat format );
+        // ** RenderTarget
+        virtual bool                setAttachment( PixelFormat format, Attachment attachment );
+        virtual bool                setDepth( PixelFormat format );
 
         // ** OpenGLRenderTarget
-		bool						check( void ) const;
+        bool                        check( void ) const;
 
     private:
 
         GLuint                      m_id;
-		GLuint						m_depth;
+        GLuint                        m_depth;
     };
 
     // ** class OpenGLVertexBuffer
@@ -287,8 +287,8 @@ namespace Renderer {
         virtual void                unlock( void );
         virtual void                setBufferData( const void* source, s32 offset, s32 size );
 
-		// ** OpenGLVertexBuffer
-		void						bind( void );
+        // ** OpenGLVertexBuffer
+        void                        bind( void );
 
     private:
 
@@ -307,8 +307,8 @@ namespace Renderer {
         virtual u16*                lock( void );
         virtual void                unlock( void );
 
-		// ** OpenGLIndexBuffer
-		void						bind( void );
+        // ** OpenGLIndexBuffer
+        void                        bind( void );
 
     private:
 
@@ -350,4 +350,4 @@ namespace Renderer {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_R_OpenGLRenderer_H__	*/
+#endif        /*    !__DC_R_OpenGLRenderer_H__    */

@@ -71,11 +71,11 @@ namespace Sound {
                             ~SoundEvent( void );
 
         //! Returns a sound event identifier.
-        CString				identifier( void ) const;
+        CString                identifier( void ) const;
         //! Sets a sound event identifier.
         void                setIdentifier( CString value );
         //! Returns a pointer to a sound data for event playback.
-        CString				requestIdentifier( void ) const;
+        CString                requestIdentifier( void ) const;
         //! Returns a random sound index.
         u32                 generateSoundIndex( void ) const;
         //! Returns a serialized sound event data.

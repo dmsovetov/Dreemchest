@@ -30,49 +30,49 @@
 DC_BEGIN_DREEMCHEST
 
 //! Macro definition to embed a type id into the class
-#define ClassEnableTypeId( T )														\
-    public:																			\
-		virtual TypeId  typeId( void ) const  { return TypeInfo<T>::id(); }			\
-		virtual TypeIdx typeIndex( void ) const  { return TypeIndex<T>::idx(); }	\
-		virtual CString typeName( void ) const { return TypeInfo<T>::name(); }		
+#define ClassEnableTypeId( T )                                                        \
+    public:                                                                            \
+        virtual TypeId  typeId( void ) const  { return TypeInfo<T>::id(); }            \
+        virtual TypeIdx typeIndex( void ) const  { return TypeIndex<T>::idx(); }    \
+        virtual CString typeName( void ) const { return TypeInfo<T>::name(); }        
 
 //! Macro definition for declaring an implementation interface.
-#define BeginPrivateInterface( T )								\
-	namespace impl {											\
-		typedef AutoPtr<class T##Private> T##PrivatePtr;		\
-		class T##Private : public RefCounted {					\
-		protected:												\
-			T*			m_parent;								\
-		public:													\
+#define BeginPrivateInterface( T )                                \
+    namespace impl {                                            \
+        typedef AutoPtr<class T##Private> T##PrivatePtr;        \
+        class T##Private : public RefCounted {                    \
+        protected:                                                \
+            T*            m_parent;                                \
+        public:                                                    \
             void  setParent( T* parent ) { m_parent = parent; } \
-			virtual		~T##Private( void ) {}
+            virtual        ~T##Private( void ) {}
 
-#define EndPrivateInterface										\
-		};														\
-	} // namespace impl
+#define EndPrivateInterface                                        \
+        };                                                        \
+    } // namespace impl
 
 #define InterfaceMethod( m ) virtual m = 0;
 
-#define UsePrivateInterface( T ) private: impl::T##PrivatePtr	m_impl;
+#define UsePrivateInterface( T ) private: impl::T##PrivatePtr    m_impl;
 
 //! Macro definition that enabled a type casting for class.
 #define ClassEnableTypeInfo( name )                                                             \
     ClassEnableTypeId( name )                                                                   \
     public:                                                                                     \
-        template<typename Type> bool is( void ) const { return is( TypeInfo<Type>::id() ); }	\
+        template<typename Type> bool is( void ) const { return is( TypeInfo<Type>::id() ); }    \
         virtual bool is( const TypeId& id ) const {                                             \
             return id == TypeInfo<name>::id();                                                  \
         }
 
 //! Macro definition for enabling instance cloning
-#define ClassEnableCloning( T )	\
-	virtual T* clone( void ) const { return new T; }
+#define ClassEnableCloning( T )    \
+    virtual T* clone( void ) const { return new T; }
 
 //! Macro definition to enable type casts & type id.
 #define ClassEnableTypeInfoSuper( name, super )                                                 \
     ClassEnableTypeId( name )                                                                   \
     public:                                                                                     \
-        template<typename Type> bool is( void ) const { return is( TypeInfo<Type>::id() ); }	\
+        template<typename Type> bool is( void ) const { return is( TypeInfo<Type>::id() ); }    \
         virtual bool is( const TypeId& id ) const {                                             \
             if( id == TypeInfo<name>::id() ) return true; else return super::is( id );          \
         }

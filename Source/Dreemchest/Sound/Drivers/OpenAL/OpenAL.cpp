@@ -151,13 +151,13 @@ void OpenAL::setPosition( const Vec3& value )
 // ** OpenAL::setVolume
 void OpenAL::setVolume( f32 value )
 {
-	alListenerf( AL_GAIN, value );
+    alListenerf( AL_GAIN, value );
 }
 
 // ** OpenAL::setPitch
 void OpenAL::setPitch( f32 value )
 {
-	alListenerf( AL_PITCH, value );
+    alListenerf( AL_PITCH, value );
 }
 
 // ** OpenAL::setDistanceModel

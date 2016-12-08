@@ -38,32 +38,32 @@ Material::Material( void )
     , m_isTwoSided( false )
     , m_features( 0 )
 {
-	setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
-	setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
+    setColor( Diffuse, Rgba( 0.8f, 0.8f, 0.8f ) );
+    setColor( Specular, Rgba( 0.8f, 0.8f, 0.8f ) );
 }
 
 // ** Material::renderingMode
 RenderingMode Material::renderingMode( void ) const
 {
-	return m_renderingMode;
+    return m_renderingMode;
 }
 
 // ** Material::setRenderingMode
 void Material::setRenderingMode( RenderingMode value )
 {
-	m_renderingMode = value;
+    m_renderingMode = value;
 }
 
 // ** Material::lightingModel
 LightingModel Material::lightingModel( void ) const
 {
-	return m_lightingModel;
+    return m_lightingModel;
 }
 
 // ** Material::setLightingModel
 void Material::setLightingModel( LightingModel value )
 {
-	m_lightingModel = value;
+    m_lightingModel = value;
 }
 
 // ** Material::isTwoSided
@@ -81,55 +81,55 @@ void Material::setTwoSided( bool value )
 // ** Material::features
 u32 Material::features( void ) const
 {
-	return m_features;
+    return m_features;
 }
 
 // ** Material::color
 const Rgba& Material::color( Layer layer ) const
 {
-	return m_color[layer];
+    return m_color[layer];
 }
 
 // ** Material::setColor
 void Material::setColor( Layer layer, const Rgba& value )
 {
-	m_color[layer] = value;
+    m_color[layer] = value;
 }
 
 // ** Material::texture
 ImageHandle Material::texture( Layer layer ) const
 {
-	return m_texture[layer];
+    return m_texture[layer];
 }
 
 // ** Material::setTexture
 void Material::setTexture( Layer layer, ImageHandle value )
 {
-	m_texture[layer] = value;
-	updateMaterialFeatures();
+    m_texture[layer] = value;
+    updateMaterialFeatures();
 }
 
 // ** Material::diffuse
 ImageHandle Material::diffuse( void ) const
 {
-	return texture( Diffuse );
+    return texture( Diffuse );
 }
 
 // ** Material::setDiffuse
 void Material::setDiffuse( ImageHandle value )
 {
-	setTexture( Diffuse, value );
+    setTexture( Diffuse, value );
 }
 
 // ** Material::updateMaterialFeatures
 void Material::updateMaterialFeatures( void )
 {
-	m_features = 0;
+    m_features = 0;
 
     for( s32 i = 0; i < TotalMaterialLayers; i++ ) {
-	    if( m_texture[i].isValid() ) {
-		    m_features |= BIT( i );
-	    }    
+        if( m_texture[i].isValid() ) {
+            m_features |= BIT( i );
+        }    
     }
 
     m_features |= PrimaryUvBit;

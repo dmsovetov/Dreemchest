@@ -332,23 +332,23 @@ QMenu* EntityInspector::createComponentMenu( TypeIdx component ) const
 // ** EntityInspector::refresh
 void EntityInspector::refresh( void )
 {
-	// Destroy old layout & mapper
-	qDeleteLayout( m_layout ); m_layout = NULL;
+    // Destroy old layout & mapper
+    qDeleteLayout( m_layout ); m_layout = NULL;
 
-	// Return if the model is not valid
-	if( !m_entity.valid() ) {
-		return;
-	}
+    // Return if the model is not valid
+    if( !m_entity.valid() ) {
+        return;
+    }
 
     // Clear object inspectors
     m_inspectors.clear();
 
-	// Create root layout.
-	m_layout = new QVBoxLayout( this );
+    // Create root layout.
+    m_layout = new QVBoxLayout( this );
     m_layout->setMargin( 0 );
     m_layout->setSpacing( 0 );
 
-	// Construct component property inspectors
+    // Construct component property inspectors
     Ecs::ComponentWeakList components = buildComponentList();
 
     foreach( Ecs::ComponentWPtr component, components ) {

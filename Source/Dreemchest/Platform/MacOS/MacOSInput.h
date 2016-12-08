@@ -39,10 +39,10 @@ namespace Platform {
     public:
         
         // ** IInput
-        virtual bool		keyDown( const Key& key ) NIMBLE_OVERRIDE;
-        virtual void		setMouse( s32 x, s32 y ) NIMBLE_OVERRIDE;
-        virtual s32			mouseX( void ) const NIMBLE_OVERRIDE;
-        virtual s32			mouseY( void ) const NIMBLE_OVERRIDE;
+        virtual bool        keyDown( const Key& key ) NIMBLE_OVERRIDE;
+        virtual void        setMouse( s32 x, s32 y ) NIMBLE_OVERRIDE;
+        virtual s32            mouseX( void ) const NIMBLE_OVERRIDE;
+        virtual s32            mouseY( void ) const NIMBLE_OVERRIDE;
     };
     
 } // namespace Platform

@@ -48,8 +48,8 @@ namespace Sound {
         virtual SoundSourcePtr  createSource( void );
         virtual SoundBufferPtr  createBuffer( SoundDecoderPtr decoder, u32 chunks );
         virtual void            setPosition( const Vec3& value );
-		virtual void			setVolume( f32 value );
-		virtual void			setPitch( f32 value );
+        virtual void            setVolume( f32 value );
+        virtual void            setPitch( f32 value );
         virtual void            setDistanceModel( DistanceModel value );
 
         // ** OpenAL

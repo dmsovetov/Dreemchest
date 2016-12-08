@@ -42,19 +42,19 @@ namespace Network {
         virtual                 ~Socket( void ) {}
 
         //! Returns a socket descriptor.
-		const SocketDescriptor& descriptor( void ) const;
+        const SocketDescriptor& descriptor( void ) const;
 
         //! Returns true if this socket is valid.
-		bool				    isValid( void ) const;
+        bool                    isValid( void ) const;
 
         //! Queues this socket for removal.
         void                    closeLater( void );
 
         //! Closes a socket.
-        virtual void		    close( void );
+        virtual void            close( void );
 
         //! Reads all incoming data.
-        virtual void		    recv( void ) = 0;
+        virtual void            recv( void ) = 0;
 
     protected:
 

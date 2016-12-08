@@ -67,19 +67,19 @@ WindowViewport::~WindowViewport( void )
 // ** WindowViewport::create
 WindowViewportPtr WindowViewport::create( const Platform::WindowWPtr& window )
 {
-	return WindowViewportPtr( DC_NEW WindowViewport( window ) );
+    return WindowViewportPtr( DC_NEW WindowViewport( window ) );
 }
 
 // ** WindowViewport::width
 s32 WindowViewport::width( void ) const
 {
-	return m_window->width();
+    return m_window->width();
 }
 
 // ** WindowViewport::height
 s32 WindowViewport::height( void ) const
 {
-	return m_window->height();
+    return m_window->height();
 }
 
 // ** WindowViewport::handleTouchBegan

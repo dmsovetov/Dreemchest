@@ -38,11 +38,11 @@ DC_BEGIN_DREEMCHEST
     using StrongPtr = Ptr<T>;
 
     template<typename T>
-	class Hash : public std::map<String64, T> {};
+    class Hash : public std::map<String64, T> {};
 
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;
-	typedef Variant			Archive;
+    typedef Variant            Archive;
 
 typedef Array<Archive> Archives;
 

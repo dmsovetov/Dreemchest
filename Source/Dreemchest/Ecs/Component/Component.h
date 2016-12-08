@@ -33,52 +33,52 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! A base class for internal system data attached to a components.
-	struct MixInBase : public RefCounted {
-	};
+    //! A base class for internal system data attached to a components.
+    struct MixInBase : public RefCounted {
+    };
 
-	//! A template class used for declaring system-specific internal data.
-	template<typename T>
-	struct MixIn : public MixInBase {
-		typedef StrongPtr<T> Ptr;	//!< The internal data pointer.
-	};
+    //! A template class used for declaring system-specific internal data.
+    template<typename T>
+    struct MixIn : public MixInBase {
+        typedef StrongPtr<T> Ptr;    //!< The internal data pointer.
+    };
 
-	//! Internal component flags.
-	enum ComponentFlags {
-		IsEnabled = BIT( 31 )	//!< Indicates that a component is enabled.
-	};
+    //! Internal component flags.
+    enum ComponentFlags {
+        IsEnabled = BIT( 31 )    //!< Indicates that a component is enabled.
+    };
 
-	//! A base class for all components.
-	/*!
-	A component is all the data for one aspect of the entity. Component is just a plain
-	data and doesn't contain any processing logic.
-	*/
-	class ComponentBase : public RefCounted {
-	friend class Entity;
-	public:
+    //! A base class for all components.
+    /*!
+    A component is all the data for one aspect of the entity. Component is just a plain
+    data and doesn't contain any processing logic.
+    */
+    class ComponentBase : public RefCounted {
+    friend class Entity;
+    public:
 
         INTROSPECTION_ABSTRACT( ComponentBase )
 
-									//! Constructs ComponentBase instance.
-									ComponentBase( void )
-										: m_flags( IsEnabled ) {}
+                                    //! Constructs ComponentBase instance.
+                                    ComponentBase( void )
+                                        : m_flags( IsEnabled ) {}
 
-		//! Sets the internal data.
-		template<typename T>
-		void						setInternal( MixInBase* value );
+        //! Sets the internal data.
+        template<typename T>
+        void                        setInternal( MixInBase* value );
 
-		//! Returns the internal data.
-		template<typename T>
-		typename MixIn<T>::Ptr      mixIn( void ) const;
+        //! Returns the internal data.
+        template<typename T>
+        typename MixIn<T>::Ptr      mixIn( void ) const;
 
-		//! Returns component flags.
-		u32							flags( void ) const;
+        //! Returns component flags.
+        u32                            flags( void ) const;
 
-		//! Sets component flags.
-		void						setFlags( u32 value );
+        //! Sets component flags.
+        void                        setFlags( u32 value );
 
-		//! Returns true if component is enabled.
-		bool						isEnabled( void ) const;
+        //! Returns true if component is enabled.
+        bool                        isEnabled( void ) const;
 
         //! Returns parent entity instance.
         EntityWPtr                  entity( void ) const;
@@ -95,67 +95,67 @@ namespace Ecs {
         virtual ComponentPtr        deepCopy( void ) const NIMBLE_ABSTRACT;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
-	protected:
+    protected:
 
-		//! Sets the component's enabled flag.
-		void						setEnabled( bool value );
+        //! Sets the component's enabled flag.
+        void                        setEnabled( bool value );
 
         //! Sets the component's parent entity.
         void                        setParentEntity( const EntityWPtr& value );
 
-	protected:
+    protected:
 
-		//! Container type to store internal system state inside a component.
-		typedef Map< TypeIdx, StrongPtr<MixInBase> > InternalDataHolder;
+        //! Container type to store internal system state inside a component.
+        typedef Map< TypeIdx, StrongPtr<MixInBase> > InternalDataHolder;
 
         EntityWPtr                  m_entity;   //!< Entity instance this component is attached to.
-		InternalDataHolder			m_internal;	//!< The internal data.
-		FlagSet32					m_flags;	//!< Component flags.
-	};
+        InternalDataHolder            m_internal;    //!< The internal data.
+        FlagSet32                    m_flags;    //!< Component flags.
+    };
 
-	// ** ComponentBase::setInternal
-	template<typename T>
-	inline void ComponentBase::setInternal( MixInBase* value )
-	{
-		m_internal[TypeIndex<T>::idx()] = value;
-	}
+    // ** ComponentBase::setInternal
+    template<typename T>
+    inline void ComponentBase::setInternal( MixInBase* value )
+    {
+        m_internal[TypeIndex<T>::idx()] = value;
+    }
 
-	// ** ComponentBase::internal
-	template<typename T>
-	inline typename MixIn<T>::Ptr ComponentBase::mixIn( void ) const
-	{
-		InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
+    // ** ComponentBase::internal
+    template<typename T>
+    inline typename MixIn<T>::Ptr ComponentBase::mixIn( void ) const
+    {
+        InternalDataHolder::const_iterator i = m_internal.find( TypeIndex<T>::idx() );
 
-		if( i != m_internal.end() ) {
-			return static_cast<T*>( i->second.get() );
-		}
+        if( i != m_internal.end() ) {
+            return static_cast<T*>( i->second.get() );
+        }
 
-		return typename MixIn<T>::Ptr();
-	}
+        return typename MixIn<T>::Ptr();
+    }
 
-	// ** ComponentBase::flags
-	inline u32 ComponentBase::flags( void ) const
-	{
-		return m_flags;
-	}
+    // ** ComponentBase::flags
+    inline u32 ComponentBase::flags( void ) const
+    {
+        return m_flags;
+    }
 
-	// ** ComponentBase::setFlags
-	inline void ComponentBase::setFlags( u32 value )
-	{
-		m_flags = value;
-	}
+    // ** ComponentBase::setFlags
+    inline void ComponentBase::setFlags( u32 value )
+    {
+        m_flags = value;
+    }
 
-	// ** ComponentBase::isEnabled
-	inline bool ComponentBase::isEnabled( void ) const
-	{
-		return m_flags.is( IsEnabled );
-	}
+    // ** ComponentBase::isEnabled
+    inline bool ComponentBase::isEnabled( void ) const
+    {
+        return m_flags.is( IsEnabled );
+    }
 
-	// ** ComponentBase::setEnabled
-	inline void ComponentBase::setEnabled( bool value )
-	{
-		m_flags.set( IsEnabled, value );
-	}
+    // ** ComponentBase::setEnabled
+    inline void ComponentBase::setEnabled( bool value )
+    {
+        m_flags.set( IsEnabled, value );
+    }
 
     // ** ComponentBase::entity
     inline EntityWPtr ComponentBase::entity( void ) const
@@ -170,27 +170,27 @@ namespace Ecs {
         m_entity = value;
     }
 
-	//! Generic component class.
-	template<typename T>
-	class Component : public ComponentBase {
-	public:
+    //! Generic component class.
+    template<typename T>
+    class Component : public ComponentBase {
+    public:
 
 
-		//! Weak pointer type.
-		typedef WeakPtr<T>		WPtr;
+        //! Weak pointer type.
+        typedef WeakPtr<T>        WPtr;
 
-		//! Strong pointer type.
-		typedef StrongPtr<T>	Ptr;
+        //! Strong pointer type.
+        typedef StrongPtr<T>    Ptr;
 
         //! Returns component type index.
         virtual TypeIdx         typeIndex( void ) const NIMBLE_OVERRIDE { return typeId<T>(); }
 
-		static const Bitset&	bit( void ) { static Bitset result = Bitset::withSingleBit( ComponentBase::typeId<T>() ); return result; }
+        static const Bitset&    bit( void ) { static Bitset result = Bitset::withSingleBit( ComponentBase::typeId<T>() ); return result; }
 
     #if DC_ECS_ENTITY_CLONING
         virtual ComponentPtr    deepCopy( void ) const NIMBLE_OVERRIDE;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
-	};
+    };
 
 #if DC_ECS_ENTITY_CLONING
     // ** Component::deepCopy
@@ -208,4 +208,4 @@ namespace Ecs {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_Component_H__	*/
+#endif    /*    !__DC_Ecs_Component_H__    */

@@ -33,23 +33,23 @@
 #define dcStaticFunction( function )        SCLOSURE( (&function) )
 
 // ** Smart ptrs
-#define        DC_DECLARE_PTRS( type, name )								\
-                typedef DC_DREEMCHEST_NS WeakPtr<class type>    dc##name##Weak;			\
+#define        DC_DECLARE_PTRS( type, name )                                \
+                typedef DC_DREEMCHEST_NS WeakPtr<class type>    dc##name##Weak;            \
                 typedef DC_DREEMCHEST_NS StrongPtr<class type>  dc##name##Strong;
 
-#define dcDeclarePtrs( T )							\
-				typedef DC_DREEMCHEST_NS StrongPtr<class T>	T##Ptr;	\
-				typedef DC_DREEMCHEST_NS WeakPtr<class T>	T##WPtr;
+#define dcDeclarePtrs( T )                            \
+                typedef DC_DREEMCHEST_NS StrongPtr<class T>    T##Ptr;    \
+                typedef DC_DREEMCHEST_NS WeakPtr<class T>    T##WPtr;
 
-#define dcDeclareNamedPtrs( T, name )					\
-				typedef DC_DREEMCHEST_NS StrongPtr<class T>	name##Ptr;	\
-				typedef DC_DREEMCHEST_NS WeakPtr<class T>	name##WPtr;
+#define dcDeclareNamedPtrs( T, name )                    \
+                typedef DC_DREEMCHEST_NS StrongPtr<class T>    name##Ptr;    \
+                typedef DC_DREEMCHEST_NS WeakPtr<class T>    name##WPtr;
 
 // ** Random
-#define		RANDOM_SCALAR( min, max ) ((rand() / float( RAND_MAX ) * ( (max) - (min) )) + (min))
-#define		RANDOM_COLOR( min, max ) (Rgb(	RANDOM_SCALAR( (min).r, (max).r ),	\
-											RANDOM_SCALAR( (min).g, (max).g ),  \
-											RANDOM_SCALAR( (min).b, (max).b ) ))
+#define        RANDOM_SCALAR( min, max ) ((rand() / float( RAND_MAX ) * ( (max) - (min) )) + (min))
+#define        RANDOM_COLOR( min, max ) (Rgb(    RANDOM_SCALAR( (min).r, (max).r ),    \
+                                            RANDOM_SCALAR( (min).g, (max).g ),  \
+                                            RANDOM_SCALAR( (min).b, (max).b ) ))
 
 #define DC_CHECK_IMPL( ... )                                                \
             if( m_impl == NULL ) {                                          \

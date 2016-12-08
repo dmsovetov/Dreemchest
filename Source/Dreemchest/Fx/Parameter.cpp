@@ -33,74 +33,74 @@ namespace Fx {
 // ** FloatParameter::setData
 void FloatParameter::setData( const FloatArray& value, CurveIndex index )
 {
-	CurveType& target = this->curve( index );
+    CurveType& target = this->curve( index );
 
-	target.clear();
-	for( s32 i = 0, n = ( s32 )value.size(); i < n / 2; i++ ) {
-		target.push( value[i * 2 + 0], value[i * 2 + 1] );
-	}
+    target.clear();
+    for( s32 i = 0, n = ( s32 )value.size(); i < n / 2; i++ ) {
+        target.push( value[i * 2 + 0], value[i * 2 + 1] );
+    }
 }
 
 // ** FloatParameter::setCurve
 void FloatParameter::setCurve( const FloatArray& value )
 {
-	setSamplingMode( SampleCurve );
-	setData( value, Lower );
+    setSamplingMode( SampleCurve );
+    setData( value, Lower );
 }
 
 // ** FloatParameter::setRandomBetweenCurves
 void FloatParameter::setRandomBetweenCurves( const FloatArray& min, const FloatArray& max )
 {
-	setSamplingMode( SampleRandomBetweenCurves );
-	setData( min, Lower );
-	setData( max, Upper );
+    setSamplingMode( SampleRandomBetweenCurves );
+    setData( min, Lower );
+    setData( max, Upper );
 }
 
 // ** FloatParameter::setRandomBetweenConstants
 void FloatParameter::setRandomBetweenConstants( f32 min, f32 max )
 {
-	setSamplingMode( SampleRandomBetweenConstants );
-	curve( Lower ).clear();
-	curve( Lower ).push( 0.0f, min );
-	curve( Upper ).clear();
-	curve( Upper ).push( 0.0f, max );
+    setSamplingMode( SampleRandomBetweenConstants );
+    curve( Lower ).clear();
+    curve( Lower ).push( 0.0f, min );
+    curve( Upper ).clear();
+    curve( Upper ).push( 0.0f, max );
 }
 
 // ** Vec3Parameter::setData
 void Vec3Parameter::setData( const FloatArray& value, CurveIndex index )
 {
-	CurveType& target = this->curve( index );
+    CurveType& target = this->curve( index );
 
-	target.clear();
-	for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
-		target.push( value[i * 4 + 0], Vec3( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
-	}
+    target.clear();
+    for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
+        target.push( value[i * 4 + 0], Vec3( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
+    }
 }
 
 // ** RgbParameter::setData
 void RgbParameter::setData( const FloatArray& value, CurveIndex index )
 {
-	CurveType& target = this->curve( index );
+    CurveType& target = this->curve( index );
 
-	target.clear();
-	for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
-		target.push( value[i * 4 + 0], Rgb( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
-	}
+    target.clear();
+    for( s32 i = 0, n = ( s32 )value.size(); i < n / 4; i++ ) {
+        target.push( value[i * 4 + 0], Rgb( value[i * 4 + 1], value[i * 4 + 2], value[i * 4 + 3] ) );
+    }
 }
 
 // ** RgbParameter::setCurve
 void RgbParameter::setCurve( const FloatArray& value )
 {
-	setSamplingMode( SampleCurve );
-	setData( value, Lower );
+    setSamplingMode( SampleCurve );
+    setData( value, Lower );
 }
 
 // ** RgbParameter::setRandomBetweenCurves
 void RgbParameter::setRandomBetweenCurves( const FloatArray& min, const FloatArray& max )
 {
-	setSamplingMode( SampleRandomBetweenCurves );
-	setData( min, Lower );
-	setData( max, Upper );
+    setSamplingMode( SampleRandomBetweenCurves );
+    setData( min, Lower );
+    setData( max, Upper );
 }
 
 } // namespace Fx

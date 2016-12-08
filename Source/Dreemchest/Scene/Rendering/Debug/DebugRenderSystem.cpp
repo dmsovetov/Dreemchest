@@ -37,16 +37,16 @@ DebugRenderSystem::DebugRenderSystem( RenderingContext& context, RenderScene& re
     , m_lights( context, renderScene )
     , m_cameras( context, renderScene )
 {
-	// Create a sprite shader
-	m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    // Create a sprite shader
+    m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugRenderSystem::emitRenderOperations
 void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer )
 {
-	// Push a shader sprite rendering state
-	StateScope state = stateStack.newScope();
-	state->bindProgram( m_context.internShader( m_debugShader ) );
+    // Push a shader sprite rendering state
+    StateScope state = stateStack.newScope();
+    state->bindProgram( m_context.internShader( m_debugShader ) );
     state->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
     // Static mesh bounding boxes

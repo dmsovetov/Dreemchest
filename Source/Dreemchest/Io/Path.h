@@ -105,4 +105,4 @@ namespace Io {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_IOPath_H__	*/
+#endif        /*    !__DC_Io_IOPath_H__    */

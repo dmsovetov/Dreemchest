@@ -101,7 +101,7 @@ PosixCondition::~PosixCondition( void )
     NIMBLE_BREAK_IF( result );
 
     while( pthread_mutex_trylock( &m_mutex ) == 0 ) {
-		PosixThread::threadYield();
+        PosixThread::threadYield();
     }
     pthread_mutex_unlock( &m_mutex );
     result = pthread_mutex_destroy( &m_mutex );

@@ -122,9 +122,9 @@ bool MacOSWindow::create( u32 width, u32 height )
     m_height = height;
 
     // ** Create window
-    NSRect		screen		= [[NSScreen mainScreen] frame];
-    NSRect		frame		= NSMakeRect( screen.size.width * 0.5 - m_width * 0.5, screen.size.height * 0.5 - m_width * 0.5, m_width, m_height );
-    NSUInteger	styleMask	= NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+    NSRect        screen        = [[NSScreen mainScreen] frame];
+    NSRect        frame        = NSMakeRect( screen.size.width * 0.5 - m_width * 0.5, screen.size.height * 0.5 - m_width * 0.5, m_width, m_height );
+    NSUInteger    styleMask    = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
 
     m_window = [[CocoaWindow alloc] initWithContentRect:frame styleMask:styleMask backing:NSBackingStoreBuffered defer:false];
     [m_window makeKeyAndOrderFront: m_window];

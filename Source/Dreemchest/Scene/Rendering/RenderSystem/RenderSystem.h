@@ -35,44 +35,44 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Base class for all render systems.
-	class RenderSystemBase {
-	public:
+    //! Base class for all render systems.
+    class RenderSystemBase {
+    public:
 
-								//! Constructs the RenderSystemBase instance.
-								RenderSystemBase( RenderingContext& context, RenderScene& renderScene, Ecs::IndexPtr cameras );
+                                //! Constructs the RenderSystemBase instance.
+                                RenderSystemBase( RenderingContext& context, RenderScene& renderScene, Ecs::IndexPtr cameras );
 
-		//! Renders all active cameras to their viewports.
-		void					render( RenderFrame& frame, RenderCommandBuffer& commands );
+        //! Renders all active cameras to their viewports.
+        void                    render( RenderFrame& frame, RenderCommandBuffer& commands );
 
-	protected:
+    protected:
 
-		//! Emits rendering operations to a command buffer for a specified camera.
-        virtual void			emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) {}
+        //! Emits rendering operations to a command buffer for a specified camera.
+        virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) {}
 
-	protected:
+    protected:
 
         RenderingContext&       m_context;      //!< Parent rendering context.
         RenderScene&            m_renderScene;  //!< Parent render scene.
-		Ecs::IndexPtr			m_cameras;	    //!< All active cameras that are processed by this render system.
-	};
+        Ecs::IndexPtr            m_cameras;        //!< All active cameras that are processed by this render system.
+    };
 
-	//! Generic render system class.
-	template<typename TRenderer>
-	class RenderSystem : public RenderSystemBase {
-	public:
+    //! Generic render system class.
+    template<typename TRenderer>
+    class RenderSystem : public RenderSystemBase {
+    public:
 
-								//! Constructs RenderSystem instance
-								RenderSystem( RenderingContext& context, RenderScene& renderScene );
+                                //! Constructs RenderSystem instance
+                                RenderSystem( RenderingContext& context, RenderScene& renderScene );
 
     protected:
 
         //! Extracts the render component from a camera entity and passes it an abstract method that should be overridden in a subclass.
-		virtual void			emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
         //! Emits rendering operations to a command buffer for a specified camera.
         virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const TRenderer& renderer ) = 0;
-	};
+    };
 
     // ** RenderSystem::RenderSystem
     template<typename TRenderer>
@@ -81,12 +81,12 @@ namespace Scene {
     {
     }
 
-	// ** RenderSystem::emitRenderOperations
-	template<typename TRenderer>
-	void RenderSystem<TRenderer>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
-	{
+    // ** RenderSystem::emitRenderOperations
+    template<typename TRenderer>
+    void RenderSystem<TRenderer>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+    {
         emitRenderOperations( frame, commands, stateStack, entity, camera, transform, *entity.get<TRenderer>() );
-	}
+    }
 
 } // namespace Scene
 

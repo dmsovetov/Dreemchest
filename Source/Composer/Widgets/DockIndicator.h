@@ -33,70 +33,70 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Dock indicator widget.
-	class DockIndicator : public QWidget {
+    //! Dock indicator widget.
+    class DockIndicator : public QWidget {
 
-		Q_OBJECT
+        Q_OBJECT
 
-	public:
+    public:
 
-		enum { Radius = 18 };
+        enum { Radius = 18 };
 
-										//! Constructs DockIndicator instance.
-										DockIndicator( QMainWindow* window, const QColor& color = Qt::green, int transparency = 20 );
+                                        //! Constructs DockIndicator instance.
+                                        DockIndicator( QMainWindow* window, const QColor& color = Qt::green, int transparency = 20 );
 
-		//! Begins the dragging process.
-		void							begin( QDockWidget* value );
+        //! Begins the dragging process.
+        void                            begin( QDockWidget* value );
 
-		//! Ends the dragging process.
-		void							end( QDockWidget* dock );
+        //! Ends the dragging process.
+        void                            end( QDockWidget* dock );
 
-		//! Sets the underlying dock widget & current cursor position.
-		void							update( const QPoint& cursor );
+        //! Sets the underlying dock widget & current cursor position.
+        void                            update( const QPoint& cursor );
 
-	protected:
+    protected:
 
-		//! Paints the indicator.
-		virtual void					paintEvent( QPaintEvent* e ) Q_DECL_OVERRIDE;
+        //! Paints the indicator.
+        virtual void                    paintEvent( QPaintEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Overridden event filter.
-		virtual bool					eventFilter( QObject* sender, QEvent* e ) Q_DECL_OVERRIDE;
+        //! Overridden event filter.
+        virtual bool                    eventFilter( QObject* sender, QEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Finds the dock widget at specified point in global coordinates.
-		QDockWidget*					findDockAtPoint( const QPoint& point ) const;
+        //! Finds the dock widget at specified point in global coordinates.
+        QDockWidget*                    findDockAtPoint( const QPoint& point ) const;
 
-		//! Places the dock widget to a destination one at specified pane.
-		void							placeToPane( QDockWidget* dock, QDockWidget* destination, int pane );
+        //! Places the dock widget to a destination one at specified pane.
+        void                            placeToPane( QDockWidget* dock, QDockWidget* destination, int pane );
 
-		//! Returns the highlighted pane.
-		int								activePane( void ) const;
+        //! Returns the highlighted pane.
+        int                                activePane( void ) const;
 
-		//! Returns the area of an active dock pane.
-		QRect							activePaneRect( void ) const;
+        //! Returns the area of an active dock pane.
+        QRect                            activePaneRect( void ) const;
 
-		//! Returns the indicator center.
-		QPoint							indicatorCenter( void ) const;
+        //! Returns the indicator center.
+        QPoint                            indicatorCenter( void ) const;
 
-		//! Renders the widget to an image with specified composition mode.
-		QImage							widgetToImage( QWidget* widget, QPainter::CompositionMode mode ) const;
+        //! Renders the widget to an image with specified composition mode.
+        QImage                            widgetToImage( QWidget* widget, QPainter::CompositionMode mode ) const;
 
-		//! Sets the dock widget size.
-		void							setDockSize( QDockWidget* dock, const QSize& value ) const;
+        //! Sets the dock widget size.
+        void                            setDockSize( QDockWidget* dock, const QSize& value ) const;
 
-	private:
+    private:
 
-		QColor							m_color;			//!< Indication color.
-		int								m_transparency;		//!< Indication transparency.
-		QMainWindow*					m_window;			//!< Parent window.
-		QPoint							m_cursor;			//!< Current cursor position.
-		QDockWidget*					m_grabbed;			//!< Dock widget being dragged. 
-		QDockWidget*					m_underlying;		//!< The underlying dock widget.
-		QImage							m_dock;				//!< The image of a dock being dragged.
-		QImage							m_indicator;		//!< The image of a placement indicator.
-	};
+        QColor                            m_color;            //!< Indication color.
+        int                                m_transparency;        //!< Indication transparency.
+        QMainWindow*                    m_window;            //!< Parent window.
+        QPoint                            m_cursor;            //!< Current cursor position.
+        QDockWidget*                    m_grabbed;            //!< Dock widget being dragged. 
+        QDockWidget*                    m_underlying;        //!< The underlying dock widget.
+        QImage                            m_dock;                //!< The image of a dock being dragged.
+        QImage                            m_indicator;        //!< The image of a placement indicator.
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_DockIndicator_H__	*/
+#endif    /*    !__DC_Composer_DockIndicator_H__    */
