@@ -10,6 +10,8 @@ F_ShadowFiltering    = shadowFiltering
 F_ClipPlanes        = cbuffer6
 
 [VertexShader]
+#extension GL_APPLE_clip_distance : require
+
 varying vec3 wsVertex;
 
 #if defined( F_VertexColor )
@@ -35,7 +37,7 @@ void main()
     vec4 vertex = Instance.transform * gl_Vertex;
     
     gl_Position     = View.transform * vertex;
-    gl_PointSize    = 5;
+    gl_PointSize    = 5.0;
 
     wsVertex = vertex.xyz;
 
@@ -138,7 +140,7 @@ float shadowSamplePCF( sampler2D texture, float currentDepth, vec2 sm )
     }
     
     // Compare and return result
-    return shadow / ((F_ShadowFiltering * 4 + 1) * (F_ShadowFiltering * 4 + 1));
+    return shadow / float((F_ShadowFiltering * 4 + 1) * (F_ShadowFiltering * 4 + 1));
 }
 
 float nrand( vec2 n ) {
@@ -187,7 +189,9 @@ float shadowSamplePoisson( sampler2D texture, float currentDepth, vec2 sm, vec3 
     sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[10], basis.xz ), dot( poisson[10], basis.yw ) ) );
     sum += shadowSampleBinary( texture, currentDepth, sm + radius * vec2( dot( poisson[11], basis.xz ), dot( poisson[11], basis.yw ) ) );
 
-    return sum / NUM_TAPS;
+    vec4 result = sum / float(NUM_TAPS);
+
+    return result.x;
 }
 
 //! Performs a projected texture lookup and returns a depth testing result

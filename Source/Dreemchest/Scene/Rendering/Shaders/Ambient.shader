@@ -28,7 +28,7 @@ void main()
     wsVertex = Instance.transform * gl_Vertex;
     
     gl_Position  = View.transform * wsVertex;
-    gl_PointSize = 5;
+    gl_PointSize = 5.0;
 
 #if defined( F_VertexColor )
     v_Color = gl_Color;
