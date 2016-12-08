@@ -38,7 +38,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
     , m_shadows( context, renderScene )
     , m_ambient( context, renderScene )
 {
-    m_phongShader       = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_phongShader       = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );
 }
 

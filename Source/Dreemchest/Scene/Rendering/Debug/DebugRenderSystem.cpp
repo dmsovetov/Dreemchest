@@ -38,7 +38,7 @@ DebugRenderSystem::DebugRenderSystem( RenderingContext& context, RenderScene& re
     , m_cameras( context, renderScene )
 {
     // Create a sprite shader
-    m_debugShader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    m_debugShader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugRenderSystem::emitRenderOperations

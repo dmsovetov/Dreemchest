@@ -293,6 +293,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 
     // Read the code from an input stream
     String code = Io::DiskFileSystem::readTextFile( fileName );
+    NIMBLE_ABORT_IF(code.empty(), "a shader source is empty or file not found");
 
     // Extract vertex/fragment shader code blocks
     size_t vertexBegin   = code.find( vertexShaderMarker );

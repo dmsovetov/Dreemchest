@@ -323,7 +323,7 @@ Scene::ScenePtr SceneEditor::loadFromFile( const QString& fileName ) const
     s32 points = 500;
     s32 c = 0;
 
-#define ENABLE_MESHES (1)
+#define ENABLE_MESHES (0)
 
 #if ENABLE_MESHES
     Scene::ImageHandle diffuse = m_project->assets().find<Scene::Image>( "cea54b49010a442db381be76" );

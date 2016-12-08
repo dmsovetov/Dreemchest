@@ -103,7 +103,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
     m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::View ), RenderScene::CBuffer::View::Layout );
 
     // Create a shader
-    m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugRenderTarget::render
@@ -138,7 +138,7 @@ DebugCascadedShadows::DebugCascadedShadows( RenderingContext& context, RenderSce
     : StreamedRenderPass( context, renderScene, 96 )
 {
     // Create a shader
-    m_shader = m_context.createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugCascadedShadows::render

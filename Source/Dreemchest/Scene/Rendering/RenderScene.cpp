@@ -175,7 +175,7 @@ RenderScene::RenderScene( SceneWPtr scene, RenderingContextWPtr context, RenderC
     m_sceneParameters = DC_NEW CBuffer::Scene;
     
     // Create a default shader
-    m_defaultShader = m_context->createShader( "../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
+    m_defaultShader = m_context->createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
 }
 
 // ** RenderScene::create
