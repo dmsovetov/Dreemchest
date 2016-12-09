@@ -10,6 +10,9 @@ target_link_libraries(03_WindowEvents Dreemchest)
 add_executable(04_RendererInitialization WIN32 MACOSX_BUNDLE 04_RendererInitialization.cpp)
 target_link_libraries(04_RendererInitialization Dreemchest)
 
+add_executable(04_RenderingTriangle WIN32 MACOSX_BUNDLE 04_RenderingTriangle.cpp)
+target_link_libraries(04_RenderingTriangle Dreemchest)
+
 add_executable(05_Files WIN32 MACOSX_BUNDLE 05_Files.cpp)
 target_link_libraries(05_Files Dreemchest)
 
@@ -46,6 +49,7 @@ set_property(TARGET 01_HelloWorld PROPERTY FOLDER "Examples")
 set_property(TARGET 02_CreatingWindows PROPERTY FOLDER "Examples")
 set_property(TARGET 03_WindowEvents PROPERTY FOLDER "Examples")
 set_property(TARGET 04_RendererInitialization PROPERTY FOLDER "Examples")
+set_property(TARGET 04_RenderingTriangle PROPERTY FOLDER "Examples")
 set_property(TARGET 05_Files PROPERTY FOLDER "Examples")
 set_property(TARGET 06_BasicNetworking PROPERTY FOLDER "Examples")
 set_property(TARGET 07_TCPSockets PROPERTY FOLDER "Examples")
