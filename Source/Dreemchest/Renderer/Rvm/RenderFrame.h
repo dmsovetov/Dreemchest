@@ -27,16 +27,16 @@
 #ifndef __DC_Renderer_RenderFrame_H__
 #define __DC_Renderer_RenderFrame_H__
 
-#include "Commands.h"
 #include "RenderState.h"
 #include "Ubershader.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Renderer {
-
+namespace Renderer
+{
     //! Render frame contains all required frame data captured by a render scene.
-    class RenderFrame {
+    class RenderFrame
+    {
     public:
                         
                                                 //! Constructs a RenderFrame instance.
@@ -46,17 +46,17 @@ namespace Renderer {
         s32                                     commandBufferCount( void ) const;
 
         //! Returns a command buffer at specified index.
-        const RenderCommandBuffer&              commandBufferAt( s32 index ) const;
+        const CommandBuffer&                    commandBufferAt( s32 index ) const;
 
         //! Creates a new command buffer.
-        RenderCommandBuffer&                    createCommandBuffer( void );
+        CommandBuffer&                          createCommandBuffer( void );
 
         //! Returns a state stack.
-        RenderStateStack&                       stateStack( void );
+        StateStack&                       stateStack( void );
 
         //! Returns a root command buffer.
-        const RenderCommandBuffer&              entryPoint( void ) const;
-        RenderCommandBuffer&                    entryPoint( void );
+        const CommandBuffer&                    entryPoint( void ) const;
+        CommandBuffer&                          entryPoint( void );
 
         //! Interns a memory buffer that will by used during a frame rendering.
         const void*                             internBuffer( const void* data, s32 size );
@@ -70,11 +70,11 @@ namespace Renderer {
     private:
 
         //! Container type to store recorded command buffers.
-        typedef Array<RenderCommandBufferUPtr>  Commands;
+        typedef Array<CommandBufferUPtr>        Commands;
 
-        RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
+        CommandBuffer*                          m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
-        RenderStateStack                        m_stateStack;           //!< Current state stack.
+        StateStack                        m_stateStack;           //!< Current state stack.
         LinearAllocator                         m_allocator;            //!< A linear allocator used by a frame renderers.
     };
 
@@ -85,7 +85,7 @@ namespace Renderer {
     }
 
     //! Returns a command buffer at specified index.
-    NIMBLE_INLINE const RenderCommandBuffer& RenderFrame::commandBufferAt( s32 index ) const
+    NIMBLE_INLINE const CommandBuffer& RenderFrame::commandBufferAt( s32 index ) const
     {
         NIMBLE_ABORT_IF( index < 0 || index >= commandBufferCount(), "index is out of range" );
         return *m_commandBuffers[index].get();

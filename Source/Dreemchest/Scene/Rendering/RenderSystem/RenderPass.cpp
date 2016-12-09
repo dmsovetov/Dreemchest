@@ -40,7 +40,7 @@ RenderPassBase::RenderPassBase( Renderer::RenderingContext& context, RenderScene
 }
 
 // ** RenderPassBase::renderWithColor
-void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Rgba& color )
+void RenderPassBase::renderWithColor( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Rgba& color )
 {
     // Create a diffuse material constant buffer
     RenderScene::CBuffer::Material material = diffuseMaterial( color );
@@ -50,7 +50,7 @@ void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& c
 
     // Push a material state
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( m_materialCBuffer, RenderState::MaterialConstants );
+    state->bindConstantBuffer( m_materialCBuffer, State::MaterialConstants );
 
     // Emit required render operations
     begin( frame, commands, stateStack );
@@ -59,7 +59,7 @@ void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& c
 }
 
 // ** RenderPassBase::emitStaticMeshes
-void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask )
+void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask )
 {
     // Process each mesh entity
     for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
@@ -75,7 +75,7 @@ void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMe
         StateScope renderableStates = stateStack.push( mesh.states );
 
         StateScope instance = stateStack.newScope();
-        instance->bindConstantBuffer( mesh.constantBuffer, RenderState::InstanceConstants );
+        instance->bindConstantBuffer( mesh.constantBuffer, State::InstanceConstants );
 
         if( mesh.material.lighting == LightingModel::Unlit ) {
             instance->disableFeatures( ShaderAmbientColor );
@@ -86,7 +86,7 @@ void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMe
 }
 
 // ** RenderPassBase::emitPointClouds
-void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask )
+void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask )
 {
     // Process each active point cloud
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {
@@ -102,7 +102,7 @@ void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointCloud
         StateScope renderableStates = stateStack.push( pointCloud.states );
 
         StateScope instance = stateStack.newScope();
-        instance->bindConstantBuffer( pointCloud.constantBuffer, RenderState::InstanceConstants );
+        instance->bindConstantBuffer( pointCloud.constantBuffer, State::InstanceConstants );
 
         if( pointCloud.material.lighting == LightingModel::Unlit ) {
             instance->disableFeatures( ShaderAmbientColor );

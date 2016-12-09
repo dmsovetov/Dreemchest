@@ -40,13 +40,13 @@ StreamedRenderPassBase::StreamedRenderPassBase( RenderingContext& context, Rende
 }
 
 // ** StreamedRenderPassBase::end
-void StreamedRenderPassBase::end( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack )
+void StreamedRenderPassBase::end( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack )
 {
     flush( commands, stateStack );
 }
 
 // ** StreamedRenderPassBase::beginBatch
-void StreamedRenderPassBase::beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity )
+void StreamedRenderPassBase::beginBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity )
 {
     // Flush an active batch
     if( m_activeBatch.primitive != primitive || m_activeBatch.vertexFormat != vertexFormat ) {
@@ -65,7 +65,7 @@ void StreamedRenderPassBase::beginBatch( RenderFrame& frame, RenderCommandBuffer
 }
 
 // ** StreamedRenderPassBase::restartBatch
-void StreamedRenderPassBase::restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive )
+void StreamedRenderPassBase::restartBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive )
 {
     // Save an active batch state
     ActiveBatch activeBatch = m_activeBatch;
@@ -78,7 +78,7 @@ void StreamedRenderPassBase::restartBatch( RenderFrame& frame, RenderCommandBuff
 }
 
 // ** StreamedRenderPassBase::flush
-void StreamedRenderPassBase::flush( RenderCommandBuffer& commands, RenderStateStack& stateStack )
+void StreamedRenderPassBase::flush( CommandBuffer& commands, StateStack& stateStack )
 {
     // Nothing to render - just skip
     if( m_activeBatch.size == 0 ) {
@@ -105,7 +105,7 @@ bool StreamedRenderPassBase::hasEnoughSpace( s32 additionalVertices ) const
 }
 
 // ** StreamedRenderPassBase::emitFrustum
-void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba* color )
+void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba* color )
 {
     // Calculate a tangents from a FOV and aspect ratio
     f32 tanHalfVFOV = tanf( radians( fov * 0.5f ) );
@@ -148,7 +148,7 @@ void StreamedRenderPassBase::emitFrustum( RenderFrame& frame, RenderCommandBuffe
 }
 
 // ** StreamedRenderPassBase::emitVertices
-void StreamedRenderPassBase::emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count )
+void StreamedRenderPassBase::emitVertices( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count )
 {
     // Get an input layout for these vertices
     u8 vertexFormat = VertexFormat::Position;
@@ -176,7 +176,7 @@ void StreamedRenderPassBase::emitVertices( RenderFrame& frame, RenderCommandBuff
 }
 
 // ** StreamedRenderPassBase::emitLine
-void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba* color )
+void StreamedRenderPassBase::emitLine( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba* color )
 {
     Rgba vertexColor = color ? *color : Rgba( 1.0f, 1.0f, 1.0f, 1.0 );
     Vec3 positions[] = { start, end   };
@@ -185,7 +185,7 @@ void StreamedRenderPassBase::emitLine( RenderFrame& frame, RenderCommandBuffer& 
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
-void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Bounds& bounds, const Rgba* color )
+void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Bounds& bounds, const Rgba* color )
 {
     // Get a bounding box position
     f32 x = bounds.min().x;
@@ -216,7 +216,7 @@ void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBu
 }
 
 // ** StreamedRenderPassBase::emitWireBounds
-void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3 vertices[8], const Rgba* color )
+void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3 vertices[8], const Rgba* color )
 {
     for( s32 i = 0; i < 4; i++ ) {
         emitLine( frame, commands, stateStack, vertices[i], vertices[(i + 1) % 4], color );
@@ -230,7 +230,7 @@ void StreamedRenderPassBase::emitWireBounds( RenderFrame& frame, RenderCommandBu
 }
 
 // ** StreamedRenderPassBase::emitBasis
-void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Matrix4& transform )
+void StreamedRenderPassBase::emitBasis( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Matrix4& transform )
 {
     // Calculate a transformed basis origin
     Vec3 origin = transform * Vec3::zero();
@@ -247,7 +247,7 @@ void StreamedRenderPassBase::emitBasis( RenderFrame& frame, RenderCommandBuffer&
 }
 
 // ** StreamedRenderPassBase::emitRect
-void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors )
+void StreamedRenderPassBase::emitRect( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors )
 {
     u16  indices[] = { 0, 1, 2, 0, 2, 3 };
     Vec3 trianglePositions[3];
@@ -265,7 +265,7 @@ void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& 
 }
 
 // ** StreamedRenderPassBase::emitRect
-void StreamedRenderPassBase::emitRect( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color )
+void StreamedRenderPassBase::emitRect( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color )
 {
     Rgba vertexColor = color ? *color : Rgba();
 

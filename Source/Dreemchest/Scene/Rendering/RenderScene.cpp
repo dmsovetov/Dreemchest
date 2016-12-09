@@ -41,9 +41,9 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types
         , _PointCloud = sizeof( RenderScene::PointCloudNode )
         , _Camera = sizeof( RenderScene::CameraNode )
         , _StaticMesh = sizeof( RenderScene::StaticMeshNode )
-        , _StateBlock = sizeof( Renderer::RenderStateBlock )
-        , _State = sizeof( Renderer::RenderState )
-        , _OpCode = sizeof( Renderer::RenderCommandBuffer::OpCode )
+        , _StateBlock = sizeof( Renderer::StateBlock )
+        , _State = sizeof( Renderer::State )
+        , _OpCode = sizeof( Renderer::CommandBuffer::OpCode )
     };
 };
 
@@ -244,10 +244,10 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     updateConstantBuffers( *frame.get() );
 
     // Get a state stack
-    Renderer::RenderStateStack& stateStack = frame->stateStack();
+    Renderer::StateStack& stateStack = frame->stateStack();
 
     // Gen a frame entry point command buffer
-    Renderer::RenderCommandBuffer& entryPoint = frame->entryPoint();
+    Renderer::CommandBuffer& entryPoint = frame->entryPoint();
 
     // Push a default state block
     Renderer::StateScope defaults = stateStack.newScope();
@@ -260,7 +260,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
 
     // Push a scene state block
     Renderer::StateScope scene = stateStack.newScope();
-    scene->bindConstantBuffer( m_sceneConstants, Renderer::RenderState::GlobalConstants );
+    scene->bindConstantBuffer( m_sceneConstants, Renderer::State::GlobalConstants );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();
@@ -286,7 +286,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
 void RenderScene::updateConstantBuffers( Renderer::RenderFrame& frame )
 {
     // Get a frame entry point command buffer
-    Renderer::RenderCommandBuffer& commands = frame.entryPoint();
+    Renderer::CommandBuffer& commands = frame.entryPoint();
 
     // Update scene constant buffer
     m_sceneParameters->ambient = Rgba( 0.2f, 0.2f, 0.2f, 1.0f );

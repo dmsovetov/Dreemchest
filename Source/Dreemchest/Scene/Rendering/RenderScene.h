@@ -137,7 +137,7 @@ namespace Scene
             {
                 u8                                  rendering;      //!< Material rendering mode.
                 u8                                  lighting;       //!< Lighting model.
-                const Renderer::RenderStateBlock*   states;         //!< A material state.
+                const Renderer::StateBlock*   states;         //!< A material state.
             } material;
 
             //! Instance parameters.
@@ -152,7 +152,7 @@ namespace Scene
         {
             const void*                         renderable;
             s32                                 count;              //!< A total number of vertices in a point cloud.
-            const Renderer::RenderStateBlock*   states;             //!< A renderable state.
+            const Renderer::StateBlock*   states;             //!< A renderable state.
         };
 
         //! Stores info about a sprite instance.
@@ -181,7 +181,7 @@ namespace Scene
         {
             const StaticMesh*                   mesh;               //!< Mesh component.
             s32                                 count;              //!< A total number of indices in a mesh.
-            const Renderer::RenderStateBlock*   states;             //!< A renderable state.
+            const Renderer::StateBlock*   states;             //!< A renderable state.
         };
 
         //! A fixed array with renderable point clouds inside.

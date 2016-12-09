@@ -54,13 +54,13 @@ namespace Renderer
         void                        reset( void );
 
         //! Executes a single command buffer.
-        void                        execute( const RenderFrame& frame, const RenderCommandBuffer& commands );
+        void                        execute( const RenderFrame& frame, const CommandBuffer& commands );
 
         //! Binds a render target with specified viewport and executes a command buffer.
-        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const RenderCommandBuffer& commands );
+        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
 
         //! Unrolls a state stack an applies all state changes.
-        void                        applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count );
+        void                        applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count );
 
         //! Clears an active render target
         void                        clear( const f32* color, f32 depth, s32 stencil, u8 mask );
@@ -72,45 +72,45 @@ namespace Renderer
         void                        uploadVertexBuffer( u32 id, const void* data, s32 size );
 
         //! Sets an alpha testing state.
-        void                        switchAlphaTest( const RenderFrame& frame, const RenderState& state );
+        void                        switchAlphaTest( const RenderFrame& frame, const State& state );
 
         //! Sets a depth state.
-        void                        switchDepthState( const RenderFrame& frame, const RenderState& state );
+        void                        switchDepthState( const RenderFrame& frame, const State& state );
 
         //! Sets a blending state.
-        void                        switchBlending( const RenderFrame& frame, const RenderState& state );
+        void                        switchBlending( const RenderFrame& frame, const State& state );
 
         //! Sets a render target.
-        void                        switchRenderTarget( const RenderFrame& frame, const RenderState& state );
+        void                        switchRenderTarget( const RenderFrame& frame, const State& state );
 
         //! Binds a shader program to a pipeline.
-        void                        switchShader( const RenderFrame& frame, const RenderState& state );
+        void                        switchShader( const RenderFrame& frame, const State& state );
 
         //! Binds a constant buffer to a pipeline.
-        void                        switchConstantBuffer( const RenderFrame& frame, const RenderState& state );
+        void                        switchConstantBuffer( const RenderFrame& frame, const State& state );
 
         //! Binds a vertex buffer to a pipeline.
-        void                        switchVertexBuffer( const RenderFrame& frame, const RenderState& state );
+        void                        switchVertexBuffer( const RenderFrame& frame, const State& state );
 
         //! Binds an index buffer to a pipeline.
-        void                        switchIndexBuffer( const RenderFrame& frame, const RenderState& state );
+        void                        switchIndexBuffer( const RenderFrame& frame, const State& state );
 
         //! Binds an input layout to a pipeline.
-        void                        switchInputLayout( const RenderFrame& frame, const RenderState& state );
+        void                        switchInputLayout( const RenderFrame& frame, const State& state );
 
         //! Binds a texture to a sampler.
-        void                        switchTexture( const RenderFrame& frame, const RenderState& state );
+        void                        switchTexture( const RenderFrame& frame, const State& state );
 
         //! Sets a cull face mode.
-        void                        switchCullFace( const RenderFrame& frame, const RenderState& state );
+        void                        switchCullFace( const RenderFrame& frame, const State& state );
 
         //! Sets a polygon offset value
-        void                        switchPolygonOffset( const RenderFrame& frame, const RenderState& state );
+        void                        switchPolygonOffset( const RenderFrame& frame, const State& state );
 
     private:
 
         //! State switcher function callback.
-        typedef void ( Rvm::*StateSwitch )( const RenderFrame&, const RenderState& );
+        typedef void ( Rvm::*StateSwitch )( const RenderFrame&, const State& );
 
         //! A helper structure to store an active shader state.
         struct ActiveShader
@@ -130,7 +130,7 @@ namespace Renderer
 
         Renderer::HalWPtr                   m_hal;                                          //!< Rendering HAL to be used.
         RenderingContextWPtr                m_context;                                      //!< Parent rendering context.
-        StateSwitch                         m_stateSwitches[RenderState::TotalStates];      //!< Function callbacks to switch states.
+        StateSwitch                         m_stateSwitches[State::TotalStates];      //!< Function callbacks to switch states.
         u64                                 m_vertexAttributeFeatures;                      //!< A vertex attribute features.
         u64                                 m_resourceFeatures;                             //!< Active resource features.
         ActiveShader                        m_activeShader;                                 //!< An active shader instance.

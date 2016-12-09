@@ -116,7 +116,7 @@ namespace Renderer
     enum { MaxStateStackDepth = 10 };
 
     //! Render state defines a single state change.
-    struct RenderState
+    struct State
     {
         //! Available constant buffers.
         enum ConstantBufferType
@@ -162,32 +162,32 @@ namespace Renderer
             , TotalStates       = Texture           + MaxTextureSamplers    //!< A total number of available render states.
         };
 
-                                        //! Constructs an empty RenderState instance.
-                                        RenderState( void );
+                                        //! Constructs an empty State instance.
+                                        State( void );
 
-                                        //! Constructs a RenderState instance of specified type.
-                                        RenderState( Type type, s32 id );
+                                        //! Constructs a State instance of specified type.
+                                        State( Type type, s32 id );
 
                                         //! Constructs a cull face render state instance.
-                                        RenderState( Renderer::TriangleFace face );
+                                        State( TriangleFace face );
 
                                         //! Constructs a depth render state instance.
-                                        RenderState( Renderer::Compare function, bool write );
+                                        State( Compare function, bool write );
 
                                         //! Constructs an alpha test render state instance.
-                                        RenderState( Renderer::Compare function, f32 reference );
+                                        State( Renderer::Compare function, f32 reference );
 
                                         //! Constructs a constant buffer binding state.
-                                        RenderState( s32 id, ConstantBufferType type );
+                                        State( s32 id, ConstantBufferType type );
 
                                         //! Constructs a blend function render state.
-                                        RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst );
+                                        State( BlendFactor src, BlendFactor dst );
 
                                         //! Constructs a texture binding state.
-                                        RenderState( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Depth );
+                                        State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Depth );
 
                                         //! Constructs a polygon offset state.
-                                        RenderState( f32 factor, f32 units );
+                                        State( f32 factor, f32 units );
 
         union
         {
@@ -213,15 +213,15 @@ namespace Renderer
     };
 
     //! Render state block agregates a set of state changes.
-    class RenderStateBlock
+    class StateBlock
     {
     public:
 
         //! A maximum number of states that can be stored inside a single block.
         enum { MaxStates = 8 };
 
-                                        //! Constructs a RenderStateBlock block.
-                                        RenderStateBlock( void );
+                                        //! Constructs a StateBlock block.
+                                        StateBlock( void );
 
         //! Binds a vertex buffer to a pipeline.
         void                            bindVertexBuffer( s32 id );
@@ -233,22 +233,22 @@ namespace Renderer
         void                            bindInputLayout( s32 id );
 
         //! Binds a constant buffer to a pipeline.
-        void                            bindConstantBuffer( s32 id, RenderState::ConstantBufferType type );
+        void                            bindConstantBuffer( s32 id, State::ConstantBufferType type );
 
         //! Binds a program to a pipeline.
         void                            bindProgram( s32 id );
 
         //! Binds a texture to a specified sampler.
-        void                            bindTexture( s32 id, RenderState::TextureSampler sampler );
+        void                            bindTexture( s32 id, State::TextureSampler sampler );
 
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture( u8 renderTarget, RenderState::TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Color0 );
+        void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Color0 );
 
         //! Sets a blend function.
-        void                            setBlend( Renderer::BlendFactor src, Renderer::BlendFactor dst );
+        void                            setBlend( BlendFactor src, BlendFactor dst );
 
         //! Sets a depth state.
-        void                            setDepthState( Renderer::Compare function, bool write );
+        void                            setDepthState( Compare function, bool write );
 
         //! Enables a ubershader features.
         void                            enableFeatures( u64 bits );
@@ -263,10 +263,10 @@ namespace Renderer
         void                            disablePolygonOffset( void );
 
         //! Sets an alpha test function.
-        void                            setAlphaTest( Renderer::Compare function, f32 reference );
+        void                            setAlphaTest( Compare function, f32 reference );
 
         //! Sets a cull face side.
-        void                            setCullFace( Renderer::TriangleFace face );
+        void                            setCullFace( TriangleFace face );
 
         //! Disables an alpha testing.
         void                            disableAlphaTest( void );
@@ -281,7 +281,7 @@ namespace Renderer
         s32                             stateCount( void ) const;
 
         //! Returns a state at specified index.
-        const RenderState&              state( s32 index ) const;
+        const State&                    state( s32 index ) const;
 
         //! Returns a state bit at specified index.
         u32                             stateBit( s32 index ) const;
@@ -295,7 +295,7 @@ namespace Renderer
     private:
 
         //! Pushes a new state to a block.
-        void                            pushState( const RenderState& state, u32 stateBit );
+        void                            pushState( const State& state, u32 stateBit );
 
     private:
 
@@ -303,55 +303,55 @@ namespace Renderer
         u64                             m_features;             //!< A shader feature set.
         u64                             m_featureMask;          //!< A shader feature mask.
         u32                             m_stateBits[MaxStates]; //!< An array of state bits.
-        RenderState                     m_states[MaxStates];    //!< An array of state changes.
+        State                           m_states[MaxStates];    //!< An array of state changes.
         s16                             m_count;                //!< A total number of states stored inside a block.
     };
 
-    // ** RenderStateBlock::mask
-    NIMBLE_INLINE u32 RenderStateBlock::mask( void ) const
+    // ** StateBlock::mask
+    NIMBLE_INLINE u32 StateBlock::mask( void ) const
     {
         return m_mask;
     }
 
     //! Returns a feature set enabled by a state block.
-    NIMBLE_INLINE u64 RenderStateBlock::features( void ) const
+    NIMBLE_INLINE u64 StateBlock::features( void ) const
     {
         return m_features;
     }
 
     //! Returns a feature mask exposed by a state block.
-    NIMBLE_INLINE u64 RenderStateBlock::featureMask( void ) const
+    NIMBLE_INLINE u64 StateBlock::featureMask( void ) const
     {
         return m_featureMask;
     }
 
-    // ** RenderStateBlock::stateCount
-    NIMBLE_INLINE s32 RenderStateBlock::stateCount( void ) const
+    // ** StateBlock::stateCount
+    NIMBLE_INLINE s32 StateBlock::stateCount( void ) const
     {
         return m_count;
     }
 
-    // ** RenderStateBlock::state
-    NIMBLE_INLINE const RenderState& RenderStateBlock::state( s32 index ) const
+    // ** StateBlock::state
+    NIMBLE_INLINE const State& StateBlock::state( s32 index ) const
     {
         NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_states[index];
     }
 
-    // ** RenderStateBlock::stateBit
-    NIMBLE_INLINE u32 RenderStateBlock::stateBit( s32 index ) const
+    // ** StateBlock::stateBit
+    NIMBLE_INLINE u32 StateBlock::stateBit( s32 index ) const
     {
         NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_stateBits[index];
     }
     
-    //! Forward declare a RenderStateStack class.
-    class RenderStateStack;
+    //! Forward declare a StateStack class.
+    class StateStack;
 
     //! A render state stack scope.
     class StateScope
     {
-    friend class RenderStateStack;
+    friend class StateStack;
     public:
 
                                     //! Performs a destructive copy of a state scope.
@@ -361,8 +361,8 @@ namespace Renderer
                                     ~StateScope( void );
 
         //! Returns a pointer to a topmost state block.
-        const RenderStateBlock*     operator -> ( void ) const;
-        RenderStateBlock*           operator -> ( void );
+        const StateBlock*           operator -> ( void ) const;
+        StateBlock*                 operator -> ( void );
 
         //! Performs a destructive copy of a state scope.
         const StateScope&           operator = ( StateScope& other );
@@ -370,40 +370,40 @@ namespace Renderer
     private:
 
                                     //! Constructs a StateScope instance.
-                                    StateScope( RenderStateStack& stack, RenderStateBlock* stateBlock );
+                                    StateScope( StateStack& stack, StateBlock* stateBlock );
 
     private:
 
-        RenderStateStack&           m_stack;        //!< A state stack that issued this scope.
-        RenderStateBlock*           m_stateBlock;   //!< A topmost state block.
+        StateStack&                 m_stack;        //!< A state stack that issued this scope.
+        StateBlock*                 m_stateBlock;   //!< A topmost state block.
     };
 
     // ** StateScope::operator ->
-    NIMBLE_INLINE const RenderStateBlock* StateScope::operator -> ( void ) const
+    NIMBLE_INLINE const StateBlock* StateScope::operator -> ( void ) const
     {
         return m_stateBlock;
     }
 
     // ** StateScope::operator ->
-    NIMBLE_INLINE RenderStateBlock* StateScope::operator -> ( void )
+    NIMBLE_INLINE StateBlock* StateScope::operator -> ( void )
     {
         return m_stateBlock;
     }
 
     //! Render state stack.
-    class RenderStateStack
+    class StateStack
     {
     friend class StateScope;
     public:
 
-                                    //! Constructs a RenderStateStack instance.
-                                    RenderStateStack( s32 maxStateBlocks, s32 maxStackSize );
+                                    //! Constructs a StateStack instance.
+                                    StateStack( s32 maxStateBlocks, s32 maxStackSize );
 
         //! Allocates and pushes a new state block onto the stack.
         StateScope                  newScope( void );
 
         //! Pushes a state block onto the stack.
-        StateScope                  push( const RenderStateBlock* block );
+        StateScope                  push( const StateBlock* block );
 
         //! Returns the stack size.
         s32                         size( void ) const;
@@ -412,7 +412,7 @@ namespace Renderer
         void                        clear( void );
 
         //! Returns the stack pointer.
-        const RenderStateBlock**    states( void ) const;
+        const StateBlock**    states( void ) const;
 
     private:
 
@@ -422,7 +422,7 @@ namespace Renderer
     private:
 
         LinearAllocator             m_allocator;    //!< Allocates a state block instances.
-        const RenderStateBlock**    m_stack;        //!< State blocks pushed onto a stack.
+        const StateBlock**          m_stack;        //!< State blocks pushed onto a stack.
         s32                         m_size;         //!< Current stack size.
     };
 

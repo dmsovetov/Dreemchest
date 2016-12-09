@@ -228,7 +228,7 @@ void SceneEditor::render( f32 dt )
     // Render the scene
     clock_t time = clock();
     Scene::RenderFrameUPtr frame = m_renderScene->captureFrame();
-    m_rvm->display( frame );
+    m_rvm->display( *frame.get() );
     time = clock() - time;
 
     static u32 kLastPrintTime = 0;

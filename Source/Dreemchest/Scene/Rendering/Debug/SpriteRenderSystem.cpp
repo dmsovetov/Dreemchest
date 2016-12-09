@@ -54,7 +54,7 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 }
 
 // ** SpriteRenderSystem::emitRenderOperations
-void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
+void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
 {
     // Push a shader sprite rendering state
     StateScope state = stateStack.newScope();
@@ -67,7 +67,7 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommand
     const RenderScene::Sprites& sprites = m_renderScene.sprites();
 
     // Process each sprite and submit them in batches for rendering
-    const RenderStateBlock* activeStates = NULL;
+    const StateBlock* activeStates = NULL;
     s32                        spriteCount  = 0;
 
     for( s32 i = 0, n = sprites.count(); i < n; i++, spriteCount++ ) {
@@ -92,7 +92,7 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommand
 }
 
 // ** SpriteRenderSystem::emitSpriteBatch
-void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor )
+void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor )
 {
     // Nothing to render - just skip
     if( count == 0 ) {

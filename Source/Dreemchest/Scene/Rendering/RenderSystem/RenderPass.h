@@ -44,22 +44,22 @@ namespace Scene
                                                 RenderPassBase( Renderer::RenderingContext& context, RenderScene& renderScene );
 
         //! Performs a render pass with a diffuse material.
-        void                                    renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Rgba& color );
+        void                                    renderWithColor( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Rgba& color );
 
         //! Renders a pass to active render target.
-        virtual void                            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+        virtual void                            emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack ) {}
 
         //! Begins a pass rendering.
-        virtual void                            begin( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+        virtual void                            begin( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack ) {}
 
         //! Ends a pass rendering.
-        virtual void                            end( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack ) {}
+        virtual void                            end( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack ) {}
 
         //! Emits rendering operations for static meshes that reside in scene.
-        static void                             emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask = ~0 );
+        static void                             emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask = ~0 );
 
         //! Emits rendering operations for point clouds that reside in scene.
-        static void                             emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, u8 mask = ~0 );
+        static void                             emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask = ~0 );
 
         //! Constructs a material constant buffer with a specified color.
         static RenderScene::CBuffer::Material   diffuseMaterial( const Rgba& color );

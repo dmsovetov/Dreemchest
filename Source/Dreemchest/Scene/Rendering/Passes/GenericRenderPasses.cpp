@@ -39,7 +39,7 @@ AmbientPass::AmbientPass( RenderingContext& context, RenderScene& renderScene )
 }
 
 // ** AmbientPass::render
-void AmbientPass::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack )
+void AmbientPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack )
 {
     StateScope pass = stateStack.newScope();
     pass->bindProgram( m_context.internShader( m_shader ) );
@@ -69,14 +69,14 @@ RenderId ShadowPass::cbuffer( void ) const
 }
 
 // ** ShadowPass::render
-u8 ShadowPass::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
+u8 ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
 {
     // Acquire a shadow render target
     s32 dimensions  = static_cast<s32>( 1.0f / parameters.invSize );
     u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
 
     // Render scene from a light's point of view
-    RenderCommandBuffer& cmd = commands.renderToTarget( renderTarget );
+    CommandBuffer& cmd = commands.renderToTarget( renderTarget );
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 
     // Update a shadow constant buffer
@@ -84,7 +84,7 @@ u8 ShadowPass::render( RenderFrame& frame, RenderCommandBuffer& commands, Render
 
     // Push a shadow pass scope
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( m_cbuffer, RenderState::ShadowConstants );
+    state->bindConstantBuffer( m_cbuffer, State::ShadowConstants );
     state->bindProgram( m_context.internShader( m_shader ) );
     state->setCullFace( Renderer::TriangleFaceFront );
 

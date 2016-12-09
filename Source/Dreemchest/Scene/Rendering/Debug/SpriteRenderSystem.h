@@ -42,7 +42,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations for rendered sprites.
-        virtual void                    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer ) NIMBLE_OVERRIDE;
+        virtual void                    emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer ) NIMBLE_OVERRIDE;
     
         //! Allocates and initializes an index buffer of a specified size.
         u16*                            allocateTrianleIndexBuffer( s32 triangleCount ) const;
@@ -51,7 +51,7 @@ namespace Scene {
         void                            emitSpriteVertices( void* vertices, s32 offset, const Matrix4& transform, s32 width, s32 height, const Rgba& color, f32 scaleFactor ) const;
 
         //! Writes a batch of sprites with same render states to an output stream.
-        void                            emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor );
+        void                            emitSpriteBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor );
 
     private:
 

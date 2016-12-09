@@ -30,79 +30,79 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-// ---------------------------------------------------------------------------- RenderState ---------------------------------------------------------------------------- //
+// ---------------------------------------------------------------------------- State ---------------------------------------------------------------------------- //
 
-// ** RenderState::RenderState
-RenderState::RenderState( void )
+// ** State::State
+State::State( void )
     : type( TotalStates )
 {
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( Type type, s32 id )
+// ** State::State
+State::State( Type type, s32 id )
     : type( type )
     , resourceId( id )
 {
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( Renderer::TriangleFace face )
+// ** State::State
+State::State( TriangleFace face )
     : type( CullFace )
 {
     cullFace = face;
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( Renderer::Compare function, bool write )
+// ** State::State
+State::State( Compare function, bool write )
     : type( DepthState )
 {
     compareFunction = function;
     data.depthWrite = write;
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( Renderer::Compare function, f32 reference )
+// ** State::State
+State::State( Compare function, f32 reference )
     : type( AlphaTest )
 {
     compareFunction     = function;
     data.alphaReference = static_cast<u8>( reference * 255 );
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( s32 id, ConstantBufferType type )
+// ** State::State
+State::State( s32 id, ConstantBufferType type )
     : type( ConstantBuffer )
 {
     resourceId = id;
     data.index = type;
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst )
+// ** State::State
+State::State( BlendFactor src, BlendFactor dst )
     : type( Blending )
 {
     data.blend = (src << 4) | dst;
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment )
+// ** State::State
+State::State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment )
     : type( Texture )
 {
     resourceId = id;
     data.index = sampler | (attachment << 4);
 }
 
-// ** RenderState::RenderState
-RenderState::RenderState( f32 factor, f32 units )
+// ** State::State
+State::State( f32 factor, f32 units )
     : type( PolygonOffset )
 {
     polygonOffset.factor = factor * 128.0f;
     polygonOffset.units  = units * 128.0f;
 }
 
-// -------------------------------------------------------------------------- RenderStateBlock -------------------------------------------------------------------------- //
+// -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
-// ** RenderStateBlock::RenderStateBlock
-RenderStateBlock::RenderStateBlock( void )
+// ** StateBlock::StateBlock
+StateBlock::StateBlock( void )
     : m_mask( 0 )
     , m_features( 0 )
     , m_featureMask( ~0 )
@@ -110,110 +110,110 @@ RenderStateBlock::RenderStateBlock( void )
 {
 }
 
-// ** RenderStateBlock::bindVertexBuffer
-void RenderStateBlock::bindVertexBuffer( s32 id )
+// ** StateBlock::bindVertexBuffer
+void StateBlock::bindVertexBuffer( s32 id )
 {
-    pushState( RenderState( RenderState::VertexBuffer, id ), RenderState::VertexBuffer );
+    pushState( State( State::VertexBuffer, id ), State::VertexBuffer );
 }
 
-// ** RenderStateBlock::bindIndexBuffer
-void RenderStateBlock::bindIndexBuffer( s32 id )
+// ** StateBlock::bindIndexBuffer
+void StateBlock::bindIndexBuffer( s32 id )
 {
-    pushState( RenderState( RenderState::IndexBuffer, id ), RenderState::IndexBuffer );
+    pushState( State( State::IndexBuffer, id ), State::IndexBuffer );
 }
 
-// ** RenderStateBlock::bindInputLayout
-void RenderStateBlock::bindInputLayout( s32 id )
+// ** StateBlock::bindInputLayout
+void StateBlock::bindInputLayout( s32 id )
 {
-    pushState( RenderState( RenderState::InputLayout, id ), RenderState::InputLayout );
+    pushState( State( State::InputLayout, id ), State::InputLayout );
 }
 
-// ** RenderStateBlock::bindConstantBuffer
-void RenderStateBlock::bindConstantBuffer( s32 id, RenderState::ConstantBufferType type )
+// ** StateBlock::bindConstantBuffer
+void StateBlock::bindConstantBuffer( s32 id, State::ConstantBufferType type )
 {
-    pushState( RenderState( id, type ), RenderState::ConstantBuffer + type );
+    pushState( State( id, type ), State::ConstantBuffer + type );
 }
 
-// ** RenderStateBlock::bindProgram
-void RenderStateBlock::bindProgram( s32 id )
+// ** StateBlock::bindProgram
+void StateBlock::bindProgram( s32 id )
 {
-    pushState( RenderState( RenderState::Shader, id ), RenderState::Shader );
+    pushState( State( State::Shader, id ), State::Shader );
 }
 
-// ** RenderStateBlock::bindTexture
-void RenderStateBlock::bindTexture( s32 id, RenderState::TextureSampler sampler )
+// ** StateBlock::bindTexture
+void StateBlock::bindTexture( s32 id, State::TextureSampler sampler )
 {
-    pushState( RenderState( id, sampler ), RenderState::Texture + sampler );
+    pushState( State( id, sampler ), State::Texture + sampler );
 }
 
-// ** RenderStateBlock::bindRenderedTexture
-void RenderStateBlock::bindRenderedTexture( u8 renderTarget, RenderState::TextureSampler sampler, Renderer::RenderTarget::Attachment attachment )
+// ** StateBlock::bindRenderedTexture
+void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment )
 {
-    pushState( RenderState( -renderTarget, sampler, attachment ), RenderState::Texture + sampler );
+    pushState( State( -renderTarget, sampler, attachment ), State::Texture + sampler );
 }
 
-// ** RenderStateBlock::setBlend
-void RenderStateBlock::setBlend( Renderer::BlendFactor src, Renderer::BlendFactor dst )
+// ** StateBlock::setBlend
+void StateBlock::setBlend( BlendFactor src, BlendFactor dst )
 {
-    pushState( RenderState( src, dst ), RenderState::Blending );
+    pushState( State( src, dst ), State::Blending );
 }
 
-// ** RenderStateBlock::setDepthState
-void RenderStateBlock::setDepthState( Renderer::Compare function, bool write )
+// ** StateBlock::setDepthState
+void StateBlock::setDepthState( Compare function, bool write )
 {
-    pushState( RenderState( function, write ), RenderState::DepthState );
+    pushState( State( function, write ), State::DepthState );
 }
 
-// ** RenderStateBlock::enableFeatures
-void RenderStateBlock::enableFeatures( u64 bits )
+// ** StateBlock::enableFeatures
+void StateBlock::enableFeatures( u64 bits )
 {
     m_features = m_features | bits;
 }
 
-// ** RenderStateBlock::disableFeatures
-void RenderStateBlock::disableFeatures( u64 bits )
+// ** StateBlock::disableFeatures
+void StateBlock::disableFeatures( u64 bits )
 {
     m_featureMask = m_featureMask & ~bits;
 }
 
-// ** RenderStateBlock::setPolygonOffset
-void RenderStateBlock::setPolygonOffset( f32 factor, f32 units )
+// ** StateBlock::setPolygonOffset
+void StateBlock::setPolygonOffset( f32 factor, f32 units )
 {
-    pushState( RenderState( factor, units ), RenderState::PolygonOffset );
+    pushState( State( factor, units ), State::PolygonOffset );
 }
 
-// ** RenderStateBlock::disablePolygonOffset
-void RenderStateBlock::disablePolygonOffset( void )
+// ** StateBlock::disablePolygonOffset
+void StateBlock::disablePolygonOffset( void )
 {
     setPolygonOffset( 0.0f, 0.0f );
 }
 
-// ** RenderStateBlock::setAlphaTest
-void RenderStateBlock::setAlphaTest( Renderer::Compare function, f32 reference )
+// ** StateBlock::setAlphaTest
+void StateBlock::setAlphaTest( Compare function, f32 reference )
 {
-    pushState( RenderState( function, reference ), RenderState::AlphaTest );
+    pushState( State( function, reference ), State::AlphaTest );
 }
 
-// ** RenderStateBlock::setCullFace
-void RenderStateBlock::setCullFace( Renderer::TriangleFace face )
+// ** StateBlock::setCullFace
+void StateBlock::setCullFace( TriangleFace face )
 {
-    pushState( RenderState( face ), RenderState::CullFace );
+    pushState( State( face ), State::CullFace );
 }
 
-// ** RenderStateBlock::disableBlending
-void RenderStateBlock::disableAlphaTest( void )
+// ** StateBlock::disableBlending
+void StateBlock::disableAlphaTest( void )
 {
     setAlphaTest( Renderer::CompareDisabled, 0.0f );
 }
 
-// ** RenderStateBlock::disableBlending
-void RenderStateBlock::disableBlending( void )
+// ** StateBlock::disableBlending
+void StateBlock::disableBlending( void )
 {
-    setBlend( Renderer::BlendDisabled, Renderer::BlendDisabled );
+    setBlend( BlendDisabled, BlendDisabled );
 }
 
-// ** RenderStateBlock::pushState
-void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
+// ** StateBlock::pushState
+void StateBlock::pushState( const State& state, u32 stateBit )
 {
     NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
     NIMBLE_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );
@@ -230,7 +230,7 @@ void RenderStateBlock::pushState( const RenderState& state, u32 stateBit )
 // ---------------------------------------------------------------------------- StateScope ------------------------------------------------------------------------------ //
 
 // ** StateScope::StateScope
-StateScope::StateScope( RenderStateStack& stack, RenderStateBlock* stateBlock )
+StateScope::StateScope( StateStack& stack, StateBlock* stateBlock )
     : m_stack( stack )
     , m_stateBlock( stateBlock )
 {
@@ -262,31 +262,31 @@ const StateScope& StateScope::operator = ( StateScope& other )
     return *this;
 }
 
-// -------------------------------------------------------------------------- RenderStateStack -------------------------------------------------------------------------- //
+// -------------------------------------------------------------------------- StateStack -------------------------------------------------------------------------- //
 
-// ** RenderStateStack::RenderStateStack
-RenderStateStack::RenderStateStack( s32 maxStateBlocks, s32 maxStackSize )
-    : m_allocator( maxStateBlocks * sizeof( RenderStateBlock ) + sizeof( RenderStateBlock* ) * maxStackSize )
+// ** StateStack::StateStack
+StateStack::StateStack( s32 maxStateBlocks, s32 maxStackSize )
+    : m_allocator( maxStateBlocks * sizeof( StateBlock ) + sizeof( StateBlock* ) * maxStackSize )
     , m_stack( NULL )
     , m_size( 0 )
 {
-    m_stack = reinterpret_cast<const RenderStateBlock**>( m_allocator.allocate( sizeof( RenderStateBlock* ) * maxStackSize ) );
+    m_stack = reinterpret_cast<const StateBlock**>( m_allocator.allocate( sizeof( StateBlock* ) * maxStackSize ) );
 }
 
-// ** RenderStateStack::newScope
-StateScope RenderStateStack::newScope( void )
+// ** StateStack::newScope
+StateScope StateStack::newScope( void )
 {
     NIMBLE_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
 
-    void* allocated = m_allocator.allocate( sizeof( RenderStateBlock ) );
+    void* allocated = m_allocator.allocate( sizeof( StateBlock ) );
     NIMBLE_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
 
-    RenderStateBlock* block = new( allocated ) RenderStateBlock;
+    StateBlock* block = new( allocated ) StateBlock;
     return push( block );
 }
 
-// ** RenderStateStack::push
-StateScope RenderStateStack::push( const RenderStateBlock* block )
+// ** StateStack::push
+StateScope StateStack::push( const StateBlock* block )
 {
     if( block == NULL ) {
         return StateScope( *this, NULL );
@@ -298,11 +298,11 @@ StateScope RenderStateStack::push( const RenderStateBlock* block )
     m_stack[0] = block;
     m_size++;
 
-    return StateScope( *this, const_cast<RenderStateBlock*>( block ) );
+    return StateScope( *this, const_cast<StateBlock*>( block ) );
 }
 
-// ** RenderStateStack::pop
-void RenderStateStack::pop( void )
+// ** StateStack::pop
+void StateStack::pop( void )
 {
     NIMBLE_ABORT_IF( size() == 0, "stack underflow" );
 
@@ -313,20 +313,20 @@ void RenderStateStack::pop( void )
     m_stack[m_size--] = NULL;
 }
 
-// ** RenderStateStack::size
-s32 RenderStateStack::size( void ) const
+// ** StateStack::size
+s32 StateStack::size( void ) const
 {
     return m_size;
 }
 
-// ** RenderStateStack::states
-const RenderStateBlock** RenderStateStack::states( void ) const
+// ** StateStack::states
+const StateBlock** StateStack::states( void ) const
 {
     return m_stack;
 }
     
-// ** RenderStateStack::clear
-void RenderStateStack::clear( void )
+// ** StateStack::clear
+void StateStack::clear( void )
 {
     m_size = 0;
 }

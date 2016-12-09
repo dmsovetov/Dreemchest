@@ -43,7 +43,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
-void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
+void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
 {
     // First perform an ambient render pass
     m_ambient.render( frame, commands, stateStack );
@@ -70,7 +70,7 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderComman
 }
 
 // ** ForwardRenderSystem::renderSpotLight
-void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
     u8               shadowTexture = 0;
     ShadowParameters shadowParameters;
@@ -96,7 +96,7 @@ void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, RenderCommandBuff
 }
 
 // ** ForwardRenderSystem::renderPointLight
-void ForwardRenderSystem::renderPointLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderPointLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
     // Render a light pass
     RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromSphere( *light.matrix * Vec3::zero(), light.light->range() );
@@ -104,7 +104,7 @@ void ForwardRenderSystem::renderPointLight( RenderFrame& frame, RenderCommandBuf
 }
 
 // ** ForwardRenderSystem::renderDirectionalLight
-void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const ForwardRenderer& forwardRenderer, const Camera& camera, const Transform& cameraTransform, const Viewport& viewport, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const Camera& camera, const Transform& cameraTransform, const Viewport& viewport, const RenderScene::LightNode& light )
 {
     // Light does not cast any shadows, so just render it
     if( !light.light->castsShadows() ) {
@@ -151,7 +151,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, RenderComm
 }
 
 // ** ForwardRenderSystem::renderLight
-void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows )
+void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows )
 {
     // A light type feature bits
     Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
@@ -161,12 +161,12 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
 
     if( clip ) {
         commands.uploadConstantBuffer( m_clipPlanesCBuffer, frame.internBuffer( clip, sizeof( RenderScene::CBuffer::ClipPlanes ) ), sizeof( RenderScene::CBuffer::ClipPlanes ) );
-        clipper->bindConstantBuffer( m_clipPlanesCBuffer, RenderState::ClippingPlanes );
+        clipper->bindConstantBuffer( m_clipPlanesCBuffer, State::ClippingPlanes );
     }
 
     // Light state block
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( light.constantBuffer, RenderState::LightConstants );
+    state->bindConstantBuffer( light.constantBuffer, State::LightConstants );
     state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
     state->bindProgram( m_context.internShader( m_phongShader ) );
     state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
@@ -175,8 +175,8 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& 
 
     // Bind a rendered shadowmap
     if( shadows ) {
-        state->bindRenderedTexture( shadows, RenderState::Texture1, Renderer::RenderTarget::Depth );
-        state->bindConstantBuffer( m_shadows.cbuffer(), RenderState::ShadowConstants );
+        state->bindRenderedTexture( shadows, State::Texture1, Renderer::RenderTarget::Depth );
+        state->bindConstantBuffer( m_shadows.cbuffer(), State::ShadowConstants );
     }
 
     // Emit render operations

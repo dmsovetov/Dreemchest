@@ -24,24 +24,23 @@
 
  **************************************************************************/
 
-#include "Commands.h"
+#include "CommandBuffer.h"
 #include "RenderFrame.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Renderer {
+namespace Renderer
+{
 
-// ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
-
-// ** RenderCommandBuffer::RenderCommandBuffer
-RenderCommandBuffer::RenderCommandBuffer( RenderFrame& frame )
+// ** CommandBuffer::CommandBuffer
+CommandBuffer::CommandBuffer( RenderFrame& frame )
     : m_frame( frame )
     , m_renderTargetIndex( 0 )
 {
 }
 
-// ** RenderCommandBuffer::clear
-void RenderCommandBuffer::clear( const Rgba& clearColor, u8 clearMask )
+// ** CommandBuffer::clear
+void CommandBuffer::clear( const Rgba& clearColor, u8 clearMask )
 {
     OpCode opCode;
     opCode.type = OpCode::Clear;
@@ -54,8 +53,8 @@ void RenderCommandBuffer::clear( const Rgba& clearColor, u8 clearMask )
     m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::execute
-void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
+// ** CommandBuffer::execute
+void CommandBuffer::execute( const CommandBuffer& commands )
 {
     OpCode opCode;
     opCode.type = OpCode::Execute;
@@ -64,10 +63,10 @@ void RenderCommandBuffer::execute( const RenderCommandBuffer& commands )
     m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::renderToTarget
-RenderCommandBuffer& RenderCommandBuffer::renderToTarget( u8 index, const Rect& viewport )
+// ** CommandBuffer::renderToTarget
+CommandBuffer& CommandBuffer::renderToTarget( u8 index, const Rect& viewport )
 {
-    RenderCommandBuffer& commands = m_frame.createCommandBuffer();
+    CommandBuffer& commands = m_frame.createCommandBuffer();
 
     OpCode opCode;
     opCode.type = OpCode::RenderTarget;
@@ -83,8 +82,8 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget( u8 index, const Rect& 
     return commands;
 }
 
-// ** RenderCommandBuffer::acquireRenderTarget
-u8 RenderCommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
+// ** CommandBuffer::acquireRenderTarget
+u8 CommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
 {
     NIMBLE_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
 
@@ -100,8 +99,8 @@ u8 RenderCommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::Pi
     return opCode.intermediateRenderTarget.index;
 }
 
-// ** RenderCommandBuffer::releaseRenderTarget
-void RenderCommandBuffer::releaseRenderTarget( u8 index )
+// ** CommandBuffer::releaseRenderTarget
+void CommandBuffer::releaseRenderTarget( u8 index )
 {
     OpCode opCode;
     opCode.type = OpCode::ReleaseRenderTarget;
@@ -110,8 +109,8 @@ void RenderCommandBuffer::releaseRenderTarget( u8 index )
     m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::uploadConstantBuffer
-void RenderCommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
+// ** CommandBuffer::uploadConstantBuffer
+void CommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
 {
     OpCode opCode;
     opCode.type = OpCode::UploadConstantBuffer;
@@ -121,8 +120,8 @@ void RenderCommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 si
     m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::uploadVertexBuffer
-void RenderCommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size )
+// ** CommandBuffer::uploadVertexBuffer
+void CommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size )
 {
     OpCode opCode;
     opCode.type = OpCode::UploadVertexBuffer;
@@ -132,32 +131,32 @@ void RenderCommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size
     m_commands.push_back( opCode );
 }
 
-// ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack )
+// ** CommandBuffer::drawIndexed
+void CommandBuffer::drawIndexed( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack )
 {
     emitDrawCall( OpCode::DrawIndexed, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth );
 }
     
-// ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock )
+// ** CommandBuffer::drawIndexed
+void CommandBuffer::drawIndexed( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock )
 {
     emitDrawCall( OpCode::DrawIndexed, sorting, primitives, first, count, &stateBlock, 1 );
 }
 
-// ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack )
+// ** CommandBuffer::drawPrimitives
+void CommandBuffer::drawPrimitives( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack )
 {
     emitDrawCall( OpCode::DrawPrimitives, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth );
 }
     
-// ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock )
+// ** CommandBuffer::drawPrimitives
+void CommandBuffer::drawPrimitives( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock )
 {
     emitDrawCall( OpCode::DrawPrimitives, sorting, primitives, first, count, &stateBlock, 1 );
 }
     
-// ** RenderCommandBuffer::emitDrawCall
-void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock** states, s32 stateCount )
+// ** CommandBuffer::emitDrawCall
+void CommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount )
 {
     OpCode opCode;
     opCode.type                 = type;
@@ -167,7 +166,7 @@ void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, Renderer
     opCode.drawCall.count       = count;
     
     memset( opCode.drawCall.states, 0, sizeof( opCode.drawCall.states ) );
-    memcpy( opCode.drawCall.states, states, sizeof( RenderStateBlock* ) * stateCount );
+    memcpy( opCode.drawCall.states, states, sizeof( StateBlock* ) * stateCount );
     
     m_commands.push_back( opCode );
 }

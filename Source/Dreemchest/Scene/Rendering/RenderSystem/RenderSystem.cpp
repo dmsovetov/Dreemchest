@@ -39,13 +39,13 @@ RenderSystemBase::RenderSystemBase( RenderingContext& context, RenderScene& rend
 }
 
 // ** RenderSystemBase::render
-void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands )
+void RenderSystemBase::render( RenderFrame& frame, CommandBuffer& commands )
 {
     // Get all cameras eligible for rendering by this system
     const Ecs::EntitySet& cameras = m_cameras->entities();
 
     // Get a state stack
-    RenderStateStack& stateStack = frame.stateStack();
+    StateStack& stateStack = frame.stateStack();
 
     // Process each camera
     for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
@@ -62,12 +62,12 @@ void RenderSystemBase::render( RenderFrame& frame, RenderCommandBuffer& commands
         const Transform& transform = *entity.get<Transform>();
 
         // Create a command buffer to render this camera
-        RenderCommandBuffer& cameraCommands = commands.renderToTarget( 0, viewport.denormalize( camera.ndc() ) );
+        CommandBuffer& cameraCommands = commands.renderToTarget( 0, viewport.denormalize( camera.ndc() ) );
 
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         StateScope pass = stateStack.newScope();
-        pass->bindConstantBuffer( cameraNode.constantBuffer, RenderState::PassConstants );
+        pass->bindConstantBuffer( cameraNode.constantBuffer, State::PassConstants );
 
         // Emit render operations for this camera
         emitRenderOperations( frame, cameraCommands, stateStack, entity, camera, transform );

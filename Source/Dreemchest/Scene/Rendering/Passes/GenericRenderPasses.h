@@ -42,7 +42,7 @@ namespace Scene {
                                 AmbientPass( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits operations to render an ambient lit scene.
-        void                    render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack );
+        void                    render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack );
 
     private:
 
@@ -57,7 +57,7 @@ namespace Scene {
                                 ShadowPass( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to output a depth to a texture.
-        u8                      render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
+        u8                      render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
 
         //! Returns a constant buffer that is used for shadow parameters.
         RenderId                cbuffer( void ) const;

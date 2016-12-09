@@ -40,7 +40,7 @@ class RendererInitialization : public ApplicationDelegate
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800 / 4, 600 / 4 );
+        Window* window = Window::create( 800, 600 );
 
         // Create a rendering view.
         RenderView* view   = Hal::createOpenGLView( window->handle() );
@@ -56,30 +56,10 @@ class RendererInitialization : public ApplicationDelegate
             1.0f, -1.0f, 0.0f,
             0.0f,  1.0f, 0.0f,
         };
-        //static f32 vertices[] = {
-        //    0, 0, 0.0f,
-        //    (f32)window->width(), 0, 0.0f,
-        //    0.0f, (f32)window->height(), 0.0f,
-        //};
         static u16 indices[] = {
             0, 1, 2
         };
-        //static Scene::RenderScene::CBuffer::Instance instance = {
-        //    Matrix4()
-        //};
-        //static Scene::RenderScene::CBuffer::View cview = {
-        //    Matrix4::ortho(0, window->width(), 0, window->height(), -9999, 9999),
-        //    -9999, 9999, Vec3::zero()
-        //};
-        
-        // Create resources
-        //m_shader                    = m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader");
-        //m_vertexBuffer              = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        //m_wsVertexBuffer            = m_renderingContext->requestVertexBuffer(wsVertices, sizeof(wsVertices));
-        //m_indexBuffer               = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
-        //m_instanceConstantBuffer    = m_renderingContext->requestConstantBuffer(&instance, sizeof(instance), Scene::RenderScene::CBuffer::Instance::Layout);
-        //m_passConstantBuffer        = m_renderingContext->requestConstantBuffer(&cview, sizeof(cview), Scene::RenderScene::CBuffer::View::Layout);
-        
+
         // Request all required resources from a rendering context
         Renderer::RenderId shader       = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
         Renderer::RenderId inputLayout  = m_renderingContext->requestInputLayout(0);
@@ -100,7 +80,7 @@ class RendererInitialization : public ApplicationDelegate
     virtual void handleWindowUpdate( const Window::Update& e )
     {
         // Get an entry point command buffer
-        Renderer::RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        Renderer::CommandBuffer& commands = m_renderFrame.entryPoint();
 
         // Now fill a command buffer with required commands
         
@@ -119,7 +99,7 @@ class RendererInitialization : public ApplicationDelegate
     HalPtr                          m_hal;              //!< Rendering HAL.
     Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
     Renderer::RvmPtr                m_rvm;              //!< Rendering virtual machine processes a list of commands and performs rendering.
-    Renderer::RenderStateBlock      m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
+    Renderer::StateBlock      m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
     Renderer::RenderFrame           m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
 };
 

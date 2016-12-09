@@ -75,13 +75,13 @@ namespace Renderer {
     //! Render frame unique pointer type.
     typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
     
-    class RenderStateBlock;
-    class RenderState;
+    struct State;
+    class StateBlock;
     class VertexFormat;
     class ConstantBufferLayout;
     
     //! Render command buffer unique pointer type.
-    typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
+    typedef AutoPtr<class CommandBuffer> CommandBufferUPtr;
 
     //! Hardware rendering API.
     enum RenderingHal {

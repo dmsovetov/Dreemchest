@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Rvm.h"
-#include "Commands.h"
+#include "CommandBuffer.h"
 #include "RenderFrame.h"
 #include "Ubershader.h"
 #include "RenderingContext.h"
@@ -146,17 +146,17 @@ Rvm::Rvm( RenderingContextWPtr context )
     memset( m_stateSwitches, 0, sizeof m_stateSwitches );
 
     // Setup render state switchers
-    m_stateSwitches[RenderState::AlphaTest]         = &Rvm::switchAlphaTest;
-    m_stateSwitches[RenderState::DepthState]        = &Rvm::switchDepthState;
-    m_stateSwitches[RenderState::Blending]          = &Rvm::switchBlending;
-    m_stateSwitches[RenderState::Shader]            = &Rvm::switchShader;
-    m_stateSwitches[RenderState::ConstantBuffer]    = &Rvm::switchConstantBuffer;
-    m_stateSwitches[RenderState::VertexBuffer]      = &Rvm::switchVertexBuffer;
-    m_stateSwitches[RenderState::IndexBuffer]       = &Rvm::switchIndexBuffer;
-    m_stateSwitches[RenderState::InputLayout]       = &Rvm::switchInputLayout;
-    m_stateSwitches[RenderState::Texture]           = &Rvm::switchTexture;
-    m_stateSwitches[RenderState::CullFace]          = &Rvm::switchCullFace;
-    m_stateSwitches[RenderState::PolygonOffset]     = &Rvm::switchPolygonOffset;
+    m_stateSwitches[State::AlphaTest]         = &Rvm::switchAlphaTest;
+    m_stateSwitches[State::DepthState]        = &Rvm::switchDepthState;
+    m_stateSwitches[State::Blending]          = &Rvm::switchBlending;
+    m_stateSwitches[State::Shader]            = &Rvm::switchShader;
+    m_stateSwitches[State::ConstantBuffer]    = &Rvm::switchConstantBuffer;
+    m_stateSwitches[State::VertexBuffer]      = &Rvm::switchVertexBuffer;
+    m_stateSwitches[State::IndexBuffer]       = &Rvm::switchIndexBuffer;
+    m_stateSwitches[State::InputLayout]       = &Rvm::switchInputLayout;
+    m_stateSwitches[State::Texture]           = &Rvm::switchTexture;
+    m_stateSwitches[State::CullFace]          = &Rvm::switchCullFace;
+    m_stateSwitches[State::PolygonOffset]     = &Rvm::switchPolygonOffset;
 }
 
 // ** Rvm::create
@@ -182,7 +182,7 @@ void Rvm::display( RenderFrame& frame )
 }
 
 // ** Rvm::renderToTarget
-void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const RenderCommandBuffer& commands )
+void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands )
 {
     // Push a render target state
     if( renderTarget )
@@ -219,7 +219,7 @@ void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* 
 }
 
 // ** Rvm::execute
-void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands )
+void Rvm::execute( const RenderFrame& frame, const CommandBuffer& commands )
 {
     // Push a new frame to an intermediate target stack
     m_intermediateTargets->pushFrame();
@@ -228,41 +228,41 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
     for( s32 i = 0, n = commands.size(); i < n; i++ )
     {
         // Get a render operation at specified index
-        const RenderCommandBuffer::OpCode& opCode = commands.opCodeAt( i );
+        const CommandBuffer::OpCode& opCode = commands.opCodeAt( i );
 
         // Perform a draw call
         switch( opCode.type ) {
-        case RenderCommandBuffer::OpCode::Clear:                clear( opCode.clear.color, opCode.clear.depth, opCode.clear.stencil, opCode.clear.mask );
-                                                                break;
-        case RenderCommandBuffer::OpCode::Execute:              execute( frame, *opCode.execute.commands );
-                                                                break;
-        case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
-                                                                break;
-        case RenderCommandBuffer::OpCode::UploadVertexBuffer:   uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
-                                                                break;
-        case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
-                                                                break;
-        case RenderCommandBuffer::OpCode::AcquireRenderTarget:  m_intermediateTargets->acquire( opCode.intermediateRenderTarget.index, opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format );
-                                                                break;
-        case RenderCommandBuffer::OpCode::ReleaseRenderTarget:  m_intermediateTargets->release( opCode.intermediateRenderTarget.index );
-                                                                break;
-        case RenderCommandBuffer::OpCode::DrawIndexed:          {
-                                                                    // Apply rendering states from a stack
-                                                                    applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+        case CommandBuffer::OpCode::Clear:                  clear( opCode.clear.color, opCode.clear.depth, opCode.clear.stencil, opCode.clear.mask );
+                                                            break;
+        case CommandBuffer::OpCode::Execute:                execute( frame, *opCode.execute.commands );
+                                                            break;
+        case CommandBuffer::OpCode::UploadConstantBuffer:   uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+                                                            break;
+        case CommandBuffer::OpCode::UploadVertexBuffer:     uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+                                                            break;
+        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
+                                                            break;
+        case CommandBuffer::OpCode::AcquireRenderTarget:    m_intermediateTargets->acquire( opCode.intermediateRenderTarget.index, opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format );
+                                                            break;
+        case CommandBuffer::OpCode::ReleaseRenderTarget:    m_intermediateTargets->release( opCode.intermediateRenderTarget.index );
+                                                            break;
+        case CommandBuffer::OpCode::DrawIndexed:            {
+                                                                // Apply rendering states from a stack
+                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
-                                                                    // Perform an actual draw call
-                                                                    m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
-                                                                }
-                                                                break;
-        case RenderCommandBuffer::OpCode::DrawPrimitives:       {
-                                                                    // Apply rendering states from a stack
-                                                                    applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+                                                                // Perform an actual draw call
+                                                                m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                            }
+                                                            break;
+        case CommandBuffer::OpCode::DrawPrimitives:         {
+                                                                // Apply rendering states from a stack
+                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
-                                                                    // Perform an actual draw call
-                                                                    m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
-                                                                }
-                                                                break;
-        default:                                                NIMBLE_NOT_IMPLEMENTED;
+                                                                // Perform an actual draw call
+                                                                m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                            }
+                                                            break;
+        default:                                            NIMBLE_NOT_IMPLEMENTED;
         }
     }
 
@@ -319,7 +319,7 @@ void Rvm::uploadVertexBuffer( u32 id, const void* data, s32 size )
 }
 
 // ** Rvm::applyStates
-void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const * states, s32 count )
+void Rvm::applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count )
 {
     u64 userFeatures = 0;
     u64 userFeaturesMask = ~0;
@@ -334,7 +334,7 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
     for( s32 i = 0; i < count; i++ )
     {
         // Get a state block at specified index
-        const RenderStateBlock* block = states[i];
+        const StateBlock* block = states[i];
 
         // No more state blocks in a stack - break
         if( block == NULL )
@@ -365,7 +365,7 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
             }
 
             // Get a render state at specified index
-            const RenderState& state = block->state( j );
+            const State& state = block->state( j );
 
             // Update an active state mask
             activeStateMask = activeStateMask | stateBit;
@@ -396,31 +396,31 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
 }
 
 // ** Rvm::switchAlphaTest
-void Rvm::switchAlphaTest( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchAlphaTest( const RenderFrame& frame, const State& state )
 {
     m_hal->setAlphaTest( static_cast<Renderer::Compare>( state.compareFunction ), state.data.alphaReference / 255.0f );
 }
 
 // ** Rvm::switchDepthState
-void Rvm::switchDepthState( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchDepthState( const RenderFrame& frame, const State& state )
 {
     m_hal->setDepthTest( state.data.depthWrite, static_cast<Renderer::Compare>( state.compareFunction ) );
 }
 
 // ** Rvm::switchBlending
-void Rvm::switchBlending( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchBlending( const RenderFrame& frame, const State& state )
 {
     m_hal->setBlendFactors( static_cast<Renderer::BlendFactor>( state.data.blend >> 4 ), static_cast<Renderer::BlendFactor>( state.data.blend & 0xF ) );
 }
 
 // ** Rvm::switchShader
-void Rvm::switchShader( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchShader( const RenderFrame& frame, const State& state )
 {
     m_activeShader.shader = m_context->shader( state.resourceId );
 }
 
 // ** Rvm::switchConstantBuffer
-void Rvm::switchConstantBuffer( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchConstantBuffer( const RenderFrame& frame, const State& state )
 {
     const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.resourceId );
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
@@ -433,21 +433,21 @@ void Rvm::switchConstantBuffer( const RenderFrame& frame, const RenderState& sta
 }
 
 // ** Rvm::switchVertexBuffer
-void Rvm::switchVertexBuffer( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchVertexBuffer( const RenderFrame& frame, const State& state )
 {
     const Renderer::VertexBufferPtr& vertexBuffer = m_context->vertexBuffer( state.resourceId );
     m_hal->setVertexBuffer( vertexBuffer );
 }
 
 // ** Rvm::switchIndexBuffer
-void Rvm::switchIndexBuffer( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchIndexBuffer( const RenderFrame& frame, const State& state )
 {
     const Renderer::IndexBufferPtr& indexBuffer = m_context->indexBuffer( state.resourceId );
     m_hal->setIndexBuffer( indexBuffer );
 }
 
 // ** Rvm::switchInputLayout
-void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchInputLayout( const RenderFrame& frame, const State& state )
 {
     // Bind an input layout
     const Renderer::InputLayoutPtr& inputLayout = m_context->inputLayout( state.resourceId );
@@ -458,7 +458,7 @@ void Rvm::switchInputLayout( const RenderFrame& frame, const RenderState& state 
 }
 
 // ** Rvm::switchTexture
-void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchTexture( const RenderFrame& frame, const State& state )
 {
     // A single u64 bit constant value
     static const u64 bit = 1;
@@ -488,13 +488,13 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
 }
 
 // ** Rvm::switchCullFace
-void Rvm::switchCullFace( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchCullFace( const RenderFrame& frame, const State& state )
 {
     m_hal->setCulling( static_cast<Renderer::TriangleFace>( state.cullFace ) );
 }
 
 // ** Rvm::switchPolygonOffset
-void Rvm::switchPolygonOffset( const RenderFrame& frame, const RenderState& state )
+void Rvm::switchPolygonOffset( const RenderFrame& frame, const State& state )
 {
     m_hal->setPolygonOffset( state.polygonOffset.factor / 128.0f, state.polygonOffset.units / 128.0f );
 }

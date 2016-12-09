@@ -185,11 +185,11 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
     node->constantBuffer    = m_context->requestConstantBuffer( &node->data, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
 
     // Now setup a material state block
-    node->states.bindConstantBuffer( node->constantBuffer, RenderState::MaterialConstants );
+    node->states.bindConstantBuffer( node->constantBuffer, State::MaterialConstants );
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
         RenderId id = requestTexture( asset->texture( static_cast<Material::Layer>( i ) ) );
         if( id ) {
-            node->states.bindTexture( id, static_cast<RenderState::TextureSampler>( RenderState::Texture0 + i ) );
+            node->states.bindTexture( id, static_cast<State::TextureSampler>( State::Texture0 + i ) );
         }
     }
 

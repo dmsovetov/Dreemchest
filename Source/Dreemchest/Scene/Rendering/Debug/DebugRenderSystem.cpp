@@ -42,7 +42,7 @@ DebugRenderSystem::DebugRenderSystem( RenderingContext& context, RenderScene& re
 }
 
 // ** DebugRenderSystem::emitRenderOperations
-void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer )
+void DebugRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer )
 {
     // Push a shader sprite rendering state
     StateScope state = stateStack.newScope();

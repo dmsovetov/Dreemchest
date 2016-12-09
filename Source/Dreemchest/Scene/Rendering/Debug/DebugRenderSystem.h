@@ -43,7 +43,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations for all objects that reside in scene.
-        virtual void                    emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer ) NIMBLE_OVERRIDE;
+        virtual void                    emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const DebugRenderer& debugRenderer ) NIMBLE_OVERRIDE;
 
     private:
 

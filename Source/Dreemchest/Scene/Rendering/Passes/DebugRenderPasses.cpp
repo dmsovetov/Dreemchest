@@ -39,7 +39,7 @@ DebugStaticMeshPass::DebugStaticMeshPass( RenderingContext& context, RenderScene
 }
 
 // ** DebugStaticMeshPass::emitRenderOperations
-void DebugStaticMeshPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform )
+void DebugStaticMeshPass::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform )
 {
     emitWireBounds( frame, commands, stateStack, staticMesh.worldSpaceBounds() );
 }
@@ -53,7 +53,7 @@ DebugLightPass::DebugLightPass( RenderingContext& context, RenderScene& renderSc
 }
 
 // ** DebugLightPass::emitRenderOperations
-void DebugLightPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Light& light, const Transform& transform )
+void DebugLightPass::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Light& light, const Transform& transform )
 {
     // Calculate a light's local space bounding box
     f32    range  = light.range();
@@ -77,7 +77,7 @@ DebugCameraPass::DebugCameraPass( RenderingContext& context, RenderScene& render
 }
 
 // ** DebugCameraPass::emitRenderOperations
-void DebugCameraPass::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void DebugCameraPass::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     // By default a frustum aspect is 1.0f
     f32 aspect = 1.0f;
@@ -107,7 +107,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
 }
 
 // ** DebugRenderTarget::render
-void DebugRenderTarget::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTarget::Attachment attachment, s32 size, s32 x, s32 y )
+void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTarget::Attachment attachment, s32 size, s32 x, s32 y )
 {
     // Begin a render pass
     begin( frame, commands, stateStack );
@@ -119,8 +119,8 @@ void DebugRenderTarget::render( RenderFrame& frame, RenderCommandBuffer& command
     // Push a rendering state
     StateScope pass = stateStack.newScope();
     pass->bindProgram( m_context.internShader( m_shader ) );
-    pass->bindRenderedTexture( slot, RenderState::Texture0, attachment );
-    pass->bindConstantBuffer( m_cbuffer, RenderState::ConstantBufferType::PassConstants );
+    pass->bindRenderedTexture( slot, State::Texture0, attachment );
+    pass->bindConstantBuffer( m_cbuffer, State::ConstantBufferType::PassConstants );
     pass->setCullFace( Renderer::TriangleFaceBack );
 
     // Emit a single rectangle
@@ -142,7 +142,7 @@ DebugCascadedShadows::DebugCascadedShadows( RenderingContext& context, RenderSce
 }
 
 // ** DebugCascadedShadows::render
-void DebugCascadedShadows::render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] )
+void DebugCascadedShadows::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] )
 {
     // Default split colors
     static Rgba kSplitColors[] = {
@@ -172,7 +172,7 @@ void DebugCascadedShadows::render( RenderFrame& frame, RenderCommandBuffer& comm
 }
 
 // ** DebugCascadedShadows::emitRenderOperations
-void DebugCascadedShadows::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+void DebugCascadedShadows::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
 {
     if( camera.projection() != Projection::Perspective ) {
         return;
