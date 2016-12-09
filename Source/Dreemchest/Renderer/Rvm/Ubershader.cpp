@@ -25,10 +25,11 @@
  **************************************************************************/
 
 #include "Ubershader.h"
+#include "../Hal.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
 // ** Ubershader::Ubershader
 Ubershader::Ubershader( void )
@@ -138,7 +139,7 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
     }
 
     // Compile the shader
-    Renderer::ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
+    ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
     NIMBLE_BREAK_IF( !compiled.valid() );
 
     m_permutations[features] = compiled;
@@ -146,6 +147,6 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
     return m_permutations[features];
 }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST

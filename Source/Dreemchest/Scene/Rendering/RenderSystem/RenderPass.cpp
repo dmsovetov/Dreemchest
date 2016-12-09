@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** RenderPassBase::RenderPassBase
-RenderPassBase::RenderPassBase( RenderingContext& context, RenderScene& renderScene )
+RenderPassBase::RenderPassBase( Renderer::RenderingContext& context, RenderScene& renderScene )
     : m_context( context )
     , m_renderScene( renderScene )
 {

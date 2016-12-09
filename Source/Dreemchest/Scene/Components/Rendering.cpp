@@ -33,7 +33,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Scene
+{
 
 // -------------------------------------------------------------- SpriteRenderer -------------------------------------------------------------- //
 
@@ -299,7 +300,7 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 // ------------------------------------------- PointCloud ----------------------------------------- //
 
 // ** PointCloud::PointCloud
-PointCloud::PointCloud( s32 vertexCount, const VertexFormat& format )
+PointCloud::PointCloud( s32 vertexCount, const Renderer::VertexFormat& format )
     : m_format( format )
     , m_vertices( NULL )
     , m_vertexCount( vertexCount )
@@ -342,13 +343,13 @@ void PointCloud::setMaterial( const MaterialHandle& value )
 }
 
 // ** PointCloud::vertexFormat
-const VertexFormat& PointCloud::vertexFormat( void ) const
+const Renderer::VertexFormat& PointCloud::vertexFormat( void ) const
 {
     return m_format;
 }
 
 // ** PointCloud::setVertexFormat
-void PointCloud::setVertexFormat( const VertexFormat& value )
+void PointCloud::setVertexFormat( const Renderer::VertexFormat& value )
 {
     m_format = value;
 }
@@ -374,7 +375,8 @@ void* PointCloud::vertices( void )
 // ------------------------------------------- Particles ----------------------------------------- //
 
 // ** Particles::Particles
-Particles::Particles( const Fx::ParticleSystemPtr& particleSystem, const Fx::ParticleSystemInstancePtr& instance ) : m_particleSystem( particleSystem ), m_instance( instance )
+Particles::Particles( const Fx::ParticleSystemPtr& particleSystem, const Fx::ParticleSystemInstancePtr& instance )
+    : m_particleSystem( particleSystem ), m_instance( instance )
 {
 
 }
@@ -534,11 +536,12 @@ Matrix4 Camera::calculateProjectionMatrix( const Camera& camera, const Viewport&
     f32  width  = rect.width();
     f32  height = rect.height();
 
-    switch( camera.projection() ) {
-    case Projection::Perspective:    return Matrix4::perspective( camera.fov(), viewport.aspect(), camera.near(), camera.far() );
-    case Projection::Ortho:            return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
-    case Projection::OrthoCenter:    return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
-    default:                        NIMBLE_NOT_IMPLEMENTED;
+    switch( camera.projection() )
+    {
+        case Projection::Perspective:   return Matrix4::perspective( camera.fov(), viewport.aspect(), camera.near(), camera.far() );
+        case Projection::Ortho:         return Matrix4::ortho( 0, width, 0, height, -10000, 10000 );
+        case Projection::OrthoCenter:   return Matrix4::ortho( -width * 0.5f, width * 0.5f, height * 0.5f, -height * 0.5f, -10000, 10000 );
+        default:                        NIMBLE_NOT_IMPLEMENTED;
     }
 
     return Matrix4();
@@ -649,7 +652,8 @@ Viewport::Viewport( ViewportWPtr viewport )
 
 Viewport::~Viewport( void )
 {
-    if( !m_viewport.valid() ) {
+    if( !m_viewport.valid() )
+    {
         return;
     }
 

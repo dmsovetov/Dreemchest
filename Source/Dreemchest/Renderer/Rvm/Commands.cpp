@@ -29,7 +29,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
 // ---------------------------------------------------------------------- RenderCommandBuffer --------------------------------------------------------------------- //
 
@@ -172,6 +172,6 @@ void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, Renderer
     m_commands.push_back( opCode );
 }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST

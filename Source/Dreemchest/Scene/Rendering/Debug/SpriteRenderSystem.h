@@ -58,12 +58,12 @@ namespace Scene {
         //! A maximum number of sprites that can be rendered in a single batch
         enum { MaxSpritesInBatch = 1000 };
 
-        UbershaderPtr                   m_spriteShader;        //!< A default shader that is used for sprite rendering.
-        VertexFormat                    m_vertexFormat;        //!< A 2D vertex format.
-        RenderResource                    m_vertexBuffer;        //!< An intermediate vertex buffer used for batching.
-        RenderResource                    m_indexBuffer;        //!< A static index buffer with pre-allocated set of indices.
-        RenderResource                    m_inputLayout;        //!< An input layout constructed from a vertex format.
-        u16*                            m_indices;            //!< An allocated static index buffer.
+        UbershaderPtr                   m_spriteShader;     //!< A default shader that is used for sprite rendering.
+        VertexFormat                    m_vertexFormat;     //!< A 2D vertex format.
+        RenderId                        m_vertexBuffer;     //!< An intermediate vertex buffer used for batching.
+        RenderId                        m_indexBuffer;      //!< A static index buffer with pre-allocated set of indices.
+        RenderId                        m_inputLayout;      //!< An input layout constructed from a vertex format.
+        u16*                            m_indices;          //!< An allocated static index buffer.
     };
 
 } // namespace Scene

@@ -60,12 +60,12 @@ namespace Scene {
         u8                      render( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
 
         //! Returns a constant buffer that is used for shadow parameters.
-        RenderResource          cbuffer( void ) const;
+        RenderId                cbuffer( void ) const;
 
     private:
 
         UbershaderPtr           m_shader;   //!< A shadowmap shader instance.
-        RenderResource          m_cbuffer;  //!< A shadow parameters constant buffer.
+        RenderId                m_cbuffer;  //!< A shadow parameters constant buffer.
     };
 
 } // namespace Scene

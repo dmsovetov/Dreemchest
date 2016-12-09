@@ -24,18 +24,19 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rvm_H__
-#define __DC_Scene_Rvm_H__
+#ifndef __DC_Renderer_Rvm_H__
+#define __DC_Renderer_Rvm_H__
 
-#include "../RenderScene.h"
 #include "Ubershader.h"
+#include "RenderState.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
-
+namespace Renderer
+{
     //! Rendering virtual machine.
-    class Rvm : public RefCounted {
+    class Rvm : public RefCounted
+    {
     public:
 
         //! Displays a frame captured by a render scene.
@@ -112,11 +113,12 @@ namespace Scene {
         typedef void ( Rvm::*StateSwitch )( const RenderFrame&, const RenderState& );
 
         //! A helper structure to store an active shader state.
-        struct ActiveShader {
+        struct ActiveShader
+        {
             UbershaderWPtr          shader;                 //!< A shader instance that should be used.
             UbershaderWPtr          activeShader;           //!< A shader instance that is now bound.
             Ubershader::Bitmask     features;               //!< An active permutation.
-            Renderer::ShaderPtr     permutation;            //!< A shader permutation instance.
+            ShaderPtr               permutation;            //!< A shader permutation instance.
 
                                     //! Constructs an ActiveShader instance.
                                     ActiveShader( void )
@@ -136,8 +138,8 @@ namespace Scene {
         AutoPtr<IntermediateTargetStack>    m_intermediateTargets;                          //!< An intermediate render target stack.
     };
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rvm_H__    */
+#endif    /*    !__DC_Renderer_Rvm_H__    */

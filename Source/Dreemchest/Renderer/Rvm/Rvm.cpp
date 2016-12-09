@@ -29,11 +29,11 @@
 #include "RenderFrame.h"
 #include "Ubershader.h"
 #include "RenderingContext.h"
-#include "../../Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer
+{
 
 // -------------------------------------------------------------------- Rvm::IntermediateTargetStack ------------------------------------------------------------------- //
 
@@ -41,7 +41,8 @@ namespace Scene {
     Intermediate target stack is used to convert local indices that are
     stored in commands to a global index of an intermediate render target.
 */
-class Rvm::IntermediateTargetStack {
+class Rvm::IntermediateTargetStack
+{
 public:
 
     //! A maximum number of intermediate render targets that can be hold by a single stack frame.
@@ -74,8 +75,8 @@ public:
 private:
 
     RenderingContextWPtr        m_context;                      //!< A parent rendering context.
-    RenderResource*             m_stackFrame;                   //!< An active render target stack frame.
-    RenderResource              m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+    RenderId*                   m_stackFrame;                   //!< An active render target stack frame.
+    RenderId                    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
 };
 
 // ** Rvm::IntermediateTargetStack::IntermediateTargetStack
@@ -99,8 +100,10 @@ void Rvm::IntermediateTargetStack::popFrame( void )
     NIMBLE_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
 
     // Ensure that all render targets were released
-    for( s32 i = 0; i < StackFrameSize; i++ ) {
-        if( m_stackFrame[i] ) {
+    for( s32 i = 0; i < StackFrameSize; i++ )
+    {
+        if( m_stackFrame[i] )
+        {
             LogWarning( "rvm", "%s", "an intermediate render target was not released before popping a stack frame\n" );
         }
     }
@@ -110,7 +113,7 @@ void Rvm::IntermediateTargetStack::popFrame( void )
 }
 
 // ** Rvm::IntermediateTargetStack::get
-Renderer::RenderTargetWPtr Rvm::IntermediateTargetStack::get( u8 index ) const
+RenderTargetWPtr Rvm::IntermediateTargetStack::get( u8 index ) const
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     return m_context->intermediateRenderTarget( m_stackFrame[index - 1] );
@@ -182,11 +185,14 @@ void Rvm::display( RenderFrame& frame )
 void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const RenderCommandBuffer& commands )
 {
     // Push a render target state
-    if( renderTarget ) {
+    if( renderTarget )
+    {
         const Renderer::RenderTargetWPtr rt = m_intermediateTargets->get( renderTarget );
         m_hal->setRenderTarget( rt );
         m_hal->setViewport( viewport[0] * rt->width(), viewport[1] * rt->height(), viewport[2] * rt->width(), viewport[3] * rt->height() );
-    } else {
+    }
+    else
+    {
         m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
     }
 
@@ -197,14 +203,16 @@ void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* 
     execute( frame, commands );
 
     // Pop a render target state
-    if( renderTarget ) {
+    if( renderTarget )
+    {
         m_hal->setRenderTarget( NULL );
     }
 
     // Pop a viewport
     m_viewportStack.pop();
 
-    if( m_viewportStack.size() ) {
+    if( m_viewportStack.size() )
+    {
         const f32* prev = m_viewportStack.top();
         m_hal->setViewport( prev[0], prev[1], prev[2], prev[3] );
     }
@@ -217,7 +225,8 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
     m_intermediateTargets->pushFrame();
 
     // Execute all commands inside a buffer
-    for( s32 i = 0, n = commands.size(); i < n; i++ ) {
+    for( s32 i = 0, n = commands.size(); i < n; i++ )
+    {
         // Get a render operation at specified index
         const RenderCommandBuffer::OpCode& opCode = commands.opCodeAt( i );
 
@@ -229,7 +238,7 @@ void Rvm::execute( const RenderFrame& frame, const RenderCommandBuffer& commands
                                                                 break;
         case RenderCommandBuffer::OpCode::UploadConstantBuffer: uploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
-        case RenderCommandBuffer::OpCode::UploadVertexBuffer:    uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+        case RenderCommandBuffer::OpCode::UploadVertexBuffer:   uploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
                                                                 break;
         case RenderCommandBuffer::OpCode::RenderTarget:         renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                                 break;
@@ -322,12 +331,14 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
 
-    for( s32 i = 0; i < count; i++ ) {
+    for( s32 i = 0; i < count; i++ )
+    {
         // Get a state block at specified index
         const RenderStateBlock* block = states[i];
 
         // No more state blocks in a stack - break
-        if( block == NULL ) {
+        if( block == NULL )
+        {
             break;
         }
 
@@ -336,17 +347,20 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
         userFeaturesMask  = userFeaturesMask & block->featureMask();
 
         // Skip redundant state blocks by testing a block bitmask against an active state mask
-        if( (activeStateMask ^ block->mask()) == 0 ) {
+        if( (activeStateMask ^ block->mask()) == 0 )
+        {
             continue;
         }
 
         // Apply all states in a block
-        for( s32 j = 0, n = block->stateCount(); j < n; j++ ) {
+        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
+        {
             // Get a render state bit
             u32 stateBit = block->stateBit( j );
 
             // Skip redundate state blocks by testing a state bitmask agains an active state mask
-            if( activeStateMask & stateBit ) {
+            if( activeStateMask & stateBit )
+            {
                 continue;
             }
 
@@ -370,7 +384,8 @@ void Rvm::applyStates( const RenderFrame& frame, const RenderStateBlock* const *
     Ubershader::Bitmask userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
     Ubershader::Bitmask features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
 
-    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features ) {
+    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features )
+    {
         m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
         m_activeShader.features     = features;
         m_activeShader.activeShader = m_activeShader.shader;
@@ -455,10 +470,13 @@ void Rvm::switchTexture( const RenderFrame& frame, const RenderState& state )
     u8 samplerIndex = state.data.index & 0xF;
 
     // Bind a texture to sampler
-    if( id >= 0 ) {
+    if( id >= 0 )
+    {
         const Renderer::TexturePtr& texture = m_context->texture( state.resourceId );
         m_hal->setTexture( state.data.index, texture.get() );
-    } else {
+    }
+    else
+    {
         NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
         Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTarget::Attachment>( state.data.index >> 4 ) );
         NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
@@ -481,6 +499,6 @@ void Rvm::switchPolygonOffset( const RenderFrame& frame, const RenderState& stat
     m_hal->setPolygonOffset( state.polygonOffset.factor / 128.0f, state.polygonOffset.units / 128.0f );
 }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST

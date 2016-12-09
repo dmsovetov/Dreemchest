@@ -41,6 +41,11 @@
 #include <Renderer/Renderer.h>
 #include <Renderer/Hal.h>
 #include <Renderer/Renderer2D.h>
+#include <Renderer/Rvm/VertexFormat.h>
+#include <Renderer/Rvm/RenderFrame.h>
+#include <Renderer/Rvm/RenderingContext.h>
+#include <Renderer/Rvm/Commands.h>
+#include <Renderer/Rvm/Ubershader.h>
 
 #include <Assets/Asset.h>
 #include <Assets/AssetHandle.h>
@@ -97,23 +102,13 @@ namespace Scene {
     class Material;
     class Terrain;
     class Prefab;
+    
+    using namespace Renderer;
 
-    dcDeclarePtrs( Ubershader )
     dcDeclareNamedPtrs( AbstractRenderCache, RenderCache )
-
-    //! A render resource handle type.
-    typedef u32 RenderResource;
-
-    //! Render frame unique pointer type.
-    typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
 
     //! Render system unique pointer type.
     typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
-
-    class RenderStateBlock;
-
-    //! Render command buffer unique pointer type.
-    typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
 
     class Transform;
     class StaticMesh;
@@ -136,216 +131,6 @@ namespace Scene {
 
     //! Terrain handle type.
     typedef Assets::DataHandle<class Terrain> TerrainHandle;
-
-    //! Renderable vertex format.
-    class VertexFormat {
-    public:
-
-        //! Available vertex attributes
-        enum Attribute {
-              Position  = BIT( 0 )  //!< Vertex position.
-            , Normal    = BIT( 1 )  //!< Vertex normal.
-            , Color     = BIT( 2 )  //!< Vertex 8-bit color.
-            , Uv0       = BIT( 3 )  //!< Texture #1 UV coordinates.
-            , Uv1       = BIT( 4 )  //!< Texture #2 UV coordinates.
-        };
-
-                                //! Constructs a VertexFormat instance.
-                                VertexFormat( u8 attributes );
-
-                                //! Converts a VertexFormat to u8 value.
-                                operator u8( void ) const;
-
-        //! Returns true if a specified attribute exists.
-        bool                    operator & ( Attribute attribute ) const;
-
-        //! Tests two vertex formats for an equality.
-        bool                    operator == ( const VertexFormat& other ) const;
-
-        //! Returns a vertex size.
-        s32                     vertexSize( void ) const;
-
-        //! Returns a vertex attribute value.
-        template<typename TValue>
-        TValue                  vertexAttribute( Attribute attribute, const void* vertices, s32 index ) const;
-
-        //! Sets a vertex attribute value.
-        template<typename TValue>
-        void                    setVertexAttribute( Attribute attribute, const TValue& value, void* vertices, s32 index ) const;
-
-        //! Returns a vertex attribute offset.
-        s32                     attributeOffset( Attribute attribute ) const;
-
-        //! Returns a vertex attribute size.
-        s32                     attributeSize( Attribute attribute ) const;
-
-        //! Returns a vertex offset.
-        s32                     vertexOffset( s32 index ) const;
-
-        //! Returns a vertex position size in bytes.
-        s32                     sizeOfPosition( void ) const;
-
-        //! Returns a vertex color size in bytes.
-        s32                     sizeOfColor( void ) const;
-
-        //! Returns a vertex normal size in bytes.
-        s32                     sizeOfNormal( void ) const;
-
-        //! Returns a vertex uv layer size in bytes.
-        s32                     sizeOfUv0( void ) const;
-
-        //! Returns a vertex uv layer size in bytes.
-        s32                     sizeOfUv1( void ) const;
-
-    private:
-
-        u8                      m_attributes;   //!< Vertex attribute mask.
-    };
-
-    // ** VertexFormat::VertexFormat
-    NIMBLE_INLINE VertexFormat::VertexFormat( u8 attributes )
-        : m_attributes( attributes | Position )
-    {
-    }
-
-    // ** VertexFormat::operator u8
-    NIMBLE_INLINE VertexFormat::operator u8( void ) const
-    {
-        return m_attributes;
-    }
-
-    // ** VertexFormat::operator &
-    NIMBLE_INLINE bool VertexFormat::operator & ( Attribute attribute ) const
-    {
-        return m_attributes & attribute ? true : false;
-    }
-
-    // ** VertexFormat::operator ==
-    NIMBLE_INLINE bool VertexFormat::operator == ( const VertexFormat& other ) const
-    {
-        return m_attributes == other.m_attributes;
-    }
-
-    // ** VertexFormat::vertexSize
-    NIMBLE_INLINE s32 VertexFormat::vertexSize( void ) const
-    {
-        return   sizeOfPosition()
-               + sizeOfNormal()
-               + sizeOfColor()
-               + sizeOfUv0()
-               + sizeOfUv1()
-               ;
-    }
-
-    // ** VertexFormat::attributeOffset
-    NIMBLE_INLINE s32 VertexFormat::attributeOffset( Attribute attribute ) const
-    {
-        NIMBLE_ABORT_IF( (m_attributes & attribute) == 0, "a vertex format does not contain a specified attribute" );
-
-        s32 offset = 0;
-
-        switch( attribute ) {
-        case Uv1:       offset += sizeOfUv0();
-        case Uv0:       offset += sizeOfColor();
-        case Color:     offset += sizeOfNormal();
-        case Normal:    offset += sizeOfPosition();
-        case Position:  break;
-        }
-
-        return offset;
-    }
-
-    // ** VertexFormat::attributeSize
-    NIMBLE_INLINE s32 VertexFormat::attributeSize( Attribute attribute ) const
-    {
-        switch( attribute ) {
-        case Position:  return sizeof( f32 ) * 3;
-        case Normal:    return sizeof( f32 ) * 3;
-        case Color:     return sizeof( u8  ) * 4;
-        case Uv0:       return sizeof( f32 ) * 2;
-        case Uv1:       return sizeof( f32 ) * 2;
-        }
-
-        return 0;
-    }
-
-    // ** VertexFormat::vertexOffset
-    NIMBLE_INLINE s32 VertexFormat::vertexOffset( s32 index ) const
-    {
-        return vertexSize() * index;
-    }
-
-    // ** VertexFormat::vertexAttribute
-    template<typename TValue>
-    TValue VertexFormat::vertexAttribute( Attribute attribute, const void* vertices, s32 index ) const
-    {
-        if( m_attributes & attribute ) {
-            NIMBLE_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
-            return *reinterpret_cast<const TValue*>( reinterpret_cast<const u8*>( vertices ) + vertexOffset( index ) + attributeOffset( attribute ) );
-        }
-
-        return TValue();
-    }
-
-    // ** VertexFormat::setVertexAttribute
-    template<typename TValue>
-    void VertexFormat::setVertexAttribute( Attribute attribute, const TValue& value, void* vertices, s32 index ) const
-    {
-        if( m_attributes & attribute ) {
-            NIMBLE_ABORT_IF( sizeof( TValue ) != attributeSize( attribute ), "vertex attribute size mismatch" );
-            *reinterpret_cast<TValue*>( reinterpret_cast<u8*>( vertices ) + vertexOffset( index ) + attributeOffset( attribute ) ) = value;
-        }
-    }
-
-    // ** VertexFormat::sizeOfPosition
-    NIMBLE_INLINE s32 VertexFormat::sizeOfPosition( void ) const
-    {
-        if( m_attributes & Position ) {
-            return attributeSize( Position );
-        }
-
-        return 0;
-    }
-
-    // ** VertexFormat::sizeOfColor
-    NIMBLE_INLINE s32 VertexFormat::sizeOfColor( void ) const
-    {
-        if( m_attributes & Color ) {
-            return attributeSize( Color );
-        }
-
-        return 0;
-    }
-
-    // ** VertexFormat::sizeOfNormal
-    NIMBLE_INLINE s32 VertexFormat::sizeOfNormal( void ) const
-    {
-        if( m_attributes & Normal ) {
-            return attributeSize( Normal );
-        }
-
-        return 0;
-    }
-
-    // ** VertexFormat::sizeOfUv0
-    NIMBLE_INLINE s32 VertexFormat::sizeOfUv0( void ) const
-    {
-        if( m_attributes & Uv0 ) {
-            return attributeSize( Uv0 );
-        }
-
-        return 0;
-    }
-
-    // ** VertexFormat::sizeOfUv1
-    NIMBLE_INLINE s32 VertexFormat::sizeOfUv1( void ) const
-    {
-        if( m_attributes & Uv1 ) {
-            return attributeSize( Uv1 );
-        }
-
-        return 0;
-    }
 
     //! Available rendering modes.
     NIMBLE_DECLARE_ENUM( RenderingMode, Opaque, Cutout, Translucent, Additive )
@@ -375,6 +160,7 @@ namespace Scene {
     typedef Ecs::EntityId            SceneObjectId;
 
     dcDeclarePtrs( Scene )
+    dcDeclarePtrs( RenderScene )
     dcDeclareNamedPtrs( AbstractViewport, Viewport )
     dcDeclarePtrs( WindowViewport )
     dcDeclarePtrs( Transform )
@@ -384,10 +170,6 @@ namespace Scene {
 
     dcDeclarePtrs( Physics2D )
     dcDeclarePtrs( RigidBody2D )
-
-    dcDeclarePtrs( RenderingContext )
-    dcDeclarePtrs( RenderScene )
-    dcDeclarePtrs( Rvm )
 
     dcDeclarePtrs( Vec3Binding )
 
@@ -733,8 +515,6 @@ DC_END_DREEMCHEST
     #include "Systems/CullingSystems.h"
     #include "Rendering/RenderScene.h"
     #include "Rendering/RenderCache.h"
-    #include "Rendering/Rvm/RenderingContext.h"
-    #include "Rendering/Rvm/Rvm.h"
     #include "Rendering/Debug/ForwardRenderSystem.h"
     #include "Rendering/Debug/SpriteRenderSystem.h"
     #include "Rendering/Debug/DebugRenderSystem.h"

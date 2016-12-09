@@ -24,14 +24,14 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_Rendering_Ubershader_H__
-#define __DC_Scene_Rendering_Ubershader_H__
+#ifndef __DC_Renderer_Ubershader_H__
+#define __DC_Renderer_Ubershader_H__
 
-#include "../RenderScene.h"
+#include "../Renderer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
     //! Ubershader stores a source code for shader and permutation cache.
     class Ubershader : public RefCounted {
@@ -93,8 +93,8 @@ namespace Scene {
         mutable Permutations        m_permutations;         //!< Compiled permutations are stored here.
     };
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_Rendering_Ubershader_H__    */
+#endif    /*    !__DC_Renderer_Rendering_Ubershader_H__    */

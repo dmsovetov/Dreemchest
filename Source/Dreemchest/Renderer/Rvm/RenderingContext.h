@@ -24,55 +24,56 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderingContext_H__
-#define __DC_Scene_RenderingContext_H__
+#ifndef __DC_Renderer_RenderingContext_H__
+#define __DC_Renderer_RenderingContext_H__
 
-#include "../RenderScene.h"
+#include "../Renderer.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
-
+namespace Renderer
+{
     //! Rendering context.
-    class RenderingContext : public RefCounted {
+    class RenderingContext : public RefCounted
+    {
     friend class Rvm;
     public:
 
         //! Returns a parent rendering HAL instance.
-        Renderer::HalWPtr                       hal( void ) const;
+        HalWPtr                                 hal( void ) const;
 
         //! Queues an input layout instance for creation and returns it's index.
-        RenderResource                          requestInputLayout( const VertexFormat& vertexFormat );
+        RenderId                                requestInputLayout( const VertexFormat& vertexFormat );
 
         //! Queues a vertex buffer instance for creation and returns it's index.
-        RenderResource                          requestVertexBuffer( const void* data, s32 size );
+        RenderId                                requestVertexBuffer( const void* data, s32 size );
 
         //! Queues an index buffer instance for creation and returns it's index.
-        RenderResource                          requestIndexBuffer( const void* data, s32 size );
+        RenderId                                requestIndexBuffer( const void* data, s32 size );
 
         //! Queues a constant buffer instance for creation and returns it's index.
-        RenderResource                          requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout );
+        RenderId                                requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout );
 
         //! Queues a texture instance for creation and returns it's index.
-        RenderResource                          requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format );
+        RenderId                                requestTexture( const void* data, s32 width, s32 height, PixelFormat format );
 
         //! Creates a shader from a file.
         UbershaderPtr                           createShader( const String& fileName ) const;
 
         //! Returns a vertex buffer by an index.
-        const Renderer::VertexBufferPtr&        vertexBuffer( RenderResource identifier ) const;
+        const VertexBufferPtr&                  vertexBuffer( RenderId identifier ) const;
 
         //! Returns an index buffer by an index.
-        const Renderer::IndexBufferPtr&         indexBuffer( RenderResource identifier ) const;
+        const IndexBufferPtr&                   indexBuffer( RenderId identifier ) const;
 
         //! Returns a constant buffer by an index.
-        const Renderer::ConstantBufferPtr&      constantBuffer( RenderResource identifier ) const;
+        const ConstantBufferPtr&                constantBuffer( RenderId identifier ) const;
 
         //! Returns an input layout by an index.
-        const Renderer::InputLayoutPtr&         inputLayout( RenderResource identifier ) const;
+        const InputLayoutPtr&                   inputLayout( RenderId identifier ) const;
 
         //! Returns a texture by an index.
-        const Renderer::TexturePtr&             texture( s32 identifier ) const;
+        const TexturePtr&                       texture( s32 identifier ) const;
        
         //! Interns a shader and returns it's integer identifier.
         s32                                     internShader( UbershaderPtr shader );
@@ -89,7 +90,7 @@ namespace Scene {
         struct ResourceConstructor;
 
                                                 //! Constructs a RenderingContext instance.
-                                                RenderingContext( Renderer::HalWPtr hal );
+                                                RenderingContext( HalWPtr hal );
 
         //! Constructs all resources before rendering a frame.
         void                                    constructResources( void );
@@ -110,20 +111,22 @@ namespace Scene {
         void                                    constructTexture( const ResourceConstructor& constructor );
 
         //! Acquires an intermediate render target.
-        RenderResource                          acquireRenderTarget( u16 width, u16 height, Renderer::PixelFormat format );
+        RenderId                                acquireRenderTarget( u16 width, u16 height, PixelFormat format );
 
         //! Releases an intermediate render target.
-        void                                    releaseRenderTarget( RenderResource id );
+        void                                    releaseRenderTarget( RenderId id );
 
         //! Returns an intermediate render target.
-        Renderer::RenderTargetWPtr              intermediateRenderTarget( RenderResource id ) const;
+        RenderTargetWPtr                        intermediateRenderTarget( RenderId id ) const;
 
     private:
 
         //! A resource item that should be created.
-        struct ResourceConstructor {
+        struct ResourceConstructor
+        {
             //! Resource type being constructed
-            enum Type {
+            enum Type
+            {
                   InputLayout       //!< An input layout will be constructed.
                 , VertexBuffer      //!< A vertex buffer will be constructed.
                 , IndexBuffer       //!< An index buffer will be constructed.
@@ -140,19 +143,24 @@ namespace Scene {
                                                 : type( type ) {}
 
             Type                            type;       //!< Resource constructor type.
-            RenderResource                  id;         //!< Handle to a resource being constructed.
-            union {
-                struct {
+            RenderId                        id;         //!< Handle to a resource being constructed.
+            
+            union
+            {
+                struct
+                {
                     u8                      format;     //!< Vertex format used by an input layout constructor.
                 } inputLayout;
 
-                struct {
+                struct
+                {
                     const void*             data;       //!< Data that should be uploaded to a buffer after construction.
                     s32                     size;       //!< A buffer size.
                     const void*             userData;   //!< Used by a constant buffer constructor.
                 } buffer;
 
-                struct {
+                struct
+                {
                     const void*             data;       //!< A texture data that should be uploaded after construction.
                     u16                     width;      //!< A texture width.
                     u16                     height;     //!< A texture height.
@@ -167,22 +175,23 @@ namespace Scene {
         //! Container type to store a list of resource constructors that should be run before rendering a frame.
         typedef List<ResourceConstructor>       ResourceConstructors;
 
-        Renderer::HalWPtr                       m_hal;                              //!< A rendering HAL to be used.
+        HalWPtr                                 m_hal;                              //!< A rendering HAL to be used.
         ResourceConstructors                    m_resourceConstructors;             //!< A list of resources to be constructed.
-        FixedArray<Renderer::VertexBufferPtr>   m_vertexBufferPool;                 //!< Allocated vertex buffers.
-        FixedArray<Renderer::IndexBufferPtr>    m_indexBufferPool;                  //!< Allocated index buffers.
-        FixedArray<Renderer::ConstantBufferPtr> m_constantBufferPool;               //!< Allocated constant buffers.
-        FixedArray<Renderer::InputLayoutPtr>    m_inputLayoutPool;                  //!< Allocated input layouts.
-        RenderResource                          m_inputLayouts[MaxInputLayouts];    //!< A lookup table for input layout types.
-        FixedArray<Renderer::TexturePtr>        m_texturePool;                      //!< Allocated textures.
+        FixedArray<VertexBufferPtr>             m_vertexBufferPool;                 //!< Allocated vertex buffers.
+        FixedArray<IndexBufferPtr>              m_indexBufferPool;                  //!< Allocated index buffers.
+        FixedArray<ConstantBufferPtr>           m_constantBufferPool;               //!< Allocated constant buffers.
+        FixedArray<InputLayoutPtr>              m_inputLayoutPool;                  //!< Allocated input layouts.
+        RenderId                                m_inputLayouts[MaxInputLayouts];    //!< A lookup table for input layout types.
+        FixedArray<TexturePtr>                  m_texturePool;                      //!< Allocated textures.
         IndexCache<UbershaderPtr>               m_shaders;                          //!< Interned shaders.
 
         //! A helper struct that hold info about an intermediate render target.
-        struct IntermediateRenderTarget {
-            Renderer::RenderTargetPtr           renderTarget;                       //!< A GPU render target instance.
+        struct IntermediateRenderTarget
+        {
+            RenderTargetPtr                     renderTarget;                       //!< A GPU render target instance.
             u16                                 width;                              //!< Render target width.
             u16                                 height;                             //!< Render target height.
-            Renderer::PixelFormat               format;                             //!< Render target internal format.
+            PixelFormat                         format;                             //!< Render target internal format.
             bool                                isFree;                             //!< Indicates that this render target is free.
         };
 

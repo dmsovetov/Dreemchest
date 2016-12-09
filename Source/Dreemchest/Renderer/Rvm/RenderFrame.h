@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderFrame_H__
-#define __DC_Scene_RenderFrame_H__
+#ifndef __DC_Renderer_RenderFrame_H__
+#define __DC_Renderer_RenderFrame_H__
 
 #include "Commands.h"
 #include "RenderState.h"
@@ -33,7 +33,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
     //! Render frame contains all required frame data captured by a render scene.
     class RenderFrame {
@@ -91,8 +91,8 @@ namespace Scene {
         return *m_commandBuffers[index].get();
     }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderFrame_H__    */
+#endif    /*    !__DC_Renderer_RenderFrame_H__    */

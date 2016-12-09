@@ -85,7 +85,7 @@ namespace Scene {
 
     private:
 
-        RenderResource      m_cbuffer;      //!< A view constant buffer instance.
+        RenderId            m_cbuffer;      //!< A view constant buffer instance.
         UbershaderPtr       m_shader;       //!< A shader to be used for rendering.
     };
 

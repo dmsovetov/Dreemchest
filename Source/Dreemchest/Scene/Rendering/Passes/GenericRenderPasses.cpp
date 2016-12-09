@@ -63,7 +63,7 @@ ShadowPass::ShadowPass( RenderingContext& context, RenderScene& renderScene )
 }
 
 // ** ShadowPass::cbuffer
-RenderResource ShadowPass::cbuffer( void ) const
+RenderId ShadowPass::cbuffer( void ) const
 {
     return m_cbuffer;
 }

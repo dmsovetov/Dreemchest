@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
 // ---------------------------------------------------------------------------- RenderState ---------------------------------------------------------------------------- //
 
@@ -331,6 +331,6 @@ void RenderStateStack::clear( void )
     m_size = 0;
 }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST

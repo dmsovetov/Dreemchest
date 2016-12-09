@@ -64,6 +64,24 @@ namespace Renderer {
     dcDeclarePtrs( Texture2D )
     dcDeclarePtrs( Shader )
     dcDeclarePtrs( RenderTarget )
+    
+    dcDeclarePtrs( Ubershader )
+    dcDeclarePtrs( RenderingContext )
+    dcDeclarePtrs( Rvm )
+    
+    //! A render resource handle type.
+    typedef u32 RenderId;
+    
+    //! Render frame unique pointer type.
+    typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
+    
+    class RenderStateBlock;
+    class RenderState;
+    class VertexFormat;
+    class ConstantBufferLayout;
+    
+    //! Render command buffer unique pointer type.
+    typedef AutoPtr<class RenderCommandBuffer> RenderCommandBufferUPtr;
 
     //! Hardware rendering API.
     enum RenderingHal {
@@ -233,6 +251,8 @@ DC_END_DREEMCHEST
     #include "RenderStateDeprecated.h"
     #include "BatchRenderer.h"
     #include "Renderer2D.h"
+    #include "Rvm/RenderingContext.h"
+    #include "Rvm/Rvm.h"
 #endif
 
 #endif

@@ -42,7 +42,7 @@ namespace Scene {
             //! A material node constant buffer type alias.
             typedef RenderScene::CBuffer::Material  CBuffer;
 
-            RenderResource                      constantBuffer; //!< A material constant buffer handle.
+            RenderId                            constantBuffer; //!< A material constant buffer handle.
             CBuffer                             data;           //!< Material constant buffer.
             RenderStateBlock                    states;         //!< Material states that is bound prior an instance state block.
         };
@@ -66,13 +66,13 @@ namespace Scene {
         virtual const RenderableNode*           createRenderable( const void* vertices, s32 count, const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
 
         //! Creates an input layout for a specified vertex format or returns a cached one.
-        virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
+        virtual RenderId                        requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_ABSTRACT;
 
         //! Requests a new vertex buffer for a mesh asset or returns a cached one.
-        virtual RenderResource                  requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
+        virtual RenderId                        requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
 
         //! Requests a new index buffer for a mesh asset or returns a cached one.
-        virtual RenderResource                  requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
+        virtual RenderId                        requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_ABSTRACT;
     };
 
 
@@ -82,13 +82,13 @@ namespace Scene {
     public:
 
         //! Creates an input layout for a specified vertex format or returns a cached one.
-        virtual RenderResource                  requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_OVERRIDE;
+        virtual RenderId                        requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_OVERRIDE;
 
         //! Requests a new vertex buffer for a mesh asset or returns a cached one.
-        virtual RenderResource                  requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
+        virtual RenderId                        requestVertexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
 
         //! Requests a new index buffer for a mesh asset or returns a cached one.
-        virtual RenderResource                  requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
+        virtual RenderId                        requestIndexBuffer( const MeshHandle& mesh ) NIMBLE_OVERRIDE;
 
         //! Creates a renderable node instance for a specified mesh or returns a cached one.
         virtual const RenderableNode*           requestMesh( const MeshHandle& asset ) NIMBLE_OVERRIDE;
@@ -100,7 +100,7 @@ namespace Scene {
         virtual const MaterialNode*             requestMaterial( const MaterialHandle& asset ) NIMBLE_OVERRIDE;
 
         //! Requests a new texture or returns a cached one.
-        RenderResource                          requestTexture( const ImageHandle& image );
+        RenderId                                requestTexture( const ImageHandle& image );
 
         //! Creates a RenderCache instance.
         static RenderCachePtr                   create( Assets::AssetsWPtr assets, RenderingContextWPtr context );
@@ -113,10 +113,10 @@ namespace Scene {
     private:
 
         //! Container type to store mapping from a vertex format to a previously created input layout.
-        typedef HashMap<u8, RenderResource>     InputLayouts;
+        typedef HashMap<u8, RenderId>           InputLayouts;
 
         //! Container type to store mapping from an asset id to a previously created render resource.
-        typedef HashMap<Assets::AssetId, RenderResource> RenderResources;
+        typedef HashMap<Assets::AssetId, RenderId> RenderResources;
 
         //! Container type to store a material node cache.
         typedef HashMap<Assets::AssetId, AutoPtr<MaterialNode>> MaterialNodeCache;

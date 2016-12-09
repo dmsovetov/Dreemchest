@@ -28,21 +28,20 @@
 #define __DC_Scene_Rendering_RenderPass_H__
 
 #include "../RenderScene.h"
-#include "../Rvm/RenderingContext.h"
 
 #include "../../Components/Rendering.h"
 #include "../../Components/Transform.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
-
+namespace Scene
+{
     //! Performs a single rendering pass.
     class RenderPassBase {
     public:
 
                                                 //! Constructs RenderPassBase instance.
-                                                RenderPassBase( RenderingContext& context, RenderScene& renderScene );
+                                                RenderPassBase( Renderer::RenderingContext& context, RenderScene& renderScene );
 
         //! Performs a render pass with a diffuse material.
         void                                    renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, RenderStateStack& stateStack, const Rgba& color );
@@ -72,7 +71,7 @@ namespace Scene {
 
         RenderingContext&                       m_context;          //!< A parent rendering context.
         RenderScene&                            m_renderScene;      //!< Parent render scene.
-        RenderResource                          m_materialCBuffer;  //!< A material constant buffer.
+        RenderId                                m_materialCBuffer;  //!< A material constant buffer.
     };
 
 } // namespace Scene

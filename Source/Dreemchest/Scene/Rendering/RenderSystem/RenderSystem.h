@@ -29,8 +29,6 @@
 
 #include "RenderPass.h"
 
-#include "../Rvm/Ubershader.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {

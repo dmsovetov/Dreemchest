@@ -28,7 +28,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
 // ** RenderFrame::RenderFrame
 RenderFrame::RenderFrame( void )
@@ -88,6 +88,6 @@ void RenderFrame::clear( void )
     m_allocator.reset();
 }
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST

@@ -26,10 +26,6 @@
 
 #include <Dreemchest.h>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/glext.h>
-
 DC_USE_DREEMCHEST
 
 using namespace Platform;
@@ -85,10 +81,10 @@ class RendererInitialization : public ApplicationDelegate
         //m_passConstantBuffer        = m_renderingContext->requestConstantBuffer(&cview, sizeof(cview), Scene::RenderScene::CBuffer::View::Layout);
         
         // Request all required resources from a rendering context
-        Scene::RenderResource shader       = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
-        Scene::RenderResource inputLayout  = m_renderingContext->requestInputLayout(0);
-        Scene::RenderResource vertexBuffer = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Scene::RenderResource indexBuffer  = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+        Renderer::RenderId shader       = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
+        Renderer::RenderId inputLayout  = m_renderingContext->requestInputLayout(0);
+        Renderer::RenderId vertexBuffer = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
+        Renderer::RenderId indexBuffer  = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
         
         // Setup a render state block that will be used during rendering
         m_renderState.bindVertexBuffer(vertexBuffer);
@@ -104,7 +100,7 @@ class RendererInitialization : public ApplicationDelegate
     virtual void handleWindowUpdate( const Window::Update& e )
     {
         // Get an entry point command buffer
-        Scene::RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        Renderer::RenderCommandBuffer& commands = m_renderFrame.entryPoint();
 
         // Now fill a command buffer with required commands
         
@@ -120,11 +116,11 @@ class RendererInitialization : public ApplicationDelegate
         m_hal->present();
     }
     
-    HalPtr                      m_hal;              //!< Rendering HAL.
-    Scene::RenderingContextPtr  m_renderingContext; //!< Rendering context instance.
-    Scene::RvmPtr               m_rvm;              //!< Rendering virtual machine processes a list of commands and performs rendering.
-    Scene::RenderStateBlock     m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
-    Scene::RenderFrame          m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
+    HalPtr                          m_hal;              //!< Rendering HAL.
+    Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
+    Renderer::RvmPtr                m_rvm;              //!< Rendering virtual machine processes a list of commands and performs rendering.
+    Renderer::RenderStateBlock      m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
+    Renderer::RenderFrame           m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
 };
 
 // Now declare an application entry point with RendererInitialization application delegate.

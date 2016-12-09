@@ -28,11 +28,12 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Scene
+{
 
 // ** Mesh::Mesh
 Mesh::Mesh( void )
-    : m_vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 )
+    : m_vertexFormat( Renderer::VertexFormat::Normal | Renderer::VertexFormat::Uv0 | Renderer::VertexFormat::Uv1 )
 {
 
 }
@@ -94,7 +95,7 @@ const Bounds& Mesh::bounds( void ) const
 }
 
 // ** Mesh::vertexFormat
-const VertexFormat& Mesh::vertexFormat( void ) const
+const Renderer::VertexFormat& Mesh::vertexFormat( void ) const
 {
     return m_vertexFormat;
 }
@@ -108,7 +109,8 @@ void Mesh::updateBounds( void )
     const VertexBuffer& vertices = vertexBuffer();
 
     // For each vertex
-    for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ ) {
+    for( s32 j = 0, jn = ( s32 )vertices.size(); j < jn; j++ )
+    {
         m_bounds << vertices[j].position;
     }
 }

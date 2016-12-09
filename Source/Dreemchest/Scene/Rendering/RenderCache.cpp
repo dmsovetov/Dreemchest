@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "RenderCache.h"
-#include "Rvm/RenderingContext.h"
 #include "../Assets/Mesh.h"
 #include "../Assets/Material.h"
 #include "../Assets/Image.h"
@@ -48,7 +47,7 @@ RenderCachePtr TestRenderCache::create( Assets::AssetsWPtr assets, RenderingCont
 }
 
 // ** TestRenderCache::requestInputLayout
-RenderResource TestRenderCache::requestInputLayout( const VertexFormat& format )
+RenderId TestRenderCache::requestInputLayout( const VertexFormat& format )
 {
     InputLayouts::iterator i = m_inputLayouts.find( format );
 
@@ -56,13 +55,13 @@ RenderResource TestRenderCache::requestInputLayout( const VertexFormat& format )
         return i->second;
     }
 
-    RenderResource id = m_context->requestInputLayout( format );
+    RenderId id = m_context->requestInputLayout( format );
     m_inputLayouts[format] = id;
     return id;
 }
 
 // ** TestRenderCache::requestVertexBuffer
-RenderResource TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
+RenderId TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
 {
     RenderResources::iterator i = m_vertexBuffers.find( mesh.asset().uniqueId() );
 
@@ -75,7 +74,7 @@ RenderResource TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
     const Mesh::VertexBuffer& vertices = mesh->vertexBuffer();
     VertexFormat vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
 
-    RenderResource id = m_context->requestVertexBuffer( &vertices[0], vertices.size() * vertexFormat.vertexSize() );
+    RenderId id = m_context->requestVertexBuffer( &vertices[0], vertices.size() * vertexFormat.vertexSize() );
     m_vertexBuffers[mesh.asset().uniqueId()] = id;
 
     LogVerbose( "renderCache", "vertex buffer with %d vertices created\n", vertices.size() );
@@ -84,7 +83,7 @@ RenderResource TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
 }
 
 // ** TestRenderCache::requestIndexBuffer
-RenderResource TestRenderCache::requestIndexBuffer( const MeshHandle& mesh )
+RenderId TestRenderCache::requestIndexBuffer( const MeshHandle& mesh )
 {
     RenderResources::iterator i = m_indexBuffers.find( mesh.asset().uniqueId() );
 
@@ -96,7 +95,7 @@ RenderResource TestRenderCache::requestIndexBuffer( const MeshHandle& mesh )
 
     const Mesh::IndexBuffer& indices = mesh->indexBuffer();
 
-    RenderResource id = m_context->requestIndexBuffer( &indices[0], indices.size() * sizeof( u16 ) );
+    RenderId id = m_context->requestIndexBuffer( &indices[0], indices.size() * sizeof( u16 ) );
     m_indexBuffers[mesh.asset().uniqueId()] = id;
 
     LogVerbose( "renderCache", "index buffer with %d indices created\n", indices.size() );
@@ -143,7 +142,7 @@ const TestRenderCache::RenderableNode* TestRenderCache::requestMesh( const MeshH
 // ** TestRenderCache::createRenderable
 const TestRenderCache::RenderableNode* TestRenderCache::createRenderable( const void* vertices, s32 count, const VertexFormat& vertexFormat )
 {
-    RenderResource vertexBuffer = m_context->requestVertexBuffer( vertices, count * vertexFormat.vertexSize() );
+    RenderId vertexBuffer = m_context->requestVertexBuffer( vertices, count * vertexFormat.vertexSize() );
 
     RenderableNode* node = DC_NEW RenderableNode;
     node->offset = 0;
@@ -188,7 +187,7 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
     // Now setup a material state block
     node->states.bindConstantBuffer( node->constantBuffer, RenderState::MaterialConstants );
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
-        RenderResource id = requestTexture( asset->texture( static_cast<Material::Layer>( i ) ) );
+        RenderId id = requestTexture( asset->texture( static_cast<Material::Layer>( i ) ) );
         if( id ) {
             node->states.bindTexture( id, static_cast<RenderState::TextureSampler>( RenderState::Texture0 + i ) );
         }
@@ -203,7 +202,7 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
 }
 
 // ** TestRenderCache::requestTexture
-RenderResource TestRenderCache::requestTexture( const ImageHandle& image )
+RenderId TestRenderCache::requestTexture( const ImageHandle& image )
 {
     if( !image.isValid() ) {
         return 0;
@@ -218,7 +217,7 @@ RenderResource TestRenderCache::requestTexture( const ImageHandle& image )
     }
 
     const Image& data = *image;
-    RenderResource id = m_context->requestTexture( &data.mipLevel( 0 )[0], data.width(), data.height(), data.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+    RenderId id = m_context->requestTexture( &data.mipLevel( 0 )[0], data.width(), data.height(), data.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
     m_textures[image.asset().uniqueId()] = id;
 
     LogVerbose( "renderCache", "texture created for '%s'\n", image.asset().name().c_str() );

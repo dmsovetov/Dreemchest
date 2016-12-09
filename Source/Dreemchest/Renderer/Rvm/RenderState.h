@@ -24,17 +24,20 @@
 
  **************************************************************************/
 
-#ifndef __DC_Scene_RenderState_H__
-#define __DC_Scene_RenderState_H__
+#ifndef __DC_Renderer_RenderState_H__
+#define __DC_Renderer_RenderState_H__
 
-#include "../../Scene.h"
+#include "../Renderer.h"
+#include "../Hal.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer
+{
 
     //! Vertex attributes that are passed to a shader.
-    enum VertexAttributeFeatures {
+    enum VertexAttributeFeatures
+    {
           VertexNormal
         , VertexColor
         , VertexTangent
@@ -55,7 +58,8 @@ namespace Scene {
     enum { SamplerFeaturesOffset = TotalVertexAttributeFeatures };
 
     //! Texture samplers that can be enabled upon rendering.
-    enum SamplerFeatures {
+    enum SamplerFeatures
+    {
           TextureSampler0
         , TextureSampler1
         , TextureSampler2
@@ -71,7 +75,8 @@ namespace Scene {
     enum { CBufferFeaturesOffset = SamplerFeaturesOffset + TotalSamplerFeatures };
 
     //! Constant buffers that can be bound upon rendering.
-    enum ConstantBufferFeatures {
+    enum ConstantBufferFeatures
+    {
           ConstantBuffer0
         , ConstantBuffer1
         , ConstantBuffer2
@@ -90,7 +95,8 @@ namespace Scene {
     enum { MaxUserDefinedFeatureBits = 64 - UserDefinedFeaturesOffset };
 
     //! Available user-defined shader features used by a scene renderer. 
-    enum SceneShaderFeatures {
+    enum SceneShaderFeatures
+    {
           ShaderAmbientColor        = 0x1
         , ShaderEmissionColor       = 0x2
         , ShaderPointLight          = 0x4
@@ -110,9 +116,11 @@ namespace Scene {
     enum { MaxStateStackDepth = 10 };
 
     //! Render state defines a single state change.
-    struct RenderState {
+    struct RenderState
+    {
         //! Available constant buffers.
-        enum ConstantBufferType {
+        enum ConstantBufferType
+        {
               GlobalConstants       //!< A constant buffer that stores global scene settings (ambient color, fog type, etc.).
             , PassConstants         //!< A constant buffer that stores a pass variables (view-projection matrix, light color, etc.).
             , InstanceConstants     //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
@@ -124,7 +132,8 @@ namespace Scene {
         };
 
         //! Available texture samplers.
-        enum TextureSampler {
+        enum TextureSampler
+        {
               Texture0
             , Texture1
             , Texture2
@@ -137,7 +146,8 @@ namespace Scene {
         };
 
         //! Available render state types.
-        enum Type {
+        enum Type
+        {
               VertexBuffer      = 0                                         //!< Binds an input vertex buffer.
             , IndexBuffer       = VertexBuffer      + 1                     //!< Binds an input index buffer.
             , InputLayout       = IndexBuffer       + 1                     //!< Binds an input layout.
@@ -174,22 +184,25 @@ namespace Scene {
                                         RenderState( Renderer::BlendFactor src, Renderer::BlendFactor dst );
 
                                         //! Constructs a texture binding state.
-                                        RenderState( s32 id, TextureSampler sampler, Renderer::RenderTarget::Attachment attachment = Renderer::RenderTarget::Depth );
+                                        RenderState( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Depth );
 
                                         //! Constructs a polygon offset state.
                                         RenderState( f32 factor, f32 units );
 
-        union {
+        union
+        {
             u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
-            struct {
+            struct
+            {
                 s8                      factor;             //!< A polygon offset factor.
                 s8                      units;              //!< A polygon offset units.
             } polygonOffset;
         };
 
-        union {
+        union
+        {
             u8                          blend;              //!< Source blend factor in high bits and destination blend factor in low bits.
             u8                          index;              //!< A constant buffer binding slot or sampler index.
             bool                        depthWrite;         //!< Enables or disables writing to a depth buffer.
@@ -200,7 +213,8 @@ namespace Scene {
     };
 
     //! Render state block agregates a set of state changes.
-    class RenderStateBlock {
+    class RenderStateBlock
+    {
     public:
 
         //! A maximum number of states that can be stored inside a single block.
@@ -335,7 +349,8 @@ namespace Scene {
     class RenderStateStack;
 
     //! A render state stack scope.
-    class StateScope {
+    class StateScope
+    {
     friend class RenderStateStack;
     public:
 
@@ -376,7 +391,8 @@ namespace Scene {
     }
 
     //! Render state stack.
-    class RenderStateStack {
+    class RenderStateStack
+    {
     friend class StateScope;
     public:
 
@@ -410,8 +426,8 @@ namespace Scene {
         s32                         m_size;         //!< Current stack size.
     };
 
-} // namespace Scene
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif    /*    !__DC_Scene_RenderState_H__    */
+#endif    /*    !__DC_Renderer_RenderState_H__    */

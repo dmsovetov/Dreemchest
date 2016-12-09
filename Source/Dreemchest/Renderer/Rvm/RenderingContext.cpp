@@ -25,10 +25,15 @@
  **************************************************************************/
 
 #include "RenderingContext.h"
+#include "VertexFormat.h"
+#include "RenderState.h"
+#include "Ubershader.h"
+#include "../../Io/DiskFileSystem.h"
+#include "../Hal.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Scene {
+namespace Renderer {
 
 // ** RenderingContext::RenderingContext
 RenderingContext::RenderingContext( Renderer::HalWPtr hal )
@@ -47,7 +52,8 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
 void RenderingContext::constructResources( void )
 {
     // A table of construction functions
-    static ResourceConstructor::Function kConstructors[ResourceConstructor::TotalConstructors + 1] = {
+    static ResourceConstructor::Function kConstructors[ResourceConstructor::TotalConstructors + 1] =
+    {
           &RenderingContext::constructInputLayout
         , &RenderingContext::constructVertexBuffer
         , &RenderingContext::constructIndexBuffer
@@ -57,7 +63,8 @@ void RenderingContext::constructResources( void )
     };
 
     // Construct all resources
-    for( ResourceConstructors::const_iterator i = m_resourceConstructors.begin(), end = m_resourceConstructors.end(); i != end; ++i ) {
+    for( ResourceConstructors::const_iterator i = m_resourceConstructors.begin(), end = m_resourceConstructors.end(); i != end; ++i )
+    {
         NIMBLE_ABORT_IF( kConstructors[i->type] == NULL, "unhandled resource constructor type" );
         ( this->*kConstructors[i->type] )( *i );
     }
@@ -75,23 +82,28 @@ void RenderingContext::constructInputLayout( const ResourceConstructor& construc
     VertexFormat format( constructor.inputLayout.format );
 
     // Create an input layout
-    Renderer::InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
+    InputLayoutPtr inputLayout = m_hal->createInputLayout( format.vertexSize() );
 
     // Add vertex attributes to an input layout
-    if( format & VertexFormat::Position ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
+    if( format & VertexFormat::Position )
+    {
+        inputLayout->attributeLocation( InputLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
     }
-    if( format & VertexFormat::Color ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
+    if( format & VertexFormat::Color )
+    {
+        inputLayout->attributeLocation( InputLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
     }
-    if( format & VertexFormat::Normal ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
+    if( format & VertexFormat::Normal )
+    {
+        inputLayout->attributeLocation( InputLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
     }
-    if( format & VertexFormat::Uv0 ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
+    if( format & VertexFormat::Uv0 )
+    {
+        inputLayout->attributeLocation( InputLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
     }
-    if( format & VertexFormat::Uv1 ) {
-        inputLayout->attributeLocation( Renderer::InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
+    if( format & VertexFormat::Uv1 )
+    {
+        inputLayout->attributeLocation( InputLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
     }
 
     // Save an input layout to a pool
@@ -104,10 +116,11 @@ void RenderingContext::constructVertexBuffer( const ResourceConstructor& constru
     NIMBLE_BREAK_IF( m_vertexBufferPool[constructor.id - 1].valid(), "resource was already constructed" );
 
     // Create a vertex buffer instance
-    Renderer::VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( constructor.buffer.size );
+    VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( constructor.buffer.size );
 
     // Upload data to a GPU buffer
-    if( constructor.buffer.data ) {
+    if( constructor.buffer.data )
+    {
         memcpy( vertexBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
         vertexBuffer->unlock();
     }
@@ -122,10 +135,11 @@ void RenderingContext::constructVertexBuffer( const ResourceConstructor& constru
 void RenderingContext::constructIndexBuffer( const ResourceConstructor& constructor )
 {
     // Create an index buffer instance
-    Renderer::IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( constructor.buffer.size );
+    IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( constructor.buffer.size );
 
     // Upload data to a GPU buffer
-    if( constructor.buffer.data ) {
+    if( constructor.buffer.data )
+    {
         memcpy( indexBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
         indexBuffer->unlock();
     }
@@ -139,10 +153,11 @@ void RenderingContext::constructIndexBuffer( const ResourceConstructor& construc
 // ** RenderingContext::constructConstantBuffer
 void RenderingContext::constructConstantBuffer( const ResourceConstructor& constructor )
 {
-    Renderer::ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( constructor.buffer.size, reinterpret_cast<const Renderer::ConstantBufferLayout*>( constructor.buffer.userData ) );
+    ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( constructor.buffer.size, reinterpret_cast<const ConstantBufferLayout*>( constructor.buffer.userData ) );
 
     // Upload data to a GPU buffer
-    if( constructor.buffer.data ) {
+    if( constructor.buffer.data )
+    {
         memcpy( constantBuffer->lock(), constructor.buffer.data, constructor.buffer.size );
         constantBuffer->unlock();
     }
@@ -154,10 +169,11 @@ void RenderingContext::constructConstantBuffer( const ResourceConstructor& const
 // ** RenderingContext::constructTexture
 void RenderingContext::constructTexture( const ResourceConstructor& constructor )
 {
-    Renderer::Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.format );
+    Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.format );
 
     // Upload data to a GPU buffer
-    if( constructor.texture.data ) {
+    if( constructor.texture.data )
+    {
         u32 size;
         void* ptr = texture->lock( 0, size );
         memcpy( ptr, constructor.texture.data, size );
@@ -169,11 +185,12 @@ void RenderingContext::constructTexture( const ResourceConstructor& constructor 
 }
 
 // ** RenderingContext::requestInputLayout
-RenderResource RenderingContext::requestInputLayout( const VertexFormat& format )
+RenderId RenderingContext::requestInputLayout( const VertexFormat& format )
 {
     // First lookup a previously constucted input layout
-    RenderResource id = m_inputLayouts[format];
-    if( id ) {
+    RenderId id = m_inputLayouts[format];
+    if( id )
+    {
         return id;
     }
 
@@ -190,7 +207,7 @@ RenderResource RenderingContext::requestInputLayout( const VertexFormat& format 
 }
 
 // ** RenderingContext::requestVertexBuffer
-RenderResource RenderingContext::requestVertexBuffer( const void* data, s32 size )
+RenderId RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
     ResourceConstructor constructor = ResourceConstructor::VertexBuffer;
     constructor.id          = m_vertexBufferPool.push( NULL ) + 1;
@@ -202,7 +219,7 @@ RenderResource RenderingContext::requestVertexBuffer( const void* data, s32 size
 }
 
 // ** RenderingContext::requestIndexBuffer
-RenderResource RenderingContext::requestIndexBuffer( const void* data, s32 size )
+RenderId RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
     ResourceConstructor constructor = ResourceConstructor::IndexBuffer;
     constructor.id          = m_indexBufferPool.push( NULL ) + 1;
@@ -214,7 +231,7 @@ RenderResource RenderingContext::requestIndexBuffer( const void* data, s32 size 
 }
 
 // ** RenderingContext::requestConstantBuffer
-RenderResource RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
+RenderId RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
 {
     ResourceConstructor constructor = ResourceConstructor::ConstantBuffer;
     constructor.id          = m_constantBufferPool.push( NULL ) + 1;
@@ -227,7 +244,7 @@ RenderResource RenderingContext::requestConstantBuffer( const void* data, s32 si
 }
 
 // ** RenderingContext::requestConstantBuffer
-RenderResource RenderingContext::requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format )
+RenderId RenderingContext::requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format )
 {
     ResourceConstructor constructor = ResourceConstructor::Texture;
     constructor.id          = m_texturePool.push( NULL ) + 1;
@@ -300,28 +317,33 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
     size_t fragmentBegin = code.find( fragmentShaderMarker );
     size_t featuresBegin = code.find( featuresMarker );
 
-    if( vertexBegin == String::npos && fragmentBegin == String::npos ) {
+    if( vertexBegin == String::npos && fragmentBegin == String::npos )
+    {
         return UbershaderPtr();
     }
 
-    if( featuresBegin != String::npos ) {
+    if( featuresBegin != String::npos )
+    {
         u32 featuresCodeStart = featuresBegin + strlen( featuresMarker );
         Array<String> features = split( code.substr( featuresCodeStart, vertexBegin - featuresCodeStart ), "\r\n" );
 
-        for( Array<String>::const_iterator i = features.begin(), end = features.end(); i != end; ++i ) {
+        for( Array<String>::const_iterator i = features.begin(), end = features.end(); i != end; ++i )
+        {
             Array<String> value = split( *i, " \t=" );
             shader->addFeature( masks[value[1]], value[0] );
             LogVerbose( "shader", "feature %s = %s (0x%x) added\n", value[0].c_str(), value[1].c_str(), masks[value[1]] );
         }
     }
 
-    if( vertexBegin != String::npos ) {
+    if( vertexBegin != String::npos )
+    {
         u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
         String vertex = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
         shader->setVertex( vertex );
     }
 
-    if( fragmentBegin != String::npos ) {
+    if( fragmentBegin != String::npos )
+    {
         u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
         String fragment = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
         shader->setFragment( fragment );
@@ -353,12 +375,15 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 }
 
 // ** RenderingContext::acquireRenderTarget
-RenderResource RenderingContext::acquireRenderTarget( u16 width, u16 height, Renderer::PixelFormat format )
+RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
 {
     // Perform a linear search of a render target
-    for( s32 i = 0, n = static_cast<s32>( m_renderTargets.size() ); i < n; i++ ) {
+    for( s32 i = 0, n = static_cast<s32>( m_renderTargets.size() ); i < n; i++ )
+    {
         IntermediateRenderTarget& intermediate = m_renderTargets[i];
-        if( intermediate.isFree && intermediate.width == width && intermediate.height == height && intermediate.format == format ) {
+        
+        if( intermediate.isFree && intermediate.width == width && intermediate.height == height && intermediate.format == format )
+        {
             intermediate.isFree = false;
             return i + 1;
         }
@@ -371,12 +396,15 @@ RenderResource RenderingContext::acquireRenderTarget( u16 width, u16 height, Ren
     intermediate.height         = height;
     intermediate.format         = format;
     intermediate.renderTarget   = m_hal->createRenderTarget( width, height );
-    intermediate.renderTarget->setDepth( Renderer::PixelD24X8 );
-    if( format == Renderer::PixelD24S8 || format == Renderer::PixelD24X8 ) {
+    if( format == Renderer::PixelD24S8 || format == Renderer::PixelD24X8 )
+    {
         intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Depth );
-    } else {
+    }
+    else
+    {
         intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Color0 );
     }
+    intermediate.renderTarget->setDepth( Renderer::PixelD24X8 );
     m_renderTargets.push_back( intermediate );
 
     LogVerbose( "renderingContext", "%dx%d render target created\n", width, height );
@@ -385,47 +413,47 @@ RenderResource RenderingContext::acquireRenderTarget( u16 width, u16 height, Ren
 }
 
 // ** RenderingContext::releaseRenderTarget
-void RenderingContext::releaseRenderTarget( RenderResource id )
+void RenderingContext::releaseRenderTarget( RenderId id )
 {
     m_renderTargets[id - 1].isFree = true;
 }
 
 // ** RenderingContext::intermediateRenderTarget
-Renderer::RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderResource id ) const
+RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderId id ) const
 {
     return m_renderTargets[id - 1].renderTarget;
 }
 
 // ** RenderingContext::vertexBuffer
-const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( RenderResource identifier ) const
+const Renderer::VertexBufferPtr& RenderingContext::vertexBuffer( RenderId identifier ) const
 {
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_vertexBufferPool[identifier - 1];
 }
         
 // ** RenderingContext::indexBuffer
-const Renderer::IndexBufferPtr& RenderingContext::indexBuffer( RenderResource identifier ) const
+const IndexBufferPtr& RenderingContext::indexBuffer( RenderId identifier ) const
 {
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_indexBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::constantBuffer
-const Renderer::ConstantBufferPtr& RenderingContext::constantBuffer( RenderResource identifier ) const
+const ConstantBufferPtr& RenderingContext::constantBuffer( RenderId identifier ) const
 {
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_constantBufferPool[identifier - 1];
 }
 
 // ** RenderingContext::inputLayout
-const Renderer::InputLayoutPtr& RenderingContext::inputLayout( RenderResource identifier ) const
+const InputLayoutPtr& RenderingContext::inputLayout( RenderId identifier ) const
 {
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_inputLayoutPool[identifier - 1];
 }
         
 // ** RenderingContext::texture
-const Renderer::TexturePtr& RenderingContext::texture( s32 identifier ) const
+const TexturePtr& RenderingContext::texture( s32 identifier ) const
 {
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_texturePool[identifier - 1];
@@ -444,7 +472,7 @@ const UbershaderPtr& RenderingContext::shader( s32 identifier ) const
 }
 
 // ** RenderingContext::create
-RenderingContextPtr RenderingContext::create( Renderer::HalWPtr hal )
+RenderingContextPtr RenderingContext::create( HalWPtr hal )
 {
     return DC_NEW RenderingContext( hal );
 }
