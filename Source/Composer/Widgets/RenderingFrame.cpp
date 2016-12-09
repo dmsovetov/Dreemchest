@@ -51,7 +51,7 @@ void RenderingFrame::setupOpenGLFormat( void )
     kOpenGLFormat.setSamples( 8 );
     
     // Construct the test OpenGL widget
-    AutoPtr<QGLWidget> widget = new QGLWidget( kOpenGLFormat );
+    UPtr<QGLWidget> widget = new QGLWidget( kOpenGLFormat );
 
     // The widget was successfully initialized - use this format
     if( widget->isValid() ) {

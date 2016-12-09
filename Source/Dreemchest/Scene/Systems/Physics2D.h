@@ -210,8 +210,8 @@ namespace Scene {
             b2Body*                m_body;                //!< The attached Box2D body.
         };
 
-        AutoPtr<b2World>        m_world;            //!< The Box2D physics world.
-        AutoPtr<Collisions>     m_collisions;       //!< Collision listener interface.
+        UPtr<b2World>        m_world;            //!< The Box2D physics world.
+        UPtr<Collisions>     m_collisions;       //!< Collision listener interface.
         ScaleFactors            m_scalingFactors;   //!< Physics world scaling factors.
     };
 

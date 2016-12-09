@@ -89,13 +89,13 @@ namespace Network {
     typedef TypeId PacketTypeId;
 
     //! Network packet unique pointer.
-    typedef AutoPtr<class AbstractPacket> PacketUPtr;
+    typedef UPtr<class AbstractPacket> PacketUPtr;
 
     //! Command unique pointer.
-    typedef AutoPtr<class AbstractCommand> CommandUPtr;
+    typedef UPtr<class AbstractCommand> CommandUPtr;
 
     //! Connection middleware unique pointer.
-    typedef AutoPtr<class ConnectionMiddleware> ConnectionMiddlewareUPtr;
+    typedef UPtr<class ConnectionMiddleware> ConnectionMiddlewareUPtr;
 
     //! Socket list type.
     typedef List<TCPSocketPtr> TCPSocketList;

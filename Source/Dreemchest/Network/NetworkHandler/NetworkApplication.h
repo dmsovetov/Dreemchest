@@ -141,16 +141,16 @@ namespace Network {
     protected:
 
         //! A container type to store all network event emitters.
-        typedef Map< TypeId, AutoPtr<IEventHandler> > EventHandlers;
+        typedef Map< TypeId, UPtr<IEventHandler> > EventHandlers;
     
         //! A container type to store all remote call handlers.
-        typedef Map< String32, AutoPtr<IRemoteCallHandler> > RemoteCallHandlers;
+        typedef Map< String32, UPtr<IRemoteCallHandler> > RemoteCallHandlers;
 
         //! Container type to store active connections.
         typedef Set<ConnectionPtr>                        ConnectionSet;
 
         //! Container type to store a list of packet handlers.
-        typedef List<AutoPtr<AbstractPacketHandler> >   PacketHandlerList;
+        typedef List<UPtr<AbstractPacketHandler> >   PacketHandlerList;
 
         //! Container type to store mapping from a packet type to a handlers list.
         typedef Map<PacketTypeId, PacketHandlerList>    PacketHandlers;

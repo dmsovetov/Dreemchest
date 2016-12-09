@@ -108,7 +108,7 @@ namespace Scene {
     dcDeclareNamedPtrs( AbstractRenderCache, RenderCache )
 
     //! Render system unique pointer type.
-    typedef AutoPtr<class RenderSystemBase> RenderSystemUPtr;
+    typedef UPtr<class RenderSystemBase> RenderSystemUPtr;
 
     class Transform;
     class StaticMesh;
@@ -118,7 +118,7 @@ namespace Scene {
     class PointCloud;
 
     //! Spatial index unique pointer type.
-    typedef AutoPtr<class Spatial> SpatialUPtr;
+    typedef UPtr<class Spatial> SpatialUPtr;
 
     //! Image handle type.
     typedef Assets::DataHandle<class Image> ImageHandle;
@@ -174,7 +174,7 @@ namespace Scene {
     dcDeclarePtrs( Vec3Binding )
 
     //! An input system unique pointer type
-    typedef AutoPtr<class InputSystemBase> InputSystemPtr;
+    typedef UPtr<class InputSystemBase> InputSystemPtr;
 
     //! Container type to store a set of scene objects.
     typedef Set<SceneObjectPtr> SceneObjectSet;

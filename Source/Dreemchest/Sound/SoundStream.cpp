@@ -63,7 +63,7 @@ u32 StandardSoundStream::length( void ) const
 // ** StandardSoundStream::loadToRam
 ISoundStreamPtr StandardSoundStream::loadToRam( void ) const
 {
-    AutoPtr<u8> data = DC_NEW u8[m_stream->length()];
+    UPtr<u8> data = DC_NEW u8[m_stream->length()];
     m_stream->read( data.get(), m_stream->length() );
     return DC_NEW MemorySoundStream( Io::ByteBuffer::createFromData( data.get(), m_stream->length() ) );
 }

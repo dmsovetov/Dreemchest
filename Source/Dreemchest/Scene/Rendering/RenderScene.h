@@ -143,7 +143,7 @@ namespace Scene
             //! Instance parameters.
             struct Instance
             {
-                AutoPtr<CBuffer::Instance>          parameters;     //!< Instance constant buffer.
+                UPtr<CBuffer::Instance>          parameters;     //!< Instance constant buffer.
             } instance;
         };
 
@@ -165,7 +165,7 @@ namespace Scene
         struct LightNode : public Node
         {
             const Light*                        light;              //!< Light component.
-            AutoPtr<CBuffer::Light>             parameters;         //!< Light constant buffer.
+            UPtr<CBuffer::Light>             parameters;         //!< Light constant buffer.
         };
 
         //! Stores info about a camera.
@@ -173,7 +173,7 @@ namespace Scene
         {
             const Camera*                       camera;             //!< Camera component.
             const Viewport*                     viewport;           //!< Output viewport component.
-            AutoPtr<CBuffer::View>              parameters;         //!< View constant buffer.
+            UPtr<CBuffer::View>              parameters;         //!< View constant buffer.
         };
 
         //! Stores info about a static mesh.
@@ -276,7 +276,7 @@ namespace Scene
         RenderCacheWPtr                         m_cache;            //!< Render cache to be used.
         Renderer::RenderingContextWPtr          m_context;          //!< Parent rendering context.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
-        AutoPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
+        UPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
         Renderer::UbershaderPtr                 m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>                 m_renderSystems;    //!< Entity render systems.

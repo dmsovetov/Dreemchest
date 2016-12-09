@@ -484,12 +484,12 @@ bool SoundFx::load( const char *identifier )
     return false;
 /*
     // ** Parse JSON
-    AutoPtr<io::Stream> file = m_ctx->iDiskFileSystem->openFile( identifier );
+    UPtr<io::Stream> file = m_ctx->iDiskFileSystem->openFile( identifier );
     if( file == NULL ) {
         return false;
     }
 
-    AutoPtr<io::ByteBuffer> text = file->toByteBuffer( true );
+    UPtr<io::ByteBuffer> text = file->toByteBuffer( true );
 
     JSON json = JSON::Read( ( const char* )text->data() );
     sound::sSoundFxData data;

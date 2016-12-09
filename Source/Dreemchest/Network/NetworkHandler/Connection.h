@@ -83,7 +83,7 @@ namespace Network {
         struct PendingRemoteCall {
             String                            m_name;            //!< Remote procedure name.
             s32                                m_timeLeft;        //!< The time left to wait for a response to this call.
-            AutoPtr<IRemoteResponseHandler>    m_handler;        //!< Response handler.
+            UPtr<IRemoteResponseHandler>    m_handler;        //!< Response handler.
 
                                             //! Constructs a PendingRemoteCall instance.
                                             PendingRemoteCall( const String& name = "", IRemoteResponseHandler* handler = NULL, s32 timeLeft = 60000 )

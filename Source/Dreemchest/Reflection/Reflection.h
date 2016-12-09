@@ -50,8 +50,8 @@ namespace Reflection {
     dcDeclarePtrs( Assembly )
 
     //! An iterator unique pointer type.
-    typedef AutoPtr<Iterator>       IteratorUPtr;
-    typedef AutoPtr<const Iterator> ConstIteratorUPtr;
+    typedef UPtr<Iterator>       IteratorUPtr;
+    typedef UPtr<const Iterator> ConstIteratorUPtr;
 
 } // namespace Reflection
 

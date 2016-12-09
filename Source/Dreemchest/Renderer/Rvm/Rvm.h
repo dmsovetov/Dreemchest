@@ -135,7 +135,7 @@ namespace Renderer
         u64                                 m_resourceFeatures;                             //!< Active resource features.
         ActiveShader                        m_activeShader;                                 //!< An active shader instance.
         Stack<const f32*>                   m_viewportStack;                                //!< A viewport stack.
-        AutoPtr<IntermediateTargetStack>    m_intermediateTargets;                          //!< An intermediate render target stack.
+        UPtr<IntermediateTargetStack>    m_intermediateTargets;                          //!< An intermediate render target stack.
     };
 
 } // namespace Renderer

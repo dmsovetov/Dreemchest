@@ -232,7 +232,7 @@ bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
     }
 
     const s32   kChunkSize = 16536;
-    AutoPtr<u8> chunk = DC_NEW u8[kChunkSize];
+    UPtr<u8> chunk = DC_NEW u8[kChunkSize];
     
     while( input->hasDataLeft() ) {
         s32 read = input->read( chunk.get(), kChunkSize );

@@ -73,7 +73,7 @@ namespace Renderer {
     typedef u32 RenderId;
     
     //! Render frame unique pointer type.
-    typedef AutoPtr<class RenderFrame> RenderFrameUPtr;
+    typedef UPtr<class RenderFrame> RenderFrameUPtr;
     
     struct State;
     class StateBlock;
@@ -81,7 +81,7 @@ namespace Renderer {
     struct ConstantBufferLayout;
     
     //! Render command buffer unique pointer type.
-    typedef AutoPtr<class CommandBuffer> CommandBufferUPtr;
+    typedef UPtr<class CommandBuffer> CommandBufferUPtr;
 
     //! Hardware rendering API.
     enum RenderingHal {

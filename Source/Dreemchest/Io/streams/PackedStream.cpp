@@ -172,7 +172,7 @@ void PackedStream::decompressChunk( void )
 {
     s32  compressedSize = 0;
     const s32 CHUNK_SIZE = 16536;
-    AutoPtr<u8> compressed = DC_NEW u8[CHUNK_SIZE * 2];
+    UPtr<u8> compressed = DC_NEW u8[CHUNK_SIZE * 2];
     
     m_file->read( &compressedSize, sizeof( compressedSize ) );
     m_file->read( compressed.get(), compressedSize );

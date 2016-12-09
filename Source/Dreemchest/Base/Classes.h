@@ -39,7 +39,7 @@ DC_BEGIN_DREEMCHEST
 //! Macro definition for declaring an implementation interface.
 #define BeginPrivateInterface( T )                                \
     namespace impl {                                            \
-        typedef AutoPtr<class T##Private> T##PrivatePtr;        \
+        typedef UPtr<class T##Private> T##PrivatePtr;        \
         class T##Private : public RefCounted {                    \
         protected:                                                \
             T*            m_parent;                                \

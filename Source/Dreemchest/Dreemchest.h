@@ -126,10 +126,10 @@ DC_BEGIN_DREEMCHEST
         typedef List<DC_DREEMCHEST_NS Assets::Handle> AssetList;
 
         // Unique ptr for asset source.
-        typedef AutoPtr<class AbstractSource> SourceUPtr;
+        typedef UPtr<class AbstractSource> SourceUPtr;
 
         //! Loading queue unique pointer type.
-        typedef AutoPtr<class LoadingQueue> LoadingQueueUPtr;
+        typedef UPtr<class LoadingQueue> LoadingQueueUPtr;
 
         dcDeclarePtrs( Assets )
 

@@ -119,10 +119,10 @@ namespace Scene {
         typedef HashMap<Assets::AssetId, RenderId> RenderResources;
 
         //! Container type to store a material node cache.
-        typedef HashMap<Assets::AssetId, AutoPtr<MaterialNode>> MaterialNodeCache;
+        typedef HashMap<Assets::AssetId, UPtr<MaterialNode>> MaterialNodeCache;
 
         //! Container type to store a renderable node cache.
-        typedef HashMap<Assets::AssetId, AutoPtr<RenderableNode>> RenderableNodeCache;
+        typedef HashMap<Assets::AssetId, UPtr<RenderableNode>> RenderableNodeCache;
 
         Assets::AssetsWPtr                      m_assets;                   //!< Parent assets instance.
         RenderingContextWPtr                    m_context;                  //!< Parent rendering context.
