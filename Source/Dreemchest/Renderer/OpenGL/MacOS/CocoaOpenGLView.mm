@@ -32,6 +32,8 @@ DC_USE_DREEMCHEST
 // ** CocoaOpenGLView
 @implementation CocoaOpenGLView
 
+#if 0   // It looks like this code is useless
+
 // ** getFrameForTime
 - ( CVReturn ) getFrameForTime : ( const CVTimeStamp* )outputTime
 {
@@ -44,12 +46,13 @@ DC_USE_DREEMCHEST
     return kCVReturnSuccess;
 }
 
-// ** OnDisplay
-static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
+// ** displayCallback
+static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
 {
     CVReturn result = [(CocoaOpenGLView*)displayLinkContext getFrameForTime:outputTime];
     return result;
 }
+#endif  /*  #if 0   */
 
 // ** initWithWindow
 -( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
@@ -141,7 +144,7 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkCreateWithActiveCGDisplays result %d\n", result );
     }
 
-    result = CVDisplayLinkSetOutputCallback( m_displayLink, &OnDisplay, self );
+    result = CVDisplayLinkSetOutputCallback( m_displayLink, NULL/*displayCallback*/, self );
     if( result != kCVReturnSuccess ) {
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkSetOutputCallback result %d\n", result );
     }
