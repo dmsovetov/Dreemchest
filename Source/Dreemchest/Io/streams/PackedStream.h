@@ -31,19 +31,17 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-        
+namespace Io
+{
     class IBufferCompressor;
 
     // ** class PackedStream
-    class PackedStream : public Stream {
-
-        DC_DECLARE_IS( PackedStream, PackedStream, this );
-
+    class PackedStream : public Stream
+    {
     public:
 
                                 PackedStream( const StreamPtr& file, IBufferCompressor* compressor, s32 fileSize, s32 fileOffset );
-        virtual                    ~PackedStream( void );
+        virtual                 ~PackedStream( void );
 
         //! Returns a decompressed file length.
         virtual s32             length( void ) const NIMBLE_OVERRIDE;
@@ -74,7 +72,7 @@ namespace Io {
 
         s32                     m_bytesAvailable;
         s32                     m_bufferOffset;
-        u8*                        m_buffer;
+        u8*                     m_buffer;
     };
 
 } // namespace Io

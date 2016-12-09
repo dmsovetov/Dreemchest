@@ -53,12 +53,6 @@ Archive::~Archive( void )
 
 }
 
-// ** Archive::release
-void Archive::release( void )
-{
-    delete this;
-}
-
 // ** Archive::createCompressor
 IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 {
@@ -121,6 +115,7 @@ bool Archive::packFile( const Path& fileName, const Path& compressedFileName )
 // ** Archive::open
 bool Archive::open( const StreamPtr& file )
 {
+#if 0
     clearFiles();
 
     m_file = StreamPtr();
@@ -143,6 +138,9 @@ bool Archive::open( const StreamPtr& file )
     }
 
     m_file = StreamPtr();
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif
     return true;
 }
 

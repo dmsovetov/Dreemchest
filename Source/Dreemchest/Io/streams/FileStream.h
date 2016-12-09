@@ -32,20 +32,18 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-        
+namespace Io
+{
     //! A FileStream class is used for work with physical files.
-    class FileStream : public Stream {
+    class FileStream : public Stream
+    {
     friend class DiskFileSystem;
-
-        DC_DECLARE_IS( FileStream, FileStream, this );
-
     public:
 
-        virtual                    ~FileStream( void );
+        virtual                 ~FileStream( void );
 
         //! Disposes this file stream.
-        virtual void            dispose( void ) NIMBLE_OVERRIDE;
+        virtual void            close( void ) NIMBLE_OVERRIDE;
 
         //! Returns a total lenght of this file.
         virtual s32             length( void ) const NIMBLE_OVERRIDE;

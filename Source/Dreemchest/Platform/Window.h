@@ -76,9 +76,6 @@ namespace Platform {
         //! Creates and shows a new Window instance.
         static Window*          create( u32 width, u32 height );
 
-        //! Closes a window and releases a memory.
-        void                    release( void );
-
         //! Returns a window caption.
         String                  caption( void ) const;
         

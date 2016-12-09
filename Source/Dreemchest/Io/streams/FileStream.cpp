@@ -35,20 +35,23 @@ namespace Io {
 u32 FileStream::s_openFileCount = 0;
 
 // ** FileStream::FileStream
-FileStream::FileStream( void ) : m_file( NULL ), m_length( 0 )
+FileStream::FileStream( void )
+    : m_file( NULL )
+    , m_length( 0 )
 {
 
 }
 
 FileStream::~FileStream( void )
 {
-    dispose();
+    close();
 }
 
-// ** FileStream::dispose
-void FileStream::dispose( void )
+// ** FileStream::close
+void FileStream::close( void )
 {
-    if( m_file == NULL ) {
+    if( m_file == NULL )
+    {
         return;
     }
 
@@ -63,16 +66,18 @@ bool FileStream::open( const Path& fileName, StreamMode mode )
 {
     CString fmode = "rb";
 
-    switch( mode ) {
-    case BinaryReadStream:  fmode = "rb"; break;
-    case BinaryWriteStream: fmode = "wb"; break;
+    switch( mode )
+    {
+        case BinaryReadStream:  fmode = "rb"; break;
+        case BinaryWriteStream: fmode = "wb"; break;
     }
 
     // ** Open file
     m_fileName = fileName;
     m_file     = fopen( fileName.c_str(), fmode );
 
-    if( !m_file ) {
+    if( !m_file )
+    {
         return false;
     }
 
@@ -102,7 +107,8 @@ s32 FileStream::read( void* buffer, s32 size ) const
 
     s32 bytesRead = fread( buffer, 1, size, m_file );
 
-    if( bytesRead != size && ferror( m_file ) ) {
+    if( bytesRead != size && ferror( m_file ) )
+    {
         LogError( "stream", "failed to read %d bytes from file, %d\n", size, errno );
     }
     
@@ -118,7 +124,8 @@ s32 FileStream::write( const void* buffer, s32 size )
 
     s32 bytesWritten = fwrite( buffer, 1, size, m_file );
     
-    if( bytesWritten != size && ferror( m_file ) ) {
+    if( bytesWritten != size && ferror( m_file ) )
+    {
         LogError( "stream", "failed to write %d bytes to file, %d\n", size, errno );
     }
     
@@ -132,10 +139,11 @@ void FileStream::setPosition( s32 offset, SeekOrigin origin )
 
     s32 result = 0;
 
-    switch( origin ) {
-    case SeekSet: result = fseek( m_file, offset, SEEK_SET ); break;
-    case SeekCur: result = fseek( m_file, offset, SEEK_CUR ); break;
-    case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
+    switch( origin )
+    {
+        case SeekSet: result = fseek( m_file, offset, SEEK_SET ); break;
+        case SeekCur: result = fseek( m_file, offset, SEEK_CUR ); break;
+        case SeekEnd: result = fseek( m_file, offset, SEEK_END ); break;
     }
 
     NIMBLE_BREAK_IF( result != 0, "fseek returned an unexpected value" );

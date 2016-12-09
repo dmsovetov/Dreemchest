@@ -74,7 +74,7 @@ void DataCacheBase::populate( void )
         }
 
         // Add entity to a cache
-        addEntity( i->get() );
+        addEntity( entity );
     }
 }
 

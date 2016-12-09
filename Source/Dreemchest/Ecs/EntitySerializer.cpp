@@ -31,7 +31,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
+namespace Ecs
+{
 
 // ** Serializer::Serializer
 Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
@@ -50,11 +51,12 @@ Serializer::Serializer( EcsWPtr ecs, const Bitset& excluded )
     registerTypeConverter<EntityPtr, Variant>( dcThisMethod( Serializer::convertEntityPtrToGuid ) );
 }
 
-// ** Serializer::serialize
-bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
+// ** Serializer::serializeEntity
+bool Serializer::serializeEntity( EntityWPtr entity, KeyValue& ar ) const
 {
     // First serialize an entity itself
-    if( !Reflection::Serializer::serialize( entity->metaInstance(), ar ) ) {
+    if( !serialize( entity->metaInstance(), ar ) )
+    {
         return false;
     }
 
@@ -62,9 +64,11 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
     const Entity::Components& components = entity->components();
 
     // Now serialize each entity component
-    for( Entity::Components::const_iterator i = components.begin(), end = components.end(); i != end; i++ ) {
+    for( Entity::Components::const_iterator i = components.begin(), end = components.end(); i != end; i++ )
+    {
         // Skip excluded components
-        if( m_excluded.is( i->second->typeIndex() ) ) {
+        if( m_excluded.is( i->second->typeIndex() ) )
+        {
             continue;
         }
 
@@ -72,13 +76,14 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
         const Reflection::Class* metaClass = i->second->metaObject();
 
         // Skip component with no type, this means it's an abstract data type
-        if( !metaClass->type() ) {
+        if( !metaClass->type() )
+        {
             continue;
         }
 
         // Serialize component to a temporary key-value storage
         KeyValue component;
-        Reflection::Serializer::serialize( i->second->metaInstance(), component );
+        serialize( i->second->metaInstance(), component );
 
         // Remove the 'class' field from a serialized data
         component.removeValueAtKey( "class" );
@@ -90,11 +95,11 @@ bool Serializer::serialize( EntityWPtr entity, KeyValue& ar ) const
     return true;
 }
 
-// ** Serializer::deserialize
-bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar )
+// ** Serializer::deserializeEntity
+bool Serializer::deserializeEntity( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar )
 {
     // First deserialize an entity itself
-    Reflection::Serializer::deserialize( entity->metaInstance(), ar );
+    deserialize( entity->metaInstance(), ar );
 
     // Create components from key-value archive
     const KeyValue::Properties& kv = ar.properties();
@@ -102,9 +107,11 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
     // Get the entity meta-class
     const Reflection::Class* metaObject = entity->metaObject();
 
-    for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i ) {
+    for( KeyValue::Properties::const_iterator i = kv.begin(); i != kv.end(); ++i )
+    {
         // Skip the class value & all entity properties
-        if( i->first == "class" || metaObject->findMember( i->first.c_str() ) ) {
+        if( i->first == "class" || metaObject->findMember( i->first.c_str() ) )
+        {
             continue;
         }
 
@@ -113,11 +120,15 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
 
         // Perform a conversion if converter found
         KeyValue kv;
-        if( converter ) {
+        if( converter )
+        {
             kv = converter( i->second );
-        } else {
+        }
+        else
+        {
             // Key-value storage expected
-            if( !i->second.type()->is<KeyValue>() ) {
+            if( !i->second.type()->is<KeyValue>() )
+            {
                 LogError( "serializer", "entity component '%s' data is expected to be a key-value storage\n", i->first.c_str() );
                 continue;
             }
@@ -127,14 +138,16 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
         // Create and read component instance
         Reflection::Instance instance = createAndDeserialize( assembly, i->first, kv );
 
-        if( !instance ) {
+        if( !instance )
+        {
             continue;
         }
 
         // Down-cast instance to an abstract component
         ComponentBase* component = instance.upCast<ComponentBase>();
 
-        if( !component ) {
+        if( !component )
+        {
             LogError( "serializer", "'%s' is not a subclass of component\n", i->first.c_str() );
             continue;           
         }
@@ -148,13 +161,13 @@ bool Serializer::deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr enti
 // ** Serializer::serializeComponent
 void Serializer::serializeComponent( ComponentWPtr component, KeyValue& ar ) const
 {
-    Reflection::Serializer::serialize( component->metaInstance(), ar );
+    serialize( component->metaInstance(), ar );
 }
 
 // ** Serializer::deserializeComponent
 void Serializer::deserializeComponent( ComponentWPtr component, const KeyValue& ar ) const
 {
-    Reflection::Serializer::deserialize( component->metaInstance(), ar );
+    deserialize( component->metaInstance(), ar );
 }
 
 // ** Serializer::findComponentConverter
@@ -184,7 +197,8 @@ Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Ref
     Guid id = value.as<Guid>();
 
     // Return a NULL pointer if this is an empty Guid
-    if( id.isNull() ) {
+    if( id.isNull() )
+    {
         return Variant::fromValue( EntityWPtr() );
     }
 
@@ -192,7 +206,8 @@ Variant Serializer::convertGuidToEntity( const Reflection::Class& cls, const Ref
     EntityWPtr entity = resolveEntity( id );
 
     // Show a warning message if no entity found
-    if( !entity.valid() ) {
+    if( !entity.valid() )
+    {
         LogWarning( "serializer", "%s.%s, unresolved entity %s\n", cls.name(), property.name(), id.toString().c_str() );
     }
 
@@ -218,7 +233,8 @@ Variant Serializer::convertGuidToEntityPtr( const Reflection::Class& cls, const 
     Guid id = value.as<Guid>();
 
     // Return a NULL pointer if this is an empty Guid
-    if( id.isNull() ) {
+    if( id.isNull() )
+    {
         return Variant::fromValue( EntityPtr() );
     }
 
@@ -226,7 +242,8 @@ Variant Serializer::convertGuidToEntityPtr( const Reflection::Class& cls, const 
     EntityPtr entity = resolveEntity( id );
 
     // Show a warning message if no entity found
-    if( !entity.valid() ) {
+    if( !entity.valid() )
+    {
         LogWarning( "serializer", "%s.%s, unresolved entity %s\n", cls.name(), property.name(), id.toString().c_str() );
     }
 

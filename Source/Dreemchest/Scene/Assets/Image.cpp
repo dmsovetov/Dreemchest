@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Scene {
 
 // ** Image::Image
-Image::Image( void ) : m_width( 0 ), m_height( 0 ), m_bytesPerPixel( 0 ), m_channels( 0 )
+Image::Image( void ) : m_width( 0 ), m_height( 0 ), m_bytesPerPixel( 0 )
 {
     setMipLevelCount( 1 );
     setBytesPerPixel( 4 );

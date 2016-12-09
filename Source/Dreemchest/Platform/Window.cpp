@@ -43,6 +43,11 @@ Window::Window( IWindow* impl ) : m_impl( impl )
 // ** Window::~Window
 Window::~Window( void )
 {
+    if (m_impl)
+    {
+        m_impl->close();
+    }
+    
     delete m_impl;
 }
 
@@ -58,16 +63,6 @@ Window* Window::create( u32 width, u32 height )
 #endif
 
     return NULL;
-}
-
-// ** Window::release
-void Window::release( void )
-{
-    if( m_impl ) {
-        m_impl->close();
-    }
-
-    delete this;
 }
 
 // ** Window::width

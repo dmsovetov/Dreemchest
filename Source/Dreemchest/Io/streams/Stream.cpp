@@ -29,7 +29,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
+namespace Io
+{
 
 // ** Stream::Stream
 Stream::Stream( void )
@@ -42,8 +43,8 @@ Stream::~Stream( void )
 
 }
 
-// ** Stream::dispose
-void Stream::dispose( void )
+// ** Stream::close
+void Stream::close( void )
 {
 
 }
@@ -58,7 +59,8 @@ s32 Stream::readString( String& str ) const
     str     = "";
     result += read( &length, sizeof( length ) );
 
-    if( length == 0 ) {
+    if( length == 0 )
+    {
         return result;
     }
 
@@ -75,7 +77,8 @@ s32 Stream::writeString( CString str )
     u32 length = ( u32 )strlen( str );
 
     result += write( &length, sizeof( length ) );
-    if( length ) {
+    if( length )
+    {
         result += write( str, length );
     }
     

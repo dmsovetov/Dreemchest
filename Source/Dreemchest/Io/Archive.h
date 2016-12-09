@@ -88,7 +88,6 @@ namespace Io {
         virtual bool            fileExists( const Path& fileName ) const NIMBLE_OVERRIDE;
 
         // ** Archive
-        void                    release( void );
         bool                    open( const StreamPtr& file );
         void                    create( const StreamPtr& file, eCompressor compressor = CompressorZ );
         void                    close( void );

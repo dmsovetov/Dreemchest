@@ -122,7 +122,7 @@ void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Pi
         u32 rtt  = connection->time() - ping.timestamp;
         u32 time = ping.time + rtt / 2;
 
-        if( abs( ( s64 )time - connection->time() ) > 50 ) {
+        if( std::abs( ( s64 )time - connection->time() ) > 50 ) {
             LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
             connection->setTime( time );
         }

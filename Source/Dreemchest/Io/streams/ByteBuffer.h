@@ -31,17 +31,15 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-
+namespace Io
+{
     //! ByteBuffer class represents a stream located in RAM.
-    class dcInterface ByteBuffer : public Stream {
+    class dcInterface ByteBuffer : public Stream
+    {
     friend class FileSystem;
-
-        DC_DECLARE_IS( ByteBuffer, ByteBuffer, this )
-
     public:
 
-        virtual                    ~ByteBuffer( void );
+        virtual                 ~ByteBuffer( void );
 
         //! Returns a length of this stream.
         virtual s32             length( void ) const NIMBLE_OVERRIDE;
@@ -74,7 +72,7 @@ namespace Io {
         const u8*               current( void ) const;
 
         //! Constructs the copy of a byte array.
-        ByteBufferPtr            copy( void ) const;
+        ByteBufferPtr           copy( void ) const;
 
         //! Trims a specified amount of bytes from the beginning of a stream.
         void                    trimFromLeft( s32 size );

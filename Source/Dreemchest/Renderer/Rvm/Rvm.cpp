@@ -138,8 +138,8 @@ void Rvm::IntermediateTargetStack::release( u8 index )
 
 // ** Rvm::Rvm
 Rvm::Rvm( RenderingContextWPtr context )
-    : m_context( context )
-    , m_hal( context->hal() )
+    : m_hal( context->hal() )
+    , m_context( context )
     , m_intermediateTargets( DC_NEW IntermediateTargetStack( context ) )
 {
     // Reset all state switchers

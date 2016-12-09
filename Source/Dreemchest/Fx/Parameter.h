@@ -234,6 +234,7 @@ namespace Fx {
                                                 m_particleCurves[particleIndex].sample( scalar, result );
                                             }
                                             break;
+        default:                            NIMBLE_NOT_IMPLEMENTED
         }
 
         return result;

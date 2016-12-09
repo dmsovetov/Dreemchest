@@ -43,12 +43,11 @@ Modifier::Modifier( void )
 Modifier* Modifier::create( ModifierType type )
 {
     switch( type ) {
-    case ModifierFriction:        return DC_NEW Friction;
-    case ModifierForce:            return DC_NEW Force;
+    case ModifierFriction:      return DC_NEW Friction;
+    case ModifierForce:         return DC_NEW Force;
     case ModifierForceField:    return DC_NEW ForceField;
+    default:                    NIMBLE_NOT_IMPLEMENTED
     }
-
-    NIMBLE_BREAK_IF( true, "unhandled modifier type" );
 
     return NULL;
 }

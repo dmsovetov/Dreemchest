@@ -254,7 +254,15 @@ void Shape2D::setParts( const Shape2D::Parts& value )
 
 // ** RigidBody2D::RigidBody2D
 RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask, bool isBullet, bool isSensor )
-    : m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask ), m_gravityScale( 1.0f ), m_rotatedTo( 0.0f )
+    : m_mass( mass )
+    , m_type( type )
+    , m_linearDamping( 0.0f )
+    , m_angularDamping( 0.0f )
+    , m_torque( 0.0f )
+    , m_category( category )
+    , m_gravityScale( 1.0f )
+    , m_collisionMask( collisionMask )
+    , m_rotatedTo( 0.0f )
 {
     m_flags.set( IsBullet, isBullet );
     m_flags.set( IsSensor, isSensor );

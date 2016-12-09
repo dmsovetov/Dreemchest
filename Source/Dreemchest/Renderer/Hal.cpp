@@ -732,8 +732,8 @@ Texture2DPtr RenderTarget::attachment( Attachment attachment ) const
 
 // ** InputLayout::attributeLocation
 InputLayout::InputLayout( s32 vertexSize )
-    : m_vertexSize( vertexSize )
-    , m_features( 0 )
+    : m_features( 0 )
+    , m_vertexSize( vertexSize )
 {
 }
 
@@ -947,7 +947,7 @@ void ConstantBuffer::unlock( void )
 // ** ConstantBuffer::data
 const u8* ConstantBuffer::data( void ) const
 {
-    return reinterpret_cast<const u8*>( m_data );
+    return m_data;
 }
 
 // ** ConstantBuffer::size

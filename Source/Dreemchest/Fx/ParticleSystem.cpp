@@ -83,7 +83,11 @@ ParticleSystemInstancePtr ParticleSystem::createInstance( IMaterialFactoryWPtr m
 // ---------------------------------------- ParticleSystemInstance ---------------------------------------- //
 
 // ** ParticleSystemInstance::ParticleSystemInstance
-ParticleSystemInstance::ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem ) : m_particleSystem( particleSystem ), m_position( 0.0f, 0.0f, 0.0f ), m_aliveCount( 0 ), m_timeScale( 1.0f )
+ParticleSystemInstance::ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem )
+    : m_particleSystem( particleSystem )
+    , m_position( 0.0f, 0.0f, 0.0f )
+    , m_timeScale( 1.0f )
+    , m_aliveCount( 0 )
 {
     for( int i = 0, n = m_particleSystem->emitterCount(); i < n; i++ ) {
         m_emitters.push_back( m_particleSystem->emitter( i )->createInstance( materialFactory ) );

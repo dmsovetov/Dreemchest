@@ -62,8 +62,8 @@ void SpriteRenderer::setScaleFactor( f32 value )
 ForwardRenderer::ForwardRenderer( s32 shadowSize, s32 shadowCascadeCount )
     : m_shadowSize( shadowSize )
     , m_shadowCascadeCount( shadowCascadeCount )
-    , m_debugCascadeShadows( false )
     , m_shadowCascadeLambda( 0.5f )
+    , m_debugCascadeShadows( false )
 {
 }
 

@@ -74,8 +74,8 @@ void EntitySystem::end( void )
 {
 }
 
-// ** EntitySystem::process
-void EntitySystem::process( u32 currentTime, f32 dt, Entity& entity )
+// ** EntitySystem::processEntity
+void EntitySystem::processEntity( u32 currentTime, f32 dt, Entity& entity )
 {
 }
 
@@ -92,7 +92,7 @@ void EntitySystem::update( u32 currentTime, f32 dt )
 
     for( EntitySet::iterator i = entities.begin(); i != entities.end(); ) {
         Entity& entity = *(i++)->get();
-        process( currentTime, dt, entity );
+        processEntity( currentTime, dt, entity );
     }
 
     end();

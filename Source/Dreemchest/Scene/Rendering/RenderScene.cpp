@@ -165,9 +165,9 @@ RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromSphere( c
 
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, Renderer::RenderingContextWPtr context, RenderCacheWPtr cache )
-    : m_scene( scene )
+    : m_cache( cache )
+    , m_scene( scene )
     , m_context( context )
-    , m_cache( cache )
 {
     // Get a parent Ecs instance
     Ecs::EcsWPtr ecs = scene->ecs();
@@ -414,7 +414,7 @@ RenderScene::StaticMeshNode RenderScene::createStaticMeshNode( const Ecs::Entity
     initializeInstanceNode( entity, mesh, mesh.mesh->material(0) );
 
     const MeshHandle& asset = mesh.mesh->mesh();
-    const Mesh&       data  = asset.readLock();
+    /*const Mesh&       data  =*/ asset.readLock();
 
     mesh.count = 0;
     mesh.states = NULL;

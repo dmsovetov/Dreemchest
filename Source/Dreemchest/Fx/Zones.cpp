@@ -35,13 +35,14 @@ namespace Fx {
 // ** Zone::create
 ZonePtr Zone::create( ZoneType type )
 {
-    switch( type ) {
-    case ZoneDisk: return ZonePtr( DC_NEW DiskZone );
-    case ZoneLine: return ZonePtr( DC_NEW LineZone );
-    case ZoneBox:  return ZonePtr( DC_NEW BoxZone );
+    switch( type )
+    {
+        case ZoneDisk:  return ZonePtr( DC_NEW DiskZone );
+        case ZoneLine:  return ZonePtr( DC_NEW LineZone );
+        case ZoneBox:   return ZonePtr( DC_NEW BoxZone );
+        default:        NIMBLE_NOT_IMPLEMENTED
     }
 
-    NIMBLE_BREAK_IF( true, "unhandled zone type" );
     return ZonePtr();
 }
 

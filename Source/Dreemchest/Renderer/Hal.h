@@ -659,9 +659,11 @@ namespace Renderer {
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
     //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
-    struct ConstantBufferLayout {
+    struct ConstantBufferLayout
+    {
         //! Constant type.
-        enum Type {
+        enum Type
+        {
               Integer   //!< Integer constant value.
             , Float     //!< Float constant value.
             , Vec2      //!< Vec2 constant value.
@@ -703,13 +705,13 @@ namespace Renderer {
 
         //! Lockes a constant buffer and performs the type cast.
         template<typename TData>
-        TData*                        lock( void );
+        TData*                      lock( void );
 
     protected:
 
         u32                         m_size;     //!< Constant buffer size.
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
-        void*                       m_data;     //!< Constant buffer data.
+        u8*                         m_data;     //!< Constant buffer data.
         const ConstantBufferLayout* m_layout;   //!< An array of constants that are stored inside a buffer.
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };

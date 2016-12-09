@@ -40,8 +40,8 @@ State::State( void )
 
 // ** State::State
 State::State( Type type, s32 id )
-    : type( type )
-    , resourceId( id )
+    : resourceId( id )
+    , type( type )
 {
 }
 

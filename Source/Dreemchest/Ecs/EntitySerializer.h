@@ -31,10 +31,11 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
-
+namespace Ecs
+{
     //! Performs writing/reading entities to a key-value storage.
-    class Serializer : public Reflection::Serializer {
+    class Serializer : public Reflection::Serializer
+    {
     public:
 
         //! Function type used by a component converters.
@@ -44,10 +45,10 @@ namespace Ecs {
                                             Serializer( EcsWPtr ecs, const Bitset& excluded = Bitset() );
 
         //! Writes entity instance to a key-value storage.
-        virtual bool                        serialize( EntityWPtr entity, KeyValue& ar ) const;
+        virtual bool                        serializeEntity( EntityWPtr entity, KeyValue& ar ) const;
 
         //! Creates entity and reads it from a key-value storage.
-        virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
+        virtual bool                        deserializeEntity( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
         //! Writes component instance to a key-value storage.
         void                                serializeComponent( ComponentWPtr component, KeyValue& ar ) const;
@@ -70,7 +71,7 @@ namespace Ecs {
         ComponentConverter                  findComponentConverter( const String& name ) const;
 
         //! Callback to access the default value of Entity flags property.
-        Variant                                defaultEntityFlags( const KeyValue& ar ) const;
+        Variant                             defaultEntityFlags( const KeyValue& ar ) const;
 
         //! Converts a Guid value to an entity reference.
         Variant                             convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;

@@ -65,10 +65,10 @@ namespace Network {
         virtual PacketTypeId    id( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::id(); }
 
         //! Writes packet to a binary stream.
-        virtual void            serialize( Io::StreamWPtr stream ) const {}
+        virtual void            serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE {}
 
         //! Reads packet from a binary stream.
-        virtual void            deserialize( Io::StreamWPtr stream ) {}
+        virtual void            deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE {}
     };
 
     //! A binary blob type

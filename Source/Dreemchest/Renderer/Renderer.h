@@ -78,7 +78,7 @@ namespace Renderer {
     struct State;
     class StateBlock;
     class VertexFormat;
-    class ConstantBufferLayout;
+    struct ConstantBufferLayout;
     
     //! Render command buffer unique pointer type.
     typedef AutoPtr<class CommandBuffer> CommandBufferUPtr;

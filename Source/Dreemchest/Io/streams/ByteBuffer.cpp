@@ -31,15 +31,18 @@ DC_BEGIN_DREEMCHEST
 namespace Io {
 
 // ** ByteBuffer::ByteBuffer
-ByteBuffer::ByteBuffer( const u8* pointer, s32 size ) : m_position( 0 )
+ByteBuffer::ByteBuffer( const u8* pointer, s32 size )
+    : m_position( 0 )
 {
-    if( size == 0 ) {
+    if( size == 0 )
+    {
         return;
     }
     
     m_buffer.resize( size );
 
-    if( pointer ) {
+    if( pointer )
+    {
         memcpy( &m_buffer[0], pointer, size );
     }
 }
@@ -146,7 +149,8 @@ s32 ByteBuffer::write( const void* buffer, s32 size )
 
     s32 extra = max2( 0, size - bytesAvailable() );
 
-    if( extra ) {
+    if( extra )
+    {
         m_buffer.resize( length() + extra );
     }
 
@@ -165,15 +169,16 @@ s32 ByteBuffer::position( void ) const
 // ** ByteBuffer::setPosition
 void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
 {
-    switch( origin ) {
-    case SeekSet:   m_position = min2( length(), offset );
-                    break;
+    switch( origin )
+    {
+        case SeekSet:   m_position = min2( length(), offset );
+                        break;
             
-    case SeekCur:   m_position = min2( m_position + offset, length() );
-                    break;
+        case SeekCur:   m_position = min2( m_position + offset, length() );
+                        break;
             
-    case SeekEnd:   m_position = max2( 0, length() - offset );
-                    break;
+        case SeekEnd:   m_position = max2( 0, length() - offset );
+                        break;
     }
 }
 

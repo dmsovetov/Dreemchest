@@ -29,11 +29,15 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
+namespace Io
+{
 
 // ** PackedStream::PackedStream
 PackedStream::PackedStream( const StreamPtr& file, IBufferCompressor* compressor, s32 fileSize, s32 fileOffset )
-    : m_compressor( compressor ), m_file( file ), m_fileSize( fileSize ), m_fileOffset( fileOffset )
+    : m_compressor( compressor )
+    , m_file( file )
+    , m_fileSize( fileSize )
+    , m_fileOffset( fileOffset )
 {
     m_position       = 0;
     m_bufferOffset   = 0;
@@ -74,25 +78,32 @@ void PackedStream::setPosition( s32 offset, SeekOrigin origin )
     u64 currentPos = position();
     u64 targetPos    = 0;
 
-    switch( origin ) {
-    case SeekCur: targetPos = currentPos  + offset;     break;
-    case SeekSet: targetPos = offset;                   break;
-    case SeekEnd: targetPos = length() - offset;        break;
+    switch( origin )
+    {
+        case SeekCur: targetPos = currentPos  + offset;     break;
+        case SeekSet: targetPos = offset;                   break;
+        case SeekEnd: targetPos = length() - offset;        break;
     }
 
-    if( targetPos == currentPos ) {
+    if( targetPos == currentPos )
+    {
         return;
     }
 
-    if( targetPos < currentPos ) {
+    if( targetPos < currentPos )
+    {
         reopen();
 
-        for( int i = 0; i < targetPos; i++ ) {
+        for( int i = 0; i < targetPos; i++ )
+        {
             u8 temp;
             read( &temp, 1 );
         }
-    } else {
-        for( int i = 0; i < (targetPos - currentPos); i++ ) {
+    }
+    else
+    {
+        for( int i = 0; i < (targetPos - currentPos); i++ )
+        {
             u8 temp;
             read( &temp, 1 );
         }
@@ -119,12 +130,14 @@ s32 PackedStream::readFile( u8 *buffer, s32 size )
     NIMBLE_BREAK_IF( bytesRead > size );
 
     // ** Output buffer is full
-    if( bytesRead >= size ) {
+    if( bytesRead >= size )
+    {
         return size;
     }
 
     // ** End of compressed file
-    if( !hasDataLeft() ) {
+    if( !hasDataLeft() )
+    {
         return bytesRead;
     }
 
@@ -139,8 +152,10 @@ s32 PackedStream::readFromBuffer( u8* buffer, s32 size )
 {
     int bytesRead = 0;
 
-    for( bytesRead = 0; bytesRead < size; bytesRead++ ) {
-        if( m_bufferOffset >= m_bytesAvailable ) {
+    for( bytesRead = 0; bytesRead < size; bytesRead++ )
+    {
+        if( m_bufferOffset >= m_bytesAvailable )
+        {
             break;
         }
 

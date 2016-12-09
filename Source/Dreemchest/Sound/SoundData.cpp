@@ -38,12 +38,12 @@ SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGro
     : m_soundFx( sfx )
     , m_uri( uri )
     , m_group( group )
-    , m_pcm( NULL )
     , m_format( SoundFormatUnknown )
+    , m_pcm( NULL )
     , m_isRelative( false )
     , m_maximumDistance( FLT_MAX )
-    , m_rolloffFactor( 1.0f )
     , m_referenceDistance( 1.0f )
+    , m_rolloffFactor( 1.0f )
 {
     m_identifier        = identifier;
     m_type              = 0;

@@ -243,7 +243,7 @@ void Acceleration::update( Particle* particles, s32 first, s32 last, const Simul
 void Position::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
     const Vec3* velocity = particles->velocity;
-    const Particle::Force* force      = particles->force;
+    //const Particle::Force* force      = particles->force;
     Vec3*        position = particles->position;
 
     for( s32 i = first; i < last; i++ ) {

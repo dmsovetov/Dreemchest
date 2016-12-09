@@ -170,7 +170,7 @@ namespace Fx {
                                     PointRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderPoints; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderPoints; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
@@ -181,7 +181,7 @@ namespace Fx {
                                     QuadRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderQuads; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderQuads; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
@@ -192,7 +192,7 @@ namespace Fx {
                                     LineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderLines; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderLines; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
@@ -203,7 +203,7 @@ namespace Fx {
                                     ThickLineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderThickLines; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderThickLines; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
@@ -214,7 +214,7 @@ namespace Fx {
                                     PathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderPaths; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderPaths; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
@@ -225,7 +225,7 @@ namespace Fx {
                                     ThickPathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode        type( void ) const { return RenderThickPaths; }
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderThickPaths; }
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 

@@ -33,10 +33,10 @@ namespace Scene {
 // ** ForwardRenderSystem::ForwardRenderSystem
 ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
-    , m_debugCascadedShadows( context, renderScene )
-    , m_debugRenderTarget( context, renderScene )
-    , m_shadows( context, renderScene )
     , m_ambient( context, renderScene )
+    , m_debugCascadedShadows( context, renderScene )
+    , m_shadows( context, renderScene )
+    , m_debugRenderTarget( context, renderScene )
 {
     m_phongShader       = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );

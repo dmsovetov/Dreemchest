@@ -45,7 +45,7 @@ namespace Ecs {
         virtual bool    initialize( EcsWPtr ecs );
 
         //! Returns the total number of entities that are processed by this system.
-        s32                entityCount( void ) const;
+        s32             entityCount( void ) const;
 
     protected:
 
@@ -59,7 +59,7 @@ namespace Ecs {
         virtual void    end( void );
 
         //! Processes a single entity.
-        virtual void    process( u32 currentTime, f32 dt, Entity& entity );
+        virtual void    processEntity( u32 currentTime, f32 dt, Entity& entity );
 
         //! Called when entity was added.
         virtual void    entityAdded( const Entity& entity );
@@ -75,7 +75,7 @@ namespace Ecs {
 
     protected:
 
-        Aspect            m_aspect;    //!< Entity aspect.
+        Aspect          m_aspect;    //!< Entity aspect.
         IndexPtr        m_index;    //!< Entity index used by this system.
     };
 } // namespace Ecs
