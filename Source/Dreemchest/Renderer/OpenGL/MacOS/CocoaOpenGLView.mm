@@ -52,6 +52,12 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
     CVReturn result = [(CocoaOpenGLView*)displayLinkContext getFrameForTime:outputTime];
     return result;
 }
+#else
+// ** displayCallback
+static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
+{
+    return kCVReturnSuccess;
+}
 #endif  /*  #if 0   */
 
 // ** initWithWindow
@@ -144,7 +150,7 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkCreateWithActiveCGDisplays result %d\n", result );
     }
 
-    result = CVDisplayLinkSetOutputCallback( m_displayLink, NULL/*displayCallback*/, self );
+    result = CVDisplayLinkSetOutputCallback( m_displayLink, displayCallback, self );
     if( result != kCVReturnSuccess ) {
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkSetOutputCallback result %d\n", result );
     }
