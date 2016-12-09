@@ -92,7 +92,7 @@ void StreamedRenderPassBase::flush( RenderCommandBuffer& commands, RenderStateSt
 
     // Upload vertex data to a GPU buffer and emit a draw primitives command
     commands.uploadVertexBuffer( m_vertexBuffer, m_activeBatch.stream, m_activeBatch.size * m_activeBatch.vertexFormat.vertexSize() );
-    commands.drawPrimitives( 0, m_activeBatch.primitive, stateStack.states(), 0, m_activeBatch.size );
+    commands.drawPrimitives( 0, m_activeBatch.primitive, 0, m_activeBatch.size, stateStack );
 
     // Reset an active batch state
     m_activeBatch = ActiveBatch();

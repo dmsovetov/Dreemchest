@@ -81,7 +81,7 @@ void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMe
             instance->disableFeatures( ShaderAmbientColor );
         }
 
-        commands.drawIndexed( 0, Renderer::PrimTriangles, stateStack.states(), 0, mesh.count );
+        commands.drawIndexed( 0, Renderer::PrimTriangles, 0, mesh.count, stateStack  );
     }
 }
 
@@ -108,7 +108,7 @@ void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointCloud
             instance->disableFeatures( ShaderAmbientColor );
         }
 
-        commands.drawPrimitives( 0, Renderer::PrimPoints, stateStack.states(), 0, pointCloud.count );
+        commands.drawPrimitives( 0, Renderer::PrimPoints, 0, pointCloud.count, stateStack );
     }
 }
 

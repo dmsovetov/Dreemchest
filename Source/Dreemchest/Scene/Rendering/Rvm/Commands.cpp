@@ -133,30 +133,42 @@ void RenderCommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size
 }
 
 // ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
+void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack )
 {
-    OpCode opCode;
-    opCode.type         = OpCode::DrawIndexed;
-    opCode.sorting      = sorting;
-    opCode.drawCall.primitives   = primitives;
-    opCode.drawCall.first        = first;
-    opCode.drawCall.count        = count;
-    memcpy( opCode.drawCall.states, states, sizeof opCode.drawCall.states );
-
-    m_commands.push_back( opCode );
+    emitDrawCall( OpCode::DrawIndexed, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth );
+}
+    
+// ** RenderCommandBuffer::drawIndexed
+void RenderCommandBuffer::drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock )
+{
+    emitDrawCall( OpCode::DrawIndexed, sorting, primitives, first, count, &stateBlock, 1 );
 }
 
 // ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count )
+void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack )
+{
+    emitDrawCall( OpCode::DrawPrimitives, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth );
+}
+    
+// ** RenderCommandBuffer::drawPrimitives
+void RenderCommandBuffer::drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock )
+{
+    emitDrawCall( OpCode::DrawPrimitives, sorting, primitives, first, count, &stateBlock, 1 );
+}
+    
+// ** RenderCommandBuffer::emitDrawCall
+void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock** states, s32 stateCount )
 {
     OpCode opCode;
-    opCode.type         = OpCode::DrawPrimitives;
-    opCode.sorting      = sorting;
-    opCode.drawCall.primitives   = primitives;
-    opCode.drawCall.first        = first;
-    opCode.drawCall.count        = count;
-    memcpy( opCode.drawCall.states, states, sizeof opCode.drawCall.states );
-
+    opCode.type                 = type;
+    opCode.sorting              = sorting;
+    opCode.drawCall.primitives  = primitives;
+    opCode.drawCall.first       = first;
+    opCode.drawCall.count       = count;
+    
+    memset( opCode.drawCall.states, 0, sizeof( opCode.drawCall.states ) );
+    memcpy( opCode.drawCall.states, states, sizeof( RenderStateBlock* ) * stateCount );
+    
     m_commands.push_back( opCode );
 }
 

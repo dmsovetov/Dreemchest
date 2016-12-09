@@ -122,16 +122,25 @@ namespace Scene {
         //! Emits a vertex buffer upload command.
         void                        uploadVertexBuffer( u32 id, const void* data, s32 size );
 
-        //! Emits a draw indexed command.
-        void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );
+        //! Emits a draw indexed command that inherits all rendering states from a state stack.
+        void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack );
+        
+        //! Emits a draw indexed command with a single render state block.
+        void                        drawIndexed( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock );
 
-        //! Emits a draw primitives command.
-        void                        drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, const RenderStateBlock* states[MaxStateStackDepth], s32 first, s32 count );
+        //! Emits a draw primitives command that inherits all rendering states from a state stack.
+        void                        drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateStack& stateStack );
+        
+        //! Emits a draw primitives command that inherits all rendering states from a state stack.
+        void                        drawPrimitives( u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock* stateBlock );
 
     private:
 
                                     //! Constructs a RenderCommandBuffer instance.
                                     RenderCommandBuffer( RenderFrame& frame );
+        
+        //! Emits a draw call command.
+        void                        emitDrawCall( OpCode::Type type, u32 sorting, Renderer::PrimitiveType primitives, s32 first, s32 count, const RenderStateBlock** states, s32 stateCount );
 
     private:
 
