@@ -183,8 +183,13 @@ namespace Renderer
                                         //! Constructs a blend function render state.
                                         State( BlendFactor src, BlendFactor dst );
 
+                                    #if DEV_DEPRECATED_HAL
                                         //! Constructs a texture binding state.
                                         State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Depth );
+                                    #else
+                                        //! Constructs a texture binding state.
+                                        State( s32 id, TextureSampler sampler, u8 attachment = 0 );
+                                    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
                                         //! Constructs a polygon offset state.
                                         State( f32 factor, f32 units );
@@ -241,8 +246,13 @@ namespace Renderer
         //! Binds a texture to a specified sampler.
         void                            bindTexture( s32 id, State::TextureSampler sampler );
 
+    #if DEV_DEPRECATED_HAL
         //! Binds a rendered texture to a specified sampler.
         void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Color0 );
+    #else
+        //! Binds a rendered texture to a specified sampler.
+        void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, u8 attachment = 0 );
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
         //! Sets a blend function.
         void                            setBlend( BlendFactor src, BlendFactor dst );

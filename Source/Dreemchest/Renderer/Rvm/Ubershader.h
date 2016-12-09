@@ -77,8 +77,10 @@ namespace Renderer {
         //! Returns a supported features bitmask.
         Bitmask                     supportedFeatures( void ) const;
 
+    #if DEV_DEPRECATED_HAL
         //! Compiles a new permutation or returns a cached one.
-        const Renderer::ShaderPtr&  permutation( Renderer::HalWPtr hal, Bitmask features ) const;
+        const ShaderPtr&            permutation( HalWPtr hal, Bitmask features ) const;
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 

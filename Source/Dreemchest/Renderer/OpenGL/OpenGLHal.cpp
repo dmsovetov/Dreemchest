@@ -32,6 +32,8 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
+    
+#if DEV_DEPRECATED_HAL
 
 // ----------------------------------------------- OpenGLHal ----------------------------------------------- //
 
@@ -1379,6 +1381,8 @@ void OpenGLShader::setVec4( u32 location, const Vec4& value )
     DC_CHECK_GL;
     glUniform4fv( location - 1, 1, &value.x );
 }
+    
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

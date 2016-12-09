@@ -24,7 +24,7 @@
 
  **************************************************************************/
 
-#if 0
+#if DEV_DEPRECATED_HAL && 0
 
 #include    "BatchRenderer.h"
 #include    "Hal.h"
@@ -696,4 +696,4 @@ void BatchRenderer::renderCircle( float x, float y, float r, const rgba& fill, c
 
 DC_END_DREEMCHEST
 
-#endif
+#endif  /*  #if DEV_DEPRECATED_HAL  */

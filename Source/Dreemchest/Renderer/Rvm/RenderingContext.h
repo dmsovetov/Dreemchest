@@ -39,8 +39,10 @@ namespace Renderer
     friend class Rvm;
     public:
 
+    #if DEV_DEPRECATED_HAL
         //! Returns a parent rendering HAL instance.
         HalWPtr                                 hal( void ) const;
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
         //! Queues an input layout instance for creation and returns it's index.
         RenderId                                requestInputLayout( const VertexFormat& vertexFormat );
@@ -60,6 +62,7 @@ namespace Renderer
         //! Creates a shader from a file.
         UbershaderPtr                           createShader( const String& fileName ) const;
 
+    #if DEV_DEPRECATED_HAL
         //! Returns a vertex buffer by an index.
         const VertexBufferPtr&                  vertexBuffer( RenderId identifier ) const;
 
@@ -74,23 +77,34 @@ namespace Renderer
 
         //! Returns a texture by an index.
         const TexturePtr&                       texture( s32 identifier ) const;
-       
-        //! Interns a shader and returns it's integer identifier.
-        s32                                     internShader( UbershaderPtr shader );
         
         //! Returns a shader by an index.
         const UbershaderPtr&                    shader( s32 identifier ) const;
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
+        
+        //! Interns a shader and returns it's integer identifier.
+        s32                                     internShader( UbershaderPtr shader );
 
+    #if DEV_DEPRECATED_HAL
         //! Creates a RenderingContext instance.
         static RenderingContextPtr              create( Renderer::HalWPtr hal );
+    #else
+        //! Creates a RenderingContext instance.
+        static RenderingContextPtr              create();
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 
         //! Forward declaration of a ResourceConstructor type.
         struct ResourceConstructor;
 
+                                            #if DEV_DEPRECATED_HAL
                                                 //! Constructs a RenderingContext instance.
                                                 RenderingContext( HalWPtr hal );
+                                            #else
+                                                //! Constructs a RenderingContext instance.
+                                                RenderingContext();
+                                            #endif  /*  #if DEV_DEPRECATED_HAL  */
 
         //! Constructs all resources before rendering a frame.
         void                                    constructResources( void );
@@ -116,8 +130,10 @@ namespace Renderer
         //! Releases an intermediate render target.
         void                                    releaseRenderTarget( RenderId id );
 
+    #if DEV_DEPRECATED_HAL
         //! Returns an intermediate render target.
         RenderTargetWPtr                        intermediateRenderTarget( RenderId id ) const;
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 
@@ -175,20 +191,26 @@ namespace Renderer
         //! Container type to store a list of resource constructors that should be run before rendering a frame.
         typedef List<ResourceConstructor>       ResourceConstructors;
 
+    #if DEV_DEPRECATED_HAL
         HalWPtr                                 m_hal;                              //!< A rendering HAL to be used.
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
         ResourceConstructors                    m_resourceConstructors;             //!< A list of resources to be constructed.
+    #if DEV_DEPRECATED_HAL
         FixedArray<VertexBufferPtr>             m_vertexBufferPool;                 //!< Allocated vertex buffers.
         FixedArray<IndexBufferPtr>              m_indexBufferPool;                  //!< Allocated index buffers.
         FixedArray<ConstantBufferPtr>           m_constantBufferPool;               //!< Allocated constant buffers.
         FixedArray<InputLayoutPtr>              m_inputLayoutPool;                  //!< Allocated input layouts.
-        RenderId                                m_inputLayouts[MaxInputLayouts];    //!< A lookup table for input layout types.
         FixedArray<TexturePtr>                  m_texturePool;                      //!< Allocated textures.
         IndexCache<UbershaderPtr>               m_shaders;                          //!< Interned shaders.
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
+        RenderId                                m_inputLayouts[MaxInputLayouts];    //!< A lookup table for input layout types.
 
         //! A helper struct that hold info about an intermediate render target.
         struct IntermediateRenderTarget
         {
+        #if DEV_DEPRECATED_HAL
             RenderTargetPtr                     renderTarget;                       //!< A GPU render target instance.
+        #endif  /*  #if DEV_DEPRECATED_HAL  */
             u16                                 width;                              //!< Render target width.
             u16                                 height;                             //!< Render target height.
             PixelFormat                         format;                             //!< Render target internal format.

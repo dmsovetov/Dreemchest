@@ -36,6 +36,8 @@ namespace Renderer {
     NIMBLE_LOGGER_TAG( Renderer )
 
     class RenderView;
+    
+#if DEV_DEPRECATED_HAL
     class Hal;
     class BatchRenderer;
     class BlendState;
@@ -64,6 +66,10 @@ namespace Renderer {
     dcDeclarePtrs( Texture2D )
     dcDeclarePtrs( Shader )
     dcDeclarePtrs( RenderTarget )
+#else
+    struct Shader : public RefCounted {};
+    dcDeclarePtrs(Shader);
+#endif  /*  #if DEV_DEPRECATED_HAL  */
     
     dcDeclarePtrs( Ubershader )
     dcDeclarePtrs( RenderingContext )

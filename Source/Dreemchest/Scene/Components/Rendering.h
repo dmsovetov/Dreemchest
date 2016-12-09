@@ -230,18 +230,22 @@ namespace Scene
         //! Sets the material by index.
         void                            setMaterial( u32 index, MaterialHandle value );
 
+    #if DEV_DEPRECATED_HAL
         //! Returns a lightmap texture.
         const Renderer::TexturePtr&     lightmap( void ) const;
 
         //! Sets a lightmap texture.
         void                            setLightmap( const Renderer::TexturePtr& value );
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 
-        MeshHandle                      m_mesh;                //!< Mesh to be rendered.
-        Bounds                          m_worldSpaceBounds;    //!< Mesh world space bounding box.
-        Array<MaterialHandle>           m_materials;        //!< Mesh materials array.
-        Renderer::TexturePtr            m_lightmap;            //!< Lightmap texture that is rendered for this mesh.
+        MeshHandle                      m_mesh;                 //!< Mesh to be rendered.
+        Bounds                          m_worldSpaceBounds;     //!< Mesh world space bounding box.
+        Array<MaterialHandle>           m_materials;            //!< Mesh materials array.
+    #if DEV_DEPRECATED_HAL
+        Renderer::TexturePtr            m_lightmap;             //!< Lightmap texture that is rendered for this mesh.
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
     };
 
     // ** StaticMesh::materialCount

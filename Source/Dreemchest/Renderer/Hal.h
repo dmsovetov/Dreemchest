@@ -34,7 +34,24 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer {
 
 #if DEV_RENDERER_SOFTWARE_CBUFFERS
-    struct ConstantBufferLayout;
+    //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
+    struct ConstantBufferLayout
+    {
+        //! Constant type.
+        enum Type
+        {
+            Integer   //!< Integer constant value.
+            , Float     //!< Float constant value.
+            , Vec2      //!< Vec2 constant value.
+            , Vec3      //!< Vec3 constant value.
+            , Vec4      //!< Vec4 constant value.
+            , Matrix4   //!< 4x4 matrix constant value.
+        };
+        
+        FixedString name;       //!< Uniform name.
+        Type        type;       //!< Uniform type.
+        u32         offset;     //!< Uniform offset.
+    };
 #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
     // ** class RenderView
@@ -53,7 +70,13 @@ namespace Renderer {
         //! Ends a frame rendering.
         virtual void                endFrame( void ) {}
     };
+    
+#ifdef DC_OPENGL_ENABLED
+    //! Platform-specific OpenGL view constructor.
+    extern RenderView* createOpenGLView( void* window, PixelFormat depthStencil );
+#endif    /*    DC_OPENGL_ENABLED    */
 
+#if DEV_DEPRECATED_HAL
     // ** class Hal
     //! Hal class is a hardware abstraction layer around a low level graphics API.
     class dcInterface Hal : public RefCounted {
@@ -657,27 +680,6 @@ namespace Renderer {
         bool                        m_isGpu;
     };
 
-    #if DEV_RENDERER_SOFTWARE_CBUFFERS
-    //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
-    struct ConstantBufferLayout
-    {
-        //! Constant type.
-        enum Type
-        {
-              Integer   //!< Integer constant value.
-            , Float     //!< Float constant value.
-            , Vec2      //!< Vec2 constant value.
-            , Vec3      //!< Vec3 constant value.
-            , Vec4      //!< Vec4 constant value.
-            , Matrix4   //!< 4x4 matrix constant value.
-        };
-
-        FixedString name;       //!< Uniform name.
-        Type        type;       //!< Uniform type.
-        u32         offset;     //!< Uniform offset.
-    };
-    #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
-
     //! Constant buffer contains data that is sent to a shader.
     class ConstantBuffer : public RenderResource {
     public:
@@ -763,6 +765,7 @@ namespace Renderer {
         //! Sets a Vec4 value to a uniform location.
         virtual void                setVec4( u32 location, const Vec4& value );
     };
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

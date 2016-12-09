@@ -136,8 +136,13 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
         renderLight( frame, commands, stateStack, light, &clip, shadows );
 
         // Render a debug shadow texture
-        if( forwardRenderer.isDebugCascadeShadows() ) {
+        if( forwardRenderer.isDebugCascadeShadows() )
+        {
+        #if DEV_DEPRECATED_HAL
             m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, Renderer::RenderTarget::Depth, 128, j * 130, 0 );
+        #else
+            m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, -1, 128, j * 130, 0 );
+        #endif  /*  #if DEV_DEPRECATED_HAL  */
         }
 
         // Release an intermediate shadow render target
@@ -174,8 +179,13 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
     state->setPolygonOffset( -1, -1 );
 
     // Bind a rendered shadowmap
-    if( shadows ) {
+    if( shadows )
+    {
+    #if DEV_DEPRECATED_HAL
         state->bindRenderedTexture( shadows, State::Texture1, Renderer::RenderTarget::Depth );
+    #else
+        state->bindRenderedTexture( shadows, State::Texture1, -1 );
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
         state->bindConstantBuffer( m_shadows.cbuffer(), State::ShadowConstants );
     }
 

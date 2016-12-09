@@ -97,7 +97,15 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
+    
+    // ** class OpenGLView
+    class OpenGLView : public RenderView {
+    public:
+        
+    };
 
+#if DEV_DEPRECATED_HAL
+    
     // ** struct sOpenGLErrorCheck
     struct sOpenGLErrorCheck {
         sOpenGLErrorCheck( void ) { NIMBLE_BREAK_IF( DumpErrors() ); }
@@ -128,12 +136,6 @@ namespace Renderer {
             
             return hasErrors;
         }
-    };
-
-    // ** class OpenGLView
-    class OpenGLView : public RenderView {
-    public:
-
     };
 
     // ** class OpenGLHal
@@ -345,6 +347,8 @@ namespace Renderer {
         GLuint                      m_vertex, m_fragment;
         mutable UniformLocations    m_uniformLocations;
     };
+    
+#endif  /*  #if DEV_DEPRECATED_HAL  */
     
 } // namespace Renderer
 

@@ -128,14 +128,16 @@ namespace Renderer
         //! A forward declaration of a stack type to store intermediate render targets.
         class IntermediateTargetStack;
 
+    #if DEV_DEPRECATED_HAL
         Renderer::HalWPtr                   m_hal;                                          //!< Rendering HAL to be used.
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
         RenderingContextWPtr                m_context;                                      //!< Parent rendering context.
         StateSwitch                         m_stateSwitches[State::TotalStates];      //!< Function callbacks to switch states.
         u64                                 m_vertexAttributeFeatures;                      //!< A vertex attribute features.
         u64                                 m_resourceFeatures;                             //!< Active resource features.
         ActiveShader                        m_activeShader;                                 //!< An active shader instance.
         Stack<const f32*>                   m_viewportStack;                                //!< A viewport stack.
-        UPtr<IntermediateTargetStack>    m_intermediateTargets;                          //!< An intermediate render target stack.
+        UPtr<IntermediateTargetStack>       m_intermediateTargets;                          //!< An intermediate render target stack.
     };
 
 } // namespace Renderer

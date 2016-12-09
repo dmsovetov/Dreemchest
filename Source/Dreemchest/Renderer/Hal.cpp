@@ -44,13 +44,9 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-#ifdef DC_OPENGL_ENABLED
-    //! Platform-specific OpenGL view constructor.
-    extern OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil );
-#endif    /*    DC_OPENGL_ENABLED    */
-
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
+#if DEV_DEPRECATED_HAL
 // ** Hal::Hal
 Hal::Hal( RenderView* view ) : m_view( view )
 {
@@ -1012,6 +1008,8 @@ void Shader::setVec4( u32 location, const Vec4& value )
 {
 
 }
+    
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

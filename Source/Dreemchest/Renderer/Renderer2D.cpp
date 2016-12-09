@@ -48,7 +48,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-#if 0
+#if DEV_DEPRECATED_HAL && 0
 // ** Renderer2D::Renderer2D
 Renderer2D::Renderer2D( const HalPtr& hal, u32 maxVertexBufferSize ) : m_hal( hal ), m_maxVertexBufferSize( maxVertexBufferSize ), m_maxIndexBufferSize( maxVertexBufferSize * 6 )
 {
@@ -562,7 +562,7 @@ u32 Renderer2D::indexCountForPrimitives( PrimitiveType primType, u32 vertexCount
     
     return 0;
 }
-#endif
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

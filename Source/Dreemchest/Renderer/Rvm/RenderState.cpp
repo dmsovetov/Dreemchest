@@ -28,7 +28,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Renderer {
+namespace Renderer
+{
 
 // ---------------------------------------------------------------------------- State ---------------------------------------------------------------------------- //
 
@@ -83,6 +84,7 @@ State::State( BlendFactor src, BlendFactor dst )
     data.blend = (src << 4) | dst;
 }
 
+#if DEV_DEPRECATED_HAL
 // ** State::State
 State::State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment )
     : type( Texture )
@@ -90,6 +92,16 @@ State::State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachmen
     resourceId = id;
     data.index = sampler | (attachment << 4);
 }
+#else
+// ** State::State
+State::State( s32 id, TextureSampler sampler, u8 attachment )
+    : type( Texture )
+{
+    NIMBLE_NOT_IMPLEMENTED
+    resourceId = id;
+    data.index = sampler | (attachment << 4);
+}
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 // ** State::State
 State::State( f32 factor, f32 units )
@@ -146,11 +158,20 @@ void StateBlock::bindTexture( s32 id, State::TextureSampler sampler )
     pushState( State( id, sampler ), State::Texture + sampler );
 }
 
+#if DEV_DEPRECATED_HAL
 // ** StateBlock::bindRenderedTexture
 void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment )
 {
     pushState( State( -renderTarget, sampler, attachment ), State::Texture + sampler );
 }
+#else
+// ** StateBlock::bindRenderedTexture
+void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, u8 attachment )
+{
+    NIMBLE_NOT_IMPLEMENTED
+    pushState( State( -renderTarget, sampler, attachment ), State::Texture + sampler );
+}
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 // ** StateBlock::setBlend
 void StateBlock::setBlend( BlendFactor src, BlendFactor dst )

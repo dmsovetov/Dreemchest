@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-#if 0
+#if DEV_DEPRECATED_HAL && 0
     //! Renderer2D is used for displaying 2D vector graphics.
     class Renderer2D : public RefCounted {
     public:
@@ -171,7 +171,7 @@ namespace Renderer {
         u32                        m_maxVertexBufferSize;                    //!< The maximum size of a vertex buffer.
         u32                        m_maxIndexBufferSize;                    //!< The maximum size of an index buffer.
     };
-#endif
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

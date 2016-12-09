@@ -80,8 +80,13 @@ namespace Scene {
                             //! Constructs a DebugRenderTarget instance.
                             DebugRenderTarget( RenderingContext& context, RenderScene& renderScene );
 
+    #if DEV_DEPRECATED_HAL
         //! Emits render operations to render a target as a 2D rectangle.
         void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTarget::Attachment attachment, s32 size, s32 x, s32 y );
+    #else
+        //! Emits render operations to render a target as a 2D rectangle.
+        void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, u8 attachment, s32 size, s32 x, s32 y );
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 

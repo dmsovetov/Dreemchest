@@ -63,11 +63,13 @@ public:
     //! Pops an active stack frame.
     void                        popFrame( void );
 
+#if DEV_DEPRECATED_HAL
     //! Returns a render target by a local index.
-    Renderer::RenderTargetWPtr  get( u8 index ) const;
+    RenderTargetWPtr            get( u8 index ) const;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
     //! Acquires an intermediate target with a specified parameters and loads it to a local slot.
-    void                        acquire( u8 index, u16 width, u16 height, Renderer::PixelFormat format );
+    void                        acquire( u8 index, u16 width, u16 height, PixelFormat format );
 
     //! Releases an intermediate target.
     void                        release( u8 index );
@@ -112,15 +114,17 @@ void Rvm::IntermediateTargetStack::popFrame( void )
     m_stackFrame -= StackFrameSize;
 }
 
+#if DEV_DEPRECATED_HAL
 // ** Rvm::IntermediateTargetStack::get
 RenderTargetWPtr Rvm::IntermediateTargetStack::get( u8 index ) const
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     return m_context->intermediateRenderTarget( m_stackFrame[index - 1] );
 }
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 // ** Rvm::IntermediateTargetStack::acquire
-void Rvm::IntermediateTargetStack::acquire( u8 index, u16 width, u16 height, Renderer::PixelFormat format )
+void Rvm::IntermediateTargetStack::acquire( u8 index, u16 width, u16 height, PixelFormat format )
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = m_context->acquireRenderTarget( width, height, format );
@@ -138,8 +142,12 @@ void Rvm::IntermediateTargetStack::release( u8 index )
 
 // ** Rvm::Rvm
 Rvm::Rvm( RenderingContextWPtr context )
+#if DEV_DEPRECATED_HAL
     : m_hal( context->hal() )
     , m_context( context )
+#else
+    : m_context( context )
+#endif  /*  #if DEV_DEPRECATED_HAL */
     , m_intermediateTargets( DC_NEW IntermediateTargetStack( context ) )
 {
     // Reset all state switchers
@@ -184,6 +192,7 @@ void Rvm::display( RenderFrame& frame )
 // ** Rvm::renderToTarget
 void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands )
 {
+#if DEV_DEPRECATED_HAL
     // Push a render target state
     if( renderTarget )
     {
@@ -216,6 +225,8 @@ void Rvm::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* 
         const f32* prev = m_viewportStack.top();
         m_hal->setViewport( prev[0], prev[1], prev[2], prev[3] );
     }
+#else
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::execute
@@ -250,16 +261,24 @@ void Rvm::execute( const RenderFrame& frame, const CommandBuffer& commands )
                                                                 // Apply rendering states from a stack
                                                                 applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
+                                                            #if DEV_DEPRECATED_HAL
                                                                 // Perform an actual draw call
                                                                 m_hal->renderIndexed( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                            #else
+                                                                NIMBLE_NOT_IMPLEMENTED
+                                                            #endif  /*  #if DEV_DEPRECATED_HAL  */
                                                             }
                                                             break;
         case CommandBuffer::OpCode::DrawPrimitives:         {
                                                                 // Apply rendering states from a stack
                                                                 applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
 
+                                                            #if DEV_DEPRECATED_HAL
                                                                 // Perform an actual draw call
                                                                 m_hal->renderPrimitives( opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count );
+                                                            #else
+                                                                NIMBLE_NOT_IMPLEMENTED
+                                                            #endif  /*  #if DEV_DEPRECATED_HAL  */
                                                             }
                                                             break;
         default:                                            NIMBLE_NOT_IMPLEMENTED;
@@ -273,6 +292,7 @@ void Rvm::execute( const RenderFrame& frame, const CommandBuffer& commands )
 // ** Rvm::reset
 void Rvm::reset( void )
 {
+#if DEV_DEPRECATED_HAL
     // Reset the face culling
     m_hal->setCulling( Renderer::TriangleFaceBack );
 
@@ -295,27 +315,41 @@ void Rvm::reset( void )
 
     // Disable the alpha test
     m_hal->setAlphaTest( Renderer::CompareDisabled );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::clear
 void Rvm::clear( const f32* color, f32 depth, s32 stencil, u8 mask )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->clear( Rgba( color ), depth,stencil, mask );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::uploadConstantBuffer
 void Rvm::uploadConstantBuffer( u32 id, const void* data, s32 size )
 {
+#if DEV_DEPRECATED_HAL
     Renderer::ConstantBufferPtr constantBuffer = m_context->constantBuffer( id );
     memcpy( constantBuffer->lock(), data, size );
     constantBuffer->unlock();
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::uploadVertexBuffer
 void Rvm::uploadVertexBuffer( u32 id, const void* data, s32 size )
 {
+#if DEV_DEPRECATED_HAL
     Renderer::VertexBufferPtr vertexBuffer = m_context->vertexBuffer( id );
     vertexBuffer->setBufferData( data, 0, size );
+#else
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::applyStates
@@ -386,42 +420,67 @@ void Rvm::applyStates( const RenderFrame& frame, const StateBlock* const * state
 
     if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features )
     {
+    #if DEV_DEPRECATED_HAL
         m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
+    #else
+        NIMBLE_NOT_IMPLEMENTED
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
         m_activeShader.features     = features;
         m_activeShader.activeShader = m_activeShader.shader;
     }
 
+#if DEV_DEPRECATED_HAL
     // Bind an active shader permutation
     m_hal->setShader( m_activeShader.permutation );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchAlphaTest
 void Rvm::switchAlphaTest( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->setAlphaTest( static_cast<Renderer::Compare>( state.compareFunction ), state.data.alphaReference / 255.0f );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchDepthState
 void Rvm::switchDepthState( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->setDepthTest( state.data.depthWrite, static_cast<Renderer::Compare>( state.compareFunction ) );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchBlending
 void Rvm::switchBlending( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->setBlendFactors( static_cast<Renderer::BlendFactor>( state.data.blend >> 4 ), static_cast<Renderer::BlendFactor>( state.data.blend & 0xF ) );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchShader
 void Rvm::switchShader( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_activeShader.shader = m_context->shader( state.resourceId );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchConstantBuffer
 void Rvm::switchConstantBuffer( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     const Renderer::ConstantBufferPtr& constantBuffer = m_context->constantBuffer( state.resourceId );
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
 
@@ -430,36 +489,52 @@ void Rvm::switchConstantBuffer( const RenderFrame& frame, const State& state )
 
     // Update resource features
     m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + CBufferFeaturesOffset));
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchVertexBuffer
 void Rvm::switchVertexBuffer( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     const Renderer::VertexBufferPtr& vertexBuffer = m_context->vertexBuffer( state.resourceId );
     m_hal->setVertexBuffer( vertexBuffer );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchIndexBuffer
 void Rvm::switchIndexBuffer( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     const Renderer::IndexBufferPtr& indexBuffer = m_context->indexBuffer( state.resourceId );
     m_hal->setIndexBuffer( indexBuffer );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchInputLayout
 void Rvm::switchInputLayout( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     // Bind an input layout
     const Renderer::InputLayoutPtr& inputLayout = m_context->inputLayout( state.resourceId );
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features
     m_vertexAttributeFeatures = inputLayout->features();
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchTexture
 void Rvm::switchTexture( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     // A single u64 bit constant value
     static const u64 bit = 1;
 
@@ -485,18 +560,29 @@ void Rvm::switchTexture( const RenderFrame& frame, const State& state )
 
     // Update resource features
     m_resourceFeatures = m_resourceFeatures | (bit << (samplerIndex + SamplerFeaturesOffset));
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchCullFace
 void Rvm::switchCullFace( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->setCulling( static_cast<Renderer::TriangleFace>( state.cullFace ) );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** Rvm::switchPolygonOffset
 void Rvm::switchPolygonOffset( const RenderFrame& frame, const State& state )
 {
+#if DEV_DEPRECATED_HAL
     m_hal->setPolygonOffset( state.polygonOffset.factor / 128.0f, state.polygonOffset.units / 128.0f );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 } // namespace Renderer

@@ -30,6 +30,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    
+#if DEV_DEPRECATED_HAL
 
 // ------------------------------- RasterizerState ------------------------------- //
 
@@ -172,6 +174,8 @@ void DepthStencilState::setStencilEnabled( bool enabled )
 {
     m_stencilEnable = enabled ? 1 : 0;
 }
+    
+#endif  /*  #if DEV_DEPRECATED_HAL  */
     
 } // namespace Renderer
 

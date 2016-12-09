@@ -33,8 +33,10 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Renderer {
+namespace Renderer
+{
 
+#if DEV_DEPRECATED_HAL
 // ** RenderingContext::RenderingContext
 RenderingContext::RenderingContext( Renderer::HalWPtr hal )
     : m_hal( hal )
@@ -47,6 +49,13 @@ Renderer::HalWPtr RenderingContext::hal( void ) const
 {
     return m_hal;
 }
+#else
+// ** RenderingContext::RenderingContext
+RenderingContext::RenderingContext( void )
+{
+    memset( m_inputLayouts, 0, sizeof m_inputLayouts );
+}
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 // ** RenderingContext::constructResources
 void RenderingContext::constructResources( void )
@@ -76,6 +85,7 @@ void RenderingContext::constructResources( void )
 // ** RenderingContext::constructInputLayout
 void RenderingContext::constructInputLayout( const ResourceConstructor& constructor )
 {
+#if DEV_DEPRECATED_HAL
     NIMBLE_BREAK_IF( m_inputLayoutPool[constructor.id - 1].valid(), "resource was already constructed" );
 
     // Create an input layout vertex format
@@ -108,11 +118,15 @@ void RenderingContext::constructInputLayout( const ResourceConstructor& construc
 
     // Save an input layout to a pool
     m_inputLayoutPool[constructor.id - 1] = inputLayout;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::constructVertexBuffer
 void RenderingContext::constructVertexBuffer( const ResourceConstructor& constructor )
 {
+#if DEV_DEPRECATED_HAL
     NIMBLE_BREAK_IF( m_vertexBufferPool[constructor.id - 1].valid(), "resource was already constructed" );
 
     // Create a vertex buffer instance
@@ -129,11 +143,15 @@ void RenderingContext::constructVertexBuffer( const ResourceConstructor& constru
     m_vertexBufferPool[constructor.id - 1] = vertexBuffer;
 
     LogDebug( "renderingContext", "vertex buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::constructIndexBuffer
 void RenderingContext::constructIndexBuffer( const ResourceConstructor& constructor )
 {
+#if DEV_DEPRECATED_HAL
     // Create an index buffer instance
     IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( constructor.buffer.size );
 
@@ -148,11 +166,15 @@ void RenderingContext::constructIndexBuffer( const ResourceConstructor& construc
     m_indexBufferPool[constructor.id - 1] = indexBuffer;
 
     LogDebug( "renderingContext", "index buffer %d of size %2.2fkb constructed\n", constructor.id, constructor.buffer.size / 1024.0f );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::constructConstantBuffer
 void RenderingContext::constructConstantBuffer( const ResourceConstructor& constructor )
 {
+#if DEV_DEPRECATED_HAL
     ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( constructor.buffer.size, reinterpret_cast<const ConstantBufferLayout*>( constructor.buffer.userData ) );
 
     // Upload data to a GPU buffer
@@ -164,11 +186,15 @@ void RenderingContext::constructConstantBuffer( const ResourceConstructor& const
 
     // Save a index buffer to a pool
     m_constantBufferPool[constructor.id - 1] = constantBuffer;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::constructTexture
 void RenderingContext::constructTexture( const ResourceConstructor& constructor )
 {
+#if DEV_DEPRECATED_HAL
     Texture2DPtr texture = m_hal->createTexture2D( constructor.texture.width, constructor.texture.height, constructor.texture.format );
 
     // Upload data to a GPU buffer
@@ -182,11 +208,14 @@ void RenderingContext::constructTexture( const ResourceConstructor& constructor 
 
     // Save a index buffer to a pool
     m_texturePool[constructor.id - 1] = texture;
+#else
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::requestInputLayout
 RenderId RenderingContext::requestInputLayout( const VertexFormat& format )
 {
+#if DEV_DEPRECATED_HAL
     // First lookup a previously constucted input layout
     RenderId id = m_inputLayouts[format];
     if( id )
@@ -204,11 +233,16 @@ RenderId RenderingContext::requestInputLayout( const VertexFormat& format )
     m_inputLayouts[format] = constructor.id;
 
     return constructor.id;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+    return 0;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::requestVertexBuffer
 RenderId RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
+#if DEV_DEPRECATED_HAL
     ResourceConstructor constructor = ResourceConstructor::VertexBuffer;
     constructor.id          = m_vertexBufferPool.push( NULL ) + 1;
     constructor.buffer.size = size;
@@ -216,11 +250,15 @@ RenderId RenderingContext::requestVertexBuffer( const void* data, s32 size )
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::requestIndexBuffer
 RenderId RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
+#if DEV_DEPRECATED_HAL
     ResourceConstructor constructor = ResourceConstructor::IndexBuffer;
     constructor.id          = m_indexBufferPool.push( NULL ) + 1;
     constructor.buffer.size = size;
@@ -228,11 +266,16 @@ RenderId RenderingContext::requestIndexBuffer( const void* data, s32 size )
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+    return 0;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::requestConstantBuffer
 RenderId RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
 {
+#if DEV_DEPRECATED_HAL
     ResourceConstructor constructor = ResourceConstructor::ConstantBuffer;
     constructor.id          = m_constantBufferPool.push( NULL ) + 1;
     constructor.buffer.size = size;
@@ -241,11 +284,16 @@ RenderId RenderingContext::requestConstantBuffer( const void* data, s32 size, co
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+    return 0;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::requestConstantBuffer
 RenderId RenderingContext::requestTexture( const void* data, s32 width, s32 height, Renderer::PixelFormat format )
 {
+#if DEV_DEPRECATED_HAL
     ResourceConstructor constructor = ResourceConstructor::Texture;
     constructor.id          = m_texturePool.push( NULL ) + 1;
     constructor.texture.data = data;
@@ -255,6 +303,10 @@ RenderId RenderingContext::requestTexture( const void* data, s32 width, s32 heig
 
     m_resourceConstructors.push_back( constructor );
     return constructor.id;
+#else
+    NIMBLE_NOT_IMPLEMENTED
+    return 0;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 }
 
 // ** RenderingContext::createShader
@@ -389,6 +441,7 @@ RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelForm
         }
     }
 
+#if DEV_DEPRECATED_HAL
     // Not found - create a new one
     IntermediateRenderTarget intermediate;
     intermediate.isFree         = false;
@@ -408,6 +461,9 @@ RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelForm
     m_renderTargets.push_back( intermediate );
 
     LogVerbose( "renderingContext", "%dx%d render target created\n", width, height );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
     return m_renderTargets.size();
 }
@@ -418,6 +474,7 @@ void RenderingContext::releaseRenderTarget( RenderId id )
     m_renderTargets[id - 1].isFree = true;
 }
 
+#if DEV_DEPRECATED_HAL
 // ** RenderingContext::intermediateRenderTarget
 RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderId id ) const
 {
@@ -458,24 +515,39 @@ const TexturePtr& RenderingContext::texture( s32 identifier ) const
     NIMBLE_ABORT_IF( identifier <= 0, "invalid identifier" );
     return m_texturePool[identifier - 1];
 }
-
+    
 // ** RenderingContext::internShader
 s32 RenderingContext::internShader( UbershaderPtr shader )
 {
     return m_shaders.add( shader );
 }
-        
+
 // ** RenderingContext::shader
 const UbershaderPtr& RenderingContext::shader( s32 identifier ) const
 {
     return m_shaders.resolve( identifier );
 }
+#else
+// ** RenderingContext::internShader
+s32 RenderingContext::internShader( UbershaderPtr shader )
+{
+    return 0;
+}
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
+#if DEV_DEPRECATED_HAL
 // ** RenderingContext::create
 RenderingContextPtr RenderingContext::create( HalWPtr hal )
 {
     return DC_NEW RenderingContext( hal );
 }
+#else
+// ** RenderingContext::create
+RenderingContextPtr RenderingContext::create( void )
+{
+    return DC_NEW RenderingContext;
+}
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Scene
 

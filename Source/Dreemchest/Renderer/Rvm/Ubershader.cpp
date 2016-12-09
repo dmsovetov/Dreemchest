@@ -104,8 +104,9 @@ Ubershader::Bitmask Ubershader::supportedFeatures( void ) const
     return m_supportedFeatures;
 }
 
+#if DEV_DEPRECATED_HAL
 // ** Ubershader::permutation
-const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitmask features ) const
+const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitmask features ) const
 {
     // First cancel all features that are not supported by a shader
     //features = features & m_supportedFeatures;
@@ -146,6 +147,7 @@ const Renderer::ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitma
 
     return m_permutations[features];
 }
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

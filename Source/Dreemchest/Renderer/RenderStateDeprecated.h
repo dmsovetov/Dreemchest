@@ -32,6 +32,8 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
+    
+#if DEV_DEPRECATED_HAL
 
     // ** class RasterizerState
     class RasterizerState {
@@ -95,6 +97,8 @@ namespace Renderer {
         void            setStencilMask( int mask );
         void            setStencilEnabled( bool enabled );
     };
+    
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer {
 
 // ** createOpenGLView
-OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
     MacOSOpenGLView* view = DC_NEW MacOSOpenGLView;
     view->initialize( reinterpret_cast<NSWindow*>( window ), depthStencil, nil );

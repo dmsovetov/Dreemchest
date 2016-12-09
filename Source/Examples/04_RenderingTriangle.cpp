@@ -43,12 +43,16 @@ class RendererInitialization : public ApplicationDelegate
         Window* window = Window::create( 800, 600 );
 
         // Create a rendering view.
-        RenderView* view   = Hal::createOpenGLView( window->handle() );
+        RenderView* view   = Renderer::createOpenGLView( window->handle(), Renderer::PixelD24S8 );
 
+    #if DEV_DEPRECATED_HAL
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Hal::create( OpenGL, view );
-        
         m_renderingContext = Scene::RenderingContext::create(m_hal);
+    #else
+        m_renderingContext = Scene::RenderingContext::create();
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
+        
         m_rvm              = Scene::Rvm::create(m_renderingContext);
         
         static f32 vertices[] = {
@@ -93,10 +97,14 @@ class RendererInitialization : public ApplicationDelegate
         // Rendering frame is now ready, so pass it to RVM to display it on a screen.
         m_rvm->display(m_renderFrame);
 
+    #if DEV_DEPRECATED_HAL
         m_hal->present();
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
     }
     
+#if DEV_DEPRECATED_HAL
     HalPtr                          m_hal;              //!< Rendering HAL.
+#endif  /*  #if DEV_DEPRECATED_HAL  */
     Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
     Renderer::RvmPtr                m_rvm;              //!< Rendering virtual machine processes a list of commands and performs rendering.
     Renderer::StateBlock      m_renderState;      //!< Render state block is a composition of rendering states required for rendering.

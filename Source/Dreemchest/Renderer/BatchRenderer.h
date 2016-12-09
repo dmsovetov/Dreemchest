@@ -33,7 +33,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-#if 0
+#if DEV_DEPRECATED_HAL && 0
 
     // ** class BatchRenderer
     class BatchRenderer {
@@ -112,7 +112,7 @@ namespace Renderer {
         int                        m_mask;
     };
 
-#endif
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

@@ -285,6 +285,7 @@ void StaticMesh::setMaterial( u32 index, MaterialHandle value )
     m_materials[index] = value;
 }
 
+#if DEV_DEPRECATED_HAL
 // ** StaticMesh::lightmap
 const Renderer::TexturePtr& StaticMesh::lightmap( void ) const
 {
@@ -296,6 +297,7 @@ void StaticMesh::setLightmap( const Renderer::TexturePtr& value )
 {
     m_lightmap = value;
 }
+#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 // ------------------------------------------- PointCloud ----------------------------------------- //
 
