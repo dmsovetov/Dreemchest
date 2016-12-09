@@ -324,6 +324,12 @@ const RenderStateBlock** RenderStateStack::states( void ) const
 {
     return m_stack;
 }
+    
+// ** RenderStateStack::clear
+void RenderStateStack::clear( void )
+{
+    m_size = 0;
+}
 
 } // namespace Scene
 

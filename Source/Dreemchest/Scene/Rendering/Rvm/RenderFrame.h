@@ -62,12 +62,15 @@ namespace Scene {
         const void*                             internBuffer( const void* data, s32 size );
 
         //! Allocates a block of memory that is used during a frame rendering.
-        void*                                    allocate( s32 size );
+        void*                                   allocate( s32 size );
+        
+        //! Clears all data recorded by this frame.
+        void                                    clear( void );
 
     private:
 
         //! Container type to store recorded command buffers.
-        typedef Array<RenderCommandBufferUPtr> Commands;
+        typedef Array<RenderCommandBufferUPtr>  Commands;
 
         RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.

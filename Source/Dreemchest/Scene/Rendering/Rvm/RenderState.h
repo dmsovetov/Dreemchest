@@ -391,6 +391,9 @@ namespace Scene {
 
         //! Returns the stack size.
         s32                         size( void ) const;
+        
+        //! Clears a render state stack.
+        void                        clear( void );
 
         //! Returns the stack pointer.
         const RenderStateBlock**    states( void ) const;

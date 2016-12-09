@@ -78,6 +78,15 @@ RenderStateStack& RenderFrame::stateStack( void )
 {
     return m_stateStack;
 }
+    
+// ** RenderFrame::clear
+void RenderFrame::clear( void )
+{
+    m_commandBuffers.clear();
+    m_entryPoint = &createCommandBuffer();
+
+    m_allocator.reset();
+}
 
 } // namespace Scene
 

@@ -39,7 +39,7 @@ namespace Scene {
     public:
 
         //! Displays a frame captured by a render scene.
-        void                        display( const RenderFrameUPtr& frame );
+        void                        display( RenderFrame& frame );
 
         //! Creates an Rvm instance.
         static RvmPtr               create( RenderingContextWPtr context );

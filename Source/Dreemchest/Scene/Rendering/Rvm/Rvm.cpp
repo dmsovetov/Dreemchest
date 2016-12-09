@@ -163,16 +163,19 @@ RvmPtr Rvm::create( RenderingContextWPtr context )
 }
 
 // ** Rvm::display
-void Rvm::display( const RenderFrameUPtr& frame )
+void Rvm::display( RenderFrame& frame )
 {
     // Construct all resources before rendering a frame
     m_context->constructResources();
 
     // Execute an entry point command buffer
-    execute( *frame.get(), frame->entryPoint() );
+    execute( frame, frame.entryPoint() );
 
     // Reset rendering states
     reset();
+    
+    // Clear this frame
+    frame.clear();
 }
 
 // ** Rvm::renderToTarget
