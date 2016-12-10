@@ -149,7 +149,7 @@ class InstallCommand(cmake.Command):
                                       os.path.join(source_dir, 'lua'),
                                       os.path.join(binary_dir, 'lua'),
                                       prefix=install_path,
-                                      options=dict(BUILD_SHARED_LIBS=False),
+                                      options=dict(BUILD_SHARED_LIBS=False, LUA_USE_C89=True),
                                       target='install'
                                       )
 

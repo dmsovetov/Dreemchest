@@ -8,7 +8,7 @@ find_path(BOX2D_INCLUDE_DIR
 
 # Locate Box2D library file
 find_library(BOX2D_LIBRARY
-             PATHS ${CMAKE_PREFIX_PATH}
+             PATHS ${PREFIX_PATH}
              NAMES box2d Box2d BOX2D Box2D
              PATH_SUFFIXES lib
              NO_DEFAULT_PATH

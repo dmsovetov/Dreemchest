@@ -9,7 +9,7 @@ find_path(PNG_INCLUDE_DIR
 # Locate libpng library file
 find_library(PNG_LIBRARY
              PATHS ${PREFIX_PATH}
-             NAMES png libpng
+             NAMES png libpng png15 libpng15
              PATH_SUFFIXES lib
              NO_DEFAULT_PATH
              )
