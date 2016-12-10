@@ -38,8 +38,8 @@ namespace Platform {
     public:
 
         // ** IApplication
-        virtual void                quit( u32 exitCode ) DC_DECL_OVERRIDE;
-        virtual s32                 launch( Application* application ) DC_DECL_OVERRIDE;
+        virtual void                quit( u32 exitCode ) NIMBLE_OVERRIDE;
+        virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
 
 	private:
 
@@ -59,8 +59,8 @@ namespace Platform {
                                     WindowsService( void );
 
         // ** IApplication
-        virtual void                quit( u32 exitCode ) DC_DECL_OVERRIDE;
-        virtual s32                 launch( Application* application ) DC_DECL_OVERRIDE;
+        virtual void                quit( u32 exitCode ) NIMBLE_OVERRIDE;
+        virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
 
     public:
 

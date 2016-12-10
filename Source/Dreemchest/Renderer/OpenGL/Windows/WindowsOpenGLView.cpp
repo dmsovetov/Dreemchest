@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer {
 
 // ** createOpenGLView
-OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
     WindowsOpenGLView* view = DC_NEW WindowsOpenGLView;
     view->initialize( reinterpret_cast<HWND>( window ), depthStencil );
@@ -119,7 +119,7 @@ bool WindowsOpenGLView::makeCurrent( void )
 
     if( !result ) {
         LogError( "opengl", "failed to make context current" );
-        DC_BREAK;
+        NIMBLE_BREAK
     }
 
 	return result;

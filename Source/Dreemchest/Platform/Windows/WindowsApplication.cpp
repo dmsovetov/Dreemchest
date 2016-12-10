@@ -108,7 +108,7 @@ WindowsService* WindowsService::s_instance = NULL;
 // ** WindowsService::WindowsService
 WindowsService::WindowsService( void ) : m_application( NULL ), m_statusHandle( NULL ), m_stopEvent( INVALID_HANDLE_VALUE )
 {
-    DC_ABORT_IF( s_instance != NULL, "only a single WindowsService instance is allowed" );
+    NIMBLE_ABORT_IF( s_instance != NULL, "only a single WindowsService instance is allowed" );
 
     s_instance = this;
     ZeroMemory( &m_status, sizeof( m_status ) );
@@ -132,8 +132,8 @@ s32 WindowsService::launch( Application* application )
 
     // Get the service name from arguments
     String name = args.string( "service" );
-    DC_ABORT_IF( name.empty(), "service name cannot be empty" );
-    DC_ABORT_IF( name.length() >= MaxServiceNameLength, "service name is too long" );
+    NIMBLE_ABORT_IF( name.empty(), "service name cannot be empty" );
+    NIMBLE_ABORT_IF( name.length() >= MaxServiceNameLength, "service name is too long" );
 
     // Save the service name
     memcpy( m_name, name.c_str(), name.length() );
