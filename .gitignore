@@ -40,3 +40,4 @@ Build/Dependencies
 Build/Composer
 Projects
 tools/cmake
+Build/LogFile.txt

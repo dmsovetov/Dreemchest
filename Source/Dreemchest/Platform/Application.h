@@ -146,18 +146,29 @@ namespace Platform {
 
 DC_END_DREEMCHEST
 
-//! Declares an application entry point
-#define dcDeclareApplication( delegate )                                                            \
-    s32 main( s32 argc, s8** argv ) {                                                                \
+//! A private macro definition to construct application instance and parse arguments
+#define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv)                                     \
         DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
-        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );            \
-    }
+        return DC_DREEMCHEST_NS Platform::AppClass::create( args )->launch( delegate );      
 
-//! Declares a service entry point
-#define dcDeclareServiceApplication( delegate )                                                     \
-    s32 main( s32 argc, s8** argv ) {                                                                \
-        DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
-        return DC_DREEMCHEST_NS Platform::ServiceApplication::create( args )->launch( delegate );    \
-    }
+#ifdef DC_PLATFORM_WINDOWS
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )                                                                    \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv) }          \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 1, ( s8** )&pCmdLine) }
+
+    //! Declares a service entry point
+    #define dcDeclareServiceApplication( delegate )                                                             \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv) }   \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, 1, ( s8** )&pCmdLine) }
+#else
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )            \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application) }
+
+    //! Declares a service entry point
+    #define dcDeclareServiceApplication( delegate )                                             \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication) }
+#endif  /*  #ifdef DC_PLATFORM_WINDOWS  */
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */
