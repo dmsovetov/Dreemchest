@@ -55,6 +55,10 @@ class InstallCommand(cmake.Command):
                             help='build system generator to be used.',
                             choices=generators,
                             default=generators[0])
+        parser.add_argument('--configuration',
+                            help='a configuration to be built.',
+                            choices=['debug', 'release'],
+                            default='release')
 
         parser.set_defaults(function=self.install)
 
@@ -63,6 +67,7 @@ class InstallCommand(cmake.Command):
         install_path = os.path.abspath(options.output)
         binary_dir = os.path.abspath(os.path.join(options.source, 'Projects'))
         source_dir = os.path.abspath(options.source)
+        configuration = options.configuration.capitalize()
 
         # Make sure to pull all submodules before building them
         git.checkout_submodules()
@@ -72,7 +77,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(source_dir, 'zlib'),
                                       os.path.join(binary_dir, 'zlib'),
                                       prefix=install_path,
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_curl:
@@ -81,7 +87,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'curl'),
                                       prefix=install_path,
                                       options=dict(BUILD_CURL_EXE=False, CURL_STATICLIB=True),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_box2d:
@@ -90,7 +97,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'Box2D'),
                                       prefix=install_path,
                                       options=dict(BOX2D_BUILD_EXAMPLES=False, BOX2D_INSTALL=True),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_jsoncpp:
@@ -99,7 +107,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'jsoncpp'),
                                       prefix=install_path,
                                       options=dict(JSONCPP_WITH_TESTS=False, JSONCPP_WITH_POST_BUILD_UNITTEST=False),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_ogg:
@@ -107,7 +116,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(source_dir, 'ogg'),
                                       os.path.join(binary_dir, 'ogg'),
                                       prefix=install_path,
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_vorbis:
@@ -115,7 +125,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(source_dir, 'vorbis'),
                                       os.path.join(binary_dir, 'vorbis'),
                                       prefix=install_path,
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_gtest:
@@ -124,7 +135,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'GoogleTest'),
                                       prefix=install_path,
                                       target='install',
-                                      options=dict(gtest_force_shared_crt=True)
+                                      options=dict(gtest_force_shared_crt=True),
+                                      configuration=configuration
                                       )
 
         if not options.no_libpng:
@@ -133,7 +145,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'libpng'),
                                       prefix=install_path,
                                       options=dict(PNG_TESTS=False),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_libtiff:
@@ -142,7 +155,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'libtiff'),
                                       prefix=install_path,
                                       options=dict(CMAKE_CXX_FLAGS='-D_XKEYCHECK_H'),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_lua:
@@ -151,7 +165,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'lua'),
                                       prefix=install_path,
                                       options=dict(BUILD_SHARED_LIBS=False, LUA_USE_C89=True),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
         if not options.no_openal:
@@ -160,10 +175,11 @@ class InstallCommand(cmake.Command):
                                       os.path.join(binary_dir, 'OpenAL'),
                                       prefix=install_path,
                                       options=dict(ALSOFT_EXAMPLES=False, ALSOFT_TESTS=False, LIBTYPE='STATIC'),
-                                      target='install'
+                                      target='install',
+                                      configuration=configuration
                                       )
 
-    #    shutil.rmtree(binary_dir)
+        shutil.rmtree(binary_dir)
 
     @staticmethod
     def _add_library(parser, name):
