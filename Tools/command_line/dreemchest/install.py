@@ -123,7 +123,8 @@ class InstallCommand(cmake.Command):
                                       os.path.join(source_dir, 'GoogleTest'),
                                       os.path.join(binary_dir, 'GoogleTest'),
                                       prefix=install_path,
-                                      target='install'
+                                      target='install',
+                                      options=dict(gtest_force_shared_crt=True)
                                       )
 
         if not options.no_libpng:
@@ -162,7 +163,7 @@ class InstallCommand(cmake.Command):
                                       target='install'
                                       )
 
-        shutil.rmtree(binary_dir)
+    #    shutil.rmtree(binary_dir)
 
     @staticmethod
     def _add_library(parser, name):
