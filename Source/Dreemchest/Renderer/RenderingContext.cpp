@@ -376,7 +376,10 @@ void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& c
                                                             break;
         case CommandBuffer::OpCode::DrawIndexed:            {
                                                                 // Apply rendering states from a stack
-                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+                                                                PipelineFeatures features = applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+            
+                                                                // Now activate a matching shader permutation
+                                                                activateShaderPermutation(features);
 
                                                             #if DEV_DEPRECATED_HAL
                                                                 // Perform an actual draw call
@@ -388,7 +391,10 @@ void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& c
                                                             break;
         case CommandBuffer::OpCode::DrawPrimitives:         {
                                                                 // Apply rendering states from a stack
-                                                                applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+                                                                PipelineFeatures features = applyStates( frame, opCode.drawCall.states, MaxStateStackDepth );
+            
+                                                                // Now activate a matching shader permutation
+                                                                activateShaderPermutation(features);
 
                                                             #if DEV_DEPRECATED_HAL
                                                                 // Perform an actual draw call
@@ -592,10 +598,10 @@ void RenderingContext::commandCreateTexture(RenderId id, u16 width, u16 height, 
 }
 
 // ** RenderingContext::applyStates
-void RenderingContext::applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count )
+PipelineFeatures RenderingContext::applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count )
 {
-    u64 userFeatures = 0;
-    u64 userFeaturesMask = ~0;
+    PipelineFeatures userFeatures = 0;
+    PipelineFeatures userFeaturesMask = ~0;
 
     // Reset all ubershader features
     m_vertexAttributeFeatures = 0;
@@ -648,26 +654,39 @@ void RenderingContext::applyStates( const RenderFrame& frame, const StateBlock* 
             (this->*m_stateSwitches[state.type])( frame, state );
         }
     }
-
+    
+    // Compose a user defined feature mask
+    PipelineFeatures userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
+    
+    // Compose a new bitmaks with pipeline features
+    PipelineFeatures features = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined);
+    
+    return features;
+}
+    
+// ** RenderingContext::activateShaderPermutation
+void RenderingContext::activateShaderPermutation( PipelineFeatures features )
+{
     // Finally apply a shader
     NIMBLE_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
-
+    
     // Select a shader permutation that match an active pipeline state
     PipelineFeatures supported   = m_activeShader.shader->supportedFeatures();
-    PipelineFeatures userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
-    PipelineFeatures features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
-
+    features = features & supported;
+    //PipelineFeatures userDefined = userFeatures << UserDefinedFeaturesOffset;
+    //PipelineFeatures features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
+    
     if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features )
     {
-    #if DEV_DEPRECATED_HAL
+#if DEV_DEPRECATED_HAL
         m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
-    #else
+#else
         NIMBLE_NOT_IMPLEMENTED
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
+#endif  /*  #if DEV_DEPRECATED_HAL  */
         m_activeShader.features     = features;
         m_activeShader.activeShader = m_activeShader.shader;
     }
-
+    
 #if DEV_DEPRECATED_HAL
     // Bind an active shader permutation
     m_hal->setShader( m_activeShader.permutation );

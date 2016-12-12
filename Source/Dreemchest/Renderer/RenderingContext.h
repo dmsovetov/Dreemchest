@@ -98,8 +98,8 @@ namespace Renderer
         //! Binds a render target with specified viewport and executes a command buffer.
         void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
 
-        //! Unrolls a state stack an applies all state changes.
-        void                        applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count );
+        //! Unrolls a state stack an applies all state changes, returns an up-to-date pipeline feature mask.
+        PipelineFeatures            applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count );
 
         //! Clears an active render target
         void                        clear( const f32* color, f32 depth, s32 stencil, u8 mask );
@@ -181,6 +181,9 @@ namespace Renderer
         
         //! Releases an intermediate render target.
         void                        releaseRenderTarget( RenderId id );
+        
+        //! Activates a shader permuation that best matches active pipeline state.
+        void                        activateShaderPermutation( PipelineFeatures features );
 
     private:
 
