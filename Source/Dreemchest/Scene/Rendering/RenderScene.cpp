@@ -166,8 +166,8 @@ RenderScene::CBuffer::ClipPlanes RenderScene::CBuffer::ClipPlanes::fromSphere( c
 // ** RenderScene::RenderScene
 RenderScene::RenderScene( SceneWPtr scene, Renderer::RenderingContextWPtr context, RenderCacheWPtr cache )
     : m_cache( cache )
-    , m_scene( scene )
     , m_context( context )
+    , m_scene( scene )
 {
     // Get a parent Ecs instance
     Ecs::EcsWPtr ecs = scene->ecs();
@@ -184,7 +184,7 @@ RenderScene::RenderScene( SceneWPtr scene, Renderer::RenderingContextWPtr contex
     m_sceneParameters = DC_NEW CBuffer::Scene;
     
     // Create a default shader
-    m_defaultShader = m_context->createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
+    m_defaultShader = m_context->requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader" );
 }
 
 // ** RenderScene::create
@@ -256,7 +256,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     defaults->setDepthState( Renderer::LessEqual, true );
     defaults->setCullFace( Renderer::TriangleFaceBack );
     defaults->disablePolygonOffset();
-    defaults->bindProgram( m_context->internShader( m_defaultShader ) );
+    defaults->bindProgram( m_defaultShader );
 
     // Push a scene state block
     Renderer::StateScope scene = stateStack.newScope();

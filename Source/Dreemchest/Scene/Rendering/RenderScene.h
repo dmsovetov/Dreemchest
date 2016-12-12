@@ -276,8 +276,8 @@ namespace Scene
         RenderCacheWPtr                         m_cache;            //!< Render cache to be used.
         Renderer::RenderingContextWPtr          m_context;          //!< Parent rendering context.
         s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
-        UPtr<CBuffer::Scene>                 m_sceneParameters;  //!< Scene parameters constant buffer.
-        Renderer::UbershaderPtr                 m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
+        UPtr<CBuffer::Scene>                    m_sceneParameters;  //!< Scene parameters constant buffer.
+        Renderer::RenderId                      m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>                 m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.

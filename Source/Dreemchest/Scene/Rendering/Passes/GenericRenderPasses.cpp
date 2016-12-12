@@ -35,14 +35,14 @@ AmbientPass::AmbientPass( RenderingContext& context, RenderScene& renderScene )
     : RenderPassBase( context, renderScene )
 {
     // Create an ambient lighting shader instance
-    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
 }
 
 // ** AmbientPass::render
 void AmbientPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack )
 {
     StateScope pass = stateStack.newScope();
-    pass->bindProgram( m_context.internShader( m_shader ) );
+    pass->bindProgram( m_shader );
     pass->enableFeatures( ShaderEmissionColor | ShaderAmbientColor );
 
     RenderPassBase::emitStaticMeshes( m_renderScene.staticMeshes(), frame, commands, stateStack );
@@ -56,7 +56,7 @@ ShadowPass::ShadowPass( RenderingContext& context, RenderScene& renderScene )
     : RenderPassBase( context, renderScene )
 {
     // Create a shadowmap shader
-    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
+    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
 
     // Create a shadow parameters constant buffer
     m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Shadow ), RenderScene::CBuffer::Shadow::Layout );
@@ -85,7 +85,7 @@ u8 ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& 
     // Push a shadow pass scope
     StateScope state = stateStack.newScope();
     state->bindConstantBuffer( m_cbuffer, State::ShadowConstants );
-    state->bindProgram( m_context.internShader( m_shader ) );
+    state->bindProgram( m_shader );
     state->setCullFace( Renderer::TriangleFaceFront );
 
     // Render all static meshes to a target

@@ -91,7 +91,7 @@ namespace Scene {
     private:
 
         RenderId            m_cbuffer;      //!< A view constant buffer instance.
-        UbershaderPtr       m_shader;       //!< A shader to be used for rendering.
+        RenderId            m_shader;       //!< A shader to be used for rendering.
     };
 
     //! A debug render pass that renders a debug info for cascaded shadow mapping
@@ -113,7 +113,7 @@ namespace Scene {
 
         const Rgba*         m_colors;           //!< Split colors.
         CascadedShadowMaps  m_csm;              //!< A CSM instance being visualized.
-        UbershaderPtr       m_shader;           //!< A shader to be used for rendering.
+        RenderId            m_shader;           //!< A shader to be used for rendering.
     };
 
 } // namespace Scene

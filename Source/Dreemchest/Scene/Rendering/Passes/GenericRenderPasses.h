@@ -46,7 +46,7 @@ namespace Scene {
 
     private:
 
-        UbershaderPtr           m_shader;   //!< An ambient light shader instance.
+        RenderId                m_shader;   //!< An ambient light shader instance.
     };
 
     //! Renders a scene depth to a render target.
@@ -64,7 +64,7 @@ namespace Scene {
 
     private:
 
-        UbershaderPtr           m_shader;   //!< A shadowmap shader instance.
+        RenderId                m_shader;   //!< A shadowmap shader instance.
         RenderId                m_cbuffer;  //!< A shadow parameters constant buffer.
     };
 

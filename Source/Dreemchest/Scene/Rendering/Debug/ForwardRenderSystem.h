@@ -64,7 +64,7 @@ namespace Scene {
 
     private:
 
-        UbershaderPtr                   m_phongShader;
+        RenderId                        m_phongShader;
         RenderId                        m_clipPlanesCBuffer;
         AmbientPass                     m_ambient;
         ShadowPass                      m_shadows;

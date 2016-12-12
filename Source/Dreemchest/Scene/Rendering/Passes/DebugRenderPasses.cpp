@@ -103,7 +103,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
     m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::View ), RenderScene::CBuffer::View::Layout );
 
     // Create a shader
-    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
     
 #if DEV_DEPRECATED_HAL
@@ -123,7 +123,7 @@ void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, Sta
 
     // Push a rendering state
     StateScope pass = stateStack.newScope();
-    pass->bindProgram( m_context.internShader( m_shader ) );
+    pass->bindProgram( m_shader );
     pass->bindRenderedTexture( slot, State::Texture0, attachment );
     pass->bindConstantBuffer( m_cbuffer, State::ConstantBufferType::PassConstants );
     pass->setCullFace( Renderer::TriangleFaceBack );
@@ -143,7 +143,7 @@ DebugCascadedShadows::DebugCascadedShadows( RenderingContext& context, RenderSce
     : StreamedRenderPass( context, renderScene, 96 )
 {
     // Create a shader
-    m_shader = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
+    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
 
 // ** DebugCascadedShadows::render
@@ -166,7 +166,7 @@ void DebugCascadedShadows::render( RenderFrame& frame, CommandBuffer& commands, 
 
     // Push a pass state
     StateScope pass = stateStack.newScope();
-    pass->bindProgram( m_context.internShader( m_shader ) );
+    pass->bindProgram( m_shader );
     pass->setBlend( Renderer::BlendSrcAlpha, Renderer::BlendInvSrcAlpha );
 
     // Emit all required render operations

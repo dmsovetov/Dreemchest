@@ -59,14 +59,14 @@ namespace Renderer
         
         //! Queues a shader feature layout instance for creation and returns it's index.
         RenderId                    requestFeatureLayout(const ShaderFeature* features);
+        
+        //! Queues a shader instance creation and returns it's index.
+        RenderId                    requestShader( const String& fileName );
+        
+        //! Queues a shader instance creation and returns it's index.
+        RenderId                    requestShader( const String& vertex, const String& fragment );
 
     #if DEV_DEPRECATED_HAL
-        //! Creates a shader from a file.
-        UbershaderPtr               createShader( const String& fileName ) const;
-        
-        //! Interns a shader and returns it's integer identifier.
-        s32                         internShader( UbershaderPtr shader );
-        
         //! Creates an RenderingContext instance.
         static RenderingContextPtr  create( HalWPtr hal );
     #endif  /*  #if DEV_DEPRECATED_HAL  */
@@ -79,9 +79,6 @@ namespace Renderer
     #if DEV_DEPRECATED_HAL
         //! Resets rendering states to defaults.
         void                        reset( void );
-        
-        //! Returns a shader by an index.
-        const UbershaderPtr&        shader( s32 identifier ) const;
         
         //! Returns an intermediate render target.
         RenderTargetWPtr            intermediateRenderTarget( RenderId id ) const;
@@ -221,7 +218,7 @@ namespace Renderer
         class ConstructionCommandBuffer;
         
 #if DEV_DEPRECATED_HAL
-        typedef Ptr<VertexBufferLayout> VertexBufferLayoutUPtr;
+        typedef Ptr<VertexBufferLayout>     VertexBufferLayoutUPtr;
 #else
         typedef UPtr<VertexBufferLayout>    VertexBufferLayoutUPtr;
 #endif  /*  #if DEV_DEPRECATED_HAL  */
@@ -232,10 +229,10 @@ namespace Renderer
         FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
         FixedArray<ConstantBufferPtr>       m_constantBuffers;                      //!< Allocated constant buffers.
         FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
-        IndexCache<UbershaderPtr>           m_shaders;                              //!< Interned shaders.
 #endif  /*  #if DEV_DEPRECATED_HAL  */
         FixedArray<ShaderFeatureLayoutUPtr> m_featureLayouts;
         FixedArray<VertexBufferLayoutUPtr>  m_inputLayouts;                         //!< Allocated input layouts.
+        FixedArray<UbershaderPtr>           m_shaders;                              //!< Allocated ubershaders.
         InputLayout                         m_inputLayoutCache[MaxInputLayouts];    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*          m_constructionCommandBuffer;            //!< A command buffer that is used for resource construction commands.
 

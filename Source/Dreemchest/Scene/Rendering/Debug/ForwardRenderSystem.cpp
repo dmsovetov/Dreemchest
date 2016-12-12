@@ -34,11 +34,11 @@ namespace Scene {
 ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
     , m_ambient( context, renderScene )
-    , m_debugCascadedShadows( context, renderScene )
     , m_shadows( context, renderScene )
+    , m_debugCascadedShadows( context, renderScene )
     , m_debugRenderTarget( context, renderScene )
 {
-    m_phongShader       = m_context.createShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
+    m_phongShader       = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
     m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
@@ -173,7 +173,7 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
     StateScope state = stateStack.newScope();
     state->bindConstantBuffer( light.constantBuffer, State::LightConstants );
     state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
-    state->bindProgram( m_context.internShader( m_phongShader ) );
+    state->bindProgram( m_phongShader );
     state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
     state->setDepthState( Renderer::LessEqual, false );
     state->setPolygonOffset( -1, -1 );

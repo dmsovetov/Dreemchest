@@ -266,6 +266,7 @@ RenderingContext::RenderingContext( HalWPtr hal )
     m_constantBuffers.push( NULL );
     m_textures.push( NULL );
     m_featureLayouts.push( NULL );
+    m_shaders.push( NULL );
 }
 
 #if DEV_DEPRECATED_HAL
@@ -733,7 +734,8 @@ void RenderingContext::switchBlending( const RenderFrame& frame, const State& st
 void RenderingContext::switchShader( const RenderFrame& frame, const State& state )
 {
 #if DEV_DEPRECATED_HAL
-    m_activeShader.shader = shader( state.resourceId );
+    m_activeShader.shader = m_shaders[state.resourceId];
+    NIMBLE_ABORT_IF(!m_activeShader.shader.valid(), "invalid resource id");
 #else
     NIMBLE_NOT_IMPLEMENTED
 #endif  /*  #if DEV_DEPRECATED_HAL  */
@@ -952,9 +954,83 @@ RenderId RenderingContext::requestTexture( const void* data, u16 width, u16 heig
 {
     return m_constructionCommandBuffer->createTexture(allocateTexture(), data, width, height, format);
 }
+
+// ** RenderingContext::requestShader
+RenderId RenderingContext::requestShader(const String& fileName)
+{
+    static CString vertexShaderMarker   = "[VertexShader]";
+    static CString fragmentShaderMarker = "[FragmentShader]";
+    
+    // Read the code from an input stream
+    String code = Io::DiskFileSystem::readTextFile( fileName );
+    NIMBLE_ABORT_IF(code.empty(), "a shader source is empty or file not found");
+    
+    // Extract vertex/fragment shader code blocks
+    size_t vertexBegin   = code.find( vertexShaderMarker );
+    size_t fragmentBegin = code.find( fragmentShaderMarker );
+    
+    if( vertexBegin == String::npos && fragmentBegin == String::npos )
+    {
+        return 0;
+    }
+    
+    String vertexShader, fragmentShader;
+    
+    if( vertexBegin != String::npos )
+    {
+        u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
+        vertexShader = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
+    }
+    
+    if( fragmentBegin != String::npos )
+    {
+        u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
+        fragmentShader = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
+    }
+    
+    return requestShader(vertexShader, fragmentShader);
+}
+    
+// ** RenderingContext::requestShader
+RenderId RenderingContext::requestShader(const String& vertex, const String& fragment)
+{
+    // Create a shader instance
+    UbershaderPtr shader = DC_NEW Ubershader;
+    
+    // Set vertex and fragment shader code
+    shader->setVertex(vertex);
+    shader->setFragment(fragment);
+    
+    // ----------------------------------------------------
+    shader->addInclude(
+                       "                                                       \n\
+                       struct CBufferScene    { vec4 ambient; };           \n\
+                       struct CBufferView     { mat4 transform; float near; float far; vec3 position; };         \n\
+                       struct CBufferInstance { mat4 transform; };         \n\
+                       struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
+                       struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
+                       struct CBufferShadow   { mat4 transform; float invSize; };         \n\
+                       struct CBufferClipPlanes { vec4 equation[6]; };         \n\
+                       uniform CBufferScene    Scene;                      \n\
+                       uniform CBufferView     View;                       \n\
+                       uniform CBufferInstance Instance;                   \n\
+                       uniform CBufferMaterial Material;                   \n\
+                       uniform CBufferLight    Light;                      \n\
+                       uniform CBufferShadow   Shadow;                     \n\
+                       uniform CBufferClipPlanes ClipPlanes;               \n\
+                       #define u_DiffuseTexture Texture0                   \n\
+                       #define u_ShadowTexture  Texture1                   \n\
+                       "
+                       );
+    
+    // Put this shader to a pool
+    RenderId id = m_shaders.push(shader);
+    
+    return id;
+}
     
 // ** RenderingContext::createShader
-UbershaderPtr RenderingContext::createShader( const String& fileName ) const
+/*UbershaderPtr RenderingContext::createShader( const String& fileName ) const
 {
     static CString vertexShaderMarker   = "[VertexShader]";
     static CString fragmentShaderMarker = "[FragmentShader]";
@@ -1068,7 +1144,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
                        );
     
     return shader;
-}
+}*/
 
 // ** RenderingContext::acquireRenderTarget
 RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
@@ -1123,18 +1199,6 @@ void RenderingContext::releaseRenderTarget( RenderId id )
 RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderId id ) const
 {
     return m_renderTargets[id - 1].renderTarget;
-}
-
-// ** RenderingContext::internShader
-s32 RenderingContext::internShader( UbershaderPtr shader )
-{
-    return m_shaders.add( shader );
-}
-
-// ** RenderingContext::shader
-const UbershaderPtr& RenderingContext::shader( s32 identifier ) const
-{
-    return m_shaders.resolve( identifier );
 }
 #endif  //  #if DEV_DEPRECATED_HAL
 
