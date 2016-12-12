@@ -164,11 +164,11 @@ DC_END_DREEMCHEST
 #else
     //! Declares an application entry point
     #define dcDeclareApplication( delegate )            \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application) }
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv) }
 
     //! Declares a service entry point
-    #define dcDeclareServiceApplication( delegate )                                             \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication) }
+    #define dcDeclareServiceApplication( delegate )     \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv) }
 #endif  /*  #ifdef DC_PLATFORM_WINDOWS  */
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */
