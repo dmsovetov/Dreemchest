@@ -24,51 +24,51 @@
  
  **************************************************************************/
 
-#include "ShaderFeatureLayout.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
     
-// ------------------------------------------------------------------- ShaderFeature --------------------------------------------------------------------- //
+// ------------------------------------------------------------------ PipelineFeature -------------------------------------------------------------------- //
     
-// ** ShaderFeature::constantBuffer
-PipelineFeatures ShaderFeature::constantBuffer(ConstantBufferFeatures index)
+// ** PipelineFeature::constantBuffer
+PipelineFeatures PipelineFeature::constantBuffer(ConstantBufferFeatures index)
 {
     return static_cast<PipelineFeatures>(1) << (CBufferFeaturesOffset + index);
 }
     
-// ----------------------------------------------------------------- ShaderFeatureLayout ----------------------------------------------------------------- //
+// ---------------------------------------------------------------- PipelineFeatureLayout ---------------------------------------------------------------- //
     
-// ** ShaderFeatureLayout::ShaderFeatureLayout
-ShaderFeatureLayout::ShaderFeatureLayout( void )
+// ** PipelineFeatureLayout::PipelineFeatureLayout
+PipelineFeatureLayout::PipelineFeatureLayout( void )
     : m_mask(0)
 {
     
 }
     
-// ** ShaderFeatureLayout::mask
-PipelineFeatures ShaderFeatureLayout::mask( void ) const
+// ** PipelineFeatureLayout::mask
+PipelineFeatures PipelineFeatureLayout::mask( void ) const
 {
     return m_mask;
 }
 
-// ** ShaderFeatureLayout::elementCount
-s32 ShaderFeatureLayout::elementCount( void ) const
+// ** PipelineFeatureLayout::elementCount
+s32 PipelineFeatureLayout::elementCount( void ) const
 {
     return static_cast<s32>(m_elements.size());
 }
 
-// ** ShaderFeatureLayout::elementAt
-const ShaderFeatureLayout::Element& ShaderFeatureLayout::elementAt(s32 index) const
+// ** PipelineFeatureLayout::elementAt
+const PipelineFeatureLayout::Element& PipelineFeatureLayout::elementAt(s32 index) const
 {
     NIMBLE_ABORT_IF(index < 0 || index >= elementCount(), "index is out of range");
     return m_elements[index];
 }
     
-// ** ShaderFeatureLayout::addFeature
-void ShaderFeatureLayout::addFeature(const String& name, PipelineFeatures mask)
+// ** PipelineFeatureLayout::addFeature
+void PipelineFeatureLayout::addFeature(const String& name, PipelineFeatures mask)
 {
     u32 offset = 0;
     

@@ -62,10 +62,10 @@ class RendererInitialization : public ApplicationDelegate
             0, 1, 2
         };
         
-        static ShaderFeature features[] =
+        static PipelineFeature features[] =
         {
-              { "F_Instance", ShaderFeature::constantBuffer(ConstantBuffer2) }
-            , { "F_View",     ShaderFeature::constantBuffer(ConstantBuffer1) }
+              { "F_Instance", PipelineFeature::constantBuffer(ConstantBuffer2) }
+            , { "F_View",     PipelineFeature::constantBuffer(ConstantBuffer1) }
             , { NULL }
         };
 
@@ -80,7 +80,7 @@ class RendererInitialization : public ApplicationDelegate
         Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
         Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
         Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
-        Renderer::FeatureLayout featureLayout = m_renderingContext->requestFeatureLayout(features);
+        Renderer::FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(features);
     #endif  /*  #if !DEV_DEPRECATED_HAL */
         
         // Setup a render state block that will be used during rendering

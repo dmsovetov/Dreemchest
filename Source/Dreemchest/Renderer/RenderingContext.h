@@ -57,8 +57,8 @@ namespace Renderer
         //! Queues a texture instance for creation and returns it's index.
         Texture_                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
         
-        //! Queues a shader feature layout instance for creation and returns it's index.
-        FeatureLayout               requestFeatureLayout(const ShaderFeature* features);
+        //! Queues a pipeline feature layout instance for creation and returns it's index.
+        FeatureLayout               requestPipelineFeatureLayout(const PipelineFeature* features);
         
         //! Queues a shader instance creation and returns it's index.
         Program                     requestShader( const String& fileName );
@@ -131,8 +131,8 @@ namespace Renderer
         //! Binds an input layout to a pipeline.
         void                        switchInputLayout( const RenderFrame& frame, const State& state );
         
-        //! Activates a feature layout.
-        void                        switchFeatureLayout( const RenderFrame& frame, const State& state );
+        //! Activates a pipeline feature layout.
+        void                        switchPipelineFeatureLayout( const RenderFrame& frame, const State& state );
 
         //! Binds a texture to a sampler.
         void                        switchTexture( const RenderFrame& frame, const State& state );
@@ -196,16 +196,16 @@ namespace Renderer
         //! A helper structure to store an active shader state.
         struct ActiveShader
         {
-            UbershaderWPtr              shader;                 //!< A shader instance that should be used.
-            UbershaderWPtr              activeShader;           //!< A shader instance that is now bound.
-            PipelineFeatures            features;               //!< An active permutation.
-            ShaderPtr                   permutation;            //!< A shader permutation instance.
-            const ShaderFeatureLayout*  featureLayout;
-            const ShaderFeatureLayout*  activeFeatureLayout;
+            UbershaderWPtr                  shader;                 //!< A shader instance that should be used.
+            UbershaderWPtr                  activeShader;           //!< A shader instance that is now bound.
+            PipelineFeatures                features;               //!< An active permutation.
+            ShaderPtr                       permutation;            //!< A shader permutation instance.
+            const PipelineFeatureLayout*    featureLayout;
+            const PipelineFeatureLayout*    activeFeatureLayout;
 
-                                        //! Constructs an ActiveShader instance.
-                                        ActiveShader( void )
-                                            : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
+                                            //! Constructs an ActiveShader instance.
+                                            ActiveShader( void )
+                                                : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
         };
         
         //! A maximum number of input layout types
@@ -218,23 +218,23 @@ namespace Renderer
         class ConstructionCommandBuffer;
         
 #if DEV_DEPRECATED_HAL
-        typedef Ptr<VertexBufferLayout>     VertexBufferLayoutUPtr;
+        typedef Ptr<VertexBufferLayout>         VertexBufferLayoutUPtr;
 #else
-        typedef UPtr<VertexBufferLayout>    VertexBufferLayoutUPtr;
+        typedef UPtr<VertexBufferLayout>        VertexBufferLayoutUPtr;
 #endif  /*  #if DEV_DEPRECATED_HAL  */
-        typedef UPtr<ShaderFeatureLayout>   ShaderFeatureLayoutUPtr;
+        typedef UPtr<PipelineFeatureLayout>     PipelineFeatureLayoutUPtr;
         
 #if DEV_DEPRECATED_HAL
-        FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
-        FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
-        FixedArray<ConstantBufferPtr>       m_constantBuffers;                      //!< Allocated constant buffers.
-        FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
+        FixedArray<VertexBufferPtr>             m_vertexBuffers;                        //!< Allocated vertex buffers.
+        FixedArray<IndexBufferPtr>              m_indexBuffers;                         //!< Allocated index buffers.
+        FixedArray<ConstantBufferPtr>           m_constantBuffers;                      //!< Allocated constant buffers.
+        FixedArray<TexturePtr>                  m_textures;                             //!< Allocated textures.
 #endif  /*  #if DEV_DEPRECATED_HAL  */
-        FixedArray<ShaderFeatureLayoutUPtr> m_featureLayouts;
-        FixedArray<VertexBufferLayoutUPtr>  m_inputLayouts;                         //!< Allocated input layouts.
-        FixedArray<UbershaderPtr>           m_shaders;                              //!< Allocated ubershaders.
-        InputLayout                         m_inputLayoutCache[MaxInputLayouts];    //!< A lookup table for input layout types.
-        ConstructionCommandBuffer*          m_constructionCommandBuffer;            //!< A command buffer that is used for resource construction commands.
+        FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;
+        FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                         //!< Allocated input layouts.
+        FixedArray<UbershaderPtr>               m_shaders;                              //!< Allocated ubershaders.
+        InputLayout                             m_inputLayoutCache[MaxInputLayouts];    //!< A lookup table for input layout types.
+        ConstructionCommandBuffer*              m_constructionCommandBuffer;            //!< A command buffer that is used for resource construction commands.
 
     #if DEV_DEPRECATED_HAL
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.

@@ -63,7 +63,7 @@ void Ubershader::setFragment( const String& value )
 
 #if DEV_DEPRECATED_HAL
 // ** Ubershader::permutation
-const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features, const ShaderFeatureLayout* featureLayout ) const
+const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const
 {
     // First cancel all features that are not supported by a shader
     //features = features & m_supportedFeatures;
@@ -80,7 +80,7 @@ const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeature
     String debug = "";
 
     for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ ) {
-        const ShaderFeatureLayout::Element& element = featureLayout->elementAt(i);
+        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
 
         if( element.mask & features )
         {

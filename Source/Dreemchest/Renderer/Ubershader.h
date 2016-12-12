@@ -28,7 +28,7 @@
 #define __DC_Renderer_Ubershader_H__
 
 #include "Renderer.h"
-#include "ShaderFeatureLayout.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -55,7 +55,7 @@ namespace Renderer {
 
     #if DEV_DEPRECATED_HAL
         //! Compiles a new permutation or returns a cached one.
-        const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features, const ShaderFeatureLayout* featureLayout ) const;
+        const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const;
     #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:

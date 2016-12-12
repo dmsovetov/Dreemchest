@@ -254,7 +254,7 @@ RenderingContext::RenderingContext( HalWPtr hal )
     m_stateSwitches[State::VertexBuffer]      = &RenderingContext::switchVertexBuffer;
     m_stateSwitches[State::IndexBuffer]       = &RenderingContext::switchIndexBuffer;
     m_stateSwitches[State::InputLayout]       = &RenderingContext::switchInputLayout;
-    m_stateSwitches[State::FeatureLayout]     = &RenderingContext::switchFeatureLayout;
+    m_stateSwitches[State::FeatureLayout]     = &RenderingContext::switchPipelineFeatureLayout;
     m_stateSwitches[State::Texture]           = &RenderingContext::switchTexture;
     m_stateSwitches[State::CullFace]          = &RenderingContext::switchCullFace;
     m_stateSwitches[State::PolygonOffset]     = &RenderingContext::switchPolygonOffset;
@@ -265,7 +265,7 @@ RenderingContext::RenderingContext( HalWPtr hal )
     m_indexBuffers.push( NULL );
     m_constantBuffers.push( NULL );
     m_textures.push( NULL );
-    m_featureLayouts.push( NULL );
+    m_pipelineFeatureLayouts.push( NULL );
     m_shaders.push( NULL );
 }
 
@@ -798,11 +798,11 @@ void RenderingContext::switchInputLayout( const RenderFrame& frame, const State&
 #endif  /*  #if DEV_DEPRECATED_HAL  */
 }
     
-// ** RenderingContext::switchFeatureLayout
-void RenderingContext::switchFeatureLayout( const RenderFrame& frame, const State& state )
+// ** RenderingContext::switchPipelineFeatureLayout
+void RenderingContext::switchPipelineFeatureLayout( const RenderFrame& frame, const State& state )
 {
     // Get a feature layout by it's id
-    const ShaderFeatureLayoutUPtr& featureLayout = m_featureLayouts[state.resourceId];
+    const PipelineFeatureLayoutUPtr& featureLayout = m_pipelineFeatureLayouts[state.resourceId];
     NIMBLE_ABORT_IF(!featureLayout.get(), "invalid resource id");
     
     // Make this feature layout active
@@ -883,11 +883,11 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
     return id;
 }
 
-// ** RenderingContext::requestFeatureLayout
-FeatureLayout RenderingContext::requestFeatureLayout(const ShaderFeature* features)
+// ** RenderingContext::requestPipelineFeatureLayout
+FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeature* features)
 {
-    // Create a shader feature layout
-    ShaderFeatureLayout* layout = DC_NEW ShaderFeatureLayout;
+    // Create a pipeline feature layout
+    PipelineFeatureLayout* layout = DC_NEW PipelineFeatureLayout;
     
     // Populate it with feature mappings
     for (; features->name; features++)
@@ -896,7 +896,7 @@ FeatureLayout RenderingContext::requestFeatureLayout(const ShaderFeature* featur
     }
     
     // Put this layout instance to a pool
-    FeatureLayout id = m_featureLayouts.push(layout);
+    FeatureLayout id = m_pipelineFeatureLayouts.push(layout);
     
     return id;
 }

@@ -24,8 +24,8 @@
  
  **************************************************************************/
 
-#ifndef __DC_Renderer_ShaderFeatureLayout_H__
-#define __DC_Renderer_ShaderFeatureLayout_H__
+#ifndef __DC_Renderer_PipelineFeatureLayout_H__
+#define __DC_Renderer_PipelineFeatureLayout_H__
 
 #include "Renderer.h"
 #include "RenderState.h"
@@ -34,22 +34,22 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-    //! A single shader feature item is a string identifier and a corrensponding bit mask.
-    struct ShaderFeature
+    //! A single pipeline feature item is a string identifier and a corrensponding bit mask.
+    struct PipelineFeature
     {
         FixedString             name;       //!< A feature name that is exposed to shader code.
-        PipelineFeatures        mask;       //!< A corresponding shader pipeline feature mask.
+        PipelineFeatures        mask;       //!< A corresponding pipeline feature mask.
         
         //! Generate a feature mask that corresponds to a constant buffer binding at specified slot.
         static PipelineFeatures constantBuffer(ConstantBufferFeatures index);
     };
     
-    //! Shader feature layout defines mappings from a feature mask to actual preprocessor definitions.
-    class ShaderFeatureLayout
+    //! Pipeline feature layout defines mappings from a pipeline feature mask to actual preprocessor definitions.
+    class PipelineFeatureLayout
     {
     public:
         
-        //! A single shader feature.
+        //! A single pipeline feature.
         struct Element
         {
             PipelineFeatures    mask;       //!< Pipeline feature mask that matches this element.
@@ -57,8 +57,8 @@ namespace Renderer
             s32                 offset;     //!< A feature mask offset to extract actual element value.
         };
         
-                                //! Construct ShaderFeatureLayout instance.
-                                ShaderFeatureLayout( void );
+                                //! Construct PipelineFeatureLayout instance.
+                                PipelineFeatureLayout( void );
         
         //! Returns a bitmask of supported pipeline features.
         PipelineFeatures        mask( void ) const;
@@ -74,7 +74,7 @@ namespace Renderer
         
     private:
         
-        Array<Element>          m_elements; //!< An array of available shader features.
+        Array<Element>          m_elements; //!< An array of available pipeline features.
         PipelineFeatures        m_mask;     //!< A bitmask with supported pipeline features.
     };
     
@@ -82,4 +82,4 @@ namespace Renderer
 
 DC_END_DREEMCHEST
 
-#endif  /*  !__DC_Renderer_ShaderFeatureLayout_H__   */
+#endif  /*  !__DC_Renderer_PipelineFeatureLayout_H__   */
