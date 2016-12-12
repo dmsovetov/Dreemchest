@@ -61,21 +61,9 @@ void Ubershader::setFragment( const String& value )
     m_fragment = value;
 }
 
-// ** Ubershader::addFeature
-void Ubershader::addFeature( PipelineFeatures mask, const String& name )
-{
-    m_features.addFeature(name, mask);
-}
-
-// ** Ubershader::supportedFeatures
-PipelineFeatures Ubershader::supportedFeatures( void ) const
-{
-    return m_features.mask();
-}
-
 #if DEV_DEPRECATED_HAL
 // ** Ubershader::permutation
-const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features ) const
+const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features, const ShaderFeatureLayout* featureLayout ) const
 {
     // First cancel all features that are not supported by a shader
     //features = features & m_supportedFeatures;
@@ -91,8 +79,8 @@ const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeature
     String macro = "";
     String debug = "";
 
-    for( u32 i = 0, n = m_features.elementCount(); i < n; i++ ) {
-        const ShaderFeatureLayout::Element& element = m_features.elementAt(i);
+    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ ) {
+        const ShaderFeatureLayout::Element& element = featureLayout->elementAt(i);
 
         if( element.mask & features )
         {

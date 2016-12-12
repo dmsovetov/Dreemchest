@@ -151,7 +151,8 @@ namespace Renderer
               VertexBuffer      = 0                                         //!< Binds an input vertex buffer.
             , IndexBuffer       = VertexBuffer      + 1                     //!< Binds an input index buffer.
             , InputLayout       = IndexBuffer       + 1                     //!< Binds an input layout.
-            , ConstantBuffer    = InputLayout       + 1                     //!< Binds a constant buffer.
+            , FeatureLayout     = InputLayout       + 1                     //!< Activates a pipeline feature layout.
+            , ConstantBuffer    = FeatureLayout     + 1                     //!< Binds a constant buffer.
             , Shader            = ConstantBuffer    + MaxConstantBuffers    //!< Binds a program instance.
             , Blending          = Shader            + 1                     //!< Sets a blend function.
             , PolygonOffset     = Blending          + 1                     //!< Sets a polygon offset fill.
@@ -236,6 +237,9 @@ namespace Renderer
 
         //! Binds an input layout to a pipeline.
         void                            bindInputLayout( s32 id );
+        
+        //! Activates a pipeline feature layout.
+        void                            bindFeatureLayout( s32 id );
 
         //! Binds a constant buffer to a pipeline.
         void                            bindConstantBuffer( s32 id, State::ConstantBufferType type );

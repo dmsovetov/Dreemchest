@@ -31,6 +31,16 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
     
+// ------------------------------------------------------------------- ShaderFeature --------------------------------------------------------------------- //
+    
+// ** ShaderFeature::constantBuffer
+PipelineFeatures ShaderFeature::constantBuffer(ConstantBufferFeatures index)
+{
+    return static_cast<PipelineFeatures>(1) << (CBufferFeaturesOffset + index);
+}
+    
+// ----------------------------------------------------------------- ShaderFeatureLayout ----------------------------------------------------------------- //
+    
 // ** ShaderFeatureLayout::ShaderFeatureLayout
 ShaderFeatureLayout::ShaderFeatureLayout( void )
     : m_mask(0)

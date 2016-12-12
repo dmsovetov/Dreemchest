@@ -139,6 +139,12 @@ void StateBlock::bindInputLayout( s32 id )
 {
     pushState( State( State::InputLayout, id ), State::InputLayout );
 }
+    
+// ** StateBlock::bindFeatureLayout
+void StateBlock::bindFeatureLayout( s32 id )
+{
+    pushState( State( State::FeatureLayout, id ), State::FeatureLayout );
+}
 
 // ** StateBlock::bindConstantBuffer
 void StateBlock::bindConstantBuffer( s32 id, State::ConstantBufferType type )

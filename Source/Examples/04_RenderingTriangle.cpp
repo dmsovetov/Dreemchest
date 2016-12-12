@@ -61,6 +61,13 @@ class RendererInitialization : public ApplicationDelegate
         static u16 indices[] = {
             0, 1, 2
         };
+        
+        static ShaderFeature features[] =
+        {
+              { "F_Instance", ShaderFeature::constantBuffer(ConstantBuffer2) }
+            , { "F_View",     ShaderFeature::constantBuffer(ConstantBuffer1) }
+            , { NULL }
+        };
 
         // Request all required resources from a rendering context
     #if !DEV_DEPRECATED_HAL
@@ -69,10 +76,11 @@ class RendererInitialization : public ApplicationDelegate
         Renderer::VertexBuffer  vertexBuffer /*= m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices))*/;
         Renderer::IndexBuffer   indexBuffer  /*= m_renderingContext->requestIndexBuffer(indices, sizeof(indices))*/;
     #else
-        Renderer::RenderId      shader   = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
-        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(0);
-        Renderer::RenderId  vertexBuffer = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Renderer::RenderId   indexBuffer  = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+        Renderer::RenderId      shader        = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
+        Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
+        Renderer::RenderId      vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
+        Renderer::RenderId      indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+        Renderer::RenderId      featureLayout = m_renderingContext->requestFeatureLayout(features);
     #endif  /*  #if !DEV_DEPRECATED_HAL */
         
         // Setup a render state block that will be used during rendering
@@ -80,6 +88,7 @@ class RendererInitialization : public ApplicationDelegate
         m_renderState.bindIndexBuffer(indexBuffer);
         m_renderState.bindInputLayout(inputLayout);
         m_renderState.bindProgram(shader);
+        m_renderState.bindFeatureLayout(featureLayout);
         
         // Finally subscribe to updates events.
         window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleWindowUpdate ) );

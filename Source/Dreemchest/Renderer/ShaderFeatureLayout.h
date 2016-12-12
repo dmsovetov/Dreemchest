@@ -28,11 +28,21 @@
 #define __DC_Renderer_ShaderFeatureLayout_H__
 
 #include "Renderer.h"
+#include "RenderState.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    //! A single shader feature item is a string identifier and a corrensponding bit mask.
+    struct ShaderFeature
+    {
+        FixedString             name;       //!< A feature name that is exposed to shader code.
+        PipelineFeatures        mask;       //!< A corresponding shader pipeline feature mask.
+        
+        //! Generate a feature mask that corresponds to a constant buffer binding at specified slot.
+        static PipelineFeatures constantBuffer(ConstantBufferFeatures index);
+    };
     
     //! Shader feature layout defines mappings from a feature mask to actual preprocessor definitions.
     class ShaderFeatureLayout

@@ -254,6 +254,7 @@ RenderingContext::RenderingContext( HalWPtr hal )
     m_stateSwitches[State::VertexBuffer]      = &RenderingContext::switchVertexBuffer;
     m_stateSwitches[State::IndexBuffer]       = &RenderingContext::switchIndexBuffer;
     m_stateSwitches[State::InputLayout]       = &RenderingContext::switchInputLayout;
+    m_stateSwitches[State::FeatureLayout]     = &RenderingContext::switchFeatureLayout;
     m_stateSwitches[State::Texture]           = &RenderingContext::switchTexture;
     m_stateSwitches[State::CullFace]          = &RenderingContext::switchCullFace;
     m_stateSwitches[State::PolygonOffset]     = &RenderingContext::switchPolygonOffset;
@@ -264,6 +265,7 @@ RenderingContext::RenderingContext( HalWPtr hal )
     m_indexBuffers.push( NULL );
     m_constantBuffers.push( NULL );
     m_textures.push( NULL );
+    m_featureLayouts.push( NULL );
 }
 
 #if DEV_DEPRECATED_HAL
@@ -669,22 +671,24 @@ void RenderingContext::activateShaderPermutation( PipelineFeatures features )
 {
     // Finally apply a shader
     NIMBLE_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
+    NIMBLE_ABORT_IF( !m_activeShader.featureLayout, "no valid feature layout set" );
     
     // Select a shader permutation that match an active pipeline state
-    PipelineFeatures supported   = m_activeShader.shader->supportedFeatures();
+    PipelineFeatures supported   = m_activeShader.featureLayout->mask();
     features = features & supported;
     //PipelineFeatures userDefined = userFeatures << UserDefinedFeaturesOffset;
     //PipelineFeatures features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
     
-    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features )
+    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features || m_activeShader.featureLayout != m_activeShader.activeFeatureLayout)
     {
 #if DEV_DEPRECATED_HAL
-        m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features );
+        m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features, m_activeShader.featureLayout );
 #else
         NIMBLE_NOT_IMPLEMENTED
 #endif  /*  #if DEV_DEPRECATED_HAL  */
         m_activeShader.features     = features;
         m_activeShader.activeShader = m_activeShader.shader;
+        m_activeShader.activeFeatureLayout = m_activeShader.featureLayout;
     }
     
 #if DEV_DEPRECATED_HAL
@@ -791,6 +795,17 @@ void RenderingContext::switchInputLayout( const RenderFrame& frame, const State&
     NIMBLE_NOT_IMPLEMENTED
 #endif  /*  #if DEV_DEPRECATED_HAL  */
 }
+    
+// ** RenderingContext::switchFeatureLayout
+void RenderingContext::switchFeatureLayout( const RenderFrame& frame, const State& state )
+{
+    // Get a feature layout by it's id
+    const ShaderFeatureLayoutUPtr& featureLayout = m_featureLayouts[state.resourceId];
+    NIMBLE_ABORT_IF(!featureLayout.get(), "invalid resource id");
+    
+    // Make this feature layout active
+    m_activeShader.featureLayout = featureLayout.get();
+}
 
 // ** RenderingContext::switchTexture
 void RenderingContext::switchTexture( const RenderFrame& frame, const State& state )
@@ -862,6 +877,24 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
     
     // Now put a new input layout to cache
     m_inputLayoutCache[format] = id;
+    
+    return id;
+}
+
+// ** RenderingContext::requestFeatureLayout
+RenderId RenderingContext::requestFeatureLayout(const ShaderFeature* features)
+{
+    // Create a shader feature layout
+    ShaderFeatureLayout* layout = DC_NEW ShaderFeatureLayout;
+    
+    // Populate it with feature mappings
+    for (; features->name; features++)
+    {
+        layout->addFeature(features->name.value(), features->mask);
+    }
+    
+    // Put this layout instance to a pool
+    RenderId id = m_featureLayouts.push(layout);
     
     return id;
 }
@@ -993,7 +1026,7 @@ UbershaderPtr RenderingContext::createShader( const String& fileName ) const
         for( Array<String>::const_iterator i = features.begin(), end = features.end(); i != end; ++i )
         {
             Array<String> value = split( *i, " \t=" );
-            shader->addFeature( masks[value[1]], value[0] );
+            //shader->addFeature( masks[value[1]], value[0] );
             LogVerbose( "shader", "feature %s = %s (0x%x) added\n", value[0].c_str(), value[1].c_str(), masks[value[1]] );
         }
     }

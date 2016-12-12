@@ -53,15 +53,9 @@ namespace Renderer {
         //! Sets fragment shader source code.
         void                        setFragment( const String& value );
 
-        //! Adds a feature to shader.
-        void                        addFeature( PipelineFeatures mask, const String& name );
-
-        //! Returns a supported features bitmask.
-        PipelineFeatures                     supportedFeatures( void ) const;
-
     #if DEV_DEPRECATED_HAL
         //! Compiles a new permutation or returns a cached one.
-        const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features ) const;
+        const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features, const ShaderFeatureLayout* featureLayout ) const;
     #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
@@ -72,7 +66,6 @@ namespace Renderer {
         String                      m_vertex;               //!< Vertex shader source.
         String                      m_fragment;             //!< Fragment shader source.
         Array<String>               m_includes;             //!< Shared shader includes.
-        ShaderFeatureLayout         m_features;             
         mutable Permutations        m_permutations;         //!< Compiled permutations are stored here.
     };
 

@@ -56,6 +56,9 @@ namespace Renderer
         
         //! Queues a texture instance for creation and returns it's index.
         RenderId                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
+        
+        //! Queues a shader feature layout instance for creation and returns it's index.
+        RenderId                    requestFeatureLayout(const ShaderFeature* features);
 
     #if DEV_DEPRECATED_HAL
         //! Creates a shader from a file.
@@ -130,6 +133,9 @@ namespace Renderer
 
         //! Binds an input layout to a pipeline.
         void                        switchInputLayout( const RenderFrame& frame, const State& state );
+        
+        //! Activates a feature layout.
+        void                        switchFeatureLayout( const RenderFrame& frame, const State& state );
 
         //! Binds a texture to a sampler.
         void                        switchTexture( const RenderFrame& frame, const State& state );
@@ -193,14 +199,16 @@ namespace Renderer
         //! A helper structure to store an active shader state.
         struct ActiveShader
         {
-            UbershaderWPtr          shader;                 //!< A shader instance that should be used.
-            UbershaderWPtr          activeShader;           //!< A shader instance that is now bound.
-            PipelineFeatures        features;               //!< An active permutation.
-            ShaderPtr               permutation;            //!< A shader permutation instance.
+            UbershaderWPtr              shader;                 //!< A shader instance that should be used.
+            UbershaderWPtr              activeShader;           //!< A shader instance that is now bound.
+            PipelineFeatures            features;               //!< An active permutation.
+            ShaderPtr                   permutation;            //!< A shader permutation instance.
+            const ShaderFeatureLayout*  featureLayout;
+            const ShaderFeatureLayout*  activeFeatureLayout;
 
-                                    //! Constructs an ActiveShader instance.
-                                    ActiveShader( void )
-                                        : features( 0 ) {}
+                                        //! Constructs an ActiveShader instance.
+                                        ActiveShader( void )
+                                            : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
         };
         
         //! A maximum number of input layout types
@@ -217,6 +225,7 @@ namespace Renderer
 #else
         typedef UPtr<VertexBufferLayout>    VertexBufferLayoutUPtr;
 #endif  /*  #if DEV_DEPRECATED_HAL  */
+        typedef UPtr<ShaderFeatureLayout>   ShaderFeatureLayoutUPtr;
         
 #if DEV_DEPRECATED_HAL
         FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
@@ -225,6 +234,7 @@ namespace Renderer
         FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
         IndexCache<UbershaderPtr>           m_shaders;                              //!< Interned shaders.
 #endif  /*  #if DEV_DEPRECATED_HAL  */
+        FixedArray<ShaderFeatureLayoutUPtr> m_featureLayouts;
         FixedArray<VertexBufferLayoutUPtr>  m_inputLayouts;                         //!< Allocated input layouts.
         InputLayout                         m_inputLayoutCache[MaxInputLayouts];    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*          m_constructionCommandBuffer;            //!< A command buffer that is used for resource construction commands.
