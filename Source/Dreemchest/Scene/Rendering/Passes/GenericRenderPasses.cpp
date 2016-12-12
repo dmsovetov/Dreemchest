@@ -63,17 +63,17 @@ ShadowPass::ShadowPass( RenderingContext& context, RenderScene& renderScene )
 }
 
 // ** ShadowPass::cbuffer
-RenderId ShadowPass::cbuffer( void ) const
+ConstantBuffer_ ShadowPass::cbuffer( void ) const
 {
     return m_cbuffer;
 }
 
 // ** ShadowPass::render
-u8 ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
+IntermediateRenderTarget ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
 {
     // Acquire a shadow render target
     s32 dimensions  = static_cast<s32>( 1.0f / parameters.invSize );
-    u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
+    IntermediateRenderTarget renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
 
     // Render scene from a light's point of view
     CommandBuffer& cmd = commands.renderToTarget( frame, renderTarget );

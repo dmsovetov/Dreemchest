@@ -105,7 +105,7 @@ namespace Scene {
             void*                       stream;                 //!< A batch vertex stream.
         };
 
-        RenderId                        m_vertexBuffer;            //!< An intermediate vertex buffer used for batching.
+        VertexBuffer_                   m_vertexBuffer;            //!< An intermediate vertex buffer used for batching.
         s32                             m_maxVerticesInBatch;   //! A maximum number of vertices that can be rendered in a single batch
         mutable ActiveBatch             m_activeBatch;          //!< An active batch state.
     };

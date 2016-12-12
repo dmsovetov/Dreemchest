@@ -71,7 +71,7 @@ namespace Scene
 
         RenderingContext&                       m_context;          //!< A parent rendering context.
         RenderScene&                            m_renderScene;      //!< Parent render scene.
-        RenderId                                m_materialCBuffer;  //!< A material constant buffer.
+        ConstantBuffer_                         m_materialCBuffer;  //!< A material constant buffer.
     };
 
 } // namespace Scene

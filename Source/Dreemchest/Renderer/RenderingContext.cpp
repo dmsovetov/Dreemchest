@@ -47,23 +47,23 @@ class RenderingContext::ConstructionCommandBuffer : public CommandBuffer
 public:
     
     //! Emits an input layout creation command.
-    RenderId                    createInputLayout(RenderId id, const VertexFormat& vertexFormat);
+    InputLayout                 createInputLayout(InputLayout id, const VertexFormat& vertexFormat);
     
     //! Emits a vertex buffer creation command.
-    RenderId                    createVertexBuffer(RenderId id, const void* data, s32 size);
+    VertexBuffer_               createVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
     
     //! Emits an index buffer creation command.
-    RenderId                    createIndexBuffer(RenderId id, const void* data, s32 size);
+    IndexBuffer_                createIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
     
     //! Emits a constant buffer creation command.
-    RenderId                    createConstantBuffer(RenderId id, const void* data, s32 size, const ConstantBufferLayout* layout);
+    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout);
     
     //! Emits a texture creation command.
-    RenderId                    createTexture(RenderId id, const void* data, u16 width, u16 height, PixelFormat format);
+    Texture_                    createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format);
 };
 
 // ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
-RenderId RenderingContext::ConstructionCommandBuffer::createInputLayout(RenderId id, const VertexFormat& vertexFormat)
+InputLayout RenderingContext::ConstructionCommandBuffer::createInputLayout(InputLayout id, const VertexFormat& vertexFormat)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateInputLayout;
@@ -74,7 +74,7 @@ RenderId RenderingContext::ConstructionCommandBuffer::createInputLayout(RenderId
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
-RenderId RenderingContext::ConstructionCommandBuffer::createVertexBuffer(RenderId id, const void *data, s32 size)
+VertexBuffer_ RenderingContext::ConstructionCommandBuffer::createVertexBuffer(VertexBuffer_ id, const void *data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateVertexBuffer;
@@ -86,7 +86,7 @@ RenderId RenderingContext::ConstructionCommandBuffer::createVertexBuffer(RenderI
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createIndexBuffer
-RenderId RenderingContext::ConstructionCommandBuffer::createIndexBuffer(RenderId id, const void *data, s32 size)
+IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(IndexBuffer_ id, const void *data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateIndexBuffer;
@@ -98,7 +98,7 @@ RenderId RenderingContext::ConstructionCommandBuffer::createIndexBuffer(RenderId
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createConstantBuffer
-RenderId RenderingContext::ConstructionCommandBuffer::createConstantBuffer(RenderId id, const void* data, s32 size, const ConstantBufferLayout* layout)
+ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateConstantBuffer;
@@ -111,7 +111,7 @@ RenderId RenderingContext::ConstructionCommandBuffer::createConstantBuffer(Rende
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createTexture
-RenderId RenderingContext::ConstructionCommandBuffer::createTexture(RenderId id, const void* data, u16 width, u16 height, PixelFormat format)
+Texture_ RenderingContext::ConstructionCommandBuffer::createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
@@ -166,8 +166,8 @@ public:
 private:
 
     RenderingContext&           m_context;                      //!< A parent rendering context.
-    RenderId*                   m_stackFrame;                   //!< An active render target stack frame.
-    RenderId                    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+    IntermediateRenderTarget*   m_stackFrame;                   //!< An active render target stack frame.
+    IntermediateRenderTarget    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
 };
 
 // ** RenderingContext::IntermediateTargetStack::IntermediateTargetStack
@@ -458,7 +458,7 @@ void RenderingContext::clear( const f32* color, f32 depth, s32 stencil, u8 mask 
 }
 
 // ** RenderingContext::commandUploadConstantBuffer
-void RenderingContext::commandUploadConstantBuffer( u32 id, const void* data, s32 size )
+void RenderingContext::commandUploadConstantBuffer( ConstantBuffer_ id, const void* data, s32 size )
 {
 #if DEV_DEPRECATED_HAL
     Renderer::ConstantBufferPtr constantBuffer = m_constantBuffers[id];
@@ -470,7 +470,7 @@ void RenderingContext::commandUploadConstantBuffer( u32 id, const void* data, s3
 }
 
 // ** RenderingContext::commandUploadVertexBuffer
-void RenderingContext::commandUploadVertexBuffer( u32 id, const void* data, s32 size )
+void RenderingContext::commandUploadVertexBuffer( VertexBuffer_ id, const void* data, s32 size )
 {
 #if DEV_DEPRECATED_HAL
     Renderer::VertexBufferPtr vertexBuffer = m_vertexBuffers[id];
@@ -519,7 +519,7 @@ void RenderingContext::commandCreateInputLayout(InputLayout id, u8 vertexFormat)
 }
 
 // ** RenderingContext::commandCreateVertexBuffer
-void RenderingContext::commandCreateVertexBuffer(RenderId id, const void* data, s32 size)
+void RenderingContext::commandCreateVertexBuffer(VertexBuffer_ id, const void* data, s32 size)
 {
     NIMBLE_BREAK_IF( m_vertexBuffers[id].valid(), "resource was already constructed" );
     
@@ -540,7 +540,7 @@ void RenderingContext::commandCreateVertexBuffer(RenderId id, const void* data, 
 }
 
 // ** RenderingContext::commandCreateIndexBuffer
-void RenderingContext::commandCreateIndexBuffer(RenderId id, const void* data, s32 size)
+void RenderingContext::commandCreateIndexBuffer(IndexBuffer_ id, const void* data, s32 size)
 {
     NIMBLE_BREAK_IF( m_indexBuffers[id].valid(), "resource was already constructed" );
     
@@ -561,7 +561,7 @@ void RenderingContext::commandCreateIndexBuffer(RenderId id, const void* data, s
 }
 
 // ** RenderingContext::commandCreateConstantBuffer
-void RenderingContext::commandCreateConstantBuffer(RenderId id, const void* data, s32 size, const ConstantBufferLayout* layout)
+void RenderingContext::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
 {
     NIMBLE_BREAK_IF( m_constantBuffers[id].valid(), "resource was already constructed" );
         
@@ -581,7 +581,7 @@ void RenderingContext::commandCreateConstantBuffer(RenderId id, const void* data
 }
 
 // ** RenderingContext::commandCreateTexture
-void RenderingContext::commandCreateTexture(RenderId id, u16 width, u16 height, const void* data, PixelFormat format)
+void RenderingContext::commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format)
 {
     NIMBLE_BREAK_IF( m_textures[id].valid(), "resource was already constructed" );
         
@@ -884,7 +884,7 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
 }
 
 // ** RenderingContext::requestFeatureLayout
-RenderId RenderingContext::requestFeatureLayout(const ShaderFeature* features)
+FeatureLayout RenderingContext::requestFeatureLayout(const ShaderFeature* features)
 {
     // Create a shader feature layout
     ShaderFeatureLayout* layout = DC_NEW ShaderFeatureLayout;
@@ -896,7 +896,7 @@ RenderId RenderingContext::requestFeatureLayout(const ShaderFeature* features)
     }
     
     // Put this layout instance to a pool
-    RenderId id = m_featureLayouts.push(layout);
+    FeatureLayout id = m_featureLayouts.push(layout);
     
     return id;
 }
@@ -908,55 +908,55 @@ InputLayout RenderingContext::allocateInputLayout( void )
 }
 
 // ** RenderingContext::allocateTexture
-RenderId RenderingContext::allocateTexture( void )
+Texture_ RenderingContext::allocateTexture( void )
 {
     return m_textures.push( NULL );
 }
 
 // ** RenderingContext::allocateConstantBuffer
-RenderId RenderingContext::allocateConstantBuffer( void )
+ConstantBuffer_ RenderingContext::allocateConstantBuffer( void )
 {
     return m_constantBuffers.push( NULL );
 }
 
 // ** RenderingContext::allocateIndexBuffer
-RenderId RenderingContext::allocateIndexBuffer( void )
+IndexBuffer_ RenderingContext::allocateIndexBuffer( void )
 {
     return m_indexBuffers.push( NULL );
 }
 
 // ** RenderingContext::allocateVertexBuffer
-RenderId RenderingContext::allocateVertexBuffer( void )
+VertexBuffer_ RenderingContext::allocateVertexBuffer( void )
 {
     return m_vertexBuffers.push( NULL );
 }
 
 // ** RenderingContext::requestVertexBuffer
-RenderId RenderingContext::requestVertexBuffer( const void* data, s32 size )
+VertexBuffer_ RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
     return m_constructionCommandBuffer->createVertexBuffer(allocateVertexBuffer(), data, size);
 }
 
 // ** RenderingContext::requestIndexBuffer
-RenderId RenderingContext::requestIndexBuffer( const void* data, s32 size )
+IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
     return m_constructionCommandBuffer->createIndexBuffer(allocateIndexBuffer(), data, size);
 }
 
 // ** RenderingContext::requestConstantBuffer
-RenderId RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
+ConstantBuffer_ RenderingContext::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
 {
     return m_constructionCommandBuffer->createConstantBuffer(allocateConstantBuffer(), data, size, layout);
 }
 
 // ** RenderingContext::requestConstantBuffer
-RenderId RenderingContext::requestTexture( const void* data, u16 width, u16 height, Renderer::PixelFormat format )
+Texture_ RenderingContext::requestTexture( const void* data, u16 width, u16 height, Renderer::PixelFormat format )
 {
     return m_constructionCommandBuffer->createTexture(allocateTexture(), data, width, height, format);
 }
 
 // ** RenderingContext::requestShader
-RenderId RenderingContext::requestShader(const String& fileName)
+Program RenderingContext::requestShader(const String& fileName)
 {
     static CString vertexShaderMarker   = "[VertexShader]";
     static CString fragmentShaderMarker = "[FragmentShader]";
@@ -992,7 +992,7 @@ RenderId RenderingContext::requestShader(const String& fileName)
 }
     
 // ** RenderingContext::requestShader
-RenderId RenderingContext::requestShader(const String& vertex, const String& fragment)
+Program RenderingContext::requestShader(const String& vertex, const String& fragment)
 {
     // Create a shader instance
     UbershaderPtr shader = DC_NEW Ubershader;
@@ -1024,7 +1024,7 @@ RenderId RenderingContext::requestShader(const String& vertex, const String& fra
                        );
     
     // Put this shader to a pool
-    RenderId id = m_shaders.push(shader);
+    Program id = m_shaders.push(shader);
     
     return id;
 }
@@ -1147,12 +1147,12 @@ RenderId RenderingContext::requestShader(const String& vertex, const String& fra
 }*/
 
 // ** RenderingContext::acquireRenderTarget
-RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
+IntermediateRenderTarget RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
 {
     // Perform a linear search of a render target
     for( s32 i = 0, n = static_cast<s32>( m_renderTargets.size() ); i < n; i++ )
     {
-        IntermediateRenderTarget& intermediate = m_renderTargets[i];
+        IntermediateRenderTarget_& intermediate = m_renderTargets[i];
         
         if( intermediate.isFree && intermediate.width == width && intermediate.height == height && intermediate.format == format )
         {
@@ -1163,7 +1163,7 @@ RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelForm
     
 #if DEV_DEPRECATED_HAL
     // Not found - create a new one
-    IntermediateRenderTarget intermediate;
+    IntermediateRenderTarget_ intermediate;
     intermediate.isFree         = false;
     intermediate.width          = width;
     intermediate.height         = height;
@@ -1189,16 +1189,16 @@ RenderId RenderingContext::acquireRenderTarget( u16 width, u16 height, PixelForm
 }
 
 // ** RenderingContext::releaseRenderTarget
-void RenderingContext::releaseRenderTarget( RenderId id )
+void RenderingContext::releaseRenderTarget( IntermediateRenderTarget id )
 {
-    m_renderTargets[id - 1].isFree = true;
+    m_renderTargets[static_cast<s32>(id) - 1].isFree = true;
 }
 
 #if DEV_DEPRECATED_HAL
 // ** RenderingContext::intermediateRenderTarget
-RenderTargetWPtr RenderingContext::intermediateRenderTarget( RenderId id ) const
+RenderTargetWPtr RenderingContext::intermediateRenderTarget( IntermediateRenderTarget id ) const
 {
-    return m_renderTargets[id - 1].renderTarget;
+    return m_renderTargets[static_cast<s32>(id) - 1].renderTarget;
 }
 #endif  //  #if DEV_DEPRECATED_HAL
 

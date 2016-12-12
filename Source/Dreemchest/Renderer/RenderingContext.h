@@ -46,25 +46,25 @@ namespace Renderer
         InputLayout                 requestInputLayout( const VertexFormat& vertexFormat );
         
         //! Queues a vertex buffer instance for creation and returns it's index.
-        RenderId                    requestVertexBuffer( const void* data, s32 size );
+        VertexBuffer_               requestVertexBuffer( const void* data, s32 size );
         
         //! Queues an index buffer instance for creation and returns it's index.
-        RenderId                    requestIndexBuffer( const void* data, s32 size );
+        IndexBuffer_                requestIndexBuffer( const void* data, s32 size );
         
         //! Queues a constant buffer instance for creation and returns it's index.
-        RenderId                    requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout );
+        ConstantBuffer_             requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout );
         
         //! Queues a texture instance for creation and returns it's index.
-        RenderId                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
+        Texture_                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
         
         //! Queues a shader feature layout instance for creation and returns it's index.
-        RenderId                    requestFeatureLayout(const ShaderFeature* features);
+        FeatureLayout               requestFeatureLayout(const ShaderFeature* features);
         
         //! Queues a shader instance creation and returns it's index.
-        RenderId                    requestShader( const String& fileName );
+        Program                     requestShader( const String& fileName );
         
         //! Queues a shader instance creation and returns it's index.
-        RenderId                    requestShader( const String& vertex, const String& fragment );
+        Program                     requestShader( const String& vertex, const String& fragment );
 
     #if DEV_DEPRECATED_HAL
         //! Creates an RenderingContext instance.
@@ -81,7 +81,7 @@ namespace Renderer
         void                        reset( void );
         
         //! Returns an intermediate render target.
-        RenderTargetWPtr            intermediateRenderTarget( RenderId id ) const;
+        RenderTargetWPtr            intermediateRenderTarget( IntermediateRenderTarget id ) const;
     #else
         //! Resets rendering states to defaults.
         virtual void                reset( void ) = 0;
@@ -144,46 +144,46 @@ namespace Renderer
         void                        switchPolygonOffset( const RenderFrame& frame, const State& state );
         
         //! Handles a command to upload data to a GPU constant buffer.
-        void                        commandUploadConstantBuffer(RenderId id, const void* data, s32 size);
+        void                        commandUploadConstantBuffer(ConstantBuffer_ id, const void* data, s32 size);
         
         //! Handles a command to upload data to a GPU vertex buffer.
-        void                        commandUploadVertexBuffer(RenderId id, const void* data, s32 size);
+        void                        commandUploadVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
         
         //! Handles an input layout creation command.
         void                        commandCreateInputLayout(InputLayout id, u8 vertexFormat);
         
         //! Handles a vertex buffer creation command.
-        void                        commandCreateVertexBuffer(RenderId id, const void* data, s32 size);
+        void                        commandCreateVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
         
         //! Handles an index buffer creation command.
-        void                        commandCreateIndexBuffer(RenderId id, const void* data, s32 size);
+        void                        commandCreateIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
         
         //! Handles an index buffer creation command.
-        void                        commandCreateConstantBuffer(RenderId id, const void* data, s32 size, const ConstantBufferLayout* layout);
+        void                        commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout);
         
         //! Handles a texture creation command.
-        void                        commandCreateTexture(RenderId id, u16 width, u16 height, const void* data, PixelFormat format);
+        void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);
         
         //! Allocates a new input layout handle.
         virtual InputLayout         allocateInputLayout( void );
         
         //! Allocates a new vertex buffer handle.
-        virtual RenderId            allocateVertexBuffer( void );
+        virtual VertexBuffer_       allocateVertexBuffer( void );
         
         //! Allocates a new index buffer handle.
-        virtual RenderId            allocateIndexBuffer( void );
+        virtual IndexBuffer_        allocateIndexBuffer( void );
         
         //! Allocates a new constant buffer handle.
-        virtual RenderId            allocateConstantBuffer( void );
+        virtual ConstantBuffer_     allocateConstantBuffer( void );
         
         //! Allocates a new texturehandle.
-        virtual RenderId            allocateTexture( void );
+        virtual Texture_            allocateTexture( void );
         
         //! Acquires an intermediate render target.
-        RenderId                    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
+        IntermediateRenderTarget    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
         
         //! Releases an intermediate render target.
-        void                        releaseRenderTarget( RenderId id );
+        void                        releaseRenderTarget( IntermediateRenderTarget id );
         
         //! Activates a shader permuation that best matches active pipeline state.
         void                        activateShaderPermutation( PipelineFeatures features );
@@ -247,7 +247,7 @@ namespace Renderer
         UPtr<IntermediateTargetStack>       m_intermediateTargets;                  //!< An intermediate render target stack.
         
         //! A helper struct that hold info about an intermediate render target.
-        struct IntermediateRenderTarget
+        struct IntermediateRenderTarget_
         {
         #if DEV_DEPRECATED_HAL
             RenderTargetPtr                 renderTarget;                       //!< A GPU render target instance.
@@ -258,7 +258,7 @@ namespace Renderer
             bool                            isFree;                             //!< Indicates that this render target is free.
         };
         
-        Array<IntermediateRenderTarget>     m_renderTargets;            //!< An array of intermediate render targets.
+        Array<IntermediateRenderTarget_>    m_renderTargets;            //!< An array of intermediate render targets.
     };
 
 } // namespace Renderer

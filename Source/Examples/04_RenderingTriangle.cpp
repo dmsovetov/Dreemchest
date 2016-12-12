@@ -76,11 +76,11 @@ class RendererInitialization : public ApplicationDelegate
         Renderer::VertexBuffer  vertexBuffer /*= m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices))*/;
         Renderer::IndexBuffer   indexBuffer  /*= m_renderingContext->requestIndexBuffer(indices, sizeof(indices))*/;
     #else
-        Renderer::RenderId      shader        = m_renderingContext->requestShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader");
+        Renderer::Program       shader        = m_renderingContext->requestShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader");
         Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
-        Renderer::RenderId      vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Renderer::RenderId      indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
-        Renderer::RenderId      featureLayout = m_renderingContext->requestFeatureLayout(features);
+        Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
+        Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+        Renderer::FeatureLayout featureLayout = m_renderingContext->requestFeatureLayout(features);
     #endif  /*  #if !DEV_DEPRECATED_HAL */
         
         // Setup a render state block that will be used during rendering

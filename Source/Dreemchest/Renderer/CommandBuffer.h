@@ -103,7 +103,7 @@ namespace Renderer
 
                 struct
                 {
-                    u32                         id;                         //!< A target buffer handle.
+                    u16                         id;                         //!< A target buffer handle.
                     const void*                 data;                       //!< A source data point.
                     s32                         size;                       //!< A total number of bytes to upload.
                 } upload;
@@ -149,19 +149,22 @@ namespace Renderer
         void                        execute( const CommandBuffer& commands );
 
         //! Emits an acquire intermediate render target command.
-        u8                          acquireRenderTarget( s32 width, s32 height, PixelFormat format );
+        IntermediateRenderTarget    acquireRenderTarget( s32 width, s32 height, PixelFormat format );
 
         //! Emits a release an intermediate render target command.
-        void                        releaseRenderTarget( u8 index );
+        void                        releaseRenderTarget( IntermediateRenderTarget index );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        CommandBuffer&              renderToTarget( RenderFrame& frame, u8 index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        CommandBuffer&              renderToTarget( RenderFrame& frame, IntermediateRenderTarget index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        
+        //! Emits a rendering to a viewport.
+        CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 
         //! Emits a constant buffer upload command.
-        void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
+        void                        uploadConstantBuffer( ConstantBuffer_ id, const void* data, s32 size );
 
         //! Emits a vertex buffer upload command.
-        void                        uploadVertexBuffer( u32 id, const void* data, s32 size );
+        void                        uploadVertexBuffer( VertexBuffer_ id, const void* data, s32 size );
 
         //! Emits a draw indexed command that inherits all rendering states from a state stack.
         void                        drawIndexed( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack );

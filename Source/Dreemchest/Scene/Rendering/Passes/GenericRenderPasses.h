@@ -38,34 +38,34 @@ namespace Scene {
     class AmbientPass : public RenderPassBase {
     public:
 
-                                //! Constructs a AmbientPass instance.
-                                AmbientPass( RenderingContext& context, RenderScene& renderScene );
+                                    //! Constructs a AmbientPass instance.
+                                    AmbientPass( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits operations to render an ambient lit scene.
-        void                    render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack );
+        void                        render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack );
 
     private:
 
-        RenderId                m_shader;   //!< An ambient light shader instance.
+        Program                     m_shader;   //!< An ambient light shader instance.
     };
 
     //! Renders a scene depth to a render target.
     class ShadowPass : public RenderPassBase {
     public:
 
-                                //! Constructs a ShadowPass instance.
-                                ShadowPass( RenderingContext& context, RenderScene& renderScene );
+                                    //! Constructs a ShadowPass instance.
+                                    ShadowPass( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to output a depth to a texture.
-        u8                      render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
+        IntermediateRenderTarget    render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
 
         //! Returns a constant buffer that is used for shadow parameters.
-        RenderId                cbuffer( void ) const;
+        ConstantBuffer_             cbuffer( void ) const;
 
     private:
 
-        RenderId                m_shader;   //!< A shadowmap shader instance.
-        RenderId                m_cbuffer;  //!< A shadow parameters constant buffer.
+        Program                     m_shader;   //!< A shadowmap shader instance.
+        ConstantBuffer_             m_cbuffer;  //!< A shadow parameters constant buffer.
     };
 
 } // namespace Scene

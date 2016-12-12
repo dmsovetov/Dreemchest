@@ -64,8 +64,8 @@ namespace Scene {
 
     private:
 
-        RenderId                        m_phongShader;
-        RenderId                        m_clipPlanesCBuffer;
+        Program                         m_phongShader;
+        ConstantBuffer_                 m_clipPlanesCBuffer;
         AmbientPass                     m_ambient;
         ShadowPass                      m_shadows;
         DebugCascadedShadows            m_debugCascadedShadows;

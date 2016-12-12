@@ -47,7 +47,7 @@ namespace Scene {
 
     private:
 
-        RenderId                        m_debugShader;      //!< A default shader that is used for debug rendering.
+        Program                         m_debugShader;      //!< A default shader that is used for debug rendering.
         DebugStaticMeshPass             m_staticMeshes;     //!< Renders bounding boxes for all static meshes.
         DebugLightPass                  m_lights;           //!< Renders bounding boxes for all lights.
         DebugCameraPass                 m_cameras;          //!< Renders bounding boxes for all cameras.

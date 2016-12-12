@@ -124,7 +124,7 @@ namespace Scene
         {
             const Transform*                    transform;          //!< Node transform component.
             const Matrix4*                      matrix;             //!< Node transform affine matrix.
-            Renderer::RenderId                  constantBuffer;     //!< Node constant buffer.
+            ConstantBuffer_                     constantBuffer;     //!< Node constant buffer.
         };
 
         //! Stores info about a scene instance.
@@ -274,10 +274,10 @@ namespace Scene
         typedef Ecs::DataCache<SpriteNode>      SpriteCache;
 
         RenderCacheWPtr                         m_cache;            //!< Render cache to be used.
-        Renderer::RenderingContextWPtr          m_context;          //!< Parent rendering context.
-        s32                                     m_sceneConstants;   //!< Global constant buffer with scene variables.
+        RenderingContextWPtr                    m_context;          //!< Parent rendering context.
+        ConstantBuffer_                         m_sceneConstants;   //!< Global constant buffer with scene variables.
         UPtr<CBuffer::Scene>                    m_sceneParameters;  //!< Scene parameters constant buffer.
-        Renderer::RenderId                      m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
+        Program                                 m_defaultShader;    //!< A default shader that will be used if no shader set by a pass.
         SceneWPtr                               m_scene;            //!< Parent scene instance.
         Array<RenderSystemUPtr>                 m_renderSystems;    //!< Entity render systems.
         Ptr<PointCloudCache>                    m_pointClouds;      //!< Renderable point clouds cache.

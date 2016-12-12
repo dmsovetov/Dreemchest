@@ -69,7 +69,7 @@ void CommandBuffer::execute( const CommandBuffer& commands )
 }
 
 // ** CommandBuffer::renderToTarget
-CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, u8 index, const Rect& viewport )
+CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, IntermediateRenderTarget index, const Rect& viewport )
 {
     CommandBuffer& commands = frame.createCommandBuffer();
 
@@ -86,9 +86,15 @@ CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, u8 index, cons
 
     return commands;
 }
+    
+// ** CommandBuffer::renderToTarget
+CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, const Rect& viewport )
+{
+    return renderToTarget(frame, IntermediateRenderTarget(), viewport);
+}
 
 // ** CommandBuffer::acquireRenderTarget
-u8 CommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFormat format )
+IntermediateRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 height, PixelFormat format )
 {
     NIMBLE_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
 
@@ -101,11 +107,11 @@ u8 CommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFor
     opCode.intermediateRenderTarget.format = format;
     push( opCode );
 
-    return opCode.intermediateRenderTarget.index;
+    return IntermediateRenderTarget::create(opCode.intermediateRenderTarget.index);
 }
 
 // ** CommandBuffer::releaseRenderTarget
-void CommandBuffer::releaseRenderTarget( u8 index )
+void CommandBuffer::releaseRenderTarget( IntermediateRenderTarget index )
 {
     OpCode opCode;
     opCode.type = OpCode::ReleaseRenderTarget;
@@ -115,7 +121,7 @@ void CommandBuffer::releaseRenderTarget( u8 index )
 }
 
 // ** CommandBuffer::uploadConstantBuffer
-void CommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
+void CommandBuffer::uploadConstantBuffer( ConstantBuffer_ id, const void* data, s32 size )
 {
     OpCode opCode;
     opCode.type = OpCode::UploadConstantBuffer;
@@ -126,7 +132,7 @@ void CommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
 }
 
 // ** CommandBuffer::uploadVertexBuffer
-void CommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size )
+void CommandBuffer::uploadVertexBuffer( VertexBuffer_ id, const void* data, s32 size )
 {
     OpCode opCode;
     opCode.type = OpCode::UploadVertexBuffer;

@@ -74,13 +74,9 @@ namespace Renderer {
     dcDeclarePtrs( Ubershader )
     dcDeclarePtrs( RenderingContext )
     
-    //! A render resource handle type.
-    typedef u32 RenderId;
-    
     //! A pipeline feature mask type.
     typedef u64 PipelineFeatures;
     
-#if !DEV_DEPRECATED_HAL
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     enum RenderResourceTag
     {
@@ -89,33 +85,41 @@ namespace Renderer {
         , IndexBufferTag
         , ConstantBufferTag
         , RenderTargetTag
-        , ShaderTag
+        , ProgramTag
+        , TextureTag
+        , FeatureLayoutTag
     };
     
     //! A render resource identifier type.
-    template<RenderResourceTag TResource, typename TIdentifier = u32>
+    template<RenderResourceTag TResource, typename TIdentifier = u16>
     class ResourceIdentifier
     {
     friend class RenderingContext;
     public:
         
-                            //! Constructs an invalid render resource identifier.
-                            ResourceIdentifier( void );
+                                    //! Constructs an invalid render resource identifier.
+                                    ResourceIdentifier( void );
         
-                            //! Type casts to a stored identifier type.
-                            operator TIdentifier( void ) const;
+                                    //! Type casts to a stored identifier type.
+                                    operator TIdentifier( void ) const;
         
-                            //! Returns true if this resource identifier is valid.
-                            operator bool( void ) const;
+                                    //! Type casts to an integer to make it possible to index arrays with a resource identifier.
+                                    operator s32( void ) const;
+        
+                                    //! Returns true if this resource identifier is valid.
+                                    operator bool( void ) const;
+        
+        //! Create a resource identifier from a specified value.
+        static ResourceIdentifier   create(TIdentifier value);
         
     private:
         
-                            //! Constructs a resource identifier with a specified value.
-                            ResourceIdentifier( TIdentifier value );
+                                    //! Constructs a resource identifier with a specified value.
+                                    ResourceIdentifier( TIdentifier value );
         
     private:
         
-        TIdentifier         m_id;   //!< Actual resource identifier.
+        TIdentifier                 m_id;   //!< Actual resource identifier.
     };
     
     // ** ResourceIdentifier::ResourceIdentifier
@@ -140,6 +144,13 @@ namespace Renderer {
         return m_id;
     }
     
+    // ** ResourceIdentifier::operator s32
+    template<RenderResourceTag TResource, typename TIdentifier>
+    NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator s32( void ) const
+    {
+        return static_cast<s32>(m_id);
+    }
+    
     // ** ResourceIdentifier::operator TIdentifier
     template<RenderResourceTag TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator bool( void ) const
@@ -147,16 +158,26 @@ namespace Renderer {
         return m_id != 0;
     }
     
+    // ** ResourceIdentifier::operator TIdentifier
+    template<RenderResourceTag TResource, typename TIdentifier>
+    ResourceIdentifier<TResource, TIdentifier> ResourceIdentifier<TResource, TIdentifier>::create(TIdentifier value)
+    {
+        return ResourceIdentifier(value);
+    }
+
     //! Declare all render resource types.
     typedef ResourceIdentifier<InputLayoutTag> InputLayout;
-    typedef ResourceIdentifier<VertexBufferTag> VertexBuffer;
-    typedef ResourceIdentifier<IndexBufferTag> IndexBuffer;
-    typedef ResourceIdentifier<ConstantBufferTag> ConstantBuffer;
-    typedef ResourceIdentifier<RenderTargetTag> RenderTarget;
-    typedef ResourceIdentifier<ShaderTag> Program;
-#else
-    typedef RenderId InputLayout;
+    typedef ResourceIdentifier<VertexBufferTag> VertexBuffer_;
+    typedef ResourceIdentifier<IndexBufferTag> IndexBuffer_;
+    typedef ResourceIdentifier<ConstantBufferTag> ConstantBuffer_;
+    typedef ResourceIdentifier<RenderTargetTag> RenderTarget_;
+    typedef ResourceIdentifier<ProgramTag> Program;
+    typedef ResourceIdentifier<TextureTag> Texture_;
+    typedef ResourceIdentifier<FeatureLayoutTag> FeatureLayout;
     
+    typedef ResourceIdentifier<RenderTargetTag, u8> IntermediateRenderTarget;
+    
+#if DEV_DEPRECATED_HAL
     // ** class RenderResource
     //! RenderResource is a base class for all render resources.
     class dcInterface RenderResource : public RefCounted {
