@@ -31,12 +31,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-// ** Ubershader::Ubershader
-Ubershader::Ubershader( void )
-    : m_supportedFeatures( 0 )
-{
-}
-
 // ** Ubershader::addInclude
 void Ubershader::addInclude( const String& value )
 {
@@ -68,45 +62,20 @@ void Ubershader::setFragment( const String& value )
 }
 
 // ** Ubershader::addFeature
-void Ubershader::addFeature( Bitmask mask, const String& name )
+void Ubershader::addFeature( PipelineFeatures mask, const String& name )
 {
-    u32 offset = 0;
-    for( offset = 0; offset < sizeof( Bitset ) * 8; offset++ ) {
-        if( (static_cast<u64>( 1 ) << offset & mask) != 0 ) {
-            break;
-        }
-    }
-
-    Feature feature;
-    feature.mask   = mask;
-    feature.name   = name;
-    feature.offset = offset;
-    m_features.push_back( feature );
-    m_supportedFeatures = m_supportedFeatures | mask;
-}
-
-// ** Ubershader::featureCount
-s32 Ubershader::featureCount( void ) const
-{
-    return static_cast<s32>( m_features.size() );
-}
-
-// ** Ubershader::feature
-const Ubershader::Feature& Ubershader::feature( s32 index ) const
-{
-    NIMBLE_ABORT_IF( index < 0 || index >= featureCount(), "index is out of range" );
-    return m_features[index];
+    m_features.addFeature(name, mask);
 }
 
 // ** Ubershader::supportedFeatures
-Ubershader::Bitmask Ubershader::supportedFeatures( void ) const
+PipelineFeatures Ubershader::supportedFeatures( void ) const
 {
-    return m_supportedFeatures;
+    return m_features.mask();
 }
 
 #if DEV_DEPRECATED_HAL
 // ** Ubershader::permutation
-const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitmask features ) const
+const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features ) const
 {
     // First cancel all features that are not supported by a shader
     //features = features & m_supportedFeatures;
@@ -122,13 +91,14 @@ const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, Bitmask feature
     String macro = "";
     String debug = "";
 
-    for( u32 i = 0, n = featureCount(); i < n; i++ ) {
-        const Feature& feature = this->feature( i );
+    for( u32 i = 0, n = m_features.elementCount(); i < n; i++ ) {
+        const ShaderFeatureLayout::Element& element = m_features.elementAt(i);
 
-        if( feature.mask & features ) {
-            macro += "#define " + feature.name + " " + toString( (feature.mask & features) >> feature.offset ) + "\n";
+        if( element.mask & features )
+        {
+            macro += "#define " + element.name + " " + toString( (element.mask & features) >> element.offset ) + "\n";
             if( debug.length() ) debug += ", ";
-            debug += feature.name;
+            debug += element.name;
         }
     }
 

@@ -30,6 +30,7 @@
 #include "Ubershader.h"
 #include "RenderingContext.h"
 #include "VertexFormat.h"
+#include "VertexBufferLayout.h"
 
 #include "../Io/DiskFileSystem.h"
 
@@ -164,7 +165,7 @@ public:
 
 private:
 
-    RenderingContext&                        m_context;                      //!< A parent rendering context.
+    RenderingContext&           m_context;                      //!< A parent rendering context.
     RenderId*                   m_stackFrame;                   //!< An active render target stack frame.
     RenderId                    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
 };
@@ -652,9 +653,9 @@ void RenderingContext::applyStates( const RenderFrame& frame, const StateBlock* 
     NIMBLE_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
 
     // Select a shader permutation that match an active pipeline state
-    Ubershader::Bitmask supported   = m_activeShader.shader->supportedFeatures();
-    Ubershader::Bitmask userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
-    Ubershader::Bitmask features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
+    PipelineFeatures supported   = m_activeShader.shader->supportedFeatures();
+    PipelineFeatures userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
+    PipelineFeatures features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
 
     if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features )
     {

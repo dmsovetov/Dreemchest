@@ -159,7 +159,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
 void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows )
 {
     // A light type feature bits
-    Ubershader::Bitmask lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
+    PipelineFeatures lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
 
     // Clip state block
     StateScope clipper = stateStack.newScope();

@@ -26,6 +26,7 @@
 
 #include    "OpenGLHal.h"
 #include    "OpenGLExtensions.h"
+#include "../VertexBufferLayout.h"
 
 #include    "../RenderStateDeprecated.h"
 

@@ -77,6 +77,9 @@ namespace Renderer {
     //! A render resource handle type.
     typedef u32 RenderId;
     
+    //! A pipeline feature mask type.
+    typedef u64 PipelineFeatures;
+    
 #if !DEV_DEPRECATED_HAL
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     enum RenderResourceTag
@@ -153,6 +156,14 @@ namespace Renderer {
     typedef ResourceIdentifier<ShaderTag> Program;
 #else
     typedef RenderId InputLayout;
+    
+    // ** class RenderResource
+    //! RenderResource is a base class for all render resources.
+    class dcInterface RenderResource : public RefCounted {
+    public:
+        
+        virtual                     ~RenderResource( void ) {}
+    };
 #endif  /*  #if DEV_DEPRECATED_HAL  */
     
     //! Render frame unique pointer type.

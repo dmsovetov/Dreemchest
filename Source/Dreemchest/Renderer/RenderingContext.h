@@ -192,7 +192,7 @@ namespace Renderer
         {
             UbershaderWPtr          shader;                 //!< A shader instance that should be used.
             UbershaderWPtr          activeShader;           //!< A shader instance that is now bound.
-            Ubershader::Bitmask     features;               //!< An active permutation.
+            PipelineFeatures        features;               //!< An active permutation.
             ShaderPtr               permutation;            //!< A shader permutation instance.
 
                                     //! Constructs an ActiveShader instance.
@@ -230,8 +230,8 @@ namespace Renderer
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.
     #endif  /*  #if DEV_DEPRECATED_HAL  */
         StateSwitch                         m_stateSwitches[State::TotalStates];    //!< Function callbacks to switch states.
-        u64                                 m_vertexAttributeFeatures;              //!< A vertex attribute features.
-        u64                                 m_resourceFeatures;                     //!< Active resource features.
+        PipelineFeatures                    m_vertexAttributeFeatures;              //!< A vertex attribute features.
+        PipelineFeatures                    m_resourceFeatures;                     //!< Active resource features.
         ActiveShader                        m_activeShader;                         //!< An active shader instance.
         Stack<const f32*>                   m_viewportStack;                        //!< A viewport stack.
         UPtr<IntermediateTargetStack>       m_intermediateTargets;                  //!< An intermediate render target stack.
@@ -240,15 +240,15 @@ namespace Renderer
         struct IntermediateRenderTarget
         {
         #if DEV_DEPRECATED_HAL
-            RenderTargetPtr                     renderTarget;                       //!< A GPU render target instance.
+            RenderTargetPtr                 renderTarget;                       //!< A GPU render target instance.
         #endif  /*  #if DEV_DEPRECATED_HAL  */
-            u16                                 width;                              //!< Render target width.
-            u16                                 height;                             //!< Render target height.
-            PixelFormat                         format;                             //!< Render target internal format.
-            bool                                isFree;                             //!< Indicates that this render target is free.
+            u16                             width;                              //!< Render target width.
+            u16                             height;                             //!< Render target height.
+            PixelFormat                     format;                             //!< Render target internal format.
+            bool                            isFree;                             //!< Indicates that this render target is free.
         };
         
-        Array<IntermediateRenderTarget>         m_renderTargets;            //!< An array of intermediate render targets.
+        Array<IntermediateRenderTarget>     m_renderTargets;            //!< An array of intermediate render targets.
     };
 
 } // namespace Renderer

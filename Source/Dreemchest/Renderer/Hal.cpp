@@ -27,6 +27,7 @@
 #include "Hal.h"
 #include "RenderStateDeprecated.h"
 #include "BatchRenderer.h"
+#include "VertexBufferLayout.h"
 
 #ifdef DC_THREADS
     #include <threads/Task/TaskManager.h>
@@ -44,84 +45,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
     
-// ---------------------------------------------- VertexBufferLayout --------------------------------------------- //
-
-// ** VertexBufferLayout::VertexBufferLayout
-VertexBufferLayout::VertexBufferLayout( s32 vertexSize )
-    : m_features( 0 )
-    , m_vertexSize( vertexSize )
-{
-}
-
-// ** VertexBufferLayout::attributeLocation
-void VertexBufferLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
-{
-    static u32 kAttributeMask[TotalAttributes] = {
-        0,
-        BIT( 0 ),
-        BIT( 1 ),
-        BIT( 2 ),
-        BIT( 3 ),
-        BIT( 4 ),
-        BIT( 5 ),
-        BIT( 6 ),
-        BIT( 7 ),
-        BIT( 8 ),
-        BIT( 9 ),
-        BIT( 10 ),
-        BIT( 11 ),
-        BIT( 12 ),
-    };
-    
-    m_attributes[attribute].count  = count;
-    m_attributes[attribute].offset = offset;
-    
-    m_features = m_features | kAttributeMask[attribute];
-}
-
-// ** VertexBufferLayout::features
-u32 VertexBufferLayout::features( void ) const
-{
-    return m_features;
-}
-
-// ** VertexBufferLayout::vertexSize
-s32 VertexBufferLayout::vertexSize( void ) const
-{
-    return m_vertexSize;
-}
-
-// ** VertexBufferLayout::position
-const VertexBufferLayout::Element& VertexBufferLayout::position( void ) const
-{
-    return m_attributes[Position];
-}
-
-// ** VertexBufferLayout::color
-const VertexBufferLayout::Element& VertexBufferLayout::color( void ) const
-{
-    return m_attributes[Color];
-}
-
-// ** VertexBufferLayout::normal
-const VertexBufferLayout::Element& VertexBufferLayout::normal( void ) const
-{
-    return m_attributes[Normal];
-}
-
-// ** VertexBufferLayout::uv
-const VertexBufferLayout::Element& VertexBufferLayout::uv( u32 sampler ) const
-{
-    return m_attributes[Uv0 + sampler];
-}
-
-// ** VertexBufferLayout::pointSize
-const VertexBufferLayout::Element& VertexBufferLayout::pointSize( void ) const
-{
-    return m_attributes[PointSize];
-}
-
-
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
 #if DEV_DEPRECATED_HAL
