@@ -43,6 +43,84 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
+    
+// ---------------------------------------------- VertexBufferLayout --------------------------------------------- //
+
+// ** VertexBufferLayout::VertexBufferLayout
+VertexBufferLayout::VertexBufferLayout( s32 vertexSize )
+    : m_features( 0 )
+    , m_vertexSize( vertexSize )
+{
+}
+
+// ** VertexBufferLayout::attributeLocation
+void VertexBufferLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
+{
+    static u32 kAttributeMask[TotalAttributes] = {
+        0,
+        BIT( 0 ),
+        BIT( 1 ),
+        BIT( 2 ),
+        BIT( 3 ),
+        BIT( 4 ),
+        BIT( 5 ),
+        BIT( 6 ),
+        BIT( 7 ),
+        BIT( 8 ),
+        BIT( 9 ),
+        BIT( 10 ),
+        BIT( 11 ),
+        BIT( 12 ),
+    };
+    
+    m_attributes[attribute].count  = count;
+    m_attributes[attribute].offset = offset;
+    
+    m_features = m_features | kAttributeMask[attribute];
+}
+
+// ** VertexBufferLayout::features
+u32 VertexBufferLayout::features( void ) const
+{
+    return m_features;
+}
+
+// ** VertexBufferLayout::vertexSize
+s32 VertexBufferLayout::vertexSize( void ) const
+{
+    return m_vertexSize;
+}
+
+// ** VertexBufferLayout::position
+const VertexBufferLayout::Element& VertexBufferLayout::position( void ) const
+{
+    return m_attributes[Position];
+}
+
+// ** VertexBufferLayout::color
+const VertexBufferLayout::Element& VertexBufferLayout::color( void ) const
+{
+    return m_attributes[Color];
+}
+
+// ** VertexBufferLayout::normal
+const VertexBufferLayout::Element& VertexBufferLayout::normal( void ) const
+{
+    return m_attributes[Normal];
+}
+
+// ** VertexBufferLayout::uv
+const VertexBufferLayout::Element& VertexBufferLayout::uv( u32 sampler ) const
+{
+    return m_attributes[Uv0 + sampler];
+}
+
+// ** VertexBufferLayout::pointSize
+const VertexBufferLayout::Element& VertexBufferLayout::pointSize( void ) const
+{
+    return m_attributes[PointSize];
+}
+
 
 // ----------------------------------------------- Hal ----------------------------------------------- //
 
@@ -155,9 +233,9 @@ ShaderPtr Hal::createShader( const char *vertex, const char *fragment )
 }
 
 // ** Hal::createVertexDeclaration
-InputLayoutPtr Hal::createInputLayout( s32 vertexSize )
+VertexBufferLayoutPtr Hal::createInputLayout( s32 vertexSize )
 {
-    return InputLayoutPtr( DC_NEW InputLayout( vertexSize ) );
+    return VertexBufferLayoutPtr( DC_NEW VertexBufferLayout( vertexSize ) );
 }
 
 // ** Hal::createIndexBuffer
@@ -300,7 +378,7 @@ void Hal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
 }
 
 // ** Hal::setInputLayout
-void Hal::setInputLayout( const InputLayoutPtr& inputLayout )
+void Hal::setInputLayout( const VertexBufferLayoutPtr& inputLayout )
 {
 
 }
@@ -722,83 +800,6 @@ bool RenderTarget::setDepth( PixelFormat format )
 Texture2DPtr RenderTarget::attachment( Attachment attachment ) const
 {
     return m_attachments[attachment];
-}
-
-// ---------------------------------------------- InputLayout --------------------------------------------- //
-
-// ** InputLayout::attributeLocation
-InputLayout::InputLayout( s32 vertexSize )
-    : m_features( 0 )
-    , m_vertexSize( vertexSize )
-{
-}
-
-// ** InputLayout::attributeLocation
-void InputLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
-{
-    static u32 kAttributeMask[TotalAttributes] = {
-        0,
-        BIT( 0 ),
-        BIT( 1 ),
-        BIT( 2 ),
-        BIT( 3 ),
-        BIT( 4 ),
-        BIT( 5 ),
-        BIT( 6 ),
-        BIT( 7 ),
-        BIT( 8 ),
-        BIT( 9 ),
-        BIT( 10 ),
-        BIT( 11 ),
-        BIT( 12 ),
-    };
-
-    m_attributes[attribute].count  = count;
-    m_attributes[attribute].offset = offset;
-
-    m_features = m_features | kAttributeMask[attribute];
-}
-
-// ** InputLayout::features
-u32 InputLayout::features( void ) const
-{
-    return m_features;
-}
-
-// ** InputLayout::vertexSize
-s32 InputLayout::vertexSize( void ) const
-{
-    return m_vertexSize;
-}
-
-// ** InputLayout::position
-const InputLayout::Element& InputLayout::position( void ) const
-{
-    return m_attributes[Position];
-}
-
-// ** InputLayout::color
-const InputLayout::Element& InputLayout::color( void ) const
-{
-    return m_attributes[Color];
-}
-
-// ** InputLayout::normal
-const InputLayout::Element& InputLayout::normal( void ) const
-{
-    return m_attributes[Normal];
-}
-
-// ** InputLayout::uv
-const InputLayout::Element& InputLayout::uv( u32 sampler ) const
-{
-    return m_attributes[Uv0 + sampler];
-}
-
-// ** InputLayout::pointSize
-const InputLayout::Element& InputLayout::pointSize( void ) const
-{
-    return m_attributes[PointSize];
 }
 
 // ----------------------------------------------- VertexBuffer ------------------------------------------------- //

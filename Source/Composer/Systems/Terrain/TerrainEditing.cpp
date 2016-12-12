@@ -306,7 +306,7 @@ f32 TerrainHeightmapSystem::calculateAverageHeight( Scene::TerrainHandle terrain
 // -------------------------------------------------------------- TerrainToolPass -------------------------------------------------------------- //
 
 // ** TerrainToolPass::render
-void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform )
+void TerrainToolPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const TerrainTool& tool, const Scene::Transform& transform )
 {
     Renderer::Renderer2DWPtr renderer = context->renderer();
 

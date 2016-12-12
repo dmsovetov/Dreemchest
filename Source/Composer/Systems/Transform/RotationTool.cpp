@@ -223,7 +223,7 @@ void RotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::E
 // -------------------------------------------------------- RotationToolPass -------------------------------------------------------- //
 
 // ** RotationToolPass::render
-void RotationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const RotationTool& tool, const Scene::Transform& transform )
+void RotationToolPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const RotationTool& tool, const Scene::Transform& transform )
 {
     Renderer::Renderer2DPtr renderer = context->renderer();
 

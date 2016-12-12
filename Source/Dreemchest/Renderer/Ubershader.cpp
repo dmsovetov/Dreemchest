@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Ubershader.h"
-#include "../Hal.h"
+#include "Hal.h"
 
 DC_BEGIN_DREEMCHEST
 

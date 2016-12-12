@@ -33,10 +33,15 @@ namespace Renderer
 {
 
 // ** CommandBuffer::CommandBuffer
-CommandBuffer::CommandBuffer( RenderFrame& frame )
-    : m_frame( frame )
-    , m_renderTargetIndex( 0 )
+CommandBuffer::CommandBuffer( void )
+    : m_renderTargetIndex( 0 )
 {
+}
+    
+// ** CommandBuffer::reset
+void CommandBuffer::reset( void )
+{
+    m_commands.clear();
 }
 
 // ** CommandBuffer::clear
@@ -50,7 +55,7 @@ void CommandBuffer::clear( const Rgba& clearColor, u8 clearMask )
     opCode.clear.stencil = 0;
 
     memcpy( opCode.clear.color, &clearColor, sizeof opCode.clear.color );
-    m_commands.push_back( opCode );
+    push( opCode );
 }
 
 // ** CommandBuffer::execute
@@ -60,13 +65,13 @@ void CommandBuffer::execute( const CommandBuffer& commands )
     opCode.type = OpCode::Execute;
     opCode.sorting = 0;
     opCode.execute.commands = &commands;
-    m_commands.push_back( opCode );
+    push( opCode );
 }
 
 // ** CommandBuffer::renderToTarget
-CommandBuffer& CommandBuffer::renderToTarget( u8 index, const Rect& viewport )
+CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, u8 index, const Rect& viewport )
 {
-    CommandBuffer& commands = m_frame.createCommandBuffer();
+    CommandBuffer& commands = frame.createCommandBuffer();
 
     OpCode opCode;
     opCode.type = OpCode::RenderTarget;
@@ -77,7 +82,7 @@ CommandBuffer& CommandBuffer::renderToTarget( u8 index, const Rect& viewport )
     opCode.renderTarget.viewport[1] = viewport.min().y;
     opCode.renderTarget.viewport[2] = viewport.width();
     opCode.renderTarget.viewport[3] = viewport.height();
-    m_commands.push_back( opCode );
+    push( opCode );
 
     return commands;
 }
@@ -94,7 +99,7 @@ u8 CommandBuffer::acquireRenderTarget( s32 width, s32 height, Renderer::PixelFor
     opCode.intermediateRenderTarget.width  = width;
     opCode.intermediateRenderTarget.height = height;
     opCode.intermediateRenderTarget.format = format;
-    m_commands.push_back( opCode );
+    push( opCode );
 
     return opCode.intermediateRenderTarget.index;
 }
@@ -106,7 +111,7 @@ void CommandBuffer::releaseRenderTarget( u8 index )
     opCode.type = OpCode::ReleaseRenderTarget;
     opCode.intermediateRenderTarget.index = index;
     opCode.sorting = 0;
-    m_commands.push_back( opCode );
+    push( opCode );
 }
 
 // ** CommandBuffer::uploadConstantBuffer
@@ -117,7 +122,7 @@ void CommandBuffer::uploadConstantBuffer( u32 id, const void* data, s32 size )
     opCode.upload.id = id;
     opCode.upload.data = data;
     opCode.upload.size = size;
-    m_commands.push_back( opCode );
+    push( opCode );
 }
 
 // ** CommandBuffer::uploadVertexBuffer
@@ -128,7 +133,7 @@ void CommandBuffer::uploadVertexBuffer( u32 id, const void* data, s32 size )
     opCode.upload.id = id;
     opCode.upload.data = data;
     opCode.upload.size = size;
-    m_commands.push_back( opCode );
+    push( opCode );
 }
 
 // ** CommandBuffer::drawIndexed
@@ -168,7 +173,13 @@ void CommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType 
     memset( opCode.drawCall.states, 0, sizeof( opCode.drawCall.states ) );
     memcpy( opCode.drawCall.states, states, sizeof( StateBlock* ) * stateCount );
     
-    m_commands.push_back( opCode );
+    push( opCode );
+}
+    
+// ** CommandBuffer::push
+void CommandBuffer::push(const OpCode& opCode)
+{
+    m_commands.push_back(opCode);
 }
 
 } // namespace Renderer

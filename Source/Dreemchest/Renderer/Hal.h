@@ -71,12 +71,109 @@ namespace Renderer {
         virtual void                endFrame( void ) {}
     };
     
+#if DEV_DEPRECATED_HAL
+    // ** class RenderResource
+    //! RenderResource is a base class for all render resources.
+    class dcInterface RenderResource : public RefCounted {
+    public:
+        
+        virtual                     ~RenderResource( void ) {}
+    };
+#endif  /*  #if DEV_DEPRECATED_HAL  */
+    
+    //! InputLayout class instance is used to define a vertex buffer layout.
+    class VertexBufferLayout
+    #if DEV_DEPRECATED_HAL
+        : public RenderResource
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
+    {
+    #if DEV_DEPRECATED_HAL
+    friend class Hal;
+    #endif  /*  #if DEV_DEPRECATED_HAL  */
+    public:
+        
+        //! Supported vertex attributes.
+        enum Attribute {
+            Position,               //!< Vertex position.
+            Normal,                 //!< Vertex normal.
+            Color,                  //!< Vertex color.
+            Tangent,                //!< Vertex tangent.
+            Bitangent,              //!< Vertex bitangent.
+            PointSize,              //!< Point sprite size.
+            Uv0,                    //!< Texture 0 UV.
+            Uv1,                    //!< Texture 1 UV.
+            Uv2,                    //!< Texture 2 UV.
+            Uv3,                    //!< Texture 3 UV.
+            Uv4,                    //!< Texture 4 UV.
+            Uv5,                    //!< Texture 2 UV.
+            Uv6,                    //!< Texture 3 UV.
+            Uv7,                    //!< Texture 4 UV.
+            TotalAttributes,        //!< Total amount of supported vertex attributes.
+        };
+        
+        
+        //! Input layout element.
+        struct Element {
+            s32     count;      //!< Attribute size.
+            s32     offset;     //!< Attribute offset.
+            
+            //! Constructs a new Element instance.
+            Element( void )
+                : count( -1 )
+                , offset( -1 )
+                {
+                }
+            
+            //! Returns true if this vertex element is used.
+            operator bool() const { return count > 0 && offset >= 0; }
+        };
+        
+    public:
+        
+                                //! Constructs an VertexBufferLayout instance.
+                                VertexBufferLayout( s32 vertexSize );
+        
+        //! Returns a bitmask of available features.
+        u32                     features( void ) const;
+        
+        //! Returns a vertex size in bytes.
+        s32                     vertexSize( void ) const;
+        
+        //! Defines a vertex attribute location.
+        void                    attributeLocation( Attribute attribute, s32 count, s32 offset );
+        
+        //! Returns the vertex position attribute.
+        const Element&          position( void ) const;
+        
+        //! Enables a color input.
+        void                    setColor( s32 size, s32 offset = -1 );
+        
+        //! Returns the vertex color attribute.
+        const Element&          color( void ) const;
+        
+        //! Returns the vertex normal attribute.
+        const Element&          normal( void ) const;
+        
+        //! Returns the vertex UV attribute for a given sampler index.
+        const Element&          uv( u32 sampler ) const;
+        
+        //! Returns the point size attribute.
+        const Element&          pointSize( void ) const;
+        
+    protected:
+        
+        u32                     m_features;                     //!< An input layout features.
+        s32                     m_vertexSize;                   //!< Vertex size in bytes.
+        Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
+    };
+    
 #ifdef DC_OPENGL_ENABLED
     //! Platform-specific OpenGL view constructor.
     extern RenderView* createOpenGLView( void* window, PixelFormat depthStencil );
 #endif    /*    DC_OPENGL_ENABLED    */
 
 #if DEV_DEPRECATED_HAL
+    
     // ** class Hal
     //! Hal class is a hardware abstraction layer around a low level graphics API.
     class dcInterface Hal : public RefCounted {
@@ -152,7 +249,7 @@ namespace Renderer {
          \param vertexSize  Vertex size in bytes.
          \return            InputLayout instance.
          */
-        virtual InputLayoutPtr  createInputLayout( s32 vertexSize );
+        virtual VertexBufferLayoutPtr  createInputLayout( s32 vertexSize );
 
         //! Creates a new index buffer.
         /*!
@@ -218,7 +315,7 @@ namespace Renderer {
         /*!
          \param inputLayout         Input layout to be bound.
          */
-        virtual void    setInputLayout( const InputLayoutPtr& inputLayout );
+        virtual void    setInputLayout( const VertexBufferLayoutPtr& inputLayout );
 
         //! Binds a constant buffer.
         /*!
@@ -346,17 +443,9 @@ namespace Renderer {
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         Array<ConstantBufferWPtr>   m_constantBuffers;      //!< An array of bound constant buffers.
     #endif   /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
-        InputLayoutWPtr             m_lastInputLayout;      //!< An input layout that was set last time.
-        InputLayoutWPtr                m_activeInputLayout;    //!< An active input layout.
+        VertexBufferLayoutWPtr             m_lastInputLayout;      //!< An input layout that was set last time.
+        VertexBufferLayoutWPtr                m_activeInputLayout;    //!< An active input layout.
         VertexBufferWPtr            m_activeVertexBuffer;   //!< An active vertex buffer.
-    };
-
-    // ** class RenderResource
-    //! RenderResource is a base class for all render resources.
-    class dcInterface RenderResource : public RefCounted {
-    public:
-
-        virtual                     ~RenderResource( void ) {}
     };
 
     //! Texture is a base class for all hardware textures.
@@ -504,88 +593,6 @@ namespace Renderer {
         Texture2DPtr                m_attachments[TotalAttachments];    //!< Texture attachments.
         u32                            m_width;                            //!< Render target width.
         u32                            m_height;                            //!< Render target height.
-    };
-
-    //! InputLayout class instance is used to define a vertex buffer layout.
-    class InputLayout : public RenderResource {
-    friend class Hal;
-    public:
-
-        //! Supported vertex attributes.
-        enum Attribute {
-            Position,               //!< Vertex position.
-            Normal,                 //!< Vertex normal.
-            Color,                  //!< Vertex color.
-            Tangent,                //!< Vertex tangent.
-            Bitangent,              //!< Vertex bitangent.
-            PointSize,              //!< Point sprite size.
-            Uv0,                    //!< Texture 0 UV.
-            Uv1,                    //!< Texture 1 UV.
-            Uv2,                    //!< Texture 2 UV.
-            Uv3,                    //!< Texture 3 UV.
-            Uv4,                    //!< Texture 4 UV.
-            Uv5,                    //!< Texture 2 UV.
-            Uv6,                    //!< Texture 3 UV.
-            Uv7,                    //!< Texture 4 UV.
-            TotalAttributes,  //!< Total amount of supported vertex attributes.
-        };
-
-
-        //! Input layout element.
-        struct Element {
-            s32     count;      //!< Attribute size.
-            s32     offset;     //!< Attribute offset.
-
-                    //! Constructs a new Element instance.
-                    Element( void )
-                        : count( -1 )
-                        , offset( -1 )
-                        {
-                        }
-
-            //! Returns true if this vertex element is used.
-            operator bool() const { return count > 0 && offset >= 0; }
-        };
-
-    public:
-
-        //! Returns a bitmask of available features.
-        u32                     features( void ) const;
-
-        //! Returns a vertex size in bytes.
-        s32                     vertexSize( void ) const;
-
-        //! Defines a vertex attribute location.
-        void                    attributeLocation( Attribute attribute, s32 count, s32 offset );
-
-        //! Returns the vertex position attribute.
-        const Element&          position( void ) const;
-
-        //! Enables a color input.
-        void                    setColor( s32 size, s32 offset = -1 );
-
-        //! Returns the vertex color attribute.
-        const Element&          color( void ) const;
-
-        //! Returns the vertex normal attribute.
-        const Element&          normal( void ) const;
-
-        //! Returns the vertex UV attribute for a given sampler index.
-        const Element&          uv( u32 sampler ) const;
-
-        //! Returns the point size attribute.
-        const Element&          pointSize( void ) const;
-
-    private:
-
-                                //! Constructs an InputLayout instance.
-                                InputLayout( s32 vertexSize );
-
-    protected:
-
-        u32                     m_features;                     //!< An input layout features.
-        s32                     m_vertexSize;                   //!< Vertex size in bytes.
-        Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
     };
 
     //! Vertex buffer class.

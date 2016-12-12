@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,44 +21,39 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#include "Rendering.h"
+#ifndef __DC_Renderer_OpenGL2Rvm_H__
+#define __DC_Renderer_OpenGL2Rvm_H__
 
-DC_BEGIN_COMPOSER
+#include "../RenderingContext.h"
+#include "OpenGL2RenderingContext.h"
 
-#if DEV_DEPRECATED_SCENE_RENDERER
+DC_BEGIN_DREEMCHEST
 
-// -------------------------------------------------------- SceneObjectIndicatorsPass -------------------------------------------------------- //
-
-// ** SceneObjectIndicatorsPass::render
-void SceneObjectIndicatorsPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform )
+namespace Renderer
 {
-    if( internal.isPrivate() ) {
-        return;
-    }
+#if !DEV_DEPRECATED_HAL
+    //! OpenGL 2 rendering virtual machine implementation.
+    class OpenGL2Rvm : public RenderingContext
+    {
+    public:
+                        //! Constructs an OpenGL2Rvm instance.
+                        OpenGL2Rvm(OpenGL2RenderingContext* renderingContext);
+        
+    protected:
+        
+        //! Submits all recorded rendering operations to OpenGL pipeline.
+        virtual void    executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        
+        //! Resets an OpenGL pipeline to a default state.
+        virtual void    reset( void ) NIMBLE_OVERRIDE;
+    };
+#endif  /*  #if !DEV_DEPRECATED_HAL */
+    
+} // namespace Renderer
 
-    if( !internal.parent().valid() ) {
-        LogError( "scene", "SceneEditorInternal has no valid scene object\n" );
-        return;
-    }
+DC_END_DREEMCHEST
 
-    Renderer::Renderer2DPtr renderer = context->renderer();
-
-    if( internal.isSelected() ) {
-        if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-            renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 1.0f, 1.0f, 0.0f ) );
-        }    
-    }
-    else if( internal.isHighlighted() ) {
-        if( Scene::StaticMesh* mesh = internal.parent()->has<Scene::StaticMesh>() ) {
-            renderer->wireBox( mesh->worldSpaceBounds(), Rgba( 0.0f, 1.0f, 0.0f ) );
-        }
-    }
-}
-
-#else
-#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
-
-DC_END_COMPOSER
+#endif  /*  __DC_Renderer_OpenGL2Rvm_H__    */

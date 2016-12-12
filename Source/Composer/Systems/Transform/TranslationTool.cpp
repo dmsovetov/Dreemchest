@@ -270,7 +270,7 @@ u8 TranslationToolSystem::mapRayToAxis( TranslationTool& tool, f32 scale, const 
 // -------------------------------------------------------- TranslationToolPass -------------------------------------------------------- //
 
 // ** TranslationToolPass::render
-void TranslationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TranslationTool& tool, const Scene::Transform& transform )
+void TranslationToolPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const TranslationTool& tool, const Scene::Transform& transform )
 {
     Renderer::Renderer2DPtr renderer = context->renderer();
 

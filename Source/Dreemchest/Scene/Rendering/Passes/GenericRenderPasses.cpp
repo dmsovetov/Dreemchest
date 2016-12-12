@@ -76,7 +76,7 @@ u8 ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& 
     u8 renderTarget = commands.acquireRenderTarget( dimensions, dimensions, Renderer::PixelD24X8 );
 
     // Render scene from a light's point of view
-    CommandBuffer& cmd = commands.renderToTarget( renderTarget );
+    CommandBuffer& cmd = commands.renderToTarget( frame, renderTarget );
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 
     // Update a shadow constant buffer

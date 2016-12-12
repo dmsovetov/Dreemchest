@@ -27,8 +27,8 @@
 #ifndef __DC_Renderer_RenderState_H__
 #define __DC_Renderer_RenderState_H__
 
-#include "../Renderer.h"
-#include "../Hal.h"
+#include "Renderer.h"
+#include "Hal.h"
 
 DC_BEGIN_DREEMCHEST
 

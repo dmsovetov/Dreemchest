@@ -164,7 +164,7 @@ namespace Renderer {
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
         virtual void                setVertexBuffer( const VertexBufferPtr& vertexBuffer );
         virtual void                setIndexBuffer( const IndexBufferPtr& indexBuffer );
-        virtual void                setInputLayout( const InputLayoutPtr& inputLayout );
+        virtual void                setInputLayout( const VertexBufferLayoutPtr& inputLayout );
         virtual void                setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
         virtual void                setColorMask( u32 value );
@@ -198,8 +198,8 @@ namespace Renderer {
 
     private:
 
-        void                        enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inputLayout );
-        void                        disableInputLayout( const InputLayoutWPtr& inputLayout );
+        void                        enableInputLayout( const u8 *pointer, const VertexBufferLayoutWPtr& inputLayout );
+        void                        disableInputLayout( const VertexBufferLayoutWPtr& inputLayout );
 
     private:
 

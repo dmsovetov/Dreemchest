@@ -112,7 +112,7 @@ DC_BEGIN_COMPOSER
     protected:
 
         //! Renders the mesh of a single translation tool.
-        virtual void    render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const TranslationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
+        virtual void    render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const TranslationTool& tool, const Scene::Transform& transform ) DC_DECL_OVERRIDE;
     };
 #else
 #endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */

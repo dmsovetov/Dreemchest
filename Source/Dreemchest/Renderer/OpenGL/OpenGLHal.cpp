@@ -334,7 +334,7 @@ void OpenGLHal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
 }
 
 // ** OpenGLHal::setInputLayout
-void OpenGLHal::setInputLayout( const InputLayoutPtr& inputLayout )
+void OpenGLHal::setInputLayout( const VertexBufferLayoutPtr& inputLayout )
 {
     if( m_activeInputLayout.valid() ) {
         disableInputLayout( m_activeInputLayout );
@@ -356,7 +356,7 @@ void OpenGLHal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 
 }
 
 // ** OpenGLHal::enableInputLayout
-void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inputLayout )
+void OpenGLHal::enableInputLayout( const u8 *pointer, const VertexBufferLayoutWPtr& inputLayout )
 {
     DC_CHECK_GL;
 
@@ -364,10 +364,10 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inp
 
     s32 stride = inputLayout->vertexSize();
 
-    const InputLayout::Element& normal     = inputLayout->normal();
-    const InputLayout::Element& position   = inputLayout->position();
-    const InputLayout::Element& color      = inputLayout->color();
-    const InputLayout::Element& pointSize  = inputLayout->pointSize();
+    const VertexBufferLayout::Element& normal     = inputLayout->normal();
+    const VertexBufferLayout::Element& position   = inputLayout->position();
+    const VertexBufferLayout::Element& color      = inputLayout->color();
+    const VertexBufferLayout::Element& pointSize  = inputLayout->pointSize();
 
     if( normal ) {
         glEnableClientState( GL_NORMAL_ARRAY );
@@ -386,8 +386,8 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inp
     #endif
     }
 
-    for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
-        const InputLayout::Element& uv = inputLayout->uv( i );
+    for( u32 i = 0; i < VertexBufferLayout::Uv4 - VertexBufferLayout::Uv0; i++ ) {
+        const VertexBufferLayout::Element& uv = inputLayout->uv( i );
         
         if( !uv ) {
             continue;
@@ -403,7 +403,7 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const InputLayoutWPtr& inp
 }
 
 // ** OpenGLHal::disableInputLayout
-void OpenGLHal::disableInputLayout( const InputLayoutWPtr& inputLayout )
+void OpenGLHal::disableInputLayout( const VertexBufferLayoutWPtr& inputLayout )
 {
     DC_CHECK_GL;
 
@@ -421,7 +421,7 @@ void OpenGLHal::disableInputLayout( const InputLayoutWPtr& inputLayout )
     #endif
     }
 
-    for( u32 i = 0; i < InputLayout::Uv4 - InputLayout::Uv0; i++ ) {
+    for( u32 i = 0; i < VertexBufferLayout::Uv4 - VertexBufferLayout::Uv0; i++ ) {
         if( inputLayout->uv( i ) ) {
             glClientActiveTexture( GL_TEXTURE0 + i );
             glDisableClientState( GL_TEXTURE_COORD_ARRAY );

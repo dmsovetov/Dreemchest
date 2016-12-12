@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,75 +21,58 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
-#include "RenderFrame.h"
-#include "CommandBuffer.h"
+#include "OpenGL2Rvm.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
 
-// ** RenderFrame::RenderFrame
-RenderFrame::RenderFrame( void )
-    : m_stateStack( 4096, MaxStateStackDepth )
-    , m_allocator( 1024 * 100 )
+#if !DEV_DEPRECATED_HAL
+// ** OpenGL2Rvm::OpenGL2Rvm
+OpenGL2Rvm::OpenGL2Rvm(OpenGL2RenderingContext* renderingContext)
+    : RenderingContext(renderingContext)
 {
-    m_entryPoint = &createCommandBuffer();
+    
 }
 
-// ** RenderFrame::internBuffer
-const void* RenderFrame::internBuffer( const void* data, s32 size )
+// ** OpenGL2Rvm::executeCommandBuffer
+void OpenGL2Rvm::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
 {
-    void* interned = allocate( size );
-    memcpy( interned, data, size );
-    return interned;
-}
-
-// ** RenderFrame::allocate
-void* RenderFrame::allocate( s32 size )
-{
-    void* allocated = m_allocator.allocate( size );
-    NIMBLE_ABORT_IF( allocated == NULL, "render frame is out of memory" );
-    return allocated;
-}
-
-// ** RenderFrame::entryPoint
-const CommandBuffer& RenderFrame::entryPoint( void ) const
-{
-    return *m_entryPoint;
-}
-
-// ** RenderFrame::entryPoint
-CommandBuffer& RenderFrame::entryPoint( void )
-{
-    return *m_entryPoint;
-}
-
-// ** RenderFrame::createCommandBuffer
-CommandBuffer& RenderFrame::createCommandBuffer( void )
-{
-    m_commandBuffers.push_back( DC_NEW CommandBuffer( *this ) );
-    return *m_commandBuffers.back().get();
-}
-
-// ** RenderFrame::stateStack
-StateStack& RenderFrame::stateStack( void )
-{
-    return m_stateStack;
+    NIMBLE_NOT_IMPLEMENTED;
 }
     
-// ** RenderFrame::clear
-void RenderFrame::clear( void )
+// ** OpenGL2Rvm::reset
+void OpenGL2Rvm::reset( void )
 {
-    m_commandBuffers.clear();
-    m_entryPoint = &createCommandBuffer();
-
-    m_allocator.reset();
+    // Reset the face culling
+    m_hal->setCulling( Renderer::TriangleFaceBack );
+    
+    // Set the default polygon mode
+    m_hal->setPolygonMode( Renderer::PolygonFill );
+    
+    // Set the default shader
+    m_hal->setShader( NULL );
+    
+    // Set the default vertex buffer
+    m_hal->setVertexBuffer( NULL );
+    
+    // Set default textures
+    for( s32 i = 0; i < 8; i++ ) {
+        m_hal->setTexture( i, NULL );
+    }
+    
+    // Enable the depth test back
+    m_hal->setDepthTest( true, Renderer::LessEqual );
+    
+    // Disable the alpha test
+    m_hal->setAlphaTest( Renderer::CompareDisabled );
 }
-
+#endif  /*  #if !DEV_DEPRECATED_HAL */
+    
 } // namespace Renderer
 
 DC_END_DREEMCHEST

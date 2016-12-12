@@ -93,7 +93,7 @@ bool SceneEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::Do
     m_renderingContext = Scene::RenderingContext::create( hal() );
     m_renderCache      = Scene::TestRenderCache::create( &project->assets(), m_renderingContext );
     m_renderScene      = Scene::RenderScene::create( m_scene, m_renderingContext, m_renderCache );
-    m_rvm              = Scene::Rvm::create( m_renderingContext );
+    m_rvm              = Scene::RenderingContext::create( m_renderingContext );
 
     // Create the scene model
     m_sceneModel = new SceneModel( m_project->assets(), m_scene, this );

@@ -41,11 +41,11 @@
 #include <Renderer/Renderer.h>
 #include <Renderer/Hal.h>
 #include <Renderer/Renderer2D.h>
-#include <Renderer/Rvm/VertexFormat.h>
-#include <Renderer/Rvm/RenderFrame.h>
-#include <Renderer/Rvm/RenderingContext.h>
-#include <Renderer/Rvm/CommandBuffer.h>
-#include <Renderer/Rvm/Ubershader.h>
+#include <Renderer/VertexFormat.h>
+#include <Renderer/RenderFrame.h>
+#include <Renderer/RenderingContext.h>
+#include <Renderer/CommandBuffer.h>
+#include <Renderer/Ubershader.h>
 
 #include <Assets/Asset.h>
 #include <Assets/AssetHandle.h>

@@ -165,7 +165,7 @@ void ArcballRotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e,
 // -------------------------------------------------------------- ArcballRotationToolPass -------------------------------------------------------------- //
 
 // ** ArcballRotationToolPass::render
-void ArcballRotationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform )
+void ArcballRotationToolPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform )
 {
     // Get batched renderer interface
     Renderer::Renderer2DWPtr renderer = context->renderer();

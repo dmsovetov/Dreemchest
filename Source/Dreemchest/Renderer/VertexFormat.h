@@ -27,7 +27,7 @@
 #ifndef __DC_Renderer_VertexFormat_H__
 #define __DC_Renderer_VertexFormat_H__
 
-#include "../Renderer.h"
+#include "Renderer.h"
 
 DC_BEGIN_DREEMCHEST
 

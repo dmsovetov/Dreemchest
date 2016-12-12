@@ -54,6 +54,11 @@ namespace Renderer
                 , UploadVertexBuffer    //!< Uploads data to a vertex buffer.
                 , AcquireRenderTarget   //!< Acquires an intermediate render target.
                 , ReleaseRenderTarget   //!< Releases an intermediate render target.
+                , CreateInputLayout     //!< Creates a new input layout from a vertex declaration.
+                , CreateVertexBuffer    //!< Creates a new vertex buffer object.
+                , CreateIndexBuffer     //!< Creates a new index buffer object.
+                , CreateConstantBuffer  //!< Creates a new constant buffer object.
+                , CreateTexture         //!< Creates a new texture.
             };
 
             Type                                type;                       //!< An op code type.
@@ -65,7 +70,7 @@ namespace Renderer
                     PrimitiveType               primitives;                 //!< A primitive type to be rendered.
                     s32                         first;                      //!< First index or primitive.
                     s32                         count;                      //!< A total number of indices or primitives to use.
-                    const StateBlock*     states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
+                    const StateBlock*           states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
                 } drawCall;
 
                 struct
@@ -102,6 +107,29 @@ namespace Renderer
                     const void*                 data;                       //!< A source data point.
                     s32                         size;                       //!< A total number of bytes to upload.
                 } upload;
+                
+                struct
+                {
+                    u16                     id;                             //!< Handle to an input layout being constructed.
+                    u8                      format;                         //!< Vertex format used by an input layout constructor.
+                } createInputLayout;
+                
+                struct
+                {
+                    u16                     id;                             //!< Handle to a buffer object being constructed.
+                    const void*             data;                           //!< Data that should be uploaded to a buffer after construction.
+                    s32                     size;                           //!< A buffer size.
+                    const void*             userData;                       //!< Used by a constant buffer constructor.
+                } createBuffer;
+                
+                struct
+                {
+                    u16                     id;                             //!< Handle to a texture being constructed.
+                    const void*             data;                           //!< A texture data that should be uploaded after construction.
+                    u16                     width;                          //!< A texture width.
+                    u16                     height;                         //!< A texture height.
+                    Renderer::PixelFormat   format;                         //!< A texture format.
+                } createTexture;
             };
         };
 
@@ -110,6 +138,9 @@ namespace Renderer
 
         //! Returns a command at specified index.
         const OpCode&               opCodeAt( s32 index ) const;
+        
+        //! Clears a command buffer.
+        void                        reset( void );
 
         //! Emits a render target clear command.
         void                        clear( const Rgba& clearColor, u8 clearMask );
@@ -124,7 +155,7 @@ namespace Renderer
         void                        releaseRenderTarget( u8 index );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        CommandBuffer&              renderToTarget( u8 index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        CommandBuffer&              renderToTarget( RenderFrame& frame, u8 index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
 
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer( u32 id, const void* data, s32 size );
@@ -144,17 +175,19 @@ namespace Renderer
         //! Emits a draw primitives command that inherits all rendering states from a state stack.
         void                        drawPrimitives( u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock );
 
-    private:
+    protected:
 
                                     //! Constructs a CommandBuffer instance.
-                                    CommandBuffer( RenderFrame& frame );
+                                    CommandBuffer( void );
         
         //! Emits a draw call command.
         void                        emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount );
+        
+        //! Pushes a new command to a buffer.
+        void                        push(const OpCode& opCode);
 
     private:
 
-        RenderFrame&                m_frame;                //!< A parent frame instance.
         Array<OpCode>               m_commands;             //!< An array of recorded commands.
         u8                          m_renderTargetIndex;    //!< An intermediate render target index relative to a current stack offset.
     };

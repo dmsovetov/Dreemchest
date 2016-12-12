@@ -201,7 +201,7 @@ namespace Scene {
                                     {}
                                 //! Constructs Event instance.
                                 CollisionEvent( Type type, SceneObjectWPtr other, bool isSensor, u16 category, const Array<Vec2>& points = Array<Vec2>() )
-                                    : type( type ), other( other ), isSensor( isSensor ), category( category ), points( points ) {}
+                                    : other( other ), type( type ), isSensor( isSensor ), category( category ), points( points ) {}
 
             SceneObjectWPtr     other;      //!< First contact body.
             Type                type;       //!< Collision type.

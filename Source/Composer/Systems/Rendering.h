@@ -51,7 +51,7 @@ DC_BEGIN_COMPOSER
     protected:
 
         //! Renders scene object indicators.
-        virtual void    render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform ) DC_DECL_OVERRIDE;    
+        virtual void    render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const Editors::SceneEditorInternal& internal, const Scene::Transform& transform ) DC_DECL_OVERRIDE;    
     };
 
     //! Scene editor helpers renderer type.

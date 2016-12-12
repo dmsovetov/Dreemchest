@@ -47,7 +47,7 @@ namespace Renderer {
         class Shader;
         class VertexBuffer;
         class IndexBuffer;
-        class InputLayout;
+        class VertexBufferLayout;
         class Texture;
             class Texture1D;
             class Texture2D;
@@ -58,7 +58,7 @@ namespace Renderer {
     //! Pointer types for renderer resources.
     dcDeclarePtrs( Hal )
     //dcDeclarePtrs( Renderer2D )
-    dcDeclarePtrs( InputLayout )
+    dcDeclarePtrs( VertexBufferLayout )
     dcDeclarePtrs( VertexBuffer )
     dcDeclarePtrs( IndexBuffer )
     dcDeclarePtrs( ConstantBuffer )
@@ -73,10 +73,87 @@ namespace Renderer {
     
     dcDeclarePtrs( Ubershader )
     dcDeclarePtrs( RenderingContext )
-    dcDeclarePtrs( Rvm )
     
     //! A render resource handle type.
     typedef u32 RenderId;
+    
+#if !DEV_DEPRECATED_HAL
+    //! Available resource type tags used to distinguish handles that point to different types of resources.
+    enum RenderResourceTag
+    {
+          InputLayoutTag = 1
+        , VertexBufferTag
+        , IndexBufferTag
+        , ConstantBufferTag
+        , RenderTargetTag
+        , ShaderTag
+    };
+    
+    //! A render resource identifier type.
+    template<RenderResourceTag TResource, typename TIdentifier = u32>
+    class ResourceIdentifier
+    {
+    friend class RenderingContext;
+    public:
+        
+                            //! Constructs an invalid render resource identifier.
+                            ResourceIdentifier( void );
+        
+                            //! Type casts to a stored identifier type.
+                            operator TIdentifier( void ) const;
+        
+                            //! Returns true if this resource identifier is valid.
+                            operator bool( void ) const;
+        
+    private:
+        
+                            //! Constructs a resource identifier with a specified value.
+                            ResourceIdentifier( TIdentifier value );
+        
+    private:
+        
+        TIdentifier         m_id;   //!< Actual resource identifier.
+    };
+    
+    // ** ResourceIdentifier::ResourceIdentifier
+    template<RenderResourceTag TResource, typename TIdentifier>
+    NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::ResourceIdentifier( void )
+        : m_id(0)
+    {
+    }
+    
+    // ** ResourceIdentifier::ResourceIdentifier
+    template<RenderResourceTag TResource, typename TIdentifier>
+    NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::ResourceIdentifier( TIdentifier value )
+        : m_id(value)
+    {
+        
+    }
+    
+    // ** ResourceIdentifier::operator TIdentifier
+    template<RenderResourceTag TResource, typename TIdentifier>
+    NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator TIdentifier( void ) const
+    {
+        return m_id;
+    }
+    
+    // ** ResourceIdentifier::operator TIdentifier
+    template<RenderResourceTag TResource, typename TIdentifier>
+    NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator bool( void ) const
+    {
+        return m_id != 0;
+    }
+    
+    //! Declare all render resource types.
+    typedef ResourceIdentifier<InputLayoutTag> InputLayout;
+    typedef ResourceIdentifier<VertexBufferTag> VertexBuffer;
+    typedef ResourceIdentifier<IndexBufferTag> IndexBuffer;
+    typedef ResourceIdentifier<ConstantBufferTag> ConstantBuffer;
+    typedef ResourceIdentifier<RenderTargetTag> RenderTarget;
+    typedef ResourceIdentifier<ShaderTag> Program;
+#else
+    typedef RenderId InputLayout;
+#endif  /*  #if DEV_DEPRECATED_HAL  */
     
     //! Render frame unique pointer type.
     typedef UPtr<class RenderFrame> RenderFrameUPtr;
@@ -85,6 +162,7 @@ namespace Renderer {
     class StateBlock;
     class VertexFormat;
     struct ConstantBufferLayout;
+    class RenderFrame;
     
     //! Render command buffer unique pointer type.
     typedef UPtr<class CommandBuffer> CommandBufferUPtr;
@@ -257,8 +335,8 @@ DC_END_DREEMCHEST
     #include "RenderStateDeprecated.h"
     #include "BatchRenderer.h"
     #include "Renderer2D.h"
-    #include "Rvm/RenderingContext.h"
-    #include "Rvm/Rvm.h"
+    #include "RenderingContext.h"
+    #include "RenderingContext.h"
 #endif
 
 #endif

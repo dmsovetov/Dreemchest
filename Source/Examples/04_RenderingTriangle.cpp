@@ -40,7 +40,7 @@ class RendererInitialization : public ApplicationDelegate
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
+        Window* window = Window::create( 800 / 4, 600 / 4 );
 
         // Create a rendering view.
         RenderView* view   = Renderer::createOpenGLView( window->handle(), Renderer::PixelD24S8 );
@@ -50,11 +50,9 @@ class RendererInitialization : public ApplicationDelegate
         m_hal = Hal::create( OpenGL, view );
         m_renderingContext = Scene::RenderingContext::create(m_hal);
     #else
-        m_renderingContext = Scene::RenderingContext::create();
+        m_renderingContext = Renderer::RenderingContext::create(Renderer::RenderingContext::OpenGL2);
     #endif  /*  #if DEV_DEPRECATED_HAL  */
-        
-        m_rvm              = Scene::Rvm::create(m_renderingContext);
-        
+
         static f32 vertices[] = {
             -1.0f, -1.0f, 0.0f,
             1.0f, -1.0f, 0.0f,
@@ -65,10 +63,17 @@ class RendererInitialization : public ApplicationDelegate
         };
 
         // Request all required resources from a rendering context
-        Renderer::RenderId shader       = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
-        Renderer::RenderId inputLayout  = m_renderingContext->requestInputLayout(0);
-        Renderer::RenderId vertexBuffer = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Renderer::RenderId indexBuffer  = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+    #if !DEV_DEPRECATED_HAL
+        Renderer::Program       shader       /*= m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"))*/;
+        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(0);
+        Renderer::VertexBuffer  vertexBuffer /*= m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices))*/;
+        Renderer::IndexBuffer   indexBuffer  /*= m_renderingContext->requestIndexBuffer(indices, sizeof(indices))*/;
+    #else
+        Renderer::RenderId      shader   = m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"));
+        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(0);
+        Renderer::RenderId  vertexBuffer = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
+        Renderer::RenderId   indexBuffer  = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
+    #endif  /*  #if !DEV_DEPRECATED_HAL */
         
         // Setup a render state block that will be used during rendering
         m_renderState.bindVertexBuffer(vertexBuffer);
@@ -95,7 +100,7 @@ class RendererInitialization : public ApplicationDelegate
         commands.drawIndexed(0, Renderer::PrimTriangles, 0, 3, &m_renderState);
         
         // Rendering frame is now ready, so pass it to RVM to display it on a screen.
-        m_rvm->display(m_renderFrame);
+        m_renderingContext->display(m_renderFrame);
 
     #if DEV_DEPRECATED_HAL
         m_hal->present();
@@ -106,8 +111,8 @@ class RendererInitialization : public ApplicationDelegate
     HalPtr                          m_hal;              //!< Rendering HAL.
 #endif  /*  #if DEV_DEPRECATED_HAL  */
     Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
-    Renderer::RvmPtr                m_rvm;              //!< Rendering virtual machine processes a list of commands and performs rendering.
-    Renderer::StateBlock      m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
+    
+    Renderer::StateBlock            m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
     Renderer::RenderFrame           m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
 };
 

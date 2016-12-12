@@ -62,7 +62,7 @@ void RenderSystemBase::render( RenderFrame& frame, CommandBuffer& commands )
         const Transform& transform = *entity.get<Transform>();
 
         // Create a command buffer to render this camera
-        CommandBuffer& cameraCommands = commands.renderToTarget( 0, viewport.denormalize( camera.ndc() ) );
+        CommandBuffer& cameraCommands = commands.renderToTarget( frame, 0, viewport.denormalize( camera.ndc() ) );
 
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
