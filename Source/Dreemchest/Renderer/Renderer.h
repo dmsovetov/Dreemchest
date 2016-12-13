@@ -78,22 +78,27 @@ namespace Renderer {
     typedef u64 PipelineFeatures;
     
     //! Available resource type tags used to distinguish handles that point to different types of resources.
-    enum RenderResourceTag
+    struct RenderResourceType
     {
-          InputLayoutTag = 1
-        , VertexBufferTag
-        , IndexBufferTag
-        , ConstantBufferTag
-        , RenderTargetTag
-        , ProgramTag
-        , TextureTag
-        , FeatureLayoutTag
+        enum Enum
+        {
+              InputLayout = 1
+            , VertexBuffer
+            , IndexBuffer
+            , ConstantBuffer
+            , RenderTarget
+            , Program
+            , Texture
+            , FeatureLayout
+            , TotalTypes
+        };
     };
     
     //! A render resource identifier type.
-    template<RenderResourceTag TResource, typename TIdentifier = u16>
+    template<RenderResourceType::Enum TResource, typename TIdentifier = u16>
     class ResourceIdentifier
     {
+    friend class RenderingContext;
     friend class RenderingContextHal;
     public:
         
@@ -123,14 +128,14 @@ namespace Renderer {
     };
     
     // ** ResourceIdentifier::ResourceIdentifier
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::ResourceIdentifier( void )
         : m_id(0)
     {
     }
     
     // ** ResourceIdentifier::ResourceIdentifier
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::ResourceIdentifier( TIdentifier value )
         : m_id(value)
     {
@@ -138,44 +143,44 @@ namespace Renderer {
     }
     
     // ** ResourceIdentifier::operator TIdentifier
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator TIdentifier( void ) const
     {
         return m_id;
     }
     
     // ** ResourceIdentifier::operator s32
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator s32( void ) const
     {
         return static_cast<s32>(m_id);
     }
     
     // ** ResourceIdentifier::operator TIdentifier
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator bool( void ) const
     {
         return m_id != 0;
     }
     
     // ** ResourceIdentifier::operator TIdentifier
-    template<RenderResourceTag TResource, typename TIdentifier>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     ResourceIdentifier<TResource, TIdentifier> ResourceIdentifier<TResource, TIdentifier>::create(TIdentifier value)
     {
         return ResourceIdentifier(value);
     }
 
     //! Declare all render resource types.
-    typedef ResourceIdentifier<InputLayoutTag> InputLayout;
-    typedef ResourceIdentifier<VertexBufferTag> VertexBuffer_;
-    typedef ResourceIdentifier<IndexBufferTag> IndexBuffer_;
-    typedef ResourceIdentifier<ConstantBufferTag> ConstantBuffer_;
-    typedef ResourceIdentifier<RenderTargetTag> RenderTarget_;
-    typedef ResourceIdentifier<ProgramTag> Program;
-    typedef ResourceIdentifier<TextureTag> Texture_;
-    typedef ResourceIdentifier<FeatureLayoutTag> FeatureLayout;
+    typedef ResourceIdentifier<RenderResourceType::InputLayout> InputLayout;
+    typedef ResourceIdentifier<RenderResourceType::VertexBuffer> VertexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::IndexBuffer> IndexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::ConstantBuffer> ConstantBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::RenderTarget> RenderTarget_;
+    typedef ResourceIdentifier<RenderResourceType::Program> Program;
+    typedef ResourceIdentifier<RenderResourceType::Texture> Texture_;
+    typedef ResourceIdentifier<RenderResourceType::FeatureLayout> FeatureLayout;
     
-    typedef ResourceIdentifier<RenderTargetTag, u8> IntermediateRenderTarget;
+    typedef ResourceIdentifier<RenderResourceType::RenderTarget, u8> IntermediateRenderTarget;
     
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource

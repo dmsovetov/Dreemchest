@@ -32,97 +32,10 @@
 #include "VertexFormat.h"
 #include "VertexBufferLayout.h"
 
-#include "../Io/DiskFileSystem.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-    
-// --------------------------------------------------------- RenderingContextHal::ConstructionCommandBuffer --------------------------------------------------------- //
-
-//! An internal comamnd buffer type that is used for resource construction.
-class RenderingContextHal::ConstructionCommandBuffer : public CommandBuffer
-{
-public:
-    
-    //! Emits an input layout creation command.
-    InputLayout                 createInputLayout(InputLayout id, const VertexFormat& vertexFormat);
-    
-    //! Emits a vertex buffer creation command.
-    VertexBuffer_               createVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
-    
-    //! Emits an index buffer creation command.
-    IndexBuffer_                createIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
-    
-    //! Emits a constant buffer creation command.
-    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout);
-    
-    //! Emits a texture creation command.
-    Texture_                    createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format);
-};
-
-// ** RenderingContextHal::ConstructionCommandBuffer::createVertexBuffer
-InputLayout RenderingContextHal::ConstructionCommandBuffer::createInputLayout(InputLayout id, const VertexFormat& vertexFormat)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateInputLayout;
-    opCode.createInputLayout.id = id;
-    opCode.createInputLayout.format = vertexFormat;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContextHal::ConstructionCommandBuffer::createVertexBuffer
-VertexBuffer_ RenderingContextHal::ConstructionCommandBuffer::createVertexBuffer(VertexBuffer_ id, const void *data, s32 size)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateVertexBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContextHal::ConstructionCommandBuffer::createIndexBuffer
-IndexBuffer_ RenderingContextHal::ConstructionCommandBuffer::createIndexBuffer(IndexBuffer_ id, const void *data, s32 size)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateIndexBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContextHal::ConstructionCommandBuffer::createConstantBuffer
-ConstantBuffer_ RenderingContextHal::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateConstantBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
-    opCode.createBuffer.userData = layout;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContextHal::ConstructionCommandBuffer::createTexture
-Texture_ RenderingContextHal::ConstructionCommandBuffer::createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateTexture;
-    opCode.createTexture.id = id;
-    opCode.createTexture.data = data;
-    opCode.createTexture.width = width;
-    opCode.createTexture.height = height;
-    opCode.createTexture.format = format;
-    push( opCode );
-    return id;
-}
 
 // -------------------------------------------------------------------- RenderingContextHal::IntermediateTargetStack ------------------------------------------------------------------- //
 
@@ -227,15 +140,11 @@ void RenderingContextHal::IntermediateTargetStack::release( u8 index )
 
 // ** RenderingContextHal::RenderingContextHal
 RenderingContextHal::RenderingContextHal( HalWPtr hal )
-    : m_constructionCommandBuffer(new ConstructionCommandBuffer)
-    , m_hal( hal )
+    : m_hal( hal )
     , m_intermediateTargets( DC_NEW IntermediateTargetStack( *this ) )
 {
     // Reset all state switchers
     memset( m_stateSwitches, 0, sizeof( m_stateSwitches ) );
-    
-    // Reset input layout cache
-    memset( m_inputLayoutCache, 0, sizeof( m_inputLayoutCache ) );
 
     // Setup render state switchers
     m_stateSwitches[State::AlphaTest]         = &RenderingContextHal::switchAlphaTest;
@@ -252,30 +161,13 @@ RenderingContextHal::RenderingContextHal( HalWPtr hal )
     m_stateSwitches[State::PolygonOffset]     = &RenderingContextHal::switchPolygonOffset;
 
     // Allocate an invalid item placeholders.
-    m_inputLayouts.push( NULL );
-    m_vertexBuffers.push( NULL );
-    m_indexBuffers.push( NULL );
-    m_constantBuffers.push( NULL );
-    m_textures.push( NULL );
-    m_pipelineFeatureLayouts.push( NULL );
-    m_shaders.push( NULL );
-}
-
-// ** RenderingContextHal::display
-void RenderingContextHal::display( RenderFrame& frame )
-{
-    // First execute a construction command buffer
-    execute(frame, *m_constructionCommandBuffer);
-    m_constructionCommandBuffer->reset();
-    
-    // Execute an entry point command buffer
-    execute( frame, frame.entryPoint() );
-
-    // Reset rendering states
-    reset();
-    
-    // Clear this frame
-    frame.clear();
+    //m_inputLayouts.push( NULL );
+    //m_vertexBuffers.push( NULL );
+    //m_indexBuffers.push( NULL );
+    //m_constantBuffers.push( NULL );
+    //m_textures.push( NULL );
+    //m_pipelineFeatureLayouts.push( NULL );
+    //m_shaders.push( NULL );
 }
 
 // ** RenderingContextHal::renderToTarget
@@ -614,7 +506,7 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
     }
     
     // Compose a user defined feature mask
-    PipelineFeatures userDefined = (userFeatures & userFeaturesMask) << UserDefinedFeaturesOffset;
+    PipelineFeatures userDefined = PipelineFeature::mask(userFeatures & userFeaturesMask);
     
     // Compose a new bitmaks with pipeline features
     PipelineFeatures features = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined);
@@ -678,11 +570,8 @@ void RenderingContextHal::switchConstantBuffer( const RenderFrame& frame, const 
     const Renderer::ConstantBufferPtr& constantBuffer = m_constantBuffers[state.resourceId];
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
 
-    // A single u64 bit constant value
-    static const u64 bit = 1;
-
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | (bit << (state.data.index + CBufferFeaturesOffset));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::mask(static_cast<ConstantBufferFeatures>(state.data.index));
 }
 
 // ** RenderingContextHal::switchVertexBuffer
@@ -727,9 +616,6 @@ void RenderingContextHal::switchPipelineFeatureLayout( const RenderFrame& frame,
 // ** RenderingContextHal::switchTexture
 void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& state )
 {
-    // A single u64 bit constant value
-    static const u64 bit = 1;
-
     // Convert a resource id to a signed integer
     s32 id = static_cast<s16>( state.resourceId );
 
@@ -751,7 +637,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     }
 
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | (bit << (samplerIndex + SamplerFeaturesOffset));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::mask(static_cast<SamplerFeatures>(samplerIndex));
 }
 
 // ** RenderingContextHal::switchCullFace
@@ -764,172 +650,6 @@ void RenderingContextHal::switchCullFace( const RenderFrame& frame, const State&
 void RenderingContextHal::switchPolygonOffset( const RenderFrame& frame, const State& state )
 {
     m_hal->setPolygonOffset( state.polygonOffset.factor / 128.0f, state.polygonOffset.units / 128.0f );
-}
-
-// ** RenderingContextHal::requestInputLayout
-InputLayout RenderingContextHal::requestInputLayout( const VertexFormat& format )
-{
-    // First lookup a previously constucted input layout
-    InputLayout id = m_inputLayoutCache[format];
-    
-    if( id )
-    {
-        return id;
-    }
-    
-    // Nothing found - construct a new one
-    id = m_constructionCommandBuffer->createInputLayout(allocateInputLayout(), format);
-    
-    // Now put a new input layout to cache
-    m_inputLayoutCache[format] = id;
-    
-    return id;
-}
-
-// ** RenderingContextHal::requestPipelineFeatureLayout
-FeatureLayout RenderingContextHal::requestPipelineFeatureLayout(const PipelineFeature* features)
-{
-    // Create a pipeline feature layout
-    PipelineFeatureLayout* layout = DC_NEW PipelineFeatureLayout;
-    
-    // Populate it with feature mappings
-    for (; features->name; features++)
-    {
-        layout->addFeature(features->name.value(), features->mask);
-    }
-    
-    // Put this layout instance to a pool
-    FeatureLayout id = m_pipelineFeatureLayouts.push(layout);
-    
-    return id;
-}
-
-// ** RenderingContextHal::allocateInputLayout
-InputLayout RenderingContextHal::allocateInputLayout( void )
-{
-    return m_inputLayouts.push( NULL );
-}
-
-// ** RenderingContextHal::allocateTexture
-Texture_ RenderingContextHal::allocateTexture( void )
-{
-    return m_textures.push( NULL );
-}
-
-// ** RenderingContextHal::allocateConstantBuffer
-ConstantBuffer_ RenderingContextHal::allocateConstantBuffer( void )
-{
-    return m_constantBuffers.push( NULL );
-}
-
-// ** RenderingContextHal::allocateIndexBuffer
-IndexBuffer_ RenderingContextHal::allocateIndexBuffer( void )
-{
-    return m_indexBuffers.push( NULL );
-}
-
-// ** RenderingContextHal::allocateVertexBuffer
-VertexBuffer_ RenderingContextHal::allocateVertexBuffer( void )
-{
-    return m_vertexBuffers.push( NULL );
-}
-
-// ** RenderingContextHal::requestVertexBuffer
-VertexBuffer_ RenderingContextHal::requestVertexBuffer( const void* data, s32 size )
-{
-    return m_constructionCommandBuffer->createVertexBuffer(allocateVertexBuffer(), data, size);
-}
-
-// ** RenderingContextHal::requestIndexBuffer
-IndexBuffer_ RenderingContextHal::requestIndexBuffer( const void* data, s32 size )
-{
-    return m_constructionCommandBuffer->createIndexBuffer(allocateIndexBuffer(), data, size);
-}
-
-// ** RenderingContextHal::requestConstantBuffer
-ConstantBuffer_ RenderingContextHal::requestConstantBuffer( const void* data, s32 size, const Renderer::ConstantBufferLayout* layout )
-{
-    return m_constructionCommandBuffer->createConstantBuffer(allocateConstantBuffer(), data, size, layout);
-}
-
-// ** RenderingContextHal::requestConstantBuffer
-Texture_ RenderingContextHal::requestTexture( const void* data, u16 width, u16 height, Renderer::PixelFormat format )
-{
-    return m_constructionCommandBuffer->createTexture(allocateTexture(), data, width, height, format);
-}
-
-// ** RenderingContextHal::requestShader
-Program RenderingContextHal::requestShader(const String& fileName)
-{
-    static CString vertexShaderMarker   = "[VertexShader]";
-    static CString fragmentShaderMarker = "[FragmentShader]";
-    
-    // Read the code from an input stream
-    String code = Io::DiskFileSystem::readTextFile( fileName );
-    NIMBLE_ABORT_IF(code.empty(), "a shader source is empty or file not found");
-    
-    // Extract vertex/fragment shader code blocks
-    size_t vertexBegin   = code.find( vertexShaderMarker );
-    size_t fragmentBegin = code.find( fragmentShaderMarker );
-    
-    if( vertexBegin == String::npos && fragmentBegin == String::npos )
-    {
-        return 0;
-    }
-    
-    String vertexShader, fragmentShader;
-    
-    if( vertexBegin != String::npos )
-    {
-        u32 vertexCodeStart = vertexBegin + strlen( vertexShaderMarker );
-        vertexShader = code.substr( vertexCodeStart, fragmentBegin > vertexBegin ? fragmentBegin - vertexCodeStart : String::npos );
-    }
-    
-    if( fragmentBegin != String::npos )
-    {
-        u32 fragmentCodeStart = fragmentBegin + strlen( fragmentShaderMarker );
-        fragmentShader = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
-    }
-    
-    return requestShader(vertexShader, fragmentShader);
-}
-    
-// ** RenderingContextHal::requestShader
-Program RenderingContextHal::requestShader(const String& vertex, const String& fragment)
-{
-    // Create a shader instance
-    UbershaderPtr shader = DC_NEW Ubershader;
-    
-    // Set vertex and fragment shader code
-    shader->setVertex(vertex);
-    shader->setFragment(fragment);
-    
-    // ----------------------------------------------------
-    shader->addInclude(
-                       "                                                       \n\
-                       struct CBufferScene    { vec4 ambient; };           \n\
-                       struct CBufferView     { mat4 transform; float near; float far; vec3 position; };         \n\
-                       struct CBufferInstance { mat4 transform; };         \n\
-                       struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
-                       struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
-                       struct CBufferShadow   { mat4 transform; float invSize; };         \n\
-                       struct CBufferClipPlanes { vec4 equation[6]; };         \n\
-                       uniform CBufferScene    Scene;                      \n\
-                       uniform CBufferView     View;                       \n\
-                       uniform CBufferInstance Instance;                   \n\
-                       uniform CBufferMaterial Material;                   \n\
-                       uniform CBufferLight    Light;                      \n\
-                       uniform CBufferShadow   Shadow;                     \n\
-                       uniform CBufferClipPlanes ClipPlanes;               \n\
-                       #define u_DiffuseTexture Texture0                   \n\
-                       #define u_ShadowTexture  Texture1                   \n\
-                       "
-                       );
-    
-    // Put this shader to a pool
-    Program id = m_shaders.push(shader);
-    
-    return id;
 }
     
 // ** RenderingContext::createShader

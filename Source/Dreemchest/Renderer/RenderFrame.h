@@ -52,7 +52,7 @@ namespace Renderer
         CommandBuffer&                          createCommandBuffer( void );
 
         //! Returns a state stack.
-        StateStack&                       stateStack( void );
+        StateStack&                             stateStack( void );
 
         //! Returns a root command buffer.
         const CommandBuffer&                    entryPoint( void ) const;
@@ -74,7 +74,7 @@ namespace Renderer
 
         CommandBuffer*                          m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
-        StateStack                        m_stateStack;           //!< Current state stack.
+        StateStack                              m_stateStack;           //!< Current state stack.
         LinearAllocator                         m_allocator;            //!< A linear allocator used by a frame renderers.
     };
 

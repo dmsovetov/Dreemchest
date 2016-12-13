@@ -41,43 +41,16 @@ namespace Renderer
                                     //! Constructs a RenderingContextHal instance.
                                     RenderingContextHal( HalWPtr hal );
 
-        //! Displays a frame captured by a render scene.
-        void                        display( RenderFrame& frame ) NIMBLE_OVERRIDE;
-        
-        //! Queues an input layout instance for creation and returns it's index.
-        InputLayout                 requestInputLayout( const VertexFormat& vertexFormat ) NIMBLE_OVERRIDE;
-        
-        //! Queues a vertex buffer instance for creation and returns it's index.
-        VertexBuffer_               requestVertexBuffer( const void* data, s32 size ) NIMBLE_OVERRIDE;
-        
-        //! Queues an index buffer instance for creation and returns it's index.
-        IndexBuffer_                requestIndexBuffer( const void* data, s32 size ) NIMBLE_OVERRIDE;
-        
-        //! Queues a constant buffer instance for creation and returns it's index.
-        ConstantBuffer_             requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout ) NIMBLE_OVERRIDE;
-        
-        //! Queues a texture instance for creation and returns it's index.
-        Texture_                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format ) NIMBLE_OVERRIDE;
-        
-        //! Queues a pipeline feature layout instance for creation and returns it's index.
-        FeatureLayout               requestPipelineFeatureLayout(const PipelineFeature* features) NIMBLE_OVERRIDE;
-        
-        //! Queues a shader instance creation and returns it's index.
-        Program                     requestShader( const String& fileName ) NIMBLE_OVERRIDE;
-        
-        //! Queues a shader instance creation and returns it's index.
-        Program                     requestShader( const String& vertex, const String& fragment ) NIMBLE_OVERRIDE;
-
     protected:
 
         //! Resets rendering states to defaults.
-        void                        reset( void );
+        virtual void                reset( void ) NIMBLE_OVERRIDE;
+        
+        //! Executes a specified command buffer.
+        virtual void                execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Returns an intermediate render target.
         RenderTargetWPtr            intermediateRenderTarget( IntermediateRenderTarget id ) const;
-    
-        //! Executes a single command buffer.
-        void                        execute( const RenderFrame& frame, const CommandBuffer& commands );
 
         //! Binds a render target with specified viewport and executes a command buffer.
         void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
@@ -148,21 +121,6 @@ namespace Renderer
         //! Handles a texture creation command.
         void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);
         
-        //! Allocates a new input layout handle.
-        virtual InputLayout         allocateInputLayout( void );
-        
-        //! Allocates a new vertex buffer handle.
-        virtual VertexBuffer_       allocateVertexBuffer( void );
-        
-        //! Allocates a new index buffer handle.
-        virtual IndexBuffer_        allocateIndexBuffer( void );
-        
-        //! Allocates a new constant buffer handle.
-        virtual ConstantBuffer_     allocateConstantBuffer( void );
-        
-        //! Allocates a new texturehandle.
-        virtual Texture_            allocateTexture( void );
-        
         //! Acquires an intermediate render target.
         IntermediateRenderTarget    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
         
@@ -191,18 +149,9 @@ namespace Renderer
                                             ActiveShader( void )
                                                 : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
         };
-        
-        //! A maximum number of input layout types
-        enum { MaxInputLayouts = 255 };
 
         //! A forward declaration of a stack type to store intermediate render targets.
         class IntermediateTargetStack;
-        
-        //! A forward declaration of an internal command buffer type used for resource construction.
-        class ConstructionCommandBuffer;
-        
-        typedef UPtr<VertexBufferLayout>        VertexBufferLayoutUPtr;
-        typedef UPtr<PipelineFeatureLayout>     PipelineFeatureLayoutUPtr;
         
 #if DEV_DEPRECATED_HAL
         FixedArray<VertexBufferPtr>             m_vertexBuffers;                        //!< Allocated vertex buffers.
@@ -210,11 +159,6 @@ namespace Renderer
         FixedArray<ConstantBufferPtr>           m_constantBuffers;                      //!< Allocated constant buffers.
         FixedArray<TexturePtr>                  m_textures;                             //!< Allocated textures.
 #endif  /*  #if DEV_DEPRECATED_HAL  */
-        FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;
-        FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                         //!< Allocated input layouts.
-        FixedArray<UbershaderPtr>               m_shaders;                              //!< Allocated ubershaders.
-        InputLayout                             m_inputLayoutCache[MaxInputLayouts];    //!< A lookup table for input layout types.
-        ConstructionCommandBuffer*              m_constructionCommandBuffer;            //!< A command buffer that is used for resource construction commands.
 
     #if DEV_DEPRECATED_HAL
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.

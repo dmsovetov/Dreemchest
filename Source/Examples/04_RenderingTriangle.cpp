@@ -64,8 +64,8 @@ class RendererInitialization : public ApplicationDelegate
         
         static PipelineFeature features[] =
         {
-              { "F_Instance", PipelineFeature::constantBuffer(ConstantBuffer2) }
-            , { "F_View",     PipelineFeature::constantBuffer(ConstantBuffer1) }
+              { "F_Instance", PipelineFeature::mask(ConstantBuffer2) }
+            , { "F_View",     PipelineFeature::mask(ConstantBuffer1) }
             , { NULL }
         };
 

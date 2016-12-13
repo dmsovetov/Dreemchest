@@ -39,32 +39,75 @@ namespace Renderer
     {
     public:
         
+        //! Cleans all allocated resources.
+        virtual                                 ~RenderingContext( void );
+        
         //! Displays a frame captured by a render scene.
-        virtual void                        display( RenderFrame& frame ) = 0;
+        void                                    display( RenderFrame& frame );
         
         //! Queues an input layout instance for creation and returns it's index.
-        virtual InputLayout                 requestInputLayout( const VertexFormat& vertexFormat ) = 0;
+        InputLayout                             requestInputLayout( const VertexFormat& vertexFormat );
         
         //! Queues a vertex buffer instance for creation and returns it's index.
-        virtual VertexBuffer_               requestVertexBuffer( const void* data, s32 size ) = 0;
+        VertexBuffer_                           requestVertexBuffer( const void* data, s32 size );
         
         //! Queues an index buffer instance for creation and returns it's index.
-        virtual IndexBuffer_                requestIndexBuffer( const void* data, s32 size ) = 0;
+        IndexBuffer_                            requestIndexBuffer( const void* data, s32 size );
         
         //! Queues a constant buffer instance for creation and returns it's index.
-        virtual ConstantBuffer_             requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout ) = 0;
+        ConstantBuffer_                         requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout );
         
         //! Queues a texture instance for creation and returns it's index.
-        virtual Texture_                    requestTexture( const void* data, u16 width, u16 height, PixelFormat format ) = 0;
+        Texture_                                requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
         
         //! Queues a pipeline feature layout instance for creation and returns it's index.
-        virtual FeatureLayout               requestPipelineFeatureLayout(const PipelineFeature* features) = 0;
+        FeatureLayout                           requestPipelineFeatureLayout(const PipelineFeature* features);
         
         //! Queues a shader instance creation and returns it's index.
-        virtual Program                     requestShader( const String& fileName ) = 0;
+        Program                                 requestShader( const String& fileName );
         
         //! Queues a shader instance creation and returns it's index.
-        virtual Program                     requestShader( const String& vertex, const String& fragment ) = 0;
+        Program                                 requestShader( const String& vertex, const String& fragment );
+        
+    protected:
+        
+                                                //! Constructs a RenderingContext instance.
+                                                RenderingContext( void );
+        
+        //! Resets rendering states to defaults.
+        virtual void                            reset( void ) NIMBLE_ABSTRACT;
+        
+        //! Executes a specified command buffer.
+        virtual void                            execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;
+        
+    private:
+        
+        //! Allocates a new render resource identifier of specified type.
+        u16                                     allocateResourceIdentifier(RenderResourceType::Enum type);
+        
+    protected:
+        
+        //! A forward declaration of an internal command buffer type used for resource construction.
+        class ConstructionCommandBuffer;
+        
+        //! A maximum number of input layout types
+        enum { MaxInputLayouts = 255 };
+        
+        //! A container type to manage resource identifiers.
+        typedef IndexManager<u16>               ResourceIdentifierManager;
+        
+        //! A unique pointer type for a vertex buffer layout instance.
+        typedef UPtr<VertexBufferLayout>        VertexBufferLayoutUPtr;
+        
+        //! A unique pointer type for a pipeline feature layout instance.
+        typedef UPtr<PipelineFeatureLayout>     PipelineFeatureLayoutUPtr;
+        
+        ResourceIdentifierManager               m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
+        FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
+        FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
+        FixedArray<UbershaderPtr>               m_shaders;                                              //!< Allocated ubershaders.
+        InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
+        ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
     };
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.
