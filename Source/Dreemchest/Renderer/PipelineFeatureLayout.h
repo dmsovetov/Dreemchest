@@ -38,10 +38,19 @@ namespace Renderer
     struct PipelineFeature
     {
         FixedString             name;       //!< A feature name that is exposed to shader code.
-        PipelineFeatures        mask;       //!< A corresponding pipeline feature mask.
+        PipelineFeatures        bits;       //!< A corresponding pipeline feature mask.
+        
+        //! Generate a feature mask that corresponds to a specified vertex attribute.
+        static PipelineFeatures mask(VertexAttributeFeatures vertexAttribute);
         
         //! Generate a feature mask that corresponds to a constant buffer binding at specified slot.
-        static PipelineFeatures constantBuffer(ConstantBufferFeatures index);
+        static PipelineFeatures mask(ConstantBufferFeatures index);
+        
+        //! Generate a feature mask that corresponds to a texture sampler binding at specified index.
+        static PipelineFeatures mask(SamplerFeatures index);
+        
+        //! Generate a feature mask that corresponds to a user defined feature bits.
+        static PipelineFeatures mask(PipelineFeatures userDefined);
     };
     
     //! Pipeline feature layout defines mappings from a pipeline feature mask to actual preprocessor definitions.

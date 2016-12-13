@@ -33,10 +33,28 @@ namespace Renderer
     
 // ------------------------------------------------------------------ PipelineFeature -------------------------------------------------------------------- //
     
-// ** PipelineFeature::constantBuffer
-PipelineFeatures PipelineFeature::constantBuffer(ConstantBufferFeatures index)
+// ** PipelineFeature::mask
+PipelineFeatures PipelineFeature::mask(ConstantBufferFeatures index)
 {
     return static_cast<PipelineFeatures>(1) << (CBufferFeaturesOffset + index);
+}
+    
+// ** PipelineFeature::mask
+PipelineFeatures PipelineFeature::mask(VertexAttributeFeatures vertexAttribute)
+{
+    return static_cast<PipelineFeatures>(1) << vertexAttribute;
+}
+
+// ** PipelineFeature::mask
+PipelineFeatures PipelineFeature::mask(SamplerFeatures index)
+{
+    return static_cast<PipelineFeatures>(1) << (SamplerFeaturesOffset + index);
+}
+    
+// ** PipelineFeature::mask
+PipelineFeatures PipelineFeature::mask(PipelineFeatures userDefined)
+{
+    return userDefined << UserDefinedFeaturesOffset;
 }
     
 // ---------------------------------------------------------------- PipelineFeatureLayout ---------------------------------------------------------------- //
