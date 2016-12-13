@@ -129,6 +129,9 @@ namespace Renderer
         
         //! Activates a shader permuation that best matches active pipeline state.
         void                        activateShaderPermutation( PipelineFeatures features );
+        
+        //! Compiles a shader permutation.
+        ShaderPtr                   compileShaderPermutation( UbershaderPtr shader, PipelineFeatures features, const PipelineFeatureLayout* featureLayout );
 
     private:
 

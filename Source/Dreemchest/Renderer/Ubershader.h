@@ -52,9 +52,12 @@ namespace Renderer {
 
         //! Sets fragment shader source code.
         void                        setFragment( const String& value );
-
-        //! Compiles a new permutation or returns a cached one.
-        const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const;
+        
+        //! Searches for a permutation that matches a specified feature set.
+        ShaderPtr                   findPermutation( PipelineFeatures features );
+        
+        //! Adds a new shader permutation.
+        void                        addPermutation( PipelineFeatures features, ShaderPtr permutation );
 
     private:
 

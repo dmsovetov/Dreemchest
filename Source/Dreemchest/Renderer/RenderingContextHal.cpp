@@ -398,7 +398,7 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
     
     if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features || m_activeShader.featureLayout != m_activeShader.activeFeatureLayout)
     {
-        m_activeShader.permutation  = m_activeShader.shader->permutation( m_hal, features, m_activeShader.featureLayout );
+        m_activeShader.permutation  = compileShaderPermutation( m_activeShader.shader, features, m_activeShader.featureLayout );
         m_activeShader.features     = features;
         m_activeShader.activeShader = m_activeShader.shader;
         m_activeShader.activeFeatureLayout = m_activeShader.featureLayout;
@@ -406,6 +406,51 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
     
     // Bind an active shader permutation
     m_hal->setShader( m_activeShader.permutation );
+}
+    
+// ** RenderingContextHal::compileShaderPermutation
+ShaderPtr RenderingContextHal::compileShaderPermutation( UbershaderPtr shader, PipelineFeatures features, const PipelineFeatureLayout* featureLayout )
+{
+    // First cancel all features that are not supported by a shader
+    //features = features & m_supportedFeatures;
+    
+    // Now lookup a permutation cache
+    ShaderPtr permutation = shader->findPermutation(features);
+    
+    if (permutation.valid())
+    {
+        return permutation;
+    }
+    
+    // Generate macro definitions from features
+    String macro = "";
+    String debug = "";
+    
+    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ ) {
+        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
+        
+        if( element.mask & features )
+        {
+            macro += "#define " + element.name + " " + toString( (element.mask & features) >> element.offset ) + "\n";
+            if( debug.length() ) debug += ", ";
+            debug += element.name;
+        }
+    }
+    
+    LogVerbose( "shader", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
+    
+    // Includes
+    //for( s32 i = 0, n = static_cast<s32>( m_includes.size() ); i < n; i++ ) {
+    //    macro += m_includes[i];
+    //}
+    
+    // Compile the shader
+    ShaderPtr compiled = m_hal->createShader( (macro + shader->vertex()).c_str(), (macro + shader->fragment()).c_str() );
+    NIMBLE_BREAK_IF( !compiled.valid() );
+    
+    shader->addPermutation(features, compiled);
+    
+    return compiled;
 }
 
 // ** RenderingContextHal::switchAlphaTest

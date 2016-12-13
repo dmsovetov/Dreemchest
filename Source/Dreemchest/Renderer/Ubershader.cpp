@@ -61,48 +61,23 @@ void Ubershader::setFragment( const String& value )
     m_fragment = value;
 }
 
-// ** Ubershader::permutation
-const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const
+// ** Ubershader::findPermutation
+ShaderPtr Ubershader::findPermutation( PipelineFeatures features )
 {
-    // First cancel all features that are not supported by a shader
-    //features = features & m_supportedFeatures;
-
-    // Now lookup a permutation cache
     Permutations::const_iterator i = m_permutations.find( features );
-
-    if( i != m_permutations.end() ) {
+    
+    if( i != m_permutations.end() )
+    {
         return i->second;
     }
+    
+    return ShaderPtr();
+}
 
-    // Generate macro definitions from features
-    String macro = "";
-    String debug = "";
-
-    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ ) {
-        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
-
-        if( element.mask & features )
-        {
-            macro += "#define " + element.name + " " + toString( (element.mask & features) >> element.offset ) + "\n";
-            if( debug.length() ) debug += ", ";
-            debug += element.name;
-        }
-    }
-
-    LogVerbose( "shader", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
-
-    // Includes
-    for( s32 i = 0, n = static_cast<s32>( m_includes.size() ); i < n; i++ ) {
-        macro += m_includes[i];
-    }
-
-    // Compile the shader
-    ShaderPtr compiled = hal->createShader( (macro + vertex()).c_str(), (macro + fragment()).c_str() );
-    NIMBLE_BREAK_IF( !compiled.valid() );
-
-    m_permutations[features] = compiled;
-
-    return m_permutations[features];
+// ** Ubershader::addPermutation
+void Ubershader::addPermutation( PipelineFeatures features, ShaderPtr permutation )
+{
+    m_permutations[features] = permutation;
 }
 
 } // namespace Renderer
