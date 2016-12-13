@@ -36,6 +36,126 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+
+// -------------------------------------------------------------------- RenderingContext::IntermediateTargetStack ------------------------------------------------------------------- //
+
+/*!
+ Intermediate target stack is used to convert local indices that are
+ stored in commands to a global index of an intermediate render target.
+ */
+class RenderingContext::IntermediateTargetStack
+{
+public:
+    
+    //! A maximum number of intermediate render targets that can be hold by a single stack frame.
+    enum { StackFrameSize = 8 };
+    
+    //! A maximum number of stack frames that can be pushed during rendering.
+    enum { MaxStackFrames = 8 };
+    
+    //! A total size of an intermediate stack size.
+    enum { MaxStackSize = MaxStackFrames * StackFrameSize };
+    
+    //! An intermediate render target slot index type.
+    typedef u8 Index;
+    
+                                //! Constructs an IntermediateTargetStack instance.
+                                IntermediateTargetStack( void );
+    
+    //! Pushes a new stack frame.
+    void                        pushFrame( void );
+    
+    //! Pops an active stack frame.
+    void                        popFrame( void );
+    
+    //! Returns a render target by a local index.
+    IntermediateRenderTarget    get( Index index ) const;
+    
+    //! Loads an acquired intermediate render target to a specified local slot.
+    void                        load( Index index, IntermediateRenderTarget id );
+    
+    //! Unloads an intermediate render target from a specified local slot.
+    void                        unload( Index index );
+    
+    //! Acquires an intermediate target with a specified parameters and loads it to a local slot.
+    //void                        acquire( Index index, u16 width, u16 height, PixelFormat format );
+    
+    //! Releases an intermediate target.
+    //void                        release( Index index );
+    
+private:
+    
+    IntermediateRenderTarget*   m_stackFrame;                   //!< An active render target stack frame.
+    IntermediateRenderTarget    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+};
+
+// ** RenderingContext::IntermediateTargetStack::IntermediateTargetStack
+RenderingContext::IntermediateTargetStack::IntermediateTargetStack( void )
+    : m_stackFrame( m_identifiers )
+{
+    memset( m_identifiers, 0, sizeof m_identifiers );
+}
+
+// ** RenderingContext::IntermediateTargetStack::pushFrame
+void RenderingContext::IntermediateTargetStack::pushFrame( void )
+{
+    NIMBLE_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
+    m_stackFrame += StackFrameSize;
+}
+
+// ** RenderingContext::IntermediateTargetStack::popFrame
+void RenderingContext::IntermediateTargetStack::popFrame( void )
+{
+    NIMBLE_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
+    
+    // Ensure that all render targets were released
+    for( s32 i = 0; i < StackFrameSize; i++ )
+    {
+        if( m_stackFrame[i] )
+        {
+            LogWarning( "rvm", "%s", "an intermediate render target was not released before popping a stack frame\n" );
+        }
+    }
+    
+    // Pop a stack frame
+    m_stackFrame -= StackFrameSize;
+}
+
+// ** RenderingContext::IntermediateTargetStack::get
+IntermediateRenderTarget RenderingContext::IntermediateTargetStack::get( Index index ) const
+{
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
+    return m_stackFrame[index - 1];
+}
+
+// ** RenderingContext::IntermediateTargetStack::load
+void RenderingContext::IntermediateTargetStack::load( Index index, IntermediateRenderTarget id )
+{
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
+    m_stackFrame[index - 1] = id;
+}
+
+// ** RenderingContext::IntermediateTargetStack::unload
+void RenderingContext::IntermediateTargetStack::unload( Index index )
+{
+    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
+    m_stackFrame[index - 1] = 0;
+}
+
+// ** RenderingContext::IntermediateTargetStack::acquire
+//void RenderingContext::IntermediateTargetStack::acquire( Index index, u16 width, u16 height, PixelFormat format )
+//{
+//    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
+//    m_stackFrame[index - 1] = m_context.acquireRenderTarget( width, height, format );
+//}
+
+// ** RenderingContext::IntermediateTargetStack::release
+//void RenderingContext::IntermediateTargetStack::release( Index index )
+//{
+//    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
+//    m_context.releaseRenderTarget( m_stackFrame[index - 1] );
+//    m_stackFrame[index - 1] = 0;
+//}
     
 // --------------------------------------------------------- RenderingContext::ConstructionCommandBuffer --------------------------------------------------------- //
 
@@ -136,6 +256,9 @@ RenderingContext::RenderingContext( void )
     // Create a construction command buffer instance
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
     
+    // Create an intermediate target stack
+    m_intermediateTargets = DC_NEW IntermediateTargetStack;
+    
     // Reset input layout cache
     memset( m_inputLayoutCache, 0, sizeof( m_inputLayoutCache ) );
     
@@ -191,6 +314,37 @@ void RenderingContext::display( RenderFrame& frame )
     frame.clear();
 }
     
+// ** RenderingContext::execute
+void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& commands )
+{
+    // Push a new frame to an intermediate target stack
+    m_intermediateTargets->pushFrame();
+    
+    // Execute a command buffer
+    executeCommandBuffer(frame, commands);
+    
+    // Pop a stack frame
+    m_intermediateTargets->popFrame();
+}
+    
+// ** RenderingContext::loadIntermediateTarget
+void RenderingContext::loadIntermediateTarget(u8 index, IntermediateRenderTarget id)
+{
+    m_intermediateTargets->load(index, id);
+}
+
+// ** RenderingContext::unloadIntermediateTarget
+void RenderingContext::unloadIntermediateTarget(u8 index)
+{
+    m_intermediateTargets->unload(index);
+}
+    
+// ** RenderingContext::intermediateTarget
+IntermediateRenderTarget RenderingContext::intermediateTarget(u8 index)
+{
+    return m_intermediateTargets->get(index);
+}
+
 // ** RenderingContext::allocateResourceIdentifier
 u16 RenderingContext::allocateResourceIdentifier(RenderResourceType::Enum type)
 {

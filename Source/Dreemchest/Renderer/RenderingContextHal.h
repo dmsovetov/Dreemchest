@@ -47,7 +47,7 @@ namespace Renderer
         virtual PipelineFeatures    applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_OVERRIDE;
         
         //! Executes a specified command buffer.
-        virtual void                execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Returns an intermediate render target.
         RenderTargetWPtr            intermediateRenderTarget( IntermediateRenderTarget id ) const;
@@ -149,26 +149,18 @@ namespace Renderer
                                             ActiveShader( void )
                                                 : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
         };
-
-        //! A forward declaration of a stack type to store intermediate render targets.
-        class IntermediateTargetStack;
         
-#if DEV_DEPRECATED_HAL
-        FixedArray<VertexBufferPtr>             m_vertexBuffers;                        //!< Allocated vertex buffers.
-        FixedArray<IndexBufferPtr>              m_indexBuffers;                         //!< Allocated index buffers.
-        FixedArray<ConstantBufferPtr>           m_constantBuffers;                      //!< Allocated constant buffers.
-        FixedArray<TexturePtr>                  m_textures;                             //!< Allocated textures.
-#endif  /*  #if DEV_DEPRECATED_HAL  */
-
-    #if DEV_DEPRECATED_HAL
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
+        FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
+        FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
+        FixedArray<ConstantBufferPtr>       m_constantBuffers;                      //!< Allocated constant buffers.
+        FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
+
         StateSwitch                         m_stateSwitches[State::TotalStates];    //!< Function callbacks to switch states.
         PipelineFeatures                    m_vertexAttributeFeatures;              //!< A vertex attribute features.
         PipelineFeatures                    m_resourceFeatures;                     //!< Active resource features.
         ActiveShader                        m_activeShader;                         //!< An active shader instance.
         Stack<const f32*>                   m_viewportStack;                        //!< A viewport stack.
-        UPtr<IntermediateTargetStack>       m_intermediateTargets;                  //!< An intermediate render target stack.
         
         //! A helper struct that hold info about an intermediate render target.
         struct IntermediateRenderTarget_

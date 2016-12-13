@@ -81,7 +81,19 @@ namespace Renderer
         virtual PipelineFeatures                applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_ABSTRACT;
         
         //! Executes a specified command buffer.
-        virtual void                            execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;
+        virtual void                            executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;
+        
+        //! Executes a specified command buffer inside an intermediate render stack frame.
+        void                                    execute( const RenderFrame& frame, const CommandBuffer& commands );
+        
+        //! Loads an intermediate render target to a specified slot.
+        void                                    loadIntermediateTarget(u8 index, IntermediateRenderTarget id);
+        
+        //! Unloads an intermediate render target from a specified slot.
+        void                                    unloadIntermediateTarget(u8 index);
+        
+        //! Returns an intermediate render target at specified slot.
+        IntermediateRenderTarget                intermediateTarget(u8 index);
         
     private:
         
@@ -92,6 +104,9 @@ namespace Renderer
         
         //! A forward declaration of an internal command buffer type used for resource construction.
         class ConstructionCommandBuffer;
+        
+        //! A forward declaration of a stack type to store intermediate render targets.
+        class IntermediateTargetStack;
         
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
@@ -111,6 +126,7 @@ namespace Renderer
         FixedArray<UbershaderPtr>               m_shaders;                                              //!< Allocated ubershaders.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
+        IntermediateTargetStack*                m_intermediateTargets;                                  //!< An intermediate render target stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
     };
     
