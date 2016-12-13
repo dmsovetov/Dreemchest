@@ -148,12 +148,30 @@ RenderingContext::RenderingContext( void )
         // And reserve the zero id.
         m_resourceIdentifiers[i].acquire();
     }
+    
+    // Initialize a default state block
+    m_defaultStateBlock.setCullFace(TriangleFaceBack);
+    m_defaultStateBlock.setDepthState(LessEqual, true);
+    m_defaultStateBlock.disableAlphaTest();
+    //m_defaultStateBlock.setPolygonMode(PolygonFill);
+    //m_defaultStateBlock.bindProgram(0);
+    //m_defaultStateBlock.bindVertexBuffer(0);
+    //for (s32 i = 0; i < State::MaxTextureSamplers; i++)
+    //{
+    //    m_defaultStateBlock.bindTexture(0, static_cast<State::TextureSampler>(i));
+    //}
 }
     
 // ** RenderingContext::~RenderingContext
 RenderingContext::~RenderingContext( void )
 {
     delete m_constructionCommandBuffer;
+}
+    
+// ** RenderingContext::setDefaultStateBlock
+void RenderingContext::setDefaultStateBlock(const StateBlock& value)
+{
+    m_defaultStateBlock = value;
 }
     
 // ** RenderingContext::display
@@ -167,7 +185,7 @@ void RenderingContext::display( RenderFrame& frame )
     execute( frame, frame.entryPoint() );
     
     // Reset rendering states
-    reset();
+    applyStateBlock(frame, m_defaultStateBlock);
     
     // Clear this frame
     frame.clear();

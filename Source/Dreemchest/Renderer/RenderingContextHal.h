@@ -44,7 +44,7 @@ namespace Renderer
     protected:
 
         //! Resets rendering states to defaults.
-        virtual void                reset( void ) NIMBLE_OVERRIDE;
+        virtual PipelineFeatures    applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_OVERRIDE;
         
         //! Executes a specified command buffer.
         virtual void                execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;

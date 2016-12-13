@@ -277,32 +277,12 @@ void RenderingContextHal::execute( const RenderFrame& frame, const CommandBuffer
     // Pop a stack frame
     m_intermediateTargets->popFrame();
 }
-
-// ** RenderingContextHal::reset
-void RenderingContextHal::reset( void )
+    
+// ** RenderingContextHal::applyStateBlock
+PipelineFeatures RenderingContextHal::applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock)
 {
-    // Reset the face culling
-    m_hal->setCulling( Renderer::TriangleFaceBack );
-
-    // Set the default polygon mode
-    m_hal->setPolygonMode( Renderer::PolygonFill );
-
-    // Set the default shader
-    m_hal->setShader( NULL );
-
-    // Set the default vertex buffer
-    m_hal->setVertexBuffer( NULL );
-
-    // Set default textures
-    for( s32 i = 0; i < 8; i++ ) {
-        m_hal->setTexture( i, NULL );
-    }
-
-    // Enable the depth test back
-    m_hal->setDepthTest( true, Renderer::LessEqual );
-
-    // Disable the alpha test
-    m_hal->setAlphaTest( Renderer::CompareDisabled );
+    const StateBlock* blocks[] = { &stateBlock };
+    return applyStates(frame, blocks, 1);
 }
 
 // ** RenderingContextHal::clear

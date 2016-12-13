@@ -42,6 +42,9 @@ namespace Renderer
         //! Cleans all allocated resources.
         virtual                                 ~RenderingContext( void );
         
+        //! Sets a default state block.
+        void                                    setDefaultStateBlock(const StateBlock& value);
+        
         //! Displays a frame captured by a render scene.
         void                                    display( RenderFrame& frame );
         
@@ -74,8 +77,8 @@ namespace Renderer
                                                 //! Constructs a RenderingContext instance.
                                                 RenderingContext( void );
         
-        //! Resets rendering states to defaults.
-        virtual void                            reset( void ) NIMBLE_ABSTRACT;
+        //! Applies a specified state block.
+        virtual PipelineFeatures                applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_ABSTRACT;
         
         //! Executes a specified command buffer.
         virtual void                            execute(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;
@@ -108,6 +111,7 @@ namespace Renderer
         FixedArray<UbershaderPtr>               m_shaders;                                              //!< Allocated ubershaders.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
+        StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
     };
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.
