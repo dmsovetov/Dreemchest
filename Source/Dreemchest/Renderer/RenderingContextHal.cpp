@@ -329,7 +329,7 @@ void RenderingContextHal::commandUploadVertexBuffer( VertexBuffer_ id, const voi
 // ** RenderingContextHal::commandCreateInputLayout
 void RenderingContextHal::commandCreateInputLayout(InputLayout id, u8 vertexFormat)
 {
-    NIMBLE_BREAK_IF( m_inputLayouts[id].get(), "resource was already constructed" );
+    //NIMBLE_BREAK_IF( m_inputLayouts[id].get(), "resource was already constructed" );
     
     // Create an input layout vertex format
     VertexFormat format( vertexFormat );
@@ -360,7 +360,7 @@ void RenderingContextHal::commandCreateInputLayout(InputLayout id, u8 vertexForm
     }
     
     // Save an input layout to a pool
-    m_inputLayouts[id] = inputLayout;
+    m_inputLayouts.emplace(id, inputLayout);
     
     LogDebug( "renderingContext", "input layout %d constructed\n", id );
 }
@@ -368,7 +368,7 @@ void RenderingContextHal::commandCreateInputLayout(InputLayout id, u8 vertexForm
 // ** RenderingContextHal::commandCreateVertexBuffer
 void RenderingContextHal::commandCreateVertexBuffer(VertexBuffer_ id, const void* data, s32 size)
 {
-    NIMBLE_BREAK_IF( m_vertexBuffers[id].valid(), "resource was already constructed" );
+    //NIMBLE_BREAK_IF( m_vertexBuffers[id].valid(), "resource was already constructed" );
     
     // Create a vertex buffer instance
     VertexBufferPtr vertexBuffer = m_hal->createVertexBuffer( size );
@@ -381,7 +381,7 @@ void RenderingContextHal::commandCreateVertexBuffer(VertexBuffer_ id, const void
     }
     
     // Save a vertex buffer to a pool
-    m_vertexBuffers[id] = vertexBuffer;
+    m_vertexBuffers.emplace(id, vertexBuffer);
     
     LogDebug( "renderingContext", "vertex buffer %d of size %2.2fkb constructed\n", id, size / 1024.0f );
 }
@@ -389,7 +389,7 @@ void RenderingContextHal::commandCreateVertexBuffer(VertexBuffer_ id, const void
 // ** RenderingContextHal::commandCreateIndexBuffer
 void RenderingContextHal::commandCreateIndexBuffer(IndexBuffer_ id, const void* data, s32 size)
 {
-    NIMBLE_BREAK_IF( m_indexBuffers[id].valid(), "resource was already constructed" );
+    //NIMBLE_BREAK_IF( m_indexBuffers[id].valid(), "resource was already constructed" );
     
     // Create an index buffer instance
     IndexBufferPtr indexBuffer = m_hal->createIndexBuffer( size );
@@ -402,7 +402,7 @@ void RenderingContextHal::commandCreateIndexBuffer(IndexBuffer_ id, const void* 
     }
     
     // Save a index buffer to a pool
-    m_indexBuffers[id] = indexBuffer;
+    m_indexBuffers.emplace(id, indexBuffer);
     
     LogDebug( "renderingContext", "index buffer %d of size %2.2fkb constructed\n", id, size / 1024.0f );
 }
@@ -410,7 +410,7 @@ void RenderingContextHal::commandCreateIndexBuffer(IndexBuffer_ id, const void* 
 // ** RenderingContextHal::commandCreateConstantBuffer
 void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
 {
-    NIMBLE_BREAK_IF( m_constantBuffers[id].valid(), "resource was already constructed" );
+    //NIMBLE_BREAK_IF( m_constantBuffers[id].valid(), "resource was already constructed" );
         
     ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( size, layout );
     
@@ -422,7 +422,7 @@ void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const 
     }
     
     // Save a index buffer to a pool
-    m_constantBuffers[id] = constantBuffer;
+    m_constantBuffers.emplace(id, constantBuffer);
     
     LogDebug( "renderingContext", "constant buffer %d of size %2.2fkb constructed\n", id, size / 1024.0f );
 }
@@ -430,7 +430,7 @@ void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const 
 // ** RenderingContextHal::commandCreateTexture
 void RenderingContextHal::commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format)
 {
-    NIMBLE_BREAK_IF( m_textures[id].valid(), "resource was already constructed" );
+    //NIMBLE_BREAK_IF( m_textures[id].valid(), "resource was already constructed" );
         
     Texture2DPtr texture = m_hal->createTexture2D( width, height, format );
     
@@ -444,7 +444,7 @@ void RenderingContextHal::commandCreateTexture(Texture_ id, u16 width, u16 heigh
     }
     
     // Save a index buffer to a pool
-    m_textures[id] = texture;
+    m_textures.emplace(id, texture);
 }
 
 // ** RenderingContextHal::applyStates

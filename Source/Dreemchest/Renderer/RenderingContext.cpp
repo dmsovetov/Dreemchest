@@ -219,11 +219,7 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
     FeatureLayout id = allocateResourceIdentifier(RenderResourceType::FeatureLayout);
     
     // Put this layout instance to a pool
-    if (static_cast<u16>(id) >= m_pipelineFeatureLayouts.count())
-    {
-        m_pipelineFeatureLayouts.resize(m_pipelineFeatureLayouts.count() + 1);
-    }
-    m_pipelineFeatureLayouts[id] = layout;
+    m_pipelineFeatureLayouts.emplace(id, layout);
 
     return id;
 }
@@ -327,12 +323,7 @@ Program RenderingContext::requestShader(const String& vertex, const String& frag
     Program id = allocateResourceIdentifier(RenderResourceType::Program);
     
     // Put this shader to a pool
-    if (static_cast<u16>(id) >= m_shaders.count())
-    {
-        m_shaders.resize(m_shaders.count() + 1);
-    }
-    
-    m_shaders[id] = shader;
+    m_shaders.emplace(id, shader);
 
     return id;
 }
