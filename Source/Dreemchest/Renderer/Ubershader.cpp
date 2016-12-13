@@ -61,7 +61,6 @@ void Ubershader::setFragment( const String& value )
     m_fragment = value;
 }
 
-#if DEV_DEPRECATED_HAL
 // ** Ubershader::permutation
 const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const
 {
@@ -105,7 +104,6 @@ const ShaderPtr& Ubershader::permutation( Renderer::HalWPtr hal, PipelineFeature
 
     return m_permutations[features];
 }
-#endif  /*  #if DEV_DEPRECATED_HAL  */
 
 } // namespace Renderer
 

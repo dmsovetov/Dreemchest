@@ -106,13 +106,8 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
     m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );
 }
     
-#if DEV_DEPRECATED_HAL
 // ** DebugRenderTarget::render
 void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTargetAttachment attachment, s32 size, s32 x, s32 y )
-#else
-// ** DebugRenderTarget::render
-void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, u8 attachment, s32 size, s32 x, s32 y )
-#endif  /*  #if DEV_DEPRECATED_HAL  */
 {
     // Begin a render pass
     begin( frame, commands, stateStack );

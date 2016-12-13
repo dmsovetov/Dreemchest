@@ -116,7 +116,7 @@ void OpenGLHal::present( void )
 void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count )
 {
     DC_CHECK_GL;
-    NIMBLE_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
+    NIMBLE_ABORT_IF( !m_activeInputLayout, "invalid input layout" )
 
     static GLenum glPrimType[TotalPrimitiveTypes] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS };
 
@@ -127,7 +127,7 @@ void OpenGLHal::renderPrimitives( PrimitiveType primType, u32 offset, u32 count 
 void OpenGLHal::renderIndexed( PrimitiveType primType, u32 firstIndex, u32 count )
 {
     DC_CHECK_GL;
-    NIMBLE_ABORT_IF( !m_activeInputLayout.valid(), "invalid input layout" )
+    NIMBLE_ABORT_IF( !m_activeInputLayout, "invalid input layout" )
     NIMBLE_ABORT_IF( !m_activeIndexBuffer.valid(), "invalid index buffer" );
     
     static GLenum glPrimType[TotalPrimitiveTypes + 1] = { GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_POINTS, 0 };
@@ -335,13 +335,13 @@ void OpenGLHal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
 }
 
 // ** OpenGLHal::setInputLayout
-void OpenGLHal::setInputLayout( const VertexBufferLayoutPtr& inputLayout )
+void OpenGLHal::setInputLayout( const VertexBufferLayout* inputLayout )
 {
-    if( m_activeInputLayout.valid() ) {
+    if( m_activeInputLayout ) {
         disableInputLayout( m_activeInputLayout );
     }
 
-    m_lastInputLayout = inputLayout;
+    m_lastInputLayout = const_cast<VertexBufferLayout*>(inputLayout);
 
     if( m_lastInputLayout != m_activeInputLayout && m_activeVertexBuffer.valid() ) {
         enableInputLayout( ( const u8* )m_activeVertexBuffer->pointer(), m_lastInputLayout );
@@ -357,11 +357,11 @@ void OpenGLHal::setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 
 }
 
 // ** OpenGLHal::enableInputLayout
-void OpenGLHal::enableInputLayout( const u8 *pointer, const VertexBufferLayoutWPtr& inputLayout )
+void OpenGLHal::enableInputLayout( const u8 *pointer, const VertexBufferLayout* inputLayout )
 {
     DC_CHECK_GL;
 
-    m_activeInputLayout = inputLayout;
+    m_activeInputLayout = const_cast<VertexBufferLayout*>(inputLayout);
 
     s32 stride = inputLayout->vertexSize();
 
@@ -404,7 +404,7 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const VertexBufferLayoutWP
 }
 
 // ** OpenGLHal::disableInputLayout
-void OpenGLHal::disableInputLayout( const VertexBufferLayoutWPtr& inputLayout )
+void OpenGLHal::disableInputLayout( const VertexBufferLayout* inputLayout )
 {
     DC_CHECK_GL;
 

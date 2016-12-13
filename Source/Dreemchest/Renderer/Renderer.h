@@ -58,7 +58,7 @@ namespace Renderer {
     //! Pointer types for renderer resources.
     dcDeclarePtrs( Hal )
     //dcDeclarePtrs( Renderer2D )
-    dcDeclarePtrs( VertexBufferLayout )
+    //dcDeclarePtrs( VertexBufferLayout )
     dcDeclarePtrs( VertexBuffer )
     dcDeclarePtrs( IndexBuffer )
     dcDeclarePtrs( ConstantBuffer )
@@ -94,7 +94,7 @@ namespace Renderer {
     template<RenderResourceTag TResource, typename TIdentifier = u16>
     class ResourceIdentifier
     {
-    friend class RenderingContext;
+    friend class RenderingContextHal;
     public:
         
                                     //! Constructs an invalid render resource identifier.

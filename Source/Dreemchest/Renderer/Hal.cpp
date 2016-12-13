@@ -49,7 +49,7 @@ namespace Renderer {
 
 #if DEV_DEPRECATED_HAL
 // ** Hal::Hal
-Hal::Hal( RenderView* view ) : m_view( view )
+Hal::Hal( RenderView* view ) : m_view( view ), m_activeInputLayout( NULL ), m_lastInputLayout( NULL )
 {
     //m_batchRenderer = NULL;
 
@@ -156,9 +156,9 @@ ShaderPtr Hal::createShader( const char *vertex, const char *fragment )
 }
 
 // ** Hal::createVertexDeclaration
-VertexBufferLayoutPtr Hal::createInputLayout( s32 vertexSize )
+VertexBufferLayout* Hal::createInputLayout( s32 vertexSize )
 {
-    return VertexBufferLayoutPtr( DC_NEW VertexBufferLayout( vertexSize ) );
+    return DC_NEW VertexBufferLayout( vertexSize );
 }
 
 // ** Hal::createIndexBuffer
@@ -301,7 +301,7 @@ void Hal::setIndexBuffer( const IndexBufferPtr& indexBuffer )
 }
 
 // ** Hal::setInputLayout
-void Hal::setInputLayout( const VertexBufferLayoutPtr& inputLayout )
+void Hal::setInputLayout( const VertexBufferLayout* inputLayout )
 {
 
 }

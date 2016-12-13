@@ -53,10 +53,8 @@ namespace Renderer {
         //! Sets fragment shader source code.
         void                        setFragment( const String& value );
 
-    #if DEV_DEPRECATED_HAL
         //! Compiles a new permutation or returns a cached one.
         const ShaderPtr&            permutation( HalWPtr hal, PipelineFeatures features, const PipelineFeatureLayout* featureLayout ) const;
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
 
     private:
 

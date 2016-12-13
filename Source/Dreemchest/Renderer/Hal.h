@@ -153,7 +153,7 @@ namespace Renderer {
          \param vertexSize  Vertex size in bytes.
          \return            InputLayout instance.
          */
-        virtual VertexBufferLayoutPtr  createInputLayout( s32 vertexSize );
+        virtual VertexBufferLayout*  createInputLayout( s32 vertexSize );
 
         //! Creates a new index buffer.
         /*!
@@ -219,7 +219,7 @@ namespace Renderer {
         /*!
          \param inputLayout         Input layout to be bound.
          */
-        virtual void    setInputLayout( const VertexBufferLayoutPtr& inputLayout );
+        virtual void    setInputLayout( const VertexBufferLayout* inputLayout );
 
         //! Binds a constant buffer.
         /*!
@@ -347,8 +347,8 @@ namespace Renderer {
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         Array<ConstantBufferWPtr>   m_constantBuffers;      //!< An array of bound constant buffers.
     #endif   /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
-        VertexBufferLayoutWPtr             m_lastInputLayout;      //!< An input layout that was set last time.
-        VertexBufferLayoutWPtr                m_activeInputLayout;    //!< An active input layout.
+        VertexBufferLayout*             m_lastInputLayout;      //!< An input layout that was set last time.
+        VertexBufferLayout*                m_activeInputLayout;    //!< An active input layout.
         VertexBufferWPtr            m_activeVertexBuffer;   //!< An active vertex buffer.
     };
 

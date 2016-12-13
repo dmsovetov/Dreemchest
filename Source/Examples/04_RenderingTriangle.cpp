@@ -48,7 +48,7 @@ class RendererInitialization : public ApplicationDelegate
     #if DEV_DEPRECATED_HAL
         // Now create the main renderer interface called HAL (hardware abstraction layer).
         m_hal = Hal::create( OpenGL, view );
-        m_renderingContext = Scene::RenderingContext::create(m_hal);
+        m_renderingContext = Renderer::createDeprecatedRenderingContext(m_hal);
     #else
         m_renderingContext = Renderer::RenderingContext::create(Renderer::RenderingContext::OpenGL2);
     #endif  /*  #if DEV_DEPRECATED_HAL  */
