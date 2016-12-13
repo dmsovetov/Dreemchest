@@ -186,7 +186,7 @@ namespace Renderer
 
                                     #if DEV_DEPRECATED_HAL
                                         //! Constructs a texture binding state.
-                                        State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Depth );
+                                        State( s32 id, TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetDepth );
                                     #else
                                         //! Constructs a texture binding state.
                                         State( s32 id, TextureSampler sampler, u8 attachment = 0 );
@@ -252,7 +252,7 @@ namespace Renderer
 
     #if DEV_DEPRECATED_HAL
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment = RenderTarget::Color0 );
+        void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetColor0 );
     #else
         //! Binds a rendered texture to a specified sampler.
         void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, u8 attachment = 0 );

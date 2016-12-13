@@ -356,6 +356,16 @@ namespace Renderer {
 
         TotalPrimitiveTypes    //!< Total primitive types available.
     };
+    
+    //! Available texture attachments
+    enum RenderTargetAttachment {
+          RenderTargetDepth             //!< A depth texture attachment.
+        , RenderTargetColor0            //!< A #1 color texture attachment.
+        , RenderTargetColor1            //!< A #2 color texture attachment.
+        , RenderTargetColor2            //!< A #3 color texture attachment.
+        , RenderTargetColor3            //!< A #4 color texture attachment.
+        , TotalRenderTargetAttachments  //!< A total number of available texture attachments.
+    };
 
 } // namespace Renderer
 

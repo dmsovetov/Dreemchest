@@ -264,7 +264,7 @@ namespace Renderer {
         virtual                     ~OpenGLRenderTarget( void );
 
         // ** RenderTarget
-        virtual bool                setAttachment( PixelFormat format, Attachment attachment );
+        virtual bool                setAttachment( PixelFormat format, RenderTargetAttachment attachment );
         virtual bool                setDepth( PixelFormat format );
 
         // ** OpenGLRenderTarget

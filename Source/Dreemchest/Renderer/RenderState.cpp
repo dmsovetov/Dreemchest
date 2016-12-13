@@ -86,7 +86,7 @@ State::State( BlendFactor src, BlendFactor dst )
 
 #if DEV_DEPRECATED_HAL
 // ** State::State
-State::State( s32 id, TextureSampler sampler, RenderTarget::Attachment attachment )
+State::State( s32 id, TextureSampler sampler, RenderTargetAttachment attachment )
     : type( Texture )
 {
     resourceId = id;
@@ -166,7 +166,7 @@ void StateBlock::bindTexture( s32 id, State::TextureSampler sampler )
 
 #if DEV_DEPRECATED_HAL
 // ** StateBlock::bindRenderedTexture
-void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTarget::Attachment attachment )
+void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment )
 {
     pushState( State( -renderTarget, sampler, attachment ), State::Texture + sampler );
 }

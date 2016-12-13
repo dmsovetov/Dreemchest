@@ -831,7 +831,7 @@ void RenderingContext::switchTexture( const RenderFrame& frame, const State& sta
     else
     {
         NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
-        Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTarget::Attachment>( state.data.index >> 4 ) );
+        Renderer::Texture2DPtr texture = m_intermediateTargets->get( -id )->attachment( static_cast<Renderer::RenderTargetAttachment>( state.data.index >> 4 ) );
         NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
         m_hal->setTexture( samplerIndex, texture.get() );
     }
@@ -1171,11 +1171,11 @@ IntermediateRenderTarget RenderingContext::acquireRenderTarget( u16 width, u16 h
     intermediate.renderTarget   = m_hal->createRenderTarget( width, height );
     if( format == Renderer::PixelD24S8 || format == Renderer::PixelD24X8 )
     {
-        intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Depth );
+        intermediate.renderTarget->setAttachment( format, Renderer::RenderTargetDepth );
     }
     else
     {
-        intermediate.renderTarget->setAttachment( format, Renderer::RenderTarget::Color0 );
+        intermediate.renderTarget->setAttachment( format, Renderer::RenderTargetColor0 );
     }
     intermediate.renderTarget->setDepth( Renderer::PixelD24X8 );
     m_renderTargets.push_back( intermediate );

@@ -139,7 +139,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
         if( forwardRenderer.isDebugCascadeShadows() )
         {
         #if DEV_DEPRECATED_HAL
-            m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, Renderer::RenderTarget::Depth, 128, j * 130, 0 );
+            m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, Renderer::RenderTargetDepth, 128, j * 130, 0 );
         #else
             m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, -1, 128, j * 130, 0 );
         #endif  /*  #if DEV_DEPRECATED_HAL  */
@@ -182,7 +182,7 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
     if( shadows )
     {
     #if DEV_DEPRECATED_HAL
-        state->bindRenderedTexture( shadows, State::Texture1, Renderer::RenderTarget::Depth );
+        state->bindRenderedTexture( shadows, State::Texture1, Renderer::RenderTargetDepth );
     #else
         state->bindRenderedTexture( shadows, State::Texture1, -1 );
     #endif  /*  #if DEV_DEPRECATED_HAL  */
