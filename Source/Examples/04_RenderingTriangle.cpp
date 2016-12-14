@@ -70,7 +70,6 @@ class RendererInitialization : public ApplicationDelegate
         };
         
         // Request all required resources from a rendering context
-        Renderer::Program       shader        = m_renderingContext->requestProgram(Renderer::ShaderProgramDescriptor());
         Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
         Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
         Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
@@ -80,7 +79,6 @@ class RendererInitialization : public ApplicationDelegate
         m_renderState.bindVertexBuffer(vertexBuffer);
         m_renderState.bindIndexBuffer(indexBuffer);
         m_renderState.bindInputLayout(inputLayout);
-        m_renderState.bindProgram(shader);
         m_renderState.bindFeatureLayout(featureLayout);
         
         // Finally subscribe to updates events.

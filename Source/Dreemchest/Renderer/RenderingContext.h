@@ -46,6 +46,9 @@ namespace Renderer
         //! Sets a default state block.
         void                                    setDefaultStateBlock(const StateBlock& value);
         
+        //! Sets a default program.
+        void                                    setDefaultProgram(Program value);
+        
         //! Displays a frame captured by a render scene.
         void                                    display( RenderFrame& frame );
         
@@ -135,6 +138,7 @@ namespace Renderer
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
         TransientTargetStack*                   m_intermediateTargets;                                  //!< An intermediate render target stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
+        Program                                 m_defaultProgram;                                       //!< A default program to be used.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
     };

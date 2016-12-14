@@ -352,8 +352,17 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
 // ** RenderingContextHal::activateShaderPermutation
 void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
 {
-    NIMBLE_ABORT_IF(!m_pipeline.program(), "no valid program set");
     NIMBLE_ABORT_IF(!m_pipeline.featureLayout(), "no valid feature layout set");
+    
+    // Get an active program
+    Program program = m_pipeline.program();
+    NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
+    
+    // Use a default program if nothing was set by a user
+    if (!program)
+    {
+        program = m_defaultProgram;
+    }
     
     // Do we have any pipeline changes that may invalidate an active program permutation?
     if (m_pipeline.changes())

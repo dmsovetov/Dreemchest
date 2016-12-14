@@ -262,6 +262,10 @@ RenderingContext::RenderingContext( void )
     //{
     //    m_defaultStateBlock.bindTexture(0, static_cast<State::TextureSampler>(i));
     //}
+    
+    // Create a default program
+    Program defaultProgram = requestProgram(ShaderProgramDescriptor());
+    setDefaultProgram(defaultProgram);
 }
     
 // ** RenderingContext::~RenderingContext
@@ -274,6 +278,12 @@ RenderingContext::~RenderingContext( void )
 void RenderingContext::setDefaultStateBlock(const StateBlock& value)
 {
     m_defaultStateBlock = value;
+}
+    
+// ** RenderingContext::setDefaultProgram
+void RenderingContext::setDefaultProgram(Program value)
+{
+    m_defaultProgram = value;
 }
     
 // ** RenderingContext::display
