@@ -50,7 +50,7 @@ namespace Renderer
         virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Returns an intermediate render target.
-        RenderTargetWPtr            intermediateRenderTarget( IntermediateRenderTarget id ) const;
+        RenderTargetWPtr            intermediateRenderTarget( TransientRenderTarget id ) const;
 
         //! Binds a render target with specified viewport and executes a command buffer.
         void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
@@ -122,10 +122,10 @@ namespace Renderer
         void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);
         
         //! Acquires an intermediate render target.
-        IntermediateRenderTarget    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
+        TransientRenderTarget    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
         
         //! Releases an intermediate render target.
-        void                        releaseRenderTarget( IntermediateRenderTarget id );
+        void                        releaseRenderTarget( TransientRenderTarget id );
         
         //! Activates a shader permuation that best matches active pipeline state.
         void                        activateShaderPermutation( PipelineFeatures features );
@@ -150,7 +150,7 @@ namespace Renderer
         Stack<const f32*>                   m_viewportStack;                        //!< A viewport stack.
         
         //! A helper struct that hold info about an intermediate render target.
-        struct IntermediateRenderTarget_
+        struct TransientRenderTarget_
         {
         #if DEV_DEPRECATED_HAL
             RenderTargetPtr                 renderTarget;                       //!< A GPU render target instance.
@@ -161,7 +161,7 @@ namespace Renderer
             bool                            isFree;                             //!< Indicates that this render target is free.
         };
         
-        Array<IntermediateRenderTarget_>    m_renderTargets;            //!< An array of intermediate render targets.
+        Array<TransientRenderTarget_>    m_renderTargets;            //!< An array of intermediate render targets.
     };
 
 } // namespace Renderer

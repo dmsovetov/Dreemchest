@@ -72,7 +72,7 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffe
 // ** ForwardRenderSystem::renderSpotLight
 void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
-    IntermediateRenderTarget shadowTexture;
+    TransientRenderTarget shadowTexture;
     ShadowParameters         shadowParameters;
 
     // Construct a view-projection matrix for this spot light
@@ -129,7 +129,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
         parameters.invSize   = 1.0f / shadowSize;
         parameters.transform = cascade.transform;
 
-        IntermediateRenderTarget shadows = m_shadows.render( frame, commands, stateStack, parameters );
+        TransientRenderTarget shadows = m_shadows.render( frame, commands, stateStack, parameters );
 
         RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromNearAndFar( cameraTransform.axisZ(), cameraTransform.worldSpacePosition(), cascade.near, cascade.far );
 

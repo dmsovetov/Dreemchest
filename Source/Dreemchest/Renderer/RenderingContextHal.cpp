@@ -130,14 +130,14 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
         case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                             break;
         case CommandBuffer::OpCode::AcquireRenderTarget:    {
-                                                                IntermediateRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
-                                                                loadIntermediateTarget(opCode.intermediateRenderTarget.index, id);
+                                                                TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
+                                                                loadTransientTarget(opCode.intermediateRenderTarget.index, id);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::ReleaseRenderTarget:    {
-                                                                IntermediateRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.index);
+                                                                TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.index);
                                                                 releaseRenderTarget(id);
-                                                                unloadIntermediateTarget(opCode.intermediateRenderTarget.index);
+                                                                unloadTransientTarget(opCode.intermediateRenderTarget.index);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::DrawIndexed:            {
@@ -684,12 +684,12 @@ void RenderingContextHal::switchPolygonOffset( const RenderFrame& frame, const S
 }*/
 
 // ** RenderingContextHal::acquireRenderTarget
-IntermediateRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
+TransientRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
 {
     // Perform a linear search of a render target
     for( s32 i = 0, n = static_cast<s32>( m_renderTargets.size() ); i < n; i++ )
     {
-        IntermediateRenderTarget_& intermediate = m_renderTargets[i];
+        TransientRenderTarget_& intermediate = m_renderTargets[i];
         
         if( intermediate.isFree && intermediate.width == width && intermediate.height == height && intermediate.format == format )
         {
@@ -699,7 +699,7 @@ IntermediateRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u1
     }
     
     // Not found - create a new one
-    IntermediateRenderTarget_ intermediate;
+    TransientRenderTarget_ intermediate;
     intermediate.isFree         = false;
     intermediate.width          = width;
     intermediate.height         = height;
@@ -722,13 +722,13 @@ IntermediateRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u1
 }
 
 // ** RenderingContextHal::releaseRenderTarget
-void RenderingContextHal::releaseRenderTarget( IntermediateRenderTarget id )
+void RenderingContextHal::releaseRenderTarget( TransientRenderTarget id )
 {
     m_renderTargets[static_cast<s32>(id) - 1].isFree = true;
 }
 
 // ** RenderingContextHal::intermediateRenderTarget
-RenderTargetWPtr RenderingContextHal::intermediateRenderTarget( IntermediateRenderTarget id ) const
+RenderTargetWPtr RenderingContextHal::intermediateRenderTarget( TransientRenderTarget id ) const
 {
     return m_renderTargets[static_cast<s32>(id) - 1].renderTarget;
 }

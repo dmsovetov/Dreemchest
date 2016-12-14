@@ -69,7 +69,7 @@ void CommandBuffer::execute( const CommandBuffer& commands )
 }
 
 // ** CommandBuffer::renderToTarget
-CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, IntermediateRenderTarget index, const Rect& viewport )
+CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRenderTarget index, const Rect& viewport )
 {
     CommandBuffer& commands = frame.createCommandBuffer();
 
@@ -90,11 +90,11 @@ CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, IntermediateRe
 // ** CommandBuffer::renderToTarget
 CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, const Rect& viewport )
 {
-    return renderToTarget(frame, IntermediateRenderTarget(), viewport);
+    return renderToTarget(frame, TransientRenderTarget(), viewport);
 }
 
 // ** CommandBuffer::acquireRenderTarget
-IntermediateRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 height, PixelFormat format )
+TransientRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 height, PixelFormat format )
 {
     NIMBLE_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
 
@@ -107,11 +107,11 @@ IntermediateRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 heig
     opCode.intermediateRenderTarget.format = format;
     push( opCode );
 
-    return IntermediateRenderTarget::create(opCode.intermediateRenderTarget.index);
+    return TransientRenderTarget::create(opCode.intermediateRenderTarget.index);
 }
 
 // ** CommandBuffer::releaseRenderTarget
-void CommandBuffer::releaseRenderTarget( IntermediateRenderTarget index )
+void CommandBuffer::releaseRenderTarget( TransientRenderTarget index )
 {
     OpCode opCode;
     opCode.type = OpCode::ReleaseRenderTarget;

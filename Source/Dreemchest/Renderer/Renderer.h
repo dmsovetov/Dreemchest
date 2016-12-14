@@ -190,7 +190,7 @@ namespace Renderer {
     typedef ResourceIdentifier<RenderResourceType::Texture> Texture_;
     typedef ResourceIdentifier<RenderResourceType::FeatureLayout> FeatureLayout;
     
-    typedef ResourceIdentifier<RenderResourceType::RenderTarget, u8> IntermediateRenderTarget;
+    typedef ResourceIdentifier<RenderResourceType::RenderTarget, u8> TransientRenderTarget;
     
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource

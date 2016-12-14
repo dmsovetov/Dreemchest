@@ -88,13 +88,13 @@ namespace Renderer
         void                                    execute( const RenderFrame& frame, const CommandBuffer& commands );
         
         //! Loads an intermediate render target to a specified slot.
-        void                                    loadIntermediateTarget(u8 index, IntermediateRenderTarget id);
+        void                                    loadTransientTarget(u8 index, TransientRenderTarget id);
         
         //! Unloads an intermediate render target from a specified slot.
-        void                                    unloadIntermediateTarget(u8 index);
+        void                                    unloadTransientTarget(u8 index);
         
         //! Returns an intermediate render target at specified slot.
-        IntermediateRenderTarget                intermediateTarget(u8 index);
+        TransientRenderTarget                intermediateTarget(u8 index);
         
     private:
         
@@ -107,7 +107,7 @@ namespace Renderer
         class ConstructionCommandBuffer;
         
         //! A forward declaration of a stack type to store intermediate render targets.
-        class IntermediateTargetStack;
+        class TransientTargetStack;
         
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
@@ -127,7 +127,7 @@ namespace Renderer
         FixedArray<UbershaderPtr>               m_shaders;                                              //!< Allocated ubershaders.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
-        IntermediateTargetStack*                m_intermediateTargets;                                  //!< An intermediate render target stack.
+        TransientTargetStack*                m_intermediateTargets;                                  //!< An intermediate render target stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
     };

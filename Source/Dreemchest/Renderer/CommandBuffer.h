@@ -149,13 +149,13 @@ namespace Renderer
         void                        execute( const CommandBuffer& commands );
 
         //! Emits an acquire intermediate render target command.
-        IntermediateRenderTarget    acquireRenderTarget( s32 width, s32 height, PixelFormat format );
+        TransientRenderTarget    acquireRenderTarget( s32 width, s32 height, PixelFormat format );
 
         //! Emits a release an intermediate render target command.
-        void                        releaseRenderTarget( IntermediateRenderTarget index );
+        void                        releaseRenderTarget( TransientRenderTarget index );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        CommandBuffer&              renderToTarget( RenderFrame& frame, IntermediateRenderTarget index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        CommandBuffer&              renderToTarget( RenderFrame& frame, TransientRenderTarget index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
         
         //! Emits a rendering to a viewport.
         CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );

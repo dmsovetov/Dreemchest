@@ -37,13 +37,13 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
-// -------------------------------------------------------------------- RenderingContext::IntermediateTargetStack ------------------------------------------------------------------- //
+// -------------------------------------------------------------------- RenderingContext::TransientTargetStack ------------------------------------------------------------------- //
 
 /*!
- Intermediate target stack is used to convert local indices that are
+ Transient target stack is used to convert local indices that are
  stored in commands to a global index of an intermediate render target.
  */
-class RenderingContext::IntermediateTargetStack
+class RenderingContext::TransientTargetStack
 {
 public:
     
@@ -59,8 +59,8 @@ public:
     //! An intermediate render target slot index type.
     typedef u8 Index;
     
-                                //! Constructs an IntermediateTargetStack instance.
-                                IntermediateTargetStack( void );
+                                //! Constructs an TransientTargetStack instance.
+                                TransientTargetStack( void );
     
     //! Pushes a new stack frame.
     void                        pushFrame( void );
@@ -69,10 +69,10 @@ public:
     void                        popFrame( void );
     
     //! Returns a render target by a local index.
-    IntermediateRenderTarget    get( Index index ) const;
+    TransientRenderTarget    get( Index index ) const;
     
     //! Loads an acquired intermediate render target to a specified local slot.
-    void                        load( Index index, IntermediateRenderTarget id );
+    void                        load( Index index, TransientRenderTarget id );
     
     //! Unloads an intermediate render target from a specified local slot.
     void                        unload( Index index );
@@ -85,26 +85,26 @@ public:
     
 private:
     
-    IntermediateRenderTarget*   m_stackFrame;                   //!< An active render target stack frame.
-    IntermediateRenderTarget    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+    TransientRenderTarget*   m_stackFrame;                   //!< An active render target stack frame.
+    TransientRenderTarget    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
 };
 
-// ** RenderingContext::IntermediateTargetStack::IntermediateTargetStack
-RenderingContext::IntermediateTargetStack::IntermediateTargetStack( void )
+// ** RenderingContext::TransientTargetStack::TransientTargetStack
+RenderingContext::TransientTargetStack::TransientTargetStack( void )
     : m_stackFrame( m_identifiers )
 {
     memset( m_identifiers, 0, sizeof m_identifiers );
 }
 
-// ** RenderingContext::IntermediateTargetStack::pushFrame
-void RenderingContext::IntermediateTargetStack::pushFrame( void )
+// ** RenderingContext::TransientTargetStack::pushFrame
+void RenderingContext::TransientTargetStack::pushFrame( void )
 {
     NIMBLE_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
     m_stackFrame += StackFrameSize;
 }
 
-// ** RenderingContext::IntermediateTargetStack::popFrame
-void RenderingContext::IntermediateTargetStack::popFrame( void )
+// ** RenderingContext::TransientTargetStack::popFrame
+void RenderingContext::TransientTargetStack::popFrame( void )
 {
     NIMBLE_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
     
@@ -121,36 +121,36 @@ void RenderingContext::IntermediateTargetStack::popFrame( void )
     m_stackFrame -= StackFrameSize;
 }
 
-// ** RenderingContext::IntermediateTargetStack::get
-IntermediateRenderTarget RenderingContext::IntermediateTargetStack::get( Index index ) const
+// ** RenderingContext::TransientTargetStack::get
+TransientRenderTarget RenderingContext::TransientTargetStack::get( Index index ) const
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     return m_stackFrame[index - 1];
 }
 
-// ** RenderingContext::IntermediateTargetStack::load
-void RenderingContext::IntermediateTargetStack::load( Index index, IntermediateRenderTarget id )
+// ** RenderingContext::TransientTargetStack::load
+void RenderingContext::TransientTargetStack::load( Index index, TransientRenderTarget id )
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = id;
 }
 
-// ** RenderingContext::IntermediateTargetStack::unload
-void RenderingContext::IntermediateTargetStack::unload( Index index )
+// ** RenderingContext::TransientTargetStack::unload
+void RenderingContext::TransientTargetStack::unload( Index index )
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = 0;
 }
 
-// ** RenderingContext::IntermediateTargetStack::acquire
-//void RenderingContext::IntermediateTargetStack::acquire( Index index, u16 width, u16 height, PixelFormat format )
+// ** RenderingContext::TransientTargetStack::acquire
+//void RenderingContext::TransientTargetStack::acquire( Index index, u16 width, u16 height, PixelFormat format )
 //{
 //    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
 //    m_stackFrame[index - 1] = m_context.acquireRenderTarget( width, height, format );
 //}
 
-// ** RenderingContext::IntermediateTargetStack::release
-//void RenderingContext::IntermediateTargetStack::release( Index index )
+// ** RenderingContext::TransientTargetStack::release
+//void RenderingContext::TransientTargetStack::release( Index index )
 //{
 //    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
 //    m_context.releaseRenderTarget( m_stackFrame[index - 1] );
@@ -257,7 +257,7 @@ RenderingContext::RenderingContext( void )
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
     
     // Create an intermediate target stack
-    m_intermediateTargets = DC_NEW IntermediateTargetStack;
+    m_intermediateTargets = DC_NEW TransientTargetStack;
     
     // Reset input layout cache
     memset( m_inputLayoutCache, 0, sizeof( m_inputLayoutCache ) );
@@ -327,20 +327,20 @@ void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& c
     m_intermediateTargets->popFrame();
 }
     
-// ** RenderingContext::loadIntermediateTarget
-void RenderingContext::loadIntermediateTarget(u8 index, IntermediateRenderTarget id)
+// ** RenderingContext::loadTransientTarget
+void RenderingContext::loadTransientTarget(u8 index, TransientRenderTarget id)
 {
     m_intermediateTargets->load(index, id);
 }
 
-// ** RenderingContext::unloadIntermediateTarget
-void RenderingContext::unloadIntermediateTarget(u8 index)
+// ** RenderingContext::unloadTransientTarget
+void RenderingContext::unloadTransientTarget(u8 index)
 {
     m_intermediateTargets->unload(index);
 }
     
 // ** RenderingContext::intermediateTarget
-IntermediateRenderTarget RenderingContext::intermediateTarget(u8 index)
+TransientRenderTarget RenderingContext::intermediateTarget(u8 index)
 {
     return m_intermediateTargets->get(index);
 }
