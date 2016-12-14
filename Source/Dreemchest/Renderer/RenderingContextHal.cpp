@@ -376,6 +376,7 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
     }
     
     // Bind an active shader permutation
+    NIMBLE_ABORT_IF(!m_activeProgram.valid(), "no valie shader permutation set");
     m_hal->setShader(m_activeProgram);
 }
     
