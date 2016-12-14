@@ -39,6 +39,7 @@ namespace Scene {
 
                                 //! Constructs the RenderSystemBase instance.
                                 RenderSystemBase( RenderingContext& context, RenderScene& renderScene, Ecs::IndexPtr cameras );
+        virtual                 ~RenderSystemBase( void ) {}
 
         //! Renders all active cameras to their viewports.
         void                    render( RenderFrame& frame, CommandBuffer& commands );
@@ -52,7 +53,7 @@ namespace Scene {
 
         RenderingContext&       m_context;      //!< Parent rendering context.
         RenderScene&            m_renderScene;  //!< Parent render scene.
-        Ecs::IndexPtr            m_cameras;        //!< All active cameras that are processed by this render system.
+        Ecs::IndexPtr           m_cameras;        //!< All active cameras that are processed by this render system.
     };
 
     //! Generic render system class.

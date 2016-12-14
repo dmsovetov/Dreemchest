@@ -49,7 +49,7 @@ namespace Renderer {
 
 #if DEV_DEPRECATED_HAL
 // ** Hal::Hal
-Hal::Hal( RenderView* view ) : m_view( view ), m_activeInputLayout( NULL ), m_lastInputLayout( NULL )
+Hal::Hal( RenderView* view ) : m_view( view ), m_lastInputLayout( NULL ), m_activeInputLayout( NULL )
 {
     //m_batchRenderer = NULL;
 
