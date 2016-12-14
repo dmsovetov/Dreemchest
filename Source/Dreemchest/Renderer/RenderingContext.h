@@ -73,6 +73,9 @@ namespace Renderer
         //! Queues a shader instance creation and returns it's index.
         Program                                 requestShader( const String& vertex, const String& fragment );
         
+        //! Merges a list of state blocks into a single array of render states.
+        s32                                     mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const;
+        
     protected:
         
                                                 //! Constructs a RenderingContext instance.

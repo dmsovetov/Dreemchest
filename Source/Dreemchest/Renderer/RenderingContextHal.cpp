@@ -317,65 +317,29 @@ void RenderingContextHal::commandCreateTexture(Texture_ id, u16 width, u16 heigh
 }
 
 // ** RenderingContextHal::applyStates
-PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count )
+PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count )
 {
-    PipelineFeatures userFeatures = 0;
-    PipelineFeatures userFeaturesMask = ~0;
-
+    // Merge all state blocks to a single array of rendering states
+    const s32 maxStates = 16;
+    State states[maxStates];
+    PipelineFeatures userDefined;
+    
+    s32 stateCount = mergeStateBlocks(stateBlocks, count, states, maxStates, userDefined);
+    
     // This will start recording pipeline changes
     m_pipeline.beginStateBlock();
-
-    // A bitmask of states that were already set
-    u32 activeStateMask = 0;
-
-    for( s32 i = 0; i < count; i++ )
+    
+    // Apply all states
+    for (s32 i = 0; i < stateCount; i++)
     {
-        // Get a state block at specified index
-        const StateBlock* block = states[i];
-
-        // No more state blocks in a stack - break
-        if( block == NULL )
-        {
-            break;
-        }
-
-        // Update feature set
-        userFeatures      = userFeatures     | block->features();
-        userFeaturesMask  = userFeaturesMask & block->featureMask();
-
-        // Skip redundant state blocks by testing a block bitmask against an active state mask
-        if( (activeStateMask ^ block->mask()) == 0 )
-        {
-            continue;
-        }
-
-        // Apply all states in a block
-        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
-        {
-            // Get a render state bit
-            u32 stateBit = block->stateBit( j );
-
-            // Skip redundate state blocks by testing a state bitmask agains an active state mask
-            if( activeStateMask & stateBit )
-            {
-                continue;
-            }
-
-            // Get a render state at specified index
-            const State& state = block->state( j );
-
-            // Update an active state mask
-            activeStateMask = activeStateMask | stateBit;
-
-            // Finally apply a state
-            NIMBLE_ABORT_IF( m_stateSwitches[state.type] == NULL, "unhandled render state type" );
-            (this->*m_stateSwitches[state.type])( frame, state );
-        }
+        // Get a state at specified index
+        const State& state = states[i];
+        
+        // Invoke a state handler function
+        NIMBLE_ABORT_IF( m_stateSwitches[state.type] == NULL, "unhandled render state type" );
+        (this->*m_stateSwitches[state.type])(frame, state);
     }
-    
-    // Compose a user defined feature mask
-    PipelineFeatures userDefined = PipelineFeature::mask(userFeatures & userFeaturesMask);
-    
+
     // Apply a user defined feature mask
     m_pipeline.activateUserFeatures(userDefined);
     

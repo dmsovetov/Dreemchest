@@ -56,7 +56,7 @@ namespace Renderer
         void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
 
         //! Unrolls a state stack an applies all state changes, returns an up-to-date pipeline feature mask.
-        PipelineFeatures            applyStates( const RenderFrame& frame, const StateBlock* const * states, s32 count );
+        PipelineFeatures            applyStates( const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count );
 
         //! Clears an active render target
         void                        clear( const f32* color, f32 depth, s32 stencil, u8 mask );

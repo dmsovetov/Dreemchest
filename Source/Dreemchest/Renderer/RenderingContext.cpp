@@ -402,6 +402,67 @@ Texture_ RenderingContext::requestTexture( const void* data, u16 width, u16 heig
     Texture_ id = allocateResourceIdentifier(RenderResourceType::Texture);
     return m_constructionCommandBuffer->createTexture(id, data, width, height, format);
 }
+    
+// ** RenderingContext::mergeStateBlocks
+s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const
+{
+    PipelineFeatures userFeatures = 0;
+    PipelineFeatures userFeaturesMask = ~0;
+    
+    // A bitmask of states that were already set
+    u32 activeStateMask = 0;
+    
+    // A total number of states written to an output array
+    s32 statesWritten = 0;
+    
+    for( s32 i = 0; i < blockCount; i++ )
+    {
+        // Get a state block at specified index
+        const StateBlock* block = stateBlocks[i];
+        
+        // No more state blocks in a stack - break
+        if( block == NULL )
+        {
+            break;
+        }
+        
+        // Update feature set
+        userFeatures      = userFeatures     | block->features();
+        userFeaturesMask  = userFeaturesMask & block->featureMask();
+        
+        // Skip redundant state blocks by testing a block bitmask against an active state mask
+        if( (activeStateMask ^ block->mask()) == 0 )
+        {
+            continue;
+        }
+        
+        // Apply all states in a block
+        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
+        {
+            // Get a render state bit
+            u32 stateBit = block->stateBit( j );
+            
+            // Skip redundate state blocks by testing a state bitmask agains an active state mask
+            if( activeStateMask & stateBit )
+            {
+                continue;
+            }
+            
+            NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
+            
+            // Write a render state at specified index to an output array
+            states[statesWritten++] = block->state(j);
+            
+            // Update an active state mask
+            activeStateMask = activeStateMask | stateBit;
+        }
+    }
+    
+    // Compose a user defined feature mask
+    userDefined = PipelineFeature::mask(userFeatures & userFeaturesMask);
+    
+    return statesWritten;
+}
 
 // ** RenderingContext::requestShader
 Program RenderingContext::requestShader(const String& fileName)
