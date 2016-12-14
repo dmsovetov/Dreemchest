@@ -114,7 +114,7 @@ DataHandle<TAsset>::DataHandle( void )
 template<typename TAsset>
 DataHandle<TAsset>::DataHandle( const Handle& asset )
 {
-    NIMBLE_ABORT_IF( isValid() && asset.isValid() && !asset->type() == Asset::typeId<TAsset>(), "" );
+    NIMBLE_ABORT_IF( isValid() && asset.isValid() && asset->type() != Asset::typeId<TAsset>(), "an asset handle types do not match" );
     this->setHandle( asset.assets(), asset.index() );
 }
 
