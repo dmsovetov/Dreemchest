@@ -35,57 +35,57 @@ namespace Renderer
 
 // ** State::State
 State::State( void )
-    : type( TotalStates )
+    : type(TotalStates)
 {
 }
 
 // ** State::State
-State::State( Type type, PersistentResourceId id )
-    : resourceId( id )
-    , type( type )
+State::State(Type type, PersistentResourceId id)
+    : resourceId(id)
+    , type(type)
 {
 }
 
 // ** State::State
-State::State( TriangleFace face )
-    : type( CullFace )
+State::State(TriangleFace face)
+    : type(CullFace)
 {
     cullFace = face;
 }
 
 // ** State::State
-State::State( Compare function, bool write )
-    : type( DepthState )
+State::State(Compare function, bool write)
+    : type(DepthState)
 {
     compareFunction = function;
     data.depthWrite = write;
 }
 
 // ** State::State
-State::State( Compare function, f32 reference )
-    : type( AlphaTest )
+State::State(Compare function, f32 reference)
+    : type(AlphaTest)
 {
     compareFunction     = function;
     data.alphaReference = static_cast<u8>( reference * 255 );
 }
 
 // ** State::State
-State::State( s32 id, ConstantBufferType type )
-    : type( ConstantBuffer )
+State::State(ConstantBuffer_ id, ConstantBufferType type)
+    : type(ConstantBuffer)
 {
     resourceId = id;
     data.index = type;
 }
 
 // ** State::State
-State::State( BlendFactor src, BlendFactor dst )
+State::State(BlendFactor src, BlendFactor dst)
     : type( Blending )
 {
     data.blend = (src << 4) | dst;
 }
 
 // ** State::State
-State::State( s32 id, TextureSampler sampler, RenderTargetAttachment attachment )
+State::State(s32 id, TextureSampler sampler, RenderTargetAttachment attachment)
     : type( Texture )
 {
     resourceId = id;
@@ -93,8 +93,8 @@ State::State( s32 id, TextureSampler sampler, RenderTargetAttachment attachment 
 }
 
 // ** State::State
-State::State( f32 factor, f32 units )
-    : type( PolygonOffset )
+State::State(f32 factor, f32 units)
+    : type(PolygonOffset)
 {
     polygonOffset.factor = factor * 128.0f;
     polygonOffset.units  = units * 128.0f;
@@ -104,87 +104,87 @@ State::State( f32 factor, f32 units )
 
 // ** StateBlock::StateBlock
 StateBlock::StateBlock( void )
-    : m_mask( 0 )
-    , m_features( 0 )
-    , m_featureMask( ~0 )
-    , m_count( 0 )
+    : m_mask(0)
+    , m_features(0)
+    , m_featureMask(~0)
+    , m_count(0)
 {
 }
 
 // ** StateBlock::bindVertexBuffer
-void StateBlock::bindVertexBuffer( s32 id )
+void StateBlock::bindVertexBuffer(VertexBuffer_ id)
 {
     pushState( State( State::VertexBuffer, id ), State::VertexBuffer );
 }
 
 // ** StateBlock::bindIndexBuffer
-void StateBlock::bindIndexBuffer( s32 id )
+void StateBlock::bindIndexBuffer(IndexBuffer_ id)
 {
     pushState( State( State::IndexBuffer, id ), State::IndexBuffer );
 }
 
 // ** StateBlock::bindInputLayout
-void StateBlock::bindInputLayout( s32 id )
+void StateBlock::bindInputLayout(InputLayout id)
 {
     pushState( State( State::InputLayout, id ), State::InputLayout );
 }
     
 // ** StateBlock::bindFeatureLayout
-void StateBlock::bindFeatureLayout( s32 id )
+void StateBlock::bindFeatureLayout(FeatureLayout id)
 {
     pushState( State( State::FeatureLayout, id ), State::FeatureLayout );
 }
 
 // ** StateBlock::bindConstantBuffer
-void StateBlock::bindConstantBuffer( s32 id, State::ConstantBufferType type )
+void StateBlock::bindConstantBuffer(ConstantBuffer_ id, State::ConstantBufferType type)
 {
     pushState( State( id, type ), State::ConstantBuffer + type );
 }
 
 // ** StateBlock::bindProgram
-void StateBlock::bindProgram( s32 id )
+void StateBlock::bindProgram(Program id)
 {
     pushState( State( State::Shader, id ), State::Shader );
 }
 
 // ** StateBlock::bindTexture
-void StateBlock::bindTexture( s32 id, State::TextureSampler sampler )
+void StateBlock::bindTexture(Texture_ id, State::TextureSampler sampler)
 {
     pushState( State( id, sampler ), State::Texture + sampler );
 }
 
 // ** StateBlock::bindRenderedTexture
-void StateBlock::bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment )
+void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment)
 {
-    pushState( State( -renderTarget, sampler, attachment ), State::Texture + sampler );
+    pushState( State( -static_cast<s32>(renderTarget), sampler, attachment ), State::Texture + sampler );
 }
 
 // ** StateBlock::setBlend
-void StateBlock::setBlend( BlendFactor src, BlendFactor dst )
+void StateBlock::setBlend(BlendFactor src, BlendFactor dst)
 {
     pushState( State( src, dst ), State::Blending );
 }
 
 // ** StateBlock::setDepthState
-void StateBlock::setDepthState( Compare function, bool write )
+void StateBlock::setDepthState(Compare function, bool write)
 {
     pushState( State( function, write ), State::DepthState );
 }
 
 // ** StateBlock::enableFeatures
-void StateBlock::enableFeatures( u64 bits )
+void StateBlock::enableFeatures(PipelineFeatures features)
 {
-    m_features = m_features | bits;
+    m_features = m_features | features;
 }
 
 // ** StateBlock::disableFeatures
-void StateBlock::disableFeatures( u64 bits )
+void StateBlock::disableFeatures(PipelineFeatures mask)
 {
-    m_featureMask = m_featureMask & ~bits;
+    m_featureMask = m_featureMask & ~mask;
 }
 
 // ** StateBlock::setPolygonOffset
-void StateBlock::setPolygonOffset( f32 factor, f32 units )
+void StateBlock::setPolygonOffset(f32 factor, f32 units)
 {
     pushState( State( factor, units ), State::PolygonOffset );
 }
@@ -196,13 +196,13 @@ void StateBlock::disablePolygonOffset( void )
 }
 
 // ** StateBlock::setAlphaTest
-void StateBlock::setAlphaTest( Compare function, f32 reference )
+void StateBlock::setAlphaTest(Compare function, f32 reference)
 {
     pushState( State( function, reference ), State::AlphaTest );
 }
 
 // ** StateBlock::setCullFace
-void StateBlock::setCullFace( TriangleFace face )
+void StateBlock::setCullFace(TriangleFace face)
 {
     pushState( State( face ), State::CullFace );
 }
@@ -216,11 +216,11 @@ void StateBlock::disableAlphaTest( void )
 // ** StateBlock::disableBlending
 void StateBlock::disableBlending( void )
 {
-    setBlend( BlendDisabled, BlendDisabled );
+    setBlend(BlendDisabled, BlendDisabled);
 }
 
 // ** StateBlock::pushState
-void StateBlock::pushState( const State& state, u32 stateBit )
+void StateBlock::pushState(const State& state, u32 stateBit)
 {
     NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
     NIMBLE_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );

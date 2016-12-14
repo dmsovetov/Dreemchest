@@ -81,7 +81,7 @@ namespace Scene {
                             DebugRenderTarget( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to render a target as a 2D rectangle.
-        void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, u8 slot, Renderer::RenderTargetAttachment attachment, s32 size, s32 x, s32 y );
+        void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientRenderTarget slot, Renderer::RenderTargetAttachment attachment, s32 size, s32 x, s32 y );
 
     private:
 

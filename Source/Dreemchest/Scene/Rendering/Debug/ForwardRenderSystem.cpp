@@ -100,7 +100,7 @@ void ForwardRenderSystem::renderPointLight( RenderFrame& frame, CommandBuffer& c
 {
     // Render a light pass
     RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromSphere( *light.matrix * Vec3::zero(), light.light->range() );
-    renderLight( frame, commands, stateStack, light, &clip, 0 );
+    renderLight( frame, commands, stateStack, light, &clip );
 }
 
 // ** ForwardRenderSystem::renderDirectionalLight
@@ -108,7 +108,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
 {
     // Light does not cast any shadows, so just render it
     if( !light.light->castsShadows() ) {
-        renderLight( frame, commands, stateStack, light, NULL, 0 );
+        renderLight( frame, commands, stateStack, light, NULL );
         return;
     }
 
@@ -152,7 +152,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
 }
 
 // ** ForwardRenderSystem::renderLight
-void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, u8 shadows )
+void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientRenderTarget shadows )
 {
     // A light type feature bits
     PipelineFeatures lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };

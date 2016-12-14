@@ -179,7 +179,7 @@ namespace Renderer
                                         State( Renderer::Compare function, f32 reference );
 
                                         //! Constructs a constant buffer binding state.
-                                        State( s32 id, ConstantBufferType type );
+                                        State( ConstantBuffer_ id, ConstantBufferType type );
 
                                         //! Constructs a blend function render state.
                                         State( BlendFactor src, BlendFactor dst );
@@ -225,52 +225,52 @@ namespace Renderer
                                         StateBlock( void );
 
         //! Binds a vertex buffer to a pipeline.
-        void                            bindVertexBuffer( s32 id );
+        void                            bindVertexBuffer(VertexBuffer_ id);
 
         //! Binds an index buffer to a pipeline.
-        void                            bindIndexBuffer( s32 id );
+        void                            bindIndexBuffer(IndexBuffer_ id);
 
         //! Binds an input layout to a pipeline.
-        void                            bindInputLayout( s32 id );
+        void                            bindInputLayout(InputLayout id);
         
         //! Activates a pipeline feature layout.
-        void                            bindFeatureLayout( s32 id );
+        void                            bindFeatureLayout(FeatureLayout id);
 
         //! Binds a constant buffer to a pipeline.
-        void                            bindConstantBuffer( s32 id, State::ConstantBufferType type );
+        void                            bindConstantBuffer(ConstantBuffer_ id, State::ConstantBufferType type);
 
         //! Binds a program to a pipeline.
-        void                            bindProgram( s32 id );
+        void                            bindProgram(Program id);
 
         //! Binds a texture to a specified sampler.
-        void                            bindTexture( s32 id, State::TextureSampler sampler );
+        void                            bindTexture(Texture_ id, State::TextureSampler sampler);
 
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture( u8 renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetColor0 );
+        void                            bindRenderedTexture(TransientRenderTarget renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetColor0);
 
         //! Sets a blend function.
-        void                            setBlend( BlendFactor src, BlendFactor dst );
+        void                            setBlend(BlendFactor src, BlendFactor dst);
 
         //! Sets a depth state.
-        void                            setDepthState( Compare function, bool write );
+        void                            setDepthState(Compare function, bool write);
 
         //! Enables a ubershader features.
-        void                            enableFeatures( u64 bits );
+        void                            enableFeatures(PipelineFeatures features);
 
         //! Disables a ubershader features.
-        void                            disableFeatures( u64 bits );
+        void                            disableFeatures(PipelineFeatures mask);
 
         //! Sets a polygon offset values.
-        void                            setPolygonOffset( f32 factor, f32 units );
+        void                            setPolygonOffset(f32 factor, f32 units);
 
         //! Disables a polygon offset.
         void                            disablePolygonOffset( void );
 
         //! Sets an alpha test function.
-        void                            setAlphaTest( Compare function, f32 reference );
+        void                            setAlphaTest(Compare function, f32 reference);
 
         //! Sets a cull face side.
-        void                            setCullFace( TriangleFace face );
+        void                            setCullFace(TriangleFace face);
 
         //! Disables an alpha testing.
         void                            disableAlphaTest( void );
@@ -285,10 +285,10 @@ namespace Renderer
         s32                             stateCount( void ) const;
 
         //! Returns a state at specified index.
-        const State&                    state( s32 index ) const;
+        const State&                    state(s32 index) const;
 
         //! Returns a state bit at specified index.
-        u32                             stateBit( s32 index ) const;
+        u32                             stateBit(s32 index) const;
 
         //! Returns a feature set enabled by a state block.
         u64                             features( void ) const;
@@ -299,7 +299,7 @@ namespace Renderer
     private:
 
         //! Pushes a new state to a block.
-        void                            pushState( const State& state, u32 stateBit );
+        void                            pushState(const State& state, u32 stateBit);
 
     private:
 
