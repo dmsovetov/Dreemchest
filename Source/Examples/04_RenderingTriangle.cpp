@@ -68,20 +68,13 @@ class RendererInitialization : public ApplicationDelegate
             , { "F_View",     PipelineFeature::mask(ConstantBuffer1) }
             , { NULL }
         };
-
+        
         // Request all required resources from a rendering context
-    #if !DEV_DEPRECATED_HAL
-        Renderer::Program       shader       /*= m_renderingContext->internShader(m_renderingContext->createShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader"))*/;
-        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(0);
-        Renderer::VertexBuffer  vertexBuffer /*= m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices))*/;
-        Renderer::IndexBuffer   indexBuffer  /*= m_renderingContext->requestIndexBuffer(indices, sizeof(indices))*/;
-    #else
-        Renderer::Program       shader        = m_renderingContext->requestShader("../Source/Dreemchest/Scene/Rendering/Shaders/Null.shader");
+        Renderer::Program       shader        = m_renderingContext->requestProgram(Renderer::ShaderProgramDescriptor());
         Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
         Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
         Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
         Renderer::FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(features);
-    #endif  /*  #if !DEV_DEPRECATED_HAL */
         
         // Setup a render state block that will be used during rendering
         m_renderState.bindVertexBuffer(vertexBuffer);

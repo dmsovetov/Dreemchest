@@ -131,19 +131,22 @@ namespace Renderer
         void                        activateShaderPermutation( PipelineFeatures features );
         
         //! Compiles a shader permutation.
-        ShaderPtr                   compileShaderPermutation( UbershaderPtr shader, PipelineFeatures features, const PipelineFeatureLayout* featureLayout );
+        ShaderPtr                   compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
 
     private:
 
         //! State switcher function callback.
         typedef void ( RenderingContextHal::*StateSwitch )( const RenderFrame&, const State& );
-
+        
+        //! A container type to store program permutations.
+        typedef HashMap<PipelineFeatures, ShaderPtr> ProgramPermutations;
 
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.
         FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
         FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
         FixedArray<ConstantBufferPtr>       m_constantBuffers;                      //!< Allocated constant buffers.
         FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
+        FixedArray<ProgramPermutations>     m_permutations;                         //!< Available program permutations.
 
         StateSwitch                         m_stateSwitches[State::TotalStates];    //!< Function callbacks to switch states.
         ShaderPtr                           m_activeProgram;                        //!< An active program permutation.

@@ -45,7 +45,6 @@
 #include <Renderer/RenderFrame.h>
 #include <Renderer/RenderingContext.h>
 #include <Renderer/CommandBuffer.h>
-#include <Renderer/Ubershader.h>
 
 #include <Assets/Asset.h>
 #include <Assets/AssetHandle.h>

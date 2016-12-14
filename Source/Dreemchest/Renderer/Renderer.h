@@ -71,7 +71,6 @@ namespace Renderer {
     dcDeclarePtrs(Shader);
 #endif  /*  #if DEV_DEPRECATED_HAL  */
     
-    dcDeclarePtrs( Ubershader )
     dcDeclarePtrs( RenderingContext )
     
     //! A pipeline feature mask type.
@@ -82,6 +81,9 @@ namespace Renderer {
     
     //! A persistent resource identifer type alias.
     typedef u16 PersistentResourceId;
+    
+    //! A container type to manage persistent resource identifiers.
+    typedef IndexManager<PersistentResourceId> PersistentResourceIdentifiers;
     
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     struct RenderResourceType
@@ -96,6 +98,10 @@ namespace Renderer {
             , Program
             , Texture
             , FeatureLayout
+            , VertexShader
+            , GeometryShader
+            , FragmentShader
+            , ComputeShader
             , TotalTypes
         };
     };
@@ -105,6 +111,7 @@ namespace Renderer {
     class ResourceIdentifier
     {
     friend class RenderingContext;
+    friend class ShaderLibrary;
     friend class RenderingContextHal;
     public:
         
@@ -195,8 +202,31 @@ namespace Renderer {
     typedef ResourceIdentifier<RenderResourceType::Program, PersistentResourceId> Program;
     typedef ResourceIdentifier<RenderResourceType::Texture, PersistentResourceId> Texture_;
     typedef ResourceIdentifier<RenderResourceType::FeatureLayout, PersistentResourceId> FeatureLayout;
-    
+    typedef ResourceIdentifier<RenderResourceType::VertexShader, PersistentResourceId> VertexShader;
+    typedef ResourceIdentifier<RenderResourceType::GeometryShader, PersistentResourceId> GeometryShader;
+    typedef ResourceIdentifier<RenderResourceType::FragmentShader, PersistentResourceId> FragmentShader;
+    typedef ResourceIdentifier<RenderResourceType::ComputeShader, PersistentResourceId> ComputeShader;
+
     typedef ResourceIdentifier<RenderResourceType::RenderTarget, TransientResourceId> TransientRenderTarget;
+    
+    //! Available shader types.
+    enum ShaderType
+    {
+          VertexShaderType      //!< A vertex shader type.
+        , GeometryShaderType    //!< A geometry shader type.
+        , FragmentShaderType    //!< A fragment shader type.
+        , ComputeShaderType     //!< A compute shader type.
+        , TotalShaderTypes
+    };
+    
+    //! A shader program descriptor that is used by rendering context to create programs.
+    struct ShaderProgramDescriptor
+    {
+        VertexShader        vertexShader;   //!< A vertex shader to be attached to a program.
+        GeometryShader      geometryShader; //!< A geometry shader to be attached to a program.
+        FragmentShader      fragmentShader; //!< A fragment shader to be attached to a program.
+        ComputeShader       computeShader;  //!< A compute shader to be attached to a program.
+    };
     
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource

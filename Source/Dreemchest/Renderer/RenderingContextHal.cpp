@@ -27,7 +27,6 @@
 #include "RenderingContextHal.h"
 #include "CommandBuffer.h"
 #include "RenderFrame.h"
-#include "Ubershader.h"
 #include "RenderingContext.h"
 #include "VertexFormat.h"
 #include "VertexBufferLayout.h"
@@ -363,7 +362,7 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
         Program program = m_pipeline.program();
         
         // Now compile a program permutation
-        m_activeProgram = compileShaderPermutation(m_shaders[program], m_pipeline.features(), m_pipeline.featureLayout());
+        m_activeProgram = compileShaderPermutation(program, m_pipeline.features(), m_pipeline.featureLayout());
         
         // Accept these changes
         m_pipeline.acceptChanges();
@@ -374,24 +373,31 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
 }
     
 // ** RenderingContextHal::compileShaderPermutation
-ShaderPtr RenderingContextHal::compileShaderPermutation( UbershaderPtr shader, PipelineFeatures features, const PipelineFeatureLayout* featureLayout )
+ShaderPtr RenderingContextHal::compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout)
 {
-    // First cancel all features that are not supported by a shader
-    //features = features & m_supportedFeatures;
+    // Get a shader program descriptor and corresponding permutations container
+    const ShaderProgramDescriptor& descriptor = m_programs[program];
+    
+    if (static_cast<s32>(program) >= m_permutations.count())
+    {
+        m_permutations.emplace(program, ProgramPermutations());
+    }
+    ProgramPermutations& permutations = m_permutations[program];
     
     // Now lookup a permutation cache
-    ShaderPtr permutation = shader->findPermutation(features);
+    ProgramPermutations::const_iterator permutation = permutations.find(features);
     
-    if (permutation.valid())
+    if (permutation != permutations.end())
     {
-        return permutation;
+        return permutation->second;
     }
     
     // Generate macro definitions from features
     String macro = "";
     String debug = "";
     
-    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ ) {
+    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ )
+    {
         const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
         
         if( element.mask & features )
@@ -409,11 +415,16 @@ ShaderPtr RenderingContextHal::compileShaderPermutation( UbershaderPtr shader, P
     //    macro += m_includes[i];
     //}
     
+    // Get a shader source code
+    const String& vertex   = m_shaderLibrary.vertexShader(descriptor.vertexShader);
+    const String& fragment = m_shaderLibrary.fragmentShader(descriptor.fragmentShader);
+    
     // Compile the shader
-    ShaderPtr compiled = m_hal->createShader( (macro + shader->vertex()).c_str(), (macro + shader->fragment()).c_str() );
+    ShaderPtr compiled = m_hal->createShader( (macro + vertex).c_str(), (macro + fragment).c_str() );
     NIMBLE_BREAK_IF( !compiled.valid() );
     
-    shader->addPermutation(features, compiled);
+    // Put it to a cache
+    permutations[features] = compiled;
     
     return compiled;
 }

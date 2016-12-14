@@ -35,7 +35,7 @@ AmbientPass::AmbientPass( RenderingContext& context, RenderScene& renderScene )
     : RenderPassBase( context, renderScene )
 {
     // Create an ambient lighting shader instance
-    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
+    m_shader = m_context.deprecatedRequestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Ambient.shader" );
 }
 
 // ** AmbientPass::render
@@ -56,7 +56,7 @@ ShadowPass::ShadowPass( RenderingContext& context, RenderScene& renderScene )
     : RenderPassBase( context, renderScene )
 {
     // Create a shadowmap shader
-    m_shader = m_context.requestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
+    m_shader = m_context.deprecatedRequestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Shadow.shader" );
 
     // Create a shadow parameters constant buffer
     m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Shadow ), RenderScene::CBuffer::Shadow::Layout );

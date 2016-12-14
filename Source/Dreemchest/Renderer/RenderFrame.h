@@ -28,7 +28,6 @@
 #define __DC_Renderer_RenderFrame_H__
 
 #include "RenderState.h"
-#include "Ubershader.h"
 
 DC_BEGIN_DREEMCHEST
 

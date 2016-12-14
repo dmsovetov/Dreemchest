@@ -27,9 +27,9 @@
 #ifndef __DC_Renderer_RenderingContext_H__
 #define __DC_Renderer_RenderingContext_H__
 
-#include "Ubershader.h"
 #include "RenderState.h"
 #include "PipelineFeatureLayout.h"
+#include "ShaderLibrary.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -67,11 +67,17 @@ namespace Renderer
         //! Queues a pipeline feature layout instance for creation and returns it's index.
         FeatureLayout                           requestPipelineFeatureLayout(const PipelineFeature* features);
         
-        //! Queues a shader instance creation and returns it's index.
-        Program                                 requestShader( const String& fileName );
+        //! Queues a program instance creation and returns it's index.
+        Program                                 requestProgram(const ShaderProgramDescriptor& descriptor);
+        
+        //! Queues a program instance creation and returns it's index.
+        Program                                 requestProgram(VertexShader vertexShader, FragmentShader fragmentShader = FragmentShader());
+        
+        //! Queues a program instance creation and returns it's index.
+        Program                                 requestProgram(const String& vertex, const String& fragment);
         
         //! Queues a shader instance creation and returns it's index.
-        Program                                 requestShader( const String& vertex, const String& fragment );
+        Program                                 deprecatedRequestShader(const String& fileName);
         
         //! Merges a list of state blocks into a single array of render states.
         s32                                     mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const;
@@ -115,24 +121,22 @@ namespace Renderer
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
         
-        //! A container type to manage resource identifiers.
-        typedef IndexManager<u16>               ResourceIdentifierManager;
-        
         //! A unique pointer type for a vertex buffer layout instance.
         typedef UPtr<VertexBufferLayout>        VertexBufferLayoutUPtr;
         
         //! A unique pointer type for a pipeline feature layout instance.
         typedef UPtr<PipelineFeatureLayout>     PipelineFeatureLayoutUPtr;
         
-        ResourceIdentifierManager               m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
+        PersistentResourceIdentifiers           m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
-        FixedArray<UbershaderPtr>               m_shaders;                                              //!< Allocated ubershaders.
+        FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
         TransientTargetStack*                   m_intermediateTargets;                                  //!< An intermediate render target stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
+        ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
     };
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.

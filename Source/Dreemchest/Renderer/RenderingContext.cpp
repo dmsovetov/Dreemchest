@@ -403,6 +403,45 @@ Texture_ RenderingContext::requestTexture( const void* data, u16 width, u16 heig
     return m_constructionCommandBuffer->createTexture(id, data, width, height, format);
 }
     
+// ** RenderingContext::requestProgram
+Program RenderingContext::requestProgram(const ShaderProgramDescriptor& descriptor)
+{
+    // Allocate a program identifier
+    Program id = allocateResourceIdentifier(RenderResourceType::Program);
+    
+    // Put this program to a pool
+    m_programs.emplace(id, descriptor);
+    
+    return id;
+}
+
+// ** RenderingContext::requestProgram
+Program RenderingContext::requestProgram(VertexShader vertexShader, FragmentShader fragmentShader)
+{
+    // Create a shader program descriptor
+    ShaderProgramDescriptor descriptor;
+    descriptor.vertexShader = vertexShader;
+    descriptor.fragmentShader = fragmentShader;
+    
+    // Now request a program
+    Program id = requestProgram(descriptor);
+    
+    return id;
+}
+
+// ** RenderingContext::requestProgram
+Program RenderingContext::requestProgram(const String& vertex, const String& fragment)
+{
+    // Create vertex and fragment shaders
+    VertexShader   vertexShader   = m_shaderLibrary.addVertexShader(vertex);
+    FragmentShader fragmentShader = m_shaderLibrary.addFragmentShader(fragment);
+    
+    // Now request a program.
+    Program id = requestProgram(vertexShader, fragmentShader);
+    
+    return id;
+}
+
 // ** RenderingContext::mergeStateBlocks
 s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const
 {
@@ -464,8 +503,8 @@ s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s3
     return statesWritten;
 }
 
-// ** RenderingContext::requestShader
-Program RenderingContext::requestShader(const String& fileName)
+// ** RenderingContext::deprecatedRequestShader
+Program RenderingContext::deprecatedRequestShader(const String& fileName)
 {
     static CString vertexShaderMarker   = "[VertexShader]";
     static CString fragmentShaderMarker = "[FragmentShader]";
@@ -497,9 +536,9 @@ Program RenderingContext::requestShader(const String& fileName)
         fragmentShader = code.substr( fragmentCodeStart, vertexBegin > fragmentBegin ? vertexBegin - fragmentCodeStart : String::npos );
     }
     
-    return requestShader(vertexShader, fragmentShader);
+    return requestProgram(vertexShader, fragmentShader);
 }
-
+/*
 // ** RenderingContext::requestShader
 Program RenderingContext::requestShader(const String& vertex, const String& fragment)
 {
@@ -538,7 +577,7 @@ Program RenderingContext::requestShader(const String& vertex, const String& frag
     m_shaders.emplace(id, shader);
 
     return id;
-}
+}*/
     
 } // namespace Renderer
 
