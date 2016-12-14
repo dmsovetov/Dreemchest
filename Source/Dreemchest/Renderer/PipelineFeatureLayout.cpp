@@ -64,7 +64,7 @@ PipelineState::PipelineState( void )
     : m_stateBlockFeatures(0)
     , m_features(0)
     , m_featureLayout(NULL)
-    , m_changes(0)
+    , m_changes(~0)
 {
     
 }
