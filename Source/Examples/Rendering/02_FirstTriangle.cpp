@@ -40,7 +40,7 @@ class RendererInitialization : public ApplicationDelegate
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800 / 4, 600 / 4 );
+        Window* window = Window::create( 800, 600 );
 
         // Create a rendering view.
         RenderView* view   = Renderer::createOpenGLView( window->handle(), Renderer::PixelD24S8 );
@@ -58,18 +58,13 @@ class RendererInitialization : public ApplicationDelegate
             1.0f, -1.0f, 0.0f,
             0.0f,  1.0f, 0.0f,
         };
-        static u16 indices[] = {
-            0, 1, 2
-        };
-        
+
         // Request all required resources from a rendering context
-        Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
+        Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(VertexFormat::Position);
         Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
         
         // Setup a render state block that will be used during rendering
         m_renderState.bindVertexBuffer(vertexBuffer);
-        m_renderState.bindIndexBuffer(indexBuffer);
         m_renderState.bindInputLayout(inputLayout);
         
         // Finally subscribe to updates events.
@@ -88,7 +83,7 @@ class RendererInitialization : public ApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), Renderer::ClearAll);
         
         // Now emit a drawIndexed command with a render state block configured upon initialization
-        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 3, &m_renderState);
+        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, &m_renderState);
         
         // Rendering frame is now ready, so pass it to RVM to display it on a screen.
         m_renderingContext->display(m_renderFrame);
