@@ -41,11 +41,20 @@ namespace Renderer
         //! Available vertex attributes
         enum Attribute
         {
-              Position  = BIT( 0 )  //!< Vertex position.
-            , Normal    = BIT( 1 )  //!< Vertex normal.
-            , Color     = BIT( 2 )  //!< Vertex 8-bit color.
-            , Uv0       = BIT( 3 )  //!< Texture #1 UV coordinates.
-            , Uv1       = BIT( 4 )  //!< Texture #2 UV coordinates.
+              Position      = BIT(VertexPosition)
+            , Normal        = BIT(VertexNormal)
+            , Color         = BIT(VertexColor)
+            , TexCoord0     = BIT(VertexTexCoord0)
+            , TexCoord1     = BIT(VertexTexCoord1)
+            , TexCoord2     = BIT(VertexTexCoord2)
+            , TexCoord3     = BIT(VertexTexCoord3)
+            , TexCoord4     = BIT(VertexTexCoord4)
+            , TexCoord5     = BIT(VertexTexCoord5)
+            , TexCoord6     = BIT(VertexTexCoord6)
+            , TexCoord7     = BIT(VertexTexCoord7)
+            , Tangent       = BIT(VertexTangent)
+            , Bitangent     = BIT(VertexBitangent)
+            , PointSize     = BIT(VertexPointSize)
         };
         
                                 //! Constructs a VertexFormat instance.
@@ -144,11 +153,12 @@ namespace Renderer
         
         switch( attribute )
         {
-            case Uv1:       offset += sizeOfUv0();
-            case Uv0:       offset += sizeOfColor();
+            case TexCoord1: offset += sizeOfUv0();
+            case TexCoord0: offset += sizeOfColor();
             case Color:     offset += sizeOfNormal();
             case Normal:    offset += sizeOfPosition();
             case Position:  break;
+            default:        NIMBLE_NOT_IMPLEMENTED
         }
         
         return offset;
@@ -162,8 +172,9 @@ namespace Renderer
             case Position:  return sizeof( f32 ) * 3;
             case Normal:    return sizeof( f32 ) * 3;
             case Color:     return sizeof( u8  ) * 4;
-            case Uv0:       return sizeof( f32 ) * 2;
-            case Uv1:       return sizeof( f32 ) * 2;
+            case TexCoord0: return sizeof( f32 ) * 2;
+            case TexCoord1: return sizeof( f32 ) * 2;
+            default:        NIMBLE_NOT_IMPLEMENTED
         }
         
         return 0;
@@ -235,9 +246,9 @@ namespace Renderer
     // ** VertexFormat::sizeOfUv0
     NIMBLE_INLINE s32 VertexFormat::sizeOfUv0( void ) const
     {
-        if( m_attributes & Uv0 )
+        if( m_attributes & TexCoord0 )
         {
-            return attributeSize( Uv0 );
+            return attributeSize( TexCoord0 );
         }
         
         return 0;
@@ -246,9 +257,9 @@ namespace Renderer
     // ** VertexFormat::sizeOfUv1
     NIMBLE_INLINE s32 VertexFormat::sizeOfUv1( void ) const
     {
-        if( m_attributes & Uv1 )
+        if( m_attributes & TexCoord1 )
         {
-            return attributeSize( Uv1 );
+            return attributeSize( TexCoord1 );
         }
         
         return 0;

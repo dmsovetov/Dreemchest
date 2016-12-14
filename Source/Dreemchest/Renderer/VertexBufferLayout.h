@@ -41,28 +41,9 @@ namespace Renderer
 #endif  /*  #if DEV_DEPRECATED_HAL  */
     public:
         
-        //! Supported vertex attributes.
-        enum Attribute {
-            Position,               //!< Vertex position.
-            Normal,                 //!< Vertex normal.
-            Color,                  //!< Vertex color.
-            Tangent,                //!< Vertex tangent.
-            Bitangent,              //!< Vertex bitangent.
-            PointSize,              //!< Point sprite size.
-            Uv0,                    //!< Texture 0 UV.
-            Uv1,                    //!< Texture 1 UV.
-            Uv2,                    //!< Texture 2 UV.
-            Uv3,                    //!< Texture 3 UV.
-            Uv4,                    //!< Texture 4 UV.
-            Uv5,                    //!< Texture 2 UV.
-            Uv6,                    //!< Texture 3 UV.
-            Uv7,                    //!< Texture 4 UV.
-            TotalAttributes,        //!< Total amount of supported vertex attributes.
-        };
-        
-        
         //! Input layout element.
-        struct Element {
+        struct Element
+        {
             s32     count;      //!< Attribute size.
             s32     offset;     //!< Attribute offset.
             
@@ -89,7 +70,7 @@ namespace Renderer
         s32                     vertexSize( void ) const;
         
         //! Defines a vertex attribute location.
-        void                    attributeLocation( Attribute attribute, s32 count, s32 offset );
+        void                    attributeLocation( VertexAttribute attribute, s32 count, s32 offset );
         
         //! Returns the vertex position attribute.
         const Element&          position( void ) const;
@@ -111,9 +92,9 @@ namespace Renderer
         
     protected:
         
-        PipelineFeatures        m_features;                     //!< An input layout features.
-        s32                     m_vertexSize;                   //!< Vertex size in bytes.
-        Element                 m_attributes[TotalAttributes];  //!< Array of vertex attributes.
+        PipelineFeatures        m_features;                         //!< An input layout features.
+        s32                     m_vertexSize;                       //!< Vertex size in bytes.
+        Element                 m_attributes[MaxVertexAttributes];  //!< Array of vertex attributes.
     };
     
 } // namespace Renderer

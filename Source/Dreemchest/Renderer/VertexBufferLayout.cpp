@@ -39,9 +39,10 @@ VertexBufferLayout::VertexBufferLayout( s32 vertexSize )
 }
 
 // ** VertexBufferLayout::attributeLocation
-void VertexBufferLayout::attributeLocation( Attribute attribute, s32 count, s32 offset )
+void VertexBufferLayout::attributeLocation(VertexAttribute attribute, s32 count, s32 offset)
 {
-    static PipelineFeatures kAttributeMask[TotalAttributes] = {
+    static PipelineFeatures kAttributeMask[MaxVertexAttributes] =
+    {
         0,
         BIT( 0 ),
         BIT( 1 ),
@@ -79,31 +80,31 @@ s32 VertexBufferLayout::vertexSize( void ) const
 // ** VertexBufferLayout::position
 const VertexBufferLayout::Element& VertexBufferLayout::position( void ) const
 {
-    return m_attributes[Position];
+    return m_attributes[VertexPosition];
 }
 
 // ** VertexBufferLayout::color
 const VertexBufferLayout::Element& VertexBufferLayout::color( void ) const
 {
-    return m_attributes[Color];
+    return m_attributes[VertexColor];
 }
 
 // ** VertexBufferLayout::normal
 const VertexBufferLayout::Element& VertexBufferLayout::normal( void ) const
 {
-    return m_attributes[Normal];
+    return m_attributes[VertexNormal];
 }
 
 // ** VertexBufferLayout::uv
 const VertexBufferLayout::Element& VertexBufferLayout::uv( u32 sampler ) const
 {
-    return m_attributes[Uv0 + sampler];
+    return m_attributes[VertexTexCoord0 + sampler];
 }
 
 // ** VertexBufferLayout::pointSize
 const VertexBufferLayout::Element& VertexBufferLayout::pointSize( void ) const
 {
-    return m_attributes[PointSize];
+    return m_attributes[VertexPointSize];
 }
     
 } // namespace Renderer

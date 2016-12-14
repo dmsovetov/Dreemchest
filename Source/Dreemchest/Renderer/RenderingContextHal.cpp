@@ -208,23 +208,23 @@ void RenderingContextHal::commandCreateInputLayout(InputLayout id, u8 vertexForm
     // Add vertex attributes to an input layout
     if( format & VertexFormat::Position )
     {
-        inputLayout->attributeLocation( VertexBufferLayout::Position, 3, format.attributeOffset( VertexFormat::Position ) );
+        inputLayout->attributeLocation( VertexPosition, 3, format.attributeOffset( VertexFormat::Position ) );
     }
     if( format & VertexFormat::Color )
     {
-        inputLayout->attributeLocation( VertexBufferLayout::Color, 4, format.attributeOffset( VertexFormat::Color ) );
+        inputLayout->attributeLocation( VertexColor, 4, format.attributeOffset( VertexFormat::Color ) );
     }
     if( format & VertexFormat::Normal )
     {
-        inputLayout->attributeLocation( VertexBufferLayout::Normal, 3, format.attributeOffset( VertexFormat::Normal ) );
+        inputLayout->attributeLocation( VertexNormal, 3, format.attributeOffset( VertexFormat::Normal ) );
     }
-    if( format & VertexFormat::Uv0 )
+    if( format & VertexFormat::TexCoord0 )
     {
-        inputLayout->attributeLocation( VertexBufferLayout::Uv0, 2, format.attributeOffset( VertexFormat::Uv0 ) );
+        inputLayout->attributeLocation( VertexTexCoord0, 2, format.attributeOffset( VertexFormat::TexCoord0 ) );
     }
-    if( format & VertexFormat::Uv1 )
+    if( format & VertexFormat::TexCoord1 )
     {
-        inputLayout->attributeLocation( VertexBufferLayout::Uv1, 2, format.attributeOffset( VertexFormat::Uv1 ) );
+        inputLayout->attributeLocation( VertexTexCoord1, 2, format.attributeOffset( VertexFormat::TexCoord1 ) );
     }
     
     // Save an input layout to a pool

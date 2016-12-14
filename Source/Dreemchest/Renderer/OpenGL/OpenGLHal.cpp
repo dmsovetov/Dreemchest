@@ -387,7 +387,7 @@ void OpenGLHal::enableInputLayout( const u8 *pointer, const VertexBufferLayout* 
     #endif
     }
 
-    for( u32 i = 0; i < VertexBufferLayout::Uv4 - VertexBufferLayout::Uv0; i++ ) {
+    for( u32 i = 0; i < VertexTexCoord4 - VertexTexCoord0; i++ ) {
         const VertexBufferLayout::Element& uv = inputLayout->uv( i );
         
         if( !uv ) {
@@ -422,7 +422,7 @@ void OpenGLHal::disableInputLayout( const VertexBufferLayout* inputLayout )
     #endif
     }
 
-    for( u32 i = 0; i < VertexBufferLayout::Uv4 - VertexBufferLayout::Uv0; i++ ) {
+    for( u32 i = 0; i < VertexTexCoord4 - VertexTexCoord0; i++ ) {
         if( inputLayout->uv( i ) ) {
             glClientActiveTexture( GL_TEXTURE0 + i );
             glDisableClientState( GL_TEXTURE_COORD_ARRAY );

@@ -35,7 +35,7 @@ namespace Scene {
 // ** SpriteRenderSystem::SpriteRenderSystem
 SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& renderScene )
     : RenderSystem( context, renderScene )
-    , m_vertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 )
+    , m_vertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::TexCoord0 )
 {
     // Allocate and initialize an index buffer
     m_indices = allocateTrianleIndexBuffer( MaxSpritesInBatch * 2 );
@@ -148,7 +148,7 @@ void SpriteRenderSystem::emitSpriteVertices( void* vertices, s32 offset, const M
     for( s32 i = 0; i < 4; i++ ) {
         m_vertexFormat.setVertexAttribute( VertexFormat::Position, Vec3( transform * localSpaceVertex[i] ), vertices, offset + i );
         m_vertexFormat.setVertexAttribute( VertexFormat::Color, color.toInteger(), vertices, offset + i );
-        m_vertexFormat.setVertexAttribute( VertexFormat::Uv0, uv[i], vertices, offset + i );
+        m_vertexFormat.setVertexAttribute( VertexFormat::TexCoord0, uv[i], vertices, offset + i );
     }
 }
 

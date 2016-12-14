@@ -119,8 +119,8 @@ void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, Sta
     // Push a rendering state
     StateScope pass = stateStack.newScope();
     pass->bindProgram( m_shader );
-    pass->bindRenderedTexture( slot, State::Texture0, attachment );
-    pass->bindConstantBuffer( m_cbuffer, State::ConstantBufferType::PassConstants );
+    pass->bindRenderedTexture( slot, TextureSampler::Diffuse, attachment );
+    pass->bindConstantBuffer( m_cbuffer, Constants::Pass );
     pass->setCullFace( Renderer::TriangleFaceBack );
 
     // Emit a single rectangle

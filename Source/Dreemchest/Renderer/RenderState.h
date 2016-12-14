@@ -35,115 +35,17 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
-    //! Vertex attributes that are passed to a shader.
-    enum VertexAttributeFeatures
-    {
-          VertexNormal
-        , VertexColor
-        , VertexTangent
-        , VertexBitangent
-        , VertexPointSize
-        , VertexTexCoord0
-        , VertexTexCoord1
-        , VertexTexCoord2
-        , VertexTexCoord3
-        , VertexTexCoord4
-        , VertexTexCoord5
-        , VertexTexCoord6
-        , VertexTexCoord7
-        , TotalVertexAttributeFeatures
-    };
-
-    //! An offset of sampler features.
-    enum { SamplerFeaturesOffset = TotalVertexAttributeFeatures };
-
-    //! Texture samplers that can be enabled upon rendering.
-    enum SamplerFeatures
-    {
-          TextureSampler0
-        , TextureSampler1
-        , TextureSampler2
-        , TextureSampler3
-        , TextureSampler4
-        , TextureSampler5
-        , TextureSampler6
-        , TextureSampler7
-        , TotalSamplerFeatures
-    };
-
-    //! An offset of constant buffer features.
-    enum { CBufferFeaturesOffset = SamplerFeaturesOffset + TotalSamplerFeatures };
-
-    //! Constant buffers that can be bound upon rendering.
-    enum ConstantBufferFeatures
-    {
-          ConstantBuffer0
-        , ConstantBuffer1
-        , ConstantBuffer2
-        , ConstantBuffer3
-        , ConstantBuffer4
-        , ConstantBuffer5
-        , ConstantBuffer6
-        , ConstantBuffer7
-        , TotalConstantBufferFeatures
-    };
-
-    //! An offset of user-defined shader features.
-    enum { UserDefinedFeaturesOffset = CBufferFeaturesOffset + TotalConstantBufferFeatures };
-
-    //! A total number of available user-defined feature bits.
-    enum { MaxUserDefinedFeatureBits = 64 - UserDefinedFeaturesOffset };
-
-    //! Available user-defined shader features used by a scene renderer. 
-    enum SceneShaderFeatures
-    {
-          ShaderAmbientColor        = 0x1
-        , ShaderEmissionColor       = 0x2
-        , ShaderPointLight          = 0x4
-        , ShaderSpotLight           = 0x8
-        , ShaderDirectionalLight    = 0xC
-        , ShaderFogColor            = 0x10
-        , ShaderSpecularColor       = 0x20
-        , ShaderRimLight            = 0x40
-        , ShaderShadowFiltering1    = 0x80
-        , ShaderShadowFiltering2    = 0x100
-        , ShaderShadowFiltering3    = 0x180
-    };
-
-    // ------------------------------------------------------------------------------------------------
-
     //! A maximum number of state blocks that can be pushed onto a state stack.
     enum { MaxStateStackDepth = 10 };
 
     //! Render state defines a single state change.
     struct State
     {
-        //! Available constant buffers.
-        enum ConstantBufferType
-        {
-              GlobalConstants       //!< A constant buffer that stores global scene settings (ambient color, fog type, etc.).
-            , PassConstants         //!< A constant buffer that stores a pass variables (view-projection matrix, light color, etc.).
-            , InstanceConstants     //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
-            , MaterialConstants     //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
-            , LightConstants        //!< A constant buffer that stores light variables (color, position, etc.).
-            , ShadowConstants       //!< A constant buffer that stores shadow variables (transform, near, far, etc.).
-            , ClippingPlanes        //!< A constant buffer that stores clipping planes.
-            , MaxConstantBuffers    //!< A maximum number of supported constant buffers.
-        };
+        //!< A maximum number of supported constant buffers.
+        enum { MaxConstantBuffers = 8 };
 
-        //! Available texture samplers.
-        enum TextureSampler
-        {
-              Texture0
-            , Texture1
-            , Texture2
-            , Texture3
-            , Texture4
-            , Texture5
-            , Texture6
-            , Texture7
-            , MaxTextureSamplers    //!< A maximum number of supported texture samplers.
-        };
+        //!< A maximum number of supported texture samplers.
+        enum { MaxTextureSamplers = 8 };
 
         //! Available render state types.
         enum Type
@@ -179,13 +81,16 @@ namespace Renderer
                                         State( Renderer::Compare function, f32 reference );
 
                                         //! Constructs a constant buffer binding state.
-                                        State( ConstantBuffer_ id, ConstantBufferType type );
+                                        State( ConstantBuffer_ id, u8 index );
 
                                         //! Constructs a blend function render state.
                                         State( BlendFactor src, BlendFactor dst );
 
-                                        //! Constructs a texture binding state.
-                                        State( s32 id, TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetDepth );
+                                        //! Constructs a rendered texture binding state.
+                                        State( TransientRenderTarget id, u8 sampler, RenderTargetAttachment attachment );
+        
+                                        //! Constructs a rendered texture binding state.
+                                        State( Texture_ id, u8 sampler );
 
                                         //! Constructs a polygon offset state.
                                         State( f32 factor, f32 units );
@@ -237,16 +142,16 @@ namespace Renderer
         void                            bindFeatureLayout(FeatureLayout id);
 
         //! Binds a constant buffer to a pipeline.
-        void                            bindConstantBuffer(ConstantBuffer_ id, State::ConstantBufferType type);
+        void                            bindConstantBuffer(ConstantBuffer_ id, u8 index);
 
         //! Binds a program to a pipeline.
         void                            bindProgram(Program id);
 
         //! Binds a texture to a specified sampler.
-        void                            bindTexture(Texture_ id, State::TextureSampler sampler);
+        void                            bindTexture(Texture_ id, u8 sampler);
 
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture(TransientRenderTarget renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment = RenderTargetColor0);
+        void                            bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, RenderTargetAttachment attachment = RenderTargetColor0);
 
         //! Sets a blend function.
         void                            setBlend(BlendFactor src, BlendFactor dst);

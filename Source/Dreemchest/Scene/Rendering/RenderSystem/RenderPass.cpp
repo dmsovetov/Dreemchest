@@ -50,7 +50,7 @@ void RenderPassBase::renderWithColor( RenderFrame& frame, CommandBuffer& command
 
     // Push a material state
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( m_materialCBuffer, State::MaterialConstants );
+    state->bindConstantBuffer( m_materialCBuffer, Constants::Material );
 
     // Emit required render operations
     begin( frame, commands, stateStack );
@@ -75,7 +75,7 @@ void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMe
         StateScope renderableStates = stateStack.push( mesh.states );
 
         StateScope instance = stateStack.newScope();
-        instance->bindConstantBuffer( mesh.constantBuffer, State::InstanceConstants );
+        instance->bindConstantBuffer( mesh.constantBuffer, Constants::Instance );
 
         if( mesh.material.lighting == LightingModel::Unlit ) {
             instance->disableFeatures( ShaderAmbientColor );
@@ -102,7 +102,7 @@ void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointCloud
         StateScope renderableStates = stateStack.push( pointCloud.states );
 
         StateScope instance = stateStack.newScope();
-        instance->bindConstantBuffer( pointCloud.constantBuffer, State::InstanceConstants );
+        instance->bindConstantBuffer( pointCloud.constantBuffer, Constants::Instance );
 
         if( pointCloud.material.lighting == LightingModel::Unlit ) {
             instance->disableFeatures( ShaderAmbientColor );

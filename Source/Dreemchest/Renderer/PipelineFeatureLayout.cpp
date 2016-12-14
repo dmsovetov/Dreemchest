@@ -31,28 +31,52 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
     
+    //! An offset of sampler features.
+    enum
+    {
+        SamplerFeaturesOffset = MaxVertexAttributes
+    };
+    
+    //! An offset of constant buffer features.
+    enum
+    {
+        CBufferFeaturesOffset = SamplerFeaturesOffset + State::MaxTextureSamplers
+    };
+    
+    //! An offset of user-defined shader features.
+    enum
+    {
+        UserDefinedFeaturesOffset = CBufferFeaturesOffset + State::MaxConstantBuffers
+    };
+    
+    //! A total number of available user-defined feature bits.
+    enum
+    {
+        MaxUserDefinedFeatureBits = 64 - UserDefinedFeaturesOffset
+    };
+    
 // ------------------------------------------------------------------ PipelineFeature -------------------------------------------------------------------- //
     
-// ** PipelineFeature::mask
-PipelineFeatures PipelineFeature::mask(ConstantBufferFeatures index)
+// ** PipelineFeature::constantBuffer
+PipelineFeatures PipelineFeature::constantBuffer(u8 index)
 {
     return static_cast<PipelineFeatures>(1) << (CBufferFeaturesOffset + index);
 }
     
-// ** PipelineFeature::mask
-PipelineFeatures PipelineFeature::mask(VertexAttributeFeatures vertexAttribute)
+// ** PipelineFeature::vertexAttribute
+PipelineFeatures PipelineFeature::vertexAttribute(VertexAttribute vertexAttribute)
 {
     return static_cast<PipelineFeatures>(1) << vertexAttribute;
 }
 
-// ** PipelineFeature::mask
-PipelineFeatures PipelineFeature::mask(SamplerFeatures index)
+// ** PipelineFeature::sampler
+PipelineFeatures PipelineFeature::sampler(u8 index)
 {
     return static_cast<PipelineFeatures>(1) << (SamplerFeaturesOffset + index);
 }
     
-// ** PipelineFeature::mask
-PipelineFeatures PipelineFeature::mask(PipelineFeatures userDefined)
+// ** PipelineFeature::user
+PipelineFeatures PipelineFeature::user(PipelineFeatures userDefined)
 {
     return userDefined << UserDefinedFeaturesOffset;
 }
@@ -126,21 +150,21 @@ void PipelineState::activateVertexAttributes(PipelineFeatures features)
 // ** PipelineState::activateSampler
 void PipelineState::activateSampler(u8 index)
 {
-    NIMBLE_BREAK_IF(index >= TotalSamplerFeatures, "sampler index is out of range");
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(static_cast<SamplerFeatures>(index));
+    NIMBLE_BREAK_IF(index >= State::MaxTextureSamplers, "sampler index is out of range");
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::sampler(index);
 }
 
 // ** PipelineState::activateConstantBuffer
 void PipelineState::activateConstantBuffer(u8 index)
 {
-    NIMBLE_BREAK_IF(index >= TotalConstantBufferFeatures, "constant buffer index is out of range");
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(static_cast<ConstantBufferFeatures>(index));
+    NIMBLE_BREAK_IF(index >= State::MaxConstantBuffers, "constant buffer index is out of range");
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::constantBuffer(index);
 }
 
 // ** PipelineState::activateUserFeatures
 void PipelineState::activateUserFeatures(PipelineFeatures features)
 {
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(features);
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::user(features);
 }
 
 // ** PipelineState::beginStateBlock

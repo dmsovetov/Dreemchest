@@ -70,11 +70,11 @@ State::State(Compare function, f32 reference)
 }
 
 // ** State::State
-State::State(ConstantBuffer_ id, ConstantBufferType type)
+State::State(ConstantBuffer_ id, u8 index)
     : type(ConstantBuffer)
 {
     resourceId = id;
-    data.index = type;
+    data.index = index;
 }
 
 // ** State::State
@@ -85,10 +85,18 @@ State::State(BlendFactor src, BlendFactor dst)
 }
 
 // ** State::State
-State::State(s32 id, TextureSampler sampler, RenderTargetAttachment attachment)
-    : type( Texture )
+State::State(Texture_ id, u8 sampler)
+    : type(Texture)
 {
     resourceId = id;
+    data.index = sampler;
+}
+    
+// ** State::State
+State::State(TransientRenderTarget id, u8 sampler, RenderTargetAttachment attachment)
+    : type(Texture)
+{
+    resourceId = -static_cast<s32>(id);
     data.index = sampler | (attachment << 4);
 }
 
@@ -136,9 +144,9 @@ void StateBlock::bindFeatureLayout(FeatureLayout id)
 }
 
 // ** StateBlock::bindConstantBuffer
-void StateBlock::bindConstantBuffer(ConstantBuffer_ id, State::ConstantBufferType type)
+void StateBlock::bindConstantBuffer(ConstantBuffer_ id, u8 index)
 {
-    pushState( State( id, type ), State::ConstantBuffer + type );
+    pushState(State(id, index), State::ConstantBuffer + index);
 }
 
 // ** StateBlock::bindProgram
@@ -148,15 +156,15 @@ void StateBlock::bindProgram(Program id)
 }
 
 // ** StateBlock::bindTexture
-void StateBlock::bindTexture(Texture_ id, State::TextureSampler sampler)
+void StateBlock::bindTexture(Texture_ id, u8 sampler)
 {
-    pushState( State( id, sampler ), State::Texture + sampler );
+    pushState(State(id, sampler), State::Texture + sampler);
 }
 
 // ** StateBlock::bindRenderedTexture
-void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, State::TextureSampler sampler, RenderTargetAttachment attachment)
+void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, RenderTargetAttachment attachment)
 {
-    pushState( State( -static_cast<s32>(renderTarget), sampler, attachment ), State::Texture + sampler );
+    pushState(State(renderTarget, sampler, attachment), State::Texture + sampler);
 }
 
 // ** StateBlock::setBlend

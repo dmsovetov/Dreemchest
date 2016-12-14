@@ -162,12 +162,12 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
 
     if( clip ) {
         commands.uploadConstantBuffer( m_clipPlanesCBuffer, frame.internBuffer( clip, sizeof( RenderScene::CBuffer::ClipPlanes ) ), sizeof( RenderScene::CBuffer::ClipPlanes ) );
-        clipper->bindConstantBuffer( m_clipPlanesCBuffer, State::ClippingPlanes );
+        clipper->bindConstantBuffer( m_clipPlanesCBuffer, Constants::ClippingPlanes );
     }
 
     // Light state block
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( light.constantBuffer, State::LightConstants );
+    state->bindConstantBuffer( light.constantBuffer, Constants::Light );
     state->enableFeatures( lightType[light.light->type()] | ShaderShadowFiltering3 );
     state->bindProgram( m_phongShader );
     state->setBlend( Renderer::BlendOne, Renderer::BlendOne );
@@ -177,8 +177,8 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
     // Bind a rendered shadowmap
     if( shadows )
     {
-        state->bindRenderedTexture( shadows, State::Texture1, Renderer::RenderTargetDepth );
-        state->bindConstantBuffer( m_shadows.cbuffer(), State::ShadowConstants );
+        state->bindRenderedTexture( shadows, TextureSampler::Shadow, Renderer::RenderTargetDepth );
+        state->bindConstantBuffer( m_shadows.cbuffer(), Constants::Shadow );
     }
 
     // Emit render operations

@@ -70,16 +70,17 @@ class RendererInitialization : public ApplicationDelegate
         String fragmentShader =
 "void main()                                     \n"
 "{                                               \n"
-"#if F_Pink                                      \n"
+"#if defined( F_Pink )                           \n"
 "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);    \n"
 "#else                                           \n"
 "    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);    \n"
 "#endif  // F_Pink                               \n"
 "}";
+        const PipelineFeatures kPinkTriangle = BIT(0);
         
         Renderer::PipelineFeature features[] =
         {
-            { "F_Pink", Renderer::PipelineFeature::mask(BIT(0)) },
+            { "F_Pink", Renderer::PipelineFeature::user(kPinkTriangle) },
             { NULL }
         };
 
@@ -94,7 +95,7 @@ class RendererInitialization : public ApplicationDelegate
         m_renderState.bindInputLayout(inputLayout);
         m_renderState.bindProgram(program);
         m_renderState.bindFeatureLayout(featureLayout);
-        m_renderState.enableFeatures(BIT(0));
+        m_renderState.enableFeatures(kPinkTriangle);
         
         // Finally subscribe to updates events.
         window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleWindowUpdate ) );

@@ -84,7 +84,7 @@ TransientRenderTarget ShadowPass::render( RenderFrame& frame, CommandBuffer& com
 
     // Push a shadow pass scope
     StateScope state = stateStack.newScope();
-    state->bindConstantBuffer( m_cbuffer, State::ShadowConstants );
+    state->bindConstantBuffer( m_cbuffer, Constants::Shadow );
     state->bindProgram( m_shader );
     state->setCullFace( Renderer::TriangleFaceFront );
 

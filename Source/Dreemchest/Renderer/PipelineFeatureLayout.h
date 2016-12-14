@@ -33,7 +33,7 @@
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
-{
+{    
     //! A single pipeline feature item is a string identifier and a corrensponding bit mask.
     struct PipelineFeature
     {
@@ -41,16 +41,16 @@ namespace Renderer
         PipelineFeatures        bits;       //!< A corresponding pipeline feature mask.
         
         //! Generate a feature mask that corresponds to a specified vertex attribute.
-        static PipelineFeatures mask(VertexAttributeFeatures vertexAttribute);
+        static PipelineFeatures vertexAttribute(VertexAttribute vertexAttribute);
         
         //! Generate a feature mask that corresponds to a constant buffer binding at specified slot.
-        static PipelineFeatures mask(ConstantBufferFeatures index);
+        static PipelineFeatures constantBuffer(u8 index);
         
         //! Generate a feature mask that corresponds to a texture sampler binding at specified index.
-        static PipelineFeatures mask(SamplerFeatures index);
+        static PipelineFeatures sampler(u8 index);
         
         //! Generate a feature mask that corresponds to a user defined feature bits.
-        static PipelineFeatures mask(PipelineFeatures userDefined);
+        static PipelineFeatures user(PipelineFeatures userDefined);
     };
     
     //! A pipeline state contains an active shader and a bitmask of activated pipeline features.

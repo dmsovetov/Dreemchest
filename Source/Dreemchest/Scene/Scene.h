@@ -152,6 +152,47 @@ namespace Scene {
         , PlaneYZBit    = BIT( PlaneYZ )    //!< The YZ coordinate plane bit mask.
         , PlaneXZBit    = BIT( PlaneXZ )    //!< The XZ coordinate plane bit mask.
     };
+    
+    //! Available user-defined shader features used by a scene renderer.
+    enum SceneShaderFeatures
+    {
+          ShaderAmbientColor        = 0x1
+        , ShaderEmissionColor       = 0x2
+        , ShaderPointLight          = 0x4
+        , ShaderSpotLight           = 0x8
+        , ShaderDirectionalLight    = 0xC
+        , ShaderFogColor            = 0x10
+        , ShaderSpecularColor       = 0x20
+        , ShaderRimLight            = 0x40
+        , ShaderShadowFiltering1    = 0x80
+        , ShaderShadowFiltering2    = 0x100
+        , ShaderShadowFiltering3    = 0x180
+    };
+    
+    //! Constant buffer mappings.
+    struct Constants
+    {
+        enum
+        {
+              Global            //!< A constant buffer that stores global scene settings (ambient color, fog type, etc.).
+            , Pass              //!< A constant buffer that stores a pass variables (view-projection matrix, light color, etc.).
+            , Instance          //!< A constant buffer that stores instance variables (model matrix, instance color, etc.).
+            , Material          //!< A constant buffer that stores material variables (diffuse color, emission, etc.).
+            , Light             //!< A constant buffer that stores light variables (color, position, etc.).
+            , Shadow            //!< A constant buffer that stores shadow variables (transform, near, far, etc.).
+            , ClippingPlanes    //!< A constant buffer that stores clipping planes.
+        };
+    };
+    
+    //! Texture sampler mappings.
+    struct TextureSampler
+    {
+        enum
+        {
+              Diffuse
+            , Shadow
+        };
+    };
 
     // Alias the Ecs::Entity type
     typedef StrongPtr<Ecs::Entity>    SceneObjectPtr;

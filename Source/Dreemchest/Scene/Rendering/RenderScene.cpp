@@ -260,7 +260,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
 
     // Push a scene state block
     Renderer::StateScope scene = stateStack.newScope();
-    scene->bindConstantBuffer( m_sceneConstants, Renderer::State::GlobalConstants );
+    scene->bindConstantBuffer( m_sceneConstants, Constants::Global );
 
     // Clear all cameras
     const Cameras& cameras = m_cameras->data();

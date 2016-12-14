@@ -85,6 +85,26 @@ namespace Renderer {
     //! A container type to manage persistent resource identifiers.
     typedef IndexManager<PersistentResourceId> PersistentResourceIdentifiers;
     
+    //! Vertex attributes that are passed to a shader.
+    enum VertexAttribute
+    {
+          VertexPosition
+        , VertexNormal
+        , VertexColor
+        , VertexTexCoord0
+        , VertexTexCoord1
+        , VertexTexCoord2
+        , VertexTexCoord3
+        , VertexTexCoord4
+        , VertexTexCoord5
+        , VertexTexCoord6
+        , VertexTexCoord7
+        , VertexTangent
+        , VertexBitangent
+        , VertexPointSize
+        , MaxVertexAttributes
+    };
+    
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     struct RenderResourceType
     {

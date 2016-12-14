@@ -72,7 +72,7 @@ VertexBuffer_ TestRenderCache::requestVertexBuffer( const MeshHandle& mesh )
     NIMBLE_BREAK_IF( mesh->chunkCount() == 0, "could not cache an empty mesh" );
 
     const Mesh::VertexBuffer& vertices = mesh->vertexBuffer();
-    VertexFormat vertexFormat( VertexFormat::Normal | VertexFormat::Uv0 | VertexFormat::Uv1 );
+    VertexFormat vertexFormat( VertexFormat::Normal | VertexFormat::TexCoord0 | VertexFormat::TexCoord1 );
 
     VertexBuffer_ id = m_context->requestVertexBuffer( &vertices[0], vertices.size() * vertexFormat.vertexSize() );
     m_vertexBuffers[mesh.asset().uniqueId()] = id;
@@ -185,11 +185,11 @@ const TestRenderCache::MaterialNode* TestRenderCache::requestMaterial( const Mat
     node->constantBuffer    = m_context->requestConstantBuffer( &node->data, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
 
     // Now setup a material state block
-    node->states.bindConstantBuffer( node->constantBuffer, State::MaterialConstants );
+    node->states.bindConstantBuffer( node->constantBuffer, Constants::Material );
     for( s32 i = 0; i < Material::TotalMaterialLayers; i++ ) {
         Texture_ id = requestTexture( asset->texture( static_cast<Material::Layer>( i ) ) );
         if( id ) {
-            node->states.bindTexture( id, static_cast<State::TextureSampler>( State::Texture0 + i ) );
+            node->states.bindTexture( id, i );
         }
     }
 

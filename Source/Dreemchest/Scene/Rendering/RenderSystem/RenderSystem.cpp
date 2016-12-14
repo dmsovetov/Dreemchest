@@ -67,7 +67,7 @@ void RenderSystemBase::render( RenderFrame& frame, CommandBuffer& commands )
         // Camera state block
         const RenderScene::CameraNode& cameraNode = m_renderScene.findCameraNode( *i );
         StateScope pass = stateStack.newScope();
-        pass->bindConstantBuffer( cameraNode.constantBuffer, State::PassConstants );
+        pass->bindConstantBuffer( cameraNode.constantBuffer, Constants::Pass );
 
         // Emit render operations for this camera
         emitRenderOperations( frame, cameraCommands, stateStack, entity, camera, transform );

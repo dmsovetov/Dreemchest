@@ -33,7 +33,7 @@ namespace Scene
 
 // ** Mesh::Mesh
 Mesh::Mesh( void )
-    : m_vertexFormat( Renderer::VertexFormat::Normal | Renderer::VertexFormat::Uv0 | Renderer::VertexFormat::Uv1 )
+    : m_vertexFormat( Renderer::VertexFormat::Normal | Renderer::VertexFormat::TexCoord0 | Renderer::VertexFormat::TexCoord1 )
 {
 
 }

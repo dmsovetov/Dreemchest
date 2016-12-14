@@ -36,7 +36,7 @@ StreamedRenderPassBase::StreamedRenderPassBase( RenderingContext& context, Rende
     , m_maxVerticesInBatch( maxVerticesInBatch )
 {
     // Request a vertex buffer used for rendering
-    m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * VertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::Uv0 ).vertexSize() );
+    m_vertexBuffer = m_context.requestVertexBuffer( NULL, m_maxVerticesInBatch * VertexFormat( VertexFormat::Position | VertexFormat::Color | VertexFormat::TexCoord0 ).vertexSize() );
 }
 
 // ** StreamedRenderPassBase::end
@@ -152,7 +152,7 @@ void StreamedRenderPassBase::emitVertices( RenderFrame& frame, CommandBuffer& co
 {
     // Get an input layout for these vertices
     u8 vertexFormat = VertexFormat::Position;
-    if( uv ) vertexFormat     = vertexFormat | VertexFormat::Uv0;
+    if( uv ) vertexFormat     = vertexFormat | VertexFormat::TexCoord0;
     if( colors ) vertexFormat = vertexFormat | VertexFormat::Color;
 
     // Ensure that we have a space for these vertices
@@ -167,7 +167,7 @@ void StreamedRenderPassBase::emitVertices( RenderFrame& frame, CommandBuffer& co
             m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::Color, colors[i].toInteger(), m_activeBatch.stream, m_activeBatch.size + i );
         }
         if( uv ) {
-            m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::Uv0, uv[i], m_activeBatch.stream, m_activeBatch.size + i );
+            m_activeBatch.vertexFormat.setVertexAttribute( VertexFormat::TexCoord0, uv[i], m_activeBatch.stream, m_activeBatch.size + i );
         }
     }
 
