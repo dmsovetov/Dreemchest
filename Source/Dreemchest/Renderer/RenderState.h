@@ -167,7 +167,7 @@ namespace Renderer
                                         State( void );
 
                                         //! Constructs a State instance of specified type.
-                                        State( Type type, s32 id );
+                                        State( Type type, PersistentResourceId id );
 
                                         //! Constructs a cull face render state instance.
                                         State( TriangleFace face );
@@ -192,7 +192,7 @@ namespace Renderer
 
         union
         {
-            u16                         resourceId;         //!< Resource identifier to be bound to a pipeline.
+            PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
             struct

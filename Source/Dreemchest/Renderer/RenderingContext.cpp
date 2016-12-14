@@ -69,19 +69,13 @@ public:
     void                        popFrame( void );
     
     //! Returns a render target by a local index.
-    TransientRenderTarget    get( Index index ) const;
+    TransientRenderTarget       get( Index index ) const;
     
     //! Loads an acquired intermediate render target to a specified local slot.
     void                        load( Index index, TransientRenderTarget id );
     
     //! Unloads an intermediate render target from a specified local slot.
     void                        unload( Index index );
-    
-    //! Acquires an intermediate target with a specified parameters and loads it to a local slot.
-    //void                        acquire( Index index, u16 width, u16 height, PixelFormat format );
-    
-    //! Releases an intermediate target.
-    //void                        release( Index index );
     
 private:
     
@@ -142,21 +136,6 @@ void RenderingContext::TransientTargetStack::unload( Index index )
     m_stackFrame[index - 1] = 0;
 }
 
-// ** RenderingContext::TransientTargetStack::acquire
-//void RenderingContext::TransientTargetStack::acquire( Index index, u16 width, u16 height, PixelFormat format )
-//{
-//    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
-//    m_stackFrame[index - 1] = m_context.acquireRenderTarget( width, height, format );
-//}
-
-// ** RenderingContext::TransientTargetStack::release
-//void RenderingContext::TransientTargetStack::release( Index index )
-//{
-//    NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
-//    m_context.releaseRenderTarget( m_stackFrame[index - 1] );
-//    m_stackFrame[index - 1] = 0;
-//}
-    
 // --------------------------------------------------------- RenderingContext::ConstructionCommandBuffer --------------------------------------------------------- //
 
 //! An internal comamnd buffer type that is used for resource construction.

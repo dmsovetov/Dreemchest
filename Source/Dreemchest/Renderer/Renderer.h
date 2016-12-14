@@ -77,6 +77,12 @@ namespace Renderer {
     //! A pipeline feature mask type.
     typedef u64 PipelineFeatures;
     
+    //! A transient resource identifier type alias.
+    typedef u8 TransientResourceId;
+    
+    //! A persistent resource identifer type alias.
+    typedef u16 PersistentResourceId;
+    
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     struct RenderResourceType
     {
@@ -95,7 +101,7 @@ namespace Renderer {
     };
     
     //! A render resource identifier type.
-    template<RenderResourceType::Enum TResource, typename TIdentifier = u16>
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
     class ResourceIdentifier
     {
     friend class RenderingContext;
@@ -181,16 +187,16 @@ namespace Renderer {
     }
 
     //! Declare all render resource types.
-    typedef ResourceIdentifier<RenderResourceType::InputLayout> InputLayout;
-    typedef ResourceIdentifier<RenderResourceType::VertexBuffer> VertexBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::IndexBuffer> IndexBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::ConstantBuffer> ConstantBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::RenderTarget> RenderTarget_;
-    typedef ResourceIdentifier<RenderResourceType::Program> Program;
-    typedef ResourceIdentifier<RenderResourceType::Texture> Texture_;
-    typedef ResourceIdentifier<RenderResourceType::FeatureLayout> FeatureLayout;
+    typedef ResourceIdentifier<RenderResourceType::InputLayout, PersistentResourceId> InputLayout;
+    typedef ResourceIdentifier<RenderResourceType::VertexBuffer, PersistentResourceId> VertexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::IndexBuffer, PersistentResourceId> IndexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::ConstantBuffer, PersistentResourceId> ConstantBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::RenderTarget, PersistentResourceId> RenderTarget_;
+    typedef ResourceIdentifier<RenderResourceType::Program, PersistentResourceId> Program;
+    typedef ResourceIdentifier<RenderResourceType::Texture, PersistentResourceId> Texture_;
+    typedef ResourceIdentifier<RenderResourceType::FeatureLayout, PersistentResourceId> FeatureLayout;
     
-    typedef ResourceIdentifier<RenderResourceType::RenderTarget, u8> TransientRenderTarget;
+    typedef ResourceIdentifier<RenderResourceType::RenderTarget, TransientResourceId> TransientRenderTarget;
     
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource

@@ -40,7 +40,7 @@ State::State( void )
 }
 
 // ** State::State
-State::State( Type type, s32 id )
+State::State( Type type, PersistentResourceId id )
     : resourceId( id )
     , type( type )
 {

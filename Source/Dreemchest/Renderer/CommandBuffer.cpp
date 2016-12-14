@@ -69,7 +69,7 @@ void CommandBuffer::execute( const CommandBuffer& commands )
 }
 
 // ** CommandBuffer::renderToTarget
-CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRenderTarget index, const Rect& viewport )
+CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRenderTarget id, const Rect& viewport )
 {
     CommandBuffer& commands = frame.createCommandBuffer();
 
@@ -77,7 +77,7 @@ CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRende
     opCode.type = OpCode::RenderTarget;
     opCode.sorting = 0;
     opCode.renderTarget.commands = &commands;
-    opCode.renderTarget.index = index;
+    opCode.renderTarget.id = id;
     opCode.renderTarget.viewport[0] = viewport.min().x;
     opCode.renderTarget.viewport[1] = viewport.min().y;
     opCode.renderTarget.viewport[2] = viewport.width();
@@ -101,21 +101,21 @@ TransientRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 height,
     OpCode opCode;
     opCode.type = OpCode::AcquireRenderTarget;
     opCode.sorting = 0;
-    opCode.intermediateRenderTarget.index  = ++m_renderTargetIndex;
+    opCode.intermediateRenderTarget.id     = ++m_renderTargetIndex;
     opCode.intermediateRenderTarget.width  = width;
     opCode.intermediateRenderTarget.height = height;
     opCode.intermediateRenderTarget.format = format;
     push( opCode );
 
-    return TransientRenderTarget::create(opCode.intermediateRenderTarget.index);
+    return TransientRenderTarget::create(opCode.intermediateRenderTarget.id);
 }
 
 // ** CommandBuffer::releaseRenderTarget
-void CommandBuffer::releaseRenderTarget( TransientRenderTarget index )
+void CommandBuffer::releaseRenderTarget( TransientRenderTarget id )
 {
     OpCode opCode;
     opCode.type = OpCode::ReleaseRenderTarget;
-    opCode.intermediateRenderTarget.index = index;
+    opCode.intermediateRenderTarget.id = id;
     opCode.sorting = 0;
     push( opCode );
 }

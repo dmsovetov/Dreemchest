@@ -83,14 +83,14 @@ namespace Renderer
 
                 struct
                 {
-                    u8                          index;                      //!< A render target resource to be activated.
+                    TransientResourceId         id;                         //!< A render target resource to be activated.
                     f32                         viewport[4];                //!< A viewport value to be set.
                     const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
                 } renderTarget;
 
                 struct
                 {
-                    u8                          index;                      //!< An intermediate render target handle.
+                    TransientResourceId         id;                         //!< An intermediate render target handle.
                     s32                         width;                      //!< A requested render target width.
                     s32                         height;                     //!< A requested render target height.
                     PixelFormat                 format;                     //!< A requested render target format.
@@ -103,32 +103,32 @@ namespace Renderer
 
                 struct
                 {
-                    u16                         id;                         //!< A target buffer handle.
+                    PersistentResourceId        id;                         //!< A target buffer handle.
                     const void*                 data;                       //!< A source data point.
                     s32                         size;                       //!< A total number of bytes to upload.
                 } upload;
                 
                 struct
                 {
-                    u16                     id;                             //!< Handle to an input layout being constructed.
-                    u8                      format;                         //!< Vertex format used by an input layout constructor.
+                    PersistentResourceId        id;                         //!< Handle to an input layout being constructed.
+                    u8                          format;                     //!< Vertex format used by an input layout constructor.
                 } createInputLayout;
                 
                 struct
                 {
-                    u16                     id;                             //!< Handle to a buffer object being constructed.
-                    const void*             data;                           //!< Data that should be uploaded to a buffer after construction.
-                    s32                     size;                           //!< A buffer size.
-                    const void*             userData;                       //!< Used by a constant buffer constructor.
+                    PersistentResourceId        id;                         //!< Handle to a buffer object being constructed.
+                    const void*                 data;                       //!< Data that should be uploaded to a buffer after construction.
+                    s32                         size;                       //!< A buffer size.
+                    const void*                 userData;                   //!< Used by a constant buffer constructor.
                 } createBuffer;
                 
                 struct
                 {
-                    u16                     id;                             //!< Handle to a texture being constructed.
-                    const void*             data;                           //!< A texture data that should be uploaded after construction.
-                    u16                     width;                          //!< A texture width.
-                    u16                     height;                         //!< A texture height.
-                    Renderer::PixelFormat   format;                         //!< A texture format.
+                    PersistentResourceId        id;                         //!< Handle to a texture being constructed.
+                    const void*                 data;                       //!< A texture data that should be uploaded after construction.
+                    u16                         width;                      //!< A texture width.
+                    u16                         height;                     //!< A texture height.
+                    PixelFormat                 format;                     //!< A texture format.
                 } createTexture;
             };
         };
@@ -149,13 +149,13 @@ namespace Renderer
         void                        execute( const CommandBuffer& commands );
 
         //! Emits an acquire intermediate render target command.
-        TransientRenderTarget    acquireRenderTarget( s32 width, s32 height, PixelFormat format );
+        TransientRenderTarget       acquireRenderTarget( s32 width, s32 height, PixelFormat format );
 
         //! Emits a release an intermediate render target command.
-        void                        releaseRenderTarget( TransientRenderTarget index );
+        void                        releaseRenderTarget( TransientRenderTarget id );
 
         //! Emits a rendering to a viewport of a specified render target command.
-        CommandBuffer&              renderToTarget( RenderFrame& frame, TransientRenderTarget index, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        CommandBuffer&              renderToTarget( RenderFrame& frame, TransientRenderTarget id, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
         
         //! Emits a rendering to a viewport.
         CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );

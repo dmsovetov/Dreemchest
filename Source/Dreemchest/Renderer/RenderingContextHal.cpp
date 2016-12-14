@@ -127,17 +127,17 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                                 commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, layout);
                                                             }
                                                             break;
-        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.index, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
+        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.id, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                             break;
         case CommandBuffer::OpCode::AcquireRenderTarget:    {
                                                                 TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
-                                                                loadTransientTarget(opCode.intermediateRenderTarget.index, id);
+                                                                loadTransientTarget(opCode.intermediateRenderTarget.id, id);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::ReleaseRenderTarget:    {
-                                                                TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.index);
+                                                                TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.id);
                                                                 releaseRenderTarget(id);
-                                                                unloadTransientTarget(opCode.intermediateRenderTarget.index);
+                                                                unloadTransientTarget(opCode.intermediateRenderTarget.id);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::DrawIndexed:            {
