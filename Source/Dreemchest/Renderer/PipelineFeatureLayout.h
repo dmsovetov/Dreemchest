@@ -53,6 +53,73 @@ namespace Renderer
         static PipelineFeatures mask(PipelineFeatures userDefined);
     };
     
+    //! A pipeline state contains an active shader and a bitmask of activated pipeline features.
+    class PipelineState
+    {
+    public:
+        
+        //! A bitfields that encode changes in a pipeline state.
+        enum
+        {
+              ProgramChanged        = BIT(0)    //!< Indicates that a bound shader program was changed.
+            , FeaturesChanged       = BIT(1)    //!< Indicates that a pipeline feature bitmask was changed.
+            , FeatureLayoutChanged  = BIT(2)    //!< Indicates that a pipeline feature layout was changed.
+        };
+        
+                                        //! Constructs a PipelineState instance.
+                                        PipelineState( void );
+        
+        //! Sets an active program.
+        void                            setProgram(Program value);
+        
+        //! Returns an active program.
+        Program                         program( void ) const;
+        
+        //! Sets an active feature layout.
+        void                            setFeatureLayout(const PipelineFeatureLayout* value);
+        
+        //! Returns an active feature layout.
+        const PipelineFeatureLayout*    featureLayout( void ) const;
+        
+        //! Activates vertex attribute features.
+        void                            activateVertexAttributes(PipelineFeatures features);
+        
+        //! Activates a corresponding sampler bit in a feature bitmask.
+        void                            activateSampler(u8 index);
+        
+        //! Activates a corresponding constant buffer bit in a feature bitmask.
+        void                            activateConstantBuffer(u8 index);
+        
+        //! Activates a corresponding user defined bits in a feature bitmask.
+        void                            activateUserFeatures(PipelineFeatures features);
+        
+        //! This method should be called BEFORE applying state blocks to track pipeline changes.
+        void                            beginStateBlock( void );
+        
+        //! This method should be called AFTER all state block are applied to track pipeline changes.
+        void                            endStateBlock( void );
+        
+        //! Returns an active feature bitmask.
+        PipelineFeatures                features( void ) const;
+        
+        //! Returns a supported features bitmask.
+        PipelineFeatures                mask( void ) const;
+        
+        //! Returns a pipeline state changes bitmask.
+        u8                              changes( void ) const;
+        
+        //! This method should be called after activating a program permutation.
+        void                            acceptChanges( void );
+        
+    private:
+        
+        Program                         m_program;              //!< An active program.
+        PipelineFeatures                m_stateBlockFeatures;   //!< A bitmask of pipeline features activated by a list of state blocks.
+        PipelineFeatures                m_features;             //!< A bitmask of activated pipeline features.
+        const PipelineFeatureLayout*    m_featureLayout;        //!< An active feature layout.
+        u8                              m_changes;              //!< A bitmask of recorded pipeline state changed.
+    };
+    
     //! Pipeline feature layout defines mappings from a pipeline feature mask to actual preprocessor definitions.
     class PipelineFeatureLayout
     {

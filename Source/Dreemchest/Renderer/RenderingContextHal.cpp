@@ -322,9 +322,8 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
     PipelineFeatures userFeatures = 0;
     PipelineFeatures userFeaturesMask = ~0;
 
-    // Reset all ubershader features
-    m_vertexAttributeFeatures = 0;
-    m_resourceFeatures        = 0;
+    // This will start recording pipeline changes
+    m_pipeline.beginStateBlock();
 
     // A bitmask of states that were already set
     u32 activeStateMask = 0;
@@ -377,35 +376,37 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
     // Compose a user defined feature mask
     PipelineFeatures userDefined = PipelineFeature::mask(userFeatures & userFeaturesMask);
     
-    // Compose a new bitmaks with pipeline features
-    PipelineFeatures features = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined);
+    // Apply a user defined feature mask
+    m_pipeline.activateUserFeatures(userDefined);
     
-    return features;
+    // Finish applying state blocks
+    m_pipeline.endStateBlock();
+    
+    //return features;
+    return m_pipeline.features();
 }
     
 // ** RenderingContextHal::activateShaderPermutation
 void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
 {
-    // Finally apply a shader
-    NIMBLE_ABORT_IF( !m_activeShader.shader.valid(), "no valid shader set" );
-    NIMBLE_ABORT_IF( !m_activeShader.featureLayout, "no valid feature layout set" );
+    NIMBLE_ABORT_IF(!m_pipeline.program(), "no valid program set");
+    NIMBLE_ABORT_IF(!m_pipeline.featureLayout(), "no valid feature layout set");
     
-    // Select a shader permutation that match an active pipeline state
-    PipelineFeatures supported   = m_activeShader.featureLayout->mask();
-    features = features & supported;
-    //PipelineFeatures userDefined = userFeatures << UserDefinedFeaturesOffset;
-    //PipelineFeatures features    = (m_vertexAttributeFeatures | m_resourceFeatures | userDefined) & supported;
-    
-    if( m_activeShader.activeShader != m_activeShader.shader || m_activeShader.features != features || m_activeShader.featureLayout != m_activeShader.activeFeatureLayout)
+    // Do we have any pipeline changes that may invalidate an active program permutation?
+    if (m_pipeline.changes())
     {
-        m_activeShader.permutation  = compileShaderPermutation( m_activeShader.shader, features, m_activeShader.featureLayout );
-        m_activeShader.features     = features;
-        m_activeShader.activeShader = m_activeShader.shader;
-        m_activeShader.activeFeatureLayout = m_activeShader.featureLayout;
+        // Get an active program handle
+        Program program = m_pipeline.program();
+        
+        // Now compile a program permutation
+        m_activeProgram = compileShaderPermutation(m_shaders[program], m_pipeline.features(), m_pipeline.featureLayout());
+        
+        // Accept these changes
+        m_pipeline.acceptChanges();
     }
     
     // Bind an active shader permutation
-    m_hal->setShader( m_activeShader.permutation );
+    m_hal->setShader(m_activeProgram);
 }
     
 // ** RenderingContextHal::compileShaderPermutation
@@ -474,8 +475,7 @@ void RenderingContextHal::switchBlending( const RenderFrame& frame, const State&
 // ** RenderingContextHal::switchShader
 void RenderingContextHal::switchShader( const RenderFrame& frame, const State& state )
 {
-    m_activeShader.shader = m_shaders[state.resourceId];
-    NIMBLE_ABORT_IF(!m_activeShader.shader.valid(), "invalid resource id");
+    m_pipeline.setProgram(state.resourceId);
 }
 
 // ** RenderingContextHal::switchConstantBuffer
@@ -485,7 +485,7 @@ void RenderingContextHal::switchConstantBuffer( const RenderFrame& frame, const 
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
 
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | PipelineFeature::mask(static_cast<ConstantBufferFeatures>(state.data.index));
+    m_pipeline.activateConstantBuffer(state.data.index);
 }
 
 // ** RenderingContextHal::switchVertexBuffer
@@ -513,7 +513,7 @@ void RenderingContextHal::switchInputLayout( const RenderFrame& frame, const Sta
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features
-    m_vertexAttributeFeatures = inputLayout->features();
+    m_pipeline.activateVertexAttributes(inputLayout->features());
 }
     
 // ** RenderingContextHal::switchPipelineFeatureLayout
@@ -524,7 +524,7 @@ void RenderingContextHal::switchPipelineFeatureLayout( const RenderFrame& frame,
     NIMBLE_ABORT_IF(!featureLayout.get(), "invalid resource id");
     
     // Make this feature layout active
-    m_activeShader.featureLayout = featureLayout.get();
+    m_pipeline.setFeatureLayout(featureLayout.get());
 }
 
 // ** RenderingContextHal::switchTexture
@@ -551,7 +551,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     }
 
     // Update resource features
-    m_resourceFeatures = m_resourceFeatures | PipelineFeature::mask(static_cast<SamplerFeatures>(samplerIndex));
+    m_pipeline.activateSampler(samplerIndex);
 }
 
 // ** RenderingContextHal::switchCullFace

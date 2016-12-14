@@ -29,6 +29,7 @@
 
 #include "Ubershader.h"
 #include "RenderState.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -128,6 +129,7 @@ namespace Renderer
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
         IntermediateTargetStack*                m_intermediateTargets;                                  //!< An intermediate render target stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
+        PipelineState                           m_pipeline;                                             //!< An active pipeline state.
     };
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.

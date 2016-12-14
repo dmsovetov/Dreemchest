@@ -57,6 +57,127 @@ PipelineFeatures PipelineFeature::mask(PipelineFeatures userDefined)
     return userDefined << UserDefinedFeaturesOffset;
 }
     
+// ------------------------------------------------------------------ PipelineFeature -------------------------------------------------------------------- //
+    
+// ** PipelineState::PipelineState
+PipelineState::PipelineState( void )
+    : m_stateBlockFeatures(0)
+    , m_features(0)
+    , m_featureLayout(NULL)
+    , m_changes(0)
+{
+    
+}
+    
+// ** PipelineState::features
+PipelineFeatures PipelineState::features( void ) const
+{
+    return m_features;
+}
+
+// ** PipelineState::mask
+PipelineFeatures PipelineState::mask( void ) const
+{
+    return m_featureLayout ? m_featureLayout->mask() : 0;
+}
+
+// ** PipelineState::setProgram
+void PipelineState::setProgram(Program value)
+{
+    if (value == m_program)
+    {
+        return;
+    }
+    
+    m_program = value;
+    m_changes = m_changes | ProgramChanged;
+}
+    
+// ** PipelineState::program
+Program PipelineState::program( void ) const
+{
+    return m_program;
+}
+    
+// ** PipelineState::setFeatureLayout
+void PipelineState::setFeatureLayout(const PipelineFeatureLayout* value)
+{
+    if (value == m_featureLayout)
+    {
+        return;
+    }
+    
+    m_featureLayout = value;
+    m_changes = m_changes | FeatureLayoutChanged;
+}
+    
+// ** PipelineState::featureLayout
+const PipelineFeatureLayout* PipelineState::featureLayout( void ) const
+{
+    return m_featureLayout;
+}
+    
+// ** PipelineState::activateVertexAttributes
+void PipelineState::activateVertexAttributes(PipelineFeatures features)
+{
+    m_stateBlockFeatures = m_stateBlockFeatures | features;
+}
+
+// ** PipelineState::activateSampler
+void PipelineState::activateSampler(u8 index)
+{
+    NIMBLE_BREAK_IF(index >= TotalSamplerFeatures, "sampler index is out of range");
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(static_cast<SamplerFeatures>(index));
+}
+
+// ** PipelineState::activateConstantBuffer
+void PipelineState::activateConstantBuffer(u8 index)
+{
+    NIMBLE_BREAK_IF(index >= TotalConstantBufferFeatures, "constant buffer index is out of range");
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(static_cast<ConstantBufferFeatures>(index));
+}
+
+// ** PipelineState::activateUserFeatures
+void PipelineState::activateUserFeatures(PipelineFeatures features)
+{
+    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::mask(features);
+}
+
+// ** PipelineState::beginStateBlock
+void PipelineState::beginStateBlock( void )
+{
+    m_stateBlockFeatures = 0;
+}
+
+// ** PipelineState::endStateBlock
+void PipelineState::endStateBlock( void )
+{
+    // Mask activated features with a feature layout mask to reject those features that won't be used by a shader program.
+    PipelineFeatures features = m_stateBlockFeatures & mask();
+    
+    // Do we have any changes?
+    if (m_stateBlockFeatures == features)
+    {
+        return;
+    }
+    
+    // Save this feature bitmask and record changes in a bitmask.
+    m_features = features;
+    m_changes  = m_changes | FeaturesChanged;
+}
+    
+// ** PipelineState::changes
+u8 PipelineState::changes( void ) const
+{
+    return m_changes;
+}
+    
+// ** PipelineState::acceptChanges
+void PipelineState::acceptChanges( void )
+{
+    m_changes = 0;
+}
+    
 // ---------------------------------------------------------------- PipelineFeatureLayout ---------------------------------------------------------------- //
     
 // ** PipelineFeatureLayout::PipelineFeatureLayout

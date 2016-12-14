@@ -138,21 +138,7 @@ namespace Renderer
         //! State switcher function callback.
         typedef void ( RenderingContextHal::*StateSwitch )( const RenderFrame&, const State& );
 
-        //! A helper structure to store an active shader state.
-        struct ActiveShader
-        {
-            UbershaderWPtr                  shader;                 //!< A shader instance that should be used.
-            UbershaderWPtr                  activeShader;           //!< A shader instance that is now bound.
-            PipelineFeatures                features;               //!< An active permutation.
-            ShaderPtr                       permutation;            //!< A shader permutation instance.
-            const PipelineFeatureLayout*    featureLayout;
-            const PipelineFeatureLayout*    activeFeatureLayout;
 
-                                            //! Constructs an ActiveShader instance.
-                                            ActiveShader( void )
-                                                : features( 0 ), featureLayout( NULL ), activeFeatureLayout( NULL ) {}
-        };
-        
         Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.
         FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
         FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
@@ -160,9 +146,7 @@ namespace Renderer
         FixedArray<TexturePtr>              m_textures;                             //!< Allocated textures.
 
         StateSwitch                         m_stateSwitches[State::TotalStates];    //!< Function callbacks to switch states.
-        PipelineFeatures                    m_vertexAttributeFeatures;              //!< A vertex attribute features.
-        PipelineFeatures                    m_resourceFeatures;                     //!< Active resource features.
-        ActiveShader                        m_activeShader;                         //!< An active shader instance.
+        ShaderPtr                           m_activeProgram;                        //!< An active program permutation.
         Stack<const f32*>                   m_viewportStack;                        //!< A viewport stack.
         
         //! A helper struct that hold info about an intermediate render target.

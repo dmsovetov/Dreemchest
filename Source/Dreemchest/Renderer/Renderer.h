@@ -114,6 +114,9 @@ namespace Renderer {
                                     //! Returns true if this resource identifier is valid.
                                     operator bool( void ) const;
         
+        //! Compares two resource identifiers.
+        bool                        operator == (const ResourceIdentifier& other) const;
+        
         //! Create a resource identifier from a specified value.
         static ResourceIdentifier   create(TIdentifier value);
         
@@ -163,6 +166,13 @@ namespace Renderer {
         return m_id != 0;
     }
     
+    // ** ResourceIdentifier::operator ==
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
+    NIMBLE_INLINE bool ResourceIdentifier<TResource, TIdentifier>::operator == (const ResourceIdentifier& other) const
+    {
+        return m_id == other.m_id;
+    }
+    
     // ** ResourceIdentifier::operator TIdentifier
     template<RenderResourceType::Enum TResource, typename TIdentifier>
     ResourceIdentifier<TResource, TIdentifier> ResourceIdentifier<TResource, TIdentifier>::create(TIdentifier value)
@@ -200,6 +210,7 @@ namespace Renderer {
     class VertexFormat;
     struct ConstantBufferLayout;
     class RenderFrame;
+    class PipelineFeatureLayout;
     
     //! Render command buffer unique pointer type.
     typedef UPtr<class CommandBuffer> CommandBufferUPtr;
