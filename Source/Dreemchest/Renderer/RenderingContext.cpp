@@ -508,7 +508,7 @@ s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s3
     }
     
     // Compose a user defined feature mask
-    userDefined = PipelineFeature::mask(userFeatures & userFeaturesMask);
+    userDefined = userFeatures & userFeaturesMask;
     
     return statesWritten;
 }

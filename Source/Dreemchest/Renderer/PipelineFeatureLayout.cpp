@@ -156,7 +156,7 @@ void PipelineState::endStateBlock( void )
     PipelineFeatures features = m_stateBlockFeatures & mask();
     
     // Do we have any changes?
-    if (m_stateBlockFeatures == features)
+    if (m_features == features)
     {
         return;
     }
