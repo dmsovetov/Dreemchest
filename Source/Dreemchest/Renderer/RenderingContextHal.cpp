@@ -352,8 +352,6 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
 // ** RenderingContextHal::activateShaderPermutation
 void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
 {
-    NIMBLE_ABORT_IF(!m_pipeline.featureLayout(), "no valid feature layout set");
-    
     // Get an active program
     Program program = m_pipeline.program();
     NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
@@ -405,7 +403,7 @@ ShaderPtr RenderingContextHal::compileShaderPermutation(Program program, Pipelin
     String macro = "";
     String debug = "";
     
-    for( u32 i = 0, n = featureLayout->elementCount(); i < n; i++ )
+    for( u32 i = 0, n = featureLayout && featureLayout->elementCount(); i < n; i++ )
     {
         const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
         

@@ -62,24 +62,15 @@ class RendererInitialization : public ApplicationDelegate
             0, 1, 2
         };
         
-        static PipelineFeature features[] =
-        {
-              { "F_Instance", PipelineFeature::mask(ConstantBuffer2) }
-            , { "F_View",     PipelineFeature::mask(ConstantBuffer1) }
-            , { NULL }
-        };
-        
         // Request all required resources from a rendering context
         Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(0);
         Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
         Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
-        Renderer::FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(features);
         
         // Setup a render state block that will be used during rendering
         m_renderState.bindVertexBuffer(vertexBuffer);
         m_renderState.bindIndexBuffer(indexBuffer);
         m_renderState.bindInputLayout(inputLayout);
-        m_renderState.bindFeatureLayout(featureLayout);
         
         // Finally subscribe to updates events.
         window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleWindowUpdate ) );
