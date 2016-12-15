@@ -199,33 +199,8 @@ void RenderingContextHal::commandCreateInputLayout(InputLayout id, u8 vertexForm
 {
     //NIMBLE_BREAK_IF( m_inputLayouts[id].get(), "resource was already constructed" );
     
-    // Create an input layout vertex format
-    VertexFormat format( vertexFormat );
-    
     // Create an input layout
-    VertexBufferLayout* inputLayout = DC_NEW VertexBufferLayout( format.vertexSize() );
-    
-    // Add vertex attributes to an input layout
-    if( format & VertexFormat::Position )
-    {
-        inputLayout->attributeLocation( VertexPosition, 3, format.attributeOffset( VertexFormat::Position ) );
-    }
-    if( format & VertexFormat::Color )
-    {
-        inputLayout->attributeLocation( VertexColor, 4, format.attributeOffset( VertexFormat::Color ) );
-    }
-    if( format & VertexFormat::Normal )
-    {
-        inputLayout->attributeLocation( VertexNormal, 3, format.attributeOffset( VertexFormat::Normal ) );
-    }
-    if( format & VertexFormat::TexCoord0 )
-    {
-        inputLayout->attributeLocation( VertexTexCoord0, 2, format.attributeOffset( VertexFormat::TexCoord0 ) );
-    }
-    if( format & VertexFormat::TexCoord1 )
-    {
-        inputLayout->attributeLocation( VertexTexCoord1, 2, format.attributeOffset( VertexFormat::TexCoord1 ) );
-    }
+    VertexBufferLayoutUPtr inputLayout = createVertexBufferLayout(vertexFormat);
     
     // Save an input layout to a pool
     m_inputLayouts.emplace(id, inputLayout);

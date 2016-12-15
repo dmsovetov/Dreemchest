@@ -28,6 +28,7 @@
 #include "RenderingContextHal.h"
 #include "CommandBuffer.h"
 #include "VertexFormat.h"
+#include "VertexBufferLayout.h"
 #include "RenderFrame.h"
 
 #include "../Io/DiskFileSystem.h"
@@ -512,6 +513,37 @@ s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s3
     
     return statesWritten;
 }
+    
+// ** RenderingContext::createVertexBufferLayout
+VertexBufferLayoutUPtr RenderingContext::createVertexBufferLayout(VertexFormat vertexFormat) const
+{
+    // Create an input layout
+    VertexBufferLayoutUPtr inputLayout = DC_NEW VertexBufferLayout(vertexFormat.vertexSize());
+    
+    // Add vertex attributes to an input layout
+    if(vertexFormat & VertexFormat::Position)
+    {
+        inputLayout->attributeLocation(VertexPosition, 3, vertexFormat.attributeOffset(VertexFormat::Position));
+    }
+    if(vertexFormat & VertexFormat::Color)
+    {
+        inputLayout->attributeLocation(VertexColor, 4, vertexFormat.attributeOffset(VertexFormat::Color));
+    }
+    if(vertexFormat & VertexFormat::Normal)
+    {
+        inputLayout->attributeLocation(VertexNormal, 3, vertexFormat.attributeOffset(VertexFormat::Normal));
+    }
+    if(vertexFormat & VertexFormat::TexCoord0)
+    {
+        inputLayout->attributeLocation(VertexTexCoord0, 2, vertexFormat.attributeOffset(VertexFormat::TexCoord0));
+    }
+    if(vertexFormat & VertexFormat::TexCoord1)
+    {
+        inputLayout->attributeLocation(VertexTexCoord1, 2, vertexFormat.attributeOffset(VertexFormat::TexCoord1));
+    }
+    
+    return inputLayout;
+}
 
 // ** RenderingContext::deprecatedRequestShader
 Program RenderingContext::deprecatedRequestShader(const String& fileName)
@@ -548,6 +580,7 @@ Program RenderingContext::deprecatedRequestShader(const String& fileName)
     
     return requestProgram(vertexShader, fragmentShader);
 }
+    
 /*
 // ** RenderingContext::requestShader
 Program RenderingContext::requestShader(const String& vertex, const String& fragment)

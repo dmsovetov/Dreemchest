@@ -83,7 +83,13 @@ namespace Renderer {
     typedef u16 PersistentResourceId;
     
     //! A container type to manage persistent resource identifiers.
-    typedef IndexManager<PersistentResourceId> PersistentResourceIdentifiers;
+    typedef IndexManager<PersistentResourceId>  PersistentResourceIdentifiers;
+    
+    //! A unique pointer type for a vertex buffer layout instance.
+    typedef UPtr<class VertexBufferLayout>      VertexBufferLayoutUPtr;
+    
+    //! A unique pointer type for a pipeline feature layout instance.
+    typedef UPtr<class PipelineFeatureLayout>   PipelineFeatureLayoutUPtr;
     
     //! Vertex attributes that are passed to a shader.
     enum VertexAttribute

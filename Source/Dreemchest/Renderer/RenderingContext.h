@@ -108,6 +108,9 @@ namespace Renderer
         //! Returns an intermediate render target at specified slot.
         TransientRenderTarget                   intermediateTarget(u8 index);
         
+        //! Creates a vertex buffer layout instance from a flexible vertex format.
+        VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;
+        
     private:
         
         //! Allocates a new render resource identifier of specified type.
@@ -124,12 +127,6 @@ namespace Renderer
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
         
-        //! A unique pointer type for a vertex buffer layout instance.
-        typedef UPtr<VertexBufferLayout>        VertexBufferLayoutUPtr;
-        
-        //! A unique pointer type for a pipeline feature layout instance.
-        typedef UPtr<PipelineFeatureLayout>     PipelineFeatureLayoutUPtr;
-        
         PersistentResourceIdentifiers           m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
@@ -145,6 +142,9 @@ namespace Renderer
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.
     RenderingContextPtr createDeprecatedRenderingContext( HalWPtr hal );
+    
+    //! Creates a rendering context that uses an OpenGL 2 rendering API.
+    RenderingContextPtr createOpenGL2RenderingContext( void );
     
 } // namespace Renderer
 

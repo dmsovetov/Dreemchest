@@ -122,7 +122,7 @@ namespace Renderer
         void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);
         
         //! Acquires an intermediate render target.
-        TransientRenderTarget    acquireRenderTarget( u16 width, u16 height, PixelFormat format );
+        TransientRenderTarget       acquireRenderTarget( u16 width, u16 height, PixelFormat format );
         
         //! Releases an intermediate render target.
         void                        releaseRenderTarget( TransientRenderTarget id );
